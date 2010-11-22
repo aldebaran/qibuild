@@ -1,13 +1,8 @@
 ##
-## debug.cmake
-## Login : <ctaf@ctaf-maptop>
-## Started on  Sat Oct 10 02:45:29 2009 Cedric GESTES
-## $Id$
-##
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009 Aldebaran Robotics
+## Copyright (C) 2009, 2010 Aldebaran Robotics
 ##
 
 ############################
@@ -15,29 +10,29 @@
 # display debug
 #
 ############################
-function(debug)
+function(qi_debug)
   if($ENV{DEBUG})
     message(STATUS "${ARGN}")
   endif($ENV{DEBUG})
-endfunction(debug)
+endfunction()
 
 ############################
 #
 # display verbose
 #
 ############################
-function(verbose)
+function(qi_verbose)
   if($ENV{VERBOSE})
     message(STATUS "${ARGN}")
   endif($ENV{VERBOSE})
-endfunction(verbose)
+endfunction()
 
 ############################
 #
 # display info
 #
 ############################
-function(info)
+function(qi_info)
   if(DEFINED ENV{INFO})
     if($ENV{INFO} EQUAL 0)
       return()
@@ -45,25 +40,25 @@ function(info)
   endif(DEFINED ENV{INFO})
 
   message(STATUS "${ARGN}")
-endfunction(info)
+endfunction()
 
 ############################
 #
 # display warning
 #
 ############################
-function(warning)
+function(qi_warning)
   message(WARNING "${ARGN}")
-endfunction(warning)
+endfunction()
 
 ############################
 #
 # display error
 #
 ############################
-function(error)
+function(qi_error)
   message(STATUS "${ARGN}")
   #use "" to force the use of ; when displaying list
   message(FATAL_ERROR "")
-endfunction(error)
+endfunction()
 

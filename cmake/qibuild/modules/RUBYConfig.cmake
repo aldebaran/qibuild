@@ -6,18 +6,17 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2008, 2010 Aldebaran Robotics
+## Copyright (C) 2008 Aldebaran Robotics
 
 include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
 
 clean(RUBY)
-fpath(RUBY ruby/ruby.h PATH_SUFFIXES ruby-1.9.1)
-fpath(RUBY ruby/config.h PATH_SUFFIXES ruby-1.9.1/x86_64-linux )
+fpath(RUBY ruby/ruby.h)
 
 IF( WIN32 )
   flib(RUBY msvcrt-ruby18-static)
 ELSE( WIN32 )
-  flib(RUBY ruby-static ruby)
+  flib(RUBY ruby-static)
 ENDIF( WIN32 )
 
 export_lib(RUBY)
