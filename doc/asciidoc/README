@@ -1,0 +1,5 @@
+== Generating the doc ==
+
+Asciidoc should be called after generate_doc_from_cmake.py with the following arguments:
+
+asciidoc -a pygments -a theme=bare -a toc qibuild/submodule.cmake.txt
