@@ -7,10 +7,12 @@
 
 function(_test_submodule_create)
   message("Testing qi_submodule_create")
+  message(STATUS "")
 endfunction()
 
 function(_test_submodule_add)
   message("Testing qi_submodule_create")
+  message(STATUS "")
 endfunction()
 
 

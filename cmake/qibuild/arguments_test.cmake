@@ -18,6 +18,7 @@ function(_test_arguments_flags)
   qi_expect_false(${argn_flag_is_current})
   qi_expect_false("${argn_flag_is_current}")
   qi_expect_strequal("${argn_remaining}" "BOYS;titi;tutu;GIRLS;foo;bar")
+  message(STATUS "")
 endfunction()
 
 
@@ -33,6 +34,7 @@ function(_test_arguments_params)
   qi_expect_strequal("${argn_param_boys}"    "")
   qi_expect_strequal("${argn_param_girls}"   "")
   qi_expect_strequal("${argn_remaining}"     "BOYS;titi;tutu;GIRLS;foo;bar;IS_CUTE;NAME;bite")
+  message(STATUS "")
 endfunction()
 
 function(_test_arguments_groups)
@@ -47,6 +49,7 @@ function(_test_arguments_groups)
   qi_expect_strequal("${argn_group_name}"    "")
   qi_expect_strequal("${argn_group_desc}"    "")
   qi_expect_strequal("${argn_remaining}"     "NAME;titi;DESC;wistiti")
+  message(STATUS "")
 endfunction()
 
 function(_test_arguments_all)
@@ -69,6 +72,7 @@ function(_test_arguments_all)
   qi_expect_strequal("${argn_group_metro}"   "")
 
   qi_expect_strequal("${argn_remaining}"     "")
+  message(STATUS "")
 endfunction()
 
 
