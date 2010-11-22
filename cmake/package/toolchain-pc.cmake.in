@@ -1,0 +1,16 @@
+#DO NOT EDIT
+#DO NOT CHANGE LOCATION, THIS FILE ONLY WORKS IN THE ROOT OF A FULL SDK
+cmake_minimum_required(VERSION 2.6.4)
+get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+
+set(TOOLCHAIN_DIR "${_ROOT_DIR}/lib/" CACHE STRING "" FORCE)
+set(SDK_DIRS "${_ROOT_DIR}")
+set(SDK_ARCH @SDK_ARCH@)
+include("${TOOLCHAIN_DIR}/cmake/Toolchain-generic.cmake")
+
+
+# This is a bit unusual: result of the compilation will always
+# be put in this directory
+set(SDK_DIR
+  "${_ROOT_DIR}"
+)

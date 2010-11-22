@@ -1,0 +1,7 @@
+@echo off
+setlocal
+set PATH="%PATH%;@_path@"
+set PYTHONPATH=@_python_path@
+"@_exec_path@" %*
+endlocal
+exit %ERRORLEVEL%

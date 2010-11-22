@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioUserFile
+	ProjectType="Visual C++"
+	Version="9.00"
+	ShowAllFiles="false"
+	>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			>
+			<DebugSettings
+				Command="@DEBUG_COMMAND@"
+				WorkingDirectory="@NATIVE_SDK_DIR@"
+                                RemoteMachine="@REMOTE_MACHINE@"
+                                Environment="@ENV@"
+				EnvironmentMerge="true"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			>
+			<DebugSettings
+				Command="@RELEASE_COMMAND@"
+				WorkingDirectory="@NATIVE_SDK_DIR@"
+                                RemoteMachine="@REMOTE_MACHINE@"
+                                Environment="@ENV@"
+				EnvironmentMerge="true"
+			/>
+	</Configurations>
+</VisualStudioUserFile>

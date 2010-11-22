@@ -1,0 +1,8 @@
+@echo off
+setlocal
+set SDK_DIR=%~dp0
+set PATH=%SDK_DIR%\lib
+set PYTHONPATH=%SDK_DIR%\@_SDK_LIB@
+"%SDK_DIR%\@_SDK_BIN@\@_binary_name@" %*
+endlocal
+exit %ERRORLEVEL%

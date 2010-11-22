@@ -1,0 +1,8 @@
+#!/bin/bash
+IFS="
+"
+
+export DYLD_LIBRARY_PATH="@_dyld_path@"
+export DYLD_FRAMEWORK_PATH="@_framework_path@"
+export PYTHONPATH="@_python_path@"
+exec "@_exec_path@" $@
