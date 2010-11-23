@@ -9,7 +9,7 @@
 # =================
 # Cedric GESTES <gestes@aldebaran-robotics.com>
 
-#! == SubModule ==
+#!
 # This Cmake module behave more or less like a library, but does not produce
 # any output, you can use submodule to organise your CMakeLists.txt more efficiently
 # but you need to call qi_create_bin or qi_create_lib to make use of your submodule.
