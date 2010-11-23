@@ -1,0 +1,63 @@
+QiBuild Cmake Framework
+=======================
+Cedric GESTES <cgestes@aldebaran-robotics.com>
+
+Programmer guides
+-----------------
+QiBuild is a set of cmake libraries.
+
+link:tutorials.html[tutorials]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+General consideration about the sdk concept. This documentation explain
+the global mecanism behind sdk. You will find information on the
+directory structure, how file are searched and organise.
+
+
+QiBuild API
+-----------
+
+link:arguments.html[QiBuild Arguments]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Functions usefull to parse arguments of a cmake function.
+
+* link:arguments.html#_qi_argn_init[qi_argn_init]
+* link:arguments.html#_qi_argn_flags[qi_argn_flags]
+* link:arguments.html#_qi_argn_params[qi_argn_params]
+* link:arguments.html#_qi_argn_groups[qi_argn_groups]
+
+
+link:submodule.html[QiBuild Submodule]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Submodule represent a group of sources and dependencies. They help
+have clean separated CMakeLists.txt when creating big libraries or
+binaries.
+
+* link:submodule.html#_qi_submodule_create[qi_submodule_create]
+* link:submodule.html#_qi_submodule_add[qi_submodule_add]
+
+link:log.html[QiBuild Log]
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Simple module to display log messages.
+
+* link:log.html#_qi_debug[qi_debug]
+* link:log.html#_qi_verbose[qi_verbose]
+* link:log.html#_qi_info[qi_info]
+* link:log.html#_qi_deprecated[qi_deprecated]
+* link:log.html#_qi_warning[qi_warning]
+* link:log.html#_qi_error[qi_error]
+
+
+
+
+
+
+[format="csv",cols="4",align="left"]
+[frame="none",grid="none",options="autowidth"]
+|======
++*[red]#qi_submodule_create#*(+,+_<name>_+,                               ,
+                    ,+*NO_SOURCE_GROUP*+ ,                     ,
+                    ,+*SOURCE_GROUP*+    , +_<source_group>_+    ,
+                    ,+*SRC*+             , +_<src> .._+           ,
+                    ,+*DEPENDENCIES*+    , +_<dependencies> .._+ ,
+                    ,+*PUBLIC_HEADER*+   , +_<public_header> .._+, +)+
+|======
