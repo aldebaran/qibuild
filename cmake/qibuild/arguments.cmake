@@ -5,15 +5,42 @@
 ## Copyright (C) 2009, 2010 Aldebaran Robotics
 ##
 
+#! QiBuild Arguments
+# ==================
+# Cedric GESTES <gestes@aldebaran-robotics.com>
+
+#! == Arguments ==
+# This modules ease the parsing of arguments.
+# Arguments are splitted by types, there could be:
 #
-#regroup argument parsing functions
+# * args: positionnal arguments
+# * flags: boolean value, the flags could be present or not (IS_OPEN?)
+# * params: simple optional parameter
+# * groups: list of optional arguments
 #
+#
+
+
+#!
+# Init parsing
+# most of the time you only want to call this function with ${ARGN} of the calling function.
+# This function must always be called once before other qi_argn_ functions.
+#
+# \argn:parameters parameters parsed by later call to qi_argn_ functions.
+# \example:qi_arguments
 function(qi_argn_init)
   set(argn_init TRUE PARENT_SCOPE)
   set(argn_remaining ${ARGN} PARENT_SCOPE)
 endfunction()
 
-
+#!
+# parse flags.
+# For each flags a variable of the form 'argn_flags_<paramname>' (all in lower case) will be set in the parent scope.
+# Remaining args will be in argn_remaining.
+#
+# WARNING: must be called before qi_argn_groups and qi_argn_params
+#
+# \argn:flags: flags list
 function(qi_argn_flags)
   if (NOT argn_init)
     qi_error("You should not call qi_argn_init before calling qi_argn_flags")
@@ -55,7 +82,12 @@ function(qi_argn_flags)
 
 endfunction()
 
-
+#!
+# parse groups of arguments.
+# For each groups a variable of the form 'argn_groups_<paramname>' (all in lower case) will be set in the parent scope.
+# remaining args will be in argn_remaining.
+#
+# \argn:groups groups list
 function(qi_argn_groups)
   if (NOT argn_init)
     qi_error("You should not call qi_argn_init before calling qi_argn_groups")
@@ -113,7 +145,13 @@ endfunction()
 
 
 
-
+#!
+# parse single optional parameters.
+# For each parameters a variable of the form 'argn_params_<paramname>' (all in lower case) will be set in the parent scope.
+# remaining args will be in argn_remaining.
+# WARNING: must be called before qi_argn_groups
+#
+# \argn:parameters: parameters list
 function(qi_argn_params)
   if (NOT argn_init)
     qi_error("You should not call qi_argn_init before calling qi_argn_params")
