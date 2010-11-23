@@ -14,7 +14,7 @@ nameregex = re.compile('# \\\\(\S*?):(\S.*?)\s+(.*)')
 
 class FunctionContext:
     """ store the documentation of a function """
-    def __init__(self):
+    def __init__(self, exampledir):
         self.name     = None
         self.desc     = None
         self.args     = dict()
@@ -22,6 +22,7 @@ class FunctionContext:
         self.params   = dict()
         self.groups   = dict()
         self.examples = dict()
+        self.exampledir = exampledir
 
     def _extractName(self, dp):
         """ extract a command with it's name and a description
@@ -86,6 +87,18 @@ class FunctionContext:
         self.desc = docline
         #print "description:", "".join(self.desc)
 
+    def getDoc(self, sample):
+        """ get an example """
+        p = os.path.join(self.exampledir, sample)
+        if not os.path.exists(p):
+            p += ".cmake"
+        if os.path.exists(p):
+            with open(p, "r") as f:
+                lines = f.readlines()
+            lines = [ x.strip() for x in lines ]
+            return lines
+        return list()
+
     def generate(self):
         #this is doc only, not a function...
         docline = list()
@@ -130,6 +143,7 @@ class FunctionContext:
             docline.append(".Example %s" % k)
             docline.append("[source,cmake]")
             docline.append("----")
+            docline.extend(self.getDoc(k))
             #TODO: source the sample
             docline.append("----")
             docline.append("")
@@ -171,11 +185,11 @@ def doc_process_command(dp, fc):
         doclines.append(dp.get_line())
     return doclines
 
-def doc_process(dp):
+def doc_process(dp, exampledir):
 
     getdoc = 0
     doclines = list()
-    fc = FunctionContext()
+    fc = FunctionContext(exampledir)
     while dp.has_next():
         current_index = dp.index
         line = dp.preview_line()
@@ -184,7 +198,7 @@ def doc_process(dp):
         if line.startswith("function") and getdoc:
             fc.extractFunctionName(dp)
             doclines.extend(fc.generate())
-            fc = FunctionContext()
+            fc = FunctionContext(exampledir)
             getdoc = 0
             #print "getdoc0:", line
 
@@ -220,13 +234,10 @@ def extract_doc_from_cmake(fname, exampledir):
     with open(fname, "r") as f:
         lines = f.readlines()
     dp = CmakeDocParser(lines)
-    doclines = doc_process(dp)
+    doclines = doc_process(dp, exampledir)
     #print doclines
     docs = "\n".join(doclines)
     return docs
-    #print docs
-
-
 
 def generate_doc(fname, exampledir, outdir):
     """ generate a .txt based on a cmake file if the doc is not empty """
