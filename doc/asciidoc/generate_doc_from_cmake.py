@@ -9,8 +9,20 @@ import sys
 import re
 import os
 
-funcregex = re.compile('\s*function\s*\((\S*?) .*')
-nameregex = re.compile('# \\\\(\S*?):(\S.*?)\s+(.*)')
+funcregex = re.compile('\s*function\s*\((\S*?)[\s\)]+.*')
+nameregex = re.compile('# \\\\(\S*?):(\S*?)\s+(.*)')
+
+def addAsciiDocLine(line, doclines):
+    if line.startswith("# ==== ") or line.startswith("# === ") or line.startswith("# == ") or line.startswith("# ."):
+        doclines.append("")
+        doclines.append(line[2:])
+        return 1
+    #indent asciidoc bis
+    elif line.startswith("# WARNING:") or line.startswith("# NOTE:") or line.startswith("# IMPORTANT:") or line.startswith("# CAUTION:") or line.startswith("# TIP:"):
+        doclines.append("")
+        doclines.append(line[2:])
+        return 1
+    return None
 
 class FunctionContext:
     """ store the documentation of a function """
@@ -18,6 +30,7 @@ class FunctionContext:
         self.name     = None
         self.desc     = None
         self.args     = dict()
+        self.argn     = None
         self.flags    = dict()
         self.params   = dict()
         self.groups   = dict()
@@ -46,6 +59,9 @@ class FunctionContext:
         doclines = list()
         line = dp.preview_line()
         while line.startswith("#") and not line.startswith("# \\"):
+            if addAsciiDocLine(dp.preview_line(), doclines):
+                dp.get_line()
+                continue
             doclines.append(dp.get_line()[2:].strip())
             line = dp.preview_line()
         return doclines
@@ -58,6 +74,8 @@ class FunctionContext:
             (name, value, desc) = ret
             if name == "arg":
                 self.args[value]   = (desc)
+            elif name == "argn":
+                self.argn          = (value, desc)
             elif name == "flag":
                 self.flags[value]  = (desc)
             elif name == "param":
@@ -66,12 +84,13 @@ class FunctionContext:
                 self.groups[value] = (desc)
             elif name == "example":
                 self.examples[value] = (desc)
+            else:
+                print "WARNING: unknown command:", dp.preview_line()
         else:
             print "WARNING: unknown command:", dp.preview_line()
             dp.get_line()
 
     def extractFunctionName(self, dp):
-        #print "extract name:", dp.preview_line()
         line = dp.get_line()
         name = funcregex.match(line)
         if name:
@@ -85,7 +104,8 @@ class FunctionContext:
         docline.append(dp.get_line()[3:].strip())
         docline.extend(self._extractBlock(dp))
         self.desc = docline
-        #print "description:", "".join(self.desc)
+        print "description:", "\n".join(self.desc)
+        print ""
 
     def getDoc(self, sample):
         """ get an example """
@@ -108,14 +128,20 @@ class FunctionContext:
             return docline
 
         docline.append("=== Function %s ===" % (self.name))
-        docline.append(".Description")
+        docline.append(".*Description*")
         docline.extend(self.desc)
         docline.append("")
 
-        docline.append(".Prototype")
+        docline.append(".*Prototype*")
+        docline.append("[source,cmake]")
+        docline.append("----")
         arg = "  %s(" % self.name
         for k in self.args.keys():
             arg += "<%s> " % k.lower()
+        if self.argn:
+            arg += ".. "
+        if arg[-1] == " ":
+            arg = arg[:-1]
         docline.append(arg)
 
         indent = " " * len("  %s(" % self.name)
@@ -126,11 +152,15 @@ class FunctionContext:
         for k in self.groups.keys():
             docline.append(indent + "%s <%s> .." % (k.upper(), k.lower()))
         docline[-1] = docline[-1] + ")"
+        docline.append("----")
         docline.append("")
 
-        docline.append(".Parameters")
+
+        docline.append(".*Parameters*")
         for (k, v) in self.args.iteritems():
             docline.append(" * <%s>: %s" % (k.lower(), " ".join(v)))
+        if self.argn:
+            docline.append(" * ARGN(%s): %s" % (self.argn[0], self.argn[1]))
         for (k, v) in self.flags.iteritems():
             docline.append(" * %s: %s" % (k.upper(), " ".join(v)))
         for (k, v) in self.params.iteritems():
@@ -140,7 +170,7 @@ class FunctionContext:
         docline.append("")
 
         for (k, v) in self.examples.iteritems():
-            docline.append(".Example %s" % k)
+            docline.append(".*Example* %s" % k)
             docline.append("[source,cmake]")
             docline.append("----")
             docline.extend(self.getDoc(k))
@@ -175,9 +205,8 @@ def doc_process_command(dp, fc):
     if line.startswith("#!"):
         fc.extractDescription(dp)
     #indent asciidoc
-    elif line.startswith("# ==== ") or line.startswith("# === ") or line.startswith("# == ") or line.startswith("# ."):
-        doclines.append("")
-        doclines.append(dp.get_line())
+    #elif addAsciiDocLine(line, doclines):
+    #    dp.get_line()
     #handle command
     elif line.startswith("# \\"):
         fc.extractCommand(dp)
