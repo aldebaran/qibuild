@@ -104,8 +104,8 @@ class FunctionContext:
         docline.append(dp.get_line()[3:].strip())
         docline.extend(self._extractBlock(dp))
         self.desc = docline
-        print "description:", "\n".join(self.desc)
-        print ""
+        #print "description:", "\n".join(self.desc)
+        #print ""
 
     def getDoc(self, sample):
         """ get an example """
@@ -115,7 +115,7 @@ class FunctionContext:
         if os.path.exists(p):
             with open(p, "r") as f:
                 lines = f.readlines()
-            lines = [ x.strip() for x in lines ]
+            lines = [ x.rstrip() for x in lines ]
             return lines
         return list()
 
@@ -127,7 +127,7 @@ class FunctionContext:
             docline.append("")
             return docline
 
-        docline.append("=== Function %s ===" % (self.name))
+        docline.append("== %s ==" % (self.name))
         docline.append(".*Description*")
         docline.extend(self.desc)
         docline.append("")
@@ -158,21 +158,22 @@ class FunctionContext:
 
         docline.append(".*Parameters*")
         for (k, v) in self.args.iteritems():
-            docline.append(" * <%s>: %s" % (k.lower(), " ".join(v)))
+            docline.append(" * _<%s>_: %s" % (k.lower(), " ".join(v)))
         if self.argn:
-            docline.append(" * ARGN(%s): %s" % (self.argn[0], self.argn[1]))
+            docline.append(" * remaining args: %s" % " ".join(self.argn[1]))
         for (k, v) in self.flags.iteritems():
-            docline.append(" * %s: %s" % (k.upper(), " ".join(v)))
+            docline.append(" * *%s*: %s" % (k.upper(), " ".join(v)))
         for (k, v) in self.params.iteritems():
-            docline.append(" * %s <%s>: %s" % (k.upper(), k.lower(),  " ".join(v)))
+            docline.append(" * *%s* _<%s>_: %s" % (k.upper(), k.lower(),  " ".join(v)))
         for (k, v) in self.groups.iteritems():
-            docline.append(" * %s <%s> .. : %s" % (k.upper(), k.lower(),  " ".join(v)))
+            docline.append(" * *%s* _<%s>_ .. : %s" % (k.upper(), k.lower(),  " ".join(v)))
         docline.append("")
 
         for (k, v) in self.examples.iteritems():
             docline.append(".*Example* %s" % k)
             docline.append("[source,cmake]")
             docline.append("----")
+            #docline.extend([ "  " + x for x in self.getDoc(k)])
             docline.extend(self.getDoc(k))
             #TODO: source the sample
             docline.append("----")
