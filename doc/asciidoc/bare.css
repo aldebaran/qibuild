@@ -27,8 +27,50 @@ tt {
 	color:#000;
 }
 
+div.tableblock {
+    	border:1px solid silver;
+}
+
+span.red {
+    color:#F01;
+}
+
 p, ul, ol, dl {
 	margin:10px 0
+}
+
+p.table, td {
+	margin:0px;
+        padding:0px;
+}
+
+div {
+	margin:15px 0
+}
+
+div.sect1 {
+	margin:40px 0
+}
+
+div#toctitle {
+    	font-weight:bold;
+}
+
+div.toclevel1 {
+	margin:2px 0
+}
+
+div.title {
+	font-size:17px;
+}
+
+li p {
+	margin:2px 0
+}
+
+em {
+        font-style: italic;
+        color: navy;
 }
 
 dl {
@@ -47,15 +89,19 @@ h1, h2, h3, h4, h5 {
 }
 
 h1 {
+	font-weight:bold;
 	font-size:30px;
 	line-height:1.428;
 	margin:20px 0;
+        border-bottom: 2px solid silver;
 }
 
 h2 {
+	font-weight:bold;
 	font-size:23px;
 	line-height:1.36363636; /* repeating, of course */
 	margin:20px 0;
+        border-bottom: 2px solid silver;
 }
 
 h2 + .sectionbody {}
@@ -64,6 +110,8 @@ h3 {
 	font-size:18px;
 	line-height:1.1;
 	margin:30px 0 10px 0;
+        border-bottom: 2px solid silver;
+
 }
 
 h4 {
@@ -82,8 +130,8 @@ pre {
 	font-size:larger;
 }
 
-#header { 
-	text-align:center;
+#header {
+    /* text-align:center; */
 	margin-bottom:30px;
 }
 
