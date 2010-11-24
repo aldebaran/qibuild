@@ -127,36 +127,62 @@ class FunctionContext:
             docline.append("")
             return docline
 
-        docline.append("== %s ==" % (self.name))
-        docline.append(".*Description*")
+        docline.append("== %s ==" % (self.name.upper()))
+        docline.append("=== Description ===")
         docline.extend(self.desc)
         docline.append("")
 
-        docline.append(".*Prototype*")
-        docline.append("[source,cmake]")
-        docline.append("----")
-        arg = "  %s(" % self.name
+        docline.append("=== Prototype ===")
+        docline.append("[format=\"csv\",cols=\"4\",align=\"left\"]")
+        docline.append("[frame=\"none\",grid=\"none\",options=\"autowidth\"]")
+        docline.append("|======")
+        #docline.append("[source,cmake]")
+        #docline.append("----")
+        arg = "+*[red]#%s#*(+," % self.name
         for k in self.args.keys():
-            arg += "<%s> " % k.lower()
+            arg += "+_<%s>_+ " % k.lower()
         if self.argn:
-            arg += ".. "
+            arg += "+_.._+ "
         if arg[-1] == " ":
             arg = arg[:-1]
+        arg += ",,"
         docline.append(arg)
 
-        indent = " " * len("  %s(" % self.name)
         for k in self.flags.keys():
-            docline.append(indent + "%s" % k.upper())
+            docline.append(",+*%s*+,," % k.upper())
         for k in self.params.keys():
-            docline.append(indent + "%s <%s>" % (k.upper(), k.lower()))
+            docline.append(",+*%s*+, +_<%s>_+," % (k.upper(), k.lower()))
         for k in self.groups.keys():
-            docline.append(indent + "%s <%s> .." % (k.upper(), k.lower()))
-        docline[-1] = docline[-1] + ")"
-        docline.append("----")
+            docline.append(",+*%s*+, +_<%s> .._+," % (k.upper(), k.lower()))
+        docline[-1] = docline[-1] + "+)+"
+        docline.append("|======")
         docline.append("")
 
 
-        docline.append(".*Parameters*")
+        # docline.append("[source,cmake]")
+        # docline.append("----")
+        # arg = "  %s(" % self.name
+        # for k in self.args.keys():
+        #     arg += "<%s> " % k.lower()
+        # if self.argn:
+        #     arg += ".. "
+        # if arg[-1] == " ":
+        #     arg = arg[:-1]
+        # docline.append(arg)
+
+        # indent = " " * len("  %s(" % self.name)
+        # for k in self.flags.keys():
+        #     docline.append(indent + "%s" % k.upper())
+        # for k in self.params.keys():
+        #     docline.append(indent + "%s <%s>" % (k.upper(), k.lower()))
+        # for k in self.groups.keys():
+        #     docline.append(indent + "%s <%s> .." % (k.upper(), k.lower()))
+        # docline[-1] = docline[-1] + ")"
+        # docline.append("----")
+        # docline.append("")
+
+
+        docline.append("=== Parameters ===")
         for (k, v) in self.args.iteritems():
             docline.append(" * _<%s>_: %s" % (k.lower(), " ".join(v)))
         if self.argn:
@@ -170,7 +196,7 @@ class FunctionContext:
         docline.append("")
 
         for (k, v) in self.examples.iteritems():
-            docline.append(".*Example* %s" % k)
+            docline.append("=== Example: %s ===" % k)
             docline.append("[source,cmake]")
             docline.append("----")
             #docline.extend([ "  " + x for x in self.getDoc(k)])

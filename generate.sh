@@ -19,6 +19,6 @@ cp "${CURDIR}/doc/asciidoc/index.txt" "${CURDIR}/build-doc-pre"
 find ${CURDIR}/build-doc-pre/ -type f -name '*.txt' | while read f ; do
   #asciidoc -a toc -a theme=bare -a pygments "$f"
   #asciidoc -a toc -a linkcss -a theme=bare -a pygments "$f"
-  asciidoc -a toc -a linkcss -a theme= -a stylesheet=bare.css -a pygments "$f"
+  asciidoc -a toc -a toclevels=1 -a linkcss -a theme= -a stylesheet=bare.css -a pygments "$f"
 done
 
