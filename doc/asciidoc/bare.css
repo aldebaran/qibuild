@@ -39,6 +39,10 @@ p, ul, ol, dl {
 	margin:10px 0
 }
 
+ul, ol {
+    list-style-position: outside;
+}
+
 p.table, td {
 	margin:0px;
         padding:0px;
