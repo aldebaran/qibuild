@@ -27,4 +27,8 @@ myfunctionwitharguments("superarg1" "supraarg2")
 
 myfunctionwitharguments("superarg1" "supraarg2" NAME "bing")
 
-myfunctionwitharguments("superarg1" "supraarg2" NAME "bing" SRC "bing.h" "bing.c" DEPS "windows" "linux" DESC "a super function")
+myfunctionwitharguments("superarg1" "supraarg2"
+                        NAME "bing"
+                        SRC "bing.h" "bing.c"
+                        DEPS "windows" "linux"
+                        DESC "a super function")
