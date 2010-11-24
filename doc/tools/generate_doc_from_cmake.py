@@ -197,7 +197,7 @@ class FunctionContext:
 
         for (k, v) in self.examples.iteritems():
             docline.append("=== Example: %s ===" % k)
-            docline.append("[source,cmake]")
+            docline.append("[source,cmake,numbered]")
             docline.append("----")
             #docline.extend([ "  " + x for x in self.getDoc(k)])
             docline.extend(self.getDoc(k))

@@ -8,17 +8,21 @@
 
 CURDIR=$(dirname "$(readlink -f $0 2>/dev/null)")/
 
+cd ${CURDIR}
 
-python ${CURDIR}/doc/tools/generate_doc_from_cmake.py \
-  "${CURDIR}/cmake/qibuild" \
-  "${CURDIR}/cmake/samples" \
-  "${CURDIR}/build-doc-pre"
+python doc/tools/generate_doc_from_cmake.py \
+  "cmake/qibuild" \
+  "cmake/samples" \
+  "build-doc"
 
-cp "${CURDIR}/doc/asciidoc/index.txt" "${CURDIR}/build-doc-pre"
+cp "/etc/asciidoc/javascripts/asciidoc-xhtml11.js" "build-doc"
+cp "doc/asciidoc/pygments.css"  "build-doc"
+cp "doc/asciidoc/bare.css"      "build-doc"
+cp "doc/asciidoc/index.txt"     "build-doc"
 
-find ${CURDIR}/build-doc-pre/ -type f -name '*.txt' | while read f ; do
-  #asciidoc -a toc -a theme=bare -a pygments "$f"
-  #asciidoc -a toc -a linkcss -a theme=bare -a pygments "$f"
-  asciidoc -a toc -a toclevels=1 -a linkcss -a theme= -a stylesheet=bare.css -a pygments "$f"
+find ${CURDIR}/build-doc/ -type f -name '*.txt' | while read f ; do
+  #asciidoc is stupid about css...
+  #we desactivated default theme, set the stylesheet to bare.css, and him to not embedded css
+  asciidoc -a toc -a toclevels=1  -a linkcss -a 'theme=' -a stylesheet="bare.css" -a pygments "$f"
 done
 
