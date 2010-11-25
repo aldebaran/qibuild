@@ -37,7 +37,7 @@
 # \group:PUBLIC_HEADER    the list of public headers
 # \group:DEPENDENCIES     the list of dependencies
 #
-# \example:qi_submodule.cmake
+# \example:submodule
 function(qi_submodule_create _name)
   qi_argn_init(${ARGN})
   qi_argn_flags(NO_VSGROUP)
@@ -69,7 +69,7 @@ endfunction()
 # \group:PUBLIC_HEADER    the list of public headers
 # \group:DEPENDENCIES     the list of dependencies
 #
-# \example:qi_submodule.cmake
+# \example:submodule
 function(qi_submodule_add _name)
   qi_argn_init(${ARGN})
   qi_argn_flags(NO_VSGROUP)

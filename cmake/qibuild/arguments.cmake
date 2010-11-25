@@ -27,7 +27,7 @@
 # This function must always be called once before other qi_argn_ functions.
 #
 # \argn: parameters parsed by later call to qi_argn_ functions.
-# \example:qi_arguments
+# \example:arguments
 function(qi_argn_init)
   set(argn_init TRUE PARENT_SCOPE)
   set(argn_remaining ${ARGN} PARENT_SCOPE)

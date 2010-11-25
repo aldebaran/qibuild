@@ -112,6 +112,8 @@ class FunctionContext:
         p = os.path.join(self.exampledir, sample)
         if not os.path.exists(p):
             p += ".cmake"
+        if not os.path.isfile(p):
+            p = os.path.join(self.exampledir, sample, "CMakeLists.txt")
         if os.path.exists(p):
             lines = list()
             try:
@@ -191,7 +193,7 @@ class FunctionContext:
         for (k, v) in self.args.iteritems():
             docline.append(" * _<%s>_: %s" % (k.lower(), " ".join(v)))
         if self.argn:
-            docline.append(" * remaining args: %s" % " ".join(self.argn[1]))
+            docline.append(" * _<remaining args>_ .. : %s" % " ".join(self.argn[1]))
         for (k, v) in self.flags.iteritems():
             docline.append(" * *%s*: %s" % (k.upper(), " ".join(v)))
         for (k, v) in self.params.iteritems():

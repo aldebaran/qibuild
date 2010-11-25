@@ -39,7 +39,7 @@
 # \param:SUBFOLDER the destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
 # \group:SRC the list of source files
-# \example:create_target.cmake
+# \example:target
 function(qi_create_bin name)
   qi_argn_flags(NO_INSTALL EXCLUDE_FROM_ALL)
   qi_argn_params(SUBFOLDER)
@@ -125,7 +125,7 @@ endfunction()
 # \param:SUBFOLDER the destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
 # \group:SRC the list of source files
-# \example:create_target.cmake
+# \example:target
 function(qi_create_lib name)
   #TODO: what is NOBINDLL?
   qi_argn_flags(NO_INSTALL NOBINDLL)
