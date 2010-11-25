@@ -25,6 +25,14 @@ Functions usefull to parse arguments of a cmake function.
 * link:arguments.html#_qi_argn_params[qi_argn_params]
 * link:arguments.html#_qi_argn_groups[qi_argn_groups]
 
+link:target.html[QiBuild Target]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Functions for creating targets. This include binaries, scripts and libraries.
+
+* link:target.html#_qi_create_bin[qi_create_bin]
+* link:target.html#_qi_create_lib[qi_create_lib]
+* link:target.html#_qi_create_script[qi_create_script]
+
 
 link:submodule.html[QiBuild Submodule]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,19 +53,3 @@ Simple module to display log messages.
 * link:log.html#_qi_deprecated[qi_deprecated]
 * link:log.html#_qi_warning[qi_warning]
 * link:log.html#_qi_error[qi_error]
-
-
-
-
-
-
-[format="csv",cols="4",align="left"]
-[frame="none",grid="none",options="autowidth"]
-|======
-+*[red]#qi_submodule_create#*(+,+_<name>_+,                               ,
-                    ,+*NO_SOURCE_GROUP*+ ,                     ,
-                    ,+*SOURCE_GROUP*+    , +_<source_group>_+    ,
-                    ,+*SRC*+             , +_<src> .._+           ,
-                    ,+*DEPENDENCIES*+    , +_<dependencies> .._+ ,
-                    ,+*PUBLIC_HEADER*+   , +_<public_header> .._+, +)+
-|======
