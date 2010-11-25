@@ -113,8 +113,13 @@ class FunctionContext:
         if not os.path.exists(p):
             p += ".cmake"
         if os.path.exists(p):
-            with open(p, "r") as f:
-                lines = f.readlines()
+            lines = list()
+            try:
+                with open(p, "r") as f:
+                    lines = f.readlines()
+            except IOError:
+                print "Error: example not found: ", p
+                pass
             lines = [ x.rstrip() for x in lines ]
             return lines
         return list()
