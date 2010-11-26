@@ -13,6 +13,9 @@ cmake_policy(SET CMP0012 NEW)
 # Bad variable reference syntax is an error.
 cmake_policy(SET CMP0010 NEW)
 
+#yeah allow NORMAL endif
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+
 function(_qi_expect_bool _var_name _bool_value)
 
   # True if the constant is 1, ON, YES, TRUE, Y, or a non-zero number.

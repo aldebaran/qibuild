@@ -1,9 +1,4 @@
 ##
-## layout.cmake
-## Login : <ctaf@ctaf-maptop>
-## Started on  Sun Oct 18 21:45:51 2009 Cedric GESTES
-## $Id$
-##
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
