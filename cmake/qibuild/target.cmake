@@ -25,7 +25,9 @@
 # and dependencies. It help keep track of groups of sources.
 # see link:submodule.html[SubModule].
 #
+# TODO: document options that could be passed to add_executable
 
+include(CMakeParseArguments)
 
 #! Create an executable
 # The target name should be unique.
@@ -36,52 +38,48 @@
 # \flag:EXCLUDE_FROM_ALL do not include the target in the 'all' target,
 #                        this target will not be build by default, you will
 #                        to compile the target explicitely.
+# \flag:STAGE Stage the binary.
+# \flag:WIN32 Build an executable with a WinMain entry point on windows.
+# \flag:MACOSX_BUNDLE refer to the add_executable documentation.
 # \param:SUBFOLDER the destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
 # \group:SRC the list of source files
+# \group:DEP the list of source files
+# \group:SUBMODULE the list of source files
 # \example:target
 function(qi_create_bin name)
-  qi_argn_flags(NO_INSTALL EXCLUDE_FROM_ALL)
-  qi_argn_params(SUBFOLDER)
-  qi_argn_groups(SRC SUBMODULE)
+  qi_debug("qi_create_bin(${name})")
 
-  #ARGN are sources too
-  set(qi_group_src "${argn_group_src}" "${argn_remaining}")
+  cmake_parse_arguments(ARG "NO_INSTALL;EXCLUDE_FROM_ALL;STAGE" "SUBFOLDER" "SRC;DEP;SUBMODULE" ${ARGN})
+
+  set(ARG_SRC "${ARG_UNPARSED_ARGUMENTS}" "${ARG_SRC}")
+  qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
+  qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
 
   #no install rules can be generated for target not always built
-  if (argn_flag_exclude_from_all)
-    set(argn_flag_no_install ON)
+  if (ARG_EXCLUDE_FROM_ALL)
+    set(ARG_NO_INSTALL ON)
+    set(ARG_SRC EXCLUDE_FROM_ALL ${ARG_SRC})
   endif()
 
-  debug("qi_create_bin(${name}, ${argn_param_subfolder})")
-
-  add_executable("${name}" ${argn_forward_flag_exclude_from_all} "${argn_group_src}")
-
-  #TODO:qi
-  #always postfix debug lib/bin with _d
-  # if(${TARGET_ARCH} STREQUAL windows)
-  #   set_target_properties("${_name}" PROPERTIES DEBUG_POSTFIX "_d")
-  # endif()
-  qi_set_global("${name}_SUBFOLDER" "${argn_param_subfolder}")
-  debug("qi_create_bin: ${name} will not be installed")
-  qi_set_global("${name}_NO_INSTALL" ${argn_flag_no_install})
+  add_executable("${name}" ${ARG_SRC})
 
   #make install rules
-  if(${argn_flag_no_install})
-    install(TARGETS "${name}" RUNTIME COMPONENT binary DESTINATION ${QI_SDK_BIN}/${argn_param_subfolder})
+  if(NOT ARG_NO_INSTALL)
+    install(TARGETS "${name}" RUNTIME COMPONENT binary DESTINATION ${QI_SDK_BIN}/${ARG_SUBFOLDER})
   endif()
 
   #TODO:qi
-  # if(${TARGET_ARCH} STREQUAL windows)
-  #   win32_copy_target("${_name}" "${SDK_DIR}/${_SDK_BIN}/${_subfolder}")
-  #   # Be nice with VS user: generate a vcproj so that:
-  #   # -> target path is the path where the executable is copyied
-  #   # (not the place where it is compiled)
-  #   # -> PATH and PYTHONPATH are always set to nice values
-  #   configure_user_vcproj(${_name} "${SDK_DIR}/${_SDK_BIN}/${_subfolder}")
-  # else()
-  set_target_properties("${name}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}/${argn_param_subfolder}")
-  #endif()
+  if(WIN32)
+    set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
+    _qi_win32_copy_target("${_name}" "${SDK_DIR}/${_SDK_BIN}/${_subfolder}")
+    # Be nice with VS user: generate a vcproj so that:
+    # -> target path is the path where the executable is copyied
+    # (not the place where it is compiled)
+    # -> PATH and PYTHONPATH are always set to nice values
+    _qi_configure_user_vcproj(${_name} "${SDK_DIR}/${_SDK_BIN}/${_subfolder}")
+  endif()
+  set_target_properties("${name}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
 endfunction()
 
 
@@ -90,24 +88,23 @@ endfunction()
 # \arg:name the name of the target script
 # \arg:source the source script, that will be copied in the sdk to bin/<name>
 # \flag:NO_INSTALL do not generate install rule for the script
+# \flag:STAGE Stage the binary.
 # \param:SUBFOLDER the subfolder to install the script into in the sdk. (sdk/bin/<subfolder>)
 #
 function(qi_create_script name source)
-  qi_argn_flags(NO_INSTALL)
-  qi_argn_params(SUBFOLDER)
+  qi_debug("qi_create_script(${name})")
+  cmake_parse_arguments(ARG "NO_INSTALL" "SUBFOLDER" "" ${ARGN})
 
-  debug("qi_create_script(${name} ${argn_param_subfolder})")
   #TODO:
-  #copy_with_depend("${_namein}" "${_SDK_BIN}/${_subfolder}/${_name}")
-  qi_set_global("${name}_SUBFOLDER" "${argn_param_subfolder}")
-  qi_set_global("${name}_NO_INSTALL" ${argn_flag_no_install})
+  _qi_copy_file("${source}" "${_SDK_BIN}/${ARG_SUBFOLDER}/${name}")
+  qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
+  qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
 
   #make install rules
-  if (${argn_flag_no_install})
-    #TODO:
-    install(PROGRAMS    "${SDK_DIR}/${_SDK_BIN}/${_subfolder}/${_name}"
+  if (NOT ARG_NO_INSTALL)
+    install(PROGRAMS    "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}"
             COMPONENT   binary
-            DESTINATION "${_SDK_BIN}")
+            DESTINATION "${QI_SDK_BIN}/${ARG_SUBFOLDER}")
   endif()
 endfunction()
 
@@ -122,76 +119,73 @@ endfunction()
 # \flag:EXCLUDE_FROM_ALL do not include the target in the 'all' target,
 #                        this target will not be build by default, you will
 #                        to compile the target explicitely.
+# \flag:NO_STAGE do not stage the librarie.
 # \param:SUBFOLDER the destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
-# \group:SRC the list of source files
+# \group:SRC the list of source files (private headers and sources)
+# \group:PUBLIC_HEADER list of public headers that should be installed with the lib
+# \group:RESOURCE the list of OSX resources
+# \group:SUBMODULE submodule to include in the lib
+# \group:DEP list of dependencies
 # \example:target
 function(qi_create_lib name)
-  #TODO: what is NOBINDLL?
-  qi_argn_flags(NO_INSTALL NOBINDLL)
-  qi_argn_params(SUBFOLDER)
-  qi_argn_groups(SRC HEADER RESOURCE)
+  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE" "SUBFOLDER" "SRC;PUBLIC_HEADER;RESOURCE;SUBMODULE;DEP" ${ARGN})
 
-  debug("qi_create_lib(${name} ${argn_param_subfolder})")
+  if (ARG_NOBINDLL)
+    qi_warning("Unhandled : NOBINDLL")
+  endif()
+  qi_debug("qi_create_lib(${name} ${ARG_SUBFOLDER})")
+
+  #ARGN are sources too
+  set(ARG_SRC "${ARG_UNPARSED_ARGUMENTS}" "${ARG_SRC}" "${ARG_PUBLIC_HEADER}")
+
+  qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
+  qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
+
+  add_library("${name}" ${ARG_SRC})
 
 
-  #TODO: handle static/shared
-  set(${_name}_NO_INSTALL CACHE INTERNAL "" FORCE)
 
-  add_library("${_name}" ${_args} ${_src} ${_header})
-  #always postfix debug lib/bin with _d
-  if (${TARGET_ARCH} STREQUAL windows)
-    set_target_properties("${_name}" PROPERTIES DEBUG_POSTFIX "_d")
-  endif (${TARGET_ARCH} STREQUAL windows)
+  if (ARG_RESOURCE)
+    set_target_properties("${name}" PROPERTIES RESOURCE      "${ARG_RESOURCE}")
+  endif()
 
-  #by default dll under windows goes in bin
-  #everything else goes into lib
-  if (_is_nobinwin)
-    set(_binlib "${_SDK_LIB}")
-  else (_is_nobinwin)
-    get_target_property(_ttype ${_name} "TYPE")
-    if (_ttype STREQUAL "STATIC_LIBRARY")
-      set(_binlib "${_SDK_LIB}")
-    else (_ttype STREQUAL "STATIC_LIBRARY")
-      set(_binlib "${_SDK_BIN}")
-    endif (_ttype STREQUAL "STATIC_LIBRARY")
-  endif (_is_nobinwin)
+  if (ARG_PUBLIC_HEADER)
+    set_target_properties("${name}" PROPERTIES PUBLIC_HEADER "${ARG_PUBLIC_HEADER}")
+  endif()
 
-  set(${_name}_SUBFOLDER ${_subfolder} CACHE INTERNAL "" FORCE)
-  if (_res)
-    set_target_properties("${_name}" PROPERTIES RESOURCE      "${_res}")
-  endif (_res)
-  if (_header)
-    set_target_properties("${_name}" PROPERTIES PUBLIC_HEADER "${_header}")
-  endif (_header)
-
+  #set(_binlib ${QI_SDK_LIB})
   #under win32 bin/lib goes into /Release and /Debug => change that
-  if (${TARGET_ARCH} STREQUAL windows)
-    win32_copy_target("${_name}" "${SDK_DIR}/${_binlib}/${_subfolder}")
-  else (${TARGET_ARCH} STREQUAL windows)
-    set_target_properties("${_name}"
-      PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${SDK_DIR}/${_binlib}/${_subfolder}
-        ARCHIVE_OUTPUT_DIRECTORY ${SDK_DIR}/${_SDK_LIB}/${_subfolder}
-        LIBRARY_OUTPUT_DIRECTORY ${SDK_DIR}/${_SDK_LIB}/${_subfolder}
+  if (WIN32)
+    #always postfix debug lib/bin with _d
+    set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
+
+    #by default put libraries next to binaries under windows
+    get_target_property(_type ${name} "TYPE")
+    # if (_type STREQUAL "SHARED_LIBRARY")
+    #   set(_binlib "${_SDK_BIN}")
+    # endif ()
+    _qi_win32_copy_target("${name}" "${SDK_DIR}/${_binlib}/${ARG_SUBFOLDER}")
+  endif()
+
+  set_target_properties("${name}"
+    PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}
+      ARCHIVE_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}
+      LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}
       )
-  endif (${TARGET_ARCH} STREQUAL windows)
+  #endif()
 
   #make install rules
-  if (${_no_install})
-    debug("libbin: create_script: ${_name} not to be installed")
-    set(${_name}_NO_INSTALL TRUE CACHE INTERNAL "" FORCE)
-  else()
-    install(TARGETS "${_name}"
-            RUNTIME COMPONENT binary     DESTINATION ${_binlib}/${_subfolder}
-            LIBRARY COMPONENT lib        DESTINATION ${_SDK_LIB}/${_subfolder}
-      PUBLIC_HEADER COMPONENT header     DESTINATION ${_SDK_INCLUDE}/${_subfolder}
-     PRIVATE_HEADER COMPONENT header     DESTINATION ${_SDK_INCLUDE}/${_subfolder}
-           RESOURCE COMPONENT data       DESTINATION ${_SDK_SHARE}/${_name}/${_subfolder}
-            ARCHIVE COMPONENT static-lib DESTINATION ${_SDK_LIB}/${_subfolder})
+  if (NOT ARG_NO_INSTALL)
+    install(TARGETS "${name}"
+            RUNTIME COMPONENT binary     DESTINATION ${QI_SDK_BIN}/${ARG_SUBFOLDER}
+            LIBRARY COMPONENT lib        DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER}
+      PUBLIC_HEADER COMPONENT header     DESTINATION ${QI_SDK_INCLUDE}/${ARG_SUBFOLDER}
+           RESOURCE COMPONENT data       DESTINATION ${QI_SDK_SHARE}/${name}/${ARG_SUBFOLDER}
+            ARCHIVE COMPONENT static-lib DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER})
   endif()
-  debug("BINLIB: END create_lib: (${_name}, ${_is_nobinwin}, ${_subfolder}, src=(${_args} ${_src}) , h=(${_header}))")
-endfunction(create_lib)
+endfunction()
 
 
 
