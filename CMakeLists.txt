@@ -12,12 +12,10 @@ project(QiBuild NONE)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 message("CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
-#include("cmake/qibuild/arguments.cmake")
 
 include("qibuild/qibuild")
 
 #include("qibuild/expect_test")
-#include("qibuild/arguments_test")
 #include("qibuild/submodule_test")
 
 add_subdirectory("cmake/samples")

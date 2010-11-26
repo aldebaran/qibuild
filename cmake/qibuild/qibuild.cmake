@@ -8,7 +8,6 @@
 include("qibuild/log")
 include("qibuild/set")
 include("qibuild/expect")
-include("qibuild/arguments")
 include("qibuild/layout")
 
 if (NOT QI_SDK_DIR)
