@@ -7,7 +7,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009 Aldebaran Robotics
+## Copyright (C) 2009, 2010 Aldebaran Robotics
 ##
 
 #standard layout for an sdk
@@ -15,15 +15,15 @@
 #warning findmodule.*.sdk.in and sdk.cmake use implicit relative path
 #between _SDK_LIB and _SDK_CMAKE_MODULES, name could be change, but
 #the relative path between each var should remain the same.
-set(_SDK_BIN            "bin"                   CACHE STRING "" FORCE)
-set(_SDK_LIB            "lib"                   CACHE STRING "" FORCE)
-set(_SDK_FRAMEWORK      "Frameworks"            CACHE STRING "" FORCE)
-set(_SDK_INCLUDE        "include"               CACHE STRING "" FORCE)
-set(_SDK_SHARE          "share"                 CACHE STRING "" FORCE)
-set(_SDK_CONF           "preferences"           CACHE STRING "" FORCE)
-set(_SDK_DOC            "share/doc"             CACHE STRING "" FORCE)
-set(_SDK_CMAKE          "lib/cmake"             CACHE STRING "" FORCE)
-set(_SDK_CMAKE_MODULES  "lib/cmake/modules"     CACHE STRING "" FORCE)
+qi_set_global(QI_SDK_BIN            "bin"              )
+qi_set_global(QI_SDK_LIB            "lib"              )
+qi_set_global(QI_SDK_FRAMEWORK      "Frameworks"       )
+qi_set_global(QI_SDK_INCLUDE        "include"          )
+qi_set_global(QI_SDK_SHARE          "share"            )
+qi_set_global(QI_SDK_CONF           "etc"              )
+qi_set_global(QI_SDK_DOC            "share/doc"        )
+qi_set_global(QI_SDK_CMAKE          "lib/cmake"        )
+qi_set_global(QI_SDK_CMAKE_MODULES  "lib/cmake/modules")
 
 #WINDOWS SDK LAYOUT
 set(WIN_LAYOUT_SDK_BIN            ""                      CACHE STRING "" FORCE)
@@ -47,11 +47,11 @@ set(WIN_LAYOUT_SDK_CMAKE_MODULES  "dev/cmake/modules"     CACHE STRING "" FORCE)
 # set(_SDK_CMAKE_MODULES  "${SDK_ARCH}/lib/cmake/modules"     CACHE STRING "" FORCE)
 
 
-mark_as_advanced(_SDK_BIN
-                 _SDK_LIB
-                 _SDK_INCLUDE
-                 _SDK_SHARE
-                 _SDK_CONF
-                 _SDK_DOC
-                 _SDK_CMAKE
-                 _SDK_CMAKE_MODULES)
+mark_as_advanced(QI_SDK_BIN
+                 QI_SDK_LIB
+                 QI_SDK_INCLUDE
+                 QI_SDK_SHARE
+                 QI_SDK_CONF
+                 QI_SDK_DOC
+                 QI_SDK_CMAKE
+                 QI_SDK_CMAKE_MODULES)

@@ -91,17 +91,6 @@ if (NOT ${TARGET_ARCH} STREQUAL windows)
 endif (NOT ${TARGET_ARCH} STREQUAL windows)
 
 
-#force buildtype to be Upper case
-if (CMAKE_BUILD_TYPE)
-  string(TOUPPER ${CMAKE_BUILD_TYPE} _BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "${_BUILD_TYPE}" CACHE STRING "" FORCE)
-endif (CMAKE_BUILD_TYPE)
-
-#ensure CMAKE_BUILD_TYPE is either Debug or Release
-if (CMAKE_BUILD_TYPE STREQUAL "")
-  debug("General: no build type specified, setting RELEASE")
-  set(CMAKE_BUILD_TYPE "RELEASE" CACHE STRING "" FORCE)
-endif (CMAKE_BUILD_TYPE STREQUAL "")
 
 #if you dont want WALL call cmake with -DNO_WALL
 #or add set(NO_WALL TRUE) in your toolchain file

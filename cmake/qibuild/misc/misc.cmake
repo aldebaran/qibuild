@@ -7,7 +7,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009 Aldebaran Robotics
+## Copyright (C) 2009, 2010 Aldebaran Robotics
 ##
 
 # add_custom_target("uninstall")
@@ -27,27 +27,6 @@ function(create_config_h _header _nameout)
 endfunction(create_config_h)
 
 
-#copy file with dependency (if the file change in source => update the output)
-function(copy_with_depend _src _dest)
-  get_filename_component(_sname "${_src}"  NAME)
-  get_filename_component(_dname "${_dest}" NAME)
-
-  if (NOT EXISTS ${_src})
-    if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_src})
-      set(_src ${CMAKE_CURRENT_SOURCE_DIR}/${_src})
-    endif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_src})
-  endif (NOT EXISTS ${_src})
-
-  #append the filename to the output filepath if necessary
-  if (_dname STREQUAL "")
-    set(_dest "${_dest}/${_sname}")
-  endif (_dname STREQUAL "")
-
-  get_filename_component(_dirname "${_dest}" PATH)
-  make_directory("${SDK_DIR}/${_dirname}/")
-
-  configure_file("${_src}" "${SDK_DIR}/${_dest}" COPYONLY)
-endfunction(copy_with_depend _src _dest)
 
 
 function(check_is_target _name)

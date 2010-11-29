@@ -26,6 +26,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
   qi_set_global(CMAKE_BUILD_TYPE "RELEASE")
 endif (CMAKE_BUILD_TYPE STREQUAL "")
 
-
+include("qibuild/uselib")
+include("qibuild/launcher")
+include("qibuild/tests")
 include("qibuild/target")
 include("qibuild/submodule")

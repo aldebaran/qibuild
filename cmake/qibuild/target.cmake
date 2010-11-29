@@ -189,3 +189,17 @@ endfunction()
 
 
 
+#! create a configuration file
+# \arg:filename path to the generated file
+# \arg:source the source file
+# \arg:dest the destination
+# TODO: example
+function(qi_create_config_h _PARENT_var source dest)
+  configure_file("${source}" "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}" ESCAPE_QUOTES)
+  include_directories("${CMAKE_CURRENT_BINARY_DIR}/include/")
+  get_filename_component(_folder "${dest}" PATH)
+  install(FILES       "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}"
+          COMPONENT   "header"
+          DESTINATION "${QI_SDK_INCLUDE}/${_folder}")
+  set(${_PARENT_var} "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}" PARENT_SCOPE)
+endfunction()

@@ -2,7 +2,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009 Aldebaran Robotics
+## Copyright (C) 2009, 2010 Aldebaran Robotics
 ##
 
 function(create_cmake _NAME)
@@ -28,6 +28,7 @@ function(create_cmake _NAME)
   list(REMOVE_DUPLICATES _internal)
   set(_INTERNAL_TC_CMAKE_DIRS ${_internal} CACHE INTERNAL "" FORCE)
 endfunction(create_cmake _NAME)
+
 
 function(use _NAME)
   find_package(${_NAME} PATHS ${_INTERNAL_TC_CMAKE_DIRS} "${SDK_DIR}/${_SDK_CMAKE_MODULES}/" ${_INTERNAL_SDK_DIRS} NO_DEFAULT_PATH)
