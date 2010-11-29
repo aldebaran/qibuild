@@ -8,7 +8,7 @@
 ##
 ## Copyright (C) 2008, 2010 Aldebaran Robotics
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 if(APPLE)
   set(UUID_IN_SYSTEM "SYSTEM")

@@ -8,7 +8,7 @@
 ##
 ## Copyright (C) 2008 Aldebaran Robotics
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 #get the root folder of this sdk
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)

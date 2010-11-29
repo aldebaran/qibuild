@@ -1,11 +1,11 @@
 ##
-## Copyright (C) 2008 Aldebaran Robotics
+## Copyright (C) 2008, 2010 Aldebaran Robotics
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 #get the root folder of this sdk
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-include("${_ROOT_DIR}/../boostutils.cmake")
+include("${_ROOT_DIR}/boostutils.cmake")
 
 set(_libname "serialization")
 set(_suffix "SERIALIZATION")

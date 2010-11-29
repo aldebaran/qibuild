@@ -27,14 +27,6 @@ function(create_config_h _header _nameout)
 endfunction(create_config_h)
 
 
-
-
-function(check_is_target _name)
-  if (NOT TARGET ${_name})
-    error("[${_name}] is not a target verify your function argument")
-  endif (NOT TARGET ${_name})
-endfunction(check_is_target _name)
-
 ###########################
 # add a subdir and an install rules for that subdirs
 ###########################

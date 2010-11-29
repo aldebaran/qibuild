@@ -4,7 +4,7 @@
 ##
 ## Copyright (C) 2008, 2010 Aldebaran Robotics
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 #get the root folder of this sdk
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
@@ -21,7 +21,7 @@ else()
 endif()
 
 if (TARGET_HOST STREQUAL "TARGET_HOST_MACOSX")
-  depend(ARCHIVE REQUIRED ZLIB)
+  set(ARCHIVE_DEPENDS "ZLIB")
 endif (TARGET_HOST STREQUAL "TARGET_HOST_MACOSX")
 
 export_lib(ARCHIVE)

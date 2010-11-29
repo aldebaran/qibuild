@@ -40,9 +40,9 @@ function(qi_create_gtest name)
 
   # Create the binary test, link with dependencies.
   if (BUILD_TESTS)
-    qi_create_bin("${name}_bin" ${_src} NO_INSTALL)
+    qi_create_bin("${name}_bin" ${ARG_SRC} NO_INSTALL)
   else()
-    qi_create_bin("${name}_bin" EXCLUDE_FROM_ALL ${_src} NO_INSTALL)
+    qi_create_bin("${name}_bin" EXCLUDE_FROM_ALL ${ARG_SRC} NO_INSTALL)
   endif()
   add_dependencies("autotest" "${name}_bin")
   qi_use_lib("${name}_bin" ${ARG_DEPENDENCIES})
@@ -51,12 +51,17 @@ function(qi_create_gtest name)
     return()
   endif()
 
+  #TODO: get this back
+  return()
+
   # use sdk trampoline (.bat on windows) to set all environment variables correctly.
   if(WIN32)
-    qi_create_insource_launcher("${name}_bin" "${name}.bat")
+    #TODO: get this back
+    #qi_create_insource_launcher("${name}_bin" "${name}.bat")
     qi_add_gtest("${name}.bat" ${name} ARGUMENTS ${_arguments})
   else()
-    qi_create_insource_launcher("${name}_bin" ${name})
+    #TODO: get this back
+    #qi_create_insource_launcher("${name}_bin" ${name})
     qi_add_gtest(${name} ${name} ARGUMENTS ${_arguments})
   endif()
   set_tests_properties(${name} PROPERTIES TIMEOUT ${_timeout})

@@ -1,4 +1,4 @@
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 clean(QPOASES)
 

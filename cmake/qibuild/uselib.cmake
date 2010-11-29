@@ -24,12 +24,19 @@ function(qi_use_lib name)
 
   foreach(_pkg ${ARG_DEPENDENCIES})
     find_package(${_pkg})
-    include_directories(${${_pkg}_INCLUDE_DIR})
-    target_link_libraries("${name}" ${${_pkg}_LIBRARIES})
+    string(TOUPPER ${_pkg} _U_PKG)
+    #TODO: search for INCLUDE_DIRS, fallback on INCLUDE_DIR
+    if (DEFINED ${_U_PKG}_INCLUDE_DIRS)
+      include_directories(${${_U_PKG}_INCLUDE_DIRS})
+    elseif(DEFINED ${_U_PKG}_INCLUDE_DIR)
+      include_directories(${${_U_PKG}_INCLUDE_DIR})
+    endif()
+
+    message(STATUS "lib: ${${_U_PKG}_LIBRARIES}")
+    target_link_libraries("${name}" ${${_U_PKG}_LIBRARIES})
     #TODO: add_dependencies
-
     #TODO: target properties
-    set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "${${_pkg}_DEFINITIONS}")
+    set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "${${_U_PKG}_DEFINITIONS}")
   endforeach()
-
+  list(APPEND "${name}_DEPENDS" ${ARG_DEPENDENCIES})
 endfunction()

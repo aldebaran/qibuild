@@ -5,7 +5,7 @@
 ## Copyright (C) 2009 Aldebaran Robotics
 ##
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 clean(RT-STATIC)
 fpath(RT-STATIC time.h SYSTEM)

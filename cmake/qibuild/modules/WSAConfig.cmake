@@ -1,7 +1,7 @@
 ##
 ## Copyright (C) 2008 Aldebaran Robotics
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 clean(WSA)
 # winsock2.h requires with ws2_32.lib

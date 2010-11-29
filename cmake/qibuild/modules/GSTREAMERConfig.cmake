@@ -8,7 +8,7 @@
 ##
 ## Copyright (C) 2008 Aldebaran Robotics
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 if(UNIX AND NOT APPLE)
   set(IN_SYSTEM "SYSTEM")

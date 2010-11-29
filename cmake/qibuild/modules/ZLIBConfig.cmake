@@ -6,7 +6,7 @@
 
 #this is zlib for windows
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 clean(ZLIB)
 fpath(ZLIB zlib.h PATH_SUFFIXES zlib)

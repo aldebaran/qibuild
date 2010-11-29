@@ -20,6 +20,7 @@
 # to find each file in the folder. For SRC *.h *.hpp *.hxx are searched,
 # for PUBLIC_HEADER *.hpp and *.hxx are searched.
 
+include(CMakeParseArguments)
 
 #!
 # A submodule is a convenient place to store  sources paths, dependencies
@@ -38,18 +39,28 @@
 # \group:DEPENDENCIES     the list of dependencies
 #
 # \example:submodule
-function(qi_submodule_create _name)
-  qi_argn_init(${ARGN})
-  qi_argn_flags(NO_VSGROUP)
-  qi_argn_params(VSGROUP)
-  qi_argn_groups(SRCS PUBLIC_HEADERS DEPENDENCIES)
+function(qi_submodule_create name)
+  cmake_parse_arguments(ARG "NO_VSGROUP" "VSGROUP" "SRC;PUBLIC_HEADER;DEP" ${ARGN})
 
-  string(TOLOWER "submodule_${_name}_srcs"           _OUT_srcs)
-  string(TOLOWER "submodule_${_name}_public_headers" _OUT_public_headers)
-  set(${_OUT_srcs}           ${_GROUP_public_headers} ${_GROUP_srcs} PARENT_SCOPE)
-  set(${_OUT_public_headers} ${_GROUP_public_headers} PARENT_SCOPE)
-  source_group("${_name}" FILES ${_GROUP_public_headers} ${_GROUP_srcs})
-  source_group("${_name}\\public" FILES ${_GROUP_public_headers})
+  string(TOUPPER "submodule_${name}_src"           _OUT_src)
+  string(TOUPPER "submodule_${name}_public_header" _OUT_public_header)
+  #message(STATUS "src:${ARG_PUBLIC_HEADER} ${ARG_SRC}")
+  qi_glob_sources(_SRC           ${ARG_SRC})
+  qi_glob_sources(_PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
+  #message(STATUS "src2:${_PUBLIC_HEADER} || ${_SRC}")
+
+  #message(STATUS "Outssrc1: ${_OUT_src}: ${${_OUT_src}}")
+  qi_set_global(${_OUT_src}           ${${_OUT_src}}           ${_PUBLIC_HEADER} ${_SRC})
+  qi_set_global(${_OUT_public_header} ${${_OUT_public_header}} ${_PUBLIC_HEADER})
+  #message(STATUS "Outssrc2: ${_OUT_src}: ${${_OUT_src}}")
+  if (NOT ARG_NO_VSGROUP)
+    set(_vsgroupname ${name})
+    if (NOT ARG_VSGROUP STREQUAL "")
+      set(_vsgroupname ${ARG_VSGROUP})
+    endif()
+    source_group("${_vsgroupname}"         FILES ${_SRC})
+    source_group("${_vsgroupname}\\public" FILES ${_PUBLIC_HEADER})
+  endif()
 endfunction()
 
 
@@ -67,21 +78,32 @@ endfunction()
 #                         for example (WITH_QT)
 # \group:SRC              the list of source to include in the submodule
 # \group:PUBLIC_HEADER    the list of public headers
-# \group:DEPENDENCIES     the list of dependencies
+# \group:DEP              the list of dependencies
 #
 # \example:submodule
 function(qi_submodule_add _name)
-  qi_argn_init(${ARGN})
-  qi_argn_flags(NO_VSGROUP)
-  qi_argn_params(VSGROUP)
-  qi_argn_groups(SRCS PUBLIC_HEADERS DEPENDENCIES IF)
+  cmake_parse_arguments(ARG "NO_VSGROUP" "VSGROUP;IF" "SRC;PUBLIC_HEADER;DEP" ${ARGN})
 
-  if (${_GROUP_if})
-    qi_submodule_create("${_name}" ${_ARGS}
-                        ${_FORWARD_FLAG_no_vsgroup}
-                        ${_FORWARD_GROUP_dependencies}
-                        ${_FORWARD_GROUP_srcs}
-                        ${_FORWARD_GROUP_public_headers}
-                        ${_FORWARD_ARGS})
+  if (ARG_NO_VSGROUP)
+    set(_forward_no_vsgroup "NO_VSGROUP")
+  endif()
+
+  set(_doit)
+  if (NOT "${ARG_IF}" STREQUAL "")
+    set(_doit TRUE)
+  else()
+    if (${ARG_IF})
+    else()
+      set(_doit TRUE)
+    endif()
+  endif()
+  if (_doit)
+    qi_submodule_create("${_name}"
+                        ${_forward_no_vsgroup}
+                        VSGROUP       ${ARG_VSGROUP}
+                        SRC           ${ARG_SRC}
+                        PUBLIC_HEADER ${ARG_PUBLIC_HEADER}
+                        DEP           ${ARG_DEP}
+                        ${ARG_UNPARSED_ARGUMENTS})
   endif()
 endfunction()

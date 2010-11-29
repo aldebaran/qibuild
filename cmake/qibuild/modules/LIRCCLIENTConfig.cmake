@@ -5,7 +5,7 @@
 ## Copyright (C) 2010 Aldebaran Robotics
 ##
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 clean(LIRCCLIENT)
 

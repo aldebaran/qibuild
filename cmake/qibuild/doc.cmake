@@ -15,7 +15,7 @@ find(DOXYGEN QUIET)
 # compile a set of asciidoc documentation
 #
 ####################################################################
-function(create_asciidoc subfoldername)
+function(qi_create_asciidoc subfoldername)
   if(ASCIIDOC_FOUND)
     if (NOT TARGET "doc")
       add_custom_target("doc")
@@ -61,7 +61,7 @@ function(create_asciidoc subfoldername)
     message(STATUS "Please install asciidoc")
     message(STATUS "###### WARNING ######")
   endif(ASCIIDOC_FOUND)
-endfunction(create_asciidoc foldername)
+endfunction()
 
 
 ####################################################################
@@ -69,7 +69,7 @@ endfunction(create_asciidoc foldername)
 # generate doxygen
 #
 ####################################################################
-function(create_doxygen)
+function(qi_create_doxygen)
 
   if (DOXYGEN_EXECUTABLE)
     if (NOT TARGET "doc")
@@ -87,4 +87,4 @@ function(create_doxygen)
     add_custom_target("${_doxygen_target}" COMMAND ${DOXYGEN_EXECUTABLE} ${ARGV0} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     add_dependencies("doc" "${_doxygen_target}")
   endif()
-endfunction(create_doxygen)
+endfunction()

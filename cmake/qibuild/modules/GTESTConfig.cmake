@@ -2,7 +2,7 @@
 ##
 ## Copyright (C) 2009, 2010 Aldebaran Robotics
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 clean(GTEST)
 fpath(GTEST gtest/gtest.h)
@@ -17,5 +17,5 @@ else()
   flib(GTEST gtest_main)
 endif()
 
-depend(GTEST PTHREAD)
+set(GTEST_DEPENDS PTHREAD)
 export_lib(GTEST)

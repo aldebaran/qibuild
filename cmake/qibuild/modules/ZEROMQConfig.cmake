@@ -5,6 +5,9 @@
 ## Copyright (C) 2010 Aldebaran Robotics
 ##
 
-macro(qi_set_global name)
-  set("${name}" ${ARGN} CACHE INTERNAL "" FORCE)
-endmacro()
+clean(ZEROMQ)
+
+fpath(ZEROMQ zmq.h)
+flib(ZEROMQ zmq)
+
+export_lib(ZEROMQ)

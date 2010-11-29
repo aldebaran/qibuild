@@ -10,7 +10,8 @@
 #
 #  ....
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
+include(CMakeParseArguments)
 
 #############
 #
@@ -22,17 +23,9 @@ include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
 # for instance, if module_name equals foo, foo.i must contain:
 #   %module foo
 ##############
-function(qi_wrap_python module_name interface_file)
+function(qi_swig_wrap_python module_name interface_file)
+  cmake_parse_arguments(ARG "" "" "SRC;DEPENDS" ${ARGN})
 
-  ##
-  # Parse args:
-  subargs_parse_args("SRCS" "DEPENDENCIES" _srcs _deps ${ARGN})
-  if (_deps)
-    subargs_parse_args("DEPENDENCIES" "" _deps _tmp ${_deps})
-  endif()
-
-
-  ##
   # Basic configurations
   find_package(SWIG REQUIRED)
   include(${SWIG_USE_FILE})
@@ -46,19 +39,19 @@ function(qi_wrap_python module_name interface_file)
 
   # Everything will end up in ${SDK_DIR}/${SDK_DIR}, so that
   # setting PYTHONPATH and LD_LIBRARY_PATH (or PATH) is enough
-  set(CMAKE_SWIG_OUTDIR ${SDK_DIR}/${_SDK_LIB})
+  set(CMAKE_SWIG_OUTDIR ${QI_SDK_DIR}/${QI_SDK_LIB})
 
   ##
   # Deal with dependencies:
-  foreach (_dep ${_deps})
-    find(${_dep})
+  foreach (_dep ${ARG_DEPENDS})
+    find_package(${_dep})
     include_directories(${${_dep}_INCLUDE_DIR})
   endforeach()
 
   # Since there is often a "lazy" include in the interface file:
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-  swig_add_module(${module_name} python ${interface_file} ${_srcs})
+  swig_add_module(${module_name} python ${interface_file} ${ARG_SRC})
 
   ##
   # Deal with the newly created target
@@ -66,11 +59,11 @@ function(qi_wrap_python module_name interface_file)
   # Store the target created by swig_add_module in a more friendly name:
   set(_swig_target ${SWIG_MODULE_${module_name}_REAL_NAME})
 
-  use_lib(${_swig_target} PYTHON ${_deps})
+  qi_use_lib(${_swig_target} PYTHON ${_deps})
 
   set_target_properties(${_swig_target}
     PROPERTIES
-      LIBRARY_OUTPUT_DIRECTORY "${SDK_DIR}/${_SDK_LIB}"
+      LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
   )
 
   # Be sure a .pyd file gets created, even though we
@@ -79,19 +72,19 @@ function(qi_wrap_python module_name interface_file)
     set_target_properties(${_swig_target} PROPERTIES SUFFIX   ".pyd"
                                              DEBUG_POSTFIX "_d")
     # Make sure _swig_target is put in the right place
-    win32_copy_target(${_swig_target} "${SDK_DIR}/${_SDK_LIB}")
+    win32_copy_target(${_swig_target} "${QI_SDK_DIR}/${QI_SDK_LIB}")
   endif(WIN32)
 
   # Re-create install rules:
   install(TARGETS ${_swig_target}
     COMPONENT python
-    LIBRARY DESTINATION "${_SDK_LIB}"
-    RUNTIME DESTINATION "${_SDK_LIB}"
+    LIBRARY DESTINATION "${QI_SDK_LIB}"
+    RUNTIME DESTINATION "${QI_SDK_LIB}"
   )
 
-  install(FILES "${SDK_DIR}/${_SDK_LIB}/${module_name}.py"
+  install(FILES "${QI_SDK_DIR}/${QI_SDK_LIB}/${module_name}.py"
     COMPONENT python
-    DESTINATION "${_SDK_LIB}"
+    DESTINATION "${QI_SDK_LIB}"
   )
 
 

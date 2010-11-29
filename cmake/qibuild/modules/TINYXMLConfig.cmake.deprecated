@@ -8,7 +8,7 @@
 ##
 ## Copyright (C) 2008 Aldebaran Robotics
 
-include("${TOOLCHAIN_DIR}/cmake/libfind.cmake")
+
 
 clean(TINYXML)
 set(TINYXML_DEFINITIONS -DTIXML_USE_STL)

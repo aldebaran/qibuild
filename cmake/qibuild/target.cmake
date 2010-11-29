@@ -62,7 +62,15 @@ function(qi_create_bin name)
     set(ARG_SRC EXCLUDE_FROM_ALL ${ARG_SRC})
   endif()
 
+  foreach(submodule ${ARG_SUBMODULE})
+    message(STATUS "SUBMODULE: ${submodule}")
+    set(ARG_SRC "${ARG_SRC}" "${${submodule}_SRC}")
+  endforeach()
+
   add_executable("${name}" ${ARG_SRC})
+
+  message(STATUS "${name} Adding deps: ${ARG_DEP}")
+  qi_use_lib("${name}" ${ARG_DEP})
 
   #make install rules
   if(NOT ARG_NO_INSTALL)
@@ -129,7 +137,7 @@ endfunction()
 # \group:DEP list of dependencies
 # \example:target
 function(qi_create_lib name)
-  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE" "SUBFOLDER" "SRC;PUBLIC_HEADER;RESOURCE;SUBMODULE;DEP" ${ARGN})
+  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE" "SUBFOLDER" "SRC;PUBLIC_HEADER;RESOURCE;SUBMODULE;DEPENDS" ${ARGN})
 
   if (ARG_NOBINDLL)
     qi_warning("Unhandled : NOBINDLL")
@@ -137,14 +145,21 @@ function(qi_create_lib name)
   qi_debug("qi_create_lib(${name} ${ARG_SUBFOLDER})")
 
   #ARGN are sources too
-  set(ARG_SRC "${ARG_UNPARSED_ARGUMENTS}" "${ARG_SRC}" "${ARG_PUBLIC_HEADER}")
+  set(ARG_SRC ${ARG_UNPARSED_ARGUMENTS} ${ARG_SRC} ${ARG_PUBLIC_HEADER})
 
   qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
   qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
 
+  foreach(submodule ${ARG_SUBMODULE})
+    string(TOUPPER "${submodule}" _upper_submodule)
+    #message(STATUS "SUBMODULE: ${_upper_submodule}: ${SUBMODULE_${_upper_submodule}_SRC}")
+    set(ARG_SRC ${ARG_SRC} ${SUBMODULE_${_upper_submodule}_SRC})
+  endforeach()
+
+  #message("SOURCES: ${ARG_SRC}")
   add_library("${name}" ${ARG_SRC})
 
-
+  qi_use_lib("${name}" ${ARG_DEPENDS})
 
   if (ARG_RESOURCE)
     set_target_properties("${name}" PROPERTIES RESOURCE      "${ARG_RESOURCE}")
