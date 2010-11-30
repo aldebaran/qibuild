@@ -16,15 +16,6 @@ directory structure, how file are searched and organise.
 QiBuild API
 -----------
 
-link:arguments.html[QiBuild Arguments]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Functions usefull to parse arguments of a cmake function.
-
-* link:arguments.html#_qi_argn_init[qi_argn_init]
-* link:arguments.html#_qi_argn_flags[qi_argn_flags]
-* link:arguments.html#_qi_argn_params[qi_argn_params]
-* link:arguments.html#_qi_argn_groups[qi_argn_groups]
-
 link:target.html[QiBuild Target]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Functions for creating targets. This include binaries, scripts and libraries.
@@ -53,3 +44,38 @@ Simple module to display log messages.
 * link:log.html#_qi_deprecated[qi_deprecated]
 * link:log.html#_qi_warning[qi_warning]
 * link:log.html#_qi_error[qi_error]
+
+link:tests.html[QiBuild Test]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Interface gtest with ctest.
+
+* link:tests.html#_qi_create_gtest[qi_create_gtest]
+* link:tests.html#_qi_add_gtest[qi_add_gtest]
+
+link:uselib.html[QiBuild UseLib]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Simple dependencies handling functions.
+
+* link:uselib.html#_qi_uselib[qi_uselib]
+
+link:launcher.html[QiBuild Launcher]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Create launcher that define proper path (python, libraries, ..) to launch targets.
+
+* link:launcher.html#_qi_create_launcher[qi_create_launcher]
+* link:launcher.html#_qi_create_insource_launcher[qi_create_insource_launcher]
+
+link:stage.html[QiBuild Stage]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Stage executable and libraries to make them available to the outside world!
+
+* link:stage.html#_qi_stage_lib[qi_stage_lib]
+* link:stage.html#_qi_stage_bin[qi_stage_bin]
+* link:stage.html#_qi_stage_script[qi_stage_script]
+* link:stage.html#_qi_stage_header[qi_stage_header]
+
+link:subdirectory.html[QiBuild SubDirectory]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Conditionaly include a subdirectory.
+
+* link:subdirectory.html#_qi_add_subdirectory[qi_add_subdirectory]
