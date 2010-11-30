@@ -10,7 +10,6 @@ if (_QI_USELIB_CMAKE_)
 endif()
 set(_QI_USELIB_CMAKE_ TRUE)
 
-
 #!
 # Find dependencies and add them to the target <name>.
 #
@@ -32,11 +31,18 @@ function(qi_use_lib name)
       include_directories(${${_U_PKG}_INCLUDE_DIR})
     endif()
 
+    if (DEFINED ${_U_PKG}_DEPENDS)
+      message(STATUS "loop: ${${_U_PKG}_DEPENDS}")
+      qi_use_lib(${name} ${${_U_PKG}_DEPENDS})
+    endif()
+
     message(STATUS "lib: ${${_U_PKG}_LIBRARIES}")
     target_link_libraries("${name}" ${${_U_PKG}_LIBRARIES})
     #TODO: add_dependencies
     #TODO: target properties
     set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "${${_U_PKG}_DEFINITIONS}")
   endforeach()
-  list(APPEND "${name}_DEPENDS" ${ARG_DEPENDENCIES})
+  string(TOUPPER "${name}" _U_name)
+  qi_set_global("${_U_name}_DEPENDS" ${${_U_name}_DEPENDS} ${ARG_DEPENDENCIES})
+  message("${_U_name}_DEPENDS = ${ARG_DEPENDENCIES}")
 endfunction()

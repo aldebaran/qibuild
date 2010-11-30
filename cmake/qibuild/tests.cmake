@@ -5,30 +5,35 @@
 ## Copyright (C) 2009, 2010 Cedric GESTES
 ##
 
+#! QiBuild Tests
+# ==============
+# Cedric GESTES <gestes@aldebaran-robotics.com>
+#
+# This cmake module provide function to interface gtest with ctest.
+
+
 set(_TESTS_RESULTS_FOLDER "${CMAKE_BINARY_DIR}/tests-results" CACHE INTERNAL "" FORCE)
 # create tests_results folder if it does not exist
 file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
 
-################################################################################
-#
-# This compiles and add_test's a C++ test that uses gtest.
-# When run, the C++ test outputs a xUnit xml file in
-#   CMAKE_SOURCE_DIR/test_name.xml.
+
+#! This compiles and add_test's a C++ test that uses gtest.
+# When run, the C++ test outputs a xUnit xml file in CMAKE_SOURCE_DIR/test_name.xml.
 #
 # \flag:NO_ADD_TEST do not call add_test, just create the binary
 # \param:TIMEOUT the timeout of the test
 # \group:SRC sources
-# \group:DEPENDENCIES dependencies to pass to use_lib
+# \group:DEPENDS dependencies to pass to use_lib
 # \group:ARGUMENTS arguments to pass to add_test (to your test program)
 #
 # Usage:
 # create_gtest("test_name" SRC mytest0.cpp mytest1.cpp
-#                          DEPENDENCIES MY_LIB_TO_TEST0 MY_LIB_TO_TEST1
+#                          DEPENDS MY_LIB_TO_TEST0 MY_LIB_TO_TEST1
 #                          TIMEOUT 45)
 ################################################################################
 function(qi_create_gtest name)
   qi_debug("qi_create_gtest(${name})")
-  cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDENCIES;ARGUMENTS" ${ARGN})
+  cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
 
   if (NOT TARGET "autotest")
     add_custom_target("autotest")
@@ -45,7 +50,7 @@ function(qi_create_gtest name)
     qi_create_bin("${name}_bin" EXCLUDE_FROM_ALL ${ARG_SRC} NO_INSTALL)
   endif()
   add_dependencies("autotest" "${name}_bin")
-  qi_use_lib("${name}_bin" ${ARG_DEPENDENCIES})
+  qi_use_lib("${name}_bin" ${ARG_DEPENDS})
 
   if (ARG_NO_ADD_TEST)
     return()
@@ -70,8 +75,10 @@ endfunction()
 
 #! add a gtest program to ctest.
 # Xml output (test_name.xml) will be in build/tests_results
+#
 # \arg:executable_name the executable
 # \arg:test_case_name the test's name
+# \argn: program arguments
 function(qi_add_gtest executable_name test_name)
   set(xml_output_name "${_TESTS_RESULTS_FOLDER}/${_test_name}.xml")
 

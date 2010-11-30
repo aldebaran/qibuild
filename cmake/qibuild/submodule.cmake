@@ -36,23 +36,23 @@ include(CMakeParseArguments)
 #                         name will be name\\sourcegroup
 # \group:SRC              the list of source to include in the submodule
 # \group:PUBLIC_HEADER    the list of public headers
-# \group:DEPENDENCIES     the list of dependencies
+# \group:DEPENDS          the list of dependencies
 #
 # \example:submodule
 function(qi_submodule_create name)
-  cmake_parse_arguments(ARG "NO_VSGROUP" "VSGROUP" "SRC;PUBLIC_HEADER;DEP" ${ARGN})
+  cmake_parse_arguments(ARG "NO_VSGROUP" "VSGROUP" "SRC;PUBLIC_HEADER;DEPENDS" ${ARGN})
 
   string(TOUPPER "submodule_${name}_src"           _OUT_src)
   string(TOUPPER "submodule_${name}_public_header" _OUT_public_header)
-  #message(STATUS "src:${ARG_PUBLIC_HEADER} ${ARG_SRC}")
-  qi_glob_sources(_SRC           ${ARG_SRC})
-  qi_glob_sources(_PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
-  #message(STATUS "src2:${_PUBLIC_HEADER} || ${_SRC}")
+  string(TOUPPER "submodule_${name}_depends"       _OUT_depends)
 
-  #message(STATUS "Outssrc1: ${_OUT_src}: ${${_OUT_src}}")
+  qi_glob_sources(_SRC           ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
+  qi_glob_sources(_PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
+
   qi_set_global(${_OUT_src}           ${${_OUT_src}}           ${_PUBLIC_HEADER} ${_SRC})
   qi_set_global(${_OUT_public_header} ${${_OUT_public_header}} ${_PUBLIC_HEADER})
-  #message(STATUS "Outssrc2: ${_OUT_src}: ${${_OUT_src}}")
+  qi_set_global(${_OUT_depends}       ${${_OUT_depends}}       ${ARG_DEPENDS})
+  message(STATUS "Setting deps: ${ARG_DEPENDS}")
   if (NOT ARG_NO_VSGROUP)
     set(_vsgroupname ${name})
     if (NOT ARG_VSGROUP STREQUAL "")
@@ -78,11 +78,11 @@ endfunction()
 #                         for example (WITH_QT)
 # \group:SRC              the list of source to include in the submodule
 # \group:PUBLIC_HEADER    the list of public headers
-# \group:DEP              the list of dependencies
+# \group:DEPENDS          the list of dependencies
 #
 # \example:submodule
 function(qi_submodule_add _name)
-  cmake_parse_arguments(ARG "NO_VSGROUP" "VSGROUP;IF" "SRC;PUBLIC_HEADER;DEP" ${ARGN})
+  cmake_parse_arguments(ARG "NO_VSGROUP" "VSGROUP;IF" "SRC;PUBLIC_HEADER;DEPENDS" ${ARGN})
 
   if (ARG_NO_VSGROUP)
     set(_forward_no_vsgroup "NO_VSGROUP")
@@ -98,12 +98,12 @@ function(qi_submodule_add _name)
     endif()
   endif()
   if (_doit)
+    message(STATUS "pif SUBMODULE: ${ARGN}")
     qi_submodule_create("${_name}"
                         ${_forward_no_vsgroup}
                         VSGROUP       ${ARG_VSGROUP}
-                        SRC           ${ARG_SRC}
+                        SRC           ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS}
                         PUBLIC_HEADER ${ARG_PUBLIC_HEADER}
-                        DEP           ${ARG_DEP}
-                        ${ARG_UNPARSED_ARGUMENTS})
+                        DEPENDS       ${ARG_DEPENDS})
   endif()
 endfunction()

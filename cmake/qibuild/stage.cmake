@@ -5,10 +5,17 @@
 ## Copyright (C) 2009, 2010 Aldebaran Robotics
 ##
 
-#! Generate a *Config.cmake, allowing other project to find the library.
+#! QiBuild Stage
+# ===============
+# Cedric GESTES <gestes@aldebaran-robotics.com>
 #
+# This module make libraries and executables build in this projects available
+# to others projects.
 #
-#
+
+
+#! Generate a 'name'-config.cmake, allowing other project to find the library.
+# \arg:target a target created with qi_create_lib
 #
 function(qi_stage_lib target)
   string(TOUPPER "${target}" _name)
@@ -18,30 +25,27 @@ function(qi_stage_lib target)
   check_is_target("${target}")
 
   #get the target definitions
-  get_directory_property(${target}_DEFINITIONS  COMPILE_DEFINITIONS)
-  get_directory_property(${target}_INCLUDE_DIRS INCLUDE_DIRECTORIES)
+  get_directory_property(${_name}_DEFINITIONS  COMPILE_DEFINITIONS)
+  get_directory_property(${_name}_INCLUDE_DIRS INCLUDE_DIRECTORIES)
 
   get_target_property(_tdebug ${target} "LOCATION_DEBUG")
   get_target_property(_topti ${target}  "LOCATION_RELEASE")
   string(REGEX REPLACE ".dll$" ".lib" _tdebug "${_tdebug}")
   string(REGEX REPLACE ".dll$" ".lib" _topti "${_topti}")
-  set(${target}_LIBRARIES "optimized;${_topti};debug;${_tdebug}")
+  set(${_name}_LIBRARIES "optimized;${_topti};debug;${_tdebug}")
   #TARGET is used to create dependencies between related target in the same build tree
   #TODO: use _ADD_DEPENDENCIES?
-  set(${target}_TARGET    "${target}")
+  set(${_name}_TARGET    "${target}")
+  #set(${target}_DEPENDS   "${target}")
   #source only module
-  _qi_create_cmake_module("${target}" "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_lname}-config.cmake"
+  _qi_create_cmake_module("${_name}" "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_lname}-config.cmake"
                           VARS INCLUDE_DIRS DEFINITIONS LIBRARIES DEPENDS TARGET)
 
-  _qi_create_cmake_module("${target}" "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_lname}-config.cmake"
+  _qi_create_cmake_module("${_name}" "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_lname}-config.cmake"
                           VARS INCLUDE_DIRS DEFINITIONS LIBRARIES DEPENDS)
 endfunction()
 
-###########################
-#
-# make a script available to other project
-#
-###########################
+#! stage a script
 function(qi_stage_script _file _name)
   subfolder_parse_args(_subfolder _args ${ARGN})
   debug("BINLIB: stage_bin (${_targetname}, ${_name}, optional header: ${ARGN})")
@@ -51,11 +55,8 @@ function(qi_stage_script _file _name)
   set(${_name}_STAGED TRUE PARENT_SCOPE)
 endfunction()
 
-###########################
-#
-# make a binary available to other project
-#
-###########################
+#! stage an executable
+# \arg:target the target
 function(qi_stage_bin _targetname)
   string(TOUPPER ${_targetname} _name)
   debug("BINLIB: stage_bin (${_targetname}, ${_name}, optional header: ${ARGN})")
@@ -66,11 +67,8 @@ function(qi_stage_bin _targetname)
   set(${_targetname}_STAGED TRUE PARENT_SCOPE)
 endfunction()
 
-###########################
+#! stage a header only library.
 #
-# make a source only library available to other project
-#
-###########################
 function(qi_stage_header _name)
   debug("BINLIB: stage_header (${_targetname}, ${_name}, optional header: ${ARGN})")
 

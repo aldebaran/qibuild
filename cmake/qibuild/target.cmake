@@ -44,13 +44,13 @@ include(CMakeParseArguments)
 # \param:SUBFOLDER the destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
 # \group:SRC the list of source files
-# \group:DEP the list of source files
+# \group:DEPENDS the list of source files
 # \group:SUBMODULE the list of source files
 # \example:target
 function(qi_create_bin name)
   qi_debug("qi_create_bin(${name})")
 
-  cmake_parse_arguments(ARG "NO_INSTALL;EXCLUDE_FROM_ALL;STAGE" "SUBFOLDER" "SRC;DEP;SUBMODULE" ${ARGN})
+  cmake_parse_arguments(ARG "NO_INSTALL;EXCLUDE_FROM_ALL;STAGE" "SUBFOLDER" "SRC;DEPENDS;SUBMODULE" ${ARGN})
 
   set(ARG_SRC "${ARG_UNPARSED_ARGUMENTS}" "${ARG_SRC}")
   qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
@@ -63,14 +63,16 @@ function(qi_create_bin name)
   endif()
 
   foreach(submodule ${ARG_SUBMODULE})
-    message(STATUS "SUBMODULE: ${submodule}")
-    set(ARG_SRC "${ARG_SRC}" "${${submodule}_SRC}")
+    string(TOUPPER "${submodule}" _upper_submodule)
+    set(ARG_SRC     ${ARG_SRC}     ${SUBMODULE_${_upper_submodule}_SRC})
+    set(ARG_DEPENDS ${ARG_DEPENDS} ${SUBMODULE_${_upper_submodule}_DEPENDS})
   endforeach()
 
   add_executable("${name}" ${ARG_SRC})
 
   message(STATUS "${name} Adding deps: ${ARG_DEP}")
-  qi_use_lib("${name}" ${ARG_DEP})
+  qi_use_lib("${name}" ${ARG_DEPENDS})
+
 
   #make install rules
   if(NOT ARG_NO_INSTALL)
@@ -153,7 +155,9 @@ function(qi_create_lib name)
   foreach(submodule ${ARG_SUBMODULE})
     string(TOUPPER "${submodule}" _upper_submodule)
     #message(STATUS "SUBMODULE: ${_upper_submodule}: ${SUBMODULE_${_upper_submodule}_SRC}")
-    set(ARG_SRC ${ARG_SRC} ${SUBMODULE_${_upper_submodule}_SRC})
+    message(STATUS "SUBMODULE DEP: ${_upper_submodule}: ${SUBMODULE_${_upper_submodule}_DEPENDS}")
+    set(ARG_SRC     ${ARG_SRC}     ${SUBMODULE_${_upper_submodule}_SRC})
+    set(ARG_DEPENDS ${ARG_DEPENDS} ${SUBMODULE_${_upper_submodule}_DEPENDS})
   endforeach()
 
   #message("SOURCES: ${ARG_SRC}")
