@@ -134,7 +134,7 @@ class FunctionContext:
             docline.append("")
             return docline
 
-        docline.append("== %s ==" % (self.name.upper()))
+        docline.append("== %s ==" % (self.name))
         docline.append("=== Description ===")
         docline.extend(self.desc)
         docline.append("")

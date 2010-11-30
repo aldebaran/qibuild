@@ -16,13 +16,13 @@ python doc/tools/generate_doc_from_cmake.py \
   "build-doc"
 
 cp "/etc/asciidoc/javascripts/asciidoc-xhtml11.js" "build-doc"
-cp "doc/asciidoc/pygments.css"  "build-doc"
-cp "doc/asciidoc/bare.css"      "build-doc"
-cp "doc/asciidoc/index.txt"     "build-doc"
+cp "doc/asciidoc/pygments.css"                     "build-doc"
+cp "doc/asciidoc/bare.css"                         "build-doc"
+cp "cmake/qibuild/index.txt"                       "build-doc"
 
 find ${CURDIR}/build-doc/ -type f -name '*.txt' | while read f ; do
   #asciidoc is stupid about css...
-  #we desactivated default theme, set the stylesheet to bare.css, and him to not embedded css
+  #we desactivated default theme, set the stylesheet to bare.css, and disable embedded css
   asciidoc -a toc -a toclevels=1  -a linkcss -a 'theme=' -a stylesheet="bare.css" -a pygments "$f"
 done
 
