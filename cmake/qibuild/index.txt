@@ -79,3 +79,16 @@ link:subdirectory.html[QiBuild SubDirectory]
 Conditionaly include a subdirectory.
 
 * link:subdirectory.html#_qi_add_subdirectory[qi_add_subdirectory]
+
+link:install.html[QiBuild Install]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Install functions.
+
+* link:install.html#_qi_install_bin[qi_install_bin]
+* link:install.html#_qi_install_lib[qi_install_lib]
+* link:install.html#_qi_install_script[qi_install_script]
+* link:install.html#_qi_install_data[qi_install_data]
+* link:install.html#_qi_install_doc[qi_install_doc]
+* link:install.html#_qi_install_header[qi_install_header]
+* link:install.html#_qi_install_conf[qi_install_conf]
+* link:install.html#_qi_install_cmake[qi_install_cmake]

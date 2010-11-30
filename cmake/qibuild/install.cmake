@@ -1,21 +1,24 @@
 ##
-## install.cmake
-## Login : <ctaf@ctaf-maptop>
-## Started on  Sun Oct 18 14:42:06 2009 Cedric GESTES
-## $Id$
-##
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009 Aldebaran Robotics
+## Copyright (C) 2009, 2010 Aldebaran Robotics
 ##
 
-# install functions
-# there could be more than one output dir
+#! QiBuild Install
+# ================
+# Cedric GESTES <gestes@aldebaran-robotics.com>
+#
+# This cmake module provide easy install functions.
+# QiBuild generated path are normalized, thoses functions help
+# creating install rules that abstract the final destination
+# file hierarchy. Furthermore files are classified by components depending
+# on the file type, this make it easy to install only what is needed,
+# for example for a runtime install, header and static libs are not needed
+# but they are needed for a developement install.
 
-###########################
-# install_header
-###########################
+#! install_header
+# \argn: list of headers to install. Globs are accepted.
 function(install_header _name)
   parse_is_options(_args0 INCLUDEPATHEXPORT _is_includepathexport ${ARGN})
   subfolder_parse_args(_subfolder _args1 ${_args0})
