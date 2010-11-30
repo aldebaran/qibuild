@@ -12,7 +12,7 @@
 #!
 # This is the main QiBuild module. It encapsulate the creation of programs,
 # scripts and libraries handling dependencies and install rules,
-# in an easy,elegant and standard way.
+# in an easy, elegant and standard way.
 #
 # There could be differents targets:
 #
@@ -37,7 +37,9 @@ include(CMakeParseArguments)
 # \flag:NO_INSTALL do not create install rules for the target
 # \flag:EXCLUDE_FROM_ALL do not include the target in the 'all' target,
 #                        this target will not be build by default, you will
-#                        to compile the target explicitely.
+#                        have to compile the target explicitely.
+#                        Warning: you will NOT be able to create install rules
+#                          for this target.
 # \flag:STAGE Stage the binary.
 # \flag:WIN32 Build an executable with a WinMain entry point on windows.
 # \flag:MACOSX_BUNDLE refer to the add_executable documentation.
@@ -128,7 +130,9 @@ endfunction()
 # \flag:NO_INSTALL do not create install rules for the target
 # \flag:EXCLUDE_FROM_ALL do not include the target in the 'all' target,
 #                        this target will not be build by default, you will
-#                        to compile the target explicitely.
+#                        have to compile the target explicitely.
+#                        Warning: you will NOT be able to create install rules
+#                          for this target.
 # \flag:NO_STAGE do not stage the librarie.
 # \param:SUBFOLDER the destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>

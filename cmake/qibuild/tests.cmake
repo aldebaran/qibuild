@@ -19,6 +19,7 @@ file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
 
 #! This compiles and add_test's a C++ test that uses gtest.
 # When run, the C++ test outputs a xUnit xml file in CMAKE_SOURCE_DIR/test_name.xml.
+# (so that the test can be run by CTest)
 #
 # \flag:NO_ADD_TEST do not call add_test, just create the binary
 # \param:TIMEOUT the timeout of the test
