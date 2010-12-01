@@ -3,12 +3,7 @@ Goals:
  - be standard as much as possible. (generated *Config.cmake should be selfcontained)
  - use standard path for *Config.cmake
 
-
-
 TODO:
  - rewrite stage_*
  - convert SDK_DIR => CMAKE_MODULE_PATH
  - finish qi_use_lib
- - install rules: support directory
- - submodule: support directory
- - use {set,get}_property
