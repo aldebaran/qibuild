@@ -10,11 +10,7 @@ function(qi_glob_sources _OUT_srcs)
   foreach(_arg ${ARGN})
     file(GLOB _glob "${_arg}")
     set(_temp ${_temp} ${_glob})
-    #message("TEMP: ${_temp}")
   endforeach()
-
-  #message("TEMPEND: ${_temp}")
-
   set(${_OUT_srcs} ${_temp} PARENT_SCOPE)
 endfunction()
 

@@ -19,6 +19,7 @@ include("qibuild/layout")
 include("qibuild/subdirectory")
 include("qibuild/internal/check")
 include("qibuild/internal/glob")
+include("qibuild/internal/install")
 
 if (NOT QI_SDK_DIR)
   qi_set_global(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk/")
