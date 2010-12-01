@@ -68,3 +68,36 @@ endfunction()
 function(qi_install_cmake subfolder)
   _qi_install(${ARGN} COMPONENT cmake DESTINATION ${QI_SDK_CMAKE}/${subfolder})
 endfunction()
+
+
+#! install a target, that could be a program or a library.
+#
+# \param:SUBFOLDER an optional subfolder
+# \argn: a list of target to install
+function(qi_install_target)
+  cmake_parse_arguments(ARG "" "SUBFOLDER" "" ${ARGN})
+
+  foreach (name ${ARG_UNPARSED_ARGUMENTS})
+    install(TARGETS "${name}"
+            RUNTIME COMPONENT binary     DESTINATION ${QI_SDK_BIN}/${ARG_SUBFOLDER}
+            LIBRARY COMPONENT lib        DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER}
+      PUBLIC_HEADER COMPONENT header     DESTINATION ${QI_SDK_INCLUDE}/${ARG_SUBFOLDER}
+           RESOURCE COMPONENT data       DESTINATION ${QI_SDK_SHARE}/${name}/${ARG_SUBFOLDER}
+            ARCHIVE COMPONENT static-lib DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER})
+  endforeach()
+endfunction()
+
+#! install program (mostly script or user provided program). Do not use this function
+# to install library or program built by your project, prefer using qi_install_target.
+#
+# \param:SUBFOLDER an optional subfolder
+# \argn: a list of program to install
+function(qi_install_program)
+  cmake_parse_arguments(ARG "" "SUBFOLDER" "" ${ARGN})
+  foreach(name ${ARG_UNPARSED_ARGUMENTS})
+    #TODO: what should be the real source here?
+    install(PROGRAMS    "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}"
+            COMPONENT   binary
+            DESTINATION "${QI_SDK_BIN}/${ARG_SUBFOLDER}")
+  endforeach()
+endfunction()

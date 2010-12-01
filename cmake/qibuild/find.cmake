@@ -24,35 +24,8 @@
 if (_QI_LIBFIND_CMAKE_)
   return()
 endif()
-
 set(_QI_LIBFIND_CMAKE_ TRUE)
 
-
-# ####################################################################
-# #
-# # THIS FUNCTION IS DEPRECATED, prefer setting ${prefix}_DEPENDS
-# #
-# # append dependent lib to another one
-# #
-# ####################################################################
-# function(depend prefix name0)
-#   #warning(WARNING "LIBFIND: depend is deprecated, please dont use")
-#   parse_is_options(_depend_modulelist "REQUIRED" _depend_is_required "${name0}" ${ARGN})
-#   if(${_depend_is_required})
-#     find_package(${_depend_modulelist} REQUIRED PATHS ${_INTERNAL_SDK_DIRS} NO_DEFAULT_PATH)
-#   else(${_depend_is_required})
-#     find_package(${_depend_modulelist} PATHS ${_INTERNAL_SDK_DIRS} NO_DEFAULT_PATH)
-#   endif(${_depend_is_required})
-
-#   qi_debug("FPKG: ${_depend_modulelist}")
-#   qi_debug("FPKG: ${${prefix}_INCLUDE_DIR}")
-#   qi_debug("FPKG: ${${_depend_modulelist}_INCLUDE_DIR}")
-#   qi_debug("FPKG: ${${_depend_modulelist}_LIBRARIES}")
-
-#   set(${prefix}_INCLUDE_DIR ${${prefix}_INCLUDE_DIR} ${${_depend_modulelist}_INCLUDE_DIR} CACHE STRING   "" FORCE)
-#   set(${prefix}_LIBRARIES   ${${prefix}_LIBRARIES}   ${${_depend_modulelist}_LIBRARIES}   CACHE STRING   "" FORCE)
-#   set(${prefix}_DEFINITIONS ${${prefix}_DEFINITIONS} ${${_depend_modulelist}_DEFINITIONS} CACHE STRING   "" FORCE)
-# endfunction(depend)
 
 include(CMakeParseArguments)
 
@@ -138,27 +111,18 @@ function(flib prefix)
   set(${name}_LIB CACHE INTERNAL "" FORCE)
 endfunction(flib)
 
-##########################
-# search a program
-##########################
-function(fprogram prefix name)
-  qi_debug( "looking for ${name} in ${BIN_PREFIX}")
-  find_program(${prefix} ${name} PATHS ${BIN_PREFIX})
-endfunction()
-
-
 ####################################################################
 #
 # cleanup variable related to a library/executable/source-only library
 #
 ####################################################################
 function(clean prefix)
-  set(${prefix}_INCLUDE_DIR ""    CACHE STRING   "Cleared." FORCE)
-  set(${prefix}_LIBRARIES   ""    CACHE STRING   "Cleared." FORCE)
-  set(${prefix}_DEFINITIONS ""    CACHE STRING   "Cleared." FORCE)
-  set(${prefix}_EXECUTABLE  ""    CACHE STRING   "Cleared." FORCE)
-  set(${prefix}_EXECUTABLE_DEBUG  ""    CACHE STRING   "Cleared." FORCE)
-  set(${prefix}_SEARCHED    FALSE CACHE INTERNAL "Cleared." FORCE)
+  set(${prefix}_INCLUDE_DIR ""           CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_LIBRARIES   ""           CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_DEFINITIONS ""           CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_EXECUTABLE  ""           CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_EXECUTABLE_DEBUG  ""     CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_SEARCHED    FALSE        CACHE INTERNAL "Cleared." FORCE)
   mark_as_advanced(${prefix}_DEFINITIONS ${prefix}_INCLUDE_DIR ${prefix}_LIBRARIES ${prefix}_TARGET ${prefix}_EXECUTABLE ${prefix}_EXECUTABLE_DEBUG)
 endfunction(clean)
 
@@ -248,16 +212,4 @@ function(export_header prefix)
     qi_info( FATAL_ERROR "Could not find ${prefix} include!")
   endif(NOT ${prefix}_FOUND AND ${prefix}_FIND_REQUIRED)
 endfunction(export_header)
-
-####################################################################
-#
-# find
-#
-####################################################################
-#TODO: move aways
-function(find)
-  if (NOT ${ARGV0}_SEARCHED)
-    find_package(${ARGN} PATHS "${SDK_DIR}/${_SDK_CMAKE_MODULES}/" ${_INTERNAL_SDK_DIRS} NO_DEFAULT_PATH)
-  endif (NOT ${ARGV0}_SEARCHED)
-endfunction(find)
 

@@ -78,20 +78,23 @@ function(qi_create_bin name)
 
   #make install rules
   if(NOT ARG_NO_INSTALL)
-    install(TARGETS "${name}" RUNTIME COMPONENT binary DESTINATION ${QI_SDK_BIN}/${ARG_SUBFOLDER})
+    qi_install_bin("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
   endif()
 
   #TODO:qi
   if(WIN32)
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
-    _qi_win32_copy_target("${_name}" "${SDK_DIR}/${_SDK_BIN}/${_subfolder}")
+    _qi_win32_copy_target("${_name}" "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
     # Be nice with VS user: generate a vcproj so that:
     # -> target path is the path where the executable is copyied
     # (not the place where it is compiled)
     # -> PATH and PYTHONPATH are always set to nice values
-    _qi_configure_user_vcproj(${_name} "${SDK_DIR}/${_SDK_BIN}/${_subfolder}")
+    _qi_configure_user_vcproj(${_name} "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
   endif()
   set_target_properties("${name}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
+  # if (NOT ARG_NO_STAGE)
+  #   qi_stage_lib("${name}")
+  # endif()
 endfunction()
 
 

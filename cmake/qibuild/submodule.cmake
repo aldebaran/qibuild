@@ -46,8 +46,8 @@ function(qi_submodule_create name)
   string(TOUPPER "submodule_${name}_public_header" _OUT_public_header)
   string(TOUPPER "submodule_${name}_depends"       _OUT_depends)
 
-  qi_glob_sources(_SRC           ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
-  qi_glob_sources(_PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
+  file(GLOB _SRC           ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
+  file(GLOB _PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
 
   qi_set_global(${_OUT_src}           ${${_OUT_src}}           ${_PUBLIC_HEADER} ${_SRC})
   qi_set_global(${_OUT_public_header} ${${_OUT_public_header}} ${_PUBLIC_HEADER})
@@ -92,6 +92,7 @@ function(qi_submodule_add _name)
   if (NOT "${ARG_IF}" STREQUAL "")
     set(_doit TRUE)
   else()
+    #I must say... lol cmake, but NOT NOT TRUE is not valid!!
     if (${ARG_IF})
     else()
       set(_doit TRUE)
