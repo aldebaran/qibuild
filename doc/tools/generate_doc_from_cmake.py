@@ -5,6 +5,22 @@
 ##
 ## Copyright (C) 2010 Aldebaran Robotics
 ##
+
+#should be rewritten with a real lexer, at least a lexer that work block by block:
+#
+# a block:
+# #!
+# # ...
+# #
+# function(name)
+#
+# another block:
+# #!
+# # ...
+# #
+#
+
+
 import sys
 import re
 import os
@@ -24,16 +40,19 @@ def addAsciiDocLine(line, doclines):
         return 1
     return None
 
-class FunctionContext:
+class DocBlock:
     """ store the documentation of a function """
     def __init__(self, exampledir):
         self.name     = None
         self.desc     = None
+
+        #function specific command
         self.args     = dict()
         self.argn     = None
         self.flags    = dict()
         self.params   = dict()
         self.groups   = dict()
+
         self.examples = dict()
         self.exampledir = exampledir
 
@@ -126,14 +145,10 @@ class FunctionContext:
             return lines
         return list()
 
-    def generate(self):
-        #this is doc only, not a function...
+    def generateFunction(self):
+        """ generate documentation for a function
+        """
         docline = list()
-        if self.name is None:
-            docline.extend(self.desc)
-            docline.append("")
-            return docline
-
         docline.append("== %s ==" % (self.name))
         docline.append("=== Description ===")
         docline.extend(self.desc)
@@ -165,30 +180,6 @@ class FunctionContext:
         docline.append("|======")
         docline.append("")
 
-
-        # docline.append("[source,cmake]")
-        # docline.append("----")
-        # arg = "  %s(" % self.name
-        # for k in self.args.keys():
-        #     arg += "<%s> " % k.lower()
-        # if self.argn:
-        #     arg += ".. "
-        # if arg[-1] == " ":
-        #     arg = arg[:-1]
-        # docline.append(arg)
-
-        # indent = " " * len("  %s(" % self.name)
-        # for k in self.flags.keys():
-        #     docline.append(indent + "%s" % k.upper())
-        # for k in self.params.keys():
-        #     docline.append(indent + "%s <%s>" % (k.upper(), k.lower()))
-        # for k in self.groups.keys():
-        #     docline.append(indent + "%s <%s> .." % (k.upper(), k.lower()))
-        # docline[-1] = docline[-1] + ")"
-        # docline.append("----")
-        # docline.append("")
-
-
         docline.append("=== Parameters ===")
         for (k, v) in self.args.iteritems():
             docline.append(" * _<%s>_: %s" % (k.lower(), " ".join(v)))
@@ -201,6 +192,17 @@ class FunctionContext:
         for (k, v) in self.groups.iteritems():
             docline.append(" * *%s* _<%s>_ .. : %s" % (k.upper(), k.lower(),  " ".join(v)))
         docline.append("")
+        return docline
+
+    def generate(self):
+        #this is doc only, not a function...
+        docline = list()
+        if self.name is None:
+            docline.extend(self.desc)
+            docline.append("")
+        else:
+            #will generate function stuff only if a function is actually defined
+            docline.extend(self.generateFunction())
 
         for (k, v) in self.examples.iteritems():
             docline.append("=== Example: %s ===" % k)
@@ -252,7 +254,7 @@ def doc_process(dp, exampledir):
 
     getdoc = 0
     doclines = list()
-    fc = FunctionContext(exampledir)
+    fc = DocBlock(exampledir)
     while dp.has_next():
         current_index = dp.index
         line = dp.preview_line()
@@ -261,7 +263,7 @@ def doc_process(dp, exampledir):
         if line.startswith("function") and getdoc:
             fc.extractFunctionName(dp)
             doclines.extend(fc.generate())
-            fc = FunctionContext(exampledir)
+            fc = DocBlock(exampledir)
             getdoc = 0
             #print "getdoc0:", line
 
@@ -289,6 +291,7 @@ def doc_process(dp, exampledir):
             print "Parse error: line(%d): %s" % (current_index, dp.preview_line())
             exit(1)
     return doclines
+
 
 def extract_doc_from_cmake(fname, exampledir):
     """
