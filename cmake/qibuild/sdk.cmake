@@ -28,13 +28,6 @@ function(_qi_create_cmake_module prefix filename)
   endforeach()
 endfunction()
 
-function(_qi_create_cmake_module_append_target prefix filename)
-
-endfunction()
-
-function(_qi_cmake_module_append_export)
-endfunction()
-
 
 function(_qi_stage_lib_sdk target)
   string(TOUPPER "${target}" _name)

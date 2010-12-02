@@ -43,11 +43,11 @@ function(qi_use_lib name)
     endif()
 
     if (DEFINED ${_U_PKG}_DEPENDS)
-      message(STATUS "loop: ${${_U_PKG}_DEPENDS}")
+      #message(STATUS "loop: ${${_U_PKG}_DEPENDS}")
       qi_use_lib(${name} ${${_U_PKG}_DEPENDS})
     endif()
 
-    message(STATUS "lib: ${${_U_PKG}_LIBRARIES}")
+    #message(STATUS "lib: ${${_U_PKG}_LIBRARIES}")
     target_link_libraries("${name}" ${${_U_PKG}_LIBRARIES})
     #TODO: add_dependencies
     #TODO: target properties
@@ -55,5 +55,5 @@ function(qi_use_lib name)
   endforeach()
   string(TOUPPER "${name}" _U_name)
   qi_set_global("${_U_name}_DEPENDS" ${${_U_name}_DEPENDS} ${ARG_DEPENDENCIES})
-  message("${_U_name}_DEPENDS = ${ARG_DEPENDENCIES}")
+  #message("${_U_name}_DEPENDS = ${ARG_DEPENDENCIES}")
 endfunction()
