@@ -26,12 +26,6 @@ file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
 # \group:SRC sources
 # \group:DEPENDS dependencies to pass to use_lib
 # \group:ARGUMENTS arguments to pass to add_test (to your test program)
-#
-# Usage:
-# create_gtest("test_name" SRC mytest0.cpp mytest1.cpp
-#                          DEPENDS MY_LIB_TO_TEST0 MY_LIB_TO_TEST1
-#                          TIMEOUT 45)
-################################################################################
 function(qi_create_gtest name)
   qi_debug("qi_create_gtest(${name})")
   cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
