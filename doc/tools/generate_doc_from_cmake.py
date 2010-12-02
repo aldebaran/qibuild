@@ -6,7 +6,9 @@
 ## Copyright (C) 2010 Aldebaran Robotics
 ##
 
-#should be rewritten with a real lexer, at least a lexer that work block by block:
+# This program parse cmake files and generate asciidoc.
+#
+# Doc block should be formated like that:
 #
 # a block:
 # #!
@@ -25,114 +27,77 @@ import sys
 import re
 import os
 
-funcregex = re.compile('\s*function\s*\((\S*?)[\s\)]+.*')
-nameregex = re.compile('# \\\\(\S*?):(\S*?)\s+(.*)')
-
-def addAsciiDocLine(line, doclines):
-    if line.startswith("# ==== ") or line.startswith("# === ") or line.startswith("# == ") or line.startswith("# ."):
-        doclines.append("")
-        doclines.append(line[2:])
-        return 1
-    #indent asciidoc bis
-    elif line.startswith("# WARNING:") or line.startswith("# NOTE:") or line.startswith("# IMPORTANT:") or line.startswith("# CAUTION:") or line.startswith("# TIP:"):
-        doclines.append("")
-        doclines.append(line[2:])
-        return 1
-    return None
+EXAMPLE_DIR=""
 
 class DocBlock:
-    """ store the documentation of a function """
-    def __init__(self, exampledir):
-        self.name     = None
-        self.desc     = None
+    """ simple doc block, representing an asciidoc block.
+    """
+    def __init__(self, content):
+        self.content = LineHolder(content)
+        self.result  = None
+        self.apply_lite_formatter()
+        #self.content = content
 
-        #function specific command
-        self.args     = dict()
-        self.argn     = None
-        self.flags    = dict()
-        self.params   = dict()
-        self.groups   = dict()
+    def apply_lite_formatter(self):
+        """ add space before title and NOTE/WARNING/... """
+        doclines = list()
+        prev = ""
+        for line in self.content.lines:
+            if line.startswith("# ==== ") or line.startswith("# === ") or line.startswith("# == ") or line.startswith("# ."):
+                if prev != "":
+                    doclines.append("")
+            elif line.startswith("# WARNING:") or line.startswith("# NOTE:") or line.startswith("# IMPORTANT:") or line.startswith("# CAUTION:") or line.startswith("# TIP:"):
+                if prev != "":
+                    doclines.append("")
+            prev = line
+            doclines.append(line)
+        self.content = LineHolder(doclines)
 
-        self.examples = dict()
-        self.exampledir = exampledir
+    def extract_block(self):
+        """ extract a block of doc, everything till the next command """
+        doclines = list()
 
-    def _extractName(self, dp):
+        while self.content.has_next():
+            line = self.content.preview_line()
+            if line.startswith("\\"):
+                break
+            doclines.append(self.content.get_line())
+        return doclines
+
+    def extract_command_name(self):
         """ extract a command with it's name and a description
             # \cmd:name description
             #           extended description
         """
-        match = nameregex.match(dp.preview_line())
+        commandregex = re.compile('\\\\(\S*?):(\S*)(.*)')
+        match = commandregex.match(self.content.preview_line())
         if match:
-            dp.get_line()
-            (name, value, desc) = match.groups(1)
+            self.content.get_line()
+            (command, value, desc) = match.groups(1)
             desc = [ desc.strip() ]
-            desc.extend(self._extractBlock(dp))
-            return (name, value, desc)
+            desc.extend(self.extract_block())
+            return (command, value, desc)
         return None
-        pass
 
-    def _extractBlock(self, dp):
-        """ extract a block
-            will stop if the next line is not a comment or is a command
+    def extract_command(self):
         """
-        doclines = list()
-        line = dp.preview_line()
-        while line.startswith("#") and not line.startswith("# \\"):
-            if addAsciiDocLine(dp.preview_line(), doclines):
-                dp.get_line()
-                continue
-            doclines.append(dp.get_line()[2:].strip())
-            line = dp.preview_line()
-        return doclines
-
-    def extractCommand(self, dp):
-        """ extract doxygen like command """
-        ret = self._extractName(dp)
-        if ret:
-            #print "matched: %s - %s : %s" % (ret[0], ret[1], ret[2])
-            (name, value, desc) = ret
-            if name == "arg":
-                self.args[value]   = (desc)
-            elif name == "argn":
-                self.argn          = (value, desc)
-            elif name == "flag":
-                self.flags[value]  = (desc)
-            elif name == "param":
-                self.params[value] = (desc)
-            elif name == "group":
-                self.groups[value] = (desc)
-            elif name == "example":
-                self.examples[value] = (desc)
-            else:
-                print "WARNING: unknown command:", dp.preview_line()
+        handle command
+        """
+        ln = self.content.preview_line()
+        (command, value, desc) = self.extract_command_name()
+        if command == "example":
+            self.result.extend(self.generate_example(value, desc))
         else:
-            print "WARNING: unknown command:", dp.preview_line()
-            dp.get_line()
+            print "WARNING unknow command:", command, value, desc
 
-    def extractFunctionName(self, dp):
-        line = dp.get_line()
-        name = funcregex.match(line)
-        if name:
-            name = name.groups(1)[0]
-            self.name = name
-
-    def extractDescription(self, dp):
-        """ extract description """
-        docline = list()
-        #print "extract desc"
-        docline.append(dp.get_line()[3:].strip())
-        docline.extend(self._extractBlock(dp))
-        self.desc = docline
-        #print "description:", "\n".join(self.desc)
-        #print ""
-
-    def getDoc(self, sample):
+    def generate_example(self, value, desc):
         """ get an example """
-        p = os.path.join(self.exampledir, sample)
+        docline = list()
+        p = os.path.join(EXAMPLE_DIR, value)
         if not os.path.exists(p):
             p += ".cmake"
         if not os.path.isfile(p):
-            p = os.path.join(self.exampledir, sample, "CMakeLists.txt")
+            p = os.path.join(EXAMPLE_DIR, value, "CMakeLists.txt")
         if os.path.exists(p):
             lines = list()
             try:
@@ -142,16 +107,98 @@ class DocBlock:
                 print "Error: example not found: ", p
                 pass
             lines = [ x.rstrip() for x in lines ]
-            return lines
-        return list()
+            docline.append("")
+            docline.append("=== Example: %s ===" % value)
+            docline.append("[source,cmake,numbered]")
+            docline.append("----")
+            docline.extend(lines)
+            docline.append("----")
+            docline.append("")
+        else:
+            print "sample not found:", p
+        return docline
 
-    def generateFunction(self):
+    def generate(self):
+        """ generate the asciidoc output for this block
+        """
+        self.result = list()
+        while self.content.has_next():
+            line = self.content.preview_line()
+            if line.startswith("\\"):
+                self.extract_command()
+                continue
+            self.result.append(self.content.get_line())
+
+    def __str__(self):
+        if not self.result:
+            self.generate()
+        return "\n".join(self.result)
+
+
+
+class FunctionBlock(DocBlock):
+    """ handle a function doc block """
+    def __init__(self, function_name, content):
+        DocBlock.__init__(self, content)
+        self.commands = dict()
+        self.valid_commands = ('arg', 'argn', 'flag', 'param', 'group', 'example')
+        for k in self.valid_commands:
+            self.commands[k] = dict()
+        self.name = self.extract_function_name(function_name)
+        self.extract_commands()
+
+    def extract_commands(self):
+        """ extract command and store them to self.commands
+            the remanaining self.content.lines is "command free"
+        """
+        doclines = list()
+        prev = ""
+        while self.content.has_next():
+            line = self.content.preview_line()
+            if line.startswith("\\"):
+                self.extract_command()
+            else:
+                self.content.get_line()
+                doclines.append(line)
+        self.content = LineHolder(doclines)
+
+    def extract_function_name(self, function_name):
+        """ extract a function name """
+        funcregex = re.compile('\s*function\s*\((\S*?)[\s\)]+.*')
+        name = funcregex.match(function_name)
+        if name:
+            name = name.groups(1)[0]
+            return name
+        return None
+
+    def extract_command(self):
+        """ extract a command """
+        (command, value, desc) = self.extract_command_name()
+        if not self.commands.get(command):
+            self.commands[command] = dict()
+        self.commands[command][value] = desc
+
+        if command not in self.valid_commands:
+            print "WARNING: unknown command:", command, value, desc
+
+
+    def generate(self):
+        """ generate the asciidoc for this block """
+        self.result = list()
+        self.result.extend(self.generate_function())
+        for k,v in self.commands['example'].iteritems():
+            print "example:", k
+            self.result.extend(self.generate_example(k, v))
+        return self.result
+
+    def generate_function(self):
         """ generate documentation for a function
         """
         docline = list()
+        docline.append("")
         docline.append("== %s ==" % (self.name))
         docline.append("=== Description ===")
-        docline.extend(self.desc)
+        docline.extend(self.content.lines)
         docline.append("")
 
         docline.append("=== Prototype ===")
@@ -161,63 +208,44 @@ class DocBlock:
         #docline.append("[source,cmake]")
         #docline.append("----")
         arg = "+*[red]#%s#*(+," % self.name
-        for k in self.args.keys():
+        for k in self.commands['arg'].keys():
             arg += "+_<%s>_+ " % k.lower()
-        if self.argn:
+        if self.commands.get('argn'):
             arg += "+_.._+ "
         if arg[-1] == " ":
             arg = arg[:-1]
         arg += ",,"
         docline.append(arg)
 
-        for k in self.flags.keys():
+        for k in self.commands['flag'].keys():
             docline.append(",+*%s*+,," % k.upper())
-        for k in self.params.keys():
+        for k in self.commands['param'].keys():
             docline.append(",+*%s*+, +_<%s>_+," % (k.upper(), k.lower()))
-        for k in self.groups.keys():
+        for k in self.commands['group'].keys():
             docline.append(",+*%s*+, +_<%s> .._+," % (k.upper(), k.lower()))
         docline[-1] = docline[-1] + "+)+"
         docline.append("|======")
         docline.append("")
 
         docline.append("=== Parameters ===")
-        for (k, v) in self.args.iteritems():
+        for (k, v) in self.commands['arg'].iteritems():
             docline.append(" * _<%s>_: %s" % (k.lower(), " ".join(v)))
-        if self.argn:
-            docline.append(" * _<remaining args>_ .. : %s" % " ".join(self.argn[1]))
-        for (k, v) in self.flags.iteritems():
+        if self.commands.get('argn'):
+            docline.append(" * _<remaining args>_ .. : %s" % " ".join(self.commands['argn'].values()[0]))
+        for (k, v) in self.commands['flag'].iteritems():
             docline.append(" * *%s*: %s" % (k.upper(), " ".join(v)))
-        for (k, v) in self.params.iteritems():
+        for (k, v) in self.commands['param'].iteritems():
             docline.append(" * *%s* _<%s>_: %s" % (k.upper(), k.lower(),  " ".join(v)))
-        for (k, v) in self.groups.iteritems():
+        for (k, v) in self.commands['group'].iteritems():
             docline.append(" * *%s* _<%s>_ .. : %s" % (k.upper(), k.lower(),  " ".join(v)))
         docline.append("")
         return docline
 
-    def generate(self):
-        #this is doc only, not a function...
-        docline = list()
-        if self.name is None:
-            docline.extend(self.desc)
-            docline.append("")
-        else:
-            #will generate function stuff only if a function is actually defined
-            docline.extend(self.generateFunction())
 
-        for (k, v) in self.examples.iteritems():
-            docline.append("=== Example: %s ===" % k)
-            docline.append("[source,cmake,numbered]")
-            docline.append("----")
-            #docline.extend([ "  " + x for x in self.getDoc(k)])
-            docline.extend(self.getDoc(k))
-            #TODO: source the sample
-            docline.append("----")
-            docline.append("")
 
-        return docline
-
-class CmakeDocParser:
-    """ parse a cmake document containing doc """
+class LineHolder:
+    """ simple class to store and fetch lines
+    """
     def __init__(self, lines):
         self.lines = lines
         self.index = 0
@@ -235,87 +263,98 @@ class CmakeDocParser:
         return self.index < len(self.lines)
 
 
-def doc_process_command(dp, fc):
-    doclines = []
-    line = dp.preview_line()
-    if line.startswith("#!"):
-        fc.extractDescription(dp)
-    #indent asciidoc
-    #elif addAsciiDocLine(line, doclines):
-    #    dp.get_line()
-    #handle command
-    elif line.startswith("# \\"):
-        fc.extractCommand(dp)
-    else:
-        doclines.append(dp.get_line())
-    return doclines
+class CMakeDocParser:
+    """ Extract doc from a cmake like file
+        This class strip # and #! from lines
+    """
 
-def doc_process(dp, exampledir):
+    def __init__(self, lines):
+        self.dp = LineHolder(lines)
+        self.blocks = list()
+        self.current_block = list()
 
-    getdoc = 0
-    doclines = list()
-    fc = DocBlock(exampledir)
-    while dp.has_next():
-        current_index = dp.index
-        line = dp.preview_line()
+    def cleanup_line(self, line):
+        """ remove comment from a line """
+        if line.startswith("#!") or line.startswith("# "):
+            return line[2:].strip()
+        elif line.startswith("#"):
+            return line[1:].strip()
+        return line.strip()
 
-        #this is a function
-        if line.startswith("function") and getdoc:
-            fc.extractFunctionName(dp)
-            doclines.extend(fc.generate())
-            fc = DocBlock(exampledir)
-            getdoc = 0
-            #print "getdoc0:", line
+    def eat_shit(self):
+        """ eat line that are not part of the doc """
+        while self.dp.has_next():
+            line = self.dp.preview_line()
+            stripped = line.strip()
+            if stripped.startswith("#!"):
+                break
+            self.dp.get_line()
 
-        #this is not doc... pass
-        if line.startswith("#!"):
-            #print "getdoc1:", line
-            getdoc = 1
+    def eat_block(self):
+        """ extract a block
+            will stop if the next line is not a comment or not a function declaration
+        """
+        doclines = list()
 
-        if not getdoc:
-            dp.get_line()
-            continue
+        while self.dp.has_next():
 
-        #this is not doc... pass
-        if not line.startswith("#"):
-            doclines.extend(fc.generate())
-            getdoc = 0
-            dp.get_line()
-            continue
+            line = self.dp.preview_line()
+            stripped = line.strip()
+
+            if stripped.startswith("#"):
+                doclines.append(self.cleanup_line(line))
+                self.dp.get_line()
+            elif stripped.startswith("function"):
+                self.dp.get_line()
+                self.blocks.append(FunctionBlock(self.cleanup_line(line), doclines))
+                break
+            else:
+                self.blocks.append(DocBlock(doclines))
+                break
+
+    def parse_block(self):
+        """ parse all block
+        this will populate self.block with DocBlock and FunctionBlock
+        """
+        while self.dp.has_next():
+            current_index = self.dp.index
+            self.eat_shit()
+            self.eat_block()
+            if current_index == self.dp.index:
+                print "parse internal error (because I love this error message)"
+                return
 
 
-        #try to see if it's asciidoc related
-        if getdoc:
-            doclines.extend(doc_process_command(dp, fc))
-        if dp.index == current_index:
-            print "Parse error: line(%d): %s" % (current_index, dp.preview_line())
-            exit(1)
-    return doclines
-
-
-def extract_doc_from_cmake(fname, exampledir):
+def extract_doc_from_cmake(fname):
     """
     return a list with line of doc
     """
     with open(fname, "r") as f:
         lines = f.readlines()
-    dp = CmakeDocParser(lines)
-    doclines = doc_process(dp, exampledir)
-    #print doclines
-    docs = "\n".join(doclines)
+
+    dp = CMakeDocParser(lines)
+    dp.parse_block()
+
+    docs = list()
+    for b in dp.blocks:
+        docs.append(str(b))
+        #     print ""
+        #     print "================================================"
+        #     print "================================================"
+        #     print b
     return docs
 
-def generate_doc(fname, exampledir, outdir):
+def generate_doc(fname, outdir):
     """ generate a .txt based on a cmake file if the doc is not empty """
     dest = os.path.join(outdir, os.path.basename(fname))
     dest = dest.replace(".cmake", ".txt")
-    docs = extract_doc_from_cmake(fname, exampledir)
+    docs = extract_doc_from_cmake(fname)
 
     if len(docs) > 0:
         print "Generated:", dest
         with open(dest, "w") as f:
             for l in docs:
-                f.write(l)
+                f.write(l + '\n')
 
 def ls(directory, pattern):
     """ return file list that match pattern """
@@ -336,7 +375,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 4:
         usage()
     src = sys.argv[1]
-    example = sys.argv[2]
+    EXAMPLE_DIR = sys.argv[2]
     dest = sys.argv[3]
     try:
         os.makedirs(dest)
@@ -346,4 +385,4 @@ if __name__ == "__main__":
     for f in cmakefiles:
         if f.endswith("_test.cmake"):
             continue
-        generate_doc(f, example, dest)
+        generate_doc(f, dest)
