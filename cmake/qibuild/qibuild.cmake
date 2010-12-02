@@ -40,9 +40,12 @@ include("qibuild/find")
 include("qibuild/uselib")
 include("qibuild/launcher")
 include("qibuild/tests")
+include("qibuild/install")
 include("qibuild/target")
 include("qibuild/submodule")
-include("qibuild/install")
 include("qibuild/stage")
 include("qibuild/sdk")
 include("qibuild/doc")
+
+
+qi_create_root()
