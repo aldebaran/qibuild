@@ -5,8 +5,8 @@
 ## Copyright (C) 2009, 2010 Cedric GESTES
 ##
 
-find(ASCIIDOC QUIET)
-find(DOXYGEN QUIET)
+find_package(ASCIIDOC QUIET)
+find_package(DOXYGEN QUIET)
 
 #The doc target will generate all the documentation, including asciidoc and doxygen.
 
