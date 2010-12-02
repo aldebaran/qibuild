@@ -69,8 +69,9 @@ function(qi_create_bin name)
     set(ARG_SRC     ${ARG_SRC}     ${SUBMODULE_${_upper_submodule}_SRC})
     set(ARG_DEPENDS ${ARG_DEPENDS} ${SUBMODULE_${_upper_submodule}_DEPENDS})
   endforeach()
+  file(GLOB _SRC           ${ARG_SRC})
 
-  add_executable("${name}" ${ARG_SRC})
+  add_executable("${name}" ${_SRC})
 
   message(STATUS "${name} Adding deps: ${ARG_DEP}")
   qi_use_lib("${name}" ${ARG_DEPENDS})
@@ -159,6 +160,7 @@ function(qi_create_lib name)
   qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
   qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
 
+
   foreach(submodule ${ARG_SUBMODULE})
     string(TOUPPER "${submodule}" _upper_submodule)
     #message(STATUS "SUBMODULE: ${_upper_submodule}: ${SUBMODULE_${_upper_submodule}_SRC}")
@@ -166,9 +168,11 @@ function(qi_create_lib name)
     set(ARG_SRC     ${ARG_SRC}     ${SUBMODULE_${_upper_submodule}_SRC})
     set(ARG_DEPENDS ${ARG_DEPENDS} ${SUBMODULE_${_upper_submodule}_DEPENDS})
   endforeach()
+  file(GLOB _SRC           ${ARG_SRC})
+  file(GLOB _PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
 
   #message("SOURCES: ${ARG_SRC}")
-  add_library("${name}" ${ARG_SRC})
+  add_library("${name}" ${_SRC})
 
   qi_use_lib("${name}" ${ARG_DEPENDS})
 
@@ -177,7 +181,7 @@ function(qi_create_lib name)
   endif()
 
   if (ARG_PUBLIC_HEADER)
-    set_target_properties("${name}" PROPERTIES PUBLIC_HEADER "${ARG_PUBLIC_HEADER}")
+    set_target_properties("${name}" PROPERTIES PUBLIC_HEADER "${_PUBLIC_HEADER}")
   endif()
 
   #set(_binlib ${QI_SDK_LIB})
