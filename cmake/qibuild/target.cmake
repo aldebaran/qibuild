@@ -78,7 +78,7 @@ function(qi_create_bin name)
 
   #make install rules
   if(NOT ARG_NO_INSTALL)
-    qi_install_bin("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
+    qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
   endif()
 
   #TODO:qi
