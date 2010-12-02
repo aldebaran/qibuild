@@ -76,7 +76,7 @@ Stage executable and libraries to make them available to the outside world!
 
 link:subdirectory.html[QiBuild SubDirectory]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Conditionaly include a subdirectory.
+Conditionally include a subdirectory.
 
 * link:subdirectory.html#_qi_add_subdirectory[qi_add_subdirectory]
 

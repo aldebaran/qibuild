@@ -5,6 +5,17 @@
 ## Copyright (C) 2009, 2010 Aldebaran Robotics
 ##
 
+#! QiBuild UseLib
+# ===============
+# Cedric GESTES <gestes@aldebaran-robotics.com>
+#
+# == Overview ==
+# qi_use_lib handle dependencies between projects.
+# It will call find_package for you, then do all include_directories
+# and target_link_libraries needed.
+# \example:uselib
+#
+
 if (_QI_USELIB_CMAKE_)
   return()
 endif()
