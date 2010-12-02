@@ -22,8 +22,8 @@ qi_set_global(QI_SDK_INCLUDE        "include"          )
 qi_set_global(QI_SDK_SHARE          "share"            )
 qi_set_global(QI_SDK_CONF           "etc"              )
 qi_set_global(QI_SDK_DOC            "share/doc"        )
-qi_set_global(QI_SDK_CMAKE          "lib/cmake"        )
-qi_set_global(QI_SDK_CMAKE_MODULES  "lib/cmake/modules")
+qi_set_global(QI_SDK_CMAKE          "cmake"            )
+qi_set_global(QI_SDK_CMAKE_MODULES  "cmake"            )
 
 #WINDOWS SDK LAYOUT
 set(WIN_LAYOUT_SDK_BIN            ""                      CACHE STRING "" FORCE)
