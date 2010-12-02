@@ -59,6 +59,8 @@ class DocBlock:
 
         while self.content.has_next():
             line = self.content.preview_line()
+            if line == "":
+                break
             if line.startswith("\\"):
                 break
             doclines.append(self.content.get_line())
@@ -79,16 +81,18 @@ class DocBlock:
             return (command, value, desc)
         return None
 
-    def extract_command(self):
+    def generate_command(self):
         """
         handle command
         """
+        docline = list()
         ln = self.content.preview_line()
         (command, value, desc) = self.extract_command_name()
         if command == "example":
-            self.result.extend(self.generate_example(value, desc))
+            docline.extend(self.generate_example(value, desc))
         else:
             print "WARNING unknow command:", command, value, desc
+        return docline
 
     def generate_example(self, value, desc):
         """ get an example """
@@ -125,7 +129,7 @@ class DocBlock:
         while self.content.has_next():
             line = self.content.preview_line()
             if line.startswith("\\"):
-                self.extract_command()
+                self.result.extend(self.generate_command())
                 continue
             self.result.append(self.content.get_line())
 
