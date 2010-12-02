@@ -14,35 +14,17 @@
 #
 
 
+
+
 #! Generate a 'name'-config.cmake, allowing other project to find the library.
 # \arg:target a target created with qi_create_lib
 #
 function(qi_stage_lib target)
-  string(TOUPPER "${target}" _name)
-  string(TOLOWER "${target}" _lname)
-
   qi_debug("BINLIB: stage_lib (${_targetname})")
   check_is_target("${target}")
 
-  #get the target definitions
-  get_directory_property(${_name}_DEFINITIONS  COMPILE_DEFINITIONS)
-  get_directory_property(${_name}_INCLUDE_DIRS INCLUDE_DIRECTORIES)
-
-  get_target_property(_tdebug ${target} "LOCATION_DEBUG")
-  get_target_property(_topti ${target}  "LOCATION_RELEASE")
-  string(REGEX REPLACE ".dll$" ".lib" _tdebug "${_tdebug}")
-  string(REGEX REPLACE ".dll$" ".lib" _topti "${_topti}")
-  set(${_name}_LIBRARIES "optimized;${_topti};debug;${_tdebug}")
-  #TARGET is used to create dependencies between related target in the same build tree
-  #TODO: use _ADD_DEPENDENCIES?
-  set(${_name}_TARGET    "${target}")
-  #set(${target}_DEPENDS   "${target}")
-  #source only module
-  _qi_create_cmake_module("${_name}" "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_lname}-config.cmake"
-                          VARS INCLUDE_DIRS DEFINITIONS LIBRARIES DEPENDS TARGET)
-
-  _qi_create_cmake_module("${_name}" "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_lname}-config.cmake"
-                          VARS INCLUDE_DIRS DEFINITIONS LIBRARIES DEPENDS)
+  _qi_stage_lib_sdk(${target} ${ARGN})
+  _qi_stage_lib_redist(${target} ${ARGN})
 endfunction()
 
 #! stage a script
