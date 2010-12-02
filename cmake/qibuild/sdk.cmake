@@ -49,6 +49,7 @@ function(_qi_stage_lib_sdk target)
   set(${_name}_TARGET    "${target}")
   #set(${target}_DEPENDS   "${target}")
   #source only module
+  message(STATUS "CREATING :" "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_lname}-config.cmake")
   _qi_create_cmake_module("${_name}" "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_lname}-config.cmake"
                           VARS INCLUDE_DIRS DEFINITIONS LIBRARIES DEPENDS TARGET)
 endfunction()

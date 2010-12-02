@@ -69,7 +69,8 @@ function(qi_create_bin name)
     set(ARG_SRC     ${ARG_SRC}     ${SUBMODULE_${_upper_submodule}_SRC})
     set(ARG_DEPENDS ${ARG_DEPENDS} ${SUBMODULE_${_upper_submodule}_DEPENDS})
   endforeach()
-  file(GLOB _SRC           ${ARG_SRC})
+
+  qi_glob(_SRC ${ARG_SRC})
 
   add_executable("${name}" ${_SRC})
 
@@ -168,8 +169,8 @@ function(qi_create_lib name)
     set(ARG_SRC     ${ARG_SRC}     ${SUBMODULE_${_upper_submodule}_SRC})
     set(ARG_DEPENDS ${ARG_DEPENDS} ${SUBMODULE_${_upper_submodule}_DEPENDS})
   endforeach()
-  file(GLOB _SRC           ${ARG_SRC})
-  file(GLOB _PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
+  qi_glob(_SRC           ${ARG_SRC})
+  qi_glob(_PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
 
   #message("SOURCES: ${ARG_SRC}")
   add_library("${name}" ${_SRC})

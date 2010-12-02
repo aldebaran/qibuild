@@ -52,7 +52,7 @@ function(qi_submodule_create name)
   qi_set_global(${_OUT_src}           ${${_OUT_src}}           ${_PUBLIC_HEADER} ${_SRC})
   qi_set_global(${_OUT_public_header} ${${_OUT_public_header}} ${_PUBLIC_HEADER})
   qi_set_global(${_OUT_depends}       ${${_OUT_depends}}       ${ARG_DEPENDS})
-  message(STATUS "Setting deps: ${ARG_DEPENDS}")
+  #message(STATUS "Setting deps: ${ARG_DEPENDS}")
   if (NOT ARG_NO_VSGROUP)
     set(_vsgroupname ${name})
     if (NOT ARG_VSGROUP STREQUAL "")
@@ -99,7 +99,7 @@ function(qi_submodule_add _name)
     endif()
   endif()
   if (_doit)
-    message(STATUS "pif SUBMODULE: ${ARGN}")
+    #message(STATUS "pif SUBMODULE: ${ARGN}")
     qi_submodule_create("${_name}"
                         ${_forward_no_vsgroup}
                         VSGROUP       ${ARG_VSGROUP}
