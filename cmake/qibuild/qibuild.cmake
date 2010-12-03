@@ -20,6 +20,7 @@ include("qibuild/internal/layout")
 include("qibuild/internal/check")
 include("qibuild/internal/install")
 include("qibuild/internal/glob")
+include("qibuild/internal/stage")
 
 if (NOT QI_SDK_DIR)
   qi_set_global(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk/")
@@ -49,5 +50,7 @@ include("qibuild/sdk")
 include("qibuild/doc")
 
 
-set(CMAKE_PREFIX_PATH ${QI_SDK_DIR} ${CMAKE_PREFIX_PATH})
-qi_create_root()
+_qi_create_sdk()
+qi_include_sdk(${QI_SDK_DIR})
+#set(CMAKE_PREFIX_PATH ${QI_SDK_DIR} ${CMAKE_PREFIX_PATH})
+#qi_create_root()
