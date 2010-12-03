@@ -46,8 +46,10 @@ function(qi_submodule_create name)
   string(TOUPPER "submodule_${name}_public_header" _OUT_public_header)
   string(TOUPPER "submodule_${name}_depends"       _OUT_depends)
 
-  file(GLOB _SRC           ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
-  file(GLOB _PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
+  qi_glob(_SRC           ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
+  qi_glob(_PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
+  qi_abspath(_SRC ${_SRC})
+  qi_abspath(_PUBLIC_HEADER ${_PUBLIC_HEADER})
 
   qi_set_global(${_OUT_src}           ${${_OUT_src}}           ${_PUBLIC_HEADER} ${_SRC})
   qi_set_global(${_OUT_public_header} ${${_OUT_public_header}} ${_PUBLIC_HEADER})
