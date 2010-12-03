@@ -23,7 +23,7 @@ function(_qi_create_cmake_module prefix filename)
     #get_property(GLOBAL
     string(TOUPPER "${prefix}_${var}" _out)
     qi_debug("writing: set(${_out} \"${${prefix}_${var}}\")")
-    file(APPEND ${filename} "set(${_out} \"${${prefix}_${var}}\")\n")
+    file(APPEND ${filename} "set(${_out} \"${${prefix}_${var}}\" CACHE STRING \"\" FORCE)\n")
     file(APPEND ${filename} "mark_as_advanced(${_out})\n")
   endforeach()
 endfunction()
@@ -37,19 +37,12 @@ function(_qi_stage_lib_sdk target)
   get_directory_property(${_name}_DEFINITIONS  COMPILE_DEFINITIONS)
   get_directory_property(${_name}_INCLUDE_DIRS INCLUDE_DIRECTORIES)
 
-  message(STATUS "${_name}_INCLUDE_DIRS=${${_name}_INCLUDE_DIRS}")
-
   get_target_property(_tdebug ${target} "LOCATION_DEBUG")
   get_target_property(_topti ${target}  "LOCATION_RELEASE")
   string(REGEX REPLACE ".dll$" ".lib" _tdebug "${_tdebug}")
   string(REGEX REPLACE ".dll$" ".lib" _topti "${_topti}")
   set(${_name}_LIBRARIES "optimized;${_topti};debug;${_tdebug}")
-  #TARGET is used to create dependencies between related target in the same build tree
-  #TODO: use _ADD_DEPENDENCIES?
   set(${_name}_TARGET    "${target}")
-  #set(${target}_DEPENDS   "${target}")
-  #source only module
-  message(STATUS "CREATING :" "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_lname}-config.cmake")
   _qi_create_cmake_module("${_name}" "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_lname}-config.cmake"
                           VARS INCLUDE_DIRS DEFINITIONS LIBRARIES DEPENDS TARGET)
 endfunction()

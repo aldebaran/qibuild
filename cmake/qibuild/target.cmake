@@ -74,9 +74,7 @@ function(qi_create_bin name)
 
   add_executable("${name}" ${_SRC})
 
-  message(STATUS "${name} Adding deps: ${ARG_DEP}")
   qi_use_lib("${name}" ${ARG_DEPENDS})
-
 
   #make install rules
   if(NOT ARG_NO_INSTALL)
@@ -164,8 +162,6 @@ function(qi_create_lib name)
 
   foreach(submodule ${ARG_SUBMODULE})
     string(TOUPPER "${submodule}" _upper_submodule)
-    #message(STATUS "SUBMODULE: ${_upper_submodule}: ${SUBMODULE_${_upper_submodule}_SRC}")
-    message(STATUS "SUBMODULE DEP: ${_upper_submodule}: ${SUBMODULE_${_upper_submodule}_DEPENDS}")
     set(ARG_SRC     ${ARG_SRC}     ${SUBMODULE_${_upper_submodule}_SRC})
     set(ARG_DEPENDS ${ARG_DEPENDS} ${SUBMODULE_${_upper_submodule}_DEPENDS})
   endforeach()

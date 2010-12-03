@@ -51,6 +51,6 @@ include("qibuild/doc")
 
 
 _qi_create_sdk()
-qi_include_sdk(${QI_SDK_DIR})
-#set(CMAKE_PREFIX_PATH ${QI_SDK_DIR} ${CMAKE_PREFIX_PATH})
+#qi_include_sdk(${QI_SDK_DIR})
+set(CMAKE_PREFIX_PATH ${QI_SDK_DIR} ${CMAKE_PREFIX_PATH})
 #qi_create_root()
