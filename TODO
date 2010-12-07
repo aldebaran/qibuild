@@ -157,7 +157,7 @@ qitoolchain create 'mingw32'
 .toc/toolchain/mingw32
 
 
-qitoolchain install 'zeromq'
+qitoolchain add 'zeromq'
 => .toc/toolchain/mingw32/zeromq.zip
    toolchain/mingw32/{include,lib}
 
