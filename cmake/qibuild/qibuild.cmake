@@ -11,6 +11,10 @@ list(APPEND CMAKE_PREFIX_PATH ${_ROOT_DIR}/modules/)
 #TODO: change the path
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR}/sdk/lib/cmake/modules)
 
+if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
+  list(APPEND CMAKE_MODULE_PATH ${_ROOT_DIR}/extern)
+endif()
+
 
 include("qibuild/log")
 include("qibuild/set")
