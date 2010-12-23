@@ -1,2 +1,4 @@
 build*
 .ropeproject
+*.pyc
+*.pyo
