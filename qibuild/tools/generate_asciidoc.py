@@ -33,7 +33,7 @@ if __name__ == "__main__":
         output.append("%s::" % (action_name))
         output.append(action_doc)
         output.append("")
-    print """
+    print """\
 QIBUILD(1)
 ==========
 :doctype: manpage
@@ -48,6 +48,7 @@ SYNOPSIS
 --------
 *qibuild* ['OPTIONS'] COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
 
+
 OPTIONS
 -------
 *--toc-work-tree='TOC_WORK_TREE'::
@@ -61,13 +62,16 @@ OPTIONS
 *-v, --verbose*::
     Print verbose output.
 
+
 DESCRIPTION
 -----------
 The command line program toc provide severals actions to work with projects.
 
+
 COMMAND
 -------
 %s
+
 
 EXIT STATUS
 -----------
@@ -76,6 +80,7 @@ EXIT STATUS
 
 *1*::
     Failure
+
 
 BUGS
 ----
