@@ -101,6 +101,17 @@ def main_wrapper(module, args):
         logger.error(str(e))
         sys.exit(2)
 
+def _dump_arguments(name, args):
+    """ dump an argparser namespace to log """
+    logger = logging.getLogger("qibuild.shell")
+    logger.debug("[%s] arguments:", name)
+    max_len = 0
+    for k in args.__dict__.keys():
+        if len(k) > max_len:
+            max_len = len(k)
+    for k,v in args.__dict__.iteritems():
+        pad = "".join([ " " for x in range(max_len - len(k)) ])
+        logger.debug("%s%s = %s", str(k), pad, str(v))
 
 def root_command_main(name, parser, modules):
     """name : name of the main program
@@ -141,10 +152,7 @@ def root_command_main(name, parser, modules):
     args = parser.parse_args()
     qibuild.log.configure_logging(args)
     module = action_modules[args.action]
-    logger = logging.getLogger("qibuild.shell")
-    logger.debug("[%s] arguments:", name)
-    for k,v in args.__dict__.iteritems():
-        logger.debug("%s = %s", str(k), str(v))
+    _dump_arguments(name, args)
     main_wrapper(module, args)
 
 def sub_command_main(module, args=None, namespace=None):
@@ -167,10 +175,7 @@ def sub_command_main(module, args=None, namespace=None):
     module.configure_parser(parser)
     parsed_args = parser.parse_args(args=args, namespace=namespace)
     qibuild.log.configure_logging(parsed_args)
-    logger = logging.getLogger("qibuild.shell")
-    logger.debug("[%s] arguments:", module.__file__)
-    for k,v in parsed_args.__dict__.iteritems():
-        logger.debug("%s = %s", str(k), str(v))
+    _dump_arguments(module.__file__, args)
     main_wrapper(module, parsed_args)
 
 

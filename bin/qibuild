@@ -16,7 +16,7 @@ def main():
     parser = argparse.ArgumentParser()
     modules = list()
     modules.extend(qibuild.shell.main.action_modules_from_package("qibuild.actions.qibuild"))
-    modules.extend(qibuild.shell.main.action_modules_from_package("qibuild.actions.git"))
+    modules.extend(qibuild.shell.main.action_modules_from_package("qibuild.actions.toc"))
     qibuild.shell.root_command_main("qibuild", parser, modules)
 
 if __name__ == "__main__":
