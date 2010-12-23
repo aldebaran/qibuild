@@ -1,0 +1,97 @@
+import os
+import qibuild.manifest
+from buildtool.config import ON_WIN
+
+<<<<<<< HEAD
+def guess_project_from_working_dir(toc, working_dir):
+    """Return the project associated with the current working directory """
+    cwd     = os.path.normpath(os.path.abspath(working_dir))
+    maxlen  = 0
+    current = None
+    pcwd    = cwd
+    dirname = None
+    #for each cwd parent folders, try to see if it match src
+    while dirname or pcwd:
+        #print "pcwd:", pcwd, "dirname:", dirname
+        for p in toc.get_projects():
+            src = os.path.normpath(os.path.abspath(p.get_src_dir()))
+            try:
+                if ON_WIN:
+                  if os.path.normcase(pcwd) == os.path.normcase(src):
+                    current = p
+                    break
+                else:
+                  if os.path.samefile(pcwd, src):
+                      maxlen = len(src)
+                      current = p
+                      break
+            except OSError:
+                pass
+        if current:
+            break
+        (npcwd, dirname) = os.path.split(pcwd)
+        if npcwd == pcwd:
+            break
+        pcwd = npcwd
+    print current
+    return current
+
+
+def get_projects(args, toc, project_names):
+=======
+def configure_parser(parser):
+    """Parser settings for every action using several toc projects
+
+    """
+    parser.add_argument("-s", "--single", action="store_true",
+        help="do not resolve any dependency")
+    parser.add_argument("--only-deps", action="store_true",
+        help="only work on the dependencies")
+    parser.add_argument("--use-deps", action="store_true",
+        help="use dependencies")
+    parser.add_argument("projects", nargs="?", metavar="PROJECT",
+        help="project name (s)")
+    parser.set_defaults(single=False, only_deps=False, use_deps=True)
+
+def get_projects(toc, args):
+>>>>>>> qibuild.shell.projectaction: cleanup
+    """Given a list of project names, return the full list of project.
+
+    """
+    # Little magic here: if arg.projects was not given,
+    # guess it from the working dir.
+    # So that:
+    #    cd /path/to foo
+    #    qibuild
+    # is the same as:
+    #   qibuild foo
+<<<<<<< HEAD
+    if project_names == [None]:
+        project = guess_project_from_working_dir(toc, os.getcwd())
+        project_names = [project.name]
+=======
+    project_names = args.projects
+    if not project_names:
+        project_dir = qibuild.manifest.search_manifest_directory(os.getcwd())
+        if project_dir:
+            project_names = [ os.path.split(project_dir)[-1] ]
+>>>>>>> qibuild.shell.projectaction: cleanup
+
+    if not project_names:
+        project_names = toc.buildable_projects.keys()
+
+    if args.single:
+        return project_names
+
+    if args.only_deps:
+        if len(project_names) != 1:
+            raise Exception("You should have a list of exactly one project when using --single or --only-deps")
+        single_project = project_names[0]
+
+    if args.use_deps:
+        project_names = toc.resolve_deps(project_names)
+
+    if args.only_deps:
+        project_names.remove(single_project)
+
+    return project_names
