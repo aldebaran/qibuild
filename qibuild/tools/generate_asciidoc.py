@@ -14,8 +14,7 @@ import qibuild.shell
 
 if __name__ == "__main__":
     actions = list()
-    actions.extend(qibuild.shell.main.action_modules_from_package("qibuild.actions.qibuild"))
-    actions.extend(qibuild.shell.main.action_modules_from_package("qibuild.actions.toc"))
+    actions.extend(qibuild.shell.main.action_modules_from_package("qibuild.actions"))
 
     max_len = 0
     for action in actions:
@@ -35,43 +34,19 @@ if __name__ == "__main__":
         output.append(action_doc)
         output.append("")
     print """
-TOC(1)
-======
+QIBUILD(1)
+==========
 :doctype: manpage
 
 
 NAME
 ----
-toc - get, build, install projects.
+qibuild - get, build, install projects.
 
 
 SYNOPSIS
 --------
-*toc* ['OPTIONS'] COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
-
-
-DESCRIPTION
------------
-The command line program toc provide severals actions to work with projects.
-
-COMMAND
--------
-TODO: move inside command?
-Commands bellow allow building a project and it's dependencies.
-If a binary archive of a depedencies is available, specified projects
-will build using them.
-
-*toc configure* - configure a project using qibuild
-*toc build* - build a project using qibuild
-
-Command bellow always works on all buildable projects.
-*toc foreach
-*toc pull*
-*toc push*
-
-COMMANDS
---------
-%s
+*qibuild* ['OPTIONS'] COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
 
 OPTIONS
 -------
@@ -86,9 +61,13 @@ OPTIONS
 *-v, --verbose*::
     Print verbose output.
 
-*--version*::
-    Print program version number.
+DESCRIPTION
+-----------
+The command line program toc provide severals actions to work with projects.
 
+COMMAND
+-------
+%s
 
 EXIT STATUS
 -----------
