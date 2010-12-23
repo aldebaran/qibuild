@@ -33,6 +33,7 @@ if __name__ == "__main__":
         #output.append("%s%s : %s" % (action_name, action_pad, action_doc))
         output.append("%s::" % (action_name))
         output.append(action_doc)
+        output.append("")
     print """
 TOC(1)
 ======
@@ -74,26 +75,16 @@ COMMANDS
 
 OPTIONS
 -------
-*-b, --backend*='BACKEND'::
-    Backend output file format: 'docbook45', 'xhtml11', 'html4',
-    'wordpress' or 'latex' (the 'latex' backend is experimental).
-    You can also the backend alias names 'html' (aliased to 'xhtml11')
-    or 'docbook' (aliased to 'docbook45').
-    Defaults to 'html'.
+*--toc-work-tree='TOC_WORK_TREE'::
+    Specify the toc work tree. This can be an environment variable too.
 
-*-f, --conf-file*='CONF_FILE'::
-    Use configuration file 'CONF_FILE'.Configuration files processed
-    in command-line order (after implicit configuration files).  This
-    option may be specified more than once.
-
-*-h, --help*[='TOPIC']::
-    Print help TOPIC. *--help*='topics' will print a list of help
+*-h, --help* ['TOPIC']::
+    Print help TOPIC. *--help* 'topics' will print a list of help
     topics, *--help*='syntax' summarizes AsciiDoc syntax,
     *--help*='manpage' prints the AsciiDoc manpage.
 
 *-v, --verbose*::
-    Verbosely print processing information and configuration file
-    checks to stderr.
+    Print verbose output.
 
 *--version*::
     Print program version number.
@@ -109,8 +100,6 @@ EXIT STATUS
 
 BUGS
 ----
-    f@r @ct|@n |n @ct|@ns:
-        pr|nt "==== ===="
-        pr|nt "d@c:", @ct|@n.__n@me__, ": ", @ct|@n.__d@c__
+    th3r3 15 n0 5p00n
 
 """ % ("\n".join(output))

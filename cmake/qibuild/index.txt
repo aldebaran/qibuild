@@ -1,20 +1,34 @@
-QiBuild Cmake Framework
-=======================
+QiBuild
+=======
 Cedric GESTES <cgestes@aldebaran-robotics.com>
 
-Programmer guides
+Introduction
+------------
+QiBuild aims to make compilation of your sources easy. It manages
+dependencies between projects and supports easy cross-compilation.
+By default QiBuild use libraries provided by your system, but you
+can use QiToolchain to get a toolchain if you dont want to build
+with your system libraries or want to cross-compile.
+
+QiBuild is composed of three parts:
+
+* the QiBuild CMake framework, that simplify CMakeLists.txt writing.
+* the qibuild command line program, that allows build a project taking dependencies
+   into account.
+* the qitoolchain command line program, that fetches binary packages from server.
+
+QiBuild Manual
+--------------
+link:qibuild-manpage.html[qibuild manpage]
+
+QiBuild CMake API
 -----------------
-QiBuild is a set of cmake libraries.
 
 link:tutorials.html[tutorials]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 General consideration about the sdk concept. This documentation explain
 the global mecanism behind sdk. You will find information on the
 directory structure, how file are searched and organise.
-
-
-QiBuild API
------------
 
 link:target.html[QiBuild Target]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
