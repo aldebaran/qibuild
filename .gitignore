@@ -1,4 +1,4 @@
-build*
+build*/
 .ropeproject
 *.pyc
 *.pyo
