@@ -19,7 +19,9 @@ python doc/tools/generate_doc_from_cmake.py \
 
 PYTHONPATH=. python qibuild/tools/generate_asciidoc.py > "build-doc/qibuild-manpage.txt"
 
-cp "/etc/asciidoc/javascripts/asciidoc-xhtml11.js" "build-doc"
+if [ -f /etc/asciidoc/javascripts/asciidoc-xhtml11.js ] ; then
+  cp "/etc/asciidoc/javascripts/asciidoc-xhtml11.js" "build-doc"
+fi
 cp "doc/asciidoc/pygments.css"                     "build-doc"
 cp "doc/asciidoc/bare.css"                         "build-doc"
 cp "cmake/qibuild/index.txt"                       "build-doc"
