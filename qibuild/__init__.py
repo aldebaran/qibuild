@@ -43,3 +43,4 @@ from . import command
 from . import log
 from . import shell
 from . import toc
+from . import dependencies
