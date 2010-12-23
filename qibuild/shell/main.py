@@ -15,7 +15,11 @@ import os
 import sys
 import logging
 
-import argparse
+try:
+    import argparse
+except:
+    from qibuild.external import argparse
+
 import qibuild.command
 
 class InvalidAction(Exception):
