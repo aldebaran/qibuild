@@ -78,19 +78,33 @@ class Toc:
         - toolchains
     """
 
-    def __init__(self, worktree, toolchain_name="system"):
+    def __init__(self, worktree, toolchain_name, release):
         self.worktree           = worktree
+        self.release            = False
         self.toolchain_name     = toolchain_name
         self.buildable_projects = dict()
         self.configstore        = qibuild.configstore.ConfigStore()
         self._load_buildable_projects()
         self._load_configuration()
 
+    def _load_project_build_config(self, project):
+        """Set the build configurations of the dependencies
+        of the projects.
+        """
+        proj_build_conf = project.build_config
+        proj_build_conf.update_from_toc_config(self)
+        #TODO
+        #proj_build_conf.update_from_build_config_name(self, self.build_config_name)
+        proj_build_conf.update_from_project_config(self, project)
+        proj_build_conf.update_from_command_line(release = self.release)
+        LOGGER.debug("[%s]\n%s", project, proj_build_conf)
+
     def _load_buildable_projects(self):
         buildable_project_dirs = _search_buildable_projects(self.worktree)
         for d in buildable_project_dirs:
             p = Project(d)
             self.buildable_projects[p.name] = p
+            self._load_project_build_config(p)
 
     def _load_configuration(self):
         for name, project in self.buildable_projects.iteritems():

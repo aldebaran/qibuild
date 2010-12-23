@@ -29,7 +29,7 @@ def _guess_work_tree(use_env=False):
             return None
     return None
 
-def toc_open(worktree=None, use_env=False):
+def toc_open(worktree=None, toolchain_name=None, release=False, use_env=False):
     """ open a toc repository
     return a valid Toc instance
     """
@@ -37,7 +37,7 @@ def toc_open(worktree=None, use_env=False):
         worktree = _guess_work_tree(use_env)
     if worktree is None:
         raise Exception("Could not find toc work tree, please go to a valid work tree.")
-    return Toc(worktree)
+    return Toc(worktree, toolchain_name=None, release=False)
 
 # def toc_create(work_tree, toc_dir=None):
 #     """ create a toc repository

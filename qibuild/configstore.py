@@ -58,16 +58,17 @@ class ConfigStore:
             element = current
         element[keys[len(keys) - 1]] = value
 
-    def get(self, *args):
+    def get(self, *args, **kargs):
         """
         """
+        default = kargs.get('default')
         element = self.root
         for s in args:
             if not isinstance(element, dict):
                 raise TocException("Could not find %s in %s" % (s, root_element))
             element = element.get(s, None)
             if element is None:
-                return None
+                return default
         return element
 
     def __str__(self, pad=True):

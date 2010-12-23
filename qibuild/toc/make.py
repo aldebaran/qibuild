@@ -12,6 +12,7 @@ unix-like systems or Visual Studio
 
 """
 
+import os
 import sys
 import logging
 
@@ -134,7 +135,7 @@ def make_project(project, num_jobs=1, nmake=False, target=None):
     """Build the project"""
     build_dir = project.get_build_dir()
     release   = project.build_config.release
-    LOGGER.debug("[%s]: building in %s", self.project.name, build_dir)
+    LOGGER.debug("[%s]: building in %s", project.name, build_dir)
     if sys.platform.startswith("win32") and not nmake:
         sln_files = glob.glob(build_dir + "/*.sln")
         if len(sln_files) == 0:
@@ -151,7 +152,7 @@ def make_project(project, num_jobs=1, nmake=False, target=None):
         if not os.path.exists(os.path.join(build_dir, "Makefile")):
             LOGGER.debug("Not calling make for %s", os.path.basename(build_dir))
             return
-        if ON_WIN:
+        if sys.platform.startswith("win32"):
             build_nmake(build_dir, target=target)
         else:
             build_unix(build_dir, num_jobs=num_jobs, target=target)

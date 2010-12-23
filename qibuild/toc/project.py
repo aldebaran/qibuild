@@ -7,6 +7,7 @@
 
 import os
 import qibuild.manifest
+from   qibuild.toc.buildconfig import BuildConfig
 
 class Project:
     """ store information about a project:
@@ -15,9 +16,10 @@ class Project:
          - build  configuration
          - dependencies
     """
-    def __init__(self, directory):
-        self.directory = directory
-        self.name      = os.path.split(directory)[-1]
+    def __init__(self, directory, toolchain_name=None):
+        self.directory    = directory
+        self.name         = os.path.split(directory)[-1]
+        self.build_config = BuildConfig()
         qibuild.manifest.verify(os.path.join(directory, "qibuild.manifest"))
 
     def get_build_dir(self):
@@ -33,3 +35,4 @@ class Project:
     def get_build_flags(self):
         print "Warning please implement Project.get_build_dir"
         return []
+

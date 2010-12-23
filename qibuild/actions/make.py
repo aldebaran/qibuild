@@ -29,12 +29,12 @@ def _print_list(name, elts):
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
-    toc      = qibuild.toc.toc_open(args.toc_work_tree, use_env=True)
+    toc      = qibuild.toc.toc_open(args.toc_work_tree, use_env=True, release=args.release)
 
     wanted_projects = qibuild.toc.get_projects_from_args(toc, args)
     _print_list("project wanted", wanted_projects)
 
-    (src_projects, bin_projects) = qibuild.dependencies.split_sources_and_binaries(wanted_projects, toc)
+    (src_projects, bin_projects) = qibuild.toc.dependencies.split_sources_and_binaries(wanted_projects, toc)
     _print_list("binary projects", bin_projects)
     _print_list("source projects", src_projects)
 

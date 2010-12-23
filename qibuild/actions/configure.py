@@ -31,7 +31,7 @@ def _print_list(name, elts):
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
-    toc      = qibuild.toc.toc_open(args.toc_work_tree, use_env=True)
+    toc      = qibuild.toc.toc_open(args.toc_work_tree, use_env=True, release=args.release)
 
     wanted_projects = qibuild.toc.get_projects_from_args(toc, args)
     _print_list("project wanted", wanted_projects)
