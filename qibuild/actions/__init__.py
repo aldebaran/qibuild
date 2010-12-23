@@ -1,3 +1,4 @@
-"""Plugins for qibuild
+"""
+Careful! work in progress
 
 """

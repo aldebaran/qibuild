@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 ##
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
