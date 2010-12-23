@@ -6,6 +6,8 @@
 ## Copyright (C) 2010 Aldebaran Robotics
 ##
 
+set -e
+
 CURDIR=$(dirname "$(readlink -f $0 2>/dev/null)")/
 
 cd ${CURDIR}
