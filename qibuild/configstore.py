@@ -26,7 +26,7 @@ def read(filename, configstore, prefix=""):
                 tkey.append(prefix)
             tkey.extend([x.strip("\"\'") for x in splitted_section])
             tkey.extend([x.strip("\"\'") for x in k.split(".")])
-            configstore.add(tkey, v.strip("\"\'"))
+            configstore.set(*tkey, value=v.strip("\"\'"))
 
 
 class ConfigStore:
@@ -40,26 +40,23 @@ class ConfigStore:
     def __init__(self):
         self.root = dict()
 
-    @classmethod
-    def _add_key(cls, element, key):
-        """ add a key """
-        t = element.get(key, None)
-        if t is None:
-            element[key] = dict()
-            t = element[key]
-        elif type(t) != dict:
-            raise Exception("The key is a leaf")
-        return t
-
-    def add(self, names, value):
+    def set(self, *keys, **kargs):
         """
         add a value
         names is a list, the full name is names0.names1...namesn
         """
-        elem = self.root
-        for n in names[:-1]:
-            elem = self._add_key(elem, n)
-        elem[names[len(names) - 1]] = value
+        value = kargs['value']
+        element = self.root
+
+        for key in keys[:-1]:
+            current = element.get(key, None)
+            if current is None:
+                element[key] = dict()
+                current      = element[key]
+            elif type(current) != dict:
+                raise Exception("The key is a leaf")
+            element = current
+        element[keys[len(keys) - 1]] = value
 
     def get(self, *args):
         """
@@ -73,18 +70,21 @@ class ConfigStore:
                 return None
         return element
 
-    def __str__(self, element = None, name = ""):
+    def __str__(self, pad=True):
         """ print the list of keys/values """
-        output = ""
-        if element is None:
-            element = self.root
-        if len(name) > 0:
-            name = name + '.'
-        for (k, v) in element.items():
-            if type(v) == dict:
-                output += self.__str__(v, name + k)
+        configdict = self.list_child()
+        output     = ""
+
+        max_len = 0
+        for k in configdict.keys():
+            if len(k) > max_len:
+                max_len = len(k)
+        for k,v in configdict.iteritems():
+            if pad:
+                pad_space = "".join([ " " for x in range(max_len - len(k)) ])
             else:
-                output += "%s%s = %s\n" % (name, k, str(v))
+                pad_space = ""
+            output += "%s%s = %s\n" % (k, pad_space, str(v))
         return output
 
     def recurse(self, callback, element = None, name = ""):
