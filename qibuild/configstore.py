@@ -12,6 +12,13 @@ import os
 import logging
 import ConfigParser
 
+class ConfigException(Exception):
+    def __init__(self, *args):
+        self.args = args
+
+    def __str__(self):
+        return repr(self.args)
+
 def read(filename, configstore, prefix=""):
     """ read a configuration file """
     parser = ConfigParser.RawConfigParser()
@@ -54,7 +61,7 @@ class ConfigStore:
                 element[key] = dict()
                 current      = element[key]
             elif type(current) != dict:
-                raise Exception("The key is a leaf")
+                raise ConfigException("The key is a leaf")
             element = current
         element[keys[len(keys) - 1]] = value
 
@@ -65,7 +72,7 @@ class ConfigStore:
         element = self.root
         for s in args:
             if not isinstance(element, dict):
-                raise TocException("Could not find %s in %s" % (s, root_element))
+                raise ConfigException("Could not find %s in %s" % (s, self.root))
             element = element.get(s, None)
             if element is None:
                 return default

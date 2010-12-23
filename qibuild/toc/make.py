@@ -14,6 +14,7 @@ unix-like systems or Visual Studio
 
 import os
 import sys
+import glob
 import logging
 
 from qibuild.command import check_call

@@ -101,27 +101,3 @@ def configure_logging(args):
 
     root_logger.handlers = list()
     root_logger.addHandler(handler)
-
-
-def main():
-    """Quick demo
-
-    """
-    from argparse import ArgumentParser
-    parser = ArgumentParser()
-    configure_parser(parser)
-    args = parser.parse_args()
-    configure_logging(args)
-    logger = logging.getLogger("test")
-    logger.debug   ("debug")
-    logger.info    ("info")
-    logger.warning ("warning")
-    logger.error   ("error")
-    logger.critical("critical")
-
-if __name__ == "__main__" :
-    main()
-
-
-
-
