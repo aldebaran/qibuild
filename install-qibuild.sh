@@ -26,4 +26,4 @@ create_launcher() {
 }
 
 mkdir -p ${DESTDIR}
-create_launcher qibuild/bin/qibuild
+create_launcher bin/qibuild
