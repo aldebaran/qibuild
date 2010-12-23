@@ -97,8 +97,10 @@ class Toc:
         for name, project in self.buildable_projects.iteritems():
             qibuild.configstore.read(os.path.join(project.directory, "qibuild.manifest"), self.configstore)
         qibuild.configstore.read(os.path.join(self.worktree, "config"), self.configstore)
-        print "loaded configuration:"
-        print self.configstore
+        LOGGER.debug("[toc] configuration:")
+        for line in str(self.configstore).split("\n"):
+            if len(line) > 0:
+                LOGGER.debug(line)
 
     def get_project(self, name):
         return self.buildable_projects[name]
