@@ -1,0 +1,28 @@
+QiBuild TODO
+============
+
+Mandatory:
+* configure/make: use buildconfig more
+** The build folder should be build-<toolchainname>[-<configname>][-release]
+** take cmake flags into account
+
+* configstore:
+** merge dependencies and cflags properly
+
+* handle multiple build configuration:
+
+* doc
+
+* cmake
+** add an option to only do bootstrap (to replace the bootstrap action)
+** guess generator
+
+* make
+** guess msbuild, etc.. path
+
+
+Future:
+* project dependencies can depends on cmake flags. This allow bringing dependencies
+  only when a specific cmake flags is used. or the opposite?
+
+* handle binary project: create a class like toc that work with binary?
