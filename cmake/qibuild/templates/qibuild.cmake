@@ -10,7 +10,7 @@
 
 set(QIBUILD_BOOTSTRAP_VERSION 1)
 
-find_program(QI_BUILD qibuild)
+find_program(QI_BUILD_EXECUTABLE qibuild)
 if(NOT QI_BUILD)
   message(STATUS
     "
@@ -29,11 +29,12 @@ endif()
 # and include it.
 # This allow us to find all qibuild/qibuild.cmake
 function(bootstrap)
+  message(STATUS "blam: ${QI_BUILD_EXECUTABLE}")
   execute_process(
-      COMMAND ${QI_BUILD} configure --bootstrap ${CMAKE_BINARY_DIR}
+      COMMAND "${QI_BUILD_EXECUTABLE}" configure --single --bootstrap "--build-directory=${CMAKE_BINARY_DIR}"
       RESULT_VARIABLE  _retcode
-      OUTPUT_VARIABLE  _stdout
-      ERROR_VARIABLE   _stderr
+      # OUTPUT_VARIABLE  _stdout
+      # ERROR_VARIABLE   _stderr
       )
   if(NOT ${_retcode} EQUAL 0)
     message(STATUS
@@ -55,7 +56,7 @@ function(bootstrap)
 endfunction()
 
 if(NOT EXISTS ${CMAKE_BINARY_DIR}/dependencies.cmake)
-  #bootstrap()
+  bootstrap()
 endif()
 
 if(EXISTS ${CMAKE_BINARY_DIR}/dependencies.cmake)
