@@ -5,9 +5,9 @@ Set of tools for aldebaran prog team.
 
 import os
 
-from qibuild.toc.tocbuilder import bootstrap_project, configure_project, make_project
-from qibuild.toc.tocbuilder import TocBuilder
-from qibuild.toc.toc        import Toc, get_projects_from_args
+from qibuild.toc.projectbuilder import bootstrap_project, configure_project, make_project
+from qibuild.toc.tocbuilder     import TocBuilder
+from qibuild.toc.toc            import Toc, get_projects_from_args
 
 def _guess_work_tree(use_env=False):
     """Look for parent directories until a .toc dir is found somewhere.

@@ -6,7 +6,6 @@
 ##
 
 import os
-from   qibuild.toc.buildconfig import BuildConfig
 
 class Project:
     """ store information about a project:
@@ -18,7 +17,6 @@ class Project:
     def __init__(self, directory):
         self.directory    = directory
         self.name         = os.path.split(directory)[-1]
-        self.build_config = BuildConfig()
 
     def get_sdk_dir(self):
-        return os.path.join(self.build_config.build_directory, "sdk")
+        return os.path.join(self.build_directory, "sdk")
