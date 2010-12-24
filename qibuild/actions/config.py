@@ -9,7 +9,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc.toc_open(args)
+    toc = qibuild.toc.toc_open(args.work_tree, use_env=True)
     print toc.configstore
 
 if __name__ == "__main__" :

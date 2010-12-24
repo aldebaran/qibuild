@@ -1,3 +1,11 @@
+##
+## Author(s):
+##  - Dimitri Merejkowsky <dmerejkowsky@aldebaran-robotics.com>
+##  - Cedric GESTES <gestes@aldebaran-robotics.com>
+##
+## Copyright (C) 2009, 2010 Aldebaran Robotics
+##
+
 "Run the same command on each project"
 
 import sys
@@ -18,19 +26,16 @@ Use -- to seprate toc arguments from the arguments of the command.
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.shell.toc_parser(parser)
-    parser.add_argument("command", metavar="COMMAND",
-        nargs="+")
-    parser.add_argument("--ignore-errors", action="store_true",
-        help="continue on error")
+    parser.add_argument("command", metavar="COMMAND", nargs="+")
+    parser.add_argument("--ignore-errors", action="store_true", help="continue on error")
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc.toc_open(args)
+    toc = qibuild.toc.toc_open(args.work_tree, use_env=True)
     logger = logging.getLogger(__name__)
-    projects = toc.get_projects()
-    for project in projects:
+    for project in toc.buildable_projects.values():
         logger.info("Running `%s` for %s", " ".join(args.command), project.name)
-        src = project.get_src_dir()
+        src = project.directory
         try:
             qibuild.command.check_call(args.command, cwd=src)
         except qibuild.command.CommandFailed, err:
@@ -39,7 +44,6 @@ def do(args):
                 continue
             else:
                 raise
-
 
 if __name__ == "__main__" :
     qibuild.shell.sub_command_main(sys.modules[__name__])

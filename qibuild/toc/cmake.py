@@ -76,13 +76,13 @@ def configure_project(project, flags=None, toolchain_file=None, generator=None):
         cmake_flags = flags[:]
     else:
         cmake_flags = list()
-    cmake_flags.extend(project.get_build_flags())
+    cmake_flags.extend(project.build_config.cmake_flags)
 
     if toolchain_file:
         cmake_flags.append("CMAKE_TOOLCHAIN_FILE=" + toolchain_file)
 
     cmake_args.extend(["-D" + x for x in cmake_flags])
 
-    cmake(project.directory, project.get_build_dir(), cmake_args)
+    cmake(project.directory, project.build_config.build_directory, cmake_args)
 
 

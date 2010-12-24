@@ -9,7 +9,7 @@ from qibuild.toc           import dependencies
 from qibuild.toc.bootstrap import bootstrap_project
 from qibuild.toc.cmake     import configure_project
 from qibuild.toc.make      import make_project
-from qibuild.toc.toc       import Toc, get_projects_from_args
+from qibuild.toc.toc       import Toc, TocBuilder, get_projects_from_args
 
 def _guess_work_tree(use_env=False):
     """Look for parent directories until a .toc dir is found somewhere.
@@ -29,15 +29,31 @@ def _guess_work_tree(use_env=False):
             return None
     return None
 
-def toc_open(worktree=None, toolchain_name=None, release=False, use_env=False):
+def toc_open(work_tree=None, use_env=False):
     """ open a toc repository
     return a valid Toc instance
     """
-    if not worktree:
-        worktree = _guess_work_tree(use_env)
-    if worktree is None:
+    if not work_tree:
+        work_tree = _guess_work_tree(use_env)
+    if work_tree is None:
         raise Exception("Could not find toc work tree, please go to a valid work tree.")
-    return Toc(worktree, toolchain_name=None, release=False)
+    return Toc(work_tree)
+
+def tob_open(work_tree, args, use_env=False):
+    build_config   = args.build_config
+    build_type     = args.build_type
+    toolchain_name = args.toolchain_name
+    cmake_flags    = args.cmake_flags
+
+    if not work_tree:
+        work_tree = _guess_work_tree(use_env)
+    if work_tree is None:
+        raise Exception("Could not find toc work tree, please go to a valid work tree.")
+    return TocBuilder(work_tree,
+                      build_type=build_type,
+                      toolchain_name=toolchain_name,
+                      build_config=build_config,
+                      cmake_flags=cmake_flags)
 
 # def toc_create(work_tree, toc_dir=None):
 #     """ create a toc repository

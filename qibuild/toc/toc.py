@@ -6,6 +6,7 @@
 ##
 
 import os
+import sys
 import logging
 import qibuild.manifest
 import qibuild.configstore
@@ -78,42 +79,25 @@ class Toc:
         - toolchains
     """
 
-    def __init__(self, worktree, toolchain_name, release):
-        self.worktree           = worktree
-        self.release            = False
-        self.toolchain_name     = toolchain_name
+    def __init__(self, work_tree):
+        self.work_tree          = work_tree
         self.buildable_projects = dict()
         self.configstore        = qibuild.configstore.ConfigStore()
         self._load_buildable_projects()
         self._load_configuration()
 
-    def _load_project_build_config(self, project):
-        """Set the build configurations of the dependencies
-        of the projects.
-        """
-        proj_build_conf = project.build_config
-        proj_build_conf.update_from_toc_config(self)
-        #TODO
-        #proj_build_conf.update_from_build_config_name(self, self.build_config_name)
-        proj_build_conf.update_from_project_config(self, project)
-        proj_build_conf.update_from_command_line(release = self.release)
-        LOGGER.debug("[%s]\n%s", project, proj_build_conf)
 
     def _load_buildable_projects(self):
-        buildable_project_dirs = _search_buildable_projects(self.worktree)
+        buildable_project_dirs = _search_buildable_projects(self.work_tree)
         for d in buildable_project_dirs:
             p = Project(d)
             self.buildable_projects[p.name] = p
-            self._load_project_build_config(p)
 
     def _load_configuration(self):
         for name, project in self.buildable_projects.iteritems():
             qibuild.configstore.read(os.path.join(project.directory, "qibuild.manifest"), self.configstore)
-        qibuild.configstore.read(os.path.join(self.worktree, ".qibuild", "config"), self.configstore)
-        LOGGER.debug("[toc] configuration:")
-        for line in str(self.configstore).split("\n"):
-            if len(line) > 0:
-                LOGGER.debug(line)
+        qibuild.configstore.read(os.path.join(self.work_tree, ".qibuild", "config"), self.configstore)
+        LOGGER.debug("[toc] configuration:\n" + str(self.configstore))
 
     def get_project(self, name):
         return self.buildable_projects[name]
@@ -135,4 +119,57 @@ class Toc:
         res_names = topological_sort(to_sort, projects)
         LOGGER.debug("Result: %s", str(res_names))
         return res_names
+
+
+class TocBuilder(Toc):
+    def __init__(self, work_tree, build_type, toolchain_name, build_config, cmake_flags):
+        """
+            work_tree      = a toc worktree
+            build_type     = a build type, could be debug or release
+            toolchain_name = by default the system toolchain is used
+            cmake_flags    = optional additional cmake flags
+            build_config   = optional a build configuration
+        """
+        Toc.__init__(self, work_tree)
+        self.build_type        = build_type
+        self.toolchain_name    = toolchain_name
+        self.build_config      = build_config
+        self.cmake_flags       = cmake_flags
+        self.build_folder_name = None
+
+        self._set_build_folder_name()
+
+        if not self.build_config:
+            self.build_config = self.configstore.get("general", "build", "config", default=None)
+
+        for p in self.buildable_projects.values():
+            self._update_project_build_config(p)
+
+    def _update_project_build_config(self, project):
+        """Set the build configurations of the dependencies
+        of the projects.
+        """
+        project.build_config.update(self, project, self.build_folder_name)
+        LOGGER.debug("[%s] build configuration\n%s", project.name, project.build_config)
+
+    def _set_build_folder_name(self):
+        """Get a reasonable build folder.
+        The point is to be sure we don't have two incompatible build configurations
+        using the same build dir.
+
+        Return a string looking like
+        build-linux-release
+        build-cross-debug ...
+        """
+        res = ["build"]
+        if self.toolchain_name:
+            res.append(self.toolchain_name)
+        if not sys.platform.startswith("win32") and self.build_type:
+            # On windows, sharing the same build dir for debug and release is OK.
+            # (and quite mandatory when using CMake + Visual studio)
+            # On linux, it's not.
+            res.append(tob.build_type)
+        if self.build_config:
+            res.append(self.build_config)
+        self.build_folder_name = "-".join(res)
 

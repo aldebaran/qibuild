@@ -31,23 +31,24 @@ def _print_list(name, elts):
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
-    toc      = qibuild.toc.toc_open(args.toc_work_tree, use_env=True, release=args.release)
+    #toc      = qibuild.toc.toc_open(args.work_tree, use_env=True)
+    tob      = qibuild.toc.tob_open(args.work_tree, args, use_env=True)
 
-    wanted_projects = qibuild.toc.get_projects_from_args(toc, args)
+    wanted_projects = qibuild.toc.get_projects_from_args(tob, args)
     _print_list("project wanted", wanted_projects)
 
-    (src_projects, bin_projects) = qibuild.toc.dependencies.split_sources_and_binaries(wanted_projects, toc)
+    (src_projects, bin_projects) = qibuild.toc.dependencies.split_sources_and_binaries(wanted_projects, tob)
     _print_list("binary projects", bin_projects)
     _print_list("source projects", src_projects)
 
     for project in src_projects:
         logger.info("Bootstraping [%s]", project)
-        dep_sdk_dirs = qibuild.toc.dependencies.get_sdk_dirs(project, toc)
-        qibuild.toc.bootstrap_project(toc.get_project(project), dep_sdk_dirs)
+        dep_sdk_dirs = qibuild.toc.dependencies.get_sdk_dirs(project, tob)
+        qibuild.toc.bootstrap_project(tob.get_project(project), dep_sdk_dirs)
 
     for project in src_projects:
         logger.info("Configuring [%s]", project)
-        qibuild.toc.configure_project(toc.get_project(project), args.cmake_flags)
+        qibuild.toc.configure_project(tob.get_project(project), args.cmake_flags)
 
 if __name__ == "__main__":
     import sys
