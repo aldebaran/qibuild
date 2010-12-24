@@ -30,6 +30,7 @@ import qibuild.command
 LOGGER = logging.getLogger("qibuild.build")
 
 CMAKE        = "cmake"
+CTEST        = "ctest"
 MAKE         = "make"
 MSBUILD      = None
 INCREDIBUILD = None
@@ -46,6 +47,13 @@ class MakeException(Exception):
         return repr(self.args)
 
 class ConfigureException(Exception):
+    def __init__(self, *args):
+        self.args = args
+
+    def __str__(self):
+        return repr(self.args)
+
+class CTestException(Exception):
     def __init__(self, *args):
         self.args = args
 
@@ -173,3 +181,26 @@ def cmake(source_dir, build_dir, cmake_args):
     cmake_args += [source_dir]
     qibuild.command.check_call([CMAKE] + cmake_args, cwd=build_dir)
 
+def ctest(source_dir, build_dir):
+    """
+    Just run test using ctest.
+    source_dir should contain CMakeLists.txt
+    build_dir must have been configured (cmake) and built.
+
+    """
+    cmd = [CTEST, "-VV", "-DExperimental", source_dir ]
+    # Check whether source_dir and build_dir look valid.
+    # TODO: Move these checks in a common place?
+    if not os.path.exists(source_dir):
+        raise CTestException("source dir: %s does not exist, aborting" % \
+                             source_dir)
+    if not os.path.exists(os.path.join(source_dir, "CMakeLists.txt")):
+        raise CTestException("source dir: %s does not contain CMakeLists,"\
+                             " aborting" % source_dir)
+    if not os.path.exists(build_dir):
+        raise CTestException("build dir: %s does not exist, aborting" % \
+                             build_dir)
+    if not os.path.exists(os.path.join(build_dir, "CMakeCache.txt")):
+        raise CTestException("build dir: %s does not contain "\
+                             "CMakeCache.txt, aborting" % build_dir)
+    qibuild.command.check_call(cmd, cwd=build_dir)
