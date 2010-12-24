@@ -107,15 +107,16 @@ def main_wrapper(module, args):
 
 def _dump_arguments(name, args):
     """ dump an argparser namespace to log """
-    logger = logging.getLogger("qibuild.shell")
-    logger.debug("[%s] arguments:", name)
+    output = ""
     max_len = 0
     for k in args.__dict__.keys():
         if len(k) > max_len:
             max_len = len(k)
     for k,v in args.__dict__.iteritems():
         pad = "".join([ " " for x in range(max_len - len(k)) ])
-        logger.debug("%s%s = %s", str(k), pad, str(v))
+        output += "  %s%s = %s\n" % (str(k), pad, str(v))
+    logger = logging.getLogger("qibuild.shell")
+    logger.debug("[%s] arguments:\n%s", name, output)
 
 def root_command_main(name, parser, modules):
     """name : name of the main program

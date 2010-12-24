@@ -92,7 +92,7 @@ class ConfigStore:
                 pad_space = "".join([ " " for x in range(max_len - len(k)) ])
             else:
                 pad_space = ""
-            output += "%s%s = %s\n" % (k, pad_space, str(v))
+            output += "  %s%s = %s\n" % (k, pad_space, str(v))
         return output
 
     def recurse(self, callback, element = None, name = ""):
