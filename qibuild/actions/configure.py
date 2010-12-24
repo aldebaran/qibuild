@@ -35,11 +35,11 @@ def do(args):
     tob      = qibuild.toc.tob_open(args.work_tree, args, use_env=True)
 
     wanted_projects = qibuild.toc.get_projects_from_args(tob, args)
-    _print_list("project wanted", wanted_projects)
+    #_print_list("project wanted", wanted_projects)
 
     (src_projects, bin_projects) = tob.split_sources_and_binaries(wanted_projects)
-    _print_list("binary projects", bin_projects)
-    _print_list("source projects", src_projects)
+    #_print_list("binary projects", bin_projects)
+    #_print_list("source projects", src_projects)
 
     for project in src_projects:
         logger.info("Bootstraping [%s]", project)
@@ -47,7 +47,7 @@ def do(args):
         qibuild.toc.bootstrap_project(tob.get_project(project), dep_sdk_dirs)
 
     for project in src_projects:
-        logger.info("Configuring [%s]", project)
+        logger.info("Configuring %s", tob.get_project(project))
         qibuild.toc.configure_project(tob.get_project(project), args.cmake_flags)
 
 if __name__ == "__main__":

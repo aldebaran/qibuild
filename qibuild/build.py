@@ -10,6 +10,13 @@
 This module contains build function for
 unix-like systems or Visual Studio
 
+Gotcha:
+=======
+Calling cmake -DCMAKE_BUILD_TYPE=debug and
+msbuild foo.sln causes foo to be build in release.
+(it's a CMake / visual studio "feature")
+
+This is why we should keep the same build dir on windows
 """
 
 import os

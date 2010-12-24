@@ -39,7 +39,7 @@ def do(args):
     _print_list("source projects", src_projects)
 
     for project in src_projects:
-        logger.info("Building [%s]", project)
+        logger.info("Building %s in %s", project, tob.build_folder_name)
         qibuild.toc.make_project(tob.get_project(project), tob.build_type)
 
 if __name__ == "__main__":

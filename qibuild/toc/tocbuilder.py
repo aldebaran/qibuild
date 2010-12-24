@@ -7,6 +7,7 @@
 
 import os
 import sys
+import platform
 import logging
 import qibuild.sh
 import qibuild.build
@@ -36,9 +37,8 @@ class TocBuilder(Toc):
         if not self.build_config:
             self.build_config = self.configstore.get("general", "build", "config", default=None)
 
-        for k,v in self.buildable_projects.iteritems():
-            # replace Project by ProjectBuilder
-            self.buildable_projects[k] = ProjectBuilder(v.directory, self, self.build_folder_name);
+        for project in self.buildable_projects.values():
+            project.update_build_config(self, self.build_folder_name)
 
     def _set_build_folder_name(self):
         """Get a reasonable build folder.
@@ -52,6 +52,8 @@ class TocBuilder(Toc):
         res = ["build"]
         if self.toolchain_name:
             res.append(self.toolchain_name)
+        else:
+            res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
         if not sys.platform.startswith("win32") and self.build_type:
             # On windows, sharing the same build dir for debug and release is OK.
             # (and quite mandatory when using CMake + Visual studio)

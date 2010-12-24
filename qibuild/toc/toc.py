@@ -100,7 +100,7 @@ class Toc:
         self.configstore        = qibuild.configstore.ConfigStore()
         self._load_buildable_projects()
         self._load_configuration()
-
+        self._update_project_depends()
 
     def _load_buildable_projects(self):
         buildable_project_dirs = _search_buildable_projects(self.work_tree)
@@ -114,25 +114,30 @@ class Toc:
         qibuild.configstore.read(os.path.join(self.work_tree, ".qibuild", "config"), self.configstore)
         LOGGER.debug("[toc] configuration:\n" + str(self.configstore))
 
+    def _update_project_depends(self):
+        for project in self.buildable_projects.values():
+            project.update_depends(self)
+
     def get_project(self, name):
         return self.buildable_projects[name]
 
-    def resolve_deps(self, projects):
+    def resolve_deps(self, projects, runtime=False):
         """Given a list of projects, resolve the dependencies, and return
         them in topological sorted order.
 
         proj_list is a list of Project objects,
         the result is a list of Project objects.
-
         """
         LOGGER.debug("Resolving deps for %s", str(projects))
         to_sort = dict()
         for proj in self.buildable_projects.keys():
-            deps = self.configstore.get("project", proj, "depends").split()
-            to_sort[proj] = deps
+            if runtime:
+                to_sort[proj] = self.get_project(proj).rdepends
+            else:
+                to_sort[proj] = self.get_project(proj).depends
         # Note: topological_sort only use lists of strings:
         res_names = topological_sort(to_sort, projects)
-        LOGGER.debug("Result: %s", str(res_names))
+        LOGGER.debug("Result(runtime=%d): %s", runtime, str(res_names))
         return res_names
 
     def split_sources_and_binaries(self, projects):

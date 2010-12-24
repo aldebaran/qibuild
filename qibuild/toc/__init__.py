@@ -5,7 +5,7 @@ Set of tools for aldebaran prog team.
 
 import os
 
-from qibuild.toc.projectbuilder import bootstrap_project, configure_project, make_project
+from qibuild.toc.project        import bootstrap_project, configure_project, make_project
 from qibuild.toc.tocbuilder     import TocBuilder
 from qibuild.toc.toc            import Toc, get_projects_from_args
 
