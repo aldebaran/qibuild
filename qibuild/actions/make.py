@@ -20,23 +20,14 @@ def configure_parser(parser):
     qibuild.shell.build_parser(parser)
     qibuild.shell.project_parser(parser)
 
-def _print_list(name, elts):
-    print ""
-    print "%s:" % (name)
-    for elt in elts:
-        print " -", elt
-
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
     tob      = qibuild.toc.tob_open(args.work_tree, args, use_env=True)
 
     wanted_projects = qibuild.toc.get_projects_from_args(tob, args)
-    _print_list("project wanted", wanted_projects)
 
     (src_projects, bin_projects) = tob.split_sources_and_binaries(wanted_projects)
-    _print_list("binary projects", bin_projects)
-    _print_list("source projects", src_projects)
 
     for project in src_projects:
         logger.info("Building %s in %s", project, tob.build_folder_name)
