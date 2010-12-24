@@ -55,6 +55,7 @@ def build_parser(parser):
 def project_parser(parser):
     """ Parser settings for every action using several toc projects
     """
+    parser.add_argument("-a", "--all", action="store_true", help="work on all projects")
     parser.add_argument("-s", "--single", action="store_true", help="do not resolve any dependency")
     parser.add_argument("--only-deps", action="store_true", help="only work on the dependencies")
     parser.add_argument("--use-deps", action="store_true", help="use dependencies")
