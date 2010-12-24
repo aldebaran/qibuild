@@ -6,7 +6,6 @@
 ##
 
 import os
-import qibuild.manifest
 from   qibuild.toc.buildconfig import BuildConfig
 
 class Project:

@@ -9,12 +9,26 @@
 import os
 import sys
 import logging
-import qibuild.manifest
 import qibuild.configstore
 from   qibuild.sort        import topological_sort
 from   qibuild.toc.project import Project
 
 LOGGER = logging.getLogger("qibuild.toc")
+
+def search_manifest_directory(working_directory):
+    """ find the manifest associated to the working_directory, return None if not found """
+    cwd     = os.path.normpath(os.path.abspath(working_directory))
+    dirname = None
+
+    #for each cwd parent folders, try to see if it match src
+    while dirname or cwd:
+        if (os.path.exists(os.path.join(cwd, "qibuild.manifest"))):
+            return cwd
+        (new_cwd, dirname) = os.path.split(cwd)
+        if new_cwd == cwd:
+            break
+        cwd = new_cwd
+    return None
 
 def get_projects_from_args(toc, args):
     """ Return the list of project specified in args. This is usefull to extract
@@ -33,7 +47,7 @@ def get_projects_from_args(toc, args):
 
     if not project_names:
         LOGGER.debug("no project specified, guessing from current working directory")
-        project_dir = qibuild.manifest.search_manifest_directory(os.getcwd())
+        project_dir = search_manifest_directory(os.getcwd())
         if project_dir:
             LOGGER.debug("Found %s from current working directory", os.path.split(project_dir)[-1])
             project_names = [ os.path.split(project_dir)[-1] ]
