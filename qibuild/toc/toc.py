@@ -1,3 +1,4 @@
+
 ##
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
@@ -120,56 +121,20 @@ class Toc:
         LOGGER.debug("Result: %s", str(res_names))
         return res_names
 
+    def split_sources_and_binaries(self, projects):
+        """ split a list of projects between buildable and binaries
+            return (sources, binaries)
 
-class TocBuilder(Toc):
-    def __init__(self, work_tree, build_type, toolchain_name, build_config, cmake_flags):
+            TODO: handle toolchain
         """
-            work_tree      = a toc worktree
-            build_type     = a build type, could be debug or release
-            toolchain_name = by default the system toolchain is used
-            cmake_flags    = optional additional cmake flags
-            build_config   = optional a build configuration
-        """
-        Toc.__init__(self, work_tree)
-        self.build_type        = build_type
-        self.toolchain_name    = toolchain_name
-        self.build_config      = build_config
-        self.cmake_flags       = cmake_flags
-        self.build_folder_name = None
+        tobuild   = []
+        toinstall = []
+        for project in projects:
+            if project in self.buildable_projects.keys():
+                tobuild.append(project)
+            else:
+                toinstall.append(project)
+        return (tobuild, toinstall)
 
-        self._set_build_folder_name()
 
-        if not self.build_config:
-            self.build_config = self.configstore.get("general", "build", "config", default=None)
-
-        for p in self.buildable_projects.values():
-            self._update_project_build_config(p)
-
-    def _update_project_build_config(self, project):
-        """Set the build configurations of the dependencies
-        of the projects.
-        """
-        project.build_config.update(self, project, self.build_folder_name)
-        LOGGER.debug("[%s] build configuration\n%s", project.name, project.build_config)
-
-    def _set_build_folder_name(self):
-        """Get a reasonable build folder.
-        The point is to be sure we don't have two incompatible build configurations
-        using the same build dir.
-
-        Return a string looking like
-        build-linux-release
-        build-cross-debug ...
-        """
-        res = ["build"]
-        if self.toolchain_name:
-            res.append(self.toolchain_name)
-        if not sys.platform.startswith("win32") and self.build_type:
-            # On windows, sharing the same build dir for debug and release is OK.
-            # (and quite mandatory when using CMake + Visual studio)
-            # On linux, it's not.
-            res.append(tob.build_type)
-        if self.build_config:
-            res.append(self.build_config)
-        self.build_folder_name = "-".join(res)
 

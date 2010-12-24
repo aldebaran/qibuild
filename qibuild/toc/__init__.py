@@ -5,11 +5,9 @@ Set of tools for aldebaran prog team.
 
 import os
 
-from qibuild.toc           import dependencies
-from qibuild.toc.bootstrap import bootstrap_project
-from qibuild.toc.cmake     import configure_project
-from qibuild.toc.make      import make_project
-from qibuild.toc.toc       import Toc, TocBuilder, get_projects_from_args
+from qibuild.toc.tocbuilder import bootstrap_project, configure_project, make_project
+from qibuild.toc.tocbuilder import TocBuilder
+from qibuild.toc.toc        import Toc, get_projects_from_args
 
 def _guess_work_tree(use_env=False):
     """Look for parent directories until a .toc dir is found somewhere.
@@ -43,7 +41,10 @@ def tob_open(work_tree, args, use_env=False):
     build_config   = args.build_config
     build_type     = args.build_type
     toolchain_name = args.toolchain_name
-    cmake_flags    = args.cmake_flags
+    try:
+        cmake_flags = args.cmake_flags
+    except:
+        cmake_flags = list()
 
     if not work_tree:
         work_tree = _guess_work_tree(use_env)

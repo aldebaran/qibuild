@@ -8,7 +8,7 @@ import os
 import sys
 import logging
 
-from qibuild           import command
+from .           import command
 
 GIT = "git"
 

@@ -16,17 +16,29 @@ import os
 import sys
 import glob
 import logging
+import qibuild.sh
+import qibuild.command
 
-from qibuild.command import check_call
 
-LOGGER = logging.getLogger("qibuild.toc.make")
+LOGGER = logging.getLogger("qibuild.build")
 
+CMAKE        = "cmake"
 MAKE         = "make"
 MSBUILD      = None
 INCREDIBUILD = None
 NMAKE        = None
 
+if sys.platform.startswith("win32"):
+    CMAKE = "cmake.exe"
+
 class MakeException(Exception):
+    def __init__(self, *args):
+        self.args = args
+
+    def __str__(self):
+        return repr(self.args)
+
+class ConfigureException(Exception):
     def __init__(self, *args):
         self.args = args
 
@@ -45,7 +57,7 @@ def build_unix(build_dir, num_jobs=None, target=None):
         cmd += ["-j%i" % num_jobs]
     if target:
         cmd.append(target)
-    check_call(cmd, cwd=build_dir)
+    qibuild.command.check_call(cmd, cwd=build_dir)
 
 
 def build_nmake(build_dir, target=None):
@@ -58,7 +70,7 @@ def build_nmake(build_dir, target=None):
     cmd = [NMAKE]
     if target:
         cmd.append(target)
-    check_call(cmd, cwd=build_dir)
+    qibuild.command.check_call(cmd, cwd=build_dir)
 
 
 def build_vc(sln_file, release=False, be_verbose=True, target=None):
@@ -107,7 +119,7 @@ def build_vc(sln_file, release=False, be_verbose=True, target=None):
 
     cmd += [sln_file]
 
-    check_call(cmd)
+    qibuild.command.check_call(cmd)
 
 def build_incredibuild(sln_file, release=False, be_verbose=True, target="ALL_BUILD"):
     """
@@ -130,30 +142,27 @@ def build_incredibuild(sln_file, release=False, be_verbose=True, target="ALL_BUI
 
     cmd += ["/nologo"]
 
-    check_call(cmd)
+    qibuild.command.check_call(cmd)
 
-def make_project(project, num_jobs=1, nmake=False, target=None):
-    """Build the project"""
-    build_dir = project.get_build_dir()
-    release   = project.build_config.release
-    LOGGER.debug("[%s]: building in %s", project.name, build_dir)
-    if sys.platform.startswith("win32") and not nmake:
-        sln_files = glob.glob(build_dir + "/*.sln")
-        if len(sln_files) == 0:
-            LOGGER.debug("Not calling msbuild for %s", os.path.basename(build_dir))
-            return
+def cmake(source_dir, build_dir, cmake_args):
+    """
+    Call cmake with from a build dir for a source dir.
+    cmake_args are directly added on the command line
 
-        if len(sln_files) != 1:
-            err_message = "Found several sln files: "
-            err_message += ", ".join(sln_files)
-            raise MakeException(err_message)
-        sln_file = sln_files[0]
-        build_vc(sln_file, release=release, target=target)
-    else:
-        if not os.path.exists(os.path.join(build_dir, "Makefile")):
-            LOGGER.debug("Not calling make for %s", os.path.basename(build_dir))
-            return
-        if sys.platform.startswith("win32"):
-            build_nmake(build_dir, target=target)
-        else:
-            build_unix(build_dir, num_jobs=num_jobs, target=target)
+    The cache is always cleaned
+    """
+    if not os.path.exists(source_dir):
+        raise ConfigureException("source dir: %s does not exist, aborting")
+
+    # Always remove CMakeCache and build/sdk/lib/cmake:
+    cache = os.path.join(build_dir, "CMakeCache.txt")
+    if os.path.exists(cache):
+        os.remove(cache)
+        LOGGER.debug("done cleaning cache")
+
+    qibuild.sh.rm(os.path.join(build_dir, "sdk", "lib", "cmake"))
+
+    # Add path to source
+    cmake_args += [source_dir]
+    qibuild.command.check_call([CMAKE] + cmake_args, cwd=build_dir)
+

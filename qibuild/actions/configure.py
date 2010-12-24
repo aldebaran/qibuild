@@ -37,13 +37,13 @@ def do(args):
     wanted_projects = qibuild.toc.get_projects_from_args(tob, args)
     _print_list("project wanted", wanted_projects)
 
-    (src_projects, bin_projects) = qibuild.toc.dependencies.split_sources_and_binaries(wanted_projects, tob)
+    (src_projects, bin_projects) = tob.split_sources_and_binaries(wanted_projects)
     _print_list("binary projects", bin_projects)
     _print_list("source projects", src_projects)
 
     for project in src_projects:
         logger.info("Bootstraping [%s]", project)
-        dep_sdk_dirs = qibuild.toc.dependencies.get_sdk_dirs(project, tob)
+        dep_sdk_dirs = tob.get_sdk_dirs(project)
         qibuild.toc.bootstrap_project(tob.get_project(project), dep_sdk_dirs)
 
     for project in src_projects:
