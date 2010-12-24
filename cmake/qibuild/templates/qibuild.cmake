@@ -8,10 +8,10 @@
 # This file is part of the qibuild project    #
 ###############################################
 
-set(QIBUILD_BOOTSTRAP_VERSION 1)
+set(QIBUILD_BOOTSTRAP_VERSION 2)
 
 find_program(QI_BUILD_EXECUTABLE qibuild)
-if(NOT QI_BUILD)
+if(NOT QI_BUILD_EXECUTABLE)
   message(STATUS
     "
     Could not find qibuild executable.

@@ -8,8 +8,6 @@
 #get the current directory of the file
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 list(APPEND CMAKE_PREFIX_PATH ${_ROOT_DIR}/modules/)
-#TODO: change the path
-list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR}/sdk/lib/cmake/modules)
 
 if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
   list(APPEND CMAKE_MODULE_PATH ${_ROOT_DIR}/extern)
@@ -25,6 +23,7 @@ include("qibuild/internal/check")
 include("qibuild/internal/install")
 include("qibuild/internal/glob")
 include("qibuild/internal/stage")
+include("qibuild/internal/autostrap")
 
 if (NOT QI_SDK_DIR)
   qi_set_global(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk/")
@@ -53,8 +52,4 @@ include("qibuild/stage")
 include("qibuild/sdk")
 include("qibuild/doc")
 
-
-_qi_create_sdk()
-#qi_include_sdk(${QI_SDK_DIR})
-set(CMAKE_PREFIX_PATH ${QI_SDK_DIR} ${CMAKE_PREFIX_PATH})
-#qi_create_root()
+list(INSERT CMAKE_PREFIX_PATH 0 ${QI_SDK_DIR})
