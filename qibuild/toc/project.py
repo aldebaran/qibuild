@@ -71,6 +71,12 @@ class Project:
             # See big __doc__ for why we use append here
             self.cmake_flags.extend(tob.cmake_flags)
 
+    def set_custom_build_directory(self, build_dir):
+        self.build_directory = build_dir
+        #create the build_directory if it does not exists
+        if not os.path.exists(self.build_directory):
+            os.makedirs(self.build_directory)
+
     def __str__(self):
         res = ""
         res += "Project: %s\n" % (self.name)
