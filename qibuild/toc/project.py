@@ -78,7 +78,7 @@ class Project:
         res += "  depends         = %s\n" % self.depends
         res += "  rdepends        = %s\n" % self.rdepends
         res += "  cmake_flags     = %s\n" % self.cmake_flags
-        res += "  build_directory = %s\n" % self.build_directory
+        res += "  build_directory = %s" % self.build_directory
         return res
 
 
@@ -88,7 +88,7 @@ def get_qibuild_cmake_framework_path():
     """ return the path to the QiBuild Cmake framework """
     return os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "cmake"))
 
-def bootstrap_project(project, dep_sdk_dirs):
+def bootstrap(project, dep_sdk_dirs):
     """Generate the find_deps.cmake for the given project
     """
     build_dir = project.build_directory
@@ -107,11 +107,10 @@ def bootstrap_project(project, dep_sdk_dirs):
     output_path = os.path.join(build_dir, "dependencies.cmake")
     with open(output_path, "w") as output_file:
         output_file.write(to_write)
+    LOGGER.debug("Wrote %s", output_path)
 
-    LOGGER.debug("Wrote to %s:\n%s", output_path, to_write)
 
-
-def configure_project(project, flags=None, toolchain_file=None, generator=None):
+def configure(project, flags=None, toolchain_file=None, generator=None):
     """ Call cmake with correct options
     if toolchain_file is None a t001chain file is generated in the cmake binary directory.
     if toolchain_file is "", then CMAKE_TOOLCHAIN_FILE is not specified.
@@ -148,7 +147,7 @@ def configure_project(project, flags=None, toolchain_file=None, generator=None):
     qibuild.build.cmake(project.directory, project.build_directory, cmake_args)
 
 
-def make_project(project, build_type, num_jobs=1, nmake=False, target=None):
+def make(project, build_type, num_jobs=1, nmake=False, target=None):
     """Build the project"""
     build_dir = project.build_directory
     LOGGER.debug("[%s]: building in %s", project.name, build_dir)

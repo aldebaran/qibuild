@@ -33,12 +33,12 @@ def do(args):
     for project in src_projects:
         logger.info("Bootstraping [%s]", project)
         dep_sdk_dirs = tob.get_sdk_dirs(project)
-        qibuild.toc.bootstrap_project(tob.get_project(project), dep_sdk_dirs)
+        qibuild.toc.project.bootstrap(tob.get_project(project), dep_sdk_dirs)
 
     for project in src_projects:
         logger.info("Configuring %s in %s", project, tob.build_folder_name)
-        logger.info("%s", tob.get_project(project))
-        qibuild.toc.configure_project(tob.get_project(project), args.cmake_flags)
+        logger.debug("%s", tob.get_project(project))
+        qibuild.toc.project.configure(tob.get_project(project), args.cmake_flags)
 
 if __name__ == "__main__":
     import sys

@@ -26,12 +26,12 @@ def do(args):
     tob      = qibuild.toc.tob_open(args.work_tree, args, use_env=True)
 
     wanted_projects = qibuild.toc.get_projects_from_args(tob, args)
-
     (src_projects, bin_projects) = tob.split_sources_and_binaries(wanted_projects)
 
     for project in src_projects:
         logger.info("Building %s in %s", project, tob.build_folder_name)
-        qibuild.toc.make_project(tob.get_project(project), tob.build_type)
+        logger.debug("%s", tob.get_project(project))
+        qibuild.toc.project.make(tob.get_project(project), tob.build_type)
 
 if __name__ == "__main__":
     import sys

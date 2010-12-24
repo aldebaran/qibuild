@@ -115,6 +115,8 @@ def _dump_arguments(name, args):
     for k,v in args.__dict__.iteritems():
         pad = "".join([ " " for x in range(max_len - len(k)) ])
         output += "  %s%s = %s\n" % (str(k), pad, str(v))
+    if output[-1] == "\n":
+        output = output[:-1]
     logger = logging.getLogger("qibuild.shell")
     logger.debug("[%s] arguments:\n%s", name, output)
 

@@ -12,7 +12,6 @@ import logging
 import qibuild.sh
 import qibuild.build
 from   qibuild.toc.toc import Toc
-from   qibuild.toc.projectbuilder import ProjectBuilder
 
 LOGGER = logging.getLogger("qibuild.tocbuilder")
 
