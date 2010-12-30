@@ -52,9 +52,12 @@ def get_projects_from_args(toc, args):
             LOGGER.debug("Found %s from current working directory", os.path.split(project_dir)[-1])
             project_names = [ os.path.split(project_dir)[-1] ]
 
-    if not project_names or args.all:
+    if args.all:
         LOGGER.debug("Using all projects")
         project_names = toc.buildable_projects.keys()
+
+    if not project_names:
+        raise Exception("No project specified")
 
     if args.single:
         LOGGER.debug("Using a single project: %s", project_names[0])
