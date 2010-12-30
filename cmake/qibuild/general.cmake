@@ -51,6 +51,7 @@ include("qibuild/target")
 include("qibuild/submodule")
 include("qibuild/stage")
 include("qibuild/doc")
+include("qibuild/autotools")
 
 list(INSERT CMAKE_PREFIX_PATH 0 ${QI_SDK_DIR})
 
