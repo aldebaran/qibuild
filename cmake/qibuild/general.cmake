@@ -13,6 +13,7 @@ if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
   list(APPEND CMAKE_MODULE_PATH ${_ROOT_DIR}/extern)
 endif()
 
+set(QI_TEMPLATE_DIR ${_ROOT_DIR}/templates)
 
 include("qibuild/log")
 include("qibuild/set")
@@ -49,7 +50,8 @@ include("qibuild/install")
 include("qibuild/target")
 include("qibuild/submodule")
 include("qibuild/stage")
-include("qibuild/sdk")
 include("qibuild/doc")
 
 list(INSERT CMAKE_PREFIX_PATH 0 ${QI_SDK_DIR})
+
+_qi_autostrap_update()

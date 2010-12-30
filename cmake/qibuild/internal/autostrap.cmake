@@ -33,19 +33,17 @@ endfunction()
 # 3/ if a new version is available, replace by the new version
 #
 function(_qi_autostrap_update)
-  get_filename_component(_THIS_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
   if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake")
     return()
   endif()
   _qi_autostrap_get_version("${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake" _vdest)
-  _qi_autostrap_get_version("${_THIS_DIR}/../templates/qibuild.cmake" _vsrc)
+  _qi_autostrap_get_version("${QI_TEMPLATE_DIR}/qibuild.cmake" _vsrc)
   if(_vsrc VERSION_GREATER _vdest)
     message(STATUS "Bootstrap upstream version : ${_vsrc}")
     message(STATUS "Bootstrap source version   : ${_vdest}")
     message(STATUS "Bootstrap will be updated")
-    configure_file("${_THIS_DIR}/../templates/qibuild.cmake"
+    configure_file("${QI_TEMPLATE_DIR}/qibuild.cmake"
                    "${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake" COPYONLY)
   endif()
 endfunction()
 
-_qi_autostrap_update()

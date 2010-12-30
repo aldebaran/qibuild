@@ -5,10 +5,6 @@
 ## Copyright (C) 2009, 2010 Aldebaran Robotics
 ##
 
-#get the current directory of the file
-get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-set(QI_TEMPLATE_DIR  ${_ROOT_DIR}/templates)
-
 include(CMakeParseArguments)
 
 
