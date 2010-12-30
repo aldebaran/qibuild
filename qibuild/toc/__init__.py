@@ -7,9 +7,9 @@ import os
 
 #from qibuild.toc.project        import bootstrap_project, configure_project, make_project
 from qibuild.toc.tocbuilder     import TocBuilder
-from qibuild.toc.toc            import Toc, get_projects_from_args
+from qibuild.toc.toc            import Toc, get_projects_from_args, search_manifest_directory
 
-def _guess_work_tree(use_env=False):
+def guess_work_tree(use_env=False):
     """Look for parent directories until a .toc dir is found somewhere.
     Otherwize, juste use TOC_WORK_TREE environnement
     variable
@@ -24,15 +24,15 @@ def _guess_work_tree(use_env=False):
             return head
         (head, _tail) = os.path.split(head)
         if not _tail:
-            return None
-    return None
+            break
+    return search_manifest_directory(os.getcwd())
 
 def toc_open(work_tree=None, use_env=False):
     """ open a toc repository
     return a valid Toc instance
     """
     if not work_tree:
-        work_tree = _guess_work_tree(use_env)
+        work_tree = guess_work_tree(use_env)
     if work_tree is None:
         raise Exception("Could not find toc work tree, please go to a valid work tree.")
     return Toc(work_tree)
@@ -47,7 +47,7 @@ def tob_open(work_tree, args, use_env=False):
         cmake_flags = list()
 
     if not work_tree:
-        work_tree = _guess_work_tree(use_env)
+        work_tree = guess_work_tree(use_env)
     if work_tree is None:
         raise Exception("Could not find toc work tree, please go to a valid work tree.")
     return TocBuilder(work_tree,
