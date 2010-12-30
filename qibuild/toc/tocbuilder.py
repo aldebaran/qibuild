@@ -69,6 +69,9 @@ class TocBuilder(Toc):
         projects = self.resolve_deps(project)
         projects.remove(project)
 
+        #TODO: handle toolchain, at the moment this is not correct.
+        #we can add the sdk for boost (from source), even if boost is provided
+        #by a toolchain
         for project in projects:
             if project in self.buildable_projects.keys():
                 dirs.append(self.get_project(project).get_sdk_dir())
@@ -76,3 +79,25 @@ class TocBuilder(Toc):
                 LOGGER.warning("dependency not found: %s", project)
         return dirs
 
+    def split_sources_and_binaries(self, projects):
+        """ split a list of projects between buildable and binaries
+            return (sources, provided, notfound)
+        """
+        tobuild  = []
+        notfound = []
+        provided = []
+        print "TC:", self.toolchain_name
+        provided_pj = self.configstore.get("toolchain", self.toolchain_name, "provide", default=list())
+        for project in projects:
+            if project in provided_pj:
+                provided.append(project)
+            elif project in self.buildable_projects.keys():
+                tobuild.append(project)
+            else:
+                notfound.append(project)
+        log  = "Split between sources and binaries for : %s\n"
+        log += "  to build  : %s\n"
+        log += "  provided  : %s\n"
+        log += "  not found : %s\n"
+        LOGGER.debug(log, ",".join(projects), ",".join(tobuild),  ",".join(provided), ",".join(notfound))
+        return (tobuild, provided, notfound)

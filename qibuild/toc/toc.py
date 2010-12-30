@@ -143,20 +143,5 @@ class Toc:
         LOGGER.debug("Result(runtime=%d): %s", runtime, str(res_names))
         return res_names
 
-    def split_sources_and_binaries(self, projects):
-        """ split a list of projects between buildable and binaries
-            return (sources, binaries)
-
-            TODO: handle toolchain
-        """
-        tobuild   = []
-        toinstall = []
-        for project in projects:
-            if project in self.buildable_projects.keys():
-                tobuild.append(project)
-            else:
-                toinstall.append(project)
-        return (tobuild, toinstall)
-
 
 

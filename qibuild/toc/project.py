@@ -62,13 +62,12 @@ class Project:
             self.cmake_flags.extend(shlex.split(project_flags))
 
         if tob.build_type:
-            self.flags.append("CMAKE_BUILD_TYPE=%s" % (tob.build_type.toupper()))
+            self.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (tob.build_type.toupper()))
 
-        if tob.toolchain_name:
-            self.flags.append("QI_TOOLCHAIN_NAME=%s" % (tob.toolchain_name))
+        if tob.toolchain.name != "system":
+            self.cmake_flags.append("QI_TOOLCHAIN_NAME=%s" % (tob.toolchain.name))
 
         if tob.cmake_flags:
-            # See big __doc__ for why we use append here
             self.cmake_flags.extend(tob.cmake_flags)
 
     def set_custom_build_directory(self, build_dir):

@@ -51,6 +51,7 @@ def build_parser(parser):
     parser.set_defaults(cmake_generator = "Unix Makefiles")
     parser.set_defaults(cross=False, debug=True)
     parser.set_defaults(num_jobs=1)
+    parser.set_defaults(toolchain_name=None)
 
 def project_parser(parser):
     """ Parser settings for every action using several toc projects

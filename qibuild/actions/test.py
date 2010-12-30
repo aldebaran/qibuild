@@ -24,7 +24,7 @@ def do(args):
     tob      = qibuild.toc.tob_open(args.work_tree, args, use_env=True)
 
     wanted_projects = qibuild.toc.get_projects_from_args(tob, args)
-    (src_projects, bin_projects) = tob.split_sources_and_binaries(wanted_projects)
+    (src_projects, bin_projects, not_found_projects) = tob.split_sources_and_binaries(wanted_projects)
 
     for project in src_projects:
         p = tob.get_project(project)
