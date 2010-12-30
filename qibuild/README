@@ -1,0 +1,41 @@
+
+
+== QiBuild major classes ==
+
+=== Toc ===
+Hold information about projects.
+List of buildable projects.
+
+=== TocBuilder(Toc) ===
+Hold build specific information about projects. You should specify everything needed for a build to this class.
+This include:
+  - the toolchain name (default to "system")
+  - the build type (release/debug)
+  - the build configuration (default to "")
+  - specifics cmake flags (default to None)
+
+=== Project ===
+Hold information about a project. This include:
+  - name
+  - directory
+  - build_directory
+  - sdk_directory
+  - depends
+  - rdepends
+
+Describe options:
+== Configuration ==
+=== General ===
+general.build.config
+general.cmake.flags
+
+=== Project ===
+project.<name>.cmake.flags
+project.<name>.depends
+project.<name>.rdepends
+
+=== Build configuration ===
+build.<name>.cmake.flags
+
+=== Toolchain ===
+toolchain.<name>.provide
