@@ -11,7 +11,8 @@ import platform
 import logging
 import qibuild.sh
 import qibuild.build
-from   qibuild.toc.toc import Toc
+from   qibuild.toc.toc       import Toc
+from   qibuild.toc.toolchain import Toolchain
 
 LOGGER = logging.getLogger("qibuild.tocbuilder")
 
@@ -26,11 +27,12 @@ class TocBuilder(Toc):
         """
         Toc.__init__(self, work_tree)
         self.build_type        = build_type
-        self.toolchain_name    = toolchain_name
+        self.toolchain         = Toolchain(toolchain_name)
         self.build_config      = build_config
         self.cmake_flags       = cmake_flags
         self.build_folder_name = None
 
+        self.toolchain.update(self)
         self._set_build_folder_name()
 
         if not self.build_config:
@@ -49,8 +51,8 @@ class TocBuilder(Toc):
         build-cross-debug ...
         """
         res = ["build"]
-        if self.toolchain_name:
-            res.append(self.toolchain_name)
+        if self.toolchain.name != "system":
+            res.append(self.toolchain.name)
         else:
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
         if not sys.platform.startswith("win32") and self.build_type:
@@ -86,10 +88,8 @@ class TocBuilder(Toc):
         tobuild  = []
         notfound = []
         provided = []
-        print "TC:", self.toolchain_name
-        provided_pj = self.configstore.get("toolchain", self.toolchain_name, "provide", default=list())
         for project in projects:
-            if project in provided_pj:
+            if project in self.toolchain.projects:
                 provided.append(project)
             elif project in self.buildable_projects.keys():
                 tobuild.append(project)
