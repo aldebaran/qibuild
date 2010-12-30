@@ -27,6 +27,16 @@ SYNOPSIS
 *qibuild* ['OPTIONS'] COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
 
 
+DESCRIPTION
+-----------
+The command line program toc provide severals actions to work with projects.
+
+
+COMMANDS
+--------
+%s
+
+
 OPTIONS
 -------
 *--toc-work-tree='TOC_WORK_TREE'::
@@ -39,16 +49,6 @@ OPTIONS
 
 *-v, --verbose*::
     Print verbose output.
-
-
-DESCRIPTION
------------
-The command line program toc provide severals actions to work with projects.
-
-
-COMMAND
--------
-%s
 
 
 EXIT STATUS
