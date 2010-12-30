@@ -17,7 +17,6 @@ set(QI_TEMPLATE_DIR ${_ROOT_DIR}/templates)
 
 include("qibuild/log")
 include("qibuild/set")
-include("qibuild/expect")
 include("qibuild/subdirectory")
 include("qibuild/internal/layout")
 include("qibuild/internal/check")
