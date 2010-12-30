@@ -114,7 +114,7 @@ class Toc:
     def _load_configuration(self):
         for name, project in self.buildable_projects.iteritems():
             qibuild.configstore.read(os.path.join(project.directory, "qibuild.manifest"), self.configstore)
-        globalconfig = os.path.join(self.work_tree, ".qibuild", "config")
+        globalconfig = os.path.join(self.work_tree, ".qi", "build")
         if os.path.exists(globalconfig):
             qibuild.configstore.read(globalconfig, self.configstore)
             LOGGER.debug("[toc] configuration:\n" + str(self.configstore))

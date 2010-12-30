@@ -19,7 +19,7 @@ def guess_work_tree(use_env=False):
         return from_env
     head = os.getcwd()
     while True:
-        d = os.path.join(head, ".qibuild")
+        d = os.path.join(head, ".qi")
         if os.path.isdir(d):
             return head
         (head, _tail) = os.path.split(head)
