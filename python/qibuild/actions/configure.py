@@ -16,9 +16,9 @@ import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.shell.toc_parser(parser)
-    qibuild.shell.build_parser(parser)
-    qibuild.shell.project_parser(parser)
+    qitools.argparsecommand.toc_parser(parser)
+    qitools.argparsecommand.build_parser(parser)
+    qitools.argparsecommand.project_parser(parser)
     group = parser.add_argument_group("cmake arguments")
     group.add_argument("--bootstrap", dest="bootstrap", action="store_true", help="only bootstrap projects, do not call cmake.")
     group.add_argument("--build-directory", dest="build_directory", action="store", help="override the default build directory used by cmake")
@@ -52,6 +52,6 @@ def do(args):
 
 if __name__ == "__main__":
     import sys
-    qibuild.shell.sub_command_main(sys.modules[__name__])
+    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
 
 

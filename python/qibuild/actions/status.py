@@ -22,7 +22,7 @@ def usage():
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.shell.toc_parser(parser)
+    qitools.argparsecommand.toc_parser(parser)
 
 def list_build_dir(project):
     """ list all buildable directory """
@@ -46,5 +46,5 @@ def do(args):
         list_build_dir(project)
 
 if __name__ == "__main__" :
-    qibuild.shell.sub_command_main(sys.modules[__name__])
+    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
 

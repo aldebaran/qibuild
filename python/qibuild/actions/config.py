@@ -4,7 +4,7 @@ import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.shell.toc_parser(parser)
+    qitools.argparsecommand.toc_parser(parser)
 
 
 def do(args):
@@ -14,4 +14,4 @@ def do(args):
 
 if __name__ == "__main__" :
     import sys
-    qibuild.shell.sub_command_main(sys.modules[__name__])
+    qitools.argparsecommand.sub_command_main(sys.modules[__name__])

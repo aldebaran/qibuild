@@ -18,8 +18,8 @@ LOGGER = logging.getLogger("qisrc.status")
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.shell.toc_parser(parser)
-    # qibuild.shell.action_parser(parser)
+    qitools.argparsecommand.toc_parser(parser)
+    # qitools.argparsecommand.action_parser(parser)
     # parser.add_argument("toolchain", action="store", help="the toolchain name")
     # parser.add_argument("feed", nargs='?', action="store", help="an url to a toolchain feed")
 
@@ -47,4 +47,4 @@ def do(args):
 
 if __name__ == "__main__" :
     import sys
-    qibuild.shell.sub_command_main(sys.modules[__name__])
+    qitools.argparsecommand.sub_command_main(sys.modules[__name__])

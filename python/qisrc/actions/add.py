@@ -22,7 +22,7 @@ import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.shell.toc_parser(parser)
+    qitools.argparsecommand.toc_parser(parser)
     parser.add_argument("name", help="name of the project. (by default the name is deduced from the git url)")
 
 def usage():
@@ -51,9 +51,9 @@ def do(args):
     #     url = args.url
     #     logger.info("cloning %s -> %s", url, name)
     #     toc.add(name, url=url)
-    #qibuild.shell.run_action("qibuild.actions.toc.load", forward_args=args)
+    #qitools.argparsecommand.run_action("qibuild.actions.toc.load", forward_args=args)
 
 
 if __name__ == "__main__" :
     import sys
-    qibuild.shell.sub_command_main(sys.modules[__name__])
+    qitools.argparsecommand.sub_command_main(sys.modules[__name__])

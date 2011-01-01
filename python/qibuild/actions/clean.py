@@ -18,7 +18,7 @@ import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.shell.toc_parser(parser)
+    qitools.argparsecommand.toc_parser(parser)
     parser.add_argument("--force", "-f", dest="force", action="store_true", help="force the cleanup")
     parser.add_argument("build_directory", nargs="*", help="build directory to cleanup")
 
@@ -52,6 +52,6 @@ def do(args):
 
 if __name__ == "__main__":
     import sys
-    qibuild.shell.sub_command_main(sys.modules[__name__])
+    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
 
 

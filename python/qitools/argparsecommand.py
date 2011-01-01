@@ -117,7 +117,7 @@ def _dump_arguments(name, args):
         output += "  %s%s = %s\n" % (str(k), pad, str(v))
     if output[-1] == "\n":
         output = output[:-1]
-    logger = logging.getLogger("qibuild.shell")
+    logger = logging.getLogger("qitools.argparsecommand")
     logger.debug("[%s] arguments:\n%s", name, output)
 
 def root_command_main(name, parser, modules):
