@@ -33,7 +33,7 @@ def cleanup(project, bdirs, work_tree, doit=False):
         if os.path.isdir(bdir):
             if doit:
                 print " ", os.path.relpath(bdir, work_tree)
-                qibuild.sh.rm(bdir)
+                qitools.sh.rm(bdir)
             else:
                 print " ", os.path.relpath(bdir, work_tree)
     pass

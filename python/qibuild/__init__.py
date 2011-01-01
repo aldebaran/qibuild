@@ -23,7 +23,7 @@ import os
 import sys
 import glob
 import logging
-import qibuild.sh
+import qitools.sh
 import qibuild.command
 
 
@@ -175,7 +175,7 @@ def cmake(source_dir, build_dir, cmake_args):
         os.remove(cache)
         LOGGER.debug("done cleaning cache")
 
-    qibuild.sh.rm(os.path.join(build_dir, "sdk", "lib", "cmake"))
+    qitools.sh.rm(os.path.join(build_dir, "sdk", "lib", "cmake"))
 
     # Add path to source
     cmake_args += [source_dir]

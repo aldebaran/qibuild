@@ -10,7 +10,7 @@ import sys
 import shlex
 import glob
 import logging
-import qibuild.sh
+import qitools.sh
 import qibuild.build
 
 LOGGER = logging.getLogger("qibuild.toc.project")
@@ -108,7 +108,7 @@ def bootstrap(project, dep_sdk_dirs):
     to_write += "\n"
     to_write += "#DEPENDENCIES:\n"
     for dep_sdk_dir in dep_sdk_dirs:
-        to_write += "list(APPEND CMAKE_PREFIX_PATH \"%s\")\n" % qibuild.sh.to_posix_path(dep_sdk_dir)
+        to_write += "list(APPEND CMAKE_PREFIX_PATH \"%s\")\n" % qitools.sh.to_posix_path(dep_sdk_dir)
 
     output_path = os.path.join(build_dir, "dependencies.cmake")
     with open(output_path, "w") as output_file:

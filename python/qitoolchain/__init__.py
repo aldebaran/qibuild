@@ -12,7 +12,7 @@
 import posixpath
 import os
 import logging
-import qibuild.sh
+import qitools.sh
 
 LOGGER = logging.getLogger("qitoolchain")
 
@@ -39,10 +39,10 @@ def create(toolchain_name):
     rootfs = get_rootfs(toolchain_name)
     if os.path.exists(rootfs):
         raise Exception("Toolchain '%s' already exists." % toolchain_name)
-    qibuild.sh.mkdir(rootfs, recursive=True)
+    qitools.sh.mkdir(rootfs, recursive=True)
     cache = get_cache(toolchain_name)
     if not os.path.exists(cache):
-        qibuild.sh.mkdir(cache,  recursive=True)
+        qitools.sh.mkdir(cache,  recursive=True)
     LOGGER.info("Toolchain initialized in: %s", rootfs)
 
 

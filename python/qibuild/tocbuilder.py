@@ -9,7 +9,7 @@ import os
 import sys
 import platform
 import logging
-import qibuild.sh
+import qitools.sh
 import qibuild.build
 from   qibuild.toc.toc       import Toc
 from   qibuild.toc.toolchain import Toolchain
