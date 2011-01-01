@@ -10,9 +10,9 @@ import sys
 import platform
 import logging
 import qitools.sh
-import qibuild.build
-from   qibuild.toc.toc       import Toc
-from   qibuild.toc.toolchain import Toolchain
+import qibuild
+from   qibuild.toc       import Toc
+from   qibuild.toolchain import Toolchain
 
 LOGGER = logging.getLogger("qibuild.tocbuilder")
 

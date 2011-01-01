@@ -3,19 +3,19 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
 """QiSrc command line tool.
 """
 
 import argparse
-import qibuild
+import qitools.argparsecommand
 
 def main():
     parser = argparse.ArgumentParser()
-    modules = qibuild.shell.main.action_modules_from_package("qisrc.actions")
-    qibuild.shell.root_command_main("qisrc", parser, modules)
+    modules = qitools.argparsecommand.action_modules_from_package("qisrc.actions")
+    qitools.argparsecommand.root_command_main("qisrc", parser, modules)
 
 if __name__ == "__main__":
     main()

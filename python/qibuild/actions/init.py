@@ -2,10 +2,11 @@
 
 import os
 import qibuild
+import qitools.argparsecommand
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.argparsecommand.toc_parser(parser)
+    qibuild.parsers.toc_parser(parser)
 
 def do(args):
     """Main entry point"""
@@ -18,7 +19,7 @@ def do(args):
         work_tree = os.getcwd()
     if toc_dir is None:
         toc_dir = os.path.join(work_tree, ".toc")
-    qibuild.toc.toc_create(work_tree, toc_dir)
+    qibuild.toc.create(work_tree, toc_dir)
 
 if __name__ == "__main__" :
     import sys

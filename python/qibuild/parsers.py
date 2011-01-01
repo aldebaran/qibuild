@@ -9,11 +9,12 @@
 """ Collection of parser fonctions for various actions
 """
 
+from qitools.argparsecommand import default_parser
 
 def toc_parser(parser):
     """ Parser settings for every action using a toc dir
     """
-    action_parser(parser)
+    default_parser(parser)
     parser.add_argument("--work-tree", help="force work tree")
 
 def build_parser(parser):

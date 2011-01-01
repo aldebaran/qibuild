@@ -9,9 +9,10 @@
 import os
 import sys
 import logging
-import qibuild.configstore
+import qitools.configstore
+import qibuild
 from   qibuild.sort        import topological_sort
-from   qibuild.toc.project import Project
+from   qibuild.project     import Project
 
 LOGGER = logging.getLogger("qibuild.toc")
 
@@ -100,7 +101,7 @@ class Toc:
     def __init__(self, work_tree):
         self.work_tree          = work_tree
         self.buildable_projects = dict()
-        self.configstore        = qibuild.configstore.ConfigStore()
+        self.configstore        = qitools.configstore.ConfigStore()
         self._load_buildable_projects()
         self._load_configuration()
         self._update_project_depends()
@@ -113,10 +114,10 @@ class Toc:
 
     def _load_configuration(self):
         for name, project in self.buildable_projects.iteritems():
-            qibuild.configstore.read(os.path.join(project.directory, "qibuild.manifest"), self.configstore)
+            self.configstore.read(os.path.join(project.directory, "qibuild.manifest"))
         globalconfig = os.path.join(self.work_tree, ".qi", "build")
         if os.path.exists(globalconfig):
-            qibuild.configstore.read(globalconfig, self.configstore)
+            self.configstore.read(globalconfig)
             LOGGER.debug("[toc] configuration:\n" + str(self.configstore))
 
     def _update_project_depends(self):
@@ -153,7 +154,7 @@ def toc_open(work_tree=None, use_env=False):
     return a valid Toc instance
     """
     if not work_tree:
-        work_tree = guess_work_tree(use_env)
+        work_tree = qibuild.guess_work_tree(use_env)
     if not work_tree:
         work_tree = search_manifest_directory(os.getcwd())
     if work_tree is None:

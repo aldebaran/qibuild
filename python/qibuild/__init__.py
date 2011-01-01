@@ -26,8 +26,10 @@ import logging
 import qitools.sh
 import qitools.command
 
+import parsers
 
-LOGGER = logging.getLogger("qibuild.build")
+
+LOGGER = logging.getLogger("qibuild")
 
 CMAKE        = "cmake"
 CTEST        = "ctest"
@@ -61,7 +63,7 @@ class CTestException(Exception):
         return repr(self.args)
 
 
-def build_unix(build_dir, num_jobs=None, target=None):
+def make(build_dir, num_jobs=None, target=None):
     """
     Just launch make from a build dir.
     Lanch make -j <num_jobs> in num_jobs is not none
@@ -75,7 +77,7 @@ def build_unix(build_dir, num_jobs=None, target=None):
     qitools.command.check_call(cmd, cwd=build_dir)
 
 
-def build_nmake(build_dir, target=None):
+def nmake(build_dir, target=None):
     """Just launch nmake from a build dir.
     For this to work, you'd better be in a Visual
     Studio command prompt
@@ -88,7 +90,7 @@ def build_nmake(build_dir, target=None):
     qitools.command.check_call(cmd, cwd=build_dir)
 
 
-def build_vc(sln_file, release=False, be_verbose=True, target=None):
+def msbuild(sln_file, release=False, be_verbose=True, target=None):
     """
     Launch msbuild with correct configuratrion
     (debug or release),

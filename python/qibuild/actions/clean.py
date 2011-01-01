@@ -2,7 +2,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 """ clean build directories
@@ -15,10 +15,11 @@ import os
 import glob
 import logging
 import qibuild
+import qitools.argparsecommand
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qitools.argparsecommand.toc_parser(parser)
+    qibuild.parsers.toc_parser(parser)
     parser.add_argument("--force", "-f", dest="force", action="store_true", help="force the cleanup")
     parser.add_argument("build_directory", nargs="*", help="build directory to cleanup")
 
@@ -41,7 +42,7 @@ def cleanup(project, bdirs, work_tree, doit=False):
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
-    toc      = qibuild.toc.toc_open(args.work_tree, use_env=True)
+    toc      = qibuild.toc.open(args.work_tree, use_env=True)
 
     if args.force:
         print "removing:"

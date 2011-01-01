@@ -2,7 +2,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
 """ store all toc configuration keys
@@ -18,23 +18,6 @@ class ConfigException(Exception):
 
     def __str__(self):
         return repr(self.args)
-
-def read(filename, configstore, prefix=""):
-    """ read a configuration file """
-    parser = ConfigParser.RawConfigParser()
-    parser.read(filename)
-    sections = parser.sections()
-    for section in sections:
-        splitted_section = section.split()
-        items = parser.items(section)
-        for k, v in items:
-            tkey = [ ]
-            if prefix:
-                tkey.append(prefix)
-            tkey.extend([x.strip("\"\'") for x in splitted_section])
-            tkey.extend([x.strip("\"\'") for x in k.split(".")])
-            configstore.set(*tkey, value=v.strip("\"\'"))
-
 
 class ConfigStore:
     """
@@ -128,3 +111,18 @@ class ConfigStore:
 
 
 
+    def read(self, filename, prefix=""):
+        """ read a configuration file """
+        parser = ConfigParser.RawConfigParser()
+        parser.read(filename)
+        sections = parser.sections()
+        for section in sections:
+            splitted_section = section.split()
+            items = parser.items(section)
+            for k, v in items:
+                tkey = [ ]
+                if prefix:
+                    tkey.append(prefix)
+                tkey.extend([x.strip("\"\'") for x in splitted_section])
+                tkey.extend([x.strip("\"\'") for x in k.split(".")])
+                self.set(*tkey, value=v.strip("\"\'"))

@@ -2,7 +2,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 """display the status of projects
@@ -15,6 +15,7 @@ import sys
 import glob
 import logging
 import qibuild
+import qitools.argparsecommand
 
 def usage():
     "Specific usage"
@@ -22,7 +23,7 @@ def usage():
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.argparsecommand.toc_parser(parser)
+    qibuild.parsers.toc_parser(parser)
 
 def list_build_dir(project):
     """ list all buildable directory """

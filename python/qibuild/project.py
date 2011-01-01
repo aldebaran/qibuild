@@ -2,7 +2,7 @@
 ## Author(s):
 ##    - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 import os
@@ -11,7 +11,7 @@ import shlex
 import glob
 import logging
 import qitools.sh
-import qibuild.build
+import qibuild
 
 LOGGER = logging.getLogger("qibuild.toc.project")
 
@@ -125,7 +125,7 @@ def configure(project, flags=None, toolchain_file=None, generator=None):
     #TODO: guess generator
 
     if not os.path.exists(project.directory):
-        raise qibuild.build.ConfigureException("source dir: %s does not exist, aborting" % project.directory)
+        raise qibuild.ConfigureException("source dir: %s does not exist, aborting" % project.directory)
 
     if not os.path.exists(os.path.join(project.directory, "CMakeLists.txt")):
         LOGGER.info("Not calling cmake for %s", os.path.basename(project.directory))
@@ -150,7 +150,7 @@ def configure(project, flags=None, toolchain_file=None, generator=None):
 
     cmake_args.extend(["-D" + x for x in cmake_flags])
 
-    qibuild.build.cmake(project.directory, project.build_directory, cmake_args)
+    qibuild.cmake(project.directory, project.build_directory, cmake_args)
 
 
 def make(project, build_type, num_jobs=1, nmake=False, target=None):
@@ -166,14 +166,14 @@ def make(project, build_type, num_jobs=1, nmake=False, target=None):
         if len(sln_files) != 1:
             err_message = "Found several sln files: "
             err_message += ", ".join(sln_files)
-            raise qibuild.build.MakeException(err_message)
+            raise qibuild.MakeException(err_message)
         sln_file = sln_files[0]
-        qibuild.build.build_vc(sln_file, build_type=build_type, target=target)
+        qibuild.msbuild(sln_file, build_type=build_type, target=target)
     else:
         if not os.path.exists(os.path.join(build_dir, "Makefile")):
             LOGGER.debug("Not calling make for %s", os.path.basename(build_dir))
             return
         if sys.platform.startswith("win32"):
-            qibuild.build.build_nmake(build_dir, target=target)
+            qibuild.nmake(build_dir, target=target)
         else:
-            qibuild.build.build_unix(build_dir, num_jobs=num_jobs, target=target)
+            qibuild.make(build_dir, num_jobs=num_jobs, target=target)

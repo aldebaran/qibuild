@@ -3,7 +3,7 @@
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##  - Dimitri Merejkowsky <dmerejkowsy@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 """Configure a project
@@ -13,12 +13,13 @@
 import os
 import logging
 import qibuild
+import qitools.argparsecommand
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qitools.argparsecommand.toc_parser(parser)
-    qitools.argparsecommand.build_parser(parser)
-    qitools.argparsecommand.project_parser(parser)
+    qibuild.parsers.toc_parser(parser)
+    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.project_parser(parser)
 
 def do(args):
     """Main entry point"""

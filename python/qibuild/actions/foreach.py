@@ -3,7 +3,7 @@
 ##  - Dimitri Merejkowsky <dmerejkowsky@aldebaran-robotics.com>
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
 "Run the same command on each project"
@@ -11,6 +11,7 @@
 import sys
 import logging
 import qibuild
+import qitools.argparsecommand
 
 def usage():
     "Specific usage"
@@ -25,13 +26,13 @@ Use -- to seprate toc arguments from the arguments of the command.
 """
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.argparsecommand.toc_parser(parser)
+    qibuild.parsers.toc_parser(parser)
     parser.add_argument("command", metavar="COMMAND", nargs="+")
     parser.add_argument("--ignore-errors", action="store_true", help="continue on error")
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc.toc_open(args.work_tree, use_env=True)
+    toc = qibuild.toc.open(args.work_tree, use_env=True)
     logger = logging.getLogger(__name__)
     for project in toc.buildable_projects.values():
         logger.info("Running `%s` for %s", " ".join(args.command), project.name)
