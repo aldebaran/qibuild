@@ -17,7 +17,7 @@ class CommandFailedException(Exception):
     def __str__(self):
         return self.message
 
-LOGGER = logging.getLogger("qibuild.command")
+LOGGER = logging.getLogger("qitools.command")
 
 DRYRUN           = False
 
@@ -110,7 +110,7 @@ def _raise_error(cmd, cwd, shell, exception=None, retcode=None, output=None):
     Raise a BuildToolException with a nice message
 
     """
-    mess = "qibuild.command failed\n"
+    mess = "qitools.command failed\n"
     if exception:
         mess += "# error  : %s\n" % (exception)
     if retcode:

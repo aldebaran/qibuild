@@ -54,4 +54,4 @@ def do(args):
         # Add DEST_DIR to os.environ:
         build_environ = os.environ.copy()  # Let's not modify os.environ gloablly !
         build_environ["DESTDIR"] = args.destdir
-        qibuild.command.check_call(cmd, cwd=build_dir, env=build_environ)
+        qitools.command.check_call(cmd, cwd=build_dir, env=build_environ)

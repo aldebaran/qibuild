@@ -20,7 +20,7 @@ try:
 except:
     from qibuild.external import argparse
 
-import qibuild.command
+import qitools.command
 
 class InvalidAction(Exception):
     """Just a custom exception """

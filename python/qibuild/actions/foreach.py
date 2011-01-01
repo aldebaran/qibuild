@@ -37,8 +37,8 @@ def do(args):
         logger.info("Running `%s` for %s", " ".join(args.command), project.name)
         src = project.directory
         try:
-            qibuild.command.check_call(args.command, cwd=src)
-        except qibuild.command.CommandFailed, err:
+            qitools.command.check_call(args.command, cwd=src)
+        except qitools.command.CommandFailed, err:
             if args.ignore_errors:
                 logger.error(str(err))
                 continue

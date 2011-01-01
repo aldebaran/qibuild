@@ -24,7 +24,7 @@ import sys
 import glob
 import logging
 import qitools.sh
-import qibuild.command
+import qitools.command
 
 
 LOGGER = logging.getLogger("qibuild.build")
@@ -72,7 +72,7 @@ def build_unix(build_dir, num_jobs=None, target=None):
         cmd += ["-j%i" % num_jobs]
     if target:
         cmd.append(target)
-    qibuild.command.check_call(cmd, cwd=build_dir)
+    qitools.command.check_call(cmd, cwd=build_dir)
 
 
 def build_nmake(build_dir, target=None):
@@ -85,7 +85,7 @@ def build_nmake(build_dir, target=None):
     cmd = [NMAKE]
     if target:
         cmd.append(target)
-    qibuild.command.check_call(cmd, cwd=build_dir)
+    qitools.command.check_call(cmd, cwd=build_dir)
 
 
 def build_vc(sln_file, release=False, be_verbose=True, target=None):
@@ -134,7 +134,7 @@ def build_vc(sln_file, release=False, be_verbose=True, target=None):
 
     cmd += [sln_file]
 
-    qibuild.command.check_call(cmd)
+    qitools.command.check_call(cmd)
 
 def build_incredibuild(sln_file, release=False, be_verbose=True, target="ALL_BUILD"):
     """
@@ -157,7 +157,7 @@ def build_incredibuild(sln_file, release=False, be_verbose=True, target="ALL_BUI
 
     cmd += ["/nologo"]
 
-    qibuild.command.check_call(cmd)
+    qitools.command.check_call(cmd)
 
 def cmake(source_dir, build_dir, cmake_args):
     """
@@ -179,7 +179,7 @@ def cmake(source_dir, build_dir, cmake_args):
 
     # Add path to source
     cmake_args += [source_dir]
-    qibuild.command.check_call([CMAKE] + cmake_args, cwd=build_dir)
+    qitools.command.check_call([CMAKE] + cmake_args, cwd=build_dir)
 
 def ctest(source_dir, build_dir):
     """
@@ -203,7 +203,7 @@ def ctest(source_dir, build_dir):
     if not os.path.exists(os.path.join(build_dir, "CMakeCache.txt")):
         raise CTestException("build dir: %s does not contain "\
                              "CMakeCache.txt, aborting" % build_dir)
-    qibuild.command.check_call(cmd, cwd=build_dir)
+    qitools.command.check_call(cmd, cwd=build_dir)
 
 
 def guess_work_tree(use_env=False):
