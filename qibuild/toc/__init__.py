@@ -1,3 +1,10 @@
+##
+## Author(s):
+##  - Cedric GESTES <gestes@aldebaran-robotics.com>
+##  - Dimitri Merejkowsky <dmerejkowsy@aldebaran-robotics.com>
+##
+## Copyright (C) 2010 Aldebaran Robotics
+##
 """
 Set of tools for aldebaran prog team.
 
@@ -25,7 +32,7 @@ def guess_work_tree(use_env=False):
         (head, _tail) = os.path.split(head)
         if not _tail:
             break
-    return search_manifest_directory(os.getcwd())
+    return None
 
 def toc_open(work_tree=None, use_env=False):
     """ open a toc repository
@@ -33,6 +40,8 @@ def toc_open(work_tree=None, use_env=False):
     """
     if not work_tree:
         work_tree = guess_work_tree(use_env)
+    if not work_tree:
+        work_tree = search_manifest_directory(os.getcwd())
     if work_tree is None:
         raise Exception("Could not find toc work tree, please go to a valid work tree.")
     return Toc(work_tree)
@@ -48,6 +57,8 @@ def tob_open(work_tree, args, use_env=False):
 
     if not work_tree:
         work_tree = guess_work_tree(use_env)
+    if not work_tree:
+        work_tree = search_manifest_directory(os.getcwd())
     if work_tree is None:
         raise Exception("Could not find toc work tree, please go to a valid work tree.")
     return TocBuilder(work_tree,
