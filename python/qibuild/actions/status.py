@@ -13,9 +13,13 @@ List all buildable projects found. For each project, display the list of build d
 import os
 import sys
 import glob
+import time
+import datetime
 import logging
 import qibuild
 import qitools
+
+LOGGER = logging.getLogger(__name__)
 
 def usage():
     "Specific usage"
@@ -30,12 +34,22 @@ def list_build_dir(path):
     bdirs = glob.glob(os.path.join(path, "build-*"))
     for bdir in bdirs:
         if os.path.isdir(bdir):
-            print " ", os.path.basename(bdir)
+            ctim = time.time()
+            ftim = os.path.getmtime(bdir)
+            delta = ctim - ftim
+            ddelta = datetime.timedelta(seconds = delta)
+            todisplay = ""
+            if ddelta.days > 0:
+                todisplay = "%d days, %d hours" % (ddelta.days, ddelta.seconds / 3600)
+            elif ddelta.seconds > 3600:
+                todisplay = "%d hours" % (ddelta.seconds / 3600)
+            else:
+                todisplay = "%d minutes" % (ddelta.seconds / 60)
+            print " %s: (%s)" % (os.path.basename(bdir), todisplay)
 
 def do(args):
     """Main entry point"""
     qiwt = qitools.qiworktree.open(args.work_tree, use_env=True)
-    logger = logging.getLogger(__name__)
     max_len = 0
     for pname, ppath in qiwt.buildable_projects.iteritems():
         if len(pname) > max_len:
@@ -43,7 +57,8 @@ def do(args):
 
     for pname, ppath in qiwt.buildable_projects.iteritems():
         pad = "".join([ " " for x in range(max_len - len(pname)) ])
-        print "%s%s [%s]" %(pname, pad, os.path.relpath(ppath, qiwt.work_tree))
+        LOGGER.info(os.path.relpath(ppath, qiwt.work_tree))
+        #print "%s%s [%s]" %(pname, pad, os.path.relpath(ppath, qiwt.work_tree))
         list_build_dir(ppath)
 
 if __name__ == "__main__" :
