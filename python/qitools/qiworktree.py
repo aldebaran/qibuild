@@ -81,13 +81,13 @@ def search_manifest_directory(working_directory):
         cwd = new_cwd
     return None
 
-def search_projects(directory=None, deep=3):
+def search_projects(directory=None, depth=3):
     """ search for qibuild.manifest files recursively starting from directory
         this function return a list of directory.
     """
     rgit = list()
     rsrc = list()
-    if deep == 0:
+    if depth == 0:
         return (rgit, rsrc)
 
     if os.path.exists(os.path.join(directory, ".git")):
@@ -98,7 +98,7 @@ def search_projects(directory=None, deep=3):
 
     for p in os.listdir(directory):
         if os.path.isdir(os.path.join(directory, p)):
-            sub_rgit, sub_rsrc = search_projects(os.path.join(directory, p), deep - 1)
+            sub_rgit, sub_rsrc = search_projects(os.path.join(directory, p), depth - 1)
             rgit.extend(sub_rgit)
             rsrc.extend(sub_rsrc)
     return (rgit, rsrc)
