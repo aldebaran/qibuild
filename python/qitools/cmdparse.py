@@ -18,7 +18,7 @@ import logging
 try:
     import argparse
 except:
-    from qibuild.external import argparse
+    from qitools.external import argparse
 
 import qitools.command
 
@@ -117,7 +117,7 @@ def _dump_arguments(name, args):
         output += "  %s%s = %s\n" % (str(k), pad, str(v))
     if output[-1] == "\n":
         output = output[:-1]
-    logger = logging.getLogger("qitools.argparsecommand")
+    logger = logging.getLogger("qitools.cmdparse")
     logger.debug("[%s] arguments:\n%s", name, output)
 
 def root_command_main(name, parser, modules):
@@ -157,7 +157,7 @@ def root_command_main(name, parser, modules):
         sys.exit(0)
 
     args = parser.parse_args()
-    qibuild.log.configure_logging(args)
+    qitools.log.configure_logging(args)
     module = action_modules[args.action]
     _dump_arguments(name, args)
     main_wrapper(module, args)
@@ -181,7 +181,7 @@ def sub_command_main(module, args=None, namespace=None):
     parser = argparse.ArgumentParser(usage=usage)
     module.configure_parser(parser)
     parsed_args = parser.parse_args(args=args, namespace=namespace)
-    qibuild.log.configure_logging(parsed_args)
+    qitools.log.configure_logging(parsed_args)
     _dump_arguments(module.__file__, args)
     main_wrapper(module, parsed_args)
 
