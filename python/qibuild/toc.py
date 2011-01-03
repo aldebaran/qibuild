@@ -77,7 +77,7 @@ import qitools.sh
 from   qitools.qiworktree import QiWorkTree
 from   qibuild.toolchain  import Toolchain
 
-LOGGER = logging.getLogger("qibuild.tocbuilder")
+LOGGER = logging.getLogger("qibuild.toc")
 
 class Toc(QiWorkTree):
     def __init__(self, work_tree, build_type, toolchain_name, build_config, cmake_flags):
