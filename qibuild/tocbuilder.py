@@ -2,7 +2,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
 import os
@@ -101,3 +101,27 @@ class TocBuilder(Toc):
         log += "  not found : %s\n"
         LOGGER.debug(log, ",".join(projects), ",".join(tobuild),  ",".join(provided), ",".join(notfound))
         return (tobuild, provided, notfound)
+
+def tob_open(work_tree, args, use_env=False):
+    build_config   = args.build_config
+    build_type     = args.build_type
+    toolchain_name = args.toolchain_name
+    try:
+        cmake_flags = args.cmake_flags
+    except:
+        cmake_flags = list()
+
+    if not work_tree:
+        work_tree = guess_work_tree(use_env)
+    if not work_tree:
+        work_tree = search_manifest_directory(os.getcwd())
+    if work_tree is None:
+        raise Exception("Could not find toc work tree, please go to a valid work tree.")
+    return TocBuilder(work_tree,
+                      build_type=build_type,
+                      toolchain_name=toolchain_name,
+                      build_config=build_config,
+                      cmake_flags=cmake_flags)
+
+
+open = tob_open

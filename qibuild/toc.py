@@ -3,7 +3,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
 import os
@@ -147,3 +147,17 @@ class Toc:
 
 
 
+
+def toc_open(work_tree=None, use_env=False):
+    """ open a toc repository
+    return a valid Toc instance
+    """
+    if not work_tree:
+        work_tree = guess_work_tree(use_env)
+    if not work_tree:
+        work_tree = search_manifest_directory(os.getcwd())
+    if work_tree is None:
+        raise Exception("Could not find toc work tree, please go to a valid work tree.")
+    return Toc(work_tree)
+
+open = toc_open

@@ -3,30 +3,12 @@
 ##  - Dimitri Merejkowsky <dmerejkowsky@aldebaran-robotics.com>
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
 """ Collection of parser fonctions for various actions
 """
 
-def log_parser(parser):
-    """ Given a parser, add the options controling log
-    """
-    group = parser.add_argument_group("logging arguments")
-    group.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="output debug messages")
-    group.add_argument("--quiet", "-q", dest="quiet", action="store_true", help="output only error messages")
-    group.add_argument("--no-color", dest="color", action="store_false", help="do not use color")
-    parser.set_defaults(verbose=False, quiet=False, color=True)
-
-def action_parser(parser):
-    """ Parser settings for every action
-    """
-    # Every action should have access to a proper log
-    log_parser(parser)
-    # Every action can use  --pdb and --backtrace
-    group = parser.add_argument_group("debug arguments")
-    group.add_argument("--backtrace", action="store_true", help="display backtrace on error")
-    group.add_argument("--pdb", action="store_true", help="use pdb on error")
 
 def toc_parser(parser):
     """ Parser settings for every action using a toc dir
