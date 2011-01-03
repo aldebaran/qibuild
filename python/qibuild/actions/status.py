@@ -32,6 +32,11 @@ def configure_parser(parser):
 def list_build_dir(path):
     """ list all buildable directory """
     bdirs = glob.glob(os.path.join(path, "build-*"))
+    max_len = 0
+    for bdir in bdirs:
+        if len(bdir) > max_len:
+            max_len = len(bdir)
+
     for bdir in bdirs:
         if os.path.isdir(bdir):
             ctim = time.time()
@@ -45,7 +50,8 @@ def list_build_dir(path):
                 todisplay = "%d hours" % (ddelta.seconds / 3600)
             else:
                 todisplay = "%d minutes" % (ddelta.seconds / 60)
-            print " %s: (%s)" % (os.path.basename(bdir), todisplay)
+            pad = "".join([ " " for x in range(max_len - len(bdir)) ])
+            print " %s%s: (%s)" % (os.path.basename(bdir), pad, todisplay)
 
 def do(args):
     """Main entry point"""
