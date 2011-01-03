@@ -111,7 +111,7 @@ link:sdk.html[QiBuild SDK]
 Find and use external projects provided by external sdk. (sources or binaries)
 
 link:autotools.html[Autotools]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Build external autotools projects
 
-* link:sdk.html#_qi_include_sdk[qi_include_sdk]
+* link:autotools.html#_qi_build_autotools[qi_build_autotools]

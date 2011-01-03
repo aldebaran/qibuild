@@ -3,7 +3,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 set -e
@@ -17,7 +17,7 @@ python doc/tools/generate_doc_from_cmake.py \
   "cmake/samples" \
   "build-doc"
 
-PYTHONPATH=. python doc/tools/generate_manpage_from_qibuild.py build-doc/qibuild-manpage.txt
+PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py build-doc/qibuild-manpage.txt
 
 if [ -f /etc/asciidoc/javascripts/asciidoc-xhtml11.js ] ; then
   cp "/etc/asciidoc/javascripts/asciidoc-xhtml11.js" "build-doc"
