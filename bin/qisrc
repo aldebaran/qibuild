@@ -10,12 +10,12 @@
 """
 
 import argparse
-import qitools.argparsecommand
+import qitools.cmdparse
 
 def main():
     parser = argparse.ArgumentParser()
-    modules = qitools.argparsecommand.action_modules_from_package("qisrc.actions")
-    qitools.argparsecommand.root_command_main("qisrc", parser, modules)
+    modules = qitools.cmdparse.action_modules_from_package("qisrc.actions")
+    qitools.cmdparse.root_command_main("qisrc", parser, modules)
 
 if __name__ == "__main__":
     main()

@@ -2,7 +2,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 """ list all git repositories and exit
@@ -11,32 +11,32 @@
 import os
 import logging
 
-import qibuild
+import qitools
 import qisrc
 
 LOGGER = logging.getLogger("qisrc.status")
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.argparsecommand.toc_parser(parser)
-    # qitools.argparsecommand.action_parser(parser)
+    qitools.qiworktree.work_tree_parser(parser)
+    # qitools.cmdparse.action_parser(parser)
     # parser.add_argument("toolchain", action="store", help="the toolchain name")
     # parser.add_argument("feed", nargs='?', action="store", help="an url to a toolchain feed")
 
 def do(args):
     """ Main method """
-    qis = qisrc.open(args.work_tree, use_env=True)
+    qiwt = qitools.qiworktree.open(args.work_tree, use_env=True)
     dirty = list()
-    for git_project in qis.git_projects:
+    for git_project in qiwt.git_projects.values():
         git = qisrc.git.open(git_project)
         if git.is_valid() and not git.is_clean():
             dirty.append(git_project)
 
-    LOGGER.info("Dirty projects: %d/%d", len(dirty), len(qis.git_projects))
+    LOGGER.info("Dirty projects: %d/%d", len(dirty), len(qiwt.git_projects))
     for git_project in dirty:
         git = qisrc.git.open(git_project)
         if git.is_valid() and not git.is_clean():
-            shortpath = os.path.relpath(git_project, qis.work_tree)
+            shortpath = os.path.relpath(git_project, qiwt.work_tree)
             #print "[ %s ]" % shortpath
             print ""
             LOGGER.info("%s : %s tracking %s", shortpath, git.get_current_branch(), git.get_tracking_branch())
@@ -47,4 +47,4 @@ def do(args):
 
 if __name__ == "__main__" :
     import sys
-    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
+    qitools.cmdparse.sub_command_main(sys.modules[__name__])

@@ -3,7 +3,7 @@
 import os
 import logging
 import qibuild
-import qitools.argparsecommand
+import qitools.cmdparse
 
 def install_project(args, project):
     r"""Build a project.
@@ -29,21 +29,21 @@ def do(args):
     logger = logging.getLogger(__name__)
     toc = qibuild.toc.toc_open(args)
 
-    projects = qitools.argparsecommand.get_projects(args, toc, args.projects)
+    projects = qitools.cmdparse.get_projects(args, toc, args.projects)
     project_names = [p.name for p in projects]
 
     dest = os.path.join(args.destdir, args.install_prefix[1:])
     logger.info("Installing %s to %s", ", ".join(project_names), dest)
 
     # Set build configurations
-    qitools.argparsecommand.buildaction.set_build_configs(args, toc, projects)
+    qitools.cmdparse.buildaction.set_build_configs(args, toc, projects)
 
     # Run cmake just to set the install prefix:
     for project in projects:
         new_flags = ["CMAKE_INSTALL_PREFIX=%s" % args.install_prefix]
         # Force args.cmake_flags
         args.cmake_flags = new_flags
-        qitools.argparsecommand.buildaction.run_cmake(args, project)
+        qitools.cmdparse.buildaction.run_cmake(args, project)
 
         # Force args.target:
         build_dir = project.cmake.get_build_dir()

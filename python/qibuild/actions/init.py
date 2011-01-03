@@ -2,7 +2,7 @@
 
 import os
 import qibuild
-import qitools.argparsecommand
+import qitools.cmdparse
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -23,4 +23,4 @@ def do(args):
 
 if __name__ == "__main__" :
     import sys
-    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
+    qitools.cmdparse.sub_command_main(sys.modules[__name__])

@@ -27,7 +27,7 @@ import qitools.sh
 import qitools.command
 
 import parsers
-
+import toc
 
 LOGGER = logging.getLogger("qibuild")
 
@@ -207,21 +207,3 @@ def ctest(source_dir, build_dir):
                              "CMakeCache.txt, aborting" % build_dir)
     qitools.command.check_call(cmd, cwd=build_dir)
 
-
-def guess_work_tree(use_env=False):
-    """Look for parent directories until a .toc dir is found somewhere.
-    Otherwize, juste use TOC_WORK_TREE environnement
-    variable
-    """
-    from_env = os.environ.get("TOC_WORK_TREE")
-    if use_env and from_env:
-        return from_env
-    head = os.getcwd()
-    while True:
-        d = os.path.join(head, ".qi")
-        if os.path.isdir(d):
-            return head
-        (head, _tail) = os.path.split(head)
-        if not _tail:
-            break
-    return None

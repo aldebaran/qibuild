@@ -3,7 +3,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 #Create a simple launcher for QiBuild. It will install in /usr/local/bin.
@@ -21,7 +21,7 @@ create_launcher() {
   #echo "QiBuild directory: $p"
 
   echo '#!/bin/sh'                                                         > ${DESTDIR}/${name}
-  echo "PYTHONPATH=\"$p:${PYTHONPATH}\" python \"${p}/${full_path}\" \$@" >> ${DESTDIR}/${name}
+  echo "PYTHONPATH=\"$p/python:${PYTHONPATH}\" python \"${p}/${full_path}\" \$@" >> ${DESTDIR}/${name}
   chmod 755 ${DESTDIR}/${name}
 
   echo "installed: ${DESTDIR}/${name}"

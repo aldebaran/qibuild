@@ -1,5 +1,5 @@
 ##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
 """ class that wrap git """
@@ -8,7 +8,7 @@ import os
 import sys
 import logging
 
-from qibuild           import command
+from qitools           import command
 
 GIT = "git"
 

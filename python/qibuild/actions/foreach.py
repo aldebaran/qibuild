@@ -6,40 +6,39 @@
 ## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
-"Run the same command on each project"
+"Run the same command on each buildable projects"
 
 import sys
 import logging
-import qibuild
-import qitools.argparsecommand
+import qitools
 
 def usage():
     "Specific usage"
-    return """foreach -- COMMAND
+    return """\
+foreach -- COMMAND
 
 Example:
-toc foreach -- git reset --hard origin/v1.10.0
+qibuild foreach -- cd build-sys-linux-x86_64 \; make clean all
 
-Use -- to seprate toc arguments from the arguments of the command.
+Use -- to seprate qibuild arguments from the arguments of the command.
 (The -- is mandatory)
-
 """
+
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.toc_parser(parser)
+    qitools.qiworktree.work_tree_parser(parser)
     parser.add_argument("command", metavar="COMMAND", nargs="+")
     parser.add_argument("--ignore-errors", action="store_true", help="continue on error")
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc.open(args.work_tree, use_env=True)
+    qiwt = qitools.qiworktree.open(args.work_tree, use_env=True)
     logger = logging.getLogger(__name__)
-    for project in toc.buildable_projects.values():
-        logger.info("Running `%s` for %s", " ".join(args.command), project.name)
-        src = project.directory
+    for pname, ppath in qiwt.buildable_projects.iteritems():
+        logger.info("Running `%s` for %s", " ".join(args.command), pname)
         try:
-            qitools.command.check_call(args.command, cwd=src)
-        except qitools.command.CommandFailed, err:
+            qitools.command.check_call(args.command, cwd=ppath)
+        except qitools.command.CommandFailedException, err:
             if args.ignore_errors:
                 logger.error(str(err))
                 continue
@@ -47,5 +46,5 @@ def do(args):
                 raise
 
 if __name__ == "__main__" :
-    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
+    qitools.cmdparse.sub_command_main(sys.modules[__name__])
 

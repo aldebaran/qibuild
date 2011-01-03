@@ -21,7 +21,7 @@ import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.argparsecommand.action_parser(parser)
+    qitools.cmdparse.action_parser(parser)
     qitoolchain.shell.toolchain_parser(parser)
     parser.add_argument("toolchain", action="store", help="the toolchain name")
 
@@ -54,4 +54,4 @@ def do(args):
 
 if __name__ == "__main__" :
     import sys
-    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
+    qitools.cmdparse.sub_command_main(sys.modules[__name__])

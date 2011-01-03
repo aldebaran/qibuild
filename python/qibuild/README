@@ -2,13 +2,19 @@
 
 == QiBuild major classes ==
 
-=== Toc ===
-Hold information about projects.
-List of buildable projects.
+=== QiWorkTree ===
+Hold general information about a worktree:
+  - buildable_projects
+  - git_projects
+  - configuration
 
-=== TocBuilder(Toc) ===
+BuildWorkTree ?
+SrcWorkTree   ?
+
+=== Toc ===
 Hold build specific information about projects. You should specify everything needed for a build to this class.
 This include:
+  - a QiWorkTree (or QiBuildWorkTree?)
   - the toolchain name (default to "system")
   - the build type (release/debug)
   - the build configuration (default to "")
@@ -22,6 +28,9 @@ Hold information about a project. This include:
   - sdk_directory
   - depends
   - rdepends
+
+
+
 
 Describe options:
 == Configuration ==

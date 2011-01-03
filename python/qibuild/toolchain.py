@@ -13,5 +13,5 @@ class Toolchain:
             self.name = name
         self.projects = list()
 
-    def update(self, tob):
-        self.projects = tob.configstore.get("toolchain", self.name, "provide", default=list())
+    def update(self, toc):
+        self.projects = toc.configstore.get("toolchain", self.name, "provide", default=list())

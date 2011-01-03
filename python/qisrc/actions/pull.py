@@ -2,25 +2,25 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 """Init a new qisrc workspace """
 
 import os
-import qibuild
+import qitools
 import qisrc
 
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.argparsecommand.toc_parser(parser)
+    qitools.qiworktree.work_tree_parser(parser)
     parser.add_argument("--continue", action="store_true", dest="continue_on_error", help="continue on error")
 
 def do(args):
     """Main entry point"""
-    qis = qisrc.open(args.work_tree, use_env=True)
-    for git_project in qis.git_projects:
+    qiwt = qitools.qiworktree.open(args.work_tree, use_env=True)
+    for git_project in qiwt.git_projects.values():
         try:
             git = qisrc.git.open(git_project)
             #TODO: replace by try/except?
@@ -35,4 +35,4 @@ def do(args):
 
 if __name__ == "__main__" :
     import sys
-    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
+    qitools.cmdparse.sub_command_main(sys.modules[__name__])

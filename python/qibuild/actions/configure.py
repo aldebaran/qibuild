@@ -13,7 +13,7 @@
 import os
 import logging
 import qibuild
-import qitools.argparsecommand
+import qitools
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -31,28 +31,28 @@ def do(args):
         raise Exception("You should use --single when specifying a build directory")
 
     logger   = logging.getLogger(__name__)
-    tob      = qibuild.tocbuilder.open(args.work_tree, args, use_env=True)
+    toc      = qibuild.toc.open(args.work_tree, args, use_env=True)
 
-    wanted_projects = qibuild.toc.get_projects_from_args(tob, args)
-    (src_projects, bin_projects, not_found_projects) = tob.split_sources_and_binaries(wanted_projects)
+    wanted_projects = qibuild.toc.get_projects_from_args(toc, args)
+    (src_projects, bin_projects, not_found_projects) = toc.split_sources_and_binaries(wanted_projects)
 
     if args.build_directory:
-        tob.get_project(wanted_projects[0]).set_custom_build_directory(args.build_directory)
+        toc.projects[wanted_projects[0]].set_custom_build_directory(args.build_directory)
 
     for project in src_projects:
         logger.info("Bootstraping [%s]", project)
-        dep_sdk_dirs = tob.get_sdk_dirs(project)
-        qibuild.project.bootstrap(tob.get_project(project), dep_sdk_dirs)
+        dep_sdk_dirs = toc.get_sdk_dirs(project)
+        qibuild.project.bootstrap(toc.projects[project], dep_sdk_dirs)
 
     if args.bootstrap:
         return
     for project in src_projects:
-        logger.info("Configuring %s in %s", project, tob.build_folder_name)
-        logger.debug("%s", tob.get_project(project))
-        qibuild.project.configure(tob.get_project(project), args.cmake_flags)
+        logger.info("Configuring %s in %s", project, toc.build_folder_name)
+        logger.debug("%s", toc.projects[project])
+        qibuild.project.configure(toc.projects[project], args.cmake_flags)
 
 if __name__ == "__main__":
     import sys
-    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
+    qitools.cmdparse.sub_command_main(sys.modules[__name__])
 
 

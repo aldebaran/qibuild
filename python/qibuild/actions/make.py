@@ -13,7 +13,7 @@
 import os
 import logging
 import qibuild
-import qitools.argparsecommand
+import qitools.cmdparse
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -24,18 +24,18 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
-    tob      = qibuild.toc.tob_open(args.work_tree, args, use_env=True)
+    toc      = qibuild.toc.toc_open(args.work_tree, args, use_env=True)
 
-    wanted_projects = qibuild.toc.get_projects_from_args(tob, args)
-    (src_projects, bin_projects, not_found_projects) = tob.split_sources_and_binaries(wanted_projects)
+    wanted_projects = qibuild.toc.get_projects_from_args(toc, args)
+    (src_projects, bin_projects, not_found_projects) = toc.split_sources_and_binaries(wanted_projects)
 
     for project in src_projects:
-        logger.info("Building %s in %s", project, tob.build_folder_name)
-        logger.debug("%s", tob.get_project(project))
-        qibuild.toc.project.make(tob.get_project(project), tob.build_type)
+        logger.info("Building %s in %s", project, toc.build_folder_name)
+        logger.debug("%s", toc.projects[project])
+        qibuild.project.make(toc.projects[project], toc.build_type)
 
 if __name__ == "__main__":
     import sys
-    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
+    qitools.cmdparse.sub_command_main(sys.modules[__name__])
 
 

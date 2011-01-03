@@ -9,7 +9,7 @@
 """ Collection of parser fonctions for various actions
 """
 
-from qitools.argparsecommand import default_parser
+from qitools.cmdparse import default_parser
 
 def toc_parser(parser):
     """ Parser settings for every action using a toc dir

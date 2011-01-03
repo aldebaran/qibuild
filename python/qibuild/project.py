@@ -42,7 +42,7 @@ class Project:
         self.depends.extend(deps)
         self.rdepends.extend(rdeps)
 
-    def update_build_config(self, tob, build_directory_name):
+    def update_build_config(self, toc, build_directory_name):
         """ Update cmake_flags
            - add flags from the build_config
            - add flags from the project config
@@ -53,25 +53,27 @@ class Project:
         if not os.path.exists(self.build_directory):
             os.makedirs(self.build_directory)
 
-        if tob.build_config:
-            build_config_flags = tob.configstore.get("build", tob.build_config, "cmake", "flags", default=None)
+        if toc.build_config:
+            build_config_flags = toc.configstore.get("build", toc.build_config, "cmake", "flags", default=None)
             if build_config_flags:
                 self.cmake_flags.extend(shlex.split(build_config_flags))
 
-        project_flags = tob.configstore.get(self.name, "build", "cmake", "flags", default=None)
+        project_flags = toc.configstore.get(self.name, "build", "cmake", "flags", default=None)
         if project_flags:
             self.cmake_flags.extend(shlex.split(project_flags))
 
-        if tob.build_type:
-            self.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (tob.build_type.toupper()))
+        if toc.build_type:
+            self.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (toc.build_type.toupper()))
 
-        if tob.toolchain.name != "system":
-            self.cmake_flags.append("QI_TOOLCHAIN_NAME=%s" % (tob.toolchain.name))
+        if toc.toolchain.name != "system":
+            self.cmake_flags.append("QI_TOOLCHAIN_NAME=%s" % (toc.toolchain.name))
 
-        if tob.cmake_flags:
-            self.cmake_flags.extend(tob.cmake_flags)
+        if toc.cmake_flags:
+            self.cmake_flags.extend(toc.cmake_flags)
 
     def set_custom_build_directory(self, build_dir):
+        """ could be used to override the default build_directory
+        """
         self.build_directory = build_dir
         #create the build_directory if it does not exists
         if not os.path.exists(self.build_directory):

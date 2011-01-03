@@ -15,7 +15,7 @@ import sys
 import glob
 import logging
 import qibuild
-import qitools.argparsecommand
+import qitools
 
 def usage():
     "Specific usage"
@@ -25,27 +25,27 @@ def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.toc_parser(parser)
 
-def list_build_dir(project):
+def list_build_dir(path):
     """ list all buildable directory """
-    bdirs = glob.glob(os.path.join(project.directory, "build-*"))
+    bdirs = glob.glob(os.path.join(path, "build-*"))
     for bdir in bdirs:
         if os.path.isdir(bdir):
             print " ", os.path.basename(bdir)
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc.toc_open(args.work_tree, use_env=True)
+    qiwt = qitools.qiworktree.open(args.work_tree, use_env=True)
     logger = logging.getLogger(__name__)
     max_len = 0
-    for project in toc.buildable_projects.values():
-        if len(project.name) > max_len:
-            max_len = len(project.name)
+    for pname, ppath in qiwt.buildable_projects.iteritems():
+        if len(pname) > max_len:
+            max_len = len(pname)
 
-    for project in toc.buildable_projects.values():
-        pad = "".join([ " " for x in range(max_len - len(project.name)) ])
-        print "%s%s [%s]" %(project.name, pad, os.path.relpath(project.directory, toc.work_tree))
-        list_build_dir(project)
+    for pname, ppath in qiwt.buildable_projects.iteritems():
+        pad = "".join([ " " for x in range(max_len - len(pname)) ])
+        print "%s%s [%s]" %(pname, pad, os.path.relpath(ppath, qiwt.work_tree))
+        list_build_dir(ppath)
 
 if __name__ == "__main__" :
-    qitools.argparsecommand.sub_command_main(sys.modules[__name__])
+    qitools.cmdparse.sub_command_main(sys.modules[__name__])
 
