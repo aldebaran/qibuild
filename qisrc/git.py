@@ -8,7 +8,7 @@ import os
 import sys
 import logging
 
-from .           import command
+from qibuild           import command
 
 GIT = "git"
 
@@ -244,6 +244,16 @@ class Git:
 
         self.cmd.check_call("config", "--add", "remote.%s.fetch" % name,
                             "+refs/heads/*:refs/remotes/%s/*" % name)
+
+    def get_tracking_branch(self, branch=None):
+        if not branch:
+            branch = self.get_current_branch()
+
+        remote = self.cmd.call_output("config", "--get", "branch.%s.remote" % (branch))[0].strip()
+        merge = self.cmd.call_output("config", "--get", "branch.%s.merge" % (branch))[0].strip()
+        if merge.startswith("refs/heads/"):
+            return "%s/%s" % (remote, merge[11:])
+        return None
 
     def set_tracking_branch(self, current_branch, remote_branch, remote=None, url=None):
         """Set the current tracking branch.
