@@ -1,5 +1,18 @@
-TODO:
- - rewrite stage_*
- - finish qi_use_lib
- - toolchain support
- - wrapper for old t001chain stuff
+TODO
+====
+
+CMake:
+* finish rewriting stage_*
+* finish qi_use_lib
+* toolchain support (iphone, mingw32-cross, android, ..)
+* wrapper for old t001chain stuff
+* rewrite and document launcher.cmake
+
+QiBuild:
+* configstore: merge dependencies and cflags properly
+* doc
+* cmake: guess generator (or name it .. windows support)
+* make: guess msbuild, etc.. path (or name it .. windows support)
+* fix install
+
+QiSrc:

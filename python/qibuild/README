@@ -1,5 +1,3 @@
-
-
 == QiBuild major classes ==
 
 === QiWorkTree ===
@@ -8,20 +6,16 @@ Hold general information about a worktree:
   - git_projects
   - configuration
 
-BuildWorkTree ?
-SrcWorkTree   ?
-
-=== Toc ===
+=== Toc(QiWorkTree) ===
 Hold build specific information about projects. You should specify everything needed for a build to this class.
 This include:
-  - a QiWorkTree (or QiBuildWorkTree?)
   - the toolchain name (default to "system")
   - the build type (release/debug)
   - the build configuration (default to "")
   - specifics cmake flags (default to None)
 
 === Project ===
-Hold information about a project. This include:
+Hold build information about a project. This include:
   - name
   - directory
   - build_directory
@@ -31,9 +25,8 @@ Hold information about a project. This include:
 
 
 
-
-Describe options:
 == Configuration ==
+
 === General ===
 general.build.config
 general.cmake.flags
