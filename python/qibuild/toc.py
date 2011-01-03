@@ -10,26 +10,14 @@ import os
 import sys
 import logging
 import qitools.configstore
+import qitools.qiworktree
 import qibuild
+
 from   qibuild.sort        import topological_sort
 from   qibuild.project     import Project
 
 LOGGER = logging.getLogger("qibuild.toc")
 
-def search_manifest_directory(working_directory):
-    """ find the manifest associated to the working_directory, return None if not found """
-    cwd     = os.path.normpath(os.path.abspath(working_directory))
-    dirname = None
-
-    #for each cwd parent folders, try to see if it match src
-    while dirname or cwd:
-        if (os.path.exists(os.path.join(cwd, "qibuild.manifest"))):
-            return cwd
-        (new_cwd, dirname) = os.path.split(cwd)
-        if new_cwd == cwd:
-            break
-        cwd = new_cwd
-    return None
 
 def get_projects_from_args(toc, args):
     """ Return the list of project specified in args. This is usefull to extract
@@ -48,7 +36,7 @@ def get_projects_from_args(toc, args):
 
     if not project_names:
         LOGGER.debug("no project specified, guessing from current working directory")
-        project_dir = search_manifest_directory(os.getcwd())
+        project_dir = qitools.qiworktree.search_manifest_directory(os.getcwd())
         if project_dir:
             LOGGER.debug("Found %s from current working directory", os.path.split(project_dir)[-1])
             project_names = [ os.path.split(project_dir)[-1] ]
@@ -80,52 +68,45 @@ def get_projects_from_args(toc, args):
     return project_names
 
 
-def _search_buildable_projects(directory=None):
-    """ search for qibuild.manifest files recursively starting from directory
-        this function return a list of directory.
-    """
-    result = list()
-    if os.path.exists(os.path.join(directory, "qibuild.manifest")):
-        result.append(directory)
-    for p in os.listdir(directory):
-        if os.path.isdir(os.path.join(directory, p)):
-            result.extend(_search_buildable_projects(os.path.join(directory, p)))
-    return result
 
-class Toc:
-    """ For a toc worktree this class allow finding:
-        - buildable projects
-        - toolchains
-    """
+import os
+import sys
+import platform
+import logging
+import qitools.sh
+from   qitools.qiworktree import QiWorkTree
+from   qibuild.toolchain  import Toolchain
 
-    def __init__(self, work_tree):
-        self.work_tree          = work_tree
-        self.buildable_projects = dict()
-        self.configstore        = qitools.configstore.ConfigStore()
-        self._load_buildable_projects()
-        self._load_configuration()
-        self._update_project_depends()
+LOGGER = logging.getLogger("qibuild.tocbuilder")
 
-    def _load_buildable_projects(self):
-        buildable_project_dirs = _search_buildable_projects(self.work_tree)
-        for d in buildable_project_dirs:
-            p = Project(d)
-            self.buildable_projects[p.name] = p
+class Toc(QiWorkTree):
+    def __init__(self, work_tree, build_type, toolchain_name, build_config, cmake_flags):
+        """
+            work_tree      = a toc worktree
+            build_type     = a build type, could be debug or release
+            toolchain_name = by default the system toolchain is used
+            cmake_flags    = optional additional cmake flags
+            build_config   = optional a build configuration
+        """
+        QiWorkTree.__init__(self, work_tree)
+        self.build_type        = build_type
+        self.toolchain         = Toolchain(toolchain_name)
+        self.build_config      = build_config
+        self.cmake_flags       = cmake_flags
+        self.build_folder_name = None
+        self.projects          = dict()
 
-    def _load_configuration(self):
-        for name, project in self.buildable_projects.iteritems():
-            self.configstore.read(os.path.join(project.directory, "qibuild.manifest"))
-        globalconfig = os.path.join(self.work_tree, ".qi", "build")
-        if os.path.exists(globalconfig):
-            self.configstore.read(globalconfig)
-            LOGGER.debug("[toc] configuration:\n" + str(self.configstore))
+        self.toolchain.update(self)
+        self._set_build_folder_name()
 
-    def _update_project_depends(self):
-        for project in self.buildable_projects.values():
+        if not self.build_config:
+            self.build_config = self.configstore.get("general", "build", "config", default=None)
+
+        for pname, ppath in self.buildable_projects.iteritems():
+            project = Project(ppath)
+            project.update_build_config(self, self.build_folder_name)
             project.update_depends(self)
-
-    def get_project(self, name):
-        return self.buildable_projects[name]
+            self.projects[pname] = project
 
     def resolve_deps(self, projects, runtime=False):
         """Given a list of projects, resolve the dependencies, and return
@@ -138,27 +119,95 @@ class Toc:
         to_sort = dict()
         for proj in self.buildable_projects.keys():
             if runtime:
-                to_sort[proj] = self.get_project(proj).rdepends
+                to_sort[proj] = self.projects[proj].rdepends
             else:
-                to_sort[proj] = self.get_project(proj).depends
+                to_sort[proj] = self.projects[proj].depends
         # Note: topological_sort only use lists of strings:
         res_names = topological_sort(to_sort, projects)
         LOGGER.debug("Result(runtime=%d): %s", runtime, str(res_names))
         return res_names
 
+    def _set_build_folder_name(self):
+        """Get a reasonable build folder.
+        The point is to be sure we don't have two incompatible build configurations
+        using the same build dir.
 
+        Return a string looking like
+        build-linux-release
+        build-cross-debug ...
+        """
+        res = ["build"]
+        if self.toolchain.name != "system":
+            res.append(self.toolchain.name)
+        else:
+            res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
+        if not sys.platform.startswith("win32") and self.build_type:
+            # On windows, sharing the same build dir for debug and release is OK.
+            # (and quite mandatory when using CMake + Visual studio)
+            # On linux, it's not.
+            res.append(self.build_type)
+        if self.build_config:
+            res.append(self.build_config)
+        self.build_folder_name = "-".join(res)
 
+    def get_sdk_dirs(self, project):
+        """ return a list of sdk, needed to build a project """
+        dirs = list()
 
-def toc_open(work_tree=None, use_env=False):
-    """ open a toc repository
-    return a valid Toc instance
-    """
+        projects = self.resolve_deps(project)
+        projects.remove(project)
+
+        #TODO: handle toolchain, at the moment this is not correct.
+        #we can add the sdk for boost (from source), even if boost is provided
+        #by a toolchain
+        for project in projects:
+            if project in self.buildable_projects.keys():
+                dirs.append(self.projects[project].get_sdk_dir())
+            else:
+                LOGGER.warning("dependency not found: %s", project)
+        return dirs
+
+    def split_sources_and_binaries(self, projects):
+        """ split a list of projects between buildable and binaries
+            return (sources, provided, notfound)
+        """
+        tocuild  = []
+        notfound = []
+        provided = []
+        for project in projects:
+            if project in self.toolchain.projects:
+                provided.append(project)
+            elif project in self.buildable_projects.keys():
+                tocuild.append(project)
+            else:
+                notfound.append(project)
+        log  = "Split between sources and binaries for : %s\n"
+        log += "  to build  : %s\n"
+        log += "  provided  : %s\n"
+        log += "  not found : %s\n"
+        LOGGER.debug(log, ",".join(projects), ",".join(tocuild),  ",".join(provided), ",".join(notfound))
+        return (tocuild, provided, notfound)
+
+def toc_open(work_tree, args, use_env=False):
+    build_config   = args.build_config
+    build_type     = args.build_type
+    toolchain_name = args.toolchain_name
+    try:
+        cmake_flags = args.cmake_flags
+    except:
+        cmake_flags = list()
+
     if not work_tree:
-        work_tree = qibuild.guess_work_tree(use_env)
+        work_tree = qitools.qiworktree.guess_work_tree(use_env)
     if not work_tree:
-        work_tree = search_manifest_directory(os.getcwd())
+        work_tree = qitools.qiworktree.search_manifest_directory(os.getcwd())
     if work_tree is None:
         raise Exception("Could not find toc work tree, please go to a valid work tree.")
-    return Toc(work_tree)
+    return Toc(work_tree,
+               build_type=build_type,
+               toolchain_name=toolchain_name,
+               build_config=build_config,
+               cmake_flags=cmake_flags)
+
 
 open = toc_open
