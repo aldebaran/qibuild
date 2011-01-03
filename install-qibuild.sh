@@ -29,3 +29,5 @@ create_launcher() {
 
 mkdir -p ${DESTDIR}
 create_launcher bin/qibuild
+create_launcher bin/qitoolchain
+create_launcher bin/qisrc
