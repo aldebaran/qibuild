@@ -9,6 +9,7 @@
 """  This module contains a few useful functions
 """
 
+import posixpath
 import os
 import logging
 import qibuild.sh
@@ -53,8 +54,8 @@ def get(toolchain, package):
     Then, extract the package to the toolchains subdir
     """
     cache = get_cache(toolchain.name)
-    remote_subdir = posixpath.join("toolchains", self.sdk_arch)
-    archive_name_regexp = self.package_name
+    remote_subdir = posixpath.join("toolchains", toolchain)
+    archive_name_regexp = package
     with FtpConnection("ananas") as ftp:
         res = ftp.download(remote_subdir, [archive_name_regexp], output_dir=cache)
 
@@ -62,7 +63,7 @@ def get(toolchain, package):
         LOGGER.error("Excpeting exactly one result, got: %s", res)
         return
 
-    base_dir = get_toolchain_base(self.toc, self.sdk_arch)
+    base_dir = get_rootfs(toolchain)
     extract_tar(res[0], base_dir)
 
     # Update the root.cmake file at the top of the toolchain dir:

@@ -59,7 +59,7 @@ class TocBuilder(Toc):
             # On windows, sharing the same build dir for debug and release is OK.
             # (and quite mandatory when using CMake + Visual studio)
             # On linux, it's not.
-            res.append(tob.build_type)
+            res.append(self.build_type)
         if self.build_config:
             res.append(self.build_config)
         self.build_folder_name = "-".join(res)

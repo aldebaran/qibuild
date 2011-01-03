@@ -8,6 +8,7 @@
 import os
 import sys
 import shlex
+import glob
 import logging
 import qibuild.sh
 import qibuild.build
@@ -124,7 +125,7 @@ def configure(project, flags=None, toolchain_file=None, generator=None):
     #TODO: guess generator
 
     if not os.path.exists(project.directory):
-        raise ConfigureException("source dir: %s does not exist, aborting" % project.directory)
+        raise qibuild.build.ConfigureException("source dir: %s does not exist, aborting" % project.directory)
 
     if not os.path.exists(os.path.join(project.directory, "CMakeLists.txt")):
         LOGGER.info("Not calling cmake for %s", os.path.basename(project.directory))
@@ -165,7 +166,7 @@ def make(project, build_type, num_jobs=1, nmake=False, target=None):
         if len(sln_files) != 1:
             err_message = "Found several sln files: "
             err_message += ", ".join(sln_files)
-            raise MakeException(err_message)
+            raise qibuild.build.MakeException(err_message)
         sln_file = sln_files[0]
         qibuild.build.build_vc(sln_file, build_type=build_type, target=target)
     else:
