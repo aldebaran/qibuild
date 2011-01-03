@@ -5,12 +5,12 @@
 ##
 ## (is it fantomas?)
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 #fold into actions, generate an asciidoc manpage
 import sys
-import qibuild.shell
+import qitools.cmdparse
 
 TEMPLATE = """QIBUILD(1)
 ==========
@@ -68,7 +68,7 @@ BUGS
 if __name__ == "__main__":
     outfile = sys.argv[1]
     actions = list()
-    actions.extend(qibuild.shell.main.action_modules_from_package("qibuild.actions"))
+    actions.extend(qitools.cmdparse.action_modules_from_package("qibuild.actions"))
 
     max_len = 0
     for action in actions:
