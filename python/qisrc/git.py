@@ -291,23 +291,20 @@ class Git:
             "refs/heads/%s" % remote_branch)
 
 
-    def is_clean(self):
+    def is_clean(self, untracked=True):
         """
         Returns true if working dir is clean.
         Nothing to commit, no untracked files
         /!\ : there could be a lot of false negatives ...
         """
-        lines = self.cmd.call_output("status")
-        # If work dir is clean, the output looks like:
-        #    # on branch master
-        #    # nothing to commit (working directory clean)
-        # Strip commments:
-        lines = [l for l in lines if not l.startswith("#")]
-        if len(lines) > 2:
+        if untracked:
+            lines = self.cmd.call_output("status", "-s")
+        else:
+            lines = self.cmd.call_output("status", "-suno")
+        lines = [l for l in lines if len(l.strip()) != 0 ]
+        if len(lines) > 0:
             return False
-        if "working directory clean" in lines[0]:
-            return True
-        return False
+        return True
 
     def update_only_ff(self, local_ref, remote_ref):
         """
