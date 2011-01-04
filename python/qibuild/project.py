@@ -179,3 +179,15 @@ def make(project, build_type, num_jobs=1, nmake=False, target=None):
             qibuild.nmake(build_dir, target=target)
         else:
             qibuild.make(build_dir, num_jobs=num_jobs, target=target)
+
+
+def install(project, destdir, prefix="/usr/local"):
+    """Install the project """
+    configure(project, flags=["CMAKE_INSTALL_PREFIX='%s'" % prefix])
+    build_dir = project.build_directory
+    cmd = ["make", "install"]
+    build_environ = os.environ.copy()  # Let's not modify os.environ gloablly !
+    build_environ["DESTDIR"] = destdir
+    qitools.command.check_call(cmd, cwd=build_dir, env=build_environ)
+
+
