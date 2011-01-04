@@ -63,7 +63,7 @@ class Project:
             self.cmake_flags.extend(shlex.split(project_flags))
 
         if toc.build_type:
-            self.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (toc.build_type.toupper()))
+            self.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (toc.build_type.upper()))
 
         if toc.toolchain.name != "system":
             self.cmake_flags.append("QI_TOOLCHAIN_NAME=%s" % (toc.toolchain.name))
