@@ -180,9 +180,9 @@ def sub_command_main(module, args=None, namespace=None):
         usage = None
     parser = argparse.ArgumentParser(usage=usage)
     module.configure_parser(parser)
+    _dump_arguments(module.__file__, namespace)
     parsed_args = parser.parse_args(args=args, namespace=namespace)
     qitools.log.configure_logging(parsed_args)
-    _dump_arguments(module.__file__, args)
     main_wrapper(module, parsed_args)
 
 

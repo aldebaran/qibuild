@@ -11,8 +11,8 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     toc_dir = None
-    if args.toc_work_tree:
-        work_tree = args.toc_work_tree
+    if args.work_tree:
+        work_tree = args.work_tree
     else:
         (toc_dir, work_tree) = qibuild.toc.path.get_dirs_from_env()
     if work_tree is None:
