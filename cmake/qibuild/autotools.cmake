@@ -2,7 +2,7 @@
 ## Author(s):
 ##  - Cedric <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 include(ExternalProject)
@@ -61,5 +61,14 @@ function(qi_install_autotools_project)
   configure_file("${QI_TEMPLATE_DIR}/install_autotools.cmake"
                  "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake"
                  @ONLY)
-  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake")
+
+  #each component should be specified, otherwize it's not possible to install
+  #a single component. (look at the generated cmake_install.cmake to understand)
+  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT lib)
+  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT static-lib)
+  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT binary)
+  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT conf)
+  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT data)
+  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT doc)
+  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT python)
 endfunction()

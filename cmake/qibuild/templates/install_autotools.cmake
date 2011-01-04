@@ -2,11 +2,18 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 #! generate cmake install rules for an autotools like project.
 message(STATUS "AUTOTOOLS SOURCE FOLDER: @SOURCE_FOLDER@")
+
+#avoid being called multiple time. (see qi_install_autotools_project)
+if (AUTOTOOLS_INSTALL_ALREADY_CALLED)
+  return()
+endif()
+set(AUTOTOOLS_INSTALL_ALREADY_CALLED TRUE)
+
 
 function(install_component COMPONENT DEST FILES)
   if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "${COMPONENT}")
