@@ -9,7 +9,10 @@
 """QiSrc command line tool.
 """
 
-import argparse
+try:
+    import argparse
+except ImportError:
+    from qitools.external import argparse
 import qitools.cmdparse
 
 def main():
