@@ -108,6 +108,8 @@ class Toc(QiWorkTree):
             project.update_depends(self)
             self.projects[pname] = project
 
+        self.set_build_env()
+
     def resolve_deps(self, projects, runtime=False):
         """Given a list of projects, resolve the dependencies, and return
         them in topological sorted order.
@@ -188,6 +190,24 @@ class Toc(QiWorkTree):
         LOGGER.debug(log, ",".join(projects), ",".join(tocuild),  ",".join(provided), ",".join(notfound))
         return (tocuild, provided, notfound)
 
+    def set_build_env(self):
+        """Update os.environ using the qibuild configuration file
+
+        """
+        env = self.configstore.get("general", "env")
+        if not env:
+            return
+        path = env.get("path")
+        if not path:
+            return
+        path = path.strip()
+        path = path.replace("\n", "")
+        env_path = os.environ["PATH"]
+        if not env_path.endswith(";"):
+            env_path += ";"
+        env_path += path
+        os.environ["PATH"] = env_path
+
 def toc_open(work_tree, args, use_env=False):
     build_config   = args.build_config
     build_type     = args.build_type
@@ -208,6 +228,7 @@ def toc_open(work_tree, args, use_env=False):
                toolchain_name=toolchain_name,
                build_config=build_config,
                cmake_flags=cmake_flags)
+
 
 
 open = toc_open

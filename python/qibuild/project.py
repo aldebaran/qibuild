@@ -156,7 +156,7 @@ def configure(project, flags=None, toolchain_file=None, generator=None):
     qibuild.cmake(project.directory, project.build_directory, cmake_args)
 
 
-def make(project, build_type, num_jobs=1, nmake=False, target=None):
+def make(project, build_type, num_jobs=1, nmake=False, incredibuild=True, target=None):
     """Build the project"""
     build_dir = project.build_directory
     LOGGER.debug("[%s]: building in %s", project.name, build_dir)
@@ -171,7 +171,10 @@ def make(project, build_type, num_jobs=1, nmake=False, target=None):
             err_message += ", ".join(sln_files)
             raise qibuild.MakeException(err_message)
         sln_file = sln_files[0]
-        qibuild.msbuild(sln_file, build_type=build_type, target=target)
+        if not incredibuild:
+            qibuild.msbuild(sln_file, build_type=build_type, target=target)
+        else:
+            qibuild.build_incredibuild(sln_file, build_type=build_type, target=target)
     else:
         if not os.path.exists(os.path.join(build_dir, "Makefile")):
             LOGGER.debug("Not calling make for %s", os.path.basename(build_dir))

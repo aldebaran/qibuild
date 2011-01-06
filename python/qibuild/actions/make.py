@@ -29,10 +29,14 @@ def do(args):
     wanted_projects = qibuild.toc.get_projects_from_args(toc, args)
     (src_projects, bin_projects, not_found_projects) = toc.split_sources_and_binaries(wanted_projects)
 
+    use_incredibuild = toc.configstore.get("general", "build", "incredibuild")
     for project in src_projects:
         logger.info("Building %s in %s", project, toc.build_folder_name)
         logger.debug("%s", toc.projects[project])
-        qibuild.project.make(toc.projects[project], toc.build_type)
+        qibuild.project.make(toc.projects[project], toc.build_type,
+            num_jobs = args.num_jobs,
+            incredibuild = use_incredibuild)
+
 
 if __name__ == "__main__":
     import sys

@@ -31,22 +31,12 @@ import toc
 
 LOGGER = logging.getLogger("qibuild")
 
-CMAKE        = "cmake"
-CTEST        = "ctest"
-MAKE         = "make"
-MSBUILD      = None
-INCREDIBUILD = None
-NMAKE        = None
-
-if sys.platform.startswith("win32"):
-    CMAKE = "cmake.exe"
-
 class MakeException(Exception):
-    def __init__(self, *args):
-        self.args = args
+    def __init__(self, message):
+        self.message = message
 
     def __str__(self):
-        return repr(self.args)
+        return self.message
 
 class ConfigureException(Exception):
     def __init__(self, *args):
@@ -69,7 +59,7 @@ def make(build_dir, num_jobs=None, target=None):
     Lanch make -j <num_jobs> in num_jobs is not none
 
     """
-    cmd = [MAKE]
+    cmd = ["make"]
     if num_jobs is not None:
         cmd += ["-j%i" % num_jobs]
     if target:
@@ -82,38 +72,23 @@ def nmake(build_dir, target=None):
     For this to work, you'd better be in a Visual
     Studio command prompt
     """
-    if NMAKE is None:
-        raise MakeException("Could not find nmake")
-    cmd = [NMAKE]
+    cmd = ["nmake"]
     if target:
         cmd.append(target)
     qitools.command.check_call(cmd, cwd=build_dir)
 
 
-def msbuild(sln_file, release=False, be_verbose=True, target=None):
+def msbuild(sln_file, build_type="Debug", be_verbose=False, target=None):
     """
     Launch msbuild with correct configuratrion
     (debug or release),
     and with correct switch if num_jobs is not None
     """
-
-    if MSBUILD is None:
-        raise MakeException("Could not find msbuild.exe")
     if not target:
         target="ALL_BUILD"
-    # Use incredibuild if available
-    if INCREDIBUILD is not None:
-        build_incredibuild(sln_file, release, be_verbose, target)
-        return
+    msbuild_conf = "/p:Configuration=%s" % build_type
 
-    if release:
-        msbuild_conf = "/p:Configuration=Release"
-    else:
-        msbuild_conf = "/p:Configuration=Debug"
-
-    LOGGER.debug("building " + sln_file)
-
-    cmd = [MSBUILD, msbuild_conf]
+    cmd = ["MSBuild.exe", msbuild_conf]
     cmd += ["/nologo"]
 
     if be_verbose:
@@ -138,21 +113,13 @@ def msbuild(sln_file, release=False, be_verbose=True, target=None):
 
     qitools.command.check_call(cmd)
 
-def build_incredibuild(sln_file, release=False, be_verbose=True, target="ALL_BUILD"):
+def build_incredibuild(sln_file, build_type="Debug", target="ALL_BUILD"):
     """
     Incredibuild build
     """
-    cmd = [INCREDIBUILD, sln_file]
+    cmd = ["BuildConsole.exe", sln_file]
 
-    if release:
-        cmd += ["/cfg=Release|Win32"]
-    else:
-        cmd += ["/cfg=Debug|Win32"]
-
-    # rather too much information, especially showcmd, but it shows how
-    # poor our include structure is.
-    #if be_verbose:
-    #    cmd += ["/SHOWAGENT", "/SHOWTIME", "/SHOWCMD"]
+    cmd += ["/cfg=%s|Win32" % build_type]
 
     if target is not None:
         cmd += ["/PRJ=" + target]
@@ -181,7 +148,7 @@ def cmake(source_dir, build_dir, cmake_args):
 
     # Add path to source
     cmake_args += [source_dir]
-    qitools.command.check_call([CMAKE] + cmake_args, cwd=build_dir)
+    qitools.command.check_call(["cmake"] + cmake_args, cwd=build_dir)
 
 def ctest(source_dir, build_dir):
     """
@@ -190,7 +157,7 @@ def ctest(source_dir, build_dir):
     build_dir must have been configured (cmake) and built.
 
     """
-    cmd = [CTEST, "-VV", "-DExperimental", source_dir ]
+    cmd = ["ctest", "-VV", "-DExperimental", source_dir ]
     # Check whether source_dir and build_dir look valid.
     # TODO: Move these checks in a common place?
     if not os.path.exists(source_dir):

@@ -17,9 +17,35 @@ class CommandFailedException(Exception):
     def __str__(self):
         return self.message
 
+class NotInPath(Exception):
+    """Custom exception """
+    def __init__(self, executable):
+        self.executable = executable
+
+    def __str__(self):
+        mess  = "Could not find executable: %s\n" % self.executable
+        mess += "Looked in:\n"
+        mess += "\n".join(os.environ["PATH"].split(os.pathsep))
+        return mess
+
 LOGGER = logging.getLogger("qitools.command")
 
 DRYRUN           = False
+
+def check_is_in_path(executable):
+    """Check that the given executable is to be found in %PATH%"""
+    env_path = os.environ["PATH"]
+    for path in env_path.split(os.pathsep):
+        full_path = os.path.join(path, executable)
+        if os.access(full_path, os.X_OK):
+            return
+        pathext = os.environ.get("PATHEXT")
+        if pathext:
+            for ext in pathext.split(";"):
+                with_ext = full_path + ext
+                if os.access(with_ext, os.X_OK):
+                    return
+    raise NotInPath(executable)
 
 def check_call(cmd, ignore_ret_code=False,
                     cwd=None,
@@ -41,6 +67,11 @@ def check_call(cmd, ignore_ret_code=False,
         if not env:
             env = os.environ.copy()
         env["PWD"] = cwd
+
+    # Check that exe is in PATH
+    # (uber-useful on windows)
+    check_is_in_path(cmd[0])
+
     LOGGER.debug("calling: %s", " ".join(cmd))
     if DRYRUN:
         return 0
@@ -122,4 +153,5 @@ def _raise_error(cmd, cwd, shell, exception=None, retcode=None, output=None):
     if output and len(output):
         mess += "# output: %s\n" % "\n".join(output)
     raise CommandFailedException(mess)
+
 
