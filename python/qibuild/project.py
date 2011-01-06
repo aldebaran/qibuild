@@ -94,7 +94,8 @@ class Project:
 
 def get_qibuild_cmake_framework_path():
     """ return the path to the QiBuild Cmake framework """
-    return os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "cmake"))
+    path = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "cmake"))
+    return qitools.sh.to_posix_path(path)
 
 def bootstrap(project, dep_sdk_dirs):
     """Generate the find_deps.cmake for the given project
