@@ -156,11 +156,16 @@ def configure(project, flags=None, toolchain_file=None, generator=None):
     qibuild.cmake(project.directory, project.build_directory, cmake_args)
 
 
-def make(project, build_type, num_jobs=1, nmake=False, incredibuild=True, target=None):
+def make(project, build_type, num_jobs=1,
+        nmake=False,
+        incredibuild=True,
+        mingw=False,
+        target=None):
     """Build the project"""
+    import pdb; pdb.set_trace()
     build_dir = project.build_directory
     LOGGER.debug("[%s]: building in %s", project.name, build_dir)
-    if sys.platform.startswith("win32") and not nmake:
+    if not nmake and not mingw:
         sln_files = glob.glob(build_dir + "/*.sln")
         if len(sln_files) == 0:
             LOGGER.debug("Not calling msbuild for %s", os.path.basename(build_dir))
@@ -179,7 +184,7 @@ def make(project, build_type, num_jobs=1, nmake=False, incredibuild=True, target
         if not os.path.exists(os.path.join(build_dir, "Makefile")):
             LOGGER.debug("Not calling make for %s", os.path.basename(build_dir))
             return
-        if sys.platform.startswith("win32"):
+        if nmake:
             qibuild.nmake(build_dir, target=target)
         else:
             qibuild.make(build_dir, num_jobs=num_jobs, target=target)
