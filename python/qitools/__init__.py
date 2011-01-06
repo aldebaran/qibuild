@@ -9,5 +9,6 @@ from qitools import configstore
 from qitools import cmdparse
 from qitools import log
 from qitools import qiworktree
+from qitools import archive
 
-__all__ = ( 'configstore', 'cmdparse', 'log', 'qiworktree' )
+__all__ = ( 'configstore', 'cmdparse', 'log', 'qiworktree', 'archive' )
