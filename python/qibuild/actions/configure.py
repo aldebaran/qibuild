@@ -49,7 +49,9 @@ def do(args):
     for project in src_projects:
         logger.info("Configuring %s in %s", project, toc.build_folder_name)
         logger.debug("%s", toc.projects[project])
-        qibuild.project.configure(toc.projects[project], args.cmake_flags)
+        qibuild.project.configure(toc.projects[project],
+            generator=args.cmake_generator,
+            flags=args.cmake_flags)
 
 if __name__ == "__main__":
     import sys

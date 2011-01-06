@@ -29,7 +29,7 @@ def build_parser(parser):
     group.add_argument("--build-config", "-c", dest="build_config",
                        help="build configuration to use. Should match a setting in ~/.toc/base.cfg")
     group.add_argument("--toolchain-name", action="store", dest="toolchain_name", help="use a specific toolchain")
-    group.add_argument("--cmake-generator", help="cmake generator")
+    group.add_argument("--cmake-generator", action="store", help="specify cmake generator")
     group.add_argument("-j", dest="num_jobs", type=int, help="number of jobs to use")
     parser.set_defaults(cmake_generator = "Unix Makefiles")
     parser.set_defaults(cross=False, debug=True)
