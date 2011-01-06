@@ -78,14 +78,12 @@ def nmake(build_dir, target=None):
     qitools.command.check_call(cmd, cwd=build_dir)
 
 
-def msbuild(sln_file, build_type="Debug", be_verbose=False, target=None):
+def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD"):
     """
     Launch msbuild with correct configuratrion
     (debug or release),
     and with correct switch if num_jobs is not None
     """
-    if not target:
-        target="ALL_BUILD"
     msbuild_conf = "/p:Configuration=%s" % build_type
 
     cmd = ["MSBuild.exe", msbuild_conf]
