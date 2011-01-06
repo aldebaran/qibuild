@@ -197,6 +197,10 @@ class Toc(QiWorkTree):
             # nane
             res.append("vs%s" % self.get_vc_version())
 
+        if self.using_nmake():
+            # TODO: guess vc version from general.env.bat_file?
+            res.append("nmake")
+
         self.build_folder_name = "-".join(res)
 
     def get_sdk_dirs(self, project):
@@ -259,6 +263,8 @@ class Toc(QiWorkTree):
             return
         # Quick hack to get env vars from a .bat script
         # (stolen idea from distutils/msvccompiler)
+        # TODO: handle non asccii chars?
+        # Hint: decode("mcbs") ...
         if not os.path.exists(bat_file):
             raise BadBuildConfig("general.env.bat_file (%s) does not exists", bat_file)
 
