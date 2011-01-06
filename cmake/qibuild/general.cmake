@@ -13,6 +13,7 @@ if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
   list(APPEND CMAKE_MODULE_PATH ${_ROOT_DIR}/extern)
 endif()
 
+set(QI_ROOT_DIR ${_ROOT_DIR})
 set(QI_TEMPLATE_DIR ${_ROOT_DIR}/templates)
 
 include("qibuild/log")
