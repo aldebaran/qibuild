@@ -8,6 +8,7 @@
 
 import os
 import platform
+import subprocess
 import logging
 import qitools.configstore
 import qitools.qiworktree
@@ -19,6 +20,17 @@ from   qitools.qiworktree import QiWorkTree
 from   qibuild.toolchain  import Toolchain
 
 LOGGER = logging.getLogger("qibuild.toc")
+
+
+class BadBuildConfig(Exception):
+    """Custom exception"""
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        mess = self.message + "\n"
+        mess += "Please check qi configuration"
+        return mess
 
 
 def get_projects_from_args(toc, args):
@@ -235,6 +247,40 @@ class Toc(QiWorkTree):
             env_path += ";"
         env_path += path
         os.environ["PATH"] = env_path
+        bat_file = env.get("bat_file")
+        if not bat_file:
+            return
+        # Quick hack to get env vars from a .bat script
+        # (stolen idea from distutils/msvccompiler)
+        if not os.path.exists(bat_file):
+            raise BadBuildConfig("general.env.bat_file (%s) does not exists", bat_file)
+
+        interesting = set(("INCLUDE", "LIB", "LIBPATH", "PATH"))
+        result = {}
+
+        popen = subprocess.Popen('"%s"& set' % (bat_file),
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+
+        stdout, stderr = popen.communicate()
+        if popen.wait() != 0:
+            raise BadBuildConfig("Calling general.env.bat_file failed!: %s",
+                (stderr.decode("mbcs")))
+
+        stdout = stdout.decode("mbcs")
+        for line in stdout.split("\n"):
+            if '=' not in line:
+                continue
+            line = line.strip()
+            key, value = line.split('=', 1)
+            key = key.uppper()
+            if key in interesting:
+                if value.endswith(os.pathsep):
+                    value = value[:-1]
+                result[key] = value
+
+        os.environ.update(result)
+
 
 def toc_open(work_tree, args, use_env=False):
     build_config   = args.build_config
