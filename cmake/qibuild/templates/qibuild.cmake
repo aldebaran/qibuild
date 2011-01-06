@@ -8,20 +8,7 @@
 # This file is part of the qibuild project    #
 ###############################################
 
-set(QIBUILD_BOOTSTRAP_VERSION 2)
-
-find_program(QI_BUILD_EXECUTABLE qibuild)
-if(NOT QI_BUILD_EXECUTABLE)
-  message(STATUS
-    "
-    Could not find qibuild executable.
-
-    Please check your setup.
-
-    "
-  )
-  message(FATAL_ERROR "")
-endif()
+set(QIBUILD_BOOTSTRAP_VERSION 3)
 
 
 ##
@@ -29,12 +16,41 @@ endif()
 # and include it.
 # This allow us to find all qibuild/qibuild.cmake
 function(bootstrap)
-  message(STATUS "blam: ${QI_BUILD_EXECUTABLE}")
+  find_program(PYTHON_EXECUTABLE NAMES python2 python python.exe)
+  find_program(QI_BUILD_EXECUTABLE qibuild)
+
+  if(NOT PYTHON_EXECUTABLE)
+    message(STATUS
+      "
+      Could not find python executable.
+
+      Please check your setup.
+
+      "
+    )
+    message(FATAL_ERROR "")
+  endif()
+
+  if(NOT QI_BUILD_EXECUTABLE)
+    message(STATUS
+      "
+      Could not find qibuild executable.
+
+      Please check your setup.
+
+      "
+    )
+    message(FATAL_ERROR "")
+  endif()
+
+  set(_cmd ${PYTHON_EXECUTABLE} ${QI_BUILD_EXECUTABLE} configure --single --bootstrap
+     "--build-directory=${CMAKE_BINARY_DIR}")
   execute_process(
-      COMMAND "${QI_BUILD_EXECUTABLE}" configure --single --bootstrap "--build-directory=${CMAKE_BINARY_DIR}"
+      COMMAND ${_cmd}
       RESULT_VARIABLE  _retcode
-      # OUTPUT_VARIABLE  _stdout
-      # ERROR_VARIABLE   _stderr
+      OUTPUT_VARIABLE  _stdout
+      ERROR_VARIABLE   _stderr
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
       )
   if(NOT ${_retcode} EQUAL 0)
     message(STATUS
@@ -42,7 +58,7 @@ function(bootstrap)
         qibuild bootstrap fail!
         Log:
         ====
-        ${QI_BUILD} bootstrap ${CMAKE_BINARY_DIR}
+        ${_cmd}
         ${_stdout}
         ${_stderr}
 
