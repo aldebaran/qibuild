@@ -30,8 +30,8 @@ def check_call(cmd, ignore_ret_code=False,
                     verbose_exception=False):
     """
     call a command from a working dir.
-    Raise a BuildToolException if the return code
-    is not zero and ignore_ret_code if False
+    Raise a CommandFailedException if the return code
+    is not zero and ignore_ret_code is not False
 
     Warning: if output_to_logger is activated, the log will be stored in RAM
 
@@ -87,7 +87,7 @@ def call_output(cmd, cwd=None, shell=False, env=None):
     """
     Get the stdout of a command as a list of split lines.
 
-    Raise a BuildToolException if something went wrong
+    Raise a CommandFailedException if something went wrong
 
     """
     res = ""
@@ -107,7 +107,7 @@ def call_output(cmd, cwd=None, shell=False, env=None):
 
 def _raise_error(cmd, cwd, shell, exception=None, retcode=None, output=None):
     """
-    Raise a BuildToolException with a nice message
+    Raise a CommandFailedException with a nice message
 
     """
     mess = "qitools.command failed\n"
