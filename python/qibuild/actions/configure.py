@@ -44,18 +44,14 @@ def do(args):
         dep_sdk_dirs = toc.get_sdk_dirs(project)
         qibuild.project.bootstrap(toc.projects[project], dep_sdk_dirs)
 
-    from_conf = toc.configstore.get("general", "build", "cmake_generator")
-    if from_conf and not args.cmake_generator:
-        args.cmake_generator = from_conf
-
     if args.bootstrap:
         return
     for project in src_projects:
         logger.info("Configuring %s in %s", project, toc.build_folder_name)
         logger.debug("%s", toc.projects[project])
-        qibuild.project.configure(toc.projects[project],
-            generator=args.cmake_generator,
-            flags=args.cmake_flags)
+        qibuild.project.configure(toc.projects[project], generator =
+                toc.cmake_generator)
+
 
 if __name__ == "__main__":
     import sys

@@ -72,27 +72,38 @@ def get_projects_from_args(toc, args):
 
 
 class Toc(QiWorkTree):
-    def __init__(self, work_tree, build_type, toolchain_name, build_config, cmake_flags):
+    def __init__(self, work_tree,
+            build_type,
+            toolchain_name,
+            build_config,
+            cmake_flags,
+            cmake_generator):
         """
             work_tree      = a toc worktree
             build_type     = a build type, could be debug or release
             toolchain_name = by default the system toolchain is used
-            cmake_flags    = optional additional cmake flags
             build_config   = optional a build configuration
+            cmake_flags    = optional additional cmake flags
+            cmake_generator = optional cmake generator (defaults to Unix Makefiles)
         """
         QiWorkTree.__init__(self, work_tree)
         self.build_type        = build_type
         self.toolchain         = Toolchain(toolchain_name)
         self.build_config      = build_config
         self.cmake_flags       = cmake_flags
+        self.cmake_generator   = cmake_generator
         self.build_folder_name = None
         self.projects          = dict()
 
-        self.toolchain.update(self)
-        self._set_build_folder_name()
-
         if not self.build_config:
             self.build_config = self.configstore.get("general", "build", "config", default=None)
+
+        if not self.cmake_generator:
+            self.cmake_generator = self.configstore.get("general", "build" ,
+                    "cmake_generator", default="Unix Makefiles")
+
+        self.toolchain.update(self)
+        self._set_build_folder_name()
 
         for pname, ppath in self.buildable_projects.iteritems():
             project = Project(ppath)
@@ -127,20 +138,14 @@ class Toc(QiWorkTree):
         "Visual Studio 9 2008"
 
         """
-        generator = self.configstore.get("general", "build", "cmake_generator")
-        if not generator:
-            return False
-        return "Visual Studio" in generator
+        return "Visual Studio" in self.cmake_generator
 
     def get_vc_version(self):
         """Return 2008, 20005 or 2010 depending of
         cmake_generator setting
 
         """
-        generator = self.configstore.get("general", "build", "cmake_generator")
-        return generator.split()[-1]
-
-
+        return self.cmake_generator.split()[-1]
 
     def _set_build_folder_name(self):
         """Get a reasonable build folder.
@@ -156,7 +161,8 @@ class Toc(QiWorkTree):
             res.append(self.toolchain.name)
         else:
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
-        if not self.using_visual_studio() and self.build_type != "debug":
+        visual_studio = self.using_visual_studio()
+        if not visual_studio and self.build_type != "debug":
             # When using cmake + visual studio, sharing the same build dir with
             # several build config is mandatory.
             # Otherwise, it's not a good idea, so we always specify it
@@ -166,7 +172,10 @@ class Toc(QiWorkTree):
         if self.build_config:
             res.append(self.build_config)
 
-        if self.using_visual_studio():
+        if visual_studio:
+            # When using visual studio, different version of the compilator
+            # produces incompatible binaries, so put vc version in the build dir
+            # nane
             res.append("vs%s" % self.get_vc_version())
 
         self.build_folder_name = "-".join(res)
@@ -236,6 +245,8 @@ def toc_open(work_tree, args, use_env=False):
     except:
         cmake_flags = list()
 
+    cmake_generator = args.cmake_generator
+
     if not work_tree:
         work_tree = qitools.qiworktree.guess_work_tree(use_env)
     if not work_tree:
@@ -246,7 +257,8 @@ def toc_open(work_tree, args, use_env=False):
                build_type=build_type,
                toolchain_name=toolchain_name,
                build_config=build_config,
-               cmake_flags=cmake_flags)
+               cmake_flags=cmake_flags,
+               cmake_generator=cmake_generator)
 
 
 

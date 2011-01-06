@@ -118,14 +118,16 @@ def bootstrap(project, dep_sdk_dirs):
     LOGGER.debug("Wrote %s", output_path)
 
 
-def configure(project, flags=None, toolchain_file=None, generator=None):
+def configure(project, toolchain_file=None, generator=None):
     """ Call cmake with correct options
     if toolchain_file is None a t001chain file is generated in the cmake binary directory.
     if toolchain_file is "", then CMAKE_TOOLCHAIN_FILE is not specified.
+
+    Note: the cmake flags (CMAKE_BUILD_TYPE, or the -D args coming from
+    qibuild configure -DFOO_BAR) have already been passed via the toc object.
+
+    (See qibuild.toc.toc_open() and the ctor of Project for the details)
     """
-
-    #TODO: guess generator
-
     if not os.path.exists(project.directory):
         raise qibuild.ConfigureException("source dir: %s does not exist, aborting" % project.directory)
 
@@ -133,18 +135,12 @@ def configure(project, flags=None, toolchain_file=None, generator=None):
         LOGGER.info("Not calling cmake for %s", os.path.basename(project.directory))
         return
 
-    # Set generator (mandatory on windows, because cmake does not
-    # autodetect visual studio compilers very well)
-    cmake_args = []
+    # Set generator if necessary
+    cmake_args = list()
     if generator:
         cmake_args.extend(["-G", generator])
 
-    # Make a copy so that we do not modify
-    # the list used by the called
-    if flags:
-        cmake_flags = flags[:]
-    else:
-        cmake_flags = list()
+    cmake_flags = list()
     cmake_flags.extend(project.cmake_flags)
 
     if toolchain_file:
