@@ -21,7 +21,7 @@ create_launcher() {
   #echo "QiBuild directory: $p"
 
   echo '#!/bin/sh'                                                         > ${DESTDIR}/${name}
-  echo "PYTHONPATH=\"$p/python:${PYTHONPATH}\" python \"${p}/${full_path}\" \$@" >> ${DESTDIR}/${name}
+  echo "PYTHONPATH=\"$p/python\" python \"${p}/${full_path}\" \$@" >> ${DESTDIR}/${name}
   chmod 755 ${DESTDIR}/${name}
 
   echo "installed: ${DESTDIR}/${name}"
