@@ -2,7 +2,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
 #! QiBuild UseLib
@@ -54,6 +54,8 @@ endfunction()
 
 #!
 # Find dependencies and add them to the target <name>.
+# This will call include_directories with XXX_INCLUDE_DIRS or fallback to XXX_INCLUDE_DIR
+# This will call target_link_libraries with XXX_LIBRARIES or fallback to XXX_LIBRARY
 #
 # \arg:name the target to add dependencies to
 # \flag:OPTIONAL do not stop on error
@@ -73,14 +75,18 @@ function(qi_use_lib name)
   foreach(_pkg ${_DEPS})
     string(TOUPPER ${_pkg} _U_PKG)
 
-    #TODO: search for INCLUDE_DIRS, fallback on INCLUDE_DIR
     if (DEFINED ${_U_PKG}_INCLUDE_DIRS)
       include_directories(${${_U_PKG}_INCLUDE_DIRS})
     elseif(DEFINED ${_U_PKG}_INCLUDE_DIR)
       include_directories(${${_U_PKG}_INCLUDE_DIR})
     endif()
 
-    target_link_libraries("${name}" ${${_U_PKG}_LIBRARIES})
+    if (DEFINED ${_U_PKG}_LIBRARIES)
+      target_link_libraries("${name}" ${${_U_PKG}_LIBRARIES})
+    elseif (DEFINED ${_U_PKG}_LIBRARY)
+      target_link_libraries("${name}" ${${_U_PKG}_LIBRARY})
+    endif()
+
     if ( (DEFINED "${_U_PKG}_TARGET") AND (TARGET "${${_U_PKG}_TARGET}") )
       add_dependencies(${name} "${${_U_PKG}_TARGET}")
     endif()
