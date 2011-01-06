@@ -30,16 +30,7 @@ def do(args):
 
     use_incredibuild = toc.configstore.get("general", "build", "incredibuild")
 
-
-    # If the user specified "Visual Studio" in the configuration
-    # file, assume it has visual studio :)
-    generator = toc.configstore.get("general", "build", "cmake_generator")
-    visual_studio = False
-    if generator:
-        if "Visual Studio" in generator:
-            visual_studio = True
-        else:
-            visual_studio = False
+    visual_studio = toc.using_visual_studio()
 
     for project in src_projects:
         logger.info("Building %s in %s", project, toc.build_folder_name)
@@ -47,6 +38,7 @@ def do(args):
         qibuild.project.make(toc.projects[project], toc.build_type,
             num_jobs = args.num_jobs,
             incredibuild = use_incredibuild,
+            nmake = toc.using_nmake(),
             visual_studio = visual_studio)
 
 

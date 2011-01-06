@@ -159,6 +159,13 @@ class Toc(QiWorkTree):
         """
         return self.cmake_generator.split()[-1]
 
+    def using_nmake(self):
+        """Return True if cmake_generator in
+        "NMake Makefiles"
+
+        """
+        return "NMake" in self.cmake_generator
+
     def _set_build_folder_name(self):
         """Get a reasonable build folder.
         The point is to be sure we don't have two incompatible build configurations
@@ -264,21 +271,20 @@ class Toc(QiWorkTree):
 
         stdout, stderr = popen.communicate()
         if popen.wait() != 0:
-            raise BadBuildConfig("Calling general.env.bat_file failed!: %s",
-                (stderr.decode("mbcs")))
+            raise BadBuildConfig("Calling general.env.bat_file failed!: %s", stderr)
 
-        stdout = stdout.decode("mbcs")
         for line in stdout.split("\n"):
             if '=' not in line:
                 continue
             line = line.strip()
             key, value = line.split('=', 1)
-            key = key.uppper()
+            key = key.upper()
             if key in interesting:
                 if value.endswith(os.pathsep):
                     value = value[:-1]
                 result[key] = value
 
+        LOGGER.debug("Updating os.environ with %s" , result)
         os.environ.update(result)
 
 
