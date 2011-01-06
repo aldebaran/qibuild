@@ -87,17 +87,8 @@ function(qi_create_bin name)
   #TODO:qi
   if(WIN32)
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
-    _qi_win32_copy_target("${_name}" "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
-    # Be nice with VS user: generate a vcproj so that:
-    # -> target path is the path where the executable is copyied
-    # (not the place where it is compiled)
-    # -> PATH and PYTHONPATH are always set to nice values
-    _qi_configure_user_vcproj(${_name} "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
   endif()
   set_target_properties("${name}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
-  # if (NOT ARG_NO_STAGE)
-  #   qi_stage_lib("${name}")
-  # endif()
 endfunction()
 
 
@@ -187,18 +178,9 @@ function(qi_create_lib name)
     set_target_properties("${name}" PROPERTIES PUBLIC_HEADER "${_PUBLIC_HEADER}")
   endif()
 
-  #set(_binlib ${QI_SDK_LIB})
-  #under win32 bin/lib goes into /Release and /Debug => change that
   if (WIN32)
     #always postfix debug lib/bin with _d
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
-
-    #by default put libraries next to binaries under windows
-    get_target_property(_type ${name} "TYPE")
-    # if (_type STREQUAL "SHARED_LIBRARY")
-    #   set(_binlib "${_SDK_BIN}")
-    # endif ()
-    _qi_win32_copy_target("${name}" "${SDK_DIR}/${_binlib}/${ARG_SUBFOLDER}")
   endif()
 
   set_target_properties("${name}"
