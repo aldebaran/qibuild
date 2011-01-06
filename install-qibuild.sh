@@ -10,6 +10,7 @@
 
 DESTDIR="/usr/local/bin"
 
+
 create_launcher() {
   full_path=$1
   name=$(basename $full_path)
@@ -20,7 +21,9 @@ create_launcher() {
   fi
   #echo "QiBuild directory: $p"
 
-  echo '#!/bin/sh'                                                         > ${DESTDIR}/${name}
+  echo '#!/bin/sh'      >  ${DESTDIR}/${name}
+  echo 'IFS="'          >> ${DESTDIR}/${name}
+  echo '"'              >> ${DESTDIR}/${name}
   echo "PYTHONPATH=\"$p/python\" python \"${p}/${full_path}\" \$@" >> ${DESTDIR}/${name}
   chmod 755 ${DESTDIR}/${name}
 
