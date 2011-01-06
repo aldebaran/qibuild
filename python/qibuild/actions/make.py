@@ -10,7 +10,6 @@
 
 """
 
-import os
 import logging
 import qibuild
 import qitools.cmdparse
@@ -30,14 +29,25 @@ def do(args):
     (src_projects, bin_projects, not_found_projects) = toc.split_sources_and_binaries(wanted_projects)
 
     use_incredibuild = toc.configstore.get("general", "build", "incredibuild")
-    use_mingw = toc.configstore.get("general", "build", "mingw")
+
+
+    # If the user specified "Visual Studio" in the configuration
+    # file, assume it has visual studio :)
+    generator = toc.configstore.get("general", "build", "cmake_generator")
+    visual_studio = False
+    if generator:
+        if "Visual Studio" in generator:
+            visual_studio = True
+        else:
+            visual_studio = False
+
     for project in src_projects:
         logger.info("Building %s in %s", project, toc.build_folder_name)
         logger.debug("%s", toc.projects[project])
         qibuild.project.make(toc.projects[project], toc.build_type,
             num_jobs = args.num_jobs,
             incredibuild = use_incredibuild,
-            mingw = use_mingw)
+            visual_studio = visual_studio)
 
 
 if __name__ == "__main__":

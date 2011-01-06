@@ -6,7 +6,6 @@
 ##
 
 import os
-import sys
 import shlex
 import glob
 import logging
@@ -159,13 +158,13 @@ def configure(project, flags=None, toolchain_file=None, generator=None):
 def make(project, build_type, num_jobs=1,
         nmake=False,
         incredibuild=True,
-        mingw=False,
+        visual_studio=True,
         target=None):
     """Build the project"""
-    import pdb; pdb.set_trace()
     build_dir = project.build_directory
     LOGGER.debug("[%s]: building in %s", project.name, build_dir)
-    if not nmake and not mingw:
+
+    if visual_studio:
         sln_files = glob.glob(build_dir + "/*.sln")
         if len(sln_files) == 0:
             LOGGER.debug("Not calling msbuild for %s", os.path.basename(build_dir))
@@ -178,16 +177,21 @@ def make(project, build_type, num_jobs=1,
         sln_file = sln_files[0]
         if not incredibuild:
             qibuild.msbuild(sln_file, build_type=build_type, target=target)
+            return
         else:
             qibuild.build_incredibuild(sln_file, build_type=build_type, target=target)
-    else:
-        if not os.path.exists(os.path.join(build_dir, "Makefile")):
-            LOGGER.debug("Not calling make for %s", os.path.basename(build_dir))
             return
-        if nmake:
-            qibuild.nmake(build_dir, target=target)
-        else:
-            qibuild.make(build_dir, num_jobs=num_jobs, target=target)
+
+    # Not using visual studio: we must have a Makefile
+    if not os.path.exists(os.path.join(build_dir, "Makefile")):
+        LOGGER.debug("Not calling make for %s", os.path.basename(build_dir))
+        return
+
+    if nmake:
+        qibuild.nmake(build_dir, target=target)
+        return
+
+    qibuild.make(build_dir, num_jobs=num_jobs, target=target)
 
 
 def install(project, destdir):

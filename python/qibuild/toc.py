@@ -7,14 +7,16 @@
 ##
 
 import os
-import sys
+import platform
 import logging
 import qitools.configstore
 import qitools.qiworktree
-import qibuild
 
 from   qibuild.sort        import topological_sort
 from   qibuild.project     import Project
+import qitools.sh
+from   qitools.qiworktree import QiWorkTree
+from   qibuild.toolchain  import Toolchain
 
 LOGGER = logging.getLogger("qibuild.toc")
 
@@ -69,16 +71,6 @@ def get_projects_from_args(toc, args):
 
 
 
-import os
-import sys
-import platform
-import logging
-import qitools.sh
-from   qitools.qiworktree import QiWorkTree
-from   qibuild.toolchain  import Toolchain
-
-LOGGER = logging.getLogger("qibuild.toc")
-
 class Toc(QiWorkTree):
     def __init__(self, work_tree, build_type, toolchain_name, build_config, cmake_flags):
         """
@@ -129,6 +121,27 @@ class Toc(QiWorkTree):
         LOGGER.debug("Result(runtime=%d): %s", runtime, str(res_names))
         return res_names
 
+    def using_visual_studio(self):
+        """Checks if user wants to use visual studio:
+        In this case, he must have set cmake_generator to something like
+        "Visual Studio 9 2008"
+
+        """
+        generator = self.configstore.get("general", "build", "cmake_generator")
+        if not generator:
+            return False
+        return "Visual Studio" in generator
+
+    def get_vc_version(self):
+        """Return 2008, 20005 or 2010 depending of
+        cmake_generator setting
+
+        """
+        generator = self.configstore.get("general", "build", "cmake_generator")
+        return generator.split()[-1]
+
+
+
     def _set_build_folder_name(self):
         """Get a reasonable build folder.
         The point is to be sure we don't have two incompatible build configurations
@@ -143,13 +156,19 @@ class Toc(QiWorkTree):
             res.append(self.toolchain.name)
         else:
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
-        if not sys.platform.startswith("win32") and self.build_type:
-            # On windows, sharing the same build dir for debug and release is OK.
-            # (and quite mandatory when using CMake + Visual studio)
-            # On linux, it's not.
+        if not self.using_visual_studio() and self.build_type != "debug":
+            # When using cmake + visual studio, sharing the same build dir with
+            # several build config is mandatory.
+            # Otherwise, it's not a good idea, so we always specify it
+            # when it's not "debug"
             res.append(self.build_type)
+
         if self.build_config:
             res.append(self.build_config)
+
+        if self.using_visual_studio():
+            res.append("vs%s" % self.get_vc_version())
+
         self.build_folder_name = "-".join(res)
 
     def get_sdk_dirs(self, project):
