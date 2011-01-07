@@ -46,7 +46,7 @@ class QiWorkTree:
     def _load_configuration(self):
         for name, ppath in self.buildable_projects.iteritems():
             self.configstore.read(os.path.join(ppath, "qibuild.manifest"))
-        globalconfig = os.path.join(self.work_tree, ".qi", "build")
+        globalconfig = os.path.join(self.work_tree, ".qi", "build.cfg")
         if os.path.exists(globalconfig):
             self.configstore.read(globalconfig)
             LOGGER.debug("[Qi] worktree configuration:\n" + str(self.configstore))
