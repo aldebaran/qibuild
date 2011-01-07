@@ -43,6 +43,29 @@ def ln(src, dst, symlink=True):
         else:
             raise
 
+def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
+    """Configure a file.
+    in_path : input file
+    out_path : output file
+
+    The out_path needs not to exist, missing leading directories will
+    be create if necessary.
+
+    If copy_only is True, the contents will be copied "as is".
+
+    If not, we will use the args and kwargs parameter as in:
+    in_content.format(*args, **kwargs)
+
+    """
+    mkdir(os.path.dirname(os.path.abspath(out_path)), recursive=True)
+    with open(in_path, "r") as in_file:
+        in_content = in_file.read()
+        if copy_only:
+            out_content = in_content
+        else:
+            out_content = in_content.format(*args, **kwargs)
+        with open(out_path, "w") as out_file:
+            out_file.write(out_content)
 
 def rm(name):
     """This one can take a file or a directory.
