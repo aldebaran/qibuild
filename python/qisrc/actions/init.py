@@ -19,14 +19,6 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    #work_tree = qibuild.toc.guess_work_tree(args.work_tree)
-    #LOGGER.debug("worktree: %s", work_tree)
-    work_tree = qitools.qiworktree.guess_work_tree(args.work_tree)
+    work_tree = qitools.qiworktree.worktree_from_args(args)
+    qitools.qiworktree.create(work_tree)
 
-    if work_tree is None:
-        work_tree = os.getcwd()
-    qisrc.create(work_tree)
-
-if __name__ == "__main__" :
-    import sys
-    qitools.cmdparse.sub_command_main(sys.modules[__name__])

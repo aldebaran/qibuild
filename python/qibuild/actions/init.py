@@ -7,19 +7,20 @@ import qitools.cmdparse
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.toc_parser(parser)
+    group = parser.add_argument_group("build configuration settings")
+    group.add_argument("--build-config-name", metavar="BUILD_CONFIGS",
+        help="list of build configurations names")
+    group.add_argument("--build-config-flags", metavar="BUILD_CONFIG_FLAGS",
+        nargs="+")
+    group.add_argument("--path", metavar="PATH",
+        help="to be added to PATH environment variable")
+    group.add_argument("--bat-file", help="a .bat file to be sourced")
+    group.add_argument("--cmake-generator", help="name of the cmake generator to use")
 
 def do(args):
     """Main entry point"""
-    toc_dir = None
-    if args.work_tree:
-        work_tree = args.work_tree
-    else:
-        (toc_dir, work_tree) = qibuild.toc.path.get_dirs_from_env()
-    if work_tree is None:
-        work_tree = os.getcwd()
-    if toc_dir is None:
-        toc_dir = os.path.join(work_tree, ".toc")
-    qibuild.toc.create(work_tree, toc_dir)
+    work_tree = qitools.qiworktree.worktree_from_args(args)
+    qibuild.toc.create(work_tree, args)
 
 if __name__ == "__main__" :
     import sys

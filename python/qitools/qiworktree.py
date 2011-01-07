@@ -9,6 +9,7 @@ import os
 import logging
 from qitools.cmdparse    import default_parser
 from qitools.configstore import ConfigStore
+import qitools.sh
 
 LOGGER = logging.getLogger("QiWorkTree")
 
@@ -120,6 +121,31 @@ def guess_work_tree(use_env=False):
         if not _tail:
             break
     return None
+
+def create(directory):
+    """Create a new Qi worktree in the given directory
+
+    """
+    to_create = os.path.join(directory, ".qi")
+    if os.path.exists(to_create):
+        raise Exception("%s already exists!" % to_create)
+    qitools.sh.mkdir(to_create, recursive=True)
+
+
+def worktree_from_args(args):
+    """Returns a suitable work tree from the command line
+    """
+    work_tree = None
+    if args.work_tree:
+        work_tree = args.work_tree
+        work_tree = os.path.abspath(work_tree)
+    elif os.environ.get("QI_WORK_TREE"):
+        work_tree = os.environ["QI_WORK_TREE"]
+        work_tree = os.path.abspath(work_tree)
+    else:
+        work_tree = os.getcwd()
+    return work_tree
+
 
 # pylint: disable-msg=W0622,C0103
 open = qiworktree_open
