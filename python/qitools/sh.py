@@ -10,6 +10,7 @@
 import sys
 import os
 import shutil
+import tempfile
 import logging
 import subprocess
 
@@ -169,3 +170,37 @@ def to_dos_path(path):
     """
     res = path.replace("/", "\\")
     return res
+
+
+class TempDir:
+    """This is a nice wrapper around tempfile module.
+
+    Usage:
+
+        with TempDir("foo-bar") as temp_dir:
+            subdir = os.path.join(temp_dir, "subdir")
+            do_foo(subdir)
+
+    This piece of code makes sure that:
+     -> a temporary directory named temp_dir has been
+     created (guaranteed to exist, be empty, and writeable)
+
+     -> the directory will be removed when the scope of
+     temp_dir has ended unless an exception has occurred
+     and DEBUG environment variable is set.
+
+    """
+    def __init__(self, name):
+        self._temp_dir = tempfile.mkdtemp(prefix=name+"-")
+
+    def __enter__(self):
+        return self._temp_dir
+
+    def __exit__(self, type, value, tb):
+        if os.environ.get("DEBUG"):
+            if tb is not None:
+                print "=="
+                print "Not removing ", self._temp_dir
+                print "=="
+                return
+        rm(self._temp_dir)
