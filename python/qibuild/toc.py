@@ -336,7 +336,7 @@ def create(directory, args):
         bat_file = ""
         cmake_generator = ""
         build_config_name = ""
-        build_configs = ""
+        build_config = ""
 
     settings = Settings()
     pathsep = os.path.pathsep
