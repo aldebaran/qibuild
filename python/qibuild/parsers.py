@@ -45,3 +45,4 @@ def project_parser(parser):
     parser.add_argument("--use-deps", action="store_true", help="use dependencies")
     parser.add_argument("projects", nargs="?", metavar="PROJECT", action="append", help="project name (s)")
     parser.set_defaults(single=False, only_deps=False, use_deps=True)
+

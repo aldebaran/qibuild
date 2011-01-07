@@ -330,51 +330,7 @@ def create(directory, args):
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     template = os.path.join(cur_dir, "..", "qibuild", "templates", "build.cfg")
     cfg_path = os.path.join(directory, ".qi", "build.cfg")
-    # Now we must build a suitable settings dir from the args.
-    class Settings:
-        path = ""
-        bat_file = ""
-        cmake_generator = ""
-        build_config_name = ""
-        build_config = ""
-
-    settings = Settings()
-    pathsep = os.path.pathsep
-    if args.path:
-        settings.path = "path = %s " % \
-            args.path.replace(pathsep, pathsep+"\n"+" "*6)
-
-    if args.bat_file:
-        settings.bat_file = "bat_file = %s " % args.bat_file
-
-    if args.cmake_generator:
-        settings.cmake_generator = 'cmake_generator = "%s"' % args.cmake_generator
-
-    if args.build_config_name:
-        if not args.build_config_flags:
-            raise Exception("using --build-config-name withouth --build-config-flags! ")
-        build_config_name = args.build_config_name
-        settings.build_config_name = "build.config = %s " % build_config_name
-        build_config_flags = args.build_config_flags
-        flag_names = list()
-        flag_values = list()
-        i=0
-        while True:
-            try:
-                flag_name  = build_config_flags[2*i]
-                flag_value = build_config_flags[2*i+1]
-                flag_names.append(flag_name)
-                flag_values.append(flag_value)
-                i+=1
-            except IndexError:
-                break
-        cmake_flags = list()
-        for (value, name) in zip(flag_names, flag_values):
-            cmake_flags.append("%s=%s" % (value, name))
-        settings.build_config = '[build "%s"]\ncmake.flags="%s"\n' % \
-            (build_config_name, " ".join(cmake_flags))
-
-    qitools.sh.configure_file(template, cfg_path, settings=settings)
+    qitools.sh.configure_file(template, cfg_path, copy_only=True)
 
 
 open = toc_open
