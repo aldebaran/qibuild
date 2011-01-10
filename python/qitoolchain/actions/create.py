@@ -29,8 +29,8 @@ def do(args):
     """ Main method """
     toolchain_name = args.toolchain_name
     toolchain_feed = args.toolchain_feed
-    qitoolchain.create(toolchain_name)
-    toolchain = qitoolchain.Toolchain(toolchain_name, toolchain_feed)
+    qitoolchain.create_toolchain(toolchain_name)
+    toolchain = qitoolchain.Toolchain(toolchain_name)
     config_path = toolchain.config_path
     if not os.path.exists(config_path):
         qitools.sh.mkdir(os.path.dirname(config_path), recursive=True)
@@ -45,7 +45,6 @@ def do(args):
     parser.add_section(toolchain_section)
     if toolchain_feed:
         parser.set(toolchain_section, "feed", toolchain_feed)
-
 
     with open(toolchain.config_path, "w") as config_file:
         parser.write(config_file)

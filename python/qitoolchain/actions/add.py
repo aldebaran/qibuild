@@ -20,7 +20,10 @@ LOGGER = logging.getLogger("actions.qitoolchain.add")
 def configure_parser(parser):
     """Configure parser for this action """
     qitools.cmdparse.default_parser(parser)
-    parser.add_argument("project_name", action="store", help="the name of the project to add")
+    parser.add_argument("toolchain_name", action="store",
+        help="name of the toolchain to add the project to.")
+    parser.add_argument("package_name",
+        help="the name of the project to add")
 
 def do(args):
     """Retrieve the latest version from the server, if not already
@@ -28,7 +31,9 @@ def do(args):
 
     Then, extract the package to the toolchains subdir
     """
-    pass
+    toolchain = qitoolchain.Toolchain(args.toolchain_name)
+    toolchain.download(args.package_name)
+
 
 
 if __name__ == "__main__" :
