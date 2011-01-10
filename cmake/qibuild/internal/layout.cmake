@@ -16,7 +16,7 @@ qi_set_global(QI_SDK_INCLUDE        "include"          )
 qi_set_global(QI_SDK_SHARE          "share"            )
 qi_set_global(QI_SDK_CONF           "etc"              )
 qi_set_global(QI_SDK_DOC            "share/doc"        )
-qi_set_global(QI_SDK_CMAKE          "cmake"        )
+qi_set_global(QI_SDK_CMAKE          "share/cmake"      )
 qi_set_global(QI_SDK_CMAKE_MODULES  "cmake")
 
 mark_as_advanced(QI_SDK_BIN
