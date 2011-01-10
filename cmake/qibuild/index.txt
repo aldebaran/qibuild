@@ -19,6 +19,8 @@ QiBuild is composed of three parts:
 
 QiBuild Manual
 --------------
+link:qibuild.html[qibuild getting started]
+link:qitoolchain.html[qitoolchain getting started]
 link:qibuild-manpage.html[qibuild manpage]
 
 QiBuild SDK
