@@ -8,6 +8,7 @@
 import os
 import posixpath
 import logging
+import urllib
 
 import qitools
 import qitoolchain
@@ -68,26 +69,32 @@ class Toolchain(object):
         package_path = os.path.join(base_dir, package_name)
         return package_path
 
+    def update_feed(self):
+        """Update the feed configuration file"""
+        LOGGER.debug("updating feed: %s", self.feed)
+        feed_path = os.path.join(get_cache(self.name), "feed.cfg")
+        urllib.urlretrieve(self.feed, feed_path)
+        self.configstore.read(feed_path)
+        LOGGER.debug("config is now: %s", self.configstore)
 
-    def download(self, package):
+    def download(self, package_name):
         """Retrieve the latest version from the server, if not already
         in cache
 
         Then, extract the package to the toolchains subdir
         """
-        cache = get_cache(self.name)
-        remote_subdir = posixpath.join("toolchains", self.name)
-        archive_name_regexp = package
-        # FIXME: use self.feed instead
-        with qitools.ftp.FtpConnection("ananas") as ftp:
-            res = ftp.download(remote_subdir, [archive_name_regexp], output_dir=cache)
-
-        if len(res) != 1:
-            LOGGER.error("Expecting exactly one result, got: %s", res)
+        self.update_feed()
+        archive_path = os.path.join(get_cache(self.name), package_name)
+        if os.path.exists(archive_path):
             return
+        url = self.configstore.get("project", package_name, "url")
+        if not url:
+            raise Exception("Could not find project %s in feed: %s" %
+                package_name, self.feed)
 
-        base_dir = get_rootfs(self.name)
-        qitools.archive.extract_tar(res[0], base_dir)
+        urllib.urlretrieve(url, archive_path)
+        base_dir = os.path.join(get_rootfs(self.name), package_name)
+        qitools.archive.extract_tar(archive_path, base_dir)
 
 
 def create_toolchain(toolchain_name):
