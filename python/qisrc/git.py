@@ -10,13 +10,6 @@ import logging
 
 from qitools           import command
 
-GIT = "git"
-
-if sys.platform.startswith("win32"):
-    GIT = "C:\\Program Files\\Git\\bin\\git.exe"
-    if not os.path.exists(GIT):
-        GIT = "git"
-
 class GitException(Exception):
     def __init__(self, *args):
         self.args = args
@@ -47,7 +40,7 @@ class GitCommand:
             git_env                  = os.environ.copy()
             git_env['GIT_WORK_TREE'] = self.worktree
             git_env['GIT_DIR']       = self.gitdir
-        margs = [ GIT ]
+        margs = ["git"]
         margs.extend([ x for x in args])
         cwd = kargs.get("cwd", self.worktree)
         return command.check_call(margs, cwd = cwd, env = git_env)
@@ -59,7 +52,7 @@ class GitCommand:
             git_env                  = os.environ.copy()
             git_env['GIT_WORK_TREE'] = self.worktree
             git_env['GIT_DIR']       = self.gitdir
-        margs = [ GIT ]
+        margs = ["git"]
         margs.extend([ x for x in args])
         cwd = kargs.get("cwd", self.worktree)
         return command.call(margs, cwd = cwd, env = git_env)
@@ -71,7 +64,7 @@ class GitCommand:
             git_env                  = os.environ.copy()
             git_env['GIT_WORK_TREE'] = self.worktree
             git_env['GIT_DIR']       = self.gitdir
-        margs = [ GIT ]
+        margs = ["git"]
         margs.extend([ x for x in args])
         cwd = kargs.get("cwd", self.worktree)
         return command.call_output(margs, cwd = cwd, env = git_env)
@@ -105,7 +98,7 @@ def get_remote_refs(git_url):
     return { 'refs/bla/bla'  : 'sha1',
              'refs/bla/bla2' : 'sha2' }
     """
-    lines = command.call_output([GIT, "ls-remote", git_url])
+    lines = command.call_output(["git", "ls-remote", git_url])
     return _dict_from_refs(lines)
 
 def get_remote_ref(git_url, ref='refs/heads/master'):
