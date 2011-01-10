@@ -89,9 +89,7 @@ def run_action(module_name, arguments, forward_args=None):
     except AttributeError, err:
         raise InvalidAction(module_name, "could not find module %s in package %s" %
             (module_name, package_name))
-    if not check_module(module):
-        raise InvalidAction(module.__name__, "Could not find do() and configure_parser() "
-            "methods")
+    check_module(module)
     sub_command_main(module, arguments, forward_args)
 
 
@@ -144,8 +142,11 @@ def root_command_main(name, parser, modules):
     action_modules = dict()
 
     for module in modules:
-        if not check_module(module):
+        try:
+            check_module(module)
+        except InvalidAction, err:
             print "Warning, skipping", module.__name__
+            print err
             continue
         name = module.__name__.split(".")[-1]
         configurator = module.configure_parser
@@ -184,8 +185,7 @@ def sub_command_main(module, args=None, namespace=None):
       of the new action, and namespace is the caller's namespace
 
     """
-    if not check_module(module):
-        raise InvalidAction( module.__name__)
+    check_module(module)
     try:
         usage = module.usage()
     except AttributeError:
@@ -198,8 +198,15 @@ def sub_command_main(module, args=None, namespace=None):
 
 
 def check_module(module):
-    """Check that a module really is an action """
-    return hasattr(module, "do") and hasattr(module, "configure_parser")
+    """Check that a module really is an action.
+    Raises InvalidAction error if not
+
+    """
+    if not hasattr(module, "do"):
+        raise InvalidAction(module._names__, "Could not find a do() method")
+    if not hasattr(module, "configure_parser"):
+        raise InvalidAction(module.__name__, "Could not find a configure_parser() method")
+
 
 
 def action_modules_from_package(package_name):
