@@ -1,0 +1,83 @@
+QiBuild
+=======
+
+== Requirements ==
+
+Python 2.7 is the preferred version, but qibuild should work
+fine on python 2.6, too.
+
+CMake version 2.8.3 is the preferred version, but you should
+not have any problem with cmake 2.6.
+
+Be sure PYTHONPATH is set to /path/to/qibuild/python and
+that  qibuild (from /path/to/qibuild/bin/qibuild) is in PATH.
+
+== Usage ==
+
+
+First you need to chose a qibuild "worktree".
+
+This path will be searched by qibuild to find the sources
+of your pojects.
+
+For the following, we call this worktree QI_WORK_TREE
+
+Then go to this directory and run
+
+[source, bash]
+----
+qibuild init
+----
+
+This will create a new qibuild configuration file in
+your working directory, in QI_WORK_TREE/.qi/build.cfg
+
+If everything went well, you should be able to see a list
+of your projects by running:
+
+[source, bash]
+----
+qibuild status
+----
+Here, we will suppose that you have a
+/path/to/foo
+
+For a source directory to be seen as a qibuild project,
+all you have to do is to put a configuration file called
+qibuild.manifest at the top of your source directory.
+
+Here, you should have something looking like:
+
+[source, ini]
+----
+[project "foo"]
+depends = "bar"
+----
+
+
+
+Then you can use:
+
+[source, bash]
+----
+qibuild configure foo
+----
+
+This will try to find all the dependencies of foo (bar in this case)
+create a build directory in /path/to/foo/build, run cmake in this build
+directory.
+
+[source, bash]
+----
+qibuild make foo
+----
+
+This will compile all the dependencies of the foo project, then the
+foo project itself.
+
+
+== Configuration ==
+
+The configuration of qibuild is made in QI_WORK_TREE/.qi/build.cfg.
+
+== Known bugs ==

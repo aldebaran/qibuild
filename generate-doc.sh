@@ -16,6 +16,8 @@ python doc/tools/generate_doc_from_cmake.py \
   "cmake/qibuild" \
   "cmake/samples" \
   "build-doc"
+cp -r python/doc/* build-doc
+
 
 PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py build-doc/qibuild-manpage.txt
 
