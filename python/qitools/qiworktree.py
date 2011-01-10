@@ -33,6 +33,7 @@ class QiWorkTree:
         self.configstore        = ConfigStore()
         self.buildable_projects = dict()
         self.git_projects       = dict()
+        self.user_config_path   = os.path.join(self.work_tree, ".qi", "build.cfg")
 
         self._load_projects()
         self._load_configuration()
@@ -47,11 +48,9 @@ class QiWorkTree:
     def _load_configuration(self):
         for name, ppath in self.buildable_projects.iteritems():
             self.configstore.read(os.path.join(ppath, "qibuild.manifest"))
-        globalconfig = os.path.join(self.work_tree, ".qi", "build.cfg")
-        if os.path.exists(globalconfig):
-            self.configstore.read(globalconfig)
+        if os.path.exists(self.user_config_path):
+            self.configstore.read(self.user_config_path)
             LOGGER.debug("[Qi] worktree configuration:\n" + str(self.configstore))
-
 
 def qiworktree_open(work_tree=None, use_env=False):
     """ open a qi worktree

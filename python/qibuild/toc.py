@@ -17,7 +17,7 @@ from   qibuild.sort        import topological_sort
 from   qibuild.project     import Project
 import qitools.sh
 from   qitools.qiworktree import QiWorkTree
-from   qibuild.toolchain  import Toolchain
+from   qitoolchain.toolchain  import Toolchain
 
 LOGGER = logging.getLogger("qibuild.toc")
 
@@ -100,13 +100,18 @@ class Toc(QiWorkTree):
         """
         QiWorkTree.__init__(self, work_tree)
         self.build_type        = build_type
-        self.toolchain         = Toolchain(toolchain_name)
         self.build_config      = build_config
         self.cmake_flags       = cmake_flags
         self.cmake_generator   = cmake_generator
         self.build_folder_name = None
         self.projects          = dict()
 
+        toolchain_feed = None
+        if not toolchain_name:
+            toolchain_name = self.configstore.get("general", "build", "toolchain")
+            toolchain_feed = self.configstore.get("toolchain", toolchain_name, "feed")
+
+        self.toolchain         = Toolchain(self, toolchain_name, toolchain_feed)
         if not self.build_config:
             self.build_config = self.configstore.get("general", "build", "config", default=None)
 
@@ -114,7 +119,6 @@ class Toc(QiWorkTree):
             self.cmake_generator = self.configstore.get("general", "build" ,
                     "cmake_generator", default="Unix Makefiles")
 
-        self.toolchain.update(self)
         self._set_build_folder_name()
 
         for pname, ppath in self.buildable_projects.iteritems():
@@ -210,14 +214,19 @@ class Toc(QiWorkTree):
         projects = self.resolve_deps(project)
         projects.remove(project)
 
-        #TODO: handle toolchain, at the moment this is not correct.
-        #we can add the sdk for boost (from source), even if boost is provided
-        #by a toolchain
         for project in projects:
-            if project in self.buildable_projects.keys():
+            # Look for dependency in toolchain projets first:
+            if project in self.toolchain.projects:
+                dirs.append(self.toolchain.get(project))
+            # Then on known sources:
+            elif project in self.buildable_projects.keys():
                 dirs.append(self.projects[project].get_sdk_dir())
+            # Then, log a warning if toolchain name is not system:
             else:
-                LOGGER.warning("dependency not found: %s", project)
+                if self.toolchain_name != "system":
+                    LOGGER.warning("Could not find project %s", project)
+
+
         return dirs
 
     def split_sources_and_binaries(self, projects):

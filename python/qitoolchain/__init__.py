@@ -18,18 +18,18 @@ LOGGER = logging.getLogger("qitoolchain")
 
 def get_config_path():
     home = os.getenv('USERPROFILE') or os.getenv('HOME')
-    return os.path.join(home, ".config", "qi")
+    return os.path.join(home, ".local", "share", "qi")
 
 def get_cache(toolchain_name):
     """Return the path to the toolchain cache:
        where the zip will be kept, and so on.
     """
-    return os.path.join(get_config_path(), "toolchain", "cache", toolchain_name)
+    return os.path.join(get_config_path(), "toolchains", "cache", toolchain_name)
 
 def get_rootfs(toolchain_name):
     """Return the path to a toolchain directory
     """
-    return os.path.join(get_config_path(), "toolchain", "rootfs", toolchain_name)
+    return os.path.join(get_config_path(), "toolchains", "rootfs", toolchain_name)
 
 
 def create(toolchain_name):
@@ -44,8 +44,6 @@ def create(toolchain_name):
     if not os.path.exists(cache):
         qitools.sh.mkdir(cache,  recursive=True)
     LOGGER.info("Toolchain initialized in: %s", rootfs)
-
-
 
 def get(toolchain, package):
     """Retrieve the latest version from the server, if not already
