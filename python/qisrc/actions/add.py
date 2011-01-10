@@ -9,6 +9,19 @@ import os
 import qisrc
 import qitools
 
+class ProjectAlreadyExists(Exception):
+    """Just a custom exception """
+    def __init__(self, url, name, path):
+        self.url = url
+        self.name = name
+        self.path = path
+
+    def __str__(self):
+        message = "Error when adding project %s (%s)\n" % (self.url, self.name)
+        message += "%s already exists." % self.path
+        return message
+
+
 """Add a new project in a qisrc workspace """
 
 def configure_parser(parser):
@@ -35,7 +48,7 @@ def do(args):
     print git_src_dir
 
     if os.path.exists(git_src_dir):
-        raise Exception("'%s' already exists. Try using an other name" % git_src_dir)
+        raise ProjectAlreadyExists(url, name, git_src_dir)
 
     git = qisrc.git.Git(git_src_dir)
     git.clone(url, git_src_dir)
