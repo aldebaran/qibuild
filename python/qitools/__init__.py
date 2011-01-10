@@ -12,6 +12,5 @@ from qitools import log
 from qitools import qiworktree
 from qitools import archive
 from qitools import sh
-from qitools import ftp
 
 __all__ = ( 'configstore', 'cmdparse', 'log', 'qiworktree', 'archive', 'sh', 'run_action')
