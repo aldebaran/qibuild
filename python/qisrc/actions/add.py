@@ -32,7 +32,11 @@ def do(args):
     worktree = qitools.qiworktree.worktree_from_args(args)
 
     git_src_dir = os.path.join(worktree, name)
+    print git_src_dir
+
+    if os.path.exists(git_src_dir):
+        raise Exception("'%s' already exists. Try using an other name" % git_src_dir)
 
     git = qisrc.git.Git(git_src_dir)
-    git.clone(url)
+    git.clone(url, git_src_dir)
 
