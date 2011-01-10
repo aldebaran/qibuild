@@ -76,7 +76,7 @@ class ConfigStore:
             else:
                 pad_space = ""
             output += "  %s%s = %s\n" % (k, pad_space, str(v))
-        if output[-1] == "\n":
+        if output.endswith("\n"):
             output = output[:-1]
         return output
 
