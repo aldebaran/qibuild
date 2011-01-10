@@ -13,6 +13,7 @@ import posixpath
 import os
 import logging
 import qitools.sh
+from qitoolchain.toolchain import Toolchain
 
 LOGGER = logging.getLogger("qitoolchain")
 

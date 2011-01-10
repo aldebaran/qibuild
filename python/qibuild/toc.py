@@ -106,12 +106,17 @@ class Toc(QiWorkTree):
         self.build_folder_name = None
         self.projects          = dict()
 
-        toolchain_feed = None
+        # If toolchain_name is None, it was not given on command line,
+        # look for it in the configuration:
         if not toolchain_name:
             toolchain_name = self.configstore.get("general", "build", "toolchain")
-            toolchain_feed = self.configstore.get("toolchain", toolchain_name, "feed")
+        # If it's not in the configuration, assume the name is
+        # "system":
+        if not toolchain_name:
+            toolchain_name = "system"
 
-        self.toolchain         = Toolchain(self, toolchain_name, toolchain_feed)
+        self.toolchain = Toolchain(toolchain_name)
+
         if not self.build_config:
             self.build_config = self.configstore.get("general", "build", "config", default=None)
 
