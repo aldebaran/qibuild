@@ -50,6 +50,50 @@ OPTIONS
 *-v, --verbose*::
     Print verbose output.
 
+CONFIGURATION
+-------------
+The configuration file is stored in .qi/build.cfg. +
+The following keys are available:
+
+General::
+
+general.build.config:::
+    The default build configuration. (see Build)
+
+general.cmake.flags:::
+    Additional cmake flags to pass to all projects, in all configuration.
+    If you want specific clags for a configuration, please refer to Build.
+    Flags look like: "FOO=BAR TITI=CACA"
+
+Project::
+Configuration specific to a project.
+
+*project.<name>.cmake.flags*:::
+    like general.cmake.flags but applied to a specific project.
+
+project.<name>.depends:::
+    specify the depends that apply to a project, this is only build depends.
+    this is a space separated list.
+
+project.<name>.rdepends:::
+    specify runtime dependencies of a project.
+    this is a space separated list.
+
+
+Build::
+This section allow creating specific build configuration.
+You set the default build configuration using general.build.config.
+You can pass the build configuration using -c <buildconfig> in command line.
+
+build.<name>.cmake.flags:::
+   cmake flags specific to a build configuration.
+
+
+Toolchain::
+Toolchain specific configuration.
+
+toolchain.<name>.provide:::
+    Name of projects that should not be build but instead taken from the toolchain.
 
 EXIT STATUS
 -----------
