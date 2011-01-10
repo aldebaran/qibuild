@@ -24,11 +24,15 @@ import qitools.command
 
 class InvalidAction(Exception):
     """Just a custom exception """
-    def __init__(self, name):
+    def __init__(self, name, message):
         self.name = name
+        self.message = message
 
     def __str__(self):
-        return "Invalid action " + self.name
+        message = "Invalid action %s\n" % self.name
+        message += self.message
+        return message
+
 
 def parse_args_for_help(args):
     """Parse a command line for help usage
@@ -76,10 +80,18 @@ def run_action(module_name, arguments, forward_args=None):
     """
     action_name  = module_name.split(".")[-1]
     package_name = ".".join(module_name.split(".")[:-1])
-    _tmp = __import__(package_name, globals(), locals(), [action_name])
-    module = getattr(_tmp, action_name)
+    try:
+        _tmp = __import__(package_name, globals(), locals(), [action_name])
+    except ImportError, err:
+        raise InvalidAction(module_name, str(err))
+    try:
+        module = getattr(_tmp, action_name)
+    except AttributeError, err:
+        raise InvalidAction(module_name, "could not find module %s in package %s" %
+            (module_name, package_name))
     if not check_module(module):
-        raise InvalidAction(module.__name__)
+        raise InvalidAction(module.__name__, "Could not find do() and configure_parser() "
+            "methods")
     sub_command_main(module, arguments, forward_args)
 
 
