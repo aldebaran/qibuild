@@ -88,9 +88,9 @@ class Toolchain(object):
         LOGGER.debug("Retrieving %s -> %s", url, archive_path)
         urllib.urlretrieve(url, archive_path)
         qitools.archive.extract_tar(archive_path, get_rootfs(self.name))
-        self.projects.append(package_name)
-        to_write = " ".join(self.projects)
-        self._update_config("provide", to_write)
+        self._projects.append(package_name)
+        to_write = " ".join(self._projects)
+        self._update_config("provide", '"%s"' % to_write)
 
     def update(self, new_feed=None):
         """Update the toolchain
@@ -99,7 +99,9 @@ class Toolchain(object):
         if new_feed:
             self.feed = new_feed
         self._update_feed()
-        for project in self.projects:
+        projects = self.configstore.get("project").keys()
+        print projects
+        for project in projects:
             self.add_package(project)
         if new_feed:
             self._update_config("feed", new_feed)
@@ -108,6 +110,7 @@ class Toolchain(object):
         """Update the toolchain configuration file
 
         """
+        LOGGER.debug("updating config %s : %s", name, value)
         import ConfigParser
         parser = ConfigParser.ConfigParser()
         parser.read(self.config_path)
@@ -122,12 +125,9 @@ class Toolchain(object):
 
     def _update_feed(self):
         """Update the feed configuration file"""
-        LOGGER.debug("updating feed: %s", self.feed)
         feed_path = os.path.join(get_cache(self.name), "feed.cfg")
         urllib.urlretrieve(self.feed, feed_path)
         self.configstore.read(feed_path)
-        LOGGER.debug("config is now: %s", self.configstore)
-
 
 
 def create_toolchain(toolchain_name):
