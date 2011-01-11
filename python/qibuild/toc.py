@@ -54,6 +54,10 @@ class Toc(QiWorkTree):
         self.cmake_flags       = cmake_flags
         self.cmake_generator   = cmake_generator
         self.build_folder_name = None
+        # List of packages provided by the current toolchain, if any
+        self.packages          = list()
+
+        # Dict of objects of type qibuild.project.Project.
         self.projects          = dict()
 
         # If toolchain_name is None, it was not given on command line,
@@ -76,6 +80,7 @@ class Toc(QiWorkTree):
 
         self._set_build_folder_name()
 
+        # self.buildable_projects has been set by QiWorkTree.__init__
         for pname, ppath in self.buildable_projects.iteritems():
             project = Project(ppath)
             project.update_build_config(self, self.build_folder_name)
@@ -171,7 +176,7 @@ class Toc(QiWorkTree):
 
         for project in projects:
             # Look for dependency in toolchain projets first:
-            if project in self.toolchain.projects:
+            if project in self.toolchain.packages:
                 dirs.append(self.toolchain.get(project))
             # Then on known sources:
             elif project in self.buildable_projects.keys():
@@ -192,7 +197,7 @@ class Toc(QiWorkTree):
         notfound = []
         provided = []
         for project in projects:
-            if project in self.toolchain.projects:
+            if project in self.toolchain.packages:
                 provided.append(project)
             if project in self.buildable_projects.keys():
                 tocuild.append(project)

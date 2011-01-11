@@ -43,6 +43,12 @@ def get_cache(toolchain_name):
 
 
 class Toolchain(object):
+    """The Toolchain class has a name and a list of packages.
+
+    A package is a set of binaries, headers and cmake files
+    (a bit like a -dev debian package)
+
+    """
     def __init__(self, name):
         if name == None:
             self.name = "system"
@@ -57,16 +63,16 @@ class Toolchain(object):
         self.cache = get_cache(self.name)
         self.rootfs = get_rootfs(self.name)
 
-        self._projects = list()
+        self._packages = list()
 
     @property
-    def projects(self):
+    def packages(self):
         from_conf = self.configstore.get("toolchain", self.name, "provide")
         if from_conf:
-            self._projects = from_conf.split()
+            self._packages = from_conf.split()
         else:
-            self._projects = list()
-        return self._projects
+            self._packages = list()
+        return self._packages
 
     def get(self, package_name):
         """Return path to a package """
@@ -87,16 +93,16 @@ class Toolchain(object):
         if os.path.exists(archive_path):
             # FIXME: do something smarter here...
             pass
-        url = self.configstore.get("project", package_name, "url")
+        url = self.configstore.get("package", package_name, "url")
         if not url:
-            raise Exception("Could not find project %s in feed: %s" % (
+            raise Exception("Could not find package %s in feed: %s" % (
                 package_name, self.feed))
 
         LOGGER.debug("Retrieving %s -> %s", url, archive_path)
         urllib.urlretrieve(url, archive_path)
         qitools.archive.extract_tar(archive_path, get_rootfs(self.name))
-        self._projects.append(package_name)
-        to_write = " ".join(self._projects)
+        self._packages.append(package_name)
+        to_write = " ".join(self._packages)
         self._update_config("provide", '"%s"' % to_write)
 
     def update(self, new_feed=None):
@@ -106,9 +112,9 @@ class Toolchain(object):
         if new_feed:
             self.feed = new_feed
         self._update_feed()
-        projects = self.configstore.get("project").keys()
-        for project in projects:
-            self.add_package(project)
+        packages = self.configstore.get("package").keys()
+        for package in packages:
+            self.add_package(package)
         if new_feed:
             self._update_config("feed", new_feed)
 
