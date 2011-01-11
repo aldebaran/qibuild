@@ -106,7 +106,7 @@ class Toolchain(object):
             default="").split()
         for dep in deps:
             self._add_package(dep)
-
+        self._add_package(package_name)
         provided = self.configstore.get("toolchain", self.name, "provide",
             default="").split()
         if package_name not in provided:
@@ -187,6 +187,8 @@ class Toolchain(object):
     def _update_feed(self):
         """Update the feed configuration file"""
         feed_path = os.path.join(get_cache(self.name), "feed.cfg")
+        if not self.feed:
+            return
         urllib.urlretrieve(self.feed, feed_path)
         self.configstore.read(feed_path)
 
