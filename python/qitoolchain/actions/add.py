@@ -32,7 +32,7 @@ def do(args):
     Then, extract the package to the toolchains subdir
     """
     toolchain = qitoolchain.Toolchain(args.toolchain_name)
-    toolchain.download(args.package_name)
+    toolchain.add_package(args.package_name)
 
 
 

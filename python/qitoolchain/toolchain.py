@@ -10,7 +10,6 @@ import logging
 import urllib
 
 import qitools
-import qitoolchain
 from qitools.configstore import ConfigStore
 
 LOGGER = logging.getLogger(__name__)
@@ -68,15 +67,7 @@ class Toolchain(object):
         package_path = os.path.join(base_dir, package_name)
         return package_path
 
-    def update_feed(self):
-        """Update the feed configuration file"""
-        LOGGER.debug("updating feed: %s", self.feed)
-        feed_path = os.path.join(get_cache(self.name), "feed.cfg")
-        urllib.urlretrieve(self.feed, feed_path)
-        self.configstore.read(feed_path)
-        LOGGER.debug("config is now: %s", self.configstore)
-
-    def download(self, package_name):
+    def add_package(self, package_name):
         """Retrieve the latest version from the server, if not already
         in cache
 
@@ -84,7 +75,7 @@ class Toolchain(object):
 
         Finally, update toolchain.provide settings
         """
-        self.update_feed()
+        self._update_feed()
         archive_path = os.path.join(get_cache(self.name), package_name)
         if os.path.exists(archive_path):
             # FIXME: do something smarter here...
@@ -94,31 +85,48 @@ class Toolchain(object):
             raise Exception("Could not find project %s in feed: %s" % (
                 package_name, self.feed))
 
+        LOGGER.debug("Retrieving %s -> %s", url, archive_path)
         urllib.urlretrieve(url, archive_path)
         qitools.archive.extract_tar(archive_path, get_rootfs(self.name))
-        self.update_provide(package_name)
+        self.projects.append(package_name)
+        to_write = " ".join(self.projects)
+        self._update_config("provide", to_write)
 
-    def update_provide(self, package_name):
-        """Update the toolchain.name.provide setting
+    def update(self, new_feed=None):
+        """Update the toolchain
+
+        """
+        if new_feed:
+            self.feed = new_feed
+        self._update_feed()
+        for project in self.projects:
+            self.add_package(project)
+        if new_feed:
+            self._update_config("feed", new_feed)
+
+    def _update_config(self, name, value):
+        """Update the toolchain configuration file
 
         """
         import ConfigParser
-        from_conf = self.configstore.get("toolchain", self.name, "provide",
-            default="")
-        packages = from_conf.split()
-        packages.append(package_name)
-        to_write = " ".join(packages)
-
         parser = ConfigParser.ConfigParser()
         parser.read(self.config_path)
 
         toolchain_section = 'toolchain "%s"' % self.name
         if parser.has_section(toolchain_section):
-            parser.set(toolchain_section, "provide", to_write)
+            parser.set(toolchain_section, name, value)
 
         with open(self.config_path, "w") as config_file:
             parser.write(config_file)
 
+
+    def _update_feed(self):
+        """Update the feed configuration file"""
+        LOGGER.debug("updating feed: %s", self.feed)
+        feed_path = os.path.join(get_cache(self.name), "feed.cfg")
+        urllib.urlretrieve(self.feed, feed_path)
+        self.configstore.read(feed_path)
+        LOGGER.debug("config is now: %s", self.configstore)
 
 
 
