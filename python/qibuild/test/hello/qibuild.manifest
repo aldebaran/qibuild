@@ -1,2 +1,2 @@
-[project "hello"]
+[project hello]
 depends = "world"

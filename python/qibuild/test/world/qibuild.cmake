@@ -8,20 +8,7 @@
 # This file is part of the qibuild project    #
 ###############################################
 
-set(QIBUILD_BOOTSTRAP_VERSION 1)
-
-find_program(QI_BUILD qibuild)
-if(NOT QI_BUILD)
-  message(STATUS
-    "
-    Could not find qibuild executable.
-
-    Please check your setup.
-
-    "
-  )
-  message(FATAL_ERROR "")
-endif()
+set(QIBUILD_BOOTSTRAP_VERSION 4)
 
 
 ##
@@ -29,11 +16,48 @@ endif()
 # and include it.
 # This allow us to find all qibuild/qibuild.cmake
 function(bootstrap)
+  find_program(PYTHON_EXECUTABLE NAMES python2 python python.exe)
+  find_program(QI_BUILD_EXECUTABLE qibuild)
+
+  if(NOT PYTHON_EXECUTABLE)
+    message(STATUS
+      "
+      Could not find python executable.
+
+      Please check your setup.
+
+      "
+    )
+    message(FATAL_ERROR "")
+  endif()
+
+  if(NOT QI_BUILD_EXECUTABLE)
+    message(STATUS
+      "
+      Could not find qibuild executable.
+
+      Please check your setup.
+
+      "
+    )
+    message(FATAL_ERROR "")
+  endif()
+
+  if(UNIX)
+    # The Shebang in QI_BUILD_EXECUTABLE will be understood by the OS:
+    set(_cmd ${QI_BUILD_EXECUTABLE})
+  else()
+    # On windows, qibuild_executable will be a python script
+    # put in PATH:
+    set(_cmd ${PYTHON_EXECUTABLE} ${QI_BUILD_EXECUTABLE})
+  endif()
+  set(_cmd ${_cmd} configure --single --bootstrap "--build-directory=${CMAKE_BINARY_DIR}")
   execute_process(
-      COMMAND ${QI_BUILD} bootstrap ${CMAKE_BINARY_DIR}
+      COMMAND ${_cmd}
       RESULT_VARIABLE  _retcode
       OUTPUT_VARIABLE  _stdout
       ERROR_VARIABLE   _stderr
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
       )
   if(NOT ${_retcode} EQUAL 0)
     message(STATUS
@@ -41,7 +65,7 @@ function(bootstrap)
         qibuild bootstrap fail!
         Log:
         ====
-        ${QI_BUILD} bootstrap ${CMAKE_BINARY_DIR}
+        ${_cmd}
         ${_stdout}
         ${_stderr}
 
@@ -54,15 +78,14 @@ function(bootstrap)
   endif()
 endfunction()
 
-if(NOT EXISTS ${CMAKE_BINARY_DIR}/use_qibuild.cmake)
+if(NOT EXISTS ${CMAKE_BINARY_DIR}/dependencies.cmake)
   bootstrap()
 endif()
 
-include(${CMAKE_BINARY_DIR}/use_qibuild.cmake)
-
-# If we used `qibuild configure`, a find_deps.cmake file
-# has been generated in CMAKE_BINARY_DIR to find the
-# dependencies.
-if(EXISTS ${CMAKE_BINARY_DIR}/find_deps.cmake)
-  include(${CMAKE_BINARY_DIR}/find_deps.cmake)
+if(EXISTS ${CMAKE_BINARY_DIR}/dependencies.cmake)
+  include(${CMAKE_BINARY_DIR}/dependencies.cmake)
+else()
+  message(STATUS "can't find dependencies.cmake")
 endif()
+
+include(qibuild/general)
