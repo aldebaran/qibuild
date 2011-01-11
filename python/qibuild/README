@@ -22,3 +22,31 @@ Hold build information about a project. This include:
   - sdk_directory
   - depends
   - rdepends
+
+
+
+
+=== Build: what do we need? ===
+- the list of project the user requested to build (we ALWAYS want to build them).
+  We can check that user provided projets are found and buildable.
+- we have toc.buildable_projects : the list of ALL buildable projects
+- we have toc.toolchain.packages : the list of binary packages the user choosen using qitoolchain add/remove
+
+
+=== Use case ===
+# normal workflow: build specified project, and a use a mix of buildable and package for dependencies
+qibuild make <pj1> <pj2>
+- should always build pj1 and pj2.
+- should fail if all deps are not found either buildable or packages. (except in the system toolchain)
+- should try it's best to use packages(user specified) instead of buildable
+
+# normal workflow: build only the specified project (use a mix of buildable and packages for dependencies),
+# but do not interact with other buildable project
+qibuild make --single <pj1>
+-
+- build pj1, do not reconfigure or build buildable dependencies
+
+=== Use case ===
+qitoolchain update -a
+qibuild configure
+qibuild make
