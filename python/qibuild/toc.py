@@ -17,7 +17,7 @@ from   qibuild.sort        import topological_sort
 from   qibuild.project     import Project
 import qitools.sh
 from   qitools.qiworktree import QiWorkTree
-from   qitoolchain.toolchain  import Toolchain
+import qitoolchain
 
 LOGGER = logging.getLogger("qibuild.toc")
 
@@ -65,7 +65,7 @@ class Toc(QiWorkTree):
         if not toolchain_name:
             toolchain_name = "system"
 
-        self.toolchain = Toolchain(toolchain_name)
+        self.toolchain = qitoolchain.Toolchain(toolchain_name)
 
         if not self.build_config:
             self.build_config = self.configstore.get("general", "build", "config", default=None)
