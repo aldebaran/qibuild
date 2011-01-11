@@ -6,7 +6,6 @@
 ##
 
 import os
-import posixpath
 import logging
 import urllib
 
@@ -65,7 +64,7 @@ class Toolchain(object):
 
     def get(self, package_name):
         """Return path to a package """
-        base_dir = qitoolchain.get_rootfs(self.name)
+        base_dir = get_rootfs(self.name)
         package_path = os.path.join(base_dir, package_name)
         return package_path
 
@@ -81,20 +80,45 @@ class Toolchain(object):
         """Retrieve the latest version from the server, if not already
         in cache
 
-        Then, extract the package to the toolchains subdir
+        Then, extract the package to the toolchains subdir.
+
+        Finally, update toolchain.provide settings
         """
         self.update_feed()
         archive_path = os.path.join(get_cache(self.name), package_name)
         if os.path.exists(archive_path):
-            return
+            pass
         url = self.configstore.get("project", package_name, "url")
         if not url:
-            raise Exception("Could not find project %s in feed: %s" %
-                package_name, self.feed)
+            raise Exception("Could not find project %s in feed: %s" % (
+                package_name, self.feed))
 
         urllib.urlretrieve(url, archive_path)
-        base_dir = os.path.join(get_rootfs(self.name), package_name)
-        qitools.archive.extract_tar(archive_path, base_dir)
+        qitools.archive.extract_tar(archive_path, get_rootfs(self.name))
+        self.update_provide(package_name)
+
+    def update_provide(self, package_name):
+        """Update the toolchain.name.provide setting
+
+        """
+        import ConfigParser
+        from_conf = self.configstore.get("toolchain", self.name, "provide",
+            default="")
+        packages = from_conf.split()
+        packages.append(package_name)
+        to_write = " ".join(packages)
+
+        parser = ConfigParser.ConfigParser()
+        parser.read(self.config_path)
+
+        toolchain_section = 'toolchain "%s"' % self.name
+        if parser.has_section(toolchain_section):
+            parser.set(toolchain_section, "provide", to_write)
+
+        with open(self.config_path, "w") as config_file:
+            parser.write(config_file)
+
+
 
 
 def create_toolchain(toolchain_name):
