@@ -8,7 +8,7 @@
 # This file is part of the qibuild project    #
 ###############################################
 
-set(QIBUILD_BOOTSTRAP_VERSION 3)
+set(QIBUILD_BOOTSTRAP_VERSION 4)
 
 
 ##
@@ -43,8 +43,15 @@ function(bootstrap)
     message(FATAL_ERROR "")
   endif()
 
-  set(_cmd ${PYTHON_EXECUTABLE} ${QI_BUILD_EXECUTABLE} configure --single --bootstrap
-     "--build-directory=${CMAKE_BINARY_DIR}")
+  if(UNIX)
+    # The Shebang in QI_BUILD_EXECUTABLE will be understood by the OS:
+    set(_cmd ${QI_BUILD_EXECUTABLE})
+  else()
+    # On windows, qibuild_executable will be a python script
+    # put in PATH:
+    set(_cmd ${PYTHON_EXECUTABLE} ${QI_BUILD_EXECUTABLE})
+  endif()
+  set(_cmd ${_cmd} configure --single --bootstrap "--build-directory=${CMAKE_BINARY_DIR}")
   execute_process(
       COMMAND ${_cmd}
       RESULT_VARIABLE  _retcode
