@@ -25,21 +25,18 @@ def do(args):
     logger   = logging.getLogger(__name__)
     toc      = qibuild.toc.toc_open(args.work_tree, args, use_env=True)
 
-    wanted_projects = qibuild.toc.get_projects_from_args(toc, args)
-    (src_projects, bin_projects, not_found_projects) = toc.split_sources_and_binaries(wanted_projects)
-
+    (project_names, package_names, not_found) = qibuild.toc.resolve_deps(toc, args)
     use_incredibuild = toc.configstore.get("general", "build", "incredibuild")
 
-    visual_studio = toc.using_visual_studio()
 
-    for project in src_projects:
-        logger.info("Building %s in %s", project, toc.build_folder_name)
-        logger.debug("%s", toc.projects[project])
-        qibuild.project.make(toc.projects[project], toc.build_type,
+    for project_names in project_names:
+        project = toc.get_project(project_names)
+        logger.info("Building %s in %s", project.name, toc.build_folder_name)
+        qibuild.project.make(project, toc.build_type,
             num_jobs = args.num_jobs,
             incredibuild = use_incredibuild,
-            nmake = toc.using_nmake(),
-            visual_studio = visual_studio)
+            nmake = toc.using_nmake,
+            visual_studio = toc.using_visual_studio)
 
 
 if __name__ == "__main__":

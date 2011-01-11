@@ -23,16 +23,23 @@ class QiBuildTestCase(unittest.TestCase):
         self.parser = argparse.ArgumentParser()
         qibuild.parsers.toc_parser(self.parser)
         qibuild.parsers.build_parser(self.parser)
-
-    def test_configure_hello(self):
-        args = self.parser.parse_args(sys.argv[1:])
+        self.args = self.parser.parse_args(sys.argv[1:])
         if os.environ.get("DEBUG"):
-            args.verbose = True
+            self.args.verbose = True
         if os.environ.get("PDB"):
-            args.pdb = True
-        args.work_tree = self.test_dir
-        qitools.run_action("qibuild.actions.configure",
-            ["world"], forward_args=args)
+            self.args.pdb = True
+        self.args.work_tree = self.test_dir
+
+    def test_configure_world(self):
+        qitools.run_action("qibuild.actions.configure", ["world"],
+            forward_args=self.args)
+
+    def test_make_hello(self):
+        qitools.run_action("qibuild.actions.configure", ["hello"],
+            forward_args=self.args)
+        qitools.run_action("qibuild.actions.make", ["hello"],
+            forward_args=self.args)
+
 
     def tearDown(self):
         # TODO: remove build dirs

@@ -10,7 +10,6 @@
 
 """
 
-import os
 import logging
 import qibuild
 import qitools
@@ -35,21 +34,20 @@ def do(args):
 
     (project_names, package_names, not_found) = qibuild.toc.resolve_deps(toc, args)
 
+    projects = [toc.get_project(name) for name in project_names]
     if args.build_directory:
-        toc.projects[wanted_projects[0]].set_custom_build_directory(args.build_directory)
+        projects[0].set_custom_build_directory(args.build_directory)
 
     for project_name in project_names:
-        logger.info("Bootstraping [%s]", project)
-        dep_sdk_dirs = toc.get_sdk_dirs(project)
-        qibuild.project.bootstrap(toc.projects[project], dep_sdk_dirs)
+        logger.info("Bootstraping [%s]", project_name)
+        dep_sdk_dirs = toc.get_sdk_dirs(project_name)
+        qibuild.project.bootstrap(toc.get_project(project_name), dep_sdk_dirs)
 
     if args.bootstrap:
         return
-    for project in src_projects:
-        logger.info("Configuring %s in %s", project, toc.build_folder_name)
-        logger.debug("%s", toc.projects[project])
-        qibuild.project.configure(toc.projects[project], generator =
-                toc.cmake_generator)
+    for project in projects:
+        logger.info("Configuring %s in %s", project.name, toc.build_folder_name)
+        qibuild.project.configure(project, generator=toc.cmake_generator)
 
 
 if __name__ == "__main__":

@@ -15,6 +15,7 @@ import qitools.qiworktree
 
 from   qibuild.project     import Project
 import qitools.sh
+from qibuild.dependencies_solver import DependenciesSolver
 from   qitools.qiworktree import QiWorkTree
 import qitoolchain
 
@@ -71,7 +72,7 @@ class Toc(QiWorkTree):
             toolchain_name = "system"
 
         self.toolchain = qitoolchain.Toolchain(toolchain_name)
-        self.packages = self.toolchain.packages()
+        self.packages = self.toolchain.packages
 
         if not self.build_config:
             self.build_config = self.configstore.get("general", "build", "config", default=None)
@@ -79,6 +80,11 @@ class Toc(QiWorkTree):
         if not self.cmake_generator:
             self.cmake_generator = self.configstore.get("general", "build" ,
                     "cmake_generator", default="Unix Makefiles")
+
+        # Useful vars:
+        self.using_visual_studio = "Visual Studio" in self.cmake_generator
+        self.vc_version = self.cmake_generator.split()[-1]
+        self.using_nmake =  "NMake" in self.cmake_generator
 
         self._set_build_folder_name()
 
@@ -91,10 +97,6 @@ class Toc(QiWorkTree):
 
         self.set_build_env()
 
-        # Useful vars:
-        self.using_visual_studio = "Visual Studio" in self.cmake_generator
-        self.vc_version = self.cmake_generator.split()[-1]
-        self.using_nmake =  "NMake" in self.cmake_generator
 
 
     def _set_build_folder_name(self):
@@ -133,26 +135,43 @@ class Toc(QiWorkTree):
 
         self.build_folder_name = "-".join(res)
 
-    def get_sdk_dirs(self, project):
+    def get_project(self, project_name):
+        """Return a project from a name.
+
+        Return None if project was not in the known projects
+        of this toc object
+
+        """
+        res = [p for p in self.projects if p.name == project_name]
+        if len(res) == 1:
+            return res[0]
+        else:
+            return None
+
+
+    def get_sdk_dirs(self, project_name):
         """ return a list of sdk, needed to build a project """
         dirs = list()
 
-        projects = self.resolve_deps(project)
-        projects.remove(project)
+        known_project_names = [p.name for p in self.projects]
+        if project_name not in known_project_names:
+            raise Exception("%s is not a buildable project" % project_name)
 
-        for project in projects:
-            # Look for dependency in toolchain projets first:
-            if project in self.toolchain.packages:
-                dirs.append(self.toolchain.get(project))
-            # Then on known sources:
-            elif project in self.buildable_projects.keys():
-                dirs.append(self.projects[project].get_sdk_dir())
-            # Then, log a warning if toolchain name is not system:
-            else:
-                if self.toolchain_name != "system":
-                    LOGGER.warning("Could not find project %s", project)
+        dep_solver = DependenciesSolver(projects=self.projects, packages=self.toolchain.packages)
+        (project_names, package_names, not_found) = dep_solver.solve([project_name])
 
+        project_names.remove(project_name)
 
+        for package_name in package_names:
+            dirs.append(self.toolchain.get(package_name))
+        for project_name in project_names:
+            project = self.get_project(project_name)
+            dirs.append(project.get_sdk_dir())
+
+        if not_found and self.toolchain_name != "system":
+            LOGGER.warning("Could not find projects %s", ", ".join(not_found))
+
+        LOGGER.debug("sdk_dirs for %s : %s", project_name, dirs)
         return dirs
 
 
@@ -270,8 +289,7 @@ def resolve_deps(toc, args):
             LOGGER.debug("Found %s from current working directory", os.path.split(project_dir)[-1])
             project_names = [ os.path.split(project_dir)[-1] ]
 
-    from qibuild.dependenies_solver import DependenciesSolver
-    dep_solver = DependenciesSolver(project=toc.projects, packages=toc.toolchain.packages)
+    dep_solver = DependenciesSolver(projects=toc.projects, packages=toc.toolchain.packages)
     return dep_solver.solve(project_names, single=args.single, all=args.all)
 
 
