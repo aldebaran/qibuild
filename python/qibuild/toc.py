@@ -33,56 +33,6 @@ class BadBuildConfig(Exception):
         return mess
 
 
-def get_projects_from_args(toc, args):
-    """ Return the list of project specified in args. This is usefull to extract
-        a project list from command line arguments. The returned list contains
-
-        case handled:
-          - nothing specified: get the project from the cwd
-          - args.single: do not resolve dependencies
-          - args.only_deps: only return dependencies
-          - args.use_deps: take dependencies into account
-    """
-    if args.projects == [ None ]:
-        project_names = list()
-    else:
-        project_names = args.projects
-
-    if not project_names:
-        LOGGER.debug("no project specified, guessing from current working directory")
-        project_dir = qitools.qiworktree.search_manifest_directory(os.getcwd())
-        if project_dir:
-            LOGGER.debug("Found %s from current working directory", os.path.split(project_dir)[-1])
-            project_names = [ os.path.split(project_dir)[-1] ]
-
-    if args.all:
-        LOGGER.debug("Using all projects")
-        project_names = toc.buildable_projects.keys()
-
-    if not project_names:
-        raise Exception("No project specified")
-
-    if args.single:
-        LOGGER.debug("Using a single project: %s", project_names[0])
-        return project_names
-
-    if args.only_deps:
-        if len(project_names) != 1:
-            raise Exception("You should have a list of exactly one project when using --single or --only-deps")
-        if not args.use_deps:
-            raise Exception("Conflicting options: only_deps, no_deps")
-        single_project = project_names[0]
-
-    if args.use_deps:
-        project_names = toc.resolve_deps(project_names)
-
-    if args.only_deps:
-        project_names.remove(single_project)
-
-    return project_names
-
-
-
 class Toc(QiWorkTree):
     def __init__(self, work_tree,
             build_type,
@@ -345,6 +295,56 @@ def create(directory, args):
     template = os.path.join(cur_dir, "..", "qibuild", "templates", "build.cfg")
     cfg_path = os.path.join(directory, ".qi", "build.cfg")
     qitools.sh.configure_file(template, cfg_path, copy_only=True)
+
+
+def get_projects_from_args(toc, args):
+    """ Return the list of project specified in args. This is usefull to extract
+        a project list from command line arguments. The returned list contains
+
+        case handled:
+          - nothing specified: get the project from the cwd
+          - args.single: do not resolve dependencies
+          - args.only_deps: only return dependencies
+          - args.use_deps: take dependencies into account
+    """
+    if args.projects == [ None ]:
+        project_names = list()
+    else:
+        project_names = args.projects
+
+    if not project_names:
+        LOGGER.debug("no project specified, guessing from current working directory")
+        project_dir = qitools.qiworktree.search_manifest_directory(os.getcwd())
+        if project_dir:
+            LOGGER.debug("Found %s from current working directory", os.path.split(project_dir)[-1])
+            project_names = [ os.path.split(project_dir)[-1] ]
+
+    if args.all:
+        LOGGER.debug("Using all projects")
+        project_names = toc.buildable_projects.keys()
+
+    if not project_names:
+        raise Exception("No project specified")
+
+    if args.single:
+        LOGGER.debug("Using a single project: %s", project_names[0])
+        return project_names
+
+    if args.only_deps:
+        if len(project_names) != 1:
+            raise Exception("You should have a list of exactly one project when using --single or --only-deps")
+        if not args.use_deps:
+            raise Exception("Conflicting options: only_deps, no_deps")
+        single_project = project_names[0]
+
+    if args.use_deps:
+        project_names = toc.resolve_deps(project_names)
+
+    if args.only_deps:
+        project_names.remove(single_project)
+
+    return project_names
+
 
 
 open = toc_open
