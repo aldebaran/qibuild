@@ -50,3 +50,27 @@ qibuild make --single <pj1>
 qitoolchain update -a
 qibuild configure
 qibuild make
+
+
+
+== What to test ==
+
+- DependenciesSolver():
+
+  only need fake Project.
+  -> projects (.depends and .rdepends)
+  -> packages
+  -> args (single, all)
+
+  -> resolve(project_list):
+
+  -> resolve(project_list, single=True)
+
+- Project(debug=True)
+  check that -DCMAKE_BUILD_TYPE=DEBUG is in project.flags
+
+- qibuild {configure, make, install, bdist}
+  (need a *real* toc object and *real* sources)
+
+
+
