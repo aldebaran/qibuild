@@ -100,7 +100,6 @@ class Toolchain(object):
             self.feed = new_feed
         self._update_feed()
         projects = self.configstore.get("project").keys()
-        print projects
         for project in projects:
             self.add_package(project)
         if new_feed:
