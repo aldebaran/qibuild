@@ -32,6 +32,11 @@ class Package:
         self.name = name
         self.depends = list()
 
+    def __str__(self):
+        res = "Package %s\n"  % self.name
+        res += "depends on : %s" %  " ".join(self.depends)
+        return res
+
 
 def get_config_path():
     """Returns a suitable config path"""
@@ -72,17 +77,14 @@ class Toolchain(object):
         self.cache = get_cache(self.name)
         self.rootfs = get_rootfs(self.name)
 
+        # Set self._packages with correct dependencies
+        self._update_feed()
+        self._load_feed_config()
         self._packages = list()
 
     @property
     def packages(self):
-        # TODO: handle deps
-        from_conf = self.configstore.get("toolchain", self.name, "provide")
-        if from_conf:
-            package_names = from_conf.split()
-            self._packages = [Package(name) for name in package_names]
-        else:
-            self._packages = list()
+        self._load_feed_config()
         return self._packages
 
     def get(self, package_name):
@@ -100,6 +102,25 @@ class Toolchain(object):
         Finally, update toolchain.provide settings
         """
         self._update_feed()
+        deps = self.configstore.get("package", package_name, "depends",
+            default="").split()
+        for dep in deps:
+            self._add_package(dep)
+
+        provided = self.configstore.get("toolchain", self.name, "provide",
+            default="").split()
+        if package_name not in provided:
+            provided.append(package_name)
+            to_write = " ".join(provided)
+            self._update_config("provide", '"%s"' % to_write)
+
+    def _add_package(self, package_name):
+        """Add just one package. called by self.add_package
+        which does resolved dependencies.
+
+        (in a non-recursive way because I'm bored)
+
+        """
         archive_path = os.path.join(get_cache(self.name), package_name)
         if os.path.exists(archive_path):
             # FIXME: do something smarter here...
@@ -113,8 +134,6 @@ class Toolchain(object):
         urllib.urlretrieve(url, archive_path)
         qitools.archive.extract_tar(archive_path, get_rootfs(self.name))
         self._packages.append(Package(package_name))
-        to_write = " ".join([p.name for p in self._packages])
-        self._update_config("provide", '"%s"' % to_write)
 
     def update(self, new_feed=None, all=False):
         """Update the toolchain
@@ -131,6 +150,22 @@ class Toolchain(object):
             self.add_package(package_name)
         if new_feed:
             self._update_config("feed", new_feed)
+
+    def _load_feed_config(self):
+        provided = self.configstore.get("toolchain", self.name, "provide")
+        self._packages = list()
+        if not provided:
+            return
+        for package_name in provided.split():
+            deps = self.configstore.get("package", package_name, "depends",
+                default="")
+            names = deps.split()
+            package = Package(package_name)
+            package.depends = names
+            self._packages.append(package)
+
+        LOGGER.debug("Loaded feed config\n" +
+            "\n".join([str(p) for p in self._packages]))
 
     def _update_config(self, name, value):
         """Update the toolchain configuration file
