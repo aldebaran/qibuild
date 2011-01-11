@@ -13,7 +13,6 @@ import logging
 import qitools.configstore
 import qitools.qiworktree
 
-from   qibuild.sort        import topological_sort
 from   qibuild.project     import Project
 import qitools.sh
 from   qitools.qiworktree import QiWorkTree
@@ -54,11 +53,13 @@ class Toc(QiWorkTree):
         self.cmake_flags       = cmake_flags
         self.cmake_generator   = cmake_generator
         self.build_folder_name = None
-        # List of packages provided by the current toolchain, if any
-        self.packages          = list()
 
-        # Dict of objects of type qibuild.project.Project.
-        self.projects          = dict()
+        # List of objects of type qibuild.project.Project.
+        self.projects          = list()
+
+        # List of objects of type qitoolchain.toolchain.Packages,
+        # provided by the current toolchain, if any
+        self.packages          = list()
 
         # If toolchain_name is None, it was not given on command line,
         # look for it in the configuration:
@@ -70,6 +71,7 @@ class Toc(QiWorkTree):
             toolchain_name = "system"
 
         self.toolchain = qitoolchain.Toolchain(toolchain_name)
+        self.packages = self.toolchain.packages()
 
         if not self.build_config:
             self.build_config = self.configstore.get("general", "build", "config", default=None)
@@ -85,50 +87,15 @@ class Toc(QiWorkTree):
             project = Project(ppath)
             project.update_build_config(self, self.build_folder_name)
             project.update_depends(self)
-            self.projects[pname] = project
+            self.projects.append(project)
 
         self.set_build_env()
 
-    def resolve_deps(self, projects, runtime=False):
-        """Given a list of projects, resolve the dependencies, and return
-        them in topological sorted order.
+        # Useful vars:
+        self.using_visual_studio = "Visual Studio" in self.cmake_generator
+        self.vc_version = self.cmake_generator.split()[-1]
+        self.using_nmake =  "NMake" in self.cmake_generator
 
-        proj_list is a list of Project objects,
-        the result is a list of Project objects.
-        """
-        LOGGER.debug("Resolving deps for %s", str(projects))
-        to_sort = dict()
-        for proj in self.buildable_projects.keys():
-            if runtime:
-                to_sort[proj] = self.projects[proj].rdepends
-            else:
-                to_sort[proj] = self.projects[proj].depends
-        # Note: topological_sort only use lists of strings:
-        res_names = topological_sort(to_sort, projects)
-        LOGGER.debug("Result(runtime=%d): %s", runtime, str(res_names))
-        return res_names
-
-    def using_visual_studio(self):
-        """Checks if user wants to use visual studio:
-        In this case, he must have set cmake_generator to something like
-        "Visual Studio 9 2008"
-
-        """
-        return "Visual Studio" in self.cmake_generator
-
-    def get_vc_version(self):
-        """Return 2008, 20005 or 2010 depending of
-        cmake_generator setting
-
-        """
-        return self.cmake_generator.split()[-1]
-
-    def using_nmake(self):
-        """Return True if cmake_generator in
-        "NMake Makefiles"
-
-        """
-        return "NMake" in self.cmake_generator
 
     def _set_build_folder_name(self):
         """Get a reasonable build folder.
@@ -144,8 +111,7 @@ class Toc(QiWorkTree):
             res.append(self.toolchain.name)
         else:
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
-        visual_studio = self.using_visual_studio()
-        if not visual_studio and self.build_type != "debug":
+        if not self.using_visual_studio and self.build_type != "debug":
             # When using cmake + visual studio, sharing the same build dir with
             # several build config is mandatory.
             # Otherwise, it's not a good idea, so we always specify it
@@ -155,13 +121,13 @@ class Toc(QiWorkTree):
         if self.build_config:
             res.append(self.build_config)
 
-        if visual_studio:
+        if self.using_visual_studio:
             # When using visual studio, different version of the compilator
             # produces incompatible binaries, so put vc version in the build dir
             # nane
-            res.append("vs%s" % self.get_vc_version())
+            res.append("vs%s" % self.vc_version())
 
-        if self.using_nmake():
+        if self.using_nmake:
             # TODO: guess vc version from general.env.bat_file?
             res.append("nmake")
 
@@ -189,26 +155,6 @@ class Toc(QiWorkTree):
 
         return dirs
 
-    def split_sources_and_binaries(self, projects):
-        """ split a list of projects between buildable and binaries
-            return (sources, provided, notfound)
-        """
-        tocuild  = []
-        notfound = []
-        provided = []
-        for project in projects:
-            if project in self.toolchain.packages:
-                provided.append(project)
-            if project in self.buildable_projects.keys():
-                tocuild.append(project)
-            else:
-                notfound.append(project)
-        log  = "Split between sources and binaries for : %s\n"
-        log += "  to build  : %s\n"
-        log += "  provided  : %s\n"
-        log += "  not found : %s\n"
-        LOGGER.debug(log, ",".join(projects), ",".join(tocuild),  ",".join(provided), ",".join(notfound))
-        return (tocuild, provided, notfound)
 
     def set_build_env(self):
         """Update os.environ using the qibuild configuration file
@@ -302,7 +248,7 @@ def create(directory, args):
     qitools.sh.configure_file(template, cfg_path, copy_only=True)
 
 
-def get_projects_from_args(toc, args):
+def resolve_deps(toc, args):
     """ Return the list of project specified in args. This is usefull to extract
         a project list from command line arguments. The returned list contains
 
@@ -324,31 +270,10 @@ def get_projects_from_args(toc, args):
             LOGGER.debug("Found %s from current working directory", os.path.split(project_dir)[-1])
             project_names = [ os.path.split(project_dir)[-1] ]
 
-    if args.all:
-        LOGGER.debug("Using all projects")
-        project_names = toc.buildable_projects.keys()
+    from qibuild.dependenies_solver import DependenciesSolver
+    dep_solver = DependenciesSolver(project=toc.projects, packages=toc.toolchain.packages)
+    return dep_solver.solve(project_names, single=args.single, all=args.all)
 
-    if not project_names:
-        raise Exception("No project specified")
-
-    if args.single:
-        LOGGER.debug("Using a single project: %s", project_names[0])
-        return project_names
-
-    if args.only_deps:
-        if len(project_names) != 1:
-            raise Exception("You should have a list of exactly one project when using --single or --only-deps")
-        if not args.use_deps:
-            raise Exception("Conflicting options: only_deps, no_deps")
-        single_project = project_names[0]
-
-    if args.use_deps:
-        project_names = toc.resolve_deps(project_names)
-
-    if args.only_deps:
-        project_names.remove(single_project)
-
-    return project_names
 
 
 

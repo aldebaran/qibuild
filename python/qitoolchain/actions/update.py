@@ -17,6 +17,7 @@ def configure_parser(parser):
     """Configure parser for this action """
     qitools.cmdparse.default_parser(parser)
     parser.add_argument("toolchain_name", metavar="NAME", action="store", help="the toolchain name")
+    parser.add_argument("--all", action="store_true", help="get all the projects knowned by the feed")
     parser.add_argument("toolchain_feed", nargs='?', metavar="FEED", action="store",
         help="an url to a toolchain feed. If not given, the previous feed will be used. "
              "Warning ! No backup is made if you change the toolchain feed")
@@ -27,5 +28,5 @@ def do(args):
     toolchain_name = args.toolchain_name
     toolchain_feed = args.toolchain_feed
     toolchain = qitoolchain.Toolchain(toolchain_name)
-    toolchain.update(toolchain_feed)
+    toolchain.update(toolchain_feed, all=args.all)
 

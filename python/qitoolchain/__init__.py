@@ -22,6 +22,17 @@ from qitools.configstore import ConfigStore
 LOGGER = logging.getLogger(__name__)
 
 
+class Package:
+    """A package is a set of binaries, headers and cmake files
+    (a bit like a -dev debian package)
+    It has a name and may depend on other packages.
+
+    """
+    def __init__(self, name):
+        self.name = name
+        self.depends = list()
+
+
 def get_config_path():
     """Returns a suitable config path"""
     # FIXME: deal with non-UNIX systems
@@ -45,8 +56,6 @@ def get_cache(toolchain_name):
 class Toolchain(object):
     """The Toolchain class has a name and a list of packages.
 
-    A package is a set of binaries, headers and cmake files
-    (a bit like a -dev debian package)
 
     """
     def __init__(self, name):
@@ -67,9 +76,11 @@ class Toolchain(object):
 
     @property
     def packages(self):
+        # TODO: handle deps
         from_conf = self.configstore.get("toolchain", self.name, "provide")
         if from_conf:
-            self._packages = from_conf.split()
+            package_names = from_conf.split()
+            self._packages = [Package(name) for name in package_names]
         else:
             self._packages = list()
         return self._packages
@@ -101,20 +112,23 @@ class Toolchain(object):
         LOGGER.debug("Retrieving %s -> %s", url, archive_path)
         urllib.urlretrieve(url, archive_path)
         qitools.archive.extract_tar(archive_path, get_rootfs(self.name))
-        self._packages.append(package_name)
-        to_write = " ".join(self._packages)
+        self._packages.append(Package(package_name))
+        to_write = " ".join([p.name for p in self._packages])
         self._update_config("provide", '"%s"' % to_write)
 
-    def update(self, new_feed=None):
+    def update(self, new_feed=None, all=False):
         """Update the toolchain
 
         """
         if new_feed:
             self.feed = new_feed
         self._update_feed()
-        packages = self.configstore.get("package").keys()
-        for package in packages:
-            self.add_package(package)
+        if all:
+            package_names = self.configstore.get("package").keys()
+        else:
+            package_names = [p.name for p in self.packages]
+        for package_name in package_names:
+            self.add_package(package_name)
         if new_feed:
             self._update_config("feed", new_feed)
 

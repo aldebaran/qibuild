@@ -33,13 +33,12 @@ def do(args):
     logger   = logging.getLogger(__name__)
     toc      = qibuild.toc.open(args.work_tree, args, use_env=True)
 
-    wanted_projects = qibuild.toc.get_projects_from_args(toc, args)
-    (src_projects, bin_projects, not_found_projects) = toc.split_sources_and_binaries(wanted_projects)
+    (project_names, package_names, not_found) = qibuild.toc.resolve_deps(toc, args)
 
     if args.build_directory:
         toc.projects[wanted_projects[0]].set_custom_build_directory(args.build_directory)
 
-    for project in src_projects:
+    for project_name in project_names:
         logger.info("Bootstraping [%s]", project)
         dep_sdk_dirs = toc.get_sdk_dirs(project)
         qibuild.project.bootstrap(toc.projects[project], dep_sdk_dirs)

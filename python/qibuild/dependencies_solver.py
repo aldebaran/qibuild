@@ -214,7 +214,6 @@ class DependenciesSolver:
             else:
                 r_not_found.append(name)
 
-
         return (r_projects, r_packages, r_not_found)
 
 if __name__ == "__main__":
