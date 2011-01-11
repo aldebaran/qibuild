@@ -29,7 +29,7 @@ def do(args):
     """ Main method """
     toolchain_name = args.toolchain_name
     toolchain_feed = args.toolchain_feed
-    qitoolchain.create_toolchain(toolchain_name)
+    qitoolchain.create(toolchain_name)
     toolchain = qitoolchain.Toolchain(toolchain_name)
     config_path = toolchain.config_path
     if not os.path.exists(config_path):
