@@ -87,6 +87,7 @@ class Toolchain(object):
         self.update_feed()
         archive_path = os.path.join(get_cache(self.name), package_name)
         if os.path.exists(archive_path):
+            # FIXME: do something smarter here...
             pass
         url = self.configstore.get("project", package_name, "url")
         if not url:
