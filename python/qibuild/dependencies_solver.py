@@ -144,6 +144,17 @@ def _topological_sort(data, head, top_node, raise_exception = False, result = No
     result.append(head)
     return result
 
+
+
+class DependenciesSolver:
+    """This class is able to resolve dependencies between projects
+
+    """
+
+
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+
