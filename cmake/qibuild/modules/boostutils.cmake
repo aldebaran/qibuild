@@ -12,12 +12,16 @@
 
 function(boost_flib _suffix _libname)
   flib(BOOST_${_suffix} OPTIMIZED NAMES
+                          # HACK ! don't do without -mt !
+                          "boost_${_libname}"
                           "boost_${_libname}-mt"
                           "boost_${_libname}-xgcc40-mt-1_38"
                           "libboost_${_libname}-vc80-mt-1_38"
                           "libboost_${_libname}-vc90-mt-1_38"
                           )
   flib(BOOST_${_suffix} DEBUG NAMES
+                          # HACK ! don't do without -mt !
+                          "boost_${_libname}"
                           "boost_${_libname}-mt-d"
                           "boost_${_libname}-xgcc40-mt-1_38"
                           "libboost_${_libname}-vc80-mt-gd-1_38"
