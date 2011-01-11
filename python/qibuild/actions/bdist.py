@@ -20,11 +20,10 @@ def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
     toc      = qibuild.toc.open(args.work_tree, args, use_env=True)
-    wanted_projects = qibuild.toc.get_projects_from_args(toc, args)
-    (src_projects, bin_projects, not_found_projects) = toc.split_sources_and_binaries(wanted_projects)
+    (project_names, package_names, not_found) = qibuild.toc.resolve_deps(toc, args)
     inst_dir = os.path.join(toc.work_tree, "bdist")
-    for project_name in wanted_projects:
-        project = toc.projects[project_name]
+    for project_name in project_names:
+        project = toc.get_project(project_name)
         logger.info("Generating bin sdk for %s in %s", project_name, inst_dir)
         qibuild.project.configure(project)
         qibuild.project.make(project, "release")
