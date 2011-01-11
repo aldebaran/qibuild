@@ -26,9 +26,9 @@ def do(args):
     logger = logging.getLogger(__name__)
     toc      = qibuild.toc.open(args.work_tree, args, use_env=True)
 
-    wanted_projects = qibuild.toc.get_projects_from_args(toc, args)
-    (src_projects, bin_projects, not_found_projects) = toc.split_sources_and_binaries(wanted_projects)
+    (project_names, _, _) = qibuild.toc.resolve_deps(toc, args, runtime=True)
 
-    logger.info("Installing %s to %s", ", ".join(src_projects), args.destdir)
-    for project in src_projects:
-        qibuild.project.install(toc.projects[project], args.destdir)
+    logger.info("Installing %s to %s", ", ".join([n for n in project_names]), args.destdir)
+    for project_name in project_names:
+        project = toc.get_project(project_name)
+        qibuild.project.install(project,  args.destdir)

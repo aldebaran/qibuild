@@ -267,7 +267,7 @@ def create(directory, args):
     qitools.sh.configure_file(template, cfg_path, copy_only=True)
 
 
-def resolve_deps(toc, args):
+def resolve_deps(toc, args, runtime=False):
     """ Return the list of project specified in args. This is usefull to extract
         a project list from command line arguments. The returned list contains
 
@@ -286,11 +286,16 @@ def resolve_deps(toc, args):
         LOGGER.debug("no project specified, guessing from current working directory")
         project_dir = qitools.qiworktree.search_manifest_directory(os.getcwd())
         if project_dir:
-            LOGGER.debug("Found %s from current working directory", os.path.split(project_dir)[-1])
+            LOGGER.debug("Found %s from current working directory",
+                os.path.split(project_dir)[-1])
             project_names = [ os.path.split(project_dir)[-1] ]
 
-    dep_solver = DependenciesSolver(projects=toc.projects, packages=toc.toolchain.packages)
-    return dep_solver.solve(project_names, single=args.single, all=args.all)
+    dep_solver = DependenciesSolver(projects=toc.projects,
+                                    packages=toc.toolchain.packages)
+    return dep_solver.solve(project_names,
+        single=args.single,
+        all=args.all,
+        runtime=runtime)
 
 
 

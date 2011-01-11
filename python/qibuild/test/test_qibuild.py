@@ -23,7 +23,7 @@ class QiBuildTestCase(unittest.TestCase):
         self.parser = argparse.ArgumentParser()
         qibuild.parsers.toc_parser(self.parser)
         qibuild.parsers.build_parser(self.parser)
-        self.args = self.parser.parse_args(sys.argv[1:])
+        self.args = self.parser.parse_args([])
         if os.environ.get("DEBUG"):
             self.args.verbose = True
         if os.environ.get("PDB"):
@@ -38,6 +38,14 @@ class QiBuildTestCase(unittest.TestCase):
         qitools.run_action("qibuild.actions.configure", ["hello"],
             forward_args=self.args)
         qitools.run_action("qibuild.actions.make", ["hello"],
+            forward_args=self.args)
+
+    def test_install_hello(self):
+        qitools.run_action("qibuild.actions.configure", ["hello"],
+            forward_args=self.args)
+        qitools.run_action("qibuild.actions.make", ["hello"],
+            forward_args=self.args)
+        qitools.run_action("qibuild.actions.install", ["hello", "/tmp"],
             forward_args=self.args)
 
 
