@@ -150,9 +150,72 @@ class DependenciesSolver:
     """This class is able to resolve dependencies between projects
 
     """
+    def __init__(self, projects=None, packages=None):
+        if projects is None:
+            self.projects = list()
+        else:
+            self.projects = projects
+        if packages is None:
+            self.packages = list()
+        else:
+            self.packages = packages
+
+    def solve(self, names, all=False, single=False, runtime=False):
+        """Given a list of names, try to sort them in the correct order.
+
+        Return (projects, packages, not_found) where:
+            - projects  is a list of project names
+            - packages  is a list of packages names
+            - not_found is a list of names that were not found
+        """
+        # returned values:
+        r_projects = list()
+        r_packages = list()
+        r_not_found = list()
+
+        project_names = [p.name for p in self.projects]
+        package_names = [p.name for p in self.packages]
+
+        if all:
+        # Preten the use has asked for all the knwon projects
+            names = project_names[:]
+
+        # Assert that all the names are known projects:
+        for name in names:
+            if name not in project_names:
+                raise Exception("Unknown project: ", name)
+
+        if single:
+            if len(names) != 1:
+                raise Exception("Using --single requires exactly one name to be given")
+            return (names, list(), list())
+
+        to_sort = dict()
+        for project in self.projects:
+            if runtime:
+                to_sort[project.name] = project.rdepends
+            else:
+                to_sort[project.name] = project.depends
+        for package in self.packages:
+            to_sort[package.name] = package.depends
+
+        sorted_names = topological_sort(to_sort, names)
+
+        # Append what is left in sorted names, looking first in
+        # known packages, then in known projects, but keeping
+        # in r_projects what was passed as argument:
+        for name in sorted_names:
+            if name in names:
+                r_projects.append(name)
+            elif name in package_names:
+                r_packages.append(name)
+            elif name in project_names:
+                r_projects.append(name)
+            else:
+                r_not_found.append(name)
 
 
-
+        return (r_projects, r_packages, r_not_found)
 
 if __name__ == "__main__":
     import doctest
