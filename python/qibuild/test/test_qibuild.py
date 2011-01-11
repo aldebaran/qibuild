@@ -48,6 +48,13 @@ class QiBuildTestCase(unittest.TestCase):
         qitools.run_action("qibuild.actions.install", ["hello", "/tmp"],
             forward_args=self.args)
 
+    def test_ctest_hello(self):
+        qitools.run_action("qibuild.actions.configure", ["hello"],
+            forward_args=self.args)
+        qitools.run_action("qibuild.actions.make", ["hello"],
+            forward_args=self.args)
+        qitools.run_action("qibuild.actions.test", ["hello"],
+            forward_args=self.args)
 
     def tearDown(self):
         # TODO: remove build dirs
