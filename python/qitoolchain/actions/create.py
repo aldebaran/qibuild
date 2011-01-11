@@ -22,8 +22,8 @@ LOGGER = logging.getLogger("actions.qitoolchain.create")
 def configure_parser(parser):
     """Configure parser for this action """
     qitools.cmdparse.default_parser(parser)
-    parser.add_argument("toolchain_name", action="store", help="the toolchain name")
-    parser.add_argument("toolchain_feed", nargs='?', action="store", help="an url to a toolchain feed")
+    parser.add_argument("toolchain_name", metavar="NAME", action="store", help="the toolchain name")
+    parser.add_argument("toolchain_feed", metavar="FEED", nargs='?', action="store", help="an url to a toolchain feed")
 
 def do(args):
     """ Main method """
