@@ -30,31 +30,29 @@ class QiBuildTestCase(unittest.TestCase):
             self.args.pdb = True
         self.args.work_tree = self.test_dir
 
-    def test_configure_world(self):
-        qitools.run_action("qibuild.actions.configure", ["world"],
+    def _run_action(self, action, *args):
+        qitools.run_action("qibuild.actions.%s" % action, args,
             forward_args=self.args)
 
-    def test_make_hello(self):
-        qitools.run_action("qibuild.actions.configure", ["hello"],
-            forward_args=self.args)
-        qitools.run_action("qibuild.actions.make", ["hello"],
-            forward_args=self.args)
+    def test_configure(self):
+        self._run_action("configure", "world")
 
-    def test_install_hello(self):
-        qitools.run_action("qibuild.actions.configure", ["hello"],
-            forward_args=self.args)
-        qitools.run_action("qibuild.actions.make", ["hello"],
-            forward_args=self.args)
-        qitools.run_action("qibuild.actions.install", ["hello", "/tmp"],
-            forward_args=self.args)
+    def test_make(self):
+        self._run_action("configure", "hello")
+        self._run_action("make", "hello")
 
-    def test_ctest_hello(self):
-        qitools.run_action("qibuild.actions.configure", ["hello"],
-            forward_args=self.args)
-        qitools.run_action("qibuild.actions.make", ["hello"],
-            forward_args=self.args)
-        qitools.run_action("qibuild.actions.test", ["hello"],
-            forward_args=self.args)
+    def test_install(self):
+        self._run_action("configure", "hello")
+        self._run_action("make", "hello")
+        self._run_action("install", "hello", "/tmp")
+
+    def test_ctest(self):
+        self._run_action("configure", "hello")
+        self._run_action("make", "hello")
+        self._run_action("test", "hello")
+
+    def test_bdist(self):
+        self._run_action("bdist", "world")
 
     def tearDown(self):
         # TODO: remove build dirs
