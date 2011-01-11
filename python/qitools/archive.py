@@ -30,7 +30,7 @@ class InvalidArchive(Exception):
 
 def extract_tar(archive_path, dest_dir):
     """Extract a .tar.gz archive"""
-    LOGGER.info("Extracting %s to %s", archive_path, dest_dir)
+    LOGGER.debug("Extracting %s to %s", archive_path, dest_dir)
     archive = tarfile.open(archive_path)
     members = archive.getmembers()
     size = len(members)
@@ -53,14 +53,14 @@ def extract_tar(archive_path, dest_dir):
         sys.stdout.write("Done: %.0f%%\r" % percent)
         sys.stdout.flush()
     archive.close()
-    LOGGER.info("%s extracted to %s", archive_path, dest_dir)
+    LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
     res = os.path.join(dest_dir, topdir)
     return res
 
 
 def extract_zip(archive_path, dest_dir):
     """Extract a zip archive"""
-    LOGGER.info("Extracting %s to %s", archive_path, dest_dir)
+    LOGGER.debug("Extracting %s to %s", archive_path, dest_dir)
     archive = zipfile.ZipFile(archive_path)
     members = archive.infolist()
     # There is always the top dir as the first element of the archive
@@ -81,7 +81,7 @@ def extract_zip(archive_path, dest_dir):
         sys.stdout.write("Done: %.0f%%\r" % percent)
         sys.stdout.flush()
     archive.close()
-    LOGGER.info("%s extracted to %s", archive_path, dest_dir)
+    LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
     res = os.path.join(dest_dir, topdir)
     return res
 
