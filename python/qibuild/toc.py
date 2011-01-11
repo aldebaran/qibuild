@@ -244,7 +244,7 @@ class Toc(QiWorkTree):
         for project in projects:
             if project in self.toolchain.projects:
                 provided.append(project)
-            elif project in self.buildable_projects.keys():
+            if project in self.buildable_projects.keys():
                 tocuild.append(project)
             else:
                 notfound.append(project)

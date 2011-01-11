@@ -42,7 +42,10 @@ def project_parser(parser):
     parser.add_argument("-a", "--all", action="store_true", help="work on all projects")
     parser.add_argument("-s", "--single", action="store_true", help="do not resolve any dependency")
     parser.add_argument("--only-deps", action="store_true", help="only work on the dependencies")
-    parser.add_argument("--use-deps", action="store_true", help="use dependencies")
+    parser.add_argument("--use-deps",    dest="use_deps", action="store_true",
+        help="use dependencies")
+    parser.add_argument("--no-use-deps", dest="use_deps", action="store_false",
+        help="do resolve any dependency")
     parser.add_argument("projects", nargs="?", metavar="PROJECT", action="append", help="project name (s)")
     parser.set_defaults(single=False, only_deps=False, use_deps=True)
 
