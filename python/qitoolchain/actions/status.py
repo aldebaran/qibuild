@@ -25,7 +25,7 @@ def do(args):
     """ Main method """
     config = qitools.configstore.ConfigStore()
     config.read(qitoolchain.get_config_path())
-    for toolchain_name in config.get("toolchain").keys():
+    for toolchain_name in config.get("toolchain", default=dict()).keys():
         print "Toolchain: ", toolchain_name
         toolchain = qitoolchain.Toolchain(toolchain_name)
         print "  feed:", toolchain.feed
