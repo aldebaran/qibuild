@@ -116,7 +116,7 @@ class Toolchain(object):
 
     def _add_package(self, package_name):
         """Add just one package. called by self.add_package
-        which does resolved dependencies.
+        which does resolve dependencies.
 
         (in a non-recursive way because I'm bored)
 
@@ -130,7 +130,7 @@ class Toolchain(object):
             raise Exception("Could not find package %s in feed: %s" % (
                 package_name, self.feed))
 
-        LOGGER.debug("Retrieving %s -> %s", url, archive_path)
+        LOGGER.info("Adding package %s", package_name)
         urllib.urlretrieve(url, archive_path)
         qitools.archive.extract_tar(archive_path, get_rootfs(self.name))
         self._packages.append(Package(package_name))
@@ -183,6 +183,7 @@ class Toolchain(object):
         with open(self.config_path, "w") as config_file:
             parser.write(config_file)
 
+        self.configstore.read(self.config_path)
 
     def _update_feed(self):
         """Update the feed configuration file"""

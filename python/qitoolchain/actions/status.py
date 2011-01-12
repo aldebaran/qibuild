@@ -31,5 +31,5 @@ def do(args):
         print "  feed:", toolchain.feed
         print "  packages: "
         for package in toolchain.packages:
-            print " " * 4, package.name, "( deps:", " ".join(package.depends), ")"
+            print " " * 4, package.name
 
