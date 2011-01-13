@@ -19,6 +19,7 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
+    parser.add_argument("--target", help="Special target to build")
 
 def do(args):
     """Main entry point"""
@@ -32,11 +33,8 @@ def do(args):
     for project_names in project_names:
         project = toc.get_project(project_names)
         logger.info("Building %s in %s", project.name, toc.build_folder_name)
-        qibuild.project.make(project, toc.build_type,
-            num_jobs = args.num_jobs,
-            incredibuild = use_incredibuild,
-            nmake = toc.using_nmake,
-            visual_studio = toc.using_visual_studio)
+        toc.build_project(project, target=args.target, num_jobs=args.num_jobs,
+            incredibuild=use_incredibuild)
 
 
 if __name__ == "__main__":

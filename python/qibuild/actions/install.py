@@ -31,4 +31,4 @@ def do(args):
     logger.info("Installing %s to %s", ", ".join([n for n in project_names]), args.destdir)
     for project_name in project_names:
         project = toc.get_project(project_name)
-        qibuild.project.install(project,  args.destdir)
+        toc.install_project(project,  args.destdir)

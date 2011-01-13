@@ -47,11 +47,6 @@ def do(args):
         return
     for project in projects:
         logger.info("Configuring %s in %s", project.name, toc.build_folder_name)
-        qibuild.project.configure(project, generator=toc.cmake_generator)
-
-
-if __name__ == "__main__":
-    import sys
-    qitools.cmdparse.sub_command_main(sys.modules[__name__])
+        toc.configure_project(project)
 
 

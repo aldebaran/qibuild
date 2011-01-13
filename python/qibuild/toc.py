@@ -7,12 +7,14 @@
 ##
 
 import os
+import glob
 import platform
 import subprocess
 import logging
 import qitools.configstore
 import qitools.qiworktree
 
+import qibuild
 from   qibuild.project     import Project
 import qitools.sh
 from qibuild.dependencies_solver import DependenciesSolver
@@ -226,6 +228,87 @@ class Toc(QiWorkTree):
 
         LOGGER.debug("Updating os.environ with %s" , result)
         os.environ.update(result)
+
+
+    def configure_project(self, project, toolchain_file=None):
+        """ Call cmake with correct options
+        if toolchain_file is None a t001chain file is generated in the cmake binary directory.
+        if toolchain_file is "", then CMAKE_TOOLCHAIN_FILE is not specified.
+
+        Note: the cmake flags (CMAKE_BUILD_TYPE, or the -D args coming from
+        qibuild configure -DFOO_BAR) have already been passed via the toc object.
+
+        (See qibuild.toc.toc_open() and the ctor of Project for the details)
+        """
+        if not os.path.exists(project.directory):
+            raise qibuild.ConfigureException("source dir: %s does not exist, aborting" % project.directory)
+
+        if not os.path.exists(os.path.join(project.directory, "CMakeLists.txt")):
+            LOGGER.info("Not calling cmake for %s", os.path.basename(project.directory))
+            return
+
+        # Set generator if necessary
+        cmake_args = list()
+        if self.cmake_generator:
+            cmake_args.extend(["-G", self.cmake_generator])
+
+        cmake_flags = list()
+        cmake_flags.extend(project.cmake_flags)
+
+        if toolchain_file:
+            cmake_flags.append("CMAKE_TOOLCHAIN_FILE=" + toolchain_file)
+
+        cmake_args.extend(["-D" + x for x in cmake_flags])
+
+        qibuild.cmake(project.directory, project.build_directory, cmake_args)
+
+
+    def build_project(self, project, incredibuild=True, num_jobs=1, target=None):
+        """Build a project, choosing between  Nmake, Visual Studio or make
+
+        """
+        build_dir = project.build_directory
+        LOGGER.debug("[%s]: building in %s", project.name, build_dir)
+
+        if self.using_visual_studio:
+            sln_files = glob.glob(build_dir + "/*.sln")
+            if len(sln_files) == 0:
+                LOGGER.debug("Not calling msbuild for %s", os.path.basename(build_dir))
+                return
+
+            if len(sln_files) != 1:
+                err_message = "Found several sln files: "
+                err_message += ", ".join(sln_files)
+                raise Exception(err_message)
+            sln_file = sln_files[0]
+            if not incredibuild:
+                qibuild.msbuild(sln_file, build_type=self.build_type, target=target)
+                return
+            else:
+                qibuild.build_incredibuild(sln_file, build_type=self.build_type, target=target)
+                return
+
+        # Not using visual studio: we must have a Makefile
+        if not os.path.exists(os.path.join(build_dir, "Makefile")):
+            LOGGER.debug("Not calling make for %s", os.path.basename(build_dir))
+            return
+
+        if self.using_nmake:
+            qibuild.nmake(build_dir, target=target)
+            return
+
+        # Not using NMake: just use plain good old make
+        qibuild.make(build_dir, num_jobs=num_jobs, target=target)
+
+
+    def install_project(self, project, destdir):
+        """Install the project """
+        # FIXME: make it work for other stuff that Unix makefiles !
+        build_dir = project.build_directory
+        cmd = ["make", "install"]
+        build_environ = os.environ.copy()  # Let's not modify os.environ gloablly !
+        build_environ["DESTDIR"] = destdir
+        qitools.command.check_call(cmd, cwd=build_dir, env=build_environ)
 
 
 def toc_open(work_tree, args, use_env=False):
