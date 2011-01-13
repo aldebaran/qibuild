@@ -25,8 +25,11 @@ def do(args):
     for project_name in project_names:
         project = toc.get_project(project_name)
         logger.info("Generating bin sdk for %s in %s", project_name, inst_dir)
-        qibuild.project.configure(project)
-        qibuild.project.make(project, "release")
+        qibuild.project.configure(project, generator=toc.cmake_generator)
+        qibuild.project.make(project, toc.build_type,
+            num_jobs = args.num_jobs,
+            nmake = toc.using_nmake,
+            visual_studio = toc.using_visual_studio)
         destdir = os.path.join(inst_dir, project_name)
         qibuild.project.install(project, destdir)
         archive = qitools.archive.zip_unix(destdir)
