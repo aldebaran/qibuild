@@ -129,7 +129,7 @@ class Toc(QiWorkTree):
             # When using visual studio, different version of the compilator
             # produces incompatible binaries, so put vc version in the build dir
             # nane
-            res.append("vs%s" % self.vc_version())
+            res.append("vs%s" % self.vc_version)
 
         if self.using_nmake:
             # TODO: guess vc version from general.env.bat_file?
