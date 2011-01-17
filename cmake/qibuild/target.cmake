@@ -84,11 +84,26 @@ function(qi_create_bin name)
     qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
   endif()
 
-  #TODO:qi
   if(WIN32)
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
   endif()
   set_target_properties("${name}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
+
+  if(MSVC)
+    string(TOUPPER ${name} _U_name)
+    configure_file(${QI_ROOT_DIR}/templates/post-copy-dlls.cmake
+                   ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
+                   COPYONLY)
+
+    add_custom_command(TARGET ${name} POST_BUILD
+      COMMAND
+        ${CMAKE_COMMAND}
+        -DBUILD_TYPE=${CMAKE_CFG_INTDIR}
+        -DPROJECT=${_U_name}
+        -P ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
+        ${CMAKE_BINARY_DIR}
+    )
+  endif()
 endfunction()
 
 
