@@ -192,7 +192,7 @@ class Toc(QiWorkTree):
         if bat_file:
             self._set_path_from_bat_conf(bat_file)
 
-    def _set_env_from_path_conf(path):
+    def _set_env_from_path_conf(self, path):
         """Set os.environ using a "path" string setting
 
         """
@@ -204,7 +204,7 @@ class Toc(QiWorkTree):
         env_path += path
         os.environ["PATH"] = env_path
 
-    def _set_path_from_bat_conf(bat_file):
+    def _set_path_from_bat_conf(self, bat_file):
         """Set environment variables using a .bat script
         """
         # Quick hack to get env vars from a .bat script
