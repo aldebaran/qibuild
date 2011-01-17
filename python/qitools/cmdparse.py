@@ -202,7 +202,7 @@ def check_module(module):
 
     """
     if not hasattr(module, "do"):
-        raise InvalidAction(module._names__, "Could not find a do() method")
+        raise InvalidAction(module.__name__, "Could not find a do() method")
     if not hasattr(module, "configure_parser"):
         raise InvalidAction(module.__name__, "Could not find a configure_parser() method")
 
