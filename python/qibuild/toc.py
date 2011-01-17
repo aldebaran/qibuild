@@ -182,11 +182,20 @@ class Toc(QiWorkTree):
 
         """
         env = self.configstore.get("general", "env")
-        if not env:
-            return
-        path = env.get("path")
-        if not path:
-            return
+        path = None
+        bat_file = None
+        if env:
+            path = env.get("path")
+            bat_file = env.get("bat_file")
+        if path:
+            self._set_env_from_path_conf(path)
+        if bat_file:
+            self._set_path_from_bat_conf(bat_file)
+
+    def _set_env_from_path_conf(path):
+        """Set os.environ using a "path" string setting
+
+        """
         path = path.strip()
         path = path.replace("\n", "")
         env_path = os.environ["PATH"]
@@ -194,9 +203,10 @@ class Toc(QiWorkTree):
             env_path += ";"
         env_path += path
         os.environ["PATH"] = env_path
-        bat_file = env.get("bat_file")
-        if not bat_file:
-            return
+
+    def _set_path_from_bat_conf(bat_file):
+        """Set environment variables using a .bat script
+        """
         # Quick hack to get env vars from a .bat script
         # (stolen idea from distutils/msvccompiler)
         # TODO: handle non asccii chars?
@@ -228,6 +238,7 @@ class Toc(QiWorkTree):
 
         LOGGER.debug("Updating os.environ with %s" , result)
         os.environ.update(result)
+
 
 
     def configure_project(self, project, toolchain_file=None):
