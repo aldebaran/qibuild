@@ -32,7 +32,7 @@ option(DISABLE_PRECOMPILED_HEADERS "If ON, the macro add_msvc_precompiled_header
 #  #include <vector>
 #  [ other includes ...]
 #
-# #endif // _MSC_VER 
+# #endif // _MSC_VER
 # #endif // YOURMODULE_PCH_H
 #
 ################################################################################
@@ -44,10 +44,10 @@ macro(add_msvc_precompiled_header precompiled_header precompiled_source sources_
         # Create a name based on the project output
         get_filename_component(precompiled_basename ${precompiled_header} NAME_WE)
         set(precompiled_binary "\$(IntDir)/${precompiled_basename}.pch")
-        
+
         # Decipher the sources list from the name of the arg
         SET(sources ${${sources_var}})
-        
+
         # Tell the compiler about the cpp which will create the precompiled header
         set_source_files_properties(
             ${precompiled_source}
@@ -70,7 +70,7 @@ macro(add_msvc_precompiled_header precompiled_header precompiled_source sources_
 
         # Add precompiled cpp to sources
         list(APPEND ${sources_var} ${precompiled_source})
-        
+
       endif(MSVC)
   endif()
 endmacro(add_msvc_precompiled_header)
