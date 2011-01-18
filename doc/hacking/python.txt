@@ -1,0 +1,18 @@
+Python
+======
+The command line tools *qisrc*, *qitoolchain*, *qibuild* are written
+in Python.
+
+
+= The Command-line interface
+
+== Actions, arguments and parsers
+
+= The QiWorkTree object
+
+= The Project object
+
+= The Toc object
+
+= How to bind them together
+
