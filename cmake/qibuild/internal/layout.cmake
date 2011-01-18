@@ -11,8 +11,8 @@
 
 if(MSVC)
   message(STATUS "We love visual studio")
-  qi_set_global(QI_SDK_BIN "")
-  qi_set_global(QI_SDK_LIB "")
+  qi_set_global(QI_SDK_BIN ".")
+  qi_set_global(QI_SDK_LIB ".")
 else()
   qi_set_global(QI_SDK_BIN "bin")
   qi_set_global(QI_SDK_LIB "lib")
