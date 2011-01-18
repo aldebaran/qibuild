@@ -314,9 +314,17 @@ class Toc(QiWorkTree):
 
     def install_project(self, project, destdir):
         """Install the project """
-        # FIXME: make it work for other stuff that Unix makefiles !
         build_dir = project.build_directory
-        cmd = ["make", "install"]
+        if self.using_visual_studio:
+          sln_files = glob.glob(build_dir + "/*.sln")
+          sln_file = sln_files[0]
+          qibuild.msbuild(sln_file, build_type=self.build_type, target="INSTALL")
+          return
+          
+        if self.using_nmake:
+          cmd = ["nmake", "install"]
+        else:
+          cmd = ["make", "install"]
         build_environ = os.environ.copy()  # Let's not modify os.environ gloablly !
         build_environ["DESTDIR"] = destdir
         qitools.command.check_call(cmd, cwd=build_dir, env=build_environ)
