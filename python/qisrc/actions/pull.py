@@ -8,8 +8,11 @@
 """Init a new qisrc workspace """
 
 import os
+import logging
 import qitools
 import qisrc
+
+LOGGER = logging.getLogger(__name__)
 
 
 def configure_parser(parser):
@@ -26,7 +29,7 @@ def do(args):
             git = qisrc.git.open(git_project)
             #TODO: replace by try/except?
             if git.is_valid():
-                print "pull:", git_project
+                LOGGER.info("Pull %s", git_project)
                 if args.rebase:
                     git.pull('--rebase')
                 else:
@@ -37,6 +40,3 @@ def do(args):
             else:
                 raise
 
-if __name__ == "__main__" :
-    import sys
-    qitools.cmdparse.sub_command_main(sys.modules[__name__])
