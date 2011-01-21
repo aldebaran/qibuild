@@ -320,7 +320,7 @@ class Toc(QiWorkTree):
           sln_file = sln_files[0]
           qibuild.msbuild(sln_file, build_type=self.build_type, target="INSTALL")
           return
-          
+
         if self.using_nmake:
           cmd = ["nmake", "install"]
         else:

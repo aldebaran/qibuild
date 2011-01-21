@@ -2,9 +2,9 @@
 ** Sample foolib
 */
 
-#ifndef   	HELLO_HPP_
-# define   	HELLO_HPP_
+#ifndef     HELLO_HPP_
+# define     HELLO_HPP_
 
 void foolib_hello();
 
-#endif	    /* !HELLO_PP_ */
+#endif      /* !HELLO_PP_ */

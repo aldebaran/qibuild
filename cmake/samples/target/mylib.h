@@ -5,8 +5,8 @@
 ** Copyright (C) 2010 Aldebaran Robotics
 */
 
-#ifndef   	MYLIB_H_
-# define   	MYLIB_H_
+#ifndef     MYLIB_H_
+# define     MYLIB_H_
 
 
 # ifdef __cplusplus
@@ -20,4 +20,4 @@ extern "C" {
 }
 # endif
 
-#endif 	    /* !MYLIB_H_ */
+#endif       /* !MYLIB_H_ */
