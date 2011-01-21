@@ -14,7 +14,7 @@ clean(GETTEXT)
 
 if(NOT WIN32)
   depend(GETTEXT REQUIRED DL)
-endif(NOT WIN32)
+endif()
 fpath(GETTEXT libintl.h SYSTEM)
 
 #dont find libintl on linux => libintl is part of glibc

@@ -12,9 +12,9 @@
 
 if(UNIX AND NOT APPLE)
   set(IN_SYSTEM "SYSTEM")
-else(UNIX AND NOT APPLE)
+else()
   set(IN_SYSTEM "")
-endif(UNIX AND NOT APPLE)
+endif()
 
 clean(GSTREAMER)
 fpath(GSTREAMER  gst/gst.h PATH_SUFFIXES gstreamer-0.10 gstreamer ${IN_SYSTEM})

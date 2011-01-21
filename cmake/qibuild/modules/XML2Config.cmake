@@ -8,9 +8,9 @@
 
 if(UNIX AND NOT APPLE)
   set(IN_SYSTEM "SYSTEM")
-else(UNIX AND NOT APPLE)
+else()
   set(IN_SYSTEM "")
-endif(UNIX AND NOT APPLE)
+endif()
 
 clean(XML2)
 fpath(XML2 libxml/parser.h PATH_SUFFIXES libxml2 ${IN_SYSTEM})

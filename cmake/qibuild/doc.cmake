@@ -54,13 +54,13 @@ function(qi_create_asciidoc subfoldername)
                         COMMENT "Asciidoc ${_in}")
 
       add_dependencies("doc" "${_in}")
-    endforeach(_file)
-  else(ASCIIDOC_FOUND)
+    endforeach()
+  else()
     message(STATUS "###### WARNING ######")
     message(STATUS "No asciidoc will be generated: asciidoc binary not found")
     message(STATUS "Please install asciidoc")
     message(STATUS "###### WARNING ######")
-  endif(ASCIIDOC_FOUND)
+  endif()
 endfunction()
 
 

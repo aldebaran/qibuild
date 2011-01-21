@@ -9,5 +9,5 @@ function(check_is_target _name)
   if (NOT TARGET ${_name})
     error("[${_name}] is not a target verify your function arguments")
   endif (NOT TARGET ${_name})
-endfunction(check_is_target _name)
+endfunction()
 

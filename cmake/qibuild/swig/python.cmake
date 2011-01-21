@@ -73,7 +73,7 @@ function(qi_swig_wrap_python module_name interface_file)
                                              DEBUG_POSTFIX "_d")
     # Make sure _swig_target is put in the right place
     win32_copy_target(${_swig_target} "${QI_SDK_DIR}/${QI_SDK_LIB}")
-  endif(WIN32)
+  endif()
 
   # Re-create install rules:
   install(TARGETS ${_swig_target}

@@ -19,6 +19,6 @@ flib(URBICORE uobject)
 
 if(TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
   flib(URBICORE libport)
-endif(TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
+endif()
 
 export_lib(URBICORE)

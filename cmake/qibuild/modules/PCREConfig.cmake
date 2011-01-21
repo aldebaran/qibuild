@@ -12,9 +12,9 @@
 
 if(UNIX AND NOT APPLE)
   set(PCRE_IN_SYSTEM "SYSTEM")
-else(UNIX AND NOT APPLE)
+else()
   set(PCRE_IN_SYSTEM "")
-endif(UNIX AND NOT APPLE)
+endif()
 
 clean(PCRE)
 

@@ -23,7 +23,7 @@
 function(qi_debug)
   if($ENV{DEBUG})
     message(STATUS "${ARGN}")
-  endif($ENV{DEBUG})
+  endif()
 endfunction()
 
 #! display a vebose message
@@ -32,7 +32,7 @@ endfunction()
 function(qi_verbose)
   if($ENV{VERBOSE})
     message(STATUS "${ARGN}")
-  endif($ENV{VERBOSE})
+  endif()
 endfunction()
 
 #! display an info message
@@ -41,8 +41,8 @@ function(qi_info)
   if(DEFINED ENV{INFO})
     if($ENV{INFO} EQUAL 0)
       return()
-    endif($ENV{INFO} EQUAL 0)
-  endif(DEFINED ENV{INFO})
+    endif()
+  endif()
 
   message(STATUS "${ARGN}")
 endfunction()

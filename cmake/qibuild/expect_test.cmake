@@ -142,7 +142,7 @@ function(_test_expect_bool)
   qi_expect_true(${_expect})
 
   message(STATUS "")
-endfunction(_test_expect_bool)
+endfunction()
 
 
 function(_test_expect_strequal)

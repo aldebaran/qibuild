@@ -56,7 +56,7 @@ function(fpath prefix name0)
   qi_debug("LIBFIND: RESULT: ${${name0}_INCLUDE}")
   qi_debug("LIBFIND: ${prefix}_INCLUDE_DIR: ${${prefix}_INCLUDE_DIR}")
   set(${name0}_INCLUDE CACHE INTERNAL "" FORCE)
-endfunction(fpath)
+endfunction()
 
 
 
@@ -109,7 +109,7 @@ function(flib prefix)
   qi_debug("LIBFIND: RESULT: ${${_modulelist}_LIB}")
   qi_debug("LIBFIND: ${prefix}_LIBRARIES: ${${prefix}_LIBRARIES}")
   set(${name}_LIB CACHE INTERNAL "" FORCE)
-endfunction(flib)
+endfunction()
 
 ####################################################################
 #
@@ -124,7 +124,7 @@ function(clean prefix)
   set(${prefix}_EXECUTABLE_DEBUG  ""     CACHE STRING   "Cleared." FORCE)
   set(${prefix}_SEARCHED    FALSE        CACHE INTERNAL "Cleared." FORCE)
   mark_as_advanced(${prefix}_DEFINITIONS ${prefix}_INCLUDE_DIR ${prefix}_LIBRARIES ${prefix}_TARGET ${prefix}_EXECUTABLE ${prefix}_EXECUTABLE_DEBUG)
-endfunction(clean)
+endfunction()
 
 
 ####################################################################
@@ -145,19 +145,19 @@ function(export_lib prefix)
 
   if(${prefix}_INCLUDE_DIR AND ${prefix}_LIBRARIES)
     set(${prefix}_FOUND TRUE CACHE INTERNAL "" FORCE)
-  endif(${prefix}_INCLUDE_DIR AND ${prefix}_LIBRARIES)
+  endif()
 
   if(NOT ${prefix}_FOUND AND ${prefix}_FIND_REQUIRED)
     if(NOT ${prefix}_INCLUDE_DIR )
       message( STATUS "Required include not found : ${prefix}_INCLUDE_DIR")
       message( FATAL_ERROR "Could not find ${prefix} include!")
-    endif( NOT ${prefix}_INCLUDE_DIR )
+    endif()
     if(NOT ${prefix}_LIBRARIES )
       message( STATUS "Required libraries not found : ${prefix}_LIBRARIES")
       message( FATAL_ERROR "Could not find ${prefix} libraries!")
-    endif(NOT ${prefix}_LIBRARIES)
-  endif(NOT ${prefix}_FOUND AND ${prefix}_FIND_REQUIRED)
-endfunction(export_lib)
+    endif()
+  endif()
+endfunction()
 
 
 
@@ -180,13 +180,13 @@ function(export_bin prefix)
 
   if(${prefix}_EXECUTABLE)
     set(${prefix}_FOUND TRUE CACHE INTERNAL "" FORCE)
-  endif(${prefix}_EXECUTABLE)
+  endif()
 
   if(NOT ${prefix}_FOUND AND ${prefix}_FIND_REQUIRED)
     qi_info( STATUS "Required executable not found : ${prefix}_EXECUTABLE")
     qi_info( FATAL_ERROR "Could not find ${prefix} executable!")
-  endif(NOT ${prefix}_FOUND AND ${prefix}_FIND_REQUIRED)
-endfunction(export_bin)
+  endif()
+endfunction()
 
 ####################################################################
 #
@@ -205,11 +205,11 @@ function(export_header prefix)
 
   if(${prefix}_INCLUDE_DIR)
     set(${prefix}_FOUND TRUE CACHE INTERNAL "" FORCE)
-  endif(${prefix}_INCLUDE_DIR)
+  endif()
 
   if(NOT ${prefix}_FOUND AND ${prefix}_FIND_REQUIRED)
     qi_info( STATUS "Required include not found : ${prefix}_INCLUDE_DIR")
     qi_info( FATAL_ERROR "Could not find ${prefix} include!")
-  endif(NOT ${prefix}_FOUND AND ${prefix}_FIND_REQUIRED)
-endfunction(export_header)
+  endif()
+endfunction()
 

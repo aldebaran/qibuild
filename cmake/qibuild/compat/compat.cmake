@@ -7,30 +7,30 @@
 
 function(sdk_add_include _name _subfolder)
   qi_deprecated("no implementation")
-endfunction(sdk_add_include _name _subfolder)
+endfunction()
 
 ######################
 # Install
 ######################
 function(install_header _name)
   qi_deprecated("no implementation")
-endfunction(install_header _name)
+endfunction()
 
 function(install_data _subfolder)
   qi_deprecated("no implementation")
-endfunction(install_data _name)
+endfunction()
 
 function(install_data_dir _subfolder)
   qi_deprecated("no implementation")
-endfunction(install_data_dir)
+endfunction()
 
 function(install_doc _subfolder)
   qi_deprecated("no implementation")
-endfunction(install_doc _name)
+endfunction()
 
 function(install_conf _subfolder)
   qi_deprecated("no implementation")
-endfunction(install_conf _name)
+endfunction()
 
 function(install_cmake _subfolder)
   qi_deprecated("no implementation")
@@ -41,19 +41,19 @@ endfunction()
 ######################
 function(create_bin _name)
   qi_deprecated("no implementation")
-endfunction(create_bin)
+endfunction()
 
 function(create_script _name _namein)
   qi_deprecated("no implementation")
-endfunction(create_script)
+endfunction()
 
 function(create_lib _name)
   qi_deprecated("no implementation")
-endfunction(create_lib)
+endfunction()
 
 function(create_config_h _header _nameout)
   qi_deprecated("unimplemented")
-endfunction(create_config_h)
+endfunction()
 
 function(create_gtest _name)
   qi_deprecated("unimplemented")
@@ -77,46 +77,46 @@ endfunction()
 function(debug)
   qi_deprecated()
   qi_debug(${ARGN})
-endfunction(debug)
+endfunction()
 
 function(verbose)
   qi_deprecated()
   qi_verbose(${ARGN})
-endfunction(verbose)
+endfunction()
 
 function(info)
   qi_deprecated()
   qi_info(${ARGN})
-endfunction(info)
+endfunction()
 
 function(warning)
   qi_deprecated()
   qi_warning(${ARGN})
-endfunction(warning)
+endfunction()
 
 function(error)
   qi_deprecated()
   qi_error(${ARGN})
-endfunction(error)
+endfunction()
 
 #####################
 # stage
 #####################
 function(stage_lib _targetname _name)
   qi_deprecated("unimplemented")
-endfunction(stage_lib _targetname _name)
+endfunction()
 
 function(stage_script _file _name)
   qi_deprecated("unimplemented")
-endfunction(stage_script)
+endfunction()
 
 function(stage_bin _targetname _name)
   qi_deprecated("unimplemented")
-endfunction(stage_bin)
+endfunction()
 
 function(stage_header _name)
   qi_deprecated("unimplemented")
-endfunction(stage_header)
+endfunction()
 
 function(cond_subdirectory subdir)
   qi_deprecated("unimplemented")

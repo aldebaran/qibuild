@@ -24,7 +24,7 @@ function(boost_flib _suffix _libname)
                           "libboost_${_libname}-vc90-mt-gd-1_38"
                           "boost_${_libname}-mt"
                           )
-endfunction(boost_flib _suffix _libname)
+endfunction()
 
 function(boost_flib_static _suffix _libname)
   flib(BOOST_${_suffix} OPTIMIZED PATH_SUFFIXES static NAMES
@@ -40,4 +40,4 @@ function(boost_flib_static _suffix _libname)
                           "libboost_${_libname}-vc90-mt-gd-1_38"
                           "boost_${_libname}-mt"
                           )
-endfunction(boost_flib_static _suffix _libname)
+endfunction()

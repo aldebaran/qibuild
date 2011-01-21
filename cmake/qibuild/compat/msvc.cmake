@@ -8,7 +8,7 @@
 if(WIN32)
     add_definitions(" -DWIN32_LEAN_AND_MEAN ")
     add_definitions(" -D_CRT_SECURE_NO_DEPRECATE ")
-endif(WIN32)
+endif()
 
 option(DISABLE_PRECOMPILED_HEADERS "If ON, the macro add_msvc_precompiled_header will be disabled (ON or OFF)" ON)
 
@@ -71,6 +71,6 @@ macro(add_msvc_precompiled_header precompiled_header precompiled_source sources_
         # Add precompiled cpp to sources
         list(APPEND ${sources_var} ${precompiled_source})
 
-      endif(MSVC)
+      endif()
   endif()
-endmacro(add_msvc_precompiled_header)
+endmacro()

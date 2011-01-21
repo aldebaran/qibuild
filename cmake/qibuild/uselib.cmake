@@ -77,7 +77,7 @@ function(qi_use_lib name)
 
     if (DEFINED ${_U_PKG}_INCLUDE_DIRS)
       include_directories(${${_U_PKG}_INCLUDE_DIRS})
-    elseif(DEFINED ${_U_PKG}_INCLUDE_DIR)
+    elseif()
       include_directories(${${_U_PKG}_INCLUDE_DIR})
     endif()
 
