@@ -41,7 +41,7 @@ def cleanup(path, bdirs, work_tree, doit=False):
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
-    qiwt     = qitools.qiworktree.open(args.work_tree, use_env=True)
+    qiwt     = qitools.qiworktree_open(args.work_tree, use_env=True)
 
     if args.force:
         print "removing:"

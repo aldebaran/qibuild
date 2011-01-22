@@ -32,7 +32,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    qiwt = qitools.qiworktree.open(args.work_tree, use_env=True)
+    qiwt = qitools.qiworktree_open(args.work_tree, use_env=True)
     logger = logging.getLogger(__name__)
     for pname, ppath in qiwt.buildable_projects.iteritems():
         logger.info("Running `%s` for %s", " ".join(args.command), pname)

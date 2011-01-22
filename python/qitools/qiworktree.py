@@ -146,5 +146,3 @@ def worktree_from_args(args):
     return work_tree
 
 
-# pylint: disable-msg=W0622,C0103
-open = qiworktree_open

@@ -26,7 +26,7 @@ def configure_parser(parser):
 
 def do(args):
     """ Main method """
-    qiwt = qitools.qiworktree.open(args.work_tree, use_env=True)
+    qiwt = qitools.qiworktree_open(args.work_tree, use_env=True)
     dirty = list()
     for git_project in qiwt.git_projects.values():
         git = qisrc.git.open(git_project)

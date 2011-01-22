@@ -27,7 +27,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     logger = logging.getLogger(__name__)
-    toc      = qibuild.toc.open(args.work_tree, args, use_env=True)
+    toc      = qibuild.toc_open(args.work_tree, args, use_env=True)
 
     (project_names, package_names, _) = qibuild.toc.resolve_deps(toc, args, runtime=True)
 

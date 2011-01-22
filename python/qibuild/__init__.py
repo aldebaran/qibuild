@@ -28,6 +28,7 @@ import qitools.command
 
 import parsers
 import toc
+from toc import toc_open
 
 LOGGER = logging.getLogger("qibuild")
 

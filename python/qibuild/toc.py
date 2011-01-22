@@ -398,8 +398,3 @@ def resolve_deps(toc, args, runtime=False):
         single=args.single,
         all=args.all,
         runtime=runtime)
-
-
-
-
-open = toc_open
