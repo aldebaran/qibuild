@@ -1,9 +1,11 @@
 """Init a new toc workspace """
 
 import os
-import subprocess
 import qibuild
+import qitoolchain
+import qitools
 import qitools.cmdparse
+import subprocess
 
 
 def ask_choice(choices, input_text):
@@ -66,9 +68,14 @@ def ask_cmake_generator():
 
 def ask_toolchain():
     """Ask the user to choose a toolchain name"""
-    print(":: Choose a toolchain name")
-    toolchain_name = raw_input("> ")
-    return toolchain_name
+
+    config_file = qitoolchain.get_config_path()
+    config = qitools.configstore.ConfigStore()
+    config.read(config_file)
+    toolchain_dict = config.get("toolchain", default=dict())
+    toolchain_names = toolchain_dict.keys()
+    return ask_choice(toolchain_names, "Choose a toolchain name")
+
 
 def ask_build_configs():
     """Ask the user to choose build configurations"""
@@ -133,6 +140,13 @@ def ask_bat_file():
     """
     pass
 
+def create_toolchain():
+    """Ask the use for a toolchain name and create one"""
+    print ":: Choose a toolchain name"
+    answer = raw_input("> ")
+    qitools.run_action("qitoolchain.actions.create", [answer])
+    return answer
+
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.toc_parser(parser)
@@ -159,7 +173,12 @@ def do(args):
 
     toolchain_name = None
     if ask_yes_no("Use a toolchain"):
-        toolchain_name  = ask_toolchain()
+        tc_config = qitoolchain.get_config_path()
+        if not os.path.exists(tc_config):
+            if ask_yes_no("No toolchain found, crate one"):
+                toolchain_name = create_toolchain()
+        else:
+            toolchain_name = ask_toolchain()
 
     env_path = ""
     bat_file = ""
