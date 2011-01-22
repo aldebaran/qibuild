@@ -52,6 +52,33 @@ class QiWorkTree:
             self.configstore.read(self.user_config_path)
             LOGGER.debug("[Qi] worktree configuration:\n" + str(self.configstore))
 
+    def update_config(self, section, name, key, value):
+        """Update the .qi/build.cfg configuration file.
+
+        for instance:
+
+        update_config(
+            foo, bar, spam, eggs
+        )
+
+        will write:
+        [foo 'bar']
+        spame = eggs
+
+        """
+        import ConfigParser
+        parser = ConfigParser.ConfigParser()
+        parser.read(self.user_config_path)
+        section_name = '%s "%s"' % (section, name)
+        if not parser.has_section(section_name):
+            parser.add_section(section_name)
+        if type(value) == type(""):
+            parser.set(section_name, key, value)
+        if type(value) == type([""]):
+            parser.set(section_name, key, " ".join(value))
+        with open(self.user_config_path, "w") as config_file:
+            parser.write(config_file)
+
 def qiworktree_open(work_tree=None, use_env=False):
     """ open a qi worktree
         return a valid QiWorkTree instance
