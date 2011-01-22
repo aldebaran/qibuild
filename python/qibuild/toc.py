@@ -198,9 +198,10 @@ class Toc(QiWorkTree):
         """
         path = path.strip()
         path = path.replace("\n", "")
+        LOGGER.debug("adding %s to PATH", path)
         env_path = os.environ["PATH"]
-        if not env_path.endswith(";"):
-            env_path += ";"
+        if not env_path.endswith(os.path.pathsep):
+            env_path += os.path.pathsep
         env_path += path
         os.environ["PATH"] = env_path
 
