@@ -162,6 +162,15 @@ def do(args):
     if not args.interactive:
         return
 
+    try:
+        run_wizard(qiworktree)
+    except KeyboardInterrupt:
+        # Remove the half-configured config file,
+        # so that the user can re-run the wizard again:
+        dot_qi = os.path.join(qiworktree.work_tree, ".qi")
+        qitools.sh.rm(dot_qi)
+
+def run_wizard(qiworktree):
     cmake_generator = ask_cmake_generator()
 
     default_build_config = None
