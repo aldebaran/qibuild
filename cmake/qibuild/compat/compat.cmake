@@ -213,3 +213,7 @@ function(gen_sdk_trampoline _binary_name _trampo_name)
   qi_deprecated("unimplemented")
 endfunction()
 
+# hack:
+function(add_msvc_precompiled_header)
+  warning("add_msvc_precompiled_header not implemented yet")
+endfunction()
