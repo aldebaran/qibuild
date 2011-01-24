@@ -50,7 +50,11 @@ endfunction()
 #! display a deprecated message
 # \argn: a message
 function(qi_deprecated)
-  message(WARNING "DEPRECATED: ${ARGN}")
+  if(NO_WARN_DEPRECATED)
+    return()
+  else()
+    message(WARNING "DEPRECATED: ${ARGN}")
+  endif()
 endfunction()
 
 #! display a warning message
