@@ -56,7 +56,7 @@ function(create_bin)
   qi_create_bin(${ARGN})
 endfunction()
 
-function(create_script _name _namein)
+function(create_script)
   qi_deprecated("create_script is deprecated:
     use qi_create_script instead")
   qi_create_script(${ARGN})
@@ -68,13 +68,13 @@ function(create_lib)
   qi_create_lib(${ARGN})
 endfunction()
 
-function(create_config_h _header _nameout)
+function(create_config_h)
   qi_deprecated("create_config_h is deprecated:
     use qi_create_config_h instead")
   qi_create_config_h(${ARGN})
 endfunction()
 
-function(create_gtest _name)
+function(create_gtest)
   qi_deprecated("create_gtest is deprecated:
     use qi_create_gtest instead")
   qi_create_gtest(${ARGN})
@@ -92,7 +92,7 @@ function(use _NAME)
   ")
 endfunction()
 
-function(use_lib _name)
+function(use_lib)
   qi_use_lib("use qi_use_lib instead.
     Note that the names can be target names.
 
@@ -178,6 +178,22 @@ function(stage_lib _targetname _name)
       qi_stage_lib(foo)
 
   ")
+  string(TOUPPER ${_targetname} _U_targetname)
+  if (NOT ${_U_targetname} STREQUAL ${_name})
+    warning("
+      Not using stage_lib(foo FOO) where the second
+      argument if not equals to the upper-version of the first
+      argument is not supported anymore.
+
+      Please replace:
+      stage_lib(${_targetname} ${_U_targetname})
+
+      instead of:
+      stage_lib(${_targetname} ${name})
+    "
+    )
+    # FIXME: stage the lib with an other name ...
+  endif()
   qi_stage_lib(${_targetname} ${ARGN})
 endfunction()
 
