@@ -7,6 +7,12 @@
 
 include(CMakeParseArguments)
 
+# FIXME: file(APPEND) is not such a good idea.
+# calling cmake mutliple times without deleting build/skd
+# lead to very long -config.cmake generated files...
+
+# Of course, qibuild configure could delete build/sdk after having
+# deleted CMakeCache, but let's be clean here
 
 #
 # Write a set of exported CMake variables into a cmake module.
