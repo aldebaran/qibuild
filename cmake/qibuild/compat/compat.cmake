@@ -5,6 +5,32 @@
 ## Copyright (C) 2009, 2010, 2011 Cedric GESTES
 ##
 
+
+# This is to be used when the names of the
+# flags have changed:
+
+
+# TODO:
+# - subfolder in install_ functions
+# - ALL, REQUIRED, LINUX, in use_lib() <- filter this
+#
+
+
+# Example:
+# After calling:
+#      _fix_flags(_res DEPENDS DEPENDENCIES
+#          foo SRC foo.h foo.cpp DEPENDENCIES bar)
+# _res equals:
+#  "foo;SRC;foo.h;foo.cpp;DEPENDS;bar
+function(_fix_flags _res _old _new)
+  set(_out)
+  foreach(_flag ${ARGN})
+    string(REPLACE ${_old} ${_new} _new_flag ${_flag})
+    list(APPEND _out ${_new_flag})
+  endforeach()
+  set(${_res} ${_out} PARENT_SCOPE)
+endfunction()
+
 function(sdk_add_include _name _subfolder)
   qi_deprecated("no implementation")
 endfunction()
@@ -77,39 +103,39 @@ endfunction()
 function(create_gtest)
   qi_deprecated("create_gtest is deprecated:
     use qi_create_gtest instead")
-  qi_create_gtest(${ARGN})
+  _fix_flags(_new_args DEPENDENCIES DEPENDS ${ARGN})
+  qi_create_gtest(${_new_args})
 endfunction()
 
 function(create_cmake _NAME)
-  qi_deprecated("create_cmake is deprecated:
-    Simply put you cmake code in you_project/cmake/modules
-  ")
+  qi_deprecated("create_cmake is deprecated
+    use qi_stage_cmake instead.")
+  qi_stage_cmake(${_NAME})
 endfunction()
 
-function(use _NAME)
-  qi_deprecated("use is deprecated:
-    Use the regular include() function instead
+function(use)
+  qi_deprecated("use() is deprecated
+   Simply use find_package() instead.
+  Old:
+    create_cmake(foo)
+    use(foo)
+  New:
+    qi_stage_cmake(foo)
+    find_package(foo)
   ")
+  find_package(${ARGN} QUIET)
 endfunction()
 
 function(use_lib)
-  qi_use_lib("use qi_use_lib instead.
+  qi_deprecated("use_lib is deprecated.
     Note that the names can be target names.
-
-    For instance, intead of:
-
+    old:
       create_lib(foo foo.cpp)
-
       stage_lib(foo FOO)
-
       use_lib(bar FOO)
-
-
-    you can do:
+    new:
       qi_create_lib(foo foo.cpp)
-
       qi_stage_lib(foo)
-
       qi_use_lib(bar foo)
   ")
   qi_use_lib(${ARGN})
@@ -142,15 +168,13 @@ endfunction()
 
 function(warning)
   qi_deprecated("warning is deprecated:
-    Use qi_warning instead:
-  ")
+    Use qi_warning instead")
   qi_warning(${ARGN})
 endfunction()
 
 function(error)
   qi_deprecated("error is deprecated:
-    Use qi_error instead:
-  ")
+    Use qi_error instead")
   qi_error(${ARGN})
 endfunction()
 
@@ -160,36 +184,26 @@ endfunction()
 function(stage_lib _targetname _name)
   qi_deprecated("stage_lib is deprecated:
     Use qi_stage_lib instead.
-
     Warning the signature has changed:
-
     Instead of:
-
       create_lib(foo foo.cpp)
-
       stage_lib(foo FOO)
-
     Use:
-
       qi_create_lib(foo foo.cpp)
-
       # No need for upper-case \"stage name\"
       # anymore:
       qi_stage_lib(foo)
-
   ")
   string(TOUPPER ${_targetname} _U_targetname)
   if (NOT ${_U_targetname} STREQUAL ${_name})
-    warning("
+    qi_warning("
       Not using stage_lib(foo FOO) where the second
       argument if not equals to the upper-version of the first
       argument is not supported anymore.
-
-      Please replace:
-      stage_lib(${_targetname} ${_U_targetname})
-
-      instead of:
-      stage_lib(${_targetname} ${name})
+      Old:
+        stage_lib(${_targetname} ${_U_targetname})
+      New:
+        stage_lib(${_targetname} ${_name})
     "
     )
     # FIXME: stage the lib with an other name ...
@@ -211,9 +225,7 @@ endfunction()
 
 function(cond_subdirectory)
   qi_deprecated("cond_subdirectory is deprecated.
-  Use qi_add_subdirectory() instead.
-
-  ")
+  Use qi_add_subdirectory() instead.")
   qi_add_subdirectory(${ARGN})
 endfunction()
 
@@ -231,5 +243,42 @@ endfunction()
 
 # hack:
 function(add_msvc_precompiled_header)
-  warning("add_msvc_precompiled_header not implemented yet")
+  qi_deprecated("not implemented yet")
 endfunction()
+
+
+
+#####################
+# swig
+#####################
+function(wrap_python)
+  qi_deprecated("wrap_python is deprecated.
+  Instead of:
+    use(PYTHON-TOOLS)
+    wrap_python(foo foo.i
+      SRCS foo.h
+      DEPENDENCIES BAR
+    )
+  Use:
+    include(qibuild/swig/python)
+    qi_swig_wrap_python(foo foo.i
+      SRCS foo.h
+      DEPENDS BAR
+    )
+  "
+  )
+  include(qibuild/swig/python)
+  _fix_flags(_new_args DEPENDENCIES DEPENDS ${ARGN})
+  qi_swig_wrap_python(${ARGN})
+endfunction()
+
+
+#####################
+# tests
+#####################
+function(configure_tests _name)
+  if(BUILD_TESTS)
+    include("${CMAKE_CURRENT_SOURCE_DIR}/${_name}")
+  endif()
+endfunction()
+
