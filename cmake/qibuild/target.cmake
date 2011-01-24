@@ -158,7 +158,12 @@ function(qi_create_lib name)
   cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE" "SUBFOLDER" "SRC;PUBLIC_HEADER;RESOURCE;SUBMODULE;DEPENDS" ${ARGN})
 
   if (ARG_NOBINDLL)
-    qi_warning("Unhandled : NOBINDLL")
+    # NOBINDLL was used for naoqi modules.
+    # We wanted them to end up in
+    # sdk/lib/naoqi/my_module.dll, and not in
+    # sdk/bin/my_module.dll  (which is the place dll should
+    # normally go on windows: next to the .exe)
+    qi_deprecated("Use of NOBINDLL is deprectated")
   endif()
   qi_debug("qi_create_lib(${name} ${ARG_SUBFOLDER})")
 
