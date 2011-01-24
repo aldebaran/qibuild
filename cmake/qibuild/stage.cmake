@@ -40,3 +40,11 @@ endfunction()
 function(qi_stage_header _name)
   qi_warning("qi_stage_header not implemented")
 endfunction()
+#! stage a cmake module
+#
+function(qi_stage_cmake _module)
+  file(COPY "${_module}Config.cmake"
+       DESTINATION
+       "${CMAKE_BINARY_DIR}/sdk/${QI_SDK_CMAKE_MODULES}/")
+ #TODO: install
+endfunction()
