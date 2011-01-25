@@ -5,6 +5,7 @@ around subprocess
 """
 
 import os
+import contextlib
 import logging
 import subprocess
 
@@ -19,6 +20,15 @@ class CommandFailedException(Exception):
 
     def __str__(self):
         return self.message
+
+
+class ProcessCrashedError(Exception):
+    """An ohter custom exception, used with run_script """
+    def __init__(self, script_path):
+        self.process_name = os.path.basename(script_path)
+
+    def __str__(self):
+        return "%s crashed!" % self.process_name
 
 class NotInPath(Exception):
     """Custom exception """
@@ -155,3 +165,42 @@ def _raise_error(cmd, cwd, shell, exception=None, retcode=None, output=None):
     raise CommandFailedException(mess)
 
 
+@contextlib.contextmanager
+def run_script(script_path, args, environ=None):
+    """
+    To be used in a "with" statement.
+
+    with runProcess(...):
+       do_stuff()
+
+    do_other_stuff()
+
+    Process is run in the background, then do_stuff()
+    is called.
+
+    By the time you are executing do_other_stuff(),
+    you know that the process has been killed,
+    better yet, if an exception has occured during
+    do_stuff, this exception is re-raised *after*
+    the process has been killed.
+
+    Useful to write automatic tests.
+    """
+    cmd = [script_path] + args
+    process = subprocess.Popen(cmd)
+    caugth_error = None
+    try:
+        yield
+    except Exception, err:
+        caugth_error = err
+    finally:
+        try:
+            if process.poll() != None:
+                # Process should not have died !
+                raise ProcessCrashedError(script_path)
+            else:
+                process.kill()
+        except ProcessCrashedError, err:
+            caugth_error = err
+    if caugth_error:
+        raise caugth_error
