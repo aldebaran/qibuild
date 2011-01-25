@@ -4,10 +4,13 @@ around subprocess
 
 """
 
-import subprocess
 import os
-from subprocess          import CalledProcessError
 import logging
+import subprocess
+
+LOGGER = logging.getLogger(__name__)
+
+DRYRUN           = False
 
 class CommandFailedException(Exception):
     """Custom exception """
@@ -28,9 +31,6 @@ class NotInPath(Exception):
         mess += "\n".join(os.environ["PATH"].split(os.pathsep))
         return mess
 
-LOGGER = logging.getLogger("qitools.command")
-
-DRYRUN           = False
 
 def check_is_in_path(executable):
     """Check that the given executable is to be found in %PATH%"""
@@ -91,7 +91,7 @@ def check_call(cmd, ignore_ret_code=False,
 
     except OSError as e:
         _raise_error(cmd, cwd, shell, exception=e, output=outputlist)
-    except CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         _raise_error(cmd, cwd, shell, exception=e, output=outputlist)
 
     if ignore_ret_code:
@@ -131,7 +131,7 @@ def call_output(cmd, cwd=None, shell=False, env=None):
         res = process.communicate()[0].split("\n")
     except OSError as e:
         _raise_error(cmd, cwd, shell, e)
-    except CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         _raise_error(cmd, cwd, shell, e)
     return res
 
