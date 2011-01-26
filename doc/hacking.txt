@@ -8,7 +8,7 @@ the code works.
 
 
 
-= Advanced documentation
+== Advanced documentation
 
 The qibuild framework is made in two parts: the first one
 is a CMake framework (just simple wrappers around functions like
@@ -23,7 +23,7 @@ The doc for the Python code can be found link:hacking/python.html[here]
 The doc for the CMake code can be found link:hacking/cmake.html[here]
 
 
-= Contributing
+== Contributing
 
 == Code conventions
 
