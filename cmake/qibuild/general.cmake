@@ -10,7 +10,7 @@ get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 list(APPEND CMAKE_PREFIX_PATH ${_ROOT_DIR}/modules/)
 
 if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
-  list(APPEND CMAKE_MODULE_PATH ${_ROOT_DIR}/extern)
+  list(APPEND CMAKE_MODULE_PATH ${_ROOT_DIR}/upstream-backports)
 endif()
 
 set(QI_ROOT_DIR ${_ROOT_DIR})
@@ -51,7 +51,7 @@ include("qibuild/target")
 include("qibuild/submodule")
 include("qibuild/stage")
 include("qibuild/doc")
-include("qibuild/autotools")
+include("qibuild/external")
 
 list(INSERT CMAKE_PREFIX_PATH 0 ${QI_SDK_DIR})
 
