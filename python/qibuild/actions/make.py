@@ -27,7 +27,11 @@ def do(args):
     toc      = qibuild.toc.toc_open(args.work_tree, args, use_env=True)
 
     (project_names, package_names, not_found) = qibuild.toc.resolve_deps(toc, args)
-    use_incredibuild = toc.configstore.get("general", "build", "incredibuild")
+    use_incredibuild_str = toc.configstore.get("general", "build", "incredibuild")
+    if use_incredibuild_str.lower() in ["1", "true", "on", "yes"]:
+        use_incredibuild = True
+    else:
+        use_incredibuild = False
 
 
     for project_names in project_names:
