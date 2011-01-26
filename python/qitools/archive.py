@@ -85,6 +85,15 @@ def extract_zip(archive_path, dest_dir):
     res = os.path.join(dest_dir, topdir)
     return res
 
+def extract(archive_path, directory):
+    """Extract an archive, calling extract_zip or extract_tar
+    when necessary
+
+    """
+    if archive_path.endswith(".zip"):
+        return extract_zip(archive_path, directory)
+    else:
+        return extract_tar(archive_path, directory)
 
 def zip_win(directory):
     """
