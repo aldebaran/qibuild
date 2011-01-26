@@ -275,7 +275,7 @@ class Toc(QiWorkTree):
         qibuild.cmake(project.directory, project.build_directory, cmake_args)
 
 
-    def build_project(self, project, incredibuild=True, num_jobs=1, target=None):
+    def build_project(self, project, incredibuild=False, num_jobs=1, target=None):
         """Build a project, choosing between  Nmake, Visual Studio or make
 
         """
@@ -293,11 +293,11 @@ class Toc(QiWorkTree):
                 err_message += ", ".join(sln_files)
                 raise Exception(err_message)
             sln_file = sln_files[0]
-            if not incredibuild:
-                qibuild.msbuild(sln_file, build_type=self.build_type, target=target)
+            if incredibuild:
+                qibuild.build_incredibuild(sln_file, build_type=self.build_type, target=target)
                 return
             else:
-                qibuild.build_incredibuild(sln_file, build_type=self.build_type, target=target)
+                qibuild.msbuild(sln_file, build_type=self.build_type, target=target)
                 return
 
         # Not using visual studio: we must have a Makefile
