@@ -18,6 +18,8 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
+    # FIXME: we should build in debug and in release
+    # no matter what when using Visual Studio
     logger   = logging.getLogger(__name__)
     toc      = qibuild.toc_open(args.work_tree, args, use_env=True)
     (project_names, package_names, not_found) = qibuild.toc.resolve_deps(toc, args)
