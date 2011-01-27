@@ -1,89 +1,89 @@
 Architecture
 ============
 
-== QiBuild ==
-Qibuild is a simple tool that build projects taking dependencies and toolchains into account.
+== qiBuild ==
+qiBuild is a simple tool that builds projects taking dependencies and toolchains into account.
 
-We have strong requirement for it:
+We have strong requirements for it:
 
-* as standard as possible
+* be as standard as possible
 * support cross-compilation
 * support visual-studio
-* support building for multiple plateforms with the same source tree
+* support building for multiple platforms with the same source tree
 
 How does it work?
 
 === Toolchains ===
-Toolchains are managed by QiToolchain, the default toolchain is called "system". The system
-toolchain represent your system, libraries and headers will be searched in your system.
+Toolchains are managed by QiToolchain. The default toolchain is called "system". The system
+toolchain represents your system, so that libraries and headers will be searched for in your system.
 Other toolchains use binary packages.
 
 A toolchain is composed of:
 
 * binary packages
-* a list of provided projects (a binary packages can provide multiples projects)
-* optional cmake toolchain file to set cross-compilation specific options (CC, CXX, rootfs, ...)
-* optional cmake flags
+* a list of provided projects (a binary package can provide multiple projects)
+* optional CMake toolchain file to set cross-compilation specific options (CC, CXX, rootfs, ...)
+* optional CMake flags
 
-Each package follow a standard SDK layout (compatible with FHS and cmake guidelines).
+Each package follow a standard SDK layout: compatible with the Filesystem Hierarchy Standard (FHS) and CMake guidelines.
 
 === Packages ===
-A binary package is an archive with a manifest that describe the package (runtime dependencies,
-provided packages, ...) with a standard SDK layout (see bellow).
-Most of the time binary packages are generated from a cmake recipe. We have cmake wrappers around make,
+A binary package is an archive with a manifest that describes the package (runtime dependencies,
+provided packages, ...) with a standard SDK layout (see below).
+Most of the time, binary packages are generated from a CMake recipe. We have CMake wrappers around make,
 jam and autotools based projects to compile external dependencies and install them in build/sdk
-like pure cmake packages. This provide recipe for boost, archive, protobuf, ...
-We can have runtime and devel binary packages. You will always need devel packages when you compile.
-Runtime packages are need to generate release archive. This will only contains data needed to start the program,
-no header, no static libs, no debug symbols...
+like pure CMake packages. ***CLARIFY*** This provide recipe for boost, archive, protobuf, ...
+We can have runtime and development binary packages. You will always need development packages when you compile.
+Runtime packages are needed to generate release archives. These only contain the data needed to start the program - 
+no headers, no static libs, no debug symbols...
 
 === Projects ===
-A project is a folder containing a manifest that describe the project. The manifest contain a list of build
-and runtime dependencies. We only support cmake based projects. (but you could write cmake rules
+A project is a folder containing a manifest that describes the project. The manifest contains a list of build
+and runtime dependencies. ***CLARIFY*** We only support CMake based projects. (but you could write CMake rules
 to compile autotools etc.. projects).
 
 === WorkTree ===
-To allow qibuild find buildable dependencies a worktree need to be created. A worktree is folder containing a .qi folder.
-You can add as many projects as you want in your worktree, they will be detected automatically,
-you can organise your worktree like you want. The only important point, is to have a qibuild.manifest
-file that describe each buildable projects. If no .qi folder are found, qibuild will not search for
-buildable dependencies. Without worktree it default to how unix projects works: find dependencies only in the system.
+***CLARIFY insert diagram of tree***
+To allow qiBuild to find buildable dependencies, a worktree needs to be created. A worktree is folder containing a .qi folder.
+You can add as many projects as you want to your worktree, they will be detected automatically. Your worktrees can be organised as you wish, the only important point, is to have a qibuild.manifest
+file that describes each buildable project. If no .qi folder is found, qiBuild will not search for
+buildable dependencies. Without a worktree, the default behavior is the same as how unix projects work: find dependencies only in the system.
 
 === 1,2,3 Compile ===
-Now how do you combine all the above concepts?
+Now how do you combine all these concepts?
 
-Building a project involve searching for each dependencies, looking in the current toolchain
-which one are provided and build the others from sources. You can add or remove a project
-from your toolchain to decide if you want to build it or no.
+Building a project involves searching for each dependency, looking in the current toolchain for binary projects provided and build the others from source. You can add or remove a project
+from your toolchain to decide if you want to build it or not.
 
 
-== CMAKE ==
-QiBuild support multiple build directories for a given source tree. This allow you to
-build for multiples plateforms using the same source tree. You can have a build folder
+== CMake ==
+***CLARIFY insert diagram of multiple builds ***
+qiBuild supports multiple build directories for a given source tree. This allows you to
+build for multiples platforms using the same source tree. You can have a build folder
 for windows next to a build folder for linux. You will find a SDK in each build folder.
 
 === the SDK layout ===
 This part explain what a project should generate (once compiled) to be a valid SDK. A valid SDK
-is a folder where cmake can find targets, libraries and headers. You will find the SDK layout in
-multiples places. When you build a project, a build folder is created, this build folder contain
+is a folder where CMake can find targets, libraries and headers. You will find the SDK layout in
+multiples places. When you build a project, a build folder is created, this build folder contains
 an sdk folder. When you install your project it will follow the SDK layout, finally a binary
-package follow the SDK layout. A SDK folder represent one or more projects. It contains headers,
-libraries, cmake modules (<name>-config.cmake files), and a manifest to describe the content.
-This folder follow link:http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard[FHS] and cmake conventions.
-Just adding the sdk folder to CMAKE_PREFIX_PATH will make find_package, find_path and find_library works.
+package follows the SDK layout. An SDK folder represents one or more projects. It contains headers,
+libraries, CMake modules (<name>-config.cmake files), and a manifest to describe the contents.
+This folder follows link:http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard[FHS] and CMake conventions.
+Just adding the sdk folder to CMake_PREFIX_PATH will make find_package, find_path and find_library work. ***CLARIFY seems complex ***
 
 This layout allow multiples projects to be merged without conflict, furthermore
-software can be installed under a link:http://en.wikipedia.org/wiki/Linux_Standard_Base[LSB]
-compatible system, without breaking established convention. All QiBuild CMake functions
-try to follow those rules. Install rules are autogenerated for executables and libraries.
-The goal being to make it hard to write badly behaving cmake.
+software can be installed on a link:http://en.wikipedia.org/wiki/Linux_Standard_Base[LSB]
+compatible system, without breaking established convention. All qiBuild CMake functions
+try to follow these rules. Install rules are autogenerated for executables and libraries.
+The goal being to make it hard to write CMake that behaves badly.
 
-Install rules have components, this allow to generate too type of binary packages:
+Install rules have components, this allows us to generate two types of binary packages:
  - runtime binary packages
- - devel binary packages
+ - development binary packages
 
 
-A typical layout look like:
+A typical layout looks like this:
 
 ----
 # programs
@@ -98,7 +98,7 @@ A typical layout look like:
 # preferences, maybe prefer /etc?
 /preferences
 
-# cmake files
+# CMake files
 /lib/cmake/<projects>-config.cmake
 
 # qibuild files
@@ -106,21 +106,23 @@ qibuild.manifest
 ----
 
 === Dependencies ===
-There are two types of dependencies, project dependencies and cmake target dependencies.
-Projects have CMakeLists.txt that allow building them, they can have multiple targets (executable or libraries).
-Each target in a project can depends on other target (in the same project or in dependents
-projects specified in the manifest). For example you can have two project A and B.
-A have too target A-lib and A-bin. B have one target B-bin. If the too target B-bin and A-bin
-depends on A-lib, you have two target dependencies:
+There are two types of dependencies, project dependencies and CMake target dependencies.
+Projects have CMakeLists.txt that allows them to be built, and can have multiple targets (resultant executables or libraries).
+Each target in a project can depend on other targets (in the same project or in dependent
+projects specified in the manifest). For example you can have two projects A and B.
+A has two targets A-lib and A-bin. B has one target B-bin. If the two target B-bin and A-bin both
+depend on A-lib, you have two target dependencies:
 
 ----
 #cmake target dependencies
 qi_use_lib(A-bin A-lib)
-qi_use_lib(B-bin B-lib)
+qi_use_lib(B-bin A-lib)
 ----
 
-A-bin that depend on A-lib will always work between they are in the same projects, but if
-you want B's target to find A's target, you need to add a project dependency (in the B manifest):
+A-bin that depends on A-lib will always work because the dependency is in the same projects, but if
+you want B's target to find A's target, you need to add a project dependency (in the B's manifest):
+
+ ***CLARIFY diagram would be nice***
 
 ----
 #project dependencies
@@ -131,60 +133,69 @@ depends = "A"
 
 
 == File Formats ==
-Basically there is two important file format we define. CMake Modules define how cmake
-find a library and compile with it (library path, compiler flags, include directories, dependencies, ..).
-At this level dependencies work at the target level. Now come qibuild.manifest that describe
+Basically there are two important file formats that we define. CMake Modules defines how CMake
+finds libraries and compile with them (library paths, compiler flags, include directories, dependencies, ...).
+At this level dependencies work at the target level. Now comes qibuild.manifest that describes
 the content of a project or package. You can define dependencies between projects here. (a project
 can contain multiples targets).
 
 
 === CMake Modules ===
-For each target we generate a target-config.cmake file that allow finding the target from
-other cmake projects. In reality two config files are generated, one for build/sdk that point
-to the "staged" (build but not installed) libraries. The other is for installed sdk.
+For each target we generate a target-config.cmake file that enables the target to be found from
+other CMake projects. In reality two config files are generated, one for build/sdk that points
+to the "staged" (built but not installed) libraries. The other is for installed sdk.
 
 ==== CMake target ====
-For each cmake target we export a set of specific variables.
+For each CMake target we export a set of specific variables.
 Exported variables:
 
  - <TARGET>_LIBRARIES
  - <TARGET>_INCLUDE_DIRS
  - <TARGET>_DEFINITIONS
 
- - <TARGET>_DEPENDS : qibuild extension to specify dependencies
- - <TARGET>_TARGET  : qibuild extension to specify the associated cmake target name
+ - <TARGET>_DEPENDS : qiBuild extension to specify dependencies
+ - <TARGET>_TARGET  : qiBuild extension to specify the associated CMake target name
 
 ===== Examples =====
-#module inside a SDK (autogenerated by qibuild):
+#module inside an SDK (autogenerated by qiBuild):
 ----
-message(STATUS "This is QIConfig.cmake")
-set(NAOQI_INCLUDE_DIRS "/home/ctaf42/src/qi/naoqi/build/include;/home/ctaf42/src/qi/naoqi/bindings/c;/home/ctaf42/src/qi/naoqi;" CACHE STRING "" FORCE)
+set(NAOQI_INCLUDE_DIRS "/home/joe/src/qi/naoqi/build/include;
+                        /home/joe/src/qi/naoqi/bindings/c;
+                        /home/joe/src/qi/naoqi;"
+                        CACHE STRING "" FORCE)
 set(NAOQI_DEFINITIONS "" CACHE STRING "" FORCE)
-set(NAOQI_LIBRARIES "optimized;/home/ctaf42/src/qi/naoqi/build/sdk/lib/libqi.a;debug;/home/ctaf42/src/qi/naoqi/build/sdk/lib/libqi.a" CACHE STRING "" FORCE)
-set(NAOQI_DEPENDS "BOOST;BOOST_DATE_TIME;BOOST_THREAD;" CACHE STRING "" FORCE)
+set(NAOQI_LIBRARIES "optimized;/home/joe/src/qi/naoqi/build/sdk/lib/libqi.a;
+                     debug;/home/joe/src/qi/naoqi/build/sdk/lib/libqi.a"
+                     CACHE STRING "" FORCE)
+set(NAOQI_DEPENDS "BOOST;BOOST_DATE_TIME;BOOST_THREAD;"
+                   CACHE STRING "" FORCE)
 set(NAOQI_TARGET "qi" CACHE STRING "" FORCE)
 ----
 
 #module installed (autogenerated by qibuild):
 ----
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-set(NAOQI_INCLUDE_DIRS "${_ROOT_DIR}/../../../include/" CACHE STRING "" FORCE)
+set(NAOQI_INCLUDE_DIRS "${_ROOT_DIR}/../../../include/"
+                        CACHE STRING "" FORCE)
 set(NAOQI_DEFINITIONS "" CACHE STRING "" FORCE)
-set(NAOQI_DEPENDS "BOOST;BOOST_DATE_TIME;BOOST_THREAD;Protobuf;ZEROMQ;UUID" CACHE STRING "" FORCE)
+set(NAOQI_DEPENDS "BOOST;BOOST_DATE_TIME;BOOST_THREAD;
+                   Protobuf;ZEROMQ;UUID" CACHE STRING "" FORCE)
 set(NAOQI_D_LIBRARY NAOQI_D_LIBRARY-NOTFOUND CACHE INTERNAL "" FORCE)
 set(NAOQI_LIBRARY   NAOQI_LIBRARY-NOTFOUND   CACHE INTERNAL "" FORCE)
+
 find_library(NAOQI_d_LIBRARY qi_d)
 find_library(NAOQI_LIBRARY qi)
 if (_qi_temp)
-  set(NAOQI_LIBRARIES "optimized;${NAOQI_LIBRARY};debug;${NAOQI_D_LIBRARY}")
+  set(NAOQI_LIBRARIES "optimized;${NAOQI_LIBRARY};
+                       debug;${NAOQI_D_LIBRARY}")
 else()
   set(NAOQI_LIBRARIES "${NAOQI_LIBRARY}")
 endif()
 ----
 
 
-=== qibuild.manifest ===
-qibuild.manifest files describes the content of a project or a package.
+=== qiBuild.manifest ===
+The qiBuild.manifest file describes the contents of a project or a package.
 It should provide the following information:
 
 Required:
@@ -196,8 +207,8 @@ Required:
 Optional:
 
 - cross-compilation options
-- cmake toolchain file
-- cmake definitions
+- CMake toolchain file
+- CMake definitions
 
 #sample qibuild.manifest
 ----
