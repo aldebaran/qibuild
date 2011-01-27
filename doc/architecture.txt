@@ -30,21 +30,37 @@ Each package follow a standard SDK layout: compatible with the Filesystem Hierar
 === Packages ===
 A binary package is an archive with a manifest that describes the package (runtime dependencies,
 provided packages, ...) with a standard SDK layout (see below).
-Most of the time, binary packages are generated from a CMake recipe. We have CMake wrappers around make,
-jam and autotools based projects to compile external dependencies and install them in build/sdk
-like pure CMake packages. ***CLARIFY*** This provide recipe for boost, archive, protobuf, ...
+Binary packages are generated from CMake recipes. Projects are configured, compiled and installed in a temporary directory. This
+temporary directory is compressed to create the binary package.
 We can have runtime and development binary packages. You will always need development packages when you compile.
-Runtime packages are needed to generate release archives. These only contain the data needed to start the program - 
+Runtime packages are needed to generate release archives. These only contain the data needed to start the program -
 no headers, no static libs, no debug symbols...
 
 === Projects ===
-A project is a folder containing a manifest that describes the project. The manifest contains a list of build
-and runtime dependencies. ***CLARIFY*** We only support CMake based projects. (but you could write CMake rules
-to compile autotools etc.. projects).
+A project is a folder containing a CMakeLists.txt and a manifest that describes the project. The manifest contains a list of build
+and runtime dependencies.
+
+Only CMake projects are supported, but you can write a CMakeLists to compile external projects.
+That way you can build projects using make, autotools, jam, ...
+
+For example, here the CMakeLists that compile protobuf:
+----
+cmake_minimum_required(VERSION 2.8)
+project(ProtoBuf NONE)
+include(qibuild.cmake)
+qi_build_autotools(protobuf
+                   "http://protobuf.googlecode.com/files/protobuf-2.3.0.tar.bz2"
+                   MD5 "f2964f636b3c67d1e9d8b90819fa8ddb"
+                   PATCH ${CMAKE_CURRENT_SOURCE_DIR}/0001-protobuf-fix-compilation.patch)
+----
+
+This will download, configure, compile and install protobuf in the SDK folder of your build directory. You will be
+able to use use protobuf from the build/sdk directory, or generate a binary package from that.
+
 
 === WorkTree ===
 ***CLARIFY insert diagram of tree***
-To allow qiBuild to find buildable dependencies, a worktree needs to be created. A worktree is folder containing a .qi folder.
+To allow qiBuild to find buildable dependencies, a worktree needs to be created. A worktree is a folder containing a .qi folder.
 You can add as many projects as you want to your worktree, they will be detected automatically. Your worktrees can be organised as you wish, the only important point, is to have a qibuild.manifest
 file that describes each buildable project. If no .qi folder is found, qiBuild will not search for
 buildable dependencies. Without a worktree, the default behavior is the same as how unix projects work: find dependencies only in the system.
@@ -52,7 +68,7 @@ buildable dependencies. Without a worktree, the default behavior is the same as 
 === 1,2,3 Compile ===
 Now how do you combine all these concepts?
 
-Building a project involves searching for each dependency, looking in the current toolchain for binary projects provided and build the others from source. You can add or remove a project
+Building a project involves searching for each dependency, looking in the current toolchain for provided binary projects and build the others from source. You can add or remove a project
 from your toolchain to decide if you want to build it or not.
 
 
@@ -64,15 +80,21 @@ for windows next to a build folder for linux. You will find a SDK in each build 
 
 === the SDK layout ===
 This part explain what a project should generate (once compiled) to be a valid SDK. A valid SDK
-is a folder where CMake can find targets, libraries and headers. You will find the SDK layout in
-multiples places. When you build a project, a build folder is created, this build folder contains
-an sdk folder. When you install your project it will follow the SDK layout, finally a binary
-package follows the SDK layout. An SDK folder represents one or more projects. It contains headers,
-libraries, CMake modules (<name>-config.cmake files), and a manifest to describe the contents.
-This folder follows link:http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard[FHS] and CMake conventions.
-Just adding the sdk folder to CMake_PREFIX_PATH will make find_package, find_path and find_library work. ***CLARIFY seems complex ***
+is a folder where CMake can find targets, libraries and headers. An SDK folder represents one or
+more projects. It contains headers, libraries, CMake modules (<name>-config.cmake files), and a
+manifest to describe the contents. You will find the SDK layout in multiples places:
 
-This layout allow multiples projects to be merged without conflict, furthermore
+- each build folder contains an SDK folder (for example build-linux/sdk)
+- installed projects follows the SDK layout
+- binary packages follows the SDK layout
+
+This folder follows link:http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard[FHS] and CMake conventions.
+
+Because the SDK layout follow CMake conventions, if you add the folder to the CMAKE_PREFIX_PATH cmake variable
+in another project, all standard cmake functions to search packages, headers and libraries will works with projects
+in your SDK.
+
+Because this layout follows the FHS, it allow multiples projects to be merged without conflict, furthermore
 software can be installed on a link:http://en.wikipedia.org/wiki/Linux_Standard_Base[LSB]
 compatible system, without breaking established convention. All qiBuild CMake functions
 try to follow these rules. Install rules are autogenerated for executables and libraries.
