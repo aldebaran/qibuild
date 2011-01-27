@@ -7,7 +7,6 @@
 
 #! QiBuild UseLib
 # ===============
-# Cedric GESTES <gestes@aldebaran-robotics.com>
 #
 # == Overview ==
 # qi_use_lib handle dependencies between projects.

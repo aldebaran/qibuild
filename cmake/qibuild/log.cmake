@@ -2,12 +2,11 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
 #! QiBuild Log
 # ============
-# Cedric GESTES <gestes@aldebaran-robotics.com>
 
 #!
 # This modules implement log message with different verbose level.

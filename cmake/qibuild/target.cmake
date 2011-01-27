@@ -2,12 +2,11 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2008, 2010 Aldebaran Robotics
+## Copyright (C) 2008, 2010, 2011 Aldebaran Robotics
 ##
 
 #! QiBuild Target
 # ===============
-# Cedric GESTES <gestes@aldebaran-robotics.com>
 
 #!
 # This is the main QiBuild module. It encapsulate the creation of programs,

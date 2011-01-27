@@ -1,6 +1,5 @@
 QiBuild
 =======
-Cedric GESTES <cgestes@aldebaran-robotics.com>
 
 QiBuild CMake API
 -----------------

@@ -2,12 +2,11 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
 #! QiBuild Stage
 # ===============
-# Cedric GESTES <gestes@aldebaran-robotics.com>
 #
 # This module make libraries and executables build in this projects available
 # to others projects.

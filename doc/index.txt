@@ -1,6 +1,5 @@
 QiBuild
 =======
-Cedric GESTES <cgestes@aldebaran-robotics.com>
 
 Introduction
 ------------
@@ -39,4 +38,6 @@ Manpages:
 * link:qitoolchain-manpage.html[qitoolchain manpage]
 
 
-
+Authors
+-------
+Cedric GESTES <gestes@aldebaran-robotics.com> : main design, cmake, python, doc
