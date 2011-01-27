@@ -104,7 +104,7 @@ def zip_win(directory):
     # Convert to DOS path just to be sure:
     directory    = os.path.normpath(directory)
     archive_name = os.path.normpath(archive_name)
-    cmd = ["7zip.exe", "a", archive_name, directory]
+    cmd = ["7z", "a", archive_name, directory]
     qitools.command.check_call(cmd)
     return archive_name
 
