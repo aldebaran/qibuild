@@ -12,76 +12,67 @@
 # This cmake module provide function to interface gtest with ctest.
 
 
-set(_TESTS_RESULTS_FOLDER "${CMAKE_BINARY_DIR}/tests-results" CACHE INTERNAL "" FORCE)
+set(_TESTS_RESULTS_FOLDER "${CMAKE_SOURC_DIR}/tests-results" CACHE INTERNAL "" FORCE)
 # create tests_results folder if it does not exist
 file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
 
 
+#! Add a test using a binary that was created by qi_create_bin
+# The only difference with add_test() is that qi_add_test will deal with
+# the fact that the the binary is in sdk/ directory, and than it is named
+# with _d on visual studio.
+# \param:TIMETOUT the timeout of the test
+# \group:ARGUMENTS arguments to pass to add_test
+function(qi_add_test test_name target_name)
+  cmake_parse_arguments(ARG "" "TIMEOUT;ARGUMENTS" "" ${ARGN})
+  if(NOT ARG_TIMEOUT)
+    set(ARG_TIMEOUT 20)
+  endif()
+  if(WIN32)
+    if (${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
+      add_test(${test_name} ${QI_SDK_DIR}/${target_name}_d ${ARG_ARGUMENTS})
+    else()
+      add_test(${test_name} ${QI_SDK_DIR}/${target_name} ${ARG_ARGUMENTS})
+    endif()
+  else()
+    # Not on windows, no need to make a distinction:
+    add_test(${test_name} ${QI_SDK_DIR}/${target_name} ${ARG_ARGUMENTS})
+  endif()
+  set_tests_properties(${test_name} PROPERTIES
+    TIMEOUT ${ARG_TIMEOUT}
+  )
+endfunction()
+
+
+
 #! This compiles and add_test's a C++ test that uses gtest.
 # (so that the test can be run by CTest)
-# When run, the C++ test outputs a xUnit xml file in CMAKE_SOURCE_DIR/test_name.xml.
+# When run, the C++ test outputs a xUnit xml file in
+# ${CMAKE_SOURCE_DIR}/test-results/${test_name}.xml
 #
 # \flag:NO_ADD_TEST do not call add_test, just create the binary
 # \param:TIMEOUT the timeout of the test
 # \group:SRC sources
 # \group:DEPENDS dependencies to pass to use_lib
 # \group:ARGUMENTS arguments to pass to add_test (to your test program)
-function(qi_create_gtest name)
-  qi_debug("qi_create_gtest(${name})")
+function(qi_create_gtest test_name target_name)
   cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
 
-  if (NOT TARGET "autotest")
-    add_custom_target("autotest")
-  endif()
-
-  if(NOT ARG_TIMEOUT)
-    set(ARG_TIMEOUT 20)
-  endif()
-
-  # Create the binary test, link with dependencies.
-  if (BUILD_TESTS)
-    qi_create_bin("${name}_bin" ${ARG_SRC} NO_INSTALL)
-  else()
-    qi_create_bin("${name}_bin" EXCLUDE_FROM_ALL ${ARG_SRC} NO_INSTALL)
-  endif()
-  add_dependencies("autotest" "${name}_bin")
-  qi_use_lib("${name}_bin" ${ARG_DEPENDS})
-
-  if (ARG_NO_ADD_TEST)
-    return()
-  endif()
-
-  #TODO: get this back
-  return()
-
-  # use sdk trampoline (.bat on windows) to set all environment variables correctly.
-  if(WIN32)
-    #TODO: get this back
-    #qi_create_insource_launcher("${name}_bin" "${name}.bat")
-    qi_add_gtest("${name}.bat" ${name} ARGUMENTS ${_arguments})
-  else()
-    #TODO: get this back
-    #qi_create_insource_launcher("${name}_bin" ${name})
-    qi_add_gtest(${name} ${name} ARGUMENTS ${_arguments})
-  endif()
-  set_tests_properties(${name} PROPERTIES TIMEOUT ${_timeout})
-endfunction()
+  # First, create the target
+  qi_create_bin(${target_name} SRC ${ARG_SRC})
+  qi_use_lib(${target_name} ${ARG_DEPENDS})
 
 
-#! add a gtest program to ctest.
-# Xml output (test_name.xml) will be in build/tests_results
-#
-# \arg:executable_name the executable
-# \arg:test_case_name the test's name
-# \argn: program arguments
-function(qi_add_gtest executable_name test_name)
-  set(xml_output_name "${_TESTS_RESULTS_FOLDER}/${_test_name}.xml")
+  # Build a correct xml output name
+  set(xml_output "${_TESTS_RESULTS_FOLDER}/${test_name}.xml")
 
-  # Replaces / for windows, and remove .bat from xml name:
   if (WIN32)
-    string(REPLACE "/" "\\\\" xml_output_name ${xml_output_name})
+    string(REPLACE "/" "\\\\" xml_output ${xml_output})
   endif()
 
-  # Add gtest for ctest with xml output file.
-  add_test(${test_name} ${SDK_DIR}/bin/${executable_name} --gtest_output=xml:${xml_output_name} ${ARGN})
+  # Call qi_add_test with correct arguments:
+  qi_add_test({test_name} ${target_name}
+    TIMEOUT ${ARG_TIMEOUT}
+    ARGUMENTS --gest_output=xml:${_xml_output} ${ARG_ARGUMENTS}
+  )
 endfunction()
