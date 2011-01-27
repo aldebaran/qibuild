@@ -19,7 +19,7 @@ function(qi_create_asciidoc subfoldername)
   if(ASCIIDOC_FOUND)
     if (NOT TARGET "doc")
       add_custom_target("doc")
-    endif (NOT TARGET "doc")
+    endif()
 
     make_directory("${SDK_DIR}/share/doc/${subfoldername}/")
     foreach(_file ${ARGN})
@@ -74,7 +74,7 @@ function(qi_create_doxygen)
   if (DOXYGEN_EXECUTABLE)
     if (NOT TARGET "doc")
       add_custom_target("doc")
-    endif (NOT TARGET "doc")
+    endif()
 
     #find a unique targetname
     #how to we do n+n? ok we wont... n + n = nn no?

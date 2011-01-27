@@ -15,6 +15,6 @@ clean(BLUEZ)
 if (NOT TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
   fpath(BLUEZ bluetooth/bluetooth.h)
   flib(BLUEZ bluetooth)
-endif (NOT TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
+endif()
 
 export_lib(BLUEZ)

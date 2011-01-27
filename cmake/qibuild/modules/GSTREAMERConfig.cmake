@@ -27,6 +27,6 @@ flib (GSTREAMER  NAMES
 if (APPLE)
   depend (GSTREAMER REQUIRED ICONV)
   depend (GSTREAMER REQUIRED GETTEXT)
-endif (APPLE)
+endif()
 
 export_lib(GSTREAMER)

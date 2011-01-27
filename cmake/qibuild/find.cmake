@@ -97,9 +97,9 @@ function(flib prefix)
 
   if (${name}_LIB)
     set(${prefix}_LIBRARIES ${_keyword} "${${name}_LIB}" ${${prefix}_LIBRARIES} CACHE STRING "" FORCE)
-  else (${name}_LIB)
+  else()
     message(STATUS "[${prefix}] Cannot find library: ${name} NOT FOUND")
-  endif (${name}_LIB)
+  endif()
 
   #list(APPEND ${prefix}_LIBRARIES "${${_modulelist}_LIB}")
   qi_debug("LIBFIND: RESULT: ${${_modulelist}_LIB}")

@@ -15,6 +15,6 @@ clean(ALSALIB)
 if (NOT TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
   fpath(ALSALIB alsa/asoundlib.h)
   flib(ALSALIB asound)
-endif (NOT TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
+endif()
 
 export_lib(ALSALIB)
