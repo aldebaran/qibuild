@@ -17,9 +17,6 @@ python doc/tools/generate_doc_from_cmake.py \
   "cmake/samples" \
   "build-doc"
 
-
-PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py build-doc/qibuild-manpage.txt
-
 if [ -f /etc/asciidoc/javascripts/asciidoc-xhtml11.js ] ; then
   cp "/etc/asciidoc/javascripts/asciidoc-xhtml11.js" "build-doc"
 fi
@@ -27,6 +24,9 @@ cp "doc/asciidoc/pygments.css"                     "build-doc"
 cp "doc/asciidoc/bare.css"                         "build-doc"
 
 cp doc/*.txt                                        build-doc
+
+PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py doc/qibuild-manpage.txt     build-doc/qibuild-manpage.txt     "qibuild.actions"
+PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py doc/qitoolchain-manpage.txt build-doc/qitoolchain-manpage.txt "qitoolchain.actions"
 
 find ${CURDIR}/build-doc/ -type f -name '*.txt' | while read f ; do
   #asciidoc is stupid about css...

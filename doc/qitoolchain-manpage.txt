@@ -1,0 +1,62 @@
+QITOOLCHAIN(1)
+==============
+:doctype: manpage
+
+
+NAME
+----
+qitoolchain - get and install binary packages.
+
+
+SYNOPSIS
+--------
+*qitoolchain* ['OPTIONS'] COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
+
+
+DESCRIPTION
+-----------
+The command line program qitoolchain provide severals actions to work with projects.
+
+
+COMMANDS
+--------
+%s
+
+
+OPTIONS
+-------
+*-h, --help* ['TOPIC']::
+    Print help TOPIC. *--help* 'topics' will print a list of help
+    topics, *--help*='syntax' summarizes AsciiDoc syntax,
+    *--help*='manpage' prints the AsciiDoc manpage.
+
+*-v, --verbose*::
+    Print verbose output.
+
+CONFIGURATION
+-------------
+The configuration file is stored in .config/qi/toolchain.cfg. +
+The following keys are available:
+
+Toolchain::
+
+*toolchain.<name>.feed*:::
+    The toolchain feed, an url from which qitoolchain will fetch new binary packages.
+
+*toolchain.<name>.provide*:::
+    The list of project provided by the toolchain
+    Name of projects that should not be build but instead taken from the toolchain.
+
+
+EXIT STATUS
+-----------
+*0*::
+    Success
+
+*1*::
+    Failure
+
+
+BUGS
+----
+    th3r3 15 n0 5p00n
