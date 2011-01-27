@@ -132,7 +132,7 @@ class Toolchain(object):
 
         LOGGER.info("Adding package %s", package_name)
         urllib.urlretrieve(url, archive_path)
-        qitools.archive.extract_tar(archive_path, get_rootfs(self.name))
+        qitools.archive.extract(archive_path, get_rootfs(self.name))
         self._packages.append(Package(package_name))
 
     def update(self, new_feed=None, all=False):

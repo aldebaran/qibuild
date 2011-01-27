@@ -31,6 +31,6 @@ def do(args):
         toc.configure_project(project)
         toc.build_project(project)
         toc.install_project(project, destdir)
-        archive = qitools.archive.zip_unix(destdir)
+        archive = qitools.archive.zip(destdir)
         logger.info("Archive generated in %s", archive)
 

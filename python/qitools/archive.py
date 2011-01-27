@@ -121,3 +121,13 @@ def zip_unix(directory):
     qitools.command.check_call(cmd, cwd=work_dir)
     full_archive_name = os.path.join(work_dir, base_archive_name)
     return full_archive_name
+
+def zip( directory):
+    """Zip a directory, using .tar.gz or .zip according to the current
+    platform
+
+    """
+    if sys.platform.startswith("win"):
+        return zip_win(directory)
+    else:
+        return zip_unix(directory)
