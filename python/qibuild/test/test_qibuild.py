@@ -35,7 +35,9 @@ class QiBuildTestCase(unittest.TestCase):
         with open(qi_cfg_path, "r") as fp:
             qi_cfg = fp.read()
         # Run git clean -fdx to be sure build dir is clean:
-        qitools.command.check_call(["git", "clean", "-fdx"], cwd=self.test_dir)
+        qitools.command.check_call(["git", "clean", "-fdx"],
+                cwd=self.test_dir,
+                ignore_ret_code = True)
         # Re-write the .qi/build.cfg file:
         qitools.sh.mkdir(os.path.join(self.test_dir, ".qi"))
         with open(qi_cfg_path, "w") as fp:
