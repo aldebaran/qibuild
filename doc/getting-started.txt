@@ -16,6 +16,8 @@ fine on python 2.6, too.
 CMake version 2.8.3 is the preferred version, but you should
 not have any problem with CMake 2.6.
 
+*** CLARIFY procedure for linux/windows/osx, we dont want users to setup PATH,
+maybe just call ./install-wrapper.sh ? or easy_install qibuild ? ***
 Be sure PYTHONPATH is set to /path/to/qibuild/python and
 that  qibuild (from /path/to/qibuild/bin/qibuild) is in PATH.
 
@@ -28,9 +30,9 @@ Creating a work tree
 First you need to chose a qibuild "worktree".
 
 This path will be searched by qibuild to find the sources
-of your pojects.
+of your projects.
 
-For the following, we call this worktree QI_WORK_TREE
+In the following document, we call this worktree QI_WORK_TREE.
 
 Then go to this directory and run:
 
@@ -93,8 +95,8 @@ to use Visual Studio 2008:
   cmake_generator = "Visual Studio 9 2008"
 ----
 
-Configuring QiBuild for MinGWin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Configuring QiBuild for MinGW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You will have to do several things for qibuild to work with
 MinGW.
@@ -104,7 +106,7 @@ MinGW.
 * Make sure CMake uses the correct generator,
 
 Here's what a complete .qi/build.cfg would look like to use
-MinGWin:
+MinGW:
 
 [source, ini]
 ----
@@ -129,7 +131,7 @@ qibuild create-new-proj foo
 
 This will create a new project in QI_WORK_TREE/foo.
 
-Let's have a look of what has been generated:
+Let's have a look at what has been generated:
 
 [source, bash]
 ----
@@ -146,7 +148,7 @@ foo
 * CMakeLists.txt : this is a script file that will be read by CMake to generate
 makefiles, or Visual Studio solutions.
 
-* qibuild.cmake : this file MUST be included for CMake to find the qibuild/cmake
+* qibuild.cmake : this file MUST be included by the CMakeLists.txt to find the qibuild/cmake
 framework
 
 * qibuild.manifest : this file MUST be present for qibuild to know how to build the

@@ -12,8 +12,8 @@ and that you've managed to compile a basic project.
 
 In this tutorial, we are going to create two projects: +hello+ and +world+.
 
-The +world+ project contains sources to build a  dynamic library
-(libwolrd.so or world.dll)
+The +world+ project contains sources to build a dynamic library
+(libworld.so or world.dll)
 
 The +hello+ project contains source to build an executable named hello which depends
 on the world library.
@@ -23,7 +23,7 @@ It also contains a small test that simply tries to launch hello.
 
 The sources of this example can be found here:...
 
-Extract the archive in your QiBuild worktree, you should end up with something looking like
+Extract the archive in your QiBuild worktree, you should end up with something looking like:
 
 [source, bash]
 ----
@@ -65,9 +65,9 @@ and that building hello also built the world project.
 You can also see that, on windows, the world DLL has been copied right next to hello.exe,
 so running qibuild test hello just worked.
 
-If you are using visual studio, you can open then hello.sln file in
+If you are using visual studio, you can open hello.sln in
 QI_WORK_TREE/hello/build-.../hello.sln, select "hello" as startup project, and start
-debuggin hello_d.exe right away.
+debugging hello_d.exe right away.
 
 
 A bit of warning here: if you try to compile hello in release, you'll get an error because
@@ -92,7 +92,7 @@ Magic explained
 Dependencies
 ~~~~~~~~~~~~
 
-If you have a look at hello/qibuild.manifest, you can see the following line:
+If you have a look at hello/qibuild.manifest, you can see the following lines:
 
 [source, ini]
 ----
@@ -123,10 +123,8 @@ qi_create_bin(hello "main.cpp")
 qi_use_lib(hello world)
 ----
 
-The call to qi_create_bin and qi_create_lib make sure the binaries are compiled in a
-"sdk" directory.
-
-This way, the build/sdk contains only the results of the compilation that are necessary
+qiBuild always generate binaries and libraries in the SDK directory, this way,
+the build/sdk contains only the results of the compilation that are necessary
 to be used by other projects.
 
 Also, the executables will be created in build/sdk/bin, and the libraries in build/sdk/lib,
