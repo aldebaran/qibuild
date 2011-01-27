@@ -194,6 +194,17 @@ def to_dos_path(path):
     res = path.replace("/", "\\")
     return res
 
+def to_native_path(path):
+    """Return an absolute, native path from a path
+
+    """
+    path = os.path.expanduser(path)
+    path = os.path.normpath(path)
+    path = os.path.abspath(path)
+    if sys.platform.startswith("win"):
+        path = to_dos_path(path)
+    return path
+
 
 class TempDir:
     """This is a nice wrapper around tempfile module.
