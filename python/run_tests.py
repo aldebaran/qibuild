@@ -24,8 +24,12 @@ def run_tests(xml_report=False, build_config="unix"):
         "qibuild", "test", "build-%s.cfg" % build_config)
     qi_test_dir = os.path.join(cur_dir,
         "qibuild", "test", ".qi")
+    qitools.sh.mkdir(qi_test_dir, recursive=True)
     shutil.copy(qi_build_cfg, os.path.join(qi_test_dir, "build.cfg"))
-    qitools.command.check_call(["nosetests", "qibuild"])
+    # If you do not use "-s" here, on windows, a bunch of cmd.exe
+    # windows will be created, and nosetests will exit with error code
+    # 1 without any error mesage...
+    qitools.command.check_call(["nosetests", "-s", "qibuild"], shell=True)
 
 
 
