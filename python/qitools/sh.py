@@ -102,6 +102,18 @@ def rm(name):
         os.remove(name)
 
 
+def mv(src, dest):
+    """Move a file into a directory, but do not crash
+    if dest/src exists
+
+    """
+    if os.path.isdir(dest):
+        dest = os.path.join(dest, os.path.basename(src))
+    if os.path.exists(dest):
+        os.remove(dest)
+    shutil.move(src, dest)
+
+
 def ls_r(directory):
     """Returns a sorted list of all the files present in a diretory,
     relative to this directory.
