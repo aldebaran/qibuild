@@ -2,17 +2,16 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2009, 2010 Cedric GESTES
+## Copyright (C) 2009, 2010, 2011 Cedric GESTES
 ##
 
 #! QiBuild Tests
 # ==============
-# Cedric GESTES <gestes@aldebaran-robotics.com>
 #
 # This cmake module provide function to interface gtest with ctest.
 
 
-set(_TESTS_RESULTS_FOLDER "${CMAKE_SOURC_DIR}/tests-results" CACHE INTERNAL "" FORCE)
+set(_TESTS_RESULTS_FOLDER "${CMAKE_SOURCE_DIR}/tests-results" CACHE INTERNAL "" FORCE)
 # create tests_results folder if it does not exist
 file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
 
@@ -73,6 +72,6 @@ function(qi_create_gtest test_name target_name)
   # Call qi_add_test with correct arguments:
   qi_add_test({test_name} ${target_name}
     TIMEOUT ${ARG_TIMEOUT}
-    ARGUMENTS --gest_output=xml:${_xml_output} ${ARG_ARGUMENTS}
+    ARGUMENTS --gtest_output=xml:${_xml_output} ${ARG_ARGUMENTS}
   )
 endfunction()
