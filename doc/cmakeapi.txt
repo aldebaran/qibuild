@@ -81,12 +81,10 @@ Install functions.
 * link:install.html#_qi_install_target[qi_install_target]
 * link:install.html#_qi_install_program[qi_install_program]
 
-link:sdk.html[QiBuild SDK]
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-Find and use external projects provided by external sdk. (sources or binaries)
-
-link:autotools.html[Autotools]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+link:external.html[External Projects]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Build external autotools projects
 
-* link:autotools.html#_qi_build_autotools[qi_build_autotools]
+* link:external.html#_qi_build_autotools[qi_build_autotools]
+* link:external.html#_qi_build_cmake[qi_build_cmake]
+* link:external.html#_qi_install_external_project[qi_install_external_project]
