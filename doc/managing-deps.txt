@@ -128,7 +128,7 @@ the build/sdk contains only the results of the compilation that are necessary
 to be used by other projects.
 
 Also, the executables will be created in build/sdk/bin, and the libraries in build/sdk/lib,
-so that we stick to the LFS convention inside the build/sdk directory.
+so that we stick to the FHS convention inside the build/sdk directory.
 
 On Windows, it also makes sure that binaries compiled in debug contains \_d in their names,
 so you can share the same build directory, and the same visual studio solution for several
