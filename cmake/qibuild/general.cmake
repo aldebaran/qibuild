@@ -2,8 +2,18 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
+
+#yeah allow NORMAL endfunction/endif/..
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+# Bad variable reference syntax is an error.
+cmake_policy(SET CMP0010 NEW)
+#cmake policy push/pop policies before including another cmake
+cmake_policy(SET CMP0011 NEW)
+# if() recognizes numbers and boolean constants.
+cmake_policy(SET CMP0012 NEW)
+
 
 #get the current directory of the file
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
