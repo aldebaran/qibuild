@@ -18,19 +18,22 @@ QiBuild is composed of two parts:
 For more detailled information look at the link:architecture.html[architecture].
 
 
-Writing CMakeLists
-------------------
-Learn how to write cmake list for your projects:
+Tutorials
+---------
+Learn how to use the QiBuild framework to build your
+C++ projects
 
-* link:cmaketutorial.html[QiBuild CMake Tutorials]
+* link:getting-started.html[Getting Started] : Read this first !
+* link:managing-deps.html[Managing dependencies between projects]
+* link:using-a-toolchain.html[Using a toolchain]
+
+
+Documentation
+--------------
+
+QiBuild CMake Framework:
+
 * link:cmakeapi.html[QiBuild CMake API Reference]
-
-Compiling projects
-------------------
-Learn how to use qibuild and qitoolchain to compile your projects:
-
-* link:qibuild.html[QiBuild getting started]
-* link:qitoolchain.html[QiToolchain getting started]
 
 Manpages:
 

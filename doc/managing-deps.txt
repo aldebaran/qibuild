@@ -1,0 +1,188 @@
+Managing dependencies
+=====================
+
+In this tutorial, you will learn how to manage dependencies between projects.
+
+
+Requirements
+------------
+
+In this tutorial, we will assume you have a properly configured QiBuild worktree,
+and that you've managed to compile a basic project.
+
+In this tutorial, we are going to create two projects: +hello+ and +world+.
+
+The +world+ project contains sources to build a  dynamic library
+(libwolrd.so or world.dll)
+
+The +hello+ project contains source to build an executable named hello which depends
+on the world library.
+
+It also contains a small test that simply tries to launch hello.
+
+
+The sources of this example can be found here:...
+
+Extract the archive in your QiBuild worktree, you should end up with something looking like
+
+[source, bash]
+----
+.qi
+|__ build.cfg
+world
+|__ CMakeLists.txt
+|__ qibuild.cmake
+|__ qibuild.manifest
+|__ world
+    |__ world.h
+    |__ world.cpp
+hello
+|__ CMakeLists.txt
+|__ qibuild.cmake
+|__ qibuild.manifest
+|__ main.cpp
+----
+
+
+
+
+Magic !
+-------
+
+Configuring and building the hello project is as easy as:
+
+[source, bash]
+----
+qibuild configure hello
+qibuild make hello
+qibuild test hello
+----
+
+
+You can see that configuring hello caused the world project to be configured too,
+and that building hello also built the world project.
+
+You can also see that, on windows, the world DLL has been copied right next to hello.exe,
+so running qibuild test hello just worked.
+
+If you are using visual studio, you can open then hello.sln file in
+QI_WORK_TREE/hello/build-.../hello.sln, select "hello" as startup project, and start
+debuggin hello_d.exe right away.
+
+
+A bit of warning here: if you try to compile hello in release, you'll get an error because
+"world" has not been compiled in release, so world.lib could not found.
+
+Simply run:
+[source, bash]
+----
+qibuild configure --release world
+qibuild make --release world
+----
+
+And try again.
+
+So, how did it work?
+
+
+Magic explained
+---------------
+
+
+Dependencies
+~~~~~~~~~~~~
+
+If you have a look at hello/qibuild.manifest, you can see the following line:
+
+[source, ini]
+----
+[project "hello"]
+depends = world
+----
+
+Each time you run qibuild, it looks for a .qi to guess your current worktree.
+
+After this, the worktree is parsed to find qibuild.manifest files.
+
+Here, there were two qibuild.manifest files, so qibuild found the two projects: world and hello.
+
+
+CMake magic: staging the world library
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can see we have used:
+
+[source, cmake]
+----
+# In world/CMakeLists:
+qi_create_lib(world SRC world/world.h world/world.cpp)
+qi_stage_lib(world)
+
+# In hello/CMakeLists:
+qi_create_bin(hello "main.cpp")
+qi_use_lib(hello world)
+----
+
+The call to qi_create_bin and qi_create_lib make sure the binaries are compiled in a
+"sdk" directory.
+
+This way, the build/sdk contains only the results of the compilation that are necessary
+to be used by other projects.
+
+Also, the executables will be created in build/sdk/bin, and the libraries in build/sdk/lib,
+so that we stick to the LFS convention inside the build/sdk directory.
+
+On Windows, it also makes sure that binaries compiled in debug contains \_d in their names,
+so you can share the same build directory, and the same visual studio solution for several
+build configurations, without risking to mix binaries compiled in release with binaires compiled in
+debug.
+
+The call to qi_stage_lib caused a world-config.cmake to be generated in
+world/build/sdk/cmake/
+
+When using qibuild configure hello, a dependencies.cmake files was generated
+in hello/build/dependencies.cmake
+
+(this file is automatically included by the qibuild.cmake file)
+
+This file contains the call to:
+[source, cmake]
+----
+list(APPEND CMAKE_PREFIX_PATH "QI_WORK_TREE/world/build/sdk")
+----
+
+So when qi_use_lib(hello, world) was called, we only had to run:
+
+[source, cmake]
+----
+find_package(world)
+----
+
+
+Since the variable CMAKE_PREFIX_PATH was correctly set, CMake could find
+the world-config.cmake file in the build dir of world.
+
+Since everyting under build/sdk follows the conventions, finding the library in
+sdk/lib was easy.
+
+
+Windows DLLs magic
+~~~~~~~~~~~~~~~~~~
+
+Since CMake knows about the dependencies of the hello project, it is easy to
+parse the list of hello dependencies, look for which of them are
+dynamic libraries, and copy them next to the executable in a "post build"
+command.
+
+This is achived by running the cmake script post-copy-dlls.cmake that
+was also generated in the build dir of the hello build directory with
+correct arguements.
+
+(It's a bit similar to the way CMake creates an install rules: you
+just have to call a cmake script with proper arguments to install
+the files)
+
+
+
+
+
