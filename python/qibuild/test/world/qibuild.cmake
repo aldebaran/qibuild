@@ -8,7 +8,7 @@
 # This file is part of the qibuild project    #
 ###############################################
 
-set(QIBUILD_BOOTSTRAP_VERSION 4)
+set(QIBUILD_BOOTSTRAP_VERSION 5)
 
 
 ##
@@ -17,7 +17,7 @@ set(QIBUILD_BOOTSTRAP_VERSION 4)
 # This allow us to find all qibuild/qibuild.cmake
 function(bootstrap)
   find_program(PYTHON_EXECUTABLE NAMES python2 python python.exe)
-  find_program(QI_BUILD_EXECUTABLE qibuild)
+  find_program(QI_BUILD_EXECUTABLE qibuild.py)
 
   if(NOT PYTHON_EXECUTABLE)
     message(STATUS
@@ -42,15 +42,7 @@ function(bootstrap)
     )
     message(FATAL_ERROR "")
   endif()
-
-  if(UNIX)
-    # The Shebang in QI_BUILD_EXECUTABLE will be understood by the OS:
-    set(_cmd ${QI_BUILD_EXECUTABLE})
-  else()
-    # On windows, qibuild_executable will be a python script
-    # put in PATH:
-    set(_cmd ${PYTHON_EXECUTABLE} ${QI_BUILD_EXECUTABLE})
-  endif()
+  set(_cmd ${PYTHON_EXECUTABLE} ${QI_BUILD_EXECUTABLE})
   set(_cmd ${_cmd} configure --single --bootstrap "--build-directory=${CMAKE_BINARY_DIR}")
   execute_process(
       COMMAND ${_cmd}
@@ -89,3 +81,4 @@ else()
 endif()
 
 include(qibuild/general)
+

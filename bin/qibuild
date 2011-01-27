@@ -9,6 +9,8 @@
 """QiBuild command line tool.
 """
 
+# sys.path
+
 try:
     import argparse
 except ImportError:
