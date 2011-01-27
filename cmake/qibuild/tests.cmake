@@ -24,19 +24,18 @@ file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
 # \group:ARGUMENTS arguments to pass to add_test
 function(qi_add_test test_name target_name)
   cmake_parse_arguments(ARG "" "TIMEOUT;ARGUMENTS" "" ${ARGN})
+
   if(NOT ARG_TIMEOUT)
     set(ARG_TIMEOUT 20)
   endif()
-  if(WIN32)
-    if (${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
-      add_test(${test_name} ${QI_SDK_DIR}/${target_name}_d ${ARG_ARGUMENTS})
-    else()
-      add_test(${test_name} ${QI_SDK_DIR}/${target_name} ${ARG_ARGUMENTS})
-    endif()
-  else()
-    # Not on windows, no need to make a distinction:
-    add_test(${test_name} ${QI_SDK_DIR}/${target_name} ${ARG_ARGUMENTS})
+
+  set(_bin_path ${QI_SDK_DIR}/${QI_SDK_BIN}/${target_name})
+  if(WIN32 AND ${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
+    set(_bin_path ${_bin_path}_d)
   endif()
+
+  add_test(${test_name} ${_bin_path} ${ARG_ARGUMENTS})
+
   set_tests_properties(${test_name} PROPERTIES
     TIMEOUT ${ARG_TIMEOUT}
   )
