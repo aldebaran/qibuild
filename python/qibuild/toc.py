@@ -316,18 +316,16 @@ class Toc(QiWorkTree):
     def install_project(self, project, destdir):
         """Install the project """
         build_dir = project.build_directory
-        if self.using_visual_studio:
-          sln_files = glob.glob(build_dir + "/*.sln")
-          sln_file = sln_files[0]
-          qibuild.msbuild(sln_file, build_type=self.build_type, target="INSTALL")
-          return
-
-        if self.using_nmake:
-          cmd = ["nmake", "install"]
-        else:
-          cmd = ["make", "install"]
         build_environ = os.environ.copy()  # Let's not modify os.environ gloablly !
         build_environ["DESTDIR"] = destdir
+        cmd = list()
+        if self.using_visual_studio:
+          install_vcproj = os.path.join(build_dir, "INSTALL.vcproj")
+          cmd = ["MSBuild.exe", "/p:Configuration=%s" % self.build_type, install_vcproj]
+        elif self.using_nmake:
+            cmd = ["nmake", "install"]
+        else:
+            cmd = ["make", "install"]
         qitools.command.check_call(cmd, cwd=build_dir, env=build_environ)
 
 
