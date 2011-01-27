@@ -1,20 +1,18 @@
-QiBuild
-=======
-
 QiBuild CMake API
------------------
+=================
+
 This page presents the public QiBuild cmake API.
 
-link:target.html[QiBuild Target]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+link:target.html[Target]
+------------------------
 Functions for creating targets. This include binaries, scripts and libraries.
 
 * link:target.html#_qi_create_bin[qi_create_bin]
 * link:target.html#_qi_create_lib[qi_create_lib]
 * link:target.html#_qi_create_script[qi_create_script]
 
-link:submodule.html[QiBuild Submodule]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+link:submodule.html[Submodule]
+------------------------------
 Submodule represent a group of sources and dependencies. They help
 have clean separated CMakeLists.txt when creating big libraries or
 binaries.
@@ -22,8 +20,8 @@ binaries.
 * link:submodule.html#_qi_submodule_create[qi_submodule_create]
 * link:submodule.html#_qi_submodule_add[qi_submodule_add]
 
-link:log.html[QiBuild Log]
-~~~~~~~~~~~~~~~~~~~~~~~~~
+link:log.html[Log]
+------------------
 Simple module to display log messages.
 
 * link:log.html#_qi_debug[qi_debug]
@@ -33,28 +31,28 @@ Simple module to display log messages.
 * link:log.html#_qi_warning[qi_warning]
 * link:log.html#_qi_error[qi_error]
 
-link:tests.html[QiBuild Test]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+link:tests.html[Test]
+---------------------
 Interface gtest with ctest.
 
 * link:tests.html#_qi_create_gtest[qi_create_gtest]
 * link:tests.html#_qi_add_gtest[qi_add_gtest]
 
-link:uselib.html[QiBuild UseLib]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+link:uselib.html[UseLib]
+------------------------
 Simple dependencies handling functions.
 
 * link:uselib.html#_qi_uselib[qi_uselib]
 
-link:launcher.html[QiBuild Launcher]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+link:launcher.html[Launcher]
+----------------------------
 Create launcher that define proper path (python, libraries, ..) to launch targets.
 
 * link:launcher.html#_qi_create_launcher[qi_create_launcher]
 * link:launcher.html#_qi_create_insource_launcher[qi_create_insource_launcher]
 
-link:stage.html[QiBuild Stage]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+link:stage.html[Stage]
+----------------------
 Stage executable and libraries to make them available to the outside world!
 
 * link:stage.html#_qi_stage_lib[qi_stage_lib]
@@ -62,14 +60,14 @@ Stage executable and libraries to make them available to the outside world!
 * link:stage.html#_qi_stage_script[qi_stage_script]
 * link:stage.html#_qi_stage_header[qi_stage_header]
 
-link:subdirectory.html[QiBuild SubDirectory]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+link:subdirectory.html[SubDirectory]
+------------------------------------
 Conditionally include a subdirectory.
 
 * link:subdirectory.html#_qi_add_subdirectory[qi_add_subdirectory]
 
-link:install.html[QiBuild Install]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+link:install.html[Install]
+--------------------------
 Install functions.
 
 * link:install.html#_qi_install_data[qi_install_data]
@@ -81,7 +79,7 @@ Install functions.
 * link:install.html#_qi_install_program[qi_install_program]
 
 link:external.html[External Projects]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 Build external autotools projects
 
 * link:external.html#_qi_build_autotools[qi_build_autotools]
