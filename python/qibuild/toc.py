@@ -218,15 +218,22 @@ class Toc(QiWorkTree):
         interesting = set(("INCLUDE", "LIB", "LIBPATH", "PATH"))
         result = {}
 
+        # This call is strange, but necessary.
+        # See: http://bytes.com/topic/python/answers/634409-subprocess-handle-invalid-error#post2512502
         popen = subprocess.Popen('"%s"& set' % (bat_file),
                              stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
+                             stdin=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             shell=True)
 
-        stdout, stderr = popen.communicate()
+
+        popen.stdin.close()
+        popen.stderr.close()
+        out = popen.stdout.read()
         if popen.wait() != 0:
             raise BadBuildConfig("Calling general.env.bat_file failed!: %s", stderr)
 
-        for line in stdout.split("\n"):
+        for line in out.split("\n"):
             if '=' not in line:
                 continue
             line = line.strip()
