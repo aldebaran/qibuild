@@ -348,7 +348,7 @@ class Toc(QiWorkTree):
                 cmd = ["nmake", "install"]
             else:
                 cmd = ["make", "install"]
-            qitools.command.check_call(cmd, cwd=build_dir, env=build_environ)
+        qitools.command.check_call(cmd, cwd=build_dir, env=build_environ)
 
 
 def toc_open(work_tree, args, use_env=False):
