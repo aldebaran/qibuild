@@ -272,7 +272,7 @@ class Toc(QiWorkTree):
         (See qibuild.toc.toc_open() and the ctor of Project for the details)
         """
         if not os.path.exists(project.directory):
-            raise qibuild.ConfigureException("source dir: %s does not exist, aborting" % project.directory)
+            raise TocException("source dir: %s does not exist, aborting" % project.directory)
 
         if not os.path.exists(os.path.join(project.directory, "CMakeLists.txt")):
             LOGGER.info("Not calling cmake for %s", os.path.basename(project.directory))
@@ -321,8 +321,7 @@ class Toc(QiWorkTree):
 
         # Not using visual studio: we must have a Makefile
         if not os.path.exists(os.path.join(build_dir, "Makefile")):
-            LOGGER.debug("Not calling make for %s", os.path.basename(build_dir))
-            return
+            raise TocException("No Makefile in %s" % build_dir)
 
         if self.using_nmake:
             qibuild.nmake(build_dir, target=target)
