@@ -56,6 +56,7 @@ sys.path.insert(0, r"%s")""" % python_path)
 
 
 if __name__ == "__main__":
+    install("qitoolchain")
     install("qibuild")
     install("qisrc")
 
