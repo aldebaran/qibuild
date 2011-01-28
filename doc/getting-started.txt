@@ -68,15 +68,6 @@ Configuring QiBuild for Visual Studio
 You will have to do several things for qibuild to work with
 visual studio.
 
-* Set environment variables (%PATH%, %LIBDIR%, etc.)
-You can use the .bat script provided with Visual Studio.
-
-For Visual Studio 2008, the script location looks liken:
-+c:\Program Files\Microsoft Visual Studio 9.0\VC\vcvarsall.bat+
-
-(Precise path can be found in the start menu, it is labeled
-"Visual Studio Command Prompt)
-
 * Make sure CMake is in the %PATH%.
 
 * Make sure CMake uses the proper generator.
@@ -84,16 +75,34 @@ For Visual Studio 2008, the script location looks liken:
 Here's what a complete .qi/build.cfg would look like
 to use Visual Studio 2008:
 
-
 [source, ini]
 ----
 [general "env"]
   path = C:\Program Files\CMake 2.8\bin;
-  bat_file = c:\Program Files\Microsoft Visual Studio 9.0\VC\vcvarsall.bat
 
 [general "build"]
   cmake_generator = "Visual Studio 9 2008"
 ----
+
+For command line addicts, you can also:
+
+* Use cmake_generator = "NMake Makefiles" and use qibuild from the
+Visual Studio command prompt.
+
+* Or, if you do not want to use the Visual Studio command prompt,
+you can specify a .bat file to be ran by qibuild, like this:
+
+[source, ini]
+----
+[general "env"]
+bat_file = c:\Program Files\Microsoft Visual Studio 9.0\VC\vcvarsall.bat
+
+[general "build"]
+cmake_generator = "NMake Makefiles"
+----
+
+(the location of the .bat file depends on your setup)
+
 
 Configuring QiBuild for MinGW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
