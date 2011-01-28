@@ -8,38 +8,6 @@ import qitools.cmdparse
 import subprocess
 
 
-def ask_choice(choices, input_text):
-    """Ask the user to choose from a list of choices
-
-    """
-    print "::", input_text
-    for i, choice in enumerate(choices):
-        print "  ", (i+1), choice
-    keep_asking = True
-    res = None
-    while keep_asking:
-        answer = raw_input("> ")
-        if not answer:
-            return choices[0]
-        try:
-            index = int(answer)
-        except ValueError:
-            print "Please enter number"
-            continue
-        if index not in range(1, len(choices)+1):
-            print "%i is out of range" % index
-            continue
-        res = choices[index-1]
-        keep_asking = False
-
-    return res
-
-def ask_yes_no(question):
-    """Ask the user to answer by yes or no"""
-    print "::", question, "(y/n)?"
-    anwer = raw_input("> ")
-    return anwer == "y"
-
 def ask_cmake_generator():
     """Ask the user to choose a cmake generator """
     cmake_process = subprocess.Popen(["cmake"], stdout=subprocess.PIPE)
@@ -62,7 +30,7 @@ def ask_cmake_generator():
             if generator:
                 generators.append(generator)
 
-    generator = ask_choice(generators, "Choose a CMake generator:")
+    generator = qitools.ask_choice(generators, "Choose a CMake generator:")
     return generator
 
 
@@ -74,7 +42,7 @@ def ask_toolchain():
     config.read(config_file)
     toolchain_dict = config.get("toolchain", default=dict())
     toolchain_names = toolchain_dict.keys()
-    return ask_choice(toolchain_names, "Choose a toolchain name")
+    return qitools.ask_choice(toolchain_names, "Choose a toolchain name")
 
 
 def ask_build_configs():
@@ -103,11 +71,11 @@ def ask_build_configs():
                 print "invalid flags"
                 continue
             build_configs[build_config_name].append(flags)
-            if ask_yes_no("Done with %s build config" % build_config_name):
+            if qitools.ask_yes_no("Done with %s build config" % build_config_name):
                 keep_asking_flags = False
             continue
 
-        keep_going = ask_yes_no("Add a new build config")
+        keep_going = qitools.ask_yes_no("Add a new build config")
 
     return build_configs
 
@@ -125,13 +93,13 @@ def ask_path():
             keep_going = False
             continue
         paths.append(path)
-        keep_going = ask_yes_no("A a new path to os.environ")
+        keep_going = qitools.ask_yes_no("A a new path to os.environ")
     # configuration file expects paths separated pathsep
     return os.path.pathsep.join(paths)
 
 def ask_default_build_config(build_configs):
     """Ask the user to choose a default build config"""
-    return ask_choice(build_configs.keys(),
+    return qitools.ask_choice(build_configs.keys(),
         "Select a default build config")
 
 def ask_bat_file():
@@ -175,23 +143,23 @@ def run_wizard(qiworktree):
 
     default_build_config = None
     build_configs = dict()
-    if ask_yes_no("Define custom build configurations"):
+    if qitools.ask_yes_no("Define custom build configurations"):
         build_configs  = ask_build_configs()
     if build_configs:
         default_build_config = ask_default_build_config(build_configs)
 
     toolchain_name = None
-    if ask_yes_no("Use a toolchain"):
+    if qitools.ask_yes_no("Use a toolchain"):
         tc_config = qitoolchain.get_config_path()
         if not os.path.exists(tc_config):
-            if ask_yes_no("No toolchain found, crate one"):
+            if qitools.ask_yes_no("No toolchain found, crate one"):
                 toolchain_name = create_toolchain()
         else:
             toolchain_name = ask_toolchain()
 
     env_path = ""
     bat_file = ""
-    if ask_yes_no("Use custom environment"):
+    if qitools.ask_yes_no("Use custom environment"):
         env_path       = ask_path()
         if "Visual Studio" in cmake_generator:
             bat_file = ask_bat_file()

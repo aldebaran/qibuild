@@ -13,5 +13,14 @@ from qitools import qiworktree
 from qitools import archive
 from qitools import sh
 from qitools.qiworktree import qiworktree_open
+from qitools import interact
+from qitools.interact import ask_yes_no, ask_choice
 
-__all__ = ( 'configstore', 'cmdparse', 'log', 'qiworktree', 'archive', 'sh', 'run_action')
+__all__ = (
+        'configstore',
+        'cmdparse',
+        'log',
+        'qiworktree',
+        'archive',
+        'sh',
+        'run_action')
