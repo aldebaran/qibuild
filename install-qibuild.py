@@ -49,10 +49,10 @@ sys.path.insert(0, r"%s")""" % python_path)
         if not os.path.exists("/usr/local"):
             os.makedirs("/usr/local")
         out_path = posixpath.join("/usr/local/bin", script_name)
-        chmod_755(out_path)
         print "Posix script in ", out_path
         with open(out_path, "w") as fp:
             fp.write(script_contents)
+        chmod_755(out_path)
 
 
 if __name__ == "__main__":
