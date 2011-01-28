@@ -43,8 +43,5 @@ def do(args):
             incredibuild=use_incredibuild)
 
 
-if __name__ == "__main__":
-    import sys
-    qitools.cmdparse.sub_command_main(sys.modules[__name__])
 
 
