@@ -9,6 +9,5 @@ qi_create_bin(@project_name@ "main.cpp")
 
 # Just a quick test to be sure the executable can run.
 enable_testing()
-qi_add_test(@project_name@)
-
+qi_add_test(zero_test @project_name@)
 
