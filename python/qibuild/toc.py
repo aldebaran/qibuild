@@ -299,6 +299,9 @@ class Toc(QiWorkTree):
 
         """
         build_dir = project.build_directory
+        makefile = os.path.join(build_dir, "Makefile")
+        if not os.path.exists(makefile):
+            _advise_using_configure(project, "Makefile")
         LOGGER.debug("[%s]: building in %s", project.name, build_dir)
 
         cmd = ["cmake", "--build", build_dir, "--config", self.build_type]
@@ -319,7 +322,7 @@ class Toc(QiWorkTree):
         build_environ = os.environ.copy()
         build_environ["DESTDIR"] = destdir
         cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
-                "--target", "INSTALL"]
+                "--target", "install"]
         qitools.command.check_call(cmd, env=build_environ)
 
 def toc_open(work_tree, args, use_env=False):
