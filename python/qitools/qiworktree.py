@@ -13,6 +13,15 @@ import qitools.sh
 
 LOGGER = logging.getLogger("QiWorkTree")
 
+class WorkTreeException(Exception):
+    """Custom excpetion """
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
+
+
 def work_tree_parser(parser):
     """ Parser settings for every action using a toc dir
     """
@@ -89,7 +98,8 @@ def qiworktree_open(work_tree=None, use_env=False):
     if not work_tree:
         work_tree = search_manifest_directory(os.getcwd())
     if work_tree is None:
-        raise Exception("Could not find toc work tree, please go to a valid work tree.")
+        raise WorkTreeException("Could not find toc work tree, "
+            "please go to a valid work tree.")
     return QiWorkTree(work_tree)
 
 
@@ -154,7 +164,7 @@ def create(directory):
     """
     to_create = os.path.join(directory, ".qi")
     if os.path.exists(to_create):
-        raise Exception("%s already exists!" % to_create)
+        raise WorkTreeException("%s already exists!" % to_create)
     qitools.sh.mkdir(to_create, recursive=True)
 
 
