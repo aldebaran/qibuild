@@ -97,7 +97,6 @@ class Toc(QiWorkTree):
             to_read = os.path.join(self.work_tree, ".qi", cfg_file)
             self.configstore.read(to_read)
 
-        print self.configstore
         if not self.cmake_generator:
             self.cmake_generator = self.configstore.get("general", "build" ,
                     "cmake_generator", default="Unix Makefiles")
@@ -306,13 +305,16 @@ class Toc(QiWorkTree):
 
         """
         build_dir = project.build_directory
+        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
+        if not os.path.exists(cmake_cache):
+            _advise_using_configure(project)
         LOGGER.debug("[%s]: building in %s", project.name, build_dir)
 
         cmd = ["cmake", "--build", build_dir, "--config", self.build_type]
+        # In order to use incredibuild, we have to do this small hack:
         if self.using_visual_studio:
             sln_files = glob.glob(build_dir + "/*.sln")
-            if len(sln_files) == 0:
-                _advise_using_configure(project, "solution file")
+            assert len(sln_files) == 1, "Expecting only one sln, got %s" % sln_files
             if incredibuild:
                 sln_file = sln_files[0]
                 cmd = ["BuildConsole.exe", sln_file]
@@ -401,13 +403,13 @@ def resolve_deps(toc, args, runtime=False):
         all=args.all,
         runtime=runtime)
 
-def _advise_using_configure(project, missing):
-    """Arguments:
-    missing: what we looked for
+def _advise_using_configure(project):
+    """Just throw a nice exception because
+    CMakeCache.txt was not found.
 
     """
     mess  = """
-    Could not find {missing} for project {project.name}.
+    Could not find CMakeCache.txt for project {project.name}.
     (Looked in {project.build_directory})
     """
     cmake_file = os.path.join(project.directory, "CMakeLists.txt")
@@ -419,6 +421,6 @@ def _advise_using_configure(project, missing):
     else:
         mess += "Try using `qibuild configure {project.name}'"
 
-    mess = mess.format(missing=missing, project=project)
+    mess = mess.format(project=project)
 
     raise TocException(mess)

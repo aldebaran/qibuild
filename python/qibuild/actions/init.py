@@ -102,12 +102,6 @@ def ask_default_build_config(build_configs):
     return qitools.ask_choice(build_configs.keys(),
         "Select a default build config")
 
-def ask_bat_file():
-    """Ask the user to choose the path to a .bat file
-
-    """
-    pass
-
 def create_toolchain():
     """Ask the use for a toolchain name and create one"""
     print ":: Choose a toolchain name"
@@ -158,11 +152,8 @@ def run_wizard(qiworktree):
             toolchain_name = ask_toolchain()
 
     env_path = ""
-    bat_file = ""
     if qitools.ask_yes_no("Use custom environment"):
         env_path       = ask_path()
-        if "Visual Studio" in cmake_generator:
-            bat_file = ask_bat_file()
 
     qiworktree.update_config(
         "general", "build", "cmake_generator", cmake_generator)
@@ -176,6 +167,3 @@ def run_wizard(qiworktree):
             "build", name, "cmake.flags", flags)
         qiworktree.update_config(
             "general", "build", "build_config", default_build_config)
-    if bat_file:
-        qiworktree.update_config(
-            "general", "env", "bat_file", bat_file)

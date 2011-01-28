@@ -25,5 +25,8 @@ QiSrc:
 
 
 DOC:
- * write a cmake tutorial (use the one from the DP doc)
+ * add tutorials:
+  - using toolchain
+  - build configurations
  * cmake: document _INCLUDE_DIRS, _LIBS, ....
+ * use cmake to generate documentation !

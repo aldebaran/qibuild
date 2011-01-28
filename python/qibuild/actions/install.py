@@ -31,7 +31,6 @@ def do(args):
 
     (project_names, package_names, _) = qibuild.toc.resolve_deps(toc, args, runtime=True)
 
-    print project_names, package_names
     logger.info("Installing %s to %s", ", ".join([n for n in project_names]), args.destdir)
     for project_name in project_names:
         project = toc.get_project(project_name)

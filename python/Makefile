@@ -45,22 +45,9 @@ pep8:
 	@echo ""
 
 
-check: test/conf.py
+check:
 	@echo "###################################"
 	@echo "running test"
 	@echo "###################################"
-	PYTHONPATH=. python test/test.py
+	PYTHONPATH=. python run_tests.py
 
-check-debug: test/conf.py
-	@echo "###################################"
-	@echo "to run test with pdb launch:"
-	@echo "PYTHONPATH=. python test/test.py -d"
-	@echo "###################################"
-
-
-test/conf.py: test/conf.py.in
-	@echo "###################################"
-	@echo "Generating a sample test/conf.py"
-	@echo "Please edit this file to meet your settings"
-	@echo "###################################"
-	cp test/conf.py.in test/conf.py

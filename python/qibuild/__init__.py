@@ -112,11 +112,6 @@ def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD"):
 
     qitools.command.check_call(cmd)
 
-def build_incredibuild(sln_file, build_type="Debug", target="ALL_BUILD"):
-    """
-    Incredibuild build
-    """
-
 def cmake(source_dir, build_dir, cmake_args):
     """
     Call cmake with from a build dir for a source dir.
