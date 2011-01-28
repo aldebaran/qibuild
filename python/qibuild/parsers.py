@@ -46,6 +46,9 @@ def project_parser(parser):
         help="use dependencies")
     parser.add_argument("--no-use-deps", dest="use_deps", action="store_false",
         help="do resolve any dependency")
-    parser.add_argument("projects", nargs="?", metavar="PROJECT", action="append", help="project name (s)")
-    parser.set_defaults(single=False, only_deps=False, use_deps=True)
+    parser.add_argument("projects", nargs="*", metavar="PROJECT", help="project name(s)")
+    parser.set_defaults(single=False,
+        only_deps=False,
+        use_deps=True,
+        projects = list())
 

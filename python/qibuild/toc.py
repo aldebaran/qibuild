@@ -385,10 +385,7 @@ def resolve_deps(toc, args, runtime=False):
           - args.only_deps: only return dependencies
           - args.use_deps: take dependencies into account
     """
-    if args.projects == [ None ]:
-        project_names = list()
-    else:
-        project_names = args.projects
+    project_names = args.projects
 
     if not project_names:
         LOGGER.debug("no project specified, guessing from current working directory")
