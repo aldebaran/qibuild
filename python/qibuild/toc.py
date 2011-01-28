@@ -243,7 +243,7 @@ class Toc(QiWorkTree):
         popen.stderr.close()
         out = popen.stdout.read()
         if popen.wait() != 0:
-            raise BadBuildConfig("Calling general.env.bat_file failed!: %s", stderr)
+            raise BadBuildConfig("Calling general.env.bat_file failed!")
 
         for line in out.split("\n"):
             if '=' not in line:
