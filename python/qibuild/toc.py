@@ -58,7 +58,7 @@ class Toc(QiWorkTree):
             work_tree      = a toc worktree
             build_type     = a build type, could be debug or release
             toolchain_name = by default the system toolchain is used
-            build_config   = optional a build configuration
+            build_config   = optional : the name of a build.cfg to be loaded
             cmake_flags    = optional additional cmake flags
             cmake_generator = optional cmake generator (defaults to Unix Makefiles)
         """
@@ -91,6 +91,13 @@ class Toc(QiWorkTree):
         if not self.build_config:
             self.build_config = self.configstore.get("general", "build", "config", default=None)
 
+
+        if self.build_config:
+            cfg_file = "build-%s.cfg" % self.build_config
+            to_read = os.path.join(self.work_tree, ".qi", cfg_file)
+            self.configstore.read(to_read)
+
+        print self.configstore
         if not self.cmake_generator:
             self.cmake_generator = self.configstore.get("general", "build" ,
                     "cmake_generator", default="Unix Makefiles")
@@ -310,8 +317,9 @@ class Toc(QiWorkTree):
             if len(sln_files) == 0:
                 _advise_using_configure(project, "solution file")
             if incredibuild:
+                sln_file = sln_files[0]
                 cmd = ["BuildConsole.exe", sln_file]
-                cmd += ["/cfg=%s|Win32" % build_type]
+                cmd += ["/cfg=%s|Win32" % self.build_type]
                 cmd += ["/nologo"]
         qitools.command.check_call(cmd)
 

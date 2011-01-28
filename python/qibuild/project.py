@@ -7,10 +7,8 @@
 
 import os
 import shlex
-import glob
 import logging
 import qitools.sh
-import qibuild
 
 LOGGER = logging.getLogger("qibuild.toc.project")
 
@@ -43,21 +41,22 @@ class Project:
 
     def update_build_config(self, toc, build_directory_name):
         """ Update cmake_flags
-           - add flags from the build_config
-           - add flags from the project config
-           - add flags from the command line
+           - add flags from the build_config (read in toc's configstore)
+           - add flags from the project config (read in toc's configstore project section)
+           - add flags from the command line (stored in toc.cmake_flags when toc is built)
         """
         self.build_directory = os.path.join(self.directory, build_directory_name)
         #create the build_directory if it does not exists
         if not os.path.exists(self.build_directory):
             os.makedirs(self.build_directory)
 
-        if toc.build_config:
-            build_config_flags = toc.configstore.get("build", toc.build_config, "cmake", "flags", default=None)
-            if build_config_flags:
-                self.cmake_flags.extend(shlex.split(build_config_flags))
+        build_config_flags = toc.configstore.get("general", "build", "cmake", "flags",
+            default=None)
+        if build_config_flags:
+            self.cmake_flags.extend(shlex.split(build_config_flags))
 
-        project_flags = toc.configstore.get(self.name, "build", "cmake", "flags", default=None)
+        project_flags = toc.configstore.get("project", self.name, "cmake", "flags",
+            default=None)
         if project_flags:
             self.cmake_flags.extend(shlex.split(project_flags))
 
@@ -65,6 +64,7 @@ class Project:
             self.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (toc.build_type.upper()))
 
         if toc.toolchain.name != "system":
+            # Used in qibuild/cmake
             self.cmake_flags.append("QI_TOOLCHAIN_NAME=%s" % (toc.toolchain.name))
 
         if toc.cmake_flags:
