@@ -36,13 +36,14 @@ def copy_helper(project_name, directory):
 def configure_parser(parser):
     """Configure parser for this action """
     qitools.cmdparse.default_parser(parser)
-    parser.add_argument("project_name")
+    parser.add_argument("project_path", help="either the name of the project, or  "
+        "a new path for the project")
 
 
 def do(args):
     """"Create a new project """
-    project_name = args.project_name
-    project_path = os.path.join(os.getcwd(), project_name)
+    project_path = qitools.sh.to_native_path(args.project_path)
+    project_name = os.path.basename(project_path)
     if os.path.exists(project_path):
         raise Exception("%s already exists" % project_path)
     os.mkdir(project_path)
