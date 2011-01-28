@@ -301,55 +301,26 @@ class Toc(QiWorkTree):
         build_dir = project.build_directory
         LOGGER.debug("[%s]: building in %s", project.name, build_dir)
 
+        cmd = ["cmake", "--build", build_dir, "--config", self.build_type]
         if self.using_visual_studio:
             sln_files = glob.glob(build_dir + "/*.sln")
             if len(sln_files) == 0:
                 _advise_using_configure(project, "solution file")
-
-            if len(sln_files) != 1:
-                err_message = "Found several sln files: "
-                err_message += ", ".join(sln_files)
-                raise Exception(err_message)
-            sln_file = sln_files[0]
             if incredibuild:
-                qibuild.build_incredibuild(sln_file, build_type=self.build_type, target=target)
-                return
-            else:
-                qibuild.msbuild(sln_file, build_type=self.build_type, target=target)
-                return
-
-        # Not using visual studio: we must have a Makefile
-        if not os.path.exists(os.path.join(build_dir, "Makefile")):
-            _advise_using_configure(project, "Makefile")
-
-        if self.using_nmake:
-            qibuild.nmake(build_dir, target=target)
-            return
-
-        # Not using NMake: just use plain good old make
-        qibuild.make(build_dir, num_jobs=num_jobs, target=target)
+                cmd = ["BuildConsole.exe", sln_file]
+                cmd += ["/cfg=%s|Win32" % build_type]
+                cmd += ["/nologo"]
+        qitools.command.check_call(cmd)
 
 
     def install_project(self, project, destdir):
         """Install the project """
         build_dir = project.build_directory
-        build_environ = os.environ.copy()  # Let's not modify os.environ gloablly !
+        build_environ = os.environ.copy()
         build_environ["DESTDIR"] = destdir
-        cmd = list()
-        if self.using_visual_studio:
-          install_vcproj = os.path.join(build_dir, "INSTALL.vcproj")
-          if not os.path.exists(install_vcproj):
-              _advise_using_configure(project, "'INSTALL VC project")
-          cmd = ["MSBuild.exe", "/p:Configuration=%s" % self.build_type, install_vcproj]
-        else:
-            if not os.path.exists(os.path.join(build_dir, "Makefile")):
-                _advise_using_configure(project, "Makefile")
-            if self.using_nmake:
-                cmd = ["nmake", "install"]
-            else:
-                cmd = ["make", "install"]
-        qitools.command.check_call(cmd, cwd=build_dir, env=build_environ)
-
+        cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
+                "--target", "INSTALL"]
+        qitools.command.check_call(cmd, env=build_environ)
 
 def toc_open(work_tree, args, use_env=False):
     build_config   = args.build_config

@@ -116,16 +116,6 @@ def build_incredibuild(sln_file, build_type="Debug", target="ALL_BUILD"):
     """
     Incredibuild build
     """
-    cmd = ["BuildConsole.exe", sln_file]
-
-    cmd += ["/cfg=%s|Win32" % build_type]
-
-    if target is not None:
-        cmd += ["/PRJ=" + target]
-
-    cmd += ["/nologo"]
-
-    qitools.command.check_call(cmd)
 
 def cmake(source_dir, build_dir, cmake_args):
     """
