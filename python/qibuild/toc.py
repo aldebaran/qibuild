@@ -34,6 +34,18 @@ class BadBuildConfig(Exception):
         mess += "Please check qi configuration"
         return mess
 
+class TocException(Exception):
+    """Custom exception.
+    Specific exceptions raised by toc are of this type,
+    so they can be caught by callers.
+
+    """
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
+
 
 class Toc(QiWorkTree):
     def __init__(self, work_tree,
@@ -157,7 +169,7 @@ class Toc(QiWorkTree):
 
         known_project_names = [p.name for p in self.projects]
         if project_name not in known_project_names:
-            raise Exception("%s is not a buildable project" % project_name)
+            raise TocException("%s is not a buildable project" % project_name)
 
         dep_solver = DependenciesSolver(projects=self.projects, packages=self.toolchain.packages)
         (project_names, package_names, not_found) = dep_solver.solve([project_name])
@@ -352,7 +364,7 @@ def toc_open(work_tree, args, use_env=False):
     if not work_tree:
         work_tree = qitools.qiworktree.search_manifest_directory(os.getcwd())
     if work_tree is None:
-        raise Exception("Could not find toc work tree, please go to a valid work tree.")
+        raise TocException("Could not find toc work tree, please go to a valid work tree.")
     return Toc(work_tree,
                build_type=build_type,
                toolchain_name=toolchain_name,
