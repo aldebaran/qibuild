@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Use this script to run tests.
 
 Make sure that this script is run with the correct
