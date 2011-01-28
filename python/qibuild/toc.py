@@ -304,8 +304,7 @@ class Toc(QiWorkTree):
         if self.using_visual_studio:
             sln_files = glob.glob(build_dir + "/*.sln")
             if len(sln_files) == 0:
-                LOGGER.debug("Not calling msbuild for %s", os.path.basename(build_dir))
-                return
+                _advise_using_configure(project, "solution file")
 
             if len(sln_files) != 1:
                 err_message = "Found several sln files: "
@@ -321,7 +320,7 @@ class Toc(QiWorkTree):
 
         # Not using visual studio: we must have a Makefile
         if not os.path.exists(os.path.join(build_dir, "Makefile")):
-            raise TocException("No Makefile in %s" % build_dir)
+            _advise_using_configure(project, "Makefile")
 
         if self.using_nmake:
             qibuild.nmake(build_dir, target=target)
@@ -339,12 +338,17 @@ class Toc(QiWorkTree):
         cmd = list()
         if self.using_visual_studio:
           install_vcproj = os.path.join(build_dir, "INSTALL.vcproj")
+          if not os.path.exists(install_vcproj):
+              _advise_using_configure(project, "'INSTALL VC project")
           cmd = ["MSBuild.exe", "/p:Configuration=%s" % self.build_type, install_vcproj]
-        elif self.using_nmake:
-            cmd = ["nmake", "install"]
         else:
-            cmd = ["make", "install"]
-        qitools.command.check_call(cmd, cwd=build_dir, env=build_environ)
+            if not os.path.exists(os.path.join(build_dir, "Makefile")):
+                _advise_using_configure(project, "Makefile")
+            if self.using_nmake:
+                cmd = ["nmake", "install"]
+            else:
+                cmd = ["make", "install"]
+            qitools.command.check_call(cmd, cwd=build_dir, env=build_environ)
 
 
 def toc_open(work_tree, args, use_env=False):
@@ -412,3 +416,25 @@ def resolve_deps(toc, args, runtime=False):
         single=args.single,
         all=args.all,
         runtime=runtime)
+
+def _advise_using_configure(project, missing):
+    """Arguments:
+    missing: what we looked for
+
+    """
+    mess  = """
+    Could not find {missing} for project {project.name}.
+    (Looked in {project.build_directory})
+    """
+    cmake_file = os.path.join(project.directory, "CMakeLists.txt")
+    if not os.path.exists(cmake_file):
+        mess += """
+    Note that {project.name} does not look like a valid CMake project
+    (No CMakeLists.txt in {project.directory}
+    """
+    else:
+        mess += "Try using `qibuild configure {project.name}'"
+
+    mess = mess.format(missing=missing, project=project)
+
+    raise TocException(mess)
