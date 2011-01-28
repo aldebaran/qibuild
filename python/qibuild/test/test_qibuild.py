@@ -55,6 +55,9 @@ class QiBuildTestCase(unittest.TestCase):
         self._run_action("configure", "hello")
         self._run_action("make", "hello")
 
+    def test_make_without_configure(self):
+        self.assertRaises(SystemExit, self._run_action, "make", "hello")
+
     def test_install(self):
         self._run_action("configure", "hello")
         self._run_action("make", "hello")
