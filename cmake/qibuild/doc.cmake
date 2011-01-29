@@ -5,86 +5,33 @@
 ## Copyright (C) 2009, 2010 Cedric GESTES
 ##
 
-find_package(ASCIIDOC QUIET)
-find_package(DOXYGEN QUIET)
 
-#The doc target will generate all the documentation, including asciidoc and doxygen.
+include("qibuild/asciidoc")
+include("qibuild/doxygen")
 
-####################################################################
-#
-# compile a set of asciidoc documentation
-#
-####################################################################
-function(qi_create_asciidoc subfoldername)
-  if(ASCIIDOC_FOUND)
-    if (NOT TARGET "doc")
-      add_custom_target("doc")
-    endif()
+function(qi_gen_doc)
+  set(_doc_deps)
 
-    make_directory("${SDK_DIR}/share/doc/${subfoldername}/")
-    foreach(_file ${ARGN})
-      get_filename_component(_file_we ${_file} NAME_WE)
-      set(_in   "${_file_we}-asciidoc")
-      set(_out  "${SDK_DIR}/${_SDK_DOC}/${subfoldername}/${_file_we}.html")
-      #set(_rout "${SDK_DIR}/share/doc/${subfoldername}/${_file_we}.html")
-      set(_fin  "${CMAKE_CURRENT_SOURCE_DIR}/${_file}")
+  cmake_parse_arguments(ARG ""
+    "ASCIIDOC_DIR"
+    "ASCIIDOC_OPTS;PYGMENTS_OPTS;DOXYFILES"
+    ${ARGN})
 
-      debug("Adding asciidoc: ${_out} : ${_in}")
-
-      install(FILES "${_out}" COMPONENT doc DESTINATION "${_SDK_DOC}/${subfoldername}/")
-
-      # way to go, but asciidoc leave the file in the filesystem even on error
-      # So when an error occur, the next time you try to build, cmake think the previous
-      # build is ok (the erronous file is at the right place) and continue building
-      # # debug("DOC: file: ${_file}, input: ${_fin}, output: ${_out}")
-      # add_custom_command(
-      #         OUTPUT "${_out}"
-      #         COMMAND "${ASCIIDOC_EXECUTABLE}" -a toc -o "${_out}" "${_fin}"
-      #         DEPENDS "${_fin}"
-      #         COMMENT "Asciidoc ${_in}"
-      #         )
-      #       add_custom
-      # #a target is needed to have depends (the doc taret wont work otherwize)
-      # add_custom_target("${_in}" DEPENDS "${_out}")
-
-      #ATM always rebuild the doc... or find a way to correct asciidoc
-      add_custom_target("${_in}"
-           #             DEPENDS "${_out}"
-                        COMMAND "${ASCIIDOC_EXECUTABLE}" -a toc -o "${_out}" "${_fin}"
-                        COMMENT "Asciidoc ${_in}")
-
-      add_dependencies("doc" "${_in}")
-    endforeach()
-  else()
-    message(STATUS "###### WARNING ######")
-    message(STATUS "No asciidoc will be generated: asciidoc binary not found")
-    message(STATUS "Please install asciidoc")
-    message(STATUS "###### WARNING ######")
+  if(ARG_ASCIIDOC_DIR)
+    qi_gen_asciidoc(${ARG_ASCIIDOC_DIR}
+      ASCIIDOC_OPTS ${ARG_ASCIIDOC_OPTS}
+      PYGMENTS_OPTS ${ARG_PYGMENTS_OTPS}
+    )
+    list(APPEND _doc_deps asciidoc)
   endif()
-endfunction()
 
+  foreach(_doxyfile ${ARG_DOXYFILES})
+    qi_gen_doxygen(doxy_target ${_doxyfile})
+    message(STATUS "doxy_target: ${doxy_target}")
 
-####################################################################
-#
-# generate doxygen
-#
-####################################################################
-function(qi_create_doxygen)
+    list(APPEND _doc_deps ${doxy_target})
+  endforeach()
 
-  if (DOXYGEN_EXECUTABLE)
-    if (NOT TARGET "doc")
-      add_custom_target("doc")
-    endif()
-
-    #find a unique targetname
-    #how to we do n+n? ok we wont... n + n = nn no?
-    set(_doxygen_target "doxygen")
-    while(TARGET "${_doxygen_target}")
-      set(_doxygen_target "${_doxygen_target}n")
-    endwhile()
-
-    message(STATUS "Doxygen(${_doxygen_target}): ${ARGV0}")
-    add_custom_target("${_doxygen_target}" COMMAND ${DOXYGEN_EXECUTABLE} ${ARGV0} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    add_dependencies("doc" "${_doxygen_target}")
-  endif()
+  add_custom_target(doc)
+  add_dependencies(doc ${_doc_deps})
 endfunction()
