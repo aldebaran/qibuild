@@ -5,10 +5,16 @@ CMake:
 * finish rewriting stage_*
   - maybe we should do something like:
      qi_create_lib(foo)
-     qi_stage_include_dirs(foo ${CMAKE_CURRENT_SOURCE_DIR})
-     qi_stage_definitions(foo -DBAR=BAZ)
-     qi_stage_depends(foo-deps)
-     qi_stage_lib(foo)
+     qi_stage_lib(foo
+      [INCLUDE_DIRS] ...
+      [DEFINITIONS] ...
+      [DEPENDS] ...
+     )
+     (INCLUDE_DIRS, DEFINITIONS and DEPENDS
+     being guessed if not given)
+* Convention:
+  - qi_add never stages
+  - qi_create calls qi_add then qi_stage
 
 * finish qi_use_lib (handle version, handle component)
 * toolchain support (iphone, mingw32-cross, android, ..)
