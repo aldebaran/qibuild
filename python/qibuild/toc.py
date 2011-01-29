@@ -306,9 +306,6 @@ class Toc(QiWorkTree):
 
         """
         build_dir = project.build_directory
-        makefile = os.path.join(build_dir, "Makefile")
-        if not os.path.exists(makefile):
-            _advise_using_configure(project, "Makefile")
         LOGGER.debug("[%s]: building in %s", project.name, build_dir)
 
         cmd = ["cmake", "--build", build_dir, "--config", self.build_type]
@@ -321,6 +318,11 @@ class Toc(QiWorkTree):
                 cmd = ["BuildConsole.exe", sln_file]
                 cmd += ["/cfg=%s|Win32" % self.build_type]
                 cmd += ["/nologo"]
+        else:
+            makefile = os.path.join(build_dir, "Makefile")
+            if not os.path.exists(makefile):
+                _advise_using_configure(project, "Makefile")
+
         qitools.command.check_call(cmd)
 
 
