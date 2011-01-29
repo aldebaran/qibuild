@@ -127,6 +127,17 @@ path = C:\Mingw\bin;C:\MinGW\msys\1.0\bin;
 ----
 
 
+QiBuild and QtCreator
+~~~~~~~~~~~~~~~~~~~~~
+
+* Windows:
+  FIXME: document how to use qibuild from QtCreator's command
+  prompt
+* Linux, mac:
+  FIXME : use +qibuild configure+, then make QtCreator point to
+  qibuild's build directory
+
+
 Creating a new project
 ----------------------
 
