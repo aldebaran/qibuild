@@ -5,12 +5,7 @@
 ## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
-
-if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
-  include(${QI_ROOT_DIR}/upstream-backports/ExternalProject.cmake)
-else()
-  include(ExternalProject)
-endif()
+cmake_minimum_required(VERSION 2.8.3)
 
 
 #! QiBuild External
