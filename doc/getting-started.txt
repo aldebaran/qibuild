@@ -146,7 +146,7 @@ You can then create a new project:
 
 [source, bash]
 ----
-qibuild create-new-proj foo
+qibuild create foo
 ----
 
 This will create a new project in QI_WORK_TREE/foo.
