@@ -68,8 +68,8 @@ class QiBuildTestCase(unittest.TestCase):
         self._run_action("make", "hello")
         self._run_action("test", "hello")
 
-    def test_bdist(self):
-        self._run_action("bdist", "world")
+    def test_package(self):
+        self._run_action("package", "world")
 
 
 if __name__ == "__main__":

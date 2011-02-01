@@ -69,7 +69,7 @@ qibuild make
 - Project(debug=True)
   check that -DCMAKE_BUILD_TYPE=DEBUG is in project.flags
 
-- qibuild {configure, make, install, bdist}
+- qibuild {configure, make, install, package}
   (need a *real* toc object and *real* sources)
 
 

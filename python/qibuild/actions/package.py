@@ -23,7 +23,7 @@ def do(args):
     logger   = logging.getLogger(__name__)
     toc      = qibuild.toc_open(args.work_tree, args, use_env=True)
     (project_names, package_names, not_found) = qibuild.toc.resolve_deps(toc, args)
-    inst_dir = os.path.join(toc.work_tree, "bdist")
+    inst_dir = os.path.join(toc.work_tree, "package")
     for project_name in project_names:
         project = toc.get_project(project_name)
         destdir = os.path.join(inst_dir, project_name)
