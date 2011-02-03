@@ -25,8 +25,7 @@ def do(args):
     toc      = qibuild.toc_open(args.work_tree, args, use_env=True)
 
     if not args.project:
-        project_dir = qitools.qiworktree.search_manifest_directory(os.getcwd())
-        project_name = os.path.basename(project_dir)
+        project_name = qibuild.toc.project_from_cwd()
     else:
         project_name = args.project_name
 
