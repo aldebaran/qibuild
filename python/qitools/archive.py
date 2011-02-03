@@ -50,8 +50,9 @@ def extract_tar(archive_path, dest_dir):
         # See: http://docs.python.org/library/tarfile.html#tarfile.TarFile.extract
         archive.extractall(members=[member], path=dest_dir)
         percent = float(i) / size * 100
-        sys.stdout.write("Done: %.0f%%\r" % percent)
-        sys.stdout.flush()
+        if sys.stdout.isatty():
+            sys.stdout.write("Done: %.0f%%\r" % percent)
+            sys.stdout.flush()
     archive.close()
     LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
     res = os.path.join(dest_dir, topdir)
@@ -78,8 +79,9 @@ def extract_zip(archive_path, dest_dir):
             raise InvalidArchive(mess)
         archive.extract(member, path=dest_dir)
         percent = float(i) / size * 100
-        sys.stdout.write("Done: %.0f%%\r" % percent)
-        sys.stdout.flush()
+        if sys.stdout.isatty():
+            sys.stdout.write("Done: %.0f%%\r" % percent)
+            sys.stdout.flush()
     archive.close()
     LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
     res = os.path.join(dest_dir, topdir)
