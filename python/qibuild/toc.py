@@ -386,22 +386,27 @@ def resolve_deps(toc, args, runtime=False):
           - args.only_deps: only return dependencies
           - args.use_deps: take dependencies into account
     """
-    project_names = args.projects
-
-    if not project_names:
-        LOGGER.debug("no project specified, guessing from current working directory")
-        project_dir = qitools.qiworktree.search_manifest_directory(os.getcwd())
-        if project_dir:
-            LOGGER.debug("Found %s from current working directory",
-                os.path.split(project_dir)[-1])
-            project_names = [ os.path.split(project_dir)[-1] ]
-
+    if not args.projects:
+        project_names = [project_from_cwd()]
+    else:
+        project_names = args.projects
     dep_solver = DependenciesSolver(projects=toc.projects,
                                     packages=toc.toolchain.packages)
     return dep_solver.solve(project_names,
         single=args.single,
         all=args.all,
         runtime=runtime)
+
+def project_from_cwd():
+    """Return a project name from the current working directory
+
+    """
+    project_dir = qitools.qiworktree.search_manifest_directory(os.getcwd())
+    config = qitools.configstore.ConfigStore()
+    config.read(os.path.join(project_dir), "qibuild.manifest")
+    project_name = config.get("project")
+    return project_name
+
 
 def _advise_using_configure(project):
     """Just throw a nice exception because
