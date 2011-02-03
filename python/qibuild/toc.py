@@ -110,7 +110,7 @@ class Toc(QiWorkTree):
 
         # self.buildable_projects has been set by QiWorkTree.__init__
         for pname, ppath in self.buildable_projects.iteritems():
-            project = Project(ppath)
+            project = Project(pname, ppath)
             project.update_build_config(self, self.build_folder_name)
             project.update_depends(self)
             self.projects.append(project)
@@ -402,10 +402,7 @@ def project_from_cwd():
 
     """
     project_dir = qitools.qiworktree.search_manifest_directory(os.getcwd())
-    config = qitools.configstore.ConfigStore()
-    config.read(os.path.join(project_dir), "qibuild.manifest")
-    project_name = config.get("project")
-    return project_name
+    return qitools.qiworktree.project_name_from_directory(project_dir)
 
 
 def _advise_using_configure(project):

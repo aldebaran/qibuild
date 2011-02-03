@@ -50,9 +50,11 @@ class QiWorkTree:
     def _load_projects(self):
         (git_p, src_p) = search_projects(self.work_tree)
         for d in src_p:
-            self.buildable_projects[os.path.split(d)[-1]] = d
+            # Get the name of the project from its directory:
+            project_name = project_name_from_directory(d)
+            self.buildable_projects[project_name] = d
         for d in git_p:
-            self.git_projects[os.path.split(d)[-1]] = d
+            self.git_projects[os.path.basename(d)] = d
 
     def _load_configuration(self):
         for name, ppath in self.buildable_projects.iteritems():
@@ -157,6 +159,21 @@ def guess_work_tree(use_env=False):
         if not _tail:
             break
     return None
+
+
+def project_name_from_directory(project_dir):
+    """Get the project name from the project directory """
+    config = qitools.configstore.ConfigStore()
+    conf_file = os.path.join(project_dir, "qibuild.manifest")
+    config.read(conf_file)
+    project_names = config.get("project").keys()
+    if len(project_names) != 1:
+        mess  = "The file %s is invalid\n" % conf_file
+        mess += "It should contains exactly one project section"
+        raise Exception(mess)
+
+    return project_names[0]
+
 
 def create(directory):
     """Create a new Qi worktree in the given directory

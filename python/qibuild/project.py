@@ -14,14 +14,15 @@ LOGGER = logging.getLogger("qibuild.toc.project")
 
 class Project:
     """ store information about a project:
+         - name
          - source directory
          - build  directory
          - build  configuration
          - dependencies
     """
-    def __init__(self, directory):
+    def __init__(self, name, directory):
+        self.name            = name
         self.directory       = directory
-        self.name            = os.path.split(directory)[-1]
         self.depends         = list()
         self.rdepends        = list()
 
