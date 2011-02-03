@@ -55,15 +55,21 @@ def get_shared_path():
             res = os.path.expandvars(r"%APPDATA%\qi")
     else:
         res = os.path.expanduser("~/.local/share/qi")
+
+    qitools.sh.mkdir(res, recursive=True)
     return res
 
 def get_rootfs(toolchain_name):
-    return os.path.join(get_shared_path(), "toolchains", "rootfs",
+    res = os.path.join(get_shared_path(), "toolchains", "rootfs",
             toolchain_name)
+    qitools.sh.mkdir(res, recursive=True)
+    return res
 
 def get_cache(toolchain_name):
-    return os.path.join(get_shared_path(), "toolchains", "cache",
+    res = os.path.join(get_shared_path(), "toolchains", "cache",
             toolchain_name)
+    qitools.sh.mkdir(res, recursive=True)
+    return res
 
 
 class Toolchain(object):
@@ -212,9 +218,6 @@ def create(toolchain_name):
     rootfs = get_rootfs(toolchain_name)
     if os.path.exists(rootfs):
         raise Exception("Toolchain '%s' already exists." % toolchain_name)
-    qitools.sh.mkdir(rootfs, recursive=True)
     cache = get_cache(toolchain_name)
-    if not os.path.exists(cache):
-        qitools.sh.mkdir(cache,  recursive=True)
     LOGGER.info("Toolchain initialized in: %s", rootfs)
 
