@@ -54,7 +54,7 @@ endfunction()
 # \group:ARGUMENTS arguments to pass to add_test (to your test program)
 function(qi_add_gtest name)
   # Using upstream GtestConfig.cmake is a good idea here:
-  find_package(GTEST REQUIRED)
+  find_package(GTest REQUIRED)
   include_directories(${GTEST_INCLUDE_DIRS})
 
   # create tests_results folder if it does not exist
@@ -67,6 +67,9 @@ function(qi_add_gtest name)
 
   target_link_libraries(${name} ${GTEST_BOTH_LIBRARIES})
 
+  if(UNIX)
+    target_link_libraries(${name} pthread)
+  endif()
 
 
   # Build a correct xml output name
