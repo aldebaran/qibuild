@@ -13,6 +13,7 @@ Toolchain class and the qitoolchain actions
 
 
 import os
+import sys
 import logging
 import urllib
 
@@ -122,6 +123,10 @@ class Toolchain(object):
 
         """
         archive_path = os.path.join(get_cache(self.name), package_name)
+        if sys.platform.startswith("win"):
+            archive_path += ".zip"
+        else:
+            archive_path += ".tar.gz"
         if os.path.exists(archive_path):
             # FIXME: do something smarter here...
             pass
