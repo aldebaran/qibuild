@@ -46,8 +46,8 @@ sys.path.insert(0, r"%s")""" % python_path)
     if not ON_WIN or "--posix" in sys.argv:
         # For convenience, also create a executable without extension
         # in /usr/local/bin:
-        if not os.path.exists("/usr/local"):
-            os.makedirs("/usr/local")
+        if not os.path.exists("/usr/local/bin"):
+            os.makedirs("/usr/local/bin")
         out_path = posixpath.join("/usr/local/bin", script_name)
         print "Posix script in ", out_path
         with open(out_path, "w") as fp:
