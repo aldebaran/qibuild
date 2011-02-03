@@ -47,8 +47,15 @@ def get_config_path():
 
 def get_shared_path():
     # FIXME: deal with non-UNIX systems
-    share_path = os.path.expanduser("~/.local/share/qi")
-    return share_path
+    if sys.platform.startswith("win"):
+        # > Vista:
+        if os.environ.get("LOCALAPPDATA"):
+            res = os.path.expandvars(r"%LOCALAPPDATA%\qi")
+        else:
+            res = os.path.expandvars(r"%APPDATA%\qi")
+    else:
+        res = os.path.expanduser("~/.local/share/qi")
+    return res
 
 def get_rootfs(toolchain_name):
     return os.path.join(get_shared_path(), "toolchains", "rootfs",
