@@ -216,8 +216,5 @@ def create(toolchain_name):
     """Create a new toolchain given its name.
     """
     rootfs = get_rootfs(toolchain_name)
-    if os.path.exists(rootfs):
-        raise Exception("Toolchain '%s' already exists." % toolchain_name)
-    cache = get_cache(toolchain_name)
     LOGGER.info("Toolchain initialized in: %s", rootfs)
 
