@@ -3,34 +3,14 @@ QiBuild
 
 This projects aims to make compilation of cmake project easy.
 
-Goals:
- - no need to specify a toolchain file to build with system libraries, toolchain file is needed only to change the compiler when *cross-compiling*.
- - be standard as much as possible. (generated *Config.cmake should be selfcontained)
- - use standard path for *Config.cmake
+Refer to the documentation for more information.
 
+git repository:
+http://github.com/aldebaran/qibuild
 
-=== QiBuild ===
-#should work on a single project
-#if no .qibuild if found create and use ~/.qibuild? (finding project may need tweaking)
-qibuild init
-qibuild configure
-qibuild make
-qibuild install
+Mailing list:
+qibuild-dev@aldebaran-robotics.com
 
-=== QiToolchain ===
-#store toolchain in the home? ~/.config/qi/toolchain/{config, tc1/, tc2/,..}?
-qitoolchain create <name> <feed>
-qitoolchain install <project>
-qitoolchain uninstall <project>
-qitoolchain status
-
-=== QiSrc ===
-#.qisrc ?
-qisrc init <feed>
-qisrc add <name> [url]
-qisrc pull
-qisrc status
-qisrc push
-qisrc reset
-qisrc clean
-qisrc foreach
+Maintainers:
+Cedric GESTES <gestes@aldebaran-robotics.com>
+Dimitri Merejkowsky <dmerejkowsky@aldebaran-robotics.com>
