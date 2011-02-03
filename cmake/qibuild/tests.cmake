@@ -11,9 +11,7 @@
 # This cmake module provide function to interface gtest with ctest.
 
 
-set(_TESTS_RESULTS_FOLDER "${CMAKE_SOURCE_DIR}/tests-results" CACHE INTERNAL "" FORCE)
-# create tests_results folder if it does not exist
-file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
+set(_TESTS_RESULTS_FOLDER "${CMAKE_SOURCE_DIR}/build-tests/results" CACHE INTERNAL "" FORCE)
 
 
 #! Add a test using a binary that was created by qi_create_bin
@@ -47,29 +45,32 @@ endfunction()
 # (so that the test can be run by CTest)
 # When run, the C++ test outputs a xUnit xml file in
 # ${CMAKE_SOURCE_DIR}/test-results/${test_name}.xml
+# The name of the test will always be the name of the target.
 #
 # \flag:NO_ADD_TEST do not call add_test, just create the binary
 # \param:TIMEOUT the timeout of the test
 # \group:SRC sources
 # \group:DEPENDS dependencies to pass to use_lib
 # \group:ARGUMENTS arguments to pass to add_test (to your test program)
-function(qi_create_gtest test_name target_name)
+function(qi_add_gtest name)
+  # create tests_results folder if it does not exist
+  file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
   cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
 
   # First, create the target
-  qi_create_bin(${target_name} SRC ${ARG_SRC})
-  qi_use_lib(${target_name} ${ARG_DEPENDS})
+  qi_create_bin(${name} SRC ${ARG_SRC})
+  qi_use_lib(${name} ${ARG_DEPENDS})
 
 
   # Build a correct xml output name
-  set(xml_output "${_TESTS_RESULTS_FOLDER}/${test_name}.xml")
+  set(_xml_output "${_TESTS_RESULTS_FOLDER}/${name}.xml")
 
   if (WIN32)
-    string(REPLACE "/" "\\\\" xml_output ${xml_output})
+    string(REPLACE "/" "\\\\" xml_output ${_xml_output})
   endif()
 
   # Call qi_add_test with correct arguments:
-  qi_add_test({test_name} ${target_name}
+  qi_add_test(${name} ${name}
     TIMEOUT ${ARG_TIMEOUT}
     ARGUMENTS --gtest_output=xml:${_xml_output} ${ARG_ARGUMENTS}
   )
