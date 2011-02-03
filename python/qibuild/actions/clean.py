@@ -5,10 +5,10 @@
 ## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
-""" clean build directories
+""" Clean build directories.
 
-By default all build directories for all project are removed.
-You can specify a list of build directory name to cleanup.
+By default all build directories for all projects are removed.
+You can specify a list of build directory names to cleanup.
 """
 
 import os

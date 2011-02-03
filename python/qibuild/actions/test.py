@@ -5,7 +5,7 @@
 ## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
-""" launch automatic test
+""" Launch automatic tests
 """
 
 import os

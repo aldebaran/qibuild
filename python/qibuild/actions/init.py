@@ -1,4 +1,4 @@
-"""Init a new toc workspace """
+"""Initialize a new toc worktree """
 
 import os
 import qibuild

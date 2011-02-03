@@ -5,9 +5,7 @@
 ## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
-"""display the status of projects
-
-List all buildable projects found. For each project, display the list of build directory.
+"""Display the status of each project
 """
 
 import os
@@ -23,7 +21,7 @@ LOGGER = logging.getLogger(__name__)
 
 def usage():
     "Specific usage"
-    return """status [--all,-a] [projects..]"""
+    return """status [--all, -a] [projects...]"""
 
 def configure_parser(parser):
     """Configure parser for this action """

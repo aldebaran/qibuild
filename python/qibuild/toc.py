@@ -353,7 +353,10 @@ def toc_open(work_tree, args, use_env=False):
     if not work_tree:
         work_tree = qitools.qiworktree.search_manifest_directory(os.getcwd())
     if work_tree is None:
-        raise TocException("Could not find toc work tree, please go to a valid work tree.")
+        raise TocException("Could not find a work tree, "
+            "please try from a valid work tree, specify an "
+            "existing work tree with '--work-tree {path}', or "
+            "create a new work with 'qibuild init'")
     return Toc(work_tree,
                build_type=build_type,
                toolchain_name=toolchain_name,

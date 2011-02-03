@@ -6,7 +6,7 @@
 ## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
-"Run the same command on each buildable projects"
+"Run the same command on each buildable project"
 
 import sys
 import logging

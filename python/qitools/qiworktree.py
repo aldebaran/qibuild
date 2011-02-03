@@ -26,7 +26,7 @@ def work_tree_parser(parser):
     """ Parser settings for every action using a toc dir
     """
     default_parser(parser)
-    parser.add_argument("--work-tree", help="force work tree")
+    parser.add_argument("--work-tree", help="Use a specific work tree path.")
 
 
 class QiWorkTree:
@@ -100,8 +100,10 @@ def qiworktree_open(work_tree=None, use_env=False):
     if not work_tree:
         work_tree = search_manifest_directory(os.getcwd())
     if work_tree is None:
-        raise WorkTreeException("Could not find toc work tree, "
-            "please go to a valid work tree.")
+        raise WorkTreeException("Could not find a work tree, "
+            "please try from a valid work tree, specify an "
+            "existing work tree with \"--work-tree PATH\", or "
+            "create a new work with \"qibuild init\"")
     return QiWorkTree(work_tree)
 
 
