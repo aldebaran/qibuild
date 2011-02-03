@@ -53,6 +53,10 @@ endfunction()
 # \group:DEPENDS dependencies to pass to use_lib
 # \group:ARGUMENTS arguments to pass to add_test (to your test program)
 function(qi_add_gtest name)
+  # Using upstream GtestConfig.cmake is a good idea here:
+  find_package(GTEST REQUIRED)
+  include_directories(${GTEST_INCLUDE_DIRS})
+
   # create tests_results folder if it does not exist
   file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
   cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
@@ -60,6 +64,9 @@ function(qi_add_gtest name)
   # First, create the target
   qi_create_bin(${name} SRC ${ARG_SRC})
   qi_use_lib(${name} ${ARG_DEPENDS})
+
+  target_link_libraries(${name} ${GTEST_BOTH_LIBRARIES})
+
 
 
   # Build a correct xml output name
