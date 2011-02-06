@@ -201,11 +201,11 @@ def run_script(script_path, args, environ=None):
     """
     cmd = [script_path] + args
     process = subprocess.Popen(cmd)
-    caugth_error = None
+    caught_error = None
     try:
         yield
     except Exception, err:
-        caugth_error = err
+        caught_error = err
     finally:
         try:
             if process.poll() != None:
@@ -214,6 +214,6 @@ def run_script(script_path, args, environ=None):
             else:
                 process.kill()
         except ProcessCrashedError, err:
-            caugth_error = err
-    if caugth_error:
-        raise caugth_error
+            caught_error = err
+    if caught_error:
+        raise caught_error
