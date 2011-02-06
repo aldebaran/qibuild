@@ -19,6 +19,7 @@ def mkdir(dest_dir, recursive=False):
         else:
             os.mkdir(dest_dir)
     except OSError, e:
+        # TODO explain magic number
         if e.errno == 17:
             pass
         else:
