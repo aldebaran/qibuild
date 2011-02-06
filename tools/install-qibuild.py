@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""This script install qibuild properly
+"""This script installs qibuild properly
 
 """
 import os
