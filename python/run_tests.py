@@ -20,6 +20,8 @@ def run_tests(xml_report=False, build_config="unix"):
     options
 
     """
+    import unittest
+    import sys
     cur_dir = os.path.abspath(os.path.dirname(__file__))
     qi_build_cfg = os.path.join(cur_dir,
         "qibuild", "test", "build-%s.cfg" % build_config)
@@ -27,8 +29,20 @@ def run_tests(xml_report=False, build_config="unix"):
         "qibuild", "test", ".qi")
     qitools.sh.mkdir(qi_test_dir, recursive=True)
     shutil.copy(qi_build_cfg, os.path.join(qi_test_dir, "build.cfg"))
-    qitools.command.check_call(["nosetests", "qibuild"])
 
+    from qibuild.test.test_qibuild import QiBuildTestCase
+    suite = unittest.TestSuite()
+    suite.addTests(unittest.makeSuite(QiBuildTestCase))
+    out_xml = qitools.sh.to_native_path(os.path.join(cur_dir, "..", "tests-results.xml"))
+
+    if xml_report:
+        from xmlrunner import XmlTestRunner
+        with open(out_xml, "w") as fp:
+            runner = XmlTestRunner(fp)
+            runner.run(suite)
+
+    else:
+        unittest.TextTestRunner().run(suite)
 
 
 def main():
