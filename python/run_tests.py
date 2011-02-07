@@ -6,6 +6,7 @@ working dir, so that python libraries are found
 """
 
 import os
+import sys
 import shutil
 import qitools
 try:
@@ -21,7 +22,6 @@ def run_tests(xml_report=False, build_config="unix"):
 
     """
     import unittest
-    import sys
     cur_dir = os.path.abspath(os.path.dirname(__file__))
     qi_build_cfg = os.path.join(cur_dir,
         "qibuild", "test", "build-%s.cfg" % build_config)
