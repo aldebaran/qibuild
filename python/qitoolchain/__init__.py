@@ -182,7 +182,7 @@ class Toolchain(object):
         else:
             package_names = [p.name for p in self.packages]
         for package_name in package_names:
-            self.add_package(package_name)
+            self.add_remote_package(package_name)
         if new_feed:
             self._update_config("feed", new_feed)
 
