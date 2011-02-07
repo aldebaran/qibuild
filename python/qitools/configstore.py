@@ -8,7 +8,6 @@
 """ store all toc configuration keys
 """
 
-import os
 import logging
 import ConfigParser
 
@@ -80,18 +79,6 @@ class ConfigStore:
             output = output[:-1]
         return output
 
-    def recurse(self, callback, element = None, name = ""):
-        """ print the list of keys/values """
-        if element is None:
-            element = self.root
-        if len(name) > 0:
-            name = name + '.'
-        for (k, v) in element.items():
-            if type(v) == dict:
-                self.recurse(callback, v, name + k)
-            else:
-                callback(str(name+k), str(v))
-
     def list_child(self, element = None, name = ""):
         """
         return a dict with k = value
@@ -101,6 +88,8 @@ class ConfigStore:
             element = self.root
         if len(name) > 0:
             name = name + '.'
+        if not element.items():
+            ret[name[:-1]] = ""
         for (k, v) in element.items():
             if type(v) == dict:
                 r = self.list_child(v, name + k)
@@ -111,7 +100,7 @@ class ConfigStore:
 
 
 
-    def read(self, filename, prefix=""):
+    def read(self, filename):
         """ read a configuration file """
         parser = ConfigParser.RawConfigParser()
         parser.read(filename)
@@ -119,10 +108,10 @@ class ConfigStore:
         for section in sections:
             splitted_section = section.split()
             items = parser.items(section)
+            if not items:
+                self.set(*splitted_section, value=dict())
             for k, v in items:
                 tkey = [ ]
-                if prefix:
-                    tkey.append(prefix)
                 tkey.extend([x.strip("\"\'") for x in splitted_section])
                 tkey.extend([x.strip("\"\'") for x in k.split(".")])
                 self.set(*tkey, value=v.strip("\"\'"))
