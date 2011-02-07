@@ -27,10 +27,7 @@ def run_tests(xml_report=False, build_config="unix"):
         "qibuild", "test", ".qi")
     qitools.sh.mkdir(qi_test_dir, recursive=True)
     shutil.copy(qi_build_cfg, os.path.join(qi_test_dir, "build.cfg"))
-    # If you do not use "-s" here, on windows, a bunch of cmd.exe
-    # windows will be created, and nosetests will exit with error code
-    # 1 without any error mesage...
-    qitools.command.check_call(["nosetests", "-s", "qibuild"], shell=True)
+    qitools.command.check_call(["nosetests", "qibuild"])
 
 
 
@@ -47,6 +44,14 @@ def main():
         build_config="unix")
 
     args = parser.parse_args()
+
+    # Quick small hack for hudson:
+    build_config = args.build_config
+    if not build_config:
+        labels = os.environ.get("NODE_LABELS")
+        if labels:
+            if "vs2008" in labels:
+                build_config = "vs2008"
     run_tests(xml_report=args.xml_report, build_config=args.build_config)
 
 if __name__ == "__main__":
