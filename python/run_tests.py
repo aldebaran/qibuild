@@ -67,9 +67,8 @@ def main():
             if "vs2008" in labels:
                 build_config = "vs2008"
 
-    # Yet another hack
-    import sys
-    sys.path.insert(0, os.getcwd())
+    if sys.platform.startswith("win"):
+        build_config = "vs2008"
     run_tests(xml_report=args.xml_report, build_config=args.build_config)
 
 if __name__ == "__main__":
