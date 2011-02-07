@@ -385,6 +385,10 @@ def resolve_deps(toc, args, runtime=False):
           - args.use_deps: take dependencies into account
     """
     if not args.projects:
+        if not project_from_cwd():
+            raise Exception("Could not guess project name from the working tree.\n"
+                    "Please try from a subdirectory of a project\n"
+                    "or specify the name of the project.")
         project_names = [project_from_cwd()]
     else:
         project_names = args.projects
@@ -400,6 +404,8 @@ def project_from_cwd():
 
     """
     project_dir = qitools.qiworktree.search_manifest_directory(os.getcwd())
+    if not project_dir:
+        return None
     return qitools.qiworktree.project_name_from_directory(project_dir)
 
 

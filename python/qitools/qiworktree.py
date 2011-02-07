@@ -168,7 +168,7 @@ def project_name_from_directory(project_dir):
     config = qitools.configstore.ConfigStore()
     conf_file = os.path.join(project_dir, "qibuild.manifest")
     config.read(conf_file)
-    project_names = config.get("project", dict()).keys()
+    project_names = config.get("project", default=dict()).keys()
     if len(project_names) != 1:
         mess  = "The file %s is invalid\n" % conf_file
         mess += "It should contains exactly one project section"
