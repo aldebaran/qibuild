@@ -422,7 +422,7 @@ def _advise_using_configure(project):
     if not os.path.exists(cmake_file):
         mess += """
     Note that {project.name} does not look like a valid CMake project
-    (No CMakeLists.txt in {project.directory}
+    (No CMakeLists.txt in {project.directory})
     """
     else:
         mess += "Try using `qibuild configure {project.name}'"
