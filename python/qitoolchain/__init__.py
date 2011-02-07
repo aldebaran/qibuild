@@ -107,7 +107,17 @@ class Toolchain(object):
         package_path = os.path.join(base_dir, package_name)
         return package_path
 
-    def add_package(self, package_name):
+    def add_local_package(self, package_path):
+        """Add a package given its name and its path
+
+        """
+        package_name = os.path.basename(package_path)
+        package_name = package_name.split(".")[0]
+        qitools.archive.extract(package_path, get_rootfs(self.name))
+        self._update_tc_provides(package_name)
+
+
+    def add_remote_package(self, package_name):
         """Retrieve the latest version from the server, if not already
         in cache
 
@@ -121,6 +131,13 @@ class Toolchain(object):
         for dep in deps:
             self._add_package(dep)
         self._add_package(package_name)
+        self._update_tc_provides(package_name)
+
+    def _update_tc_provides(self, package_name):
+        """When a package has been added, update the tooclchain
+        configuration
+
+        """
         provided = self.configstore.get("toolchain", self.name, "provide",
             default="").split()
         if package_name not in provided:

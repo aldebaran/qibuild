@@ -22,8 +22,8 @@ def configure_parser(parser):
     qitools.cmdparse.default_parser(parser)
     parser.add_argument("toolchain_name", action="store",
         help="name of the toolchain to add the project to.")
-    parser.add_argument("package_name",
-        help="the name of the project to add")
+    parser.add_argument("package_path",
+        help="the path of the package to add")
 
 def do(args):
     """Retrieve the latest version from the server, if not already
@@ -31,8 +31,9 @@ def do(args):
 
     Then, extract the package to the toolchains subdir
     """
+    package_path = qitools.sh.to_native_path(args.package_path)
     toolchain = qitoolchain.Toolchain(args.toolchain_name)
-    toolchain.add_package(args.package_name)
+    toolchain.add_local_package(package_path)
 
 
 
