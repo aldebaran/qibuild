@@ -320,11 +320,6 @@ class Toc(QiWorkTree):
                 cmd = ["BuildConsole.exe", sln_file]
                 cmd += ["/cfg=%s|Win32" % self.build_type]
                 cmd += ["/nologo"]
-        else:
-            makefile = os.path.join(build_dir, "Makefile")
-            if not os.path.exists(makefile):
-                _advise_using_configure(project, "Makefile")
-
         qitools.command.check_call(cmd)
 
 
