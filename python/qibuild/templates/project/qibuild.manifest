@@ -1,4 +1,4 @@
 [project @project_name@]
 # Put dependencies of your project here:
-# depends =
+depends =
 
