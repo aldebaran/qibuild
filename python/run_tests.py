@@ -69,7 +69,7 @@ def main():
 
     if sys.platform.startswith("win"):
         build_config = "vs2008"
-    run_tests(xml_report=args.xml_report, build_config=args.build_config)
+    run_tests(xml_report=args.xml_report, build_config=build_config)
 
 if __name__ == "__main__":
     main()
