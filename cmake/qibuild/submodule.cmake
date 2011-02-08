@@ -5,7 +5,7 @@
 ## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
-#! QiBuild SubModule
+#! qiBuild SubModule
 # ==================
 
 #!

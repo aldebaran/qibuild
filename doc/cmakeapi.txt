@@ -1,7 +1,7 @@
-QiBuild CMake API
+qiBuild CMake API
 =================
 
-This page presents the public QiBuild cmake API.
+This page presents the public qiBuild cmake API.
 
 link:target.html[Target]
 ------------------------

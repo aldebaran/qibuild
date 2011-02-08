@@ -1,4 +1,4 @@
-QiBuild
+qiBuild
 =======
 
 == Requirements ==

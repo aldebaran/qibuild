@@ -14,7 +14,7 @@ The requirements for this tutorial are the same as in link:managing-deps.html[Ma
 
 You should have:
 
- * a properly configured QiBuild worktree
+ * a properly configured qiBuild worktree
  * two projects, world and hello, with hello depending on the world library.
 
 

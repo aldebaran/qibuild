@@ -1,4 +1,4 @@
-== QiBuild major classes ==
+== qiBuild major classes ==
 
 === QiWorkTree ===
 Hold general information about a worktree:

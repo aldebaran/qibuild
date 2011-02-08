@@ -1,4 +1,4 @@
-QiBuild CMake Tutorial
+qiBuild CMake Tutorial
 ======================
 Cedric GESTES <cgestes@aldebaran-robotics.com>
 

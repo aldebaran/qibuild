@@ -5,7 +5,7 @@
 ## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
-#! QiBuild Stage
+#! qiBuild Stage
 # ===============
 #
 # This module make libraries and executables build in this projects available

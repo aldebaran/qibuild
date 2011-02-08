@@ -88,7 +88,7 @@ class Project:
 
 
 def get_qibuild_cmake_framework_path():
-    """ return the path to the QiBuild Cmake framework """
+    """ return the path to the qiBuild Cmake framework """
     path = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "cmake"))
     return qitools.sh.to_posix_path(path)
 

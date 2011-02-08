@@ -5,7 +5,7 @@
 ## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
-#! QiBuild UseLib
+#! qiBuild UseLib
 # ===============
 #
 # == Overview ==

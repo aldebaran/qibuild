@@ -22,7 +22,7 @@ CMake:
 * rewrite and document launcher.cmake
 * do something nice with static/shared libraries
 
-QiBuild:
+qiBuild:
 * configstore: merge dependencies and cflags properly
 * doc
 * fix install component

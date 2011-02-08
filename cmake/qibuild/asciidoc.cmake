@@ -2,7 +2,7 @@
 ## Copyright (C) 2008, 2010, 2011 Aldebaran Robotics
 ##
 
-#! QiBuild Asciidoc
+#! qiBuild Asciidoc
 # =================
 
 #!

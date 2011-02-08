@@ -1,4 +1,4 @@
-Hacking QiBuild
+Hacking qiBuild
 ===============
 
 Welcome, brave hacker !

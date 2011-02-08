@@ -5,11 +5,11 @@
 ## Copyright (C) 2008, 2010, 2011 Aldebaran Robotics
 ##
 
-#! QiBuild Target
+#! qiBuild Target
 # ===============
 
 #!
-# This is the main QiBuild module. It encapsulate the creation of programs,
+# This is the main qiBuild module. It encapsulate the creation of programs,
 # scripts and libraries handling dependencies and install rules,
 # in an easy, elegant and standard way.
 #
@@ -19,7 +19,7 @@
 # * *lib* : a library
 # * *script* : a script
 #
-# The separated module link:submodule.html[QiBuild SubModule], can be used to write more readable
+# The separated module link:submodule.html[qiBuild SubModule], can be used to write more readable
 # and maintainable CMakeLists for binaries and libraries with lots of sources
 # and dependencies. It help keep track of groups of sources.
 # see link:submodule.html[SubModule].

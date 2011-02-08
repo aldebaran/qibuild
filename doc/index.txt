@@ -1,18 +1,18 @@
-QiBuild
+qiBuild
 =======
 
 Introduction
 ------------
-QiBuild aims to make compilation of your sources easy. It manages
+qiBuild aims to make compilation of your sources easy. It manages
 dependencies between projects and supports easy cross-compilation.
-By default QiBuild use libraries provided by your system, but you
+By default qiBuild use libraries provided by your system, but you
 can use QiToolchain to get a toolchain if you dont want to build
 with your system libraries or want to cross-compile.
 
 
-QiBuild is composed of two parts:
+qiBuild is composed of two parts:
 
-* the QiBuild CMake framework, that simplify CMakeLists.txt writing.
+* the qiBuild CMake framework, that simplify CMakeLists.txt writing.
 * qibuild/qitoolchain command line programs, that build projects taking dependencies into account.
 
 For more detailled information look at the link:architecture.html[architecture].
@@ -20,7 +20,7 @@ For more detailled information look at the link:architecture.html[architecture].
 
 Tutorials
 ---------
-Learn how to use the QiBuild framework to build your
+Learn how to use the qiBuild framework to build your
 C++ projects
 
 * link:getting-started.html[Getting Started] : Read this first !
@@ -31,9 +31,9 @@ C++ projects
 Documentation
 --------------
 
-QiBuild CMake Framework:
+qiBuild CMake Framework:
 
-* link:cmakeapi.html[QiBuild CMake API Reference]
+* link:cmakeapi.html[qiBuild CMake API Reference]
 
 Manpages:
 

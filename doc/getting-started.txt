@@ -3,14 +3,14 @@ Getting Started
 
 
 In this tutorial, you will learn how to configure and build a
-C++ project using the QiBuild framework.
+C++ project using the qiBuild framework.
 
 
 Requirements
 ------------
 
 
-Python 2.7 is the preferred version, but QiBuild should work
+Python 2.7 is the preferred version, but qiBuild should work
 fine on python 2.6, too.
 
 CMake version 2.8.3 is the preferred version, but you should
@@ -45,7 +45,7 @@ This will create a new qibuild configuration file in
 your working directory, in QI_WORK_TREE/.qi/build.cfg
 
 
-Configuring QiBuild
+Configuring qiBuild
 -------------------
 
 You can skip this section if you want to build with Unix Makefiles.
@@ -62,7 +62,7 @@ qibuild init --interactive
 
 and then answering the questions
 
-Configuring QiBuild for Visual Studio
+Configuring qiBuild for Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You will have to do several things for qibuild to work with
@@ -104,7 +104,7 @@ cmake_generator = "NMake Makefiles"
 (the location of the .bat file depends on your setup)
 
 
-Configuring QiBuild for MinGW
+Configuring qiBuild for MinGW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You will have to do several things for qibuild to work with
@@ -127,7 +127,7 @@ path = C:\Mingw\bin;C:\MinGW\msys\1.0\bin;
 ----
 
 
-QiBuild and QtCreator
+qiBuild and QtCreator
 ~~~~~~~~~~~~~~~~~~~~~
 
 * Windows:

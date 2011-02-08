@@ -5,12 +5,12 @@
 ## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 ##
 
-#! QiBuild Install
+#! qiBuild Install
 # ================
 #
 # == General overview ==
 # This cmake module provide easy install functions.
-# QiBuild generated path are normalized, thoses functions help
+# qiBuild generated path are normalized, thoses functions help
 # creating install rules that abstract the final destination
 # file hierarchy. Furthermore files are classified by components depending
 # on the file type, this make it easy to install only what is needed,
