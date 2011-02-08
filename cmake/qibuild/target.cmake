@@ -1,4 +1,4 @@
-##
+sdk/lib)
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
@@ -100,6 +100,21 @@ function(qi_create_bin name)
         -DBUILD_TYPE=${CMAKE_CFG_INTDIR}
         -DPROJECT=${_U_name}
         -P ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
+        ${CMAKE_BINARY_DIR}
+    )
+  endif()
+
+  if(APPLE)
+    string(TOUPPER ${name} _U_name)
+    configure_file(${QI_ROOT_DIR}/templates/post-copy-dylibs.cmake
+                   ${CMAKE_BINARY_DIR}/post-copy-dylibs.cmake
+                   COPYONLY)
+
+    add_custom_command(TARGET ${name} POST_BUILD
+      COMMAND
+        ${CMAKE_COMMAND}
+        -DPROJECT=${_U_name}
+        -P ${CMAKE_BINARY_DIR}/post-copy-dylibs.cmake
         ${CMAKE_BINARY_DIR}
     )
   endif()
@@ -219,6 +234,14 @@ function(qi_create_lib name)
            RESOURCE COMPONENT data       DESTINATION ${QI_SDK_SHARE}/${name}/${ARG_SUBFOLDER}
             ARCHIVE COMPONENT static-lib DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER})
   endif()
+
+  if(APPLE)
+    set_target_properties("${name}"
+      PROPERTIES
+        INSTALL_NAME_DIR "@executable_path/../lib"
+    )
+  else()
+
 endfunction()
 
 
