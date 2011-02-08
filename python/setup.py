@@ -15,13 +15,16 @@ packages = [
 ]
 
 scripts = [
-    "../bin/qisrc",
-    "../bin/qibuild",
-    "../bin/qitoolchain",
+    "bin/qisrc",
+    "bin/qibuild",
+    "bin/qitoolchain",
 ]
 
 package_data = {
- "qibuild" : ["templates/build.cfg"]
+ "qibuild" : ["templates/qibuild.cmake",
+              "templates/build.cfg",
+              "templates/project/*"
+              ]
 }
 
 
