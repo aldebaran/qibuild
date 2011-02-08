@@ -25,7 +25,6 @@ The sources of this example can be found link:qi-examples.tar.gz[here]
 
 Extract the archive in your qiBuild worktree, you should end up with something looking like:
 
-[source, bash]
 ----
 .qi
 |__ build.cfg
@@ -51,7 +50,6 @@ Magic !
 
 Configuring and building the hello project is as easy as:
 
-[source, bash]
 ----
 qibuild configure hello
 qibuild make hello
@@ -74,7 +72,6 @@ A bit of warning here: if you try to compile hello in release, you'll get an err
 "world" has not been compiled in release, so world.lib could not found.
 
 Simply run:
-[source, bash]
 ----
 qibuild configure --release world
 qibuild make --release world

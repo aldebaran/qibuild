@@ -27,7 +27,6 @@ Creating the world package
 
 Generating a package for the world project is done with:
 
-[source, bash]
 ----
 qibuild package world
 ----
@@ -37,7 +36,6 @@ This will create a package named hello.tar.gz in +QI_WORK_TREE+/package/hello.ta
 
 Inside the package, you'll have:
 
-[source, bash]
 ----
 world
 |__ include
@@ -68,7 +66,6 @@ Using a toolchain
 
 First, you have to create a "toolchain" dir for qibuild to use:
 
-[source, bash]
 ----
 qitoolchain create linux
 ----
@@ -80,7 +77,6 @@ This is where every packages corresponding to the "linux" toolchain will be put.
 
 Now you can use:
 
-[source, bash]
 ----
 qitoolchain add linux /path/to/worktree/package/world.tar.gz
 ----
@@ -98,7 +94,6 @@ so it's enough to set CMAKE_MODULE_PATHS to +path/to/linux/toolchain/world+
 The +world+ project will not be built when you use +qibuild make hello+, unless
 you specify it explicitly on the command line:
 
-[source, bash]
 ----
 qibuild make world hello
 ----
