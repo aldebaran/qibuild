@@ -15,6 +15,8 @@ try:
 except ImportError:
     from qitools.external import argparse
 
+from qitools.external.xmlrunner import XmlTestRunner
+
 BUILD_CONFIGS = ["unix", "vs2008"]
 
 def run_tests(xml_report=False, build_config="unix"):
@@ -37,7 +39,6 @@ def run_tests(xml_report=False, build_config="unix"):
     out_xml = qitools.sh.to_native_path(os.path.join(cur_dir, "..", "tests-results.xml"))
 
     if xml_report:
-        from xmlrunner import XmlTestRunner
         with open(out_xml, "w") as fp:
             runner = XmlTestRunner(fp)
             runner.run(suite)
