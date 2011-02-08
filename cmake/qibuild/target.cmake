@@ -1,4 +1,3 @@
-sdk/lib)
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
@@ -240,7 +239,7 @@ function(qi_create_lib name)
       PROPERTIES
         INSTALL_NAME_DIR "@executable_path/../lib"
     )
-  else()
+  endif()
 
 endfunction()
 

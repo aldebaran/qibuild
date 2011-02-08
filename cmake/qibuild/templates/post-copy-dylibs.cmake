@@ -17,20 +17,22 @@
 # folder
 
 # PROJECT : upper-case name of the target beeing built.
-#           (${PROJECT}_DEPENDS must exist in the CMake cache)
+#          (${PROJECT}_DEPENDS must exist in the CMake cache)
 
 set(_libs)
 
 foreach(_dep ${${PROJECT}_DEPENDS})
   string(TOUPPER ${_dep} _U_dep)
   list(APPEND _libs ${${_U_dep}_LIBRARIES})
+  list(APPEND _libs ${${_U_dep}_LIBRARY})
 endforeach()
 
 
 set(_in_dylibs)
 
-foreach(_lib ${_libs}})
-  if(${_lib} MATCHES "*.dylib")
+foreach(_lib ${_libs})
+  if(${_lib} MATCHES ".*\\.dylib")
+    message(STATUS "_lib: ${_lib}")
     list(APPEND _in_dylibs ${_lib})
   endif()
 endforeach()
