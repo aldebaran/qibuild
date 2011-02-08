@@ -1,0 +1,27 @@
+#!/bin/bash -e
+## Copyright (C) 2011 Aldebaran Robotics
+
+# Generate a .tar.gz containing
+# qibuild/python/qibuild/test/{world, hello}
+
+# Usage: generate_example_archive /path/to/examples /path/to/build
+
+function generate_example_archive {
+  dest_dir="$2/qi-examples"
+  rm -fr "$dest_dir"
+  mkdir -p "$dest_dir"
+  cp -r $1/{world,hello} "$dest_dir"
+  pushd $2
+  tar cfz qi-examples.tar.gz qi-examples
+}
+
+
+if [ $# -ne 2 ]; then
+  echo "usage: $0 /path/to/examples /path/to/build"
+  exit 2
+fi
+
+generate_example_archive $1 $2
+
+
+

@@ -34,3 +34,4 @@ find ${CURDIR}/build-doc/ -type f -name '*.txt' | while read f ; do
   asciidoc.py -a toc -a toclevels=1  -a linkcss -a 'theme=' -a stylesheet="bare.css" -a pygments "$f"
 done
 
+doc/tools/generate_examples_archive python/qibuild/test/ "build-doc"

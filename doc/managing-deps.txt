@@ -21,7 +21,7 @@ on the world library.
 It also contains a small test that simply tries to launch hello.
 
 
-The sources of this example can be found here:...
+The sources of this example can be found link:qi-examples.tar.gz[here]
 
 Extract the archive in your QiBuild worktree, you should end up with something looking like:
 
