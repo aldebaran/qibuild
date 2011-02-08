@@ -2,8 +2,7 @@
 
 """
 
-# Those are high-level tests, using sources from
-# qibuild/python/qibuild/tests
+## Copyright (C) 2011 Aldebaran Robotics
 
 import os
 import sys

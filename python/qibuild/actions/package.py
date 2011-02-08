@@ -1,3 +1,4 @@
+## Copyright (C) 2011 Aldebaran Robotics
 """Generate a binary sdk"""
 
 import logging

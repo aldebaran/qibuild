@@ -2,7 +2,7 @@
 
 """
 
-#TODO: color !
+## Copyright (C) 2011 Aldebaran Robotics
 
 def ask_choice(choices, input_text):
     """Ask the user to choose from a list of choices

@@ -1,10 +1,4 @@
-##
-## Author(s):
-##  - Dimitri Merejkowsky <dmerejkowsy@aldebaran-robotics.com>
-##  - Cedric GESTES <gestes@aldebaran-robotics.com>
-##
-## Copyright (C) 2010 Aldebaran Robotics
-##
+## Copyright (C) 2011 Aldebaran Robotics
 
 """ Update a toolchain
     This will try to update every package already found in the toolchain """

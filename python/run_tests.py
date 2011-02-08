@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+## Copyright (C) 2011 Aldebaran Robotics
 """Use this script to run tests.
 
 Make sure that this script is run with the correct

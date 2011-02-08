@@ -1,3 +1,4 @@
+## Copyright (C) 2011 Aldebaran Robotics
 """Testing DependenciesSolver class
 
 """

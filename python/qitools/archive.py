@@ -1,6 +1,4 @@
-##
-## Copyright (C) 2009 Aldebaran Robotics
-##
+## Copyright (C) 2011 Aldebaran Robotics
 
 """This module contains function to
 manipulate archives

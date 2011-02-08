@@ -1,3 +1,4 @@
+## Copyright (C) 2011 Aldebaran Robotics
 """Initialize a new toc worktree """
 
 import os

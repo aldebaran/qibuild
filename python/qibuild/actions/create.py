@@ -1,3 +1,4 @@
+## Copyright (C) 2011 Aldebaran Robotics
 """Create a new project """
 
 import os

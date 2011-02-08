@@ -1,9 +1,4 @@
-##
-## Author(s):
-##  - Cedric GESTES <gestes@aldebaran-robotics.com>
-##
 ## Copyright (C) 2011 Aldebaran Robotics
-##
 
 from qitools import configstore
 from qitools import cmdparse

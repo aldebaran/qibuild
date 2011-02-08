@@ -1,10 +1,4 @@
-##
-## Author(s):
-##  - Cedric GESTES <gestes@aldebaran-robotics.com>
-##  - Dimitri Merejkowsky <dmerejkowsky@aldebaran-robotics.com>
-##
-## Copyright (C) 2010, 2011 Aldebaran Robotics
-##
+## Copyright (C) 2011 Aldebaran Robotics
 
 """Init a new qisrc workspace """
 
