@@ -20,8 +20,8 @@ CMake:
 * toolchain support (iphone, mingw32-cross, android, ..)
 * wrapper for old t001chain stuff
 * do something nice with static/shared libraries
-* fix linker problems on mac.
-  (using qitoolchain on mac does not work)
+* fix linker problems when using toolchain and
+  third party libraries
 
 qiBuild:
 * configstore: merge dependencies and cflags properly
