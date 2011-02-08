@@ -19,20 +19,26 @@ CMake:
 * finish qi_use_lib (handle version, handle component)
 * toolchain support (iphone, mingw32-cross, android, ..)
 * wrapper for old t001chain stuff
-* rewrite and document launcher.cmake
 * do something nice with static/shared libraries
+* fix linker problems on mac.
+  (using qitoolchain on mac does not work)
 
 qiBuild:
 * configstore: merge dependencies and cflags properly
 * doc
 * fix install component
 
-QiSrc:
+qiSrc:
 
 
 DOC:
  * add tutorials:
   - using toolchain
   - build configurations
- * cmake: document _INCLUDE_DIRS, _LIBS, ....
+ * cmake: document +_INCLUDE_DIRS+, +_LIBS+, ....
  * use cmake to generate documentation !
+
+Install:
+  * find a way to install cmake files along with python stuff.
+(right now, after running python setup.py install, no cmake
+stuff can be found :/)
