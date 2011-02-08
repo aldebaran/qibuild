@@ -161,7 +161,8 @@ class Toc(QiWorkTree):
         if len(res) == 1:
             return res[0]
         else:
-            return None
+            raise TocException("No such project: %s" % project_name)
+        # FIXME: it's perfectly possible that two projects have the same name...
 
 
     def get_sdk_dirs(self, project_name):
