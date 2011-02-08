@@ -10,7 +10,7 @@ set -e
 
 CURDIR=$(dirname "$(readlink -f $0 2>/dev/null)")/
 
-cd ${CURDIR}
+cd ${CURDIR}/..
 
 python doc/tools/generate_doc_from_cmake.py \
   "cmake/qibuild" \
@@ -28,7 +28,7 @@ cp doc/*.txt                                        build-doc
 PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py doc/qibuild-manpage.txt     build-doc/qibuild-manpage.txt     "qibuild.actions"
 PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py doc/qitoolchain-manpage.txt build-doc/qitoolchain-manpage.txt "qitoolchain.actions"
 
-find ${CURDIR}/build-doc/ -type f -name '*.txt' | while read f ; do
+find build-doc/ -type f -name '*.txt' | while read f ; do
   #asciidoc is stupid about css...
   #we desactivated default theme, set the stylesheet to bare.css, and disable embedded css
   asciidoc.py -a toc -a toclevels=1  -a linkcss -a 'theme=' -a stylesheet="bare.css" -a pygments "$f"
