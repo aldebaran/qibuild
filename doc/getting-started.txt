@@ -16,11 +16,31 @@ fine on python 2.6, too.
 CMake version 2.8.3 is the preferred version, but you should
 not have any problem with CMake 2.6.
 
-*** CLARIFY procedure for linux/windows/osx, we dont want users to setup PATH,
-maybe just call ./install-wrapper.sh ? or easy_install qibuild ? ***
-Be sure PYTHONPATH is set to /path/to/qibuild/python and
-that  qibuild (from /path/to/qibuild/bin/qibuild) is in PATH.
+On windows, to use scripts written in Python, you have to put
+C:\Python2.x and c:\Python2.x\Scripts in your %PATH%.
 
+
+
+Installation
+------------
+
+Linux, mac
+~~~~~~~~~~
+
+Simply run:
+
+----
+sudo ./install-qibuild.sh
+----
+
+Windows
+~~~~~~~
+
+Just run install-qibuild.bat
+
+If you have bash available on your system,
+and want to use qibuild from there, you should
+also be able to use the .sh script.
 
 
 Creating a work tree
