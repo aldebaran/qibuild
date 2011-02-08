@@ -123,6 +123,13 @@ qi_create_bin(hello "main.cpp")
 qi_use_lib(hello world)
 ----
 
+NOTE: For those already familiar with CMake:
+
+      * We used +qi_create_lib+ and +qi_create_bin+ instead of
+      +add_exeuctable+ and +add_library+
+      * We never had to call +find_package+ or +include_directories+,
+      or +target_link_libraries+.
+
 qiBuild always generate binaries and libraries in the SDK directory, this way,
 the build/sdk contains only the results of the compilation that are necessary
 to be used by other projects.
@@ -130,7 +137,7 @@ to be used by other projects.
 Also, the executables will be created in build/sdk/bin, and the libraries in build/sdk/lib,
 so that we stick to the FHS convention inside the build/sdk directory.
 
-On Windows, it also makes sure that binaries compiled in debug contains \_d in their names,
+On Windows, the binaries compiled in debug contain +_d+ in their names,
 so you can share the same build directory, and the same visual studio solution for several
 build configurations, without risking to mix binaries compiled in release with binaires compiled in
 debug.
