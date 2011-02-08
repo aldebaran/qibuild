@@ -1,4 +1,4 @@
 @echo off
-python win-install-qibuild.py
+python tools/install-qibuild.py --windows
 pause
 
