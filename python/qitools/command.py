@@ -43,20 +43,32 @@ class NotInPath(Exception):
         return mess
 
 
-def check_is_in_path(executable):
-    """Check that the given executable is to be found in %PATH%"""
+def find_program(executable):
+    """Get the full path of an executable by
+    looking at PATH environment variable
+    (and PATHEXT on windows)
+
+    return None if program was not found
+    """
+    full_path = None
     env_path = os.environ["PATH"]
     for path in env_path.split(os.pathsep):
         full_path = os.path.join(path, executable)
         if os.access(full_path, os.X_OK):
-            return
+            return full_path
         pathext = os.environ.get("PATHEXT")
         if pathext:
             for ext in pathext.split(";"):
                 with_ext = full_path + ext
                 if os.access(with_ext, os.X_OK):
-                    return
-    raise NotInPath(executable)
+                    return with_ext
+    return None
+
+
+def check_is_in_path(executable):
+    """Check that the given executable is to be found in %PATH%"""
+    if find_program(executable) is None:
+        raise NotInPath(executable)
 
 def check_call(cmd, ignore_ret_code=False,
                     cwd=None,
