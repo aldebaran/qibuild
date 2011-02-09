@@ -14,8 +14,6 @@ This is why we should keep the same build dir on windows
 """
 
 import os
-import sys
-import glob
 import logging
 import qitools.sh
 import qitools.command
@@ -25,28 +23,6 @@ import toc
 from toc import toc_open
 
 LOGGER = logging.getLogger("qibuild")
-
-class MakeException(Exception):
-    def __init__(self, message):
-        self.message = message
-
-    def __str__(self):
-        return self.message
-
-class ConfigureException(Exception):
-    def __init__(self, *args):
-        self.args = args
-
-    def __str__(self):
-        return repr(self.args)
-
-class CTestException(Exception):
-    def __init__(self, *args):
-        self.args = args
-
-    def __str__(self):
-        return repr(self.args)
-
 
 def make(build_dir, num_jobs=None, target=None):
     """
@@ -114,7 +90,7 @@ def cmake(source_dir, build_dir, cmake_args):
     The cache is always cleaned
     """
     if not os.path.exists(source_dir):
-        raise ConfigureException("source dir: %s does not exist, aborting")
+        raise Exception("source dir: %s does not exist, aborting")
 
     # Always remove CMakeCache and build/sdk/lib/cmake:
     cache = os.path.join(build_dir, "CMakeCache.txt")
@@ -139,16 +115,15 @@ def ctest(source_dir, build_dir):
     # Check whether source_dir and build_dir look valid.
     # TODO: Move these checks in a common place?
     if not os.path.exists(source_dir):
-        raise CTestException("source dir: %s does not exist, aborting" % \
+        raise Exception("source dir: %s does not exist, aborting" % \
                              source_dir)
     if not os.path.exists(os.path.join(source_dir, "CMakeLists.txt")):
-        raise CTestException("source dir: %s does not contain CMakeLists,"\
+        raise Exception("source dir: %s does not contain CMakeLists,"\
                              " aborting" % source_dir)
     if not os.path.exists(build_dir):
-        raise CTestException("build dir: %s does not exist, aborting" % \
+        raise Exception("build dir: %s does not exist, aborting" % \
                              build_dir)
     if not os.path.exists(os.path.join(build_dir, "CMakeCache.txt")):
-        raise CTestException("build dir: %s does not contain "\
+        raise Exception("build dir: %s does not contain "\
                              "CMakeCache.txt, aborting" % build_dir)
-    qitools.command.check_call(cmd, cwd=build_dir)
 

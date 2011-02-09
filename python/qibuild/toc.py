@@ -15,6 +15,7 @@ import qitools.sh
 from qibuild.dependencies_solver import DependenciesSolver
 from   qitools.qiworktree import QiWorkTree
 import qitoolchain
+from qitools.command import CommandFailedException
 
 LOGGER = logging.getLogger("qibuild.toc")
 
@@ -41,6 +42,29 @@ class TocException(Exception):
     def __str__(self):
         return self.message
 
+class ConfigureFailed(TocException):
+    def __init__(self, project):
+        self.project = project
+    def __str__(self):
+        return "Error occured when configuring project %s" % self.project.name
+
+class BuildFailed(TocException):
+    def __init__(self, project):
+        self.project = project
+    def __str__(self):
+        return "Error occured when building project %s" % self.project.name
+
+class TestsFailed(TocException):
+    def __init__(self, project):
+        self.project = project
+    def __str__(self):
+        return "Error occured when testing project %s" % self.project.name
+
+class InstallFailed(TocException):
+    def __init__(self, project):
+        self.project = project
+    def __str__(self):
+        return "Error occured when installing project %s" % self.project.name
 
 class Toc(QiWorkTree):
     def __init__(self, work_tree,
@@ -293,7 +317,10 @@ class Toc(QiWorkTree):
 
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
-        qibuild.cmake(project.directory, project.build_directory, cmake_args)
+        try:
+            qibuild.cmake(project.directory, project.build_directory, cmake_args)
+        except CommandFailedException:
+            raise ConfigureFailed(project)
 
 
     def build_project(self, project, incredibuild=False, num_jobs=1, target=None):
@@ -316,7 +343,23 @@ class Toc(QiWorkTree):
                 cmd = ["BuildConsole.exe", sln_file]
                 cmd += ["/cfg=%s|Win32" % self.build_type]
                 cmd += ["/nologo"]
-        qitools.command.check_call(cmd)
+        try:
+            qitools.command.check_call(cmd)
+        except CommandFailedException:
+            raise BuildFailed(project)
+
+    def test_project(self, project):
+        """Run ctest on a project """
+        build_dir = project.build_directory
+        source_dir = project.directory
+        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
+        if not os.path.exists(cmake_cache):
+            _advise_using_configure(project)
+        cmd = ["ctest", source_dir]
+        try:
+            qitools.command.check_call(cmd, cwd=build_dir)
+        except CommandFailedException:
+            raise TestsFailed(project)
 
 
     def install_project(self, project, destdir):
@@ -326,7 +369,10 @@ class Toc(QiWorkTree):
         build_environ["DESTDIR"] = destdir
         cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
                 "--target", "install"]
-        qitools.command.check_call(cmd, env=build_environ)
+        try:
+            qitools.command.check_call(cmd, env=build_environ)
+        except CommandFailedException:
+            raise InstallFailed(project)
 
 def toc_open(work_tree, args, use_env=False):
     build_config   = args.build_config

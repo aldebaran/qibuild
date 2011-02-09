@@ -26,7 +26,7 @@ def do(args):
 
     project = toc.get_project(project_name)
     logger.info("Testing %s in %s", project.name, toc.build_folder_name)
-    qibuild.ctest(project.directory, project.build_directory)
+    toc.test_project(project)
 
 
 
