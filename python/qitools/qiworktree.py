@@ -95,10 +95,11 @@ def qiworktree_open(work_tree=None, use_env=False):
     if not work_tree:
         work_tree = search_manifest_directory(os.getcwd())
     if work_tree is None:
-        raise WorkTreeException("Could not find a work tree, "
-            "please try from a valid work tree, specify an "
-            "existing work tree with \"--work-tree PATH\", or "
-            "create a new work with \"qibuild init\"")
+        raise WorkTreeException("Could not find a work tree\n "
+            "Here is what you can do :\n"
+            " - try from a valid work tree\n"
+            " - specify an existing work tree with \"--work-tree PATH\"\n"
+            " - create a new work tree with \"qibuild init\"")
     return QiWorkTree(work_tree)
 
 
