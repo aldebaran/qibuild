@@ -178,7 +178,7 @@ class DependenciesSolver:
         # Assert that all the names are known projects:
         for name in names:
             if name not in project_names:
-                raise Exception("Unknown project: ", name)
+                raise Exception("Unknown project: %s" % name)
 
         if single:
             if len(names) != 1:
