@@ -23,8 +23,12 @@ def do(args):
     if args.toolchain_name:
         toolchain_name = args.toolchain_name
     else:
-        qiwt = qitools.qiworktree_open(args.work_tree, use_env=True)
-        tc_from_conf = qiwt.configstore.get("general", "build", "toolchain")
+        tc_from_conf = None
+        try:
+            qiwt = qitools.qiworktree_open(args.work_tree, use_env=True)
+            tc_from_conf = qiwt.configstore.get("general", "build", "toolchain")
+        except qitools.qiworktree.WorkTreeException:
+            pass
         if not tc_from_conf:
             mess  = "Could not find default toolchain name in configuration.\n"
             mess += "Try specifying a toolchain name on the command line"
