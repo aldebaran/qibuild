@@ -172,7 +172,7 @@ class Toolchain(object):
             self.feed = new_feed
         self._update_feed()
         if all:
-            package_names = self.configstore.get("package").keys()
+            package_names = self.configstore.get("package", default=dict()).keys()
         else:
             package_names = [p.name for p in self.packages]
         for package_name in package_names:
