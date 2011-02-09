@@ -68,10 +68,13 @@ def parse_args_for_help(args):
         return(False, None)
 
 
-def run_action(module_name, arguments, forward_args=None):
+def run_action(module_name, arguments=None, forward_args=None):
     """Run an action using its module path and a list of arguments
+    (if not given, action will be called with not arguments)
 
     """
+    if not arguments:
+        arguments = list()
     action_name  = module_name.split(".")[-1]
     package_name = ".".join(module_name.split(".")[:-1])
     try:
