@@ -23,6 +23,17 @@ Installation:
     (adapt these paths to reflect your Python's installation)
   * Run install-qibuild.bat
 
+
+
+qiBuild contains work from:
+
+* argparse http://pypi.python.org/pypi/argparse/
+ (licensed under Apache Software license)
+
+* xmlrunner http://www.rittau.org/python/xmlrunner.py (public domain)
+
+* cmake http://www.cmake.org/cmake/project/license.html (BSD)
+
 Maintainers:
 Cedric GESTES <gestes@aldebaran-robotics.com>
 Dimitri Merejkowsky <dmerejkowsky@aldebaran-robotics.com>
