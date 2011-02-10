@@ -33,10 +33,10 @@ function(fpath prefix name0)
   set(${name0}_INCLUDE "${name0}_INCLUDE-NOTFOUND" CACHE INTERNAL "Cleared." FORCE)
   mark_as_advanced(${name0}_INCLUDE)
   if (ARG_SYSTEM)
-    #qi_deprecated("You should not use fpath(SYSTEM) anymore")
+    qi_deprecated("You should not use fpath(SYSTEM) anymore")
   endif()
 
-  find_path(${name0}_INCLUDE ${name0} ${ARG_UNPARSED_ARGUMENTS} HINTS ${FRAMEWORK_PREFIX} ${INCLUDE_PREFIX})
+  find_path(${name0}_INCLUDE ${name0} ${ARG_UNPARSED_ARGUMENTS})
 
   if (${name0}_INCLUDE)
     set(${prefix}_INCLUDE_DIR ${${name0}_INCLUDE} ${${prefix}_INCLUDE_DIR} CACHE PATH "" FORCE)
@@ -75,13 +75,11 @@ function(flib prefix)
 
   set(${name}_LIB "${_name}_LIB-NOTFOUND" CACHE INTERNAL "Cleared." FORCE)
 
-  qi_debug("LIBFIND: PREFIX(system): ${LIB_PREFIX}")
-  qi_debug("LIBFIND: PREFIX : ${LIB_EXTRA_PREFIX}")
   qi_debug("LIBFIND: modulelist: ${_flib_modulelist}")
   if (ARG_SYSTEM)
-    #qi_deprecated("Deprecated SYSTEM arguments")
+    qi_deprecated("Deprecated SYSTEM arguments")
   endif()
-  find_library(${name}_LIB ${ARG_NAMES} PATHS ${FRAMEWORK_PREFIX} ${LIB_PREFIX})
+  find_library(${name}_LIB ${ARG_NAMES})
 
   if (ARG_DEBUG)
     set(_keyword "debug")
