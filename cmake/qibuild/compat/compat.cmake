@@ -189,6 +189,11 @@ function(stage_lib _targetname _name)
       # anymore:
       qi_stage_lib(foo)
   ")
+  # old signature
+  # stage_lib(target name [incdir ...] [DEFINITIONS def1])
+  # new signature:
+  # qi_stage_lib(name [INCLUDE_DIRS incdir ...] [DEFINITIONS def])
+
   string(TOUPPER ${_targetname} _U_targetname)
   if (NOT ${_U_targetname} STREQUAL ${_name})
     qi_warning("
@@ -203,7 +208,10 @@ function(stage_lib _targetname _name)
     )
     # FIXME: stage the lib with an other name ...
   endif()
-  qi_stage_lib(${_targetname} ${ARGN})
+
+  cmake_parse_arguments(ARG "" "" "DEFINITIONS" ${ARGN})
+  qi_stage_lib(${_targetname} INCLUDE_DIRS ${ARG_UNPARSED_ARGUMENTS}
+    DEFINITIONS ${ARG_DEFINITIONS})
 endfunction()
 
 function(stage_script _file _name)
