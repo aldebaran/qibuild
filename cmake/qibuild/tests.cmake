@@ -47,7 +47,7 @@ endfunction()
 # \group:SRC sources
 # \group:DEPENDS dependencies to pass to use_lib
 # \group:ARGUMENTS arguments to pass to add_test (to your test program)
-function(qi_add_gtest name)
+function(qi_create_gtest name)
   # Using upstream GtestConfig.cmake is a good idea here:
   # create tests_results folder if it does not exist
   file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
