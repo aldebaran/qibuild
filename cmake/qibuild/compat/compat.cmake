@@ -97,9 +97,9 @@ endfunction()
 
 function(create_gtest)
   qi_deprecated("create_gtest is deprecated:
-    use qi_create_gtest instead")
+    use qi_add_gtest instead")
   _fix_flags(_new_args DEPENDENCIES DEPENDS ${ARGN})
-  qi_create_gtest(${_new_args})
+  qi_add_gtest(${_new_args})
 endfunction()
 
 function(create_cmake _NAME)
@@ -196,9 +196,9 @@ function(stage_lib _targetname _name)
       argument if not equals to the upper-version of the first
       argument is not supported anymore.
       Old:
-        stage_lib(${_targetname} ${_U_targetname})
-      New:
         stage_lib(${_targetname} ${_name})
+      New:
+        stage_lib(${_targetname} ${_U_targetname})
     "
     )
     # FIXME: stage the lib with an other name ...
