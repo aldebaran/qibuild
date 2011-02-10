@@ -22,6 +22,10 @@ CMake:
 * do something nice with static/shared libraries
 * fix linker problems when using toolchain and
   third party libraries
+* modules => BLAConfig.cmake => bla-config.cmake (could be found using all cases Bla, BLA, bla, ...)
+* remove PUBLIC_HEADERS from qi_create_* it's error prone.
+* add a IF to qi_install_*() => qi_install_header(mylib mylib-protobuf.h IF WITH_PROTOBUF)
+
 
 qiBuild:
 * configstore: merge dependencies and cflags properly
