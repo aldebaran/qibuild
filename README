@@ -16,10 +16,12 @@ http://developer.aldebaran-robotics.com/resources/projects/146/public/index.html
 
 Installation:
   Linux, Mac:
-  * install-qibuild.sh
+  * sudo ./install-qibuild.sh
 
   Windows:
-  * install-qibuild.bat
+  * Make sure c:\Python27 and c:\Python27\scripts are in %PATH%
+    (adapt these paths to reflect your Python's installation)
+  * Run install-qibuild.bat
 
 Maintainers:
 Cedric GESTES <gestes@aldebaran-robotics.com>
