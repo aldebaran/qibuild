@@ -1,31 +1,15 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-
-
-# on linux, it is advised to use openvc
-# from system.
-# (this way you get gtk bindings ...)
-
-# otherwise, we'll use openv from toolchain-pc.
-
-# Please not, however that you should install
-# opencv by hand to get peopledection example
-# working
-if (${SDK_ARCH} STREQUAL "linux")
-  set(_in_system "SYSTEM")
-endif()
-
-
 clean(OPENCV)
 fpath(OPENCV opencv/cv.h ${_in_system} )
-flib(OPENCV OPTIMIZED NAMES cv      cv200       ${_in_system})
-flib(OPENCV DEBUG     NAMES cv      cv200d      ${_in_system})
-flib(OPENCV OPTIMIZED NAMES cvaux   cvaux200    ${_in_system})
-flib(OPENCV DEBUG     NAMES cvaux   cvaux200d   ${_in_system})
-flib(OPENCV OPTIMIZED NAMES cxcore  cxcore200   ${_in_system})
-flib(OPENCV DEBUG     NAMES cxcore  cxcore200d  ${_in_system})
-flib(OPENCV OPTIMIZED NAMES highgui highgui200  ${_in_system})
-flib(OPENCV DEBUG     NAMES highgui highgui200d ${_in_system})
-flib(OPENCV OPTIMIZED NAMES ml      ml200d      ${_in_system})
-flib(OPENCV DEBUG     NAMES ml      ml200       ${_in_system})
+flib(OPENCV OPTIMIZED NAMES cv      cv200      )
+flib(OPENCV DEBUG     NAMES cv      cv200d     )
+flib(OPENCV OPTIMIZED NAMES cvaux   cvaux200   )
+flib(OPENCV DEBUG     NAMES cvaux   cvaux200d  )
+flib(OPENCV OPTIMIZED NAMES cxcore  cxcore200  )
+flib(OPENCV DEBUG     NAMES cxcore  cxcore200d )
+flib(OPENCV OPTIMIZED NAMES highgui highgui200 )
+flib(OPENCV DEBUG     NAMES highgui highgui200d)
+flib(OPENCV OPTIMIZED NAMES ml      ml200d     )
+flib(OPENCV DEBUG     NAMES ml      ml200      )
 export_lib(OPENCV)

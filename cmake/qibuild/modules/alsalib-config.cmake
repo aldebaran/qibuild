@@ -1,12 +1,6 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-
-
 clean(ALSALIB)
-
-if (NOT TARGET_HOST STREQUAL "TARGET_HOST_WINDOWS")
-  fpath(ALSALIB alsa/asoundlib.h)
-  flib(ALSALIB asound)
-endif()
-
+fpath(ALSALIB alsa/asoundlib.h)
+flib(ALSALIB asound)
 export_lib(ALSALIB)

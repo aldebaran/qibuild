@@ -1,8 +1,4 @@
-## Author: David Coz <dcoz@aldebaran-robotics.com>
-##
-## Copyright (C) 2009, 2010 Aldebaran Robotics
-
-
+## Copyright (C) 2009, 2010, 2011 Aldebaran Robotics
 
 clean(GTEST)
 fpath(GTEST gtest/gtest.h)

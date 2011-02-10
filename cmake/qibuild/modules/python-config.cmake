@@ -1,7 +1,6 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
 clean(PYTHON)
-
 fpath(PYTHON Python.h PATH_SUFFIXES "python2.7" "python2.6")
 flib(PYTHON OPTIMIZED NAMES python27 python2.7
                             python26 python2.6

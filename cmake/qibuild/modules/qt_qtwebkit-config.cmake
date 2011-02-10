@@ -3,7 +3,6 @@
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 include("${_ROOT_DIR}/qtutils.cmake")
 
-
 set(_suffix "QTWEBKIT")
 set(_libame "QtWebKit")
 

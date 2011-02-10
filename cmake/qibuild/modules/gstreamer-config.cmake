@@ -1,20 +1,11 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-
-
-if(UNIX AND NOT APPLE)
-  set(IN_SYSTEM "SYSTEM")
-else()
-  set(IN_SYSTEM "")
-endif()
-
 clean(GSTREAMER)
-fpath(GSTREAMER  gst/gst.h PATH_SUFFIXES gstreamer-0.10 gstreamer ${IN_SYSTEM})
+fpath(GSTREAMER  gst/gst.h PATH_SUFFIXES gstreamer-0.10 gstreamer)
 flib (GSTREAMER  NAMES
   gstreamer-0.10.0
   gstreamer-0.10
-  gstreamer
-  ${IN_SYSTEM})
+  gstreamer)
 
 if (APPLE)
   depend (GSTREAMER REQUIRED ICONV)

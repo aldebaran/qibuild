@@ -1,13 +1,11 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-
-
 clean(GETTEXT)
 
 if(NOT WIN32)
   depend(GETTEXT REQUIRED DL)
 endif()
-fpath(GETTEXT libintl.h SYSTEM)
+fpath(GETTEXT libintl.h)
 
 #dont find libintl on linux => libintl is part of glibc
 if (NOT UNIX OR APPLE)
