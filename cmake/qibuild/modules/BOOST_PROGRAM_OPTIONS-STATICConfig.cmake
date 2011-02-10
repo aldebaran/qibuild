@@ -1,5 +1,4 @@
-##
-## Copyright (C) 2008, 2010 Aldebaran Robotics
+## Copyright (C) 2011 Aldebaran Robotics
 
 #get the root folder of this sdk
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)

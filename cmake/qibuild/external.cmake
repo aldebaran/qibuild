@@ -1,9 +1,4 @@
-##
-## Author(s):
-##  - Cedric <gestes@aldebaran-robotics.com>
-##
-## Copyright (C) 2010, 2011 Aldebaran Robotics
-##
+## Copyright (C) 2011 Aldebaran Robotics
 
 cmake_minimum_required(VERSION 2.8.3)
 include(ExternalProject)

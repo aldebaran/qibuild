@@ -1,4 +1,4 @@
-## Copyright (C) 2008, 2010 Aldebaran Robotics
+## Copyright (C) 2011 Aldebaran Robotics
 
 clean(PYTHON)
 

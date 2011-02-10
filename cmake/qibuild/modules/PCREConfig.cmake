@@ -1,12 +1,4 @@
-##
-## Login : <ctaf@localhost.localdomain>
-## Started on  Mon Oct  6 18:19:18 2008 Cedric GESTES
-## $Id$
-##
-## Author(s):
-##  - Jean-Charles DELAY <jdelay@aldebaran-robotics.com>
-##
-## Copyright (C) 2008 Aldebaran Robotics
+## Copyright (C) 2011 Aldebaran Robotics
 
 
 

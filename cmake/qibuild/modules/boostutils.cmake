@@ -1,14 +1,4 @@
-##
-## boosttools.cmake
-## Login : <ctaf@cgestes-de>
-## Started on  Mon Oct 19 14:29:49 2009 Cedric GESTES
-## $Id$
-##
-## Author(s):
-##  - Cedric GESTES <gestes@aldebaran-robotics.com>
-##
-## Copyright (C) 2009 Aldebaran Robotics
-##
+## Copyright (C) 2011 Aldebaran Robotics
 
 function(boost_flib _suffix _libname)
   flib(BOOST_${_suffix} OPTIMIZED NAMES

@@ -1,9 +1,4 @@
-##
-## Author(s):
-##  - Cedric GESTES <cgestes@aldebaran-robotics.com>
-##
-## Copyright (C) 2009, 2010, 2011 Cedric GESTES
-##
+## Copyright (C) 2011 Aldebaran Robotics
 
 function(_try_install_dir _dir)
   if (EXISTS ${_dir})

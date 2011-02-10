@@ -1,4 +1,4 @@
-## Copyright (C) 2008 Aldebaran Robotics
+## Copyright (C) 2011 Aldebaran Robotics
 
 
 if(NOT ${SDK_ARCH} STREQUAL "linux")

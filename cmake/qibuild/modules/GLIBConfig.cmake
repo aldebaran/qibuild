@@ -1,10 +1,4 @@
-## Started on  Thu Jun 12 15:19:44 2008 Cedric GESTES
-## $Id$
-##
-## Author(s):
-##  - Cedric GESTES <gestes@aldebaran-robotics.com>
-##
-## Copyright (C) 2008 Aldebaran Robotics
+## Copyright (C) 2011 Aldebaran Robotics
 
 
 

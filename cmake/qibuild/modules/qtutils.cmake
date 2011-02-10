@@ -1,6 +1,4 @@
-####
-# Useful things for qt.
-#
+## Copyright (C) 2011 Aldebaran Robotics
 
 # Uncomment this to use Qt from system
 #set(QT_IN_SYSTEM SYSTEM CACHE INTERNAL "" FORCE)

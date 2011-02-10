@@ -1,14 +1,4 @@
-##
-## Toolchain-geode.cmake
-## Login : <ctaf@ctaf-maptop>
-## Started on  Sat Sep 12 03:01:43 2009 Cedric GESTES
-## $Id$
-##
-## Author(s):
-##  - Cedric GESTES <gestes@aldebaran-robotics.com>
-##
-## Copyright (C) 2009 Aldebaran Robotics
-##
+## Copyright (C) 2011 Aldebaran Robotics
 include("${TOOLCHAIN_DIR}/cmake/plateform.cmake")
 
 include(CMakeForceCompiler)

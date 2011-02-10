@@ -1,9 +1,4 @@
-##
-## Author(s):
-##  - Chris Kilner <ckilner@aldebaran-robotics.com>
-##
-## Copyright (C) 2009 Aldebaran Robotics
-##
+## Copyright (C) 2011 Aldebaran Robotics
 
 if(WIN32)
     add_definitions(" -DWIN32_LEAN_AND_MEAN ")

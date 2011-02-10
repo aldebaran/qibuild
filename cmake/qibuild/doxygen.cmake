@@ -1,5 +1,6 @@
+## Copyright (C) 2011 Aldebaran Robotics
+
 #! Generate doxygen documentation
-# a suitable target_name is put in ${target_name}
 function(qi_gen_doxygen res doxyfile)
   find_program(DOXYGEN_EXCUTABLE doxygen)
   if(NOT DOXYGEN_EXCUTABLE)

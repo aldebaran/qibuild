@@ -1,4 +1,4 @@
-# Extract last version information
+## Copyright (C) 2011 Aldebaran Robotics
 
 FIND_PROGRAM(SVNVERSION_EXECUTABLE svnversion)
 MARK_AS_ADVANCED(SVNVERSION_EXECUTABLE)

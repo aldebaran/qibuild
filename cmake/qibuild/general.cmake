@@ -1,9 +1,4 @@
-##
-## Author(s):
-##  - Cedric GESTES <gestes@aldebaran-robotics.com>
-##
-## Copyright (C) 2010, 2011 Aldebaran Robotics
-##
+## Copyright (C) 2011 Aldebaran Robotics
 
 #yeah allow NORMAL endfunction/endif/..
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
