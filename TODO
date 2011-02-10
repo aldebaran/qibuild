@@ -20,10 +20,9 @@ CMake:
 * toolchain support (iphone, mingw32-cross, android, ..)
 * wrapper for old t001chain stuff
 * do something nice with static/shared libraries
-* fix linker problems when using toolchain and
-  third party libraries
-* modules => BLAConfig.cmake => bla-config.cmake (could be found using all cases Bla, BLA, bla, ...)
-* remove PUBLIC_HEADERS from qi_create_* it's error prone.
+* fix linker problems when using toolchain and third party libraries
+* modules: decide weither clean/fpath/flib/depends/export_* is part of the public qiBuild API (rename to qi_fpath, qi_flib, qi_fdepends ?)
+* remove PUBLIC_HEADERS from qi_create_* it's error prone
 * add a IF to qi_install_*() => qi_install_header(mylib mylib-protobuf.h IF WITH_PROTOBUF)
 
 
