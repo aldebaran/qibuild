@@ -93,8 +93,6 @@ function(qi_use_lib name)
       endif()
 
       set(_to_add "${_to_add} ${${_U_PKG}_DEFINITIONS}")
-      message(STATUS "_to_add: ${_to_add}")
-
       if(_to_add)
         set_target_properties(${name}
           PROPERTIES
