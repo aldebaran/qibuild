@@ -73,13 +73,13 @@ function(flib prefix)
     qi_error("empty name: ${name}")
   endif()
 
-  set(${name}_LIB "${_name}_LIB-NOTFOUND" CACHE INTERNAL "Cleared." FORCE)
+  set(${name}_LIB "${name}_LIB-NOTFOUND" CACHE INTERNAL "Cleared." FORCE)
 
   qi_debug("LIBFIND: modulelist: ${_flib_modulelist}")
   if (ARG_SYSTEM)
     qi_deprecated("Deprecated SYSTEM arguments")
   endif()
-  find_library(${name}_LIB ${ARG_NAMES})
+  find_library(${name}_LIB "${name}" NAMES ${ARG_NAMES})
 
   if (ARG_DEBUG)
     set(_keyword "debug")
