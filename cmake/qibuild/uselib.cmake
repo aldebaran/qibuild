@@ -84,8 +84,23 @@ function(qi_use_lib name)
     if ( (DEFINED "${_U_PKG}_TARGET") AND (TARGET "${${_U_PKG}_TARGET}") )
       add_dependencies(${name} "${${_U_PKG}_TARGET}")
     endif()
-    #TODO: target properties
-    set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "${${_U_PKG}_DEFINITIONS}")
+    if(${_U_PKG}_DEFINITIONS)
+      # Append the correct compile definitions to the target
+      set(_to_add)
+      get_target_property(_compile_defs ${name} COMPILE_DEFINITIONS)
+      if(_compile_defs)
+        set(_to_add ${_compile_defs})
+      endif()
+
+      set(_to_add "${_to_add} ${${_U_PKG}_DEFINITIONS}")
+      message(STATUS "_to_add: ${_to_add}")
+
+      if(_to_add)
+        set_target_properties(${name}
+          PROPERTIES
+            COMPILE_DEFINITIONS ${_to_add})
+      endif()
+    endif()
   endforeach()
   string(TOUPPER "${name}" _U_name)
   qi_set_global("${_U_name}_DEPENDS" ${${_U_name}_DEPENDS} ${_DEPS})
