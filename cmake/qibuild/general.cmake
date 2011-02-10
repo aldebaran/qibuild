@@ -28,7 +28,6 @@ include("qibuild/internal/layout")
 include("qibuild/internal/check")
 include("qibuild/internal/install")
 include("qibuild/internal/glob")
-include("qibuild/internal/stage")
 include("qibuild/internal/autostrap")
 
 if (NOT QI_SDK_DIR)
