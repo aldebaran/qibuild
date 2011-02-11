@@ -35,8 +35,17 @@ endfunction()
 #####################
 
 # In theory those should not be used that often...
-set(_SDK_LIB ${QI_SDK_LIB})
-set(_SDK_BIN ${QI_SDK_BIN})
+qi_set_global(_SDK_LIB           ${QI_SDK_LIB})
+qi_set_global(_SDK_BIN           ${QI_SDK_BIN})
+qi_set_global(_SDK_FRAMEWORK     ${QI_SDK_FRAMEWORK}    )
+qi_set_global(_SDK_INCLUDE       ${QI_SDK_INCLUDE}      )
+qi_set_global(_SDK_SHARE         ${QI_SDK_SHARE}        )
+qi_set_global(_SDK_CONF          ${QI_SDK_CONF}         )
+qi_set_global(_SDK_DOC           ${QI_SDK_DOC}          )
+qi_set_global(_SDK_CMAKE         ${QI_SDK_CMAKE}        )
+qi_set_global(_SDK_CMAKE_MODULES ${QI_SDK_CMAKE_MODULES})
+
+qi_set_global(SDK_DIR ${QI_SDK_DIR})
 
 function(win32_copy_targe)
   qi_deprecated("win32_copy_target is deprecated.
