@@ -177,6 +177,7 @@ endfunction()
 # stage
 #####################
 function(stage_lib _targetname _name)
+  set(_need_other_name FALSE)
   qi_deprecated("stage_lib is deprecated:
     Use qi_stage_lib instead.
     Warning the signature has changed:
@@ -196,7 +197,7 @@ function(stage_lib _targetname _name)
 
   string(TOUPPER ${_targetname} _U_targetname)
   if (NOT ${_U_targetname} STREQUAL ${_name})
-    qi_warning("
+    qi_deprecated("
       Not using stage_lib(foo FOO) where the second
       argument if not equals to the upper-version of the first
       argument is not supported anymore.
@@ -206,12 +207,20 @@ function(stage_lib _targetname _name)
         stage_lib(${_targetname} ${_U_targetname})
     "
     )
-    # FIXME: stage the lib with an other name ...
+    set(_need_other_name TRUE)
   endif()
 
   cmake_parse_arguments(ARG "" "" "DEFINITIONS" ${ARGN})
-  qi_stage_lib(${_targetname} INCLUDE_DIRS ${ARG_UNPARSED_ARGUMENTS}
-    DEFINITIONS ${ARG_DEFINITIONS})
+  set(_new_args
+      ${_targetname}
+      INCLUDE_DIRS ${ARG_UNPARSED_ARGUMENTS}
+      DEFINITIONS ${ARG_DEFINITIONS}
+  )
+  if(_need_other_name)
+    list(APPEND _new_args "STAGED_NAME" "${_name}")
+  endif()
+
+  qi_stage_lib(${_new_args})
 endfunction()
 
 function(stage_script _file _name)
