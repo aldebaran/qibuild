@@ -30,6 +30,21 @@ function(sdk_add_include _name _subfolder)
   qi_deprecated("no implementation")
 endfunction()
 
+#####################
+# Layout variables
+#####################
+
+# In theory those should not be used that often...
+set(_SDK_LIB ${QI_SDK_LIB})
+set(_SDK_BIN ${QI_SDK_BIN})
+
+function(win32_copy_targe)
+  qi_deprecated("win32_copy_target is deprecated.
+  You sould even not have to call it now :)
+  ")
+endfunction()
+
+
 ######################
 # Install
 ######################
