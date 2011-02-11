@@ -25,15 +25,7 @@ def do(args):
     logger   = logging.getLogger(__name__)
     toc      = qibuild.toc_open(args.work_tree, args, use_env=True)
 
-    (project_names, _, not_found) = qibuild.toc.resolve_deps(toc, args)
-    if not_found:
-        mess  = "Could not find all required dependencies !\n"
-        mess += "Missing: "+ " ".join(not_found)
-
-        if toc.toolchain.name == "system":
-            logger.warning(mess)
-        else:
-            raise Exception(mess)
+    (project_names, _, _) = qibuild.toc.resolve_deps(toc, args)
 
     projects = [toc.get_project(name) for name in project_names]
     if args.build_directory:
