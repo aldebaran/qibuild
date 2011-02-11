@@ -29,7 +29,8 @@ set(_in_dylibs)
 
 foreach(_lib ${_libs})
   if(${_lib} MATCHES ".*\\.dylib")
-    list(APPEND _in_dylibs ${_lib})
+    get_filename_component(_abs ${_lib} REALPATH)
+    list(APPEND _in_dylibs ${_abs})
   endif()
 endforeach()
 
