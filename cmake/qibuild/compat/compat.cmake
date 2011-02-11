@@ -97,9 +97,9 @@ endfunction()
 
 function(create_gtest)
   qi_deprecated("create_gtest is deprecated:
-    use qi_add_gtest instead")
+    use qi_create_gtest instead")
   _fix_flags(_new_args DEPENDENCIES DEPENDS ${ARGN})
-  qi_add_gtest(${_new_args})
+  qi_create_gtest(${_new_args})
 endfunction()
 
 function(create_cmake _NAME)

@@ -36,7 +36,7 @@ link:tests.html[Test]
 Interface gtest with ctest.
 
 * link:tests.html#_qi_create_gtest[qi_create_gtest]
-* link:tests.html#_qi_add_gtest[qi_add_gtest]
+* link:tests.html#_qi_create_gtest[qi_create_gtest]
 
 link:uselib.html[UseLib]
 ------------------------
