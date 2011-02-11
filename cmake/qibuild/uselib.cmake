@@ -82,6 +82,8 @@ function(qi_use_lib name)
       target_link_libraries("${name}" ${${_U_PKG}_LIBRARY})
     endif()
 
+    # local lib are staged with _U_PKG_TARGET = localtargetname, this allow dependencies
+    # between local libs
     if ( (DEFINED "${_U_PKG}_TARGET") AND (TARGET "${${_U_PKG}_TARGET}") )
       add_dependencies(${name} "${${_U_PKG}_TARGET}")
     endif()

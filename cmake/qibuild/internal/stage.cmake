@@ -177,6 +177,8 @@ function(_qi_gen_code_lib_sdk res target)
   _qi_gen_find_lib_code_sdk(_lib ${target})
   set(_res "${_res} ${_lib}")
 
+  # needed for local config.cmake only, it will be used by qi_use_lib,
+  # to add local dependencies between target (in the same project)
   set(${_U_target}_TARGET    "${target}")
   _qi_gen_code_from_vars(_defs
     ${_U_target}_TARGET
