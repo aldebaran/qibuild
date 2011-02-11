@@ -5,7 +5,6 @@
 #the relative path between each var should remain the same.
 
 if(MSVC)
-  message(STATUS "We love visual studio")
   qi_set_global(QI_SDK_BIN ".")
   qi_set_global(QI_SDK_LIB ".")
 else()
