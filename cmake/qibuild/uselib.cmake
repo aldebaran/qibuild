@@ -92,12 +92,11 @@ function(qi_use_lib name)
       if(_compile_defs)
         set(_to_add ${_compile_defs})
       endif()
-
-      set(_to_add "${_to_add} ${${_U_PKG}_DEFINITIONS}")
+      list(APPEND _to_add "${${_U_PKG}_DEFINITIONS}")
       if(_to_add)
         set_target_properties(${name}
           PROPERTIES
-            COMPILE_DEFINITIONS ${_to_add})
+            COMPILE_DEFINITIONS "${_to_add}")
       endif()
     endif()
   endforeach()
