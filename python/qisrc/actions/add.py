@@ -1,8 +1,11 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
 import os
+import logging
 import qisrc
 import qitools
+
+LOGGER = logging.getLogger(__name__)
 
 class ProjectAlreadyExists(Exception):
     """Just a custom exception """
@@ -40,7 +43,7 @@ def do(args):
     worktree = qitools.qiworktree.worktree_from_args(args)
 
     git_src_dir = os.path.join(worktree, name)
-    print git_src_dir
+    LOGGER.info("Git clone: %s -> %s", url, git_src_dir)
 
     if os.path.exists(git_src_dir):
         raise ProjectAlreadyExists(url, name, git_src_dir)
