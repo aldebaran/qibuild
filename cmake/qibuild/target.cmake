@@ -155,6 +155,7 @@ endfunction()
 #                        Warning: you will NOT be able to create install rules
 #                          for this target.
 # \flag:NO_STAGE do not stage the librarie.
+# \flag:NO_FPIC do not set -fPIC on static libraries (will be set for shared lib by cmake anyway)
 # \param:SUBFOLDER the destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
 # \group:SRC the list of source files (private headers and sources)
@@ -164,7 +165,7 @@ endfunction()
 # \group:DEP list of dependencies
 # \example:target
 function(qi_create_lib name)
-  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE" "SUBFOLDER" "SRC;PUBLIC_HEADER;RESOURCE;SUBMODULE;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC" "SUBFOLDER" "SRC;PUBLIC_HEADER;RESOURCE;SUBMODULE;DEPENDS" ${ARGN})
 
   if (ARG_NOBINDLL)
     # NOBINDLL was used for naoqi modules.
@@ -182,7 +183,6 @@ function(qi_create_lib name)
   qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
   qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
 
-
   foreach(submodule ${ARG_SUBMODULE})
     string(TOUPPER "${submodule}" _upper_submodule)
     if (NOT DEFINED "SUBMODULE_${_upper_submodule}_SRC")
@@ -194,8 +194,15 @@ function(qi_create_lib name)
   qi_glob(_SRC           ${ARG_SRC})
   qi_glob(_PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
 
-  #message("SOURCES: ${ARG_SRC}")
   add_library("${name}" ${_SRC})
+
+  if (NOT ARG_NO_FPIC)
+    if (UNIX)
+      # always set fpic (position independent code) on libraries,
+      # because static libs could be include in shared lib. (shared lib are fpic by default)
+      set_target_properties("${name}" PROPERTIES COMPILE_FLAGS "-fPIC")
+    endif()
+  endif()
 
   qi_use_lib("${name}" ${ARG_DEPENDS})
 
