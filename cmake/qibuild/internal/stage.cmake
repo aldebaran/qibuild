@@ -222,7 +222,17 @@ endfunction()
 
 function(_qi_stage_lib target ${ARGN})
   cmake_parse_arguments(ARG "" "" "STAGED_NAME" ${ARGN})
-  _qi_set_vars(${target} ${ARGN})
+  set(_staged_name ${ARG_STAGED_NAME})
+
+  set(_new_args)
+  foreach(_arg ${ARGN})
+    if(${_arg} STREQUAL "STAGED_NAME")
+      break()
+    endif()
+    list(APPEND _new_args ${_arg})
+  endforeach()
+
+  _qi_set_vars(${target} ${_new_args})
 
   _qi_gen_code_lib_redist(_redist ${target})
   set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${target}-config.cmake")
@@ -233,28 +243,33 @@ function(_qi_stage_lib target ${ARGN})
   set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${target}-config.cmake")
   file(WRITE "${_sdk_file}" "${_sdk}")
 
-  if(ARG_STAGED_NAME)
+  if(_staged_name)
     message(STATUS "Staging with an other name!")
     string(TOUPPER ${target} _U_target)
-    string(REPLACE ${_U_target} ${ARG_STAGED_NAME} _other_redist ${_redist})
-    set(_other_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${ARG_STAGED_NAME}-config.cmake")
-    file(WRITE ${_other_redist_file} ${_other_redist})
-    file(APPEND ${_other_redist_file} "
-    message(STATUS \"
-    Usage of this file is deprecated!
-    Use ${_redist_file} instead
-    \")
-    ")
+    string(TOLOWER ${_staged_name} _other_name)
+    string(REPLACE ${_U_target} ${_staged_name} _other_redist "${_redist}")
+    set(_other_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_other_name}-config.cmake")
+    file(WRITE  "${_other_redist_file}" "${_other_redist}")
+    file(APPEND "${_other_redist_file}"
+"
+message(STATUS \"
+  Usage of ${_other_redist_file} is deprecated
+  Use ${_redist_file} instead
+\")
+"
+    )
 
-    string(REPLACE ${_U_target} ${ARG_STAGED_NAME} _other_sdk ${_sdk})
-    set(_other_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${ARG_STAGED_NAME}-config.cmake")
-    file(WRITE "${_other_sdk_file}" "${_other_sdk}")
-    file(APPEND ${_other_sdk_file} "
-    message(STATUS \"
-    Usage of this file is deprecated!
-    Use ${_sdk_file} instead
-    \")
-    ")
+    string(REPLACE ${_U_target} ${_staged_name} _other_sdk "${_sdk}")
+    set(_other_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_other_name}-config.cmake")
+    file(WRITE  "${_other_sdk_file}" "${_other_sdk}")
+    file(APPEND "${_other_sdk_file}"
+"
+message(STATUS \"
+  Usage of ${_other_sdk_file} file is deprecated
+  Use ${_sdk_file} instead
+  \")
+"
+    )
 
 
   endif()
