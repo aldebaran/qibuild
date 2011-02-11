@@ -2,5 +2,5 @@
 
 clean(PTHREAD)
 fpath(PTHREAD "pthread.h")
-flib(PTHREAD "pthread")
+flib(PTHREAD NAMES "pthread" "pthreadVCE2")
 export_lib(PTHREAD)
