@@ -63,10 +63,12 @@ function(qi_swig_wrap_python module_name interface_file)
   # Be sure a .pyd file gets created, even though we
   # use an old version of swig, which may create .dll files ...
   if (WIN32)
-    set_target_properties(${_swig_target} PROPERTIES SUFFIX   ".pyd"
-                                             DEBUG_POSTFIX "_d")
-    # Make sure _swig_target is put in the right place
-    win32_copy_target(${_swig_target} "${QI_SDK_DIR}/${QI_SDK_LIB}")
+    set_target_properties(${_swig_target}
+      PROPERTIES
+        SUFFIX   ".pyd"
+        DEBUG_POSTFIX "_d"
+        RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}"
+    )
   endif()
 
   # Re-create install rules:
