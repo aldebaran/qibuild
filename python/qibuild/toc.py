@@ -162,16 +162,6 @@ class Toc(QiWorkTree):
         if self.build_config:
             res.append(self.build_config)
 
-        if self.using_visual_studio:
-            # When using visual studio, different version of the compilator
-            # produces incompatible binaries, so put vc version in the build dir
-            # nane
-            res.append("vs%s" % self.vc_version)
-
-        if self.using_nmake:
-            # TODO: guess vc version from general.env.bat_file?
-            res.append("nmake")
-
         self.build_folder_name = "-".join(res)
 
     def get_project(self, project_name):
