@@ -53,7 +53,7 @@ function(qi_swig_wrap_python module_name interface_file)
   # Store the target created by swig_add_module in a more friendly name:
   set(_swig_target ${SWIG_MODULE_${module_name}_REAL_NAME})
 
-  qi_use_lib(${_swig_target} PYTHON ${_deps})
+  qi_use_lib(${_swig_target} PYTHON ${ARG_DEPENDS})
 
   set_target_properties(${_swig_target}
     PROPERTIES
