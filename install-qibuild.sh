@@ -7,7 +7,10 @@ mkdir -p /usr/local/bin
 function install_wrapper {
   name=$1
   script_path=$(which ${name}.py)
-  ln -sf $script_path /usr/local/bin/$1
+  python=$(which python)
+  echo "#!/bin/bash" > /usr/local/bin/${name}
+  echo "${python} ${script_path} \$@" >> /usr/local/bin/${name}
+  chmod +x /usr/local/bin/${name}
 }
 
 install_wrapper qitoolchain

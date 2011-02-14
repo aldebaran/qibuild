@@ -6,7 +6,6 @@
 import os
 import sys
 import stat
-import posixpath
 
 CUR_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -33,18 +32,21 @@ sys.path.insert(0, r"%s")""" % python_path)
         dest_dir = "/usr/local/bin"
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
-    out_path = posixpath.join(dest_dir, script_name + ".py")
+    out_path = os.path.join(dest_dir, script_name + ".py")
     with open(out_path, "w") as fp:
         fp.write(script_contents)
     print "Script installed in ", out_path
 
     chmod_755(out_path)
+    if sys.platform.startswith("win32"):
+        # Also create a .bat just in case:
+        with open(os.path.join(dest_dir, script_name + ".bat")) as fp:
+            fp.write('"{python}" "{script}" %@\n'.format(
+                python=sys.executable,
+                script=out_path))
+
 
 if __name__ == "__main__":
-    if "--windows" in sys.argv:
-        on_win = True
-    else:
-        on_win = False
     install("qitoolchain")
     install("qibuild")
     install("qisrc")
