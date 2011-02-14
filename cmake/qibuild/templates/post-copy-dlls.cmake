@@ -18,6 +18,8 @@
 # PROJECT : upper-case name of the target beeing built.
 #           (${PROJECT}_DEPENDS must exist in the CMake cache
 
+include(CMakeParseArguments)
+
 if(${BUILD_TYPE} STREQUAL "Debug")
   set(token "debug")
 else()
@@ -26,19 +28,27 @@ endif()
 
 set(_libs)
 
+# Iterate through the dependencies, adding every
+# required .lib
 foreach(_dep ${${PROJECT}_DEPENDS})
   string(TOUPPER ${_dep} _U_dep)
-  list(APPEND _libs ${${_U_dep}_LIBRARIES})
+  set(_dep_libs ${${_U_dep}_LIBRARIES})
+  cmake_parse_arguments(ARG "" "" "optimized;debug" ${_dep_libs})
+  if(ARG_UNPARSED_ARGUMENTS)
+    # same .lib for debug and release
+    list(APPEND _libs ${_dep_libs})
+  else()
+    # different .lib for debug and release: only append the
+    # necessary .libs
+    list(APPEND _libs ${ARG_${token}})
+  endif()
 endforeach()
-
-
-include(CMakeParseArguments)
-
-cmake_parse_arguments(ARG "" "" "optimized;debug" ${_libs})
 
 set(_in_dlls)
 
-foreach(_lib ${ARG_${token}})
+# Each .lib may correspond to a .dll, build a list with
+# all the .dlls on which the project depends
+foreach(_lib ${_libs})
   string(REPLACE ".lib" ".dll" _dll ${_lib})
   if (EXISTS ${_dll})
     list(APPEND _in_dlls ${_dll})
