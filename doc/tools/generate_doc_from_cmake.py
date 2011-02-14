@@ -91,7 +91,7 @@ class DocBlock:
         if command == "example":
             docline.extend(self.generate_example(value, desc))
         else:
-            print "WARNING unknow command:", command, value, desc
+            print "WARNING unknown command:", command, value, desc
         return docline
 
     def generate_example(self, value, desc):
