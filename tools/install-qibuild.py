@@ -40,7 +40,7 @@ sys.path.insert(0, r"%s")""" % python_path)
     chmod_755(out_path)
     if sys.platform.startswith("win32"):
         # Also create a .bat just in case:
-        with open(os.path.join(dest_dir, script_name + ".bat")) as fp:
+        with open(os.path.join(dest_dir, script_name + ".bat"), "w") as fp:
             fp.write('"{python}" "{script}" %@\n'.format(
                 python=sys.executable,
                 script=out_path))
