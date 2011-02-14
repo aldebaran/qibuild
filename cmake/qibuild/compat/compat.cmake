@@ -57,10 +57,41 @@ endfunction()
 ######################
 # Install
 ######################
-function(install_header)
+function(install_header _staged_name)
+  # old API:
+  # install_header(STAGED_NAME [SUBFOLDER subfolder] [headers ...])
+  # new API:
+  # qi_install_header(subfolder [headers...])
   qi_deprecated("install_header is deprecated.
-  Use qi_install_header instead")
-  qi_install_header(${ARGN})
+  Use qi_install_header instead
+  Old:
+    install_header(FOO SUBFOLDER foo foo.h)
+  New:
+    qi_install_header(foo foo.h)
+  "
+  )
+  string(TOLOWER ${_staged_name} _targetname)
+  cmake_parse_arguments(ARG "INCLUDEPATHEXPORT" "SUBFOLDER" "" ${ARGN})
+  if(ARG_INCLUDEPATHEXPORT)
+    qi_warning("
+    Using  INCLUDEPATHEXPORT is not longer suppoprted
+    (problematic target: ${_targetname})
+    Old:
+      # include \"bar.h\"
+    New:
+      # include <${_targetname}/bar.h>
+    "
+    )
+  endif()
+
+  if(NOT ARG_SUBFOLDER)
+    qi_error("
+    The SUBFOLDER argument is now mandatory
+    "
+    )
+  endif()
+
+  qi_install_header(${ARG_SUBFOLDER} ${ARG_UNPARSED_ARGUMENTS})
 endfunction()
 
 function(install_data)
