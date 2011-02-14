@@ -5,17 +5,17 @@ Introduction
 ------------
 qiBuild aims to make compilation of your sources easy. It manages
 dependencies between projects and supports easy cross-compilation.
-By default qiBuild use libraries provided by your system, but you
-can use QiToolchain to get a toolchain if you dont want to build
+By default qiBuild uses libraries provided by your system, but you
+can use qiToolchain to get a toolchain if you dont want to build
 with your system libraries or want to cross-compile.
 
 
 qiBuild is composed of two parts:
 
-* the qiBuild CMake framework, that simplify CMakeLists.txt writing.
-* qibuild/qitoolchain command line programs, that build projects taking dependencies into account.
+* the qiBuild CMake framework, that simplifies CMakeLists.txt writing.
+* qibuild/qitoolchain command line programs, that builds projects taking dependencies into account.
 
-For more detailled information look at the link:architecture.html[architecture].
+For more detailed information look at the link:architecture.html[architecture].
 
 
 Tutorials
@@ -40,7 +40,3 @@ Manpages:
 * link:qibuild-manpage.html[qibuild manpage]
 * link:qitoolchain-manpage.html[qitoolchain manpage]
 
-
-Authors
--------
-Cedric GESTES <gestes@aldebaran-robotics.com> : main design, cmake, python, doc

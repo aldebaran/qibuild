@@ -1,11 +1,11 @@
 qiBuild CMake API
 =================
 
-This page presents the public qiBuild cmake API.
+This page presents the qiBuild cmake public API.
 
 link:target.html[Target]
 ------------------------
-Functions for creating targets. This include binaries, scripts and libraries.
+Functions for creating targets. This includes binaries, scripts and libraries.
 
 * link:target.html#_qi_create_bin[qi_create_bin]
 * link:target.html#_qi_create_lib[qi_create_lib]
@@ -14,7 +14,7 @@ Functions for creating targets. This include binaries, scripts and libraries.
 link:submodule.html[Submodule]
 ------------------------------
 Submodule represent a group of sources and dependencies. They help
-have clean separated CMakeLists.txt when creating big libraries or
+maintain cleanly separated CMakeLists.txt when creating big libraries or
 binaries.
 
 * link:submodule.html#_qi_submodule_create[qi_submodule_create]
@@ -36,7 +36,6 @@ link:tests.html[Test]
 Interface gtest with ctest.
 
 * link:tests.html#_qi_create_gtest[qi_create_gtest]
-* link:tests.html#_qi_create_gtest[qi_create_gtest]
 
 link:uselib.html[UseLib]
 ------------------------
@@ -46,14 +45,14 @@ Simple dependencies handling functions.
 
 link:launcher.html[Launcher]
 ----------------------------
-Create launcher that define proper path (python, libraries, ..) to launch targets.
+Create a launcher that defines proper paths (python, libraries, ..) to launch targets.
 
 * link:launcher.html#_qi_create_launcher[qi_create_launcher]
 * link:launcher.html#_qi_create_insource_launcher[qi_create_insource_launcher]
 
 link:stage.html[Stage]
 ----------------------
-Stage executable and libraries to make them available to the outside world!
+Stage executables and libraries to make them available to the outside world.
 
 * link:stage.html#_qi_stage_lib[qi_stage_lib]
 * link:stage.html#_qi_stage_bin[qi_stage_bin]

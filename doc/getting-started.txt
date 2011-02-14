@@ -49,7 +49,7 @@ Creating a work tree
 
 First you need to chose a qibuild "worktree".
 
-This path will be searched by qibuild to find the sources
+This path will be searched by qiBuild to find the sources
 of your projects.
 
 In the following document, we call this worktree QI_WORK_TREE.
@@ -60,7 +60,7 @@ Then go to this directory and run:
 qibuild init
 ----
 
-This will create a new qibuild configuration file in
+This will create a new qiBuild configuration file in
 your working directory, in QI_WORK_TREE/.qi/build.cfg
 
 
@@ -83,7 +83,7 @@ and then answering the questions
 Configuring qiBuild for Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You will have to do several things for qibuild to work with
+You will have to do several things for qiBuild to work with
 visual studio.
 
 * Make sure CMake is in the %PATH%.
@@ -223,7 +223,7 @@ wit the same source tree)
 Then run:
 ----
 qibuild make foo
-qibuild tests foo
+qibuild test foo
 ----
 
 This will compile and launch tests on the foo project.

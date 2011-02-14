@@ -101,7 +101,7 @@ Each time you run qibuild, it looks for a .qi to guess your current worktree.
 
 After this, the worktree is parsed to find qibuild.manifest files.
 
-Here, there were two qibuild.manifest files, so qibuild found the two projects: world and hello.
+Here, there were two qibuild.manifest files, so qiBuild found the two projects: world and hello.
 
 
 CMake magic: staging the world library
@@ -127,7 +127,7 @@ NOTE: For those already familiar with CMake:
       * We never had to call +find_package+ or +include_directories+,
       or +target_link_libraries+.
 
-qiBuild always generate binaries and libraries in the SDK directory, this way,
+qiBuild always generates binaries and libraries in the SDK directory, this way,
 the build/sdk contains only the results of the compilation that are necessary
 to be used by other projects.
 
@@ -136,7 +136,7 @@ so that we stick to the FHS convention inside the build/sdk directory.
 
 On Windows, the binaries compiled in debug contain +_d+ in their names,
 so you can share the same build directory, and the same visual studio solution for several
-build configurations, without risking to mix binaries compiled in release with binaires compiled in
+build configurations, without the risk of a mix of binaries compiled in release and binaires compiled in
 debug.
 
 The call to qi_stage_lib caused a world-config.cmake to be generated in
@@ -164,7 +164,7 @@ find_package(world)
 Since the variable CMAKE_PREFIX_PATH was correctly set, CMake could find
 the world-config.cmake file in the build dir of world.
 
-Since everyting under build/sdk follows the conventions, finding the library in
+Since everything under build/sdk follows the same conventions, finding the library in
 sdk/lib was easy.
 
 
@@ -180,7 +180,7 @@ This is achived by running the cmake script post-copy-dlls.cmake that
 was also generated in the build dir of the hello build directory with
 correct arguements.
 
-(It's a bit similar to the way CMake creates an install rules: you
+(It is similar to the way CMake creates install rules: you
 just have to call a cmake script with proper arguments to install
 the files)
 

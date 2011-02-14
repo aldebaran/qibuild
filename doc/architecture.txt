@@ -6,7 +6,7 @@ qiBuild is a simple tool that builds projects taking dependencies and toolchains
 
 We have strong requirements for it:
 
-* be as standard as possible
+* to be as standard as possible
 * support cross-compilation
 * support visual-studio
 * support building for multiple platforms with the same source tree
@@ -14,7 +14,7 @@ We have strong requirements for it:
 How does it work?
 
 === Toolchains ===
-Toolchains are managed by QiToolchain. The default toolchain is called "system". The system
+Toolchains are managed by qiToolchain. The default toolchain is called "system". The system
 toolchain represents your system, so that libraries and headers will be searched for in your system.
 Other toolchains use binary packages.
 

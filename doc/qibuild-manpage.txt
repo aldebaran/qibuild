@@ -15,8 +15,8 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The command line program qibuild provide severals actions to work with projects.
-You can configure, build, install and generate binary archive of projects.
+The command line program qibuild provides severals actions to work with projects.
+You can configure, build, install and generate binary archives of projects.
 
 
 COMMANDS
@@ -48,7 +48,7 @@ General::
     The default build configuration. (see Build)
 
 *general.cmake.flags*:::
-    Additional cmake flags to pass to all projects, in all configuration.
+    Additional CMake flags to pass to all projects, in all configuration.
     If you want specific clags for a configuration, please refer to Build.
     Flags look like: "FOO=BAR TITI=CACA"
 
@@ -68,9 +68,9 @@ Configuration specific to a project.
 
 
 Build::
-This section allow creating specific build configuration.
+This section allows you to creat specific build configuration.
 You set the default build configuration using general.build.config.
-You can pass the build configuration using -c <buildconfig> in command line.
+You can pass the build configuration using -c <buildconfig> in the command line.
 
 *build.<name>.cmake.flags*:::
    cmake flags specific to a build configuration.
@@ -84,7 +84,3 @@ EXIT STATUS
 *1*::
     Failure
 
-
-BUGS
-----
-    th3r3 15 n0 5p00n
