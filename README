@@ -1,9 +1,8 @@
 qiBuild
 =======
 
-This projects aims to make compilation of cmake project easy.
-
-Refer to the documentation for more information.
+This projects aims to make compilation of cmake projects easy.
+Please refer to the documentation for more information.
 
 git repository:
 http://github.com/aldebaran/qibuild
