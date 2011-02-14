@@ -265,9 +265,6 @@ function(cond_subdirectory)
   qi_add_subdirectory(${ARGN})
 endfunction()
 
-function(add_python_test _name _pythonFile)
-  qi_deprecated("unimplemented")
-endfunction()
 
 function(gen_trampoline _binary_name _trampo_name)
   qi_deprecated("unimplemented")
@@ -318,3 +315,14 @@ function(configure_tests _name)
   endif()
 endfunction()
 
+# Old undocumented functions. (Used for aldebaran's
+# automatic testing only)
+function(find)
+endfunction()
+
+function(gen_python_script)
+endfunction()
+
+function(add_python_test _name _pythonFile)
+ add_test(${_name}  ${PYTHON_EXCUTABLE} ${_pythonFile} ${ARGN})
+endfunction()
