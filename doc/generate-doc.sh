@@ -12,6 +12,7 @@ CURDIR=$(dirname "$(readlink -f $0 2>/dev/null)")/
 
 cd ${CURDIR}/..
 
+mkdir -p build-doc/images
 python doc/tools/generate_doc_from_cmake.py \
   "cmake/qibuild" \
   "cmake/samples" \
