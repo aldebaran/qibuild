@@ -24,6 +24,7 @@ cp "doc/asciidoc/pygments.css"                     "build-doc"
 cp "doc/asciidoc/bare.css"                         "build-doc"
 
 cp doc/*.txt                                        build-doc
+cp -R doc/images/*                                  build-doc/images/
 
 PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py doc/qibuild-manpage.txt     build-doc/qibuild-manpage.txt     "qibuild.actions"
 PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py doc/qitoolchain-manpage.txt build-doc/qitoolchain-manpage.txt "qitoolchain.actions"

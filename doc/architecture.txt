@@ -60,11 +60,11 @@ able to use use protobuf from the build/sdk directory, or generate a binary pack
 
 
 === WorkTree ===
-***CLARIFY insert diagram of tree***
 To allow qiBuild to find buildable dependencies, a worktree needs to be created. A worktree is a folder containing a .qi folder.
 You can add as many projects as you want to your worktree, they will be detected automatically. Your worktrees can be organised as you wish, the only important point, is to have a qibuild.manifest
 file that describes each buildable project. If no .qi folder is found, qiBuild will not search for
 buildable dependencies. Without a worktree, the default behavior is the same as how unix projects work: find dependencies only in the system.
+image:images/qi_work_tree.png[]
 
 === 1,2,3 Compile ===
 Now how do you combine all these concepts?
@@ -74,10 +74,10 @@ from your toolchain to decide if you want to build it or not.
 
 
 == CMake ==
-***CLARIFY insert diagram of multiple builds ***
 qiBuild supports multiple build directories for a given source tree. This allows you to
 build for multiples platforms using the same source tree. You can have a build folder
 for windows next to a build folder for linux. You will find a SDK in each build folder.
+image:images/multiple_sdks.png[]
 
 === the SDK layout ===
 This part explain what a project should generate (once compiled) to be a valid SDK. A valid SDK
@@ -94,6 +94,8 @@ This folder follows link:http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Stand
 Because the SDK layout follow CMake conventions, if you add the folder to the CMAKE_PREFIX_PATH cmake variable
 in another project, all standard cmake functions to search packages, headers and libraries will works with projects
 in your SDK.
+
+image:images/sdk_layout.png[]
 
 Because this layout follows the FHS, it allow multiples projects to be merged without conflict, furthermore
 software can be installed on a link:http://en.wikipedia.org/wiki/Linux_Standard_Base[LSB]
@@ -148,7 +150,7 @@ qi_use_lib(B-bin A-lib)
 A-bin that depends on A-lib will always work because the dependency is in the same projects, but if
 you want B's target to find A's target, you need to add a project dependency (in the B's manifest):
 
- ***CLARIFY diagram would be nice***
+image:images/cross_project_dependencies.png[]
 
 [source, ini]
 ----
