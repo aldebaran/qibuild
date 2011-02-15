@@ -7,25 +7,27 @@
 # to others projects.
 #
 
+include(qibuild/internal/stage)
+
 #! Generate a 'name'-config.cmake, allowing other project to find the library.
 # \arg:target a target created with qi_create_lib
 #
-
-include(qibuild/internal/stage)
-
 function(qi_stage_lib target)
   check_is_target("${target}")
   _qi_stage_lib(${target} ${ARGN})
 endfunction()
 
+#! not implemented yet
 function(qi_stage_header)
   qi_error("qi_stage_header: not implemented")
 endfunction()
 
+#! not implemented yet
 function(qi_stage_bin)
   qi_error("qi_stage_bin: not implemented")
 endfunction()
 
+#! not implemented yet
 function(qi_stage_script)
   qi_error("qi_stage_script: not implemented")
 endfunction()
