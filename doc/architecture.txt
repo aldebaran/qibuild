@@ -141,23 +141,32 @@ projects specified in the manifest). For example you can have two projects A and
 A has two targets A-lib and A-bin. B has one target B-bin. If the two targets B-bin and A-bin both
 depend on A-lib, you have two target dependencies:
 
+Part of A's CMakeLists.txt
 ----
-#cmake target dependencies
+# Add A-lib as a target dependency for A-bin
 qi_use_lib(A-bin A-lib)
+----
+
+The above will always work because the dependency is in the same project.
+
+Part of B's CMakeLists.txt
+----
+# Add A-lib as a target dependency for B-bin
 qi_use_lib(B-bin A-lib)
 ----
 
-A-bin that depends on A-lib will always work because the dependency is in the same projects, but if
-you want B's target to find A's target, you need to add a project dependency (in the B's manifest):
+When you need B's target to find one of A's target, you need to add a project dependency in B's qibuild.manifest.
+----
+# Project dependencies
+[project B]
+depends = "A"
+----
+
 
 image:images/cross_project_dependencies.png[]
 
 [source, ini]
-----
-#project dependencies
-[project B]
-depends = "A"
-----
+
 
 
 
