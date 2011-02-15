@@ -86,7 +86,6 @@ class Toolchain(object):
         self.rootfs = get_rootfs(self.name)
 
         # Set self._packages with correct dependencies
-        self._update_feed()
         self._load_feed_config()
         self._packages = list()
 
