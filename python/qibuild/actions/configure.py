@@ -32,7 +32,7 @@ def do(args):
         projects[0].set_custom_build_directory(args.build_directory)
 
     for project_name in project_names:
-        logger.info("Bootstraping [%s]", project_name)
+        logger.info("Bootstrapping [%s]", project_name)
         dep_sdk_dirs = toc.get_sdk_dirs(project_name)
         qibuild.project.bootstrap(toc.get_project(project_name), dep_sdk_dirs)
 
