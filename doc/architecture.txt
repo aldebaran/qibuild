@@ -43,7 +43,7 @@ and runtime dependencies.
 Only CMake projects are supported, but you can write a CMakeLists to compile external projects.
 That way you can build projects using make, autotools, jam, ...
 
-For example, here the CMakeLists that compile protobuf:
+For example, here the CMakeLists that compiles Google's Protocol Buffers:
 [source, cmake]
 ----
 cmake_minimum_required(VERSION 2.8.3)
@@ -55,7 +55,7 @@ qi_build_autotools(protobuf
                    PATCH ${CMAKE_CURRENT_SOURCE_DIR}/0001-protobuf-fix-compilation.patch)
 ----
 
-This will download, configure, compile and install protobuf in the SDK folder of your build directory. You will be
+This will download, patch, configure, compile and install protobuf in the SDK folder of your build directory. You will be
 able to use use protobuf from the build/sdk directory, or generate a binary package from that.
 
 
