@@ -26,6 +26,8 @@ C++ projects
 * link:getting-started.html[Getting Started] : Read this first !
 * link:managing-deps.html[Managing dependencies between projects]
 * link:using-toolchains.html[Using a toolchain]
+* link:porting-to-qibuild.html[Porting a CMake-based project to qiBuild] :
+  Read this if you are already using CMake for your projects.
 
 
 Documentation
