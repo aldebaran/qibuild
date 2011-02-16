@@ -156,6 +156,7 @@ qi_use_lib(B-bin A-lib)
 ----
 
 When you need B's target to find one of A's target, you need to add a project dependency in B's qibuild.manifest.
+[source, ini]
 ----
 # Project dependencies
 [project B]
@@ -165,7 +166,6 @@ depends = "A"
 
 image:images/cross_project_dependencies.png[]
 
-[source, ini]
 
 
 
