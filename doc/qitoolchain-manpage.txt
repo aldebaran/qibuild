@@ -15,7 +15,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-The command line program qitoolchain provide severals actions to work with projects.
+The command line program qitoolchain provides severals actions to work with projects.
 
 
 COMMANDS
@@ -44,7 +44,7 @@ Toolchain::
     The toolchain feed, an url from which qitoolchain will fetch new binary packages.
 
 *toolchain.<name>.provide*:::
-    The list of project provided by the toolchain
+    The list of projects provided by the toolchain
     Name of projects that should not be build but instead taken from the toolchain.
 
 
