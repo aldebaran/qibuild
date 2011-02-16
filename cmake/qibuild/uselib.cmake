@@ -4,9 +4,9 @@
 # ===============
 #
 # == Overview ==
-# qi_use_lib handle dependencies between projects.
-# It will call find_package for you, then do all include_directories
-# and target_link_libraries needed.
+# qi_use_lib handles dependencies between projects.
+# It will call find_package for you, then do all the include_directories
+# and target_link_libraries that are needed.
 # \example:uselib
 #
 
@@ -49,12 +49,12 @@ endfunction()
 
 #!
 # Find dependencies and add them to the target <name>.
-# This will call include_directories with XXX_INCLUDE_DIRS or fallback to XXX_INCLUDE_DIR
-# This will call target_link_libraries with XXX_LIBRARIES or fallback to XXX_LIBRARY
+# This will call include_directories with XXX_INCLUDE_DIRS or fallback to XXX_INCLUDE_DIR.
+# This will call target_link_libraries with XXX_LIBRARIES or fallback to XXX_LIBRARY.
 #
-# \arg:name the target to add dependencies to
-# \flag:OPTIONAL do not stop on error
-# \group:DEPENDENCIES the list of dependencies
+# \arg:name The target to add dependencies to
+# \flag:OPTIONAL Do not stop on error
+# \group:DEPENDENCIES The list of dependencies
 function(qi_use_lib name)
   cmake_parse_arguments(ARG "OPTIONAL" "PLATEFORM" "DEPENDS" ${ARGN})
 

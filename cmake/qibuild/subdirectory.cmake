@@ -3,9 +3,9 @@
 include(CMakeParseArguments)
 
 #!
-# include a subdirectory if all options are ON
-# \arg:subdir the subdirectory that should be added to the build
-# \argn: condi
+# Include a subdirectory if all the options are ON
+# \arg:subdir The subdirectory that should be added to the build
+# \argn: The conditions
 function(qi_add_subdirectory subdir)
   cmake_parse_arguments(ARG "" "" "IF" ${ARGN})
   set(ARG_IF ${ARG_IF} ${ARG_UNPARSED_ARGUMENTS})

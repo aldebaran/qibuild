@@ -3,18 +3,18 @@
 #! qiBuild Tests
 # ==============
 #
-# This cmake module provide function to interface gtest with ctest.
+# This CMake module provides function to interface gtest with ctest.
 
 
 set(_TESTS_RESULTS_FOLDER "${CMAKE_SOURCE_DIR}/build-tests/results" CACHE INTERNAL "" FORCE)
 
 
 #! Add a test using a binary that was created by qi_create_bin
-# The only difference with add_test() is that qi_add_test will deal with
-# the fact that the the binary is in sdk/ directory, and than it is named
+# The only difference with the CMake method add_test() is that qi_add_test will deal with
+# the fact that the the binary is in the sdk/bin directory, and than it is named
 # with _d on visual studio.
-# \param:TIMETOUT the timeout of the test
-# \group:ARGUMENTS arguments to pass to add_test
+# \param:TIMETOUT The timeout of the test
+# \group:ARGUMENTS Arguments to pass to add_test
 function(qi_add_test test_name target_name)
   cmake_parse_arguments(ARG "" "TIMEOUT;ARGUMENTS" "" ${ARGN})
 
@@ -36,17 +36,17 @@ endfunction()
 
 
 
-#! This compiles and add_test's a C++ test that uses gtest.
+#! This compiles and add_test's a CTest test that uses gtest.
 # (so that the test can be run by CTest)
-# When run, the C++ test outputs a xUnit xml file in
+# When run, the CTest test outputs an xUnit xml file in
 # ${CMAKE_SOURCE_DIR}/test-results/${test_name}.xml
 # The name of the test will always be the name of the target.
 #
-# \flag:NO_ADD_TEST do not call add_test, just create the binary
-# \param:TIMEOUT the timeout of the test
-# \group:SRC sources
-# \group:DEPENDS dependencies to pass to use_lib
-# \group:ARGUMENTS arguments to pass to add_test (to your test program)
+# \flag:NO_ADD_TEST Do not call add_test, just create the binary
+# \param:TIMEOUT The timeout of the test
+# \group:SRC Sources
+# \group:DEPENDS Dependencies to pass to use_lib
+# \group:ARGUMENTS Arguments to pass to add_test (to your test program)
 function(qi_create_gtest name)
   # Using upstream GtestConfig.cmake is a good idea here:
   # create tests_results folder if it does not exist

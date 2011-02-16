@@ -4,8 +4,8 @@
 # ============
 
 #!
-# This modules implement log message with different verbose level.
-# By default debug and verbose are disable.
+# This modules implements log messages with different verbosity levels.
+# By default debug and verbose are disabled.
 # If you want the verbose output call cmake with a VERBOSE=1 environment variable set.
 # If you want the debug output call cmake with a DEBUG=1 environment variable set.
 # You can combine DEBUG and VERBOSE.

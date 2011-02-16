@@ -4,7 +4,7 @@
 # ==================
 
 #!
-# This Cmake module behave more or less like a library, but does not produce
+# This CMake module behaves more or less like a library, but does not produce
 # any output, you can use submodule to organise your CMakeLists.txt more efficiently
 # but you need to call qi_create_bin or qi_create_lib to make use of your submodule.
 #
@@ -17,20 +17,20 @@
 include(CMakeParseArguments)
 
 #!
-# A submodule is a convenient place to store  sources paths, dependencies
+# A submodule is a convenient place to store source paths, dependencies
 # and public headers. Submodule can be added a library or a module.
-# SubModule are directly visible in Visual Studio, you can change the
+# SubModules are directly visible in Visual Studio, you can change the
 # submodule name displayed in Visual Studio using VSGROUP, or disable it
 # using NO_VSGROUP
 #
-# \arg:name               the name of the submodule
-# \flag:NO_SOURCE_GROUP   do not create a source_group
-# \param:SOURCE_GROUP     by default a source_group with name is created,
+# \arg:name               The name of the submodule
+# \flag:NO_SOURCE_GROUP   Do not create a source_group
+# \param:SOURCE_GROUP     By default a source_group with name is created,
 #                         if sourcegroup is specified then the source_group
 #                         name will be name\\sourcegroup
-# \group:SRC              the list of source to include in the submodule
-# \group:PUBLIC_HEADER    the list of public headers
-# \group:DEPENDS          the list of dependencies
+# \group:SRC              The list of source to include in the submodule
+# \group:PUBLIC_HEADER    The list of public headers
+# \group:DEPENDS          The list of dependencies
 #
 # \example:submodule
 function(qi_submodule_create name)
@@ -60,21 +60,21 @@ function(qi_submodule_create name)
 endfunction()
 
 
-#! This function is similar to qi_submodule_create but append content to
+#! This function is similar to qi_submodule_create but appends content to
 # the submodule. This function can be condionnal, if you specify IF
-# then the content will be append to the submodule only if the flags
-# is defined.
+# then the content will be appended to the submodule only if the flags
+# are defined.
 #
-# \arg:name               the name of the submodule
-# \flag:NO_SOURCE_GROUP   do not create a source_group
-# \param:SOURCE_GROUP     by default a source_group with name is created,
+# \arg:name               The name of the submodule
+# \flag:NO_SOURCE_GROUP   Do not create a source_group.
+# \param:SOURCE_GROUP     By default a source_group with name is created,
 #                         if sourcegroup is specified then the source_group
 #                         name will be name\\sourcegroup
-# \param:IF               condition that should be verified before adding content
+# \param:IF               Condition that should be verified before adding content
 #                         for example (WITH_QT)
-# \group:SRC              the list of source to include in the submodule
-# \group:PUBLIC_HEADER    the list of public headers
-# \group:DEPENDS          the list of dependencies
+# \group:SRC              The list of source to include in the submodule
+# \group:PUBLIC_HEADER    The list of public headers
+# \group:DEPENDS          The list of dependencies
 #
 # \example:submodule
 function(qi_submodule_add _name)

@@ -4,8 +4,8 @@
 # ===============
 
 #!
-# This is the main qiBuild module. It encapsulate the creation of programs,
-# scripts and libraries handling dependencies and install rules,
+# This is the main qiBuild module. It encapsulates the creation of programs,
+# scripts and libraries, handling dependencies and install rules,
 # in an easy, elegant and standard way.
 #
 # There could be differents targets:
@@ -14,34 +14,34 @@
 # * *lib* : a library
 # * *script* : a script
 #
-# The separated module link:submodule.html[qiBuild SubModule], can be used to write more readable
+# The separate qibuild module link:submodule.html[SubModule], can be used to write more readable
 # and maintainable CMakeLists for binaries and libraries with lots of sources
-# and dependencies. It help keep track of groups of sources.
+# and dependencies. It helps keep track of groups of sources.
 # see link:submodule.html[SubModule].
 #
 # TODO: document options that could be passed to add_executable
 
 include(CMakeParseArguments)
 
-#! Create an executable
+#! Create an executable.
 # The target name should be unique.
 #
 # \arg:name the target name
-# \argn: sources files, like the SRC group, argn and SRC will be merged
-# \flag:NO_INSTALL do not create install rules for the target
-# \flag:EXCLUDE_FROM_ALL do not include the target in the 'all' target,
+# \argn: source files, like the SRC group, argn and SRC will be merged
+# \flag:NO_INSTALL Do not create install rules for the target
+# \flag:EXCLUDE_FROM_ALL Do not include the target in the 'all' target,
 #                        this target will not be build by default, you will
-#                        have to compile the target explicitely.
+#                        have to compile the target explicitly.
 #                        Warning: you will NOT be able to create install rules
 #                          for this target.
 # \flag:STAGE Stage the binary.
 # \flag:WIN32 Build an executable with a WinMain entry point on windows.
-# \flag:MACOSX_BUNDLE refer to the add_executable documentation.
-# \param:SUBFOLDER the destination subfolder. The install rules generated will be
+# \flag:MACOSX_BUNDLE Refer to the add_executable documentation.
+# \param:SUBFOLDER The destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
-# \group:SRC the list of source files
-# \group:DEPENDS the list of source files
-# \group:SUBMODULE the list of source files
+# \group:SRC The list of source files
+# \group:DEPENDS The list of source files
+# \group:SUBMODULE The list of source files
 # \example:target
 function(qi_create_bin name)
   qi_debug("qi_create_bin(${name})")
@@ -52,7 +52,7 @@ function(qi_create_bin name)
   qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
   qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
 
-  #no install rules can be generated for target not always built
+  #no install rules can be generated for a target that is not always built
   if (ARG_EXCLUDE_FROM_ALL)
     set(ARG_NO_INSTALL ON)
     set(ARG_SRC EXCLUDE_FROM_ALL ${ARG_SRC})
@@ -116,13 +116,13 @@ function(qi_create_bin name)
 endfunction()
 
 
-#! Create a script. This will generate rules to install it in the sdk too.
+#! Create a script. This will generate rules to install it in the sdk.
 #
-# \arg:name the name of the target script
-# \arg:source the source script, that will be copied in the sdk to bin/<name>
-# \flag:NO_INSTALL do not generate install rule for the script
+# \arg:name The name of the target script
+# \arg:source The source script, that will be copied in the sdk to bin/<name>
+# \flag:NO_INSTALL Do not generate install rule for the script
 # \flag:STAGE Stage the binary.
-# \param:SUBFOLDER the subfolder to install the script into in the sdk. (sdk/bin/<subfolder>)
+# \param:SUBFOLDER The subfolder in sdk/bin to install the script into. (sdk/bin/<subfolder>)
 #
 function(qi_create_script name source)
   qi_debug("qi_create_script(${name})")
@@ -144,25 +144,25 @@ endfunction()
 
 
 #! Create a library
-# The target name should be unique
+# The target name should be unique.
 #
 # \arg:name the target name
 # \argn: sources files, like the SRC group, argn and SRC will be merged
-# \flag:NO_INSTALL do not create install rules for the target
-# \flag:EXCLUDE_FROM_ALL do not include the target in the 'all' target,
-#                        this target will not be build by default, you will
-#                        have to compile the target explicitely.
+# \flag:NO_INSTALL Do not create install rules for the target
+# \flag:EXCLUDE_FROM_ALL Do not include the target in the 'all' target,
+#                        This target will not be built by default, you will
+#                        have to compile the target explicitly.
 #                        Warning: you will NOT be able to create install rules
 #                          for this target.
-# \flag:NO_STAGE do not stage the librarie.
-# \flag:NO_FPIC do not set -fPIC on static libraries (will be set for shared lib by cmake anyway)
-# \param:SUBFOLDER the destination subfolder. The install rules generated will be
+# \flag:NO_STAGE Do not stage the library.
+# \flag:NO_FPIC Do not set -fPIC on static libraries (will be set for shared lib by CMake anyway)
+# \param:SUBFOLDER The destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
-# \group:SRC the list of source files (private headers and sources)
-# \group:PUBLIC_HEADER list of public headers that should be installed with the lib
-# \group:RESOURCE the list of OSX resources
-# \group:SUBMODULE submodule to include in the lib
-# \group:DEP list of dependencies
+# \group:SRC The list of source files (private headers and sources)
+# \group:PUBLIC_HEADER List of public headers that should be installed with the lib
+# \group:RESOURCE The list of OSX resources
+# \group:SUBMODULE Submodule to include in the lib
+# \group:DEP List of dependencies
 # \example:target
 function(qi_create_lib name)
   cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC" "SUBFOLDER" "SRC;PUBLIC_HEADER;RESOURCE;SUBMODULE;DEPENDS" ${ARGN})
@@ -248,10 +248,10 @@ endfunction()
 
 
 
-#! create a configuration file
-# \arg:filename path to the generated file
-# \arg:source the source file
-# \arg:dest the destination
+#! Create a configuration file
+# \arg:filename Path to the generated file
+# \arg:source The source file
+# \arg:dest The destination
 # TODO: example
 function(qi_create_config_h _PARENT_var source dest)
   configure_file("${source}" "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}" ESCAPE_QUOTES)
