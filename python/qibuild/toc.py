@@ -352,13 +352,20 @@ class Toc(QiWorkTree):
             raise TestsFailed(project)
 
 
-    def install_project(self, project, destdir):
+    def install_project(self, project, destdir, runtime=False):
         """Install the project """
         build_dir = project.build_directory
         build_environ = os.environ.copy()
         build_environ["DESTDIR"] = destdir
-        cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
-                "--target", "install"]
+        if runtime:
+            # FIXME: implement!
+            # call cmake install with correct CMAKE_INSTALL_COMPONENTS
+            # settings
+            cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
+                    "--target", "install"]
+        else:
+            cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
+                    "--target", "install"]
         try:
             qitools.command.check_call(cmd, env=build_environ)
         except CommandFailedException:
