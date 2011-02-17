@@ -12,7 +12,7 @@ with your system libraries or want to cross-compile.
 
 qiBuild is composed of two parts:
 
-* the qiBuild CMake framework, that simplifies CMakeLists.txt writing.
+* the qiBuild CMake framework, that simplifies authoring CMakeLists.txt.
 * qibuild/qitoolchain command line programs, that builds projects taking dependencies into account.
 
 For more detailed information look at the link:architecture.html[architecture].
