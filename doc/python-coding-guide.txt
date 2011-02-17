@@ -13,11 +13,11 @@ reminders/exceptions
   and when it does not hurt readability, and below *100* characters
   at any case.
 
-* Indentation is made with *four spaces*
+* Indentation are *four spaces*
 
 * No trailing whitespace are allowed.
 
-* Every text file must pushed using *UNIX line endings*. (On windows, you are
+* Every text file must be pushed using *UNIX line endings*. (On windows, you are
 advised to set +core.autocrlf+ to +true+).
 
 * Variables, functions and modules are named +like_this+ *lower case, underscore*
@@ -53,6 +53,7 @@ def main():
 
   add_eggs(spam, eggs)
 
+#if we are not standalone, do nothing
 if __name__ == "__main__":
   main()
 ----
@@ -60,7 +61,7 @@ if __name__ == "__main__":
 Note that the +main()+ function does nothing but parsing command line, the real
 work being done by a nicely named +this_and_that+ function.
 
-You will be glad to have write you +foo.py+ script this way and what to add
+You will be glad to have written your +foo.py+ script this way if you want to add
 some spam to the eggs somewhere else :)
 
 
@@ -77,7 +78,10 @@ from foo.eggs import Eggs
 
 spam = Spam()
 eggs = Eggs()
+----
 
+[source, python]
+----
 # OK:
 import foo
 
@@ -89,7 +93,7 @@ eggs = foo.eggs.Eggs()
 
 ----
 
-For this to work, you will have to put something like
+For this to work, you will have to put something like this in +foo/__init__.py+:
 
 [source, python]
 ----
@@ -98,41 +102,12 @@ from foo import eggs
 
 ----
 
-in +foo/__init__.py+
-
-
-You can also write shortcuts, like this:
-
-[source, python]
-----
-# in foo/__init__.py
-
-from spam import create_spam
-
-# in foo/spam.py
-
-class Spam:
-
-  ...
-
-
-def create_spam():
-  spam = Spam()
-  return spam
-
-# in the rest of the code
-import foo
-
-spam = foo.create_spam()
-
-----
-
 
 File Paths
 ----------
 
 * *Never* using strings to manipulate file paths. Use +os.path.join+ which
-will handle all the nasty stuff for you .
+will handle all the nasty stuff for you.
 
 [source, python]
 ----
@@ -144,7 +119,7 @@ bar_path = spam_path + "/" + "bar"
 bar_path = os.path.join(spam_path, "bar")
 ----
 
-* *Always* convert files coming from the user to native, abolute path.
+* *Always* convert files coming from the user to native, absolute path.
 
 [source, python]
 ----
@@ -152,7 +127,8 @@ user_input = ...
 my_path = qitools.sh.to_native_path(user_input)
 ----
 
-Convert to the required format only in the last moment.
+Always store and manipulate native paths (using os.path), and if needed convert to
+posix or windows format at the last moment.
 
 NOTE: if you need to build +POSIX+ paths, don't use string operations either,
 use +posixpath.join+  (This works really well to build +URL+, for instance)
@@ -173,11 +149,11 @@ WIN_PATH = r"c:\windows\spam\eggs"
 Logging
 -------
 
-* Usage of the +loggging+ module is advised. It enalbes you to dispay nice, colorful
-messages to the user, helps to debug with just the +-v+ option, has a nice syntax...
-Please don't use +print+ unless you have a very good reason not to.
+* Usage of the +logging+ module is advised. It enables you to display nice, colorful
+messages to the user, helps to debug with the +-v+ option, has a nice syntax...
+Please don't use +print+ unless you have a very good reason to.
 
-* Please get a logger with :
+* Get a logger with:
 
 [source, python]
 ----
@@ -200,8 +176,7 @@ If it's an *unexpected* error message, here's what you can do:
 
 * run qibuild with +--backtrace+ to print the full backtrace
 
-* run qibuild with +--pdb+ to create a +pdb+ session right where the uncaught exception
-was raised.
+* run qibuild with +--pdb+ to drop to a +pdb+ session when an uncaught exception is raised.
 
 
 Extending qiBuild actions
@@ -227,7 +202,7 @@ The only requirements for the +spam+ module is to contain two functions:
 
 The +configure_parser+ function takes a +argparse.ArgumentParser+ object and modifies it.
 
-Then you can modifiy the parser passed as arguments to add specific arguments
+You can modify the parser passed as arguments to add specific arguments
 to you action.
 
 The +do+ function takes the result of the command line parsing. It's a

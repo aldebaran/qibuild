@@ -9,7 +9,7 @@ CMake coding guide
 
 * No trailing whitespace are allowed.
 
-* Every text file must pushed using +UNIX line endings+. (On windows, you are
+* Every text file must be pushed using +UNIX line endings+. (On windows, you are
 advised to set +core.autocrlf+ to +true+).
 
 * Never use old CMake syntax code for loop constructs:
