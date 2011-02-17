@@ -148,16 +148,25 @@ endfunction()
 # The target name should be unique.
 #
 # If you need your library to be static, use:
-#    qi_create_lib(mylib STATIC SRC ....)
+# [source, cmake]
+# ----
+# qi_create_lib(mylib STATIC SRC ....)
+# ----
 #
 # If you need your library to be shared, use:
-#    qi_create_lib(mylib STATIC SRC ....)
+# [source, cmake]
+# ----
+# qi_create_lib(mylib SHARED SRC ....)
+# ----
 #
 # If you want to let the user choose, use
+# [source, cmake]
+# ----
 #    qi_create_lib(mylib SRC ....)
+# ----
 #
 # The library will be compiled in static by default, unless
-# BUILD_SHARED_LIBS is true.
+# +BUILD_SHARED_LIBS+ is true.
 #
 # This is the standard CMake behavior, see link:http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library[cmake documentation] for more details
 #
