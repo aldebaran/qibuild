@@ -15,13 +15,17 @@ You have the following files:
  * foo.cpp  : implementation of the foo.h functions
 
  * foo_private.h : private header of the +foo+ library. This one
-   may include a bunch of other headers
+   may include third-party headers (say +zeromq.h+), without having the +foo.+h header
+   depending on +zeromq.h+, which is nice for the users of your library.
+   If you link statically with +zeromq+, users of +foo+ won't even need to know
+   about +zeromq+!
+
  * foo_private.cpp : private implementation.
 
  * foo_test.cpp : You would not *dare* writing a library without unit tests, would you?
 
 Proposed layout
---------------
+---------------
 
 ----
 fooproject
@@ -37,6 +41,8 @@ fooproject
 ----
 
 * The full path to the public header is  +foo/foo/foo.h+
+Note that the name of the root directory does not have to be +foo+, it can be
++foolib+, for instance.
 
 * The private code is put in a +src+ sub-directory
 
@@ -54,6 +60,8 @@ add_subdirectory(foo)
 add_subdirectory(foo/test)
 
 # foo/CMakeLists.txt:
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 qi_create_lib(foo
   SRC foo/foo.h
       foo/foo.cpp
