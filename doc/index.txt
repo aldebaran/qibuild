@@ -28,6 +28,9 @@ C++ projects
 * link:using-toolchains.html[Using a toolchain]
 * link:porting-to-qibuild.html[Porting a CMake-based project to qiBuild] :
   Read this if you are already using CMake for your projects.
+* link:how-to-write-a-library.html[How to write a library] :
+  Useful guidelines when writing a library in a large, redistributable
+  project.
 
 
 Documentation
@@ -49,6 +52,5 @@ Hacking
 Read this if you want to contribute to qiBuild, or learn about
 a few good pratices / conventions we are trying to follow.
 
-* link:how-to-write-a-library.html[How to write a library]
 * link:cmake-coding-guide.html[CMake coding guide]
 * link:python-coding-guide.html[Python coding guide]
