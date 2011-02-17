@@ -1,13 +1,13 @@
 CMake coding guide
 ==================
 
-* Keep the lenght of the line below *80* characters when possible,
+* Keep the length of the line below *80* characters when possible,
   and when it does not hurt readibility, and below *100* characters
   at any case.
 
 * Indentation is made with *two spaces*
 
-* No trailing whitespace is allowed.
+* No trailing whitespace are allowed.
 
 * Every text file must pushed using +UNIX line endings+. (On windows, you are
 advised to set +core.autocrlf+ to +true+).
@@ -54,7 +54,7 @@ endfunction()
 ----
 
 * Every function in the public API of +qiBuild+ code (i.e: that could en up in
-a user cmake code) *must* start with +qi+.
+a user cmake code) *must* start with +qi+, other should not start with +qi+ (prefer using _qi for example).
 
 * The link:http://www.cmake.org/cmake/help/cmake-2-8-docs.html#module:CMakeParseArguments[CMakeParseArguments]
 module is very useful, please use it.
@@ -64,33 +64,43 @@ a bit like +Doxygen+, but with the asciidoc syntax.
 
 [source, cmake]
 ----
-#! my_function : <small description>
+#! foobar : this function foo then bar! (small description)
 #
-# Long description of my_function
+# this is a long description for the function, the function have two parameters,
+# accept two flags, two params and two groups.
 #
 # Paragraph separated by blank lines
 #
-# \argn ...
-# \flag: ....
-# \param: ...
+# \argn: a list of optional arguments
+# \arg:first_arg the first argument
+# \arg:second_arg the second argument
+# \param:PARAM1 PARAM1 specify the fooness of the function
+# \param:PARAM2 PARAM2 should always be 42
+# \group:GROUP1 GROUP1 is a list of project to foo
+# \group:GROUP2 This group represent optional project to pass to bar
 #
-function(....)
+function(foobar first_arg second_arg)
+  cmake_parse_arguments(ARG "FLAG1;FLAG2" "PARAM1;PARAM2" "GROUP1;GROUP2" ${ARGN})
+endfunction()
 ----
 
 Note the +bang+ in the first line of the documentation of the function.
 
 The rest is straightforward
 
-+\flag+  indicates an option : the keyword may appear once
++\argn+ this represent the all the remaining optional arguments (cmake ${ARGN})
 
-+\param+ indicates a "one-value option" : the keyword must be followed by a value
++\arg:<name>+ this represent a function parameter, the name is the name of the parameter you are documenting.
 
-+\group+ indicates a "mutli-value option" : the keyword will be followed by a list of values
++\flag:<FLAG>+  This represent a boolean value, the flag could be present or not. (see CMakeParseArguments)
 
-* When writing a convenience function, not to be used outside, start then name with
++\param:<PARAM>+ indicates a "one-value option" : the keyword must be followed by a value (see CMakeParseArguments)
+
++\group:<GROUP>+ indicates a "mutli-value option" : the keyword will be followed by a list of values (see CMakeParseArguments)
+
+* When writing a convenience function, not to be used outside, start the name with
 an underscore, if you have a whole bunch of internal functions, put them in a
 separated file, in the +internal+ subdirectory.
-
 
 * Use the log functions carefully. The output of +CMake+ must stay minimal
 (when it gets too long, it's impossible for the user to see if something went wrong)
