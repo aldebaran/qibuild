@@ -9,7 +9,6 @@
 function generate_example_archive {
   qi_root="$1"
   dest_dir="$2"
-  rm -fr "$dest_dir"
   mkdir -p "$dest_dir/qi-examples"
   cp -r ${qi_root}/python/qibuild/test/{world,hello} "$dest_dir/qi-examples"
   cp -r ${qi_root}/doc/foobar "$dest_dir/foobar"

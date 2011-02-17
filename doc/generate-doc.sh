@@ -34,6 +34,7 @@ PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py doc/qitoolch
 find build-doc/ -type f -name '*.txt' | while read f ; do
   #asciidoc is stupid about css...
   #we desactivated default theme, set the stylesheet to bare.css, and disable embedded css
+  echo "ASCIIDOC $f";
   asciidoc.py -a toc -a toclevels=1  -a linkcss -a 'theme=bare' -a stylesheet="bare.css" -a pygments "$f"
 done
 
