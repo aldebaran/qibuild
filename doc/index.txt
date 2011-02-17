@@ -50,5 +50,5 @@ Read this if you want to contribute to qiBuild, or learn about
 a few good pratices / conventions we are trying to follow.
 
 * link:how-to-write-a-library.html[How to write a library]
-* link:cmake-coding-guide.html[CMake coding guied]
+* link:cmake-coding-guide.html[CMake coding guide]
 * link:python-coding-guide.html[Python coding guide]

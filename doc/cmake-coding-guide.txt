@@ -1,0 +1,101 @@
+CMake coding guide
+==================
+
+* Keep the lenght of the line below *80* characters when possible,
+  and when it does not hurt readibility, and below *100* characters
+  at any case.
+
+* Indentation is made with *two spaces*
+
+* No trailing whitespace is allowed.
+
+* Every text file must pushed using +UNIX line endings+. (On windows, you are
+advised to set +core.autocrlf+ to +true+).
+
+* Never use old CMake syntax code for loop constructs:
+
+[source, cmake]
+----
+
+# NO
+if(foo)
+  ...
+else(foo)
+  ...
+endif(foo)
+
+# YES
+if(foo)
+  ...
+else()
+  ...
+endif()
+
+----
+
+* Although CMake is rather leniant with case sensitivity, please write every function
+*lower-case*, and separate words by *underscores*
+
+[source, cmake]
+----
+#NO
+function(QI_MY_WONDERFUL_FUNCTION)
+
+  ...
+
+endfunction()
+
+#YES
+function(qi_my_nice_function)
+
+  ...
+
+endfunction()
+----
+
+* Every function in the public API of +qiBuild+ code (i.e: that could en up in
+a user cmake code) *must* start with +qi+.
+
+* The link:http://www.cmake.org/cmake/help/cmake-2-8-docs.html#module:CMakeParseArguments[CMakeParseArguments]
+module is very useful, please use it.
+
+* Every function in the *public* API *must* have corresponding documentation. It works
+a bit like +Doxygen+, but with the asciidoc syntax.
+
+[source, cmake]
+----
+#! my_function : <small description>
+#
+# Long description of my_function
+#
+# Paragraph separated by blank lines
+#
+# \argn ...
+# \flag: ....
+# \param: ...
+#
+function(....)
+----
+
+Note the +bang+ in the first line of the documentation of the function.
+
+The rest is straightforward
+
++\flag+  indicates an option : the keyword may appear once
+
++\param+ indicates a "one-value option" : the keyword must be followed by a value
+
++\group+ indicates a "mutli-value option" : the keyword will be followed by a list of values
+
+* When writing a convenience function, not to be used outside, start then name with
+an underscore, if you have a whole bunch of internal functions, put them in a
+separated file, in the +internal+ subdirectory.
+
+
+* Use the log functions carefully. The output of +CMake+ must stay minimal
+(when it gets too long, it's impossible for the user to see if something went wrong)
+
+* If you run into a +CMake+ warning, *never* ignore it. Fix your code or file a bug report.
+(+CMake+ warnings almost always mean there's a nasty bug somewhere)
+
+
