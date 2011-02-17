@@ -9,8 +9,9 @@
 set -e
 
 CURDIR=$(dirname "$(readlink -f $0 2>/dev/null)")/
+QI_ROOT_DIR=${CURDIR}/..
 
-cd ${CURDIR}/..
+cd $QI_ROOT_DIR
 
 mkdir -p build-doc/images
 python doc/tools/generate_doc_from_cmake.py \
@@ -36,4 +37,4 @@ find build-doc/ -type f -name '*.txt' | while read f ; do
   asciidoc.py -a toc -a toclevels=1  -a linkcss -a 'theme=bare' -a stylesheet="bare.css" -a pygments "$f"
 done
 
-doc/tools/generate_examples_archive python/qibuild/test/ "build-doc"
+doc/tools/generate_examples_archive "${QI_ROOT_DIR}" "build-doc"

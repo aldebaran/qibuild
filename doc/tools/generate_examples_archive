@@ -4,20 +4,25 @@
 # Generate a .tar.gz containing
 # qibuild/python/qibuild/test/{world, hello}
 
-# Usage: generate_example_archive /path/to/examples /path/to/build
+# Usage: generate_example_archive /path/to/qibuild /path/to/build
 
 function generate_example_archive {
-  dest_dir="$2/qi-examples"
+  qi_root="$1"
+  dest_dir="$2"
   rm -fr "$dest_dir"
-  mkdir -p "$dest_dir"
-  cp -r $1/{world,hello} "$dest_dir"
+  mkdir -p "$dest_dir/qi-examples"
+  cp -r ${qi_root}/python/qibuild/test/{world,hello} "$dest_dir/qi-examples"
+  cp -r ${qi_root}/doc/foobar "$dest_dir/foobar"
   pushd $2
   tar cfz qi-examples.tar.gz qi-examples
+  tar cfz foobar.tar.gz foobar
+  popd
+
 }
 
 
 if [ $# -ne 2 ]; then
-  echo "usage: $0 /path/to/examples /path/to/build"
+  echo "usage: $0 /path/to/qibuild /path/to/build"
   exit 2
 fi
 
