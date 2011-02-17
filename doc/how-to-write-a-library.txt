@@ -15,7 +15,7 @@ You have the following files:
  * foo.cpp  : implementation of the foo.h functions
 
  * foo_private.h : private header of the +foo+ library. This one
-   may include third-party headers (say +zeromq.h+), without having the +foo.+h header
+   may include third-party headers (say +zeromq.h+), without having the +foo.h+ header
    depending on +zeromq.h+, which is nice for the users of your library.
    If you link statically with +zeromq+, users of +foo+ won't even need to know
    about +zeromq+!
