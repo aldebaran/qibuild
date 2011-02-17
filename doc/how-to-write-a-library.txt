@@ -161,3 +161,7 @@ undefined referecence to `bar_func'
 
 
 NOTE: For large libraries, also consider using link:submodule.html[qi_submodule]
+
+
+NOTE: The complete sources of the project can be found link:fooproject.tar.gz[here]
+      Warning, you will need +GTest+ to compile the project

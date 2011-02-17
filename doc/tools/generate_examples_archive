@@ -12,9 +12,11 @@ function generate_example_archive {
   mkdir -p "$dest_dir/qi-examples"
   cp -r ${qi_root}/python/qibuild/test/{world,hello} "$dest_dir/qi-examples"
   cp -r ${qi_root}/doc/foobar "$dest_dir/foobar"
+  cp -r ${qi_root}/cmake/samples/fooproject "$dest_dir/fooproject"
   pushd $2
   tar cfz qi-examples.tar.gz qi-examples
   tar cfz foobar.tar.gz foobar
+  tar cfz fooproject.tar.gz fooproject
   popd
 
 }
