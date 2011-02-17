@@ -1,0 +1,269 @@
+Python coding guide
+===================
+
+
+General
+-------
+
+* The code should follow the Python coding style expressed in
+link:http://www.python.org/dev/peps/pep-0008/[PEP 8] with the following
+reminders/exceptions
+
+* Keep the length of the line below *80* characters when possible,
+  and when it does not hurt readability, and below *100* characters
+  at any case.
+
+* Indentation is made with *four spaces*
+
+* No trailing whitespace are allowed.
+
+* Every text file must pushed using *UNIX line endings*. (On windows, you are
+advised to set +core.autocrlf+ to +true+).
+
+* Variables, functions and modules are named +like_this+ *lower case, underscore*
+
+* Classes are named +LikeThis+ *camel case*
+
+* Constants and globals are named +LIKE_THIS+ *upper case, underscore*
+
+
+Using nice imports
+------------------
+
+* *Every file* that ends with a +.py+ *must* support to be imported, without
+doing anything or printing anything to the screen.
+
+* Even if you are sure you code is standalone, and is only supposed to be used
+as a script, please follow the following skeleton:
+
+[source, python]
+----
+"""The foo script adds spam to the eggs """
+
+def add_eggs(spam, eggs):
+  """Add some spam to the eggs """
+
+  ...
+
+
+def main():
+  """Parse command line """
+
+  ...
+
+  add_eggs(spam, eggs)
+
+if __name__ == "__main__":
+  main()
+----
+
+Note that the +main()+ function does nothing but parsing command line, the real
+work being done by a nicely named +this_and_that+ function.
+
+You will be glad to have write you +foo.py+ script this way and what to add
+some spam to the eggs somewhere else :)
+
+
+* Please avoid doing lots and lots of import at the beginning of the file
+
+[source, python]
+----
+# BAD:
+import foo
+from foo.spam import Spam
+from foo.eggs import Eggs
+
+...
+
+spam = Spam()
+eggs = Eggs()
+
+# OK:
+import foo
+
+...
+
+spam = foo.spam.Spam()
+
+eggs = foo.eggs.Eggs()
+
+----
+
+For this to work, you will have to put something like
+
+[source, python]
+----
+from foo import spam
+from foo import eggs
+
+----
+
+in +foo/__init__.py+
+
+
+You can also write shortcuts, like this:
+
+[source, python]
+----
+# in foo/__init__.py
+
+from spam import create_spam
+
+# in foo/spam.py
+
+class Spam:
+
+  ...
+
+
+def create_spam():
+  spam = Spam()
+  return spam
+
+# in the rest of the code
+import foo
+
+spam = foo.create_spam()
+
+----
+
+
+File Paths
+----------
+
+* *Never* using strings to manipulate file paths. Use +os.path.join+ which
+will handle all the nasty stuff for you .
+
+[source, python]
+----
+# BAD : you are doomed if you ever want to
+# generate a .bat file with bar_path
+bar_path = spam_path + "/" + "bar"
+
+# OK:
+bar_path = os.path.join(spam_path, "bar")
+----
+
+* *Always* convert files coming from the user to native, abolute path.
+
+[source, python]
+----
+user_input = ...
+my_path = qitools.sh.to_native_path(user_input)
+----
+
+Convert to the required format only in the last moment.
+
+NOTE: if you need to build +POSIX+ paths, don't use string operations either,
+use +posixpath.join+  (This works really well to build +URL+, for instance)
+
+* Pro-tip: hard-coding paths on windows:
+
+Use +r"+ rather than ugly +\\+
+[source, python]
+----
+# UGLY:
+WIN_PATH = "c:\\windows\\spam\\egss"
+
+# NICE:
+WIN_PATH = r"c:\windows\spam\eggs"
+----
+
+
+Logging
+-------
+
+* Usage of the +loggging+ module is advised. It enalbes you to dispay nice, colorful
+messages to the user, helps to debug with just the +-v+ option, has a nice syntax...
+Please don't use +print+ unless you have a very good reason not to.
+
+* Please get a logger with :
+
+[source, python]
+----
+import logging
+
+LOGGER = logging.getLogger(__name__)
+----
+
+This makes sure the names of the loggers are always consistent with the source code
+
+Debugging
+---------
+
+When something goes wrong, you will just have the last error message printed, with
+no other information. (Which is nice for the end user!)
+
+If it's an *unexpected* error message, here's what you can do:
+
+* run qibuild with +-v+ flag to display debug messages
+
+* run qibuild with +--backtrace+ to print the full backtrace
+
+* run qibuild with +--pdb+ to create a +pdb+ session right where the uncaught exception
+was raised.
+
+
+Extending qiBuild actions
+-------------------------
+
+
+Writing a new +qibuild+ action is quite simple.
+
+When you type
+
+----
+qibuild spam
+----
+
+the qibuild script will look for a module named +spam+ in the
++qibuild.actions+ package.
+
+The only requirements for the +spam+ module is to contain two functions:
+
+* configure_parser(parser)
+
+* do(args)
+
+The +configure_parser+ function takes a +argparse.ArgumentParser+ object and modifies it.
+
+Then you can modifiy the parser passed as arguments to add specific arguments
+to you action.
+
+The +do+ function takes the result of the command line parsing. It's a
++argparse.Namespace+ object.
+
+Quick example of a generic action:
+
+[source, python]
+----
+"""Add some eggs !"""
+
+import argparse
+import logging
+import qitools
+
+LOGGER = logging.getLogger(__name__)
+
+def configure_parser(parser):
+    """Configure parser for this action """
+    qitools.cmdparse.default_parser(parser)
+    parser.add_argument("--num-eggs",
+      help="Number of eggs to add",
+      type=int)
+    parser.set_defaults(
+      num_eggs=3)
+
+def do(args):
+  """Main entry point"""
+  LOGGER.info("adding %i eggs", args.num_eggs)
+----
+
+
+The call to +qitools.cmdparse.default_parser+ is mandatory:
+It handles the logging configuration, and all the debug options.
+
+There are a bunch of other functions available to configure the parsers in
+the +qibuild.parsers+ package, depending on what you need to do, and, yes,
+they all call +qitools.cmdparse.default_parser+ for you :)
+
