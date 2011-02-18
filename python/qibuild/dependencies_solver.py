@@ -3,6 +3,7 @@
 """
 topological_sort
 """
+import logging
 
 __all__ = [ "DagError", "assert_dag", "topological_sort" ]
 
@@ -145,14 +146,14 @@ class DependenciesSolver:
     """This class is able to resolve dependencies between projects
 
     """
+    logger = logging.getLogger("dependencies solver")
+
     def __init__(self, projects=None, packages=None):
-        if projects is None:
-            self.projects = list()
-        else:
+        self.projects = list()
+        self.packages = list()
+        if projects:
             self.projects = projects
-        if packages is None:
-            self.packages = list()
-        else:
+        if packages:
             self.packages = packages
 
     def solve(self, names, all=False, single=False, runtime=False):
@@ -173,6 +174,7 @@ class DependenciesSolver:
 
         if all:
         # Preten the use has asked for all the knwon projects
+            self.logger.debug("All projects have been selected")
             names = project_names[:]
 
         # Assert that all the names are known projects:
@@ -181,6 +183,8 @@ class DependenciesSolver:
                 raise Exception("Unknown project: %s" % name)
 
         if single:
+            self.logger.debug("Single project selected")
+
             if len(names) != 1:
                 raise Exception("Using --single requires exactly one name to be given")
             return (names, list(), list())
@@ -194,6 +198,10 @@ class DependenciesSolver:
         for package in self.packages:
             to_sort[package.name] = package.depends
 
+        if runtime:
+            self.logger.debug("sorting runtime projects: %s", ",".join(to_sort))
+        else:
+            self.logger.debug("sorting buildable projects: %s", ",".join(to_sort))
         sorted_names = topological_sort(to_sort, names)
 
         # Append what is left in sorted names, looking first in
