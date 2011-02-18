@@ -335,6 +335,11 @@ class Toc(QiWorkTree):
                 cmd = ["BuildConsole.exe", sln_file]
                 cmd += ["/cfg=%s|Win32" % self.build_type]
                 cmd += ["/nologo"]
+            else:
+                if self.vc_version == "10":
+                    # CMake will use MSBuild for VS2010 builds, in other
+                    # cases, it uses devenv directly
+                    cmd = cmd + ["--", "/verbosity:minimal", "/nologo"]
         try:
             qitools.command.check_call(cmd)
         except CommandFailedException:
