@@ -89,6 +89,12 @@ class Toolchain(object):
         self._load_feed_config()
         self._packages = list()
 
+    def __str__(self):
+        ret = ""
+        ret += "feed     = %s\n" % self.feed
+        ret += "packages = %s" % ",".join([ str(x) for x in self.packages])
+        return ret
+
     @property
     def packages(self):
         self._load_feed_config()
@@ -133,6 +139,10 @@ class Toolchain(object):
         """
         provided = self.configstore.get("toolchain", self.name, "provide",
             default="").split()
+        self.logger.debug("[%s] toolchain: new package %s providing %s",
+                          self.name,
+                          package_name,
+                          ",".join(provided))
         if package_name not in provided:
             provided.append(package_name)
             to_write = " ".join(provided)

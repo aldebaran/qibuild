@@ -107,6 +107,7 @@ class Toc(QiWorkTree):
 
         self.toolchain = qitoolchain.Toolchain(toolchain_name)
         self.packages = self.toolchain.packages
+        LOGGER.debug("[%s] toolchain:\n%s", toolchain_name, self.toolchain)
 
         if not self.build_config:
             self.build_config = self.configstore.get("general", "build", "config", default=None)
