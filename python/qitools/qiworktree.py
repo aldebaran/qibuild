@@ -133,7 +133,12 @@ def search_projects(directory=None, depth=4):
     if os.path.exists(os.path.join(directory, "qibuild.manifest")):
         rsrc.append(directory)
 
-    for p in os.listdir(directory):
+    subdirs = list()
+    try:
+        subdirs = os.listdir(directory)
+    except OSError:
+        pass
+    for p in subdirs:
         if os.path.isdir(os.path.join(directory, p)):
             sub_rgit, sub_rsrc = search_projects(os.path.join(directory, p), depth - 1)
             rgit.extend(sub_rgit)
