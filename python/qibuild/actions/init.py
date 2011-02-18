@@ -120,18 +120,26 @@ def do(args):
     """Main entry point"""
     work_tree = qitools.qiworktree.worktree_from_args(args)
     qiworktree = qitools.qiworktree_open(work_tree)
-    qibuild.toc.create(work_tree, args)
+    dot_qi = os.path.join(qiworktree.work_tree, ".qi")
+
+    if not os.path.isdir(dot_qi):
+        qibuild.toc.create(work_tree, args)
 
     if not args.interactive:
         return
+
+    build_cfg = os.path.join(dot_qi, "build.cfg")
+    if os.path.exists(build_cfg):
+        to_ask  = "%s already exists, do you which to configure it" % build_cfg
+        if not qitools.ask_yes_no(to_ask):
+            return
 
     try:
         run_wizard(qiworktree)
     except KeyboardInterrupt:
         # Remove the half-configured config file,
         # so that the user can re-run the wizard again:
-        dot_qi = os.path.join(qiworktree.work_tree, ".qi")
-        qitools.sh.rm(dot_qi)
+        qitools.sh.rm(build_cfg)
 
 def run_wizard(qiworktree):
     cmake_generator = ask_cmake_generator()
