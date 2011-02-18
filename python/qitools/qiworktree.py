@@ -65,8 +65,10 @@ def qiworktree_open(work_tree=None, use_env=False):
     """
     if not work_tree:
         work_tree = guess_work_tree(use_env)
+        LOGGER.debug("found a qi worktree: %s", work_tree)
     if not work_tree:
         work_tree = search_manifest_directory(os.getcwd())
+        LOGGER.debug("no work tree found using the project root: %s", work_tree)
     if work_tree is None:
         raise WorkTreeException("Could not find a work tree\n "
             "Here is what you can do :\n"
