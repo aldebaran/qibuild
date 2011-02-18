@@ -3,7 +3,20 @@
 # install with support for directory, globbing and files.
 # this function know how to handle COMPONENT
 function(_qi_install)
-  cmake_parse_arguments(ARG "" "COMPONENT;DESTINATION" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "IF;COMPONENT;DESTINATION" "" ${ARGN})
+
+  if (NOT "${ARG_IF}" STREQUAL "")
+    set(_doit TRUE)
+  else()
+    #I must say... lol cmake, but NOT NOT TRUE is not valid!!
+    if (${ARG_IF})
+    else()
+      set(_doit TRUE)
+    endif()
+  endif()
+  if (NOT _doit)
+    return()
+  endif()
 
   set(_files_to_install)
   set(_dirs_to_install)

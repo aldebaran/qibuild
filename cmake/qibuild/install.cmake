@@ -24,6 +24,8 @@
 #
 # \arg:subfolder The subfolder where headers will be installed
 # \argn: list of files. Directories and globs on files are accepted.
+# \param:IF Condition that should be verified for the install rules to be active.
+#           for example (IF WITH_ZEROMQ)
 function(qi_install_header subfolder)
   _qi_install(${ARGN} COMPONENT header DESTINATION ${QI_SDK_INCLUDE}/${subfolder})
 endfunction()
@@ -33,6 +35,8 @@ endfunction()
 #
 # \arg:subfolder The application name
 # \argn: list of files. Directories and globs on files are accepted.
+# \param:IF Condition that should be verified for the install rules to be active.
+#           for example (IF WITH_ZEROMQ)
 function(qi_install_data subfolder)
   _qi_install(${ARGN} COMPONENT data  DESTINATION ${QI_SDK_SHARE}/${subfolder})
 endfunction()
@@ -41,6 +45,8 @@ endfunction()
 # On linux the destination will be: <prefix>/share/doc/<subfolder>/
 #
 # \arg:subfolder The application name
+# \param:IF Condition that should be verified for the install rules to be active.
+#           for example (IF WITH_ZEROMQ)
 # \argn: list of files. Directories and globs on files are accepted.
 function(qi_install_doc subfolder)
   _qi_install(${ARGN} COMPONENT doc   DESTINATION ${QI_SDK_DOC}/${subfolder})
@@ -51,6 +57,8 @@ endfunction()
 #
 # \arg:subfolder The application name
 # \argn: list of files. Directories and globs on files are accepted.
+# \param:IF Condition that should be verified for the install rules to be active.
+#           for example (IF WITH_ZEROMQ)
 function(qi_install_conf subfolder)
   _qi_install(${ARGN} COMPONENT conf  DESTINATION ${QI_SDK_CONF}/${subfolder})
 endfunction()
@@ -59,6 +67,8 @@ endfunction()
 #
 # \arg:subfolder The application name
 # \argn: list of files. Directories and globs on files are accepted.
+# \param:IF Condition that should be verified for the install rules to be active.
+#           for example (IF WITH_ZEROMQ)
 function(qi_install_cmake subfolder)
   _qi_install(${ARGN} COMPONENT cmake DESTINATION ${QI_SDK_CMAKE}/${subfolder})
 endfunction()
@@ -68,8 +78,23 @@ endfunction()
 #
 # \param:SUBFOLDER An optional subfolder
 # \argn: A list of target to install
+# \param:IF Condition that should be verified for the install rules to be active.
+#           for example (IF WITH_ZEROMQ)
 function(qi_install_target)
-  cmake_parse_arguments(ARG "" "SUBFOLDER" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "IF;SUBFOLDER" "" ${ARGN})
+
+  if (NOT "${ARG_IF}" STREQUAL "")
+    set(_doit TRUE)
+  else()
+    #I must say... lol cmake, but NOT NOT TRUE is not valid!!
+    if (${ARG_IF})
+    else()
+      set(_doit TRUE)
+    endif()
+  endif()
+  if (NOT _doit)
+    return()
+  endif()
 
   foreach (name ${ARG_UNPARSED_ARGUMENTS})
     install(TARGETS "${name}"
@@ -86,8 +111,24 @@ endfunction()
 #
 # \param:SUBFOLDER An optional subfolder
 # \argn: A list of programs to install
+# \param:IF Condition that should be verified for the install rules to be active.
+#           for example (IF WITH_ZEROMQ)
 function(qi_install_program)
-  cmake_parse_arguments(ARG "" "SUBFOLDER" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "IF;SUBFOLDER" "" ${ARGN})
+
+  if (NOT "${ARG_IF}" STREQUAL "")
+    set(_doit TRUE)
+  else()
+    #I must say... lol cmake, but NOT NOT TRUE is not valid!!
+    if (${ARG_IF})
+    else()
+      set(_doit TRUE)
+    endif()
+  endif()
+  if (NOT _doit)
+    return()
+  endif()
+
   foreach(name ${ARG_UNPARSED_ARGUMENTS})
     #TODO: what should be the real source here?
     install(PROGRAMS    "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}"
