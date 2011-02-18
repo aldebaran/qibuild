@@ -78,6 +78,12 @@ def ask_build_configs():
 
         keep_going = qitools.ask_yes_no("Add a new build config")
 
+    # We only asked for the cmake.flags part of the build configs, so fix this
+    # now
+    for (name, cmake_flags) in build_configs.iteritems():
+        build_configs[name] = dict()
+        build_configs[name]["cmake"] = dict()
+        build_configs[name]["cmake"]["flags"] = " ".join(cmake_flags)
     return build_configs
 
 def ask_path():
@@ -97,11 +103,6 @@ def ask_path():
         keep_going = qitools.ask_yes_no("A a new path to os.environ")
     # configuration file expects paths separated pathsep
     return os.path.pathsep.join(paths)
-
-def ask_default_build_config(build_configs):
-    """Ask the user to choose a default build config"""
-    return qitools.ask_choice(build_configs.keys(),
-        "Select a default build config")
 
 def create_toolchain():
     """Ask the use for a toolchain name and create one"""
@@ -127,27 +128,35 @@ def do(args):
     if not args.interactive:
         return
 
-    build_cfg = os.path.join(dot_qi, "build.cfg")
-    if os.path.exists(build_cfg):
-        to_ask  = "%s already exists, do you which to configure it" % build_cfg
-        if not qitools.ask_yes_no(to_ask):
-            return
-
-    run_wizard(build_cfg)
+    try:
+        build_cfg = os.path.join(dot_qi, "build.cfg")
+        if os.path.exists(build_cfg):
+            to_ask  = "%s already exists, do you which to configure it" % build_cfg
+            if not qitools.ask_yes_no(to_ask):
+                return
+        run_wizard(build_cfg)
+    except KeyboardInterrupt:
+        pass
 
 def run_wizard(build_cfg):
     """Write a new configuration if the file passed as
     arguments, asking the user a lot of questions
 
     """
+    old_config = qitools.configstore.ConfigStore()
+    old_config.read(build_cfg)
     cmake_generator = ask_cmake_generator()
 
     default_build_config = None
-    build_configs = dict()
-    if qitools.ask_yes_no("Define custom build configurations"):
-        build_configs  = ask_build_configs()
+    new_build_configs = dict()
+    if qitools.ask_yes_no("Add custom build configurations"):
+        new_build_configs  = ask_build_configs()
+    build_configs = old_config.get("build", default=dict())
+    build_configs.update(new_build_configs)
+    default_build_config = None
     if build_configs:
-        default_build_config = ask_default_build_config(build_configs)
+        default_build_config = qitools.ask_choice(build_configs.keys(),
+            "Choose a default build config")
 
     toolchain_name = None
     if qitools.ask_yes_no("Use a toolchain"):
@@ -169,8 +178,13 @@ def run_wizard(build_cfg):
     qitools.configstore.update_config(build_cfg,
         "general", "env", "path", env_path)
     if build_configs:
-        for name, flags in build_configs.iteritems():
+        for name, config in build_configs.iteritems():
+            cmake_flags = ""
+            cmake = config.get("cmake")
+            if cmake:
+                cmake_flags = cmake.get("flags")
             qitools.configstore.update_config(build_cfg,
-                "build", name, "cmake.flags", flags)
+                "build", name, "cmake.flags", cmake_flags)
+    if default_build_config:
         qitools.configstore.update_config(build_cfg,
             "general", "build", "build_config", default_build_config)
