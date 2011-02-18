@@ -109,3 +109,42 @@ separated file, in the +internal+ subdirectory.
 (+CMake+ warnings almost always mean there's a nasty bug somewhere)
 
 
+== Conditions and Variables ==
+
+* Always quote variable that represent string
+[source, cmake]
+----
+set(myvar "foo")
+if ("${myvar}" STREQUAL "bar")
+endif()
+----
+
+* Don't quote variable that are boolean
+[source, cmake]
+----
+set(mybvar ON)
+set(mybvar OFF)
+if (${myvar})
+endif()
+----
+
+* Always use list(APPEND) to append to a list
+[source, cmake]
+----
+list(APPEND mylist "one item")
+----
+
+* Always quote string when comparing string in a if
+[source, cmake]
+----
+set(myvar "test")
+if ("${myvar}" STREQUAL test)
+endif()
+----
+
+* Always use if(DEFINED varname) to check if a variable is set
+[source, cmake]
+----
+if (DEFINED myvar)
+endif()
+----
