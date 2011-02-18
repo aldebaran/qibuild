@@ -1,8 +1,10 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 """Generate a binary sdk"""
 
-import logging
 import os
+import sys
+import logging
+
 import qitools
 import qibuild
 
@@ -13,14 +15,15 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     parser.set_defaults(
-        use_deps=False,
-        debug=False,
         cmake_flags=["CMAKE_INSTALL_PREFIX='/'"])
 
-def do(args):
-    """Main entry point"""
-    # FIXME: we should build in debug and in release
-    # no matter what when using Visual Studio
+def _do(args, build_type):
+    """Called by do().
+    Once with build_type=release on UNIX.
+    Twice with build_type=debug and build_type=release on windows
+
+    """
+    args.build_type = build_type
     logger   = logging.getLogger(__name__)
     toc      = qibuild.toc_open(args.work_tree, args, use_env=True)
     (project_names, package_names, not_found) = qibuild.toc.resolve_deps(toc, args)
@@ -29,9 +32,14 @@ def do(args):
         project = toc.get_project(project_name)
         destdir = os.path.join(inst_dir, project_name)
         logger.info("Generating bin sdk for %s in %s", project_name, inst_dir)
-        toc.configure_project(project)
-        toc.build_project(project)
-        toc.install_project(project, destdir)
+        toc.package_project(project, destdir)
         archive = qitools.archive.zip(destdir)
         logger.info("Archive generated in %s", archive)
+
+def do(args):
+    """Main entry point"""
+    if sys.platform.startswith("win"):
+        _do(args, "debug")
+    _do(args, "release")
+
 

@@ -2,6 +2,7 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
 import os
+import sys
 import glob
 import platform
 import subprocess
@@ -370,6 +371,20 @@ class Toc(QiWorkTree):
             qitools.command.check_call(cmd, env=build_environ)
         except CommandFailedException:
             raise InstallFailed(project)
+
+    def package_project(self, project, destdir):
+        """Package a project.
+
+        It's simply a matter of calling:
+
+            qibuild configure
+            qibuild make
+            qibuild install
+
+        """
+        self.configure_project(project)
+        self.build_project(project)
+        self.install_project(project, destdir)
 
 def toc_open(work_tree, args, use_env=False):
     build_config   = args.build_config
