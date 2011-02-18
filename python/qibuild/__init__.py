@@ -24,6 +24,12 @@ from toc import toc_open
 
 LOGGER = logging.getLogger("qibuild")
 
+QIBUILD_ROOT_DIR  = os.path.dirname(os.path.abspath(__file__))
+CMAKE_QIBUILD_DIR = os.path.abspath(os.path.join(QIBUILD_ROOT_DIR,
+        "..", "cmake", "qibuild"))
+
+
+
 def make(build_dir, num_jobs=None, target=None):
     """
     Just launch make from a build dir.

@@ -13,8 +13,6 @@ def copy_helper(project_name, directory):
     """Create a new project in the specified directory.
 
     """
-    cur_dir = os.path.dirname(os.path.abspath(__file__))
-
     # Read the templates for projects
     template_dir = os.path.join(cur_dir, "..", "templates", "project")
     template_dir = os.path.abspath(template_dir)
@@ -27,11 +25,8 @@ def copy_helper(project_name, directory):
             new_file.write(new_contents)
 
     # Also create the necessary qibuild.cmake file:
-    qibuild_cmake = os.path.join(cur_dir, "..", "..", "..",
-        "cmake", "qibuild", "templates", "qibuild.cmake")
-    qibuild_cmake = os.path.abspath(qibuild_cmake)
-
-    shutil.copy(qibuild_cmake, os.path.join(directory, "qibuild.cmake"))
+    to_copy = os.path.join(CMAKE_QIBUILD_DIR, "templates", "qibuild.cmake")
+    shutil.copy(to_copy, os.path.join(directory, "qibuild.cmake"))
 
 
 def configure_parser(parser):
