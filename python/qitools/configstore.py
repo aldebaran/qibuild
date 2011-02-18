@@ -110,3 +110,43 @@ class ConfigStore:
                 tkey.extend([x.strip("\"\'") for x in splitted_section])
                 tkey.extend([x.strip("\"\'") for x in k.split(".")])
                 self.set(*tkey, value=v.strip("\"\'"))
+
+
+def update_config(config_path, section, name, key, value):
+    """Update a config file.
+
+    For instance, if foo.cfg looks like
+
+    [spam "eggs"]
+    answer = 42
+
+    after update_config(foo.cfg, "spam", "eggs", "anser", 43):
+
+    foo.cfg looks like
+
+    [spam "eggs"]
+    anser = 43
+
+    Note: all comments in the file will be lost!
+    Sections will be created if they do not exist
+
+    Gotcha: this does NOT update a configstore object per se,
+    because the configstore may have read several files.
+
+    Here you are just fixing *one* config file, that someone
+    else will read later.
+
+    """
+    import ConfigParser
+    parser = ConfigParser.ConfigParser()
+    parser.read(config_path)
+    section_name = '%s "%s"' % (section, name)
+    if not parser.has_section(section_name):
+        parser.add_section(section_name)
+    if type(value) == type(""):
+        parser.set(section_name, key, value)
+    if type(value) == type([""]):
+        parser.set(section_name, key, " ".join(value))
+    with open(config_path, "w") as config_file:
+        parser.write(config_file)
+

@@ -119,8 +119,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     work_tree = qitools.qiworktree.worktree_from_args(args)
-    qiworktree = qitools.qiworktree_open(work_tree)
-    dot_qi = os.path.join(qiworktree.work_tree, ".qi")
+    dot_qi = os.path.join(work_tree, ".qi")
 
     if not os.path.isdir(dot_qi):
         qibuild.toc.create(work_tree, args)
@@ -134,14 +133,13 @@ def do(args):
         if not qitools.ask_yes_no(to_ask):
             return
 
-    try:
-        run_wizard(qiworktree)
-    except KeyboardInterrupt:
-        # Remove the half-configured config file,
-        # so that the user can re-run the wizard again:
-        qitools.sh.rm(build_cfg)
+    run_wizard(build_cfg)
 
-def run_wizard(qiworktree):
+def run_wizard(build_cfg):
+    """Write a new configuration if the file passed as
+    arguments, asking the user a lot of questions
+
+    """
     cmake_generator = ask_cmake_generator()
 
     default_build_config = None
@@ -164,15 +162,15 @@ def run_wizard(qiworktree):
     if qitools.ask_yes_no("Use custom environment"):
         env_path       = ask_path()
 
-    qiworktree.update_config(
+    qitools.configstore.update_config(build_cfg,
         "general", "build", "cmake_generator", cmake_generator)
-    qiworktree.update_config(
+    qitools.configstore.update_config(build_cfg,
         "general", "build", "toolchain", toolchain_name)
-    qiworktree.update_config(
+    qitools.configstore.update_config(build_cfg,
         "general", "env", "path", env_path)
     if build_configs:
         for name, flags in build_configs.iteritems():
-            qiworktree.update_config(
-            "build", name, "cmake.flags", flags)
-        qiworktree.update_config(
+            qitools.configstore.update_config(build_cfg,
+                "build", name, "cmake.flags", flags)
+        qitools.configstore.update_config(build_cfg,
             "general", "build", "build_config", default_build_config)
