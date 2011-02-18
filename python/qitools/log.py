@@ -102,3 +102,40 @@ def configure_logging(args):
 
     root_logger.handlers = list()
     root_logger.addHandler(handler)
+
+def get_current_log_level():
+    """Get the current log level.
+
+    """
+    # This looks a bit weird.
+    root_logger = logging.getLogger()
+    handlers = root_logger.handlers
+    if handlers:
+        return handlers[0].level
+    else:
+        return logging.INFO
+
+
+def main():
+    class Namespace:
+        color = True
+        verbose = False
+        quiet = False
+    args = Namespace()
+    import sys
+    if "-v" in sys.argv:
+        args.verbose = True
+    if "-q" in sys.argv:
+        args.quiet = True
+    configure_logging(args)
+    logger = logging.getLogger("foo.bar")
+    logger.debug("debug")
+    logger.info("info")
+    logger.warning("warning")
+    logger.error("error")
+
+    print "current log level", get_current_log_level()
+
+
+if __name__ == "__main__":
+    main()
