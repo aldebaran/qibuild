@@ -158,8 +158,6 @@ def create(directory):
 
     """
     to_create = os.path.join(directory, ".qi")
-    if os.path.exists(to_create):
-        raise WorkTreeException("%s already exists!" % to_create)
     qitools.sh.mkdir(to_create, recursive=True)
 
 

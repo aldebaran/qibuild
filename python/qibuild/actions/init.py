@@ -2,11 +2,15 @@
 """Initialize a new toc worktree """
 
 import os
+import logging
+
 import qibuild
 import qitoolchain
 import qitools
 import qitools.cmdparse
 import subprocess
+
+LOGGER = logging.getLogger(__name__)
 
 
 def ask_cmake_generator():
@@ -121,19 +125,30 @@ def do(args):
     """Main entry point"""
     work_tree = qitools.qiworktree.worktree_from_args(args)
     dot_qi = os.path.join(work_tree, ".qi")
+    build_cfg = os.path.join(dot_qi, "build.cfg")
+    should_run = False
+    if os.path.exists(build_cfg):
+        if not args.interactive:
+            LOGGER.error("%s already exists, aborting", build_cfg)
+            return
+        try:
+            to_ask  = "%s already exists, do you which to configure it" % build_cfg
+            should_run = qitools.ask_yes_no(to_ask)
+        except KeyboardInterrupt:
+            pass
+    else:
+        should_run = True
 
-    if not os.path.isdir(dot_qi):
+    if not should_run:
+        return
+
+    if not os.path.exists(build_cfg):
         qibuild.toc.create(work_tree, args)
 
     if not args.interactive:
         return
 
     try:
-        build_cfg = os.path.join(dot_qi, "build.cfg")
-        if os.path.exists(build_cfg):
-            to_ask  = "%s already exists, do you which to configure it" % build_cfg
-            if not qitools.ask_yes_no(to_ask):
-                return
         run_wizard(build_cfg)
     except KeyboardInterrupt:
         pass

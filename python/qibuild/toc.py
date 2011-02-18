@@ -426,12 +426,12 @@ def create(directory, args):
     the template in qibuild/templates/build.cfg
 
     """
-    # FIXME: could  this be interactive?
     qitools.qiworktree.create(directory)
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     template = os.path.join(cur_dir, "..", "qibuild", "templates", "build.cfg")
     cfg_path = os.path.join(directory, ".qi", "build.cfg")
-    qitools.sh.configure_file(template, cfg_path, copy_only=True)
+    if not os.path.exists(cfg_path):
+        qitools.sh.configure_file(template, cfg_path, copy_only=True)
 
 
 def resolve_deps(toc, args, runtime=False):
