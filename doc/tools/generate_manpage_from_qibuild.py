@@ -31,7 +31,7 @@ def generate_man(src, dst, packages):
         action_doc = "TODO: documentation"
         action_name = action.__name__[len(packages) + 1:].strip().replace(".", " ")
         if action.__doc__:
-            action_doc = action.__doc__.split("\n")[0].strip()
+            action_doc = " ".join([ x.strip() for x in action.__doc__.split("\n") ])
         action_pad = "".join([ " " for x in range(max_len - len(action_name)) ])
         #output.append("%s%s : %s" % (action_name, action_pad, action_doc))
         output.append("%s::" % (action_name))
