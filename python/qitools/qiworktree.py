@@ -47,6 +47,9 @@ class QiWorkTree:
         for d in src_p:
             # Get the name of the project from its directory:
             project_name = project_name_from_directory(d)
+            if self.buildable_projects.get(project_name):
+                raise WorkTreeException("Conflict: two projects have the same name '%s': %s and %s"
+                                        % (project_name, self.buildable_projects.get(project_name), d))
             self.buildable_projects[project_name] = d
         for d in git_p:
             self.git_projects[os.path.basename(d)] = d
