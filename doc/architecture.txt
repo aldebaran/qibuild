@@ -89,7 +89,8 @@ manifest to describe the contents. You will find the SDK layout in multiples pla
 - installed projects follows the SDK layout
 - binary packages follows the SDK layout
 
-This folder follows link:http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard[FHS] and CMake conventions.
+This folder follows link:http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard[FHS] on UNIX and CMake conventions.
+On Windows, there are a few differences.
 
 Because the SDK layout follow CMake conventions, if you add the folder to the CMAKE_PREFIX_PATH cmake variable
 in another project, all standard cmake functions to search packages, headers and libraries will works with projects
@@ -108,7 +109,7 @@ Install rules have components, this allows us to generate two types of binary pa
  - development binary packages
 
 
-A typical layout looks like this:
+A typical layout on UNIX looks like this:
 
 ----
 # programs
@@ -132,6 +133,28 @@ A typical layout looks like this:
 # qibuild files
 qibuild.manifest
 ----
+
+
+The layout on Windows is the same, except that there are now bin/ and lib/ subfolders.
+Instead, you have something like
+
+----
+#
+Debug/<programs>
+Debug/<libraries>
+
+Release/<programs>
+Release/<libraries>
+----
+
+This consistent with what a CMake-configured Visual Studio project does when
+you specify an output directory for a target.
+
+(It always creates a directory named with the build configuration at the root of the
+output directory)
+
+Also, this layout enables you to have the +.exe+ next to the +.dll+ so that you can run
+the +.exe+ without messing up with +%PATH%+ or windows manifest files.
 
 === Dependencies ===
 There are two types of dependencies, project dependencies and CMake target dependencies.
