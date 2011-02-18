@@ -183,13 +183,12 @@ endfunction()
 # \param:SUBFOLDER The destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
 # \group:SRC The list of source files (private headers and sources)
-# \group:PUBLIC_HEADER List of public headers that should be installed with the lib
 # \group:RESOURCE The list of OSX resources
 # \group:SUBMODULE Submodule to include in the lib
 # \group:DEP List of dependencies
 # \example:target
 function(qi_create_lib name)
-  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC" "SUBFOLDER" "SRC;PUBLIC_HEADER;RESOURCE;SUBMODULE;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC" "SUBFOLDER" "SRC;RESOURCE;SUBMODULE;DEPENDS" ${ARGN})
 
   if (ARG_NOBINDLL)
     # NOBINDLL was used for naoqi modules.
@@ -202,7 +201,7 @@ function(qi_create_lib name)
   qi_debug("qi_create_lib(${name} ${ARG_SUBFOLDER})")
 
   #ARGN are sources too
-  set(ARG_SRC ${ARG_UNPARSED_ARGUMENTS} ${ARG_SRC} ${ARG_PUBLIC_HEADER})
+  set(ARG_SRC ${ARG_UNPARSED_ARGUMENTS} ${ARG_SRC})
 
   qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
   qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
@@ -216,7 +215,6 @@ function(qi_create_lib name)
     set(ARG_DEPENDS ${ARG_DEPENDS} ${SUBMODULE_${_upper_submodule}_DEPENDS})
   endforeach()
   qi_glob(_SRC           ${ARG_SRC})
-  qi_glob(_PUBLIC_HEADER ${ARG_PUBLIC_HEADER})
 
   add_library("${name}" ${_SRC})
 
@@ -232,10 +230,6 @@ function(qi_create_lib name)
 
   if (ARG_RESOURCE)
     set_target_properties("${name}" PROPERTIES RESOURCE      "${ARG_RESOURCE}")
-  endif()
-
-  if (ARG_PUBLIC_HEADER)
-    set_target_properties("${name}" PROPERTIES PUBLIC_HEADER "${_PUBLIC_HEADER}")
   endif()
 
   if (WIN32)

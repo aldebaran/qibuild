@@ -12,17 +12,11 @@ CMake:
      )
      (INCLUDE_DIRS, DEFINITIONS and DEPENDS
      being guessed if not given)
-* Convention:
-  - qi_add never stages
-  - qi_create calls qi_add then qi_stage
 
 * finish qi_use_lib (handle version, handle component)
-* toolchain support (iphone, mingw32-cross, android, ..)
-* wrapper for old t001chain stuff
 * do something nice with static/shared libraries
 * fix linker problems when using toolchain and third party libraries
 * modules: decide weither clean/fpath/flib/depends/export_* is part of the public qiBuild API (rename to qi_fpath, qi_flib, qi_fdepends ?)
-* remove PUBLIC_HEADERS from qi_create_* it's error prone
 * add a IF to qi_install_*() => qi_install_header(mylib mylib-protobuf.h IF WITH_PROTOBUF)
 
 

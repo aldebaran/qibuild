@@ -223,14 +223,13 @@ the install rules:
 ----
 qi_create_lib(bar
   SRC bar/bar.h bar/bar.cpp
-  PUBLIC_HEADER bar/bar.h
   SUBFOLDER bar)
 ----
 
 You can see that:
 
- - The install rules have been properly generated (the +SUBFOLDER+ and
-  +PUBLIC_HEADER+ arguments used by +qi_create_lib+ are only used for install rules)
+ - The install rules have been properly generated (the +SUBFOLDER+
+   argument used by +qi_create_lib+ is only needed to generate install rules)
  - A +sdk+ directory has been created, with +libbar+ in +skd/lib+
 
 
@@ -327,8 +326,6 @@ qi_create_lib(bar
   SRC
     bar/bar.h
     bar/bar.cpp
-  PUBLIC_HEADER
-    bar/bar.h
   SUBFOLDER
     bar
 )

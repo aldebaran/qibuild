@@ -8,8 +8,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 qi_create_lib(world SHARED
   SRC world/world.h
       world/world.cpp
-  PUBLIC_HEADER
-      world/world.h
   SUBFOLDER
     world)
 
