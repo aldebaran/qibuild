@@ -1,5 +1,0 @@
-qiBuild CMake Tutorial
-======================
-Cedric GESTES <cgestes@aldebaran-robotics.com>
-
-TODO: use the tutorial of the DP?
