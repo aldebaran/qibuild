@@ -5,6 +5,7 @@ import os
 import shutil
 import logging
 import qitools
+import qibuild
 
 
 LOGGER = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ def copy_helper(project_name, directory):
 
     """
     # Read the templates for projects
-    template_dir = os.path.join(cur_dir, "..", "templates", "project")
+    template_dir = os.path.join(qibuild.QIBUILD_ROOT_DIR, "templates", "project")
     template_dir = os.path.abspath(template_dir)
 
     for file in os.listdir(template_dir):
@@ -25,7 +26,7 @@ def copy_helper(project_name, directory):
             new_file.write(new_contents)
 
     # Also create the necessary qibuild.cmake file:
-    to_copy = os.path.join(CMAKE_QIBUILD_DIR, "templates", "qibuild.cmake")
+    to_copy = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "templates", "qibuild.cmake")
     shutil.copy(to_copy, os.path.join(directory, "qibuild.cmake"))
 
 
