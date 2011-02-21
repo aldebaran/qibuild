@@ -224,12 +224,17 @@ the install rules:
 qi_create_lib(bar
   SRC bar/bar.h bar/bar.cpp
   SUBFOLDER bar)
+
+qi_install_header(bar bar/bar.h)
 ----
 
 You can see that:
 
- - The install rules have been properly generated (the +SUBFOLDER+
-   argument used by +qi_create_lib+ is only needed to generate install rules)
+ - The install rules have been properly generated for the library
+ - For the headers, you *have* to choose a subfolder in which to put your headers.
+ (otherwise, it's too easy to have conflicts, especially when you are generating a big SDK.)
+  Unless you have a very good reason not to, please choose the same folder name that the one you
+  used for the +qi_create_lib()+ call.
  - A +sdk+ directory has been created, with +libbar+ in +skd/lib+
 
 
@@ -330,6 +335,7 @@ qi_create_lib(bar
     bar
 )
 
+qi_install_header(bar bar/bar.h)
 qi_stage_lib(bar)
 
 # foo:

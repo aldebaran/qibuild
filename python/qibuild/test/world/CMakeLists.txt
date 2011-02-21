@@ -11,4 +11,6 @@ qi_create_lib(world SHARED
   SUBFOLDER
     world)
 
+qi_install_header(world world/world.h)
+
 qi_stage_lib(world)

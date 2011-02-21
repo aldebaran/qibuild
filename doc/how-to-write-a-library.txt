@@ -71,6 +71,8 @@ qi_create_lib(foo
       foo
 )
 
+qi_install_header(foo foo/foo.h)
+
 qi_stage_lib(foo)
 
 # foo/test/CMakeLists.txt
@@ -90,6 +92,10 @@ You will note that:
   * The only time we call +include_directories()+ is when we are staging
   the +foo+ library.
 
+  * The +foo.h+ header is in a directory named +foo+, and qi_install_header() uses
+  this directory as first argument.
+  It's advised you use the same name for the target and the subdirectory.
+
   * Everything that need a +foo+ header must use
 
 [source, c]
@@ -99,7 +105,9 @@ You will note that:
 This way, we are sure that the code we use can be re-distributed when
 the headers are installed, and that the path to find the headers while in
 the source tree does not differ from the paths to find the installed headers.
-That's why we have to put +foo.h+ in a +foo+ subdirectory
+This works because:
+  - We have put +foo.h+ in a +foo+ subdirectory.
+  - We have used +qi_install_header(foo ... )+
 
  * The test can use both the public API and the private implementation
 
