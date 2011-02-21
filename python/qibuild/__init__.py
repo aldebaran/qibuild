@@ -14,6 +14,7 @@ This is why we should keep the same build dir on windows
 """
 
 import os
+import re
 import logging
 import qitools.sh
 import qitools.command
@@ -106,7 +107,21 @@ def cmake(source_dir, build_dir, cmake_args):
 
     qitools.sh.rm(os.path.join(build_dir, "sdk", "lib", "cmake"))
 
-    # Add path to source
+    # Check that no one has made an in-source build
+    in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
+    if os.path.exists(in_source_cache):
+        # FIXME: better wording
+        mess  = "You have run cmake from your sources\n"
+        mess += "CMakeCache.txt found here: %s\n" % in_source_cache
+        mess += "Please clean your sources and try again\n"
+        raise Exception(mess)
+
+    # Patch root CMakeLists.txt if needed
+    root_cmake = os.path.join(source_dir, "CMakeLists.txt")
+    _add_missing_project_call(root_cmake, os.path.basename(source_dir))
+
+    # Add path to source to the list of args, and set buildir for
+    # the current working dir.
     cmake_args += [source_dir]
     qitools.command.check_call(["cmake"] + cmake_args, cwd=build_dir)
 
@@ -132,4 +147,32 @@ def ctest(source_dir, build_dir):
     if not os.path.exists(os.path.join(build_dir, "CMakeCache.txt")):
         raise Exception("build dir: %s does not contain "\
                              "CMakeCache.txt, aborting" % build_dir)
+def _add_missing_project_call(cmake_list_file, project_name):
+    """Patch a CMakeLists.txt to add missing call to project() """
+    # Check that the root CMakeLists contains a project() call
+    # The call to project() is necessary for cmake --build
+    # to work when used with Visual Studio generator.
+    need_fix = True
+    lines = list()
+    with open(cmake_list_file, "r") as fp:
+        lines = fp.readlines()
+
+    for line in lines:
+        if re.match(r'^\s*project\s*\(', line, re.IGNORECASE):
+            need_fix = False
+            break
+
+    if not need_fix:
+        return
+
+    LOGGER.warning("Patching CMakeLists.txt to add missing call to project()")
+    new_lines = list()
+
+    for line in lines:
+        new_lines.append(line)
+        if re.match("cmake_minimum_required", line, re.IGNORECASE):
+            new_lines.append('project("%s")\n' % project_name)
+
+    with open(cmake_list_file, "w") as fp:
+        fp.writelines(new_lines)
 
