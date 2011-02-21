@@ -17,12 +17,23 @@ def build_parser(parser):
     group = parser.add_argument_group("build configuration arguments")
     # group.add_argument("--cross", action="store_true", help="Cross compile")
     # group.add_argument("--ctc--path", dest="ctc_path", help="Cross toolchain path")
-    group.add_argument("--release", action="store_const", const="release", dest="build_type", help="Build in release (set CMAKE_BUILD_TYPE=RELEASE)")
-    group.add_argument("--debug", action="store_const", const="debug", dest="build_type", help="Build in debug (set CMAKE_BUILD_TYPE=DEBUG)")
-    group.add_argument("--build-type", action="store", dest="build_type", help="CMAKE_BUILD_TYPE usually DEBUG or RELEASE")
-    group.add_argument("--build-config", "-c", dest="build_config", help="Build configuration to use. Should match a setting in ~/.toc/base.cfg")
-    group.add_argument("--toolchain", "-t", action="store", dest="toolchain_name", help="Use a specific toolchain")
-    group.add_argument("--cmake-generator", action="store", help="Specify the CMake generator")
+    group.add_argument("--release", action="store_const", const="release",
+        dest="build_type",
+        help="Build in release (set CMAKE_BUILD_TYPE=RELEASE)")
+    group.add_argument("--debug", action="store_const", const="debug",
+        dest="build_type",
+        help="Build in debug (set CMAKE_BUILD_TYPE=DEBUG)")
+    group.add_argument("--build-type", action="store",
+        dest="build_type",
+        help="CMAKE_BUILD_TYPE usually DEBUG or RELEASE")
+    group.add_argument("--build-config", "-c",
+        dest="build_config",
+        help="Build configuration to use. A corresponding .qi/build-<name>.cfg file should exist.")
+    group.add_argument("--toolchain", "-t", action="store",
+    dest="toolchain_name",
+        help="Use a specific toolchain")
+    group.add_argument("--cmake-generator", action="store",
+        help="Specify the CMake generator")
     group.add_argument("-j", dest="num_jobs", type=int, help="Number of jobs to use")
     parser.set_defaults(cross=False, debug=True)
     parser.set_defaults(num_jobs=1)

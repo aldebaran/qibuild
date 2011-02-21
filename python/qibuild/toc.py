@@ -2,9 +2,9 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
 import os
-import sys
 import glob
 import platform
+import shutil
 import subprocess
 import logging
 import qitools.configstore
@@ -169,16 +169,13 @@ class Toc(QiWorkTree):
     def get_project(self, project_name):
         """Return a project from a name.
 
-        Return None if project was not in the known projects
-        of this toc object
-
+        Raise a TocException if the project was not found
         """
         res = [p for p in self.projects if p.name == project_name]
         if len(res) == 1:
             return res[0]
         else:
             raise TocException("No such project: %s" % project_name)
-        # FIXME: it's perfectly possible that two projects have the same name...
 
 
     def get_sdk_dirs(self, project_name):
@@ -427,11 +424,18 @@ def create(directory, args):
 
     """
     qitools.qiworktree.create(directory)
-    cur_dir = os.path.dirname(os.path.abspath(__file__))
-    template = os.path.join(cur_dir, "..", "qibuild", "templates", "build.cfg")
-    cfg_path = os.path.join(directory, ".qi", "build.cfg")
-    if not os.path.exists(cfg_path):
-        qitools.sh.configure_file(template, cfg_path, copy_only=True)
+    names = ["build.cfg", "build-default.cfg"]
+    srcs = [
+        os.path.join(qibuild.QIBUILD_ROOT_DIR, "templates", name)
+        for name in names
+    ]
+    dests = [
+        os.path.join(directory, ".qi", name)
+        for name in names
+    ]
+    for (src, dest) in zip(srcs, dests):
+        if not os.path.exists(dest):
+            shutil.copy(src, dest)
 
 
 def resolve_deps(toc, args, runtime=False):

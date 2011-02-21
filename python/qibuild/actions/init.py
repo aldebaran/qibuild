@@ -49,65 +49,6 @@ def ask_toolchain():
     toolchain_names = toolchain_dict.keys()
     return qitools.ask_choice(toolchain_names, "Choose a toolchain name")
 
-
-def ask_build_configs():
-    """Ask the user to choose build configurations"""
-    keep_going = True
-    build_configs = dict()
-    while keep_going:
-        print ":: Choose a build configuration name: "
-        build_config_name = raw_input("> ")
-        if not build_config_name:
-            keep_going = False
-            continue
-        build_configs[build_config_name] = list()
-        keep_asking_flags=True
-        while keep_asking_flags:
-            print ":: Flags for %s build config (name=value)" % build_config_name
-            flags = raw_input("> ")
-            if not flags:
-                keep_asking_flags = False
-                continue
-            if not "=" in flags:
-                print "invalid flags"
-                continue
-            splitted = flags.split("=")
-            if len(splitted) != 2:
-                print "invalid flags"
-                continue
-            build_configs[build_config_name].append(flags)
-            if qitools.ask_yes_no("Done with %s build config" % build_config_name):
-                keep_asking_flags = False
-            continue
-
-        keep_going = qitools.ask_yes_no("Add a new build config")
-
-    # We only asked for the cmake.flags part of the build configs, so fix this
-    # now
-    for (name, cmake_flags) in build_configs.iteritems():
-        build_configs[name] = dict()
-        build_configs[name]["cmake"] = dict()
-        build_configs[name]["cmake"]["flags"] = " ".join(cmake_flags)
-    return build_configs
-
-def ask_path():
-    """Ask the user to choose paths to be added to
-    os.environ[PATH]
-
-    """
-    paths = list()
-    keep_going = True
-    while keep_going:
-        print ":: Select a new path to be added to os.environ"
-        path = raw_input("> ")
-        if not path:
-            keep_going = False
-            continue
-        paths.append(path)
-        keep_going = qitools.ask_yes_no("A a new path to os.environ")
-    # configuration file expects paths separated pathsep
-    return os.path.pathsep.join(paths)
-
 def create_toolchain():
     """Ask the use for a toolchain name and create one"""
     print ":: Choose a toolchain name"
@@ -155,23 +96,10 @@ def do(args):
 
 def run_wizard(build_cfg):
     """Write a new configuration if the file passed as
-    arguments, asking the user a lot of questions
+    argument, asking the user a few questions
 
     """
-    old_config = qitools.configstore.ConfigStore()
-    old_config.read(build_cfg)
     cmake_generator = ask_cmake_generator()
-
-    default_build_config = None
-    new_build_configs = dict()
-    if qitools.ask_yes_no("Add custom build configurations"):
-        new_build_configs  = ask_build_configs()
-    build_configs = old_config.get("build", default=dict())
-    build_configs.update(new_build_configs)
-    default_build_config = None
-    if build_configs:
-        default_build_config = qitools.ask_choice(build_configs.keys(),
-            "Choose a default build config")
 
     toolchain_name = None
     if qitools.ask_yes_no("Use a toolchain"):
@@ -182,24 +110,7 @@ def run_wizard(build_cfg):
         else:
             toolchain_name = ask_toolchain()
 
-    env_path = ""
-    if qitools.ask_yes_no("Use custom environment"):
-        env_path       = ask_path()
-
     qitools.configstore.update_config(build_cfg,
         "general", "build", "cmake_generator", cmake_generator)
     qitools.configstore.update_config(build_cfg,
         "general", "build", "toolchain", toolchain_name)
-    qitools.configstore.update_config(build_cfg,
-        "general", "env", "path", env_path)
-    if build_configs:
-        for name, config in build_configs.iteritems():
-            cmake_flags = ""
-            cmake = config.get("cmake")
-            if cmake:
-                cmake_flags = cmake.get("flags")
-            qitools.configstore.update_config(build_cfg,
-                "build", name, "cmake.flags", cmake_flags)
-    if default_build_config:
-        qitools.configstore.update_config(build_cfg,
-            "general", "build", "build_config", default_build_config)
