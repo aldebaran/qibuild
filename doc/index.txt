@@ -15,7 +15,6 @@ qiBuild is composed of two parts:
 * the qiBuild CMake framework, that simplifies authoring CMakeLists.txt.
 * qibuild/qitoolchain command line programs, that builds projects taking dependencies into account.
 
-For more detailed information look at the link:architecture.html[architecture].
 
 
 Tutorials
@@ -23,11 +22,26 @@ Tutorials
 Learn how to use the qiBuild framework to build your
 C++ projects
 
-* link:getting-started.html[Getting Started] : Read this first !
+
+Beginner
+~~~~~~~~~
+
+* link:getting-started.html[Getting Started] : Read this first!
+* link:cmake-tutorial.html[CMake Tutorial] : Skip this part if you already know how
+  to use CMake.
+
+Intermediate
+~~~~~~~~~~~~
+
 * link:managing-deps.html[Managing dependencies between projects]
-* link:using-toolchains.html[Using a toolchain]
+* link:multi-configs.html[Managing build configurations]
+
+Advanced
+~~~~~~~~
+
 * link:porting-to-qibuild.html[Porting a CMake-based project to qiBuild] :
   Read this if you are already using CMake for your projects.
+* link:using-toolchains.html[Using a toolchain]
 * link:how-to-write-a-library.html[How to write a library] :
   Useful guidelines when writing a library in a large, redistributable
   project.
@@ -42,15 +56,15 @@ qiBuild CMake Framework:
 
 Manpages:
 
-* link:qibuild-manpage.html[qibuild manpage]
-* link:qitoolchain-manpage.html[qitoolchain manpage]
+* link:man/qibuild-manpage.html[qibuild manpage]
+* link:man/qitoolchain-manpage.html[qitoolchain manpage]
 
 
 Hacking
 -------
 
-Read this if you want to contribute to qiBuild, or learn about
-a few good pratices / conventions we are trying to follow.
+Read this if you want to contribute to qiBuild,
 
-* link:cmake-coding-guide.html[CMake coding guide]
-* link:python-coding-guide.html[Python coding guide]
+* link:hacking/cmake-coding-guide.html[CMake coding guide]
+* link:hacking/python-coding-guide.html[Python coding guide]
+* link:hacking/architecture.html[qiBuild architecture].
