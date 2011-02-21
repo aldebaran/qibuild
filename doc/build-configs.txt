@@ -1,0 +1,135 @@
+Mananing build configurations
+=============================
+
+
+In this tutorial, you will learn how to use serveral
+build configurations with the same sources.
+
+
+The problem
+-----------
+
+Let's say you have a +foo+ library, with some tests.
+You want to make the compilation of the tests optional
+(because they depend on +gtest+, and you do not want to
+
+force your users to have gtest)
+
+A standard CMake way to do it would be
+
+[source, cmake]
+----
+
+option(WITH_GTEST "Enable compilation of unit tests" OFF)
+
+if(WITH_GTEST)
+  find_package(GTest Required)
+
+  ...
+
+  add_test(...)
+
+  ...
+
+endif()
+----
+
+So far so good.
+
+But now you have to pass "-DWITH_GTEST=ON" to all your project when you
+configure them.
+
+
+
+Passing CMake Flags with qiBuild
+--------------------------------
+
+There are several ways to pass CMake flags to a project managed by qiBuild,
+in ascending priority:
+
+* Just once
+
+Simply call:
+----
+qibuild configure foo -DWITH_GTEST=ON
+----
+
+* Just for a project.
+
+Edit the configuration to have something like
+
+[source, ini]
+----
+[project foo]
+cmake.flags = "WITH_GTEST=ON"
+----
+
+In fact, they are several places where you can put those line:
+
+ - In your +.qi/build.cfg+ file.
+
+ - In the qibuild.manifest of your project (if you are sure everyone should
+ use those flags)
+
+* For every project found on your current build tree
+
+In this case, the configuration would look like
+
+[source, ini]
+----
+[general "build"]
+cmake.flags = "WITH_GTEST=ON"
+----
+
+
+Using build configurations
+--------------------------
+
+Sometimes you may need to use a different set of flags.
+
+For instance, you may want to pass a +ENABLE_PERF=ON+ flag to every
+project because you have performance issues and want to figure them out.
+
+You also may have to add a dependency to the +foo+ project, +libperf+
+
+You can do this by creating an other file called +build-perf.cfg+ in you
++.qi+ directory.
+
+
++.qi/build.cfg+ will always be read, and the configuration will be updated
+with  +build-perf.cfg+ if you pass the +-c+ flag to the build
+commands.
+
+In this case you could write:
+
+[source, ini]
+----
+# In build-perf.cfg
+[general "build"]
+cmake.flags = "ENABLE_PERF=ON"
+
+[project "foo"]
+depends = "bar libperf"
+----
+
+
+Then use
+
+----
+qibuild configure -c perf foo
+----
+
+
+You will note that the +qibuild+ will choose an other build directory, containing
+the name of the configuration.
+
+Lastly, if you get tired of passing the +-c+ option all the time, you can also
+edit the main +.qi/build.cfg+ to specify a default build configuration.
+
+[source, ini]
+----
+[general "build"]
+config = perf
+----
+
+

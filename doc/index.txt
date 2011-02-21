@@ -34,7 +34,7 @@ Intermediate
 ~~~~~~~~~~~~
 
 * link:managing-deps.html[Managing dependencies between projects]
-* link:multi-configs.html[Managing build configurations]
+* link:build-configs.html[Managing build configurations]
 
 Advanced
 ~~~~~~~~
@@ -56,8 +56,8 @@ qiBuild CMake Framework:
 
 Manpages:
 
-* link:man/qibuild-manpage.html[qibuild manpage]
-* link:man/qitoolchain-manpage.html[qitoolchain manpage]
+* link:qibuild-manpage.html[qibuild manpage]
+* link:qitoolchain-manpage.html[qitoolchain manpage]
 
 
 Hacking
@@ -65,6 +65,6 @@ Hacking
 
 Read this if you want to contribute to qiBuild,
 
-* link:hacking/cmake-coding-guide.html[CMake coding guide]
-* link:hacking/python-coding-guide.html[Python coding guide]
-* link:hacking/architecture.html[qiBuild architecture].
+* link:cmake-coding-guide.html[CMake coding guide]
+* link:python-coding-guide.html[Python coding guide]
+* link:architecture.html[qiBuild architecture].
