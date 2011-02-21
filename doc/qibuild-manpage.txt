@@ -81,6 +81,6 @@ EXIT STATUS
 *0*::
     Success
 
-*1*::
+*2*::
     Failure
 
