@@ -27,7 +27,7 @@ LOGGER = logging.getLogger("qibuild")
 
 QIBUILD_ROOT_DIR  = os.path.dirname(os.path.abspath(__file__))
 CMAKE_QIBUILD_DIR = os.path.abspath(os.path.join(QIBUILD_ROOT_DIR,
-        "..", "cmake", "qibuild"))
+        "..", "..", "cmake", "qibuild"))
 
 
 
