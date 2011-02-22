@@ -139,7 +139,7 @@ class Toolchain(object):
         """
         provided = self.configstore.get("toolchain", self.name, "provide",
             default="").split()
-        self.logger.debug("[%s] toolchain: new package %s providing %s",
+        LOGGER.debug("[%s] toolchain: new package %s providing %s",
                           self.name,
                           package_name,
                           ",".join(provided))
