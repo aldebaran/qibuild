@@ -197,7 +197,7 @@ class Toc(QiWorkTree):
             project = self.get_project(project_name)
             dirs.append(project.get_sdk_dir())
 
-        if not_found and self.toolchain.name != "system":
+        if not_found:
             LOGGER.warning("Could not find projects %s", ", ".join(not_found))
 
         LOGGER.debug("sdk_dirs for %s : %s", project_name, dirs)
