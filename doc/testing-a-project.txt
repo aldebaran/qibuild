@@ -1,0 +1,34 @@
+Testing a project
+=================
+
+
++CMake+ comes with a tool called +CTest+.
+
+The idea is that you specify a executable to run, ctest lanches
+the executable, and the test passes if the return code is 0.
+
+Assuming you have add some tests in your project, you can test them
+by running
+
+----
+qibuild test foo
+----
+
+On our case, this is simply going to launch the foo executable.
+
+
+Going further
+-------------
+
+See link:unit-testing[Unit testing].
+
+
+link:packaging-a-project.html[Next]: package the project.
+
+
+NOTE: the integration of +qiBuild+ with a tool like *CDash* is not covered in
+      this document.
+      +qiBuild+ works fine with +Hudson+, for those intersted in a continuous
+      integration tool.
+
+link:packaging-a-project.html[Next]: package the project

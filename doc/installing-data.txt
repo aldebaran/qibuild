@@ -1,0 +1,39 @@
+Install data
+============
+
+
+Let's assume the foo executable needs to read data from a file called
++foo.data+
+
+When you install +foo+, you would like to have something looking like
+
+----
+bin/foo
+share/foo/foo.data
+----
+
+(at least on UNIX)
+
+So, create a folder named +share/foo+ and put a file names +foo.dat+ in your
+source tree.
+
+Installing files
+----------------
+
+To install the files, simply use
+
+[source, cmake]
+----
+qi_install_data(foo share/foo/foo.data)
+----
+
+
+
+Going further
+-------------
+
+
+Here we have just covered what the +qibuild/cmake+ framework can do for you.
+
+You will find a comprehensive documentation in the link:cmakeapi.html[qiBuild CMake API]
+

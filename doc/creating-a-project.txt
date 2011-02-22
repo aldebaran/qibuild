@@ -1,0 +1,56 @@
+Creating a new project
+======================
+
+
+In this tutorial, we will simply create a new project:
+
+Enter:
+
+----
+qibuild create foo
+----
+
+(remember, for this to work on windows, you should have:
+ * run install-qibuild.bat
+ * put +C:\Python27+ and +c:\Python\Scripts+  in your +%PATH%+)
+
+This will create a new project in QI_WORK_TREE/foo.
+
+Let's have a look at what has been generated:
+
+----
+foo
+|__  CMakeLists.txt
+|__  main.cpp
+|__  qibuild.cmake
+|__  qibuild.manifest
+----
+
+
+* main.cpp is just a standard "Hello World"
+
+* CMakeLists.txt : this is a script file that will be read by CMake to generate
+makefiles, or Visual Studio solutions.
+
+* qibuild.cmake : this file MUST be included by the CMakeLists.txt to find the qibuild/cmake
+framework
+
+* qibuild.manifest : this file MUST be present for qibuild to know how to build the
+foo project.
+
+
+
+If you already have source code somewhere, all you have to do is:
+
+* create a qibuild.manifest looking like
+
+[source, ini]
+----
+[project foo]
+
+----
+
+* copy-paste the qibuild.cmake file from +qibuild/cmake/qibuild/templates/qibuild.cmake+
+and make sure to include it in you root +CMakeLists+
+
+link:building-a-project.html[Next]: build the project

@@ -4,16 +4,25 @@ qiBuild
 Introduction
 ------------
 qiBuild aims to make compilation of your sources easy. It manages
-dependencies between projects and supports easy cross-compilation.
-By default qiBuild uses libraries provided by your system, but you
-can use qiToolchain to get a toolchain if you dont want to build
-with your system libraries or want to cross-compile.
+*dependencies* between projects and supports easy *cross-compilation.*
 
+By default qiBuild uses libraries provided by your system, but you
+can also use qiToolchain to manage sets of pre-compiled packages (called
+toolchains) if you want. Cross-compilation is then just a matter of
+using a specific toolchain.
+
+qiBuild is truly *cross-platform:* it is tested on linux, Mac and Windows.
+You can use tools from +gcc+ and +Makefile+, to +Visual Studio+ projects.
+It is based of the well-known +CMake+ build system.
+
+The qiBuild framework tries hard to stand out of your way: it remains
+*close to standards*, and will play nice with other build systems.
 
 qiBuild is composed of two parts:
 
 * the qiBuild CMake framework, that simplifies authoring CMakeLists.txt.
-* qibuild/qitoolchain command line programs, that builds projects taking dependencies into account.
+* qibuild/qitoolchain command line programs, that builds projects taking
+  dependencies into account.
 
 
 
@@ -26,9 +35,21 @@ C++ projects
 Beginner
 ~~~~~~~~~
 
-* link:getting-started.html[Getting Started] : Read this first!
-* link:cmake-tutorial.html[CMake Tutorial] : Skip this part if you already know how
-  to use CMake.
+*qiBuild command line tool*
+
+* link:getting-started.html[Getting Started]
+* link:creating-a-project.html[Creating a project]
+* link:configuring-a-project.html[Configuring a project]
+* link:building-a-project.html[Building a project]
+* link:testing-a-project.html[Testing a project]
+* link:packaging-a-project.html[Packaging a project]
+
+*qiBuild CMake framework*
+
+* link:creating-a-binary.html[Creating a library]
+* link:creating-a-library.html[Creating a library]
+* link:unit-testing.html[Unit testing]
+* link:installing-data.html[Installing data]
 
 Intermediate
 ~~~~~~~~~~~~
@@ -39,10 +60,10 @@ Intermediate
 Advanced
 ~~~~~~~~
 
-* link:porting-to-qibuild.html[Porting a CMake-based project to qiBuild] :
+* link:porting-to-qibuild.html[Porting a CMake-based project to qiBuild]
   Read this if you are already using CMake for your projects.
 * link:using-toolchains.html[Using a toolchain]
-* link:how-to-write-a-library.html[How to write a library] :
+* link:how-to-write-a-library.html[How to write a library]
   Useful guidelines when writing a library in a large, redistributable
   project.
 
@@ -63,8 +84,8 @@ Manpages:
 Hacking
 -------
 
-Read this if you want to contribute to qiBuild,
+Read this if you want to contribute to qiBuild
 
 * link:cmake-coding-guide.html[CMake coding guide]
 * link:python-coding-guide.html[Python coding guide]
-* link:architecture.html[qiBuild architecture].
+* link:architecture.html[qiBuild architecture]
