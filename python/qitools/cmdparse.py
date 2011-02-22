@@ -29,7 +29,12 @@ class InvalidAction(Exception):
 
 
 def parse_args_for_help(args):
-    """Parse a command line for help usage
+    """Parse a command line for help usage.
+
+    Returns a tuple:
+     - help has been requested
+     - name of the action on which help has been requested
+       (or None if there was not any)
 
     >>> parse_args_for_help("toc".split())
     (True, None)
@@ -162,8 +167,7 @@ def root_command_main(name, parser, modules):
                 print
                 parser.print_help()
             else:
-                module = action_modules[action]
-                run_action(module.__name__, ["--help"])
+                parser.parse_args([action, "--help"])
         sys.exit(0)
 
     args = parser.parse_args()
