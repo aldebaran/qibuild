@@ -217,8 +217,8 @@ def action_modules_from_package(package_name):
     Example:
     assuming you have:
     actions/foo/__init__.py
-    actions/foo/spam.py  (containing an ACTION gloval var)
-    actions/foo/eggs.py  (containing an ACTION global var)
+    actions/foo/spam.py
+    actions/foo/eggs.py
 
     then
     action_modules_from_package("actions.foo") returns:
