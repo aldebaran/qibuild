@@ -188,6 +188,28 @@ function(use_lib)
       qi_stage_lib(foo)
       qi_use_lib(bar foo)
   ")
+
+  cmake_parse_arguments(ARG "WINDOWS;MACOSX;LINUX" "" "" ${ARGN})
+
+  if(ARG_WINDOWS OR ARG_MACOSX OR ARG_LINUX)
+    qi_error("using use_lib with a \"platform\" flag is deprecated.
+    Please use standard CMake code instead.
+    old:
+      use_lib(mylib LINUX bar WINDOWS foo MACOSX baz)
+    new:
+      if(UNIX)
+        if(APPLE)
+          qi_use_lib(mylib baz)
+        else()
+          qi_use_lib(mylib bar)
+        endif()
+      else()
+        qi_use_lib(mylib foo)
+      endif()
+
+    ")
+  endif()
+
   qi_use_lib(${ARGN})
 
 endfunction()
