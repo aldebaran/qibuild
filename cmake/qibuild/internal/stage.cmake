@@ -240,7 +240,7 @@ function(_qi_stage_lib target ${ARGN})
 
   _qi_gen_code_lib_redist(_redist ${target})
   set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${target}-config.cmake")
-  file(WRITE "${_redist_file}" ${_redist})
+  file(WRITE "${_redist_file}" "${_redist}")
   qi_install_cmake(${target} ${_redist_file})
 
   _qi_gen_code_lib_sdk(_sdk ${target})
