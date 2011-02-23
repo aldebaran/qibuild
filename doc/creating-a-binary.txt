@@ -61,4 +61,4 @@ NOTE: To run directly the foo executable from Visual Studio, simply right-click
       on the +foo+ project and select "Choose as start up project", then press
       F5 as usual.
 
-link:creating-a-library.html[Next]: create a library
+link:creating-a-library.html[Next]: adding a library
