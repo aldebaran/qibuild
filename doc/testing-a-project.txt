@@ -20,7 +20,7 @@ In our case, this is simply going to launch the +foo+ executable.
 Going further
 -------------
 
-See link:unit-testing[Unit testing].
+See link:unit-testing.html[Unit testing].
 
 
 link:packaging-a-project.html[Next]: package the project.
