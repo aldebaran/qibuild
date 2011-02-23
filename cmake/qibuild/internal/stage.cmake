@@ -19,7 +19,7 @@ function(_qi_gen_code_from_vars res)
   set(_res "")
   foreach(_arg ${ARGN})
     set(_name ${_arg})
-    set(_value ${${_arg}})
+    set(_value "${${_arg}}")
     set(_res "${_res}
 set(${_name} \"${_value}\" CACHE STRING \"\" FORCE)
 mark_as_advanced(${_name})
