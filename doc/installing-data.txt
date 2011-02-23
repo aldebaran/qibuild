@@ -14,7 +14,7 @@ share/foo/foo.data
 
 (at least on UNIX)
 
-So, create a folder named +share/foo+ and put a file names +foo.dat+ in your
+So, create a folder named +share/foo+ and put a file names +foo.data+ in your
 source tree.
 
 Installing files
@@ -33,7 +33,9 @@ Going further
 -------------
 
 
-Here we have just covered what the +qibuild/cmake+ framework can do for you.
+Here we have just covered what the basics of what the +qibuild/cmake+ framework
+can do for you.
 
-You will find a comprehensive documentation in the link:cmakeapi.html[qiBuild CMake API]
+You will find comprehensive documentation in the link:cmakeapi.html[qiBuild CMake API]
 
+link:managing-deps.html[Next] Managing dependencies between projects

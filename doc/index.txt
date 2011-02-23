@@ -4,16 +4,16 @@ qiBuild
 Introduction
 ------------
 qiBuild aims to make compilation of your sources easy. It manages
-*dependencies* between projects and supports easy *cross-compilation.*
+*dependencies* between projects and supports *cross-compilation*.
 
 By default qiBuild uses libraries provided by your system, but you
 can also use qiToolchain to manage sets of pre-compiled packages (called
 toolchains) if you want. Cross-compilation is then just a matter of
 using a specific toolchain.
 
-qiBuild is truly *cross-platform:* it is tested on linux, Mac and Windows.
-You can use tools from +gcc+ and +Makefile+, to +Visual Studio+ projects.
-It is based of the well-known +CMake+ build system.
+qiBuild is truly *cross-platform:* it is tested on Linux, Mac and Windows.
+Being based on the well-known +CMake+ build system, it allows you to use
+your existing tools such as +gcc+, +Makefile+, or +Visual Studio+.
 
 The qiBuild framework tries hard to stand out of your way: it remains
 *close to standards*, and will play nice with other build systems.
@@ -21,15 +21,14 @@ The qiBuild framework tries hard to stand out of your way: it remains
 qiBuild is composed of two parts:
 
 * the qiBuild CMake framework, that simplifies authoring CMakeLists.txt.
-* qibuild/qitoolchain command line programs, that builds projects taking
-  dependencies into account.
+* the qibuild/qitoolchain command line tools, that help build projects
+  while taking dependencies into account.
 
 
 
 Tutorials
 ---------
-Learn how to use the qiBuild framework to build your
-C++ projects
+Learn how to use the qiBuild framework to build your C++ projects.
 
 
 Beginner
@@ -46,7 +45,7 @@ Beginner
 
 *qiBuild CMake framework*
 
-* link:creating-a-binary.html[Creating a library]
+* link:creating-a-binary.html[Creating an executable]
 * link:creating-a-library.html[Creating a library]
 * link:unit-testing.html[Unit testing]
 * link:installing-data.html[Installing data]

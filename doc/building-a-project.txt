@@ -24,7 +24,7 @@ Using an IDE
 ------------
 
 qiBuild is based on +CMake+, which in turns knows how to generate project files for
-a lot of IDEs : +XCode+, +Eclipse+, +Visual Studio+.
+many of IDEs : +XCode+, +Eclipse+, +Visual Studio+.
 
 Here we are only dealing with the details for:
 
@@ -39,17 +39,17 @@ able to use +XCode+ or +Eclipse+. Patches and tutorials welcome !
 qiBuild and QtCreator
 ~~~~~~~~~~~~~~~~~~~~~
 
-The only thing to remember is that you should not let +QtCreator+ call cmake by
+The only thing to remember is that you should not let +QtCreator+ call CMake by
 itself the first time.
 
-Use +qibuild configure+, +qibuild make+ to be sure everything works fine.
+Use +qibuild configure+ then +qibuild make+ to be sure everything works fine.
 
 Then open the root +CMakeLists+ in +qtcreator+.
 
 You will be prompted to use a build directory, chose the one that was created by
 +qibuild+.
 
-+QtCreator+ will read the setting from the exising build directory, so everything
++QtCreator+ will read the settings from the exising build directory, so everything
 should work fine.
 
 
@@ -59,9 +59,11 @@ qiBuild and Visual Studio
 When you have run +qibuild configure+, you will have a +.sln+ file generated in
 your build directory.
 
-Your solution should be already configured. Please avoid making changes to the
+Your solution should already be properly configured. Please avoid making changes to the
 solution file by hand, they will be lost the next time you change a CMake file
-or re-run CMake.
+or re-run CMake. To keep your project cross-platform and sharable with others you are
+strongly advised to use your +CMakeLists.txt+ to make any changes to your solution. After
+each change of your +CMakeLists.txt+, run +qibuild configure+ to update your solution file.
 
 
 

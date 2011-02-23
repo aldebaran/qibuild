@@ -26,25 +26,16 @@ The answer library
 
 Add the following files into your project:
 
++answer.h+
 [source, c++]
 ----
-/**
- * Answer.h
- */
-
- /**
-  * Get answer to the great question of
-  * life, the Universe and Everything
-  */
+ /// Get the meaning of life
  int get_answer();
 ----
 
++answer.cpp+
 [source, c++]
 ----
-/**
- * Answer.cpp
- */
-
 int get_answer()
 {
   return 42;
@@ -52,12 +43,11 @@ int get_answer()
 ----
 
 
-Then, edit main.cpp to have:
+Then, edit +main.cpp+ to have:
 
 [source, c++]
 ----
 #include <stdio>
-
 #include "answer.h"
 
 int main()
@@ -83,7 +73,7 @@ In order to use our library in the foo executable, we have to:
 Adding the include directories
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Simply edit the CMakeLists to have:
+Add the following line to the +CMakeLists.txt+:
 
 [source, cmake]
 ----
@@ -91,7 +81,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 ----
 
-+CMAKE_CURRENT_SOURCE_DIR+ is a variable that points to the location of the +CMakeLists+ file. This way you don't have to hard-code anything.
++CMAKE_CURRENT_SOURCE_DIR+ is a variable that points to the location of the +CMakeLists.txt+ file. This way you don't have to hard-code anything.
 
 
 Creating the answer library
@@ -122,12 +112,13 @@ Add a call to +qi_use_lib+ :
 qi_use_lib(foo answer)
 ----
 
-Make sure to call this *after* the call to +qi_create_lib+
+Make sure you call this *after* the call to +qi_create_lib+ - you need
+to create a library before using it.
 
 
 This call does several things:
 
-* It adds a dependency betwen the +answer+ library and the +foo+ executable
+* It adds a dependency between the +answer+ library and the +foo+ executable
 
 * It makes sure the +foo+ executable is linked with the +answer+ library
 
@@ -141,7 +132,7 @@ You can then build your project.
 A few notes:
 
 * On windows, the library will be found in +build/sdk/Debug/answer_d.lib+ if
-built on debug, or in +build/sdk/Release/answer.lib+ if built on release.
+built in debug, or in +build/sdk/Release/answer.lib+ if built in release.
 
 * On UNIX, the library will be found in +builds/sdk/lib/libanswer.a+
 
@@ -155,7 +146,7 @@ Conclusion
 ----------
 
 
-The final cmake code looks like
+The final +CMakeLists.txt+ code looks like
 
 [source, cmake]
 ----
@@ -170,4 +161,4 @@ qi_create_bin(foo main.cpp)
 qi_use_lib(foo answer)
 ----
 
-link:unit-testing.html[Next]: add unit testing
+link:unit-testing.html[Next]: add a unit test

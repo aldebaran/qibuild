@@ -10,7 +10,11 @@ Requirements
 In this tutorial, we will assume you have a properly configured qiBuild worktree,
 and that you've managed to compile a basic project.
 
-In this tutorial, we are going to create two projects: +hello+ and +world+.
+Overview
+--------
+
+We are going to create two separate projects: +hello+ and +world+, where +hello+ 
+depends on the compiled library found in +world+.
 
 The +world+ project contains sources to build a dynamic library
 (libworld.so or world.dll)
@@ -19,7 +23,6 @@ The +hello+ project contains source to build an executable named hello which dep
 on the world library.
 
 It also contains a small test that simply tries to launch hello.
-
 
 The sources of this example can be found link:qi-examples.tar.gz[here]
 
@@ -43,12 +46,10 @@ hello
 ----
 
 
-
-
 Magic !
 -------
 
-Configuring and building the hello project is as easy as:
+Configuring and building the +hello+ project is as easy as:
 
 ----
 qibuild configure hello
@@ -57,18 +58,18 @@ qibuild test hello
 ----
 
 
-You can see that configuring hello caused the world project to be configured too,
-and that building hello also built the world project.
+You can see that configuring +hello+ caused the +world+ project to be configured too,
+and that building +hello+ also built the +world+ project.
 
-You can also see that, on windows, the world DLL has been copied right next to hello.exe,
-so running qibuild test hello just worked.
+On windows, the world DLL was copied right next to +hello.exe+,
+so running +qibuild test hello+ just worked.
 
 If you are using visual studio, you can open hello.sln in
 QI_WORK_TREE/hello/build-.../hello.sln, select "hello" as startup project, and start
 debugging hello_d.exe right away.
 
 
-A bit of warning here: if you try to compile hello in release, you'll get an error because
+A word of warning here: if you try to compile +hello+ in release, you'll get an error because
 "world" has not been compiled in release, so world.lib could not found.
 
 Simply run:
@@ -89,7 +90,7 @@ Magic explained
 Dependencies
 ~~~~~~~~~~~~
 
-If you have a look at hello/qibuild.manifest, you can see the following lines:
+If you have a look at +hello/qibuild.manifest+, you will see the following lines:
 
 [source, ini]
 ----
@@ -97,25 +98,28 @@ If you have a look at hello/qibuild.manifest, you can see the following lines:
 depends = world
 ----
 
-Each time you run qibuild, it looks for a .qi to guess your current worktree.
+Each time you run +qibuild+, it looks for a .qi to guess your current worktree.
 
-After this, the worktree is parsed to find qibuild.manifest files.
+After this, the worktree is parsed to find +qibuild.manifest+ files.
 
-Here, there were two qibuild.manifest files, so qiBuild found the two projects: world and hello.
+Here, there were two +qibuild.manifest+ files, so qiBuild found the two projects: +hello+ and +world+.
 
 
 CMake magic: staging the world library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can see we have used:
+The relevant lines of the CMakeLists.txt are:
 
+In world/CMakeLists:
 [source, cmake]
 ----
-# In world/CMakeLists:
 qi_create_lib(world SRC world/world.h world/world.cpp)
 qi_stage_lib(world)
+----
 
-# In hello/CMakeLists:
+In hello/CMakeLists.txt:
+[source, cmake]
+----
 qi_create_bin(hello "main.cpp")
 qi_use_lib(hello world)
 ----

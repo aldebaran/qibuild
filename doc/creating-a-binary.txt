@@ -7,7 +7,7 @@ In this tutorial, we will learn how to create executables with the
 Requirements
 ------------
 
-We assume you have at least followed the link:getting-started.html[Getting Started]
+We assume you have followed the link:getting-started.html[Getting Started]
 tutorial.
 
 
@@ -61,4 +61,4 @@ NOTE: To run directly the foo executable from Visual Studio, simply right-click
       on the +foo+ project and select "Choose as start up project", then press
       F5 as usual.
 
-link:creating-a-library.html[Next]: adding some tests
+link:creating-a-library.html[Next]: create a library

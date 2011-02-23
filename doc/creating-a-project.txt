@@ -4,7 +4,7 @@ Creating a new project
 
 In this tutorial, we will simply create a new project:
 
-Enter:
+Navigate to your QI_WORK_TREE and Enter:
 
 ----
 qibuild create foo
@@ -35,7 +35,7 @@ makefiles, or Visual Studio solutions.
 * qibuild.cmake : this file MUST be included by the CMakeLists.txt to find the qibuild/cmake
 framework
 
-* qibuild.manifest : this file MUST be present for qibuild to know how to build the
+* qibuild.manifest : this file MUST be present for qiBuild to know how to build the
 foo project.
 
 

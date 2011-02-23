@@ -2,13 +2,12 @@ Getting Started
 ===============
 
 
-In this tutorial, you will learn how to configure and build a
-C++ project using the qiBuild framework.
+In this tutorial, you will learn how to install and configure the
+qiBuild system.
 
 
 Requirements
 ------------
-
 
 Python 2.7 is the preferred version, but qiBuild should work
 fine on python 2.6, too.
@@ -39,7 +38,7 @@ Windows
 Just run install-qibuild.bat
 
 If you have bash available on your system,
-and want to use qibuild from there, you should
+and want to use qiBuild from there, you should
 also be able to use the .sh script.
 
 
@@ -49,10 +48,10 @@ Creating a work tree
 
 First you need to chose a qibuild "worktree".
 
-This path will be searched by qiBuild to find the sources
-of your projects.
+This path will be the root from where qiBuild searches to find
+the sources of your projects.
 
-In the following document, we call this worktree QI_WORK_TREE.
+In the following document, we will call this worktree QI_WORK_TREE.
 
 Then go to this directory and run:
 

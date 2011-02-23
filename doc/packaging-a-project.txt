@@ -1,8 +1,8 @@
 Packaging a project
 ===================
 
-You may also want to distribute a pre-compiled package for an other
-person to use.
+You may want to distribute a pre-compiled package for an other
+person to use. With qiBuild, this is easy.
 
 
 Runtime package
@@ -15,11 +15,11 @@ qibuild package foo
 ----
 
 This will compile in release and install the foo project in a temporary
-directory, and generate a re-distributable, binary package in
+directory, and generate a re-distributable binary package in
 +QI_WORK_TREE/package/foo.tar.gz)+ (or foo.zip if you are on windows)
 
 The archive will by default contain only the *runtime* components (executables,
-charged libraries, data ...)
+dependent libraries, data ...)
 
 
 Development package
@@ -34,5 +34,7 @@ qibuild package --devel foo
 ----
 
 If you are using visual studio, this will generate a archive containing the
-libraries built in debug and in release, along will the headers, the cmake files,
+libraries built in debug and in release, along will the headers, the CMake files,
 and so on.
+
+link:creating-a-binary.html[Next]: Create a library with the qiBuild CMake framework
