@@ -102,7 +102,7 @@ def bootstrap(project, dep_sdk_dirs):
     to_write += "#############################################\n"
     to_write += "\n"
     to_write += "#QIBUILD CMAKE FRAMEWORK PATH:\n"
-    to_write += "set(CMAKE_MODULE_PATH \"%s\")\n" % get_qibuild_cmake_framework_path()
+    to_write += "list(APPEND CMAKE_MODULE_PATH \"%s\")\n" % get_qibuild_cmake_framework_path()
     to_write += "\n"
     to_write += "#DEPENDENCIES:\n"
     for dep_sdk_dir in dep_sdk_dirs:
