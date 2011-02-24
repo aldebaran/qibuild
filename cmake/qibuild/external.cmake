@@ -58,14 +58,16 @@ function(qi_build_cmake name url)
     list(APPEND patchs_cmd "patch" "-p1" "<" "${p}" ";")
   endforeach()
 
+  #/ is not a valid install_prefix in most place
+  #so we use /sdk and set DESTDIR to ..
   ExternalProject_Add(${name}
   URL "${url}"
   URL_MD5 "${ARGS_MD5}"
   PREFIX "${name}"
   BUILD_IN_SOURCE 0
   PATCH_COMMAND "${patchs_cmd}"
-  CMAKE_ARGS "${ARGS_CMAKE_ARGS}"
-  INSTALL_COMMAND   "DESTDIR=${QI_SDK_DIR}" make install ${ARGS_INSTALL_OPTIONS}
+  CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=/sdk ${ARGS_CMAKE_ARGS}"
+  INSTALL_COMMAND   "DESTDIR=${QI_SDK_DIR}/../" make install ${ARGS_INSTALL_OPTIONS}
   )
 
   #generate install rules for the project
