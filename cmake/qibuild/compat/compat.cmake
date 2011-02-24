@@ -388,18 +388,16 @@ function(copy_with_depend _src _dest)
   if (NOT EXISTS ${_src})
     if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_src})
       set(_src ${CMAKE_CURRENT_SOURCE_DIR}/${_src})
-    endif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_src})
-  endif (NOT EXISTS ${_src})
+    endif()
+  endif()
 
   #append the filename to the output filepath if necessary
   if (_dname STREQUAL "")
     set(_dest "${_dest}/${_sname}")
-  endif (_dname STREQUAL "")
+  endif()
 
   get_filename_component(_dirname "${_dest}" PATH)
   make_directory("${SDK_DIR}/${_dirname}/")
 
   configure_file("${_src}" "${SDK_DIR}/${_dest}" COPYONLY)
-endfunction(copy_with_depend _src _dest)
-
-
+endfunction()
