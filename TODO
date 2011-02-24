@@ -2,27 +2,16 @@ TODO
 ====
 
 CMake:
-* finish rewriting stage_*
-  - maybe we should do something like:
-     qi_create_lib(foo)
-     qi_stage_lib(foo
-      [INCLUDE_DIRS] ...
-      [DEFINITIONS] ...
-      [DEPENDS] ...
-     )
-     (INCLUDE_DIRS, DEFINITIONS and DEPENDS
-     being guessed if not given)
-
 * finish qi_use_lib (handle version, handle component)
 * do something nice with static/shared libraries
 * fix linker problems when using toolchain and third party libraries
 * modules: decide weither clean/fpath/flib/depends/export_* is part of the public qiBuild API (rename to qi_fpath, qi_flib, qi_fdepends ?)
-
+* export lib does not fail when REQUIRED is set
 
 qiBuild:
 * configstore: merge dependencies and cflags properly
 * doc
-* fix install component
+* fix install component (only have two components: runtime and devel)
 
 qiSrc:
 
