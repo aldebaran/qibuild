@@ -247,6 +247,40 @@ function(_qi_stage_lib target ${ARGN})
   set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${target}-config.cmake")
   file(WRITE "${_sdk_file}" "${_sdk}")
 
+  # OK, this one is tricky.
+  # with qibuild, when you have a target named "foo", you always prefix
+  # the variables concerning the foo target with the upper-case name
+  # of the target (FOO_INCLUDE_DIRS, FOO_DEFINITIONS, FOO_DEPENDS....)
+
+  # previously, when using toc/t001chain, you could stage a library
+  # with whatever named you wanted. For instance, you could use:
+  # stage_lib(foo LIBFOO)
+
+  # In order to preserve backward compatibility, (for instance use_lib(bar LIBFOO)
+  # MUST continue to work), when we stumble upon this kind of call in compat/compat.cmake,
+  # we create two different modules.
+
+  # one is still called foo-config.cmake, the other one is a copy of foo-config.cmake,
+  # named libfoo-config.cmake, where every occurrence of "FOO" is replaced by
+  # LIBFOO.
+  # This way, only the *names* of the values changed, but not their value, so
+  # LIBFOO_DEPENDS is the same as FOO_DEPENDS
+
+  # TODO: this little final hack is not very safe. Maybe a better way to do it will
+  # be to generate a file looking like
+
+  #   message(STAUS "Usage of
+  #       use_lib(... LIBFOO)
+  #   is deprecated, please use
+  #       qi_use_lib(.. foo)
+  #   find_package(foo)
+  #   ")
+  #
+  #   set(LIBFOO_DEPENDS ${FOO_DEPENDS}
+  #   set(LIBFOO_INLUDE_DIRS ${FOO_INCLUDE_DIRS}
+  #
+  #
+
   if(_staged_name)
     message(STATUS "Staging ${_staged_name} instead of ${target}!")
     string(TOUPPER ${target} _U_target)
