@@ -11,7 +11,15 @@ include(qibuild/internal/stage)
 
 #! Generate a 'name'-config.cmake, allowing other project to find the library.
 # \arg:target a target created with qi_create_lib
-#
+# \group:DEPENDS if not given, ${TARGET}_DEPENDS will be guessed from
+#                the previous calls to qi_use_lib().
+#                Use this (whith care!) to override this behavior.
+# \group:INCLUDE_DIRS it not given, ${TARGET}_INCLUDE_DIRS  will be
+#                 guessed from the previous calls to
+#                 include_directories()
+#                 Use this (whith care!) to override this behavior.
+# \group:DEFINITIONS list of compilation flags targets depending
+#                 of this library should use.
 function(qi_stage_lib target)
   check_is_target("${target}")
   _qi_stage_lib(${target} ${ARGN})

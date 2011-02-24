@@ -81,27 +81,7 @@ endfunction()
 # installed SDK.
 function(_qi_gen_inc_dir_code_redist res target)
   string(TOUPPER ${target} _U_target)
-  set(_relative_inc_dirs)
-  if(${_U_target}_INCLUDE_DIRS)
-    set(_relative_inc_dirs ${${_U_target}_INCLUDE_DIRS})
-  else()
-    get_directory_property(_inc_dirs INCLUDE_DIRECTORIES)
-    # set this directories relative to CMAKE_CURRENT_SOURCE_DIR:
-    foreach(_inc_dir ${_inc_dirs})
-      file(RELATIVE_PATH _rel_inc_dir ${_inc_dir} ${CMAKE_CURRENT_SOURCE_DIR})
-      if(NOT _rel_inc_dir)
-        set(_rel_inc_dir ".")
-      endif()
-      list(APPEND _relative_inc_dirs ${_rel_inc_dir})
-    endforeach()
-  endif()
-  # Preprend include dirs with ${ROOT_DIR}:
-  set(_to_write)
-  foreach(_inc_dir ${_relative_inc_dirs})
-    list(APPEND _to_write "\${ROOT_DIR}/${QI_SDK_INCLUDE}/${_inc_dir}")
-  endforeach()
-
-  set(${_U_target}_INCLUDE_DIRS ${_to_write})
+  set(${_U_target}_INCLUDE_DIRS "\${ROOT_DIR}/include")
   _qi_gen_code_from_vars(_res ${_U_target}_INCLUDE_DIRS)
   set(${res} ${_res} PARENT_SCOPE)
 endfunction()
@@ -220,6 +200,9 @@ function(_qi_set_vars target)
 
   if(ARG_INCLUDE_DIRS)
     set(${_U_target}_INCLUDE_DIRS ${ARG_INCLUDE_DIRS} PARENT_SCOPE)
+  else()
+    # ARG_INCLUDE_DIRS defaults to ${CMAKE_CURRENT_SOURCE_DIR}
+    set(${_U_target}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
   endif()
 endfunction()
 
