@@ -33,7 +33,7 @@ function(_qi_use_lib_get_deps _OUT_list)
     if (NOT ${_U_PKG}_SEARCHED)
       find_package(${_pkg} NO_MODULE)
       if (NOT ${${_pkg}_FOUND})
-        find_package(${_pkg} ${_is_required})
+        find_package(${_pkg} REQUIRED)
       endif()
       qi_set_global("${_U_PKG}_SEARCHED" TRUE)
     endif()
@@ -57,17 +57,13 @@ endfunction()
 # Find dependencies and add them to the target <name>.
 # This will call include_directories with XXX_INCLUDE_DIRS or fallback to XXX_INCLUDE_DIR.
 # This will call target_link_libraries with XXX_LIBRARIES or fallback to XXX_LIBRARY.
+# All dependencies should be found, otherwize it will fail. If you want to check if a
+# package could be found, prefer using find_package.
 #
 # \arg:name The target to add dependencies to
-# \flag:OPTIONAL Do not stop on error
 # \group:DEPENDENCIES The list of dependencies
 function(qi_use_lib name)
-  cmake_parse_arguments(ARG "OPTIONAL" "PLATEFORM" "DEPENDS" ${ARGN})
-
-  set(_is_required "REQUIRED")
-  if (ARG_OPTIONAL)
-    set(_is_required "")
-  endif()
+  cmake_parse_arguments(ARG "" "PLATEFORM" "DEPENDS" ${ARGN})
 
   set(ARG_DEPENDS ${ARG_UNPARSED_ARGUMENTS} ${ARG_DEPENDS})
 
