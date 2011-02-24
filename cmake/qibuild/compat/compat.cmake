@@ -47,7 +47,7 @@ qi_set_global(_SDK_CMAKE_MODULES ${QI_SDK_CMAKE_MODULES})
 
 qi_set_global(SDK_DIR ${QI_SDK_DIR})
 
-function(win32_copy_targe)
+function(win32_copy_target)
   qi_deprecated("win32_copy_target is deprecated.
   You sould even not have to call it now :)
   ")
@@ -74,7 +74,7 @@ function(install_header _staged_name)
   cmake_parse_arguments(ARG "INCLUDEPATHEXPORT" "SUBFOLDER" "" ${ARGN})
   if(ARG_INCLUDEPATHEXPORT)
     qi_warning("
-    Using  INCLUDEPATHEXPORT is not longer suppoprted
+    Using  INCLUDEPATHEXPORT is not longer supported
     (problematic target: ${_targetname})
     Old:
       # include \"bar.h\"
