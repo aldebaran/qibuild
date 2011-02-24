@@ -45,5 +45,7 @@ def do(args):
     archive = qitools.archive.zip(destdir)
     logger   = logging.getLogger(__name__)
     logger.info("Package generated in %s", archive)
+    # Now, clean the destdir.
+    qitools.sh.rm(destdir)
 
 
