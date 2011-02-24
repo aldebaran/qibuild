@@ -29,18 +29,11 @@ def do(args):
         # that we never ask again
         print "Could not find the editor to use."
         editor = qitools.interact.ask_string("Please enter an editor")
+        qitools.command.check_is_in_path(editor)
         qitools.configstore.update_config(config_path,
             "general", "env", "editor", editor)
 
     qitools.command.check_call([editor, config_path])
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__" :
