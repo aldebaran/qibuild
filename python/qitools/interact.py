@@ -35,3 +35,12 @@ def ask_yes_no(question):
     print "::", question, "(y/n)?"
     anwer = raw_input("> ")
     return anwer == "y"
+
+def ask_string(question):
+    """Ask the user to enter something.
+
+    Returns what the user entered
+    """
+    print "::", question
+    anwer = raw_input("> ")
+    return anwer
