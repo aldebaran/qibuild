@@ -248,7 +248,7 @@ function(_qi_stage_lib target ${ARGN})
   file(WRITE "${_sdk_file}" "${_sdk}")
 
   if(_staged_name)
-    message(STATUS "Staging with an other name!")
+    message(STATUS "Staging ${_staged_name} instead of ${target}!")
     string(TOUPPER ${target} _U_target)
     string(TOLOWER ${_staged_name} _other_name)
     string(REPLACE ${_U_target} ${_staged_name} _other_redist "${_redist}")
