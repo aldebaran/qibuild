@@ -171,6 +171,8 @@ class DependenciesSolver:
 
         project_names = [p.name for p in self.projects]
         package_names = [p.name for p in self.packages]
+        self.logger.debug("projects: %s", ",".join(project_names))
+        self.logger.debug("packages :%s", ",".join(package_names))
 
         if all:
         # Preten the use has asked for all the knwon projects
@@ -217,7 +219,9 @@ class DependenciesSolver:
             else:
                 r_not_found.append(name)
 
-        return (r_projects, r_packages, r_not_found)
+        res = (r_projects, r_packages, r_not_found)
+        self.logger.debug("result: %s", res)
+        return res
 
 if __name__ == "__main__":
     import doctest
