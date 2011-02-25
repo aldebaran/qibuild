@@ -4,6 +4,16 @@ TODO
 CMake:
 * finish qi_use_lib (handle version, handle component)
 * do something nice with static/shared libraries
+   - several cases:
+         * shared builds, shared deps   (useful on robot: perf, eg a plugin)
+         * static builds, static deps   (useful for portability and "hiding deps")
+         * shared builds, static deps   (useful for re-distributable library, eg qimessaging)
+         * static builds, shared deps   (for fun ...)
+   - shared build -> set (BUILD_SHARED_LIBS TRUE)
+   - static search -> set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+   TODO:
+    abstract those details for the user
+
 * fix linker problems when using toolchain and third party libraries
 * modules: decide weither clean/fpath/flib/depends/export_* is part of the public qiBuild API (rename to qi_fpath, qi_flib, qi_fdepends ?)
 * export lib does not fail when REQUIRED is set
