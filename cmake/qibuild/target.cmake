@@ -22,6 +22,7 @@
 # TODO: document options that could be passed to add_executable
 
 include(CMakeParseArguments)
+include(qibuild/internal/copy)
 
 #! Create an executable.
 # The target name should be unique.
