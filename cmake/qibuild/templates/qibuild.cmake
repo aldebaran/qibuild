@@ -6,7 +6,7 @@
 # This file is part of the qibuild project    #
 ###############################################
 
-set(QIBUILD_BOOTSTRAP_VERSION 6)
+set(QIBUILD_BOOTSTRAP_VERSION 7)
 
 
 ##
@@ -79,15 +79,17 @@ function(bootstrap)
   endif()
 endfunction()
 
+
+include(qibuild/general OPTIONAL RESULT_VARIABLE _qibuild_found)
+if(_qibuild_found)
+  return()
+endif()
+
 if(NOT EXISTS ${CMAKE_BINARY_DIR}/dependencies.cmake)
   bootstrap()
 endif()
 
-if(EXISTS ${CMAKE_BINARY_DIR}/dependencies.cmake)
-  include(${CMAKE_BINARY_DIR}/dependencies.cmake)
-else()
-  message(STATUS "can't find dependencies.cmake")
-endif()
+include(${CMAKE_BINARY_DIR}/dependencies.cmake)
+
 
 include(qibuild/general)
-
