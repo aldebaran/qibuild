@@ -147,7 +147,7 @@ endfunction()
 function(create_config_h)
   qi_deprecated("create_config_h is deprecated:
     use qi_create_config_h instead")
-  qi_create_config_h(${ARGN})
+  qi_create_config_h(_dummy ${ARGN})
 endfunction()
 
 function(create_gtest)
