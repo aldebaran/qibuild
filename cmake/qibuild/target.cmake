@@ -267,16 +267,17 @@ endfunction()
 
 
 #! Create a configuration file
-# \arg:filename Path to the generated file
+# \arg:OUT_PATH Path to the generated file
 # \arg:source The source file
 # \arg:dest The destination
-# TODO: example
-function(qi_create_config_h _PARENT_var source dest)
+# This function configure a file (using configure_file), it will generate the install rules
+# and return the path of the generated file in OUT_PATH
+function(qi_create_config_h OUT_PATH source dest)
   configure_file("${source}" "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}" ESCAPE_QUOTES)
   include_directories("${CMAKE_CURRENT_BINARY_DIR}/include/")
   get_filename_component(_folder "${dest}" PATH)
   install(FILES       "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}"
           COMPONENT   "header"
           DESTINATION "${QI_SDK_INCLUDE}/${_folder}")
-  set(${_PARENT_var} "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}" PARENT_SCOPE)
+  set(${OUT_PATH} "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}" PARENT_SCOPE)
 endfunction()
