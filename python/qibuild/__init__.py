@@ -1,16 +1,8 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"""
-This module contains build function for
-unix-like systems or Visual Studio
+""" This module contains a few functions for running CMake
+and building projects.
 
-Gotcha:
-=======
-Calling cmake -DCMAKE_BUILD_TYPE=debug and
-msbuild foo.sln causes foo to be build in release.
-(it's a CMake / visual studio "feature")
-
-This is why we should keep the same build dir on windows
 """
 
 import os
@@ -31,9 +23,8 @@ CMAKE_QIBUILD_DIR = os.path.abspath(os.path.join(QIBUILD_ROOT_DIR,
 
 
 def make(build_dir, num_jobs=None, target=None):
-    """
-    Just launch make from a build dir.
-    Lanch make -j <num_jobs> in num_jobs is not none
+    """ Launch make from a build dir.
+    Launch make -j <num_jobs> in num_jobs is not none
 
     """
     cmd = ["make"]
@@ -45,9 +36,9 @@ def make(build_dir, num_jobs=None, target=None):
 
 
 def nmake(build_dir, target=None):
-    """Just launch nmake from a build dir.
-    For this to work, you'd better be in a Visual
-    Studio command prompt
+    """ Launch nmake from a build dir.
+    For this to work, you may need to be in a Visual
+    Studio command prompt, or having run vcvarsall.bar
     """
     cmd = ["nmake"]
     if target:
@@ -56,10 +47,8 @@ def nmake(build_dir, target=None):
 
 
 def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD"):
-    """
-    Launch msbuild with correct configuratrion
-    (debug or release),
-    and with correct switch if num_jobs is not None
+    """ Launch msbuild with correct configuration
+    (debug or release), and with correct switch if num_jobs is not None
     """
     msbuild_conf = "/p:Configuration=%s" % build_type
 
@@ -91,26 +80,25 @@ def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD"):
 def cmake(source_dir, build_dir, cmake_args):
     """
     Call cmake with from a build dir for a source dir.
-    cmake_args are directly added on the command line
+    cmake_args are added on the command line.
 
-    The cache is always cleaned
+    The cache is always cleaned.
     """
     if not os.path.exists(source_dir):
         raise Exception("source dir: %s does not exist, aborting")
 
-    # Always remove CMakeCache and build/sdk/lib/cmake:
+    # Always remove CMakeCache and sdk/lib/cmake
+    # (CMake does not always do the right thing when .cmake
+    # files change)
     cache = os.path.join(build_dir, "CMakeCache.txt")
-    if os.path.exists(cache):
-        os.remove(cache)
-        LOGGER.debug("done cleaning cache")
-
+    qitools.sh.rm(cache)
     qitools.sh.rm(os.path.join(build_dir, "sdk", "lib", "cmake"))
 
     # Check that no one has made an in-source build
     in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
     if os.path.exists(in_source_cache):
         # FIXME: better wording
-        mess  = "You have run cmake from your sources\n"
+        mess  = "You have run CMake from your sources\n"
         mess += "CMakeCache.txt found here: %s\n" % in_source_cache
         mess += "Please clean your sources and try again\n"
         raise Exception(mess)

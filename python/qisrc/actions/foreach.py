@@ -39,5 +39,3 @@ def do(args):
             else:
                 raise
 
-if __name__ == "__main__" :
-    qitools.cmdparse.sub_command_main(sys.modules[__name__])

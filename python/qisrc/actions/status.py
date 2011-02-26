@@ -1,6 +1,6 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-""" list all git repositories and exit
+""" List all git repositories and exit
 """
 
 import os
@@ -48,6 +48,3 @@ def do(args):
         print
         print("Tips: use -u to show untracked files")
 
-if __name__ == "__main__" :
-    import sys
-    qitools.cmdparse.sub_command_main(sys.modules[__name__])

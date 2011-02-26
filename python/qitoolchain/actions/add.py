@@ -28,9 +28,3 @@ def do(args):
     package_path = qitools.sh.to_native_path(args.package_path)
     toolchain = qitoolchain.Toolchain(args.toolchain_name)
     toolchain.add_local_package(package_path)
-
-
-
-if __name__ == "__main__" :
-    import sys
-    qitools.cmdparse.sub_command_main(sys.modules[__name__])

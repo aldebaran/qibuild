@@ -1,5 +1,9 @@
-
 ## Copyright (C) 2011 Aldebaran Robotics
+
+""" This module contains the Toc class.
+which is where all the 'magic' happens ....
+
+"""
 
 import os
 import glob
@@ -68,6 +72,27 @@ class InstallFailed(TocException):
         return "Error occured when installing project %s" % self.project.name
 
 class Toc(QiWorkTree):
+    """This class contains a list of packages, and a list of projects.
+
+    It is also capable of sorting dependencies.
+
+    It also store various configurations, to be sure it is consistent
+    across the projects.
+
+    This class also contains "high-level" functions.
+
+    Example of use:
+
+        toc = Toc("/path/to/work/tree", "release", ...)
+        # Look for the foo project in the worktree
+        foo = toc.get_project("foo")
+        # Resolve foo dependencies, call cmake on each on then,
+        toc.configure_project(foo)
+        # Build the foo project, building all the dependencies in
+        # the correct order:
+        toc.build_project(foo)
+
+    """
     def __init__(self, work_tree,
             build_type,
             toolchain_name,
@@ -179,7 +204,14 @@ class Toc(QiWorkTree):
 
 
     def get_sdk_dirs(self, project_name):
-        """ return a list of sdk, needed to build a project """
+        """ Return a list of sdk, needed to build a project.
+
+        Iterate through the dependencies.
+        When it is a package (pre-compiled), add the path of
+        the package, when it is a project, add the path to the "sdk" dir
+        under the build directory of the project.
+
+        """
         dirs = list()
 
         known_project_names = [p.name for p in self.projects]
@@ -273,7 +305,6 @@ class Toc(QiWorkTree):
 
         LOGGER.debug("Updating os.environ with %s" , result)
         os.environ.update(result)
-
 
 
     def configure_project(self, project, toolchain_file=None):
@@ -418,8 +449,7 @@ def toc_open(work_tree, args, use_env=False):
 
 
 def create(directory, args):
-    """
-    Create a new toc work_tree by configuring
+    """ Create a new toc work_tree by configuring
     the template in qibuild/templates/build.cfg
 
     """
@@ -439,14 +469,18 @@ def create(directory, args):
 
 
 def resolve_deps(toc, args, runtime=False):
-    """ Return the list of project specified in args. This is usefull to extract
-        a project list from command line arguments. The returned list contains
+    """ To be called from commmand line. (args being the result
+    of parsing with a ArgumentParser object for instance)
 
-        case handled:
-          - nothing specified: get the project from the cwd
-          - args.single: do not resolve dependencies
-          - args.only_deps: only return dependencies
-          - args.use_deps: take dependencies into account
+    Return a tuple of three lists:
+    (projects, package, not_foud), see qibuild.dependencies_solver
+    for more documentation.
+
+    Cases handled:
+      - nothing specified: get the project from the cwd
+      - args.single: do not resolve dependencies
+      - args.only_deps: only return dependencies
+      - args.use_deps: take dependencies into account
     """
     if not args.projects:
         if not project_from_cwd():

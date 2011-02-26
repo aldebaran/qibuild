@@ -1,7 +1,34 @@
 ## Copyright (C) 2011 Aldebaran Robotics
-"""
-This modules contains wrapper classes
-around subprocess
+""" This modules contains few functions around subprocess
+
+
+Few notes:
+
+ - for each command, we try to look the executable in PATH,
+ (also using %PATHEXT% on windows), raising a NotInPath exception when
+ not found.
+
+ This way:
+     We can alway use:
+        - qitools.command.check_call(["cmake", ..."])
+    on every platform as soon as cmake is in
+    os.environ["PATH"]
+
+    without:
+       - using shell=True
+        (although we can display it in our error message)
+       - caring about the fact that it in fact "cmake.exe" on windows:
+    but:
+        - still using native, absolute paths for the executables we run.
+        (which is nice when debugging)
+
+    Note that on windows, you can specify paths to add to %PATH% in
+    qibuild configuration file, without polluting you whole
+    environment.
+
+ - Unless explicitly told not to, we alway raise an exception when
+ the return code of the command is not zero.
+     Return code always matter when you are building software ;-)
 
 """
 
@@ -24,7 +51,7 @@ class CommandFailedException(Exception):
 
 
 class ProcessCrashedError(Exception):
-    """An ohter custom exception, used with run_script """
+    """An other custom exception, used by call_background """
     def __init__(self, script_path):
         self.process_name = os.path.basename(script_path)
 
@@ -179,11 +206,11 @@ def _raise_error(cmd, cwd, shell, exception=None, retcode=None, output=None):
 
 
 @contextlib.contextmanager
-def run_script(script_path, args, environ=None):
+def call_background(script_path, args, environ=None):
     """
     To be used in a "with" statement.
 
-    with runProcess(...):
+    with call_background(...):
        do_stuff()
 
     do_other_stuff()
@@ -193,11 +220,10 @@ def run_script(script_path, args, environ=None):
 
     By the time you are executing do_other_stuff(),
     you know that the process has been killed,
-    better yet, if an exception has occured during
+    better yet, if an exception has occurred during
     do_stuff, this exception is re-raised *after*
     the process has been killed.
 
-    Useful to write automatic tests.
     """
     cmd = [script_path] + args
     process = subprocess.Popen(cmd)

@@ -1,5 +1,29 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
+"""This package contains the QiWorkTree object.
+
+Typical usage is:
+
+ - Create a new worktree.
+
+This create /path/to/work/.qi,
+
+ - Go to /path/to/work/src/foo, find the "bar" project
+
+Explore each parent directory until a ".qi" is found.
+Use the parent directory as a work tree.
+Build a QiWorkTree object from the work tree.
+Parses the worktree so that QiWorkTree every buildable projects
+(directories that contains a qibuild.manifest)
+
+To find the "bar" project, look for a project named "bar" in
+qiworktree.projects
+
+Note: the .qi also contains a config file, so you can
+have different configurations with different work trees if you need.
+
+"""
+
 import os
 import logging
 from qitools.cmdparse    import default_parser
@@ -9,7 +33,7 @@ import qitools.sh
 LOGGER = logging.getLogger("QiWorkTree")
 
 class WorkTreeException(Exception):
-    """Custom excpetion """
+    """Custom exception """
     def __init__(self, message):
         self.message = message
 
@@ -18,7 +42,7 @@ class WorkTreeException(Exception):
 
 
 def work_tree_parser(parser):
-    """ Parser settings for every action using a toc dir
+    """ Parser settings for every action using a work tree.
     """
     default_parser(parser)
     parser.add_argument("--work-tree", help="Use a specific work tree path.")
@@ -64,12 +88,15 @@ class QiWorkTree:
 def qiworktree_open(work_tree=None, use_env=False):
     """ open a qi worktree
         return a valid QiWorkTree instance
-        TODO: explain why we search for manifest
     """
     if not work_tree:
         work_tree = guess_work_tree(use_env)
         LOGGER.debug("found a qi worktree: %s", work_tree)
     if not work_tree:
+        # Sometimes we you just want to create a fake worktree object because
+        # you just want to build one project (no dependencies at all, no configuration...)
+        # In this case, just searching for a manifest from the current working directory
+        # is enough
         work_tree = search_manifest_directory(os.getcwd())
         LOGGER.debug("no work tree found using the project root: %s", work_tree)
     if work_tree is None:
@@ -97,9 +124,12 @@ def search_manifest_directory(working_directory):
     return None
 
 def search_projects(directory=None, depth=3):
-    """ search for qibuild.manifest files recursively starting from directory
-        this function return a list of directory.
+    """ Search for qibuild.manifest files recursively starting from directory
+        This function return a list of directories.
     """
+    # TODO: caching, please!
+    # TODO: may warn the user that this may take some times, of force user
+    # to run qibuild init in empty directories
     rgit = list()
     rsrc = list()
     if depth == 0:
@@ -124,10 +154,11 @@ def search_projects(directory=None, depth=3):
     return (rgit, rsrc)
 
 def guess_work_tree(use_env=False):
-    """Look for parent directories until a .toc dir is found somewhere.
-    Otherwize, juste use TOC_WORK_TREE environnement
+    """Look for parent directories until a .qi dir is found somewhere.
+    Otherwise, just use TOC_WORK_TREE environment
     variable
     """
+    # FIXME: not sure who would need use_env to be False ...
     from_env = os.environ.get("QI_WORK_TREE")
     if use_env and from_env:
         return from_env
@@ -143,7 +174,16 @@ def guess_work_tree(use_env=False):
 
 
 def project_name_from_directory(project_dir):
-    """Get the project name from the project directory """
+    """Get the project name from the project directory
+
+    The directory should contain a "qibuild.manifest" file,
+    looking like
+
+        [project foo]
+        ...
+
+    If such a section can not be found, raise an exception
+    """
     config = qitools.configstore.ConfigStore()
     conf_file = os.path.join(project_dir, "qibuild.manifest")
     config.read(conf_file)
@@ -157,7 +197,7 @@ def project_name_from_directory(project_dir):
 
 
 def create(directory):
-    """Create a new Qi worktree in the given directory
+    """Create a new Qi work tree in the given directory
 
     """
     to_create = os.path.join(directory, ".qi")

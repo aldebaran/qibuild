@@ -8,11 +8,11 @@ import qitools.sh
 LOGGER = logging.getLogger("qibuild.toc.project")
 
 class Project:
-    """ store information about a project:
+    """ Store information about a project:
          - name
          - source directory
-         - build  directory
-         - build  configuration
+         - build directory
+         - build configuration
          - dependencies
     """
     def __init__(self, name, directory):
@@ -26,10 +26,15 @@ class Project:
         self.build_directory = None
 
     def get_sdk_dir(self):
+        """ Return the SDK dir of the project.
+        To use the project build results, from an other project,
+        you just have to add this directory to CMAKE_PREFIX_PATH
+
+        """
         return os.path.join(self.build_directory, "sdk")
 
     def update_depends(self, toc):
-        """ update project dependency list """
+        """ Update project dependency list """
         deps  = toc.configstore.get("project", self.name, "depends", default="").split()
         rdeps = toc.configstore.get("project", self.name, "rdepends", default="").split()
         self.depends.extend(deps)
@@ -83,8 +88,6 @@ class Project:
         res += "  cmake_flags     = %s\n" % self.cmake_flags
         res += "  build_directory = %s" % self.build_directory
         return res
-
-
 
 
 def get_qibuild_cmake_framework_path():

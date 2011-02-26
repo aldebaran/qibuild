@@ -16,13 +16,11 @@ class DagError(Exception):
         self.result = result
 
     def __str__(self):
-        """ string representation """
         return "Circular dependency error: Starting from '%s', node '%s' depends on '%s', complete path %s" \
                % (self.node, self.parent, self.node, self.result)
 
 def assert_dag(data):
-    """
-    check if data is a dag
+    """ Check if data is a dag
     >>> assert_dag({
     ...   'a' : ( 'g', 'b', 'c', 'd' ),
     ...   'b' : ( 'e', 'c' ),
@@ -42,8 +40,7 @@ def assert_dag(data):
         _topological_sort(data, node, node, True)
 
 def topological_sort(data, heads):
-    """
-    topological sort
+    """ Topological sort
 
     data should be a dictionary like that (it's a dag):
     {
@@ -119,7 +116,7 @@ def topological_sort(data, heads):
         return _topological_sort(data, head, head)
 
 def _topological_sort(data, head, top_node, raise_exception = False, result = None, visited = None):
-    """ internal function
+    """ Internal function
     """
     if not result:
         result = []
@@ -175,7 +172,7 @@ class DependenciesSolver:
         self.logger.debug("packages :%s", ",".join(package_names))
 
         if all:
-        # Preten the use has asked for all the knwon projects
+        # Pretend the user has asked for all the known projects
             self.logger.debug("All projects have been selected")
             names = project_names[:]
 

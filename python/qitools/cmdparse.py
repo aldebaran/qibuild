@@ -1,9 +1,19 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"""This handles dispacthing first arg to other actions
+"""Tools to parse command lines.
+
+For instance, after
+
+    qibuild make --release foo
+
+- look for a module named make.py
+- configure a parser using the configure_parser() of the make.py module
+- parse the arguments
+- call the do() method of make.py with
+  arg.release = True
+  arg.prohect = "foo"
 
 """
-
 
 import os
 import sys
@@ -98,8 +108,8 @@ def run_action(module_name, arguments=None, forward_args=None):
 def main_wrapper(module, args):
     """This wraps the main method of an action so that:
        - backtrace is not printed by default
-       - backtrace is printed is --backtrace is given
-       - pdb is started if --pdb is given
+       - backtrace is printed is --backtrace was given
+       - a pdb session is run if --pdb was given
     """
     try:
         module.do(args)
@@ -118,7 +128,7 @@ def main_wrapper(module, args):
         sys.exit(2)
 
 def _dump_arguments(name, args):
-    """ dump an argparser namespace to log """
+    """ Dump an argparser namespace to log """
     output = ""
     max_len = 0
     for k in args.__dict__.keys():
@@ -138,7 +148,9 @@ def root_command_main(name, parser, modules):
        modules : list of Python modules
 
     """
-    subparsers = parser.add_subparsers(help="action", dest="action")
+    subparsers = parser.add_subparsers(
+        dest="action",
+        title="actions")
 
     # A dict name -> python module for the the action
     action_modules = dict()
@@ -177,13 +189,20 @@ def root_command_main(name, parser, modules):
     main_wrapper(module, args)
 
 def sub_command_main(module, args=None, namespace=None):
-    """This is called in two different cases:
+    """This is called  by run_action() for an other module
 
-    - In the "if __name__ == "__main__" part
-      of the subcommands (when args and namespace are None)
+    Note that you could also use this to make an script from an
+    action module if you need to, like this:
 
-    - By a run_action from another action, where args are the arguments
-      of the new action, and namespace is the caller's namespace
+        def configure_parser(parser):
+            ...
+
+        def do(args):
+            ....
+
+
+        if __name__ == "__main__"
+            sub_command_main(sys.modules[__name__])
 
     """
     check_module(module)
@@ -245,7 +264,7 @@ def action_modules_from_package(package_name):
     return res
 
 def log_parser(parser):
-    """ Given a parser, add the options controling log
+    """ Given a parser, add the options controlling log
     """
     group = parser.add_argument_group("logging arguments")
     group.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Output debug messages")

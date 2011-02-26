@@ -1,5 +1,5 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-from qisrc import git
+""" This package contains the qisrc actions """
 
-__all__ = ( 'all' )
+from qisrc import git

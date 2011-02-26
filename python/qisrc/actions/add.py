@@ -1,5 +1,7 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
+"""Add a new project in a qisrc workspace """
+
 import os
 import logging
 import qisrc
@@ -19,8 +21,6 @@ class ProjectAlreadyExists(Exception):
         message += "%s already exists." % self.path
         return message
 
-
-"""Add a new project in a qisrc workspace """
 
 def configure_parser(parser):
     """Configure parser for this action """

@@ -1,7 +1,28 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"""This package contains the
-Toolchain class and the qitoolchain actions
+""" This package contains the Toolchain and the Package
+class
+
+How does it work?
+
+ - Create a Toolchain with a name ("linux" for instance)
+/path/to/share/qi/toolchains/rootfs/linux
+and
+/path/to/share/qi/toolchains/cache/linux
+are created.
+qitoolchain build configuration is updated to reflect
+there is a toolchain called "linux"
+
+ - Add the foo package:
+The foo archive is extracted in:
+/path/to/share/qi/toolchains/rootfs/<name>/foo
+qitoolchain build configuration is update to
+reflect the fact that the "linux" toolchain now provides
+the "foo" package.
+
+ - Build a Toc object with the toolchain name "linux",
+When finding a project depending on foo, add the foo package
+path to the list of SDK dirs to use
 
 """
 
@@ -34,13 +55,13 @@ class Package:
 
 
 def get_config_path():
-    """Returns a suitable config path"""
+    """ Return a suitable config path"""
     # FIXME: deal with non-UNIX systems
     config_path = os.path.expanduser("~/.config/qi/toolchain.cfg")
     return config_path
 
 def get_shared_path():
-    # FIXME: deal with non-UNIX systems
+    """ Return a suitable path to put toolchain files """
     if sys.platform.startswith("win"):
         # > Vista:
         if os.environ.get("LOCALAPPDATA"):
@@ -54,6 +75,9 @@ def get_shared_path():
     return res
 
 def get_rootfs(toolchain_name):
+    """ Return a suitable path to extract the packages
+
+    """
     res = os.path.join(get_shared_path(), "toolchains", "rootfs",
             toolchain_name)
     qitools.sh.mkdir(res, recursive=True)
@@ -97,6 +121,10 @@ class Toolchain(object):
 
     @property
     def packages(self):
+        """List of packages in this toolchain.
+
+        This list is always up to date.
+        """
         self._load_feed_config()
         return self._packages
 
@@ -149,12 +177,12 @@ class Toolchain(object):
             self._update_config("provide", '"%s"' % to_write)
 
     def _add_package(self, package_name):
-        """Add just one package. called by self.add_package
+        """Add just one package. Called by self.add_package
         which does resolve dependencies.
 
-        (in a non-recursive way because I'm bored)
-
         """
+        # FIXME: recurse until every dependency is handled, here the
+        # dependencies may also have dependencies themselves...
         archive_path = os.path.join(get_cache(self.name), package_name)
         if sys.platform.startswith("win"):
             archive_path += ".zip"
@@ -190,6 +218,10 @@ class Toolchain(object):
             self._update_config("feed", new_feed)
 
     def _load_feed_config(self):
+        """ Re-build self._packages list using the configuration file
+
+        Called each time someone uses self.packages
+        """
         provided = self.configstore.get("toolchain", self.name, "provide")
         self._packages = list()
         if not provided:

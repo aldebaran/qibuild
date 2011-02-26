@@ -1,6 +1,34 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-""" store all toc configuration keys
+""" Nice wrapper around ConfigParser objects.
+
+Highlight: instead of sections and values, the ConfigStore object
+uses nested dictionaries.
+
+This enables to store abritrary depth of configuration "trees".
+
+For instance, with
+
+foo.cfg looking like
+
+    [project "foo"]
+    bar.baz = 42
+    bar.spam = "eggs"
+
+[project "bar"]
+
+You can use:
+
+    conf = ConfigStore()
+    conf.read("foo.cfg")
+
+    projects = conf.get("project")
+
+    # Project is now a dictionary
+
+    # Returns 42
+    projects["foo"]["bar"]
+
 """
 
 import logging
@@ -14,10 +42,7 @@ class ConfigException(Exception):
         return repr(self.args)
 
 class ConfigStore:
-    """
-    store a list of config of the form:
-    titi.toto.tata = paf
-    toc.tac.tic = pof
+    """ Store a list of configuration values
     """
     logger = logging.getLogger("qibuild.configstore")
 
@@ -93,8 +118,6 @@ class ConfigStore:
                 ret[name + k] = v
         return ret
 
-
-
     def read(self, filename):
         """ read a configuration file """
         parser = ConfigParser.RawConfigParser()
@@ -128,7 +151,7 @@ def update_config(config_path, section, name, key, value):
     anser = 43
 
     Note: all comments in the file will be lost!
-    Sections will be created if they do not exist
+    Sections will be created if they do not exist.
 
     Gotcha: this does NOT update a configstore object per se,
     because the configstore may have read several files.

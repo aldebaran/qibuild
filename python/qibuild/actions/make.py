@@ -1,6 +1,6 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"""Configure a project
+"""Build a project
 
 """
 

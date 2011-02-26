@@ -143,10 +143,5 @@ class DependenciesSolverTestCase(unittest.TestCase):
         self.assertEquals(not_found, [])
 
 
-
-
-
-
-
 if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,9 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
 """ Update a toolchain
-    This will try to update every package already found in the toolchain """
+    This will try to update every package already found in the toolchain
+
+"""
 
 import qitools
 import qitoolchain

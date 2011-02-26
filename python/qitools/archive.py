@@ -1,7 +1,11 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
 """This module contains function to
-manipulate archives
+manipulate archives.
+
+We will always manipulate .tar.gz archives on UNIX,
+and .zip on windows. (keeping it close to the more common
+used format of the given platform)
 """
 
 import os

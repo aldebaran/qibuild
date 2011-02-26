@@ -1,8 +1,9 @@
+## Copyright (C) 2011 Aldebaran Robotics
+
 """Automatic testing for qibuild
 
 """
 
-## Copyright (C) 2011 Aldebaran Robotics
 
 import os
 import sys

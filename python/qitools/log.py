@@ -1,5 +1,7 @@
 ## Copyright (C) 2011 Aldebaran Robotics
-"""Few useful functions for loggging
+"""Few useful functions for loggging,
+featuring a loghandler using colors
+(depends on pyreadline for this to work on windows)
 
 """
 
@@ -16,7 +18,7 @@ if ON_WIN:
     except ImportError:
         HAS_PYREADLINE = False
 
-# Ansi colors: feel free to add stuff here:
+# Ansi colors
 COLORS = {
     "bold"    :  "\033[1m"  ,
     "clear"   :  "\033[0m"  ,
@@ -107,7 +109,7 @@ def get_current_log_level():
     """Get the current log level.
 
     """
-    # This looks a bit weird.
+    # This looks a bit weird...
     root_logger = logging.getLogger()
     handlers = root_logger.handlers
     if handlers:

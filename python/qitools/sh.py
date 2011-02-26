@@ -2,6 +2,9 @@
 
 """ sh like functions """
 
+# Mostly wrappers around somehow strange-behaving
+# shutil functions ...
+
 import sys
 import os
 import shutil
@@ -12,7 +15,7 @@ import subprocess
 LOGGER = logging.getLogger("buildtool.sh")
 
 def mkdir(dest_dir, recursive=False):
-    """ recursive mkdir (do not fail if file exists) """
+    """ Recursive mkdir (do not fail if file exists) """
     try:
         if recursive:
             os.makedirs(dest_dir)
@@ -145,15 +148,13 @@ def ls_r(directory):
     res.sort()
     return res
 
+# FIXME: derpeciate this...
 def which(program):
     """
     find program in the environment PATH
     @return path to program if found, None otherwise
     """
-    for path in os.getenv('PATH').split(':'):
-        if os.path.exists(path) and program in os.listdir(path):
-            return os.path.join(path, program)
-    return None
+    return qitools.command.find_program(program)
 
 
 def run(program, args):
@@ -186,7 +187,7 @@ def to_posix_path(path):
 
     Guidelines:
         * always use os.path insternally
-        * convert to POXIS path at the very last moment
+        * convert to POSIX path at the very last moment
 
     """
     res = os.path.expanduser(path)
@@ -197,7 +198,7 @@ def to_posix_path(path):
 def to_dos_path(path):
     """Return a DOS path from a "windows with /" path.
     Useful because people sometimes use forward slash in
-    env var
+    environment variable, for instance
     """
     res = path.replace("/", "\\")
     return res
@@ -224,10 +225,10 @@ class TempDir:
             do_foo(subdir)
 
     This piece of code makes sure that:
-     -> a temporary directory named temp_dir has been
+       - a temporary directory named temp_dir has been
      created (guaranteed to exist, be empty, and writeable)
 
-     -> the directory will be removed when the scope of
+       - the directory will be removed when the scope of
      temp_dir has ended unless an exception has occurred
      and DEBUG environment variable is set.
 
