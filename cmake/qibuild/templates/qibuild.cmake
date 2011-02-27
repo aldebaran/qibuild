@@ -6,7 +6,7 @@
 # This file is part of the qibuild project    #
 ###############################################
 
-set(QIBUILD_BOOTSTRAP_VERSION 7)
+set(QIBUILD_BOOTSTRAP_VERSION 8)
 
 
 ##
@@ -34,11 +34,10 @@ function(bootstrap)
   endif()
 
   get_filename_component(_python_root ${PYTHON_EXECUTABLE} PATH)
-  find_program(QI_BUILD_EXECUTABLE qibuild.py
+  find_program(QI_BUILD_EXECUTABLE NAMES qibuild.py qibuild
     PATHS
       "${_python_root}/Scripts"
   )
-
 
   if(NOT QI_BUILD_EXECUTABLE)
     message(STATUS
