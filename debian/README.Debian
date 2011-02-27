@@ -1,0 +1,8 @@
+The Debian Package qibuild
+----------------------------
+
+The call to -DDEB_PACKAGE=ON is required to have 'python setup.py install'
+having the correct options. (--install-layout=deb, --no-compile)
+
+
+ -- Aldebaran Robotics <qidev@aldebaran-robotics.com>  Sun, 27 Feb 2011 16:11:23 +0000

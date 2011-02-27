@@ -1,0 +1,51 @@
+QIBUILD(1)
+==========
+:doctype: manpage
+
+
+NAME
+----
+qisrc - manage multiple git projects
+
+
+SYNOPSIS
+--------
+*qibuild* ['OPTIONS'] COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
+
+
+DESCRIPTION
+-----------
+The command line program qibuild provides severals actions to work with git projects.
+
+
+COMMANDS
+--------
+%s
+
+
+OPTIONS
+-------
+*--work-tree='WORK_TREE'::
+    Specify the work tree. This can be an environment variable too.
+
+*-h, --help* ['TOPIC']::
+    Print help about TOPIC.
+
+*-v, --verbose*::
+    Print verbose output.
+
+NOTES
+-----
+
+To be able to work, *qisrc* requires that you have run *qisrc init*
+(or *qibuild init*, and that *git* is in you *PATH*)
+
+
+EXIT STATUS
+-----------
+*0*::
+    Success
+
+*2*::
+    Failure
+

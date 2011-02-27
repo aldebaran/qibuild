@@ -26,9 +26,7 @@ COMMANDS
 OPTIONS
 -------
 *-h, --help* ['TOPIC']::
-    Print help TOPIC. *--help* 'topics' will print a list of help
-    topics, *--help*='syntax' summarizes AsciiDoc syntax,
-    *--help*='manpage' prints the AsciiDoc manpage.
+    Print help about TOPIC.
 
 *-v, --verbose*::
     Print verbose output.

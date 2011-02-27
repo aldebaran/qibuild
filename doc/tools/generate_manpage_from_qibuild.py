@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 ##
-## Author(s):
-##  -  <>
-##
-## (is it fantomas?)
-##
 ## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 

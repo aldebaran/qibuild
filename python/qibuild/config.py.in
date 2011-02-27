@@ -1,0 +1,6 @@
+"""Configured by CMake during installation
+of qiBuild.
+
+"""
+
+CMAKE_ROOT = "${CMAKE_ROOT}"

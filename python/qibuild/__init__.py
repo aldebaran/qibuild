@@ -17,9 +17,32 @@ from toc import toc_open
 LOGGER = logging.getLogger("qibuild")
 
 QIBUILD_ROOT_DIR  = os.path.dirname(os.path.abspath(__file__))
-CMAKE_QIBUILD_DIR = os.path.abspath(os.path.join(QIBUILD_ROOT_DIR,
-        "..", "..", "cmake", "qibuild"))
 
+def get_cmake_qibuild_dir():
+    """Get the path to cmake modules.
+
+    Useful to copy qibuild.cmake template in
+    qibuild create, among other things.
+
+    """
+    # First, assume this file is not installed,
+    # so we have the python code in qibuild/python,
+    # and the cmake code in qibuild/cmake:
+    res = os.path.join(QIBUILD_ROOT_DIR, "..", "..", "cmake", "qibuild")
+    if os.path.isdir(res):
+        return qitools.sh.to_native_path(res)
+
+    # Else, try to import qibuild.config, a
+    # python module configured by cmake during installation,
+    # containing CMAKE_ROOT
+    from qibuild.config import CMAKE_ROOT
+    res = os.path.join(CMAKE_ROOT, "Modules", "qibuild")
+    if os.path.isdir(res):
+        return qitools.sh.to_native_path(res)
+
+    raise Exception("Could not find qibuild cmake root dir!")
+
+CMAKE_QIBUILD_DIR = get_cmake_qibuild_dir()
 
 
 def make(build_dir, num_jobs=None, target=None):

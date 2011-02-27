@@ -1,0 +1,17 @@
+
+set(_setup_py_args "@SETUP_PY_ARGS@")
+
+message(STATUS "DESTDIR $ENV{DESTDIR}")
+
+if(NOT "$ENV{DESTDIR}" STREQUAL "")
+  set(_setup_py_args "${_setup_py_args}" "--root=$ENV{DESTDIR}")
+endif()
+
+# Then run python setup.py install
+execute_process(
+  COMMAND
+    @PYTHON_EXECUTABLE@ setup.py install ${_setup_py_args}
+  WORKING_DIRECTORY
+    ${CMAKE_BINARY_DIR}/../python
+)
+

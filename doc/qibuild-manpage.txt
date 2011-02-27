@@ -26,15 +26,13 @@ COMMANDS
 
 OPTIONS
 -------
-*--work-tree='WORK_TREE'::
+*--work-tree ['WORK_TREE']* ::
     Specify the work tree. This can be an environment variable too.
 
-*-h, --help* ['TOPIC']::
-    Print help TOPIC. *--help* 'topics' will print a list of help
-    topics, *--help*='syntax' summarizes AsciiDoc syntax,
-    *--help*='manpage' prints the AsciiDoc manpage.
+*-h, --help* ['TOPIC'] ::
+    Print help about TOPIC.
 
-*-v, --verbose*::
+*-v, --verbose* ::
     Print verbose output.
 
 CONFIGURATION
