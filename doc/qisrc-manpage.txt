@@ -10,7 +10,7 @@ qisrc - manage multiple git projects
 
 SYNOPSIS
 --------
-*qibuild* ['OPTIONS'] COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
+*qibuild* COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
 
 
 DESCRIPTION
@@ -25,20 +25,28 @@ COMMANDS
 
 OPTIONS
 -------
-*--work-tree='WORK_TREE'::
+Useful options:
+
+(use *qisrc --help* to have the full list)
+
+*--work-tree* ['WORK_TREE'] ::
     Specify the work tree. This can be an environment variable too.
 
-*-h, --help* ['TOPIC']::
+*-h, --help* ['TOPIC'] ::
     Print help about TOPIC.
 
-*-v, --verbose*::
-    Print verbose output.
+*-v, --verbose* ::
+    Set verbose output.
+
+*--backtrace ::
+    Print the full backtrace when an error occurs.
+    (useful for bug reports)
 
 NOTES
 -----
 
 To be able to work, *qisrc* requires that you have run *qisrc init*
-(or *qibuild init*, and that *git* is in you *PATH*)
+or *qibuild init*, and that *git* is in you *PATH*
 
 
 EXIT STATUS

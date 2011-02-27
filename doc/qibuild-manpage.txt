@@ -10,7 +10,7 @@ qibuild - get, build, install projects.
 
 SYNOPSIS
 --------
-*qibuild* ['OPTIONS'] COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
+*qibuild* COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
 
 
 DESCRIPTION
@@ -26,14 +26,22 @@ COMMANDS
 
 OPTIONS
 -------
-*--work-tree ['WORK_TREE']* ::
+Useful options:
+
+(use *qibuild --help* to have the full list)
+
+*--work-tree* ['WORK_TREE'] ::
     Specify the work tree. This can be an environment variable too.
 
 *-h, --help* ['TOPIC'] ::
     Print help about TOPIC.
 
 *-v, --verbose* ::
-    Print verbose output.
+    Set verbose output.
+
+*--backtrace ::
+    Print the full backtrace when an error occurs.
+    (useful for bug reports)
 
 CONFIGURATION
 -------------

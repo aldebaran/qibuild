@@ -10,7 +10,7 @@ qitoolchain - get and install binary packages.
 
 SYNOPSIS
 --------
-*qitoolchain* ['OPTIONS'] COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
+*qitoolchain* COMMAND ['COMMAND_OPTIONS'] ARGUMENTS
 
 
 DESCRIPTION
@@ -25,11 +25,19 @@ COMMANDS
 
 OPTIONS
 -------
+Useful options:
+
+(use *qitoolchain --help* to have the full list)
+
 *-h, --help* ['TOPIC']::
     Print help about TOPIC.
 
-*-v, --verbose*::
-    Print verbose output.
+*-v, --verbose* ::
+    Set verbose output.
+
+*--backtrace ::
+    Print the full backtrace when an error occurs.
+    (useful for bug reports)
 
 CONFIGURATION
 -------------
