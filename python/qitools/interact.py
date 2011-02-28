@@ -36,11 +36,15 @@ def ask_yes_no(question):
     anwer = raw_input("> ")
     return anwer == "y"
 
-def ask_string(question):
+def ask_string(question, default=None):
     """Ask the user to enter something.
 
     Returns what the user entered
     """
+    if default:
+        question += " (%s)" % default
     print "::", question
     anwer = raw_input("> ")
-    return anwer
+    if not anwer:
+        return default
+    return answer
