@@ -6,7 +6,7 @@
 # This file is part of the qibuild project    #
 ###############################################
 
-set(QIBUILD_BOOTSTRAP_VERSION 5)
+set(QIBUILD_BOOTSTRAP_VERSION 8)
 
 
 ##
@@ -14,8 +14,12 @@ set(QIBUILD_BOOTSTRAP_VERSION 5)
 # and include it.
 # This allow us to find all qibuild/qibuild.cmake
 function(bootstrap)
-  find_program(PYTHON_EXECUTABLE NAMES python2 python python.exe)
-  find_program(QI_BUILD_EXECUTABLE qibuild.py)
+  find_program(PYTHON_EXECUTABLE NAMES python2 python python.exe
+    PATHS
+      [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath]
+      [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.7\\InstallPath]
+  )
+
 
   if(NOT PYTHON_EXECUTABLE)
     message(STATUS
@@ -28,6 +32,12 @@ function(bootstrap)
     )
     message(FATAL_ERROR "")
   endif()
+
+  get_filename_component(_python_root ${PYTHON_EXECUTABLE} PATH)
+  find_program(QI_BUILD_EXECUTABLE NAMES qibuild.py qibuild
+    PATHS
+      "${_python_root}/Scripts"
+  )
 
   if(NOT QI_BUILD_EXECUTABLE)
     message(STATUS
@@ -68,15 +78,17 @@ function(bootstrap)
   endif()
 endfunction()
 
+
+include(qibuild/general OPTIONAL RESULT_VARIABLE _qibuild_found)
+if(_qibuild_found)
+  return()
+endif()
+
 if(NOT EXISTS ${CMAKE_BINARY_DIR}/dependencies.cmake)
   bootstrap()
 endif()
 
-if(EXISTS ${CMAKE_BINARY_DIR}/dependencies.cmake)
-  include(${CMAKE_BINARY_DIR}/dependencies.cmake)
-else()
-  message(STATUS "can't find dependencies.cmake")
-endif()
+include(${CMAKE_BINARY_DIR}/dependencies.cmake)
+
 
 include(qibuild/general)
-
