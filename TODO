@@ -2,7 +2,8 @@ TODO
 ====
 
 CMake:
-* finish qi_use_lib (handle version, handle component)
+* finish qi_use_lib (handle version, handle component, handler error
+  messages properly)
 * do something nice with static/shared libraries
    - several cases:
          * shared builds, shared deps   (useful on robot: perf, eg a plugin)
@@ -20,20 +21,24 @@ CMake:
 
 qiBuild:
 * configstore: merge dependencies and cflags properly
-* doc
 * fix install component (only have two components: runtime and devel)
 
 qiSrc:
 
 
 DOC:
- * add tutorials:
-  - using toolchain
-  - build configurations
+ * fix tutorials on using toolchain
  * cmake: document +_INCLUDE_DIRS+, +_LIBS+, ....
  * use cmake to generate documentation !
 
 Install:
-  * find a way to install cmake files along with python stuff.
-(right now, after running python setup.py install, no cmake
-stuff can be found :/)
+  * root's cmake list should honor CMAKE_INSTALL_PREFIX setting.
+  * qibuild.get_cmake_root_path() could for cmake instead of
+  trusted qibuild/config.py
+
+Compat:
+  * when we see a base.cfg, override the bootstrap.cmake,
+  and create proper qibuild.manifest and qibuild.cmake,
+  to that going from toc to qibuild is automagic
+
+  * same thing for ROS?
