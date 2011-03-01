@@ -8,8 +8,8 @@ Introduction
 This tutorial is targeted towards +rosbuild+ users wanted to know
 more about +qiBuild+
 
-Comparison
-----------
+General comparison
+------------------
 
 First, +qiBuild+ and +rosbuild+ have a lot of common.
 
@@ -29,7 +29,7 @@ What's inside qiBuild and not in rosbuild
 * Automatic creation of installation rules.
 
 * Ability to create redistributable, pre-compiled packages.
-(ros support generation of .deb packages, thoug)
+(ROS support generation of .deb packages, though)
 
 * Strong cross-platform support. Support both UNIX makefiles and
 Visual Studio supports. (Basically everything that is supported by
@@ -37,14 +37,14 @@ CMake should run fine with qiBuild)
 
 * Easy cross-compilation
 
-* Handling of multiple build configuration with the same source dirs.
+* Handling of multiple build configuration with the same source directories.
 
 * A bit less monolithic: the CMake framework can be used alone,
 (without the scripts), the redistributable packages can be used in pure
 CMake.
 
-* Loose coupling: qimessagin can be used without qibuild, generation
-of code is not made inside qibuild.
+* Loose coupling: qimessaging can be used without qiBuild, generation
+of code is not made inside qiBuild.
 
 What's inside rosbuild and not in qiBuild
 -----------------------------------------
@@ -54,10 +54,16 @@ apt-get install)
 
 * Parallel building of dependencies
 
-* Nicer output ;)
+* Nice shell features: nice output, auto-completion, +roscd+, etc...
 
-* Tied coupling between, rosmake (the build system), roslib (the library
-for communication), and genereation of messages
+* Tied coupling between rosmake (the build system), roslib (the library
+for communication), and generation of messages
+
+* Nice Python support : automatic handling of $PYTHONPATH variable,
++rospython+, ....
+
+* Nice documentation support
+
 
 
 Table of equivalences
@@ -75,7 +81,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 rosbuild_init()
 
 ----
-Need a few environnement variables to be set.
+Need a few environment variables to be set.
 
 *qibuild*
 

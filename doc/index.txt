@@ -65,7 +65,6 @@ Advanced
 * link:how-to-write-a-library.html[How to write a library]
   Useful guidelines when writing a library in a large, redistributable
   project.
-* link:qibuild-and-rosbuild.html[qiBuild and rosbuild]
 
 
 Documentation
@@ -89,3 +88,4 @@ Read this if you want to contribute to qiBuild
 * link:cmake-coding-guide.html[CMake coding guide]
 * link:python-coding-guide.html[Python coding guide]
 * link:architecture.html[qiBuild architecture]
+* link:qibuild-and-rosbuild.html[qiBuild and rosbuild]
