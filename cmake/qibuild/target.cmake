@@ -114,6 +114,15 @@ function(qi_create_bin name)
         ${CMAKE_BINARY_DIR}
     )
   endif()
+
+  if(UNIX AND NOT APPLE)
+    # Use a relative rpath at installation
+    set_target_properties("${name}"
+      PROPERTIES
+        INSTALL_RPATH "\$ORIGIN/../lib"
+    )
+  endif()
+
 endfunction()
 
 
