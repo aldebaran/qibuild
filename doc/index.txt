@@ -65,6 +65,7 @@ Advanced
 * link:how-to-write-a-library.html[How to write a library]
   Useful guidelines when writing a library in a large, redistributable
   project.
+* link:qibuild-and-rosbuild.html[qiBuild and rosbuild]
 
 
 Documentation
