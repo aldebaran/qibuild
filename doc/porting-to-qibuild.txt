@@ -222,8 +222,7 @@ the install rules:
 [source, cmake]
 ----
 qi_create_lib(bar
-  SRC bar/bar.h bar/bar.cpp
-  SUBFOLDER bar)
+  SRC bar/bar.h bar/bar.cpp)
 
 qi_install_header(bar bar/bar.h)
 ----
@@ -232,9 +231,12 @@ You can see that:
 
  - The install rules have been properly generated for the library
  - For the headers, you *have* to choose a subfolder in which to put your headers.
- (otherwise, it's too easy to have conflicts, especially when you are generating a big SDK.)
-  Unless you have a very good reason not to, please choose the same folder name that the one you
-  used for the +qi_create_lib()+ call.
+   (otherwise, it's too easy to have conflicts, especially when you are
+   generating a big SDK.)
+   Unless you have a very good reason not to, please choose the same folder name
+   to put you headers inside your source tree, and once your header is installed.
+   (here, the "bar" argument of qi_install_header matches the location of bar.h:
+   +bar/bar.h+)
  - A +sdk+ directory has been created, with +libbar+ in +skd/lib+
 
 
@@ -308,9 +310,9 @@ Conclusion
 
 This is what the final code looks like when you're done:
 
+*Main CMakeLists.txt*
 [source, cmake]
 ----
-# Main CMakeLists.txt
 cmake_minimum_required(VERSION 2.8)
 
 project(foobar)
@@ -320,31 +322,33 @@ include(qibuild.cmake)
 add_subdirectory(bar)
 
 add_subdirectory(foo)
+----
 
-# build/dependencies.cmake
+*build/dependencies.cmake*
+[source, cmake]
 set(CMAKE_MODULE_PATH "/home/dmerejkowsky/work/qi/qibuild/cmake")
 
-# bar:
+*bar/CMakeLists.txt*
+[source, cmake]
+----
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 qi_create_lib(bar
   SRC
     bar/bar.h
     bar/bar.cpp
-  SUBFOLDER
-    bar
 )
 
 qi_install_header(bar bar/bar.h)
 qi_stage_lib(bar)
-
-# foo:
-
-qi_create_bin(foo main.cpp)
-qi_use_lib(foo bar)
-
 ----
 
+*foo/CMakeLists.txt*
+[source, cmake]
+----
+qi_create_bin(foo main.cpp)
+qi_use_lib(foo bar)
+----
 
 Less code, so many features !
 
