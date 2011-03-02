@@ -32,9 +32,12 @@ PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py doc/qibuild-
 PYTHONPATH=python python doc/tools/generate_manpage_from_qibuild.py doc/qitoolchain-manpage.txt build-doc/qitoolchain-manpage.txt "qitoolchain.actions"
 
 find build-doc/ -type f -name '*.txt' | while read f ; do
+  if [ "$(basename ${f})" = "CMakeLists.txt" ] ; then
+    continue
+  fi
   #asciidoc is stupid about css...
   #we desactivated default theme, set the stylesheet to bare.css, and disable embedded css
-  echo "ASCIIDOC $f";
+  echo "asciidoc $f";
   asciidoc.py -a toc -a toclevels=1  -a linkcss -a 'theme=bare' -a stylesheet="bare.css" -a pygments "$f"
 done
 
