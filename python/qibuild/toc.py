@@ -98,7 +98,8 @@ class Toc(QiWorkTree):
             toolchain_name,
             build_config,
             cmake_flags,
-            cmake_generator):
+            cmake_generator,
+            path_hints=None):
         """
             work_tree      = a toc worktree
             build_type     = a build type, could be debug or release
@@ -107,7 +108,7 @@ class Toc(QiWorkTree):
             cmake_flags    = optional additional cmake flags
             cmake_generator = optional cmake generator (defaults to Unix Makefiles)
         """
-        QiWorkTree.__init__(self, work_tree)
+        QiWorkTree.__init__(self, work_tree, path_hints=path_hints)
         self.build_type        = build_type
         self.build_config      = build_config
         self.cmake_flags       = cmake_flags
@@ -424,6 +425,7 @@ def toc_open(work_tree, args, use_env=False):
     build_config   = args.build_config
     build_type     = args.build_type
     toolchain_name = args.toolchain_name
+    path_hints     = list()
     try:
         cmake_flags = args.cmake_flags
     except:
@@ -433,8 +435,19 @@ def toc_open(work_tree, args, use_env=False):
 
     if not work_tree:
         work_tree = qitools.qiworktree.guess_work_tree(use_env)
+    current_project = qitools.qiworktree.search_manifest_directory(os.getcwd())
     if not work_tree:
-        work_tree = qitools.qiworktree.search_manifest_directory(os.getcwd())
+        # Sometimes we you just want to create a fake worktree object because
+        # you just want to build one project (no dependencies at all, no configuration...)
+        # In this case, just searching for a manifest from the current working directory
+        # is enough
+        work_tree = current_project
+        LOGGER.debug("no work tree found using the project root: %s", work_tree)
+
+    if current_project:
+        #we add the current project as a hint, see the function doc
+        path_hints.append(current_project)
+
     if work_tree is None:
         raise TocException("Could not find a work tree, "
             "please try from a valid work tree, specify an "
@@ -445,7 +458,8 @@ def toc_open(work_tree, args, use_env=False):
                toolchain_name=toolchain_name,
                build_config=build_config,
                cmake_flags=cmake_flags,
-               cmake_generator=cmake_generator)
+               cmake_generator=cmake_generator,
+               path_hints=path_hints)
 
 
 def create(directory, args):

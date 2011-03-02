@@ -56,27 +56,42 @@ class QiWorkTree:
         - git projects
     """
 
-    def __init__(self, work_tree):
+    def __init__(self, work_tree, path_hints=None):
         self.work_tree          = work_tree
         self.configstore        = ConfigStore()
         self.buildable_projects = dict()
         self.git_projects       = dict()
         self.user_config_path   = os.path.join(self.work_tree, ".qi", "build.cfg")
 
-        self._load_projects()
+        if not path_hints:
+            path_hints = list()
+        if self.work_tree not in path_hints:
+            path_hints.append(self.work_tree)
+        self._load_projects(path_hints)
         self._load_configuration()
 
-    def _load_projects(self):
-        (git_p, src_p) = search_projects(self.work_tree)
-        for d in src_p:
-            # Get the name of the project from its directory:
-            project_name = project_name_from_directory(d)
-            if self.buildable_projects.get(project_name):
-                raise WorkTreeException("Conflict: two projects have the same name '%s': %s and %s"
-                                        % (project_name, self.buildable_projects.get(project_name), d))
-            self.buildable_projects[project_name] = d
-        for d in git_p:
-            self.git_projects[os.path.basename(d)] = d
+    def _load_projects(self, path_hints):
+
+        for p in path_hints:
+            (git_p, src_p) = search_projects(p)
+            for d in src_p:
+                # Get the name of the project from its directory:
+                project_name = project_name_from_directory(d)
+
+                #project already exist
+                if self.buildable_projects.get(project_name):
+                    if d != self.buildable_projects.get(project_name):
+                        raise WorkTreeException("Conflict: two projects have the same name '%s': %s and %s"
+                                                % (project_name, self.buildable_projects.get(project_name), d))
+                else:
+                    self.buildable_projects[project_name] = d
+            for d in git_p:
+                if self.git_projects.get(os.path.basename(d)):
+                    if d != self.git_projects.get(project_name):
+                        raise WorkTreeException("Conflict: two projects have the same name '%s': %s and %s"
+                                                % (project_name, self.buildable_projects.get(project_name), d))
+                else:
+                    self.git_projects[os.path.basename(d)] = d
 
     def _load_configuration(self):
         for name, ppath in self.buildable_projects.iteritems():
@@ -88,24 +103,36 @@ class QiWorkTree:
 def qiworktree_open(work_tree=None, use_env=False):
     """ open a qi worktree
         return a valid QiWorkTree instance
+
+        we use path_hints because, we guess_work_tree from the cwd. There is no recursion limit.
+        there could be 4 or more folder separating cwd from work_tree, if it is the case, the current
+        project will not be found because we only found project in the first 4 levels of folders
+        starting from work_tree.
     """
+    path_hints = list()
     if not work_tree:
         work_tree = guess_work_tree(use_env)
         LOGGER.debug("found a qi worktree: %s", work_tree)
+    current_project = search_manifest_directory(os.getcwd())
     if not work_tree:
         # Sometimes we you just want to create a fake worktree object because
         # you just want to build one project (no dependencies at all, no configuration...)
         # In this case, just searching for a manifest from the current working directory
         # is enough
-        work_tree = search_manifest_directory(os.getcwd())
+        work_tree = current_project
         LOGGER.debug("no work tree found using the project root: %s", work_tree)
+
+    if current_project:
+        #we add the current project as a hint, see the function doc
+        path_hints.append(current_project)
+
     if work_tree is None:
         raise WorkTreeException("Could not find a work tree\n "
             "Here is what you can do :\n"
             " - try from a valid work tree\n"
             " - specify an existing work tree with \"--work-tree PATH\"\n"
             " - create a new work tree with \"qibuild init\"")
-    return QiWorkTree(work_tree)
+    return QiWorkTree(work_tree, path_hints=path_hints)
 
 
 def search_manifest_directory(working_directory):
