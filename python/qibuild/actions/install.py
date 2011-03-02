@@ -10,12 +10,13 @@ import shutil
 LOGGER = logging.getLogger(__name__)
 
 def install_package(package_src, destdir, runtime=False):
-    """
+    """Install a package to a desdir.
 
     """
     if runtime:
-        raise NotImplementedError("run")
-        return
+        LOGGER.warning("Installing only runtime components of "
+            "packages is not supported yet.")
+        # FIXME!
     LOGGER.debug("Installing %s -> %s", package_src, destdir)
     qitools.sh.mkdir(destdir, recursive=True)
     for (root, dirs, files) in os.walk(package_src):
@@ -34,10 +35,12 @@ def configure_parser(parser):
     qibuild.parsers.project_parser(parser)
     qibuild.parsers.build_parser(parser)
     group = parser.add_argument_group("install arguments")
+    group.add_argument("--prefix", metavar="PREFIX",
+        help="value of CMAKE_INSTALL_PREFIX, defaults to '/'")
     group.add_argument("destdir", metavar="DESTDIR")
     group.add_argument("--runtime", action="store_true",
         help="install runtime componenents only")
-    parser.set_defaults(runtime=False)
+    parser.set_defaults(runtime=False, prefix="/")
 
 def do(args):
     """Main entry point"""
@@ -45,13 +48,39 @@ def do(args):
 
     (project_names, package_names, _) = qibuild.toc.resolve_deps(toc, args, runtime=args.runtime)
 
-    LOGGER.info("Installing %s to %s", ", ".join([n for n in project_names]), args.destdir)
+    # Why do we call cmake here?
+
+    # If CMAKE_INSTALL_PREFIX was never set by the user, it
+    # defaults to /usr/local.
+    # If the destdir given by the user is /tmp/foo/, files will be installed in
+    # /tmp/foo/usr/local.
+
+    # So, if we want packages to be installed to /tmp/usr/local too we need to
+    # know what was the value of CMAKE_INSTALL_PREFIX, and better be sure
+    # that it has the same value for every project.
+
+    # A simple way to do this is to re-call cmake on every dependency,
+    # without cleaning the cache (or else we would use user's previous
+    # settings)
+
+    # DESTDIR=/tmp/foo and CMAKE_PREFIX="/usr/local" means
+    # dest = /tmp/foo/usr/local
+    prefix = args.prefix[1:]
+    dest = os.path.join(args.destdir, prefix)
+    LOGGER.info("Setting CMAKE_INSTALL_PREFIX=%s on every project", args.prefix)
+    for project_name in project_names:
+        project = toc.get_project(project_name)
+        qibuild.cmake(project.directory, project.build_directory,
+            ['-DCMAKE_INSTALL_PREFIX=%s' % args.prefix],
+            clean_first=False)
+
+    LOGGER.info("Installing %s to %s", ", ".join([n for n in project_names]), dest)
     for project_name in project_names:
         project = toc.get_project(project_name)
         toc.install_project(project,  args.destdir, runtime=args.runtime)
 
+    LOGGER.info("Installing %s to %s", ", ".join([p for p in package_names]), dest)
     for package_name in package_names:
         package_src = toc.toolchain.get(package_name)
-        dest = os.path.join(args.destdir, args.prefix)
         install_package(package_src, dest, runtime=args.runtime)
 
