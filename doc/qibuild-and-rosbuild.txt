@@ -24,7 +24,7 @@ The +CMake+ frameworks have both a public and a private API.
 
 
 What is in qiBuild and not in rosbuild
------------------------------------------
+--------------------------------------
 
 * Automatic creation of installation rules.
 
@@ -44,7 +44,7 @@ CMake should run fine with qiBuild)
 CMake.
 
 What is in rosbuild and not in qiBuild
------------------------------------------
+--------------------------------------
 
 * Automatic installation of dependencies (via rosdep scripts calling
 apt-get install)
