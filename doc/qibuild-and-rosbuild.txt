@@ -43,13 +43,10 @@ CMake should run fine with qiBuild)
 (without the scripts), the redistributable packages can be used in pure
 CMake.
 
-* Loose coupling: qimessaging can be used without qiBuild, generation
-of code is not made inside qiBuild. ( *** TODO - this should no be here? *** )
-
 What is in rosbuild and not in qiBuild
 -----------------------------------------
 
-* Automatic installation of dependencies (via scripts calling
+* Automatic installation of dependencies (via rosdep scripts calling
 apt-get install)
 
 * Parallel build of dependencies
@@ -93,7 +90,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake)
 User has to copy/paste a qibuild.cmake files everywhere,
 but this file can update itself.
 
-Need +qibuild init+ to have be run once if using dependencies.
++qibuild init+ have be run once if using source dependencies.
 
 
 Code generation
@@ -294,7 +291,7 @@ When +qibuild+ is run from a source dir where there is a +manifest.xml+, it will
 
 * create the qibuild.manifest file
 
-* set ROS_ROOT to something like +qibuild/cmake/qibuild/compat/ros/rosbuild/rosbuild.cmake+
+* set ROS_ROOT to something like +qibuild/cmake/qibuild/compat/+
 
 
 The rosbuild.cmake files then calls something like
