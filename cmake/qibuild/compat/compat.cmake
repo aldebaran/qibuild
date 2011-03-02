@@ -5,12 +5,6 @@
 # flags have changed:
 
 
-# TODO:
-# - subfolder in install_ functions
-# - ALL, REQUIRED, LINUX, in use_lib() <- filter this
-#
-
-
 # Example:
 # After calling:
 #      _fix_flags(_res DEPENDS DEPENDENCIES
@@ -163,7 +157,24 @@ function(create_cmake _NAME)
   qi_stage_cmake(${_NAME})
 endfunction()
 
-function(use)
+function(use module)
+  # Some modules are now in qibuild/cmake, so
+  # there is no need to find them anymore.
+  set(_known_modules
+    "PYTHON-TOOLS"
+  )
+
+  list(FIND _known_modules ${module} _index)
+
+  if(NOT ${_index} EQUAL -1)
+    qi_deprecated("use(${module}) is deprecated.
+    This code has been put in qibuild/cmake.
+    You can safely remove the call to this line now
+    ")
+    return()
+  endif()
+
+
   qi_deprecated("use() is deprecated
    Simply use find_package() instead.
   Old:
@@ -173,7 +184,7 @@ function(use)
     qi_stage_cmake(foo)
     find_package(foo)
   ")
-  find_package(${ARGN} QUIET)
+  find_package(${module} REQUIRED)
 endfunction()
 
 function(use_lib)
