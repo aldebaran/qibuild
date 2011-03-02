@@ -186,11 +186,31 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
                 parser.parse_args([action, "--help"])
         sys.exit(0)
 
-    args = parser.parse_args(args)
-    qitools.log.configure_logging(args)
-    module = action_modules[args.action]
-    _dump_arguments(name, args)
-    main_wrapper(module, args)
+    #we use a fake parser to know if arguments are good
+    #if they are not we return silently
+    global _cmdparse_no_action
+    if return_if_no_action:
+        def fake_error(b):
+            global _cmdparse_no_action
+            if "invalid choice" in b and "argument action" in b:
+                _cmdparse_no_action = True
+
+        parser_fake         = parser
+        parser_fake.error   = fake_error
+        _cmdparse_no_action = False
+
+        try:
+            (ns, remaining) = parser_fake.parse_known_args(args)
+        except:
+            if _cmdparse_no_action == True:
+                return False
+
+
+    pargs = parser.parse_args(args)
+    qitools.log.configure_logging(pargs)
+    module = action_modules[pargs.action]
+    _dump_arguments(name, pargs)
+    main_wrapper(module, pargs)
     return True
 
 def sub_command_main(module, args=None, namespace=None):
