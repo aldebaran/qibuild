@@ -171,8 +171,8 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
         action_modules[name] = module
 
     (help_requested, action) = parse_args_for_help(args)
-    if not action and return_if_no_action:
-        return False
+    # if not action and return_if_no_action:
+    #     return False
     if help_requested:
         if not action:
             parser.print_help()
