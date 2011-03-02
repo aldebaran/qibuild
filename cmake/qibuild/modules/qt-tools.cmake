@@ -1,3 +1,20 @@
+
+####
+#
+# This is just an re-write for FindQt4 methods.
+# We search programs moc and uic, then we use the
+# rest of the upstream's Qt4.cmake file
+
+
+find_program(QT_MOC_EXECUTABLE moc)
+find_program(QT_UIC_EXECUTABLE uic)
+
+if(QT_MOC_EXECUTABLE)
+  debug("QT_MOC_EXECUTABLE: ${QT_MOC_EXECUTABLE}")
+else()
+  message(FATAL_ERROR "QT_MOC not found!")
+endif()
+
 #####
 # this is directy taken from Qt4.cmake upstream file
 #
