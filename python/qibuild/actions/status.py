@@ -56,7 +56,7 @@ def do(args):
 
     for pname, ppath in qiwt.buildable_projects.iteritems():
         pad = "".join([ " " for x in range(max_len - len(pname)) ])
-        LOGGER.info("%s in %s", pname, os.path.relpath(ppath, qiwt.work_tree))
+        LOGGER.info("%s", os.path.relpath(ppath, qiwt.work_tree))
         #print "%s%s [%s]" %(pname, pad, os.path.relpath(ppath, qiwt.work_tree))
         list_build_dir(ppath)
 
