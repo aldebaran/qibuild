@@ -77,18 +77,19 @@ class QiWorkTree:
             for d in src_p:
                 # Get the name of the project from its directory:
                 project_name = project_name_from_directory(d)
-
+                pdir = self.buildable_projects.get(project_name)
                 #project already exist
-                if self.buildable_projects.get(project_name):
-                    if d != self.buildable_projects.get(project_name):
+                if pdir:
+                    if d != pdir:
                         raise WorkTreeException("Conflict: two projects have the same name '%s': %s and %s"
-                                                % (project_name, self.buildable_projects.get(project_name), d))
+                                                % (project_name, pdir, d))
                 else:
                     self.buildable_projects[project_name] = d
             for d in git_p:
+
                 if self.git_projects.get(os.path.basename(d)):
-                    if d != self.git_projects.get(project_name):
-                        raise WorkTreeException("Conflict: two projects have the same name '%s': %s and %s"
+                    if d != self.git_projects.get(os.path.basename(d)):
+                        raise WorkTreeException("Conflict: two git projects have the same name '%s': %s and %s"
                                                 % (project_name, self.buildable_projects.get(project_name), d))
                 else:
                     self.git_projects[os.path.basename(d)] = d
