@@ -12,6 +12,7 @@
 # sys.path
 
 import sys
+import os
 
 try:
     import argparse
@@ -23,6 +24,15 @@ import qitools.cmdparse
 def main():
     parser = argparse.ArgumentParser()
     modules = qitools.cmdparse.action_modules_from_package("qibuild.actions")
+
+    # no arguments...
+    if len(sys.argv) == 1:
+        # and we are in a qibuild project
+        if qitools.qiworktree.search_manifest_directory(os.getcwd()):
+            qitools.cmdparse.root_command_main("qibuild", argparse.ArgumentParser(), modules, args=[ "configure" ])
+            qitools.cmdparse.root_command_main("qibuild", argparse.ArgumentParser(), modules, args=[ "make" ])
+            return
+
     if not qitools.cmdparse.root_command_main("qibuild", parser, modules, return_if_no_action=True):
         argsc = [ "configure" ]
         argsc.extend(sys.argv[1:])
