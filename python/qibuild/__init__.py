@@ -100,12 +100,13 @@ def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD"):
 
     qitools.command.check_call(cmd)
 
-def cmake(source_dir, build_dir, cmake_args):
-    """
-    Call cmake with from a build dir for a source dir.
+def cmake(source_dir, build_dir, cmake_args, clean_first=True):
+    """Call cmake with from a build dir for a source dir.
     cmake_args are added on the command line.
 
-    The cache is always cleaned.
+    If clean_first is True, we will remove cmake-generated files.
+    Useful when dependencies have changed.
+
     """
     if not os.path.exists(source_dir):
         raise Exception("source dir: %s does not exist, aborting")
@@ -113,9 +114,10 @@ def cmake(source_dir, build_dir, cmake_args):
     # Always remove CMakeCache and sdk/lib/cmake
     # (CMake does not always do the right thing when .cmake
     # files change)
-    cache = os.path.join(build_dir, "CMakeCache.txt")
-    qitools.sh.rm(cache)
-    qitools.sh.rm(os.path.join(build_dir, "sdk", "lib", "cmake"))
+    if clean_first:
+        cache = os.path.join(build_dir, "CMakeCache.txt")
+        qitools.sh.rm(cache)
+        qitools.sh.rm(os.path.join(build_dir, "sdk", "lib", "cmake"))
 
     # Check that no one has made an in-source build
     in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
