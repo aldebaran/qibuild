@@ -5,15 +5,15 @@ qiBuild and rosbuild
 Introduction
 ------------
 
-This tutorial is targeted towards +rosbuild+ users wanted to know
+This tutorial is targeted towards +rosbuild+ users wanting to know
 more about +qiBuild+
 
 General comparison
 ------------------
 
-First, +qiBuild+ and +rosbuild+ have a lot of common.
+First, +qiBuild+ and +rosbuild+ have much in common.
 
-They are both based on +CMake+, and provide both a set of tools
+They are both based on +CMake+, and provide a set of tools
 written in Python to manage multiple projects, and dependencies between
 projects.
 
@@ -23,46 +23,46 @@ The +CMake+ frameworks have both a public and a private API.
 +qiBuild+ is still a work in progress :)
 
 
-What's inside qiBuild and not in rosbuild
+What is in qiBuild and not in rosbuild
 -----------------------------------------
 
 * Automatic creation of installation rules.
 
 * Ability to create redistributable, pre-compiled packages.
-(ROS support generation of .deb packages, though)
+(ROS supports generation of .deb packages, though)
 
-* Strong cross-platform support. Support both UNIX makefiles and
-Visual Studio supports. (Basically everything that is supported by
+* Strong cross-platform support. Supports both UNIX makefiles and
+Visual Studio projects. (Basically everything that is supported by
 CMake should run fine with qiBuild)
 
 * Easy cross-compilation
 
-* Handling of multiple build configuration with the same source directories.
+* Handling of multiple build configurations with the same source directories.
 
 * A bit less monolithic: the CMake framework can be used alone,
 (without the scripts), the redistributable packages can be used in pure
 CMake.
 
 * Loose coupling: qimessaging can be used without qiBuild, generation
-of code is not made inside qiBuild.
+of code is not made inside qiBuild. ( *** TODO - this should no be here? *** )
 
-What's inside rosbuild and not in qiBuild
+What is in rosbuild and not in qiBuild
 -----------------------------------------
 
 * Automatic installation of dependencies (via scripts calling
 apt-get install)
 
-* Parallel building of dependencies
+* Parallel build of dependencies
 
 * Nice shell features: nice output, auto-completion, +roscd+, etc...
 
-* Tied coupling between rosmake (the build system), roslib (the library
+* Tight coupling between +rosmake+ (the build system), +roslib+ (the library
 for communication), and generation of messages
 
 * Nice Python support : automatic handling of $PYTHONPATH variable,
 +rospython+, ....
 
-* Nice documentation support
+* Nice documentation
 
 
 
@@ -90,10 +90,10 @@ Need a few environment variables to be set.
 include(${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake)
 
 ----
-User has to copy/paste a qibuild.cmake file everywhere,
+User has to copy/paste a qibuild.cmake files everywhere,
 but this file can update itself.
 
-Need +qibuild init+ to have be ran once if using dependencies.
+Need +qibuild init+ to have be run once if using dependencies.
 
 
 Code generation
@@ -111,7 +111,7 @@ rosbuild_gensrv()
 
 N/A : loose coupling between the messaging library
 and the build framework.
-Will be implemented in qibuild/cmake ?
+Could be implemented in qibuild/cmake ?
 
 
 Output paths
@@ -131,8 +131,7 @@ Output path is inside source dir.
 
 *qibuild*
 
-N/A : automatically set, user by default always end
-up with the same SDK layout.
+N/A : automatically set. Default SDK layout.
 
 Output path is inside build dir, in a directory named
 sdk/ (temporary build results are NOT in build/sdk)
@@ -153,7 +152,7 @@ rosbuild_add_executable()
 
 [source, cmake]
 ----
-qi_create_lib()
+qi_create_bin()
 
 ----
 
@@ -183,25 +182,23 @@ Management of dependencies
 
 *rosbuild*
 
-
-* Look for dependencies using rosdep and +manifest.xml+
-
+* Looks for dependencies using rosdep and +manifest.xml+
 
 * Try to +apt-get+ them when relevant
 
 * Run +make+ inside the source dirs of the
 "buildable" dependencies.
 
-* +make' run cmake which launches +rospack+ to get the
+* +make+ runs cmake which launches +rospack+ to get the
 compile flags and include dirs.
 
 *qibuild*
 
-* Look for dependencies using +qibuild+ and +qibuild.manifest+
+* Looks for dependencies using +qibuild+ and +qibuild.manifest+
 
-* Never tries to install anything, but use library from the system when found.
+* Never tries to install anything, but uses libraries from the system when found.
 
-* Run +cmake+ inside the source dirs of the buildable dependencies,
+* Runs +cmake+ inside the source dirs of the buildable dependencies,
 during +qibuild configure+, then +cmake --build+ inside the
 build directories of the buildable dependencies, during +qibuild make+
 
@@ -211,13 +208,12 @@ Interface with other build systems
 
 *rosbuild*
 
-
 * +rospack+ : command line tool, may be used by any build system
 
 *qibuild*
 
-* generate and install standard +CMake+ files, usable by any +CMake+ based
-project. (implementing a +rospack+ like functionality would not be hard,
+* generates and installs standard +CMake+ files, usable by any +CMake+ based
+projects. (implementing a +rospack+ like functionality would not be hard,
 though)
 
 Boost dependency
@@ -239,7 +235,7 @@ rosbuild_link_boost(${PROJECT_NAME} thread)
 qi_use_lib(myproject BOOST_THREAD)
 ----
 
-Easy do-able for other third-party libraries
+Easily do-able for other third-party libraries
 
 
 Swig
@@ -272,7 +268,7 @@ qi_swig_wrap_python(_foo foo.i
 
 
 
-Making the too play nice together
+Making the two play nice together
 ---------------------------------
 
 
@@ -280,11 +276,11 @@ Why?
 ~~~~
 
 
-Nao's user would be glad to be able to use the great Ros framework
+Nao's users would be glad to be able to use the great Ros framework
 with their robot.
 
-Using qibuild strong cross-platform support would be great for ros !
-Ros can be compatible with Visual Studio with small effort afterwards
+Using +qibuild+'s strong cross-platform support would be great for ros !
+Ros could become compatible with Visual Studio with reduced effort.
 
 
 
@@ -294,7 +290,7 @@ How?
 
 One way we could do it:
 
-When +qibuild+ is ran from a source dir where there is a +manifest.xml+, it will
+When +qibuild+ is run from a source dir where there is a +manifest.xml+, it will
 
 * create the qibuild.manifest file
 
@@ -333,6 +329,6 @@ endfunction()
 
 
 
-This can be a nice first step to see how things go from there
+This could be a nice first step to see how things go from there
 
 
