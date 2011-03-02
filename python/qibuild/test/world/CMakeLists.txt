@@ -12,3 +12,8 @@ qi_create_lib(world SHARED
 qi_install_header(world world/world.h)
 
 qi_stage_lib(world)
+
+qi_stage_cmake(foo)
+
+find_package(foo REQUIRED)
+foo()

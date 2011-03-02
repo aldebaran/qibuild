@@ -12,3 +12,6 @@ enable_testing()
 # Add a test that just runs hello without arguments
 qi_add_test(zero_test hello)
 
+# Use the foo file staged by world:
+find_package(foo REQUIRED)
+foo()
