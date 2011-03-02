@@ -46,5 +46,11 @@ function(qi_stage_cmake _module)
   file(COPY "${_module}Config.cmake"
        DESTINATION
        "${CMAKE_BINARY_DIR}/sdk/${QI_SDK_CMAKE_MODULES}/")
- #TODO: install
+
+  get_filename_component(_name ${CMAKE_CURRENT_SOURCE_DIR}/${_module} NAME)
+
+  install(FILES "${_module}Config.cmake"
+      DESTINATION
+      "${QI_SDK_CMAKE}/${_name}/"
+  )
 endfunction()
