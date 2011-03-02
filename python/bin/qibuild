@@ -11,6 +11,8 @@
 
 # sys.path
 
+import sys
+
 try:
     import argparse
 except ImportError:
@@ -21,7 +23,14 @@ import qitools.cmdparse
 def main():
     parser = argparse.ArgumentParser()
     modules = qitools.cmdparse.action_modules_from_package("qibuild.actions")
-    qitools.cmdparse.root_command_main("qibuild", parser, modules)
+    if not qitools.cmdparse.root_command_main("qibuild", parser, modules, return_if_no_action=True):
+        argsc = [ "configure" ]
+        argsc.extend(sys.argv[1:])
+        qitools.cmdparse.root_command_main("qibuild", argparse.ArgumentParser(), modules, args=argsc)
+
+        argsm = [ "make" ]
+        argsm.extend(sys.argv[1:])
+        qitools.cmdparse.root_command_main("qibuild", argparse.ArgumentParser(), modules, args=argsm)
 
 if __name__ == "__main__":
     main()
