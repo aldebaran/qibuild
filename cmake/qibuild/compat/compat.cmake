@@ -174,6 +174,12 @@ function(use module)
     return()
   endif()
 
+  # Small hack for QT-TOOLS
+  if(${module} STREQUAL "QT-TOOLS")
+    include(qibuild/modules/qt-tools)
+    return()
+  endif()
+
 
   qi_deprecated("use() is deprecated
    Simply use find_package() instead.
