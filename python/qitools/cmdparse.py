@@ -142,12 +142,14 @@ def _dump_arguments(name, args):
     logger = logging.getLogger("qitools.cmdparse")
     logger.debug("[%s] arguments:\n%s", name, output)
 
-def root_command_main(name, parser, modules, return_if_no_action=False):
+def root_command_main(name, parser, modules, args=None, return_if_no_action=False):
     """name : name of the main program
        parser : an instance of ArgumentParser class
        modules : list of Python modules
 
     """
+    if not args:
+        args = sys.argv[1:]
     subparsers = parser.add_subparsers(
         dest="action",
         title="actions")
@@ -168,7 +170,7 @@ def root_command_main(name, parser, modules, return_if_no_action=False):
         configurator(action_parser)
         action_modules[name] = module
 
-    (help_requested, action) = parse_args_for_help(sys.argv)
+    (help_requested, action) = parse_args_for_help(args)
     if not action and return_if_no_action:
         return False
     if help_requested:
@@ -184,7 +186,7 @@ def root_command_main(name, parser, modules, return_if_no_action=False):
                 parser.parse_args([action, "--help"])
         sys.exit(0)
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     qitools.log.configure_logging(args)
     module = action_modules[args.action]
     _dump_arguments(name, args)
