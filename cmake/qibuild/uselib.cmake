@@ -31,10 +31,7 @@ function(_qi_use_lib_get_deps _OUT_list)
     # for upstream Find-*.cmake
     # See: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:find_package
     if (NOT ${_U_PKG}_SEARCHED)
-      find_package(${_pkg} NO_MODULE)
-      if (NOT ${${_pkg}_FOUND})
-        find_package(${_pkg} REQUIRED)
-      endif()
+      find_package(${_pkg} REQUIRED)
       qi_set_global("${_U_PKG}_SEARCHED" TRUE)
     endif()
 
