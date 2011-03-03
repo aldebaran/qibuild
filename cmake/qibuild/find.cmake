@@ -28,8 +28,6 @@ include(FindPackageHandleStandardArgs)
 # \flag: EXECUTABLE : just an executable was searched,
 #                      only ${prefix}_EXECUTABLE will be set.
 function(_qi_call_fphsa prefix)
-  set(${prefix}_FIND_REQUIRED TRUE)
-  set(${prefix}_FIND_QUIETLY TRUE)
   cmake_parse_arguments(ARG "HEADER;EXECUTABLE" "" "" ${ARGN})
 
   set(_to_check)
