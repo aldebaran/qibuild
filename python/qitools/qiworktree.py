@@ -81,16 +81,39 @@ class QiWorkTree:
                 #project already exist
                 if pdir:
                     if d != pdir:
-                        raise WorkTreeException("Conflict: two projects have the same name '%s': %s and %s"
-                                                % (project_name, pdir, d))
+                        mess  = "Name conflict: those two projects:\n"
+                        mess += "\t\t%s\n\t\tand\n\t\t%s\n" % (d, pdir)
+                        mess += "have the same name. (%s)\n" % project_name
+                        mess += "Please change the name in the qibuild.manifest, "
+                        mess += "or move one of them outside you worktree."
+                        raise WorkTreeException(mess)
                 else:
                     self.buildable_projects[project_name] = d
+# FIXME:
+# If you have something like
+# | worktree
+#   |__ .qi
+#   |__ bar
+#       |__ .git
+#   |__foo
+#      |__ bar
+#          |__ .git
+# the load with fail because we store paths to git projects
+# using the basename of the directory.
+# An easy way to prevent this from happenning would be
+# to use relative paths to the worktree as keys.
+# But, the behavior of qisrc would be too much different
+# from the one of qibuild, so maybe this is not such
+# a good idea...
             for d in git_p:
-
-                if self.git_projects.get(os.path.basename(d)):
-                    if d != self.git_projects.get(os.path.basename(d)):
-                        raise WorkTreeException("Conflict: two git projects have the same name '%s': %s and %s"
-                                                % (project_name, self.buildable_projects.get(project_name), d))
+                conflicting_path = self.git_projects.get(os.path.basename(d))
+                if conflicting_path:
+                    if d != conflicting_path:
+                        mess  = "Name conflict: these git source trees:\n"
+                        mess += "\t\t%s\n\t\tand\n\t\t%s\n" % (d, conflicting_path)
+                        mess += "have the same basename.\n"
+                        mess += "Please rename one of them, or move one of then outside your worktree"
+                        raise WorkTreeException(mess)
                 else:
                     self.git_projects[os.path.basename(d)] = d
 
