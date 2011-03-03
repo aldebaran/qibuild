@@ -55,4 +55,4 @@ foreach(_lib ${_libs})
   endif()
 endforeach()
 
-file(COPY ${_in_dlls} DESTINATION ${CMAKE_BINARY_DIR}/sdk/${BUILD_TYPE})
+file(COPY ${_in_dlls} DESTINATION ${QI_SDK_DIR}/${QI_SDK_LIB}/${BUILD_TYPE})
