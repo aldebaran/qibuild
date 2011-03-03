@@ -100,16 +100,21 @@ def extract(archive_path, directory):
         return extract_tar(archive_path, directory)
 
 def zip_win(directory):
-    """
-    Call 7zip.exe on a directory
+    """Compress the directory in a .zip file
 
     """
     archive_name = directory + ".zip"
     # Convert to DOS path just to be sure:
-    directory    = os.path.normpath(directory)
-    archive_name = os.path.normpath(archive_name)
-    cmd = ["7z", "a", archive_name, directory]
-    qitools.command.check_call(cmd)
+    directory    = qitools.sh.to_native_path(directory)
+    archive_name = qitools.sh.to_native_path(archive_name)
+    archive = zipfile.ZipFile(archive_name, "w")
+    for (root, directories, filenames) in os.walk(directory):
+        for filename in filenames:
+            full_path = os.path.join(root, filename)
+            rel_path = os.path.relpath(full_path, directory)
+            arcname  = os.path.join(os.path.basename(directory), rel_path)
+            archive.write(full_path, arcname)
+    archive.close()
     return archive_name
 
 
