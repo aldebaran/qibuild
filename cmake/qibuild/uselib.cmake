@@ -63,6 +63,7 @@ endfunction()
 # \arg:name The target to add dependencies to
 # \group:DEPENDENCIES The list of dependencies
 function(qi_use_lib name)
+  _qi_check_is_target("${name}")
   cmake_parse_arguments(ARG "" "PLATEFORM" "DEPENDS" ${ARGN})
 
   set(ARG_DEPENDS ${ARG_UNPARSED_ARGUMENTS} ${ARG_DEPENDS})

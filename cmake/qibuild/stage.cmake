@@ -21,7 +21,7 @@ include(qibuild/internal/stage)
 # \group:DEFINITIONS list of compilation flags targets depending
 #                 of this library should use.
 function(qi_stage_lib target)
-  check_is_target("${target}")
+  _qi_check_is_target("${target}")
   _qi_stage_lib(${target} ${ARGN})
 endfunction()
 
