@@ -20,6 +20,29 @@ set(_QI_LIBFIND_CMAKE_ TRUE)
 
 
 include(CMakeParseArguments)
+include(FindPackageHandleStandardArgs)
+
+# Helper function to call FPHSA
+# \flag: HEADER : just a header was searched,
+#                      only ${prefix}_INCLUDE_DIRS will be set.
+# \flag: EXECUTABLE : just an executable was searched,
+#                      only ${prefix}_EXECUTABLE will be set.
+function(_qi_call_fphsa prefix)
+  set(${prefix}_FIND_REQUIRED TRUE)
+  set(${prefix}_FIND_QUIETLY TRUE)
+  cmake_parse_arguments(ARG "HEADER;EXECUTABLE" "" "" ${ARGN})
+
+  set(_to_check)
+  if(ARG_HEADER)
+    set(_to_check ${prefix}_INCLUDE_DIR)
+  elseif(ARG_EXECUTABLE)
+    set(_to_check ${prefix}_EXECUTABLE)
+  else()
+    set(_to_check ${prefix}_LIBRARIES ${prefix}_INCLUDE_DIR)
+  endif()
+  find_package_handle_standard_args(${prefix} DEFAULT_MSG ${_to_check})
+endfunction()
+
 
 ####################################################################
 #
@@ -129,27 +152,8 @@ function(export_lib prefix)
   qi_verbose("  libraries  : ${${prefix}_LIBRARIES}" )
   qi_verbose("  definitions: ${${prefix}_DEFINITIONS}" )
 
-  mark_as_advanced(${prefix}_DIR)
-  #mark as already searched
-  set(${prefix}_SEARCHED TRUE CACHE INTERNAL "" FORCE)
-
-  if(${prefix}_INCLUDE_DIR AND ${prefix}_LIBRARIES)
-    set(${prefix}_FOUND TRUE CACHE INTERNAL "" FORCE)
-  endif()
-
-  if(NOT ${prefix}_FOUND AND ${prefix}_FIND_REQUIRED)
-    if(NOT ${prefix}_INCLUDE_DIR )
-      message( STATUS "Required include not found : ${prefix}_INCLUDE_DIR")
-      message( FATAL_ERROR "Could not find ${prefix} include!")
-    endif()
-    if(NOT ${prefix}_LIBRARIES )
-      message( STATUS "Required libraries not found : ${prefix}_LIBRARIES")
-      message( FATAL_ERROR "Could not find ${prefix} libraries!")
-    endif()
-  endif()
+  _qi_call_fphsa(${prefix})
 endfunction()
-
-
 
 
 
@@ -164,18 +168,7 @@ function(export_bin prefix)
   qi_verbose("  executable  : ${${prefix}_EXECUTABLE}" )
   qi_verbose("  executable_d: ${${prefix}_EXECUTABLE_DEBUG}" )
 
-  mark_as_advanced(${prefix}_DIR)
-  #mark as already searched
-  set(${prefix}_SEARCHED TRUE CACHE INTERNAL "" FORCE)
-
-  if(${prefix}_EXECUTABLE)
-    set(${prefix}_FOUND TRUE CACHE INTERNAL "" FORCE)
-  endif()
-
-  if(NOT ${prefix}_FOUND AND ${prefix}_FIND_REQUIRED)
-    qi_info( STATUS "Required executable not found : ${prefix}_EXECUTABLE")
-    qi_info( FATAL_ERROR "Could not find ${prefix} executable!")
-  endif()
+  _qi_call_fphsa(${prefix} EXECUTABLE)
 endfunction()
 
 ####################################################################
@@ -184,22 +177,6 @@ endfunction()
 #
 ####################################################################
 function(export_header prefix)
-  # Finally, display informations if not in quiet mode
-  qi_verbose("header ${prefix}:" )
-  qi_verbose("  includes   : ${${prefix}_INCLUDE_DIR}" )
-  qi_verbose("  definitions: ${${prefix}_DEFINITIONS}" )
-
-  mark_as_advanced(${prefix}_DIR)
-  #mark as already searched
-  set(${prefix}_SEARCHED TRUE CACHE INTERNAL "" FORCE)
-
-  if(${prefix}_INCLUDE_DIR)
-    set(${prefix}_FOUND TRUE CACHE INTERNAL "" FORCE)
-  endif()
-
-  if(NOT ${prefix}_FOUND AND ${prefix}_FIND_REQUIRED)
-    qi_info( STATUS "Required include not found : ${prefix}_INCLUDE_DIR")
-    qi_info( FATAL_ERROR "Could not find ${prefix} include!")
-  endif()
+  _qi_call_fphsa(${prefix} HEADER)
 endfunction()
 
