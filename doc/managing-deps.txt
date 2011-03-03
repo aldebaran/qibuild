@@ -13,7 +13,7 @@ and that you've managed to compile a basic project.
 Overview
 --------
 
-We are going to create two separate projects: +hello+ and +world+, where +hello+ 
+We are going to create two separate projects: +hello+ and +world+, where +hello+
 depends on the compiled library found in +world+.
 
 The +world+ project contains sources to build a dynamic library
@@ -80,113 +80,13 @@ qibuild make --release world
 
 And try again.
 
-So, how did it work?
 
 
-Magic explained
----------------
-
-
-Dependencies
-~~~~~~~~~~~~
-
-If you have a look at +hello/qibuild.manifest+, you will see the following lines:
-
-[source, ini]
-----
-[project "hello"]
-depends = world
-----
-
-Each time you run +qibuild+, it looks for a .qi to guess your current worktree.
-
-After this, the worktree is parsed to find +qibuild.manifest+ files.
-
-Here, there were two +qibuild.manifest+ files, so qiBuild found the two projects: +hello+ and +world+.
-
-
-CMake magic: staging the world library
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The relevant lines of the CMakeLists.txt are:
-
-In world/CMakeLists:
-[source, cmake]
-----
-qi_create_lib(world SRC world/world.h world/world.cpp)
-qi_stage_lib(world)
-----
-
-In hello/CMakeLists.txt:
-[source, cmake]
-----
-qi_create_bin(hello "main.cpp")
-qi_use_lib(hello world)
-----
-
-NOTE: For those already familiar with CMake:
-
-      * We used +qi_create_lib+ and +qi_create_bin+ instead of
-      +add_exeuctable+ and +add_library+
-      * We never had to call +find_package+ or +include_directories+,
-      or +target_link_libraries+.
-
-qiBuild always generates binaries and libraries in the SDK directory, this way,
-the build/sdk contains only the results of the compilation that are necessary
-to be used by other projects.
-
-Also, the executables will be created in build/sdk/bin, and the libraries in build/sdk/lib,
-so that we stick to the FHS convention inside the build/sdk directory.
-
-On Windows, the binaries compiled in debug contain +_d+ in their names,
-so you can share the same build directory, and the same visual studio solution for several
-build configurations, without the risk of a mix of binaries compiled in release and binaires compiled in
-debug.
-
-The call to qi_stage_lib caused a world-config.cmake to be generated in
-world/build/sdk/cmake/
-
-When using qibuild configure hello, a dependencies.cmake files was generated
-in hello/build/dependencies.cmake
-
-(this file is automatically included by the qibuild.cmake file)
-
-This file contains the call to:
-[source, cmake]
-----
-list(APPEND CMAKE_PREFIX_PATH "QI_WORK_TREE/world/build/sdk")
-----
-
-So when qi_use_lib(hello, world) was called, we only had to run:
-
-[source, cmake]
-----
-find_package(world)
-----
-
-
-Since the variable CMAKE_PREFIX_PATH was correctly set, CMake could find
-the world-config.cmake file in the build dir of world.
-
-Since everything under build/sdk follows the same conventions, finding the library in
-sdk/lib was easy.
 
 
 Windows DLLs magic
 ~~~~~~~~~~~~~~~~~~
 
-Since CMake knows about the dependencies of the hello project, it is easy to
-parse the list of hello dependencies, look for which of them are
-dynamic libraries, and copy them next to the executable in a "post build"
-command.
-
-This is achived by running the cmake script post-copy-dlls.cmake that
-was also generated in the build dir of the hello build directory with
-correct arguements.
-
-(It is similar to the way CMake creates install rules: you
-just have to call a cmake script with proper arguments to install
-the files)
 
 
 

@@ -89,3 +89,4 @@ Read this if you want to contribute to qiBuild
 * link:python-coding-guide.html[Python coding guide]
 * link:architecture.html[qiBuild architecture]
 * link:qibuild-and-rosbuild.html[qiBuild and rosbuild]
+* link:qibuild-cmake-under-the-hood.html[qiBuild CMake framework, under the hood]
