@@ -166,7 +166,9 @@ def search_manifest_directory(working_directory):
 
     #for each cwd parent folders, try to see if it match src
     while dirname or cwd:
-        if (os.path.exists(os.path.join(cwd, "qibuild.manifest"))):
+        if os.path.exists(os.path.join(cwd, "qibuild.manifest")):
+            return cwd
+        if os.path.exists(os.path.join(cwd, "manifest.xml")):
             return cwd
         (new_cwd, dirname) = os.path.split(cwd)
         if new_cwd == cwd:
@@ -190,6 +192,9 @@ def search_projects(directory=None, depth=3):
         rgit.append(directory)
 
     if os.path.exists(os.path.join(directory, "qibuild.manifest")):
+        rsrc.append(directory)
+
+    if os.path.exists(os.path.join(directory, "manifest.xml")):
         rsrc.append(directory)
 
     subdirs = list()
@@ -233,8 +238,12 @@ def project_name_from_directory(project_dir):
         [project foo]
         ...
 
-    If such a section can not be found, raise an exception
+    If such a section can not be found, simply return
+    the base name of the directory
     """
+    manifest = os.path.join(project_dir, "qibuild.manifest")
+    if not os.path.exists(manifest):
+        return os.path.basename(project_dir)
     config = qitools.configstore.ConfigStore()
     conf_file = os.path.join(project_dir, "qibuild.manifest")
     config.read(conf_file)
