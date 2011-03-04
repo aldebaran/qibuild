@@ -18,6 +18,7 @@ For instance, after
 import os
 import sys
 import logging
+import copy
 
 try:
     import argparse
@@ -195,7 +196,7 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
             if "invalid choice" in b and "argument action" in b:
                 _cmdparse_no_action = True
 
-        parser_fake         = parser
+        parser_fake         = copy.copy(parser)
         parser_fake.error   = fake_error
         _cmdparse_no_action = False
 
