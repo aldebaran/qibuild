@@ -7,8 +7,6 @@ Support is planned for:
   - previous versions of Aldebaran's projects
     (using a bootstrap.cmake and a toolchain file)
 
-  - ros stacks
-
 """
 
 #NOTE: none of this code here should need a QiWorkTree
@@ -75,9 +73,6 @@ def guess_type(source_dir):
     bootstrap = os.path.join(source_dir, "bootstrap.cmake")
     if os.path.exists(bootstrap):
         return "bootstrap"
-    manifest = os.path.join(source_dir, "manifest.xml")
-    if os.path.exists(manifest):
-        return "ros"
     cmake = os.path.join(source_dir, "CMakeLists.txt")
     if os.path.exists(cmake):
         return "cmake"
@@ -127,44 +122,6 @@ def _name_from_base_cfg(base_cfg):
             return name
 
     return None
-
-
-def convert_ros(source_dir):
-    """ Create a qibuild.manifest using the manifest.xml.
-
-    """
-    manifest = os.path.join(source_dir, "manifest.xml")
-    copy_qibuild(source_dir)
-    name = _name_from_manifest(manifest)
-    create_qibuild_manifest(source_dir, project_name=name)
-
-    # FIXME: do something with deps.
-    # Build deps using qibuild so that layout is OK?
-    # Simply use rospack to generate the *-config.cmake?
-
-    # This piece of code is hard to fix while keeping
-    # the cmakelists compatible both with ros and qibuild...
-    #  include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
-
-    # (modifiying the $ROS_ROOT environment variable seems risky)
-
-
-def _name_from_manifest(manifest):
-    """ Get the name of the project from a manifest.xml
-    file
-
-    """
-    from xml.etree.ElementTree   import ElementTree
-    tree = ElementTree()
-    tree.parse(manifest)
-    desc  = tree.find("description")
-    if desc is None:
-        return None
-    brief = desc.find("brief")
-    if brief is None:
-        return None
-    return brief
-
 
 
 def convert_cmake(source_dir):
