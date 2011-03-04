@@ -31,6 +31,12 @@ function(_qi_use_lib_get_deps _OUT_list)
     # for upstream Find-*.cmake
     # See: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:find_package
     if (NOT ${_U_PKG}_SEARCHED)
+      # find_package in two calls. The first call:
+      # Uses NO_MODULE - looks for PKGConfig.cmake, not FindPKG.cmake
+      # Uses QUIET     - no warning will be generated
+      # If Config is found, then PKG_DIR will be set so that the following
+      # find_package knows where to look
+      find_package(${_pkg} NO_MODULE QUIET)
       find_package(${_pkg} REQUIRED)
       qi_set_global("${_U_PKG}_SEARCHED" TRUE)
     endif()
