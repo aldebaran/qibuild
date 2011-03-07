@@ -21,7 +21,32 @@ function(_fix_flags _res _old _new)
 endfunction()
 
 function(sdk_add_include _name _subfolder)
-  qi_deprecated("no implementation")
+  qi_warning("sdk_add_include is deprectated.
+
+  Note:
+    Assuming you have a foo.h in a bar library,
+    calling this function lets you use:
+
+      #include<foo.h>
+
+    Instead of
+
+      #include<bar/foo.h>
+
+    Don't use that if you can fix the client code
+    of the library !
+
+  If you can not fix the client code, use the PATH_SUFFIXES argument of
+  qi_stage_lib instead.
+
+  Old:
+    install_header(FOO SUBFOLDER bar foo.h)
+    sdk_add_include(FOO bar)
+    stage_lib(foo FOO)
+  New:
+    qi_stage_lib(foo PATH_SUFFIXES bar)
+    qi_install_header(bar foo.h)
+  ")
 endfunction()
 
 #####################
