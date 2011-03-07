@@ -22,7 +22,7 @@ include(qibuild/internal/stage)
 #                 of this library should use.
 function(qi_stage_lib target)
   _qi_check_is_target("${target}")
-  _qi_stage_lib(${target} ${ARGN})
+  _qi_internal_stage_lib(${target} ${ARGN})
 endfunction()
 
 #! not implemented yet

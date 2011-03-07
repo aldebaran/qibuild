@@ -207,7 +207,7 @@ function(_qi_set_vars target)
 endfunction()
 
 
-function(_qi_stage_lib target ${ARGN})
+function(_qi_internal_stage_lib target ${ARGN})
   cmake_parse_arguments(ARG "" "" "STAGED_NAME" ${ARGN})
   set(_staged_name ${ARG_STAGED_NAME})
 
