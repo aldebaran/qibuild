@@ -81,8 +81,18 @@ endfunction()
 # installed SDK.
 function(_qi_gen_inc_dir_code_redist res target)
   string(TOUPPER ${target} _U_target)
-  set(${_U_target}_INCLUDE_DIRS "\${ROOT_DIR}/include")
-  _qi_gen_code_from_vars(_res ${_U_target}_INCLUDE_DIRS)
+
+  set(_suffixes)
+  foreach(_suffix ${${_U_target}_PATH_SUFFIXES})
+    list(APPEND _suffixes "\${ROOT_DIR}/include/${_suffix}")
+  endforeach()
+
+  set(_res "
+set(${_U_target}_INCLUDE_DIRS \"${_suffixes}\" CACHE STRING \"\" FORCE)
+mark_as_advanced(${_U_target}_INCLUDE_DIRS)
+  "
+  )
+
   set(${res} ${_res} PARENT_SCOPE)
 endfunction()
 
@@ -178,6 +188,7 @@ endfunction()
 #  DEPENDS
 #  DEFINITIONS
 #  INCLUDE_DIRS
+#  PATH_SUFFIXES
 # (those will be guessed if not given:
 # target_DEPENDS <- filled by qi_use_lib
 # target_INCLUDE_DIRS <- using get_direcotry_properties()
@@ -187,7 +198,7 @@ function(_qi_set_vars target)
   string(TOUPPER ${target} _U_target)
   cmake_parse_arguments(ARG ""
     ""
-    "DEPENDS;DEFINITIONS;INCLUDE_DIRS"
+    "DEPENDS;DEFINITIONS;INCLUDE_DIRS;PATH_SUFFIXES"
     ${ARGN})
   if(ARG_DEPENDS)
     set(${_U_target}_DEPENDS ${ARG_DEPENDS} PARENT_SCOPE)
@@ -204,6 +215,14 @@ function(_qi_set_vars target)
     # ARG_INCLUDE_DIRS defaults to ${CMAKE_CURRENT_SOURCE_DIR}
     set(${_U_target}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
   endif()
+
+  if(ARG_PATH_SUFFIXES)
+    set(${_U_target}_PATH_SUFFIXES ${ARG_PATH_SUFFIXES} PARENT_SCOPE)
+  else()
+    # PATH_SUFFIXES defaults to '.'
+    set(${_U_target}_PATH_SUFFIXES '.' PARENT_SCOPE)
+  endif()
+
 endfunction()
 
 
