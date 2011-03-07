@@ -205,7 +205,8 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
         except:
             if _cmdparse_no_action == True:
                 return False
-
+            else:
+                raise
 
     pargs = parser.parse_args(args)
     qitools.log.configure_logging(pargs)
