@@ -227,6 +227,30 @@ function(use_lib)
     ")
   endif()
 
+  cmake_parse_arguments(ARG "REQUIRED" "" "" ${ARGN})
+  if(ARG_REQUIRED)
+    qi_warning("using use_lib() with a REQUIRED flag
+    is no longer necessary.
+
+    Note: optional dependencies are NOT supported in qibuild.
+
+    Use something like:
+
+        find_package(FOO)
+        if(FOO_FOUND)
+          qi_use_lib(bar foo)
+        endif()
+
+    if you really need optional dependencies.
+
+    Note: the REQUIRED keyword is not used by use_lib() anyway ....
+    "
+    )
+    qi_use_lib(${ARG_UNPARSED_ARGUMENTS})
+    return()
+  endif()
+
+
   qi_use_lib(${ARGN})
 
 endfunction()
