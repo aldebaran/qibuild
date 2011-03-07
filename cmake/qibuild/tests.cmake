@@ -29,6 +29,10 @@ function(qi_add_test test_name target_name)
 
   add_test(${test_name} ${_bin_path} ${ARG_ARGUMENTS})
 
+  set_target_properties(${target_name}
+    PROPERTIES
+      FOLDER "tests")
+
   set_tests_properties(${test_name} PROPERTIES
     TIMEOUT ${ARG_TIMEOUT}
   )
