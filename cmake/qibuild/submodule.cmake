@@ -16,9 +16,7 @@ include(CMakeParseArguments)
 #!
 # A submodule is a convenient place to store source paths, dependencies
 # and public headers. Submodule can be added a library or a module.
-# SubModules are directly visible in Visual Studio, you can change the
-# submodule name displayed in Visual Studio using VSGROUP, or disable it
-# using NO_VSGROUP
+# Submodules are directly visible in Visual Studio.
 #
 # \arg:name               The name of the submodule
 # \flag:NO_SOURCE_GROUP   Do not create a source_group
@@ -30,23 +28,17 @@ include(CMakeParseArguments)
 #
 # \example:submodule
 function(qi_submodule_create name)
-  cmake_parse_arguments(ARG "NO_VSGROUP" "VSGROUP" "SRC;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "" "" "SRC;DEPENDS" ${ARGN})
 
   string(TOUPPER "submodule_${name}_src"           _OUT_src)
   string(TOUPPER "submodule_${name}_depends"       _OUT_depends)
 
   qi_glob(_SRC           ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
   qi_abspath(_SRC ${_SRC})
-
+  # Note: this function may be called more that once, that why we
+  # ADD values inside cache if they are already here.
   qi_set_advanced_cache(${_OUT_src}           ${${_OUT_src}}           ${_SRC})
   qi_set_advanced_cache(${_OUT_depends}       ${${_OUT_depends}}       ${ARG_DEPENDS})
-  if (NOT ARG_NO_VSGROUP)
-    set(_vsgroupname ${name})
-    if (NOT "${ARG_VSGROUP}" STREQUAL "")
-      set(_vsgroupname ${ARG_VSGROUP})
-    endif()
-    source_group("${_vsgroupname}"         FILES ${_SRC})
-  endif()
 endfunction()
 
 
@@ -62,32 +54,26 @@ endfunction()
 #                         name will be name\\sourcegroup
 # \param:IF               Condition that should be verified before adding content
 #                         for example (WITH_QT)
-# \group:SRC              The list of source to include in the submodule
+# \group:SRC              The list of sources to include in the submodule
 # \group:DEPENDS          The list of dependencies
 #
 # \example:submodule
 function(qi_submodule_add _name)
-  cmake_parse_arguments(ARG "NO_VSGROUP" "VSGROUP;IF" "SRC;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "" "IF" "SRC;DEPENDS" ${ARGN})
 
-  if (ARG_NO_VSGROUP)
-    set(_forward_no_vsgroup "NO_VSGROUP")
-  endif()
-
+  # CMake handling of booleans is a little weird...
   set(_doit)
-  if (NOT "${ARG_IF}" STREQUAL "")
+  if ("${ARG_IF}" STREQUAL "")
     set(_doit TRUE)
   else()
-    #I must say... lol cmake, but NOT NOT TRUE is not valid!!
     if (${ARG_IF})
-    else()
       set(_doit TRUE)
+    else()
+      set(_doit FALSE)
     endif()
   endif()
   if (_doit)
-    #message(STATUS "pif SUBMODULE: ${ARGN}")
     qi_submodule_create("${_name}"
-                        ${_forward_no_vsgroup}
-                        VSGROUP       ${ARG_VSGROUP}
                         SRC           ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS}
                         DEPENDS       ${ARG_DEPENDS})
   endif()
