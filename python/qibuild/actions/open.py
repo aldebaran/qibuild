@@ -37,7 +37,7 @@ def do(args):
     if editor == "Visual Studio":
         sln_files = glob.glob(project.build_directory + "/*.sln")
         assert len(sln_files) == 1, "Expecting only one sln, got %s" % sln_files
-        subprocess.Popen(["start", sln_files[0]])
+        subprocess.Popen(["start", sln_files[0]], shell=True)
         return
 
     if editor == "QtCreator":
