@@ -30,6 +30,8 @@ DOC:
  * fix tutorials on using toolchain
  * cmake: document +_INCLUDE_DIRS+, +_LIBS+, ....
  * use cmake to generate documentation !
+ * How to use a lib not wrapped in qiBuild (opengl for example)
+ * How to use a qiBuild project from a standard cmake project
 
 Install:
   * root's cmake list should honor CMAKE_INSTALL_PREFIX setting.
