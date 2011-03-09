@@ -21,7 +21,7 @@ function(_fix_flags _res _old _new)
 endfunction()
 
 function(sdk_add_include _name _subfolder)
-  qi_warning("sdk_add_include is deprectated.
+  qi_warning("sdk_add_include is deprecated.
 
   Note:
     Assuming you have a foo.h in a bar library,
@@ -393,7 +393,6 @@ function(gen_sdk_trampoline _binary_name _trampo_name)
   qi_deprecated("unimplemented")
 endfunction()
 
-# hack:
 function(add_msvc_precompiled_header)
   qi_deprecated("not implemented yet")
 endfunction()
