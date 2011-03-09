@@ -60,13 +60,15 @@ function(qi_build_cmake name url)
 
   #/ is not a valid install_prefix in most place
   #so we use /sdk and set DESTDIR to ..
+  set(_cmake_args "-DCMAKE_INSTALL_PREFIX=/sdk" ${ARGS_CMAKE_ARGS})
+
   ExternalProject_Add(${name}
   URL "${url}"
   URL_MD5 "${ARGS_MD5}"
   PREFIX "${name}"
   BUILD_IN_SOURCE 0
   PATCH_COMMAND "${patchs_cmd}"
-  CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=/sdk ${ARGS_CMAKE_ARGS}"
+  CMAKE_ARGS ${_cmake_args}
   INSTALL_COMMAND   "DESTDIR=${QI_SDK_DIR}/../" make install ${ARGS_INSTALL_OPTIONS}
   )
 
