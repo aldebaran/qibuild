@@ -148,3 +148,20 @@ endif()
 if (DEFINED myvar)
 endif()
 ----
+
+* Don't quote variables that CMake expects to be a list
+
+[source, cmake]
+----
+set(_foo_args "--foo" "--bar")
+
+# YES:
+execute_process(COMMAND foo ${_foo_args})
+
+# NO:
+execute_process(COMMAND foo "${_foo_args}")
+----
+
+In the second line, since you've quoted the list, you are calling
+foo with *one* argument, ("--foo --bar").
+
