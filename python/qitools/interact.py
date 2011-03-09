@@ -46,7 +46,7 @@ def ask_string(question, default=None):
     if default:
         question += " (%s)" % default
     print "::", question
-    anwer = raw_input("> ")
-    if not anwer:
+    answer = raw_input("> ")
+    if not answer:
         return default
     return answer
