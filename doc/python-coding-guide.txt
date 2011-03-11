@@ -27,11 +27,34 @@ advised to set +core.autocrlf+ to +true+).
 * Constants and globals are named +LIKE_THIS+ *upper case, underscore*
 
 
-Using nice imports
-------------------
+For easy code re-use
+--------------------
+
 
 * *Every file* that ends with a +.py+ *must* support to be imported, without
 doing anything or printing anything to the screen.
+
+* +import foo+ must never fails, unless there's a necessary module that could not
+be found. But don't catch the +ImportError+ unless it's necessary, for example to
+deal with optional dependencies, for instance:
+
+[source, python]
+----
+import required_module
+
+HAS_NICE_FEATURE = True
+try:
+  import nicefeature
+except ImportError:
+  HAS_NICE_FEATURE = False
+
+...
+
+if HAS_NICE_FEATURE:
+  ....
+
+----
+
 
 * Even if you are sure you code is standalone, and is only supposed to be used
 as a script, please follow the following skeleton:
@@ -53,13 +76,15 @@ def main():
 
   add_eggs(spam, eggs)
 
-#if we are not standalone, do nothing
 if __name__ == "__main__":
   main()
 ----
 
 Note that the +main()+ function does nothing but parsing command line, the real
-work being done by a nicely named +this_and_that+ function.
+work being done by a nicely named +add_eggs+ function.
+
+Unless you have a good reason too, please do not call +sys.exit()+ outside the +main()+
+function.
 
 You will be glad to have written your +foo.py+ script this way if you want to add
 some spam to the eggs somewhere else :)
