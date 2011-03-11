@@ -1,10 +1,10 @@
 
-set(_setup_py_args @SETUP_PY_ARGS@)
+set(_setup_py_args "@SETUP_PY_ARGS@")
 
 message(STATUS "DESTDIR $ENV{DESTDIR}")
 
 if(NOT "$ENV{DESTDIR}" STREQUAL "")
-  list(APPEND _setup_py_args  "--root=$ENV{DESTDIR}")
+  set(_setup_py_args "${_setup_py_args}" "--root=$ENV{DESTDIR}")
 endif()
 
 # Then run python setup.py install

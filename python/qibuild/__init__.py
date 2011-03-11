@@ -8,7 +8,6 @@ and building projects.
 import os
 import logging
 import qitools.sh
-import qitools.cmake
 import qitools.command
 
 import parsers
@@ -29,23 +28,19 @@ def get_cmake_qibuild_dir():
     # First, assume this file is not installed,
     # so we have the python code in qibuild/python,
     # and the cmake code in qibuild/cmake:
-    in_source = os.path.join(QIBUILD_ROOT_DIR, "..", "..", "cmake", "qibuild")
-    in_source = qitools.sh.to_native_path(in_source)
-    if os.path.isdir(in_source):
-        return in_source
+    res = os.path.join(QIBUILD_ROOT_DIR, "..", "..", "cmake", "qibuild")
+    if os.path.isdir(res):
+        return qitools.sh.to_native_path(res)
 
-    # Else, try to use an installed version of qibuild in cmake
-    # standard location.
-    from qibuild.config import CMAKE_INSTALL_PREFIX
-    installed = os.path.join(CMAKE_INSTALL_PREFIX, "share", "cmake", "modules")
-    if os.path.isdir(installed):
-        return qitools.sh.to_native_path(installed)
+    # Else, try to import qibuild.config, a
+    # python module configured by cmake during installation,
+    # containing CMAKE_ROOT
+    from qibuild.config import CMAKE_ROOT
+    res = os.path.join(CMAKE_ROOT, "Modules", "qibuild")
+    if os.path.isdir(res):
+        return qitools.sh.to_native_path(res)
 
-    mess  = "Could not find qibuild cmake root dir!\n"
-    mess += "Looked in: \n"
-    mess += "\t%s (in source)\n" % in_source
-    mess += "\t%s (installed)\n" % installed
-    raise Exception(mess)
+    raise Exception("Could not find qibuild cmake root dir!")
 
 CMAKE_QIBUILD_DIR = get_cmake_qibuild_dir()
 
