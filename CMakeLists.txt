@@ -39,7 +39,7 @@ install(
   DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/qibuild
   DESTINATION
-    "${CMAKE_ROOT}/Modules"
+    "share/cmake/modules"
 )
 
 # Useful for python script to work later:
@@ -88,10 +88,12 @@ configure_file(
 # Configure the run_setup_py.cmake.in script,
 # and have it run at installation:
 
+
+set(SETUP_PY_ARGS "--prefix=${CMAKE_INSTALL_PREFIX}")
 # We will pass the DEB_PACAKGE flag in debian/rules,
 # because python packages on debian need special flags
 if(DEB_PACKAGE)
-  set(SETUP_PY_ARGS "--install-layout=deb" "--no-compile")
+  list(APPEND SETUP_PY_ARGS "--install-layout=deb" "--no-compile")
 endif()
 
 configure_file(
