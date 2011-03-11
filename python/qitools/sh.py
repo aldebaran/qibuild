@@ -233,7 +233,7 @@ class TempDir:
      and DEBUG environment variable is set.
 
     """
-    def __init__(self, name):
+    def __init__(self, name="tmp"):
         self._temp_dir = tempfile.mkdtemp(prefix=name+"-")
 
     def __enter__(self):
