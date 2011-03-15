@@ -175,7 +175,7 @@ def do(args):
     convert_fun(source_dir)
 
     LOGGER.info("Done. \n"
-        "Create a qiBuild worktree if you have not alreday done so\n"
-        "and trye using `qibuild configure' now")
+        "Create a qiBuild worktree if you have not already done so\n"
+        "and try using `qibuild configure' now")
 
 
