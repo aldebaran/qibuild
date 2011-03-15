@@ -161,7 +161,7 @@ def check_root_cmake_list(cmake_list_file, project_name):
         if re.match(r'^\s*include\s*\(.*qibuild\.cmake.*\)', line, re.IGNORECASE):
             include_line_number = i
 
-    if not project_line_number:
+    if project_line_number is None:
         mess  = """Incorrect CMakeLists file detected !
 
 Missing call to project().
@@ -178,7 +178,7 @@ include(qibuild.cmake)
         LOGGER.warning(mess)
         return
 
-    if not include_line_number:
+    if include_line_number is None:
         # Using qibuild command line, but not the qiBuild framework:
         # -> nothing to do ;)
         return
