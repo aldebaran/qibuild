@@ -62,6 +62,8 @@ Advanced
 * link:porting-to-qibuild.html[Porting a CMake-based project to qiBuild]
   Read this if you are already using CMake for your projects.
 * link:using-toolchains.html[Using a toolchain]
+* link:using-a-cross-toolchain.html[Using a cross toolchain]
+  Read this if you want to use qibuild for cross-compiling.
 * link:how-to-write-a-library.html[How to write a library]
   Useful guidelines when writing a library in a large, redistributable
   project.
