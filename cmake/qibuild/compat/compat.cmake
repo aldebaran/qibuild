@@ -104,10 +104,7 @@ function(install_header _staged_name)
   endif()
 
   if(NOT ARG_SUBFOLDER)
-    qi_error("
-    The SUBFOLDER argument is now mandatory
-    "
-    )
+    set(ARG_SUBFOLDER "")
   endif()
 
   qi_install_header(${ARG_SUBFOLDER} ${ARG_UNPARSED_ARGUMENTS})
