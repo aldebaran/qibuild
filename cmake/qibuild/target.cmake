@@ -30,6 +30,11 @@ include(qibuild/internal/copy)
 # \arg:name the target name
 # \argn: source files, like the SRC group, argn and SRC will be merged
 # \flag:NO_INSTALL Do not create install rules for the target
+# \flag:NO_RPATH_FIX Do not try to fix rpath
+#                    By default, qibuild runs chrpath on the targets so
+#                    everything work even when project is intalled to a
+#                    non-standard location.
+#                    Use this to prevent chrpath to be run.
 # \flag:EXCLUDE_FROM_ALL Do not include the target in the 'all' target,
 #                        this target will not be build by default, you will
 #                        have to compile the target explicitly.
@@ -47,7 +52,7 @@ include(qibuild/internal/copy)
 function(qi_create_bin name)
   qi_debug("qi_create_bin(${name})")
 
-  cmake_parse_arguments(ARG "NO_INSTALL;EXCLUDE_FROM_ALL;STAGE" "SUBFOLDER" "SRC;DEPENDS;SUBMODULE" ${ARGN})
+  cmake_parse_arguments(ARG "NO_RPATH_FIX;NO_INSTALL;EXCLUDE_FROM_ALL;STAGE" "SUBFOLDER" "SRC;DEPENDS;SUBMODULE" ${ARGN})
 
   set(ARG_SRC "${ARG_UNPARSED_ARGUMENTS}" "${ARG_SRC}")
   qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
@@ -117,11 +122,15 @@ function(qi_create_bin name)
   endif()
 
   if(UNIX AND NOT APPLE)
-    # Use a relative rpath at installation
-    set_target_properties("${name}"
-      PROPERTIES
-        INSTALL_RPATH "\$ORIGIN/../lib"
-    )
+    if(NOT ARG_NO_RPATH_FIX)
+      # Use a relative rpath at installation
+      set_target_properties("${name}"
+        PROPERTIES
+          INSTALL_RPATH "\$ORIGIN/../lib"
+      )
+    else()
+      # Nothing to do!
+    endif()
   endif()
 
 endfunction()
