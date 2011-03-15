@@ -137,3 +137,14 @@ function(qi_install_program)
   endforeach()
 endfunction()
 
+
+#! install external library. Do not use this function
+# to install a library or a program built by your project, prefer using qi_install_target.
+#
+# \param:SUBFOLDER An optional subfolder
+# \argn: A list of libraries to install
+# \param:IF Condition that should be verified for the install rules to be active.
+#           for example (IF WITH_ZEROMQ)
+function(qi_install_library)
+  _qi_install(${ARGN} COMPONENT lib DESTINATION ${QI_SDK_LIB}/${subfolder})
+endfunction()

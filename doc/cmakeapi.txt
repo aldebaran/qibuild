@@ -76,6 +76,7 @@ Install functions.
 * link:install.html#_qi_install_cmake[qi_install_cmake]
 * link:install.html#_qi_install_target[qi_install_target]
 * link:install.html#_qi_install_program[qi_install_program]
+* link:install.html#_qi_install_library[qi_install_library]
 
 link:external.html[External Projects]
 -------------------------------------
