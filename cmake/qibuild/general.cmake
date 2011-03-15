@@ -64,5 +64,6 @@ include("qibuild/stage")
 include("qibuild/doc")
 
 list(INSERT CMAKE_PREFIX_PATH 0 ${QI_SDK_DIR})
+qi_set_global(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH})
 
 _qi_autostrap_update()
