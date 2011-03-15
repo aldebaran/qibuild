@@ -32,6 +32,8 @@ DOC:
  * use cmake to generate documentation !
  * How to use a lib not wrapped in qiBuild (opengl for example)
  * How to use a qiBuild project from a standard cmake project
+ * Add a troubleshooting section and/or a FAQ, when there are enough
+   people using qibuild ;-)
 
 Install:
   * root's cmake list should honor CMAKE_INSTALL_PREFIX setting.
