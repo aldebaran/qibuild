@@ -88,7 +88,7 @@ function(_qi_gen_inc_dir_code_redist res target)
   endforeach()
 
   set(_res "
-set(${_U_target}_INCLUDE_DIRS \"${_suffixes}\" CACHE STRING \"\" FORCE)
+set(${_U_target}_INCLUDE_DIRS \"\${ROOT_DIR}/include;${_suffixes}\" CACHE STRING \"\" FORCE)
 mark_as_advanced(${_U_target}_INCLUDE_DIRS)
   "
   )
