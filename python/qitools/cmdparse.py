@@ -20,6 +20,8 @@ import sys
 import logging
 import copy
 
+LOGGER = logging.getLogger(__name__)
+
 try:
     import argparse
 except:
@@ -140,8 +142,7 @@ def _dump_arguments(name, args):
         output += "  %s%s = %s\n" % (str(k), pad, str(v))
     if output[-1] == "\n":
         output = output[:-1]
-    logger = logging.getLogger("qitools.cmdparse")
-    logger.debug("[%s] arguments:\n%s", name, output)
+    LOGGER.debug("[%s] arguments:\n%s", name, output)
 
 def root_command_main(name, parser, modules, args=None, return_if_no_action=False):
     """name : name of the main program
@@ -235,6 +236,12 @@ def sub_command_main(module, args=None, namespace=None):
             sub_command_main(sys.modules[__name__])
 
     """
+    LOGGER.debug("""calling sub_command_main
+        module=%s,
+        args=%s,
+        namespace=%s
+    """, module, args, namespace)
+
     check_module(module)
     try:
         usage = module.usage()
