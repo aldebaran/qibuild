@@ -219,8 +219,7 @@ function(_qi_set_vars target)
   if(ARG_PATH_SUFFIXES)
     set(${_U_target}_PATH_SUFFIXES ${ARG_PATH_SUFFIXES} PARENT_SCOPE)
   else()
-    # PATH_SUFFIXES defaults to '.'
-    set(${_U_target}_PATH_SUFFIXES '.' PARENT_SCOPE)
+    set(${_U_target}_PATH_SUFFIXES "" PARENT_SCOPE)
   endif()
 
 endfunction()

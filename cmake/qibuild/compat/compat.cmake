@@ -101,13 +101,14 @@ function(install_header _staged_name)
       # include <${_targetname}/bar.h>
     "
     )
+    set(${_staged_name}_PATH_SUFFIXES "${${_staged_name}_PATH_SUFFIXES}" "${ARG_SUBFOLDER}" CACHE INTERNAL "" FORCE)
   endif()
 
   if(NOT ARG_SUBFOLDER)
     set(ARG_SUBFOLDER "")
   endif()
 
-  qi_install_header(${ARG_SUBFOLDER} ${ARG_UNPARSED_ARGUMENTS})
+  qi_install_header("${ARG_SUBFOLDER}" ${ARG_UNPARSED_ARGUMENTS})
 endfunction()
 
 function(install_data)
