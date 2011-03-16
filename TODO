@@ -24,6 +24,14 @@ qiBuild:
 * fix install component (only have two components: runtime and devel)
 
 qiSrc:
+* Git: when trying to get the url, use:
+  git remote for remote names, and if there is only one,
+  git config --get remote.NAME.
+  This cover 99% of the cases.
+  If there are several remotes, do not do anything.
+  Do not check anything before calling qirsrc pull, it's much better
+  to have the pure git error messages.
+
 
 
 DOC:
