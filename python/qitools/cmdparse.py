@@ -166,6 +166,9 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
             print err
             continue
         name = module.__name__.split(".")[-1]
+        # we want to type `foo bar-baz', and not type `foo bar_baz',
+        # even if "bar-baz" is not a valid module name.
+        name = name.replace("_", "-")
         configurator = module.configure_parser
         action_parser = subparsers.add_parser(name, help=module.__doc__)
         configurator(action_parser)
