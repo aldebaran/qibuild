@@ -33,7 +33,12 @@ def _do(args, build_type):
     project = toc.get_project(project_name)
     inst_dir = os.path.join(project.build_directory, "package")
     destdir = os.path.join(inst_dir, project_name)
-    toc.package_project(project, destdir)
+    qitools.run_action("qibuild.actions.configure", [project_name],
+        forward_args=args)
+    qitools.run_action("qibuild.actions.make", [project_name],
+        forward_args=args)
+    qitools.run_action("qibuild.actions.install", [project_name, destdir],
+        forward_args=args)
     return destdir
 
 def do(args):

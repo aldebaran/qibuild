@@ -25,7 +25,7 @@ def install_package(package_src, destdir, runtime=False):
             file_src = os.path.join(root, file)
             qitools.sh.mkdir(os.path.join(destdir, new_root), recursive=True)
             file_dest = os.path.join(destdir, new_root, file)
-            print "-- installing:", file_dest
+            print "-- Installing:", file_dest
             shutil.copy(file_src, file_dest)
 
 
