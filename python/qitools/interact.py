@@ -35,8 +35,8 @@ def ask_choice(choices, input_text):
 def ask_yes_no(question):
     """Ask the user to answer by yes or no"""
     print "::", question, "(y/n)?"
-    anwer = raw_input("> ")
-    return anwer == "y"
+    answer = raw_input("> ")
+    return answer == "y"
 
 def ask_string(question, default=None):
     """Ask the user to enter something.
