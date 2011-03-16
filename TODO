@@ -32,6 +32,8 @@ qiSrc:
   Do not check anything before calling qirsrc pull, it's much better
   to have the pure git error messages.
 
+* qisrc add should be able to read a base git url. For instance,
+  qisrc add foo/bar.git, should read a setting and clone git://example.com:foo/bar.git
 
 
 DOC:
