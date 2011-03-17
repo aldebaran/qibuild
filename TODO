@@ -56,3 +56,8 @@ Compat:
   to that going from toc to qibuild is automagic
 
   * same thing for ROS?
+
+To help automatic testing:
+  * When sys.stdout is not a tty
+    - Do not print "installing..." stuff when installing packages
+    - Do not call tar with a verbose argument when building packages
