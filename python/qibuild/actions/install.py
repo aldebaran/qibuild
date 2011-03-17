@@ -63,12 +63,14 @@ def do(args):
             ['-DCMAKE_INSTALL_PREFIX=%s' % args.prefix],
             clean_first=False)
 
-    LOGGER.info("Installing %s to %s", ", ".join([n for n in project_names]), dest)
+    if project_names:
+        LOGGER.info("Installing %s to %s", ", ".join([n for n in project_names]), dest)
     for project_name in project_names:
         project = toc.get_project(project_name)
         toc.install_project(project,  args.destdir, runtime=args.runtime)
 
-    LOGGER.info("Installing %s to %s", ", ".join([p for p in package_names]), dest)
+    if package_names:
+        LOGGER.info("Installing %s to %s", ", ".join([p for p in package_names]), dest)
     for package_name in package_names:
         package_src = toc.toolchain.get(package_name)
         install_package(package_src, dest, runtime=args.runtime)
