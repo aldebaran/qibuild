@@ -16,18 +16,7 @@ def install_package(package_src, destdir, runtime=False):
     if runtime:
         LOGGER.warning("Installing only runtime components of "
             "packages is not supported yet.")
-        # FIXME!
-    LOGGER.debug("Installing %s -> %s", package_src, destdir)
-    qitools.sh.mkdir(destdir, recursive=True)
-    for (root, dirs, files) in os.walk(package_src):
-        new_root = os.path.relpath(root, package_src)
-        for file in files:
-            file_src = os.path.join(root, file)
-            qitools.sh.mkdir(os.path.join(destdir, new_root), recursive=True)
-            file_dest = os.path.join(destdir, new_root, file)
-            print "-- Installing:", file_dest
-            shutil.copy(file_src, file_dest)
-
+    qitools.sh.install(package_src, destdir)
 
 def configure_parser(parser):
     """Configure parser for this action"""

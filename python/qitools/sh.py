@@ -66,6 +66,32 @@ def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
         with open(out_path, "w") as out_file:
             out_file.write(out_content)
 
+def install(src, dest):
+    """Install a directory to a destination.
+
+    Few notes: rewriting `cp' or `install' is a hard problem.
+    This version will happily erase whatever is inside dest,
+    and won't complain if dest does not exists (missing
+    directories will simply be created)
+
+    Note that if src contains empty directories, they won't be
+    installled.
+
+    """
+    LOGGER.debug("Installing %s -> %s", src, dest)
+    mkdir(dest, recursive=True)
+    for (root, dirs, files) in os.walk(src):
+        new_root = os.path.relpath(root, src)
+        for file in files:
+            file_src = os.path.join(root, file)
+            mkdir(os.path.join(dest, new_root), recursive=True)
+            file_dest = os.path.join(dest, new_root, file)
+            # If this is not run interactively, avoid polluting
+            # stdout:
+            if sys.stdout.isatty():
+                print "-- Installing:", file_dest
+            shutil.copy(file_src, file_dest)
+
 def rm(name):
     """This one can take a file or a directory.
     Contrary to shutil.remove or os.remove, it:
