@@ -79,18 +79,24 @@ def install(src, dest):
 
     """
     LOGGER.debug("Installing %s -> %s", src, dest)
-    mkdir(dest, recursive=True)
-    for (root, dirs, files) in os.walk(src):
-        new_root = os.path.relpath(root, src)
-        for file in files:
-            file_src = os.path.join(root, file)
-            mkdir(os.path.join(dest, new_root), recursive=True)
-            file_dest = os.path.join(dest, new_root, file)
-            # If this is not run interactively, avoid polluting
-            # stdout:
-            if sys.stdout.isatty():
-                print "-- Installing:", file_dest
-            shutil.copy(file_src, file_dest)
+    if os.path.isdir(src):
+        mkdir(dest, recursive=True)
+        for (root, dirs, files) in os.walk(src):
+            new_root = os.path.relpath(root, src)
+            for file in files:
+                file_src = os.path.join(root, file)
+                mkdir(os.path.join(dest, new_root), recursive=True)
+                file_dest = os.path.join(dest, new_root, file)
+                # If this is not run interactively, avoid polluting
+                # stdout:
+                if sys.stdout.isatty():
+                    print "-- Installing:", file_dest
+                shutil.copy(file_src, file_dest)
+    else:
+        if os.path.isdir(dest):
+            dest = os.path.join(dest, os.path.basename(src))
+        mkdir(os.path.dirname(dest), recursive=True)
+        shutil.copy(src, dest)
 
 def rm(name):
     """This one can take a file or a directory.
