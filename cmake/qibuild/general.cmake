@@ -46,6 +46,12 @@ if (NOT QI_SDK_DIR)
   qi_info("QI_SDK_DIR: ${QI_SDK_DIR}")
 endif()
 
+# always add SDK to FIND_ROOT_PATH when cross-compiling
+if (DEFINED CMAKE_FIND_ROOT_PATH)
+  qi_prepend_global(CMAKE_FIND_ROOT_PATH "${QI_SDK_DIR}")
+  qi_debug("CMAKE_FIND_ROOT_PATH: ${CMAKE_FIND_ROOT_PATH}")
+endif()
+
 #force buildtype to be Upper case
 if (DEFINED CMAKE_BUILD_TYPE)
   string(TOUPPER "${CMAKE_BUILD_TYPE}" "_BUILD_TYPE")
