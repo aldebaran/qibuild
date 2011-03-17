@@ -3,7 +3,7 @@
 
 # This is to be used when the names of the
 # flags have changed:
-
+message(STATUS "using t001chain compatibility layer")
 
 # Example:
 # After calling:
