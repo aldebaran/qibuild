@@ -28,10 +28,21 @@ def get_cmake_qibuild_dir():
     """
     # First, assume this file is not installed,
     # so we have the python code in qibuild/python,
-    # and the cmake code in qibuild/cmake:
+    # and the cmake code in qibuild/cmake
+    # (using qibuild from sources)
     res = os.path.join(QIBUILD_ROOT_DIR, "..", "..", "cmake", "qibuild")
+    res = qitools.sh.to_native_path(res)
     if os.path.isdir(res):
-        return qitools.sh.to_native_path(res)
+        return res
+
+    # Then, assume we are in a toolchain or/in a SDK, with
+    # the following layout sdk/share/cmake/qibuild, sdk/lib/python/qibuild
+    sdk_dir = os.path.join(QIBUILD_ROOT_DIR, "..", "..", "..")
+    sdk_dir = qitools.sh.to_native_path(sdk_dir)
+    res = os.path.join(sdk_dir, "share", "cmake", "qibuild")
+    if os.path.isdir(res):
+        return res
+
 
     # Else, try to import qibuild.config, a
     # python module configured by cmake during installation,
@@ -41,7 +52,11 @@ def get_cmake_qibuild_dir():
     if os.path.isdir(res):
         return qitools.sh.to_native_path(res)
 
-    raise Exception("Could not find qibuild cmake root dir!")
+    # Else, just return None. Portions of code using CMAKE_QIBUILD_DIR, such as
+    # qibuild convert or qibuild --version will fail loudly
+    # ('NoneType' object has no attribute ...), but we do want them to fail
+    # loudly...
+    return None
 
 CMAKE_QIBUILD_DIR = get_cmake_qibuild_dir()
 
