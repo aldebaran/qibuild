@@ -17,7 +17,7 @@ function(qi_swig_wrap_python module_name interface_file)
   cmake_parse_arguments(ARG "" "" "SRC;DEPENDS" ${ARGN})
 
   # we search for the SWIG_EXECUTABLE by yourself, because FindSWIG call find_file
-  # be when we are cross-compiling and we want to use swig from the system
+  # but when we are cross-compiling and we want to use swig from the system
   # then CMAKE_FIND_ROOT_PATH prevent find_file from working.
   find_program(SWIG_EXECUTABLE swig)
   include("UseSWIG")
