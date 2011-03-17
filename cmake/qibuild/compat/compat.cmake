@@ -440,7 +440,10 @@ function(gen_python_script)
 endfunction()
 
 function(add_python_test _name _pythonFile)
- add_test(${_name}  ${PYTHON_EXCUTABLE} ${_pythonFile} ${ARGN})
+  qi_deprecated("add_python_test is deprecated.
+  High-level tests now are to be found in the
+  qi/qitest repository
+  ")
 endfunction()
 
 #copy file with dependency (if the file change in source => update the output)
