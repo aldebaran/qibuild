@@ -267,3 +267,14 @@ There are a bunch of other functions available to configure the parsers in
 the +qibuild.parsers+ package, depending on what you need to do, and, yes,
 they all call +qitools.cmdparse.default_parser+ for you :)
 
+
+Quick note : often you have to have an action with two words in it, for
+instance foo-bar.
+
+Although simply writing a file called +foo-bar.py+ would world, please
+create a module called +foo_bar.py+ . Note that "import foo-bar" won't
+work, Python will read it as "import foo minus bar"...
+
+Note that having called your module +foo_bar.py+ won't prevent you to use
++qibuild foo-bar+ if necessary.
+
