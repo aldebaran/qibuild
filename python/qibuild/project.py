@@ -110,6 +110,8 @@ def bootstrap(project, dep_sdk_dirs):
     to_write += "#DEPENDENCIES:\n"
     for dep_sdk_dir in dep_sdk_dirs:
         to_write += "list(APPEND CMAKE_PREFIX_PATH \"%s\")\n" % qitools.sh.to_posix_path(dep_sdk_dir)
+    to_write += "set(CMAKE_MODULE_PATH \"${CMAKE_MODULE_PATH}\" CACHE INTERNAL \"\" FORCE)\n"
+    to_write += "set(CMAKE_PREFIX_PATH \"${CMAKE_PREFIX_PATH}\" CACHE INTERNAL \"\" FORCE)\n"
 
     output_path = os.path.join(build_dir, "dependencies.cmake")
     with open(output_path, "w") as output_file:
