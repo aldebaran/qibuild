@@ -1,0 +1,1 @@
+set(QIBUILD_VERSION 0.1)

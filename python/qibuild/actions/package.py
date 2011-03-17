@@ -25,6 +25,11 @@ def qibuildize(destdir):
     dest = os.path.join(destdir, "share", "cmake", "qibuild")
     qitools.sh.install(src, dest)
 
+    # Lastly, install qibuild/version.cmake at the root of the SDK:
+    src  = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "version.cmake")
+    dest = os.path.join(destdir, "share", "cmake", "qibuild", "qibuild-version.cmake")
+    qitools.sh.install(src, dest)
+
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -69,6 +74,7 @@ def do(args):
     destdir = _do(args, "release")
 
     if args.standalone:
+        LOGGER.info("Embedding qiBuild in package")
         qibuildize(destdir)
 
     LOGGER.info("Compressing package")
