@@ -1,8 +1,10 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-# Toolchain file to be passed to cmake, using
+# Toolchain file to be passed to cmake, using:
 # cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/sdk/toolchain-pc.cmake
+# (or the "use a toolchain file" option from the cmake-gui
 
+# Warning ! This file is NOT usable for cross-compilation
 
 # Set _ROOT_DIR to the dirname of this file (/path/to/sdk)
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
