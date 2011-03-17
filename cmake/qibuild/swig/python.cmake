@@ -16,9 +16,14 @@ include(CMakeParseArguments)
 function(qi_swig_wrap_python module_name interface_file)
   cmake_parse_arguments(ARG "" "" "SRC;DEPENDS" ${ARGN})
 
-  # Basic configurations
-  find_package(SWIG REQUIRED)
-  include(${SWIG_USE_FILE})
+  # we search for the SWIG_EXECUTABLE by yourself, because FindSWIG call find_file
+  # be when we are cross-compiling and we want to use swig from the system
+  # then CMAKE_FIND_ROOT_PATH prevent find_file from working.
+  find_program(SWIG_EXECUTABLE swig)
+  include("UseSWIG")
+  #find_package(SWIG REQUIRED)
+  #include(${SWIG_USE_FILE})
+
   set_source_files_properties(${interface_file} PROPERTIES CPLUSPLUS ON)
   # tell swig that the generated module name is ${module_name}.py
   # without this property, it assumes that it is ${interface_file}.py
