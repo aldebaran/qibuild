@@ -14,22 +14,22 @@ if(MSVC)
  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
-
-
-
 #get the current directory of the file
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-list(APPEND CMAKE_PREFIX_PATH ${_ROOT_DIR}/modules/)
 
+include("qibuild/log")
+include("qibuild/set")
+
+qi_append_global(CMAKE_PREFIX_PATH "${_ROOT_DIR}/modules/")
+
+#include new cmake modules, when using old cmake
 if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
-  list(APPEND CMAKE_MODULE_PATH ${_ROOT_DIR}/upstream-backports)
+  qi_append_global(CMAKE_MODULE_PATH "${_ROOT_DIR}/upstream-backports")
 endif()
 
 set(QI_ROOT_DIR ${_ROOT_DIR})
 set(QI_TEMPLATE_DIR ${_ROOT_DIR}/templates)
 
-include("qibuild/log")
-include("qibuild/set")
 include("qibuild/subdirectory")
 include("qibuild/internal/layout")
 include("qibuild/internal/check")
@@ -71,3 +71,4 @@ list(INSERT CMAKE_PREFIX_PATH 0 ${QI_SDK_DIR})
 qi_set_global(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH})
 
 _qi_autostrap_update()
+
