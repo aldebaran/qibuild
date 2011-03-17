@@ -148,13 +148,16 @@ def ls_r(directory):
     res.sort()
     return res
 
-# FIXME: derpeciate this...
 def which(program):
     """
     find program in the environment PATH
     @return path to program if found, None otherwise
     """
-    return qitools.command.find_program(program)
+    import warnings
+    warnings.warn("qitools.sh.which is deprecated, "
+     "use qitools.command.find_program instead")
+    from qitools.command import find_program
+    return find_program(program)
 
 
 def run(program, args):
