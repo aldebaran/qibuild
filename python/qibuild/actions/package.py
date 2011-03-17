@@ -4,9 +4,26 @@
 import os
 import sys
 import logging
+import shutil
 
 import qitools
 import qibuild
+
+LOGGER = logging.getLogger(__name__)
+
+def qibuildize(destdir):
+    """Make sure the package is usable even without qibuild installed.
+
+    """
+    # First, create the toolchain.cmake file :
+    src  = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "templates", "toolchain-pc.cmake")
+    dest = os.path.join(destdir, "toolchain-pc.cmake")
+    shutil.copy(src, dest)
+
+    # Then, install the qibuild/cmake files inside the package:
+    src  = os.path.join(qibuild.CMAKE_QIBUILD_DIR)
+    dest = os.path.join(destdir, "share", "cmake", "qibuild")
+    qitools.sh.install(src, dest)
 
 
 def configure_parser(parser):
@@ -14,6 +31,10 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     parser.add_argument("project", nargs="?")
+    parser.add_argument("--standalone", action="store_true",
+        help="make a standalone package. "
+        "This will package qibuild inside your package, and create a toolchain "
+        "file for others to use your pacakge")
     parser.set_defaults(
         cmake_flags=["CMAKE_INSTALL_PREFIX='/'"])
 
@@ -47,9 +68,12 @@ def do(args):
         _do(args, "debug")
     destdir = _do(args, "release")
 
+    if args.standalone:
+        qibuildize(destdir)
+
+    LOGGER.info("Compressing package")
     archive = qitools.archive.zip(destdir)
-    logger   = logging.getLogger(__name__)
-    logger.info("Package generated in %s", archive)
+    LOGGER.info("Package generated in %s", archive)
     # Now, clean the destdir.
     qitools.sh.rm(destdir)
 
