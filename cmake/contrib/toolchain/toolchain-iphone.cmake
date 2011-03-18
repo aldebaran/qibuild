@@ -1,5 +1,4 @@
 ## Copyright (C) 2011 Aldebaran Robotics
-include("${TOOLCHAIN_DIR}/cmake/plateform.cmake")
 
 include(CMakeForceCompiler)
 
@@ -8,10 +7,6 @@ set(IPHONE_TARGET   "3.0")
 set(GCC_VERSION     "4.2")
 set(OSX_MIN_VERSION "10.5")
 #set(DEV_TARGET      "iPhoneOS")
-
-#cross-compiling: dont use system libraries at all
-set(INCLUDE_EXTRA_PREFIX "" CACHE INTERNAL "" FORCE)
-set(LIB_EXTRA_PREFIX     "" CACHE INTERNAL "" FORCE)
 
 set(IPHONE_DEVROOT "/Developer/Platforms/${DEV_TARGET}.platform/Developer")
 set(IPHONE_SYSROOT "${IPHONE_DEVROOT}/SDKs/${DEV_TARGET}${IPHONE_TARGET}.sdk")
@@ -24,17 +19,11 @@ message(STATUS "Gcc   Version: ${GCC_VERSION}")
 message(STATUS "sysroot      : ${IPHONE_SYSROOT}")
 #message(STATUS "prefix       : ${IPHONE_PREFIX}")
 
-#standard library path:
-#where to search for bin, library and include
-set(BIN_PREFIX     "${IPHONE_SYSROOT}/usr/bin/"     CACHE INTERNAL "" FORCE)
-set(INCLUDE_PREFIX "${TOOLCHAIN_DIR}/toolchain-pc/common/include/" "${IPHONE_SYSROOT}/usr/include/" CACHE INTERNAL "" FORCE)
-set(LIB_PREFIX     "${IPHONE_SYSROOT}/usr/lib/"     CACHE INTERNAL "" FORCE)
-
 # root of the cross compiled filesystem
 #should be set but we do find_path in each module outside this folder !!!!
-#set(CMAKE_FIND_ROOT_PATH  ${OE_CROSS_DIR}/staging/${OE_PREFIX}/ ${OE_CROSS_DIR}/cross)
+set(CMAKE_FIND_ROOT_PATH  ${IPHONE_SYSROOT})
 # search for programs in the build host directories
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)
 # for libraries and headers in the target directories
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
