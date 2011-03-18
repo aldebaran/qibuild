@@ -37,10 +37,6 @@ include("qibuild/internal/install")
 include("qibuild/internal/glob")
 include("qibuild/internal/autostrap")
 
-if (QI_T001CHAIN_COMPAT)
-  include("qibuild/compat/compat")
-endif()
-
 if (NOT QI_SDK_DIR)
   qi_set_global(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk/")
   qi_info("QI_SDK_DIR: ${QI_SDK_DIR}")
@@ -73,8 +69,11 @@ include("qibuild/submodule")
 include("qibuild/stage")
 include("qibuild/doc")
 
-list(INSERT CMAKE_PREFIX_PATH 0 ${QI_SDK_DIR})
-qi_set_global(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH})
+qi_prepend_global(CMAKE_PREFIX_PATH ${QI_SDK_DIR})
 
 _qi_autostrap_update()
+
+if (QI_T001CHAIN_COMPAT)
+  include("qibuild/compat/compat")
+endif()
 
