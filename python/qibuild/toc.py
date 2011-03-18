@@ -127,9 +127,12 @@ class Toc(QiWorkTree):
             self.build_config = self.configstore.get("general", "build", "config", default=None)
 
         if self.build_config:
-            cfg_file = "build-%s.cfg" % self.build_config
-            to_read = os.path.join(self.work_tree, ".qi", cfg_file)
-            self.configstore.read(to_read)
+            cfg_filename = "build-%s.cfg" % self.build_config
+            cfg_path = os.path.join(self.work_tree, ".qi", cfg_filename)
+            if not os.path.exists(cfg_path):
+                raise BadBuildConfig("Invalid build config: %s\n(%s does not exists)" %
+                    (self.build_config, cfg_path))
+            self.configstore.read(cfg_path)
 
         # If toolchain_name is None, it was not given on command line,
         # look for it in the configuration:
