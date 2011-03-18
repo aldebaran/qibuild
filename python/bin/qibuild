@@ -39,7 +39,7 @@ def main():
     parser = argparse.ArgumentParser()
     modules = qitools.cmdparse.action_modules_from_package("qibuild.actions")
 
-    if "--version" in sys.argv:
+    if len(sys.argv) == 2 and sys.argv[1] == '--version':
         print_version()
         sys.exit(0)
 

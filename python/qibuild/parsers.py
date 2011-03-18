@@ -56,3 +56,23 @@ def project_parser(parser):
         use_deps=True,
         projects = list())
 
+
+def package_parser(parser):
+    """ Parse setting for every action making packages
+
+    """
+    group = parser.add_argument_group("package options")
+    group.add_argument("--standalone", action="store_true",
+        help="Make a standalone package. "
+        "This will package qibuild inside your package, and create a toolchain "
+        "file for others to use your pacakge")
+    group.add_argument("--version", help="Version of the package. "
+        "Default is read from the version.cmake file")
+    group.add_argument("--continuous", action="store_true",
+        help="Append the date at the end of the name "
+        "of the package")
+    group.add_argument("--arch", help="A string describing the architecture of "
+        "the package: linux, linux64, mac, windows-vs2008, etc...")
+    parser.set_defaults(continuous=False)
+
+

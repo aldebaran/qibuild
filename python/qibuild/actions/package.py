@@ -35,11 +35,8 @@ def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
+    qibuild.parsers.package_parser(parser)
     parser.add_argument("project", nargs="?")
-    parser.add_argument("--standalone", action="store_true",
-        help="make a standalone package. "
-        "This will package qibuild inside your package, and create a toolchain "
-        "file for others to use your pacakge")
     parser.set_defaults(
         cmake_flags=["CMAKE_INSTALL_PREFIX='/'"])
 
@@ -58,7 +55,13 @@ def _do(args, build_type):
         project_name = args.project
     project = toc.get_project(project_name)
     inst_dir = os.path.join(project.build_directory, "package")
-    destdir = os.path.join(inst_dir, project_name)
+
+    package_name = project.get_package_name(
+        continuous=args.continuous,
+        arch=args.arch,
+        version=args.version)
+
+    destdir = os.path.join(inst_dir, package_name)
     qitools.run_action("qibuild.actions.configure", [project_name],
         forward_args=args)
     qitools.run_action("qibuild.actions.make", [project_name],
