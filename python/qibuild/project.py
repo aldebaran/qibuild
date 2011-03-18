@@ -3,6 +3,8 @@
 import os
 import shlex
 import logging
+import datetime
+
 import qitools.sh
 
 LOGGER = logging.getLogger("qibuild.toc.project")
@@ -78,6 +80,58 @@ class Project:
         #create the build_directory if it does not exists
         if not os.path.exists(self.build_directory):
             os.makedirs(self.build_directory)
+
+
+    def get_package_name(self, continuous=False, version=None, arch=None):
+        """Get the package name of a project.
+
+        Recognized args are:
+          continuous -> append the date the the name of the package
+          version    -> if not given, will try to use version.cmake at
+                        the root of the project
+          arch       -> if not given, do nothing, else add this at the end
+                        of the package name
+        """
+        res = [self.name]
+
+        if not version:
+            version = self.get_version()
+            if version:
+                res.append(version)
+        else:
+            res.append(version)
+
+        if continuous:
+            now = datetime.datetime.now()
+            res.append(now.strftime("%Y-%m-%d"))
+
+        if arch:
+            res.append(arch)
+
+        return "-".join(res)
+
+
+    def get_version(self):
+        """Try to guess version from the sources of the project.
+        Return None
+
+        """
+        version_cmake = os.path.join(self.directory, "version.cmake")
+        if not os.path.exists(version_cmake):
+            return None
+        contents = None
+        with open(version_cmake, "r") as fp:
+            contents = fp.read()
+
+        import re
+        up_name = self.name.upper()
+        match = re.match('^set\(%s_VERSION (.*?)\)' % up_name,
+                         contents)
+        if not match:
+            LOGGER.warning("Invalid version.cmake. Should have a line looking like\n"
+               "set(%s_VERSION <VERSION>)",  up_name)
+            return None
+        return match.groups()[0]
 
     def __str__(self):
         res = ""
