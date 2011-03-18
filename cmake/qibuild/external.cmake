@@ -24,6 +24,11 @@ function(qi_build_autotools name url)
   set(options)
   list(APPEND options "${ARGS_CONFIGURE_OPTIONS}")
 
+  # Ugly hack for mac: configure the CFGLAGS based on the name of the toolchain...
+  if("${QI_TOOLCHAIN_NAME}" STREQUAL "mac-32")
+    list(APPEND options "CFLAGS=-arch i386")
+  endif()
+
   set(patchs_cmd)
   foreach(p ${ARGS_PATCH})
     list(APPEND patchs_cmd "patch" "-p1" "<" "${p}" ";")
@@ -76,22 +81,7 @@ function(qi_build_cmake name url)
   qi_install_external_project()
 endfunction()
 
-#! install all files related to an autotools like project.
 function(qi_install_external_project)
-  get_filename_component(_THIS_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-  set(SOURCE_FOLDER "${QI_SDK_DIR}")
-  set(QI_BUILD_DIR  "${QI_BUILD_ROOT_DIR}")
-  configure_file("${QI_TEMPLATE_DIR}/install_autotools.cmake"
-                 "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake"
-                 @ONLY)
-
-  #each component should be specified, otherwize it's not possible to install
-  #a single component. (look at the generated cmake_install.cmake to understand)
-  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT lib)
-  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT static-lib)
-  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT binary)
-  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT conf)
-  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT data)
-  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT doc)
-  install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/install_autotools.cmake" COMPONENT python)
+  install(DIRECTORY "${QI_SDK_DIR}" DESTINATION "${CMAKE_INSTALL_PREFIX}")
+  # FIXME: on mac, do something with install_name ?
 endfunction()
