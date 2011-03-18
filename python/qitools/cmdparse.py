@@ -303,7 +303,7 @@ def action_modules_from_package(package_name):
 def log_parser(parser):
     """ Given a parser, add the options controlling log
     """
-    group = parser.add_argument_group("logging arguments")
+    group = parser.add_argument_group("logging options")
     group.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Output debug messages")
     group.add_argument("--quiet", "-q", dest="quiet", action="store_true", help="Only output error messages")
     group.add_argument("--no-color", dest="color", action="store_false", help="Do not use color")
@@ -315,7 +315,7 @@ def default_parser(parser):
     # Every action should have access to a proper log
     log_parser(parser)
     # Every action can use  --pdb and --backtrace
-    group = parser.add_argument_group("debug arguments")
+    group = parser.add_argument_group("debug options")
     group.add_argument("--backtrace", action="store_true", help="Display backtrace on error")
     group.add_argument("--pdb", action="store_true", help="Use pdb on error")
 
