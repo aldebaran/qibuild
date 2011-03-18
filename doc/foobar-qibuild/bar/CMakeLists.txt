@@ -9,5 +9,5 @@ qi_create_lib(bar
   bar/bar.cpp)
 
 qi_stage_lib(bar)
-qi_in
+qi_install_header(bar bar/bar.h)
 
