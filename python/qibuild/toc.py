@@ -122,10 +122,20 @@ class Toc(QiWorkTree):
         # provided by the current toolchain, if any
         self.packages          = list()
 
+        # Update build configurations
+        if not self.build_config:
+            self.build_config = self.configstore.get("general", "build", "config", default=None)
+
+        if self.build_config:
+            cfg_file = "build-%s.cfg" % self.build_config
+            to_read = os.path.join(self.work_tree, ".qi", cfg_file)
+            self.configstore.read(to_read)
+
         # If toolchain_name is None, it was not given on command line,
         # look for it in the configuration:
         if not toolchain_name:
             toolchain_name = self.configstore.get("general", "build", "toolchain")
+
         # If it's not in the configuration, assume the name is
         # "system":
         if not toolchain_name:
@@ -134,15 +144,6 @@ class Toc(QiWorkTree):
         self.toolchain = qitoolchain.Toolchain(toolchain_name)
         self.packages = self.toolchain.packages
         LOGGER.debug("[%s] toolchain:\n%s", toolchain_name, self.toolchain)
-
-        if not self.build_config:
-            self.build_config = self.configstore.get("general", "build", "config", default=None)
-
-
-        if self.build_config:
-            cfg_file = "build-%s.cfg" % self.build_config
-            to_read = os.path.join(self.work_tree, ".qi", cfg_file)
-            self.configstore.read(to_read)
 
         if not self.cmake_generator:
             self.cmake_generator = self.configstore.get("general", "build" ,
@@ -176,19 +177,17 @@ class Toc(QiWorkTree):
         build-cross-debug ...
         """
         res = ["build"]
-        if self.toolchain.name != "system":
-            res.append(self.toolchain.name)
-        else:
+        if self.toolchain.name == "system":
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
+        else:
+            res.append(self.toolchain.name)
+
         if not self.using_visual_studio and self.build_type != "debug":
             # When using cmake + visual studio, sharing the same build dir with
             # several build config is mandatory.
             # Otherwise, it's not a good idea, so we always specify it
             # when it's not "debug"
             res.append(self.build_type)
-
-        if self.build_config:
-            res.append(self.build_config)
 
         self.build_folder_name = "-".join(res)
 
