@@ -221,16 +221,27 @@ class Toc(QiWorkTree):
         dep_solver = DependenciesSolver(projects=self.projects, packages=self.toolchain.packages)
         (project_names, package_names, not_found) = dep_solver.solve([project_name])
 
+        if not_found:
+            LOGGER.warning("Could not find projects %s", ", ".join(not_found))
+
         project_names.remove(project_name)
 
-        for package_name in package_names:
-            dirs.append(self.toolchain.get(package_name))
+        # Quick hack: sometimes user has more packages inside his toolchain
+        # than he thinks ...
+        # So we just add everything here.
+        for package in self.toolchain.packages:
+            if package.name not in project_names:
+                dirs.append(self.toolchain.get(package.name))
+
+        # Note: correct version is:
+        #
+        # for package_name in package_names:
+        #     dirs.append(self.toolchain.get(package_name))
+        #
+
         for project_name in project_names:
             project = self.get_project(project_name)
             dirs.append(project.get_sdk_dir())
-
-        if not_found:
-            LOGGER.warning("Could not find projects %s", ", ".join(not_found))
 
         LOGGER.debug("sdk_dirs for %s : %s", project_name, dirs)
         return dirs
