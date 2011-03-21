@@ -203,11 +203,6 @@ endfunction()
 #                          for this target.
 # \flag:NO_STAGE Do not stage the library.
 # \flag:NO_FPIC Do not set -fPIC on static libraries (will be set for shared lib by CMake anyway)
-# \flag:PLUGIN Build a plugin. This will make sure that:
-#    - the library is built as a dynamic library
-#    - a SUBFOLDER argument has been given
-#    - the .dll will be installed in lib/${SUBFOLDER}. (by default, the dynamic libraries
-#      are installed in bin/${SUBFOLDER} on windows)
 # \param:SUBFOLDER The destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
 # \group:SRC The list of source files (private headers and sources)
@@ -215,8 +210,16 @@ endfunction()
 # \group:DEP List of dependencies
 # \example:target
 function(qi_create_lib name)
-  cmake_parse_arguments(ARG "PLUGIN;NO_INSTALL;NO_STAGE;NO_FPIC" "SUBFOLDER" "SRC;SUBMODULE;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC" "SUBFOLDER" "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
+  if (ARG_NOBINDLL)
+    # NOBINDLL was used for naoqi modules.
+    # We wanted them to end up in
+    # sdk/lib/naoqi/my_module.dll, and not in
+    # sdk/bin/my_module.dll  (which is the place dll should
+    # normally go on windows: next to the .exe)
+    qi_deprecated("Use of NOBINDLL is deprectated")
+  endif()
   qi_debug("qi_create_lib(${name} ${ARG_SUBFOLDER})")
 
   #ARGN are sources too
@@ -246,17 +249,6 @@ function(qi_create_lib name)
     endif()
   endif()
 
-  # Sanity checks when building a plugin:
-  if(ARG_PLUGIN)
-    if("${ARG_SUBFOLDER}" STREQUAL "")
-      qi_error("Using qi_create_lib with PLUGIN flag but without SUBFOLDER parameter is not supported")
-    endif()
-    get_target_property(_target_type ${name} TYPE)
-    if(NOT "${_target_type}" STREQUAL "SHARED_LIBRARY")
-      qi_error("Using qi_create_lib with PLUGIN flag but '${name}' is not a shared library")
-    endif()
-  endif()
-
   qi_use_lib("${name}" ${ARG_DEPENDS})
 
   if (WIN32)
@@ -278,11 +270,7 @@ function(qi_create_lib name)
   endif()
 
   #make install rules
-  if (ARG_PLUGIN)
-    qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}" PLUGIN)
-  else()
-    qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
-  endif()
+  qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
 
   if(APPLE)
     set_target_properties("${name}"

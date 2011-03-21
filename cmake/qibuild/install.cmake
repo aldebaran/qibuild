@@ -78,14 +78,10 @@ endfunction()
 #
 # \param:SUBFOLDER An optional subfolder
 # \argn: A list of target to install
-# \flag: PLUGIN Different install rules on windows if the library is a plugin,
-#        or needed at runtime
-#   - plugin:       installed in lib/${SUBFOLDER}/foo.dll
-#   - not a plugin: installed in  bin/${SUBFOLDER}/foo.dll
 # \param:IF Condition that should be verified for the install rules to be active.
 #           for example (IF WITH_ZEROMQ)
 function(qi_install_target)
-  cmake_parse_arguments(ARG "PLUGIN" "IF;SUBFOLDER" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "IF;SUBFOLDER" "" ${ARGN})
 
   if (NOT "${ARG_IF}" STREQUAL "")
     set(_doit TRUE)
@@ -100,17 +96,12 @@ function(qi_install_target)
     return()
   endif()
 
-  if(ARG_PLUGIN)
-    set(_runtime_out ${QI_SDK_LIB}/${ARG_SUBFOLDER})
-  else()
-    set(_runtime_out ${QI_SDK_BIN}/${ARG_SUBFOLDER})
-  endif()
-
   foreach (name ${ARG_UNPARSED_ARGUMENTS})
     install(TARGETS "${name}"
-            RUNTIME COMPONENT binary     DESTINATION ${_runtime_out}
+            RUNTIME COMPONENT binary     DESTINATION ${QI_SDK_BIN}/${ARG_SUBFOLDER}
             LIBRARY COMPONENT lib        DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER}
       PUBLIC_HEADER COMPONENT header     DESTINATION ${QI_SDK_INCLUDE}/${ARG_SUBFOLDER}
+           RESOURCE COMPONENT data       DESTINATION ${QI_SDK_SHARE}/${name}/${ARG_SUBFOLDER}
             ARCHIVE COMPONENT static-lib DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER})
   endforeach()
 endfunction()
