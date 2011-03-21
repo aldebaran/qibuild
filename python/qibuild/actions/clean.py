@@ -29,9 +29,25 @@ def cleanup(path, bdirs, work_tree, doit=False):
             if doit:
                 print " ", os.path.relpath(bdir, work_tree)
                 qitools.sh.rm(bdir)
-            else:
-                print " ", os.path.relpath(bdir, work_tree)
     pass
+
+def list_build_folder(path, bdirs, work_tree):
+    """ list all buildable directory """
+    result = dict()
+    if not len(bdirs):
+        bdirs = glob.glob(os.path.join(path, "build-*"))
+    else:
+        bdirs = [ os.path.join(path, x) for x in bdirs ]
+    for bdir in bdirs:
+        if os.path.isdir(bdir):
+            bname = os.path.basename(bdir)
+            dirname = os.path.basename(os.path.dirname(os.path.relpath(bdir, work_tree)))
+            lst = result.get(bname)
+            if not lst:
+                result[bname] = list()
+            result[bname].append(dirname)
+    return result
+
 
 def do(args):
     """Main entry point"""
@@ -39,11 +55,28 @@ def do(args):
     qiwt     = qitools.qiworktree_open(args.work_tree, use_env=True)
 
     if args.force:
-        print "removing:"
+        logger.info("preparing to remove:")
     else:
-        print "Build directory that will be removed (use -f to apply):"
+        logger.info("Build directory that will be removed (use -f to apply):")
+    folders = dict()
     for project in qiwt.buildable_projects.values():
-        cleanup(project, args.build_directory, qiwt.work_tree, args.force)
+        result = list_build_folder(project, args.build_directory, qiwt.work_tree)
+        for k,v in result.iteritems():
+            if folders.get(k):
+                folders[k].extend(v)
+            else:
+                folders[k] = v
+    for k,v in folders.iteritems():
+        logger.info(k)
+        print " ", ",".join(v)
+        # for p in v:
+        #     print "  %s" % p
+
+    if args.force:
+        logger.info("")
+        logger.info("removing:")
+        for project in qiwt.buildable_projects.values():
+            cleanup(project, args.build_directory, qiwt.work_tree, args.force)
 
 if __name__ == "__main__":
     import sys
