@@ -206,12 +206,11 @@ endfunction()
 # \param:SUBFOLDER The destination subfolder. The install rules generated will be
 #                  sdk/bin/<subfolder>
 # \group:SRC The list of source files (private headers and sources)
-# \group:RESOURCE The list of OSX resources
 # \group:SUBMODULE Submodule to include in the lib
 # \group:DEP List of dependencies
 # \example:target
 function(qi_create_lib name)
-  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC" "SUBFOLDER" "SRC;RESOURCE;SUBMODULE;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC" "SUBFOLDER" "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
   if (ARG_NOBINDLL)
     # NOBINDLL was used for naoqi modules.
@@ -252,9 +251,6 @@ function(qi_create_lib name)
 
   qi_use_lib("${name}" ${ARG_DEPENDS})
 
-  if (ARG_RESOURCE)
-    set_target_properties("${name}" PROPERTIES RESOURCE      "${ARG_RESOURCE}")
-  endif()
   if (WIN32)
     # always postfix debug lib/bin with _d ...
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
