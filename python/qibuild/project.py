@@ -103,7 +103,7 @@ class Project:
 
         if continuous:
             now = datetime.datetime.now()
-            res.append(now.strftime("%Y-%m-%d"))
+            res.append(now.strftime("%Y-%m-%d-%H-i%M"))
 
         if arch:
             res.append(arch)
