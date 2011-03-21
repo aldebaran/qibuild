@@ -86,9 +86,15 @@ function(qi_create_bin name)
   endif()
 
   if(WIN32)
+    # always postfix debug lib/bin with _d ...
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
+    # ... and generate libraries and next to executables.
+    set_target_properties("${name}" PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${ARG_SUBFOLDER}")
+  else()
+    set_target_properties("${name}" PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
   endif()
-  set_target_properties("${name}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
 
   if(MSVC)
     string(TOUPPER ${name} _U_name)
@@ -251,27 +257,24 @@ function(qi_create_lib name)
   endif()
 
   if (WIN32)
-    #always postfix debug lib/bin with _d
+    # always postfix debug lib/bin with _d ...
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
+    # ... and generate libraries and next to executables.
+    set_target_properties("${name}"
+      PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${ARG_SUBFOLDER}
+        ARCHIVE_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${ARG_SUBFOLDER}
+        LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${ARG_SUBFOLDER}
+    )
+  else()
+    set_target_properties("${name}" PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${SDK_LIB}/${ARG_SUBFOLDER}
+        LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${SDK_LIB}/${ARG_SUBFOLDER}
+    )
   endif()
-
-  set_target_properties("${name}"
-    PROPERTIES
-      RUNTIME_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}
-      ARCHIVE_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}
-      LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}
-      )
-  #endif()
 
   #make install rules
-  if (NOT ARG_NO_INSTALL)
-    install(TARGETS "${name}"
-            RUNTIME COMPONENT binary     DESTINATION ${QI_SDK_BIN}/${ARG_SUBFOLDER}
-            LIBRARY COMPONENT lib        DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER}
-      PUBLIC_HEADER COMPONENT header     DESTINATION ${QI_SDK_INCLUDE}/${ARG_SUBFOLDER}
-           RESOURCE COMPONENT data       DESTINATION ${QI_SDK_SHARE}/${name}/${ARG_SUBFOLDER}
-            ARCHIVE COMPONENT static-lib DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER})
-  endif()
+  qi_install_target("${name}")
 
   if(APPLE)
     set_target_properties("${name}"
