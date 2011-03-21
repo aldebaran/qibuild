@@ -255,26 +255,26 @@ function(qi_create_lib name)
   if (ARG_RESOURCE)
     set_target_properties("${name}" PROPERTIES RESOURCE      "${ARG_RESOURCE}")
   endif()
-
   if (WIN32)
     # always postfix debug lib/bin with _d ...
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
     # ... and generate libraries and next to executables.
     set_target_properties("${name}"
       PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${ARG_SUBFOLDER}
-        ARCHIVE_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${ARG_SUBFOLDER}
-        LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${ARG_SUBFOLDER}
+        RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${ARG_SUBFOLDER}"
+        ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${ARG_SUBFOLDER}"
+        LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${ARG_SUBFOLDER}"
     )
   else()
     set_target_properties("${name}" PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${SDK_LIB}/${ARG_SUBFOLDER}
-        LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${SDK_LIB}/${ARG_SUBFOLDER}
+        RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
+        ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
+        LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
     )
   endif()
 
   #make install rules
-  qi_install_target("${name}")
+  qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
 
   if(APPLE)
     set_target_properties("${name}"
