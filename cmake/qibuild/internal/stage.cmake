@@ -48,10 +48,23 @@ endfunction()
 
 function(_qi_gen_find_lib_code_redist res target)
   string(TOUPPER ${target} _U_target)
-  set(_res
+  if("${target}_SUBFOLDER" STREQUAL "")
+    set(_res
 "
 find_library(${_U_target}_DEBUG_LIBRARY ${target}_d)
 find_library(${_U_target}_LIBRARY       ${target})
+")
+  else()
+    set(_res
+"
+find_library(${_U_target}_DEBUG_LIBRARY ${target}_d PATH_SUFFIXES ${${target}_SUBFOLDER})
+find_library(${_U_target}_LIBRARY       ${target}   PATH_SUFFIXES ${${target}_SUBFOLDER})
+")
+  endif()
+  set(_res
+"
+${_res}
+
 if (${_U_target}_DEBUG_LIBRARY)
   set(${_U_target}_LIBRARIES optimized;\${${_U_target}_LIBRARY};debug;\${${_U_target}_DEBUG_LIBRARY})
 else()
