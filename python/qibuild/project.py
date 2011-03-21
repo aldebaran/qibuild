@@ -125,7 +125,7 @@ class Project:
 
         import re
         up_name = self.name.upper()
-        match = re.match('^set\(%s_VERSION (.*?)\)' % up_name,
+        match = re.match('^set\(%s_VERSION\s+"?(.*?)"?\s*\)' % up_name,
                          contents)
         if not match:
             LOGGER.warning("Invalid version.cmake. Should have a line looking like\n"
