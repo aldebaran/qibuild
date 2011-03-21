@@ -22,7 +22,12 @@ function(qi_add_test test_name target_name)
     set(ARG_TIMEOUT 20)
   endif()
 
-  set(_bin_path ${QI_SDK_DIR}/${target_name})
+  if(WIN32)
+    set(_bin_path ${QI_SDK_DIR}/${target_name})
+  else()
+    set(_bin_path ${QI_SDK_DIR}/${QI_SDK_BIN}/${target_name})
+  endif()
+
   if(WIN32 AND ${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
     set(_bin_path ${_bin_path}_d)
   endif()
