@@ -255,12 +255,38 @@ function(qi_create_lib name)
     # always postfix debug lib/bin with _d ...
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
     # ... and generate libraries and next to executables.
+    if("${ARG_SUBFOLDER}" STREQUAL "")
     set_target_properties("${name}"
       PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${ARG_SUBFOLDER}"
-        ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${ARG_SUBFOLDER}"
-        LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${ARG_SUBFOLDER}"
+        RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}"
+        ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}"
+        LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}"
     )
+    else()
+      # After qi_create_bin(foo), foo.exe is in build/sdk/Release/foo.exe,
+      # So we need to copy paste hello.dll from build/src/hello/Release/hello.dll to
+      # build/sdk/Release/${SUBFOLER}/hello.dll
+      # We will achieve this using a post-build rule using post-copy-plugin.cmake.
+      configure_file(${QI_ROOT_DIR}/templates/post-copy-plugin.cmake
+                     ${CMAKE_BINARY_DIR}/post-copy-plugin.cmake
+                     COPYONLY)
+
+
+      get_target_property(_location_release "${name}" LOCATION_RELEASE)
+      get_target_property(_location_debug   "${name}" LOCATION_DEBUG)
+
+
+      add_custom_command(TARGET ${name} POST_BUILD
+        COMMAND
+          "${CMAKE_COMMAND}"
+          -DBUILD_TYPE=${CMAKE_CFG_INTDIR}
+          -DLOCATION_DEBUG="${_location_debug}"
+          -DLOCATION_RELEASE="${_location_release}"
+          -DOUTPUT="${QI_SDK_DIR}/${CMAKE_CFG_INTDIR}/${ARG_SUBFOLDER}"
+          -P "${CMAKE_BINARY_DIR}/post-copy-plugin.cmake"
+          "${CMAKE_BINARY_DIR}"
+      )
+    endif()
   else()
     set_target_properties("${name}" PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
