@@ -297,33 +297,33 @@ function(_qi_internal_stage_lib target ${ARGN})
   #
 
   if(_staged_name)
+    string(TOUPPER ${target} _U_target)
+    set(_warning_message
+"
+message(STATUS \"
+  Usage of :
+    use_lib(... ${_staged_name})
+  is deprecated
+  Use:
+    qi_use_lib(... ${target})
+    or
+    use_lib(... ${_U_target})
+   instead
+\")
+"  )
+
     message(STATUS "Staging ${_staged_name} instead of ${target}!")
     string(TOUPPER ${target} _U_target)
     string(TOLOWER ${_staged_name} _other_name)
     string(REPLACE ${_U_target} ${_staged_name} _other_redist "${_redist}")
     set(_other_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_other_name}-config.cmake")
     file(WRITE  "${_other_redist_file}" "${_other_redist}")
-    file(APPEND "${_other_redist_file}"
-"
-message(STATUS \"
-  Usage of ${_other_redist_file} is deprecated
-  Use ${_redist_file} instead
-\")
-"
-    )
+    file(APPEND "${_other_redist_file}" ${_warning_message})
 
     string(REPLACE ${_U_target} ${_staged_name} _other_sdk "${_sdk}")
     set(_other_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_other_name}-config.cmake")
     file(WRITE  "${_other_sdk_file}" "${_other_sdk}")
-    file(APPEND "${_other_sdk_file}"
-"
-message(STATUS \"
-  Usage of ${_other_sdk_file} file is deprecated
-  Use ${_sdk_file} instead
-  \")
-"
-    )
-
+    file(APPEND "${_other_sdk_file}" ${_warning_message})
 
   endif()
 
