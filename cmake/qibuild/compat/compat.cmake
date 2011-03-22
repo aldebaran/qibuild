@@ -418,6 +418,7 @@ function(wrap_python)
   )
   include(qibuild/swig/python)
   _fix_flags(_new_args DEPENDENCIES DEPENDS ${ARGN})
+  _fix_flags(_new_args SRCS SRC ${ARGN})
   qi_swig_wrap_python(${_new_args})
 endfunction()
 
