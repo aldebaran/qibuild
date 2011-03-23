@@ -39,7 +39,8 @@ function(qi_swig_wrap_python module_name interface_file)
   ##
   # Deal with dependencies:
   foreach (_dep ${ARG_DEPENDS})
-    find_package(${_dep})
+    find_package(${_dep} NO_MODULE QUIET)
+    find_package(${_dep} REQUIRED)
     include_directories(
       ${${_dep}_INCLUDE_DIR}
       ${${_dep}_INCLUDE_DIRS})
