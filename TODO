@@ -35,6 +35,13 @@ qiSrc:
 * qisrc add should be able to read a base git url. For instance,
   qisrc add foo/bar.git, should read a setting and clone git://example.com:foo/bar.git
 
+Command line parsing, actions and plugins:
+* Make it possible for qitools.run_action() to return a value.
+  Typicall use case, after a `package' action:
+
+  package = run_action('qibuild.actions.package', ...)
+  upload_package(package)
+
 
 DOC:
  * fix tutorials on using toolchain
