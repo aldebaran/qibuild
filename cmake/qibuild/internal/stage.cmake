@@ -300,7 +300,7 @@ function(_qi_internal_stage_lib target ${ARGN})
     string(TOUPPER ${target} _U_target)
     set(_warning_message
 "
-message(STATUS \"
+message(WARNING \"
   Usage of :
     use_lib(... ${_staged_name})
   is deprecated
