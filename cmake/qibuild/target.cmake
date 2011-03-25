@@ -282,7 +282,7 @@ function(qi_create_lib name)
           -DBUILD_TYPE=${CMAKE_CFG_INTDIR}
           -DLOCATION_DEBUG="${_location_debug}"
           -DLOCATION_RELEASE="${_location_release}"
-          -DOUTPUT="${QI_SDK_DIR}/${CMAKE_CFG_INTDIR}/${ARG_SUBFOLDER}"
+          -DOUTPUT="${QI_SDK_DIR}/${CMAKE_CFG_INTDIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
           -P "${CMAKE_BINARY_DIR}/post-copy-plugin.cmake"
           "${CMAKE_BINARY_DIR}"
       )

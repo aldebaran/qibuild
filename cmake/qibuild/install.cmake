@@ -96,9 +96,21 @@ function(qi_install_target)
     return()
   endif()
 
+  if(ARG_SUBFOLDER)
+    set(_dll_output ${QI_SDK_LIB}/${ARG_SUBFOLDER})
+  else()
+    set(_dll_output ${QI_SDK_BIN})
+  endif()
+
+  if(WIN32)
+    set(_runtime_output ${_dll_output})
+  else()
+    set(_runtime_output ${QI_SDK_BIN}/${ARG_SUBFOLDER})
+  endif()
+
   foreach (name ${ARG_UNPARSED_ARGUMENTS})
     install(TARGETS "${name}"
-            RUNTIME COMPONENT binary     DESTINATION ${QI_SDK_BIN}/${ARG_SUBFOLDER}
+            RUNTIME COMPONENT binary     DESTINATION ${_runtime_output}
             LIBRARY COMPONENT lib        DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER}
       PUBLIC_HEADER COMPONENT header     DESTINATION ${QI_SDK_INCLUDE}/${ARG_SUBFOLDER}
            RESOURCE COMPONENT data       DESTINATION ${QI_SDK_SHARE}/${name}/${ARG_SUBFOLDER}
