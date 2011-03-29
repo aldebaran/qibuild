@@ -50,7 +50,11 @@ function(_qi_use_lib_get_deps _OUT_list)
     endforeach()
   endforeach()
 
-  list(REMOVE_DUPLICATES _result)
+  #We do not remove duplicate here.. If libA and libB each depends on
+  #libC, libC need to be after libA and libB, so we need to take each
+  #libC occurence into acount, in fact, we could optimise if we want
+  #and only take the last one, but REMOVE_DUPLICATES keep the first occurence
+  #list(REMOVE_DUPLICATES _result)
 
   set(${_OUT_list} ${_result} PARENT_SCOPE)
 endfunction()
