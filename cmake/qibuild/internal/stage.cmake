@@ -239,7 +239,14 @@ function(_qi_set_vars target)
 endfunction()
 
 
-function(_qi_internal_stage_lib target ${ARGN})
+function(_qi_internal_stage_lib target)
+  message(STATUS "
+
+  In _qi_internal_stage_lib:
+  called with ${target} ${ARGN}
+
+  "
+  )
   cmake_parse_arguments(ARG "" "" "STAGED_NAME" ${ARGN})
   string(TOUPPER ${target} _U_target)
   string(TOLOWER ${target} _l_target)
