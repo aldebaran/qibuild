@@ -188,10 +188,14 @@ endfunction()
 #    qi_create_lib(mylib SRC ....)
 # ----
 #
-# The library will be compiled in static by default, unless
-# +BUILD_SHARED_LIBS+ is true.
+# The library will be:
+#  - built as a shared library on UNIX
+#  - built as a static library on windows
 #
-# This is the standard CMake behavior, see link:http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:add_library[cmake documentation] for more details
+# But the user can set BUILD_SHARED_LIBS=OFF to compile
+# everything in static by default.
+#
+# Warning ! This is quite not the standard CMake behavior
 #
 # \arg:name the target name
 # \argn: sources files, like the SRC group, argn and SRC will be merged
@@ -210,7 +214,7 @@ endfunction()
 # \group:DEP List of dependencies
 # \example:target
 function(qi_create_lib name)
-  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC" "SUBFOLDER" "SRC;SUBMODULE;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC;SHARED;STATIC" "SUBFOLDER" "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
   if (ARG_NOBINDLL)
     # NOBINDLL was used for naoqi modules.
@@ -239,7 +243,25 @@ function(qi_create_lib name)
   endforeach()
   qi_glob(_SRC           ${ARG_SRC})
 
-  add_library("${name}" ${_SRC})
+  if(UNIX)
+    set(_type "SHARED")
+  else()
+    set(_type "STATIC")
+  endif()
+
+  if ("${BUILD_SHARED_LIBS}" STREQUAL "OFF")
+    set(_type "STATIC")
+  endif()
+
+  if(ARG_SHARED)
+    set(_type "SHARED")
+  endif()
+  if(ARG_STATIC)
+    set(_type "STATIC")
+  endif()
+
+
+  add_library("${name}" ${_type} ${_SRC})
 
   if (NOT ARG_NO_FPIC)
     if (UNIX)
