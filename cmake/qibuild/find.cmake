@@ -38,7 +38,13 @@ function(_qi_call_fphsa prefix)
   else()
     set(_to_check ${prefix}_LIBRARIES ${prefix}_INCLUDE_DIR)
   endif()
-  find_package_handle_standard_args(${prefix} DEFAULT_MSG ${_to_check})
+
+  if($ENV{VERBOSE})
+    find_package_handle_standard_args(${prefix} DEFAULT_MSG ${_to_check})
+  else()
+    set(${prefix}_FIND_QUIETLY TRUE)
+    find_package_handle_standard_args(${prefix} DEFAULT_MSG ${_to_check})
+  endif()
 endfunction()
 
 
