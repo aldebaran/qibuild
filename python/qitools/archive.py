@@ -140,3 +140,23 @@ def zip( directory):
         return zip_win(directory)
     else:
         return zip_unix(directory)
+
+def extracted_name(archive_name):
+    """Return the extracted name from the archive name.
+
+    Warning: this assumes the archive is well-formed
+    (ie the root dir of foo.tar.gz is foo)
+
+    >>> extracted_name("foo.zip")
+    'foo'
+    >>> extracted_name("foo.tar.gz")
+    'foo'
+    """
+    known_exts = [".zip", ".tar.gz", ".tar.bz2"]
+    for ext in known_exts:
+        if archive_name.endswith(ext):
+            return archive_name[:-len(ext)]
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
