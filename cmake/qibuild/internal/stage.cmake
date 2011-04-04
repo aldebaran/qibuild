@@ -314,7 +314,7 @@ message(WARNING \"
 \")
 "  )
 
-    message(STATUS "Staging ${_staged_name} instead of ${target}!")
+    qi_verbose("Staging ${_staged_name} instead of ${target}!")
     string(TOUPPER ${target} _U_target)
     string(TOLOWER ${_staged_name} _other_name)
     string(TOUPPER ${_staged_name} _U_staged_name)
