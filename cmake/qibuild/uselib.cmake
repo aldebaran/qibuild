@@ -7,7 +7,6 @@
 # qi_use_lib handles dependencies between projects.
 # It will call find_package for you, then do all the include_directories
 # and target_link_libraries that are needed.
-# \example:uselib
 #
 
 if (_QI_USELIB_CMAKE_)
