@@ -10,7 +10,7 @@ find_program(QT_MOC_EXECUTABLE moc)
 find_program(QT_UIC_EXECUTABLE uic)
 
 if(QT_MOC_EXECUTABLE)
-  debug("QT_MOC_EXECUTABLE: ${QT_MOC_EXECUTABLE}")
+  qi_debug("QT_MOC_EXECUTABLE: ${QT_MOC_EXECUTABLE}")
 else()
   message(FATAL_ERROR "QT_MOC not found!")
 endif()
