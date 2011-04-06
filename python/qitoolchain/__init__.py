@@ -204,7 +204,7 @@ class Toolchain(object):
             dest = os.path.join(get_rootfs(self.name), package_name)
             if os.path.exists(dest):
                 qitools.sh.rm(dest)
-            os.rename(extracted, dest)
+            qitools.sh.mv(extracted, dest)
         self._packages.append(Package(package_name))
 
     def update(self, new_feed=None, all=False):
