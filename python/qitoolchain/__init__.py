@@ -198,7 +198,13 @@ class Toolchain(object):
 
         LOGGER.info("Adding package %s", package_name)
         urllib.urlretrieve(url, archive_path)
-        qitools.archive.extract(archive_path, get_rootfs(self.name))
+        with qitools.sh.TempDir() as tmp:
+            extracted = qitools.archive.extract(archive_path, tmp)
+            # Rename package once it is extracted:
+            dest = os.path.join(get_rootfs(self.name), package_name)
+            if os.path.exists(dest):
+                qitools.sh.rm(dest)
+            os.rename(extracted, dest)
         self._packages.append(Package(package_name))
 
     def update(self, new_feed=None, all=False):
