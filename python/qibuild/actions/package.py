@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 import shutil
+import datetime
 
 import qitools
 import qibuild
@@ -29,6 +30,56 @@ def qibuildize(destdir):
     src  = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "version.cmake")
     dest = os.path.join(destdir, "share", "cmake", "qibuild", "qibuild-version.cmake")
     qitools.sh.install(src, dest)
+
+def get_package_name(project, continuous=False, version=None, arch=None):
+    """Get the package name of a project.
+
+    Recognized args are:
+      continuous -> append the date the the name of the package
+      version    -> if not given, will try to use version.cmake at
+                    the root of the project
+      arch       -> if not given, do nothing, else add this at the end
+                    of the package name
+    """
+    res = [project.name]
+
+    if not version:
+        version = get_project_version(project)
+        if version:
+            res.append(version)
+    else:
+        res.append(version)
+
+    if continuous:
+        now = datetime.datetime.now()
+        res.append(now.strftime("%Y-%m-%d"))
+
+    if arch:
+        res.append(arch)
+
+    return "-".join(res)
+
+def get_project_version(project):
+    """Try to guess version from the sources of the project.
+
+    Return None if not found.
+    """
+    version_cmake = os.path.join(project.directory, "version.cmake")
+    if not os.path.exists(version_cmake):
+        return None
+    contents = None
+    with open(version_cmake, "r") as fp:
+        contents = fp.read()
+
+    import re
+    up_name = project.name.upper()
+    match = re.match('^set\(%s_VERSION\s+"?(.*?)"?\s*\)' % up_name,
+                     contents)
+    if not match:
+        LOGGER.warning("Invalid version.cmake. Should have a line looking like\n"
+           "set(%s_VERSION <VERSION>)",  up_name)
+        return None
+    return match.groups()[0]
 
 
 def configure_parser(parser):
@@ -56,7 +107,8 @@ def _do(args, build_type):
     project = toc.get_project(project_name)
     inst_dir = os.path.join(project.build_directory, "package")
 
-    package_name = project.get_package_name(
+    package_name = get_package_name(
+        project,
         continuous=args.continuous,
         arch=args.arch,
         version=args.version)
