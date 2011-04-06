@@ -13,6 +13,20 @@ For instance, after
   arg.release = True
   arg.prohect = "foo"
 
+
+The main methods are:
+
+ - run_action()
+    Use this to call an action from another piece of code.
+
+ - root_command_main() and action_modules_from_package()
+    Use this write a script able to load several actions, see
+bin/qibuild for an example)
+
+This also contains the default_parser() functions, to be
+sure every script you write will understand --pdb, --verbose and so on...
+
+
 """
 
 import os
@@ -86,13 +100,16 @@ def parse_args_for_help(args):
         return(False, None)
 
 
-def run_action(module_name, arguments=None, forward_args=None):
+def run_action(module_name, args=None, forward_args=None):
     """Run an action using its module path and a list of arguments
-    (if not given, action will be called with not arguments)
+
+    If forward_args is given, it must be an argparse.Namespace object.
+        This namespace will be merged with args before being
+        passed to the do() method of module_name.
 
     """
-    if not arguments:
-        arguments = list()
+    if not args:
+        args = list()
     action_name  = module_name.split(".")[-1]
     package_name = ".".join(module_name.split(".")[:-1])
     try:
@@ -105,7 +122,15 @@ def run_action(module_name, arguments=None, forward_args=None):
         raise InvalidAction(module_name, "Could not find module %s in package %s" %
             (module_name, package_name))
     check_module(module)
-    sub_command_main(module, arguments, forward_args)
+    try:
+        usage = module.usage()
+    except AttributeError:
+        usage = None
+    parser = argparse.ArgumentParser(usage=usage)
+    module.configure_parser(parser)
+    parsed_args = parser.parse_args(args=args, namespace=forward_args)
+    qitools.log.configure_logging(parsed_args)
+    return module.do(parsed_args)
 
 
 def main_wrapper(module, args):
@@ -219,39 +244,6 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
     main_wrapper(module, pargs)
     return True
 
-def sub_command_main(module, args=None, namespace=None):
-    """This is called  by run_action() for an other module
-
-    Note that you could also use this to make an script from an
-    action module if you need to, like this:
-
-        def configure_parser(parser):
-            ...
-
-        def do(args):
-            ....
-
-
-        if __name__ == "__main__"
-            sub_command_main(sys.modules[__name__])
-
-    """
-    LOGGER.debug("""calling sub_command_main
-        module=%s,
-        args=%s,
-        namespace=%s
-    """, module, args, namespace)
-
-    check_module(module)
-    try:
-        usage = module.usage()
-    except AttributeError:
-        usage = None
-    parser = argparse.ArgumentParser(usage=usage)
-    module.configure_parser(parser)
-    parsed_args = parser.parse_args(args=args, namespace=namespace)
-    qitools.log.configure_logging(parsed_args)
-    main_wrapper(module, parsed_args)
 
 
 def check_module(module):
