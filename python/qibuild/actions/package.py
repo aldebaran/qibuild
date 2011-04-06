@@ -83,6 +83,7 @@ def do(args):
     LOGGER.info("Compressing package")
     archive = qitools.archive.zip(destdir)
     LOGGER.info("Package generated in %s", archive)
+    return archive
     # Now, clean the destdir.
     qitools.sh.rm(destdir)
 
