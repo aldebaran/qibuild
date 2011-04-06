@@ -32,7 +32,11 @@ def do(args):
 
     for project_names in project_names:
         project = toc.get_project(project_names)
-        logger.info("Building %s in %s", project.name, toc.build_folder_name)
+        if args.target:
+            logger.info("Building target %s for project %s in %s",
+                args.target, project.name, toc.build_folder_name)
+        else:
+            logger.info("Building %s in %s", project.name, toc.build_folder_name)
         toc.build_project(project, target=args.target, num_jobs=args.num_jobs,
             incredibuild=use_incredibuild)
 

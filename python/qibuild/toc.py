@@ -365,9 +365,11 @@ class Toc(QiWorkTree):
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
             _advise_using_configure(project)
-        LOGGER.debug("[%s]: building in %s", project.name, build_dir)
 
         cmd = ["cmake", "--build", build_dir, "--config", self.build_type]
+        if target:
+            cmd += ["--target", target]
+
         # In order to use incredibuild, we have to do this small hack:
         if self.using_visual_studio:
             sln_files = glob.glob(build_dir + "/*.sln")
@@ -377,6 +379,8 @@ class Toc(QiWorkTree):
                 cmd = ["BuildConsole.exe", sln_file]
                 cmd += ["/cfg=%s|Win32" % self.build_type]
                 cmd += ["/nologo"]
+                if target:
+                    cmd += ["/target=%s" % target]
             else:
                 if self.vc_version == "10":
                     # CMake will use MSBuild for VS2010 builds, in other
