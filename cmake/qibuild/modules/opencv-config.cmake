@@ -1,7 +1,17 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
 clean(OPENCV)
+# Old API
+# include <cv.h>
+fpath(OPENCV cv.h PATH_SUFFIXES opencv)
+# include <opencv/cv.h>
 fpath(OPENCV opencv/cv.h)
+
+# New API:
+# include <opencv2/cv.hpp>
+# fpath(OPENCV opencv2/cp.hpp PATH_SUFFIXES opencv2)
+
+
 flib(OPENCV OPTIMIZED NAMES cv      cv200       opencv_legacy)
 flib(OPENCV DEBUG     NAMES cv      cv200d      opencv_legacy)
 flib(OPENCV OPTIMIZED NAMES cvaux   cvaux200    opencv_contrib)
