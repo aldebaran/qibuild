@@ -95,7 +95,9 @@ def get_tc_cache(toolchain_name):
     """
     # FIXME: deal with non-UNIX systems
     cache_path = os.path.expanduser("~/.cache/qi")
-    return os.path.join(cache_path, "toolchains", toolchain_name)
+    res = os.path.join(cache_path, "toolchains", toolchain_name)
+    qitools.sh.mkdir(res, recursive=True)
+    return res
 
 
 class Toolchain(object):
@@ -206,8 +208,7 @@ def create(toolchain_name):
     """Create a new toolchain given its name.
     """
     path = get_tc_path(toolchain_name)
-    if os.path.exists(path):
-        raise Exception("%s alread exist.\n"
-            "Please choose another toolchain name" % path)
+    qitools.sh.mkdir(path, recursive=True)
+    qitools.sh.mkdir(get_tc_cache(toolchain_name), recursive=True)
     LOGGER.info("Toolchain initialized in: %s", path)
 
