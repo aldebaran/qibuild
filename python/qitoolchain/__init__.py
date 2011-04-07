@@ -180,7 +180,7 @@ class Toolchain(object):
                 lines = fp.readlines()
 
         package_path = self.get(package_name)
-        qitools.sh.to_posix_path(package_path)
+        package_name = qitools.sh.to_posix_path(package_path)
         lines.append('list(APPEND CMAKE_PREFIX_PATH "%s")\n' % package_path)
 
         with open(self.toolchain_file, "w") as fp:
