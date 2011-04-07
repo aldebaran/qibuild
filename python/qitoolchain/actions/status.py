@@ -18,12 +18,7 @@ def configure_parser(parser):
 def do(args):
     """ Main method """
     config = qitools.configstore.ConfigStore()
-    config.read(qitoolchain.get_config_path())
+    config.read(qitoolchain.get_tc_config_path())
     for toolchain_name in config.get("toolchain", default=dict()).keys():
-        print "Toolchain: ", toolchain_name
         toolchain = qitoolchain.Toolchain(toolchain_name)
-        print "  feed:", toolchain.feed
-        print "  packages: "
-        for package in toolchain.packages:
-            print " " * 4, package.name
-
+        print toolchain

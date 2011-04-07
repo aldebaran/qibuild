@@ -42,7 +42,7 @@ def ask_cmake_generator():
 def ask_toolchain():
     """Ask the user to choose a toolchain name"""
 
-    config_file = qitoolchain.get_config_path()
+    config_file = qitoolchain.get_tc_config_path()
     config = qitools.configstore.ConfigStore()
     config.read(config_file)
     toolchain_dict = config.get("toolchain", default=dict())
@@ -103,7 +103,7 @@ def run_wizard(build_cfg):
 
     toolchain_name = None
     if qitools.ask_yes_no("Use a toolchain"):
-        tc_config = qitoolchain.get_config_path()
+        tc_config = qitoolchain.get_tc_config_path()
         if not os.path.exists(tc_config):
             if qitools.ask_yes_no("No toolchain found, crate one"):
                 toolchain_name = create_toolchain()

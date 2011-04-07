@@ -6,23 +6,35 @@ class
 How does it work?
 
  - Create a Toolchain with a name ("linux" for instance)
-/path/to/share/qi/toolchains/rootfs/linux
+    ~/.local/share/qi/toolchains/linux/
 and
-/path/to/share/qi/toolchains/cache/linux
+    ~/.cache/qi/toolchains/linux/packages/
 are created.
+
+A toolchain file is created in
+~/.local/share/qi/toolchains/linux/toolchain.cmake
+
 qitoolchain build configuration is updated to reflect
 there is a toolchain called "linux"
 
  - Add the foo package:
-The foo archive is extracted in:
-/path/to/share/qi/toolchains/rootfs/<name>/foo
-qitoolchain build configuration is update to
+The foo archive is copied in the cache:
+~/.cache/qi/toolchains/linux/packages/foo.tar.gz
+
+The foo package is extraced to the toolchain:
+~/.local/share/qi/toolchain/linux/foo/{lib,include,cmake}
+
+The toolchain.cmake in ~/.local/share/qi/toolchains/linux/toolchain.cmake
+is updated to contain:
+
+    list(APPEND CMAKE_PREFIX_PATH "~/.local/share/qi/toolchains/linux/foo")
+
+qitoolchain build configuration is updated to
 reflect the fact that the "linux" toolchain now provides
 the "foo" package.
 
- - Build a Toc object with the toolchain name "linux",
-When finding a project depending on foo, add the foo package
-path to the list of SDK dirs to use
+ - Build a Toc object with the toolchain name "linux", when building a project,
+add the -DCMAKE_TOOLCHAIN_FILE parameter
 
 """
 
@@ -30,10 +42,8 @@ path to the list of SDK dirs to use
 import os
 import sys
 import logging
-import urllib
 
 import qitools
-from qitools.configstore import ConfigStore
 
 LOGGER = logging.getLogger(__name__)
 
@@ -49,19 +59,24 @@ class Package:
         self.depends = list()
 
     def __str__(self):
-        res = "Package %s\n"  % self.name
-        res += "depends on : %s" %  " ".join(self.depends)
+        res = "Package %s"  % self.name
+        if self.depends:
+            res += " (depends on : %s)" %  " ".join(self.depends)
         return res
 
 
-def get_config_path():
-    """ Return a suitable config path"""
+def get_tc_config_path():
+    """ Return a suitable config path
+
+    """
     # FIXME: deal with non-UNIX systems
     config_path = os.path.expanduser("~/.config/qi/toolchain.cfg")
     return config_path
 
-def get_shared_path():
-    """ Return a suitable path to put toolchain files """
+def get_tc_path(toolchain_name):
+    """ Return a suitable path to extract the packages
+
+    """
     if sys.platform.startswith("win"):
         # > Vista:
         if os.environ.get("LOCALAPPDATA"):
@@ -70,98 +85,71 @@ def get_shared_path():
             res = os.path.expandvars(r"%APPDATA%\qi")
     else:
         res = os.path.expanduser("~/.local/share/qi")
-
+    res = os.path.join(res, "toolchains", toolchain_name)
     qitools.sh.mkdir(res, recursive=True)
     return res
 
-def get_rootfs(toolchain_name):
-    """ Return a suitable path to extract the packages
+def get_tc_cache(toolchain_name):
+    """ Return the path where to store packages
 
     """
-    res = os.path.join(get_shared_path(), "toolchains", "rootfs",
-            toolchain_name)
-    qitools.sh.mkdir(res, recursive=True)
-    return res
-
-def get_cache(toolchain_name):
-    res = os.path.join(get_shared_path(), "toolchains", "cache",
-            toolchain_name)
-    qitools.sh.mkdir(res, recursive=True)
-    return res
+    # FIXME: deal with non-UNIX systems
+    cache_path = os.path.expanduser("~/.cache/qi")
+    return os.path.join(cache_path, "toolchains", toolchain_name)
 
 
 class Toolchain(object):
-    """The Toolchain class has a name and a list of packages.
-
+    """ The Toolchain class has a name and a list of packages.
 
     """
-    def __init__(self, name):
-        if name == None:
-            self.name = "system"
+    def __init__(self, name, path=""):
+        self.name = name
+        if path:
+            self.path = path
         else:
-            self.name = name
-        self.feed = None
-        self.config_path = get_config_path()
-        self.shared_path = get_shared_path()
-        self.configstore = ConfigStore()
-        self.configstore.read(get_config_path())
-        self.feed = self.configstore.get("toolchain", self.name, "feed")
-        self.cache = get_cache(self.name)
-        self.rootfs = get_rootfs(self.name)
-
-        # Set self._packages with correct dependencies
-        self._load_feed_config()
-        self._packages = list()
+            self.path = get_tc_path(self.name)
+        self.toolchain_file = os.path.join(self.path, "toolchain-%s.cmake" % self.name)
+        self.configstore = qitools.configstore.ConfigStore()
+        self.configstore.read(get_tc_config_path())
+        self.packages = list()
+        self._load_config()
+        LOGGER.debug("Created a new toolchain:\n%s", str(self))
 
     def __str__(self):
-        ret = ""
-        ret += "feed     = %s\n" % self.feed
-        ret += "packages = %s" % ",".join([ str(x) for x in self.packages])
-        return ret
+        res  = "Toolchain:\n"
+        res += "  name: %s\n" % self.name
+        res += "  packages:\n" + "\n".join([" " * 4  + str(x) for x in self.packages])
+        return res
 
-    @property
-    def packages(self):
-        """List of packages in this toolchain.
-
-        This list is always up to date.
-        """
-        self._load_feed_config()
-        return self._packages
 
     def get(self, package_name):
-        """Return path to a package """
-        base_dir = get_rootfs(self.name)
-        package_path = os.path.join(base_dir, package_name)
+        """Return path to a package
+        """
+        known_names = [p.name for p in self.packages]
+        if package_name not in known_names:
+            raise Exception("No such package: %s" % package_name)
+        package_path = os.path.join(self.path, package_name)
         return package_path
 
-    def add_local_package(self, package_path):
+    def add_package(self, name, path):
         """Add a package given its name and its path
 
         """
-        package_name = os.path.basename(package_path)
-        package_name = package_name.split(".")[0]
-        qitools.archive.extract(package_path, get_rootfs(self.name))
-        self._update_tc_provides(package_name)
+        LOGGER.info("Adding package %s",name)
+        with qitools.sh.TempDir() as tmp:
+            extracted = qitools.archive.extract(path, tmp)
+            # Rename package once it is extracted:
+            dest = os.path.join(self.path, name)
+            if os.path.exists(dest):
+                qitools.sh.rm(dest)
+            qitools.sh.mv(extracted, dest)
+        self.packages.append(Package(name))
+        self._update_tc_provides(name)
+        self._update_toolchain_file(name)
 
-
-    def add_remote_package(self, package_name):
-        """Retrieve the latest version from the server, if not already
-        in cache
-
-        Then, extract the package to the toolchains subdir.
-
-        Finally, update toolchain.provide settings
-        """
-        self._update_feed()
-        deps = self.configstore.get("package", package_name, "depends",
-            default="").split()
-        for dep in deps:
-            self._add_package(dep)
-        self._add_package(package_name)
-        self._update_tc_provides(package_name)
 
     def _update_tc_provides(self, package_name):
-        """When a package has been added, update the tooclchain
+        """When a package has been added, update the toolchain
         configuration
 
         """
@@ -171,65 +159,39 @@ class Toolchain(object):
                           self.name,
                           package_name,
                           ",".join(provided))
-        if package_name not in provided:
-            provided.append(package_name)
-            to_write = " ".join(provided)
-            self._update_config("provide", '"%s"' % to_write)
+        if package_name in provided:
+            return
 
-    def _add_package(self, package_name):
-        """Add just one package. Called by self.add_package
-        which does resolve dependencies.
+        provided.append(package_name)
+        to_write = " ".join(provided)
+        qitools.configstore.update_config(get_tc_config_path(),
+            "toolchain", self.name, "provide", to_write)
 
-        """
-        # FIXME: recurse until every dependency is handled, here the
-        # dependencies may also have dependencies themselves...
-        archive_path = os.path.join(get_cache(self.name), package_name)
-        if sys.platform.startswith("win"):
-            archive_path += ".zip"
-        else:
-            archive_path += ".tar.gz"
-        if os.path.exists(archive_path):
-            # FIXME: do something smarter here...
-            pass
-        url = self.configstore.get("package", package_name, "url")
-        if not url:
-            raise Exception("Could not find package %s in feed: %s" % (
-                package_name, self.feed))
-
-        LOGGER.info("Adding package %s", package_name)
-        urllib.urlretrieve(url, archive_path)
-        with qitools.sh.TempDir() as tmp:
-            extracted = qitools.archive.extract(archive_path, tmp)
-            # Rename package once it is extracted:
-            dest = os.path.join(get_rootfs(self.name), package_name)
-            if os.path.exists(dest):
-                qitools.sh.rm(dest)
-            qitools.sh.mv(extracted, dest)
-        self._packages.append(Package(package_name))
-
-    def update(self, new_feed=None, all=False):
-        """Update the toolchain
+    def _update_toolchain_file(self, package_name):
+        """When a package has been added, update the toolchain.cmake
+        file
 
         """
-        if new_feed:
-            self.feed = new_feed
-        self._update_feed()
-        if all:
-            package_names = self.configstore.get("package", default=dict()).keys()
-        else:
-            package_names = [p.name for p in self.packages]
-        for package_name in package_names:
-            self.add_remote_package(package_name)
-        if new_feed:
-            self._update_config("feed", new_feed)
+        lines = list()
+        if os.path.exists(self.toolchain_file):
+            with open(self.toolchain_file, "r") as fp:
+                lines = fp.readlines()
 
-    def _load_feed_config(self):
-        """ Re-build self._packages list using the configuration file
+        package_path = self.get(package_name)
+        qitools.sh.to_posix_path(package_path)
+        lines.append('list(APPEND CMAKE_PREFIX_PATH "%s")\n' % package_path)
+
+        with open(self.toolchain_file, "w") as fp:
+            lines = fp.writelines(lines)
+
+
+    def _load_config(self):
+        """ Re-build self.packages list using the configuration file
 
         Called each time someone uses self.packages
         """
         provided = self.configstore.get("toolchain", self.name, "provide")
-        self._packages = list()
+        self.packages = list()
         if not provided:
             return
         for package_name in provided.split():
@@ -238,41 +200,14 @@ class Toolchain(object):
             names = deps.split()
             package = Package(package_name)
             package.depends = names
-            self._packages.append(package)
-
-        LOGGER.debug("Loaded feed config\n" +
-            "\n".join([str(p) for p in self._packages]))
-
-    def _update_config(self, name, value):
-        """Update the toolchain configuration file
-
-        """
-        LOGGER.debug("updating config %s : %s", name, value)
-        import ConfigParser
-        parser = ConfigParser.ConfigParser()
-        parser.read(self.config_path)
-
-        toolchain_section = 'toolchain "%s"' % self.name
-        if parser.has_section(toolchain_section):
-            parser.set(toolchain_section, name, value)
-
-        with open(self.config_path, "w") as config_file:
-            parser.write(config_file)
-
-        self.configstore.read(self.config_path)
-
-    def _update_feed(self):
-        """Update the feed configuration file"""
-        feed_path = os.path.join(get_cache(self.name), "feed.cfg")
-        if not self.feed:
-            return
-        urllib.urlretrieve(self.feed, feed_path)
-        self.configstore.read(feed_path)
-
+            self.packages.append(package)
 
 def create(toolchain_name):
     """Create a new toolchain given its name.
     """
-    rootfs = get_rootfs(toolchain_name)
-    LOGGER.info("Toolchain initialized in: %s", rootfs)
+    path = get_tc_path(toolchain_name)
+    if os.path.exists(path):
+        raise Exception("%s alread exist.\n"
+            "Please choose another toolchain name" % path)
+    LOGGER.info("Toolchain initialized in: %s", path)
 

@@ -146,7 +146,6 @@ class Toc(QiWorkTree):
 
         self.toolchain = qitoolchain.Toolchain(toolchain_name)
         self.packages = self.toolchain.packages
-        LOGGER.debug("[%s] toolchain:\n%s", toolchain_name, self.toolchain)
 
         if not self.cmake_generator:
             self.cmake_generator = self.configstore.get("general", "build" ,
@@ -229,18 +228,8 @@ class Toc(QiWorkTree):
 
         project_names.remove(project_name)
 
-        # Quick hack: sometimes user has more packages inside his toolchain
-        # than he thinks ...
-        # So we just add everything here.
-        for package in self.toolchain.packages:
-            if package.name not in project_names:
-                dirs.append(self.toolchain.get(package.name))
-
-        # Note: correct version is:
-        #
-        # for package_name in package_names:
-        #     dirs.append(self.toolchain.get(package_name))
-        #
+        # SDK_DIRS from toolchain are managed inside the toolchain.cmake file
+        # of the toolchain
 
         for project_name in project_names:
             project = self.get_project(project_name)
@@ -321,6 +310,19 @@ class Toc(QiWorkTree):
         os.environ.update(result)
 
 
+    def get_toolchain_file(self):
+        """A toolchain file must be used if we are using a toolchain
+        It is to be found using self.toolchain.toolchain_file
+
+        """
+        if self.toolchain.name == "system":
+            return None
+        toolchain_file = self.toolchain.toolchain_file
+        if not os.path.exists(toolchain_file):
+            return None
+        return toolchain_file
+
+
     def configure_project(self, project, toolchain_file=None):
         """ Call cmake with correct options
         if toolchain_file is None a t001chain file is generated in the cmake binary directory.
@@ -346,11 +348,13 @@ class Toc(QiWorkTree):
         cmake_flags = list()
         cmake_flags.extend(project.cmake_flags)
 
-        if toolchain_file:
-            cmake_flags.append("CMAKE_TOOLCHAIN_FILE=" + toolchain_file)
-
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
+        toolchain_file = self.get_toolchain_file()
+
+        if toolchain_file:
+            toolchain_path = qitools.sh.to_posix_path(toolchain_file)
+            cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
         try:
             qibuild.cmake(project.directory, project.build_directory, cmake_args)
         except CommandFailedException:
