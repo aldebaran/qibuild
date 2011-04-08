@@ -115,10 +115,8 @@ endfunction()
 # the absolute paths in CMAKE_BINARY_DIR/sdk/cmake/target-config.cmake
 function(_qi_gen_inc_dir_code_sdk res target)
   string(TOUPPER ${target} _U_target)
-  if(NOT ${_U_target}_INCLUDE_DIRS)
-    get_directory_property(_inc_dirs INCLUDE_DIRECTORIES)
-    set(${_U_target}_INCLUDE_DIRS ${_inc_dirs})
-  endif()
+  get_directory_property(_inc_dirs INCLUDE_DIRECTORIES)
+  set(${_U_target}_INCLUDE_DIRS ${_inc_dirs})
 
   _qi_gen_code_from_vars(_res ${_U_target}_INCLUDE_DIRS)
 
