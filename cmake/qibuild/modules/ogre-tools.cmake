@@ -47,8 +47,6 @@ function(configure_ogre)
     qi_error("Could not find library for render plugin: '${ARG_RENDER_PLUGIN}'")
   endif()
 
-  message(STATUS "_ogre_plugin: ${_ogre_plugin}")
-
   get_filename_component(_ogre_plugins_folder ${_ogre_plugin} PATH)
 
   set(_plugins_cfg "${QI_SDK_DIR}/${QI_SDK_BIN}/plugins.cfg")
