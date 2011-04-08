@@ -127,13 +127,10 @@ def cmake(source_dir, build_dir, cmake_args, clean_first=True):
     if not os.path.exists(source_dir):
         raise Exception("source dir: %s does not exist, aborting")
 
-    # Always remove CMakeCache and sdk/lib/cmake
-    # (CMake does not always do the right thing when .cmake
-    # files change)
+    # Always remove CMakeCache
     if clean_first:
         cache = os.path.join(build_dir, "CMakeCache.txt")
         qitools.sh.rm(cache)
-        qitools.sh.rm(os.path.join(build_dir, "sdk", "lib", "cmake"))
 
     # Check that no one has made an in-source build
     in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
