@@ -181,25 +181,33 @@ function(create_cmake _NAME)
 endfunction()
 
 function(use module)
+  # Small hack for python-tools:
+  if ("${module}" STREQUAL "PYTHON-TOOLS")
+    qi_deprecated("use(${module}) is deprecated.
+    This code has been put in qibuild/cmake
+    Use include(qibuild/swig/python) instead
+    ")
+    include(qibuild/swig/python)
+    return()
+  endif()
+
   # Some modules are now in qibuild/cmake, so
-  # there is no need to find them anymore.
+  # we have in include() them instead of finding them
   set(_known_modules
     "PYTHON-TOOLS"
+    "QT-TOOLS"
+    "OGRE-TOOLS"
   )
 
   list(FIND _known_modules ${module} _index)
 
   if(NOT ${_index} EQUAL -1)
+    string(TOLOWER  ${module} _l_module)
     qi_deprecated("use(${module}) is deprecated.
     This code has been put in qibuild/cmake.
-    You can safely remove the call to this line now
+    Use include(qibuild/modules/${_l_module}) instead
     ")
-    return()
-  endif()
-
-  # Small hack for QT-TOOLS
-  if(${module} STREQUAL "QT-TOOLS")
-    include(qibuild/modules/qt-tools)
+    include(qibuild/modules/${_l_module})
     return()
   endif()
 
