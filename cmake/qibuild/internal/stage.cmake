@@ -116,7 +116,7 @@ endfunction()
 function(_qi_gen_inc_dir_code_sdk res target)
   string(TOUPPER ${target} _U_target)
   get_directory_property(_inc_dirs INCLUDE_DIRECTORIES)
-  set(${_U_target}_INCLUDE_DIRS ${_inc_dirs})
+  list(APPEND ${_U_target}_INCLUDE_DIRS ${_inc_dirs})
 
   _qi_gen_code_from_vars(_res ${_U_target}_INCLUDE_DIRS)
 
