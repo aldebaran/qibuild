@@ -115,6 +115,7 @@ class Toolchain(object):
         self.configstore.read(get_tc_config_path())
         self.packages = list()
         self._load_config()
+        self._update_toolchain_file()
         LOGGER.debug("Created a new toolchain:\n%s", str(self))
 
     def __str__(self):
@@ -145,9 +146,13 @@ class Toolchain(object):
             if os.path.exists(dest):
                 qitools.sh.rm(dest)
             qitools.sh.mv(extracted, dest)
+        new_package = Package(name)
+        matches = [p for p in self.packages if p.name == name]
+        if matches:
+            return
         self.packages.append(Package(name))
         self._update_tc_provides(name)
-        self._update_toolchain_file(name)
+        self._update_toolchain_file()
 
 
     def _update_tc_provides(self, package_name):
@@ -169,19 +174,15 @@ class Toolchain(object):
         qitools.configstore.update_config(get_tc_config_path(),
             "toolchain", self.name, "provide", to_write)
 
-    def _update_toolchain_file(self, package_name):
-        """When a package has been added, update the toolchain.cmake
-        file
+    def _update_toolchain_file(self):
+        """Update the toolchain file when the packages have changed.
 
         """
         lines = list()
-        if os.path.exists(self.toolchain_file):
-            with open(self.toolchain_file, "r") as fp:
-                lines = fp.readlines()
-
-        package_path = self.get(package_name)
-        package_name = qitools.sh.to_posix_path(package_path)
-        lines.append('list(APPEND CMAKE_PREFIX_PATH "%s")\n' % package_path)
+        for package in self.packages:
+            package_path = self.get(package.name)
+            package_path = qitools.sh.to_posix_path(package_path)
+            lines.append('list(APPEND CMAKE_PREFIX_PATH "%s")\n' % package_path)
 
         with open(self.toolchain_file, "w") as fp:
             lines = fp.writelines(lines)
