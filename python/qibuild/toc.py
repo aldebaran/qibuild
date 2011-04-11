@@ -323,7 +323,7 @@ class Toc(QiWorkTree):
         return toolchain_file
 
 
-    def configure_project(self, project, toolchain_file=None):
+    def configure_project(self, project, toolchain_file=None, clean_first=True):
         """ Call cmake with correct options
 
         Note: the cmake flags (CMAKE_BUILD_TYPE, or the -D args coming
@@ -357,7 +357,10 @@ class Toc(QiWorkTree):
             toolchain_path = qitools.sh.to_posix_path(toolchain_file)
             cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
         try:
-            qibuild.cmake(project.directory, project.build_directory, cmake_args)
+            qibuild.cmake(project.directory,
+                          project.build_directory,
+                          cmake_args,
+                          clean_first=clean_first)
         except CommandFailedException:
             raise ConfigureFailed(project)
 

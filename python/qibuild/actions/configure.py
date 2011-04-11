@@ -22,6 +22,10 @@ def configure_parser(parser):
     group.add_argument("-D", dest="cmake_flags",
         action="append",
         help="additional cmake flags")
+    group.add_argument("--no-clean-first", dest="clean_first",
+        action="store_false",
+        help="do not clean CMake cache")
+    parser.set_defaults(clean_first=True)
 
 def do(args):
     """Main entry point"""
@@ -46,6 +50,6 @@ def do(args):
         return
     for project in projects:
         logger.info("Configuring %s in %s", project.name, toc.build_folder_name)
-        toc.configure_project(project)
+        toc.configure_project(project, clean_first=args.clean_first)
 
 

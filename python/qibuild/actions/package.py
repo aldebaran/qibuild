@@ -114,7 +114,7 @@ def _do(args, build_type):
         version=args.version)
 
     destdir = os.path.join(inst_dir, package_name)
-    qitools.run_action("qibuild.actions.configure", [project_name],
+    qitools.run_action("qibuild.actions.configure", [project_name, "--no-clean-first"],
         forward_args=args)
     qitools.run_action("qibuild.actions.make", [project_name],
         forward_args=args)
