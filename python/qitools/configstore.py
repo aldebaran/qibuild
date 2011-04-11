@@ -31,8 +31,11 @@ You can use:
 
 """
 
+import os
 import logging
 import ConfigParser
+
+import qitools
 
 class ConfigException(Exception):
     def __init__(self, *args):
@@ -160,7 +163,6 @@ def update_config(config_path, section, name, key, value):
     else will read later.
 
     """
-    import ConfigParser
     parser = ConfigParser.ConfigParser()
     parser.read(config_path)
     section_name = '%s "%s"' % (section, name)
@@ -170,6 +172,7 @@ def update_config(config_path, section, name, key, value):
         parser.set(section_name, key, value)
     if type(value) == type([""]):
         parser.set(section_name, key, " ".join(value))
+    qitools.sh.mkdir(os.path.dirname(config_path), recursive=True)
     with open(config_path, "w") as config_file:
         parser.write(config_file)
 
