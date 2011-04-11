@@ -325,20 +325,21 @@ class Toc(QiWorkTree):
 
     def configure_project(self, project, toolchain_file=None):
         """ Call cmake with correct options
-        if toolchain_file is None a t001chain file is generated in the cmake binary directory.
-        if toolchain_file is "", then CMAKE_TOOLCHAIN_FILE is not specified.
 
-        Note: the cmake flags (CMAKE_BUILD_TYPE, or the -D args coming from
-        qibuild configure -DFOO_BAR) have already been passed via the toc object.
+        Note: the cmake flags (CMAKE_BUILD_TYPE, or the -D args coming
+        from qibuild configure -DFOO_BAR) have already been passed via
+        the toc object. See qibuild.toc.toc_open() and the ctor of
+        Project for the details.
 
-        (See qibuild.toc.toc_open() and the ctor of Project for the details)
+        Note2: if toolchain file is not None, the flag CMAKE_TOOLCHAIN_FILE
+            will be set.
+
+        Note3: if clean_first is False, we won't delete CMake's cache.
+        This is mainly useful when you are calling cmake NOT from
+        `qibuild configure'.
         """
         if not os.path.exists(project.directory):
             raise TocException("source dir: %s does not exist, aborting" % project.directory)
-
-        if not os.path.exists(os.path.join(project.directory, "CMakeLists.txt")):
-            LOGGER.info("Not calling cmake for %s", os.path.basename(project.directory))
-            return
 
         # Set generator if necessary
         cmake_args = list()
