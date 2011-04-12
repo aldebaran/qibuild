@@ -52,7 +52,7 @@ def get_package_name(project, continuous=False, version=None, arch=None):
 
     if continuous:
         now = datetime.datetime.now()
-        res.append(now.strftime("%Y-%m-%d"))
+        res.append(now.strftime("%Y-%m-%d-%H-%M"))
 
     if arch:
         res.append(arch)
