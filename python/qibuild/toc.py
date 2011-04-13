@@ -6,6 +6,7 @@ which is where all the 'magic' happens ....
 """
 
 import os
+import sys
 import glob
 import platform
 import shutil
@@ -243,6 +244,16 @@ class Toc(QiWorkTree):
         """Update os.environ using the qibuild configuration file
 
         """
+        # On windows, clean %PATH% first:
+        if sys.platform == "win32":
+            paths = list()
+            paths.append(os.path.expandvars(r"%systemroot%\system32"))
+            paths.append(os.path.expandvars("%systemroot%"))
+            cmake = qitools.command.find_program("cmake.exe")
+            paths.append(os.path.dirname(cmake))
+            paths.append(os.path.dirname(sys.executable))
+            os.environ["PATH"] = os.pathsep.join(paths)
+
         env = self.configstore.get("general", "env")
         path = None
         bat_file = None
@@ -257,15 +268,16 @@ class Toc(QiWorkTree):
     def _set_env_from_path_conf(self, path):
         """Set os.environ using a "path" string setting
 
+        On windows, clean %PATH% first.
         """
+        system_path = os.environ["PATH"]
+        if not system_path.endswith(os.path.pathsep):
+            system_path += os.path.pathsep
         path = path.strip()
         path = path.replace("\n", "")
         LOGGER.debug("adding %s to PATH", path)
-        env_path = os.environ["PATH"]
-        if not env_path.endswith(os.path.pathsep):
-            env_path += os.path.pathsep
-        env_path += path
-        os.environ["PATH"] = env_path
+        new_path = system_path + path
+        os.environ["PATH"] = new_path
 
     def _set_path_from_bat_conf(self, bat_file):
         """Set environment variables using a .bat script
