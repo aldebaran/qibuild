@@ -85,7 +85,7 @@ function(qi_create_bin name)
     qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
   endif()
 
-  if(WIN32)
+  if(MSVC)
     # always postfix debug lib/bin with _d ...
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
     # ... and generate libraries and next to executables.
@@ -96,7 +96,7 @@ function(qi_create_bin name)
       RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
   endif()
 
-  if(MSVC)
+  if(WIN32)
     string(TOUPPER ${name} _U_name)
     configure_file(${QI_ROOT_DIR}/templates/post-copy-dlls.cmake
                    ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
