@@ -3,7 +3,7 @@
 clean(GTEST)
 fpath(GTEST gtest/gtest.h)
 
-if (WIN32)
+if (MSVC)
   flib(GTEST OPTIMIZED gtest)
   flib(GTEST OPTIMIZED gtest_main-md)
   flib(GTEST DEBUG     gtestd)
