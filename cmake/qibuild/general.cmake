@@ -77,3 +77,7 @@ if (QI_T001CHAIN_COMPAT)
   include("qibuild/compat/compat")
 endif()
 
+
+qi_debug("CMAKE_PREFIX_PATH  = ${CMAKE_PREFIX_PATH}")
+qi_debug("CMAKE_MODULE_PATH  = ${CMAKE_MODULE_PATH}")
+qi_debug("CMAKE_INCLUDE_PATH = ${CMAKE_INCLUDE_PATH}")
