@@ -155,6 +155,13 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(${_U_target} DEFAULT_MSG
   ${_U_target}_LIBRARIES
   ${_U_target}_INCLUDE_DIRS
 )
+# Right after find_package_handle_standard_args, ${prefix}_FOUND is
+# set correctly.
+# For instance, if foo/bar.h is not foud, FOO_FOUND is FALSE.
+# But, right after this, since foo-config.cmake HAS been found, CMake
+# re-set FOO_FOUND to TRUE.
+# So we set ${prefix}_PACKAGE_FOUND in cache...
+set(${_U_target}_PACKAGE_FOUND \${${_U_target}_FOUND} CACHE INTERNAL \"\" FORCE)
 ")
 
   set(_res "${_res} ${_call_fphsa}")
@@ -188,6 +195,10 @@ function(_qi_gen_code_lib_sdk res target)
     ${_U_target}_DEFINITIONS
   )
   set(_res "${_res} ${_defs}")
+
+  set(_res "${_res}
+ set(${_U_target}_PACKAGE_FOUND TRUE CACHE INTERNAL \"\" FORCE)
+  ")
   set(${res} ${_res} PARENT_SCOPE)
 endfunction()
 

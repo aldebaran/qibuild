@@ -36,7 +36,11 @@ function(_qi_use_lib_get_deps _OUT_list)
       # If Config is found, then PKG_DIR will be set so that the following
       # find_package knows where to look
       find_package(${_pkg} NO_MODULE QUIET)
-      find_package(${_pkg} QUIET REQUIRED)
+      # _PACKAGE_FOUND is only set when using qibuild/cmake modules,
+      # see comments in find.cmake for details.
+      if(NOT ${_U_PKG}_PACKAGE_FOUND)
+        find_package(${_pkg} QUIET REQUIRED)
+      endif()
       qi_set_global("${_U_PKG}_SEARCHED" TRUE)
     endif()
 

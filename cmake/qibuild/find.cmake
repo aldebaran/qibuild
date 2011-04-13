@@ -45,6 +45,14 @@ function(_qi_call_fphsa prefix)
     set(${prefix}_FIND_QUIETLY TRUE)
     find_package_handle_standard_args(${prefix} DEFAULT_MSG ${_to_check})
   endif()
+
+  # Right after find_package_handle_standard_args, ${prefix}_FOUND is
+  # set correctly.
+  # For instance, if foo/bar.h is not foud, FOO_FOUND is FALSE.
+  # But, right after this, since foo-config.cmake HAS been found, CMake
+  # re-set FOO_FOUND to TRUE.
+  # So we set ${prefix}_PACKAGE_FOUND in cache...
+  qi_set_global(${prefix}_PACKAGE_FOUND ${${prefix}_FOUND})
 endfunction()
 
 
