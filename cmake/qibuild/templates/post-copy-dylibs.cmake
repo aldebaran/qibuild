@@ -34,4 +34,6 @@ foreach(_lib ${_libs})
   endif()
 endforeach()
 
-file(COPY ${_in_dylibs} DESTINATION ${CMAKE_BINARY_DIR}/sdk/lib)
+list(REMOVE_DUPLICATES _in_dylibs)
+
+file(COPY ${_in_dylibs} DESTINATION ${QI_SDK_DIR}/${QI_SDK_LIB})
