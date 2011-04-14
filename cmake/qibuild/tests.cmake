@@ -41,6 +41,13 @@ function(qi_add_test test_name target_name)
   set_tests_properties(${test_name} PROPERTIES
     TIMEOUT ${ARG_TIMEOUT}
   )
+
+  # HACK for apple until the .dylib problems are fixed...
+  if(APPLE)
+    set_tests_properties(${test_name} PROPERTIES
+      ENVIRONMENT "DYLD_LIBRARY_PATH=${QI_SDK_DIR}/${QI_SDK_LIB}"
+    )
+  endif()
 endfunction()
 
 
