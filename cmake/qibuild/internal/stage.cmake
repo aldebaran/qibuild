@@ -331,6 +331,7 @@ message(WARNING \"
     set(_other_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_other_name}-config.cmake")
     file(WRITE  "${_other_redist_file}" "${_other_redist}")
     file(APPEND "${_other_redist_file}" ${_warning_message})
+    qi_install_cmake(${_other_name} ${_other_redist_file})
 
     string(REPLACE ${_U_target} ${_U_staged_name} _other_sdk "${_sdk}")
     set(_other_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_other_name}-config.cmake")
