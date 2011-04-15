@@ -273,7 +273,7 @@ function(qi_create_lib name)
 
   qi_use_lib("${name}" ${ARG_DEPENDS})
 
-  if (WIN32)
+  if (MSVC)
     # always postfix debug lib/bin with _d ...
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
     # ... and generate libraries and next to executables.
