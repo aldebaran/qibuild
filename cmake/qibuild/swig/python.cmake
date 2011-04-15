@@ -66,15 +66,26 @@ function(qi_swig_wrap_python module_name interface_file)
       LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
   )
 
-  # Be sure a .pyd file gets created, even though we
-  # use an old version of swig, which may create .dll files ...
   if (WIN32)
+  # Be sure a .pyd file gets created.
     set_target_properties(${_swig_target}
       PROPERTIES
         SUFFIX   ".pyd"
-        DEBUG_POSTFIX "_d"
         RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}"
     )
+
+    if(MSVC)
+      # .dll compiled in debug with visual studio are not usable
+      # from python.exe, (unless you are very careful : the size of the ojbjects
+      # are not the same in debug or in release with visual studio), which
+      # can lead to hard to solve bugs.
+      # Here, we add an _d so we are sure a Visual Studio users cannot
+      # use their modules unless they have built them in release.
+      set_target_properties(${_swig_target}
+        PROPERTIES
+          DEBUG_POSTFIX "_d"
+      )
+    endif()
   endif()
 
   # Re-create install rules:
