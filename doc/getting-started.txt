@@ -121,8 +121,8 @@ cmake_generator = "NMake Makefiles"
 (the location of the .bat file depends on your setup)
 
 
-Configuring qiBuild for MinGW
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Configuring qiBuild for MinGW with Msys
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You will have to do several things for qibuild to work with
 MinGW.
@@ -142,6 +142,49 @@ path = C:\Mingw\bin;C:\MinGW\msys\1.0\bin;
 [general "build"]
   cmake_generator = "Unix Makefiles"
 ----
+
+Note: here you have to setup a complete msys environnement before
+being able to use qibuild.
+
+You should also have cmake.exe in your %PATH%.
+
+
+Configuring qiBuild for MinGW and QtCreator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Here, you do not have to install msys or mingw at all.
+
+Simply get the latest qtcreator and install it.
+
+(you only need the qtcreator package, no need for the full-fledged
+Qt SDK)
+
+QtCreator already comes with a pre-packaged mingw, you just
+have to tell qibuild to use it.
+
+* add the path to QtCreator's mingw in you %PATH% so that QtCreator can find
+mingw32-make without running qmake:
+
+(Using the configuration panel, set PATH to C:\qt\qtcreator\MinGW\bin)
+
+* tell qibuild to use mingw Makefile
+
+Here's what a complete .qi/build.cfg would look like to use
+MinGW with QtCreator:
+
+[source, ini]
+----
+[general "env"]
+path = C:\Qt\Qtcreator\MinGw\bin;
+
+[general "build"]
+  cmake_generator = "MinGW Makefiles"
+----
+
+You should also have cmake.exe in your %PATH%.
+
+
 
 
 link:creating-a-project.html[Next]: create a project

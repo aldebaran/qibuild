@@ -52,6 +52,9 @@ You will be prompted to use a build directory, chose the one that was created by
 +QtCreator+ will read the settings from the exising build directory, so everything
 should work fine.
 
+Remember to use the same CMake generator in QtCreator and in your
+configuration file, if qtcreator asks you to choose.
+
 
 qiBuild and Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~
