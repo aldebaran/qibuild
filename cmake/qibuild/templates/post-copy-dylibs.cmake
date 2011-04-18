@@ -34,6 +34,8 @@ foreach(_lib ${_libs})
   endif()
 endforeach()
 
-list(REMOVE_DUPLICATES _in_dylibs)
+if(_in_dylibs)
+  list(REMOVE_DUPLICATES _in_dylibs)
+endif()
 
 file(COPY ${_in_dylibs} DESTINATION ${QI_SDK_DIR}/${QI_SDK_LIB})
