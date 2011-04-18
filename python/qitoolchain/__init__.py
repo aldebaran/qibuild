@@ -77,14 +77,8 @@ def get_tc_path(toolchain_name):
     """ Return a suitable path to extract the packages
 
     """
-    if sys.platform.startswith("win"):
-        # > Vista:
-        if os.environ.get("LOCALAPPDATA"):
-            res = os.path.expandvars(r"%LOCALAPPDATA%\qi")
-        else:
-            res = os.path.expandvars(r"%APPDATA%\qi")
-    else:
-        res = os.path.expanduser("~/.local/share/qi")
+    # FIXME: deal with non-UNIX systems
+    res = os.path.expanduser("~/.local/share/qi")
     res = os.path.join(res, "toolchains", toolchain_name)
     qitools.sh.mkdir(res, recursive=True)
     return res
