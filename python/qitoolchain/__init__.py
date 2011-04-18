@@ -114,8 +114,8 @@ class Toolchain(object):
         self.configstore = qitools.configstore.ConfigStore()
         self.configstore.read(get_tc_config_path())
         self.packages = list()
-        self._load_config()
-        self._update_toolchain_file()
+        self.load_config()
+        self.update_toolchain_file()
         LOGGER.debug("Created a new toolchain:\n%s", str(self))
 
     def __str__(self):
@@ -138,6 +138,7 @@ class Toolchain(object):
         """Add a package given its name and its path
 
         """
+        self.load_config()
         LOGGER.info("Adding package %s",name)
         with qitools.sh.TempDir() as tmp:
             extracted = qitools.archive.extract(path, tmp)
@@ -148,14 +149,13 @@ class Toolchain(object):
             qitools.sh.mv(extracted, dest)
         new_package = Package(name)
         matches = [p for p in self.packages if p.name == name]
-        if matches:
-            return
-        self.packages.append(Package(name))
-        self._update_tc_provides(name)
-        self._update_toolchain_file()
+        if not matches:
+            self.packages.append(Package(name))
+        self.update_tc_provides(name)
+        self.update_toolchain_file()
 
 
-    def _update_tc_provides(self, package_name):
+    def update_tc_provides(self, package_name):
         """When a package has been added, update the toolchain
         configuration
 
@@ -174,7 +174,7 @@ class Toolchain(object):
         qitools.configstore.update_config(get_tc_config_path(),
             "toolchain", self.name, "provide", to_write)
 
-    def _update_toolchain_file(self):
+    def update_toolchain_file(self):
         """Update the toolchain file when the packages have changed.
 
         """
@@ -188,7 +188,7 @@ class Toolchain(object):
             lines = fp.writelines(lines)
 
 
-    def _load_config(self):
+    def load_config(self):
         """ Re-build self.packages list using the configuration file
 
         Called each time someone uses self.packages
