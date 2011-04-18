@@ -2,7 +2,6 @@
 """Generate a binary sdk"""
 
 import os
-import sys
 import logging
 import shutil
 import datetime
@@ -124,7 +123,8 @@ def _do(args, build_type):
 
 def do(args):
     """Main entry point"""
-    if sys.platform.startswith("win"):
+    toc = qibuild.toc_open(args.work_tree, args, use_env=True)
+    if toc.using_visual_studio:
         _do(args, "debug")
     destdir = _do(args, "release")
 
