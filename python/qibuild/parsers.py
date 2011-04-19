@@ -29,15 +29,15 @@ def build_parser(parser):
     group.add_argument("--build-config", "-c",
         dest="build_config",
         help="Build configuration to use. A corresponding .qi/build-<name>.cfg file should exist.")
-    group.add_argument("--toolchain", "-t", action="store",
-    dest="toolchain_name",
-        help="Use a specific toolchain")
+    group.add_argument("--toolchain-file",  action="store",
+        dest="toolchain_file",
+        help="Use a specific toolchain file")
     group.add_argument("--cmake-generator", action="store",
         help="Specify the CMake generator")
     group.add_argument("-j", dest="num_jobs", type=int, help="Number of jobs to use")
     parser.set_defaults(cross=False, debug=True)
     parser.set_defaults(num_jobs=1)
-    parser.set_defaults(toolchain_name=None)
+    parser.set_defaults(toolchain_file=None)
     parser.set_defaults(build_type="debug")
 
 def project_parser(parser):

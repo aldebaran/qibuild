@@ -62,10 +62,6 @@ class Project:
         if toc.build_type:
             self.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (toc.build_type.upper()))
 
-        if toc.toolchain.name != "system":
-            # Used in qibuild/cmake
-            self.cmake_flags.append("QI_TOOLCHAIN_NAME=%s" % (toc.toolchain.name))
-
         if toc.cmake_flags:
             self.cmake_flags.extend(toc.cmake_flags)
 

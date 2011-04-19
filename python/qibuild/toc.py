@@ -96,18 +96,20 @@ class Toc(QiWorkTree):
     """
     def __init__(self, work_tree,
             build_type,
-            toolchain_name,
             build_config,
             cmake_flags,
             cmake_generator,
-            path_hints=None):
+            path_hints=None,
+            toolchain_file=None):
         """
             work_tree      = a toc worktree
             build_type     = a build type, could be debug or release
-            toolchain_name = by default the system toolchain is used
             build_config   = optional : the name of a build.cfg to be loaded
             cmake_flags    = optional additional cmake flags
             cmake_generator = optional cmake generator (defaults to Unix Makefiles)
+            toolchain_file  = if not None, a toolchain file to use.
+                              This makes it possible to use a QiToolchain object
+                              (set of pre-compiled packages), or a cross-toolchain
         """
         QiWorkTree.__init__(self, work_tree, path_hints=path_hints)
         self.build_type        = build_type
@@ -135,19 +137,26 @@ class Toc(QiWorkTree):
                     (self.build_config, cfg_path))
             self.configstore.read(cfg_path)
 
-        # If toolchain_name is None, it was not given on command line,
-        # look for it in the configuration:
-        if not toolchain_name:
-            toolchain_name = self.configstore.get("general", "build", "toolchain")
+        # Read toolchain file:
+        self.toolchain = None
+        self.toolchain_file = None
+        self.toolchain_name = None
+        self.using_system = True
+        self.cross = False
+        if not toolchain_file:
+            # try to read id from configuration:
+            toolchain_file = self.configstore.get("general",
+                "build", "toolchain_file", default=None)
+            if toolchain_file:
+                self.toolchain_file = qitools.sh.to_native_path(toolchain_file)
+                self._load_toolchain_file()
 
-        # If it's not in the configuration, assume the name is
-        # "system":
-        if not toolchain_name:
-            toolchain_name = "system"
+        if self.toolchain:
+            self.packages = self.toolchain.packages
+        else:
+            self.packages = list()
 
-        self.toolchain = qitoolchain.Toolchain(toolchain_name)
-        self.packages = self.toolchain.packages
-
+        # Set cmake generator
         if not self.cmake_generator:
             self.cmake_generator = self.configstore.get("general", "build" ,
                     "cmake_generator", default="Unix Makefiles")
@@ -166,9 +175,33 @@ class Toc(QiWorkTree):
             project.update_depends(self)
             self.projects.append(project)
 
+        # Set build environment
         self.set_build_env()
 
 
+    def _load_toolchain_file(self):
+        """Given a toolchain file.
+        If we detect a layout like:
+            ctc/toolchain-$name.cmake
+            ctc/sysroot
+        Assume we are cross-compiling, and do not
+        construct a QiToolchain object, else
+        build a QiToolchain object, update known
+        packages, so they are no re-compiled.
+
+        """
+        toolchain_name = os.path.basename(self.toolchain_file)
+        toolchain_name = toolchain_name.split("-")[-1]
+        toolchain_name = os.path.splitext(toolchain_name)[0]
+
+        tc_dir = os.path.dirname(self.toolchain_file)
+        if os.path.exists(os.path.join(tc_dir, "sysroot")):
+            self.cross = True
+            self.toolchain_name=toolchain_name
+            return
+
+        self.toolchain = qitoolchain.Toolchain(toolchain_name)
+        self.toolchain_name = toolchain_name
 
     def _set_build_folder_name(self):
         """Get a reasonable build folder.
@@ -180,10 +213,10 @@ class Toc(QiWorkTree):
         build-cross-debug ...
         """
         res = ["build"]
-        if self.toolchain.name == "system":
+        if self.toolchain_name is None:
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
         else:
-            res.append(self.toolchain.name)
+            res.append(self.toolchain_name)
 
         if not self.using_visual_studio and self.build_type != "debug":
             # When using cmake + visual studio, sharing the same build dir with
@@ -221,11 +254,12 @@ class Toc(QiWorkTree):
         if project_name not in known_project_names:
             raise TocException("%s is not a buildable project" % project_name)
 
-        dep_solver = DependenciesSolver(projects=self.projects, packages=self.toolchain.packages)
+        dep_solver = DependenciesSolver(projects=self.projects, packages=self.packages)
         (project_names, package_names, not_found) = dep_solver.solve([project_name])
 
         if not_found:
-            LOGGER.warning("Could not find projects %s", ", ".join(not_found))
+            if not (self.using_system or self.cross):
+                LOGGER.warning("Could not find projects %s", ", ".join(not_found))
 
         project_names.remove(project_name)
 
@@ -363,10 +397,8 @@ class Toc(QiWorkTree):
 
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
-        toolchain_file = self.get_toolchain_file()
-
-        if toolchain_file:
-            toolchain_path = qitools.sh.to_posix_path(toolchain_file)
+        if self.toolchain_file:
+            toolchain_path = qitools.sh.to_posix_path(self.toolchain_file)
             cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
         try:
             qibuild.cmake(project.directory,
@@ -448,7 +480,7 @@ class Toc(QiWorkTree):
 def toc_open(work_tree, args, use_env=False):
     build_config   = args.build_config
     build_type     = args.build_type
-    toolchain_name = args.toolchain_name
+    toolchain_file = args.toolchain_file
     path_hints     = list()
     try:
         cmake_flags = args.cmake_flags
@@ -479,7 +511,7 @@ def toc_open(work_tree, args, use_env=False):
             "create a new work with 'qibuild init'")
     return Toc(work_tree,
                build_type=build_type,
-               toolchain_name=toolchain_name,
+               toolchain_file=toolchain_file,
                build_config=build_config,
                cmake_flags=cmake_flags,
                cmake_generator=cmake_generator,
@@ -529,7 +561,7 @@ def resolve_deps(toc, args, runtime=False):
     else:
         project_names = args.projects
     dep_solver = DependenciesSolver(projects=toc.projects,
-                                    packages=toc.toolchain.packages)
+                                    packages=toc.packages)
     return dep_solver.solve(project_names,
         single=args.single,
         all=args.all,
