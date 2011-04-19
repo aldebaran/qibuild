@@ -24,11 +24,6 @@ function(qi_build_autotools name url)
   set(options)
   list(APPEND options "${ARGS_CONFIGURE_OPTIONS}")
 
-  # Ugly hack for mac: configure the CFGLAGS based on the name of the toolchain...
-  if("${QI_TOOLCHAIN_NAME}" STREQUAL "mac-32")
-    list(APPEND options "CFLAGS=-arch i386")
-  endif()
-
   set(patchs_cmd)
   foreach(p ${ARGS_PATCH})
     list(APPEND patchs_cmd "patch" "-p1" "<" "${p}" ";")
