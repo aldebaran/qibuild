@@ -122,11 +122,7 @@ def run_action(module_name, args=None, forward_args=None):
         raise InvalidAction(module_name, "Could not find module %s in package %s" %
             (module_name, package_name))
     check_module(module)
-    try:
-        usage = module.usage()
-    except AttributeError:
-        usage = None
-    parser = argparse.ArgumentParser(usage=usage)
+    parser = argparse.ArgumentParser()
     module.configure_parser(parser)
     parsed_args = parser.parse_args(args=args, namespace=forward_args)
     qitools.log.configure_logging(parsed_args)
@@ -198,6 +194,16 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
         configurator = module.configure_parser
         action_parser = subparsers.add_parser(name, help=module.__doc__)
         configurator(action_parser)
+        action_parser.formatter_class = argparse.RawDescriptionHelpFormatter
+
+        try:
+            doc_lines = module.__doc__.splitlines()
+            epilog = "\n".join(doc_lines[1:])
+        except AttributeError:
+            epilog = None
+        if epilog:
+            action_parser.epilog = epilog
+
         action_modules[name] = module
 
     (help_requested, action) = parse_args_for_help(args)

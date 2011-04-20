@@ -1,22 +1,16 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"Run the same command on each source projects"
+"""Run the same command on each source project.
+Example:
+    qisrc foreach -- git reset --hard origin/mytag
+
+Use -- to seprate qisrc arguments from the arguments of the command.
+"""
 
 import sys
 import logging
 import qitools
 
-def usage():
-    "Specific usage"
-    return """foreach -- COMMAND
-
-Example:
-qisrc foreach -- git reset --hard origin/v1.10.0
-
-Use -- to seprate qisrc arguments from the arguments of the command.
-(The -- is mandatory)
-
-"""
 def configure_parser(parser):
     """Configure parser for this action """
     qitools.qiworktree.work_tree_parser(parser)

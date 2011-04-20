@@ -1,22 +1,16 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"Run the same command on each buildable project"
+""""Run the same command on each buildable project.
+
+Use -- to separate qibuild arguments from the arguments of the command.
+For instance
+  qibuild --ignore-errors -- ls -l
+"""
 
 import sys
 import logging
 import qitools
 
-def usage():
-    "Specific usage"
-    return """\
-foreach -- COMMAND
-
-Example:
-qibuild foreach -- cd build-sys-linux-x86_64 \; make clean all
-
-Use -- to seprate qibuild arguments from the arguments of the command.
-(The -- is mandatory)
-"""
 
 def configure_parser(parser):
     """Configure parser for this action """
