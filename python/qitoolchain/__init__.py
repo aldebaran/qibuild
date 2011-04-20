@@ -143,7 +143,6 @@ class Toolchain(object):
                 qitools.sh.rm(dest)
             qitools.sh.mv(extracted, dest)
         new_package = Package(name)
-        print [str(p) for p in self.packages]
         matches = [p for p in self.packages if p.name == name]
         if not matches:
             self.packages.append(new_package)
