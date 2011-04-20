@@ -1,0 +1,4 @@
+qisrc add git@foo/bar.git
+
+and it just works ...
+
