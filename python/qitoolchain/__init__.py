@@ -40,7 +40,6 @@ add the -DCMAKE_TOOLCHAIN_FILE parameter
 
 
 import os
-import sys
 import logging
 
 import qitools
@@ -98,26 +97,29 @@ class Toolchain(object):
     """ The Toolchain class has a name and a list of packages.
 
     """
-    def __init__(self, name, path=""):
+    def __init__(self, name):
         self.name = name
-        if path:
-            self.path = path
-        else:
-            self.path = get_tc_path(self.name)
-        self.toolchain_file = os.path.join(self.path, "toolchain-%s.cmake" % self.name)
         self.configstore = qitools.configstore.ConfigStore()
         self.configstore.read(get_tc_config_path())
+        self.path = get_tc_path(self.name)
+        tc_file_from_conf = self.configstore.get("toolchain", self.name, "file", default=None)
+        if tc_file_from_conf:
+            self.toolchain_file = tc_file_from_conf
+        else:
+            self.toolchain_file = os.path.join(self.path, "toolchain-%s.cmake" % self.name)
+
         self.packages = list()
-        self.load_config()
-        self.update_toolchain_file()
-        LOGGER.debug("Created a new toolchain:\n%s", str(self))
+        self.cross = self.configstore.get("toolchain", self.name, "cross", default=False)
+        if not self.cross:
+            self.load_config()
+            self.update_toolchain_file()
+            LOGGER.debug("Created a new toolchain:\n%s", str(self))
 
     def __str__(self):
         res  = "Toolchain:\n"
         res += "  name: %s\n" % self.name
         res += "  packages:\n" + "\n".join([" " * 4  + str(x) for x in self.packages])
         return res
-
 
     def get(self, package_name):
         """Return path to a package
@@ -132,7 +134,6 @@ class Toolchain(object):
         """Add a package given its name and its path
 
         """
-        self.load_config()
         LOGGER.info("Adding package %s",name)
         with qitools.sh.TempDir() as tmp:
             extracted = qitools.archive.extract(path, tmp)
@@ -142,31 +143,24 @@ class Toolchain(object):
                 qitools.sh.rm(dest)
             qitools.sh.mv(extracted, dest)
         new_package = Package(name)
+        print [str(p) for p in self.packages]
         matches = [p for p in self.packages if p.name == name]
         if not matches:
-            self.packages.append(Package(name))
-        self.update_tc_provides(name)
+            self.packages.append(new_package)
+        self.update_tc_provides()
         self.update_toolchain_file()
 
 
-    def update_tc_provides(self, package_name):
+    def update_tc_provides(self):
         """When a package has been added, update the toolchain
         configuration
 
         """
-        provided = self.configstore.get("toolchain", self.name, "provide",
-            default="").split()
-        LOGGER.debug("[%s] toolchain: new package %s providing %s",
-                          self.name,
-                          package_name,
-                          ",".join(provided))
-        if package_name in provided:
-            return
-
-        provided.append(package_name)
-        to_write = " ".join(provided)
+        provided = self.configstore.get("toolchain", self.name, "provide", default="")
+        provided = " ".join(p.name for p in self.packages)
+        LOGGER.debug("update_tc_provides: provided is now %s", provided)
         qitools.configstore.update_config(get_tc_config_path(),
-            "toolchain", self.name, "provide", to_write)
+            "toolchain", self.name, "provide", provided)
 
     def update_toolchain_file(self):
         """Update the toolchain file when the packages have changed.

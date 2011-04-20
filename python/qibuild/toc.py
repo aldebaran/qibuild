@@ -95,78 +95,73 @@ class Toc(QiWorkTree):
 
     """
     def __init__(self, work_tree,
-            build_type,
-            build_config,
-            cmake_flags,
-            cmake_generator,
             path_hints=None,
-            toolchain_file=None):
+            config=None,
+            build_type=None,
+            cmake_flags=None,
+            cmake_generator=None,
+            toolchain_name=None):
         """
-            work_tree      = a toc worktree
-            build_type     = a build type, could be debug or release
-            build_config   = optional : the name of a build.cfg to be loaded
-            cmake_flags    = optional additional cmake flags
-            cmake_generator = optional cmake generator (defaults to Unix Makefiles)
-            toolchain_file  = if not None, a toolchain file to use.
-                              This makes it possible to use a QiToolchain object
-                              (set of pre-compiled packages), or a cross-toolchain
+            work_tree       : see QiWorkTree.__init__
+            config          : see QiWorkTree.__init__
+            path_hints      : see QiWorkTree.__init__
+
+            build_type      : a build type, could be debug or release (defaults to debug)
+            cmake_flags     : optional additional cmake flags
+            cmake_generator : optional cmake generator (defaults to Unix Makefiles)
         """
-        QiWorkTree.__init__(self, work_tree, path_hints=path_hints)
+        QiWorkTree.__init__(self, work_tree, path_hints=path_hints, config=config)
         self.build_type        = build_type
-        self.build_config      = build_config
         self.cmake_flags       = cmake_flags
         self.cmake_generator   = cmake_generator
         self.build_folder_name = None
 
-        # List of objects of type qibuild.project.Project.
+        # Set build environment
+        self.set_build_env()
+
+        # List of objects of type qibuild.project.Project,
+        # this is updated using QiWorkTree.buildable_projects
         self.projects          = list()
 
         # List of objects of type qitoolchain.toolchain.Packages,
-        # provided by the current toolchain, if any
+        # this is updated by the use_toolchain() function
         self.packages          = list()
-
-        # Update build configurations
-        if not self.build_config:
-            self.build_config = self.configstore.get("general", "build", "config", default=None)
-
-        if self.build_config:
-            cfg_filename = "build-%s.cfg" % self.build_config
-            cfg_path = os.path.join(self.work_tree, ".qi", cfg_filename)
-            if not os.path.exists(cfg_path):
-                raise BadBuildConfig("Invalid build config: %s\n(%s does not exists)" %
-                    (self.build_config, cfg_path))
-            self.configstore.read(cfg_path)
-
-        # Read toolchain file:
-        self.toolchain = None
-        self.toolchain_file = None
-        self.toolchain_name = None
-        self.using_system = True
-        self.cross = False
-        if not toolchain_file:
-            # try to read id from configuration:
-            toolchain_file = self.configstore.get("general",
-                "build", "toolchain_file", default=None)
-            if toolchain_file:
-                self.toolchain_file = qitools.sh.to_native_path(toolchain_file)
-                self._load_toolchain_file()
-
-        if self.toolchain:
-            self.packages = self.toolchain.packages
-        else:
-            self.packages = list()
 
         # Set cmake generator
         if not self.cmake_generator:
             self.cmake_generator = self.configstore.get("general", "build" ,
                     "cmake_generator", default="Unix Makefiles")
 
-        # Useful vars:
+        self.using_system = True
+        self.cross = False
+        self.toolchain_name = toolchain_name
+        self.toolchain_file = None
+        if toolchain_name is None:
+            # Maybe ther is a toolchain name in the configuration:
+            toolchain_name = self.configstore.get("general", "build", "toolchain", default=None)
+            if toolchain_name:
+                # Update self.packages, self.toolchain_file
+                # and self.cross
+                LOGGER.info("Using toolchain %s", toolchain_name)
+                self.use_toolchain(toolchain_name)
+
+        # Useful vars to cope with Visual Studio quirks
         self.using_visual_studio = "Visual Studio" in self.cmake_generator
         self.vc_version = self.cmake_generator.split()[-1]
-        self.using_nmake =  "NMake" in self.cmake_generator
 
-        self._set_build_folder_name()
+        self.update_projects()
+
+
+
+    def update_projects(self):
+        """Set self.projects() with the correct build configs and correct build folder
+        name.
+
+        This make sure that every project managed by a Toc instance has the correct
+        build config, and the same build folder
+
+        """
+        self.set_build_folder_name()
 
         # self.buildable_projects has been set by QiWorkTree.__init__
         for pname, ppath in self.buildable_projects.iteritems():
@@ -175,35 +170,23 @@ class Toc(QiWorkTree):
             project.update_depends(self)
             self.projects.append(project)
 
-        # Set build environment
-        self.set_build_env()
 
 
-    def _load_toolchain_file(self):
-        """Given a toolchain file.
-        If we detect a layout like:
-            ctc/toolchain-$name.cmake
-            ctc/sysroot
-        Assume we are cross-compiling, and do not
-        construct a QiToolchain object, else
-        build a QiToolchain object, update known
-        packages, so they are no re-compiled.
+    def use_toolchain(self, toolchain_name):
+        """Given a toolchain file name,
+        construct a QiToolchain object and update
+        self.packages, self.toolchain_file,
+        and self.cross
 
         """
-        toolchain_name = os.path.basename(self.toolchain_file)
-        toolchain_name = toolchain_name.split("-")[-1]
-        toolchain_name = os.path.splitext(toolchain_name)[0]
-
-        tc_dir = os.path.dirname(self.toolchain_file)
-        if os.path.exists(os.path.join(tc_dir, "sysroot")):
-            self.cross = True
-            self.toolchain_name=toolchain_name
-            return
-
-        self.toolchain = qitoolchain.Toolchain(toolchain_name)
+        toolchain = qitoolchain.Toolchain(toolchain_name)
         self.toolchain_name = toolchain_name
+        self.packages = toolchain.packages
+        self.toolchain_file = toolchain.toolchain_file
+        self.cross = toolchain.cross
 
-    def _set_build_folder_name(self):
+
+    def set_build_folder_name(self):
         """Get a reasonable build folder.
         The point is to be sure we don't have two incompatible build configurations
         using the same build dir.
@@ -356,19 +339,6 @@ class Toc(QiWorkTree):
         os.environ.update(result)
 
 
-    def get_toolchain_file(self):
-        """A toolchain file must be used if we are using a toolchain
-        It is to be found using self.toolchain.toolchain_file
-
-        """
-        if self.toolchain.name == "system":
-            return None
-        toolchain_file = self.toolchain.toolchain_file
-        if not os.path.exists(toolchain_file):
-            return None
-        return toolchain_file
-
-
     def configure_project(self, project, toolchain_file=None, clean_first=True):
         """ Call cmake with correct options
 
@@ -478,9 +448,9 @@ class Toc(QiWorkTree):
 
 
 def toc_open(work_tree, args, use_env=False):
-    build_config   = args.build_config
+    config   = args.config
     build_type     = args.build_type
-    toolchain_file = args.toolchain_file
+    toolchain_name = args.toolchain_name
     path_hints     = list()
     try:
         cmake_flags = args.cmake_flags
@@ -510,9 +480,9 @@ def toc_open(work_tree, args, use_env=False):
             "existing work tree with '--work-tree {path}', or "
             "create a new work with 'qibuild init'")
     return Toc(work_tree,
+               config=config,
                build_type=build_type,
-               toolchain_file=toolchain_file,
-               build_config=build_config,
+               toolchain_name=toolchain_name,
                cmake_flags=cmake_flags,
                cmake_generator=cmake_generator,
                path_hints=path_hints)

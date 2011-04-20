@@ -13,7 +13,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    qiwt = qitools.qiworktree_open(args.work_tree, use_env=True)
+    qiwt = qitools.qiworktree_open(args.work_tree, use_env=True, config=args.config)
     if not args.edit:
         print qiwt.configstore
         return

@@ -32,9 +32,10 @@ def do(args):
 
     """
     toc = qibuild.toc.toc_open(args.work_tree, args, use_env=True)
-    if toc.toolchain.name == "system":
-        raise Exception("Could not find current toolchain.\n"
-            "Please use a --toolchain option or edit configuration file")
+
+    tc_name = toc.toolchain_name
+    if tc_name is None:
+        raise Exception("Could not find current toolchain")
 
     if not args.project_or_package_path:
         project_name = qibuild.toc.project_from_cwd()
@@ -48,9 +49,10 @@ def do(args):
             package = qitools.cmdparse.run_action("qibuild.actions.package",
                 [project_name], forward_args=args)
 
-    tc_cache_path = qitoolchain.get_tc_cache(toc.toolchain.name)
+    tc_cache_path = qitoolchain.get_tc_cache(tc_name)
     qitools.sh.mkdir(tc_cache_path, recursive=True)
     in_cache = os.path.join(tc_cache_path, os.path.basename(package))
     shutil.copy(package, in_cache)
 
-    toc.toolchain.add_package(project_name, in_cache)
+    tc = qitoolchain.Toolchain(tc_name)
+    tc.add_package(project_name, in_cache)

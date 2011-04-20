@@ -3,13 +3,13 @@
 """ Collection of parser fonctions for various actions
 """
 
+import qitools
 from qitools.cmdparse import default_parser
 
 def toc_parser(parser):
     """ Parser settings for every action using a toc dir
     """
-    default_parser(parser)
-    parser.add_argument("--work-tree", help="Use a specific work tree path")
+    qitools.qiworktree.work_tree_parser(parser)
 
 def build_parser(parser):
     """ Parser settings for every action doing builds
@@ -26,12 +26,10 @@ def build_parser(parser):
     group.add_argument("--build-type", action="store",
         dest="build_type",
         help="CMAKE_BUILD_TYPE usually DEBUG or RELEASE")
-    group.add_argument("--build-config", "-c",
-        dest="build_config",
-        help="Build configuration to use. A corresponding .qi/build-<name>.cfg file should exist.")
-    group.add_argument("--toolchain-file",  action="store",
-        dest="toolchain_file",
-        help="Use a specific toolchain file")
+    group.add_argument("--toolchain-name",  action="store",
+        dest="toolchain_name",
+        help="Use a specific toolchain name. "
+             "You shoul have called `qitoolchain install' first before using this option")
     group.add_argument("--cmake-generator", action="store",
         help="Specify the CMake generator")
     group.add_argument("-j", dest="num_jobs", type=int, help="Number of jobs to use")
