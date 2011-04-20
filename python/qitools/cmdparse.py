@@ -124,6 +124,22 @@ def run_action(module_name, args=None, forward_args=None):
     check_module(module)
     parser = argparse.ArgumentParser()
     module.configure_parser(parser)
+    # Quick hack to prevent argparse.parse_args to
+    #  - print usage to the console
+    #  - call SystemExit
+    # Instead, raise a nice Exception
+    def exit():
+        return
+    parser.exit = exit
+
+    def error(message):
+        mess  = "Invalid arguments when calling run_action(%s)\n" % module_name
+        mess += message + "\n"
+        mess += "args: %s\n" % " ".join(args)
+        mess += "forward_args: %s\n" % forward_args
+        raise Exception(mess)
+
+    parser.error = error
     parsed_args = parser.parse_args(args=args, namespace=forward_args)
     qitools.log.configure_logging(parsed_args)
     return module.do(parsed_args)
