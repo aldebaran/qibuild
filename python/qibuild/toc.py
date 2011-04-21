@@ -413,14 +413,23 @@ class Toc(QiWorkTree):
         except CommandFailedException:
             raise BuildFailed(project)
 
-    def test_project(self, project):
-        """Run ctest on a project """
+    def test_project(self, project, verbose_tests=False, test_name=None):
+        """Run ctest on a project
+
+        Print the output of the tests in verbose_tests is True
+        Only run the test given in test_name is not None
+        """
         build_dir = project.build_directory
         source_dir = project.directory
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
             _advise_using_configure(project)
-        cmd = ["ctest", source_dir]
+        cmd = ["ctest"]
+        if verbose_tests:
+            cmd.append("-VV")
+        if test_name is not None:
+            cmd.extend(["-R", test_name])
+
         try:
             qitools.command.check_call(cmd, cwd=build_dir)
         except CommandFailedException:
