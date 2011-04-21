@@ -17,10 +17,18 @@
 # BUILD_TYPE : (Debug, Release RelWithDebugInfo, etc...)
 # PROJECT : upper-case name of the target beeing built.
 #           (${PROJECT}_DEPENDS must exist in the CMake cache
+# MSVC    : if it is a string equals to "ON", we are using
+#           visual studio. (CMake does not store MSVC in cache ...)
 
 include(CMakeParseArguments)
 
-if (MSVC)
+set(_using_visual_studio FALSE)
+
+if("${MSVC}" STREQUAL "ON")
+  set(_using_visual_studio TRUE)
+endif()
+
+if(_using_visual_studio)
   if("${BUILD_TYPE}" STREQUAL "Debug")
     set(token "debug")
   else()
@@ -54,7 +62,7 @@ set(_in_dlls)
 # all the .dlls on which the project depends
 foreach(_lib ${_libs})
   # First case: in the same build dir: dll is next to the lib
-  if(MSVC)
+  if(_using_visual_studio)
     string(REPLACE ".lib" ".dll" _dll ${_lib})
     if (EXISTS ${_dll})
       list(APPEND _in_dlls ${_dll})
@@ -77,10 +85,8 @@ if(_in_dlls)
   list(REMOVE_DUPLICATES _in_dlls)
 endif()
 
-message(STATUS "_in_dlls: ${_in_dlls}")
 
-
-if(MSVC)
+if(_using_visual_studio)
   file(COPY ${_in_dlls} DESTINATION ${QI_SDK_DIR}/${BUILD_TYPE})
 else()
   file(COPY ${_in_dlls} DESTINATION ${QI_SDK_DIR}/${QI_SDK_BIN})

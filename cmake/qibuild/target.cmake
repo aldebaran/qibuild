@@ -102,11 +102,18 @@ function(qi_create_bin name)
                    ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
                    COPYONLY)
 
+    if(MSVC)
+      set(_using_visual_studio "ON")
+    else()
+      set(_using_visual_studio "OFF")
+    endif()
+
     add_custom_command(TARGET ${name} POST_BUILD
       COMMAND
         ${CMAKE_COMMAND}
         -DBUILD_TYPE=${CMAKE_CFG_INTDIR}
         -DPROJECT=${_U_name}
+        -DMSVC=${_using_visual_studio}
         -P ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
         ${CMAKE_BINARY_DIR}
     )
