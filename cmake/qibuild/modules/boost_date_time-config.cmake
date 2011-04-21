@@ -8,7 +8,7 @@ set(_libname "date_time")
 set(_suffix "DATE_TIME")
 
 clean(BOOST_${_suffix})
-fpath(BOOST_${_suffix} boost)
+fpath(BOOST_${_suffix} boost/config.hpp)
 
 boost_flib(${_suffix} ${_libname})
 boost_flib(${_suffix} "system")

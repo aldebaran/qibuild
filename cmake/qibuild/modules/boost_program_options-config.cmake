@@ -8,6 +8,6 @@ set(_libname "program_options")
 set(_suffix "PROGRAM_OPTIONS")
 
 clean(BOOST_${_suffix})
-fpath(BOOST_${_suffix} boost)
+fpath(BOOST_${_suffix} boost/config.hpp)
 boost_flib(${_suffix} ${_libname})
 export_lib(BOOST_${_suffix})

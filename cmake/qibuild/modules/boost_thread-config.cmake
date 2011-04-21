@@ -8,6 +8,6 @@ set(_libname "thread")
 set(_suffix "THREAD")
 
 clean(BOOST_${_suffix})
-fpath(BOOST_${_suffix} boost)
+fpath(BOOST_${_suffix} boost/config.hpp)
 boost_flib(${_suffix} ${_libname})
 export_lib(BOOST_${_suffix})
