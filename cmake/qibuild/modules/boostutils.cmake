@@ -36,6 +36,7 @@ function(boost_flib _suffix _libname)
     "boost_${_libname}-xgcc40-mt-${BOOST_VERSION}"
 
     # linux
+    "boost_${_libname}_d"
     "boost_${_libname}-mt"
     "boost_${_libname}"
   )

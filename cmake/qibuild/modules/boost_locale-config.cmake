@@ -12,6 +12,6 @@ fpath(BOOST_${_suffix} boost/locale.hpp)
 
 boost_flib(${_suffix} ${_libname})
 #boost filesystem use boost_system
-boost_flib(${_suffix} "system")
+boost_flib(${_suffix} "thread")
 
 export_lib(BOOST_${_suffix})
