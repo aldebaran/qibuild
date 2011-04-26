@@ -65,8 +65,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     work_tree = qitools.qiworktree.worktree_from_args(args)
-    dot_qi = os.path.join(work_tree, ".qi")
-    build_cfg = os.path.join(dot_qi, "build.cfg")
+    build_cfg = qitools.qiworktree.get_user_config_path()
     should_run = False
     if os.path.exists(build_cfg):
         if not args.interactive:
@@ -83,8 +82,7 @@ def do(args):
     if not should_run:
         return
 
-    if not os.path.exists(build_cfg):
-        qibuild.toc.create(work_tree, args)
+    qibuild.toc.create(work_tree, args)
 
     if not args.interactive:
         return

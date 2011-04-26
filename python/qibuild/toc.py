@@ -498,23 +498,10 @@ def toc_open(work_tree, args, use_env=False):
 
 
 def create(directory, args):
-    """ Create a new toc work_tree by configuring
-    the template in qibuild/templates/build.cfg
+    """ Create a new toc work_tree.
 
     """
     qitools.qiworktree.create(directory)
-    names = ["build.cfg", "build-default.cfg"]
-    srcs = [
-        os.path.join(qibuild.QIBUILD_ROOT_DIR, "templates", name)
-        for name in names
-    ]
-    dests = [
-        os.path.join(directory, ".qi", name)
-        for name in names
-    ]
-    for (src, dest) in zip(srcs, dests):
-        if not os.path.exists(dest):
-            shutil.copy(src, dest)
 
 
 def resolve_deps(toc, args, runtime=False):
