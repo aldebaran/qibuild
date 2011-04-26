@@ -23,7 +23,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.qiworktree.work_tree_parser(parser)
+    qitools.cmdparse.default_parser(parser)
     parser.add_argument("name",
         help="The name of the toolchain file")
     parser.add_argument("toolchain_file",
@@ -49,9 +49,7 @@ def do(args):
         qitools.configstore.update_config(tc_cfg,
             "toolchain", tc_name, "cross", "yes")
 
-    qiwt = qitools.qiworktree_open(args.work_tree, use_env=True)
-    work_tree = qiwt.work_tree
-    cfg_path = os.path.join(work_tree, ".qi", "build-%s.cfg" % tc_name)
+    cfg_path = qitools.qiworktree.get_user_config_path(tc_name)
     qitools.configstore.update_config(cfg_path,
         "general", "build", "toolchain", tc_name)
 
@@ -63,7 +61,7 @@ def do(args):
         LOGGER.info("Now try using `qibuild -c %s'", tc_name)
         return
 
-    cfg_path = qiwt.user_config_path
+    cfg_path = qitools.qiworktree.get_user_config_path()
     qitools.configstore.update_config(cfg_path,
         "general", "build", "config", tc_name)
     LOGGER.info("Now using %s toolchain by default", tc_name)

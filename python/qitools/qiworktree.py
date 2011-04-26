@@ -51,6 +51,22 @@ def work_tree_parser(parser):
              "A corresponding .qi/build-<name>.cfg file should exist.")
 
 
+def get_user_config_path(config_name=None):
+    """ Get the path to the user config path
+    ~/.config/qi/qibuild.cfg on UNIX
+
+    If config_name is None, resturn
+     ~/.config/qi/qibuild-NAME.cfg,
+
+    """
+    # FIXME: deal with non-UNIX systems ?
+    base_cfg = qitools.sh.to_native_path("~/.config/qi")
+    if config_name:
+        return os.path.join(base_cfg, "qibuild-%s.cfg" % config_name)
+    else:
+        return os.path.join(base_cfg, "qibuild.cfg")
+
+
 class QiWorkTree:
     """ This class represent a Qi worktree.
         - work_tree
@@ -64,7 +80,7 @@ class QiWorkTree:
         self.configstore        = ConfigStore()
         self.buildable_projects = dict()
         self.git_projects       = dict()
-        self.user_config_path   = os.path.join(self.work_tree, ".qi", "build.cfg")
+        self.user_config_path   = get_user_config_path()
 
         if not path_hints:
             path_hints = list()
@@ -123,28 +139,27 @@ class QiWorkTree:
     def _load_configuration(self, config=None):
         """Initialize self.configstore, reading files in this order:
           - the qibuild.manifest in the projects
-          - common config files for all worktrees ~/.config/qi/build.cfg
-          - config file for this work tree worktree/.qi/build.cfg
-          - custom config file worktree/.qi/build-<config>.cfg
-
+          - common config files for all work trees: ~/.config/qi/qibuild.cfg
+          - named config file   for all work trees: ~/.config/qi/qibuild-<name>.cfg
+          - config file for this work tree  only  : QI_WORK_TREE/.qi/build.cfg
         """
 
         for _name, ppath in self.buildable_projects.iteritems():
             self.configstore.read(os.path.join(ppath, "qibuild.manifest"))
 
-        self.configstore.read("~/.config/qi/qibuild.cfg")
-        self.configstore.read(os.path.join(self.work_tree, ".qi", "build.cfg"))
-
+        self.configstore.read(self.user_config_path)
         if not config:
-            # try from config
+            # try to read the default config name from the config:
             config = self.configstore.get("general", "build", "config", default=None)
         if config:
-            custom_path = os.path.join(self.work_tree, ".qi", "build-%s.cfg" % config)
+            custom_path = get_user_config_path(config)
             if not os.path.exists(custom_path):
                 LOGGER.warning("Failed to read custom config file\n"
                     "Looked in %s", custom_path)
-            self.configstore.read(custom_path)
+            else:
+                self.configstore.read(custom_path)
 
+        self.configstore.read(os.path.join(self.work_tree, ".qi", "build.cfg"))
         LOGGER.debug("[Qi] worktree configuration:\n" + str(self.configstore))
 
 def qiworktree_open(work_tree=None, use_env=False, config=None):
