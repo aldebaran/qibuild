@@ -40,6 +40,18 @@ class WorkTreeException(Exception):
     def __str__(self):
         return self.message
 
+class ProjectAlreadyExists(Exception):
+    """Just a custom exception """
+    def __init__(self, url, name, path):
+        self.url = url
+        self.name = name
+        self.path = path
+
+    def __str__(self):
+        message = "Error when adding project %s (%s)\n" % (self.url, self.name)
+        message += "%s already exists." % self.path
+        return message
+
 
 def work_tree_parser(parser):
     """ Parser settings for every action using a work tree.

@@ -9,18 +9,6 @@ import qitools
 
 LOGGER = logging.getLogger(__name__)
 
-class ProjectAlreadyExists(Exception):
-    """Just a custom exception """
-    def __init__(self, url, name, path):
-        self.url = url
-        self.name = name
-        self.path = path
-
-    def __str__(self):
-        message = "Error when adding project %s (%s)\n" % (self.url, self.name)
-        message += "%s already exists." % self.path
-        return message
-
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -46,7 +34,7 @@ def do(args):
     LOGGER.info("Git clone: %s -> %s", url, git_src_dir)
 
     if os.path.exists(git_src_dir):
-        raise ProjectAlreadyExists(url, name, git_src_dir)
+        raise qitools.qiworktree.ProjectAlreadyExists(url, name, git_src_dir)
 
     git = qisrc.git.Git(git_src_dir)
     git.clone(url, git_src_dir)
