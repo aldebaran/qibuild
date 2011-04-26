@@ -40,7 +40,6 @@ class TocException(Exception):
     """Custom exception.
     Specific exceptions raised by toc are of this type,
     so they can be caught by callers.
-
     """
     def __init__(self, message):
         self.message = message
@@ -48,25 +47,25 @@ class TocException(Exception):
     def __str__(self):
         return self.message
 
-class ConfigureFailed(TocException):
+class ConfigureFailed(Exception):
     def __init__(self, project):
         self.project = project
     def __str__(self):
         return "Error occured when configuring project %s" % self.project.name
 
-class BuildFailed(TocException):
+class BuildFailed(Exception):
     def __init__(self, project):
         self.project = project
     def __str__(self):
         return "Error occured when building project %s" % self.project.name
 
-class TestsFailed(TocException):
+class TestsFailed(Exception):
     def __init__(self, project):
         self.project = project
     def __str__(self):
         return "Error occured when testing project %s" % self.project.name
 
-class InstallFailed(TocException):
+class InstallFailed(Exception):
     def __init__(self, project):
         self.project = project
     def __str__(self):
