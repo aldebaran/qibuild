@@ -41,8 +41,15 @@ def do(args):
         return
 
     if editor == "QtCreator":
-        qitools.command.check_is_in_path("qtcreator")
-        qtcreator = qitools.command.find_program("qtcreator")
+        qtcreator_full_path = toc.configstore.get("general", "env", "ide_path", default = None)
+        if not qtcreator_full_path:
+            qtcreator = qitools.command.find_program("qtcreator")
+            if qtcreator is None:
+                qtcreator_full_path = qitools.interact.ask_program("Please enter path to qtcreator")
+                # Store it so we dont ask again:
+                qitools.configstore.update_config(toc.user_config_path,
+                    "general", "env", "ide_path", qtcreator_full_path)
+
         cmake_list = os.path.join(project.directory, "CMakeLists.txt")
-        subprocess.Popen([qtcreator, cmake_list])
+        subprocess.Popen([qtcreator_full_path, cmake_list])
         return
