@@ -38,8 +38,10 @@ def do(args):
 
     for (project_name, project_conf) in config.get("project").iteritems():
         project_url = config.get("project", project_name, "url")
-        qitools.run_action("qisrc.actions.add",
-            [project_url, project_name])
+        try:
+            qitools.run_action("qisrc.actions.add", [project_url, project_name])
+        except qitools.qiworktree.ProjectAlreadyExists:
+            pass
 
 
 
