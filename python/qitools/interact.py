@@ -3,8 +3,11 @@
 """Small set of tools to interact with the user
 
 """
-
 #TODO: color!
+
+import os
+from qitools.command import find_program
+
 
 def ask_choice(choices, input_text):
     """Ask the user to choose from a list of choices
@@ -50,3 +53,26 @@ def ask_string(question, default=None):
     if not answer:
         return default
     return answer
+
+def ask_program(message):
+    """Ask the user to enter a path
+    to a program.
+
+    Look for it in PATH. If not found,
+    ask the user to enter the full path.
+
+    If still not found, give up ...
+    """
+    program = ask_string(message)
+    full_path = find_program(program)
+    # TODO: hard-coded guess ?
+    if full_path is not None:
+        return full_path
+
+    print "%s not found" % program
+    full_path = ask_string("Please enter full path to %s" % program)
+    if not os.path.exists(full_path):
+       raise Exception("%s does not exists, aborting")
+    return full_path
+
+
