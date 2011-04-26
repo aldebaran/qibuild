@@ -260,6 +260,9 @@ def search_projects(directory=None, depth=3):
     except OSError:
         pass
     for p in subdirs:
+        blacklist_file = os.path.join(p, ".qiblacklist")
+        if os.path.exists(blacklist_file):
+            continue
         if os.path.isdir(os.path.join(directory, p)):
             sub_rgit, sub_rsrc = search_projects(os.path.join(directory, p), depth - 1)
             rgit.extend(sub_rgit)
