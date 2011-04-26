@@ -238,7 +238,7 @@ def search_projects(directory=None, depth=3):
         This function return a list of directories.
     """
     # TODO: caching, please!
-    # TODO: may warn the user that this may take some times, of force user
+    # TODO: may warn the user that this may take some time, of force user
     # to run qibuild init in empty directories
     rgit = list()
     rsrc = list()
