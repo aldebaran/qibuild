@@ -28,8 +28,7 @@ def do(args):
         # Ask the user to choose, and store the answer so
         # that we never ask again
         print "Could not find the editor to use."
-        editor = qitools.interact.ask_string("Please enter an editor")
-        qitools.command.check_is_in_path(editor)
+        editor = qitools.interact.ask_program("Please enter an editor")
         qitools.configstore.update_config(config_path,
             "general", "env", "editor", editor)
 
