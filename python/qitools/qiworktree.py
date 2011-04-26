@@ -158,8 +158,6 @@ class QiWorkTree:
                     "Looked in %s", custom_path)
             else:
                 self.configstore.read(custom_path)
-
-        self.configstore.read(os.path.join(self.work_tree, ".qi", "build.cfg"))
         LOGGER.debug("[Qi] worktree configuration:\n" + str(self.configstore))
 
 def qiworktree_open(work_tree=None, use_env=False, config=None):
