@@ -208,15 +208,13 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
         # even if "bar-baz" is not a valid module name.
         name = name.replace("_", "-")
         configurator = module.configure_parser
-        action_parser = subparsers.add_parser(name, help=module.__doc__)
+        first_doc_line = module.__doc__.splitlines()[0]
+        action_parser = subparsers.add_parser(name, help=first_doc_line)
         configurator(action_parser)
         action_parser.formatter_class = argparse.RawDescriptionHelpFormatter
 
-        try:
-            doc_lines = module.__doc__.splitlines()
-            epilog = "\n".join(doc_lines[1:])
-        except AttributeError:
-            epilog = None
+        doc_lines = module.__doc__.splitlines()
+        epilog = "\n".join(doc_lines[1:])
         if epilog:
             action_parser.epilog = epilog
 
@@ -277,6 +275,21 @@ def check_module(module):
         raise InvalidAction(module.__name__, "Could not find a do() method")
     if not hasattr(module, "configure_parser"):
         raise InvalidAction(module.__name__, "Could not find a configure_parser() method")
+    if module.__doc__ is None:
+        mess = """{module_name} has no doc string !
+Please add something like:
+
+    \"\"\" Short description of {module_name}
+
+    A longer desciption here....
+
+    \"\"\"
+
+at the top of the file
+
+"""
+        mess = mess.format(module_path=module.__file__, module_name=module.__name__)
+        raise InvalidAction(module.__name__, mess)
 
 
 
