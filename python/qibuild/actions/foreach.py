@@ -1,6 +1,6 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-""""Run the same command on each buildable project.
+"""Run the same command on each buildable project.
 
 Use -- to separate qibuild arguments from the arguments of the command.
 For instance
