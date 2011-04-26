@@ -105,7 +105,7 @@ def run_wizard(build_cfg):
     if qitools.ask_yes_no("Use a toolchain"):
         tc_config = qitoolchain.get_tc_config_path()
         if not os.path.exists(tc_config):
-            if qitools.ask_yes_no("No toolchain found, crate one"):
+            if qitools.ask_yes_no("No toolchain found, create one"):
                 toolchain_name = create_toolchain()
         else:
             toolchain_name = ask_toolchain()
