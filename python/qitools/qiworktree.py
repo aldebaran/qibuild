@@ -281,7 +281,7 @@ def search_projects(directory=None, depth=3):
 
 def guess_work_tree(use_env=False):
     """Look for parent directories until a .qi dir is found somewhere.
-    Otherwise, just use TOC_WORK_TREE environment
+    Otherwise, just use QI_WORK_TREE environment
     variable
     """
     # FIXME: not sure who would need use_env to be False ...
