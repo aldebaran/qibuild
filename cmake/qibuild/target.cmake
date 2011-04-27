@@ -308,7 +308,7 @@ function(qi_create_lib name)
       endif()
     else() # no windows
       set_target_properties("${name}" PROPERTIES
-            RUNTIME_OUTPUT_DIRerror: Cannot lock the ref 'ORIG_HEAD'.ECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
+            RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
             LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
             ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
           )
