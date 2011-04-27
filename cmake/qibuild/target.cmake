@@ -224,11 +224,7 @@ function(qi_create_lib name)
   cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC;SHARED;STATIC" "SUBFOLDER" "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
   if (ARG_NOBINDLL)
-    # NOBINDLL was used for naoqi modules.
-    # We wanted them to end up in
-    # sdk/lib/naoqi/my_module.dll, and not in
-    # sdk/bin/my_module.dll  (which is the place dll should
-    # normally go on windows: next to the .exe)
+    # Kept here for historical reason: TODO: fix this in qibuild/compat.
     qi_deprecated("Use of NOBINDLL is deprectated")
   endif()
   qi_debug("qi_create_lib(${name} ${ARG_SUBFOLDER})")
@@ -280,48 +276,76 @@ function(qi_create_lib name)
 
   qi_use_lib("${name}" ${ARG_DEPENDS})
 
+
   if (MSVC)
     # always postfix debug lib/bin with _d ...
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
-    # ... and generate libraries and next to executables.
-    if("${ARG_SUBFOLDER}" STREQUAL "")
-    set_target_properties("${name}"
-      PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}"
-        ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}"
-        LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}"
-    )
-    else()
-      # After qi_create_bin(foo), foo.exe is in build/sdk/Release/foo.exe,
-      # So we need to copy paste hello.dll from build/src/hello/Release/hello.dll to
-      # build/sdk/Release/${SUBFOLER}/hello.dll
-      # We will achieve this using a post-build rule using post-copy-plugin.cmake.
-      configure_file(${QI_ROOT_DIR}/templates/post-copy-plugin.cmake
-                     ${CMAKE_BINARY_DIR}/post-copy-plugin.cmake
-                     COPYONLY)
+  endif()
 
-
-      get_target_property(_location_release "${name}" LOCATION_RELEASE)
-      get_target_property(_location_debug   "${name}" LOCATION_DEBUG)
-
-
-      add_custom_command(TARGET ${name} POST_BUILD
-        COMMAND
-          "${CMAKE_COMMAND}"
-          -DBUILD_TYPE=${CMAKE_CFG_INTDIR}
-          -DLOCATION_DEBUG="${_location_debug}"
-          -DLOCATION_RELEASE="${_location_release}"
-          -DOUTPUT="${QI_SDK_DIR}/${CMAKE_CFG_INTDIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
-          -P "${CMAKE_BINARY_DIR}/post-copy-plugin.cmake"
-          "${CMAKE_BINARY_DIR}"
-      )
+  # Handle output directories
+  if("${ARG_SUBFOLDER}" STREQUAL "")
+    if(WIN32)
+    # Always generate libraries and next to executables, when
+    # no subfolder is given
+      if(MSVC)
+        # Since VS always add the build configuration to the output
+        # directory, we have to use the same output directory for
+        # .exe and .dll, otherwise foo.exe will not be able to find
+        # foo.dll
+        set_target_properties("${name}"
+          PROPERTIES
+            LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}"
+            RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}"
+            ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}"
+        )
+      else()
+        # MinGW: just use QI_SDK_BIN for runtine targets.
+        set_target_properties("${name}" PROPERTIES
+          RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}"
+          LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
+          ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
+        )
+      endif()
+    else() # no windows
+      set_target_properties("${name}" PROPERTIES
+            RUNTIME_OUTPUT_DIRerror: Cannot lock the ref 'ORIG_HEAD'.ECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
+            LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
+            ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
+          )
     endif()
   else()
-    set_target_properties("${name}" PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
-        ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
-        LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
-    )
+      # A subfolder has beed given, so the dll is in fact a plugin,
+      # and it should always be in sdk/lib/SUBFOLER
+      if (MSCV)
+        # You can't just use a _OUTPUT_DIRECTORY property, because VS will always
+        # append the build configuration to this path.
+        # After qi_create_bin(foo), foo.exe is in build/sdk/Release/foo.exe,
+        # So we need to copy paste hello.dll from build/src/hello/Release/hello.dll to
+        # build/sdk/Release/${SUBFOLER}/hello.dll
+        # We will achieve this using a post-build rule using post-copy-plugin.cmake.
+        configure_file(${QI_ROOT_DIR}/templates/post-copy-plugin.cmake
+                       ${CMAKE_BINARY_DIR}/post-copy-plugin.cmake
+                       COPYONLY)
+        get_target_property(_location_release "${name}" LOCATION_RELEASE)
+        get_target_property(_location_debug   "${name}" LOCATION_DEBUG)
+        add_custom_command(TARGET ${name} POST_BUILD
+          COMMAND
+            "${CMAKE_COMMAND}"
+            -DBUILD_TYPE=${CMAKE_CFG_INTDIR}
+            -DLOCATION_DEBUG="${_location_debug}"
+            -DLOCATION_RELEASE="${_location_release}"
+            -DOUTPUT="${QI_SDK_DIR}/${CMAKE_CFG_INTDIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
+            -P "${CMAKE_BINARY_DIR}/post-copy-plugin.cmake"
+            "${CMAKE_BINARY_DIR}"
+        )
+    else()
+        # NO MSCV and a SUBFOLER : simply use _OUTPUT_DIRECTORY properties
+      set_target_properties("${name}" PROPERTIES
+          RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
+          ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
+          LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
+      )
+    endif()
   endif()
 
   #make install rules
