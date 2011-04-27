@@ -266,17 +266,19 @@ def search_projects(directory=None, depth=3):
 
     subdirs = list()
     try:
-        subdirs = os.listdir(directory)
+        dir_contents = [os.path.join(directory, s) for s in os.listdir(directory)]
+        subdirs = [s for s in dir_contents if os.path.isdir(s)]
     except OSError:
         pass
+    # If os.listdir fails (permission denied for instance),
+    # we will iter on a empty list, so no worry :)
     for p in subdirs:
         blacklist_file = os.path.join(p, ".qiblacklist")
         if os.path.exists(blacklist_file):
             continue
-        if os.path.isdir(os.path.join(directory, p)):
-            sub_rgit, sub_rsrc = search_projects(os.path.join(directory, p), depth - 1)
-            rgit.extend(sub_rgit)
-            rsrc.extend(sub_rsrc)
+        sub_rgit, sub_rsrc = search_projects(p, depth - 1)
+        rgit.extend(sub_rgit)
+        rsrc.extend(sub_rsrc)
     return (rgit, rsrc)
 
 def guess_work_tree(use_env=False):
