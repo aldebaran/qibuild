@@ -12,8 +12,11 @@ url = git://foo.com/foo.git
 
 import os
 import urllib
+import logging
 
 import qitools
+
+LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -31,17 +34,17 @@ def do(args):
         urllib.urlretrieve(args.url, manifest)
         config.read(manifest)
 
-    print config
     projects = config.get("project", default=None)
     if not projects:
         raise Exception("Not project found in url %s" % args.url)
 
+    qiwt = qitools.qiworktree_open(args.work_tree, use_env=True)
+
     for (project_name, project_conf) in config.get("project").iteritems():
         project_url = config.get("project", project_name, "url")
-        try:
+        if project_name in qiwt.buildable_projects.keys():
+            LOGGER.info("Found %s, skipping", project_name)
+        else:
             qitools.run_action("qisrc.actions.add", [project_url, project_name])
-        except qitools.qiworktree.ProjectAlreadyExists:
-            pass
-
 
 
