@@ -67,10 +67,7 @@ def do(args):
     work_tree = qitools.qiworktree.worktree_from_args(args)
     build_cfg = qitools.qiworktree.get_user_config_path()
     should_run = False
-    if os.path.exists(build_cfg):
-        if not args.interactive:
-            LOGGER.error("%s already exists, aborting", build_cfg)
-            return
+    if os.path.exists(build_cfg) and args.interactive:
         try:
             to_ask  = "%s already exists, do you which to configure it" % build_cfg
             should_run = qitools.ask_yes_no(to_ask)
@@ -83,6 +80,9 @@ def do(args):
         return
 
     qibuild.toc.create(work_tree, args)
+    if not os.path.exists(build_cfg):
+        template_cfg = os.path.join(qibuild.QIBUILD_ROOT_DIR, "templates", "qibuild.cfg")
+        qitools.sh.install(template_cfg, build_cfg)
 
     if not args.interactive:
         return
