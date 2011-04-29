@@ -45,6 +45,8 @@ def do(args):
         if project_name in qiwt.buildable_projects.keys():
             LOGGER.info("Found %s, skipping", project_name)
         else:
-            qitools.run_action("qisrc.actions.add", [project_url, project_name])
-
+            try:
+                qitools.run_action("qisrc.actions.add", [project_url, project_name])
+            except qitools.qiworktree.ProjectAlreadyExists:
+                pass
 
