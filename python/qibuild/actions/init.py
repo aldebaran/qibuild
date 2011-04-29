@@ -19,7 +19,12 @@ def ask_cmake_generator():
         cmake_process = subprocess.Popen(["cmake"], stdout=subprocess.PIPE)
         (out, _err) = cmake_process.communicate()
     except:
-        raise Exception("unable to guess the cmake generator. Do you have cmake installed?")
+        cmake = qitools.command.find_program("cmake.exe")
+        if cmake:
+            #TODO: ask user to enter one?
+            raise Exception("Unable to guess cmake generators.")
+        else:
+            raise Exception("Could not find cmake. cmake should be in your PATH.")
 
     lines = out.splitlines()
     interesting_lines = list()
