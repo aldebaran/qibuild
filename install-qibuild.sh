@@ -13,9 +13,10 @@ DESTDIR="/usr/local/bin"
 create_launcher() {
   full_path=$1
   name=$(basename $full_path)
-  if which readlink >/dev/null 2>/dev/null ; then
+  if readlink -f . >/dev/null 2>/dev/null ; then
       p=$(dirname "$(readlink -f $0 2>/dev/null)")
   else
+     echo "ici"
       p=$(pwd)
   fi
   #echo "QiBuild directory: $p"
