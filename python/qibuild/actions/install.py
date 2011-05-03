@@ -2,10 +2,12 @@
 """Install a project """
 
 import os
-import logging
-import qibuild
-import qitools
 import shutil
+import logging
+
+import qitools
+import qibuild
+import qitoolchain
 
 LOGGER = logging.getLogger(__name__)
 
@@ -72,6 +74,7 @@ def do(args):
     if package_names:
         LOGGER.info("Installing %s to %s", ", ".join([p for p in package_names]), dest)
     for package_name in package_names:
-        package_src = toc.toolchain.get(package_name)
+        toolchain = qitoolchain.Toolchain(toc.toolchain_name)
+        package_src = toolchain.get(package_name)
         install_package(package_src, dest, runtime=args.runtime)
 
