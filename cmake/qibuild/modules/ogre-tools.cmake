@@ -14,6 +14,7 @@
 #  instead of doing it with the C++ Ogre API.
 #
 #
+# \group APPLICATION_NAME Name of the application.
 # \group SRC_RESOURCES_PATHS The list of absoluted paths to the directories
 #                           where to find the meshes,
 #                           the .material, and so on.
@@ -35,7 +36,7 @@ function(configure_ogre)
   # FIXME: install rules
   # FIXME: put configuration files in etc/ rather that in bin/
 
-  cmake_parse_arguments(ARG "" "RENDER_PLUGIN"
+  cmake_parse_arguments(ARG "" "APPLICATION_NAME;RENDER_PLUGIN"
     "SRC_RESOURCES_PATHS;INSTALLED_RESOURCES_PATHS" ${ARGN})
 
   # Set CMAKE_FIND_LIBRARY_PREFIXES so that RenderSystem_GL.so is found
@@ -52,19 +53,19 @@ function(configure_ogre)
 
   get_filename_component(_ogre_plugins_folder ${_ogre_plugin} PATH)
 
-  set(_plugins_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/ogre/plugins.cfg")
+  set(_plugins_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/${ARG_APPLICATION_NAME}/ogre/plugins.cfg")
   file(WRITE  "${_plugins_cfg}" "# Defines Ogre plugins to load\n")
   file(APPEND "${_plugins_cfg}" "PluginFolder=${_ogre_plugins_folder}\n")
   file(APPEND "${_plugins_cfg}" "Plugin=${ARG_RENDER_PLUGIN}\n")
 
   if(WIN32)
-    set(_plugins_d_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/ogre/plugins_d.cfg")
+    set(_plugins_d_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/${ARG_APPLICATION_NAME}/ogre/plugins_d.cfg")
     file(WRITE  "${_plugins__d_cfg}" "# Defines Ogre plugins to load\n")
     file(APPEND "${_plugins__d_cfg}" "PluginFolder=${_ogre_plugins_folder}\n")
     file(APPEND "${_plugins__d_cfg}" "Plugin=${ARG_RENDER_PLUGIN}_d\n")
   endif()
 
-  set(_resources_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/ogre/resources.cfg")
+  set(_resources_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/${ARG_APPLICATION_NAME}/ogre/resources.cfg")
   file(WRITE  "${_resources_cfg}" "# Defines where to find Ogre resources\n")
   file(APPEND "${_resources_cfg}" "[General]\n")
   foreach(_resource_path ${ARG_SRC_RESOURCES_PATHS})
@@ -87,8 +88,8 @@ function(configure_ogre)
     file(APPEND "${_inst_resources}" "FileSystem=@sdk@/${_resource_path}\n")
   endforeach()
 
-  qi_install_conf("ogre" ${_inst_resources})
-  qi_install_conf("ogre" ${_inst_plugins})
+  qi_install_conf("${ARG_APPLICATION_NAME}/ogre" ${_inst_resources})
+  qi_install_conf("${ARG_APPLICATION_NAME}/ogre" ${_inst_plugins})
 
 
 endfunction()
