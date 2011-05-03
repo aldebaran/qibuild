@@ -14,9 +14,11 @@
 #  instead of doing it with the C++ Ogre API.
 #
 #
-# \group RESOURCES_PATHS The path to the directory where to find the meshes,
-#                        the .material, and so on.
-#
+# \group SRC_RESOURCES_PATHS The list of absoluted paths to the directories
+#                           where to find the meshes,
+#                           the .material, and so on.
+# \group INSTALLED_RESOURCES_PATHS The same list, but relative to the
+#                                  install directory
 # \param RENDER_PLUGIN   The name of the Render plugins, for instance
 #                        RenderSystem_GL.
 #
@@ -33,7 +35,8 @@ function(configure_ogre)
   # FIXME: install rules
   # FIXME: put configuration files in etc/ rather that in bin/
 
-  cmake_parse_arguments(ARG "" "RENDER_PLUGIN" "RESOURCES_PATHS" ${ARGN})
+  cmake_parse_arguments(ARG "" "RENDER_PLUGIN"
+    "SRC_RESOURCES_PATHS;INSTALLED_RESOURCES_PATHS" ${ARGN})
 
   # Set CMAKE_FIND_LIBRARY_PREFIXES so that RenderSystem_GL.so is found
   # (there is not libRendeSystem_GL.so)
@@ -49,25 +52,43 @@ function(configure_ogre)
 
   get_filename_component(_ogre_plugins_folder ${_ogre_plugin} PATH)
 
-  set(_plugins_cfg "${QI_SDK_DIR}/${QI_SDK_BIN}/plugins.cfg")
+  set(_plugins_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/ogre/plugins.cfg")
   file(WRITE  "${_plugins_cfg}" "# Defines Ogre plugins to load\n")
   file(APPEND "${_plugins_cfg}" "PluginFolder=${_ogre_plugins_folder}\n")
   file(APPEND "${_plugins_cfg}" "Plugin=${ARG_RENDER_PLUGIN}\n")
 
   if(WIN32)
-    set(_plugins_d_cfg "${QI_SDK_DIR}/${QI_SDK_BIN}/plugins_d.cfg")
+    set(_plugins_d_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/ogre/plugins_d.cfg")
     file(WRITE  "${_plugins__d_cfg}" "# Defines Ogre plugins to load\n")
     file(APPEND "${_plugins__d_cfg}" "PluginFolder=${_ogre_plugins_folder}\n")
     file(APPEND "${_plugins__d_cfg}" "Plugin=${ARG_RENDER_PLUGIN}_d\n")
   endif()
 
-  set(_resources_cfg "${QI_SDK_DIR}/${QI_SDK_BIN}/resources.cfg")
+  set(_resources_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/ogre/resources.cfg")
   file(WRITE  "${_resources_cfg}" "# Defines where to find Ogre resources\n")
   file(APPEND "${_resources_cfg}" "[General]\n")
-  foreach(_resource_path ${ARG_RESOURCES_PATHS})
+  foreach(_resource_path ${ARG_SRC_RESOURCES_PATHS})
     file(APPEND "${_resources_cfg}" "FileSystem=${_resource_path}\n")
   endforeach()
 
+  # Create files to be installed:
+  # A custom plugins.cfg with no PluginFolder section
+  set(_inst_plugins "${CMAKE_CURRENT_BINARY_DIR}/plugins.cfg")
+  file(WRITE  "${_inst_plugins}" "#Defines ogre plugins to load\n")
+  file(APPEND "${_inst_plugins}" "Plugin=${ARG_RENDER_PLUGIN}\n")
+  file(APPEND "${_inst_plugins}" "PluginFolder=@sdk@/lib/OGRE\n")
+
+  # A custon resource.cfg with the installed PATH
+  set(_inst_resources "${CMAKE_CURRENT_BINARY_DIR}/resources.cfg")
+
+  file(WRITE  "${_inst_resources}" "# Defines where to find Ogre resources\n")
+  file(APPEND "${_inst_resources}" "[General]\n")
+  foreach(_resource_path ${ARG_INSTALLED_RESOURCES_PATHS})
+    file(APPEND "${_inst_resources}" "FileSystem=@sdk@/${_resource_path}\n")
+  endforeach()
+
+  qi_install_conf("ogre" ${_inst_resources})
+  qi_install_conf("ogre" ${_inst_plugins})
+
+
 endfunction()
-
-
