@@ -2,7 +2,7 @@
 """Install a project """
 
 import os
-import shutil
+import sys
 import logging
 
 import qitools
@@ -11,14 +11,42 @@ import qitoolchain
 
 LOGGER = logging.getLogger(__name__)
 
+def is_runtime(filename):
+    if filename.startswith("bin"):
+        if sys.platform.startswith("win"):
+            if filename.endswith(".exe"):
+                return True
+            if filename.endswith(".dll"):
+                return True
+            else:
+                return False
+        else:
+            return True
+    if filename.startswith("lib"):
+        shared_lib_ext = ""
+        if sys.platform.startswith("win"):
+            shared_lib_ext = ".dll"
+        if sys.platform == "linux2":
+            shared_lib_ext = ".so"
+        if sys.platform == "darwing":
+            shared_lib_ext = ".dylib"
+        if shared_lib_ext in os.path.basename(filename):
+            return True
+        else:
+            return False
+    if filename.startswith("share/cmake"):
+        return False
+    if filename.startswith("share"):
+        return True
+
 def install_package(package_src, destdir, runtime=False):
     """Install a package to a desdir.
 
     """
     if runtime:
-        LOGGER.warning("Installing only runtime components of "
-            "packages is not supported yet.")
-    qitools.sh.install(package_src, destdir)
+        qitools.sh.install(package_src, destdir, filter=is_runtime)
+    else:
+        qitools.sh.install(package_src, destdir)
 
 def configure_parser(parser):
     """Configure parser for this action"""

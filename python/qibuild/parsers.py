@@ -71,6 +71,9 @@ def package_parser(parser):
         "of the package")
     group.add_argument("--arch", help="A string describing the architecture of "
         "the package: linux, linux64, mac, windows-vs2008, etc...")
-    parser.set_defaults(continuous=False)
+    group.add_argument("--runtime", action="store_true",
+        help="Install runtime components only")
+    parser.set_defaults(continuous=False,
+        runtime=False)
 
 

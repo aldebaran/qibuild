@@ -66,24 +66,36 @@ def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
         with open(out_path, "w") as out_file:
             out_file.write(out_content)
 
-def install(src, dest):
+def install(src, dest, filter=None):
     """Install a directory to a destination.
+
+    If filter is not None, then the file will only be
+    installed if filter(relative/path/to/file) returns
+    True.
 
     Few notes: rewriting `cp' or `install' is a hard problem.
     This version will happily erase whatever is inside dest,
     and won't complain if dest does not exists (missing
     directories will simply be created)
 
+
     Note that if src contains empty directories, they won't be
     installled.
 
     """
     LOGGER.debug("Installing %s -> %s", src, dest)
+    if filter is None:
+        def filter(filename):
+            return True
+
     if os.path.isdir(src):
         mkdir(dest, recursive=True)
         for (root, dirs, files) in os.walk(src):
             new_root = os.path.relpath(root, src)
             for file in files:
+                rel_path = os.path.join(new_root, file)
+                if not filter(rel_path):
+                    continue
                 file_src = os.path.join(root, file)
                 mkdir(os.path.join(dest, new_root), recursive=True)
                 file_dest = os.path.join(dest, new_root, file)

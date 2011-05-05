@@ -9,7 +9,6 @@ import os
 import sys
 import glob
 import platform
-import shutil
 import subprocess
 import logging
 import qitools.configstore
@@ -419,7 +418,6 @@ class Toc(QiWorkTree):
         Only run the test given in test_name is not None
         """
         build_dir = project.build_directory
-        source_dir = project.directory
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
             _advise_using_configure(project)
@@ -440,20 +438,36 @@ class Toc(QiWorkTree):
         build_dir = project.build_directory
         build_environ = os.environ.copy()
         build_environ["DESTDIR"] = destdir
-        if runtime:
-            # FIXME: implement!
-            # call cmake install with correct CMAKE_INSTALL_COMPONENTS
-            # settings
-            cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
-                    "--target", "install"]
-        else:
-            cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
-                    "--target", "install"]
         try:
-            qitools.command.check_call(cmd, env=build_environ)
+            if runtime:
+                self.install_project_runtime(project, destdir)
+            else:
+                cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
+                        "--target", "install"]
+                qitools.command.check_call(cmd, env=build_environ)
         except CommandFailedException:
             raise InstallFailed(project)
 
+    def install_project_runtime(self, project, destdir):
+        """Install runtime component of a project to a destdir """
+        runtime_components = [
+             "binary",
+             "data",
+             "conf",
+             "lib",
+             "python",
+             "doc"
+         ]
+        for component in runtime_components:
+            build_env = os.environ.copy()
+            build_env["DESTDIR"] = destdir
+            cmake_args = list()
+            cmake_args += ["-DCOMPONENT=%s" % component]
+            cmake_args += ["-P", "cmake_install.cmake"]
+            LOGGER.debug("Installing %s", component)
+            qitools.command.check_call(["cmake"] + cmake_args,
+                cwd=project.build_directory,
+                env=build_env)
 
 def toc_open(work_tree, args, use_env=False):
     config   = args.config
