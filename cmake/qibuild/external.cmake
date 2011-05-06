@@ -68,7 +68,7 @@ function(qi_build_cmake name url)
   PREFIX "${name}"
   BUILD_IN_SOURCE 0
   PATCH_COMMAND "${patchs_cmd}"
-  CMAKE_ARGS ${_cmake_args}
+  CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} ${_cmake_args}
   INSTALL_COMMAND   "DESTDIR=${QI_SDK_DIR}/../" make install ${ARGS_INSTALL_OPTIONS}
   )
 
