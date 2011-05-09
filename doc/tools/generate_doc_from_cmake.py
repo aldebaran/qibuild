@@ -3,7 +3,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2010 Aldebaran Robotics
+## Copyright (C) 2010, 2011 Aldebaran Robotics
 ##
 
 # This program parse cmake files and generate asciidoc.
@@ -49,6 +49,8 @@ class DocBlock:
             elif line.startswith("# WARNING:") or line.startswith("# NOTE:") or line.startswith("# IMPORTANT:") or line.startswith("# CAUTION:") or line.startswith("# TIP:"):
                 if prev != "":
                     doclines.append("")
+            elif "${" in line:
+                line = line.replace("${", "$\\{")
             prev = line
             doclines.append(line)
         self.content = LineHolder(doclines)
