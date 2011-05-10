@@ -65,10 +65,23 @@ function(qi_swig_wrap_python module_name interface_file)
 
   qi_use_lib(${_swig_target} PYTHON ${ARG_DEPENDS})
 
-  set_target_properties(${_swig_target}
-    PROPERTIES
-      LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
-  )
+  # Mimic the behavior of qi_create_lib()
+  # if visual studio: put the .pyd in sdk/Debug/_foo_d.pyd,
+  # else put the .so in sdk/lib/_foo.so
+  # Warning: since foo.py will be generated in sdk/lib/foo.py, you
+  # will have to deal with PYTHONPATH yourself. (for instance using
+  # qi::path)
+  if(MSVC)
+    set_target_properties(${_swig_target}
+      PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/"
+    )
+  else()
+    set_target_properties(${_swig_target}
+      PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
+    )
+  endif()
 
   if (WIN32)
   # Be sure a .pyd file gets created.
