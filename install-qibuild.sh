@@ -16,7 +16,6 @@ create_launcher() {
   if readlink -f . >/dev/null 2>/dev/null ; then
       p=$(dirname "$(readlink -f $0 2>/dev/null)")
   else
-     echo "ici"
       p=$(pwd)
   fi
   #echo "QiBuild directory: $p"
