@@ -264,6 +264,8 @@ function(qi_create_lib name)
   endif()
 
 
+  qi_verbose("create lib ${name} ${_type}")
+
   add_library("${name}" ${_type} ${_SRC})
 
   if (NOT ARG_NO_FPIC)
@@ -316,7 +318,7 @@ function(qi_create_lib name)
   else()
       # A subfolder has beed given, so the dll is in fact a plugin,
       # and it should always be in sdk/lib/SUBFOLER
-      if (MSCV)
+      if (MSVC)
         # You can't just use a _OUTPUT_DIRECTORY property, because VS will always
         # append the build configuration to this path.
         # After qi_create_bin(foo), foo.exe is in build/sdk/Release/foo.exe,
@@ -334,12 +336,12 @@ function(qi_create_lib name)
             -DBUILD_TYPE=${CMAKE_CFG_INTDIR}
             -DLOCATION_DEBUG="${_location_debug}"
             -DLOCATION_RELEASE="${_location_release}"
-            -DOUTPUT="${QI_SDK_DIR}/${CMAKE_CFG_INTDIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
+            -DOUTPUT="${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
             -P "${CMAKE_BINARY_DIR}/post-copy-plugin.cmake"
             "${CMAKE_BINARY_DIR}"
         )
     else()
-        # NO MSCV and a SUBFOLER : simply use _OUTPUT_DIRECTORY properties
+        # NO MSVC and a SUBFOLER : simply use _OUTPUT_DIRECTORY properties
       set_target_properties("${name}" PROPERTIES
           RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
           ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
