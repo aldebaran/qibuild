@@ -3,7 +3,7 @@
 clean(GETTEXT)
 
 if(NOT WIN32)
-  depend(GETTEXT REQUIRED DL)
+  set(GETTEXT_DEPENDS DL)
 endif()
 fpath(GETTEXT libintl.h)
 

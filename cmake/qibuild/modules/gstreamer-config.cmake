@@ -8,8 +8,7 @@ flib (GSTREAMER  NAMES
   gstreamer)
 
 if (APPLE)
-  depend (GSTREAMER REQUIRED ICONV)
-  depend (GSTREAMER REQUIRED GETTEXT)
+  set(GSTREAMER_DEPENDS ICONV GETTEXT)
 endif()
 
 export_lib(GSTREAMER)
