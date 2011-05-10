@@ -52,7 +52,7 @@ function(boost_flib _suffix _libname)
   )
 
   if(WIN32)
-    if(MSCV)
+    if(MSVC)
       # vs
       flib(BOOST_${_suffix} DEBUG NAMES
         ${_vc_names_debug}
