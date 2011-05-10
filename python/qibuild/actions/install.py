@@ -12,6 +12,7 @@ import qitoolchain
 LOGGER = logging.getLogger(__name__)
 
 def is_runtime(filename):
+    basename = os.path.basename(filename)
     if filename.startswith("bin"):
         if sys.platform.startswith("win"):
             if filename.endswith(".exe"):
@@ -23,6 +24,10 @@ def is_runtime(filename):
         else:
             return True
     if filename.startswith("lib"):
+        # exception for python:
+        if "python" in filename and filename.endswith("Makefile"):
+            return True
+        # shared libraries
         shared_lib_ext = ""
         if sys.platform.startswith("win"):
             shared_lib_ext = ".dll"
@@ -30,14 +35,27 @@ def is_runtime(filename):
             shared_lib_ext = ".so"
         if sys.platform == "darwing":
             shared_lib_ext = ".dylib"
-        if shared_lib_ext in os.path.basename(filename):
+        if shared_lib_ext in basename:
+            return True
+        # python
+        if basename.endswith(".py"):
+            return True
+        if basename.endswith(".pyd"):
             return True
         else:
             return False
-    if filename.startswith("share/cmake"):
+    if filename.startswith(os.path.join("share", "cmake")):
+        return False
+    if filename.startswith(os.path.join("share", "man")):
         return False
     if filename.startswith("share"):
         return True
+    if filename.startswith("include"):
+        # exception for python:
+        if filename.endswith("pyconfig.h"):
+            return True
+        else:
+            return False
 
 def install_package(package_src, destdir, runtime=False):
     """Install a package to a desdir.
