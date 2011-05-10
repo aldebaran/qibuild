@@ -124,7 +124,7 @@ def _do(args, build_type):
 def do(args):
     """Main entry point"""
     toc = qibuild.toc_open(args.work_tree, args, use_env=True)
-    if toc.using_visual_studio:
+    if toc.using_visual_studio and not args.runtime:
         _do(args, "debug")
     destdir = _do(args, "release")
 
