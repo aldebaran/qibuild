@@ -12,7 +12,9 @@ function(boost_flib _suffix _libname)
   )
 
   set(_osx_names
+    # boost on mac64
     "boost_${_libname}-xgcc40-mt-${BOOST_VERSION}"
+    "boost_${_libname}-mt"
     # for boost-locale < 1.37
     "boost_${_libname}"
   )
