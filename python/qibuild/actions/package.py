@@ -1,6 +1,10 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 """Generate a binary sdk"""
 
+#FIXME: maybe we should make --no-compress the default
+#FIXME: put the resulting package in QI_WORKTREE/package/config/project
+# instead of putting it in the build directory
+
 import os
 import logging
 import shutil
@@ -87,8 +91,12 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.package_parser(parser)
     parser.add_argument("project", nargs="?")
+    parser.add_argument("--no-compress", dest="compress",
+        action="store_false",
+        help  ="Do not compress the final install directory")
     parser.set_defaults(
-        cmake_flags=["CMAKE_INSTALL_PREFIX='/'"])
+        cmake_flags=["CMAKE_INSTALL_PREFIX='/'"],
+        compress=True)
 
 def _do(args, build_type):
     """Called by do().
@@ -132,11 +140,14 @@ def do(args):
         LOGGER.info("Embedding qiBuild in package")
         qibuildize(destdir)
 
-    LOGGER.info("Compressing package")
-    archive = qitools.archive.zip(destdir)
-    LOGGER.info("Package generated in %s", archive)
-    return archive
-    # Now, clean the destdir.
-    qitools.sh.rm(destdir)
+    if args.compress:
+        LOGGER.info("Compressing package")
+        archive = qitools.archive.zip(destdir)
+        LOGGER.info("Package generated in %s", archive)
+        # Now, clean the destdir.
+        qitools.sh.rm(destdir)
+        return archive
+    else:
+        return destdir
 
 
