@@ -30,6 +30,7 @@ Proposed layout
 ----
 fooproject
 |__ foo
+    | CMakeLists.txt
     |__ foo
     |   |__ foo.h
     |   |__ foo.cpp
@@ -37,6 +38,7 @@ fooproject
     |       |__ foo_private.h
     |       |__ foo_private.cpp
     |__ test
+        |__ CMakeLists.txt
         |__ foo_test.cpp
 ----
 
@@ -81,6 +83,8 @@ qi_create_gtest(foo_test
     gtest
     foo)
 ----
+
+Please note that the *location* of the cmake list file matters.
 
 
 Rationale
