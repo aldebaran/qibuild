@@ -69,7 +69,7 @@ function(qi_create_gtest name)
   cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
 
   # First, create the target
-  qi_create_bin(${name} SRC ${ARG_SRC})
+  qi_create_bin(${name} SRC ${ARG_SRC} NO_INSTALL)
   qi_use_lib(${name} ${ARG_DEPENDS})
 
   # Build a correct xml output name
