@@ -13,6 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 def is_runtime(filename):
     basename = os.path.basename(filename)
+    basedir  = filename.split(os.path.sep)[0]
     if filename.startswith("bin"):
         if sys.platform.startswith("win"):
             if filename.endswith(".exe"):
@@ -48,14 +49,20 @@ def is_runtime(filename):
         return False
     if filename.startswith(os.path.join("share", "man")):
         return False
-    if filename.startswith("share"):
+    if basedir == "share":
         return True
-    if filename.startswith("include"):
+    if basedir == "include":
         # exception for python:
         if filename.endswith("pyconfig.h"):
             return True
         else:
             return False
+    if basedir.endswith(".framework"):
+        return True
+
+    # True by default: better have too many stuff than
+    # not enough
+    return True
 
 def install_package(package_src, destdir, runtime=False):
     """Install a package to a desdir.
