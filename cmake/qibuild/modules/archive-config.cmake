@@ -3,12 +3,7 @@
 clean(ARCHIVE)
 fpath(ARCHIVE archive.h PATH_SUFFIXES archive)
 
-if(WIN32)
-  flib(ARCHIVE OPTIMIZED NAMES archive)
-  flib(ARCHIVE DEBUG     NAMES archive_d)
-else()
-  flib(ARCHIVE NAMES archive)
-endif()
+flib(ARCHIVE NAMES archive)
 
 if (APPLE)
   set(ARCHIVE_DEPENDS "ZLIB")
