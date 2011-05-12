@@ -4,10 +4,6 @@ clean(ARCHIVE)
 fpath(ARCHIVE archive.h PATH_SUFFIXES archive)
 
 flib(ARCHIVE NAMES archive)
-
-if (APPLE)
-  set(ARCHIVE_DEPENDS "ZLIB")
-endif()
-
+set(ARCHIVE_DEPENDS "ZLIB")
 export_lib(ARCHIVE)
 
