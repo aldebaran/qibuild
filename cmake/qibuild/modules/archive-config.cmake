@@ -4,6 +4,6 @@ clean(ARCHIVE)
 fpath(ARCHIVE archive.h PATH_SUFFIXES archive)
 
 flib(ARCHIVE NAMES archive)
-set(ARCHIVE_DEPENDS "ZLIB")
+qi_set_global(ARCHIVE_DEPENDS "ZLIB")
 export_lib(ARCHIVE)
 

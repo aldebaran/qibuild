@@ -13,5 +13,5 @@ else()
   flib(GTEST gtest_main)
 endif()
 
-set(GTEST_DEPENDS PTHREAD CACHE STRING "" FORCE)
+qi_set_global(GTEST_DEPENDS "PTHREAD")
 export_lib(GTEST)

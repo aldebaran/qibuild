@@ -8,7 +8,7 @@ flib (GSTREAMER  NAMES
   gstreamer)
 
 if (APPLE)
-  set(GSTREAMER_DEPENDS ICONV GETTEXT)
+  qi_set_global(GSTREAMER_DEPENDS "ICONV" "GETTEXT")
 endif()
 
 export_lib(GSTREAMER)
