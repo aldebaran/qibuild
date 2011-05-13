@@ -2,7 +2,8 @@
 
 clean(ZEROMQ)
 fpath(ZEROMQ zmq.h)
-flib(ZEROMQ zmq)
+# zeromq is called libzmq.dll on windows...
+flib(ZEROMQ libzmq zmq)
 if(UNIX)
   qi_set_global(ZEROMQ_DEPENDS "UUID")
 else()
