@@ -9,9 +9,6 @@ set(_suffix "LOCALE")
 
 clean(BOOST_${_suffix})
 fpath(BOOST_${_suffix} boost/locale.hpp)
-
 boost_flib(${_suffix} ${_libname})
-#boost filesystem use boost_system
-boost_flib(${_suffix} "thread")
-
+qi_set_global(BOOST_LOCALE_DEPENDS "BOOST_THREAD")
 export_lib(BOOST_${_suffix})
