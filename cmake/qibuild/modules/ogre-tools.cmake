@@ -59,7 +59,7 @@ function(configure_ogre)
   file(APPEND "${_plugins_cfg}" "Plugin=${ARG_RENDER_PLUGIN}\n")
 
   if(WIN32)
-    set(_plugins_d_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/ogre/plugins_d.cfg")
+    set(_plugins_d_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/${ARG_APPLICATION_NAME}/ogre/plugins_d.cfg")
     file(WRITE  "${_plugins_d_cfg}" "# Defines Ogre plugins to load\n")
     file(APPEND "${_plugins_d_cfg}" "PluginFolder=${_ogre_plugins_folder}\n")
     file(APPEND "${_plugins_d_cfg}" "Plugin=${ARG_RENDER_PLUGIN}_d\n")
