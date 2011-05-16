@@ -171,6 +171,15 @@ class Toolchain(object):
             package_path = qitools.sh.to_posix_path(package_path)
             lines.append('list(APPEND CMAKE_PREFIX_PATH "%s")\n' % package_path)
 
+        oldlines = list()
+        try:
+            with open(self.toolchain_file, "r") as fp:
+                oldlines = fp.readlines()
+        except:
+            pass
+        #do not write the file if it's the same
+        if lines == oldlines:
+            return
         with open(self.toolchain_file, "w") as fp:
             lines = fp.writelines(lines)
 
