@@ -15,11 +15,7 @@
 include(CMakeParseArguments)
 
 set(_input)
-if("${BUILD_TYPE}" STREQUAL "Debug")
-  set(_input "${LOCATION_DEBUG}")
-else()
-  set(_input "${LOCATION_RELEASE}")
-endif()
-
+string(TOUPPER "${BUILD_TYPE}" _UP_BUILD_TYPE)
+set(_input "${LOCATION_${_UP_BUILD_TYPE}}")
 message(STATUS "copy: ${_input} -> ${OUTPUT}")
 file(COPY ${_input} DESTINATION ${OUTPUT})
