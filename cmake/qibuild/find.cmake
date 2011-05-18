@@ -167,6 +167,23 @@ function(export_lib prefix)
   _qi_call_fphsa(${prefix})
 endfunction()
 
+####################################################################
+#
+# export_lib
+#
+####################################################################
+function(export_lib_pkgconfig prefix)
+  qi_set_cache(${prefix}_INCLUDE_DIR "${${prefix}_INCLUDE_DIRS}")
+  #qi_set_cache(${prefix}_DEFINITIONS "${${prefix}_CFLAGS_OTHER}")
+
+  # Finally, display informations if not in quiet mode
+  qi_verbose("library ${prefix}:" )
+  qi_verbose("  includes   : ${${prefix}_INCLUDE_DIR}" )
+  qi_verbose("  libraries  : ${${prefix}_LIBRARIES}" )
+  qi_verbose("  definitions: ${${prefix}_DEFINITIONS}" )
+
+  _qi_call_fphsa(${prefix})
+endfunction()
 
 
 ####################################################################
@@ -189,6 +206,10 @@ endfunction()
 #
 ####################################################################
 function(export_header prefix)
+  # Finally, display informations if not in quiet mode
+  qi_verbose("header library ${prefix}:" )
+  qi_verbose("  includes   : ${${prefix}_INCLUDE_DIR}" )
+  qi_verbose("  definitions: ${${prefix}_DEFINITIONS}" )
   _qi_call_fphsa(${prefix} HEADER)
 endfunction()
 
