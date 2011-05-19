@@ -69,7 +69,7 @@ include("qibuild/submodule")
 include("qibuild/stage")
 include("qibuild/doc")
 
-qi_prepend_global(CMAKE_PREFIX_PATH ${QI_SDK_DIR})
+qi_prepend_global(CMAKE_PREFIX_PATH "${QI_SDK_DIR}")
 
 _qi_autostrap_update()
 
