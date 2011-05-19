@@ -123,6 +123,7 @@ class ConfigStore:
 
     def read(self, filename):
         """ read a configuration file """
+        self.logger.debug("loading: %s", filename)
         parser = ConfigParser.RawConfigParser()
         parser.read(filename)
         sections = parser.sections()
