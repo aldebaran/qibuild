@@ -159,7 +159,11 @@ class QiWorkTree:
         for _name, ppath in self.buildable_projects.iteritems():
             self.configstore.read(os.path.join(ppath, "qibuild.manifest"))
 
+        #read ~/.config/qi/qibuild.cfg
         self.configstore.read(self.user_config_path)
+        #read work_tree/.qi/qibuild.cfg
+        self.configstore.read(os.path.join(self.work_tree, ".qi", "qibuild.cfg"))
+
         if not config:
             # try to read the default config name from the config:
             config = self.configstore.get("general", "build", "config", default=None)
