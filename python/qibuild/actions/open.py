@@ -30,7 +30,7 @@ def do(args):
 
     editor = toc.configstore.get("general", "env", "ide")
     if editor is None:
-        editor  = qibuild.ask_choice(KNOWN_IDES, "Please choose between the following IDEs")
+        editor  = qibuild.interact.ask_choice(KNOWN_IDES, "Please choose between the following IDEs")
         qibuild.configstore.update_config(toc.user_config_path,
             "general", "env", "ide", editor)
 

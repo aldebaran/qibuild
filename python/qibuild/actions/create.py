@@ -53,7 +53,7 @@ def do(args):
     try:
         qibuild.qiworktree_open(args.work_tree, use_env=True)
     except qibuild.qiworktree.WorkTreeException:
-        if qibuild.ask_yes_no("Warning, no worktree found. Create one"):
+        if qibuild.interact.ask_yes_no("Warning, no worktree found. Create one"):
             qibuild.run_action("qibuild.actions.init", ["--interactive"])
 
 
