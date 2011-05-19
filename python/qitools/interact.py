@@ -6,7 +6,7 @@
 #TODO: color!
 
 import os
-from qitools.command import find_program
+from qibuild.command import find_program
 
 
 def ask_choice(choices, input_text):

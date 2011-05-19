@@ -5,7 +5,7 @@
 
 import os
 import logging
-import qitools
+import qibuild
 import qibuild
 
 def configure_parser(parser):

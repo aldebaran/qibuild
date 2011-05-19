@@ -8,14 +8,14 @@ import os
 import logging
 import ConfigParser
 
-import qitools
+import qibuild
 import qitoolchain
 
 LOGGER = logging.getLogger("actions.qitoolchain.create")
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.cmdparse.default_parser(parser)
+    qibuild.cmdparse.default_parser(parser)
     parser.add_argument("toolchain_name", metavar="NAME", action="store", help="the toolchain name")
 
 def do(args):
@@ -31,6 +31,6 @@ def do(args):
     if parser.has_section(toolchain_section):
         raise Exception("Toolchain %s already exists in configuration" % toolchain_name)
 
-    qitools.configstore.update_config(cfg_path,
+    qibuild.configstore.update_config(cfg_path,
         "toolchain", toolchain_name, "path", toolchain.path)
 

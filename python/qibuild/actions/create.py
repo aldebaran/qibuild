@@ -4,7 +4,7 @@
 import os
 import shutil
 import logging
-import qitools
+import qibuild
 import qibuild
 
 
@@ -32,14 +32,14 @@ def copy_helper(project_name, directory):
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.qiworktree.work_tree_parser(parser)
+    qibuild.qiworktree.work_tree_parser(parser)
     parser.add_argument("project_path", help="either the name of the project, or  "
         "a new path for the project")
 
 
 def do(args):
     """"Create a new project """
-    project_path = qitools.sh.to_native_path(args.project_path)
+    project_path = qibuild.sh.to_native_path(args.project_path)
     project_name = os.path.basename(project_path)
     if os.path.exists(project_path):
         raise Exception("%s already exists" % project_path)
@@ -51,10 +51,10 @@ def do(args):
     # Try to open a qiworktree.
     # If not, ask the user if he wants to create one:
     try:
-        qitools.qiworktree_open(args.work_tree, use_env=True)
-    except qitools.qiworktree.WorkTreeException:
-        if qitools.ask_yes_no("Warning, no worktree found. Create one"):
-            qitools.run_action("qibuild.actions.init", ["--interactive"])
+        qibuild.qiworktree_open(args.work_tree, use_env=True)
+    except qibuild.qiworktree.WorkTreeException:
+        if qibuild.ask_yes_no("Warning, no worktree found. Create one"):
+            qibuild.run_action("qibuild.actions.init", ["--interactive"])
 
 
 

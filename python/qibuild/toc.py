@@ -11,16 +11,16 @@ import glob
 import platform
 import subprocess
 import logging
-import qitools.configstore
-import qitools.qiworktree
+import qibuild.configstore
+import qibuild.qiworktree
 
 import qibuild
 from   qibuild.project     import Project
-import qitools.sh
+import qibuild.sh
 from qibuild.dependencies_solver import DependenciesSolver
-from   qitools.qiworktree import QiWorkTree
+from   qibuild.qiworktree import QiWorkTree
 import qitoolchain
-from qitools.command import CommandFailedException
+from qibuild.command import CommandFailedException
 
 LOGGER = logging.getLogger("qibuild.toc")
 
@@ -265,7 +265,7 @@ class Toc(QiWorkTree):
             paths = list()
             paths.append(os.path.expandvars(r"%systemroot%\system32"))
             paths.append(os.path.expandvars("%systemroot%"))
-            cmake = qitools.command.find_program("cmake.exe")
+            cmake = qibuild.command.find_program("cmake.exe")
             paths.append(os.path.dirname(cmake))
             paths.append(os.path.dirname(sys.executable))
             os.environ["PATH"] = os.pathsep.join(paths)
@@ -367,7 +367,7 @@ class Toc(QiWorkTree):
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
         if self.toolchain_file:
-            toolchain_path = qitools.sh.to_posix_path(self.toolchain_file)
+            toolchain_path = qibuild.sh.to_posix_path(self.toolchain_file)
             cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
         try:
             qibuild.cmake(project.directory,
@@ -408,7 +408,7 @@ class Toc(QiWorkTree):
                     # cases, it uses devenv directly
                     cmd = cmd + ["--", "/verbosity:minimal", "/nologo"]
         try:
-            qitools.command.check_call(cmd)
+            qibuild.command.check_call(cmd)
         except CommandFailedException:
             raise BuildFailed(project)
 
@@ -429,7 +429,7 @@ class Toc(QiWorkTree):
             cmd.extend(["-R", test_name])
 
         try:
-            qitools.command.check_call(cmd, cwd=build_dir)
+            qibuild.command.check_call(cmd, cwd=build_dir)
         except CommandFailedException:
             raise TestsFailed(project)
 
@@ -445,7 +445,7 @@ class Toc(QiWorkTree):
             else:
                 cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
                         "--target", "install"]
-                qitools.command.check_call(cmd, env=build_environ)
+                qibuild.command.check_call(cmd, env=build_environ)
         except CommandFailedException:
             raise InstallFailed(project)
 
@@ -466,7 +466,7 @@ class Toc(QiWorkTree):
             cmake_args += ["-DCOMPONENT=%s" % component]
             cmake_args += ["-P", "cmake_install.cmake"]
             LOGGER.debug("Installing %s", component)
-            qitools.command.check_call(["cmake"] + cmake_args,
+            qibuild.command.check_call(["cmake"] + cmake_args,
                 cwd=project.build_directory,
                 env=build_env)
 
@@ -483,8 +483,8 @@ def toc_open(work_tree, args, use_env=False):
     cmake_generator = args.cmake_generator
 
     if not work_tree:
-        work_tree = qitools.qiworktree.guess_work_tree(use_env)
-    current_project = qitools.qiworktree.search_manifest_directory(os.getcwd())
+        work_tree = qibuild.qiworktree.guess_work_tree(use_env)
+    current_project = qibuild.qiworktree.search_manifest_directory(os.getcwd())
     if not work_tree:
         # Sometimes we you just want to create a fake worktree object because
         # you just want to build one project (no dependencies at all, no configuration...)
@@ -515,7 +515,7 @@ def create(directory, args):
     """ Create a new toc work_tree.
 
     """
-    qitools.qiworktree.create(directory)
+    qibuild.qiworktree.create(directory)
 
 
 def resolve_deps(toc, args, runtime=False):
@@ -551,10 +551,10 @@ def project_from_cwd():
     """Return a project name from the current working directory
 
     """
-    project_dir = qitools.qiworktree.search_manifest_directory(os.getcwd())
+    project_dir = qibuild.qiworktree.search_manifest_directory(os.getcwd())
     if not project_dir:
         return None
-    return qitools.qiworktree.project_name_from_directory(project_dir)
+    return qibuild.qiworktree.project_name_from_directory(project_dir)
 
 
 def _advise_using_configure(project):

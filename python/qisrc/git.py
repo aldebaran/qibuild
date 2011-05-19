@@ -6,7 +6,7 @@ import os
 import sys
 import logging
 
-from qitools           import command
+from qibuild           import command
 
 class GitException(Exception):
     def __init__(self, *args):

@@ -8,13 +8,13 @@
 import os
 import sys
 import unittest
-import qitools
+import qibuild
 import qibuild
 
 try:
     import argparse
 except ImportError:
-    from qitools.external import argparse
+    from qibuild.external import argparse
 
 
 class QiBuildTestCase(unittest.TestCase):
@@ -35,17 +35,17 @@ class QiBuildTestCase(unittest.TestCase):
         with open(qi_cfg_path, "r") as fp:
             qi_cfg = fp.read()
         # Run git clean -fdx to be sure build dir is clean:
-        qitools.command.check_call(["git", "clean", "-fdx"],
+        qibuild.command.check_call(["git", "clean", "-fdx"],
                 cwd=self.test_dir,
                 ignore_ret_code = True)
         # Re-write the .qi/build.cfg file:
-        qitools.sh.mkdir(os.path.join(self.test_dir, ".qi"))
+        qibuild.sh.mkdir(os.path.join(self.test_dir, ".qi"))
         with open(qi_cfg_path, "w") as fp:
             fp.write(qi_cfg)
 
 
     def _run_action(self, action, *args):
-        qitools.run_action("qibuild.actions.%s" % action, args,
+        qibuild.run_action("qibuild.actions.%s" % action, args,
             forward_args=self.args)
 
     def test_configure(self):

@@ -26,9 +26,9 @@ have different configurations with different work trees if you need.
 
 import os
 import logging
-from qitools.cmdparse    import default_parser
-from qitools.configstore import ConfigStore
-import qitools.sh
+from qibuild.cmdparse    import default_parser
+from qibuild.configstore import ConfigStore
+import qibuild.sh
 
 LOGGER = logging.getLogger("QiWorkTree")
 
@@ -72,7 +72,7 @@ def get_user_config_path(config_name=None):
 
     """
     # FIXME: deal with non-UNIX systems ?
-    base_cfg = qitools.sh.to_native_path("~/.config/qi")
+    base_cfg = qibuild.sh.to_native_path("~/.config/qi")
     if config_name:
         return os.path.join(base_cfg, "qibuild-%s.cfg" % config_name)
     else:
@@ -320,7 +320,7 @@ def project_name_from_directory(project_dir):
     manifest = os.path.join(project_dir, "qibuild.manifest")
     if not os.path.exists(manifest):
         return os.path.basename(project_dir)
-    config = qitools.configstore.ConfigStore()
+    config = qibuild.configstore.ConfigStore()
     conf_file = os.path.join(project_dir, "qibuild.manifest")
     config.read(conf_file)
     project_names = config.get("project", default=dict()).keys()
@@ -337,7 +337,7 @@ def create(directory):
 
     """
     to_create = os.path.join(directory, ".qi")
-    qitools.sh.mkdir(to_create, recursive=True)
+    qibuild.sh.mkdir(to_create, recursive=True)
 
 
 def worktree_from_args(args):

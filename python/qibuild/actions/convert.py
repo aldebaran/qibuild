@@ -18,14 +18,14 @@ import sys
 import logging
 import shutil
 
-import qitools
+import qibuild
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.cmdparse.default_parser(parser)
+    qibuild.cmdparse.default_parser(parser)
     parser.add_argument("source_dir", nargs="?",
         help="Top source directory of the project. "
              "Defaults to current working directory.")
@@ -109,7 +109,7 @@ def _name_from_base_cfg(base_cfg):
     """ Convert an old base.cfg file to a new qibuild.manifest file
 
     """
-    config = qitools.configstore.ConfigStore()
+    config = qibuild.configstore.ConfigStore()
     config.read(base_cfg)
     projects = config.get("project")
     if not projects:
@@ -154,7 +154,7 @@ def do(args):
     source_dir = args.source_dir
     if not source_dir:
         source_dir = os.getcwd()
-    source_dir = qitools.sh.to_native_path(source_dir)
+    source_dir = qibuild.sh.to_native_path(source_dir)
 
     source_type = guess_type(source_dir)
 

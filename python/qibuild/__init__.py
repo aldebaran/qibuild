@@ -8,12 +8,22 @@ and building projects.
 import os
 import re
 import logging
-import qitools.sh
-import qitools.command
 
-import parsers
-import toc
-from toc import toc_open
+from . import toc
+from . import parsers
+from . import command
+from . import configstore
+from . import cmdparse
+from . import log
+from . import qiworktree
+from . import archive
+from . import sh
+from . import interact
+
+from toc        import toc_open
+from qiworktree import qiworktree_open
+from cmdparse   import run_action
+from interact   import ask_yes_no, ask_choice
 
 LOGGER = logging.getLogger("qibuild")
 
@@ -31,14 +41,14 @@ def get_cmake_qibuild_dir():
     # and the cmake code in qibuild/cmake
     # (using qibuild from sources)
     res = os.path.join(QIBUILD_ROOT_DIR, "..", "..", "cmake", "qibuild")
-    res = qitools.sh.to_native_path(res)
+    res = qibuild.sh.to_native_path(res)
     if os.path.isdir(res):
         return res
 
     # Then, assume we are in a toolchain or/in a SDK, with
     # the following layout sdk/share/cmake/qibuild, sdk/lib/python/qibuild
     sdk_dir = os.path.join(QIBUILD_ROOT_DIR, "..", "..", "..")
-    sdk_dir = qitools.sh.to_native_path(sdk_dir)
+    sdk_dir = qibuild.sh.to_native_path(sdk_dir)
     res = os.path.join(sdk_dir, "share", "cmake", "qibuild")
     if os.path.isdir(res):
         return res
@@ -50,7 +60,7 @@ def get_cmake_qibuild_dir():
     from qibuild.config import CMAKE_ROOT
     res = os.path.join(CMAKE_ROOT, "Modules", "qibuild")
     if os.path.isdir(res):
-        return qitools.sh.to_native_path(res)
+        return qibuild.sh.to_native_path(res)
 
     # Else, just return None. Portions of code using CMAKE_QIBUILD_DIR, such as
     # qibuild convert or qibuild --version will fail loudly
@@ -71,7 +81,7 @@ def make(build_dir, num_jobs=None, target=None):
         cmd += ["-j%i" % num_jobs]
     if target:
         cmd.append(target)
-    qitools.command.check_call(cmd, cwd=build_dir)
+    qibuild.command.check_call(cmd, cwd=build_dir)
 
 
 def nmake(build_dir, target=None):
@@ -82,7 +92,7 @@ def nmake(build_dir, target=None):
     cmd = ["nmake"]
     if target:
         cmd.append(target)
-    qitools.command.check_call(cmd, cwd=build_dir)
+    qibuild.command.check_call(cmd, cwd=build_dir)
 
 
 def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD"):
@@ -114,7 +124,7 @@ def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD"):
 
     cmd += [sln_file]
 
-    qitools.command.check_call(cmd)
+    qibuild.command.check_call(cmd)
 
 def cmake(source_dir, build_dir, cmake_args, clean_first=True):
     """Call cmake with from a build dir for a source dir.
@@ -130,7 +140,7 @@ def cmake(source_dir, build_dir, cmake_args, clean_first=True):
     # Always remove CMakeCache
     if clean_first:
         cache = os.path.join(build_dir, "CMakeCache.txt")
-        qitools.sh.rm(cache)
+        qibuild.sh.rm(cache)
 
     # Check that no one has made an in-source build
     in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
@@ -148,7 +158,7 @@ def cmake(source_dir, build_dir, cmake_args, clean_first=True):
     # Add path to source to the list of args, and set buildir for
     # the current working dir.
     cmake_args += [source_dir]
-    qitools.command.check_call(["cmake"] + cmake_args, cwd=build_dir)
+    qibuild.command.check_call(["cmake"] + cmake_args, cwd=build_dir)
 
 
 def check_root_cmake_list(cmake_list_file, project_name):

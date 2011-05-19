@@ -42,7 +42,7 @@ add the -DCMAKE_TOOLCHAIN_FILE parameter
 import os
 import logging
 
-import qitools
+import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ def get_tc_path(toolchain_name):
     # FIXME: deal with non-UNIX systems
     res = os.path.expanduser("~/.local/share/qi")
     res = os.path.join(res, "toolchains", toolchain_name)
-    qitools.sh.mkdir(res, recursive=True)
+    qibuild.sh.mkdir(res, recursive=True)
     return res
 
 def get_tc_cache(toolchain_name):
@@ -89,7 +89,7 @@ def get_tc_cache(toolchain_name):
     # FIXME: deal with non-UNIX systems
     cache_path = os.path.expanduser("~/.cache/qi")
     res = os.path.join(cache_path, "toolchains", toolchain_name)
-    qitools.sh.mkdir(res, recursive=True)
+    qibuild.sh.mkdir(res, recursive=True)
     return res
 
 
@@ -99,7 +99,7 @@ class Toolchain(object):
     """
     def __init__(self, name):
         self.name = name
-        self.configstore = qitools.configstore.ConfigStore()
+        self.configstore = qibuild.configstore.ConfigStore()
         self.configstore.read(get_tc_config_path())
         self.path = get_tc_path(self.name)
         tc_file_from_conf = self.configstore.get("toolchain", self.name, "file", default=None)
@@ -135,13 +135,13 @@ class Toolchain(object):
 
         """
         LOGGER.info("Adding package %s",name)
-        with qitools.sh.TempDir() as tmp:
-            extracted = qitools.archive.extract(path, tmp)
+        with qibuild.sh.TempDir() as tmp:
+            extracted = qibuild.archive.extract(path, tmp)
             # Rename package once it is extracted:
             dest = os.path.join(self.path, name)
             if os.path.exists(dest):
-                qitools.sh.rm(dest)
-            qitools.sh.mv(extracted, dest)
+                qibuild.sh.rm(dest)
+            qibuild.sh.mv(extracted, dest)
         new_package = Package(name)
         matches = [p for p in self.packages if p.name == name]
         if not matches:
@@ -158,7 +158,7 @@ class Toolchain(object):
         provided = self.configstore.get("toolchain", self.name, "provide", default="")
         provided = " ".join(p.name for p in self.packages)
         LOGGER.debug("update_tc_provides: provided is now %s", provided)
-        qitools.configstore.update_config(get_tc_config_path(),
+        qibuild.configstore.update_config(get_tc_config_path(),
             "toolchain", self.name, "provide", provided)
 
     def update_toolchain_file(self):
@@ -168,7 +168,7 @@ class Toolchain(object):
         lines = list()
         for package in self.packages:
             package_path = self.get(package.name)
-            package_path = qitools.sh.to_posix_path(package_path)
+            package_path = qibuild.sh.to_posix_path(package_path)
             lines.append('list(APPEND CMAKE_PREFIX_PATH "%s")\n' % package_path)
 
         oldlines = list()
@@ -205,7 +205,7 @@ def create(toolchain_name):
     """Create a new toolchain given its name.
     """
     path = get_tc_path(toolchain_name)
-    qitools.sh.mkdir(path, recursive=True)
-    qitools.sh.mkdir(get_tc_cache(toolchain_name), recursive=True)
+    qibuild.sh.mkdir(path, recursive=True)
+    qibuild.sh.mkdir(get_tc_cache(toolchain_name), recursive=True)
     LOGGER.info("Toolchain initialized in: %s", path)
 

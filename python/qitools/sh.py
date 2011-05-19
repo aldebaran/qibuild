@@ -198,9 +198,9 @@ def which(program):
     @return path to program if found, None otherwise
     """
     import warnings
-    warnings.warn("qitools.sh.which is deprecated, "
-     "use qitools.command.find_program instead")
-    from qitools.command import find_program
+    warnings.warn("qibuild.sh.which is deprecated, "
+     "use qibuild.command.find_program instead")
+    from qibuild.command import find_program
     return find_program(program)
 
 

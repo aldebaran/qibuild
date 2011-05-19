@@ -10,7 +10,7 @@ import logging
 import shutil
 import datetime
 
-import qitools
+import qibuild
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
@@ -27,12 +27,12 @@ def qibuildize(destdir):
     # Then, install the qibuild/cmake files inside the package:
     src  = os.path.join(qibuild.CMAKE_QIBUILD_DIR)
     dest = os.path.join(destdir, "share", "cmake", "qibuild")
-    qitools.sh.install(src, dest)
+    qibuild.sh.install(src, dest)
 
     # Lastly, install qibuild/version.cmake at the root of the SDK:
     src  = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "version.cmake")
     dest = os.path.join(destdir, "share", "cmake", "qibuild", "qibuild-version.cmake")
-    qitools.sh.install(src, dest)
+    qibuild.sh.install(src, dest)
 
 def get_package_name(project, continuous=False, version=None, arch=None):
     """Get the package name of a project.
@@ -121,11 +121,11 @@ def _do(args, build_type):
         version=args.version)
 
     destdir = os.path.join(inst_dir, package_name)
-    qitools.run_action("qibuild.actions.configure", [project_name, "--no-clean-first"],
+    qibuild.run_action("qibuild.actions.configure", [project_name, "--no-clean-first"],
         forward_args=args)
-    qitools.run_action("qibuild.actions.make", [project_name],
+    qibuild.run_action("qibuild.actions.make", [project_name],
         forward_args=args)
-    qitools.run_action("qibuild.actions.install", [project_name, destdir],
+    qibuild.run_action("qibuild.actions.install", [project_name, destdir],
         forward_args=args)
     return destdir
 
@@ -142,10 +142,10 @@ def do(args):
 
     if args.compress:
         LOGGER.info("Compressing package")
-        archive = qitools.archive.zip(destdir)
+        archive = qibuild.archive.zip(destdir)
         LOGGER.info("Package generated in %s", archive)
         # Now, clean the destdir.
-        qitools.sh.rm(destdir)
+        qibuild.sh.rm(destdir)
         return archive
     else:
         return destdir

@@ -3,17 +3,17 @@
 
 import os
 
-import qitools
+import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.qiworktree.work_tree_parser(parser)
+    qibuild.qiworktree.work_tree_parser(parser)
     parser.add_argument("--edit", action="store_true",
         help="edit the configuration")
 
 def do(args):
     """Main entry point"""
-    qiwt = qitools.qiworktree_open(args.work_tree, use_env=True, config=args.config)
+    qiwt = qibuild.qiworktree_open(args.work_tree, use_env=True, config=args.config)
     if not args.edit:
         print qiwt.configstore
         return
@@ -28,13 +28,13 @@ def do(args):
         # Ask the user to choose, and store the answer so
         # that we never ask again
         print "Could not find the editor to use."
-        editor = qitools.interact.ask_program("Please enter an editor")
-        qitools.configstore.update_config(config_path,
+        editor = qibuild.interact.ask_program("Please enter an editor")
+        qibuild.configstore.update_config(config_path,
             "general", "env", "editor", editor)
 
-    qitools.command.check_call([editor, config_path])
+    qibuild.command.check_call([editor, config_path])
 
 
 if __name__ == "__main__" :
     import sys
-    qitools.cmdparse.sub_command_main(sys.modules[__name__])
+    qibuild.cmdparse.sub_command_main(sys.modules[__name__])

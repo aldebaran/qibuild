@@ -3,13 +3,13 @@
 """ Collection of parser fonctions for various actions
 """
 
-import qitools
-from qitools.cmdparse import default_parser
+import qibuild
+from qibuild.cmdparse import default_parser
 
 def toc_parser(parser):
     """ Parser settings for every action using a toc dir
     """
-    qitools.qiworktree.work_tree_parser(parser)
+    qibuild.qiworktree.work_tree_parser(parser)
 
 def build_parser(parser):
     """ Parser settings for every action doing builds

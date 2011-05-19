@@ -3,16 +3,16 @@
 """Init a new qisrc workspace """
 
 import os
-import qitools
+import qibuild
 import qisrc
 
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.qiworktree.work_tree_parser(parser)
+    qibuild.qiworktree.work_tree_parser(parser)
 
 def do(args):
     """Main entry point"""
-    work_tree = qitools.qiworktree.worktree_from_args(args)
-    qitools.qiworktree.create(work_tree)
+    work_tree = qibuild.qiworktree.worktree_from_args(args)
+    qibuild.qiworktree.create(work_tree)
 

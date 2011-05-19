@@ -6,7 +6,7 @@
 
 import logging
 import qibuild
-import qitools.cmdparse
+import qibuild.cmdparse
 
 def configure_parser(parser):
     """Configure parser for this action"""

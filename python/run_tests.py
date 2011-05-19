@@ -9,13 +9,13 @@ working dir, so that python libraries are found
 import os
 import sys
 import shutil
-import qitools
+import qibuild
 try:
     import argparse
 except ImportError:
-    from qitools.external import argparse
+    from qibuild.external import argparse
 
-from qitools.external.xmlrunner import XmlTestRunner
+from qibuild.external.xmlrunner import XmlTestRunner
 
 BUILD_CONFIGS = ["unix", "vs2008"]
 
@@ -30,13 +30,13 @@ def run_tests(xml_report=False, build_config="unix"):
         "qibuild", "test", "build-%s.cfg" % build_config)
     qi_test_dir = os.path.join(cur_dir,
         "qibuild", "test", ".qi")
-    qitools.sh.mkdir(qi_test_dir, recursive=True)
+    qibuild.sh.mkdir(qi_test_dir, recursive=True)
     shutil.copy(qi_build_cfg, os.path.join(qi_test_dir, "build.cfg"))
 
     from qibuild.test.test_qibuild import QiBuildTestCase
     suite = unittest.TestSuite()
     suite.addTests(unittest.makeSuite(QiBuildTestCase))
-    out_xml = qitools.sh.to_native_path(os.path.join(cur_dir, "..", "tests-results.xml"))
+    out_xml = qibuild.sh.to_native_path(os.path.join(cur_dir, "..", "tests-results.xml"))
 
     if xml_report:
         with open(out_xml, "w") as fp:

@@ -7,7 +7,7 @@ import os
 import shutil
 import logging
 
-import qitools
+import qibuild
 import qibuild
 import qitoolchain
 
@@ -43,14 +43,14 @@ def do(args):
         if os.path.exists(args.project_or_package_path):
             package = args.project_or_package_path
             project_name = os.path.basename(package)
-            project_name = qitools.archive.extracted_name(project_name)
+            project_name = qibuild.archive.extracted_name(project_name)
         else:
             project_name = args.project_or_package_path
-            package = qitools.cmdparse.run_action("qibuild.actions.package",
+            package = qibuild.cmdparse.run_action("qibuild.actions.package",
                 [project_name], forward_args=args)
 
     tc_cache_path = qitoolchain.get_tc_cache(tc_name)
-    qitools.sh.mkdir(tc_cache_path, recursive=True)
+    qibuild.sh.mkdir(tc_cache_path, recursive=True)
     in_cache = os.path.join(tc_cache_path, os.path.basename(package))
     shutil.copy(package, in_cache)
 

@@ -6,22 +6,22 @@
 import os
 import logging
 
-import qitools
+import qibuild
 import qisrc
 
 LOGGER = logging.getLogger("qisrc.status")
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qitools.qiworktree.work_tree_parser(parser)
+    qibuild.qiworktree.work_tree_parser(parser)
     parser.add_argument("--untracked-files", "-u", dest="untracked_files", action="store_true", help="display untracked files")
-    # qitools.cmdparse.action_parser(parser)
+    # qibuild.cmdparse.action_parser(parser)
     # parser.add_argument("toolchain", action="store", help="the toolchain name")
     # parser.add_argument("feed", nargs='?', action="store", help="an url to a toolchain feed")
 
 def do(args):
     """ Main method """
-    qiwt = qitools.qiworktree_open(args.work_tree, use_env=True)
+    qiwt = qibuild.qiworktree_open(args.work_tree, use_env=True)
     dirty = list()
     for git_project in qiwt.git_projects.values():
         git = qisrc.git.open(git_project)

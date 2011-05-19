@@ -15,7 +15,7 @@ import logging
 import tarfile
 import zipfile
 
-import qitools
+import qibuild
 
 
 
@@ -105,8 +105,8 @@ def zip_win(directory):
     """
     archive_name = directory + ".zip"
     # Convert to DOS path just to be sure:
-    directory    = qitools.sh.to_native_path(directory)
-    archive_name = qitools.sh.to_native_path(archive_name)
+    directory    = qibuild.sh.to_native_path(directory)
+    archive_name = qibuild.sh.to_native_path(archive_name)
     archive = zipfile.ZipFile(archive_name, "w")
     for (root, directories, filenames) in os.walk(directory):
         for filename in filenames:
@@ -127,7 +127,7 @@ def zip_unix(directory):
     work_dir = os.path.abspath(os.path.join(directory, ".."))
     base_archive_name = base_dir + ".tar.gz"
     cmd = ["tar", "cfz", base_archive_name, base_dir]
-    qitools.command.check_call(cmd, cwd=work_dir)
+    qibuild.command.check_call(cmd, cwd=work_dir)
     full_archive_name = os.path.join(work_dir, base_archive_name)
     return full_archive_name
 

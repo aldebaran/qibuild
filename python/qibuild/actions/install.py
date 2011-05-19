@@ -5,7 +5,7 @@ import os
 import sys
 import logging
 
-import qitools
+import qibuild
 import qibuild
 import qitoolchain
 
@@ -69,9 +69,9 @@ def install_package(package_src, destdir, runtime=False):
 
     """
     if runtime:
-        qitools.sh.install(package_src, destdir, filter=is_runtime)
+        qibuild.sh.install(package_src, destdir, filter=is_runtime)
     else:
-        qitools.sh.install(package_src, destdir)
+        qibuild.sh.install(package_src, destdir)
 
 def configure_parser(parser):
     """Configure parser for this action"""

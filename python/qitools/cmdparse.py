@@ -39,9 +39,9 @@ LOGGER = logging.getLogger(__name__)
 try:
     import argparse
 except:
-    from qitools.external import argparse
+    from qibuild.external import argparse
 
-import qitools.command
+import qibuild.command
 
 class InvalidAction(Exception):
     """Just a custom exception """
@@ -141,7 +141,7 @@ def run_action(module_name, args=None, forward_args=None):
 
     parser.error = error
     parsed_args = parser.parse_args(args=args, namespace=forward_args)
-    qitools.log.configure_logging(parsed_args)
+    qibuild.log.configure_logging(parsed_args)
     return module.do(parsed_args)
 
 
@@ -258,7 +258,7 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
                 raise
 
     pargs = parser.parse_args(args)
-    qitools.log.configure_logging(pargs)
+    qibuild.log.configure_logging(pargs)
     module = action_modules[pargs.action]
     _dump_arguments(name, pargs)
     main_wrapper(module, pargs)

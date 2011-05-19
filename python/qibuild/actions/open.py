@@ -7,7 +7,7 @@ import os
 import glob
 import subprocess
 
-import qitools
+import qibuild
 import qibuild
 
 KNOWN_IDES = ["QtCreator", "Visual Studio"]
@@ -30,8 +30,8 @@ def do(args):
 
     editor = toc.configstore.get("general", "env", "ide")
     if editor is None:
-        editor  = qitools.ask_choice(KNOWN_IDES, "Please choose between the following IDEs")
-        qitools.configstore.update_config(toc.user_config_path,
+        editor  = qibuild.ask_choice(KNOWN_IDES, "Please choose between the following IDEs")
+        qibuild.configstore.update_config(toc.user_config_path,
             "general", "env", "ide", editor)
 
     if editor == "Visual Studio":
@@ -43,11 +43,11 @@ def do(args):
     if editor == "QtCreator":
         qtcreator_full_path = toc.configstore.get("general", "env", "ide_path", default = None)
         if not qtcreator_full_path:
-            qtcreator = qitools.command.find_program("qtcreator")
+            qtcreator = qibuild.command.find_program("qtcreator")
             if qtcreator is None:
-                qtcreator_full_path = qitools.interact.ask_program("Please enter path to qtcreator")
+                qtcreator_full_path = qibuild.interact.ask_program("Please enter path to qtcreator")
                 # Store it so we dont ask again:
-                qitools.configstore.update_config(toc.user_config_path,
+                qibuild.configstore.update_config(toc.user_config_path,
                     "general", "env", "ide_path", qtcreator_full_path)
 
         cmake_list = os.path.join(project.directory, "CMakeLists.txt")

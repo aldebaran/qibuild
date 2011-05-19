@@ -19,8 +19,8 @@ def check_config():
 check_config()
 
 packages = [
-    "qitools",
-    "qitools.external",
+    "qibuild",
+    "qibuild.external",
     "qisrc",
     "qisrc.actions",
     "qibuild",

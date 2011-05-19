@@ -10,7 +10,7 @@ Few notes:
 
  This way:
      We can alway use:
-        - qitools.command.check_call(["cmake", ..."])
+        - qibuild.command.check_call(["cmake", ..."])
     on every platform as soon as cmake is in
     os.environ["PATH"]
 
@@ -191,7 +191,7 @@ def _raise_error(cmd, cwd, shell, exception=None, retcode=None, output=None):
     Raise a CommandFailedException with a nice message
 
     """
-    mess = "qitools.command failed\n"
+    mess = "qibuild.command failed\n"
     if exception:
         mess += "# error  : %s\n" % (exception)
     if retcode:
