@@ -25,6 +25,8 @@ class Project:
         #build related flags
         self.cmake_flags     = list()
         self.build_directory = None
+        self.sdk_directory   = None
+        self._custom_sdk_dir = False
 
     def get_sdk_dir(self):
         """ Return the SDK dir of the project.
@@ -47,7 +49,17 @@ class Project:
            - add flags from the project config (read in toc's configstore project section)
            - add flags from the command line (stored in toc.cmake_flags when toc is built)
         """
-        self.build_directory = os.path.join(self.directory, build_directory_name)
+
+        #handle custom global build directory containing all projects
+        singlebdir = toc.configstore.get("general", "build", "build_dir", default=None)
+        if singlebdir:
+            if not os.path.isabs(singlebdir):
+                singlebdir = os.path.join(toc.work_tree, singlebdir)
+            bname = "%s-build-%s" % (self.name, build_directory_name)
+            self.build_directory = os.path.join(singlebdir, bname)
+        else:
+            bname = "build-%s" % (build_directory_name)
+            self.build_directory = os.path.join(self.directory, bname)
 
         build_config_flags = toc.configstore.get("general", "build", "cmake", "flags",
             default=None)
@@ -65,13 +77,28 @@ class Project:
         if toc.cmake_flags:
             self.cmake_flags.extend(toc.cmake_flags)
 
+        #handle single sdk dir
+        sdk_dir = toc.configstore.get("general", "build", "sdk_dir", default=None)
+        if sdk_dir:
+            if os.path.isabs(sdk_dir):
+                self.sdk_directory = sdk_dir
+            else:
+                self.sdk_directory = os.path.join(toc.work_tree, sdk_dir)
+            self._custom_sdk_dir = True
+            self.cmake_flags.append("QI_SDK_DIR=%s" % (self.sdk_directory))
+        else:
+            #normal sdk dir in buildtree
+            self.sdk_directory   = os.path.join(self.build_directory, "sdk")
+
     def set_custom_build_directory(self, build_dir):
         """ could be used to override the default build_directory
         """
+        old = self.build_directory
         self.build_directory = build_dir
 
-
-
+        #detect single sdk directory for multiple projects
+        if self._custom_sdk_dir == False:
+            self.sdk_directory = os.path.join(self.build_directory, "sdk")
 
     def __str__(self):
         res = ""

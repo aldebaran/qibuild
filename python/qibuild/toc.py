@@ -193,7 +193,8 @@ class Toc(QiWorkTree):
         build-linux-release
         build-cross-debug ...
         """
-        res = ["build"]
+        res = list()
+
         if self.toolchain_name is None or self.toolchain_name == "system":
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
         else:
