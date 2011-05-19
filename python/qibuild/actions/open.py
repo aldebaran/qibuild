@@ -50,7 +50,6 @@ def do(args):
     project = toc.get_project(project_name)
 
     ides = find_ide(toc)
-    return
     editor = toc.configstore.get("general", "env", "ide")
     if len(ides) == 1 and editor == None:
         editor = ides[0]
@@ -59,29 +58,33 @@ def do(args):
         qibuild.configstore.update_config(toc.user_config_path,
             "general", "env", "ide", editor)
 
-
     if editor == "Visual Studio":
         sln_files = glob.glob(project.build_directory + "/*.sln")
         assert len(sln_files) == 1, "Expecting only one sln, got %s" % sln_files
+        print "starting VisualStudio:"
+        print "%s %s" % ("start", sln_files[0])
         subprocess.Popen(["start", sln_files[0]], shell=True)
-        return
 
     if editor == "Xcode":
         projs = glob.glob(project.build_directory + "/*.xcodeproj")
         assert len(projs) == 1, "Expecting only one xcodeproj, got %s" % sln_files
-        print "staring:", projs[0]
+        print "starting Xcode:"
+        print "%s %s" % ("open", projs[0])
         subprocess.Popen(["open", projs[0]])
 
     if editor == "QtCreator":
-        qtcreator_full_path = toc.configstore.get("general", "env", "ide_path", default = None)
+        qtcreator_full_path = toc.configstore.get("general", "env", "qtcreator_path", default=None)
         if not qtcreator_full_path:
-            qtcreator = qibuild.command.find_program("qtcreator")
-            if qtcreator is None:
+            qtcreator_full_path = qibuild.command.find_program("qtcreator")
+            if not qtcreator_full_path:
                 qtcreator_full_path = qibuild.interact.ask_program("Please enter path to qtcreator")
                 # Store it so we dont ask again:
                 qibuild.configstore.update_config(toc.user_config_path,
-                    "general", "env", "ide_path", qtcreator_full_path)
-
+                                                  "general", "env", "qtcreator_path", qtcreator_full_path)
+        if not qtcreator_full_path:
+            raise Exception("Could not find QtCreator")
         cmake_list = os.path.join(project.directory, "CMakeLists.txt")
+        print "starting QtCreator:"
+        print "%s %s" % (qtcreator_full_path, cmake_list)
         subprocess.Popen([qtcreator_full_path, cmake_list])
         return
