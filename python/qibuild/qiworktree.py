@@ -196,7 +196,7 @@ def qiworktree_open(work_tree=None, use_env=False, config=None):
     if not work_tree:
         work_tree = guess_work_tree(use_env)
         LOGGER.debug("found a qi worktree: %s", work_tree)
-    current_project = search_manifest_directory(os.getcwd())
+    current_project = search_current_project_root(os.getcwd())
     if not work_tree:
         # Sometimes we you just want to create a fake worktree object because
         # you just want to build one project (no dependencies at all, no configuration...)
@@ -229,14 +229,42 @@ def qiworktree_open(work_tree=None, use_env=False, config=None):
             " - create a new work tree with \"qibuild init\"")
     return QiWorkTree(work_tree, path_hints=path_hints, config=config)
 
+def search_current_project_root(working_directory):
+    cwd = _search_manifest_directory(working_directory)
+    if not cwd:
+        #get the project directory associated to the build dir
+        tmp = _search_build_directory(working_directory)
+        #verify it's really a project dir
+        cwd = _search_manifest_directory(tmp)
+    return cwd
 
-def search_manifest_directory(working_directory):
+def _search_build_directory(working_directory):
     """ find the manifest associated to the working_directory, return None if not found """
     cwd     = os.path.normpath(os.path.abspath(working_directory))
     dirname = None
 
     #for each cwd parent folders, try to see if it match src
     while dirname or cwd:
+        if os.path.exists(os.path.join(cwd, "CMakeCache.txt")):
+            with open(os.path.join(cwd, "CMakeCache.txt"), "r") as f:
+                lines = f.readlines()
+                for l in lines:
+                    if l.startswith("CMAKE_HOME_DIRECTORY:INTERNAL="):
+                        return str(l[30:]).strip()
+        (new_cwd, dirname) = os.path.split(cwd)
+        if new_cwd == cwd:
+            break
+        cwd = new_cwd
+    return None
+
+def _search_manifest_directory(working_directory):
+    """ find the manifest associated to the working_directory, return None if not found """
+    cwd     = os.path.normpath(os.path.abspath(working_directory))
+    dirname = None
+
+    #for each cwd parent folders, try to see if it match src
+    while dirname or cwd:
+        print "test:", os.path.join(cwd, "qibuild.manifest")
         if os.path.exists(os.path.join(cwd, "qibuild.manifest")):
             return cwd
         if os.path.exists(os.path.join(cwd, "manifest.xml")):

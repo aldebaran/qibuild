@@ -484,7 +484,7 @@ def toc_open(work_tree, args, use_env=False):
 
     if not work_tree:
         work_tree = qibuild.qiworktree.guess_work_tree(use_env)
-    current_project = qibuild.qiworktree.search_manifest_directory(os.getcwd())
+    current_project = qibuild.qiworktree.search_current_project_root(os.getcwd())
     if not work_tree:
         # Sometimes we you just want to create a fake worktree object because
         # you just want to build one project (no dependencies at all, no configuration...)
@@ -551,7 +551,8 @@ def project_from_cwd():
     """Return a project name from the current working directory
 
     """
-    project_dir = qibuild.qiworktree.search_manifest_directory(os.getcwd())
+    project_dir = qibuild.qiworktree.search_current_project_root(os.getcwd())
+    print "pdir:", project_dir
     if not project_dir:
         return None
     return qibuild.qiworktree.project_name_from_directory(project_dir)
