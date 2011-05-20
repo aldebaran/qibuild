@@ -55,7 +55,7 @@ class Project:
         if singlebdir:
             if not os.path.isabs(singlebdir):
                 singlebdir = os.path.join(toc.work_tree, singlebdir)
-            bname = "%s-build-%s" % (self.name, build_directory_name)
+            bname = os.path.join("build-%s" % (build_directory_name), self.name)
             self.build_directory = os.path.join(singlebdir, bname)
         else:
             bname = "build-%s" % (build_directory_name)
