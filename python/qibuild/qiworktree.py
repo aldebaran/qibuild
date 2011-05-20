@@ -234,6 +234,8 @@ def search_current_project_root(working_directory):
     if not cwd:
         #get the project directory associated to the build dir
         tmp = _search_build_directory(working_directory)
+        if not tmp:
+            return None
         #verify it's really a project dir
         cwd = _search_manifest_directory(tmp)
     return cwd
@@ -264,7 +266,6 @@ def _search_manifest_directory(working_directory):
 
     #for each cwd parent folders, try to see if it match src
     while dirname or cwd:
-        print "test:", os.path.join(cwd, "qibuild.manifest")
         if os.path.exists(os.path.join(cwd, "qibuild.manifest")):
             return cwd
         if os.path.exists(os.path.join(cwd, "manifest.xml")):
