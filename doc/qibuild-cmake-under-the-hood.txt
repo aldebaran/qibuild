@@ -190,6 +190,11 @@ sdk/lib is also easy.
 SDK and redistributable config files
 ------------------------------------
 
+Note: you can see qibuild as a way to automatically follow the cmake conventions:
+
+See the
+link:http://www.cmake.org/Wiki/CMake:How_to_create_a_ProjectConfig.cmake_file[CMake wiki]
+for more information
 
 In fact we have two different +world-config+ files.
 
