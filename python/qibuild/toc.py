@@ -552,7 +552,6 @@ def project_from_cwd():
 
     """
     project_dir = qibuild.qiworktree.search_current_project_root(os.getcwd())
-    print "pdir:", project_dir
     if not project_dir:
         return None
     return qibuild.qiworktree.project_name_from_directory(project_dir)

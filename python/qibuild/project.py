@@ -56,7 +56,7 @@ class Project:
             if not os.path.isabs(singlebdir):
                 singlebdir = os.path.join(toc.work_tree, singlebdir)
             bname = os.path.join("build-%s" % (build_directory_name), self.name)
-            self.build_directory = os.path.join(singlebdir, bname)
+            self.build_directory = os.path.normpath(os.path.join(singlebdir, bname))
         else:
             bname = "build-%s" % (build_directory_name)
             self.build_directory = os.path.join(self.directory, bname)
@@ -84,6 +84,8 @@ class Project:
                 self.sdk_directory = sdk_dir
             else:
                 self.sdk_directory = os.path.join(toc.work_tree, sdk_dir)
+            bname = "sdk-%s" % (build_directory_name)
+            self.sdk_directory = os.path.normpath(os.path.join(self.sdk_directory, bname))
             self._custom_sdk_dir = True
             self.cmake_flags.append("QI_SDK_DIR=%s" % (self.sdk_directory))
         else:
