@@ -407,6 +407,10 @@ class Toc(QiWorkTree):
                     # CMake will use MSBuild for VS2010 builds, in other
                     # cases, it uses devenv directly
                     cmd = cmd + ["--", "/verbosity:minimal", "/nologo"]
+
+        if num_jobs > 1 and "make" in self.cmake_generator.lower():
+            cmd += ["--", "-j%d" % num_jobs]
+
         try:
             qibuild.command.check_call(cmd)
         except CommandFailedException:
