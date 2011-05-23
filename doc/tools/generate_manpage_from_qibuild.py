@@ -5,12 +5,12 @@
 
 #fold into actions, generate an asciidoc manpage
 import sys
-import qitools.cmdparse
+import qibuild.cmdparse
 
 def generate_man(src, dst, packages):
     outfile = sys.argv[1]
     actions = list()
-    actions.extend(qitools.cmdparse.action_modules_from_package(packages))
+    actions.extend(qibuild.cmdparse.action_modules_from_package(packages))
 
     with open(src, "r+") as f:
         template = f.read()
