@@ -47,10 +47,14 @@ function(boost_flib _suffix _libname)
 
   set (_mingw_names_debug
     "libboost_${_libname}-mgw44-mt-d-${BOOST_VERSION}"
+    # for boost-locale
+    "libboost_${_libname}"
   )
 
   set (_mingw_names_release
     "libboost_${_libname}-mgw44-mt-${BOOST_VERSION}"
+    # for boost-locale
+    "libboost_${_libname}"
   )
 
   if(WIN32)
