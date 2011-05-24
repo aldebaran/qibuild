@@ -116,9 +116,10 @@ class Toolchain(object):
             LOGGER.debug("Created a new toolchain:\n%s", str(self))
 
     def __str__(self):
-        res  = "Toolchain:\n"
-        res += "  name: %s\n" % self.name
-        res += "  packages:\n" + "\n".join([" " * 4  + str(x) for x in self.packages])
+        res  = "Toolchain %s\n" % self.name
+        res += "  path: %s\n" % self.path
+        if not self.cross:
+            res += "  packages:\n" + "\n".join([" " * 4  + x.name for x in self.packages])
         return res
 
     def get(self, package_name):

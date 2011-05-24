@@ -22,3 +22,4 @@ def do(args):
     for toolchain_name in config.get("toolchain", default=dict()).keys():
         toolchain = qitoolchain.Toolchain(toolchain_name)
         print toolchain
+        print
