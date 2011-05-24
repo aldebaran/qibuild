@@ -9,10 +9,6 @@ cmake_policy(SET CMP0011 NEW)
 # if() recognizes numbers and boolean constants.
 cmake_policy(SET CMP0012 NEW)
 
-# Nice stuff for Visual Studio users:
-if(MSVC)
- set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-endif()
 
 #get the current directory of the file
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
