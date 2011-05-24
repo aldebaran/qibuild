@@ -47,14 +47,27 @@ endfunction()
 #! stage a cmake module
 #
 function(qi_stage_cmake _module)
-  file(COPY "${_module}Config.cmake"
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_module}Config.cmake")
+    set(_filename "${_module}Config.cmake")
+  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_module}-config.cmake")
+    set(_filename "${_module}-config.cmake")
+  else()
+    qi_error("Could not find file for module ${_module}.
+
+    Neither:
+     ${CMAKE_CURRENT_SOURCE_DIR}/${_module}-config.cmake
+    nor
+     ${CMAKE_CURRENT_SOURCE_DIR}/${_module}Config.cmake
+
+    exist
+    ")
+  endif()
+
+  file(COPY "${_filename}"
        DESTINATION
        "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/")
 
-  get_filename_component(_name ${CMAKE_CURRENT_SOURCE_DIR}/${_module} NAME)
-
-  install(FILES "${_module}Config.cmake"
+  install(FILES "${_filename}"
       DESTINATION
-      "${QI_SDK_CMAKE}/${_name}/"
-  )
+      "${QI_SDK_CMAKE}/${_module}/${_filename}")
 endfunction()
