@@ -165,3 +165,30 @@ execute_process(COMMAND foo "${_foo_args}")
 In the second line, since you've quoted the list, you are calling
 foo with *one* argument, ("--foo --bar").
 
+
+* When you need a function to retun a result, use:
+
+[source, cmake]
+----
+function compute_stuff(arg res)
+
+  set(_result ....)
+  ...
+
+
+  set(${res} ${_result} PARENT_SCOPE)
+
+
+endfunction()
+
+...
+
+compute_stuff(my_arg result)
+
+do_something(${result})
+
+----
+
+(Note that we use 'set(${res} ... PARENT_SCOPE})',
+NOT 'set(res ... PARENT_SCOPE)' )
+
