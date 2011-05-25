@@ -77,6 +77,8 @@ if (QI_T001CHAIN_COMPAT)
   include("qibuild/compat/compat")
 endif()
 
+#always include CMAKE_PREFIX_PATH in the cross-compilation "compliant" folder.
+set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${CMAKE_PREFIX_PATH})
 
 qi_debug("CMAKE_PREFIX_PATH  = ${CMAKE_PREFIX_PATH}")
 qi_debug("CMAKE_MODULE_PATH  = ${CMAKE_MODULE_PATH}")
