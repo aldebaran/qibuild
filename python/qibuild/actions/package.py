@@ -2,8 +2,6 @@
 """Generate a binary sdk"""
 
 #FIXME: maybe we should make --no-compress the default
-#FIXME: put the resulting package in QI_WORKTREE/package/config/project
-# instead of putting it in the build directory
 
 import os
 import logging
@@ -92,7 +90,7 @@ def _do(args, build_type):
     else:
         project_name = args.project
     project = toc.get_project(project_name)
-    inst_dir = os.path.join(project.build_directory, "package")
+    inst_dir = os.path.join(toc.work_tree, "package")
 
     package_name = get_package_name(
         project,
