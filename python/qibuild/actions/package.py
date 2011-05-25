@@ -7,32 +7,12 @@
 
 import os
 import logging
-import shutil
 import datetime
 
-import qibuild
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
-def qibuildize(destdir):
-    """Make sure the package is usable even without qibuild installed.
-
-    """
-    # First, create the toolchain.cmake file :
-    src  = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "templates", "toolchain-pc.cmake")
-    dest = os.path.join(destdir, "toolchain-pc.cmake")
-    shutil.copy(src, dest)
-
-    # Then, install the qibuild/cmake files inside the package:
-    src  = os.path.join(qibuild.CMAKE_QIBUILD_DIR)
-    dest = os.path.join(destdir, "share", "cmake", "qibuild")
-    qibuild.sh.install(src, dest)
-
-    # Lastly, install qibuild/version.cmake at the root of the SDK:
-    src  = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "version.cmake")
-    dest = os.path.join(destdir, "share", "cmake", "qibuild", "qibuild-version.cmake")
-    qibuild.sh.install(src, dest)
 
 def get_package_name(project, continuous=False, version=None, arch=None):
     """Get the package name of a project.
@@ -135,10 +115,6 @@ def do(args):
     if toc.using_visual_studio and not args.runtime:
         _do(args, "debug")
     destdir = _do(args, "release")
-
-    if args.standalone:
-        LOGGER.info("Embedding qiBuild in package")
-        qibuildize(destdir)
 
     if args.compress:
         LOGGER.info("Compressing package")

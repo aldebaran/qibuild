@@ -60,10 +60,6 @@ def package_parser(parser):
 
     """
     group = parser.add_argument_group("package options")
-    group.add_argument("--standalone", action="store_true",
-        help="Make a standalone package. "
-        "This will package qibuild inside your package, and create a toolchain "
-        "file for others to use your pacakge")
     group.add_argument("--version", help="Version of the package. "
         "Default is read from the version.cmake file")
     group.add_argument("--continuous", action="store_true",
