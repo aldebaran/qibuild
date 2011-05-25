@@ -24,6 +24,9 @@ def do(args):
             git = qisrc.git.open(git_project)
             #TODO: replace by try/except?
             if git.is_valid():
+                if git.get_current_remote_url() == None:
+                    LOGGER.debug("Not pulling. No remote for %s", git_project)
+                    continue
                 LOGGER.info("Pull %s", git_project)
                 if args.rebase:
                     git.pull('--rebase')
