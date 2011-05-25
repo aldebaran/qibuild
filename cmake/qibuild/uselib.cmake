@@ -16,7 +16,7 @@ set(_QI_USELIB_CMAKE_ TRUE)
 
 
 function(_qi_check_for_static pkg _backup)
-  set(_backup ${CMAKE_FIND_LIBRARY_SUFFIXES} PARENT_SCOPE)
+  set(${_backup} ${CMAKE_FIND_LIBRARY_SUFFIXES} PARENT_SCOPE)
   if(${pkg}_STATIC)
     if(UNIX)
       set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" PARENT_SCOPE)
