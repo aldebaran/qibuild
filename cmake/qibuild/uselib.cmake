@@ -14,6 +14,21 @@ if (_QI_USELIB_CMAKE_)
 endif()
 set(_QI_USELIB_CMAKE_ TRUE)
 
+
+function(_qi_check_for_static pkg _backup)
+  set(_backup ${CMAKE_FIND_LIBRARY_SUFFIXES} PARENT_SCOPE)
+  if(${pkg}_STATIC)
+    if(UNIX)
+      set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" PARENT_SCOPE)
+    endif()
+  endif()
+endfunction()
+
+function(_qi_disable_check_for_static pkg _backup)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES "${_backup}" PARENT_SCOPE)
+endfunction()
+
+
 #compute the dependencies list, removing duplicate
 #TODO: store computed dependencies in ${_U_PKG}_FLAT_DEPENDS ?
 function(_qi_use_lib_get_deps _OUT_list)
@@ -30,6 +45,9 @@ function(_qi_use_lib_get_deps _OUT_list)
     # for upstream Find-*.cmake
     # See: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:find_package
     if (NOT ${_U_PKG}_SEARCHED)
+
+      _qi_check_for_static("${_pkg}" _backup_static)
+
       # find_package in two calls. The first call:
       # Uses NO_MODULE - looks for PKGConfig.cmake, not FindPKG.cmake
       # Uses QUIET     - no warning will be generated
@@ -41,6 +59,9 @@ function(_qi_use_lib_get_deps _OUT_list)
       if(NOT ${_U_PKG}_PACKAGE_FOUND)
         find_package(${_pkg} QUIET REQUIRED)
       endif()
+
+      _qi_disable_check_for_static("${_pkg}" "${_backup_static}")
+
       qi_set_global("${_U_PKG}_SEARCHED" TRUE)
     endif()
 
@@ -69,6 +90,8 @@ endfunction()
 # This will call target_link_libraries with XXX_LIBRARIES or fallback to XXX_LIBRARY.
 # All dependencies should be found, otherwize it will fail. If you want to check if a
 # package could be found, prefer using find_package.
+#
+# to search for static libs set XXX_STATIC=ON before calling qi_use_lib.
 #
 # \arg:name The target to add dependencies to
 # \group:DEPENDENCIES The list of dependencies
