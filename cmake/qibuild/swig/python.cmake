@@ -112,6 +112,55 @@ function(qi_swig_wrap_python module_name interface_file)
     RUNTIME DESTINATION "${QI_SDK_LIB}"
   )
 
+  # On windows, we are going to put the .py and the .pyd in lib/
+  # but the .dll on which the .pyd depends are in bin/
+  # This causes no problem when the .pyd is used in an embedded interpreter,
+  # but to be able to use the .pyd "standalone", we have to iter through the
+  # dependencies of the .pyd, and install the dlls in lib/ too
+  # This trick can only works with mingw, right now...
+  # TODO: make it work for visual studio?
+  # TODO: factor this with post-copy-dlls.cmake ?
+  if(WIN32 AND NOT MSVC)
+    set(_libs)
+
+    string(TOUPPER "${_swig_target}" _U_target)
+    foreach(_dep ${${_U_target}_DEPENDS})
+      string(TOUPPER ${_dep} _U_dep)
+      set(_dep_libs ${${_U_dep}_LIBRARIES})
+
+      cmake_parse_arguments(ARG "" "" "optimized;debug" ${_dep_libs})
+      if(ARG_debug)
+          list(APPEND _libs ${ARG_debug})
+      endif()
+      cmake_parse_arguments(ARG "" "" "general" ${_dep_libs})
+      if(ARG_general)
+          list(APPEND _libs ${ARG_general})
+      endif()
+    endforeach()
+
+    if(_libs)
+      list(REMOVE_DUPLICATES _libs)
+    endif()
+
+    set(_dlls)
+    foreach(_lib ${_libs})
+      string(REGEX MATCH "\\.dll$" _match "${_lib}")
+      if(_match)
+        list(APPEND _dlls ${_lib})
+      endif()
+      string(REGEX MATCH "\\.dll\\.a$" _match ${_lib})
+      if(_match)
+        string(REPLACE ".dll.a" ".dll" _dll ${_lib})
+        list(APPEND _dlls ${_dll})
+      endif()
+    endforeach()
+
+    install(FILES ${_dlls}
+      COMPONENT python
+      DESTINATION "${QI_SDK_LIB}"
+    )
+  endif()
+
   install(FILES "${QI_SDK_DIR}/${QI_SDK_LIB}/${module_name}.py"
     COMPONENT python
     DESTINATION "${QI_SDK_LIB}"
