@@ -174,6 +174,7 @@ endfunction()
 ####################################################################
 function(export_lib_pkgconfig prefix)
   qi_set_cache(${prefix}_INCLUDE_DIR "${${prefix}_INCLUDE_DIRS}")
+  qi_set_cache(${prefix}_LIBRARIES   "${${prefix}_LIBRARIES}")
   #qi_set_cache(${prefix}_DEFINITIONS "${${prefix}_CFLAGS_OTHER}")
 
   # Finally, display informations if not in quiet mode
