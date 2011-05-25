@@ -64,6 +64,10 @@ endfunction()
 # \group:DEPENDS Dependencies to pass to use_lib
 # \group:ARGUMENTS Arguments to pass to add_test (to your test program)
 function(qi_create_gtest name)
+  if (DEFINED BUILD_TESTS AND NOT BUILD_TESTS)
+    qi_debug("Test(${name}) disabled by BUILD_TESTS=OFF")
+    return()
+  endif()
   # create tests_results folder if it does not exist
   file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
   cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
