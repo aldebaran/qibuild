@@ -84,7 +84,9 @@ def configure_parser(parser):
     group.add_argument("destdir", metavar="DESTDIR")
     group.add_argument("--runtime", action="store_true",
         help="install runtime componenents only")
-    parser.set_defaults(runtime=False, prefix="/")
+    group.add_argument("--no-rdeps", action="store_false", dest="rdeps",
+        help="ignore runtime dependencies. Use with caution.")
+    parser.set_defaults(runtime=False, prefix="/", rdeps=True)
 
 def do(args):
     """Main entry point"""
@@ -123,6 +125,9 @@ def do(args):
     for project_name in project_names:
         project = toc.get_project(project_name)
         toc.install_project(project,  args.destdir, runtime=args.runtime)
+
+    if not args.rdeps:
+        return
 
     if package_names:
         LOGGER.info("Installing %s to %s", ", ".join([p for p in package_names]), dest)
