@@ -15,6 +15,13 @@ endif()
 set(_QI_USELIB_CMAKE_ TRUE)
 
 
+# Set CMAKE_FIND_LIBRARY_SUFFIXES so that
+# only static libs are searched when ${pkg}_STATIC
+# is set.
+# The _backup argument will be set to the previous
+# value of CMAKE_FIND_LIBRARY_SUFFIXES.
+# Don't forget to call _qi_disable_check_for_static(_backup)
+# afterwards !
 function(_qi_check_for_static pkg _backup)
   set(${_backup} ${CMAKE_FIND_LIBRARY_SUFFIXES} PARENT_SCOPE)
   if(${pkg}_STATIC)
@@ -24,7 +31,7 @@ function(_qi_check_for_static pkg _backup)
   endif()
 endfunction()
 
-function(_qi_disable_check_for_static pkg _backup)
+function(_qi_disable_check_for_static _backup)
   set(CMAKE_FIND_LIBRARY_SUFFIXES "${_backup}" PARENT_SCOPE)
 endfunction()
 
@@ -60,7 +67,7 @@ function(_qi_use_lib_get_deps _OUT_list)
         find_package(${_pkg} QUIET REQUIRED)
       endif()
 
-      _qi_disable_check_for_static("${_pkg}" "${_backup_static}")
+      _qi_disable_check_for_static("${_backup_static}")
 
       qi_set_global("${_U_PKG}_SEARCHED" TRUE)
     endif()
