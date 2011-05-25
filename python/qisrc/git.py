@@ -213,7 +213,7 @@ class Git:
         branch = self.get_current_branch()
         remote = self.cmd.call_output("config", "--get", "branch.%s.remote" % (branch))[0]
         if not remote:
-            self.logger.warning("Current branch %s does not track any remote branch!" % \
+            self.logger.debug("Current branch %s does not track any remote branch!" % \
                 branch)
             return None
         try:
