@@ -81,11 +81,15 @@ function(_qi_use_lib_get_deps _OUT_list)
     endforeach()
   endforeach()
 
-  #We do not remove duplicate here.. If libA and libB each depends on
-  #libC, libC need to be after libA and libB, so we need to take each
-  #libC occurence into acount, in fact, we could optimise if we want
-  #and only take the last one, but REMOVE_DUPLICATES keep the first occurence
-  #list(REMOVE_DUPLICATES _result)
+  #We remove duplicate here..
+  #Problem: If libA and libB each depends on libC, we will have "A C B C".
+  # libC need to be after libA and libB, so we need to take each libC occurence into acount,
+  # in fact, we could optimise if we want and only take the last one,
+  # but REMOVE_DUPLICATES keep the first occurence
+  # so ... we reverse the list, remove duplicate and reverse again!
+  list(REVERSE _result)
+  list(REMOVE_DUPLICATES _result)
+  list(REVERSE _result)
 
   set(${_OUT_list} ${_result} PARENT_SCOPE)
 endfunction()
