@@ -11,6 +11,8 @@ include(qibuild/internal/stage)
 
 #! Generate a 'name'-config.cmake, allowing other project to find the library.
 # \arg:target a target created with qi_create_lib
+# \group:DEPRECATED specify a deprecated message. This message will be displayed
+#                   each time another project use that lib.
 # \group:DEPENDS if not given, ${TARGET}_DEPENDS will be guessed from
 #                the previous calls to qi_use_lib().
 #                Use this (whith care!) to override this behavior.

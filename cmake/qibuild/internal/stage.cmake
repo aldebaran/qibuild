@@ -251,7 +251,7 @@ endfunction()
 
 
 function(_qi_internal_stage_lib target)
-  cmake_parse_arguments(ARG "" "" "STAGED_NAME" ${ARGN})
+  cmake_parse_arguments(ARG "" "DEPRECATED;STAGED_NAME" ${ARGN})
   string(TOUPPER ${target} _U_target)
   string(TOLOWER ${target} _l_target)
 
@@ -269,11 +269,21 @@ function(_qi_internal_stage_lib target)
 
   _qi_gen_code_lib_redist(_redist ${target})
   set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_l_target}-config.cmake")
+  if (ARG_DEPRECATED)
+    set(_redist "${_redist}\nmessage(STATUS \"\")\n")
+    set(_redist "${_redist}\nmessage(STATUS \"## Warning ##: ${target} is deprecated: ${ARG_DEPRECATED}\")\n")
+    set(_redist "${_redist}\nmessage(STATUS \"\")\n")
+  endif()
   file(WRITE "${_redist_file}" "${_redist}")
   qi_install_cmake(${target} ${_redist_file})
 
   _qi_gen_code_lib_sdk(_sdk ${target})
   set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_l_target}-config.cmake")
+  if (ARG_DEPRECATED)
+    set(_sdk "${_sdk}\nmessage(STATUS \"\")\n")
+    set(_sdk "${_sdk}\nmessage(STATUS \"## Warning ##: ${target} is deprecated: ${ARG_DEPRECATED}\")\n")
+    set(_sdk "${_sdk}\nmessage(STATUS \"\")\n")
+  endif()
   file(WRITE "${_sdk_file}" "${_sdk}")
 
   # OK, this one is tricky.
