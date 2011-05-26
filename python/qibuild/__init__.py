@@ -103,7 +103,7 @@ def nmake(build_dir, target=None):
 
 
 
-def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD"):
+def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD", num_jobs=None):
     """ Launch msbuild with correct configuration
     (debug or release), and with correct switch if num_jobs is not None
     """
@@ -111,6 +111,8 @@ def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD"):
 
     cmd = ["MSBuild.exe", msbuild_conf]
     cmd += ["/nologo"]
+    if num_jobs != None:
+        cmd.append("/m:%d" % int(num_jobs))
 
     if be_verbose:
         # PerformanceSummary:
