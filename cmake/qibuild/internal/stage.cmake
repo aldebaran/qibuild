@@ -251,18 +251,15 @@ endfunction()
 
 
 function(_qi_internal_stage_lib target)
-  cmake_parse_arguments(ARG "" "DEPRECATED;STAGED_NAME" ${ARGN})
+  cmake_parse_arguments(ARG "INTERNAL" "STAGED_NAME" "DEPRECATED;INCLUDE_DIRS;DEFINITIONS;PATH_SUFFIXES;DEPENDS" ${ARGN})
   string(TOUPPER ${target} _U_target)
   string(TOLOWER ${target} _l_target)
-
   set(_staged_name ${ARG_STAGED_NAME})
-
   set(_new_args)
-  foreach(_arg ${ARGN})
-    if(${_arg} STREQUAL "STAGED_NAME")
-      break()
+  foreach(_arg INCLUDE_DIRS DEFINITIONS PATH_SUFFIXES DEPENDS)
+    if (DEFINED ARG_${_arg})
+      list(APPEND _new_args "ARG_${_arg}" "${ARG_${_arg}}")
     endif()
-    list(APPEND _new_args ${_arg})
   endforeach()
 
   _qi_set_vars(${target} ${_new_args})
