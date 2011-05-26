@@ -181,7 +181,10 @@ endfunction()
 function(create_cmake _NAME)
   qi_deprecated("create_cmake is deprecated
     use qi_stage_cmake instead.")
-  qi_stage_cmake(${_NAME})
+  # Old behavior: create_cmake foo (and have to make sure that
+  # fooConfig.cmake exists...)
+  # New behavior: qi_stage_cmake(foo-config.cmake)
+  qi_stage_cmake("${_NAME}Config.cmake")
 endfunction()
 
 function(use module)

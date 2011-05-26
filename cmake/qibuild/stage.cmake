@@ -44,30 +44,56 @@ function(qi_stage_script)
   qi_error("qi_stage_script: not implemented")
 endfunction()
 
-#! stage a cmake module
+#! stage a cmake file
+# For instance, assuming you have a foo-config.cmake file
+# containing my_awesome_function, you can do:
+# qi_stage_cmake("foo-config.cmake")
 #
-function(qi_stage_cmake _module)
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_module}Config.cmake")
-    set(_filename "${_module}Config.cmake")
-  elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_module}-config.cmake")
-    set(_filename "${_module}-config.cmake")
-  else()
-    qi_error("Could not find file for module ${_module}.
+# Then later, (in an other project, or in the same project):
+# find_package(foo)
+# my_awesome_function()
+#
+# \arg module : path to the module file, relative to
+#               CMAKE_CURRENT_SOURCE_DIR
+#
+function(qi_stage_cmake module_file)
+  if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${module_file}")
+    qi_error("
 
-    Neither:
-     ${CMAKE_CURRENT_SOURCE_DIR}/${_module}-config.cmake
-    nor
-     ${CMAKE_CURRENT_SOURCE_DIR}/${_module}Config.cmake
-
-    exist
+    Could not stage ${module_file}:
+    ${CMAKE_CURRENT_SOURCE_DIR}/${module_file}
+    does not exist
     ")
+
   endif()
 
-  file(COPY "${_filename}"
+  get_filename_component(_basename "${module_file}" NAME)
+
+  # module_file is something like foo/bar/baz-config.cmake, or
+  # foo/bar/bazConfig.cmake, and we need to install it to
+  # share/cmake/baz/baz-config.cmake
+
+  string(REGEX MATCH "-config\\.cmake$" _match ${_basename})
+  if(_match)
+    string(REPLACE "-config.cmake" "" _module_name "${_basename}")
+  else()
+    string(REGEX MATCH "Config\\.cmake" _match ${_basename})
+    if(_match)
+      string(REPLACE "Config.cmake" "" _module_name {_basename})
+    else()
+      qi_error("
+        Could not stage ${module_file}:
+        The file name should end with \"-config.cmake\"
+        or \"Config.cmake\" (deprecated)
+      ")
+    endif()
+  endif()
+
+  file(COPY "${module_file}"
        DESTINATION
        "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/")
 
-  install(FILES "${_filename}"
+  install(FILES "${module_file}"
       DESTINATION
-      "${QI_SDK_CMAKE}/${_module}/${_filename}")
+      "${QI_SDK_CMAKE}/${_module_name}/")
 endfunction()

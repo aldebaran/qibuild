@@ -13,7 +13,7 @@ qi_install_header(world world/world.h)
 
 qi_stage_lib(world)
 
-qi_stage_cmake(foo)
+qi_stage_cmake(cmake/foo-config.cmake)
 
 find_package(foo REQUIRED)
 foo()
