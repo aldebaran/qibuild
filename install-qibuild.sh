@@ -31,7 +31,18 @@ create_launcher() {
 }
 
 
+localinst=no
 if ! mkdir -p "${DESTDIR}" 2>/dev/null ; then
+  localinst=yes
+fi
+
+if ! touch "${DESTDIR}"/.tmp_test ; then
+  localinst=yes
+else
+  rm -f "${DESTDIR}/.tmp_test"
+fi
+
+if [ "$localinst" = "yes" ] ; then
   echo WARNING: ${DESTDIR} is not writable
   echo =====================
   echo installing into ~/bin
