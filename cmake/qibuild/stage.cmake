@@ -11,6 +11,8 @@ include(qibuild/internal/stage)
 
 #! Generate a 'name'-config.cmake, allowing other project to find the library.
 # \arg:target a target created with qi_create_lib
+# \flag:INTERNAL An internal library will not be searchable once installed.
+#                This could be overwritten using QI_INSTALL_INTERNAL=ON
 # \group:DEPRECATED specify a deprecated message. This message will be displayed
 #                   each time another project use that lib.
 # \group:DEPENDS if not given, ${TARGET}_DEPENDS will be guessed from
