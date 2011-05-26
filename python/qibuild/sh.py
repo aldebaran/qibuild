@@ -66,6 +66,36 @@ def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
         with open(out_path, "w") as out_file:
             out_file.write(out_content)
 
+
+def _handle_dir_symlinks(src, dest, root, directories):
+    """ Used by qibuild.sh#install to make sure
+    symlins on dirs are preseverd
+
+    root, dirs is the part of the iterator of os.walk()
+    """
+    if sys.platform.startswith("win"):
+        # Nothing to do !
+        return
+    for directory in directories:
+        src_root = os.path.join(src, root)
+        initial_link = os.path.join(src_root, directory)
+        if not os.path.islink(initial_link):
+            continue
+        # The trick here is to re-create the symlink,
+        # using relative paths
+        initial_target = os.path.realpath(initial_link)
+        rel_link   = os.path.relpath(initial_link,   src_root)
+        rel_target = os.path.relpath(initial_target, src_root)
+        new_root = os.path.relpath(root, src)
+        new_root = os.path.join(dest, new_root)
+        mkdir(new_root, recursive=True)
+        new_link = os.path.join(new_root, rel_link)
+        if os.path.exists(new_link):
+            rm(new_link)
+        if sys.stdout.isatty():
+            print "-- Installing", new_link, "->", rel_target
+        os.symlink(rel_target, new_link)
+
 def install(src, dest, filter=None):
     """Install a directory to a destination.
 
@@ -78,11 +108,20 @@ def install(src, dest, filter=None):
     and won't complain if dest does not exists (missing
     directories will simply be created)
 
+    This function will preserve relative symlinks between directories,
+    used for instance in Mac frameworks:
+    |__ Versions
+        |__ Current  -> 4.0
+        |__ 4        -> 4.0
+        |__ 4.0
+
 
     Note that if src contains empty directories, they won't be
     installled.
 
     """
+    src  = to_native_path(src)
+    dest = to_native_path(dest)
     LOGGER.debug("Installing %s -> %s", src, dest)
     if filter is None:
         def filter(filename):
@@ -91,6 +130,7 @@ def install(src, dest, filter=None):
     if os.path.isdir(src):
         mkdir(dest, recursive=True)
         for (root, dirs, files) in os.walk(src):
+            _handle_dir_symlinks(src, dest, root, dirs)
             new_root = os.path.relpath(root, src)
             for file in files:
                 rel_path = os.path.join(new_root, file)
@@ -137,7 +177,7 @@ def rm(name):
             # Something else must be wrong...
             raise
 
-    if os.path.isdir(name):
+    if os.path.isdir(name) and not os.path.islink(name):
         LOGGER.debug("Removing directory: %s", name)
         shutil.rmtree(name, False, _rmtree_handler)
     else:
