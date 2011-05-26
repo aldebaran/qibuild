@@ -260,7 +260,7 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
     pargs = parser.parse_args(args)
     qibuild.log.configure_logging(pargs)
     module = action_modules[pargs.action]
-    _dump_arguments(name, pargs)
+    _dump_arguments(module.__name__, pargs)
     main_wrapper(module, pargs)
     return True
 
