@@ -53,6 +53,7 @@ function(_qi_call_fphsa prefix)
   # re-set FOO_FOUND to TRUE.
   # So we set ${prefix}_PACKAGE_FOUND in cache...
   qi_set_global(${prefix}_PACKAGE_FOUND ${${prefix}_FOUND})
+  qi_set_global(${prefix}_SEARCHED TRUE)
 endfunction()
 
 
