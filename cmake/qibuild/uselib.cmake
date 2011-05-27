@@ -76,9 +76,11 @@ function(_qi_use_lib_get_deps _OUT_list)
       list(FIND _result ${_sub_dep} _is_present)
       string(TOUPPER ${_sub_dep} _u_sub_dep)
       if (_is_present EQUAL -1)
-        #if (NOT ${_u_sub_dep}_SEARCHED AND NOT ${_u_sub_dep}_PACKAGE_FOUND)
+        if (NOT ${_u_sub_dep}_FAT_DEPENDS)
           _qi_use_lib_get_deps(_new_deps "${_sub_dep}")
-        #endif()
+        else()
+          set(_new_deps ${${_u_sub_dep}_FAT_DEPENDS})
+        endif()
         list(APPEND _result ${_new_deps})
       endif()
     endforeach()
@@ -94,6 +96,9 @@ function(_qi_use_lib_get_deps _OUT_list)
   list(REMOVE_DUPLICATES _result)
   list(REVERSE _result)
 
+  #why? because it will avoid many recursion. we store the complete dependencies of a project
+  # in cache, and use that, instead of digging into deps by recursion.
+  qi_set_cache(${_U_PKG}_FAT_DEPENDS "${_result}")
   set(${_OUT_list} ${_result} PARENT_SCOPE)
 endfunction()
 
