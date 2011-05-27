@@ -2,7 +2,7 @@
 
 # Toolchain file to be passed to cmake, using:
 # cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/sdk/toolchain-pc.cmake
-# (or the "use a toolchain file" option from the cmake-gui
+# (or the "use a toolchain file" option from the cmake-gui)
 
 # Warning ! This file is NOT usable for cross-compilation
 
@@ -13,5 +13,11 @@ get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 # headers in /path/to/include, and so on.
 set(CMAKE_FIND_ROOT_PATH "${_ROOT_DIR}")
 
-# To be able to do +include(qibuild/general.cmake)+.
+# Path to the qibuild framework:
 list(APPEND CMAKE_MODULE_PATH "${_ROOT_DIR}/share/cmake")
+
+# Enable usage of the qi_ cmake functions:
+include(qibuild/general)
+
+# Enable backward compatibility:
+include(qibuild/compat/compat)
