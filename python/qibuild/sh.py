@@ -66,35 +66,61 @@ def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
         with open(out_path, "w") as out_file:
             out_file.write(out_content)
 
+def _copy_link(src, dest):
+    if not os.path.islink(src):
+        raise Exception("%s is not a link!" % src)
 
-def _handle_dir_symlinks(src, dest, root, directories):
-    """ Used by qibuild.sh#install to make sure
-    symlins on dirs are preseverd
+    target = os.readlink(src)
+        #remove existing stuff
+    if os.path.lexists(dest):
+        print "-- Removing ", dest
+        rm(dest)
+    if sys.stdout.isatty():
+        print "-- Installing %s -> %s" % (dest, target)
+    os.symlink(target, dest)
 
-    root, dirs is the part of the iterator of os.walk()
+
+def _handle_dirs(src, dest, root, directories, filter):
+    """ Helper function used by install()
+
     """
-    if sys.platform.startswith("win"):
-        # Nothing to do !
-        return
+    rel_root = os.path.relpath(root, src)
+    new_root = os.path.join(dest, rel_root)
+    mkdir(new_root, recursive=True)
+
     for directory in directories:
-        src_root = os.path.join(src, root)
-        initial_link = os.path.join(src_root, directory)
-        if not os.path.islink(initial_link):
+        if not filter(os.path.join(rel_root, directory)):
             continue
-        # The trick here is to re-create the symlink,
-        # using relative paths
-        initial_target = os.path.realpath(initial_link)
-        rel_link   = os.path.relpath(initial_link,   src_root)
-        rel_target = os.path.relpath(initial_target, src_root)
-        new_root = os.path.relpath(root, src)
-        new_root = os.path.join(dest, new_root)
-        mkdir(new_root, recursive=True)
-        new_link = os.path.join(new_root, rel_link)
-        if os.path.exists(new_link):
-            rm(new_link)
-        if sys.stdout.isatty():
-            print "-- Installing", new_link, "->", rel_target
-        os.symlink(rel_target, new_link)
+        dsrc  = os.path.join(root, directory)
+        ddest = os.path.join(new_root, directory)
+
+        if os.path.islink(dsrc):
+            _copy_link(dsrc, ddest)
+        else:
+            if os.path.lexists(ddest) and not os.path.isdir(ddest):
+                raise Exception("Expecting a directory but found a file: %s" % ddest)
+            mkdir(ddest, recursive=True)
+
+def _handle_files(src, dest, root, files, filter):
+    """ Helper function used by install()
+
+    """
+    rel_root = os.path.relpath(root, src)
+    new_root = os.path.join(dest, rel_root)
+    mkdir(new_root, recursive=True)
+
+    for f in files:
+        if not filter(os.path.join(rel_root, f)):
+            continue
+        fsrc  = os.path.join(root, f)
+        fdest = os.path.join(new_root, f)
+        if os.path.islink(fsrc):
+            _copy_link(fsrc, fdest)
+        else:
+            if os.path.lexists(fdest) and os.path.isdir(fdest):
+                raise Exception("Expecting a file but found a directory: %s" % ddest)
+            shutil.copy(fsrc, fdest)
+
 
 def install(src, dest, filter=None):
     """Install a directory to a destination.
@@ -128,23 +154,13 @@ def install(src, dest, filter=None):
             return True
 
     if os.path.isdir(src):
-        mkdir(dest, recursive=True)
         for (root, dirs, files) in os.walk(src):
-            _handle_dir_symlinks(src, dest, root, dirs)
-            new_root = os.path.relpath(root, src)
-            for file in files:
-                rel_path = os.path.join(new_root, file)
-                if not filter(rel_path):
-                    continue
-                file_src = os.path.join(root, file)
-                mkdir(os.path.join(dest, new_root), recursive=True)
-                file_dest = os.path.join(dest, new_root, file)
-                # If this is not run interactively, avoid polluting
-                # stdout:
-                if sys.stdout.isatty():
-                    print "-- Installing:", file_dest
-                shutil.copy(file_src, file_dest)
+            _handle_dirs (src, dest, root, dirs,  filter)
+            _handle_files(src, dest, root, files, filter)
     else:
+        # Emulate posix `install' behavior:
+        # if dest is a dir, install in the directory, else
+        # simply copy the file.
         if os.path.isdir(dest):
             dest = os.path.join(dest, os.path.basename(src))
         mkdir(os.path.dirname(dest), recursive=True)
@@ -160,7 +176,7 @@ def rm(name):
 
     Please avoid using shutil.rmtree ...
     """
-    if not os.path.exists(name):
+    if not os.path.lexists(name):
         return
     def _rmtree_handler(func, path, _execinfo):
         """Call by rmtree when there was an error.
