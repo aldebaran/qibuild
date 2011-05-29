@@ -90,6 +90,7 @@ def _do(args, build_type):
     else:
         project_name = args.project
     project = toc.get_project(project_name)
+    #TODO create package directory if it does not exit
     inst_dir = os.path.join(toc.work_tree, "package")
 
     package_name = get_package_name(
@@ -113,6 +114,7 @@ def do(args):
     if toc.using_visual_studio and not args.runtime:
         _do(args, "debug")
     destdir = _do(args, "release")
+    #TODO warn if dest dir is empty
 
     if args.compress:
         LOGGER.info("Compressing package")
