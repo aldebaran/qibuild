@@ -63,6 +63,11 @@ class Package:
             res += " (depends on : %s)" %  " ".join(self.depends)
         return res
 
+    def __lt__(self, other):
+        if hasattr(other, 'name'):
+            return self.name < other.name
+        return self.name < other
+
 
 def get_tc_config_path():
     """ Return a suitable config path
@@ -119,7 +124,7 @@ class Toolchain(object):
         res  = "Toolchain %s\n" % self.name
         res += "  path: %s\n" % self.path
         if not self.cross:
-            res += "  packages:\n" + "\n".join([" " * 4  + x.name for x in self.packages])
+            res += "  packages:\n" + "\n".join([" " * 4  + x.name for x in sorted(self.packages)])
         return res
 
     def get(self, package_name):
