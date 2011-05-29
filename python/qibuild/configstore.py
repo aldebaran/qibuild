@@ -59,6 +59,7 @@ class ConfigStore:
         """
         value = kargs['value']
         element = self.root
+        keys = [k.strip("\"\'") for k in keys]
 
         for key in keys[:-1]:
             current = element.get(key, None)
