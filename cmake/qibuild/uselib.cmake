@@ -38,12 +38,14 @@ endfunction()
 
 #compute the dependencies list, removing duplicate
 #TODO: store computed dependencies in ${_U_PKG}_FLAT_DEPENDS ?
-function(_qi_use_lib_get_deps _OUT_list)
+function(_qi_use_lib_get_deps name _OUT_list)
   set(_result ${ARGN})
   list(LENGTH _result _count)
   if (_count EQUAL 0)
     return()
   endif()
+
+  string(TOUPPER ${name} _U_NAME)
 
   foreach(_pkg ${ARGN})
     string(TOUPPER ${_pkg} _U_PKG)
@@ -77,7 +79,7 @@ function(_qi_use_lib_get_deps _OUT_list)
       string(TOUPPER ${_sub_dep} _u_sub_dep)
       if (_is_present EQUAL -1)
         if (NOT ${_u_sub_dep}_FAT_DEPENDS)
-          _qi_use_lib_get_deps(_new_deps "${_sub_dep}")
+          _qi_use_lib_get_deps("${_U_PKG}" _new_deps "${_sub_dep}")
         else()
           set(_new_deps ${${_u_sub_dep}_FAT_DEPENDS})
         endif()
@@ -98,7 +100,7 @@ function(_qi_use_lib_get_deps _OUT_list)
 
   #why? because it will avoid many recursion. we store the complete dependencies of a project
   # in cache, and use that, instead of digging into deps by recursion.
-  qi_set_cache(${_U_PKG}_FAT_DEPENDS "${_result}")
+  qi_set_cache(${_U_NAME}_FAT_DEPENDS "${_result}")
   set(${_OUT_list} ${_result} PARENT_SCOPE)
 endfunction()
 
@@ -120,7 +122,7 @@ function(qi_use_lib name)
 
   set(ARG_DEPENDS ${ARG_UNPARSED_ARGUMENTS} ${ARG_DEPENDS})
 
-  _qi_use_lib_get_deps(_DEPS ${ARG_DEPENDS})
+  _qi_use_lib_get_deps("${name}" _DEPS ${ARG_DEPENDS})
 
   foreach(_pkg ${_DEPS})
     string(TOUPPER ${_pkg} _U_PKG)
