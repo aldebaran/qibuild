@@ -303,7 +303,7 @@ class Toc(QiWorkTree):
         # TODO: handle non asccii chars?
         # Hint: decode("mcbs") ...
         if not os.path.exists(bat_file):
-            raise BadBuildConfig("general.env.bat_file (%s) does not exists", bat_file)
+            raise BadBuildConfig("general.env.bat_file (%s) does not exists" % bat_file)
 
         interesting = set(("INCLUDE", "LIB", "LIBPATH", "PATH"))
         result = {}
