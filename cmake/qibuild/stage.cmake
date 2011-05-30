@@ -25,7 +25,7 @@ include(qibuild/internal/stage)
 # \group:DEFINITIONS list of compilation flags targets depending
 #                 of this library should use.
 # \group:PATH_SUFFIXES when your header is installed in foo/bar.h,
-#                 but you still need to do #include <bar/h>, you can
+#                 but you still need to do #include <bar.h>, you can
 #                 set PATH_SUFFIXES to 'foo'. Be careful to test the
 #                 intall rules of your headers if you choose to do so.
 function(qi_stage_lib target)

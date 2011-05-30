@@ -247,6 +247,7 @@ function(_qi_set_vars target)
     set(${_U_target}_PATH_SUFFIXES "" PARENT_SCOPE)
   endif()
 
+
 endfunction()
 
 
@@ -258,7 +259,7 @@ function(_qi_internal_stage_lib target)
   set(_new_args)
   foreach(_arg INCLUDE_DIRS DEFINITIONS PATH_SUFFIXES DEPENDS)
     if (DEFINED ARG_${_arg})
-      list(APPEND _new_args "ARG_${_arg}" "${ARG_${_arg}}")
+      list(APPEND _new_args "${_arg}" "${ARG_${_arg}}")
     endif()
   endforeach()
 
