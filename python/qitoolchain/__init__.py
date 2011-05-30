@@ -74,7 +74,7 @@ def get_tc_config_path():
 
     """
     # FIXME: deal with non-UNIX systems
-    config_path = os.path.expanduser("~/.config/qi/toolchain.cfg")
+    config_path = qibuild.sh.to_native_path("~/.config/qi/toolchain.cfg")
     return config_path
 
 def get_tc_path(toolchain_name):
@@ -82,7 +82,7 @@ def get_tc_path(toolchain_name):
 
     """
     # FIXME: deal with non-UNIX systems
-    res = os.path.expanduser("~/.local/share/qi")
+    res = qibuild.sh.to_native_path("~/.local/share/qi")
     res = os.path.join(res, "toolchains", toolchain_name)
     qibuild.sh.mkdir(res, recursive=True)
     return res
@@ -92,7 +92,7 @@ def get_tc_cache(toolchain_name):
 
     """
     # FIXME: deal with non-UNIX systems
-    cache_path = os.path.expanduser("~/.cache/qi")
+    cache_path = qibuild.sh.to_native_path("~/.cache/qi")
     res = os.path.join(cache_path, "toolchains", toolchain_name)
     qibuild.sh.mkdir(res, recursive=True)
     return res
