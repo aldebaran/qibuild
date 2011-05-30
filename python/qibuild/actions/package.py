@@ -22,7 +22,10 @@ def get_package_name(project, continuous=False, version=None, arch=None):
       arch       -> if not given, do nothing, else add this at the end
                     of the package name
     """
-    res = [project.name]
+    if project.package_name:
+        res = [project.package_name]
+    else:
+        res = [project.name]
 
     if not version:
         version = get_project_version(project)
@@ -92,6 +95,11 @@ def _do(args, build_type):
     project = toc.get_project(project_name)
     #TODO create package directory if it does not exit
     inst_dir = os.path.join(toc.work_tree, "package")
+
+    # quick hack, adding a 'package_name' attributes
+    # to the Project instance:
+    project.package_name = args.package_name
+
 
     package_name = get_package_name(
         project,

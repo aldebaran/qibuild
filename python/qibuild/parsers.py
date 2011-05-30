@@ -69,7 +69,10 @@ def package_parser(parser):
         "the package: linux, linux64, mac, windows-vs2008, etc...")
     group.add_argument("--runtime", action="store_true",
         help="Install runtime components only")
-    parser.set_defaults(continuous=False,
+    group.add_argument("--package-name", help="The package name, if you want "
+        "it to be different from the project name")
+    parser.set_defaults(
+        continuous=False,
         runtime=False)
 
 
