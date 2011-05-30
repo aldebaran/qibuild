@@ -145,18 +145,16 @@ class Toolchain(object):
         dest_mtime = os.stat(dest).st_mtime
         src_mtime  = os.stat(path).st_mtime
 
-        if src_mtime < dest_mtime:
-            LOGGER.info("Skipping up to date package: %s", name)
-            return
-
-        LOGGER.info("Adding package %s",name)
-        with qibuild.sh.TempDir() as tmp:
-            extracted = qibuild.archive.extract(path, tmp)
-            if os.path.exists(dest):
-                qibuild.sh.rm(dest)
-            qibuild.sh.mv(extracted, dest)
+        if src_mtime > dest_mtime:
+            LOGGER.info("Extracting package %s", name)
+            with qibuild.sh.TempDir() as tmp:
+                extracted = qibuild.archive.extract(path, tmp)
+                if os.path.exists(dest):
+                    qibuild.sh.rm(dest)
+                qibuild.sh.mv(extracted, dest)
         new_package = Package(name)
         matches = [p for p in self.packages if p.name == name]
+        LOGGER.info("Adding package %s",name)
         if not matches:
             self.packages.append(new_package)
         self.update_tc_provides()
