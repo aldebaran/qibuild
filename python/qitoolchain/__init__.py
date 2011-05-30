@@ -141,11 +141,16 @@ class Toolchain(object):
 
         """
         # Rename package once it is extracted:
+        should_skip = False
         dest = os.path.join(self.path, name)
-        dest_mtime = os.stat(dest).st_mtime
-        src_mtime  = os.stat(path).st_mtime
-
-        if src_mtime > dest_mtime:
+        if not os.path.exists(dest):
+            should_skip = False
+        else:
+            dest_mtime = os.stat(dest).st_mtime
+            src_mtime  = os.stat(path).st_mtime
+            if src_mtime < dest_mtime:
+                should_skip = True
+        if not should_skip:
             LOGGER.info("Extracting package %s", name)
             with qibuild.sh.TempDir() as tmp:
                 extracted = qibuild.archive.extract(path, tmp)
