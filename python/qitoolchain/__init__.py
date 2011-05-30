@@ -140,11 +140,18 @@ class Toolchain(object):
         """Add a package given its name and its path
 
         """
+        # Rename package once it is extracted:
+        dest = os.path.join(self.path, name)
+        dest_mtime = os.stat(dest).st_mtime
+        src_mtime  = os.stat(path).st_mtime
+
+        if src_mtime < dest_mtime:
+            LOGGER.info("Skipping up to date package: %s", name)
+            return
+
         LOGGER.info("Adding package %s",name)
         with qibuild.sh.TempDir() as tmp:
             extracted = qibuild.archive.extract(path, tmp)
-            # Rename package once it is extracted:
-            dest = os.path.join(self.path, name)
             if os.path.exists(dest):
                 qibuild.sh.rm(dest)
             qibuild.sh.mv(extracted, dest)
