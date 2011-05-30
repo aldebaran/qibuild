@@ -77,13 +77,13 @@ function(qi_stage_cmake module_file)
   # foo/bar/bazConfig.cmake, and we need to install it to
   # share/cmake/baz/baz-config.cmake
 
-  string(REGEX MATCH "-config\\.cmake$" _match ${_basename})
+  string(REGEX MATCH "-config\\.cmake$" _match "${_basename}")
   if(_match)
     string(REPLACE "-config.cmake" "" _module_name "${_basename}")
   else()
-    string(REGEX MATCH "Config\\.cmake" _match ${_basename})
+    string(REGEX MATCH "Config\\.cmake" _match "${_basename}")
     if(_match)
-      string(REPLACE "Config.cmake" "" _module_name {_basename})
+      string(REPLACE "Config.cmake" "" _module_name "${_basename}")
     else()
       qi_error("
         Could not stage ${module_file}:
