@@ -378,7 +378,7 @@ class Toc(QiWorkTree):
             raise ConfigureFailed(project)
 
 
-    def build_project(self, project, incredibuild=False, num_jobs=1, target=None):
+    def build_project(self, project, incredibuild=False, num_jobs=1, target=None, rebuild=False):
         """Build a project, choosing between  Nmake, Visual Studio or make
 
         """
@@ -390,6 +390,9 @@ class Toc(QiWorkTree):
         cmd = ["cmake", "--build", build_dir, "--config", self.build_type]
         if target:
             cmd += ["--target", target]
+
+        if rebuild:
+            cmd += ["--clean-first"]
 
         # In order to use incredibuild, we have to do this small hack:
         if self.using_visual_studio:

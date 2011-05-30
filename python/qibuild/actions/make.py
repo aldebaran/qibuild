@@ -14,6 +14,7 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     parser.add_argument("--target", help="Special target to build")
+    parser.add_argument("--rebuild", "-r", action="store_true", default=False)
 
 def do(args):
     """Main entry point"""
@@ -38,7 +39,7 @@ def do(args):
         else:
             logger.info("Building %s in %s", project.name, toc.build_folder_name)
         toc.build_project(project, target=args.target, num_jobs=args.num_jobs,
-            incredibuild=use_incredibuild)
+            incredibuild=use_incredibuild, rebuild=args.rebuild)
 
 
 
