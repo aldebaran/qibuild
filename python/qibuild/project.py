@@ -15,18 +15,23 @@ class Project:
          - build directory
          - build configuration
          - dependencies
+         - configstore (read from the qibuild.manifest file from the
+                        source directory)
     """
     def __init__(self, name, directory):
         self.name            = name
         self.directory       = directory
         self.depends         = list()
         self.rdepends        = list()
+        self.configstore     = qibuild.configstore.ConfigStore()
 
         #build related flags
         self.cmake_flags     = list()
         self.build_directory = None
         self.sdk_directory   = None
         self._custom_sdk_dir = False
+
+        self.load_config()
 
     def get_sdk_dir(self):
         """ Return the SDK dir of the project.
@@ -36,10 +41,12 @@ class Project:
         """
         return os.path.join(self.build_directory, "sdk")
 
-    def update_depends(self, toc):
+    def load_config(self):
         """ Update project dependency list """
-        deps  = toc.configstore.get("project", self.name, "depends", default="").split()
-        rdeps = toc.configstore.get("project", self.name, "rdepends", default="").split()
+        qibuild_manifest = os.path.join(self.directory, "qibuild.manifest")
+        self.configstore.read(qibuild_manifest)
+        deps  = self.configstore.get("project", self.name, "depends", default="").split()
+        rdeps = self.configstore.get("project", self.name, "rdepends", default="").split()
         self.depends.extend(deps)
         self.rdepends.extend(rdeps)
 
@@ -49,9 +56,10 @@ class Project:
            - add flags from the project config (read in toc's configstore project section)
            - add flags from the command line (stored in toc.cmake_flags when toc is built)
         """
+        LOGGER.debug("[%s]: Updating build config", self.name)
 
         #handle custom global build directory containing all projects
-        singlebdir = toc.configstore.get("general", "build", "build_dir", default=None)
+        singlebdir = toc.configstore.get("build", "build_dir", default=None)
         if singlebdir:
             if not os.path.isabs(singlebdir):
                 singlebdir = os.path.join(toc.work_tree, singlebdir)
@@ -61,24 +69,16 @@ class Project:
             bname = "build-%s" % (build_directory_name)
             self.build_directory = os.path.join(self.directory, bname)
 
-        build_config_flags = toc.configstore.get("general", "build", "cmake", "flags",
-            default=None)
-        if build_config_flags:
-            self.cmake_flags.extend(shlex.split(build_config_flags))
-
-        project_flags = toc.configstore.get("project", self.name, "cmake", "flags",
-            default=None)
-        if project_flags:
-            self.cmake_flags.extend(shlex.split(project_flags))
-
         if toc.build_type:
             self.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (toc.build_type.upper()))
 
         if toc.cmake_flags:
             self.cmake_flags.extend(toc.cmake_flags)
 
+        LOGGER.debug("[%s]: cmake flags: %s", self.name, self.cmake_flags)
+
         #handle single sdk dir
-        sdk_dir = toc.configstore.get("general", "build", "sdk_dir", default=None)
+        sdk_dir = toc.configstore.get("build", "sdk_dir", default=None)
         if sdk_dir:
             if os.path.isabs(sdk_dir):
                 self.sdk_directory = sdk_dir
@@ -92,6 +92,7 @@ class Project:
             #normal sdk dir in buildtree
             self.sdk_directory   = os.path.join(self.build_directory, "sdk")
 
+
     def set_custom_build_directory(self, build_dir):
         """ could be used to override the default build_directory
         """
@@ -100,6 +101,7 @@ class Project:
         #detect single sdk directory for multiple projects
         if self._custom_sdk_dir == False:
             self.sdk_directory = os.path.join(self.build_directory, "sdk")
+
 
     def __str__(self):
         res = ""

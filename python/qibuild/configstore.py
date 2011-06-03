@@ -31,11 +31,36 @@ You can use:
 
 """
 
+import re
 import os
 import logging
 import ConfigParser
 
 import qibuild
+
+
+def get_config_dir():
+    """ Get a suitable directory to find all the
+    config files
+
+    """
+    # TODO: handle non-UNIX platforms?
+    root = qibuild.sh.to_native_path("~/.config/qi")
+    qibuild.sh.mkdir(root, recursive=True)
+    return root
+
+def get_config_path(config=None):
+    """ Get a writeable path associated with a
+    given config
+
+    """
+    root = get_config_dir()
+    if config:
+        filename = "qibuild-%s.cfg" % config
+    else:
+        filename = "qibuild.cfg"
+    return os.path.join(root, filename)
+
 
 class ConfigException(Exception):
     def __init__(self, *args):
@@ -86,6 +111,8 @@ class ConfigStore:
 
     def __str__(self, pad=True):
         """ print the list of keys/values """
+        if not self.root:
+            return "None"
         configdict = self.list_child()
         output     = ""
 
@@ -177,4 +204,5 @@ def update_config(config_path, section, name, key, value):
     qibuild.sh.mkdir(os.path.dirname(config_path), recursive=True)
     with open(config_path, "w") as config_file:
         parser.write(config_file)
+
 

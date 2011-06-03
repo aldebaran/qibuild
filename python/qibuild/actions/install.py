@@ -132,7 +132,6 @@ def do(args):
     if package_names:
         LOGGER.info("Installing %s to %s", ", ".join([p for p in package_names]), dest)
     for package_name in package_names:
-        toolchain = qitoolchain.Toolchain(toc.toolchain_name)
-        package_src = toolchain.get(package_name)
+        package_src = toc.toolchain.get(package_name)
         install_package(package_src, dest, runtime=args.runtime)
 

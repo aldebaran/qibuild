@@ -242,3 +242,32 @@ Please exchange the following lines:
             include_line=lines[include_line_number],
             project_line=lines[project_line_number])
         LOGGER.warning(mess)
+
+
+
+
+def parse_cmake(cmake_file):
+    """Parse a file looking like:
+
+    set(FOO BAR)
+    set(SPAM "eggs")
+
+    Return a list of cmake flags
+    ["FOO=BAR", "SPAM=eggs"]
+
+    """
+    # FIXME: get rid of this hack, and use plain ConfigParser
+    # files instead?
+    with open(cmake_file, 'r') as fp:
+        contents = fp.read()
+
+    matches = re.findall('set\s*\((.*)\)\s*', contents, re.IGNORECASE)
+
+    res = list()
+    for match in matches:
+        match = match.strip()
+        key = match.split(' ')[0]
+        value = ' '.join(match.split(' ')[1:])
+        res.append("%s=%s" % (key, value))
+
+    return res

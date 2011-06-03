@@ -54,8 +54,7 @@ def ask_toolchain():
     config_file = qitoolchain.get_tc_config_path()
     config = qibuild.configstore.ConfigStore()
     config.read(config_file)
-    toolchain_dict = config.get("toolchain", default=dict())
-    toolchain_names = toolchain_dict.keys()
+    toolchain_names = qitoolchain.get_toolchain_names()
     return qibuild.interact.ask_choice(toolchain_names, "Choose a toolchain name")
 
 def create_toolchain():
@@ -75,7 +74,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     work_tree = qibuild.qiworktree.worktree_from_args(args)
-    build_cfg = qibuild.qiworktree.get_user_config_path()
+    build_cfg = qibuild.configstore.get_config_path()
     should_run = False
     if os.path.exists(build_cfg) and args.interactive:
         try:
@@ -124,7 +123,5 @@ def run_wizard(build_cfg):
         else:
             toolchain_name = ask_toolchain()
 
-    qibuild.configstore.update_config(build_cfg,
-        "general", "build", "cmake_generator", cmake_generator)
-    qibuild.configstore.update_config(build_cfg,
-        "general", "build", "toolchain", toolchain_name)
+    qibuild.configstore.update_config(build_cfg, "build", "cmake_generator", cmake_generator)
+    qibuild.configstore.update_config(build_cfg, "build", "toolchain", toolchain_name)

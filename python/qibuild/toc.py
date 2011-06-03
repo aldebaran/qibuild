@@ -11,7 +11,6 @@ import glob
 import platform
 import subprocess
 import logging
-import qibuild.configstore
 import qibuild.qiworktree
 
 import qibuild
@@ -70,6 +69,86 @@ class InstallFailed(Exception):
     def __str__(self):
         return "Error occured when installing project %s" % self.project.name
 
+class TocConfigStore:
+    """ A configuration associated with a Toc object..
+
+    Pass a toc Object to its constructor, and optionnaly
+    a custom config to use, then use get() as you would do
+    for a ConfigStore object, the setting from the
+    [general]  and  [config '...'] sections will be merged
+    for you.
+
+    """
+    def __init__(self, toc, user_config=None):
+
+        # A internal configstore object
+        self._configstore = qibuild.configstore.ConfigStore()
+
+        # Read from config files
+        self.default_config = None
+
+        # The config that is being used
+        self.active_config = None
+
+        self.toc = toc
+        self._load_config()
+        if user_config:
+            self.active_config = user_config
+        else:
+            self.active_config = self.default_config
+
+    def _load_config(self):
+        """ Initialize the configstore attribute,
+        and the default configuration.
+
+        """
+        general_file = qibuild.configstore.get_config_path()
+        self._configstore.read(general_file)
+
+        local_file = os.path.join(self.toc.work_tree, ".qi", "qibuild.cfg")
+        self._configstore.read(local_file)
+
+        self.default_config = self._configstore.get('general', 'config')
+
+    def get(self, *args, **kwargs):
+        """ Handle different configurations, for instance, assuming the
+        configuration looks like:
+
+          [general]
+          build.cmake.flags = FOO=BAR
+          config = mingw32
+
+          [config vs2010]
+          build.cmake.generator = 'Visual Studio 10'
+
+          [config mingw32]
+          build.cmake.generator = 'MinGW Makefiles'
+          env.path = c:\MinGW\bin;
+
+        and self.config = 'vs2010'
+        self.get('build, 'cmake', 'generator')
+        returns 'Visual Studio 10',
+
+        whereas
+        self.get('build', 'cmake', 'flags')
+        returns 'FOO=BAR'
+
+        """
+        default = kwargs.get('default')
+        res = self._configstore.get('config', self.active_config, *args)
+        if not res:
+            res = self._configstore.get('general', *args)
+
+        if not res:
+            res = default
+
+        return res
+
+    def __str__(self):
+        return str(self._configstore)
+
+
+
 class Toc(QiWorkTree):
     """This class contains a list of packages, and a list of projects.
 
@@ -85,7 +164,7 @@ class Toc(QiWorkTree):
         toc = Toc("/path/to/work/tree", "release", ...)
         # Look for the foo project in the worktree
         foo = toc.get_project("foo")
-        # Resolve foo dependencies, call cmake on each on then,
+        # Resolve foo dependencies, call cmake on each of them,
         toc.configure_project(foo)
         # Build the foo project, building all the dependencies in
         # the correct order:
@@ -97,20 +176,32 @@ class Toc(QiWorkTree):
             config=None,
             build_type="debug",
             cmake_flags=None,
-            cmake_generator=None,
-            toolchain_name=None):
+            cmake_generator=None):
         """
             work_tree       : see QiWorkTree.__init__
-            config          : see QiWorkTree.__init__
             path_hints      : see QiWorkTree.__init__
 
             build_type      : a build type, could be debug or release (defaults to debug)
             cmake_flags     : optional additional cmake flags
             cmake_generator : optional cmake generator (defaults to Unix Makefiles)
         """
-        QiWorkTree.__init__(self, work_tree, path_hints=path_hints, config=config)
+        QiWorkTree.__init__(self, work_tree, path_hints=path_hints)
+
+        # User set a configuration, use it, then build
+        # the configstore
+        self.configstore = TocConfigStore(self, config)
+        if config:
+            self.active_config = config
+        else:
+            self.active_config = self.configstore.default_config
+
         self.build_type        = build_type
-        self.cmake_flags       = cmake_flags
+
+        # The cmake flags set by the user will always be added
+        # to the actual cmake flags used by the Toc oject,
+        # but we may add other flags when using a toolchain.
+        # see self.update_cmake_flags()
+        self.cmake_flags       = list()
         self.cmake_generator   = cmake_generator
         self.build_folder_name = None
 
@@ -121,32 +212,40 @@ class Toc(QiWorkTree):
         # this is updated using QiWorkTree.buildable_projects
         self.projects          = list()
 
-        # List of objects of type qitoolchain.toolchain.Packages,
-        # this is updated by the use_toolchain() function
-        self.packages          = list()
-
         # Set cmake generator
         if not self.cmake_generator:
-            self.cmake_generator = self.configstore.get("general", "build" ,
+            self.cmake_generator = self.configstore.get("build" ,
                     "cmake_generator", default="Unix Makefiles")
 
-        self.using_system = True
-        self.cross = False
-        self.toolchain_name = toolchain_name
-        self.toolchain_file = None
-        if toolchain_name is None:
-            # Maybe ther is a toolchain name in the configuration:
-            toolchain_name = self.configstore.get("general", "build", "toolchain", default=None)
-            if toolchain_name:
-                # Update self.packages, self.toolchain_file
-                # and self.cross
-                LOGGER.info("Using toolchain %s", toolchain_name)
-                self.use_toolchain(toolchain_name)
+        # Read the current config, create toolchain and pacakges object
+        # if necessary
+        self.packages = list()
+        self.toolchain = None
+        if self.active_config is not None:
+            if self.active_config in qitoolchain.get_toolchain_names():
+                self.toolchain = qitoolchain.Toolchain(self.active_config)
+                self.packages  = self.toolchain.packages
+            else:
+                # The config does not match a toolchain (but who knows,
+                # this may be only some cmake flags in a specific section
+                # for instance :
+                #   [config perf]
+                #   cmake.flags = WITH_TEST=OFF WITH_PERF=ON
+                pass
 
         # Useful vars to cope with Visual Studio quirks
         self.using_visual_studio = "Visual Studio" in self.cmake_generator
         self.vc_version = self.cmake_generator.split()[-1]
 
+        # Actual list of cmake flags we are going to use.
+        # * the toolchain file if a toolchain is used
+        # * additional cmake flags from the *.cmake config files
+        # * and the flags set by the user.
+        self.cmake_flags = self.compute_cmake_flags(cmake_flags)
+
+        # Finally, update the build configuration of all the projects
+        # (this way we are sure that the build configuration is the same for
+        # every project)
         self.update_projects()
 
 
@@ -165,23 +264,49 @@ class Toc(QiWorkTree):
         for pname, ppath in self.buildable_projects.iteritems():
             project = Project(pname, ppath)
             project.update_build_config(self, self.build_folder_name)
-            project.update_depends(self)
             self.projects.append(project)
 
 
+    def compute_cmake_flags(self, user_flags):
+        """ The cmake flags used by toc comes for several source:
+        - if a toolchain is used, add
+           -DCMAKE_TOOLCHAIN_FILE = toolchain.toolchain_file
+        - if ~/.config/qi/<tc_name>.cmake exist, parse the file and add flags
+        - same thing for ~/.qi/<tc_name>.cmake
 
-    def use_toolchain(self, toolchain_name):
-        """Given a toolchain file name,
-        construct a QiToolchain object and update
-        self.packages, self.toolchain_file,
-        and self.cross
+        Finally, add user_cmake_flags (which are the flags set by the user,
+        passed to Toc ctor.
 
         """
-        toolchain = qitoolchain.Toolchain(toolchain_name)
-        self.toolchain_name = toolchain_name
-        self.packages = toolchain.packages
-        self.toolchain_file = toolchain.toolchain_file
-        self.cross = toolchain.cross
+        if not self.toolchain:
+            if user_flags:
+                return user_flags
+            else:
+                return list()
+
+        res = list()
+        tc_file = self.toolchain.toolchain_file
+        tc_name = self.toolchain.name
+        tc_file = qibuild.sh.to_posix_path(tc_file)
+        res.append("CMAKE_TOOLCHAIN_FILE=%s" % tc_file)
+
+        global_cmake = os.path.join(qibuild.configstore.get_config_dir(),
+            "%s.cmake" % tc_name)
+        if os.path.exists(global_cmake):
+            to_add = qibuild.parse_cmake(global_cmake)
+            LOGGER.debug("Adding flags from %s : %s", global_cmake, ", ".join(to_add))
+            res.extend(to_add)
+
+        local_cmake = os.path.join(self.work_tree, ".qi", "%s.cmake" % tc_name)
+        if os.path.exists(local_cmake):
+            to_add = qibuild.parse_cmake(local_cmake)
+            LOGGER.debug("Adding flags from %s : %s", local_cmake, ", ".join(to_add))
+            res.extend(to_add)
+
+        if user_flags:
+            res.extend(user_flags)
+
+        return res
 
 
     def set_build_folder_name(self):
@@ -195,10 +320,10 @@ class Toc(QiWorkTree):
         """
         res = list()
 
-        if self.toolchain_name is None or self.toolchain_name == "system":
+        if self.toolchain is None:
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
         else:
-            res.append(self.toolchain_name)
+            res.append(self.toolchain.name)
 
         if not self.using_visual_studio and self.build_type != "debug":
             # When using cmake + visual studio, sharing the same build dir with
@@ -240,7 +365,7 @@ class Toc(QiWorkTree):
         (project_names, package_names, not_found) = dep_solver.solve([project_name])
 
         if not_found:
-            if not (self.using_system or self.cross):
+            if self.toolchain is None or self.toolchain.cross:
                 LOGGER.warning("Could not find projects %s", ", ".join(not_found))
 
         project_names.remove(project_name)
@@ -260,7 +385,7 @@ class Toc(QiWorkTree):
         """Update os.environ using the qibuild configuration file
 
         """
-        env = self.configstore.get("general", "env")
+        env = self.configstore.get("build", "env")
         path = None
         bat_file = None
         if env:
@@ -327,7 +452,7 @@ class Toc(QiWorkTree):
         os.environ.update(result)
 
 
-    def configure_project(self, project, toolchain_file=None, clean_first=True):
+    def configure_project(self, project, clean_first=True):
         """ Call cmake with correct options
 
         Note: the cmake flags (CMAKE_BUILD_TYPE, or the -D args coming
@@ -355,9 +480,15 @@ class Toc(QiWorkTree):
 
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
+        if self.toolchain is not None:
+            tc_file = self.toolchain.toolchain_file
+            toolchain_path = qibuild.sh.to_posix_path(tc_file)
+            
+        cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
 
-        env = os.environ.copy()
+
         #remove sh.exe from path on win32, because cmake will fail when using mingw generator.
+        env = os.environ.copy()
         if "MinGW" in self.cmake_generator:
             paths = os.environ["PATH"].split(os.pathsep)
             paths_withoutsh = list()
@@ -366,9 +497,6 @@ class Toc(QiWorkTree):
                     paths_withoutsh.append(p)
             env["PATH"] = os.pathsep.join(paths_withoutsh)
 
-        if self.toolchain_file:
-            toolchain_path = qibuild.sh.to_posix_path(self.toolchain_file)
-            cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
         try:
             qibuild.cmake(project.directory,
                           project.build_directory,
@@ -483,7 +611,6 @@ class Toc(QiWorkTree):
 def toc_open(work_tree, args, use_env=False):
     config   = args.config
     build_type     = args.build_type
-    toolchain_name = args.toolchain_name
     path_hints     = list()
     try:
         cmake_flags = args.cmake_flags
@@ -515,7 +642,6 @@ def toc_open(work_tree, args, use_env=False):
     return Toc(work_tree,
                config=config,
                build_type=build_type,
-               toolchain_name=toolchain_name,
                cmake_flags=cmake_flags,
                cmake_generator=cmake_generator,
                path_hints=path_hints)

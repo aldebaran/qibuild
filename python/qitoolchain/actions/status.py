@@ -17,9 +17,8 @@ def configure_parser(parser):
 
 def do(args):
     """ Main method """
-    config = qibuild.configstore.ConfigStore()
-    config.read(qitoolchain.get_tc_config_path())
-    for toolchain_name in config.get("toolchain", default=dict()).keys():
-        toolchain = qitoolchain.Toolchain(toolchain_name)
+    tc_names = qitoolchain.get_toolchain_names()
+    for tc_name in tc_names:
+        toolchain = qitoolchain.Toolchain(tc_name)
         print toolchain
         print

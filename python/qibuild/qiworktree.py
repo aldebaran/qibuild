@@ -27,7 +27,6 @@ have different configurations with different work trees if you need.
 import os
 import logging
 from qibuild.cmdparse    import default_parser
-from qibuild.configstore import ConfigStore
 import qibuild.sh
 
 LOGGER = logging.getLogger("QiWorkTree")
@@ -58,25 +57,6 @@ def work_tree_parser(parser):
     """
     default_parser(parser)
     parser.add_argument("--work-tree", help="Use a specific work tree path.")
-    parser.add_argument("-c", "--config",
-        help="Build configuration to use. "
-             "A corresponding .qi/build-<name>.cfg file should exist.")
-
-
-def get_user_config_path(config_name=None):
-    """ Get the path to the user config path
-    ~/.config/qi/qibuild.cfg on UNIX
-
-    If config_name is None, resturn
-     ~/.config/qi/qibuild-NAME.cfg,
-
-    """
-    # FIXME: deal with non-UNIX systems ?
-    base_cfg = qibuild.sh.to_native_path("~/.config/qi")
-    if config_name:
-        return os.path.join(base_cfg, "qibuild-%s.cfg" % config_name)
-    else:
-        return os.path.join(base_cfg, "qibuild.cfg")
 
 
 class QiWorkTree:
@@ -87,19 +67,17 @@ class QiWorkTree:
         - git projects
     """
 
-    def __init__(self, work_tree, path_hints=None, config=None):
+    def __init__(self, work_tree, path_hints=None):
         self.work_tree          = work_tree
-        self.configstore        = ConfigStore()
+
         self.buildable_projects = dict()
         self.git_projects       = dict()
-        self.user_config_path   = get_user_config_path()
 
         if not path_hints:
             path_hints = list()
         if self.work_tree not in path_hints:
             path_hints.append(self.work_tree)
         self._load_projects(path_hints)
-        self._load_configuration(config)
 
     def _load_projects(self, path_hints):
 
@@ -148,47 +126,16 @@ class QiWorkTree:
                 else:
                     self.git_projects[os.path.basename(d)] = d
 
-    def _load_configuration(self, config=None):
-        """Initialize self.configstore, reading files in this order:
-          - the qibuild.manifest in the projects
-          - common config files for all work trees: ~/.config/qi/qibuild.cfg
-          - named config file   for all work trees: ~/.config/qi/qibuild-<name>.cfg
-          - config file for this work tree  only  : QI_WORK_TREE/.qi/build.cfg
-        """
 
-        for _name, ppath in self.buildable_projects.iteritems():
-            self.configstore.read(os.path.join(ppath, "qibuild.manifest"))
-
-        #read ~/.config/qi/qibuild.cfg
-        self.configstore.read(self.user_config_path)
-        #read work_tree/.qi/qibuild.cfg
-        self.configstore.read(os.path.join(self.work_tree, ".qi", "qibuild.cfg"))
-
-        if not config:
-            # try to read the default config name from the config:
-            config = self.configstore.get("general", "build", "config", default=None)
-        if config:
-            custom_path = get_user_config_path(config)
-            if not os.path.exists(custom_path):
-                LOGGER.warning("Failed to read custom config file\n"
-                    "Looked in %s", custom_path)
-            else:
-                self.configstore.read(custom_path)
-        LOGGER.debug("[Qi] worktree configuration:\n" + str(self.configstore))
-
-def qiworktree_open(work_tree=None, use_env=False, config=None):
+def qiworktree_open(work_tree=None, use_env=False):
     """ Open a qi worktree.
 
         Return a valid QiWorkTree instance.
 
         The QiWorkTree instance will have the following important members
         initialized:
-         qiwt.projects  : a list of Project instance
-         qiwt.configstore: a ConfigStore object obtained by reading the following files:
-            ~/.config/qi/qibuild.cfg
-            worktree/.qi/build.cfg
-            worktree/.qi/build-<config>.cfg (if a config argument was given)
-        in this order.
+         qiwt.buildable_projects  : a list of Project instances
+         qiwt.git_projects        : al list of git repositories
 
         If worktree is None, guess it from the current working dir.
     """
@@ -227,7 +174,7 @@ def qiworktree_open(work_tree=None, use_env=False, config=None):
             " - try from a valid work tree\n"
             " - specify an existing work tree with \"--work-tree PATH\"\n"
             " - create a new work tree with \"qibuild init\"")
-    return QiWorkTree(work_tree, path_hints=path_hints, config=config)
+    return QiWorkTree(work_tree, path_hints=path_hints)
 
 def search_current_project_root(working_directory):
     cwd = _search_manifest_directory(working_directory)

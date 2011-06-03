@@ -10,13 +10,17 @@ def toc_parser(parser):
     """ Parser settings for every action using a toc dir
     """
     qibuild.qiworktree.work_tree_parser(parser)
+    parser.add_argument('-c', '--config',
+        help='The configuration to use. '
+             'If a toolchain exists with the same name '
+             'exists it will be used. '
+             'The settings from [config "<name>"] sections will '
+             'also be used')
 
 def build_parser(parser):
     """ Parser settings for every action doing builds
     """
     group = parser.add_argument_group("build configuration arguments")
-    # group.add_argument("--cross", action="store_true", help="Cross compile")
-    # group.add_argument("--ctc--path", dest="ctc_path", help="Cross toolchain path")
     group.add_argument("--release", action="store_const", const="release",
         dest="build_type",
         help="Build in release (set CMAKE_BUILD_TYPE=RELEASE)")
@@ -26,16 +30,11 @@ def build_parser(parser):
     group.add_argument("--build-type", action="store",
         dest="build_type",
         help="CMAKE_BUILD_TYPE usually DEBUG or RELEASE")
-    group.add_argument("--toolchain-name",  action="store",
-        dest="toolchain_name",
-        help="Use a specific toolchain name. "
-             "You shoul have called `qitoolchain install' first before using this option")
     group.add_argument("--cmake-generator", action="store",
         help="Specify the CMake generator")
     group.add_argument("-j", dest="num_jobs", type=int, help="Number of jobs to use")
-    parser.set_defaults(cross=False, debug=True)
+    parser.set_defaults(debug=True)
     parser.set_defaults(num_jobs=1)
-    parser.set_defaults(toolchain_file=None)
     parser.set_defaults(build_type="debug")
 
 def project_parser(parser):

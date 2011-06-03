@@ -11,10 +11,9 @@ Then you can use your toolchain with:
     qibuild -c NAME build
 
 
-You can edit the .qi/build-NAME.cfg file if you wish.
+You can edit the .qi/qibuild-NAME.cfg file if you wish.
 """
 
-import os
 import logging
 import qibuild
 import qitoolchain
@@ -49,19 +48,15 @@ def do(args):
         qibuild.configstore.update_config(tc_cfg,
             "toolchain", tc_name, "cross", "yes")
 
-    cfg_path = qibuild.qiworktree.get_user_config_path(tc_name)
-    qibuild.configstore.update_config(cfg_path,
-        "general", "build", "toolchain", tc_name)
+    cfg_path = qibuild.configstore.get_config_path(tc_name)
 
     if args.generator:
         qibuild.configstore.update_config(cfg_path,
-            "general", "build", "cmake_generator", args.generator)
+            "build", "cmake_generator", args.generator)
 
     if not args.default:
         LOGGER.info("Now try using `qibuild -c %s'", tc_name)
         return
 
-    cfg_path = qibuild.qiworktree.get_user_config_path()
-    qibuild.configstore.update_config(cfg_path,
-        "general", "build", "config", tc_name)
+    qibuild.configstore.update_config(cfg_path, "build", "config", tc_name)
     LOGGER.info("Now using %s toolchain by default", tc_name)

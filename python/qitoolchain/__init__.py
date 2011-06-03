@@ -98,6 +98,18 @@ def get_tc_cache(toolchain_name):
     return res
 
 
+def get_toolchain_names():
+    """ Return the list of all known toolchains
+
+    """
+    config = qibuild.configstore.ConfigStore()
+    config.read(get_tc_config_path())
+    tc_config = config.get("toolchain")
+    if tc_config is None:
+        return []
+    return tc_config.keys()
+
+
 class Toolchain(object):
     """ The Toolchain class has a name and a list of packages.
 
