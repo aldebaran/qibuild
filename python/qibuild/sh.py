@@ -118,7 +118,7 @@ def _handle_files(src, dest, root, files, filter):
             _copy_link(fsrc, fdest)
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
-                raise Exception("Expecting a file but found a directory: %s" % ddest)
+                raise Exception("Expecting a file but found a directory: %s" % fdest)
             shutil.copy(fsrc, fdest)
 
 
@@ -149,6 +149,8 @@ def install(src, dest, filter=None):
     src  = to_native_path(src)
     dest = to_native_path(dest)
     LOGGER.debug("Installing %s -> %s", src, dest)
+    #pylint: disable-msg=E0102
+    # (function IS already defined, that's the point!)
     if filter is None:
         def filter(filename):
             return True

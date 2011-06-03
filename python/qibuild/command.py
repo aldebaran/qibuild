@@ -242,4 +242,6 @@ def call_background(script_path, args, environ=None):
         except ProcessCrashedError, err:
             caught_error = err
     if caught_error:
+    #pylint: disable-msg=E0702
+    #(we are not going to raise None...)
         raise caught_error

@@ -12,6 +12,7 @@ LOGGER = logging.getLogger(__name__)
 
 def ask_cmake_generator():
     """Ask the user to choose a cmake generator """
+    out = ""
     try:
         cmake_process = subprocess.Popen(["cmake"], stdout=subprocess.PIPE)
         (out, _err) = cmake_process.communicate()
