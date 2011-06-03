@@ -143,7 +143,7 @@ class DependenciesSolver:
     """This class is able to resolve dependencies between projects
 
     """
-    logger = logging.getLogger("dependencies solver")
+    logger = logging.getLogger(__name__)
 
     def __init__(self, projects=None, packages=None):
         self.projects = list()
@@ -168,8 +168,18 @@ class DependenciesSolver:
 
         project_names = [p.name for p in self.projects]
         package_names = [p.name for p in self.packages]
-        self.logger.debug("projects: %s", ",".join(project_names))
-        self.logger.debug("packages :%s", ",".join(package_names))
+
+        mess  = "Solving deps...\n"
+        mess += "Projects:\n"
+        for project in self.projects:
+            mess += "  " + project.name + "\n"
+            mess += "   deps: " +  ",".join(project.depends) + "\n"
+            mess += "  rdeps: " +  ",".join(project.depends) + "\n"
+        mess += "Packages:\n"
+        for package in self.packages:
+            mess += "  " + package.name + "\n"
+
+        self.logger.debug(mess)
 
         if all:
         # Pretend the user has asked for all the known projects
@@ -198,9 +208,9 @@ class DependenciesSolver:
             to_sort[package.name] = package.depends
 
         if runtime:
-            self.logger.debug("sorting runtime projects: %s", ",".join(to_sort))
+            self.logger.debug("Sorting runtime projects: %s", ",".join(to_sort))
         else:
-            self.logger.debug("sorting buildable projects: %s", ",".join(to_sort))
+            self.logger.debug("Sorting buildable projects: %s", ",".join(to_sort))
         sorted_names = topological_sort(to_sort, names)
 
         # Append what is left in sorted names, looking first in
@@ -217,7 +227,12 @@ class DependenciesSolver:
                 r_not_found.append(name)
 
         res = (r_projects, r_packages, r_not_found)
-        self.logger.debug("result: %s", res)
+
+        mess  =  "Sorting result:\n"
+        mess +=  "  projects:  " + ",".join(r_projects)  + "\n"
+        mess +=  "  packages:  " + ",".join(r_packages)  + "\n"
+        mess +=  "  not_found: " + ",".join(r_not_found) + "\n"
+        self.logger.debug(mess)
         return res
 
 if __name__ == "__main__":
