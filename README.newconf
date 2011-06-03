@@ -1,0 +1,186 @@
+What we would like to have:
+==========================
+
+
+1. Handling different IDE.
+
+qibuild configure --vs2010  foo
+qibuild make --vs2010 foo
+qibuild open --vs2010       ?
+
+
+(Don't like this very much)
+
+
+We want a global file containing:
+ - The path settings  (path to SWIG for instance)
+ - The prefered IDE ?
+ - The prefered CMake Generator (maybe decuded from the IDE?)
+
+
+2. Using toolchain and cross-toolchain
+
+Using:
+
+  qidev update-toolchain linux32 ftp://feeds/linux32.feed --default
+  qibuild configure
+
+Or:
+  qidev update-ctc
+  qibuild configure -c cross-geode
+
+
+Looks like a nice way to use qibuild with a toolchain.
+
+'-c' means 'configuration'.
+
+You can have specific config files associated with specific toolchains
+
+
+
+3. Custom cmake flags
+
+That's where the fun *really* begins.
+
+Sometimes we want flag only for a particular toolchain:
+
+
+###
+toolchain = linux32-python-sdk
+
+[project naoqi]
+cmake.flags = BUILDCONFIG=python-sdk
+
+###
+toolchain = linux32-1.12
+
+[project naoqi]
+cmake.flags = BUILDCONFIG=desktop
+
+
+
+Mac:
+
+###
+toolchain = mac32
+[build]
+cmake.flags = CMAKE_OSX_ARCHITECTURES=i386
+
+toolchain = mac64
+[build]
+
+
+
+
+3.
+
+Sometimes people have several work trees...
+
+
+
+What is not great:
+=================
+
+
+Create a config file just to specify a toolchain name
+looks overkill
+
+For instance, after qidev update-ctc, we create
+~/.config/qi/qibuild-cross-geode.cfg, with juste this:
+
+[general config]
+toolchain = cross-geode
+
+This is wrong because we can override settings while using
+-c 'cross-geode'
+
+
+Known issues:
+------------
+
+Bug #171:
+ Config should be implicit. Do not allow specifying a toolchain.
+ Specify a config, fallback on a vierge config pointing to the toolchain.
+
+
+Bug #173
+  qibuild: config should be namespaced
+
+  for example toolchain-toto.cfg should be namespaced in:
+
+  toolchain.toto.*
+
+  This avoid conflict between multiple files, and clarify which file can
+  modify which var.
+
+
+
+Solutions
+=========
+
+(flags are in CMakeLists.txt, toolchain names are frozen)
+
+qibuild init --interactive allow people to choose from the
+frozen names:
+
+win32-vs2010 -> force cmake.generator and toolchain
+win32-vs2008 -> force cmake.generator
+mingw32      -> force cmake.generator and env.path
+
+mac32        -> force toolchain-mac32.cmake (CMAKE_OSX_ARCHITECTURES)
+
+
+
+-----
+
+
+
+Global config:
+~/.config/qi/qibuild.cfg
+<repo>/.qi/qibuild.cfg
+=> toc.configstore
+
+
+To use different settings for different toolchains, use
+the same keys but in a different section.
+
+For instance:
+
+
+  [build]
+  cmake.flags = FOO=BAR
+  config = mingw32
+
+  [config vs2010]
+  cmake.generator = 'Visual Studio 10'
+
+  [config mingw32]
+  cmake.generator = 'MinGW Makefiles'
+  env.path = c:\MinGW\bin;
+
+
+Cmake flags:
+~/.local/share/qi/toolchains/<name>/toolchain-<name>.cmake
+~/.config/qi/<name>.cmake
+<repo>/.qi/<name>.cmake
+
+
+Project config:
+*/.manifest
+=> project.configstore
+
+global config:
+- build.sdk_dir
+- build.build_dir
+- config.default
+- env.path
+- build.cmake.generator
+
+project:
+- depends
+- rdepends
+- <toolchain>.depends
+- <toolchain>.rdepends
+
+
+
