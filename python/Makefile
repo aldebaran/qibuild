@@ -29,14 +29,6 @@ check-error:
 	@pylint --include-ids=y -f colorized --errors-only --rcfile pylint.rc $(PYMODULES) --ignore=gui 2>&1 | grep -v "Exception RuntimeError: 'maximum recursion depth exceeded" && exit 1 || exit 0
 	@echo " >checked only for pylint error (use check-all for more)"
 
-check-release:
-	@echo "###################################"
-	@echo "# Checking that everything is OK for a release"
-	@echo "###################################"
-	@python bin/dorelease quickcheck
-	pylint --rcfile pylint.rc --errors-only actions/release 2>&1 | grep -v "Exception RuntimeError: 'maximum recursion depth exceeded" && exit 1 || exit 0
-
-
 
 pep8:
 	@echo "###################################"
