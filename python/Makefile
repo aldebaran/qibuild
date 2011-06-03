@@ -30,12 +30,6 @@ check-error:
 	@echo " >checked only for pylint error (use check-all for more)"
 
 
-pep8:
-	@echo "###################################"
-	@echo "checking code conform to pep8"
-	@python pep8.py --filename="*.py" .
-	@echo ""
-
 
 check:
 	@echo "###################################"
