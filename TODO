@@ -4,19 +4,10 @@ TODO
 CMake:
 * finish qi_use_lib (handle version, handle component, handler error
   messages properly)
-* do something nice with static/shared libraries
-   - several cases:
-         * shared builds, shared deps   (useful on robot: perf, eg a plugin)
-         * static builds, static deps   (useful for portability and "hiding deps")
-         * shared builds, static deps   (useful for re-distributable library, eg qimessaging)
-         * static builds, shared deps   (for fun ...)
-   - shared build -> set (BUILD_SHARED_LIBS TRUE)
-   - static search -> set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-   TODO:
-    abstract those details for the user
 
-* fix linker problems when using toolchain and third party libraries
-* modules: decide weither clean/fpath/flib/depends/export_* is part of the public qiBuild API (rename to qi_fpath, qi_flib, qi_fdepends ?)
+* fix linker problems when using toolchain and third party libraries on mac
+* modules: decide weither clean/fpath/flib/depends/export_* is part of
+  the public qiBuild API (rename to qi_fpath, qi_flib, qi_fdepends ?)
 * export lib does not fail when REQUIRED is set
 
 qiBuild:
@@ -35,12 +26,7 @@ qiSrc:
 * qisrc add should be able to read a base git url. For instance,
   qisrc add foo/bar.git, should read a setting and clone git://example.com:foo/bar.git
 
-Command line parsing, actions and plugins:
-* Make it possible for qitools.run_action() to return a value.
-  Typicall use case, after a `package' action:
-
-  package = run_action('qibuild.actions.package', ...)
-  upload_package(package)
+* qisrc pull should call 'qisrc fetch' first
 
 
 DOC:
@@ -49,22 +35,19 @@ DOC:
  * use cmake to generate documentation !
  * How to use a lib not wrapped in qiBuild (opengl for example)
  * How to use a qiBuild project from a standard cmake project
- * Add a troubleshooting section and/or a FAQ, when there are enough
-   people using qibuild ;-)
+ * Add a troubleshooting section and/or a FAQ
 
 Install:
   * root's cmake list should honor CMAKE_INSTALL_PREFIX setting.
-  * qibuild.get_cmake_root_path() could for cmake instead of
-  trusted qibuild/config.py
+  * qibuild.get_cmake_root_path() could use cmake instead of
+  trusting qibuild/config.py
 
 Compat:
-  * when we see a base.cfg, override the bootstrap.cmake,
-  and create proper qibuild.manifest and qibuild.cmake,
-  to that going from toc to qibuild is automagic
-
-  * same thing for ROS?
+  * Improve compatibility with rosbuild
 
 To help automatic testing:
-  * When sys.stdout is not a tty
-    - Do not print "installing..." stuff when installing packages
-    - Do not call tar with a verbose argument when building packages
+  * Use an alternate logger when sys.stdout is not a tty?
+  * In qibuild.command:
+    - Log STDERR and STDOUT in a ring buffer while the process is running
+    - Log (not print!) the last lines of the buffer if the process had a non-zero retcode.
+    - Do not log anything if the process suceed.
