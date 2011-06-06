@@ -95,7 +95,6 @@ class Project:
     def set_custom_build_directory(self, build_dir):
         """ could be used to override the default build_directory
         """
-        old = self.build_directory
         self.build_directory = build_dir
 
         #detect single sdk directory for multiple projects
@@ -141,3 +140,53 @@ def bootstrap(project, dep_sdk_dirs):
     with open(output_path, "w") as output_file:
         output_file.write(to_write)
     LOGGER.debug("Wrote %s", output_path)
+
+def name_from_directory(project_dir):
+    """Get the project name from the project directory
+
+    The directory should contain a "qibuild.manifest" file,
+    looking like
+
+        [project foo]
+        ...
+
+    If such a section can not be found, simply return
+    the base name of the directory
+    """
+    manifest = os.path.join(project_dir, "qibuild.manifest")
+    if not os.path.exists(manifest):
+        return os.path.basename(project_dir)
+    config = qibuild.configstore.ConfigStore()
+    conf_file = os.path.join(project_dir, "qibuild.manifest")
+    config.read(conf_file)
+    project_names = config.get("project", default=dict()).keys()
+    if len(project_names) != 1:
+        mess  = "The file %s is invalid\n" % conf_file
+        mess += "It should contains exactly one project section"
+        raise Exception(mess)
+
+    return project_names[0]
+
+
+def version_from_directory(project_dir):
+    """Try to guess version from the sources of the project.
+
+    Return None if not found.
+    """
+    version_cmake = os.path.join(project_dir, "version.cmake")
+    if not os.path.exists(version_cmake):
+        return None
+    contents = None
+    with open(version_cmake, "r") as fp:
+        contents = fp.read()
+    name = name_from_directory(project_dir)
+    import re
+    up_name = name.upper()
+    match = re.match('^set\(%s_VERSION\s+"?(.*?)"?\s*\)' % up_name,
+                     contents)
+    if not match:
+        LOGGER.warning("Invalid version.cmake. Should have a line looking like\n"
+           "set(%s_VERSION <VERSION>)",  up_name)
+        return None
+    return match.groups()[0]
+

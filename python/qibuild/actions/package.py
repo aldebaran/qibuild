@@ -43,27 +43,6 @@ def get_package_name(project, continuous=False, version=None, arch=None):
 
     return "-".join(res)
 
-def get_project_version(project):
-    """Try to guess version from the sources of the project.
-
-    Return None if not found.
-    """
-    version_cmake = os.path.join(project.directory, "version.cmake")
-    if not os.path.exists(version_cmake):
-        return None
-    contents = None
-    with open(version_cmake, "r") as fp:
-        contents = fp.read()
-
-    import re
-    up_name = project.name.upper()
-    match = re.match('^set\(%s_VERSION\s+"?(.*?)"?\s*\)' % up_name,
-                     contents)
-    if not match:
-        LOGGER.warning("Invalid version.cmake. Should have a line looking like\n"
-           "set(%s_VERSION <VERSION>)",  up_name)
-        return None
-    return match.groups()[0]
 
 
 def configure_parser(parser):

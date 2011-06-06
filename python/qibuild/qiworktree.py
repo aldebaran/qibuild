@@ -107,7 +107,7 @@ class QiWorkTree:
             (git_p, src_p) = search_projects(p)
             for d in src_p:
                 # Get the name of the project from its directory:
-                project_name = project_name_from_directory(d)
+                project_name = qibuild.project.name_from_directory(d)
                 pdir = self.buildable_projects.get(project_name)
                 #project already exist
                 if pdir:
@@ -333,32 +333,6 @@ def guess_work_tree(use_env=False):
             break
     return None
 
-
-def project_name_from_directory(project_dir):
-    """Get the project name from the project directory
-
-    The directory should contain a "qibuild.manifest" file,
-    looking like
-
-        [project foo]
-        ...
-
-    If such a section can not be found, simply return
-    the base name of the directory
-    """
-    manifest = os.path.join(project_dir, "qibuild.manifest")
-    if not os.path.exists(manifest):
-        return os.path.basename(project_dir)
-    config = qibuild.configstore.ConfigStore()
-    conf_file = os.path.join(project_dir, "qibuild.manifest")
-    config.read(conf_file)
-    project_names = config.get("project", default=dict()).keys()
-    if len(project_names) != 1:
-        mess  = "The file %s is invalid\n" % conf_file
-        mess += "It should contains exactly one project section"
-        raise Exception(mess)
-
-    return project_names[0]
 
 
 def create(directory):
