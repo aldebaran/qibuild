@@ -31,8 +31,8 @@ You can use:
 
 """
 
-import re
 import os
+import shlex
 import logging
 import ConfigParser
 
@@ -49,17 +49,12 @@ def get_config_dir():
     qibuild.sh.mkdir(root, recursive=True)
     return root
 
-def get_config_path(config=None):
-    """ Get a writeable path associated with a
-    given config
+def get_config_path():
+    """ Get a writeable global config path
 
     """
     root = get_config_dir()
-    if config:
-        filename = "qibuild-%s.cfg" % config
-    else:
-        filename = "qibuild.cfg"
-    return os.path.join(root, filename)
+    return os.path.join(root, "qibuild.cfg")
 
 
 class ConfigException(Exception):
@@ -77,14 +72,12 @@ class ConfigStore:
     def __init__(self):
         self.root = dict()
 
-    def set(self, *keys, **kargs):
+    def set(self, key, value):
         """
         add a value
-        names is a list, the full name is names0.names1...namesn
         """
-        value = kargs['value']
         element = self.root
-        keys = [k.strip("\"\'") for k in keys]
+        keys = key.split(".")
 
         for key in keys[:-1]:
             current = element.get(key, None)
@@ -96,17 +89,29 @@ class ConfigStore:
             element = current
         element[keys[len(keys) - 1]] = value
 
-    def get(self, *args, **kargs):
+    def get(self, key, default=None):
+        """ Get a value from a dot-separated key
+
         """
+        keys = key.split(".")
+        res = ConfigStore._get(self, keys)
+        if not res:
+            return default
+        return res
+
+
+    @staticmethod
+    def _get(element, keys):
+        """ Recursive function used by self.get()
+
         """
-        default = kargs.get('default')
-        element = self.root
-        for s in args:
+        element = element.root
+        for s in keys:
             if not isinstance(element, dict):
-                raise ConfigException("Could not find %s in %s" % (s, self.root))
-            element = element.get(s, None)
+                return None
+            element = element.get(s)
             if element is None:
-                return default
+                return None
         return element
 
     def __str__(self, pad=True):
@@ -154,33 +159,39 @@ class ConfigStore:
         self.logger.debug("loading: %s", filename)
         parser = ConfigParser.RawConfigParser()
         parser.read(filename)
-        sections = parser.sections()
-        for section in sections:
-            splitted_section = section.split()
-            items = parser.items(section)
+        parsed_sections = parser.sections()
+        for parsed_section in parsed_sections:
+            splitted_section = shlex.split(parsed_section)
+            # When just parsed, the [config 'bar'] sections have names
+            # looking like "config 'bar'", but we really want config.bar
+            # as the dot-separated key:
+            if len(splitted_section) == 1:
+                key_name = parsed_section
+            elif len(splitted_section) == 2:
+                section_name, subsection = splitted_section
+                key_name = section_name + '.' + subsection
+            items = parser.items(parsed_section)
             if not items:
-                self.set(*splitted_section, value=dict())
+                # The key exists but is empty:
+                self.set(key_name, dict())
             for k, v in items:
-                tkey = [ ]
+                tkey = list()
                 tkey.extend([x.strip("\"\'") for x in splitted_section])
                 tkey.extend([x.strip("\"\'") for x in k.split(".")])
-                self.set(*tkey, value=v.strip("\"\'"))
+                self.set(".".join(tkey), value=v.strip("\"\'"))
 
 
-def update_config(config_path, section, name, key, value):
-    """Update a config file.
+def update_config(config_path, section, key, value):
+    """ Update a config file
 
-    For instance, if foo.cfg looks like
+    For instance, if foo.cfg is empty,
 
-    [spam "eggs"]
-    answer = 42
+    After update_config_section(foo.cfg, "bar", "baz", "buzz"):
 
-    after update_config(foo.cfg, "spam", "eggs", "anser", 43):
+    foo.cfg looks like:
 
-    foo.cfg looks like
-
-    [spam "eggs"]
-    anser = 43
+    [bar]
+    baz = buzz
 
     Note: all comments in the file will be lost!
     Sections will be created if they do not exist.
@@ -191,16 +202,20 @@ def update_config(config_path, section, name, key, value):
     Here you are just fixing *one* config file, that someone
     else will read later.
 
+    If you want to permanetely store Toc configuration, use
+    toc.update_config() instead.
+
+    If value is a list, we will write a string separated by spaces
+
     """
     parser = ConfigParser.ConfigParser()
     parser.read(config_path)
-    section_name = '%s "%s"' % (section, name)
-    if not parser.has_section(section_name):
-        parser.add_section(section_name)
+    if not parser.has_section(section):
+        parser.add_section(section)
     if type(value) == type(""):
-        parser.set(section_name, key, value)
+        parser.set(section, key, value)
     if type(value) == type([""]):
-        parser.set(section_name, key, " ".join(value))
+        parser.set(section, key, " ".join(value))
     qibuild.sh.mkdir(os.path.dirname(config_path), recursive=True)
     with open(config_path, "w") as config_file:
         parser.write(config_file)

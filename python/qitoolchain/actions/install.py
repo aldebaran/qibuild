@@ -51,12 +51,24 @@ def do(args):
     cfg_path = qibuild.configstore.get_config_path(tc_name)
 
     if args.generator:
-        qibuild.configstore.update_config(cfg_path,
-            "cmake.generator", args.generator)
+        # Fixme: open toc without passing build args...
+        #qibuild.configstore.update_config(cfg_path,
+            #"cmake.generator", args.generator)
+        """
+        toc.update_config("build", "cmake.generator", arg.generator, config=tc_name)
+        """
+        pass
+
 
     if not args.default:
-        LOGGER.info("Now try using `qibuild -c %s'", tc_name)
+        mess  = "Not try using: \n"
+        mess += "qibuild configure -c {tc_name} \n"
+        mess += "qibuild make      -c {tc_name} \n"
+        LOGGER.info(mess.format(tc_name=tc_name))
         return
 
-    qibuild.configstore.update_config(cfg_path, "general", "config", tc_name)
+    #qibuild.configstore.update_config(cfg_path, "general", "config", tc_name)
+    """
+    qibuild.configstore.update_config(toc.config_path, "general", "config", tc_name)
+    """
     LOGGER.info("Now using %s toolchain by default", tc_name)

@@ -31,7 +31,7 @@ def do(args):
     - Add the package from cache to toolchain
 
     """
-    toc = qibuild.toc.toc_open(args.work_tree, args, use_env=True)
+    toc = qibuild.toc.toc_open(args.work_tree, args)
 
     tc_name = toc.toolchain_name
     if tc_name is None:

@@ -14,7 +14,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc.toc_open(args.work_tree, args, use_env=True)
+    toc = qibuild.toc.toc_open(args.work_tree, args)
     if not args.edit:
         if toc.active_config:
             print "Active configuration:"
@@ -32,7 +32,7 @@ def do(args):
         return
 
     config_path = qibuild.configstore.get_config_path()
-    editor = toc.configstore.get("env", "editor")
+    editor = toc.configstore.get("env.editor")
     if not editor:
         editor = os.environ.get("VISUAL")
     if not editor:
@@ -42,7 +42,7 @@ def do(args):
         # that we never ask again
         print "Could not find the editor to use."
         editor = qibuild.interact.ask_program("Please enter an editor")
-        qibuild.configstore.update_config(config_path, "env", "editor", editor)
+        qibuild.configstore.update_config(config_path, "general", "env.editor", editor)
 
     qibuild.command.check_call([editor, config_path])
 

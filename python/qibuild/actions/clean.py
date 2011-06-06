@@ -52,7 +52,7 @@ def list_build_folder(path, bdirs, work_tree):
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
-    qiwt     = qibuild.qiworktree_open(args.work_tree, use_env=True)
+    qiwt     = qibuild.qiworktree_open(args.work_tree)
 
     if args.force:
         logger.info("preparing to remove:")

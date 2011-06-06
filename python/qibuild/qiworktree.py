@@ -127,7 +127,7 @@ class QiWorkTree:
                     self.git_projects[os.path.basename(d)] = d
 
 
-def qiworktree_open(work_tree=None, use_env=False):
+def qiworktree_open(work_tree=None):
     """ Open a qi worktree.
 
         Return a valid QiWorkTree instance.
@@ -141,7 +141,7 @@ def qiworktree_open(work_tree=None, use_env=False):
     """
     path_hints = list()
     if not work_tree:
-        work_tree = guess_work_tree(use_env)
+        work_tree = guess_work_tree()
         LOGGER.debug("found a qi worktree: %s", work_tree)
     current_project = search_current_project_root(os.getcwd())
     if not work_tree:
@@ -261,15 +261,10 @@ def search_projects(directory=None, depth=3):
         rsrc.extend(sub_rsrc)
     return (rgit, rsrc)
 
-def guess_work_tree(use_env=False):
+def guess_work_tree():
     """Look for parent directories until a .qi dir is found somewhere.
-    Otherwise, just use QI_WORK_TREE environment
-    variable
+
     """
-    # FIXME: not sure who would need use_env to be False ...
-    from_env = os.environ.get("QI_WORK_TREE")
-    if use_env and from_env:
-        return from_env
     head = os.getcwd()
     while True:
         d = os.path.join(head, ".qi")
@@ -279,7 +274,6 @@ def guess_work_tree(use_env=False):
         if not _tail:
             break
     return None
-
 
 
 def create(directory):

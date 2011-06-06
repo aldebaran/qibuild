@@ -184,7 +184,8 @@ project:
 
 
 
-Also cleanup config stuff:
+Changed config files
+--------------------
 
 Old:
   [general build]
@@ -226,12 +227,43 @@ New:
 
 
 
-Also, changed names:
+Changed names
+-------------
+
 build.cmake     -> cmake
 cmake_generator -> cmake.generator
 build_dir       -> build.directory
-sdk_dir         -> build.sdk.directory  (Useful ?)
+sdk_dir         -> build.sdk.directory
 
+
+Changed API
+-----------
+
+Old:
+
+>>> qibuild.configstore.update_config(build_cfg, "general", "foo", "bar", 42)
+>>> qibuild.configstore.update_config(build_myconf_cfg,  "general", "foo", "bar", 0)
+
+>>> toc = Toc()
+>>> toc.configstore.get("general", "foo", "bar")
+42
+
+>>> toc = Toc()
+>>> toc.configstore.get("config", "myconf", "bar")
+0
+
+New:
+
+>>> toc.update_config("foo.bar", 42)
+>>> toc.update_config("foo.bar", 0, config="myconf")
+
+>>> toc = Toc()
+>>> toc.get("foo.bar")
+42
+
+>>> toc = Toc(config="myconf")
+>>> toc.get("foo.bar")
+0
 
 
 

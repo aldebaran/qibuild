@@ -32,5 +32,5 @@ def do(args):
         raise Exception("Toolchain %s already exists in configuration" % toolchain_name)
 
     qibuild.configstore.update_config(cfg_path,
-        "toolchain", toolchain_name, "path", toolchain.path)
+        'toolchain "%s"' % toolchain_name, "path", toolchain.path)
 

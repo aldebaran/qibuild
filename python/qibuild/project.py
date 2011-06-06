@@ -44,8 +44,8 @@ class Project:
         """ Update project dependency list """
         qibuild_manifest = os.path.join(self.directory, "qibuild.manifest")
         self.configstore.read(qibuild_manifest)
-        deps  = self.configstore.get("project", self.name, "depends", default="").split()
-        rdeps = self.configstore.get("project", self.name, "rdepends", default="").split()
+        deps  = self.configstore.get("project.%s.depends"  % self.name, default="").split()
+        rdeps = self.configstore.get("project.%s.rdepends" % self.name, default="").split()
         self.depends.extend(deps)
         self.rdepends.extend(rdeps)
 
@@ -134,7 +134,7 @@ def update_project(project, toc):
 
     """
     # Handle custom global build directory containing all projects
-    singlebdir = toc.configstore.get("build", "directory", default=None)
+    singlebdir = toc.configstore.get("build.directory")
     if singlebdir:
         if not os.path.isabs(singlebdir):
             singlebdir = os.path.join(toc.work_tree, singlebdir)
@@ -146,7 +146,7 @@ def update_project(project, toc):
 
 
     # Handle single sdk dir
-    sdk_dir = toc.configstore.get("build", "sdk.directory", default=None)
+    sdk_dir = toc.configstore.get("build.sdk.directory", default=None)
     if sdk_dir:
         if os.path.isabs(sdk_dir):
             project.sdk_directory = sdk_dir

@@ -90,6 +90,7 @@ class TocConfigStore:
         # The config that is being used
         self.active_config = None
 
+
         self.toc = toc
         self._load_config()
         if user_config:
@@ -108,10 +109,10 @@ class TocConfigStore:
         local_file = os.path.join(self.toc.work_tree, ".qi", "qibuild.cfg")
         self._configstore.read(local_file)
 
-        self.default_config = self._configstore.get('general', 'config')
+        self.default_config = self._configstore.get('general.config')
 
-    def get(self, *args, **kwargs):
-        """ Handle different configurations, for instance, assuming the
+    def get(self, key, default=None):
+        r""" Handle different configurations, for instance, assuming the
         configuration looks like:
 
           [general]
@@ -126,23 +127,33 @@ class TocConfigStore:
           env.path = c:\MinGW\bin;
 
         and self.config = 'vs2010'
-        self.get('build, 'cmake', 'generator')
+        self.get('cmake.generator')
         returns 'Visual Studio 10',
 
         whereas
-        self.get('build', 'cmake', 'flags')
+        self.get('cmake.flags')
         returns 'FOO=BAR'
 
         """
-        default = kwargs.get('default')
-        res = self._configstore.get('config', self.active_config, *args)
+        res = self._configstore.get('config.%s.' % self.toc.active_config + key, default=default)
         if not res:
-            res = self._configstore.get('general', *args)
+            res = self._configstore.get('general.' + key, default=default)
 
         if not res:
             res = default
 
         return res
+
+    def get_known_configs(self):
+        """ List all the knwown configurations
+
+        """
+        res = list()
+        configs = self._configstore.get('config')
+        if configs:
+            res = configs.keys()[:]
+        return res
+
 
     def __str__(self):
         return str(self._configstore)
@@ -195,7 +206,13 @@ class Toc(QiWorkTree):
         else:
             self.active_config = self.configstore.default_config
 
-        self.build_type        = build_type
+        # The local config file in which to write
+        # (the global is in qibuild.configstore.get_config_path())
+        self.config_path = os.path.join(self.work_tree, ".qi", "qibuild.cfg")
+
+        self.build_type = build_type
+        if not self.build_type:
+            self.build_type = "debug"
 
         # The cmake flags set by the user will always be added
         # to the actual cmake flags used by the Toc oject,
@@ -212,7 +229,7 @@ class Toc(QiWorkTree):
         # this is updated using QiWorkTree.buildable_projects
         self.projects          = list()
 
-        # Set cmake generator
+        # Set cmake generator if user has not set if in Toc ctor:
         if not self.cmake_generator:
             self.cmake_generator = self.configstore.get("cmake.generator", default="Unix Makefiles")
 
@@ -246,6 +263,18 @@ class Toc(QiWorkTree):
         # every project)
         self.update_projects()
 
+
+    def update_config(self, key, value, config=None):
+        """ Update config file used by Toc.
+        This will only update the config filed used in this worktree
+
+        """
+        if config is None:
+            section = "general"
+        else:
+            section = 'config "%s"' % config
+
+        qibuild.configstore.update_config(self.config_path, section, key, value)
 
 
     def update_projects(self):
@@ -478,9 +507,7 @@ class Toc(QiWorkTree):
         if self.toolchain is not None:
             tc_file = self.toolchain.toolchain_file
             toolchain_path = qibuild.sh.to_posix_path(tc_file)
-            
-        cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
-
+            cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
 
         #remove sh.exe from path on win32, because cmake will fail when using mingw generator.
         env = os.environ.copy()
@@ -603,19 +630,37 @@ class Toc(QiWorkTree):
                 cwd=project.build_directory,
                 env=build_env)
 
-def toc_open(work_tree, args, use_env=False):
-    config   = args.config
-    build_type     = args.build_type
-    path_hints     = list()
-    try:
-        cmake_flags = args.cmake_flags
-    except:
-        cmake_flags = list()
+def toc_open(work_tree, args=None):
+    """ Open a toc work_tree.
 
-    cmake_generator = args.cmake_generator
+    """
+    # Not that args can come from:
+    #    - a work_tree parser
+    #    - a toc parser
+    #    - a build parser
+    # (hence all the hasattr...)
+    # ...
+    # or simply not given :)
+    path_hints     = list()
+
+    config = None
+    if hasattr(args, 'config'):
+        config   = args.config
+
+    build_type = None
+    if hasattr(args, 'build_type'):
+        build_type = args.build_type
+
+    cmake_flags = list()
+    if hasattr(args,'cmake_flags'):
+        cmake_flags = args.cmake_flags
+
+    cmake_generator = None
+    if hasattr(args, 'cmake_generator'):
+        cmake_generator = args.cmake_generator
 
     if not work_tree:
-        work_tree = qibuild.qiworktree.guess_work_tree(use_env)
+        work_tree = qibuild.qiworktree.guess_work_tree()
     current_project = qibuild.qiworktree.search_current_project_root(os.getcwd())
     if not work_tree:
         # Sometimes we you just want to create a fake worktree object because
@@ -642,8 +687,8 @@ def toc_open(work_tree, args, use_env=False):
                path_hints=path_hints)
 
 
-def create(directory, args):
-    """ Create a new toc work_tree.
+def create(directory):
+    """ Create a new toc work_tree inside a work tree
 
     """
     qibuild.qiworktree.create(directory)

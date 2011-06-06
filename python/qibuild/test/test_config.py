@@ -1,8 +1,9 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"""Automatic testing for handling qibuidl configurations
+"""Automatic testing for handling qibuild configurations
 
 """
+
 import os
 import unittest
 
@@ -21,14 +22,14 @@ class QiConfigTestCase(unittest.TestCase):
 cmake.generator = 'Unix Makefiles'
 config = 'mingw32'
 
-[config mingw32]
+[config 'mingw32']
 cmake.generator = 'MinGW Makefiles'
 env.path = C:\MinGW\bin
 
-[config win32-vs2010]
+[config 'win32-vs2010']
 cmake.generator = 'Visual Studio 10'
 
-        """
+"""
 
         # Create a temp dir to use as a toc worktree:
         self.tmp = tempfile.mkdtemp(prefix="tmp-qibuild-test")
@@ -38,26 +39,26 @@ cmake.generator = 'Visual Studio 10'
         fp.write(config)
         fp.close()
 
-    def _check_config(self, toc, expected, *keys):
+    def _check_config(self, toc, expected, key):
         """ Check that toc configuration matches the
         expected value
 
         """
-        actual = toc.configstore.get(*keys)
-        mess  = "Wrong config for %s\n" % ".".join(keys)
+        actual = toc.configstore.get(key)
+        mess  = "Wrong config for %s\n" % key
         mess += "Actual   : %s\n" % actual
         mess += "Expected : %s\n" % expected
         self.assertEquals(actual, expected, mess)
 
     def test_default_config(self):
         toc =  qibuild.toc.Toc(self.tmp)
-        self._check_config(toc, "MinGW Makefiles", "cmake", "generator")
-        self._check_config(toc, r"C:\MinGW\bin", "env", "path")
+        self._check_config(toc, "MinGW Makefiles", "cmake.generator")
+        self._check_config(toc, r"C:\MinGW\bin", "env.path")
 
 
     def test_setting_config(self):
         toc =  qibuild.toc.Toc(self.tmp, config='win32-vs2010')
-        self._check_config(toc, "Visual Studio 10", "cmake", "generator")
+        self._check_config(toc, "Visual Studio 10", "cmake.generator")
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)

@@ -66,7 +66,7 @@ def _do(args, build_type):
     Returns the directory to make an archive from
     """
     args.build_type = build_type
-    toc      = qibuild.toc_open(args.work_tree, args, use_env=True)
+    toc      = qibuild.toc_open(args.work_tree, args)
     if not args.project:
         project_name = qibuild.toc.project_from_cwd()
     else:
@@ -97,7 +97,7 @@ def _do(args, build_type):
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc_open(args.work_tree, args, use_env=True)
+    toc = qibuild.toc_open(args.work_tree, args)
     if toc.using_visual_studio and not args.runtime:
         _do(args, "debug")
     destdir = _do(args, "release")

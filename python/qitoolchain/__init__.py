@@ -119,14 +119,14 @@ class Toolchain(object):
         self.configstore = qibuild.configstore.ConfigStore()
         self.configstore.read(get_tc_config_path())
         self.path = get_tc_path(self.name)
-        tc_file_from_conf = self.configstore.get("toolchain", self.name, "file", default=None)
+        tc_file_from_conf = self.configstore.get("toolchain.%s.file" % self.name)
         if tc_file_from_conf:
             self.toolchain_file = tc_file_from_conf
         else:
             self.toolchain_file = os.path.join(self.path, "toolchain-%s.cmake" % self.name)
 
         self.packages = list()
-        self.cross = self.configstore.get("toolchain", self.name, "cross", default=False)
+        self.cross = self.configstore.get("toolchain.%s.cross" % self.name, default=False)
         if not self.cross:
             self.load_config()
             self.update_toolchain_file()
@@ -183,7 +183,7 @@ class Toolchain(object):
         configuration
 
         """
-        provided = self.configstore.get("toolchain", self.name, "provide", default="")
+        provided = self.configstore.get("toolchain.%s.provide" % self.name, default="")
         provided = " ".join(p.name for p in self.packages)
         LOGGER.debug("update_tc_provides: provided is now %s", provided)
         qibuild.configstore.update_config(get_tc_config_path(),
@@ -217,13 +217,12 @@ class Toolchain(object):
 
         Called each time someone uses self.packages
         """
-        provided = self.configstore.get("toolchain", self.name, "provide")
+        provided = self.configstore.get("toolchain.%s.provide" % self.name)
         self.packages = list()
         if not provided:
             return
         for package_name in provided.split():
-            deps = self.configstore.get("package", package_name, "depends",
-                default="")
+            deps = self.configstore.get("package.%s.depends" % package_name, default="")
             names = deps.split()
             package = Package(package_name)
             package.depends = names

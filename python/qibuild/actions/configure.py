@@ -30,7 +30,7 @@ def do(args):
         raise Exception("You should use --single when specifying a build directory")
 
     logger   = logging.getLogger(__name__)
-    toc      = qibuild.toc_open(args.work_tree, args, use_env=True)
+    toc      = qibuild.toc_open(args.work_tree, args)
 
     (project_names, _, _) = qibuild.toc.resolve_deps(toc, args)
 

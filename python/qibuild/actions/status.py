@@ -48,7 +48,7 @@ def list_build_dir(path):
 
 def do(args):
     """Main entry point"""
-    qiwt = qibuild.qiworktree_open(args.work_tree, use_env=True)
+    qiwt = qibuild.qiworktree_open(args.work_tree)
     max_len = 0
     for pname, ppath in qiwt.buildable_projects.iteritems():
         if len(pname) > max_len:

@@ -20,7 +20,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    qiwt = qibuild.qiworktree_open(args.work_tree, use_env=True)
+    qiwt = qibuild.qiworktree_open(args.work_tree)
     logger = logging.getLogger(__name__)
     for pname, ppath in qiwt.buildable_projects.iteritems():
         logger.info("Running `%s` for %s", " ".join(args.command), pname)
