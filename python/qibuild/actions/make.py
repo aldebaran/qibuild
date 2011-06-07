@@ -30,6 +30,8 @@ def do(args):
     else:
         use_incredibuild = False
 
+    if toc.active_config:
+        logger.info("Active configuration: %s", toc.active_config)
 
     for project_names in project_names:
         project = toc.get_project(project_names)

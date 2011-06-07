@@ -238,7 +238,6 @@ class Toc(QiWorkTree):
 
         # Actual list of cmake flags we are going to use.
         # * the toolchain file if a toolchain is used
-        # * additional cmake flags from the *.cmake config files
         # * and the flags set by the user.
         self.cmake_flags = self.compute_cmake_flags(cmake_flags)
 
@@ -262,8 +261,15 @@ class Toc(QiWorkTree):
         # self.buildable_projects has been set by QiWorkTree.__init__
         for pname, ppath in self.buildable_projects.iteritems():
             project = Project(pname, ppath)
-            project.update_build_config(self, self.build_folder_name)
             self.projects.append(project)
+
+        # Small warning here: when we update the projects, we do NOT
+        # have the complete list of the projects, their dependencies,
+        # the list of sdk dirs, and so on ...
+        # So we only call qibuild.projects.bootstrap_project() at the last
+        # moment...
+        for project in self.projects:
+            qibuild.project.update_project(project, self)
 
 
     def compute_cmake_flags(self, user_flags):
@@ -289,18 +295,6 @@ class Toc(QiWorkTree):
         tc_file = qibuild.sh.to_posix_path(tc_file)
         res.append("CMAKE_TOOLCHAIN_FILE=%s" % tc_file)
 
-        global_cmake = os.path.join(qibuild.configstore.get_config_dir(),
-            "%s.cmake" % tc_name)
-        if os.path.exists(global_cmake):
-            to_add = qibuild.parse_cmake(global_cmake)
-            LOGGER.debug("Adding flags from %s : %s", global_cmake, ", ".join(to_add))
-            res.extend(to_add)
-
-        local_cmake = os.path.join(self.work_tree, ".qi", "%s.cmake" % tc_name)
-        if os.path.exists(local_cmake):
-            to_add = qibuild.parse_cmake(local_cmake)
-            LOGGER.debug("Adding flags from %s : %s", local_cmake, ", ".join(to_add))
-            res.extend(to_add)
 
         if user_flags:
             res.extend(user_flags)
@@ -468,6 +462,8 @@ class Toc(QiWorkTree):
         """
         if not os.path.exists(project.directory):
             raise TocException("source dir: %s does not exist, aborting" % project.directory)
+        # Generate the dependencies.cmake just in time:
+        qibuild.project.bootstrap_project(project, self)
 
         # Set generator if necessary
         cmake_args = list()

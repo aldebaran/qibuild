@@ -13,9 +13,6 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("cmake arguments")
-    group.add_argument("--bootstrap", dest="bootstrap",
-        action="store_true",
-        help="only bootstrap projects, do not call cmake.")
     group.add_argument("--build-directory", dest="build_directory",
         action="store",
         help="override the default build directory used by cmake")
@@ -41,15 +38,10 @@ def do(args):
     if args.build_directory:
         projects[0].set_custom_build_directory(args.build_directory)
 
-    for project_name in project_names:
-        logger.info("Bootstrapping [%s]", project_name)
-        dep_sdk_dirs = toc.get_sdk_dirs(project_name)
-        qibuild.project.bootstrap(toc.get_project(project_name), dep_sdk_dirs)
-
-    if args.bootstrap:
-        return
+    if toc.active_config:
+        logger.info("Active configuration: %s", toc.active_config)
     for project in projects:
-        logger.info("Configuring %s in %s", project.name, toc.build_folder_name)
+        logger.info("Configuring %s", project.name)
         toc.configure_project(project, clean_first=args.clean_first)
 
 
