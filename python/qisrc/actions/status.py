@@ -15,9 +15,6 @@ def configure_parser(parser):
     """Configure parser for this action """
     qibuild.qiworktree.work_tree_parser(parser)
     parser.add_argument("--untracked-files", "-u", dest="untracked_files", action="store_true", help="display untracked files")
-    # qibuild.cmdparse.action_parser(parser)
-    # parser.add_argument("toolchain", action="store", help="the toolchain name")
-    # parser.add_argument("feed", nargs='?', action="store", help="an url to a toolchain feed")
 
 def do(args):
     """ Main method """
