@@ -10,6 +10,8 @@ import subprocess
 
 LOGGER = logging.getLogger(__name__)
 
+
+
 def ask_cmake_generator():
     """Ask the user to choose a cmake generator """
     out = ""
@@ -68,6 +70,7 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     parser.add_argument("--interactive", action="store_true",
         help="start a wizard to help you configuring qibuild")
+    parser.add_argument("--force", action="store_true", help="force the init")
 
 def do(args):
     """Main entry point"""
@@ -85,6 +88,12 @@ def do(args):
 
     if not should_run:
         return
+
+    old_work_tree = qibuild.qiworktree.guess_work_tree(True)
+    if old_work_tree and not args.force:
+        print
+        raise Exception("You already have a qi worktree in : %s.\n" % (old_work_tree) +
+                        "If you know what you are doing and really want to create a new worktree here use --force.")
 
     qibuild.toc.create(work_tree, args)
     if not os.path.exists(build_cfg):
