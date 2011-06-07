@@ -319,16 +319,16 @@ class Toc(QiWorkTree):
         """
         res = list()
 
-        if self.toolchain is None:
-            res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
+        if self.active_config:
+            res.append(self.active_config)
         else:
-            res.append(self.toolchain.name)
+            res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
 
         if not self.using_visual_studio and self.build_type != "debug":
             # When using cmake + visual studio, sharing the same build dir with
             # several build config is mandatory.
             # Otherwise, it's not a good idea, so we always specify it
-            # when it's not "debug"
+            # when it's not "debug" (the default)
             res.append(self.build_type)
 
         self.build_folder_name = "-".join(res)
