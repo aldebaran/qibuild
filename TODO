@@ -52,11 +52,3 @@ To help automatic testing:
     - Log (not print!) the last lines of the buffer if the process had a non-zero retcode.
     - Do not log anything if the process suceed.
 
-
-Put cmake flags in dependencies.cmake (using project.boostrap()),
-do not parse it with python.
-
-And do not call it from `qibuild configure' action ...
-
-
-
