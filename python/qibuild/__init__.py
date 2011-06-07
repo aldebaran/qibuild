@@ -256,6 +256,7 @@ def parse_cmake(cmake_file):
     ["FOO=BAR", "SPAM=eggs"]
 
     """
+    import shlex
     # FIXME: get rid of this hack, and use plain ConfigParser
     # files instead?
     with open(cmake_file, 'r') as fp:
@@ -266,8 +267,10 @@ def parse_cmake(cmake_file):
     res = list()
     for match in matches:
         match = match.strip()
-        key = match.split(' ')[0]
-        value = ' '.join(match.split(' ')[1:])
+        # Yeah, I know cmake parsing does not look like shell parsing ...
+        splitted = shlex.split(match)
+        key = splitted[0]
+        value = " ".join(splitted[1:])
         res.append("%s=%s" % (key, value))
 
     return res
