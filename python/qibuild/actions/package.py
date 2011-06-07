@@ -28,7 +28,7 @@ def get_package_name(project, continuous=False, version=None, arch=None):
         res = [project.name]
 
     if not version:
-        version = get_project_version(project)
+        version = qibuild.project.version_from_directory(project.directory)
         if version:
             res.append(version)
     else:
