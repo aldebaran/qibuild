@@ -16,20 +16,16 @@ def do(args):
     """Main entry point"""
     toc = qibuild.toc.toc_open(args.work_tree, args, use_env=True)
     if not args.edit:
-        print ":: Build configurations:"
-        print
+        if toc.active_config:
+            print "Active configuration:"
+            print " ", toc.active_config
+            print
+        print "Build configurations:"
         print toc.configstore
         print
-        print ":: Projects configuration:"
-        print
+        print "Projects configuration:"
         for project in toc.projects:
             print project.configstore
-        if toc.active_config:
-            print
-            print ":: Active configuration:"
-            print
-            print "  ", toc.active_config
-            print
 
 
     if not args.edit:
