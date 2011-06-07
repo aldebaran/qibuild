@@ -44,7 +44,10 @@ def run_tests(xml_report=False, build_config="unix"):
             runner.run(suite)
 
     else:
-        unittest.TextTestRunner().run(suite)
+        runner = unittest.TextTestRunner()
+        result = runner.run(suite)
+        if not result.wasSuccessful():
+            sys.exit(1)
 
 
 def main():
