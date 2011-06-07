@@ -99,7 +99,7 @@ class Project:
         self.build_directory = build_dir
 
         #detect single sdk directory for multiple projects
-        if self._custom_sdk_dir == False:
+        if not self._custom_sdk_dir:
             self.sdk_directory = os.path.join(self.build_directory, "sdk")
 
 
