@@ -6,6 +6,7 @@
 #   - Propose a list of configs to choose from, automagically set
 #     toolchain name and cmake generator.
 #   (preparing the release of qitoolchain/ repo)
+#   - Only configure the local file.
 
 import os
 import logging

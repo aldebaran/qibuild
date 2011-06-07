@@ -51,3 +51,13 @@ To help automatic testing:
     - Log STDERR and STDOUT in a ring buffer while the process is running
     - Log (not print!) the last lines of the buffer if the process had a non-zero retcode.
     - Do not log anything if the process suceed.
+
+
+
+toc.build_folder_name -> use toc.active_config. not toc.toolchain.name
+
+Put cmake flags in dependencies.cmake (using project.boostrap()),
+do not parse it with python.
+
+And do not call it from `qibuild configure' action ...
+
