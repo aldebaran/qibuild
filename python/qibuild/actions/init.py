@@ -1,6 +1,12 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 """Initialize a new toc worktree """
 
+
+# FIXME qibuild --interactive:
+#   - Propose a list of configs to choose from, automagically set
+#     toolchain name and cmake generator.
+#   (preparing the release of qitoolchain/ repo)
+
 import os
 import logging
 
