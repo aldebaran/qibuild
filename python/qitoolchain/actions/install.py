@@ -52,11 +52,11 @@ def do(args):
 
     if args.generator:
         qibuild.configstore.update_config(cfg_path,
-            "build", "cmake_generator", args.generator)
+            "cmake.generator", args.generator)
 
     if not args.default:
         LOGGER.info("Now try using `qibuild -c %s'", tc_name)
         return
 
-    qibuild.configstore.update_config(cfg_path, "build", "config", tc_name)
+    qibuild.configstore.update_config(cfg_path, "general", "config", tc_name)
     LOGGER.info("Now using %s toolchain by default", tc_name)

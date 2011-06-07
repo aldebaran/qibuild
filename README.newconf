@@ -184,3 +184,54 @@ project:
 
 
 
+Also cleanup config stuff:
+
+Old:
+  [general build]
+  toolchain = linux
+
+New:
+  [general]
+  config = linux
+
+(to use a toolchain by default)
+
+
+Old:
+  [general env]
+  path =  c:\MinGw\bin;
+
+New:
+  [general]
+  env.path = C:\MinGw\bin
+
+Old:
+  # in qibuild-mingw32.cfg
+  [general build]
+  cmake.generator = MinGW Makefiles
+
+  # in qibuild-win32-vs2010.cfg
+  [general build]
+  cmake.generator = Visual Studio 10
+
+New:
+  [general]
+  ...
+
+  [config mingw32]
+  cmake.generator = MinGW Makefiles
+
+  [config win32-vs2008]
+  cmake.generator = Visual Studio 10
+
+
+
+Also, changed names:
+build.cmake     -> cmake
+cmake_generator -> cmake.generator
+build_dir       -> build.directory
+sdk_dir         -> build.sdk.directory  (Useful ?)
+
+
+
+

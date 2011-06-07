@@ -214,8 +214,7 @@ class Toc(QiWorkTree):
 
         # Set cmake generator
         if not self.cmake_generator:
-            self.cmake_generator = self.configstore.get("build" ,
-                    "cmake_generator", default="Unix Makefiles")
+            self.cmake_generator = self.configstore.get("cmake.generator", default="Unix Makefiles")
 
         # Read the current config, create toolchain and pacakges object
         # if necessary
@@ -385,7 +384,7 @@ class Toc(QiWorkTree):
         """Update os.environ using the qibuild configuration file
 
         """
-        env = self.configstore.get("build", "env")
+        env = self.configstore.get("env")
         path = None
         bat_file = None
         if env:

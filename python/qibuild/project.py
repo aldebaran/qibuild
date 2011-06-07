@@ -59,7 +59,7 @@ class Project:
         LOGGER.debug("[%s]: Updating build config", self.name)
 
         #handle custom global build directory containing all projects
-        singlebdir = toc.configstore.get("build", "build_dir", default=None)
+        singlebdir = toc.configstore.get("build", "directory", default=None)
         if singlebdir:
             if not os.path.isabs(singlebdir):
                 singlebdir = os.path.join(toc.work_tree, singlebdir)
@@ -78,7 +78,7 @@ class Project:
         LOGGER.debug("[%s]: cmake flags: %s", self.name, self.cmake_flags)
 
         #handle single sdk dir
-        sdk_dir = toc.configstore.get("build", "sdk_dir", default=None)
+        sdk_dir = toc.configstore.get("build", "sdk.directory", default=None)
         if sdk_dir:
             if os.path.isabs(sdk_dir):
                 self.sdk_directory = sdk_dir
