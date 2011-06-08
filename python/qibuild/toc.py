@@ -510,7 +510,7 @@ def toc_open(work_tree, args, use_env=False):
         raise TocException("Could not find a work tree, "
             "please try from a valid work tree, specify an "
             "existing work tree with '--work-tree {path}', or "
-            "create a new work with 'qibuild init'")
+            "create a new work tree with 'qibuild init'")
     return Toc(work_tree,
                config=config,
                build_type=build_type,
