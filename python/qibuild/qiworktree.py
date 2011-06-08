@@ -111,7 +111,7 @@ class QiWorkTree:
                 pdir = self.buildable_projects.get(project_name)
                 #project already exist
                 if pdir:
-                    if os.path.normcase(os.path.normpath(d)) != os.path.normcase(os.path.normpath(pdir)):
+                    if qibuild.sh.to_native_path(d) != qibuild.sh.to_native_path(pdir):
                         mess  = "Name conflict: those two projects:\n"
                         mess += "\t\t%s\n\t\tand\n\t\t%s\n" % (d, pdir)
                         mess += "have the same name. (%s)\n" % project_name
@@ -139,7 +139,7 @@ class QiWorkTree:
             for d in git_p:
                 conflicting_path = self.git_projects.get(os.path.basename(d))
                 if conflicting_path:
-                    if d != conflicting_path:
+                    if qibuild.sh.to_native_path(d) != qibuild.sh.to_native_path(conflicting_path):
                         mess  = "Name conflict: these git source trees:\n"
                         mess += "\t\t%s\n\t\tand\n\t\t%s\n" % (d, conflicting_path)
                         mess += "have the same basename.\n"
