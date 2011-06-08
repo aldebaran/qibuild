@@ -19,6 +19,16 @@ from qibuild.external.xmlrunner import XmlTestRunner
 
 BUILD_CONFIGS = ["unix", "vs2008"]
 
+from qibuild.test.test_qibuild import QiBuildTestCase
+from qibuild.test.test_config  import QiConfigTestCase, TocCMakeFlagsTestCase
+
+TEST_CASES = [
+    QiBuildTestCase,
+    QiConfigTestCase,
+    TocCMakeFlagsTestCase
+]
+
+
 def run_tests(xml_report=False, build_config="unix"):
     """Prepare the test/ subdir, run nosetests with correct
     options
@@ -33,21 +43,24 @@ def run_tests(xml_report=False, build_config="unix"):
     qibuild.sh.mkdir(qi_test_dir, recursive=True)
     shutil.copy(qi_build_cfg, os.path.join(qi_test_dir, "build.cfg"))
 
-    from qibuild.test.test_qibuild import QiBuildTestCase
+
     suite = unittest.TestSuite()
-    suite.addTests(unittest.makeSuite(QiBuildTestCase))
+    for test_case in TEST_CASES:
+        suite.addTests(unittest.makeSuite(test_case))
+
     out_xml = qibuild.sh.to_native_path(os.path.join(cur_dir, "..", "tests-results.xml"))
 
+    result = None
     if xml_report:
         with open(out_xml, "w") as fp:
             runner = XmlTestRunner(fp)
-            runner.run(suite)
-
+            result = runner.run(suite)
     else:
         runner = unittest.TextTestRunner()
         result = runner.run(suite)
-        if not result.wasSuccessful():
-            sys.exit(1)
+
+    if not result.wasSuccessful():
+        sys.exit(1)
 
 
 def main():
