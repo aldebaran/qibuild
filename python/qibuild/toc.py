@@ -95,7 +95,7 @@ class Toc(QiWorkTree):
     def __init__(self, work_tree,
             path_hints=None,
             config=None,
-            build_type=None,
+            build_type="debug",
             cmake_flags=None,
             cmake_generator=None,
             toolchain_name=None):
