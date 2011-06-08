@@ -111,7 +111,7 @@ class QiWorkTree:
                 pdir = self.buildable_projects.get(project_name)
                 #project already exist
                 if pdir:
-                    if d != pdir:
+                    if os.path.normcase(os.path.normpath(d)) != os.path.normcase(os.path.normpath(pdir)):
                         mess  = "Name conflict: those two projects:\n"
                         mess += "\t\t%s\n\t\tand\n\t\t%s\n" % (d, pdir)
                         mess += "have the same name. (%s)\n" % project_name
