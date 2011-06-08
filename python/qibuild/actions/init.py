@@ -90,7 +90,7 @@ def do(args):
         return
 
     old_work_tree = qibuild.qiworktree.guess_work_tree(True)
-    if old_work_tree and not args.force:
+    if old_work_tree and not args.force and not args.work_tree:
         print
         raise Exception("You already have a qi worktree in : %s.\n" % (old_work_tree) +
                         "If you know what you are doing and really want to create a new worktree here use --force.")
