@@ -309,10 +309,12 @@ def to_dos_path(path):
     return res
 
 def to_native_path(path):
-    """Return an absolute, native path from a path
+    """Return an absolute, native path from a path,
+    (and all lower-case on case-insensitive filesystems)
 
     """
     path = os.path.expanduser(path)
+    path = os.path.normcase(path)
     path = os.path.normpath(path)
     path = os.path.abspath(path)
     if sys.platform.startswith("win"):
