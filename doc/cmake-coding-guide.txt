@@ -59,6 +59,28 @@ a user cmake code) *must* start with +qi+, other should not start with +qi+ (pre
 * The link:http://www.cmake.org/cmake/help/cmake-2-8-docs.html#module:CMakeParseArguments[CMakeParseArguments]
 module is very useful, please use it.
 
+* Please don't use C-like construct for strings spanning on several lines:
+
+[source, cmake]
+----
+message(STATUS  "This is a very long\n"
+                "message on\n"
+                "several lines\n"
+)
+----
+
+Rather use nice CMake feature for this:
+
+[source, cmake]
+----
+message(STATUS "This is a very long
+message spanning on
+several lines
+")
+----
+
+See link:http://www.cmake.org/cmake/help/syntax.html[CMake syntax]
+
 * Every function in the *public* API *must* have corresponding documentation. It works
 a bit like +Doxygen+, but with the asciidoc syntax.
 
