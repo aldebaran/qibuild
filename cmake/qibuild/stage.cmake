@@ -34,7 +34,7 @@ function(qi_stage_lib target)
 endfunction()
 
 #! Generate a 'name'-config.cmake, allowing other project to find the library.
-# This library does not have a cmake target, it's a header only library.
+# This library does not have to be a cmake target, it's a header only library.
 # \arg:target a target created with qi_create_lib
 # \flag:INTERNAL An internal library will not be searchable once installed.
 #                This could be overwritten using QI_INSTALL_INTERNAL=ON
@@ -76,7 +76,7 @@ endfunction()
 # find_package(foo)
 # my_awesome_function()
 #
-# \arg module : path to the module file, relative to
+# \arg : module  path to the module file, relative to
 #               CMAKE_CURRENT_SOURCE_DIR
 #
 function(qi_stage_cmake module_file)

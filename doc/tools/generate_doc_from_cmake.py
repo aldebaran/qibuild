@@ -46,7 +46,11 @@ class DocBlock:
             if line.startswith("# ==== ") or line.startswith("# === ") or line.startswith("# == ") or line.startswith("# ."):
                 if prev != "":
                     doclines.append("")
-            elif line.startswith("# WARNING:") or line.startswith("# NOTE:") or line.startswith("# IMPORTANT:") or line.startswith("# CAUTION:") or line.startswith("# TIP:"):
+            elif line.startswith("# WARNING:")   or \
+                 line.startswith("# NOTE:")      or \
+                 line.startswith("# IMPORTANT:") or \
+                 line.startswith("# CAUTION:")   or \
+                 line.startswith("# TIP:"):
                 if prev != "":
                     doclines.append("")
             elif "${" in line:
@@ -73,14 +77,18 @@ class DocBlock:
             # \cmd:name description
             #           extended description
         """
-        commandregex = re.compile('\\\\(\S*?):(\S*)(.*)')
-        match = commandregex.match(self.content.preview_line())
+        commandregex = re.compile('\\\\(\S*?)\s*:\s*(\S*)(.*)')
+        line = self.content.preview_line()
+        match = commandregex.match(line)
         if match:
             self.content.get_line()
             (command, value, desc) = match.groups(1)
             desc = [ desc.strip() ]
             desc.extend(self.extract_block())
             return (command, value, desc)
+        else:
+            # FIXME: handle this in a better way...
+            raise Exception("Invalid doxylike line: %s" % line)
         return None
 
     def generate_command(self):

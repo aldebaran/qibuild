@@ -58,6 +58,7 @@ Stage executables and libraries to make them available to the outside world.
 * link:stage.html#_qi_stage_bin[qi_stage_bin]
 * link:stage.html#_qi_stage_script[qi_stage_script]
 * link:stage.html#_qi_stage_header[qi_stage_header]
+* link:stage.html#qi_stage_header_only_lib[qi_stage_header_only_lib]
 
 link:subdirectory.html[SubDirectory]
 ------------------------------------

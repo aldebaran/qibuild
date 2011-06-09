@@ -274,7 +274,6 @@ class Toc(QiWorkTree):
     def _set_env_from_path_conf(self, path):
         """Set os.environ using a "path" string setting
 
-        On windows, clean %PATH% first.
         """
         system_path = os.environ["PATH"]
         if not system_path.endswith(os.path.pathsep):
