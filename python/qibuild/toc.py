@@ -260,16 +260,6 @@ class Toc(QiWorkTree):
         """Update os.environ using the qibuild configuration file
 
         """
-        # On windows, clean %PATH% first:
-        if sys.platform == "win32":
-            paths = list()
-            paths.append(os.path.expandvars(r"%systemroot%\system32"))
-            paths.append(os.path.expandvars("%systemroot%"))
-            cmake = qibuild.command.find_program("cmake.exe")
-            paths.append(os.path.dirname(cmake))
-            paths.append(os.path.dirname(sys.executable))
-            os.environ["PATH"] = os.pathsep.join(paths)
-
         env = self.configstore.get("general", "env")
         path = None
         bat_file = None
@@ -366,6 +356,17 @@ class Toc(QiWorkTree):
 
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
+
+        env = os.environ.copy()
+        #remove sh.exe from path on win32, because cmake will fail when using mingw generator.
+        if "MinGW" in self.cmake_generator:
+            paths = os.environ["PATH"].split(os.pathsep)
+            paths_withoutsh = list()
+            for p in paths:
+                if not os.path.exists(os.path.join(p, "sh.exe")):
+                    paths_withoutsh.append(p)
+            env["PATH"] = os.pathsep.join(paths_withoutsh)
+
         if self.toolchain_file:
             toolchain_path = qibuild.sh.to_posix_path(self.toolchain_file)
             cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
@@ -373,7 +374,8 @@ class Toc(QiWorkTree):
             qibuild.cmake(project.directory,
                           project.build_directory,
                           cmake_args,
-                          clean_first=clean_first)
+                          clean_first=clean_first,
+                          env=env)
         except CommandFailedException:
             raise ConfigureFailed(project)
 

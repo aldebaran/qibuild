@@ -136,7 +136,7 @@ def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD", 
 
     command.check_call(cmd)
 
-def cmake(source_dir, build_dir, cmake_args, clean_first=True):
+def cmake(source_dir, build_dir, cmake_args, clean_first=True, env=None):
     """Call cmake with from a build dir for a source dir.
     cmake_args are added on the command line.
 
@@ -168,7 +168,7 @@ def cmake(source_dir, build_dir, cmake_args, clean_first=True):
     # Add path to source to the list of args, and set buildir for
     # the current working dir.
     cmake_args += [source_dir]
-    command.check_call(["cmake"] + cmake_args, cwd=build_dir)
+    command.check_call(["cmake"] + cmake_args, cwd=build_dir, env=env)
 
 
 def check_root_cmake_list(cmake_list_file, project_name):
