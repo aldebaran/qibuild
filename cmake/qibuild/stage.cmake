@@ -33,9 +33,28 @@ function(qi_stage_lib target)
   _qi_internal_stage_lib(${target} ${ARGN})
 endfunction()
 
-#! not implemented yet
-function(qi_stage_header)
-  qi_error("qi_stage_header: not implemented")
+#! Generate a 'name'-config.cmake, allowing other project to find the library.
+# This library does not have a cmake target, it's a header only library.
+# \arg:target a target created with qi_create_lib
+# \flag:INTERNAL An internal library will not be searchable once installed.
+#                This could be overwritten using QI_INSTALL_INTERNAL=ON
+# \group:DEPRECATED specify a deprecated message. This message will be displayed
+#                   each time another project use that lib.
+# \group:DEPENDS if not given, ${TARGET}_DEPENDS will be guessed from
+#                the previous calls to qi_use_lib().
+#                Use this (whith care!) to override this behavior.
+# \group:INCLUDE_DIRS it not given, ${TARGET}_INCLUDE_DIRS  will be
+#                 guessed from the previous calls to
+#                 include_directories()
+#                 Use this (whith care!) to override this behavior.
+# \group:DEFINITIONS list of compilation flags targets depending
+#                 of this library should use.
+# \group:PATH_SUFFIXES when your header is installed in foo/bar.h,
+#                 but you still need to do #include <bar.h>, you can
+#                 set PATH_SUFFIXES to 'foo'. Be careful to test the
+#                 intall rules of your headers if you choose to do so.
+function(qi_stage_header_only_lib target)
+  _qi_internal_stage_header_only_lib(${target} ${ARGN})
 endfunction()
 
 #! not implemented yet

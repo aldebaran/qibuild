@@ -389,7 +389,12 @@ function(stage_bin _targetname _name)
 endfunction()
 
 function(stage_header _name)
-  qi_deprecated("unimplemented")
+  set(_need_other_name FALSE)
+  qi_deprecated("stage_header is deprecated:
+    Use qi_stage_header_only_lib instead.
+  ")
+
+  qi_stage_header_only_lib("${_name}" ${ARGN})
 endfunction()
 
 function(cond_subdirectory)
