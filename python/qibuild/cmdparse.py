@@ -161,7 +161,7 @@ def main_wrapper(module, args):
             print "### Starting a debugger"
             try:
                 import ipdb
-                pdb.post_mortem(traceback)
+                ipdb.post_mortem(traceback)
                 sys.exit(0)
             except ImportError:
                 import pdb
