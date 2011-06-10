@@ -155,15 +155,18 @@ def main_wrapper(module, args):
         module.do(args)
     except Exception as e:
         if args.pdb:
+            traceback = sys.exc_info()[2]
             print ""
             print "### Exception:", e
             print "### Starting a debugger"
             try:
-                import ipdb as pdb
+                import ipdb
+                pdb.post_mortem(traceback)
+                sys.exit(0)
             except ImportError:
                 import pdb
-            traceback = sys.exc_info()[2]
-            pdb.post_mortem(traceback)
+                pdb.post_mortem(traceback)
+                sys.exit(0)
         if args.backtrace:
             raise
         logger = logging.getLogger("\n") # small hack
