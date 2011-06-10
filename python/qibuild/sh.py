@@ -73,7 +73,6 @@ def _copy_link(src, dest):
     target = os.readlink(src)
         #remove existing stuff
     if os.path.lexists(dest):
-        print "-- Removing ", dest
         rm(dest)
     if sys.stdout.isatty():
         print "-- Installing %s -> %s" % (dest, target)
@@ -119,6 +118,8 @@ def _handle_files(src, dest, root, files, filter):
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
                 raise Exception("Expecting a file but found a directory: %s" % fdest)
+            if sys.stdout.isatty():
+                print "-- Installing %s" % fdest
             shutil.copy(fsrc, fdest)
 
 
