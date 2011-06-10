@@ -38,7 +38,10 @@ class GitCommand:
             git_env                  = os.environ.copy()
             git_env['GIT_WORK_TREE'] = self.worktree
             git_env['GIT_DIR']       = self.gitdir
-        margs = ["git"]
+        git = command.find_program("git")
+        if not git:
+            raise Exception("git not found")
+        margs = [git]
         margs.extend([ x for x in args])
         cwd = kargs.get("cwd", self.worktree)
         return command.check_call(margs, cwd = cwd, env = git_env)
@@ -50,7 +53,10 @@ class GitCommand:
             git_env                  = os.environ.copy()
             git_env['GIT_WORK_TREE'] = self.worktree
             git_env['GIT_DIR']       = self.gitdir
-        margs = ["git"]
+        git = command.find_program("git")
+        if not git:
+            raise Exception("git not found")
+        margs = [git]
         margs.extend([ x for x in args])
         cwd = kargs.get("cwd", self.worktree)
         return command.call(margs, cwd = cwd, env = git_env)
@@ -62,7 +68,10 @@ class GitCommand:
             git_env                  = os.environ.copy()
             git_env['GIT_WORK_TREE'] = self.worktree
             git_env['GIT_DIR']       = self.gitdir
-        margs = ["git"]
+        git = command.find_program("git")
+        if not git:
+            raise Exception("git not found")
+        margs = [git]
         margs.extend([ x for x in args])
         cwd = kargs.get("cwd", self.worktree)
         return command.call_output(margs, cwd = cwd, env = git_env)
@@ -96,7 +105,10 @@ def get_remote_refs(git_url):
     return { 'refs/bla/bla'  : 'sha1',
              'refs/bla/bla2' : 'sha2' }
     """
-    lines = command.call_output(["git", "ls-remote", git_url])
+    git = command.find_program("git")
+    if not git:
+        raise Exception("git not found")
+    lines = command.call_output([git, "ls-remote", git_url])
     return _dict_from_refs(lines)
 
 def get_remote_ref(git_url, ref='refs/heads/master'):
