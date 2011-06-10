@@ -24,13 +24,8 @@ def do(args):
     qitoolchain.create(toolchain_name)
     toolchain = qitoolchain.Toolchain(toolchain_name)
 
-    cfg_path = qitoolchain.get_tc_config_path()
-    parser = ConfigParser.ConfigParser()
-    parser.read(cfg_path)
-    toolchain_section = 'toolchain "%s"' % toolchain_name
-    if parser.has_section(toolchain_section):
+    toolchain_names = qitoolchain.get_toolchain_names()
+    if toolchain_name in toolchain_names:
         raise Exception("Toolchain %s already exists in configuration" % toolchain_name)
 
-    qibuild.configstore.update_config(cfg_path,
-        'toolchain "%s"' % toolchain_name, "path", toolchain.path)
-
+    qitoolchain.set_tc_config(toolchain_name, "path", toolchain.path)

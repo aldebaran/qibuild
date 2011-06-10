@@ -109,6 +109,23 @@ def get_toolchain_names():
         return []
     return tc_config.keys()
 
+def get_tc_config(tc_name, key, default=None):
+    """ Get the configuration for a specific toolchain
+
+    """
+    configstore = qibuild.configstore.ConfigStore()
+    cfg_path = get_tc_config_path()
+    configstore.read(cfg_path)
+    full_key = 'toolchain.%s.%s' % (tc_name, key)
+    return configstore.get(full_key, default=default)
+
+def set_tc_config(tc_name, key, value):
+    """ Set the configuration for a specific toolchain
+
+    """
+    cfg_path = get_tc_config_path()
+    section = 'toolchain "%s"' % tc_name
+    qibuild.configstore.update_config(cfg_path, section, key, value)
 
 class Toolchain(object):
     """ The Toolchain class has a name and a list of packages.
@@ -119,14 +136,16 @@ class Toolchain(object):
         self.configstore = qibuild.configstore.ConfigStore()
         self.configstore.read(get_tc_config_path())
         self.path = get_tc_path(self.name)
-        tc_file_from_conf = self.configstore.get("toolchain.%s.file" % self.name)
+        tc_file_from_conf = get_tc_config(self.name, 'file')
         if tc_file_from_conf:
             self.toolchain_file = tc_file_from_conf
         else:
             self.toolchain_file = os.path.join(self.path, "toolchain-%s.cmake" % self.name)
 
+        self.cmake_flags = get_tc_config(self.name, "cmake.flags", default="").split()
+
         self.packages = list()
-        self.cross = self.configstore.get("toolchain.%s.cross" % self.name, default=False)
+        self.cross = get_tc_config(self.name, 'cross')
         if not self.cross:
             self.load_config()
             self.update_toolchain_file()
@@ -183,17 +202,24 @@ class Toolchain(object):
         configuration
 
         """
-        provided = self.configstore.get("toolchain.%s.provide" % self.name, default="")
-        provided = " ".join(p.name for p in self.packages)
-        LOGGER.debug("update_tc_provides: provided is now %s", provided)
-        qibuild.configstore.update_config(get_tc_config_path(),
-            "toolchain", self.name, "provide", provided)
+        provides = get_tc_config(self.name, "provides")
+        provides = " ".join(p.name for p in self.packages)
+        LOGGER.debug("update_tc_provides: provides is now %s", provides)
+        set_tc_config(self.name, "provides", provides)
 
     def update_toolchain_file(self):
         """Update the toolchain file when the packages have changed.
 
         """
         lines = list()
+        if self.cmake_flags:
+            for flag_setting in self.cmake_flags:
+                splitted = flag_setting.split('=')
+                if len(splitted) != 2:
+                    LOGGER.warning("Ignoring bad cmake flag setting, %s", flag_setting)
+                (key, value) = splitted
+                lines.append('set(%s "%s" CACHE INTERNAL \"\" FORCE)\n' % (key, value))
+
         for package in self.packages:
             package_path = self.get(package.name)
             package_path = qibuild.sh.to_posix_path(package_path)
@@ -217,11 +243,11 @@ class Toolchain(object):
 
         Called each time someone uses self.packages
         """
-        provided = self.configstore.get("toolchain.%s.provide" % self.name)
+        provides = get_tc_config(self.name, "provides")
         self.packages = list()
-        if not provided:
+        if not provides:
             return
-        for package_name in provided.split():
+        for package_name in provides.split():
             deps = self.configstore.get("package.%s.depends" % package_name, default="")
             names = deps.split()
             package = Package(package_name)

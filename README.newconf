@@ -235,6 +235,9 @@ cmake_generator -> cmake.generator
 build_dir       -> build.directory
 sdk_dir         -> build.sdk.directory
 
+toolchain.name.provide -> toolchain.name.provides
+(should not be visible by the user)
+
 
 Changed API
 -----------
