@@ -12,34 +12,35 @@ import qibuild
 LOGGER = logging.getLogger(__name__)
 
 
-def get_package_name(project, continuous=False, version=None, arch=None):
+def get_package_name(project,
+    continuous=False,
+    version=None,
+    config=None):
     """Get the package name of a project.
 
     Recognized args are:
       continuous -> append the date the the name of the package
       version    -> if not given, will try to use version.cmake at
                     the root of the project
-      arch       -> if not given, do nothing, else add this at the end
+      config     -> if not given, do nothing, else add this at the end
                     of the package name
     """
-    if project.package_name:
-        res = [project.package_name]
-    else:
-        res = [project.name]
+    res = [project.name]
 
-    if not version:
+    if version:
+        res.append(version)
+    else:
+        # Try to get it from project/version.cmake:
         version = qibuild.project.version_from_directory(project.directory)
         if version:
             res.append(version)
-    else:
-        res.append(version)
 
     if continuous:
         now = datetime.datetime.now()
         res.append(now.strftime("%Y-%m-%d-%H-%M"))
 
-    if arch:
-        res.append(arch)
+    if config:
+        res.append(config)
 
     return "-".join(res)
 
@@ -56,7 +57,8 @@ def configure_parser(parser):
         help  ="Do not compress the final install directory")
     parser.set_defaults(
         cmake_flags=["CMAKE_INSTALL_PREFIX='/'"],
-        compress=True)
+        compress=True,
+        include_deps=False)
 
 def _do(args, build_type):
     """Called by do().
@@ -67,23 +69,20 @@ def _do(args, build_type):
     """
     args.build_type = build_type
     toc      = qibuild.toc_open(args.work_tree, args)
+    config = toc.active_config
+
     if not args.project:
         project_name = qibuild.toc.project_from_cwd()
     else:
         project_name = args.project
     project = toc.get_project(project_name)
-    #TODO create package directory if it does not exit
+
     inst_dir = os.path.join(toc.work_tree, "package")
-
-    # quick hack, adding a 'package_name' attributes
-    # to the Project instance:
-    project.package_name = args.package_name
-
 
     package_name = get_package_name(
         project,
         continuous=args.continuous,
-        arch=args.arch,
+        config=config,
         version=args.version)
 
     destdir = os.path.join(inst_dir, package_name)
@@ -101,6 +100,7 @@ def do(args):
     if toc.using_visual_studio and not args.runtime:
         _do(args, "debug")
     destdir = _do(args, "release")
+
     #TODO warn if dest dir is empty
 
     if args.compress:

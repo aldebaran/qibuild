@@ -55,7 +55,7 @@ def project_parser(parser):
 
 
 def package_parser(parser):
-    """ Parse setting for every action making packages
+    """ Parser setting for every action making packages
 
     """
     group = parser.add_argument_group("package options")
@@ -64,12 +64,16 @@ def package_parser(parser):
     group.add_argument("--continuous", action="store_true",
         help="Append the date at the end of the name "
         "of the package")
-    group.add_argument("--arch", help="A string describing the architecture of "
-        "the package: linux, linux64, mac, windows-vs2008, etc...")
     group.add_argument("--runtime", action="store_true",
         help="Install runtime components only")
-    group.add_argument("--package-name", help="The package name, if you want "
-        "it to be different from the project name")
+    parser.add_argument("--include-deps",
+        action="store_true", dest="include_deps",
+        help="Include dependencies when making the package. "
+             "Use if you want to distribute the package")
+    parser.add_argument("--no-include-deps",
+        action="store_false", dest="include_deps",
+        help="Do not include dependencies when making the package. "
+             "This is the default")
     parser.set_defaults(
         continuous=False,
         runtime=False)

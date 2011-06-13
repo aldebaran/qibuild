@@ -40,6 +40,7 @@ add the -DCMAKE_TOOLCHAIN_FILE parameter
 
 
 import os
+import sys
 import logging
 
 import qibuild
@@ -126,6 +127,8 @@ def set_tc_config(tc_name, key, value):
     cfg_path = get_tc_config_path()
     section = 'toolchain "%s"' % tc_name
     qibuild.configstore.update_config(cfg_path, section, key, value)
+
+
 
 class Toolchain(object):
     """ The Toolchain class has a name and a list of packages.
@@ -254,6 +257,20 @@ class Toolchain(object):
             package.depends = names
             self.packages.append(package)
 
+    def install_package(self, package_name, destdir, runtime=False):
+        """ Install a package to a destdir.
+
+        If a runtime is False, only the runtime files
+        (dynamic libraries, executables, config files) will be
+        installed
+
+        """
+        package_path = self.get(package_name)
+        if runtime:
+            qibuild.sh.install(package_path, destdir, filter=is_runtime)
+        else:
+            qibuild.sh.install(package_path, destdir)
+
 def create(toolchain_name):
     """Create a new toolchain given its name.
     """
@@ -262,3 +279,62 @@ def create(toolchain_name):
     qibuild.sh.mkdir(get_tc_cache(toolchain_name), recursive=True)
     LOGGER.info("Toolchain initialized in: %s", path)
 
+def is_runtime(filename):
+    """ Filter function to only install runtime components of packages
+
+    """
+    # FIXME: this looks like a hack.
+    # Maybe a user-generated MANIFEST at the root of the package path
+    # would be better?
+
+    basename = os.path.basename(filename)
+    basedir  = filename.split(os.path.sep)[0]
+    if filename.startswith("bin"):
+        if sys.platform.startswith("win"):
+            if filename.endswith(".exe"):
+                return True
+            if filename.endswith(".dll"):
+                return True
+            else:
+                return False
+        else:
+            return True
+    if filename.startswith("lib"):
+        # exception for python:
+        if "python" in filename and filename.endswith("Makefile"):
+            return True
+        # shared libraries
+        shared_lib_ext = ""
+        if sys.platform.startswith("win"):
+            shared_lib_ext = ".dll"
+        if sys.platform == "linux2":
+            shared_lib_ext = ".so"
+        if sys.platform == "darwing":
+            shared_lib_ext = ".dylib"
+        if shared_lib_ext in basename:
+            return True
+        # python
+        if basename.endswith(".py"):
+            return True
+        if basename.endswith(".pyd"):
+            return True
+        else:
+            return False
+    if filename.startswith(os.path.join("share", "cmake")):
+        return False
+    if filename.startswith(os.path.join("share", "man")):
+        return False
+    if basedir == "share":
+        return True
+    if basedir == "include":
+        # exception for python:
+        if filename.endswith("pyconfig.h"):
+            return True
+        else:
+            return False
+    if basedir.endswith(".framework"):
+        return True
+
+    # True by default: better have too much stuff than
+    # not enough
+    return True
