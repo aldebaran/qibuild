@@ -271,6 +271,19 @@ class Toolchain(object):
         else:
             qibuild.sh.install(package_path, destdir)
 
+    def remove_package(self, package_name):
+        """ Remove a package from the toolchain
+
+        """
+        package_path = self.get(package_name)
+        qibuild.sh.rm(package_path)
+        self.packages = [p for p in self.packages if p.name != package_name]
+        provides = get_tc_config(self.name, "provides")
+        provides = " ".join(p.name for p in self.packages)
+
+        set_tc_config(self.name, "provides", provides)
+
+
 def create(toolchain_name):
     """Create a new toolchain given its name.
     """

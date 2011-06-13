@@ -24,7 +24,7 @@ def configure_parser(parser):
     """Configure parser for this action """
     qibuild.qiworktree.work_tree_parser(parser)
     parser.add_argument("name",
-        help="The name of the toolchain file")
+        help="The name of the toolchain")
     parser.add_argument("toolchain_file",
         help="Path to the toolchain file to use")
     parser.add_argument("--cross", action="store_true",
