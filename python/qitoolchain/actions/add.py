@@ -1,13 +1,11 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"""Add a new package in a toolchain dir
+"""Add a new package to a toolchain
 """
 
 import os
-import shutil
 import logging
 
-import qibuild
 import qibuild
 import qitoolchain
 
@@ -17,12 +15,13 @@ LOGGER = logging.getLogger(__name__)
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.toc_parser(parser)
-    qibuild.parsers.build_parser(parser)
-    parser.add_argument("project_or_package_path", nargs="?",
-        help="Name of the project to package, or path to an existing package")
+    parser.add_argument("package_name", metavar='NAME',
+        help="The name of the package")
+    parser.add_argument("package_path", metavar='PATH',
+        help="The path to the package")
 
 def do(args):
-    """ Add a project to the current toolchain
+    """ Add a project to a toolchain
 
     - Check that there is a current toolchain
     - Run `qibuild package' if a project, and not a package was given as
@@ -31,28 +30,30 @@ def do(args):
     - Add the package from cache to toolchain
 
     """
-    toc = qibuild.toc.toc_open(args.work_tree, args)
+    package_name = args.package_name
+    package_path = args.package_path
+    tc_name = args.config
 
-    tc_name = toc.toolchain_name
-    if tc_name is None:
-        raise Exception("Could not find current toolchain")
-
-    if not args.project_or_package_path:
-        project_name = qibuild.toc.project_from_cwd()
-    else:
-        if os.path.exists(args.project_or_package_path):
-            package = args.project_or_package_path
-            project_name = os.path.basename(package)
-            project_name = qibuild.archive.extracted_name(project_name)
-        else:
-            project_name = args.project_or_package_path
-            package = qibuild.cmdparse.run_action("qibuild.actions.package",
-                [project_name], forward_args=args)
+    if not tc_name:
+        active_config = None
+        try:
+            toc = qibuild.toc.toc_open(args.work_tree, args)
+            active_config = toc.active_config
+        except qibuild.toc.TocException:
+            pass
+        if not active_config:
+            mess  = "Could not find which config to use.\n"
+            mess  = "(not it a work tree or not default config in "
+            mess += "current worktree configuration)\n"
+            mess += "Please specify a configuration with -c \n"
+            raise Exception(mess)
+        tc_name = active_config
 
     tc_cache_path = qitoolchain.get_tc_cache(tc_name)
-    qibuild.sh.mkdir(tc_cache_path, recursive=True)
-    in_cache = os.path.join(tc_cache_path, os.path.basename(package))
-    shutil.copy(package, in_cache)
+    dest = os.path.join(tc_cache_path, package_name)
+    in_cache = qibuild.archive.archive_name(dest)
+
+    qibuild.sh.install(package_path, in_cache)
 
     tc = qitoolchain.Toolchain(tc_name)
-    tc.add_package(project_name, in_cache)
+    tc.add_package(package_name, in_cache)

@@ -157,6 +157,26 @@ def extracted_name(archive_name):
         if archive_name.endswith(ext):
             return archive_name[:-len(ext)]
 
+def archive_name(directory):
+    """ Return the name an archive made from the
+    directory would have.
+    (platform-dependant)
+
+    On windows:
+        >> archive_name('foo')
+        foo.zip
+    Elsewhere:
+        >> archive_name('foo')
+        foo.tar.gz
+    """
+    if sys.platform.startswith("win"):
+        return directory + ".zip"
+    else:
+        return directory + ".tar.gz"
+
+
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
