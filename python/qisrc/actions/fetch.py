@@ -32,20 +32,19 @@ def do(args):
     """Main entry point
 
     """
-    qiwt = qibuild.qiworktree_open(args.work_tree)
-    qibuild_cfg = os.path.join(qiwt.work_tree, ".qi", "qibuild.cfg")
-    qibuild_store = qibuild.configstore.ConfigStore()
-    qibuild_store.read(qibuild_cfg)
+    toc = qibuild.toc.toc_open(args.work_tree)
+    toc_cfg = toc.config_path
+    toc_configstore = qibuild.configstore.ConfigStore()
+    toc_configstore.read(toc_cfg)
     if args.url:
        manifest_url = args.url
     else:
-        # Read it from conf:
-        manifest_url = qibuild_store.get("manifest", "url")
+        manifest_url = toc_configstore.get("manifest.url")
         if manifest_url is None:
             mess  = "Could not find URL fo fetch from.\n"
             mess += "Here is what you can do:\n"
             mess += " - specify an URL from the command line\n"
-            mess += " - edit %s to have: \n\n" % qibuild_cfg
+            mess += " - edit %s to have: \n\n" % toc_cfg
             mess += """[manifest]
 url = ftp://example.com/foo.manifest
 """
@@ -54,7 +53,7 @@ url = ftp://example.com/foo.manifest
     config = qibuild.configstore.ConfigStore()
     with qibuild.sh.TempDir() as tmp:
         manifest = os.path.join(tmp, "manifest")
-        urllib.urlretrieve(args.url, manifest)
+        urllib.urlretrieve(manifest_url, manifest)
         config.read(manifest)
 
     projects = config.get("project", default=None)
@@ -64,7 +63,7 @@ url = ftp://example.com/foo.manifest
     qiwt = qibuild.qiworktree_open(args.work_tree)
 
     for (project_name, project_conf) in config.get("project").iteritems():
-        project_url = config.get("project", project_name, "url")
+        project_url = config.get("project.%s.url" % project_name)
         if project_name in qiwt.buildable_projects.keys():
             LOGGER.info("Found %s, skipping", project_name)
         else:
@@ -74,6 +73,6 @@ url = ftp://example.com/foo.manifest
                 pass
 
     # Everything went fine, store the manifest URL for later use:
-    qibuild.configstore.update_config(qibuild_cfg, "manifest", "url", manifest_url)
+    qibuild.configstore.update_config(toc_cfg, "manifest", "url", manifest_url)
 
 
