@@ -73,6 +73,27 @@ spam = eggs
         expected = ['linux32', 'linux32-1.12']
         self.assertEquals(actual, expected)
 
+    def test_merge_conf_files(self):
+        global_cfg = os.path.join(self.tmp, "global.cfg")
+        with open(global_cfg, "w") as fp:
+            fp.write(r"""
+[general]
+env.path = c:\path\to\swig
+""")
+        user_cfg = os.path.join(self.tmp, "user.cfg")
+        with open(user_cfg, "w") as fp:
+            fp.write(r"""
+[general]
+config = win32-vs2008
+""")
+
+        configstore = qibuild.configstore.ConfigStore()
+        configstore.read(global_cfg)
+        configstore.read(user_cfg)
+
+        self.assertEquals(configstore.get('general.env.path'), r"c:\path\to\swig")
+        self.assertEquals(configstore.get('general.config'), "win32-vs2008")
+
 
 
 
@@ -123,6 +144,7 @@ cmake.generator = 'Visual Studio 10'
     def test_setting_config(self):
         toc =  qibuild.toc.Toc(self.tmp, config='win32-vs2010')
         self._check_config(toc, "Visual Studio 10", "cmake.generator")
+
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)

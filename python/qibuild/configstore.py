@@ -180,7 +180,8 @@ class ConfigStore:
             # looking like "config 'bar'", but we really want config.bar
             # as the dot-separated key:
             if len(splitted_section) == 1:
-                self.root[parsed_section] = dict()
+                if self.root.get(parsed_section) is None:
+                    self.root[parsed_section] = dict()
                 to_update = self.root[parsed_section]
             elif len(splitted_section) == 2:
                 section_name, subsection = splitted_section
