@@ -253,10 +253,15 @@ class Toc(QiWorkTree):
         self.using_visual_studio = "Visual Studio" in self.cmake_generator
         self.vc_version = self.cmake_generator.split()[-1]
 
-        # Actual list of cmake flags we are going to use.
-        # * the toolchain file if a toolchain is used
-        # * and the flags set by the user.
-        self.cmake_flags = self.compute_cmake_flags(cmake_flags)
+        # The actual list of cmake flags we are going to use
+        # will be computed during self.configure_project.
+        # Right now, we will just store the flags passed in ctor
+        # in self.user_cmake_flags, to be sure they are always added
+        # at the end of the list of flags
+        if cmake_flags:
+            self.user_cmake_flags = cmake_flags[:]
+        else:
+            self.user_cmake_flags = list()
 
         # Finally, update the build configuration of all the projects
         # (this way we are sure that the build configuration is the same for
@@ -299,36 +304,6 @@ class Toc(QiWorkTree):
         # moment...
         for project in self.projects:
             qibuild.project.update_project(project, self)
-
-
-    def compute_cmake_flags(self, user_flags):
-        """ The cmake flags used by toc comes for several source:
-        - if a toolchain is used, add
-           -DCMAKE_TOOLCHAIN_FILE = toolchain.toolchain_file
-        - if ~/.config/qi/<tc_name>.cmake exist, parse the file and add flags
-        - same thing for ~/.qi/<tc_name>.cmake
-
-        Finally, add user_cmake_flags (which are the flags set by the user,
-        passed to Toc ctor.
-
-        """
-        if not self.toolchain:
-            if user_flags:
-                return user_flags
-            else:
-                return list()
-
-        res = list()
-        tc_file = self.toolchain.toolchain_file
-        tc_name = self.toolchain.name
-        tc_file = qibuild.sh.to_posix_path(tc_file)
-        res.append("CMAKE_TOOLCHAIN_FILE=%s" % tc_file)
-
-
-        if user_flags:
-            res.extend(user_flags)
-
-        return res
 
 
     def set_build_folder_name(self):
@@ -504,6 +479,9 @@ class Toc(QiWorkTree):
             tc_file = self.toolchain.toolchain_file
             toolchain_path = qibuild.sh.to_posix_path(tc_file)
             cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
+
+        # Finally append user's cmake flags (passed in ctor)
+        cmake_flags.extend(self.user_cmake_flags)
 
         #remove sh.exe from path on win32, because cmake will fail when using mingw generator.
         env = os.environ.copy()
