@@ -407,14 +407,10 @@ class Toc(QiWorkTree):
         """Update os.environ using the qibuild configuration file
 
         """
-        env = self.configstore.get("env")
-        path = None
-        bat_file = None
-        if env:
-            path = env.get("path")
-            bat_file = env.get("bat_file")
-        if path:
-            self._set_env_from_path_conf(path)
+        path_conf = self.configstore.get("env.path")
+        bat_file  = self.configstore.get("env.bat_file")
+        if path_conf:
+            self._set_env_from_path_conf(path_conf)
         if bat_file:
             self._set_path_from_bat_conf(bat_file)
 
