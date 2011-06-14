@@ -11,6 +11,70 @@ import qibuild
 import tempfile
 
 
+class ConfigStoreTestCase(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix="tmp-configstore-test")
+        self.cfg_path = os.path.join(self.tmp, "conf.cfg")
+        with open(self.cfg_path, "w") as fp:
+            fp.write("""
+[foo]
+bar = 42
+""")
+
+    def tearDown(self):
+        qibuild.sh.rm(self.tmp)
+
+    def test_get_set(self):
+        confistore = qibuild.configstore.ConfigStore()
+        confistore.read(self.cfg_path)
+        self.assertEquals(confistore.get('foo.bar'), '42')
+
+        # Update existing section:
+        qibuild.configstore.update_config(self.cfg_path, 'foo', 'bar', '43')
+
+        # Re-init configstore:
+        confistore = qibuild.configstore.ConfigStore()
+        confistore.read(self.cfg_path)
+        self.assertEquals(confistore.get('foo.bar'), '43')
+
+    def test_create_section(self):
+        confistore = qibuild.configstore.ConfigStore()
+        confistore.read(self.cfg_path)
+        self.assertEquals(confistore.get('foo.bar'), '42')
+
+        # Update existing section:
+        qibuild.configstore.update_config(self.cfg_path, 'spam', 'eggs', '43')
+
+        # Re-init configstore:
+        confistore = qibuild.configstore.ConfigStore()
+        confistore.read(self.cfg_path)
+        self.assertEquals(confistore.get('spam.eggs'), '43')
+
+
+    def test_dot_in_subsection(self):
+        with open(self.cfg_path, "wa") as fp:
+            fp.write("""
+[config "linux32"]
+foo = bar
+
+[config "linux32-1.12"]
+spam = eggs
+""")
+
+        confistore = qibuild.configstore.ConfigStore()
+        confistore.read(self.cfg_path)
+
+        self.assertEquals(confistore.get('config.linux32-1.12.spam'), 'eggs')
+
+        configs = confistore.get('config')
+        actual = configs.keys()
+        actual.sort()
+
+        expected = ['linux32', 'linux32-1.12']
+        self.assertEquals(actual, expected)
+
+
+
 
 class QiConfigTestCase(unittest.TestCase):
     def setUp(self):

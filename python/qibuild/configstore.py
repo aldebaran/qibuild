@@ -65,54 +65,68 @@ class ConfigException(Exception):
         return repr(self.args)
 
 class ConfigStore:
-    """ Store a list of configuration values
+    """ Store a list of configuration values.
+
+    Values are accessible via dot-separated names.
+
+    Note: there is no set() value, use update_config
+    instead.
     """
     logger = logging.getLogger("qibuild.configstore")
 
     def __init__(self):
         self.root = dict()
 
-    def set(self, key, value):
-        """
-        add a value
-        """
-        element = self.root
-        keys = key.split(".")
-
-        for key in keys[:-1]:
-            current = element.get(key, None)
-            if current is None:
-                element[key] = dict()
-                current      = element[key]
-            elif type(current) != dict:
-                raise ConfigException("The key is a leaf")
-            element = current
-        element[keys[len(keys) - 1]] = value
-
     def get(self, key, default=None):
         """ Get a value from a dot-separated key
 
         """
         keys = key.split(".")
-        res = ConfigStore._get(self, keys)
+        res = ConfigStore._get(self.root, keys)
         if not res:
             return default
         return res
 
 
     @staticmethod
-    def _get(element, keys):
-        """ Recursive function used by self.get()
+    def _get(d, keys):
+        """ Recursive function used by self.get().
+        Allow sections names to contains at least one dot.
 
+        >>> d = {
+        ...     "a"   : {"g" : "h"},
+        ...     "b.c" : {"i" :  "j"},
+        ...     "d"   : {"k.l" : "m"},
+        ...     "n"   : {},
+        ... }
+        >>> ConfigStore._get(d, 'a.g'.split('.'))
+        'h'
+        >>> ConfigStore._get(d, 'b.c.i'.split('.'))
+        'j'
+        >>> ConfigStore._get(d, 'd.k.l'.split('.'))
+        'm'
+        >>> ConfigStore._get(d, 'n'.split('.'))
+        {}
+        >>> ConfigStore._get(d, 'o'.split('.'))
         """
-        element = element.root
-        for s in keys:
-            if not isinstance(element, dict):
-                return None
-            element = element.get(s)
-            if element is None:
-                return None
-        return element
+        # FIXME: allow several dots?
+        k = keys[0]
+        rest = keys[1:]
+        if not rest:
+            return d.get(k)
+        if k in d.keys():
+            if isinstance(d[k], dict):
+                return ConfigStore._get(d[k], rest)
+            else:
+                return d[k]
+        else:
+            k = ".".join(keys[0:2])
+            rest = keys[2:]
+            if k in d.keys():
+                if isinstance(d[k], dict):
+                    return ConfigStore._get(d[k], rest)
+                else:
+                    return d[k]
 
     def __str__(self, pad=True):
         """ print the list of keys/values """
@@ -166,19 +180,24 @@ class ConfigStore:
             # looking like "config 'bar'", but we really want config.bar
             # as the dot-separated key:
             if len(splitted_section) == 1:
-                key_name = parsed_section
+                self.root[parsed_section] = dict()
+                to_update = self.root[parsed_section]
             elif len(splitted_section) == 2:
                 section_name, subsection = splitted_section
-                key_name = section_name + '.' + subsection
+                if self.root.get(section_name) is None:
+                    self.root[section_name] = dict()
+                self.root[section_name][subsection] = dict()
+                to_update = self.root[section_name][subsection]
+
             items = parser.items(parsed_section)
             if not items:
                 # The key exists but is empty:
-                self.set(key_name, dict())
+                to_update = dict()
             for k, v in items:
-                tkey = list()
-                tkey.extend([x.strip("\"\'") for x in splitted_section])
-                tkey.extend([x.strip("\"\'") for x in k.split(".")])
-                self.set(".".join(tkey), value=v.strip("\"\'"))
+                v = v.strip('"')
+                v = v.strip("'")
+                to_update[k] = v
+
 
 
 def update_config(config_path, section, key, value):
@@ -221,3 +240,7 @@ def update_config(config_path, section, key, value):
         parser.write(config_file)
 
 
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
