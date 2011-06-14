@@ -233,7 +233,7 @@ Changed names
 build.cmake     -> cmake
 cmake_generator -> cmake.generator
 build_dir       -> build.directory
-sdk_dir         -> build.sdk.directory
+sdk_dir         -> build.sdk_dir (could not do build.skd.directory ...)
 
 toolchain.name.provide -> toolchain.name.provides
 (should not be visible by the user)

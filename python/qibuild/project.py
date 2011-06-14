@@ -146,7 +146,7 @@ def update_project(project, toc):
 
 
     # Handle single sdk dir
-    sdk_dir = toc.configstore.get("build.sdk.directory", default=None)
+    sdk_dir = toc.configstore.get("build.sdk_dir", default=None)
     if sdk_dir:
         if os.path.isabs(sdk_dir):
             project.sdk_directory = sdk_dir
