@@ -42,7 +42,7 @@ def do(args):
     qitoolchain.set_tc_config(tc_name, "file", tc_file)
 
     if args.cross:
-        qibuild.configstore.update_config(tc_name, "cross", "yes")
+        qitoolchain.set_tc_config(tc_name, 'cross', 'yes')
 
     if not args.default:
         mess  = "Not try using: \n"
