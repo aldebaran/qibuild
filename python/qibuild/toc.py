@@ -473,15 +473,15 @@ class Toc(QiWorkTree):
         cmake_flags = list()
         cmake_flags.extend(project.cmake_flags)
 
-        cmake_args.extend(["-D" + x for x in cmake_flags])
-
         if self.toolchain is not None:
             tc_file = self.toolchain.toolchain_file
             toolchain_path = qibuild.sh.to_posix_path(tc_file)
-            cmake_args.append('-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
+            cmake_flags.append('CMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
 
         # Finally append user's cmake flags (passed in ctor)
         cmake_flags.extend(self.user_cmake_flags)
+
+        cmake_args.extend(["-D" + x for x in cmake_flags])
 
         #remove sh.exe from path on win32, because cmake will fail when using mingw generator.
         env = os.environ.copy()
