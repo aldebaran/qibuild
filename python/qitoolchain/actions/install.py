@@ -45,7 +45,7 @@ def do(args):
         qitoolchain.set_tc_config(tc_name, 'cross', 'yes')
 
     if not args.default:
-        mess  = "Not try using: \n"
+        mess  = "Now try using: \n"
         mess += "qibuild configure -c {tc_name} \n"
         mess += "qibuild make      -c {tc_name} \n"
         LOGGER.info(mess.format(tc_name=tc_name))
