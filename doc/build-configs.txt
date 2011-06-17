@@ -12,7 +12,6 @@ The problem
 Let's say you have a +foo+ library, with some tests.
 You want to make the compilation of the tests optional
 (because they depend on +gtest+, and you do not want to
-
 force your users to have gtest)
 
 A standard CMake way to do it would be
@@ -36,9 +35,22 @@ endif()
 
 So far so good.
 
+
 But now you have to pass "-DWITH_GTEST=ON" to all your project when you
 configure them.
 
+
+Note that ther is a shortcut for that in qibuild CMake API:
+[source, cmake]
+----
+qi_add_optional_package(GTEST)
+
+----
+
+Here, if GTEST is not found, no error is raised, and WITH_GTEST is
+simply set to "OFF"...
+
+But let's assume you *really* need some flags
 
 
 Passing CMake Flags with qiBuild
@@ -54,82 +66,51 @@ Simply call:
 qibuild configure foo -DWITH_GTEST=ON
 ----
 
-* Just for a project.
+* For all the projects on your worktree
 
-Edit the configuration to have something like
+You may want to trigger some flags depending on the
+toolchain / configuration you use.
 
-[source, ini]
+For instance, if you want to pass -DWITH_FOO=OFF when you are using
+the toolchain mingw32, you can write something like:
+
+[source, cmake]
 ----
-[project foo]
-cmake.flags = "WITH_GTEST=ON"
+set(WITH_FOO OFF CACHE INTERAL "" FORCE)
 ----
 
-In fact, they are several places where you can put those line:
+in .qi/mingw32.cmake
 
- - In your +.qi/build.cfg+ file.
-
- - In the qibuild.manifest of your project (if you are sure everyone should
- use those flags)
-
-* For every project found on your current build tree
-
-In this case, the configuration would look like
-
-[source, ini]
-----
-[general "build"]
-cmake.flags = "WITH_GTEST=ON"
-----
 
 
 Using build configurations
 --------------------------
 
-Sometimes you may need to use a different set of flags.
 
-For instance, you may want to pass a +ENABLE_PERF=ON+ flag to every
-project because you have performance issues and want to figure them out.
+QiBuild also lets you to have different settings depending on the
+toolchain you use.
 
-You also may have to add a dependency to the +foo+ project, +libperf+
-
-You can do this by creating an other file called +build-perf.cfg+ in you
-+.qi+ directory.
-
-
-+.qi/build.cfg+ will always be read, and the configuration will be updated
-with  +build-perf.cfg+ if you pass the +-c+ flag to the build
-commands.
-
-In this case you could write:
+For instance, you could have on a windows machine
 
 [source, ini]
 ----
-# In build-perf.cfg
-[general "build"]
-cmake.flags = "ENABLE_PERF=ON"
+[general]
+env.path = ....
 
-[project "foo"]
-depends = "bar libperf"
+
+[config mingw32]
+cmake.generator = 'MinGW Makefiles'
+env.path = c:\MinGW\bin
+
+[config win32-vs2010]
+cmake.generator =  'Visual Studio 10'
 ----
 
-
-Then use
-
-----
-qibuild configure -c perf foo
-----
+This can be done just for your current worktree (in
+<worktree/.qi/qibuild.cfg), or for all your worktrees,
+in .config/qi/qibuild/qibuild.cfg
 
 
-You will note that the +qibuild+ will choose an other build directory, containing
-the name of the configuration.
-
-Lastly, if you get tired of passing the +-c+ option all the time, you can also
-edit the main +.qi/build.cfg+ to specify a default build configuration.
-
-[source, ini]
-----
-[general "build"]
-config = perf
-----
-
+NOTE: Several tools or qibuild actions will update your config
+      files for you, so please be careful :)
 
