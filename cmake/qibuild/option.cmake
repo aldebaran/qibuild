@@ -1,9 +1,5 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-
-
-include(CMakeDependentOption)
-
 #! Add optional dependency to a package
 # \arg:  NAME             Name of the package, a WITH_${NAME} option will be created
 # \arg:  DESCRIPTION      The description of the option (will be shown in cmake gui)
