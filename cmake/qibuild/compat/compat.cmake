@@ -448,9 +448,7 @@ endfunction()
 # tests
 #####################
 function(configure_tests _name)
-  if(BUILD_TESTS)
-    include("${CMAKE_CURRENT_SOURCE_DIR}/${_name}")
-  endif()
+  include("${CMAKE_CURRENT_SOURCE_DIR}/${_name}")
 endfunction()
 
 # Old undocumented functions. (Used for aldebaran's
