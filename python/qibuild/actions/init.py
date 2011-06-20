@@ -78,6 +78,7 @@ def ask_config(toc):
     elif "vs2010" in config:
         cmake_generator = "Visual Studio 2010"
     elif "mingw32" in config:
+        cmake_generator = "MinGW Makefiles"
         # Check that mingw32-make.exe is in %PATH%:
         mingw32_make = qibuild.command.find_program("mingw32-make")
         qibuild.command.find_program
