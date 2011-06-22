@@ -21,7 +21,8 @@ function(qi_swig_wrap_python module_name interface_file)
   # then CMAKE_FIND_ROOT_PATH prevent find_file from working.
   find_program(SWIG_EXECUTABLE swig)
   if(NOT SWIG_EXECUTABLE)
-    qi_error("Could not find swig executable in PATH, python wrapping is disabled")
+    qi_warning("Could not find swig executable in PATH, python wrapping is disabled")
+    return()
   endif()
 
   include("UseSWIG")
