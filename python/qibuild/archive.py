@@ -123,6 +123,9 @@ def zip_unix(directory):
     Call tar cvfz on a directory
 
     """
+    # Do not use tarfile python module when tar:
+    # - is faster
+    # - is not buggy
     base_dir = os.path.basename(directory)
     work_dir = os.path.abspath(os.path.join(directory, ".."))
     base_archive_name = base_dir + ".tar.gz"
