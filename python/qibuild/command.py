@@ -138,6 +138,10 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
     the last 30 lines of the process to sys.stdout if the
     retcode is not zero, else write everything.
 
+    Note: this trick with sys.stderr, sys.stdout and subprocess
+    does not work on windows with python < 2.7, so it is simply
+    disabled, and you have a normal behavior instead.
+
     """
     check_is_in_path(cmd[0])
     if cwd:
@@ -147,22 +151,23 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
     cmdline = CommandLine(cmd, cwd=cwd, env=env, shell=False)
     buffer = RingBuffer(30)
 
-    # Avoid writing to sys.stdout or sys.stderr
-    # if they are not tty's
-
     minimal_write = False
-    if not sys.stdout.isatty() or not sys.stderr.isatty():
-        minimal_write = True
+    if sys.platform.startswith("win") and sys.version_info < (2, 7):
+        returncode = subprocess.call(cmd, env=env, cwd=cwd)
+    else:
+        # This code won't work on windows with python < 2.7
+        if not sys.stdout.isatty() or not sys.stderr.isatty():
+            minimal_write = True
 
-    for(out, err) in cmdline.execute():
-        if out is not None:
-            if not minimal_write:
-                sys.stdout.write(out)
-            buffer.append(out)
-        if err is not None:
-            if not minimal_write:
-                sys.stderr.write(err)
-            buffer.append(err)
+        for(out, err) in cmdline.execute():
+            if out is not None:
+                if not minimal_write:
+                    sys.stdout.write(out)
+                buffer.append(out)
+            if err is not None:
+                if not minimal_write:
+                    sys.stderr.write(err)
+                buffer.append(err)
 
     returncode = cmdline.returncode
     sys.stdout.flush()
