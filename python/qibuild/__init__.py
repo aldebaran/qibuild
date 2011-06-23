@@ -103,7 +103,7 @@ def nmake(build_dir, target=None):
 
 
 
-def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD", num_jobs=None):
+def msbuild(sln_file, build_type="Debug", target=None, num_jobs=None):
     """ Launch msbuild with correct configuration
     (debug or release), and with correct switch if num_jobs is not None
     """
@@ -113,21 +113,6 @@ def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD", 
     cmd += ["/nologo"]
     if num_jobs != None:
         cmd.append("/m:%d" % int(num_jobs))
-
-    if be_verbose:
-        # PerformanceSummary:
-        # Displays the time spent in tasks, targets, and projects.
-        # NoItemAndPropertyList:
-
-        # Hides the list of items and properties displayed at the
-        # start of each project build in diagnostic verbosity
-
-        # Verbosity:
-        # The available verbosity levels are q[uiet], m[inimal],
-        # n[ormal], d[etailed], and diag[nostic].
-
-        cmd += ["/clp:PerformanceSummary;NoItemAndPropertyList;Summary;Verbosity=normal"]
-
 
     if target is not None:
         cmd += ["/target:%s" % target]

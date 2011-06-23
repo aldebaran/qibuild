@@ -40,6 +40,8 @@ import subprocess
 import threading
 import Queue
 
+from qibuild import log
+
 LOGGER = logging.getLogger(__name__)
 
 DRYRUN           = False
@@ -50,6 +52,8 @@ class CommandFailedException(Exception):
         self.cmd = cmd
         if cwd is None:
             self.cwd = os.getcwd()
+        else:
+            self.cwd = cwd
         self.returncode = returncode
 
     def __str__(self):
@@ -109,9 +113,7 @@ def check_is_in_path(executable):
         raise NotInPath(executable)
 
 
-def call(cmd, cwd=None, env=None,
-        ignore_ret_code=False,
-        verbose=True):
+def call(cmd, cwd=None, env=None, ignore_ret_code=False):
     """ Execute a command line.
 
     If ignore_ret_code is False:
@@ -119,16 +121,11 @@ def call(cmd, cwd=None, env=None,
     Else:
         simply returns the returncode of the process
 
-    If verbose is False, nothing but the last 30 lines
-    of output are printed to the screen.
-    Else, the output is directly printed  to the screen.
-
     Note: first arg of the cmd is assumed to be something
     inside %PATH%.
 
     Note: the shell= argument of the subprocess.Popen
     call will always be False.
-
 
     can raise:
         - CommandFailedException if ignore_ret_code is False
@@ -136,6 +133,11 @@ def call(cmd, cwd=None, env=None,
         - NotInPath  if first arg of cmd is not in %PATH%
         - and normal exception if cwd is given and is not
         an existing directory.
+
+    If sys.stdout or sys.stderr are not a tty, only write
+    the last 30 lines of the process to sys.stdout if the
+    retcode is not zero, else write everything.
+
     """
     check_is_in_path(cmd[0])
     if cwd:
@@ -143,30 +145,36 @@ def call(cmd, cwd=None, env=None,
             raise Exception("Trying to to run %s in non-existing %s" %
                 (" ".join(cmd), cwd))
     cmdline = CommandLine(cmd, cwd=cwd, env=env, shell=False)
-    if not verbose:
-        # Create a buffer to avoid storing too much stuff in RAM
-        buffer = RingBuffer(30)
+    buffer = RingBuffer(30)
+
+    # Avoid writing to sys.stdout or sys.stderr
+    # if they are not tty's
+
+    minimal_write = False
+    if not sys.stdout.isatty() or not sys.stderr.isatty():
+        minimal_write = True
 
     for(out, err) in cmdline.execute():
         if out is not None:
-            if verbose:
+            if not minimal_write:
                 sys.stdout.write(out)
-            else:
-                buffer.append(out)
+            buffer.append(out)
         if err is not None:
-            if verbose:
+            if not minimal_write:
                 sys.stderr.write(err)
-            else:
-                buffer.append(err)
+            buffer.append(err)
 
     returncode = cmdline.returncode
+    sys.stdout.flush()
+    sys.stderr.flush()
     if ignore_ret_code:
         return returncode
 
     if returncode != 0:
-        if not verbose:
-            # Display the last 30 lines so that user knows what went wrong
-            print buffer.get()
+        if minimal_write:
+            lines = buffer.get()
+            for line in lines:
+                sys.stdout.write(line)
         # Raise correct exception
         raise CommandFailedException(cmd, returncode, cwd)
 

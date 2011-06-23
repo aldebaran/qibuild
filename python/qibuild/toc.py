@@ -602,7 +602,8 @@ class Toc(QiWorkTree):
             LOGGER.debug("Installing %s", component)
             qibuild.command.call(["cmake"] + cmake_args,
                 cwd=project.build_directory,
-                env=build_env)
+                env=build_env,
+                )
 
 def toc_open(work_tree, args=None):
     """ Open a toc work_tree.
