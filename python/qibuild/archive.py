@@ -127,7 +127,7 @@ def zip_unix(directory):
     work_dir = os.path.abspath(os.path.join(directory, ".."))
     base_archive_name = base_dir + ".tar.gz"
     cmd = ["tar", "cfz", base_archive_name, base_dir]
-    qibuild.command.check_call(cmd, cwd=work_dir)
+    qibuild.command.call(cmd, cwd=work_dir)
     full_archive_name = os.path.join(work_dir, base_archive_name)
     return full_archive_name
 

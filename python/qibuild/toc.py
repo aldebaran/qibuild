@@ -542,7 +542,7 @@ class Toc(QiWorkTree):
             cmd += ["--", "-j%d" % num_jobs]
 
         try:
-            qibuild.command.check_call(cmd)
+            qibuild.command.call(cmd)
         except CommandFailedException:
             raise BuildFailed(project)
 
@@ -563,7 +563,7 @@ class Toc(QiWorkTree):
             cmd.extend(["-R", test_name])
 
         try:
-            qibuild.command.check_call(cmd, cwd=build_dir)
+            qibuild.command.call(cmd, cwd=build_dir)
         except CommandFailedException:
             raise TestsFailed(project)
 
@@ -579,7 +579,7 @@ class Toc(QiWorkTree):
             else:
                 cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
                         "--target", "install"]
-                qibuild.command.check_call(cmd, env=build_environ)
+                qibuild.command.call(cmd, env=build_environ)
         except CommandFailedException:
             raise InstallFailed(project)
 
@@ -600,7 +600,7 @@ class Toc(QiWorkTree):
             cmake_args += ["-DCOMPONENT=%s" % component]
             cmake_args += ["-P", "cmake_install.cmake"]
             LOGGER.debug("Installing %s", component)
-            qibuild.command.check_call(["cmake"] + cmake_args,
+            qibuild.command.call(["cmake"] + cmake_args,
                 cwd=project.build_directory,
                 env=build_env)
 

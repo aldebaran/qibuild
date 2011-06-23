@@ -33,9 +33,12 @@ Few notes:
 """
 
 import os
+import sys
 import contextlib
 import logging
 import subprocess
+import threading
+import Queue
 
 LOGGER = logging.getLogger(__name__)
 
@@ -43,11 +46,19 @@ DRYRUN           = False
 
 class CommandFailedException(Exception):
     """Custom exception """
-    def __init__(self, message):
-        self.message = message
+    def __init__(self, cmd, returncode, cwd=None):
+        self.cmd = cmd
+        if cwd is None:
+            self.cwd = os.getcwd()
+        self.returncode = returncode
 
     def __str__(self):
-        return self.message
+        mess  = """The following command failed
+{cmd}
+Return code is {returncode}
+Working dir was {cwd}
+"""
+        return mess.format(cmd=self.cmd, returncode=self.returncode, cwd=self.cwd)
 
 
 class ProcessCrashedError(Exception):
@@ -97,112 +108,67 @@ def check_is_in_path(executable):
     if find_program(executable) is None:
         raise NotInPath(executable)
 
-def check_call(cmd, ignore_ret_code=False,
-                    cwd=None,
-                    shell=False,
-                    env=None,
-                    return_ret_code=False,
-                    output_to_logger=False,
-                    verbose_exception=False):
+
+def call(cmd, cwd=None, env=None,
+        ignore_ret_code=False,
+        verbose=True):
+    """ Execute a command line.
+
+    If ignore_ret_code is False:
+        raise CommandFailedException if returncode is None.
+    Else:
+        simply returns the returncode of the process
+
+    If verbose is False, nothing but the last 30 lines
+    of output are printed to the screen.
+    Else, the output is directly printed  to the screen.
+
+    Note: first arg of the cmd is assumed to be something
+    inside %PATH%.
+
+    Note: the shell= argument of the subprocess.Popen
+    call will always be False.
+
+
+    can raise:
+        - CommandFailedException if ignore_ret_code is False
+        and returncode is non zero
+        - NotInPath  if first arg of cmd is not in %PATH%
+        - and normal exception if cwd is given and is not
+        an existing directory.
     """
-    call a command from a working dir.
-    Raise a CommandFailedException if the return code
-    is not zero and ignore_ret_code is not False
-
-    Warning: if output_to_logger is activated, the log will be stored in RAM
-
-    """
-    #changing the working directory is not enough.. change the env var too (or git at least will not be happy)
-    if cwd:
-        if not env:
-            env = os.environ.copy()
-        env["PWD"] = cwd
-
-    # Check that exe is in PATH
-    # (uber-useful on windows)
     check_is_in_path(cmd[0])
+    if cwd:
+        if not os.path.exists(cwd):
+            raise Exception("Trying to to run %s in non-existing %s" %
+                (" ".join(cmd), cwd))
+    cmdline = CommandLine(cmd, cwd=cwd, env=env, shell=False)
+    if not verbose:
+        # Create a buffer to avoid storing too much stuff in RAM
+        buffer = RingBuffer(30)
 
-    LOGGER.debug("calling: %s", " ".join(cmd))
-    if DRYRUN:
-        return 0
-    try:
-        outputlist = list()
-        if output_to_logger or verbose_exception:
-            process = subprocess.Popen(cmd, cwd=cwd, env=env,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.STDOUT)
-            outputlist = process.communicate()[0].split("\n")
-            if output_to_logger:
-                for line in outputlist:
-                    LOGGER.info(line)
-            retcode = process.returncode
-        else:
-            retcode = subprocess.call(cmd, cwd=cwd, env=env)
+    for(out, err) in cmdline.execute():
+        if out is not None:
+            if verbose:
+                sys.stdout.write(out)
+            else:
+                buffer.append(out)
+        if err is not None:
+            if verbose:
+                sys.stderr.write(err)
+            else:
+                buffer.append(err)
 
-    except OSError as e:
-        _raise_error(cmd, cwd, shell, exception=e, output=outputlist)
-    except subprocess.CalledProcessError as e:
-        _raise_error(cmd, cwd, shell, exception=e, output=outputlist)
-
+    returncode = cmdline.returncode
     if ignore_ret_code:
-        return 0
+        return returncode
 
-    if retcode != 0:
-        if return_ret_code == False:
-            _raise_error(cmd, cwd, shell, retcode=retcode, output=outputlist)
-    return retcode
-
-def call(cmd, cwd=None, shell=False, env=None):
-    """
-    call without exception if retcode is not 0
-    """
-    return check_call(cmd, ignore_ret_code=True, shell=shell, cwd=cwd, env=env)
-
-def call_retcode(cmd, cwd=None, shell=False, env=None):
-    """
-    call which returns the true return code
-    """
-    return check_call(cmd, shell=shell, cwd=cwd, env=env, return_ret_code=True)
-
-def call_output(cmd, cwd=None, shell=False, env=None):
-    """
-    Get the stdout of a command as a list of split lines.
-
-    Raise a CommandFailedException if something went wrong
-
-    """
-    res = ""
-    LOGGER.debug("calling: %s", " ".join(cmd))
-    if DRYRUN:
-        return [""]
-    try:
-        process = subprocess.Popen(cmd, cwd=cwd, env=env,
-                                   stdout=subprocess.PIPE)
-        res = process.communicate()[0].split("\n")
-    except OSError as e:
-        _raise_error(cmd, cwd, shell, e)
-    except subprocess.CalledProcessError as e:
-        _raise_error(cmd, cwd, shell, e)
-    return res
-
-
-def _raise_error(cmd, cwd, shell, exception=None, retcode=None, output=None):
-    """
-    Raise a CommandFailedException with a nice message
-
-    """
-    mess = "qibuild.command failed\n"
-    if exception:
-        mess += "# error  : %s\n" % (exception)
-    if retcode:
-        mess += "# error  : retcode is %d\n" % (retcode)
-    if cwd is not None:
-        mess += "# workdir: %s\n" % (cwd)
-    mess += "# run in shell: %s\n" % (shell)
-    mess += "# command: %s\n" % " ".join(cmd)
-    if output and len(output):
-        mess += "# output: %s\n" % "\n".join(output)
-    raise CommandFailedException(mess)
+    if returncode != 0:
+        if not verbose:
+            # Display the last 30 lines so that user knows what went wrong
+            print buffer.get()
+        # Raise correct exception
+        raise CommandFailedException(cmd, returncode, cwd)
 
 
 @contextlib.contextmanager
@@ -245,3 +211,104 @@ def call_background(script_path, args, environ=None):
     #pylint: disable-msg=E0702
     #(we are not going to raise None...)
         raise caught_error
+
+
+
+
+# This CommandLine class with an .execute generator
+# is a idea taken from Bitten (BSD license), thanks pals!
+class CommandLine:
+    """Helper for executing subprocess
+
+    """
+    def __init__(self, cmd, cwd=None, env=None, shell=False):
+        self.cmd = cmd
+        self.cwd = cwd
+        self.env = env
+        cmd_str = " ".join(cmd)
+
+        self.returncode = None
+
+    def execute(self):
+        """Execute the command, and return a generator for iterating over
+        the output written to the standard output and error streams.
+
+        """
+        def reader(pipe, pipe_name, queue):
+            "To be called in a thread"
+            while pipe and not pipe.closed:
+                line = pipe.readline()
+                if line == '':
+                    break
+                queue.put((pipe_name, line))
+            if not pipe.closed:
+                pipe.close()
+
+        process =  subprocess.Popen(
+            self.cmd,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            cwd=self.cwd,
+            env=self.env)
+        queue = Queue.Queue()
+
+        pipe_out = threading.Thread(target=reader,
+            args=(process.stdout, 'stdout', queue))
+        pipe_err = threading.Thread(target=reader,
+            args=(process.stderr, 'stderr', queue))
+
+        pipe_out.start()
+        pipe_err.start()
+
+        while True:
+            if process.poll() is not None and self.returncode is None:
+                self.returncode = process.returncode
+            try:
+                name, line = queue.get(block=True, timeout=.01)
+                if name == "stderr":
+                    yield(None, line)
+                else:
+                    yield(line, None)
+            except Queue.Empty:
+                if self.returncode is not None:
+                    break
+
+        pipe_out.join()
+        pipe_err.join()
+
+
+class RingBuffer:
+    """Quick'n dirty implementation of a ring buffer
+
+    >>> rb = RingBuffer(4)
+    >>> rb.append(1)
+    >>> rb.get()
+    [1]
+    >>> rb.append(2); rb.append(3); rb.append(4)
+    >>> rb.get()
+    [1, 2, 3, 4]
+    >>> rb.append(5)
+    >>> rb.get()
+    [2, 3, 4, 5]
+    >>> rb.append(6)
+    >>> rb.get()
+    [3, 4, 5, 6]
+
+    """
+    def __init__(self, size):
+        self.size = size
+        self._data = list()
+        self._full = False
+        self._index = 0
+
+    def append(self, x):
+        if self._full:
+            self._data[self._index] = x
+        else:
+            self._data.append(x)
+            if len(self._data) == self.size:
+                self._full = True
+        self._index = (self._index + 1) % self.size
+
+    def get(self):
+        return self._data[self._index:] + \
+               self._data[:self._index]

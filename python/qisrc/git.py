@@ -5,6 +5,7 @@
 import os
 import sys
 import logging
+import subprocess
 
 from qibuild           import command
 
@@ -15,15 +16,31 @@ class GitException(Exception):
     def __str__(self):
         return repr(self.args)
 
+GIT = None
+
+def find_git():
+    """ Find the Git executable """
+    # FIXME: trusting path when on a cmd line makes sense,
+    # but one day we may have a GUI calling qisrc...
+    return command.find_program("git")
+
+GIT = find_git()
+
+
+
 class GitCommand:
     """ launch git command """
     logger = logging.getLogger("qibuild.git")
 
     def __init__(self, git_work_tree, git_dir=None):
         """
-        warning: we use realpath for worktree and gitdir, because if we set GIT_WORK_TREE and GIT_DIR
-        changing directory would make relative path invalid
         """
+        if not GIT:
+            raise Exception("Could not find git executable !")
+
+        # warning: we use realpath for worktree and gitdir,
+        # because if we set GIT_WORK_TREE and GIT_DIR
+        # changing directory would make relative path invalid
         self.worktree = os.path.realpath(git_work_tree)
         if git_dir:
             self.gitdir = git_dir
@@ -32,34 +49,30 @@ class GitCommand:
         self.gitdir = os.path.realpath(self.gitdir)
 
     def check_call(self, *args, **kargs):
-        """ call a git command """
+        """ Call a git command """
         git_env = None
         if not kargs.get("no_env", False):
             git_env                  = os.environ.copy()
             git_env['GIT_WORK_TREE'] = self.worktree
             git_env['GIT_DIR']       = self.gitdir
-        git = command.find_program("git")
-        if not git:
-            raise Exception("git not found")
-        margs = [git]
-        margs.extend([ x for x in args])
-        cwd = kargs.get("cwd", self.worktree)
-        return command.check_call(margs, cwd = cwd, env = git_env)
-
-    def call(self, *args, **kargs):
-        """ call a git command """
-        git_env = None
-        if not kargs.get("no_env", False):
-            git_env                  = os.environ.copy()
-            git_env['GIT_WORK_TREE'] = self.worktree
-            git_env['GIT_DIR']       = self.gitdir
-        git = command.find_program("git")
-        if not git:
-            raise Exception("git not found")
-        margs = [git]
+        margs = [GIT]
         margs.extend([ x for x in args])
         cwd = kargs.get("cwd", self.worktree)
         return command.call(margs, cwd = cwd, env = git_env)
+
+    def call(self, *args, **kargs):
+        """ Call a git command, but do not throw if it fails
+
+        """
+        git_env = None
+        if not kargs.get("no_env", False):
+            git_env                  = os.environ.copy()
+            git_env['GIT_WORK_TREE'] = self.worktree
+            git_env['GIT_DIR']       = self.gitdir
+        margs = [GIT]
+        margs.extend([ x for x in args])
+        cwd = kargs.get("cwd", self.worktree)
+        return command.call(margs, cwd = cwd, env = git_env, ignore_ret_code=True)
 
     def call_output(self, *args, **kargs):
         """ call a git command with output """
@@ -68,13 +81,13 @@ class GitCommand:
             git_env                  = os.environ.copy()
             git_env['GIT_WORK_TREE'] = self.worktree
             git_env['GIT_DIR']       = self.gitdir
-        git = command.find_program("git")
-        if not git:
-            raise Exception("git not found")
-        margs = [git]
+        margs = [GIT]
         margs.extend([ x for x in args])
         cwd = kargs.get("cwd", self.worktree)
-        return command.call_output(margs, cwd = cwd, env = git_env)
+        process = subprocess.Popen(margs, cwd=cwd, env=git_env,
+            stdout=subprocess.PIPE)
+        out = process.communicate()[0]
+        return out.splitlines()
 
 def git_open(git_work_tree, git_dir=None):
     """ open a git repository """

@@ -44,7 +44,7 @@ def do(args):
         editor = qibuild.interact.ask_program("Please enter an editor")
         qibuild.configstore.update_config(config_path, "general", "env.editor", editor)
 
-    qibuild.command.check_call([editor, config_path])
+    qibuild.command.call([editor, config_path])
 
 
 if __name__ == "__main__" :

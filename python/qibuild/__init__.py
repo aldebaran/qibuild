@@ -88,7 +88,7 @@ def make(build_dir, num_jobs=None, target=None):
         cmd += ["-j%i" % num_jobs]
     if target:
         cmd.append(target)
-    command.check_call(cmd, cwd=build_dir)
+    command.call(cmd, cwd=build_dir)
 
 
 def nmake(build_dir, target=None):
@@ -99,7 +99,7 @@ def nmake(build_dir, target=None):
     cmd = ["nmake"]
     if target:
         cmd.append(target)
-    command.check_call(cmd, cwd=build_dir)
+    command.call(cmd, cwd=build_dir)
 
 
 
@@ -134,7 +134,7 @@ def msbuild(sln_file, build_type="Debug", be_verbose=False, target="ALL_BUILD", 
 
     cmd += [sln_file]
 
-    command.check_call(cmd)
+    command.call(cmd)
 
 def cmake(source_dir, build_dir, cmake_args, clean_first=True, env=None):
     """Call cmake with from a build dir for a source dir.
@@ -179,7 +179,7 @@ def cmake(source_dir, build_dir, cmake_args, clean_first=True, env=None):
     # Add path to source to the list of args, and set buildir for
     # the current working dir.
     cmake_args += [source_dir]
-    command.check_call(["cmake"] + cmake_args, cwd=build_dir, env=env)
+    command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
 
 
 def check_root_cmake_list(cmake_list_file, project_name):
