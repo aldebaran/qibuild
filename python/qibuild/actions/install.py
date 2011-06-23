@@ -62,7 +62,7 @@ def do(args):
         project_names = [project_name]
 
     if project_names:
-        LOGGER.info("Installing %s to %s", ", ".join([n for n in project_names]), dest)
+        LOGGER.info("Installing %s to %s (%s)", ", ".join([n for n in project_names]), dest, toc.build_type)
     for project_name in project_names:
         project = toc.get_project(project_name)
         toc.install_project(project,  args.destdir, runtime=args.runtime)
@@ -71,7 +71,7 @@ def do(args):
         return
 
     if package_names:
-        LOGGER.info("Installing %s to %s", ", ".join([p for p in package_names]), dest)
+        LOGGER.info("Installing %s to %s (%s)", ", ".join([p for p in package_names]), dest, toc.build_type)
     for package_name in package_names:
         toc.toolchain.install_package(package_name, dest, runtime=args.runtime)
 

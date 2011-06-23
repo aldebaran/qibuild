@@ -31,15 +31,15 @@ def do(args):
         use_incredibuild = False
 
     if toc.active_config:
-        logger.info("Active configuration: %s", toc.active_config)
+        logger.info("Active configuration: %s (%s)", toc.active_config, toc.build_type)
 
     for project_names in project_names:
         project = toc.get_project(project_names)
         if args.target:
-            logger.info("Building target %s for project %s in %s",
-                args.target, project.name, toc.build_folder_name)
+            logger.info("Building target %s for project %s in %s (%s)",
+                args.target, project.name, toc.build_folder_name, toc.build_type)
         else:
-            logger.info("Building %s in %s", project.name, toc.build_folder_name)
+            logger.info("Building %s in %s (%s)", project.name, toc.build_folder_name, toc.build_type)
         toc.build_project(project, target=args.target, num_jobs=args.num_jobs,
             incredibuild=use_incredibuild, rebuild=args.rebuild)
 
