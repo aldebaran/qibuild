@@ -28,7 +28,7 @@ function(qi_add_test test_name target_name)
     set(_bin_path ${QI_SDK_DIR}/${QI_SDK_BIN}/${target_name})
   endif()
 
-  if(WIN32 AND "${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
+  if(MSVC AND "${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
     set(_bin_path ${_bin_path}_d)
   endif()
 
