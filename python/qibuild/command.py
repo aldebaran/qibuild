@@ -136,7 +136,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
 
     If sys.stdout or sys.stderr are not a tty, only write
     the last 30 lines of the process to sys.stdout if the
-    retcode is not zero, else write everything.
+    returncode is not zero, else write everything.
 
     Note: this trick with sys.stderr, sys.stdout and subprocess
     does not work on windows with python < 2.7, so it is simply
@@ -148,14 +148,15 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
         if not os.path.exists(cwd):
             raise Exception("Trying to to run %s in non-existing %s" %
                 (" ".join(cmd), cwd))
-    cmdline = CommandLine(cmd, cwd=cwd, env=env, shell=False)
     buffer = RingBuffer(30)
 
+    returncode = 0
     minimal_write = False
     if sys.platform.startswith("win") and sys.version_info < (2, 7):
         returncode = subprocess.call(cmd, env=env, cwd=cwd)
     else:
         # This code won't work on windows with python < 2.7
+        cmdline = CommandLine(cmd, cwd=cwd, env=env, shell=False)
         if not sys.stdout.isatty() or not sys.stderr.isatty():
             minimal_write = True
 
@@ -168,8 +169,8 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
                 if not minimal_write:
                     sys.stderr.write(err)
                 buffer.append(err)
+        returncode = cmdline.returncode
 
-    returncode = cmdline.returncode
     sys.stdout.flush()
     sys.stderr.flush()
     if ignore_ret_code:
