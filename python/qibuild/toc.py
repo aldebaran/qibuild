@@ -242,12 +242,19 @@ class Toc(QiWorkTree):
                 self.toolchain = qitoolchain.Toolchain(self.active_config)
                 self.packages  = self.toolchain.packages
             else:
-                # The config does not match a toolchain (but who knows,
-                # this may be only some cmake flags in a specific section
-                # for instance :
-                #   [config perf]
-                #   cmake.flags = WITH_TEST=OFF WITH_PERF=ON
-                pass
+                # The config does not match a toolchain (
+                local_dir = os.path.join(self.work_tree, ".qi")
+                local_cmake = os.path.join(local_dir, "%s.cmake" % self.active_config)
+                if not os.path.exists(local_cmake):
+                    mess  = """Invalid configuration {active_config}
+ * No toolchain named {active_config}. Known toolchains are:
+    {tc_names}
+ * No custom cmake file for config {active_config} found.
+   (looked in {local_cmake})
+"""
+                    raise Exception(mess.format(active_config=self.active_config,
+                        local_cmake = local_cmake,
+                        tc_names = qitoolchain.get_toolchain_names()))
 
         # Useful vars to cope with Visual Studio quirks
         self.using_visual_studio = "Visual Studio" in self.cmake_generator
