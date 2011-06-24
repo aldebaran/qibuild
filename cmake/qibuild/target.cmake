@@ -21,8 +21,27 @@
 #
 # TODO: document options that could be passed to add_executable
 
+if (_QI_TARGET_CMAKE_)
+  return()
+endif()
+set(_QI_TARGET_CMAKE_ TRUE)
+
 include(CMakeParseArguments)
 include(qibuild/internal/copy)
+
+# We need this later for the post-copy-dll trick to work
+set(_QI_USELIB_CMAKE_ TRUE)
+if(MSVC)
+  set(QI_MSVC "ON" CACHE INTERNAL "" FORCE)
+else()
+  set(QI_MSVC "OFF" CACHE INTERNAL "" FORCE)
+endif()
+
+if(MSVC_IDE)
+  set(QI_MSVC_IDE "ON" CACHE INTERNAL "" FORCE)
+else()
+  set(QI_MSVC_IDE "OFF" CACHE INTERNAL "" FORCE)
+endif()
 
 #! Create an executable.
 # The target name should be unique.
