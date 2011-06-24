@@ -63,7 +63,7 @@ function(qi_install_conf subfolder)
   _qi_install(${ARGN} COMPONENT conf  DESTINATION ${QI_SDK_CONF}/${subfolder})
 endfunction()
 
-#! Install Cmake module files. On linux the destination will be <prefix>/share/cmake/<subfolder>/
+#! Install CMake module files. On linux the destination will be <prefix>/share/cmake/<subfolder>/
 #
 # \arg:subfolder The application name
 # \argn: list of files. Directories and globs on files are accepted.
