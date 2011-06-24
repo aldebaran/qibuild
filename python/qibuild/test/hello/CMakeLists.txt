@@ -6,7 +6,7 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake")
 
 
 qi_create_bin(hello "main.cpp")
-qi_use_lib(hello world)
+qi_use_lib(hello world bar)
 
 enable_testing()
 # Add a test that just runs hello without arguments

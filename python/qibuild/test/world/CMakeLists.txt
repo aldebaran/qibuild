@@ -4,14 +4,26 @@ project(world)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(".")
+
 qi_create_lib(world SHARED
-  SRC world/world.h
-      world/world.cpp)
+  world/world.h
+  world/world.cpp)
+
+qi_create_lib(bar STATIC
+  bar/bar.h
+  bar/bar.cpp)
+
+qi_create_lib(myplugin SHARED SUBFOLDER "word"
+  plugin.cpp
+  plugin.h)
+
 
 qi_install_header(world world/world.h)
+qi_install_header(bar   bar/bar.h)
 
 qi_stage_lib(world)
+qi_stage_lib(bar)
 
 qi_stage_cmake(cmake/foo-config.cmake)
 
