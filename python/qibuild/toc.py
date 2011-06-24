@@ -511,7 +511,7 @@ class Toc(QiWorkTree):
         build_dir = project.build_directory
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
-            _advise_using_configure(project)
+            _advise_using_configure(self, project)
 
         cmd = ["cmake", "--build", build_dir, "--config", self.build_type]
         if target:
@@ -556,7 +556,7 @@ class Toc(QiWorkTree):
         build_dir = project.build_directory
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
-            _advise_using_configure(project)
+            _advise_using_configure(self, project)
         cmd = ["ctest"]
         if verbose_tests:
             cmd.append("-VV")
@@ -709,7 +709,7 @@ def project_from_cwd():
     return qibuild.project.name_from_directory(project_dir)
 
 
-def _advise_using_configure(project):
+def _advise_using_configure(self, project):
     """Just throw a nice exception because
     CMakeCache.txt was not found.
 
@@ -725,7 +725,10 @@ def _advise_using_configure(project):
     (No CMakeLists.txt in {project.directory})
     """
     else:
-        mess += "Try using `qibuild configure {project.name}'"
+        if self.active_config:
+            mess += "Try using `qibuild configure -c %s {project.name}'" % self.active_config
+        else:
+            mess += "Try using `qibuild configure {project.name}'"
 
     mess = mess.format(project=project)
 
