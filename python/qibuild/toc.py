@@ -384,10 +384,10 @@ class Toc(QiWorkTree):
         """
         path_conf = self.configstore.get("env.path")
         bat_file  = self.configstore.get("env.bat_file")
-        if path_conf:
-            self._set_env_from_path_conf(path_conf)
         if bat_file:
             self._set_path_from_bat_conf(bat_file)
+        if path_conf:
+            self._set_env_from_path_conf(path_conf)
 
     def _set_env_from_path_conf(self, path):
         """Set os.environ using a "path" string setting
@@ -415,20 +415,14 @@ class Toc(QiWorkTree):
         interesting = set(("INCLUDE", "LIB", "LIBPATH", "PATH"))
         result = {}
 
-        # This call is strange, but necessary.
-        # See: http://bytes.com/topic/python/answers/634409-subprocess-handle-invalid-error#post2512502
-        popen = subprocess.Popen('"%s"& set' % (bat_file),
+        process = subprocess.Popen('"%s"& set' % (bat_file),
                              stdout=subprocess.PIPE,
-                             stdin=subprocess.PIPE,
-                             stderr=subprocess.PIPE,
                              shell=True)
-
-
-        popen.stdin.close()
-        popen.stderr.close()
-        out = popen.stdout.read()
-        if popen.wait() != 0:
-            raise BadBuildConfig("Calling general.env.bat_file failed!")
+        (out, err) = process.communicate()
+        if process.returncode != 0:
+            LOGGER.error("Calling %s failed with return code: %d", bat_file, process.returncode)
+            LOGGER.error("Error was: %s" , err)
+            return
 
         for line in out.split("\n"):
             if '=' not in line:
