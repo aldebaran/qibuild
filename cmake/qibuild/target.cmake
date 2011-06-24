@@ -108,8 +108,13 @@ function(qi_create_bin name)
     # always postfix debug lib/bin with _d ...
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
     # ... and generate libraries and next to executables.
-    set_target_properties("${name}" PROPERTIES
-      RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${ARG_SUBFOLDER}")
+    if(MSVC_IDE)
+      set_target_properties("${name}" PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${ARG_SUBFOLDER}")
+    else()
+      set_target_properties("${name}" PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
+    endif()
   else()
     set_target_properties("${name}" PROPERTIES
       RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
@@ -121,18 +126,12 @@ function(qi_create_bin name)
                    ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
                    COPYONLY)
 
-    if(MSVC)
-      set(_using_visual_studio "ON")
-    else()
-      set(_using_visual_studio "OFF")
-    endif()
 
     add_custom_command(TARGET ${name} POST_BUILD
       COMMAND
         ${CMAKE_COMMAND}
         -DBUILD_TYPE=${CMAKE_CFG_INTDIR}
         -DPROJECT=${_U_name}
-        -DMSVC=${_using_visual_studio}
         -P ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
         ${CMAKE_BINARY_DIR}
     )
@@ -234,7 +233,7 @@ endfunction()
 # \flag:NO_STAGE Do not stage the library.
 # \flag:NO_FPIC Do not set -fPIC on static libraries (will be set for shared lib by CMake anyway)
 # \param:SUBFOLDER The destination subfolder. The install rules generated will be
-#                  sdk/bin/<subfolder>
+#                  sdk/lib/<subfolder>
 # \group:SRC The list of source files (private headers and sources)
 # \group:SUBMODULE Submodule to include in the lib
 # \group:DEP List of dependencies
@@ -308,7 +307,7 @@ function(qi_create_lib name)
     if(WIN32)
     # Always generate libraries and next to executables, when
     # no subfolder is given
-      if(MSVC)
+      if(MSVC_IDE)
         # Since VS always add the build configuration to the output
         # directory, we have to use the same output directory for
         # .exe and .dll, otherwise foo.exe will not be able to find
@@ -320,7 +319,7 @@ function(qi_create_lib name)
             ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}"
         )
       else()
-        # MinGW: just use QI_SDK_BIN for runtine targets.
+        # MinGW on nmake: just use QI_SDK_BIN for runtine targets.
         set_target_properties("${name}" PROPERTIES
           RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}"
           LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
@@ -337,7 +336,7 @@ function(qi_create_lib name)
   else()
       # A subfolder has beed given, so the dll is in fact a plugin,
       # and it should always be in sdk/lib/SUBFOLER
-      if (MSVC)
+      if (MSVC_IDE)
         # You can't just use a _OUTPUT_DIRECTORY property, because VS will always
         # append the build configuration to this path.
         # After qi_create_bin(foo), foo.exe is in build/sdk/Release/foo.exe,
@@ -360,7 +359,7 @@ function(qi_create_lib name)
             "${CMAKE_BINARY_DIR}"
         )
     else()
-        # NO MSVC and a SUBFOLER : simply use _OUTPUT_DIRECTORY properties
+        # NO MSVC_IDE and a SUBFOLER : simply use _OUTPUT_DIRECTORY properties
       set_target_properties("${name}" PROPERTIES
           RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
           ARCHIVE_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
