@@ -20,23 +20,31 @@
 
 
 #! Install application headers.
-# On Linux the destination will be <prefix>/include/<subfolder>/
+# The destination will be <prefix>/include/<subfolder>/
 #
-# \arg:subfolder The subfolder where headers will be installed
+# \arg:subfolder The subfolder where headers will be installed (mandatory)
 # \argn: list of files. Directories and globs on files are accepted.
 # \param:IF Condition that should be verified for the install rules to be active.
 #           for example (IF WITH_ZEROMQ)
+# \flag: KEEP_REL_PATHS  If true, relative paths will be preserved during installtion.
+#                        (False by default because this is NOT the standard CMake
+#                         behavior)
 function(qi_install_header subfolder)
   _qi_install(${ARGN} COMPONENT header DESTINATION ${QI_SDK_INCLUDE}/${subfolder})
 endfunction()
 
+
+
 #! Install application data.
 # On linux the destination will be: <prefix>/share/<subfolder>/
 #
-# \arg:subfolder The application name
+# \arg:subfolder The application name (mandatory)
 # \argn: list of files. Directories and globs on files are accepted.
 # \param:IF Condition that should be verified for the install rules to be active.
 #           for example (IF WITH_ZEROMQ)
+# \flag: KEEP_REL_PATHS  If true, relative paths will be preserved during installtion.
+#                        (False by default because this is NOT the standard CMake
+#                         behavior)
 function(qi_install_data subfolder)
   _qi_install(${ARGN} COMPONENT data  DESTINATION ${QI_SDK_SHARE}/${subfolder})
 endfunction()
@@ -48,6 +56,9 @@ endfunction()
 # \param:IF Condition that should be verified for the install rules to be active.
 #           for example (IF WITH_ZEROMQ)
 # \argn: list of files. Directories and globs on files are accepted.
+# \flag: KEEP_REL_PATHS  If true, relative paths will be preserved during installtion.
+#                        (False by default because this is NOT the standard CMake
+#                         behavior)
 function(qi_install_doc subfolder)
   _qi_install(${ARGN} COMPONENT doc   DESTINATION ${QI_SDK_DOC}/${subfolder})
 endfunction()
