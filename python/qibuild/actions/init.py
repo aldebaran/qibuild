@@ -76,7 +76,7 @@ def ask_config(toc):
     if "vs2008" in config:
         cmake_generator = "Visual Studio 9 2008"
     elif "vs2010" in config:
-        cmake_generator = "Visual Studio 2010"
+        cmake_generator = "Visual Studio 10"
     elif "mingw32" in config:
         cmake_generator = "MinGW Makefiles"
     else:
