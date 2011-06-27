@@ -6,7 +6,6 @@ which is where all the 'magic' happens ....
 """
 
 import os
-import sys
 import glob
 import platform
 import subprocess
@@ -463,6 +462,13 @@ class Toc(QiWorkTree):
         """
         if not os.path.exists(project.directory):
             raise TocException("source dir: %s does not exist, aborting" % project.directory)
+        cmake_file = os.path.join(project.directory, "CMakeLists.txt")
+        if not os.path.exists(cmake_file):
+            mess = """{project.name} does not look like a valid CMake project!
+        (No CMakeLists.txt in {project.directory})
+        """.format(project=project)
+            raise TocException(mess)
+
         # Generate the dependencies.cmake just in time:
         qibuild.project.bootstrap_project(project, self)
 
@@ -718,17 +724,10 @@ def _advise_using_configure(self, project):
     Could not find CMakeCache.txt for project {project.name}.
     (Looked in {project.build_directory})
     """
-    cmake_file = os.path.join(project.directory, "CMakeLists.txt")
-    if not os.path.exists(cmake_file):
-        mess += """
-    Note that {project.name} does not look like a valid CMake project
-    (No CMakeLists.txt in {project.directory})
-    """
+    if self.active_config:
+        mess += "Try using `qibuild configure -c %s {project.name}'" % self.active_config
     else:
-        if self.active_config:
-            mess += "Try using `qibuild configure -c %s {project.name}'" % self.active_config
-        else:
-            mess += "Try using `qibuild configure {project.name}'"
+        mess += "Try using `qibuild configure {project.name}'"
 
     mess = mess.format(project=project)
 
