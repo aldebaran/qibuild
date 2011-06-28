@@ -123,11 +123,9 @@ MinGW with QtCreator:
 
 [source, ini]
 ----
-[general "env"]
-path = C:\MinGW\bin;
-
-[general "build"]
-  cmake_generator = "MinGW Makefiles"
+[general]
+env.path = C:\MinGW\bin;
+build.cmake_generator = "MinGW Makefiles"
 ----
 
 
@@ -146,11 +144,8 @@ to use Visual Studio 2008:
 
 [source, ini]
 ----
-[general "env"]
-  path = C:\Program Files\CMake 2.8\bin;
-
-[general "build"]
-  cmake_generator = "Visual Studio 9 2008"
+[general]
+build.cmake_generator = "Visual Studio 9 2008"
 ----
 
 For command line addicts, you can also:
@@ -163,14 +158,21 @@ you can specify a .bat file to be ran by qibuild, like this:
 
 [source, ini]
 ----
-[general "env"]
-bat_file = c:\Program Files\Microsoft Visual Studio 9.0\VC\vcvarsall.bat
+[general]
+env.bat_file = c:\Program Files\Microsoft Visual Studio 9.0\VC\vcvarsall.bat
+cmake.generator = 'NMake Makefiles'
 
-[general "build"]
-cmake_generator = "NMake Makefiles"
 ----
 
 (the location of the .bat file depends on your setup)
+
+This can also be useful if you want to have the same SDK layout whatever the platform
+you are using.
+
+For instance, with visual studio, debug builds will end up in
++build/sdk/DEBUG/foo_d.exe+, but with NMake Makefiles, in:
++build-debug/sdk/bin/foo.exe+, which is nice if you plan to use scripts for continuous
+testing or the like...
 
 
 Configuring qiBuild for MinGW with Msys
@@ -188,11 +190,9 @@ MinGW:
 
 [source, ini]
 ----
-[general "env"]
-path = C:\Mingw\bin;C:\MinGW\msys\1.0\bin;
-
-[general "build"]
-  cmake_generator = "Unix Makefiles"
+[general]
+env.path = C:\Mingw\bin;C:\MinGW\msys\1.0\bin;
+build.cmake_generator = "Unix Makefiles"
 ----
 
 Note: here you have to setup a complete msys environnement before
