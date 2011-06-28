@@ -466,8 +466,18 @@ function(add_python_test _name _pythonFile)
   ")
 endfunction()
 
+function(configure_naoqi_tests)
+  qi_deprecated("configure_naoqi_tests is deprecated.
+  High-level tests now are to be found in the
+  qi/qitest repository
+  ")
+endfunction()
+
 #copy file with dependency (if the file change in source => update the output)
 function(copy_with_depend _src _dest)
+  qi_deprecated("copy_with_depend is deprecated.
+  Use file(COPY ...) instead (cmake > 2.8 only)
+  ")
   get_filename_component(_sname "${_src}"  NAME)
   get_filename_component(_dname "${_dest}" NAME)
 
