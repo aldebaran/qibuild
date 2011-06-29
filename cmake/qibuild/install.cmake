@@ -20,77 +20,87 @@
 
 
 #! Install application headers.
-# The destination will be <prefix>/include/<subfolder>/
+# The destination will be <prefix>/include/
 #
-# \arg:subfolder The subfolder where headers will be installed (mandatory)
-# \argn: list of files. Directories and globs on files are accepted.
-# \param:IF Condition that should be verified for the install rules to be active.
-#           for example (IF WITH_ZEROMQ)
-# \flag: KEEP_REL_PATHS  If true, relative paths will be preserved during installtion.
+# \argn:                 A list of files : directories and globs on files are accepted.
+# \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \param: IF             Condition that should be verified for the install rules
+#                        to be active for example (IF WITH_ZEROMQ)
+# \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
-function(qi_install_header subfolder)
-  _qi_install(${ARGN} COMPONENT header DESTINATION ${QI_SDK_INCLUDE}/${subfolder})
+function(qi_install_header)
+  _qi_install(${ARGN} COMPONENT header DESTINATION ${QI_SDK_INCLUDE})
 endfunction()
 
 
 
 #! Install application data.
-# On linux the destination will be: <prefix>/share/<subfolder>/
+# The destination will be: <prefix>/share/
 #
-# \arg:subfolder The application name (mandatory)
-# \argn: list of files. Directories and globs on files are accepted.
-# \param:IF Condition that should be verified for the install rules to be active.
-#           for example (IF WITH_ZEROMQ)
-# \flag: KEEP_REL_PATHS  If true, relative paths will be preserved during installtion.
+# \argn:                 A list of files : directories and globs on files are accepted.
+# \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \param: IF             Condition that should be verified for the install rules
+#                        to be active for example (IF WITH_ZEROMQ)
+# \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
-function(qi_install_data subfolder)
-  _qi_install(${ARGN} COMPONENT data  DESTINATION ${QI_SDK_SHARE}/${subfolder})
+#
+function(qi_install_data)
+  _qi_install(${ARGN} COMPONENT data  DESTINATION ${QI_SDK_SHARE})
 endfunction()
 
 #! Install application doc.
-# On linux the destination will be: <prefix>/share/doc/<subfolder>/
+# The destination will be: <prefix>/share/doc/
 #
-# \arg:subfolder The application name
-# \param:IF Condition that should be verified for the install rules to be active.
-#           for example (IF WITH_ZEROMQ)
-# \argn: list of files. Directories and globs on files are accepted.
-# \flag: KEEP_REL_PATHS  If true, relative paths will be preserved during installtion.
+# \argn:                 A list of files : directories and globs on files are accepted.
+# \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \param: IF             Condition that should be verified for the install rules
+#                        to be active for example (IF WITH_ZEROMQ)
+# \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
-function(qi_install_doc subfolder)
-  _qi_install(${ARGN} COMPONENT doc   DESTINATION ${QI_SDK_DOC}/${subfolder})
+#
+function(qi_install_doc)
+  _qi_install(${ARGN} COMPONENT doc   DESTINATION ${QI_SDK_DOC})
 endfunction()
 
 #! Install application configuration files.
-# On linux the destination will be: <prefix>/preferences/<subfolder>/
 #
-# \arg:subfolder The application name
-# \argn: list of files. Directories and globs on files are accepted.
-# \param:IF Condition that should be verified for the install rules to be active.
-#           for example (IF WITH_ZEROMQ)
-function(qi_install_conf subfolder)
-  _qi_install(${ARGN} COMPONENT conf  DESTINATION ${QI_SDK_CONF}/${subfolder})
+# \argn:                 A list of files : directories and globs on files are accepted.
+# \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \param: IF             Condition that should be verified for the install rules
+#                        to be active for example (IF WITH_ZEROMQ)
+# \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
+#                        (False by default because this is NOT the standard CMake
+#                         behavior)
+#
+function(qi_install_conf)
+  _qi_install(${ARGN} COMPONENT conf  DESTINATION ${QI_SDK_CONF})
 endfunction()
 
-#! Install CMake module files. On linux the destination will be <prefix>/share/cmake/<subfolder>/
+#! Install CMake module files.
+# The destination will be: <prefix>/share/cmake/
 #
-# \arg:subfolder The application name
-# \argn: list of files. Directories and globs on files are accepted.
-# \param:IF Condition that should be verified for the install rules to be active.
-#           for example (IF WITH_ZEROMQ)
-function(qi_install_cmake subfolder)
-  _qi_install(${ARGN} COMPONENT cmake DESTINATION ${QI_SDK_CMAKE}/${subfolder})
+# \argn:                 A list of files : directories and globs on files are accepted.
+# \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \param: IF             Condition that should be verified for the install rules
+#                        to be active for example (IF WITH_ZEROMQ)
+# \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
+#                        (False by default because this is NOT the standard CMake
+#                         behavior)
+#
+function(qi_install_cmake)
+  _qi_install(${ARGN} COMPONENT cmake DESTINATION ${QI_SDK_CMAKE})
 endfunction()
 
 
 #! install a target, that could be a program or a library.
 #
-# \param:SUBFOLDER An optional subfolder
-# \argn: A list of target to install
-# \param:IF Condition that should be verified for the install rules to be active.
-#           for example (IF WITH_ZEROMQ)
+# \argn:                 A list of targets to install
+# \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \param: IF             Condition that should be verified for the install rules
+#                        to be active for example (IF WITH_ZEROMQ)
 function(qi_install_target)
   cmake_parse_arguments(ARG "" "IF;SUBFOLDER" "" ${ARGN})
 
@@ -132,10 +142,10 @@ endfunction()
 #! install program (mostly script or user provided program). Do not use this function
 # to install a library or a program built by your project, prefer using qi_install_target.
 #
-# \param:SUBFOLDER An optional subfolder
-# \argn: A list of programs to install
-# \param:IF Condition that should be verified for the install rules to be active.
-#           for example (IF WITH_ZEROMQ)
+# \argn:                 A list of programs to install
+# \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \param: IF             Condition that should be verified for the install rules
+#                        to be active for example (IF WITH_ZEROMQ)
 function(qi_install_program)
   cmake_parse_arguments(ARG "" "IF;SUBFOLDER" "" ${ARGN})
 
@@ -162,12 +172,13 @@ endfunction()
 
 
 #! install external library. Do not use this function
-# to install a library or a program built by your project, prefer using qi_install_target.
+# to install a library or a program built by your project,
+# prefer using qi_install_target.
 #
-# \param:SUBFOLDER An optional subfolder
-# \argn: A list of libraries to install
-# \param:IF Condition that should be verified for the install rules to be active.
-#           for example (IF WITH_ZEROMQ)
+# \argn:                 A list of libraries to install
+# \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \param: IF             Condition that should be verified for the install rules
+#                        to be active for example (IF WITH_ZEROMQ)
 function(qi_install_library)
-  _qi_install(${ARGN} COMPONENT lib DESTINATION ${QI_SDK_LIB}/${subfolder})
+  _qi_install(${ARGN} COMPONENT lib DESTINATION ${QI_SDK_LIB})
 endfunction()

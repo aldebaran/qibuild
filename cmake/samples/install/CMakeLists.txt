@@ -9,9 +9,9 @@ project(QiInstallSample NONE)
 #install bar/*.h  in include/qiinstallsample/*.h
 #install foobar/* in include/qiinstallsample/foobar/
 
-qi_install_header(qiinstallsample foo.h bar/*.h foobar)
+qi_install_header(qiinstallsample foo.h bar/*.h SUBFOLDER foobar)
 
 
 
 #to install to a subfolder you can do:
-qi_install_header(qiinstallsample/subbar subbar/*.h)
+qi_install_header(subbar/*.h SUBFOLDER qiinstallsample/subbar)

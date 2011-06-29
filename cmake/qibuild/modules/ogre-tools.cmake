@@ -88,8 +88,8 @@ function(configure_ogre)
     file(APPEND "${_inst_resources}" "FileSystem=@sdk@/${_resource_path}\n")
   endforeach()
 
-  qi_install_conf("${ARG_APPLICATION_NAME}/ogre" ${_inst_resources})
-  qi_install_conf("${ARG_APPLICATION_NAME}/ogre" ${_inst_plugins})
+  qi_install_conf(${_inst_resources} SUBFOLDER ${ARG_APPLICATION_NAME}/ogre)
+  qi_install_conf(${_inst_plugins}   SUBFOLDER ${ARG_APPLICATION_NAME}/ogre)
 
 
 endfunction()

@@ -97,8 +97,9 @@ def _do(args, build_type):
 def do(args):
     """Main entry point"""
     toc = qibuild.toc_open(args.work_tree, args)
-    if "vs" in toc.active_config or "mingw" in toc.active_config:
-        _do(args, "debug")
+    if toc.active_config:
+        if "vs" in toc.active_config or "mingw" in toc.active_config:
+            _do(args, "debug")
     destdir = _do(args, "release")
 
     #TODO warn if dest dir is empty

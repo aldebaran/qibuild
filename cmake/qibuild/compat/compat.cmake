@@ -84,13 +84,15 @@ function(install_header _staged_name)
   # old API:
   # install_header(STAGED_NAME [SUBFOLDER subfolder] [headers ...])
   # new API:
-  # qi_install_header(subfolder [headers...])
+  # qi_install_header(subfolder [SUBFOLDER subfolder] [headers...])
   qi_deprecated("install_header is deprecated.
   Use qi_install_header instead
   Old:
     install_header(FOO SUBFOLDER foo foo.h)
   New:
-    qi_install_header(foo foo.h)
+    qi_install_header(SUBFOLDER foo foo.h)
+    or:
+    qi_install_header(foo/foo.h KEEP_RELATIVE_PATHS)
   "
   )
   string(TOLOWER ${_staged_name} _targetname)
@@ -108,11 +110,7 @@ function(install_header _staged_name)
     set(${_staged_name}_PATH_SUFFIXES "${${_staged_name}_PATH_SUFFIXES}" "${ARG_SUBFOLDER}" CACHE INTERNAL "" FORCE)
   endif()
 
-  if(NOT ARG_SUBFOLDER)
-    set(ARG_SUBFOLDER "")
-  endif()
-
-  qi_install_header("${ARG_SUBFOLDER}" ${ARG_UNPARSED_ARGUMENTS})
+  qi_install_header(${ARG_UNPARSED_ARGUMENTS} SUBFOLDER ${ARG_SUBFOLDER})
 endfunction()
 
 function(install_data)

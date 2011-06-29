@@ -19,8 +19,8 @@ qi_create_lib(myplugin SHARED SUBFOLDER "word"
   plugin.h)
 
 
-qi_install_header(world world/world.h)
-qi_install_header(bar   bar/bar.h)
+qi_install_header(world/world.h SUBFOLDER WORLD)
+qi_install_header(bar/bar.h KEEP_RELATIVE_PATHS)
 
 qi_stage_lib(world)
 qi_stage_lib(bar)
