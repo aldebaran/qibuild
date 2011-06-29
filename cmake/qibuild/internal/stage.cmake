@@ -84,21 +84,14 @@ function(_qi_gen_find_lib_code_sdk res target)
 
   if(WIN32)
     if(MSVC)
-      if(MSVC_IDE)
-        # We cannot trust ARCHIVE_OUTPUT_DIRECTORY,
-        # but somehow LOCATION works here...
-        get_target_property(_trelease ${target} "LOCATION_RELEASE")
-        get_target_property(_tdebug   ${target} "LOCATION_DEBUG")
-        string(REGEX REPLACE ".dll$" ".lib" _trelease "${_trelease}")
-        string(REGEX REPLACE ".dll$" ".lib" _tdebug "${_tdebug}")
-      else()
-        # Trust ARCHIVE_OUTPUT_DIRECTORY, and handle the _d:
-        get_target_property(_archive_dir  ${target}  "ARCHIVE_OUTPUT_DIRECTORY")
-        get_target_property(_archive_name ${target}  "ARCHIVE_OUTPUT_NAME")
-        set(_trelease  "${_archive_dir}/${target}.lib")
-        set(_tdebug    "${_archive_dir}/${target}_d.lib")
-      endif()
-      set(${_U_target}_LIBRARIES "optimized;${_trelease};debug;${_tdebug}")
+      # Trust ARCHIVE_OUTPUT_DIRECTORY, and handle the _d:
+      get_target_property(_lib_dir_debug   ${target}  ARCHIVE_OUTPUT_DIRECTORY_DEBUG)
+      get_target_property(_lib_dir_release ${target}  ARCHIVE_OUTPUT_DIRECTORY_RELEASE)
+      set(_lib_name_debug   "${target}_d.lib")
+      set(_lib_name_release "${target}.lib")
+      set(_lib_debug "${_lib_dir_debug}/${_lib_name_debug}")
+      set(_lib_release "${_lib_dir_release}/${_lib_name_release}")
+      set(${_U_target}_LIBRARIES "debug;${_lib_debug};optimized;${_lib_release}")
     else()
       # Mingw: lib is .a when building a static library, and
       # .dll.a when building a shared library
