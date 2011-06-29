@@ -257,7 +257,7 @@ class CommandLine:
                 queue.put((pipe_name, line))
             if not pipe.closed:
                 pipe.close()
-
+        LOGGER.debug("Starting: %s", " ".join(self.cmd))
         process =  subprocess.Popen(
             self.cmd,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
