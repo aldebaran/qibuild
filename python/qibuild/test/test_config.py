@@ -52,7 +52,7 @@ bar = 42
 
 
     def test_dot_in_subsection(self):
-        with open(self.cfg_path, "wa") as fp:
+        with open(self.cfg_path, "a") as fp:
             fp.write("""
 [config "linux32"]
 foo = bar
