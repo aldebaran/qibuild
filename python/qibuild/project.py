@@ -155,8 +155,7 @@ def update_project(project, toc):
         bname = "sdk-%s" % (toc.build_folder_name)
         project.sdk_directory = os.path.normpath(os.path.join(project.sdk_directory, bname))
         project._custom_sdk_dir = True
-        # cmake will choke if a path containing backslashes is passed to a macro, so use slashes instead
-        cmake_sdk_dir = project.sdk_directory.replace('\\', '/')
+        cmake_sdk_dir = qibuild.sh.to_posix_path(project.sdk_directory)
         project.cmake_flags.append("QI_SDK_DIR=%s" % (cmake_sdk_dir))
     else:
         #normal sdk dir in buildtree
