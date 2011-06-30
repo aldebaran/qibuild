@@ -94,7 +94,29 @@ config = win32-vs2008
         self.assertEquals(configstore.get('general.env.path'), r"c:\path\to\swig")
         self.assertEquals(configstore.get('general.config'), "win32-vs2008")
 
+    def test_merge_conf_files2(self):
+        global_cfg = os.path.join(self.tmp, "global.cfg")
+        with open(global_cfg, "w") as fp:
+            fp.write(r"""
+[general "build"]
+config = win32-vs2008
+toolchain = win32-vs2008
+cmake_generator = Visual Studio 9 2008
 
+[general "env"]
+""")
+        user_cfg = os.path.join(self.tmp, "user.cfg")
+        with open(user_cfg, "w") as fp:
+            fp.write(r"""
+[general]
+build.sdk_dir = /path/to/foo
+""")
+
+        configstore = qibuild.configstore.ConfigStore()
+        configstore.read(global_cfg)
+        configstore.read(user_cfg)
+
+        self.assertEquals(configstore.get('general.build.sdk_dir'), r"/path/to/foo")
 
 
 class QiConfigTestCase(unittest.TestCase):
