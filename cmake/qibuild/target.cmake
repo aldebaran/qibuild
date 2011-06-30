@@ -125,6 +125,7 @@ function(qi_create_bin name)
         ${CMAKE_COMMAND}
         -Dtarget=${name}
         -DMSVC=${MSVC}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -P ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
         ${CMAKE_BINARY_DIR}
     )

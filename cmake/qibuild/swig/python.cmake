@@ -66,44 +66,37 @@ function(qi_swig_wrap_python module_name interface_file)
 
   qi_use_lib(${_swig_target} PYTHON ${ARG_DEPENDS})
 
-  # Mimic the behavior of qi_create_lib()
-  # if visual studio: put the .pyd in sdk/Debug/_foo_d.pyd,
-  # else put the .so in sdk/lib/_foo.so
-  # Warning: since foo.py will be generated in sdk/lib/foo.py, you
-  # will have to deal with PYTHONPATH yourself. (for instance using
-  # qi::path)
-  if(MSVC)
-    set_target_properties(${_swig_target}
+  # Fix output directory
+  set_target_properties(${_swig_target}
       PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/"
-    )
-  else()
-    set_target_properties(${_swig_target}
-      PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_LIB}"
-    )
-  endif()
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}"
+        RUNTIME_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}"
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}"
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}"
+        ARCHIVE_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}"
+        LIBRARY_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}"
+  )
 
   if (WIN32)
   # Be sure a .pyd file gets created.
+    message(STATUS "hi")
+    set_target_properties(${_swig_target} PROPERTIES SUFFIX   ".pyd")
+  endif()
+
+  if(MSVC)
+    # .dll compiled in debug with visual studio are not usable
+    # from python.exe, (unless you are very careful : the size of the ojbjects
+    # are not the same in debug or in release with visual studio), which
+    # can lead to hard to solve bugs.
+    # Here, we add an _d so we are sure a Visual Studio users cannot
+    # use their modules unless they have built them in release.
     set_target_properties(${_swig_target}
       PROPERTIES
-        SUFFIX   ".pyd"
-        RUNTIME_OUTPUT_DIRECTORY "${QI_SDK_DIR}/${QI_SDK_BIN}"
+        DEBUG_POSTFIX "_d"
     )
-
-    if(MSVC)
-      # .dll compiled in debug with visual studio are not usable
-      # from python.exe, (unless you are very careful : the size of the ojbjects
-      # are not the same in debug or in release with visual studio), which
-      # can lead to hard to solve bugs.
-      # Here, we add an _d so we are sure a Visual Studio users cannot
-      # use their modules unless they have built them in release.
-      set_target_properties(${_swig_target}
-        PROPERTIES
-          DEBUG_POSTFIX "_d"
-      )
-    endif()
   endif()
 
   # Re-create install rules:
