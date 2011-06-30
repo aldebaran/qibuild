@@ -3,7 +3,7 @@
 clean(DL)
 fpath(DL dlfcn.h)
 if (UNIX AND NOT APPLE)
-  set(DL_LIBRARIES "-ldl")
+  set(DL_LIBRARIES "-ldl" CACHE STRING "" FORCE)
 else()
   flib(DL dl)
 endif()
