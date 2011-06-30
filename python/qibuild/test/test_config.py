@@ -94,7 +94,7 @@ config = win32-vs2008
         self.assertEquals(configstore.get('general.env.path'), r"c:\path\to\swig")
         self.assertEquals(configstore.get('general.config'), "win32-vs2008")
 
-    def test_merge_conf_files2(self):
+    def test_merge_conf_files_different_syntax(self):
         global_cfg = os.path.join(self.tmp, "global.cfg")
         with open(global_cfg, "w") as fp:
             fp.write(r"""
