@@ -120,9 +120,17 @@ cmake.generator = 'Visual Studio 10'
         self.tmp = tempfile.mkdtemp(prefix="tmp-qibuild-test")
         os.makedirs(os.path.join(self.tmp, ".qi"))
         qibuild_cfg = os.path.join(self.tmp, ".qi", "qibuild.cfg")
-        fp = open(qibuild_cfg, "w")
-        fp.write(config)
-        fp.close()
+
+        # Create custom cmake flags so that toc won't complain
+        # about unknown configs
+        with open(qibuild_cfg, "w") as fp:
+            fp.write(config)
+
+        with open(os.path.join(self.tmp, ".qi", "mingw32.cmake"), "w") as fp:
+            fp.write("\n")
+
+        with open(os.path.join(self.tmp, ".qi", "win32-vs2010.cmake"), "w") as fp:
+            fp.write("\n")
 
     def _check_config(self, toc, expected, key):
         """ Check that toc configuration matches the
@@ -145,6 +153,16 @@ cmake.generator = 'Visual Studio 10'
         toc =  qibuild.toc.Toc(self.tmp, config='win32-vs2010')
         self._check_config(toc, "Visual Studio 10", "cmake.generator")
 
+    def test_general_only(self):
+        config = """
+[general]
+build.sdk_dir = /path/to/foo
+"""
+        qibuild_cfg = os.path.join(self.tmp, ".qi", "qibuild.cfg")
+        with open(qibuild_cfg, "w") as fp:
+            fp.write(config)
+        toc = qibuild.toc.Toc(self.tmp, config="win32-vs2010")
+        self._check_config(toc, "/path/to/foo", "build.sdk_dir")
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
