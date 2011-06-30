@@ -113,10 +113,10 @@ function(install_header _staged_name)
   qi_install_header(${ARG_UNPARSED_ARGUMENTS} SUBFOLDER ${ARG_SUBFOLDER})
 endfunction()
 
-function(install_data)
+function(install_data subfolder)
   qi_deprecated("install_data is deprecated.
   Use qi_install_data instead")
-  qi_install_data(${ARGN})
+  qi_install_data(${ARGN} SUBFOLDER ${subfolder})
 endfunction()
 
 function(install_data_dir _subfolder)
