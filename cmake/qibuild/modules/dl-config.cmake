@@ -2,5 +2,9 @@
 
 clean(DL)
 fpath(DL dlfcn.h)
-flib(DL dl)
+if (UNIX AND NOT APPLE)
+  set(DL_LIBRARIES "-ldl")
+else()
+  flib(DL dl)
+endif()
 export_lib(DL)

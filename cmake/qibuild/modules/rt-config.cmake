@@ -2,5 +2,9 @@
 
 clean(RT)
 fpath(RT time.h)
-flib(RT rt)
+if (UNIX AND NOT APPLE)
+  set(RT_LIBRARIES "-lrt")
+else()
+  flib(RT rt)
+endif()
 export_lib(RT)
