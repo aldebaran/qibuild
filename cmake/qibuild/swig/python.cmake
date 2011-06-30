@@ -82,7 +82,6 @@ function(qi_swig_wrap_python module_name interface_file)
 
   if (WIN32)
   # Be sure a .pyd file gets created.
-    message(STATUS "hi")
     set_target_properties(${_swig_target} PROPERTIES SUFFIX   ".pyd")
   endif()
 
