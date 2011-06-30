@@ -236,7 +236,10 @@ class Git:
         git config --get branch.master.remote
         """
         branch = self.get_current_branch()
-        remote = self.cmd.call_output("config", "--get", "branch.%s.remote" % (branch))[0]
+        try:
+            remote = self.cmd.call_output("config", "--get", "branch.%s.remote" % (branch))[0]
+        except IndexError:
+            return None
         if not remote:
             self.logger.debug("Current branch %s does not track any remote branch!" % \
                 branch)
