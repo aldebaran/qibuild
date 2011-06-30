@@ -95,21 +95,14 @@ class ConfigStore:
 
         >>> d = {
         ...     "a"   : {"g" : "h"},
-        ...     "b.c" : {"i" :  "j"},
-        ...     "d"   : {"k.l" : "m"},
         ...     "n"   : {},
         ... }
         >>> ConfigStore._get(d, 'a.g'.split('.'))
         'h'
-        >>> ConfigStore._get(d, 'b.c.i'.split('.'))
-        'j'
-        >>> ConfigStore._get(d, 'd.k.l'.split('.'))
-        'm'
         >>> ConfigStore._get(d, 'n'.split('.'))
         {}
         >>> ConfigStore._get(d, 'o'.split('.'))
         """
-        # FIXME: allow several dots?
         k = keys[0]
         rest = keys[1:]
         if not rest:
@@ -120,6 +113,9 @@ class ConfigStore:
             else:
                 return d[k]
         else:
+            # Go from ['config', 'linux32-1', '12']
+            # to ['config', 'linux32-1.12']
+            # FIXME: allow more than one dot?
             k = ".".join(keys[0:2])
             rest = keys[2:]
             if k in d.keys():
@@ -127,6 +123,34 @@ class ConfigStore:
                     return ConfigStore._get(d[k], rest)
                 else:
                     return d[k]
+
+            return None
+
+    @staticmethod
+    def _set(d, keys, value):
+        """ Recursive function used by self.read()
+        >>> d = {}
+        >>> ConfigStore._set(d, "a.b".split("."), "c")
+        >>> ConfigStore._set(d, "a.d".split("."), "e")
+        >>> d
+        {'a': {'b': 'c', 'd': 'e'}}
+        >>> d2 = {}
+        >>> ConfigStore._set(d2, "a.b.c".split("."), "d")
+        >>> ConfigStore._set(d2, "a.b.e".split("."), "f")
+        >>> d2
+        {'a': {'b': {'c': 'd', 'e': 'f'}}}
+
+
+        """
+        k = keys[0]
+        rest = keys[1:]
+        if not rest:
+            d[k] = value
+        else:
+            if not d.get(k):
+                d[k] = dict()
+            ConfigStore._set(d[k], rest, value)
+
 
     def __str__(self, pad=True):
         """ print the list of keys/values """
@@ -182,23 +206,25 @@ class ConfigStore:
             if len(splitted_section) == 1:
                 if self.root.get(parsed_section) is None:
                     self.root[parsed_section] = dict()
-                to_update = self.root[parsed_section]
+                keys = [parsed_section]
             elif len(splitted_section) == 2:
                 section_name, subsection = splitted_section
                 if self.root.get(section_name) is None:
                     self.root[section_name] = dict()
                 self.root[section_name][subsection] = dict()
-                to_update = self.root[section_name][subsection]
+                keys = [section_name, subsection]
 
             items = parser.items(parsed_section)
             if not items:
                 # The key exists but is empty:
-                to_update = dict()
+                ConfigStore._set(self.root, keys, dict())
             for k, v in items:
-                v = v.strip('"')
+                subkeys = k.split(".")
+                subkeys = [x.strip("'") for x in subkeys]
+                subkeys = [x.strip("'") for x in subkeys]
                 v = v.strip("'")
-                to_update[k] = v
-
+                v = v.strip('"')
+                ConfigStore._set(self.root, keys + subkeys, v)
 
 
 def update_config(config_path, section, key, value):
