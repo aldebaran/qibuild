@@ -109,3 +109,15 @@ def run_wizard(toc):
     if default_config:
         qibuild.configstore.update_config(toc.config_path, "general", "config", default_config)
 
+    # Create the custom cmake file so that Toc won't complain.
+    custom_cmake = os.path.join(toc.work_tree, ".qi", config_name + ".cmake")
+    if os.path.exists(custom_cmake):
+        return
+
+    with open(custom_cmake, "w") as fp:
+        fp.write("""## Custom cmake file for config {config_name}
+
+# Put your specific cmake settings for {config_name} here
+# For instance:
+# set(MY_FLAG ON CACHE INTERNAL "" FORCE)
+""".format(config_name=config_name))
