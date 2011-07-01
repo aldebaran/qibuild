@@ -134,9 +134,11 @@ class TocConfigStore:
         returns 'FOO=BAR'
 
         """
-        res = self._configstore.get('config.%s.' % self.toc.active_config + key, default=default)
+        res = None
+        if self.toc.active_config:
+            res = self._configstore.get('config.%s.' % self.toc.active_config + key)
         if not res:
-            res = self._configstore.get('general.' + key, default=default)
+            res = self._configstore.get('general.' + key)
 
         if not res:
             res = default
