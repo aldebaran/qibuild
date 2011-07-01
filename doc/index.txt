@@ -49,6 +49,7 @@ Beginner
 * link:creating-a-library.html[Creating a library]
 * link:unit-testing.html[Unit testing]
 * link:installing-data.html[Installing data]
+* link:managing-config-files.html[Managing config files]
 
 Intermediate
 ~~~~~~~~~~~~

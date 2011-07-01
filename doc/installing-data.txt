@@ -8,11 +8,13 @@ Let's assume the foo executable needs to read data from a file called
 When you install +foo+, you would like to have something looking like
 
 ----
-bin/foo
-share/foo/foo.data
+<prefix>
+|__ bin
+    |__ foo
+|__ share
+    |__ foo
+        |__ foo.data
 ----
-
-(at least on UNIX)
 
 So, create a folder named +share/foo+ and put a file names +foo.data+ in your
 source tree.
@@ -24,18 +26,11 @@ To install the files, simply use
 
 [source, cmake]
 ----
-qi_install_data(foo share/foo/foo.data)
+qi_install_data(share/foo/foo.data SUBFOLDER foo)
 ----
 
 
+Please note: how to make sure that the foo executable is able to find the
+foo.data file is out of the scope of this documentation
 
-Going further
--------------
-
-
-Here we have just covered what the basics of what the +qibuild/cmake+ framework
-can do for you.
-
-You will find comprehensive documentation in the link:cmakeapi.html[qiBuild CMake API]
-
-link:managing-deps.html[Next] Managing dependencies between projects
+link:managing-config-files.html[Next] Managing config files
