@@ -26,6 +26,11 @@ function(_qi_install)
       list(APPEND _dirs_to_install ${f})
     else()
       file(GLOB_RECURSE _file_to_install RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${f})
+      if(NOT _file_to_install)
+        qi_error(
+"Error when parsing qi_install arguments:
+  '${f}' does not match any files")
+      endif()
       list(APPEND _files_to_install ${_file_to_install})
     endif()
   endforeach()
