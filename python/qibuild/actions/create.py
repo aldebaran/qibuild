@@ -42,17 +42,20 @@ def do(args):
     """"Create a new project """
     # Try to open a qiworktree.
     # If not, ask the user if he wants to create one:
+    qiwt = None
     try:
         qiwt = qibuild.qiworktree_open(args.work_tree)
     except qibuild.qiworktree.WorkTreeException:
         if qibuild.interact.ask_yes_no("Warning, no worktree found. Create one"):
             qibuild.run_action("qibuild.actions.init", ["--interactive"])
             qiwt = qibuild.qiworktree_open(args.work_tree)
-        else:
-            return
 
     project_name = args.project_name
-    project_path = os.path.join(qiwt.work_tree, project_name)
+    if qiwt:
+        project_path = os.path.join(qiwt.work_tree, project_name)
+    else:
+        project_path = os.path.join(os.getcwd(), project_name)
+
     if os.path.exists(project_path):
         raise Exception("%s already exists" % project_path)
     os.mkdir(project_path)
