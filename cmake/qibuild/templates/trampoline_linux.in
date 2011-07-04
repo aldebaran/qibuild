@@ -1,9 +1,0 @@
-#!/bin/bash
-
-SDK_DIR=$(dirname "$(readlink -f $0 2>/dev/null)")
-
-export LD_LIBRARY_PATH="${SDK_DIR}/@_SDK_LIB@"
-export PYTHONHOME="${SDK_DIR}"
-export PYTHONPATH="${SDK_DIR}/@_SDK_LIB@"
-exec "${SDK_DIR}/@_SDK_BIN@/@_binary_name@" $@
-

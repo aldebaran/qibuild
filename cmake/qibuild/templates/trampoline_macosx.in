@@ -1,8 +1,0 @@
-#!/bin/bash
-
-SDK_DIR="$(dirname "$0")"
-
-export DYLD_LIBRARY_PATH="${SDK_DIR}/@_SDK_LIB@"
-export DYLD_FRAMEWORK_PATH="${SDK_DIR}/@_SDK_FRAMEWORK@"
-export PYTHONPATH="${SDK_DIR}/@_SDK_LIB@"
-"${SDK_DIR}/@_SDK_BIN@/@_binary_name@" $@
