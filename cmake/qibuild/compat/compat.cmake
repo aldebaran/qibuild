@@ -353,9 +353,9 @@ function(stage_lib _targetname _name)
   string(TOUPPER ${_targetname} _U_targetname)
   if (NOT ${_U_targetname} STREQUAL ${_name})
     qi_deprecated("
-      Not using stage_lib(foo FOO) where the second
-      argument if not equals to the upper-version of the first
-      argument is not supported anymore.
+      Using stage_lib(foo FOO) where the second
+      argument is not the upper-version of the first
+      argument is deprecated.
       Old:
         stage_lib(${_targetname} ${_name})
       New:
