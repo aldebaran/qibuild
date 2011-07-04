@@ -109,10 +109,17 @@ function(qi_create_bin name)
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
   endif()
 
+  # prevent having "//": in filenames: visual studio does not like it
+  if("${ARG_SUBFOLDER}" STREQUAL "")
+    set(_runtime_out "${QI_SDK_DIR}/${QI_SDK_BIN}")
+  else()
+    set(_runtime_out "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
+  endif()
+
   set_target_properties("${name}" PROPERTIES
-      RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}"
-      RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}"
-      RUNTIME_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}"
+      RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY_RELEASE "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY         "${_runtime_out}"
   )
 
   if(WIN32)
@@ -296,22 +303,25 @@ function(qi_create_lib name)
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
   endif()
 
+  # Prevent having '//' in folder names, vs 2008 does not like it
   if("${ARG_SUBFOLDER}" STREQUAL "")
     set(_runtime_out "${QI_SDK_DIR}/${QI_SDK_BIN}")
+    set(_lib_out     "${QI_SDK_DIR}/${QI_SDK_LIB}")
   else()
-    set(_runtime_out "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}")
+    set(_runtime_out "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
+    set(_lib_out     "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}")
   endif()
 
   set_target_properties("${name}" PROPERTIES
       RUNTIME_OUTPUT_DIRECTORY_DEBUG    "${_runtime_out}"
       RUNTIME_OUTPUT_DIRECTORY_RELEASE  "${_runtime_out}"
       RUNTIME_OUTPUT_DIRECTORY          "${_runtime_out}"
-      LIBRARY_OUTPUT_DIRECTORY_DEBUG    "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
-      LIBRARY_OUTPUT_DIRECTORY_RELEASE  "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
-      LIBRARY_OUTPUT_DIRECTORY          "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
-      ARCHIVE_OUTPUT_DIRECTORY_DEBUG    "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
-      ARCHIVE_OUTPUT_DIRECTORY_RELEASE  "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
-      ARCHIVE_OUTPUT_DIRECTORY          "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}"
+      LIBRARY_OUTPUT_DIRECTORY_DEBUG    "${_lib_out}"
+      LIBRARY_OUTPUT_DIRECTORY_RELEASE  "${_lib_out}"
+      LIBRARY_OUTPUT_DIRECTORY          "${_lib_out}"
+      ARCHIVE_OUTPUT_DIRECTORY_DEBUG    "${_lib_out}"
+      ARCHIVE_OUTPUT_DIRECTORY_RELEASE  "${_lib_out}"
+      ARCHIVE_OUTPUT_DIRECTORY          "${_lib_out}"
   )
 
   #make install rules

@@ -40,7 +40,7 @@ include("qibuild/internal/glob")
 include("qibuild/internal/autostrap")
 
 if (NOT QI_SDK_DIR)
-  qi_set_global(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk/")
+  qi_set_global(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk")
   qi_info("QI_SDK_DIR: ${QI_SDK_DIR}")
 endif()
 
