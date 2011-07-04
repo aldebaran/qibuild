@@ -77,6 +77,24 @@ endif()
 #always include CMAKE_PREFIX_PATH in the cross-compilation "compliant" folder.
 set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${CMAKE_PREFIX_PATH})
 
+# temporary work around for ubuntu >= natty and cmake < 2.8.6
+# (inspired by http://www.cmake.org/Bug/view.php?id=12037
+
+find_program(_dpkg_architecture dpkg-architecture)
+
+if(_dpkg_architecture)
+  execute_process(
+    COMMAND dpkg-architecture -qDEB_HOST_MULTIARCH
+    OUTPUT_VARIABLE _arch_triplet
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE _ret)
+  if(${_ret} EQUAL 0)
+    list(APPEND CMAKE_SYSTEM_LIBRARY_PATH /usr/lib/${_arch_triplet})
+  endif()
+endif()
+
 qi_debug("CMAKE_PREFIX_PATH  = ${CMAKE_PREFIX_PATH}")
 qi_debug("CMAKE_MODULE_PATH  = ${CMAKE_MODULE_PATH}")
 qi_debug("CMAKE_INCLUDE_PATH = ${CMAKE_INCLUDE_PATH}")
+qi_debug("CMAKE_SYSTEM_LIBRARY_PATH = ${CMAKE_SYSTEM_LIBRARY_PATH}")

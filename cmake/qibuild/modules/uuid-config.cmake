@@ -3,10 +3,9 @@
 clean(UUID)
 fpath(UUID uuid/uuid.h)
 if (NOT APPLE)
-  if(UNIX)
-    set(UUID_LIBRARIES "-luuid" CACHE INTERNAL "" FORCE)
-  endif()
+  flib(UUID uuid)
   export_lib(UUID)
 else()
+  # UUID is header-only on apple
   export_header(UUID)
 endif()

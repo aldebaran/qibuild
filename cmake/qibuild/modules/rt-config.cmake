@@ -2,9 +2,5 @@
 
 clean(RT)
 fpath(RT time.h)
-if (UNIX AND NOT APPLE)
-  set(RT_LIBRARIES "-lrt"  CACHE STRING "" FORCE)
-else()
-  flib(RT rt)
-endif()
+flib(RT rt)
 export_lib(RT)

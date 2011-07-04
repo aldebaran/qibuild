@@ -2,9 +2,5 @@
 
 clean(PTHREAD)
 fpath(PTHREAD "pthread.h" SYSTEM)
-if (UNIX AND NOT APPLE)
-  set(PTHREAD_LIBRARIES "-lpthread"  CACHE STRING "" FORCE)
-else()
-  flib(PTHREAD pthread pthreadVCE2)
-endif()
+flib(PTHREAD pthread pthreadVCE2)
 export_lib(PTHREAD)
