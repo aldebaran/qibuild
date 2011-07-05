@@ -50,7 +50,9 @@ def do(args):
     # DESTDIR=/tmp/foo and CMAKE_PREFIX="/usr/local" means
     # dest = /tmp/foo/usr/local
     prefix = args.prefix[1:]
+    destdir = qibuild.sh.to_native_path(args.destdir)
     dest = os.path.join(args.destdir, prefix)
+    dest = qibuild.sh.to_native_path(dest)
     LOGGER.info("Setting CMAKE_INSTALL_PREFIX=%s on every project", args.prefix)
     for project_name in project_names:
         project = toc.get_project(project_name)
@@ -65,7 +67,7 @@ def do(args):
         LOGGER.info("Installing %s to %s (%s)", ", ".join([n for n in project_names]), dest, toc.build_type)
     for project_name in project_names:
         project = toc.get_project(project_name)
-        toc.install_project(project,  args.destdir, runtime=args.runtime)
+        toc.install_project(project,  destdir, runtime=args.runtime)
 
     if not args.include_deps:
         return
