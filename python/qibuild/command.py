@@ -10,7 +10,7 @@ Few notes:
 
  This way:
      We can alway use:
-        - qibuild.command.check_call(["cmake", ..."])
+        - qibuild.command.call(["cmake", ..."])
     on every platform as soon as cmake is in
     os.environ["PATH"]
 
