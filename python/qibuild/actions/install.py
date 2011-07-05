@@ -44,7 +44,7 @@ def do(args):
     # that it has the same value for every project.
 
     # A simple way to do this is to re-call cmake on every dependency,
-    # without cleaning the cache (or else we would use user's previous
+    # without cleaning the cache (or else we would not use user's previous
     # settings)
 
     # DESTDIR=/tmp/foo and CMAKE_PREFIX="/usr/local" means
