@@ -2,7 +2,7 @@
 
 # install with support for directory, globbing and files.
 # this function know how to handle COMPONENT and KEEP_RELATIVE_PATHS
-function(_qi_install)
+function(_qi_install_internal)
   cmake_parse_arguments(ARG "KEEP_RELATIVE_PATHS" "IF;COMPONENT;DESTINATION;SUBFOLDER" "" ${ARGN})
 
   if (NOT "${ARG_IF}" STREQUAL "")

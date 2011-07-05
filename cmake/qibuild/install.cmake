@@ -18,6 +18,15 @@
 #
 # \example:install
 
+#! Generic install function.
+#  Prefer using other qi_install_*
+# \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \param: IF             Condition that should be verified for the install rules
+#                        to be active for example (IF WITH_ZEROMQ)
+# \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
+function(qi_install)
+  _qi_install_internal(${ARGN})
+endfunction()
 
 #! Install application headers.
 # The destination will be <prefix>/include/
@@ -30,7 +39,7 @@
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
 function(qi_install_header)
-  _qi_install(${ARGN} COMPONENT header DESTINATION ${QI_SDK_INCLUDE})
+  _qi_install_internal(${ARGN} COMPONENT header DESTINATION ${QI_SDK_INCLUDE})
 endfunction()
 
 
@@ -47,7 +56,7 @@ endfunction()
 #                         behavior)
 #
 function(qi_install_data)
-  _qi_install(${ARGN} COMPONENT data  DESTINATION ${QI_SDK_SHARE})
+  _qi_install_internal(${ARGN} COMPONENT data  DESTINATION ${QI_SDK_SHARE})
 endfunction()
 
 #! Install application doc.
@@ -62,8 +71,9 @@ endfunction()
 #                         behavior)
 #
 function(qi_install_doc)
-  _qi_install(${ARGN} COMPONENT doc   DESTINATION ${QI_SDK_DOC})
+  _qi_install_internal(${ARGN} COMPONENT doc   DESTINATION ${QI_SDK_DOC})
 endfunction()
+
 
 #! Install application configuration files.
 #
@@ -76,7 +86,7 @@ endfunction()
 #                         behavior)
 #
 function(qi_install_conf)
-  _qi_install(${ARGN} COMPONENT conf  DESTINATION ${QI_SDK_CONF})
+  _qi_install_internal(${ARGN} COMPONENT conf  DESTINATION ${QI_SDK_CONF})
 endfunction()
 
 #! Install CMake module files.
@@ -91,7 +101,7 @@ endfunction()
 #                         behavior)
 #
 function(qi_install_cmake)
-  _qi_install(${ARGN} COMPONENT cmake DESTINATION ${QI_SDK_CMAKE})
+  _qi_install_internal(${ARGN} COMPONENT cmake DESTINATION ${QI_SDK_CMAKE})
 endfunction()
 
 
@@ -180,5 +190,5 @@ endfunction()
 # \param: IF             Condition that should be verified for the install rules
 #                        to be active for example (IF WITH_ZEROMQ)
 function(qi_install_library)
-  _qi_install(${ARGN} COMPONENT lib DESTINATION ${QI_SDK_LIB})
+  _qi_install_internal(${ARGN} COMPONENT lib DESTINATION ${QI_SDK_LIB})
 endfunction()
