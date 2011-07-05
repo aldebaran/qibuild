@@ -9,6 +9,12 @@ cmake_policy(SET CMP0011 NEW)
 # if() recognizes numbers and boolean constants.
 cmake_policy(SET CMP0012 NEW)
 
+# We use RUNTIME_DIRECTORY_<CONFIG> for visual studio
+# which is a very nice feature but that only came up with
+# cmake 2.8.2
+if(MSVC_IDE)
+  cmake_minimum_required(VERSION 2.8.3)
+endif()
 
 #get the current directory of the file
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
