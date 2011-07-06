@@ -60,6 +60,7 @@ endfunction()
 # The name of the test will always be the name of the target.
 #
 # \flag:NO_ADD_TEST Do not call add_test, just create the binary
+# \argn: source files, like the SRC group, argn and SRC will be merged
 # \param:TIMEOUT The timeout of the test
 # \group:SRC Sources
 # \group:DEPENDS Dependencies to pass to use_lib
@@ -74,7 +75,7 @@ function(qi_create_gtest name)
   cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
 
   # First, create the target
-  qi_create_bin(${name} SRC ${ARG_SRC} NO_INSTALL)
+  qi_create_bin(${name} SRC ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS} NO_INSTALL)
   qi_use_lib(${name} ${ARG_DEPENDS})
 
   # Build a correct xml output name
