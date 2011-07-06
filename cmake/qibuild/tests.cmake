@@ -16,7 +16,7 @@ set(_TESTS_RESULTS_FOLDER "${CMAKE_SOURCE_DIR}/build-tests/results" CACHE INTERN
 # \param:TIMETOUT The timeout of the test
 # \group:ARGUMENTS Arguments to pass to add_test
 function(qi_add_test test_name target_name)
-  cmake_parse_arguments(ARG "" "TIMEOUT;ARGUMENTS" "" ${ARGN})
+  cmake_parse_arguments(ARG "" "TIMEOUT" "ARGUMENTS" ${ARGN})
 
   if(NOT ARG_TIMEOUT)
     set(ARG_TIMEOUT 20)
@@ -34,6 +34,7 @@ function(qi_add_test test_name target_name)
 
   add_test(${test_name} ${_bin_path} ${ARG_ARGUMENTS})
 
+  # Be nice with Visual Studio users:
   set_target_properties(${target_name}
     PROPERTIES
       FOLDER "tests")
@@ -83,9 +84,16 @@ function(qi_create_gtest name)
     string(REPLACE "/" "\\\\" xml_output ${_xml_output})
   endif()
 
+
   # Call qi_add_test with correct arguments:
+  # first, --gtest_output:
+  set(_args --gtest_output=xml:${_xml_output})
+
+  # then, arguments coming from the user:
+  list(APPEND _args  ${ARG_ARGUMENTS})
+
   qi_add_test(${name} ${name}
     TIMEOUT ${ARG_TIMEOUT}
-    ARGUMENTS --gtest_output=xml:${_xml_output} ${ARG_ARGUMENTS}
+    ARGUMENTS ${_args}
   )
 endfunction()
