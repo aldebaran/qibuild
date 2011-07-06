@@ -115,10 +115,11 @@ endfunction()
 # to search for static libs set XXX_STATIC=ON before calling qi_use_lib.
 #
 # \arg:name The target to add dependencies to
-# \group:DEPENDENCIES The list of dependencies
+# \argn: dependencies, like the DEPENDS group, argn and DEPENDS will be merged
+# \group:DEPENDS The list of dependencies
 function(qi_use_lib name)
   _qi_check_is_target("${name}")
-  cmake_parse_arguments(ARG "" "PLATEFORM" "DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "" "" "DEPENDS" ${ARGN})
 
   set(ARG_DEPENDS ${ARG_UNPARSED_ARGUMENTS} ${ARG_DEPENDS})
 
