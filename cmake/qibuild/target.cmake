@@ -29,19 +29,44 @@ set(_QI_TARGET_CMAKE_ TRUE)
 include(CMakeParseArguments)
 include(qibuild/internal/copy)
 
-# We need this later for the post-copy-dll trick to work
-set(_QI_USELIB_CMAKE_ TRUE)
-if(MSVC)
-  set(QI_MSVC "ON" CACHE INTERNAL "" FORCE)
-else()
-  set(QI_MSVC "OFF" CACHE INTERNAL "" FORCE)
-endif()
 
-if(MSVC_IDE)
-  set(QI_MSVC_IDE "ON" CACHE INTERNAL "" FORCE)
-else()
-  set(QI_MSVC_IDE "OFF" CACHE INTERNAL "" FORCE)
-endif()
+##
+# Copy the dlls on which a target depends to the correct location
+# on windows, the .dll on which the target depends are copied to bin/,
+# next to the .exe.
+# on mac, the .dylib are copied to lib/, so that setting DYLD_LIBRARY_PATH to
+# build/sdk/lib works.
+# on linux, cmake does The Right Thing for us.
+function(_qi_post_copy_deps name)
+  if(WIN32)
+    configure_file(${QI_ROOT_DIR}/templates/post-copy-dlls.cmake
+                   ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
+                   COPYONLY)
+    add_custom_command(TARGET ${name} POST_BUILD
+      COMMAND
+        ${CMAKE_COMMAND}
+        -Dtarget=${name}
+        -DMSVC=${MSVC}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -P ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
+        ${CMAKE_BINARY_DIR}
+    )
+  endif()
+
+  if(APPLE)
+    configure_file(${QI_ROOT_DIR}/templates/post-copy-dylibs.cmake
+                   ${CMAKE_BINARY_DIR}/post-copy-dylibs.cmake
+                   COPYONLY)
+
+    add_custom_command(TARGET ${name} POST_BUILD
+      COMMAND
+        ${CMAKE_COMMAND}
+        -Dtarget=${name}
+        -P ${CMAKE_BINARY_DIR}/post-copy-dylibs.cmake
+        ${CMAKE_BINARY_DIR}
+    )
+  endif()
+endfunction()
 
 #! Create an executable.
 # The target name should be unique.
@@ -122,36 +147,8 @@ function(qi_create_bin name)
       RUNTIME_OUTPUT_DIRECTORY         "${_runtime_out}"
   )
 
-  if(WIN32)
-    string(TOUPPER ${name} _U_name)
-    configure_file(${QI_ROOT_DIR}/templates/post-copy-dlls.cmake
-                   ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
-                   COPYONLY)
-    add_custom_command(TARGET ${name} POST_BUILD
-      COMMAND
-        ${CMAKE_COMMAND}
-        -Dtarget=${name}
-        -DMSVC=${MSVC}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -P ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
-        ${CMAKE_BINARY_DIR}
-    )
-  endif()
+  _qi_post_copy_deps("${name}")
 
-  if(APPLE)
-    string(TOUPPER ${name} _U_name)
-    configure_file(${QI_ROOT_DIR}/templates/post-copy-dylibs.cmake
-                   ${CMAKE_BINARY_DIR}/post-copy-dylibs.cmake
-                   COPYONLY)
-
-    add_custom_command(TARGET ${name} POST_BUILD
-      COMMAND
-        ${CMAKE_COMMAND}
-        -DPROJECT=${_U_name}
-        -P ${CMAKE_BINARY_DIR}/post-copy-dylibs.cmake
-        ${CMAKE_BINARY_DIR}
-    )
-  endif()
 
   if(UNIX AND NOT APPLE)
     if(NOT ARG_NO_RPATH)
@@ -323,6 +320,8 @@ function(qi_create_lib name)
       ARCHIVE_OUTPUT_DIRECTORY_RELEASE  "${_lib_out}"
       ARCHIVE_OUTPUT_DIRECTORY          "${_lib_out}"
   )
+
+  _qi_post_copy_deps("${name}")
 
   #make install rules
   qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
