@@ -305,7 +305,7 @@ function(qi_create_lib name)
     set(_runtime_out "${QI_SDK_DIR}/${QI_SDK_BIN}")
     set(_lib_out     "${QI_SDK_DIR}/${QI_SDK_LIB}")
   else()
-    set(_runtime_out "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}")
+    set(_runtime_out "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}")
     set(_lib_out     "${QI_SDK_DIR}/${QI_SDK_LIB}/${ARG_SUBFOLDER}")
   endif()
 
