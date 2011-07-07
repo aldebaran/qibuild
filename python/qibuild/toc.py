@@ -370,7 +370,7 @@ class Toc(QiWorkTree):
         (project_names, package_names, not_found) = dep_solver.solve([project_name])
 
         if not_found:
-            if self.toolchain is None or self.toolchain.cross:
+            if self.toolchain and not self.toolchain.cross:
                 LOGGER.warning("Could not find projects %s", ", ".join(not_found))
 
         project_names.remove(project_name)
