@@ -2,8 +2,8 @@
 
 clean(ZEROMQ)
 fpath(ZEROMQ zmq.h)
-# zeromq is called libzmq.dll on windows...
-flib(ZEROMQ libzmq zmq)
+flib(ZEROMQ OPTIMIZED NAMES libzmq zmq)
+flib(ZEROMQ DEBUG     NAME  libzmq zmq_d)
 if(UNIX)
   qi_set_global(ZEROMQ_DEPENDS "UUID")
 else()
