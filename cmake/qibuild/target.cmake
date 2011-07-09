@@ -330,6 +330,8 @@ function(qi_create_lib name)
     set_target_properties("${name}"
       PROPERTIES
         INSTALL_NAME_DIR "@executable_path/../lib"
+        BUILD_WITH_INSTALL_RPATH 1
+
     )
   endif()
 
