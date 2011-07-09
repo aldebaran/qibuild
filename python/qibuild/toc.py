@@ -540,10 +540,6 @@ class Toc(QiWorkTree):
                 if target:
                     cmd += ["/target=%s" % target]
             else:
-                if self.vc_version == "10":
-                    # CMake will use MSBuild for VS2010 builds, in other
-                    # cases, it uses devenv directly
-                    cmd = cmd + ["--", "/verbosity:minimal", "/nologo"]
                 if num_jobs > 1 and "visual studio" in self.cmake_generator.lower():
                     cmd += ["/m:%d" % num_jobs]
 
