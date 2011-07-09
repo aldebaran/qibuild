@@ -290,6 +290,11 @@ def create(toolchain_name):
     path = get_tc_path(toolchain_name)
     qibuild.sh.mkdir(path, recursive=True)
     qibuild.sh.mkdir(get_tc_cache(toolchain_name), recursive=True)
+    # Create a toolchain file to keep qibuild happy:
+    tc_file = os.path.join(path, "toolchain-%s.cmake" % toolchain_name)
+    with open(tc_file, "w") as fp:
+        fp.write("# Toolchain file for %s configuration. Do not edit\n" %
+            toolchain_name)
     LOGGER.info("Toolchain initialized in: %s", path)
 
 def is_runtime(filename):
