@@ -2,11 +2,18 @@
 
 clean(ZEROMQ)
 fpath(ZEROMQ zmq.h)
-flib(ZEROMQ OPTIMIZED NAMES libzmq zmq)
-flib(ZEROMQ DEBUG     NAMES libzmq zmq zmq_d)
+
+if(WIN32)
+  flib(ZEROMQ OPTIMIZED NAMES zmq)
+  flib(ZEROMQ DEBUG     NAMES zmq_d)
+else()
+  flib(ZEROMQ NAMES zmq)
+endif()
+
 if(UNIX)
   qi_set_global(ZEROMQ_DEPENDS "UUID")
 else()
   qi_set_global(ZEROMQ_DEPENDS "WSA" "RPCRT")
 endif()
+
 export_lib(ZEROMQ)
