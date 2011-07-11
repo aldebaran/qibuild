@@ -1,7 +1,7 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
 clean(ZEROMQ)
-fpath(ZEROMQ zmq.h)
+fpath(ZEROMQ zmq.h PATH_SUFFIXES zmq)
 
 if(WIN32)
   # For some reason, it's zmq on vs2010 and libzmq on vs2008
