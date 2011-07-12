@@ -63,7 +63,6 @@ endif()
 
 include("qibuild/find")
 include("qibuild/uselib")
-include("qibuild/launcher")
 include("qibuild/tests")
 include("qibuild/install")
 include("qibuild/target")
