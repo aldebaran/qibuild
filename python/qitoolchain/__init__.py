@@ -187,7 +187,12 @@ class Toolchain(object):
         if not should_skip:
             LOGGER.info("Extracting package %s", name)
             with qibuild.sh.TempDir() as tmp:
-                extracted = qibuild.archive.extract(path, tmp)
+                try:
+                    extracted = qibuild.archive.extract(path, tmp)
+                except qibuild.archive.InvalidArchive, err:
+                    mess = str(err)
+                    mess += "\nPlease fix the archive and try again"
+                    raise Exception(mess)
                 if os.path.exists(dest):
                     qibuild.sh.rm(dest)
                 qibuild.sh.mv(extracted, dest)

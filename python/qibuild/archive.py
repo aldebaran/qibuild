@@ -94,10 +94,18 @@ def extract(archive_path, directory):
     when necessary
 
     """
-    if archive_path.endswith(".zip"):
-        return extract_zip(archive_path, directory)
-    else:
-        return extract_tar(archive_path, directory)
+    try:
+        if archive_path.endswith(".zip"):
+            return extract_zip(archive_path, directory)
+        else:
+            return extract_tar(archive_path, directory)
+    # Errors returned by tarfile of zipfile are not very good,
+    # so let's just catch everything
+    except Exception, err:
+        mess = "Error occured when extracting %s\n" % archive_path
+        mess += "Original error was: %s" % err
+        raise InvalidArchive(mess)
+
 
 def zip_win(directory):
     """Compress the directory in a .zip file
