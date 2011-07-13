@@ -32,6 +32,9 @@ if ON_WIN and not HAS_PYREADLINE:
     for k in COLORS.iterkeys():
         COLORS[k] = ""
 
+# Make sure logging is configured only once:
+LOG_CONFIG_DONE = False
+
 class ColorLogHandler(logging.StreamHandler):
     """A class that outputs nice colored messages
 
@@ -87,6 +90,9 @@ class ColorLogHandler(logging.StreamHandler):
 
 def configure_logging(args):
     """Configure logging globally """
+    global LOG_CONFIG_DONE
+    if LOG_CONFIG_DONE:
+        return
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     handler = None
@@ -102,9 +108,8 @@ def configure_logging(args):
     else:
         handler.setLevel(level=logging.INFO)
 
-    # removing the handlers crashes Python 2.7.1 on Windows 7
-    #root_logger.handlers = list()
     root_logger.addHandler(handler)
+    LOG_CONFIG_DONE = True
 
 def get_current_log_level():
     """Get the current log level.
