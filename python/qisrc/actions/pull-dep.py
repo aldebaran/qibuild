@@ -1,6 +1,6 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"""Init a new qisrc workspace """
+""" Pull the sources of a project and each of its dependencies """
 
 import os
 import logging
