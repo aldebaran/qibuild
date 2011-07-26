@@ -66,7 +66,12 @@ def do(args):
 
     if editor == "Xcode":
         projs = glob.glob(project.build_directory + "/*.xcodeproj")
-        assert len(projs) == 1, "Expecting only one xcodeproj, got %s" % sln_files
+        if len(projs) == 0:
+            print "Do you have called qibuild configure with --cmake-generator=Xcode"
+            exit(1)
+        if len(projs) > 1:
+            print "Expecting only one xcodeproj, got %s" % projs
+            exit(1)
         print "starting Xcode:"
         print "%s %s" % ("open", projs[0])
         subprocess.Popen(["open", projs[0]])
