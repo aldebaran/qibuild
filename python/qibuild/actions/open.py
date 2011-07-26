@@ -56,10 +56,11 @@ def do(args):
     if editor is None:
         editor  = qibuild.interact.ask_choice(ides, "Please choose between the following IDEs")
         toc.update_config("env", "ide", editor)
-
+    error_message = "Could not open project %s:\n" % project_name
     if editor == "Visual Studio":
         sln_files = glob.glob(project.build_directory + "/*.sln")
-        assert len(sln_files) == 1, "Expecting only one sln, got %s" % sln_files
+        if len(sln_files) != 1:
+            raise Exception(error_message + "Expecting only one sln, got %s" % sln_files)
         print "starting VisualStudio:"
         print "%s %s" % ("start", sln_files[0])
         subprocess.Popen(["start", sln_files[0]], shell=True)
@@ -67,11 +68,9 @@ def do(args):
     if editor == "Xcode":
         projs = glob.glob(project.build_directory + "/*.xcodeproj")
         if len(projs) == 0:
-            print "Do you have called qibuild configure with --cmake-generator=Xcode"
-            exit(1)
+            raise Exception(error_message + "Do you have called qibuild configure with --cmake-generator=Xcode?")
         if len(projs) > 1:
-            print "Expecting only one xcodeproj, got %s" % projs
-            exit(1)
+            raise Exception(error_message + "Expecting only one xcode project file, got %s" % projs)
         print "starting Xcode:"
         print "%s %s" % ("open", projs[0])
         subprocess.Popen(["open", projs[0]])
@@ -88,7 +87,7 @@ def do(args):
                     # Store it so we dont ask again:
                     toc.update_config("env", "qtcreator.path", qtcreator_full_path)
         if not qtcreator_full_path:
-            raise Exception("Could not find QtCreator")
+            raise Exception("Could not find QtCreator. Please check your configuration.")
         cmake_list = os.path.join(project.directory, "CMakeLists.txt")
         print "starting QtCreator:"
         print "%s %s" % (qtcreator_full_path, cmake_list)
