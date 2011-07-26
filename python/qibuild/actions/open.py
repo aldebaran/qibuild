@@ -81,9 +81,12 @@ def do(args):
         if not qtcreator_full_path:
             qtcreator_full_path = qibuild.command.find_program("qtcreator")
             if not qtcreator_full_path:
-                qtcreator_full_path = qibuild.interact.ask_program("Please enter path to qtcreator")
-                # Store it so we dont ask again:
-                toc.update_config("env", "qtcreator.path", qtcreator_full_path)
+                if os.path.exists("/Applications/Qt Creator.app/Contents/MacOS/Qt Creator"):
+                    qtcreator_full_path = "/Applications/Qt Creator.app/Contents/MacOS/Qt Creator"
+                if not qtcreator_full_path:
+                    qtcreator_full_path = qibuild.interact.ask_program("Please enter path to qtcreator")
+                    # Store it so we dont ask again:
+                    toc.update_config("env", "qtcreator.path", qtcreator_full_path)
         if not qtcreator_full_path:
             raise Exception("Could not find QtCreator")
         cmake_list = os.path.join(project.directory, "CMakeLists.txt")
