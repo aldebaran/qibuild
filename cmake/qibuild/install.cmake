@@ -214,7 +214,7 @@
 #
 # === Special syntax features ===
 #
-# ==== Support of glob and directories ===
+# ==== Support of glob and directories ====
 # Please not that on top of this, you can use directories, globbing expressions
 # and list of files as arguments on all qi_install_* functions.
 #
