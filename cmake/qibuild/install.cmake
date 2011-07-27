@@ -11,7 +11,7 @@
 #
 # They also help you producing 'runtime' packages (containing just what is necessary
 # to run your software), or 'developpement' packages (containing everything in the
-# runtime package, plus all that is necessary to use your code: headers, library,
+# runtime package, plus all that is necessary to use your : headers, library,
 # cmake config files, et al.)
 #
 # === Examples ===
@@ -31,7 +31,7 @@
 #
 # use:
 #
-# [code, cmake]
+# [source, cmake]
 # ----
 # qi_install_header(foo/include/foo.h
 #                   foo/include/bar.h
@@ -60,7 +60,7 @@
 #
 # use:
 #
-# [code, cmake]
+# [source, cmake]
 # ----
 # qi_install_header(foo/foo.h
 #                   bar/bar.h
