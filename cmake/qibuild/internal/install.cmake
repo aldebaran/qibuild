@@ -4,6 +4,9 @@
 # this function know how to handle COMPONENT and KEEP_RELATIVE_PATHS
 function(_qi_install_internal)
   cmake_parse_arguments(ARG "KEEP_RELATIVE_PATHS" "IF;COMPONENT;DESTINATION;SUBFOLDER" "" ${ARGN})
+  if(NOT ARG_DESTINATION)
+    qi_error("Invalid arguments for qi_install. Missing DESTINATION argument")
+  endif()
 
   if (NOT "${ARG_IF}" STREQUAL "")
     set(_doit TRUE)
