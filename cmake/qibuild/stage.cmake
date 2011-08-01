@@ -1,7 +1,7 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-#! qiBuild Stage
-# ===============
+#! Staging targets
+# ================
 #
 # This module make libraries and executables build in this projects available
 # to others projects.
@@ -69,12 +69,14 @@ endfunction()
 
 #! stage a cmake file
 # For instance, assuming you have a foo-config.cmake file
-# containing my_awesome_function, you can do:
-# qi_stage_cmake("foo-config.cmake")
+# containing my_awesome_function, you can do::
 #
-# Then later, (in an other project, or in the same project):
-# find_package(foo)
-# my_awesome_function()
+#   qi_stage_cmake("foo-config.cmake")
+#
+# Then later, (in an other project, or in the same project)::
+#
+#   find_package(foo)
+#   my_awesome_function()
 #
 # \arg : module  path to the module file, relative to
 #               CMAKE_CURRENT_SOURCE_DIR

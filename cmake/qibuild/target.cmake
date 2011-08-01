@@ -1,7 +1,7 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-#! qiBuild Target
-# ===============
+#! Functions to create targets
+# ============================
 
 #!
 # This is the main qiBuild module. It encapsulates the creation of programs,
@@ -193,27 +193,21 @@ endfunction()
 #
 # The target name should be unique.
 #
-# If you need your library to be static, use:
-# [source, cmake]
-# ----
-# qi_create_lib(mylib STATIC SRC ....)
-# ----
+# If you need your library to be static, use::
 #
-# If you need your library to be shared, use:
-# [source, cmake]
-# ----
-# qi_create_lib(mylib SHARED SRC ....)
-# ----
+#   qi_create_lib(mylib STATIC SRC ....)
 #
-# If you want to let the user choose, use
-# [source, cmake]
-# ----
+# If you need your library to be shared, use::
+#
+#   qi_create_lib(mylib SHARED SRC ....)
+#
+# If you want to let the user choose, use::
+#
 #    qi_create_lib(mylib SRC ....)
-# ----
 #
 # The library will be:
-#  - built as a shared library on UNIX
-#  - built as a static library on windows
+#  * built as a shared library on UNIX
+#  * built as a static library on windows
 #
 # But the user can set BUILD_SHARED_LIBS=OFF to compile
 # everything in static by default.
