@@ -29,22 +29,21 @@ Proposed layout
 
 ----
 fooproject
-|__ foo
+|__ libfoo
     | CMakeLists.txt
     |__ foo
     |   |__ foo.h
+    |__ src
     |   |__ foo.cpp
-    |   |__ src
-    |       |__ foo_private.h
-    |       |__ foo_private.cpp
+    |   |__ foo_private.h
+    |   |__ foo_private.cpp
     |__ test
         |__ CMakeLists.txt
         |__ foo_test.cpp
 ----
 
 * The full path to the public header is  +foo/foo/foo.h+
-Note that the name of the root directory does not have to be +foo+, it can be
-+foolib+, for instance.
+Note that the name of the root directory is 'libfoo'
 
 * The private code is put in a +src+ sub-directory
 
@@ -61,17 +60,21 @@ project(fooproject)
 add_subdirectory(foo)
 add_subdirectory(foo/test)
 
-# foo/CMakeLists.txt:
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+include_directories(".")
+
+# optional if you have private headers
+include_directories("src")
+
 
 qi_create_lib(foo
   SRC foo/foo.h
       foo/foo.cpp
-      foo/src/foo_private.h
-      foo/src/foo_private.cpp
+      src/foo_private.h
+      src/foo_private.cpp
 )
 
-qi_install_header(foo foo/foo.h)
+qi_install_header(KEEP_RELATIVE_PATHS foo/foo.h)
 
 qi_stage_lib(foo)
 
@@ -119,7 +122,7 @@ This works because:
 With the proposed layout, you have something like:
 ----
 
-lib
+libfoo
 |__ foo
 |    |__ foo
 |    |    |__ foo.h
