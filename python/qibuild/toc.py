@@ -527,7 +527,7 @@ class Toc(QiWorkTree):
 
         if rebuild:
             cmd += ["--clean-first"]
-
+        cmd += [ "--" ]
         # In order to use incredibuild, we have to do this small hack:
         if self.using_visual_studio:
             sln_files = glob.glob(build_dir + "/*.sln")
