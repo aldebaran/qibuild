@@ -544,7 +544,7 @@ class Toc(QiWorkTree):
                     cmd += ["/m:%d" % num_jobs]
 
         if num_jobs > 1 and "make" in self.cmake_generator.lower():
-            cmd += ["--", "-j%d" % num_jobs]
+            cmd += [ "-j%d" % num_jobs]
 
         try:
             qibuild.command.call(cmd)
