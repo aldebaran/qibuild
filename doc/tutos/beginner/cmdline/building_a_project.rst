@@ -1,0 +1,64 @@
+Building a project
+==================
+
+Simple build
+------------
+
+Let’s assume you only want to compile your project once.
+
+Doing so is easy::
+
+  qibuild make foo
+
+Or, to build in release, use::
+
+  qibuild make --release foo
+
+Using an IDE
+------------
+
+QiBuild is based on CMake, which in turns knows how to generate project files
+for many of IDEs : XCode, Eclipse, Visual Studio.
+
+Here we are only dealing with the details for:
+
+* QtCreator on Mac and linux
+
+* Visual studio on windows.
+
+QiBuild is known to work fine with these IDEs, there may be some work to do to
+be able to use XCode or Eclipse. Patches and tutorials welcome !
+
+QiBuild and QtCreator
++++++++++++++++++++++
+
+The only thing to remember is that you should not let QtCreator call CMake by
+itself the first time.
+
+Use qibuild configure then qibuild make to be sure everything works fine.
+
+Then open the root CMakeLists in qtcreator.
+
+You will be prompted to use a build directory, chose the one that was created
+by qibuild.
+
+QtCreator will read the settings from the exising build directory, so
+everything should work fine.
+
+Remember to use the same CMake generator in QtCreator and in your configuration
+file, if qtcreator asks you to choose.
+
+QiBuild and Visual Studio
++++++++++++++++++++++++++
+
+When you have run qibuild configure, you will have a .sln file generated in
+your build directory.
+
+Your solution should already be properly configured. Please avoid making
+changes to the solution file by hand, they will be lost the next time you
+change a CMake file or re-run CMake. To keep your project cross-platform and
+sharable with others you are strongly advised to use your CMakeLists.txt to
+make any changes to your solution. After each change of your CMakeLists.txt,
+run qibuild configure to update your solution file.
+
+

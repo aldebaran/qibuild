@@ -1,0 +1,255 @@
+Python coding guide
+===================
+
+.. highlight:: python
+
+General
+-------
+
+* The code should follow the Python coding style expressed in
+  http://www.python.org/dev/peps/pep-0008/ PEP8 with the following
+  reminders/exceptions
+
+* Keep the length of the line below *80* characters when possible,
+  and when it does not hurt readability, and below *100* characters
+  at any case.
+
+* Indentation are *four spaces*
+
+* No trailing whitespace are allowed.
+
+* Every text file must be pushed using *UNIX line endings*. (On windows, you
+  are advised to set core.autocrlf to true).
+
+* Variables, functions and modules are named like_this
+  *lower case, underscore*
+
+* Classes are named LikeThis *camel case*
+
+* Constants and globals are named LIKE_THIS *upper case, underscore*
+
+
+For easy code re-use
+--------------------
+
+
+* *Every file* that ends with a .py *must* support to be imported, without
+  doing anything or printing anything to the screen.
+
+* import foo must never fails, unless there's a necessary module that could
+  not be found. But don't catch the ImportError unless it's necessary, for
+  example to deal with optional dependencies, for instance::
+
+    import required_module
+
+    HAS_NICE_FEATURE = True
+    try:
+      import nicefeature
+    except ImportError:
+      HAS_NICE_FEATURE = False
+
+    ...
+
+    if HAS_NICE_FEATURE:
+      ....
+
+
+
+* Even if you are sure you code is standalone, and is only supposed to be used
+  as a script, please follow the following skeleton::
+
+    """The foo script adds spam to the eggs """
+
+    def add_eggs(spam, eggs):
+      """Add some spam to the eggs """
+
+      ...
+
+
+    def main():
+      """Parse command line """
+
+      ...
+
+      add_eggs(spam, eggs)
+
+    if __name__ == "__main__":
+      main()
+
+Note that the main() function does nothing but parsing command line, the real
+work being done by a nicely named add_eggs function.
+
+Unless you have a good reason too, please do not call sys.exit() outside the
+main() function.
+
+You will be glad to have written your foo.py script this way if you want to
+add some spam to the eggs somewhere else :)
+
+
+* Please avoid doing lots and lots of import at the beginning of
+  the file::
+
+    # BAD:
+    import foo
+    from foo.spam import Spam
+    from foo.eggs import Eggs
+
+    ...
+
+    spam = Spam()
+    eggs = Eggs()
+
+
+    # OK:
+    import foo
+
+    ...
+
+    spam = foo.spam.Spam()
+
+    eggs = foo.eggs.Eggs()
+
+
+For this to work, you will have to put something like this in
+foo/__init__.py::
+
+  from foo import spam
+  from foo import eggs
+
+
+File Paths
+----------
+
+* *Never* using strings to manipulate file paths. Use os.path.join
+  which will handle all the nasty stuff for you::
+
+    # BAD : you are doomed if you ever want to
+    # generate a .bat file with bar_path
+    bar_path = spam_path + "/" + "bar"
+
+    # OK:
+    bar_path = os.path.join(spam_path, "bar")
+
+* *Always* convert files coming from the user to native, absolute path::
+
+    user_input = ...
+    my_path = qibuild.sh.to_native_path(user_input)
+
+* Always store and manipulate native paths (using os.path), and if needed
+  convert to posix or windows format at the last moment.
+
+.. note:: If you need to build POSIX paths, don't use string operations
+   either, use `posixpath.join`  (This works really well to build URL, for
+   instance)
+
+* Pro-tip: hard-coding paths on windows:
+
+Use r" rather than ugly \\::
+  # UGLY:
+  WIN_PATH = "c:\\windows\\spam\\egss"
+
+  # NICE:
+  WIN_PATH = r"c:\windows\spam\eggs"
+
+
+Logging
+-------
+
+* Usage of the logging module is advised. It enables you to display nice,
+  colorful messages to the user, helps to debug with the -v option, has a
+  nice syntax...
+  Please don't use print unless you have a very good reason to.
+
+* Get a logger with::
+
+    import logging
+
+    LOGGER = logging.getLogger(__name__)
+
+This makes sure the names of the loggers are always consistent with the source code
+
+Debugging
+---------
+
+When something goes wrong, you will just have the last error message printed,
+with no other information. (Which is nice for the end user!)
+
+If it's an *unexpected* error message, here's what you can do:
+
+* run qibuild with -v flag to display debug messages
+
+* run qibuild with --backtrace to print the full backtrace
+
+* run qibuild with --pdb to drop to a pdb session when an uncaught exception is raised.
+
+
+Extending QiBuild actions
+-------------------------
+
+
+Writing a new qibuild action is quite simple.
+
+When you type::
+
+  qibuild spam
+
+the qibuild script will look for a module named spam in the
+qibuild.actions package.
+
+The only requirements for the spam module is to contain two functions:
+
+* configure_parser(parser)
+
+* do(args)
+
+The configure_parser function takes a argparse.ArgumentParser object and
+modifies it.
+
+You can modify the parser passed as arguments to add specific arguments
+to you action.
+
+The do function takes the result of the command line parsing. It's a
+argparse.Namespace object.
+
+Quick example of a generic action:::
+
+  """Add some eggs !"""
+
+  import argparse
+  import logging
+  import qibuild
+
+  LOGGER = logging.getLogger(__name__)
+
+  def configure_parser(parser):
+      """Configure parser for this action """
+      qibuild.cmdparse.default_parser(parser)
+      parser.add_argument("--num-eggs",
+        help="Number of eggs to add",
+        type=int)
+      parser.set_defaults(
+        num_eggs=3)
+
+  def do(args):
+    """Main entry point"""
+    LOGGER.info("adding %i eggs", args.num_eggs)
+
+
+The call to qibuild.cmdparse.default_parser is mandatory:
+It handles the logging configuration, and all the debug options.
+
+There are a bunch of other functions available to configure the parsers in
+the qibuild.parsers package, depending on what you need to do, and, yes,
+they all call qibuild.cmdparse.default_parser for you :)
+
+
+Quick note : often you have to have an action with two words in it, for
+instance foo-bar.
+
+Although simply writing a file called foo-bar.py would world, please
+create a module called foo_bar.py . Note that "import foo-bar" won't
+work, Python will read it as "import foo minus bar"...
+
+Note that having called your module foo_bar.py won't prevent you to use
+qibuild foo-bar if necessary.
+
