@@ -52,6 +52,8 @@ Documentation
 
    cmake/index
 
+   man/index
+
 
 Hacking
 -------

@@ -211,6 +211,10 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'qibuild', u'QiBuild Documentation',
+    ('man/qisrc', 'qisrc', u'Handle several project sources',
+     [u'Aldebaran Robotics'], 1),
+    ('man/qibuild', 'qibuild', u'Configure, build, install, package your project',
+     [u'Aldebaran Robotics'], 1),
+    ('man/qitoolchain', 'qitoolchain', u'QITOOLCHAIN',
      [u'Aldebaran Robotics'], 1)
 ]
