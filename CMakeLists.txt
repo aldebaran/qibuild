@@ -47,37 +47,6 @@ set(ENV{PYTHONPATH} "${CMAKE_SOURCE_DIR}/python")
 
 # Generate and install manpages
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc)
-function(gen_man_pages)
-  foreach(_name ${ARGN})
-    execute_process(
-      COMMAND
-        ${PYTHON_EXECUTABLE}
-        ${CMAKE_SOURCE_DIR}/doc/tools/generate_manpage_from_qibuild.py
-        ${CMAKE_SOURCE_DIR}/doc/${_name}-manpage.txt
-        ${CMAKE_BINARY_DIR}/doc/${_name}-manpage.txt
-        "${_name}.actions"
-      WORKING_DIRECTORY
-        ${CMAKE_SOURCE_DIR}/python
-    )
-
-    execute_process(
-     COMMAND
-        a2x -f manpage ${CMAKE_BINARY_DIR}/doc/${_name}-manpage.txt
-      WORKING_DIRECTORY
-        ${CMAKE_BINARY_DIR}/doc
-    )
-
-    install(
-    FILES
-      ${CMAKE_BINARY_DIR}/doc/${_name}.1
-    DESTINATION
-      share/man/man1/
-    )
-  endforeach()
-endfunction()
-
-gen_man_pages(qisrc qibuild qitoolchain)
-
 
 # Configure python/qibuild/config.py:
 configure_file(
