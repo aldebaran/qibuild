@@ -250,7 +250,10 @@ def gen_fun_rst(name, txt):
     usage = gen_usage_rst(name, params)
 
 
-    res = """{name}
+    res = """.. index::
+  single: {name}
+
+{name}
 {h2}
 
 {desc}

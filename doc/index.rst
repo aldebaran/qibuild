@@ -29,6 +29,19 @@ QiBuild is composed of two parts:
 * the qibuild/qitoolchain command line tools, that help build projects while
   taking dependencies into account.
 
+References
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   cmake/index
+
+   man/index
+
+
+* :ref:`search`
+* :ref:`genindex`
 
 Tutorials
 ---------
@@ -42,17 +55,6 @@ Learn how to use the QiBuild framework to build your C++ projects.
    tutos/beginner
    tutos/intermediate
    tutos/advanced
-
-
-Documentation
--------------
-
-.. toctree::
-   :maxdepth: 2
-
-   cmake/index
-
-   man/index
 
 
 Hacking
