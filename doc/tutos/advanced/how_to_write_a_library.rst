@@ -45,7 +45,8 @@ This is what your layout should look like::
 * The full path to the public header is foo/foo/foo.h. Note that the name of the
   root directory is libfoo
 
-* The private code is put in a src sub-directory
+* The private code is put in a src sub-directory. Private and public directories
+  are separated, it's easy to search only in public headers.
 
 CMake
 -----
