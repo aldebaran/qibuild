@@ -5,7 +5,6 @@ import os
 import shutil
 import logging
 import qibuild
-import qibuild
 
 
 LOGGER = logging.getLogger(__name__)
@@ -36,6 +35,8 @@ def configure_parser(parser):
     parser.add_argument("project_name",
         help="The name of the project. "
              "The project will be created in QI_WORK_TREE/<name> ")
+    parser.add_argument("--git", action="store_true",
+        help="Create a git repository")
 
 
 def do(args):
@@ -60,6 +61,14 @@ def do(args):
         raise Exception("%s already exists" % project_path)
     os.mkdir(project_path)
     copy_helper(project_name, project_path)
+
+
+    if args.git:
+        qibuild.command.call(["git", "init"], cwd=project_path)
+        with open(os.path.join(project_path, ".gitignore"), "w") as fp:
+            fp.write("build-*\n")
+        qibuild.command.call(["git" , "add" , "."], cwd=project_path)
+        qibuild.command.call(["git" , "commit" , "-m" , "initial commit"], cwd=project_path)
 
     LOGGER.info("New project initialized in %s", project_path)
 
