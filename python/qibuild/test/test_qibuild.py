@@ -29,20 +29,9 @@ class QiBuildTestCase(unittest.TestCase):
         if os.environ.get("PDB"):
             self.args.pdb = True
         self.args.work_tree = self.test_dir
-        # Backup the .qi/build.cfg
-        qi_cfg_path = os.path.join(self.test_dir, ".qi", "build.cfg")
-        qi_cfg = ""
-        with open(qi_cfg_path, "r") as fp:
-            qi_cfg = fp.read()
-        # Run git clean -fdx to be sure build dir is clean:
-        qibuild.command.call(["git", "clean", "-fdx"],
-                cwd=self.test_dir,
-                ignore_ret_code = True)
-        # Re-write the .qi/build.cfg file:
-        qibuild.sh.mkdir(os.path.join(self.test_dir, ".qi"))
-        with open(qi_cfg_path, "w") as fp:
-            fp.write(qi_cfg)
-
+        # Run qibuild clean
+        qibuild.run_action('qibuild.actions.clean',
+            ['-f'])
 
     def _run_action(self, action, *args):
         qibuild.run_action("qibuild.actions.%s" % action, args,
