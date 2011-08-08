@@ -57,7 +57,6 @@ endfunction()
 # \group:SRC              The list of sources to include in the submodule
 # \group:DEPENDS          The list of dependencies
 #
-# \example:submodule
 function(qi_submodule_add _name)
   cmake_parse_arguments(ARG "" "IF" "SRC;DEPENDS" ${ARGN})
 

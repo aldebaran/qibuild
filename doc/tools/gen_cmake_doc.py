@@ -9,8 +9,9 @@
 DOCUMENTED_FILES=[
     "target",
     "stage",
-    "uselib",
-    "install"
+    "install",
+    "submodule",
+    "option"
 ]
 
 import re
@@ -61,10 +62,11 @@ def clean_indent(txt):
 
 def parse_fun_block(txt):
     r""" Return a tuple of two elements:
-    (fun_desc, params)
-    where fun_desc is the general desription of
-    the function, and params is a list of tuples:
-    (type, name, doc)
+    (fun_desc, params, example)
+    where:
+        * fun_desc is the general desription of the function
+        * params is a list of tuples: (type, name, doc)
+        * example is list of examples
 
     """
     desc = ""
@@ -81,7 +83,8 @@ def parse_fun_block(txt):
                 param_txt += line + "\n"
 
     params = parse_params(param_txt)
-    return (desc, params)
+    example = parse_example(txt)
+    return (desc, params, example)
 
 
 
@@ -118,46 +121,95 @@ def parse_params(txt):
     return res
 
 
-def gen_param_rst(param):
+def parse_example(txt):
+    """ Parse a block of text linked to a function,
+    looking for an example.
+
+    Return None if not example was found
+    """
+    res = re.findall(r'\\example\s*:\s*(\w+)', txt, re.DOTALL)
+    if not res:
+        return
+    if len(res) > 1:
+        print "warning: only zero or one examples authorized for each function"
+    return res[0]
+
+
+def gen_params_rst(params):
     """ Generate rst doc from a parameter
 
     """
-    (type_, name, doc) = param
+    res = """**Parameters**
 
-    return """**{name}**
+    """
+
+    for param in params:
+        (type_, name, doc) = param
+
+        res += """*{name}*
 
 {doc}
 
 """.format(name=name, doc=indent(doc, 1))
+
+    return res
 
 
 def gen_usage_rst(fun_name, params):
     """ Generate rst doc for usage of a function
 
     """
-    res = ""
+    usage = ""
     for (type, name, doc_) in params:
         if type == "arg":
-            res += name
+            usage += name
         elif type == "flag":
-            res += "[%s]" % name
+            usage += "[%s]" % name
         elif type == "param":
-            res += "%s <%s>" % (name, name.lower())
+            usage += "%s <%s>" % (name, name.lower())
         elif type == "group":
-            res += "%s <%s> ..." % (name, name.lower())
+            usage += "%s <%s> ..." % (name, name.lower())
         elif type == "argn":
-            res += "[<%s> ...]" % (name)
+            usage += "[<%s> ...]" % (name)
         elif type == "example":
-            # FIXME
+            # \example is handled by gen_example_rst
             pass
+
         else:
             print "unknown type: ", type
-        res += "\n"
-    res = indent(res, 2)
+        usage += "\n"
+    if len(params) > 1:
+        usage = indent(usage, 2)
+        usage = "%s(\n%s\n)" % (fun_name, usage)
+    else:
+        usage = usage[:-1] # remove usless \n
+        usage = "%s(%s)" % (fun_name, usage)
 
-    res = "%s(\n%s\n)" % (fun_name, res)
+    res = """
+**Usage**
+
+.. code-block:: cmake
+
+{usage}
+""".format(usage=indent(usage, 1))
+
     return res
 
+
+def gen_example_rst(example):
+    r"""
+
+    """
+    if not example:
+        return ""
+
+    res =  """**Example**
+
+.. literalinclude:: /samples/{example}/CMakeLists.txt
+   :language: cmake
+
+"""
+    return res.format(example=example)
 
 def get_title_block(txt):
     """ Get the general doc of the cmake code.
@@ -234,46 +286,44 @@ def gen_title_rst(txt):
     """Generate rst title from a cmake comment
 
     """
+    # Just add a few useful directives
+    txt = ".. highlight:: cmake\n\n" + txt
     return txt
-
 
 def gen_fun_rst(name, txt):
     """Generate rst documentation for a documentation from
     a name an a text
 
     """
-    (desc, params) = parse_fun_block(txt)
-    params_rst = ""
-    for param in params:
-        params_rst += gen_param_rst(param)
+    (desc, params, example) = parse_fun_block(txt)
+    params_rst = gen_params_rst(params)
 
     usage = gen_usage_rst(name, params)
+    example_rst = gen_example_rst(example)
 
 
+# We generate an index AND a ref, because
+# writing a CMake domain is a little hard
+# and prbably overkill
     res = """.. index::
   single: {name}
+
+.. _{name}:
 
 {name}
 {h2}
 
 {desc}
-
-Usage
-+++++
-
-.. code-block:: cmake
-
 {usage}
-
-Parameters
-++++++++++
-
 {params}
+{example}
+
 """.format(name=name,
            h2="-"*len(name),
            desc=desc,
-           usage=indent(usage, 1),
-           params=params_rst)
+           usage=usage,
+           params=params_rst,
+           example=example_rst)
     return res
 
 
@@ -295,13 +345,6 @@ def gen_rst(txt):
         res += fun_rst
 
     return res
-
-
-def gen_example_rst(filename):
-    r""" Handle # \example strings from cmake
-    comments
-
-    """
 
 
 def gen_cmake_doc(cmake_file, rst_file):

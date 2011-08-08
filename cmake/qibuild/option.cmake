@@ -1,18 +1,23 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
+#!
+# Using options
+# =============
+
 #! Add optional dependency to a package
+#
+# Example::
+#
+#   # Create a WITH_FOO option if FOO_PACKAGE is found
+#   qi_add_optional_package(FOO)
+#
+#   if(WITH_FOO)
+#      ...
+#   endif()
+#
 # \arg:  NAME             Name of the package, a WITH_${NAME} option will be created
 # \arg:  DESCRIPTION      The description of the option (will be shown in cmake gui)
 #
-# Usage:
-# qi_add_optional_package(FOO)
-#
-# Create a WITH_FOO option.
-# It is ON if the FOO package has been found
-#
-# if(WITH_FOO)
-#    ...
-# endif()
 function(qi_add_optional_package name)
   set(_desc "${ARGN}")
   string(TOUPPER "${name}" _U_name)
