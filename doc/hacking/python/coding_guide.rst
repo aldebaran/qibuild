@@ -183,6 +183,129 @@ If it's an *unexpected* error message, here's what you can do:
 * run qibuild with --pdb to drop to a pdb session when an uncaught exception is raised.
 
 
+Error messages
+--------------
+
+Please do not overlook those. Often, when writing code you do something like::
+
+  try:
+     something_really_complicated()
+  except SomeStrangeError, e:
+     log.error("Error occured: %s", e)
+
+
+Because you are in an hurry, and just are thinking "Great, I've handled the excpetion,
+now I can go back to write some code ...)
+
+The problem is: the end user does not care you are glad you've handled the
+exception, he needs to **understand** what just happens.
+
+So you need to take a step back, think a litttle. "Ok, what path would lead to this
+exception? What was the end user probably doing? How can I help him understand what
+went wrong, and how he can fix this?"
+
+So here's a short list of do's and don'ts when you are writing your error message.
+
+* Wording sould look like::
+
+    Could not < descritiion for what went wrong >
+    <Detailed explanation>
+    Please < suggestion of a solution >
+
+  For instance::
+
+    Could not open configuration file
+    path/to/inexistant.cfg does not exist
+    Please check your configuration.
+
+
+* Put filenames between quotes. For instance, if you are using a path given
+  via a GUI, or via a prompt, it's possible that you forgot to strip it before using
+  it, thus trying to create '/path/to/foo ' or 'path/to/foo\n'.
+  Unless you are putting the filename between quotes, this kind of error is hard to find.
+
+
+* Put commands to use like this::
+
+    Please try running: `qibuild configure -c linux32 foo'
+
+
+* Give information
+
+  Code like this makes little kitten cry::
+
+    try:
+      with open(config_file, "w") as fp:
+        config = fp.read()
+    except IOError, err:
+      raise Exception("Could not open config file for writing")
+
+
+  It's not helpful at all!
+  It does not answer those basic questions:
+
+    * What was the config file?
+    * What was the problem with opening the config file?
+    * ...
+
+  So the end user has **no clue** what to do...
+
+  And the fix is so simple! Just add a few lines::
+
+    try:
+      with open(config_file, "w") as fp:
+        config = fp.read()
+    except IOError, err:
+      mess   = "Could not open config ('%s') file for writing\n" % config_file
+      mess += "Error was: %s" % err
+      raise Exception(mess)
+
+  So the error message would then be ::
+
+    Could not open '/etc/foo/bar.cfg' for writing
+    Error was: [Errno 13] Permission denied
+
+  Which is much more helpful.
+
+
+
+* Suggest a solution
+
+  This is the harder part, but it's nice if the user can figure out what to do next.
+
+  Here are a few examples::
+
+    $ qibuild configure -c foo
+
+    Error: Invalid configuration foo
+     * No toolchain named foo. Known toolchains are:
+        ['linux32', 'linux64']
+     * No custom cmake file for config foo found.
+       (looked in /home/dmerejkowsky/work/tmp/qi/.qi/foo.cmake)
+
+
+    $ qibuild install foo (when build dir does not exists)
+
+    Error: Could not find build directory:
+      /home/dmerejkowsky/work/tmp/qi/foo/build-linux64-release
+    If you were trying to install the project, make sure that you have configured
+    and built it first
+
+
+    $ qibuild configure # when not in a worktree
+
+    Error: Could not find a work tree. please try from a valid work tree,
+    specify an existing work tree with '--work-tree {path}', or create a new
+    work tree with 'qibuild init'
+
+
+    $ qibuild configure # at the root for the worktree
+
+    Error: Could not guess project name from the working tree. Please try
+    from a subdirectory of a project or specify the name of the project.
+
+
+
 Extending QiBuild actions
 -------------------------
 
