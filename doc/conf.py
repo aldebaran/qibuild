@@ -28,7 +28,10 @@ import sys, os
 extensions = ['sphinx.ext.intersphinx']
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = list()
+
+if os.environ.get("QIBUILD_DOC_EMBEDDED"):
+    templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
