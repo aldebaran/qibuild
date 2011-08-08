@@ -62,7 +62,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 include("qibuild/find")
-include("qibuild/uselib")
 include("qibuild/tests")
 include("qibuild/install")
 include("qibuild/target")
@@ -86,6 +85,8 @@ set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${CMAKE_PREFIX_PATH})
 # (inspired by http://www.cmake.org/Bug/view.php?id=12037
 
 find_program(_dpkg_architecture dpkg-architecture)
+# make it internal so the user don't see it:
+set(_dpkg_architecture ${_dpkg_architecture} CACHE INTERNAL "" FORCE)
 
 if(_dpkg_architecture)
   execute_process(

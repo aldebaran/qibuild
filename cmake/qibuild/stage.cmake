@@ -8,6 +8,7 @@
 #
 
 include(qibuild/internal/stage)
+include(qibuild/internal/uselib)
 
 #! Generate a 'name'-config.cmake, allowing other project to find the library.
 # \arg:target a target created with qi_create_lib
@@ -121,4 +122,27 @@ function(qi_stage_cmake module_file)
   install(FILES "${module_file}"
       DESTINATION
       "${QI_SDK_CMAKE}/${_module_name}/")
+endfunction()
+
+
+#! Handles dependencies between projects.
+#
+# Call find_package for you, then do all the include_directories
+# and target_link_libraries that are needed.
+# \arg:name The target to add dependencies to.
+#      .. note: This must be an existing target, so you must call
+#         ``qi_use_lib`` **after** :ref:`qi_create_bin` or :ref:`qi_create_lib`
+# \argn: dependencies
+#
+# .. note: You can however call ``qi_use_lib`` several times, for instance::
+#    qi_create_bin(foo)
+#    qi_use_lib(foo bar)
+#    if(UNIX)
+#       qi_use_lib(foo PTHREAD)
+#    endif()
+#
+function(qi_use_lib name)
+ _qi_use_lib_internal(${name} ${ARGN})
+
+
 endfunction()

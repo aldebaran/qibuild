@@ -1,13 +1,5 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-#! qiBuild UseLib
-# ===============
-#
-# qi_use_lib handles dependencies between projects.
-# It will call find_package for you, then do all the include_directories
-# and target_link_libraries that are needed.
-#
-
 if (_QI_USELIB_CMAKE_)
   return()
 endif()
@@ -99,13 +91,13 @@ function(_qi_use_lib_get_deps name _OUT_list)
 
   #why? because it will avoid many recursion. we store the complete dependencies of a project
   # in cache, and use that, instead of digging into deps by recursion.
-  qi_set_cache(${_U_NAME}_FAT_DEPENDS "${_result}")
+  qi_set_global(${_U_NAME}_FAT_DEPENDS "${_result}" )
   set(${_OUT_list} ${_result} PARENT_SCOPE)
 endfunction()
 
 
-#!
-# Find dependencies and add them to the target <name>.
+#! Find dependencies and add them to the target <name>.
+#
 # This will call include_directories with XXX_INCLUDE_DIRS or fallback to XXX_INCLUDE_DIR.
 # This will call target_link_libraries with XXX_LIBRARIES or fallback to XXX_LIBRARY.
 # All dependencies should be found, otherwize it will fail. If you want to check if a
@@ -116,7 +108,7 @@ endfunction()
 # \arg:name The target to add dependencies to
 # \argn: dependencies, like the DEPENDS group, argn and DEPENDS will be merged
 # \group:DEPENDS The list of dependencies
-function(qi_use_lib name)
+function(_qi_use_lib_internal name)
   _qi_check_is_target("${name}")
   cmake_parse_arguments(ARG "" "" "DEPENDS" ${ARGN})
 
@@ -160,5 +152,5 @@ function(qi_use_lib name)
     endif()
   endforeach()
   string(TOUPPER "${name}" _U_name)
-  qi_set_global("${_U_name}_DEPENDS" ${${_U_name}_DEPENDS} ${_DEPS})
+  qi_set_advanced_cache("${_U_name}_DEPENDS" ${${_U_name}_DEPENDS} ${_DEPS})
 endfunction()
