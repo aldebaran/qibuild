@@ -144,6 +144,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
 
     """
     check_is_in_path(cmd[0])
+    cmd[0] = find_program(cmd[0])
     if cwd:
         if not os.path.exists(cwd):
             raise Exception("Trying to to run %s in non-existing %s" %
