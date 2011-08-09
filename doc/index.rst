@@ -40,8 +40,7 @@ References
    man/index
 
 
-* :ref:`search`
-* :ref:`genindex`
+* :ref:`List of qibuild cmake functions <genindex>`
 
 Tutorials
 ---------
