@@ -139,6 +139,9 @@ def gen_params_rst(params):
     """ Generate rst doc from a parameter
 
     """
+    if not params:
+        return ""
+
     res = """**Parameters**
 
     """
