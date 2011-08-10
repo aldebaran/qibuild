@@ -1,7 +1,7 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-#! qiBuild SubModule
-# ==================
+#! Using submodules
+# =================
 
 #!
 # This CMake module behaves more or less like a library, but does not produce

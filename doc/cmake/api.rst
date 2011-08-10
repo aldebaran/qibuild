@@ -8,5 +8,6 @@ QiBuild CMake API
    api/target
    api/stage
    api/install
-   api/option
    api/submodule
+   api/log
+   api/option

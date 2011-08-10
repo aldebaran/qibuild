@@ -1,7 +1,7 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-#! qiBuild Install
-# ================
+#! Installing
+# ===========
 #
 #
 # Components

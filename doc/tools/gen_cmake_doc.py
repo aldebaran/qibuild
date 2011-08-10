@@ -7,11 +7,12 @@
 """
 
 DOCUMENTED_FILES=[
+    "log",
     "target",
     "stage",
     "install",
     "submodule",
-    "option"
+    "option",
 ]
 
 import re
