@@ -8,7 +8,6 @@ which is where all the 'magic' happens ....
 import os
 import glob
 import platform
-import subprocess
 import logging
 import qibuild.qiworktree
 
@@ -224,6 +223,7 @@ class Toc(QiWorkTree):
         self.build_folder_name = None
 
         # Set build environment
+        self.envsetter = qibuild.envsetter.EnvSetter()
         self.set_build_env()
 
         # List of objects of type qibuild.project.Project,
@@ -243,7 +243,7 @@ class Toc(QiWorkTree):
                 self.toolchain = qitoolchain.Toolchain(self.active_config)
                 self.packages  = self.toolchain.packages
             else:
-                # The config does not match a toolchain (
+                # The config does not match a toolchain
                 local_dir = os.path.join(self.work_tree, ".qi")
                 local_cmake = os.path.join(local_dir, "%s.cmake" % self.active_config)
                 if not os.path.exists(local_cmake):
@@ -390,61 +390,16 @@ class Toc(QiWorkTree):
         """Update os.environ using the qibuild configuration file
 
         """
-        path_conf = self.configstore.get("env.path")
+        path_env = self.configstore.get("env.path")
         bat_file  = self.configstore.get("env.bat_file")
+        if path_env:
+            path_env = path_env.replace("\n", "")
+            path_env = path_env.strip()
+            for directory in path_env.split(os.path.pathsep):
+                self.envsetter.append_to_path(directory)
         if bat_file:
-            self._set_path_from_bat_conf(bat_file)
-        if path_conf:
-            self._set_env_from_path_conf(path_conf)
+            self.envsetter.source_bat(bat_file)
 
-    def _set_env_from_path_conf(self, path):
-        """Set os.environ using a "path" string setting
-
-        """
-        system_path = os.environ["PATH"]
-        if not system_path.endswith(os.path.pathsep):
-            system_path += os.path.pathsep
-        path = path.strip()
-        path = path.replace("\n", "")
-        LOGGER.debug("adding %s to PATH", path)
-        new_path = system_path + path
-        os.environ["PATH"] = new_path
-
-    def _set_path_from_bat_conf(self, bat_file):
-        """Set environment variables using a .bat script
-        """
-        # Quick hack to get env vars from a .bat script
-        # (stolen idea from distutils/msvccompiler)
-        # TODO: handle non asccii chars?
-        # Hint: decode("mcbs") ...
-        if not os.path.exists(bat_file):
-            raise BadBuildConfig("general.env.bat_file (%s) does not exists" % bat_file)
-
-        interesting = set(("INCLUDE", "LIB", "LIBPATH", "PATH"))
-        result = {}
-
-        process = subprocess.Popen('"%s"& set' % (bat_file),
-                             stdout=subprocess.PIPE,
-                             shell=True)
-        (out, err) = process.communicate()
-        if process.returncode != 0:
-            LOGGER.error("Calling %s failed with return code: %d", bat_file, process.returncode)
-            LOGGER.error("Error was: %s" , err)
-            return
-
-        for line in out.split("\n"):
-            if '=' not in line:
-                continue
-            line = line.strip()
-            key, value = line.split('=', 1)
-            key = key.upper()
-            if key in interesting:
-                if value.endswith(os.pathsep):
-                    value = value[:-1]
-                result[key] = value
-
-        LOGGER.debug("Updating os.environ with %s" , result)
-        os.environ.update(result)
 
 
     def configure_project(self, project, clean_first=True):
@@ -492,22 +447,22 @@ class Toc(QiWorkTree):
 
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
+        build_env = self.envsetter.get_build_env()
         #remove sh.exe from path on win32, because cmake will fail when using mingw generator.
-        env = os.environ.copy()
         if "MinGW" in self.cmake_generator:
-            paths = os.environ["PATH"].split(os.pathsep)
+            paths = build_env["PATH"].split(os.pathsep)
             paths_withoutsh = list()
             for p in paths:
                 if not os.path.exists(os.path.join(p, "sh.exe")):
                     paths_withoutsh.append(p)
-            env["PATH"] = os.pathsep.join(paths_withoutsh)
+            build_env["PATH"] = os.pathsep.join(paths_withoutsh)
 
         try:
             qibuild.cmake(project.directory,
                           project.build_directory,
                           cmake_args,
                           clean_first=clean_first,
-                          env=env)
+                          env=build_env)
         except CommandFailedException:
             raise ConfigureFailed(project)
 
@@ -546,8 +501,9 @@ class Toc(QiWorkTree):
         if num_jobs > 1 and "make" in self.cmake_generator.lower():
             cmd += [ "-j%d" % num_jobs]
 
+        build_env = self.envsetter.get_build_env()
         try:
-            qibuild.command.call(cmd)
+            qibuild.command.call(cmd, env=build_env)
         except CommandFailedException:
             raise BuildFailed(project)
 
@@ -567,24 +523,28 @@ class Toc(QiWorkTree):
         if test_name is not None:
             cmd.extend(["-R", test_name])
 
+        build_env = self.envsetter.get_build_env()
+        # FIXME: should we fix build environnement on mac so that
+        # DYLD_LIBRARY_PATH and DYLD_FRAMEWORK_PATH are always correct?
+        # Note that we could also do that with a pure cmake solution, in
+        # qi_add_test()
         try:
-            qibuild.command.call(cmd, cwd=build_dir)
+            qibuild.command.call(cmd, cwd=build_dir, env=build_env)
         except CommandFailedException:
             raise TestsFailed(project)
-
 
     def install_project(self, project, destdir, runtime=False):
         """Install the project """
         build_dir = project.build_directory
-        build_environ = os.environ.copy()
-        build_environ["DESTDIR"] = destdir
+        build_env = self.envsetter.get_build_env()
+        build_env["DESTDIR"] = destdir
         try:
             if runtime:
                 self.install_project_runtime(project, destdir)
             else:
                 cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
                         "--target", "install"]
-                qibuild.command.call(cmd, env=build_environ)
+                qibuild.command.call(cmd, env=build_env)
         except CommandFailedException:
             raise InstallFailed(project)
 
@@ -599,7 +559,7 @@ class Toc(QiWorkTree):
              "doc"
          ]
         for component in runtime_components:
-            build_env = os.environ.copy()
+            build_env = self.envsetter.get_build_env()
             build_env["DESTDIR"] = destdir
             cmake_args = list()
             cmake_args += ["-DCOMPONENT=%s" % component]

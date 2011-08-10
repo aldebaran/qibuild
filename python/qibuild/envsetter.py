@@ -7,6 +7,7 @@ designed to take care of environnement variables.
 """
 import os
 import sys
+import subprocess
 
 import qibuild
 
@@ -82,5 +83,40 @@ class EnvSetter():
 
 
     def source_bat(self, bat_file):
-        pass
+        """Set environment variables using a .bat script
 
+        """
+        # Quick hack to get env vars from a .bat script
+        # (stolen idea from distutils/msvccompiler)
+        # TODO: handle non asccii chars?
+        # Hint: decode("mcbs") ...
+        if not os.path.exists(bat_file):
+            raise Exception("general.env.bat_file (%s) does not exists" % bat_file)
+
+        interesting = set(("INCLUDE", "LIB", "LIBPATH", "PATH"))
+        result = {}
+
+        process = subprocess.Popen('"%s"& set' % (bat_file),
+                             stdout=subprocess.PIPE,
+                             shell=True)
+        (out, err) = process.communicate()
+        if process.returncode != 0:
+            mess  = "Calling %s failed\n", bat_file
+            mess += "Error was: %s" % err
+            raise Exception(mess)
+
+        for line in out.split("\n"):
+            if '=' not in line:
+                continue
+            line = line.strip()
+            key, value = line.split('=', 1)
+            key = key.upper()
+            if key in interesting:
+                if value.endswith(os.pathsep):
+                    value = value[:-1]
+                result[key] = value
+
+        for (variable, directories_list) in result:
+            directories = directories_list.split(os.path.pathsep)
+            for directory in directories:
+                self.append_directory_to_variable(directory, variable)
