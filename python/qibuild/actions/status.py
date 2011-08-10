@@ -59,7 +59,3 @@ def do(args):
         LOGGER.info("%s", os.path.relpath(ppath, qiwt.work_tree))
         #print "%s%s [%s]" %(pname, pad, os.path.relpath(ppath, qiwt.work_tree))
         list_build_dir(ppath)
-
-if __name__ == "__main__" :
-    qibuild.cmdparse.sub_command_main(sys.modules[__name__])
-

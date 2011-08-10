@@ -78,8 +78,4 @@ def do(args):
         for project in qiwt.buildable_projects.values():
             cleanup(project, args.build_directory, qiwt.work_tree, args.force)
 
-if __name__ == "__main__":
-    import sys
-    qibuild.cmdparse.sub_command_main(sys.modules[__name__])
-
 

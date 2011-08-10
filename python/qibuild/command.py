@@ -40,7 +40,7 @@ import subprocess
 import threading
 import Queue
 
-from qibuild import log
+import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
@@ -80,17 +80,17 @@ class NotInPath(Exception):
         self.env = env
 
     def __str__(self):
-        if build_env:
-            path_env = build_env.get("PATH")
+        if self.env:
+            path_env = self.env.get("PATH")
         else:
             path_env = os.environ["PATH"]
         mess  = "Could not find executable: %s\n" % self.executable
         mess += "Looked in:\n"
-        mess += "\n".join(path.split(os.pathsep))
+        mess += "\n".join(path_env.split(os.pathsep))
         return mess
 
 
-def find_program(executable, build_env=None):
+def find_program(executable, env=None):
     """Get the full path of an executable by
     looking at PATH environment variable
     (and PATHEXT on windows)
@@ -98,8 +98,8 @@ def find_program(executable, build_env=None):
     return None if program was not found
     """
     full_path = None
-    if build_env:
-        env_path = build_env.get("PATH", "")
+    if env:
+        env_path = env.get("PATH", "")
     else:
         env_path = os.environ["PATH"]
     for path in env_path.split(os.pathsep):
@@ -117,8 +117,8 @@ def find_program(executable, build_env=None):
 
 def check_is_in_path(executable, build_env=None):
     """Check that the given executable is to be found in %PATH%"""
-    if find_program(executable) is None:
-        raise NotInPath(executable, build_env=env)
+    if find_program(executable, env=build_env) is None:
+        raise NotInPath(executable, env=build_env)
 
 
 def call(cmd, cwd=None, env=None, ignore_ret_code=False):
@@ -252,7 +252,6 @@ class CommandLine:
         self.cmd = cmd
         self.cwd = cwd
         self.env = env
-        cmd_str = " ".join(cmd)
 
         self.returncode = None
 

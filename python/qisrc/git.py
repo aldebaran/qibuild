@@ -121,7 +121,9 @@ def get_remote_refs(git_url):
     git = command.find_program("git")
     if not git:
         raise Exception("git not found")
-    lines = command.call_output([git, "ls-remote", git_url])
+    process = subprocess.Popen([git, "ls-remote", git_url], stdout=subprocess.PIPE)
+    out = process.communicate()[0]
+    lines = out.splitlines()
     return _dict_from_refs(lines)
 
 def get_remote_ref(git_url, ref='refs/heads/master'):

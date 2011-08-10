@@ -30,8 +30,7 @@ class QiBuildTestCase(unittest.TestCase):
             self.args.pdb = True
         self.args.work_tree = self.test_dir
         # Run qibuild clean
-        qibuild.run_action('qibuild.actions.clean',
-            ['-f'])
+        self._run_action('clean', '-f')
 
     def _run_action(self, action, *args):
         qibuild.run_action("qibuild.actions.%s" % action, args,

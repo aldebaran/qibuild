@@ -1,7 +1,7 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
 r""" This module contains the EnvSetter class,
-designed to take care of environnement variables.
+designed to take care of environment variables.
 
 
 """
@@ -12,12 +12,13 @@ import subprocess
 import qibuild
 
 class EnvSetter():
-    r""" A class to manager environnement variables
+    r""" A class to manager environment variables
 
     Typical usage::
 
         envsetter = EnvSetter()
-        envsetter.append_directory_to_path(r"c:\path\to\cmake", "PATH")
+        envsetter.append_directory_to_path(r"c:\path\to\cmake")
+        envsetter.set_env_var("WITH_SPAM", "ON")
         envsetter.source_bat(r"C:\path\to\vcvars.bat")
         build_env = envsetter.get_build_env()
         # build_env is now a *copy* of os.environ, os.environ does
@@ -44,8 +45,14 @@ class EnvSetter():
     def get_build_env(self):
         return self._build_env.copy()
 
+    def set_env_var(self, variable, value):
+        """ Set a new variable
+
+        """
+        self._build_env[variable] = value
+
     def append_directory_to_variable(self, directory, variable):
-        """ Append a new directory to an environnement variable
+        """ Append a new directory to an environment variable
         containing a list of paths (most of the time PATH, but
         can be LIBDIR, for instance when using cl.exe)
 
@@ -67,7 +74,7 @@ class EnvSetter():
             variable = variable.upper()
         directory = qibuild.sh.to_native_path(directory)
 
-        old_value = self._build_env[variable]
+        old_value = self._build_env.get(variable, "")
         # avoid having empty paths:
         if old_value.endswith(pathsep):
             old_value = old_value[:-1]
@@ -78,12 +85,17 @@ class EnvSetter():
         self._build_env[variable] = pathsep.join(splitted_paths)
 
     def append_to_path(self, directory):
-        """ Just a shorthand """
+        """ Append a directory to PATH environment variable
+
+        """
         self.append_directory_to_variable(directory, "PATH")
 
 
     def source_bat(self, bat_file):
         """Set environment variables using a .bat script
+
+        Note: right now, this only works well with vcvarsall.bat scripts in
+        fact,
 
         """
         # Quick hack to get env vars from a .bat script
@@ -93,6 +105,9 @@ class EnvSetter():
         if not os.path.exists(bat_file):
             raise Exception("general.env.bat_file (%s) does not exists" % bat_file)
 
+        # set of environment variables that are in fact list of paths
+        # FIXME: what should we do with other env?
+        # FIXME: how can we avoid to hardcode this?
         interesting = set(("INCLUDE", "LIB", "LIBPATH", "PATH"))
         result = {}
 
@@ -105,6 +120,7 @@ class EnvSetter():
             mess += "Error was: %s" % err
             raise Exception(mess)
 
+        #pylint: disable-msg=E1103
         for line in out.split("\n"):
             if '=' not in line:
                 continue
@@ -116,7 +132,7 @@ class EnvSetter():
                     value = value[:-1]
                 result[key] = value
 
-        for (variable, directories_list) in result:
+        for (variable, directories_list) in result.iteritems():
             directories = directories_list.split(os.path.pathsep)
             for directory in directories:
                 self.append_directory_to_variable(directory, variable)

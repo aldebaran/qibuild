@@ -46,7 +46,3 @@ def do(args):
 
     qibuild.command.call([editor, config_path])
 
-
-if __name__ == "__main__" :
-    import sys
-    qibuild.cmdparse.sub_command_main(sys.modules[__name__])

@@ -36,13 +36,8 @@ def run_tests(xml_report=False, build_config="unix"):
     """
     import unittest
     cur_dir = os.path.abspath(os.path.dirname(__file__))
-    qi_build_cfg = os.path.join(cur_dir,
-        "qibuild", "test", "build-%s.cfg" % build_config)
-    qi_test_dir = os.path.join(cur_dir,
-        "qibuild", "test", ".qi")
+    qi_test_dir = os.path.join(cur_dir, "qibuild", "test", ".qi")
     qibuild.sh.mkdir(qi_test_dir, recursive=True)
-    shutil.copy(qi_build_cfg, os.path.join(qi_test_dir, "build.cfg"))
-
 
     suite = unittest.TestSuite()
     for test_case in TEST_CASES:

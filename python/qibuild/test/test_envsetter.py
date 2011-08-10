@@ -15,7 +15,8 @@ import qibuild
 
 class EnvSetterTestCase(unittest.TestCase):
     def setUp(self):
-        # clean up path
+        # clean up os.environ (simpler debug)
+        os.environ = dict()
         # defines useful vars
         if sys.platform.startswith("win"):
             os.environ["PATH"] = r"c:\windows;c:\windows\system32\;"
@@ -33,6 +34,13 @@ class EnvSetterTestCase(unittest.TestCase):
         paths = path_env.split(os.path.pathsep)
         mess  = "Could not find %s in %s" % (directory, paths)
         self.assertTrue(directory in paths, mess)
+
+    def test_create_new_env(self):
+        # Check that envsetter is able to create new env vars
+        envsetter = qibuild.envsetter.EnvSetter()
+        envsetter.set_env_var("WITH_SPAM", "ON")
+        build_env = envsetter.get_build_env()
+        self.assertTrue(build_env.get("WITH_SPAM", "ON"))
 
     def test_append_to_path(self):
         previous_path = os.environ["PATH"]
@@ -55,7 +63,6 @@ class EnvSetterTestCase(unittest.TestCase):
         self.assertEquals(path_env1, path_env2)
         self._check_is_in_path(self.unlikely, path_env1)
 
-
     def test_append_to_path_several_times(self):
         # adding two different paths should work
         previous_path = os.environ["PATH"]
@@ -74,6 +81,30 @@ class EnvSetterTestCase(unittest.TestCase):
         build_env = envsetter.get_build_env()
         build_env["spam"] = "eggs"
         self.assertTrue(envsetter.get_build_env().get("spam") is None)
+
+    if sys.platform.startswith("win"):
+        def test_source_bat(self):
+            vc_path  = r'c:\microsoft\vc\bin'
+            lib_path = r'c:\microsoft\vc\lib'
+            with qibuild.sh.TempDir() as tmp:
+                sourceme = os.path.join(tmp, "sourceme.bat")
+                to_write = r"""@echo hello world
+set PATH=%PATH%;{}
+set LIBPATH={}
+""".format(vc_path, lib_path)
+                with open(sourceme, "w") as fp:
+                    fp.write(to_write)
+                envsetter = qibuild.envsetter.EnvSetter()
+                envsetter.source_bat(sourceme)
+                build_env = envsetter.get_build_env()
+                # simple assert:
+                build_env_path = build_env["PATH"]
+                self._check_is_in_path(vc_path, build_env["PATH"])
+                self._check_is_in_path(lib_path, build_env["LIBPATH"])
+                # sourcing the .bat twice should not change the PATH env var
+                envsetter.source_bat(sourceme)
+                build_env_path2 = envsetter.get_build_env()["PATH"]
+                self.assertEquals(build_env_path2, build_env_path)
 
 def main():
     unittest.main()
