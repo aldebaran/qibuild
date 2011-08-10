@@ -67,7 +67,6 @@ include("qibuild/install")
 include("qibuild/target")
 include("qibuild/submodule")
 include("qibuild/stage")
-include("qibuild/doc")
 include("qibuild/option")
 
 qi_prepend_global(CMAKE_PREFIX_PATH "${QI_SDK_DIR}")
