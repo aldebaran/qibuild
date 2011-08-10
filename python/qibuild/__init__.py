@@ -19,16 +19,17 @@ from . import qiworktree
 from . import archive
 from . import sh
 from . import interact
+from . import envsetter
 
 from toc        import toc_open
 from qiworktree import qiworktree_open
 from cmdparse   import run_action
-#from interact   import ask_yes_no, ask_choice
 
 __all__ = ( 'toc', 'parsers', 'command', 'configstore', 'cmdparse',
             'log', 'qiworktree', 'archive', 'sh', 'interact',
             'qiworktree_open', 'toc_open', 'run_action',
-            'check_root_cmake_list', 'cmake', 'msbuild', 'make', 'nmake', 'get_cmake_qibuild_dir'
+            'check_root_cmake_list', 'cmake', 'msbuild', 'make', 'nmake', 'get_cmake_qibuild_dir',
+            'EnvSetter'
             )
 
 LOGGER = logging.getLogger("qibuild")
