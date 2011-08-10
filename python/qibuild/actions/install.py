@@ -56,9 +56,15 @@ def do(args):
     LOGGER.info("Setting CMAKE_INSTALL_PREFIX=%s on every project", args.prefix)
     for project_name in project_names:
         project = toc.get_project(project_name)
+        # note: cmake will emit warnings at this time when using NMake makefiles
+        # because LIBPATH, INCLUDE et al. are not set.
+        # this is because we do NOT mess with os.environ ...
+        # This is why we need to re-read env from toc.envsetter so that no warning
+        # appears.
         qibuild.cmake(project.directory, project.build_directory,
             ['-DCMAKE_INSTALL_PREFIX=%s' % args.prefix],
-            clean_first=False)
+            clean_first=False,
+            env=toc.envsetter.get_build_env())
 
     if not args.include_deps:
         project_names = [project_name]
