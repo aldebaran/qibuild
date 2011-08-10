@@ -75,17 +75,22 @@ class ProcessCrashedError(Exception):
 
 class NotInPath(Exception):
     """Custom exception """
-    def __init__(self, executable):
+    def __init__(self, executable, env=None):
         self.executable = executable
+        self.env = env
 
     def __str__(self):
+        if build_env:
+            path_env = build_env.get("PATH")
+        else:
+            path_env = os.environ["PATH"]
         mess  = "Could not find executable: %s\n" % self.executable
         mess += "Looked in:\n"
-        mess += "\n".join(os.environ["PATH"].split(os.pathsep))
+        mess += "\n".join(path.split(os.pathsep))
         return mess
 
 
-def find_program(executable):
+def find_program(executable, build_env=None):
     """Get the full path of an executable by
     looking at PATH environment variable
     (and PATHEXT on windows)
@@ -93,7 +98,10 @@ def find_program(executable):
     return None if program was not found
     """
     full_path = None
-    env_path = os.environ["PATH"]
+    if build_env:
+        env_path = build_env.get("PATH", "")
+    else:
+        env_path = os.environ["PATH"]
     for path in env_path.split(os.pathsep):
         full_path = os.path.join(path, executable)
         if os.access(full_path, os.X_OK):
@@ -103,14 +111,14 @@ def find_program(executable):
             for ext in pathext.split(";"):
                 with_ext = full_path + ext
                 if os.access(with_ext, os.X_OK):
-                    return with_ext
+                    return qibuild.sh.to_native_path(with_ext)
     return None
 
 
-def check_is_in_path(executable):
+def check_is_in_path(executable, build_env=None):
     """Check that the given executable is to be found in %PATH%"""
     if find_program(executable) is None:
-        raise NotInPath(executable)
+        raise NotInPath(executable, build_env=env)
 
 
 def call(cmd, cwd=None, env=None, ignore_ret_code=False):
@@ -122,7 +130,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
         simply returns the returncode of the process
 
     Note: first arg of the cmd is assumed to be something
-    inside %PATH%.
+    inside %PATH%. (or in env[PATH] if env is not None)
 
     Note: the shell= argument of the subprocess.Popen
     call will always be False.
@@ -143,11 +151,16 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
     disabled, and you have a normal behavior instead.
 
     """
-    check_is_in_path(cmd[0])
+    exe_full_path = find_program(cmd[0], env=env)
+    cmd[0] = exe_full_path
+
     if cwd:
         if not os.path.exists(cwd):
+            # We know we are likely to have a problem on windows here,
+            # so always raise.
             raise Exception("Trying to to run %s in non-existing %s" %
                 (" ".join(cmd), cwd))
+
     buffer = RingBuffer(300)
 
     returncode = 0
