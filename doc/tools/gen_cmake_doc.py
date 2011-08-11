@@ -11,6 +11,7 @@ DOCUMENTED_FILES=[
     "target",
     "stage",
     "install",
+    "tests",
     "submodule",
     "option",
 ]

@@ -1,9 +1,10 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-#! qiBuild Tests
-# ==============
+#! Testing
+# ========
 #
-# This CMake module provides function to interface gtest with ctest.
+# This CMake module provides functions to interface gtest with ctest.
+#
 
 
 set(_TESTS_RESULTS_FOLDER "${CMAKE_SOURCE_DIR}/build-tests/results" CACHE INTERNAL "" FORCE)
