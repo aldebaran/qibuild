@@ -17,7 +17,7 @@ class EnvSetter():
     Typical usage::
 
         envsetter = EnvSetter()
-        envsetter.append_directory_to_path(r"c:\path\to\cmake")
+        envsetter.append_to_path(r"c:\path\to\cmake")
         envsetter.set_env_var("WITH_SPAM", "ON")
         envsetter.source_bat(r"C:\path\to\vcvars.bat")
         build_env = envsetter.get_build_env()

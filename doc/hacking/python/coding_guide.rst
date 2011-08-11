@@ -144,12 +144,37 @@ File Paths
 
 * Pro-tip: hard-coding paths on windows:
 
-Use r" rather than ugly \\::
+Use `r"` rather than ugly `\\\\` ::
+
   # UGLY:
-  WIN_PATH = "c:\\windows\\spam\\egss"
+  WIN_PATH = "c:\\windows\\spam\\eggs"
 
   # NICE:
   WIN_PATH = r"c:\windows\spam\eggs"
+
+
+Environment Variables
+---------------------
+
+Please make sure to **never** modify `os.environ`
+
+Remember that `os.environ` is in fact a huge global variable, and we all know
+it's a bad idea to use global variables ...
+
+Instead, use `qibuild.envsetter.EnvSetter` which allows you to run
+commands with a controller environment, without modifying os.environ.
+
+A small example::
+
+  import qibuild
+
+  envsetter = qibuild.envsetter.EnvSetter()
+  envsetter.append_to_path(r"c:\Program Files\Foobar\bin")
+  build_env = envsetter.get_build_env()
+  cmd = ["foobar", "/spam:eggs"]
+  qibuild.command.call(cmd, env=build_env)
+
+This way, `foobar.exe` is found but we never had to touch `os.environ`
 
 
 Logging
