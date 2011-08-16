@@ -177,6 +177,21 @@ A small example::
 This way, `foobar.exe` is found but we never had to touch `os.environ`
 
 
+Note: using EnvSetter is sometimes not necessary, for instance::
+
+  import qibuild
+
+  # Note the .copy() !
+  # If you forget it, build_env is a *reference* to
+  # os.environ, so os.environ will be modified ...
+  cmd_env = os.environ.copy()
+  cmd_env["SPAM"] = "eggs"
+  # Assuming foobar need SPAM environment variable set to 'eggs'
+  cmd = ["foobar"]
+  qibuild.command.call(foobar, env=cmd_env)
+
+
+
 Logging
 -------
 
