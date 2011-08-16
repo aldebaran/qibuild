@@ -145,7 +145,7 @@ endfunction()
 #
 #
 function(qi_use_lib name)
- _qi_use_lib_internal(${name} ${ARGN})
 
+  _qi_use_lib_internal(${name} ${ARGN})
 
 endfunction()

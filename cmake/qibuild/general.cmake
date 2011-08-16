@@ -1,5 +1,11 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
+# if (_QI_GENERAL_CMAKE_INCLUDED)
+#   return()
+# endif()
+# set(_QI_GENERAL_CMAKE_INCLUDED TRUE)
+
+
 #yeah allow NORMAL endfunction/endif/..
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 # Bad variable reference syntax is an error.
@@ -22,11 +28,11 @@ get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 include("qibuild/log")
 include("qibuild/set")
 
-qi_append_global(CMAKE_PREFIX_PATH "${_ROOT_DIR}/modules/")
+qi_append_uniq_global(CMAKE_PREFIX_PATH "${_ROOT_DIR}/modules/")
 
 #include new cmake modules, when using old cmake
 if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
-  qi_append_global(CMAKE_MODULE_PATH "${_ROOT_DIR}/upstream-backports")
+  qi_append_uniq_global(CMAKE_MODULE_PATH "${_ROOT_DIR}/upstream-backports")
 endif()
 
 set(QI_ROOT_DIR ${_ROOT_DIR})
@@ -46,7 +52,7 @@ endif()
 
 # always add SDK to FIND_ROOT_PATH when cross-compiling
 if (DEFINED CMAKE_FIND_ROOT_PATH)
-  qi_prepend_global(CMAKE_FIND_ROOT_PATH "${QI_SDK_DIR}")
+  qi_prepend_uniq_global(CMAKE_FIND_ROOT_PATH "${QI_SDK_DIR}")
   qi_debug("CMAKE_FIND_ROOT_PATH: ${CMAKE_FIND_ROOT_PATH}")
 endif()
 
@@ -69,7 +75,7 @@ include("qibuild/submodule")
 include("qibuild/stage")
 include("qibuild/option")
 
-qi_prepend_global(CMAKE_PREFIX_PATH "${QI_SDK_DIR}")
+qi_prepend_uniq_global(CMAKE_PREFIX_PATH "${QI_SDK_DIR}")
 
 _qi_autostrap_update()
 
@@ -78,7 +84,7 @@ if (QI_T001CHAIN_COMPAT)
 endif()
 
 #always include CMAKE_PREFIX_PATH in the cross-compilation "compliant" folder.
-set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${CMAKE_PREFIX_PATH})
+qi_prepend_uniq_global(CMAKE_FIND_ROOT_PATH ${CMAKE_PREFIX_PATH})
 
 # temporary work around for ubuntu >= natty and cmake < 2.8.6
 # (inspired by http://www.cmake.org/Bug/view.php?id=12037
@@ -98,6 +104,11 @@ if(_dpkg_architecture)
     list(APPEND CMAKE_SYSTEM_LIBRARY_PATH /usr/lib/${_arch_triplet})
   endif()
 endif()
+
+qi_uniq_global(CMAKE_FIND_ROOT_PATH)
+qi_uniq_global(CMAKE_PREFIX_PATH)
+qi_uniq_global(CMAKE_MODULE_PATH)
+#qi_uniq_global(CMAKE_INCLUDE_PATH)
 
 qi_debug("CMAKE_PREFIX_PATH  = ${CMAKE_PREFIX_PATH}")
 qi_debug("CMAKE_MODULE_PATH  = ${CMAKE_MODULE_PATH}")

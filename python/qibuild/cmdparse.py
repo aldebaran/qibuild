@@ -340,6 +340,9 @@ def log_parser(parser):
     group.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Output debug messages")
     group.add_argument("--quiet", "-q", dest="quiet", action="store_true", help="Only output error messages")
     group.add_argument("--no-color", dest="color", action="store_false", help="Do not use color")
+    group.add_argument("--color", dest = "color", action = "store_false",
+                       help = "Colorize output. This is the default")
+
     parser.set_defaults(verbose=False, quiet=False, color=True)
 
 def default_parser(parser):
