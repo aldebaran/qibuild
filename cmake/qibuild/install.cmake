@@ -147,10 +147,10 @@
 #
 # .. code-block:: cpp
 #
-#   const std::string foo_lib = qi::path::findLib(bar/foo);
-#   void* handle = qi::os::dlopen(foo_lib);
-#   // ... do something using qi::os::dlsym(handle ...);
-#   qi::os::dlclose(handle);
+#    const std::string foo_lib = qi::path::findLib(bar/foo);
+#    void* handle = qi::os::dlopen(foo_lib);
+#    // ... do something using qi::os::dlsym(handle ...);
+#    qi::os::dlclose(handle);
 #
 #
 # About configuration files
@@ -182,8 +182,38 @@
 #
 # will always work
 #
-# Special syntax features
-# -----------------------
+# Special features
+# -----------------
+#
+# qi_install ends up calling regular install() CMake functions, but there
+# are some differences, here are a few
+#
+# Check of arguments
+# ++++++++++++++++++
+#
+# If you try to install a file that does not exists,
+# using `install()` will exit during installation, but qi_install will
+# exit during configuration.
+# This does no prevent you from installing generated files, but you have to make
+# sure the are generated *before* creating the install rule.
+#
+# .. code-block:: cmake
+#
+#    # Always generate files in cmake build dir:
+#    set(_out ${CMAKE_CURRENT_BINARY_DIR}/foobar)
+#    configure_file(foobar.in "${_out}")
+#    qi_install("${_out}"
+#      DESTINATION /etc/init.d/
+#      )
+#
+#    # Note the trailing "/" at the end of the DESTINATION argument.
+#
+#    # Do NOT use:
+#    qi_install("${_out}"
+#      DESTINATION /etc/init.d/foobar
+#      )
+#
+#    # or you'll end up with /etc/init.d/foobar/foobar ...
 #
 # Support of glob and directories
 # +++++++++++++++++++++++++++++++
