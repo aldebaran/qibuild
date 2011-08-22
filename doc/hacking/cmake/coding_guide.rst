@@ -53,14 +53,14 @@ CMake coding guide
                   "several lines\n"
     )
 
-Rather use nice CMake feature for this::
+  Rather use nice CMake feature for this::
 
     message(STATUS "This is a very long
       message spanning on
       several lines
     ")
 
-See CMake syntax
+  See `CMake Syntax <http://www.cmake.org/cmake/help/syntax.html>`_
 
 * Every function in the public API must have corresponding documentation. It
   works a bit like Doxygen, but with the asciidoc syntax::
