@@ -147,6 +147,11 @@ def install(src, dest, filter=None):
     installled.
 
     """
+    mess = "Could not install '%s' to '%s'\n" % (src, dest)
+    if not os.path.exists(src):
+        mess += '%s does not exist' % src
+        raise Exception(mess)
+
     src  = to_native_path(src)
     dest = to_native_path(dest)
     LOGGER.debug("Installing %s -> %s", src, dest)
