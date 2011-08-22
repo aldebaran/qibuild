@@ -195,3 +195,15 @@ argument, ("--foo --bar").
 
     # NOT set(res ... PARENT_SCOPE) )
 
+
+* A very common mistake is to use something like::
+
+  set(_my_out ${CMAKE_BINARY_DIR}/sdk
+
+This will work fine most of the time, but :
+ - qibuild users may have chosen a unique sdk dir
+ - they also may have chose a unique build directory
+ (useful for eclipse, for instance)
+
+so please use `QI_SDK_DIR` instead
+
