@@ -59,50 +59,26 @@ def configure_parser(parser):
         cmake_flags=["CMAKE_INSTALL_PREFIX='/'"],
         compress=True,
         include_deps=False)
-
-def _do(args, build_type):
-    """Called by do().
-    Once with build_type=release on UNIX.
-    Twice with build_type=debug and build_type=release on windows
-
-    Returns the directory to make an archive from
-    """
-    args.build_type = build_type
-    toc      = qibuild.toc_open(args.work_tree, args)
-    config = toc.active_config
-
+def do(args):
+    """Main entry point"""
+    toc = qibuild.toc_open(args.work_tree, args)
     if not args.project:
         project_name = qibuild.toc.project_from_cwd()
     else:
         project_name = args.project
-    project = toc.get_project(project_name)
 
-    inst_dir = os.path.join(toc.work_tree, "package")
+    package_name = project_name
+    if toc.active_config:
+        package_name += "-%s" % toc.active_config
+    destdir = os.path.join(toc.work_tree, "package")
+    destdir = os.path.join(destdir, package_name)
 
-    package_name = get_package_name(
-        project,
-        continuous=args.continuous,
-        config=config,
-        version=args.version)
-
-    destdir = os.path.join(inst_dir, package_name)
     qibuild.run_action("qibuild.actions.configure", [project_name, "--no-clean-first"],
         forward_args=args)
     qibuild.run_action("qibuild.actions.make", [project_name],
         forward_args=args)
     qibuild.run_action("qibuild.actions.install", [project_name, destdir],
         forward_args=args)
-    return destdir
-
-def do(args):
-    """Main entry point"""
-    toc = qibuild.toc_open(args.work_tree, args)
-    if toc.active_config:
-        if "vs" in toc.active_config or "mingw" in toc.active_config:
-            _do(args, "debug")
-    destdir = _do(args, "release")
-
-    #TODO warn if dest dir is empty
 
     if args.compress:
         LOGGER.info("Compressing package")
@@ -113,5 +89,4 @@ def do(args):
         return archive
     else:
         return destdir
-
 
