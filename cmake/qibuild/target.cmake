@@ -29,29 +29,6 @@ set(_QI_TARGET_CMAKE_ TRUE)
 include(CMakeParseArguments)
 include(qibuild/internal/copy)
 
-
-##
-# Copy the dlls on which a target depends to the correct location
-# on windows, the .dll on which the target depends are copied to bin/,
-# next to the .exe.
-# on mac, the .dylib are copied to lib/, so that setting DYLD_LIBRARY_PATH to
-# build/sdk/lib works.
-function(_qi_post_copy_deps name)
-  if(APPLE)
-    configure_file(${QI_ROOT_DIR}/templates/post-copy-dylibs.cmake
-                   ${CMAKE_BINARY_DIR}/post-copy-dylibs.cmake
-                   COPYONLY)
-
-    add_custom_command(TARGET ${name} POST_BUILD
-      COMMAND
-        ${CMAKE_COMMAND}
-        -Dtarget=${name}
-        -P ${CMAKE_BINARY_DIR}/post-copy-dylibs.cmake
-        ${CMAKE_BINARY_DIR}
-    )
-  endif()
-endfunction()
-
 #! Create an executable.
 # The target name should be unique.
 #
@@ -130,9 +107,6 @@ function(qi_create_bin name)
       RUNTIME_OUTPUT_DIRECTORY_RELEASE "${_runtime_out}"
       RUNTIME_OUTPUT_DIRECTORY         "${_runtime_out}"
   )
-
-  _qi_post_copy_deps("${name}")
-
 
   if(UNIX AND NOT APPLE)
     if(NOT ARG_NO_RPATH)
@@ -298,8 +272,6 @@ function(qi_create_lib name)
       ARCHIVE_OUTPUT_DIRECTORY_RELEASE  "${_lib_out}"
       ARCHIVE_OUTPUT_DIRECTORY          "${_lib_out}"
   )
-
-  _qi_post_copy_deps("${name}")
 
   #make install rules
   qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")

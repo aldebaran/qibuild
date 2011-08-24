@@ -107,3 +107,7 @@ qi_debug("CMAKE_SYSTEM_LIBRARY_PATH = ${CMAKE_SYSTEM_LIBRARY_PATH}")
 if(WIN32)
   include(qibuild/internal/copydlls)
 endif()
+
+if(APPLE)
+  include(qibuild/internal/fixdylibs)
+endif()
