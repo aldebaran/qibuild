@@ -184,6 +184,7 @@ class Toolchain(object):
 
         """
         # Rename package once it is extracted:
+        LOGGER.info("Adding package %s to %s", name, self.name)
         should_skip = False
         dest = os.path.join(self.path, name)
         if not os.path.exists(dest):
@@ -194,7 +195,6 @@ class Toolchain(object):
             if src_mtime < dest_mtime:
                 should_skip = True
         if not should_skip:
-            LOGGER.info("Extracting package %s", name)
             with qibuild.sh.TempDir() as tmp:
                 try:
                     extracted = qibuild.archive.extract(path, tmp)
@@ -207,11 +207,11 @@ class Toolchain(object):
                 qibuild.sh.mv(extracted, dest)
         new_package = Package(name)
         matches = [p for p in self.packages if p.name == name]
-        LOGGER.info("Adding package %s",name)
         if not matches:
             self.packages.append(new_package)
         self.update_tc_provides()
         self.update_toolchain_file()
+        LOGGER.info("Package %s added to %s", name, self.name)
 
 
     def update_tc_provides(self):
