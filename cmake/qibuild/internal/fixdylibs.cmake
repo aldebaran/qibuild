@@ -28,8 +28,6 @@ foreach(_prefix_path ${_prefix_paths})
   list(APPEND _frameworks ${_glob})
 endforeach()
 
-message(STATUS "_dylibs: ${_dylibs}")
-
 file(MAKE_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB})
 
 
