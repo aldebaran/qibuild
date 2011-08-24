@@ -36,23 +36,7 @@ include(qibuild/internal/copy)
 # next to the .exe.
 # on mac, the .dylib are copied to lib/, so that setting DYLD_LIBRARY_PATH to
 # build/sdk/lib works.
-# on linux, cmake does The Right Thing for us.
 function(_qi_post_copy_deps name)
-  if(WIN32)
-    configure_file(${QI_ROOT_DIR}/templates/post-copy-dlls.cmake
-                   ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
-                   COPYONLY)
-    add_custom_command(TARGET ${name} POST_BUILD
-      COMMAND
-        ${CMAKE_COMMAND}
-        -Dtarget=${name}
-        -DMSVC=${MSVC}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -P ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
-        ${CMAKE_BINARY_DIR}
-    )
-  endif()
-
   if(APPLE)
     configure_file(${QI_ROOT_DIR}/templates/post-copy-dylibs.cmake
                    ${CMAKE_BINARY_DIR}/post-copy-dylibs.cmake
