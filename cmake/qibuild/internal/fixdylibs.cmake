@@ -34,19 +34,23 @@ file(MAKE_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB})
 foreach(_dylib ${_dylibs})
   get_filename_component(_name "${_dylib}" NAME)
   set(_dest "${QI_SDK_DIR}/${QI_SDK_LIB}/${_name}")
-  execute_process(
-    COMMAND
-      "${CMAKE_COMMAND}" "-E" "create_symlink" "${_dylib}" "${_dest}"
-  )
+  if(NOT EXISTS ${_dest})
+    execute_process(
+      COMMAND
+        "${CMAKE_COMMAND}" "-E" "create_symlink" "${_dylib}" "${_dest}"
+    )
+  endif()
 endforeach()
 
 foreach(_framework ${_frameworks})
   get_filename_component(_name "${_framework}" NAME)
   set(_dest "${QI_SDK_DIR}/${_name}")
-  execute_process(
-    COMMAND
-      "${CMAKE_COMMAND}" "-E" "create_symlink" "${_framework}" "${_dest}"
-  )
+  if(NOT EXISTS ${_dest})
+    execute_process(
+      COMMAND
+        "${CMAKE_COMMAND}" "-E" "create_symlink" "${_framework}" "${_dest}"
+    )
+  endif()
 endforeach()
 
 
