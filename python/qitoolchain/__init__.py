@@ -184,7 +184,7 @@ class Toolchain(object):
 
         """
         # Rename package once it is extracted:
-        LOGGER.info("Adding package %s to %s", name, self.name)
+        LOGGER.info("Toolchain %s: adding %s", self.name, name)
         should_skip = False
         dest = os.path.join(self.path, name)
         if not os.path.exists(dest):
@@ -211,7 +211,6 @@ class Toolchain(object):
             self.packages.append(new_package)
         self.update_tc_provides()
         self.update_toolchain_file()
-        LOGGER.info("Package %s added to %s", name, self.name)
 
 
     def update_tc_provides(self):
