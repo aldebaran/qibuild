@@ -14,8 +14,11 @@ set(_TESTS_RESULTS_FOLDER "${CMAKE_SOURCE_DIR}/build-tests/results" CACHE INTERN
 # The only difference with the CMake method add_test() is that qi_add_test will deal with
 # the fact that the the binary is in the sdk/bin directory, and than it is named
 # with _d on visual studio.
-# \param:TIMETOUT The timeout of the test
-# \group:ARGUMENTS Arguments to pass to add_test
+#
+# \arg:test_name The name of the test
+# \arg:target_name The name of the binary to use
+# \param:TIMEOUT The timeout of the test
+# \group:ARGUMENTS Arguments to be passed to the executable
 function(qi_add_test test_name target_name)
   cmake_parse_arguments(ARG "" "TIMEOUT" "ARGUMENTS" ${ARGN})
 
