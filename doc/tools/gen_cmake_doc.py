@@ -146,7 +146,7 @@ def gen_params_rst(params):
 
     res = """**Parameters**
 
-    """
+"""
 
     for param in params:
         (type_, name, doc) = param
@@ -191,7 +191,6 @@ def gen_usage_rst(fun_name, params):
         usage = "%s(%s)" % (fun_name, usage)
 
     res = """
-**Usage**
 
 .. code-block:: cmake
 
@@ -317,9 +316,8 @@ def gen_fun_rst(name, txt):
 
 {name}
 {h2}
-
-{desc}
 {usage}
+{desc}
 {params}
 {example}
 
