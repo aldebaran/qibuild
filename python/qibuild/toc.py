@@ -649,10 +649,6 @@ def resolve_deps(toc, args, runtime=False):
       - args.use_deps: take dependencies into account
     """
     if not args.projects:
-        if not project_from_cwd():
-            raise Exception("Could not guess project name from the working tree.\n"
-                    "Please try from a subdirectory of a project\n"
-                    "or specify the name of the project.")
         project_names = [project_from_cwd()]
     else:
         project_names = args.projects
@@ -669,7 +665,9 @@ def project_from_cwd():
     """
     project_dir = qibuild.qiworktree.search_current_project_root(os.getcwd())
     if not project_dir:
-        return None
+        raise Exception("Could not guess project name from the working directory.\n"
+                "Please go to a subdirectory of a project\n"
+                "or specify the name of the project.")
     return qibuild.project.name_from_directory(project_dir)
 
 
