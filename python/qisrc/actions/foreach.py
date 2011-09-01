@@ -28,7 +28,6 @@ def do(args):
             qibuild.command.call(args.command, cwd=ppath)
         except qibuild.command.CommandFailedException, err:
             if args.ignore_errors:
-                logger.error(str(err))
                 continue
             else:
                 raise
