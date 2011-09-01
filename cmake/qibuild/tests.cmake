@@ -46,7 +46,7 @@ function(qi_add_test test_name target_name)
   # HACK for apple until the .dylib problems are fixed...
   if(APPLE)
     set_tests_properties(${test_name} PROPERTIES
-      ENVIRONMENT "DYLD_LIBRARY_PATH=${QI_SDK_DIR}/${QI_SDK_LIB} DYLD_FRAMEWORK_PATH=${QI_SDK_DIR}"
+      ENVIRONMENT "DYLD_LIBRARY_PATH=${QI_SDK_DIR}/${QI_SDK_LIB};DYLD_FRAMEWORK_PATH=${QI_SDK_DIR}"
     )
   endif()
 endfunction()
