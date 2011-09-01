@@ -304,11 +304,17 @@ Please fix your code, this warning will be an error soon.
     set(_should_install TRUE)
   endif()
 
+  set(_relative_flag "")
+  if(${ARG_KEEP_RELATIVE_PATHS})
+    set(_relative_flag KEEP_RELATIVE_PATHS)
+  endif()
+
   if(_should_install)
     _qi_install_internal(${_headers}
       COMPONENT header
       DESTINATION ${QI_SDK_INCLUDE}
       SUBFOLDER ${ARG_SUBFOLDER}
+      ${_relative_flag}
     )
   endif()
 endfunction()
