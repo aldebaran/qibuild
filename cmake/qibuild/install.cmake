@@ -31,9 +31,11 @@
 #
 #   use::
 #
-#     qi_install_header(foo/include/foo.h
-#                      foo/include/bar.h
-#                      ${CMAKE_BUILD_DIR}/config.h
+#     qi_install_header(foo
+#                      HEADERS
+#                        foo/include/foo.h
+#                        foo/include/bar.h
+#                        ${CMAKE_BUILD_DIR}/config.h
 #                      SUBFOLDER foo)
 #
 # qi_install_header will set DESTINATION "include" for you,
@@ -56,9 +58,11 @@
 #
 #   use::
 #
-#     qi_install_header(foo/foo.h
-#                       bar/bar.h
-#                       bar/baz/baz.h
+#     qi_install_header(foo
+#                       HEADERS
+#                         foo/foo.h
+#                         bar/bar.h
+#                         bar/baz/baz.h
 #                       KEEP_RELATIVE_PATHS)
 #
 # qi_install_header will set DESTINATION "include" for you, and you do not need
@@ -263,6 +267,8 @@ endfunction()
 #! Install application headers.
 # The destination will be <prefix>/include/
 #
+# \arg target            The library corresponding to these headers. The library
+#                        must already exist. Necessary if you want to use internal libraries.
 # \argn:                 A list of files : directories and globs on files are accepted.
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
 # \param: IF             Condition that should be verified for the install rules
@@ -270,8 +276,41 @@ endfunction()
 # \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
-function(qi_install_header)
-  _qi_install_internal(${ARGN} COMPONENT header DESTINATION ${QI_SDK_INCLUDE})
+# \group: HEADERS        Required: the list of headers to install
+function(qi_install_header target)
+  cmake_parse_arguments(ARG  "KEEP_RELATIVE_PATHS" "SUBFOLDER"  "HEADERS" ${ARGN})
+  if(NOT ARG_HEADERS)
+    # dm: tmp fix, should raise an error instead:
+    qi_warning("
+Using qi_install_header without HEADERS group is deprecated.
+Old:
+  qi_install_header(foo.h)
+New:
+  qi_install_header(foo HEADERS foo.h)
+Please fix your code, this warning will be an error soon.
+")
+    set(_headers ${ARG_UNPARSED_ARGUMENTS} ${target})
+    set(target "")
+  else()
+    set(_headers ${ARG_HEADERS})
+  endif()
+
+  # Handle ${target}_INTERNAL
+  set(_should_install TRUE)
+  if(${${target}_INTERNAL})
+    set(_should_install FALSE)
+  endif()
+  if(${QI_INSTALL_INTERNAL})
+    set(_should_install TRUE)
+  endif()
+
+  if(_should_install)
+    _qi_install_internal(${_headers}
+      COMPONENT header
+      DESTINATION ${QI_SDK_INCLUDE}
+      SUBFOLDER ${ARG_SUBFOLDER}
+    )
+  endif()
 endfunction()
 
 

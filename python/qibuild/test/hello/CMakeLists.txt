@@ -6,7 +6,13 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake")
 
 
 qi_create_bin(hello "main.cpp")
-qi_use_lib(hello world bar)
+
+# should fail when using world package
+find_package(bar)
+message(STATUS "bar_FOUND: ${bar_FOUND}")
+
+
+qi_use_lib(hello world)
 
 enable_testing()
 # Add a test that just runs hello without arguments

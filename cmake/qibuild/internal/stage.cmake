@@ -359,28 +359,94 @@ function(_qi_set_vars target)
 
 endfunction()
 
-function(_qi_internal_append_deprecated OUT_RESULT target)
-  cmake_parse_arguments(ARG "INTERNAL" "" "DEPRECATED" ${ARGN})
+##
+# Add a message at the end of the generated cmake file
+# telling the use the target is deprecated.
+# Last argument is the message about the replacement.
+#   (usually something like: 'please use ... instead')
+function(_qi_gen_deprecated_message res target deprecrated_message)
   string(TOUPPER ${target} _U_target)
-  set(_result)
-  if (ARG_INTERNAL)
-    set(_result "${_result}\nif(NOT ${_U_target}_I_KNOW_IT_IS_INTERNAL)\n")
-    set(_result "${_result}\n  message(STATUS \"\")\n")
-    set(_result "${_result}\n  message(STATUS \"## INTERNAL: \${CMAKE_CURRENT_SOURCE_DIR}: ${target} is internal\")\n")
-    set(_result "${_result}\n  message(STATUS \"\")\n")
-    set(_result "${_result}\nendif()")
-  else()
-    set(_result "${_result}\nif(NOT ${_U_target}_I_KNOW_IT_IS_DEPRECATED)\n")
-    set(_result "${_result}\n  message(STATUS \"\")\n")
-    set(_result "${_result}\n  message(STATUS \"## DEPRECATED: \${CMAKE_CURRENT_SOURCE_DIR}: ${target} is deprecated: ${ARG_DEPRECATED}\")\n")
-    set(_result "${_result}\n  message(STATUS \"\")\n")
-    set(_result "${_result}\nendif()")
-  endif()
-  set("${OUT_RESULT}" "${${OUT_RESULT}}${_result}" PARENT_SCOPE)
+  set(_res "
+if(NOT ${_U_target}_I_KNOW_IT_IS_DEPRECATED)
+  message(STATUS \"
+    \${CMAKE_CURRENT_SOURCE_DIR}: ${target} is deprecated
+    ${deprecrated_message}
+  \"
+  )
+  set(${_U_target}_I_KNOW_IT_IS_DEPRECATED ON)
+endif()
+")
+  set(${res} ${_res} PARENT_SCOPE)
 endfunction()
 
+
+
+##
+# Create install rules for the redist file of a target.
+# By default, the redist file will be installed.
+# If the target has been created by qi_create_lib(.. INTERNAL),
+# ${_U_target}_INTERNAL will be TRUE, and the redist file
+# should NOT be installed.
+# But, if the global flag QI_INSTALL_INTERNAL is ON,
+# the redist file must be installed anyway. (Thus you can
+# make pre-compiled packages containing the internal libraries)
+function(_qi_install_redist_file redist_file target)
+  string(TOUPPER ${target} _U_target)
+  string(TOLOWER ${target} _l_target)
+  set(_should_install TRUE)
+
+  # if target has been create with qi_create_lib(... INTERNAL), ${target}_INTERNAL
+  # will be and we should not install the redist file:
+  if(${${target}_INTERNAL})
+    qi_verbose("Not creating redist file for ${target} because it is internal")
+    set(_should_install FALSE)
+  endif()
+
+  # but we can by-pass this with QI_INSTALL_INTERNAL (useful to create internal
+  # pre-compiled packages, for instance)
+  if(${QI_INSTALL_INTERNAL})
+    qi_verbose("QI_INSTALL_INTERNAL set:
+      Creating redist file for internal target: ${target} anyway")
+    set(_should_install TRUE)
+  endif()
+
+  if(${_should_install})
+    qi_install_cmake(${_redist_file} SUBFOLDER ${_l_target})
+  endif()
+
+endfunction()
+
+##
+# Implementation of qi_stage_lib()
+#
+# We have to generate to {target}-config.cmake file:
+#   - the redist file, which will be installed, and contains only relative paths
+#   - the sdk  file,   which will NOT be installed, and contains only absolute paths.
+# Those files are generated using the various _qi_gen_code_* functions.
+# We also need to create the installation rules for the redist file.
+# Last, but not least, we need to handle several cases:
+#  - The target has been staged with a name which is NOT the target name
+#      (required for t001chain backward compatibility)
+#  - The library has been marked as deprecated, because a new library is meant
+#       to replace it
+#  - The library is internal, so the redist file should not be installed by default
 function(_qi_internal_stage_lib target)
-  cmake_parse_arguments(ARG "INTERNAL" "STAGED_NAME" "DEPRECATED;INCLUDE_DIRS;DEFINITIONS;PATH_SUFFIXES;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG
+    "INTERNAL"
+    "STAGED_NAME"
+    "DEPRECATED;INCLUDE_DIRS;DEFINITIONS;PATH_SUFFIXES;DEPENDS"
+    ${ARGN})
+
+
+  # dm: temp warning:
+  if (${ARG_INTERNAL})
+    qi_warning("Using qi_stage_lib(.. INTERNAL ..) is deprecated
+Please use
+
+qi_create_lib(foo INTERNAL) instead
+")
+  endif()
+
   string(TOUPPER ${target} _U_target)
   string(TOLOWER ${target} _l_target)
   set(_staged_name ${ARG_STAGED_NAME})
@@ -393,62 +459,58 @@ function(_qi_internal_stage_lib target)
 
   _qi_set_vars(${target} ${_new_args})
 
-  #todo: enable me...
-  #if (NOT ARG_INTERNAL OR QI_INSTALL_INTERNAL)
-    _qi_gen_code_lib_redist(_redist ${target})
-    set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_l_target}-config.cmake")
-    if (ARG_DEPRECATED)
-      _qi_internal_append_deprecated(_redist ${target} DEPRECATED ${ARG_DEPRECATED})
-    endif()
-    if (ARG_INTERNAL)
-      _qi_internal_append_deprecated(_redist ${target} INTERNAL)
-    endif()
-    file(WRITE "${_redist_file}" "${_redist}")
-    qi_install_cmake(${_redist_file} SUBFOLDER ${target})
-  #endif()
-
-  _qi_gen_code_lib_sdk(_sdk ${target})
-  set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_l_target}-config.cmake")
-  if (ARG_DEPRECATED)
-    _qi_internal_append_deprecated(_sdk ${target} DEPRECATED ${ARG_DEPRECATED})
+  set(_additional_code) # code that will be added at the end of the generated files
+  if(ARG_DEPRECATED)
+      _qi_gen_deprecated_message(_additional_code ${target} ${ARG_DEPRECATED})
   endif()
-  file(WRITE "${_sdk_file}" "${_sdk}")
 
-  # OK, this one is tricky.
-  # with qibuild, when you have a target named "foo", you always prefix
-  # the variables concerning the foo target with the upper-case name
-  # of the target (FOO_INCLUDE_DIRS, FOO_DEFINITIONS, FOO_DEPENDS....)
+  _qi_gen_code_lib_redist(_redist_code ${target})
+  set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_l_target}-config.cmake")
+  set(_redist_code "${_redist_code} ${_additional_code}")
+  file(WRITE "${_redist_file}" "${_redist_code}")
+  _qi_install_redist_file("${_redist_file}" "${target}")
 
-  # previously, when using toc/t001chain, you could stage a library
-  # with whatever named you wanted. For instance, you could use:
-  # stage_lib(foo LIBFOO)
 
-  # In order to preserve backward compatibility, (for instance use_lib(bar LIBFOO)
-  # MUST continue to work), when we stumble upon this kind of call in compat/compat.cmake,
-  # we create two different modules.
+  _qi_gen_code_lib_sdk(_sdk_code ${target})
+  set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_l_target}-config.cmake")
+  set(_sdk_code "${_sdk_code} ${_additional_code}")
+  file(WRITE "${_sdk_file}" "${_sdk_code}")
 
-  # one is still called foo-config.cmake, the other one is a copy of foo-config.cmake,
-  # named libfoo-config.cmake, where every occurrence of "FOO" is replaced by
-  # LIBFOO.
-  # This way, only the *names* of the values changed, but not their value, so
-  # LIBFOO_DEPENDS is the same as FOO_DEPENDS
-
-  # TODO: this little final hack is not very safe. Maybe a better way to do it will
-  # be to generate a file looking like
-
-  #   message(STAUS "Usage of
-  #       use_lib(... LIBFOO)
-  #   is deprecated, please use
-  #       qi_use_lib(.. foo)
-  #   find_package(foo)
-  #   ")
-  #
-  #   set(LIBFOO_DEPENDS ${FOO_DEPENDS}
-  #   set(LIBFOO_INLUDE_DIRS ${FOO_INCLUDE_DIRS}
-  #
-  #
 
   if(_staged_name)
+    # OK, this one is tricky.
+    # with qibuild, when you have a target named "foo", you always prefix
+    # the variables concerning the foo target with the upper-case name
+    # of the target (FOO_INCLUDE_DIRS, FOO_DEFINITIONS, FOO_DEPENDS....)
+
+    # previously, when using toc/t001chain, you could stage a library
+    # with whatever named you wanted. For instance, you could use:
+    # stage_lib(foo LIBFOO)
+
+    # In order to preserve backward compatibility, (for instance use_lib(bar LIBFOO)
+    # MUST continue to work), when we stumble upon this kind of call in compat/compat.cmake,
+    # we create two different modules.
+
+    # one is still called foo-config.cmake, the other one is a copy of foo-config.cmake,
+    # named libfoo-config.cmake, where every occurrence of "FOO" is replaced by
+    # LIBFOO.
+    # This way, only the *names* of the values changed, but not their value, so
+    # LIBFOO_DEPENDS is the same as FOO_DEPENDS
+
+    # TODO: this little final hack is not very safe. Maybe a better way to do it will
+    # be to generate a file looking like
+
+    #   message(STAUS "Usage of
+    #       use_lib(... LIBFOO)
+    #   is deprecated, please use
+    #       qi_use_lib(.. foo)
+    #   find_package(foo)
+    #   ")
+    #
+    #   set(LIBFOO_DEPENDS ${FOO_DEPENDS}
+    #   set(LIBFOO_INLUDE_DIRS ${FOO_INCLUDE_DIRS}
+    #
+    #
     set(_warning_message
 "
 message(WARNING \${CMAKE_CURRENT_LIST_FILE}\"
@@ -468,33 +530,44 @@ message(WARNING \${CMAKE_CURRENT_LIST_FILE}\"
     string(TOLOWER ${_staged_name} _other_name)
     string(TOUPPER ${_staged_name} _U_staged_name)
 
-    #ARG_INTERNAL not handled here, we dont really care, user already have a deprecated message..
-    #todo: enable
-    #if (NOT ARG_INTERNAL OR QI_INSTALL_INTERNAL)
-      string(REPLACE ${_U_target} ${_U_staged_name} _other_redist "${_redist}")
-      set(_other_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_other_name}-config.cmake")
-      file(WRITE  "${_other_redist_file}" "${_other_redist}")
-      file(APPEND "${_other_redist_file}" ${_warning_message})
-      qi_install_cmake(${_other_redist_file} SUBFOLDER ${_other_name})
-    #endif()
+    string(REPLACE ${_U_target} ${_U_staged_name} _other_redist_code "${_redist_code}")
+    set(_other_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_other_name}-config.cmake")
+    file(WRITE  "${_other_redist_file}" "${_other_redist_code}")
+    file(APPEND "${_other_redist_file}" ${_warning_message})
+    # Not using _qi_gen_deprecated_message, or _qi_install_redist_file, because
+    # the file should not be used anyway...
+    qi_install_cmake(${_other_redist_file} SUBFOLDER ${_other_name})
 
-    string(REPLACE ${_U_target} ${_U_staged_name} _other_sdk "${_sdk}")
+    string(REPLACE ${_U_target} ${_U_staged_name} _other_sdk_code "${_sdk_code}")
     set(_other_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_other_name}-config.cmake")
-    file(WRITE  "${_other_sdk_file}" "${_other_sdk}")
+    file(WRITE  "${_other_sdk_file}" "${_other_sdk_code}")
     file(APPEND "${_other_sdk_file}" ${_warning_message})
-
   endif()
 
 endfunction()
 
 
 
-
+##
+# Implements qi_stage_header_only_lib
+#
 function(_qi_internal_stage_header_only_lib target)
   cmake_parse_arguments(ARG "INTERNAL" "" "DEPRECATED;INCLUDE_DIRS;DEFINITIONS;PATH_SUFFIXES;DEPENDS" ${ARGN})
+  # dm: temp warning:
+  if (${ARG_INTERNAL})
+    qi_warning("Using qi_stage_header_only_lib(.. INTERNAL ..) is deprecated
+
+    What were you trying to do anyway?
+")
+  endif()
+
+  set(_additional_code)
+  if (ARG_DEPRECATED)
+    _qi_gen_deprecated_message(_additional_code ${target} ${ARG_DEPRECATED})
+  endif()
+
   string(TOUPPER ${target} _U_target)
   string(TOLOWER ${target} _l_target)
-  #set(_staged_name ${ARG_STAGED_NAME})
   set(_new_args)
   foreach(_arg INCLUDE_DIRS DEFINITIONS PATH_SUFFIXES DEPENDS)
     if (DEFINED ARG_${_arg})
@@ -504,25 +577,15 @@ function(_qi_internal_stage_header_only_lib target)
 
   _qi_set_vars(${target} ${_new_args})
 
-  #todo: enable me...
-  #if (NOT ARG_INTERNAL OR QI_INSTALL_INTERNAL)
-    _qi_gen_code_header_only_lib_redist(_redist ${target})
-    set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_l_target}-config.cmake")
-    if (ARG_DEPRECATED)
-      _qi_internal_append_deprecated(_redist ${target} DEPRECATED ${ARG_DEPRECATED})
-    endif()
-    if (ARG_INTERNAL)
-      _qi_internal_append_deprecated(_redist ${target} INTERNAL)
-    endif()
-    file(WRITE "${_redist_file}" "${_redist}")
-    qi_install_cmake(${_redist_file} SUBFOLDER ${target})
-  #endif()
+  _qi_gen_code_header_only_lib_redist(_redist_code ${target})
+  set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_l_target}-config.cmake")
+  set(_redist_code "${_redist_code} ${_additional_code}")
+  file(WRITE "${_redist_file}" "${_redist_code}")
+  _qi_install_redist_file(${_redist_file} ${target})
 
-  _qi_gen_code_header_only_lib_sdk(_sdk ${target})
+  _qi_gen_code_header_only_lib_sdk(_sdk_code ${target})
   set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_l_target}-config.cmake")
-  if (ARG_DEPRECATED)
-    _qi_internal_append_deprecated(_sdk ${target} DEPRECATED ${ARG_DEPRECATED})
-  endif()
-  file(WRITE "${_sdk_file}" "${_sdk}")
+  set(_sdk_code "${_sdk_code} ${_additional_code}")
+  file(WRITE "${_sdk_file}" "${_sdk_code}")
 
 endfunction()

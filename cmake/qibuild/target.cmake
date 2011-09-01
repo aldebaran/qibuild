@@ -180,6 +180,12 @@ endfunction()
 #                        have to compile the target explicitly.
 #                        Warning: you will NOT be able to create install rules
 #                          for this target.
+# \flag: INTERNAL  By default, the library won't be installed, the
+#                  headers of the library won't be installed either, and
+#                  library cmake config file will not be generated, thus it will
+#                  be impossible to use the library from another project using
+#                  a package of the project.
+#                  You can by-pass this behavior by setting QI_INSTALL_INTERNAL to "ON"
 # \flag:NO_STAGE Do not stage the library.
 # \flag:NO_FPIC Do not set -fPIC on static libraries (will be set for shared lib by CMake anyway)
 # \param:SUBFOLDER The destination subfolder. The install rules generated will be
@@ -189,7 +195,10 @@ endfunction()
 # \group:DEP List of dependencies
 # \example:target
 function(qi_create_lib name)
-  cmake_parse_arguments(ARG "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC;SHARED;STATIC" "SUBFOLDER" "SRC;SUBMODULE;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG
+    "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC;SHARED;STATIC;INTERNAL"
+    "SUBFOLDER"
+    "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
   if (ARG_NOBINDLL)
     # Kept here for historical reason: TODO: fix this in qibuild/compat.
@@ -202,6 +211,7 @@ function(qi_create_lib name)
 
   qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
   qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
+  qi_set_global("${name}_INTERNAL"   "${ARG_INTERNAL}")
 
   foreach(submodule ${ARG_SUBMODULE})
     string(TOUPPER "${submodule}" _upper_submodule)
