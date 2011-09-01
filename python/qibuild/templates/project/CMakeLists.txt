@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
 
 project(@project_name@)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake")
+include("qibuild.cmake")
 
 # Create a executable
 qi_create_bin(@project_name@ "main.cpp")
