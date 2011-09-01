@@ -57,7 +57,6 @@ endfunction()
 # Layout variables
 #####################
 
-# In theory those should not be used that often...
 qi_set_global(_SDK_LIB           ${QI_SDK_LIB})
 qi_set_global(_SDK_BIN           ${QI_SDK_BIN})
 qi_set_global(_SDK_FRAMEWORK     ${QI_SDK_FRAMEWORK}    )
