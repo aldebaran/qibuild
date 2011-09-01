@@ -55,10 +55,15 @@ def configure_parser(parser):
     parser.add_argument("--no-compress", dest="compress",
         action="store_false",
         help  ="Do not compress the final install directory")
+    parser.add_argument("--internal", dest="internal",
+        action="store_true",
+        help = "Include internal libs in package")
     parser.set_defaults(
         cmake_flags=["CMAKE_INSTALL_PREFIX='/'"],
         compress=True,
-        include_deps=False)
+        include_deps=False,
+        internal=False)
+
 def do(args):
     """Main entry point"""
     toc = qibuild.toc_open(args.work_tree, args)
@@ -72,6 +77,9 @@ def do(args):
         package_name += "-%s" % toc.active_config
     destdir = os.path.join(toc.work_tree, "package")
     destdir = os.path.join(destdir, package_name)
+
+    if args.internal:
+        args.cmake_flags.append('QI_INSTALL_INTERNAL=ON')
 
     qibuild.run_action("qibuild.actions.configure", [project_name, "--no-clean-first"],
         forward_args=args)
