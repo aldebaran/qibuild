@@ -280,20 +280,9 @@ endfunction()
 function(qi_install_header target)
   cmake_parse_arguments(ARG  "KEEP_RELATIVE_PATHS" "SUBFOLDER"  "HEADERS" ${ARGN})
   if(NOT ARG_HEADERS)
-    # dm: tmp fix, should raise an error instead:
-    qi_warning("
-Using qi_install_header without HEADERS group is deprecated.
-Old:
-  qi_install_header(foo.h)
-New:
-  qi_install_header(foo HEADERS foo.h)
-Please fix your code, this warning will be an error soon.
-")
-    set(_headers ${ARG_UNPARSED_ARGUMENTS} ${target})
-    set(target "")
-  else()
-    set(_headers ${ARG_HEADERS})
+    qi_error("Using qi_install_header with HEADERS group arguments ")
   endif()
+  set(_headers ${ARG_HEADERS})
 
   # Handle ${target}_INTERNAL
   set(_should_install TRUE)
