@@ -1,0 +1,111 @@
+QiBuild/QiBuildFarm/Qidev TODO
+==============================
+
+
+API changes
+-------------
+
+# because it's internal, keep it the way it is
+qidev get-ctc
+
+
+# because we want our clients to use our toolchains in 1.14:
+qidev init -> qitoolchain init <name> <url>
+qidev update-toolchain -> qitoolchain get <name> [<version>]
+
+
+# because it's no easy to understand what it does:
+qitoolchain install <name> <tc_file> -> REMOVED
+qitoolchain uninstall -> qitoolchain remove
+
+# because this is too advanced and rarely used:
+qitoolchain add -> qitoolchain add-package
+qitoolchain remove -> qitoolchain remove-package
+
+
+
+Changing in code layout
+-----------------------
+
+
+
+qibuild/qiworktree     -> qibuild/worktree
+qitoolchain/__init__   -> qitoolchain/toolchain
+
+qidev/benco             -> qitoolchain/download
+
+
+qibuildfarm:
+    worktree
+        # init worktree
+        # manage several sources (run_git_for_all ...)
+     upload
+        # upload stuff
+     deliveries
+        # download deliveries, using qitoolchain.download
+        # Here you can find hard-coded names of deliveries
+      config
+        # hard coded stuff, like ananas url and stuff like that.
+
+   qirelase/
+     actions
+      # one action per delivery (internal or not)
+
+  qibuildfarm/
+    actions/
+        continuous_build
+          # Run C++ tests, ctest rewritten in Python so
+          # that we can have non-gtest too
+        continuous_cross_build
+          # Same as cross_qiproj
+        nightly_build
+          # Linux: coverage, CCCC, memcheck
+          # All: upload to qi/packages/continuous
+        # high-level python test using latest SDKs (naoqi and pynaoqi)
+        ...
+
+        # Release actions:
+        release
+        release_dotnet
+        release_python
+        ....
+
+
+   jobs
+      # parse env
+      # init stuff (if necessary):
+      #  - qiworktree
+      #  - sources at the correct revision if necessary
+      #  And just that !
+      # just a function WITHOUT arguments
+      # call run_action(). So no env, no worktree and no git in actions ...
+
+   configs
+    feeds/
+      linux32.cfg   (continuous)
+      linux32-1.14.cfg
+      linux32-1.12.cfg
+    manifests/
+      # Keeping .cfg extension so that Windows is not confused
+      choregraphe.cfg
+      qimesssaging.cfg
+      ....
+    machines/
+      # One conf file per box
+
+
+Changes in behavior
+-------------------
+
+
+when doing 1.14 release, you use the 1.14 feed with the 1.14 toolchain (obvious ...)
+
+linux32.cfg contains url to continuous packages created by
+  qibuildfarm nightly_build
+
+linux32-minimal.cfg contains url to static deps
+
+linux32-1.12.cfg contains NO continuous URL.
+
+NOTE: no need to create separate packages, if you upgrade say openc, leave the two
+version in qi/packages/
