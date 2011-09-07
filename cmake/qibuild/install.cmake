@@ -279,10 +279,10 @@ endfunction()
 # \group: HEADERS        Required: the list of headers to install
 function(qi_install_header target)
   cmake_parse_arguments(ARG  "KEEP_RELATIVE_PATHS" "SUBFOLDER"  "HEADERS" ${ARGN})
-  if(NOT ARG_HEADERS)
-    qi_error("Using qi_install_header with HEADERS group arguments ")
+  set(_headers ${ARG_HEADERS} ${ARG_UNPARSED_ARGUMENTS})
+  if(NOT _headers)
+    qi_error("No headers specified")
   endif()
-  set(_headers ${ARG_HEADERS})
 
   # Handle ${target}_INTERNAL
   set(_should_install TRUE)
