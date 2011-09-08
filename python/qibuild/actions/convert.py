@@ -9,8 +9,8 @@ Support is planned for:
 
 """
 
-#NOTE: none of this code here should need a QiWorkTree
-# (because QiWorkTree +needs+ qibuild.manifest files right now)
+#NOTE: none of this code here should need a WorkTree
+# (because WorkTree +needs+ qibuild.manifest files right now)
 
 import os
 import re

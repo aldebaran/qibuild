@@ -1,6 +1,6 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"""This package contains the QiWorkTree object.
+"""This package contains the WorkTree object.
 
 Typical usage is:
 
@@ -12,12 +12,12 @@ This create /path/to/work/.qi,
 
 Explore each parent directory until a ".qi" is found.
 Use the parent directory as a work tree.
-Build a QiWorkTree object from the work tree.
-Parses the worktree so that QiWorkTree every buildable projects
+Build a WorkTree object from the work tree.
+Parses the worktree so that WorkTree every buildable projects
 (directories that contains a qibuild.manifest)
 
 To find the "bar" project, look for a project named "bar" in
-qiworktree.projects
+worktree.projects
 
 Note: the .qi also contains a config file, so you can
 have different configurations with different work trees if you need.
@@ -29,7 +29,7 @@ import logging
 from qibuild.cmdparse    import default_parser
 import qibuild.sh
 
-LOGGER = logging.getLogger("QiWorkTree")
+LOGGER = logging.getLogger("WorkTree")
 
 class WorkTreeException(Exception):
     """Custom exception """
@@ -59,7 +59,7 @@ def work_tree_parser(parser):
     parser.add_argument("--work-tree", help="Use a specific work tree path.")
 
 
-class QiWorkTree:
+class WorkTree:
     """ This class represent a Qi worktree.
         - work_tree
         - configstore
@@ -127,12 +127,12 @@ class QiWorkTree:
                     self.git_projects[os.path.basename(d)] = d
 
 
-def qiworktree_open(work_tree=None):
+def worktree_open(work_tree=None):
     """ Open a qi worktree.
 
-        Return a valid QiWorkTree instance.
+        Return a valid WorkTree instance.
 
-        The QiWorkTree instance will have the following important members
+        The WorkTree instance will have the following important members
         initialized:
          qiwt.buildable_projects  : a list of Project instances
          qiwt.git_projects        : al list of git repositories
@@ -160,7 +160,7 @@ def qiworktree_open(work_tree=None):
         # so there could be there could be 4 or more #
         # folder separating cwd from work_tree, and in this case the current
         # project will not be found.
-        # (when building the QiWorkTree object, we only seach for projects)
+        # (when building the WorkTree object, we only seach for projects)
         # in the first 4 levels of folders starting from work_tree.
 
         # Tldr: this solves a quite a nasty bug when you have:
@@ -174,7 +174,7 @@ def qiworktree_open(work_tree=None):
             " - try from a valid work tree\n"
             " - specify an existing work tree with \"--work-tree PATH\"\n"
             " - create a new work tree with \"qibuild init\"")
-    return QiWorkTree(work_tree, path_hints=path_hints)
+    return WorkTree(work_tree, path_hints=path_hints)
 
 def search_current_project_root(working_directory):
     cwd = _search_manifest_directory(working_directory)

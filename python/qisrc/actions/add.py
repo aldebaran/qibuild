@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.qiworktree.work_tree_parser(parser)
+    qibuild.worktree.work_tree_parser(parser)
     parser.add_argument("url",  metavar="URL", help="url of the project. "
         "right now only git URLs are supported")
     parser.add_argument("name", metavar="NAME", nargs="?",
@@ -27,14 +27,14 @@ def do(args):
     if not name:
         name = url.split("/")[-1].replace(".git", "")
 
-    # Create the git worktree in qiworktree by default.
-    worktree = qibuild.qiworktree.worktree_from_args(args)
+    # Create the git worktree in worktree by default.
+    worktree = qibuild.worktree.worktree_from_args(args)
 
     git_src_dir = os.path.join(worktree, name)
     LOGGER.info("Git clone: %s -> %s", url, git_src_dir)
 
     if os.path.exists(git_src_dir):
-        raise qibuild.qiworktree.ProjectAlreadyExists(url, name, git_src_dir)
+        raise qibuild.worktree.ProjectAlreadyExists(url, name, git_src_dir)
 
     git = qisrc.git.Git(git_src_dir)
     git.clone(url, git_src_dir)

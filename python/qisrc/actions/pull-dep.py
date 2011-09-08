@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.qiworktree.work_tree_parser(parser)
+    qibuild.worktree.work_tree_parser(parser)
     qibuild.parsers.project_parser(parser)
 
     parser.add_argument("--continue", action="store_true", dest="continue_on_error", help="continue on error")
@@ -20,7 +20,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    qiwt = qibuild.qiworktree_open(args.work_tree)
+    qiwt = qibuild.worktree_open(args.work_tree)
     toc  = qibuild.toc_open(args.work_tree, args)
 
     (project_names, _, _) = qibuild.toc.resolve_deps(toc, args)

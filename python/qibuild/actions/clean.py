@@ -14,7 +14,7 @@ import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.qiworktree.work_tree_parser(parser)
+    qibuild.worktree.work_tree_parser(parser)
     parser.add_argument("--force", "-f", dest="force", action="store_true", help="force the cleanup")
     parser.add_argument("build_directory", nargs="*", help="build directory to cleanup")
 
@@ -52,7 +52,7 @@ def list_build_folder(path, bdirs, work_tree):
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
-    qiwt     = qibuild.qiworktree_open(args.work_tree)
+    qiwt     = qibuild.worktree_open(args.work_tree)
 
     if args.force:
         logger.info("preparing to remove:")

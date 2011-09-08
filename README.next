@@ -7,6 +7,7 @@ API changes
 
 # because it's internal, keep it the way it is
 qidev get-ctc
+qidev get-image
 
 
 # because we want our clients to use our toolchains in 1.14:

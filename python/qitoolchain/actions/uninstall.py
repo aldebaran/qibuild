@@ -15,7 +15,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.qiworktree.work_tree_parser(parser)
+    qibuild.worktree.work_tree_parser(parser)
     parser.add_argument("name",
         help="The name of the toolchain to remove")
 

@@ -15,19 +15,19 @@ from . import command
 from . import configstore
 from . import cmdparse
 from . import log
-from . import qiworktree
+from . import worktree
 from . import archive
 from . import sh
 from . import interact
 from . import envsetter
 
 from toc        import toc_open
-from qiworktree import qiworktree_open
+from worktree import worktree_open
 from cmdparse   import run_action
 
 __all__ = ( 'toc', 'parsers', 'command', 'configstore', 'cmdparse',
-            'log', 'qiworktree', 'archive', 'sh', 'interact',
-            'qiworktree_open', 'toc_open', 'run_action',
+            'log', 'worktree', 'archive', 'sh', 'interact',
+            'worktree_open', 'toc_open', 'run_action',
             'check_root_cmake_list', 'cmake', 'msbuild', 'make', 'nmake', 'get_cmake_qibuild_dir',
             'EnvSetter'
             )

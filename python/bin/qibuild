@@ -46,7 +46,7 @@ def main():
     # no arguments...
     if len(sys.argv) == 1:
         # and we are in a qibuild project
-        if qibuild.qiworktree.search_current_project_root(os.getcwd()):
+        if qibuild.worktree.search_current_project_root(os.getcwd()):
             qibuild.cmdparse.root_command_main("qibuild", argparse.ArgumentParser(), modules, args=[ "configure" ])
             qibuild.cmdparse.root_command_main("qibuild", argparse.ArgumentParser(), modules, args=[ "make" ])
             return

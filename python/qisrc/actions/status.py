@@ -13,7 +13,7 @@ LOGGER = logging.getLogger("qisrc.status")
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.qiworktree.work_tree_parser(parser)
+    qibuild.worktree.work_tree_parser(parser)
     parser.add_argument("--untracked-files", "-u", dest="untracked_files", action="store_true", help="display untracked files")
     parser.add_argument("--show-branch", "-b", dest="show_branch", action="store_true", help="display branch and tracking branch for each repository")
 
@@ -33,7 +33,7 @@ def _add_pad(max_len, k, v):
 
 def do(args):
     """ Main method """
-    qiwt = qibuild.qiworktree_open(args.work_tree)
+    qiwt = qibuild.worktree_open(args.work_tree)
     gitrepo = list()
     dirty = list()
     for git_project in qiwt.git_projects.values():

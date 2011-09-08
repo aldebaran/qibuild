@@ -9,7 +9,7 @@ from qibuild.cmdparse import default_parser
 def toc_parser(parser):
     """ Parser settings for every action using a toc dir
     """
-    qibuild.qiworktree.work_tree_parser(parser)
+    qibuild.worktree.work_tree_parser(parser)
     parser.add_argument('-c', '--config',
         help='The configuration to use. '
              'If a toolchain exists with the same name '

@@ -20,7 +20,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.qiworktree.work_tree_parser(parser)
+    qibuild.worktree.work_tree_parser(parser)
     parser.add_argument("url",
         nargs = "?",
         metavar="URL",
@@ -60,7 +60,7 @@ url = ftp://example.com/foo.manifest
     if not projects:
         raise Exception("Not project found in url %s" % args.url)
 
-    qiwt = qibuild.qiworktree_open(args.work_tree)
+    qiwt = qibuild.worktree_open(args.work_tree)
 
     for (project_name, project_conf) in config.get("project").iteritems():
         project_url = config.get("project.%s.url" % project_name)
@@ -69,7 +69,7 @@ url = ftp://example.com/foo.manifest
         else:
             try:
                 qibuild.run_action("qisrc.actions.add", [project_url, project_name])
-            except qibuild.qiworktree.ProjectAlreadyExists:
+            except qibuild.worktree.ProjectAlreadyExists:
                 pass
 
     # Everything went fine, store the manifest URL for later use:

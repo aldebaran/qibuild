@@ -1,12 +1,12 @@
 == qiBuild major classes ==
 
-=== QiWorkTree ===
+=== WorkTree ===
 Hold general information about a worktree:
   - buildable_projects
   - git_projects
   - configuration
 
-=== Toc(QiWorkTree) ===
+=== Toc(WorkTree) ===
 Hold build specific information about projects. You should specify everything needed for a build to this class.
 This include:
   - the toolchain name (default to "system")

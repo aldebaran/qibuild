@@ -9,13 +9,13 @@ import os
 import glob
 import platform
 import logging
-import qibuild.qiworktree
+import qibuild.worktree
 
 import qibuild
 from   qibuild.project     import Project
 import qibuild.sh
 from qibuild.dependencies_solver import DependenciesSolver
-from   qibuild.qiworktree import QiWorkTree
+from   qibuild.worktree import WorkTree
 import qitoolchain
 from qibuild.command import CommandFailedException
 
@@ -161,7 +161,7 @@ class TocConfigStore:
 
 
 
-class Toc(QiWorkTree):
+class Toc(WorkTree):
     """This class contains a list of packages, and a list of projects.
 
     It is also capable of sorting dependencies.
@@ -190,14 +190,14 @@ class Toc(QiWorkTree):
             cmake_flags=None,
             cmake_generator=None):
         """
-            work_tree       : see QiWorkTree.__init__
-            path_hints      : see QiWorkTree.__init__
+            work_tree       : see WorkTree.__init__
+            path_hints      : see WorkTree.__init__
 
             build_type      : a build type, could be debug or release (defaults to debug)
             cmake_flags     : optional additional cmake flags
             cmake_generator : optional cmake generator (defaults to Unix Makefiles)
         """
-        QiWorkTree.__init__(self, work_tree, path_hints=path_hints)
+        WorkTree.__init__(self, work_tree, path_hints=path_hints)
 
         # User set a configuration, use it, then build
         # the configstore
@@ -228,7 +228,7 @@ class Toc(QiWorkTree):
         self.set_build_env()
 
         # List of objects of type qibuild.project.Project,
-        # this is updated using QiWorkTree.buildable_projects
+        # this is updated using WorkTree.buildable_projects
         self.projects          = list()
 
         # Set cmake generator if user has not set if in Toc ctor:
@@ -301,7 +301,7 @@ class Toc(QiWorkTree):
         """
         self.set_build_folder_name()
 
-        # self.buildable_projects has been set by QiWorkTree.__init__
+        # self.buildable_projects has been set by WorkTree.__init__
         for pname, ppath in self.buildable_projects.iteritems():
             project = Project(pname, ppath)
             self.projects.append(project)
@@ -604,8 +604,8 @@ def toc_open(work_tree, args=None):
         cmake_generator = args.cmake_generator
 
     if not work_tree:
-        work_tree = qibuild.qiworktree.guess_work_tree()
-    current_project = qibuild.qiworktree.search_current_project_root(os.getcwd())
+        work_tree = qibuild.worktree.guess_work_tree()
+    current_project = qibuild.worktree.search_current_project_root(os.getcwd())
     if not work_tree:
         # Sometimes we you just want to create a fake worktree object because
         # you just want to build one project (no dependencies at all, no configuration...)
@@ -635,7 +635,7 @@ def create(directory):
     """ Create a new toc work_tree inside a work tree
 
     """
-    qibuild.qiworktree.create(directory)
+    qibuild.worktree.create(directory)
 
 
 def resolve_deps(toc, args, runtime=False):
@@ -667,7 +667,7 @@ def project_from_cwd():
     """Return a project name from the current working directory
 
     """
-    project_dir = qibuild.qiworktree.search_current_project_root(os.getcwd())
+    project_dir = qibuild.worktree.search_current_project_root(os.getcwd())
     if not project_dir:
         raise Exception("Could not guess project name from the working directory.\n"
                 "Please go to a subdirectory of a project\n"

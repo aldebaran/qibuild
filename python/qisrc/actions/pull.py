@@ -12,13 +12,13 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.qiworktree.work_tree_parser(parser)
+    qibuild.worktree.work_tree_parser(parser)
     parser.add_argument("--continue", action="store_true", dest="continue_on_error", help="continue on error")
     parser.add_argument("--rebase", action="store_true", dest="rebase", help="rebase")
 
 def do(args):
     """Main entry point"""
-    qiwt = qibuild.qiworktree_open(args.work_tree)
+    qiwt = qibuild.worktree_open(args.work_tree)
     for git_project in qiwt.git_projects.values():
         try:
             git = qisrc.git.open(git_project)

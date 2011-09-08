@@ -31,7 +31,7 @@ def copy_helper(project_name, directory):
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.qiworktree.work_tree_parser(parser)
+    qibuild.worktree.work_tree_parser(parser)
     parser.add_argument("project_name",
         help="The name of the project. "
              "The project will be created in QI_WORK_TREE/<name> ")
@@ -41,15 +41,15 @@ def configure_parser(parser):
 
 def do(args):
     """"Create a new project """
-    # Try to open a qiworktree.
+    # Try to open a worktree.
     # If not, ask the user if he wants to create one:
     qiwt = None
     try:
-        qiwt = qibuild.qiworktree_open(args.work_tree)
-    except qibuild.qiworktree.WorkTreeException:
+        qiwt = qibuild.worktree_open(args.work_tree)
+    except qibuild.worktree.WorkTreeException:
         if qibuild.interact.ask_yes_no("Warning, no worktree found. Create one"):
             qibuild.run_action("qibuild.actions.init", ["--interactive"])
-            qiwt = qibuild.qiworktree_open(args.work_tree)
+            qiwt = qibuild.worktree_open(args.work_tree)
 
     project_name = args.project_name
     if qiwt:
