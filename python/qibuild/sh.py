@@ -173,6 +173,8 @@ def install(src, dest, filter=None):
         if os.path.isdir(dest):
             dest = os.path.join(dest, os.path.basename(src))
         mkdir(os.path.dirname(dest), recursive=True)
+        if sys.stdout.isatty():
+            print "-- Installing %s" % dest
         shutil.copy(src, dest)
 
 def rm(name):
