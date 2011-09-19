@@ -217,7 +217,8 @@ set(CMAKE_PREFIX_PATH ${{CMAKE_PREFIX_PATH}} CACHE INTERNAL ""  FORCE)
     # cmake module_ath to cmake/ to be able to do
     # include(qibuild/general)
     cmake_qibuild_dir = qibuild.CMAKE_QIBUILD_DIR
-    path_to_add = qibuild.sh.to_posix_path(os.path.join(cmake_qibuild_dir, ".."))
+    cmake_qibuild_dir = os.path.abspath(os.path.join(cmake_qibuild_dir, ".."))
+    path_to_add = qibuild.sh.to_posix_path(cmake_qibuild_dir)
 
     dep_sdk_dirs = toc.get_sdk_dirs(project.name)
 
