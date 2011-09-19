@@ -7,9 +7,12 @@
 
 import os
 import sys
+import difflib
+
 import unittest
 import qibuild
 import qibuild
+
 
 try:
     import argparse
@@ -58,6 +61,43 @@ class QiBuildTestCase(unittest.TestCase):
 
     def test_package(self):
         self._run_action("package", "world")
+
+    def test_preserve_cache(self):
+        # If cache changes when runnning cmake .. after
+        # qibuild configure, then you have two problems:
+        #     * every target will alway be seen has out of date
+        #     * chances are some list vars contains more element,
+        #       so perf will decrease each time you run cmake ..
+        # Since some IDE automatically run cmake .. (qtcreator,
+        # visual studio, for instance), this will lead to
+        # performance issues
+        self._run_action("configure", "world")
+
+        toc = qibuild.toc.toc_open(self.test_dir, args=self.args)
+        build_folder_name = toc.build_folder_name
+        world_src = os.path.join(self.test_dir, "world")
+        build_dir = os.path.join(world_src, "build-%s" % build_folder_name)
+        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
+
+        # run cmake .. once and store contents of cache:
+        qibuild.command.call(["cmake", ".."], cwd=build_dir)
+        before = ""
+        with open(cmake_cache, "r") as fp:
+            before = fp.readlines()
+
+        # run cmake .. twice
+        qibuild.command.call(["cmake", ".."], cwd=build_dir)
+        after = ""
+        with open(cmake_cache, "r") as fp:
+            after = fp.readlines()
+
+        diff = ""
+        for line in difflib.unified_diff(before, after, fromfile='before', tofile='after'):
+            diff += line
+
+        self.assertEquals(diff, "", "Diff non empty\n%s" % diff)
+
+
 
 
 if __name__ == "__main__":
