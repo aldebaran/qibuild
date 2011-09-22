@@ -367,7 +367,7 @@ endfunction()
 function(_qi_gen_deprecated_message res target deprecrated_message)
   string(TOUPPER ${target} _U_target)
   set(_res "
-if(NOT ${_U_target}_I_KNOW_IT_IS_DEPRECATED)
+if(NOT ${_U_target}_I_KNOW_IT_IS_DEPRECATED AND QI_WARN_DEPRECATED)
   message(STATUS \"
     \${CMAKE_CURRENT_SOURCE_DIR}: ${target} is deprecated
     ${deprecrated_message}
