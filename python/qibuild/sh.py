@@ -84,11 +84,14 @@ def _handle_dirs(src, dest, root, directories, filter):
 
     """
     rel_root = os.path.relpath(root, src)
+    # To avoid filering './' stuff
+    if rel_root == ".":
+        rel_root = ""
     new_root = os.path.join(dest, rel_root)
-    mkdir(new_root, recursive=True)
 
     for directory in directories:
-        if not filter(os.path.join(rel_root, directory)):
+        to_filter = os.path.join(rel_root, directory)
+        if not filter(to_filter):
             continue
         dsrc  = os.path.join(root, directory)
         ddest = os.path.join(new_root, directory)
@@ -106,7 +109,6 @@ def _handle_files(src, dest, root, files, filter):
     """
     rel_root = os.path.relpath(root, src)
     new_root = os.path.join(dest, rel_root)
-    mkdir(new_root, recursive=True)
 
     for f in files:
         if not filter(os.path.join(rel_root, f)):
@@ -114,12 +116,14 @@ def _handle_files(src, dest, root, files, filter):
         fsrc  = os.path.join(root, f)
         fdest = os.path.join(new_root, f)
         if os.path.islink(fsrc):
+            mkdir(new_root, recursive=True)
             _copy_link(fsrc, fdest)
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
                 raise Exception("Expecting a file but found a directory: %s" % fdest)
             if sys.stdout.isatty():
                 print "-- Installing %s" % fdest
+            mkdir(new_root, recursive=True)
             shutil.copy(fsrc, fdest)
 
 
@@ -147,8 +151,8 @@ def install(src, dest, filter=None):
     installled.
 
     """
-    mess = "Could not install '%s' to '%s'\n" % (src, dest)
     if not os.path.exists(src):
+        mess = "Could not install '%s' to '%s'\n" % (src, dest)
         mess += '%s does not exist' % src
         raise Exception(mess)
 
