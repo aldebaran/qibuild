@@ -147,9 +147,6 @@ def install(src, dest, filter=None):
         |__ 4.0
 
 
-    Note that if src contains empty directories, they won't be
-    installled.
-
     """
     if not os.path.exists(src):
         mess = "Could not install '%s' to '%s'\n" % (src, dest)
