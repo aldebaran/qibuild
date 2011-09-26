@@ -270,8 +270,11 @@ class Git:
         if not branch:
             branch = self.get_current_branch()
 
-        remote = self.cmd.call_output("config", "--get", "branch.%s.remote" % (branch))[0].strip()
-        merge = self.cmd.call_output("config", "--get", "branch.%s.merge" % (branch))[0].strip()
+        try:
+            remote = self.cmd.call_output("config", "--get", "branch.%s.remote" % (branch))[0].strip()
+            merge = self.cmd.call_output("config", "--get", "branch.%s.merge" % (branch))[0].strip()
+        except:
+            return None
         if merge.startswith("refs/heads/"):
             return "%s/%s" % (remote, merge[11:])
         return None
