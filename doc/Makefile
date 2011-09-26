@@ -2,6 +2,7 @@
 #
 
 # You can set these variables from the command line.
+PYTHON        = python
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
@@ -18,7 +19,7 @@ all: gen_cmake html
 
 gen_cmake:
 	@echo "Generating cmake rst doc from sources"
-	@python tools/gen_cmake_doc.py ..
+	@$(PYTHON) tools/gen_cmake_doc.py ..
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
