@@ -1,10 +1,12 @@
+.. _how-to-write-a-library:
+
 How to write a library
 ======================
 
 This is merely a convention, but you are advised to follow it, especially if
 you are working in a large project.
 
-Let’s say you have a foo library.
+Let's say you have a foo library.
 
 You have the following files:
 
@@ -17,7 +19,8 @@ You have the following files:
 * foo_private.h : private header of the foo library. This one may include
   third-party headers (say zeromq.h), without having the foo.h header depending
   on zeromq.h, which is nice for the users of your library. If you link
-  statically with zeromq, users of foo won’t even need to know about zeromq!
+  statically with zeromq, users of foo won't even need to know about zeromq
+  (well, this is true if foo is a dynamic library, but that's an other topic)
 
 * foo_private.cpp : private implementation.
 
@@ -100,7 +103,7 @@ You will note that:
   library.
 
 * The foo.h header is in a directory named foo, and qi_install_header() uses
-  this directory as first argument. It’s advised you use the same name for the
+  this directory as first argument. It's advised you use the same name for the
   target and the subdirectory.
 
 * Everything that need a foo header must use
@@ -112,13 +115,17 @@ You will note that:
 This way, we are sure that the code we use can be re-distributed when the
 headers are installed, and that the path to find the headers while in the
 source tree does not differ from the paths to find the installed headers. This
-works because: - We have put foo.h in a foo subdirectory. - We have used
-qi_install_header(foo ... )
+works because:
+
+  * We have put foo.h in a foo subdirectory.
+
+  * We have used :ref:`qi_install_header` with the correct SUBFOLDER
+    argument
 
 * The test can use both the public API and the private implementation
 
-* Let’s assume you have two libraries, foo and bar, and a foobar executable
-  that need code from foo and bar.
+* Let's assume you have two libraries, foo and bar, and a foobar executable
+  that needs code from foo and bar.
 
 With the proposed layout, you have something like::
 
@@ -143,7 +150,7 @@ instead::
   foobar
       |__ foobar.cpp
 
-But, let’s assume you have
+But, let's assume you have
 
 .. code-block:: cmake
 
@@ -167,7 +174,9 @@ layout, you will have an error during link time, looking like::
 
 (because the include directory that was staged was always the same: lib)
 
-.. note:: For large libraries, also consider using qi_submodule
+.. note:: For large libraries, also consider using submodles. The
+   documentation can be found :ref:`here <using-submodules>`
 
-.. note:: The complete sources of the project can be found here
-   Warning, you will need GTest to compile the project
+.. FIXME
+  The complete sources of the project can be found here
+  Warning, you will need GTest to compile the project

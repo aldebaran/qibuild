@@ -12,7 +12,7 @@ Adding a test
 
 You first need to call enable_testing()
 
-Then you call add_test() with the first argument being the name of the test,
+Then you call :ref:`qi_add_test` with the first argument being the name of the test,
 the second being the name of the exeuctable.
 
 .. code-block:: cmake

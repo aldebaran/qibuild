@@ -7,33 +7,39 @@ the same sources.
 The problem
 -----------
 
-Let’s say you have a foo library, with some tests. You want to make the
+Let's say you have a foo library, with some tests. You want to make the
 compilation of the tests optional (because they depend on gtest, and you do not
 want to force your users to have gtest)
 
-A standard CMake way to do it would be::
+A standard CMake way to do it would be:
 
-  option(WITH_GTEST "Enable compilation of unit tests" OFF)
+.. code-block:: cmake
 
-  if(WITH_GTEST)
-    find_package(GTest Required)
-
-    ...
-
-    add_test(...)
-
-    ...
-
-  endif()
+   option(WITH_GTEST "Enable compilation of unit tests" OFF)
+   if(WITH_GTEST)
+     find_package(GTest Required)
+   # ...
+     add_test(...)
+   else()
+   # ...
+   endif()
 
 So far so good.
 
-But now you have to pass "-DWITH_GTEST=ON" to all your project when you
+But now you have to pass "-DWITH_GTEST=ON" to all your projects when you
 configure them.
 
-Note that ther is a shortcut for that in qibuild CMake API::
+Note that ther is a shortcut for that in qibuild CMake API using
+:ref:`qi_add_optional_package`:
+
+.. code-block:: cmake
 
   qi_add_optional_package(GTEST)
+  if(GTEST)
+  # ....
+  else()
+  # ...
+  endif()
 
 Here, if GTEST is not found, no error is raised, and WITH_GTEST is simply set
 to "OFF"...
@@ -43,25 +49,27 @@ But let’s assume you really need some flags
 Passing CMake flags with QiBuild
 --------------------------------
 
-There are several ways to pass CMake flags to a project managed by QiBuild, in ascending priority:
+There are several ways to pass CMake flags to a project managed by QiBuild, in
+ascending priority:
 
 * Just once
 
-  Simply call::
+Simply call::
 
-    qibuild configure foo -DWITH_GTEST=ON
+  qibuild configure foo -DWITH_GTEST=ON
 
-  For all the projects on your worktree
 
 * You may want to trigger some flags depending on the toolchain / configuration
   you use.
 
   For instance, if you want to pass -DWITH_FOO=OFF when you are using the
-  toolchain mingw32, you can write something like::
+  toolchain mingw32, you can write something like:
+
+.. code-block:: cmake
 
     set(WITH_FOO OFF CACHE INTERAL "" FORCE)
 
-  in .qi/mingw32.cmake
+in .qi/mingw32.cmake
 
 Using build configurations
 ---------------------------
@@ -69,7 +77,9 @@ Using build configurations
 QiBuild also lets you to have different settings depending on the toolchain you
 use.
 
-For instance, you could have on a windows machine::
+For instance, you could have on a windows machine:
+
+.. code-block:: ini
 
   [general]
   env.path = ....

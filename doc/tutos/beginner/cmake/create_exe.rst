@@ -7,7 +7,7 @@ framework
 Requirements
 ------------
 
-We assume you have followed the Getting Started tutorial.
+We assume you have followed the :ref:`getting-started` tutorial.
 
 Basic CMake
 -----------
@@ -33,7 +33,7 @@ Adding an executable
 --------------------
 
 
-To add an executable, simply call qi_create_bin. The first argument is the name
+To add an executable, simply call :ref:`qi_create_bin`. The first argument is the name
 of the executable, followed by the sources of the executable.
 
 The paths of the sources are relative to the path where the CMakeLists is

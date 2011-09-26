@@ -1,3 +1,5 @@
+.. _getting-started:
+
 Getting Started
 ===============
 
@@ -7,10 +9,11 @@ Requirements
 ------------
 
 Python 2.7 is the preferred version, but QiBuild should work fine on python
-2.6, too.
+2.6, too. Note that to prepare a possible conversion to python3, python2.5 is
+*not* supported.
 
 CMake version 2.8.3 is the preferred version, but you should not have any
-problem with CMake 2.6. On Windows, hoose to add CMake in your PATH
+problem with CMake 2.6. On Windows, choose to add CMake in your PATH
 
 On windows, to use scripts written in Python, you have to put C:\Python2.x and
 c:\Python2.x\Scripts in your %PATH%.
@@ -23,7 +26,9 @@ Linux, mac
 
 Simply run::
 
-  sudo ./install-qibuild.sh
+  ./install-qibuild.sh
+
+And make sure ~/.local/bin is in your PATH
 
 Windows
 +++++++
@@ -87,11 +92,17 @@ Configuring QiBuild for MinGW (and QtCreator)
 
 * Tell qibuild to use "MinGW Makefiles"
 
-Here’s what a complete .qi/build.cfg would look like to use MinGW with QtCreator::
+Here’s what a complete .qi/build.cfg would look like to use MinGW with QtCreator
+
+.. code-block:: ini
 
   [general]
   env.path = C:\MinGW\bin;
-  build.cmake_generator = "MinGW Makefiles"
+  cmake.generator = "MinGW Makefiles"
+
+
+.. warning:: qibuild never modify os.environ globally, so the executable you just built
+   won't run unless you have mingw's DLLs in your PATH.
 
 Configuring QiBuild for Visual Studio
 +++++++++++++++++++++++++++++++++++++
@@ -102,18 +113,23 @@ You will have to do several things for QiBuild to work with visual studio.
 
 * Make sure CMake uses the proper generator.
 
-Here’s what a complete .qi/build.cfg would look like to use Visual Studio 2008::
+Here’s what a complete .qi/build.cfg would look like to use Visual Studio 2008
+
+.. code-block:: ini
 
   [general]
-  build.cmake_generator = "Visual Studio 9 2008"
+  cmake.generator = "Visual Studio 9 2008"
 
-For command line addicts, you can also:
+For command line addicts (or people doing continuous integration who would like
+a better build output), you can also:
 
 * Use cmake_generator = "NMake Makefiles" and use qibuild from the Visual
   Studio command prompt.
 
 * Or, if you do not want to use the Visual Studio command prompt, you can
-  specify a .bat file to be ran by qibuild, like this::
+  specify a .bat file to be ran by qibuild, like this
+
+.. code-block:: ini
 
     [general]
     env.bat_file = c:\Program Files\Microsoft Visual Studio 9.0\VC\vcvarsall.bat
@@ -121,13 +137,6 @@ For command line addicts, you can also:
 
 (the location of the .bat file depends on your setup)
 
-This can also be useful if you want to have the same SDK layout whatever the
-platform you are using.
-
-For instance, with visual studio, debug builds will end up in
-build/sdk/DEBUG/foo_d.exe, but with NMake Makefiles, in:
-build-debug/sdk/bin/foo.exe, which is nice if you plan to use scripts for
-continuous testing or the like...
 
 Configuring QiBuild for MinGW with Msys
 +++++++++++++++++++++++++++++++++++++++
@@ -136,13 +145,15 @@ You will have to do several things for qibuild to work with MinGW.
 
 * Set PATH properly so that make.exe and gcc.exe are found
 
-* Make sure CMake uses the correct generator,
+* Make sure CMake uses the correct generator
 
-Here’s what a complete .qi/build.cfg would look like to use MinGW::
+Here’s what a complete .qi/build.cfg would look like to use MinGW
+
+.. code-block:: ini
 
   [general]
   env.path = C:\Mingw\bin;C:\MinGW\msys\1.0\bin;
-  build.cmake_generator = "Unix Makefiles"
+  cmake.generator = "Unix Makefiles"
 
 .. note:: here you have to setup a complete msys environnement before being
    able to use qibuild.

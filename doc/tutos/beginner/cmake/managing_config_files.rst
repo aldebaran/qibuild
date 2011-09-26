@@ -48,6 +48,9 @@ Going further
 Here we have just covered what the basics of what the QiBuild CMake framework
 can do for you.
 
-You will find comprehensive documentation in the QiBuild CMake API
+* You can continue with the :ref:`intermediate-tutorials`
+  and then the :ref:`advanced-tutorials`
+
+* You will find the list of all qi CMake functions in the :ref:`index <genindex>`
 
 

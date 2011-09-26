@@ -1,14 +1,17 @@
+.. _managing-deps:
+
 Managing dependencies between projects
 ======================================
-
 
 In this tutorial, you will learn how to manage dependencies between projects.
 
 Requirements
 ------------
 
-In this tutorial, we will assume you have a properly configured QiBuild
-worktree, and that you’ve managed to compile a basic project.
+We will assume you have a properly configured QiBuild
+worktree, and that you have managed to compile a basic project.
+
+Please make sure you have follow the :ref:`getting started tutorial <getting-started>`
 
 Overview
 --------
@@ -24,7 +27,8 @@ depends on the world library.
 
 It also contains a small test that simply tries to launch hello.
 
-The sources of this example can be found here
+.. FIXME!
+   The sources of this example can be found ...
 
 Extract the archive in your QiBuild worktree, you should end up with something
 looking like::
@@ -56,7 +60,7 @@ Configuring and building the hello project is as easy as::
 You can see that configuring hello caused the world project to be configured
 too, and that building hello also built the world project.
 
-On windows, the world DLL was copied right next to hello.exe, so running
+On Windows, the world DLL was copied right next to hello.exe, so running
 qibuild test hello just worked.
 
 If you are using visual studio, you can open hello.sln in
@@ -64,8 +68,8 @@ QI_WORK_TREE/hello/build-.../hello.sln, select "hello" as startup project, and
 start debugging hello_d.exe right away.
 
 .. warning:: If you try to compile hello in release, you’ll get an
-  error because "world" has not been compiled in release, so world.lib could not
-  found.
+  error because "world" has not been compiled in release, so world.lib could
+  not found.
 
 Simply run::
 

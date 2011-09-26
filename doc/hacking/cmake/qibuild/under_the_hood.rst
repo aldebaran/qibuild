@@ -64,6 +64,7 @@ projects: hello and world.
 The relevant lines of the CMakeLists.txt are:
 
 In world/CMakeLists
+
 .. code-block:: cmake
 
   qi_create_lib(world SRC world/world.h world/world.cpp)
@@ -207,9 +208,11 @@ We now we have a layout looking like::
 
 So we generate the following code to set ROOT_DIR
 
-get_filename_component(_cur_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
-set(_root_dir "${_cur_dir}/../../../")
-get_filename_component(ROOT_DIR ${_root_dir} ABSOLUTE)
+.. code-block:: cmake
+
+  get_filename_component(_cur_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
+  set(_root_dir "${_cur_dir}/../../../")
+  get_filename_component(ROOT_DIR ${_root_dir} ABSOLUTE)
 
 Calling qi_stage_lib
 --------------------
@@ -234,7 +237,7 @@ qi_stage_lib on something that is not a target.
 
 Let’s go through the variables one by one:
 
-**<PREFIX>_INCLUDE_DIRS**
+*<PREFIX>_INCLUDE_DIRS*
    only used in the sdk file. During the configuration of hello, we will simply
    call +include_directories(WORLD_INCLUDE_DIRS)
 
@@ -244,7 +247,7 @@ Let’s go through the variables one by one:
 
   get_directory_property(_inc_dirs INCLUDE_DIRECTORIES)
 
-**<PREFIX>_PATH_SUFFIXES** :
+*<PREFIX>_PATH_SUFFIXES*
   only used in the redistributable file. The file will contain something like:
 
 .. code-block:: cmake
@@ -271,7 +274,7 @@ The standard CMake way to deal with this is to call
 
 This will never be guessed, because it’s too specific.
 
-**<PREFIX>_DEFINITIONS**
+*<PREFIX>_DEFINITIONS*
   used by both config files. During the configuration of hello, we will simply
   call
 
@@ -290,7 +293,7 @@ This will never been guessed. We could have done something like:
 
 But most of the time you don’t have to propagate the compile flags everywhere.
 
-**<PREFIX>_DEPENDS**
+*<PREFIX>_DEPENDS*
   used by both config files. If world depends on an thirdparty library (boost
   for instance), we want to make sure that whenever we use qi_use_lib(hello
   world), we also add the boost include directories.
@@ -303,7 +306,7 @@ always propagate the dependencies by default.
 This is guessed using the previous call to qi_use_lib. In our example, after
 using qi_use_lib(world boost), WORLD_DEPENDS contains "boost".
 
-**<PREFIX>_LIBRARIES**
+*<PREFIX>_LIBRARIES*
   used by both config files. In this case the SDK and the redistributable
   config file do not use the same code.
 
@@ -330,7 +333,7 @@ When using qi_use_lib(foo bar), we will always call
 
 .. code-block:: cmake
 
-  find_package(bar).
+  find_package(bar)
 
 But we have several cases here:
 

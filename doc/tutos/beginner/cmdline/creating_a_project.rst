@@ -7,9 +7,10 @@ Navigate to your QI_WORK_TREE and Enter::
 
   qibuild create foo
 
-(remember, for this to work on windows, you should have:
-* run install-qibuild.bat
-* put C:\Python27 and c:\Python\Scripts in your %PATH%)
+Remember, for this to work on windows, you should have:
+
+* Run install-qibuild.bat
+* Put C:\Python27 and c:\Python\Scripts in your %PATH%
 
 This will create a new project in QI_WORK_TREE/foo.
 
@@ -34,13 +35,14 @@ Let’s have a look at what has been generated::
   the foo project.
 
 If you already have source code somewhere, all you have to do is to:
+
 *  create a qibuild.manifest looking like::
 
     [project foo]
 
 * copy-paste the qibuild.cmake file from
   qibuild/cmake/qibuild/templates/qibuild.cmake and make sure to include it in
-  you root CMakeLists
+  you root CMakeLists.txt
 
 * (optional, if you want to use qi\_ functions...): include 'qibuild/cmake'
   somewhere
@@ -52,3 +54,15 @@ You cand do this by running::
 .. note:: 'qibuild convert' will check that your root CMakeLists is correct,
    please read the messages carefully
 
+
+In any case, the root CMakeLists should look like
+
+.. code-block:: cmake
+
+  cmake_minimum_required(VERSION 2.8)
+  project(my_project)
+  include("qibuild.cmake")
+
+The 'project()' call is mandatory for qibuild to work when using
+Visual Studio, the include('qibuild.cmake') call must be right
+after 'project()', otherwize you can have trouble when cross-compiling.

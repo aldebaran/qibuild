@@ -1,5 +1,7 @@
-Intermediate
-============
+.. _intermediate-tutorials:
+
+Intermediate tutorials
+======================
 
 .. toctree::
     :maxdepth: 1

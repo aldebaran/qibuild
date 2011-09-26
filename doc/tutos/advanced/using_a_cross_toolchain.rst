@@ -1,9 +1,14 @@
 Using a cross toolchain
 =======================
 
+.. FIXME: This probably not longer works:/
+   Probably the best way would be
+   qibuild use-toolchain cross-geode /path/to/ctc.tar.gz
+   qibuild use-toolchain linux32     /path/to/sdk.tar.gz
+
 Using a cross toolchain is not very different from using a toolchain.
 
-Here is what Aldebaran’s cross toolchains look like
+Here is what Aldebaran's cross toolchains look like
 
 There are three main parts:
 
@@ -14,7 +19,7 @@ There are three main parts:
 
 * A tooclhain.cmake file.
 
-Here is how the file hiearchy looks like::
+Here is what the file hiearchy looks like::
 
   ctc
   |__ cross
@@ -31,8 +36,8 @@ Here is how the file hiearchy looks like::
   toolchain.cmake
 
 The purpose of toolchain.cmake file is to tell cmake where the cross-compiler
-is (we do not want to use the host’s compiler), and to tell cmake that it
-should not look for libraries in the host system (say, find boost in
+is (we do not want to use the host compiler by definition), and to tell cmake
+that it should not look for libraries in the host system (say, find boost in
 /usr/include/boost), but in the syroot of the cross toolchain (ie we want to
 find boost in ctc/sysroot/usr/include/boost)
 
@@ -51,9 +56,7 @@ Basically, the toolchain_file looks like this:
 
 So how do you configure qibuild to use the cross toolchain ?
 
-Part of the answer is in the Manaing build configurations tutorial.
-
-Here’s what you should do :
+Here's what you should do :
 
 Create a .qi/build-cross.cfg looking like::
 

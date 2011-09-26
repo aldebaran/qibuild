@@ -1,5 +1,7 @@
-Beginner
-========
+.. _beginner-tutorials:
+
+Beginner tutorials
+==================
 
 QiBuild command line tool
 -------------------------

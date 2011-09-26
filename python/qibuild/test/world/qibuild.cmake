@@ -6,16 +6,23 @@
 # This file is part of the qibuild project    #
 ###############################################
 
-set(QIBUILD_BOOTSTRAP_VERSION 9)
+set(QIBUILD_BOOTSTRAP_VERSION 10)
 
-# Someone used qibuild and generated a dependencies.cmake
-# file (for the dependencies and where to find qibuild/cmake file),
-# so just use it.
 if(EXISTS ${CMAKE_BINARY_DIR}/dependencies.cmake)
   include(${CMAKE_BINARY_DIR}/dependencies.cmake)
 endif()
 
-# Someone called cmake with a toolchain file that is
-# able to find qibuild/cmake code, so just include it.
-# Else, fail loudly.
-include(qibuild/general)
+include(qibuild/general
+  OPTIONAL
+  RESULT_VARIABLE _qibuild_found)
+
+if(NOT _qibuild_found)
+  message(FATAL_ERROR "
+Could not find the qibuild CMake framework
+    include(qibuild/general)
+did not work
+If you are using qibuild command line tool, please check your installation
+If you are cross-compiling, make sure you are using a correct toolchain.cmake file.
+")
+
+endif()

@@ -32,7 +32,7 @@ Note: to use a toolchain, you must pass the ``-c`` option to your
 ``qibuild`` action, or set a default toolchain in the configuration, like
 this::
 
-  [general build]
+  [general]
   config = NAME
 
 

@@ -26,4 +26,10 @@ To install the files, simply use
   qi_install_data(share/foo/foo.data SUBFOLDER foo)
 
 Please note: how to make sure that the foo executable is able to find the
-foo.data file is out of the scope of this documentation
+foo.data file is out of the scope of this documentation.
+
+A more in-depth tutorial on installation is availabe here:
+:ref:`cmake-installing`
+
+
+

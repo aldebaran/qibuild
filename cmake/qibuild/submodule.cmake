@@ -1,6 +1,10 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-#! Using submodules
+#
+#!
+# .. _using-submodules:
+#
+# Using submodules
 # =================
 
 #!

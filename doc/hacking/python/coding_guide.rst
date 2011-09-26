@@ -14,7 +14,7 @@ General
   and when it does not hurt readability, and below *100* characters
   at any case.
 
-* Indentation are *four spaces*
+* Indentation is made of *four spaces*
 
 * No trailing whitespace are allowed.
 
@@ -120,7 +120,7 @@ foo/__init__.py::
 File Paths
 ----------
 
-* *Never* using strings to manipulate file paths. Use os.path.join
+* **Never** use strings to manipulate file paths. Use os.path.join
   which will handle all the nasty stuff for you::
 
     # BAD : you are doomed if you ever want to
@@ -130,7 +130,16 @@ File Paths
     # OK:
     bar_path = os.path.join(spam_path, "bar")
 
-* *Always* convert files coming from the user to native, absolute path::
+* When using os.path.join(), use one argement per file part::
+
+    # BAD: you can end up with an ugly path like c:\path\to/foo/bar
+    my_path = os.path.join(base_dir, "foo/bar")
+
+    # OK:
+    my_path = os.path.join(base_dir, "foo", "bar")
+
+
+* **Always** convert files coming from the user to native, absolute path::
 
     user_input = ...
     my_path = qibuild.sh.to_native_path(user_input)
@@ -161,23 +170,7 @@ Please make sure to **never** modify `os.environ`
 Remember that `os.environ` is in fact a huge global variable, and we all know
 it's a bad idea to use global variables ...
 
-Instead, use `qibuild.envsetter.EnvSetter` which allows you to run
-commands with a controller environment, without modifying os.environ.
-
-A small example::
-
-  import qibuild
-
-  envsetter = qibuild.envsetter.EnvSetter()
-  envsetter.append_to_path(r"c:\Program Files\Foobar\bin")
-  build_env = envsetter.get_build_env()
-  cmd = ["foobar", "/spam:eggs"]
-  qibuild.command.call(cmd, env=build_env)
-
-This way, `foobar.exe` is found but we never had to touch `os.environ`
-
-
-Note: using EnvSetter is sometimes not necessary, for instance::
+Instead, use a copy of os.environ, for instance::
 
   import qibuild
 
@@ -190,6 +183,19 @@ Note: using EnvSetter is sometimes not necessary, for instance::
   cmd = ["foobar"]
   qibuild.command.call(foobar, env=cmd_env)
 
+
+In more complex cases, especially when handling the
+%PATH% environnment variable, you can use `qibuild.envsetter.EnvSetter`.
+
+A small example::
+
+  import qibuild
+
+  envsetter = qibuild.envsetter.EnvSetter()
+  envsetter.append_to_path(r"c:\Program Files\Foobar\bin")
+  build_env = envsetter.get_build_env()
+  cmd = ["foobar", "/spam:eggs"]
+  qibuild.command.call(cmd, env=build_env)
 
 
 Logging
@@ -234,17 +240,18 @@ Please do not overlook those. Often, when writing code you do something like::
      log.error("Error occured: %s", e)
 
 
-Because you are in an hurry, and just are thinking "Great, I've handled the excpetion,
-now I can go back to write some code ...)
+Because you are in an hurry, and just are thinking "Great, I've handled the
+excpetion, now I can go back to write some code ...)
 
 The problem is: the end user does not care you are glad you've handled the
 exception, he needs to **understand** what just happens.
 
-So you need to take a step back, think a litttle. "Ok, what path would lead to this
-exception? What was the end user probably doing? How can I help him understand what
-went wrong, and how he can fix this?"
+So you need to take a step back, think a litttle. "Ok, what path would lead to
+this exception? What was the end user probably doing? How can I help him
+understand what went wrong, and how he can fix this?"
 
-So here's a short list of do's and don'ts when you are writing your error message.
+So here's a short list of do's and don'ts when you are writing your error
+message.
 
 * Wording sould look like::
 
@@ -260,9 +267,10 @@ So here's a short list of do's and don'ts when you are writing your error messag
 
 
 * Put filenames between quotes. For instance, if you are using a path given
-  via a GUI, or via a prompt, it's possible that you forgot to strip it before using
-  it, thus trying to create '/path/to/foo ' or 'path/to/foo\n'.
-  Unless you are putting the filename between quotes, this kind of error is hard to find.
+  via a GUI, or via a prompt, it's possible that you forgot to strip it before
+  using it, thus trying to create '/path/to/foo ' or 'path/to/foo\n'.
+  Unless you are putting the filename between quotes, this kind of error is hard
+  to find.
 
 
 * Put commands to use like this::
@@ -311,7 +319,8 @@ So here's a short list of do's and don'ts when you are writing your error messag
 
 * Suggest a solution
 
-  This is the harder part, but it's nice if the user can figure out what to do next.
+  This is the harder part, but it's nice if the user can figure out what to do
+  next.
 
   Here are a few examples::
 

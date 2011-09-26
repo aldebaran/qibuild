@@ -5,3 +5,4 @@ QiBuild CMake framework
    :maxdepth: 2
 
    api.rst
+   installing.rst

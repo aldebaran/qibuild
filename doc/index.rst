@@ -27,7 +27,8 @@ QiBuild is composed of two parts:
 * the QiBuild CMake framework, that simplifies authoring CMakeLists.txt.
 
 * the qibuild/qitoolchain command line tools, that help build projects while
-  taking dependencies into account.
+  taking dependencies into account and generate re-destributable binary
+  packages
 
 References
 ----------

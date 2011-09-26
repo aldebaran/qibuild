@@ -277,7 +277,7 @@ The rosbuild.cmake files then calls something like
   function(rosbuild_add_executable)
 
     # re-parse arguments
-    ...
+    # ...
     qi_create_bin(_args)
 
   endfunction()

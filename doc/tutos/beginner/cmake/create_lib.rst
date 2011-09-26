@@ -4,7 +4,7 @@ Creating a library
 This tutorial only convers the most simple way of writing a library.
 
 If you are working in a large project, or wish to re-distribute your library,
-you may want to read a more in-depth tutorial.
+you may want to read this more in-depth tutorial: :ref:`how-to-write-a-library`
 
 Requirements
 ------------
@@ -26,12 +26,18 @@ Add the following files into your project:
 
 .. code-block:: cpp
 
-  answer.h
+  // answer.h
 
-   /// Get the meaning of life
-   int get_answer();
+  ///
+  /// Get the meaning of life
+  ///
+  int get_answer();
 
-  answer.cpp
+.. code-block:: cpp
+
+  // answer.cpp
+
+  #include "answer.h"
 
   int get_answer()
   {
@@ -78,7 +84,7 @@ Add the following line to the CMakeLists.txt:
 Creating the answer library
 +++++++++++++++++++++++++++
 
-Add a call to qi_create_lib:
+Add a call to :ref:`qi_create_lib`:
 
 .. code-block:: cmake
 
@@ -92,13 +98,13 @@ It also makes the answer library usable by other targets.
 Link the foo executable with the answer library
 +++++++++++++++++++++++++++++++++++++++++++++++
 
-Add a call to qi_use_lib :
+Add a call to :ref:`qi_use_lib`:
 
 .. code-block:: cmake
 
   qi_use_lib(foo answer)
 
-Make sure you call this after the call to qi_create_lib - you need to create a
+Make sure you call this after the call to :ref:`qi_create_lib` - you need to create a
 library before using it.
 
 This call does several things:
@@ -117,13 +123,16 @@ A few notes:
 * On windows, the library will be found in build/sdk/lib/answer_d.lib if
   built in debug, or in build/sdk/lib/answer.lib if built in release.
 
-On UNIX, the library will be found in builds/sdk/lib/libanswer.so
+* On linux, the library will be found in build/sdk/lib/libanswer.so
+
+* On mac, the library will be fon in build/sdk/lib/libanswer.dylib
 
 .. note:: On UNIX, you can force the creation of static library by using
    -DBUILD_SHARED_LIBS=OFF
 
 On Windows, the sources need to be patched to use libanswer as a shared
 library, but this out of the scope of this documentation.
+
 
 Conclusion
 ----------

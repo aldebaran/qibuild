@@ -28,7 +28,7 @@ If you want to build in release, use::
 
   qibuild configure --release
 
-If you are not using visual studio, you will see that qibuild chose an other
+If you are not using Visual Studio, you will see that qibuild chose an other
 build directory for you, ending with -release-.
 
 Passing CMake flags

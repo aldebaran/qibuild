@@ -114,21 +114,22 @@ class TocConfigStore:
         configuration looks like:
 
           [general]
-          build.cmake.flags = FOO=BAR
+          cmake.flags = FOO=BAR
           config = mingw32
 
           [config vs2010]
-          build.cmake.generator = 'Visual Studio 10'
+          cmake.generator = 'Visual Studio 10'
 
           [config mingw32]
-          build.cmake.generator = 'MinGW Makefiles'
+          cmake.generator = 'MinGW Makefiles'
           env.path = c:\MinGW\bin;
 
-        and self.config = 'vs2010'
+        if self.config = 'vs2010' then
         self.get('cmake.generator')
         returns 'Visual Studio 10',
 
-        whereas
+        whereas if config is None, default
+        config is using from [general] section, and
         self.get('cmake.flags')
         returns 'FOO=BAR'
 

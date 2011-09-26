@@ -6,14 +6,19 @@ Requirements
 
 This tutorial assumes that you already have a CMake-based project.
 
-We will see how QiBuild can help you writing less code !
+We will see how QiBuild can help you writing less code, while staying
+close to the "official" CMake recommendations when dealing with the
+'Find<>.cmake' of '<>-config.cmake' files.
 
-In this tutorial, we will use a simple project called foobar
+.. FIXME: add relevant link in cmake wiki
 
-It’s pure CMake code, there is a foo library, and a bar executable linking with
-the foo library.
+In this tutorial, we will use a simple project called foobar.
 
-The sources of the foobar project can be found here
+It is pure CMake code, there is a foo library, and a bar executable linking
+with the foo library.
+
+.. FIMXE!
+   The sources of the foobar project can be found here
 
 Extract the archive in you QiBuild worktree, you should end up with something
 like::
@@ -34,7 +39,7 @@ like::
 A standard CMake project
 ------------------------
 
-The standard CMakeLists.txt for such a project look like this
+The standard CMakeLists.txt for such a project looks like this
 
 .. code-block:: cmake
 
@@ -82,10 +87,11 @@ A few CMake limitations
 
 * You have to specify install rules for every target
 
-* If you move the bar library to an other directory, you’ll have to fix foo's
+* If you move the bar library to an other directory, you will have to fix foo's
   CMakeLists
 
-* You can’t use foobar as a subdirectory of a new project (because of the use of CMAKE_SOURCE_DIR)
+* You cannot use foobar as a subdirectory of a new project (because of the use
+  of CMAKE_SOURCE_DIR)
 
 * You have a standard layout when you install your targets::
 
@@ -142,7 +148,7 @@ cannot use them...
 
 Neither libbar or bar.h can be found by CMake: bar.h is hidden somewhere in the
 sources of foobar, and libbar.a somewhere in the build directory of foobar, so
-it’s impossible to use the carefully home-made bar-config.cmake
+it is impossible to use the carefully home-made bar-config.cmake
 
 QiBuild to the rescue!
 ----------------------
@@ -154,8 +160,8 @@ projects.
 Preparation
 +++++++++++
 
-Add a qibuild.cmake at the root of the project and have it included right after
-the project() line.
+Add a qibuild.cmake file at the root of the project and have it included right
+after the project() line.
 
 The qibuild.cmake file can be found in
 qibuild/cmake/qibuild/templates/qibuild.cmake
@@ -171,27 +177,27 @@ CMakeLists.txt to have:
 
 We wanted to have this explicit step.
 
-If you have a look at the qibuild.cmake file, you can see that there is a
-bootstrap() function that will be called if there is no dependencies.cmake file
-in the build directory.
+The 'qibuild.cmake' file does 3 things:
 
-(Since this file depends on your qibuild setup, it’s not be put in your
-sources, unless you are sure you’ll never share you sources...)
+* It includes the 'dependencies.cmake' found in the build dir
+  if it exists
 
-This bootstrap() function needs you to install qibuild, but you can also manage
-the dependencies.cmake file yourself
+* It includes qibuild/general.cmake to given access
+  to all the qibuild CMake functions
 
-Here’s what it should look like
+* It procudes a nice error message if this step fails.
+
+So here you should write a dependencies.cmake file in your build
+dir looking like
 
 .. code-block:: cmake
 
-  set(CMAKE_MODULE_PATH "/path/to/qi/qibuild/cmake")
+   list(APPEND CMAKE_MODULE_PATH
+    "/path/to/qibuild"
+  )
 
-This enables you to write include(qibuild/general), and find the
-qibuild/general.cmake file in /path/to/qi/qibuild/cmake/qibuild/general.cmake
 
-This file includes every required files, so you have access to all qi\_
-functions.
+Or just use `qibuid configure` which will do the job for you.
 
 Install rules
 ++++++++++++++
@@ -203,7 +209,7 @@ Replace the add_library by qi_create_lib, and remove the install rules:
   qi_create_lib(bar
     SRC bar/bar.h bar/bar.cpp)
 
-  qi_install_header(bar bar/bar.h)
+  qi_install_header(bar HEADERS bar/bar.h SUBFOLDER bar)
 
 You can see that:
 
@@ -215,6 +221,10 @@ You can see that:
   choose the same folder name to put you headers inside your source tree, and
   once your header is installed. (here, the "bar" argument of qi_install_header
   matches the location of bar.h: bar/bar.h)
+  The first argument of qi_install_header must be the name of an existing
+  library. This will let you have 'internal libraries' if you need it,
+  but this is an other topic.
+
 
 * A sdk directory has been created, with libbar in skd/lib
 
@@ -240,7 +250,7 @@ So what happened?
 Two versions of the foo-config.cmake file have been generated:
 
 * The first one is in build/cmake/sdk/bar-config.cmake : this one is supposed
-  to be installed. You can see it’s only using relative paths to find the
+  to be installed. You can see it is only using relative paths to find the
   library.
 
 * The second one is in build/sdk/cmake/bar-config.cmake : this one is supposed
@@ -249,8 +259,9 @@ Two versions of the foo-config.cmake file have been generated:
 So, since the layout in build/sdk is the same as the layout when the library is
 installed, and since the foo-config file has been automatically generated
 (along with the install rules), it makes no difference whether you want to find
-the bar library you’ve just built in the foobar project, using the bar library
-you’ve just built in a other project, or using the installed bar library.
+the bar library you have just built in the foobar project, using the bar
+library you have just built in a other project, or using the installed bar
+library.
 
 Finding the bar-config.cmake in foobar/build/skd from an other project is as
 easy as:
@@ -264,15 +275,20 @@ Finding the bar-config.cmake once bar has been installed in as easy as:
 .. code-block:: cmake
 
   # No QiBuild required: the installed bar-config.cmake contains
-  # no qibuild-sepecif code:
+  # no qibuild-sepecific code:
 
   find_package(bar)
 
-  include_directories(...)
-  ...
+  include_directories(${BAR_INCLUDE_DIRS})
+  add_library(foo)
+  target_link_libraries(${BAR_LIBRARIES})
 
   # Or, still using qibuild:
   qi_use_lib(... bar)
+
+
+.. note:: We always generate variables in the form <PREFIX>_INCLUDE_DIRS
+   and <PREFIX>_LIBRARIES (all upper case, no version number, plural form)
 
 Conclusion
 ----------
@@ -324,9 +340,9 @@ Less code, so many features !
 
   qi_use_lib(foo bar)
 
-* You did not have to write any install rule
+* You did not have to write any install rule.
 
-* You did not have to write any bar-config.cmake
+* You did not have to write any bar-config.cmake.
 
 * You can build SDK packages for other people to use, even on Visual Studio,
   without handling all the annoying cross-platform stuff (for instance, on
