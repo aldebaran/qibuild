@@ -8,7 +8,7 @@
 # This file is part of the qiBuild project    #
 ###############################################
 
-set(BOOTSTRAP_VERSION 5)
+set(BOOTSTRAP_VERSION 6)
 
 #we use t00lchain, when we have a toolchain_file and t00chain_dir is set
 if (CMAKE_TOOLCHAIN_FILE AND TOOLCHAIN_DIR)
@@ -19,6 +19,6 @@ endif()
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake)
   set(QI_T001CHAIN_COMPAT   ON   CACHE INTERNAL "" FORCE)
-  set(QI_NO_WARN_DEPRECATED TRUE CACHE INTERNAL "" FORCE)
+  set(QI_WARN_DEPRECATED    OFF  CACHE INTERNAL "" FORCE)
   include(${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake)
 endif()

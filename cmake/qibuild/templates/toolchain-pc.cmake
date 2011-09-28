@@ -23,7 +23,7 @@ include(qibuild/general)
 set(TOOLCHAIN_DIR "" CACHE INTERNAL "" FORCE)
 set(T001CHAIN_DIR "${_SDK_ROOT_DIR}/share/cmake/qibuild/compat/t001chain/" CACHE INTERNAL "" FORCE)
 include(qibuild/compat/compat)
-set(QI_NO_WARN_DEPRECATED TRUE CACHE INTERNAL "" FORCE)
+set(QI_WARN_DEPRECATED OFF CACHE INTERNAL "" FORCE)
 
 # Force 32 bits compilation even if we are on a
 # 64 bits OS:

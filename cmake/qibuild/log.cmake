@@ -10,7 +10,7 @@
 # If you want the debug output call cmake with a DEBUG=1 environment variable set.
 # You can combine DEBUG and VERBOSE.
 #
-# You can also trigger deprectated warning messages with QI_NO_WARN_DEPRECATED
+# You can also trigger deprectated warning messages with QI_WARN_DEPRECATED
 
 #! display a debug message
 # To enable debug output set DEBUG=1 in your environment.
@@ -45,7 +45,12 @@ endfunction()
 #! display a deprecated message
 # \argn: a message
 function(qi_deprecated)
-  if(NOT QI_NO_WARN_DEPRECATED)
+  set(_warn OFF)
+  if(QI_WARN_DEPRECATED)
+    set(_warn ON)
+  endif()
+
+  if(_warn)
     message(WARNING "DEPRECATED: ${ARGN}")
   endif()
 endfunction()
