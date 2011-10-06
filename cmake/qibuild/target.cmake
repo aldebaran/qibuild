@@ -133,12 +133,8 @@ function(qi_create_script name source)
   qi_debug("qi_create_script(${name})")
   cmake_parse_arguments(ARG "NO_INSTALL" "SUBFOLDER" "" ${ARGN})
 
-  _qi_copy_with_depend("${source}" "${_SDK_BIN}/${ARG_SUBFOLDER}/${name}")
-  qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
-  qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
-
-  #make install rules
-  if (NOT ARG_NO_INSTALL)
+  configure_file("${source}" "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}")
+  if(NOT ARG_NO_INSTALL)
     install(PROGRAMS    "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}"
             COMPONENT   binary
             DESTINATION "${QI_SDK_BIN}/${ARG_SUBFOLDER}")
