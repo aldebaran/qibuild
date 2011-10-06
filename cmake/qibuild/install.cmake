@@ -36,7 +36,6 @@ function(qi_install_header target)
     qi_error("No headers specified")
   endif()
 
-  _qi_check_is_target(${target})
   # Handle ${target}_INTERNAL
   set(_should_install TRUE)
   if(${${target}_INTERNAL})
