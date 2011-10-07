@@ -36,7 +36,7 @@ def do(args):
             pass
         if not active_config:
             mess  = "Could not find which config to use.\n"
-            mess  = "(not it a work tree or not default config in "
+            mess  = "(not in a work tree or not default config in "
             mess += "current worktree configuration)\n"
             mess += "Please specify a configuration with -c \n"
             raise Exception(mess)
