@@ -89,9 +89,9 @@ function(install_header _staged_name)
   Old:
     install_header(FOO SUBFOLDER foo foo.h)
   New:
-    qi_install_header(foo HEADERS foo.h SUBFOLDER foo)
+    qi_install_header(foo.h SUBFOLDER foo)
     or:
-    qi_install_header(foo HEADERS foo/foo.h KEEP_RELATIVE_PATHS)
+    qi_install_header(foo/foo.h KEEP_RELATIVE_PATHS)
   "
   )
   string(TOLOWER ${_staged_name} _targetname)
@@ -109,7 +109,7 @@ function(install_header _staged_name)
     set(${_staged_name}_PATH_SUFFIXES "${${_staged_name}_PATH_SUFFIXES}" "${ARG_SUBFOLDER}" CACHE INTERNAL "" FORCE)
   endif()
 
-  qi_install_header(${_targetname} HEADERS ${ARG_UNPARSED_ARGUMENTS} SUBFOLDER ${ARG_SUBFOLDER})
+  qi_install_header(${ARG_UNPARSED_ARGUMENTS} SUBFOLDER ${ARG_SUBFOLDER})
 endfunction()
 
 function(install_data subfolder)

@@ -19,8 +19,6 @@ endfunction()
 #! Install application headers.
 # The destination will be <prefix>/include/
 #
-# \arg target            The library corresponding to these headers. The library
-#                        must already exist. Necessary if you want to use internal libraries.
 # \argn:                 A list of files : directories and globs on files are accepted.
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
 # \param: IF             Condition that should be verified for the install rules
@@ -29,35 +27,8 @@ endfunction()
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
 # \group: HEADERS        Required: the list of headers to install
-function(qi_install_header target)
-  cmake_parse_arguments(ARG  "KEEP_RELATIVE_PATHS" "SUBFOLDER"  "HEADERS" ${ARGN})
-  set(_headers ${ARG_HEADERS} ${ARG_UNPARSED_ARGUMENTS})
-  if(NOT _headers)
-    qi_error("No headers specified")
-  endif()
-
-  # Handle ${target}_INTERNAL
-  set(_should_install TRUE)
-  if(${${target}_INTERNAL})
-    set(_should_install FALSE)
-  endif()
-  if(${QI_INSTALL_INTERNAL})
-    set(_should_install TRUE)
-  endif()
-
-  set(_relative_flag "")
-  if(${ARG_KEEP_RELATIVE_PATHS})
-    set(_relative_flag KEEP_RELATIVE_PATHS)
-  endif()
-
-  if(_should_install)
-    _qi_install_internal(${_headers}
-      COMPONENT header
-      DESTINATION ${QI_SDK_INCLUDE}
-      SUBFOLDER ${ARG_SUBFOLDER}
-      ${_relative_flag}
-    )
-  endif()
+function(qi_install_header)
+  _qi_install_internal(${ARGN} COMPONENT headers DESTINATION ${QI_SDK_INCLUDE})
 endfunction()
 
 
