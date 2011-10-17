@@ -26,61 +26,47 @@ KNOWN_CONFIGS = [
 def configure_parser(parser):
     """Configure parse for this action """
     qibuild.worktree.work_tree_parser(parser)
-    parser.add_argument("--tc-file", metavar="TOOLCHAIN_FILE",
-        help="Path to the toolchain file.\n"
-             "Mandatory if no name was given")
+    parser.add_argument("feed", metavar="TOOLCHAIN FEED",
+        help="Optional: path to the toolchain configuration file.\n"
+             "May be a local file or an url")
     parser.add_argument("--name",
         help="Name of the toolchain to create.\n"
-             "Mandatory if no toolchain file was given")
-    parser.add_argument("--cmake-generator",
-        help="Name of the CMake generator to use.\n"
-             "Guessed from the toolchain name")
+             "Mandatory if no toolchain configuration file was given")
     parser.add_argument("--default",
         help="Use this toolchain by default in this worktree",
         action="store_true")
-
-def guess_tc_name(tc_file):
-    """ Guess the name of the toolchain from the toolchain file
-
-    """
-    root_dir = os.path.dirname(tc_file)
-    basename = os.path.basename(root_dir)
-    for config in KNOWN_CONFIGS:
-        if config in basename:
-            return config
-    mess  = "Could not guess config name from toolchain file %s\n" % tc_file
-    mess += "Used base directory: %s\n" % basename
-    mess += "But this directory does not contain any know config.\n"
-    mess += "Known configs are: %s\n" % ", ".join(KNOWN_CONFIGS)
-
-def guess_generator(tc_name):
-    """ Guess the CMake generator from the config name
-
-    """
-    if tc_name == "win32-vs2010":
-        return 'Visual Studio 10'
-    elif tc_name == "win32-vs2008":
-        return 'Visual Studio 9 2008'
-    return 'Unix Makefiles'
 
 def do(args):
     """Main entry point
 
     """
-    tc_file = args.tc_file
-    if tc_file:
-        tc_file = qibuild.sh.to_native_path(tc_file)
+    feed = args.feed
     tc_name = args.name
-    if not tc_name and not tc_file:
-        raise Exception("Please use at least --tc-file or --name")
+    if not tc_name and not feed:
+        raise Exception("Please use at specify a feed or use --name")
+
+    feed_path = qibuild.sh.to_native_path(feed)
+    if os.path.exists(feed_path):
+        tc_cfg = qibuild.configstore.ConfigStore()
+        tc_cfg.read(feed_path)
+        local = True
+    else:
+        tc_cfg = qitoolchain.remote.get_remote_config(feed)
+        local = False
+
 
     if not tc_name:
-        tc_name = guess_tc_name(tc_file)
+        tc_name = tc_cfg.get("toolchain.name")
 
-    cmake_generator = args.cmake_generator
 
-    if not cmake_generator:
-        cmake_generator = guess_generator(tc_name)
+    tc_file = None
+    if local:
+        tc_root = os.path.dirname(feed_path)
+        tc_file = tc_cfg.get("toolchain.toolchain_file")
+        if tc_file:
+            tc_file = os.path.join(tc_root, tc_file)
+    else:
+        tc_file = None
 
     toc_error = None
     toc = None
@@ -94,10 +80,14 @@ def do(args):
         mess += toc_error
         raise Exception(mess)
 
-    qitoolchain.set_tc_config(tc_name, "file", tc_file)
-
-    if toc:
-        toc.update_config('cmake.generator', cmake_generator, config=tc_name)
+    cmake_generator = tc_cfg.get("toolchain.cmake.generator")
+    cmake_flags     = tc_cfg.get("toolchain.cmake.flags")
+    if tc_file:
+        qitoolchain.set_tc_config(tc_name, "file", tc_file)
+    if cmake_generator:
+        qitoolchain.set_tc_config(tc_name, "cmake.generator", cmake_generator)
+    if cmake_flags:
+        qitoolchain.set_tc_config(tc_name, "cmake.flags", cmake_flags)
 
     if args.default:
         toc.update_config("config", tc_name)

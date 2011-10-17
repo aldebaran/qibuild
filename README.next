@@ -12,13 +12,13 @@ qidev update-toolchain -> qidev get-toolchain <name> [<version>]
 
 
 # because we want our clients to use our toolchains in 1.14:
-qidev init -> qitoolchain init [toolchain_file_path]
-#  Guess cmake_generator, name and whether we are cross-compiling
-#  from the archive name. Of course, let user use --name --cross
-#  if he wants to.
-#  If toolchain_file_path is not given, create an empty toolchain.
-#  Useful only if you do NOT want to make alcommon-dep projects,
-#  of if you are in Aldebaran.
+qidev init -> qitoolchain init [feed.cfg]
+#  Read cmake_generator, name, cmake flags, and whether we need a toolchain file
+#  from the config file.
+#  Also, add packages if we need to.
+#  If feed.cfg is not given, create an empty toolchain.
+qidev update-toolchain -> qitoolchain update
+# Getting packages from config :)
 
 
 # because it's no easy to understand what it does:
