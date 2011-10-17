@@ -82,16 +82,26 @@ def do(args):
     if not cmake_generator:
         cmake_generator = guess_generator(tc_name)
 
+    toc_error = None
+    toc = None
+    try:
+        toc = qibuild.toc.toc_open(args.work_tree)
+    except qibuild.toc.TocException, e:
+        toc_error = e
+
+    if args.default and not toc:
+        mess = "You need to be in a toc worktree to use --default\n"
+        mess += toc_error
+        raise Exception(mess)
+
     qitoolchain.set_tc_config(tc_name, "file", tc_file)
 
-    toc = qibuild.toc.toc_open(args.work_tree)
-    toc.update_config('cmake.generator', cmake_generator, config=tc_name)
-
+    if toc:
+        toc.update_config('cmake.generator', cmake_generator, config=tc_name)
 
     if args.default:
         toc.update_config("config", tc_name)
         LOGGER.info("Now using toolchain %s by default", tc_name)
-
     else:
         mess = """Now try using:
     qibuild configure -c {tc_name}
