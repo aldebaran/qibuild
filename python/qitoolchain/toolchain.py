@@ -152,12 +152,19 @@ class Toolchain(object):
     """
     def __init__(self, name):
         self.name = name
+
         self.configstore = qibuild.configstore.ConfigStore()
         self.configstore.read(get_tc_config_path())
         self.path = get_tc_path(self.name)
         cache = get_tc_cache(name)
+        # Create any directory we may need
         qibuild.sh.mkdir(self.path, recursive=True)
         qibuild.sh.mkdir(cache, recursive=True)
+
+        # Add self to the list of known toolchains:
+        if not self.name in get_toolchain_names():
+            set_tc_config(self.name, "path", self.path)
+
         user_toolchain_file = get_tc_config(self.name, "file")
         if user_toolchain_file:
             if not os.path.exists(user_toolchain_file):
