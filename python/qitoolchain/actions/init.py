@@ -68,7 +68,8 @@ def do(args):
 
     """
     tc_file = args.tc_file
-    tc_file = qibuild.sh.to_native_path(tc_file)
+    if tc_file:
+        tc_file = qibuild.sh.to_native_path(tc_file)
     tc_name = args.name
     if not tc_name and not tc_file:
         raise Exception("Please use at least --tc-file or --name")
@@ -94,7 +95,7 @@ def do(args):
     else:
         mess = """Now try using:
     qibuild configure -c {tc_name}
-    qibuild make      -c ${tc_name}
+    qibuild make      -c {tc_name}
 """
         mess = mess.format(tc_name=tc_name)
         LOGGER.info(mess)
