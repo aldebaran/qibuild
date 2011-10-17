@@ -7,9 +7,11 @@ With QiBuild, this is easy.
 Runtime package
 ---------------
 
-Simply run::
+Simply run:
 
-  qibuild package foo
+.. code-block:: console
+
+  $ qibuild package --runtime foo
 
 This will configure, build and install the foo project in
 QI_WORK_TREE/package/foo, and  and generate a re-distributable binary package
@@ -22,9 +24,11 @@ Development package
 -------------------
 
 If you want to provide a pre-compiled package so that other people can compile
-their own software with it, run::
+their own software with it, run:
 
-  qibuild package --devel foo
+.. code-block:: console
+
+  $ qibuild package foo
 
 The archive will contain the static libraries, the headers (provided
 you used the correct install rule), the cmake files, and so on.

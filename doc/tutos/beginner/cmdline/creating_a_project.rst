@@ -1,11 +1,13 @@
 Creating a new project
 ======================
 
-In this tutorial, we will simply create a new project:
+In this tutorial, we will simply create a new project
 
-Navigate to your QI_WORK_TREE and Enter::
+Navigate to your QI_WORK_TREE and type:
 
-  qibuild create foo
+.. code-block:: console
+
+  $ qibuild create foo
 
 Remember, for this to work on windows, you should have:
 
@@ -36,7 +38,9 @@ Let’s have a look at what has been generated::
 
 If you already have source code somewhere, all you have to do is to:
 
-*  create a qibuild.manifest looking like::
+*  create a qibuild.manifest looking like
+
+.. code-block:: ini
 
     [project foo]
 
@@ -47,15 +51,17 @@ If you already have source code somewhere, all you have to do is to:
 * (optional, if you want to use qi\_ functions...): include 'qibuild/cmake'
   somewhere
 
-You cand do this by running::
+You cand do this by running
 
-  qibuild convert
+.. code-block:: console
+
+  $ qibuild convert
 
 .. note:: 'qibuild convert' will check that your root CMakeLists is correct,
    please read the messages carefully
 
 
-In any case, the root CMakeLists should look like
+In any case, the root CMakeLists should look like:
 
 .. code-block:: cmake
 

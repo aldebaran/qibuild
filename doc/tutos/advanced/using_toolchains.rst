@@ -6,7 +6,6 @@ Using toolchains
 In this tutorial, you will learn how to build your projects using pre-compiled
 packages.
 
-.. warning:: This is still a work in progress.
 
 Requirements
 ------------
@@ -26,12 +25,14 @@ binary of world.
 Creating the world package
 --------------------------
 
-Generating a package for the world project is done with::
+Generating a package for the world project is done with:
 
-  qibuild package world
+.. code-block:: console
 
-This will create a package named hello.tar.gz in
-QI_WORK_TREE/package/hello.tar.gz (or hello.zip on windows)
+  $ qibuild package world
+
+This will create a package named ``hello.tar.gz`` in
+``QI_WORK_TREE/package/hello.tar.gz`` (or hello.zip on windows)
 
 Inside the package, you will have::
 
@@ -52,9 +53,9 @@ Inside the package, you will have::
    of Windows, you will end up with world/world/ ...),
    so get over it or just use 7zip.
 
-The LFS hierarchy is still preserved, and it is the same as in build/sdk.
+The LFS hierarchy is still preserved, and it is the same as in ``build/sdk``.
 
-The world-config.cmake is a standard CMake file, but it can be used even after
+The ``world-config.cmake`` is a standard CMake file, but it can be used even after
 installing the world package, because it only uses relative paths.
 
 So the world package is usable anywhere.
@@ -65,65 +66,312 @@ So the world package is usable anywhere.
 Using a toolchain
 -----------------
 
-First, you have to create a "toolchain" dir for qibuild to use::
+First, you have to create a **toolchain** for qibuild to use:
 
-  qitoolchain create linux32
+.. code-block:: console
+
+  $ qitoolchain init <TOOLCHAIN_NAME> --default
 
 Not that you can choose any name for your toolchain, but is advised
 to choose between this set of configurations:
 
 * linux32
-
 * linux64
-
 * mac32
-
 * mac64
-
 * win32-vs2008
-
 * win32-vs2010
-
 * mingw
+
+Here we will assume you chose ``linux32``
+
+Here we used the ``--default`` option. If you don't use ``--default``, you
+will have to use ``-c linux32`` for every qibuild command.
+
+The only thing the ``default`` option does is to set ``QI_WORK_TREE/.qi/qibuild.cfg``
+so that it looks like:
+
+.. code-block:: ini
+
+   [general]
+   config = linux32
+
+So it's easy to change your mind later.
 
 
 This will create a directory looking like:
-~/.local/share/qi/toolchains/rootfs/linux32/
+``~/.local/share/qi/toolchains/linux32/``
 
-This is where every packages corresponding to the "linux" toolchain will be
+This is where every packages corresponding will be put.
 put.
 
-Now you can use::
+You can check that your toolchain has been created with:
 
-  qitoolchain add linux32 world /path/to/worktree/package/world.tar.gz
+.. code-block:: console
+
+   $ qitoolchain status
+
+   Toolchain linux32
+   No feed
+   No packages
+
+Now you can use:
+
+.. code-block:: console
+
+  $ qitoolchain add-package -c linux32 world /path/to/worktree/package/world.tar.gz
+
+
+You can check that your package has been added with:
+
+.. code-block:: console
+
+   $ qitoolchain status
+
+  Toolchain linux32
+  No feed
+    Packages:
+      foo
+        in /home/user/.local/share/qi/toolchains/linux32/world
+
 
 This will simply:
 
-* copy the world package somewhere in you toolchain directory.
+* copy the ``world`` package somewhere in you toolchain directory.
 
-* configure the file ~/.config/qi/toolchain.cfg so that qibuild knows that the
-  "linux" toolchain can provide the "world" package
+* configure some files so that qibuild knows that the
+  ``linux32`` toolchain can provide the ``world`` package
 
-When resolving dependencies of the hello project, qibuild will see that you use
-a toolchain called "linux", and that this toolchain provides the hello project,
-so it’s enough to set CMAKE_MODULE_PATHS to path/to/linux/toolchain/world
+When resolving dependencies of the ``hello`` project, qibuild will see that you use
+a toolchain called ``linux32`` and that this toolchain provides the ``world`` project,
+so it’s enough to set ``CMAKE_MODULE_PATHS`` to ``path/to/linux/toolchain/world``
 
-The world project will not be built when you use qibuild make hello, unless you
-specify it explicitly on the command line::
+The ``world`` project will not be built when you use ``qibuild make hello``, unless you
+specify it explicitly on the command line:
 
-  qibuild make world hello
+.. code-block:: console
 
-Not covered in this document
+  $ qibuild configure world hello
+
+Creating toolchain feeds
+------------------------
+
+Now, that you have a nice local toolchain, and a ``world`` package,
+you may want other people to be able to use the ``world`` package,
+without them having to recompile it from source.
+
+So here we are going to create a remote configuration file, so
+that other developpers can simply download the ``world`` package from
+a server
+
+We will assume you have access to a FTP or a HTTP sever.
+
+
+First, upload the world package, so that is accessible with the url:
+``http://example.com/packages/world.tar.gz``
+
+Next, create a ``fee.xml`` accessible with the url:
+``http://example.com/feed.xml``, looking like
+
+.. code-block:: xml
+
+   <toolchain>
+
+    <package
+      name="world"
+      url = "http://example.com/packages/world.tar.gz"
+    />
+
+  </toolchain>
+
+
+Then, from an other machine, run
+
+.. code-block:: console
+
+   $ qitoolchain init linux32 http://example.com/feed.xml
+
+  Getting package world from http://example.com/packages/world.tar.gz
+  Toolchain linux32: adding package world
+
+
+You can see that the feed has been store in qibuild configuration:
+
+.. code-block:: console
+
+  $ qitoolchain status
+
+  Toolchain linux32
+  Using feed from http://example.com/feed.xml
+    Packages:
+      foo
+        in /home/user/.local/share/qi/toolchains/linux32/world
+
+
+
+
+Full feed.xml specification
 ----------------------------
 
-How to create "feeds"
-+++++++++++++++++++++
 
-A feed is just an url pointing to a simple configuration files, which contains
-a list of packages and their URL.
+The feed can do more that that!
 
-By maintaining the feeds and the list of packages on a web server, you can
-share packages between developers, have them upgrade the package’s versions,
-and so on.
+The root of the ``feed.xml`` should be ``toolchain``
+
+toolchain type
+++++++++++++++++++
+
+The ``toolchain`` node accepts two types of children:
+
+* ``package`` type
+
+* ``feed`` type
+
+* ``select`` type (more on this later)
+
+feed type
++++++++++
+
+The ``feed`` type can have a ``url`` attribute, pointing to an other feed.
+
+This lets you include feeds inside other feeds.
+
+.. code-block:: xml
+
+    <!-- in feeds/full.xml  -->
+    <toolchain>
+      <feed url = "feeds/included.xml" />
+    </toolchain>
+
+.. code-block:: xml
+
+    <!-- feeds/included.xml -->
+
+    <toolchain>
+      <!-- some other packages -->
+    </toolchain>
+
+
+package type
+++++++++++++
+
+The ``package`` type **must** have at least a ``name`` attribute.
+
+Optionally, it can have a ``version`` and a ``arch`` attributes.
+
+This lets you store several configuration and several versions of the
+same package in the same feed
+
+.. code-block:: xml
+
+    <toolchain>
+      <package name="world" arch="linux32" version="0.1" url="world-0.1-linux32.tar.gz" />
+      <package name="world" arch="linux32" version="0.2" url="world-0.2-linux32.tar.gz" />
+      <package name="world" arch="linux64" version="0.1" url="world-0.1-linux64.tar.gz" />
+      <package name="world" arch="linux64" version="0.2" url="world-0.2-linux64.tar.gz" />
+    </toolchain>
+
+
+If it does not have an ``url`` attribute, it should have a ``directory`` attribute,
+and then the package path will be **relative** to the feed path.
+
+
+This lets you put several packages in a big archive (for instance
+``my-sdk.tar.gz``), and give it to other developers.
+
+Simply create a ``toolchain.xml`` at the root of the SDK, looking like
+
+.. code-block:: xml
+
+    <toolchain>
+      <package name="my-sdk" directory="." />
+    </toolchain>
+
+If you need a toolchain file, (for instance because your are generating a
+cross-toolchain), simply use the ``toolchain_file`` attribute
+
+.. code-block:: xml
+
+    <toolchain>
+      <package name="my-ctc" directory="." toolchain_file="my-toolchain.cmake" />
+    </toolchain>
+
+
+The ``toolchain_file`` is relative to the path of the package.
+
+
+Of course, nothing prevents you to create a feed letting developers getting
+your cross-toolchain remotely.
+
+.. code-block:: xml
+
+    <toolchain>
+      <package
+      name="my-ctc"
+      url="http://example.com/myctc.tar.gz"
+      toolchain_file="my-toolchain.cmake"
+      />
+    </toolchain>
+
+
+
+select type
++++++++++++
+
+Right now we have no need for this, but several
+things might be implemented later:
+
+
+.. code-block:: xml
+
+    <!-- Force a given arch -->
+    <select>
+      <arch>linux32</arch>
+    </select>
+
+    <!-- or: -->
+    <select arch="linux32" />
+
+    <!-- blacklist a specific package:
+      foo-1.12 will never be added
+    -->
+    <select>
+      <blacklist name="foo" version="1.12" />
+    </select>
+
+
+    <!-- assert that a specific package
+      is here
+      If no bar-1.14 package is found, an
+      error will be raised
+    -->
+      <select>
+        <force name="bar" version="1.14" />
+      </select>
+
+
+We do not need this because when several packages are found,
+we simply take the latest version.
+
+So for instance, if you need ``foobar-0.1`` in your maintenance branch,
+but ``foobar-2.0`` in your devel branch, you can simply have two feeds, like
+this
+
+.. code-block:: xml
+
+    <!-- in maint.xml -->
+    <toolchain>
+      <package name="foobar" version="0.1" url="http://example.com/packages/foobar-0.1.tar.gz" />
+      <package name="spam"   version="1.0" url="http://example.com/packages/spam-1.0.tar.gz" />
+    </toolchain>
+
+.. code-block:: xml
+
+    <!-- in devel.xml -->
+    <toolchain>
+      <feed url="http://example.com/feeds/maint.xml" />
+      <package name="foobar" version="2.0" url="http://example.com/packages/foobar-2.0.tar.gz" />
+    </toolchain>
+
 
 

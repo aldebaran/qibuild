@@ -1,9 +1,9 @@
 Install data
 ============
 
-Let’s assume the foo executable needs to read data from a file called foo.data
+Let’s assume the ``foo`` executable needs to read data from a file called ``foo.data``
 
-When you install foo, you would like to have something looking like::
+When you install ``foo,`` you would like to have something looking like::
 
   <prefix>
   |__ bin
@@ -12,7 +12,7 @@ When you install foo, you would like to have something looking like::
       |__ foo
           |__ foo.data
 
-So, create a folder named share/foo and put a file names foo.data in your
+So, create a folder named ``share/foo`` and put a file named ``foo.data`` in your
 source tree.
 
 Installing files

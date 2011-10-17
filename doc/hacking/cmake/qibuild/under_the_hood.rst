@@ -15,12 +15,12 @@ Make sure you have followed it before going further.
 
 A quick reminder of what we want.
 
-We have a project called world, which contains a dynamic library also called
-world. So we have a libworld.so on linux, and libworld.dylib on mac, and a
-world.dll on windows.
+We have a project called ``world``, which contains a dynamic library also called
+``world``. So we have a ``libworld.so`` on linux, and ``libworld.dylib`` on mac, and a
+``world.dll`` on windows.
 
-Then we have a project called hello, which contains a executable also called
-hello, which uses code from the world library.
+Then we have a project called ``hello``, which contains a executable also called
+``hello``, which uses code from the ``world`` library.
 
 Using the following two lines of cmake
 
@@ -31,23 +31,22 @@ Using the following two lines of cmake
 
 we want to:
 
-* add the correct include directories when building hello
+* add the correct include directories when building ``hello``
 
-* link hello with the world library, without mixing a world library compile in
-  release with an hello executable compiled in debug (on windows at least)
+* link ``hello`` with the ``world`` library, without mixing a ``world`` library
+  compiled in release with an ``hello`` executable compiled in debug (on windows at least)
 
-* make sure that the hello executable will find the world library, with messing
-  up with %PATH%, LD_LIBRARY_PATH or DYLD_LIBRARY_PATH
+* make sure that the ``hello`` executable will find the ``world`` library,
+  without messing up with ``PATH``, ``LD_LIBRARY_PATH`` or ``DYLD_LIBRARY_PATH``
 
-* generate a world-config.cmake so that the world library is usable by standard
+* generate a ``world-config.cmake`` so that the ``world`` library is usable by standard
   CMake project when installed.
 
-(I hope you understand why it’s tricky ...)
 
 Overview of the process: the power of the SDK layout
 ----------------------------------------------------
 
-If you have a look at hello/qibuild.manifest, you will see the following lines
+If you have a look at ``hello/qibuild.manifest,`` you will see the following lines
 
 .. code-block:: ini
 
@@ -56,21 +55,21 @@ If you have a look at hello/qibuild.manifest, you will see the following lines
 
 Each time you run qibuild, it looks for a .qi to guess your current worktree.
 
-After this, the worktree is parsed to find qibuild.manifest files.
+After this, the worktree is parsed to find ``qibuild.manifest`` files.
 
-Here, there are two qibuild.manifest files, so qibuild can find the two
-projects: hello and world.
+Here, there are two ``qibuild.manifest`` files, so qibuild can find the two
+projects: ``hello`` and ``world``.
 
-The relevant lines of the CMakeLists.txt are:
+The relevant lines of the ``CMakeLists.txt`` are:.
 
-In world/CMakeLists
+In ``world/CMakeLists``
 
 .. code-block:: cmake
 
   qi_create_lib(world SRC world/world.h world/world.cpp)
   qi_stage_lib(world)
 
-In hello/CMakeLists.txt
+In ``hello/CMakeLists.txt``
 
 .. code-block:: cmake
 
@@ -78,32 +77,32 @@ In hello/CMakeLists.txt
   qi_use_lib(hello world)
 
 .. note:: For those already familiar with CMake:
-   We use qi_create_lib and qi_create_bin instead of add_executable and
-   add_library
+   We use :ref:`qi_create_lib` and :ref:`qi_create_bin` instead of
+   ``add_executable`` and ``add_library``
 
-  We never have to call find_package or include_directories, or
-  target_link_libraries.
+  We never have to call ``find_package`` or ``include_directories``,  or
+  ``target_link_libraries``.
 
-This first part is the job is done by the qi_create_bin and qi_create_lib
-functions.
+This first part is the job is done by the :ref:`qi_create_bin` and
+:ref:`qi_create_lib` functions.
 
-Those are just wrappers for add_executable and add_library.
+Those are just wrappers for ``add_executable`` and ``add_library``.
 
-They just set a few properties (like the RUNTIME_OUTPUT_LOCATION for instance).
+They just set a few properties (like the ``RUNTIME_OUTPUT_LOCATION`` for instance).
 
 There are other properties that are used so that the executable can find the
 dynamic libraries it depends on at runtime, more on this later.
 
 This way, we always generate binaries and libraries in the SDK directory. The
-build/sdk contains only the results of the compilation that are necessary to be
+``build/sdk`` contains only the results of the compilation that are necessary to be
 used by other projects.
 
-Also, the executables are created in build/sdk/bin, and the libraries in
-build/sdk/lib, so that we stick to the FHS convention inside the build/sdk
-directory.
+Also, the executables are created in ``build/sdk/bin``, and the libraries in
+``build/sdk/lib``, so that we stick to the FHS convention inside the
+``build/sdk`` directory.
 
-On Windows, the binaries compiled in debug contain _d in their names, so you
-can share the same build directory, and the same visual studio solution for
+On Windows, the binaries compiled in debug contain ``_d`` in their names, so you
+can share the same build directory, and the same Visual Studio solution for
 several build configurations, without the risk of a mix of binaries compiled in
 release and binaries compiled in debug.
 
@@ -135,33 +134,32 @@ This is done by something like
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
   endif()
 
-The call to qi_stage_lib causes a world-config.cmake to be generated in
-world/build/sdk/cmake/
+The call to :ref:`qi_stage_lib` causes a ``world-config.cmake`` to be generated in
+``world/build/sdk/cmake/``
 
-When using qibuild configure hello, a dependencies.cmake files is generated in
-hello/build/dependencies.cmake
+When using ``qibuild configure hello``, a ``dependencies.cmake`` files is generated in
+``hello/build/dependencies.cmake``
 
-(this file is automatically included by the qibuild.cmake file)
+(this file is automatically included by the ``qibuild.cmake`` file at the root
+of the ``hello`` project)
 
 This file contains a call to
 
 .. code-block:: cmake
 
-  list(APPEND CMAKE_PREFIX_PATH "QI_WORK_TREE/world/build/sdk")
+  list(INSERT CMAKE_FIND_ROOT_PATH 0 "QI_WORK_TREE/world/build/sdk")
 
-So when qi_use_lib(hello world) is called, we only have run
+So when ``qi_use_lib(hello world)`` is called, we only have run
 
 .. code-block:: cmake
 
   find_package(world)
 
-Since the variable CMAKE_PREFIX_PATH is correctly set, CMake can find the
-world-config.cmake file in the build dir of world.
+Since the variable ``CMAKE_FIND_ROOT_PATH`` is correctly set, CMake can find the
+``world-config.cmake`` file in the build dir of world.
 
-Since everything under build/sdk follows the standard FHS, conventions, finding
-the library in sdk/lib is also easy.
-
-find_library always searches inside CMAKE_PREFIX_PATH/lib, for instance.
+Since everything under ``build/sdk`` follows the standard FHS conventions, finding
+the library in ``sdk/lib`` is also works.
 
 
 SDK and redistributable config files
@@ -170,28 +168,28 @@ SDK and redistributable config files
 .. note:: you can see qibuild as a way to automatically follow the cmake conventions
   See the CMake wiki for more information
 
-In fact we have two different world-config files.
+In fact we have two different ``world-config`` files.
 
-The first one is installed. It is supposed to be used with a world pre-compile
+The first one is installed. It is supposed to be used with a ``world`` pre-compiled
 package, from an other machine than the one used to compile world. We call it
-the *redistributable* config file.
+the **redistributable** config file.
 
-The second one is generated in build/sdk/share/cmake/world/world-config.cmake
-so that CMake will find it if CMAKE_PREFIX_PATH is set to build/sdk. We call it
-the *SDK* config file.
+The second one is generated in ``build/sdk/share/cmake/world/world-config.cmake``
+so that CMake will find it if ``CMAKE_FIND_ROOT_PATH`` is set to ``build/sdk.`` We call it
+the **SDK** config file.
 
-There are several differences between the "redistributable" config file and the
-"SDK" config file.
+There are several differences between the **redistributable** config file and the
+**SDK** config file.
 
 * The SDK file never has to call find_* functions: since we’ve just built the
   library, we know where it is. The redistributable file however must call
-  find_library, and find_path.
+  ``find_library``, and ``find_path``.
 
 * The SDK file uses absolute paths : we don’t care because we will never share
   this file with anyone. The redistributable file must only use relative paths to
   the root dir of the package.
 
-This is how we can set ROOT_DIR to world-prefix from world-config.cmake
+This is how we can set ``ROOT_DIR`` to world-prefix from ``world-config.cmake``
 
 We now we have a layout looking like::
 
@@ -217,7 +215,7 @@ So we generate the following code to set ROOT_DIR
 Calling qi_stage_lib
 --------------------
 
-The complete signature to qi_stage_lib() is in fact:
+The complete signature to :ref:`qi_stage_lib` is in fact:
 
 
 .. code-block:: cmake
@@ -232,14 +230,14 @@ The complete signature to qi_stage_lib() is in fact:
 When flags are missing, we will guess them.
 
 Note that prefix is always the name of a cmake target, i.e the first argument
-of something like qi_create_lib. There is an error message if you try to use
-qi_stage_lib on something that is not a target.
+of something like :ref:`qi_create_lib`. There is an error message if you try to use
+:ref:`qi_stage_lib` on something that is not a target.
 
 Let’s go through the variables one by one:
 
 *<PREFIX>_INCLUDE_DIRS*
    only used in the sdk file. During the configuration of hello, we will simply
-   call +include_directories(WORLD_INCLUDE_DIRS)
+   call ``include_directories(WORLD_INCLUDE_DIRS)``
 
   If not given, this can be guessed using the "directory properties", like so:
 
@@ -258,10 +256,10 @@ Let’s go through the variables one by one:
 
 A few words about what this variable is for.
 
-Let’s assume a client of the world library wants to use #include<world.h>, but
-world.h is installed in world-prefix/include/world/world.h
+Let’s assume a client of the world library wants to use ``#include<world.h>``, but
+``world.h`` is installed in ``world-prefix/include/world/world.h``
 
-Other people, on the other hand, want to use #include<world/world.h>.
+Other people, on the other hand, want to use ``#include<world/world.h>``.
 
 The standard CMake way to deal with this is to call
 
@@ -295,16 +293,16 @@ But most of the time you don’t have to propagate the compile flags everywhere.
 
 *<PREFIX>_DEPENDS*
   used by both config files. If world depends on an thirdparty library (boost
-  for instance), we want to make sure that whenever we use qi_use_lib(hello
-  world), we also add the boost include directories.
+  for instance), we want to make sure that whenever we use
+  ``qi_use_lib(hello world)``, we also add the boost include directories.
 
-Unless the world headers have been very carefully written, (using private
+Unless the ``world`` headers have been very carefully written, (using private
 pointer implementations, forward declarations and the like), there’s a great
-chance we will also need the boost headers when compiling hello, that’s why we
+chance we will also need the boost headers when compiling ``hello,`` that’s why we
 always propagate the dependencies by default.
 
-This is guessed using the previous call to qi_use_lib. In our example, after
-using qi_use_lib(world boost), WORLD_DEPENDS contains "boost".
+This is guessed using the previous call to :ref:`qi_use_lib`. In our example, after
+using ``qi_use_lib(world boost)``, ``WORLD_DEPENDS`` contains "boost".
 
 *<PREFIX>_LIBRARIES*
   used by both config files. In this case the SDK and the redistributable
@@ -327,9 +325,9 @@ In the redistributable file, we use:
 Calling qi_use_lib
 -------------------
 
-So what happens when using a qi_use_lib ?
+So what happens when using a :ref:`qi_use_lib`?
 
-When using qi_use_lib(foo bar), we will always call
+When using ``qi_use_lib(foo bar)``, we will always call
 
 .. code-block:: cmake
 
@@ -337,17 +335,23 @@ When using qi_use_lib(foo bar), we will always call
 
 But we have several cases here:
 
-* We are using a bar-config.cmake that was generated by qibuild.
+* We are using a ``bar-config.cmake`` that was generated by qibuild.
 
-* We are using the custom bar-config.cmake+ in qibuild/cmake/modules. This can
-  happen because the upstream FindBar.cmake does not exist or is not usable. (For
-  instance, the upstream FindGTest.cmake sets GTEST_BOTH_LIBRARIES, instead fo
-  GTEST_LIBRARIES ...)
+* We are using the custom ``bar-config.cmake`` in ``qibuild/cmake/modules``. This can
+  happen because the upstream ``FindBar.cmake`` does not exist or is not usable. (For
+  instance, the upstream ``FindGTest.cmake`` sets ``GTEST_BOTH_LIBRARIES,`` instead fo
+  ``GTEST_LIBRARIES`` ...)
 
-* We are using upstream’s CMake FindBar.cmake.
+* We are using upstream’s CMake ``FindBar.cmake``.
 
-To do this, we have to search for -config.cmake files generated by QiBuild,
-then fo look for upstream Find-\*.cmake See: CMake documentation
+To do this, we have to search for the `-config.cmake` files generated by QiBuild,
+then fo look for upstream `Find-\*.cmake`
+
+
+.. seealso::
+
+   `CMake documentation of find_package
+   <http://cmake.org/cmake/help/cmake-2-8-docs.html#command:find_package>`_
 
 The relevant lines of code are:
 

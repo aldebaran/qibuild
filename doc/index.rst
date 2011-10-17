@@ -40,7 +40,6 @@ References
    man/index
 
 
-* :ref:`List of qibuild cmake functions <genindex>`
 
 Tutorials
 ---------

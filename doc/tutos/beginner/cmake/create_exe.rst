@@ -43,20 +43,19 @@ found, so you should create the main.cpp right next to the CMakeLists
 
   qi_create_bin(foo main.cpp)
 
-If you are on UNIX, the executable will end up in build/sdk/bin/foo.
-
+If you are on UNIX, the executable will end up in ``build/sdk/bin/foo``
 If you are using Visual Studio, the executable will be in:
 
-build/sdk/bin/foo_d.exe (if you chose to build in debug)
+* ``build/sdk/bin/foo_d.exe`` (if you chose to build in debug)
 
 or in
 
-build/sdk/bin/foo.exe (if you chose to build in release)
+* ``build/sdk/bin/foo.exe`` (if you chose to build in release)
 
 .. note:: To run directly the foo executable from Visual Studio, simply
-   right-click on the foo project and select "Choose as start up project", then
+   right-click on the foo project and select ``Choose as start up project``, then
    press F5 as usual.
-   If you try to run the 'ALL' project which is selected by default, you will
-   get an error message because the 'ALL' project does not correspond to any
-   executable
+   If you try to run the ``ALL`` project which is selected by default, you will
+   get an error message because the ``ALL`` project does not correspond to any
+   executable.
 

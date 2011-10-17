@@ -7,9 +7,9 @@ the same sources.
 The problem
 -----------
 
-Let's say you have a foo library, with some tests. You want to make the
-compilation of the tests optional (because they depend on gtest, and you do not
-want to force your users to have gtest)
+Let's say you have a ``foo`` library, with some tests. You want to make the
+compilation of the tests optional (because they depend on ``gtest,`` and you do not
+want to force your users to have ``gtest``).
 
 A standard CMake way to do it would be:
 
@@ -44,7 +44,7 @@ Note that ther is a shortcut for that in qibuild CMake API using
 Here, if GTEST is not found, no error is raised, and WITH_GTEST is simply set
 to "OFF"...
 
-But let’s assume you really need some flags
+But let’s assume you really need some flags.
 
 Passing CMake flags with QiBuild
 --------------------------------
@@ -54,9 +54,11 @@ ascending priority:
 
 * Just once
 
-Simply call::
+Simply call:
 
-  qibuild configure foo -DWITH_GTEST=ON
+.. code-block:: console
+
+  $ qibuild configure foo -DWITH_GTEST=ON
 
 
 * You may want to trigger some flags depending on the toolchain / configuration
@@ -77,6 +79,8 @@ Using build configurations
 QiBuild also lets you to have different settings depending on the toolchain you
 use.
 
+The config file will always be found in ``QI_WORK_TREE/.qi/qibuild.cfg``
+
 For instance, you could have on a windows machine:
 
 .. code-block:: ini
@@ -92,8 +96,3 @@ For instance, you could have on a windows machine:
   [config win32-vs2010]
   cmake.generator =  'Visual Studio 10'
 
-This can be done just for your current worktree (in <worktree/.qi/qibuild.cfg),
-or for all your worktrees, in .config/qi/qibuild/qibuild.cfg
-
-.. note:: Several tools or qibuild actions will update your config files for
-   you, so please be careful :)

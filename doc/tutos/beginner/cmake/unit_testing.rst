@@ -1,16 +1,16 @@
 Unit testing
 ============
 
-Here we will just add a test that tries to launch the foo executable that we
+Here we will just add a test that tries to launch the ``foo`` executable that we
 have just built.
 
-This test is often called zero_test because the least thing you can expect for
+This test is often called ``zero_test`` because the least thing you can expect for
 your executable is that it runs without crashing.
 
 Adding a test
 --------------
 
-You first need to call enable_testing()
+You first need to call ``enable_testing()``
 
 Then you call :ref:`qi_add_test` with the first argument being the name of the test,
 the second being the name of the exeuctable.

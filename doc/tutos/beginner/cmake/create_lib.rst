@@ -9,11 +9,11 @@ you may want to read this more in-depth tutorial: :ref:`how-to-write-a-library`
 Requirements
 ------------
 
-We assume you have a QiBuild project containing a executable named foo
+We assume you have a QiBuild project containing a executable named ``foo``.
 
-(You can use qibuild create foo) to get such a project.
+You can use ``qibuild create foo`` to get such a project.
 
-We are going to write a function called get_answer() that will return an
+We are going to write a function called ``get_answer()`` that will return an
 integer.
 
 Since this function may be used by other people, we are going to put it in a
@@ -62,11 +62,11 @@ Using the answer library
 
 In order to use our library in the foo executable, we have to:
 
-* Find the answer.h file : so we need to add some include directories
+* Find the ``answer.h`` file : so we need to add some include directories
 
-* Create a library named answer with answer.h and answer.cpp
+* Create a library named answer with ``answer.h`` and ``answer.cpp``
 
-* Link the foo executable with the answer library.
+* Link the ``foo`` executable with the ``answer`` library.
 
 Adding the include directories
 ++++++++++++++++++++++++++++++
@@ -90,10 +90,10 @@ Add a call to :ref:`qi_create_lib`:
 
   qi_create_lib(answer answer.h answer.cpp)
 
-This creates a static library by default, named libanswer.a on UNIX, and
-answer.lib or answer_d.lib on Windows.
+This creates a static library by default, named ``libanswer.a`` on UNIX, and
+``answer.lib`` or ``answer_d.lib`` on Windows.
 
-It also makes the answer library usable by other targets.
+It also makes the ``answer`` library usable by other targets.
 
 Link the foo executable with the answer library
 +++++++++++++++++++++++++++++++++++++++++++++++
@@ -109,9 +109,9 @@ library before using it.
 
 This call does several things:
 
-* It adds a dependency between the answer library and the foo executable
+* It adds a dependency between the ``answer`` library and the ``foo`` executable
 
-* It makes sure the foo executable is linked with the answer library
+* It makes sure the ``foo`` executable is linked with the ``answer`` library
 
 Building
 --------
@@ -120,17 +120,17 @@ You can then build your project.
 
 A few notes:
 
-* On windows, the library will be found in build/sdk/lib/answer_d.lib if
-  built in debug, or in build/sdk/lib/answer.lib if built in release.
+* On Windows, the library will be found in ``build/sdk/lib/answer_d.lib`` if
+  built in debug, or in ``build/sdk/lib/answer.lib`` if built in release.
 
-* On linux, the library will be found in build/sdk/lib/libanswer.so
+* On linux, the library will be found in ``build/sdk/lib/libanswer.so``
 
-* On mac, the library will be fon in build/sdk/lib/libanswer.dylib
+* On mac, the library will be fon in ``build/sdk/lib/libanswer.dylib``
 
 .. note:: On UNIX, you can force the creation of static library by using
    -DBUILD_SHARED_LIBS=OFF
 
-On Windows, the sources need to be patched to use libanswer as a shared
+On Windows, the sources need to be patched to use ``answer`` as a shared
 library, but this out of the scope of this documentation.
 
 

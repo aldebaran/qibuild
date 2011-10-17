@@ -10,11 +10,11 @@ his toolchain directory.
 
 Example of usage:
 
-    # Create a toolchain for mingwin32
-    qitoolchain create "mingwin32"
+    # Create a toolchain for mingw32
+    qitoolchain init --name "mingw2"
 
     # Add zeromq libs, headers, and cmake files in the toolchain dir:
-    qitoolchain add zeromq
+    qitoolchain add zeromq -c mingw32
 
 After this, calling qi_use_lib(foo zeromq) just works :)
 
