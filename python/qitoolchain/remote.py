@@ -53,6 +53,7 @@ def download(url, output_dir, callback=callback, clobber=True, message=None):
         raise Exception(mess)
 
     try:
+        url_obj = None
         url_obj = urllib2.urlopen(url)
         content_length = url_obj.headers.dict['content-length']
         size = int(content_length)
@@ -71,8 +72,10 @@ def download(url, output_dir, callback=callback, clobber=True, message=None):
         error += "Error was: %s" % e
     finally:
         dest_file.close()
-        url_obj.close()
+        if url_obj:
+            url_obj.close()
     if error:
+        qibuild.sh.rm(dest_name)
         raise Exception(error)
 
     return dest_name
