@@ -116,3 +116,7 @@ linux32-1.12.cfg contains NO continuous URL.
 
 NOTE: no need to create separate packages, if you upgrade say openc, leave the two
 versions in qi/packages/
+
+
+We should install a toolchain-win32-vs2010.cmake file at the root of the C++ SDK,
+and let toolchain-pc.cmake just include it.
