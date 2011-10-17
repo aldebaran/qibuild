@@ -8,10 +8,11 @@ downloading package or reading configs from URLs
 import os
 import sys
 import urllib2
+import logging
 
 import qibuild
 
-
+LOGGER = logging.getLogger(__name__)
 
 def callback(total, done):
     """ Called during download """
@@ -22,7 +23,7 @@ def callback(total, done):
     sys.stdout.flush()
 
 
-def download(url, output_dir, callback=callback, clobber=True):
+def download(url, output_dir, callback=callback, clobber=True, message=None):
     """ Download a file from an url, and save it
     in output_dir.
 
@@ -40,6 +41,9 @@ def download(url, output_dir, callback=callback, clobber=True):
 
     if os.path.exists(dest_name) and not clobber:
         return dest_name
+
+    if message:
+        LOGGER.info(message)
 
     try:
         dest_file = open(dest_name, "w")

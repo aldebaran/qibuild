@@ -29,9 +29,6 @@ def configure_parser(parser):
     parser.add_argument("feed", metavar="TOOLCHAIN FEED",
         help="Optional: path to the toolchain configuration file.\n"
              "May be a local file or an url")
-    parser.add_argument("--name",
-        help="Name of the toolchain to create.\n"
-             "Mandatory if no toolchain configuration file was given")
     parser.add_argument("--default",
         help="Use this toolchain by default in this worktree",
         action="store_true")
@@ -41,10 +38,6 @@ def do(args):
 
     """
     feed = args.feed
-    tc_name = args.name
-    if not tc_name and not feed:
-        raise Exception("Please use at specify a feed or use --name")
-
     feed_path = qibuild.sh.to_native_path(feed)
     if os.path.exists(feed_path):
         tc_cfg = qibuild.configstore.ConfigStore()
@@ -55,8 +48,14 @@ def do(args):
         local = False
 
 
+    tc_name = tc_cfg.get("toolchain.name")
     if not tc_name:
-        tc_name = tc_cfg.get("toolchain.name")
+        mess  = "Could not create a toolchain with feed: '%s'\n" % feed
+        mess += """The config file should a least contain:
+[toolchain]
+name = <NAME>
+"""
+        raise Exception(mess)
 
 
     tc_file = None
@@ -88,6 +87,25 @@ def do(args):
         qitoolchain.set_tc_config(tc_name, "cmake.generator", cmake_generator)
     if cmake_flags:
         qitoolchain.set_tc_config(tc_name, "cmake.flags", cmake_flags)
+
+    packages = tc_cfg.get("package", default=dict())
+    if not packages:
+        qitoolchain.set_tc_config(tc_name, "provides", "")
+
+    cache = qitoolchain.get_tc_cache(tc_name)
+    toolchain = qitoolchain.Toolchain(tc_name)
+
+    for package_name in packages.keys():
+        package_url = tc_cfg.get("package.%s.url" % package_name)
+        if package_url is None:
+            LOGGER.error("No url for package %s, skipping", package_name)
+            continue
+        message = "Getting package %s from %s" % (package_name, package_url)
+        archive_path = qitoolchain.remote.download(package_url,
+            cache,
+            clobber=False,
+            message=message)
+        toolchain.add_package(package_name, archive_path)
 
     if args.default:
         toc.update_config("config", tc_name)
