@@ -371,8 +371,11 @@ class Toc(QiWorkTree):
         (project_names, package_names, not_found) = dep_solver.solve([project_name])
 
         if not_found:
-            if self.toolchain and not self.toolchain.cross:
-                LOGGER.warning("Could not find projects %s", ", ".join(not_found))
+            # FIXME: right now there are tons of case where you could have missing
+            # projects. (using a cross-toolchain, or an Aldebaran SDK)
+            # Put this back later.
+            # LOGGER.warning("Could not find projects %s", ", ".join(not_found))
+            pass
 
         project_names.remove(project_name)
 
