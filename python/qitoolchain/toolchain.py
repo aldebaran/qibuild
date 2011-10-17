@@ -142,31 +142,43 @@ def set_tc_config(tc_name, key, value):
 class Toolchain(object):
     """ The Toolchain class has a name and a list of packages.
 
+    It is able to generate CMake code looking like:
+    list(APPEND CMAKE_PREFIX_PATH "~/.local/share/qi/toolchains/linux64/foo")
+
+    It can be initialized with an existing toolchain file.
+    In this case, the cmake code will be appended to the toolchain file
+    given in the constructor.
+
     """
     def __init__(self, name):
         self.name = name
         self.configstore = qibuild.configstore.ConfigStore()
         self.configstore.read(get_tc_config_path())
         self.path = get_tc_path(self.name)
-        tc_file_from_conf = get_tc_config(self.name, 'file')
-        if tc_file_from_conf:
-            self.toolchain_file = tc_file_from_conf
-        else:
-            self.toolchain_file = os.path.join(self.path, "toolchain-%s.cmake" % self.name)
+        cache = get_tc_cache(name)
+        qibuild.sh.mkdir(self.path, recursive=True)
+        qibuild.sh.mkdir(cache, recursive=True)
+        user_toolchain_file = get_tc_config(self.name, "file")
+        if user_toolchain_file:
+            if not os.path.exists(user_toolchain_file):
+                mess  = "Could not create toolchain named %s\n" % name
+                mess += "with toolchain file: '%s'\n" % user_toolchain_file
+                mess += "The toolchain file does not exist\n"
+                raise Exception(mess)
+        self.user_toolchain_file = user_toolchain_file
 
         self.cmake_flags = get_tc_config(self.name, "cmake.flags", default="").split()
+        self.toolchain_file = os.path.join(cache, "toolchain-%s.cmake" % self.name)
 
         self.packages = list()
-        self.cross = get_tc_config(self.name, 'cross')
-        if not self.cross:
-            self.load_config()
-            self.update_toolchain_file()
-            LOGGER.debug("Created a new toolchain:\n%s", str(self))
+        self.load_config()
+        self.update_toolchain_file()
+        LOGGER.debug("Created a new toolchain:\n%s", str(self))
 
     def __str__(self):
         res  = "Toolchain %s\n" % self.name
         res += "  path: %s\n" % self.path
-        if not self.cross:
+        if self.packages:
             res += "  packages:\n" + "\n".join([" " * 4  + x.name for x in sorted(self.packages)])
         return res
 
@@ -228,6 +240,10 @@ class Toolchain(object):
 
         """
         lines = list()
+        if self.user_toolchain_file:
+            tc_path = qibuild.sh.to_posix_path(self.user_toolchain_file)
+            lines = ["include(\"%s\")\n" % tc_path]
+
         if self.cmake_flags:
             for flag_setting in self.cmake_flags:
                 splitted = flag_setting.split('=')
@@ -247,9 +263,11 @@ class Toolchain(object):
                 oldlines = fp.readlines()
         except:
             pass
-        #do not write the file if it's the same
+
+        # Do not write the file if it's the same
         if lines == oldlines:
             return
+
         with open(self.toolchain_file, "w") as fp:
             lines = fp.writelines(lines)
 
