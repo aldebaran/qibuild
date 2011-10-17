@@ -22,18 +22,24 @@ def callback(total, done):
     sys.stdout.flush()
 
 
-def download(url, output_dir, callback=callback):
+def download(url, output_dir, callback=callback, clobber=True):
     """ Download a file from an url, and save it
     in output_dir.
 
     The name of the file will be the basename of the url,
     and a nice progressbar will be printed during the download
 
+    If clobber is False, the file won't be overwritten if it
+    already exists
+
     """
     dest_name = url.split("/")[-1]
     dest_name = os.path.join(output_dir, dest_name)
 
     error = None
+
+    if os.path.exists(dest_name) and not clobber:
+        return dest_name
 
     try:
         dest_file = open(dest_name, "w")
@@ -94,17 +100,3 @@ def get_remote_config(url):
             raise Exception(mess)
 
 
-def get_remote_package(url, output_dir):
-    """ Get and extract a package from an url
-
-    """
-    archive = download(url, output_dir)
-    res = qibuild.archive.extract(archive, output_dir)
-    return res
-
-
-
-if __name__ == "__main__":
-    url = sys.argv[1]
-    dest = sys.argv[2]
-    get_remote_package(url, dest)
