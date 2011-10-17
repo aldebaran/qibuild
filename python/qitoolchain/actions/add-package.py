@@ -21,11 +21,9 @@ def configure_parser(parser):
         help="The path to the package")
 
 def do(args):
-    """ Add a project to a toolchain
+    """ Add a package to a toolchain
 
     - Check that there is a current toolchain
-    - Run `qibuild package' if a project, and not a package was given as
-        argument
     - Add the package to the cache
     - Add the package from cache to toolchain
 
@@ -36,7 +34,5 @@ def do(args):
     tc_cache_path = qitoolchain.get_tc_cache(tc.name)
     dest = os.path.join(tc_cache_path, package_name)
     in_cache = qibuild.archive.archive_name(dest)
-
     qibuild.sh.install(package_path, in_cache)
-
     tc.add_package(package_name, in_cache)
