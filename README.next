@@ -8,11 +8,17 @@ API changes
 # because it's internal, keep it the way it is
 qidev get-ctc
 qidev get-image
+qidev update-toolchain -> qidev get-toolchain <name> [<version>]
 
 
 # because we want our clients to use our toolchains in 1.14:
-qidev init -> qitoolchain init <name> <url>
-qidev update-toolchain -> qitoolchain get <name> [<version>]
+qidev init -> qitoolchain init [toolchain_file_path]
+#  Guess cmake_generator, name and whether we are cross-compiling
+#  from the archive name. Of course, let user use --name --cross
+#  if he wants to.
+#  If toolchain_file_path is not given, create an empty toolchain.
+#  Useful only if you do NOT want to make alcommon-dep projects,
+#  of if you are in Aldebaran.
 
 
 # because it's no easy to understand what it does:
@@ -109,4 +115,4 @@ linux32-minimal.cfg contains url to static deps
 linux32-1.12.cfg contains NO continuous URL.
 
 NOTE: no need to create separate packages, if you upgrade say openc, leave the two
-version in qi/packages/
+versions in qi/packages/
