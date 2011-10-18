@@ -26,9 +26,12 @@ KNOWN_CONFIGS = [
 def configure_parser(parser):
     """Configure parse for this action """
     qibuild.worktree.work_tree_parser(parser)
-    parser.add_argument("feed", metavar="TOOLCHAIN FEED",
+    parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
         help="Optional: path to the toolchain configuration file.\n"
-             "May be a local file or an url")
+             "May be a local file or an url",
+        nargs="?")
+    parser.add_argument("--name",
+        help="Mandatory if feed was not given")
     parser.add_argument("--default",
         help="Use this toolchain by default in this worktree",
         action="store_true")
@@ -38,24 +41,32 @@ def do(args):
 
     """
     feed = args.feed
-    feed_path = qibuild.sh.to_native_path(feed)
-    if os.path.exists(feed_path):
-        tc_cfg = qibuild.configstore.ConfigStore()
-        tc_cfg.read(feed_path)
-        local = True
+    name = args.name
+    if not feed and not name:
+        raise Exception("Please specify a feed or use --name")
+
+    tc_cfg = qibuild.configstore.ConfigStore()
+    tc_name = None
+    if feed:
+        feed_path = qibuild.sh.to_native_path(feed)
+        if os.path.exists(feed_path):
+            tc_cfg.read(feed_path)
+            local = True
+        else:
+            tc_cfg = qitoolchain.remote.get_remote_config(feed)
+            local = False
+        tc_name = tc_cfg.get("toolchain.name")
+        if not tc_name:
+            mess  = "Could not create a toolchain with feed: '%s'\n" % feed
+            mess += """The config file should a least contain:
+    [toolchain]
+    name = <NAME>
+    """
+            raise Exception(mess)
     else:
-        tc_cfg = qitoolchain.remote.get_remote_config(feed)
+        # No feed:
+        tc_name = args.name
         local = False
-
-
-    tc_name = tc_cfg.get("toolchain.name")
-    if not tc_name:
-        mess  = "Could not create a toolchain with feed: '%s'\n" % feed
-        mess += """The config file should a least contain:
-[toolchain]
-name = <NAME>
-"""
-        raise Exception(mess)
 
 
     tc_file = None
@@ -75,8 +86,9 @@ name = <NAME>
         toc_error = e
 
     if args.default and not toc:
-        mess = "You need to be in a toc worktree to use --default\n"
-        mess += toc_error
+        mess = "You need to be in a valid toc worktree to use --default\n"
+        mess += "Exception was:\n"
+        mess += str(toc_error)
         raise Exception(mess)
 
     cmake_generator = tc_cfg.get("toolchain.cmake.generator")
