@@ -1,6 +1,8 @@
 .. QiBuild documentation master file, created by
    sphinx-quickstart on Mon Aug  1 15:48:52 2011.
 
+.. _qibuild-documentation:
+
 Welcome to QiBuild's documentation!
 ===================================
 
