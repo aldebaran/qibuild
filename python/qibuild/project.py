@@ -136,6 +136,7 @@ def update_project(project, toc):
     # Handle custom global build directory containing all projects
     singlebdir = toc.configstore.get("build.directory")
     if singlebdir:
+        singlebdir = os.path.expanduser(singlebdir)
         if not os.path.isabs(singlebdir):
             singlebdir = os.path.join(toc.work_tree, singlebdir)
         bname = os.path.join("build-%s" % (toc.build_folder_name), project.name)
