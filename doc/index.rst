@@ -3,8 +3,8 @@
 
 .. _qibuild-documentation:
 
-Welcome to QiBuild's documentation!
-===================================
+QiBuild documentation
+=====================
 
 
 Introduction
