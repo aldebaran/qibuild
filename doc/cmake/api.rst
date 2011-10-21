@@ -1,3 +1,5 @@
+.. _qibuild-cmake-api:
+
 QiBuild CMake API
 =================
 
