@@ -133,7 +133,7 @@ function(qi_create_script name source)
   qi_debug("qi_create_script(${name})")
   cmake_parse_arguments(ARG "NO_INSTALL" "SUBFOLDER" "" ${ARGN})
 
-  configure_file("${source}" "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}")
+  configure_file("${source}" "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}" COPYONLY)
   if(NOT ARG_NO_INSTALL)
     install(PROGRAMS    "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}"
             COMPONENT   binary
