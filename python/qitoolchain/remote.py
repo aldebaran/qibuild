@@ -81,29 +81,23 @@ def download(url, output_dir, callback=callback, clobber=True, message=None):
     return dest_name
 
 
-def get_remote_config(url):
-    """ Read a config from an url.
+def get_remote_xml(url):
+    """ Read a xml file from an url
 
-    The format of the file should be the same as the one used by
-    qibuild.configstore
-
-    Return a qibuild.configstore.ConfigStore object
+    Returns a parsed xml ElementTree object
 
     """
-    with qibuild.sh.TempDir() as tmp:
-        try:
-            url_obj = urllib2.urlopen(url)
-            contents = url_obj.read()
-            conf_file = os.path.join(tmp, "conf")
-            with open(conf_file, "w") as fp:
-                fp.write(contents)
+    try:
+        url_obj = urllib2.urlopen(url)
+        tree = ElementTree()
+        tree.parse(url_obj)
+    except Exception, e:
+        mess  = "Could not read configuration from %s\n" % url
+        mess += "Error was: %s" % e
+        raise Exception(mess)
+    finally:
+        if url_obj:
             url_obj.close()
-            config = qibuild.configstore.ConfigStore()
-            config.read(conf_file)
-            return config
-        except Exception, e:
-            mess  = "Could not read configuration from %s\n" % url
-            mess += "Error was: %s" % e
-            raise Exception(mess)
+        return tree
 
 

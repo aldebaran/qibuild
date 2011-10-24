@@ -1,267 +1,234 @@
-## Copyright (C) 2011 Aldebaran Robotics
+""" Toolchain
 
-""" This package contains the Toolchain and the Package
-class
+A set of packages and a toolchain file
 
-How does it work?
 
- - Create a Toolchain with a name ("linux" for instance)
-    ~/.local/share/qi/toolchains/linux/
-and
-    ~/.cache/qi/toolchains/linux/packages/
-are created.
-
-A toolchain file is created in
-~/.local/share/qi/toolchains/linux/toolchain.cmake
-
-qitoolchain build configuration is updated to reflect
-there is a toolchain called "linux"
-
- - Add the foo package:
-The foo archive is copied in the cache:
-~/.cache/qi/toolchains/linux/packages/foo.tar.gz
-
-The foo package is extraced to the toolchain:
-~/.local/share/qi/toolchain/linux/foo/{lib,include,cmake}
-
-The toolchain.cmake in ~/.local/share/qi/toolchains/linux/toolchain.cmake
-is updated to contain:
-
-    list(APPEND CMAKE_PREFIX_PATH "~/.local/share/qi/toolchains/linux/foo")
-
-qitoolchain build configuration is updated to
-reflect the fact that the "linux" toolchain now provides
-the "foo" package.
-
- - Build a Toc object with the toolchain name "linux", when building a project,
-add the -DCMAKE_TOOLCHAIN_FILE parameter
 
 """
 
+CONFIG_PATH = "~/.config/qi/"
+CACHE_PATH  = "~/.cache/qi"
+
+import ConfigParser
 
 import os
-import sys
-import logging
-
 import qibuild
 
-LOGGER = logging.getLogger(__name__)
-
-
-class Package:
-    """A package is a set of binaries, headers and cmake files
-    (a bit like a -dev debian package)
-    It has a name and may depend on other packages.
-
-    """
-    def __init__(self, name):
-        self.name = name
-        self.depends = list()
-
-    def __str__(self):
-        res = "Package %s"  % self.name
-        if self.depends:
-            res += " (depends on : %s)" %  " ".join(self.depends)
-        return res
-
-    def __lt__(self, other):
-        if hasattr(other, 'name'):
-            return self.name < other.name
-        return self.name < other
-
-
-def get_tc_config_path():
-    """ Return a suitable config path
-
-    """
-    # FIXME: deal with non-UNIX systems
-    config_path = qibuild.sh.to_native_path("~/.config/qi/toolchain.cfg")
-    return config_path
-
-def get_tc_path(toolchain_name):
-    """ Return a suitable path to extract the packages
-
-    """
-    configstore = qibuild.configstore.ConfigStore()
-    cfg_path = get_tc_config_path()
-    configstore.read(cfg_path)
-    root = configstore.get("default.root")
-    if not root:
-        root = qibuild.sh.to_native_path("~/.local/share/qi/toolchains")
-    res = os.path.join(root, toolchain_name)
-    qibuild.sh.mkdir(res, recursive=True)
-    return res
-
-def get_tc_cache(toolchain_name):
-    """ Return the path where to store packages
-
-    """
-    # FIXME: deal with non-UNIX systems
-    configstore = qibuild.configstore.ConfigStore()
-    cfg_path = get_tc_config_path()
-    configstore.read(cfg_path)
-    cache = configstore.get("default.cache")
-    if not cache:
-        cache = qibuild.sh.to_native_path("~/.cache/qi/toolchains")
-    res = os.path.join(cache, toolchain_name)
-    qibuild.sh.mkdir(res, recursive=True)
-    return res
-
-
-def get_toolchain_names():
+def get_tc_names():
     """ Return the list of all known toolchains
 
+    They are simply stored in ~/.config/qi/toolchains.cfg
+    in this format
+
+        [toolchains]
+        linux32=
+        linu64=
     """
-    config = qibuild.configstore.ConfigStore()
+    config = ConfigParser.ConfigParser()
     config.read(get_tc_config_path())
-    tc_config = config.get("toolchain")
-    if tc_config is None:
-        return []
-    return tc_config.keys()
+    if not config.has_section('toolchains'):
+        return list()
+    tc_items = config.items('toolchains')
+    return [x[0] for x in tc_items]
 
-def get_tc_config(tc_name, key, default=None):
-    """ Get the configuration for a specific toolchain
+def get_tc_config_path():
+    """ Return the general toolchain config file.
+    It simply lists all the known toolchains
+
+        [toolchains]
+        linux32=
+        linux64=
+        ...
+
 
     """
-    configstore = qibuild.configstore.ConfigStore()
-    cfg_path = get_tc_config_path()
-    configstore.read(cfg_path)
-    full_key = 'toolchain.%s.%s' % (tc_name, key)
-    return configstore.get(full_key, default=default)
+    config_path = qibuild.sh.to_native_path(CONFIG_PATH)
+    qibuild.sh.mkdir(CONFIG_PATH, recursive=True)
+    config_path = os.path.join(config_path, "toolchains.cfg")
+    return config_path
 
-def set_tc_config(tc_name, key, value):
-    """ Set the configuration for a specific toolchain
+
+class Package():
+    """ A package simply has a name and a path
 
     """
-    cfg_path = get_tc_config_path()
-    section = 'toolchain "%s"' % tc_name
-    qibuild.configstore.update_config(cfg_path, section, key, value)
+    def __init__(self, name, path):
+        self.name = name
+        self.path = path
+
+    def __repr__(self):
+        res = "<Package %s in %s>"  % (self.name, self.path)
+        return res
 
 
+    def __eq__(self, other):
+        return self.name == other.name and self.path == other.path
 
-class Toolchain(object):
-    """ The Toolchain class has a name and a list of packages.
+    def __lt__(self, other):
+        return self.name < other.name
 
-    It is able to generate CMake code looking like:
-    list(APPEND CMAKE_PREFIX_PATH "~/.local/share/qi/toolchains/linux64/foo")
+class Toolchain:
+    """ A toolchain is a set of packages
 
-    It can be initialized with an existing toolchain file.
-    In this case, the cmake code will be appended to the toolchain file
-    given in the constructor.
+    It has a configuration in ~/.config/qi/toolchains/<name.cfg>
+    looking like:
+
+      [toolchain 'name']
+      arch = <arch>
+
+      # Additional CMake flags required to use this toolchain
+      # (for instance CMAKE_OSX_ARCHITECTURES on mac)
+      # cmake.flags =
+      # Custom toolchain file to be used when using this toolchain
+      # (for instanche when cross-compiling)
+      # toolchain_file = '/path/to/ctc/toolchain-atom.cmake'
+
+      [package foo]
+      path = '~/.cache/share/qi/ .... '
+
+      [package naoqi-sdk]
+      path = 'path/to/naoqi-sdk'
+
+    thus added packages are stored permanentely.
 
     """
     def __init__(self, name):
         self.name = name
-
-        self.configstore = qibuild.configstore.ConfigStore()
-        self.configstore.read(get_tc_config_path())
-        self.path = get_tc_path(self.name)
-        cache = get_tc_cache(name)
-        # Create any directory we may need
-        qibuild.sh.mkdir(self.path, recursive=True)
-        qibuild.sh.mkdir(cache, recursive=True)
+        self.packages = list()
+        cache_path = self._get_cache_path()
+        self.toolchain_file  = os.path.join(cache_path, "toolchain-%s.cmake" % self.name)
 
         # Add self to the list of known toolchains:
-        if not self.name in get_toolchain_names():
-            set_tc_config(self.name, "path", self.path)
+        if not self.name in get_tc_names():
+            config = ConfigParser.ConfigParser()
+            config_path = get_tc_config_path()
+            config.read(config_path)
+            if not config.has_section("toolchains"):
+                config.add_section("toolchains")
+            config.set("toolchains", self.name, "")
+            with open(config_path, "w") as fp:
+                config.write(fp)
 
-        user_toolchain_file = get_tc_config(self.name, "file")
-        if user_toolchain_file:
-            if not os.path.exists(user_toolchain_file):
-                mess  = "Could not create toolchain named %s\n" % name
-                mess += "with toolchain file: '%s'\n" % user_toolchain_file
-                mess += "The toolchain file does not exist\n"
-                raise Exception(mess)
-        self.user_toolchain_file = user_toolchain_file
+        self.user_toolchain_file = None
+        self.cmake_flags = list()
 
-        self.cmake_flags = get_tc_config(self.name, "cmake.flags", default="").split()
-        self.toolchain_file = os.path.join(cache, "toolchain-%s.cmake" % self.name)
-
-        self.packages = list()
         self.load_config()
-        self.update_toolchain_file()
-        LOGGER.debug("Created a new toolchain:\n%s", str(self))
 
-    def __str__(self):
-        res  = "Toolchain %s\n" % self.name
-        res += "  path: %s\n" % self.path
-        if self.packages:
-            res += "  packages:\n" + "\n".join([" " * 4  + x.name for x in sorted(self.packages)])
-        return res
 
-    def get(self, package_name):
-        """Return path to a package
-        """
-        known_names = [p.name for p in self.packages]
-        if package_name not in known_names:
-            raise Exception("No such package: %s" % package_name)
-        package_path = os.path.join(self.path, package_name)
-        return package_path
-
-    def add_package(self, name, path):
-        """Add a package given its name and its path
+    def _get_config_path(self):
+        """ Returns path to self configuration file
 
         """
-        # Rename package once it is extracted:
-        LOGGER.info("Toolchain %s: adding %s", self.name, name)
-        should_skip = False
-        dest = os.path.join(self.path, name)
-        if not os.path.exists(dest):
-            should_skip = False
-        else:
-            dest_mtime = os.stat(dest).st_mtime
-            src_mtime  = os.stat(path).st_mtime
-            if src_mtime < dest_mtime:
-                should_skip = True
-        if not should_skip:
-            with qibuild.sh.TempDir() as tmp:
-                try:
-                    extracted = qibuild.archive.extract(path, tmp)
-                except qibuild.archive.InvalidArchive, err:
-                    mess = str(err)
-                    mess += "\nPlease fix the archive and try again"
+        config_path = qibuild.sh.to_native_path(CONFIG_PATH)
+        config_path = os.path.join(config_path, "toolchains")
+        qibuild.sh.mkdir(config_path, recursive=True)
+        config_path = os.path.join(config_path, self.name + ".cfg")
+        return config_path
+
+    def _get_cache_path(self):
+        """ Returns path to self cache directory
+
+        """
+        cache_path = qibuild.sh.to_native_path(CACHE_PATH)
+        cache_path = os.path.join(cache_path, "toolchains", self.name)
+        qibuild.sh.mkdir(cache_path, recursive=True)
+        return cache_path
+
+
+
+    def load_config(self):
+        """ Parse configuration, update toolchain file
+        when done
+
+        """
+        config_path = self._get_config_path()
+        configstore = qibuild.configstore.ConfigStore()
+        configstore.read(config_path)
+        packages_conf = configstore.get('package')
+        self.packages = list()
+        if packages_conf:
+            for (package_name, package_conf) in packages_conf.iteritems():
+                package_path = package_conf.get('path')
+                if not package_path:
+                    mess  = "Invalid configuration for toolchain %s\n" % self.name
+                    mess += "(from '%s')\n" % config_path
+                    mess += "Package %s has no 'path' setting" % package_name
                     raise Exception(mess)
-                if os.path.exists(dest):
-                    qibuild.sh.rm(dest)
-                qibuild.sh.mv(extracted, dest)
-        new_package = Package(name)
-        matches = [p for p in self.packages if p.name == name]
-        if not matches:
-            self.packages.append(new_package)
-        self.update_tc_provides()
+                package = Package(package_name, package_path)
+                self.packages.append(package)
+
+        tc_file = configstore.get("toolchain.toolchain_file")
+        if tc_file:
+            self.user_toolchain_file = tc_file
+
+        cmake_flags_cfg = configstore.get("toolchain.cmake.flags")
+        if cmake_flags_cfg:
+            flag_settings = cmake_flags_cfg.split()
+            for flag_setting in flag_settings:
+                splitted = flag_setting.split('=')
+                if len(splitted) != 2:
+                    mess  = "Invalid cmake.flags setting for toolchain %s\n" % self.name
+                    mess += "(%s)\n" % cmake_flags_cfg
+                    mess += "cmake.flags should be a space separated list of KEY=VALUE\n"
+                    raise Exception(mess)
+                (key, value) = splitted
+                self.cmake_flags.append((key, value))
+        else:
+            self.cmake_flags = list()
+
         self.update_toolchain_file()
 
 
-    def update_tc_provides(self):
-        """When a package has been added, update the toolchain
-        configuration
+    def add_package(self, package):
+        """ Add a package to the list
 
         """
-        provides = get_tc_config(self.name, "provides")
-        provides = " ".join(p.name for p in self.packages)
-        LOGGER.debug("update_tc_provides: provides is now %s", provides)
-        set_tc_config(self.name, "provides", provides)
+        config_path = self._get_config_path()
+        qibuild.configstore.update_config(config_path,
+            'package "%s"' % package.name,
+            "path",
+            package.path)
+        self.load_config()
+
+    def remove_package(self, name):
+        """ Remove a package from the list
+
+        """
+        cfg_path = self._get_config_path()
+        config = ConfigParser.RawConfigParser()
+        config.read(cfg_path)
+        package_section = 'package "%s"' % name
+        if not config.has_section(package_section):
+            mess  = "Could not remove %s from toolchain %s\n" % (self.name, name)
+            mess += "No such package"
+            raise Exception(mess)
+        config.remove_section(package_section)
+
+        with open(cfg_path, "w") as fp:
+            config.write(fp)
+
+        self.load_config()
+
 
     def update_toolchain_file(self):
-        """Update the toolchain file when the packages have changed.
+        """
 
         """
+        # Read [(path, name)] from self.packages,
+        # Generate text
+        #    # Autogenerated by qibuild. Do not edit
+        #    list(APPEND CMAKE_PREFIX_PATH ...."
         lines = ["# Autogenerated file. Do not edit\n"]
         if self.user_toolchain_file:
             tc_path = qibuild.sh.to_posix_path(self.user_toolchain_file)
-            lines = ["include(\"%s\")\n" % tc_path]
+            lines.append("include(\"%s\")\n" % tc_path)
 
-        if self.cmake_flags:
-            for flag_setting in self.cmake_flags:
-                splitted = flag_setting.split('=')
-                if len(splitted) != 2:
-                    LOGGER.warning("Ignoring bad cmake flag setting, %s", flag_setting)
-                (key, value) = splitted
-                lines.append('set(%s "%s" CACHE INTERNAL \"\" FORCE)\n' % (key, value))
+        for (key, value) in self.cmake_flags:
+            lines.append('set(%s "%s" CACHE INTERNAL \"\" FORCE)\n' % (key, value))
 
         for package in self.packages:
-            package_path = self.get(package.name)
-            package_path = qibuild.sh.to_posix_path(package_path)
+            package_path = qibuild.sh.to_posix_path(package.path)
+            lines.append("# %s\n" % package.name)
             lines.append('list(APPEND CMAKE_PREFIX_PATH "%s")\n' % package_path)
 
         oldlines = list()
@@ -279,105 +246,30 @@ class Toolchain(object):
             lines = fp.writelines(lines)
 
 
-    def load_config(self):
-        """ Re-build self.packages list using the configuration file
 
-        Called each time someone uses self.packages
-        """
-        provides = get_tc_config(self.name, "provides")
-        self.packages = list()
-        if not provides:
-            return
-        for package_name in provides.split():
-            deps = self.configstore.get("package.%s.depends" % package_name, default="")
-            names = deps.split()
-            package = Package(package_name)
-            package.depends = names
-            self.packages.append(package)
+def tc_handle_feed(toolchain, feed_location, tree):
+    feeds = tree.findall("feed")
+    for feed in feeds:
+        # Get the url attrib
+        # feed_location = ...
+        tc_handle_feed(toolchain, feed_location)
 
-    def install_package(self, package_name, destdir, runtime=False):
-        """ Install a package to a destdir.
-
-        If a runtime is False, only the runtime files
-        (dynamic libraries, executables, config files) will be
-        installed
-
-        """
-        package_path = self.get(package_name)
-        if runtime:
-            qibuild.sh.install(package_path, destdir, filter=is_runtime)
-        else:
-            qibuild.sh.install(package_path, destdir)
-
-    def remove_package(self, package_name):
-        """ Remove a package from the toolchain
-
-        """
-        package_path = self.get(package_name)
-        qibuild.sh.rm(package_path)
-        self.packages = [p for p in self.packages if p.name != package_name]
-        provides = get_tc_config(self.name, "provides")
-        provides = " ".join(p.name for p in self.packages)
-
-        set_tc_config(self.name, "provides", provides)
+    packages = tree.findall("package")
+    for package in packages:
+        tc_handle_package(toolchain, feed_location, package)
 
 
-def is_runtime(filename):
-    """ Filter function to only install runtime components of packages
 
-    """
-    # FIXME: this looks like a hack.
-    # Maybe a user-generated MANIFEST at the root of the package path
-    # would be better?
+def tc_handle_package(toolchain, feed_location, package):
+    pass
+    # check 'arch' attrib and toolchain.arch
 
-    basename = os.path.basename(filename)
-    basedir  = filename.split(os.path.sep)[0]
-    if filename.startswith("bin"):
-        if sys.platform.startswith("win"):
-            if filename.endswith(".exe"):
-                return True
-            if filename.endswith(".dll"):
-                return True
-            else:
-                return False
-        else:
-            return True
-    if filename.startswith("lib"):
-        # exception for python:
-        if "python" in filename and filename.endswith("Makefile"):
-            return True
-        # shared libraries
-        shared_lib_ext = ""
-        if sys.platform.startswith("win"):
-            shared_lib_ext = ".dll"
-        if sys.platform == "linux2":
-            shared_lib_ext = ".so"
-        if sys.platform == "darwing":
-            shared_lib_ext = ".dylib"
-        if shared_lib_ext in basename:
-            return True
-        # python
-        if basename.endswith(".py"):
-            return True
-        if basename.endswith(".pyd"):
-            return True
-        else:
-            return False
-    if filename.startswith(os.path.join("share", "cmake")):
-        return False
-    if filename.startswith(os.path.join("share", "man")):
-        return False
-    if basedir == "share":
-        return True
-    if basedir == "include":
-        # exception for python:
-        if filename.endswith("pyconfig.h"):
-            return True
-        else:
-            return False
-    if basedir.endswith(".framework"):
-        return True
+    # handle 'url' attrib of package:
+    # sha1(url) -> extract in ~/.local/share/qi/toolchain/<SHA1>
+    # using mtime so that it works
 
-    # True by default: better have too much stuff than
-    # not enough
-    return True
+    # handle 'directory' attrib of package
+    # concat feed_location base dir in package directory
+    # (handle feed_location being a url of a path)
+
+    # Create Package object, add it to the toolchain
