@@ -244,6 +244,10 @@ def search_projects(directory=None, depth=3):
     if os.path.exists(os.path.join(directory, "manifest.xml")):
         rsrc.append(directory)
 
+    blacklist_file = os.path.join(directory, ".qiblacklist")
+    if os.path.exists(blacklist_file):
+        return(rgit, rsrc)
+
     subdirs = list()
     try:
         dir_contents = [os.path.join(directory, s) for s in os.listdir(directory)]
@@ -253,9 +257,6 @@ def search_projects(directory=None, depth=3):
     # If os.listdir fails (permission denied for instance),
     # we will iter on a empty list, so no worry :)
     for p in subdirs:
-        blacklist_file = os.path.join(p, ".qiblacklist")
-        if os.path.exists(blacklist_file):
-            continue
         sub_rgit, sub_rsrc = search_projects(p, depth - 1)
         rgit.extend(sub_rgit)
         rsrc.extend(sub_rsrc)
