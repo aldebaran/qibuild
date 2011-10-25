@@ -23,19 +23,29 @@ def callback(total, done):
     sys.stdout.flush()
 
 
-def download(url, output_dir, callback=callback, clobber=True, message=None):
+def download(url, output_dir,
+    output_name=None,
+    callback=callback,
+    clobber=True,
+    message=None):
     """ Download a file from an url, and save it
     in output_dir.
 
-    The name of the file will be the basename of the url,
+    The name of the file will be the basename of the url, unless
+    output_name is given
     and a nice progressbar will be printed during the download
 
     If clobber is False, the file won't be overwritten if it
     already exists
 
+    Returns the path to the downloaded file
+
     """
-    dest_name = url.split("/")[-1]
-    dest_name = os.path.join(output_dir, dest_name)
+    if output_name:
+        dest_name = os.path.join(output_dir, output_name)
+    else:
+        dest_name = url.split("/")[-1]
+        dest_name = os.path.join(output_dir, dest_name)
 
     error = None
 
