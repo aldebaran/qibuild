@@ -117,7 +117,7 @@ def _handle_files(src, dest, root, files, filter, quiet):
         fdest = os.path.join(new_root, f)
         if os.path.islink(fsrc):
             mkdir(new_root, recursive=True)
-            _copy_link(fsrc, fdest)
+            _copy_link(fsrc, fdest, quiet)
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
                 raise Exception("Expecting a file but found a directory: %s" % fdest)
