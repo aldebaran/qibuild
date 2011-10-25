@@ -1,11 +1,11 @@
 <toolchain>
     <package name="boost" version="1.42"
         arch="linux32"
-        url="boost-1.42-linux32.tar.gz"
+        url="@srv_url@/boost-1.42-linux32.tar.gz"
         toolchain_file="toolchain-geode.cmake"
     />
     <package name="boost" version="1.42"
         arch="linux64"
-        url="boost-1.42-linux64.tar.gz"
+        url="@srv_url@/boost-1.42-linux64.tar.gz"
     />
 </toolchain>

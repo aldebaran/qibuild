@@ -1,10 +1,10 @@
 <toolchain>
     <package name="nuance"
-        url="nuance-42-geode.tar.gz"
+        url="@srv_url@/nuance-42-geode.tar.gz"
         arch="opennao-geode"
     />
     <package name="nuance"
-        url="nuance-42.atom.tar.gz"
+        url="@srv_url@/nuance-42.atom.tar.gz"
         arch="opennao-atom"
     />
 </toolchain>

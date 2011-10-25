@@ -1,6 +1,6 @@
 <toolchain>
-    <feed url="thirdparty.xml" />
-    <feed url="continuous.xml" />
+    <feed url="@srv_url@/thirdparty.xml" />
+    <feed url="@srv_url@/continuous.xml" />
     <select>
         <arch>linux32</arch>
     </select>

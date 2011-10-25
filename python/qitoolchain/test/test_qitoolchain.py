@@ -127,13 +127,24 @@ class FeedTestCase(unittest.TestCase):
         dest in self.tmp
 
         Returns path to the created file
+        Replace @srv_url@ by file://path/to/fest/feeds/ while
+        doing so
 
         """
         this_dir = os.path.dirname(__file__)
         this_dir = qibuild.sh.to_native_path(this_dir)
         src = os.path.join(this_dir, "feeds", name)
-        dest = os.path.join(self.tmp, dest, name)
-        qibuild.sh.install(src, dest, quiet=True)
+        dest = os.path.join(self.tmp, dest)
+        qibuild.sh.mkdir(dest, recursive=True)
+        dest = os.path.join(dest, name)
+        srv_path = os.path.join(this_dir, "feeds")
+        srv_path = qibuild.sh.to_posix_path(srv_path)
+        srv_url = "file://" + srv_path
+        with open(src, "r") as fp:
+            lines = fp.readlines()
+        lines = [l.replace("@srv_url@", srv_url) for l in lines]
+        with open(dest, "w") as fp:
+            fp.writelines(lines)
         return dest
 
     def test_sdk_parse(self):
@@ -170,8 +181,16 @@ class FeedTestCase(unittest.TestCase):
             "Did not find %s\n in\n %s" % (expected, tc_file))
 
 
+    def test_buildfarm_parse(self):
+        srv_path = os.path.join(self.tmp, "srv")
+        self.configure_xml("continuous.xml", srv_path)
+        self.configure_xml("thirdparty.xml", srv_path)
+        buildfarm_xml = self.configure_xml("buildfarm.xml",  srv_path)
 
+        tc = qitoolchain.Toolchain("buildfarm")
+        tc.parse_feed(buildfarm_xml)
 
+        print tc.packages
 
 
 

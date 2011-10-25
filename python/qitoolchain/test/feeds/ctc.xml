@@ -3,7 +3,7 @@
         directory="."
         toolchain_file = "toolchain-geode.cmake"
     />
-    <feed url="opennao.xml" />
+    <feed url="@srv_url@/opennao.xml" />
     <select>
         <arch>opennao-geode</arch>
     </select>
