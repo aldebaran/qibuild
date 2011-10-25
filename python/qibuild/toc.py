@@ -240,7 +240,7 @@ class Toc(WorkTree):
         self.packages = list()
         self.toolchain = None
         if self.active_config is not None:
-            if self.active_config in qitoolchain.get_toolchain_names():
+            if self.active_config in qitoolchain.get_tc_names():
                 self.toolchain = qitoolchain.Toolchain(self.active_config)
                 self.packages  = self.toolchain.packages
             else:
@@ -256,7 +256,7 @@ class Toc(WorkTree):
 """
                     raise Exception(mess.format(active_config=self.active_config,
                         local_cmake = local_cmake,
-                        tc_names = qitoolchain.get_toolchain_names()))
+                        tc_names = qitoolchain.get_tc_names()))
 
         # Useful vars to cope with Visual Studio quirks
         self.using_visual_studio = "Visual Studio" in self.cmake_generator

@@ -17,7 +17,7 @@ def configure_parser(parser):
 
 def do(args):
     """ Main method """
-    tc_names = qitoolchain.get_toolchain_names()
+    tc_names = qitoolchain.get_tc_names()
     for tc_name in tc_names:
         toolchain = qitoolchain.Toolchain(tc_name)
         print toolchain
