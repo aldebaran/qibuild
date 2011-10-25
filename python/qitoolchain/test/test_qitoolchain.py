@@ -12,22 +12,6 @@ import qibuild
 import qitoolchain
 
 
-BAD_CMAKE_CONFIG = """
-[toolchain]
-cmake.flags = FOO
-"""
-
-TEST_CONFIG = """
-[toolchain]
-cmake.flags = FOO=BAR SPAM=EGGS
-toolchain_file = /path/to/ctc/toolchain-atom.cmake
-"""
-
-EMPTY_CONFIG = """
-[toolchain]
-"""
-
-
 class QiToolchainTestCase(unittest.TestCase):
     def setUp(self):
         """ Small hack: set qitoolchain.CONFIG_PATH global variable
@@ -39,20 +23,17 @@ class QiToolchainTestCase(unittest.TestCase):
         qitoolchain.toolchain.CACHE_PATH  = os.path.join(self.tmp, "cache")
 
 
-    def tearDown(self):
-        qibuild.sh.rm(self.tmp)
-
-    def write_conf(self, name, conf):
-        """ Helper function: write a test config file for
-        toolchain 'name' with config read from conf
+    def get_tc_file_contents(self, tc):
+        """ get the contents of the toolchain file of a toolchain
 
         """
-        config_path = os.path.join(self.tmp, "config", "toolchains")
-        qibuild.sh.mkdir(config_path, recursive=True)
-        config_path = os.path.join(config_path, name + ".cfg")
-        with open(config_path, "w") as fp:
-            fp.write(conf)
+        tc_file_path = tc.toolchain_file
+        with open(tc_file_path, "r") as fp:
+            contents = fp.read()
+        return contents
 
+    def tearDown(self):
+        qibuild.sh.rm(self.tmp)
 
     def test_setup(self):
         # Check that we are not modifying normal config
@@ -65,33 +46,11 @@ class QiToolchainTestCase(unittest.TestCase):
         self.assertEquals(tc_names, list())
 
 
-    def test_bad_config(self):
-        self.write_conf("foo", BAD_CMAKE_CONFIG)
-        error = None
-
-        try:
-            qitoolchain.Toolchain("foo")
-        except Exception, e:
-            error = e
-
-        self.assertFalse(error is None)
-        self.assertTrue("Invalid cmake.flags setting" in str(error))
-
-    def test_load_config(self):
-        self.write_conf("foo", TEST_CONFIG)
-        foo = qitoolchain.Toolchain("foo")
-
+    def test_create_toolchain(self):
+        qitoolchain.Toolchain("foo")
         self.assertEquals(qitoolchain.get_tc_names(), ["foo"])
 
-        tc_file_path = foo.toolchain_file
-        with open(tc_file_path, "r") as fp:
-            tc_file = fp.read()
-
-        self.assertTrue('set(FOO "BAR" CACHE INTERNAL "" FORCE)' in tc_file)
-        self.assertTrue('include("/path/to/ctc/toolchain-atom.cmake")' in tc_file)
-
     def test_add_package(self):
-        self.write_conf("test", EMPTY_CONFIG)
         tc = qitoolchain.Toolchain("test")
 
         self.assertEquals(tc.packages, list())
@@ -101,10 +60,7 @@ class QiToolchainTestCase(unittest.TestCase):
         self.assertEquals(tc.packages, [foo_package])
 
         # Check that generated toolchain file is correct
-        tc_file_path = tc.toolchain_file
-        with open(tc_file_path, "r") as fp:
-            tc_file = fp.read()
-
+        tc_file = self.get_tc_file_contents(tc)
         self.assertTrue('list(APPEND CMAKE_PREFIX_PATH "%s")' % "/path/to/foo"
             in tc_file)
 
@@ -115,14 +71,10 @@ class QiToolchainTestCase(unittest.TestCase):
         # Create a new toolchain object and check that toolchain
         # file contents did not change
         other_tc = qitoolchain.Toolchain("test")
-        other_tc_file_path = other_tc.toolchain_file
-        with open(other_tc_file_path, "r") as fp:
-            other_tc_file = fp.read()
-
+        other_tc_file = self.get_tc_file_contents(other_tc)
         self.assertEquals(other_tc_file, tc_file)
 
     def test_remove_package(self):
-        self.write_conf("test", EMPTY_CONFIG)
         tc = qitoolchain.Toolchain("test")
 
         error = None
@@ -140,19 +92,26 @@ class QiToolchainTestCase(unittest.TestCase):
 
         tc.remove_package("foo")
 
-        tc_file_path = tc.toolchain_file
-        with open(tc_file_path, "r") as fp:
-            tc_file = fp.read()
+        tc_file = self.get_tc_file_contents(tc)
 
         self.assertFalse("/path/to/foo" in tc_file)
 
-    def test_no_config(self):
-        """ Check that you do not need a config file to
-        test a toolchain
+    def test_add_package_with_tc_file(self):
+        tc = qitoolchain.Toolchain("test")
+        naoqi_ctc = qitoolchain.toolchain.Package("naoqi-ctc", "/path/to/ctc", "toolchain-geode.cmake")
+        tc.add_package(naoqi_ctc)
 
-        """
-        tc = qitoolchain.Toolchain("foo")
-        self.assertEquals(qitoolchain.get_tc_names(), ["foo"])
+        tc_file = self.get_tc_file_contents(tc)
+        self.assertTrue('include("/path/to/ctc/toolchain-geode.cmake")' in tc_file, tc_file)
+
+    def test_remove_package_with_tc_file(self):
+        tc = qitoolchain.Toolchain("test")
+        naoqi_ctc = qitoolchain.toolchain.Package("naoqi-ctc", "/path/to/ctc", "toolchain-geode.cmake")
+        tc.add_package(naoqi_ctc)
+        tc.remove_package("naoqi-ctc")
+
+        tc_file = self.get_tc_file_contents(tc)
+        self.assertFalse("toolchain-geode.cmake" in tc_file)
 
 
 if __name__ == "__main__":
