@@ -41,6 +41,7 @@ def download(url, output_dir,
     Returns the path to the downloaded file
 
     """
+    qibuild.sh.mkdir(output_dir, recursive=True)
     if output_name:
         dest_name = os.path.join(output_dir, output_name)
     else:
