@@ -13,6 +13,20 @@ CONFIG_PATH = "~/.config/qi/"
 CACHE_PATH  = "~/.cache/qi"
 
 
+def get_default_packages_path(tc_name):
+    """ Get a default path to store extracted packages
+
+    """
+    configstore = qibuild.configstore.ConfigStore()
+    cfg_path = get_tc_config_path()
+    configstore.read(cfg_path)
+    root = configstore.get("default.root")
+    if not root:
+        root = qibuild.sh.to_native_path("~/.local/share/qi/toolchains")
+    res = os.path.join(root, tc_name)
+    qibuild.sh.mkdir(res, recursive=True)
+    return res
+
 def get_tc_names():
     """ Return the list of all known toolchains
 
