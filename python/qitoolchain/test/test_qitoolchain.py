@@ -103,7 +103,7 @@ class QiToolchainTestCase(unittest.TestCase):
         tc.add_package(naoqi_ctc)
 
         tc_file = get_tc_file_contents(tc)
-        self.assertTrue('include("/path/to/ctc/toolchain-geode.cmake")' in tc_file, tc_file)
+        self.assertTrue('include("toolchain-geode.cmake")' in tc_file, tc_file)
 
     def test_remove_package_with_tc_file(self):
         tc = qitoolchain.Toolchain("test")
