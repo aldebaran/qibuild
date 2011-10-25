@@ -65,6 +65,21 @@ def package_from_tree(feed, tree):
     return qitoolchain.Package(package_name, package_path, toolchain_path)
 
 
+def package_from_archive(toolchain, archive_path):
+    """ Extract an archive in the cache, then
+    return a qitoolchain.Package object
+
+    """
+    tc_cache = toolchain.cache
+    return qitoolchain.Package("", "")
+
+def package_from_url(toolchain, package_url):
+    """
+
+    """
+    package_archive = qitoolchain.remote.download(package_url, toolchain.cache)
+    return package_from_archive(toolchain, package_archive)
+
 def parse_feed(toolchain, feed):
     """ Parse the feed and add the packages in the toolchain
 

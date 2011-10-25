@@ -31,8 +31,5 @@ def do(args):
     package_name = args.package_name
     package_path = args.package_path
     tc = qitoolchain.get_toolchain(args)
-    tc_cache_path = qitoolchain.get_tc_cache(tc.name)
-    dest = os.path.join(tc_cache_path, package_name)
-    in_cache = qibuild.archive.archive_name(dest)
-    qibuild.sh.install(package_path, in_cache)
-    tc.add_package(package_name, in_cache)
+    package = qitoolchain.feed.package_from_archive(tc, package_path)
+    tc.add_package(package)

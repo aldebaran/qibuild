@@ -28,9 +28,4 @@ def do(args):
     tc = qitoolchain.get_toolchain(args)
 
     LOGGER.info("Removing package %s from toolchain %s", package_name, tc.name)
-    tc_cache_path = qitoolchain.get_tc_cache(tc.name)
-    in_cache = os.path.join(tc_cache_path, package_name)
-    in_cache = qibuild.archive.archive_name(in_cache)
-    qibuild.sh.rm(in_cache)
-
     tc.remove_package(package_name)

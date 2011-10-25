@@ -22,26 +22,7 @@ def configure_parser(parser):
 def do(args):
     """ Main entry point  """
     tc_name = args.name
+    toolchain = qitoolchain.Toolchain(tc_name)
     LOGGER.info("Removing toolchain %s", tc_name)
-
-    LOGGER.info("Removing cache ...")
-    tc_cache_path = qitoolchain.get_tc_cache(args.name)
-    qibuild.sh.rm(tc_cache_path)
-
-    LOGGER.info("Removing packages ...")
-    tc_path = qitoolchain.get_tc_path(tc_name)
-    qibuild.sh.rm(tc_path)
-
-    LOGGER.info("Updating configuration ...")
-    cfg_path = qitoolchain.get_tc_config_path()
-
-    tc_section = 'toolchain "%s"' % tc_name
-
-    config = ConfigParser.RawConfigParser()
-    config.read(cfg_path)
-
-    config.remove_section(tc_section)
-    with open(cfg_path, "w") as fp:
-        config.write(fp)
-
+    toolchain.remove()
     LOGGER.info("Done removing toolchain %s", tc_name)

@@ -5,14 +5,15 @@ A set of packages and a toolchain file
 
 """
 
+import os
+import ConfigParser
+
+import qibuild
+import qitoolchain
+
 CONFIG_PATH = "~/.config/qi/"
 CACHE_PATH  = "~/.cache/qi"
 
-import ConfigParser
-
-import os
-import qibuild
-import qitoolchain
 
 def get_tc_names():
     """ Return the list of all known toolchains
@@ -99,8 +100,8 @@ class Toolchain:
     def __init__(self, name):
         self.name = name
         self.packages = list()
-        cache_path = self._get_cache_path()
-        self.toolchain_file  = os.path.join(cache_path, "toolchain-%s.cmake" % self.name)
+        self.cache = self._get_cache_path()
+        self.toolchain_file  = os.path.join(self.cache, "toolchain-%s.cmake" % self.name)
 
         # Add self to the list of known toolchains:
         if not self.name in get_tc_names():
@@ -115,6 +116,24 @@ class Toolchain:
 
         self.cmake_flags = list()
         self.load_config()
+
+
+    def remove(self):
+        """ Remove a toolchain
+
+        Clean cache, remove all packages, remove self from configurations
+        """
+        qibuild.sh.rm(self.cache)
+
+        cfg_path = get_tc_config_path()
+        tc_section = 'toolchain "%s"' % self.name
+
+        config = ConfigParser.RawConfigParser()
+        config.read(cfg_path)
+
+        config.remove_section(tc_section)
+        with open(cfg_path, "w") as fp:
+            config.write(fp)
 
 
     def _get_config_path(self):
@@ -234,4 +253,25 @@ class Toolchain:
 
         """
         qitoolchain.feed.parse_feed(self, feed)
+
+
+    def install_package(self, package_name, destdir, runtime=False):
+        """ Install a package to a destdir.
+
+        If a runtime is False, only the runtime files
+        (dynamic libraries, executables, config files) will be
+        installed
+
+        """
+        package_names = [p.name for p in self.packages]
+        if package_name not in package_names:
+            mess  = "Could not install %s from toolchain %s" % (package_name, self.name)
+            mess += "No such package"
+            raise Exception(mess)
+        package = [p for p in self.packages if p.name == package_name][0]
+        package_path = package.path
+        if runtime:
+            qibuild.sh.install(package_path, destdir, filter=qibuild.sh.is_runtime)
+        else:
+            qibuild.sh.install(package_path, destdir)
 
