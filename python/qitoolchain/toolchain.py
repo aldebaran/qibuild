@@ -69,6 +69,13 @@ class Package():
         res += ">"
         return res
 
+    def __str__(self):
+        res = self.name
+        res += "\nIn %s" % self.path
+        if self.toolchain_file:
+            res += "\nUsing %s toolchain file" % self.toolchain_file
+        return res
+
     def __eq__(self, other):
         if self.name  != other.name:
             return False
@@ -116,6 +123,14 @@ class Toolchain:
 
         self.cmake_flags = list()
         self.load_config()
+
+    def __str__(self):
+        res  = "Toolchain %s\n" % self.name
+        if self.packages:
+            res += "  Packages:\n"
+        for package in self.packages:
+            res += " " * 4 + str(package).replace("\n", "\n" + " " * 4)
+        return res
 
 
     def remove(self):
