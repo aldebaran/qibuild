@@ -135,7 +135,7 @@ class FeedTestCase(unittest.TestCase):
         this_dir = qibuild.sh.to_native_path(this_dir)
         src = os.path.join(this_dir, "feeds", name)
         dest = os.path.join(self.tmp, dest, name)
-        qibuild.sh.install(src, dest)
+        qibuild.sh.install(src, dest, quiet=True)
         return dest
 
     def test_sdk_parse(self):
