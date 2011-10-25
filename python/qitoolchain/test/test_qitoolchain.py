@@ -11,6 +11,14 @@ import unittest
 import qibuild
 import qitoolchain
 
+def get_tc_file_contents(tc):
+    """ get the contents of the toolchain file of a toolchain
+
+    """
+    tc_file_path = tc.toolchain_file
+    with open(tc_file_path, "r") as fp:
+        contents = fp.read()
+    return contents
 
 class QiToolchainTestCase(unittest.TestCase):
     def setUp(self):
@@ -23,14 +31,6 @@ class QiToolchainTestCase(unittest.TestCase):
         qitoolchain.toolchain.CACHE_PATH  = os.path.join(self.tmp, "cache")
 
 
-    def get_tc_file_contents(self, tc):
-        """ get the contents of the toolchain file of a toolchain
-
-        """
-        tc_file_path = tc.toolchain_file
-        with open(tc_file_path, "r") as fp:
-            contents = fp.read()
-        return contents
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
@@ -55,12 +55,12 @@ class QiToolchainTestCase(unittest.TestCase):
 
         self.assertEquals(tc.packages, list())
 
-        foo_package = qitoolchain.toolchain.Package("foo", "/path/to/foo")
+        foo_package = qitoolchain.Package("foo", "/path/to/foo")
         tc.add_package(foo_package)
         self.assertEquals(tc.packages, [foo_package])
 
         # Check that generated toolchain file is correct
-        tc_file = self.get_tc_file_contents(tc)
+        tc_file = get_tc_file_contents(tc)
         self.assertTrue('list(APPEND CMAKE_PREFIX_PATH "%s")' % "/path/to/foo"
             in tc_file)
 
@@ -71,7 +71,7 @@ class QiToolchainTestCase(unittest.TestCase):
         # Create a new toolchain object and check that toolchain
         # file contents did not change
         other_tc = qitoolchain.Toolchain("test")
-        other_tc_file = self.get_tc_file_contents(other_tc)
+        other_tc_file = get_tc_file_contents(other_tc)
         self.assertEquals(other_tc_file, tc_file)
 
     def test_remove_package(self):
@@ -87,31 +87,72 @@ class QiToolchainTestCase(unittest.TestCase):
         self.assertFalse(error is None)
         self.assertTrue("No such package" in str(error))
 
-        foo_package = qitoolchain.toolchain.Package("foo", "/path/to/foo")
+        foo_package = qitoolchain.Package("foo", "/path/to/foo")
         tc.add_package(foo_package)
 
         tc.remove_package("foo")
 
-        tc_file = self.get_tc_file_contents(tc)
+        tc_file = get_tc_file_contents(tc)
 
         self.assertFalse("/path/to/foo" in tc_file)
 
     def test_add_package_with_tc_file(self):
         tc = qitoolchain.Toolchain("test")
-        naoqi_ctc = qitoolchain.toolchain.Package("naoqi-ctc", "/path/to/ctc", "toolchain-geode.cmake")
+        naoqi_ctc = qitoolchain.Package("naoqi-ctc", "/path/to/ctc", "toolchain-geode.cmake")
         tc.add_package(naoqi_ctc)
 
-        tc_file = self.get_tc_file_contents(tc)
+        tc_file = get_tc_file_contents(tc)
         self.assertTrue('include("/path/to/ctc/toolchain-geode.cmake")' in tc_file, tc_file)
 
     def test_remove_package_with_tc_file(self):
         tc = qitoolchain.Toolchain("test")
-        naoqi_ctc = qitoolchain.toolchain.Package("naoqi-ctc", "/path/to/ctc", "toolchain-geode.cmake")
+        naoqi_ctc = qitoolchain.Package("naoqi-ctc", "/path/to/ctc", "toolchain-geode.cmake")
         tc.add_package(naoqi_ctc)
         tc.remove_package("naoqi-ctc")
 
-        tc_file = self.get_tc_file_contents(tc)
+        tc_file = get_tc_file_contents(tc)
         self.assertFalse("toolchain-geode.cmake" in tc_file)
+
+
+
+class FeedTestCase(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix="test-feed")
+        qitoolchain.toolchain.CONFIG_PATH = os.path.join(self.tmp, "config")
+        qitoolchain.toolchain.CACHE_PATH  = os.path.join(self.tmp, "cache")
+
+    def tearDown(self):
+        qibuild.sh.rm(self.tmp)
+
+    def configure_xml(self, name, dest):
+        """ Copy a xml file from the test dir to a
+        dest in self.tmp
+
+        Returns path to the created file
+
+        """
+        this_dir = os.path.dirname(__file__)
+        this_dir = qibuild.sh.to_native_path(this_dir)
+        src = os.path.join(this_dir, "feeds", name)
+        dest = os.path.join(self.tmp, dest, name)
+        qibuild.sh.install(src, dest)
+        return dest
+
+    def test_sdk_parse(self):
+        # Generate a fake SDK in self.tmp
+        sdk_path = os.path.join(self.tmp, "sdk")
+        sdk_xml = self.configure_xml("sdk.xml", sdk_path)
+
+        tc = qitoolchain.Toolchain("sdk")
+        tc.parse_feed(sdk_xml)
+        tc_file = get_tc_file_contents(tc)
+
+        package_names = [p.name for p in tc.packages]
+
+        self.assertTrue("naoqi-sdk" in package_names)
+        self.assertTrue(qibuild.sh.to_posix_path(sdk_path) in tc_file)
+
+
 
 
 if __name__ == "__main__":

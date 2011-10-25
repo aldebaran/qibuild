@@ -12,6 +12,7 @@ import ConfigParser
 
 import os
 import qibuild
+import qitoolchain
 
 def get_tc_names():
     """ Return the list of all known toolchains
@@ -225,4 +226,12 @@ class Toolchain:
 
         with open(self.toolchain_file, "w") as fp:
             lines = fp.writelines(lines)
+
+
+    def parse_feed(self, feed):
+        """ Recursively parse an xml feed,
+        adding packages while doing so
+
+        """
+        qitoolchain.feed.parse_feed(self, feed)
 
