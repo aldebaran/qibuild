@@ -47,43 +47,58 @@ def package_from_tree(toolchain, feed, tree):
     mess  = "Error when parsing feed: '%s'\n" % feed
     mess += "Could not parse:\t%s\n" % as_str
 
+    package.feed = feed
     name = tree.get("name")
     if not name:
         mess += "Missing 'name' attribue"
         raise Exception(mess)
-    package_name = name
-    package_path = None
 
-    feed_root = os.path.dirname(feed)
-    directory = tree.get("directory")
-    if directory:
-        package_path = os.path.join(feed_root, directory)
-        package_path = qibuild.sh.to_native_path(package_path)
-
-        toolchain_path = None
-        toolchain_file = tree.get("toolchain_file")
-        if toolchain_file:
-            toolchain_path = os.path.join(feed_root, toolchain_file)
-            toolchain_path = qibuild.sh.to_native_path(toolchain_path)
-
-        return qitoolchain.Package(package_name, package_path, toolchain_path)
-
-    package_url = tree.get("url")
-    if package_url:
-        return package_from_url(toolchain, package_url, package_name)
+    package.url = tree.get("url")
+    package.arch = tree.get("arch")
+    package.version = tree.get("version")
+    package.directory = tree.get("directory")
+    package.toolchain_file = tree.get("toolchain_file")
 
     return None
 
+def handle_package(toolchain, package):
+    """ Handle a package.
 
-def package_from_archive(toolchain, package_name, archive_path):
-    """ Extract an archive in the cache, then
-    return a qitoolchain.Package object
+    It is has an url, download and extract it.
+    """
+    if package.url:
+        handle_remote_package(toolchain, package)
+    if package.directory:
+        handle_local_package(package)
+    if package.toolchain_file:
+        handle_toochain_file(package)
+
+def handle_remote_package(toolchain, package):
+    """ Set package.path of the given package,
+    downloading it and extracting it if necessary.
 
     """
+    # We use a sha1 for the url to be sure to not downlad the
+    # same package twice
+    archive_name = hashlib.sha1(package.url).hexdigest()
+    top = archive_name[:2]
+    rest = archive_name[2:]
+    if package_url.endswith(".tar.gz"):
+        rest += ".tar.gz"
+    if package_url.endswith(".zip"):
+        rest += ".zip"
+    output = toolchain.cache
+    output = os.path.join(output, top)
+    message = "Getting package %s from %s" % (package_name, package_url)
+    package_archive = qitoolchain.remote.download(package_url,
+        output,
+        output_name=rest,
+        clobber=False,
+        message=message)
+
     packages_path = qitoolchain.toolchain.get_default_packages_path(toolchain.name)
     should_skip = False
     dest = os.path.join(packages_path, package_name)
-    res = qitoolchain.Package(package_name, dest)
     if not os.path.exists(dest):
         should_skip = False
     else:
@@ -102,44 +117,97 @@ def package_from_archive(toolchain, package_name, archive_path):
             if os.path.exists(dest):
                 qibuild.sh.rm(dest)
             qibuild.sh.mv(extracted, dest)
-    return res
+    package.path = dest
 
-def package_from_url(toolchain, package_url, package_name):
-    """ Get a package from an url
+
+def handle_local_package(toolchain, package):
+    """ Set package.path using package.feed
 
     """
-    # We use a sha1 for the url to be sure to not downlad the
-    # same package twice
-    archive_name = hashlib.sha1(package_url).hexdigest()
-    top = archive_name[:2]
-    rest = archive_name[2:]
-    if package_url.endswith(".tar.gz"):
-        rest += ".tar.gz"
-    if package_url.endswith(".zip"):
-        rest += ".zip"
-    output = toolchain.cache
-    output = os.path.join(output, top)
-    message = "Getting package %s from %s" % (package_name, package_url)
-    package_archive = qitoolchain.remote.download(package_url,
-        output,
-        output_name=rest,
-        clobber=False,
-        message=message)
-    return package_from_archive(toolchain, package_name, package_archive)
+    feed = package.feed
+    feed_root = os.path.dirname(feed)
+    package.path = os.path.join(feed_root, package.directory)
+
+
+def handle_toochain_file(package):
+    """ Make sure package.toolchain_file is
+    relative to package.path
+
+    """
+    package.toolchain_file = os.path.join(package.path, package.toolchain_file)
+
+class PackageSelector:
+    """ A class to handle package selection
+
+    Usage:
+        selector = PackageSelector()
+        selector.parse(tree) # where tree in a select xml configuration
+        selector.select(package)
+
+    """
+    def __init__(self):
+        self._tree = None
+
+    def parse(self, select_tree):
+        """ Read an xml configuration looking like
+        <select>
+            <arch>linux32</arch>
+        </select>
+
+        """
+        self._tree = select_tree
+
+    def select(self, package_tree):
+        """ Parse an xml package configuration.
+        Returns True if we should keep the
+        package
+
+        """
+        if self._tree is None:
+            return True
+        return True
+
+
+class ToolchainFeedParser:
+    """ A class to handle feed parsing
+
+    """
+    def __init__(self, toolchain):
+        self.toolchain = toolchain
+        self.packages = list()
+        self.selector = PackageSelector()
+
+
+    def parse(self, feed):
+        """ Recursively parse the feed, filling the packages
+        last variable
+
+        """
+        tree = tree_from_feed(feed)
+        select_tree = tree.find("select")
+        if select_tree is not None:
+            self.selector.parse(select_tree)
+        package_trees = tree.findall("package")
+        for package_tree in package_trees:
+            package = package_from_tree(self.toolchain, feed, package_tree)
+            if package:
+                if self.selector.select(package):
+                    self.packages.append(package)
+        feeds = tree.findall("feed")
+        for feed_tree in feeds:
+            feed_url = feed_tree.get("url")
+            if feed_url:
+                self.parse(feed_url)
+
 
 def parse_feed(toolchain, feed):
-    """ Parse the feed and add the packages in the toolchain
+    """ Recursively parse an xml feed,
+    adding packages to the feed while doing so
 
     """
-    tree = tree_from_feed(feed)
-    package_trees = tree.findall("package")
-    for package_tree in package_trees:
-        package = package_from_tree(toolchain, feed, package_tree)
-        if package:
-            toolchain.add_package(package)
-    feeds = tree.findall("feed")
-    for feed_tree in feeds:
-        feed_url = feed_tree.get("url")
-        if feed_url:
-            parse_feed(toolchain, feed_url)
-
+    parser = ToolchainFeedParser(toolchain)
+    parser.parse(feed)
+    packages = parser.packages
+    for package in packages:
+        handle_package(package)
+        toolchain.add_package(package)

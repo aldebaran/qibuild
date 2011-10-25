@@ -280,10 +280,23 @@ class Toolchain:
 
     def parse_feed(self, feed):
         """ Recursively parse an xml feed,
-        adding packages while doing so
+        adding packages to the feed while doing so
 
         """
         qitoolchain.feed.parse_feed(self, feed)
+
+    def get(self, package_name):
+        """ Get the path to a package
+
+        """
+        package_names = [p.name for p in self.packages]
+        if package_name not in package_names:
+            mess  = "Could not install %s from toolchain %s" % (package_name, self.name)
+            mess += "No such package"
+            raise Exception(mess)
+        package = [p for p in self.packages if p.name == package_name][0]
+        package_path = package.path
+        return package_path
 
 
     def install_package(self, package_name, destdir, runtime=False):
@@ -294,13 +307,7 @@ class Toolchain:
         installed
 
         """
-        package_names = [p.name for p in self.packages]
-        if package_name not in package_names:
-            mess  = "Could not install %s from toolchain %s" % (package_name, self.name)
-            mess += "No such package"
-            raise Exception(mess)
-        package = [p for p in self.packages if p.name == package_name][0]
-        package_path = package.path
+        package_path = self.get(package_name)
         if runtime:
             qibuild.sh.install(package_path, destdir, filter=qibuild.sh.is_runtime)
         else:

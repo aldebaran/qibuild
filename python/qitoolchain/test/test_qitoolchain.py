@@ -20,6 +20,7 @@ def get_tc_file_contents(tc):
         contents = fp.read()
     return contents
 
+
 class QiToolchainTestCase(unittest.TestCase):
     def setUp(self):
         """ Small hack: set qitoolchain.CONFIG_PATH global variable
@@ -219,6 +220,12 @@ class FeedTestCase(unittest.TestCase):
         self.assertTrue("nuance" in package_names)
         self.assertTrue("naoqi-geode-ctc" in package_names)
 
+        nuance_path = tc.get("nuance")
+        nuance_geode = os.path.join(nuance_path, "nuance-42-geode")
+        nuance_atom  = os.path.join(nuance_path, "nuance-42-atom")
+
+        self.assertTrue(os.path.exists(nuance_geode))
+        self.assertFalse(os.path.exists(nuance_atom))
 
 
     def test_buildfarm(self):
