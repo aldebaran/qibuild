@@ -1,6 +1,3 @@
-<toolchain arch="linux32">
+<toolchain>
     <package name="naoqi-sdk" directory="." />
-    <select>
-        <arch>linux32</arch>
-    </select>
 </toolchain>
