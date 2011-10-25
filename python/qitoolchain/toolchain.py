@@ -11,6 +11,7 @@ import qitoolchain
 
 CONFIG_PATH = "~/.config/qi/"
 CACHE_PATH  = "~/.cache/qi"
+SHARE_PATH  = "~/.local/share/qi/"
 
 
 def get_default_packages_path(tc_name):
@@ -22,7 +23,8 @@ def get_default_packages_path(tc_name):
     configstore.read(cfg_path)
     root = configstore.get("default.root")
     if not root:
-        root = qibuild.sh.to_native_path("~/.local/share/qi/toolchains")
+        root = qibuild.sh.to_native_path(SHARE_PATH)
+        root = os.path.join(SHARE_PATH, "toolchains")
     res = os.path.join(root, tc_name)
     qibuild.sh.mkdir(res, recursive=True)
     return res
