@@ -66,7 +66,7 @@ def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
         with open(out_path, "w") as out_file:
             out_file.write(out_content)
 
-def _copy_link(src, dest):
+def _copy_link(src, dest, quiet):
     if not os.path.islink(src):
         raise Exception("%s is not a link!" % src)
 
@@ -74,12 +74,12 @@ def _copy_link(src, dest):
         #remove existing stuff
     if os.path.lexists(dest):
         rm(dest)
-    if sys.stdout.isatty():
+    if sys.stdout.isatty() and not quiet:
         print "-- Installing %s -> %s" % (dest, target)
     os.symlink(target, dest)
 
 
-def _handle_dirs(src, dest, root, directories, filter):
+def _handle_dirs(src, dest, root, directories, filter, quiet):
     """ Helper function used by install()
 
     """
@@ -97,13 +97,13 @@ def _handle_dirs(src, dest, root, directories, filter):
         ddest = os.path.join(new_root, directory)
 
         if os.path.islink(dsrc):
-            _copy_link(dsrc, ddest)
+            _copy_link(dsrc, ddest, quiet)
         else:
             if os.path.lexists(ddest) and not os.path.isdir(ddest):
                 raise Exception("Expecting a directory but found a file: %s" % ddest)
             mkdir(ddest, recursive=True)
 
-def _handle_files(src, dest, root, files, filter):
+def _handle_files(src, dest, root, files, filter, quiet):
     """ Helper function used by install()
 
     """
@@ -121,13 +121,13 @@ def _handle_files(src, dest, root, files, filter):
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
                 raise Exception("Expecting a file but found a directory: %s" % fdest)
-            if sys.stdout.isatty():
+            if sys.stdout.isatty() and not quiet:
                 print "-- Installing %s" % fdest
             mkdir(new_root, recursive=True)
             shutil.copy(fsrc, fdest)
 
 
-def install(src, dest, filter=None):
+def install(src, dest, filter=None, quiet=False):
     """Install a directory to a destination.
 
     If filter is not None, then the file will only be
@@ -164,8 +164,8 @@ def install(src, dest, filter=None):
 
     if os.path.isdir(src):
         for (root, dirs, files) in os.walk(src):
-            _handle_dirs (src, dest, root, dirs,  filter)
-            _handle_files(src, dest, root, files, filter)
+            _handle_dirs (src, dest, root, dirs,  filter, quiet)
+            _handle_files(src, dest, root, files, filter, quiet)
     else:
         # Emulate posix `install' behavior:
         # if dest is a dir, install in the directory, else
@@ -173,7 +173,7 @@ def install(src, dest, filter=None):
         if os.path.isdir(dest):
             dest = os.path.join(dest, os.path.basename(src))
         mkdir(os.path.dirname(dest), recursive=True)
-        if sys.stdout.isatty():
+        if sys.stdout.isatty() and not quiet:
             print "-- Installing %s" % dest
         shutil.copy(src, dest)
 
