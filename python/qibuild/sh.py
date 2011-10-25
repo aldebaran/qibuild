@@ -363,3 +363,66 @@ class TempDir:
                 print "=="
                 return
         rm(self._temp_dir)
+
+
+
+
+def is_runtime(filename):
+    """ Filter function to only install runtime components of packages
+
+    """
+    # FIXME: this looks like a hack.
+    # Maybe a user-generated MANIFEST at the root of the package path
+    # would be better?
+
+    basename = os.path.basename(filename)
+    basedir  = filename.split(os.path.sep)[0]
+    if filename.startswith("bin"):
+        if sys.platform.startswith("win"):
+            if filename.endswith(".exe"):
+                return True
+            if filename.endswith(".dll"):
+                return True
+            else:
+                return False
+        else:
+            return True
+    if filename.startswith("lib"):
+        # exception for python:
+        if "python" in filename and filename.endswith("Makefile"):
+            return True
+        # shared libraries
+        shared_lib_ext = ""
+        if sys.platform.startswith("win"):
+            shared_lib_ext = ".dll"
+        if sys.platform == "linux2":
+            shared_lib_ext = ".so"
+        if sys.platform == "darwing":
+            shared_lib_ext = ".dylib"
+        if shared_lib_ext in basename:
+            return True
+        # python
+        if basename.endswith(".py"):
+            return True
+        if basename.endswith(".pyd"):
+            return True
+        else:
+            return False
+    if filename.startswith(os.path.join("share", "cmake")):
+        return False
+    if filename.startswith(os.path.join("share", "man")):
+        return False
+    if basedir == "share":
+        return True
+    if basedir == "include":
+        # exception for python:
+        if filename.endswith("pyconfig.h"):
+            return True
+        else:
+            return False
+    if basedir.endswith(".framework"):
+        return True
+
+    # True by default: better have too much stuff than
+    # not enough
+    return True
