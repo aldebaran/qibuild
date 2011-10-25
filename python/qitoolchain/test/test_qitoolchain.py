@@ -29,6 +29,7 @@ class QiToolchainTestCase(unittest.TestCase):
         self.tmp = tempfile.mkdtemp(prefix="test-qitoolchain")
         qitoolchain.toolchain.CONFIG_PATH = os.path.join(self.tmp, "config")
         qitoolchain.toolchain.CACHE_PATH  = os.path.join(self.tmp, "cache")
+        qitoolchain.toolchain.SHARE_PATH  = os.path.join(self.tmp, "share")
 
 
     def tearDown(self):
@@ -117,11 +118,12 @@ class QiToolchainTestCase(unittest.TestCase):
 class FeedTestCase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="test-feed")
+        self.srv = os.path.join(self.tmp, "srv")
         qitoolchain.toolchain.CONFIG_PATH = os.path.join(self.tmp, "config")
         qitoolchain.toolchain.CACHE_PATH  = os.path.join(self.tmp, "cache")
+        qitoolchain.toolchain.SHARE_PATH  = os.path.join(self.tmp, "share")
 
     def setup_srv(self):
-        self.srv = os.path.join(self.tmp, "srv")
         this_dir = os.path.dirname(__file__)
         this_dir = qibuild.sh.to_native_path(this_dir)
         feeds_dir = os.path.join(this_dir, "feeds")
@@ -129,9 +131,18 @@ class FeedTestCase(unittest.TestCase):
         for filename in contents:
             if filename.endswith(".xml"):
                 self.configure_xml(filename, self.srv)
-            else:
-                src = os.path.join(feeds_dir, filename)
-                qibuild.sh.install(src, self.srv, quiet=True)
+
+        packages_dir = os.path.join(this_dir, "packages")
+        contents = os.listdir(packages_dir)
+        for filename in contents:
+            if filename.endswith(".tar.gz"):
+                continue
+            if filename.endswith(".zip"):
+                continue
+            package_dir = os.path.join(packages_dir, filename)
+            archive = qibuild.archive.zip(package_dir)
+            qibuild.sh.install(archive, self.srv, quiet=True)
+
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
@@ -160,7 +171,7 @@ class FeedTestCase(unittest.TestCase):
             fp.writelines(lines)
         return dest
 
-    def test_sdk_parse(self):
+    def test_sdk(self):
         # Generate a fake SDK in self.tmp
         sdk_path = os.path.join(self.tmp, "sdk")
         sdk_xml = self.configure_xml("sdk.xml", sdk_path)
@@ -174,7 +185,7 @@ class FeedTestCase(unittest.TestCase):
         self.assertTrue("naoqi-sdk" in package_names)
         self.assertTrue(qibuild.sh.to_posix_path(sdk_path) in tc_file)
 
-    def test_ctc_parse(self):
+    def test_ctc(self):
         # Generate a fake ctc in self.tmp
         ctc_path = os.path.join(self.tmp, "ctc")
         ctc_xml  = self.configure_xml("ctc.xml", ctc_path)
@@ -193,15 +204,34 @@ class FeedTestCase(unittest.TestCase):
         self.assertTrue(expected in tc_file,
             "Did not find %s\n in\n %s" % (expected, tc_file))
 
+    def test_ctc_nonfree(self):
+        self.setup_srv()
 
-    def test_buildfarm_parse(self):
+        # Generate a fake ctc in self.tmp
+        ctc_path = os.path.join(self.tmp, "ctc")
+        ctc_xml  = self.configure_xml("ctc-nonfree.xml", ctc_path)
+
+        tc = qitoolchain.Toolchain("ctc")
+        tc.parse_feed(ctc_xml)
+
+        package_names = [p.name for p in tc.packages]
+
+        self.assertTrue("nuance" in package_names)
+        self.assertTrue("naoqi-geode-ctc" in package_names)
+
+
+
+    def test_buildfarm(self):
         self.setup_srv()
         buildfarm_xml = os.path.join(self.srv, "buildfarm.xml")
 
         tc = qitoolchain.Toolchain("buildfarm")
         tc.parse_feed(buildfarm_xml)
 
-        print tc.packages
+        package_names = [p.name for p in tc.packages]
+
+        self.assertTrue("boost" in package_names)
+        self.assertTrue("naoqi" in package_names)
 
 
 
