@@ -1,8 +1,6 @@
 """ Toolchain
 
 A set of packages and a toolchain file
-
-
 """
 
 import os
@@ -61,6 +59,8 @@ class Package():
         if toolchain_file:
             toolchain_file = os.path.join(self.path, toolchain_file)
             self.toolchain_file = toolchain_file
+        # Quick hack for now
+        self.depends = list()
 
     def __repr__(self):
         res = "<Package %s in %s"  % (self.name, self.path)
