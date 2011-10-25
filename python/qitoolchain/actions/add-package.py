@@ -31,5 +31,5 @@ def do(args):
     package_name = args.package_name
     package_path = args.package_path
     tc = qitoolchain.get_toolchain(args)
-    package = qitoolchain.feed.package_from_archive(tc, package_path)
+    package = qitoolchain.feed.package_from_archive(tc, package_name, package_path)
     tc.add_package(package)

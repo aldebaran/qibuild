@@ -37,7 +37,7 @@ def tree_from_feed(feed_location):
     return tree
 
 
-def package_from_tree(feed, tree):
+def package_from_tree(toolchain, feed, tree):
     """ Get a package from an XML tree.
 
     Return None if something is wrong.
@@ -68,9 +68,9 @@ def package_from_tree(feed, tree):
 
         return qitoolchain.Package(package_name, package_path, toolchain_path)
 
-    url = tree.get("url")
-    if url:
-        return package_from_url(url)
+    package_url = tree.get("url")
+    if package_url:
+        return package_from_url(toolchain, package_url, package_name)
 
     return None
 
@@ -113,6 +113,10 @@ def package_from_url(toolchain, package_url, package_name):
     archive_name = hashlib.sha1(package_url).hexdigest()
     top = archive_name[:2]
     rest = archive_name[2:]
+    if package_url.endswith(".tar.gz"):
+        rest += ".tar.gz"
+    if package_url.endswith(".zip"):
+        rest += ".zip"
     output = toolchain.cache
     output = os.path.join(output, top)
     message = "Getting package %s from %s" % (package_name, package_url)
@@ -131,7 +135,7 @@ def parse_feed(toolchain, feed):
     tree = tree_from_feed(feed)
     package_trees = tree.findall("package")
     for package_tree in package_trees:
-        package = package_from_tree(feed, package_tree)
+        package = package_from_tree(toolchain, feed, package_tree)
         if package:
             toolchain.add_package(package)
     feeds = tree.findall("feed")
