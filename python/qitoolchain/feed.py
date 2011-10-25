@@ -7,6 +7,7 @@
 import os
 from xml.etree import ElementTree
 
+import qibuild
 import qitoolchain
 
 def tree_from_feed(feed_location):
@@ -29,7 +30,6 @@ def tree_from_feed(feed_location):
     finally:
         if fp:
             fp.close()
-
     return tree
 
 
@@ -48,14 +48,21 @@ def package_from_tree(feed, tree):
         mess += "Missing 'name' attribue"
         raise Exception(mess)
     package_name = name
-
     package_path = None
+
     feed_root = os.path.dirname(feed)
     directory = tree.get("directory")
     if directory:
         package_path = os.path.join(feed_root, directory)
+        package_path = qibuild.sh.to_native_path(package_path)
 
-    return qitoolchain.Package(package_name, package_path)
+    toolchain_path = None
+    toolchain_file = tree.get("toolchain_file")
+    if toolchain_file:
+        toolchain_path = os.path.join(feed_root, toolchain_file)
+        toolchain_path = qibuild.sh.to_native_path(toolchain_path)
+
+    return qitoolchain.Package(package_name, package_path, toolchain_path)
 
 
 def parse_feed(toolchain, feed):

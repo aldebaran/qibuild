@@ -30,8 +30,6 @@ class QiToolchainTestCase(unittest.TestCase):
         qitoolchain.toolchain.CONFIG_PATH = os.path.join(self.tmp, "config")
         qitoolchain.toolchain.CACHE_PATH  = os.path.join(self.tmp, "cache")
 
-
-
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
 
@@ -151,6 +149,28 @@ class FeedTestCase(unittest.TestCase):
 
         self.assertTrue("naoqi-sdk" in package_names)
         self.assertTrue(qibuild.sh.to_posix_path(sdk_path) in tc_file)
+
+    def test_ctc_parse(self):
+        # Generate a fake ctc in self.tmp
+        ctc_path = os.path.join(self.tmp, "ctc")
+        ctc_xml  = self.configure_xml("ctc.xml", ctc_path)
+
+        tc = qitoolchain.Toolchain("ctc")
+        tc.parse_feed(ctc_xml)
+        tc_file = get_tc_file_contents(tc)
+
+        package_names = [p.name for p in tc.packages]
+
+        self.assertTrue("naoqi-geode-ctc" in package_names)
+        cross_tc_path = os.path.join(ctc_path, "toolchain-geode.cmake")
+        cross_tc_path = qibuild.sh.to_posix_path(cross_tc_path)
+        expected  = 'include("%s")' % cross_tc_path
+
+        self.assertTrue(expected in tc_file,
+            "Did not find %s\n in\n %s" % (expected, tc_file))
+
+
+
 
 
 
