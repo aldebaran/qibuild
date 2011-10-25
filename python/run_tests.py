@@ -21,11 +21,14 @@ BUILD_CONFIGS = ["unix", "vs2008"]
 
 from qibuild.test.test_qibuild import QiBuildTestCase
 from qibuild.test.test_config  import QiConfigTestCase, TocCMakeFlagsTestCase
+from qitoolchain.test.test_qitoolchain import QiToolchainTestCase, FeedTestCase
 
 TEST_CASES = [
     QiBuildTestCase,
     QiConfigTestCase,
-    TocCMakeFlagsTestCase
+    TocCMakeFlagsTestCase,
+    QiToolchainTestCase,
+    FeedTestCase
 ]
 
 
