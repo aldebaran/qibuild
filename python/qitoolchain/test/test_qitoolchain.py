@@ -30,6 +30,7 @@ class QiToolchainTestCase(unittest.TestCase):
         qitoolchain.toolchain.CONFIG_PATH = os.path.join(self.tmp, "config")
         qitoolchain.toolchain.CACHE_PATH  = os.path.join(self.tmp, "cache")
 
+
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
 
@@ -119,6 +120,19 @@ class FeedTestCase(unittest.TestCase):
         qitoolchain.toolchain.CONFIG_PATH = os.path.join(self.tmp, "config")
         qitoolchain.toolchain.CACHE_PATH  = os.path.join(self.tmp, "cache")
 
+    def setup_srv(self):
+        self.srv = os.path.join(self.tmp, "srv")
+        this_dir = os.path.dirname(__file__)
+        this_dir = qibuild.sh.to_native_path(this_dir)
+        feeds_dir = os.path.join(this_dir, "feeds")
+        contents = os.listdir(feeds_dir)
+        for filename in contents:
+            if filename.endswith(".xml"):
+                self.configure_xml(filename, self.srv)
+            else:
+                src = os.path.join(feeds_dir, filename)
+                qibuild.sh.install(src, self.srv, quiet=True)
+
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
 
@@ -137,8 +151,7 @@ class FeedTestCase(unittest.TestCase):
         dest = os.path.join(self.tmp, dest)
         qibuild.sh.mkdir(dest, recursive=True)
         dest = os.path.join(dest, name)
-        srv_path = os.path.join(this_dir, "feeds")
-        srv_path = qibuild.sh.to_posix_path(srv_path)
+        srv_path = qibuild.sh.to_posix_path(self.srv)
         srv_url = "file://" + srv_path
         with open(src, "r") as fp:
             lines = fp.readlines()
@@ -182,10 +195,8 @@ class FeedTestCase(unittest.TestCase):
 
 
     def test_buildfarm_parse(self):
-        srv_path = os.path.join(self.tmp, "srv")
-        self.configure_xml("continuous.xml", srv_path)
-        self.configure_xml("thirdparty.xml", srv_path)
-        buildfarm_xml = self.configure_xml("buildfarm.xml",  srv_path)
+        self.setup_srv()
+        buildfarm_xml = os.path.join(self.srv, "buildfarm.xml")
 
         tc = qitoolchain.Toolchain("buildfarm")
         tc.parse_feed(buildfarm_xml)
