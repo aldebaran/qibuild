@@ -131,7 +131,6 @@ def parse_feed(toolchain, feed):
     """ Parse the feed and add the packages in the toolchain
 
     """
-    import ipdb; ipdb.set_trace()
     tree = tree_from_feed(feed)
     package_trees = tree.findall("package")
     for package_tree in package_trees:
