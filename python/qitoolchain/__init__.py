@@ -5,6 +5,7 @@ import qibuild
 from qitoolchain.toolchain import Toolchain, Package
 from qitoolchain.toolchain import get_tc_names, get_tc_config_path
 from qitoolchain import remote
+from qitoolchain import feed
 
 
 

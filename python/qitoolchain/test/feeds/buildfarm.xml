@@ -1,0 +1,7 @@
+<toolchain>
+    <feed url="thirdparty.xml" />
+    <feed url="continuous.xml" />
+    <select>
+        <arch>linux32</arch>
+    </select>
+</toolchain>

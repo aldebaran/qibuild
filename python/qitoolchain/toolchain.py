@@ -3,7 +3,6 @@
 A set of packages and a toolchain file
 
 
-
 """
 
 CONFIG_PATH = "~/.config/qi/"

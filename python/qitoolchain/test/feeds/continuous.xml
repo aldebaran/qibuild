@@ -1,0 +1,10 @@
+<toolchain>
+    <package name="naoqi" version="latest"
+        arch="linux32"
+        url="naoqi-latest-linux32.tar.gz"
+    />
+    <package name="naoqi" version="latest"
+        arch="linux64"
+        url="naoqi-latest-linux64.tar.gz"
+    />
+</toolchain>

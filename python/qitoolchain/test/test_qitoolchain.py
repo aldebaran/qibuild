@@ -122,7 +122,6 @@ class QiToolchainTestCase(unittest.TestCase):
         self.assertEquals(other_tc_file, tc_file)
 
     def test_remove_package(self):
-
         self.write_conf("test", EMPTY_CONFIG)
         tc = qitoolchain.Toolchain("test")
 
@@ -146,6 +145,14 @@ class QiToolchainTestCase(unittest.TestCase):
             tc_file = fp.read()
 
         self.assertFalse("/path/to/foo" in tc_file)
+
+    def test_no_config(self):
+        """ Check that you do not need a config file to
+        test a toolchain
+
+        """
+        tc = qitoolchain.Toolchain("foo")
+        self.assertEquals(qitoolchain.get_tc_names(), ["foo"])
 
 
 if __name__ == "__main__":
