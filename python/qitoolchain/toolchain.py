@@ -71,10 +71,7 @@ class Package():
     def __init__(self, name, path, toolchain_file=None):
         self.name = name
         self.path = path
-        self.toolchain_file = None
-        if toolchain_file:
-            toolchain_file = os.path.join(self.path, toolchain_file)
-            self.toolchain_file = toolchain_file
+        self.toolchain_file = toolchain_file
         # Quick hack for now
         self.depends = list()
 

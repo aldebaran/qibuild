@@ -12,6 +12,18 @@ import qibuild
 import qitoolchain
 
 
+def raise_parse_error(package_tree, feed, message):
+    """ Raise a nice pasing error about the given
+    package_tree element.
+
+    """
+    as_str = ElementTree.tostring(package_tree)
+    mess  = "Error when parsing feed: '%s'\n" % feed
+    mess += "Could not parse:\t%s\n" % as_str
+    mess += message
+    raise Exception(mess)
+
+
 def tree_from_feed(feed_location):
     """ Returns an ElementTree object from an
     feed location
@@ -37,50 +49,37 @@ def tree_from_feed(feed_location):
     return tree
 
 
-def package_from_tree(toolchain, feed, tree):
-    """ Get a package from an XML tree.
-
-    Return None if something is wrong.
-    """
-    # For error messages:
-    as_str = ElementTree.tostring(tree)
-    mess  = "Error when parsing feed: '%s'\n" % feed
-    mess += "Could not parse:\t%s\n" % as_str
-
-    package.feed = feed
-    name = tree.get("name")
-    if not name:
-        mess += "Missing 'name' attribue"
-        raise Exception(mess)
-
-    package.url = tree.get("url")
-    package.arch = tree.get("arch")
-    package.version = tree.get("version")
-    package.directory = tree.get("directory")
-    package.toolchain_file = tree.get("toolchain_file")
-
-    return None
-
-def handle_package(toolchain, package):
+def handle_package(package, package_tree, toolchain):
     """ Handle a package.
 
     It is has an url, download and extract it.
-    """
-    if package.url:
-        handle_remote_package(toolchain, package)
-    if package.directory:
-        handle_local_package(package)
-    if package.toolchain_file:
-        handle_toochain_file(package)
 
-def handle_remote_package(toolchain, package):
+    Update the package given as first parameter
+    """
+    # feed attribue of package_tree is set during parsing
+    feed = package_tree.get("feed")
+    name = package_tree.get("name")
+    if not name:
+        raise_parse_error(package_tree, feed, "Missing 'name' attribute")
+
+    package.name = name
+    if package_tree.get("url"):
+        handle_remote_package(package, package_tree, toolchain)
+    if package_tree.get("directory"):
+        handle_local_package(package, package_tree)
+    if package_tree.get("toolchain_file"):
+        handle_toochain_file(package, package_tree)
+
+def handle_remote_package(package, package_tree, toolchain):
     """ Set package.path of the given package,
     downloading it and extracting it if necessary.
 
     """
     # We use a sha1 for the url to be sure to not downlad the
     # same package twice
-    archive_name = hashlib.sha1(package.url).hexdigest()
+    package_url = package_tree.get("url")
+    package_name = package_tree.get("name")
+    archive_name = hashlib.sha1(package_url).hexdigest()
     top = archive_name[:2]
     rest = archive_name[2:]
     if package_url.endswith(".tar.gz"):
@@ -103,13 +102,13 @@ def handle_remote_package(toolchain, package):
         should_skip = False
     else:
         dest_mtime = os.stat(dest).st_mtime
-        src_mtime  = os.stat(archive_path).st_mtime
+        src_mtime  = os.stat(package_archive).st_mtime
         if src_mtime < dest_mtime:
             should_skip = True
     if not should_skip:
         with qibuild.sh.TempDir() as tmp:
             try:
-                extracted = qibuild.archive.extract(archive_path, tmp)
+                extracted = qibuild.archive.extract(package_archive, tmp)
             except qibuild.archive.InvalidArchive, err:
                 mess = str(err)
                 mess += "\nPlease fix the archive and try again"
@@ -120,21 +119,27 @@ def handle_remote_package(toolchain, package):
     package.path = dest
 
 
-def handle_local_package(toolchain, package):
+def handle_local_package(package, package_tree):
     """ Set package.path using package.feed
 
     """
-    feed = package.feed
+    # feed attribue of package_tree is set during parsing
+    feed = package_tree.get("feed")
+    directory = package_tree.get("directory")
     feed_root = os.path.dirname(feed)
-    package.path = os.path.join(feed_root, package.directory)
+    package_path = os.path.join(feed_root, directory)
+    package_path = qibuild.sh.to_native_path(package_path)
+    package.path = package_path
 
 
-def handle_toochain_file(package):
+def handle_toochain_file(package, package_tree):
     """ Make sure package.toolchain_file is
     relative to package.path
 
     """
-    package.toolchain_file = os.path.join(package.path, package.toolchain_file)
+    toolchain_file = package_tree.get("toolchain_file")
+    package_path = package.path
+    package.toolchain_file = os.path.join(package_path, toolchain_file)
 
 class PackageSelector:
     """ A class to handle package selection
@@ -165,6 +170,12 @@ class PackageSelector:
         """
         if self._tree is None:
             return True
+        arch = self._tree.get("arch")
+        package_arch = package_tree.get("arch")
+        if arch:
+           if package_arch:
+               if package_arch != arch:
+                   return False
         return True
 
 
@@ -189,10 +200,9 @@ class ToolchainFeedParser:
             self.selector.parse(select_tree)
         package_trees = tree.findall("package")
         for package_tree in package_trees:
-            package = package_from_tree(self.toolchain, feed, package_tree)
-            if package:
-                if self.selector.select(package):
-                    self.packages.append(package)
+            if self.selector.select(package_tree):
+                package_tree.set("feed", feed)
+                self.packages.append(package_tree)
         feeds = tree.findall("feed")
         for feed_tree in feeds:
             feed_url = feed_tree.get("url")
@@ -207,7 +217,13 @@ def parse_feed(toolchain, feed):
     """
     parser = ToolchainFeedParser(toolchain)
     parser.parse(feed)
-    packages = parser.packages
-    for package in packages:
-        handle_package(package)
+    package_trees = parser.packages
+    for package_tree in package_trees:
+        package = qitoolchain.Package(None, None)
+        handle_package(package, package_tree, toolchain)
+        if package.path is None:
+            mess  = "Could not guess package path from configuration\n"
+            mess += "Please make sure you have at least an url or a directory\n"
+            feed = package_tree.get("feed")
+            raise_parse_error(package_tree, feed, mess)
         toolchain.add_package(package)
