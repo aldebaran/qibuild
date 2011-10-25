@@ -35,9 +35,6 @@ def do(args):
     LOGGER.info("Updating configuration ...")
     cfg_path = qitoolchain.get_tc_config_path()
 
-    tc_names = qitoolchain.get_toolchain_names()
-    tc_names = [x for x in tc_names if x != tc_name]
-
     tc_section = 'toolchain "%s"' % tc_name
 
     config = ConfigParser.RawConfigParser()
