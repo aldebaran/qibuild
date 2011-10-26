@@ -24,7 +24,6 @@ function(qi_add_optional_package name)
 
   # if already set by user, do nothing:
   if(DEFINED "WITH_${_U_name}")
-    message(STATUS "WITH_${_U_name}: ${WITH_${_U_name}}")
     return()
   endif()
 
@@ -34,8 +33,6 @@ function(qi_add_optional_package name)
   # result of find_package
 
   find_package("${_U_name}" QUIET)
-  message(STATUS "${_U_name}_PACKAGE_FOUND: ${${_U_name}_PACKAGE_FOUND}")
-
 
   if(${_U_name}_PACKAGE_FOUND)
     set("WITH_${_U_name}" ON CACHE BOOL "${_desc}" FORCE)
