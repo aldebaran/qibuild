@@ -227,6 +227,16 @@ class FeedTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(nuance_geode))
         self.assertFalse(os.path.exists(nuance_atom))
 
+        ctc_path = tc.get("naoqi-geode-ctc")
+        cross_tc_path = os.path.join(ctc_path, "toolchain-geode.cmake")
+        cross_tc_path = qibuild.sh.to_posix_path(cross_tc_path)
+        self.assertTrue(os.path.exists(cross_tc_path))
+        expected  = 'include("%s")' % cross_tc_path
+
+        tc_file = get_tc_file_contents(tc)
+        self.assertTrue(expected in tc_file,
+            "Did not find %s\n in\n %s" % (expected, tc_file))
+
 
     def test_buildfarm(self):
         self.setup_srv()

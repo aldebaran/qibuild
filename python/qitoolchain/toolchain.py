@@ -58,7 +58,7 @@ def get_tc_config_path():
 
     """
     config_path = qibuild.sh.to_native_path(CONFIG_PATH)
-    qibuild.sh.mkdir(CONFIG_PATH, recursive=True)
+    qibuild.sh.mkdir(config_path, recursive=True)
     config_path = os.path.join(config_path, "toolchains.cfg")
     return config_path
 
