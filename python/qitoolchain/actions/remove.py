@@ -25,30 +25,12 @@ def do(args):
 
     """
     package_name = args.package_name
-    tc_name = args.config
+    tc = qitoolchain.get_toolchain(args)
 
-    if not tc_name:
-        active_config = None
-        try:
-            toc = qibuild.toc.toc_open(args.work_tree, args)
-            active_config = toc.active_config
-        except qibuild.toc.TocException:
-            pass
-        if not active_config:
-            mess  = "Could not find which config to use.\n"
-            mess  = "(not in a work tree or no default config in "
-            mess += "current worktree configuration)\n"
-            mess += "Please specify a configuration with -c \n"
-            raise Exception(mess)
-        tc_name = active_config
-
-
-    LOGGER.info("Removing package %s from toolchain %s", package_name, tc_name)
-    tc_cache_path = qitoolchain.get_tc_cache(tc_name)
+    LOGGER.info("Removing package %s from toolchain %s", package_name, tc.name)
+    tc_cache_path = qitoolchain.get_tc_cache(tc.name)
     in_cache = os.path.join(tc_cache_path, package_name)
     in_cache = qibuild.archive.archive_name(in_cache)
-
     qibuild.sh.rm(in_cache)
 
-    tc = qitoolchain.Toolchain(tc_name)
     tc.remove_package(package_name)

@@ -32,28 +32,11 @@ def do(args):
     """
     package_name = args.package_name
     package_path = args.package_path
-    tc_name = args.config
-
-    if not tc_name:
-        active_config = None
-        try:
-            toc = qibuild.toc.toc_open(args.work_tree, args)
-            active_config = toc.active_config
-        except qibuild.toc.TocException:
-            pass
-        if not active_config:
-            mess  = "Could not find which config to use.\n"
-            mess  = "(not in a work tree or no default config in "
-            mess += "current worktree configuration)\n"
-            mess += "Please specify a configuration with -c \n"
-            raise Exception(mess)
-        tc_name = active_config
-
-    tc_cache_path = qitoolchain.get_tc_cache(tc_name)
+    tc = qitoolchain.get_toolchain(args)
+    tc_cache_path = qitoolchain.get_tc_cache(tc.name)
     dest = os.path.join(tc_cache_path, package_name)
     in_cache = qibuild.archive.archive_name(dest)
 
     qibuild.sh.install(package_path, in_cache)
 
-    tc = qitoolchain.Toolchain(tc_name)
     tc.add_package(package_name, in_cache)
