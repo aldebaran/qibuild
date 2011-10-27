@@ -51,6 +51,12 @@ class QiToolchainTestCase(unittest.TestCase):
         qitoolchain.Toolchain("foo")
         self.assertEquals(qitoolchain.get_tc_names(), ["foo"])
 
+    def test_remove_toolchain(self):
+        tc = qitoolchain.Toolchain("foo")
+        self.assertEquals(qitoolchain.get_tc_names(), ["foo"])
+        tc.remove()
+        self.assertEquals(qitoolchain.get_tc_names(), list())
+
     def test_add_package(self):
         tc = qitoolchain.Toolchain("test")
 
@@ -113,6 +119,7 @@ class QiToolchainTestCase(unittest.TestCase):
 
         tc_file = get_tc_file_contents(tc)
         self.assertFalse("toolchain-geode.cmake" in tc_file)
+
 
 
 

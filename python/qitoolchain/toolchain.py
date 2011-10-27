@@ -154,14 +154,14 @@ class Toolchain:
         qibuild.sh.rm(self.cache)
 
         cfg_path = get_tc_config_path()
-        tc_section = 'toolchain "%s"' % self.name
-
         config = ConfigParser.RawConfigParser()
         config.read(cfg_path)
-
-        config.remove_section(tc_section)
+        config.remove_option("toolchains", self.name)
         with open(cfg_path, "w") as fp:
             config.write(fp)
+
+        cfg_path = self._get_config_path()
+        qibuild.sh.rm(cfg_path)
 
     def _get_config_path(self):
         """ Returns path to self configuration file
