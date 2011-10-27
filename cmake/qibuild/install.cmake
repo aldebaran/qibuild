@@ -26,7 +26,6 @@ endfunction()
 # \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
-# \group: HEADERS        Required: the list of headers to install
 function(qi_install_header)
   _qi_install_internal(${ARGN} COMPONENT headers DESTINATION ${QI_SDK_INCLUDE})
 endfunction()
