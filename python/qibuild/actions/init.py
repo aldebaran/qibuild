@@ -10,6 +10,7 @@
 
 import os
 import logging
+import subprocess
 
 import qibuild
 
@@ -22,6 +23,10 @@ def configure_parser(parser):
     parser.add_argument("--interactive", action="store_true",
         help="start a wizard to help you configuring qibuild")
     parser.add_argument("--force", action="store_true", help="force the init")
+    parser.add_argument("--cmake-generator",
+        help="Choose a default cmake generator")
+    parser.set_defaults(
+        cmake_generator="Unix Makefiles")
 
 def do(args):
     """Main entry point"""
@@ -53,71 +58,41 @@ def do(args):
     run_wizard(toc)
 
 
-def ask_config(toc):
-    """ Ask the user to choose between a set of configurations.
-
-    Return (config_name, cmake_generator)
-    or none if user did not choose anything
+def ask_generator():
+    """ Ask the user to choose a cmake generator
 
     """
-    known_configs = [
-        "linux32",
-        "linux64",
-        "mac32",
-        "mac64",
-        "mingw32",
-        "win32-vs2008",
-        "win32-vs2010"
+    known_generators = [
+        "Unix Makefiles",
+        "Eclipse CDT4 - Unix Makefiles",
+        "Visual Studio 9 2008",
+        "Visual Studio 10",
+        "NMake Makefiles",
     ]
-    config = qibuild.interact.ask_choice(known_configs, "please choose a configuration")
-    if not config:
-        return None
 
-    if "vs2008" in config:
-        cmake_generator = "Visual Studio 9 2008"
-    elif "vs2010" in config:
-        cmake_generator = "Visual Studio 10"
-    elif "mingw32" in config:
-        cmake_generator = "MinGW Makefiles"
-    else:
-        cmake_generator = "Unix Makefiles"
+    cmake = qibuild.command.find_program("cmake")
+    if not cmake:
+        mess  = "Could not find CMake in your PATH.\n"
+        mess  += "Please check your configuration"
+        raise Exception(mess)
 
-    return (config, cmake_generator)
+    cmake_generator = qibuild.interact.ask_choice(known_generators,
+        "Please choose a generator")
+
+    if cmake_generator == 'NMake Makefiles':
+        cl = qibuild.command.find_program("cl.exe")
+        if not cl:
+            mess  = "Could not find cl.exe in your path"
+            mess += "Please run from Visual Studio command line prompt"
+            raise Exception(mess)
+
+    return cmake_generator
 
 def run_wizard(toc):
     """Write a new configuration if the file passed as
     argument, asking the user a few questions
 
     """
-    config = ask_config(toc)
-    if not config:
-        return
+    cmake_generator = ask_generator()
+    toc.update_config("cmake.generator", cmake_generator)
 
-    (config_name, cmake_generator) = config
-
-    toc.update_config("cmake.generator", cmake_generator, config=config_name)
-
-    config_names = toc.configstore.get_known_configs()
-    default_config = None
-    if len(config_names) == 1:
-        default_config = config_names[0]
-    else:
-        answer = qibuild.interact.ask_yes_no("Use %s as default config" % config_name)
-        if answer:
-            default_config = config_name
-
-    if default_config:
-        qibuild.configstore.update_config(toc.config_path, "general", "config", default_config)
-
-    # Create the custom cmake file so that Toc won't complain.
-    custom_cmake = os.path.join(toc.work_tree, ".qi", config_name + ".cmake")
-    if os.path.exists(custom_cmake):
-        return
-
-    with open(custom_cmake, "w") as fp:
-        fp.write("""## Custom cmake file for config {config_name}
-
-# Put your specific cmake settings for {config_name} here
-# For instance:
-# set(MY_FLAG ON CACHE INTERNAL "" FORCE)
-""".format(config_name=config_name))
