@@ -36,6 +36,15 @@ LOGGER = logging.getLogger("qibuild")
 
 QIBUILD_ROOT_DIR  = os.path.dirname(os.path.abspath(__file__))
 
+# FIXME: filter this in using platform information ?
+KNOWN_CMAKE_GENERATORS = [
+        "Unix Makefiles",
+        "Eclipse CDT4 - Unix Makefiles",
+        "Visual Studio 9 2008",
+        "Visual Studio 10",
+        "NMake Makefiles",
+]
+
 
 def get_cmake_qibuild_dir():
     """Get the path to cmake modules.

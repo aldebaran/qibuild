@@ -62,13 +62,6 @@ def ask_generator():
     """ Ask the user to choose a cmake generator
 
     """
-    known_generators = [
-        "Unix Makefiles",
-        "Eclipse CDT4 - Unix Makefiles",
-        "Visual Studio 9 2008",
-        "Visual Studio 10",
-        "NMake Makefiles",
-    ]
 
     cmake = qibuild.command.find_program("cmake")
     if not cmake:
@@ -76,7 +69,7 @@ def ask_generator():
         mess  += "Please check your configuration"
         raise Exception(mess)
 
-    cmake_generator = qibuild.interact.ask_choice(known_generators,
+    cmake_generator = qibuild.interact.ask_choice(qibuild.KNOWN_CMAKE_GENERATORS,
         "Please choose a generator")
 
     if cmake_generator == 'NMake Makefiles':

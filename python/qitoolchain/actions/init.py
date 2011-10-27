@@ -16,7 +16,7 @@ LOGGER = logging.getLogger(__name__)
 def configure_parser(parser):
     """Configure parse for this action """
     qibuild.worktree.work_tree_parser(parser)
-    parser.add_argument("name",
+    parser.add_argument("name", metavar="NAME",
         help="Name of the toolchain")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
         help="Optional: path to the toolchain configuration file.\n"
@@ -26,6 +26,9 @@ def configure_parser(parser):
     parser.add_argument("--default",
         help="Use this toolchain by default in this worktree",
         action="store_true")
+    parser.add_argument("--cmake-generator",
+        help="CMake generator to use when using this toolchain",
+        choices=qibuild.KNOWN_CMAKE_GENERATORS)
 
 
 def do(args):
@@ -48,10 +51,18 @@ def do(args):
         mess += str(toc_error)
         raise Exception(mess)
 
+    if args.cmake_generator and not toc:
+        mess = "You need to be in a valid toc worktree to use --cmake-generator\n"
+        mess += "Exception was:\n"
+        mess += str(toc_error)
+        raise Exception(mess)
+
     toolchain = qitoolchain.Toolchain(tc_name)
     if feed:
         toolchain.parse_feed(feed)
 
+    if args.cmake_generator:
+        toc.update_config("cmake.generator", cmake_generator, tc_name)
     if args.default:
         toc.update_config("config", tc_name)
         LOGGER.info("Now using toolchain %s by default", tc_name)
