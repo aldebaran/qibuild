@@ -84,9 +84,9 @@ class Package():
 
     def __str__(self):
         res = self.name
-        res += "\nIn %s" % self.path
+        res += "\n  in %s" % self.path
         if self.toolchain_file:
-            res += "\nUsing %s toolchain file" % self.toolchain_file
+            res += "\n  using %s toolchain file" % self.toolchain_file
         return res
 
     def __eq__(self, other):
@@ -143,6 +143,7 @@ class Toolchain:
             res += "  Packages:\n"
         for package in self.packages:
             res += " " * 4 + str(package).replace("\n", "\n" + " " * 4)
+            res += "\n"
         return res
 
     def remove(self):
