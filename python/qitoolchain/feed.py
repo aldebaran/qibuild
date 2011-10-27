@@ -4,12 +4,15 @@
 
 
 import os
+import logging
 import hashlib
 import urllib2
 from xml.etree import ElementTree
 
 import qibuild
 import qitoolchain
+
+LOGGER = logging.getLogger(__name__)
 
 
 def raise_parse_error(package_tree, feed, message):
@@ -95,6 +98,7 @@ def handle_remote_package(package, package_tree, toolchain):
         clobber=False,
         message=message)
 
+    LOGGER.info("Toolchain %s: adding package %s", toolchain.name, package.name)
     packages_path = qitoolchain.toolchain.get_default_packages_path(toolchain.name)
     should_skip = False
     dest = os.path.join(packages_path, package_name)
@@ -155,9 +159,9 @@ class PackageSelector:
 
     def parse(self, select_tree):
         """ Read an xml configuration looking like
-        <select>
-            <arch>linux32</arch>
-        </select>
+        <select
+            arch="linux32"
+        />
 
         """
         self._tree = select_tree

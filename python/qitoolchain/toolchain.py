@@ -24,7 +24,7 @@ def get_default_packages_path(tc_name):
     root = configstore.get("default.root")
     if not root:
         root = qibuild.sh.to_native_path(SHARE_PATH)
-        root = os.path.join(SHARE_PATH, "toolchains")
+        root = os.path.join(root, "toolchains")
     res = os.path.join(root, tc_name)
     qibuild.sh.mkdir(res, recursive=True)
     return res
@@ -145,7 +145,6 @@ class Toolchain:
             res += " " * 4 + str(package).replace("\n", "\n" + " " * 4)
         return res
 
-
     def remove(self):
         """ Remove a toolchain
 
@@ -162,7 +161,6 @@ class Toolchain:
         config.remove_section(tc_section)
         with open(cfg_path, "w") as fp:
             config.write(fp)
-
 
     def _get_config_path(self):
         """ Returns path to self configuration file
@@ -182,8 +180,6 @@ class Toolchain:
         cache_path = os.path.join(cache_path, "toolchains", self.name)
         qibuild.sh.mkdir(cache_path, recursive=True)
         return cache_path
-
-
 
     def load_config(self):
         """ Parse configuration, update toolchain file
@@ -208,7 +204,6 @@ class Toolchain:
                 self.packages.append(package)
 
         self.update_toolchain_file()
-
 
     def add_package(self, package):
         """ Add a package to the list
@@ -245,7 +240,6 @@ class Toolchain:
 
         self.load_config()
 
-
     def update_toolchain_file(self):
         """ Generates a toolchain file for use by qibuild
 
@@ -274,7 +268,6 @@ class Toolchain:
         with open(self.toolchain_file, "w") as fp:
             lines = fp.writelines(lines)
 
-
     def parse_feed(self, feed):
         """ Recursively parse an xml feed,
         adding packages to the feed while doing so
@@ -294,7 +287,6 @@ class Toolchain:
         package = [p for p in self.packages if p.name == package_name][0]
         package_path = package.path
         return package_path
-
 
     def install_package(self, package_name, destdir, runtime=False):
         """ Install a package to a destdir.
