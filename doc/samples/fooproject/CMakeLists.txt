@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 2.8)
-include("qibuild.cmake")
 project(fooproject)
+include("qibuild.cmake")
 
-enable_testing()
+# Add a subdirectory containing the foo library
+add_subdirectory(libfoo)
 
-add_subdirectory(foo)
-add_subdirectory(foo/test)
+
+# Use it in the bar project.
+qi_create_bin(bar main.cpp)
+qi_use_lib(bar foo)
+
+

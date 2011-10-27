@@ -6,26 +6,28 @@ How to write a library
 This is merely a convention, but you are advised to follow it, especially if
 you are working in a large project.
 
-Let's say you have a foo library.
+Let's say you have a ``foo`` library.
 
 You have the following files:
 
-* foo.h : the public header of the foo library. It contains the public API, and
-  include the least possible number of other headers. (Use of forward
+* ``foo.hpp``: the public header of the ``foo`` library. It contains the public
+  API, and include the least possible number of other headers. (Use of forward
   declarations, and PIMPL implementations are recommanded)
 
-* foo.cpp : implementation of the foo.h functions
+* ``foo.cpp`` : implementation of the ``foo.hpp`` functions
 
-* foo_private.h : private header of the foo library. This one may include
-  third-party headers (say zeromq.h), without having the foo.h header depending
-  on zeromq.h, which is nice for the users of your library. If you link
-  statically with zeromq, users of foo won't even need to know about zeromq
-  (well, this is true if foo is a dynamic library, but that's an other topic)
+* ``foo_private.hpp``: private header of the ``foo`` library. This one may
+  include third-party headers (say ``zeromq.h),`` without having the
+  ``foo.hpp`` header depending on ``zeromq.h,`` which is nice for the users of
+  your library. If you link statically with ``zeromq,`` users of ``foo`` won't
+  even need to know about ``zeromq``
+  (well, this is true if ``foo`` is a dynamic library, but that's an other
+  topic)
 
-* foo_private.cpp : private implementation.
+* ``foo_private.cpp`` : private implementation.
 
-* foo_test.cpp : You would not dare writing a library without unit tests, would
-  you?
+* ``test_foo.cpp`` : You would not dare writing a library without unit tests,
+  would you?
 
 Proposed layout
 ---------------
@@ -36,77 +38,45 @@ This is what your layout should look like::
   |__ libfoo
       | CMakeLists.txt
       |__ foo
-      |   |__ foo.h
+      |   |__ foo.hpp
       |__ src
       |   |__ foo.cpp
-      |   |__ foo_private.h
+      |   |__ foo_private.hpp
       |   |__ foo_private.cpp
       |__ test
           |__ CMakeLists.txt
           |__ foo_test.cpp
 
-* The full path to the public header is foo/foo/foo.h. Note that the name of the
-  root directory is libfoo
+* The full path to the public header is ``foo/foo/foo.hpp``. Note that the name
+  of the root directory is ``libfoo``
 
-* The private code is put in a src sub-directory. Private and public directories
-  are separated, it's easy to search only in public headers.
+* The private code is put in a ``src`` sub-directory. Private and public
+  directories are separated, it's easy to search only in public headers.
 
 CMake
 -----
 
-Here's what the CMakeLists should look like
-
-.. code-block:: cmake
-
-  # Main CMakeLists
-  cmake_minimum_required(VERSION 2.8)
-  include("qibuild.cmake")
-  project(fooproject)
-
-  add_subdirectory(foo)
-  add_subdirectory(foo/test)
+Here's what the ``CMakeLists.txt`` should look like
 
 
-  include_directories(".")
+.. literalinclude:: /samples/fooproject/libfoo/CMakeLists.txt
+   :language: cmake
 
-  # optional if you have private headers
-  include_directories("src")
-
-
-  qi_create_lib(foo
-    SRC foo/foo.h
-        foo/foo.cpp
-        src/foo_private.h
-        src/foo_private.cpp
-  )
-
-  qi_install_header(KEEP_RELATIVE_PATHS foo/foo.h)
-
-  qi_stage_lib(foo)
-
-  # foo/test/CMakeLists.txt
-  qi_create_gtest(foo_test
-    SRC
-      foo_test.cpp
-    DEPENDS
-      gtest
-      foo)
-
-Please note that the location of the cmake list file matters.
+Please note that the location of the CMake list file matters.
 
 Rationale
 ---------
 
 You will note that:
 
-* The only time we call include_directories() is when we are staging the foo
+* The only time we call ``include_directories()`` is when we are staging the foo
   library.
 
-* The foo.h header is in a directory named foo, and qi_install_header() uses
-  this directory as first argument. It's advised you use the same name for the
-  target and the subdirectory.
+* The ``foo.hpp`` header is in a directory named ``foo``, and will be
+  installed to ``foo/foo.hpp``.
+  It's advised you use the same name for the target and the subdirectory.
 
-* Everything that need a foo header must use
+* Everything that need a ``foo`` header must use
 
 .. code-block:: cpp
 
@@ -117,36 +87,39 @@ headers are installed, and that the path to find the headers while in the
 source tree does not differ from the paths to find the installed headers. This
 works because:
 
-  * We have put foo.h in a foo subdirectory.
+* We have put ``foo.hpp`` in a ``foo`` subdirectory.
 
-  * We have used :ref:`qi_install_header` with the correct SUBFOLDER
-    argument
+* We have used :ref:`qi_install_header` with the ``KEEP_RELATIVE_PATHS``
+  argument. You could also have used it with a ``SUBFOLDER`` argument, like
+  this:
 
-* The test can use both the public API and the private implementation
+.. code-block:: cmake
 
-* Let's assume you have two libraries, foo and bar, and a foobar executable
-  that needs code from foo and bar.
+   qi_install_header(foo/foo.hpp SUBFOLDER foo)
+
+* Let's assume you have two libraries, ``foo`` and ``bar``, and a ``foobar``
+  executable that needs code from ``foo`` and ``bar``.
 
 With the proposed layout, you have something like::
 
-  libfoo
-  |__ foo
+  foooproject
+  |__ libfoo
   |    |__ foo
-  |    |    |__ foo.h
-  |    bar
+  |    |    |__ foo.hpp
+  |    libbar
   |    |__ bar
-  |        |__ bar.h
-  foobar
+  |        |__ bar.hpp
+  |__ foobar
       |__ foobar.cpp
 
 You may want to get rid of the useless redundancy foo/foo, bar/bar, and do this
 instead::
 
-  lib
+  fooproject
   |__ foo
-  |    |__ foo.h
-  |    bar
-  |    |__ bar.h
+  |   |__ foo.hpp
+  |   bar
+  |   |__ bar.hpp
   foobar
       |__ foobar.cpp
 
@@ -164,7 +137,7 @@ instead of
 
 In the first layout, you will have an error during compile time, looking like::
 
-  bar/bar.h : no such file or directory
+  bar/bar.hpp : no such file or directory
 
 (because the include directory that has been staged for foo is different from
 the include directory that has been staged for bar) But, using the second
