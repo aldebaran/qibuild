@@ -31,5 +31,13 @@ def do(args):
     package_name = args.package_name
     package_path = args.package_path
     tc = qitoolchain.get_toolchain(args)
-    package = qitoolchain.feed.package_from_archive(tc, package_name, package_path)
+    # extract it to the default packages path of the toolchain
+    tc_packages_path = qitoolchain.toolchain.get_default_packages_path(tc.name)
+    dest = os.path.join(tc_packages_path, package_name)
+    qibuild.sh.rm(dest)
+    with qibuild.sh.TempDir() as tmp:
+        extracted = qibuild.archive.extract(package_path, tmp)
+        qibuild.sh.install(extracted, dest, quiet=True)
+
+    package = qitoolchain.Package(package_name, dest)
     tc.add_package(package)
