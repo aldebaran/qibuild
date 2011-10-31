@@ -226,8 +226,9 @@ def parse_feed(toolchain, feed):
         package = qitoolchain.Package(None, None)
         handle_package(package, package_tree, toolchain)
         if package.path is None:
-            mess  = "Could not guess package path from configuration\n"
+            mess  = "could guess package path from this configuration:\n"
+            mess += ElementTree.tostring(package_tree)
             mess += "Please make sure you have at least an url or a directory\n"
-            feed = package_tree.get("feed")
-            raise_parse_error(package_tree, feed, mess)
+            LOGGER.warning(mess)
+            continue
         toolchain.add_package(package)
