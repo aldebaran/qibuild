@@ -157,8 +157,12 @@ class Toolchain:
         res  = "Toolchain %s\n" % self.name
         if self.feed:
             res += "Using feed from %s\n" % self.feed
+        else:
+            res += "No feed\n"
         if self.packages:
             res += "  Packages:\n"
+        else:
+            res += "No packages\n"
         for package in self.packages:
             res += " " * 4 + str(package).replace("\n", "\n" + " " * 4)
             res += "\n"
