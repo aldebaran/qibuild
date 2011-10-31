@@ -14,7 +14,7 @@ import qitoolchain
 LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
-    """Configure parse for this action """
+    """ Configure parser for this action """
     qibuild.worktree.work_tree_parser(parser)
     parser.add_argument("name", metavar="NAME",
         help="Name of the toolchain")

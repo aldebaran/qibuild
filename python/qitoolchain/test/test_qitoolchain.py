@@ -257,6 +257,14 @@ class FeedTestCase(unittest.TestCase):
         self.assertTrue("boost" in package_names)
         self.assertTrue("naoqi" in package_names)
 
+    def test_feed_is_stored(self):
+        self.setup_srv()
+        buildfarm_xml = os.path.join(self.srv, "buildfarm.xml")
+
+        tc = qitoolchain.Toolchain("buildfarm")
+        tc.parse_feed(buildfarm_xml)
+
+        self.assertTrue(tc.feed, buildfarm_xml)
 
 
 if __name__ == "__main__":

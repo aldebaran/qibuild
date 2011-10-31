@@ -37,7 +37,7 @@ def get_tc_names():
 
         [toolchains]
         linux32=
-        linu64=
+        linux64=/path/to/linux64/feed.xxml
     """
     config = ConfigParser.ConfigParser()
     config.read(get_tc_config_path())
@@ -45,6 +45,17 @@ def get_tc_names():
         return list()
     tc_items = config.items('toolchains')
     return [x[0] for x in tc_items]
+
+def get_tc_feed(tc_name):
+    """ Get the feed associated to a toolchain
+
+    """
+    config = ConfigParser.ConfigParser()
+    config.read(get_tc_config_path())
+    if not config.has_section('toolchains'):
+        return None
+    return config.get('toolchains', tc_name)
+
 
 def get_tc_config_path():
     """ Return the general toolchain config file.
@@ -104,6 +115,8 @@ class Package():
 class Toolchain:
     """ A toolchain is a set of packages
 
+    If has a name and is initialized with a feed
+
     It has a configuration in ~/.config/qi/toolchains/<name.cfg>
     looking like:
 
@@ -122,6 +135,9 @@ class Toolchain:
         self.packages = list()
         self.cache = self._get_cache_path()
         self.toolchain_file  = os.path.join(self.cache, "toolchain-%s.cmake" % self.name)
+        # Stored in general config file when using self.parse_feed,
+        # updated by self.load_config()
+        self.feed = None
 
         # Add self to the list of known toolchains:
         if not self.name in get_tc_names():
@@ -130,7 +146,7 @@ class Toolchain:
             config.read(config_path)
             if not config.has_section("toolchains"):
                 config.add_section("toolchains")
-            config.set("toolchains", self.name, "")
+            config.set("toolchains", self.name, self.feed)
             with open(config_path, "w") as fp:
                 config.write(fp)
 
@@ -139,6 +155,8 @@ class Toolchain:
 
     def __str__(self):
         res  = "Toolchain %s\n" % self.name
+        if self.feed:
+            res += "Using feed from %s\n" % self.feed
         if self.packages:
             res += "  Packages:\n"
         for package in self.packages:
@@ -162,6 +180,7 @@ class Toolchain:
 
         cfg_path = self._get_config_path()
         qibuild.sh.rm(cfg_path)
+
 
     def _get_config_path(self):
         """ Returns path to self configuration file
@@ -187,6 +206,7 @@ class Toolchain:
         when done
 
         """
+        self.feed = get_tc_feed(self.name)
         config_path = self._get_config_path()
         configstore = qibuild.configstore.ConfigStore()
         configstore.read(config_path)
@@ -274,7 +294,18 @@ class Toolchain:
         adding packages to the feed while doing so
 
         """
+        # Delegate this to qitoolchain.feed module
         qitoolchain.feed.parse_feed(self, feed)
+
+        # Update configuration so we keep which was
+        # the last used feed
+        self.feed = feed
+        config = ConfigParser.ConfigParser()
+        config_path = get_tc_config_path()
+        config.read(config_path)
+        config.set("toolchains", self.name, self.feed)
+        with open(config_path, "w") as fp:
+            config.write(fp)
 
     def get(self, package_name):
         """ Get the path to a package
