@@ -146,7 +146,7 @@ class Toolchain:
             config.read(config_path)
             if not config.has_section("toolchains"):
                 config.add_section("toolchains")
-            config.set("toolchains", self.name, self.feed)
+            config.set("toolchains", self.name, "")
             with open(config_path, "w") as fp:
                 config.write(fp)
 
