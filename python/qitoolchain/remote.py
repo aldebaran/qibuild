@@ -57,7 +57,7 @@ def download(url, output_dir,
         LOGGER.info(message)
 
     try:
-        dest_file = open(dest_name, "w")
+        dest_file = open(dest_name, "wb")
     except Exception, e:
         mess  = "Could not save %s to %s\n" % (url, dest_name)
         mess += "Error was %s" % e
