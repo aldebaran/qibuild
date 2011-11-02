@@ -18,13 +18,17 @@ def get_default_packages_path(tc_name):
     """ Get a default path to store extracted packages
 
     """
-    configstore = qibuild.configstore.ConfigStore()
+    default_root = qibuild.sh.to_native_path(SHARE_PATH)
+    default_root = os.path.join(default_root, "toolchains")
+    config = ConfigParser.ConfigParser()
     cfg_path = get_tc_config_path()
-    configstore.read(cfg_path)
-    root = configstore.get("default.root")
-    if not root:
-        root = qibuild.sh.to_native_path(SHARE_PATH)
-        root = os.path.join(root, "toolchains")
+    config.read(cfg_path)
+    root = default_root
+    if config.has_section("default"):
+        try:
+            root = config.get("default", "root")
+        except ConfigStore.NoOptionError:
+            pass
     res = os.path.join(root, tc_name)
     qibuild.sh.mkdir(res, recursive=True)
     return res
