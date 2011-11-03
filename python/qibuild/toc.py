@@ -219,7 +219,7 @@ class Toc(WorkTree):
         # to the actual cmake flags used by the Toc oject,
         # but we may add other flags when using a toolchain.
         # see self.update_cmake_flags()
-        self.cmake_flags       = self.configstore.get("cmake.flags", "").split()
+        self.cmake_flags       = list()
         self.cmake_generator   = cmake_generator
         self.build_folder_name = None
 
@@ -263,7 +263,7 @@ class Toc(WorkTree):
         self.vc_version = self.cmake_generator.split()[-1]
 
         # The actual list of cmake flags we are going to use
-        # will be computed during self..
+        # will be computed during self.configure_project.
         # Right now, we will just store the flags passed in ctor
         # in self.user_cmake_flags, to be sure they are always added
         # at the end of the list of flags
