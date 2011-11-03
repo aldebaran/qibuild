@@ -59,6 +59,7 @@ endfunction()
 # ${CMAKE_SOURCE_DIR}/test-results/${test_name}.xml
 # The name of the test will always be the name of the target.
 #
+# \arg:name name of the test
 # \flag:NO_ADD_TEST Do not call add_test, just create the binary
 # \argn: source files, like the SRC group, argn and SRC will be merged
 # \param:TIMEOUT The timeout of the test
