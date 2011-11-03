@@ -281,7 +281,7 @@ class Toolchain:
             if package.toolchain_file:
                 tc_file = qibuild.sh.to_posix_path(package.toolchain_file)
                 lines.append('include("%s")\n' % tc_file)
-            lines.append('list(APPEND CMAKE_PREFIX_PATH "%s")\n' % package_path)
+            lines.append('list(INSERT CMAKE_FIND_ROOT_PATH 0 "%s")\n' % package_path)
 
         oldlines = list()
         try:

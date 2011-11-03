@@ -1,6 +1,6 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-# Copy every dll from CMAKE_PREFIX_PATH into the build dir,
+# Copy every dll from CMAKE_FIND_ROOT_PATH into the build dir,
 # then set _QI_DLLS_COPIED so that this only happens once
 
 if(DEFINED _QI_DLLS_COPIED)
@@ -9,7 +9,7 @@ endif()
 
 qi_info("Copying dlls in build dir ...")
 
-set(_prefix_paths ${CMAKE_PREFIX_PATH})
+set(_prefix_paths ${CMAKE_FIND_ROOT_PATH})
 list(REMOVE_DUPLICATES _prefix_paths)
 
 set(_dlls)

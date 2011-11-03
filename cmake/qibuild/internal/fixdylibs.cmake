@@ -1,7 +1,7 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
 # Create symlinks to dylib and framework to every .dylib and
-# .Frawework found in CMAKE_PREFIX_PATH
+# .Frawework found in CMAKE_FIND_ROOT_PATH
 
 # This way you only have to set DYLD_LIBRARY_PATH to
 # build/sdk/lib and DYLD_FRAMEWORK_PATH to build/sdk/
@@ -15,7 +15,7 @@ endif()
 qi_info("Creating symlinks in build dir ...")
 
 
-set(_prefix_paths ${CMAKE_PREFIX_PATH})
+set(_prefix_paths ${CMAKE_FIND_ROOT_PATH})
 list(REMOVE_DUPLICATES _prefix_paths)
 
 set(_dylibs)

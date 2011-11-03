@@ -35,7 +35,7 @@ class Project:
     def get_sdk_dir(self):
         """ Return the SDK dir of the project.
         To use the project build results, from an other project,
-        you just have to add this directory to CMAKE_PREFIX_PATH
+        you just have to add this directory to CMAKE_FIND_ROOT_PATH
 
         """
         return os.path.join(self.build_directory, "sdk")
@@ -197,9 +197,9 @@ endif()
 # Dependencies:
 {dep_to_add}
 
-# Store CMAKE_MODULE_PATH and  CMAKE_PREFIX_PATH in cache:
+# Store CMAKE_MODULE_PATH and CMAKE_FIND_ROOT_PATH in cache:
 set(CMAKE_MODULE_PATH ${{CMAKE_MODULE_PATH}} CACHE INTERNAL ""  FORCE)
-set(CMAKE_PREFIX_PATH ${{CMAKE_PREFIX_PATH}} CACHE INTERNAL ""  FORCE)
+set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
 
 {custom_cmake_code}
 """
@@ -219,7 +219,7 @@ set(CMAKE_PREFIX_PATH ${{CMAKE_PREFIX_PATH}} CACHE INTERNAL ""  FORCE)
                 qibuild.sh.to_posix_path(local_cmake)
 
     # This is cmake/qibuild, but we need to set the
-    # cmake module_ath to cmake/ to be able to do
+    # CMAKE_MODULE_PATH to cmake/ to be able to do
     # include(qibuild/general)
     cmake_qibuild_dir = qibuild.CMAKE_QIBUILD_DIR
     cmake_qibuild_dir = os.path.abspath(os.path.join(cmake_qibuild_dir, ".."))
@@ -229,7 +229,7 @@ set(CMAKE_PREFIX_PATH ${{CMAKE_PREFIX_PATH}} CACHE INTERNAL ""  FORCE)
 
     dep_to_add = ""
     for sdk_dir in dep_sdk_dirs:
-        dep_to_add += 'list(APPEND CMAKE_PREFIX_PATH "%s")\n' % \
+        dep_to_add += 'list(APPEND CMAKE_FIND_ROOT_PATH "%s")\n' % \
             qibuild.sh.to_posix_path(sdk_dir)
 
     to_write = to_write.format(
