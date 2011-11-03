@@ -321,7 +321,7 @@ class Toolchain:
         """
         package_names = [p.name for p in self.packages]
         if package_name not in package_names:
-            mess  = "Could not install %s from toolchain %s" % (package_name, self.name)
+            mess  = "Could not get %s from toolchain %s\n" % (package_name, self.name)
             mess += "No such package"
             raise Exception(mess)
         package = [p for p in self.packages if p.name == package_name][0]
