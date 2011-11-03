@@ -145,68 +145,50 @@ def handle_toochain_file(package, package_tree):
     package_path = package.path
     package.toolchain_file = os.path.join(package_path, toolchain_file)
 
-class PackageSelector:
-    """ A class to handle package selection
-
-    Usage:
-        selector = PackageSelector()
-        selector.parse(tree) # where tree in a select xml configuration
-        selector.select(package)
-
-    """
-    def __init__(self):
-        self._tree = None
-
-    def parse(self, select_tree):
-        """ Read an xml configuration looking like
-        <select
-            arch="linux32"
-        />
-
-        """
-        self._tree = select_tree
-
-    def select(self, package_tree):
-        """ Parse an xml package configuration.
-        Returns True if we should keep the
-        package
-
-        """
-        if self._tree is None:
-            return True
-        arch = self._tree.get("arch")
-        package_arch = package_tree.get("arch")
-        if arch:
-           if package_arch:
-               if package_arch != arch:
-                   return False
-        return True
-
-
 class ToolchainFeedParser:
     """ A class to handle feed parsing
 
     """
-    def __init__(self, toolchain):
-        self.toolchain = toolchain
+    def __init__(self):
         self.packages = list()
-        self.selector = PackageSelector()
+        # A dict name -> version used to only keep the latest
+        # version
+        self._versions = dict()
 
+    def append_package(self, package_tree):
+        """ Add a package to self.packages.
+        If an older version of the package exists,
+        replace by the new version
+
+        """
+        version = package_tree.get("version")
+        name = package_tree.get("name")
+
+        names = self._versions.keys()
+        if name not in names:
+            self._versions[name] = version
+            self.packages.append(package_tree)
+        else:
+            if version is None:
+                # if version not defined, don't keep it
+                return
+            prev_version = self._versions[name]
+            if qitoolchain.version.compare(prev_version, version) > 0:
+                return
+            else:
+                self.packages = [x for x in self.packages if x.get("name") != name]
+                self.packages.append(package_tree)
+                self._versions[name] = version
 
     def parse(self, feed):
-        """ Recursively parse the feed, filling the packages
-        last variable
+        """ Recursively parse the feed, filling the self.packages
 
         """
         tree = tree_from_feed(feed)
-        select_tree = tree.find("select")
-        if select_tree is not None:
-            self.selector.parse(select_tree)
         package_trees = tree.findall("package")
         for package_tree in package_trees:
-            if self.selector.select(package_tree):
-                package_tree.set("feed", feed)
-                self.packages.append(package_tree)
+            package_tree.set("feed", feed)
+            self.append_package(package_tree)
         feeds = tree.findall("feed")
         for feed_tree in feeds:
             feed_url = feed_tree.get("url")
@@ -219,7 +201,7 @@ def parse_feed(toolchain, feed):
     adding packages to the feed while doing so
 
     """
-    parser = ToolchainFeedParser(toolchain)
+    parser = ToolchainFeedParser()
     parser.parse(feed)
     package_trees = parser.packages
     for package_tree in package_trees:

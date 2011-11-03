@@ -1,0 +1,3 @@
+<toolchain>
+    <feed url="@srv_url@/thirdparty.xml" />
+</toolchain>

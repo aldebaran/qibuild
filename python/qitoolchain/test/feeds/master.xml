@@ -1,0 +1,10 @@
+<toolchain>
+    <feed url="@srv_url@/maint.xml" />
+
+    <!-- special version just for master -->
+    <package name="boost" version="1.44"
+      url="@srv_url@/boost-1.44-linux32.tar.gz"
+    />
+
+</toolchain>
+

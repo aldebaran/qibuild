@@ -7,6 +7,7 @@
 import os
 import tempfile
 import unittest
+from xml.etree import ElementTree
 
 import qibuild
 import qitoolchain
@@ -151,7 +152,6 @@ class FeedTestCase(unittest.TestCase):
             archive = qibuild.archive.zip(package_dir)
             qibuild.sh.install(archive, self.srv, quiet=True)
 
-
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
 
@@ -229,10 +229,8 @@ class FeedTestCase(unittest.TestCase):
 
         nuance_path = tc.get("nuance")
         nuance_geode = os.path.join(nuance_path, "nuance-42-geode")
-        nuance_atom  = os.path.join(nuance_path, "nuance-42-atom")
 
         self.assertTrue(os.path.exists(nuance_geode))
-        self.assertFalse(os.path.exists(nuance_atom))
 
         ctc_path = tc.get("naoqi-geode-ctc")
         cross_tc_path = os.path.join(ctc_path, "toolchain-geode.cmake")
@@ -257,6 +255,27 @@ class FeedTestCase(unittest.TestCase):
         self.assertTrue("boost" in package_names)
         self.assertTrue("naoqi" in package_names)
 
+    def test_master_maint(self):
+        self.setup_srv()
+        master_xml = os.path.join(self.srv, "master.xml")
+        maint_xml  = os.path.join(self.srv, "maint.xml")
+
+        tc_master = qitoolchain.Toolchain("master")
+        tc_maint  = qitoolchain.Toolchain("maint")
+
+        tc_master.parse_feed(master_xml)
+        tc_maint.parse_feed(maint_xml)
+
+        boost_master = tc_master.get("boost")
+        boost_maint  = tc_maint.get("boost")
+
+        boost_44 = os.path.join(boost_master, "boost-1.44-linux32")
+        boost_42 = os.path.join(boost_maint , "boost-1.42-linux32")
+
+        self.assertTrue(os.path.exists(boost_44))
+        self.assertTrue(os.path.exists(boost_42))
+
+
     def test_feed_is_stored(self):
         self.setup_srv()
         buildfarm_xml = os.path.join(self.srv, "buildfarm.xml")
@@ -264,7 +283,12 @@ class FeedTestCase(unittest.TestCase):
         tc = qitoolchain.Toolchain("buildfarm")
         tc.parse_feed(buildfarm_xml)
 
-        self.assertTrue(tc.feed, buildfarm_xml)
+        self.assertEquals(tc.feed, buildfarm_xml)
+
+        # Create a new object, and check that feed storing
+        # is persistent
+        tc2 = qitoolchain.Toolchain("buildfarm")
+        self.assertEquals(tc2.feed, buildfarm_xml)
 
 
 if __name__ == "__main__":
