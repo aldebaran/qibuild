@@ -13,8 +13,10 @@ get_filename_component(_SDK_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 # headers in /path/to/sdk/include, and so on.
 set(CMAKE_FIND_ROOT_PATH "${_SDK_ROOT_DIR}")
 
-# Path to the qibuild framework:
-list(APPEND CMAKE_MODULE_PATH "${_SDK_ROOT_DIR}/share/cmake")
+# Path to the qibuild framework
+# (prefer cmake module inside current qibuild over cmake
+# files inside the ctc)
+list(INSERT CMAKE_MODULE_PATH 0 "${_SDK_ROOT_DIR}/share/cmake")
 
 # Enable usage of the qi_ cmake functions:
 include(qibuild/general)

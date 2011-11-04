@@ -191,7 +191,13 @@ def bootstrap_project(project, toc):
 set(_qibuild_path "{path_to_add}")
 list(FIND CMAKE_MODULE_PATH "${{_qibuild_path}}" _found)
 if(_found STREQUAL "-1")
-  list(APPEND CMAKE_MODULE_PATH "${{_qibuild_path}}")
+  # Prefer cmake files matching  current qibuild installation
+  # over cmake files in the cross-toolchain
+  list(INSERT CMAKE_MODULE_PATH 0 "${{_qibuild_path}}")
+
+  # Uncomment this if you really need to use qibuild
+  # cmake files from the cross-toolchain
+  # list(APPEND CMAKE_MODULE_PATH "${{_qibuild_path}}")
 endif()
 
 # Dependencies:
