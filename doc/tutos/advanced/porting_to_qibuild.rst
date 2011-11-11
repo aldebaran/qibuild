@@ -136,9 +136,9 @@ is somewhere in ``build/foo/`` and ``libbar.a`` in ``build/bar``).
 
   find_package(bar)
 
-  include_directories(${BAR_INCLUDE_DIR})
+  include_directories(${BAR_INCLUDE_DIRS})
   add_executable(myexe ...)
-  target_link_libraries(myexe ${BAR_LIBRARY})
+  target_link_libraries(myexe ${BAR_LIBRARIES})
 
 This assumes that the person has installed the ``bar`` packaged somewhere CMake can
 find it. (For instance in ``/usr/local/share/cmake/bar-config.cmake``), or that

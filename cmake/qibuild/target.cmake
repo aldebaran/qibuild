@@ -2,8 +2,7 @@
 
 #! Functions to create targets
 # ============================
-
-#!
+#
 # This is the main qiBuild module. It encapsulates the creation of programs,
 # scripts and libraries, handling dependencies and install rules,
 # in an easy, elegant and standard way.
@@ -14,12 +13,10 @@
 # * *lib* : a library
 # * *script* : a script
 #
-# The separate qibuild module link:submodule.html[SubModule], can be used to write more readable
-# and maintainable CMakeLists for binaries and libraries with lots of sources
-# and dependencies. It helps keep track of groups of sources.
-# see link:submodule.html[SubModule].
+# .. seealso::
 #
-# TODO: document options that could be passed to add_executable
+#    * :ref:`using-submodules`
+#
 
 if (_QI_TARGET_CMAKE_)
   return()

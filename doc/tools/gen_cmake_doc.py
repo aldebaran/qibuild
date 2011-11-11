@@ -14,6 +14,7 @@ DOCUMENTED_FILES=[
     "tests",
     "submodule",
     "option",
+    "find",
 ]
 
 import re
@@ -217,8 +218,8 @@ def gen_example_rst(example):
 
 def get_title_block(txt):
     """ Get the general doc of the cmake code.
-    Should be at the top of the file, from then
-    first '#!' to the next title block
+    Should be at the top of the file, from the
+    first '#!' to the next text block
 
     """
     res = ""

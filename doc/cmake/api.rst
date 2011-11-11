@@ -14,3 +14,4 @@ QiBuild CMake API
    api/tests
    api/log
    api/option
+   api/find
