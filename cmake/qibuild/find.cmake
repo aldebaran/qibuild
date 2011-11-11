@@ -77,13 +77,18 @@ include(FindPackageHandleStandardArgs)
 #
 # \arg:prefix  The prefix of the variables to clean
 function(clean prefix)
-  set(${prefix}_INCLUDE_DIRS ""           CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_INCLUDE_DIRS ""          CACHE STRING   "Cleared." FORCE)
   set(${prefix}_LIBRARIES   ""           CACHE STRING   "Cleared." FORCE)
   set(${prefix}_DEFINITIONS ""           CACHE STRING   "Cleared." FORCE)
   set(${prefix}_EXECUTABLE  ""           CACHE STRING   "Cleared." FORCE)
   set(${prefix}_EXECUTABLE_DEBUG  ""     CACHE STRING   "Cleared." FORCE)
   set(${prefix}_SEARCHED    FALSE        CACHE INTERNAL "Cleared." FORCE)
-  mark_as_advanced(${prefix}_DEFINITIONS ${prefix}_INCLUDE_DIR ${prefix}_LIBRARIES ${prefix}_TARGET ${prefix}_EXECUTABLE ${prefix}_EXECUTABLE_DEBUG)
+  mark_as_advanced(
+    ${prefix}_DEFINITIONS
+    ${prefix}_INCLUDE_DIR
+    ${prefix}_LIBRARIES
+    ${prefix}_EXECUTABLE
+    ${prefix}_EXECUTABLE_DEBUG)
 endfunction()
 
 
