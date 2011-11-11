@@ -71,38 +71,19 @@ set(_QI_LIBFIND_CMAKE_ TRUE)
 include(CMakeParseArguments)
 include(FindPackageHandleStandardArgs)
 
-# Helper function to call FPHSA
-# \flag: HEADER : just a header was searched,
-# Use this at the beginning of the ``${prefix}-config.cmake`` file
-# \flag: EXECUTABLE : just an executable was searched,
-#                      only ${prefix}_EXECUTABLE will be set.
-function(_qi_call_fphsa prefix)
-  cmake_parse_arguments(ARG "HEADER;EXECUTABLE" "" "" ${ARGN})
-
-  set(_to_check)
-  if(ARG_HEADER)
-    set(_to_check ${prefix}_INCLUDE_DIRS)
-  elseif(ARG_EXECUTABLE)
-    set(_to_check ${prefix}_EXECUTABLE)
-  else()
-    set(_to_check ${prefix}_LIBRARIES ${prefix}_INCLUDE_DIRS)
-  endif()
-
-  if($ENV{VERBOSE})
-    find_package_handle_standard_args(${prefix} DEFAULT_MSG ${_to_check})
-  else()
-    set(${prefix}_FIND_QUIETLY TRUE)
-    find_package_handle_standard_args(${prefix} DEFAULT_MSG ${_to_check})
-  endif()
-
-  # Right after find_package_handle_standard_args, ${prefix}_FOUND is
-  # set correctly.
-  # For instance, if foo/bar.h is not foud, FOO_FOUND is FALSE.
-  # But, right after this, since foo-config.cmake HAS been found, CMake
-  # re-set FOO_FOUND to TRUE.
-  # So we set ${prefix}_PACKAGE_FOUND in cache...
-  qi_set_global(${prefix}_PACKAGE_FOUND ${${prefix}_FOUND})
-  qi_set_global(${prefix}_SEARCHED TRUE)
+#!
+# Cleanup variables related to a library/executable/source-only library
+# Use this at the start of the ``${prefix}-config.cmake`` file
+#
+# \arg:prefix  The prefix of the variables to clean
+function(clean prefix)
+  set(${prefix}_INCLUDE_DIRS ""           CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_LIBRARIES   ""           CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_DEFINITIONS ""           CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_EXECUTABLE  ""           CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_EXECUTABLE_DEBUG  ""     CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_SEARCHED    FALSE        CACHE INTERNAL "Cleared." FORCE)
+  mark_as_advanced(${prefix}_DEFINITIONS ${prefix}_INCLUDE_DIR ${prefix}_LIBRARIES ${prefix}_TARGET ${prefix}_EXECUTABLE ${prefix}_EXECUTABLE_DEBUG)
 endfunction()
 
 
@@ -216,21 +197,6 @@ function(flib prefix)
   qi_debug("LIBFIND: ${prefix}_LIBRARIES: ${${prefix}_LIBRARIES}")
 endfunction()
 
-#!
-# Cleanup variable related to a library/executable/source-only library
-# Use this at the start of the ``${prefix}-config.cmake`` file
-#
-# \arg:prefix  The prefix of the variables to clean
-function(clean prefix)
-  set(${prefix}_INCLUDE_DIRS ""           CACHE STRING   "Cleared." FORCE)
-  set(${prefix}_LIBRARIES   ""           CACHE STRING   "Cleared." FORCE)
-  set(${prefix}_DEFINITIONS ""           CACHE STRING   "Cleared." FORCE)
-  set(${prefix}_EXECUTABLE  ""           CACHE STRING   "Cleared." FORCE)
-  set(${prefix}_EXECUTABLE_DEBUG  ""     CACHE STRING   "Cleared." FORCE)
-  set(${prefix}_SEARCHED    FALSE        CACHE INTERNAL "Cleared." FORCE)
-  mark_as_advanced(${prefix}_DEFINITIONS ${prefix}_INCLUDE_DIR ${prefix}_LIBRARIES ${prefix}_TARGET ${prefix}_EXECUTABLE ${prefix}_EXECUTABLE_DEBUG)
-endfunction()
-
 
 #!
 # Export the variables related to a library
@@ -318,4 +284,39 @@ function(export_header prefix)
   qi_verbose("  definitions: ${${prefix}_DEFINITIONS}" )
   _qi_call_fphsa(${prefix} HEADER)
 endfunction()
+
+# Helper function to call FPHSA
+# \flag: HEADER : just a header was searched,
+#                      only ${prefix}_INCLUDE_DIRS will be set.
+# \flag: EXECUTABLE : just an executable was searched,
+#                      only ${prefix}_EXECUTABLE will be set.
+function(_qi_call_fphsa prefix)
+  cmake_parse_arguments(ARG "HEADER;EXECUTABLE" "" "" ${ARGN})
+
+  set(_to_check)
+  if(ARG_HEADER)
+    set(_to_check ${prefix}_INCLUDE_DIRS)
+  elseif(ARG_EXECUTABLE)
+    set(_to_check ${prefix}_EXECUTABLE)
+  else()
+    set(_to_check ${prefix}_LIBRARIES ${prefix}_INCLUDE_DIRS)
+  endif()
+
+  if($ENV{VERBOSE})
+    find_package_handle_standard_args(${prefix} DEFAULT_MSG ${_to_check})
+  else()
+    set(${prefix}_FIND_QUIETLY TRUE)
+    find_package_handle_standard_args(${prefix} DEFAULT_MSG ${_to_check})
+  endif()
+
+  # Right after find_package_handle_standard_args, ${prefix}_FOUND is
+  # set correctly.
+  # For instance, if foo/bar.h is not foud, FOO_FOUND is FALSE.
+  # But, right after this, since foo-config.cmake HAS been found, CMake
+  # re-set FOO_FOUND to TRUE.
+  # So we set ${prefix}_PACKAGE_FOUND in cache...
+  qi_set_global(${prefix}_PACKAGE_FOUND ${${prefix}_FOUND})
+  qi_set_global(${prefix}_SEARCHED TRUE)
+endfunction()
+
 
