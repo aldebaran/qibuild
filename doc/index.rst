@@ -33,7 +33,7 @@ QiBuild is composed of two parts:
 QiBuild in 5 minutes
 --------------------
 
-* Create a worktree:
+Create a worktree:
 
 .. code-block:: console
 
@@ -57,6 +57,23 @@ QiBuild in 5 minutes
 
     qi_create_lib(world world/world.hpp world/world.cpp)
     qi_stage_lib(world)
+
+* Make world depend on ``ode``
+
+.. code-block:: console
+
+    $ $EDITOR qibuid/modules/ode-config.cmake
+
+.. code-block:: cmake
+
+   clean(ODE)
+   fpath(ODE ode/ode.h)
+   flib(ODE ode)
+   export_lib(ODE)
+
+.. code-block:: cmake
+
+   qi_use_lib(world ODE)
 
 
 * Create a ``hello`` in the ``hello`` project, in
@@ -100,14 +117,24 @@ QiBuild in 5 minutes
    `src/world/build/sdk/lib/libworld.so`
 
 
-* Distribute the world project to the world
+* Distribute the world project to the world, step 1:
+  Add install rules for world header
+
+.. code-block:: cmake
+
+   qi_install_header(world/world.hpp SUBFOLDER world)
+
+* Distribute the world project to the world, step 2:
+  Generate world package in ~/src/packages/world.tar.gz
+  using cmake install rules.
 
 .. code-block:: console
 
    $ qibuild package world
 
-   Generate world package in ~/src/packages/world.tar.gz
 
+* Distribute the world project to the world, step 3:
+  Upload the package along with a feed description:
 
 .. code-block:: xml
 
@@ -118,7 +145,7 @@ QiBuild in 5 minutes
      />
     </toolchain>
 
-On a other machine:
+* Use the world package from an other machine:
 
 .. code-block:: console
 
