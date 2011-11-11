@@ -148,6 +148,33 @@ def convert_cmake(source_dir):
     copy_qibuild(source_dir)
     create_qibuild_manifest(source_dir)
 
+def convert_default(source_dir):
+    """ Create an empty CMakeLists, and assume project name
+    if the basename of the source_dir
+
+    """
+    root_cmake = os.path.join(source_dir, "CMakeLists.txt")
+    template = """# CMake file for {project_name}
+
+cmake_minimum_required(VERSION 2.8)
+project({project_name})
+include(qibuild.cmake)
+
+# qi_create_lib(...)
+
+# qi_create_bin(...)
+
+"""
+
+    project_name = os.path.basename(source_dir)
+    to_write = template.format(project_name=project_name)
+
+    with open(root_cmake, "w") as fp:
+        fp.write(to_write)
+
+    copy_qibuild(source_dir)
+    create_qibuild_manifest(source_dir)
+
 
 def do(args):
     """Main entry point """
@@ -159,8 +186,8 @@ def do(args):
     source_type = guess_type(source_dir)
 
     if not source_type:
-        LOGGER.error("Could not guess type of the project!")
-        return
+        LOGGER.warning("Could not guess type of the project, creating a new default cmake project")
+        source_type = "default"
 
     this_module = sys.modules[__name__]
     fun_name = "convert_" + source_type
