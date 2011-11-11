@@ -296,12 +296,24 @@ endfunction()
 
 
 #! Create a configuration file
-
+#
+# Configures a header named ${dest} using the source file from
+# ${source} using ``configure_file``
+# In addition:
+#
+#  - Make sure the path where the header is generated is
+#    added to the include path
+#
+#  - Create the necessary install rules
+#
+# If you need the header to be generated in a subdirectory
+# (recommended), simply use something like::
+#
+#   qi_create_config_h(_out config.h.in foo/config.h)
+#
 # \arg:OUT_PATH Path to the generated file
 # \arg:source The source file
 # \arg:dest The destination
-# This function configure a file (using configure_file), it will generate the install rules
-# and return the path of the generated file in OUT_PATH
 function(qi_create_config_h OUT_PATH source dest)
   configure_file("${source}" "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}" ESCAPE_QUOTES)
   include_directories("${CMAKE_CURRENT_BINARY_DIR}/include/")
