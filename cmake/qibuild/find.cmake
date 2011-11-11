@@ -197,6 +197,35 @@ function(flib prefix)
   qi_debug("LIBFIND: ${prefix}_LIBRARIES: ${${prefix}_LIBRARIES}")
 endfunction()
 
+#!
+# Search for an executable
+#
+# \arg:prefix Prefix of the variables to export. Must match the calls
+#             to ``clean()`` and ``export_bin()`` calls.
+function(fprogram prefix)
+  qi_debug("LIBFIND: FLIB (prefix=${prefix}, name=${name})")
+  cmake_parse_arguments(ARG "DEBUG;OPTIMIZED" "" "NAMES" ${ARGN})
+
+  set(ARG_NAMES ${ARG_UNPARSED_ARGUMENTS} ${ARG_NAMES})
+  list(GET ARG_NAMES 0 name)
+
+  if ("${name}" STREQUAL "")
+    qi_error("empty name: ${name}")
+  endif()
+
+  find_program(${name}_EXE ${ARG_UNPARSED_ARGUMENTS})
+
+  if(NOT ${name}_EXE)
+    return()
+  endif()
+
+  if (ARG_DEBUG)
+    qi_set_global(${name}_EXECUTABLE_DEBUG ${${prefix}_EXE})
+  else()
+    qi_set_global(${name}_EXECUTABLE ${${prefix}_EXE})
+  endif()
+
+endfunction()
 
 #!
 # Export the variables related to a library
