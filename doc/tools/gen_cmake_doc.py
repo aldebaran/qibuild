@@ -342,6 +342,8 @@ def gen_rst(txt):
     title_block = get_title_block(txt)
     title_rst = gen_title_rst(title_block)
     res += title_rst
+    # add a blank line just to be sure
+    res += "\n"
 
     fun_blocks = get_fun_blocks(txt)
     for (name, fun_block) in fun_blocks:
