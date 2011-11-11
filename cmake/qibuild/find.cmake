@@ -32,11 +32,11 @@ function(_qi_call_fphsa prefix)
 
   set(_to_check)
   if(ARG_HEADER)
-    set(_to_check ${prefix}_INCLUDE_DIR)
+    set(_to_check ${prefix}_INCLUDE_DIRS)
   elseif(ARG_EXECUTABLE)
     set(_to_check ${prefix}_EXECUTABLE)
   else()
-    set(_to_check ${prefix}_LIBRARIES ${prefix}_INCLUDE_DIR)
+    set(_to_check ${prefix}_LIBRARIES ${prefix}_INCLUDE_DIRS)
   endif()
 
   if($ENV{VERBOSE})
@@ -73,17 +73,12 @@ function(fpath prefix name0)
   endif()
 
   find_path(${name0}_INCLUDE ${name0} ${ARG_UNPARSED_ARGUMENTS})
-
   if (${name0}_INCLUDE)
-    set(${prefix}_INCLUDE_DIR ${${name0}_INCLUDE} ${${prefix}_INCLUDE_DIR} CACHE PATH "" FORCE)
-  else()
-    message(STATUS "[${prefix}] file_path ${name0} NOT FOUND")
+    qi_append_uniq_global(${prefix}_INCLUDE_DIRS ${${name0}_INCLUDE})
   endif()
 
-  #list(APPEND ${prefix}_INCLUDE_DIR "${${_modullelist}_INCLUDE}")
   qi_debug("LIBFIND: RESULT: ${${name0}_INCLUDE}")
-  qi_debug("LIBFIND: ${prefix}_INCLUDE_DIR: ${${prefix}_INCLUDE_DIR}")
-  set(${name0}_INCLUDE CACHE INTERNAL "" FORCE)
+  qi_debug("LIBFIND: ${prefix}_INCLUDE_DIRS: ${${prefix}_INCLUDE_DIRS}")
 endfunction()
 
 
@@ -126,15 +121,12 @@ function(flib prefix)
   endif()
 
   if (${name}_LIB)
-    set(${prefix}_LIBRARIES ${_keyword} "${${name}_LIB}" ${${prefix}_LIBRARIES} CACHE STRING "" FORCE)
-  else()
-    message(STATUS "[${prefix}] Cannot find library: ${name} NOT FOUND")
+    list(APPEND ${prefix}_LIBRARIES ${_keyword} ${${name}_LIB})
+    qi_set_global(${prefix}_LIBRARIES ${${prefix}_LIBRARIES})
   endif()
 
-  #list(APPEND ${prefix}_LIBRARIES "${${_modulelist}_LIB}")
   qi_debug("LIBFIND: RESULT: ${${_modulelist}_LIB}")
   qi_debug("LIBFIND: ${prefix}_LIBRARIES: ${${prefix}_LIBRARIES}")
-  set(${name}_LIB CACHE INTERNAL "" FORCE)
 endfunction()
 
 ####################################################################
@@ -143,7 +135,7 @@ endfunction()
 #
 ####################################################################
 function(clean prefix)
-  set(${prefix}_INCLUDE_DIR ""           CACHE STRING   "Cleared." FORCE)
+  set(${prefix}_INCLUDE_DIRS ""           CACHE STRING   "Cleared." FORCE)
   set(${prefix}_LIBRARIES   ""           CACHE STRING   "Cleared." FORCE)
   set(${prefix}_DEFINITIONS ""           CACHE STRING   "Cleared." FORCE)
   set(${prefix}_EXECUTABLE  ""           CACHE STRING   "Cleared." FORCE)
@@ -161,7 +153,7 @@ endfunction()
 function(export_lib prefix)
   # Finally, display informations if not in quiet mode
   qi_verbose("library ${prefix}:" )
-  qi_verbose("  includes   : ${${prefix}_INCLUDE_DIR}" )
+  qi_verbose("  includes   : ${${prefix}_INCLUDE_DIRS}" )
   qi_verbose("  libraries  : ${${prefix}_LIBRARIES}" )
   qi_verbose("  definitions: ${${prefix}_DEFINITIONS}" )
 
@@ -174,13 +166,13 @@ endfunction()
 #
 ####################################################################
 function(export_lib_pkgconfig prefix)
-  qi_set_cache(${prefix}_INCLUDE_DIR "${${prefix}_INCLUDE_DIRS}")
-  qi_set_cache(${prefix}_LIBRARIES   "${${prefix}_LIBRARIES}")
+  qi_set_cache(${prefix}_INCLUDE_DIRS "${${prefix}_INCLUDE_DIRS}")
+  qi_set_cache(${prefix}_LIBRARIES    "${${prefix}_LIBRARIES}")
   #qi_set_cache(${prefix}_DEFINITIONS "${${prefix}_CFLAGS_OTHER}")
 
   # Finally, display informations if not in quiet mode
   qi_verbose("library ${prefix}:" )
-  qi_verbose("  includes   : ${${prefix}_INCLUDE_DIR}" )
+  qi_verbose("  includes   : ${${prefix}_INCLUDE_DIRS}" )
   qi_verbose("  libraries  : ${${prefix}_LIBRARIES}" )
   qi_verbose("  definitions: ${${prefix}_DEFINITIONS}" )
 
@@ -210,7 +202,7 @@ endfunction()
 function(export_header prefix)
   # Finally, display informations if not in quiet mode
   qi_verbose("header library ${prefix}:" )
-  qi_verbose("  includes   : ${${prefix}_INCLUDE_DIR}" )
+  qi_verbose("  includes   : ${${prefix}_INCLUDE_DIRS}" )
   qi_verbose("  definitions: ${${prefix}_DEFINITIONS}" )
   _qi_call_fphsa(${prefix} HEADER)
 endfunction()
