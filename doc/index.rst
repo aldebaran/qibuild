@@ -29,6 +29,114 @@ QiBuild is composed of two parts:
   taking dependencies into account and generate re-destributable binary
   packages
 
+
+QiBuild in 5 minutes
+--------------------
+
+* Create a worktree:
+
+.. code-block:: console
+
+   $ cd ~/src
+   $ qibuild init
+
+
+* Create a ``world`` library in the ``world``
+  project, in ``src/world``
+
+.. code-block:: console
+
+   $ cd ~/src/world
+   $ $EDITOR CMakeLists.txt
+
+.. code-block:: cmake
+
+    cmake_minimum_required(VERSION 2.8)
+    project(world)
+    include("qibuild.cmake")
+
+    qi_create_lib(world world/world.hpp world/world.cpp)
+    qi_stage_lib(world)
+
+
+* Create a ``hello`` in the ``hello`` project, in
+  ``src/hello``, using the ``world`` library:
+
+.. code-block:: console
+
+   $ cd ~/src/hello
+   $ $EDITOR qibuild.manifest
+
+
+.. code-block:: ini
+
+   [project hello]
+   depends = world
+
+.. code-block:: console
+
+   $ $EDITOR CMakeLists.txt
+
+
+.. code-block:: cmake
+
+    cmake_minimum_required(VERSION 2.8)
+    project(hello)
+    include("qibuild.cmake")
+
+    qi_create_bin(hello main.cpp)
+
+.. code-block:: console
+
+   $ cd ~/src
+   $ qibuild configure hello
+
+   Call cmake on world, then hello
+
+   $ qibuild make hello
+
+   Build world, then hello, automagically
+   linking `src/hello/build/sdk/bin/hello` with
+   `src/world/build/sdk/lib/libworld.so`
+
+
+* Distribute the world project to the world
+
+.. code-block:: console
+
+   $ qibuild package world
+
+   Generate world package in ~/src/packages/world.tar.gz
+
+
+.. code-block:: xml
+
+   <toolchain>
+     <package
+      name="world"
+      url="htpp://example.com/world.tar.gz"
+     />
+    </toolchain>
+
+On a other machine:
+
+.. code-block:: console
+
+   $ qitoolchain init $NAME htpp://example.com/feed.xml
+
+   Add package from htpp://example.com/world.tar.gz to
+   a toolchain named $NAME
+
+   $ qisrc add git@git.example.com/hello.git
+
+   Get hello sources from a git repository
+
+   $ qibuild configure -c $NAME hello
+
+   No need for world sources, using pre-compiled library
+   from the world package
+
+
 References
 ----------
 
