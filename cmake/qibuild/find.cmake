@@ -7,6 +7,7 @@
 # The qibuild CMake framework contains several ``-config.cmake`` files
 # when upstream ``Find-.cmake`` files are not correct or missing.
 #
+#
 # For instance, the canonical ``FindFoo.cmake`` looks like::
 #
 #   include(FindPackageHandleStandardArgs.cmake)
@@ -61,6 +62,8 @@
 #
 # So this variable can be used directly in the ``target_link_libraries()`` call
 #
+# .. seealso:
+#  :ref:`writing-a-config-cmake` section for a detailed tutorial on how to write a ``-config.cmake`` file.
 #
 if (_QI_LIBFIND_CMAKE_)
   return()

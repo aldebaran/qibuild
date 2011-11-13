@@ -387,7 +387,7 @@ def main():
     qibuild_dir = os.path.abspath(qibuild_dir)
     this_file = __file__
     this_dir = os.path.dirname(this_file)
-    cmake_api = os.path.join(this_dir, "../cmake/api")
+    cmake_api = os.path.join(this_dir, "../ref/cmake/api")
     cmake_api = os.path.abspath(cmake_api)
     if not os.path.exists(cmake_api):
         os.makedirs(cmake_api)

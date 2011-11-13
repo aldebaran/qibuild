@@ -3,7 +3,7 @@
 #! Installing
 # ===========
 #
-# See general documentation here :ref:`cmake-installing`
+# See general documentation here :ref:`cmake-install`
 #
 
 
