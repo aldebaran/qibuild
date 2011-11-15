@@ -235,8 +235,13 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
 
     dep_to_add = ""
     for sdk_dir in dep_sdk_dirs:
-        dep_to_add += 'list(APPEND CMAKE_FIND_ROOT_PATH "%s")\n' % \
-            qibuild.sh.to_posix_path(sdk_dir)
+
+        dep_to_add += """
+list(FIND CMAKE_FIND_ROOT_PATH "{sdk_dir}" _found)
+if(_found STREQUAL "-1")
+    list(INSERT CMAKE_FIND_ROOT_PATH 0 "{sdk_dir}")
+endif()
+""".format(sdk_dir=qibuild.sh.to_posix_path(sdk_dir))
 
     to_write = to_write.format(
         path_to_add       = path_to_add,
