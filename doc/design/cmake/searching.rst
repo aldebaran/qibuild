@@ -81,7 +81,7 @@ The code in ``dependencies.cmake`` looks like
 
 .. code-block:: cmake
 
-  list(INSERT 0 CMAKE_FIND_ROOT_PATH /path/to/src/world/build/sdk)
+  list(INSERT CMAKE_FIND_ROOT_PATH 0 /path/to/src/world/build/sdk)
 
 So that sources are searched **before** the packages from toolchain
 
