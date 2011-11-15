@@ -4,11 +4,11 @@
 # return c:\windows\system32\wscock32.dll ...
 
 # Also, we do not need any additional include dirs to
-# use wsock32, but we need WSOCK_INCLUDE_DIR for
+# use wsock32, but we need WSOCK_INCLUDE_DIRS for
 # export_lib() to be happy
 
 clean(WSOCK)
-set(WSOCK_INCLUDE_DIR " " CACHE STRING "" FORCE)
+set(WSOCK_INCLUDE_DIRS " " CACHE STRING "" FORCE)
 if(MSCV)
   set(WSOCK_LIBRARIES wsock32.lib CACHE STRING "" FORCE)
 else()
