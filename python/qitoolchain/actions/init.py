@@ -62,7 +62,7 @@ def do(args):
         toolchain.parse_feed(feed)
 
     if args.cmake_generator:
-        toc.update_config("cmake.generator", cmake_generator, tc_name)
+        toc.update_config("cmake.generator", args.cmake_generator, tc_name)
     if args.default:
         toc.update_config("config", tc_name)
         LOGGER.info("Now using toolchain %s by default", tc_name)

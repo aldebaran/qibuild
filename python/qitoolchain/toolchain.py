@@ -27,7 +27,7 @@ def get_default_packages_path(tc_name):
     if config.has_section("default"):
         try:
             root = config.get("default", "root")
-        except ConfigStore.NoOptionError:
+        except ConfigParser.NoOptionError:
             pass
     res = os.path.join(root, tc_name)
     qibuild.sh.mkdir(res, recursive=True)

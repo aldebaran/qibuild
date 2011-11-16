@@ -82,6 +82,7 @@ def handle_remote_package(package, package_tree, toolchain):
     # same package twice
     package_url = package_tree.get("url")
     package_name = package_tree.get("name")
+    # pylint: disable-msg=E1101
     archive_name = hashlib.sha1(package_url).hexdigest()
     top = archive_name[:2]
     rest = archive_name[2:]
