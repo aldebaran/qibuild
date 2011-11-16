@@ -75,7 +75,12 @@ class GitCommand:
         return command.call(margs, cwd = cwd, env = git_env, ignore_ret_code=True)
 
     def call_output(self, *args, **kargs):
-        """ call a git command with output """
+        """ call a git command with output
+        kargs:
+          - cwd
+          - stderr (could be True or False, True by default)
+          - rawout : return [ stdout, stderr ]
+        """
         git_env = None
         if not kargs.get("no_env", False):
             git_env                  = os.environ.copy()
@@ -84,10 +89,17 @@ class GitCommand:
         margs = [GIT]
         margs.extend([ x for x in args])
         cwd = kargs.get("cwd", self.worktree)
+        wanterr = kargs.get("stderr", True)
+        rawout  = kargs.get("rawout", False)
+        stderrout = None if wanterr or not rawout else subprocess.PIPE
+        stderrout = subprocess.PIPE
         process = subprocess.Popen(margs, cwd=cwd, env=git_env,
-            stdout=subprocess.PIPE)
-        out = process.communicate()[0]
-        return out.splitlines()
+            stdout=subprocess.PIPE, stderr=stderrout)
+        out = process.communicate()
+        process.poll()
+        if rawout:
+            return (process.returncode,  out)
+        return out[0].splitlines()
 
 def git_open(git_work_tree, git_dir=None):
     """ open a git repository """
