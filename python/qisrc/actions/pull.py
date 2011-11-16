@@ -1,6 +1,8 @@
 ## Copyright (C) 2011 Aldebaran Robotics
 
-"""Init a new qisrc workspace """
+""" Run git pull on every git projects of a worktree
+
+"""
 
 import os
 import logging
@@ -34,14 +36,8 @@ def do(args):
             print out[1][0],
             print out[1][1],
         else:
-            LOGGER.error("failed (See bellow for details)")
-            #print "Failed"
             fail.append((git_project, out))
             if not args.continue_on_error:
-                # LOGGER.error("Pull failed: %s", f[0])
-                # print "error:"
-                # print f[1][1][0],
-                # print f[1][1][1],
                 raise Exception("\n%s%s" % (out[1][0], out[1][1]))
 
     if len(fail) > 0:
