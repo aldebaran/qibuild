@@ -88,7 +88,7 @@ function(clean prefix)
   set(${prefix}_SEARCHED    FALSE        CACHE INTERNAL "Cleared." FORCE)
   mark_as_advanced(
     ${prefix}_DEFINITIONS
-    ${prefix}_INCLUDE_DIR
+    ${prefix}_INCLUDE_DIRS
     ${prefix}_LIBRARIES
     ${prefix}_EXECUTABLE
     ${prefix}_EXECUTABLE_DEBUG)
