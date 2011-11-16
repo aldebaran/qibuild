@@ -1,3 +1,5 @@
+.. _qibuild-ref:
+
 QiBuild reference documentation
 ===============================
 
