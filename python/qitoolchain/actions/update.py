@@ -37,6 +37,11 @@ def do(args):
     toc = qibuild.toc.toc_open(args.work_tree)
     if not tc_name:
         tc_name = toc.active_config
+        if not tc_name:
+            mess  = "Could not find which toolchain to update\n"
+            mess += "Please specify a toolchain name from command line\n"
+            mess += "Or edit your qibuild.cfg to set a default config\n"
+            raise Exception(mess)
 
     known_tc_names = qitoolchain.toolchain.get_tc_names()
     if not tc_name in known_tc_names:
