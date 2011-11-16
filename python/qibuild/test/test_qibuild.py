@@ -71,12 +71,12 @@ class QiBuildTestCase(unittest.TestCase):
         # Since some IDE automatically run cmake .. (qtcreator,
         # visual studio, for instance), this will lead to
         # performance issues
-        self._run_action("configure", "world")
-
+        self._run_action("status")
+        self._run_action("configure", "foo")
         toc = qibuild.toc.toc_open(self.test_dir, args=self.args)
         build_folder_name = toc.build_folder_name
-        world_src = os.path.join(self.test_dir, "world")
-        build_dir = os.path.join(world_src, "build-%s" % build_folder_name)
+        foo_src = os.path.join(self.test_dir, "foo")
+        build_dir = os.path.join(foo_src, "build-%s" % build_folder_name)
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
 
         # run cmake .. once and store contents of cache:

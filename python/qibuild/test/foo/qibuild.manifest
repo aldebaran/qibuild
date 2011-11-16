@@ -1,0 +1,4 @@
+[project foo]
+# Add your project dependencies here:
+depends =
+

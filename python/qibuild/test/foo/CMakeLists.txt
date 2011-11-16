@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 2.8)
+project(foo)
+include(qibuild.cmake)
+
+qi_create_lib(spam spam.cpp)
+qi_stage_lib(spam)
+
+qi_create_lib(eggs eggs.cpp)
+qi_use_lib(eggs spam)
+qi_stage_lib(eggs)
+
+qi_create_lib(bar  bar.cpp)
+qi_use_lib(bar eggs)
