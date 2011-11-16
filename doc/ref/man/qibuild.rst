@@ -33,6 +33,11 @@ create PROJECT
   In the following actions, you do not need to specify the project name if you
   are in a subdirectory of this project
 
+
+All following command accept a ``-c,--config`` argument which should be
+the name a a toolchain.
+(see :ref:`qitoolchain-man-page`)
+
 configure [PROJECT]
   Configure a project.
 
@@ -47,7 +52,7 @@ install PROJECT DESTINATION
 
 package PROJECT
   Generate a pre-compiled archive of the project.
-  Archive will be generated in ``WORK_TREE/package/``
+  Archive will be generated in ``QI_WORK_TREE/package/``
 
 
 OPTIONS
@@ -80,7 +85,7 @@ Useful build options:
 CONFIGURATION
 -------------
 
-Configuration is done in ``.qi/qibuild.cfg`` or in ``.config/.qi/qibuild.cfg``.
+Configuration is done in ``.qi/qibuild.cfg``.
 
 
 EXIT STATUS
