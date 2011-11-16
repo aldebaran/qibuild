@@ -1,3 +1,5 @@
+.. _qibuild-search-order:
+
 Search order
 ============
 
