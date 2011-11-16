@@ -234,15 +234,19 @@ class Git:
         git symbolic-ref HEAD
         else: git name-rev --name-only --always HEAD
         """
-        lines = self.cmd.call_output("symbolic-ref", ref)
+        lines = self.cmd.call_output("symbolic-ref", ref, stderr=False)
+        if len(lines) < 1:
+            return None
         self.logger.debug("current.refs=" + str(lines[0]))
         return lines[0]
 
     def get_current_branch(self):
         """ return the current branch """
-        branch = self.get_current_ref()[11:]
-        self.logger.debug("current.branch=" + str(branch))
-        return branch
+        branch = self.get_current_ref()
+        if not branch:
+            return branch
+        self.logger.debug("current.branch=" + str(branch[11:]))
+        return branch[11:]
 
     def get_current_remote_url(self):
         """
@@ -251,7 +255,7 @@ class Git:
         """
         branch = self.get_current_branch()
         try:
-            remote = self.cmd.call_output("config", "--get", "branch.%s.remote" % (branch))[0]
+            remote = self.cmd.call_output("config", "--get", "branch.%s.remote" % (branch), stderr=False)[0]
         except IndexError:
             return None
         if not remote:
@@ -259,10 +263,10 @@ class Git:
                 branch)
             return None
         try:
-            url = self.cmd.call_output("config", "--get", "remote.%s.url" % (remote))[0]
+            url = self.cmd.call_output("config", "--get", "remote.%s.url" % (remote), stderr=False)[0]
         except command.CommandFailedException:
             try:
-                url = self.cmd.call_output("config", "--get", "remote.origin.url")[0]
+                url = self.cmd.call_output("config", "--get", "remote.origin.url", stderr=False)[0]
             except command.CommandFailedException:
                 url = None
         self.logger.debug("remote=" + str(remote) + " ,url=" + str(url))
