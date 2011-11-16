@@ -18,13 +18,16 @@ for instance with ``qibuild package``
 COMMANDS
 --------
 
-create NAME
+init NAME [FEED_URL]
   create a new toolchain
 
-add -c TOOLCHAIN_NAME PACKAGE_NAME PACKAGE_PATH
+update NAME
+  update a toolchain using the last feed
+
+add-package -c TOOLCHAIN_NAME PACKAGE_NAME PACKAGE_PATH
   add a new package to the given toolchain
 
-remove -c TOOLCHAIN_NAME PACKAGE_NAME
+remove-package -c TOOLCHAIN_NAME PACKAGE_NAME
   remove the package from the toolcain
 
 
