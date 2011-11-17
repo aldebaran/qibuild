@@ -153,7 +153,7 @@ class DependenciesSolver:
         if packages:
             self.packages = packages
 
-    def solve(self, names, all=False, single=False, runtime=False):
+    def solve(self, names, runtime=False):
         """Given a list of names, try to sort them in the correct order.
 
         Return (projects, packages, not_found) where:
@@ -181,22 +181,10 @@ class DependenciesSolver:
 
         self.logger.debug(mess)
 
-        if all:
-        # Pretend the user has asked for all the known projects
-            self.logger.debug("All projects have been selected")
-            names = project_names[:]
-
         # Assert that all the names are known projects:
         for name in names:
             if name not in project_names:
                 raise Exception("Unknown project: %s" % name)
-
-        if single:
-            self.logger.debug("Single project selected")
-
-            if len(names) != 1:
-                raise Exception("Using --single requires exactly one name to be given")
-            return (names, list(), list())
 
         to_sort = dict()
         for project in self.projects:

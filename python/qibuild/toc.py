@@ -649,19 +649,25 @@ def resolve_deps(toc, args, runtime=False):
     Cases handled:
       - nothing specified: get the project from the cwd
       - args.single: do not resolve dependencies
-      - args.only_deps: only return dependencies
-      - args.use_deps: take dependencies into account
+      - args.all: return all projects
     """
-    if not args.projects:
+    if args.all:
+        # Pretend the user has asked for all the known projects
+        LOGGER.debug("All projects have been selected")
+        project_names = [p.name for p in toc.projects]
+    elif not args.projects:
         project_names = [project_from_cwd()]
     else:
         project_names = args.projects
+
+    if args.single:
+        LOGGER.debug("Single project selected")
+        return (project_names, list(), list())
+
     dep_solver = DependenciesSolver(projects=toc.projects,
                                     packages=toc.packages)
     return dep_solver.solve(project_names,
-        single=args.single,
-        all=args.all,
-        runtime=runtime)
+                            runtime=runtime)
 
 def project_from_cwd():
     """Return a project name from the current working directory
