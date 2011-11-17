@@ -282,6 +282,10 @@ class Toolchain:
                 tc_file = qibuild.sh.to_posix_path(package.toolchain_file)
                 lines.append('include("%s")\n' % tc_file)
             lines.append('list(INSERT CMAKE_FIND_ROOT_PATH 0 "%s")\n' % package_path)
+            # For some reason CMAKE_FRAMEWORK_PATH does not follow CMAKE_FIND_ROOT_PATH
+            # (well, you seldom use frameworks when cross-compiling ...), so we
+            # need to change this variable too
+            lines.append('list(INSERT CMAKE_FRAMEWORK_PATH 0 "%s")\n' % package_path)
 
         oldlines = list()
         try:
