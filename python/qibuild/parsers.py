@@ -41,17 +41,9 @@ def project_parser(parser):
     """ Parser settings for every action using several toc projects
     """
     parser.add_argument("-a", "--all", action="store_true", help="Work on all projects")
-    parser.add_argument("-s", "--single", action="store_true", help="Work on a single project")
-    parser.add_argument("--only-deps", action="store_true", help="Only work on the dependencies")
-    parser.add_argument("--use-deps",    dest="use_deps", action="store_true",
-        help="Use dependencies")
-    parser.add_argument("--no-use-deps", dest="use_deps", action="store_false",
-        help="Do not resolve any dependencies")
+    parser.add_argument("-s", "--single", action="store_true", help="Work on specified projects without taking dependencies into account.")
     parser.add_argument("projects", nargs="*", metavar="PROJECT", help="Project name(s)")
-    parser.set_defaults(single=False,
-        only_deps=False,
-        use_deps=True,
-        projects = list())
+    parser.set_defaults(single=False, projects = list())
 
 
 def package_parser(parser):
