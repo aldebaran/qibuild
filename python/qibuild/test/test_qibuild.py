@@ -6,6 +6,7 @@
 
 
 import os
+import re
 import sys
 import difflib
 
@@ -79,6 +80,12 @@ class QiBuildTestCase(unittest.TestCase):
         build_dir = os.path.join(foo_src, "build-%s" % build_folder_name)
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
 
+        # Read cache and check that DEPENDS value are here
+        cache = read_cmake_cache(cmake_cache)
+
+        self.assertEquals(cache["EGGS_DEPENDS"], "spam")
+        self.assertEquals(cache["BAR_DEPENDS"] , "eggs;spam")
+
         # run cmake .. once and store contents of cache:
         qibuild.command.call(["cmake", ".."], cwd=build_dir)
         before = ""
@@ -96,6 +103,31 @@ class QiBuildTestCase(unittest.TestCase):
             diff += line
 
         self.assertEquals(diff, "", "Diff non empty\n%s" % diff)
+
+
+
+def read_cmake_cache(cache_path):
+    """ Read a CMakeCache.txt file, returning a dict
+    name -> value
+
+    """
+    with open(cache_path, "r") as fp:
+        lines = fp.readlines()
+    res = dict()
+    for line in lines:
+        if line.startswith("//"):
+            continue
+        if line.startswith("#"):
+            continue
+        if not line:
+            continue
+        match = re.match(r"(\w+):(\w+)=(.*)", line)
+        if not match:
+            continue
+        else:
+            (key, _type, value) = match.groups()
+            res[key] = value
+    return res
 
 
 
