@@ -16,28 +16,35 @@ def configure_parser(parser):
     parser.add_argument("project", nargs="?")
 
 def find_ide(toc):
-    ides = list()
-    vs        = False
-    qtcreator = False
-    xcode     = False
+    """ Return a ide to use.
 
+    - Either read it from configuration
+    - Or ask it to the user, but use sys.platform
+      to ask only reasonable choices
 
-    qtcreator = toc.configstore.get("env.ide.path", default=False)
-    if not qtcreator:
-        qtcreator = qibuild.command.find_program("qtcreator")
+    Return the path to the chosen ide, and
+    store in it the configuration to not
+    ask it again
+
+    """
+    ide = toc.configstore.get("env.ide")
+    ides = ["QtCreator"] # QtCreator rocks!
+    # FIXME: add 'Eclipse CDT'
 
     if sys.platform.startswith("win32"):
-        vs = True
-    if sys.platform == "darwin":
-        xcode = True
-
-    if xcode:
-        ides.append("Xcode")
-    if qtcreator:
-        ides.append("QtCreator")
-    if vs:
         ides.append("Visual Studio")
-    return ides
+
+    if sys.platform == "darwin":
+        ides.append("Visual Studio")
+
+    if ide is None:
+        if len(ides) > 1:
+            ide  = qibuild.interact.ask_choice(ides, "Please choose between the following IDEs")
+        else:
+            ide = "QtCreator"
+
+    toc.update_config("env.ide", ide)
+    return ide
 
 def do(args):
     """Main entry point """
@@ -49,15 +56,8 @@ def do(args):
 
     project = toc.get_project(project_name)
 
-    ides = find_ide(toc)
-    editor = toc.configstore.get("env.ide")
-    if len(ides) == 1 and editor is None:
-        editor = ides[0]
-    if editor is None:
-        editor  = qibuild.interact.ask_choice(ides, "Please choose between the following IDEs")
-        toc.update_config("env", "ide", editor)
-    error_message = "Could not open project %s:\n" % project_name
-    if editor == "Visual Studio":
+    ide = find_ide(toc)
+    if ide == "Visual Studio":
         sln_files = glob.glob(project.build_directory + "/*.sln")
         if len(sln_files) != 1:
             raise Exception(error_message + "Expecting only one sln, got %s" % sln_files)
@@ -65,31 +65,46 @@ def do(args):
         print "%s %s" % ("start", sln_files[0])
         subprocess.Popen(["start", sln_files[0]], shell=True)
 
-    if editor == "Xcode":
+    if ide == "XCode":
         projs = glob.glob(project.build_directory + "/*.xcodeproj")
         if len(projs) == 0:
             raise Exception(error_message + "Do you have called qibuild configure with --cmake-generator=Xcode?")
         if len(projs) > 1:
             raise Exception(error_message + "Expecting only one xcode project file, got %s" % projs)
-        print "starting Xcode:"
+        print "starting XCode:"
         print "%s %s" % ("open", projs[0])
         subprocess.Popen(["open", projs[0]])
 
-    if editor == "QtCreator":
-        qtcreator_full_path = toc.configstore.get("env.qtcreator.path", default=None)
-        if not qtcreator_full_path:
-            qtcreator_full_path = qibuild.command.find_program("qtcreator")
+    if ide == "QtCreator":
+        # Something qtcreator executable in not in Path, so ask it
+        ide_path = toc.configstore.get("env.qtcreator.path", default=None)
+        build_env = toc.envsetter.get_build_env()
+        if not ide_path:
+            # Try to guess it:
+            qtcreator_full_path = qibuild.command.find_program("qtcreator", env=build_env)
             if not qtcreator_full_path:
                 if os.path.exists("/Applications/Qt Creator.app/Contents/MacOS/Qt Creator"):
                     qtcreator_full_path = "/Applications/Qt Creator.app/Contents/MacOS/Qt Creator"
+                # Ask it to the use
                 if not qtcreator_full_path:
                     qtcreator_full_path = qibuild.interact.ask_program("Please enter path to qtcreator")
-                    # Store it so we dont ask again:
-                    toc.update_config("env", "qtcreator.path", qtcreator_full_path)
-        if not qtcreator_full_path:
-            raise Exception("Could not find QtCreator. Please check your configuration.")
+                    toc.update_config("env.qtcreator.path", qtcreator_full_path)
+        else:
+            qtcreator_full_path = ide_path
+            if not os.path.exists(qtcreator_full_path):
+                mess  = "Wrong configuration detected\n"
+                mess += "In %s\n" % toc.config_path
+                mess += "env.qtcreator.path is %s\n" % ide_path
+                mess += "but this file does not exist\n"
+                mess += "Please fix your configuration"
+                raise Exception(mess)
         cmake_list = os.path.join(project.directory, "CMakeLists.txt")
         print "starting QtCreator:"
         print "%s %s" % (qtcreator_full_path, cmake_list)
         subprocess.Popen([qtcreator_full_path, cmake_list])
         return
+
+    # Not supported (yet) IDE:
+    mess  = "Invalid ide: %s\n" % ide
+    mess += "Supported IDES are: QtCreator, Visual Studio, XCode"
+    raise Exception(mess)
