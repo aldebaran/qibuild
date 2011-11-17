@@ -43,22 +43,7 @@ def main():
         print_version()
         sys.exit(0)
 
-    # no arguments...
-    if len(sys.argv) == 1:
-        # and we are in a qibuild project
-        if qibuild.worktree.search_current_project_root(os.getcwd()):
-            qibuild.cmdparse.root_command_main("qibuild", argparse.ArgumentParser(), modules, args=[ "configure" ])
-            qibuild.cmdparse.root_command_main("qibuild", argparse.ArgumentParser(), modules, args=[ "make" ])
-            return
-
-    if not qibuild.cmdparse.root_command_main("qibuild", parser, modules, return_if_no_action=True):
-        argsc = [ "configure" ]
-        argsc.extend(sys.argv[1:])
-        qibuild.cmdparse.root_command_main("qibuild", argparse.ArgumentParser(), modules, args=argsc)
-
-        argsm = [ "make" ]
-        argsm.extend(sys.argv[1:])
-        qibuild.cmdparse.root_command_main("qibuild", argparse.ArgumentParser(), modules, args=argsm)
+    qibuild.cmdparse.root_command_main("qibuild", parser, modules)
 
 if __name__ == "__main__":
     main()
