@@ -121,6 +121,47 @@ class QiToolchainTestCase(unittest.TestCase):
         tc_file = get_tc_file_contents(tc)
         self.assertFalse("toolchain-geode.cmake" in tc_file)
 
+    def test_tc_order(self):
+        tc = qitoolchain.Toolchain("test")
+        a_path  = "/path/to/a"
+        b_path  = "/path/to/b"
+        a_cmake = "a-config.cmake"
+        b_cmake = "b-config.cmake"
+
+        a_package   = qitoolchain.Package("a", a_path, a_cmake)
+        b_package   = qitoolchain.Package("b", b_path, b_cmake)
+
+        tc.add_package(a_package)
+        tc.add_package(b_package)
+
+        tc_file = get_tc_file_contents(tc)
+        tc_file_lines = tc_file.splitlines()
+
+        a_path_index  = 0
+        b_path_index  = 0
+        a_cmake_index = 0
+        b_cmake_index = 0
+        for (i, line) in enumerate(tc_file_lines):
+            if a_cmake in line:
+                a_cmake_index = i
+            if b_cmake in line:
+                b_cmake_index = i
+            if a_path in line:
+                a_path_index = i
+            if b_path in line:
+                b_path_index = i
+
+        self.assertTrue(a_path_index != 0)
+        self.assertTrue(b_path_index != 0)
+        self.assertTrue(a_cmake_index != 0)
+        self.assertTrue(b_cmake_index != 0)
+
+        # Check that toolchain files are always written before
+        # CMAKE_FIND_ROOT_PATH
+        self.assertTrue(a_cmake_index < a_path_index)
+        self.assertTrue(a_cmake_index < b_path_index)
+        self.assertTrue(b_cmake_index < a_path_index)
+        self.assertTrue(b_cmake_index < b_path_index)
 
 
 
