@@ -56,6 +56,8 @@ def do(args):
 
     project = toc.get_project(project_name)
 
+    error_message = "Could not open project %s\n" % project_name
+
     ide = find_ide(toc)
     if ide == "Visual Studio":
         sln_files = glob.glob(project.build_directory + "/*.sln")
@@ -68,9 +70,11 @@ def do(args):
     if ide == "XCode":
         projs = glob.glob(project.build_directory + "/*.xcodeproj")
         if len(projs) == 0:
-            raise Exception(error_message + "Do you have called qibuild configure with --cmake-generator=Xcode?")
+            raise Exception(error_message +
+                "Do you have called qibuild configure with --cmake-generator=Xcode?")
         if len(projs) > 1:
-            raise Exception(error_message + "Expecting only one xcode project file, got %s" % projs)
+            raise Exception(error_message +
+                "Expecting only one xcode project file, got %s" % projs)
         print "starting XCode:"
         print "%s %s" % ("open", projs[0])
         subprocess.Popen(["open", projs[0]])
