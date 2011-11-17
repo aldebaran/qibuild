@@ -29,10 +29,6 @@ class DependenciesSolverTestCase(unittest.TestCase):
         dep_solver = DependenciesSolver(projects=projects, packages=packages)
         self.assertRaises(Exception, dep_solver.solve, "foo")
 
-    def test_bad_single_arg(self):
-        dep_solver = DependenciesSolver()
-        self.assertRaises(Exception, dep_solver.solve, ["foo", "bar"], single=True)
-
     def test_unknown_dep(self):
         world = Project("world")
         hello = Project("hello")
@@ -116,32 +112,6 @@ class DependenciesSolverTestCase(unittest.TestCase):
         self.assertEquals(projects,  ["big-lib", "my-exe"])
         self.assertEquals(packages,  [])
         self.assertEquals(not_found, [])
-
-    def test_single_arg(self):
-        world = Project("world")
-        hello = Project("hello")
-        hello.depends = ["world"]
-        projects = [hello, world]
-        packages = []
-
-        dep_solver = DependenciesSolver(projects=projects, packages=packages)
-        (projects, packages, not_found) = dep_solver.solve(["hello"], single=True)
-        self.assertEquals(projects,  ["hello"])
-        self.assertEquals(packages,  [])
-        self.assertEquals(not_found, [])
-
-    def test_all(self):
-        world = Project("world")
-        hello = Project("hello")
-        hello.depends = ["world"]
-        projects = [hello, world]
-        packages = []
-        dep_solver = DependenciesSolver(projects=projects, packages=packages)
-        (projects, packages, not_found) = dep_solver.solve([], all=True)
-        self.assertEquals(projects,  ["world", "hello"])
-        self.assertEquals(packages,  [])
-        self.assertEquals(not_found, [])
-
 
 if __name__ == "__main__":
     unittest.main()
