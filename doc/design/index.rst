@@ -2,9 +2,9 @@
 .. toctree::
     :hidden:
 
-    cmake/managing_deps
-    cmake/searching
-    cmake/shared_libs
+    managing_deps
+    searching
+    shared_libs
 
 
 .. _qibuild-design:
@@ -12,15 +12,8 @@
 QiBuild framework design
 ========================
 
-CMake
------
-
-
 General design decisions
-++++++++++++++++++++++++
-  ..- close to standard
-  ..- use toolchain files
-  ..- SDK layout
+------------------------
 
 
 QiBuild CMake framework is design around a few principles:
@@ -38,7 +31,7 @@ QiBuild CMake framework is design around a few principles:
 .. _qibuild-cmake-concepts:
 
 Concepts
-++++++++
+--------
 
 **SDK**
   A directory containing files used to compile other code.
@@ -113,7 +106,7 @@ containg some libs in  ``ctc/sysroot/usr/lib``, and a cross-compiler in
 
 
 Overviews
-+++++++++
+---------
 
 You can read the following sections if you want to understand deeply
 how qibuild works, under the hood.
@@ -121,29 +114,5 @@ how qibuild works, under the hood.
 * :ref:`qibuild-managing-deps-overview`
 * :ref:`qibuild-search-order`
 * :ref:`qibuild-shared-libs`
-
-
-
-Python
-------
-
-
-* DRY
-
-* Modular design: one executable per task
-
-* Toc and Worktree:
-  - dependency resolution
-  - projects search
-
-* cmake flags handling
-
-* config hanlding:
-  - configstore stuff
-  - config.get(..., config=None)
-
-* Toolchain and packages handling:
-  - feed parsing
-  - cache
 
 
