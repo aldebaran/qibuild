@@ -72,7 +72,7 @@ def resolv_git_deps(toc, qiwt, args):
     project_names = None
 
     #all
-    if args.all and not args.single:
+    if args.all:
         LOGGER.debug("All projects have been selected")
         project_names = qiwt.git_projects.values()
         return project_names

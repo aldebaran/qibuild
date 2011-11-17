@@ -655,8 +655,11 @@ def resolve_deps(toc, args, runtime=False):
         # Pretend the user has asked for all the known projects
         LOGGER.debug("All projects have been selected")
         project_names = [p.name for p in toc.projects]
-    elif not args.projects:
-        project_names = [project_from_cwd()]
+    elif not len(args.projects):
+        try:
+            project_names = [project_from_cwd()]
+        except:
+            project_names = [p.name for p in toc.projects]
     else:
         project_names = args.projects
 
