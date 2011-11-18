@@ -33,9 +33,9 @@ Let’s have a look at what has been generated::
   makefiles, or Visual Studio solutions.
 
 * qibuild.cmake : this file MUST be included by the CMakeLists.txt to find the
-  QiBuild CMake framework
+  qiBuild CMake framework
 
-* qibuild.manifest : this file MUST be present for QiBuild to know how to build
+* qibuild.manifest : this file MUST be present for qiBuild to know how to build
   the foo project.
 
 If you already have source code somewhere, all you have to do is to:

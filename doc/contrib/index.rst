@@ -1,4 +1,4 @@
-Contributing to QiBuild
+Contributing to qiBuild
 =======================
 
 .. toctree::

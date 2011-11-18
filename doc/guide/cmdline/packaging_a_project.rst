@@ -4,7 +4,7 @@ Packaging a project
 ===================
 
 You may want to distribute a pre-compiled package for an other person to use.
-With QiBuild, this is easy.
+With qiBuild, this is easy.
 
 Runtime package
 ---------------

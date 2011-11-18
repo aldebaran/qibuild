@@ -1,6 +1,6 @@
 .. _qibuild-cmake-api:
 
-QiBuild CMake API
+qiBuild CMake API
 =================
 
 .. toctree::

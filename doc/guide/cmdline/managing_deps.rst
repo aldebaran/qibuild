@@ -8,7 +8,7 @@ In this tutorial, you will learn how to manage dependencies between projects.
 Requirements
 ------------
 
-We will assume you have a properly configured QiBuild
+We will assume you have a properly configured qiBuild
 worktree, and that you have managed to compile a basic project.
 
 Please make sure you have follow the :ref:`getting started tutorial <qibuild-getting-started>`
@@ -30,7 +30,7 @@ It also contains a small test that simply tries to launch ``hello.``
 .. FIXME!
    The sources of this example can be found ...
 
-Extract the archive in your QiBuild worktree, you should end up with something
+Extract the archive in your qiBuild worktree, you should end up with something
 looking like::
 
   .qi
@@ -50,7 +50,7 @@ looking like::
 
 
 
-QiBuild in action
+qiBuild in action
 ------------------
 
 Configuring and building the hello project is as easy as

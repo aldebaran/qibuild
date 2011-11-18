@@ -7,7 +7,7 @@ Getting Started
 Requirements
 ------------
 
-Python 2.7 is the preferred version, but QiBuild should work fine on python
+Python 2.7 is the preferred version, but qiBuild should work fine on python
 2.6, too. Note that to prepare a possible conversion to python3, python2.5 is
 *not* supported.
 
@@ -42,7 +42,7 @@ Just run ``install-qibuild.bat``:
 
   c:\path\to\qibuild> install-qibuild.bat
 
-If you have bash available on your system, and want to use QiBuild from there,
+If you have bash available on your system, and want to use qiBuild from there,
 you should also be able to use the .sh script. (Be careful if you are using
 cygwin: you must be sure the .sh has UNIX end of lines)
 
@@ -53,7 +53,7 @@ Creating a work tree
 
 First you need to chose a qibuild "worktree".
 
-This path will be the root from where QiBuild searches to find the sources of
+This path will be the root from where qiBuild searches to find the sources of
 your projects.
 
 In the following document, we will use the notation ``QI_WORK_TREE`` to refer
@@ -68,11 +68,11 @@ Then go to this directory and run
 You will be asked to choose a CMake generator. Choose the one that matches your
 platform.
 
-This will create a new QiBuild configuration file in your working directory, in
+This will create a new qiBuild configuration file in your working directory, in
 ``QI_WORK_TREE/.qi/build.cfg``
 
 
-Configuring QiBuild
+Configuring qiBuild
 -------------------
 
 You can run ``qibuild config`` to get a look at your current settings,
@@ -85,7 +85,7 @@ Building with Unix Makefiles
 No specific configuration is needed, since this is the default behaviour.
 Enjoy!
 
-Configuring QiBuild for Eclipse CDT
+Configuring qiBuild for Eclipse CDT
 +++++++++++++++++++++++++++++++++++
 
 Eclipse supports having distinct directories for the source and the build, but
@@ -113,7 +113,7 @@ Then from within eclipse, go to "File -> Import" then choose
 as "root directory". Let the "Copy projects into workspace" box unchecked
 and click "Finish".
 
-Configuring QiBuild for QtCreator
+Configuring qiBuild for QtCreator
 ++++++++++++++++++++++++++++++++++
 
 on Unix
@@ -151,10 +151,10 @@ Here’s what a complete .qi/build.cfg would look like to use MinGW with QtCreat
 .. warning:: qibuild never modify os.environ globally, so the executable you just built
    won't run unless you have mingw's DLLs in your PATH.
 
-Configuring QiBuild for Visual Studio
+Configuring qiBuild for Visual Studio
 +++++++++++++++++++++++++++++++++++++
 
-You will have to make sure CMake uses the proper generator for QiBuild to work
+You will have to make sure CMake uses the proper generator for qiBuild to work
 with Visual Studio.
 
 Here’s what a complete .qi/build.cfg would look like to use Visual Studio 2008
@@ -182,7 +182,7 @@ a better build output), you can also:
 (the location of the .bat file depends on your setup)
 
 
-Configuring QiBuild for MinGW with Msys
+Configuring qiBuild for MinGW with Msys
 +++++++++++++++++++++++++++++++++++++++
 
 You will have to do several things for qibuild to work with MinGW.

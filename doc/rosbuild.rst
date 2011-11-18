@@ -1,28 +1,28 @@
 .. _qibuild-and-rosbuild:
 
-QiBuild and rosbuild
+qiBuild and rosbuild
 ====================
 
 Introduction
 ------------
 
 This tutorial is targeted towards rosbuild users wanting to know more about
-QiBuild
+qiBuild
 
 General comparison
 ------------------
 
-First, QiBuild and rosbuild have much in common.
+First, qiBuild and rosbuild have much in common.
 
 They are both based on CMake, and provide a set of tools written in Python to
 manage multiple projects, and dependencies between projects.
 
 The CMake frameworks have both a public and a private API.
 
-rosbuild is more used, has better documentation, and a large community. QiBuild
+rosbuild is more used, has better documentation, and a large community. qiBuild
 is still a work in progress :)
 
-What is in QiBuild and not in rosbuild
+What is in qiBuild and not in rosbuild
 --------------------------------------
 
 * Automatic creation of installation rules.
@@ -32,7 +32,7 @@ What is in QiBuild and not in rosbuild
 
 * Strong cross-platform support. Supports both UNIX makefiles and Visual
   Studio projects. (Basically everything that is supported by CMake should run
-  fine with QiBuild)
+  fine with qiBuild)
 
 * Easy cross-compilation
 
@@ -41,7 +41,7 @@ What is in QiBuild and not in rosbuild
 * A bit less monolithic: the CMake framework can be used alone, (without the
   scripts), the redistributable packages can be used in pure CMake.
 
-What is in rosbuild and not in QiBuild
+What is in rosbuild and not in qiBuild
 --------------------------------------
 
 * Automatic installation of dependencies (via rosdep scripts calling apt-get

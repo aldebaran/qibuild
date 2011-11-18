@@ -1,4 +1,4 @@
-Using QiBuild CMake API
+Using qiBuild CMake API
 =======================
 
 .. toctree::

@@ -3,7 +3,7 @@
 Creating a binary
 =================
 
-In this tutorial, we will learn how to create executables with the QiBuild
+In this tutorial, we will learn how to create executables with the qiBuild
 framework
 
 Requirements

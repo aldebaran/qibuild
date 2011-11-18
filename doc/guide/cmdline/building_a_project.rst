@@ -23,7 +23,7 @@ Or, to build in release, use:
 Using an IDE
 ------------
 
-QiBuild is based on CMake, which in turns knows how to generate project files
+qiBuild is based on CMake, which in turns knows how to generate project files
 for many of IDEs : XCode, Eclipse, Visual Studio.
 
 Here we are only dealing with the details for:
@@ -32,10 +32,10 @@ Here we are only dealing with the details for:
 
 * Visual Studio on Windows.
 
-QiBuild is known to work fine with these IDEs, there may be some work to do to
+qiBuild is known to work fine with these IDEs, there may be some work to do to
 be able to use XCode or Eclipse. Patches and tutorials welcome !
 
-QiBuild and QtCreator
+qiBuild and QtCreator
 +++++++++++++++++++++
 
 The only thing to remember is that you should not let QtCreator call CMake by
@@ -54,7 +54,7 @@ everything should work fine.
 Remember to use the same CMake generator in QtCreator and in your configuration
 file, if qtcreator asks you to choose.
 
-QiBuild and Visual Studio
+qiBuild and Visual Studio
 +++++++++++++++++++++++++
 
 When you have run ``qibuild configure``, you will have a .sln file generated in

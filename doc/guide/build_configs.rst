@@ -48,10 +48,10 @@ to "OFF"...
 
 But let’s assume you really need some flags.
 
-Passing CMake flags with QiBuild
+Passing CMake flags with qiBuild
 --------------------------------
 
-There are several ways to pass CMake flags to a project managed by QiBuild, in
+There are several ways to pass CMake flags to a project managed by qiBuild, in
 ascending priority:
 
 * Just once
@@ -78,7 +78,7 @@ in .qi/mingw32.cmake
 Using build configurations
 ---------------------------
 
-QiBuild also lets you to have different settings depending on the toolchain you
+qiBuild also lets you to have different settings depending on the toolchain you
 use.
 
 The config file will always be found in ``QI_WORK_TREE/.qi/qibuild.cfg``

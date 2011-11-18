@@ -355,7 +355,7 @@ message.
 
 
 
-Extending QiBuild actions
+Extending qiBuild actions
 -------------------------
 
 

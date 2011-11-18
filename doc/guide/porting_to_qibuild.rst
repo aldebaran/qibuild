@@ -1,6 +1,6 @@
 .. _porting-to-qibuild:
 
-Porting to QiBuild
+Porting to qiBuild
 ==================
 
 Requirements
@@ -8,7 +8,7 @@ Requirements
 
 This tutorial assumes that you already have a CMake-based project.
 
-We will see how QiBuild can help you writing less code, while staying
+We will see how qiBuild can help you writing less code, while staying
 close to the "official" CMake recommendations when dealing with the
 ``Find<>.cmake`` or ``<>-config.cmake`` files.
 
@@ -22,7 +22,7 @@ with the ``foo`` library.
 .. FIMXE!
    The sources of the foobar project can be found here
 
-Extract the archive in you QiBuild worktree, you should end up with something
+Extract the archive in you qiBuild worktree, you should end up with something
 like::
 
   .qi
@@ -154,10 +154,10 @@ sources of ``foobar,`` and ``libbar.a`` somewhere in the build directory of ``fo
 it is impossible to use the carefully home-made ``bar-config.cmake``, unless you
 install ``libbar`` to ``/usr/local/lib/libbar.a`` for instance.
 
-QiBuild to the rescue!
+qiBuild to the rescue!
 ----------------------
 
-The motivation for QiBuild is to help solve this CMake limitations with a
+The motivation for qiBuild is to help solve this CMake limitations with a
 clean, easy way, while staying the more compatible possible with other CMake
 projects.
 
@@ -275,7 +275,7 @@ Finding the ``bar-config.cmake`` once bar has been installed in as easy as:
 
 .. code-block:: cmake
 
-  # No QiBuild required: the installed bar-config.cmake contains
+  # No qiBuild required: the installed bar-config.cmake contains
   # no qibuild-sepecific code:
 
   find_package(bar)

@@ -11,7 +11,7 @@ you may want to read this more in-depth tutorial: :ref:`how-to-write-a-library`
 Requirements
 ------------
 
-We assume you have a QiBuild project containing a executable named ``foo``.
+We assume you have a qiBuild project containing a executable named ``foo``.
 
 You can use ``qibuild create foo`` to get such a project.
 

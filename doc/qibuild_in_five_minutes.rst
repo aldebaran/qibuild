@@ -1,6 +1,6 @@
 .. _qibuild-in-five-minutes:
 
-QiBuild in five minutes
+qiBuild in five minutes
 =======================
 
 

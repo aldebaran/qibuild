@@ -15,7 +15,7 @@ the :ref:`qibuild-managing-deps` tutorial.
 
 You should have:
 
-* a properly configured QiBuild worktree
+* a properly configured qiBuild worktree
 
 * two projects, world and hello, with hello depending on the world library.
 

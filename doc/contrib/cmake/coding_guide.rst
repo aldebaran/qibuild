@@ -42,7 +42,7 @@ CMake coding guide
     #  ...
     endfunction()
 
-* Every function in the public API of QiBuild code (i.e: that could en up in a user cmake code) must start with qi, other should not start with qi (prefer using _qi for example).
+* Every function in the public API of qiBuild code (i.e: that could en up in a user cmake code) must start with qi, other should not start with qi (prefer using _qi for example).
 
 * The CMakeParseArguments module is very useful, please use it.
 

@@ -1,6 +1,6 @@
 .. _qibuild-ref:
 
-QiBuild reference documentation
+qiBuild reference documentation
 ===============================
 
 

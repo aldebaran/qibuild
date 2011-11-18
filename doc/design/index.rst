@@ -9,14 +9,14 @@
 
 .. _qibuild-design:
 
-QiBuild framework design
+qiBuild framework design
 ========================
 
 General design decisions
 ------------------------
 
 
-QiBuild CMake framework is design around a few principles:
+qiBuild CMake framework is design around a few principles:
 
 * Staying close to the standards
 
@@ -80,7 +80,7 @@ Concepts
   Usually, your are supposed to use a toolchain file when cross-compiling
   with CMake, with the ``CMAKE_TOOLCHAIN_FILE`` variable.
 
-For QiBuild, we extend the usage of the toolchain file a little bit.
+For qiBuild, we extend the usage of the toolchain file a little bit.
 
 In a toolchain file, you may:
 

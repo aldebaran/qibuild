@@ -13,36 +13,36 @@
   rosbuild
 
 
-QiBuild documentation
+qiBuild documentation
 =====================
 
 
 Introduction
 ------------
 
-QiBuild aims to make compilation of your sources easy. It manages dependencies
+qiBuild aims to make compilation of your sources easy. It manages dependencies
 between projects and supports cross-compilation.
 
-By default QiBuild uses libraries provided by your system, but you can also use
+By default qiBuild uses libraries provided by your system, but you can also use
 qiToolchain to manage sets of pre-compiled packages (called toolchains) if you
 want. Cross-compilation is then just a matter of using a specific toolchain.
 
-QiBuild is truly cross-platform: it is tested on Linux, Mac and Windows. Being
+qiBuild is truly cross-platform: it is tested on Linux, Mac and Windows. Being
 based on the well-known CMake build system, it allows you to use your existing
 tools such as gcc, Makefile, or Visual Studio.
 
-The QiBuild framework tries hard to stand out of your way: it remains close to
+The qiBuild framework tries hard to stand out of your way: it remains close to
 standards, and will play nice with other build systems.
 
-QiBuild is composed of two parts:
+qiBuild is composed of two parts:
 
-* the QiBuild CMake framework, that simplifies authoring CMakeLists.txt.
+* the qiBuild CMake framework, that simplifies authoring CMakeLists.txt.
 
 * the qibuild/qitoolchain command line tools, that helps build projects while
   taking dependencies into account and generate re-destributable binary
   packages
 
-QiBuild programming guide
+qiBuild programming guide
 --------------------------
 
 
@@ -74,10 +74,10 @@ Configuration syntax
 
 
 
-Contributing to QiBuild
+Contributing to qiBuild
 ------------------------
 
-Read this if you want to contribute to QiBuild
+Read this if you want to contribute to qiBuild
 
 .. toctree::
    :maxdepth: 1
@@ -86,10 +86,10 @@ Read this if you want to contribute to QiBuild
    contrib/python/coding_guide
 
 
-QiBuild design
+qiBuild design
 --------------
 
-Read this if you want to learn more about QiBuild design:
+Read this if you want to learn more about qiBuild design:
 
 :ref:`qibuild-design`
 
