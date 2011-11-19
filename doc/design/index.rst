@@ -1,118 +1,69 @@
-
 .. toctree::
-    :hidden:
+   :hidden:
 
-    managing_deps
-    searching
-    shared_libs
-
+   cmake/index
+   python/index
 
 .. _qibuild-design:
 
-qiBuild framework design
-========================
-
-General design decisions
-------------------------
+qiBuild desing
+==============
 
 
-qiBuild CMake framework is design around a few principles:
-
-* Staying close to the standards
-
-* Trying to follow CMake best practices (from CMake wiki
-  or in /usr/share/cmake-2.8/Modules/readme.txt)
-
-* Do not get into the developer's way
-
-* Play nice with other build frameworks
+qiBuild source code is divide into two loosely-couple components.
 
 
-.. _qibuild-cmake-concepts:
-
-Concepts
---------
-
-**SDK**
-  A directory containing files used to compile other code.
-  A SDK always has a **layout**, following POSIX and cmake
-  conventions.
-
-  Here is an example of a SDK containing the ``bar`` executable,
-  a ``bar.cfg`` configuration file for ``bar,`` a ``foo`` library
-  with the ``foo-config.cmake`` file, and the ``foo.h`` hader::
+qiBuild CMake framework
+-----------------------
 
 
-    <sdk>
-    |__ include
-        |__ foo
-             |__ foo.h
-    |__ lib
-        |__  libfoo.a
-        |__  libfoo.a
-        |__  foo.lib
-    |__ bin
-        |__ bar
-        |__ foo.dll
-        |__ bar.exe
-    |__ cmake
-        |__ foo
-            |__ foo-config.cmake
-    |__ etc
-           |__ bar
-               |__ bar.cfg
+The CMake framework is composed of two parts:
+
+* A bunch of files containing nice wrappers for CMake functions,
+  aim to simplify authoring of CMakeLists files, which
+  constitutes the :ref:`qibuild-cmake-api`
+
+* A set of `-config.cmake` files, written because upstream
+  CMake modules files are missing or not correct.
+  You can learn about about this config files by following
+  the :ref:`writing-a-config-cmake` tutorial.
 
 
-  The root of a SDK can safely be added to ``CMAKE_FIND_ROOT_PATH``
-  variable.
+But of course, the main feature of the qiBuild CMake
+framework is to allow you to easily manage dependencies
+between project.
 
-**Package**
-  A package is simply an archive containing the one or several SDKs.
-  If always has a ``.tar.gz`` extension on UNIX, and a ``.zip`` extension
-  on windows.
-
-  All files are in the same top dir, so it is safe to extract it everywhere.
-
-  Some packages may also need a toolchain file.
+For a more detailed description of how this works,
+please read the :ref:`qibuild-cmake-design` section.
 
 
-**Toolchain file**
-  Usually, your are supposed to use a toolchain file when cross-compiling
-  with CMake, with the ``CMAKE_TOOLCHAIN_FILE`` variable.
 
-For qiBuild, we extend the usage of the toolchain file a little bit.
+qiBuild command line tools
+--------------------------
 
-In a toolchain file, you may:
+First note that the qibuild command line tools are absolutely
+not necessary use the qiBuild CMake framework.
 
-* Force a compiler (which is the main purpose of a toolchain file)
+The qibuild tools are all written in Python.
 
-* Set some CMake flags (for instance CMAKE_OSX_ARCHITECTURES)
+The :ref:`porting-to-qibuild` guide never uses the qibuild command
+line, for instance.
 
-* Or set some CMake variables like CMAKE_FIND_ROOT_PATH
+The coupling between the Python command line tools and the CMake
+framework is very loose.
 
+qibuild command line only generates small bits of CMake code:
 
-A package can be associated to a toolchain file.
+* A `dependencies.cmake` in the build directory, which is
+  only useful if your project depends on library not found on
+  your system, or if the qibuild CMake framework is not
+  installed on your system.
+  (And this file is simply NOT included if it does not exist)
 
-For instance, you may have a simple package ``foobar`` containing the result
-of the installation of the ``bar`` executable and the ``foo libaray``,
-requiring now toolchain file at all, or a complex package name ``geode-ctc``
-containg some libs in  ``ctc/sysroot/usr/lib``, and a cross-compiler in
-``ctc/cross``, and a toolchain file forcing the compiler to be
-``ctc/cross/bin/gcc``, and setting CMAKE_FIND_ROOT_PATH to ``ctc/sysroot``.
-
-
-**Toolchain**
-  A toolchain is simply a collection of packages.
+* A CMake toolchain file when using toolchains. (more on this later)
 
 
-Overviews
----------
-
-You can read the following sections if you want to understand deeply
-how qibuild works, under the hood.
-
-* :ref:`qibuild-managing-deps-overview`
-* :ref:`qibuild-search-order`
-* :ref:`qibuild-shared-libs`
+For a more details description of the qibuild features
+and how the are implemented, please read the :ref:`qibuild-python-design` section.
 
 

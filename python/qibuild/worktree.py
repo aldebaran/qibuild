@@ -62,7 +62,6 @@ def work_tree_parser(parser):
 class WorkTree:
     """ This class represent a Qi worktree.
         - work_tree
-        - configstore
         - buildable projects
         - git projects
     """

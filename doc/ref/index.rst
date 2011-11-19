@@ -10,4 +10,5 @@ qiBuild reference documentation
    man/index
    cmake/api
    cfg/index
+   python/packages/index
 

@@ -10,7 +10,19 @@ This is used by the ``qitoolchain init`` command.
 
 The root of the ``feed.xml`` should be ``toolchain``
 
-The global xml file should look like
+The global xml file should look like this:
+
+.. code-block:: xml
+
+   <toolchain>
+
+    <package
+      name="foo"
+      url="http://example.com/packages/foo-1.0.tar.gz"
+      version="1.0"
+    />
+
+  </toolchain>
 
 
 toolchain type

@@ -57,6 +57,7 @@ References
 ----------
 
 * :ref:`qibuild-cmake-api`
+* :ref:`qibuild-python-doc`
 
 Man pages
 +++++++++

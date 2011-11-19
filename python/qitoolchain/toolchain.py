@@ -119,7 +119,8 @@ class Package():
 class Toolchain:
     """ A toolchain is a set of packages
 
-    If has a name and is initialized with a feed
+    If has a name that will later be used as 'build config'
+    by the toc object.
 
     It has a configuration in ~/.config/qi/toolchains/<name.cfg>
     looking like:
@@ -302,8 +303,8 @@ class Toolchain:
             lines = fp.writelines(lines)
 
     def parse_feed(self, feed):
-        """ Recursively parse an xml feed,
-        adding packages to the feed while doing so
+        """ Parse an xml feed,
+        adding packages to self while doing so
 
         """
         # Delegate this to qitoolchain.feed module

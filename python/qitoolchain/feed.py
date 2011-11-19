@@ -199,7 +199,7 @@ class ToolchainFeedParser:
 
 def parse_feed(toolchain, feed):
     """ Recursively parse an xml feed,
-    adding packages to the feed while doing so
+    adding packages to the toolchain while doing so
 
     """
     parser = ToolchainFeedParser()
