@@ -1,11 +1,4 @@
-""" Convert an existing CMake project to a qiBuild project
-
-Support is planned for:
-
-  - standard cmake projects
-
-  - previous versions of Aldebaran's projects
-    (using a bootstrap.cmake and a toolchain file)
+""" Convert an existing project to a qiBuild project
 
 """
 
