@@ -11,8 +11,8 @@ qidev get-image
 qidev update-toolchain -> qidev get-toolchain <name> [<version>]
 
 
-# because we want our clients to use our toolchains in 1.14:
-qidev init -> qitoolchain init [feed.cfg]
+# because we want our clients to use our toolchains in 1.12:
+qidev init -> qitoolchain create [feed.xml]
 #  Read cmake_generator, name, cmake flags, and whether we need a toolchain file
 #  from the config file.
 #  Also, add packages if we need to.

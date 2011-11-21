@@ -70,7 +70,7 @@ First, you have to create a **toolchain** for qibuild to use:
 
 .. code-block:: console
 
-  $ qitoolchain init <TOOLCHAIN_NAME> --default
+  $ qitoolchain create <TOOLCHAIN_NAME> --default
 
 Not that you can choose any name for your toolchain, but is advised
 to choose between this set of configurations:
@@ -189,7 +189,7 @@ Then, from an other machine, run
 
 .. code-block:: console
 
-   $ qitoolchain init linux32 http://example.com/feed.xml
+   $ qitoolchain create linux32 http://example.com/feed.xml
 
   Getting package world from http://example.com/packages/world.tar.gz
   Toolchain linux32: adding package world

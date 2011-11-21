@@ -27,7 +27,7 @@ And you run
 
 .. code-block:: console
 
-   $ qitoolchain init cross-foo http://example.com/feeds/cross.xml
+   $ qitoolchain create cross-foo http://example.com/feeds/cross.xml
 
 
 

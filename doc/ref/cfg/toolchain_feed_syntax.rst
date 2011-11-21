@@ -6,7 +6,7 @@ Toolchain feed syntax
 General
 -------
 
-This is used by the ``qitoolchain init`` command.
+This is used by the ``qitoolchain create`` command.
 
 The root of the ``feed.xml`` should be ``toolchain``
 

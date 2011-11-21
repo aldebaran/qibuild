@@ -132,6 +132,6 @@ will work.
   * You can read about the XML format of feeds in the
     :ref:`toolchain-feed-syntax` section.
   * You can read more about what happens next when using
-    `qitoolchain init`, `qibuild configure` in the
+    `qitoolchain create`, `qibuild configure` in the
     :ref:`parsing-toolchain-feeds` overview
 
