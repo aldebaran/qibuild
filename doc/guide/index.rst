@@ -8,7 +8,6 @@ qiBuild Programming guide
 .. toctree::
    :hidden:
 
-
    cmdline/index
    cmake/index
    porting_to_qibuild
@@ -16,6 +15,7 @@ qiBuild Programming guide
    build_configs
    how_to_write_a_library
    extending_qibuild_actions
+   tips_and_tricks
 
 
 
@@ -49,10 +49,14 @@ Advanced tutorials
 * :ref:`managing-build-configs`
 * :ref:`using-toolchains`
 * :ref:`extending-qibuild-actions`
-* :ref:`using-qibuild-convert`
 
 See also
 --------
 
 * :ref:`qibuild-ref`
 * :ref:`qibuild-design`
+
+qiBuild tips and tricks
+-----------------------
+
+* :ref:`qibuild-tips-and-tricks`
