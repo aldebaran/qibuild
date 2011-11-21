@@ -19,6 +19,7 @@ qiBuild Programming guide
 
 
 
+
 Using qibuild command line
 --------------------------
 
@@ -50,3 +51,8 @@ Advanced tutorials
 * :ref:`extending-qibuild-actions`
 * :ref:`using-qibuild-convert`
 
+See also
+--------
+
+* :ref:`qibuild-ref`
+* :ref:`qibuild-design`

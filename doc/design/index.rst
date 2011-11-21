@@ -6,11 +6,11 @@
 
 .. _qibuild-design:
 
-qiBuild desing
+qiBuild design
 ==============
 
 
-qiBuild source code is divide into two loosely-couple components.
+qiBuild source code is divide into two loosely-coupled components.
 
 
 qiBuild CMake framework
@@ -63,7 +63,7 @@ qibuild command line only generates small bits of CMake code:
 * A CMake toolchain file when using toolchains. (more on this later)
 
 
-For a more details description of the qibuild features
+For a more detailed description of the qibuild features
 and how the are implemented, please read the :ref:`qibuild-python-design` section.
 
 
