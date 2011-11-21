@@ -11,6 +11,7 @@
   contrib/index
   design/index
   rosbuild
+  extending_qibuild_actions
 
 
 qiBuild documentation

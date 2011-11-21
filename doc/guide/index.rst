@@ -15,6 +15,7 @@ qiBuild Programming guide
    using_toolchains
    build_configs
    how_to_write_a_library
+   extending_qibuild_actions
 
 
 
@@ -46,5 +47,6 @@ Advanced tutorials
 * :ref:`how-to-write-a-library`
 * :ref:`managing-build-configs`
 * :ref:`using-toolchains`
-
+* :ref:`extending-qibuild-actions`
+* :ref:`using-qibuild-convert`
 
