@@ -209,13 +209,15 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
             print "Warning, skipping", module.__name__
             print err
             continue
-        name = module.__name__.split(".")[-1]
+        module_name = module.__name__.split(".")[-1]
         # we want to type `foo bar-baz', and not type `foo bar_baz',
         # even if "bar-baz" is not a valid module name.
-        name = name.replace("_", "-")
+        action_name = module_name.replace("_", "-")
         configurator = module.configure_parser
         first_doc_line = module.__doc__.splitlines()[0]
-        action_parser = subparsers.add_parser(name, help=first_doc_line)
+        first_doc_line = first_doc_line.strip()
+        action_parser = subparsers.add_parser(action_name, help=first_doc_line,
+            usage='%s %s [options ...]\n%s' % (name, action_name, first_doc_line))
         configurator(action_parser)
         action_parser.formatter_class = argparse.RawDescriptionHelpFormatter
 
@@ -224,7 +226,7 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
         if epilog:
             action_parser.epilog = epilog
 
-        action_modules[name] = module
+        action_modules[action_name] = module
 
     (help_requested, action) = parse_args_for_help(args)
     # if not action and return_if_no_action:
