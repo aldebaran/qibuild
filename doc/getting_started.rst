@@ -48,6 +48,9 @@ cygwin: you must be sure the .sh has UNIX end of lines)
 
 Plase make sure that ``CMake`` is in your ``PATH``
 
+If you'd like to have nice colors in your console, you can install
+the Python readline library: http://pypi.python.org/pypi/pyreadline
+
 Creating a work tree
 --------------------
 
