@@ -205,8 +205,18 @@ class Toolchain:
         """ Returns path to self cache directory
 
         """
+        config_path = self._get_config_path()
+        config = ConfigParser.ConfigParser()
+        config.read(config_path)
         cache_path = qibuild.sh.to_native_path(CACHE_PATH)
-        cache_path = os.path.join(cache_path, "toolchains", self.name)
+        cache_path = os.path.join(cache_path, "toolchains")
+        if config.has_section("default"):
+            try:
+                root_cfg = config.get("default", "root")
+                cache_path = os.path.join(root_cfg, "cache")
+            except ConfigParser.NoOptionError:
+                pass
+        cache_path = os.path.join(cache_path, self.name)
         qibuild.sh.mkdir(cache_path, recursive=True)
         return cache_path
 
