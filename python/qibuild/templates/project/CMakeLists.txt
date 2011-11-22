@@ -10,7 +10,7 @@ include("qibuild.cmake")
 # with the source file: main.cpp
 qi_create_bin(@project_name@ "main.cpp")
 
-# Just a quick test to be sure the executable can run.
+# Add a simple test:
 enable_testing()
-qi_add_test(zero_test @project_name@)
+qi_create_test(test_@project_name@ "test.cpp")
 
