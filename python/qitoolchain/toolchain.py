@@ -205,7 +205,7 @@ class Toolchain:
         """ Returns path to self cache directory
 
         """
-        config_path = self._get_config_path()
+        config_path = get_tc_config_path()
         config = ConfigParser.ConfigParser()
         config.read(config_path)
         cache_path = qibuild.sh.to_native_path(CACHE_PATH)
