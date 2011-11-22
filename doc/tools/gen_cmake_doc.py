@@ -137,72 +137,64 @@ def parse_example(txt):
         print "warning: only zero or one examples authorized for each function"
     return res[0]
 
+def decorate(name, type):
+    """ Decorate a parameter
+    >>> decorate("foo", "arg")
+    'foo'
+    >>> decorate("foo", "flag")
+    '[FOO]'
+    >>> decorate("foo", "param")
+    '[FOO foo]'
+    >>> decorate("foo", "group")
+    '[FOO <foo> ...]'
+    >>> decorate("foo", "argn")
+    None
+    """
+    if type == "arg":
+        return name
+    elif type == "flag":
+        return "[%s]" % name
+    elif type == "param":
+        return "[%s <%s>]" % (name, name.lower())
+    elif type == "group":
+        return "[%s <%s> ...]" % (name, name.lower())
+    elif type == "argn":
+        return "[<%s> ...]" % (name)
+    elif type == "example":
+        # \example is handled by gen_example_rst
+        return None
+    return None
 
-def gen_params_rst(params):
-    """ Generate rst doc from a parameter
+
+def gen_rst_directive(fun_name, params):
+    """ Generate rst directive for a cmake function
 
     """
-    if not params:
-        return ""
-
-    res = """**Parameters**
-
-"""
-
+    res = ".. cmake:function:: %s" % fun_name
+    res += "("
+    sig_params = [decorate(name, type) for(type, name, doc) in params]
+    sig_params = [x for x in sig_params if x is not None]
+    sig_params = " ".join(sig_params)
+    res += sig_params
+    res += ")"
+    res += "\n"
+    res += "\n"
     for param in params:
-        (type_, name, doc) = param
-
-        res += """*{name}*
-
-{doc}
-
-""".format(name=name, doc=indent(doc, 1))
-
-    return res
-
-
-def gen_usage_rst(fun_name, params):
-    """ Generate rst doc for usage of a function
-
-    """
-    usage = ""
-    for (type, name, doc_) in params:
-        if type == "arg":
-            usage += name
-        elif type == "flag":
-            usage += "[%s]" % name
-        elif type == "param":
-            usage += "%s <%s>" % (name, name.lower())
-        elif type == "group":
-            usage += "%s <%s> ..." % (name, name.lower())
-        elif type == "argn":
-            usage += "[<%s> ...]" % (name)
-        elif type == "example":
+        (type, name, doc) = param
+        if type == "example":
             # \example is handled by gen_example_rst
-            pass
-
-        else:
-            print "unknown type: ", type
-        usage += "\n"
-    if len(params) > 1:
-        usage = indent(usage, 2)
-        usage = "%s(\n%s\n)" % (fun_name, usage)
-    else:
-        usage = usage[:-1] # remove usless \n
-        usage = "%s(%s)" % (fun_name, usage)
-
-    res = """
-
-.. code-block:: cmake
-
-{usage}
-""".format(usage=indent(usage, 1))
+            continue
+        doc = doc.replace("\n", " ")
+        to_add = ":arg %s: %s" % (name, doc)
+        res += indent(to_add, 2)
+        res += "\n"
 
     return res
 
 
 def gen_example_rst(example):
-    r"""
+    r""" Process the \example flag
+    from cmake doc
 
     """
     if not example:
@@ -301,32 +293,24 @@ def gen_fun_rst(name, txt):
 
     """
     (desc, params, example) = parse_fun_block(txt)
-    params_rst = gen_params_rst(params)
-
-    usage = gen_usage_rst(name, params)
+    directive = gen_rst_directive(name, params)
     example_rst = gen_example_rst(example)
 
 
-# We generate an index AND a ref, because
-# writing a CMake domain is a little hard
-# and prbably overkill
-    res = """.. index::
-  single: {name}
-
+    res = """
 .. _{name}:
 
 {name}
 {h2}
-{usage}
+
+{directive}
 {desc}
-{params}
 {example}
 
 """.format(name=name,
            h2="-"*len(name),
-           desc=desc,
-           usage=usage,
-           params=params_rst,
+           directive=directive,
+           desc=indent(desc, 2),
            example=example_rst)
     return res
 
