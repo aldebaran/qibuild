@@ -120,7 +120,7 @@ Create a worktree:
 
 .. code-block:: console
 
-   $ qitoolchain init $NAME htpp://example.com/feed.xml
+   $ qitoolchain create $NAME htpp://example.com/feed.xml
 
    Add package from htpp://example.com/world.tar.gz to
    a toolchain named $NAME

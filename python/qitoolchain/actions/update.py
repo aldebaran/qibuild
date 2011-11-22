@@ -56,7 +56,7 @@ def do(args):
             mess += "Pleas check configuration or specifiy a feed on the command line\n"
             raise Exception(mess)
 
-    qibuild.run_action("qitoolchain.actions.init", [tc_name, feed])
+    qibuild.run_action("qitoolchain.actions.create", [tc_name, feed])
 
 
 
