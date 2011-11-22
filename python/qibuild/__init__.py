@@ -42,6 +42,7 @@ KNOWN_CMAKE_GENERATORS = [
         "Eclipse CDT4 - Unix Makefiles",
         "Visual Studio 9 2008",
         "Visual Studio 10",
+        "Xcode",
         "NMake Makefiles",
 ]
 

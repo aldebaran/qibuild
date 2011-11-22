@@ -35,7 +35,7 @@ def find_ide(toc):
         ides.append("Visual Studio")
 
     if sys.platform == "darwin":
-        ides.append("Visual Studio")
+        ides.append("Xcode")
 
     if ide is None:
         if len(ides) > 1:
@@ -66,8 +66,9 @@ def do(args):
         print "starting VisualStudio:"
         print "%s %s" % ("start", sln_files[0])
         subprocess.Popen(["start", sln_files[0]], shell=True)
+        return
 
-    if ide == "XCode":
+    if ide == "Xcode":
         projs = glob.glob(project.build_directory + "/*.xcodeproj")
         if len(projs) == 0:
             raise Exception(error_message +
@@ -75,9 +76,10 @@ def do(args):
         if len(projs) > 1:
             raise Exception(error_message +
                 "Expecting only one xcode project file, got %s" % projs)
-        print "starting XCode:"
+        print "starting Xcode:"
         print "%s %s" % ("open", projs[0])
         subprocess.Popen(["open", projs[0]])
+        return
 
     if ide == "QtCreator":
         # Something qtcreator executable in not in Path, so ask it
