@@ -51,8 +51,9 @@ You could end up write something like
 
 But then you will have this strange message:
 
-.. code-block:: raw
+.. code-block:: console
 
+    $ qibuild configure foobar
 
     Could not find module FindFoo.cmake or a configuration
     file for package FOO.
