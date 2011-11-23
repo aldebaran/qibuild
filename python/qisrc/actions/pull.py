@@ -130,7 +130,6 @@ def do(args):
             out = git.cmd.call_output("pull", "--rebase", rawout=True)
         else:
             out = git.cmd.call_output("pull", rawout=True)
-        out = git.cmd.call_output("pull", rawout=True)
         if out[0] == 0:
             print out[1][0],
             print out[1][1],
