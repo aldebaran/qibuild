@@ -124,6 +124,8 @@ def _handle_files(src, dest, root, files, filter, quiet):
             if sys.stdout.isatty() and not quiet:
                 print "-- Installing %s" % fdest
             mkdir(new_root, recursive=True)
+            # We do not want to fail if dest exists but is read only
+            # (following what `install` does, but not what `cp` does)
             shutil.copy(fsrc, fdest)
 
 
@@ -136,7 +138,8 @@ def install(src, dest, filter=None, quiet=False):
 
     Few notes: rewriting `cp' or `install' is a hard problem.
     This version will happily erase whatever is inside dest,
-    and won't complain if dest does not exists (missing
+    (even it the dest is readonly, dest will be erased before being
+    written) and it won't complain if dest does not exists (missing
     directories will simply be created)
 
     This function will preserve relative symlinks between directories,
@@ -148,6 +151,7 @@ def install(src, dest, filter=None, quiet=False):
 
 
     """
+    # FIXME: add a `safe mode` ala install?
     if not os.path.exists(src):
         mess = "Could not install '%s' to '%s'\n" % (src, dest)
         mess += '%s does not exist' % src
@@ -175,6 +179,9 @@ def install(src, dest, filter=None, quiet=False):
         mkdir(os.path.dirname(dest), recursive=True)
         if sys.stdout.isatty() and not quiet:
             print "-- Installing %s" % dest
+        # We do not want to fail if dest exists but is read only
+        # (following what `install` does, but not what `cp` does)
+        rm(dest)
         shutil.copy(src, dest)
 
 def rm(name):
