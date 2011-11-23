@@ -270,7 +270,7 @@ class Toolchain:
         config.read(cfg_path)
         package_section = 'package "%s"' % name
         if not config.has_section(package_section):
-            mess  = "Could not remove %s from toolchain %s\n" % (self.name, name)
+            mess  = "Could not remove package %s from toolchain %s\n" % (name, self.name)
             mess += "No such package"
             raise Exception(mess)
         config.remove_section(package_section)
