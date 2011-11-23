@@ -6,6 +6,7 @@
 
 import os
 import stat
+import errno
 import unittest
 import tempfile
 
@@ -13,11 +14,10 @@ import qibuild
 
 class ArchiveTestCase(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.mkdtemp(prefix="tmp-configstore-test")
+        self.tmp = tempfile.mkdtemp(prefix="tmp-archive-test")
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
-
 
     def test_zip_extract(self):
         # Create some files in the temp dir:
@@ -58,6 +58,16 @@ class ArchiveTestCase(unittest.TestCase):
         qibuild.archive.extract(archive, dest)
         ls_r = qibuild.sh.ls_r(dest)
         self.assertEquals(ls_r, ["a/ro"])
+        dest_ro = os.path.join(dest, "a", "ro")
+        # check that the dest is readonly:
+        error = None
+        try:
+            open(dest_ro, "w")
+        except IOError, e:
+            error = e
+        self.assertFalse(error is None)
+        self.assertEquals(error.errno,  errno.EACCES)
+
 
 if __name__ == "__main__":
     unittest.main()
