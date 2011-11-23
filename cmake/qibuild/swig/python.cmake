@@ -15,6 +15,7 @@ include(CMakeParseArguments)
 # \group:DEPENDS The list of source files
 function(qi_swig_wrap_python module_name interface_file)
   cmake_parse_arguments(ARG "" "" "SRC;DEPENDS" ${ARGN})
+  set(_srcs ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
 
   # we search for the SWIG_EXECUTABLE by yourself, because FindSWIG call find_file
   # but when we are cross-compiling and we want to use swig from the system
@@ -56,7 +57,7 @@ function(qi_swig_wrap_python module_name interface_file)
   # Since there is often a "lazy" include in the interface file:
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-  swig_add_module(${module_name} python ${interface_file} ${ARG_SRC})
+  swig_add_module(${module_name} python ${interface_file} ${_srcs})
 
   ##
   # Deal with the newly created target
