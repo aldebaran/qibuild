@@ -38,7 +38,7 @@ def tree_from_feed(feed_location):
         if os.path.exists(feed_location):
             fp = open(feed_location, "r")
         else:
-            fp = urllib2.urlopen(feed_location)
+            fp = qitoolchain.remote.open_remote_location(feed_location)
         tree = ElementTree.ElementTree()
         tree.parse(fp)
     except Exception, e:

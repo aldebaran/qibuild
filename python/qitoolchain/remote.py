@@ -12,6 +12,7 @@ import urlparse
 import urllib2
 import logging
 import ConfigParser
+import StringIO
 
 import qibuild
 
@@ -46,15 +47,29 @@ def get_ftp_password(server):
         items.get("root")
     )
 
-
-def install_ftp_handler():
-    """ This read a ftp login/password
-    from a config file, and add it to the
-    list of urllib2 handlers so that you
-    can get feeds and packages from a
-    password protected ftp server
+def open_remote_location(location):
+    """ Open a file from an url
+    Returns a file-like object
 
     """
+    url_split = urlparse.urlsplit(location)
+    if url_split.scheme == "ftp":
+        server = url_split.netloc
+        user, password, root = get_ftp_password(server)
+        ftp = ftplib.FTP(server, user, password)
+        if root:
+            ftp.cwd(root)
+        class Transfer:
+            pass
+        Transfer.data = ""
+        cmd = "RETR " + url_split.path
+        def retr_callback(data):
+            Transfer.data += data
+        ftp.retrbinary(cmd, retr_callback)
+        return StringIO.StringIO(Transfer.data)
+    else:
+        return urllib2.urlopen(location)
+
 
 
 def download(url, output_dir,
