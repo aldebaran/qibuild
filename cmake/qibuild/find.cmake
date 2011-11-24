@@ -165,6 +165,8 @@ endfunction()
 #              Must match the argument of ``clean()`` and ``export()``
 #              calls.
 # \arg:name    The name of the library
+# \flag: DEBUG     find a library that will be used for a debug build
+# \flag: OPTIMIZED find a library that will be used for an optimized build
 # \argn:       The remaining arguments will be passed to
 #              ``find_library``
 #
