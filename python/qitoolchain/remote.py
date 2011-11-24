@@ -7,12 +7,17 @@ downloading package or reading configs from URLs
 
 import os
 import sys
+import ftplib
+import urlparse
 import urllib2
 import logging
+import ConfigParser
 
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
+
+REMOTE_CFG = "~/.config/qi/remote.cfg"
 
 def callback(total, done):
     """ Called during download """
@@ -21,6 +26,35 @@ def callback(total, done):
     percent = done * 100 / total
     sys.stdout.write("Done: %i%%\r" % percent)
     sys.stdout.flush()
+
+
+def get_ftp_password(server):
+    """ Get ftp password from the config file
+
+    """
+    remote_cfg = qibuild.sh.to_native_path(REMOTE_CFG)
+    config = ConfigParser.ConfigParser()
+    config.read(remote_cfg)
+    if not config.has_section(server):
+        return ("anonymous", "anonymous", "/")
+
+    items = dict(config.items(server))
+
+    return (
+        items.get("username"),
+        items.get("password"),
+        items.get("root")
+    )
+
+
+def install_ftp_handler():
+    """ This read a ftp login/password
+    from a config file, and add it to the
+    list of urllib2 handlers so that you
+    can get feeds and packages from a
+    password protected ftp server
+
+    """
 
 
 def download(url, output_dir,
@@ -63,21 +97,43 @@ def download(url, output_dir,
         mess += "Error was %s" % e
         raise Exception(mess)
 
+    url_split = urlparse.urlsplit(url)
+    url_obj = None
     try:
-        url_obj = None
-        url_obj = urllib2.urlopen(url)
-        content_length = url_obj.headers.dict['content-length']
-        size = int(content_length)
-        buff_size = 100 * 1024
-        xferd = 0
-        while xferd < size:
-            data = url_obj.read(buff_size)
-            if not data:
-                break
-            xferd += len(data)
-            if callback:
-                callback(size, xferd)
-            dest_file.write(data)
+        if url_split.scheme == "ftp":
+        # We cannot use urllib2 here because it has no support
+        # for username/password for ftp, so we will use ftplib
+        # here.
+            server = url_split.netloc
+            user, password, root = get_ftp_password(server)
+            ftp = ftplib.FTP(server, user, password)
+            if root:
+                ftp.cwd(root)
+            class Tranfert:
+                pass
+            size = ftp.size(url_split.path)
+            Tranfert.xferd = 0
+            def retr_callback(data):
+                Tranfert.xferd += len(data)
+                if callback:
+                    callback(size, Tranfert.xferd)
+                dest_file.write(data)
+            cmd = "RETR " + url_split.path
+            ftp.retrbinary(cmd, retr_callback)
+        else:
+            url_obj = urllib2.urlopen(url)
+            content_length = url_obj.headers.dict['content-length']
+            size = int(content_length)
+            buff_size = 100 * 1024
+            xferd = 0
+            while xferd < size:
+                data = url_obj.read(buff_size)
+                if not data:
+                    break
+                xferd += len(data)
+                if callback:
+                    callback(size, xferd)
+                dest_file.write(data)
     except Exception, e:
         error  = "Could not dowload file from %s\n to %s\n" % (url, dest_name)
         error += "Error was: %s" % e
