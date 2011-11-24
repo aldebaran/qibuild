@@ -20,8 +20,8 @@ def patch_sys_path():
     from the sources works
 
     """
-    this_dir = os.path.basename(__file__)
-    to_add =  os.path.join(this_dir, "..", "..")
+    this_dir = os.path.dirname(__file__)
+    to_add =  os.path.join(this_dir, "..")
     to_add = os.path.abspath(to_add)
     sys.path.insert(0, to_add)
 
