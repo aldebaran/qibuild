@@ -11,6 +11,23 @@
 
 # sys.path
 
+import os
+import sys
+
+def patch_sys_path():
+    """
+    Add self sources to sys.path, so that directly using this script
+    from the sources works
+
+    """
+    this_dir = os.path.basename(__file__)
+    to_add =  os.path.join(this_dir, "..", "..")
+    to_add = os.path.abspath(to_add)
+    sys.path.insert(0, to_add)
+
+
+patch_sys_path()
+
 try:
     import argparse
 except ImportError:
