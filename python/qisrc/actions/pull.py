@@ -131,9 +131,10 @@ def do(args):
         else:
             out = git.cmd.call_output("pull", rawout=True)
         if out[0] == 0:
-            print out[1][0],
             print out[1][1],
+            print out[1][0],
         else:
+            LOGGER.error("failed")
             fail.append((git_project, out))
             if not args.continue_on_error:
                 raise Exception("\n%s%s" % (out[1][0], out[1][1]))
