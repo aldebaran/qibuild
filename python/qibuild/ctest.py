@@ -24,10 +24,20 @@ def run_test(build_dir, cmd, properties, build_env):
     """
     # FIXME: do something with timeout
     timeout = properties.get("TIMEOUT")
-    # FIXME: do something with ENVIRONMENT
-    environment = properties.get("ENVIRONMENT")
+
+    # we will merge the build env coming from toc
+    # config with the env coming from CMake config,
+    # assuming that cmake is always right
+    env = build_env.copy()
+    cmake_env = properties.get("ENVIRONMENT")
+    if cmake_env:
+        cmake_env = cmake_env.split(";")
+        for key_value in cmake_env:
+            key, value = key_value.split("=")
+            env[key] = value
+
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT, cwd=build_dir, env=build_env)
+        stderr=subprocess.STDOUT, cwd=build_dir, env=env)
     (out, err_) = process.communicate()
     retcode = process.returncode
     return (retcode == 0, out)
