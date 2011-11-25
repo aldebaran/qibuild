@@ -126,6 +126,7 @@ def _handle_files(src, dest, root, files, filter, quiet):
             mkdir(new_root, recursive=True)
             # We do not want to fail if dest exists but is read only
             # (following what `install` does, but not what `cp` does)
+            rm(fdest)
             shutil.copy(fsrc, fdest)
 
 
