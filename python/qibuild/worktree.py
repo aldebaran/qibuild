@@ -222,7 +222,7 @@ def _search_manifest_directory(working_directory):
         cwd = new_cwd
     return None
 
-def search_projects(directory=None, depth=3):
+def search_projects(directory=None, depth=4):
     """ Search for qibuild.manifest files recursively starting from directory
         This function return a list of directories.
     """
