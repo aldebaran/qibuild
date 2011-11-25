@@ -511,31 +511,19 @@ class Toc(WorkTree):
         except CommandFailedException:
             raise BuildFailed(project)
 
-    def test_project(self, project, verbose_tests=False, test_name=None):
+    def test_project(self, project):
         """Run ctest on a project
 
-        Print the output of the tests in verbose_tests is True
-        Only run the test given in test_name is not None
         """
         build_dir = project.build_directory
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
             _advise_using_configure(self, project)
-        cmd = ["ctest"]
-        if verbose_tests:
-            cmd.append("-VV")
-        if test_name is not None:
-            cmd.extend(["-R", test_name])
-
         build_env = self.envsetter.get_build_env()
-        # FIXME: should we fix build environnement on mac so that
-        # DYLD_LIBRARY_PATH and DYLD_FRAMEWORK_PATH are always correct?
-        # Note that we could also do that with a pure cmake solution, in
-        # qi_add_test()
-        try:
-            qibuild.command.call(cmd, cwd=build_dir, env=build_env)
-        except CommandFailedException:
+        passed = qibuild.ctest.run_tests(build_dir, build_env)
+        if not passed:
             raise TestsFailed(project)
+
 
     def install_project(self, project, destdir, runtime=False):
         """Install the project """

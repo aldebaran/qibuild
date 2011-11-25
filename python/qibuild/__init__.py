@@ -14,6 +14,7 @@ from . import parsers
 from . import command
 from . import configstore
 from . import cmdparse
+from . import ctest
 from . import log
 from . import worktree
 from . import archive
