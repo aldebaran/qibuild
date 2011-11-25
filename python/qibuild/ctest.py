@@ -9,22 +9,45 @@ import re
 import shlex
 import logging
 import subprocess
+import time
+import threading
 
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
+class ProcessThread(threading.Thread):
+    def __init__(self, test_name, cmd, cwd, env):
+        threading.Thread.__init__(self, name="ProcessThread<%s>" % test_name)
+        self.cmd = cmd
+        self.cwd = cwd
+        self.env = env
+        self.out = ""
+        self.process = None
 
-def run_test(build_dir, cmd, properties, build_env):
+    def run(self):
+        self.process = subprocess.Popen(self.cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=self.cwd,
+            env=self.env)
+        while self.process.poll() is None:
+            self.out += self.process.stdout.readline()
+            sys.stdout.write(".")
+            sys.stdout.flush()
+
+
+
+def run_test(build_dir, test_name, cmd, properties, build_env):
     """ Run a test. Return
     (res, output) where res is a boolean
     stating if the test was sucessul, and
     output is the output of the test
 
     """
-    # FIXME: do something with timeout
-    timeout = properties.get("TIMEOUT")
 
+    timeout = properties.get("TIMEOUT")
+    timeout = int(timeout)
     # we will merge the build env coming from toc
     # config with the env coming from CMake config,
     # assuming that cmake is always right
@@ -35,12 +58,16 @@ def run_test(build_dir, cmd, properties, build_env):
         for key_value in cmake_env:
             key, value = key_value.split("=")
             env[key] = value
-
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT, cwd=build_dir, env=env)
-    (out, err_) = process.communicate()
-    retcode = process.returncode
-    return (retcode == 0, out)
+    process_thread = ProcessThread(test_name, cmd, build_dir, env)
+    process_thread.start()
+    process_thread.join(timeout)
+    process = process_thread.process
+    out = process_thread.out
+    if process_thread.isAlive():
+        process.terminate()
+        return (False, out + "\n*** Timed out (%i s)\n" % timeout)
+    else:
+        return (process.returncode == 0, out)
 
 
 def run_tests(build_dir, build_env):
@@ -55,7 +82,7 @@ def run_tests(build_dir, build_env):
         (test_name, cmd, properties) = test
         sys.stdout.write("Running %i/%i %s ... " % (i+1, len(tests), test_name))
         sys.stdout.flush()
-        (ok, out) = run_test(build_dir, cmd, properties, build_env)
+        (ok, out) = run_test(build_dir, test_name, cmd, properties, build_env)
         if ok:
             sys.stdout.write("[OK]\n")
         else:
