@@ -38,6 +38,17 @@ def do(args):
     feed = args.feed
     tc_name = args.name
 
+    # Validate the name: must be a valid filename:
+    bad_chars = r'<>:"/\|?*'
+    for bad_char in bad_chars:
+        if bad_char in tc_name:
+            mess  = "Invalid toolchain name: '%s'\n" % tc_name
+            mess += "A vaild toolchain name should not contain any "
+            mess += "of the following chars:\n"
+            mess += " ".join(bad_chars)
+            raise Exception(mess)
+
+
     toc_error = None
     toc = None
     try:
