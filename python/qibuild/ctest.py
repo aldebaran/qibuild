@@ -33,8 +33,6 @@ class ProcessThread(threading.Thread):
             env=self.env)
         while self.process.poll() is None:
             self.out += self.process.stdout.readline()
-            sys.stdout.write(".")
-            sys.stdout.flush()
 
 
 
