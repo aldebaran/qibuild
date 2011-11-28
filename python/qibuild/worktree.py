@@ -34,10 +34,10 @@ LOGGER = logging.getLogger("WorkTree")
 class WorkTreeException(Exception):
     """Custom exception """
     def __init__(self, message):
-        self.message = message
+        self._message = message
 
     def __str__(self):
-        return self.message
+        return self._message
 
 class ProjectAlreadyExists(Exception):
     """Just a custom exception """

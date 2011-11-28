@@ -25,10 +25,10 @@ LOGGER = logging.getLogger("qibuild.toc")
 class BadBuildConfig(Exception):
     """Custom exception"""
     def __init__(self, message):
-        self.message = message
+        self._message = message
 
     def __str__(self):
-        mess = self.message + "\n"
+        mess = self._message + "\n"
         mess += "Please check qi configuration"
         return mess
 
@@ -38,10 +38,10 @@ class TocException(Exception):
     so they can be caught by callers.
     """
     def __init__(self, message):
-        self.message = message
+        self._message = message
 
     def __str__(self):
-        return self.message
+        return self._message
 
 class ConfigureFailed(Exception):
     def __init__(self, project):

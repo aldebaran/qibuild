@@ -24,11 +24,11 @@ LOGGER = logging.getLogger("buildtool.archive")
 class InvalidArchive(Exception):
     """Just a custom exception """
     def __init__(self, message):
-        self.message = message
+        self._message = message
         Exception.__init__(self)
 
     def __str__(self):
-        return self.message
+        return self._message
 
 def extract_tar(archive_path, dest_dir):
     """Extract a .tar.gz archive"""

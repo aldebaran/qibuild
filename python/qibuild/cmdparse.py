@@ -47,11 +47,11 @@ class InvalidAction(Exception):
     """Just a custom exception """
     def __init__(self, name, message):
         self.name = name
-        self.message = message
+        self._message = message
 
     def __str__(self):
         message = "Invalid action %s\n" % self.name
-        message += self.message
+        message += self._message
         return message
 
 
