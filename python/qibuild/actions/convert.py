@@ -138,6 +138,7 @@ def convert_cmake(source_dir, args):
     new_lines = list()
     regexp = re.compile(r'^\s*project\s*\((.*)\)', re.IGNORECASE)
     to_add = "include(qibuild.cmake)"
+    qibuild_included=False
     for line in lines:
         new_lines.append(line)
         match = re.match(regexp, line)
@@ -145,7 +146,10 @@ def convert_cmake(source_dir, args):
             new_lines.append(to_add + "\n")
             project_name = match.groups()[0]
             project_name = project_name.strip()
-    if args.patch_cmake:
+        match = re.match("\s*include\s*\(.*/?qibuild.cmake.*", line)
+        if match:
+            qibuild_included = True
+    if args.patch_cmake and not qibuild_included:
         with open(root_cmake, "w") as fp:
             fp.writelines(new_lines)
         copy_qibuild(source_dir)
