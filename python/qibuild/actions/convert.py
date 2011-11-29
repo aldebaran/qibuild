@@ -22,6 +22,12 @@ def configure_parser(parser):
     parser.add_argument("source_dir", nargs="?",
         help="Top source directory of the project. "
              "Defaults to current working directory.")
+    parser.add_argument("--no-cmake", action="store_false",
+        dest="patch_cmake",
+        help="Do not patch any cmake code. "
+             "Use this if you do not want to depend on the qibuild "
+             "CMake framework.")
+    parser.set_defaults(cmake_patch=True)
 
 def copy_qibuild(source_dir):
     """ Every convert function should at least call this
@@ -72,7 +78,7 @@ def guess_type(source_dir):
 
     return None
 
-def convert_bootstrap(source_dir):
+def convert_bootstrap(source_dir, args):
     """ Convert a old bootstrap project to a qiBuild project
 
     """
@@ -86,8 +92,9 @@ def convert_bootstrap(source_dir):
         for filename in filenames:
             if filename == "bootstrap.cmake":
                 full_path = os.path.join(root, filename)
-                LOGGER.debug("updating %s", full_path)
-                shutil.copy(new_bootstrap, full_path)
+                if args.patch_cmake:
+                    LOGGER.debug("updating %s", full_path)
+                    shutil.copy(new_bootstrap, full_path)
 
     # qibuild.manifest was once named base.cfg:
     project_name = None
@@ -117,31 +124,35 @@ def _name_from_base_cfg(base_cfg):
     return None
 
 
-def convert_cmake(source_dir):
+def convert_cmake(source_dir, args):
     """ Patch the root's CMakeLists file, then
     add the missing qibuild.cmake and qibuild.manifest
     files
 
     """
+    project_name = None
     root_cmake = os.path.join(source_dir, "CMakeLists.txt")
     lines = list()
     with open(root_cmake, "r") as fp:
         lines = fp.readlines()
     new_lines = list()
-    regexp = re.compile(r'^\s*project\s*\(', re.IGNORECASE)
+    regexp = re.compile(r'^\s*project\s*\((.*)\)', re.IGNORECASE)
     to_add = "include(qibuild.cmake)"
     for line in lines:
         new_lines.append(line)
-        if re.match(regexp, line):
+        match = re.match(regexp, line)
+        if match:
             new_lines.append(to_add + "\n")
+            project_name = match.groups()[0]
+            project_name = project_name.strip()
+    if args.patch_cmake:
+        with open(root_cmake, "w") as fp:
+            fp.writelines(new_lines)
+        copy_qibuild(source_dir)
 
-    with open(root_cmake, "w") as fp:
-        fp.writelines(new_lines)
+    create_qibuild_manifest(source_dir, project_name)
 
-    copy_qibuild(source_dir)
-    create_qibuild_manifest(source_dir)
-
-def convert_default(source_dir):
+def convert_default(source_dir, args_):
     """ Create an empty CMakeLists, and assume project name
     if the basename of the source_dir
 
@@ -192,7 +203,7 @@ def do(args):
         return
 
     LOGGER.info("Converting %s from %s to qiBuild", source_dir, source_type)
-    convert_fun(source_dir)
+    convert_fun(source_dir, args)
 
     LOGGER.info("Done. \n"
         "Create a qiBuild worktree if you have not already done so\n"
