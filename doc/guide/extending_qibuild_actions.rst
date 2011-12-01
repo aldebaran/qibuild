@@ -22,7 +22,7 @@ The only requirements for the spam module is to contain two functions:
 The configure_parser function takes a ``argparse.ArgumentParser`` object and
 modifies it.
 
-You can modify the parser passed as arguments to add specific arguments
+You can modify the parser passed as argument to add specific arguments
 to you action.
 
 The do function takes the result of the command line parsing. It is a
@@ -60,13 +60,13 @@ the ``qibuild.parsers`` package, depending on what you need to do, and, yes,
 they all call ``qibuild.cmdparse.default_parser`` for you :)
 
 
-Quick note : often you have to have an action with two words in it, for
-instance ``foo-bar``.
+Quick note : often you'll want an action with two words in it, for instance
+``foo-bar``.
 
 Although simply writing a file called ``foo-bar.py`` would work, please
 create a module called ``foo_bar.py``. Note that ``import foo-bar`` will not
 work, Python will read it as ``import foo minus bar`` ...
 
-Note that the command line parsing made by ``qibuild`` will replace ``-`` by ``_``
-anyway.
+Note that the command line parsing done by ``qibuild`` will replace ``-`` by
+``_`` anyway.
 

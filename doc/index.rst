@@ -29,7 +29,7 @@ want. Cross-compilation is then just a matter of using a specific toolchain.
 
 qiBuild is truly cross-platform: it is tested on Linux, Mac and Windows. Being
 based on the well-known CMake build system, it allows you to use your existing
-tools such as gcc, Makefile, or Visual Studio.
+tools such as gcc, Make, or Visual Studio.
 
 The qiBuild framework tries hard to stand out of your way: it remains close to
 standards, and will play nice with other build systems.
@@ -39,16 +39,17 @@ qiBuild is composed of two parts:
 * the qiBuild CMake framework, that simplifies authoring CMakeLists.txt.
 
 * the qibuild/qitoolchain command line tools, that helps build projects while
-  taking dependencies into account and generate re-destributable binary
+  taking dependencies into account and generate re-distributable binary
   packages
 
 qiBuild programming guide
 --------------------------
 
 
-First, plase follow the tutorial in the :ref:`qibuild-getting-started` section.
+First, please follow the tutorial in the :ref:`qibuild-getting-started` section.
 
-You can now read the :ref:`qibuild-in-five-minutes` section if you want to dig in right now.
+You can now read the :ref:`qibuild-in-five-minutes` section if you want to dig
+in right now.
 
 Or you can follow the :ref:`qibuild-guide` for a more progressive course.
 

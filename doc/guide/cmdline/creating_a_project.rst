@@ -42,9 +42,9 @@ If you already have source code somewhere, all you have to do is to:
 
 *  create a qibuild.manifest looking like
 
-.. code-block:: ini
+   .. code-block:: ini
 
-    [project foo]
+       [project foo]
 
 * copy-paste the qibuild.cmake file from
   qibuild/cmake/qibuild/templates/qibuild.cmake and make sure to include it in
@@ -53,7 +53,7 @@ If you already have source code somewhere, all you have to do is to:
 * (optional, if you want to use qi\_ functions...): include 'qibuild/cmake'
   somewhere
 
-You cand do this by running
+You can do this by running
 
 .. code-block:: console
 

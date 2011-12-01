@@ -72,8 +72,8 @@ First, you have to create a **toolchain** for qibuild to use:
 
   $ qitoolchain create <TOOLCHAIN_NAME> --default
 
-Not that you can choose any name for your toolchain, but is advised
-to choose between this set of configurations:
+You are free to choose any name for your toolchain, but it is advised
+to pick one from this set of configurations:
 
 * linux32
 * linux64
@@ -83,13 +83,13 @@ to choose between this set of configurations:
 * win32-vs2010
 * mingw
 
-Here we will assume you chose ``linux32``
+Here we will assume you chose ``linux32``.
 
-Here we used the ``--default`` option. If you don't use ``--default``, you
-will have to use ``-c linux32`` for every qibuild command.
+Here we used the ``--default`` option. If you don't, you will have to add
+``-c linux32`` to every qibuild command.
 
-The only thing the ``default`` option does is to set ``QI_WORK_TREE/.qi/qibuild.cfg``
-so that it looks like:
+The only thing the ``default`` option does is to set
+``QI_WORK_TREE/.qi/qibuild.cfg`` so that it looks like:
 
 .. code-block:: ini
 
@@ -101,9 +101,7 @@ So it's easy to change your mind later.
 
 This will create a directory looking like:
 ``~/.local/share/qi/toolchains/linux32/``
-
-This is where every packages corresponding will be put.
-put.
+where every packages will be put.
 
 You can check that your toolchain has been created with:
 
@@ -120,7 +118,6 @@ Now you can use:
 .. code-block:: console
 
   $ qitoolchain add-package -c linux32 world /path/to/worktree/package/world.tar.gz
-
 
 You can check that your package has been added with:
 
@@ -142,12 +139,13 @@ This will simply:
 * configure some files so that qibuild knows that the
   ``linux32`` toolchain can provide the ``world`` package
 
-When resolving dependencies of the ``hello`` project, qibuild will see that you use
-a toolchain called ``linux32`` and that this toolchain provides the ``world`` project,
-so it’s enough to set ``CMAKE_MODULE_PATHS`` to ``path/to/linux/toolchain/world``
+When resolving dependencies of the ``hello`` project, qibuild will see that you
+use a toolchain called ``linux32`` and that this toolchain provides the
+``world`` project, so it’s enough to set ``CMAKE_MODULE_PATHS`` to
+``path/to/linux/toolchain/world``
 
-The ``world`` project will not be built when you use ``qibuild make hello``, unless you
-specify it explicitly on the command line:
+The ``world`` project will not be built when you use ``qibuild make hello``,
+unless you specify it explicitly on the command line:
 
 .. code-block:: console
 
@@ -170,7 +168,7 @@ We will assume you have access to a FTP or a HTTP sever.
 First, upload the world package, so that is accessible with the url:
 ``http://example.com/packages/world.tar.gz``
 
-Next, create a ``fee.xml`` accessible with the url:
+Next, create a ``feed.xml`` accessible with the url:
 ``http://example.com/feed.xml``, looking like
 
 .. code-block:: xml
@@ -195,7 +193,7 @@ Then, from an other machine, run
   Toolchain linux32: adding package world
 
 
-You can see that the feed has been store in qibuild configuration:
+You can see that the feed has been stored in your qibuild configuration:
 
 .. code-block:: console
 

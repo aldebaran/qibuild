@@ -66,7 +66,7 @@ Then go to this directory and run
 
 .. code-block:: console
 
-  $ qibuild init --interative
+  $ qibuild init --interactive
 
 You will be asked to choose a CMake generator. Choose the one that matches your
 platform.
@@ -151,8 +151,8 @@ Here’s what a complete .qi/build.cfg would look like to use MinGW with QtCreat
   cmake.generator = "MinGW Makefiles"
 
 
-.. warning:: qibuild never modify os.environ globally, so the executable you just built
-   won't run unless you have mingw's DLLs in your PATH.
+.. warning:: qibuild never modify os.environ globally, so the executable you
+   just built won't run unless you have mingw's DLLs in your PATH.
 
 Configuring qiBuild for Visual Studio
 +++++++++++++++++++++++++++++++++++++
@@ -170,19 +170,19 @@ Here’s what a complete .qi/build.cfg would look like to use Visual Studio 2008
 For command line addicts (or people doing continuous integration who would like
 a better build output), you can also:
 
-* Use cmake_generator = "NMake Makefiles" and use qibuild from the Visual
+* Use ``cmake_generator = "NMake Makefiles"`` and use qibuild from the Visual
   Studio command prompt.
 
 * Or, if you do not want to use the Visual Studio command prompt, you can
-  specify a .bat file to be ran by qibuild, like this
+  specify a ``.bat`` file to be ran by qibuild, like this
 
-.. code-block:: ini
+  .. code-block:: ini
 
-    [general]
-    env.bat_file = c:\Program Files\Microsoft Visual Studio 9.0\VC\vcvarsall.bat
-    cmake.generator = 'NMake Makefiles'
+     [general]
+     env.bat_file = c:\Program Files\Microsoft Visual Studio 9.0\VC\vcvarsall.bat
+     cmake.generator = 'NMake Makefiles'
 
-(the location of the .bat file depends on your setup)
+  (the location of the ``.bat`` file depends on your setup)
 
 
 Configuring qiBuild for MinGW with Msys

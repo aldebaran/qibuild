@@ -42,12 +42,16 @@ Create a worktree:
    flib(ODE ode)
    export_lib(ODE)
 
+.. code-block:: console
+
+   $ $EDITOR CMakeLists.txt
+
 .. code-block:: cmake
 
    qi_use_lib(world ODE)
 
 
-* Create a ``hello`` in the ``hello`` project, in
+* Create a ``hello`` executable in the ``hello`` project, in
   ``src/hello``, using the ``world`` library:
 
 .. code-block:: console
@@ -91,12 +95,17 @@ Create a worktree:
 * Distribute the world project to the world, step 1:
   Add install rules for world header
 
+.. code-block:: console
+
+   $ cd ~/src/world/
+   $ $EDITOR CMakeLists.txt
+
 .. code-block:: cmake
 
    qi_install_header(world/world.hpp SUBFOLDER world)
 
 * Distribute the world project to the world, step 2:
-  Generate world package in ~/src/packages/world.tar.gz
+  Generate world package in ``~/src/packages/world.tar.gz``
   using cmake install rules.
 
 .. code-block:: console
@@ -133,5 +142,3 @@ Create a worktree:
 
    No need for world sources, using pre-compiled library
    from the world package
-
-

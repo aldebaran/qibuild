@@ -41,7 +41,8 @@ qiBuild and QtCreator
 The only thing to remember is that you should not let QtCreator call CMake by
 itself the first time.
 
-Use ``qibuild configure`` then ``qibuild`` make to be sure everything works fine.
+Use ``qibuild configure`` then ``qibuild make`` to be sure everything works
+fine.
 
 Then open the root CMakeLists in qtcreator.
 
@@ -52,7 +53,7 @@ QtCreator will read the settings from the exising build directory, so
 everything should work fine.
 
 Remember to use the same CMake generator in QtCreator and in your configuration
-file, if qtcreator asks you to choose.
+file, if qtcreator asks you to choose one.
 
 qiBuild and Visual Studio
 +++++++++++++++++++++++++
@@ -62,7 +63,7 @@ your build directory.
 
 Your solution should already be properly configured. Please avoid making
 changes to the solution file by hand, they will be lost the next time you
-change a CMake file or re-run CMake. To keep your project cross-platform and
+change a CMake file or run CMake. To keep your project cross-platform and
 sharable with others you are strongly advised to use your CMakeLists.txt to
 make any changes to your solution. After each change of your CMakeLists.txt,
 run qibuild configure to update your solution file.
