@@ -123,7 +123,7 @@ You can check that your package has been added with:
 
 .. code-block:: console
 
-   $ qitoolchain status
+  $ qitoolchain status
 
   Toolchain linux32
   No feed
@@ -173,7 +173,7 @@ Next, create a ``feed.xml`` accessible with the url:
 
 .. code-block:: xml
 
-   <toolchain>
+  <toolchain>
 
     <package
       name="world"
@@ -187,7 +187,7 @@ Then, from an other machine, run
 
 .. code-block:: console
 
-   $ qitoolchain create linux32 http://example.com/feed.xml
+  $ qitoolchain create linux32 http://example.com/feed.xml
 
   Getting package world from http://example.com/packages/world.tar.gz
   Toolchain linux32: adding package world
