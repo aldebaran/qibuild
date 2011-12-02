@@ -53,7 +53,9 @@ def open_remote_location(location):
 
     """
     url_split = urlparse.urlsplit(location)
+    #pylint: disable-msg=E1103
     if url_split.scheme == "ftp":
+        #pylint: disable-msg=E1103
         server = url_split.netloc
         user, password, root = get_ftp_password(server)
         ftp = ftplib.FTP(server, user, password)
@@ -62,6 +64,7 @@ def open_remote_location(location):
         class Transfer:
             pass
         Transfer.data = ""
+        #pylint: disable-msg=E1103
         cmd = "RETR " + url_split.path
         def retr_callback(data):
             Transfer.data += data
@@ -115,10 +118,12 @@ def download(url, output_dir,
     url_split = urlparse.urlsplit(url)
     url_obj = None
     try:
+        #pylint: disable-msg=E1103
         if url_split.scheme == "ftp":
         # We cannot use urllib2 here because it has no support
         # for username/password for ftp, so we will use ftplib
         # here.
+            #pylint: disable-msg=E1103
             server = url_split.netloc
             user, password, root = get_ftp_password(server)
             ftp = ftplib.FTP(server, user, password)
@@ -126,6 +131,7 @@ def download(url, output_dir,
                 ftp.cwd(root)
             class Tranfert:
                 pass
+            #pylint: disable-msg=E1103
             size = ftp.size(url_split.path)
             Tranfert.xferd = 0
             def retr_callback(data):
@@ -133,6 +139,7 @@ def download(url, output_dir,
                 if callback:
                     callback(size, Tranfert.xferd)
                 dest_file.write(data)
+            #pylint: disable-msg=E1103
             cmd = "RETR " + url_split.path
             ftp.retrbinary(cmd, retr_callback)
         else:

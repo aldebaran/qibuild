@@ -171,15 +171,4 @@ SET_TESTS_PROPERTIES(a_gtest PROPERTIES TIMEOUT "20")
         parse_ctest_test_files(tests, build_dir, subdirs)
         print tests
 
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("build_dir")
-    args = parser.parse_args()
-    build_dir = args.build_dir
-    run_tests(build_dir)
 
-
-
-if __name__ == "__main__":
-    main()
