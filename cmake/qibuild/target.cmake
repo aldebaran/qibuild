@@ -26,6 +26,22 @@ set(_QI_TARGET_CMAKE_ TRUE)
 include(CMakeParseArguments)
 include(qibuild/internal/copy)
 
+
+
+function(_qi_post_copy_deps name)
+  configure_file(${QI_ROOT_DIR}/templates/post-copy-deps.cmake
+                 ${CMAKE_BINARY_DIR}/post-copy-deps.cmake
+                 COPYONLY)
+
+  add_custom_command(TARGET ${name} POST_BUILD
+    COMMAND
+      ${CMAKE_COMMAND}
+      -D "QIBUILD_CMAKE=${CMAKE_SOURCE_DIR}/qibuild.cmake"
+      -P ${CMAKE_BINARY_DIR}/post-copy-deps.cmake
+      ${CMAKE_BINARY_DIR}
+  )
+endfunction()
+
 #! Create an executable.
 # The target name should be unique.
 #
@@ -114,6 +130,8 @@ function(qi_create_bin name)
       )
     endif()
   endif()
+
+  _qi_post_copy_deps("${name}")
 
 endfunction()
 

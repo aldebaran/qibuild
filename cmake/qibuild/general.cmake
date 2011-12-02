@@ -111,10 +111,3 @@ qi_debug("CMAKE_MODULE_PATH     = ${CMAKE_MODULE_PATH}")
 qi_debug("CMAKE_INCLUDE_PATH    = ${CMAKE_INCLUDE_PATH}")
 qi_debug("CMAKE_SYSTEM_LIBRARY_PATH = ${CMAKE_SYSTEM_LIBRARY_PATH}")
 
-if(WIN32)
-  include(qibuild/internal/copydlls)
-endif()
-
-if(APPLE)
-  include(qibuild/internal/fixdylibs)
-endif()
