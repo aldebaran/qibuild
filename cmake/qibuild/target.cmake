@@ -24,9 +24,6 @@ endif()
 set(_QI_TARGET_CMAKE_ TRUE)
 
 include(CMakeParseArguments)
-include(qibuild/internal/copy)
-
-
 
 function(_qi_post_copy_deps name)
   configure_file(${QI_ROOT_DIR}/templates/post-copy-deps.cmake
