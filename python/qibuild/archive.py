@@ -115,7 +115,7 @@ def zip_win(directory):
     # Convert to DOS path just to be sure:
     directory    = qibuild.sh.to_native_path(directory)
     archive_name = qibuild.sh.to_native_path(archive_name)
-    archive = zipfile.ZipFile(archive_name, "w")
+    archive = zipfile.ZipFile(archive_name, "w", zipfile.ZIP_DEFLATED)
     for (root, directories, filenames) in os.walk(directory):
         for filename in filenames:
             full_path = os.path.join(root, filename)
