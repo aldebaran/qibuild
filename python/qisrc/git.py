@@ -499,13 +499,3 @@ class Git:
 
 # pylint: disable-msg=W0622,C0103
 open = git_open
-
-def main():
-    "Quick test"
-    g = Git("/home/dmerejkowsky/src/appu_plugins/")
-    g.set_tracking_branch("release", "release")
-    g.set_tracking_branch("foo", "master", "foo", "git://foo.git")
-
-
-if __name__ == "__main__":
-    main()
