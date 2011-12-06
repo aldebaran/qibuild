@@ -34,9 +34,15 @@ def do(args):
     feed = args.feed
     tc_name = args.name
 
-    toc = qibuild.toc.toc_open(args.work_tree)
+    toc = None
+    try:
+        toc = qibuild.toc.toc_open(args.work_tree)
+    except qibuild.toc.TocException:
+        pass
+
     if not tc_name:
-        tc_name = toc.active_config
+        if toc:
+            tc_name = toc.active_config
         if not tc_name:
             mess  = "Could not find which toolchain to update\n"
             mess += "Please specify a toolchain name from command line\n"
@@ -56,8 +62,5 @@ def do(args):
             mess += "Pleas check configuration or specifiy a feed on the command line\n"
             raise Exception(mess)
 
-    qibuild.run_action("qitoolchain.actions.create", [tc_name, feed])
-
-
-
-
+    toolchain = qitoolchain.Toolchain(tc_name)
+    toolchain.parse_feed(feed)
