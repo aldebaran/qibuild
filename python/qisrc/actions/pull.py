@@ -121,6 +121,15 @@ def do(args):
     qiwt = qibuild.worktree_open(args.work_tree)
     toc  = qibuild.toc_open(args.work_tree, args)
 
+    toc_cfg = toc.config_path
+    toc_configstore = qibuild.configstore.ConfigStore()
+    toc_configstore.read(toc_cfg)
+    manifest_url = toc_configstore.get("manifest.url")
+    if manifest_url:
+        qibuild.run_action("qisrc.actions.fetch",
+            args=[manifest_url],
+            forward_args=args)
+
     project_names = resolv_git_deps(toc, qiwt, args)
 
     for git_project in project_names:
