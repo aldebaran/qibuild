@@ -59,7 +59,7 @@ class ColorLogHandler(logging.StreamHandler):
         """
         name  = record.name
         level = record.levelname
-        mess  = record.msg % record.args
+        mess  = record.getMessage()
         res   = COLORS["bold"]
         if record.levelno   == logging.DEBUG:
             res += COLORS["blue"]
