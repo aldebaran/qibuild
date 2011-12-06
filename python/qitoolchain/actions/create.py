@@ -69,6 +69,10 @@ def do(args):
         raise Exception(mess)
 
     toolchain = qitoolchain.Toolchain(tc_name)
+    if tc_name in qitoolchain.get_tc_names():
+        LOGGER.info("%s already exists, creating a new one", tc_name)
+        toolchain.remove()
+        toolchain = qitoolchain.Toolchain(tc_name)
     if feed:
         toolchain.parse_feed(feed)
 
