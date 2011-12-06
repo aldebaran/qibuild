@@ -16,24 +16,6 @@ import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
-class ProcessThread(threading.Thread):
-    def __init__(self, test_name, cmd, cwd, env):
-        threading.Thread.__init__(self, name="ProcessThread<%s>" % test_name)
-        self.cmd = cmd
-        self.cwd = cwd
-        self.env = env
-        self.out = ""
-        self.process = None
-
-    def run(self):
-        self.process = subprocess.Popen(self.cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            cwd=self.cwd,
-            env=self.env)
-        while self.process.poll() is None:
-            self.out += self.process.stdout.readline()
-
 
 
 def run_test(build_dir, test_name, cmd, properties, build_env):
@@ -56,7 +38,10 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
         for key_value in cmake_env:
             key, value = key_value.split("=")
             env[key] = value
-    process_thread = ProcessThread(test_name, cmd, build_dir, env)
+    process_thread = qibuild.command.ProcessThread(cmd,
+        name=test_name,
+        cwd=build_dir,
+        env=env)
     process_thread.start()
     process_thread.join(timeout)
     process = process_thread.process

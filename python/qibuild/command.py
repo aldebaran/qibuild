@@ -44,7 +44,36 @@ import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
-DRYRUN           = False
+class ProcessThread(threading.Thread):
+    """ A simple way to run commands.
+
+    The thread will terminate when the command terminates
+
+    The full log is available in self.out, and the subprocess.Popen
+    object in self.process
+
+    """
+    def __init__(self, cmd, name=None, cwd=None, env=None):
+        if name is None:
+            thread_name = "ProcessThread"
+        else:
+            thread_name = "ProcessThread<%s>" % name
+        threading.Thread.__init__(self, name=thread_name)
+        self.cmd = cmd
+        self.cwd = cwd
+        self.env = env
+        self.out = ""
+        self.process = None
+
+    def run(self):
+        self.process = subprocess.Popen(self.cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=self.cwd,
+            env=self.env)
+        while self.process.poll() is None:
+            self.out += self.process.stdout.readline()
+
 
 class CommandFailedException(Exception):
     """Custom exception """
@@ -201,7 +230,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
 
 
 @contextlib.contextmanager
-def call_background(script_path, args, environ=None):
+def call_background(cmd, cwd=None, env=None):
     """
     To be used in a "with" statement.
 
@@ -220,8 +249,7 @@ def call_background(script_path, args, environ=None):
     the process has been killed.
 
     """
-    cmd = [script_path] + args
-    process = subprocess.Popen(cmd)
+    process = subprocess.Popen(cmd, cwd=cwd, env=env)
     caught_error = None
     try:
         yield
