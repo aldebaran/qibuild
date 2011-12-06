@@ -6,7 +6,6 @@
 import os
 import logging
 import hashlib
-import urllib2
 from xml.etree import ElementTree
 
 import qibuild
@@ -198,10 +197,13 @@ class ToolchainFeedParser:
 
 
 def parse_feed(toolchain, feed):
-    """ Recursively parse an xml feed,
-    adding packages to the toolchain while doing so
+    """ Helper for toolchain.parse_feed
 
     """
+    # Reset toolchain.packages:
+    package_names = [package.name for package in toolchain.packages]
+    for package_name in package_names:
+        toolchain.remove_package(package_name)
     parser = ToolchainFeedParser()
     parser.parse(feed)
     package_trees = parser.packages

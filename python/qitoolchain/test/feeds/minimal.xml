@@ -1,0 +1,6 @@
+<toolchain>
+    <package name="boost" version="1.42"
+        arch="linux32"
+        url="@srv_url@/boost-1.42-linux32.tar.gz"
+    />
+</toolchain>

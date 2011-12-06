@@ -165,6 +165,7 @@ class QiToolchainTestCase(unittest.TestCase):
 
 
 
+
 class FeedTestCase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="test-feed")
@@ -330,6 +331,24 @@ class FeedTestCase(unittest.TestCase):
         # is persistent
         tc2 = qitoolchain.Toolchain("buildfarm")
         self.assertEquals(tc2.feed, buildfarm_xml)
+
+    def test_parse_feed_twice(self):
+        self.setup_srv()
+        tc = qitoolchain.Toolchain("test")
+        full = os.path.join(self.srv, "full.xml")
+        minimal = os.path.join(self.srv, "minimal.xml")
+        tc.parse_feed(full)
+        package_names = [p.name for p in tc.packages]
+        package_names.sort()
+        self.assertEquals(["boost", "python"], package_names)
+        self.assertTrue("python" in get_tc_file_contents(tc))
+
+        tc2 = qitoolchain.Toolchain("test")
+        tc2.parse_feed(minimal)
+        package_names = [p.name for p in tc2.packages]
+        package_names.sort()
+        self.assertEquals(["boost"], package_names)
+        self.assertFalse("python" in get_tc_file_contents(tc2))
 
 
 if __name__ == "__main__":
