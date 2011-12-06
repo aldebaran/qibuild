@@ -96,11 +96,13 @@ Working dir was {cwd}
 
 class ProcessCrashedError(Exception):
     """An other custom exception, used by call_background """
-    def __init__(self, script_path):
-        self.process_name = os.path.basename(script_path)
+    def __init__(self, cmd):
+        self.cmd = cmd
 
     def __str__(self):
-        return "%s crashed!" % self.process_name
+        mess = "%s crashed!\n" % os.path.basename(self.cmd[0])
+        mess += "Full command: %s" % self.cmd
+        return mess
 
 class NotInPath(Exception):
     """Custom exception """
@@ -259,7 +261,7 @@ def call_background(cmd, cwd=None, env=None):
         try:
             if process.poll() != None:
                 # Process should not have died !
-                raise ProcessCrashedError(script_path)
+                raise ProcessCrashedError(cmd)
             else:
                 process.kill()
         except ProcessCrashedError, err:
