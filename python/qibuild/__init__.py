@@ -181,6 +181,31 @@ def cmake(source_dir, build_dir, cmake_args, clean_first=True, env=None, quiet=T
         ignore_ret_code=ignore_ret_code)
 
 
+
+def read_cmake_cache(cache_path):
+    """ Read a CMakeCache.txt file, returning a dict
+    name -> value
+
+    """
+    with open(cache_path, "r") as fp:
+        lines = fp.readlines()
+    res = dict()
+    for line in lines:
+        if line.startswith("//"):
+            continue
+        if line.startswith("#"):
+            continue
+        if not line:
+            continue
+        match = re.match(r"(\w+):(\w+)=(.*)", line)
+        if not match:
+            continue
+        else:
+            (key, _type, value) = match.groups()
+            res[key] = value
+    return res
+
+
 def check_root_cmake_list(cmake_list_file, project_name):
     """Check that the root CMakeLists.txt
     is correct.
