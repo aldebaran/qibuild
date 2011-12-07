@@ -406,7 +406,7 @@ class Toc(WorkTree):
 
 
 
-    def configure_project(self, project, clean_first=True):
+    def configure_project(self, project, clean_first=True, quiet=True):
         """ Call cmake with correct options
 
         Note: the cmake flags (CMAKE_BUILD_TYPE, or the -D args coming
@@ -420,6 +420,8 @@ class Toc(WorkTree):
         Note3: if clean_first is False, we won't delete CMake's cache.
         This is mainly useful when you are calling cmake NOT from
         `qibuild configure'.
+
+        Note4: if quiet is True, do not bother if cmake fails
         """
         if not os.path.exists(project.directory):
             raise TocException("source dir: %s does not exist, aborting" % project.directory)
@@ -466,9 +468,11 @@ class Toc(WorkTree):
                           project.build_directory,
                           cmake_args,
                           clean_first=clean_first,
-                          env=build_env)
+                          env=build_env,
+                          quiet=quiet)
         except CommandFailedException:
-            raise ConfigureFailed(project)
+            if not quiet:
+                raise ConfigureFailed(project)
 
 
     def build_project(self, project, incredibuild=False, num_jobs=1, target=None, rebuild=False):
