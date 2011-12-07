@@ -105,11 +105,14 @@ def configure_logging(args):
         handler.setLevel(logging.DEBUG)
     elif args.quiet:
         handler.setLevel(level=logging.ERROR)
+        import qibuild.command
+        qibuild.command.CONFIG["quiet"] = True
     else:
         handler.setLevel(level=logging.INFO)
 
     root_logger.addHandler(handler)
     LOG_CONFIG_DONE = True
+
 
 def get_current_log_level():
     """Get the current log level.

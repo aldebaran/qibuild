@@ -44,6 +44,12 @@ import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
+
+# Quick hack: in order to be able to configure how
+# qibuild.command works, we have to use this
+# global variable
+CONFIG = dict()
+
 class ProcessThread(threading.Thread):
     """ A simple way to run commands.
 
@@ -197,7 +203,8 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
     buffer = RingBuffer(300)
 
     returncode = 0
-    minimal_write = False
+    global CONFIG
+    minimal_write = CONFIG.get("quiet", False)
     if sys.platform.startswith("win") and sys.version_info < (2, 7):
         returncode = subprocess.call(cmd, env=env, cwd=cwd)
     else:
