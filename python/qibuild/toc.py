@@ -620,7 +620,15 @@ def _projects_from_args(toc, args):
         if args.projects:
             return ([args.projects, False])
         else:
-            return ([project_from_cwd()], args.single)
+            from_cwd = None
+            try:
+                from_cwd = project_from_cwd()
+            except:
+                pass
+            if from_cwd:
+                return ([from_cwd], args.single)
+            else:
+                return (toc_p_names, args.single)
     else:
         return (list(), False)
 
