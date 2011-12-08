@@ -173,13 +173,16 @@ def update_project(project, toc):
 
 
 
-def bootstrap_project(project, toc):
+def bootstrap_project(project, toc, project_names=None):
     """ Create the magic build/dependencies.cmake file
 
     This is to be called right before calling cmake
     inside the project build directory, not before
     because we need to know about all the other projects
     inside the Toc oject to get the list of SDK dirs, for instance.
+
+    project_names can be given to by-pass the 'package first, then
+    source dir' toc.get_sdk_dir algorithm
     """
     # To be written in dependencies.cmake
     to_write = """
@@ -231,7 +234,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
     cmake_qibuild_dir = os.path.abspath(os.path.join(cmake_qibuild_dir, ".."))
     path_to_add = qibuild.sh.to_posix_path(cmake_qibuild_dir)
 
-    dep_sdk_dirs = toc.get_sdk_dirs(project.name)
+    dep_sdk_dirs = toc.get_sdk_dirs(project.name, project_names=project_names)
 
     dep_to_add = ""
     for sdk_dir in dep_sdk_dirs:

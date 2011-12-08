@@ -188,7 +188,9 @@ class Toc(WorkTree):
             config=None,
             build_type="debug",
             cmake_flags=None,
-            cmake_generator=None):
+            cmake_generator=None,
+            active_projects=None,
+            solve_deps=True):
         """
             work_tree       : see WorkTree.__init__
             path_hints      : see WorkTree.__init__
@@ -196,6 +198,7 @@ class Toc(WorkTree):
             build_type      : a build type, could be debug or release (defaults to debug)
             cmake_flags     : optional additional cmake flags
             cmake_generator : optional cmake generator (defaults to Unix Makefiles)
+            active_projects : the projects excplicitely specified by user
         """
         WorkTree.__init__(self, work_tree, path_hints=path_hints)
 
@@ -230,6 +233,15 @@ class Toc(WorkTree):
         # List of objects of type qibuild.project.Project,
         # this is updated using WorkTree.buildable_projects
         self.projects          = list()
+
+        # The list of projects the user asked for from command
+        # line.
+        # Set by toc_open()
+        if not active_projects:
+            self.active_projects = list()
+        else:
+            self.active_projects = active_projects
+        self.solve_deps = solve_deps
 
         # Set cmake generator if user has not set if in Toc ctor:
         if not self.cmake_generator:
@@ -352,13 +364,18 @@ class Toc(WorkTree):
             raise TocException("No such project: %s" % project_name)
 
 
-    def get_sdk_dirs(self, project_name):
+    def get_sdk_dirs(self, project_name, project_names=None):
         """ Return a list of sdk, needed to build a project.
 
         Iterate through the dependencies.
         When it is a package (pre-compiled), add the path of
         the package, when it is a project, add the path to the "sdk" dir
         under the build directory of the project.
+
+        If a name is both in source and in package, use the package
+        (saves compile time), unless it is excplicitely set in
+        project_names, in that case, the list should at least contain
+        the name of the package you want to configure.
 
         """
         dirs = list()
@@ -367,8 +384,11 @@ class Toc(WorkTree):
         if project_name not in known_project_names:
             raise TocException("%s is not a buildable project" % project_name)
 
+        if not project_names:
+            project_names = [project_name]
+        # Here do not honor self.solve_deps or the software won't compile :)
         dep_solver = DependenciesSolver(projects=self.projects, packages=self.packages)
-        (project_names, package_names, not_found) = dep_solver.solve([project_name])
+        (r_project_names, package_namess, not_found) = dep_solver.solve(project_names)
 
         if not_found:
             # FIXME: right now there are tons of case where you could have missing
@@ -377,12 +397,13 @@ class Toc(WorkTree):
             # LOGGER.warning("Could not find projects %s", ", ".join(not_found))
             pass
 
-        project_names.remove(project_name)
+        # Remove self from the list:
+        r_project_names.remove(project_name)
 
         # SDK_DIRS from toolchain are managed inside the toolchain.cmake file
         # of the toolchain
 
-        for project_name in project_names:
+        for project_name in r_project_names:
             project = self.get_project(project_name)
             dirs.append(project.get_sdk_dir())
 
@@ -405,6 +426,19 @@ class Toc(WorkTree):
             self.envsetter.source_bat(bat_file)
 
 
+    def resolve_deps(self, runtime=False):
+        """ Return a tuple of three lists:
+        (projects, package, not_foud), see qibuild.dependencies_solver
+        for more documentation.
+
+        """
+        if not self.solve_deps:
+            return (self.active_projects, list(), list())
+        else:
+            dep_solver = DependenciesSolver(projects=self.projects,
+                                            packages=self.packages)
+            return dep_solver.solve(self.active_projects,
+                                    runtime=runtime)
 
     def configure_project(self, project, clean_first=True, quiet=True):
         """ Call cmake with correct options
@@ -433,7 +467,7 @@ class Toc(WorkTree):
             raise TocException(mess)
 
         # Generate the dependencies.cmake just in time:
-        qibuild.project.bootstrap_project(project, self)
+        qibuild.project.bootstrap_project(project, self, self.active_projects)
 
         # Set generator if necessary
         cmake_args = list()
@@ -566,6 +600,31 @@ class Toc(WorkTree):
                 env=build_env,
                 )
 
+def _projects_from_args(toc, args):
+    """
+    Cases handled:
+      - nothing specified: get the project from the cwd
+      - args.single: do not resolve dependencies
+      - args.all: return all projects
+    Returns a tuple (project_names, single):
+        project_names: the actual list for project
+        single: user specified --single
+    """
+    toc_p_names = [p.name for p in toc.projects]
+    if hasattr(args, "all") and args.all:
+        # Pretend the user has asked for all the known projects
+        LOGGER.debug("All projects have been selected")
+        return (toc_p_names, False)
+
+    if hasattr(args, "projects"):
+        if args.projects:
+            return ([args.projects, False])
+        else:
+            return ([project_from_cwd()], args.single)
+    else:
+        return (list(), False)
+
+
 def toc_open(work_tree, args=None):
     """ Open a toc work_tree.
 
@@ -615,12 +674,18 @@ def toc_open(work_tree, args=None):
             "please try from a valid work tree, specify an "
             "existing work tree with '--work-tree {path}', or "
             "create a new work tree with 'qibuild init'")
-    return Toc(work_tree,
+
+    toc = Toc(work_tree,
                config=config,
                build_type=build_type,
                cmake_flags=cmake_flags,
                cmake_generator=cmake_generator,
                path_hints=path_hints)
+
+    (active_projects, single) =  _projects_from_args(toc, args)
+    toc.active_projects = active_projects
+    toc.solve_deps = (not single)
+    return toc
 
 
 def create(directory):
@@ -630,39 +695,6 @@ def create(directory):
     qibuild.worktree.create(directory)
 
 
-def resolve_deps(toc, args, runtime=False):
-    """ To be called from commmand line. (args being the result
-    of parsing with a ArgumentParser object for instance)
-
-    Return a tuple of three lists:
-    (projects, package, not_foud), see qibuild.dependencies_solver
-    for more documentation.
-
-    Cases handled:
-      - nothing specified: get the project from the cwd
-      - args.single: do not resolve dependencies
-      - args.all: return all projects
-    """
-    if args.all:
-        # Pretend the user has asked for all the known projects
-        LOGGER.debug("All projects have been selected")
-        project_names = [p.name for p in toc.projects]
-    elif not len(args.projects):
-        try:
-            project_names = [project_from_cwd()]
-        except:
-            project_names = [p.name for p in toc.projects]
-    else:
-        project_names = args.projects
-
-    if args.single:
-        LOGGER.debug("Single project selected")
-        return (project_names, list(), list())
-
-    dep_solver = DependenciesSolver(projects=toc.projects,
-                                    packages=toc.packages)
-    return dep_solver.solve(project_names,
-                            runtime=runtime)
 
 def project_from_cwd():
     """Return a project name from the current working directory

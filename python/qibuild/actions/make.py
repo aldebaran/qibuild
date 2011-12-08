@@ -21,7 +21,7 @@ def do(args):
     logger   = logging.getLogger(__name__)
     toc      = qibuild.toc.toc_open(args.work_tree, args)
 
-    (project_names, package_names, not_found) = qibuild.toc.resolve_deps(toc, args)
+    (project_names, package_names, not_found) = toc.resolve_deps()
     use_incredibuild_str = toc.configstore.get("build.incredibuild",
         default="")
 

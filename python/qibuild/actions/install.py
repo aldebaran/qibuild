@@ -30,7 +30,7 @@ def do(args):
     """Main entry point"""
     toc      = qibuild.toc_open(args.work_tree, args)
 
-    (project_names, package_names, _) = qibuild.toc.resolve_deps(toc, args, runtime=args.runtime)
+    (project_names, package_names, _) = toc.resolve_deps(runtime=args.runtime)
 
     # Why do we call cmake here?
 

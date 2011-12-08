@@ -32,7 +32,7 @@ def do(args):
     logger   = logging.getLogger(__name__)
     toc      = qibuild.toc_open(args.work_tree, args)
 
-    (project_names, _, _) = qibuild.toc.resolve_deps(toc, args)
+    (project_names, _, _) = toc.resolve_deps()
 
     projects = [toc.get_project(name) for name in project_names]
     if args.build_directory:
