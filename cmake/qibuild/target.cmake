@@ -292,7 +292,9 @@ function(qi_create_lib name)
   )
 
   #make install rules
-  qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
+  if (NOT ${ARG_NO_INSTALL})
+    qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
+  endif()
 
   if(APPLE)
     set_target_properties("${name}"
