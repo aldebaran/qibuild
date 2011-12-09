@@ -6,8 +6,6 @@ CMake:
   messages properly)
 
 * fix linker problems when using toolchain and third party libraries on mac
-* modules: decide weither clean/fpath/flib/depends/export_* is part of
-  the public qiBuild API (rename to qi_fpath, qi_flib, qi_fdepends ?)
 * export lib does not fail when REQUIRED is set
 
 qiBuild:
@@ -15,26 +13,12 @@ qiBuild:
 * fix install component (only have two components: runtime and devel)
 
 qiSrc:
-* Git: when trying to get the url, use:
-  git remote for remote names, and if there is only one,
-  git config --get remote.NAME.
-  This cover 99% of the cases.
-  If there are several remotes, do not do anything.
-  Do not check anything before calling qirsrc pull, it's much better
-  to have the pure git error messages.
 
 * qisrc add should be able to read a base git url. For instance,
   qisrc add foo/bar.git, should read a setting and clone git://example.com:foo/bar.git
 
-* qisrc pull should call 'qisrc fetch' first
-
 
 DOC:
- * fix tutorials on using toolchain
- * cmake: document +_INCLUDE_DIRS+, +_LIBS+, ....
- * use cmake to generate documentation !
- * How to use a lib not wrapped in qiBuild (opengl for example)
- * How to use a qiBuild project from a standard cmake project
  * Add a troubleshooting section and/or a FAQ
 
 Install:
@@ -44,11 +28,4 @@ Install:
 
 Compat:
   * Improve compatibility with rosbuild
-
-To help automatic testing:
-  * Use an alternate logger when sys.stdout is not a tty?
-  * In qibuild.command:
-    - Log STDERR and STDOUT in a ring buffer while the process is running
-    - Log (not print!) the last lines of the buffer if the process had a non-zero retcode.
-    - Do not log anything if the process suceed.
 
