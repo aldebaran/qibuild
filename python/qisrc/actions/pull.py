@@ -126,9 +126,14 @@ def do(args):
     toc_configstore.read(toc_cfg)
     manifest_url = toc_configstore.get("manifest.url")
     if manifest_url:
-        qibuild.run_action("qisrc.actions.fetch",
-            args=[manifest_url],
-            forward_args=args)
+        try:
+            qibuild.run_action("qisrc.actions.fetch",
+                args=[manifest_url],
+                forward_args=args)
+        except Exception, e:
+            mess  = "Could not run qisrc fetch\n"
+            mess += "Error was: %s\n" % e
+            LOGGER.warning(mess)
 
     project_names = resolv_git_deps(toc, qiwt, args)
 
