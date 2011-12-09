@@ -81,7 +81,7 @@ function(qi_create_gtest name)
 
   # First, create the target
   qi_create_bin(${name} SRC ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS} NO_INSTALL)
-  qi_use_lib(${name} ${ARG_DEPENDS})
+  qi_use_lib(${name} GTEST ${ARG_DEPENDS})
 
   # Build a correct xml output name
   set(_xml_output "${_TESTS_RESULTS_FOLDER}/${name}.xml")
