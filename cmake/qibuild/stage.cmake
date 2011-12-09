@@ -152,7 +152,13 @@ endfunction()
 #
 #
 function(qi_use_lib name)
+  if(QI_${name}_TARGET_DISABLED)
+    qi_warning("When calling qi_use_lib(${name})
 
+    This target is disabled, ignoring this call
+    ")
+    return()
+  endif()
   if(NOT TARGET "${name}")
     qi_error("When calling qi_use_lib(${name})
     No such target: ${name}
