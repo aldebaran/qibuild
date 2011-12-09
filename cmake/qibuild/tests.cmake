@@ -53,6 +53,24 @@ endfunction()
 # \group:DEPENDS Dependencies to pass to use_lib
 # \group:ARGUMENTS Arguments to pass to add_test (to your test program)
 function(qi_create_gtest name)
+  if(NOT DEFINED GTEST_PACKAGE_FOUND)
+    find_package(GTEST)
+    if(NOT GTEST)
+      qi_set_global(GTEST_PACKAGE_FOUND FALSE)
+    endif()
+  endif()
+
+  if(NOT GTEST_PACKAGE_FOUND)
+    if(NOT QI_CREATE_GTEST_WARNED)
+      qi_info("GTest was not found:
+      qi_create_gtest will create no target
+      ")
+      qi_set_global(QI_CREATE_GTEST_WARNED TRUE)
+    endif()
+    qi_set_global(QI_${name}_TARGET_DISABLED TRUE)
+    return()
+  endif()
+
   if (DEFINED BUILD_TESTS AND NOT BUILD_TESTS)
     qi_debug("Test(${name}) disabled by BUILD_TESTS=OFF")
     return()
