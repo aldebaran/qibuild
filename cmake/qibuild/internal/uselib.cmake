@@ -109,7 +109,6 @@ endfunction()
 # \argn: dependencies, like the DEPENDS group, argn and DEPENDS will be merged
 # \group:DEPENDS The list of dependencies
 function(_qi_use_lib_internal name)
-  _qi_check_is_target("${name}")
   cmake_parse_arguments(ARG "" "" "DEPENDS" ${ARGN})
 
   set(ARG_DEPENDS ${ARG_UNPARSED_ARGUMENTS} ${ARG_DEPENDS})

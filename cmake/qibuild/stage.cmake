@@ -28,7 +28,14 @@ include(qibuild/internal/uselib)
 #                 set PATH_SUFFIXES to 'foo'. Be careful to test the
 #                 intall rules of your headers if you choose to do so.
 function(qi_stage_lib target)
-  _qi_check_is_target("${target}")
+  if(NOT TARGET "${target}")
+    qi_error("When calling qi_stage_lib(${target})
+    No such target.
+
+    Please make sure the target exists, and that qi_stage_lib
+    is called *after* qi_create_lib and qi_use_lib
+    ")
+  endif()
   _qi_internal_stage_lib(${target} ${ARGN})
 endfunction()
 
@@ -146,6 +153,13 @@ endfunction()
 #
 function(qi_use_lib name)
 
+  if(NOT TARGET "${name}")
+    qi_error("When calling qi_use_lib(${name})
+    No such target: ${name}
+    Make sure you call qi_use_lib after qi_create_bin or
+    qi_create_lib
+    ")
+    return()
+  endif()
   _qi_use_lib_internal(${name} ${ARGN})
-
 endfunction()

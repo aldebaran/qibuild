@@ -43,7 +43,6 @@ set(QI_TEMPLATE_DIR ${_ROOT_DIR}/templates)
 
 include("qibuild/subdirectory")
 include("qibuild/internal/layout")
-include("qibuild/internal/check")
 include("qibuild/internal/install")
 include("qibuild/internal/glob")
 include("qibuild/internal/autostrap")
