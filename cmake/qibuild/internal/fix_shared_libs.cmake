@@ -6,7 +6,7 @@
 # This function needs to run only once, but *after* every target
 # has been built.
 function(_qi_fix_shared_libs)
-  if(DEFINED _QI_SHARED_LIBS_FIXED)
+  if(EXISTS "${CMAKE_SOURCE_DIR}/shared_libs_fixed")
     return()
   endif()
 
@@ -87,6 +87,6 @@ function(_qi_fix_shared_libs)
     file(COPY ${_dlls} DESTINATION "${_dest}")
   endif()
 
-  qi_set_global(_QI_SHARED_LIBS_FIXED)
+  file(WRITE "${CMAKE_SOURCE_DIR}/shared_libs_fixed" "")
 
 endfunction()
