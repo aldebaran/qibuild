@@ -26,14 +26,16 @@ set(_QI_TARGET_CMAKE_ TRUE)
 include(CMakeParseArguments)
 
 function(_qi_post_copy_deps name)
+  # Get qibuild cmake module path:
+  include(qibuild/general RESULT_VARIABLE _qibuild_general_path)
+  get_filename_component(_qibuild_cmake_module_path ${_qibuild_general_path} PATH)
+  set(_qibuild_cmake_module_path "${_qibuild_cmake_module_path}/..")
   configure_file(${QI_ROOT_DIR}/templates/post-copy-deps.cmake
                  ${CMAKE_BINARY_DIR}/post-copy-deps.cmake
-                 COPYONLY)
-
+                 @ONLY)
   add_custom_command(TARGET ${name} POST_BUILD
     COMMAND
       ${CMAKE_COMMAND}
-      -D "QIBUILD_CMAKE=${CMAKE_SOURCE_DIR}/qibuild.cmake"
       -P ${CMAKE_BINARY_DIR}/post-copy-deps.cmake
       ${CMAKE_BINARY_DIR}
   )
