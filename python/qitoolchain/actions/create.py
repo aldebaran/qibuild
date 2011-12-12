@@ -29,7 +29,8 @@ def configure_parser(parser):
     parser.add_argument("--cmake-generator",
         help="CMake generator to use when using this toolchain",
         choices=qibuild.KNOWN_CMAKE_GENERATORS)
-
+    parser.add_argument("--dry-run", action="store_true",
+        help="Print what would be done")
 
 def do(args):
     """Main entry point
@@ -37,6 +38,7 @@ def do(args):
     """
     feed = args.feed
     tc_name = args.name
+    dry_run = args.dry_run
 
     # Validate the name: must be a valid filename:
     bad_chars = r'<>:"/\|?*'
@@ -75,7 +77,7 @@ def do(args):
 
     toolchain = qitoolchain.Toolchain(tc_name)
     if feed:
-        toolchain.parse_feed(feed)
+        toolchain.parse_feed(feed, dry_run=dry_run)
 
     if args.cmake_generator:
         toc.update_config("cmake.generator", args.cmake_generator, tc_name)

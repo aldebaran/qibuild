@@ -4,6 +4,7 @@
 
 
 import os
+import sys
 import logging
 import hashlib
 from xml.etree import ElementTree
@@ -196,7 +197,7 @@ class ToolchainFeedParser:
                 self.parse(feed_url)
 
 
-def parse_feed(toolchain, feed):
+def parse_feed(toolchain, feed, dry_run=False):
     """ Helper for toolchain.parse_feed
 
     """
@@ -207,13 +208,41 @@ def parse_feed(toolchain, feed):
     parser = ToolchainFeedParser()
     parser.parse(feed)
     package_trees = parser.packages
+    errors = list()
     for package_tree in package_trees:
         package = qitoolchain.Package(None, None)
-        handle_package(package, package_tree, toolchain)
+        if dry_run:
+            package_name = package_tree.get("name")
+            package_url  = package_tree.get("url")
+            # Check that url can be opened
+            fp = None
+            try:
+                fp = qitoolchain.remote.open_remote_location(package_url)
+            except Exception, e:
+                error = "Could not add %s from %s\n" % (package_name, package_url)
+                error += "Error was: %s" % e
+                errors.append(error)
+                continue
+            finally:
+                if fp:
+                    fp.close()
+            if package_url:
+                print "Would add ", package_name, "from", package_url
+            continue
+        else:
+            handle_package(package, package_tree, toolchain)
         if package.path is None:
             mess  = "could guess package path from this configuration:\n"
             mess += ElementTree.tostring(package_tree)
             mess += "Please make sure you have at least an url or a directory\n"
             LOGGER.warning(mess)
             continue
-        toolchain.add_package(package)
+        if not dry_run:
+            toolchain.add_package(package)
+
+    if dry_run and errors:
+        print "Errors when parsing %s\n" % feed
+        for error in errors:
+            print error
+        sys.exit(2)
+

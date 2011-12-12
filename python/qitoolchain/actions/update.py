@@ -26,6 +26,8 @@ def configure_parser(parser):
              "If not given, the toolchain will be empty.\n"
              "May be a local file or an url",
         nargs="?")
+    parser.add_argument("--dry-run", action="store_true",
+        help="Print what would be done")
 
 def do(args):
     """Main entry point
@@ -33,6 +35,7 @@ def do(args):
     """
     feed = args.feed
     tc_name = args.name
+    dry_run = args.dry_run
 
     toc = None
     try:
@@ -63,4 +66,4 @@ def do(args):
             raise Exception(mess)
 
     toolchain = qitoolchain.Toolchain(tc_name)
-    toolchain.parse_feed(feed)
+    toolchain.parse_feed(feed, dry_run=dry_run)

@@ -312,13 +312,13 @@ class Toolchain:
         with open(self.toolchain_file, "w") as fp:
             lines = fp.writelines(lines)
 
-    def parse_feed(self, feed):
+    def parse_feed(self, feed, dry_run=False):
         """ Parse an xml feed,
         adding packages to self while doing so
 
         """
         # Delegate this to qitoolchain.feed module
-        qitoolchain.feed.parse_feed(self, feed)
+        qitoolchain.feed.parse_feed(self, feed, dry_run=dry_run)
 
         # Update configuration so we keep which was
         # the last used feed
