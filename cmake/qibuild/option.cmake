@@ -11,8 +11,19 @@
 #   # Create a WITH_FOO option if FOO_PACKAGE is found
 #   qi_add_optional_package(FOO)
 #
+#   # Add some foo-dependent sources when buidling bar library:
+#   set(bar_srcs
+#         bar_spam.cpp
+#         bar_eggs.cpp
+#   )
 #   if(WITH_FOO)
-#      ...
+#      list(APPEND bar_srcs bar_foo.cpp)
+#   endif()
+#
+#   qi_create_bin(bar ${bar_srcs})
+#   qi_use_lib(bar SPAM EGGS)
+#   if(WITH_FOO)
+#      qi_use_lib(bar FOO)
 #   endif()
 #
 # \arg:  NAME             Name of the package, a WITH_${NAME} option will be created
