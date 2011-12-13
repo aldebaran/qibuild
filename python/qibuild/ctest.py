@@ -6,23 +6,31 @@ Necessary to by-pass some small ctest shortcomings.
 import os
 import sys
 import re
+import errno
+import signal
 import shlex
 import logging
-import subprocess
-import time
-import threading
+from xml.etree import ElementTree
 
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
+def _str_from_signal(code):
+    """ Returns a nice string describing the signal
 
+    """
+    if code == signal.SIGSEGV:
+        return "Segmentation fault"
+    if code == signal.SIGABRT:
+        return "Aborted"
+    else:
+        return "%i" % code
 
 def run_test(build_dir, test_name, cmd, properties, build_env):
     """ Run a test. Return
-    (res, output) where res is a boolean
-    stating if the test was sucessul, and
-    output is the output of the test
+    (res, output) where res is a string describing wether
+    the test was sucessul, and output is the output of the test
 
     """
 
@@ -42,22 +50,46 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
         name=test_name,
         cwd=build_dir,
         env=env)
+
     process_thread.start()
     process_thread.join(timeout)
     process = process_thread.process
+    if not process:
+        exception = process_thread.exception
+        mess  = "Could not run test: %s\n" % test_name
+        mess += "Error was: %s\n" % exception
+        mess += "Full command was: %s\n" % " ".join(cmd)
+        if isinstance(exception, OSError):
+            if exception.errno == errno.ENOENT:
+                mess += "Are you sure you have built the tests?"
+        raise Exception(mess)
     out = process_thread.out
     if process_thread.isAlive():
         process.terminate()
-        return (False, out + "\n*** Timed out (%i s)\n" % timeout)
+        return (False,
+            "%s\n*** Timed out (%i s)\n" % (out, timeout))
     else:
-        return (process.returncode == 0, out)
+        retcode = process.returncode
+        if retcode == 0:
+            return(True, out)
+        else:
+            if retcode > 0:
+                return(False,
+                    "%s\n*** Return code: %i\n" % (out, retcode))
+            else:
+                desc = _str_from_signal(-retcode)
+                return(False,
+                    "%s\n*** %s\n" % (out, desc))
 
 
-def run_tests(build_dir, build_env):
+def run_tests(project, build_env):
     """ Called by toc.test_project
 
     Returns True if all test passed
     """
+    build_dir = project.build_directory
+    results_dir = os.path.join(project.directory, "build-tests",
+        "results")
     tests = list()
     parse_ctest_test_files(tests, build_dir, list())
     res = True
@@ -72,8 +104,45 @@ def run_tests(build_dir, build_env):
             res = False
             sys.stdout.write("[FAIL]\n")
             print out
+        xml_out = os.path.join(results_dir, test_name + ".xml")
+        if not os.path.exists(xml_out):
+            write_xml(xml_out, test_name, ok, out)
     return res
 
+
+def write_xml(xml_out, test_name, ok, out):
+    """ Write a XUnit XML file
+
+    """
+    to_write = """<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="1" failures="{num_failures}" disabled="0" errors="0" time="0" name="All">
+    <testsuite name="{testsuite_name}" tests="1" failures="{num_failures}" disabled="0" errors="0" time="0">
+    <testcase name="{testcase_name}" status="run">
+      {failure}
+    </testcase>
+  </testsuite>
+</testsuites>
+"""
+    if ok:
+        num_failures="0"
+        failure = ""
+    else:
+        num_failures="1"
+        failure = """
+      <failure>
+          <![CDATA[ {out} ]]>
+    </failure>
+"""
+        failure = failure.format(out=out)
+    to_write = to_write.format(num_failures=num_failures,
+                               testsuite_name=test_name,
+                               testcase_name=test_name,
+                               failure=failure)
+    print xml_out
+    qibuild.sh.mkdir(os.path.dirname(xml_out), recursive=True)
+    print to_write
+    with open(xml_out, "w") as fp:
+        fp.write(to_write)
 
 def parse_ctest_test_files(tests, root, subdirs):
     """ Recursively parse CTestTestfile.cmake,

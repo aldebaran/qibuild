@@ -567,7 +567,7 @@ class Toc(WorkTree):
         if not os.path.exists(cmake_cache):
             _advise_using_configure(self, project)
         build_env = self.envsetter.get_build_env()
-        passed = qibuild.ctest.run_tests(build_dir, build_env)
+        passed = qibuild.ctest.run_tests(project, build_env)
         if not passed:
             raise TestsFailed(project)
 
