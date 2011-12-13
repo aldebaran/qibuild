@@ -45,16 +45,6 @@ from qibuild.command import CommandFailedException
 LOGGER = logging.getLogger("qibuild.toc")
 
 
-class BadBuildConfig(Exception):
-    """Custom exception"""
-    def __init__(self, message):
-        self._message = message
-
-    def __str__(self):
-        mess = self._message + "\n"
-        mess += "Please check qi configuration"
-        return mess
-
 class TocException(Exception):
     """Custom exception.
     Specific exceptions raised by toc are of this type,
@@ -289,7 +279,7 @@ class Toc(WorkTree):
  * No custom cmake file for config {active_config} found.
    (looked in {local_cmake})
 """
-                    raise Exception(mess.format(active_config=self.active_config,
+                    raise TocException(mess.format(active_config=self.active_config,
                         local_cmake = local_cmake,
                         tc_names = qitoolchain.get_tc_names()))
 
