@@ -93,13 +93,19 @@ class ProcessThread(threading.Thread):
         self.env = env
         self.out = ""
         self.process = None
+        self.exception = ""
 
     def run(self):
-        self.process = subprocess.Popen(self.cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            cwd=self.cwd,
-            env=self.env)
+        try:
+            self.process = subprocess.Popen(self.cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                cwd=self.cwd,
+                env=self.env)
+        except Exception, e:
+            self.exception = e
+            return
+
         while self.process.poll() is None:
             self.out += self.process.stdout.readline()
 
