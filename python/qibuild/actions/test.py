@@ -26,9 +26,7 @@
 """ Launch automatic tests
 """
 
-import os
 import logging
-import qibuild
 import qibuild
 
 def configure_parser(parser):
