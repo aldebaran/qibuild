@@ -26,3 +26,4 @@
 """ This package contains the qisrc actions """
 
 from qisrc import git
+from qisrc.manifest import parse_manifest

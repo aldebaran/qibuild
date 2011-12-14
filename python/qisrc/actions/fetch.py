@@ -25,10 +25,18 @@
 
 """ Read a list of projects to clone from a manifest URL
 
-The url should point to a file looking like
+The url should point to a xml file looking like
 
-[project "foo"]
-url = git://foo.com/foo.git
+<manifest>
+    <project
+        name="foo"
+        url="git://foo.com/foo.git"
+    />
+    <manifest
+        url = "http://example.org/an_other_manifest.xml"
+    />
+<manifest>
+
 
 
 """
@@ -37,6 +45,7 @@ import os
 import urllib
 import logging
 
+import qisrc
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
@@ -73,27 +82,14 @@ url = ftp://example.com/foo.manifest
 """
             raise Exception(mess)
 
-    config = qibuild.configstore.ConfigStore()
-    with qibuild.sh.TempDir() as tmp:
-        manifest = os.path.join(tmp, "manifest")
-        urllib.urlretrieve(manifest_url, manifest)
-        config.read(manifest)
-
-    projects = config.get("project", default=None)
-    if not projects:
-        raise Exception("Not project found in url %s" % args.url)
-
     qiwt = qibuild.worktree_open(args.work_tree)
 
-    for (project_name, project_conf) in config.get("project").iteritems():
-        project_url = config.get("project.%s.url" % project_name)
-        if project_name in qiwt.buildable_projects.keys():
+    projects = qisrc.parse_manifest(manifest_url)
+    for (project_name, project_url) in projects.iteritems():
+        if project_name in qiwt.git_projects.keys():
             LOGGER.info("Found %s, skipping", project_name)
         else:
-            try:
-                qibuild.run_action("qisrc.actions.add", [project_url, project_name])
-            except qibuild.worktree.ProjectAlreadyExists:
-                pass
+            qibuild.run_action("qisrc.actions.add", [project_url, project_name])
 
     # Everything went fine, store the manifest URL for later use:
     qibuild.configstore.update_config(toc_cfg, "manifest", "url", manifest_url)
