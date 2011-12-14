@@ -97,7 +97,7 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
     process_thread.join(timeout)
     end = datetime.datetime.now()
     delta = end - start
-    res.time = delta.total_seconds()
+    res.time = float(delta.microseconds) / 10**6 + delta.seconds
 
     process = process_thread.process
     if not process:
