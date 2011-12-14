@@ -45,6 +45,27 @@ if(MSVC_IDE)
   cmake_minimum_required(VERSION 2.8.3)
 endif()
 
+# Sanitize compiler options to help cross-platform
+# compatibility:
+
+if(MSVC)
+  if(MSVC10)
+    # Avoid GTEST using its own tuple, when we have a real tuple
+    add_definitions(" -DGTEST_USE_OWN_TR1_TUPLE=0 ")
+  endif()
+  # Fix annoying windows.h quirks:
+  add_definitions(" -DNOMINMAX ")
+  add_definitions(" -D_CRT_SECURE_NO_DEPRECATE ")
+endif()
+
+if(UNIX)
+  # on gcc no return statement in function returning non-void,
+  # does not cause any error or warning, but on cl.exe it won't
+  # compile, so at least emit a warning:
+  add_definitions(" -Wreturn-type ")
+endif()
+
+
 #get the current directory of the file
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 
