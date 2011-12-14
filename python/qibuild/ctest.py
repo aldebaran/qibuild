@@ -142,6 +142,12 @@ def run_tests(project, build_env):
         "results")
     tests = list()
     parse_ctest_test_files(tests, build_dir, list())
+    if not tests:
+        # Create a fake test result to keep CI jobs happy:
+        fake_test_res = TestResult("compilation")
+        fake_test_res.ok = True
+        xml_out = os.path.join(results_dir, "compilation.xml")
+        write_xml(xml_out, fake_test_res)
     ok = True
     fail_tests = list()
     for (i, test) in enumerate(tests):
@@ -207,6 +213,8 @@ def parse_ctest_test_files(tests, root, subdirs):
 
     """
     ctest_test_file = os.path.join(root, "CTestTestfile.cmake")
+    if not os.path.exists(ctest_test_file):
+        return list()
     with open(ctest_test_file, "r") as fp:
         lines = fp.readlines()
     cur_test = None
