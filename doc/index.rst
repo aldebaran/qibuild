@@ -79,7 +79,13 @@ Configuration syntax
 Contributing to qiBuild
 ------------------------
 
-Read this if you want to contribute to qiBuild
+qiBuild development process take place on github:
+https://github.com/aldebaran/qibuild
+
+Please fork the project on github and make a merge request
+if you want to contribute.
+
+Please also read this first:
 
 .. toctree::
    :maxdepth: 1

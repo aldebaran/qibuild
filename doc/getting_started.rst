@@ -20,6 +20,8 @@ On windows, to use scripts written in Python, you have to put ``C:\Python2.x`` a
 Installation
 ------------
 
+Get the source code from github: https://github.com/aldebaran/qibuild
+
 Linux, mac
 ++++++++++
 
