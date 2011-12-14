@@ -1,0 +1,8 @@
+## Copyright (C) 2011 Aldebaran Robotics
+
+clean(QTMOBILITY_SERVICEFRAMEWORK)
+fpath(QTMOBILITY_SERVICEFRAMEWORK qservicemanager.h PATH_SUFFIXES QtServiceFramework)
+fpath(QTMOBILITY_SERVICEFRAMEWORK QServiceManager PATH_SUFFIXES QtServiceFramework)
+fpath(QTMOBILITY_SERVICEFRAMEWORK qmobilityglobal.h PATH_SUFFIXES QtMobility)
+flib(QTMOBILITY_SERVICEFRAMEWORK QtServiceFramework)
+export_lib(QTMOBILITY_SERVICEFRAMEWORK)
