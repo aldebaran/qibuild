@@ -6,11 +6,11 @@ Necessary to by-pass some small ctest shortcomings.
 import os
 import sys
 import re
+import datetime
 import errno
 import signal
 import shlex
 import logging
-from xml.etree import ElementTree
 
 import qibuild
 
@@ -26,6 +26,21 @@ def _str_from_signal(code):
         return "Aborted"
     else:
         return "%i" % code
+
+
+class TestResult:
+    """ Just a small class to store the results for a test
+
+    """
+    def __init__(self, test_name):
+        self.test_name = test_name
+        self.time = 0
+        self.ok   = False
+        # Output of the executable of the test
+        self.out = ""
+        # Short description of what went wrong
+        self.message = ""
+
 
 def run_test(build_dir, test_name, cmd, properties, build_env):
     """ Run a test. Return
@@ -51,8 +66,14 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
         cwd=build_dir,
         env=env)
 
+    res = TestResult(test_name)
+    start = datetime.datetime.now()
     process_thread.start()
     process_thread.join(timeout)
+    end = datetime.datetime.now()
+    delta = end - start
+    res.time = delta.total_seconds()
+
     process = process_thread.process
     if not process:
         exception = process_thread.exception
@@ -63,23 +84,22 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
             if exception.errno == errno.ENOENT:
                 mess += "Are you sure you have built the tests?"
         raise Exception(mess)
-    out = process_thread.out
+    res.out = process_thread.out
     if process_thread.isAlive():
         process.terminate()
-        return (False,
-            "%s\n*** Timed out (%i s)\n" % (out, timeout))
+        res.ok = False
+        res.message =  "Timed out (%i s)" % timeout
     else:
         retcode = process.returncode
         if retcode == 0:
-            return(True, out)
+            res.ok = True
         else:
+            res.ok = False
             if retcode > 0:
-                return(False,
-                    "%s\n*** Return code: %i\n" % (out, retcode))
+                res.message = "Return code: %i" % retcode
             else:
-                desc = _str_from_signal(-retcode)
-                return(False,
-                    "%s\n*** %s\n" % (out, desc))
+                res.message = _str_from_signal(-retcode)
+    return res
 
 
 def run_tests(project, build_env):
@@ -97,47 +117,49 @@ def run_tests(project, build_env):
         (test_name, cmd, properties) = test
         sys.stdout.write("Running %i/%i %s ... " % (i+1, len(tests), test_name))
         sys.stdout.flush()
-        (ok, out) = run_test(build_dir, test_name, cmd, properties, build_env)
-        if ok:
+        test_res = run_test(build_dir, test_name, cmd, properties, build_env)
+        if test_res.ok:
             sys.stdout.write("[OK]\n")
         else:
             res = False
             sys.stdout.write("[FAIL]\n")
-            print out
+            print test_res.out
         xml_out = os.path.join(results_dir, test_name + ".xml")
         if not os.path.exists(xml_out):
-            write_xml(xml_out, test_name, ok, out)
+            write_xml(xml_out, test_res)
     return res
 
 
-def write_xml(xml_out, test_name, ok, out):
+def write_xml(xml_out, test_res):
     """ Write a XUnit XML file
 
     """
     to_write = """<?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="1" failures="{num_failures}" disabled="0" errors="0" time="0" name="All">
-    <testsuite name="{testsuite_name}" tests="1" failures="{num_failures}" disabled="0" errors="0" time="0">
+<testsuites tests="1" failures="{num_failures}" disabled="0" errors="0" time="{time}" name="All">
+    <testsuite name="{testsuite_name}" tests="1" failures="{num_failures}" disabled="0" errors="0" time="{time}">
     <testcase name="{testcase_name}" status="run">
       {failure}
     </testcase>
   </testsuite>
 </testsuites>
 """
-    if ok:
+    if test_res.ok:
         num_failures="0"
         failure = ""
     else:
         num_failures="1"
         failure = """
-      <failure>
+      <failure message="{message}">
           <![CDATA[ {out} ]]>
     </failure>
 """
-        failure = failure.format(out=out)
+        failure = failure.format(out=test_res.out,
+            message=test_res.message)
     to_write = to_write.format(num_failures=num_failures,
-                               testsuite_name=test_name,
-                               testcase_name=test_name,
-                               failure=failure)
+                               testsuite_name=test_res.test_name,
+                               testcase_name=test_res.test_name,
+                               failure=failure,
+                               time=test_res.time)
     qibuild.sh.mkdir(os.path.dirname(xml_out), recursive=True)
     with open(xml_out, "w") as fp:
         fp.write(to_write)
