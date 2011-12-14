@@ -130,14 +130,20 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
 def run_tests(project, build_env):
     """ Called by toc.test_project
 
-    Returns True if all test passed
+    Returns (ok, summary) where ok is True if all
+    test passed, and summary is a nice summary of what happened:
+
+    ran 10 tests, 2 failures:
+        * test_foo
+        * test_bar
     """
     build_dir = project.build_directory
     results_dir = os.path.join(project.directory, "build-tests",
         "results")
     tests = list()
     parse_ctest_test_files(tests, build_dir, list())
-    res = True
+    ok = True
+    fail_tests = list()
     for (i, test) in enumerate(tests):
         (test_name, cmd, properties) = test
         sys.stdout.write("Running %i/%i %s ... " % (i+1, len(tests), test_name))
@@ -146,13 +152,18 @@ def run_tests(project, build_env):
         if test_res.ok:
             sys.stdout.write("[OK]\n")
         else:
-            res = False
+            ok = False
             sys.stdout.write("[FAIL]\n")
             print test_res.out
+            fail_tests.append(test_name)
         xml_out = os.path.join(results_dir, test_name + ".xml")
         if not os.path.exists(xml_out):
             write_xml(xml_out, test_res)
-    return res
+    summary  = "Ran %i tests, %i failures\n" % (len(tests), len(fail_tests))
+    for fail_test in fail_tests:
+        summary += "  * %s\n" % fail_test
+
+    return (ok, summary)
 
 
 def write_xml(xml_out, test_res):

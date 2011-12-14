@@ -69,10 +69,13 @@ class BuildFailed(Exception):
         return "Error occured when building project %s" % self.project.name
 
 class TestsFailed(Exception):
-    def __init__(self, project):
+    def __init__(self, project, summary):
         self.project = project
+        self.summary = summary
     def __str__(self):
-        return "Error occured when testing project %s" % self.project.name
+        res  = "Error occured when testing project %s\n" % self.project.name
+        res += self.summary
+        return res
 
 class InstallFailed(Exception):
     def __init__(self, project):
@@ -567,9 +570,11 @@ class Toc(WorkTree):
         if not os.path.exists(cmake_cache):
             _advise_using_configure(self, project)
         build_env = self.envsetter.get_build_env()
-        passed = qibuild.ctest.run_tests(project, build_env)
-        if not passed:
-            raise TestsFailed(project)
+        (res, summary) = qibuild.ctest.run_tests(project, build_env)
+        if res:
+            LOGGER.info(summary)
+        else:
+            raise TestsFailed(project, summary)
 
 
     def install_project(self, project, destdir, runtime=False):
