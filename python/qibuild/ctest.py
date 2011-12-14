@@ -138,9 +138,7 @@ def write_xml(xml_out, test_name, ok, out):
                                testsuite_name=test_name,
                                testcase_name=test_name,
                                failure=failure)
-    print xml_out
     qibuild.sh.mkdir(os.path.dirname(xml_out), recursive=True)
-    print to_write
     with open(xml_out, "w") as fp:
         fp.write(to_write)
 
