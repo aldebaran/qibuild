@@ -11,11 +11,11 @@ Mailing list:
 qibuild-dev@aldebaran-robotics.com
 
 Documentation:
-http://developer.aldebaran-robotics.com/resources/projects/146/public/index.html
+http://developer.aldebaran-robotics.com/doc/qibuild/index.html
 
 Installation:
   Linux, Mac:
-  * sudo ./install-qibuild.sh
+  * ./install-qibuild.sh
 
   Windows:
   * Make sure c:\Python27 and c:\Python27\scripts are in %PATH%
