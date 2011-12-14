@@ -4,141 +4,141 @@ qiBuild in five minutes
 =======================
 
 
-Create a worktree:
+* Create a worktree:
 
-.. code-block:: console
+  .. code-block:: console
 
-   $ cd ~/src
-   $ qibuild init
+     $ cd ~/src
+     $ qibuild init
 
 
 * Create a ``world`` library in the ``world``
   project, in ``src/world``
 
-.. code-block:: console
+  .. code-block:: console
 
-   $ cd ~/src/world
-   $ $EDITOR CMakeLists.txt
+     $ cd ~/src/world
+     $ $EDITOR CMakeLists.txt
 
-.. code-block:: cmake
+  .. code-block:: cmake
 
-    cmake_minimum_required(VERSION 2.8)
-    project(world)
-    include("qibuild.cmake")
+      cmake_minimum_required(VERSION 2.8)
+      project(world)
+      include("qibuild.cmake")
 
-    qi_create_lib(world world/world.hpp world/world.cpp)
-    qi_stage_lib(world)
+      qi_create_lib(world world/world.hpp world/world.cpp)
+      qi_stage_lib(world)
 
 * Make world depend on ``ode``
 
-.. code-block:: console
+  .. code-block:: console
 
-    $ $EDITOR qibuid/modules/ode-config.cmake
+      $ $EDITOR qibuid/modules/ode-config.cmake
 
-.. code-block:: cmake
+  .. code-block:: cmake
 
-   clean(ODE)
-   fpath(ODE ode/ode.h)
-   flib(ODE ode)
-   export_lib(ODE)
+     clean(ODE)
+     fpath(ODE ode/ode.h)
+     flib(ODE ode)
+     export_lib(ODE)
 
-.. code-block:: console
+  .. code-block:: console
 
-   $ $EDITOR CMakeLists.txt
+     $ $EDITOR CMakeLists.txt
 
-.. code-block:: cmake
+  .. code-block:: cmake
 
-   qi_use_lib(world ODE)
+     qi_use_lib(world ODE)
 
 
 * Create a ``hello`` executable in the ``hello`` project, in
   ``src/hello``, using the ``world`` library:
 
-.. code-block:: console
+  .. code-block:: console
 
-   $ cd ~/src/hello
-   $ $EDITOR qibuild.manifest
-
-
-.. code-block:: ini
-
-   [project hello]
-   depends = world
-
-.. code-block:: console
-
-   $ $EDITOR CMakeLists.txt
+     $ cd ~/src/hello
+     $ $EDITOR qibuild.manifest
 
 
-.. code-block:: cmake
+  .. code-block:: ini
 
-    cmake_minimum_required(VERSION 2.8)
-    project(hello)
-    include("qibuild.cmake")
+     [project hello]
+     depends = world
 
-    qi_create_bin(hello main.cpp)
+  .. code-block:: console
 
-.. code-block:: console
+     $ $EDITOR CMakeLists.txt
 
-   $ cd ~/src
-   $ qibuild configure hello
 
-   Call cmake on world, then hello
+  .. code-block:: cmake
 
-   $ qibuild make hello
+      cmake_minimum_required(VERSION 2.8)
+      project(hello)
+      include("qibuild.cmake")
 
-   Build world, then hello, automagically
-   linking `src/hello/build/sdk/bin/hello` with
-   `src/world/build/sdk/lib/libworld.so`
+      qi_create_bin(hello main.cpp)
+
+  .. code-block:: console
+
+     $ cd ~/src
+     $ qibuild configure hello
+
+     Call cmake on world, then hello
+
+     $ qibuild make hello
+
+     Build world, then hello, automagically
+     linking `src/hello/build/sdk/bin/hello` with
+     `src/world/build/sdk/lib/libworld.so`
 
 
 * Distribute the world project to the world, step 1:
   Add install rules for world header
 
-.. code-block:: console
+  .. code-block:: console
 
-   $ cd ~/src/world/
-   $ $EDITOR CMakeLists.txt
+     $ cd ~/src/world/
+     $ $EDITOR CMakeLists.txt
 
-.. code-block:: cmake
+  .. code-block:: cmake
 
-   qi_install_header(world/world.hpp SUBFOLDER world)
+     qi_install_header(world/world.hpp SUBFOLDER world)
 
 * Distribute the world project to the world, step 2:
   Generate world package in ``~/src/packages/world.tar.gz``
   using cmake install rules.
 
-.. code-block:: console
+  .. code-block:: console
 
-   $ qibuild package world
+     $ qibuild package world
 
 
 * Distribute the world project to the world, step 3:
   Upload the package along with a feed description:
 
-.. code-block:: xml
+  .. code-block:: xml
 
-   <toolchain>
-     <package
-      name="world"
-      url="htpp://example.com/world.tar.gz"
-     />
-    </toolchain>
+     <toolchain>
+       <package
+        name="world"
+        url="htpp://example.com/world.tar.gz"
+       />
+      </toolchain>
 
 * Use the world package from an other machine:
 
-.. code-block:: console
+  .. code-block:: console
 
-   $ qitoolchain create $NAME htpp://example.com/feed.xml
+     $ qitoolchain create $NAME htpp://example.com/feed.xml
 
-   Add package from htpp://example.com/world.tar.gz to
-   a toolchain named $NAME
+     Add package from htpp://example.com/world.tar.gz to
+     a toolchain named $NAME
 
-   $ qisrc add git@git.example.com/hello.git
+     $ qisrc add git@git.example.com/hello.git
 
-   Get hello sources from a git repository
+     Get hello sources from a git repository
 
-   $ qibuild configure -c $NAME hello
+     $ qibuild configure -c $NAME hello
 
-   No need for world sources, using pre-compiled library
-   from the world package
+     No need for world sources, using pre-compiled library
+     from the world package
