@@ -5,6 +5,7 @@ qibuild modules
    :maxdepth: 1
 
    configstore
+   dependencies_solver
    worktree
    toc
 

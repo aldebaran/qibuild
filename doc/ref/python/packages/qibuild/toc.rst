@@ -10,7 +10,7 @@ qibuid.toc.Toc
 
 .. py:class:: Toc(work_tree[ , path_hints=None, config=None, build_type="debug", cmake_flags=None, cmake_generator=None)
 
-    This class inherits from :py:class:`qibuild.qiworktree.WorkTree`,
+    This class inherits from :py:class:`qibuild.worktree.WorkTree`,
     so it has a list of projects.
 
     It contains "high-level" functions.
@@ -47,6 +47,32 @@ qibuid.toc.Toc
        :py:meth:`Toc.configure_project`, and
        ``self.toolchain.packages`` can be used to install contents
        of binary packages when calling :py:meth:`Toc.install_project`
+
+
+    .. py:method:: resolve_deps([runtime=False])
+
+        Return a tuple of three lists:
+        (projects, package, not_foud), see :py:mod:`qibuild.dependencies_solver`
+        for more information.
+
+        Note that the result depends on how the Toc object has been built.
+
+        For instance, assuming you have 'hello' depending on 'world', and
+        'world' is also a package, you will get:
+
+        (['hello'], ['world'], [])  if user used
+
+        .. code-block:: console
+
+           $ qibuild configure hello
+
+        but:
+
+        (['world', 'hello], [], []) if user used:
+
+        .. code-block:: console
+
+           $ qibuild configure world hello
 
 
 
@@ -136,21 +162,6 @@ qibuild.toc.toc_open
    You should always use this function to call Toc methods from
    a qibuild :term:`action`.
 
-qibuild.toc.resolve_deps
-++++++++++++++++++++++++
-
-
-.. py:function:: resolve_deps(toc, args, [runtime=False])
-
-    To be called from a qibuild :term:`action`.  (args being the result
-    of parsing with a ArgumentParser object for instance)
-
-    Return a tuple of three lists:
-    (projects, package, not_foud), see qibuild.dependencies_solver
-    for more documentation.
-
-    Cases handled:
-      - nothing specified: get the project from the cwd
-      - args.single: do not resolve dependencies
-      - args.all: return all projects
+   It takes care of all the options you specify from command line,
+   and calls Toc constructor accordingly
 
