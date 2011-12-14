@@ -73,6 +73,7 @@ Configuration syntax
 * :ref:`qibuild-cfg-syntax`
 * :ref:`qibuild-manifest-syntax`
 * :ref:`toolchain-feed-syntax`
+* :ref:`qisrc-manifest-syntax`
 
 
 
