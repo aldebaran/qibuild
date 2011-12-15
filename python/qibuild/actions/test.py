@@ -34,6 +34,7 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     parser.add_argument("project", nargs="?")
+    parser.add_argument("--test-name")
 
 def do(args):
     """Main entry point"""
@@ -47,5 +48,5 @@ def do(args):
 
     project = toc.get_project(project_name)
     logger.info("Testing %s in %s", project.name, toc.build_folder_name)
-    toc.test_project(project)
+    toc.test_project(project, test_name=args.test_name)
 

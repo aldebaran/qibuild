@@ -561,8 +561,10 @@ class Toc(WorkTree):
         except CommandFailedException:
             raise BuildFailed(project)
 
-    def test_project(self, project):
-        """Run ctest on a project
+    def test_project(self, project, test_name=None):
+        """Run qibuild.ctest on a project
+
+        :param test_name: if given, only this test will run
 
         """
         build_dir = project.build_directory
@@ -570,7 +572,8 @@ class Toc(WorkTree):
         if not os.path.exists(cmake_cache):
             _advise_using_configure(self, project)
         build_env = self.envsetter.get_build_env()
-        (res, summary) = qibuild.ctest.run_tests(project, build_env)
+        (res, summary) = qibuild.ctest.run_tests(project, build_env,
+            test_name=test_name)
         if res:
             LOGGER.info(summary)
         else:

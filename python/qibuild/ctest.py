@@ -68,8 +68,9 @@ class TestResult:
 
 
 def run_test(build_dir, test_name, cmd, properties, build_env):
-    """ Run a test. Return
-    (res, output) where res is a string describing wether
+    """ Run a test.
+
+    Return (res, output) where res is a string describing wether
     the test was sucessul, and output is the output of the test
 
     """
@@ -127,7 +128,7 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
     return res
 
 
-def run_tests(project, build_env):
+def run_tests(project, build_env, test_name=None):
     """ Called by toc.test_project
 
     Returns (ok, summary) where ok is True if all
@@ -136,12 +137,23 @@ def run_tests(project, build_env):
     ran 10 tests, 2 failures:
         * test_foo
         * test_bar
+
+    :param test_name: If given, only run this test
     """
     build_dir = project.build_directory
     results_dir = os.path.join(project.directory, "build-tests",
         "results")
     tests = list()
     parse_ctest_test_files(tests, build_dir, list())
+    if test_name:
+        tests = [x for x in tests if x[0] == test_name]
+        if not tests:
+            mess  = "No such test: %s\n" % test_name
+            mess += "Known tests are:\n"
+            for x in tests:
+                mess += "  * " + x[0] + "\n"
+            raise Exception(mess)
+
     if not tests:
         # Create a fake test result to keep CI jobs happy:
         fake_test_res = TestResult("compilation")
