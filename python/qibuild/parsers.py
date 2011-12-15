@@ -67,30 +67,3 @@ def project_parser(parser):
     parser.add_argument("-s", "--single", action="store_true", help="Work on specified projects without taking dependencies into account.")
     parser.add_argument("projects", nargs="*", metavar="PROJECT", help="Project name(s)")
     parser.set_defaults(single=False, projects = list())
-
-
-def package_parser(parser):
-    """ Parser setting for every action making packages
-
-    """
-    group = parser.add_argument_group("package options")
-    group.add_argument("--version", help="Version of the package. "
-        "Default is read from the version.cmake file")
-    group.add_argument("--continuous", action="store_true",
-        help="Append the date at the end of the name "
-        "of the package")
-    group.add_argument("--runtime", action="store_true",
-        help="Install runtime components only")
-    parser.add_argument("--include-deps",
-        action="store_true", dest="include_deps",
-        help="Include dependencies when making the package. "
-             "Use if you want to distribute the package")
-    parser.add_argument("--no-include-deps",
-        action="store_false", dest="include_deps",
-        help="Do not include dependencies when making the package. "
-             "This is the default")
-    parser.set_defaults(
-        continuous=False,
-        runtime=False)
-
-

@@ -24,11 +24,8 @@
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Generate a binary sdk"""
 
-#FIXME: maybe we should make --no-compress the default
-
 import os
 import logging
-import datetime
 
 import qibuild
 
@@ -36,13 +33,11 @@ LOGGER = logging.getLogger(__name__)
 
 
 def get_package_name(project,
-    continuous=False,
     version=None,
     config=None):
     """Get the package name of a project.
 
     Recognized args are:
-      continuous -> append the date the the name of the package
       version    -> if not given, will try to use version.cmake at
                     the root of the project
       config     -> if not given, do nothing, else add this at the end
@@ -58,10 +53,6 @@ def get_package_name(project,
         if version:
             res.append(version)
 
-    if continuous:
-        now = datetime.datetime.now()
-        res.append(now.strftime("%Y-%m-%d-%H-%M"))
-
     if config:
         res.append(config)
 
@@ -73,11 +64,12 @@ def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
-    qibuild.parsers.package_parser(parser)
     parser.add_argument("project", nargs="?")
-    parser.add_argument("--no-compress", dest="compress",
-        action="store_false",
-        help  ="Do not compress the final install directory")
+    group = parser.add_argument_group("package options")
+    group.add_argument("--version", help="Version of the package. "
+        "Default is read from the version.cmake file")
+    group.add_argument("--runtime", action="store_true",
+        help="Install runtime components only")
     parser.add_argument("--internal", dest="internal",
         action="store_true",
         help = "Include internal libs in package")
@@ -85,19 +77,21 @@ def configure_parser(parser):
         cmake_flags=["CMAKE_INSTALL_PREFIX='/'"],
         compress=True,
         include_deps=False,
-        internal=False)
+        internal=False,
+        continuous=False,
+        runtime=False)
 
 def do(args):
     """Main entry point"""
     toc = qibuild.toc_open(args.work_tree, args)
+    config = toc.active_config
     if not args.project:
         project_name = qibuild.toc.project_from_cwd()
     else:
         project_name = args.project
-
-    package_name = project_name
-    if toc.active_config:
-        package_name += "-%s" % toc.active_config
+    project = toc.get_project(project_name)
+    package_name = get_package_name(project,
+        version=args.version, config=config)
     destdir = os.path.join(toc.work_tree, "package")
     destdir = os.path.join(destdir, package_name)
 
