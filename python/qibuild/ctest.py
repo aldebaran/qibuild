@@ -198,7 +198,7 @@ def write_xml(xml_out, test_res):
         failure = failure.format(out=test_res.out,
             message=test_res.message)
     to_write = to_write.format(num_failures=num_failures,
-                               testsuite_name=test_res.test_name,
+                               testsuite_name="test", # nothing clever to put here :/
                                testcase_name=test_res.test_name,
                                failure=failure,
                                time=test_res.time)
