@@ -19,9 +19,6 @@ manage multiple projects, and dependencies between projects.
 
 The CMake frameworks have both a public and a private API.
 
-rosbuild is more used, has better documentation, and a large community. qiBuild
-is still a work in progress :)
-
 What is in qiBuild and not in rosbuild
 --------------------------------------
 
@@ -38,14 +35,18 @@ What is in qiBuild and not in rosbuild
 
 * Handling of multiple build configurations with the same source directories.
 
-* A bit less monolithic: the CMake framework can be used alone, (without the
-  scripts), the redistributable packages can be used in pure CMake.
+* Loosly coupling between the command line tools and the CMake framework:
+  you can use qibuild script to build pure-cmake projects, you do not need
+  the qibuild script to use CMake qibuild functions
+
+* Close to CMake standards: packages made with qiBuild do NOT depend
+  on the qibuild CMake framework.
+
+* qitoolchain provides a clean way to package and use third-party dependencies
+  without touching the system, which will work on any Linux distribution.
 
 What is in rosbuild and not in qiBuild
 --------------------------------------
-
-* Automatic installation of dependencies (via rosdep scripts calling apt-get
-  install)
 
 * Parallel build of dependencies
 
@@ -56,7 +57,6 @@ What is in rosbuild and not in qiBuild
 
 * Nice Python support : automatic handling of $PYTHONPATH variable, rospython, ...
 
-* Nice documentation
 
 Table of equivalences
 ---------------------
@@ -85,6 +85,7 @@ User has to copy/paste a qibuild.cmake files everywhere, but this file can
 update itself.
 
 Code generation
++++++++++++++++
 
 rosbuild
 ^^^^^^^^
@@ -174,8 +175,8 @@ qibuild
 
 * Looks for dependencies using qibuild and qibuild.manifest
 
-* Never tries to install anything, but uses libraries from the system when
-  found.
+* Never tries to install anything, uses libraries from the system when
+  found or can use pre-compiled packages with qitoolchain.
 
 * Runs cmake inside the source dirs of the buildable dependencies, during
   qibuild configure, then cmake --build inside the build directories of the
@@ -289,5 +290,5 @@ The rosbuild.cmake files then calls something like
     message(STATUS "not implemented yet!"
   endfunction()
 
-This could be a nice first step to see how things go from there
+This could be a nice first step to see how things go from there.
 
