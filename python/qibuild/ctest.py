@@ -143,16 +143,20 @@ def run_tests(project, build_env, test_name=None):
     build_dir = project.build_directory
     results_dir = os.path.join(project.directory, "build-tests",
         "results")
+
+    all_tests = list()
     tests = list()
-    parse_ctest_test_files(tests, build_dir, list())
+    parse_ctest_test_files(all_tests, build_dir, list())
     if test_name:
         tests = [x for x in tests if x[0] == test_name]
         if not tests:
             mess  = "No such test: %s\n" % test_name
             mess += "Known tests are:\n"
-            for x in tests:
+            for x in all_tests:
                 mess += "  * " + x[0] + "\n"
             raise Exception(mess)
+    else:
+        tests = all_tests[:]
 
     if not tests:
         # Create a fake test result to keep CI jobs happy:
