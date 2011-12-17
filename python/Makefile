@@ -10,6 +10,8 @@ PYMODULES=qibuild qitoolchain qisrc \
           bin/qisrc                 \
           bin/qitoolchain
 
+PYTHON ?= python
+
 all: check-error check
 	@echo ""
 	@echo "###################################"
@@ -35,5 +37,5 @@ check:
 	@echo "###################################"
 	@echo "running test"
 	@echo "###################################"
-	PYTHONPATH=. python run_tests.py
+	PYTHONPATH=. $(PYTHON) run_tests.py
 
