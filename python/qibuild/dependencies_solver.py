@@ -168,8 +168,12 @@ class DependenciesSolver:
     """
     logger = logging.getLogger(__name__)
 
-    def __init__(self, projects=None, packages=None):
+    def __init__(self, projects=None, packages=None, active_projects=None):
         self.projects = list()
+        if active_projects is None:
+            self.active_projects = list()
+        else:
+            self.active_projects = active_projects[:]
         self.packages = list()
         if projects:
             self.projects = projects
@@ -191,6 +195,7 @@ class DependenciesSolver:
 
         project_names = [p.name for p in self.projects]
         package_names = [p.name for p in self.packages]
+        package_names = [x for x in package_names if not x in self.active_projects]
 
         mess  = "Solving deps...\n"
         mess += "Projects:\n"

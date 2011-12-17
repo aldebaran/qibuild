@@ -380,8 +380,8 @@ class Toc(WorkTree):
             raise TocException("No such project: %s" % project_name)
 
 
-    def get_sdk_dirs(self, project_name, project_names=None):
-        """ Return a list of sdk, needed to build a project.
+    def get_sdk_dirs(self, project_name):
+        """ Return a list of sdk needed to build a project.
 
         Iterate through the dependencies.
         When it is a package (pre-compiled), add the path of
@@ -389,10 +389,8 @@ class Toc(WorkTree):
         under the build directory of the project.
 
         If a name is both in source and in package, use the package
-        (saves compile time), unless it is excplicitely set in
-        project_names, in that case, the list should at least contain
-        the name of the package you want to configure.
-
+        (saves compile time), unless user asked explicitely for a list
+        of projects
         """
         dirs = list()
 
@@ -400,11 +398,10 @@ class Toc(WorkTree):
         if project_name not in known_project_names:
             raise TocException("%s is not a buildable project" % project_name)
 
-        if not project_names:
-            project_names = [project_name]
         # Here do not honor self.solve_deps or the software won't compile :)
-        dep_solver = DependenciesSolver(projects=self.projects, packages=self.packages)
-        (r_project_names, package_namess, not_found) = dep_solver.solve(project_names)
+        dep_solver = DependenciesSolver(projects=self.projects, packages=self.packages,
+            active_projects=self.active_projects)
+        (r_project_names, package_namess, not_found) = dep_solver.solve([project_name])
 
         if not_found:
             # FIXME: right now there are tons of case where you could have missing
@@ -452,7 +449,8 @@ class Toc(WorkTree):
             return (self.active_projects, list(), list())
         else:
             dep_solver = DependenciesSolver(projects=self.projects,
-                                            packages=self.packages)
+                                            packages=self.packages,
+                                            active_projects=self.active_projects)
             return dep_solver.solve(self.active_projects,
                                     runtime=runtime)
 
