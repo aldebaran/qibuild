@@ -107,6 +107,7 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
         mess += "Error was: %s\n" % exception
         mess += "Full command was: %s\n" % " ".join(cmd)
         if isinstance(exception, OSError):
+            # pylint: disable-msg=E1101
             if exception.errno == errno.ENOENT:
                 mess += "Are you sure you have built the tests?"
         raise Exception(mess)
