@@ -92,6 +92,10 @@ class Project:
         res += "  cmake_flags     = %s"   % ", ".join(self.cmake_flags)
         return res
 
+    def __repr__(self):
+        res = "<Project %s in %s>" % (self.name, self.directory)
+        return res
+
 def name_from_directory(project_dir):
     """Get the project name from the project directory
 
