@@ -26,16 +26,23 @@
 
 include(CMakeParseArguments)
 
-#! Python wrapper for swig.
+#! Python wrapper for swig
+# ========================
+
+
+
+#!
+# Create a python wrapping of the C/C++ library
 #
-# /!\ The module_name must be the same as the one declare in ${interface_file}
-# for instance, if module_name equals foo, foo.i must contain:
-#   %module foo
+# .. warning:: The ``module_name`` must match the name declared in ``interface_file``
+#     for instance, if ``module_name`` equals foo, `foo.i` must contain:
+#     ``%module foo``
 #
 # \arg:module_name the target name
 # \arg:interface_file the swig interface file (extension is .i)
 # \group:SRC The list of source files
-# \group:DEPENDS The list of source files
+# \group:DEPENDS The list of dependencies
+#
 function(qi_swig_wrap_python module_name interface_file)
   cmake_parse_arguments(ARG "" "" "SRC;DEPENDS" ${ARGN})
   set(_srcs ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})

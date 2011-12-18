@@ -36,6 +36,7 @@ DOCUMENTED_FILES=[
     "submodule",
     "option",
     "find",
+    "swig/python"
 ]
 
 import re
@@ -364,6 +365,9 @@ def gen_cmake_doc(cmake_file, rst_file):
 
     """
     should_skip = False
+    basedir = os.path.dirname(rst_file)
+    if not os.path.exists(basedir):
+        os.makedirs(basedir)
     if not os.path.exists(rst_file):
         should_skip = False
     else:
