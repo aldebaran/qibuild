@@ -6,7 +6,7 @@ qiBuild and rosbuild
 Introduction
 ------------
 
-This tutorial is targeted towards rosbuild users wanting to know more about
+This section is targeted towards rosbuild users wanting to know more about
 qiBuild
 
 General comparison
@@ -236,59 +236,20 @@ qibuild
 
 .. code-block:: cmake
 
-  include(qibuild.cmake)
+  include(qibuild/swig/python)
   qi_swig_wrap_python(_foo foo.i
     SRC bar.cpp
     DEPENDS ...)
 
-Making the two play nice together
----------------------------------
 
-Why?
-++++
+Using qiBuild with rosbuild
+---------------------------
 
-Nao’s users would be glad to be able to use the great Ros framework with their
-robot.
+Patching qiBuild to be able to **compile** rosbuild projects is probably doable,
+but maybe not that useful. (Why would rosbuild users want to change their build
+system?)
 
-Using qibuild's strong cross-platform support would be great for ros ! Ros
-could become compatible with Visual Studio with reduced effort.
-
-How?
-++++
-
-One way we could do it:
-
-When qibuild is run from a source dir where there is a manifest.xml, it will
-
-* create the qibuild.manifest file
-
-* set ROS_ROOT to something like qibuild/cmake/qibuild/compat/
-
-The rosbuild.cmake files then calls something like
-
-.. code-block:: cmake
-
-  include(qibuild/compat/ros/compat.cmake)
-
-  function(ros_build_init)
-
-    # other cmake magic can go here :)
-
-    message(STATUS "Using qibuild!")
-  endfunction()
-
-  function(rosbuild_add_executable)
-
-    # re-parse arguments
-    # ...
-    qi_create_bin(_args)
-
-  endfunction()
-
-
-  function(rosbuild_genmsg)
-    message(STATUS "not implemented yet!"
-  endfunction()
-
-This could be a nice first step to see how things go from there.
+What could be nice instead is to make it easy to use rosbuild pre-compiled
+**packages** from qibuild projects, using for instance a toolchain feed so that
+the rosbuild packages only have to be compiled once.
 

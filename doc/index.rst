@@ -10,7 +10,7 @@
   guide/index
   contrib/index
   design/index
-  rosbuild
+  other_build_frameworks
 
 
 qiBuild documentation
@@ -103,7 +103,10 @@ Read this if you want to learn more about qiBuild design:
 :ref:`qibuild-design`
 
 
-Going further
--------------
+qiBuild and other build frameworks
+----------------------------------
 
-* :ref:`qibuild-and-rosbuild`
+Read this if you are already using a build framework.
+
+* :ref:`qibuild-compared-to-other-build-frameworks`
+
