@@ -23,12 +23,11 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-""" Update a toolchain from a feed.
+""" Update every toolchain using the feed that was used to create them
 
-If no toolchain is given, use the current one.
-If no feed is given, use the feed used
-to initialize the given toolchain
-
+If a toolchain name is given, only update this toolchain.
+If a feed url is given, use this feed instead of the recorded one
+to update the given toolchain.
 """
 
 import logging
@@ -41,13 +40,11 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """ Configure parser for this action """
-    qibuild.worktree.work_tree_parser(parser)
+    qibuild.cmdparse.default_parser(parser)
     parser.add_argument("name", nargs="?", metavar="NAME",
-        help="Name of the toolchain. Defaults to the current toolchain")
+        help="Update only this toolchain")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
-        help="Optional: path to the toolchain configuration file.\n"
-             "If not given, the toolchain will be empty.\n"
-             "May be a local file or an url",
+        help="Use this feed location to update the toolchain.\n",
         nargs="?")
     parser.add_argument("--dry-run", action="store_true",
         help="Print what would be done")
@@ -60,33 +57,32 @@ def do(args):
     tc_name = args.name
     dry_run = args.dry_run
 
-    toc = None
-    try:
-        toc = qibuild.toc.toc_open(args.work_tree)
-    except qibuild.toc.TocException:
-        pass
-
-    if not tc_name:
-        if toc:
-            tc_name = toc.active_config
-        if not tc_name:
-            mess  = "Could not find which toolchain to update\n"
-            mess += "Please specify a toolchain name from command line\n"
-            mess += "Or edit your qibuild.cfg to set a default config\n"
-            raise Exception(mess)
-
     known_tc_names = qitoolchain.toolchain.get_tc_names()
-    if not tc_name in known_tc_names:
-        mess  = "No such toolchain: '%s'\n" % tc_name
-        mess += "Known toolchains are: %s" % known_tc_names
-        raise Exception(mess)
-
-    if not feed:
-        feed = qitoolchain.toolchain.get_tc_feed(tc_name)
-        if not feed:
-            mess  = "Could not find feed for toolchain %s\n" % tc_name
-            mess += "Pleas check configuration or specifiy a feed on the command line\n"
+    if tc_name:
+        if not tc_name in known_tc_names:
+            mess  = "No such toolchain: '%s'\n" % tc_name
+            mess += "Known toolchains are: %s" % known_tc_names
             raise Exception(mess)
+        if not feed:
+            feed = qitoolchain.toolchain.get_tc_feed(tc_name)
+            if not feed:
+                mess  = "Could not find feed for toolchain %s\n" % tc_name
+                mess += "Pleas check configuration or specifiy a feed on the command line\n"
+                raise Exception(mess)
 
-    toolchain = qitoolchain.Toolchain(tc_name)
-    toolchain.parse_feed(feed, dry_run=dry_run)
+        LOGGER.info("Updating toolchain %s using %s", tc_name, feed)
+        toolchain = qitoolchain.Toolchain(tc_name)
+        toolchain.parse_feed(feed, dry_run=dry_run)
+    else:
+        for tc_name in qitoolchain.get_tc_names():
+            tc_feed = qitoolchain.toolchain.get_tc_feed(tc_name)
+            if not tc_feed:
+                LOGGER.info("No feed found for %s, skipping", tc_name)
+                print
+                continue
+            LOGGER.info("###\n## Updating toolchain %s using %s\n##\n",
+                tc_name, tc_feed)
+            toolchain = qitoolchain.Toolchain(tc_name)
+            toolchain.parse_feed(tc_feed, dry_run=dry_run)
+            print
+
