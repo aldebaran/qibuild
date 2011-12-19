@@ -86,9 +86,7 @@ url = ftp://example.com/foo.manifest
 
     projects = qisrc.parse_manifest(manifest_url)
     for (project_name, project_url) in projects.iteritems():
-        if project_name in qiwt.git_projects.keys():
-            LOGGER.info("Found %s, skipping", project_name)
-        else:
+        if project_name not in qiwt.git_projects.keys():
             qibuild.run_action("qisrc.actions.add", [project_url, project_name])
 
     # Everything went fine, store the manifest URL for later use:
