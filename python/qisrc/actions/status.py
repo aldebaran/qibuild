@@ -27,6 +27,7 @@
 """
 
 import os
+import sys
 import logging
 
 import qibuild
@@ -54,13 +55,32 @@ def _add_pad(max_len, k, v):
     pad = "".join([ " " for x in range(max_len - len(k)) ])
     return "%s%s%s" % (str(k), pad, str(v))
 
+def _pad(szold, sznew):
+    if sznew > szold:
+        return ""
+    return "".join([ " " for x in range(szold - sznew)])
+
+
 def do(args):
     """ Main method """
     qiwt = qibuild.worktree_open(args.work_tree)
     gitrepo = list()
     dirty = list()
+    sz = len(qiwt.git_projects.values())
+    i = 1
+    oldsz = 0
     for git_project in qiwt.git_projects.values():
+
         git = qisrc.git.open(git_project)
+        pad = ""
+        if sys.stdout.isatty():
+            name = os.path.split(git_project)
+            name = git_project if len(name) <= 0 else name[-1]
+            print "checking (%d/%d): " % (i, sz), name, _pad(oldsz, len(name)), "\r",
+            oldsz = len(name)
+            if i == sz:
+                print "checking (%d/%d): done" % (i, sz), _pad(oldsz, 2)
+        i = i + 1
         if git.is_valid():
             clean = git.is_clean(untracked=args.untracked_files)
             if args.show_branch or not clean:
