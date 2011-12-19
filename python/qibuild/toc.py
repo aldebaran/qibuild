@@ -635,8 +635,8 @@ def _projects_from_args(toc, args):
 
     if hasattr(args, "projects"):
         if args.projects:
-            return ([args.projects, False])
             LOGGER.debug("select: projects list from arguments: %s", ",".join(args.projects))
+            return ([args.projects, args.single])
         else:
             from_cwd = None
             try:
