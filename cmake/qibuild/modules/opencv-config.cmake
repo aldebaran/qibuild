@@ -23,26 +23,21 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#This is the old OpenCV please prefer opencv2_* packages
 clean(OPENCV)
-# Old API
-# include <cv.h>
+
 fpath(OPENCV cv.h PATH_SUFFIXES opencv)
-# include <opencv/cv.h>
 fpath(OPENCV opencv/cv.h)
 
-# New API:
-# include <opencv2/cv.hpp>
-# fpath(OPENCV opencv2/cp.hpp PATH_SUFFIXES opencv2)
+flib(OPENCV OPTIMIZED NAMES cv      cv200      )
+flib(OPENCV DEBUG     NAMES cv      cv200d     )
+flib(OPENCV OPTIMIZED NAMES cvaux   cvaux200   )
+flib(OPENCV DEBUG     NAMES cvaux   cvaux200d  )
+flib(OPENCV OPTIMIZED NAMES cxcore  cxcore200  )
+flib(OPENCV DEBUG     NAMES cxcore  cxcore200d )
+flib(OPENCV OPTIMIZED NAMES highgui highgui200 )
+flib(OPENCV DEBUG     NAMES highgui highgui200d)
+flib(OPENCV OPTIMIZED NAMES ml      ml200d     )
+flib(OPENCV DEBUG     NAMES ml      ml200      )
 
-
-flib(OPENCV OPTIMIZED NAMES cv      cv200       opencv_legacy)
-flib(OPENCV DEBUG     NAMES cv      cv200d      opencv_legacy)
-flib(OPENCV OPTIMIZED NAMES cvaux   cvaux200    opencv_contrib)
-flib(OPENCV DEBUG     NAMES cvaux   cvaux200d   opencv_contrib)
-flib(OPENCV OPTIMIZED NAMES cxcore  cxcore200   opencv_core)
-flib(OPENCV DEBUG     NAMES cxcore  cxcore200d  opencv_core)
-flib(OPENCV OPTIMIZED NAMES highgui highgui200  opencv_highgui)
-flib(OPENCV DEBUG     NAMES highgui highgui200d opencv_highgui)
-flib(OPENCV OPTIMIZED NAMES ml      ml200d      opencv_ml)
-flib(OPENCV DEBUG     NAMES ml      ml200       opencv_ml)
 export_lib(OPENCV)
