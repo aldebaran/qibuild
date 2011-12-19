@@ -630,12 +630,13 @@ def _projects_from_args(toc, args):
     toc_p_names = [p.name for p in toc.projects]
     if hasattr(args, "all") and args.all:
         # Pretend the user has asked for all the known projects
-        LOGGER.debug("All projects have been selected")
+        LOGGER.debug("select: All projects have been selected")
         return (toc_p_names, False)
 
     if hasattr(args, "projects"):
         if args.projects:
             return ([args.projects, False])
+            LOGGER.debug("select: projects list from arguments: %s", ",".join(args.projects))
         else:
             from_cwd = None
             try:
@@ -643,8 +644,10 @@ def _projects_from_args(toc, args):
             except:
                 pass
             if from_cwd:
+                LOGGER.debug("select: projects from cwd: %s", from_cwd)
                 return ([from_cwd], args.single)
             else:
+                LOGGER.debug("select: default to all projects")
                 return (toc_p_names, args.single)
     else:
         return (list(), False)
@@ -709,6 +712,8 @@ def toc_open(work_tree, args=None):
 
     (active_projects, single) =  _projects_from_args(toc, args)
     toc.active_projects = active_projects
+    LOGGER.debug("active projects: %s", ".".join(toc.active_projects))
+    LOGGER.debug("single: %s", str(single))
     toc.solve_deps = (not single)
     return toc
 
