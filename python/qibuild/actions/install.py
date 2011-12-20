@@ -96,6 +96,9 @@ def do(args):
         LOGGER.info("Installing %s to %s (%s)", ", ".join([n for n in project_names]), dest, toc.build_type)
     for project_name in project_names:
         project = toc.get_project(project_name)
+        # Build target preinstall on the project (not always called for some reason)
+        if not toc.using_visual_studio:
+            toc.build_project(project, target="preinstall")
         toc.install_project(project,  destdir, runtime=args.runtime)
 
     if not args.include_deps:
