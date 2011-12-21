@@ -5,6 +5,10 @@ qiBuild tips and tricks
 
 Here is a few collections of tips and tricks when using the qibuild framework
 
+.. seealso::
+
+   * :ref:`qibuild-cmake-coding-guide`
+   * :ref:`CMake common mistakes <qibuild-cmake-common-mistakes>`
 
 Use --help
 ----------

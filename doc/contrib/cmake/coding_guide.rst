@@ -1,3 +1,5 @@
+.. _qibuild-cmake-coding-guide:
+
 CMake coding guide
 ==================
 
@@ -204,6 +206,8 @@ argument, ("--foo --bar").
     do_something(${result})
     # NOT set(res ... PARENT_SCOPE)
 
+
+.. _qibuild-cmake-common-mistakes:
 
 Common mistakes
 ----------------
