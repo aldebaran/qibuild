@@ -205,6 +205,10 @@ argument, ("--foo --bar").
     # NOT set(res ... PARENT_SCOPE)
 
 
+Common mistakes
+----------------
+
+
 * A very common mistake is to use something like::
 
     set(_my_out ${CMAKE_BINARY_DIR}/sdk)
@@ -216,3 +220,51 @@ argument, ("--foo --bar").
 
   so please use `QI_SDK_DIR` instead
 
+
+* Do not set CMAKE_CXX_FLAGS::
+
+    # This will break cross-compilation
+    set(CMAKE_CXX_FLAGS "-DFOO=42")
+
+    # use:
+    add_definitions("-DFOO=42")
+
+    # or, better, set the compile flags
+    # only when necessary:
+    # (this will save compile time when you change the define!)
+    set_source_files_properties(
+      src/foo.cpp
+        PROPERTIES
+          COMPILE_DEFINITIONS FOO=42
+    )
+
+
+* Do not set CMAKE_FIND_ROOT_PATH::
+
+    # This will break finding packages in the toolchain:
+
+    set(CMAKE_FIND_ROOT_PATH "/path/to/something")
+
+    # Use this instead:
+
+    # (create an empty list if CMAKE_FIND_ROOT_PATH does not exist)
+    if(NOT CMAKE_FIND_ROOT_PATH)
+      set(CMAKE_FIND_ROOT_PATH)
+    endif()
+    list(APPEND CMAKE_FIND_ROOT_PATH "/path/to/something")
+
+
+* Do not set CMAKE_MODULE_PATH::
+
+    # This will break finding the qibuild framework
+    #  include (qibuild/general) will no longer work
+
+    set (CMAKE_MODULE_PATH "/path/to/something")
+
+    # Use this instead:
+
+    # (create an empty list if CMAKE_FIND_ROOT_PATH does not exist)
+    if(NOT CMAKE_MODULE_PATH)
+      set(CMAKE_MODULE_PATH)
+    endif()
+    list(APPEND CMAKE_MODULE_PATH "/path/to/something")
