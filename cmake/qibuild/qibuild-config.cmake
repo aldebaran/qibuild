@@ -23,45 +23,15 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from distutils.core import setup
-import sys
-import os
+# Try to find the qibuild cmake framework.
+# Useful when not using the qibuild command line
 
-packages = [
-    "qibuild",
-    "qibuild.external",
-    "qisrc",
-    "qisrc.actions",
-    "qibuild",
-    "qibuild.actions",
-    "qitoolchain",
-    "qitoolchain.actions",
-]
+get_filename_component(_this_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
+set(_qibuild_path ${_this_dir}/..)
 
-scripts = [
-    "bin/qisrc",
-    "bin/qibuild",
-    "bin/qitoolchain",
-]
-
-package_data = {
- "qibuild" : ["templates/project/CMakeLists.txt",
-              "templates/project/main.cpp",
-              "templates/project/test.cpp",
-              "templates/project/qibuild.manifest"
-              ]
-}
-
-
-setup(name = 'qibuild',
-      version = "0.1",
-      description = "The qiBuild Framework",
-      author = "Aldebaran Robotics",
-      author_email = "qi-dev@aldebaran-robotics.com",
-      packages = packages,
-      package_data = package_data,
-      license = "BSD",
-      scripts = scripts
-)
-
+list(FIND CMAKE_MODULE_PATH "${_qibuild_path}" _found)
+if(_found STREQUAL "-1")
+  list(APPEND CMAKE_MODULE_PATH "${_qibuild_path}")
+endif()
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} CACHE INTERNAL ""  FORCE)
 

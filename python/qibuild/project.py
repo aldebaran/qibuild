@@ -231,7 +231,7 @@ def bootstrap_project(project, toc):
 #############################################
 
 # Add path to CMake framework path if necessary:
-set(_qibuild_path "{path_to_add}")
+set(_qibuild_path "{cmake_qibuild_dir}")
 list(FIND CMAKE_MODULE_PATH "${{_qibuild_path}}" _found)
 if(_found STREQUAL "-1")
   # Prefer cmake files matching  current qibuild installation
@@ -267,13 +267,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             custom_cmake_code += 'include("%s")\n' % \
                 qibuild.sh.to_posix_path(local_cmake)
 
-    # This is cmake/qibuild, but we need to set the
-    # CMAKE_MODULE_PATH to cmake/ to be able to do
-    # include(qibuild/general)
-    cmake_qibuild_dir = qibuild.CMAKE_QIBUILD_DIR
-    cmake_qibuild_dir = os.path.abspath(os.path.join(cmake_qibuild_dir, ".."))
-    path_to_add = qibuild.sh.to_posix_path(cmake_qibuild_dir)
-
+    cmake_qibuild_dir = qibuild.get_cmake_qibuild_dir()
     dep_sdk_dirs = toc.get_sdk_dirs(project.name)
 
     dep_to_add = ""
@@ -287,7 +281,7 @@ endif()
 """.format(sdk_dir=qibuild.sh.to_posix_path(sdk_dir))
 
     to_write = to_write.format(
-        path_to_add       = path_to_add,
+        cmake_qibuild_dir  = cmake_qibuild_dir,
         dep_to_add        = dep_to_add,
         custom_cmake_code = custom_cmake_code
     )

@@ -43,10 +43,8 @@ def print_version():
 
     """
     import qibuild
-    version = "0.1" # TODO!
-    print "qibuild version: %s" % version
-    root_cmake = os.path.abspath(os.path.join(qibuild.CMAKE_QIBUILD_DIR, ".."))
-    print "Using cmake code from `%s'" % root_cmake
+    print "qibuild version 1.12"
+    print "Using cmake code from", qibuild.get_cmake_qibuild_dir()
 
 
 def main():
