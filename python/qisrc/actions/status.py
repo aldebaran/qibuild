@@ -38,11 +38,17 @@ LOGGER = logging.getLogger("qisrc.status")
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.worktree.work_tree_parser(parser)
-    parser.add_argument("--untracked-files", "-u", dest="untracked_files", action="store_true", help="display untracked files")
-    parser.add_argument("--show-branch", "-b", dest="show_branch", action="store_true", help="display branch and tracking branch for each repository")
+    parser.add_argument("--untracked-files", "-u",
+        dest="untracked_files",
+        action="store_true",
+        help="display untracked files")
+    parser.add_argument("--show-branch", "-b",
+        dest="show_branch",
+        action="store_true",
+        help="display branch and tracking branch for each repository")
 
 def _max_len(wt, names):
-    """ Dump an argparser namespace to log """
+    """ Helper function to display status """
     output = ""
     max_len = 0
     for k in names:
@@ -52,13 +58,13 @@ def _max_len(wt, names):
     return max_len
 
 def _add_pad(max_len, k, v):
-    pad = "".join([ " " for x in range(max_len - len(k)) ])
+    pad = " " * (max_len - len(k))
     return "%s%s%s" % (str(k), pad, str(v))
 
 def _pad(szold, sznew):
     if sznew > szold:
         return ""
-    return "".join([ " " for x in range(szold - sznew)])
+    return " " * (szold - sznew)
 
 
 def do(args):
@@ -70,9 +76,7 @@ def do(args):
     i = 1
     oldsz = 0
     for git_project in qiwt.git_projects.values():
-
         git = qisrc.git.open(git_project)
-        pad = ""
         if sys.stdout.isatty():
             name = os.path.split(git_project)
             name = git_project if len(name) <= 0 else name[-1]

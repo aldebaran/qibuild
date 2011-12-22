@@ -32,8 +32,6 @@ import logging
 import qibuild
 import qitoolchain
 
-import ConfigParser
-
 LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):

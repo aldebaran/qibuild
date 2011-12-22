@@ -41,8 +41,6 @@ The url should point to a xml file looking like
 
 """
 
-import os
-import urllib
 import logging
 
 import qisrc
@@ -69,7 +67,7 @@ def do(args):
     toc_configstore = qibuild.configstore.ConfigStore()
     toc_configstore.read(toc_cfg)
     if args.url:
-       manifest_url = args.url
+        manifest_url = args.url
     else:
         manifest_url = toc_configstore.get("manifest.url")
         if manifest_url is None:

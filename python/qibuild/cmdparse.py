@@ -61,7 +61,7 @@ LOGGER = logging.getLogger(__name__)
 
 try:
     import argparse
-except:
+except ImportError:
     from qibuild.external import argparse
 
 import qibuild.command
@@ -203,8 +203,8 @@ def _dump_arguments(name, args):
     for k in args.__dict__.keys():
         if len(k) > max_len:
             max_len = len(k)
-    for k,v in args.__dict__.iteritems():
-        pad = "".join([ " " for x in range(max_len - len(k)) ])
+    for k, v in args.__dict__.iteritems():
+        pad = " " * (max_len - len(k))
         output += "  %s%s = %s\n" % (str(k), pad, str(v))
     if output[-1] == "\n":
         output = output[:-1]

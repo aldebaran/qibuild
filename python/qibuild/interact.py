@@ -95,7 +95,7 @@ def ask_program(message):
     print "%s not found" % program
     full_path = ask_string("Please enter full path to %s" % program)
     if not os.path.exists(full_path):
-       raise Exception("%s does not exists, aborting")
+        raise Exception("%s does not exists, aborting")
     return full_path
 
 

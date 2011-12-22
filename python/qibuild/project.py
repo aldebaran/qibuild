@@ -23,6 +23,21 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+""" This module contains the Project class, and method to
+handle them
+
+A project is simply a directory in a worktree containing a qibuild.manifest
+file.
+
+The toc object is able to:
+    - update a project to set cmake flags, build directory and so on
+    - bootstrap the project to generate the dependencies.cmake used
+    by the qibuild CMake framework
+
+
+"""
+
 import os
 import logging
 
@@ -200,7 +215,7 @@ def update_project(project, toc):
 
 
 
-def bootstrap_project(project, toc, project_names=None):
+def bootstrap_project(project, toc):
     """ Create the magic build/dependencies.cmake file
 
     This is to be called right before calling cmake
@@ -208,8 +223,6 @@ def bootstrap_project(project, toc, project_names=None):
     because we need to know about all the other projects
     inside the Toc oject to get the list of SDK dirs, for instance.
 
-    project_names can be given to by-pass the 'package first, then
-    source dir' toc.get_sdk_dir algorithm
     """
     # To be written in dependencies.cmake
     to_write = """

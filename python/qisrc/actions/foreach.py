@@ -49,7 +49,7 @@ def do(args):
         logger.info("Running `%s` for %s", " ".join(args.command), pname)
         try:
             qibuild.command.call(args.command, cwd=ppath)
-        except qibuild.command.CommandFailedException, err:
+        except qibuild.command.CommandFailedException:
             if args.ignore_errors:
                 continue
             else:

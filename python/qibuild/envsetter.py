@@ -66,6 +66,9 @@ class EnvSetter():
         self._build_env = os.environ.copy()
 
     def get_build_env(self):
+        """ Returns a dict containing the new environnment
+        (note that os.environ is presevered)
+        """
         return self._build_env.copy()
 
     def set_env_var(self, variable, value):

@@ -41,10 +41,9 @@ def configure_parser(parser):
     """Configure parser for this action """
     qibuild.worktree.work_tree_parser(parser)
     qibuild.parsers.project_parser(parser)
-    parser.add_argument("--continue", action="store_true", dest="continue_on_error", help="continue on error")
-    parser.add_argument("--stop-on-error", action="store_false", dest="continue_on_error", help="continue on error")
-    parser.add_argument("--rebase", action="store_true", dest="rebase", help="rebase")
-    parser.set_defaults(continue_on_error=True)
+    parser.add_argument("--rebase", action="store_true", dest="rebase",
+        help="Use git pull --rebase")
+    parser.set_defaults(rebase=False)
 
 
 def uniq(lst):
@@ -173,8 +172,6 @@ def do(args):
         else:
             LOGGER.error("failed")
             fail.append((git_project, out))
-            if not args.continue_on_error:
-                raise Exception("\n%s%s" % (out[1][0], out[1][1]))
 
     if len(fail) > 0:
         print ""

@@ -186,7 +186,7 @@ class ConfigStore:
         for k in configdict.keys():
             if len(k) > max_len:
                 max_len = len(k)
-        for k,v in configdict.iteritems():
+        for k, v in configdict.iteritems():
             if pad:
                 pad_space = "".join([ " " for x in range(max_len - len(k)) ])
             else:
