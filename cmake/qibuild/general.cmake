@@ -37,6 +37,7 @@ cmake_policy(SET CMP0010 NEW)
 cmake_policy(SET CMP0011 NEW)
 # if() recognizes numbers and boolean constants.
 cmake_policy(SET CMP0012 NEW)
+cmake_policy(SET CMP0017 NEW)
 
 # We use RUNTIME_DIRECTORY_<CONFIG> for visual studio
 # which is a very nice feature but that only came up with
