@@ -23,8 +23,11 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Try to find the qibuild cmake framework.
-# Useful when not using the qibuild command line
+# If someone is using qibuild configure, includes
+# the dependencies.cmake file
+if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
+  include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
+endif()
 
 get_filename_component(_this_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
 set(_qibuild_path ${_this_dir}/..)
@@ -34,4 +37,6 @@ if(_found STREQUAL "-1")
   list(APPEND CMAKE_MODULE_PATH "${_qibuild_path}")
 endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} CACHE INTERNAL ""  FORCE)
+
+include(qibuild/general)
 

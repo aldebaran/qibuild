@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(@project_name@)
 
-# You need this to find the QiBuild CMake framework
-include("qibuild.cmake")
+# Find the qibuild cmake framework
+find_package(qibuild)
 
 # Create a executable named @project_name@
 # with the source file: main.cpp
