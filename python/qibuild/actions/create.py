@@ -48,7 +48,8 @@ def copy_helper(project_name, directory):
             new_file.write(new_contents)
 
     # Also create the necessary qibuild.cmake file:
-    to_copy = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "templates", "qibuild.cmake")
+    to_copy = os.path.join(qibuild.get_cmake_qibuild_dir(),
+        "qibuild", "templates", "qibuild.cmake")
     shutil.copy(to_copy, os.path.join(directory, "qibuild.cmake"))
 
 

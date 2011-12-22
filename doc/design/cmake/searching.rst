@@ -190,10 +190,8 @@ something like:
   list(APPEND CMAKE_MODULE_PATH  "${sysroot}/usr/share/cmake/Modules/")
 
 
-
 To find the qibuild cmake files while using code from ``src/qibuild``, we
 do something like:
-
 
 .. code-block:: python
 
@@ -204,12 +202,8 @@ do something like:
 
         """
 
-    CMAKE_QIBUILD_DIR = get_cmake_qibuild_dir()
-
-
     # in project.bootstrap()
-
-    cmake_module_path = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "..")
+    cmake_module_path = get_cmake_qibuild_dir()
 
 
 
