@@ -230,13 +230,16 @@ class TocCMakeFlagsTestCase(unittest.TestCase):
     def test_default_is_debug(self):
         toc = qibuild.toc.Toc(self.tmp)
         qibuild.project.update_project(self.foo_project, toc)
-        self.assertEquals(self.foo_project.cmake_flags, ["CMAKE_BUILD_TYPE=DEBUG"])
+        cmake_flags = self.foo_project.cmake_flags[:]
+        self.assertFalse("CMAKE_BUILD_TYPE=RELEASE" in cmake_flags)
+        self.assertTrue ("CMAKE_BUILD_TYPE=DEBUG"   in cmake_flags)
 
     def test_release(self):
         toc = qibuild.toc.Toc(self.tmp, build_type="release")
         qibuild.project.update_project(self.foo_project, toc)
-        self.assertEquals(self.foo_project.cmake_flags, ["CMAKE_BUILD_TYPE=RELEASE"])
-
+        cmake_flags = self.foo_project.cmake_flags[:]
+        self.assertTrue ("CMAKE_BUILD_TYPE=RELEASE" in cmake_flags)
+        self.assertFalse("CMAKE_BUILD_TYPE=DEBUG"   in cmake_flags)
 
     def test_custom_flags(self):
         custom_cmake = os.path.join(self.tmp, ".qi", "myconf.cmake")

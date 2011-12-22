@@ -213,6 +213,10 @@ def update_project(project, toc):
     if toc.cmake_flags:
         project.cmake_flags.extend(toc.cmake_flags)
 
+    # lastly, add a correct -DCMAKE_MODULE_PATH
+    cmake_qibuild_dir = qibuild.get_cmake_qibuild_dir()
+    qibuild_dir = os.path.join(cmake_qibuild_dir, "qibuild")
+    project.cmake_flags.append("qibuild_DIR=%s" % qibuild_dir)
 
 
 def bootstrap_project(project, toc):
