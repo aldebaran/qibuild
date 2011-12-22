@@ -25,10 +25,7 @@
 
 """Init a new qisrc workspace """
 
-import os
 import qibuild
-import qisrc
-
 
 def configure_parser(parser):
     """Configure parser for this action """

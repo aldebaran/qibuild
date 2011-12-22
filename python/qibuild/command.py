@@ -229,16 +229,15 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
             raise Exception("Trying to to run %s in non-existing %s" %
                 (" ".join(cmd), cwd))
 
-    buffer = RingBuffer(300)
+    ring_buffer = RingBuffer(300)
 
     returncode = 0
-    global CONFIG
     minimal_write = CONFIG.get("quiet", False)
     if sys.platform.startswith("win") and sys.version_info < (2, 7):
         returncode = subprocess.call(cmd, env=env, cwd=cwd)
     else:
         # This code won't work on windows with python < 2.7
-        cmdline = CommandLine(cmd, cwd=cwd, env=env, shell=False)
+        cmdline = CommandLine(cmd, cwd=cwd, env=env)
         if not sys.stdout.isatty() or not sys.stderr.isatty():
             minimal_write = True
 
@@ -246,11 +245,11 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
             if out is not None:
                 if not minimal_write:
                     sys.stdout.write(out)
-                buffer.append(out)
+                ring_buffer.append(out)
             if err is not None:
                 if not minimal_write:
                     sys.stderr.write(err)
-                buffer.append(err)
+                ring_buffer.append(err)
         returncode = cmdline.returncode
 
     sys.stdout.flush()
@@ -260,7 +259,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
 
     if returncode != 0:
         if minimal_write:
-            lines = buffer.get()
+            lines = ring_buffer.get()
             for line in lines:
                 sys.stdout.write(line)
         # Raise correct exception
@@ -316,7 +315,7 @@ class CommandLine:
     """Helper for executing subprocess
 
     """
-    def __init__(self, cmd, cwd=None, env=None, shell=False):
+    def __init__(self, cmd, cwd=None, env=None):
         self.cmd = cmd
         self.cwd = cwd
         self.env = env

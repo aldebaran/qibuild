@@ -45,9 +45,9 @@ from . import sh
 from . import interact
 from . import envsetter
 
-from toc        import toc_open
-from worktree import worktree_open
-from cmdparse   import run_action
+from qibuild.toc        import toc_open
+from qibuild.worktree import worktree_open
+from qibuild.cmdparse   import run_action
 
 __all__ = ( 'toc', 'parsers', 'command', 'configstore', 'cmdparse',
             'log', 'worktree', 'archive', 'sh', 'interact',

@@ -34,7 +34,6 @@ import logging
 import shutil
 
 import qibuild
-import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
@@ -110,7 +109,7 @@ def convert_bootstrap(source_dir, args):
 
     # update the "bootstrap.cmake" files so that they try to include qibuild.cmake
     new_bootstrap = os.path.join(CMAKE_QIBUILD_DIR, "templates", "bootstrap.cmake")
-    for (root, directories, filenames) in os.walk(source_dir):
+    for (root, _dirs, filenames) in os.walk(source_dir):
         for filename in filenames:
             if filename == "bootstrap.cmake":
                 full_path = os.path.join(root, filename)
@@ -160,7 +159,7 @@ def convert_cmake(source_dir, args):
     new_lines = list()
     regexp = re.compile(r'^\s*project\s*\((.*)\)', re.IGNORECASE)
     to_add = "include(qibuild.cmake)"
-    qibuild_included=False
+    qibuild_included = False
     for line in lines:
         new_lines.append(line)
         match = re.match(regexp, line)

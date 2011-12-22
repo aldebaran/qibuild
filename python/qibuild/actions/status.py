@@ -27,12 +27,10 @@
 """
 
 import os
-import sys
 import glob
 import time
 import datetime
 import logging
-import qibuild
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
@@ -66,7 +64,7 @@ def list_build_dir(path):
                 todisplay = "%d hours" % (ddelta.seconds / 3600)
             else:
                 todisplay = "%d minutes" % (ddelta.seconds / 60)
-            pad = "".join([ " " for x in range(max_len - len(bdir)) ])
+            pad = " " * (max_len - len(bdir))
             print " %s%s: (%s)" % (os.path.basename(bdir), pad, todisplay)
 
 def do(args):
@@ -78,7 +76,5 @@ def do(args):
             max_len = len(pname)
 
     for pname, ppath in qiwt.buildable_projects.iteritems():
-        pad = "".join([ " " for x in range(max_len - len(pname)) ])
         LOGGER.info("%s", os.path.relpath(ppath, qiwt.work_tree))
-        #print "%s%s [%s]" %(pname, pad, os.path.relpath(ppath, qiwt.work_tree))
         list_build_dir(ppath)
