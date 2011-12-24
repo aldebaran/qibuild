@@ -25,6 +25,7 @@
 """Display the current config """
 
 import os
+import subprocess
 
 import qibuild
 
@@ -67,5 +68,7 @@ def do(args):
         editor = qibuild.interact.ask_program("Please enter an editor")
         qibuild.configstore.update_config(config_path, "general", "env.editor", editor)
 
+    full_path = qibuild.command.find_program(editor)
+    subprocess.call([full_path, toc.config_path])
     qibuild.command.call([editor, config_path])
 
