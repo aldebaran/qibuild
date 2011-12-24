@@ -45,7 +45,7 @@ will need to have something like
   cmake.generator = "Visual Studio 10"
 
   [config mingw]
-  cmake.generators = "MinGW Makefiles"
+  cmake.generator = "MinGW Makefiles"
 
 
 Here are the generators that will be used depending on the
@@ -85,12 +85,16 @@ Known keys
 
   The editor to use. (By default on UNIX, **$EDITOR** will be used)
 
-**env.ide.path**
+**env.ide**
 
   The IDE to use with ``qibuild open``.
 
   Not used with Visual Studio: we will simply call ``start
   path\to\project.sln``
+
+**env.qtcreator.path**
+
+  The path to qtcreator, if it is not found in ``$PATH``
 
 **env.path**
 
