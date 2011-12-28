@@ -219,8 +219,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
     """
     exe_full_path = find_program(cmd[0], env=env)
     if not exe_full_path:
-        raise Exception("Could not find: %s" % cmd[0])
-
+        raise NotInPath(cmd[0], env=env)
 
     if cwd:
         if not os.path.exists(cwd):
