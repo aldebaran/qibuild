@@ -60,7 +60,8 @@ class Project:
     def load_config(self):
         """ Update project dependency list """
         qibuild_manifest = os.path.join(self.directory, "qibuild.manifest")
-        self.configstore.read(qibuild_manifest)
+        if os.path.exists(qibuild_manifest):
+            self.configstore.read(qibuild_manifest)
         self.depends  = self.configstore.depends
         self.rdepends  = self.configstore.rdepends
 

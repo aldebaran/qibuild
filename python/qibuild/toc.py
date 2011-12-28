@@ -107,7 +107,8 @@ class Toc(WorkTree):
         # The local config file in which to write
         self.config_path = os.path.join(self.work_tree, ".qi", "qibuild.xml")
         self.configstore = qibuild.config.QiBuildConfig(config)
-        self.configstore.read(self.config_path)
+        if os.path.exists(self.config_path):
+            self.configstore.read(self.config_path)
         self.active_config = self.configstore.active_config
 
         self.build_type = build_type
