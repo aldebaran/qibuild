@@ -60,7 +60,7 @@ class Project:
         self.directory       = directory
         self.depends         = list()
         self.rdepends        = list()
-        self.configstore     = qibuild.configstore.ConfigStore()
+        self.configstore     = qibuild.config.ProjectConfig()
 
         #build related settings
         self.cmake_flags     = list()
@@ -82,10 +82,8 @@ class Project:
         """ Update project dependency list """
         qibuild_manifest = os.path.join(self.directory, "qibuild.manifest")
         self.configstore.read(qibuild_manifest)
-        deps  = self.configstore.get("project.%s.depends"  % self.name, default="").split()
-        rdeps = self.configstore.get("project.%s.rdepends" % self.name, default="").split()
-        self.depends.extend(deps)
-        self.rdepends.extend(rdeps)
+        self.depends  = self.configstore.depends
+        self.rdepends  = self.configstore.rdepends
 
     def set_custom_build_directory(self, build_dir):
         """ could be used to override the default build_directory
@@ -117,8 +115,9 @@ def name_from_directory(project_dir):
     The directory should contain a "qibuild.manifest" file,
     looking like
 
-        [project foo]
-        ...
+        <project name="...">
+
+        </project>
 
     If such a section can not be found, simply return
     the base name of the directory
@@ -126,16 +125,9 @@ def name_from_directory(project_dir):
     manifest = os.path.join(project_dir, "qibuild.manifest")
     if not os.path.exists(manifest):
         return os.path.basename(project_dir)
-    config = qibuild.configstore.ConfigStore()
-    conf_file = os.path.join(project_dir, "qibuild.manifest")
-    config.read(conf_file)
-    project_names = config.get("project", default=dict()).keys()
-    if len(project_names) != 1:
-        mess  = "The file %s is invalid\n" % conf_file
-        mess += "It should contains exactly one project section"
-        raise Exception(mess)
-
-    return project_names[0]
+    p_cfg = qibuild.config.ProjectConfig()
+    p_cfg.read(manifest)
+    return p_cfg.name
 
 
 def version_from_directory(project_dir):
@@ -176,7 +168,7 @@ def update_project(project, toc):
 
     """
     # Handle custom global build directory containing all projects
-    singlebdir = toc.configstore.get("build.directory")
+    singlebdir = toc.configstore.build.build_dir
     if singlebdir:
         singlebdir = os.path.expanduser(singlebdir)
         if not os.path.isabs(singlebdir):
@@ -189,7 +181,7 @@ def update_project(project, toc):
 
 
     # Handle single sdk dir
-    sdk_dir = toc.configstore.get("build.sdk_dir", default=None)
+    sdk_dir = toc.configstore.build.sdk_dir
     if sdk_dir:
         if os.path.isabs(sdk_dir):
             project.sdk_directory = sdk_dir
@@ -259,12 +251,6 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
     custom_cmake_code = ""
     config = toc.active_config
     if config:
-        global_dir = qibuild.configstore.get_config_dir()
-        global_cmake = os.path.join(global_dir, "%s.cmake" % config)
-        if os.path.exists(global_cmake):
-            custom_cmake_code += 'include("%s")\n' % \
-                qibuild.sh.to_posix_path(global_cmake)
-
         local_dir = os.path.join(toc.work_tree, ".qi")
         local_cmake = os.path.join(local_dir, "%s.cmake" % config)
         if os.path.exists(local_cmake):

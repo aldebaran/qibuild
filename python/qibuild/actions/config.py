@@ -55,8 +55,7 @@ def do(args):
     if not args.edit:
         return
 
-    config_path = qibuild.configstore.get_config_path()
-    editor = toc.configstore.get("env.editor")
+    editor = toc.configstore.defaults.env.editor
     if not editor:
         editor = os.environ.get("VISUAL")
     if not editor:
@@ -66,9 +65,9 @@ def do(args):
         # that we never ask again
         print "Could not find the editor to use."
         editor = qibuild.interact.ask_program("Please enter an editor")
-        qibuild.configstore.update_config(config_path, "general", "env.editor", editor)
+        toc.configstore.set_default_editor(editor)
+        toc.save_config()
 
     full_path = qibuild.command.find_program(editor)
     subprocess.call([full_path, toc.config_path])
-    qibuild.command.call([editor, config_path])
 

@@ -1,4 +1,7 @@
-[project @project_name@]
-# Add your project dependencies here:
-depends =
+<project name="@project_name@">
+  <!-- Add your project dependencies here -->
 
+  <!--
+  <depends name="foo" />
+  -->
+</project>

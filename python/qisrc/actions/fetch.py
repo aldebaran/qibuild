@@ -41,6 +41,7 @@ The url should point to a xml file looking like
 
 """
 
+import os
 import logging
 
 import qisrc
@@ -63,22 +64,23 @@ def do(args):
 
     """
     toc = qibuild.toc.toc_open(args.work_tree)
-    toc_cfg = toc.config_path
-    toc_configstore = qibuild.configstore.ConfigStore()
-    toc_configstore.read(toc_cfg)
     if args.url:
         manifest_url = args.url
     else:
-        manifest_url = toc_configstore.get("manifest.url")
-        if manifest_url is None:
+        manifest = toc.configstore.manifest
+        if manifest is None:
             mess  = "Could not find URL fo fetch from.\n"
             mess += "Here is what you can do:\n"
             mess += " - specify an URL from the command line\n"
-            mess += " - edit %s to have: \n\n" % toc_cfg
-            mess += """[manifest]
-url = ftp://example.com/foo.manifest
+            mess += " - edit %s to have: \n\n" % toc.config_path
+            mess += """<qibuild>
+            <manifest
+                url = ftp://example.com/foo.manifest
+            />
+</qibuild>
 """
             raise Exception(mess)
+        manifest_url = manifest.url
 
     qiwt = qibuild.worktree_open(args.work_tree)
 
@@ -86,8 +88,12 @@ url = ftp://example.com/foo.manifest
     for (project_name, project_url) in projects.iteritems():
         if project_name not in qiwt.git_projects.keys():
             qibuild.run_action("qisrc.actions.add", [project_url, project_name])
+        else:
+            p_path = qiwt.git_projects[project_name]
+            LOGGER.info("Found project %s, skipping", project_name)
 
     # Everything went fine, store the manifest URL for later use:
-    qibuild.configstore.update_config(toc_cfg, "manifest", "url", manifest_url)
+    toc.configstore.set_manifest_url(manifest_url)
+    toc.save_config()
 
 

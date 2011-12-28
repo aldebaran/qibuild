@@ -319,8 +319,12 @@ def create(directory):
 
     """
     to_create = os.path.join(directory, ".qi")
-    qibuild.sh.mkdir(to_create, recursive=True)
-
+    if not os.path.exists(to_create):
+        qibuild.sh.mkdir(to_create, recursive=True)
+    qi_xml = os.path.join(directory, ".qi", "qibuild.xml")
+    if not os.path.exists(qi_xml):
+        with open(qi_xml, "w") as fp:
+            fp.write("<qibuild />\n")
 
 def worktree_from_args(args):
     """Returns a suitable work tree from the command line

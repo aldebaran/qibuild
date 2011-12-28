@@ -35,6 +35,7 @@ import logging
 from . import toc
 from . import parsers
 from . import command
+from . import config
 from . import configstore
 from . import cmdparse
 from . import ctest
