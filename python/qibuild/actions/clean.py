@@ -33,7 +33,6 @@ import os
 import glob
 import logging
 import qibuild
-import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -52,7 +51,6 @@ def cleanup(path, bdirs, work_tree, doit=False):
             if doit:
                 print " ", os.path.relpath(bdir, work_tree)
                 qibuild.sh.rm(bdir)
-    pass
 
 def list_build_folder(path, bdirs, work_tree):
     """ list all buildable directory """
@@ -84,12 +82,12 @@ def do(args):
     folders = dict()
     for project in qiwt.buildable_projects.values():
         result = list_build_folder(project, args.build_directory, qiwt.work_tree)
-        for k,v in result.iteritems():
+        for k, v in result.iteritems():
             if folders.get(k):
                 folders[k].extend(v)
             else:
                 folders[k] = v
-    for k,v in folders.iteritems():
+    for k, v in folders.iteritems():
         logger.info(k)
         print " ", ",".join(v)
         # for p in v:

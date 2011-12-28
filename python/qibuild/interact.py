@@ -29,7 +29,8 @@
 #TODO: color!
 
 import os
-from qibuild.command import find_program
+
+import qibuild
 
 
 def ask_choice(choices, input_text):
@@ -87,15 +88,16 @@ def ask_program(message):
     If still not found, give up ...
     """
     program = ask_string(message)
-    full_path = find_program(program)
+    full_path = qibuild.command.find_program(program)
     # TODO: hard-coded guess ?
     if full_path is not None:
         return full_path
 
     print "%s not found" % program
     full_path = ask_string("Please enter full path to %s" % program)
+    full_path = qibuild.sh.to_native_path(full_path)
     if not os.path.exists(full_path):
-       raise Exception("%s does not exists, aborting")
+        raise Exception("%s does not exists, aborting" % full_path)
     return full_path
 
 

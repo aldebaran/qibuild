@@ -26,7 +26,6 @@
 """Remove a package from a toolchain
 """
 
-import os
 import logging
 
 import qibuild

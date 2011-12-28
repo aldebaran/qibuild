@@ -30,7 +30,6 @@ For instance
   qibuild --ignore-errors -- ls -l
 """
 
-import sys
 import logging
 import qibuild
 

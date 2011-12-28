@@ -102,7 +102,13 @@ class WorkTree:
         self._load_projects(path_hints)
 
     def _load_projects(self, path_hints):
+        """ Parse a worktree.
 
+        Look for git projects and qibuild projects (directories containing a
+        qibuild.manifest and update self.buildable_projects and self.git_projects
+
+        Make sure there is no name conflict.
+        """
         for p in path_hints:
             (git_p, src_p) = search_projects(p)
             for d in src_p:
@@ -199,6 +205,15 @@ def worktree_open(work_tree=None):
     return WorkTree(work_tree, path_hints=path_hints)
 
 def search_current_project_root(working_directory):
+    """ When you run qibuild without any arguement,
+    we try to guess the current project using the current working dir.
+
+    Two cases:
+        - inside a subdir of qibuild project: look for a qibuild.manifest
+        - inside the build directory of a qibuild project: search a
+        cmake build directory, and guess the project from the contents
+        of the cmake cache.
+    """
     cwd = _search_manifest_directory(working_directory)
     if not cwd:
         #get the project directory associated to the build dir

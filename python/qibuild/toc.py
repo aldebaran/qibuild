@@ -401,7 +401,11 @@ class Toc(WorkTree):
         # Here do not honor self.solve_deps or the software won't compile :)
         dep_solver = DependenciesSolver(projects=self.projects, packages=self.packages,
             active_projects=self.active_projects)
-        (r_project_names, package_namess, not_found) = dep_solver.solve([project_name])
+        (r_project_names, _package_names, not_found) = dep_solver.solve([project_name])
+
+        # Nothing to do with with the packages:
+        # SDK dirs from toolchain are managed by the toolchain file in
+        # self.toolchain
 
         if not_found:
             # FIXME: right now there are tons of case where you could have missing
@@ -413,8 +417,6 @@ class Toc(WorkTree):
         # Remove self from the list:
         r_project_names.remove(project_name)
 
-        # SDK_DIRS from toolchain are managed inside the toolchain.cmake file
-        # of the toolchain
 
         for project_name in r_project_names:
             project = self.get_project(project_name)
@@ -479,7 +481,7 @@ class Toc(WorkTree):
             raise TocException(mess)
 
         # Generate the dependencies.cmake just in time:
-        qibuild.project.bootstrap_project(project, self, self.active_projects)
+        qibuild.project.bootstrap_project(project, self)
 
         # Set generator if necessary
         cmake_args = list()

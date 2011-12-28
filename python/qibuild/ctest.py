@@ -203,10 +203,10 @@ def write_xml(xml_out, test_res):
 </testsuites>
 """
     if test_res.ok:
-        num_failures="0"
+        num_failures = "0"
         failure = ""
     else:
-        num_failures="1"
+        num_failures = "1"
         failure = """
       <failure message="{message}">
           <![CDATA[ {out} ]]>

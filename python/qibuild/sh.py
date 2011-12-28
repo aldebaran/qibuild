@@ -102,7 +102,7 @@ def _copy_link(src, dest, quiet):
     os.symlink(target, dest)
 
 
-def _handle_dirs(src, dest, root, directories, filter, quiet):
+def _handle_dirs(src, dest, root, directories, filter_fun, quiet):
     """ Helper function used by install()
 
     """
@@ -114,7 +114,7 @@ def _handle_dirs(src, dest, root, directories, filter, quiet):
 
     for directory in directories:
         to_filter = os.path.join(rel_root, directory)
-        if not filter(to_filter):
+        if not filter_fun(to_filter):
             continue
         dsrc  = os.path.join(root, directory)
         ddest = os.path.join(new_root, directory)
@@ -126,7 +126,7 @@ def _handle_dirs(src, dest, root, directories, filter, quiet):
                 raise Exception("Expecting a directory but found a file: %s" % ddest)
             mkdir(ddest, recursive=True)
 
-def _handle_files(src, dest, root, files, filter, quiet):
+def _handle_files(src, dest, root, files, filter_fun, quiet):
     """ Helper function used by install()
 
     """
@@ -134,7 +134,7 @@ def _handle_files(src, dest, root, files, filter, quiet):
     new_root = os.path.join(dest, rel_root)
 
     for f in files:
-        if not filter(os.path.join(rel_root, f)):
+        if not filter_fun(os.path.join(rel_root, f)):
             continue
         fsrc  = os.path.join(root, f)
         fdest = os.path.join(new_root, f)
@@ -153,11 +153,11 @@ def _handle_files(src, dest, root, files, filter, quiet):
             shutil.copy(fsrc, fdest)
 
 
-def install(src, dest, filter=None, quiet=False):
+def install(src, dest, filter_fun=None, quiet=False):
     """Install a directory to a destination.
 
-    If filter is not None, then the file will only be
-    installed if filter(relative/path/to/file) returns
+    If filter_fun is not None, then the file will only be
+    installed if filter_fun(relative/path/to/file) returns
     True.
 
     Few notes: rewriting `cp' or `install' is a hard problem.
@@ -186,14 +186,14 @@ def install(src, dest, filter=None, quiet=False):
     LOGGER.debug("Installing %s -> %s", src, dest)
     #pylint: disable-msg=E0102
     # (function IS already defined, that's the point!)
-    if filter is None:
-        def filter(filename):
+    if filter_fun is None:
+        def filter_fun(_unused):
             return True
 
     if os.path.isdir(src):
         for (root, dirs, files) in os.walk(src):
-            _handle_dirs (src, dest, root, dirs,  filter, quiet)
-            _handle_files(src, dest, root, files, filter, quiet)
+            _handle_dirs (src, dest, root, dirs,  filter_fun, quiet)
+            _handle_files(src, dest, root, files, filter_fun, quiet)
     else:
         # Emulate posix `install' behavior:
         # if dest is a dir, install in the directory, else
