@@ -45,6 +45,7 @@ import qibuild.sh
 
 LOGGER = logging.getLogger("qibuild.toc.project")
 
+
 class Project:
     """ Store information about a project:
          - name
@@ -52,7 +53,7 @@ class Project:
          - build directory
          - build configuration
          - dependencies
-         - configstore (read from the qibuild.manifest file from the
+         - configstore (read from the project.xml file from the
                         source directory)
     """
     def __init__(self, name, directory):
@@ -80,9 +81,11 @@ class Project:
 
     def load_config(self):
         """ Update project dependency list """
-        qibuild_manifest = os.path.join(self.directory, "qibuild.manifest")
-        if os.path.exists(qibuild_manifest):
-            self.configstore.read(qibuild_manifest)
+        handle_old_manifest(self.directory)
+        project_xml = os.path.join(self.directory, "qiproject.xml")
+        if not os.path.exists(project_xml):
+            return
+        self.configstore.read(project_xml)
         self.depends  = self.configstore.depends
         self.rdepends  = self.configstore.rdepends
 
@@ -113,7 +116,7 @@ class Project:
 def name_from_directory(project_dir):
     """Get the project name from the project directory
 
-    The directory should contain a "qibuild.manifest" file,
+    The directory should contain a "qiproject.xml" file,
     looking like
 
         <project name="...">
@@ -123,11 +126,15 @@ def name_from_directory(project_dir):
     If such a section can not be found, simply return
     the base name of the directory
     """
-    manifest = os.path.join(project_dir, "qibuild.manifest")
-    if not os.path.exists(manifest):
+    # FIXME: qiproject.xml is read twice!
+    # once for finding project names, and an other time for
+    # loading complete configuration (with {r,}depends)
+    handle_old_manifest(project_dir)
+    xml = os.path.join(project_dir, "qiproject.xml")
+    if not os.path.exists(xml):
         return os.path.basename(project_dir)
     p_cfg = qibuild.config.ProjectConfig()
-    p_cfg.read(manifest)
+    p_cfg.read(xml)
     return p_cfg.name
 
 
@@ -235,6 +242,7 @@ if(_found STREQUAL "-1")
   # over cmake files in the cross-toolchain
   list(INSERT CMAKE_MODULE_PATH 0 "${{_qibuild_path}}")
 
+
   # Uncomment this if you really need to use qibuild
   # cmake files from the cross-toolchain
   # list(APPEND CMAKE_MODULE_PATH "${{_qibuild_path}}")
@@ -284,3 +292,16 @@ endif()
     with open(dep_cmake, "w") as fp:
         fp.write(to_write)
 
+
+def handle_old_manifest(directory):
+    """ Handle processing a qibuild.manifest file,
+    transforming it to a project.xml file on the fly
+
+    """
+    project_xml = os.path.join(directory, "qiproject.xml")
+    if not os.path.exists(project_xml):
+        qibuild_manifest = os.path.join(directory, "qibuild.manifest")
+        if os.path.exists(qibuild_manifest):
+            xml = qibuild.config.convert_project_manifest(qibuild_manifest)
+            with open(project_xml, "w") as fp:
+                fp.write(xml)
