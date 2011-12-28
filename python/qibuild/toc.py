@@ -62,99 +62,6 @@ class InstallFailed(Exception):
     def __str__(self):
         return "Error occured when installing project %s" % self.project.name
 
-class TocConfigStore:
-    """ A configuration associated with a Toc object..
-
-    Pass a toc Object to its constructor, and optionnaly
-    a custom config to use, then use get() as you would do
-    for a ConfigStore object, the setting from the
-    [general]  and  [config '...'] sections will be merged
-    for you.
-
-    """
-    def __init__(self, toc, user_config=None):
-
-        # A internal configstore object
-        self._configstore = qibuild.configstore.ConfigStore()
-
-        # Read from config files
-        self.default_config = None
-
-        # The config that is being used
-        self.active_config = None
-
-
-        self.toc = toc
-        self._load_config()
-        if user_config:
-            self.active_config = user_config
-        else:
-            self.active_config = self.default_config
-
-    def _load_config(self):
-        """ Initialize the configstore attribute,
-        and the default configuration.
-
-        """
-        general_file = qibuild.configstore.get_config_path()
-        self._configstore.read(general_file)
-
-        local_file = os.path.join(self.toc.work_tree, ".qi", "qibuild.cfg")
-        self._configstore.read(local_file)
-
-        self.default_config = self._configstore.get('general.config')
-
-    def get(self, key, default=None):
-        r""" Handle different configurations, for instance, assuming the
-        configuration looks like:
-
-          [general]
-          cmake.flags = FOO=BAR
-          config = mingw32
-
-          [config vs2010]
-          cmake.generator = 'Visual Studio 10'
-
-          [config mingw32]
-          cmake.generator = 'MinGW Makefiles'
-          env.path = c:\MinGW\bin;
-
-        if self.config = 'vs2010' then
-        self.get('cmake.generator')
-        returns 'Visual Studio 10',
-
-        whereas if config is None, default
-        config is using from [general] section, and
-        self.get('cmake.flags')
-        returns 'FOO=BAR'
-
-        """
-        res = None
-        if self.toc.active_config:
-            res = self._configstore.get('config.%s.' % self.toc.active_config + key)
-        if not res:
-            res = self._configstore.get('general.' + key)
-
-        if not res:
-            res = default
-
-        return res
-
-    def get_known_configs(self):
-        """ List all the knwown configurations
-
-        """
-        res = list()
-        configs = self._configstore.get('config')
-        if configs:
-            res = configs.keys()[:]
-        return res
-
-
-    def __str__(self):
-        return str(self._configstore)
-
-
 
 class Toc(WorkTree):
     """This class contains a list of packages, and a list of projects.
@@ -197,17 +104,11 @@ class Toc(WorkTree):
         """
         WorkTree.__init__(self, work_tree, path_hints=path_hints)
 
-        # User set a configuration, use it, then build
-        # the configstore
-        self.configstore = TocConfigStore(self, config)
-        if config:
-            self.active_config = config
-        else:
-            self.active_config = self.configstore.default_config
-
         # The local config file in which to write
-        # (the global is in qibuild.configstore.get_config_path())
-        self.config_path = os.path.join(self.work_tree, ".qi", "qibuild.cfg")
+        self.config_path = os.path.join(self.work_tree, ".qi", "qibuild.xml")
+        self.configstore = qibuild.config.QiBuildConfig(config)
+        self.configstore.read(self.config_path)
+        self.active_config = self.configstore.active_config
 
         self.build_type = build_type
         if not self.build_type:
@@ -240,7 +141,9 @@ class Toc(WorkTree):
 
         # Set cmake generator if user has not set if in Toc ctor:
         if not self.cmake_generator:
-            self.cmake_generator = self.configstore.get("cmake.generator", default="Unix Makefiles")
+            self.cmake_generator = self.configstore.cmake.generator
+            if not self.cmake_generator:
+                self.cmake_generator = "Unix Makefiles"
 
         # Read the current config, create toolchain and pacakges object
         # if necessary
@@ -285,18 +188,12 @@ class Toc(WorkTree):
         self.update_projects()
 
 
-    def update_config(self, key, value, config=None):
-        """ Update config file used by Toc.
-        This will only update the config filed used in this worktree
+    def save_config(self):
+        """ Save configuration. You should call this after changing
+        self.configstore in order to make the changes permanent
 
         """
-        if config is None:
-            section = "general"
-        else:
-            section = 'config "%s"' % config
-
-        qibuild.configstore.update_config(self.config_path, section, key, value)
-
+        self.configstore.write(self.config_path)
 
     def update_projects(self):
         """Set self.projects() with the correct build configs and correct build folder
@@ -409,13 +306,10 @@ class Toc(WorkTree):
         """Update os.environ using the qibuild configuration file
 
         """
-        path_env = self.configstore.get("env.path")
-        bat_file  = self.configstore.get("env.bat_file")
+        path_env = self.configstore.env.path
+        bat_file = self.configstore.env.bat_file
         if path_env:
-            path_env = path_env.replace("\n", "")
-            path_env = path_env.strip()
-            for directory in path_env.split(os.path.pathsep):
-                self.envsetter.append_to_path(directory)
+            self.envsetter.append_to_path(path_env)
         if bat_file:
             self.envsetter.source_bat(bat_file)
 

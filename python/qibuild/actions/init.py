@@ -47,7 +47,6 @@ def do(args):
         work_tree = os.getcwd()
 
     # Safe to be called: only creates the .qi/ repertory
-    # if it does not exists.
     qibuild.toc.create(work_tree)
 
     # Safe to be called now that we've created it :)
@@ -88,5 +87,6 @@ def run_wizard(toc):
 
     """
     cmake_generator = ask_generator()
-    toc.update_config("cmake.generator", cmake_generator)
+    toc.configstore.defaults.cmake.generator = cmake_generator
+    toc.save_config()
 

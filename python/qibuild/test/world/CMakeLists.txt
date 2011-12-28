@@ -2,10 +2,8 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
-
 project(world)
-
-include("${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake")
+find_package(qibuild)
 
 include_directories(".")
 

@@ -1,2 +1,4 @@
-[project hello]
-depends = "world"
+<project name="hello">
+  <depends name="world" />
+</project>
+

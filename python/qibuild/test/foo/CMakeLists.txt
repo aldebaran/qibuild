@@ -3,7 +3,7 @@
 ## found in the COPYING file.
 cmake_minimum_required(VERSION 2.8)
 project(foo)
-include(qibuild.cmake)
+find_package(qibuild)
 
 qi_create_lib(spam spam.cpp)
 qi_stage_lib(spam)

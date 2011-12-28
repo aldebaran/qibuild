@@ -24,13 +24,7 @@ def do(args):
     toc      = qibuild.toc.toc_open(args.work_tree, args)
 
     (project_names, _package_names, _not_found) = toc.resolve_deps()
-    use_incredibuild_str = toc.configstore.get("build.incredibuild",
-        default="")
-
-    if use_incredibuild_str.lower() in ["1", "true", "on", "yes"]:
-        use_incredibuild = True
-    else:
-        use_incredibuild = False
+    use_incredibuild = toc.configstore.build.incredibuild
 
     if toc.active_config:
         logger.info("Active configuration: %s (%s)", toc.active_config, toc.build_type)
