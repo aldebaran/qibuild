@@ -103,6 +103,7 @@ class Toc(WorkTree):
             active_projects : the projects excplicitely specified by user
         """
         WorkTree.__init__(self, work_tree, path_hints=path_hints)
+        handle_old_qibuild_cfg(self.work_tree)
 
         # The local config file in which to write
         self.config_path = os.path.join(self.work_tree, ".qi", "qibuild.xml")
@@ -629,3 +630,17 @@ def _advise_using_configure(self, project):
     mess = mess.format(project=project)
 
     raise TocException(mess)
+
+
+def handle_old_qibuild_cfg(worktree):
+    """ Handle processing a qibuild.cfg file,
+    transforming it to a qibuild.xml file on the fly
+
+    """
+    qibuild_xml = os.path.join(worktree, ".qi", "qibuild.xml")
+    if not os.path.exists(qibuild_xml):
+        qibuild_cfg = os.path.join(worktree, ".qi", "qibuild.cfg")
+        if os.path.exists(qibuild_cfg):
+            xml = qibuild.config.convert_qibuild_cfg(qibuild_cfg)
+            with open(qibuild_xml, "w") as fp:
+                fp.write(xml)

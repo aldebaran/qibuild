@@ -29,9 +29,11 @@
 """
 
 import os
-import qibuild
 import unittest
+import tempfile
 from StringIO import StringIO
+
+import qibuild
 
 
 def cfg_from_string(str, user_config=None):
@@ -357,6 +359,76 @@ class QiBuildConfig(unittest.TestCase):
         self.assertFalse(new_cfg.manifest is None)
         self.assertEqual(new_cfg.manifest.url, manifest_url)
 
+
+
+class ConvertTestCase(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix="tmp-configstore-test")
+        self.cfg_path = os.path.join(self.tmp, "conf.cfg")
+
+    def test_qibuild_cfg(self):
+        qibuild_cfg = r"""[general]
+config = vs2010
+cmake.generator = Unix Makefiles
+env.editor = vim
+env.ide = QtCreator
+env.path = c:\MinGW\bin;c:\Program Files\swig;
+env.bat_file = c:\path\to\vsvarsall.bat
+build.directory = "/path/to/build"
+build.sdk_dir   = "/path/to/sdk"
+build.incredibuild = yes
+env.qtcreator.path = "/path/to/qtcreator"
+
+[manifest]
+url = "http://example.com/foo.manifest"
+
+[config vs2010]
+cmake.generator = "Visual Studio 10"
+"""
+
+        with open(self.cfg_path, "w") as fp:
+            fp.write(qibuild_cfg)
+        qibuild_xml = qibuild.config.convert_qibuild_cfg(self.cfg_path)
+        qibuild_cfg = cfg_from_string(qibuild_xml)
+        self.assertEqual(qibuild_cfg.defaults.config, "vs2010")
+        self.assertEqual(qibuild_cfg.defaults.cmake.generator, "Unix Makefiles")
+        self.assertEqual(qibuild_cfg.env.editor, "vim")
+        self.assertEqual(qibuild_cfg.ides["QtCreator"].path,
+            "/path/to/qtcreator")
+        self.assertEqual(qibuild_cfg.defaults.env.path,
+            r"c:\MinGW\bin;c:\Program Files\swig;")
+        self.assertEqual(qibuild_cfg.build.build_dir,
+            "/path/to/build")
+        self.assertEqual(qibuild_cfg.build.sdk_dir,
+            "/path/to/sdk")
+        self.assertEqual(qibuild_cfg.manifest.url,
+             "http://example.com/foo.manifest")
+        self.assertEqual(qibuild_cfg.configs["vs2010"].cmake.generator,
+            "Visual Studio 10")
+        self.assertEqual(qibuild_cfg.cmake.generator, "Visual Studio 10")
+
+        unix_cfg = cfg_from_string(qibuild_xml, "foo")
+        self.assertEqual(unix_cfg.cmake.generator, "Unix Makefiles")
+
+    def test_project_manifest(self):
+        cfg = """[project foo]
+depends = bar baz
+rdepends = spam eggs
+"""
+        with open(self.cfg_path, "w") as fp:
+            fp.write(cfg)
+        project_xml = qibuild.config.convert_project_manifest(self.cfg_path)
+        with open(self.cfg_path, "w") as fp:
+            fp.write(project_xml)
+        project_cfg = qibuild.config.ProjectConfig()
+        project_cfg.read(self.cfg_path)
+        self.assertEqual(project_cfg.name, "foo")
+        self.assertEqual(project_cfg.depends, ["bar", "baz"])
+        self.assertEqual(project_cfg.rdepends, ["spam", "eggs"])
+
+
+    def tearDown(self):
+        qibuild.sh.rm(self.tmp)
 
 
 if __name__ == "__main__":

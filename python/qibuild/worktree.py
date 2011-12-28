@@ -229,6 +229,8 @@ def _search_manifest_directory(working_directory):
 
     #for each cwd parent folders, try to see if it match src
     while dirname or cwd:
+        if os.path.exists(os.path.join(cwd, "qiproject.xml")):
+            return cwd
         if os.path.exists(os.path.join(cwd, "qibuild.manifest")):
             return cwd
         if os.path.exists(os.path.join(cwd, "manifest.xml")):
@@ -254,10 +256,12 @@ def search_projects(directory=None, depth=4):
     if os.path.exists(os.path.join(directory, ".git")):
         rgit.append(directory)
 
-    if os.path.exists(os.path.join(directory, "qibuild.manifest")):
+
+    if os.path.exists(os.path.join(directory, "qiproject.xml")):
         rsrc.append(directory)
 
-    if os.path.exists(os.path.join(directory, "manifest.xml")):
+    # old qibuild syntax
+    if os.path.exists(os.path.join(directory, "qibuild.manifest")):
         rsrc.append(directory)
 
     blacklist_file = os.path.join(directory, ".qiblacklist")

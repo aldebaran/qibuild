@@ -35,6 +35,7 @@ try:
     HAS_LXML = True
 except ImportError:
     from xml.etree import ElementTree as etree
+from StringIO import StringIO
 
 import qibuild
 
@@ -288,7 +289,12 @@ class QiBuildConfig:
             ide.parse(ide_tree)
             self.ides[ide.name] = ide
 
-        # Merge various configs:
+        self.merge_configs()
+
+    def merge_configs(self):
+        """ Merge various configs
+
+        """
         default_config = self.defaults.config
         if self.user_config:
             self.active_config = self.user_config
@@ -297,7 +303,16 @@ class QiBuildConfig:
                 self.active_config = default_config
 
         self.env.bat_file = self.defaults.env.bat_file
+        self.env.editor   = self.defaults.env.editor
+        self.cmake        = self.defaults.cmake
+        self.ide          = None
+
         current_ide = self.defaults.ide
+        if current_ide:
+            matching_ide = self.ides.get(current_ide)
+            if matching_ide:
+                self.ide = matching_ide
+
         if self.active_config:
             matching_config = self.configs.get(self.active_config)
             if matching_config:
@@ -312,19 +327,12 @@ class QiBuildConfig:
                 self.env.bat_file = matching_config.env.bat_file
                 # Set cmake settings from current config
                 self.cmake = matching_config.cmake
-                # If no generator was specified in the matching config,
-                # use the default one:
-                if not self.cmake.generator:
-                    self.cmake.generator = self.defaults.cmake.generator
                 # Set ide from current config
-                current_ide = matching_config.ide
-        else:
-            self.cmake = self.defaults.cmake
+                matching_config_ide = matching_config.ide
+                if matching_config_ide:
+                    if self.ides.get(matching_config_ide):
+                        self.ide = self.ides[matching_config_ide]
 
-        if current_ide:
-            matching_ide = self.ides.get(current_ide)
-            if matching_ide:
-                self.ide = matching_ide
 
     def set_default_config(self, name):
         """ Set a new config to use by default
@@ -452,3 +460,112 @@ class ProjectConfig:
                     tree=rdepends_tree)
             self.rdepends.append(rdepends_name)
 
+    def write(self, location):
+        """ Write configuration back to a config file
+
+        """
+        project_tree = etree.Element("project")
+        project_tree.set("name", self.name)
+        for depend in self.depends:
+            depend_tree = etree.Element("depends")
+            depend_tree.set("name", depend)
+            project_tree.append(depend_tree)
+        for rdepend in self.rdepends:
+            rdepend_tree = etree.Element("rdepends")
+            rdepend_tree.set("name", rdepend)
+            project_tree.append(rdepend_tree)
+        tree = etree.ElementTree(element=project_tree)
+        if HAS_LXML:
+            # pylint: disable-msg=E1123
+            tree.write(location, pretty_print=True)
+        else:
+            tree.write(location)
+
+
+def convert_qibuild_cfg(qibuild_cfg):
+    """ Convert an old qibuild.cfg file
+    into a new qibuild.xml file
+
+    """
+    ini_cfg = qibuild.configstore.ConfigStore()
+    ini_cfg.read(qibuild_cfg)
+    qibuild_cfg = QiBuildConfig()
+    general_config = ini_cfg.get("general.config")
+    if general_config:
+        qibuild_cfg.defaults.config = general_config
+    cmake_generator = ini_cfg.get("general.cmake.generator")
+    if cmake_generator:
+        qibuild_cfg.defaults.cmake.generator = cmake_generator
+    env_editor = ini_cfg.get("general.env.editor")
+    if env_editor:
+        qibuild_cfg.defaults.env.editor = env_editor
+    env_path = ini_cfg.get("general.env.path")
+    if env_path:
+        qibuild_cfg.defaults.env.path = env_path
+    env_bat_file = ini_cfg.get("general.env.bat_file")
+    if env_bat_file:
+        qibuild_cfg.defaults.env.bat_file = env_bat_file
+    env_ide = ini_cfg.get("general.env.ide")
+    if env_ide:
+        qibuild_cfg.defaults.ide = env_ide
+        ide = IDE()
+        ide.name = env_ide
+        qibuild_cfg.ides[ide.name] = ide
+    qtcreator_path = ini_cfg.get("general.env.qtcreator.path")
+    if qtcreator_path:
+        if not qibuild_cfg.ides.get("QtCreator"):
+            qibuild_cfg.ides["QtCreator"] = IDE("QtCreator")
+        qibuild_cfg.ides["QtCreator"].path = qtcreator_path
+    build_dir = ini_cfg.get("general.build.directory")
+    if build_dir:
+        qibuild_cfg.build.build_dir = build_dir
+    sdk_dir = ini_cfg.get("general.build.sdk_dir")
+    if sdk_dir:
+        qibuild_cfg.build.sdk_dir = sdk_dir
+    incredibuild_str = ini_cfg.get("general.build.incredibuild", default="")
+    if incredibuild_str.lower() in ["y", "yes", "1", "true", "on"]:
+            qibuild_cfg.build.incredibuild = True
+
+    manifest_url = ini_cfg.get("manifest.url")
+    if manifest_url:
+        manifest = Manifest()
+        manifest.url = manifest_url
+        qibuild_cfg.manifest = manifest
+
+    for (name, _) in ini_cfg.get("config", default=dict()).iteritems():
+        config = Config()
+        config.name = name
+        cmake_generator = ini_cfg.get("config.%s.cmake.generator" % name)
+        if cmake_generator:
+            config.cmake.generator = cmake_generator
+        qibuild_cfg.configs[config.name] = config
+
+    out = StringIO()
+    qibuild_cfg.write(out)
+
+    return out.getvalue()
+
+
+
+def convert_project_manifest(qibuild_manifest):
+    """ Convert a on qibuild.manifest file
+    (ini format) into a new qibuild.manifest
+    file (xml format)
+
+    """
+    ini_cfg = qibuild.configstore.ConfigStore()
+    ini_cfg.read(qibuild_manifest)
+    p_names = ini_cfg.get("project", default=dict()).keys()
+    if len(p_names) != 1:
+        raise_parse_error("File should countain exactly one [project] section",
+            cfg_path=qibuild_manifest)
+    name = p_names[0]
+    project = ProjectConfig()
+    project.name = name
+    depends  = ini_cfg.get("project.%s.depends"  % name, default="").split()
+    rdepends = ini_cfg.get("project.%s.rdepends" % name, default="").split()
+    project.depends  = depends[:]
+    project.rdepends = rdepends[:]
+    out = StringIO()
+    project.write(out)
+    return out.getvalue()
