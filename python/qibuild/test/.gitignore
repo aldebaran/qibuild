@@ -1,3 +1,6 @@
 build-*/
 package
 .qi/
+
+# Created on the fly by qibuild:
+qiproject.xml

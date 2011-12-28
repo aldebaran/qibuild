@@ -1,4 +1,3 @@
-<project name="hello">
-  <depends name="world" />
-</project>
+[project "hello"]
+depends = "world"
 
