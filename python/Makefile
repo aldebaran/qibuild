@@ -13,29 +13,18 @@ PYMODULES=qibuild qitoolchain qisrc \
 PYTHON ?= python
 
 all: check-error check
-	@echo ""
-	@echo "###################################"
-	@echo "GG, now you can commit!"
-	@echo "###################################"
 
 check-all:
-	@echo "###################################"
-	@echo "running pylint check-all"
-	@echo "###################################"
+	@echo ":: Running pylint check-all"
 	@pylint -f colorized --rcfile pylint.rc $(PYMODULES) --ignore=external 2>&1 | grep -v "Exception RuntimeError: 'maximum recursion depth exceeded" && exit 1 || exit 0
 
 check-error:
-	@echo "###################################"
-	@echo "# running pylint check-error"
-	@echo "###################################"
+	@echo ":: Running pylint --errors-only"
 	@pylint --include-ids=y -f colorized --errors-only --rcfile pylint.rc $(PYMODULES) --ignore=external 2>&1 | grep -v "Exception RuntimeError: 'maximum recursion depth exceeded" && exit 1 || exit 0
-	@echo " >checked only for pylint error (use check-all for more)"
-
-
+	@echo " => Checked only for pylint errors"
+	@echo "    Use make check-all for running a full pylint check"
 
 check:
-	@echo "###################################"
-	@echo "running test"
-	@echo "###################################"
-	PYTHONPATH=. $(PYTHON) run_tests.py
+	@echo ":: Running tests"
+	@$(PYTHON) run_tests.py
 
