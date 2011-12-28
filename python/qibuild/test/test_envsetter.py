@@ -38,6 +38,7 @@ import qibuild
 
 class EnvSetterTestCase(unittest.TestCase):
     def setUp(self):
+        self.environ_back = os.environ.copy()
         # clean up os.environ (simpler debug)
         os.environ = dict()
         # defines useful vars
@@ -49,6 +50,9 @@ class EnvSetterTestCase(unittest.TestCase):
             os.environ["PATH"] = "/usr/bin:/usr/local/bin"
             self.unlikely = "/a/very/unlikely/path"
             self.absurd   = "/this/is/absurd"
+
+    def tearDown(self):
+        os.environ = self.environ_back.copy()
 
     def _check_is_in_path(self, directory, path_env):
         """ Check that a given directory is in the given string
