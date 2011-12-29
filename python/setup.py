@@ -27,20 +27,6 @@ from distutils.core import setup
 import sys
 import os
 
-def check_config():
-    """ qibuild script can only be installed if
-    qibuild/config.py has been configured by cmake
-
-    """
-    cur_dir = os.path.abspath(os.path.dirname(__file__))
-    config_py = os.path.join(cur_dir, "qibuild", "config.py")
-    if not os.path.exists(config_py):
-        print "Error, could not find %s" % config_py
-        print "Did you run cmake? "
-        sys.exit(2)
-
-check_config()
-
 packages = [
     "qibuild",
     "qibuild.external",
@@ -59,10 +45,9 @@ scripts = [
 ]
 
 package_data = {
- "qibuild" : ["templates/build.cfg",
-              "templates/build-default.cfg",
-              "templates/project/CMakeLists.txt",
+ "qibuild" : ["templates/project/CMakeLists.txt",
               "templates/project/main.cpp",
+              "templates/project/test.cpp",
               "templates/project/qibuild.manifest"
               ]
 }

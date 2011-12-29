@@ -23,12 +23,28 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+""" This module contains the Project class, and method to
+handle them
+
+A project is simply a directory in a worktree containing a qibuild.manifest
+file.
+
+The toc object is able to:
+    - update a project to set cmake flags, build directory and so on
+    - bootstrap the project to generate the dependencies.cmake used
+    by the qibuild CMake framework
+
+
+"""
+
 import os
 import logging
 
 import qibuild.sh
 
 LOGGER = logging.getLogger("qibuild.toc.project")
+
 
 class Project:
     """ Store information about a project:
@@ -37,7 +53,7 @@ class Project:
          - build directory
          - build configuration
          - dependencies
-         - configstore (read from the qibuild.manifest file from the
+         - configstore (read from the project.xml file from the
                         source directory)
     """
     def __init__(self, name, directory):
@@ -45,7 +61,7 @@ class Project:
         self.directory       = directory
         self.depends         = list()
         self.rdepends        = list()
-        self.configstore     = qibuild.configstore.ConfigStore()
+        self.configstore     = qibuild.config.ProjectConfig()
 
         #build related settings
         self.cmake_flags     = list()
@@ -65,12 +81,13 @@ class Project:
 
     def load_config(self):
         """ Update project dependency list """
-        qibuild_manifest = os.path.join(self.directory, "qibuild.manifest")
-        self.configstore.read(qibuild_manifest)
-        deps  = self.configstore.get("project.%s.depends"  % self.name, default="").split()
-        rdeps = self.configstore.get("project.%s.rdepends" % self.name, default="").split()
-        self.depends.extend(deps)
-        self.rdepends.extend(rdeps)
+        handle_old_manifest(self.directory)
+        project_xml = os.path.join(self.directory, "qiproject.xml")
+        if not os.path.exists(project_xml):
+            return
+        self.configstore.read(project_xml)
+        self.depends  = self.configstore.depends
+        self.rdepends  = self.configstore.rdepends
 
     def set_custom_build_directory(self, build_dir):
         """ could be used to override the default build_directory
@@ -99,28 +116,26 @@ class Project:
 def name_from_directory(project_dir):
     """Get the project name from the project directory
 
-    The directory should contain a "qibuild.manifest" file,
+    The directory should contain a "qiproject.xml" file,
     looking like
 
-        [project foo]
-        ...
+        <project name="...">
+
+        </project>
 
     If such a section can not be found, simply return
     the base name of the directory
     """
-    manifest = os.path.join(project_dir, "qibuild.manifest")
-    if not os.path.exists(manifest):
+    # FIXME: qiproject.xml is read twice!
+    # once for finding project names, and an other time for
+    # loading complete configuration (with {r,}depends)
+    handle_old_manifest(project_dir)
+    xml = os.path.join(project_dir, "qiproject.xml")
+    if not os.path.exists(xml):
         return os.path.basename(project_dir)
-    config = qibuild.configstore.ConfigStore()
-    conf_file = os.path.join(project_dir, "qibuild.manifest")
-    config.read(conf_file)
-    project_names = config.get("project", default=dict()).keys()
-    if len(project_names) != 1:
-        mess  = "The file %s is invalid\n" % conf_file
-        mess += "It should contains exactly one project section"
-        raise Exception(mess)
-
-    return project_names[0]
+    p_cfg = qibuild.config.ProjectConfig()
+    p_cfg.read(xml)
+    return p_cfg.name
 
 
 def version_from_directory(project_dir):
@@ -161,7 +176,7 @@ def update_project(project, toc):
 
     """
     # Handle custom global build directory containing all projects
-    singlebdir = toc.configstore.get("build.directory")
+    singlebdir = toc.configstore.build.build_dir
     if singlebdir:
         singlebdir = os.path.expanduser(singlebdir)
         if not os.path.isabs(singlebdir):
@@ -174,7 +189,7 @@ def update_project(project, toc):
 
 
     # Handle single sdk dir
-    sdk_dir = toc.configstore.get("build.sdk_dir", default=None)
+    sdk_dir = toc.configstore.build.sdk_dir
     if sdk_dir:
         if os.path.isabs(sdk_dir):
             project.sdk_directory = sdk_dir
@@ -198,9 +213,13 @@ def update_project(project, toc):
     if toc.cmake_flags:
         project.cmake_flags.extend(toc.cmake_flags)
 
+    # lastly, add a correct -DCMAKE_MODULE_PATH
+    cmake_qibuild_dir = qibuild.get_cmake_qibuild_dir()
+    qibuild_dir = os.path.join(cmake_qibuild_dir, "qibuild")
+    project.cmake_flags.append("qibuild_DIR=%s" % qibuild_dir)
 
 
-def bootstrap_project(project, toc, project_names=None):
+def bootstrap_project(project, toc):
     """ Create the magic build/dependencies.cmake file
 
     This is to be called right before calling cmake
@@ -208,8 +227,6 @@ def bootstrap_project(project, toc, project_names=None):
     because we need to know about all the other projects
     inside the Toc oject to get the list of SDK dirs, for instance.
 
-    project_names can be given to by-pass the 'package first, then
-    source dir' toc.get_sdk_dir algorithm
     """
     # To be written in dependencies.cmake
     to_write = """
@@ -218,12 +235,13 @@ def bootstrap_project(project, toc, project_names=None):
 #############################################
 
 # Add path to CMake framework path if necessary:
-set(_qibuild_path "{path_to_add}")
+set(_qibuild_path "{cmake_qibuild_dir}")
 list(FIND CMAKE_MODULE_PATH "${{_qibuild_path}}" _found)
 if(_found STREQUAL "-1")
   # Prefer cmake files matching  current qibuild installation
   # over cmake files in the cross-toolchain
   list(INSERT CMAKE_MODULE_PATH 0 "${{_qibuild_path}}")
+
 
   # Uncomment this if you really need to use qibuild
   # cmake files from the cross-toolchain
@@ -242,25 +260,13 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
     custom_cmake_code = ""
     config = toc.active_config
     if config:
-        global_dir = qibuild.configstore.get_config_dir()
-        global_cmake = os.path.join(global_dir, "%s.cmake" % config)
-        if os.path.exists(global_cmake):
-            custom_cmake_code += 'include("%s")\n' % \
-                qibuild.sh.to_posix_path(global_cmake)
-
         local_dir = os.path.join(toc.work_tree, ".qi")
         local_cmake = os.path.join(local_dir, "%s.cmake" % config)
         if os.path.exists(local_cmake):
             custom_cmake_code += 'include("%s")\n' % \
                 qibuild.sh.to_posix_path(local_cmake)
 
-    # This is cmake/qibuild, but we need to set the
-    # CMAKE_MODULE_PATH to cmake/ to be able to do
-    # include(qibuild/general)
-    cmake_qibuild_dir = qibuild.CMAKE_QIBUILD_DIR
-    cmake_qibuild_dir = os.path.abspath(os.path.join(cmake_qibuild_dir, ".."))
-    path_to_add = qibuild.sh.to_posix_path(cmake_qibuild_dir)
-
+    cmake_qibuild_dir = qibuild.get_cmake_qibuild_dir()
     dep_sdk_dirs = toc.get_sdk_dirs(project.name)
 
     dep_to_add = ""
@@ -274,7 +280,7 @@ endif()
 """.format(sdk_dir=qibuild.sh.to_posix_path(sdk_dir))
 
     to_write = to_write.format(
-        path_to_add       = path_to_add,
+        cmake_qibuild_dir  = cmake_qibuild_dir,
         dep_to_add        = dep_to_add,
         custom_cmake_code = custom_cmake_code
     )
@@ -286,3 +292,16 @@ endif()
     with open(dep_cmake, "w") as fp:
         fp.write(to_write)
 
+
+def handle_old_manifest(directory):
+    """ Handle processing a qibuild.manifest file,
+    transforming it to a project.xml file on the fly
+
+    """
+    project_xml = os.path.join(directory, "qiproject.xml")
+    if not os.path.exists(project_xml):
+        qibuild_manifest = os.path.join(directory, "qibuild.manifest")
+        if os.path.exists(qibuild_manifest):
+            xml = qibuild.config.convert_project_manifest(qibuild_manifest)
+            with open(project_xml, "w") as fp:
+                fp.write(xml)

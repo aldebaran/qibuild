@@ -23,15 +23,13 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# This CMakeLists is only here for packaging.
-# Do not try to use for installing directly on you system:
-#   * CMAKE_PREFIX_PATH is NOT used ! (so you will get
-#       stuff on /usr instead of /usr/local)
-#  * CMake does not handle un-install
-#  Use the ./install-qibuild.sh script instead, or the
-#  packages provided by Aldebaran
+# You can use this CMake file to install qibuild on your
+# system, if you want to, but please not that you
+# won't be able to uninstall it afterward.
+# It is advised you use the ./install-qibuild scripts instead, or the
+# packages provided by Aldebaran
 
-cmake_minimum_required(VERSION 2.6.4)
+cmake_minimum_required(VERSION 2.8)
 
 project(qiBuild NONE)
 
@@ -55,24 +53,53 @@ if(NOT PYTHON_EXECUTABLE)
 endif()
 
 # Install CMake code where it belongs
+set(_qibuild_cmake_install_dest)
+
+if(UNIX)
+  set(_qibuild_cmake_install_dest
+    ${CMAKE_INSTALL_PREFIX}/share/cmake/
+  )
+else()
+  # No need to try /usr/local/share/
+  # on windows:
+  set(_qibuild_cmake_install_dest
+    ${CMAKE_ROOT}/Modules
+  )
+endif()
+
 install(
   DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/qibuild
   DESTINATION
-    "${CMAKE_ROOT}/Modules"
+    "${_qibuild_cmake_install_dest}"
 )
+
+# Generate man pages with sphinx:
+find_program(_sphinx_build sphinx-build)
+if(NOT _sphinx_build)
+  message(STATUS "Please install python-sphinx to generate "
+  "documentation and man pages"
+  )
+else()
+  execute_process(COMMAND
+    ${_sphinx_build}
+    "-b" "man"
+    "${CMAKE_SOURCE_DIR}/doc"
+    "${CMAKE_BINARY_DIR}/man1"
+  )
+  install(
+    DIRECTORY    ${CMAKE_BINARY_DIR}/man1
+    DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/man/
+    PATTERN      ".doctrees" EXCLUDE
+  )
+endif()
+
 
 # Useful for python script to work later:
 set(ENV{PYTHONPATH} "${CMAKE_SOURCE_DIR}/python")
 
 # Generate and install manpages
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc)
-
-# Configure python/qibuild/config.py:
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/python/qibuild/config.py.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/python/qibuild/config.py
-)
 
 # Configure the run_setup_py.cmake.in script,
 # and have it run at installation:
@@ -83,10 +110,31 @@ if(DEB_PACKAGE)
   set(SETUP_PY_ARGS "--install-layout=deb" "--no-compile")
 endif()
 
+list(APPEND SETUP_PY_ARGS "--prefix=${CMAKE_INSTALL_PREFIX}")
+
 configure_file(
   "${CMAKE_SOURCE_DIR}/run_setup_py.cmake.in"
   "${CMAKE_BINARY_DIR}/run_setup_py.cmake"
   @ONLY)
 
 install(SCRIPT "${CMAKE_BINARY_DIR}/run_setup_py.cmake")
+
+if(_sphinx_build)
+  add_custom_target("html-doc"
+    ALL
+      ${PYTHON_EXECUTABLE}
+       "${CMAKE_SOURCE_DIR}/doc/tools/gen_cmake_doc.py"
+       "${CMAKE_SOURCE_DIR}"
+    COMMAND
+      ${_sphinx_build}
+      "-b" "html"
+      ${CMAKE_SOURCE_DIR}/doc
+      ${CMAKE_BINARY_DIR}/doc/html
+  )
+  install(
+    DIRECTORY ${CMAKE_BINARY_DIR}/doc/html
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/qibuild/doc
+    PATTERN      ".doctrees" EXCLUDE
+  )
+endif()
 

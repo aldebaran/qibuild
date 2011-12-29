@@ -23,22 +23,20 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-###############################################
-# Auto-generated file.                        #
-# Do not edit                                 #
-# This file is part of the qibuild project    #
-###############################################
-
-set(QIBUILD_BOOTSTRAP_VERSION 10)
-
-# Someone used qibuild and generated a dependencies.cmake
-# file (for the dependencies and where to find qibuild/cmake file),
-# so just use it.
+# If someone is using qibuild configure, includes
+# the dependencies.cmake file
 if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
   include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
 endif()
 
-# Someone called cmake with a toolchain file that is
-# able to find qibuild/cmake code, so just include it.
-# Else, fail loudly.
+get_filename_component(_this_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
+set(_qibuild_path ${_this_dir}/..)
+
+list(FIND CMAKE_MODULE_PATH "${_qibuild_path}" _found)
+if(_found STREQUAL "-1")
+  list(APPEND CMAKE_MODULE_PATH "${_qibuild_path}")
+endif()
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} CACHE INTERNAL ""  FORCE)
+
 include(qibuild/general)
+

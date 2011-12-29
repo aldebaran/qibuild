@@ -37,6 +37,7 @@ ON_WIN = sys.platform.startswith("win")
 HAS_PYREADLINE = True
 if ON_WIN:
     try:
+        # pylint: disable-msg=F0401
         from pyreadline.console import Console
     except ImportError:
         HAS_PYREADLINE = False
@@ -73,7 +74,7 @@ class ColorLogHandler(logging.StreamHandler):
         # Avoid printing colors if not a tty:
         if not sys.stdout.isatty():
             for k in COLORS.keys():
-                COLORS[k] = "";
+                COLORS[k] = ""
             self.console = None
 
     def emit(self, record):
@@ -156,7 +157,6 @@ def main():
         verbose = False
         quiet = False
     args = Namespace()
-    import sys
     if "-v" in sys.argv:
         args.verbose = True
     if "-q" in sys.argv:

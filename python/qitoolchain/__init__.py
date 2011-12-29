@@ -23,6 +23,12 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+""" qitoolchain: a package to handle set of precompiled
+packages
+
+"""
+
 import qibuild
 
 from qitoolchain.toolchain import Toolchain, Package

@@ -40,15 +40,16 @@ def copy_helper(project_name, directory):
     template_dir = os.path.join(qibuild.QIBUILD_ROOT_DIR, "templates", "project")
     template_dir = os.path.abspath(template_dir)
 
-    for file in os.listdir(template_dir):
-        with open(os.path.join(template_dir, file), "r") as old_file:
+    for file_name in os.listdir(template_dir):
+        with open(os.path.join(template_dir, file_name), "r") as old_file:
             old_contents = old_file.read()
         new_contents = old_contents.replace("@project_name@", project_name)
-        with open(os.path.join(directory, file), "w") as new_file:
+        with open(os.path.join(directory, file_name), "w") as new_file:
             new_file.write(new_contents)
 
     # Also create the necessary qibuild.cmake file:
-    to_copy = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "templates", "qibuild.cmake")
+    to_copy = os.path.join(qibuild.get_cmake_qibuild_dir(),
+        "qibuild", "templates", "qibuild.cmake")
     shutil.copy(to_copy, os.path.join(directory, "qibuild.cmake"))
 
 

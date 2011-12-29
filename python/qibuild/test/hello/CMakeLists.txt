@@ -1,12 +1,3 @@
-cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
-
-project(hello)
-
-include("${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake")
-
-
-qi_create_bin(hello "main.cpp")
-
 ## Copyright (c) 2011, Aldebaran Robotics
 ## All rights reserved.
 ##
@@ -31,10 +22,14 @@ qi_create_bin(hello "main.cpp")
 ## ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
+project(hello)
+find_package(qibuild)
 find_package(bar)
 message(STATUS "bar_FOUND: ${bar_FOUND}")
 
-
+qi_create_bin(hello "main.cpp")
 qi_use_lib(hello world)
 
 enable_testing()

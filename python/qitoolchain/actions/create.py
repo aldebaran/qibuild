@@ -102,10 +102,20 @@ def do(args):
     if feed:
         toolchain.parse_feed(feed, dry_run=dry_run)
 
-    if args.cmake_generator:
-        toc.update_config("cmake.generator", args.cmake_generator, tc_name)
+    config = None
+    cmake_generator = args.cmake_generator
+    if toc:
+        matching_conf = toc.configstore.configs.get(tc_name)
+        if matching_conf:
+            matching_conf.cmake.generator = cmake_generator
+        else:
+            config = qibuild.config.Config()
+            config.name = tc_name
+            toc.configstore.add_config(config)
+        toc.save_config()
     if args.default:
-        toc.update_config("config", tc_name)
+        toc.configstore.set_default_config(tc_name)
+        toc.save_config()
         LOGGER.info("Now using toolchain %s by default", tc_name)
     else:
         mess = """Now try using:

@@ -23,10 +23,8 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
-
 project(world)
-
-include("${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake")
+find_package(qibuild)
 
 include_directories(".")
 

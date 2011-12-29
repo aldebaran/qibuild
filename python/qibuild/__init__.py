@@ -35,6 +35,7 @@ import logging
 from . import toc
 from . import parsers
 from . import command
+from . import config
 from . import configstore
 from . import cmdparse
 from . import ctest
@@ -45,9 +46,9 @@ from . import sh
 from . import interact
 from . import envsetter
 
-from toc        import toc_open
-from worktree import worktree_open
-from cmdparse   import run_action
+from qibuild.toc        import toc_open
+from qibuild.worktree import worktree_open
+from qibuild.cmdparse   import run_action
 
 __all__ = ( 'toc', 'parsers', 'command', 'configstore', 'cmdparse',
             'log', 'worktree', 'archive', 'sh', 'interact',
@@ -74,43 +75,31 @@ KNOWN_CMAKE_GENERATORS = [
 def get_cmake_qibuild_dir():
     """Get the path to cmake modules.
 
-    Useful to copy qibuild.cmake template in
-    qibuild create, among other things.
+    First, assume we are using qibuild from sources,
+    then assume we are using an installed version of qibuild,
 
+    Returns None if nothing was found
     """
     # First, assume this file is not installed,
     # so we have the python code in qibuild/python,
     # and the cmake code in qibuild/cmake
     # (using qibuild from sources)
-    res = os.path.join(QIBUILD_ROOT_DIR, "..", "..", "cmake", "qibuild")
+    res = os.path.join(QIBUILD_ROOT_DIR, "..", "..", "cmake")
     res = sh.to_native_path(res)
     if os.path.isdir(res):
         return res
 
     # Then, assume we are in a toolchain or/in a SDK, with
-    # the following layout sdk/share/cmake/qibuild, sdk/lib/python/qibuild
-    sdk_dir = os.path.join(QIBUILD_ROOT_DIR, "..", "..", "..")
+    # the following layout sdk/share/cmake/qibuild, sdk/lib/python2.x/site-packages/qibuild
+    sdk_dir = os.path.join(QIBUILD_ROOT_DIR, "..",  "..", "..", "..")
     sdk_dir = sh.to_native_path(sdk_dir)
-    res = os.path.join(sdk_dir, "share", "cmake", "qibuild")
+    res = os.path.join(sdk_dir, "share", "cmake")
     if os.path.isdir(res):
         return res
 
-
-    # Else, try to import qibuild.config, a
-    # python module configured by cmake during installation,
-    # containing CMAKE_ROOT
-    from .config import CMAKE_ROOT
-    res = os.path.join(CMAKE_ROOT, "Modules", "qibuild")
-    if os.path.isdir(res):
-        return sh.to_native_path(res)
-
-    # Else, just return None. Portions of code using CMAKE_QIBUILD_DIR, such as
-    # qibuild convert or qibuild --version will fail loudly
-    # ('NoneType' object has no attribute ...), but we do want them to fail
-    # loudly...
-    return None
-
-CMAKE_QIBUILD_DIR = get_cmake_qibuild_dir()
+    mess  = "Could not find qibuild cmake framework path\n"
+    mess += "Please file a bug report with the details of your installation"
+    raise Exception(mess)
 
 
 def make(build_dir, num_jobs=None, target=None):

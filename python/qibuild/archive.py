@@ -63,11 +63,11 @@ def extract_tar(archive_path, dest_dir):
     topdir = members[0].name.split(posixpath.sep)[0]
     for (i, member) in enumerate(members):
         member_top_dir = member.name.split(posixpath.sep)[0]
-        if i !=0 and topdir != member_top_dir:
+        if i != 0 and topdir != member_top_dir:
             # something wrong: members do not have the
             # same basename
             mess  = "Invalid member %s in archive:\n" % member.name
-            mess += "Every files sould be in the same top dir (%s != %s)" %\
+            mess += "Every files sould be in the same top dir (%s != %s)" % \
                  (topdir, member_top_dir)
             raise InvalidArchive(mess)
 
@@ -95,11 +95,11 @@ def extract_zip(archive_path, dest_dir):
     size = len(members)
     for (i, member) in enumerate(members):
         member_top_dir = member.filename.split(posixpath.sep)[0]
-        if i !=0 and topdir != member_top_dir:
+        if i != 0 and topdir != member_top_dir:
             # something wrong: members do not have the
             # same basename
             mess  = "Invalid member %s in archive:\n" % member.filename
-            mess += "Every files sould be in the same top dir (%s != %s)" %\
+            mess += "Every files sould be in the same top dir (%s != %s)" % \
                  (topdir, member_top_dir)
             raise InvalidArchive(mess)
         archive.extract(member, path=dest_dir)

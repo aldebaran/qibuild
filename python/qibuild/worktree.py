@@ -102,7 +102,13 @@ class WorkTree:
         self._load_projects(path_hints)
 
     def _load_projects(self, path_hints):
+        """ Parse a worktree.
 
+        Look for git projects and qibuild projects (directories containing a
+        qibuild.manifest and update self.buildable_projects and self.git_projects
+
+        Make sure there is no name conflict.
+        """
         for p in path_hints:
             (git_p, src_p) = search_projects(p)
             for d in src_p:
@@ -199,6 +205,15 @@ def worktree_open(work_tree=None):
     return WorkTree(work_tree, path_hints=path_hints)
 
 def search_current_project_root(working_directory):
+    """ When you run qibuild without any arguement,
+    we try to guess the current project using the current working dir.
+
+    Two cases:
+        - inside a subdir of qibuild project: look for a qibuild.manifest
+        - inside the build directory of a qibuild project: search a
+        cmake build directory, and guess the project from the contents
+        of the cmake cache.
+    """
     cwd = _search_manifest_directory(working_directory)
     if not cwd:
         #get the project directory associated to the build dir
@@ -235,6 +250,8 @@ def _search_manifest_directory(working_directory):
 
     #for each cwd parent folders, try to see if it match src
     while dirname or cwd:
+        if os.path.exists(os.path.join(cwd, "qiproject.xml")):
+            return cwd
         if os.path.exists(os.path.join(cwd, "qibuild.manifest")):
             return cwd
         if os.path.exists(os.path.join(cwd, "manifest.xml")):
@@ -260,10 +277,12 @@ def search_projects(directory=None, depth=4):
     if os.path.exists(os.path.join(directory, ".git")):
         rgit.append(directory)
 
-    if os.path.exists(os.path.join(directory, "qibuild.manifest")):
+
+    if os.path.exists(os.path.join(directory, "qiproject.xml")):
         rsrc.append(directory)
 
-    if os.path.exists(os.path.join(directory, "manifest.xml")):
+    # old qibuild syntax
+    if os.path.exists(os.path.join(directory, "qibuild.manifest")):
         rsrc.append(directory)
 
     blacklist_file = os.path.join(directory, ".qiblacklist")
@@ -304,8 +323,12 @@ def create(directory):
 
     """
     to_create = os.path.join(directory, ".qi")
-    qibuild.sh.mkdir(to_create, recursive=True)
-
+    if not os.path.exists(to_create):
+        qibuild.sh.mkdir(to_create, recursive=True)
+    qi_xml = os.path.join(directory, ".qi", "qibuild.xml")
+    if not os.path.exists(qi_xml):
+        with open(qi_xml, "w") as fp:
+            fp.write("<qibuild />\n")
 
 def worktree_from_args(args):
     """Returns a suitable work tree from the command line

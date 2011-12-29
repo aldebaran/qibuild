@@ -323,11 +323,9 @@ class Toolchain:
             lines.append('list(INSERT CMAKE_FRAMEWORK_PATH 0 "%s")\n' % package_path)
 
         oldlines = list()
-        try:
+        if os.path.exists(self.toolchain_file):
             with open(self.toolchain_file, "r") as fp:
                 oldlines = fp.readlines()
-        except:
-            pass
 
         # Do not write the file if it's the same
         if lines == oldlines:
@@ -377,7 +375,8 @@ class Toolchain:
         """
         package_path = self.get(package_name)
         if runtime:
-            qibuild.sh.install(package_path, destdir, filter=qibuild.sh.is_runtime)
+            qibuild.sh.install(package_path, destdir,
+                filter_fun=qibuild.sh.is_runtime)
         else:
             qibuild.sh.install(package_path, destdir)
 

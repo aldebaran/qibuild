@@ -1,7 +1,3 @@
-""" Convert an existing project to a qiBuild project
-
-"""
-
 ## Copyright (c) 2011, Aldebaran Robotics
 ## All rights reserved.
 ##
@@ -27,13 +23,16 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+""" Convert an existing project to a qiBuild project
+
+"""
+
 import os
 import re
 import sys
 import logging
 import shutil
 
-import qibuild
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
@@ -55,7 +54,8 @@ def copy_qibuild(source_dir):
     """ Every convert function should at least call this
 
     """
-    qibuild_template = os.path.join(qibuild.CMAKE_QIBUILD_DIR, "templates", "qibuild.cmake")
+    qibuild_template = os.path.join(qibuild.get_cmake_qibuild_dir(),
+        "qibuild", "templates", "qibuild.cmake")
     shutil.copy(qibuild_template, os.path.join(source_dir, "qibuild.cmake"))
 
 def create_qibuild_manifest(source_dir, project_name=None):
@@ -104,13 +104,13 @@ def convert_bootstrap(source_dir, args):
     """ Convert a old bootstrap project to a qiBuild project
 
     """
-    from qibuild import CMAKE_QIBUILD_DIR
     # Copy the qibuild.cmake file
     copy_qibuild(source_dir)
 
     # update the "bootstrap.cmake" files so that they try to include qibuild.cmake
-    new_bootstrap = os.path.join(CMAKE_QIBUILD_DIR, "templates", "bootstrap.cmake")
-    for (root, directories, filenames) in os.walk(source_dir):
+    new_bootstrap = os.path.join(qibuild.get_cmake_qibuild_dir(),
+        "qibuild", "templates", "bootstrap.cmake")
+    for (root, _dirs, filenames) in os.walk(source_dir):
         for filename in filenames:
             if filename == "bootstrap.cmake":
                 full_path = os.path.join(root, filename)
@@ -160,7 +160,7 @@ def convert_cmake(source_dir, args):
     new_lines = list()
     regexp = re.compile(r'^\s*project\s*\((.*)\)', re.IGNORECASE)
     to_add = "include(qibuild.cmake)"
-    qibuild_included=False
+    qibuild_included = False
     for line in lines:
         new_lines.append(line)
         match = re.match(regexp, line)
@@ -174,8 +174,8 @@ def convert_cmake(source_dir, args):
     if args.patch_cmake and not qibuild_included:
         with open(root_cmake, "w") as fp:
             fp.writelines(new_lines)
-        copy_qibuild(source_dir)
 
+    copy_qibuild(source_dir)
     create_qibuild_manifest(source_dir, project_name)
 
 def convert_default(source_dir, args_):
