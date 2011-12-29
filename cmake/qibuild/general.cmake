@@ -37,7 +37,10 @@ cmake_policy(SET CMP0010 NEW)
 cmake_policy(SET CMP0011 NEW)
 # if() recognizes numbers and boolean constants.
 cmake_policy(SET CMP0012 NEW)
-cmake_policy(SET CMP0017 NEW)
+
+if(CMAKE_VERSION VERSION_GREATER "2.8.3")
+  cmake_policy(SET CMP0017 NEW)
+endif()
 
 # We use RUNTIME_DIRECTORY_<CONFIG> for visual studio
 # which is a very nice feature but that only came up with
