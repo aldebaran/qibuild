@@ -2,8 +2,9 @@
 XML Test Runner for PyUnit
 """
 
-# Written by Sebastian Rittau <srittau@jroger.in-berlin.de> and placed in
-# the Public Domain.
+## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
 
 __revision__ = "$Id: /mirror/jroger/python/stdlib/xmlrunner.py 3506 2006-07-27T09:12:39.629878Z srittau  $"
 
