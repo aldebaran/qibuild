@@ -251,6 +251,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
                 qibuild.sh.to_posix_path(local_cmake)
 
     cmake_qibuild_dir = qibuild.get_cmake_qibuild_dir()
+    cmake_qibuild_dir = qibuild.sh.to_posix_path(cmake_qibuild_dir)
     dep_sdk_dirs = toc.get_sdk_dirs(project.name)
 
     dep_to_add = ""
