@@ -56,9 +56,11 @@ fi
 create_launcher python/bin/qibuild      qibuild
 create_launcher python/bin/qitoolchain  qitoolchain
 create_launcher python/bin/qisrc        qisrc
+create_launcher python/bin/qidoc        qidoc
 
 #aliases
 create_launcher python/bin/qibuild      qc           configure
 create_launcher python/bin/qibuild      qm           make
 create_launcher python/bin/qisrc        qp           pull --rebase
 create_launcher python/bin/qibuild      qo           open
+create_launcher python/bin/qidoc        qd           build

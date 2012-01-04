@@ -1,0 +1,17 @@
+<qidoc>
+  <repo name="qibuild">
+    <sphinxdoc name="qibuild" src="doc" />
+  </repo>
+
+  <repo name="libnaoqi" >
+    <doxydoc name="libalcommon" src="libalcommon" />
+    <doxydoc name="libalvision" src="libalvision" />
+  </repo>
+
+  <repo name="doc">
+    <sphinxdoc name="doc" src="." dest="." />
+  </repo>
+
+  <templates repo="aldeb-templates" />
+
+</qidoc>
