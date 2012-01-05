@@ -12,7 +12,7 @@ import qidoc.command
 import qidoc.templates
 import qibuild.sh
 
-def configure(src, dest, templates, doxylink, opts):
+def configure(src, dest, templates, intersphinx_mapping, doxylink, opts):
     """ Configure a sphinx repo
 
     The sphix repo MUST have a src/source/ directory
@@ -24,6 +24,7 @@ def configure(src, dest, templates, doxylink, opts):
     under version control
 
     """
+    # Rebuild a doxylink dict with relative paths
     rel_doxylink = doxylink.copy()
     for (name, (tag_file, prefix)) in rel_doxylink.iteritems():
         full_prefix = os.path.join(dest, prefix)
@@ -39,6 +40,8 @@ def configure(src, dest, templates, doxylink, opts):
         raise Exception(mess)
 
     opts["doxylink"] = str(rel_doxylink)
+    opts["intersphinx_mapping"] = str(intersphinx_mapping)
+
     conf_py_out = os.path.join(src, "qidoc", "conf.py")
     qidoc.templates.configure_file(conf_py_tmpl, conf_py_out,
         append_file=conf_py_in,
@@ -49,11 +52,10 @@ def configure(src, dest, templates, doxylink, opts):
     themes_dst = os.path.join(src, "qidoc", "_themes")
     qibuild.sh.install(themes_src, themes_dst, quiet=True)
 
-    # Copy doxylink code:
+    # Copy doxylink source code:
     doxylink_src = os.path.join(templates, "sphinx", "tools", "doxylink")
     doxylink_dst = os.path.join(src, "qidoc", "tools", "doxylink")
     qibuild.sh.install(doxylink_src, doxylink_dst, quiet=True)
-
 
 def build(src, dest):
     """ Run sphinx-build on a sphinx repo
@@ -71,5 +73,3 @@ def build(src, dest):
         os.path.join(src, "source"),
         dest]
     qidoc.command.call(cmd, cwd=src)
-
-

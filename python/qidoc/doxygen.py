@@ -15,7 +15,8 @@ import qibuild
 
 def configure(src, templates, opts,
     project_name=None,
-    doxytags_path=None):
+    doxytags_path=None,
+    doxygen_mapping=None):
     """ Configure a doxygen project
 
     Will we generate a Doxyfile.qidoc file
@@ -35,6 +36,15 @@ def configure(src, templates, opts,
         if doxytags_path:
             tag_file = os.path.join(doxytags_path, project_name + ".tag")
             opts["GENERATE_TAGFILE"] = tag_file
+        else:
+            opts["GENERATE_TAGFILE"] = ""
+        if doxygen_mapping:
+            tagfiles = list()
+            for (k, v) in doxygen_mapping.iteritems():
+                tagfiles.append("%s=%s" % (k, v))
+            opts["TAGFILES"] = " ".join(tagfiles)
+        else:
+            opts["TAGFILES"] = ""
         qidoc.templates.configure_file(in_file, out_file, opts=opts)
 
     # Also copy the css:
@@ -42,8 +52,6 @@ def configure(src, templates, opts,
         os.path.join(templates, "doxygen", "doxygen.css"),
         os.path.join(src, "doxygen.css"),
         quiet=True)
-
-
 
 def build(src, dest):
     """ Build a doxygen project

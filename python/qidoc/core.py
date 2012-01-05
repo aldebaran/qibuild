@@ -8,6 +8,7 @@
 import os
 
 import qibuild
+from qibuild.dependencies_solver import topological_sort
 import qidoc.config
 import qidoc.sphinx
 import qidoc.doxygen
@@ -43,6 +44,46 @@ class QiDocBuilder:
             raise Exception(mess)
         self.templates_path = templates_path
 
+        self.doxytags_path = os.path.join(self.out_dir, "doxytags")
+        self.sphinxdocs = dict()
+        for sphinxdoc in self.config.sphinxdocs:
+            sphinxdoc.src = os.path.join(self.in_dir, sphinxdoc.src)
+            sphinxdoc.src = os.path.abspath(sphinxdoc.src)
+            sphinxdoc.dest = os.path.join(self.out_dir, sphinxdoc.dest)
+            sphinxdoc.dest = os.path.abspath(sphinxdoc.dest)
+            self.sphinxdocs[sphinxdoc.name] = sphinxdoc
+
+        self.doxydocs = dict()
+        for doxydoc in self.config.doxydocs:
+            doxydoc.src = os.path.join(self.in_dir, doxydoc.src)
+            doxydoc.src = os.path.abspath(doxydoc.src)
+            doxydoc.dest = os.path.join(self.out_dir, doxydoc.dest)
+            doxydoc.dest = os.path.abspath(doxydoc.dest)
+            self.doxydocs[doxydoc.name] = doxydoc
+        self.deps_tree = self.get_deps_tree()
+
+
+    def get_deps_tree(self):
+        """ Get the tree of dependencies
+
+        It is a dict {type:deps_tree} where
+        type is 'sphinx' or 'doxygen', and
+        deps_tree is a dict:
+            {name:[dep names]}
+        """
+        doxy_tree = dict()
+        sphinx_tree = dict()
+        res = dict()
+        for repo in self.config.repos:
+            for doxydoc in repo.doxydocs:
+                doxy_tree[doxydoc.name] = doxydoc.depends
+            for sphinxdoc in repo.sphinxdocs:
+                sphinx_tree[sphinxdoc.name] = sphinxdoc.depends
+
+        res["doxygen"] = doxy_tree
+        res["sphinx"]  = sphinx_tree
+        return res
+
 
     def build(self, opts):
         """ Main method: build everything for every
@@ -50,38 +91,108 @@ class QiDocBuilder:
 
         """
         version = opts.get("version")
-        doxytags_path = os.path.join(self.out_dir, "doxytags")
-        qibuild.sh.mkdir(doxytags_path, recursive=True)
-        doxylink = dict()
         if not version:
             raise Exception("opts dict must at least contain a 'version' key")
-        for repo in self.config.repos:
-            repo_path = os.path.join(self.in_dir, repo.name)
-            for doxydoc in repo.doxydocs:
-                doxy_src  = os.path.join(repo_path, doxydoc.src)
-                doxy_dest = os.path.join(self.out_dir, doxydoc.dest)
-                qidoc.doxygen.configure(doxy_src, self.templates_path,
+
+        qibuild.sh.mkdir(self.doxytags_path, recursive=True)
+        doxylink = dict()
+
+        doxydocs = self.sort_doxygen()
+        for doxydoc in doxydocs:
+            doxygen_mapping = self.get_doxygen_mapping(doxydoc.name)
+            qidoc.doxygen.configure(doxydoc.src,
+                    self.templates_path,
                     opts,
                     project_name=doxydoc.name,
-                    doxytags_path=doxytags_path)
-                qidoc.doxygen.build(doxy_src, doxy_dest)
-                tag_file = os.path.join(doxytags_path, doxydoc.name + ".tag")
-                # Store full path here because we'll need to compute
-                # a relative path later
-                doxylink[doxydoc.name] = (tag_file,
-                    os.path.join(self.out_dir, doxydoc.dest))
+                    doxytags_path=self.doxytags_path,
+                    doxygen_mapping=doxygen_mapping)
+            qidoc.doxygen.build(doxydoc.src, doxydoc.dest)
+            tag_file = os.path.join(self.doxytags_path, doxydoc.name + ".tag")
+            # Store full path here because we'll need to compute
+            # a relative path later
+            doxylink[doxydoc.name] = (tag_file, doxydoc.dest)
 
+        sphinxdocs = self.sort_sphinx()
+        for sphinxdoc in sphinxdocs:
+            intersphinx_mapping = self.get_intersphinx_mapping(sphinxdoc.name)
+            qidoc.sphinx.configure(sphinxdoc.src, sphinxdoc.dest,
+                self.templates_path,
+                intersphinx_mapping,
+                doxylink,
+                opts)
+            qidoc.sphinx.build(sphinxdoc.src, sphinxdoc.dest)
 
+    def sort_sphinx(self):
+        """ Get a list of sphinx docs to build, in the
+        correct order
+
+        """
+        deps_tree = self.deps_tree["sphinx"]
+        all_names = list()
         for repo in self.config.repos:
-            repo_path = os.path.join(self.in_dir, repo.name)
             for sphinxdoc in repo.sphinxdocs:
-                sphinx_src = os.path.join(repo_path, sphinxdoc.src)
-                sphinx_dest = os.path.join(self.out_dir, sphinxdoc.dest)
-                qidoc.sphinx.configure(sphinx_src, sphinx_dest,
-                    self.templates_path,
-                    doxylink,
-                    opts)
-                qidoc.sphinx.build(sphinx_src, sphinx_dest)
+                all_names.append(sphinxdoc.name)
+        doc_names = topological_sort(deps_tree, all_names)
+        return [self.get_doc("sphinx", d) for d in doc_names]
+
+    def sort_doxygen(self):
+        """ Get a list of doxygen repos to build
+
+        """
+        deps_tree = self.deps_tree["doxygen"]
+        all_names = list()
+        for repo in self.config.repos:
+            for doxydoc in repo.doxydocs:
+                all_names.append(doxydoc.name)
+        doc_names = topological_sort(deps_tree, all_names)
+        return [self.get_doc("doxygen", d) for d in doc_names]
+
+    def get_intersphinx_mapping(self, name):
+        """ Get the relevant intersphinx_mapping for
+        the given name
+
+        """
+        res = dict()
+        deps_tree = self.deps_tree["sphinx"]
+        doc_names = topological_sort(deps_tree, [name])
+        docs = [self.get_doc("sphinx", d) for d in doc_names]
+        for doc in docs:
+            # Remove self from the list:
+            if doc.name != name:
+                res[doc.name] = (doc.dest, None)
+        return res
+
+    def get_doxygen_mapping(self, name):
+        """ Get the relevant Doxygen TAGFILES setting
+
+        """
+        doc = self.get_doc("doxygen", name)
+        res = dict()
+        deps_tree = self.deps_tree["doxygen"]
+        dep_doc_names = topological_sort(deps_tree, [name])
+        dep_docs = [self.get_doc("doxygen", d) for d in dep_doc_names]
+        for dep_doc in dep_docs:
+            # Remove self from the list
+            if dep_doc.name == name:
+                continue
+            doxytag_file = os.path.join(self.doxytags_path,
+                dep_doc.name + ".tag")
+            dep_dest = dep_doc.dest
+            rel_path = os.path.relpath(dep_dest, doc.dest)
+            res[doxytag_file] = rel_path
+
+        return res
+
+
+    def get_doc(self, type_, name):
+        """ Retun a qibuild.config.SphinxDoc or a
+        qidoc.config.DoxyDoc object
+
+        """
+        if type_ == "doxygen":
+            return self.doxydocs[name]
+        if type_ == "sphinx":
+            return self.sphinxdocs[name]
 
 
 def find_qidoc_root(cwd=None):

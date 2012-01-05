@@ -13,10 +13,12 @@ html_use_index = True
 
 extensions = ["sphinx.ext.pngmath",
               "sphinx.ext.todo",
+              "sphinx.ext.intersphinx",
               "doxylink"]
 
 sys.path.insert(0, os.path.abspath("tools/doxylink"))
 doxylink = {doxylink}
+intersphinx_mapping = {intersphinx_mapping}
 
 # Useful when building internal doc,
 # we should remove that when building

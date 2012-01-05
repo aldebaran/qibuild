@@ -6,13 +6,22 @@
 
 """
 
+import os
 from xml.etree import ElementTree as etree
+
+class Depends:
+    def __init__(self):
+        self.name = None
+
+    def parse(self, element):
+        self.name = element.get("name")
 
 class SphinxDoc:
     def __init__(self):
         self.name = None
         self.src = None
         self.dest = None
+        self.depends = list()
 
     def parse(self, element):
         self.name = element.get("name")
@@ -22,12 +31,18 @@ class SphinxDoc:
             self.dest = self.name
         else:
             self.dest = dest
+        depends_elements = element.findall("depends")
+        for depends_element in depends_elements:
+            depends = Depends()
+            depends.parse(depends_element)
+            self.depends.append(depends.name)
 
 class DoxyDoc:
     def __init__(self):
         self.name = None
         self.src = None
         self.dest = None
+        self.depends = list()
 
     def parse(self, element):
         self.name = element.get("name")
@@ -37,6 +52,11 @@ class DoxyDoc:
             self.dest = self.name
         else:
             self.dest = dest
+        depends_elements = element.findall("depends")
+        for depends_element in depends_elements:
+            depends = Depends()
+            depends.parse(depends_element)
+            self.depends.append(depends.name)
 
 class DoxygenTemplates:
     def __init__(self):
@@ -102,6 +122,8 @@ class QiDocConfig:
         self.repos = list()
         self.defaults = Defaults()
         self.templates = Templates()
+        self.sphinxdocs = list()
+        self.doxydocs   = list()
 
     def parse(self, element):
         defaults_tree = element.find("defaults")
@@ -118,7 +140,16 @@ class QiDocConfig:
         for repo_tree in repo_trees:
             repo = Repo()
             repo.parse(repo_tree)
+            for sphinxdoc in repo.sphinxdocs:
+                sphinxdoc.src = os.path.join(repo.name, sphinxdoc.src)
+                sphinxdoc.src = os.path.normpath(sphinxdoc.src)
+                self.sphinxdocs.append(sphinxdoc)
+            for doxydoc in repo.doxydocs:
+                doxydoc.src   = os.path.join(repo.name, doxydoc.src)
+                doxydoc.src   = os.path.normpath(doxydoc.src)
+                self.doxydocs.append(doxydoc)
             self.repos.append(repo)
+
 
 
 def parse(config_path):
