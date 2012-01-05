@@ -8,4 +8,5 @@ Aldebaran Documentation
    :hidden:
 
    contents
+   dev/cpp
 

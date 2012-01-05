@@ -42,7 +42,7 @@
       <h1><a href="{{ pathto('index') }}">{{ docstitle }}</a></h1>
       <div id="global-nav">
         <a title="Home page" href="{{ pathto('index') }}">Home</a> {{ reldelim2 }}
-        {% if hasdoc(pathto('contents')) %}
+        {% if project == "NAO Software Documentation" %}
           <a title="Site map" href="{{ pathto('contents') }}">Site map</a> {{ reldelim2 }}
         {% endif %}
         <a title="Site map" href="{{ pathto('genindex') }}">Index</a>
