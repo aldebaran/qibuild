@@ -54,9 +54,7 @@ def get_cmake_qibuild_dir():
     """Get the path to cmake modules.
 
     First, assume we are using qibuild from sources,
-    then assume we are using an installed version of qibuild,
-
-    Returns None if nothing was found
+    then assume we are using an installed version of qibuild.
     """
     # First, assume this file is not installed,
     # so we have the python code in qibuild/python,
