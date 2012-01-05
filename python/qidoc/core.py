@@ -62,19 +62,25 @@ class QiDocBuilder:
                 doxy_dest = os.path.join(self.out_dir, doxydoc.dest)
                 qidoc.doxygen.configure(doxy_src, self.templates_path,
                     opts,
-                    project_name=doxydoc.name)
+                    project_name=doxydoc.name,
+                    doxytags_path=doxytags_path)
                 qidoc.doxygen.build(doxy_src, doxy_dest)
-                tag_file = qidoc.doxygen.gen_tag_file(doxy_src, doxydoc.name, doxytags_path)
-                doxylink[doxydoc.name] = (tag_file, doxydoc.dest)
+                tag_file = os.path.join(doxytags_path, doxydoc.name + ".tag")
+                # Store full path here because we'll need to compute
+                # a relative path later
+                doxylink[doxydoc.name] = (tag_file,
+                    os.path.join(self.out_dir, doxydoc.dest))
 
-        opts["doxylink"] = str(doxylink)
 
         for repo in self.config.repos:
             repo_path = os.path.join(self.in_dir, repo.name)
             for sphinxdoc in repo.sphinxdocs:
                 sphinx_src = os.path.join(repo_path, sphinxdoc.src)
                 sphinx_dest = os.path.join(self.out_dir, sphinxdoc.dest)
-                qidoc.sphinx.configure(sphinx_src, self.templates_path, opts)
+                qidoc.sphinx.configure(sphinx_src, sphinx_dest,
+                    self.templates_path,
+                    doxylink,
+                    opts)
                 qidoc.sphinx.build(sphinx_src, sphinx_dest)
 
 

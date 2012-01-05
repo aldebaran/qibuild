@@ -13,7 +13,9 @@ import qidoc.templates
 
 import qibuild
 
-def configure(src, templates, opts, project_name=None):
+def configure(src, templates, opts,
+    project_name=None,
+    doxytags_path=None):
     """ Configure a doxygen project
 
     Will we generate a Doxyfile.qidoc file
@@ -30,6 +32,9 @@ def configure(src, templates, opts, project_name=None):
         opts["PROJECT_NAME"] = project_name
         opts["PROJECT_NUMBER"] = opts["version"]
         opts["OUTPUT_DIRECTORY"] = "build-doc"
+        if doxytags_path:
+            tag_file = os.path.join(doxytags_path, project_name + ".tag")
+            opts["GENERATE_TAGFILE"] = tag_file
         qidoc.templates.configure_file(in_file, out_file, opts=opts)
 
     # Also copy the css:
@@ -54,20 +59,4 @@ def build(src, dest):
     build_html = os.path.join(src, "build-doc", "html")
     qibuild.sh.install(build_html, dest, quiet=True)
 
-
-def gen_tag_file(src, project_name, tags_path):
-    """ Generate doxygen tags for the given project
-    inside tags_path
-
-    build() should have been called first
-    (doxytags needs to parse html files)
-
-    Return path to the generated tag file
-
-    """
-    tag_file = os.path.join(tags_path, project_name + ".tag")
-    build_html = os.path.join(src, "build-doc", "html")
-    cmd = ["doxytag", "-t", tag_file]
-    qidoc.command.call(cmd, cwd=build_html)
-    return tag_file
 

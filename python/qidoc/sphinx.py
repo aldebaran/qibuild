@@ -12,7 +12,7 @@ import qidoc.command
 import qidoc.templates
 import qibuild.sh
 
-def configure(src, templates, opts):
+def configure(src, dest, templates, doxylink, opts):
     """ Configure a sphinx repo
 
     The sphix repo MUST have a src/source/ directory
@@ -24,6 +24,12 @@ def configure(src, templates, opts):
     under version control
 
     """
+    rel_doxylink = doxylink.copy()
+    for (name, (tag_file, prefix)) in rel_doxylink.iteritems():
+        full_prefix = os.path.join(dest, prefix)
+        rel_prefix = os.path.relpath(full_prefix, dest)
+        rel_doxylink[name] = (tag_file, rel_prefix)
+
     # Deal with conf.py
     conf_py_tmpl = os.path.join(templates, "sphinx", "conf.in.py")
     conf_py_in = os.path.join(src, "qidoc", "conf.in.py")
@@ -32,6 +38,7 @@ def configure(src, templates, opts):
         mess += "qidoc/conf.in.py does not exists"
         raise Exception(mess)
 
+    opts["doxylink"] = str(rel_doxylink)
     conf_py_out = os.path.join(src, "qidoc", "conf.py")
     qidoc.templates.configure_file(conf_py_tmpl, conf_py_out,
         append_file=conf_py_in,

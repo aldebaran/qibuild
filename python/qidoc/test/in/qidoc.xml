@@ -10,6 +10,11 @@
       dest="ref/libalvision" />
   </repo>
 
+  <repo name="libqi" >
+    <doxydoc name="libqi" src="."
+      dest="ref/libqi" />
+  </repo>
+
   <repo name="doc">
     <sphinxdoc name="doc" src="." dest="." />
   </repo>
