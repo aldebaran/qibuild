@@ -55,4 +55,19 @@ def build(src, dest):
     qibuild.sh.install(build_html, dest, quiet=True)
 
 
+def gen_tag_file(src, project_name, tags_path):
+    """ Generate doxygen tags for the given project
+    inside tags_path
+
+    build() should have been called first
+    (doxytags needs to parse html files)
+
+    Return path to the generated tag file
+
+    """
+    tag_file = os.path.join(tags_path, project_name + ".tag")
+    build_html = os.path.join(src, "build-doc", "html")
+    cmd = ["doxytag", "-t", tag_file]
+    qidoc.command.call(cmd, cwd=build_html)
+    return tag_file
 

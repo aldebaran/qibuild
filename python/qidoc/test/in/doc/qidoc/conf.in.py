@@ -14,3 +14,4 @@ html_additional_pages = {
 
 html_static_path = ['../source/_static']
 project = u'NAO Software Documentation'
+

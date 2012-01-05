@@ -3,92 +3,41 @@
 
 {% block body %}
 
-  <img class="bigimgtitle" src="{{ pathto('_static/index_naodoc.png', 1) }}" alt="NAO documentation" title="NAO documentation"/>
+  <img class="bigimgtitle" src="{{ pathto('_static/nao.png', 1) }}" alt="NAO documentation" title="NAO documentation"/>
 
   <div id="whatsnew">
     <p>v{{ version }}</p>
-    <a class="biglink" href="{{ pathto("news/index") }}">Release Notes</a><br/>
-    <a class="biglink" href="{{ pathto("news/changelog") }}">Changelog</a><br/>
   </div>
 
   <table class="contentstable">
     <tr>
       <td width="50%">
-        <img class="bigimg" src="{{ pathto('_static/index_nao.png', 1) }}" alt="Nao" title="Nao"/>
-        <div>
-          <ul>
-            <li><a class="biglink" href="{{ pathto("nao/first_steps") }}"   >First Steps</a>  </li>
-          <li>
-            <a class="biglink" href="{{ pathto("nao/led_messages") }}">NAO Messages</a>,
-            <a class="biglink" href="{{ pathto("nao/practices") }}">Best pratices</a>
-            <br/>
-          </li>
-            <li><a class="biglink" href="{{ pathto("nao/nao-webpage") }}" >NAO Web page</a></li>
-            <li><a class="biglink" href="{{ pathto("nao/hardware/index") }}">Hardware</a>     </li>
-          </ul>
-        </div>
-      </td>
 
-      <td width="50%">
-        <img class="bigimg" src="{{ pathto('_static/index_programming.png', 1) }}" alt="Programming" title="Programming"/>
-        <div>
-        <ul>
-          <li>
-            <a class="biglink" href="{{ pathto("dev/index") }}">Overview</a>
-          </li>
-          <li>
-            <a class="biglink" href="{{ pathto("dev/cpp/index") }}">C++</a>,
-            <a class="biglink" href="{{ pathto("dev/python/index") }}">Python</a>
-          </li>
-          <li>
-            <a class="biglink" href="{{ pathto("dev/java/index") }}">Java</a>,
-            <a class="biglink" href="{{ pathto("dev/dotnet/index") }}">.NET</a>,
-            <a class="biglink" href="{{ pathto("dev/matlab/index") }}">Matlab</a>,
-            <a class="biglink" href="{{ pathto("dev/urbi/index") }}">Urbi</a>
-            <br/>
-          </li>
-          <li>
-            <a class="biglink" href="{{ pathto("dev/example-index") }}">Examples</a><br/>
-          </li>
-        </ul>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td width="50%">
-        <img class="bigimg" src="{{ pathto('_static/index_software.png', 1) }}" alt="Software" title="Software"/>
-        <div>
-        <ul>
-          <li><a class="biglink" href="{{ pathto("software/index") }}"             >Overview</a>    </li>
-          <li><a class="biglink" href="{{ pathto("software/choregraphe/index") }}" >Choregraphe</a> </li>
-          <li><a class="biglink" href="{{ pathto("software/monitor/index") }}"     >Monitor</a>     </li>
-          <li><a class="biglink" href="{{ pathto("software/naosim/index") }}"      >NAOsim</a>      </li>
-          <li><a class="biglink" href="{{ pathto("software/naoflasher/index") }}"      >NAOFlasher</a>      </li>
-        </ul>
-        </div>
-      </td>
+    <strong> qiBuild stuff </strong>
+    <ul>
+      <li>
+        <a class="biglink" href="{{ pathto("qibuild/index") }}"> qiBuild </a>
+      </li>
+    </ul>
+    </td>
 
-      <td width="50%">
-        <img class="bigimg" src="{{ pathto('_static/index_reference.png', 1) }}" alt="Reference" title="Reference"/>
-        <div>
-        <ul>
-          <li><a class="biglink" href="{{ pathto("naoqi/index") }}"      >NAOqi API</a>  </li>
-          <li><a class="biglink" href="{{ pathto("ref/cpp-api") }}"      >C++ API</a>,
-              <a class="biglink" href="{{ pathto("ref/python-api") }}"   >Python API</a> </li>
-          <li><a class="biglink" href="{{ pathto("qibuild/index") }}">qiBuild</a>    </li>
-          <li><a class="biglink" href="{{ pathto("glossary") }}"         >Glossary</a>   </li>
-        </ul>
-        </div>
-      </td>
-    </tr>
+    <td width="50%">
 
-    <tr>
-      <td>
-        <a href="{{ pathto("legal/notice") }}" class="legal">Legal notice</a>
-      </td>
-    <tr>
+    <strong> C++ stuff </strong>
+    <ul>
+      <li>
+        <a class="biglink" href="{{ pathto("ref/cpp-api") }}"> C++ API </a>
+      </li>
+    </ul>
+    </td>
+
+    </td>
+  </tr>
+
+
 
   </table>
+
 
 {% endblock %}
 

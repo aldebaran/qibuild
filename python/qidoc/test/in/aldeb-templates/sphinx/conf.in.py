@@ -16,6 +16,7 @@ extensions = ["sphinx.ext.pngmath",
               "doxylink"]
 
 sys.path.insert(0, os.path.abspath("tools/doxylink"))
+doxylink = {doxylink}
 
 # Useful when building internal doc,
 # we should remove that when building

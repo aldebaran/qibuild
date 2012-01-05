@@ -1,7 +1,7 @@
 Site map
 ========
 
-under contruction.
+.. toctree::
 
-* :ref:`genindex`
+ ref/cpp-api
 

@@ -4,8 +4,10 @@
   </repo>
 
   <repo name="libnaoqi" >
-    <doxydoc name="libalcommon" src="libalcommon" />
-    <doxydoc name="libalvision" src="libalvision" />
+    <doxydoc name="libalcommon" src="libalcommon"
+      dest="ref/libalcommon" />
+    <doxydoc name="libalvision" src="libalvision"
+      dest="ref/libalvision" />
   </repo>
 
   <repo name="doc">

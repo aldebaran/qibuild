@@ -43,21 +43,20 @@ class QiDocBuilder:
             raise Exception(mess)
         self.templates_path = templates_path
 
+
     def build(self, opts):
         """ Main method: build everything for every
         repository
 
         """
         version = opts.get("version")
+        doxytags_path = os.path.join(self.out_dir, "doxytags")
+        qibuild.sh.mkdir(doxytags_path, recursive=True)
+        doxylink = dict()
         if not version:
             raise Exception("opts dict must at least contain a 'version' key")
         for repo in self.config.repos:
             repo_path = os.path.join(self.in_dir, repo.name)
-            for sphinxdoc in repo.sphinxdocs:
-                sphinx_src = os.path.join(repo_path, sphinxdoc.src)
-                sphinx_dest = os.path.join(self.out_dir, sphinxdoc.dest)
-                qidoc.sphinx.configure(sphinx_src, self.templates_path, opts)
-                qidoc.sphinx.build(sphinx_src, sphinx_dest)
             for doxydoc in repo.doxydocs:
                 doxy_src  = os.path.join(repo_path, doxydoc.src)
                 doxy_dest = os.path.join(self.out_dir, doxydoc.dest)
@@ -65,6 +64,18 @@ class QiDocBuilder:
                     opts,
                     project_name=doxydoc.name)
                 qidoc.doxygen.build(doxy_src, doxy_dest)
+                tag_file = qidoc.doxygen.gen_tag_file(doxy_src, doxydoc.name, doxytags_path)
+                doxylink[doxydoc.name] = (tag_file, doxydoc.dest)
+
+        opts["doxylink"] = str(doxylink)
+
+        for repo in self.config.repos:
+            repo_path = os.path.join(self.in_dir, repo.name)
+            for sphinxdoc in repo.sphinxdocs:
+                sphinx_src = os.path.join(repo_path, sphinxdoc.src)
+                sphinx_dest = os.path.join(self.out_dir, sphinxdoc.dest)
+                qidoc.sphinx.configure(sphinx_src, self.templates_path, opts)
+                qidoc.sphinx.build(sphinx_src, sphinx_dest)
 
 
 def find_qidoc_root(cwd=None):
