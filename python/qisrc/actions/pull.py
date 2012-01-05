@@ -7,6 +7,7 @@
 """
 
 import os
+import sys
 import logging
 import qibuild
 import qisrc
@@ -152,16 +153,20 @@ def do(args):
             LOGGER.error("failed")
             fail.append((git_project, out))
 
-    if len(fail) > 0:
-        print ""
-        LOGGER.info("=====================")
-        LOGGER.info("Projects that failed:")
-        print "\n".join(x[0] for x in fail)
-        LOGGER.info("=====================")
-        print ""
-        LOGGER.info("details:")
+    if not fail:
+        sys.exit(0)
+
+    print ""
+    LOGGER.info("=====================")
+    LOGGER.info("Projects that failed:")
+    print "\n".join(x[0] for x in fail)
+    LOGGER.info("=====================")
+    print ""
+    LOGGER.info("details:")
 
     for f in fail:
         LOGGER.error(f[0])
         print f[1][1][0],
         print f[1][1][1],
+
+    sys.exit(2)
