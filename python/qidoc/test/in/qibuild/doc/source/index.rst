@@ -13,6 +13,10 @@ See also :libqi:`qi::path::findData`
 
     qibuild_aldeb
 
+.. toctree::
+
+    samples/fooproject/index
+    samples/api/submodule/index
 
 Tutorials
 ---------

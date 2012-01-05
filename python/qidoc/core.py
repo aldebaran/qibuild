@@ -120,6 +120,7 @@ class QiDocBuilder:
                 intersphinx_mapping,
                 doxylink,
                 opts)
+            qidoc.sphinx.gen_download_zips(sphinxdoc.src)
             qidoc.sphinx.build(sphinxdoc.src, sphinxdoc.dest)
 
     def sort_sphinx(self):

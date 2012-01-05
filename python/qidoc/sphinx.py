@@ -57,6 +57,21 @@ def configure(src, dest, templates, intersphinx_mapping, doxylink, opts):
     doxylink_dst = os.path.join(src, "qidoc", "tools", "doxylink")
     qibuild.sh.install(doxylink_src, doxylink_dst, quiet=True)
 
+def gen_download_zips(src):
+    """ Process sources of the documentation, looking for
+    every directory containing a .zipme, and
+    copying it do src/_zips/
+
+    """
+    zips_path = os.path.join(src, "_zips")
+    qibuild.sh.mkdir(zips_path)
+    for (root, directories, _files) in os.walk(src):
+        for directory in directories:
+            zipme = os.path.join(root, directory, ".zipme")
+            if os.path.exists(zipme):
+                qibuild.archive.zip_win(os.path.join(root, directory))
+
+
 def build(src, dest):
     """ Run sphinx-build on a sphinx repo
 

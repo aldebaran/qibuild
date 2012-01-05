@@ -27,6 +27,9 @@ class TestQiDoc(unittest.TestCase):
         opts = dict()
         opts["version"] = 1.42
         self.qidoc_builder.build(opts)
+        submodule_zip = os.path.join(self.out_dir,
+            "qibuild", "_downloads", "submodule.zip")
+        self.assertTrue(os.path.exists(submodule_zip))
 
     def test_cfg_parse(self):
         qidoc_cfg = self.qidoc_builder.config

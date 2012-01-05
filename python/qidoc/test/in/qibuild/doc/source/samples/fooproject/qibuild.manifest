@@ -1,0 +1,2 @@
+[project fooproject]
+depends = gtest
