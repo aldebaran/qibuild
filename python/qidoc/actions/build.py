@@ -30,7 +30,8 @@ def do(args):
     worktree = args.worktree
     worktree = qidoc.core.find_qidoc_root(worktree)
     if not worktree:
-        raise Exception("No qidoc worktree found. Please call qidoc init")
+        raise Exception("No qidoc worktree found.\n"
+          "Please call qidoc init or go to a qidoc worktree")
 
     if not output_dir:
         output_dir = os.path.join(worktree, "build-doc")
