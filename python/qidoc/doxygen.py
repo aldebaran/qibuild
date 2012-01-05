@@ -45,7 +45,9 @@ def configure(src, templates, opts,
             opts["TAGFILES"] = " ".join(tagfiles)
         else:
             opts["TAGFILES"] = ""
-        qidoc.templates.configure_file(in_file, out_file, opts=opts)
+        qidoc.templates.configure_file(in_file, out_file,
+            append_file = os.path.join(src, "Doxyfile.in"),
+            opts=opts)
 
     # Also copy the css:
     qibuild.sh.install(
