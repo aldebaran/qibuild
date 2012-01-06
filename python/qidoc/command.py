@@ -17,7 +17,7 @@ def call(cmd, cwd=None, env=None):
     and the errors
 
     """
-    if os.environ.get("VERBOSE"):
+    if not os.environ.get("QI_BUILD_FARM"):
         subprocess.check_call(cmd, cwd=cwd, env=env)
         return
 
