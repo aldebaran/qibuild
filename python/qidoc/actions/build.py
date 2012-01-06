@@ -25,15 +25,17 @@ def do(args):
     """ Main entry point
 
     """
-    output_dir = args.output_dir
     worktree = args.worktree
     worktree = qidoc.core.find_qidoc_root(worktree)
     if not worktree:
         raise Exception("No qidoc worktree found.\n"
           "Please call qidoc init or go to a qidoc worktree")
 
+    output_dir = args.output_dir
     if not output_dir:
         output_dir = os.path.join(worktree, "build-doc")
+    else:
+        output_dir = qibuild.sh.to_native_path(output_dir)
 
     builder = qidoc.core.QiDocBuilder(worktree, output_dir)
     opts = dict()
