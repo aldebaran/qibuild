@@ -16,18 +16,19 @@ def configure_parser(parser):
     """ Configure parser for this action """
     qibuild.cmdparse.default_parser(parser)
     parser.add_argument("--work-tree", dest="worktree")
+    parser.add_argument("template_repo")
 
 def do(args):
     """ Main entry point
 
     """
-    worktree = args.worktree
-    worktree = qidoc.core.find_qidoc_root(worktree)
-    if worktree:
-        print "Found a worktree in %", worktree, ": nothing to do"
-        return
     qidoc_xml = os.path.join(os.getcwd(), "qidoc.xml")
-    if not os.path.exists(qidoc_xml):
-        with open(qidoc_xml, "w") as fp:
-            fp.write("<qidoc />")
+    to_write = """<qidoc>
+    <templates repo="%s" />
+</qidoc>
+"""
+    to_write = to_write % args.template_repo
+    with open(qidoc_xml, "w") as fp:
+        fp.write(to_write)
+
 
