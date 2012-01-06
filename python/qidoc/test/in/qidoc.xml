@@ -1,27 +1,3 @@
 <qidoc>
-  <repo name="qibuild">
-    <sphinxdoc name="qibuild" src="doc" />
-  </repo>
-
-  <repo name="libnaoqi" >
-    <doxydoc name="libalcommon" src="libalcommon" dest="ref/libalcommon">
-      <depends name="libqi" />
-    </doxydoc>
-    <doxydoc name="libalvision" src="libalvision" dest="ref/libalvision">
-      <depends name="libalcommon" />
-    </doxydoc>
-  </repo>
-
-  <repo name="libqi" >
-    <doxydoc name="libqi" src="." dest="ref/libqi" />
-  </repo>
-
-  <repo name="doc">
-    <sphinxdoc name="doc" src="." dest=".">
-      <depends name="qibuild" />
-    </sphinxdoc>
-  </repo>
-
   <templates repo="aldeb-templates" />
-
 </qidoc>

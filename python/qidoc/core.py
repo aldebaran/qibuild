@@ -14,26 +14,18 @@ import qidoc.sphinx
 import qidoc.doxygen
 
 
-class QiDocBuilder:
+
+class QiDocBuilder(qibuild.worktree.WorkTree):
     """ A class to handle doc generation of several
     projects
 
-    All repositories must be relative to a qidoc.xml
-    file
     """
     def __init__(self, in_dir, out_dir):
+        qibuild.worktree.WorkTree.__init__(self, in_dir)
         self.in_dir = in_dir
         self.out_dir = out_dir
         self.cfg_path = os.path.join(in_dir, "qidoc.xml")
-        self.config = qidoc.config.parse(self.cfg_path)
-        # Sanity checks
-        for repo in self.config.repos:
-            repo_path = os.path.join(self.in_dir, repo.name)
-            if not os.path.exists(repo_path):
-                mess  = "Invalid config file: %s" % self.cfg_path
-                mess += "Could not find repo: %s" % repo_path
-                mess += "(%s does not exist)" % repo_path
-                raise Exception(mess)
+        self.config = qidoc.config.parse_qidoc_config(self.cfg_path)
 
         templates_repo = self.config.templates.repo
         templates_path = os.path.join(self.in_dir, templates_repo)
@@ -45,21 +37,10 @@ class QiDocBuilder:
         self.templates_path = templates_path
 
         self.doxytags_path = os.path.join(self.out_dir, "doxytags")
-        self.sphinxdocs = dict()
-        for sphinxdoc in self.config.sphinxdocs:
-            sphinxdoc.src = os.path.join(self.in_dir, sphinxdoc.src)
-            sphinxdoc.src = os.path.abspath(sphinxdoc.src)
-            sphinxdoc.dest = os.path.join(self.out_dir, sphinxdoc.dest)
-            sphinxdoc.dest = os.path.abspath(sphinxdoc.dest)
-            self.sphinxdocs[sphinxdoc.name] = sphinxdoc
 
+        self.sphinxdocs = dict()
         self.doxydocs = dict()
-        for doxydoc in self.config.doxydocs:
-            doxydoc.src = os.path.join(self.in_dir, doxydoc.src)
-            doxydoc.src = os.path.abspath(doxydoc.src)
-            doxydoc.dest = os.path.join(self.out_dir, doxydoc.dest)
-            doxydoc.dest = os.path.abspath(doxydoc.dest)
-            self.doxydocs[doxydoc.name] = doxydoc
+        self._load_doc_projects()
         self.deps_tree = self.get_deps_tree()
 
 
@@ -74,11 +55,10 @@ class QiDocBuilder:
         doxy_tree = dict()
         sphinx_tree = dict()
         res = dict()
-        for repo in self.config.repos:
-            for doxydoc in repo.doxydocs:
-                doxy_tree[doxydoc.name] = doxydoc.depends
-            for sphinxdoc in repo.sphinxdocs:
-                sphinx_tree[sphinxdoc.name] = sphinxdoc.depends
+        for doxydoc in self.doxydocs.values():
+            doxy_tree[doxydoc.name] = doxydoc.depends
+        for sphinxdoc in self.sphinxdocs.values():
+            sphinx_tree[sphinxdoc.name] = sphinxdoc.depends
 
         res["doxygen"] = doxy_tree
         res["sphinx"]  = sphinx_tree
@@ -86,8 +66,7 @@ class QiDocBuilder:
 
 
     def build(self, opts):
-        """ Main method: build everything for every
-        repository
+        """ Main method: build everything
 
         """
         version = opts.get("version")
@@ -123,30 +102,22 @@ class QiDocBuilder:
             qidoc.sphinx.gen_download_zips(sphinxdoc.src)
             qidoc.sphinx.build(sphinxdoc.src, sphinxdoc.dest)
 
+    def sort_doxygen(self):
+        """ Get a list of doxygen docs to build
+
+        """
+        deps_tree = self.deps_tree["doxygen"]
+        doc_names = topological_sort(deps_tree, self.doxydocs.keys())
+        return [self.get_doc("doxygen", d) for d in doc_names]
+
     def sort_sphinx(self):
         """ Get a list of sphinx docs to build, in the
         correct order
 
         """
         deps_tree = self.deps_tree["sphinx"]
-        all_names = list()
-        for repo in self.config.repos:
-            for sphinxdoc in repo.sphinxdocs:
-                all_names.append(sphinxdoc.name)
-        doc_names = topological_sort(deps_tree, all_names)
+        doc_names = topological_sort(deps_tree, self.sphinxdocs.keys())
         return [self.get_doc("sphinx", d) for d in doc_names]
-
-    def sort_doxygen(self):
-        """ Get a list of doxygen repos to build
-
-        """
-        deps_tree = self.deps_tree["doxygen"]
-        all_names = list()
-        for repo in self.config.repos:
-            for doxydoc in repo.doxydocs:
-                all_names.append(doxydoc.name)
-        doc_names = topological_sort(deps_tree, all_names)
-        return [self.get_doc("doxygen", d) for d in doc_names]
 
     def get_intersphinx_mapping(self, name):
         """ Get the relevant intersphinx_mapping for
@@ -195,6 +166,24 @@ class QiDocBuilder:
         if type_ == "sphinx":
             return self.sphinxdocs[name]
 
+    def _load_doc_projects(self):
+        """ Explore the qibuild projects, building the
+        sphinxdocs and doxydocs attributes
+
+        """
+        for (p_name, p_path) in self.buildable_projects.iteritems():
+            qiproj_xml = os.path.join(p_path, "qiproject.xml")
+            (doxydocs, sphinxdocs) = qidoc.config.parse_project_config(qiproj_xml)
+            # Fixup src, dest attributes:
+            for doxydoc in doxydocs:
+                doxydoc.src = os.path.join(p_path, doxydoc.src)
+                doxydoc.dest = os.path.join(self.out_dir, doxydoc.dest)
+                self.doxydocs[doxydoc.name] = doxydoc
+            for sphinxdoc in sphinxdocs:
+                sphinxdoc.src = os.path.join(p_path, sphinxdoc.src)
+                sphinxdoc.dest = os.path.join(self.out_dir, sphinxdoc.dest)
+                self.sphinxdocs[sphinxdoc.name] = sphinxdoc
+
 
 def find_qidoc_root(cwd=None):
     """ Find a qidoc root
@@ -210,7 +199,6 @@ def find_qidoc_root(cwd=None):
         if new_cwd == cwd:
             return
         cwd = new_cwd
-
 
 def create_builder(worktree=None):
     """ Open a new QiDocBuilder using

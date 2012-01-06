@@ -1,0 +1,10 @@
+<project name="libnaoqi">
+
+  <doxydoc name="libalcommon" src="libalcommon" dest="ref/libalcommon">
+    <depends name="libqi" />
+  </doxydoc>
+  <doxydoc name="libalvision" src="libalvision" dest="ref/libalvision">
+    <depends name="libalcommon" />
+  </doxydoc>
+
+</project>

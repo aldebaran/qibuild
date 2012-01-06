@@ -95,35 +95,10 @@ class Defaults:
     def parse(self, element):
         self.root_project = element.get("root_project")
 
-class Repo:
-    def __init__(self):
-        self.name = None
-        self.sphinxdocs = list()
-        self.doxydocs   = list()
-
-    def parse(self, element):
-        self.name = element.get("name")
-        sphinx_trees = element.findall("sphinxdoc")
-        for sphinx_tree in sphinx_trees:
-            sphinxdoc = SphinxDoc()
-            sphinxdoc.parse(sphinx_tree)
-            self.sphinxdocs.append(sphinxdoc)
-
-        dox_trees = element.findall("doxydoc")
-        for dox_tree in dox_trees:
-            doxydoc = DoxyDoc()
-            doxydoc.parse(dox_tree)
-            self.doxydocs.append(doxydoc)
-
-
-
 class QiDocConfig:
     def __init__(self):
-        self.repos = list()
         self.defaults = Defaults()
         self.templates = Templates()
-        self.sphinxdocs = list()
-        self.doxydocs   = list()
 
     def parse(self, element):
         defaults_tree = element.find("defaults")
@@ -136,23 +111,7 @@ class QiDocConfig:
             self.templates = Templates()
             self.templates.parse(template_tree)
 
-        repo_trees = element.findall("repo")
-        for repo_tree in repo_trees:
-            repo = Repo()
-            repo.parse(repo_tree)
-            for sphinxdoc in repo.sphinxdocs:
-                sphinxdoc.src = os.path.join(repo.name, sphinxdoc.src)
-                sphinxdoc.src = os.path.normpath(sphinxdoc.src)
-                self.sphinxdocs.append(sphinxdoc)
-            for doxydoc in repo.doxydocs:
-                doxydoc.src   = os.path.join(repo.name, doxydoc.src)
-                doxydoc.src   = os.path.normpath(doxydoc.src)
-                self.doxydocs.append(doxydoc)
-            self.repos.append(repo)
-
-
-
-def parse(config_path):
+def parse_qidoc_config(config_path):
     """ Parse a config file, returns a
     QiDoc object
 
@@ -168,3 +127,30 @@ def parse(config_path):
     root = tree.getroot()
     res.parse(root)
     return res
+
+def parse_project_config(config_path):
+    """ Parse a config file, returns a  tuple
+    of lists (SphinxDoc, DoxyDoc)
+
+    """
+    tree = etree.ElementTree()
+    try:
+        tree.parse(config_path)
+    except Exception, e:
+        mess  = "Could not parse config from %s\n" % config_path
+        mess += "Error was: %s" % e
+        raise Exception(mess)
+    root = tree.getroot()
+    doxydocs = list()
+    doxy_trees = root.findall("doxydoc")
+    for doxy_tree in doxy_trees:
+        doxydoc = SphinxDoc()
+        doxydoc.parse(doxy_tree)
+        doxydocs.append(doxydoc)
+    sphinxdocs = list()
+    sphinx_trees = root.findall("sphinxdoc")
+    for sphinx_tree in sphinx_trees:
+        sphinxdoc = SphinxDoc()
+        sphinxdoc.parse(sphinx_tree)
+        sphinxdocs.append(sphinxdoc)
+    return (doxydocs, sphinxdocs)

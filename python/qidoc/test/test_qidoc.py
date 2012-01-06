@@ -34,24 +34,17 @@ class TestQiDoc(unittest.TestCase):
     def test_cfg_parse(self):
         qidoc_cfg = self.qidoc_builder.config
 
-        repos = qidoc_cfg.repos
-        qibuild_repo = repos[0]
-        self.assertEqual(qibuild_repo.name,   "qibuild")
-        self.assertEqual(len(qibuild_repo.sphinxdocs), 1)
-        qibuild_sphinx = qibuild_repo.sphinxdocs[0]
+        qibuild_sphinx = self.qidoc_builder.sphinxdocs["qibuild"]
         self.assertEqual(qibuild_sphinx.name, "qibuild")
         self.assertEqual(qibuild_sphinx.src ,
             os.path.join(self.in_dir, "qibuild", "doc"))
 
-        doc_sphinx = repos[-1].sphinxdocs[0]
+        doc_sphinx = self.qidoc_builder.sphinxdocs["doc"]
         self.assertEqual(doc_sphinx.depends, ["qibuild"])
 
 
-        libnaoqi = repos[1]
-        self.assertEqual(libnaoqi.name, "libnaoqi")
-        self.assertEqual(len(libnaoqi.doxydocs), 2)
-        libalcommon = libnaoqi.doxydocs[0]
-        libalvision = libnaoqi.doxydocs[1]
+        libalcommon = self.qidoc_builder.doxydocs["libalcommon"]
+        libalcommon = self.qidoc_builder.doxydocs["libalvision"]
         self.assertEqual(libalcommon.name, "libalcommon")
         self.assertEqual(libalvision.name, "libalvision")
         self.assertEqual(libalcommon.src ,
@@ -62,7 +55,6 @@ class TestQiDoc(unittest.TestCase):
             os.path.join(self.out_dir, "ref", "libalcommon"))
         self.assertEqual(libalvision.dest,
             os.path.join(self.out_dir, "ref", "libalvision"))
-
 
         self.assertEqual(qidoc_cfg.templates.repo, "aldeb-templates")
 

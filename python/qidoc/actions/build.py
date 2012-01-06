@@ -8,7 +8,6 @@
 
 
 import os
-import shutil
 
 import qibuild
 import qidoc.core
