@@ -29,14 +29,20 @@ class ProjectConfigTestClass(unittest.TestCase):
     def test_read_depends(self):
         xml = """
 <project name="foo">
-    <depends name="bar" />
-    <depends name="baz" />
-    <rdepends name="spam" />
+    <depends runtime="true" buildtime="true"
+        names="bar baz"
+    />
+    <depends runtime="true"
+        names="spam" />
+    />
+    <depends buildtime="true"
+        names="eggs"
+    />
 </project>
 """
         project_cfg = cfg_from_string(xml)
-        self.assertEqual(project_cfg.depends, ["bar", "baz"])
-        self.assertEqual(project_cfg.rdepends, ["spam"])
+        self.assertEqual(project_cfg.depends,  set(["bar", "baz", "eggs"]))
+        self.assertEqual(project_cfg.rdepends, set(["bar", "baz", "spam"]))
 
 
 if __name__ == "__main__":

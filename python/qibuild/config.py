@@ -23,11 +23,11 @@ def raise_parse_error(message, cfg_path=None, tree=None):
     tree element
 
     """
-    as_str = etree.tostring(tree)
     mess = ""
     if cfg_path:
         mess += "Error when parsing '%s'\n" % cfg_path
-    if tree:
+    if tree is not None:
+        as_str = etree.tostring(tree)
         mess += "Could not parse:\t%s\n" % as_str
     mess += message
     raise Exception(mess)
@@ -44,12 +44,22 @@ def parse_bool_attr(tree, name):
     res = tree.get(name)
     if res is None:
         return False
-    if res in ["yes", "1"]:
+    if res in ["true", "1"]:
         return True
     if res in ["false", "0"]:
         return False
     raise_parse_error("Expecting value in [true, false, 0, 1] "
-        "for attribute %s" % name)
+        "for attribute %s" % name,
+        tree=tree)
+
+def parse_list_attr(tree, name):
+    """ Parse a list attribute
+    Return an empty list if the attribute is not found
+
+    """
+    res = tree.get(name, "")
+    return res.split()
+
 
 # Using hand-written 'class to xml' stuff is not that
 # hard and actually works quite well
@@ -444,50 +454,53 @@ class ProjectConfig:
         for depends_tree in depends_trees:
             buildtime = parse_bool_attr(depends_tree, "buildtime")
             runtime   = parse_bool_attr(depends_tree, "runtime")
-            buildtime  = buildtime.lower() in ["yes", "1"]
-            runtime
-            if buildtime.lower() in ["yes", "1"]:
-                dep_names = depends_trees.get("names",  "")
-                for dep_name in dep
-
-            #depends_name = depends_tree.get("name")
-            #if not depends_name:
-                #raise_parse_error("'depends' node must have a 'name' attribute",
-                    #cfg_path=cfg_path,
-                    #tree=depends_tree)
-            #self.depends.append(depends_name)
-
-        # Read rdepends:
-        rdepends_trees = self.tree.findall("rdepends")
-        for rdepends_tree in rdepends_trees:
-            rdepends_name = rdepends_tree.get("name")
-            if not rdepends_name:
-                raise_parse_error("'rdepends' node must have a 'name' attribute",
-                    cfg_path=cfg_path,
-                    tree=rdepends_tree)
-            self.rdepends.append(rdepends_name)
+            dep_names = parse_list_attr(depends_tree, "names")
+            if buildtime:
+                for dep_name in dep_names:
+                    self.depends.add(dep_name)
+            if runtime:
+                for dep_name in dep_names:
+                    self.rdepends.add(dep_name)
 
     def write(self, location):
         """ Write configuration back to a config file
 
         """
+        # FIXME: remove existing <depends> element first ...
         project_tree = self.tree.getroot()
+        if not project_tree:
+            project_tree = etree.Element("project")
+            self.tree = etree.ElementTree(element = project_tree)
         project_tree.set("name", self.name)
 
-        for depend in self.depends:
-            depend_tree = etree.Element("depends")
-            depend_tree.set("name", depend)
-            project_tree.append(depend_tree)
-        for rdepend in self.rdepends:
-            rdepend_tree = etree.Element("rdepends")
-            rdepend_tree.set("name", rdepend)
-            project_tree.append(rdepend_tree)
+        both_deps = self.depends.intersection(self.rdepends)
+        if both_deps:
+            both_deps_tree = etree.Element("depends")
+            both_deps_tree.set("buildtime", "true")
+            both_deps_tree.set("runtime"  , "true")
+            both_deps_tree.set("names", " ".join(both_deps))
+            project_tree.append(both_deps_tree)
+
+        runtime_only = self.rdepends - self.depends
+        if runtime_only:
+            runtime_tree = etree.Element("depends")
+            runtime_tree.set("runtime", "true")
+            runtime_tree.set("names", " ".join(runtime_only))
+            project_tree.append(runtime_tree)
+
+        build_only = self.depends - self.rdepends
+        if build_only:
+            build_tree = etree.Element("depends")
+            build_tree.set("buildtime", "true")
+            build_tree.set("names", " ".join(build_only))
+            project_tree.append(build_tree)
+
         if HAS_LXML:
             # pylint: disable-msg=E1123
             self.tree.write(location, pretty_print=True)
         else:
             xml_indent(project_tree)
-            tree.write(location)
+            self.tree.write(location)
 
 def xml_indent(elem, level=0):
     """ Poor man's pretty print for elementTree
@@ -590,8 +603,8 @@ def convert_project_manifest(qibuild_manifest):
     project.name = name
     depends  = ini_cfg.get("project.%s.depends"  % name, default="").split()
     rdepends = ini_cfg.get("project.%s.rdepends" % name, default="").split()
-    project.depends  = depends[:]
-    project.rdepends = rdepends[:]
+    project.depends  = set(depends)
+    project.rdepends = set(rdepends)
     out = StringIO()
     project.write(out)
     return out.getvalue()

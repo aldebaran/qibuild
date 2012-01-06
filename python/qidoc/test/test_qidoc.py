@@ -44,7 +44,7 @@ class TestQiDoc(unittest.TestCase):
 
 
         libalcommon = self.qidoc_builder.doxydocs["libalcommon"]
-        libalcommon = self.qidoc_builder.doxydocs["libalvision"]
+        libalvision = self.qidoc_builder.doxydocs["libalvision"]
         self.assertEqual(libalcommon.name, "libalcommon")
         self.assertEqual(libalvision.name, "libalvision")
         self.assertEqual(libalcommon.src ,
