@@ -460,26 +460,7 @@ class ProjectConfig:
                     tree=rdepends_tree)
             self.rdepends.append(rdepends_name)
 
-    def write(self, location):
-        """ Write configuration back to a config file
 
-        """
-        project_tree = etree.Element("project")
-        project_tree.set("name", self.name)
-        for depend in self.depends:
-            depend_tree = etree.Element("depends")
-            depend_tree.set("name", depend)
-            project_tree.append(depend_tree)
-        for rdepend in self.rdepends:
-            rdepend_tree = etree.Element("rdepends")
-            rdepend_tree.set("name", rdepend)
-            project_tree.append(rdepend_tree)
-        tree = etree.ElementTree(element=project_tree)
-        if HAS_LXML:
-            # pylint: disable-msg=E1123
-            tree.write(location, pretty_print=True)
-        else:
-            tree.write(location)
 
 
 def convert_qibuild_cfg(qibuild_cfg):
