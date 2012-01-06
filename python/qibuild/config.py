@@ -406,6 +406,7 @@ class QiBuildConfig:
             # pylint: disable-msg=E1123
             tree.write(location, pretty_print=True)
         else:
+            xml_indent(tree.getroot())
             tree.write(location)
 
 class ProjectConfig:
@@ -461,7 +462,24 @@ class ProjectConfig:
             self.rdepends.append(rdepends_name)
 
 
+def xml_indent(elem, level=0):
+    """ Poor man's pretty print for elementTree
 
+    """
+    # Taken from http://infix.se/2007/02/06/gentlemen-indent-your-xml
+    i = "\n" + level*"  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        for e in elem:
+            xml_indent(e, level+1)
+            if not e.tail or not e.tail.strip():
+                e.tail = i + "  "
+        if not e.tail or not e.tail.strip():
+            e.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
 
 def convert_qibuild_cfg(qibuild_cfg):
     """ Convert an old qibuild.cfg file
