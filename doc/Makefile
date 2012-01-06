@@ -44,7 +44,11 @@ clean:
 	@rm -rf $(BUILDDIR)/*
 
 html:
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	@if [ !  -f qidoc/conf.py ] ; then     \
+		echo "Please run qidoc first" ;  \
+		exit 1;                          \
+	fi
+	$(SPHINXBUILD) -c qidoc -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
