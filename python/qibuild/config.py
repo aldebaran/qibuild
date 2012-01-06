@@ -1,27 +1,6 @@
-## Copyright (c) 2011, Aldebaran Robotics
-## All rights reserved.
-##
-## Redistribution and use in source and binary forms, with or without
-## modification, are permitted provided that the following conditions are met:
-##     * Redistributions of source code must retain the above copyright
-##       notice, this list of conditions and the following disclaimer.
-##     * Redistributions in binary form must reproduce the above copyright
-##       notice, this list of conditions and the following disclaimer in the
-##       documentation and/or other materials provided with the distribution.
-##     * Neither the name of the Aldebaran Robotics nor the
-##       names of its contributors may be used to endorse or promote products
-##       derived from this software without specific prior written permission.
-##
-## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-## ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-## WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-## DISCLAIMED. IN NO EVENT SHALL Aldebaran Robotics BE LIABLE FOR ANY
-## DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-## (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-## LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-## ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-## SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
 
 
 """ Read / write qibuild configuration file
@@ -52,6 +31,25 @@ def raise_parse_error(message, cfg_path=None, tree=None):
         mess += "Could not parse:\t%s\n" % as_str
     mess += message
     raise Exception(mess)
+
+def parse_bool_attr(tree, name):
+    """ Parse a boolean attribute of an elelement
+    Return True is the attribute exists and is
+     "1" or "true".
+    Returns False if:
+        - the attribute does not exist
+        - the attribute exist and is "0" or "false"
+
+    """
+    res = tree.get(name)
+    if res is None:
+        return False
+    if res in ["yes", "1"]:
+        return True
+    if res in ["false", "0"]:
+        return False
+    raise_parse_error("Expecting value in [true, false, 0, 1] "
+        "for attribute %s" % name)
 
 # Using hand-written 'class to xml' stuff is not that
 # hard and actually works quite well
@@ -415,8 +413,8 @@ class ProjectConfig:
     """
     def __init__(self):
         self.name = None
-        self.depends = list()
-        self.rdepends = list()
+        self.depends = set()
+        self.rdepends = set()
         self.tree = etree.ElementTree()
 
     def read(self, cfg_path):
@@ -444,12 +442,20 @@ class ProjectConfig:
         # Read depends:
         depends_trees = self.tree.findall("depends")
         for depends_tree in depends_trees:
-            depends_name = depends_tree.get("name")
-            if not depends_name:
-                raise_parse_error("'depends' node must have a 'name' attribute",
-                    cfg_path=cfg_path,
-                    tree=depends_tree)
-            self.depends.append(depends_name)
+            buildtime = parse_bool_attr(depends_tree, "buildtime")
+            runtime   = parse_bool_attr(depends_tree, "runtime")
+            buildtime  = buildtime.lower() in ["yes", "1"]
+            runtime
+            if buildtime.lower() in ["yes", "1"]:
+                dep_names = depends_trees.get("names",  "")
+                for dep_name in dep
+
+            #depends_name = depends_tree.get("name")
+            #if not depends_name:
+                #raise_parse_error("'depends' node must have a 'name' attribute",
+                    #cfg_path=cfg_path,
+                    #tree=depends_tree)
+            #self.depends.append(depends_name)
 
         # Read rdepends:
         rdepends_trees = self.tree.findall("rdepends")
@@ -461,6 +467,27 @@ class ProjectConfig:
                     tree=rdepends_tree)
             self.rdepends.append(rdepends_name)
 
+    def write(self, location):
+        """ Write configuration back to a config file
+
+        """
+        project_tree = self.tree.getroot()
+        project_tree.set("name", self.name)
+
+        for depend in self.depends:
+            depend_tree = etree.Element("depends")
+            depend_tree.set("name", depend)
+            project_tree.append(depend_tree)
+        for rdepend in self.rdepends:
+            rdepend_tree = etree.Element("rdepends")
+            rdepend_tree.set("name", rdepend)
+            project_tree.append(rdepend_tree)
+        if HAS_LXML:
+            # pylint: disable-msg=E1123
+            self.tree.write(location, pretty_print=True)
+        else:
+            xml_indent(project_tree)
+            tree.write(location)
 
 def xml_indent(elem, level=0):
     """ Poor man's pretty print for elementTree
