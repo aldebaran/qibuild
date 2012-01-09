@@ -540,6 +540,7 @@ def convert_qibuild_cfg(qibuild_cfg):
         qibuild_cfg.defaults.env.editor = env_editor
     env_path = ini_cfg.get("general.env.path")
     if env_path:
+        env_path = env_path.replace("\n", "")
         qibuild_cfg.defaults.env.path = env_path
     env_bat_file = ini_cfg.get("general.env.bat_file")
     if env_bat_file:
