@@ -123,14 +123,11 @@ def do(args):
     qiwt = qibuild.worktree_open(args.work_tree)
     toc  = qibuild.toc_open(args.work_tree, args)
 
-    toc_cfg = toc.config_path
-    toc_configstore = qibuild.configstore.ConfigStore()
-    toc_configstore.read(toc_cfg)
-    manifest_url = toc_configstore.get("manifest.url")
-    if manifest_url:
+    manifest = toc.configstore.manifest
+    if manifest:
         try:
             qibuild.run_action("qisrc.actions.fetch",
-                args=[manifest_url],
+                args=[manifest.url],
                 forward_args=args)
         except Exception, e:
             mess  = "Could not run qisrc fetch\n"
