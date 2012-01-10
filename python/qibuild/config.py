@@ -310,10 +310,10 @@ class QiBuildConfig:
             if default_config:
                 self.active_config = default_config
 
-        self.env.bat_file = self.defaults.env.bat_file
-        self.env.editor   = self.defaults.env.editor
-        self.cmake        = self.defaults.cmake
-        self.ide          = None
+        self.cmake.generator = self.defaults.cmake.generator
+        self.env.bat_file    = self.defaults.env.bat_file
+        self.env.editor = self.defaults.env.editor
+        self.ide = None
 
         current_ide = self.defaults.ide
         if current_ide:
@@ -332,9 +332,11 @@ class QiBuildConfig:
                     if defaults_env_path:
                         self.env.path += os.path.pathsep + defaults_env_path
                 # Set bat file
-                self.env.bat_file = matching_config.env.bat_file
+                if matching_config.env.bat_file:
+                    self.env.bat_file = matching_config.env.bat_file
                 # Set cmake settings from current config
-                self.cmake = matching_config.cmake
+                if matching_config.cmake.generator:
+                    self.cmake.generator = matching_config.cmake.generator
                 # Set ide from current config
                 matching_config_ide = matching_config.ide
                 if matching_config_ide:
