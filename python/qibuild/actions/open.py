@@ -129,6 +129,8 @@ def do(args):
     if ide.name == "QtCreator":
         ide_path = ide.path
         cmake_list = os.path.join(project.directory, "CMakeLists.txt")
+        if not ide_path:
+            ide_path = 'qtcreator'
         print "starting QtCreator:"
         print ide_path, cmake_list
         subprocess.Popen([ide_path, cmake_list])
