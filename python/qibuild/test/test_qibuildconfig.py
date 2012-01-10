@@ -338,6 +338,30 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEqual(new_cfg.manifest.url, manifest_url)
 
 
+    def test_merge_settings_with_empty_active(self):
+        qibuild_cfg = qibuild.config.QiBuildConfig(user_config="win32-vs2010")
+        qibuild_cfg.defaults.cmake.generator = "NMake Makefiles"
+        qibuild_cfg.configs['win32-vs2010'] = qibuild.config.Config()
+        qibuild_cfg.merge_configs()
+        self.assertEquals(qibuild_cfg.cmake.generator, "NMake Makefiles")
+
+    def test_build_farm_config(self):
+        xml = r"""
+<qibuild>
+  <build/>
+  <defaults>
+    <env path="C:\Program Files\swigwin-2.0.1;C:\Program Files (x86)\dotNetInstaller\bin;C:\Program Files (x86)\Windows Installer XML v3.5\bin" bat_file="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"/>
+    <cmake generator="NMake Makefiles"/>
+  </defaults>
+  <config name="win32-vs2010">
+    <env/>
+    <cmake/>
+  </config>
+</qibuild>
+"""
+        qibuild_cfg = cfg_from_string(xml,  user_config='win32-vs2010')
+        self.assertEquals(qibuild_cfg.cmake.generator, "NMake Makefiles")
+
 
 class ConvertTestCase(unittest.TestCase):
     def setUp(self):
