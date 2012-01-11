@@ -19,7 +19,7 @@ class EnvSetter():
     Typical usage::
 
         envsetter = EnvSetter()
-        envsetter.preprend_to_path(r"c:\path\to\cmake")
+        envsetter.prepend_to_path(r"c:\path\to\cmake")
         envsetter.set_env_var("WITH_SPAM", "ON")
         envsetter.source_bat(r"C:\path\to\vcvars.bat")
         build_env = envsetter.get_build_env()
@@ -89,7 +89,7 @@ class EnvSetter():
 
         self._build_env[variable] = pathsep.join(splitted_paths)
 
-    def preprend_to_path(self, directory):
+    def prepend_to_path(self, directory):
         """ Append a directory to PATH environment variable
 
         """

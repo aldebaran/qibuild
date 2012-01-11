@@ -48,44 +48,44 @@ class EnvSetterTestCase(unittest.TestCase):
         build_env = envsetter.get_build_env()
         self.assertTrue(build_env.get("WITH_SPAM", "ON"))
 
-    def test_preprend_to_path(self):
+    def test_prepend_to_path(self):
         previous_path = os.environ["PATH"]
         envsetter = qibuild.envsetter.EnvSetter()
-        envsetter.preprend_to_path(self.unlikely)
+        envsetter.prepend_to_path(self.unlikely)
         build_env = envsetter.get_build_env()
         self.assertEquals(os.environ["PATH"], previous_path)
         new_path = build_env["PATH"]
         self._check_is_in_path(self.unlikely, new_path)
 
-    def test_preprend_to_path_twice_the_same(self):
+    def test_prepend_to_path_twice_the_same(self):
         # adding the same path twice should be a no-op
         previous_path = os.environ["PATH"]
         envsetter = qibuild.envsetter.EnvSetter()
-        envsetter.preprend_to_path(self.unlikely)
+        envsetter.prepend_to_path(self.unlikely)
         path_env1 = envsetter.get_build_env()["PATH"]
-        envsetter.preprend_to_path(self.unlikely)
+        envsetter.prepend_to_path(self.unlikely)
         path_env2 = envsetter.get_build_env()["PATH"]
         self.assertEquals(os.environ["PATH"], previous_path)
         self.assertEquals(path_env1, path_env2)
         self._check_is_in_path(self.unlikely, path_env1)
 
-    def test_preprend_to_path_multi(self):
+    def test_prepend_to_path_multi(self):
         # Adding a directory containing os.path.sep should
         # do the smart thing:
         envsetter = qibuild.envsetter.EnvSetter()
         to_add = self.unlikely + os.path.pathsep + self.absurd
-        envsetter.preprend_to_path(to_add)
+        envsetter.prepend_to_path(to_add)
         env_path = envsetter.get_build_env()["PATH"]
         self._check_is_in_path(self.unlikely, env_path)
         self._check_is_in_path(self.absurd, env_path)
 
 
-    def test_preprend_to_path_several_times(self):
+    def test_prepend_to_path_several_times(self):
         # adding two different paths should work
         previous_path = os.environ["PATH"]
         envsetter = qibuild.envsetter.EnvSetter()
-        envsetter.preprend_to_path(self.unlikely)
-        envsetter.preprend_to_path(self.absurd)
+        envsetter.prepend_to_path(self.unlikely)
+        envsetter.prepend_to_path(self.absurd)
         path_env = envsetter.get_build_env()["PATH"]
         self.assertEquals(os.environ["PATH"], previous_path)
         self._check_is_in_path(self.unlikely, path_env)

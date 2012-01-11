@@ -132,7 +132,7 @@ endfunction()
 
 
 # Here we have a list of relative paths, we want
-# to write a variable with these paths preprend with
+# to write a variable with these paths prepend with
 # ${ROOT_DIR}/include, the root include dir of the
 # installed SDK.
 function(_qi_gen_inc_dir_code_redist res target)
