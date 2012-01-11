@@ -313,6 +313,7 @@ class QiBuildConfig:
         self.cmake.generator = self.defaults.cmake.generator
         self.env.bat_file    = self.defaults.env.bat_file
         self.env.editor = self.defaults.env.editor
+        self.env.path = self.defaults.env.path
         self.ide = None
 
         current_ide = self.defaults.ide
