@@ -6,7 +6,6 @@
 
 """
 
-import os
 from xml.etree import ElementTree as etree
 
 class Depends:
@@ -154,3 +153,12 @@ def parse_project_config(config_path):
         sphinxdoc.parse(sphinx_tree)
         sphinxdocs.append(sphinxdoc)
     return (doxydocs, sphinxdocs)
+
+def is_template(qiproj_xml):
+    """ Check whether a project is a template repo
+
+    """
+    tree = etree.ElementTree()
+    tree.parse(qiproj_xml)
+    root = tree.getroot()
+    return root.get("template_repo", "")  in ["true", "1"]

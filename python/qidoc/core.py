@@ -27,22 +27,20 @@ class QiDocBuilder(qibuild.worktree.WorkTree):
         self.cfg_path = os.path.join(in_dir, "qidoc.xml")
         self.config = qidoc.config.parse_qidoc_config(self.cfg_path)
 
-        templates_repo = self.config.templates.repo
-        templates_path = os.path.join(self.in_dir, templates_repo)
-        if not os.path.exists(templates_path):
-            mess  = "Invalid config file: %s " % self.cfg_path
-            mess += "Could not find templates repo: %" % templates_repo
-            mess += "(%s does not exist)" % templates_path
-            raise Exception(mess)
-        self.templates_path = templates_path
-
-        self.doxytags_path = os.path.join(self.out_dir, "doxytags")
-
+        self.templates_path = None
         self.sphinxdocs = dict()
         self.doxydocs = dict()
+
+        # Will fill up self.templates_path, self.sphinxdocs and self.doxydocs
         self._load_doc_projects()
         self.deps_tree = self.get_deps_tree()
 
+        if not self.templates_path:
+            mess  = "Could not find any template repo\n"
+            mess += "Please make sure that one on the qiproj.xml looks like:\n"
+            mess += '<qiproject template_repo="yes" />\n'
+            raise Exception(mess)
+        self.doxytags_path = os.path.join(self.out_dir, "doxytags")
 
     def get_deps_tree(self):
         """ Get the tree of dependencies
@@ -183,6 +181,25 @@ class QiDocBuilder(qibuild.worktree.WorkTree):
                 sphinxdoc.src = os.path.join(p_path, sphinxdoc.src)
                 sphinxdoc.dest = os.path.join(self.out_dir, sphinxdoc.dest)
                 self.sphinxdocs[sphinxdoc.name] = sphinxdoc
+            # Check if the project is a template project:
+            self.check_template(p_name, p_path, qiproj_xml)
+
+    def check_template(self, p_name, p_path, qiproj_xml):
+        """ Check whether a project is a template project
+        If not templates project has been found yet, set
+        self.templates_path, else raise an exception
+
+        """
+        is_template = qidoc.config.is_template(qiproj_xml)
+        if is_template and  self.templates_path:
+            mess  = "Could not add project %s from %s " (p_name, p_path)
+            mess += "as a template repository.\n"
+            mess += "There is already a template repository in %s\n" % self.templates_path
+            mess += "Please check your configuration"
+            raise Exception(mess)
+        if is_template:
+            self.templates_path = p_path
+
 
 
 def find_qidoc_root(cwd=None):
@@ -193,7 +210,7 @@ def find_qidoc_root(cwd=None):
         cwd = os.getcwd()
     dirname = None
     while dirname or cwd:
-        if os.path.exists(os.path.join(cwd, "qidoc.xml")):
+        if os.path.exists(os.path.join(cwd, ".qi", "qibuild.xml")):
             return cwd
         (new_cwd, dirname) = os.path.split(cwd)
         if new_cwd == cwd:

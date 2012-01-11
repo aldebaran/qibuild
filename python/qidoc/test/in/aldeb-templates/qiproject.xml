@@ -1,1 +1,2 @@
-<project name="aldeb-templates" />
+<project name="aldeb-templates" template_repo="true" />
+
