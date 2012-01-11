@@ -73,6 +73,21 @@ function(qi_create_gtest name)
     return()
   endif()
 
+  set(_using_qibuild_gtest TRUE)
+  # Make sure we are using the qibuild flavored gtest
+  # package:
+  find_package(gtest_main QUIET)
+  if(NOT GTEST_MAIN_PACKAGE_FOUND)
+    set(_using_qibuild_gtest FALSE)
+    if(NOT QI_GTEST_QIBUID_WARNED)
+      qi_info("Could not find qibuild flavored gtest. (not GTEST_MAIN package)
+      Please use a qibuild port of gtest or be ready to
+      experience weird link errors ...
+      ")
+      qi_set_global(QI_GTEST_QIBUID_WARNED TRUE)
+    endif()
+  endif()
+
   if (DEFINED BUILD_TESTS AND NOT BUILD_TESTS)
     qi_debug("Test(${name}) disabled by BUILD_TESTS=OFF")
     return()
@@ -84,6 +99,9 @@ function(qi_create_gtest name)
   # First, create the target
   qi_create_bin(${name} SRC ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS} NO_INSTALL)
   qi_use_lib(${name} GTEST ${ARG_DEPENDS})
+  if(${_using_qibuild_gtest})
+    qi_use_lib(${name} GTEST_MAIN)
+  endif()
 
   # Build a correct xml output name
   set(_xml_output "${_TESTS_RESULTS_FOLDER}/${name}.xml")
