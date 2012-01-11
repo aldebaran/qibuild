@@ -1,4 +1,3 @@
-.. _qibuild-documentation:
 
 
 .. toctree::
@@ -12,6 +11,8 @@
   design/index
   other_build_frameworks
 
+
+.. _qibuild-documentation:
 
 qiBuild documentation
 =====================
