@@ -45,8 +45,12 @@ def configure(src, templates, opts,
             opts["TAGFILES"] = " ".join(tagfiles)
         else:
             opts["TAGFILES"] = ""
+        if name == "Doxyfile.in":
+            append_file = os.path.join(src, "Doxyfile.in")
+        else:
+            append_file = None
         qidoc.templates.configure_file(in_file, out_file,
-            append_file = os.path.join(src, "Doxyfile.in"),
+            append_file=append_file,
             opts=opts)
 
     # Also copy the css:
