@@ -227,7 +227,8 @@ def _search_manifest_directory(working_directory):
     cwd     = os.path.normpath(os.path.abspath(working_directory))
     dirname = None
 
-    #for each cwd parent folders, try to see if it match src
+    # for each cwd parent folders, try to see if it is a project
+    # directory, but do not go through nested .qi projects
     while dirname or cwd:
         if os.path.exists(os.path.join(cwd, "qiproject.xml")):
             return cwd
@@ -238,7 +239,10 @@ def _search_manifest_directory(working_directory):
         (new_cwd, dirname) = os.path.split(cwd)
         if new_cwd == cwd:
             break
+        if os.path.exists(os.path.join(cwd, ".qi")):
+            break
         cwd = new_cwd
+
     return None
 
 def search_projects(directory=None, depth=4):
@@ -274,6 +278,11 @@ def search_projects(directory=None, depth=4):
         subdirs = [s for s in dir_contents if os.path.isdir(s)]
     except OSError:
         pass
+
+    # Do not go through nested worktrees:
+    if os.path.basename(directory) == ".qi":
+        return (list(), list())
+
     # If os.listdir fails (permission denied for instance),
     # we will iter on a empty list, so no worry :)
     for p in subdirs:
