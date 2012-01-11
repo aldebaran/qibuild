@@ -19,7 +19,7 @@ class EnvSetter():
     Typical usage::
 
         envsetter = EnvSetter()
-        envsetter.append_to_path(r"c:\path\to\cmake")
+        envsetter.preprend_to_path(r"c:\path\to\cmake")
         envsetter.set_env_var("WITH_SPAM", "ON")
         envsetter.source_bat(r"C:\path\to\vcvars.bat")
         build_env = envsetter.get_build_env()
@@ -56,7 +56,7 @@ class EnvSetter():
         """
         self._build_env[variable] = value
 
-    def append_directory_to_variable(self, directory, variable):
+    def prepend_directory_to_variable(self, directory, variable):
         """ Append a new directory to an environment variable
         containing a list of paths (most of the time PATH, but
         can be LIBDIR, for instance when using cl.exe)
@@ -85,15 +85,15 @@ class EnvSetter():
             old_value = old_value[:-1]
         splitted_paths = old_value.split(pathsep)
         if directory not in splitted_paths:
-            splitted_paths.append(directory)
+            splitted_paths.insert(0, directory)
 
         self._build_env[variable] = pathsep.join(splitted_paths)
 
-    def append_to_path(self, directory):
+    def preprend_to_path(self, directory):
         """ Append a directory to PATH environment variable
 
         """
-        self.append_directory_to_variable(directory, "PATH")
+        self.prepend_directory_to_variable(directory, "PATH")
 
 
     def source_bat(self, bat_file):
@@ -140,4 +140,4 @@ class EnvSetter():
         for (variable, directories_list) in result.iteritems():
             directories = directories_list.split(os.path.pathsep)
             for directory in directories:
-                self.append_directory_to_variable(directory, variable)
+                self.prepend_directory_to_variable(directory, variable)

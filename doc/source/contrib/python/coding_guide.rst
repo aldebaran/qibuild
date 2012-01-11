@@ -192,7 +192,7 @@ A small example::
   import qibuild
 
   envsetter = qibuild.envsetter.EnvSetter()
-  envsetter.append_to_path(r"c:\Program Files\Foobar\bin")
+  envsetter.preprend_to_path(r"c:\Program Files\Foobar\bin")
   build_env = envsetter.get_build_env()
   cmd = ["foobar", "/spam:eggs"]
   qibuild.command.call(cmd, env=build_env)

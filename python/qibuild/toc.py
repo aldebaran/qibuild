@@ -311,7 +311,7 @@ class Toc(WorkTree):
         path_env = self.configstore.env.path
         bat_file = self.configstore.env.bat_file
         if path_env:
-            self.envsetter.append_to_path(path_env)
+            self.envsetter.preprend_to_path(path_env)
         if bat_file:
             self.envsetter.source_bat(bat_file)
 
