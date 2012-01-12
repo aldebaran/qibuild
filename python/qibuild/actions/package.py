@@ -4,6 +4,7 @@
 """Generate a binary sdk"""
 
 import os
+import sys
 import logging
 
 import qibuild
@@ -60,6 +61,25 @@ def configure_parser(parser):
         continuous=False,
         runtime=False)
 
+def _do_package(args, project_name, destdir, debug):
+    """ Helper function used on windows.
+    We need both debug and release in the package,
+    otherwize the package is not usable to compile
+    something else
+
+    """
+    if debug:
+        build_args = ["--debug",  project_name]
+    else:
+        build_args = ["--release", project_name]
+
+    qibuild.run_action("qibuild.actions.configure", build_args + ["--no-clean-first"],
+        forward_args=args)
+    qibuild.run_action("qibuild.actions.make", build_args,
+        forward_args=args)
+    qibuild.run_action("qibuild.actions.install", build_args + [destdir],
+        forward_args=args)
+
 def do(args):
     """Main entry point"""
     toc = qibuild.toc_open(args.work_tree, args)
@@ -77,12 +97,18 @@ def do(args):
     if args.internal:
         args.cmake_flags.append('QI_INSTALL_INTERNAL=ON')
 
-    qibuild.run_action("qibuild.actions.configure", [project_name, "--no-clean-first"],
-        forward_args=args)
-    qibuild.run_action("qibuild.actions.make", [project_name],
-        forward_args=args)
-    qibuild.run_action("qibuild.actions.install", [project_name, destdir],
-        forward_args=args)
+    if sys.platform.startswith("win") and not args.runtime:
+        # Ignore the --release flag and always build in debug and in release:
+        _do_package(args, project_name, destdir, debug=True)
+        _do_package(args, project_name, destdir, debug=False)
+    else:
+        qibuild.run_action("qibuild.actions.configure", [project_name, "--no-clean-first"],
+            forward_args=args)
+        qibuild.run_action("qibuild.actions.make", [project_name],
+            forward_args=args)
+        qibuild.run_action("qibuild.actions.install", [project_name, destdir],
+            forward_args=args)
+
 
     if args.compress:
         LOGGER.info("Compressing package")
