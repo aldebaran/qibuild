@@ -84,13 +84,12 @@ def do(args):
     config = None
     cmake_generator = args.cmake_generator
     if toc:
-        matching_conf = toc.configstore.configs.get(tc_name)
-        if matching_conf:
-            matching_conf.cmake.generator = cmake_generator
-        else:
+        config = toc.configstore.configs.get(tc_name)
+        if not config:
             config = qibuild.config.Config()
             config.name = tc_name
             toc.configstore.add_config(config)
+        config.cmake.generator = cmake_generator
         toc.save_config()
     if args.default:
         toc.configstore.set_default_config(tc_name)
