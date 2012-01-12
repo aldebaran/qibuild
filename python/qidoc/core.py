@@ -24,8 +24,6 @@ class QiDocBuilder(qibuild.worktree.WorkTree):
         qibuild.worktree.WorkTree.__init__(self, in_dir)
         self.in_dir = in_dir
         self.out_dir = out_dir
-        self.cfg_path = os.path.join(in_dir, "qidoc.xml")
-        self.config = qidoc.config.parse_qidoc_config(self.cfg_path)
 
         self.templates_path = None
         self.sphinxdocs = dict()
