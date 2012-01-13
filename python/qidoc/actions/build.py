@@ -39,7 +39,10 @@ def do(args):
 
     builder = qidoc.core.QiDocBuilder(worktree, output_dir)
     opts = dict()
-    opts["version"] = args.version
+    if args.version:
+        opts["version"] = args.version
+    else:
+        opts["version"] = "0.42"
     builder.build(opts)
 
 
