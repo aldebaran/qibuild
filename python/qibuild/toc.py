@@ -108,8 +108,18 @@ class Toc(WorkTree):
         # The local config file in which to write
         self.config_path = os.path.join(self.work_tree, ".qi", "qibuild.xml")
         self.configstore = qibuild.config.QiBuildConfig(config)
-        if os.path.exists(self.config_path):
-            self.configstore.read(self.config_path)
+
+        # When you are running toc actions for a qibuild project, sometimes
+        # a Toc object is created on the fly (Using toc_open with a non
+        # empty path_hints) variable.
+        # In this case, the .qi directory may not even exists, nor the
+        # .qi directory, so create it:
+        if not os.path.exists(self.config_path):
+            to_create = os.path.dirname(self.config_path)
+            qibuild.sh.mkdir(to_create, recursive=True)
+            with open(self.config_path, "w") as fp:
+                fp.write("<qibuild />\n")
+        self.configstore.read(self.config_path)
         self.active_config = self.configstore.active_config
 
         self.build_type = build_type
