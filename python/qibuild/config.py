@@ -116,11 +116,9 @@ class Build:
         incredibuild = tree.get("incredibuild")
         if incredibuild and incredibuild.lower() in ["y", "yes", "1", "true", "on"]:
             self.incredibuild = True
-        build_dir = tree.get("build_dir")
-        if build_dir:
-            self.build_dir = qibuild.sh.to_native_path(build_dir)
-        # Not calling to_native_path because sdk_dir can be
+        # Not calling to_native_path because build_dir and sdk_dir can be
         # relative to the worktree
+        self.build_dir = tree.get("build_dir")
         self.sdk_dir = tree.get("sdk_dir")
 
     def tree(self):
