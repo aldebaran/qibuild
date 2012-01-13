@@ -32,8 +32,6 @@ class TestQiDoc(unittest.TestCase):
         self.assertTrue(os.path.exists(submodule_zip))
 
     def test_cfg_parse(self):
-        qidoc_cfg = self.qidoc_builder.config
-
         qibuild_sphinx = self.qidoc_builder.sphinxdocs["qibuild"]
         self.assertEqual(qibuild_sphinx.name, "qibuild")
         self.assertEqual(qibuild_sphinx.src ,
@@ -56,7 +54,6 @@ class TestQiDoc(unittest.TestCase):
         self.assertEqual(libalvision.dest,
             os.path.join(self.out_dir, "ref", "libalvision"))
 
-        self.assertEqual(qidoc_cfg.templates.repo, "aldeb-templates")
 
 
     def test_sorting(self):
