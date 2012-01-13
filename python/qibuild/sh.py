@@ -7,8 +7,11 @@
 # Mostly wrappers around somehow strange-behaving
 # shutil functions ...
 
-import sys
 import os
+import sys
+import time
+import errno
+import stat
 import shutil
 import tempfile
 import logging
@@ -199,28 +202,89 @@ def rm(name):
     """
     if not os.path.lexists(name):
         return
-    def _rmtree_handler(func, path, _execinfo):
-        """Call by rmtree when there was an error.
-
-        if this is called because we could not remove a file, then see if
-        it is readonly, change it back to nornal and try again
-
-        """
-        import stat
-        if (func == os.remove) and not os.access(path, os.W_OK):
-            os.chmod(path, stat.S_IWRITE)
-            os.remove(path)
-        else:
-            # Something else must be wrong...
-            raise
-
     if os.path.isdir(name) and not os.path.islink(name):
         LOGGER.debug("Removing directory: %s", name)
-        shutil.rmtree(name, False, _rmtree_handler)
+        rmtree(name)
     else:
         LOGGER.debug("Removing %s", name)
         os.remove(name)
 
+# Taken from gclient source code (BSD license)
+def rmtree(path):
+  """shutil.rmtree() on steroids.
+
+  Recursively removes a directory, even if it's marked read-only.
+
+  shutil.rmtree() doesn't work on Windows if any of the files or directories
+  are read-only, which svn repositories and some .svn files are.  We need to
+  be able to force the files to be writable (i.e., deletable) as we traverse
+  the tree.
+
+  Even with all this, Windows still sometimes fails to delete a file, citing
+  a permission error (maybe something to do with antivirus scans or disk
+  indexing).  The best suggestion any of the user forums had was to wait a
+  bit and try again, so we do that too.  It's hand-waving, but sometimes it
+  works. :/
+
+  On POSIX systems, things are a little bit simpler.  The modes of the files
+  to be deleted doesn't matter, only the modes of the directories containing
+  them are significant.  As the directory tree is traversed, each directory
+  has its mode set appropriately before descending into it.  This should
+  result in the entire tree being removed, with the possible exception of
+  *path itself, because nothing attempts to change the mode of its parent.
+  Doing so would be hazardous, as it's not a directory slated for removal.
+  In the ordinary case, this is not a problem: for our purposes, the user
+  will never lack write permission on *path's parent.
+  """
+  if not os.path.exists(path):
+    return
+
+  if os.path.islink(path) or not os.path.isdir(path):
+    raise Exception('Called rmtree(%s) in non-directory' % path)
+
+  if sys.platform == 'win32':
+    # Some people don't have the APIs installed. In that case we'll do without.
+    win32api = None
+    win32con = None
+    try:
+      # Unable to import 'XX'
+      # pylint: disable=F0401
+      import win32api, win32con
+    except ImportError:
+      pass
+  else:
+    # On POSIX systems, we need the x-bit set on the directory to access it,
+    # the r-bit to see its contents, and the w-bit to remove files from it.
+    # The actual modes of the files within the directory is irrelevant.
+    os.chmod(path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+
+  def remove(func, subpath):
+    if sys.platform == 'win32':
+      os.chmod(subpath, stat.S_IWRITE)
+      if win32api and win32con:
+        win32api.SetFileAttributes(subpath, win32con.FILE_ATTRIBUTE_NORMAL)
+    try:
+      func(subpath)
+    except OSError, e:
+      if e.errno != errno.EACCES or sys.platform != 'win32':
+        raise
+      # Failed to delete, try again after a 100ms sleep.
+      time.sleep(0.1)
+      func(subpath)
+
+  for fn in os.listdir(path):
+    # If fullpath is a symbolic link that points to a directory, isdir will
+    # be True, but we don't want to descend into that as a directory, we just
+    # want to remove the link.  Check islink and treat links as ordinary files
+    # would be treated regardless of what they reference.
+    fullpath = os.path.join(path, fn)
+    if os.path.islink(fullpath) or not os.path.isdir(fullpath):
+      remove(os.remove, fullpath)
+    else:
+      # Recurse.
+      rm(fullpath)
+
+  remove(os.rmdir, path)
 
 def mv(src, dest):
     """Move a file into a directory, but do not crash

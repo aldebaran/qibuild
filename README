@@ -33,6 +33,8 @@ qiBuild contains work from:
 
 * cmake http://www.cmake.org/cmake/project/license.html (BSD)
 
+* gclient http://code.google.com/p/gclient/ (BSD)
+
 Maintainers:
 Dimitri Merejkowsky <dmerejkowsky@aldebaran-robotics.com>
 Cedric GESTES <gestes@aldebaran-robotics.com>
