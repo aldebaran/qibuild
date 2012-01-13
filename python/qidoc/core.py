@@ -174,13 +174,35 @@ class QiDocBuilder(qibuild.worktree.WorkTree):
             for doxydoc in doxydocs:
                 doxydoc.src = os.path.join(p_path, doxydoc.src)
                 doxydoc.dest = os.path.join(self.out_dir, doxydoc.dest)
+                self.check_collision(doxydoc, "doxygen")
                 self.doxydocs[doxydoc.name] = doxydoc
             for sphinxdoc in sphinxdocs:
                 sphinxdoc.src = os.path.join(p_path, sphinxdoc.src)
                 sphinxdoc.dest = os.path.join(self.out_dir, sphinxdoc.dest)
+                self.check_collision(sphinxdoc, "sphinx")
                 self.sphinxdocs[sphinxdoc.name] = sphinxdoc
             # Check if the project is a template project:
             self.check_template(p_name, p_path, qiproj_xml)
+
+
+    def check_collision(self, project, doc_type):
+        """" Check for collision between doc projects
+
+        """
+        name = project.name
+        if doc_type == "doxygen":
+            other_project = self.doxydocs.get(name)
+        elif doc_type == "sphinx":
+            other_project = self.sphinxdocs.get(name)
+
+        if not other_project:
+            return
+
+        mess  = "Two %s projects have the same name: %s\n" % (doc_type, name)
+        mess += "First project is in: %s\n" % other_project.src
+        mess += "Other project is in: %s\n" % project.src
+        mess += "Please check your configuration"
+        raise Exception(mess)
 
     def check_template(self, p_name, p_path, qiproj_xml):
         """ Check whether a project is a template project
