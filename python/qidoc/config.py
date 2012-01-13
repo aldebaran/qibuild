@@ -143,7 +143,7 @@ def parse_project_config(config_path):
     doxydocs = list()
     doxy_trees = root.findall("doxydoc")
     for doxy_tree in doxy_trees:
-        doxydoc = SphinxDoc()
+        doxydoc = DoxyDoc()
         doxydoc.parse(doxy_tree)
         doxydocs.append(doxydoc)
     sphinxdocs = list()
