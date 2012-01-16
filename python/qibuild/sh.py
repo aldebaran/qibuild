@@ -400,6 +400,7 @@ def to_native_path(path):
     path = os.path.normcase(path)
     path = os.path.normpath(path)
     path = os.path.abspath(path)
+    path = os.path.realpath(path)
     if sys.platform.startswith("win"):
         path = to_dos_path(path)
     return path
