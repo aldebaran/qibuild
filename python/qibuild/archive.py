@@ -65,6 +65,7 @@ def extract_tar(archive_path, dest_dir):
 
 def extract_zip(archive_path, dest_dir):
     """Extract a zip archive"""
+    dest_dir = qibuild.sh.to_native_path(dest_dir)
     LOGGER.debug("Extracting %s to %s", archive_path, dest_dir)
     archive = zipfile.ZipFile(archive_path)
     members = archive.infolist()
@@ -81,6 +82,17 @@ def extract_zip(archive_path, dest_dir):
             mess += "Every files sould be in the same top dir (%s != %s)" % \
                  (topdir, member_top_dir)
             raise InvalidArchive(mess)
+        # By-pass buggy zipfile for python 2.6:
+        if sys.version_info < (2, 7):
+            if member.filename.endswith("/"):
+                # upstream buggy code would create an empty filename
+                # instead of a directory, thus preventing next members
+                # to be extracted
+                to_create = member.filename[:-1]
+                posix_dest_dir = qibuild.sh.to_posix_path(dest_dir)
+                to_create = posixpath.join(posix_dest_dir, to_create)
+                qibuild.sh.mkdir(to_create, recursive=True)
+                continue
         archive.extract(member, path=dest_dir)
         percent = float(i) / size * 100
         if sys.stdout.isatty():
