@@ -53,6 +53,9 @@ This is what your layout should look like::
 * The private code is put in a ``src`` sub-directory. Private and public
   directories are separated, it's easy to search only in public headers.
 
+Note: you can download an archive containing the foo project here:
+:download:`fooproject.zip </samples/fooproject.zip>`
+
 CMake
 -----
 
