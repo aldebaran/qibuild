@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
@@ -21,6 +22,9 @@ import qibuild
 LOGGER = logging.getLogger(__name__)
 
 REMOTE_CFG = "~/.config/qi/remote.cfg"
+REMOTE_CFG_USERNAME = "username"
+REMOTE_CFG_PASSWORD = "password"
+REMOTE_CFG_ROOT = "root"
 
 def callback(total, done):
     """ Called during download """
@@ -30,24 +34,59 @@ def callback(total, done):
     sys.stdout.write("Done: %i%%\r" % percent)
     sys.stdout.flush()
 
+def read_config():
+    """ Reads the configuration file for remote locations
+    
+    """
+    remote_cfg = qibuild.sh.to_native_path(REMOTE_CFG)
+    config = ConfigParser.ConfigParser()
+    config.read(remote_cfg)
+    return config
+
+def get_site_user_and_password(server, defaultUser=None, defaultPassword=None):
+    """ Get username and password for a remote site
+    
+    """
+    config = read_config()
+    if not config.has_section(server):
+        return (defaultUser, defaultPassword)
+        
+    items = dict(config.items(server))
+    
+    return (
+        items.get(REMOTE_CFG_USERNAME),
+        items.get(REMOTE_CFG_PASSWORD)
+    )
+    
 
 def get_ftp_password(server):
     """ Get ftp password from the config file
 
     """
-    remote_cfg = qibuild.sh.to_native_path(REMOTE_CFG)
-    config = ConfigParser.ConfigParser()
-    config.read(remote_cfg)
+    config = read_config()
     if not config.has_section(server):
         return ("anonymous", "anonymous", "/")
 
     items = dict(config.items(server))
 
     return (
-        items.get("username"),
-        items.get("password"),
-        items.get("root")
+        items.get(REMOTE_CFG_USERNAME),
+        items.get(REMOTE_CFG_PASSWORD),
+        items.get(REMOTE_CFG_ROOT)
     )
+
+def authenticated_urlopen(location):
+    """ A wrapper around urlopen adding authentication information if provided by the user.
+    
+    """
+    passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+    user, password = get_site_user_and_password(urlparse.urlsplit(location).netloc)
+    if user != None and password != None:
+        passman.add_password(None, location, user, password)
+    authhandler = urllib2.HTTPBasicAuthHandler(passman)
+    opener = urllib2.build_opener(authhandler)
+    urllib2.install_opener(opener)
+    return urllib2.urlopen(location)
 
 def open_remote_location(location):
     """ Open a file from an url
@@ -73,8 +112,7 @@ def open_remote_location(location):
         ftp.retrbinary(cmd, retr_callback)
         return StringIO.StringIO(Transfer.data)
     else:
-        return urllib2.urlopen(location)
-
+        return authenticated_urlopen(location)
 
 
 def download(url, output_dir,
@@ -145,7 +183,7 @@ def download(url, output_dir,
             cmd = "RETR " + url_split.path
             ftp.retrbinary(cmd, retr_callback)
         else:
-            url_obj = urllib2.urlopen(url)
+            url_obj = authenticated_urlopen(url)
             content_length = url_obj.headers.dict['content-length']
             size = int(content_length)
             buff_size = 100 * 1024
