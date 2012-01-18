@@ -28,6 +28,10 @@
 #      qi_use_lib(bar FOO)
 #   endif()
 #
+# .. note:: if the foo package is found, WITH_FOO will automatically be set to true.
+#       however, there are a few cases where you would like to NOT use the
+#       features of the FOO library even if it is found, in this case, we let
+#       the user set -DWITH_FOO=OFF from the command line.
 # \arg:  NAME             Name of the package, a WITH_${NAME} option will be created
 # \arg:  DESCRIPTION      The description of the option (will be shown in cmake gui)
 #
