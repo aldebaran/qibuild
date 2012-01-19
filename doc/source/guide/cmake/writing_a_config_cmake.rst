@@ -75,7 +75,7 @@ modify ``src/bar/CMakeLists.txt`` too look like:
 
 
 
-Finding libraires with different names
+Finding libraries with different names
 --------------------------------------
 
 
@@ -144,10 +144,27 @@ In this case, ``FOO_INCLUDE_DIRS`` will equal
 
    #include <foo.h>
 
+Headers-only libraries
+----------------------
+
+Some libraries are only made of headers! Let's assume this is the case for
+foo.
+
+What you have to do here is:
+
+.. code-block:: cmake
+
+  fpath(FOO foo/foo.h)
+  export_header(FOO)
+
+In a nutshell:
+
+* No ``flib`` needed.
+
+* ``export_header`` instead of ``export_lib``
 
 Finding in non standards paths
 ------------------------------
-
 
 Sometimes want you want to find is not under a standard location,
 such as ``/usr/local/include`` or ``/usr/include``.
