@@ -1,7 +1,7 @@
 .. _porting-to-qibuild:
 
-Porting to qiBuild
-==================
+Porting a CMake project to qiBuild
+==================================
 
 Requirements
 ------------

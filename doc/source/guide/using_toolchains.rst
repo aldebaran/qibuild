@@ -7,8 +7,26 @@ In this tutorial, you will learn how to build your projects using pre-compiled
 packages.
 
 
+Using Aldebaran toolchains
+---------------------------
+
+Aldebaran C++ SDKs and cross-toolchains are, by definition, toolchains.
+
+Using them is done with
+
+.. code-block:: console
+
+   $ qitoolchain create <name> /path/to/toolchain.xml
+
+.. seealso:: :ref:`qibuild-using-aldebaran-packages`
+
+
+
+Adding packages to a toolchain
+------------------------------
+
 Requirements
-------------
+++++++++++++
 
 The requirements for this tutorial are the same as in
 the :ref:`qibuild-managing-deps` tutorial.
@@ -23,7 +41,7 @@ The goal of this tutorial is to manage to compile hello, using a pre-compiled
 binary of world.
 
 Creating the world package
---------------------------
+++++++++++++++++++++++++++
 
 Generating a package for the world project is done with:
 
@@ -63,10 +81,12 @@ So the world package is usable anywhere.
 .. note:: The world-config.cmake does not even requires qibuild to be used by
   an other CMake project, all it does is calling standard CMake functions.
 
-Using a toolchain
------------------
+Create a toolchain from scratch
+++++++++++++++++++++++++++++++++
 
-First, you have to create a **toolchain** for qibuild to use:
+If you are already using a Aldebaran toolchain, you can skip this section.
+
+Otherwize, you have to create a **toolchain** from scratch for qibuild to use:
 
 .. code-block:: console
 
@@ -113,6 +133,10 @@ You can check that your toolchain has been created with:
    No feed
    No packages
 
+
+Adding the world package to the toolchain
++++++++++++++++++++++++++++++++++++++++++
+
 Now you can use:
 
 .. code-block:: console
@@ -150,6 +174,8 @@ unless you specify it explicitly on the command line:
 .. code-block:: console
 
   $ qibuild configure world hello
+
+
 
 Creating toolchain feeds
 ------------------------
@@ -206,6 +232,24 @@ You can see that the feed has been stored in your qibuild configuration:
         in /home/user/.local/share/qi/toolchains/linux32/world
 
 
+
+You can also add the Aldebaran C++ SDKs or cross toolchains as if they were packages.
+(This sound a bit weird, but it works)
+
+For instance, assuming you were using the atom cross-toolchain and cross-compiled
+the world package, you can create a feed looking like
+
+.. code-block:: xml
+
+   <toolchain>
+    <package name="atom-ctc"  url="http://example.com/packages/aldebaran-ctc.tar.gz"
+      toolchain_file="cross-config.cmake" />
+
+    <package name="hello"  url="http://example.com/packages/world.tar.gz" />
+  </toolchain>
+
+
+Don't forget the ``toolchain_file`` attribute of the ``atom-ctc`` package, though.
 
 
 Full feed.xml specification

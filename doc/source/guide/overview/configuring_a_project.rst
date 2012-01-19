@@ -49,3 +49,9 @@ To pass additional CMake flags, use:
   qibuild configure -DFOO=BAR
 
 
+
+Using Aldebaran packages
+-------------------------
+
+
+See: :ref:`qibuild-using-aldebaran-packages`

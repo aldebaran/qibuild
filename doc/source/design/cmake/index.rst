@@ -116,6 +116,10 @@ containg some libs in  ``ctc/sysroot/usr/lib``, and a cross-compiler in
   **toolchain**
     A toolchain is simply a collection of :term:`packages <package>`
 
+  **feed**
+    A feed is a smiple XML file describing a toolchain: its location,
+    and the packages that are in it.
+
 
 Overviews
 ---------

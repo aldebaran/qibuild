@@ -1,5 +1,5 @@
-Using qibuild command line
-==========================
+qiBuild overview
+================
 
 .. toctree::
 

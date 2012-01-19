@@ -3,6 +3,7 @@
 Building a project
 ==================
 
+
 Simple build
 ------------
 
@@ -72,3 +73,9 @@ run qibuild configure to update your solution file.
    re-generate itself. This sadly does not always work, so if you
    experience trouble, it's best to close the project,
    then re-run ``qibuild configure`` by hand
+
+
+Using Aldebaran packages
+-------------------------
+
+See: :ref:`qibuild-using-aldebaran-packages`

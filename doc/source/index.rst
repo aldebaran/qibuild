@@ -43,16 +43,19 @@ qiBuild is composed of two parts:
   taking dependencies into account and generate re-distributable binary
   packages
 
-qiBuild programming guide
---------------------------
-
+Getting started with qiBuild
+----------------------------
 
 First, please follow the tutorial in the :ref:`qibuild-getting-started` section.
 
 You can now read the :ref:`qibuild-in-five-minutes` section if you want to dig
 in right now.
 
-Or you can follow the :ref:`qibuild-guide` for a more progressive course.
+qiBuild programming guide
+--------------------------
+
+
+Please follow the :ref:`qibuild-guide` for a more progressive, comprehensive course.
 
 
 References

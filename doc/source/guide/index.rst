@@ -8,7 +8,7 @@ qiBuild Programming guide
 .. toctree::
    :hidden:
 
-   cmdline/index
+   overview/index
    cmake/index
    porting_to_qibuild
    using_toolchains
@@ -20,8 +20,8 @@ qiBuild Programming guide
 
 
 
-Using qibuild command line
---------------------------
+qibuild Overview
+-----------------
 
 * :ref:`qibuild-create-project`
 * :ref:`qibuild-configure-project`

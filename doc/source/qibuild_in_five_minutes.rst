@@ -3,142 +3,102 @@
 qiBuild in five minutes
 =======================
 
+First, please make sure you have follow the :ref:`qibuild-getting-started`
+tutorial.
 
-* Create a worktree:
+Starting a new project from scratch
+------------------------------------
 
-  .. code-block:: console
+* Create a :term:`worktree`. It is advised to use an empty folder as
+  a worktree
 
-     $ cd ~/src
-     $ qibuild init
+.. code-block:: console
 
+    $ cd /path/to/worktree
+    $ qibuild init
 
-* Create a ``world`` library in the ``world``
-  project, in ``src/world``
+* Create a new project
 
-  .. code-block:: console
+.. code-block:: console
 
-     $ cd ~/src/world
-     $ $EDITOR CMakeLists.txt
-
-  .. code-block:: cmake
-
-      cmake_minimum_required(VERSION 2.8)
-      project(world)
-      include("qibuild.cmake")
-
-      qi_create_lib(world world/world.hpp world/world.cpp)
-      qi_stage_lib(world)
-
-* Make world depend on ``ode``
-
-  .. code-block:: console
-
-      $ $EDITOR qibuid/modules/ode-config.cmake
-
-  .. code-block:: cmake
-
-     clean(ODE)
-     fpath(ODE ode/ode.h)
-     flib(ODE ode)
-     export_lib(ODE)
-
-  .. code-block:: console
-
-     $ $EDITOR CMakeLists.txt
-
-  .. code-block:: cmake
-
-     qi_use_lib(world ODE)
+    $ qibuild create foo
 
 
-* Create a ``hello`` executable in the ``hello`` project, in
-  ``src/hello``, using the ``world`` library:
+* Configure and build the foo project
 
-  .. code-block:: console
+.. code-block:: console
 
-     $ cd ~/src/hello
-     $ $EDITOR qibuild.manifest
-
-
-  .. code-block:: ini
-
-     [project hello]
-     depends = world
-
-  .. code-block:: console
-
-     $ $EDITOR CMakeLists.txt
+    $ qibuild configure foo
+    $ qibuild make foo
 
 
-  .. code-block:: cmake
+.. _qibuild-using-aldebaran-packages:
 
-      cmake_minimum_required(VERSION 2.8)
-      project(hello)
-      include("qibuild.cmake")
-
-      qi_create_bin(hello main.cpp)
-
-  .. code-block:: console
-
-     $ cd ~/src
-     $ qibuild configure hello
-
-     Call cmake on world, then hello
-
-     $ qibuild make hello
-
-     Build world, then hello, automagically
-     linking `src/hello/build/sdk/bin/hello` with
-     `src/world/build/sdk/lib/libworld.so`
+Using Aldebaran packages
+-------------------------
 
 
-* Distribute the world project to the world, step 1:
-  Add install rules for world header
+For the Desktop
++++++++++++++++
 
-  .. code-block:: console
+You can use the C++ packages on Visual Studio 2008 and 2010 (32 bits only),
+Mac and Linux.
 
-     $ cd ~/src/world/
-     $ $EDITOR CMakeLists.txt
+First, get the C++ SKD and extract it, say in ``/path/to/cpp/sdk``
 
-  .. code-block:: cmake
+* Create a :term:`worktree` inside the C++ SDK examples folder:
 
-     qi_install_header(world/world.hpp SUBFOLDER world)
+.. code-block:: console
 
-* Distribute the world project to the world, step 2:
-  Generate world package in ``~/src/packages/world.tar.gz``
-  using cmake install rules.
-
-  .. code-block:: console
-
-     $ qibuild package world
+    $ cd /path/to/cpp/sdk/examples
+    $ qibuild init
 
 
-* Distribute the world project to the world, step 3:
-  Upload the package along with a feed description:
+* Create a :term:`toolchain` using the :term:`feed` from the C++ SDK:
 
-  .. code-block:: xml
+.. code-block:: console
 
-     <toolchain>
-       <package
-        name="world"
-        url="htpp://example.com/world.tar.gz"
-       />
-      </toolchain>
+    $ qitoolchain create naoqi-sdk /path/to/cpp/sdk/toolchain.xml
 
-* Use the world package from an other machine:
 
-  .. code-block:: console
+* Configure and build the helloworld project:
 
-     $ qitoolchain create $NAME htpp://example.com/feed.xml
+.. code-block:: console
 
-     Add package from htpp://example.com/world.tar.gz to
-     a toolchain named $NAME
+    $ qibuild configure -c naoqi-sdk helloworld
+    $ qibuild make -c naoqi-sdk helloworld
 
-     $ qisrc add git@git.example.com/hello.git
 
-     Get hello sources from a git repository
 
-     $ qibuild configure -c $NAME hello
+For the robot
+++++++++++++++
 
-     No need for world sources, using pre-compiled library
-     from the world package
+
+You have to be on Linux to be able to compile code for the robot.
+This if often refer to as ``cross-compilation``.
+
+First, get the cross-toolchain that matches your robot
+version (atom for V4 and later, geode for previous version),
+and extract it, say in ``/path/to/atom/ctc``
+
+
+.. note:: on linux64 you will have to install some 32bits libraries for the
+          cross-compiler to work.
+
+          On ubuntu, you should use something like:
+
+          .. code-block:: console
+
+              $ sudo apt-get install gcc-multilib libc6-dev libc6-i386
+
+
+* Create a :term:`toolchain` using the :term:`feed` from the cross-toolchain
+
+.. code-block:: console
+
+    $ qitoolchain create cross-atom /path/to/ctc/
+
+
+    $ qibuild configure -c cross-atom
+    $ qibuild make -c cross-atom
+
