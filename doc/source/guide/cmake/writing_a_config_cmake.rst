@@ -25,7 +25,7 @@ Simplest case
 -------------
 
 Here we assume that the ``foo`` library only needs an include directory,
-and tht the name of the library is the same in debug and in release.
+and the name of the library is the same in debug and in release.
 
 The canonical ``foo-config.cmake`` should look like
 
@@ -41,6 +41,17 @@ Here we assume that the library is named ``foo.lib`` for
 Visual Studio, ``libfoo.a`` or ``libfoo.so`` for Linux, or
 ``libfoo.a`` or ``libfoo.dylib`` for Mac.
 
+We also assume that the library is in a `/lib` directory
+and the header in a `include` directory, and from a prefix
+where CMake can find it, either because:
+
+* foo is in a package in a toolchain following the sdk layout
+
+* foo is installed on the system, so the prefix is ``/usr/``
+  or ``/usr/local``.
+
+
+This should cover 90% of the use cases.
 
 If the ``foo`` library is open source, do not hesitate to submit
 a patch to integrate ``foo-config.cmake`` with other qibuild cmake modules.
@@ -133,6 +144,27 @@ In this case, ``FOO_INCLUDE_DIRS`` will equal
 
    #include <foo.h>
 
+
+Finding in non standards paths
+------------------------------
+
+
+Sometimes want you want to find is not under a standard location,
+such as ``/usr/local/include`` or ``/usr/include``.
+
+So, for instance let's assume the foo library is in ``/opt/bar/lib/libfoo.so``
+and the header in ``/opt/bar/include/foo/foo.h``
+
+All you have to do is to specify PATHS as you would do if you used the normal
+``find_path`` CMake method.
+
+So in our case
+
+.. code-block:: cmake
+
+
+   fpath(FOO foo/foo.h PATHS /opt/bar/include)
+   flib(FOO NAMES foo PATHS /opt/bar/lib)
 
 Finding pkg-config libraries
 ----------------------------
