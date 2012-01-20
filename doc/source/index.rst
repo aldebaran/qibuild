@@ -10,6 +10,7 @@
   contrib/index
   design/index
   other_build_frameworks
+  relnotes
 
 
 .. _qibuild-documentation:
@@ -114,3 +115,8 @@ Read this if you are already using a build framework.
 
 * :ref:`qibuild-compared-to-other-build-frameworks`
 
+
+Release notes
+-------------
+
+* :ref:`qibuild-relnotes`
