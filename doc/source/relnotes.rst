@@ -25,7 +25,14 @@ Configuration files
 +++++++++++++++++++
 
 Every configuration file used by qiBuild is now in XML.
-Conversion is done by qiBuild on the fly
+
+``QI_WORK_TREE/.qi/qibuild.cfg`` is deprecated, use ``QI_WORK_TREE/.qi/qibuild.xml``
+intead.
+
+``<project>/qibuild.manifest`` is deprecated, use ``<project>/qiproject.xml>`` instead.
+
+Note that conversion is done by qiBuild on the fly, but the XML file is only written
+if it does not exist.
 
 
 qidoc
@@ -68,21 +75,21 @@ Python
 Command line
 ~~~~~~~~~~~~
 
-* qibuild package: always build in debug and in release on windows
-* qisrc pull: fix return code on error (#6343)
-* qibuild config --edit : do not mess with stdin
-* qibuild install: force calling of 'make preinstall'
-* qitoolchain update: update every toolchain by default
-* qibuild test: use a custom CTest implementation instead of using
-  the ``ctest`` executable. (Makes continuous integration much easier)
-* qibuild package: clean command-line API
-* qibuild convert: add "--no-cmake" argument
-* qibuild convert: do not add include(qibuild.cmake) if it is already here
-* qisrc pull now call qisrc fetch first (#204)
-* qitoolchain create: prevent user to create bad toolchain names
 * qitoolchain: add support for password-protected HTTP and FTP feed URLS.
+* ``qibuild package``: always build in debug and in release on windows
+* ``qisrc pull``: fix return code on error (#6343)
+* ``qibuild config --edit`` : do not mess with stdin
+* ``qibuild install``: force calling of 'make preinstall'
+* ``qitoolchain update``: update every toolchain by default
+* ``qibuild test``: use a custom CTest implementation instead of using
+  the ``ctest`` executable. (Makes continuous integration much easier)
+* ``qibuild package``: clean command-line API
+* ``qibuild convert``: add ``--no-cmake`` argument
+* ``qibuild convert``: do not add ``include(qibuild.cmake)`` if it is already here
+* ``qisrc pull`` now call ``qisrc fetch`` first (#204)
+* ``qitoolchain create``: prevent user to create bad toolchain names
 * Added ``qitoolchain clean-cache`` to clean toolchains cache
-* Added qidoc executable (work in progress)
+* Added ``qidoc`` executable (work in progress)
 * Added ``qibuild find PACKAGE`` to display CMake variables relate to the package (work in progress)
 
 Configuration files
@@ -99,7 +106,7 @@ CMake
 
 * Better way of finding qibuild cmake framework, using ``find_package(qibuild)``
   instead of ``include(qibuild.cmake)``
-* qi_create_gtest : prefer using a qibuild port of gtest
+* qi_create_gtest: prefer using a qibuild port of gtest
 * qi_create_gtest: disable the target when gtest is not found
 * qi_create_gtest: always add GTEST dependency
 * qi_stage/qi_use_lib: better handling when first arg is not a target
