@@ -9,109 +9,73 @@
 import os
 import re
 import sys
+import difflib
 import logging
-import shutil
+from xml.etree import ElementTree as etree
 
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
-def configure_parser(parser):
-    """Configure parser for this action """
-    qibuild.cmdparse.default_parser(parser)
-    parser.add_argument("source_dir", nargs="?",
-        help="Top source directory of the project. "
-             "Defaults to current working directory.")
-    parser.add_argument("--no-cmake", action="store_false",
-        dest="patch_cmake",
-        help="Do not patch any cmake code. "
-             "Use this if you do not want to depend on the qibuild "
-             "CMake framework.")
-    parser.set_defaults(cmake_patch=True)
-
-def copy_qibuild(source_dir):
-    """ Every convert function should at least call this
+def guess_project_name(source_dir):
+    """ Try to guess the project name
 
     """
-    qibuild_template = os.path.join(qibuild.get_cmake_qibuild_dir(),
-        "qibuild", "templates", "qibuild.cmake")
-    shutil.copy(qibuild_template, os.path.join(source_dir, "qibuild.cmake"))
-
-def create_qibuild_manifest(source_dir, project_name=None):
-    """ Every convert function should at least call this.
-
-    The project name will be the basename of the source_dir,
-    unless project_name is not None.
-    (the convert function may be able to guess the project name
-    using a better way)
-
-    """
-    to_write = os.path.join(source_dir, "qibuild.manifest")
-    if os.path.exists(to_write):
-        LOGGER.info("%s already exists, nothing to do ;)",
-            to_write)
-        return
-
-    if project_name is None:
-        project_name = os.path.basename(source_dir)
-
-    from qibuild import QIBUILD_ROOT_DIR
-    manifest_in = os.path.join(QIBUILD_ROOT_DIR,
-        "templates", "project", "qibuild.manifest")
-    old_contents = ""
-    with open(manifest_in, "r") as old_file:
-        old_contents = old_file.read()
-    new_contents = old_contents.replace("@project_name@", project_name)
-    with open(to_write, "w") as new_file:
-        new_file.write(new_contents)
-
-def guess_type(source_dir):
-    """ Try to guess the build system used by the sources.
-
-    Return None if nothing seems to fit.
-    """
-    bootstrap = os.path.join(source_dir, "bootstrap.cmake")
-    if os.path.exists(bootstrap):
-        return "bootstrap"
-    cmake = os.path.join(source_dir, "CMakeLists.txt")
-    if os.path.exists(cmake):
-        return "cmake"
-
-    return None
-
-def convert_bootstrap(source_dir, args):
-    """ Convert a old bootstrap project to a qiBuild project
-
-    """
-    # Copy the qibuild.cmake file
-    copy_qibuild(source_dir)
-
-    # update the "bootstrap.cmake" files so that they try to include qibuild.cmake
-    new_bootstrap = os.path.join(qibuild.get_cmake_qibuild_dir(),
-        "qibuild", "templates", "bootstrap.cmake")
-    for (root, _dirs, filenames) in os.walk(source_dir):
-        for filename in filenames:
-            if filename == "bootstrap.cmake":
-                full_path = os.path.join(root, filename)
-                if args.patch_cmake:
-                    LOGGER.debug("updating %s", full_path)
-                    shutil.copy(new_bootstrap, full_path)
-
-    # qibuild.manifest was once named base.cfg:
-    project_name = None
+    res = None
+    qiproj_xml = os.path.join(source_dir, "qiproject.xml")
+    res = name_from_xml(qiproj_xml)
+    if res:
+        return res
+    qibuild_manifest = os.path.join(source_dir, "qibuild.manifest")
+    res = name_from_cfg(qibuild_manifest)
+    if res:
+        return res
     base_cfg = os.path.join(source_dir, "base.cfg")
-    if os.path.exists(base_cfg):
-        project_name = _name_from_base_cfg(base_cfg)
+    res = name_from_cfg(base_cfg)
+    if res:
+        return res
+    cmakelists = os.path.join(source_dir, "CMakeLists.txt")
+    res = name_from_cmakelists(cmakelists)
+    if res:
+        return res
+    res = os.path.basename(source_dir)
+    return res
 
-    create_qibuild_manifest(source_dir, project_name=project_name)
-
-
-def _name_from_base_cfg(base_cfg):
-    """ Convert an old base.cfg file to a new qibuild.manifest file
+def name_from_xml(xml_path):
+    """ Get a name from an qiproject.xml file
 
     """
+    mess  = "Invalid qiproject.xml file detected!\n"
+    mess += "(%s)\n" % xml_path
+    if not os.path.exists(xml_path):
+        return None
+    tree = etree.ElementTree()
+    try:
+        tree.parse(xml_path)
+    except Exception, e:
+        mess += str(e)
+        raise Exception(mess)
+
+    # Read name
+    root = tree.getroot()
+    if root.tag != "project":
+        mess += "Root node must be 'project'"
+        raise Exception(mess)
+    name = root.get('name')
+    if not name:
+        mess += "'project' node must have a 'name' attribute"
+        raise Exception(mess)
+
+    return name
+
+def name_from_cfg(cfg_path):
+    """ Get a name from a .cfg file
+
+    """
+    if not os.path.exists(cfg_path):
+        return None
     config = qibuild.configstore.ConfigStore()
-    config.read(base_cfg)
+    config.read(cfg_path)
     projects = config.get("project")
     if not projects:
         return None
@@ -124,45 +88,34 @@ def _name_from_base_cfg(base_cfg):
 
     return None
 
-
-def convert_cmake(source_dir, args):
-    """ Patch the root's CMakeLists file, then
-    add the missing qibuild.cmake and qibuild.manifest
-    files
+def name_from_cmakelists(cmakelists):
+    """ Get a project name from a CMakeLists.txt file
 
     """
-    project_name = None
-    root_cmake = os.path.join(source_dir, "CMakeLists.txt")
-    lines = list()
-    with open(root_cmake, "r") as fp:
-        lines = fp.readlines()
-    new_lines = list()
+    res = None
     regexp = re.compile(r'^\s*project\s*\((.*)\)', re.IGNORECASE)
-    to_add = "include(qibuild.cmake)"
-    qibuild_included = False
+    lines = list()
+    with open(cmakelists, "r") as fp:
+        lines = fp.readlines()
     for line in lines:
-        new_lines.append(line)
         match = re.match(regexp, line)
         if match:
-            new_lines.append(to_add + "\n")
-            project_name = match.groups()[0]
-            project_name = project_name.strip()
-        match = re.match("\s*include\s*\(.*/?qibuild.cmake.*", line)
-        if match:
-            qibuild_included = True
-    if args.patch_cmake and not qibuild_included:
-        with open(root_cmake, "w") as fp:
-            fp.writelines(new_lines)
+            res = match.groups()[0]
+            res = res.strip()
+            return res
+    return res
 
-    copy_qibuild(source_dir)
-    create_qibuild_manifest(source_dir, project_name)
+def fix_root_cmake(cmakelists, project_name, dry_run=True):
+    """ Fix the root CMakeLists.txt file
 
-def convert_default(source_dir, args_):
-    """ Create an empty CMakeLists, and assume project name
-    if the basename of the source_dir
+    If not found, create a new one
+    If include(qibuild.cmake) is found, replace by find_package(qibuild)
+    If include(boostrap.cmake) is found, replace by find_package(qibuild)
+
+    If no find_package(qibuild) is found, add the line next to the
+    first project() line
 
     """
-    root_cmake = os.path.join(source_dir, "CMakeLists.txt")
     template = """# CMake file for {project_name}
 
 cmake_minimum_required(VERSION 2.8)
@@ -174,44 +127,150 @@ include(qibuild.cmake)
 # qi_create_bin(...)
 
 """
+    template = template.format(project_name=project_name)
+    if not os.path.exists(cmakelists):
+        with open(cmakelists, "w") as fp:
+            fp.write(template)
+            return
 
-    project_name = os.path.basename(source_dir)
-    to_write = template.format(project_name=project_name)
+    with open(cmakelists, "r") as fp:
+        old_lines = fp.readlines()
 
-    with open(root_cmake, "w") as fp:
-        fp.write(to_write)
+    new_lines = list()
+    # Replace old include() by new find_package
+    seen_find_package_qibuild = False
+    for line in old_lines:
+        match = re.match("\s*find_package\s*\(\s*qibuild\s*\)", line)
+        if match:
+            seen_find_package_qibuild = True
+        match = re.match("\s*include\s*\(.*/?bootstrap.cmake.*", line)
+        if match:
+            if not seen_find_package_qibuild:
+                new_lines.append('find_package(qibuild)\n')
+                new_lines.append('include(qibuild/compat/compat)\n')
+            seen_find_package_qibuild = True
+        else:
+            match = re.match("\s*include\s*\(.*/?qibuild.cmake.*", line)
+            if match:
+                if not seen_find_package_qibuild:
+                    new_lines.append('find_package(qibuild)\n')
+                seen_find_package_qibuild = True
+            else:
+                new_lines.append(line)
 
-    copy_qibuild(source_dir)
-    create_qibuild_manifest(source_dir)
+    # Add find_package(qibuild) after project() if it is not there
+    if not seen_find_package_qibuild:
+        tmp_lines = new_lines[:]
+        new_lines = list()
+        for line in tmp_lines:
+            regexp = re.compile(r'^\s*project\s*\((.*)\)', re.IGNORECASE)
+            if re.match(regexp, line):
+                new_lines.append('find_package(qibuild)\n')
+            new_lines.append(line)
 
+    if dry_run:
+        print "Would patch", cmakelists
+        # Print a nice diff
+        for line in difflib.unified_diff(old_lines, new_lines):
+            sys.stdout.write(line)
+        return
+
+    with open(cmakelists, "w") as fp:
+        print "Patching", cmakelists
+        fp.writelines(new_lines)
+
+def create_qiproj_xml(args):
+    """ Create a new qiproject.xml
+
+    """
+
+    source_dir = args.source_dir
+    project_name = args.project_name
+    qiproj_xml = os.path.join(source_dir, "qiproject.xml")
+    if os.path.exists(qiproj_xml):
+        return
+
+    # use convert_project_manifest() so that depends and other settings
+    # are not lost
+    for cfg_name in ["qibuild.manifest", "base.cfg"]:
+        cfg_path = os.path.join(source_dir, cfg_name)
+        if os.path.exists(cfg_path):
+            xml = qibuild.config.convert_project_manifest(cfg_path)
+            with open(qiproj_xml, "w") as fp:
+                fp.write(xml)
+            return
+
+    proj_elem = etree.Element("project")
+    proj_elem.set("name", project_name)
+    tree = etree.ElementTree(element=proj_elem)
+    if args.dry_run:
+        print "Would create", qiproj_xml
+        print "with: "
+        print etree.tostring(proj_elem)
+        return
+
+    print "Creating", qiproj_xml
+    tree.write(qiproj_xml)
+
+def clean_up(args):
+    """ Clean up old qibuild.cmake, boostrap.cmake, qibuild.manifest
+    files
+
+    """
+    source_dir = args.source_dir
+    names_to_remove = ["qibuild.cmake", "bootstrap.cmake", "qibuild.manifest"]
+    for (root, _dirs, filenames) in os.walk(source_dir):
+        for filename in filenames:
+            if filename in names_to_remove:
+                full_path = os.path.join(root, filename)
+                if args.dry_run:
+                    print "Would remove", full_path
+                else:
+                    print "Removing", full_path
+                    qibuild.sh.rm(full_path)
+
+def configure_parser(parser):
+    """Configure parser for this action """
+    qibuild.cmdparse.default_parser(parser)
+    parser.add_argument("source_dir", nargs="?",
+        help="Top source directory of the project. "
+             "Defaults to current working directory.")
+    parser.add_argument("--project-name",
+        dest="project_name",
+        help="Name of the project. Guess if not given")
+    parser.add_argument("--go", action="store_false",
+        dest="dry_run",
+        help="Actually perform file changes")
+    parser.add_argument("--dry-run", action="store_true",
+        dest="dry_run",
+        help="Only print what would be done. This is the default")
+    parser.add_argument("--no-cmake", action="store_false",
+        dest="fix_cmake",
+        help="Do not touch any cmake file.\n"
+         "You won't be able to use the qibuild cmake frameowk")
+    parser.set_defaults(dry_run=True, fix_cmake=True)
 
 def do(args):
     """Main entry point """
-    source_dir = args.source_dir
-    if not source_dir:
-        source_dir = os.getcwd()
-    source_dir = qibuild.sh.to_native_path(source_dir)
+    if not args.source_dir:
+        args.source_dir = os.getcwd()
+    args.source_dir = qibuild.sh.to_native_path(args.source_dir)
 
-    source_type = guess_type(source_dir)
+    if not args.project_name:
+        args.project_name = guess_project_name(args.source_dir)
+        LOGGER.info("Detected project name: %s", args.project_name)
 
-    if not source_type:
-        LOGGER.warning("Could not guess type of the project, creating a new default cmake project")
-        source_type = "default"
+    # Create qiproject.xml
+    create_qiproj_xml(args)
 
-    this_module = sys.modules[__name__]
-    fun_name = "convert_" + source_type
-    convert_fun = None
-    try:
-        convert_fun = getattr(this_module, fun_name)
-    except AttributeError:
-        LOGGER.error("No method named %s, aborting", fun_name)
+    if not args.fix_cmake:
         return
 
-    LOGGER.info("Converting %s from %s to qiBuild", source_dir, source_type)
-    convert_fun(source_dir, args)
+    # Fix the root CMakeLists.txt:
+    source_dir = args.source_dir
+    project_name = args.project_name
+    cmakelists = os.path.join(source_dir, "CMakeLists.txt")
+    fix_root_cmake(cmakelists, project_name, dry_run=args.dry_run)
 
-    LOGGER.info("Done. \n"
-        "Create a qiBuild worktree if you have not already done so\n"
-        "and try using `qibuild configure' now")
-
-
+    # Remove useless files
+    clean_up(args)
