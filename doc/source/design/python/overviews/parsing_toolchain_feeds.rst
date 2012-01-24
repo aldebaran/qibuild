@@ -34,8 +34,8 @@ And you run
 See :py:mod:`qitoolchain.feed` for how XML parsing is done.
 
 After every package has been parsed and added to the toolchain,
-it is just a matter of calling :py:meth:`toolchain.update_toolchain` so
-that the :attr:`toolchain.toolchain_file` is regenerated.
+it is just a matter of ``toolchain.update_toolchain`` so
+that the toolchain file is regenerated.
 
 The toolchain file will then look like:
 
@@ -55,7 +55,7 @@ Then, when using
    $ qibuild configure -c cross-foo my_project
 
 
-A :py:class:`Toc` object will be created, containg a :py:class:`Toolchain` because
+A :py:class:`qibuild.toc.Toc` object will be created, containg a :py:class:`qitoolchain.toolchain.Toolchain` because
 ``cross-foo`` is a known name.
 
 Then, a build directory name ``build-cross-foo`` will be created, and cmake will

@@ -5,8 +5,8 @@ qibuild.toc -- TOC means Obvious Compilation
 
 
 
-qibuid.toc.Toc
---------------
+qibuild.toc.Toc
+---------------
 
 .. py:class:: Toc(work_tree[ , path_hints=None, config=None, build_type="debug", cmake_flags=None, cmake_generator=None)
 
@@ -89,7 +89,7 @@ Compilation related methods
       * The cmake flags (``CMAKE_BUILD_TYPE``, or the ``-D`` args coming
         from ``qibuild configure -DFOO_BAR``) have already been passed
         via the toc object. See :py:func:`qibuild.toc.toc_open` and the
-        :py:class:`qibuild.project.Project` for the details.
+        ``qibuild.project.Project`` for the details.
 
       * If toolchain file is not None, the flag CMAKE_TOOLCHAIN_FILE
           will be set.

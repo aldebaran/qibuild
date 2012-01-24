@@ -110,7 +110,7 @@ file, like this:
 .. seealso::
 
    * :ref:`qibuild-manifest-syntax`
-   * :py:mod:`qibuild.project`
+   * :term:`project`
 
 By convention, the name of the project matches the subdirectory
 name, (that's what ``qibuild convert`` will do, for instance),

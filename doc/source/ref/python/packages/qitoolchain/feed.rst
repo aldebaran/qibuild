@@ -65,7 +65,7 @@ Handling packages
       instance.
       Initially the Packge object will only have its name set,
       but after is has been handled, it will have a correct
-      :attr:`path` and a correct :attr:`toolchain_file` attributes.
+      ``path`` and a correct ``toolchain_file`` attributes.
 
     :param package_tree:
       A ``ElementTree`` object. Note that it contains all the
@@ -84,14 +84,14 @@ Handling packages
 
 .. py:function:: handle_remote_package(package, package_tree, toolchain)
 
-    Set :attr:`package.path` of the given package,
+    Set the `path`` attribute of the given package,
     downloading it and extracting it inside
-    :attr:`toolchain.cache` if necessary.
+    ``toolchain.cache`` if necessary.
 
 
 .. py:function:: handle_local_package(package, package_tree)
 
-    Set :attr:`package.path` using the feed attribute.
+    Set ``package.path`` using the feed attribute.
     Useful when the package path is relative to the feed
 
     For instance with:
@@ -101,12 +101,11 @@ Handling packages
         <!-- in /path/to/sdk/feed.xml -->
         <package name="foo directory="foo" >
 
-    :attr:`package.path` will be ``/path/to/foo``
+    ``package.path`` will be ``/path/to/foo``
 
 .. py:function:: handle_toochain_file(package, package_tree)
 
-    Set :attr:`package.toolchain_file` using
-    :attr:`package.path`
+    Set ``package.toolchain_file`` using ``package.path``
     The toolchain file path wil always be relative
     to the package path.
 
