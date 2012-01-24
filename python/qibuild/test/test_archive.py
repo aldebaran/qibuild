@@ -70,6 +70,25 @@ class ArchiveTestCase(unittest.TestCase):
         self.assertFalse(error is None)
         self.assertEquals(error.errno,  errno.EACCES)
 
+    def test_zip_extract_ro_dir(self):
+        src = os.path.join(self.tmp, "src")
+        os.mkdir(src)
+        ro1 = os.path.join(src, "ro1")
+        os.mkdir(ro1)
+        ro2 = os.path.join(ro1, "ro2")
+        os.mkdir(ro2)
+        a = os.path.join(ro2, "a")
+        with open(a, "w") as fp:
+            fp.write("a\n")
+        # RO dir inside an other RO dir
+        os.chmod(ro2, stat.S_IRUSR | stat.S_IXUSR)
+        os.chmod(ro1, stat.S_IRUSR | stat.S_IXUSR)
+        archive = qibuild.archive.zip(src)
+        dest = os.path.join(self.tmp, "dest")
+        os.mkdir(dest)
+        qibuild.archive.extract(archive, dest)
+
+
 
 if __name__ == "__main__":
     unittest.main()

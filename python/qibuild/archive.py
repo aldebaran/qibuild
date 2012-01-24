@@ -11,9 +11,11 @@ used format of the given platform)
 """
 
 import os
-import posixpath
 import sys
+import copy
+import posixpath
 import logging
+import operator
 import tarfile
 import zipfile
 
@@ -34,29 +36,64 @@ class InvalidArchive(Exception):
 
 def extract_tar(archive_path, dest_dir):
     """Extract a .tar.gz archive"""
+
+    # Algorithm taken from tarfile.extractall():
+    # First, extract everything directory in 700 mode,
+    # then reverse-sort the order of the directory and
+    # re-fix the permissions as they were in the original archive
+    # We have to do this in case the archive contains something like:
+    # src
+    #   ro
+    #     a
+    # where ro is a read-only directory
+    #
+    # Obviously, creating ro1 first with the same permissions as
+    # in the archive will prevent 'a' to be created.
+    # See test_archive.py for relevant test.
+
     LOGGER.debug("Extracting %s to %s", archive_path, dest_dir)
     archive = tarfile.open(archive_path)
     members = archive.getmembers()
     size = len(members)
     res = None
     topdir = members[0].name.split(posixpath.sep)[0]
-    for (i, member) in enumerate(members):
-        member_top_dir = member.name.split(posixpath.sep)[0]
-        if i != 0 and topdir != member_top_dir:
+    done = 0
+    # Extract directories with a safe mode.
+    directories = list()
+    for tarinfo in members:
+        member_top_dir = tarinfo.name.split(posixpath.sep)[0]
+        if done != 0 and topdir != member_top_dir:
             # something wrong: members do not have the
             # same basename
-            mess  = "Invalid member %s in archive:\n" % member.name
+            mess  = "Invalid member %s in archive:\n" % tarinfo.name
             mess += "Every files sould be in the same top dir (%s != %s)" % \
                  (topdir, member_top_dir)
             raise InvalidArchive(mess)
-
-        # Do not use archive.extract(member)
-        # See: http://docs.python.org/library/tarfile.html#tarfile.TarFile.extract
-        archive.extractall(members=[member], path=dest_dir)
-        percent = float(i) / size * 100
+        if tarinfo.isdir():
+            directories.append(tarinfo)
+            tarinfo = copy.copy(tarinfo)
+            tarinfo.mode = 0700
+        archive.extract(tarinfo, dest_dir)
+        done += 1
         if sys.stdout.isatty():
+            percent = float(done/size)
             sys.stdout.write("Done: %.0f%%\r" % percent)
             sys.stdout.flush()
+
+    # Reverse sort directories.
+    directories.sort(key=operator.attrgetter('name'))
+    directories.reverse()
+
+    # Set correct owner, mtime and filemode on directories.
+    for tarinfo in directories:
+        dirpath = os.path.join(dest_dir, tarinfo.name)
+        try:
+            archive.chown(tarinfo, dirpath)
+            archive.utime(tarinfo, dirpath)
+            archive.chmod(tarinfo, dirpath)
+        except tarfile.ExtractError:
+            raise
+
     archive.close()
     LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
     res = os.path.join(dest_dir, topdir)
