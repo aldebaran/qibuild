@@ -59,7 +59,7 @@ def configure(src, templates, opts,
         os.path.join(src, "doxygen.css"),
         quiet=True)
 
-def build(src, dest):
+def build(src, dest, opts):
     """ Build a doxygen project
 
     configure() should have been called first
@@ -69,7 +69,7 @@ def build(src, dest):
     print "# Building doxygen ", src
     print
     cmd = ["doxygen", "Doxyfile.qidoc"]
-    qidoc.command.call(cmd, cwd=src)
+    qidoc.command.call(cmd, cwd=src, quiet=opts.get("quiet"))
     build_html = os.path.join(src, "build-doc", "html")
     qibuild.sh.install(build_html, dest, quiet=True)
 

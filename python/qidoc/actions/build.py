@@ -18,6 +18,12 @@ def configure_parser(parser):
     parser.add_argument("--work-tree", dest="worktree")
     parser.add_argument("output_dir", nargs="?",
         help="Where to generate the docs")
+    parser.add_argument("--Werror", dest="werror",
+        action="store_true",
+        help="treat warnings as errors")
+    parser.add_argument("--quiet-build", dest="quiet_build",
+        action="store_true",
+        help="be quiet when building")
     parser.add_argument("--version")
 
 
@@ -43,6 +49,10 @@ def do(args):
         opts["version"] = args.version
     else:
         opts["version"] = "0.42"
+    if args.quiet_build:
+        opts["quiet"] = True
+    if args.werror:
+        opts["werror"] = True
     builder.build(opts)
 
 

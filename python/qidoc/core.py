@@ -81,7 +81,7 @@ class QiDocBuilder(qibuild.worktree.WorkTree):
                     project_name=doxydoc.name,
                     doxytags_path=self.doxytags_path,
                     doxygen_mapping=doxygen_mapping)
-            qidoc.doxygen.build(doxydoc.src, doxydoc.dest)
+            qidoc.doxygen.build(doxydoc.src, doxydoc.dest, opts)
             tag_file = os.path.join(self.doxytags_path, doxydoc.name + ".tag")
             # Store full path here because we'll need to compute
             # a relative path later
@@ -96,7 +96,7 @@ class QiDocBuilder(qibuild.worktree.WorkTree):
                 doxylink,
                 opts)
             qidoc.sphinx.gen_download_zips(sphinxdoc.src)
-            qidoc.sphinx.build(sphinxdoc.src, sphinxdoc.dest)
+            qidoc.sphinx.build(sphinxdoc.src, sphinxdoc.dest, opts)
 
     def sort_doxygen(self):
         """ Get a list of doxygen docs to build

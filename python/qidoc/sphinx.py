@@ -72,7 +72,7 @@ def gen_download_zips(src):
                 qibuild.archive.zip_win(os.path.join(root, directory))
 
 
-def build(src, dest):
+def build(src, dest, opts):
     """ Run sphinx-build on a sphinx repo
 
     configure() should have been called first
@@ -83,8 +83,10 @@ def build(src, dest):
     print "# Building sphinx ", src, "->", dest
     print
     config_path = os.path.join(src, "qidoc")
-    cmd = ["sphinx-build",
-        "-c", config_path,
-        os.path.join(src, "source"),
-        dest]
+    cmd = ["sphinx-build", "-c", config_path]
+    if opts.get("werror"):
+        cmd.append("-W")
+    if opts.get("quiet"):
+        cmd.append("-q")
+    cmd.extend([os.path.join(src, "source"), dest])
     qidoc.command.call(cmd, cwd=src)
