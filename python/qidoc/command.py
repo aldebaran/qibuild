@@ -25,7 +25,7 @@ def call(cmd, cwd=None, env=None, quiet=False):
     process = subprocess.Popen(cmd, cwd=cwd, env=env,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
-    retcode = process.wait()
+    while process.poll() is None:
         out += process.stdout.readline()
     retcode = process.wait()
     if retcode != 0:
