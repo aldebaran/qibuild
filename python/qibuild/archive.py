@@ -76,7 +76,7 @@ def extract_tar(archive_path, dest_dir):
         archive.extract(tarinfo, dest_dir)
         done += 1
         if sys.stdout.isatty():
-            percent = float(done/size)
+            percent = float(done) /size * 100
             sys.stdout.write("Done: %.0f%%\r" % percent)
             sys.stdout.flush()
 
