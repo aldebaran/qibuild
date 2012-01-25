@@ -352,6 +352,42 @@ class FeedTestCase(unittest.TestCase):
         self.assertEquals(["boost"], package_names)
         self.assertFalse("python" in get_tc_file_contents(tc2))
 
+    def test_relative_url(self):
+        os.mkdir(self.srv)
+        feeds = os.path.join(self.srv, "feeds")
+        packages = os.path.join(self.srv, "packages")
+        os.mkdir(feeds)
+        os.mkdir(packages)
+
+        # Create a fake package
+        a_package = os.path.join(packages, "a_package")
+        os.mkdir(a_package)
+        a_file = os.path.join(a_package, "a_file")
+        with open(a_file, "w") as fp:
+            fp.write("This file is not empty\n")
+        archive = qibuild.archive.zip(a_package)
+        package_name = os.path.basename(archive)
+
+        # Create a fake feed:
+        a_feed = os.path.join(feeds, "a_feed.xml")
+        to_write = """<toolchain>
+  <package name="a_package"
+           url="{rel_url}"
+  />
+</toolchain>
+"""
+        rel_url = "../packages/" + package_name
+        to_write = to_write.format(rel_url=rel_url)
+
+        with open(a_feed, "w") as fp:
+            fp.write(to_write)
+
+        tc = qitoolchain.Toolchain("test")
+        feed_url = "file://" + qibuild.sh.to_posix_path(a_feed)
+        tc.parse_feed(feed_url)
+
+
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,6 +10,7 @@ import os
 import sys
 import logging
 import hashlib
+import urlparse
 from xml.etree import ElementTree
 
 import qibuild
@@ -70,21 +71,26 @@ def handle_package(package, package_tree, toolchain):
 
     package.name = name
     if package_tree.get("url"):
-        handle_remote_package(package, package_tree, toolchain)
+        handle_remote_package(feed, package, package_tree, toolchain)
     if package_tree.get("directory"):
         handle_local_package(package, package_tree)
     if package_tree.get("toolchain_file"):
         handle_toochain_file(package, package_tree)
 
-def handle_remote_package(package, package_tree, toolchain):
+def handle_remote_package(feed, package, package_tree, toolchain):
     """ Set package.path of the given package,
     downloading it and extracting it if necessary.
 
     """
-    # We use a sha1 for the url to be sure to not downlad the
-    # same package twice
     package_url = package_tree.get("url")
     package_name = package_tree.get("name")
+
+    if "://"  in feed:
+        # package_url may be relative to the feed url:
+        package_url = urlparse.urljoin(feed, package_url)
+
+    # We use a sha1 for the url to be sure to not downlad the
+    # same package twice
     # pylint: disable-msg=E1101
     archive_name = hashlib.sha1(package_url).hexdigest()
     top = archive_name[:2]
