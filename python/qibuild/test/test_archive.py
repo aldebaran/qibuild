@@ -87,7 +87,8 @@ class ArchiveTestCase(unittest.TestCase):
         dest = os.path.join(self.tmp, "dest")
         os.mkdir(dest)
         qibuild.archive.extract(archive, dest)
-
+        ls_r = qibuild.sh.ls_r(dest)
+        self.assertEquals(ls_r, ["src/ro1/ro2/a"])
 
 
 if __name__ == "__main__":
