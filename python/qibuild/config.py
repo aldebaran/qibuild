@@ -189,6 +189,51 @@ class Defaults:
         tree.append(cmake_tree)
         return tree
 
+class Access:
+    def __init__(self):
+        self.root = None
+        self.username = None
+        self.password = None
+
+    def parse(self, tree):
+        self.root = tree.get("root")
+        self.username = tree.get("username")
+        self.password = tree.get("password")
+
+    def tree(self):
+        tree = etree.Element("access")
+        if self.root:
+            tree.set("root", self.root)
+        if self.username:
+            tree.set("username", self.username)
+        if self.password:
+            tree.set("password", self.password)
+        return tree
+
+class Server:
+    def __init__(self):
+        self.name = None
+        self.access = Access()
+
+    def parse(self, tree):
+        name = tree.get("name")
+        if not name:
+            raise_parse_error("server node should have a name attribute",
+                tree=tree)
+        self.name = name
+        access_tree = tree.find("access")
+        if access_tree is not None:
+            self.access.parse(access_tree)
+
+    def tree(self):
+        tree = etree.Element("server")
+        if self.name:
+            tree.set("name", self.name)
+        access_tree = self.access.tree()
+        tree.append(access_tree)
+        return tree
+
+
 class LocalDefaults:
     def __init__(self):
         # An config name to use by default
@@ -254,6 +299,9 @@ class QiBuildConfig:
         # A dict of possible IDE
         self.ides = dict()
 
+        # A dicf of server name -> access:
+        self.servers = dict()
+
         # Either: None (in the general case)
         #         The default config as read in the config file
         #         The config set by the user
@@ -305,6 +353,13 @@ class QiBuildConfig:
             ide.parse(ide_tree)
             self.ides[ide.name] = ide
 
+        # Parse servers:
+        server_trees =  self.tree.findall("server")
+        for server_tree in server_trees:
+            server = Server()
+            server.parse(server_tree)
+            self.servers[server.name] = server
+
         self.merge_configs()
 
     def read_local_config(self, local_xml_path):
@@ -334,8 +389,6 @@ class QiBuildConfig:
         else:
             xml_indent(tree.getroot())
             tree.write(local_xml_path)
-
-
 
     def merge_configs(self):
         """ Merge various configs
@@ -423,6 +476,15 @@ class QiBuildConfig:
             self.manifest = Manifest()
         self.manifest.url = manifest_url
 
+    def get_server_access(self, server_name):
+        """ Return the access settings of a server
+
+        """
+        server = self.servers.get(server_name)
+        if not server:
+            return None
+        return server.access
+
     def write(self, xml_path=None):
         """ Write back the new config
 
@@ -450,6 +512,10 @@ class QiBuildConfig:
         for ide in ides:
             ide_tree = ide.tree()
             qibuild_tree.append(ide_tree)
+        servers = self.servers.values()
+        for server in servers:
+            server_tree = server.tree()
+            qibuild_tree.append(server_tree)
 
         tree = etree.ElementTree(element=qibuild_tree)
         if HAS_LXML:

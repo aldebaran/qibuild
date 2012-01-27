@@ -13,14 +13,11 @@ import ftplib
 import urlparse
 import urllib2
 import logging
-import ConfigParser
 import StringIO
 
 import qibuild
 
 LOGGER = logging.getLogger(__name__)
-
-REMOTE_CFG = "~/.config/qi/remote.cfg"
 
 def callback(total, done):
     """ Called during download """
@@ -30,24 +27,48 @@ def callback(total, done):
     sys.stdout.write("Done: %i%%\r" % percent)
     sys.stdout.flush()
 
+def get_server_access(server_name):
+    """ Get username and password for a remote site.
 
-def get_ftp_password(server):
+    cfg_path should be the path to the global qibuild.xml
+    config file, or NONE if you want to use the default
+    ~/.config/qi/qibuild.xml
+
+    """
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
+    access = qibuild_cfg.get_server_access(server_name)
+    return access
+
+
+def get_ftp_access(server_name):
     """ Get ftp password from the config file
 
     """
-    remote_cfg = qibuild.sh.to_native_path(REMOTE_CFG)
-    config = ConfigParser.ConfigParser()
-    config.read(remote_cfg)
-    if not config.has_section(server):
+    access = get_server_access(server_name)
+    if not access:
         return ("anonymous", "anonymous", "/")
+    else:
+        return (access.username, access.password, access.root)
 
-    items = dict(config.items(server))
 
-    return (
-        items.get("username"),
-        items.get("password"),
-        items.get("root")
-    )
+def authenticated_urlopen(location):
+    """ A wrapper around urlopen adding authentication information
+    if provided by the user.
+
+    """
+    passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+    server_name = urlparse.urlsplit(location).netloc
+    access = get_server_access(server_name)
+    if access is not None:
+        user = access.username
+        password = access.password
+        if user is not None and password is not None:
+            passman.add_password(None, location, user, password)
+    authhandler = urllib2.HTTPBasicAuthHandler(passman)
+    opener = urllib2.build_opener(authhandler)
+    urllib2.install_opener(opener)
+    return urllib2.urlopen(location)
 
 def open_remote_location(location):
     """ Open a file from an url
@@ -55,12 +76,11 @@ def open_remote_location(location):
 
     """
     url_split = urlparse.urlsplit(location)
+    server_name = url_split.netloc
     #pylint: disable-msg=E1103
     if url_split.scheme == "ftp":
-        #pylint: disable-msg=E1103
-        server = url_split.netloc
-        user, password, root = get_ftp_password(server)
-        ftp = ftplib.FTP(server, user, password)
+        (username, password, root) = get_ftp_access(server_name)
+        ftp = ftplib.FTP(server_name, username, password)
         if root:
             ftp.cwd(root)
         class Transfer:
@@ -73,8 +93,7 @@ def open_remote_location(location):
         ftp.retrbinary(cmd, retr_callback)
         return StringIO.StringIO(Transfer.data)
     else:
-        return urllib2.urlopen(location)
-
+        return authenticated_urlopen(location)
 
 
 def download(url, output_dir,
@@ -119,6 +138,7 @@ def download(url, output_dir,
 
     url_split = urlparse.urlsplit(url)
     url_obj = None
+    server_name = url_split.netloc
     try:
         #pylint: disable-msg=E1103
         if url_split.scheme == "ftp":
@@ -126,9 +146,9 @@ def download(url, output_dir,
         # for username/password for ftp, so we will use ftplib
         # here.
             #pylint: disable-msg=E1103
-            server = url_split.netloc
-            user, password, root = get_ftp_password(server)
-            ftp = ftplib.FTP(server, user, password)
+
+            (username, password, root) = get_ftp_access(server_name)
+            ftp = ftplib.FTP(server_name, username, password)
             if root:
                 ftp.cwd(root)
             class Tranfert:
@@ -145,7 +165,7 @@ def download(url, output_dir,
             cmd = "RETR " + url_split.path
             ftp.retrbinary(cmd, retr_callback)
         else:
-            url_obj = urllib2.urlopen(url)
+            url_obj = authenticated_urlopen(url)
             content_length = url_obj.headers.dict['content-length']
             size = int(content_length)
             buff_size = 100 * 1024
