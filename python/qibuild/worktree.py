@@ -257,9 +257,9 @@ def search_projects(directory=None, depth=4):
     if depth == 0:
         return (rgit, rsrc)
 
+
     if os.path.exists(os.path.join(directory, ".git")):
         rgit.append(directory)
-
 
     if os.path.exists(os.path.join(directory, "qiproject.xml")):
         rsrc.append(directory)
@@ -281,6 +281,10 @@ def search_projects(directory=None, depth=4):
 
     # Do not go through nested worktrees:
     if os.path.basename(directory) == ".qi":
+        return (list(), list())
+
+    # Do not go through repo config dir
+    if os.path.basename(directory) == ".repo":
         return (list(), list())
 
     # If os.listdir fails (permission denied for instance),
