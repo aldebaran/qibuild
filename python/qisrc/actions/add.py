@@ -29,8 +29,7 @@ def do(args):
     if not name:
         name = url.split("/")[-1].replace(".git", "")
 
-    # Create the git worktree in worktree by default.
-    worktree = qibuild.worktree.worktree_from_args(args)
+    worktree = qibuild.worktree.worktree_open(args.worktree)
 
     git_src_dir = os.path.join(worktree, name)
     LOGGER.info("Git clone: %s -> %s", url, git_src_dir)

@@ -318,18 +318,4 @@ def create(directory):
         with open(qi_xml, "w") as fp:
             fp.write("<qibuild />\n")
 
-def worktree_from_args(args):
-    """Returns a suitable work tree from the command line
-    """
-    work_tree = None
-    if args.work_tree:
-        work_tree = args.work_tree
-        work_tree = os.path.abspath(work_tree)
-    elif os.environ.get("QI_WORK_TREE"):
-        work_tree = os.environ["QI_WORK_TREE"]
-        work_tree = os.path.abspath(work_tree)
-    else:
-        work_tree = os.getcwd()
-    return work_tree
-
 
