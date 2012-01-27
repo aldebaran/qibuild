@@ -29,9 +29,9 @@ def do(args):
     if not name:
         name = url.split("/")[-1].replace(".git", "")
 
-    worktree = qibuild.worktree.worktree_open(args.worktree)
+    work_tree = qibuild.worktree.worktree_open(args.work_tree)
 
-    git_src_dir = os.path.join(worktree, name)
+    git_src_dir = os.path.join(work_tree.work_tree, name)
     LOGGER.info("Git clone: %s -> %s", url, git_src_dir)
 
     if os.path.exists(git_src_dir):
