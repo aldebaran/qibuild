@@ -27,12 +27,12 @@ Configuration files
 Every configuration file used by qiBuild is now in XML.
 
 ``QI_WORK_TREE/.qi/qibuild.cfg`` is deprecated, use ``QI_WORK_TREE/.qi/qibuild.xml``
-intead.
+and ``~/.config/qi/qibuild.xml`` instead.
 
 ``<project>/qibuild.manifest`` is deprecated, use ``<project>/qiproject.xml>`` instead.
 
-Note that conversion is done by qiBuild on the fly, but the XML file is only written
-if it does not exist.
+Note that conversion is done by qiBuild on the fly, but the XML file are only written
+if they do not exist.
 
 
 qidoc
