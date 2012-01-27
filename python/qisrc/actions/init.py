@@ -4,6 +4,7 @@
 
 """Init a new qisrc workspace """
 
+import os
 import qibuild
 
 def configure_parser(parser):

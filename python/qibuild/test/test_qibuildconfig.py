@@ -26,11 +26,17 @@ def cfg_to_string(cfg):
     cfg.write(cfg_loc)
     return cfg_loc.getvalue()
 
+
+def local_cfg_to_string(cfg):
+    cfg_loc = StringIO()
+    cfg.write_local_config(cfg_loc)
+    return cfg_loc.getvalue()
+
 class QiBuildConfig(unittest.TestCase):
 
     def test_simple(self):
         xml = """
-<qibuild>
+<qibuild version="1">
   <config name="linux32">
     <env path="/path/to/swig" />
   </config>
@@ -52,7 +58,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_several_configs(self):
         xml = """
-<qibuild>
+<qibuild version="1">
   <config name="linux32">
     <env path="/path/to/swig32" />
   </config>
@@ -75,8 +81,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_default_from_conf(self):
         xml = """
-<qibuild>
-  <defaults config="linux32" />
+<qibuild version="1">
   <config name="linux32">
     <env path="/path/to/swig32" />
   </config>
@@ -85,15 +90,20 @@ class QiBuildConfig(unittest.TestCase):
   </config>
 </qibuild>
 """
+        local_xml = """
+<qibuild version="1">
+  <defaults config="linux32" />
+</qibuild>
+"""
         qibuild_cfg = cfg_from_string(xml)
-        self.assertEquals(qibuild_cfg.defaults.config, "linux32")
+        qibuild_cfg.read_local_config(StringIO(local_xml))
+        self.assertEquals(qibuild_cfg.local_defaults.config, "linux32")
         self.assertEquals(qibuild_cfg.active_config, "linux32")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig32")
 
     def test_user_active_conf(self):
         xml = """
-<qibuild>
-  <defaults config="linux32" />
+<qibuild version="1">
   <config name="linux32">
     <env path="/path/to/swig32" />
   </config>
@@ -102,14 +112,20 @@ class QiBuildConfig(unittest.TestCase):
   </config>
 </qibuild>
 """
+        local_xml = """
+<qibuild version="1">
+  <defaults config="linux32" />
+</qibuild>
+"""
         qibuild_cfg = cfg_from_string(xml, user_config="linux64")
-        self.assertEquals(qibuild_cfg.defaults.config, "linux32")
+        qibuild_cfg.read_local_config(StringIO(local_xml))
+        self.assertEquals(qibuild_cfg.local_defaults.config, "linux32")
         self.assertEquals(qibuild_cfg.active_config, "linux64")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig64")
 
     def test_path_merging(self):
         xml = """
-<qibuild>
+<qibuild version="1">
   <defaults>
     <env path="/path/to/foo" />
   </defaults>
@@ -126,7 +142,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_ide_selection(self):
         xml = """
-<qibuild>
+<qibuild version="1">
   <defaults ide="qtcreator" />
   <ide name="qtcreator"
     path="/path/to/qtcreator"
@@ -138,8 +154,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_add_env_config(self):
         xml = """
-<qibuild>
-</qibuild>
+<qibuild version="1" />
 """
         qibuild_cfg = cfg_from_string(xml)
         config = qibuild.config.Config()
@@ -159,13 +174,15 @@ class QiBuildConfig(unittest.TestCase):
         config.cmake.generator = "Xcode"
         qibuild_cfg.add_config(config)
         qibuild_cfg.set_default_config("mac64")
+        local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
+        new_cfg.read_local_config(StringIO(local_xml))
         self.assertEquals(new_cfg.cmake.generator, "Xcode")
 
     def test_default_cmake_generator(self):
         xml = """
-<qibuild>
+<qibuild version="1">
   <defaults>
     <cmake generator="Visual Studio 10" />
   </defaults>
@@ -182,7 +199,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_set_default_config(self):
         xml = """
-<qibuild>
+<qibuild version="1">
   <config name="linux32">
     <cmake
         generator="Unix Makefiles"
@@ -193,14 +210,15 @@ class QiBuildConfig(unittest.TestCase):
         qibuild_cfg = cfg_from_string(xml)
         self.assertEquals(qibuild_cfg.cmake.generator, None)
         qibuild_cfg.set_default_config("linux32")
+        local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
+        new_cfg.read_local_config(StringIO(local_xml))
         self.assertEquals(new_cfg.cmake.generator, "Unix Makefiles")
 
     def test_change_default_config(self):
         xml = """
-<qibuild>
-  <defaults config="linux32" />
+<qibuild version="1">
   <config name="linux32">
     <cmake
         generator="Unix Makefiles"
@@ -213,16 +231,24 @@ class QiBuildConfig(unittest.TestCase):
   </config>
 </qibuild>
 """
+        local_xml = """
+<qibuild version="1">
+  <defaults config="linux32" />
+</qibuild>
+"""
         qibuild_cfg = cfg_from_string(xml)
+        qibuild_cfg.read_local_config(StringIO(local_xml))
         self.assertEquals(qibuild_cfg.cmake.generator, "Unix Makefiles")
         qibuild_cfg.set_default_config("win32-vs2010")
+        local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
+        new_cfg.read_local_config(StringIO(local_xml))
         self.assertEquals(new_cfg.cmake.generator, "Visual Studio 10")
 
     def test_add_ide(self):
         xml = """
-<qibuild>
+<qibuild version="1">
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
@@ -237,7 +263,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_adding_conf_twice(self):
         xml = """
-<qibuild>
+<qibuild version="1">
   <config name="linux32" />
 </qibuild>
 """
@@ -254,7 +280,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_ide_from_config(self):
         xml = """
-<qibuild>
+<qibuild version="1">
   <ide
     name = "Visual Studio"
   />
@@ -282,7 +308,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_adding_ide_twice(self):
         xml = """
-<qibuild>
+<qibuild version="1">
   <ide name="qtcreator" />
 </qibuild>
 """
@@ -299,7 +325,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_build_settings(self):
         xml = """
-<qibuild>
+<qibuild version="1">
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
@@ -308,7 +334,7 @@ class QiBuildConfig(unittest.TestCase):
         self.assertTrue(qibuild_cfg.build.build_dir is None)
 
         xml = """
-<qibuild>
+<qibuild version="1">
     <build
         sdk_dir="/path/to/sdk"
         build_dir="/path/to/build"
@@ -325,15 +351,17 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_set_manifest_url(self):
         xml = """
-<qibuild>
+<qibuild version="1">
 </qibuild>
 """
         manifest_url = "http://example.com/qi/foo.xml"
         qibuild_cfg = cfg_from_string(xml)
         self.assertTrue(qibuild_cfg.manifest is None)
         qibuild_cfg.set_manifest_url(manifest_url)
+        local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
+        new_cfg.read_local_config(StringIO(local_xml))
         self.assertFalse(new_cfg.manifest is None)
         self.assertEqual(new_cfg.manifest.url, manifest_url)
 
@@ -347,7 +375,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_build_farm_config(self):
         xml = r"""
-<qibuild>
+<qibuild version="1">
   <build/>
   <defaults>
     <env path="C:\Program Files\swigwin-2.0.1;C:\Program Files (x86)\dotNetInstaller\bin;C:\Program Files (x86)\Windows Installer XML v3.5\bin" bat_file="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"/>
@@ -390,9 +418,9 @@ cmake.generator = "Visual Studio 10"
 
         with open(self.cfg_path, "w") as fp:
             fp.write(qibuild_cfg)
-        qibuild_xml = qibuild.config.convert_qibuild_cfg(self.cfg_path)
+        (qibuild_xml, local_xml) = qibuild.config.convert_qibuild_cfg(self.cfg_path)
         qibuild_cfg = cfg_from_string(qibuild_xml)
-        self.assertEqual(qibuild_cfg.defaults.config, "vs2010")
+        qibuild_cfg.read_local_config(StringIO(local_xml))
         self.assertEqual(qibuild_cfg.defaults.cmake.generator, "Unix Makefiles")
         self.assertEqual(qibuild_cfg.env.editor, "vim")
         self.assertEqual(qibuild_cfg.ides["QtCreator"].path,
@@ -411,6 +439,26 @@ cmake.generator = "Visual Studio 10"
 
         unix_cfg = cfg_from_string(qibuild_xml, "foo")
         self.assertEqual(unix_cfg.cmake.generator, "Unix Makefiles")
+
+
+    def test_xml_no_version(self):
+        xml = """<qibuild>
+  <defaults config="linux32">
+    <cmake generator="Unix Makefiles" />
+    <env path="/opt/swig/bin" />
+  </defaults>
+  <config name="linux32">
+    <ide name="QtCreator" />
+  </config>
+  <ide name="QtCreator" path="/qtsdk/bin/qtcreator" />
+</qibuild>
+"""
+        (qibuild_xml, local_xml) = qibuild.config.convert_qibuild_xml(StringIO(xml))
+        qibuild_cfg = cfg_from_string(qibuild_xml)
+        qibuild_cfg.read_local_config(StringIO(local_xml))
+        self.assertEqual(qibuild_cfg.local_defaults.config, "linux32")
+
+
 
     def test_project_manifest(self):
         cfg = """[project foo]

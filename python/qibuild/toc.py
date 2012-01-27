@@ -103,11 +103,8 @@ class Toc(WorkTree):
             active_projects : the projects excplicitely specified by user
         """
         WorkTree.__init__(self, work_tree, path_hints=path_hints)
-        handle_old_qibuild_cfg(self.work_tree)
-
         # The local config file in which to write
         self.config_path = os.path.join(self.work_tree, ".qi", "qibuild.xml")
-        self.configstore = qibuild.config.QiBuildConfig(config)
 
         # When you are running toc actions for a qibuild project, sometimes
         # a Toc object is created on the fly (Using toc_open with a non
@@ -119,7 +116,14 @@ class Toc(WorkTree):
             qibuild.sh.mkdir(to_create, recursive=True)
             with open(self.config_path, "w") as fp:
                 fp.write("<qibuild />\n")
-        self.configstore.read(self.config_path)
+        # Perform format conversion if necessary
+        handle_old_qibuild_cfg(self.work_tree)
+        handle_old_qibuild_xml(self.work_tree)
+
+        # Handle config:
+        self.configstore = qibuild.config.QiBuildConfig(config)
+        self.configstore.read()
+        self.configstore.read_local_config(self.config_path)
         self.active_config = self.configstore.active_config
 
         self.build_type = build_type
@@ -205,7 +209,8 @@ class Toc(WorkTree):
         self.configstore in order to make the changes permanent
 
         """
-        self.configstore.write(self.config_path)
+        self.configstore.write_local_config(self.config_path)
+        self.configstore.write()
 
     def update_projects(self):
         """Set self.projects() with the correct build configs and correct build folder
@@ -654,3 +659,28 @@ def handle_old_qibuild_cfg(worktree):
             xml = qibuild.config.convert_qibuild_cfg(qibuild_cfg)
             with open(qibuild_xml, "w") as fp:
                 fp.write(xml)
+
+def handle_old_qibuild_xml(worktree):
+    """ Handle processing an old qibuild.xml  file,
+    creating the global xml config on the fly if it does not
+    exist
+
+    """
+    from xml.etree import ElementTree as etree
+    local_xml_path = os.path.join(worktree, ".qi", "qibuild.xml")
+    tree = etree.ElementTree()
+    tree.parse(local_xml_path)
+    qibuild_tree = tree.getroot()
+    if qibuild_tree.get("version") == "1":
+        return
+    (global_xml, local_xml) = qibuild.config.convert_qibuild_xml(local_xml_path)
+    with open(local_xml_path, "w") as fp:
+        fp.write(local_xml)
+    global_path = qibuild.config.QIBUILD_CFG_PATH
+    if os.path.exists(global_path):
+        # Refuse to try to merge back global configs ...
+        # FIXME: add an error message here?
+        return
+    with open(global_path, "w") as fp:
+        fp.write(global_xml)
+

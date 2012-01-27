@@ -18,6 +18,9 @@ from StringIO import StringIO
 
 import qibuild
 
+QIBUILD_CFG_PATH = "~/.config/qi/qibuild.xml"
+QIBUILD_CFG_PATH = qibuild.sh.to_native_path(QIBUILD_CFG_PATH)
+
 def raise_parse_error(message, cfg_path=None, tree=None):
     """ Raise a nice parsing error about the given
     tree element
@@ -159,8 +162,6 @@ class Manifest:
 
 class Defaults:
     def __init__(self):
-        # A config name to use by default
-        self.config = None
         # An ide name to use by default
         self.ide = None
         # A cmake config to use by default (for intance, a CMake generator)
@@ -175,14 +176,11 @@ class Defaults:
         cmake_tree = tree.find("cmake")
         if cmake_tree is not None:
             self.cmake.parse(cmake_tree)
-        self.config = tree.get("config")
         self.ide    = tree.get("ide")
 
 
     def tree(self):
         tree = etree.Element("defaults")
-        if self.config:
-            tree.set("config", self.config)
         if self.ide:
             tree.set("ide", self.ide)
         env_tree = self.env.tree()
@@ -190,6 +188,21 @@ class Defaults:
         cmake_tree = self.cmake.tree()
         tree.append(cmake_tree)
         return tree
+
+class LocalDefaults:
+    def __init__(self):
+        # An config name to use by default
+        self.config = None
+
+    def parse(self, tree):
+        self.config = tree.get("config")
+
+    def tree(self):
+        tree = etree.Element("defaults")
+        if self.config:
+            tree.set("config", self.config)
+        return tree
+
 
 class Config:
     def __init__(self):
@@ -230,6 +243,7 @@ class QiBuildConfig:
     def __init__(self, user_config=None):
         self.tree = etree.ElementTree()
         self.defaults = Defaults()
+        self.local_defaults = LocalDefaults()
         self.build = Build()
         self.manifest = None
         self.user_config = user_config
@@ -254,14 +268,16 @@ class QiBuildConfig:
         # Active CMake config:
         self.cmake  = CMake()
 
-    def read(self, config_location):
+    def read(self, cfg_path=None):
         """ Read from a config location
 
         """
+        if not cfg_path:
+            cfg_path = QIBUILD_CFG_PATH
         try:
-            self.tree.parse(config_location)
+            self.tree.parse(cfg_path)
         except Exception, e:
-            mess  = "Could not parse config from %s\n" % config_location
+            mess  = "Could not parse config from %s\n" % cfg_path
             mess += "Error was: %s" % str(e)
             raise Exception(mess)
 
@@ -274,12 +290,6 @@ class QiBuildConfig:
         build_tree = self.tree.find("build")
         if build_tree is not None:
             self.build.parse(build_tree)
-
-        # Parse manifest settings:
-        manifest_tree = self.tree.find("manifest")
-        if manifest_tree is not None:
-            self.manifest = Manifest()
-            self.manifest.parse(manifest_tree)
 
         # Parse configs:
         config_trees = self.tree.findall("config")
@@ -297,11 +307,41 @@ class QiBuildConfig:
 
         self.merge_configs()
 
+    def read_local_config(self, local_xml_path):
+        """ Apply a local configuration """
+        local_tree = etree.parse(local_xml_path)
+        local_defaults_tree = local_tree.find("defaults")
+        if local_defaults_tree is not None:
+            self.local_defaults.parse(local_defaults_tree)
+        manifest_tree = local_tree.find("manifest")
+        if manifest_tree is not None:
+            if not self.manifest:
+                self.manifest = Manifest()
+            self.manifest.parse(manifest_tree)
+        self.merge_configs()
+
+    def write_local_config(self, local_xml_path):
+        """ Dump local settings to a xml file """
+        local_tree = etree.Element("qibuild")
+        local_tree.set("version", "1")
+        local_tree.append(self.local_defaults.tree())
+        if self.manifest:
+            local_tree.append(self.manifest.tree())
+        tree = etree.ElementTree(element=local_tree)
+        if HAS_LXML:
+            # pylint: disable-msg=E1123
+            tree.write(local_xml_path, pretty_print=True)
+        else:
+            xml_indent(tree.getroot())
+            tree.write(local_xml_path)
+
+
+
     def merge_configs(self):
         """ Merge various configs
 
         """
-        default_config = self.defaults.config
+        default_config = self.local_defaults.config
         if self.user_config:
             self.active_config = self.user_config
         else:
@@ -347,7 +387,7 @@ class QiBuildConfig:
         """ Set a new config to use by default
 
         """
-        self.defaults.config = name
+        self.local_defaults.config = name
 
     def set_default_ide(self, name):
         """ Set a new IDE to use by default
@@ -383,18 +423,19 @@ class QiBuildConfig:
             self.manifest = Manifest()
         self.manifest.url = manifest_url
 
-    def write(self, location):
+    def write(self, xml_path=None):
         """ Write back the new config
 
         """
+        if not xml_path:
+            xml_path = QIBUILD_CFG_PATH
+
         def get_name(x):
             " helper functions to sort elements "
             return x.name
 
         qibuild_tree = etree.Element("qibuild")
-        if self.manifest:
-            manifest_tree = self.manifest.tree()
-            qibuild_tree.append(manifest_tree)
+        qibuild_tree.set("version", "1")
         build_tree = self.build.tree()
         qibuild_tree.append(build_tree)
         defaults_tree = self.defaults.tree()
@@ -413,10 +454,10 @@ class QiBuildConfig:
         tree = etree.ElementTree(element=qibuild_tree)
         if HAS_LXML:
             # pylint: disable-msg=E1123
-            tree.write(location, pretty_print=True)
+            tree.write(xml_path, pretty_print=True)
         else:
             xml_indent(tree.getroot())
-            tree.write(location)
+            tree.write(xml_path)
 
 class ProjectConfig:
     """ A class to read project configuration
@@ -429,7 +470,9 @@ class ProjectConfig:
         self.tree = etree.ElementTree()
 
     def read(self, cfg_path):
-        """ Read configuration from an XML file
+        """ Read configuration from an XML file.
+
+        If None is given, use the default: QIBUILD_CFG_PATH
 
         """
         try:
@@ -524,7 +567,8 @@ def xml_indent(elem, level=0):
 
 def convert_qibuild_cfg(qibuild_cfg):
     """ Convert an old qibuild.cfg file
-    into a new qibuild.xml file
+    into two new strings:
+    (global_xml, local_xml)
 
     """
     ini_cfg = qibuild.configstore.ConfigStore()
@@ -532,7 +576,7 @@ def convert_qibuild_cfg(qibuild_cfg):
     qibuild_cfg = QiBuildConfig()
     general_config = ini_cfg.get("general.config")
     if general_config:
-        qibuild_cfg.defaults.config = general_config
+        qibuild_cfg.local_defaults.config = general_config
     cmake_generator = ini_cfg.get("general.cmake.generator")
     if cmake_generator:
         qibuild_cfg.defaults.cmake.generator = cmake_generator
@@ -583,9 +627,36 @@ def convert_qibuild_cfg(qibuild_cfg):
 
     out = StringIO()
     qibuild_cfg.write(out)
+    global_xml = out.getvalue()
 
-    return out.getvalue()
+    out = StringIO()
+    qibuild_cfg.write_local_config(out)
+    local_xml = out.getvalue()
 
+    return (global_xml, local_xml)
+
+
+
+def convert_qibuild_xml(xml_path):
+    """ Convert from previous version.
+    (Between 1.12 and 1.12.1 XML had no 'version' attribute)
+
+    """
+    tree = etree.ElementTree()
+    tree.parse(xml_path)
+    qibuild_cfg = QiBuildConfig()
+    qibuild_cfg.read(xml_path)
+    qibuild_cfg.read_local_config(xml_path)
+
+    out = StringIO()
+    qibuild_cfg.write(out)
+    global_xml = out.getvalue()
+
+    out = StringIO()
+    qibuild_cfg.write_local_config(out)
+    local_xml = out.getvalue()
+
+    return (global_xml, local_xml)
 
 
 def convert_project_manifest(qibuild_manifest):
