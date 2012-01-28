@@ -22,7 +22,10 @@ def ask_choice(choices, input_text):
     keep_asking = True
     res = None
     while keep_asking:
-        answer = raw_input("> ")
+        try:
+            answer = raw_input("> ")
+        except KeyboardInterrupt:
+            break
         if not answer:
             return choices[0]
         try:
@@ -38,11 +41,20 @@ def ask_choice(choices, input_text):
 
     return res
 
-def ask_yes_no(question):
+def ask_yes_no(question, default=False):
     """Ask the user to answer by yes or no"""
-    print "::", question, "(y/n)?"
-    answer = raw_input("> ")
-    return answer == "y"
+    if default:
+        print "::", question, "(Y/n)?"
+    else:
+        print "::", question, "(y/N)?"
+    try:
+        answer = raw_input("> ")
+    except KeyboardInterrupt:
+        answer = "n"
+    if not default:
+        return answer == "y"
+    else:
+        return answer != "n"
 
 def ask_string(question, default=None):
     """Ask the user to enter something.
@@ -52,7 +64,10 @@ def ask_string(question, default=None):
     if default:
         question += " (%s)" % default
     print "::", question
-    answer = raw_input("> ")
+    try:
+        answer = raw_input("> ")
+    except KeyboardInterrupt:
+        return default
     if not answer:
         return default
     return answer
@@ -66,17 +81,20 @@ def ask_program(message):
 
     If still not found, give up ...
     """
-    program = ask_string(message)
-    full_path = qibuild.command.find_program(program)
-    # TODO: hard-coded guess ?
-    if full_path is not None:
+    keep_going = True
+    while keep_going:
+        full_path = ask_string(message)
+        if not full_path:
+            break
+        full_path = qibuild.sh.to_native_path(full_path)
+        if not os.path.exists(full_path):
+            print "%s does not exists!" % full_path
+            keep_going = ask_yes_no("continue")
+            continue
+        if not os.access(full_path, os.X_OK):
+            print "%s is not a valid executable!" % full_path
+            keep_going = ask_yes_no("continue")
+            continue
         return full_path
-
-    print "%s not found" % program
-    full_path = ask_string("Please enter full path to %s" % program)
-    full_path = qibuild.sh.to_native_path(full_path)
-    if not os.path.exists(full_path):
-        raise Exception("%s does not exists, aborting" % full_path)
-    return full_path
 
 
