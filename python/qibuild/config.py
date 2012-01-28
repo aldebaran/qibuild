@@ -550,6 +550,18 @@ class QiBuildConfig:
         """
         self.ides[ide.name] = ide
 
+    def add_to_default_path(self, to_add):
+        """ Add a path to the default env path
+
+        """
+        default_env_path = self.defaults.env.path
+        if not default_env_path:
+            default_env_path = ""
+        splitted_paths = default_env_path.split(os.pathsep)
+        to_add = qibuild.sh.to_native_path(to_add)
+        if to_add not in splitted_paths:
+            splitted_paths.insert(0, to_add)
+        self.defaults.env.path = os.pathsep.join(splitted_paths)
 
     def set_manifest_url(self, manifest_url):
         """ Set a manifest url to use
