@@ -18,77 +18,14 @@ def configure_parser(parser):
     parser.add_argument("project", nargs="?")
 
 
-def get_qtcreator_path(toc):
-    """ Get the path to qtcreator
+def get_ide(toc):
+    """ Return an IDE to use
 
     """
-    qtcreator_path = None
-    # Get it from conf:
-    qtcreator_conf = toc.config.ides.get("QtCreator")
-    if qtcreator_conf:
-        qtcreator_path = qtcreator_conf.path
-        if os.path.exists(qtcreator_path):
-            return qtcreator_path
-        else:
-            mess  = "Invalide configuration detected\n"
-            mess += "In %s\n" % toc.config_path
-            mess += "ide.qtcreator.path is %s\n" % qtcreator_conf
-            mess += "but this file does not exist\n"
-            mess += "Please fix your configuration"
-            raise Exception(mess)
-
-    # Try to guess it:
-    build_env = toc.envsetter.get_build_env()
-    qtcreator_path = qibuild.command.find_program("qtcreator", env=build_env)
-    if qtcreator_path:
-        return qtcreator_path
-    mac_path = "/Applications/Qt Creator.app/Contents/MacOS/Qt Creator"
-    if os.path.exists(mac_path):
-        return mac_path
-    qtcreator_path = qibuild.interact.ask_program("Please enter path to qtcreator")
-    return qtcreator_path
-
-def find_ide(toc):
-    """ Return a ide to use.
-
-    - Either read it from configuration
-    - Or ask it to the user, but use sys.platform
-      to ask only reasonable choices
-
-    Return the path to the chosen ide, and
-    store in it the configuration to not
-    ask it again
-
-    """
-    ide = toc.config.ide
-    if ide:
-        return ide
-    ides = ["QtCreator"] # QtCreator rocks!
-    # FIXME: add 'Eclipse CDT'
-    if sys.platform.startswith("win32"):
-        ides.append("Visual Studio")
-
-    if sys.platform == "darwin":
-        ides.append("Xcode")
-
-    if ide is None:
-        ide_config = qibuild.config.IDE()
-        if len(ides) > 1:
-            ide  = qibuild.interact.ask_choice(ides,
-                "Please choose between the following IDEs")
-        else:
-            ide = "QtCreator"
-        if  ide == "QtCreator":
-            ide_path = get_qtcreator_path(toc)
-            if ide_path:
-                ide_config.path = ide_path
-        ide_config.name = ide
-        toc.config.add_ide(ide_config)
-        if len(toc.config.ides) == 1:
-            toc.config.set_default_ide(ide)
-            toc.ide = ide
-    toc.save_config()
-    return ide_config
+    qibuild_cfg = qibuild.config.QiBuildConfig(user_config=toc.active_config)
+    qibuild_cfg.read()
+    ide = qibuild_cfg.ide
+    return ide
 
 
 def do(args):
@@ -102,8 +39,12 @@ def do(args):
     project = toc.get_project(project_name)
 
     error_message = "Could not open project %s\n" % project_name
+    ide = get_ide(toc)
+    if not ide:
+        print "Could not find any IDE in configuration"
+        print "Please use `qibuild config --wizard` or `qibuild config --edit`"
+        return
 
-    ide = find_ide(toc)
     if ide.name == "Visual Studio":
         sln_files = glob.glob(project.build_directory + "/*.sln")
         if len(sln_files) != 1:
@@ -128,9 +69,14 @@ def do(args):
 
     if ide.name == "QtCreator":
         ide_path = ide.path
-        cmake_list = os.path.join(project.directory, "CMakeLists.txt")
         if not ide_path:
             ide_path = 'qtcreator'
+        cmake_list = os.path.join(project.directory, "CMakeLists.txt")
+        if not os.access(ide_path, os.X_OK):
+            mess  = "Invalid configuration dectected!\n"
+            mess += "QtCreator path (%s) is not a valid path\n" % ide_path
+            mess += "Please run `qibuild config --wizard\n"
+            raise Exception(mess)
         print "starting QtCreator:"
         print ide_path, cmake_list
         subprocess.Popen([ide_path, cmake_list])

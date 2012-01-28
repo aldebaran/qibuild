@@ -55,38 +55,6 @@ def do(args):
     if not args.interactive:
         return
 
-    run_wizard(toc)
+    qibuild.actions.config.run_config_wizard()
 
-
-def ask_generator():
-    """ Ask the user to choose a cmake generator
-
-    """
-
-    cmake = qibuild.command.find_program("cmake")
-    if not cmake:
-        mess  = "Could not find CMake in your PATH.\n"
-        mess  += "Please check your configuration"
-        raise Exception(mess)
-
-    cmake_generator = qibuild.interact.ask_choice(qibuild.KNOWN_CMAKE_GENERATORS,
-        "Please choose a generator")
-
-    if cmake_generator == 'NMake Makefiles':
-        cl = qibuild.command.find_program("cl.exe")
-        if not cl:
-            mess  = "Could not find cl.exe in your path"
-            mess += "Please run from Visual Studio command line prompt"
-            raise Exception(mess)
-
-    return cmake_generator
-
-def run_wizard(toc):
-    """Write a new configuration if the file passed as
-    argument, asking the user a few questions
-
-    """
-    cmake_generator = ask_generator()
-    toc.config.defaults.cmake.generator = cmake_generator
-    toc.save_config()
 
