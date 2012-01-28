@@ -24,7 +24,7 @@ def get_qtcreator_path(toc):
     """
     qtcreator_path = None
     # Get it from conf:
-    qtcreator_conf = toc.configstore.ides.get("QtCreator")
+    qtcreator_conf = toc.config.ides.get("QtCreator")
     if qtcreator_conf:
         qtcreator_path = qtcreator_conf.path
         if os.path.exists(qtcreator_path):
@@ -60,7 +60,7 @@ def find_ide(toc):
     ask it again
 
     """
-    ide = toc.configstore.ide
+    ide = toc.config.ide
     if ide:
         return ide
     ides = ["QtCreator"] # QtCreator rocks!
@@ -83,9 +83,9 @@ def find_ide(toc):
             if ide_path:
                 ide_config.path = ide_path
         ide_config.name = ide
-        toc.configstore.add_ide(ide_config)
-        if len(toc.configstore.ides) == 1:
-            toc.configstore.set_default_ide(ide)
+        toc.config.add_ide(ide_config)
+        if len(toc.config.ides) == 1:
+            toc.config.set_default_ide(ide)
             toc.ide = ide
     toc.save_config()
     return ide_config

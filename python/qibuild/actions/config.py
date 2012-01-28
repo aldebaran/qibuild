@@ -59,4 +59,4 @@ def do(args):
     if projects:
         print "  Projects:"
         for project in projects:
-            print qibuild.config.indent(str(project.configstore), 2)
+            print qibuild.config.indent(str(project.config), 2)

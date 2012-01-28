@@ -123,7 +123,7 @@ def do(args):
     qiwt = qibuild.worktree_open(args.work_tree)
     toc  = qibuild.toc_open(args.work_tree, args)
 
-    manifest = toc.configstore.manifest
+    manifest = toc.config.manifest
     if manifest:
         try:
             qibuild.run_action("qisrc.actions.fetch",

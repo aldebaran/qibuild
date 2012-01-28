@@ -84,15 +84,15 @@ def do(args):
     config = None
     cmake_generator = args.cmake_generator
     if toc:
-        config = toc.configstore.configs.get(tc_name)
+        config = toc.config.configs.get(tc_name)
         if not config:
             config = qibuild.config.Config()
             config.name = tc_name
-            toc.configstore.add_config(config)
+            toc.config.add_config(config)
         config.cmake.generator = cmake_generator
         toc.save_config()
     if args.default:
-        toc.configstore.set_default_config(tc_name)
+        toc.config.set_default_config(tc_name)
         toc.save_config()
         LOGGER.info("Now using toolchain %s by default", tc_name)
     else:

@@ -46,7 +46,7 @@ def do(args):
     if args.url:
         manifest_url = args.url
     else:
-        manifest = toc.configstore.manifest
+        manifest = toc.config.manifest
         if manifest is None:
             mess  = "Could not find URL fo fetch from.\n"
             mess += "Here is what you can do:\n"
@@ -72,7 +72,7 @@ def do(args):
             LOGGER.info("Found project %s, skipping", project_name)
 
     # Everything went fine, store the manifest URL for later use:
-    toc.configstore.set_manifest_url(manifest_url)
+    toc.config.set_manifest_url(manifest_url)
     toc.save_config()
 
 

@@ -87,6 +87,6 @@ def run_wizard(toc):
 
     """
     cmake_generator = ask_generator()
-    toc.configstore.defaults.cmake.generator = cmake_generator
+    toc.config.defaults.cmake.generator = cmake_generator
     toc.save_config()
 

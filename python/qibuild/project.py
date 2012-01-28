@@ -32,15 +32,15 @@ class Project:
          - build directory
          - build configuration
          - dependencies
-         - configstore (read from the project.xml file from the
+         - config (read from the qiproject.xml file from the
                         source directory)
     """
     def __init__(self, name, directory):
-        self.name            = name
-        self.directory       = directory
-        self.depends         = list()
-        self.rdepends        = list()
-        self.configstore     = qibuild.config.ProjectConfig()
+        self.name       = name
+        self.directory  = directory
+        self.depends    = list()
+        self.rdepends   = list()
+        self.config     = qibuild.config.ProjectConfig()
 
         #build related settings
         self.cmake_flags     = list()
@@ -64,9 +64,9 @@ class Project:
         project_xml = os.path.join(self.directory, "qiproject.xml")
         if not os.path.exists(project_xml):
             return
-        self.configstore.read(project_xml)
-        self.depends  = self.configstore.depends
-        self.rdepends  = self.configstore.rdepends
+        self.config.read(project_xml)
+        self.depends  = self.config.depends
+        self.rdepends = self.config.rdepends
 
     def set_custom_build_directory(self, build_dir):
         """ could be used to override the default build_directory
@@ -155,7 +155,7 @@ def update_project(project, toc):
 
     """
     # Handle custom global build directory containing all projects
-    singlebdir = toc.configstore.build.build_dir
+    singlebdir = toc.config.build.build_dir
     if singlebdir:
         singlebdir = os.path.expanduser(singlebdir)
         if not os.path.isabs(singlebdir):
@@ -168,7 +168,7 @@ def update_project(project, toc):
 
 
     # Handle single sdk dir
-    sdk_dir = toc.configstore.build.sdk_dir
+    sdk_dir = toc.config.build.sdk_dir
     if sdk_dir:
         if os.path.isabs(sdk_dir):
             project.sdk_directory = sdk_dir

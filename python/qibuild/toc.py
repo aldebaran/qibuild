@@ -121,10 +121,10 @@ class Toc(WorkTree):
         handle_old_qibuild_xml(self.work_tree)
 
         # Handle config:
-        self.configstore = qibuild.config.QiBuildConfig(config)
-        self.configstore.read()
-        self.configstore.read_local_config(self.config_path)
-        self.active_config = self.configstore.active_config
+        self.config = qibuild.config.QiBuildConfig(config)
+        self.config.read()
+        self.config.read_local_config(self.config_path)
+        self.active_config = self.config.active_config
 
         self.build_type = build_type
         if not self.build_type:
@@ -157,7 +157,7 @@ class Toc(WorkTree):
 
         # Set cmake generator if user has not set if in Toc ctor:
         if not self.cmake_generator:
-            self.cmake_generator = self.configstore.cmake.generator
+            self.cmake_generator = self.config.cmake.generator
             if not self.cmake_generator:
                 self.cmake_generator = "Unix Makefiles"
 
@@ -206,11 +206,11 @@ class Toc(WorkTree):
 
     def save_config(self):
         """ Save configuration. You should call this after changing
-        self.configstore in order to make the changes permanent
+        self.config in order to make the changes permanent
 
         """
-        self.configstore.write_local_config(self.config_path)
-        self.configstore.write()
+        self.config.write_local_config(self.config_path)
+        self.config.write()
 
     def update_projects(self):
         """Set self.projects() with the correct build configs and correct build folder
@@ -325,8 +325,8 @@ class Toc(WorkTree):
         """Update os.environ using the qibuild configuration file
 
         """
-        path_env = self.configstore.env.path
-        bat_file = self.configstore.env.bat_file
+        path_env = self.config.env.path
+        bat_file = self.config.env.bat_file
         if path_env:
             self.envsetter.prepend_to_path(path_env)
         if bat_file:
