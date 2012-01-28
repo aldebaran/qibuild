@@ -141,3 +141,15 @@ class EnvSetter():
             directories = directories_list.split(os.path.pathsep)
             for directory in directories:
                 self.prepend_directory_to_variable(directory, variable)
+
+
+    def read_config(self, qibuild_cfg):
+        """ Read a qibuild config instance
+
+        """
+        path_env = qibuild_cfg.env.path
+        bat_file = qibuild_cfg.env.bat_file
+        if path_env:
+            self.prepend_to_path(path_env)
+        if bat_file:
+            self.source_bat(bat_file)

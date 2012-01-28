@@ -139,8 +139,9 @@ class Toc(WorkTree):
         self.build_folder_name = None
 
         # Set build environment
-        self.envsetter = qibuild.envsetter.EnvSetter()
-        self.set_build_env()
+        envsetter = qibuild.envsetter.EnvSetter()
+        envsetter.read_config(self.config)
+        self.build_env =  envsetter.get_build_env()
 
         # List of objects of type qibuild.project.Project,
         # this is updated using WorkTree.buildable_projects
@@ -321,18 +322,6 @@ class Toc(WorkTree):
         return dirs
 
 
-    def set_build_env(self):
-        """Update os.environ using the qibuild configuration file
-
-        """
-        path_env = self.config.env.path
-        bat_file = self.config.env.bat_file
-        if path_env:
-            self.envsetter.prepend_to_path(path_env)
-        if bat_file:
-            self.envsetter.source_bat(bat_file)
-
-
     def resolve_deps(self, runtime=False):
         """ Return a tuple of three lists:
         (projects, package, not_foud), see qibuild.dependencies_solver
@@ -393,22 +382,20 @@ class Toc(WorkTree):
 
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
-        build_env = self.envsetter.get_build_env()
-        #remove sh.exe from path on win32, because cmake will fail when using mingw generator.
         if "MinGW" in self.cmake_generator:
-            paths = build_env["PATH"].split(os.pathsep)
+            paths = self.build_env["PATH"].split(os.pathsep)
             paths_withoutsh = list()
             for p in paths:
                 if not os.path.exists(os.path.join(p, "sh.exe")):
                     paths_withoutsh.append(p)
-            build_env["PATH"] = os.pathsep.join(paths_withoutsh)
+            self.build_env["PATH"] = os.pathsep.join(paths_withoutsh)
 
         try:
             qibuild.cmake(project.directory,
                           project.build_directory,
                           cmake_args,
                           clean_first=clean_first,
-                          env=build_env)
+                          env=self.build_env)
         except CommandFailedException:
             raise ConfigureFailed(project)
 
@@ -447,9 +434,8 @@ class Toc(WorkTree):
         if num_jobs > 1 and "make" in self.cmake_generator.lower():
             cmd += [ "-j%d" % num_jobs]
 
-        build_env = self.envsetter.get_build_env()
         try:
-            qibuild.command.call(cmd, env=build_env)
+            qibuild.command.call(cmd, env=self.build_env)
         except CommandFailedException:
             raise BuildFailed(project)
 
@@ -463,8 +449,7 @@ class Toc(WorkTree):
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
             _advise_using_configure(self, project)
-        build_env = self.envsetter.get_build_env()
-        (res, summary) = qibuild.ctest.run_tests(project, build_env,
+        (res, summary) = qibuild.ctest.run_tests(project, self.build_env,
             test_name=test_name)
         if res:
             LOGGER.info(summary)
@@ -475,15 +460,14 @@ class Toc(WorkTree):
     def install_project(self, project, destdir, runtime=False):
         """Install the project """
         build_dir = project.build_directory
-        build_env = self.envsetter.get_build_env()
-        build_env["DESTDIR"] = destdir
+        self.build_env["DESTDIR"] = destdir
         try:
             if runtime:
                 self.install_project_runtime(project, destdir)
             else:
                 cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
                         "--target", "install"]
-                qibuild.command.call(cmd, env=build_env)
+                qibuild.command.call(cmd, env=self.build_env)
         except CommandFailedException:
             raise InstallFailed(project)
 
@@ -498,15 +482,14 @@ class Toc(WorkTree):
              "doc"
          ]
         for component in runtime_components:
-            build_env = self.envsetter.get_build_env()
-            build_env["DESTDIR"] = destdir
+            self.build_env["DESTDIR"] = destdir
             cmake_args = list()
             cmake_args += ["-DCOMPONENT=%s" % component]
             cmake_args += ["-P", "cmake_install.cmake"]
             LOGGER.debug("Installing %s", component)
             qibuild.command.call(["cmake"] + cmake_args,
                 cwd=project.build_directory,
-                env=build_env,
+                env=self.build_env,
                 )
 
 

@@ -61,12 +61,12 @@ def do(args):
         # note: cmake will emit warnings at this time when using NMake makefiles
         # because LIBPATH, INCLUDE et al. are not set.
         # this is because we do NOT mess with os.environ ...
-        # This is why we need to re-read env from toc.envsetter so that no warning
+        # This is why we need to re-read env from toc.build_env so that no warning
         # appears.
         qibuild.cmake(project.directory, project.build_directory,
             ['-DCMAKE_INSTALL_PREFIX=%s' % args.prefix],
             clean_first=False,
-            env=toc.envsetter.get_build_env())
+            env=toc.build_env)
 
     if not args.include_deps:
         project_names = [project_name]
