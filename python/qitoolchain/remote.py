@@ -58,6 +58,7 @@ def authenticated_urlopen(location):
 
     """
     passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+    #pylint: disable-msg=E1103
     server_name = urlparse.urlsplit(location).netloc
     access = get_server_access(server_name)
     if access is not None:
@@ -75,6 +76,7 @@ def open_remote_location(location):
     Returns a file-like object
 
     """
+    #pylint: disable-msg=E1103
     url_split = urlparse.urlsplit(location)
     server_name = url_split.netloc
     #pylint: disable-msg=E1103
@@ -138,6 +140,7 @@ def download(url, output_dir,
 
     url_split = urlparse.urlsplit(url)
     url_obj = None
+    #pylint: disable-msg=E1103
     server_name = url_split.netloc
     try:
         #pylint: disable-msg=E1103
