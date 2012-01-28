@@ -17,36 +17,46 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc.toc_open(args.work_tree, args)
-    if not args.edit:
-        if toc.active_config:
-            print "Active configuration:"
-            print " ", toc.active_config
-            print
-        print "Build configurations:"
-        print toc.configstore
-        print
-        print "Projects configuration:"
-        for project in toc.projects:
-            print project.configstore
+    toc = None
+    try:
+        toc = qibuild.toc.toc_open(args.work_tree, args)
+    except qibuild.toc.TocException:
+        pass
 
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
 
-    if not args.edit:
+    if args.edit:
+        editor = qibuild_cfg.defaults.env.editor
+        if not editor:
+            editor = os.environ.get("VISUAL")
+        if not editor:
+            editor = os.environ.get("EDITOR")
+        if not editor:
+            # Ask the user to choose, and store the answer so
+            # that we never ask again
+            print "Could not find the editor to use."
+            editor = qibuild.interact.ask_program("Please enter an editor")
+            qibuild_cfg.defaults.env.editor = editor
+            qibuild_cfg.write()
+
+        full_path = qibuild.command.find_program(editor)
+        subprocess.call([full_path, qibuild.config.QIBUILD_CFG_PATH])
         return
 
-    editor = toc.configstore.defaults.env.editor
-    if not editor:
-        editor = os.environ.get("VISUAL")
-    if not editor:
-        editor = os.environ.get("EDITOR")
-    if not editor:
-        # Ask the user to choose, and store the answer so
-        # that we never ask again
-        print "Could not find the editor to use."
-        editor = qibuild.interact.ask_program("Please enter an editor")
-        toc.configstore.set_default_editor(editor)
-        toc.save_config()
+    if not toc:
+        print qibuild_cfg
+        return
 
-    full_path = qibuild.command.find_program(editor)
-    subprocess.call([full_path, toc.config_path])
+    print "General config"
+    print "--------------"
+    print qibuild.config.indent(str(qibuild_cfg))
 
+    print "Local config"
+    print "------------"
+
+    projects = toc.projects
+    if projects:
+        print "  Projects:"
+        for project in projects:
+            print qibuild.config.indent(str(project.configstore), 2)

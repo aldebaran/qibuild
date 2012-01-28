@@ -8,6 +8,8 @@
 """
 
 import os
+import operator
+
 HAS_LXML = False
 try:
     from lxml import etree
@@ -20,6 +22,12 @@ import qibuild
 
 QIBUILD_CFG_PATH = "~/.config/qi/qibuild.xml"
 QIBUILD_CFG_PATH = qibuild.sh.to_native_path(QIBUILD_CFG_PATH)
+
+def indent(text, num=1):
+    """ Helper for __str__ methods
+
+    """
+    return "\n".join(["  " * num + l for l in text.splitlines()])
 
 def raise_parse_error(message, cfg_path=None, tree=None):
     """ Raise a nice parsing error about the given
@@ -88,6 +96,16 @@ class Env:
             tree.set("editor", self.editor)
         return tree
 
+    def __str__(self):
+        res = ""
+        if self.path:
+            res += "env.path: %s\n" % self.path
+        if self.bat_file:
+            res += "env.bat_file: %s\n"  % self.bat_file
+        if self.editor:
+            res += "env.editor: %s\n"  % self.editor
+        return res
+
 class IDE:
     def __init__(self):
         self.name = None
@@ -107,6 +125,13 @@ class IDE:
         if self.path:
             tree.set("path", self.path)
         return tree
+
+    def __str__(self):
+        res = self.name
+        res += "\n"
+        if self.path:
+            res += "  path: %s\n" % self.path
+        return res
 
 
 class Build:
@@ -134,6 +159,16 @@ class Build:
             tree.set("incredibuild", "true")
         return tree
 
+    def __str__(self):
+        res = ""
+        if self.build_dir:
+            res += "build_dir: %s\n" % self.build_dir
+        if self.sdk_dir:
+            res += "sdk_dir: %s\n" % self.sdk_dir
+        if self.incredibuild:
+            res += "incredibuild: %s\n" % self.incredibuild
+        return res
+
 class CMake:
     def __init__(self):
         self.generator = None
@@ -146,6 +181,12 @@ class CMake:
         if self.generator:
             tree.set("generator", self.generator)
         return tree
+
+    def __str__(self):
+        res = ""
+        if self.generator:
+            res += "cmake.generator: %s\n" % self.generator
+        return res
 
 class Manifest:
     def __init__(self):
@@ -178,7 +219,6 @@ class Defaults:
             self.cmake.parse(cmake_tree)
         self.ide    = tree.get("ide")
 
-
     def tree(self):
         tree = etree.Element("defaults")
         if self.ide:
@@ -188,6 +228,18 @@ class Defaults:
         cmake_tree = self.cmake.tree()
         tree.append(cmake_tree)
         return tree
+
+    def __str__(self):
+        res = ""
+        if self.ide:
+            res += "  defaults.ide: %s\n" % self.ide
+        cmake_str = str(self.cmake)
+        if cmake_str:
+            res += indent(cmake_str) + "\n"
+        env_str = str(self.env)
+        if env_str:
+            res += indent(env_str) + "\n"
+        return res
 
 class Access:
     def __init__(self):
@@ -209,6 +261,14 @@ class Access:
         if self.password:
             tree.set("password", self.password)
         return tree
+
+    def __str__(self):
+        res = ""
+        if self.username:
+            res += "username: %s\n" % self.username
+        if self.password:
+            res += "password: XXXXX\n"
+        return res
 
 class Server:
     def __init__(self):
@@ -233,6 +293,13 @@ class Server:
         tree.append(access_tree)
         return tree
 
+    def __str__(self):
+        res = self.name
+        access_str = str(self.access)
+        if access_str:
+            res += "\n"
+            res += indent(access_str)
+        return res
 
 class LocalDefaults:
     def __init__(self):
@@ -281,6 +348,22 @@ class Config:
         cmake_tree = self.cmake.tree()
         tree.append(cmake_tree)
         return tree
+
+    def __str__(self):
+        res = self.name
+        res += "\n"
+        if self.ide:
+            res += "  ide: %s\n" % self.ide
+        env_str = str(self.env)
+        if env_str:
+            res += indent(env_str)
+            res += "\n"
+        cmake_str = str(self.cmake)
+        if cmake_str:
+            res += indent(cmake_str)
+            res += "\n"
+        return res
+
 
 
 class QiBuildConfig:
@@ -525,6 +608,44 @@ class QiBuildConfig:
             xml_indent(tree.getroot())
             tree.write(xml_path)
 
+    def __str__(self):
+        res = ""
+        build_str = str(self.build)
+        if build_str:
+            res += "build:\n"
+            res += indent(build_str) + "\n"
+            res += "\n"
+        defaults_str = str(self.defaults)
+        if defaults_str:
+            res += "defaults:\n"
+            res += indent(defaults_str) + "\n"
+            res += "\n"
+        configs = self.configs.values()
+        configs.sort(key = operator.attrgetter('name'))
+        if configs:
+            res += "configs:\n"
+            for config in configs:
+                res += indent(str(config))
+                res += "\n"
+            res += "\n"
+        ides = self.ides.values()
+        ides.sort(key = operator.attrgetter('name'))
+        if ides:
+            res += "ides:\n"
+            for ide in ides:
+                res += indent(str(ide))
+                res += "\n"
+            res += "\n"
+        servers = self.servers.values()
+        servers.sort(key = operator.attrgetter('name'))
+        if servers:
+            res += "servers:\n"
+            for server in servers:
+                res += indent(str(server))
+                res += "\n"
+        return res
+
+
 class ProjectConfig:
     """ A class to read project configuration
 
@@ -611,6 +732,22 @@ class ProjectConfig:
         else:
             xml_indent(project_tree)
             self.tree.write(location)
+
+    def __str__(self):
+        res = ""
+        res += self.name
+        if self.depends:
+            res += "\n"
+            res += "  depends: \n"
+            for depends in self.depends:
+                res += indent(depends, 2)
+                res += "\n"
+        if self.rdepends:
+            res += "  rdepends: \n"
+            for rdepends in self.rdepends:
+                res += indent(rdepends, 2)
+                res += "\n"
+        return res
 
 def xml_indent(elem, level=0):
     """ Poor man's pretty print for elementTree
