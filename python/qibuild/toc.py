@@ -11,15 +11,15 @@ import os
 import glob
 import platform
 import logging
-import qibuild.worktree
+import operator
 
 import qibuild
-from   qibuild.project     import Project
-import qibuild.sh
-from qibuild.dependencies_solver import DependenciesSolver
-from   qibuild.worktree import WorkTree
 import qitoolchain
-from qibuild.command import CommandFailedException
+
+from qibuild.project  import Project
+from qibuild.worktree import WorkTree
+from qibuild.command  import CommandFailedException
+from qibuild.dependencies_solver import DependenciesSolver
 
 LOGGER = logging.getLogger("qibuild.toc")
 
@@ -234,6 +234,8 @@ class Toc(WorkTree):
         # moment...
         for project in self.projects:
             qibuild.project.update_project(project, self)
+
+        self.projects.sort(key=operator.attrgetter('name'))
 
 
     def set_build_folder_name(self):
@@ -506,6 +508,8 @@ class Toc(WorkTree):
                 cwd=project.build_directory,
                 env=build_env,
                 )
+
+
 
 def _projects_from_args(toc, args):
     """
