@@ -137,34 +137,20 @@ class IDE:
 class Build:
     def __init__(self):
         self.incredibuild = False
-        self.build_dir = None
-        self.sdk_dir   = None
 
     def parse(self, tree):
         incredibuild = tree.get("incredibuild")
         if incredibuild and incredibuild.lower() in ["y", "yes", "1", "true", "on"]:
             self.incredibuild = True
-        # Not calling to_native_path because build_dir and sdk_dir can be
-        # relative to the worktree
-        self.build_dir = tree.get("build_dir")
-        self.sdk_dir = tree.get("sdk_dir")
 
     def tree(self):
         tree = etree.Element("build")
-        if self.build_dir:
-            tree.set("build_dir", self.build_dir)
-        if self.sdk_dir:
-            tree.set("sdk_dir", self.sdk_dir)
         if self.incredibuild:
             tree.set("incredibuild", "true")
         return tree
 
     def __str__(self):
         res = ""
-        if self.build_dir:
-            res += "build_dir: %s\n" % self.build_dir
-        if self.sdk_dir:
-            res += "sdk_dir: %s\n" % self.sdk_dir
         if self.incredibuild:
             res += "incredibuild: %s\n" % self.incredibuild
         return res
@@ -200,6 +186,12 @@ class Manifest:
         if self.url:
             tree.set("url", self.url)
         return tree
+
+    def __str__(self):
+        res = ""
+        if self.url:
+            res += "url: %s\n" % self.url
+        return res
 
 class Defaults:
     def __init__(self):
@@ -301,6 +293,50 @@ class Server:
             res += indent(access_str)
         return res
 
+class LocalSettings:
+    def __init__(self):
+        self.defaults = LocalDefaults()
+        self.build = LocalBuild()
+        self.manifest = None
+
+    def parse(self, tree):
+        defaults_tree = tree.find("defaults")
+        if defaults_tree is not None:
+            self.defaults.parse(defaults_tree)
+        build_tree = tree.find("build")
+        if build_tree is not None:
+            self.build.parse(build_tree)
+        manifest_tree = tree.find("manifest")
+        if manifest_tree is not None:
+            self.manifest = Manifest()
+            self.manifest.parse(manifest_tree)
+
+    def tree(self):
+        tree = etree.Element("qibuild")
+        tree.set("version", "1")
+        tree.append(self.defaults.tree())
+        tree.append(self.build.tree())
+        if self.manifest:
+            tree.append(self.manifest.tree())
+        return tree
+
+    def __str__(self):
+        res = ""
+        defaults_str = str(self.defaults)
+        if defaults_str:
+            res += "default settings for this worktree:\n"
+            res += indent(defaults_str) + "\n"
+        build_str = str(self.build)
+        if build_str:
+            res += "build settings for this worktree:\n"
+            res += indent(build_str) + "\n"
+        manifest_str = str(self.manifest)
+        if manifest_str:
+            res += "qisrc manifest:\n"
+            res += indent(manifest_str) + "\n"
+        return res
+
+
 class LocalDefaults:
     def __init__(self):
         # An config name to use by default
@@ -314,6 +350,39 @@ class LocalDefaults:
         if self.config:
             tree.set("config", self.config)
         return tree
+
+    def __str__(self):
+        res = ""
+        if self.config:
+            res += "default config: %s\n" % self.config
+        return res
+
+class LocalBuild:
+    def __init__(self):
+        self.sdk_dir = None
+        self.build_dir = None
+
+    def parse(self, tree):
+        # Not calling to_native_path because build_dir and sdk_dir can be
+        # relative to the worktree
+        self.build_dir = tree.get("build_dir")
+        self.sdk_dir = tree.get("sdk_dir")
+
+    def tree(self):
+        tree = etree.Element("build")
+        if self.build_dir:
+            tree.set("build_dir", self.build_dir)
+        if self.sdk_dir:
+            tree.set("sdk_dir", self.sdk_dir)
+        return tree
+
+    def __str__(self):
+        res = ""
+        if self.build_dir:
+            res += "build_dir: %s\n" % self.build_dir
+        if self.sdk_dir:
+            res += "sdk_dir: %s\n" % self.sdk_dir
+        return res
 
 
 class Config:
@@ -371,10 +440,11 @@ class QiBuildConfig:
     def __init__(self, user_config=None):
         self.tree = etree.ElementTree()
         self.defaults = Defaults()
-        self.local_defaults = LocalDefaults()
         self.build = Build()
-        self.manifest = None
         self.user_config = user_config
+
+        # Set by self.read_local_config()
+        self.local = LocalSettings()
 
         # A dict of possible configs
         self.configs = dict()
@@ -448,23 +518,12 @@ class QiBuildConfig:
     def read_local_config(self, local_xml_path):
         """ Apply a local configuration """
         local_tree = etree.parse(local_xml_path)
-        local_defaults_tree = local_tree.find("defaults")
-        if local_defaults_tree is not None:
-            self.local_defaults.parse(local_defaults_tree)
-        manifest_tree = local_tree.find("manifest")
-        if manifest_tree is not None:
-            if not self.manifest:
-                self.manifest = Manifest()
-            self.manifest.parse(manifest_tree)
+        self.local.parse(local_tree)
         self.merge_configs()
 
     def write_local_config(self, local_xml_path):
         """ Dump local settings to a xml file """
-        local_tree = etree.Element("qibuild")
-        local_tree.set("version", "1")
-        local_tree.append(self.local_defaults.tree())
-        if self.manifest:
-            local_tree.append(self.manifest.tree())
+        local_tree = self.local.tree()
         tree = etree.ElementTree(element=local_tree)
         if HAS_LXML:
             # pylint: disable-msg=E1123
@@ -477,7 +536,7 @@ class QiBuildConfig:
         """ Merge various configs
 
         """
-        default_config = self.local_defaults.config
+        default_config = self.local.defaults.config
         if self.user_config:
             self.active_config = self.user_config
         else:
@@ -523,7 +582,7 @@ class QiBuildConfig:
         """ Set a new config to use by default
 
         """
-        self.local_defaults.config = name
+        self.local.defaults.config = name
 
     def set_default_ide(self, name):
         """ Set a new IDE to use by default
@@ -567,9 +626,9 @@ class QiBuildConfig:
         """ Set a manifest url to use
 
         """
-        if not self.manifest:
-            self.manifest = Manifest()
-        self.manifest.url = manifest_url
+        if not self.local.manifest:
+            self.local.manifest = Manifest()
+        self.local.manifest.url = manifest_url
 
     def get_server_access(self, server_name):
         """ Return the access settings of a server
@@ -791,7 +850,7 @@ def convert_qibuild_cfg(qibuild_cfg):
     qibuild_cfg = QiBuildConfig()
     general_config = ini_cfg.get("general.config")
     if general_config:
-        qibuild_cfg.local_defaults.config = general_config
+        qibuild_cfg.local.defaults.config = general_config
     cmake_generator = ini_cfg.get("general.cmake.generator")
     if cmake_generator:
         qibuild_cfg.defaults.cmake.generator = cmake_generator
@@ -818,10 +877,10 @@ def convert_qibuild_cfg(qibuild_cfg):
         qibuild_cfg.ides["QtCreator"].path = qtcreator_path
     build_dir = ini_cfg.get("general.build.directory")
     if build_dir:
-        qibuild_cfg.build.build_dir = build_dir
+        qibuild_cfg.local.build.build_dir = build_dir
     sdk_dir = ini_cfg.get("general.build.sdk_dir")
     if sdk_dir:
-        qibuild_cfg.build.sdk_dir = sdk_dir
+        qibuild_cfg.local.build.sdk_dir = sdk_dir
     incredibuild_str = ini_cfg.get("general.build.incredibuild", default="")
     if incredibuild_str.lower() in ["y", "yes", "1", "true", "on"]:
             qibuild_cfg.build.incredibuild = True
@@ -830,7 +889,7 @@ def convert_qibuild_cfg(qibuild_cfg):
     if manifest_url:
         manifest = Manifest()
         manifest.url = manifest_url
-        qibuild_cfg.manifest = manifest
+        qibuild_cfg.local.manifest = manifest
 
     for (name, _) in ini_cfg.get("config", default=dict()).iteritems():
         config = Config()

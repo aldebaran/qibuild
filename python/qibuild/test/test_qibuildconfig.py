@@ -97,7 +97,7 @@ class QiBuildConfig(unittest.TestCase):
 """
         qibuild_cfg = cfg_from_string(xml)
         qibuild_cfg.read_local_config(StringIO(local_xml))
-        self.assertEquals(qibuild_cfg.local_defaults.config, "linux32")
+        self.assertEquals(qibuild_cfg.local.defaults.config, "linux32")
         self.assertEquals(qibuild_cfg.active_config, "linux32")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig32")
 
@@ -119,7 +119,7 @@ class QiBuildConfig(unittest.TestCase):
 """
         qibuild_cfg = cfg_from_string(xml, user_config="linux64")
         qibuild_cfg.read_local_config(StringIO(local_xml))
-        self.assertEquals(qibuild_cfg.local_defaults.config, "linux32")
+        self.assertEquals(qibuild_cfg.local.defaults.config, "linux32")
         self.assertEquals(qibuild_cfg.active_config, "linux64")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig64")
 
@@ -330,23 +330,30 @@ class QiBuildConfig(unittest.TestCase):
 """
         qibuild_cfg = cfg_from_string(xml)
         self.assertFalse(qibuild_cfg.build.incredibuild)
-        self.assertTrue(qibuild_cfg.build.sdk_dir   is None)
-        self.assertTrue(qibuild_cfg.build.build_dir is None)
+        self.assertTrue(qibuild_cfg.local.build.sdk_dir   is None)
+        self.assertTrue(qibuild_cfg.local.build.build_dir is None)
 
         xml = """
 <qibuild version="1">
     <build
-        sdk_dir="/path/to/sdk"
-        build_dir="/path/to/build"
         incredibuild="Yes"
     />
 </qibuild>
 """
+        local_xml = """
+<qibuild version="1">
+  <build
+    sdk_dir="/path/to/sdk"
+    build_dir="/path/to/build"
+  />
+</qibuild>
+"""
         qibuild_cfg = cfg_from_string(xml)
         self.assertTrue(qibuild_cfg.build.incredibuild)
-        self.assertEqual(qibuild_cfg.build.sdk_dir,
+        qibuild_cfg.read_local_config(StringIO(local_xml))
+        self.assertEqual(qibuild_cfg.local.build.sdk_dir,
             qibuild.sh.to_native_path("/path/to/sdk"))
-        self.assertEqual(qibuild_cfg.build.build_dir,
+        self.assertEqual(qibuild_cfg.local.build.build_dir,
             qibuild.sh.to_native_path("/path/to/build"))
 
     def test_set_manifest_url(self):
@@ -356,14 +363,14 @@ class QiBuildConfig(unittest.TestCase):
 """
         manifest_url = "http://example.com/qi/foo.xml"
         qibuild_cfg = cfg_from_string(xml)
-        self.assertTrue(qibuild_cfg.manifest is None)
+        self.assertTrue(qibuild_cfg.local.manifest is None)
         qibuild_cfg.set_manifest_url(manifest_url)
         local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
         new_cfg.read_local_config(StringIO(local_xml))
-        self.assertFalse(new_cfg.manifest is None)
-        self.assertEqual(new_cfg.manifest.url, manifest_url)
+        self.assertFalse(new_cfg.local.manifest is None)
+        self.assertEqual(new_cfg.local.manifest.url, manifest_url)
 
 
     def test_get_server_access(self):
@@ -440,7 +447,6 @@ url = "http://example.com/foo.manifest"
 [config vs2010]
 cmake.generator = "Visual Studio 10"
 """
-
         with open(self.cfg_path, "w") as fp:
             fp.write(qibuild_cfg)
         (qibuild_xml, local_xml) = qibuild.config.convert_qibuild_cfg(self.cfg_path)
@@ -452,11 +458,11 @@ cmake.generator = "Visual Studio 10"
             "/path/to/qtcreator")
         self.assertEqual(qibuild_cfg.defaults.env.path,
             r"c:\MinGW\bin;c:\Program Files\swig;")
-        self.assertEqual(qibuild_cfg.build.build_dir,
+        self.assertEqual(qibuild_cfg.local.build.build_dir,
             "/path/to/build")
-        self.assertEqual(qibuild_cfg.build.sdk_dir,
+        self.assertEqual(qibuild_cfg.local.build.sdk_dir,
             "/path/to/sdk")
-        self.assertEqual(qibuild_cfg.manifest.url,
+        self.assertEqual(qibuild_cfg.local.manifest.url,
              "http://example.com/foo.manifest")
         self.assertEqual(qibuild_cfg.configs["vs2010"].cmake.generator,
             "Visual Studio 10")
@@ -481,7 +487,7 @@ cmake.generator = "Visual Studio 10"
         (qibuild_xml, local_xml) = qibuild.config.convert_qibuild_xml(StringIO(xml))
         qibuild_cfg = cfg_from_string(qibuild_xml)
         qibuild_cfg.read_local_config(StringIO(local_xml))
-        self.assertEqual(qibuild_cfg.local_defaults.config, "linux32")
+        self.assertEqual(qibuild_cfg.local.defaults.config, "linux32")
 
 
 

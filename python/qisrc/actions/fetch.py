@@ -46,7 +46,7 @@ def do(args):
     if args.url:
         manifest_url = args.url
     else:
-        manifest = toc.config.manifest
+        manifest = toc.config.local.manifest
         if manifest is None:
             mess  = "Could not find URL fo fetch from.\n"
             mess += "Here is what you can do:\n"

@@ -8,6 +8,7 @@ import sys
 import subprocess
 
 import qibuild
+import qitoolchain
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -30,7 +31,7 @@ def do(args):
     qibuild_cfg.read()
 
     if args.wizard:
-        run_config_wizard()
+        run_config_wizard(toc)
         return
 
     if args.edit:
@@ -55,13 +56,18 @@ def do(args):
         print qibuild_cfg
         return
 
-    print "General config"
-    print "--------------"
-    print qibuild.config.indent(str(qibuild_cfg))
+    print "General configuration"
+    print "---------------------"
+    print qibuild.config.indent(str(toc.config))
+    print
 
-    print "Local config"
-    print "------------"
+    print "Local configuration"
+    print "-------------------"
+    print qibuild.config.indent(str(toc.config.local))
 
+    print
+    print "Projects configuration"
+    print "----------------------"
     projects = toc.projects
     if projects:
         print "  Projects:"
@@ -194,8 +200,57 @@ def configure_ide(qibuild_cfg, ide_name):
     ide.name = ide.name
     qibuild_cfg.add_ide(ide)
 
+def configure_local_settings(qibuild_cfg, toc):
+    """ Configure local settings for this worktree
 
-def run_config_wizard():
+    """
+    print
+    print "Found a worktree in", toc.work_tree
+    answer = qibuild.interact.ask_yes_no(
+        "Do you want to configure settings for this worktree",
+        default=True)
+    if not answer:
+        return
+    tc_names = qitoolchain.get_tc_names()
+    if tc_names:
+        print "Found the following toolchains: ", ", ".join(tc_names)
+        answer = qibuild.interact.ask_yes_no(
+            "Use one of these toolchains by default",
+            default=True)
+        if answer:
+            default = qibuild.interact.ask_choice(tc_names,
+                "Choose a toolchain to use by default")
+            if default:
+                toc.config.local.defaults.config = default
+                toc.save_config()
+    answer = qibuild.interact.ask_yes_no(
+        "Do you want to use a unique build dir "
+        "(mandatory when using Eclipse)",
+        default=False)
+
+    build_dir = None
+    if answer:
+        build_dir = qibuild.interact.ask_string("Path to a build directory")
+        full_path = os.path.join(toc.work_tree, build_dir)
+        print "Will use", full_path, "as a root for all build directories"
+    if build_dir:
+        toc.config.local.build.build_dir = build_dir
+        toc.save_config()
+
+    sdk_dir = None
+    answer = qibuild.interact.ask_yes_no(
+        "Do you want to use a unique SDK dir",
+        default=False)
+    if answer:
+        sdk_dir = qibuild.interact.ask_string("Path to a SDK directory")
+        full_path = os.path.join(toc.work_tree, sdk_dir)
+        print "Will use", full_path, "as a unique SDK directory"
+    if sdk_dir:
+        toc.config.local.build.sdk_dir = sdk_dir
+        toc.save_config()
+
+
+def run_config_wizard(toc):
     """ Run a nice interactive config wizard
 
     """
@@ -213,5 +268,5 @@ def run_config_wizard():
 
     qibuild_cfg.write()
 
-
-
+    if toc:
+        configure_local_settings(qibuild_cfg, toc)

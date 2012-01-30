@@ -155,7 +155,7 @@ def update_project(project, toc):
 
     """
     # Handle custom global build directory containing all projects
-    singlebdir = toc.config.build.build_dir
+    singlebdir = toc.config.local.build.build_dir
     if singlebdir:
         singlebdir = os.path.expanduser(singlebdir)
         if not os.path.isabs(singlebdir):
@@ -168,7 +168,7 @@ def update_project(project, toc):
 
 
     # Handle single sdk dir
-    sdk_dir = toc.config.build.sdk_dir
+    sdk_dir = toc.config.local.build.sdk_dir
     if sdk_dir:
         if os.path.isabs(sdk_dir):
             project.sdk_directory = sdk_dir
