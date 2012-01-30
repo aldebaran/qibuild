@@ -231,6 +231,7 @@ def configure_local_settings(qibuild_cfg, toc):
     build_dir = None
     if answer:
         build_dir = qibuild.interact.ask_string("Path to a build directory")
+        build_dir = os.path.expanduser(build_dir)
         full_path = os.path.join(toc.work_tree, build_dir)
         print "Will use", full_path, "as a root for all build directories"
     if build_dir:
@@ -243,6 +244,7 @@ def configure_local_settings(qibuild_cfg, toc):
         default=False)
     if answer:
         sdk_dir = qibuild.interact.ask_string("Path to a SDK directory")
+        sdk_dir = os.path.expanduser(sdk_dir)
         full_path = os.path.join(toc.work_tree, sdk_dir)
         print "Will use", full_path, "as a unique SDK directory"
     if sdk_dir:
