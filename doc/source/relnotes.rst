@@ -76,9 +76,14 @@ Command line
 ~~~~~~~~~~~~
 
 * qitoolchain: add support for password-protected HTTP and FTP feed URLS.
+* Added ``qitoolchain clean-cache`` to clean toolchains cache
+* Added ``qidoc`` executable (work in progress)
+* Added ``qibuild find PACKAGE`` to display CMake variables relate to the package (work in progress)
+* Added ``qibuild config --wizard`` to configure both global and local settings
 * ``qibuild package``: always build in debug and in release on windows
 * ``qisrc pull``: fix return code on error (#6343)
 * ``qibuild config --edit`` : do not mess with stdin
+* ``qibuild init --interactive`` now calls ``qibuild config --wizard``
 * ``qibuild install``: force calling of 'make preinstall'
 * ``qitoolchain update``: update every toolchain by default
 * ``qibuild test``: use a custom CTest implementation instead of using
@@ -88,9 +93,6 @@ Command line
 * ``qibuild convert``: do not add ``include(qibuild.cmake)`` if it is already here
 * ``qisrc pull`` now call ``qisrc fetch`` first (#204)
 * ``qitoolchain create``: prevent user to create bad toolchain names
-* Added ``qitoolchain clean-cache`` to clean toolchains cache
-* Added ``qidoc`` executable (work in progress)
-* Added ``qibuild find PACKAGE`` to display CMake variables relate to the package (work in progress)
 
 Configuration files
 ~~~~~~~~~~~~~~~~~~~
