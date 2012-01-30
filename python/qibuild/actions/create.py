@@ -26,12 +26,6 @@ def copy_helper(project_name, directory):
         with open(os.path.join(directory, file_name), "w") as new_file:
             new_file.write(new_contents)
 
-    # Also create the necessary qibuild.cmake file:
-    to_copy = os.path.join(qibuild.get_cmake_qibuild_dir(),
-        "qibuild", "templates", "qibuild.cmake")
-    shutil.copy(to_copy, os.path.join(directory, "qibuild.cmake"))
-
-
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.worktree.work_tree_parser(parser)
