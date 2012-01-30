@@ -653,21 +653,22 @@ def handle_old_qibuild_xml(worktree):
     exist
 
     """
+    global_path = qibuild.config.QIBUILD_CFG_PATH
     from xml.etree import ElementTree as etree
     local_xml_path = os.path.join(worktree, ".qi", "qibuild.xml")
     tree = etree.ElementTree()
     tree.parse(local_xml_path)
     qibuild_tree = tree.getroot()
-    if qibuild_tree.get("version") == "1":
+    if qibuild_tree.get("version") == "1" and os.path.exists(global_path):
         return
     (global_xml, local_xml) = qibuild.config.convert_qibuild_xml(local_xml_path)
     with open(local_xml_path, "w") as fp:
         fp.write(local_xml)
-    global_path = qibuild.config.QIBUILD_CFG_PATH
     if os.path.exists(global_path):
         # Refuse to try to merge back global configs ...
         # FIXME: add an error message here?
         return
+    qibuild.sh.mkdir(os.path.dirname(global_path), recursive=True)
     with open(global_path, "w") as fp:
         fp.write(global_xml)
 
