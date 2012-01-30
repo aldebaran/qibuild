@@ -90,6 +90,28 @@ class ArchiveTestCase(unittest.TestCase):
         ls_r = qibuild.sh.ls_r(dest)
         self.assertEquals(ls_r, ["src/ro1/ro2/a"])
 
+    def test_extract_change_topdir(self):
+        src = os.path.join(self.tmp, "src")
+        os.mkdir(src)
+        a_long_dir = os.path.join(src, "a_long_dir")
+        os.mkdir(a_long_dir)
+        b = os.path.join(a_long_dir, "b")
+        with open(b, "w") as fp:
+            fp.write("b\n")
+        dest = os.path.join(self.tmp, "dest")
+        os.mkdir(dest)
+        tar_gz = qibuild.archive.zip_unix(a_long_dir)
+        qibuild.archive.extract(tar_gz, dest, topdir="a")
+        a = os.path.join(dest, "a")
+        ls_r = qibuild.sh.ls_r(a)
+        self.assertEquals(ls_r, ["b"])
+        a_zip = qibuild.archive.zip_win(a_long_dir)
+        qibuild.archive.extract(a_zip, dest, topdir="aa")
+        aa = os.path.join(dest, "aa")
+        ls_r = qibuild.sh.ls_r(aa)
+        self.assertEquals(ls_r, ["b"])
+
+
 
 if __name__ == "__main__":
     unittest.main()

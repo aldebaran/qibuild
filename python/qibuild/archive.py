@@ -34,8 +34,12 @@ class InvalidArchive(Exception):
     def __str__(self):
         return self._message
 
-def extract_tar(archive_path, dest_dir):
-    """Extract a .tar.gz archive"""
+def extract_tar(archive_path, dest_dir, topdir=None):
+    """Extract a .tar.gz archive
+
+    If topdir is not None, replace the topdir by the given
+    argument.
+    """
 
     # Algorithm taken from tarfile.extractall():
     # First, extract everything directory in 700 mode,
@@ -56,19 +60,25 @@ def extract_tar(archive_path, dest_dir):
     members = archive.getmembers()
     size = len(members)
     res = None
-    topdir = members[0].name.split(posixpath.sep)[0]
+    orig_topdir = members[0].name.split(posixpath.sep)[0]
     done = 0
     # Extract directories with a safe mode.
     directories = list()
     for tarinfo in members:
         member_top_dir = tarinfo.name.split(posixpath.sep)[0]
-        if done != 0 and topdir != member_top_dir:
+        if done != 0 and member_top_dir != orig_topdir:
             # something wrong: members do not have the
             # same basename
             mess  = "Invalid member %s in archive:\n" % tarinfo.name
             mess += "Every files sould be in the same top dir (%s != %s)" % \
-                 (topdir, member_top_dir)
+                 (orig_topdir, member_top_dir)
             raise InvalidArchive(mess)
+        if topdir:
+            # Ugly hack:
+            old_name = tarinfo.name
+            splitted = old_name.split(posixpath.sep)
+            splitted[0] = topdir
+            tarinfo.name = posixpath.sep.join(splitted)
         if tarinfo.isdir():
             directories.append(tarinfo)
             tarinfo = copy.copy(tarinfo)
@@ -96,11 +106,14 @@ def extract_tar(archive_path, dest_dir):
 
     archive.close()
     LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
-    res = os.path.join(dest_dir, topdir)
+    if topdir:
+        res = os.path.join(dest_dir, topdir)
+    else:
+        res = os.path.join(dest_dir, orig_topdir)
     return res
 
 
-def extract_zip(archive_path, dest_dir):
+def extract_zip(archive_path, dest_dir, topdir=None):
     """Extract a zip archive"""
     dest_dir = qibuild.sh.to_native_path(dest_dir)
     LOGGER.debug("Extracting %s to %s", archive_path, dest_dir)
@@ -108,17 +121,24 @@ def extract_zip(archive_path, dest_dir):
     members = archive.infolist()
     # There is always the top dir as the first element of the archive
     # (or so we hope)
-    topdir = members[0].filename.split(posixpath.sep)[0]
+    orig_topdir = members[0].filename.split(posixpath.sep)[0]
     size = len(members)
     for (i, member) in enumerate(members):
         member_top_dir = member.filename.split(posixpath.sep)[0]
-        if i != 0 and topdir != member_top_dir:
+        if i != 0 and member_top_dir != orig_topdir:
             # something wrong: members do not have the
             # same basename
             mess  = "Invalid member %s in archive:\n" % member.filename
             mess += "Every files sould be in the same top dir (%s != %s)" % \
-                 (topdir, member_top_dir)
+                 (orig_topdir, member_top_dir)
             raise InvalidArchive(mess)
+        if topdir:
+            # Ugly hack:
+            old_name = member.filename
+            splitted = old_name.split(posixpath.sep)
+            splitted[0] = topdir
+            member.filename = posixpath.sep.join(splitted)
+
         # By-pass buggy zipfile for python 2.6:
         if sys.version_info < (2, 7):
             if member.filename.endswith("/"):
@@ -137,19 +157,24 @@ def extract_zip(archive_path, dest_dir):
             sys.stdout.flush()
     archive.close()
     LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
-    res = os.path.join(dest_dir, topdir)
+    if topdir:
+        res = os.path.join(dest_dir, topdir)
+    else:
+        res = os.path.join(dest_dir, orig_topdir)
     return res
 
-def extract(archive_path, directory):
+def extract(archive_path, directory, topdir=None):
     """Extract an archive, calling extract_zip or extract_tar
     when necessary
 
+    The top directory of the archive will be replaced by topdir
+    if it is given
     """
     try:
         if archive_path.endswith(".zip"):
-            return extract_zip(archive_path, directory)
+            return extract_zip(archive_path, directory, topdir=topdir)
         else:
-            return extract_tar(archive_path, directory)
+            return extract_tar(archive_path, directory, topdir=topdir)
     # Errors returned by tarfile of zipfile are not very good,
     # so let's just catch everything
     except Exception, err:
