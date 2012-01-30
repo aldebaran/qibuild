@@ -3,13 +3,6 @@
 ## found in the COPYING file.
 """Initialize a new toc worktree """
 
-
-# FIXME qibuild --interactive:
-#   - Propose a list of configs to choose from, automagically set
-#     toolchain name and cmake generator.
-#   (preparing the release of qitoolchain/ repo)
-#   - Only configure the local file.
-
 import os
 import logging
 
@@ -55,6 +48,6 @@ def do(args):
     if not args.interactive:
         return
 
-    qibuild.actions.config.run_config_wizard()
+    qibuild.actions.config.run_config_wizard(toc)
 
 
