@@ -51,7 +51,9 @@ def get_tc_names():
     if not config.has_section('toolchains'):
         return list()
     tc_items = config.items('toolchains')
-    return [x[0] for x in tc_items]
+    res = [x[0] for x in tc_items]
+    res.sort()
+    return res
 
 def get_tc_feed(tc_name):
     """ Get the feed associated to a toolchain
