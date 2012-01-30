@@ -81,20 +81,23 @@ Using build configurations
 qiBuild also lets you to have different settings depending on the toolchain you
 use.
 
-The config file will always be found in ``QI_WORK_TREE/.qi/qibuild.cfg``
+The config file will always be found in ``.config/qi/qibuild.xml``
 
 For instance, you could have on a windows machine:
 
-.. code-block:: ini
+.. code-block:: xml
 
-  [general]
-  env.path = ....
+  <qibuild version="1">
+    <defaults>
+      <!-- some defaults -->
+    </defaults>
 
+    <config name="mingw32">
+      <cmake generator="MinGW Makefiles" />
+      <env path="c:\MinGW\bin" />
+    </config>
 
-  [config mingw32]
-  cmake.generator = 'MinGW Makefiles'
-  env.path = c:\MinGW\bin
-
-  [config win32-vs2010]
-  cmake.generator =  'Visual Studio 10'
-
+    <config name="win32-vs2010">
+      <cmake generator="Visual Studio 10" />
+    </config>
+  </qibuild>

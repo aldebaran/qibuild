@@ -75,8 +75,8 @@ Man pages
 Configuration syntax
 ++++++++++++++++++++
 
-* :ref:`qibuild-cfg-syntax`
-* :ref:`qibuild-manifest-syntax`
+* :ref:`qibuild-xml-syntax`
+* :ref:`qiproject-xml-syntax`
 * :ref:`toolchain-feed-syntax`
 * :ref:`qisrc-manifest-syntax`
 

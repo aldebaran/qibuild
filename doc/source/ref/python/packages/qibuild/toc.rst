@@ -138,7 +138,7 @@ It always has a "current config". This config can be:
 
 * None in the simplest case
 * A default configuration specified in the current worktree
-  configuration file (``qibuild.cfg``)
+  configuration file (``.qi/qibuild.xml``)
 * A configuration set by the user with the ``-c,--config`` of
   various qibuild command
 

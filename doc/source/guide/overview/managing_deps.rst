@@ -28,25 +28,23 @@ which depends on the ``world`` library.
 
 It also contains a small test that simply tries to launch ``hello.``
 
-.. FIXME!
-   The sources of this example can be found ...
+The sources of this example can be found here:
+:download:`helloworld.zip </samples/helloworld.zip>`
 
 Extract the archive in your qiBuild worktree, you should end up with something
 looking like::
 
   .qi
-  |__ build.cfg
+  |__ qibuild.xml
   world
+  |__ qiproject.xml
   |__ CMakeLists.txt
-  |__ qibuild.cmake
-  |__ qibuild.manifest
   |__ world
-      |__ world.h
+      |__ world.hpp
       |__ world.cpp
   hello
+  |__ qiproject.xml
   |__ CMakeLists.txt
-  |__ qibuild.cmake
-  |__ qibuild.manifest
   |__ main.cpp
 
 
@@ -63,25 +61,27 @@ Configuring and building the hello project is as easy as
   $ qibuild test hello
 
 
-For this to work, you only have to write two ``qibuild.manifest`` files
+For this to work, you only have to write two ``qiproject.xml`` files
 
-The first one in ``QI_WORK_TREE/world/qibild.manifest`` simply tells
+The first one in ``QI_WORK_TREE/world/qiproject.xml`` simply tells
 qibuild that there is a project named ``world`` in
 ``QI_WORK_TREE/world``
 
-.. code-block:: ini
+.. code-block:: xml
 
-   [project world]
-
+   <project name="world" />
 
 The second one in ``QI_WORK_TREE/hello`` tells ``qibuild``
 there is a project named ``hello`` in ``QI_WORK_TREE/hello``,
 and that it depends on the ``world`` project:
 
-.. code-block:: ini
+.. code-block:: xml
 
-   [project hello]
-   depends = world
+  <project name="hello">
+    <depends buildtime="true" runtime="true"
+      name="world"
+    />
+  </project>
 
 You can see that configuring ``hello`` caused the ``world`` project to be
 configured too, and that building ``hello`` also built the ``world`` project.

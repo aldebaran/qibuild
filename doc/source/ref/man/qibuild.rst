@@ -85,7 +85,9 @@ Useful build options:
 CONFIGURATION
 -------------
 
-Configuration is done in ``.qi/qibuild.cfg``.
+Configuration is done in ``~/.config/qi/qibuild.xml``.
+
+See ``qibuild config --wizard``
 
 
 EXIT STATUS

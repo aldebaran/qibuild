@@ -58,4 +58,9 @@ called :ref:`qi_add_test`
       ARGUMENTS "bar")
 
 
+Important
+---------
+
+Please read :ref:`qibuild-ctest` before using ``qibuild test``
+for continuous integration.
 

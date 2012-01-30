@@ -32,12 +32,14 @@ remove-package -c TOOLCHAIN_NAME PACKAGE_NAME
 
 
 Note: to use a toolchain, you must pass the ``-c`` option to your
-``qibuild`` action, or set a default toolchain in the configuration, like
-this:
+``qibuild`` action, or set a default toolchain in the
+configuration file of you worktree (``QI_WORK_TREE/.qi/qibuild.xml``)
+like this:
 
 .. code-block:: ini
 
-  [general]
-  config = NAME
+  <qibuild version="1">
+    <defaults config=NAME />
+  </qibuild>
 
 

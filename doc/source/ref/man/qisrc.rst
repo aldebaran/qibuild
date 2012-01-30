@@ -35,9 +35,13 @@ fetch *MANIFEST*
 
 The manifest file should look like::
 
-  [project "foo"]
-  url = git@git.example.com:foo.git
-
-  [project "bar"]
-  url = git@git.example.com:bar.git
-
+  <manifest>
+    <project
+      name="foo"
+      url="git@git.example.com:foo.git"
+    />
+    <project
+      name="bar"
+      url="git@git.example.com:bar.git"
+    />
+  </manifest>

@@ -179,3 +179,10 @@ Even better, you can still use standard CMake code:
 
 You do not need to read the `world-config.cmake` because you *know* the
 exported variables will always have the same name: `<target>_INCLUDE_DIRS` and `<target>_LIBRARIES`
+
+
+qibuild and CTest
+------------------
+
+
+See :ref:`qibuild-ctest`

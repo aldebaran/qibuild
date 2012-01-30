@@ -37,27 +37,29 @@ You should have:
 
 * two projects, world and hello, with hello depending on the world library.
 
-The goal of this tutorial is to manage to compile hello, using a pre-compiled
-binary of world.
+You can find these two projects here :download:`helloworld.zip </samples/helloworld.zip>`
+
+The goal of this tutorial is to manage to compile ``hello``, using a pre-compiled
+binary of ``world``.
 
 Creating the world package
 ++++++++++++++++++++++++++
 
-Generating a package for the world project is done with:
+Generating a package for the ``world`` project is done with:
 
 .. code-block:: console
 
   $ qibuild package world
 
-This will create a package named ``hello.tar.gz`` in
-``QI_WORK_TREE/package/hello.tar.gz`` (or hello.zip on windows)
+This will create a package named ``world.tar.gz`` in
+``QI_WORK_TREE/package/world.tar.gz`` (or ``world.tar.gz`` on windows)
 
 Inside the package, you will have::
 
   world
   |__ include
       |__ world
-         |__ world.h
+         |__ world.hpp
       lib
          |__ libworld.so
       share
@@ -86,7 +88,7 @@ Create a toolchain from scratch
 
 If you are already using a Aldebaran toolchain, you can skip this section.
 
-Otherwize, you have to create a **toolchain** from scratch for qibuild to use:
+Otherwise, you have to create a **toolchain** from scratch for qibuild to use:
 
 .. code-block:: console
 
@@ -109,12 +111,13 @@ Here we used the ``--default`` option. If you don't, you will have to add
 ``-c linux32`` to every qibuild command.
 
 The only thing the ``default`` option does is to set
-``QI_WORK_TREE/.qi/qibuild.cfg`` so that it looks like:
+``QI_WORK_TREE/.qi/qibuild.xml`` so that it looks like:
 
-.. code-block:: ini
+.. code-block:: xml
 
-   [general]
-   config = linux32
+   <qibuild version="1" >
+    <defaults config="linux32" />
+  </qibuild>
 
 So it's easy to change your mind later.
 
@@ -152,7 +155,7 @@ You can check that your package has been added with:
   Toolchain linux32
   No feed
     Packages:
-      foo
+      world
         in /home/user/.local/share/qi/toolchains/linux32/world
 
 
@@ -185,8 +188,8 @@ you may want other people to be able to use the ``world`` package,
 without them having to recompile it from source.
 
 So here we are going to create a remote configuration file, so
-that other developpers can simply download the ``world`` package from
-a server
+that other developers can simply download the ``world`` package from
+a server.
 
 We will assume you have access to a FTP or a HTTP sever.
 
@@ -232,6 +235,10 @@ You can see that the feed has been stored in your qibuild configuration:
         in /home/user/.local/share/qi/toolchains/linux32/world
 
 
+Note: if you HTTP or FTP server is protected by a password, you can put
+the username and password in the ``.config/qi/qibuild.xml`` configuration file.
+
+See the section :ref:`qibuild-xml-syntax` for details.
 
 You can also add the Aldebaran C++ SDKs or cross toolchains as if they were packages.
 (This sound a bit weird, but it works)
@@ -255,7 +262,7 @@ Don't forget the ``toolchain_file`` attribute of the ``atom-ctc`` package, thoug
 Full feed.xml specification
 ----------------------------
 
-The full sepcifcation can be found in the
+The full specification can be found in the
 :ref:`toolchain-feed-syntax` section
 
 

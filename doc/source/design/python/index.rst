@@ -79,19 +79,19 @@ Concepts
 Worktrees can be nested, although this is not recommended
 (situation can get a little confused if you do so)
 
-A worktree can also contain a ``qibuild.cfg`` configuration
+A worktree should also contain a ``qibuild.xml`` configuration
 file.
 
 .. seealso::
 
-   * :ref:`qibuild-cfg-syntax`
+   * :ref:`qibuild-xml-syntax`
 
 
 .. glossary::
 
   **Project**
     A qibuild project is simply a directory containing a
-    ``qibuild.manifest`` file at its root.
+    ``qiproject.xml`` file at its root.
     The project must belong to a worktree, which means
     that one of the parent directories of the project directory
     must be a ``.qi`` directory.
@@ -100,16 +100,16 @@ file.
     also means you cannot have several projects with the
     same name inside the same worktree.
 
-The name of the project is given inside the ``qibuild.manifest``
+The name of the project is given inside the ``qproject.xml``
 file, like this:
 
-.. code-block:: ini
+.. code-block:: xml
 
-   [project foo]
+   <project name="foo" />
 
 .. seealso::
 
-   * :ref:`qibuild-manifest-syntax`
+   * :ref:`qiproject-xml-syntax`
    * :term:`project`
 
 By convention, the name of the project matches the subdirectory

@@ -143,12 +143,13 @@ The final CMakeLists.txt code looks like
 
 .. code-block:: cmake
 
-  cmake_minimum_required(VERSION 2.6.4)
-  include(qibuild.cmake)
+  cmake_minimum_required(VERSION 2.8)
+  find_package(qibuild)
   project(foo)
 
   include_directories(".")
   qi_create_lib(answer answer.h answer.cpp)
+  qi_stage_lib(answer)
 
   qi_create_bin(foo main.cpp)
   qi_use_lib(foo answer)

@@ -18,16 +18,13 @@ Every CMake project should begin with something like:
 
 .. code-block:: cmake
 
-  cmake_minimum_required(VERSION 2.6.4)
-  include(qibuild.cmake)
+  cmake_minimum_required(VERSION 2.8)
+  find_packagte(qibuild)
   project(foo)
 
 The first line is required by the CMake standards.
 
-The second line includes the qibuild.cmake file that you just copied from
-qibuild sources.
-
-Don’t worry, the file will be automatically updated whenever the source changes.
+The second line let you use the ``qibuild`` cmake framwork.
 
 The project() call is good practice, and is used by several IDEs.
 

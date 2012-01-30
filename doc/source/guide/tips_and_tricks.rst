@@ -10,13 +10,27 @@ Here is a few collections of tips and tricks when using the qibuild framework
    * :ref:`qibuild-cmake-coding-guide`
    * :ref:`CMake common mistakes <qibuild-cmake-common-mistakes>`
 
-Use --help
-----------
+Use ``qibuild help``
+--------------------
 
 The builtin documentation is directly generated from the source code,
 so it will always be accurate.
 
 Trust it and use it!
+
+You can use
+
+.. code-block:: console
+
+    qibuild help
+
+To see a short description of all qibuild actions, and also
+
+.. code-block:: console
+
+   $ qibuild help <action>
+
+To see the full help of the given action
 
 Subdirectories order
 --------------------

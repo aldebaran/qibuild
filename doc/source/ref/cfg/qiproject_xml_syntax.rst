@@ -1,19 +1,36 @@
-.. _qibuild-manifest-syntax:
+.. _qiproject-xml-syntax:
 
-qibuild.manifest syntax
-=======================
+qiproject.xml syntax
+====================
 
 General
 -------
 
-There must be exactly one `qibuild.manifest` file per
-project inside a `QI_WORK_TREE`.
+There must be exactly one ``qiproject.xml`` file per
+project inside a :term:`worktree`
 
-Every `qibuild.manifest` must at least contains a section
-`[project <name>]`
+Every ``qiproject.xml`` must have a root element named
+``project`` with a ``name`` attribute.
 
-Known keys
-----------
+The file will look like:
+
+.. code-block:: xml
+
+  <project name="hello">
+    <depends buildtime="true" runtime="true"
+      names="foo bar"
+    />
+    <depends runtime="true"
+      name="spam"
+    />
+  </project>
+
+
+
+project node
+------------
+
+The project nodes accepts a
 
 **depends**
 
