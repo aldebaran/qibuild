@@ -15,6 +15,9 @@ CMake coding guide
 * Every text file must be pushed using UNIX line endings. (On windows, you are
   advised to set core.autocrlf to true).
 
+* Please use a spell checker when you write comments. Typos in
+  comments are annoying and distractive.
+
 * Never use old CMake syntax code for loop constructs::
 
     # NO
@@ -48,7 +51,7 @@ CMake coding guide
 
 * The CMakeParseArguments module is very useful, please use it.
 
-* Please don’t use C-like construct for strings spanning on several lines::
+* Please do not use C-like construct for strings spanning on several lines::
 
     message(STATUS  "This is a very long\n"
                   "message on\n"

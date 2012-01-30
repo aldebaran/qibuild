@@ -28,6 +28,11 @@ General
 
 * Constants and globals are named ``LIKE_THIS`` *upper case, underscore*
 
+* Please use a spell checker when you write comments. Typos in
+  comments are annoying and distractive, typos in doc strings are
+  bad because we may generate public documentation from those
+  doc strings one day.
+
 
 For easy code re-use
 --------------------
