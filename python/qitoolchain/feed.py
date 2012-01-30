@@ -120,16 +120,14 @@ def handle_remote_package(feed, package, package_tree, toolchain):
         if src_mtime < dest_mtime:
             should_skip = True
     if not should_skip:
-        with qibuild.sh.TempDir() as tmp:
-            try:
-                extracted = qibuild.archive.extract(package_archive, tmp)
-            except qibuild.archive.InvalidArchive, err:
-                mess = str(err)
-                mess += "\nPlease fix the archive and try again"
-                raise Exception(mess)
-            if os.path.exists(dest):
-                qibuild.sh.rm(dest)
-            qibuild.sh.mv(extracted, dest)
+        if os.path.exists(dest):
+            qibuild.sh.rm(dest)
+        try:
+            extracted = qibuild.archive.extract(package_archive, packages_path, topdir=package_name)
+        except qibuild.archive.InvalidArchive, err:
+            mess = str(err)
+            mess += "\nPlease fix the archive and try again"
+            raise Exception(mess)
     package.path = dest
 
 
