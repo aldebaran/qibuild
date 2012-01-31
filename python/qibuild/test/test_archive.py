@@ -7,6 +7,7 @@
 """
 
 import os
+import sys
 import stat
 import errno
 import unittest
@@ -110,6 +111,55 @@ class ArchiveTestCase(unittest.TestCase):
         aa = os.path.join(dest, "aa")
         ls_r = qibuild.sh.ls_r(aa)
         self.assertEquals(ls_r, ["b"])
+
+
+    def test_extract_with_symlink(self):
+        if sys.platform.startswith("win"):
+            return
+        src = os.path.join(self.tmp, "src")
+        os.mkdir(src)
+        a_dir = os.path.join(src, "a_dir")
+        os.mkdir(a_dir)
+        a_file = os.path.join(a_dir, "a_file")
+        with open(a_file, "w") as fp:
+            fp.write("a_file\n")
+        a_link = os.path.join(a_dir, "a_link")
+        os.symlink("a_file", a_link)
+        tar_gz = qibuild.archive.zip_unix(a_dir)
+        dest = os.path.join(self.tmp, "dest")
+        os.mkdir(dest)
+        qibuild.archive.extract(tar_gz, dest)
+        ls_r = qibuild.sh.ls_r(dest)
+        self.assertEquals(ls_r,
+            ['a_dir/a_file', 'a_dir/a_link'])
+        dest_link = os.path.join(dest, "a_dir", "a_link")
+        self.assertTrue(os.path.islink(dest_link))
+        dest_target = os.readlink(dest_link)
+        self.assertEquals(dest_target, "a_file")
+
+    def test_extract_with_symlink_and_change_topdir(self):
+        if sys.platform.startswith("win"):
+            return
+        src = os.path.join(self.tmp, "src")
+        os.mkdir(src)
+        a_long_dir = os.path.join(src, "a_long_dir")
+        os.mkdir(a_long_dir)
+        a_file = os.path.join(a_long_dir, "a_file")
+        with open(a_file, "w") as fp:
+            fp.write("a_file\n")
+        a_link = os.path.join(a_long_dir, "a_link")
+        os.symlink("a_file", a_link)
+        tar_gz = qibuild.archive.zip_unix(a_long_dir)
+        dest = os.path.join(self.tmp, "dest")
+        os.mkdir(dest)
+        qibuild.archive.extract(tar_gz, dest, topdir="a_dir")
+        ls_r = qibuild.sh.ls_r(dest)
+        self.assertEquals(ls_r,
+            ['a_dir/a_file', 'a_dir/a_link'])
+        dest_link = os.path.join(dest, "a_dir", "a_link")
+        self.assertTrue(os.path.islink(dest_link))
+        dest_target = os.readlink(dest_link)
+        self.assertEquals(dest_target, "a_file")
 
 
 
