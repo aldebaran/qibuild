@@ -161,9 +161,29 @@ server node
 
 The 'server' node must contain a 'name' attribute.
 
-It accepts the following attributes:
+It accepts a child named 'access'.
 
-**username**
+The 'access' child accepts the following attributes:
+
+* **username**
+* **password**
+* **root**
+   When using ftp, this will be the root directory of
+   the ftp server.
+
+For instance to use 'john' username with password 'p4ssw0rd'
+on ``ftp://example.com`` using root ``pub``, you can use
+
+.. code-block:: xml
+
+   <server name="example.com">
+     <access
+      username="john"
+      password="p4ssw0rd"
+      root="pub"
+     />
+  </server>
+
 
 
 Local Settings
@@ -240,30 +260,16 @@ The local 'build' nodes accepts the following attributes:
 manifest node
 ~~~~~~~~~~~~~
 
-The 'manifest' node should have a 'name' attribute.
+The 'manifest' node must have a 'url' attribute.
 
-It accepts  an 'access' childrn with the following attributes.
-
-* **username**
-* **password**
-
-* **root**
-   When using ftp, this will be the root directory of
-   the ftp server.
-
-For instance, assuming you are using a toolchain behind a
-password-protected HTTP server, here is what you could use
+For instance
 
 .. code-block:: xml
 
-  <qibuild>
-    <server name="www.example.com">
-      <access
-        username="john"
-        password="p4ssw0rd"
-      />
-    />
-  </qibuild>
+   <manifest
+      url="http://example.com/feed.xml
+   />
+
 
 
 .. _qibuild-config-merging:
