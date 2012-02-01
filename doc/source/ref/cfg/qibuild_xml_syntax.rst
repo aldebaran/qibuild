@@ -23,7 +23,7 @@ to find a work tree, only the ``.qi`` directory is used.
 
 
 When using nested worktrees (not recommended), the first
-``.qi/qibuild.xml`` found file is used.
+``.qi/qibuild.xml`` file found is used.
 
 
 
@@ -189,7 +189,7 @@ on ``ftp://example.com`` using root ``pub``, you can use
 Local Settings
 --------------
 
-The schema of the global xml file looks like this:
+The schema of the local xml file looks like this:
 
 .. code-block:: xml
 
@@ -200,11 +200,10 @@ The schema of the global xml file looks like this:
     </qibuild>
 
 
-
 Note the ``version`` attribute of the ``qibuild`` node.
 It will be used for backward compatibility in case the format syntax changes.
 
-It accepts:
+The root element accepts:
 
 * One or zero :ref:`qibuild-xml-node-local-defaults`
 * One or zero :ref:`qibuild-xml-node-local-build`
