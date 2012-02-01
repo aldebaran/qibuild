@@ -274,3 +274,6 @@ def do(args):
 
     # Remove useless files
     clean_up(args)
+
+    if args.dry_run:
+        LOGGER.info("Re-run with `qibuild convert --go` to proceed")
