@@ -47,9 +47,8 @@ def tree_from_feed(feed_location):
         tree.parse(fp)
     except Exception, e:
         mess  = "Could not parse %s\n" % feed_location
-        mess += "Error was: \n"
-        mess += str(e)
-        raise Exception(mess)
+        LOGGER.error(mess)
+        raise
     finally:
         if fp:
             fp.close()
