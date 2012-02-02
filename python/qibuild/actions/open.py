@@ -11,6 +11,8 @@ import glob
 import subprocess
 import qibuild
 
+SUPPORTED_IDES = ["QtCreator", "Visual Studio", "XCode"]
+
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.toc_parser(parser)
@@ -24,8 +26,37 @@ def get_ide(toc):
     """
     qibuild_cfg = qibuild.config.QiBuildConfig(user_config=toc.active_config)
     qibuild_cfg.read()
-    ide = qibuild_cfg.ide
-    return ide
+    known_ides = qibuild_cfg.ides.values()
+    ide_names  = qibuild_cfg.ides.keys()
+    if not known_ides:
+        mess  =  "Could not find any IDE in configuration"
+        mess +=  "Please use `qibuild config --wizard` or `qibuild config --edit`"
+        raise Exception(mess)
+
+    # Remove the one that are not supported:
+    supported_ides = [x for x in known_ides if x.name in SUPPORTED_IDES]
+
+    if len(supported_ides) == 1:
+        return supported_ides[0]
+
+    if not supported_ides:
+        mess  = "Found those IDEs in configuration: %s\n" % ", ".join(ide_names)
+        mess += "But `qibuild open` only supports: %s\n" % ", ".join(SUPPORTED_IDES)
+        raise Exception(mess)
+
+    #  User chose a specific config and an IDE matches this config
+    if qibuild_cfg.ide:
+        return qibuild_cfg.ide
+
+
+    supported_names = [x.name for x in supported_ides]
+    # Several IDEs, ask the user to choose
+    ide_name = qibuild.interact.ask_choice(supported_names,
+        "Please choose an ide to use")
+    if not ide_name:
+        return None
+    return qibuild_cfg.ides[ide_name]
+
 
 
 def do(args):
@@ -41,8 +72,6 @@ def do(args):
     error_message = "Could not open project %s\n" % project_name
     ide = get_ide(toc)
     if not ide:
-        print "Could not find any IDE in configuration"
-        print "Please use `qibuild config --wizard` or `qibuild config --edit`"
         return
 
     if ide.name == "Visual Studio":
@@ -84,5 +113,5 @@ def do(args):
 
     # Not supported (yet) IDE:
     mess  = "Invalid ide: %s\n" % ide.name
-    mess += "Supported IDES are: QtCreator, Visual Studio, XCode"
+    mess += "Supported IDES are: %s" % ", ".join(SUPPORTED_IDES)
     raise Exception(mess)
