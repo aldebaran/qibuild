@@ -148,8 +148,9 @@ def find_program(executable, env=None):
     else:
         env_path = os.environ["PATH"]
     for path in env_path.split(os.pathsep):
+        path = qibuild.sh.to_native_path(path)
         full_path = os.path.join(path, executable)
-        if os.access(full_path, os.X_OK):
+        if os.access(full_path, os.X_OK) and os.path.isfile(full_path):
             return full_path
         pathext = os.environ.get("PATHEXT")
         if pathext:
