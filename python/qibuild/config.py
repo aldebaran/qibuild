@@ -20,14 +20,21 @@ from StringIO import StringIO
 
 import qibuild
 
-QIBUILD_CFG_PATH = "~/.config/qi/qibuild.xml"
-QIBUILD_CFG_PATH = qibuild.sh.to_native_path(QIBUILD_CFG_PATH)
+
+def get_global_cfg_path():
+    """ Get path to global config file
+
+    """
+    res = "~/.config/qi/qibuild.xml"
+    res = qibuild.sh.to_native_path(res)
+    return res
 
 def indent(text, num=1):
     """ Helper for __str__ methods
 
     """
     return "\n".join(["  " * num + l for l in text.splitlines()])
+
 
 def raise_parse_error(message, cfg_path=None, tree=None):
     """ Raise a nice parsing error about the given
@@ -474,7 +481,7 @@ class QiBuildConfig:
 
         """
         if not cfg_path:
-            cfg_path = QIBUILD_CFG_PATH
+            cfg_path = get_global_cfg_path()
         try:
             self.tree.parse(cfg_path)
         except Exception, e:
@@ -646,7 +653,7 @@ class QiBuildConfig:
 
         """
         if not xml_path:
-            xml_path = QIBUILD_CFG_PATH
+            xml_path = get_global_cfg_path()
 
         def get_name(x):
             " helper functions to sort elements "
@@ -731,8 +738,6 @@ class ProjectConfig:
 
     def read(self, cfg_path):
         """ Read configuration from an XML file.
-
-        If None is given, use the default: QIBUILD_CFG_PATH
 
         """
         try:

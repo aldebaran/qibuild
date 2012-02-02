@@ -49,7 +49,7 @@ def do(args):
             qibuild_cfg.write()
 
         full_path = qibuild.command.find_program(editor)
-        subprocess.call([full_path, qibuild.config.QIBUILD_CFG_PATH])
+        subprocess.call([full_path, qibuild.config.get_global_cfg_path()])
         return
 
     if not toc:

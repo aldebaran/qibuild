@@ -653,7 +653,7 @@ def handle_old_qibuild_xml(worktree):
     exist
 
     """
-    global_path = qibuild.config.QIBUILD_CFG_PATH
+    global_path = qibuild.config.get_global_cfg_path()
     from xml.etree import ElementTree as etree
     local_xml_path = os.path.join(worktree, ".qi", "qibuild.xml")
     tree = etree.ElementTree()
