@@ -359,3 +359,19 @@ message.
     from a subdirectory of a project or specify the name of the project.
 
 
+Interacting with the user
+--------------------------
+
+Make sure you only ask user when you have absolutely no way
+to do something smart by default
+
+(See for instance how ``qibuild open`` ask when it has absolutely
+no choice but to ask)
+
+And when you ask, make sure the default action (pressing enter) will
+do the smart thing by default.
+
+Most people will not pay attention to the questions, (and they do not
+have to), so make the default obvious.
+
+(See for instance how ``qibuild config --wizard`` does it)
