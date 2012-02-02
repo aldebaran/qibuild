@@ -197,7 +197,7 @@ def configure_ide(qibuild_cfg, ide_name):
         configure_qtcreator(qibuild_cfg)
         return
     ide = qibuild.config.IDE()
-    ide.name = ide.name
+    ide.name = ide_name
     qibuild_cfg.add_ide(ide)
 
 def configure_local_settings(qibuild_cfg, toc):
