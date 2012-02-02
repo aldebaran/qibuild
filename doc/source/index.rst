@@ -99,6 +99,14 @@ Please also read this first:
    contrib/cmake/coding_guide
    contrib/python/coding_guide
 
+And make sure you check your code is correct
+before sending a merge request
+
+.. toctree::
+   :maxdepth: 1
+
+   contrib/running_test_suite
+
 
 qiBuild design
 --------------
