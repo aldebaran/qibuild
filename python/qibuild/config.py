@@ -607,6 +607,8 @@ class QiBuildConfig:
         """ Add a new IDE to the list
 
         """
+        if not ide.name:
+            raise Exception("ide.name cannot be None")
         self.ides[ide.name] = ide
 
     def add_to_default_path(self, to_add):
