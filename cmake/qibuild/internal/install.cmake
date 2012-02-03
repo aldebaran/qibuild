@@ -5,7 +5,7 @@
 # install with support for directory, globbing and files.
 # this function know how to handle COMPONENT and KEEP_RELATIVE_PATHS
 function(_qi_install_internal)
-  cmake_parse_arguments(ARG "KEEP_RELATIVE_PATHS" "IF;COMPONENT;DESTINATION;SUBFOLDER" "" ${ARGN})
+  cmake_parse_arguments(ARG "RECURSE;KEEP_RELATIVE_PATHS" "IF;COMPONENT;DESTINATION;SUBFOLDER" "" ${ARGN})
   if(NOT ARG_DESTINATION)
     qi_error("Invalid arguments for qi_install. Missing DESTINATION argument")
   endif()
@@ -23,6 +23,12 @@ function(_qi_install_internal)
     return()
   endif()
 
+  set(_glob_keyword)
+  if(${ARG_RECURSE})
+    set(_glob_keyword GLOB_RECURSE)
+  else()
+    set(_glob_keyword GLOB)
+  endif()
   set(_files_to_install)
   set(_dirs_to_install)
   foreach(f ${ARG_UNPARSED_ARGUMENTS})
@@ -30,7 +36,7 @@ function(_qi_install_internal)
     if(IS_DIRECTORY ${_abs_path})
       list(APPEND _dirs_to_install ${f})
     else()
-      file(GLOB_RECURSE _file_to_install RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${f})
+      file(${_glob_keyword} _file_to_install RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${f})
       if(NOT _file_to_install)
         qi_error(
 "Error when parsing qi_install arguments:
