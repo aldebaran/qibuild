@@ -16,9 +16,9 @@ class FakeToc:
     def __init__(self, active_config=None, local_config=None):
         self.active_config = active_config
         if not local_config:
-            self.cfg_path = StringIO.StringIO('<qibuild version="1"/>')
+            self.config_path = StringIO.StringIO('<qibuild version="1"/>')
         else:
-            self.cfg_path = StringIO.StringIO(local_config)
+            self.config_path = StringIO.StringIO(local_config)
 
 class OpenTestCase(unittest.TestCase):
 

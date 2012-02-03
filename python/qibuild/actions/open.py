@@ -25,7 +25,7 @@ def get_ide(toc):
     """
     qibuild_cfg = qibuild.config.QiBuildConfig(user_config=toc.active_config)
     qibuild_cfg.read()
-    qibuild_cfg.read_local_config(toc.cfg_path)
+    qibuild_cfg.read_local_config(toc.config_path)
     known_ides = qibuild_cfg.ides.values()
     ide_names  = qibuild_cfg.ides.keys()
     if not known_ides:
