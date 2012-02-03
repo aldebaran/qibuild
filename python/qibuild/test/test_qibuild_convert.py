@@ -9,7 +9,6 @@
 import os
 import unittest
 import tempfile
-from StringIO import StringIO
 
 import qibuild
 import qibuild.actions.convert
@@ -65,6 +64,36 @@ class QiBuildConvertTestCase(unittest.TestCase):
             ["--work-tree", self.tmp, "foo_1_12"])
         qibuild.run_action("qibuild.actions.make",
             ["--work-tree", self.tmp, "foo_1_12"])
+
+    def test_convert_pure_cmake(self):
+        src_pure_cmake = os.path.join(self.tmp, "src", "pure_cmake")
+        qibuild.sh.install(
+            os.path.join(self.test_dir, "src", "pure_cmake"),
+            src_pure_cmake,
+            quiet=True)
+        qibuild.run_action("qibuild.actions.convert",
+            [src_pure_cmake, "--go"])
+        qibuild.run_action("qibuild.actions.init",
+            ["--work-tree", self.tmp])
+        qibuild.run_action("qibuild.actions.configure",
+            ["--work-tree", self.tmp, "pure_cmake"])
+        qibuild.run_action("qibuild.actions.make",
+            ["--work-tree", self.tmp, "pure_cmake"])
+
+    def test_convert_no_cmake(self):
+        src_no_cmake = os.path.join(self.tmp, "src", "no_cmake")
+        qibuild.sh.install(
+            os.path.join(self.test_dir, "src", "no_cmake"),
+            src_no_cmake,
+            quiet=True)
+        qibuild.run_action("qibuild.actions.convert",
+            [src_no_cmake, "--go"])
+        qibuild.run_action("qibuild.actions.init",
+            ["--work-tree", self.tmp])
+        qibuild.run_action("qibuild.actions.configure",
+            ["--work-tree", self.tmp, "no_cmake"])
+        qibuild.run_action("qibuild.actions.make",
+            ["--work-tree", self.tmp, "no_cmake"])
 
 
     def test_fix_cmake_pure_1_10(self):

@@ -92,6 +92,8 @@ def name_from_cmakelists(cmakelists):
     """ Get a project name from a CMakeLists.txt file
 
     """
+    if not os.path.exists(cmakelists):
+        return None
     res = None
     regexp = re.compile(r'^\s*project\s*\((.*)\)', re.IGNORECASE)
     lines = list()
