@@ -124,9 +124,8 @@ function(qi_stage_cmake module_file)
        DESTINATION
        "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/")
 
-  install(FILES "${module_file}"
-      DESTINATION
-      "${QI_SDK_CMAKE}/${_module_name}/")
+  qi_install_cmake("${module_file}" SUBFOLDER "${_module_name}")
+
 endfunction()
 
 
