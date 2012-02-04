@@ -8,10 +8,16 @@ SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = build
 
+ifeq ($(wildcard qidoc/conf.py), qidoc/conf.py)
+	ALLSPHINXOPTS = -c qidoc
+else
+	ALLSPHINXOPTS =
+endif
+
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
+ALLSPHINXOPTS   += -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
 
 .PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest
 
@@ -44,11 +50,7 @@ clean:
 	@rm -rf $(BUILDDIR)/*
 
 html:
-	@if [ !  -f qidoc/conf.py ] ; then     \
-		echo "Please run qidoc first" ;  \
-		exit 1;                          \
-	fi
-	$(SPHINXBUILD) -c qidoc -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
