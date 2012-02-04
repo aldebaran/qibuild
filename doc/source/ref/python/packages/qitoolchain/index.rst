@@ -6,5 +6,7 @@ qitoolchain modules
 
     toolchain
     feed
+    remote
+    version
 
 

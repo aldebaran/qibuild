@@ -1,3 +1,5 @@
+.. _qibuild-cfg-syntax:
+
 Configuration files syntax
 ==========================
 

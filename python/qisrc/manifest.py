@@ -83,8 +83,8 @@ def  parse_manifest(manifest):
     """ Parse a manifest, cloning required repositories
     while doing so
 
-    :param wt: the worktree
     :param manifest: a manifest location (a file path or an url)
+    :return: a dictionary (name, url) of projects to clone
     """
     parser = ManifestParser()
     parser.parse(manifest)

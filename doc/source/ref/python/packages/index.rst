@@ -1,5 +1,3 @@
-.. _qibuild-python-doc:
-
 qiBuild Python packages documentation
 =====================================
 
@@ -8,4 +6,5 @@ qiBuild Python packages documentation
 
     qibuild/index
     qitoolchain/index
+    qisrc/index
 

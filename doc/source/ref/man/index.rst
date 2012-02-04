@@ -1,5 +1,7 @@
-Man Pages
-=========
+.. _qibuild-man-pages:
+
+qibild man Pages
+================
 
 
 .. toctree::

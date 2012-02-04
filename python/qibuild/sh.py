@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" sh like functions """
+""" Common filesystem operations """
 
 # Mostly wrappers around somehow strange-behaving
 # shutil functions ...
@@ -49,16 +49,17 @@ def ln(src, dst, symlink=True):
 
 def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
     """Configure a file.
-    in_path : input file
-    out_path : output file
+    :param in_path: input file
+    :parm out_path: output file
 
     The out_path needs not to exist, missing leading directories will
-    be create if necessary.
+    be created if necessary.
 
     If copy_only is True, the contents will be copied "as is".
 
-    If not, we will use the args and kwargs parameter as in:
-    in_content.format(*args, **kwargs)
+    If not, we will use the args and kwargs parameter as in::
+
+        in_content.format(*args, **kwargs)
 
     """
     mkdir(os.path.dirname(os.path.abspath(out_path)), recursive=True)
@@ -142,18 +143,19 @@ def install(src, dest, filter_fun=None, quiet=False):
     installed if filter_fun(relative/path/to/file) returns
     True.
 
-    Few notes: rewriting `cp' or `install' is a hard problem.
+    Few notes: rewriting ``cp`` or ``install`` is a hard problem.
     This version will happily erase whatever is inside dest,
     (even it the dest is readonly, dest will be erased before being
     written) and it won't complain if dest does not exists (missing
     directories will simply be created)
 
     This function will preserve relative symlinks between directories,
-    used for instance in Mac frameworks:
-    |__ Versions
-        |__ Current  -> 4.0
-        |__ 4        -> 4.0
-        |__ 4.0
+    used for instance in Mac frameworks::
+
+        |__ Versions
+            |__ Current  -> 4.0
+            |__ 4        -> 4.0
+            |__ 4.0
 
 
     """
@@ -231,10 +233,10 @@ def rmtree(path):
   them are significant.  As the directory tree is traversed, each directory
   has its mode set appropriately before descending into it.  This should
   result in the entire tree being removed, with the possible exception of
-  *path itself, because nothing attempts to change the mode of its parent.
+  ``path`` itself, because nothing attempts to change the mode of its parent.
   Doing so would be hazardous, as it's not a directory slated for removal.
   In the ordinary case, this is not a problem: for our purposes, the user
-  will never lack write permission on *path's parent.
+  will never lack write permission on ``path``'s parent.
   """
   if not os.path.exists(path):
     return
@@ -302,16 +304,16 @@ def ls_r(directory):
     """Returns a sorted list of all the files present in a diretory,
     relative to this directory.
 
-    For instance, with:
+    For instance, with::
 
-    foo
-    |-- eggs
-    |   |-- c
-    |   |-- d
-    |-- empty
-    |-- spam
-    |   |-- a
-    |   |-- b
+        foo
+        |__ eggs
+        |    |__ c
+        |    |__ d
+        |__ empty
+        |__ spam
+            |__a
+            |__b
 
     ls_r(foo) returns:
     ["eggs/c", "eggs/d", "empty/", "spam/a", "spam/b"]
@@ -336,7 +338,7 @@ def ls_r(directory):
 def which(program):
     """
     find program in the environment PATH
-    @return path to program if found, None otherwise
+    :return: path to program if found, None otherwise
     """
     import warnings
     warnings.warn("qibuild.sh.which is deprecated, "
@@ -347,10 +349,14 @@ def which(program):
 
 def run(program, args):
     """ exec a process.
-        linux: this will call exec and replace the current process
-        win  : this will call spawn and wait till the end
-        ex:
+
+    * linux: this will call exec and replace the current process
+    * windows: this will call spawn and wait till the end
+
+    Example::
+
         run("python.exe", "toto.py")
+
     """
     real_args = [ program ]
     real_args.extend(args)
@@ -409,19 +415,20 @@ def to_native_path(path):
 class TempDir:
     """This is a nice wrapper around tempfile module.
 
-    Usage:
+    Usage::
 
         with TempDir("foo-bar") as temp_dir:
             subdir = os.path.join(temp_dir, "subdir")
             do_foo(subdir)
 
     This piece of code makes sure that:
-       - a temporary directory named temp_dir has been
-     created (guaranteed to exist, be empty, and writeable)
 
-       - the directory will be removed when the scope of
-     temp_dir has ended unless an exception has occurred
-     and DEBUG environment variable is set.
+    * a temporary directory named temp_dir has been
+      created (guaranteed to exist, be empty, and writeable)
+
+    * the directory will be removed when the scope of
+      temp_dir has ended unless an exception has occurred
+      and DEBUG environment variable is set.
 
     """
     def __init__(self, name="tmp"):

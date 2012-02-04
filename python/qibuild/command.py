@@ -1,36 +1,8 @@
 ## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
-""" This modules contains few functions around subprocess
 
-
-Few notes:
-
- - for each command, we try to look the executable in PATH,
- (also using %PATHEXT% on windows), raising a NotInPath exception when
- not found.
-
- This way:
-     We can alway use:
-        - qibuild.command.call(["cmake", ..."])
-    on every platform as soon as cmake is in
-    os.environ["PATH"]
-
-    without:
-       - using shell=True
-        (although we can display it in our error message)
-       - caring about the fact that it in fact "cmake.exe" on windows:
-    but:
-        - still using native, absolute paths for the executables we run.
-        (which is nice when debugging)
-
-    Note that on windows, you can specify paths to add to %PATH% in
-    qibuild configuration file, without polluting you whole
-    environment.
-
- - Unless explicitly told not to, we alway raise an exception when
- the return code of the command is not zero.
-     Return code always matter when you are building software ;-)
+""" This module contains few functions around subprocess
 
 """
 
@@ -140,7 +112,8 @@ def find_program(executable, env=None):
     looking at PATH environment variable
     (and PATHEXT on windows)
 
-    return None if program was not found
+    :return: None if program was not found,
+      the full path to executable otherwize
     """
     full_path = None
     if env:
@@ -182,10 +155,10 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
     call will always be False.
 
     can raise:
-        - CommandFailedException if ignore_ret_code is False
+      * CommandFailedException if ignore_ret_code is False
         and returncode is non zero
-        - NotInPath  if first arg of cmd is not in %PATH%
-        - and normal exception if cwd is given and is not
+      * NotInPath  if first arg of cmd is not in %PATH%
+      * And a normal exception if cwd is given and is not
         an existing directory.
 
     If sys.stdout or sys.stderr are not a tty, only write
@@ -249,12 +222,12 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
 @contextlib.contextmanager
 def call_background(cmd, cwd=None, env=None):
     """
-    To be used in a "with" statement.
+    To be used in a "with" statement::
 
-    with call_background(...):
-       do_stuff()
+        with call_background(...):
+           do_stuff()
 
-    do_other_stuff()
+        do_other_stuff()
 
     Process is run in the background, then do_stuff()
     is called.

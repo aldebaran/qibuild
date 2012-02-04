@@ -8,6 +8,8 @@ manipulate archives.
 We will always manipulate .tar.gz archives on UNIX,
 and .zip on windows. (keeping it close to the more common
 used format of the given platform)
+
+All archives should have a unique top dir.
 """
 
 import os
@@ -35,12 +37,12 @@ class InvalidArchive(Exception):
         return self._message
 
 def extract_tar(archive_path, dest_dir):
-    """Extract a .tar.gz archive
+    """ Extract a .tar.gz archive
 
-    If topdir is not None, replace the topdir by the given
-    argument.
+    :return: path to the extracted archive
+             (dest_dir/topdir)
+
     """
-
     # Algorithm taken from tarfile.extractall():
     # First, extract everything directory in 700 mode,
     # then reverse-sort the order of the directory and
@@ -105,7 +107,12 @@ def extract_tar(archive_path, dest_dir):
 
 
 def extract_zip(archive_path, dest_dir):
-    """Extract a zip archive"""
+    """ Extract a zip archive
+    :return: path to the extracted archive
+             (dest_dir/topdir)
+
+    """
+    (dest_dir/topdir)
     dest_dir = qibuild.sh.to_native_path(dest_dir)
     LOGGER.debug("Extracting %s to %s", archive_path, dest_dir)
     archive = zipfile.ZipFile(archive_path)
@@ -150,6 +157,8 @@ def extract(archive_path, directory, topdir=None):
 
     The top directory of the archive will be replaced by topdir
     if it is given
+
+    :return: path to the extracted archive
     """
     if archive_path.endswith(".zip"):
         extract_fun = extract_zip
@@ -240,12 +249,15 @@ def archive_name(directory):
     directory would have.
     (platform-dependant)
 
-    On windows:
-        >> archive_name('foo')
-        foo.zip
-    Elsewhere:
-        >> archive_name('foo')
-        foo.tar.gz
+    On windows::
+
+      >>> archive_name('foo')
+      foo.zip
+
+    Elsewhere::
+
+      >>> archive_name('foo')
+      foo.tar.gz
     """
     if sys.platform.startswith("win"):
         return directory + ".zip"

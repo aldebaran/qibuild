@@ -49,11 +49,10 @@ class TestResult:
 def run_test(build_dir, test_name, cmd, properties, build_env):
     """ Run a test.
 
-    Return (res, output) where res is a string describing wether
-    the test was sucessul, and output is the output of the test
+    :return: (res, output) where res is a string describing wether
+      the test was sucessul, and output is the output of the test
 
     """
-
     timeout = properties.get("TIMEOUT")
     timeout = int(timeout)
     # we will merge the build env coming from toc
@@ -109,16 +108,21 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
 
 
 def run_tests(project, build_env, test_name=None):
-    """ Called by toc.test_project
-
-    Returns (ok, summary) where ok is True if all
-    test passed, and summary is a nice summary of what happened:
-
-    ran 10 tests, 2 failures:
-        * test_foo
-        * test_bar
+    """ Called by :py:meth:`qibuild.toc.Toc.test_project`
 
     :param test_name: If given, only run this test
+
+    Always write some XML files in build-test/results
+    (even if they were no tests to run at all)
+
+    :return: (ok, summary) where ok is True if all
+             test passed, and summary is a nice summary
+             of what happened::
+
+                ran 10 tests, 2 failures:
+                    * test_foo
+                    * test_bar
+
     """
     build_dir = project.build_directory
     results_dir = os.path.join(project.directory, "build-tests",

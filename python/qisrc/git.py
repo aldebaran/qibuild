@@ -337,7 +337,7 @@ class Git:
         """
         Returns true if working dir is clean.
         Nothing to commit, no untracked files
-        /!\ : there could be a lot of false negatives ...
+        .. warning:: there could be a lot of false negatives ...
         """
         if untracked:
             lines = self.cmd.call_output("status", "-s")
@@ -471,9 +471,13 @@ class Git:
         """
         clean working dir
 
-        examples:
-        git.clean(args=["-fd"])
-        git.clean(args=["-fdx"]) # also dele files in .gitignore
+        examples::
+
+            # remove files and directories
+            git.clean("--force", "-d")
+
+            # also delete files matching .gitignore
+            git.clean("--force", "-d", "-x")
         """
         self.cmd.check_call("clean", *args)
 

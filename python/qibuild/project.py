@@ -9,10 +9,12 @@ handle them
 A project is simply a directory in a worktree containing a qibuild.manifest
 file.
 
-The toc object is able to:
-    - update a project to set cmake flags, build directory and so on
-    - bootstrap the project to generate the dependencies.cmake used
-    by the qibuild CMake framework
+The :py:class:`toc` object is able to:
+ * update a project to set cmake flags, build directory and so on
+   (see :py:func:`update_project`
+ * bootstrap the project to generate the dependencies.cmake used
+   by the qibuild CMake framework
+   (see :py:func:`bootstrap_project`)
 
 
 """
@@ -26,14 +28,8 @@ LOGGER = logging.getLogger("qibuild.toc.project")
 
 
 class Project:
-    """ Store information about a project:
-         - name
-         - source directory
-         - build directory
-         - build configuration
-         - dependencies
-         - config (read from the qiproject.xml file from the
-                        source directory)
+    """ Store information about a :term:`project`
+
     """
     def __init__(self, name, directory):
         self.name       = name
@@ -144,11 +140,6 @@ def version_from_directory(project_dir):
 def update_project(project, toc):
     """ Update a project using a Toc instance:
 
-    This will set:
-        project.cmake_flags
-        project.sdk_directory
-        project.build_directory
-
     This is to be called right after the toc object has
     been created, to be sure that the settings are consistent
     among all the projects.
@@ -201,10 +192,6 @@ def update_project(project, toc):
 def bootstrap_project(project, toc):
     """ Create the magic build/dependencies.cmake file
 
-    This is to be called right before calling cmake
-    inside the project build directory, not before
-    because we need to know about all the other projects
-    inside the Toc oject to get the list of SDK dirs, for instance.
 
     """
     # To be written in dependencies.cmake

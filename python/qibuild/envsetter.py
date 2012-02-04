@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-r""" This module contains the EnvSetter class,
+r""" This module contains the :py:class:`EnvSetter` class,
 designed to take care of environment variables.
 
 
@@ -27,16 +27,14 @@ class EnvSetter():
         # NOT change
         qibuild.command.call("cmake", env=build_env)
 
-    Note1: this will work even in cmake was not in %PATH% before,
-    because we will use build_env when searching for 'cmake'.
-    see qibuild.command.call documentation
+    Notes:
 
-    Note2: this is a nice way to set cmake (or git) in a config file
-    withouth to mess up with %PATH% on windows
+    * this will work even in cmake was not in %PATH% before,
+      because we will use build_env when searching for 'cmake'.
+      (see :py:func:`qibuild.command.call` documentation)
 
-    Note3: the source_bat() function is mandatory to use cl.exe and
-    NMake Makefiles. (you usually have to source vsvarsall.bat)
-
+    * the :py:meth:`source_bat` function is useful to use cl.exe and
+      NMake Makefiles. In this case, you have to source vsvarsall.bat.
 
     """
     # Note: always use .copy() when working with dict, else you end up
@@ -99,8 +97,7 @@ class EnvSetter():
     def source_bat(self, bat_file):
         """Set environment variables using a .bat script
 
-        Note: right now, this only works well with vcvarsall.bat scripts in
-        fact,
+        Note: right now, this only works well with vcvarsall.bat scripts.
 
         """
         # Quick hack to get env vars from a .bat script
@@ -144,7 +141,7 @@ class EnvSetter():
 
 
     def read_config(self, qibuild_cfg):
-        """ Read a qibuild config instance
+        """ Read a :py:class:`qibuild.config.QiBuildConfig` instance
 
         """
         path_env = qibuild_cfg.env.path

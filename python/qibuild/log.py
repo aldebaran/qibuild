@@ -1,7 +1,7 @@
 ## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
-"""Few useful functions for loggging,
+"""Few useful functions for logging,
 featuring a loghandler using colors
 (depends on pyreadline for this to work on windows)
 

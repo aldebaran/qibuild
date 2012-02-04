@@ -28,11 +28,12 @@ def callback(total, done):
     sys.stdout.flush()
 
 def get_server_access(server_name):
-    """ Get username and password for a remote site.
+    """ Get server access for a remote site.
 
-    cfg_path should be the path to the global qibuild.xml
-    config file, or NONE if you want to use the default
-    ~/.config/qi/qibuild.xml
+    :param server: A :ref:`qibuild-xml-node-server` in
+                   the global qibuild xml configuration file
+
+    :return: A ``qibuild.config.Access`` instance
 
     """
     qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -43,6 +44,11 @@ def get_server_access(server_name):
 
 def get_ftp_access(server_name):
     """ Get ftp password from the config file
+
+    :param server: A :ref:`qibuild-xml-node-server` in
+                   the global qibuild xml configuration file
+
+    :return: A ``qibuild.config.Access`` instance
 
     """
     access = get_server_access(server_name)
@@ -73,7 +79,8 @@ def authenticated_urlopen(location):
 
 def open_remote_location(location):
     """ Open a file from an url
-    Returns a file-like object
+
+    :return: a file-like object
 
     """
     #pylint: disable-msg=E1103
@@ -106,14 +113,19 @@ def download(url, output_dir,
     """ Download a file from an url, and save it
     in output_dir.
 
-    The name of the file will be the basename of the url, unless
-    output_name is given
-    and a nice progressbar will be printed during the download
+    :param output_name: The name of the file will be the basename of the url,
+        unless output_name is given
 
-    If clobber is False, the file won't be overwritten if it
-    already exists
+    :param callback: callback to use to show download progress.
+        By default :py:func:`qitoolchain.remote.callback` is called
 
-    Returns the path to the downloaded file
+    :param message: a message to print right before displaying progress
+        bar.
+
+    :param clobber: If False, the file won't be overwritten if it
+        already exists (True by default)
+
+    :return: the path to the downloaded file
 
     """
     qibuild.sh.mkdir(output_dir, recursive=True)

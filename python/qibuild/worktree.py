@@ -62,13 +62,20 @@ def work_tree_parser(parser):
 
 
 class WorkTree:
-    """ This class represent a Qi worktree.
-        - work_tree
-        - buildable projects
-        - git projects
+    """ This class represent a :term:`worktree`
+
     """
 
     def __init__(self, work_tree, path_hints=None):
+        """
+        Construct a new worktree
+
+        :param work_tree: The directory to be used as a worktree.
+        :param path_hints: Some additional directories to be
+                              used when searching for projects.
+        :raise: WorkTreeException if two projects have the same name or
+                    if two git directories have the same basename
+        """
         self.work_tree          = work_tree
 
         self.buildable_projects = dict()
@@ -135,16 +142,12 @@ class WorkTree:
 
 
 def worktree_open(work_tree=None):
-    """ Open a qi worktree.
+    """
+    Open a qi worktree.
 
-        Return a valid WorkTree instance.
+    :return: a valid :py:class:`WorkTree` instance.
+             If worktree is None, guess it from the current working dir.
 
-        The WorkTree instance will have the following important members
-        initialized:
-         qiwt.buildable_projects  : a list of Project instances
-         qiwt.git_projects        : al list of git repositories
-
-        If worktree is None, guess it from the current working dir.
     """
     path_hints = list()
     if not work_tree:

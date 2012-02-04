@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" This module contains the Toc class.
+""" This module contains the :py:class:`qibuild.toc.Toc` class.
 which is where all the 'magic' happens ....
 
 """
@@ -64,22 +64,22 @@ class InstallFailed(Exception):
 
 
 class Toc(WorkTree):
-    """This class contains a list of packages, and a list of projects.
-
-    It is also capable of sorting dependencies.
-
-    It also store various configurations, to be sure it is consistent
-    across the projects.
-
-    This class also contains "high-level" functions.
+    """
+    This class inherits from :py:class:`qibuild.worktree.WorkTree`,
+    so it has a list of projects.
 
     Example of use:
 
-        toc = Toc("/path/to/work/tree", "release", ...)
+    .. code-block:: python
+
+        toc = Toc("/path/to/work/tree", build_type="release")
+
         # Look for the foo project in the worktree
         foo = toc.get_project("foo")
+
         # Resolve foo dependencies, call cmake on each of them,
         toc.configure_project(foo)
+
         # Build the foo project, building all the dependencies in
         # the correct order:
         toc.build_project(foo)
@@ -94,13 +94,17 @@ class Toc(WorkTree):
             active_projects=None,
             solve_deps=True):
         """
-            work_tree       : see WorkTree.__init__
-            path_hints      : see WorkTree.__init__
+        Create a new Toc object. Most of the keyargs come directly from
+        the command line. (--wortree, --debug, -c, etc.)
 
-            build_type      : a build type, could be debug or release (defaults to debug)
-            cmake_flags     : optional additional cmake flags
-            cmake_generator : optional cmake generator (defaults to Unix Makefiles)
-            active_projects : the projects excplicitely specified by user
+        :param work_tree:  see :py:meth:`qibuild.worktree.WorkTree.__init__`
+        :param path_hints: see :py:meth:`qibuild.worktree.WorkTree.__init__`
+        :param build_type: a build type, could be debug or release
+                           (defaults to debug)
+        :param cmake_flags:     optional additional cmake flags
+        :param cmake_generator: optional cmake generator
+                         (defaults to Unix Makefiles)
+        :param active_projects: the projects excplicitely specified by user
         """
         WorkTree.__init__(self, work_tree, path_hints=path_hints)
         # The local config file in which to write
@@ -265,9 +269,11 @@ class Toc(WorkTree):
         self.build_folder_name = "-".join(res)
 
     def get_project(self, project_name):
-        """Return a project from a name.
+        """ Get a project from a name.
 
-        Raise a TocException if the project was not found
+        :return: A vali :py:class:`qibuild.project.Project` instance
+        :raise: a TocException if the project was not found
+
         """
         res = [p for p in self.projects if p.name == project_name]
         if len(res) == 1:
@@ -287,6 +293,7 @@ class Toc(WorkTree):
         If a name is both in source and in package, use the package
         (saves compile time), unless user asked explicitely for a list
         of projects
+
         """
         dirs = list()
 
@@ -324,8 +331,27 @@ class Toc(WorkTree):
 
     def resolve_deps(self, runtime=False):
         """ Return a tuple of three lists:
-        (projects, package, not_foud), see qibuild.dependencies_solver
-        for more documentation.
+        (projects, package, not_foud), see :py:mod:`qibuild.dependencies_solver`
+        for more information.
+
+        Note that the result depends on how the Toc object has been built.
+
+        For instance, assuming you have 'hello' depending on 'world', and
+        'world' is also a package, you will get:
+
+        (['hello'], ['world'], [])  if user used
+
+        .. code-block:: console
+
+           $ qibuild configure hello
+
+        but:
+
+        (['world', 'hello], [], []) if user used:
+
+        .. code-block:: console
+
+           $ qibuild configure world hello
 
         """
         if not self.solve_deps:
@@ -338,19 +364,22 @@ class Toc(WorkTree):
                                     runtime=runtime)
 
     def configure_project(self, project, clean_first=True):
-        """ Call cmake with correct options
+        """ Call cmake with correct options.
 
-        Note: the cmake flags (CMAKE_BUILD_TYPE, or the -D args coming
-        from qibuild configure -DFOO_BAR) have already been passed via
-        the toc object. See qibuild.toc.toc_open() and the ctor of
-        Project for the details.
+        Few notes:
 
-        Note2: if toolchain file is not None, the flag CMAKE_TOOLCHAIN_FILE
-            will be set.
+          * The cmake flags (``CMAKE_BUILD_TYPE``, or the ``-D`` args coming
+            from ``qibuild configure -DFOO_BAR``) have already been passed
+            via the toc object. See :py:func:`qibuild.toc.toc_open` and the
+            ``qibuild.project.Project`` for the details.
 
-        Note3: if clean_first is False, we won't delete CMake's cache.
-        This is mainly useful when you are calling cmake NOT from
-        `qibuild configure'.
+          * If toolchain file is not None, the flag CMAKE_TOOLCHAIN_FILE
+              will be set.
+
+          * If clean_first is False, we won't delete CMake's cache.
+            This is mainly useful when you are calling cmake NOT from
+            `qibuild configure`.
+
         """
         if not os.path.exists(project.directory):
             raise TocException("source dir: %s does not exist, aborting" % project.directory)
@@ -401,7 +430,10 @@ class Toc(WorkTree):
 
 
     def build_project(self, project, incredibuild=False, num_jobs=1, target=None, rebuild=False):
-        """Build a project, choosing between  Nmake, Visual Studio or make
+        """ Build a project.
+
+        Usually we will simply can ``cmake --build``, but for incredibuild
+        we need to call `BuildConsole.exe` with an sln.
 
         """
         build_dir = project.build_directory
@@ -458,7 +490,18 @@ class Toc(WorkTree):
 
 
     def install_project(self, project, destdir, runtime=False):
-        """Install the project """
+        """ Install the project
+
+        :param project: project name.
+        :param destdir: destination. Note that when using `qibuild install`,
+          we will first call `cmake` to make sure `CMAKE_INSTALL_PREFIX` is
+          ``/``. But this function simply calls ``cmake --target install``
+          in the simple case.
+        :param runtime: Whether to install the project as a runtime
+           package or not.
+           (see :ref:`cmake-install` section for the details)
+
+        """
         build_dir = project.build_directory
         self.build_env["DESTDIR"] = destdir
         try:
@@ -531,8 +574,17 @@ def _projects_from_args(toc, args):
 
 
 def toc_open(work_tree, args=None):
-    """ Open a toc work_tree.
+    """ Creates a :py:class:`Toc` object.
 
+    :param worktree: The worktree to be used. (see :py:class:`qibuild.worktree.WorkTree`)
+    :param args: an ``argparse.NameSpace`` object containing
+     the arguments passed from the comand line.
+
+    You should always use this function to call Toc methods from
+    a qibuild :term:`action`.
+
+    It takes care of all the options you specify from command line,
+    and calls Toc constructor accordingly (see :py:meth:`Toc.__init__`)
     """
     # Not that args can come from:
     #    - a work_tree parser

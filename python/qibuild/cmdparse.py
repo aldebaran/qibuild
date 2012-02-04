@@ -2,32 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-"""Tools to parse command lines.
-
-For instance, after
-
-    qibuild make --release foo
-
-- look for a module named make.py
-- configure a parser using the configure_parser() of the make.py module
-- parse the arguments
-- call the do() method of make.py with
-  arg.release = True
-  arg.prohect = "foo"
-
-
-The main methods are:
-
- - run_action()
-    Use this to call an action from another piece of code.
-
- - root_command_main() and action_modules_from_package()
-    Use this write a script able to load several actions, see
-bin/qibuild for an example)
-
-This also contains the default_parser() functions, to be
-sure every script you write will understand --pdb, --verbose and so on...
-
+""" Tools to related to command line parsing
 
 """
 
@@ -103,11 +78,12 @@ def parse_args_for_help(args):
 
 
 def run_action(module_name, args=None, forward_args=None):
-    """Run an action using its module path and a list of arguments
+    """
+    Run an action using its module path and a list of arguments
 
     If forward_args is given, it must be an argparse.Namespace object.
-        This namespace will be merged with args before being
-        passed to the do() method of module_name.
+    This namespace will be merged with args before being
+    passed to the do() method of module_name.
 
     """
     if not args:

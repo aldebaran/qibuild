@@ -8,126 +8,87 @@ qibuild.toc -- TOC means Obvious Compilation
 qibuild.toc.Toc
 ---------------
 
-.. py:class:: Toc(work_tree[ , path_hints=None, config=None, build_type="debug", cmake_flags=None, cmake_generator=None)
-
-    This class inherits from :py:class:`qibuild.worktree.WorkTree`,
-    so it has a list of projects.
-
-    It contains "high-level" functions.
-
-    Example of use:
-
-    .. code-block:: python
-
-        toc = Toc("/path/to/work/tree", build_type="release")
-
-        # Look for the foo project in the worktree
-        foo = toc.get_project("foo")
-
-        # Resolve foo dependencies, call cmake on each of them,
-        toc.configure_project(foo)
-
-        # Build the foo project, building all the dependencies in
-        # the correct order:
-        toc.build_project(foo)
+.. autoclass:: Toc
 
 
-    It also manages build configurations (see :ref:`toc-configuration`)
-    cmake flags (see :ref:`handling-cmake-flags`), and dependencies
-    resolution.
+Since the class is huge, documentation of the Toc class
+has been splitted in several parts:
+
+* :ref:`toc-init`
+* :ref:`toc-compilation-methods`
+* :ref:`toc-configuration`
+* :ref:`toc-dependencies-resolution`
+* :ref:`toc-attributes`
+
+.. _toc-init:
+
+Initialisation
++++++++++++++++
+
+.. automethod:: Toc.__init__
 
 
-    .. py:attribute:: toolchain
+.. _toc-dependencies-resolution:
 
-       A :py:class:`qitoolchain.toolchain.Toolchain` instance.
-       Will be built from the active configuration name.
+Dependency resolution
++++++++++++++++++++++
 
-       Thus, ``self.toolchain.toolchain_file`` can be passed as
-       `-DCMAKE_TOOLCHAIN_FILE` argument when calling
-       :py:meth:`Toc.configure_project`, and
-       ``self.toolchain.packages`` can be used to install contents
-       of binary packages when calling :py:meth:`Toc.install_project`
+.. automethod:: Toc.resolve_deps
 
 
-    .. py:method:: resolve_deps([runtime=False])
-
-        Return a tuple of three lists:
-        (projects, package, not_foud), see :py:mod:`qibuild.dependencies_solver`
-        for more information.
-
-        Note that the result depends on how the Toc object has been built.
-
-        For instance, assuming you have 'hello' depending on 'world', and
-        'world' is also a package, you will get:
-
-        (['hello'], ['world'], [])  if user used
-
-        .. code-block:: console
-
-           $ qibuild configure hello
-
-        but:
-
-        (['world', 'hello], [], []) if user used:
-
-        .. code-block:: console
-
-           $ qibuild configure world hello
-
-
+.. _toc-compilation-methods:
 
 Compilation related methods
 +++++++++++++++++++++++++++
 
+Note : to use these method you must have a valid
+:py:class:`qibuild.project.Project` instance.
 
-.. py:method:: Toc.configure_project(project[, clean_first=True)
+You can get one using :py:meth:`Toc.get_project` method
 
-      Call cmake with correct options.
+.. automethod:: Toc.get_project
 
-      Few notes:
+.. automethod:: Toc.get_sdk_dirs
 
-      * The cmake flags (``CMAKE_BUILD_TYPE``, or the ``-D`` args coming
-        from ``qibuild configure -DFOO_BAR``) have already been passed
-        via the toc object. See :py:func:`qibuild.toc.toc_open` and the
-        ``qibuild.project.Project`` for the details.
+.. automethod:: Toc.configure_project
 
-      * If toolchain file is not None, the flag CMAKE_TOOLCHAIN_FILE
-          will be set.
+.. automethod:: Toc.build_project
 
-      * If clean_first is False, we won't delete CMake's cache.
-        This is mainly useful when you are calling cmake NOT from
-        `qibuild configure`.
+.. automethod:: Toc.install_project
 
+.. automethod:: Toc.test_project
 
-.. py:method:: Toc.build_project(self, project[, incredibuild=False, num_jobs=1, target=None, rebuild=False])
+.. _toc-attributes:
 
-    Build a project.
+Attributes
++++++++++++
 
-    Usually we will simply can ``cmake --build``, but for incredibuild
-    we need to call `BuildConsole.exe` with an sln.
+This is only a small list of :py:class:`Toc` attributes.
 
-.. py:method:: Toc.test_project(self, project[, verbose_tests=False, test_name=None])
+.. py:attribute:: Toc.active_config
 
-      Run ctest on a project
+   See :ref:`toc-configuration`
 
-      :param verbose_tests: Print the output of the tests
-        (calling ``ctest -VV``)
-      :param test_name: If given and not None, run only this
-        test name
+.. py:attribute:: Toc.config
 
+   A :py:class:`qibuild.config.QiBuildConfig` instance.
 
-.. py:method:: Toc.install_project(self, project, destdir[ , runtime=False)
+.. py:attribute:: Toc.projects
 
-    Install the project
+   List of objects of type :py:class:`qibuild.project.Project`
+   this is updated using :py:attr:`qibuild.worktree.WorkTree.buildable_projects`
 
-    :param project: project name.
-    :param destdir: destination. Note that when using `qibuild install`,
-      we will first call `cmake` to make sure `CMAKE_INSTALL_PREFIX` is
-      ``/``. But this function simply calls ``cmake --target install``
-      in the simple case.
-    :param runtime: Whether to install the project as a runtime
-       package or not.
-       (see :ref:`cmake-install` section for the details)
+.. py:attribute:: Toc.toolchain
+
+   A :py:class:`qitoolchain.toolchain.Toolchain` instance.
+   Will be built from the active configuration name.
+
+   Thus, ``self.toolchain.toolchain_file`` can be passed as
+   `-DCMAKE_TOOLCHAIN_FILE` argument when calling
+   :py:meth:`configure_project`, and
+   ``self.toolchain.packages`` can be used to install contents
+   of binary packages when calling :py:meth:`install_project`
+
 
 .. _toc-configuration:
 
@@ -151,17 +112,30 @@ qibuild.toc.toc_open
 ++++++++++++++++++++
 
 
-.. py:function:: toc_open(worktree[, args=None)
+.. autofunction:: qibuild.toc.toc_open
 
-   Creates a Toc object.
+Typical usage from an action is:
 
-   :param worktree: The worktree to be used. (see :py:class:`qibuild.worktree.WorkTree`)
-   :param args: an ``argparse.NameSpace`` object containing
-    the arguments passed from the comand line.
+.. code-block:: python
 
-   You should always use this function to call Toc methods from
-   a qibuild :term:`action`.
+    def configure_parser(parser):
+        # Add -c option
+        qibuild.parsers.toc_parser(parser)
 
-   It takes care of all the options you specify from command line,
-   and calls Toc constructor accordingly
+        # Add --release, --cmake-generator, -j options:
+        qibuild.parsers.build_parser(parser)
+
+        # Handle specifing zero, one or several project names
+        # on the command line
+        qibuild.parser.project_parser(parse)
+
+
+    def do(args):
+        toc = qibuild.toc.toc_open(args.work_tree, args)
+        (project_names, _package_names, _not_found) = toc.resolve_deps()
+
+        for project_name in project_nanes:
+            project = toc.get_project(project_name)
+            # Do something with 'project'
+
 

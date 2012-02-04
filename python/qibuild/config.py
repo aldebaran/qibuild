@@ -443,7 +443,10 @@ class Config:
 
 
 class QiBuildConfig:
+    """ A class to represent both local and global
+    qibuild.xml configuration files
 
+    """
     def __init__(self, user_config=None):
         self.tree = etree.ElementTree()
         self.defaults = Defaults()
