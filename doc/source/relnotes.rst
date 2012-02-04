@@ -55,23 +55,6 @@ Full Changelog
 1.12.1
 ++++++
 
-
-
-Python
-~~~~~~
-
-* Remove deprecated warning message when using python 2.6.1 on Mac
-* qibuild.archive: by-pass python2.6 bugs
-* qibuild.archive.zip_win: actually compress the archive
-* qibuild.sh.to_native_path: follow symlinks
-* qibuild.sh.rm : use rmtree from gclient
-* qibuild.worktree: do not go through nested qi worktrees
-* qibuild.command: use NotInPath in qibuild.call
-* qibuild.toc.get_sdk_dirs: fix generation of dependencies.cmake in
-  some corner cases
-* qibuild.Project: add a nice __repr__ method
-* qibuild does not crashes when an exception is raised which contains '%' (#6205)
-
 Command line
 ~~~~~~~~~~~~
 
@@ -94,15 +77,6 @@ Command line
 * ``qisrc pull`` now call ``qisrc fetch`` first (#204)
 * ``qitoolchain create``: prevent user to create bad toolchain names
 
-Configuration files
-~~~~~~~~~~~~~~~~~~~
-
-* Use XML configuration everywhere, conversion is done by qibuild on the fly
-  for .qi/qibuild.cfg and <project>/qibuild.manifest
-* Path in the configuration files are now **preprend** to the
-  OS environment variables instead of being appended.
-* Add a small tool to convert to new XML config (tools/convert-config)
-
 CMake
 ~~~~~
 
@@ -121,6 +95,30 @@ CMake
   * qtmobility, qtxmlpatterns, qt_qtscript, qtsvg
   * qxt-core, qtxt-newtork
   * pythonqt
+
+Configuration files
+~~~~~~~~~~~~~~~~~~~
+
+* Use XML configuration everywhere, conversion is done by qibuild on the fly
+  for .qi/qibuild.cfg and <project>/qibuild.manifest
+* Path in the configuration files are now **preprend** to the
+  OS environment variables instead of being appended.
+* Add a small tool to convert to new XML config (tools/convert-config)
+
+Python
+~~~~~~
+
+* Remove deprecated warning message when using python 2.6.1 on Mac
+* qibuild.archive: by-pass python2.6 bugs
+* qibuild.archive.zip_win: actually compress the archive
+* qibuild.sh.to_native_path: follow symlinks
+* qibuild.sh.rm : use rmtree from gclient
+* qibuild.worktree: do not go through nested qi worktrees
+* qibuild.command: use NotInPath in qibuild.call
+* qibuild.toc.get_sdk_dirs: fix generation of dependencies.cmake in
+  some corner cases
+* qibuild.Project: add a nice __repr__ method
+* qibuild does not crashes when an exception is raised which contains '%' (#6205)
 
 Misc:
 ~~~~~
