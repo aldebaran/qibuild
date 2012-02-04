@@ -33,6 +33,26 @@ General
   bad because we may generate public documentation from those
   doc strings one day.
 
+Doc strings
+------------
+
+Right now the state of the docstrings inside qiBuild are quite a mess.
+But you should try to write docstrings as if all of then were going
+to be use with `sphinx autodoc extension <http://sphinx.pocoo.org/ext/autodoc.html>`_.
+
+So the canonical docstring should look like:
+
+.. code-block:: python
+
+    def foo(bar, baz):
+        """ Does this and that
+        :param bar: ...
+        :param baz: ...
+
+        :raise: MyError if ...
+        :return: True if ...
+
+        """
 
 For easy code re-use
 --------------------

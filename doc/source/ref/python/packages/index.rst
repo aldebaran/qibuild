@@ -1,3 +1,5 @@
+.. _qibuild-python-packages:
+
 qiBuild Python packages documentation
 =====================================
 
