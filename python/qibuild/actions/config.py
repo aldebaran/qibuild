@@ -27,12 +27,12 @@ def do(args):
     except qibuild.toc.TocException:
         pass
 
-    qibuild_cfg = qibuild.config.QiBuildConfig()
-    qibuild_cfg.read()
-
     if args.wizard:
         run_config_wizard(toc)
         return
+
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
 
     if args.edit:
         editor = qibuild_cfg.defaults.env.editor
@@ -83,10 +83,11 @@ def guess_cmake(qibuild_cfg):
     """
     build_env = qibuild.config.get_build_env()
     cmake = qibuild.command.find_program("cmake", env=build_env)
-    if sys.platform.startswith("win"):
+    platform = qibuild.get_platform()
+    if platform == "windows":
         # FIXME: loook for it in registry
         pass
-    if sys.platform.startswith("darwin"):
+    if platform == "mac":
         # FIXME: hard-code some path in /Applications
         pass
 
@@ -105,13 +106,7 @@ def guess_cmake(qibuild_cfg):
     qibuild_cfg.write()
     return cmake
 
-def guess_cmake_generators(cmake):
-    """ Use cmake --help to get the list of cmake
-    generators
-
-    """
-
-def ask_cmake_generator(cmake):
+def ask_cmake_generator():
     """ Ask the user to choose a cmake generator
 
     """
@@ -126,9 +121,10 @@ def ask_ide(qibuild_cfg):
 
     """
     ides = ["QtCreator", "Eclipse CDT"]
-    if sys.platform.startswith("win32"):
+    platform = qibuild.get_platform()
+    if platform == "windows":
         ides.append("Visual Studio")
-    if sys.platform == "darwin":
+    if platform == "mac":
         ides.append("Xcode")
     ide = qibuild.interact.ask_choice(ides,
         "Please choose an IDE")
@@ -145,6 +141,11 @@ def configure_qtcreator(qibuild_cfg):
     qtcreator_path = qibuild.command.find_program("qtcreator", env=build_env)
     if qtcreator_path:
         print "Found QtCreator: ", qtcreator_path
+        mess  = "Do you want to use qtcreator from %s ?\n" % qtcreator_path
+        mess += "Answer 'no' if you installed qtcreator from Nokia's installer"
+        answer = qibuild.interact.ask_yes_no(mess, default=True)
+        if not answer:
+            qtcreator_path = None
     else:
         print "QtCreator NOT found"
     if not qtcreator_path:
@@ -226,11 +227,17 @@ def run_config_wizard(toc):
 
     """
     qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg_path = qibuild.config.get_global_cfg_path()
+    if not os.path.exists(qibuild_cfg_path):
+        to_create = os.path.dirname(qibuild_cfg_path)
+        qibuild.sh.mkdir(to_create, recursive=True)
+        with open(qibuild_cfg_path, "w") as fp:
+            fp.write('<qibuild version="1" />\n')
     qibuild_cfg.read()
 
     # Ask for a default cmake generator
     cmake = guess_cmake(qibuild_cfg)
-    generator = ask_cmake_generator(cmake)
+    generator = ask_cmake_generator()
     qibuild_cfg.defaults.cmake.generator = generator
 
     ide = ask_ide(qibuild_cfg)
