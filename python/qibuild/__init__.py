@@ -8,7 +8,7 @@ and building projects.
 """
 
 import os
-import re
+import sys
 import logging
 
 from qibuild import archive
@@ -34,3 +34,11 @@ from qibuild.cmdparse import run_action
 
 
 QIBUILD_ROOT_DIR  = os.path.dirname(os.path.abspath(__file__))
+
+def get_platform():
+    if sys.platform.startswith("linux"):
+        return "linux"
+    if sys.platform.startswith("win"):
+        return "windows"
+    if sys.platform == "darwin":
+        return "mac"
