@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" testing for qibuild config --wizard
+""" testing for qibuild.wizard.run_config_wizard
 
 """
 
@@ -15,7 +15,7 @@ import unittest
 import mock
 
 import qibuild
-import qibuild.actions.config
+import qibuild.wizard
 
 class FakeInteract:
     """ A class to control qibuild.interact behavior
@@ -139,7 +139,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         """ Run the wizard, return the QiBuildConfig object
 
         """
-        qibuild.actions.config.run_config_wizard(toc)
+        qibuild.wizard.run_config_wizard(toc)
         qibuild_cfg = qibuild.config.QiBuildConfig()
         qibuild_cfg.read()
         return qibuild_cfg

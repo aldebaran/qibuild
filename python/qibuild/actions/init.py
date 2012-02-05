@@ -7,6 +7,7 @@ import os
 import logging
 
 import qibuild
+import qibuild.wizard
 
 LOGGER = logging.getLogger(__name__)
 
@@ -48,6 +49,6 @@ def do(args):
     if not args.interactive:
         return
 
-    qibuild.actions.config.run_config_wizard(toc)
+    qibuild.wizard.run_config_wizard(toc)
 
 
