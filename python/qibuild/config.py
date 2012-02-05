@@ -626,9 +626,10 @@ class QiBuildConfig:
 
         """
         default_env_path = self.defaults.env.path
-        if not default_env_path:
-            default_env_path = ""
-        splitted_paths = default_env_path.split(os.pathsep)
+        if default_env_path:
+            splitted_paths = default_env_path.split(os.pathsep)
+        else:
+            splitted_paths = list()
         to_add = qibuild.sh.to_native_path(to_add)
         if to_add not in splitted_paths:
             splitted_paths.insert(0, to_add)
