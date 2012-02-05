@@ -14,11 +14,7 @@ def get_known_cmake_generators():
     configured in ~/.config/qi/qibuild.xml
 
     """
-    qibuild_cfg = qibuild.config.QiBuildConfig()
-    qibuild_cfg.read()
-    envsetter = qibuild.envsetter.EnvSetter()
-    envsetter.read_config(qibuild_cfg)
-    build_env = envsetter.get_build_env()
+    build_env = qibuild.config.get_build_env()
     cmake = qibuild.command.find_program("cmake", env=build_env)
     if not cmake:
         raise Exception("Could not find cmake executable\n"
