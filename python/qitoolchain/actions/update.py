@@ -19,7 +19,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """ Configure parser for this action """
-    qibuild.cmdparse.default_parser(parser)
+    qibuild.parsers.default_parser(parser)
     parser.add_argument("name", nargs="?", metavar="NAME",
         help="Update only this toolchain")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",

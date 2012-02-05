@@ -39,7 +39,7 @@ def do(args):
         print "Could not find CMakeCache for project %s" % project_name
         print "Try using `qibuild configure` first"
         sys.exit(2)
-    cache = qibuild.read_cmake_cache(cmake_cache)
+    cache = qibuild.cmake.read_cmake_cache(cmake_cache)
     u_package = package.upper()
 
     u_package_dir = cache.get(u_package + "_DIR")

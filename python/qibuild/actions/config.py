@@ -75,21 +75,13 @@ def do(args):
             print qibuild.config.indent(str(project.config), 2)
 
 
-def get_build_env(qibuild_cfg):
-    """ Return the build environnment as read from
-    qibuild config
-
-    """
-    envsetter = qibuild.envsetter.EnvSetter()
-    envsetter.read_config(qibuild_cfg)
-    return envsetter.get_build_env()
 
 
 def guess_cmake(qibuild_cfg):
     """ Try to find cmake
 
     """
-    build_env = get_build_env(qibuild_cfg)
+    build_env = qibuild.config.get_build_env()
     cmake = qibuild.command.find_program("cmake", env=build_env)
     if sys.platform.startswith("win"):
         # FIXME: loook for it in registry
@@ -118,35 +110,12 @@ def guess_cmake_generators(cmake):
     generators
 
     """
-    process = subprocess.Popen([cmake, "--help"],
-        stdout=subprocess.PIPE)
-    (out, err) = process.communicate()
-    intersting = False
-    intersting_lines = list()
-    magic_line = "The following generators are available on this platform:"
-    # pylint: disable-msg=E1103
-    for line in out.splitlines():
-        if line == magic_line:
-            intersting = True
-            continue
-        if intersting:
-            intersting_lines.append(line)
-    to_parse = ""
-    for line in intersting_lines:
-        to_parse += line.strip()
-        if "=" in line:
-            to_parse += "\n"
-    res = list()
-    for line in to_parse.splitlines():
-        generator = line.split("=")[0]
-        res.append(generator.strip())
-    return res
 
 def ask_cmake_generator(cmake):
     """ Ask the user to choose a cmake generator
 
     """
-    cmake_generators = guess_cmake_generators(cmake)
+    cmake_generators = qibuild.cmake.get_known_cmake_generators()
     cmake_generator = qibuild.interact.ask_choice(cmake_generators,
         "Please choose a generator")
 
@@ -172,7 +141,7 @@ def configure_qtcreator(qibuild_cfg):
     """
     ide = qibuild.config.IDE()
     ide.name = "QtCreator"
-    build_env = get_build_env(qibuild_cfg)
+    build_env = qibuild.config.get_build_env()
     qtcreator_path = qibuild.command.find_program("qtcreator", env=build_env)
     if qtcreator_path:
         print "Found QtCreator: ", qtcreator_path

@@ -233,7 +233,7 @@ def clean_up(args):
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.cmdparse.default_parser(parser)
+    qibuild.parsers.default_parser(parser)
     parser.add_argument("source_dir", nargs="?",
         help="Top source directory of the project. "
              "Defaults to current working directory.")

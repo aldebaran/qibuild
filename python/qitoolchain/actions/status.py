@@ -12,7 +12,7 @@ import qitoolchain
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.cmdparse.default_parser(parser)
+    qibuild.parsers.default_parser(parser)
     parser.add_argument("name", nargs="?",
         help="Name of the toolchain to print. Default: all")
     parser.add_argument("--list", action="store_true",

@@ -15,7 +15,7 @@ import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.worktree.work_tree_parser(parser)
+    qibuild.parsers.work_tree_parser(parser)
     parser.add_argument("--force", "-f", dest="force", action="store_true", help="force the cleanup")
     parser.add_argument("build_directory", nargs="*", help="build directory to cleanup")
 

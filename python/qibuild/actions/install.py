@@ -63,7 +63,7 @@ def do(args):
         # this is because we do NOT mess with os.environ ...
         # This is why we need to re-read env from toc.build_env so that no warning
         # appears.
-        qibuild.cmake(project.directory, project.build_directory,
+        qibuild.cmake.cmake(project.directory, project.build_directory,
             ['-DCMAKE_INSTALL_PREFIX=%s' % args.prefix],
             clean_first=False,
             env=toc.build_env)

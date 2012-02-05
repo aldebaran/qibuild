@@ -19,7 +19,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.worktree.work_tree_parser(parser)
+    qibuild.parsers.work_tree_parser(parser)
     qibuild.parsers.project_parser(parser)
     parser.add_argument("--rebase", action="store_true", dest="rebase",
         help="Use git pull --rebase")

@@ -14,7 +14,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.worktree.work_tree_parser(parser)
+    qibuild.parsers.work_tree_parser(parser)
     parser.add_argument("url",  metavar="URL", help="url of the project. "
         "right now only git URLs are supported")
     parser.add_argument("name", metavar="NAME", nargs="?",

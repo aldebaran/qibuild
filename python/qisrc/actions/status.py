@@ -16,7 +16,7 @@ LOGGER = logging.getLogger("qisrc.status")
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.worktree.work_tree_parser(parser)
+    qibuild.parsers.work_tree_parser(parser)
     parser.add_argument("--untracked-files", "-u",
         dest="untracked_files",
         action="store_true",

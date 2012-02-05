@@ -12,7 +12,7 @@ import qitoolchain
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.cmdparse.default_parser(parser)
+    qibuild.parsers.default_parser(parser)
 
 
 def do(args):

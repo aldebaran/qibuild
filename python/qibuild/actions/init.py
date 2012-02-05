@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.worktree.work_tree_parser(parser)
+    qibuild.parsers.work_tree_parser(parser)
     parser.add_argument("--interactive", action="store_true",
         help="start a wizard to help you configuring qibuild")
     parser.add_argument("--force", action="store_true", help="force the init")

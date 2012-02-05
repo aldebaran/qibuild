@@ -84,7 +84,7 @@ class QiBuildTestCase(unittest.TestCase):
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
 
         # Read cache and check that DEPENDS value are here
-        cache = qibuild.read_cmake_cache(cmake_cache)
+        cache = qibuild.cmake.read_cmake_cache(cmake_cache)
 
         self.assertEquals(cache["EGGS_DEPENDS"], "spam")
         self.assertEquals(cache["BAR_DEPENDS"] , "eggs;spam")

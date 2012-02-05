@@ -965,3 +965,15 @@ def convert_project_manifest(qibuild_manifest):
     out = StringIO()
     project.write(out)
     return out.getvalue()
+
+
+def get_build_env():
+    """ Return the build environnment as read from
+    qibuild config file
+
+    """
+    qibuild_cfg = QiBuildConfig()
+    qibuild_cfg.read()
+    envsetter = qibuild.envsetter.EnvSetter()
+    envsetter.read_config(qibuild_cfg)
+    return envsetter.get_build_env()

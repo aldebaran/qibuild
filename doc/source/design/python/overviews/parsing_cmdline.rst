@@ -21,7 +21,7 @@ Briefly, you should create a file named ``spam.py`` looking like:
 
   def configure_parser(parser):
       """Configure parser for this action """
-      qibuild.cmdparse.default_parser(parser)
+      qibuild.parsers.default_parser(parser)
       parser.add_argument("--num-eggs",
         help="Number of eggs to add",
         type=int)

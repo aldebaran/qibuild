@@ -28,11 +28,13 @@ Tools
 .. toctree::
    :maxdepth: 1
 
-   archive
-   command
-   config
+   cmake
+   build
    ctest
    envsetter
-   interact
-   log
+   command
+   config
+   archive
    sh
+   log
+   interact

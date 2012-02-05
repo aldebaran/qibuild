@@ -12,6 +12,7 @@ import unittest
 from xml.etree import ElementTree
 
 import qibuild
+import qibuild.archive
 import qitoolchain
 
 def get_tc_file_contents(tc):

@@ -26,8 +26,6 @@ The main function are:
    to generate a 'main' script, such as ``bin/qibuild``
 
 
-This also contains the :py:func:`default_parser` functions, to be
-sure every action understand ``--pdb``, ``--verbose`` and so on...
 
 Functions defined in this module
 --------------------------------
@@ -61,8 +59,6 @@ Example of usage:
       parser = argparse.ArgumentParser()
       modules = qibuild.cmdparse.action_modules_from_package("qibuild.actions")
       qibuild.cmdparse.root_command_main("qibuild", parser, modules)
-
-.. autofunction:: default_parser
 
 
 .. seealso::

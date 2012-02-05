@@ -28,7 +28,6 @@ have different configurations with different work trees if you need.
 
 import os
 import logging
-from qibuild.cmdparse    import default_parser
 import qibuild.sh
 
 LOGGER = logging.getLogger("WorkTree")
@@ -54,11 +53,6 @@ class ProjectAlreadyExists(Exception):
         return message
 
 
-def work_tree_parser(parser):
-    """ Parser settings for every action using a work tree.
-    """
-    default_parser(parser)
-    parser.add_argument("--work-tree", help="Use a specific work tree path.")
 
 
 class WorkTree:

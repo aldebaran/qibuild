@@ -10,6 +10,7 @@ import os
 import ConfigParser
 
 import qibuild
+import qibuild.configstore
 import qitoolchain
 
 CONFIG_PATH = "~/.config/qi/"

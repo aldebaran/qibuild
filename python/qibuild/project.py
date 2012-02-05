@@ -184,7 +184,7 @@ def update_project(project, toc):
         project.cmake_flags.extend(toc.cmake_flags)
 
     # lastly, add a correct -DCMAKE_MODULE_PATH
-    cmake_qibuild_dir = qibuild.get_cmake_qibuild_dir()
+    cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
     qibuild_dir = os.path.join(cmake_qibuild_dir, "qibuild")
     project.cmake_flags.append("qibuild_DIR=%s" % qibuild_dir)
 
@@ -232,7 +232,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             custom_cmake_code += 'include("%s")\n' % \
                 qibuild.sh.to_posix_path(local_cmake)
 
-    cmake_qibuild_dir = qibuild.get_cmake_qibuild_dir()
+    cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
     cmake_qibuild_dir = qibuild.sh.to_posix_path(cmake_qibuild_dir)
     dep_sdk_dirs = toc.get_sdk_dirs(project.name)
 

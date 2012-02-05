@@ -112,7 +112,6 @@ def extract_zip(archive_path, dest_dir):
              (dest_dir/topdir)
 
     """
-    (dest_dir/topdir)
     dest_dir = qibuild.sh.to_native_path(dest_dir)
     LOGGER.debug("Extracting %s to %s", archive_path, dest_dir)
     archive = zipfile.ZipFile(archive_path)

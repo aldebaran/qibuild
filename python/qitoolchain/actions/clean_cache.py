@@ -15,7 +15,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """ Configure parser for this action """
-    qibuild.worktree.work_tree_parser(parser)
+    qibuild.parsers.work_tree_parser(parser)
     parser.add_argument("name", nargs="?", metavar="NAME",
         help="Name of the toolchain. Defaults to the current toolchain")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",

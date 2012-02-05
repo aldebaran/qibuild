@@ -420,7 +420,7 @@ class Toc(WorkTree):
             self.build_env["PATH"] = os.pathsep.join(paths_withoutsh)
 
         try:
-            qibuild.cmake(project.directory,
+            qibuild.cmake.cmake(project.directory,
                           project.build_directory,
                           cmake_args,
                           clean_first=clean_first,

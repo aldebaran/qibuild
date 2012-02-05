@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """ Configure parser for this action """
-    qibuild.worktree.work_tree_parser(parser)
+    qibuild.parsers.work_tree_parser(parser)
     parser.add_argument("name", metavar="NAME",
         help="Name of the toolchain")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
@@ -29,8 +29,7 @@ def configure_parser(parser):
         help="Use this toolchain by default in this worktree",
         action="store_true")
     parser.add_argument("--cmake-generator",
-        help="CMake generator to use when using this toolchain",
-        choices=qibuild.KNOWN_CMAKE_GENERATORS)
+        help="CMake generator to use when using this toolchain")
     parser.add_argument("--dry-run", action="store_true",
         help="Print what would be done")
 
@@ -52,6 +51,10 @@ def do(args):
             mess += " ".join(bad_chars)
             raise Exception(mess)
 
+    known_generators = qibuild.cmake.get_known_cmake_generators()
+    if args.generator not in known_generators:
+        mess  = "Invalid CMake generator: %s" % args.generator
+        mess += "Known generators are: %s" % ", ".join(known_generators)
 
     toc_error = None
     toc = None

@@ -9,7 +9,7 @@ import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.worktree.work_tree_parser(parser)
+    qibuild.parsers.work_tree_parser(parser)
 
 def do(args):
     """Main entry point"""
