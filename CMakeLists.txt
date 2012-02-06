@@ -63,7 +63,7 @@ else()
   execute_process(COMMAND
     ${_sphinx_build}
     "-b" "man"
-    "${CMAKE_SOURCE_DIR}/doc"
+    "${CMAKE_SOURCE_DIR}/doc/source"
     "${CMAKE_BINARY_DIR}/man1"
   )
   install(
@@ -107,7 +107,7 @@ if(_sphinx_build)
     COMMAND
       ${_sphinx_build}
       "-b" "html"
-      ${CMAKE_SOURCE_DIR}/doc
+      ${CMAKE_SOURCE_DIR}/doc/source
       ${CMAKE_BINARY_DIR}/doc/html
   )
   install(
