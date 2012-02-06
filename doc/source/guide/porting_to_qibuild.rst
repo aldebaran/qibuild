@@ -164,14 +164,14 @@ or:
 Install rules
 ++++++++++++++
 
-Replace the ``add_library`` by :ref:`qi_create_lib`, and remove
-the install rules to use :ref:`qi_install_header`  instead:
+Replace the ``add_library`` by :cmake:function:`qi_create_lib`, and remove
+the install rules to use :cmake:function:`qi_install_header`  instead:
 
 .. literalinclude:: /samples/foobar_qibuild/libbar/CMakeLists.txt
     :language: cmake
 
 
-Using :ref:`qi_create_lib` and :ref:`qi_install_header` will have
+Using :cmake:function:`qi_create_lib` and :cmake:function:`qi_install_header` will have
 the following effects:
 
 * The install rules will been properly generated for the library
@@ -180,7 +180,7 @@ the following effects:
   (otherwise, it is too easy to have conflicts, especially when you are
   generating a big SDK.) Unless you have a very good reason not to, please
   choose the same folder name to put you headers inside your source tree, and
-  once your header is installed. (here, the ``bar`` argument of :ref:`qi_install_header`
+  once your header is installed. (here, the ``bar`` argument of :cmake:function:`qi_install_header`
   matches the location of ``bar.hpp``: ``bar/bar.hpp``).
 
 * A ``sdk`` directory will be created, with ``libbar`` in ``skd/lib``

@@ -17,8 +17,8 @@ running:
 
 
 Note that for this to work you nedd to have called
-``enable_testing()``  and ``add_test`` (or :ref:`qi_create_test`, or
-:ref:`qi_create_gtest`) somewhere in your ``CMakeLists.txt``
+``enable_testing()``  and ``add_test`` (or :cmake:function:`qi_create_test`, or
+:cmake:function:`qi_create_gtest`) somewhere in your ``CMakeLists.txt``
 
 
 .. _qibuild-ctest:

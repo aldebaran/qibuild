@@ -59,6 +59,6 @@ Generating pkg config files
 
 Again, nothing hard to do here.
 
-During the call to :ref:`qi_stage_lib`, it should be easy to
+During the call to :cmake:function:`qi_stage_lib`, it should be easy to
 generate the `.pc` file. All the information is already here.
 

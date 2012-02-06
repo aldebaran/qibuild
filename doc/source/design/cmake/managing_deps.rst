@@ -76,14 +76,14 @@ In ``hello/CMakeLists.txt``
   qi_use_lib(hello world)
 
 .. note:: For those already familiar with CMake:
-   We use :ref:`qi_create_lib` and :ref:`qi_create_bin` instead of
+   We use :cmake:function:`qi_create_lib` and :cmake:function:`qi_create_bin` instead of
    ``add_executable`` and ``add_library``
 
   We never have to call ``find_package`` or ``include_directories``,  or
   ``target_link_libraries``.
 
-This first part is the job is done by the :ref:`qi_create_bin` and
-:ref:`qi_create_lib` functions.
+This first part is the job is done by the :cmake:function:`qi_create_bin` and
+:cmake:function:`qi_create_lib` functions.
 
 Those are just wrappers for ``add_executable`` and ``add_library``.
 
@@ -133,7 +133,7 @@ This is done by something like
     set_target_properties("${name}" PROPERTIES DEBUG_POSTFIX "_d")
   endif()
 
-The call to :ref:`qi_stage_lib` causes a ``world-config.cmake`` to be generated in
+The call to :cmake:function:`qi_stage_lib` causes a ``world-config.cmake`` to be generated in
 ``world/build/sdk/cmake/``
 
 When using ``qibuild configure hello``, a ``dependencies.cmake`` files is generated in
@@ -214,7 +214,7 @@ So we generate the following code to set ROOT_DIR
 Calling qi_stage_lib
 --------------------
 
-The complete signature to :ref:`qi_stage_lib` is in fact:
+The complete signature to :cmake:function:`qi_stage_lib` is in fact:
 
 
 .. code-block:: cmake
@@ -229,8 +229,8 @@ The complete signature to :ref:`qi_stage_lib` is in fact:
 When flags are missing, we will guess them.
 
 Note that prefix is always the name of a cmake target, i.e the first argument
-of something like :ref:`qi_create_lib`. There is an error message if you try to use
-:ref:`qi_stage_lib` on something that is not a target.
+of something like :cmake:function:`qi_create_lib`. There is an error message if you try to use
+:cmake:function:`qi_stage_lib` on something that is not a target.
 
 Let’s go through the variables one by one:
 
@@ -300,7 +300,7 @@ pointer implementations, forward declarations and the like), there’s a great
 chance we will also need the boost headers when compiling ``hello,`` that’s why we
 always propagate the dependencies by default.
 
-This is guessed using the previous call to :ref:`qi_use_lib`. In our example, after
+This is guessed using the previous call to :cmake:function:`qi_use_lib`. In our example, after
 using ``qi_use_lib(world boost)``, ``WORLD_DEPENDS`` contains "boost".
 
 *<PREFIX>_LIBRARIES*
@@ -324,7 +324,7 @@ In the redistributable file, we use:
 Calling qi_use_lib
 -------------------
 
-So what happens when using a :ref:`qi_use_lib`?
+So what happens when using a :cmake:function:`qi_use_lib`?
 
 When using ``qi_use_lib(foo bar)``, we will always call
 

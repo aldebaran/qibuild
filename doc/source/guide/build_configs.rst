@@ -32,7 +32,7 @@ But now you have to pass "-DWITH_GTEST=ON" to all your projects when you
 configure them.
 
 Note that ther is a shortcut for that in qibuild CMake API using
-:ref:`qi_add_optional_package`:
+:cmake:function:`qi_add_optional_package`:
 
 .. code-block:: cmake
 

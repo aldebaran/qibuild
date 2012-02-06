@@ -299,8 +299,6 @@ def gen_fun_rst(name, txt):
 
 
     res = """
-.. _{name}:
-
 {name}
 {h2}
 

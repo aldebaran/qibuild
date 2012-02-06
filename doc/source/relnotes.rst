@@ -82,15 +82,15 @@ CMake
 
 * Better way of finding qibuild cmake framework, using ``find_package(qibuild)``
   instead of ``include(qibuild.cmake)``
-* :ref:`qi_create_gtest`: prefer using a qibuild port of gtest
-* :ref:`qi_create_gtest`: disable the target when gtest is not found
-* :ref:`qi_create_gtest`: always add GTEST dependency
-* :ref:`qi_stage_lib`, :ref:`qi_use_lib` better handling when first arg is not
+* :cmake:function:`qi_create_gtest`: prefer using a qibuild port of gtest
+* :cmake:function:`qi_create_gtest`: disable the target when gtest is not found
+* :cmake:function:`qi_create_gtest`: always add GTEST dependency
+* :cmake:function:`qi_stage_lib`, :cmake:function:`qi_use_lib` better handling when first arg is not
   a target
-* :ref:`qi_create_lib` did not honor NO_INSTALL argument
+* :cmake:function:`qi_create_lib` did not honor NO_INSTALL argument
 * ``qi_install_*`` functions no longer recurse through directories by default,
   use ``qi_install_*(... RECURSE)``
-* Added :ref:`qi_create_test` function, simpler to use than :ref:`qi_add_test`
+* Added :cmake:function:`qi_create_test` function, simpler to use than :cmake:function:`qi_add_test`
 * Added new qibuild cmake modules:
 
   * lttng and its dependencies

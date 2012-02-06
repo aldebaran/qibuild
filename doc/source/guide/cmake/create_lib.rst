@@ -86,7 +86,7 @@ Add the following line to the CMakeLists.txt:
 Creating the answer library
 +++++++++++++++++++++++++++
 
-Add a call to :ref:`qi_create_lib`:
+Add a call to :cmake:function:`qi_create_lib`:
 
 .. code-block:: cmake
 
@@ -100,13 +100,13 @@ It also makes the ``answer`` library usable by other targets.
 Link the foo executable with the answer library
 +++++++++++++++++++++++++++++++++++++++++++++++
 
-Add a call to :ref:`qi_use_lib`:
+Add a call to :cmake:function:`qi_use_lib`:
 
 .. code-block:: cmake
 
   qi_use_lib(foo answer)
 
-Make sure you call this after the call to :ref:`qi_create_lib` - you need to create a
+Make sure you call this after the call to :cmake:function:`qi_create_lib` - you need to create a
 library before using it.
 
 This call does several things:

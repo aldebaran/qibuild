@@ -92,7 +92,7 @@ works because:
 
 * We have put ``foo.hpp`` in a ``foo`` subdirectory.
 
-* We have used :ref:`qi_install_header` with the ``KEEP_RELATIVE_PATHS``
+* We have used :cmake:function:`qi_install_header` with the ``KEEP_RELATIVE_PATHS``
   argument. You could also have used it with a ``SUBFOLDER`` argument, like
   this:
 

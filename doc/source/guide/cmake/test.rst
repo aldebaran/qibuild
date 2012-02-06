@@ -11,7 +11,7 @@ Adding a test
 
 You first need to call ``enable_testing()``
 
-Then you call :ref:`qi_create_test` with the first argument being the name of
+Then you call :cmake:function:`qi_create_test` with the first argument being the name of
 the test, and the rest being the sources of the executable.
 
 .. code-block:: cmake
@@ -20,7 +20,7 @@ the test, and the rest being the sources of the executable.
   qi_create_test(foo_test test.cpp)
 
 If you have arguments to pass to the executable you want to test,
-simply add them to the :ref:`qi_create_test` call, like this:
+simply add them to the :cmake:function:`qi_create_test` call, like this:
 
 .. code-block:: cmake
 
@@ -28,7 +28,7 @@ simply add them to the :ref:`qi_create_test` call, like this:
 
 
 If you have ``gtest`` installed, you can use
-:ref:`qi_create_gtest`:
+:cmake:function:`qi_create_gtest`:
 
 .. code-block:: cmake
 
@@ -42,7 +42,7 @@ you are doing continuous integration.
 
 If you need to run the same executable with different
 arguments, you should use a lower-level function
-called :ref:`qi_add_test`
+called :cmake:function:`qi_add_test`
 
 .. code-block:: cmake
 

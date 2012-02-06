@@ -40,7 +40,7 @@ Here are the components that will be used during a runtime install
 | "doc"         |   qi_install_doc          | share/doc                          |
 +---------------+---------------------------+------------------------------------+
 
-Note that :ref:`qi_create_bin` and :ref:`qi_create_lib` create the install
+Note that :cmake:function:`qi_create_bin` and :cmake:function:`qi_create_lib` create the install
 rules for you by default.
 If you don't what the executable to be installed (because it's just a test, for instance, you can use:
 
@@ -49,7 +49,7 @@ If you don't what the executable to be installed (because it's just a test, for 
   qi_create_bin(foo NO_INSTALL)
 
 If you want to install an executable that is NOT the result of a compilation
-(for instance a script), you can use :ref:`qi_install_program`
+(for instance a script), you can use :cmake:function:`qi_install_program`
 
 
 When doing a normal install, you will get the previous component, plus
@@ -67,7 +67,7 @@ the following ones
 
 If you want to install something in your development install that does not fit
 in these components (say, an example), you can use the generic
-:ref:`qi_install` function
+:cmake:function:`qi_install` function
 
 For instance
 
@@ -98,7 +98,7 @@ Since no component as been given, this files won't be in the runtime install.
 Special features
 -----------------
 
-:ref:`qi_install` ends up calling regular install() CMake functions, but there
+:cmake:function:`qi_install` ends up calling regular install() CMake functions, but there
 are some differences, here are a few
 
 Check of arguments
@@ -196,7 +196,7 @@ bit like an autotools project)::
                        ${CMAKE_BUILD_DIR}/config.h
                      SUBFOLDER foo)
 
-:ref:`qi_install_header` will set DESTINATION "include" for you,
+:cmake:function:`qi_install_header` will set DESTINATION "include" for you,
 but you need 'SUBFOLDER foo' argument to tell CMake to install files
 to include/foo, regardless their original path.
 
@@ -227,6 +227,6 @@ hierarchy in the source tree and when installed (a bit like boost)::
                         bar/baz/baz.h
                       KEEP_RELATIVE_PATHS)
 
-:ref:`qi_install_header` will set DESTINATION "include" for you, and you do not
+:cmake:function:`qi_install_header` will set DESTINATION "include" for you, and you do not
 need ``SUBFOLDER`` because ``KEEP_RELATIVE_PATHS`` is set.
 

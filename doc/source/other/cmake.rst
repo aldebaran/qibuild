@@ -69,7 +69,7 @@ Creating executables
 ++++++++++++++++++++
 
 
-Using :ref:`qi_create_bin` will make sure that:
+Using :cmake:function:`qi_create_bin` will make sure that:
 
 * The executable is generated in `build/sdk/bin`
 
@@ -88,7 +88,7 @@ Creating libraries
 ++++++++++++++++++
 
 
-Using :ref:`qi_create_lib` will make sure that:
+Using :cmake:function:`qi_create_lib` will make sure that:
 
 * If the library is static, it is generated in `build/sdk/lib`
 
@@ -119,7 +119,7 @@ default.
 Installing
 ++++++++++
 
-Using :ref:`qi_install` functions will make sure that:
+Using :cmake:function:`qi_install` functions will make sure that:
 
 * You will get an error if the files you want to install do not exist
   at configuration time, not at install time.
@@ -141,7 +141,7 @@ In `qibuild`, you have a much nicer API
    qi_use_lib(hello world)
 
 
-Using :ref:`qi_use_lib` in conjunction with :ref:`qi_stage_lib` work in any of the following cases:
+Using :cmake:function:`qi_use_lib` in conjunction with :cmake:function:`qi_stage_lib` work in any of the following cases:
 
 * world and hello are both targets in the same project
 

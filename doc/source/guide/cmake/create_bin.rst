@@ -32,7 +32,7 @@ Adding an executable
 --------------------
 
 
-To add an executable, simply call :ref:`qi_create_bin`. The first argument is the name
+To add an executable, simply call :cmake:function:`qi_create_bin`. The first argument is the name
 of the executable, followed by the sources of the executable.
 
 The paths of the sources are relative to the path where the CMakeLists is

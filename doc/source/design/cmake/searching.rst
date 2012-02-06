@@ -34,11 +34,11 @@ Here is the order CMake will use to find headers and libraries, in this order:
 * ``/usr/include/`` (if ``world`` is installed in the system)
 
 
-Note that it makes no difference whether you are using :ref:`qi_use_lib`
+Note that it makes no difference whether you are using :cmake:function:`qi_use_lib`
 or ``find_package``.
 
 To make this work, we only use the ``CMAKE_FIND_ROOT_PATH`` cmake
-variable, and :ref:`qi_use_lib` calls ``find_package`` without any specific
+variable, and :cmake:function:`qi_use_lib` calls ``find_package`` without any specific
 argument
 
 This means that if you really need to find a library **inside** a toolchain,
