@@ -133,7 +133,7 @@ endfunction()
 #  * We make sure necessary environment variables are set on mac
 #
 # This is a low-level function, you should rather use
-# :ref:`qi_create_test` or :ref:`qi_create_gtest` instead.
+# :cmake:function:`qi_create_test` or :cmake:function:`qi_create_gtest` instead.
 #
 # \arg:test_name The name of the test
 # \arg:target_name The name of the binary to use

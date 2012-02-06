@@ -135,7 +135,7 @@ endfunction()
 # and target_link_libraries that are needed.
 #
 # .. note:: The name must be an existing target, so you must call
-#     ``qi_use_lib`` **after** :ref:`qi_create_bin` or :ref:`qi_create_lib`
+#     ``qi_use_lib`` **after** :cmake:function:`qi_create_bin` or :cmake:function:`qi_create_lib`
 #
 # You can however call ``qi_use_lib`` several times, for instance::
 #
