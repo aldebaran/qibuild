@@ -36,8 +36,18 @@ Those are set during initialization
 Build related attributes:
 +++++++++++++++++++++++++
 
-Those need a :py:class:`Toc` to be correctly set,
+Those need a :py:class:`toc instance <qibuild.toc.Toc>` to be correctly set,
 add :py:func:`update_project` must have been called.
+
+Here is a small example:
+
+.. code-block:: console
+
+   $ qibuild make --release foo
+
+When this is  called, a ``toc`` ojbect is built with ``build_type=release``
+and then the ``foo`` project and all its depencies are updated so
+that they  contain ``-DCMAKE_BUILD_TYPE=RELEASE`` in their CMake flags.
 
 .. attribute:: Project.cmake_flags
 

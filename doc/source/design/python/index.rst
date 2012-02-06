@@ -172,18 +172,6 @@ CMake framework.
     You cannot have two different build configurations sharing
     the same build directory.
 
-
-.. glossary::
-
-  **ConfigStore**
-    A ConfigStore is just a view of the contents of
-    the various config files used by qibuild
-
-
-.. seealso::
-
-   * :py:mod:`qibuild.configstore`
-
 .. glossary::
 
   **Toc**

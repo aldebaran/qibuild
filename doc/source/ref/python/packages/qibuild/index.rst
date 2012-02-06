@@ -38,3 +38,4 @@ Tools
    sh
    log
    interact
+   wizard

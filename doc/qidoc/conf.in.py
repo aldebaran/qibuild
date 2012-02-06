@@ -1,6 +1,9 @@
 project = u'qiBuild'
 sys.path.insert(0, os.path.abspath('../tools'))
+# for autodoc
+sys.path.insert(0, os.path.abspath('../../python'))
 extensions.append("cmakedomain")
+extensions.append("sphinx.ext.autodoc")
 
 man_pages = [
     ('ref/man/qisrc', 'qisrc', u'Handle several project sources',
