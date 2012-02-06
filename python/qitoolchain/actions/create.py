@@ -52,7 +52,8 @@ def do(args):
             raise Exception(mess)
 
     known_generators = qibuild.cmake.get_known_cmake_generators()
-    if args.cmake_generator not in known_generators:
+    cmake_generator = args.cmake_generator
+    if cmake_generator and cmake_generator not in known_generators:
         mess  = "Invalid CMake generator: %s\n" % args.cmake_generator
         mess += "Known generators are:"
         mess += "\n * " + "\n * ".join(known_generators)
@@ -80,17 +81,17 @@ def do(args):
     if feed:
         toolchain.parse_feed(feed, dry_run=dry_run)
 
-    config = None
     cmake_generator = args.cmake_generator
-    if toc:
-        config = toc.config.configs.get(tc_name)
-        if not config:
-            config = qibuild.config.Config()
-            config.name = tc_name
-            toc.config.add_config(config)
-        if cmake_generator:
-            config.cmake.generator = cmake_generator
-        toc.save_config()
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
+    config = qibuild.config.Config()
+    config.name = tc_name
+    if cmake_generator:
+        config.cmake.generator = cmake_generator
+    qibuild_cfg.add_config(config)
+    qibuild_cfg.write()
+
+
     if args.default:
         toc.config.set_default_config(tc_name)
         toc.save_config()
