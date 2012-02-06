@@ -88,7 +88,8 @@ def do(args):
             config = qibuild.config.Config()
             config.name = tc_name
             toc.config.add_config(config)
-        config.cmake.generator = cmake_generator
+        if cmake_generator:
+            config.cmake.generator = cmake_generator
         toc.save_config()
     if args.default:
         toc.config.set_default_config(tc_name)
