@@ -28,7 +28,7 @@ def configure_parser(parser):
     parser.add_argument("--default",
         help="Use this toolchain by default in this worktree",
         action="store_true")
-    parser.add_argument("--cmake-generator",
+    parser.add_argument("--cmake-generator", dest="cmake_generator",
         help="CMake generator to use when using this toolchain")
     parser.add_argument("--dry-run", action="store_true",
         help="Print what would be done")
@@ -52,9 +52,11 @@ def do(args):
             raise Exception(mess)
 
     known_generators = qibuild.cmake.get_known_cmake_generators()
-    if args.generator not in known_generators:
-        mess  = "Invalid CMake generator: %s" % args.generator
-        mess += "Known generators are: %s" % ", ".join(known_generators)
+    if args.cmake_generator not in known_generators:
+        mess  = "Invalid CMake generator: %s\n" % args.cmake_generator
+        mess += "Known generators are:"
+        mess += "\n * " + "\n * ".join(known_generators)
+        raise Exception(mess)
 
     toc_error = None
     toc = None
@@ -65,12 +67,6 @@ def do(args):
 
     if args.default and not toc:
         mess = "You need to be in a valid toc worktree to use --default\n"
-        mess += "Exception was:\n"
-        mess += str(toc_error)
-        raise Exception(mess)
-
-    if args.cmake_generator and not toc:
-        mess = "You need to be in a valid toc worktree to use --cmake-generator\n"
         mess += "Exception was:\n"
         mess += str(toc_error)
         raise Exception(mess)
