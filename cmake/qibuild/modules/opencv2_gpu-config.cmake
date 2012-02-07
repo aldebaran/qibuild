@@ -2,9 +2,11 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-clean(OPENCV2_GPU)
-fpath(OPENCV2_GPU opencv2/gpu/gpu.hpp)
-flib(OPENCV2_GPU OPTIMIZED NAMES opencv_gpu)
-flib(OPENCV2_GPU DEBUG     NAMES opencv_gpu)
-qi_set_global(OPENCV2_GPU_DEPENDS "OPENCV2_CORE;OPENCV2_IMGPROC;OPENCV2_OBJDETECT;OPENCV2_FEATURES2D")
-export_lib(OPENCV2_GPU)
+get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+include("${_ROOT_DIR}/opencv2utils.cmake")
+
+opencv2_flib(gpu DPENDS
+  core
+  imgproc
+  objdetect
+  features2d)

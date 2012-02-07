@@ -2,9 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-clean(OPENCV2_HIGHGUI)
-fpath(OPENCV2_HIGHGUI opencv2/highgui/highgui.hpp)
-flib(OPENCV2_HIGHGUI OPTIMIZED NAMES opencv_highgui)
-flib(OPENCV2_HIGHGUI DEBUG     NAMES opencv_highgui)
-qi_set_global(OPENCV2_HIGHGUI_DEPENDS "OPENCV2_CORE")
-export_lib(OPENCV2_HIGHGUI)
+get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+include("${_ROOT_DIR}/opencv2utils.cmake")
+
+opencv2_flib(highgui DPENDS core)

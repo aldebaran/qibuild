@@ -2,8 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-clean(OPENCV2_CORE)
-fpath(OPENCV2_CORE opencv2/core/core.hpp)
-flib(OPENCV2_CORE OPTIMIZED NAMES opencv_core)
-flib(OPENCV2_CORE DEBUG     NAMES opencv_core)
-export_lib(OPENCV2_CORE)
+get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+include("${_ROOT_DIR}/opencv2utils.cmake")
+
+opencv2_flib(core)

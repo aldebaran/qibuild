@@ -2,9 +2,10 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-clean(OPENCV2_CALIB3D)
-fpath(OPENCV2_CALIB3D opencv2/calib3d/calib3d.hpp)
-flib(OPENCV2_CALIB3D OPTIMIZED NAMES opencv_calib3d)
-flib(OPENCV2_CALIB3D DEBUG     NAMES opencv_calib3d)
-qi_set_global(OPENCV2_CALIB3D_DEPENDS "OPENCV2_CORE;OPENCV2_FEATURES2D")
-export_lib(OPENCV2_CALIB3D)
+get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+include("${_ROOT_DIR}/opencv2utils.cmake")
+
+opencv2_flib(calib3d DPENDS
+  core
+  features2d
+)
