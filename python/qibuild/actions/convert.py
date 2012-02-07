@@ -95,7 +95,7 @@ def name_from_cmakelists(cmakelists):
     if not os.path.exists(cmakelists):
         return None
     res = None
-    regexp = re.compile(r'^\s*project\s*\((.*)\)', re.IGNORECASE)
+    regexp = re.compile(r'^\s*project\s*\("?(.*?)"?\)', re.IGNORECASE)
     lines = list()
     with open(cmakelists, "r") as fp:
         lines = fp.readlines()
