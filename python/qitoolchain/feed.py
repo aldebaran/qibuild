@@ -200,6 +200,9 @@ class ToolchainFeedParser:
         for feed_tree in feeds:
             feed_url = feed_tree.get("url")
             if feed_url:
+                # feed_url can be relative to feed:
+                if not "://" in feed_url:
+                    feed_url = urlparse.urljoin(feed, feed_url)
                 self.parse(feed_url)
 
 
