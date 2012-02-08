@@ -16,11 +16,67 @@ build system.
 
 qiBuild is built **on top** of CMake.
 
-Ultimately, every `qi_` functions call standard CMake functions, so for instance
-`qi_create_bin` accepts every argument the standard `add_executable` CMake function does.
+Ultimately, every ``qi_`` functions call standard CMake functions, so for instance
+:cmake:function:`qi_create_bin` accepts every argument the standard
+``add_executable`` CMake function does.
 
-After installing a qiBuild project, you can use the `-config.cmake` files generated
+After installing a qiBuild project, you can use the ``-config.cmake`` files generated
 by qiBuild even from a pure CMake project.
+
+A very high-level point of view
+--------------------------------
+
+One way to think about the ``qibuild`` is to compare this two few samples
+
+.. code-block:: cmake
+
+    # Find some deps for the whole project
+    find_package(foo COMPONENT spam eggs)
+
+    # Add include path for every target in this file
+    include_directories(${FOO_INCLUDE_DIRS})
+
+    # Create a bar library
+    add_library(bar bar.h bar.c)
+
+    # Link the bar target with foo libraries
+    # (both libfoo_spam.so and libfoo_eggs.so)
+    target_link_libraries(bar ${FOO_LIBRARIES})
+
+    # Create a baz library
+    add_library(baz bar.h bar.c)
+
+    # Link the baz target with foo libraries
+    # (both libfoo_spam.so and libfoo_eggs.so)
+    target_link_libraries(bar ${FOO_LIBRARIES})
+
+    # Lots and lots of install rules
+
+.. code-block:: cmake
+
+    qi_create_lib(bar bar.h bar.c)
+
+    # Find the SPAM component of foo,
+    # add the foo/spam include directory, and only link with
+    # libfoo_spam.so
+    qi_use_lib(bar FOO_SPAM)
+
+    # Find the EGGS component of foo,
+    # add the foo/eggs include directory, and only link with
+    # libfoo_eggs.so
+    qi_use_lib(baz FOO_EGGS)
+
+    # Install rules for bar, baz already created,
+    # bar-config and baz-config generated and ready to be installed to
+
+You can see than in fact everything in qibuild is close to a target:
+we tie together the include directories and the libraries, making it easier to avoid
+weird link errors (i.e the include directory was correct but you forget to link with
+the library)
+
+Also note how easy it is to make sure that someone using bar will only depend on ``FOO_SPAM``,
+and not the whole ``FOO`` package.
+
 
 CMake variables
 ---------------
@@ -69,18 +125,18 @@ Creating executables
 ++++++++++++++++++++
 
 
-Using :cmake:function:`qi_create_bin` will make sure that:
+Using :cmake:function:``qi_create_bin`` will make sure that:
 
-* The executable is generated in `build/sdk/bin`
+* The executable is generated in ``build/sdk/bin``
 
-* An install rule is created to `<prefix>/bin`
+* An install rule is created to ``<prefix>/bin``
 
-* On linux, rpath is set to `$ORIGIN/../lib`
+* On linux, rpath is set to ``$ORIGIN/../lib``
 
 
 You can change this behavior using various ``NO_`` arguments
-to `qi_create_bin` (for instance ``NO_INSTALL``, ``NO_RPATH`` ...),
-or simply call `set_target_properties` yourself
+to :cmake:function:`qi_create_bin` (for instance ``NO_INSTALL``, ``NO_RPATH`` ...),
+or simply call ``set_target_properties`` yourself
 
 
 
@@ -90,29 +146,29 @@ Creating libraries
 
 Using :cmake:function:`qi_create_lib` will make sure that:
 
-* If the library is static, it is generated in `build/sdk/lib`
+* If the library is static, it is generated in ``build/sdk/lib``
 
-* If the library is shared, it is generated in `build/sdk/bin` on Windows,
-  and in `build/sdk/lib` on Windows
+* If the library is shared, it is generated in ``build/sdk/bin`` on Windows,
+  and in ``build/sdk/lib`` on Windows
 
 * The install rules us created accordingly
 
-* On linux, `-fPIC` is used so that you can use the static library
+* On linux, ``-fPIC`` is used so that you can use the static library
   inside a shared library
 
-* On mac, the install name dir is set to `@executable_path/../lib`
+* On mac, the install name dir is set to ``@executable_path/../lib``
 
 
 You can change this behavior using various ``NO_`` arguments
-to `qi_create_bin` (for instance ``NO_FPIC``, ``NO_INSTALL`` ...),
-or simply call `set_target_properties` yourself
+to :cmake:function:`qi_create_bin` (for instance ``NO_FPIC``, ``NO_INSTALL``
+...), or simply call ``set_target_properties`` yourself
 
 The library will be:
 
 * built as a shared library on UNIX
 * built as a static library on windows
 
-You can can set BUILD_SHARED_LIBS=OFF to compile everything in static by
+You can can set ``BUILD_SHARED_LIBS=OFF`` to compile everything in static by
 default.
 
 
@@ -129,10 +185,12 @@ Exporting targets
 +++++++++++++++++
 
 
-The `export()` and `install(EXPORT ...)`  command do exist in standard CMake
+The ``export()`` and ``install(EXPORT ...)``  command do exist in standard CMake
 but they are a bit clumsy to use.
 
-In `qibuild`, you have a much nicer API
+(See :ref:`qi-stage-lib-vs-export` for details)
+
+In ``qibuild``, you have a much nicer API
 
 .. code-block:: cmake
 
@@ -157,11 +215,11 @@ Using :cmake:function:`qi_use_lib` in conjunction with :cmake:function:`qi_stage
   an upstream CMake module in  `/usr/share/cmake/modules/FindWorld.cmake`
 
 
-Plus, `qi_use_lib` will export sane defaults for you:
+Plus, :cmake:function:`qi_use_lib` will export sane defaults for you:
 
 * include directories will be set to the last call to `include_directories`
 
-* WORLD_DEPENDS will be set using the calls to `qi_use_lib(world ...)`
+* WORLD_DEPENDS will be set using the calls to :cmake:function:`qi_use_lib(world ...)`
 
 And still, you will be able to stage different include directories or dependencies if you want.
 
@@ -186,3 +244,24 @@ qibuild and CTest
 
 
 See :ref:`qibuild-ctest`
+
+
+.. _qi-stage-lib-vs-export:
+
+qi_stage_lib versus export
+--------------------------
+
+You may wonder why :cmake:function:`qi_stage_lib` does not use ``export``.
+
+There are several reaons but the main reason is that we did not like the idea
+of the "global CMake package registry".
+
+One workflow we needed to support since the beginning was to be able to use the
+same worktree to compile for two different targets (say ``linux64`` and
+cross-compiling)
+
+Also, ``export`` does not work that well when you want to work with several versions
+of the same target (say ``master`` and a ``release-1.12`` branch).
+
+You can kind of solve that using version numbers (in a FooConfigVersion.cmake) for instance,
+but that's a bit clumsy too.
