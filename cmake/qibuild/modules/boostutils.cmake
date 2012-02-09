@@ -6,7 +6,7 @@
 
 
 function(boost_flib _suffix _libname)
-  set (BOOST_VERSION 1_47)
+  set (BOOST_VERSION 1_44)
   set(_linux_names
     "boost_${_libname}-mt"
     # for boost-locale < 1.37
