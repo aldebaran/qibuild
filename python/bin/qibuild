@@ -44,7 +44,7 @@ def print_version():
     """
     import qibuild
     print "qibuild version 1.12"
-    print "Using cmake code from", qibuild.get_cmake_qibuild_dir()
+    print "Using cmake code from", qibuild.cmake.get_cmake_qibuild_dir()
 
 
 def main():
