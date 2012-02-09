@@ -2,8 +2,8 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-# libusb-0.1 module
-clean(USB)
-fpath(USB usb.h)
-flib(USB usb)
-export_lib(USB)
+# libusb-1.0 module
+clean(USB_1)
+fpath(USB_1 libusb.h PATH_SUFFIXES libusb-1.0)
+flib(USB_1 usb-1.0)
+export_lib(USB_1)
