@@ -7,8 +7,6 @@
 """
 
 import os
-import sys
-import StringIO
 import tempfile
 
 import unittest
@@ -269,7 +267,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
-        toc = mock.Mock()
+        work_tree = os.path.join(self.tmp, "work_tree")
+        toc = qibuild.toc.Toc(work_tree=work_tree)
         self.run_wizard(toc=toc)
 
     def test_local_settings_choose_default_toolchain(self):
@@ -285,7 +284,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(["linux32", "linux64"])
-        toc = mock.Mock()
+        work_tree = os.path.join(self.tmp, "work_tree")
+        toc = qibuild.toc.Toc(work_tree=work_tree)
         self.run_wizard(toc=toc)
         self.assertEqual(toc.config.local.defaults.config, "linux64")
 
@@ -305,12 +305,31 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
-        toc = mock.Mock()
-        toc.work_tree = "/path/to/worktree"
+        work_tree = os.path.join(self.tmp, "work_tree")
+        toc = qibuild.toc.Toc(work_tree=work_tree)
         self.run_wizard(toc=toc)
         self.assertEqual(toc.config.local.build.build_dir, "build")
         self.assertEqual(toc.config.local.build.sdk_dir,   "sdk")
 
+    def test_full_wizard(self):
+        self.setup_platform("windows")
+        self.setup_find_program({
+            "cmake"  : r"c:\Program Files\CMake\bin\cmake.exe"
+        })
+        self.setup_answers({
+            "generator" : "Visual Studio 10",
+            "ide" : "Visual Studio",
+            "use on of these toolchains by default" : True,
+            "toolchain to use by default": "win32-vs2010",
+        })
+        self.setup_generators(["Visual Studio 10"])
+        self.setup_tc_names(["win32-vs2010"])
+        work_tree = os.path.join(self.tmp, "work_tree")
+        toc = qibuild.toc.Toc(work_tree=work_tree)
+
+        self.run_wizard(toc=toc)
+        self.assertEqual(toc.config.local.defaults.config, "win32-vs2010")
+        self.assertEqual(toc.config.defaults.cmake.generator, "Visual Studio 10")
 
 
     def tearDown(self):

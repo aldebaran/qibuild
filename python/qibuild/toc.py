@@ -88,6 +88,7 @@ class Toc(WorkTree):
     def __init__(self, work_tree,
             path_hints=None,
             config=None,
+            qibuild_cfg=None,
             build_type="debug",
             cmake_flags=None,
             cmake_generator=None,
@@ -99,6 +100,8 @@ class Toc(WorkTree):
 
         :param work_tree:  see :py:meth:`qibuild.worktree.WorkTree.__init__`
         :param path_hints: see :py:meth:`qibuild.worktree.WorkTree.__init__`
+        :param qibuild_cfg: a  :py:class:`qibuild.config.QiBuildConfig` instance
+                            if not given, a new one will be created
         :param build_type: a build type, could be debug or release
                            (defaults to debug)
         :param cmake_flags:     optional additional cmake flags
@@ -125,8 +128,11 @@ class Toc(WorkTree):
         handle_old_qibuild_xml(self.work_tree)
 
         # Handle config:
-        self.config = qibuild.config.QiBuildConfig(config)
-        self.config.read()
+        if not qibuild_cfg:
+            self.config = qibuild.config.QiBuildConfig(config)
+            self.config.read()
+        else:
+            self.config = config
         self.config.read_local_config(self.config_path)
         self.active_config = self.config.active_config
 
@@ -573,18 +579,21 @@ def _projects_from_args(toc, args):
         return (list(), False)
 
 
-def toc_open(work_tree, args=None):
+def toc_open(work_tree, args=None, qibuild_cfg=None):
     """ Creates a :py:class:`Toc` object.
 
     :param worktree: The worktree to be used. (see :py:class:`qibuild.worktree.WorkTree`)
     :param args: an ``argparse.NameSpace`` object containing
      the arguments passed from the comand line.
+    :param qibuild_cfg: A (:py:class:`qibuild.config.QiBuildConfig` instance) to use.
+     If None, we built a new instance to store in ``toc.config``
 
     You should always use this function to call Toc methods from
     a qibuild :term:`action`.
 
     It takes care of all the options you specify from command line,
     and calls Toc constructor accordingly (see :py:meth:`Toc.__init__`)
+
     """
     # Not that args can come from:
     #    - a work_tree parser
@@ -637,7 +646,8 @@ def toc_open(work_tree, args=None):
                build_type=build_type,
                cmake_flags=cmake_flags,
                cmake_generator=cmake_generator,
-               path_hints=path_hints)
+               path_hints=path_hints,
+               qibuild_cfg=qibuild_cfg)
 
     (active_projects, single) =  _projects_from_args(toc, args)
     toc.active_projects = active_projects

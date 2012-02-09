@@ -104,7 +104,7 @@ def configure_ide(qibuild_cfg, ide_name):
     ide.name = ide_name
     qibuild_cfg.add_ide(ide)
 
-def configure_local_settings(qibuild_cfg, toc):
+def configure_local_settings(toc):
     """ Configure local settings for this worktree
 
     """
@@ -160,14 +160,17 @@ def run_config_wizard(toc):
     """ Run a nice interactive config wizard
 
     """
-    qibuild_cfg = qibuild.config.QiBuildConfig()
-    qibuild_cfg_path = qibuild.config.get_global_cfg_path()
-    if not os.path.exists(qibuild_cfg_path):
-        to_create = os.path.dirname(qibuild_cfg_path)
-        qibuild.sh.mkdir(to_create, recursive=True)
-        with open(qibuild_cfg_path, "w") as fp:
-            fp.write('<qibuild version="1" />\n')
-    qibuild_cfg.read()
+    if toc:
+        qibuild_cfg = toc.config
+    else:
+        qibuild_cfg = qibuild.config.QiBuildConfig()
+        qibuild_cfg_path = qibuild.config.get_global_cfg_path()
+        if not os.path.exists(qibuild_cfg_path):
+            to_create = os.path.dirname(qibuild_cfg_path)
+            qibuild.sh.mkdir(to_create, recursive=True)
+            with open(qibuild_cfg_path, "w") as fp:
+                fp.write('<qibuild version="1" />\n')
+        qibuild_cfg.read()
 
     # Ask for a default cmake generator
     guess_cmake(qibuild_cfg)
@@ -181,4 +184,4 @@ def run_config_wizard(toc):
     qibuild_cfg.write()
 
     if toc:
-        configure_local_settings(qibuild_cfg, toc)
+        configure_local_settings(toc)
