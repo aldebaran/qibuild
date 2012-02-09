@@ -150,7 +150,12 @@ def handle_toochain_file(package, package_tree):
     """
     toolchain_file = package_tree.get("toolchain_file")
     package_path = package.path
-    package.toolchain_file = os.path.join(package_path, toolchain_file)
+    # toolchain_file can be an url too
+    if not "://" in toolchain_file:
+        package.toolchain_file = os.path.join(package_path, toolchain_file)
+    else:
+        tc_file = qitoolchain.remote.download(toolchain_file, package_path)
+        package.toolchain_file = tc_file
 
 class ToolchainFeedParser:
     """ A class to handle feed parsing
