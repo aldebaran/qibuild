@@ -4,10 +4,21 @@
 
 clean(UUID)
 fpath(UUID uuid/uuid.h)
-if (NOT APPLE)
-  flib(UUID uuid)
-  export_lib(UUID)
+if(UNIX)
+  if(APPLE)
+    # UUID is header-only on apple
+    export_header(UUID)
+  else()
+    flib(UUID uuid)
+    export_lib(UUID)
+  endif()
 else()
-  # UUID is header-only on apple
-  export_header(UUID)
+  if(MSVC)
+    # UUID is libonly on Visual Studio
+    set(UUID_INCLUDE_DIRS " " CACHE STRING "" FORCE)
+    set(UUID_LIBRARIES "uuid" CACHE STRING "" FORCE)
+    export_lib(UUID)
+  else()
+    # UUID on mingw is yet something else
+  endif()
 endif()
