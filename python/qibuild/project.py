@@ -180,8 +180,14 @@ def update_project(project, toc):
         project.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (toc.build_type.upper()))
 
     # add cmake flags
-    if toc.cmake_flags:
-        project.cmake_flags.extend(toc.cmake_flags)
+    if toc.user_cmake_flags:
+        project.cmake_flags.extend(toc.user_cmake_flags)
+
+    # add the toolchain file:
+    if toc.toolchain is not None:
+        tc_file = toc.toolchain.toolchain_file
+        toolchain_path = qibuild.sh.to_posix_path(tc_file)
+        project.cmake_flags.append('CMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
 
     # lastly, add a correct -DCMAKE_MODULE_PATH
     cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()

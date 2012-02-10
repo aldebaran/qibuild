@@ -140,11 +140,6 @@ class Toc(WorkTree):
         if not self.build_type:
             self.build_type = "debug"
 
-        # The cmake flags set by the user will always be added
-        # to the actual cmake flags used by the Toc oject,
-        # but we may add other flags when using a toolchain.
-        # see self.update_cmake_flags()
-        self.cmake_flags       = list()
         self.cmake_generator   = cmake_generator
         self.build_folder_name = None
 
@@ -200,7 +195,7 @@ class Toc(WorkTree):
         self.vc_version = self.cmake_generator.split()[-1]
 
         # The actual list of cmake flags we are going to use
-        # will be computed during self.configure_project.
+        # will be computed during self.update_projects
         # Right now, we will just store the flags passed in ctor
         # in self.user_cmake_flags, to be sure they are always added
         # at the end of the list of flags
@@ -372,17 +367,7 @@ class Toc(WorkTree):
     def configure_project(self, project, clean_first=True):
         """ Call cmake with correct options.
 
-        Few notes:
-
-          * The cmake flags (``CMAKE_BUILD_TYPE``, or the ``-D`` args coming
-            from ``qibuild configure -DFOO_BAR``) have already been passed
-            via the toc object. See :py:func:`qibuild.toc.toc_open` and the
-            ``qibuild.project.Project`` for the details.
-
-          * If toolchain file is not None, the flag CMAKE_TOOLCHAIN_FILE
-              will be set.
-
-          * If clean_first is False, we won't delete CMake's cache.
+        :param clean_first: If False, do not delete CMake cache.
             This is mainly useful when you are calling cmake NOT from
             `qibuild configure`.
 
@@ -407,13 +392,6 @@ class Toc(WorkTree):
         cmake_flags = list()
         cmake_flags.extend(project.cmake_flags)
 
-        if self.toolchain is not None:
-            tc_file = self.toolchain.toolchain_file
-            toolchain_path = qibuild.sh.to_posix_path(tc_file)
-            cmake_flags.append('CMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
-
-        # Finally append user's cmake flags (passed in ctor)
-        cmake_flags.extend(self.user_cmake_flags)
 
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
