@@ -44,7 +44,7 @@ For the Desktop
 You can use the C++ packages on Visual Studio 2008 and 2010 (32 bits only),
 Mac and Linux.
 
-First, get the C++ SKD and extract it, say in ``/path/to/cpp/sdk``
+First, get the C++ SDK and extract it, say in ``/path/to/cpp/sdk``
 
 * Create a :term:`worktree` inside the C++ SDK examples folder:
 
