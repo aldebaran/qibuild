@@ -4,7 +4,14 @@
 
 clean(LIBEVENT)
 
-fpath(LIBEVENT event.h PATH_SUFFIXES event2)
-flib(LIBEVENT NAMES event event_core)
-
+fpath(LIBEVENT event2/event.h)
+if (WIN32)
+  flib(LIBEVENT DEBUG     NAMES event_core_d)
+  flib(LIBEVENT DEBUG     NAMES event_d)
+  flib(LIBEVENT OPTIMIZED NAMES event_core)
+  flib(LIBEVENT OPTIMIZED NAMES event)
+else()
+  flib(LIBEVENT NAMES event)
+  flib(LIBEVENT NAMES event_core)
+endif()
 export_lib(LIBEVENT)
