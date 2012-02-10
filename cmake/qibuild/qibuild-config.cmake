@@ -17,5 +17,5 @@ if(_found STREQUAL "-1")
 endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} CACHE INTERNAL ""  FORCE)
 
-include(qibuild/general)
+include(${_this_dir}/general.cmake)
 
