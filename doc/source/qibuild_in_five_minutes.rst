@@ -102,3 +102,96 @@ and extract it, say in ``/path/to/atom/ctc``
     $ qibuild configure -c cross-atom
     $ qibuild make -c cross-atom
 
+
+
+Troubleshooting
+---------------
+
+Here are a few messages you can get, and a possible solution.
+
+
+Configuration fails
+++++++++++++++++++++
+
+Usually the best way to know what is going wrong it to have
+a look at the top of the error message, not the bottom...
+
+Windows: cannot find specifed file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+qiBuild did not find ``cmake.exe.`` You have to make sure
+``cmake.exe`` is in your ``PATH``.
+
+You can do so during ``CMake`` installation, or re-run
+``qibuild config --wizard`` to help qiBuild find it.
+
+
+Cannot create generator 'Unix Makefiles'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This happens on windows. You have to tell qibuild to use
+the 'Visual Studio' generator for instance.
+
+See :ref:`qibuild-getting-started`
+
+Cannot find alcommon
+~~~~~~~~~~~~~~~~~~~~
+
+
+::
+
+  Could not find module FindALCOMMON.cmake or a configuration file for
+  package ALCOMMON.
+
+  Adjust CMAKE_MODULE_PATH to find FindALCOMMON.cmake or set ALCOMMON_DIR to
+  the directory containing a CMake configuration file for ALCOMMON. The file
+  will have one of the following names:
+
+  ALCOMMONConfig.cmake
+  alcommon-config.cmake
+
+
+This happens because qibuild id not find the CMake files related to ``ALCOMMON``.
+
+This can be because you did not add any toolchain to ``qibuild``
+You can check with:
+
+.. code-block:: console
+
+   qitoolchain status
+
+Output should look like ::
+
+  toolchain naoqi-sdk
+    Using feed from /path/to/naoqi-sdk-1.12-linux32/toolchain.xml
+    Packages:
+      naoqi-sdk-linux32
+      in /path/to/naoqi-sdk-1.12-linux32
+
+Here you can see that the toolchain is named ``naoqi-sdk``, so you have to:
+
+* make sure qibuild uses the ``naoqi-sdk`` toolchain by default (you can do
+  that by running the config wizard)
+
+* or tell qibuild to use the ``naoqi-sdk`` toolchain:
+
+.. code-block:: console
+
+   $ qibuild configure -c naoqi-sdk
+   $ qibuild make -c naoqi-sdk
+
+
+
+Strange XML error messages
+++++++++++++++++++++++++++
+
+Right now qiBuild does not cope well with badly formatted XML.
+
+For instance, if ``.config/qi/qibuild.xml``, you will get error messages
+like ::
+
+  Could not parse config from /home/dmerejkowsky/.config/qi/qibuild.xml
+  Error was: Opening and ending tag mismatch: qibuild line 1 and ibuild, line 39, column 10
+
+Here the best way to fix it is to edit the config file by hand, or remove it
+and re-run the config wizard.
