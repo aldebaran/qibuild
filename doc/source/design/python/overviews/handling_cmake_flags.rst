@@ -13,16 +13,14 @@ For this overview, we will assume we have:
   an ``hello`` project, which depends on ``world``
 
 
-This overview guides you through all what
-happends from the moment you run
+This overview guides you through all what happens from the moment you run
 
 .. code-block:: console
 
  $ qibuild configure --worktree /path/to/worktree -c foo-sdk --release -DWITH_EGGS=ON hello
 
 
-To every cmake code that is generated, and what
-CMake flags are passed.
+To every cmake code that is generated, and what CMake flags are passed.
 
 
 Command line parsing
@@ -99,7 +97,7 @@ function.
     (active_projects, single) =  _projects_from_args(toc, args)
     toc.active_projects = active_projects
 
-Note how the ``argparse.NameSpace`` object is exploded to become explicit keywork arguments
+Note how the ``argparse.NameSpace`` object is exploded to become explicit keyword arguments
 to the Toc constructor.
 
 This decouples the ``Toc`` initialization from the command line parsing, which is a good
@@ -148,7 +146,7 @@ Excerpt:
 For the cmake flags it is a bit more complicated.
 
 
-The flags are given are kept in ``self.user_cmake_flags``.
+The flags passed on the command line are kept in ``self.user_cmake_flags``.
 
 .. code-block:: python
 
@@ -160,8 +158,13 @@ The flags are given are kept in ``self.user_cmake_flags``.
                 self.user_cmake_flags = list()
 
 
+Here, ``toc.user_cmake_flags`` will be ``["SPAM=EGGS"]``.
+
 And then the computation of the exact cmake flags to use is done
-inside the `qibuild.project.Project` class
+inside the `qibuild.project.Project` class.
+
+For instance, because of the ``--release`` command line option, we have
+to set ``-DCMAKE_BUILD_TYPE=RELEASE``.
 
 
 Computation of projects cmake flags
@@ -275,9 +278,10 @@ Second case:
 
 ``hello`` must use the ``world-config.cmake`` from ``src/world/build/sdk/``.
 
-In the first case, the toolchain file is enough, so everything works fine.
-
-The ``dependencies.cmake`` in the second case.
+In the first case, the toolchain file is enough, so everything works fine,
+but in the second case, we have to tell cmake it should insert
+``/path/to/worktree/world/build/sdk``
+at the beginning of ``CMAKE_FIND_ROOT_PATH``
 
 So, let's what happens there in the two cases.
 
@@ -309,11 +313,9 @@ So, let's what happens there in the two cases.
         ....
 
 
-So, we have updated every project, the cmake flags are correct, but we
-still have to tell cmake it should insert ``/path/to/worktree/world/build/sdk``
-at the beginning of ``CMAKE_FIND_ROOT_PATH``
+Here ``toc.active_projects`` will be set to ``["hello"]`` in the first
+case, but to ``["world", "hello"]`` in the second case.
 
-So, how does this work?
 
 
 .. code-block:: python
