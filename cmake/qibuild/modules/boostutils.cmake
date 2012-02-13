@@ -8,7 +8,7 @@ function(boost_flib _libname)
   clean(${_prefix})
   # Required so that FindBoost.cmake does not try to include this file
   set(Boost_NO_BOOST_CMAKE TRUE)
-  find_package(Boost COMPONENTS "${_libname}")
+  find_package(Boost COMPONENTS "${_libname}" QUIET)
   qi_set_global(${_prefix}_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
   qi_set_global(${_prefix}_LIBRARIES    ${Boost_LIBRARIES})
   export_lib(${_prefix})
