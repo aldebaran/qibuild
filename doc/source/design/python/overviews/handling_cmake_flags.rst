@@ -521,6 +521,9 @@ That's why the ``toc.get_sdk_dirs`` is called by each project.
 Parsing custom cmake file
 --------------------------
 
+The 'custom cmake file' in a cmake file you can use to add additional CMake code to
+all your projects.
+
 This is mainly useful when you do continuous integration and releases.
 
 For instance, we you just need to compile the ``hello`` project, you have
@@ -529,10 +532,10 @@ nothing to do.
 But you may want to set ``-DCOVERAGE=TRUE`` for your nightly builds, or something
 like that.
 
-So to do that you have to have a way to have CMake code, but not put in the ``qiproject.xml`` file, because you only want to use those flags on certain occasions.
+You cannot use the ``qiproject.xml`` to set ``-DCOVERABE=TRUE``, because you
+only want to use those flags on certain occasions.
 
 Note that sometimes you can even have complete piece of CMake code:
-
 
 .. code-block:: cmake
 
@@ -543,3 +546,6 @@ Note that sometimes you can even have complete piece of CMake code:
 
 
 So the convention is that you put you custom cmake code in ``.qi/<config>.cmake``.
+
+The ``<config>`` should be the name of a toolchain, or the value of the
+``-c`` option.
