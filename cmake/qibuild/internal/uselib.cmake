@@ -6,6 +6,7 @@ if (_QI_USELIB_CMAKE_)
   return()
 endif()
 set(_QI_USELIB_CMAKE_ TRUE)
+include(qibuild/internal/list)
 
 
 # Set CMAKE_FIND_LIBRARY_SUFFIXES so that
@@ -144,7 +145,7 @@ function(_qi_use_lib_internal name)
       if(_compile_defs)
         set(_to_add ${_compile_defs})
       endif()
-      list(APPEND _to_add "${${_U_PKG}_DEFINITIONS}")
+      _qi_list_append_uniq(_to_add "${${_U_PKG}_DEFINITIONS}")
       if(_to_add)
         set_target_properties(${name}
           PROPERTIES
