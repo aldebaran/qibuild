@@ -6,8 +6,4 @@
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 include("${_ROOT_DIR}/boostutils.cmake")
 
-boost_flib("locale")
-qi_set_global(BOOST_LOCALE_DEPENDS "BOOST_THREAD")
-if (APPLE)
-  qi_set_global(BOOST_LOCALE_DEPENDS "BOOST_THREAD" "ICONV")
-endif()
+boost_flib("system")
