@@ -2,6 +2,8 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-clean(BOOST)
-fpath(BOOST boost/config.hpp)
+# Required so that FindBoost.cmake does not try to include this file
+set(Boost_NO_BOOST_CMAKE TRUE)
+find_package(Boost)
+qi_set_global(BOOST_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
 export_header(BOOST)
