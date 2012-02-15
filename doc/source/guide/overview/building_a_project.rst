@@ -56,6 +56,9 @@ everything should work fine.
 Remember to use the same CMake generator in QtCreator and in your configuration
 file, if qtcreator asks you to choose one.
 
+Note: If QtCreator does not ask you for a build directory, one way to force it
+do to so is deleting the ``CMakeLists.txt.user`` file.
+
 qiBuild and Visual Studio
 +++++++++++++++++++++++++
 
