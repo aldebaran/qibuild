@@ -35,7 +35,7 @@ class QiDocBuilder(qibuild.worktree.WorkTree):
 
         if not self.templates_path:
             mess  = "Could not find any template repo\n"
-            mess += "Please make sure that one on the qiproj.xml looks like:\n"
+            mess += "Please make sure that one of the qiproject.xml looks like:\n"
             mess += '<qiproject template_repo="yes" />\n'
             raise Exception(mess)
         self.doxytags_path = os.path.join(self.out_dir, "doxytags")
