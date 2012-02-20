@@ -27,6 +27,13 @@ def get_known_cmake_generators():
     magic_line = "The following generators are available on this platform:"
     # pylint: disable-msg=E1103
     for line in out.splitlines():
+
+        # handle lines like that:
+        # Generator = "blalblalba"
+        #       files.
+        if len(line) >=3:
+            if line[2] == ' ' and not "=" in line:
+                continue
         if line == magic_line:
             intersting = True
             continue
@@ -35,6 +42,9 @@ def get_known_cmake_generators():
     to_parse = ""
     for line in intersting_lines:
         to_parse += line.strip()
+        # handle lines like that:
+        #   Generator
+        #           = "blabla"
         if "=" in line:
             to_parse += "\n"
     res = list()
