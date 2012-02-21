@@ -181,12 +181,12 @@ def worktree_open(work_tree=None):
     return WorkTree(work_tree, path_hints=path_hints)
 
 def search_current_project_root(working_directory):
-    """ When you run qibuild without any arguement,
-    we try to guess the current project using the current working dir.
+    """
+    Try to guess the current project directory using the current working dir.
 
     Two cases:
-        - inside a subdir of qibuild project: look for a qibuild.manifest
-        - inside the build directory of a qibuild project: search a
+      * inside a subdir of qibuild project: look for a qibuild.manifest
+      * inside the build directory of a qibuild project: search a
         cmake build directory, and guess the project from the contents
         of the cmake cache.
     """

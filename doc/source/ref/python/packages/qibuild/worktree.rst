@@ -44,3 +44,9 @@ Typical usage from an action is:
 
     def do(args):
         qiwt = qibuild.worktree_open(args.work_tree)
+
+
+qibuild.worktree.search_current_project_root
+++++++++++++++++++++++++++++++++++++++++++++
+
+.. autofunction:: qibuild.worktree.search_current_project_root
