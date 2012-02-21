@@ -10,6 +10,7 @@ import os
 import sys
 import logging
 import copy
+import operator
 
 LOGGER = logging.getLogger(__name__)
 
@@ -309,6 +310,7 @@ def action_modules_from_package(package_name):
             print "Skipping %s (%s)" % (module_path, err)
             continue
 
+    res.sort(key=operator.attrgetter("__name__"))
     return res
 
 
