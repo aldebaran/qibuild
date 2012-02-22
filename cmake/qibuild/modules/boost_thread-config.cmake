@@ -7,3 +7,6 @@ get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 include("${_ROOT_DIR}/boostutils.cmake")
 
 boost_flib("thread")
+if(UNIX)
+  qi_set_global(BOOST_THREAD_DEPENDS "PTHREAD")
+endif()
