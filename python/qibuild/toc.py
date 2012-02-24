@@ -364,12 +364,16 @@ class Toc(WorkTree):
             return dep_solver.solve(self.active_projects,
                                     runtime=runtime)
 
-    def configure_project(self, project, clean_first=True):
+    def configure_project(self, project,
+        clean_first=True,
+        debug_trycompile=False):
         """ Call cmake with correct options.
 
         :param clean_first: If False, do not delete CMake cache.
             This is mainly useful when you are calling cmake NOT from
             `qibuild configure`.
+        :param debug_trycompile: If True, will pass --debug-trycompile.
+            Useful when detecting compiler fails
 
         """
         if not os.path.exists(project.directory):
@@ -394,6 +398,9 @@ class Toc(WorkTree):
 
 
         cmake_args.extend(["-D" + x for x in cmake_flags])
+
+        if debug_trycompile:
+            cmake_args.append("--debug-trycompile")
 
         if "MinGW" in self.cmake_generator:
             paths = self.build_env["PATH"].split(os.pathsep)

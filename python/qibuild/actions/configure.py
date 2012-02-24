@@ -24,6 +24,9 @@ def configure_parser(parser):
     group.add_argument("--no-clean-first", dest="clean_first",
         action="store_false",
         help="do not clean CMake cache")
+    group.add_argument("--debug-trycompile", dest="debug_trycompile",
+        action="store_true",
+        help="pass --debug-trycompile to CMake call")
     parser.set_defaults(clean_first=True)
 
 def do(args):
@@ -40,10 +43,15 @@ def do(args):
     if args.build_directory:
         projects[0].set_custom_build_directory(args.build_directory)
 
+    if args.debug_trycompile:
+        print "--debug-trycompile ON"
+
     if toc.active_config:
         logger.info("Active configuration: %s", toc.active_config)
     for project in projects:
         logger.info("Configuring %s", project.name)
-        toc.configure_project(project, clean_first=args.clean_first)
+        toc.configure_project(project,
+            clean_first=args.clean_first,
+            debug_trycompile=args.debug_trycompile)
 
 
