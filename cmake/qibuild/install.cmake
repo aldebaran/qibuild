@@ -10,10 +10,13 @@
 
 
 #! Generic install function.
+# See general documentation here :ref:`cmake-install`
+# \argn:                 A list of files : directories and globs on files are accepted.
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
 # \param: IF             Condition that should be verified for the install rules
-#                        to be active for example (IF WITH_ZEROMQ)
-# \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
+#                        to be active (for example IF WITH_ZEROMQ)
+# \flag: KEEP_RELATIVE_PATHS Wether relative path should be preserved during installation.
+# \flag: RECURSE         Wether glob should be recursive.
 function(qi_install)
   _qi_install_internal(${ARGN})
 endfunction()
@@ -24,7 +27,8 @@ endfunction()
 # \argn:                 A list of files : directories and globs on files are accepted.
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
 # \param: IF             Condition that should be verified for the install rules
-#                        to be active for example (IF WITH_ZEROMQ)
+#                        to be active (for example IF WITH_ZEROMQ)
+# \flag: RECURSE         Wether glob should be recursive
 # \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
@@ -40,7 +44,8 @@ endfunction()
 # \argn:                 A list of files : directories and globs on files are accepted.
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
 # \param: IF             Condition that should be verified for the install rules
-#                        to be active for example (IF WITH_ZEROMQ)
+#                        to be active (for example IF WITH_ZEROMQ)
+# \flag: RECURSE         Wether glob should be recursive.
 # \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
@@ -56,6 +61,7 @@ endfunction()
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
 # \param: IF             Condition that should be verified for the install rules
 #                        to be active for example (IF WITH_ZEROMQ)
+# \flag: RECURSE         Wether glob should be recursive
 # \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
@@ -71,6 +77,7 @@ endfunction()
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
 # \param: IF             Condition that should be verified for the install rules
 #                        to be active for example (IF WITH_ZEROMQ)
+# \flag: RECURSE         Wether glob should be recursive
 # \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
@@ -86,6 +93,7 @@ endfunction()
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
 # \param: IF             Condition that should be verified for the install rules
 #                        to be active for example (IF WITH_ZEROMQ)
+# \flag: RECURSE         Wether glob should be recursive
 # \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)

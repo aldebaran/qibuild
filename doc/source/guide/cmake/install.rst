@@ -138,13 +138,23 @@ For instance
 
 .. code-block:: cmake
 
-  qi_install(foo/bar/ \*.txt spam.cfg eggs.cfg DESTINATION "prefix")
+  qi_install(foo/bar/ *.txt spam.cfg eggs.cfg DESTINATION "prefix")
 
 will install:
 
 * directory foo/bar to "prefix/bar"
 * every .txt file in current directory to "prefix"
 * the spam and eggs cfg file to "prefix"
+
+Note the glob is not recursive by default.
+
+If you really need it, just use:
+
+.. code-block:: cmake
+
+   qi_install(foo/*.hpp RECURSE)
+
+
 
 "IF" keyword
 ++++++++++++
