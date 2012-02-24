@@ -28,7 +28,6 @@ def configure_parser(parser):
 
 def _max_len(wt, names):
     """ Helper function to display status """
-    output = ""
     max_len = 0
     for k in names:
         shortpath = os.path.relpath(k, wt)
@@ -59,7 +58,11 @@ def do(args):
         if sys.stdout.isatty():
             name = os.path.split(git_project)
             name = git_project if len(name) <= 0 else name[-1]
-            print "checking (%d/%d): " % (i, sz), name, _pad(oldsz, len(name)), "\r",
+            to_write = "checking (%d/%d)" % (i, sz)
+            to_write += name
+            to_write += _pad(oldsz, len(name))
+            sys.stdout.write(to_write + "\r")
+            sys.stdout.flush()
             oldsz = len(name)
             if i == sz:
                 print "checking (%d/%d): done" % (i, sz), _pad(oldsz, 2)
@@ -78,14 +81,17 @@ def do(args):
         git = qisrc.git.open(git_project)
         shortpath = os.path.relpath(git_project, qiwt.work_tree)
         if git.is_valid():
-            line = _add_pad(max_len, shortpath, " : %s tracking %s" % (git.get_current_branch(), git.get_tracking_branch()))
+            branch = git.get_current_branch()
+            tracking = git.get_tracking_branch()
+            line = _add_pad(max_len, shortpath, " : %s tracking %s" %
+                (branch, tracking))
             LOGGER.info(line)
         if not git.is_clean(untracked=args.untracked_files):
             if args.untracked_files:
-                lines = git.cmd.call_output("status", "-s")
+                (status_, out) = git.call("status", "-s", raises=False)
             else:
-                lines = git.cmd.call_output("status", "-suno")
-            nlines = [ x[:3] + shortpath + "/" + x[3:] for x in lines if len(x.strip()) > 0 ]
+                (status_, out) = git.call("status", "-suno", raises=False)
+            nlines = [ x[:3] + shortpath + "/" + x[3:] for x in out.splitlines() if len(x.strip()) > 0 ]
             print "\n".join(nlines)
 
 

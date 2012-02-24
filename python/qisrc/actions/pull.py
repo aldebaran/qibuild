@@ -140,12 +140,11 @@ def do(args):
         git = qisrc.git.open(git_project)
         LOGGER.info("Pull %s", git_project)
         if args.rebase:
-            out = git.cmd.call_output("pull", "--rebase", rawout=True)
+            (retcode, out) = git.pull("--rebase", raises=False)
         else:
-            out = git.cmd.call_output("pull", rawout=True)
-        if out[0] == 0:
-            print out[1][1],
-            print out[1][0],
+            (retcode, out) = git.pull(raises=False)
+        if retcode == 0:
+            sys.stdout.write(out)
         else:
             LOGGER.error("failed")
             fail.append((git_project, out))
@@ -161,9 +160,8 @@ def do(args):
     print ""
     LOGGER.info("details:")
 
-    for f in fail:
-        LOGGER.error(f[0])
-        print f[1][1][0],
-        print f[1][1][1],
+    for (project, out) in fail:
+        LOGGER.error(project)
+        sys.stdout.write(out)
 
     sys.exit(2)
