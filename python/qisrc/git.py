@@ -43,6 +43,8 @@ class Git:
                 **kwargs)
             out = process.communicate()[0]
             return (process.returncode, out)
+        else:
+            qibuild.command.call(cmd, **kwargs)
 
     def get_config(self, name):
         """ Get a git config value.

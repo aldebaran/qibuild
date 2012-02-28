@@ -38,5 +38,5 @@ def do(args):
         raise qibuild.worktree.ProjectAlreadyExists(url, name, git_src_dir)
 
     git = qisrc.git.Git(git_src_dir)
-    git.clone(url, git_src_dir)
+    git.clone(url)
 
