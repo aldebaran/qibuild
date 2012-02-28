@@ -11,9 +11,12 @@ def log_parser(parser):
     """ Given a parser, add the options controlling log
     """
     group = parser.add_argument_group("logging options")
-    group.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Output debug messages")
-    group.add_argument("--quiet", "-q", dest="quiet", action="store_true", help="Only output error messages")
-    group.add_argument("--no-color", dest="color", action="store_false", help="Do not use color")
+    group.add_argument("-v", "--verbose", dest="verbose", action="store_true",
+         help="Output debug messages")
+    group.add_argument("--quiet", "-q", dest="quiet", action="store_true",
+        help="Only output error messages")
+    group.add_argument("--no-color", dest="color", action="store_false",
+        help="Do not use color")
     group.add_argument("--color", dest = "color", action = "store_false",
                        help = "Colorize output. This is the default")
 
@@ -28,6 +31,8 @@ def default_parser(parser):
     group = parser.add_argument_group("debug options")
     group.add_argument("--backtrace", action="store_true", help="Display backtrace on error")
     group.add_argument("--pdb", action="store_true", help="Use pdb on error")
+    group.add_argument("--quiet-commands", action="store_true", dest="quiet_commands",
+        help="Do not print command outputs")
 
 def work_tree_parser(parser):
     """ Parser settings for every action using a work tree.
