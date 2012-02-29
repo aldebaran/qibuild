@@ -22,7 +22,7 @@ function(qi_install)
 endfunction()
 
 #! Install application headers.
-# The destination will be <prefix>/include/
+# The destination will be **<prefix>/include/**
 #
 # \argn:                 A list of files : directories and globs on files are accepted.
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
@@ -39,7 +39,7 @@ endfunction()
 
 
 #! Install application data.
-# The destination will be: <prefix>/share/
+# The destination will be: **<prefix>/share/**
 #
 # \argn:                 A list of files : directories and globs on files are accepted.
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
@@ -55,7 +55,7 @@ function(qi_install_data)
 endfunction()
 
 #! Install application doc.
-# The destination will be: <prefix>/share/doc/
+# The destination will be: **<prefix>/share/doc/**
 #
 # \argn:                 A list of files : directories and globs on files are accepted.
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
@@ -72,6 +72,7 @@ endfunction()
 
 
 #! Install application configuration files.
+# The destination will be: **<prefix>/etc/**
 #
 # \argn:                 A list of files : directories and globs on files are accepted.
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
@@ -87,7 +88,7 @@ function(qi_install_conf)
 endfunction()
 
 #! Install CMake module files.
-# The destination will be: <prefix>/share/cmake/
+# The destination will be: **<prefix>/share/cmake/**
 #
 # \argn:                 A list of files : directories and globs on files are accepted.
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
@@ -104,6 +105,12 @@ endfunction()
 
 
 #! install a target, that could be a program or a library.
+# The destination will be: **<prefix>/lib** or **<prefix>/bin**,
+# depending on the target and the platform:
+#
+# * Windows: ``*.dll``  and ``*.exe`` in ``bin``, ``*.lib`` in ``lib``
+# * Mac:     ``.dylib`` and ``.a`` in ``lib``, executables in ``bin``
+# * Linux :  ``.so``    and ``.a`` in ``lib``, executables in ``bin``
 #
 # \argn:                 A list of targets to install
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
@@ -148,7 +155,7 @@ function(qi_install_target)
 endfunction()
 
 #! install program (mostly script or user provided program). Do not use this function
-# to install a library or a program built by your project, prefer using qi_install_target.
+# to install a library or a program built by your project, prefer using :cmake:function:`qi_install_target`.
 #
 # \argn:                 A list of programs to install
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
@@ -181,7 +188,7 @@ endfunction()
 
 #! install external library. Do not use this function
 # to install a library or a program built by your project,
-# prefer using qi_install_target.
+# prefer using :cmake:function:`qi_install_target`.
 #
 # \argn:                 A list of libraries to install
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
