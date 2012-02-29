@@ -120,7 +120,10 @@ def run_action(module_name, args=None, forward_args=None):
 
     parser.error = error
     parsed_args = parser.parse_args(args=args, namespace=forward_args)
+
+    # Re-do log and qibuild.command.call configs:
     qibuild.log.configure_logging(parsed_args)
+    qibuild.command.configure_call(parsed_args)
     return module.do(parsed_args)
 
 
