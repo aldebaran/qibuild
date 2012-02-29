@@ -59,18 +59,16 @@ def do(args):
         mess += "\n * " + "\n * ".join(known_generators)
         raise Exception(mess)
 
-    toc_error = None
     toc = None
-    try:
-        toc = qibuild.toc.toc_open(args.work_tree)
-    except qibuild.toc.TocException, e:
-        toc_error = e
 
-    if args.default and not toc:
-        mess = "You need to be in a valid toc worktree to use --default\n"
-        mess += "Exception was:\n"
-        mess += str(toc_error)
-        raise Exception(mess)
+    if args.default:
+        try:
+            toc = qibuild.toc.toc_open(args.work_tree)
+        except qibuild.toc.TocException, e:
+            mess = "You need to be in a valid toc worktree to use --default\n"
+            mess += "Exception was:\n"
+            mess += str(toc_error)
+            raise Exception(mess)
 
     if tc_name in qitoolchain.get_tc_names():
         LOGGER.info("%s already exists, removing previous "
