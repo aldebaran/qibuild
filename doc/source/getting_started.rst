@@ -155,6 +155,29 @@ a better build output), you can also:
 (the location of the ``.bat`` file depends on your setup)
 
 
+Bonus: using JOM
+~~~~~~~~~~~~~~~~
+
+Get the JOM package from here: `ftp://ftp.qt.nokia.com/jom <ftp://ftp.qt.nokia.com/jom/>`_
+and extract it, for instance in ``C:\Jom109``
+
+Then, add jom to you path and use **MinGW Makefiles JOM** generator:
+
+For instance
+
+.. code-block:: xml
+
+  <qibuild version="1">
+    <defaults>
+      <env
+        bat_file="c:\Program Files\Microsoft Visual Studio 9.0\VC\vcvarsall.bat" />
+        path="C:\Jom109"
+      />
+      <cmake generator = "NMake Makefiles JOM" />
+    </defaults>
+  </qibuild>
+
+
 Configuring qiBuild for Eclipse CDT
 +++++++++++++++++++++++++++++++++++
 
@@ -236,14 +259,15 @@ Here’s what a complete ``.config/.qi/qibuild.xml`` would look like to use MinG
 
   <qibuild version="1">
     <defaults>
-      <env path="C:\qtcreator\mingw\bin" />
+      <env path="C:\QtSDK\mingw\bin" />
       <cmake general="MinGW Makefiles" />
     </defaults>
   </qibuild>
 
 
 .. warning:: qibuild never modify os.environ globally, so the executable you
-   just built won't run unless you have mingw's DLLs in your PATH.
+   just built won't run unless you have mingw's DLLs in your PATH,
+   but it should run from QtCreator without problems
 
 
 Configuring qiBuild for MinGW with Msys
