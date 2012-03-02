@@ -508,3 +508,23 @@ def is_runtime(filename):
     # True by default: better have too much stuff than
     # not enough
     return True
+
+
+
+def is_executable_binary(file_path):
+    """ Returns true if the file:
+      * is executable
+      * is a binary (i.e not a script)
+    """
+    if not os.path.isfile(file_path):
+        return False
+    if not os.access(file_path, os.X_OK):
+        return False
+    with open(file_path, 'rb') as fp:
+        data = fp.read(1024)
+        if not data:
+            return False
+        if b'\0' in data:
+            return True
+        return False
+
