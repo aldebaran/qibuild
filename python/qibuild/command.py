@@ -182,6 +182,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
             raise Exception("Trying to to run %s in non-existing %s" %
                 (" ".join(cmd), cwd))
 
+    LOGGER.debug("Calling %s", ", ".join(cmd))
     ring_buffer = RingBuffer(300)
 
     returncode = 0
