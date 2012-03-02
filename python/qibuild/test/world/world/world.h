@@ -17,6 +17,29 @@
 #  define WORLD_API
 #endif
 
+#include <stdexcept>
+
 WORLD_API int get_answer_to_the_question_of_life_universe_and_everything();
+
+
+
+class WORLD_API WorldError : public std::runtime_error
+{
+  public:
+      explicit WorldError(const std::string &message)
+        : std::runtime_error(message)
+      {}
+
+      WorldError(const WorldError &e)
+        : std::runtime_error(e.what())
+      {}
+
+      virtual ~WorldError() throw()
+      {}
+
+};
+
+WORLD_API void kaboom();
+
 
 #endif // _ANSWER_H
