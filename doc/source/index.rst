@@ -99,8 +99,19 @@ Please also read this first:
    contrib/cmake/coding_guide
    contrib/python/coding_guide
 
-Make sure you check your code is correct
-before sending a merge request
+qibuild uses the 'Test Driven Development' technique.
+
+It is advised you write tests **before** adding new code.
+
+You can read more about it here:
+
+.. toctree::
+   :maxdepth: 1
+
+   contrib/test_driven_development
+
+In any case, you must make sure to check your code is correct
+before sending a merge request:
 
 .. toctree::
    :maxdepth: 1
@@ -115,6 +126,7 @@ updates concerning your changes.
    :maxdepth: 1
 
    contrib/writing_documentation
+
 
 
 qiBuild design
