@@ -17,15 +17,19 @@ class Git:
         self.repo = repo
 
     def call(self, *args, **kwargs):
-        """ Call a git command
+        """
+        Call a git command
+
         :param args: The arguments of the command.
-            For instance ["frobnicate", "--spam=eggs"]
+                     For instance ["frobnicate", "--spam=eggs"]
+
         :param kwargs: Will be passed to subprocess.check_call()
                        command, with the following changes:
+
            * if cwd is not given it will be self.repo instead
            * if env is not given it will be read from the config file
            * if raises is False, no exception will be raise if command
-                fails, and a (retcode, output) tuple will be returned.
+             fails, and a (retcode, output) tuple will be returned.
         """
         build_env = qibuild.config.get_build_env()
         if not "cwd" in kwargs.keys():
@@ -129,8 +133,8 @@ class Git:
         """
         Returns true if working dir is clean.
         (ie no untracked files, no unstaged changes)
-        :param untracked: will return True even if there are
-           untracked files.
+
+            :param untracked: will return True even if there are untracked files.
         """
         if untracked:
             (status, out) = self.call("status", "-s", raises=False)
