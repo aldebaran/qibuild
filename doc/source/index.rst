@@ -88,6 +88,14 @@ Contributing to qiBuild
 qiBuild development process take place on github:
 https://github.com/aldebaran/qibuild
 
+Please open an issue on github for every qibuild bug you may
+find, but make sure to read this first:
+
+.. toctree::
+    :maxdepth 1:
+
+    contrib/reporting_bugs
+
 Please fork the project on github and make a merge request
 if you want to contribute.
 
