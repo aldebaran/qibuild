@@ -163,7 +163,7 @@ and extract it, for instance in ``C:\Jom109``
 
 Then, add jom to you path and use **MinGW Makefiles JOM** generator:
 
-For instance
+For instance:
 
 .. code-block:: xml
 
@@ -174,6 +174,31 @@ For instance
         path="C:\Jom109"
       />
       <cmake generator = "NMake Makefiles JOM" />
+    </defaults>
+  </qibuild>
+
+
+Bonus: using IncrediBuild
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Get IncrediBuild from http://www.xoreax.com/download_center.php
+
+Then you should:
+
+* Tell qibuild to use incredibuild
+
+* Tell qibuild how to find BuildConsole.exe (a tool to use incredibuild from the command line)
+
+For instance:
+
+.. code-block:: xml
+
+  <qibuild version="1">
+    <build incredibuild="true" />
+    <defaults>
+      <env
+        path="C:\Program Files\Xoreax\IncrediBuild"
+      />
     </defaults>
   </qibuild>
 
