@@ -27,22 +27,6 @@ set(_QI_TARGET_CMAKE_ TRUE)
 
 include(CMakeParseArguments)
 
-function(_qi_post_copy_deps name)
-  # Get qibuild cmake module path:
-  include(qibuild/general RESULT_VARIABLE _qibuild_general_path)
-  get_filename_component(_qibuild_cmake_module_path ${_qibuild_general_path} PATH)
-  set(_qibuild_cmake_module_path "${_qibuild_cmake_module_path}/..")
-  configure_file(${QI_ROOT_DIR}/templates/post-copy-deps.cmake
-                 ${CMAKE_BINARY_DIR}/post-copy-deps.cmake
-                 @ONLY)
-  add_custom_command(TARGET ${name} POST_BUILD
-    COMMAND
-      ${CMAKE_COMMAND}
-      -P ${CMAKE_BINARY_DIR}/post-copy-deps.cmake
-      ${CMAKE_BINARY_DIR}
-  )
-endfunction()
-
 #! Create an executable.
 # The target name should be unique.
 #
@@ -131,9 +115,6 @@ function(qi_create_bin name)
       )
     endif()
   endif()
-
-  _qi_post_copy_deps("${name}")
-
 endfunction()
 
 
@@ -267,7 +248,6 @@ function(qi_create_lib name)
   endif()
 
   qi_use_lib("${name}" ${ARG_DEPENDS})
-
 
   if (MSVC)
     # always postfix debug lib/bin with _d ...

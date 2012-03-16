@@ -8,6 +8,7 @@ which is where all the 'magic' happens ....
 """
 
 import os
+import sys
 import glob
 import platform
 import logging
@@ -462,6 +463,37 @@ class Toc(WorkTree):
         except CommandFailedException:
             raise BuildFailed(project)
 
+        self.fix_shared_libs(project)
+
+
+    def fix_shared_libs(self, project):
+        """ Fix shared libraries so that newly compiled
+        executables can run withtout having to set any
+        environment variable
+
+        """
+        build_dir = project.build_directory
+        sdk_dir   = project.sdk_directory
+
+        paths = list()
+
+        for package in self.packages:
+            paths.append(package.path)
+
+        sdk_dirs = self.get_sdk_dirs(project.name)
+        paths.extend(sdk_dirs)
+
+        if sys.platform.startswith("win"):
+            mingw = "mingw" in self.cmake_generator.lower()
+            import qibuild.dlls
+            qibuild.dlls.fix_dlls(sdk_dir, paths=paths,
+                mingw=mingw,
+                build_env=self.build_env)
+        if sys.platform == "darwin":
+            import qibuild.dylibs
+            qibuild.dylibs.fix_dylibs(sdk_dir, paths=paths)
+
+
     def test_project(self, project, test_name=None):
         """Run qibuild.ctest on a project
 
@@ -718,4 +750,5 @@ def handle_old_qibuild_xml(worktree):
     qibuild.sh.mkdir(os.path.dirname(global_path), recursive=True)
     with open(global_path, "w") as fp:
         fp.write(global_xml)
+
 

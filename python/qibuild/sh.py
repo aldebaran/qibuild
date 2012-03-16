@@ -192,6 +192,24 @@ def install(src, dest, filter_fun=None, quiet=False):
         rm(dest)
         shutil.copy(src, dest)
 
+def safe_copy(src, dest):
+    """ Copy a source to a destination but
+    do not overwrite dest if it is more recent than src
+
+    Create any missing directories when necessary
+
+    If dest is a directory, src will be copied inside dest.
+
+    """
+    if os.path.isdir(dest):
+        dest = os.path.join(dest, os.path.basename(src))
+    if os.path.exists(dest):
+        dest_mtime = os.stat(dest).st_mtime
+        src_mtime  = os.stat(src).st_mtime
+        if src_mtime < dest_mtime:
+            return
+    shutil.copy(src, dest)
+
 def rm(name):
     """This one can take a file or a directory.
     Contrary to shutil.remove or os.remove, it:
