@@ -11,6 +11,7 @@ import os
 import sys
 import glob
 import platform
+import signal
 import logging
 import operator
 
@@ -37,10 +38,14 @@ class TocException(Exception):
         return self._message
 
 class ConfigureFailed(Exception):
-    def __init__(self, project):
+    def __init__(self, project, message=None):
         self.project = project
+        self.message = message
     def __str__(self):
-        return "Error occured when configuring project %s" % self.project.name
+        res = "Error occured when configuring project %s" % self.project.name
+        if self.message:
+            res += "\n" + self.message
+        return res
 
 class BuildFailed(Exception):
     def __init__(self, project):
@@ -417,8 +422,14 @@ class Toc(WorkTree):
                           cmake_args,
                           clean_first=clean_first,
                           env=self.build_env)
-        except CommandFailedException:
-            raise ConfigureFailed(project)
+        except CommandFailedException, e:
+            if e.returncode == -signal.SIGSEGV:
+                mess = "CMake crashed. "
+                mess += "This usually means you have an endless recursive "
+                mess += "loop in your cmake code"
+            else:
+                mess = None
+            raise ConfigureFailed(project, message=mess)
 
 
     def build_project(self, project, incredibuild=False, num_jobs=1, target=None, rebuild=False):
