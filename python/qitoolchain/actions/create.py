@@ -67,7 +67,7 @@ def do(args):
         except qibuild.toc.TocException, e:
             mess = "You need to be in a valid toc worktree to use --default\n"
             mess += "Exception was:\n"
-            mess += str(toc_error)
+            mess += str(e)
             raise Exception(mess)
 
     if tc_name in qitoolchain.get_tc_names():
