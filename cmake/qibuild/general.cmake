@@ -70,6 +70,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 include("qibuild/find")
+include("qibuild/flags")
 include("qibuild/tests")
 include("qibuild/install")
 include("qibuild/target")

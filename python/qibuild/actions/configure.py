@@ -27,12 +27,27 @@ def configure_parser(parser):
     group.add_argument("--debug-trycompile", dest="debug_trycompile",
         action="store_true",
         help="pass --debug-trycompile to CMake call")
-    parser.set_defaults(clean_first=True)
+    group.add_argument("--eff-c++", dest="effective_cplusplus",
+        action="store_true",
+        help="activate warnings from the 'Effective C++' book (gcc only)")
+    group.add_argument("--werror", dest="werror",
+        action="store_true",
+        help="tread warnings as error")
+    parser.set_defaults(clean_first=True,
+        effective_cplusplus=False,
+        werror=False)
 
 def do(args):
     """Main entry point"""
     if args.build_directory and not args.single:
         raise Exception("You should use --single when specifying a build directory")
+
+    if not args.cmake_flags:
+        args.cmake_flags = list()
+    if args.effective_cplusplus:
+        args.cmake_flags.append("QI_EFFECTIVE_CPP=ON")
+    if args.werror:
+        args.cmake_flags.append("QI_WERROR=ON")
 
     logger   = logging.getLogger(__name__)
     toc      = qibuild.toc_open(args.work_tree, args)
