@@ -8,8 +8,6 @@
 
 """
 
-import sys
-import os
 import subprocess
 
 def call(cmd, cwd=None, env=None, quiet=False):

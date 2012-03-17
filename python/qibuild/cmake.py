@@ -21,7 +21,7 @@ def get_known_cmake_generators():
           "Please install it if necessary and re-run `qibuild config --wizard`")
     process = subprocess.Popen([cmake, "--help"],
         stdout=subprocess.PIPE)
-    (out, err) = process.communicate()
+    (out, _err) = process.communicate()
     intersting = False
     intersting_lines = list()
     magic_line = "The following generators are available on this platform:"

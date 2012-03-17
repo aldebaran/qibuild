@@ -12,7 +12,6 @@ import tempfile
 import unittest
 import mock
 
-import qibuild
 import qibuild.wizard
 
 class FakeInteract:

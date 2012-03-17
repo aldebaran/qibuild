@@ -107,9 +107,9 @@ def run_action(module_name, args=None, forward_args=None):
     #  - print usage to the console
     #  - call SystemExit
     # Instead, raise a nice Exception
-    def exit():
+    def custom_exit():
         return
-    parser.exit = exit
+    parser.exit = custom_exit
 
     def error(message):
         mess  = "Invalid arguments when calling run_action(%s)\n" % module_name
@@ -238,7 +238,7 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
         _cmdparse_no_action = False
 
         try:
-            (ns, remaining) = parser_fake.parse_known_args(args)
+            parser_fake.parse_known_args(args)
         except:
             if _cmdparse_no_action == True:
                 return False

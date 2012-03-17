@@ -61,7 +61,6 @@ def extract_tar(archive_path, dest_dir):
     archive = tarfile.open(archive_path)
     members = archive.getmembers()
     size = len(members)
-    res = None
     orig_topdir = members[0].name.split(posixpath.sep)[0]
     done = 0
     # Extract directories with a safe mode.
@@ -191,7 +190,7 @@ def zip_win(directory):
     directory    = qibuild.sh.to_native_path(directory)
     archive_name = qibuild.sh.to_native_path(archive_name)
     archive = zipfile.ZipFile(archive_name, "w", zipfile.ZIP_DEFLATED)
-    for (root, directories, filenames) in os.walk(directory):
+    for (root, _directories, filenames) in os.walk(directory):
         for filename in filenames:
             full_path = os.path.join(root, filename)
             rel_path = os.path.relpath(full_path, directory)

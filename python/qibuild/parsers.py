@@ -5,8 +5,6 @@
 """ Collection of parser fonctions for various actions
 """
 
-import qibuild
-
 def log_parser(parser):
     """ Given a parser, add the options controlling log
     """

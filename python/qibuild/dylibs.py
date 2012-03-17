@@ -37,7 +37,6 @@ def find_missing_libs_and_frameworks(executable):
         # Line looks like:
         #     /pat/to/foo/dylib  (compatibility version ...)
         libs_to_check.append(line.split("(")[0].strip())
-    res = list()
     for lib in libs_to_check:
         # Absolute path (/usr/lib/libstdc++.lib, /usr/local/mydep.dylib)
         if os.path.isabs(lib):

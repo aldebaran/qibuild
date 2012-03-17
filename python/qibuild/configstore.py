@@ -167,7 +167,7 @@ class ConfigStore:
                 max_len = len(k)
         for k, v in configdict.iteritems():
             if pad:
-                pad_space = "".join([ " " for x in range(max_len - len(k)) ])
+                pad_space = " " * (max_len - len(k))
             else:
                 pad_space = ""
             output += "  %s%s = %s\n" % (k, pad_space, str(v))
