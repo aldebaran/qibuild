@@ -64,6 +64,28 @@ def ask_ide(qibuild_cfg):
         "Please choose an IDE")
     return ide
 
+def ask_incredibuild(qibuild_cfg):
+    """ Ask the user if he wants to use IncrediBuild
+
+    """
+    build_env = qibuild.config.get_build_env()
+    answer = qibuild.interact.ask_yes_no("Do you want to use IncrediBuild ?", False)
+    if not answer:
+        return
+
+    build_console = qibuild.command.find_program("BuildConsole.exe", env=build_env)
+    if build_console:
+        qibuild_cfg.build.incredibuild = True
+        return
+
+    build_console = qibuild.interact.ask_program("Please enter full BuildConsole.exe path")
+    if not build_console:
+        return
+    # Add path to CMake in build env
+    import ntpath
+    build_console_path = ntpath.dirname(build_console)
+    qibuild_cfg.add_to_default_path(build_console_path)
+    qibuild_cfg.build.incredibuild = True
 
 def configure_qtcreator(qibuild_cfg):
     """ Configure QtCreator
@@ -180,6 +202,9 @@ def run_config_wizard(toc):
     ide = ask_ide(qibuild_cfg)
     if ide:
         configure_ide(qibuild_cfg, ide)
+
+    if qibuild.get_platform() == "windows":
+        ask_incredibuild(qibuild_cfg)
 
     qibuild_cfg.write()
 

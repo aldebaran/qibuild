@@ -331,6 +331,22 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.assertEqual(toc.config.defaults.cmake.generator, "Visual Studio 10")
 
 
+    def test_incredibuild(self):
+        self.setup_platform("windows")
+        self.setup_find_program({
+            "cmake"  : r"c:\Program Files\CMake\bin\cmake.exe",
+        })
+        self.setup_answers({
+            "generator" : "Visual Studio 10",
+            "ide" : "Visual Studio",
+            "use incredibuild" : True,
+            "buildconsole.exe path" : r"C:\Program Files\Xoreax\BuildConsole.exe"
+        })
+        self.setup_generators(["Visual Studio 10"])
+        cfg = self.run_wizard()
+        self.assertEqual(cfg.build.incredibuild, True)
+        self.assertEqual(cfg.defaults.env.path, r"C:\Program Files\Xoreax")
+
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
         self.get_platform.stop()
