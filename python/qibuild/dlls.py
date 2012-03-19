@@ -21,6 +21,7 @@ def fix_dlls(sdk_dir, build_env=None, paths=None, mingw=False):
     if not paths:
         return
     dest = os.path.join(sdk_dir, "bin")
+    qibuild.sh.mkdir(dest, recursive=True)
     dlls_to_copy = list()
     for path in paths:
         bin_dir = os.path.join(path, "bin")
