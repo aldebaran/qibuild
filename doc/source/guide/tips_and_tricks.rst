@@ -123,7 +123,7 @@ Compile warnings
 By default, ``qibuild`` will not change your compile flags at all.
 
 If you work in a cross-platform environment, it is advised you
-use
+use :cmake:function:`qi_sanitize_compile_flags`
 
 .. code-block:: cmake
 
