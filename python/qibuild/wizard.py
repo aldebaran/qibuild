@@ -75,11 +75,13 @@ def ask_incredibuild(qibuild_cfg):
 
     build_console = qibuild.command.find_program("BuildConsole.exe", env=build_env)
     if build_console:
+        print "Found BuildConsole.exe:", build_console
         qibuild_cfg.build.incredibuild = True
         return
 
     build_console = qibuild.interact.ask_program("Please enter full BuildConsole.exe path")
     if not build_console:
+        print "Cannot use Incredibuild without knowing the path to BuildConsole.exe"
         return
     # Add path to CMake in build env
     import ntpath
