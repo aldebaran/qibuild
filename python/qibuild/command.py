@@ -47,6 +47,7 @@ class ProcessThread(threading.Thread):
         self.exception = ""
 
     def run(self):
+        LOGGER.debug("starting %s", self.cmd)
         try:
             self.process = subprocess.Popen(self.cmd,
                 stdout=subprocess.PIPE,
