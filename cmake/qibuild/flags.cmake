@@ -6,19 +6,19 @@
 # =======================
 
 
-#!\ Sanitize compile flags between different compilers
+#! Sanitize compile flags between different compilers
 #   (gcc and cl.exe)
-# \flag HIDDEN_SYMBOLS Hide symbol in dynamic
+# The function will also read the following variables that
+# can be set from the command line:
+#   * QI_WERROR:         treat warning as errors
+#   * QI_EFFECTIVE_CPP : emit warnings from the 'Effective C++' book
+# \flag:HIDDEN_SYMBOLS Hide symbol in dynamic
 #       unless exlicitely exported.
 #       Useful when you want to
 #       have the same behavior between cl.exe and gcc
 #       for shared libraries.
 #       Note that in this case, you should use qi/macro.hpp
 #       to export the symbols of your library.
-# The function will also read the following variables that
-# can be set from the command line:
-#   * QI_WERROR:         treat warning as errors
-#   * QI_EFFECTIVE_CPP : emit warnings from the 'Effective C++' book
 function(qi_sanitize_compile_flags)
   cmake_parse_arguments(ARGS "HIDDEN_SYMBOLS" "" "" ${ARGN})
   # cl.exe :

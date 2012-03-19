@@ -15,6 +15,7 @@ DOCUMENTED_FILES=[
     "submodule",
     "option",
     "find",
+    "flags",
     "swig/python"
 ]
 

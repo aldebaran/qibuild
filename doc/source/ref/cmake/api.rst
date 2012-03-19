@@ -28,4 +28,5 @@ qibuild CMake API functions
    api/log
    api/option
    api/find
+   api/flags
    api/swig/python
