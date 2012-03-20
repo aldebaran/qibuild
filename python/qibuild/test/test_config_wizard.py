@@ -340,15 +340,16 @@ class ConfigWizardTestCase(unittest.TestCase):
             "generator" : "Visual Studio 10",
             "ide" : "Visual Studio",
             "use incredibuild" : True,
-            "buildconsole.exe path" : r"C:\Program Files\Xoreax\BuildConsole.exe"
+            "buildconsole.exe path" : "/c/Program Files/Xoreax/BuildConsole.exe"
         })
         self.setup_generators(["Visual Studio 10"])
         cfg = self.run_wizard()
         self.assertEqual(cfg.build.incredibuild, True)
-        self.assertEqual(cfg.defaults.env.path, r"C:\Program Files\Xoreax")
+        self.assertEqual(cfg.defaults.env.path, r"/c/Program Files/Xoreax")
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
+        # pylint: disable-msg=E1103
         self.get_platform.stop()
         self.get_tc_names_patcher.stop()
         self.cfg_patcher.stop()

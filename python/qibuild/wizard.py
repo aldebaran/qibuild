@@ -84,8 +84,7 @@ def ask_incredibuild(qibuild_cfg):
         print "Cannot use Incredibuild without knowing the path to BuildConsole.exe"
         return
     # Add path to CMake in build env
-    import ntpath
-    build_console_path = ntpath.dirname(build_console)
+    build_console_path = os.path.dirname(build_console)
     qibuild_cfg.add_to_default_path(build_console_path)
     qibuild_cfg.build.incredibuild = True
 
