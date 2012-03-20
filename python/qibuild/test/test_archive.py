@@ -112,6 +112,16 @@ class ArchiveTestCase(unittest.TestCase):
         ls_r = qibuild.sh.ls_r(aa)
         self.assertEquals(ls_r, ["b"])
 
+    def test_extract_change_topdir_already_correct(self):
+        src = os.path.join(self.tmp, "src")
+        os.mkdir(src)
+        a_dir = os.path.join(src, "a")
+        os.mkdir(a_dir)
+        tar_gz = qibuild.archive.zip_unix(a_dir)
+        dest = os.path.join(self.tmp, "dest")
+        qibuild.archive.extract(tar_gz, dest, topdir="a")
+        ls_r = qibuild.sh.ls_r(dest)
+        self.assertEquals(ls_r, ["a/"])
 
     def test_extract_with_symlink(self):
         if sys.platform.startswith("win"):

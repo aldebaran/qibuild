@@ -168,6 +168,8 @@ def extract(archive_path, directory, topdir=None):
     try:
         if topdir:
             extracted = extract_fun(archive_path, directory)
+            if os.path.basename(extracted) == topdir:
+                return
             res = os.path.join(directory, topdir)
             qibuild.sh.rm(res)
             os.rename(extracted, res)
@@ -265,4 +267,4 @@ def archive_name(directory):
 
 
 if __name__ == "__main__":
-    extract(sys.argv[1], sys.argv[2], topdir="py")
+    extract(sys.argv[1], sys.argv[2], topdir=sys.argv[3])
