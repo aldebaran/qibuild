@@ -167,11 +167,10 @@ def extract(archive_path, directory, topdir=None):
     # so let's just catch everything
     try:
         if topdir:
-            with qibuild.sh.TempDir() as tmp:
-                extracted = extract_fun(archive_path, tmp)
-                dest = os.path.join(directory, topdir)
-                qibuild.sh.install(extracted, dest, quiet=True)
-                res = dest
+            extracted = extract_fun(archive_path, directory)
+            res = os.path.join(directory, topdir)
+            qibuild.sh.rm(res)
+            os.rename(extracted, res)
         else:
             res = extract_fun(archive_path, directory)
         return res
