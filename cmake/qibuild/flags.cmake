@@ -44,7 +44,9 @@ function(qi_sanitize_compile_flags)
   # gcc or clang:
   if(UNIX OR MINGW)
     # Use 'standard': c89 and c++98
-    add_definitions("-ansi")
+
+    # doesn't work: bug #7215
+    # add_definitions("-ansi")
 
     # Activate warnings
     add_definitions("-Wall -Wextra")
