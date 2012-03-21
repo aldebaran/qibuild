@@ -484,7 +484,9 @@ cmake.generator = "Visual Studio 10"
   <ide name="QtCreator" path="/qtsdk/bin/qtcreator" />
 </qibuild>
 """
-        (qibuild_xml, local_xml) = qibuild.config.convert_qibuild_xml(StringIO(xml))
+        with open(self.cfg_path, "w") as fp:
+            fp.write(xml)
+        (qibuild_xml, local_xml) = qibuild.config.convert_qibuild_xml(self.cfg_path)
         qibuild_cfg = cfg_from_string(qibuild_xml)
         qibuild_cfg.read_local_config(StringIO(local_xml))
         self.assertEqual(qibuild_cfg.local.defaults.config, "linux32")
