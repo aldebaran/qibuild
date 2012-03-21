@@ -83,7 +83,17 @@ def build(src, dest, opts):
     print "# Building sphinx ", src, "->", dest
     print
     config_path = os.path.join(src, "qidoc")
-    cmd = ["sphinx-build", "-c", config_path]
+    # Try with sphinx-build2 (for arch), then fall back on
+    # sphinx-build
+    sphinx_build2 = qibuild.command.find_program("sphinx-build2")
+    if sphinx_build2:
+        cmd = [sphinx_build2]
+    else:
+        sphinx_build = qibuild.command.find_program("sphinx-build")
+        if not sphinx_build:
+            raise Exception("sphinx-build not in path, please install it")
+
+    cmd.extend(["-c", config_path])
     if opts.get("werror"):
         cmd.append("-W")
     if opts.get("quiet"):

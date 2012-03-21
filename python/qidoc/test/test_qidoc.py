@@ -23,7 +23,6 @@ class TestQiDoc(unittest.TestCase):
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
 
-    @unittest.skip("not a unittest: depends on sphinx-build2")
     def test_build(self):
         opts = dict()
         opts["version"] = 1.42
