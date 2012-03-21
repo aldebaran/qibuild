@@ -28,3 +28,10 @@ check:
 	@echo ":: Running tests"
 	@$(PYTHON) run_tests.py
 
+
+coverage:
+	@echo ":: Running tests (with coverage)"
+	@rm -fr .coverage htmlcov
+	@$(PYTHON) run_tests.py --coverage
+	@$(PYTHON) -m coverage html
+

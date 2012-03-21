@@ -11,10 +11,11 @@ working dir, so that python libraries are found
 import os
 import sys
 import nose
+import argparse
 
 import qibuild
 
-def run_tests():
+def run_tests(args):
     """Prepare the test/ subdir, run nosetests with correct
     options
 
@@ -25,7 +26,13 @@ def run_tests():
     qibuild.sh.mkdir(qi_test_dir, recursive=True)
     with open(os.path.join(qi_test_dir, "qibuild.xml"), "w") as fp:
         fp.write("<qibuild />")
-    nose.main()
+    nose_args = ["nose"]
+    if args.coverage:
+        nose_args.append("--with-coverage")
+    nose.main(argv=nose_args)
 
 if __name__ == "__main__":
-    run_tests()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--coverage", action="store_true")
+    args = parser.parse_args()
+    run_tests(args)

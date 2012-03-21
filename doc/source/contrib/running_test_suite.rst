@@ -87,3 +87,19 @@ failing test and mark it as 'skipped'
 
 This way when the bug is fixed we just have to remove the ``@unittest.skip``
 and we are sure the bug never occurs again.
+
+
+Coverage
+--------
+
+First, install `python-coverage <http://nedbatchelder.com/code/coverage/>`_
+
+Then use:
+
+.. code-block:: console
+
+   $ cd qibuild/python
+   $ make coverage
+   # or
+   $ python run_tests.py --coverage
+   $ python -m coverage html
