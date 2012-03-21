@@ -29,10 +29,13 @@ def run_tests(args):
     nose_args = ["nose"]
     if args.coverage:
         nose_args.append("--with-coverage")
+    if args.xunit:
+        nose_args.append("--with-xunit")
     nose.main(argv=nose_args)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--coverage", action="store_true")
+    parser.add_argument("--xunit", action="store_true")
     args = parser.parse_args()
     run_tests(args)

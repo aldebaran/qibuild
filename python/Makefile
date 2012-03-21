@@ -35,3 +35,8 @@ coverage:
 	@$(PYTHON) run_tests.py --coverage
 	@$(PYTHON) -m coverage html
 
+
+# To be run on a build farm:
+continuous: check-error
+	@$(PYTHON) run_tests.py --coverage --xunit
+
