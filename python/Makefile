@@ -32,11 +32,10 @@ check:
 coverage:
 	@echo ":: Running tests (with coverage)"
 	@rm -fr .coverage htmlcov
-	@$(PYTHON) run_tests.py --coverage
+	@$(PYTHON) run_tests.py --coverage --xunit
 	@$(PYTHON) -m coverage html
 
 
 # To be run on a build farm:
-continuous: check-error
-	@$(PYTHON) run_tests.py --coverage --xunit
+continuous: check-error coverage
 
