@@ -13,6 +13,9 @@ include(qibuild/internal/stage)
 include(qibuild/internal/uselib)
 
 #! Generate a 'name'-config.cmake, allowing other project to find the library.
+# Usage of the various arguments are a bit tricky, so please read
+# :ref:`using-qi-stage-lib` before using them
+#
 # \arg:target a target created with qi_create_lib
 # \group:DEPRECATED specify a deprecated message. This message will be displayed
 #                   each time another project use that lib.
@@ -29,6 +32,7 @@ include(qibuild/internal/uselib)
 #                 but you still need to do #include <bar.h>, you can
 #                 set PATH_SUFFIXES to 'foo'. Be careful to test the
 #                 intall rules of your headers if you choose to do so.
+#
 function(qi_stage_lib target)
   if(NOT TARGET "${target}")
     qi_error("When calling qi_stage_lib(${target})

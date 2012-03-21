@@ -45,6 +45,7 @@ Advanced tutorials
 
 * :ref:`porting-to-qibuild`
 * :ref:`writing-a-config-cmake`
+* :ref:`using-qi-stage-lib`
 * :ref:`how-to-write-a-library`
 * :ref:`managing-build-configs`
 * :ref:`using-toolchains`

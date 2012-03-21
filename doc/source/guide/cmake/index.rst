@@ -9,5 +9,5 @@ Using qiBuild CMake API
    test
    managing_config_files
    writing_a_config_cmake
-
+   using_qi_stage
 
