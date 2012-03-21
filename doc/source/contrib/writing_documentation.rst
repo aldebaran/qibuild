@@ -11,13 +11,34 @@ so do not hesitate to create links between various sections.
 
 Please submit documentation updates (if relevant) when you submit your patches.
 
+Building the doc
+-----------------
+
+On linux, simply install sphinx, and then run
+
+.. code-block:: console
+
+   $ cd doc
+   $ make
+
+Note: on archlinux, (or any distribution using python3 by default),
+because we use a custom sphinx extension written in python2,
+you have to install ``python2-sphinx`` and use:
+
+.. code-block:: console
+
+   $ cd doc
+   $ make SPHINXBUILD=sphinx-build2
+
+
 Documenting CMake API
 ----------------------
 
 The :ref:`qibuild-cmake-api` is automatically generated from the
 comments of the cmake files in ``cmake/qibuild``
 
-If you add a new file, please add it to the list in ``ref/cmake/api.rst``
+If you add a new file, please add it to the list in
+``ref/cmake/api.rst`` and in ``tools/gen_cmake_rst.py``
 
 Also, when changing the comments of a cmake functions, please
 regenerate the ``.rst`` files to check the output.
