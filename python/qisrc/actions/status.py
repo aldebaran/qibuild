@@ -16,7 +16,7 @@ LOGGER = logging.getLogger("qisrc.status")
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.work_tree_parser(parser)
+    qibuild.parsers.worktree_parser(parser)
     parser.add_argument("--untracked-files", "-u",
         dest="untracked_files",
         action="store_true",
@@ -47,17 +47,16 @@ def _pad(szold, sznew):
 
 def do(args):
     """ Main method """
-    qiwt = qibuild.worktree_open(args.work_tree)
+    qiwt = qibuild.open_worktree(args.worktree)
     gitrepo = list()
     dirty = list()
-    sz = len(qiwt.git_projects.values())
+    sz = len(qiwt.git_projects)
     i = 1
     oldsz = 0
-    for git_project in qiwt.git_projects.values():
-        git = qisrc.git.open(git_project)
+    for git_project in qiwt.git_projects:
+        git = qisrc.git.open(git_project.src)
         if sys.stdout.isatty():
-            name = os.path.split(git_project)
-            name = git_project if len(name) <= 0 else name[-1]
+            name = git_project.name
             to_write = "checking (%d/%d)" % (i, sz)
             to_write += name
             to_write += _pad(oldsz, len(name))
@@ -76,10 +75,10 @@ def do(args):
 
     LOGGER.info("Dirty projects: %d/%d", len(dirty), len(qiwt.git_projects))
 
-    max_len = _max_len(qiwt.work_tree, gitrepo)
+    max_len = _max_len(qiwt.root, gitrepo)
     for git_project in gitrepo:
-        git = qisrc.git.open(git_project)
-        shortpath = os.path.relpath(git_project, qiwt.work_tree)
+        git = qisrc.git.open(git_project.src)
+        shortpath = os.path.relpath(git_project, qiwt.root)
         if git.is_valid():
             branch = git.get_current_branch()
             tracking = git.get_tracking_branch()
