@@ -29,10 +29,10 @@ qibuild.worktree.WorkTree
 Other functions in this module
 ------------------------------
 
-qibuild.worktree.worktree_open
+qibuild.worktree.open_worktree
 +++++++++++++++++++++++++++++++
 
-.. autofunction:: qibuild.worktree.worktree_open
+.. autofunction:: qibuild.worktree.open_worktree
 
 Typical usage from an action is:
 
@@ -43,7 +43,7 @@ Typical usage from an action is:
         qibuild.worktree.work_tree_parser(parser)
 
     def do(args):
-        qiwt = qibuild.worktree_open(args.work_tree)
+        qiwt = qibuild.open_worktree(args.work_tree)
 
 
 qibuild.worktree.search_current_project_root

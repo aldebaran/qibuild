@@ -32,16 +32,17 @@ def default_parser(parser):
     group.add_argument("--quiet-commands", action="store_true", dest="quiet_commands",
         help="Do not print command outputs")
 
-def work_tree_parser(parser):
+def worktree_parser(parser):
     """ Parser settings for every action using a work tree.
     """
     default_parser(parser)
-    parser.add_argument("--work-tree", help="Use a specific work tree path.")
+    parser.add_argument("--work-tree", dest="worktree",
+        help="Use a specific work tree path.")
 
 def toc_parser(parser):
     """ Parser settings for every action using a toc dir
     """
-    work_tree_parser(parser)
+    worktree_parser(parser)
     parser.add_argument('-c', '--config',
         help='The configuration to use. '
              'If a toolchain exists with the same name '

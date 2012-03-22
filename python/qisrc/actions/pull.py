@@ -19,7 +19,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.work_tree_parser(parser)
+    qibuild.parsers.worktree_parser(parser)
     qibuild.parsers.project_parser(parser)
     parser.add_argument("--rebase", action="store_true", dest="rebase",
         help="Use git pull --rebase")
@@ -120,8 +120,8 @@ def resolv_git_deps(toc, qiwt, args):
 def do(args):
     """Main entry point"""
     fail = list()
-    qiwt = qibuild.worktree_open(args.work_tree)
-    toc  = qibuild.toc_open(args.work_tree, args)
+    qiwt = qibuild.open_worktree(args.worktree)
+    toc  = qibuild.toc_open(args.worktree, args)
 
     manifest = toc.config.local.manifest
     if manifest:

@@ -32,7 +32,7 @@ class QiBuildTestCase(unittest.TestCase):
             self.args.verbose = True
         if os.environ.get("PDB"):
             self.args.pdb = True
-        self.args.work_tree = self.test_dir
+        self.args.worktree = self.test_dir
         # Run qibuild clean
         self._run_action('clean', '-f')
 

@@ -29,7 +29,7 @@ from qibuild import worktree
 
 
 from qibuild.toc      import toc_open
-from qibuild.worktree import worktree_open
+from qibuild.worktree import open_worktree
 from qibuild.cmdparse import run_action
 
 

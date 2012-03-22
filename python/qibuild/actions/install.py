@@ -30,7 +30,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    toc      = qibuild.toc_open(args.work_tree, args)
+    toc      = qibuild.toc_open(args.worktree, args)
 
     (project_names, package_names, _) = toc.resolve_deps(runtime=args.runtime)
 

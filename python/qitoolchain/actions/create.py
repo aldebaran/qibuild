@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """ Configure parser for this action """
-    qibuild.parsers.work_tree_parser(parser)
+    qibuild.parsers.worktree_parser(parser)
     parser.add_argument("name", metavar="NAME",
         help="Name of the toolchain")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
@@ -56,7 +56,7 @@ def do(args):
 
     if args.default:
         try:
-            toc = qibuild.toc.toc_open(args.work_tree)
+            toc = qibuild.toc.toc_open(args.worktree)
         except qibuild.toc.TocException, e:
             mess = "You need to be in a valid toc worktree to use --default\n"
             mess += "Exception was:\n"

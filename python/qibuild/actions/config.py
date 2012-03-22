@@ -22,7 +22,7 @@ def do(args):
     """Main entry point"""
     toc = None
     try:
-        toc = qibuild.toc.toc_open(args.work_tree, args)
+        toc = qibuild.toc.toc_open(args.worktree, args)
     except qibuild.toc.TocException:
         pass
 

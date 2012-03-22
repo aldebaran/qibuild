@@ -9,13 +9,13 @@ import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.work_tree_parser(parser)
+    qibuild.parsers.worktree_parser(parser)
 
 def do(args):
     """Main entry point"""
-    if args.work_tree:
-        work_tree = args.work_tree
+    if args.worktree:
+        worktree = args.worktree
     else:
-        work_tree = os.getcwd()
-    qibuild.worktree.create(work_tree)
+        worktree = os.getcwd()
+    qibuild.worktree.create(worktree)
 

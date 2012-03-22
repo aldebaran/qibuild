@@ -50,7 +50,7 @@ def do(args):
         args.cmake_flags.append("QI_WERROR=ON")
 
     logger   = logging.getLogger(__name__)
-    toc      = qibuild.toc_open(args.work_tree, args)
+    toc      = qibuild.toc_open(args.worktree, args)
 
     (project_names, _, _) = toc.resolve_deps()
 

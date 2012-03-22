@@ -61,7 +61,7 @@ def get_ide(toc):
 
 def do(args):
     """Main entry point """
-    toc      = qibuild.toc.toc_open(args.work_tree, args)
+    toc      = qibuild.toc.toc_open(args.worktree, args)
     if not args.project:
         project_name = qibuild.toc.project_from_cwd()
     else:

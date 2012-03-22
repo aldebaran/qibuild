@@ -15,13 +15,13 @@ import qibuild
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.work_tree_parser(parser)
+    qibuild.parsers.worktree_parser(parser)
     parser.add_argument("command", metavar="COMMAND", nargs="+")
     parser.add_argument("--ignore-errors", action="store_true", help="continue on error")
 
 def do(args):
     """Main entry point"""
-    qiwt = qibuild.worktree_open(args.work_tree)
+    qiwt = qibuild.open_worktree(args.worktree)
     logger = logging.getLogger(__name__)
     for pname, ppath in qiwt.buildable_projects.iteritems():
         logger.info("Running `%s` for %s", " ".join(args.command), pname)

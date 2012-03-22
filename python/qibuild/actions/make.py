@@ -21,7 +21,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
-    toc      = qibuild.toc.toc_open(args.work_tree, args)
+    toc      = qibuild.toc.toc_open(args.worktree, args)
 
     (project_names, _package_names, _not_found) = toc.resolve_deps()
     use_incredibuild = toc.config.build.incredibuild

@@ -24,7 +24,7 @@ import logging
 
 import qibuild.sh
 
-LOGGER = logging.getLogger("qibuild.toc.project")
+LOGGER = logging.getLogger(__name__)
 
 
 class Project:
@@ -150,7 +150,7 @@ def update_project(project, toc):
     if singlebdir:
         singlebdir = os.path.expanduser(singlebdir)
         if not os.path.isabs(singlebdir):
-            singlebdir = os.path.join(toc.work_tree, singlebdir)
+            singlebdir = os.path.join(toc.worktree, singlebdir)
         bname = os.path.join("build-%s" % (toc.build_folder_name), project.name)
         project.build_directory = os.path.normpath(os.path.join(singlebdir, bname))
     else:
@@ -164,7 +164,7 @@ def update_project(project, toc):
         if os.path.isabs(sdk_dir):
             project.sdk_directory = sdk_dir
         else:
-            project.sdk_directory = os.path.join(toc.work_tree, sdk_dir)
+            project.sdk_directory = os.path.join(toc.worktree, sdk_dir)
         bname = "sdk-%s" % (toc.build_folder_name)
         project.sdk_directory = os.path.normpath(os.path.join(project.sdk_directory, bname))
         project._custom_sdk_dir = True
@@ -232,7 +232,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
     custom_cmake_code = ""
     config = toc.active_config
     if config:
-        local_dir = os.path.join(toc.work_tree, ".qi")
+        local_dir = os.path.join(toc.worktree, ".qi")
         local_cmake = os.path.join(local_dir, "%s.cmake" % config)
         if os.path.exists(local_cmake):
             custom_cmake_code += 'include("%s")\n' % \

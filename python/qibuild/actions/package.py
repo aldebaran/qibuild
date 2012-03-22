@@ -84,7 +84,7 @@ def _do_package(args, project_name, destdir, debug):
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc_open(args.work_tree, args)
+    toc = qibuild.toc_open(args.worktree, args)
     config = toc.active_config
     if not args.project:
         project_name = qibuild.toc.project_from_cwd()
@@ -93,7 +93,7 @@ def do(args):
     project = toc.get_project(project_name)
     package_name = get_package_name(project,
         version=args.version, config=config)
-    destdir = os.path.join(toc.work_tree, "package")
+    destdir = os.path.join(toc.worktree, "package")
     destdir = os.path.join(destdir, package_name)
 
     if args.internal:

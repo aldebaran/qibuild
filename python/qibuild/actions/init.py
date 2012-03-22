@@ -14,7 +14,7 @@ LOGGER = logging.getLogger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.work_tree_parser(parser)
+    qibuild.parsers.worktree_parser(parser)
     parser.add_argument("--interactive", action="store_true",
         help="start a wizard to help you configuring qibuild")
     parser.add_argument("--force", action="store_true", help="force the init")
@@ -28,23 +28,23 @@ def do(args):
     # If user did not specify a worktree, make sure he is not
     # trying to create nested worktrees (there's nothing wrong in
     # having nested worktree, but it may be confusing a little bit)
-    if not args.work_tree:
-        old_work_tree = qibuild.worktree.guess_work_tree()
-        if old_work_tree and os.path.exists(old_work_tree) and not args.force:
-            raise Exception("You already have a qi worktree in : %s.\n" % (old_work_tree) +
+    if not args.worktree:
+        old_worktree = qibuild.worktree.guess_worktree()
+        if old_worktree and os.path.exists(old_worktree) and not args.force:
+            raise Exception("You already have a qi worktree in : %s.\n" % (old_worktree) +
                         "Use --force if you know what you are doing "
                         "and really want to create a new worktree here.")
 
     # Use getcwd() if no worktree was given
-    work_tree = args.work_tree
-    if not work_tree:
-        work_tree = os.getcwd()
+    worktree = args.worktree
+    if not worktree:
+        worktree = os.getcwd()
 
     # Safe to be called: only creates the .qi/ repertory
-    qibuild.toc.create(work_tree)
+    qibuild.toc.create(worktree)
 
     try:
-        toc = qibuild.toc.toc_open(work_tree)
+        toc = qibuild.toc.toc_open(worktree)
     except qibuild.toc.WrongDefaultException:
         pass
 

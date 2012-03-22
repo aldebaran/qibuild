@@ -102,7 +102,7 @@ class Toc(WorkTree):
         toc.build_project(foo)
 
     """
-    def __init__(self, work_tree,
+    def __init__(self, worktree,
             path_hints=None,
             config=None,
             qibuild_cfg=None,
@@ -115,7 +115,7 @@ class Toc(WorkTree):
         Create a new Toc object. Most of the keyargs come directly from
         the command line. (--wortree, --debug, -c, etc.)
 
-        :param work_tree:  see :py:meth:`qibuild.worktree.WorkTree.__init__`
+        :param worktree:  see :py:meth:`qibuild.worktree.WorkTree.__init__`
         :param path_hints: see :py:meth:`qibuild.worktree.WorkTree.__init__`
         :param qibuild_cfg: a  :py:class:`qibuild.config.QiBuildConfig` instance
                             if not given, a new one will be created
@@ -126,9 +126,9 @@ class Toc(WorkTree):
                          (defaults to Unix Makefiles)
         :param active_projects: the projects excplicitely specified by user
         """
-        WorkTree.__init__(self, work_tree, path_hints=path_hints)
+        WorkTree.__init__(self, worktree, path_hints=path_hints)
         # The local config file in which to write
-        self.config_path = os.path.join(self.work_tree, ".qi", "qibuild.xml")
+        self.config_path = os.path.join(self.worktree, ".qi", "qibuild.xml")
 
         # When you are running toc actions for a qibuild project, sometimes
         # a Toc object is created on the fly (Using toc_open with a non
@@ -141,8 +141,8 @@ class Toc(WorkTree):
             with open(self.config_path, "w") as fp:
                 fp.write("<qibuild />\n")
         # Perform format conversion if necessary
-        handle_old_qibuild_cfg(self.work_tree)
-        handle_old_qibuild_xml(self.work_tree)
+        handle_old_qibuild_cfg(self.worktree)
+        handle_old_qibuild_xml(self.worktree)
 
         # Handle config:
         if not qibuild_cfg:
@@ -197,7 +197,7 @@ class Toc(WorkTree):
                 self.packages  = self.toolchain.packages
             else:
                 # The config does not match a toolchain
-                local_dir = os.path.join(self.work_tree, ".qi")
+                local_dir = os.path.join(self.worktree, ".qi")
                 local_cmake = os.path.join(local_dir, "%s.cmake" % self.active_config)
                 if not os.path.exists(local_cmake):
                     mess  = """Invalid configuration {active_config}
@@ -629,7 +629,7 @@ def _projects_from_args(toc, args):
         return (list(), False)
 
 
-def toc_open(work_tree, args=None, qibuild_cfg=None):
+def toc_open(worktree, args=None, qibuild_cfg=None):
     """ Creates a :py:class:`Toc` object.
 
     :param worktree: The worktree to be used. (see :py:class:`qibuild.worktree.WorkTree`)
@@ -646,7 +646,7 @@ def toc_open(work_tree, args=None, qibuild_cfg=None):
 
     """
     # Not that args can come from:
-    #    - a work_tree parser
+    #    - a worktree parser
     #    - a toc parser
     #    - a build parser
     # (hence all the hasattr...)
@@ -670,28 +670,28 @@ def toc_open(work_tree, args=None, qibuild_cfg=None):
     if hasattr(args, 'cmake_generator'):
         cmake_generator = args.cmake_generator
 
-    if not work_tree:
-        work_tree = qibuild.worktree.guess_work_tree()
+    if not worktree:
+        worktree = qibuild.worktree.guess_worktree()
     current_project = qibuild.worktree.search_current_project_root(os.getcwd())
-    if not work_tree:
+    if not worktree:
         # Sometimes we you just want to create a fake worktree object because
         # you just want to build one project (no dependencies at all, no configuration...)
         # In this case, just searching for a manifest from the current working directory
         # is enough
-        work_tree = current_project
-        LOGGER.debug("no work tree found using the project root: %s", work_tree)
+        worktree = current_project
+        LOGGER.debug("no work tree found using the project root: %s", worktree)
 
     if current_project:
         #we add the current project as a hint, see the function doc
         path_hints.append(current_project)
 
-    if work_tree is None:
+    if worktree is None:
         raise TocException("Could not find a work tree, "
             "please try from a valid work tree, specify an "
             "existing work tree with '--work-tree {path}', or "
             "create a new work tree with 'qibuild init'")
 
-    toc = Toc(work_tree,
+    toc = Toc(worktree,
                config=config,
                build_type=build_type,
                cmake_flags=cmake_flags,
@@ -708,7 +708,7 @@ def toc_open(work_tree, args=None, qibuild_cfg=None):
 
 
 def create(directory):
-    """ Create a new toc work_tree inside a work tree
+    """ Create a new toc worktree inside a work tree
 
     """
     qibuild.worktree.create(directory)

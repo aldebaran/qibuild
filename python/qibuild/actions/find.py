@@ -26,7 +26,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point """
-    toc = qibuild.toc.toc_open(args.work_tree, args)
+    toc = qibuild.toc.toc_open(args.worktree, args)
     package = args.package
     project_name = args.project_name
     if not project_name:

@@ -26,7 +26,7 @@ def get_toolchain(args):
     if not tc_name:
         active_config = None
         try:
-            toc = qibuild.toc.toc_open(args.work_tree, args)
+            toc = qibuild.toc.toc_open(args.worktree, args)
             active_config = toc.active_config
         except qibuild.toc.TocException:
             pass

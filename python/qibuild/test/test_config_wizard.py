@@ -266,8 +266,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
-        work_tree = os.path.join(self.tmp, "work_tree")
-        toc = qibuild.toc.Toc(work_tree=work_tree)
+        worktree = os.path.join(self.tmp, "worktree")
+        toc = qibuild.toc.Toc(worktree=worktree)
         self.run_wizard(toc=toc)
 
     def test_local_settings_choose_default_toolchain(self):
@@ -283,8 +283,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(["linux32", "linux64"])
-        work_tree = os.path.join(self.tmp, "work_tree")
-        toc = qibuild.toc.Toc(work_tree=work_tree)
+        worktree = os.path.join(self.tmp, "worktree")
+        toc = qibuild.toc.Toc(worktree=worktree)
         self.run_wizard(toc=toc)
         self.assertEqual(toc.config.local.defaults.config, "linux64")
 
@@ -304,8 +304,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
-        work_tree = os.path.join(self.tmp, "work_tree")
-        toc = qibuild.toc.Toc(work_tree=work_tree)
+        worktree = os.path.join(self.tmp, "worktree")
+        toc = qibuild.toc.Toc(worktree=worktree)
         self.run_wizard(toc=toc)
         self.assertEqual(toc.config.local.build.build_dir, "build")
         self.assertEqual(toc.config.local.build.sdk_dir,   "sdk")
@@ -323,8 +323,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Visual Studio 10"])
         self.setup_tc_names(["win32-vs2010"])
-        work_tree = os.path.join(self.tmp, "work_tree")
-        toc = qibuild.toc.Toc(work_tree=work_tree)
+        worktree = os.path.join(self.tmp, "worktree")
+        toc = qibuild.toc.Toc(worktree=worktree)
 
         self.run_wizard(toc=toc)
         self.assertEqual(toc.config.local.defaults.config, "win32-vs2010")
