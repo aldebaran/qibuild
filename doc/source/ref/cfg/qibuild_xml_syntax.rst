@@ -240,7 +240,7 @@ The local 'build' nodes accepts the following attributes:
   Instead of creating a different build directory per project,
   (for instance ``~/src/hello/build-linux``), every build
   directory will be created under this directory, for instance
-  ``/path/to/build.directory/hello/build-linux``
+  ``/path/to/build.directory/build-linux/hello``
 
   Mandatory if you are using Eclipse CDT.
 
