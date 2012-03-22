@@ -182,6 +182,7 @@ def create(directory):
     if not os.path.exists(qi_xml):
         with open(qi_xml, "w") as fp:
             fp.write("<qibuild />\n")
+    return open_worktree(directory)
 
 
 
