@@ -219,7 +219,7 @@ Plus, :cmake:function:`qi_use_lib` will export sane defaults for you:
 
 * include directories will be set to the last call to `include_directories`
 
-* WORLD_DEPENDS will be set using the calls to :cmake:function:`qi_use_lib(world ...)`
+* WORLD_DEPENDS will be set using the call to ``qi_use_lib(... world)``
 
 And still, you will be able to stage different include directories or dependencies if you want.
 

@@ -161,13 +161,13 @@ def worktree_open(work_tree=None):
         #
         # We use path_hints because we guess_work_tree from the cwd.
         # There is no limit for how fare we look for the worktree directory,
-        # so there could be there could be 4 or more #
+        # so there could be there could be 4 or more
         # folder separating cwd from work_tree, and in this case the current
         # project will not be found.
-        # (when building the WorkTree object, we only seach for projects)
-        # in the first 4 levels of folders starting from work_tree.
+        # (when building the WorkTree object, we only seach for projects
+        # in the first 4 levels of folders starting from work_tree)
 
-        # Tldr: this solves a quite a nasty bug when you have:
+        # Tl,dr: this solves a quite a nasty bug when you have:
         # worktree/.qi/a/b/c/d/e/f/project, and you run qibuild commands from
         # the <project> directory.
         path_hints.append(current_project)

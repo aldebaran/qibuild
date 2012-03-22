@@ -7,11 +7,13 @@
 
 
 #! Sanitize compile flags between different compilers
-#   (gcc and cl.exe)
+# (gcc and cl.exe)
 # The function will also read the following variables that
 # can be set from the command line:
+#
 #   * QI_WERROR:         treat warning as errors
 #   * QI_EFFECTIVE_CPP : emit warnings from the 'Effective C++' book
+#
 # \flag:HIDDEN_SYMBOLS Hide symbol in dynamic
 #       unless exlicitely exported.
 #       Useful when you want to

@@ -338,7 +338,7 @@ class Toc(WorkTree):
 
     def resolve_deps(self, runtime=False):
         """ Return a tuple of three lists:
-        (projects, package, not_foud), see :py:mod:`qibuild.dependencies_solver`
+        (projects, packages, not_foud), see :py:mod:`qibuild.dependencies_solver`
         for more information.
 
         Note that the result depends on how the Toc object has been built.

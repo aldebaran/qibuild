@@ -31,8 +31,8 @@ Here is a list of useful information that should be mentioned in your bug
 report :
 
 * Version of the package being used.
-``qibuild --version`` may be useful. Also please precise where you
-qibuild installation comes from.
+  ``qibuild --version`` may be useful. Also please precise where you
+  qibuild installation comes from.
 
 * Platform used: operating system, 32/64bits, etc.
 
