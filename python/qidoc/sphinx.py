@@ -92,6 +92,7 @@ def build(src, dest, opts):
         sphinx_build = qibuild.command.find_program("sphinx-build")
         if not sphinx_build:
             raise Exception("sphinx-build not in path, please install it")
+        cmd = [sphinx_build]
 
     cmd.extend(["-c", config_path])
     if opts.get("werror"):

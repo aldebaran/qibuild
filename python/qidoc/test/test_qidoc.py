@@ -10,6 +10,19 @@ import qidoc.core
 import qibuild
 
 
+def check_tools():
+    """ Check if sphinx-build and doxygen are installed.
+    If not, we will skip the test_build test
+
+    """
+    executables = dict()
+    for name in ["sphinx-build", "sphinx-build2", "doxygen"]:
+        executables[name] = qibuild.command.find_program(name)
+
+    res = executables["sphinx-build"] or executables["sphinx-build2"]
+    res = res and executables["doxygen"]
+    return res
+
 class TestQiDoc(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="tmp-qidoc")
@@ -23,6 +36,7 @@ class TestQiDoc(unittest.TestCase):
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
 
+    @unittest.skipUnless(check_tools(), "Some required tools are not installed")
     def test_build(self):
         opts = dict()
         opts["version"] = 1.42
