@@ -172,6 +172,5 @@ class ArchiveTestCase(unittest.TestCase):
         self.assertEquals(dest_target, "a_file")
 
 
-
 if __name__ == "__main__":
     unittest.main()

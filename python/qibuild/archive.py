@@ -19,6 +19,7 @@ import posixpath
 import logging
 import operator
 import tarfile
+import shutil
 import zipfile
 
 import qibuild
@@ -53,7 +54,7 @@ def extract_tar(archive_path, dest_dir):
     #     a
     # where ro is a read-only directory
     #
-    # Obviously, creating ro1 first with the same permissions as
+    # Obviously, creating ro first with the same permissions as
     # in the archive will prevent 'a' to be created.
     # See test_archive.py for relevant test.
 
@@ -62,6 +63,10 @@ def extract_tar(archive_path, dest_dir):
     members = archive.getmembers()
     size = len(members)
     orig_topdir = members[0].name.split(posixpath.sep)[0]
+    if orig_topdir == ".":
+        archive_name = os.path.basename(archive_path)
+        archive_name = archive_name.split(".")[0]
+        dest_dir = os.path.join(dest_dir, archive_name)
     done = 0
     # Extract directories with a safe mode.
     directories = list()
@@ -101,7 +106,10 @@ def extract_tar(archive_path, dest_dir):
 
     archive.close()
     LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
-    res = os.path.join(dest_dir, orig_topdir)
+    if orig_topdir == ".":
+        res = dest_dir
+    else:
+        res = os.path.join(dest_dir, orig_topdir)
     return res
 
 
@@ -172,7 +180,7 @@ def extract(archive_path, directory, topdir=None):
                 return
             res = os.path.join(directory, topdir)
             qibuild.sh.rm(res)
-            os.rename(extracted, res)
+            shutil.move(extracted, res)
         else:
             res = extract_fun(archive_path, directory)
         return res
