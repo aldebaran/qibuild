@@ -332,7 +332,7 @@ endfunction()
 #  PATH_SUFFIXES
 # (those will be guessed if not given:
 # target_DEPENDS <- filled by qi_use_lib
-# target_INCLUDE_DIRS <- using get_direcotry_properties()
+# target_INCLUDE_DIRS <- using get_directory_properties()
 # target_DEFINITIONS <- definitions are never guessed,
 # use stage_lib(foo DEFINITIONS "-DSPAM=EGGS") if you need this.
 function(_qi_set_vars target)
