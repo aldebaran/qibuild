@@ -31,7 +31,6 @@ endfunction()
 
 
 #compute the dependencies list, removing duplicate
-#TODO: store computed dependencies in ${_U_PKG}_FLAT_DEPENDS ?
 function(_qi_use_lib_get_deps name _OUT_list)
   set(_result ${ARGN})
   list(LENGTH _result _count)
@@ -69,16 +68,8 @@ function(_qi_use_lib_get_deps name _OUT_list)
     endif()
 
     foreach(_sub_dep ${${_U_PKG}_DEPENDS})
-      list(FIND _result ${_sub_dep} _is_present)
-      string(TOUPPER ${_sub_dep} _u_sub_dep)
-      if (_is_present EQUAL -1)
-        #if (NOT ${_u_sub_dep}_FAT_DEPENDS)
-          _qi_use_lib_get_deps("${_U_PKG}" _new_deps "${_sub_dep}")
-        #else()
-        #  set(_new_deps ${${_u_sub_dep}_FAT_DEPENDS})
-        #endif()
-        list(APPEND _result ${_new_deps})
-      endif()
+      _qi_use_lib_get_deps("${_U_PKG}" _new_deps "${_sub_dep}")
+      list(APPEND _result ${_new_deps})
     endforeach()
   endforeach()
 
@@ -92,9 +83,6 @@ function(_qi_use_lib_get_deps name _OUT_list)
   list(REMOVE_DUPLICATES _result)
   list(REVERSE _result)
 
-  #why? because it will avoid many recursion. we store the complete dependencies of a project
-  # in cache, and use that, instead of digging into deps by recursion.
-  qi_set_global(${_U_NAME}_FAT_DEPENDS "${_result}" )
   set(${_OUT_list} ${_result} PARENT_SCOPE)
 endfunction()
 
@@ -112,13 +100,32 @@ endfunction()
 # \argn: dependencies, like the DEPENDS group, argn and DEPENDS will be merged
 # \group:DEPENDS The list of dependencies
 function(_qi_use_lib_internal name)
+  STRING(REGEX MATCH "@" _at_in_name ${name})
+  if("${_at_in_name}" STREQUAL "@")
+    qi_error("Invalid target name: ${name}.
+    Target names must not contain the '@' character
+    ")
+  endif()
   cmake_parse_arguments(ARG "" "" "DEPENDS" ${ARGN})
-
   set(ARG_DEPENDS ${ARG_UNPARSED_ARGUMENTS} ${ARG_DEPENDS})
+  string(TOUPPER "${name}" _U_name)
 
-  _qi_use_lib_get_deps("${name}" _DEPS ${ARG_DEPENDS})
+  # Compute a key to store the call of this function,
+  # using '@' as a separator
+  set(_key "_QI_USE_LIB_${_U_name}")
+  foreach(_arg ${ARG_DEPENDS})
+    set(_key "${_key}@${_arg}")
+  endforeach()
 
-  foreach(_pkg ${_DEPS})
+  if(${_key})
+    # qi_use_lib already put in cache
+  else()
+    _qi_use_lib_get_deps("${name}" _DEPS ${ARG_DEPENDS})
+    qi_set_advanced_cache("${_U_name}_DEPENDS" ${${_U_name}_DEPENDS} ${_DEPS})
+    qi_set_advanced_cache("${_key}" TRUE)
+  endif()
+
+  foreach(_pkg ${${_U_name}_DEPENDS})
     string(TOUPPER ${_pkg} _U_PKG)
 
     if (DEFINED ${_U_PKG}_INCLUDE_DIRS)
@@ -153,6 +160,4 @@ function(_qi_use_lib_internal name)
       endif()
     endif()
   endforeach()
-  string(TOUPPER "${name}" _U_name)
-  qi_set_advanced_cache("${_U_name}_DEPENDS" ${${_U_name}_DEPENDS} ${_DEPS})
 endfunction()

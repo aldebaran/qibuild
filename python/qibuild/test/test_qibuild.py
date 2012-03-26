@@ -41,6 +41,21 @@ class QiBuildTestCase(unittest.TestCase):
     def _run_action(self, action, *args):
         qibuild.run_action("qibuild.actions.%s" % action, args,
             forward_args=self.args)
+    def get_build_dir(self, project_name):
+        """ Get the build dir of a project
+
+        """
+        toc = qibuild.toc.toc_open(self.test_dir, args=self.args)
+        project = toc.get_project(project_name)
+        return project.build_directory
+
+    def get_cmake_cache(self, project_name):
+        """ Get the CMake cache path of the given project
+
+        """
+        build_dir = self.get_build_dir(project_name)
+        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
+        return cmake_cache
 
     def test_configure(self):
         self._run_action("configure", "world")
@@ -62,10 +77,22 @@ class QiBuildTestCase(unittest.TestCase):
         self._run_action("make", "hello")
         self._run_action("test", "hello")
 
+    def test_qi_uselib(self):
+        self._run_action("configure", "uselib")
+        # Read cache and check that DEPENDS value are here
+        cmake_cache = self.get_cmake_cache("uselib")
+        cache = qibuild.cmake.read_cmake_cache(cmake_cache)
+        self.assertEquals(cache["D_DEPENDS"], "a;b")
+        self.assertEquals(cache["E_DEPENDS"], "d;cc;a;b")
+        self._run_action("make", "uselib")
+
+        self.assertRaises(Exception,
+                self._run_action, "configure", "uselib", "-DSHOULD_FAIL=ON")
+
+
     def test_package(self):
         self._run_action("package", "world")
 
-    @unittest.skip("Bug still not fixed in qibuild/uselib.cmake ...")
     def test_preserve_cache(self):
         # If cache changes when runnning cmake .. after
         # qibuild configure, then you have two problems:
@@ -77,11 +104,8 @@ class QiBuildTestCase(unittest.TestCase):
         # performance issues
         self._run_action("status")
         self._run_action("configure", "foo")
-        toc = qibuild.toc.toc_open(self.test_dir, args=self.args)
-        build_folder_name = toc.build_folder_name
-        foo_src = os.path.join(self.test_dir, "foo")
-        build_dir = os.path.join(foo_src, "build-%s" % build_folder_name)
-        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
+        cmake_cache = self.get_cmake_cache("foo")
+        build_dir = self.get_build_dir("foo")
 
         # Read cache and check that DEPENDS value are here
         cache = qibuild.cmake.read_cmake_cache(cmake_cache)
