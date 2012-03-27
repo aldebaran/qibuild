@@ -46,6 +46,41 @@ class TocTestCase(unittest.TestCase):
         workd_sdk_dirs = self.toc.get_sdk_dirs("world")
         self.assertEquals(workd_sdk_dirs, list())
 
+    def test_custom_sdk_dir(self):
+        dot_qi = os.path.join(self.tmp, ".qi")
+        qibuild.sh.mkdir(dot_qi, recursive=True)
+        qibuild_xml = os.path.join(dot_qi, "qibuild.xml")
+        with open(qibuild_xml, "w") as fp:
+            fp.write("""
+<qibuild>
+    <build sdk_dir="sdk" />
+</qibuild>
+"""
+)
+        # Create a project named hello
+        hello_src = os.path.join(self.tmp, "hello")
+        qibuild.sh.mkdir(hello_src)
+        qiproj_xml = os.path.join(hello_src, "qiproject.xml")
+        with open(qiproj_xml, "w") as fp:
+            fp.write('<project name="hello" />\n')
+        toc = qibuild.toc.Toc(self.tmp)
+        hello_proj = toc.get_project("hello")
+
+        sdk_dirs= dict()
+        for config in ["a", "b"]:
+            # Create custom a.cmake a b.cmake files so that
+            # toc does not complain
+            custom_cmake = os.path.join(dot_qi, config + ".cmake")
+            with open(custom_cmake, "w") as fp:
+                fp.write("# Custom %s cmake config\n" % config)
+            toc = qibuild.toc.Toc(self.tmp, config=config)
+            sdk_dirs[config] = toc.get_project("hello").sdk_directory
+
+        a_sdk_dir = sdk_dirs["a"]
+        b_sdk_dir = sdk_dirs["b"]
+        self.assertTrue(a_sdk_dir != b_sdk_dir)
+
+
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
