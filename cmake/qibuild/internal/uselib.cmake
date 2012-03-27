@@ -121,7 +121,15 @@ function(_qi_use_lib_internal name)
     # qi_use_lib already put in cache
   else()
     _qi_use_lib_get_deps("${name}" _DEPS ${ARG_DEPENDS})
-    qi_set_advanced_cache("${_U_name}_DEPENDS" ${${_U_name}_DEPENDS} ${_DEPS})
+    # Append the new deps to the list of previous deps:
+    set(_new_deps ${${_U_name}_DEPENDS} ${_DEPS})
+    # reverse, remove duplicated and reverse again:
+    if(_new_deps)
+      list(REVERSE _new_deps)
+      list(REMOVE_DUPLICATES _new_deps)
+      list(REVERSE _new_deps)
+    endif()
+    qi_set_advanced_cache("${_U_name}_DEPENDS" ${_new_deps})
     qi_set_advanced_cache("${_key}" TRUE)
   endif()
 
