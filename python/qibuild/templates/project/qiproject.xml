@@ -2,6 +2,6 @@
   <!-- Add your project dependencies here -->
 
   <!--
-  <depends name="foo" />
+  <depends names="foo" />
   -->
 </project>
