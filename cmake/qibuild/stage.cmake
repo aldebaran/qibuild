@@ -42,6 +42,12 @@ function(qi_stage_lib target)
     is called *after* qi_create_lib and qi_use_lib
     ")
   endif()
+  get_target_property(_target_type ${target} TYPE)
+  if("${_target_type}" STREQUAL "EXECUTABLE")
+    qi_error("When calling qi_stage_lib(${target})
+    Target is an executable, expecting a library
+    ")
+  endif()
   _qi_internal_stage_lib(${target} ${ARGN})
 endfunction()
 

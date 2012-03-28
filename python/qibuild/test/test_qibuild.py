@@ -77,7 +77,7 @@ class QiBuildTestCase(unittest.TestCase):
         self._run_action("make", "hello")
         self._run_action("test", "hello")
 
-    def test_qi_uselib(self):
+    def test_qi_use_lib(self):
         self._run_action("configure", "uselib")
         # Read cache and check that DEPENDS value are here
         cmake_cache = self.get_cmake_cache("uselib")
@@ -88,6 +88,27 @@ class QiBuildTestCase(unittest.TestCase):
 
         self.assertRaises(Exception,
                 self._run_action, "configure", "uselib", "-DSHOULD_FAIL=ON")
+
+    def test_qi_stage_lib_simple(self):
+        self._run_action("configure", "stagelib")
+
+    def test_qi_stage_lib_but_really_bin(self):
+        error = None
+        try:
+            self._run_action("configure", "stagelib",
+                "-DSHOULD_FAIL_STAGE_LIB_BUT_REALLY_BIN=ON")
+        except Exception, e:
+            error = e
+        self.assertFalse(error is None)
+
+    def test_qi_stage_lib_but_no_such_target(self):
+        error = None
+        try:
+            self._run_action("configure", "stagelib",
+                "-DSHOULD_FAIL_STAGE_NO_SUCH_TARGET=ON")
+        except qibuild.toc.ConfigureFailed, e:
+            error = e
+        self.assertFalse(error is None)
 
 
     def test_package(self):
