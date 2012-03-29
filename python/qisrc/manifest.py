@@ -73,15 +73,3 @@ class Remote(qibuild.xml.XMLModel):
         name = qibuild.xml.StringField()
         fetch = qibuild.xml.StringField()
         review = qibuild.xml.StringField()
-
-
-
-
-def sync_worktree(worktree, manifest_location):
-    """ Synchronize a worktree using a manifest location
-
-    """
-
-
-
-
