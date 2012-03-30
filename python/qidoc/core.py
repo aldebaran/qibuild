@@ -15,13 +15,13 @@ import qidoc.doxygen
 
 
 
-class QiDocBuilder(qibuild.worktree.WorkTree):
+class QiDocBuilder:
     """ A class to handle doc generation of several
     projects
 
     """
     def __init__(self, in_dir, out_dir):
-        qibuild.worktree.WorkTree.__init__(self, in_dir)
+        self.worktree = qibuild.worktree.open_worktree(in_dir)
         self.in_dir = in_dir
         self.out_dir = out_dir
 
@@ -167,22 +167,24 @@ class QiDocBuilder(qibuild.worktree.WorkTree):
         sphinxdocs and doxydocs attributes
 
         """
-        for (p_name, p_path) in self.buildable_projects.iteritems():
-            qiproj_xml = os.path.join(p_path, "qiproject.xml")
+        for project in self.worktree.projects:
+            qiproj_xml = os.path.join(project.src, "qiproject.xml")
+            if not os.path.exists(qiproj_xml):
+                continue
             (doxydocs, sphinxdocs) = qidoc.config.parse_project_config(qiproj_xml)
             # Fixup src, dest attributes:
             for doxydoc in doxydocs:
-                doxydoc.src = os.path.join(p_path, doxydoc.src)
+                doxydoc.src = os.path.join(project.src, doxydoc.src)
                 doxydoc.dest = os.path.join(self.out_dir, doxydoc.dest)
                 self.check_collision(doxydoc, "doxygen")
                 self.doxydocs[doxydoc.name] = doxydoc
             for sphinxdoc in sphinxdocs:
-                sphinxdoc.src = os.path.join(p_path, sphinxdoc.src)
+                sphinxdoc.src = os.path.join(project.src, sphinxdoc.src)
                 sphinxdoc.dest = os.path.join(self.out_dir, sphinxdoc.dest)
                 self.check_collision(sphinxdoc, "sphinx")
                 self.sphinxdocs[sphinxdoc.name] = sphinxdoc
             # Check if the project is a template project:
-            self.check_template(p_name, p_path, qiproj_xml)
+            self.check_template(project.name, project.src, qiproj_xml)
 
 
     def check_collision(self, project, doc_type):

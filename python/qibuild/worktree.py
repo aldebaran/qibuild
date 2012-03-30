@@ -16,15 +16,6 @@ from qixml import etree
 
 LOGGER = logging.getLogger("WorkTree")
 
-class NoSuchProject(Exception):
-    """ Custom excption """
-    def __init__(self, message):
-        self._message = message
-
-    def __str__(self):
-        return self._message
-
-
 class WorkTree:
     """ This class represent a :term:`worktree`
 
@@ -128,7 +119,7 @@ class WorkTree:
         if not name in p_names:
             mess  = "No such project: '%s'\n" % name
             mess += "Know projects are: %s" % ", ".join(p_names)
-            raise NoSuchProject(mess)
+            raise Exception(mess)
         match = [p for p in self.projects if p.name == name]
         return match[0]
 
@@ -143,8 +134,8 @@ class WorkTree:
         if name in p_names:
             project = self.get_project(name)
             mess  = "Cannot add project %s to worktree in %s\n" % (name, self.root)
-            mess += "A project named %s already exists "
-            mess += "(in %s)\n" % (name, project.name)
+            mess += "A project named %s already exists " % project.name
+            mess += "(in %s)\n" % project.src
             mess += "Please choose a different name"
             raise Exception(mess)
 
@@ -235,9 +226,9 @@ def create(directory):
 
 
 class Project:
-    def __init__(self):
-        self.name = None
-        self.src = None
+    def __init__(self, name=None, src=None):
+        self.name = name
+        self.src = src
         self.git_project = None
 
     def parse(self, xml_elem):

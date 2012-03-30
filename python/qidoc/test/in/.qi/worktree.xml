@@ -1,0 +1,7 @@
+<worktree>
+  <project name="aldeb-templates" src="aldeb-templates" />
+  <project name="doc" src="doc" />
+  <project name="libnaoqi" src="libnaoqi" />
+  <project name="libqi" src="libqi" />
+  <project name="qibuild" src="qibuild" />
+</worktree>

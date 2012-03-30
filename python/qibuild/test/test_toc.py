@@ -24,7 +24,7 @@ class TocTestCase(unittest.TestCase):
         self.world_project.build_directory = "src/world/build"
         self.hello_project.build_directory = "src/hello/build"
         self.hello_project.depends = ["world"]
-        self.toc = qibuild.toc.Toc(self.tmp)
+        self.toc = qibuild.toc.toc_open(self.tmp)
 
     def test_src_deps(self):
         self.toc.projects = [self.hello_project, self.world_project]

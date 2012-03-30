@@ -124,8 +124,9 @@ class Toc:
         """
         self.worktree = worktree
         # The local config file in which to write
-        self.config_path = os.path.join(self.worktree.root, ".qi", "qibuild.xml")
-
+        dot_qi = os.path.join(self.worktree.root, ".qi")
+        qibuild.sh.mkdir(dot_qi)
+        self.config_path =  os.path.join(dot_qi, "qibuild.xml")
         if not os.path.exists(self.config_path):
             with open(self.config_path, "w") as fp:
                 fp.write("<qibuild />\n")
