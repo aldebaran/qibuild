@@ -30,7 +30,7 @@ def do(args):
     package = args.package
     project_name = args.project_name
     if not project_name:
-        project_name = qibuild.toc.project_from_cwd()
+        project_name = qibuild.worktree.project_from_cwd()
 
 
     project = toc.get_project(project_name)

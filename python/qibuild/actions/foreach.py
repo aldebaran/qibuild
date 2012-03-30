@@ -23,10 +23,10 @@ def do(args):
     """Main entry point"""
     qiwt = qibuild.open_worktree(args.worktree)
     logger = logging.getLogger(__name__)
-    for pname, ppath in qiwt.buildable_projects.iteritems():
-        logger.info("Running `%s` for %s", " ".join(args.command), pname)
+    for project in qiwt.buildable_projects:
+        logger.info("Running `%s` for %s", " ".join(args.command), project.name)
         try:
-            qibuild.command.call(args.command, cwd=ppath)
+            qibuild.command.call(args.command, cwd=project.src)
         except qibuild.command.CommandFailedException, err:
             if args.ignore_errors:
                 logger.error(str(err))

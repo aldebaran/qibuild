@@ -11,6 +11,8 @@ import logging
 import operator
 
 import qibuild.sh
+import qixml
+from qixml import etree
 
 LOGGER = logging.getLogger("WorkTree")
 
@@ -42,7 +44,7 @@ class WorkTree:
             with open(worktree_xml, "w") as fp:
                 fp.write("<worktree />\n")
         if os.path.exists(worktree_xml):
-            self.xml_tree = qibuild.xml.parse_xml(worktree_xml)
+            self.xml_tree = qixml.read(worktree_xml)
             self.parse_projects()
             self.parse_git_projects()
             self.parse_buildable_projects()
@@ -55,7 +57,7 @@ class WorkTree:
         dot_qi = os.path.join(self.root, ".qi")
         qibuild.sh.mkdir(dot_qi, recursive=True)
         worktree_xml = os.path.join(self.root, ".qi", "worktree.xml")
-        qibuild.xml.write(self.xml_tree, worktree_xml)
+        qixml.write(self.xml_tree, worktree_xml)
 
     def parse_projects(self):
         """ Parse .qi/worktree.xml
@@ -171,6 +173,29 @@ def guess_worktree():
     return None
 
 
+def project_from_cwd():
+    """Return a project name from the current working directory
+
+    """
+    head = os.getcwd()
+    qiproj_xml = None
+    while True:
+        qiproj_xml = os.path.join(head, "qiproject.xml")
+        if os.path.exists(qiproj_xml):
+            break
+        (head, _tail) = os.path.split(head)
+        if not _tail:
+            break
+    if not qiproj_xml:
+        mess  = "Could not guess project name from current working directory\n"
+        mess += "(No qiproject.xml found in the parent directories\n"
+        mess += "Please go inside a project, or specify the project name "
+        mess += "from the command line"
+
+    xml_elem = qixml.read(qiproj_xml)
+    return xml_elem.getroot().get("name")
+
+
 def create(directory):
     """Create a new Qi work tree in the given directory
 
@@ -186,7 +211,6 @@ def create(directory):
 
 
 class Project:
-
     def __init__(self):
         self.name = None
         self.src = None
@@ -197,4 +221,10 @@ class Project:
         self.src = xml_elem.get("src")
         self.git_project = xml_elem.get("git_project")
 
-
+    def xml_elem(self):
+        res = etree.Element("project")
+        res.set("name", self.name)
+        res.set("src", self.src)
+        if self.git_project:
+            res.set("git_project", self.git_project)
+        return res

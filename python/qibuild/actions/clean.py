@@ -59,8 +59,8 @@ def do(args):
     else:
         logger.info("Build directory that will be removed (use -f to apply):")
     folders = dict()
-    for project in qiwt.buildable_projects.values():
-        result = list_build_folder(project, args.build_directory, qiwt.root)
+    for project in qiwt.buildable_projects:
+        result = list_build_folder(project.src, args.build_directory, qiwt.root)
         for k, v in result.iteritems():
             if folders.get(k):
                 folders[k].extend(v)
@@ -75,7 +75,7 @@ def do(args):
     if args.force:
         logger.info("")
         logger.info("removing:")
-        for project in qiwt.buildable_projects.values():
-            cleanup(project, args.build_directory, qiwt.root, args.force)
+        for project in qiwt.buildable_projects:
+            cleanup(project.src, args.build_directory, qiwt.root, args.force)
 
 

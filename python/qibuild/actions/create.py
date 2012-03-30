@@ -44,7 +44,7 @@ def do(args):
     qiwt = qibuild.open_worktree(args.worktree)
 
     project_name = args.project_name
-    project_path = os.path.join(qiwt.worktree, project_name)
+    project_path = os.path.join(qiwt.root, project_name)
 
     if os.path.exists(project_path):
         raise Exception("%s already exists" % project_path)

@@ -50,10 +50,10 @@ def do(args):
     """Main entry point"""
     qiwt = qibuild.open_worktree(args.worktree)
     max_len = 0
-    for pname, ppath in qiwt.buildable_projects.iteritems():
-        if len(pname) > max_len:
-            max_len = len(pname)
+    for project in qiwt.buildable_projects:
+        if len(project.name) > max_len:
+            max_len = len(project.name)
 
-    for pname, ppath in qiwt.buildable_projects.iteritems():
-        LOGGER.info("%s", os.path.relpath(ppath, qiwt.root))
-        list_build_dir(ppath)
+    for project in qiwt.buildable_projects:
+        LOGGER.info("%s", os.path.relpath(project.src, qiwt.root))
+        list_build_dir(project.src)
