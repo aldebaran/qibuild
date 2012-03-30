@@ -80,16 +80,14 @@ class InstallFailed(Exception):
         return "Error occured when installing project %s" % self.project.name
 
 
-class Toc(WorkTree):
+class Toc:
     """
-    This class inherits from :py:class:`qibuild.worktree.WorkTree`,
-    so it has a list of projects.
-
     Example of use:
 
     .. code-block:: python
 
-        toc = Toc("/path/to/work/tree", build_type="release")
+        worktree = qibuild.open_worktree("/path/to/src")
+        toc = Toc(worktree=worktree, build_type="release")
 
         # Look for the foo project in the worktree
         foo = toc.get_project("foo")
@@ -103,7 +101,6 @@ class Toc(WorkTree):
 
     """
     def __init__(self, worktree,
-            path_hints=None,
             config=None,
             qibuild_cfg=None,
             build_type="Debug",
@@ -126,9 +123,9 @@ class Toc(WorkTree):
                          (defaults to Unix Makefiles)
         :param active_projects: the projects excplicitely specified by user
         """
-        WorkTree.__init__(self, worktree, path_hints=path_hints)
+        self.worktree = worktree
         # The local config file in which to write
-        self.config_path = os.path.join(self.worktree, ".qi", "qibuild.xml")
+        self.config_path = os.path.join(self.worktree.root, ".qi", "qibuild.xml")
 
         # When you are running toc actions for a qibuild project, sometimes
         # a Toc object is created on the fly (Using toc_open with a non
@@ -141,8 +138,8 @@ class Toc(WorkTree):
             with open(self.config_path, "w") as fp:
                 fp.write("<qibuild />\n")
         # Perform format conversion if necessary
-        handle_old_qibuild_cfg(self.worktree)
-        handle_old_qibuild_xml(self.worktree)
+        handle_old_qibuild_cfg(self.worktree.root)
+        handle_old_qibuild_xml(self.worktree.root)
 
         # Handle config:
         if not qibuild_cfg:
@@ -197,7 +194,7 @@ class Toc(WorkTree):
                 self.packages  = self.toolchain.packages
             else:
                 # The config does not match a toolchain
-                local_dir = os.path.join(self.worktree, ".qi")
+                local_dir = os.path.join(self.worktree.root, ".qi")
                 local_cmake = os.path.join(local_dir, "%s.cmake" % self.active_config)
                 if not os.path.exists(local_cmake):
                     mess  = """Invalid configuration {active_config}
@@ -258,9 +255,13 @@ You may want to run:
         self.set_build_folder_name()
 
         # self.buildable_projects has been set by WorkTree.__init__
-        for pname, ppath in self.buildable_projects.iteritems():
-            project = Project(pname, ppath)
-            self.projects.append(project)
+        for worktree_project in self.worktree.buildable_projects:
+            # Promote the simple worktree project (just a name an a src dir),
+            # inside a full qibuild.project.Project object
+            # (with CMake flags, build dir, et al.)
+            qibuild_project = qibuild.project.Project(
+                worktree_project.name, worktree_project.src)
+            self.projects.append(worktree_project)
 
         # Small warning here: when we update the projects, we do NOT
         # have the complete list of the projects, their dependencies,
@@ -616,7 +617,7 @@ def _projects_from_args(toc, args):
         else:
             from_cwd = None
             try:
-                from_cwd = project_from_cwd()
+                from_cwd = qibuild.worktree.project_from_cwd()
             except:
                 pass
             if from_cwd:
@@ -670,27 +671,6 @@ def toc_open(worktree, args=None, qibuild_cfg=None):
     if hasattr(args, 'cmake_generator'):
         cmake_generator = args.cmake_generator
 
-    if not worktree:
-        worktree = qibuild.worktree.guess_worktree()
-    current_project = qibuild.worktree.search_current_project_root(os.getcwd())
-    if not worktree:
-        # Sometimes we you just want to create a fake worktree object because
-        # you just want to build one project (no dependencies at all, no configuration...)
-        # In this case, just searching for a manifest from the current working directory
-        # is enough
-        worktree = current_project
-        LOGGER.debug("no work tree found using the project root: %s", worktree)
-
-    if current_project:
-        #we add the current project as a hint, see the function doc
-        path_hints.append(current_project)
-
-    if worktree is None:
-        raise TocException("Could not find a work tree, "
-            "please try from a valid work tree, specify an "
-            "existing work tree with '--work-tree {path}', or "
-            "create a new work tree with 'qibuild init'")
-
     toc = Toc(worktree,
                config=config,
                build_type=build_type,
@@ -715,16 +695,7 @@ def create(directory):
 
 
 
-def project_from_cwd():
-    """Return a project name from the current working directory
 
-    """
-    project_dir = qibuild.worktree.search_current_project_root(os.getcwd())
-    if not project_dir:
-        raise Exception("Could not guess project name from the working directory.\n"
-                "Please go to a subdirectory of a project\n"
-                "or specify the name of the project.")
-    return qibuild.project.name_from_directory(project_dir)
 
 
 def _advise_using_configure(self, project):
