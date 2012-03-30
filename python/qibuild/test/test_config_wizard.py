@@ -83,6 +83,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.get_generators_patcher = mock.patch('qibuild.cmake.get_known_cmake_generators')
         self.get_generators = self.get_generators_patcher.start()
         self.interact_patcher = None
+        self.toc = qibuild.toc.toc_open(self.tmp)
 
     def setup_platform(self, platform):
         """ Setup qibuild.get_platform
@@ -266,9 +267,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
-        worktree = os.path.join(self.tmp, "worktree")
-        toc = qibuild.toc.Toc(worktree=worktree)
-        self.run_wizard(toc=toc)
+        self.run_wizard(toc=self.toc)
 
     def test_local_settings_choose_default_toolchain(self):
         self.setup_platform("linux")
@@ -284,9 +283,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(["linux32", "linux64"])
         worktree = os.path.join(self.tmp, "worktree")
-        toc = qibuild.toc.Toc(worktree=worktree)
-        self.run_wizard(toc=toc)
-        self.assertEqual(toc.config.local.defaults.config, "linux64")
+        self.run_wizard(toc=self.toc)
+        self.assertEqual(self.toc.config.local.defaults.config, "linux64")
 
     def test_local_build_settings(self):
         self.setup_platform("linux")
@@ -305,10 +303,9 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
         worktree = os.path.join(self.tmp, "worktree")
-        toc = qibuild.toc.Toc(worktree=worktree)
-        self.run_wizard(toc=toc)
-        self.assertEqual(toc.config.local.build.build_dir, "build")
-        self.assertEqual(toc.config.local.build.sdk_dir,   "sdk")
+        self.run_wizard(toc=self.toc)
+        self.assertEqual(self.toc.config.local.build.build_dir, "build")
+        self.assertEqual(self.toc.config.local.build.sdk_dir,   "sdk")
 
     def test_full_wizard(self):
         self.setup_platform("windows")
@@ -324,11 +321,9 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.setup_generators(["Visual Studio 10"])
         self.setup_tc_names(["win32-vs2010"])
         worktree = os.path.join(self.tmp, "worktree")
-        toc = qibuild.toc.Toc(worktree=worktree)
-
-        self.run_wizard(toc=toc)
-        self.assertEqual(toc.config.local.defaults.config, "win32-vs2010")
-        self.assertEqual(toc.config.defaults.cmake.generator, "Visual Studio 10")
+        self.run_wizard(toc=self.toc)
+        self.assertEqual(self.toc.config.local.defaults.config, "win32-vs2010")
+        self.assertEqual(self.toc.config.defaults.cmake.generator, "Visual Studio 10")
 
 
     def test_incredibuild(self):
