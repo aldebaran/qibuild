@@ -74,6 +74,7 @@ class Project:
         self.name = xml_element.get("name")
         self.path = xml_element.get("path")
         self.review = qixml.parse_bool_attr(xml_element, "review")
+        self.remote = xml_element.get("remote")
 
 
 class Remote:
