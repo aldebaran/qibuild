@@ -26,11 +26,11 @@ def configure_parser(parser):
         action="store_true",
         help="display branch and tracking branch for each repository")
 
-def _max_len(wt, names):
+def _max_len(wt, projects):
     """ Helper function to display status """
     max_len = 0
-    for k in names:
-        shortpath = os.path.relpath(k, wt)
+    for p in projects:
+        shortpath = os.path.relpath(p.src, wt)
         if len(shortpath) > max_len:
             max_len = len(shortpath)
     return max_len
@@ -78,7 +78,7 @@ def do(args):
     max_len = _max_len(qiwt.root, gitrepo)
     for git_project in gitrepo:
         git = qisrc.git.open(git_project.src)
-        shortpath = os.path.relpath(git_project, qiwt.root)
+        shortpath = os.path.relpath(git_project.src, qiwt.root)
         if git.is_valid():
             branch = git.get_current_branch()
             tracking = git.get_tracking_branch()

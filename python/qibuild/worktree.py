@@ -16,6 +16,14 @@ from qixml import etree
 
 LOGGER = logging.getLogger("WorkTree")
 
+class NoSuchProject(Exception):
+    """ Custom excption """
+    def __init__(self, message):
+        self._message = message
+
+    def __str__(self):
+        return self._message
+
 
 class WorkTree:
     """ This class represent a :term:`worktree`
@@ -39,8 +47,10 @@ class WorkTree:
         Load the worktree.xml file
 
         """
-        worktree_xml = os.path.join(self.root, ".qi", "worktree.xml")
+        dot_qi = os.path.join(self.root, ".qi")
+        worktree_xml = os.path.join(dot_qi, "worktree.xml")
         if not os.path.exists(worktree_xml):
+            qibuild.sh.mkdir(dot_qi)
             with open(worktree_xml, "w") as fp:
                 fp.write("<worktree />\n")
         if os.path.exists(worktree_xml):
@@ -118,6 +128,7 @@ class WorkTree:
         if not name in p_names:
             mess  = "No such project: '%s'\n" % name
             mess += "Know projects are: %s" % ", ".join(p_names)
+            raise NoSuchProject(mess)
         match = [p for p in self.projects if p.name == name]
         return match[0]
 
@@ -128,6 +139,15 @@ class WorkTree:
         :param: path If not given, will be root/name
 
         """
+        p_names = [p.name for p in self.projects]
+        if name in p_names:
+            project = self.get_project(name)
+            mess  = "Cannot add project %s to worktree in %s\n" % (name, self.root)
+            mess += "A project named %s already exists "
+            mess += "(in %s)\n" % (name, project.name)
+            mess += "Please choose a different name"
+            raise Exception(mess)
+
         if not src:
             src = name
         project = Project()
@@ -155,6 +175,10 @@ def open_worktree(worktree=None):
             " - try from a valid work tree\n"
             " - specify an existing work tree with \"--work-tree PATH\"\n"
             " - create a new work tree with \"qibuild init\"")
+    if not os.path.exists(worktree):
+        mess =  "Cannot open a worktree from %s\n" % worktree
+        mess += "This path does not exist"
+        raise Exception(mess)
     return WorkTree(worktree)
 
 

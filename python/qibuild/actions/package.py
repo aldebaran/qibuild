@@ -93,7 +93,7 @@ def do(args):
     project = toc.get_project(project_name)
     package_name = get_package_name(project,
         version=args.version, config=config)
-    destdir = os.path.join(toc.worktree, "package")
+    destdir = os.path.join(toc.worktree.root, "package")
     destdir = os.path.join(destdir, package_name)
 
     if args.internal:

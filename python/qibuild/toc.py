@@ -113,7 +113,6 @@ class Toc:
         the command line. (--wortree, --debug, -c, etc.)
 
         :param worktree:  see :py:meth:`qibuild.worktree.WorkTree.__init__`
-        :param path_hints: see :py:meth:`qibuild.worktree.WorkTree.__init__`
         :param qibuild_cfg: a  :py:class:`qibuild.config.QiBuildConfig` instance
                             if not given, a new one will be created
         :param build_type: a build type, could be debug or release
@@ -127,16 +126,10 @@ class Toc:
         # The local config file in which to write
         self.config_path = os.path.join(self.worktree.root, ".qi", "qibuild.xml")
 
-        # When you are running toc actions for a qibuild project, sometimes
-        # a Toc object is created on the fly (Using toc_open with a non
-        # empty path_hints) variable.
-        # In this case, the .qi directory may not even exists, nor the
-        # .qi directory, so create it:
         if not os.path.exists(self.config_path):
-            to_create = os.path.dirname(self.config_path)
-            qibuild.sh.mkdir(to_create, recursive=True)
             with open(self.config_path, "w") as fp:
                 fp.write("<qibuild />\n")
+
         # Perform format conversion if necessary
         handle_old_qibuild_cfg(self.worktree.root)
         handle_old_qibuild_xml(self.worktree.root)
@@ -261,7 +254,7 @@ You may want to run:
             # (with CMake flags, build dir, et al.)
             qibuild_project = qibuild.project.Project(
                 worktree_project.name, worktree_project.src)
-            self.projects.append(worktree_project)
+            self.projects.append(qibuild_project)
 
         # Small warning here: when we update the projects, we do NOT
         # have the complete list of the projects, their dependencies,
@@ -630,7 +623,7 @@ def _projects_from_args(toc, args):
         return (list(), False)
 
 
-def toc_open(worktree, args=None, qibuild_cfg=None):
+def toc_open(worktree_root, args=None, qibuild_cfg=None):
     """ Creates a :py:class:`Toc` object.
 
     :param worktree: The worktree to be used. (see :py:class:`qibuild.worktree.WorkTree`)
@@ -653,7 +646,6 @@ def toc_open(worktree, args=None, qibuild_cfg=None):
     # (hence all the hasattr...)
     # ...
     # or simply not given :)
-    path_hints     = list()
 
     config = None
     if hasattr(args, 'config'):
@@ -671,12 +663,12 @@ def toc_open(worktree, args=None, qibuild_cfg=None):
     if hasattr(args, 'cmake_generator'):
         cmake_generator = args.cmake_generator
 
+    worktree = qibuild.worktree.open_worktree(worktree_root)
     toc = Toc(worktree,
                config=config,
                build_type=build_type,
                cmake_flags=cmake_flags,
                cmake_generator=cmake_generator,
-               path_hints=path_hints,
                qibuild_cfg=qibuild_cfg)
 
     (active_projects, single) =  _projects_from_args(toc, args)
