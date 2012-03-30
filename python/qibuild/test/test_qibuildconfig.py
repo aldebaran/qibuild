@@ -336,7 +336,7 @@ class QiBuildConfig(unittest.TestCase):
         xml = """
 <qibuild version="1">
     <build
-        incredibuild="Yes"
+        incredibuild="true"
     />
 </qibuild>
 """

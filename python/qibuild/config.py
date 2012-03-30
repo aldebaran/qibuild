@@ -100,9 +100,7 @@ class Build:
         self.incredibuild = False
 
     def parse(self, tree):
-        incredibuild = tree.get("incredibuild")
-        if incredibuild and incredibuild.lower() in ["y", "yes", "1", "true", "on"]:
-            self.incredibuild = True
+        self.incredibuild = qixml.parse_bool_attr(tree, "incredibuild")
 
     def tree(self):
         tree = etree.Element("build")
