@@ -7,7 +7,8 @@
 """
 
 import posixpath
-import qibuild.xml
+
+import qixml
 
 def git_url_join(remote, name):
     """ Join a remote ref with a name
@@ -21,7 +22,7 @@ def git_url_join(remote, name):
 
 class Manifest():
     def __init__(self, xml_path):
-        self.tree = qibuild.xml.parse_xml(xml_path)
+        self.tree = qixml.read(xml_path)
         self.projects = list()
         self.remotes = list()
         self.parse_remotes()
@@ -62,14 +63,26 @@ class Manifest():
             self.projects.append(project)
 
 
-class Project(qibuild.xml.XMLModel):
-        name = qibuild.xml.StringField()
-        path = qibuild.xml.StringField()
-        review = qibuild.xml.BoolField()
-        remote = qibuild.xml.StringField()
+class Project:
+    def __init__(self):
+        self.name = None
+        self.path = None
+        self.review = False
+        self.remote = None
+
+    def parse(self, xml_element):
+        self.name = xml_element.get("name")
+        self.path = xml_element.get("path")
+        self.review = qixml.parse_bool_attr(xml_element, "review")
 
 
-class Remote(qibuild.xml.XMLModel):
-        name = qibuild.xml.StringField()
-        fetch = qibuild.xml.StringField()
-        review = qibuild.xml.StringField()
+class Remote:
+    def __init__(self):
+        self.name = None
+        self.fetch = None
+        self.review = None
+
+    def parse(self, xml_element):
+        self.name = xml_element.get("name")
+        self.fetch = xml_element.get("fetch")
+        self.review = xml_element.get("review")

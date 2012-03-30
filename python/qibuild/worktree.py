@@ -11,7 +11,6 @@ import logging
 import operator
 
 import qibuild.sh
-import qibuild.xml
 
 LOGGER = logging.getLogger("WorkTree")
 
@@ -186,7 +185,16 @@ def create(directory):
 
 
 
-class Project(qibuild.xml.XMLModel):
-    name = qibuild.xml.StringField()
-    src = qibuild.xml.StringField()
-    git_project = qibuild.xml.StringField()
+class Project:
+
+    def __init__(self):
+        self.name = None
+        self.src = None
+        self.git_project = None
+
+    def parse(self, xml_elem):
+        self.name = xml_elem.get("name")
+        self.src = xml_elem.get("src")
+        self.git_project = xml_elem.get("git_project")
+
+
