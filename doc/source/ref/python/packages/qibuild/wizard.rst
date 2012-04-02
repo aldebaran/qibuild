@@ -1,4 +1,4 @@
-qiubild.wizard -- Configuration wizards
+qibuild.wizard -- Configuration wizards
 =======================================
 
 .. automodule:: qibuild.wizard

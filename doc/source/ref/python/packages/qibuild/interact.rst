@@ -1,4 +1,4 @@
-qiubild.interact -- Interacting with the user
+qibuild.interact -- Interacting with the user
 =============================================
 
 .. automodule:: qibuild.interact
