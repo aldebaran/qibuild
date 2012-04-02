@@ -133,14 +133,11 @@ class QiBuildTestCase(unittest.TestCase):
 
         self.assertEquals(cache["EGGS_DEPENDS"], "spam")
         self.assertEquals(cache["BAR_DEPENDS"] , "eggs;spam")
-
-        # run cmake .. once and store contents of cache:
-        qibuild.command.call(["cmake", ".."], cwd=build_dir)
         before = ""
         with open(cmake_cache, "r") as fp:
             before = fp.readlines()
 
-        # run cmake .. twice
+        # run cmake .. and check the cache did not change
         qibuild.command.call(["cmake", ".."], cwd=build_dir)
         after = ""
         with open(cmake_cache, "r") as fp:
@@ -149,7 +146,6 @@ class QiBuildTestCase(unittest.TestCase):
         diff = ""
         for line in difflib.unified_diff(before, after, fromfile='before', tofile='after'):
             diff += line
-
         self.assertEquals(diff, "", "Diff non empty\n%s" % diff)
 
 
