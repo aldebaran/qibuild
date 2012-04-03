@@ -2,11 +2,19 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-####
-#
-# This is just an re-write for FindQt4 methods.
-# We search programs moc and uic, then we use the
-# rest of the upstream's Qt4.cmake file
+# Hack here: we cannot integrate qmake in the
+# qt packages in the toolchains, because qmake will report
+# a path that probably does not exists, so we instead
+# look for moc and uic, and the copy-paste the macros from
+# QT_USE_FILE ...
+
+find_program(QT_QMAKE qmake)
+if(QT_QMAKE)
+  # Use upstream cmake files:
+  find_package(Qt4 COMPONENTS "")
+  include("${QT_USE_FILE}")
+  return()
+endif()
 
 find_program(QT_MOC_EXECUTABLE moc)
 find_program(QT_UIC_EXECUTABLE uic)
