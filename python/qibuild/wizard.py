@@ -161,9 +161,8 @@ def configure_local_settings(toc):
         build_dir = os.path.expanduser(build_dir)
         full_path = os.path.join(toc.work_tree, build_dir)
         print "Will use", full_path, "as a root for all build directories"
-    if build_dir:
-        toc.config.local.build.build_dir = build_dir
-        toc.save_config()
+    toc.config.local.build.build_dir = build_dir
+    toc.save_config()
 
     sdk_dir = None
     answer = qibuild.interact.ask_yes_no(
@@ -174,9 +173,8 @@ def configure_local_settings(toc):
         sdk_dir = os.path.expanduser(sdk_dir)
         full_path = os.path.join(toc.work_tree, sdk_dir)
         print "Will use", full_path, "as a unique SDK directory"
-    if sdk_dir:
-        toc.config.local.build.sdk_dir = sdk_dir
-        toc.save_config()
+    toc.config.local.build.sdk_dir = sdk_dir
+    toc.save_config()
 
 
 def run_config_wizard(toc):

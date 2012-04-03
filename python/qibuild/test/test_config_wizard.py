@@ -347,6 +347,45 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.assertEqual(cfg.build.incredibuild, True)
         self.assertEqual(cfg.defaults.env.path, r"/c/Program Files/Xoreax")
 
+    def test_unsetting_unique_build_dir(self):
+        self.setup_platform("linux")
+        self.setup_find_program({
+            "cmake" : "/usr/bin/cmake",
+            "qtcreator" : "/usr/bin/qtcreator",
+        })
+        self.setup_answers({
+            "generator" : "Unix Makefiles",
+            "ide" : "Eclipse CDT",
+            "unique build dir" : True,
+            "unique sdk dir"   : True,
+            "path to a build dir" : "build",
+            "path to a sdk dir"   : "sdk",
+        })
+        self.setup_generators(["Unix Makefiles"])
+        self.setup_tc_names(list())
+        work_tree = os.path.join(self.tmp, "work_tree")
+        toc = qibuild.toc.Toc(work_tree=work_tree)
+        self.run_wizard(toc=toc)
+        self.assertEqual(toc.config.local.build.build_dir, "build")
+        self.assertEqual(toc.config.local.build.sdk_dir,   "sdk")
+
+        self.interact_patcher.stop()
+        self.setup_answers({
+            "generator" : "Unix Makefiles",
+            "ide" : "Eclipse CDT",
+            "unique build dir" : False,
+            "unique sdk dir"   : False,
+        })
+        work_tree = os.path.join(self.tmp, "work_tree")
+        toc = qibuild.toc.Toc(work_tree=work_tree)
+        self.run_wizard(toc=toc)
+        build_dir = toc.config.local.build.build_dir
+        sdk_dir = toc.config.local.build.sdk_dir
+        self.assertFalse(build_dir,
+            "build_dir is '%s', should be None or empty" % build_dir)
+        self.assertFalse(sdk_dir,
+            "sdk_dir is '%s', should be None or empty" % sdk_dir)
+
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
         # pylint: disable-msg=E1103
