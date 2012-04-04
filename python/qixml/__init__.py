@@ -8,12 +8,7 @@
 """
 
 HAS_LXML = False
-try:
-    from lxml import etree
-    HAS_LXML = True
-except ImportError:
-    from xml.etree import ElementTree as etree
-
+from xml.etree import ElementTree as etree
 
 def indent(elem, level=0):
     """ Poor man's pretty print for elementTree
@@ -107,11 +102,7 @@ def write(xml_obj, output):
     else:
         tree = etree.ElementTree(element=xml_obj)
         root = xml_obj
-    if HAS_LXML:
-        # pylint: disable-msg=E1123
-        tree.write(output, pretty_print=True)
-    else:
-        indent(root)
-        tree.write(output)
+    indent(root)
+    tree.write(output)
 
 
