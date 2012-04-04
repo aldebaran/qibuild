@@ -69,10 +69,12 @@ class Project:
         self.path = None
         self.review = False
         self.remote = None
+        self.worktree_name = None
 
     def parse(self, xml_element):
         self.name = xml_element.get("name")
         self.path = xml_element.get("path")
+        self.worktree_name = xml_element.get("worktree_name")
         self.review = qixml.parse_bool_attr(xml_element, "review")
         self.remote = xml_element.get("remote")
 

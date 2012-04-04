@@ -66,6 +66,31 @@ class SyncTestCase(unittest.TestCase):
         libqi = worktree.projects[0]
         self.assertEqual(libqi.src,
                          os.path.join(worktree.root, "lib/libqi"))
+        self.assertEqual(libqi.name, "libqi")
+
+    def test_local_manifest_sync_worktree_name(self):
+        create_git_repo(self.tmp, "qi/libqi2")
+        worktree = qibuild.worktree.create(self.tmp)
+        xml = """
+<manifest>
+    <remote name="origin"
+        fetch="{tmp}"
+    />
+
+    <project name="srv/qi/libqi2.git"
+        worktree_name="libqi"
+        path="lib/libqi"
+    />
+</manifest>
+"""
+        xml = xml.format(tmp=self.tmp)
+        manifest = StringIO(xml)
+        qisrc.sync.sync_worktree(worktree, manifest)
+        self.assertEqual(len(worktree.projects), 1)
+        libqi = worktree.projects[0]
+        self.assertEqual(libqi.src,
+                         os.path.join(worktree.root, "lib/libqi"))
+        self.assertEqual(libqi.name, "libqi")
 
     def test_git_manifest_sync(self):
         create_git_repo(self.tmp, "qi/libqi")

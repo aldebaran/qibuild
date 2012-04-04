@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Handling synchronistation of a worktree with a manifest
+""" Handling synchronization of a worktree with a manifest
 
 """
 import os
@@ -14,6 +14,12 @@ import qisrc.git
 LOGGER = logging.getLogger(__name__)
 
 def sync_worktree_from_git(worktree, manifest_git_url):
+    """ Synchronize a worktree given a manifest git url.
+
+    The url should point to a git repository containing a
+    'default.xml' file, ala repo
+
+    """
     clone_project(worktree, manifest_git_url,
                   name="manifest",
                   path="manifest",
@@ -26,9 +32,21 @@ def sync_worktree_from_git(worktree, manifest_git_url):
 
 
 def sync_worktree(worktree, manifest_location):
+    """ Synchronize a worktree given a manifest location.
+
+    The location should be the path to a xml file
+
+    """
     manifest = qisrc.manifest.Manifest(manifest_location)
     for project in manifest.projects:
-        p_name = project.name
+        if project.worktree_name:
+            p_name = project.worktree_name
+        else:
+            # Here project.name is in fact the relative path
+            # of the git url (for instance remote is git://foo.com,
+            # and name is bar/bar.git), but we want 'bar'
+            # as worktree project name:
+            p_name = project.name.split("/")[-1].replace(".git", "")
         p_url = project.fetch_url
         p_path = project.path
         clone_project(worktree, p_url,
@@ -41,6 +59,15 @@ def clone_project(worktree, url,
                   name=None,
                   path=None,
                   skip_if_exists=False):
+    """ Add a project to a worktree given its url.
+
+    If name is not given, it will be guessed from the
+    url.
+    If path is not given, it will be <worktree>/name
+    If skip_if_exists is False, an error message will be
+    raised if the project already exists
+
+    """
     if not name:
         name = url.split("/")[-1].replace(".git", "")
     if not path:
