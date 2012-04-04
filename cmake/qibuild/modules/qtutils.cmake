@@ -10,8 +10,7 @@
 # and include/QtCore
 #
 function(qt_flib _suffix _libame)
-  find_program(QT_QMAKE qmake)
-  if(QT_QMAKE)
+  if(QT_USE_QMAKE)
     # Use upstream cmake files
     find_package(Qt4 COMPONENTS ${_libname} REQUIRED)
     include("${QT_USE_FILE}")

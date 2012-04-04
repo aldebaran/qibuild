@@ -8,8 +8,19 @@
 # look for moc and uic, and the copy-paste the macros from
 # QT_USE_FILE ...
 
-find_program(QT_QMAKE qmake)
-if(QT_QMAKE)
+# Note: when cross-compiling, you should set QT_USE_QMAKE
+# to false so that we do not use qmake from the system.
+
+if(NOT DEFINED QT_USE_QMAKE)
+  find_program(QT_QMAKE qmake)
+  if(QT_QMAKE)
+    set(QT_USE_QMAKE TRUE CACHE INTERNAL "" FORCE)
+  else()
+    set(QT_USE_QMAKE FALSE CACHE INTERNAL "" FORCE)
+  endif()
+endif()
+
+if(QT_USE_QMAKE)
   # Use upstream cmake files:
   find_package(Qt4 COMPONENTS "")
   include("${QT_USE_FILE}")
