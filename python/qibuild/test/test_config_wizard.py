@@ -358,11 +358,10 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
-        work_tree = os.path.join(self.tmp, "work_tree")
-        toc = qibuild.toc.Toc(work_tree=work_tree)
-        self.run_wizard(toc=toc)
-        self.assertEqual(toc.config.local.build.build_dir, "build")
-        self.assertEqual(toc.config.local.build.sdk_dir,   "sdk")
+        old_toc = qibuild.toc.toc_open(self.tmp)
+        self.run_wizard(toc=old_toc)
+        self.assertEqual(old_toc.config.local.build.build_dir, "build")
+        self.assertEqual(old_toc.config.local.build.sdk_dir,   "sdk")
 
         self.interact_patcher.stop()
         self.setup_answers({
@@ -372,10 +371,10 @@ class ConfigWizardTestCase(unittest.TestCase):
             "unique sdk dir"   : False,
         })
         work_tree = os.path.join(self.tmp, "work_tree")
-        toc = qibuild.toc.Toc(work_tree=work_tree)
-        self.run_wizard(toc=toc)
-        build_dir = toc.config.local.build.build_dir
-        sdk_dir = toc.config.local.build.sdk_dir
+        new_toc = qibuild.toc.toc_open(self.tmp)
+        self.run_wizard(toc=new_toc)
+        build_dir = new_toc.config.local.build.build_dir
+        sdk_dir   = new_toc.config.local.build.sdk_dir
         self.assertFalse(build_dir,
             "build_dir is '%s', should be None or empty" % build_dir)
         self.assertFalse(sdk_dir,

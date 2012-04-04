@@ -63,7 +63,13 @@ class TocTestCase(unittest.TestCase):
         qiproj_xml = os.path.join(hello_src, "qiproject.xml")
         with open(qiproj_xml, "w") as fp:
             fp.write('<project name="hello" />\n')
-        toc = qibuild.toc.Toc(self.tmp)
+        hello_cmake = os.path.join(hello_src, "CMakeLists.txt")
+        with open(hello_cmake, "w") as fp:
+            fp.write("project(hello)\n")
+
+        worktree = qibuild.worktree.open_worktree(self.tmp)
+        worktree.add_project("hello", hello_src)
+        toc = qibuild.toc.toc_open(self.tmp)
         hello_proj = toc.get_project("hello")
 
         sdk_dirs= dict()
@@ -73,7 +79,11 @@ class TocTestCase(unittest.TestCase):
             custom_cmake = os.path.join(dot_qi, config + ".cmake")
             with open(custom_cmake, "w") as fp:
                 fp.write("# Custom %s cmake config\n" % config)
-            toc = qibuild.toc.Toc(self.tmp, config=config)
+            class FakeArgs:
+                pass
+            args = FakeArgs()
+            args.config = config
+            toc = qibuild.toc.toc_open(self.tmp, args=args)
             sdk_dirs[config] = toc.get_project("hello").sdk_directory
 
         a_sdk_dir = sdk_dirs["a"]
