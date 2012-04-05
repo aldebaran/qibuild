@@ -16,7 +16,7 @@ Explore each parent directory until a ".qi" is found.
 Use the parent directory as a work tree.
 Build a WorkTree object from the work tree.
 Parses the worktree so that WorkTree every buildable projects
-(directories that contains a qibuild.manifest)
+(directories that contains a qiproject.xml)
 
 To find the "bar" project, look for a project named "bar" in
 worktree.projects
@@ -85,7 +85,7 @@ class WorkTree:
         """ Parse a worktree.
 
         Look for git projects and qibuild projects (directories containing a
-        qibuild.manifest and update self.buildable_projects and self.git_projects
+        qiproject.xml and update self.buildable_projects and self.git_projects
 
         Make sure there is no name conflict.
         """
@@ -101,7 +101,7 @@ class WorkTree:
                         mess  = "Name conflict: those two projects:\n"
                         mess += "\t\t%s\n\t\tand\n\t\t%s\n" % (d, pdir)
                         mess += "have the same name. (%s)\n" % project_name
-                        mess += "Please change the name in the qibuild.manifest, "
+                        mess += "Please change the name in the qiproject.xml, "
                         mess += "or move one of them outside you worktree."
                         raise WorkTreeException(mess)
                 else:
