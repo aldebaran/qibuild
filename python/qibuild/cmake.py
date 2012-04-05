@@ -155,7 +155,7 @@ so that it looks like
 
 cmake_minimum_required(VERSION 2.8)
 project({project_name})
-include(qibuild.cmake)
+find_package(qibuild)
 
 """.format(
         cmake_list_file=cmake_list_file,
