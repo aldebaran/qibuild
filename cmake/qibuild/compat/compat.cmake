@@ -373,9 +373,8 @@ function(stage_lib _targetname _name)
       DEFINITIONS ${ARG_DEFINITIONS}
   )
   if(_need_other_name)
-    list(APPEND _new_args "STAGED_NAME" "${_name}")
+    qi_stage_lib(${_new_args} STAGED_NAME "${_name}" DEPRECATED)
   endif()
-
   qi_stage_lib(${_new_args})
 endfunction()
 

@@ -130,8 +130,10 @@ function(_qi_use_lib_internal name)
       list(REMOVE_DUPLICATES _new_deps)
       list(REVERSE _new_deps)
     endif()
+
     qi_set_advanced_cache("${_U_name}_DEPENDS" ${_new_deps})
   endif()
+
 
   foreach(_pkg ${${_key}})
     string(TOUPPER ${_pkg} _U_PKG)
@@ -148,11 +150,11 @@ function(_qi_use_lib_internal name)
       target_link_libraries("${name}" ${${_U_PKG}_LIBRARY})
     endif()
 
-    # local lib are staged with _U_PKG_TARGET = localtargetname, this allow dependencies
-    # between local libs
-    if ( (DEFINED "${_U_PKG}_TARGET") AND (TARGET "${${_U_PKG}_TARGET}") )
-      add_dependencies(${name} "${${_U_PKG}_TARGET}")
+    if ((DEFINED "${_U_PKG}_TARGET") AND (TARGET "${${_U_PKG}_TARGET}"))
+      qi_append_global(${_U_name}_TARGET_DEPENDS ${${_U_PKG}_TARGET})
+      add_dependencies(${name} ${${_U_PKG}_TARGET})
     endif()
+
     if(${_U_PKG}_DEFINITIONS)
       # Append the correct compile definitions to the target
       set(_to_add)
