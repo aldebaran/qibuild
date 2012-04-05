@@ -51,7 +51,7 @@ function(qi_sanitize_compile_flags)
     # add_definitions("-ansi")
 
     # Activate warnings
-    add_definitions("-Wall -Wextra")
+    add_definitions("-Wall -Wextra -Wno-unused-parameter")
 
     if (ARGS_HIDDEN_SYMBOLS)
       add_definitions("-fvisibility=hidden")
