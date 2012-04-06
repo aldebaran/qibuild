@@ -387,7 +387,6 @@ function(stage_bin _targetname _name)
 endfunction()
 
 function(stage_header _name)
-  set(_need_other_name FALSE)
   qi_deprecated("stage_header is deprecated:
     Use qi_stage_header_only_lib instead.
   ")

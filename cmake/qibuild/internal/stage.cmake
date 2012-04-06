@@ -225,6 +225,13 @@ set(${_U_staged_name}_PACKAGE_FOUND \${${_U_staged_name}_FOUND} CACHE INTERNAL \
 ")
   set(_res "${_res} ${_call_fphsa}")
 
+  # _DEPENDS:
+  set(${_U_staged_name}_DEPENDS   ${${_U_staged_name}_DEPENDS})
+  _qi_gen_code_from_vars(_vars
+    ${_U_staged_name}_DEPENDS
+  )
+
+  set(_res "${_res} ${_vars}")
   set(${res} ${_res} PARENT_SCOPE)
 endfunction()
 
@@ -274,8 +281,15 @@ function(_qi_gen_code_header_only_lib_sdk res target _U_staged_name)
   set(_res "${_res} ${_inc}")
 
   set(_res "${_res}
- set(${_U_staged_name}_PACKAGE_FOUND TRUE CACHE INTERNAL \"\" FORCE)
+set(${_U_staged_name}_PACKAGE_FOUND TRUE CACHE INTERNAL \"\" FORCE)
   ")
+
+  set(${_U_staged_name}_DEPENDS   ${${_U_target}_DEPENDS})
+  _qi_gen_code_from_vars(_vars
+    ${_U_staged_name}_DEPENDS
+  )
+
+  set(_res "${_res} ${_vars}")
   set(${res} ${_res} PARENT_SCOPE)
 endfunction()
 
