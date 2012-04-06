@@ -17,6 +17,8 @@ function(qt_flib _suffix _libame)
     qi_append_uniq_global(QT_${_suffix}_INCLUDE_DIRS "${QT_${_suffix}_INCLUDE_DIR}")
     qi_append_uniq_global(QT_${_suffix}_INCLUDE_DIRS "${QT_INCLUDE_DIR}")
     qi_append_uniq_global(QT_${_suffix}_LIBRARIES    "${QT_LIBRARIES}")
+    set(QT_${_suffix}_LIBRARIES ${QT_${_suffix}_LIBRARIES} PARENT_SCOPE)
+    set(QT_${_suffix}_INCLUDE_DIRS ${QT_${_suffix}_INCLUDE_DIRS} PARENT_SCOPE)
     return()
   endif()
 
