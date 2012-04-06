@@ -14,10 +14,12 @@ function(qt_flib _suffix _libame)
     # Use upstream cmake files
     find_package(Qt4 COMPONENTS ${_libname} REQUIRED)
     include("${QT_USE_FILE}")
-    set(QT_${_suffix}_INCLUDE_DIRS ${QT_INCLUDE_DIR} PARENT_SCOPE)
-    set(QT_${_suffix}_LIBRARIES    ${QT_LIBRARIES}   PARENT_SCOPE)
+    qi_append_uniq_global(QT_${_suffix}_INCLUDE_DIRS "${QT_${_suffix}_INCLUDE_DIR}")
+    qi_append_uniq_global(QT_${_suffix}_INCLUDE_DIRS "${QT_INCLUDE_DIR}")
+    qi_append_uniq_global(QT_${_suffix}_LIBRARIES    "${QT_LIBRARIES}")
     return()
   endif()
+
 
   flib(QT_${_suffix} OPTIMIZED NAMES "${_libame}" "${_libame}4"  PATH_SUFFIXES qt4)
   flib(QT_${_suffix} DEBUG     NAMES "${_libame}" "${_libame}d4" PATH_SUFFIXES qt4)
