@@ -16,6 +16,8 @@ def git_url_join(remote, name):
     """
     if remote.startswith("http://"):
         return posixpath.join(remote, name)
+    if remote.startswith("ssh://"):
+        return posixpath.join(remote, name)
     if "@" in remote:
         return remote + ":" + name
     return posixpath.join(remote, name)

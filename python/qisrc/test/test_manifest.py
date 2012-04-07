@@ -48,10 +48,12 @@ class ManifestTestCase(unittest.TestCase):
         xml = """
 <manifest>
     <remote name="ssh" fetch="git@foo" />
+    <remote name="ssh-url" fetch="ssh://git@foo" />
     <remote name="http" fetch="http://foo" />
     <remote name="local" fetch="/path/to/foo" />
 
     <project name="ssh-bar.git" remote="ssh" />
+    <project name="ssh-url-bar.git" remote="ssh-url" />
     <project name="http-bar.git" remote="http" />
     <project name="local-bar.git" remote="local" />
 
@@ -61,6 +63,9 @@ class ManifestTestCase(unittest.TestCase):
         manifest = qisrc.manifest.Manifest(xml_in)
         ssh_bar = manifest.get_project("ssh-bar.git")
         self.assertEquals(ssh_bar.fetch_url, "git@foo:ssh-bar.git")
+
+        ssh_url_bar = manifest.get_project("ssh-url-bar.git")
+        self.assertEquals(ssh_url_bar.fetch_url, "ssh://git@foo/ssh-url-bar.git")
 
         http_bar = manifest.get_project("http-bar.git")
         self.assertEquals(http_bar.fetch_url, "http://foo/http-bar.git")
