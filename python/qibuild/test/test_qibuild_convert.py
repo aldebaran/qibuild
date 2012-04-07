@@ -8,12 +8,15 @@
 
 import os
 import unittest
+import pytest
 import tempfile
 
 import qibuild
 import qibuild.actions.convert
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 class QiBuildConvertTestCase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="tmp-convert-test")

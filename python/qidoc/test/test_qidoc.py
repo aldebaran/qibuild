@@ -5,6 +5,7 @@
 import os
 import tempfile
 import unittest
+import pytest
 
 import qidoc.core
 import qibuild
@@ -36,6 +37,7 @@ class TestQiDoc(unittest.TestCase):
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
 
+    @pytest.mark.slow
     @unittest.skipUnless(check_tools(), "Some required tools are not installed")
     def test_build(self):
         opts = dict()

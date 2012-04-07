@@ -28,6 +28,10 @@ check:
 	@echo ":: Running tests"
 	@$(PYTHON) run_tests.py
 
+check-fast:
+	@echo ":: Runnig fasts tests"
+	@$(PTHON) -m pytest -k -slow
+
 
 coverage:
 	@echo ":: Running tests (with coverage)"
