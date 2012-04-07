@@ -13,7 +13,7 @@ import qisrc.git
 
 LOGGER = logging.getLogger(__name__)
 
-def sync_worktree_from_git(worktree, manifest_git_url):
+def manifest_from_git(worktree, manifest_git_url):
     """ Synchronize a worktree given a manifest git url.
 
     The url should point to a git repository containing a
@@ -21,38 +21,47 @@ def sync_worktree_from_git(worktree, manifest_git_url):
 
     """
     clone_project(worktree, manifest_git_url,
-                  name="manifest",
-                  path="manifest",
                   skip_if_exists=True)
     manifest = worktree.get_project("manifest")
     git = qisrc.git.open(manifest.src)
     git.pull()
     default_xml = os.path.join(manifest.src, "default.xml")
-    sync_worktree(worktree, default_xml)
+    return default_xml
 
 
-def sync_worktree(worktree, manifest_location):
-    """ Synchronize a worktree given a manifest location.
-
-    The location should be the path to a xml file
+def sync_worktree(worktree, rebase=True, manifest_locations=None):
+    """ Synchronize a worktree.
+    :param manifest_locations: If given, must be a
+        list of paths to xml files
 
     """
-    manifest = qisrc.manifest.Manifest(manifest_location)
-    for project in manifest.projects:
-        if project.worktree_name:
-            p_name = project.worktree_name
+    if manifest_locations is None:
+        manifest_locations = list()
+    # First clone every missing repository using the manifest locations
+    for manifest_location in manifest_locations:
+        manifest = qisrc.manifest.Manifest(manifest_location)
+        for project in manifest.projects:
+            if project.worktree_name:
+                p_name = project.worktree_name
+            else:
+                # Here project.name is in fact the relative path
+                # of the git url (for instance remote is git://foo.com,
+                # and name is bar/bar.git), but we want 'bar'
+                # as worktree project name:
+                p_name = project.name.split("/")[-1].replace(".git", "")
+            p_url = project.fetch_url
+            p_path = project.path
+            clone_project(worktree, p_url,
+                          name=p_name,
+                          path=p_path,
+                          skip_if_exists=True)
+    # Then pull everything
+    for git_project in worktree.git_projects:
+        git = qisrc.git.open(git_project.src)
+        if rebase:
+            git.pull("--rebase")
         else:
-            # Here project.name is in fact the relative path
-            # of the git url (for instance remote is git://foo.com,
-            # and name is bar/bar.git), but we want 'bar'
-            # as worktree project name:
-            p_name = project.name.split("/")[-1].replace(".git", "")
-        p_url = project.fetch_url
-        p_path = project.path
-        clone_project(worktree, p_url,
-                      name=p_name,
-                      path=p_path,
-                      skip_if_exists=True)
+            git.pull()
 
 
 def clone_project(worktree, url,
