@@ -5,17 +5,23 @@
 """Init a new qisrc workspace """
 
 import os
+
 import qibuild
+import qisrc
 
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.worktree_parser(parser)
+    parser.add_argument("manifest_url")
 
 def do(args):
     """Main entry point"""
     if args.worktree:
-        worktree = args.worktree
+        worktree_root = args.worktree
     else:
-        worktree = os.getcwd()
-    qibuild.worktree.create(worktree)
-
+        worktree_root = os.getcwd()
+    worktree = qibuild.worktree.create(worktree_root)
+    manifest_url = args.manifest_url
+    manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
+    qisrc.sync.sync_worktree(worktree, manifest_location=manifest)
+    worktree.add_manifest_url(manifest_url)

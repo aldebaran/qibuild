@@ -61,7 +61,7 @@ class SyncTestCase(unittest.TestCase):
 """
         xml = xml.format(tmp=self.tmp)
         manifest = StringIO(xml)
-        qisrc.sync.sync_worktree(worktree, manifest)
+        qisrc.sync.sync_worktree(worktree, manifest_location=manifest)
         self.assertEqual(len(worktree.projects), 1)
         libqi = worktree.projects[0]
         self.assertEqual(libqi.src,
@@ -85,7 +85,7 @@ class SyncTestCase(unittest.TestCase):
 """
         xml = xml.format(tmp=self.tmp)
         manifest = StringIO(xml)
-        qisrc.sync.sync_worktree(worktree, manifest)
+        qisrc.sync.sync_worktree(worktree, manifest_location=manifest)
         self.assertEqual(len(worktree.projects), 1)
         libqi = worktree.projects[0]
         self.assertEqual(libqi.src,
@@ -93,10 +93,9 @@ class SyncTestCase(unittest.TestCase):
         self.assertEqual(libqi.name, "libqi")
 
     def test_git_manifest_sync(self):
-        create_git_repo(self.tmp, "qi/libqi")
         manifest_url = create_git_repo(self.tmp, "manifest")
         manifest_src = os.path.join(self.tmp, "src", "manifest")
-        default_xml = os.path.join(manifest_src, "default.xml")
+        manifest_xml = os.path.join(manifest_src, "manifest.xml")
         xml = """
 <manifest>
     <remote name="origin"
@@ -109,15 +108,18 @@ class SyncTestCase(unittest.TestCase):
 </manifest>
 """
         xml = xml.format(tmp=self.tmp)
-        with open(default_xml, "w") as fp:
+        with open(manifest_xml, "w") as fp:
             fp.write(xml)
         git = qisrc.git.Git(manifest_src)
-        git.call("add", "default.xml")
-        git.call("commit", "-m", "added default.xml")
+        git.call("add", "manifest.xml")
+        git.call("commit", "-m", "added manifest.xml")
         git.call("push", manifest_url, "master:master")
-        other = os.path.join(self.tmp, "other")
-        worktree = qibuild.worktree.create(other)
-        qisrc.sync.sync_worktree_from_git(worktree, manifest_url)
+        worktree = qibuild.worktree.create(self.tmp)
+        fetched_manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
+        with open(fetched_manifest, "r") as fp:
+            fetched_xml = fp.read()
+        self.assertEqual(fetched_xml, xml)
+
 
 
 if __name__ == "__main__":

@@ -13,11 +13,11 @@ import qisrc.git
 
 LOGGER = logging.getLogger(__name__)
 
-def manifest_from_git(worktree, manifest_git_url):
-    """ Synchronize a worktree given a manifest git url.
+def fetch_manifest(worktree, manifest_git_url):
+    """ Fetch the manifest for a worktree
 
     The url should point to a git repository containing a
-    'default.xml' file, ala repo
+    'manifest.xml' file, ala repo
 
     """
     clone_project(worktree, manifest_git_url,
@@ -25,36 +25,35 @@ def manifest_from_git(worktree, manifest_git_url):
     manifest = worktree.get_project("manifest")
     git = qisrc.git.open(manifest.src)
     git.pull()
-    default_xml = os.path.join(manifest.src, "default.xml")
-    return default_xml
+    manifest_xml = os.path.join(manifest.src, "manifest.xml")
+    return manifest_xml
 
 
-def sync_worktree(worktree, rebase=True, manifest_locations=None):
+def sync_worktree(worktree, rebase=True, manifest_location=None):
     """ Synchronize a worktree.
     :param manifest_locations: If given, must be a
         list of paths to xml files
 
     """
-    if manifest_locations is None:
-        manifest_locations = list()
-    # First clone every missing repository using the manifest locations
-    for manifest_location in manifest_locations:
-        manifest = qisrc.manifest.Manifest(manifest_location)
-        for project in manifest.projects:
-            if project.worktree_name:
-                p_name = project.worktree_name
-            else:
-                # Here project.name is in fact the relative path
-                # of the git url (for instance remote is git://foo.com,
-                # and name is bar/bar.git), but we want 'bar'
-                # as worktree project name:
-                p_name = project.name.split("/")[-1].replace(".git", "")
-            p_url = project.fetch_url
-            p_path = project.path
-            clone_project(worktree, p_url,
-                          name=p_name,
-                          path=p_path,
-                          skip_if_exists=True)
+    if manifest_location is None:
+        manifest_location = list()
+    # First clone every missing repository using the manifest location
+    manifest = qisrc.manifest.Manifest(manifest_location)
+    for project in manifest.projects:
+        if project.worktree_name:
+            p_name = project.worktree_name
+        else:
+            # Here project.name is in fact the relative path
+            # of the git url (for instance remote is git://foo.com,
+            # and name is bar/bar.git), but we want 'bar'
+            # as worktree project name:
+            p_name = project.name.split("/")[-1].replace(".git", "")
+        p_url = project.fetch_url
+        p_path = project.path
+        clone_project(worktree, p_url,
+                      name=p_name,
+                      path=p_path,
+                      skip_if_exists=True)
     # Then pull everything
     for git_project in worktree.git_projects:
         git = qisrc.git.open(git_project.src)

@@ -111,6 +111,31 @@ class WorktreeTestCase(unittest.TestCase):
         self.assertEquals(git_foo.src,
             os.path.join(self.tmp, "foo"))
 
+
+    def test_get_manifest_urls(self):
+        xml = """
+<worktree>
+  <manifest url="git@foo:manifest.git" />
+  <manifest url="git@bar:manifest.git" />
+</worktree>
+"""
+        worktree = self.create_worktee(xml)
+        manifest_urls = worktree.get_manifest_urls()
+        self.assertEquals(manifest_urls,
+            ["git@foo:manifest.git", "git@bar:manifest.git"])
+
+    def test_add_manifest_url(self):
+        xml = "<worktree />"
+        worktree = self.create_worktee(xml)
+        worktree.add_manifest_url("git@foo:manifest.git")
+        self.assertEquals(worktree.get_manifest_urls(),
+            ["git@foo:manifest.git"])
+        # Adding same url twice should do nothing:
+        worktree.add_manifest_url("git@foo:manifest.git")
+        self.assertEquals(worktree.get_manifest_urls(),
+            ["git@foo:manifest.git"])
+
+
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
 

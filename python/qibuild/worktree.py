@@ -50,6 +50,30 @@ class WorkTree:
             self.parse_git_projects()
             self.parse_buildable_projects()
 
+    def get_manifest_urls(self):
+        """ Get the manifest urls associated to this worktree
+
+        """
+        res = list()
+        manifest_elems = self.xml_tree.findall("manifest")
+        for manifest_elem in manifest_elems:
+            url = manifest_elem.get("url")
+            if url:
+                res.append(url)
+        return res
+
+    def add_manifest_url(self, url):
+        """ Add a manifet url
+
+        """
+        urls = self.get_manifest_urls()
+        if url in urls:
+            return
+        manifest_elem = qixml.etree.Element("manifest")
+        manifest_elem.set("url", url)
+        self.xml_tree.getroot().append(manifest_elem)
+        self.dump()
+
     def dump(self):
         """
         Dump self to the worktree.xml file
