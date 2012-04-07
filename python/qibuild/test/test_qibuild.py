@@ -129,22 +129,23 @@ class QiBuildTestCase(unittest.TestCase):
         build_dir = self.get_build_dir("foo")
 
         # Read cache and check that DEPENDS value are here
-        cache = qibuild.cmake.read_cmake_cache(cmake_cache)
-
-        self.assertEquals(cache["EGGS_DEPENDS"], "spam")
-        self.assertEquals(cache["BAR_DEPENDS"] , "eggs;spam")
-        before = ""
+        cache_before = qibuild.cmake.read_cmake_cache(cmake_cache)
         with open(cmake_cache, "r") as fp:
-            before = fp.readlines()
+            txt_before = fp.readlines()
+            txt_before = [l for l in txt_before if "ADVANCED" not in l]
+
+        self.assertEquals(cache_before["EGGS_DEPENDS"], "spam")
+        self.assertEquals(cache_before["BAR_DEPENDS"] , "eggs;spam")
 
         # run cmake .. and check the cache did not change
         qibuild.command.call(["cmake", ".."], cwd=build_dir)
-        after = ""
+        cache_after = qibuild.cmake.read_cmake_cache(cmake_cache)
         with open(cmake_cache, "r") as fp:
-            after = fp.readlines()
+            txt_after = fp.readlines()
+            txt_after = [l for l in txt_after if "ADVANCED" not in l]
 
         diff = ""
-        for line in difflib.unified_diff(before, after, fromfile='before', tofile='after'):
+        for line in difflib.unified_diff(txt_before, txt_after, fromfile='before', tofile='after'):
             diff += line
         self.assertEquals(diff, "", "Diff non empty\n%s" % diff)
 
