@@ -141,7 +141,7 @@ def check_is_in_path(executable, build_env=None):
         raise NotInPath(executable, env=build_env)
 
 
-def call(cmd, cwd=None, env=None, ignore_ret_code=False):
+def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=None):
     """ Execute a command line.
 
     If ignore_ret_code is False:
@@ -162,14 +162,6 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
       * And a normal exception if cwd is given and is not
         an existing directory.
 
-    If sys.stdout or sys.stderr are not a tty, only write
-    the last 300 lines of the process to sys.stdout if the
-    returncode is not zero, else write everything.
-
-    Note: this trick with sys.stderr, sys.stdout and subprocess
-    does not work on windows with python < 2.7, so it is simply
-    disabled, and you have a normal behavior instead.
-
     """
     exe_full_path = find_program(cmd[0], env=env)
     if not exe_full_path:
@@ -187,7 +179,10 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
     ring_buffer = RingBuffer(300)
 
     returncode = 0
-    quiet_command = CONFIG.get("quiet", False)
+    if quiet:
+        quiet_command = quiet
+    else:
+        quiet_command = CONFIG.get("quiet", False)
     # This code won't work on windows with python < 2.7,
     # so quiet will be ignored
     if sys.platform.startswith("win") and sys.version_info < (2, 7):
