@@ -6,6 +6,7 @@
 
 """
 import os
+import sys
 import logging
 
 import qisrc.manifest
@@ -24,7 +25,7 @@ def fetch_manifest(worktree, manifest_git_url):
                   skip_if_exists=True)
     manifest = worktree.get_project("manifest")
     git = qisrc.git.open(manifest.src)
-    git.pull()
+    git.pull(quiet=True)
     manifest_xml = os.path.join(manifest.src, "manifest.xml")
     return manifest_xml
 
@@ -55,12 +56,18 @@ def sync_worktree(worktree, rebase=True, manifest_location=None):
                       path=p_path,
                       skip_if_exists=True)
     # Then pull everything
-    for git_project in worktree.git_projects:
+    pad = " " * max([len(p.name) for p in worktree.git_projects])
+    project_count = len(worktree.git_projects)
+    for i, git_project in enumerate(worktree.git_projects):
+        sys.stdout.write("Pulling project %i on %i (%s)" %
+            (i+1, project_count, git_project.name)
+            + pad + "\r")
+        sys.stdout.flush()
         git = qisrc.git.open(git_project.src)
         if rebase:
-            git.pull("--rebase")
+            git.pull("--rebase", quiet=True)
         else:
-            git.pull()
+            git.pull(quiet=True)
 
 
 def clone_project(worktree, url,
@@ -92,7 +99,7 @@ def clone_project(worktree, url,
 
     if os.path.exists(path):
         if skip_if_exists:
-            LOGGER.info("Found %s in %s, skipping" % (name, path))
+            LOGGER.debug("Found %s in %s, skipping" % (name, path))
         else:
             mess  = "Could not add project %s from %s\n" % (name, url)
             mess += "Path %s already exists\n" % path
