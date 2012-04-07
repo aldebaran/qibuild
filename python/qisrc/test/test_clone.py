@@ -36,6 +36,7 @@ class CloneProjectTestCase(unittest.TestCase):
         qisrc.sync.clone_project(self.worktree, bar_url)
         self.assertEqual(self.worktree.git_projects[0].name, "bar")
         qisrc.sync.clone_project(self.worktree, bar_url, skip_if_exists=True)
+        self.assertEqual(len(self.worktree.git_projects), 1)
         self.assertEqual(self.worktree.git_projects[0].name, "bar")
 
     def test_clone_already_project_already_exists(self):

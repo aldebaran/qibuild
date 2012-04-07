@@ -28,7 +28,6 @@ class Manifest():
         self.parse_remotes()
         self.parse_projects()
 
-
     def parse_remotes(self):
         remote_elems = self.tree.findall("remote")
         for remote_elem in remote_elems:

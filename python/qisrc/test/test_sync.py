@@ -93,6 +93,7 @@ class SyncTestCase(unittest.TestCase):
         self.assertEqual(libqi.name, "libqi")
 
     def test_git_manifest_sync(self):
+        create_git_repo(self.tmp, "qi/libqi")
         manifest_url = create_git_repo(self.tmp, "manifest")
         manifest_src = os.path.join(self.tmp, "src", "manifest")
         manifest_xml = os.path.join(manifest_src, "manifest.xml")
@@ -119,7 +120,9 @@ class SyncTestCase(unittest.TestCase):
         with open(fetched_manifest, "r") as fp:
             fetched_xml = fp.read()
         self.assertEqual(fetched_xml, xml)
-
+        qisrc.sync.sync_worktree(worktree, manifest_location=fetched_manifest)
+        # And do it a second time:
+        qisrc.sync.sync_worktree(worktree, manifest_location=fetched_manifest)
 
 
 if __name__ == "__main__":
