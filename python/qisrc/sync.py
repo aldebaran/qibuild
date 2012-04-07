@@ -83,17 +83,24 @@ def clone_project(worktree, url,
     else:
         path = os.path.join(worktree.root, path)
 
+    p_names = [p.name for p in worktree.projects]
+    if name in p_names and not skip_if_exists:
+        conflicting_project = worktree.get_project(name)
+        mess  = "Could not add project %s from %s\n" % (name, url)
+        mess += "A project named %s already exists in %s\n" % (name, conflicting_project.src)
+        raise Exception(mess)
+
     if os.path.exists(path):
         if skip_if_exists:
             LOGGER.info("Found %s in %s, skipping" % (name, path))
         else:
             mess  = "Could not add project %s from %s\n" % (name, url)
-            mess += "%s already exists\n" % path
+            mess += "Path %s already exists\n" % path
             mess += "Please choose another name or another path"
             raise Exception(mess)
-
-    LOGGER.info("Git clone: %s -> %s", url, path)
-    git = qisrc.git.Git(path)
-    git.clone(url)
-
-    worktree.add_project(name, path)
+    else:
+        LOGGER.info("Git clone: %s -> %s", url, path)
+        git = qisrc.git.Git(path)
+        git.clone(url)
+    if not name in p_names:
+        worktree.add_project(name, path)
