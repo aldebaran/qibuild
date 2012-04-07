@@ -75,6 +75,8 @@ if (${_U_staged_name}_DEBUG_LIBRARY)
 else()
   set(${_U_staged_name}_LIBRARIES \${${_U_staged_name}_LIBRARY})
 endif()
+
+set(${_U_staged_name}_LIBRARIES \${${_U_staged_name}_LIBRARIES} CACHE INTERNAL \"\" FORCE)
 ")
   set(${res} ${_res} PARENT_SCOPE)
 endfunction()
