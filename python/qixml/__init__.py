@@ -29,14 +29,14 @@ def indent(elem, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
-def raise_parse_error(message, cfg_path=None, tree=None):
+def raise_parse_error(message, xml_path=None, tree=None):
     """ Raise a nice parsing error about the given
     tree element
 
     """
     mess = ""
-    if cfg_path:
-        mess += "Error when parsing '%s'\n" % cfg_path
+    if xml_path:
+        mess += "Error when parsing '%s'\n" % xml_path
     if tree is not None:
         as_str = etree.tostring(tree)
         mess += "Could not parse:\t%s\n" % as_str

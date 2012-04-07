@@ -695,11 +695,11 @@ class ProjectConfig:
         root = self.tree.getroot()
         if root.tag != "project":
             qixml.raise_parse_error("Root node must be 'project'",
-                cfg_path=cfg_path)
+                xml_path=cfg_path)
         name = root.get("name")
         if not name:
             qixml.raise_parse_error("'project' node must have a 'name' attribute",
-                cfg_path=cfg_path)
+                xml_path=cfg_path)
         self.name = name
 
         # Read depends:
@@ -872,7 +872,7 @@ def convert_project_manifest(qibuild_manifest):
     p_names = ini_cfg.get("project", default=dict()).keys()
     if len(p_names) != 1:
         qixml.raise_parse_error("File should countain exactly one [project] section",
-            cfg_path=qibuild_manifest)
+            xml_path=qibuild_manifest)
     name = p_names[0]
     project = ProjectConfig()
     project.name = name
