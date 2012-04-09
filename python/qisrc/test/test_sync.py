@@ -61,7 +61,7 @@ class SyncTestCase(unittest.TestCase):
 """
         xml = xml.format(tmp=self.tmp)
         manifest = StringIO(xml)
-        qisrc.sync.sync_worktree(worktree, manifest_location=manifest)
+        qisrc.sync.clone_missing(worktree, manifest)
         self.assertEqual(len(worktree.projects), 1)
         libqi = worktree.projects[0]
         self.assertEqual(libqi.src,
@@ -85,7 +85,7 @@ class SyncTestCase(unittest.TestCase):
 """
         xml = xml.format(tmp=self.tmp)
         manifest = StringIO(xml)
-        qisrc.sync.sync_worktree(worktree, manifest_location=manifest)
+        qisrc.sync.clone_missing(worktree, manifest)
         self.assertEqual(len(worktree.projects), 1)
         libqi = worktree.projects[0]
         self.assertEqual(libqi.src,
@@ -120,9 +120,9 @@ class SyncTestCase(unittest.TestCase):
         with open(fetched_manifest, "r") as fp:
             fetched_xml = fp.read()
         self.assertEqual(fetched_xml, xml)
-        qisrc.sync.sync_worktree(worktree, manifest_location=fetched_manifest)
+        qisrc.sync.clone_missing(worktree, fetched_manifest)
         # And do it a second time:
-        qisrc.sync.sync_worktree(worktree, manifest_location=fetched_manifest)
+        qisrc.sync.clone_missing(worktree, fetched_manifest)
 
 
 if __name__ == "__main__":

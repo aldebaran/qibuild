@@ -23,5 +23,5 @@ def do(args):
     worktree = qibuild.worktree.create(worktree_root)
     manifest_url = args.manifest_url
     manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
-    qisrc.sync.sync_worktree(worktree, manifest_location=manifest)
+    qisrc.sync.clone_missing(worktree, manifest)
     worktree.add_manifest_url(manifest_url)

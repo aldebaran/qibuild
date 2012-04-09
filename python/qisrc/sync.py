@@ -30,15 +30,11 @@ def fetch_manifest(worktree, manifest_git_url):
     return manifest_xml
 
 
-def sync_worktree(worktree, rebase=True, manifest_location=None):
-    """ Synchronize a worktree.
-    :param manifest_locations: If given, must be a
-        list of paths to xml files
+def clone_missing(worktree, manifest_location):
+    """ Synchronize a worktree with a manifest,
+    cloning any missing repository.
 
     """
-    if manifest_location is None:
-        manifest_location = list()
-    # First clone every missing repository using the manifest location
     manifest = qisrc.manifest.Manifest(manifest_location)
     for project in manifest.projects:
         if project.worktree_name:
@@ -55,7 +51,11 @@ def sync_worktree(worktree, rebase=True, manifest_location=None):
                       name=p_name,
                       path=p_path,
                       skip_if_exists=True)
-    # Then pull everything
+
+def pull_projects(worktree, rebase=False):
+    """ Pull every project in a worktree
+
+    """
     pad = " " * max([len(p.name) for p in worktree.git_projects])
     project_count = len(worktree.git_projects)
     for i, git_project in enumerate(worktree.git_projects):

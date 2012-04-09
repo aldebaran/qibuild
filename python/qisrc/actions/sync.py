@@ -34,4 +34,6 @@ def do(args):
 
     for manifest_url in manifest_urls:
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
-        qisrc.sync.sync_worktree(worktree, manifest_location=manifest)
+        qisrc.sync.clone_missing(worktree, manifest)
+
+    qisrc.sync.pull_projects(worktree, rebase=args.rebase)
