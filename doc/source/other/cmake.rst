@@ -149,9 +149,9 @@ Using :cmake:function:`qi_create_lib` will make sure that:
 * If the library is static, it is generated in ``build/sdk/lib``
 
 * If the library is shared, it is generated in ``build/sdk/bin`` on Windows,
-  and in ``build/sdk/lib`` on Windows
+  and in ``build/sdk/lib`` on linux
 
-* The install rules us created accordingly
+* The install rules are created accordingly
 
 * On linux, ``-fPIC`` is used so that you can use the static library
   inside a shared library
@@ -166,7 +166,7 @@ to :cmake:function:`qi_create_bin` (for instance ``NO_FPIC``, ``NO_INSTALL``
 The library will be:
 
 * built as a shared library on UNIX
-* built as a static library on windows
+* built as a static library on Windows
 
 You can can set ``BUILD_SHARED_LIBS=OFF`` to compile everything in static by
 default.
@@ -208,7 +208,7 @@ Using :cmake:function:`qi_use_lib` in conjunction with :cmake:function:`qi_stage
 
 * world is a package in a :term:`toolchain`
 
-* world is a library that has been fond by a custom qibuild module in
+* world is a library that has been found by a custom qibuild module in
   `cmake/qibuild/modules/world-config.cmake`
 
 * world is a library installed on the system that has been found by
