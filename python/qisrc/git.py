@@ -92,7 +92,7 @@ class Git:
             return None
         if merge.startswith("refs/heads/"):
             return "%s/%s" % (remote, merge[11:])
-        return None
+        return "%s/%s" % (remote, merge)
 
     def fetch(self, *args, **kwargs):
         """ Wrapper for git fetch """
