@@ -17,7 +17,7 @@ General installation:
 
 There are two ways you can install qiBuild:
 *  Default installation: Works as expected. qiBuild works after you installed it. It stops working until you remove it.
-*  Installation by linking. qiBuild is run from source. If the source changes then the behaviour of qiBuild changes. qiBuild won't work if you move the source around. Probably only interesting for qiBuild developers.
+*  Installation by linking. qiBuild is run from source. If the source changes then the behaviour of qiBuild changes. qiBuild won't work if you move the source around. Propably only interesting for qiBuild developers.
 
 Default installation:
 
