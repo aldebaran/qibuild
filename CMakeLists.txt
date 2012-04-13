@@ -12,6 +12,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(qiBuild NONE)
 
+option(WITH_DOCS "Build documentation with sphinx" ON)
+
 find_program(PYTHON_EXECUTABLE NAMES python2 python python.exe
   PATHS
     [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath]
@@ -53,32 +55,8 @@ install(
     "${_qibuild_cmake_install_dest}"
 )
 
-# Generate man pages with sphinx:
-find_program(_sphinx_build sphinx-build)
-if(NOT _sphinx_build)
-  message(STATUS "Please install python-sphinx to generate "
-  "documentation and man pages"
-  )
-else()
-  execute_process(COMMAND
-    ${_sphinx_build}
-    "-b" "man"
-    "${CMAKE_SOURCE_DIR}/doc/source"
-    "${CMAKE_BINARY_DIR}/man1"
-  )
-  install(
-    DIRECTORY    ${CMAKE_BINARY_DIR}/man1
-    DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/man/
-    PATTERN      ".doctrees" EXCLUDE
-  )
-endif()
-
-
 # Useful for python script to work later:
 set(ENV{PYTHONPATH} "${CMAKE_SOURCE_DIR}/python")
-
-# Generate and install manpages
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc)
 
 # Configure the run_setup_py.cmake.in script,
 # and have it run at installation:
@@ -98,7 +76,33 @@ configure_file(
 
 install(SCRIPT "${CMAKE_BINARY_DIR}/run_setup_py.cmake")
 
+
+if(NOT WITH_DOCS)
+  return()
+endif()
+
+# Generate man pages and documentation with sphinx:
+find_program(_sphinx_build sphinx-build2 sphinx-build)
+if(NOT _sphinx_build)
+  message(STATUS "Please install python-sphinx to generate "
+  "documentation and man pages"
+  )
+else()
+  execute_process(COMMAND
+    ${_sphinx_build}
+    "-b" "man"
+    "${CMAKE_SOURCE_DIR}/doc/source"
+    "${CMAKE_BINARY_DIR}/man1"
+  )
+  install(
+    DIRECTORY    ${CMAKE_BINARY_DIR}/man1
+    DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/man/
+    PATTERN      ".doctrees" EXCLUDE
+  )
+endif()
+
 if(_sphinx_build)
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc)
   add_custom_target("html-doc"
     ALL
       ${PYTHON_EXECUTABLE}
@@ -116,4 +120,3 @@ if(_sphinx_build)
     PATTERN      ".doctrees" EXCLUDE
   )
 endif()
-

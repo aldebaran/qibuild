@@ -3,8 +3,6 @@
 ## found in the COPYING file.
 
 from distutils.core import setup
-import sys
-import os
 
 packages = [
     "qibuild",
@@ -13,11 +11,14 @@ packages = [
     "qisrc.actions",
     "qibuild",
     "qibuild.actions",
+    "qidoc",
+    "qidoc.actions",
     "qitoolchain",
     "qitoolchain.actions",
 ]
 
 scripts = [
+    "bin/qidoc",
     "bin/qisrc",
     "bin/qibuild",
     "bin/qitoolchain",
@@ -27,20 +28,17 @@ package_data = {
  "qibuild" : ["templates/project/CMakeLists.txt",
               "templates/project/main.cpp",
               "templates/project/test.cpp",
-              "templates/project/qibuild.manifest"
+              "templates/project/qiproject.xml"
               ]
 }
 
-
 setup(name = 'qibuild',
       version = "1.14",
-      description = "The qiBuild Framework",
+      description = "Compilation of C++ projects made easy!",
       author = "Aldebaran Robotics",
-      author_email = "qi-dev@aldebaran-robotics.com",
+      author_email = "dmerejkowsky@aldebaran-robotics.com",
       packages = packages,
       package_data = package_data,
       license = "BSD",
       scripts = scripts
 )
-
-
