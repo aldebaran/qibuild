@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 ##
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
