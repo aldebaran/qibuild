@@ -14,21 +14,11 @@ Please submit documentation updates (if relevant) when you submit your patches.
 Building the doc
 -----------------
 
-On linux, simply install sphinx, and then run
+First, install tox, then run:
 
 .. code-block:: console
 
-   $ cd doc
-   $ make
-
-Note: on archlinux, (or any distribution using python3 by default),
-because we use a custom sphinx extension written in python2,
-you have to install ``python2-sphinx`` and use:
-
-.. code-block:: console
-
-   $ cd doc
-   $ make SPHINXBUILD=sphinx-build2
+  $ tox -c python/tox.ini -e doc
 
 
 Documenting CMake API
@@ -38,17 +28,12 @@ The :ref:`qibuild-cmake-api` is automatically generated from the
 comments of the cmake files in ``cmake/qibuild``
 
 If you add a new file, please add it to the list in
-``ref/cmake/api.rst`` and in ``tools/gen_cmake_rst.py``
+``ref/cmake/api.rst`` and in ``tools/gen_cmake_doc.py``
+
+(The script is called by tox right before building the sphinx documentation)
 
 Also, when changing the comments of a cmake functions, please
 regenerate the ``.rst`` files to check the output.
-
-You can do so by running ``make`` in ``doc/``, or using:
-
-.. code-block:: console
-
-  $ cd doc
-  $ python tools/gen_cmake_rst.py ..
 
 
 Generating command line help

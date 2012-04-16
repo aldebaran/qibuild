@@ -9,32 +9,32 @@ Installing required packages
 
 You need to install the following Python packages to run the test suite:
 
-* python-nose
-* python-mock
-
-And you also need to install ``pylint``
-
+* python-tox
 
 Althought qiBuild is a cross-platform, running the test suite on Windows
 with Visual Studio is quite painful. (Patches welcome ...)
 
 
-All in one step (Unix only)
-----------------------------
+All in one step
+---------------
 
-Simply go to ``qibuild/python`` and run ``make``
+Simply go to the root directory of qibuild and run:
+
+.. code-block:: console
+
+    tox -c python/tox.ini
 
 Note: if you are on a distribution where ``/usr/bin/python`` is Python3,
 you should use
 
 .. code-block:: console
 
-    make PYTHON=python2
+    tox2 -c python/tox.ini
 
 
 This will use pylint to find obvious errors (like variables referenced
 before assignement, missing imports, and so on), then will run
-the automatic tests.
+the automatic tests, and finally run a coverage report.
 
 Sometime pylint is mistaken, you can fix this by adding a small comment
 to disable the check, using the pylint error code:
@@ -43,33 +43,11 @@ to disable the check, using the pylint error code:
 
     # pylint: disable-mgs=E1101
 
-Check for pylint
-----------------
-
-Either run:
-
-.. code-block:: console
-
-    $ make check-all
-
-Or run pylint with the ``pylint.rc`` you will find in ``qibuild/python``.
-
-The score must NOT go below 9/10.
-
-
-
 Running test suite
 ------------------
 
-Use:
-
-.. code-block:: console
-
-   $ cd qibuild/python
-   $ PYTHONPATH=. python run_tests.py
-
-
-This is not yet on a build farm, so it is possible that some test will fail.
+This is on a build farm but only for linux and python2.7, so it is possible
+that some tests will fail.
 
 If you do find a failing test, please open a bug.
 
@@ -78,28 +56,27 @@ failing test and mark it as 'skipped'
 
 .. code-block:: python
 
-  @unittest.skip("See bug # ....")
+  @pytest.skip("See bug # ....")
   def test_subtle_bug(self):
      res = do_something_complicated()
      # Should be 42 but for some reason is 41 ...
      self.assertTrue(res, 42)
 
 
-This way when the bug is fixed we just have to remove the ``@unittest.skip``
+This way when the bug is fixed we just have to remove the ``@pytest.skip``
 and we are sure the bug never occurs again.
 
+Note: some tests are slow to run, you can mark them with
 
-Coverage
---------
+.. code-block:: python
 
-First, install `python-coverage <http://nedbatchelder.com/code/coverage/>`_
+  @pytest.mark.slow
+  def test_slow_command(self):
+    # something long going on here ...
 
-Then use:
+And then run the tests with
 
 .. code-block:: console
 
-   $ cd qibuild/python
-   $ make coverage
-   # or
-   $ python run_tests.py --coverage
-   $ python -m coverage html
+    cd python/
+    py.test -k -slow
