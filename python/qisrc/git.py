@@ -102,6 +102,10 @@ class Git:
         """ Wrapper for git reset """
         return self.call("reset", *args, **kwargs)
 
+    def checkout(self, *args, **kwargs):
+        """ Wrapper for git checkout """
+        return self.call("checkout", *args, **kwargs)
+
     def pull(self, *args, **kwargs):
         """ Wrapper for git pull """
         return self.call("pull", *args, **kwargs)

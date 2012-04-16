@@ -39,10 +39,13 @@ def create_git_repo(tmp, path):
 
 class SyncTestCase(unittest.TestCase):
     def setUp(self):
+        # Quick hack:
+        qibuild.command.CONFIG["quiet"] = True
         self.tmp = tempfile.mkdtemp(prefix="test-qisrc-sync")
         qibuild.sh.mkdir(self.tmp)
 
     def tearDown(self):
+        qibuild.command.CONFIG["quiet"] = False
         qibuild.sh.rm(self.tmp)
 
     def test_local_manifest_sync(self):
@@ -121,8 +124,79 @@ class SyncTestCase(unittest.TestCase):
             fetched_xml = fp.read()
         self.assertEqual(fetched_xml, xml)
         qisrc.sync.clone_missing(worktree, fetched_manifest)
-        # And do it a second time:
+        # And do it a second time, checking that we don't get an
+        # 'directory not empty' git failure
         qisrc.sync.clone_missing(worktree, fetched_manifest)
+
+    def test_git_manifest_sync_branch(self):
+        naoqi_url = create_git_repo(self.tmp, "naoqi")
+        create_git_repo(self.tmp, "libnaoqi")
+        manifest_url = create_git_repo(self.tmp, "manifest")
+        # Create a release-1.12 branch:
+        naoqi_src = os.path.join(self.tmp, "src", "naoqi")
+        git = qisrc.git.open(naoqi_src)
+        git.checkout("-b", "release-1.12")
+        readme = os.path.join(naoqi_src, "README")
+        with open(readme, "w") as fp:
+            fp.write("naoqi on release-1.12\n")
+        git.call("add", "README")
+        git.call("commit", "-m", "update README for 1.12")
+        git.call("push", naoqi_url, "release-1.12:release-1.12")
+        manifest_src = os.path.join(self.tmp, "src", "manifest")
+        manifest_xml = os.path.join(manifest_src, "manifest.xml")
+        xml = """
+<manifest>
+    <remote name="origin" fetch="{tmp}/srv" />
+    <project name="naoqi.git" path="naoqi" />
+    <project name="libnaoqi.git" path="lib/naoqi" />
+</manifest>
+"""
+        xml = xml.format(tmp=self.tmp)
+        with open(manifest_xml, "w") as fp:
+            fp.write(xml)
+        git = qisrc.git.Git(manifest_src)
+        git.call("add", "manifest.xml")
+        git.call("commit", "-m", "added manifest.xml")
+        git.call("push", manifest_url, "master:master")
+        git.checkout("-b", "release-1.12")
+        xml = """
+<manifest>
+    <remote name="origin" fetch="{tmp}/srv" />
+    <project name="naoqi.git" path="naoqi" />
+</manifest>
+"""
+        xml = xml.format(tmp=self.tmp)
+        with open(manifest_xml, "w") as fp:
+            fp.write(xml)
+        git.call("add", "manifest.xml")
+        git.call("commit", "-m", "fixed manifest.xml for 1.12")
+        git.call("push", manifest_url, "release-1.12:release-1.12")
+        master_root  = os.path.join(self.tmp, "work", "master")
+        release_root = os.path.join(self.tmp, "work", "release-1.12")
+        qibuild.sh.mkdir(master_root,  recursive=True)
+        qibuild.sh.mkdir(release_root, recursive=True)
+        master_wt  = qibuild.worktree.create(master_root)
+        release_wt = qibuild.worktree.create(release_root)
+        master_manifest  = qisrc.sync.fetch_manifest(master_wt,  manifest_url,
+            branch="master")
+        release_manifest = qisrc.sync.fetch_manifest(release_wt, manifest_url,
+            branch="release-1.12")
+        qisrc.sync.clone_missing(master_wt,  master_manifest)
+        qisrc.sync.clone_missing(release_wt, release_manifest, "release-1.12")
+        release_names = [p.name for p in release_wt.projects]
+        self.assertEqual(release_names, ["manifest", "naoqi"])
+        naoqi_release = release_wt.get_project("naoqi")
+        release_readme = os.path.join(naoqi_release.src, "README")
+        with open(release_readme, "r") as fp:
+            contents = fp.read()
+        self.assertEqual(contents, "naoqi on release-1.12\n")
+        master_names = [p.name for p in master_wt.projects]
+        self.assertEqual(master_names, ["libnaoqi", "manifest", "naoqi"])
+        naoqi_master = master_wt.get_project("naoqi")
+        master_readme = os.path.join(naoqi_master.src, "README")
+        with open(master_readme, "r") as fp:
+            contents = fp.read()
+        self.assertEqual(contents, "naoqi\n")
 
 
 if __name__ == "__main__":

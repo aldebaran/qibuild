@@ -14,15 +14,16 @@ import qisrc.git
 
 LOGGER = logging.getLogger(__name__)
 
-def fetch_manifest(worktree, manifest_git_url):
+def fetch_manifest(worktree, manifest_git_url, branch="master"):
     """ Fetch the manifest for a worktree
 
-    The url should point to a git repository containing a
-    'manifest.xml' file, ala repo
+    :param manifest_git_url: A git repository containing a
+        'manifest.xml' file, ala repo
+    :parm branch: The branch to use
 
     """
     clone_project(worktree, manifest_git_url,
-                  skip_if_exists=True)
+                  skip_if_exists=True, branch=branch)
     manifest = worktree.get_project("manifest")
     git = qisrc.git.open(manifest.src)
     git.pull(quiet=True)
@@ -30,7 +31,7 @@ def fetch_manifest(worktree, manifest_git_url):
     return manifest_xml
 
 
-def clone_missing(worktree, manifest_location):
+def clone_missing(worktree, manifest_location, branch="master"):
     """ Synchronize a worktree with a manifest,
     cloning any missing repository.
 
@@ -50,6 +51,7 @@ def clone_missing(worktree, manifest_location):
         clone_project(worktree, p_url,
                       name=p_name,
                       path=p_path,
+                      branch=branch,
                       skip_if_exists=True)
 
 def pull_projects(worktree, rebase=False):
@@ -73,6 +75,7 @@ def pull_projects(worktree, rebase=False):
 def clone_project(worktree, url,
                   name=None,
                   path=None,
+                  branch="master",
                   skip_if_exists=False):
     """ Add a project to a worktree given its url.
 
@@ -108,6 +111,6 @@ def clone_project(worktree, url,
     else:
         LOGGER.info("Git clone: %s -> %s", url, path)
         git = qisrc.git.Git(path)
-        git.clone(url)
+        git.clone(url, "-b", branch)
     if not name in p_names:
         worktree.add_project(name, path)

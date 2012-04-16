@@ -20,7 +20,9 @@ def configure_parser(parser):
     qibuild.parsers.project_parser(parser)
     parser.add_argument("--rebase", action="store_true", dest="rebase",
         help="Use git pull --rebase")
-    parser.set_defaults(rebase=False)
+    parser.add_argument("-b", "--branch",
+        help="Use this branch for the manifest and all the projects")
+    parser.set_defaults(rebase=False, branch="master")
 
 
 def do(args):
@@ -32,8 +34,10 @@ def do(args):
         mess += "Try calling `qisrc init`"
         raise Exception(mess)
 
+    branch = args.branch
+    rebase = args.rebase
     for manifest_url in manifest_urls:
-        manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
-        qisrc.sync.clone_missing(worktree, manifest)
+        manifest = qisrc.sync.fetch_manifest(worktree, manifest_url, branch=branch)
+        qisrc.sync.clone_missing(worktree, manifest, branch=branch)
 
     qisrc.sync.pull_projects(worktree, rebase=args.rebase)
