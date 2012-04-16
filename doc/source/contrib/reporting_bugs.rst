@@ -34,7 +34,11 @@ report :
 ``qibuild --version`` may be useful. Also please precise where you
 qibuild installation comes from.
 
-* Platform used: operating system, 32/64bits, etc.
+* Add context about the system:
+
+  * Operating system being used: Windows, Mac, Linux, 32/64bits, etc.
+
+  * CMake generator being used: UNIX Makefiles, Visual Studio, etc.
 
 * Add relevant information when any is available:
 
@@ -52,7 +56,7 @@ For instance:
 
 ::
 
-    Cannot frobinicate with latest qibuild
+    Cannot frobnicate with latest qibuild
 
     Using qibuild from github (rev 0f452b), I get the
     following when I try to frobnicate:

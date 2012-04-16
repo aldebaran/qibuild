@@ -92,7 +92,7 @@ Please open an issue on github for every qibuild bug you may
 find, but make sure to read this first:
 
 .. toctree::
-    :maxdepth 1:
+    :maxdepth: 1
 
     contrib/reporting_bugs
 
