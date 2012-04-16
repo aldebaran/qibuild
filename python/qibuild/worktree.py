@@ -38,6 +38,9 @@ class WorkTree:
         Load the worktree.xml file
 
         """
+        self.projects = list()
+        self.git_projects = list()
+        self.buildable_projects = list()
         dot_qi = os.path.join(self.root, ".qi")
         worktree_xml = os.path.join(dot_qi, "worktree.xml")
         if not os.path.exists(worktree_xml):
@@ -266,4 +269,8 @@ class Project:
         res.set("src", self.src)
         if self.git_project:
             res.set("git_project", self.git_project)
+        return res
+
+    def __repr__(self):
+        res = "<Project %s in %s>" % (self.name, self.src)
         return res
