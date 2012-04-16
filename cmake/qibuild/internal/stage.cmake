@@ -416,7 +416,7 @@ function(_qi_internal_stage_lib target)
   cmake_parse_arguments(ARG
     "INTERNAL"
     "STAGED_NAME"
-    "DEPRECATED;INCLUDE_DIRS;DEFINITIONS;PATH_SUFFIXES;DEPENDS"
+    "DEPRECATED;INCLUDE_DIRS;DEFINITIONS;PATH_SUFFIXES;DEPENDS;CUSTOM_CODE"
     ${ARGN})
 
 
@@ -465,6 +465,9 @@ qi_create_lib(foo INTERNAL) instead
   _qi_gen_code_lib_sdk(_sdk_code ${target} ${_U_staged_name})
   set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_module_name}")
   set(_sdk_code "${_sdk_code} ${_additional_code}")
+  if (ARG_CUSTOM_CODE)
+    set(_sdk_code "${_sdk_code} \n${ARG_CUSTOM_CODE}\n")
+  endif()
   file(WRITE "${_sdk_file}" "${_sdk_code}")
 
 endfunction()
