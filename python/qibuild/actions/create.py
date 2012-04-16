@@ -60,5 +60,4 @@ def do(args):
         qibuild.command.call(["git" , "commit" , "-m" , "initial commit"], cwd=project_path)
 
     LOGGER.info("New project initialized in %s", project_path)
-
-
+    qiwt.add_project(project_name, src=project_path)
