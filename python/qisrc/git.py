@@ -36,11 +36,14 @@ class Git:
             kwargs["cwd"] = self.repo
         if not "env" in kwargs.keys():
             kwargs["env"] = build_env
+        if not "quiet" in kwargs.keys():
+            kwargs["quiet"] = False
         cmd = ["git"]
         cmd.extend(args)
         raises = kwargs.get("raises")
         if raises is False:
             del kwargs["raises"]
+            del kwargs["quiet"]
             process = subprocess.Popen(cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
