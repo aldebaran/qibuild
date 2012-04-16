@@ -60,6 +60,8 @@ class Manifest():
             remote = self.get_remote(p_remote)
             if not remote:
                 continue
+            if not project.revision:
+                project.revision = remote.revision
             project.fetch_url = git_url_join(remote.fetch, project.name)
             self.projects.append(project)
 
@@ -70,11 +72,13 @@ class Project:
         self.path = None
         self.review = False
         self.remote = None
+        self.revision = None
         self.worktree_name = None
 
     def parse(self, xml_element):
         self.name = xml_element.get("name")
         self.path = xml_element.get("path")
+        self.revision = xml_element.get("revision")
         self.worktree_name = xml_element.get("worktree_name")
         self.review = qixml.parse_bool_attr(xml_element, "review")
         self.remote = xml_element.get("remote")
@@ -85,8 +89,12 @@ class Remote:
         self.name = None
         self.fetch = None
         self.review = None
+        self.revision = None
 
     def parse(self, xml_element):
         self.name = xml_element.get("name")
         self.fetch = xml_element.get("fetch")
         self.review = xml_element.get("review")
+        self.revision = xml_element.get("revision")
+        if not self.revision:
+            self.revision = "master"

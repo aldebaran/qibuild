@@ -13,6 +13,8 @@ def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.worktree_parser(parser)
     parser.add_argument("manifest_url")
+    parser.add_argument("-b", "--branch", dest="branch",
+        help="Use this branch for the manifest and all the projects")
 
 def do(args):
     """Main entry point"""
@@ -22,6 +24,7 @@ def do(args):
         worktree_root = os.getcwd()
     worktree = qibuild.worktree.create(worktree_root)
     manifest_url = args.manifest_url
-    manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
+    branch = args.branch
+    manifest = qisrc.sync.fetch_manifest(worktree, manifest_url, branch=branch)
     qisrc.sync.clone_missing(worktree, manifest)
     worktree.add_manifest_url(manifest_url)

@@ -31,7 +31,7 @@ def fetch_manifest(worktree, manifest_git_url, branch="master"):
     return manifest_xml
 
 
-def clone_missing(worktree, manifest_location, branch="master"):
+def clone_missing(worktree, manifest_location):
     """ Synchronize a worktree with a manifest,
     cloning any missing repository.
 
@@ -46,12 +46,15 @@ def clone_missing(worktree, manifest_location, branch="master"):
             # and name is bar/bar.git), but we want 'bar'
             # as worktree project name:
             p_name = project.name.split("/")[-1].replace(".git", "")
+        # Use the same branch for the project as the branch
+        # for the manifest, unless explicitely set:
+        p_revision = project.revision
         p_url = project.fetch_url
         p_path = project.path
         clone_project(worktree, p_url,
                       name=p_name,
                       path=p_path,
-                      branch=branch,
+                      branch=p_revision,
                       skip_if_exists=True)
 
 def pull_projects(worktree, rebase=False):

@@ -129,8 +129,14 @@ class SyncTestCase(unittest.TestCase):
         qisrc.sync.clone_missing(worktree, fetched_manifest)
 
     def test_git_manifest_sync_branch(self):
+        # FIXME: this code is very confusing.
+        # What we have here are two branches in the manifest repo:
+        #  - master:  3 projects: naoqi, libnaoqi and doc
+        #  - release-1.12: 2 projects: naoqi and doc, but doc stays with the
+        #   'master' branch
         naoqi_url = create_git_repo(self.tmp, "naoqi")
         create_git_repo(self.tmp, "libnaoqi")
+        create_git_repo(self.tmp, "doc")
         manifest_url = create_git_repo(self.tmp, "manifest")
         # Create a release-1.12 branch:
         naoqi_src = os.path.join(self.tmp, "src", "naoqi")
@@ -149,6 +155,7 @@ class SyncTestCase(unittest.TestCase):
     <remote name="origin" fetch="{tmp}/srv" />
     <project name="naoqi.git" path="naoqi" />
     <project name="libnaoqi.git" path="lib/naoqi" />
+    <project name="doc" path="doc" />
 </manifest>
 """
         xml = xml.format(tmp=self.tmp)
@@ -161,8 +168,9 @@ class SyncTestCase(unittest.TestCase):
         git.checkout("-b", "release-1.12")
         xml = """
 <manifest>
-    <remote name="origin" fetch="{tmp}/srv" />
+    <remote name="origin" fetch="{tmp}/srv" revision="release-1.12" />
     <project name="naoqi.git" path="naoqi" />
+    <project name="doc" path="doc" revision="master" />
 </manifest>
 """
         xml = xml.format(tmp=self.tmp)
@@ -182,16 +190,16 @@ class SyncTestCase(unittest.TestCase):
         release_manifest = qisrc.sync.fetch_manifest(release_wt, manifest_url,
             branch="release-1.12")
         qisrc.sync.clone_missing(master_wt,  master_manifest)
-        qisrc.sync.clone_missing(release_wt, release_manifest, "release-1.12")
+        qisrc.sync.clone_missing(release_wt, release_manifest)
         release_names = [p.name for p in release_wt.projects]
-        self.assertEqual(release_names, ["manifest", "naoqi"])
+        self.assertEqual(release_names, ["doc", "manifest", "naoqi"])
         naoqi_release = release_wt.get_project("naoqi")
         release_readme = os.path.join(naoqi_release.src, "README")
         with open(release_readme, "r") as fp:
             contents = fp.read()
         self.assertEqual(contents, "naoqi on release-1.12\n")
         master_names = [p.name for p in master_wt.projects]
-        self.assertEqual(master_names, ["libnaoqi", "manifest", "naoqi"])
+        self.assertEqual(master_names, ["doc", "libnaoqi", "manifest", "naoqi"])
         naoqi_master = master_wt.get_project("naoqi")
         master_readme = os.path.join(naoqi_master.src, "README")
         with open(master_readme, "r") as fp:
