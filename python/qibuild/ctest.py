@@ -132,7 +132,7 @@ def run_tests(project, build_env, test_name=None):
     tests = list()
     parse_ctest_test_files(all_tests, build_dir, list())
     if test_name:
-        tests = [x for x in tests if x[0] == test_name]
+        tests = [x for x in all_tests if x[0] == test_name]
         if not tests:
             mess  = "No such test: %s\n" % test_name
             mess += "Known tests are:\n"
