@@ -17,11 +17,12 @@ def check_tools():
 
     """
     executables = dict()
-    for name in ["sphinx-build", "sphinx-build2", "doxygen"]:
+    for name in ["sphinx-build", "sphinx-build2", "doxygen", "dot"]:
         executables[name] = qibuild.command.find_program(name)
 
     res = executables["sphinx-build"] or executables["sphinx-build2"]
     res = res and executables["doxygen"]
+    res = res and executables["dot"]
     return res
 
 class TestQiDoc(unittest.TestCase):
