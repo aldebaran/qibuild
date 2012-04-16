@@ -25,7 +25,7 @@ def fix_dylibs(sdk_dir, paths=None):
 
     """
     # This directory may not exist, so create it:
-    qibuild.sh.mkdir(os.path.join(sdk_dir, "lib"))
+    qibuild.sh.mkdir(os.path.join(sdk_dir, "lib"), recursive=True)
 
     for path in paths:
         frameworks = os.listdir(path)
