@@ -43,7 +43,6 @@ include(CMakeParseArguments)
 #                        have to compile the target explicitly.
 #                        Warning: you will NOT be able to create install rules
 #                          for this target.
-# \flag:STAGE Stage the binary.
 # \flag:WIN32 Build an executable with a WinMain entry point on windows.
 # \flag:MACOSX_BUNDLE Refer to the add_executable documentation.
 # \param:SUBFOLDER The destination subfolder. The install rules generated will be
@@ -55,7 +54,7 @@ include(CMakeParseArguments)
 function(qi_create_bin name)
   qi_debug("qi_create_bin(${name})")
 
-  cmake_parse_arguments(ARG "NO_RPATH;NO_INSTALL;EXCLUDE_FROM_ALL;STAGE" "SUBFOLDER" "SRC;DEPENDS;SUBMODULE" ${ARGN})
+  cmake_parse_arguments(ARG "NO_RPATH;NO_INSTALL;EXCLUDE_FROM_ALL" "SUBFOLDER" "SRC;DEPENDS;SUBMODULE" ${ARGN})
 
   set(ARG_SRC "${ARG_UNPARSED_ARGUMENTS}" "${ARG_SRC}")
   qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
@@ -123,7 +122,6 @@ endfunction()
 # \arg:name The name of the target script
 # \arg:source The source script, that will be copied in the sdk to bin/<name>
 # \flag:NO_INSTALL Do not generate install rule for the script
-# \flag:STAGE Stage the binary.
 # \param:SUBFOLDER The subfolder in sdk/bin to install the script into. (sdk/bin/<subfolder>)
 #
 function(qi_create_script name source)
@@ -179,7 +177,6 @@ endfunction()
 #                  be impossible to use the library from another project using
 #                  a package of the project.
 #                  You can by-pass this behavior by setting QI_INSTALL_INTERNAL to "ON"
-# \flag:NO_STAGE Do not stage the library.
 # \flag:NO_FPIC Do not set -fPIC on static libraries (will be set for shared lib by CMake anyway)
 # \param:SUBFOLDER The destination subfolder. The install rules generated will be
 #                  sdk/lib/<subfolder>
@@ -189,7 +186,7 @@ endfunction()
 # \example:target
 function(qi_create_lib name)
   cmake_parse_arguments(ARG
-    "NOBINDLL;NO_INSTALL;NO_STAGE;NO_FPIC;SHARED;STATIC;INTERNAL"
+    "NOBINDLL;NO_INSTALL;NO_FPIC;SHARED;STATIC;INTERNAL"
     "SUBFOLDER"
     "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
