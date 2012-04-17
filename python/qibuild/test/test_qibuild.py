@@ -8,8 +8,6 @@
 
 
 import os
-import re
-import sys
 import difflib
 
 import unittest
@@ -114,6 +112,14 @@ class QiBuildTestCase(unittest.TestCase):
     def test_package(self):
         self._run_action("package", "world")
 
+    def test_using_tool_for_install(self):
+        self._run_action("configure", "bar")
+        self._run_action("make", "bar")
+        with qibuild.sh.TempDir() as tmp:
+            self._run_action("install", "bar", tmp)
+            foo_out = os.path.join(tmp, "share", "foo", "foo.out")
+            self.assertTrue(os.path.exists(foo_out))
+
     def test_preserve_cache(self):
         # If cache changes when runnning cmake .. after
         # qibuild configure, then you have two problems:
@@ -139,7 +145,6 @@ class QiBuildTestCase(unittest.TestCase):
 
         # run cmake .. and check the cache did not change
         qibuild.command.call(["cmake", ".."], cwd=build_dir)
-        cache_after = qibuild.cmake.read_cmake_cache(cmake_cache)
         with open(cmake_cache, "r") as fp:
             txt_after = fp.readlines()
             txt_after = [l for l in txt_after if "ADVANCED" not in l]

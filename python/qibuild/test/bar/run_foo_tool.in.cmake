@@ -1,0 +1,4 @@
+execute_process(COMMAND "${FOOTOOL_EXECUTABLE}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/foo.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/foo.out"
+)
