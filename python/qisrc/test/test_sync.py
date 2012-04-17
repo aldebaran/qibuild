@@ -11,35 +11,12 @@ import qisrc.sync
 import qisrc.git
 import qibuild.sh
 
+from qisrc.test.test_git import create_git_repo, read_readme
 
-def create_git_repo(tmp, path):
-    """ Create a empty git repository, which just
-    what is enough so that it is possible to clone it
-
-    Rerturn a valid git url
-    """
-    tmp_srv = os.path.join(tmp, "srv", path + ".git")
-    qibuild.sh.mkdir(tmp_srv, recursive=True)
-    srv_git = qisrc.git.Git(tmp_srv)
-    srv_git.call("init", "--bare")
-
-    tmp_src = os.path.join(tmp, "src", path)
-    qibuild.sh.mkdir(tmp_src, recursive=True)
-    readme = os.path.join(tmp_src, "README")
-    with open(readme, "w") as fp:
-        fp.write(path + "\n")
-    git = qisrc.git.Git(tmp_src)
-    git.call("init")
-    git.call("add", ".")
-    git.call("commit", "-m", "intial commit")
-    git.call("push", tmp_srv, "master:master")
-
-    return tmp_srv
 
 
 class SyncTestCase(unittest.TestCase):
     def setUp(self):
-        # Quick hack:
         qibuild.command.CONFIG["quiet"] = True
         self.tmp = tempfile.mkdtemp(prefix="test-qisrc-sync")
         qibuild.sh.mkdir(self.tmp)
@@ -64,7 +41,7 @@ class SyncTestCase(unittest.TestCase):
 """
         xml = xml.format(tmp=self.tmp)
         manifest = StringIO(xml)
-        qisrc.sync.clone_missing(worktree, manifest)
+        qisrc.sync.sync_projects(worktree, manifest)
         self.assertEqual(len(worktree.projects), 1)
         libqi = worktree.projects[0]
         self.assertEqual(libqi.src,
@@ -88,7 +65,7 @@ class SyncTestCase(unittest.TestCase):
 """
         xml = xml.format(tmp=self.tmp)
         manifest = StringIO(xml)
-        qisrc.sync.clone_missing(worktree, manifest)
+        qisrc.sync.sync_projects(worktree, manifest)
         self.assertEqual(len(worktree.projects), 1)
         libqi = worktree.projects[0]
         self.assertEqual(libqi.src,
@@ -123,10 +100,10 @@ class SyncTestCase(unittest.TestCase):
         with open(fetched_manifest, "r") as fp:
             fetched_xml = fp.read()
         self.assertEqual(fetched_xml, xml)
-        qisrc.sync.clone_missing(worktree, fetched_manifest)
+        qisrc.sync.sync_projects(worktree, fetched_manifest)
         # And do it a second time, checking that we don't get an
         # 'directory not empty' git failure
-        qisrc.sync.clone_missing(worktree, fetched_manifest)
+        qisrc.sync.sync_projects(worktree, fetched_manifest)
 
     def test_git_manifest_sync_branch(self):
         # FIXME: this code is very confusing.
@@ -134,22 +111,14 @@ class SyncTestCase(unittest.TestCase):
         #  - master:  3 projects: naoqi, libnaoqi and doc
         #  - release-1.12: 2 projects: naoqi and doc, but doc stays with the
         #   'master' branch
-        naoqi_url = create_git_repo(self.tmp, "naoqi")
+        manifest_url = create_git_repo(self.tmp, "manifest", with_release_branch=True)
+        create_git_repo(self.tmp, "naoqi", with_release_branch=True)
         create_git_repo(self.tmp, "libnaoqi")
         create_git_repo(self.tmp, "doc")
-        manifest_url = create_git_repo(self.tmp, "manifest")
-        # Create a release-1.12 branch:
-        naoqi_src = os.path.join(self.tmp, "src", "naoqi")
-        git = qisrc.git.open(naoqi_src)
-        git.checkout("-b", "release-1.12")
-        readme = os.path.join(naoqi_src, "README")
-        with open(readme, "w") as fp:
-            fp.write("naoqi on release-1.12\n")
-        git.call("add", "README")
-        git.call("commit", "-m", "update README for 1.12")
-        git.call("push", naoqi_url, "release-1.12:release-1.12")
         manifest_src = os.path.join(self.tmp, "src", "manifest")
         manifest_xml = os.path.join(manifest_src, "manifest.xml")
+        git = qisrc.git.Git(manifest_src)
+        git.checkout("-f", "master")
         xml = """
 <manifest>
     <remote name="origin" fetch="{tmp}/srv" />
@@ -161,11 +130,10 @@ class SyncTestCase(unittest.TestCase):
         xml = xml.format(tmp=self.tmp)
         with open(manifest_xml, "w") as fp:
             fp.write(xml)
-        git = qisrc.git.Git(manifest_src)
         git.call("add", "manifest.xml")
         git.call("commit", "-m", "added manifest.xml")
         git.call("push", manifest_url, "master:master")
-        git.checkout("-b", "release-1.12")
+        git.checkout("release-1.12")
         xml = """
 <manifest>
     <remote name="origin" fetch="{tmp}/srv" revision="release-1.12" />
@@ -189,22 +157,47 @@ class SyncTestCase(unittest.TestCase):
             branch="master")
         release_manifest = qisrc.sync.fetch_manifest(release_wt, manifest_url,
             branch="release-1.12")
-        qisrc.sync.clone_missing(master_wt,  master_manifest)
-        qisrc.sync.clone_missing(release_wt, release_manifest)
+        qisrc.sync.sync_projects(master_wt,  master_manifest)
+        qisrc.sync.pull_projects(master_wt)
+        qisrc.sync.sync_projects(release_wt, release_manifest)
+        qisrc.sync.pull_projects(release_wt)
         release_names = [p.name for p in release_wt.projects]
-        self.assertEqual(release_names, ["doc", "manifest", "naoqi"])
+        self.assertEqual(release_names, ["doc", "manifest/default", "naoqi"])
         naoqi_release = release_wt.get_project("naoqi")
-        release_readme = os.path.join(naoqi_release.src, "README")
-        with open(release_readme, "r") as fp:
-            contents = fp.read()
-        self.assertEqual(contents, "naoqi on release-1.12\n")
+        readme = read_readme(naoqi_release.src)
+        self.assertEqual(readme, "naoqi on release-1.12\n")
         master_names = [p.name for p in master_wt.projects]
-        self.assertEqual(master_names, ["doc", "libnaoqi", "manifest", "naoqi"])
+        self.assertEqual(master_names, ["doc", "libnaoqi", "manifest/default", "naoqi"])
         naoqi_master = master_wt.get_project("naoqi")
-        master_readme = os.path.join(naoqi_master.src, "README")
-        with open(master_readme, "r") as fp:
-            contents = fp.read()
-        self.assertEqual(contents, "naoqi\n")
+        readme = read_readme(naoqi_master.src)
+        self.assertEqual(readme, "naoqi\n")
+
+
+    def test_manifest_wrong_revision(self):
+        manifest_url = create_git_repo(self.tmp, "manifest", with_release_branch=True)
+        manifest_src = os.path.join(self.tmp, "src", "manifest")
+        xml = """
+<manifest>
+    <remote name="origin" revision="release-1.12" />
+</manifest>
+"""
+        manifest_xml = os.path.join(manifest_src, "manifest.xml")
+        with open(manifest_xml, "w") as fp:
+            fp.write(xml)
+        git = qisrc.git.Git(manifest_src)
+        git.add("manifest.xml")
+        git.commit("-m", "add manifest.xml")
+        git.push(manifest_url, "release-1.12:release-1.12")
+        worktree = qibuild.worktree.create(self.tmp)
+        qisrc.sync.clone_project(worktree, manifest_url)
+        manifest = qisrc.sync.fetch_manifest(worktree, manifest_url, branch="release-1.12")
+        qisrc.sync.sync_projects(worktree, manifest)
+        worktree.set_manifest_project("manifest/default")
+        manifest_projects = worktree.get_manifest_projects()
+        self.assertEqual(len(manifest_projects), 1)
+        manifest_src = manifest_projects[0].src
+        readme = read_readme(manifest_src)
+        self.assertEqual(readme, "manifest on release-1.12\n")
 
 
 if __name__ == "__main__":

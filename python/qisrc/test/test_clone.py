@@ -9,12 +9,12 @@ import tempfile
 
 import qisrc
 import qibuild
-from qisrc.test.test_sync import create_git_repo
-
+from qisrc.test.test_git import create_git_repo
 
 
 class CloneProjectTestCase(unittest.TestCase):
     def setUp(self):
+        qibuild.command.CONFIG["quiet"] = True
         self.tmp = tempfile.mkdtemp(prefix="test-qisrc-sync")
         qibuild.sh.mkdir(self.tmp)
         self.srv = os.path.join(self.tmp, "srv")
@@ -24,6 +24,7 @@ class CloneProjectTestCase(unittest.TestCase):
         self.worktree = qibuild.worktree.open_worktree(worktree_root)
 
     def tearDown(self):
+        qibuild.command.CONFIG["false"] = True
         qibuild.sh.rm(self.tmp)
 
     def test_simple_clone(self):
@@ -66,3 +67,6 @@ class CloneProjectTestCase(unittest.TestCase):
         self.assertEqual(self.worktree.git_projects[0].name, "bar")
         self.assertEqual(self.worktree.git_projects[0].src,
             os.path.join(self.worktree.root, "baz"))
+
+if __name__ == "__main__":
+    unittest.main()

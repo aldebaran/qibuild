@@ -5,6 +5,7 @@
 """ Handling synchronization of a worktree with a manifest
 
 """
+
 import os
 import sys
 import logging
@@ -14,7 +15,9 @@ import qisrc.git
 
 LOGGER = logging.getLogger(__name__)
 
-def fetch_manifest(worktree, manifest_git_url, branch="master"):
+def fetch_manifest(worktree, manifest_git_url,
+    branch="master",
+    name="manifest/default"):
     """ Fetch the manifest for a worktree
 
     :param manifest_git_url: A git repository containing a
@@ -23,19 +26,26 @@ def fetch_manifest(worktree, manifest_git_url, branch="master"):
 
     """
     clone_project(worktree, manifest_git_url,
-                  skip_if_exists=True, branch=branch)
-    manifest = worktree.get_project("manifest")
+        name=name,
+        skip_if_exists=True)
+    # Make sure manifest project is on the correct, up to date branch:
+    manifest = worktree.get_project(name)
     git = qisrc.git.open(manifest.src)
-    git.pull(quiet=True)
+    git.set_remote("origin", manifest_git_url)
+    git.safe_checkout(branch, tracks="origin")
+    git.fetch(quiet=True)
+    git.reset("--hard", "origin/%s" % branch, quiet=True)
     manifest_xml = os.path.join(manifest.src, "manifest.xml")
     return manifest_xml
 
 
-def clone_missing(worktree, manifest_location):
+def sync_projects(worktree, manifest_location):
     """ Synchronize a worktree with a manifest,
-    cloning any missing repository.
+    cloning any missing repository, setting the correct
+    remote and tracking branch on every repository
 
     """
+    errors = list()
     manifest = qisrc.manifest.Manifest(manifest_location)
     for project in manifest.projects:
         if project.worktree_name:
@@ -50,12 +60,25 @@ def clone_missing(worktree, manifest_location):
         # for the manifest, unless explicitely set:
         p_revision = project.revision
         p_url = project.fetch_url
+        p_remote = project.remote
         p_path = project.path
         clone_project(worktree, p_url,
                       name=p_name,
                       path=p_path,
-                      branch=p_revision,
                       skip_if_exists=True)
+        p_src = worktree.get_project(p_name).src
+        git = qisrc.git.Git(p_src)
+        git.set_remote(p_remote, p_url)
+        err = git.safe_checkout(p_revision, tracks=p_remote)
+        if err:
+            errors.append((p_name, err))
+    if not errors:
+        return
+    LOGGER.error("Failed to synchronized some projects")
+    for (name, err) in errors:
+        print project
+        print err
+
 
 def pull_projects(worktree, rebase=False):
     """ Pull every project in a worktree
@@ -75,11 +98,7 @@ def pull_projects(worktree, rebase=False):
             git.pull(quiet=True)
 
 
-def clone_project(worktree, url,
-                  name=None,
-                  path=None,
-                  branch="master",
-                  skip_if_exists=False):
+def clone_project(worktree, url, name=None, path=None, skip_if_exists=False):
     """ Add a project to a worktree given its url.
 
     If name is not given, it will be guessed from the
@@ -114,6 +133,6 @@ def clone_project(worktree, url,
     else:
         LOGGER.info("Git clone: %s -> %s", url, path)
         git = qisrc.git.Git(path)
-        git.clone(url, "-b", branch)
+        git.clone(url)
     if not name in p_names:
         worktree.add_project(name, path)

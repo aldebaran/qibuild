@@ -55,8 +55,6 @@ class Manifest():
             project = Project()
             project.parse(project_elem)
             p_remote = project.remote
-            if not p_remote:
-                p_remote = "origin"
             remote = self.get_remote(p_remote)
             if not remote:
                 continue
@@ -82,6 +80,8 @@ class Project:
         self.worktree_name = xml_element.get("worktree_name")
         self.review = qixml.parse_bool_attr(xml_element, "review")
         self.remote = xml_element.get("remote")
+        if not self.remote:
+            self.remote = "origin"
 
 
 class Remote:

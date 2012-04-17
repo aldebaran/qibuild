@@ -97,6 +97,14 @@ class Git:
             return "%s/%s" % (remote, merge[11:])
         return "%s/%s" % (remote, merge)
 
+    def add(self, *args, **kwargs):
+        """ Wrapper for git add """
+        return self.call("add", *args, **kwargs)
+
+    def commit(self, *args, **kwargs):
+        """ Wrapper for git commit """
+        return self.call("commit", *args, **kwargs)
+
     def fetch(self, *args, **kwargs):
         """ Wrapper for git fetch """
         return self.call("fetch", *args, **kwargs)
@@ -152,6 +160,41 @@ class Git:
             return False
         return True
 
+    def set_remote(self, name, url):
+        """
+        Set a new remote with the given name and url
+
+        """
+        # If it is already here, do nothing:
+        in_conf = self.get_config("remote.%s.url" % name)
+        if in_conf and in_conf == url:
+            return
+        self.call("remote", "rm",  name, quiet=True, raises=False)
+        self.call("remote", "add", name, url, quiet=True)
+        self.call("fetch", name)
+
+    def safe_checkout(self, branch, tracks=None, remote_branch=None):
+        """
+        Checkout a new branch.
+        If tracks is given, make sure it tracks the given remote,
+        defaulting with a remote branch with the same name,
+        so that `git pull` works afterwards
+        If the worktree is not clean, dont' do it, but
+        return the git error message.
+
+        """
+        self.call("branch", branch, quiet=True, raises=False)
+        (retcode, out) = self.call("checkout", branch, raises=False)
+        if retcode != 0:
+            return out
+        if not tracks:
+            return
+        if not remote_branch:
+            remote_branch = branch
+        self.call("branch",
+            "--set-upstream", branch, "%s/%s" % (tracks, remote_branch),
+             quiet=True)
+        return None
 
 
 def open(repo):

@@ -20,7 +20,6 @@ class WorkTree:
     """ This class represent a :term:`worktree`
 
     """
-
     def __init__(self, root):
         """
         Construct a new worktree
@@ -53,29 +52,25 @@ class WorkTree:
             self.parse_git_projects()
             self.parse_buildable_projects()
 
-    def get_manifest_urls(self):
-        """ Get the manifest urls associated to this worktree
+    def get_manifest_projects(self):
+        """ Get the projects mark as beeing 'manifest' projects
 
         """
-        res = list()
-        manifest_elems = self.xml_tree.findall("manifest")
-        for manifest_elem in manifest_elems:
-            url = manifest_elem.get("url")
-            if url:
-                res.append(url)
-        return res
+        return [p for p in self.projects if p.manifest]
 
-    def add_manifest_url(self, url):
-        """ Add a manifet url
+    def set_manifest_project(self, name):
+        """ Mark a project as being a manifest project
 
         """
-        urls = self.get_manifest_urls()
-        if url in urls:
-            return
-        manifest_elem = qixml.etree.Element("manifest")
-        manifest_elem.set("url", url)
-        self.xml_tree.getroot().append(manifest_elem)
+        project = self.get_project(name)
+        project.manifest = True
+        project_elems = self.xml_tree.findall("project")
+        for project_elem in project_elems:
+            if project_elem.get("name") == name:
+                project_elem.set("manifest", "true")
+                break
         self.dump()
+        self.load()
 
     def dump(self):
         """
@@ -257,11 +252,13 @@ class Project:
         self.name = name
         self.src = src
         self.git_project = None
+        self.manifest = False
 
     def parse(self, xml_elem):
         self.name = xml_elem.get("name")
         self.src = xml_elem.get("src")
         self.git_project = xml_elem.get("git_project")
+        self.manifest = qixml.parse_bool_attr(xml_elem, "manifest")
 
     def xml_elem(self):
         res = etree.Element("project")
@@ -269,6 +266,8 @@ class Project:
         res.set("src", self.src)
         if self.git_project:
             res.set("git_project", self.git_project)
+        if self.manifest:
+            res.set("manifest", "true")
         return res
 
     def __repr__(self):

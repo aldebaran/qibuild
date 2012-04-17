@@ -112,28 +112,48 @@ class WorktreeTestCase(unittest.TestCase):
             os.path.join(self.tmp, "foo"))
 
 
-    def test_get_manifest_urls(self):
+    def test_get_manifest_projects(self):
         xml = """
 <worktree>
-  <manifest url="git@foo:manifest.git" />
-  <manifest url="git@bar:manifest.git" />
+  <project name="manifest/default"
+           src="manifest/default"
+           url="git@foo:manifest.git"
+           manifest="true"
+  />
+  <project name="manifest/custom"
+           src="manifest/custom"
+           url="git@bar:manifest.git"
+           manifest="true"
+  />
+  <project name="foo" src="foo" url="git@foo:foo.git" />
 </worktree>
 """
         worktree = self.create_worktee(xml)
-        manifest_urls = worktree.get_manifest_urls()
-        self.assertEquals(manifest_urls,
-            ["git@foo:manifest.git", "git@bar:manifest.git"])
+        manifest_projects = worktree.get_manifest_projects()
+        manifest_names = [p.name for p in manifest_projects]
+        self.assertEquals(manifest_names, ["manifest/custom", "manifest/default"])
 
-    def test_add_manifest_url(self):
-        xml = "<worktree />"
+    def test_add_manifest_project(self):
+        xml = """
+<worktree>
+    <project name="manifest/default" src="manifest/default" url="git@foo:manifest.git" />
+</worktree>
+"""
         worktree = self.create_worktee(xml)
-        worktree.add_manifest_url("git@foo:manifest.git")
-        self.assertEquals(worktree.get_manifest_urls(),
-            ["git@foo:manifest.git"])
-        # Adding same url twice should do nothing:
-        worktree.add_manifest_url("git@foo:manifest.git")
-        self.assertEquals(worktree.get_manifest_urls(),
-            ["git@foo:manifest.git"])
+        manifest_projects = worktree.get_manifest_projects()
+        manifest_names = [p.name for p in manifest_projects]
+        self.assertEquals(manifest_names, list())
+
+        # Set the manifest project
+        worktree.set_manifest_project("manifest/default")
+        manifest_projects = worktree.get_manifest_projects()
+        manifest_names = [p.name for p in manifest_projects]
+        self.assertEquals(manifest_names, ["manifest/default"])
+
+        # Adding same proect twice should do nothing:
+        worktree.set_manifest_project("manifest/default")
+        manifest_names = [p.name for p in manifest_projects]
+        self.assertEquals(manifest_names, ["manifest/default"])
 
 
     def tearDown(self):
