@@ -1,7 +1,6 @@
 <project name="@project_name@">
   <!-- Add your project dependencies here -->
-
   <!--
-  <depends names="foo" />
+  <depends buildtime="true" runtime="true" names="foo" />
   -->
 </project>
