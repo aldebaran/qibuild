@@ -36,5 +36,3 @@ def do(args):
     for manifest_project in manifest_projects:
         manifest_xml = os.path.join(manifest_project.path, "manifest.xml")
         qisrc.sync.sync_projects(worktree, manifest_xml)
-
-    qisrc.sync.pull_projects(worktree, rebase=args.rebase)

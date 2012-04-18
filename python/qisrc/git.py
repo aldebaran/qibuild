@@ -197,8 +197,9 @@ class Git:
         """
         if not remote_branch:
             remote_branch = branch
-        if self.get_current_branch() != branch:
-            return "Current branch is %s, skipping" % branch
+        current_branch = self.get_current_branch()
+        if current_branch != branch:
+            return "Current branch is %s, skipping" % current_branch
         (retcode, out) = self.pull(raises=False)
         if retcode == 0:
             return

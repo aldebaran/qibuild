@@ -53,8 +53,14 @@ def sync_projects(worktree, manifest_location):
     remote and tracking branch on every repository
 
     """
+    errors = list()
     manifest = qisrc.manifest.Manifest(manifest_location)
-    for project in manifest.projects:
+    pad = " " * max([len(p.name) for p in manifest.projects])
+    project_count = len(manifest.projects)
+    for i, project in enumerate(manifest.projects):
+        sys.stdout.write("Syncing project %i on %i (%s)" %
+            (i+1, project_count, project.name) + pad + "\r")
+        sys.stdout.flush()
         # Use the same branch for the project as the branch
         # for the manifest, unless explicitely set:
         p_revision = project.revision
@@ -69,6 +75,17 @@ def sync_projects(worktree, manifest_location):
         git = qisrc.git.Git(p_path)
         git.set_remote(p_remote, p_url)
         git.set_tracking_branch(p_revision, p_remote)
+        error = git.update_branch(p_revision, p_revision)
+        if error:
+            errors.append((p_src, error))
+    if not errors:
+        return
+    LOGGER.error("Fail to sync some projects")
+    for (src, err) in errors:
+        print src
+        print "-" * len(src)
+        print
+        print indent(err, 2)
 
 
 def pull_projects(worktree, rebase=False):
