@@ -598,6 +598,19 @@ class QiBuildConfig:
             return None
         return server.access
 
+    def set_server_access(self, server_name, username, password=None, root=None):
+        """ Configure access to a server """
+        server = self.servers.get(server_name)
+        if not server:
+            server = Server()
+            server.name = server_name
+            self.servers[server_name] = server
+        access = self.servers[server_name].access
+        access.name = server_name
+        access.username = username
+        access.password = password
+        access.root = root
+
     def write(self, xml_path=None):
         """ Write back the new config
 

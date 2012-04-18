@@ -13,6 +13,7 @@ import logging
 import qibuild.sh
 
 import qisrc.manifest
+import qisrc.review
 import qisrc.git
 
 LOGGER = logging.getLogger(__name__)
@@ -76,7 +77,7 @@ def sync_projects(worktree, manifest_location):
                       skip_if_exists=True)
         p_path = worktree.get_project(p_src).path
         if project.review:
-            qisrc.review.setup_project(p_path, project_name, p_url, p_revision)
+            qisrc.review.setup_project(p_path, project.name, project.review_url, p_revision)
         git = qisrc.git.Git(p_path)
         git.set_remote(p_remote, p_url)
         git.set_tracking_branch(p_revision, p_remote)
@@ -131,6 +132,7 @@ def clone_project(worktree, url, src=None, branch=None, skip_if_exists=False):
     raised if the project already exists
 
     """
+    should_add = True
     if not src:
         src = url.split("/")[-1].replace(".git", "")
     if os.path.isabs(src):
@@ -144,8 +146,11 @@ def clone_project(worktree, url, src=None, branch=None, skip_if_exists=False):
             mess += "This path is already registered for worktree in %s\n" % worktree.root
             raise Exception(mess)
         else:
-            LOGGER.debug("Found project in %s, skipping" % src)
-            return
+            if os.path.exists(project.path):
+                LOGGER.debug("Found project in %s, skipping" % src)
+                return
+            # Some one erase the project manually without telling qiworktree
+            should_add = False
 
     path = os.path.join(worktree.root, src)
     if os.path.exists(path):
@@ -166,4 +171,5 @@ def clone_project(worktree, url, src=None, branch=None, skip_if_exists=False):
         git.clone(url, "-b", branch)
     else:
         git.clone(url)
-    worktree.add_project(path)
+    if should_add:
+        worktree.add_project(path)

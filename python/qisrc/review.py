@@ -12,14 +12,14 @@ import urlparse
 
 import qisrc.git
 import qibuild.interact
+import qibuild.config
 
 
 def parse_git_url(url):
     """ Parse a git url. Return a tuple: username, server, port
 
     """
-    match = re.match("(ssh://)?(?P<username>\w+)@(?P<server>\w+)(:(?P<port>\d+))?",
-        url)
+    match = re.match(r"(ssh://)?(?P<username>[a-zA-Z0-9\._-]+)@(?P<server>[a-zA-Z0-9\._-]+)(:(?P<port>\d+))?", url)
     if not match:
         return None
     groupdict = match.groupdict()
@@ -34,6 +34,7 @@ def http_to_ssh(url, project_name, username, gerrit_ssh_port=29418):
 
     """
     # Extract server from url:
+    # pylint: disable-msg=E1103
     netloc = urlparse.urlsplit(url).netloc
     server = netloc.split(":")[0]
     res = "ssh://%s@%s:%i/%s" % (username, server, gerrit_ssh_port, project_name)
@@ -41,15 +42,15 @@ def http_to_ssh(url, project_name, username, gerrit_ssh_port=29418):
 
 
 
-def fetch_gerrit_hook(username, server, port, path):
+def fetch_gerrit_hook(path, username, server, port):
     """ Fetch the commint-msg hook from gerrit
 
     """
     git_hooks_dir = os.path.join(path, ".git", "hooks")
-    cmd = ["scp", "-p", str(port),
-        "%s@%s" % (username, server),
+    cmd = ["scp", "-P", str(port),
+        "%s@%s:hooks/commit-msg" % (username, server),
         git_hooks_dir]
-    qibuild.command.call(cmd)
+    qibuild.command.call(cmd, quiet=True)
 
 
 def check_gerrit_connection(username, server, gerrit_ssh_port=29418):
@@ -110,29 +111,36 @@ def setup_project(project_path, project_name, review_url, branch):
      - Add the hook
     """
     git = qisrc.git.Git(project_path)
-    remote_url = git.get_config("remote.gerrit.url")
-    if not remote_url:
-        # Extract server from url:
-        netloc = urlparse.urlsplit(review_url).netloc
-        server = netloc.split(":")[0]
+    # Extract server from url:
+    # pylint: disable-msg=E1103
+    netloc = urlparse.urlsplit(review_url).netloc
+    server = netloc.split(":")[0]
 
+    # Get username
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(create_if_mssing=True)
+    access = qibuild_cfg.get_server_access(server)
+    if access:
+        username = access.username
+    else:
         username = guess_user_name(server)
         if not username:
             print "qisrc: could not find your gerrit username"
             print "You will not be able to submit for code review"
             return
-        remote_url = http_to_ssh(review_url, project_name, username)
-        git.set_remote("gerrit", remote_url)
+        qibuild_cfg.set_server_access(server, username)
+        qibuild_cfg.write()
+
+    # Set a remote named 'gerrit'
+    remote_url = http_to_ssh(review_url, project_name, username)
+    git.set_remote("gerrit", remote_url)
 
 
-def setup_hook(project_path, remote_url):
-    """ Add the commit-msg hook to a project
-
-    """
-    (username, server, port) = parse_git_url(remote_url)
+    # Install the hook
     commit_hook = os.path.join(project_path, ".git", "hooks", "commit-msg")
     if os.path.exists(commit_hook):
         return
+    (username, server, port) = parse_git_url(remote_url)
     fetch_gerrit_hook(project_path, username, server, port)
 
 

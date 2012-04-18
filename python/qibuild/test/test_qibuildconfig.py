@@ -398,6 +398,32 @@ class QiBuildConfig(unittest.TestCase):
         access = new_cfg.get_server_access("doesnotexists")
         self.assertTrue(access is None)
 
+
+    def test_set_server_access(self):
+        xml = '<qibuild />'
+        qibuild_cfg = cfg_from_string(xml)
+        qibuild_cfg.set_server_access("gerrit", "john")
+        new_conf = cfg_to_string(qibuild_cfg)
+        new_cfg = cfg_from_string(new_conf)
+        access = new_cfg.get_server_access("gerrit")
+        self.assertEqual(access.username, "john")
+
+    def test_change_server_access(self):
+        xml = """
+<qibuild version="1">
+    <server name="gerrit">
+        <access username="steve" />
+    </server>
+</qibuild>
+"""
+        qibuild_cfg = cfg_from_string(xml)
+        qibuild_cfg.set_server_access("gerrit", "john")
+        new_conf = cfg_to_string(qibuild_cfg)
+        new_cfg = cfg_from_string(new_conf)
+        access = new_cfg.get_server_access("gerrit")
+        self.assertEqual(access.username, "john")
+
+
     def test_merge_settings_with_empty_active(self):
         qibuild_cfg = qibuild.config.QiBuildConfig(user_config="win32-vs2010")
         qibuild_cfg.defaults.cmake.generator = "NMake Makefiles"
