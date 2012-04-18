@@ -11,7 +11,7 @@ import tempfile
 import unittest
 
 import qibuild.sh
-import qibuild.worktree
+import qisrc.worktree
 
 class WorktreeTestCase(unittest.TestCase):
     def setUp(self):
@@ -27,64 +27,38 @@ class WorktreeTestCase(unittest.TestCase):
         worktree_xml = os.path.join(dot_qi, "worktree.xml")
         with open(worktree_xml, "w") as fp:
             fp.write(xml)
-        worktree = qibuild.worktree.open_worktree(self.tmp)
+        worktree = qisrc.worktree.open_worktree(self.tmp)
         return worktree
 
     def test_read_projects(self):
         xml = """
 <worktree>
-    <project
-        name="naoqi"
-        src="core/naoqi"
-    />
-    <project
-        name="libqi"
-        src="lib/libqi"
-    />
+    <project src="core/naoqi" />
+    <project src="lib/libqi" />
 </worktree>
 """
         worktree = self.create_worktee(xml)
-        project_names = [p.name for p in worktree.projects]
-        self.assertEquals(project_names, ["libqi", "naoqi"])
-        naoqi = worktree.get_project("naoqi")
-        self.assertEquals(naoqi.src,
-            os.path.join(self.tmp, "core/naoqi"))
+        p_srcs = [p.src for p in worktree.projects]
+        self.assertEquals(p_srcs, ["core/naoqi", "lib/libqi"])
 
     def test_read_git_projects(self):
         xml = """
 <worktree>
-    <project
-        name="libqi"
-        src="lib/libqi"
-    />
-    <project
-        name="foo-gui"
-        src="foo/gui"
-    />
-    <project
-        name="foo-lib"
-        src="foo/lib"
-        git_project="foo"
-    />
-    <project
-        name="foo"
-        src="foo"
-    />
+    <project src="lib/libqi" />
+    <project src="foo/gui" />
+    <project src="foo/lib" git_project="foo" />
+    <project src="foo" />
 </worktree>
 """
-        qibuild.sh.mkdir(os.path.join(self.tmp,
-            "lib/libqi/.git"), recursive=True)
-        qibuild.sh.mkdir(os.path.join(self.tmp,
-            "foo/.git"), recursive=True)
+        qibuild.sh.mkdir(os.path.join(self.tmp, "lib/libqi/.git"), recursive=True)
+        qibuild.sh.mkdir(os.path.join(self.tmp, "foo/.git"), recursive=True)
         worktree = self.create_worktee(xml)
-        foo_lib = worktree.get_project("foo-lib")
-        self.assertEquals(foo_lib.git_project.name, "foo")
-        self.assertEquals(foo_lib.git_project.src,
-            os.path.join(self.tmp, "foo"))
-        libqi = worktree.get_project("libqi")
+        foo_lib = worktree.get_project("foo/lib")
+        self.assertEquals(foo_lib.git_project.src, "foo")
+        libqi = worktree.get_project("lib/libqi")
         self.assertEquals(libqi.git_project, libqi)
-        g_names = [p.name for p in worktree.git_projects]
-        self.assertEquals(g_names, ["foo", "libqi"])
+        g_srcs = [p.src for p in worktree.git_projects]
+        self.assertEquals(g_srcs, ["foo", "lib/libqi"])
 
 
     def test_add_project(self):
@@ -93,8 +67,7 @@ class WorktreeTestCase(unittest.TestCase):
         worktree.add_project("foo")
         self.assertEquals(len(worktree.projects), 1)
         foo = worktree.get_project("foo")
-        self.assertEquals(foo.src,
-            os.path.join(self.tmp, "foo"))
+        self.assertEquals(foo.src, "foo")
 
     def test_add_git_project(self):
         xml = "<worktree />"
@@ -105,55 +78,50 @@ class WorktreeTestCase(unittest.TestCase):
             recursive=True)
 
         # Re-open worktre, check that foo is in git_projects
-        worktree = qibuild.open_worktree(self.tmp)
+        worktree = qisrc.open_worktree(self.tmp)
         self.assertEquals(len(worktree.git_projects), 1)
         git_foo = worktree.get_project("foo")
-        self.assertEquals(git_foo.src,
-            os.path.join(self.tmp, "foo"))
+        self.assertEquals(git_foo.src, "foo")
 
 
     def test_get_manifest_projects(self):
         xml = """
 <worktree>
-  <project name="manifest/default"
-           src="manifest/default"
-           url="git@foo:manifest.git"
+  <project src="manifest/default"
            manifest="true"
   />
-  <project name="manifest/custom"
-           src="manifest/custom"
-           url="git@bar:manifest.git"
+  <project src="manifest/custom"
            manifest="true"
   />
-  <project name="foo" src="foo" url="git@foo:foo.git" />
+  <project src="foo" />
 </worktree>
 """
         worktree = self.create_worktee(xml)
         manifest_projects = worktree.get_manifest_projects()
-        manifest_names = [p.name for p in manifest_projects]
-        self.assertEquals(manifest_names, ["manifest/custom", "manifest/default"])
+        manifest_srcs = [p.src for p in manifest_projects]
+        self.assertEquals(manifest_srcs, ["manifest/custom", "manifest/default"])
 
     def test_add_manifest_project(self):
         xml = """
 <worktree>
-    <project name="manifest/default" src="manifest/default" url="git@foo:manifest.git" />
+    <project src="manifest/default" />
 </worktree>
 """
         worktree = self.create_worktee(xml)
         manifest_projects = worktree.get_manifest_projects()
-        manifest_names = [p.name for p in manifest_projects]
-        self.assertEquals(manifest_names, list())
+        manifest_srcs = [p.src for p in manifest_projects]
+        self.assertEquals(manifest_srcs, list())
 
         # Set the manifest project
         worktree.set_manifest_project("manifest/default")
         manifest_projects = worktree.get_manifest_projects()
-        manifest_names = [p.name for p in manifest_projects]
-        self.assertEquals(manifest_names, ["manifest/default"])
+        manifest_srcs = [p.src for p in manifest_projects]
+        self.assertEquals(manifest_srcs, ["manifest/default"])
 
         # Adding same proect twice should do nothing:
         worktree.set_manifest_project("manifest/default")
-        manifest_names = [p.name for p in manifest_projects]
-        self.assertEquals(manifest_names, ["manifest/default"])
+        manifest_srcs = [p.src for p in manifest_projects]
+        self.assertEquals(manifest_srcs, ["manifest/default"])
 
 
     def tearDown(self):

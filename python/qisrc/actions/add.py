@@ -14,18 +14,14 @@ def configure_parser(parser):
     qibuild.parsers.worktree_parser(parser)
     parser.add_argument("url",  metavar="URL", help="url of the project. "
         "right now only git URLs are supported")
-    parser.add_argument("name", metavar="NAME", nargs="?",
-        help="name of the project. If not given, this will be deduced from the "
-             "URL")
-    parser.add_argument("--path",
-        help="path to the project. If not given, the project will be put in "
+    parser.add_argument("--src",
+        help="path to the source of project. (Relative to the worktree). "
+             "If not given, the project will be put in "
              "<QI_WORK_TREE>/<name>")
-
 
 def do(args):
     """Main entry point"""
-    worktree = qibuild.worktree.open_worktree(args.worktree)
+    worktree = qisrc.worktree.open_worktree(args.worktree)
     qisrc.sync.clone_project(worktree, args.url,
-                             name=args.name,
-                             path=args.path,
+                             src=args.src,
                              skip_if_exists=False)

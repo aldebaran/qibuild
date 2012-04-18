@@ -47,14 +47,14 @@ def _pad(szold, sznew):
 
 def do(args):
     """ Main method """
-    qiwt = qibuild.open_worktree(args.worktree)
+    qiwt = qisrc.open_worktree(args.worktree)
     gitrepo = list()
     dirty = list()
     sz = len(qiwt.git_projects)
     i = 1
     oldsz = 0
     for git_project in qiwt.git_projects:
-        git = qisrc.git.open(git_project.src)
+        git = qisrc.git.open(git_project.path)
         if sys.stdout.isatty():
             name = git_project.name
             to_write = "checking (%d/%d)" % (i, sz)
@@ -77,8 +77,8 @@ def do(args):
 
     max_len = _max_len(qiwt.root, gitrepo)
     for git_project in gitrepo:
-        git = qisrc.git.open(git_project.src)
-        shortpath = os.path.relpath(git_project.src, qiwt.root)
+        git = qisrc.git.open(git_project.path)
+        shortpath = os.path.relpath(git_project.path, qiwt.root)
         if git.is_valid():
             branch = git.get_current_branch()
             tracking = git.get_tracking_branch()

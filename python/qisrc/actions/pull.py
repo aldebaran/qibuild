@@ -120,7 +120,7 @@ def resolv_git_deps(toc, qiwt, args):
 def do(args):
     """Main entry point"""
     fail = list()
-    qiwt = qibuild.open_worktree(args.worktree)
+    qiwt = qisrc.open_worktree(args.worktree)
     toc  = qibuild.toc_open(args.worktree, args)
 
     manifest = toc.config.local.manifest

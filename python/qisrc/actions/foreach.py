@@ -11,6 +11,8 @@ Use -- to seprate qisrc arguments from the arguments of the command.
 
 import sys
 import logging
+
+import qisrc
 import qibuild
 
 def configure_parser(parser):
@@ -22,12 +24,12 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    qiwt = qibuild.open_worktree(args.worktree)
+    qiwt = qisrc.open_worktree(args.worktree)
     logger = logging.getLogger(__name__)
     for project in qiwt.git_projects:
         logger.info("Running `%s` for %s", " ".join(args.command), project.name)
         try:
-            qibuild.command.call(args.command, cwd=project.src)
+            qibuild.command.call(args.command, cwd=project.path)
         except qibuild.command.CommandFailedException:
             if args.ignore_errors:
                 continue

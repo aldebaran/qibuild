@@ -7,6 +7,7 @@
 """
 import os
 
+import qisrc
 import qibuild
 from qibuild.dependencies_solver import topological_sort
 import qidoc.config
@@ -21,7 +22,7 @@ class QiDocBuilder:
 
     """
     def __init__(self, in_dir, out_dir):
-        self.worktree = qibuild.worktree.open_worktree(in_dir)
+        self.worktree = qisrc.worktree.open_worktree(in_dir)
         self.in_dir = in_dir
         self.out_dir = out_dir
 
@@ -168,23 +169,23 @@ class QiDocBuilder:
 
         """
         for project in self.worktree.projects:
-            qiproj_xml = os.path.join(project.src, "qiproject.xml")
+            qiproj_xml = os.path.join(project.path, "qiproject.xml")
             if not os.path.exists(qiproj_xml):
                 continue
             (doxydocs, sphinxdocs) = qidoc.config.parse_project_config(qiproj_xml)
             # Fixup src, dest attributes:
             for doxydoc in doxydocs:
-                doxydoc.src = os.path.join(project.src, doxydoc.src)
+                doxydoc.src = os.path.join(project.path, doxydoc.src)
                 doxydoc.dest = os.path.join(self.out_dir, doxydoc.dest)
                 self.check_collision(doxydoc, "doxygen")
                 self.doxydocs[doxydoc.name] = doxydoc
             for sphinxdoc in sphinxdocs:
-                sphinxdoc.src = os.path.join(project.src, sphinxdoc.src)
+                sphinxdoc.src = os.path.join(project.path, sphinxdoc.src)
                 sphinxdoc.dest = os.path.join(self.out_dir, sphinxdoc.dest)
                 self.check_collision(sphinxdoc, "sphinx")
                 self.sphinxdocs[sphinxdoc.name] = sphinxdoc
             # Check if the project is a template project:
-            self.check_template(project.name, project.src, qiproj_xml)
+            self.check_template(project.path, qiproj_xml)
 
 
     def check_collision(self, project, doc_type):
@@ -201,26 +202,27 @@ class QiDocBuilder:
             return
 
         mess  = "Two %s projects have the same name: %s\n" % (doc_type, name)
-        mess += "First project is in: %s\n" % other_project.src
-        mess += "Other project is in: %s\n" % project.src
+        mess += "First project is in: %s\n" % other_project.path
+        mess += "Other project is in: %s\n" % project.path
         mess += "Please check your configuration"
         raise Exception(mess)
 
-    def check_template(self, p_name, p_path, qiproj_xml):
+    def check_template(self, p_path, qiproj_xml):
         """ Check whether a project is a template project
         If not templates project has been found yet, set
         self.templates_path, else raise an exception
 
         """
         is_template = qidoc.config.is_template(qiproj_xml)
-        if is_template and  self.templates_path:
-            mess  = "Could not add project %s from %s " (p_name, p_path)
+        if not is_template:
+            return
+        if self.templates_path:
+            mess  = "Could not add project in %s" % (p_path)
             mess += "as a template repository.\n"
             mess += "There is already a template repository in %s\n" % self.templates_path
             mess += "Please check your configuration"
             raise Exception(mess)
-        if is_template:
-            self.templates_path = p_path
+        self.templates_path = p_path
 
 
 

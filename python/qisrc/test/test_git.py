@@ -74,15 +74,15 @@ class GitTestCase(unittest.TestCase):
         out, err_ = git.pull("origin", raises=False)
         self.assertFalse(out == 0)
         # Must work
-        git.safe_checkout("master", tracks="origin")
+        git.set_tracking_branch("master", "origin")
         git.pull()
         readme = read_readme(bar_src)
         self.assertEqual(readme, "bar\n")
-        git.safe_checkout("stable", tracks="origin", remote_branch="release-1.12")
+        git.set_tracking_branch("stable", "origin", remote_branch="release-1.12")
+        git.checkout("stable")
         git.pull()
         readme = read_readme(bar_src)
         self.assertEqual(readme, "bar on release-1.12\n")
-
 
 
 if __name__ == "__main__":

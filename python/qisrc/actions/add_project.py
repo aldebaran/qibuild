@@ -18,23 +18,8 @@ def configure_parser(parser):
     qibuild.parsers.worktree_parser(parser)
     parser.add_argument("src", metavar="PATH",
         help="Path to the project sources")
-    parser.add_argument("--name",
-        help="Name of the project")
-
-
 
 def do(args):
     """Main entry point"""
-    worktree = qibuild.open_worktree(args.worktree)
-    project_src = args.src
-    project_name = args.name
-    if not project_name:
-        # We need to find a project name to add it to the
-        # worktree.
-        qiproj_xml = os.path.join(project_src, "qiproject.xml")
-        if os.path.exists(qiproj_xml):
-            xml_tree = qixml.read(qiproj_xml)
-            project_name = xml_tree.getroot().get("name")
-        else:
-            project_name = os.path.basename(project_src)
-    worktree.add_project(project_name, project_src)
+    worktree = qisrc.open_worktree(args.worktree)
+    worktree.add_project(args.src)

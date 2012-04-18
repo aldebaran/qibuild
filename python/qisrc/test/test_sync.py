@@ -27,7 +27,7 @@ class SyncTestCase(unittest.TestCase):
 
     def test_local_manifest_sync(self):
         create_git_repo(self.tmp, "qi/libqi")
-        worktree = qibuild.worktree.create(self.tmp)
+        worktree = qisrc.worktree.create(self.tmp)
         xml = """
 <manifest>
     <remote name="origin"
@@ -44,33 +44,8 @@ class SyncTestCase(unittest.TestCase):
         qisrc.sync.sync_projects(worktree, manifest)
         self.assertEqual(len(worktree.projects), 1)
         libqi = worktree.projects[0]
-        self.assertEqual(libqi.src,
+        self.assertEqual(libqi.path,
                          os.path.join(worktree.root, "lib/libqi"))
-        self.assertEqual(libqi.name, "libqi")
-
-    def test_local_manifest_sync_worktree_name(self):
-        create_git_repo(self.tmp, "qi/libqi2")
-        worktree = qibuild.worktree.create(self.tmp)
-        xml = """
-<manifest>
-    <remote name="origin"
-        fetch="{tmp}"
-    />
-
-    <project name="srv/qi/libqi2.git"
-        worktree_name="libqi"
-        path="lib/libqi"
-    />
-</manifest>
-"""
-        xml = xml.format(tmp=self.tmp)
-        manifest = StringIO(xml)
-        qisrc.sync.sync_projects(worktree, manifest)
-        self.assertEqual(len(worktree.projects), 1)
-        libqi = worktree.projects[0]
-        self.assertEqual(libqi.src,
-                         os.path.join(worktree.root, "lib/libqi"))
-        self.assertEqual(libqi.name, "libqi")
 
     def test_git_manifest_sync(self):
         create_git_repo(self.tmp, "qi/libqi")
@@ -95,7 +70,7 @@ class SyncTestCase(unittest.TestCase):
         git.call("add", "manifest.xml")
         git.call("commit", "-m", "added manifest.xml")
         git.call("push", manifest_url, "master:master")
-        worktree = qibuild.worktree.create(self.tmp)
+        worktree = qisrc.worktree.create(self.tmp)
         fetched_manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
         with open(fetched_manifest, "r") as fp:
             fetched_xml = fp.read()
@@ -123,7 +98,7 @@ class SyncTestCase(unittest.TestCase):
 <manifest>
     <remote name="origin" fetch="{tmp}/srv" />
     <project name="naoqi.git" path="naoqi" />
-    <project name="libnaoqi.git" path="lib/naoqi" />
+    <project name="libnaoqi.git" path="lib/libnaoqi" />
     <project name="doc" path="doc" />
 </manifest>
 """
@@ -151,8 +126,8 @@ class SyncTestCase(unittest.TestCase):
         release_root = os.path.join(self.tmp, "work", "release-1.12")
         qibuild.sh.mkdir(master_root,  recursive=True)
         qibuild.sh.mkdir(release_root, recursive=True)
-        master_wt  = qibuild.worktree.create(master_root)
-        release_wt = qibuild.worktree.create(release_root)
+        master_wt  = qisrc.worktree.create(master_root)
+        release_wt = qisrc.worktree.create(release_root)
         master_manifest  = qisrc.sync.fetch_manifest(master_wt,  manifest_url,
             branch="master")
         release_manifest = qisrc.sync.fetch_manifest(release_wt, manifest_url,
@@ -161,15 +136,15 @@ class SyncTestCase(unittest.TestCase):
         qisrc.sync.pull_projects(master_wt)
         qisrc.sync.sync_projects(release_wt, release_manifest)
         qisrc.sync.pull_projects(release_wt)
-        release_names = [p.name for p in release_wt.projects]
-        self.assertEqual(release_names, ["doc", "manifest/default", "naoqi"])
+        release_srcs = [p.src for p in release_wt.projects]
+        self.assertEqual(release_srcs, ["doc", "manifest/default", "naoqi"])
         naoqi_release = release_wt.get_project("naoqi")
-        readme = read_readme(naoqi_release.src)
+        readme = read_readme(naoqi_release.path)
         self.assertEqual(readme, "naoqi on release-1.12\n")
-        master_names = [p.name for p in master_wt.projects]
-        self.assertEqual(master_names, ["doc", "libnaoqi", "manifest/default", "naoqi"])
+        master_srcs = [p.src for p in master_wt.projects]
+        self.assertEqual(master_srcs, ["doc", "lib/libnaoqi", "manifest/default", "naoqi"])
         naoqi_master = master_wt.get_project("naoqi")
-        readme = read_readme(naoqi_master.src)
+        readme = read_readme(naoqi_master.path)
         self.assertEqual(readme, "naoqi\n")
 
 
@@ -188,15 +163,15 @@ class SyncTestCase(unittest.TestCase):
         git.add("manifest.xml")
         git.commit("-m", "add manifest.xml")
         git.push(manifest_url, "release-1.12:release-1.12")
-        worktree = qibuild.worktree.create(self.tmp)
+        worktree = qisrc.worktree.create(self.tmp)
         qisrc.sync.clone_project(worktree, manifest_url)
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url, branch="release-1.12")
         qisrc.sync.sync_projects(worktree, manifest)
         worktree.set_manifest_project("manifest/default")
         manifest_projects = worktree.get_manifest_projects()
         self.assertEqual(len(manifest_projects), 1)
-        manifest_src = manifest_projects[0].src
-        readme = read_readme(manifest_src)
+        manifest_path = manifest_projects[0].path
+        readme = read_readme(manifest_path)
         self.assertEqual(readme, "manifest on release-1.12\n")
 
 

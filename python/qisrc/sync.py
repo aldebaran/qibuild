@@ -10,32 +10,34 @@ import os
 import sys
 import logging
 
+import qibuild.sh
+
 import qisrc.manifest
 import qisrc.git
 
 LOGGER = logging.getLogger(__name__)
 
-def fetch_manifest(worktree, manifest_git_url,
-    branch="master",
-    name="manifest/default"):
+def fetch_manifest(worktree, manifest_git_url, branch="master", src="manifest/default"):
     """ Fetch the manifest for a worktree
 
     :param manifest_git_url: A git repository containing a
         'manifest.xml' file, ala repo
     :parm branch: The branch to use
 
+    Note: every changes made by the user directly in the manifest repo
+    will be lost!
+
     """
-    clone_project(worktree, manifest_git_url,
-        name=name,
-        skip_if_exists=True)
+    clone_project(worktree, manifest_git_url, src=src, skip_if_exists=True)
     # Make sure manifest project is on the correct, up to date branch:
-    manifest = worktree.get_project(name)
-    git = qisrc.git.open(manifest.src)
+    manifest = worktree.get_project(src)
+    git = qisrc.git.open(manifest.path)
     git.set_remote("origin", manifest_git_url)
-    git.safe_checkout(branch, tracks="origin")
+    git.set_tracking_branch(branch, "origin")
+    git.checkout("-f", branch)
     git.fetch(quiet=True)
     git.reset("--hard", "origin/%s" % branch, quiet=True)
-    manifest_xml = os.path.join(manifest.src, "manifest.xml")
+    manifest_xml = os.path.join(manifest.path, "manifest.xml")
     return manifest_xml
 
 
@@ -45,94 +47,84 @@ def sync_projects(worktree, manifest_location):
     remote and tracking branch on every repository
 
     """
-    errors = list()
     manifest = qisrc.manifest.Manifest(manifest_location)
     for project in manifest.projects:
-        if project.worktree_name:
-            p_name = project.worktree_name
-        else:
-            # Here project.name is in fact the relative path
-            # of the git url (for instance remote is git://foo.com,
-            # and name is bar/bar.git), but we want 'bar'
-            # as worktree project name:
-            p_name = project.name.split("/")[-1].replace(".git", "")
         # Use the same branch for the project as the branch
         # for the manifest, unless explicitely set:
         p_revision = project.revision
         p_url = project.fetch_url
         p_remote = project.remote
-        p_path = project.path
+        p_src = project.path
         clone_project(worktree, p_url,
-                      name=p_name,
-                      path=p_path,
+                      src=p_src,
+                      branch=p_revision,
                       skip_if_exists=True)
-        p_src = worktree.get_project(p_name).src
-        git = qisrc.git.Git(p_src)
+        p_path = worktree.get_project(p_src).path
+        git = qisrc.git.Git(p_path)
         git.set_remote(p_remote, p_url)
-        err = git.safe_checkout(p_revision, tracks=p_remote)
-        if err:
-            errors.append((p_name, err))
-    if not errors:
-        return
-    LOGGER.error("Failed to synchronized some projects")
-    for (name, err) in errors:
-        print project
-        print err
+        git.update_branch(p_revision, p_remote)
 
 
 def pull_projects(worktree, rebase=False):
     """ Pull every project in a worktree
 
     """
-    pad = " " * max([len(p.name) for p in worktree.git_projects])
-    project_count = len(worktree.git_projects)
-    for i, git_project in enumerate(worktree.git_projects):
+    projects = [p for p in worktree.git_projects if not p.manifest]
+    pad = " " * max([len(p.src) for p in projects])
+    project_count = len(projects)
+    for i, project in enumerate(projects):
         sys.stdout.write("Pulling project %i on %i (%s)" %
-            (i+1, project_count, git_project.name)
-            + pad + "\r")
+            (i+1, project_count, project.src) + pad + "\r")
         sys.stdout.flush()
-        git = qisrc.git.open(git_project.src)
+        git = qisrc.git.open(project.path)
         if rebase:
             git.pull("--rebase", quiet=True)
         else:
             git.pull(quiet=True)
 
 
-def clone_project(worktree, url, name=None, path=None, skip_if_exists=False):
+def clone_project(worktree, url, src=None, branch=None, skip_if_exists=False):
     """ Add a project to a worktree given its url.
 
-    If name is not given, it will be guessed from the
-    url.
-    If path is not given, it will be <worktree>/name
+    If src is not given, it will be guessed from the url
+
     If skip_if_exists is False, an error message will be
     raised if the project already exists
 
     """
-    if not name:
-        name = url.split("/")[-1].replace(".git", "")
-    if not path:
-        path = os.path.join(worktree.root, name)
-    else:
-        path = os.path.join(worktree.root, path)
+    if not src:
+        src = url.split("/")[-1].replace(".git", "")
+    if os.path.isabs(src):
+        src = os.path.relpath(worktree.root, src)
+        src = qibuild.sh.to_posix_path(src)
 
-    p_names = [p.name for p in worktree.projects]
-    if name in p_names and not skip_if_exists:
-        conflicting_project = worktree.get_project(name)
-        mess  = "Could not add project %s from %s\n" % (name, url)
-        mess += "A project named %s already exists in %s\n" % (name, conflicting_project.src)
-        raise Exception(mess)
+    project = worktree.get_project(src, raises=False)
+    if project:
+        if not skip_if_exists:
+            mess  = "Could not add project from %s in %s\n" % (url, src)
+            mess += "This path is already registered for worktree in %s\n" % worktree.root
+            raise Exception(mess)
+        else:
+            LOGGER.debug("Found project in %s, skipping" % src)
+            return
 
+    path = os.path.join(worktree.root, src)
     if os.path.exists(path):
         if skip_if_exists:
-            LOGGER.debug("Found %s in %s, skipping" % (name, path))
+            LOGGER.debug("Adding project in %s", src)
+            worktree.add_project(src)
+            return
         else:
-            mess  = "Could not add project %s from %s\n" % (name, url)
-            mess += "Path %s already exists\n" % path
-            mess += "Please choose another name or another path"
+            mess  = "Could not add project from %s in %s\n" % (url, src)
+            mess += "This path already exists\n"
             raise Exception(mess)
+
+    LOGGER.info("Git clone: %s -> %s", url, path)
+    dirname = os.path.dirname(path)
+    qibuild.sh.mkdir(dirname, recursive=True)
+    git = qisrc.git.Git(path)
+    if branch:
+        git.clone(url, "-b", branch)
     else:
-        LOGGER.info("Git clone: %s -> %s", url, path)
-        git = qisrc.git.Git(path)
         git.clone(url)
-    if not name in p_names:
-        worktree.add_project(name, path)
+    worktree.add_project(path)

@@ -26,7 +26,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    worktree = qibuild.open_worktree(args.worktree)
+    worktree = qisrc.open_worktree(args.worktree)
     manifest_projects = worktree.get_manifest_projects()
     if not manifest_projects:
         mess  = "Could not find any manifest project for worktree in %s \n" % worktree.root
@@ -34,7 +34,7 @@ def do(args):
         raise Exception(mess)
 
     for manifest_project in manifest_projects:
-        manifest_xml = os.path.join(manifest_project.src, "manifest.xml")
+        manifest_xml = os.path.join(manifest_project.path, "manifest.xml")
         qisrc.sync.sync_projects(worktree, manifest_xml)
 
     qisrc.sync.pull_projects(worktree, rebase=args.rebase)

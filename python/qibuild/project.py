@@ -23,6 +23,7 @@ import os
 import logging
 
 import qibuild.sh
+import qixml
 
 LOGGER = logging.getLogger(__name__)
 
@@ -31,8 +32,8 @@ class Project:
     """ Store information about a :term:`project`
 
     """
-    def __init__(self, name, directory):
-        self.name       = name
+    def __init__(self, directory):
+        self.name = None
         self.directory  = directory
         self.depends    = list()
         self.rdepends   = list()
@@ -61,6 +62,7 @@ class Project:
         if not os.path.exists(project_xml):
             return
         self.config.read(project_xml)
+        self.name = self.config.name
         self.depends  = self.config.depends
         self.rdepends = self.config.rdepends
 
@@ -278,3 +280,25 @@ def handle_old_manifest(directory):
             xml = qibuild.config.convert_project_manifest(qibuild_manifest)
             with open(project_xml, "w") as fp:
                 fp.write(xml)
+
+def project_from_cwd():
+    """Return a project name from the current working directory
+
+    """
+    head = os.getcwd()
+    qiproj_xml = None
+    while True:
+        qiproj_xml = os.path.join(head, "qiproject.xml")
+        if os.path.exists(qiproj_xml):
+            break
+        (head, _tail) = os.path.split(head)
+        if not _tail:
+            break
+    if not qiproj_xml:
+        mess  = "Could not guess project name from current working directory\n"
+        mess += "(No qiproject.xml found in the parent directories\n"
+        mess += "Please go inside a project, or specify the project name "
+        mess += "from the command line"
+
+    xml_elem = qixml.read(qiproj_xml)
+    return xml_elem.getroot().get("name")

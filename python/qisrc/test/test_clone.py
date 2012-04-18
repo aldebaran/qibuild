@@ -8,6 +8,7 @@ import unittest
 import tempfile
 
 import qisrc
+import qisrc.sync
 import qibuild
 from qisrc.test.test_git import create_git_repo
 
@@ -21,7 +22,7 @@ class CloneProjectTestCase(unittest.TestCase):
         qibuild.sh.mkdir(self.srv)
         worktree_root = os.path.join(self.tmp, "work")
         qibuild.sh.mkdir(worktree_root)
-        self.worktree = qibuild.worktree.open_worktree(worktree_root)
+        self.worktree = qisrc.worktree.open_worktree(worktree_root)
 
     def tearDown(self):
         qibuild.command.CONFIG["false"] = True
@@ -30,27 +31,27 @@ class CloneProjectTestCase(unittest.TestCase):
     def test_simple_clone(self):
         bar_url = create_git_repo(self.tmp, "bar")
         qisrc.sync.clone_project(self.worktree, bar_url)
-        self.assertEqual(self.worktree.git_projects[0].name, "bar")
+        self.assertEqual(self.worktree.git_projects[0].src, "bar")
 
     def test_clone_skipping(self):
         bar_url = create_git_repo(self.tmp, "bar")
         qisrc.sync.clone_project(self.worktree, bar_url)
-        self.assertEqual(self.worktree.git_projects[0].name, "bar")
+        self.assertEqual(self.worktree.git_projects[0].src, "bar")
         qisrc.sync.clone_project(self.worktree, bar_url, skip_if_exists=True)
         self.assertEqual(len(self.worktree.git_projects), 1)
-        self.assertEqual(self.worktree.git_projects[0].name, "bar")
+        self.assertEqual(self.worktree.git_projects[0].src, "bar")
 
-    def test_clone_already_project_already_exists(self):
+    def test_clone_project_already_exists(self):
         bar_url = create_git_repo(self.tmp, "bar")
         baz_url = create_git_repo(self.tmp, "baz")
-        qisrc.sync.clone_project(self.worktree, bar_url, name="bar")
+        qisrc.sync.clone_project(self.worktree, bar_url, src="bar")
         error = None
         try:
-            qisrc.sync.clone_project(self.worktree, baz_url, name="bar")
+            qisrc.sync.clone_project(self.worktree, baz_url, src="bar")
         except Exception, e:
             error = e
         self.assertFalse(error is None)
-        self.assertTrue("A project named bar already exists" in str(error))
+        self.assertTrue("already registered" in str(error))
 
     def test_clone_path_already_exists(self):
         bar_url = create_git_repo(self.tmp, "bar")
@@ -61,12 +62,11 @@ class CloneProjectTestCase(unittest.TestCase):
             qisrc.sync.clone_project(self.worktree, bar_url)
         except Exception, e:
             error = e
+
         self.assertFalse(error is None)
-        self.assertTrue("Path %s already exists" % conflicting_path in str(error))
-        qisrc.sync.clone_project(self.worktree, bar_url, name="bar", path="baz")
-        self.assertEqual(self.worktree.git_projects[0].name, "bar")
-        self.assertEqual(self.worktree.git_projects[0].src,
-            os.path.join(self.worktree.root, "baz"))
+        self.assertTrue("already exists" in str(error), error)
+        qisrc.sync.clone_project(self.worktree, bar_url, src="baz")
+        self.assertEqual(self.worktree.git_projects[0].src, "baz")
 
 if __name__ == "__main__":
     unittest.main()

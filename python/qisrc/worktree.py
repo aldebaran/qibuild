@@ -58,15 +58,15 @@ class WorkTree:
         """
         return [p for p in self.projects if p.manifest]
 
-    def set_manifest_project(self, name):
+    def set_manifest_project(self, src):
         """ Mark a project as being a manifest project
 
         """
-        project = self.get_project(name)
+        project = self.get_project(src)
         project.manifest = True
         project_elems = self.xml_tree.findall("project")
         for project_elem in project_elems:
-            if project_elem.get("name") == name:
+            if project_elem.get("src") == src:
                 project_elem.set("manifest", "true")
                 break
         self.dump()
@@ -90,14 +90,14 @@ class WorkTree:
         for project_elem in projects_elem:
             project = Project()
             project.parse(project_elem)
-            project.src = os.path.join(self.root, project.src)
-            if os.path.exists(os.path.join(
-                    project.src, ".git")):
+            p_path = os.path.join(self.root, project.src)
+            project.path = qibuild.sh.to_native_path(p_path)
+            if os.path.exists(os.path.join(project.path, ".git")):
                 project.git_project = project
                 self.git_projects.append(project)
             self.projects.append(project)
-        self.git_projects.sort(key=operator.attrgetter("name"))
-        self.projects.sort(key=operator.attrgetter("name"))
+        self.git_projects.sort(key=operator.attrgetter("src"))
+        self.projects.sort(key=operator.attrgetter("src"))
 
 
     def parse_git_projects(self):
@@ -109,11 +109,11 @@ class WorkTree:
         """
         projects_elem = self.xml_tree.findall("project")
         for project_elem in projects_elem:
-            p_name = project_elem.get("name")
-            git_name = project_elem.get("git_project")
-            if git_name:
-                project = self.get_project(p_name)
-                git_project = self.get_project(git_name)
+            p_src = project_elem.get("src")
+            git_project_src = project_elem.get("git_project")
+            if git_project_src:
+                project = self.get_project(p_src)
+                git_project = self.get_project(git_project_src)
                 project.git_project = git_project
 
     def parse_buildable_projects(self):
@@ -124,52 +124,62 @@ class WorkTree:
 
         """
         for project in self.projects:
-            src = project.src
-            qiproj_xml = os.path.join(src, "qiproject.xml")
-            cmake_lists = os.path.join(src, "CMakeLists.txt")
+            p_path = project.path
+            qiproj_xml = os.path.join(p_path, "qiproject.xml")
+            cmake_lists = os.path.join(p_path, "CMakeLists.txt")
             if os.path.exists(qiproj_xml) and \
                 os.path.exists(cmake_lists):
                 self.buildable_projects.append(project)
 
-    def get_project(self, name):
+    def get_project(self, src, raises=False):
         """
         Get a project.
-        :returns:  a :py:class:`Project` instance
+        :param src: a absolute path, or a path relative to the worktree
+        :param raises: Raises if project is not found
+        :returns:  a :py:class:`Project` instance or None if raises is
+            False and project is not found
 
         """
-        p_names = [p.name for p in self.projects]
-        if not name in p_names:
-            mess  = "No such project: '%s'\n" % name
-            mess += "Know projects are: %s" % ", ".join(p_names)
+        if os.path.isabs(src):
+            src = os.path.relpath(src, self.root)
+            src = qibuild.sh.to_posix_path(src)
+        p_srcs = [p.src for p in self.projects]
+        if not src in p_srcs:
+            if not raises:
+                return None
+            mess  = "No project in '%s'\n" % src
+            mess += "Know projects are in %s" % ", ".join(p_srcs)
             raise Exception(mess)
-        match = [p for p in self.projects if p.name == name]
-        return match[0]
+        match = [p for p in self.projects if p.src == src]
+        res = match[0]
+        return res
 
-    def add_project(self, name, src=None):
+    def add_project(self, src):
         """
         Add a project to a worktree
-        :param: name The name of the new project
-        :param: path If not given, will be root/name
+        :param src: path to the worktree, can be absolute,
+            or relative to the worktree root
 
         """
-        p_names = [p.name for p in self.projects]
-        if name in p_names:
-            project = self.get_project(name)
-            mess  = "Cannot add project %s to worktree in %s\n" % (name, self.root)
-            mess += "A project named %s already exists " % project.name
-            mess += "(in %s)\n" % project.src
-            mess += "Please choose a different name"
+        if os.path.isabs(src):
+            src = os.path.relpath(src, self.root)
+            src = qibuild.sh.to_posix_path(src)
+        # Coming from user, can be an abspath:
+        p_srcs = [p.src for p in self.projects]
+        if src in p_srcs:
+            mess  = "Project in %s already in worktree in %s" % (src, self.root)
             raise Exception(mess)
 
-        if not src:
-            src = name
         project = Project()
-        project.name = name
         project.src = src
         root_elem = self.xml_tree.getroot()
         root_elem.append(project.xml_elem())
         self.dump()
         self.load()
+
+    def __repr__(self):
+        res = "<worktree in %s>" % self.root
+        return res
 
 
 def open_worktree(worktree=None):
@@ -210,27 +220,6 @@ def guess_worktree():
     return None
 
 
-def project_from_cwd():
-    """Return a project name from the current working directory
-
-    """
-    head = os.getcwd()
-    qiproj_xml = None
-    while True:
-        qiproj_xml = os.path.join(head, "qiproject.xml")
-        if os.path.exists(qiproj_xml):
-            break
-        (head, _tail) = os.path.split(head)
-        if not _tail:
-            break
-    if not qiproj_xml:
-        mess  = "Could not guess project name from current working directory\n"
-        mess += "(No qiproject.xml found in the parent directories\n"
-        mess += "Please go inside a project, or specify the project name "
-        mess += "from the command line"
-
-    xml_elem = qixml.read(qiproj_xml)
-    return xml_elem.getroot().get("name")
 
 
 def create(directory):
@@ -248,21 +237,19 @@ def create(directory):
 
 
 class Project:
-    def __init__(self, name=None, src=None):
-        self.name = name
+    def __init__(self, src=None):
         self.src = src
+        self.path = None
         self.git_project = None
         self.manifest = False
 
     def parse(self, xml_elem):
-        self.name = xml_elem.get("name")
         self.src = xml_elem.get("src")
         self.git_project = xml_elem.get("git_project")
         self.manifest = qixml.parse_bool_attr(xml_elem, "manifest")
 
     def xml_elem(self):
         res = etree.Element("project")
-        res.set("name", self.name)
         res.set("src", self.src)
         if self.git_project:
             res.set("git_project", self.git_project)
@@ -271,5 +258,5 @@ class Project:
         return res
 
     def __repr__(self):
-        res = "<Project %s in %s>" % (self.name, self.src)
+        res = "<Project in %s>" % (self.src)
         return res

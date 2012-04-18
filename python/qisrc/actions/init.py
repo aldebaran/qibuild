@@ -25,11 +25,11 @@ def do(args):
         worktree_root = args.worktree
     else:
         worktree_root = os.getcwd()
-    manifest_name = "manifest/%s" % args.manifest_name
-    worktree = qibuild.worktree.create(worktree_root)
+    manifest_src = "manifest/%s" % args.manifest_name
+    worktree = qisrc.worktree.create(worktree_root)
     manifest_url = args.manifest_url
     branch = args.branch
     manifest = qisrc.sync.fetch_manifest(worktree,
-        manifest_url, branch=branch, name=manifest_name)
+        manifest_url, branch=branch, src=manifest_src)
     qisrc.sync.sync_projects(worktree, manifest)
-    worktree.set_manifest_project(manifest_name)
+    worktree.set_manifest_project(manifest_src)

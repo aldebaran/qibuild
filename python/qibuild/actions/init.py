@@ -6,6 +6,7 @@
 import os
 import logging
 
+import qisrc
 import qibuild
 import qibuild.wizard
 
@@ -29,7 +30,7 @@ def do(args):
     # trying to create nested worktrees (there's nothing wrong in
     # having nested worktree, but it may be confusing a little bit)
     if not args.worktree:
-        old_worktree = qibuild.worktree.guess_worktree()
+        old_worktree = qisrc.worktree.guess_worktree()
         if old_worktree and os.path.exists(old_worktree) and not args.force:
             raise Exception("You already have a qi worktree in : %s.\n" % (old_worktree) +
                         "Use --force if you know what you are doing "

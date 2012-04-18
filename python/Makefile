@@ -5,7 +5,7 @@
 ## Copyright (C) 2009, 2010 Aldebaran Robotics
 ##
 
-PYMODULES=qibuild qitoolchain qisrc \
+PYMODULES=qibuild qitoolchain qisrc qixml qidoc \
           bin/qibuild               \
           bin/qisrc                 \
           bin/qitoolchain

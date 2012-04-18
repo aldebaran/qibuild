@@ -5,3 +5,5 @@
 """ This package contains the qisrc actions """
 
 from qisrc import git
+from qisrc import worktree
+from qisrc.worktree import open_worktree

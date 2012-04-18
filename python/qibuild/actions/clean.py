@@ -11,6 +11,8 @@ You can specify a list of build directory names to cleanup.
 import os
 import glob
 import logging
+
+import qisrc
 import qibuild
 
 def configure_parser(parser):
@@ -52,7 +54,7 @@ def list_build_folder(path, bdirs, worktree):
 def do(args):
     """Main entry point"""
     logger   = logging.getLogger(__name__)
-    qiwt     = qibuild.open_worktree(args.worktree)
+    qiwt     = qisrc.open_worktree(args.worktree)
 
     if args.force:
         logger.info("preparing to remove:")
@@ -60,7 +62,7 @@ def do(args):
         logger.info("Build directory that will be removed (use -f to apply):")
     folders = dict()
     for project in qiwt.buildable_projects:
-        result = list_build_folder(project.src, args.build_directory, qiwt.root)
+        result = list_build_folder(project.path, args.build_directory, qiwt.root)
         for k, v in result.iteritems():
             if folders.get(k):
                 folders[k].extend(v)
@@ -76,6 +78,6 @@ def do(args):
         logger.info("")
         logger.info("removing:")
         for project in qiwt.buildable_projects:
-            cleanup(project.src, args.build_directory, qiwt.root, args.force)
+            cleanup(project.path, args.build_directory, qiwt.root, args.force)
 
 

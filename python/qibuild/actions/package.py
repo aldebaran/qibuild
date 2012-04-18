@@ -87,7 +87,7 @@ def do(args):
     toc = qibuild.toc_open(args.worktree, args)
     config = toc.active_config
     if not args.project:
-        project_name = qibuild.worktree.project_from_cwd()
+        project_name = qibuild.project.project_from_cwd()
     else:
         project_name = args.project
     project = toc.get_project(project_name)

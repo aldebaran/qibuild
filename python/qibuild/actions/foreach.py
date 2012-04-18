@@ -10,6 +10,8 @@ For instance
 """
 
 import logging
+
+import qisrc
 import qibuild
 
 
@@ -21,12 +23,12 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    qiwt = qibuild.open_worktree(args.worktree)
+    qiwt = qisrc.open_worktree(args.worktree)
     logger = logging.getLogger(__name__)
     for project in qiwt.buildable_projects:
         logger.info("Running `%s` for %s", " ".join(args.command), project.name)
         try:
-            qibuild.command.call(args.command, cwd=project.src)
+            qibuild.command.call(args.command, cwd=project.path)
         except qibuild.command.CommandFailedException, err:
             if args.ignore_errors:
                 logger.error(str(err))

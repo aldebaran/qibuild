@@ -11,6 +11,7 @@ import unittest
 import pytest
 import tempfile
 
+import qisrc
 import qibuild
 import qibuild.actions.convert
 
@@ -44,8 +45,8 @@ class QiBuildConvertTestCase(unittest.TestCase):
             os.path.join(self.test_dir, "src", "1.10"),
             src_1_10,
             quiet=True)
-        worktree = qibuild.worktree.create(self.tmp)
-        worktree.add_project("foo_1_10", src_1_10)
+        worktree = qisrc.worktree.create(self.tmp)
+        worktree.add_project(src_1_10)
         qibuild.run_action("qibuild.actions.convert",
             [src_1_10, "--go"])
         qibuild.run_action("qibuild.actions.init",
@@ -61,8 +62,8 @@ class QiBuildConvertTestCase(unittest.TestCase):
             os.path.join(self.test_dir, "src", "1.12"),
             src_1_12,
             quiet=True)
-        worktree = qibuild.worktree.create(self.tmp)
-        worktree.add_project("foo_1_12", src_1_12)
+        worktree = qisrc.worktree.create(self.tmp)
+        worktree.add_project(src_1_12)
         qibuild.run_action("qibuild.actions.convert",
             [src_1_12, "--go"])
         qibuild.run_action("qibuild.actions.init",
@@ -78,8 +79,8 @@ class QiBuildConvertTestCase(unittest.TestCase):
             os.path.join(self.test_dir, "src", "pure_cmake"),
             src_pure_cmake,
             quiet=True)
-        worktree = qibuild.worktree.create(self.tmp)
-        worktree.add_project("pure_cmake", src_pure_cmake)
+        worktree = qisrc.worktree.create(self.tmp)
+        worktree.add_project(src_pure_cmake)
         qibuild.run_action("qibuild.actions.convert",
             [src_pure_cmake, "--go"])
         qibuild.run_action("qibuild.actions.init",
@@ -95,8 +96,8 @@ class QiBuildConvertTestCase(unittest.TestCase):
             os.path.join(self.test_dir, "src", "no_cmake"),
             src_no_cmake,
             quiet=True)
-        worktree = qibuild.worktree.create(self.tmp)
-        worktree.add_project("no_cmake", src_no_cmake)
+        worktree = qisrc.worktree.create(self.tmp)
+        worktree.add_project(src_no_cmake)
         qibuild.run_action("qibuild.actions.convert",
             [src_no_cmake, "--go"])
         qibuild.run_action("qibuild.actions.init",

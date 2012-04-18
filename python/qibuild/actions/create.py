@@ -6,6 +6,8 @@
 import os
 import shutil
 import logging
+
+import qisrc
 import qibuild
 
 
@@ -41,7 +43,7 @@ def do(args):
     # Try to open a worktree.
     # If not, ask the user if he wants to create one:
     qiwt = None
-    qiwt = qibuild.open_worktree(args.worktree)
+    qiwt = qisrc.open_worktree(args.worktree)
 
     project_name = args.project_name
     project_path = os.path.join(qiwt.root, project_name)
@@ -51,7 +53,6 @@ def do(args):
     os.mkdir(project_path)
     copy_helper(project_name, project_path)
 
-
     if args.git:
         qibuild.command.call(["git", "init"], cwd=project_path)
         with open(os.path.join(project_path, ".gitignore"), "w") as fp:
@@ -60,4 +61,4 @@ def do(args):
         qibuild.command.call(["git" , "commit" , "-m" , "initial commit"], cwd=project_path)
 
     LOGGER.info("New project initialized in %s", project_path)
-    qiwt.add_project(project_name, src=project_path)
+    qiwt.add_project(project_path)

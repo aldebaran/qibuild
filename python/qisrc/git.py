@@ -173,9 +173,8 @@ class Git:
         self.call("remote", "add", name, url, quiet=True)
         self.call("fetch", name)
 
-    def safe_checkout(self, branch, tracks=None, remote_branch=None):
+    def set_tracking_branch(self, branch, remote_name, remote_branch=None):
         """
-        Checkout a new branch.
         If tracks is given, make sure it tracks the given remote,
         defaulting with a remote branch with the same name,
         so that `git pull` works afterwards
@@ -183,18 +182,24 @@ class Git:
         return the git error message.
 
         """
+        if remote_branch is None:
+            remote_branch = branch
         self.call("branch", branch, quiet=True, raises=False)
-        (retcode, out) = self.call("checkout", branch, raises=False)
-        if retcode != 0:
-            return out
-        if not tracks:
-            return
+        self.call("branch",
+            "--set-upstream", branch, "%s/%s" % (remote_name, remote_branch),
+             quiet=True)
+
+    def update_branch(self, branch, remote_name, remote_branch=None):
+        """ Update the given branch to match the given remote branch
+
+
+        Return an string if something went wrong
+        """
         if not remote_branch:
             remote_branch = branch
-        self.call("branch",
-            "--set-upstream", branch, "%s/%s" % (tracks, remote_branch),
-             quiet=True)
-        return None
+        if self.get_current_branch() != branch:
+            return "Current branch is %s, skipping" % branch
+        self.pull()
 
 
 def open(repo):

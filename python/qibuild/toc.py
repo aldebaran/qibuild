@@ -15,11 +15,12 @@ import signal
 import logging
 import operator
 
+import qisrc
 import qibuild
 import qitoolchain
 
 from qibuild.project  import Project
-from qibuild.worktree import WorkTree
+from qisrc.worktree import WorkTree
 from qibuild.command  import CommandFailedException
 from qibuild.dependencies_solver import DependenciesSolver
 
@@ -86,7 +87,7 @@ class Toc:
 
     .. code-block:: python
 
-        worktree = qibuild.open_worktree("/path/to/src")
+        worktree = qisrc.open_worktree("/path/to/src")
         toc = Toc(worktree=worktree, build_type="release")
 
         # Look for the foo project in the worktree
@@ -110,9 +111,9 @@ class Toc:
             solve_deps=True):
         """
         Create a new Toc object. Most of the keyargs come directly from
-        the command line. (--wortree, --debug, -c, etc.)
+        the command line. (--worktree, --debug, -c, etc.)
 
-        :param worktree:  see :py:meth:`qibuild.worktree.WorkTree.__init__`
+        :param worktree:  see :py:meth:`qisrc.worktree.WorkTree.__init__`
         :param qibuild_cfg: a  :py:class:`qibuild.config.QiBuildConfig` instance
                             if not given, a new one will be created
         :param build_type: a build type, could be debug or release
@@ -253,8 +254,7 @@ You may want to run:
             # Promote the simple worktree project (just a name an a src dir),
             # inside a full qibuild.project.Project object
             # (with CMake flags, build dir, et al.)
-            qibuild_project = qibuild.project.Project(
-                worktree_project.name, worktree_project.src)
+            qibuild_project = qibuild.project.Project(worktree_project.path)
             self.projects.append(qibuild_project)
 
         # Small warning here: when we update the projects, we do NOT
@@ -611,7 +611,7 @@ def _projects_from_args(toc, args):
         else:
             from_cwd = None
             try:
-                from_cwd = qibuild.worktree.project_from_cwd()
+                from_cwd = qibuild.project.project_from_cwd()
             except:
                 pass
             if from_cwd:
@@ -627,7 +627,7 @@ def _projects_from_args(toc, args):
 def toc_open(worktree_root, args=None, qibuild_cfg=None):
     """ Creates a :py:class:`Toc` object.
 
-    :param worktree: The worktree to be used. (see :py:class:`qibuild.worktree.WorkTree`)
+    :param worktree: The worktree to be used. (see :py:class:`qisrc.worktree.WorkTree`)
     :param args: an ``argparse.NameSpace`` object containing
      the arguments passed from the comand line.
     :param qibuild_cfg: A (:py:class:`qibuild.config.QiBuildConfig` instance) to use.
@@ -664,7 +664,7 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
     if hasattr(args, 'cmake_generator'):
         cmake_generator = args.cmake_generator
 
-    worktree = qibuild.worktree.open_worktree(worktree_root)
+    worktree = qisrc.worktree.open_worktree(worktree_root)
     toc = Toc(worktree,
                config=config,
                build_type=build_type,
@@ -684,7 +684,7 @@ def create(directory):
     """ Create a new toc worktree inside a work tree
 
     """
-    qibuild.worktree.create(directory)
+    qisrc.worktree.create(directory)
 
 
 

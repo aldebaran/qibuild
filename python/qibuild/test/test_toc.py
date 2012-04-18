@@ -10,6 +10,7 @@ import os
 import tempfile
 import unittest
 
+import qisrc
 import qibuild
 import qitoolchain
 
@@ -19,8 +20,10 @@ class TocTestCase(unittest.TestCase):
         self.tmp = tempfile.mkdtemp(prefix="test-feed")
         qibuild.sh.mkdir(os.path.join(self.tmp, "qi"))
         self.world_package = qitoolchain.Package("world", "package/world")
-        self.world_project = qibuild.project.Project("world", "src/world")
-        self.hello_project = qibuild.project.Project("hello", "src/hello")
+        self.world_project = qibuild.project.Project("src/world")
+        self.world_project.name = "world"
+        self.hello_project = qibuild.project.Project("src/hello")
+        self.hello_project.name = "hello"
         self.world_project.build_directory = "src/world/build"
         self.hello_project.build_directory = "src/hello/build"
         self.hello_project.depends = ["world"]
@@ -67,8 +70,8 @@ class TocTestCase(unittest.TestCase):
         with open(hello_cmake, "w") as fp:
             fp.write("project(hello)\n")
 
-        worktree = qibuild.worktree.open_worktree(self.tmp)
-        worktree.add_project("hello", hello_src)
+        worktree = qisrc.worktree.open_worktree(self.tmp)
+        worktree.add_project(hello_src)
         toc = qibuild.toc.toc_open(self.tmp)
         hello_proj = toc.get_project("hello")
 
