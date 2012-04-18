@@ -51,6 +51,7 @@ def sync_projects(worktree, manifest_location):
     """ Synchronize a worktree with a manifest,
     cloning any missing repository, setting the correct
     remote and tracking branch on every repository
+    Also set up the project for review
 
     """
     errors = list()
@@ -74,6 +75,8 @@ def sync_projects(worktree, manifest_location):
                       branch=p_revision,
                       skip_if_exists=True)
         p_path = worktree.get_project(p_src).path
+        if project.review:
+            qisrc.review.setup_project(p_path, project_name, p_url, p_revision)
         git = qisrc.git.Git(p_path)
         git.set_remote(p_remote, p_url)
         git.set_tracking_branch(p_revision, p_remote)

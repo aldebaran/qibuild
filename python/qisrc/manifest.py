@@ -61,6 +61,8 @@ class Manifest():
             if not project.revision:
                 project.revision = remote.revision
             project.fetch_url = git_url_join(remote.fetch, project.name)
+            if project.review:
+                project.review_url = git_url_join(remote.review, project.name)
             self.projects.append(project)
 
 
@@ -71,7 +73,9 @@ class Project:
         self.review = False
         self.remote = None
         self.revision = None
-        self.worktree_name = None
+        # Set during manifest parsing
+        self.fetch_url = None
+        self.review_url = None
 
     def parse(self, xml_element):
         self.name = xml_element.get("name")
@@ -93,6 +97,8 @@ class Remote:
 
     def parse(self, xml_element):
         self.name = xml_element.get("name")
+        if not self.name:
+            self.name = "origin"
         self.fetch = xml_element.get("fetch")
         self.review = xml_element.get("review")
         self.revision = xml_element.get("revision")

@@ -110,6 +110,10 @@ class Git:
         """ Wrapper for git fetch """
         return self.call("fetch", *args, **kwargs)
 
+    def init(self, *args, **kwargs):
+        """ Wrapper for git init """
+        return self.call("init", *args, **kwargs)
+
     def reset(self, *args, **kwargs):
         """ Wrapper for git reset """
         return self.call("reset", *args, **kwargs)
@@ -172,7 +176,6 @@ class Git:
             return
         self.call("remote", "rm",  name, quiet=True, raises=False)
         self.call("remote", "add", name, url, quiet=True)
-        self.call("fetch", name, quiet=True)
 
     def set_tracking_branch(self, branch, remote_name, remote_branch=None):
         """

@@ -74,6 +74,21 @@ class ManifestTestCase(unittest.TestCase):
         self.assertEquals(local_bar.fetch_url, "/path/to/foo/local-bar.git")
 
 
+    def test_review_parse(self):
+        xml = """
+<manifest>
+    <remote fetch="git@foo" review="http://gerrit"  />
+    <project name="foo" review="true" />
+    <project name="bar" />
+</manifest>
+"""
+        xml_in = StringIO(xml)
+        manifest = qisrc.manifest.Manifest(xml_in)
+        foo = manifest.get_project("foo")
+        self.assertEqual(foo.review, True)
+        self.assertEqual(foo.review_url, "http://gerrit/foo")
+
+
 
 if __name__ == "__main__":
     unittest.main()
