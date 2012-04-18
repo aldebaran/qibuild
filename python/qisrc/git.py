@@ -171,7 +171,7 @@ class Git:
             return
         self.call("remote", "rm",  name, quiet=True, raises=False)
         self.call("remote", "add", name, url, quiet=True)
-        self.call("fetch", name)
+        self.call("fetch", name, quiet=True)
 
     def set_tracking_branch(self, branch, remote_name, remote_branch=None):
         """
@@ -199,7 +199,10 @@ class Git:
             remote_branch = branch
         if self.get_current_branch() != branch:
             return "Current branch is %s, skipping" % branch
-        self.pull()
+        (retcode, out) = self.pull(raises=False)
+        if retcode == 0:
+            return
+        return out
 
 
 def open(repo):

@@ -17,6 +17,12 @@ import qisrc.git
 
 LOGGER = logging.getLogger(__name__)
 
+def indent(text, num):
+    """ Indent a piece of text """
+    lines = text.splitlines()
+    lines = [" " * num + l for l in lines]
+    return "\n".join(lines)
+
 def fetch_manifest(worktree, manifest_git_url, branch="master", src="manifest/default"):
     """ Fetch the manifest for a worktree
 
@@ -34,7 +40,7 @@ def fetch_manifest(worktree, manifest_git_url, branch="master", src="manifest/de
     git = qisrc.git.open(manifest.path)
     git.set_remote("origin", manifest_git_url)
     git.set_tracking_branch(branch, "origin")
-    git.checkout("-f", branch)
+    git.checkout("-f", branch, quiet=True)
     git.fetch(quiet=True)
     git.reset("--hard", "origin/%s" % branch, quiet=True)
     manifest_xml = os.path.join(manifest.path, "manifest.xml")
@@ -62,13 +68,14 @@ def sync_projects(worktree, manifest_location):
         p_path = worktree.get_project(p_src).path
         git = qisrc.git.Git(p_path)
         git.set_remote(p_remote, p_url)
-        git.update_branch(p_revision, p_remote)
+        git.set_tracking_branch(p_revision, p_remote)
 
 
 def pull_projects(worktree, rebase=False):
     """ Pull every project in a worktree
 
     """
+    errors = list()
     projects = [p for p in worktree.git_projects if not p.manifest]
     pad = " " * max([len(p.src) for p in projects])
     project_count = len(projects)
@@ -78,9 +85,19 @@ def pull_projects(worktree, rebase=False):
         sys.stdout.flush()
         git = qisrc.git.open(project.path)
         if rebase:
-            git.pull("--rebase", quiet=True)
+            (retcode, out) = git.pull("--rebase", raises=False)
         else:
-            git.pull(quiet=True)
+            (retcode, out) = git.pull(raises=False)
+        if retcode != 0:
+            errors.append((project.src, out))
+    if not errors:
+        return
+    LOGGER.error("Fail to pull some projects")
+    for (src, err) in errors:
+        print src
+        print "-" * len(src)
+        print
+        print indent(err, 2)
 
 
 def clone_project(worktree, url, src=None, branch=None, skip_if_exists=False):

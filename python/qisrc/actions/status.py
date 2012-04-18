@@ -56,13 +56,13 @@ def do(args):
     for git_project in qiwt.git_projects:
         git = qisrc.git.open(git_project.path)
         if sys.stdout.isatty():
-            name = git_project.name
+            src = git_project.src
             to_write = "checking (%d/%d)" % (i, sz)
-            to_write += name
-            to_write += _pad(oldsz, len(name))
+            to_write += src
+            to_write += _pad(oldsz, len(src))
             sys.stdout.write(to_write + "\r")
             sys.stdout.flush()
-            oldsz = len(name)
+            oldsz = len(src)
             if i == sz:
                 print "checking (%d/%d): done" % (i, sz), _pad(oldsz, 2)
         i = i + 1
