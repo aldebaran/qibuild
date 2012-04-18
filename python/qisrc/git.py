@@ -6,9 +6,10 @@
 
 """
 import os
+import contextlib
 import subprocess
-import qibuild.config
 
+import qibuild.config
 
 class Git:
     """ The Git represent a git tree """
@@ -189,21 +190,56 @@ class Git:
             "--set-upstream", branch, "%s/%s" % (remote_name, remote_branch),
              quiet=True)
 
+
+    @contextlib.contextmanager
+    def change_branch(self, branch):
+        """ Change branch if not currently on the correct branch,
+        then go back to where we were
+
+        """
+        current_branch = self.get_current_branch()
+        if current_branch == branch:
+            yield
+            return
+        with self.stash_changes():
+            self.checkout(branch, quiet=True)
+            yield
+            self.checkout(current_branch, quiet=True)
+
+
+    @contextlib.contextmanager
+    def stash_changes(self):
+        """ Stash changes, do something, then try to apply.
+
+        If something went wrong, returns the error message
+        """
+        if self.is_clean(untracked=False):
+            yield
+            return
+        self.call("stash")
+        yield
+        (retcode, out) = self.call("stash", "apply", quiet=True, raises=False)
+        if retcode != 0:
+            raise Exception(out)
+
+
     def update_branch(self, branch, remote_name, remote_branch=None):
         """ Update the given branch to match the given remote branch
 
 
         Return an string if something went wrong
         """
-        if not remote_branch:
-            remote_branch = branch
-        current_branch = self.get_current_branch()
-        if current_branch != branch:
-            return "Current branch is %s, skipping" % current_branch
-        (retcode, out) = self.pull(raises=False)
-        if retcode == 0:
-            return
-        return out
+        with self.change_branch(branch):
+            try:
+                with self.stash_changes():
+                    (out, err) = self.pull("--rebase", quiet=True, raises=False)
+                    if out != 0:
+                        return err
+            except Exception, e:
+                self.call("reset", "--hard", "HEAD~1")
+                self.call("stash", "apply")
+                return str(e)
+
 
 
 def open(repo):

@@ -55,6 +55,8 @@ def sync_projects(worktree, manifest_location):
     """
     errors = list()
     manifest = qisrc.manifest.Manifest(manifest_location)
+    if not manifest.projects:
+        return
     pad = " " * max([len(p.name) for p in manifest.projects])
     project_count = len(manifest.projects)
     for i, project in enumerate(manifest.projects):
