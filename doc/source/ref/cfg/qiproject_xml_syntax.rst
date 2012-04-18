@@ -21,49 +21,47 @@ The file will look like:
       names="foo bar"
     />
     <depends runtime="true"
-      name="spam"
+      names="spam"
     />
   </project>
 
 
+The ``project`` name accepts a ``depends`` child.
 
-project node
+
+depends node
 ------------
 
-The project nodes accepts a
-
-**depends**
-
-  The list of build dependencies.
-  For instance, with a ``world`` project in ``src/world`` and
-  an hello project in ``src/hello``, you should have
-
-.. code-block:: ini
-
-    # in src/world/qibuild.manifest
-    [project world]
-
-.. code-block:: ini
-
-    # in src/hello/qibuild.manifest
-    [project hello]
-    depends = world
-
 The list of dependencies is given as a white space separated
-name list.
+name list in a ``names`` attribute (note the plural form).
+
 
 The names can be other projects in the same work tree, or the
 name of packages in a toolchain.
 
+The dependencies can be of two sorts:
 
-**rdepends**
+  * **buildtime**: a dependency that is used when compiling the package
 
-  A list of runtime dependencies.
+  * **runtime**: a dependency that is required when running the executables
+    of the package, used when installing the package.
 
-  The list of dependencies is given as a white space separated
-  name list.
+You can mix them using the ``buildtime="true"`` and ``runtime="true"``
+attributes:
 
-  The names can be other projects in the same work tree, or the
-  name of packages in a toolchain.
+For instance
 
-  Those will used by the ``qibuild install --runtime`` command.
+.. code-block:: xml
+
+  <project name="hello">
+    <depends buildtime="true" runtime="true"
+      names="foo bar"
+    />
+    <depends runtime="true"
+      names="spam"
+    />
+  </project>
+
+
+Here runtime dependencies are ``foo,`` ``bar`` and ``spam``, and buildtime dependencies are just
+``foo`` and ``bar``.
