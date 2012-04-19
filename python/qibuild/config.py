@@ -437,17 +437,12 @@ class QiBuildConfig:
         """
         if not cfg_path:
             cfg_path = get_global_cfg_path()
-
-        if not os.path.exists(cfg_path):
-            if create_if_mssing:
-                dirname = os.path.dirname(cfg_path)
-                qibuild.sh.mkdir(dirname, recursive=True)
-                with open(cfg_path, "w") as fp:
-                    fp.write('<qibuild />\n')
-            else:
-                mess  = "Could not parse config"
-                mess += "'%s' does not exist" % cfg_path
-                raise Exception(mess)
+            if not os.path.exists(cfg_path):
+                if create_if_mssing:
+                    dirname = os.path.dirname(cfg_path)
+                    qibuild.sh.mkdir(dirname, recursive=True)
+                    with open(cfg_path, "w") as fp:
+                        fp.write('<qibuild />\n')
         try:
             self.tree.parse(cfg_path)
         except Exception, e:
