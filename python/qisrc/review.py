@@ -135,7 +135,6 @@ def setup_project(project_path, project_name, review_url, branch):
     remote_url = http_to_ssh(review_url, project_name, username)
     git.set_remote("gerrit", remote_url)
 
-
     # Install the hook
     commit_hook = os.path.join(project_path, ".git", "hooks", "commit-msg")
     if os.path.exists(commit_hook):
@@ -145,14 +144,18 @@ def setup_project(project_path, project_name, review_url, branch):
 
 
 
-def update(project_path, branch, review=True):
+def update(project_path, branch, review=True, dry_run=False):
     """ Push the changes for review.
     Unless review is False, in this case, simply update
     the remote gerrit branch
 
     """
     git = qisrc.git.Git(project_path)
+    args = ["gerrit"]
+    if dry_run:
+        args.append("--dry-run")
     if review:
-        git.push("gerrit", "%s:refs/for/%s" % (branch, branch))
+        args.append("%s:refs/for/%s" % (branch, branch))
     else:
-        git.push("gerrit", "%s:%s" % (branch, branch))
+        args.append("%s:%s" % (branch, branch))
+    git.push(*args)

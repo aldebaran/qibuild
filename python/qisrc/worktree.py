@@ -235,6 +235,41 @@ def create(directory):
     return open_worktree(directory)
 
 
+def project_path_from_cwd():
+    """ Get the full path of a project using cwd
+
+    """
+    head = os.getcwd()
+    qiproj_xml = None
+    while True:
+        qiproj_xml = os.path.join(head, "qiproject.xml")
+        if os.path.exists(qiproj_xml):
+            break
+        (head, _tail) = os.path.split(head)
+        if not _tail:
+            break
+    if not qiproj_xml:
+        mess  = "Could not guess project name from current working directory\n"
+        mess += "(No qiproject.xml found in the parent directories\n)"
+        mess += "Please go inside a project, or specify the project name "
+        mess += "from the command line"
+    res = os.path.dirname(qiproj_xml)
+    return res
+
+def git_project_path_from_cwd():
+    """ Get the path to the git repo of the current
+    project using cwd
+
+    """
+    head = os.getcwd()
+    res = None
+    while True:
+        if os.path.exists(os.path.join(head, ".git")):
+            break
+        (head, _tail) = os.path.split(head)
+        if not _tail:
+            return None
+    return head
 
 class Project:
     def __init__(self, src=None):
