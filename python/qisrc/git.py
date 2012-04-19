@@ -219,7 +219,7 @@ class Git:
         if self.is_clean(untracked=False):
             yield
             return
-        self.call("stash")
+        self.call("stash", quiet=True)
         yield
         (retcode, out) = self.call("stash", "apply", quiet=True, raises=False)
         if retcode != 0:
