@@ -76,7 +76,7 @@ def do(args):
     for project_name in project_names:
         project = toc.get_project(project_name)
         # Build target preinstall on the project (not always called for some reason)
-        if not toc.using_visual_studio:
+        if not toc.using_visual_studio and not toc.cmake_generator == "Xcode":
             toc.build_project(project, target="preinstall")
         toc.install_project(project,  destdir, runtime=args.runtime)
 
