@@ -27,8 +27,9 @@ if(QT_USE_QMAKE)
   return()
 endif()
 
-find_program(QT_MOC_EXECUTABLE moc)
-find_program(QT_UIC_EXECUTABLE uic)
+find_program(QT_MOC_EXECUTABLE moc REQUIRED)
+find_program(QT_UIC_EXECUTABLE uic REQUIRED)
+find_program(QT_RCC_EXECUTABLE rcc REQUIRED)
 
 if(QT_MOC_EXECUTABLE)
   qi_debug("QT_MOC_EXECUTABLE: ${QT_MOC_EXECUTABLE}")
