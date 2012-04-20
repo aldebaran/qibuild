@@ -10,7 +10,7 @@ import glob
 import subprocess
 import qibuild
 
-SUPPORTED_IDES = ["QtCreator", "Visual Studio", "XCode"]
+SUPPORTED_IDES = ["QtCreator", "Visual Studio", "Xcode"]
 
 def configure_parser(parser):
     """Configure parser for this action """
