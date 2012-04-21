@@ -80,6 +80,8 @@ class Project:
     def parse(self, xml_element):
         self.name = qixml.parse_required_attr(xml_element, "name")
         self.path = xml_element.get("path")
+        if not self.path:
+            self.path = self.name.replace(".git", "")
         self.revision = xml_element.get("revision")
         self.worktree_name = xml_element.get("worktree_name")
         self.review = qixml.parse_bool_attr(xml_element, "review")

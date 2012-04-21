@@ -120,6 +120,18 @@ class ManifestTestCase(unittest.TestCase):
         self.assertFalse(error is None)
         self.assertTrue("project must have a 'name' attribute" in str(error), error)
 
+    def test_no_project_path(self):
+        xml = """
+<manifest>
+    <remote fetch="git@goo" />
+    <project name="bar/foo.git" />
+</manifest>
+"""
+        xml_in = StringIO(xml)
+        manifest = qisrc.manifest.Manifest(xml_in)
+        project = manifest.get_project("bar/foo.git")
+        self.assertEqual(project.path, "bar/foo")
+
 
 
 if __name__ == "__main__":
