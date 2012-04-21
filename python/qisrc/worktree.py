@@ -49,8 +49,11 @@ class WorkTree:
         if os.path.exists(worktree_xml):
             self.xml_tree = qixml.read(worktree_xml)
             self.parse_projects()
-            self.parse_git_projects()
             self.parse_buildable_projects()
+
+        self.projects.sort(key=operator.attrgetter("src"))
+        self.buildable_projects.sort(key=operator.attrgetter("src"))
+        self.git_projects.sort(key=operator.attrgetter("src"))
 
     def get_manifest_projects(self):
         """ Get the projects mark as beeing 'manifest' projects
@@ -83,38 +86,37 @@ class WorkTree:
         qixml.write(self.xml_tree, worktree_xml)
 
     def parse_projects(self):
-        """ Parse .qi/worktree.xml
-        and returns a lits of Projects instances
+        """ Parse .qi/worktree.xml, resolve subprojects, set the
+        git_project attribute of every project
+
         """
         projects_elem = self.xml_tree.findall("project")
         for project_elem in projects_elem:
+            is_git = False
             project = Project()
             project.parse(project_elem)
-            p_path = os.path.join(self.root, project.src)
-            project.path = qibuild.sh.to_native_path(p_path)
-            if os.path.exists(os.path.join(project.path, ".git")):
-                project.git_project = project
-                self.git_projects.append(project)
+            self.set_path(project)
+            project.parse_qiproject_xml()
             self.projects.append(project)
-        self.git_projects.sort(key=operator.attrgetter("src"))
-        self.projects.sort(key=operator.attrgetter("src"))
+            if os.path.exists(os.path.join(project.path, ".git")):
+                is_git = True
+                self.git_projects.append(project)
+                project.git_project = project
+            for sub_project_src in project.subprojects:
+                sub_project = Project()
+                sub_project.src = os.path.join(project.src, sub_project_src)
+                self.set_path(sub_project)
+                if is_git:
+                    sub_project.git_project = project
+                self.projects.append(sub_project)
 
-
-    def parse_git_projects(self):
-        """ Iterate through every project.
-
-        If project is a git directory, add it to the list.
-        If not, look at the config and search of a matching project
+    def set_path(self, project):
+        """ Set the path attribute of a project
 
         """
-        projects_elem = self.xml_tree.findall("project")
-        for project_elem in projects_elem:
-            p_src = project_elem.get("src")
-            git_project_src = project_elem.get("git_project")
-            if git_project_src:
-                project = self.get_project(p_src)
-                git_project = self.get_project(git_project_src)
-                project.git_project = git_project
+        p_path = os.path.join(self.root, project.src)
+        project.path = qibuild.sh.to_native_path(p_path)
+
 
     def parse_buildable_projects(self):
         """ Iterate through every project.
@@ -262,7 +264,6 @@ def git_project_path_from_cwd():
 
     """
     head = os.getcwd()
-    res = None
     while True:
         if os.path.exists(os.path.join(head, ".git")):
             break
@@ -276,12 +277,22 @@ class Project:
         self.src = src
         self.path = None
         self.git_project = None
+        self.subprojects = list()
         self.manifest = False
 
     def parse(self, xml_elem):
-        self.src = xml_elem.get("src")
-        self.git_project = xml_elem.get("git_project")
+        self.src = qixml.parse_required_attr(xml_elem, "src")
         self.manifest = qixml.parse_bool_attr(xml_elem, "manifest")
+
+    def parse_qiproject_xml(self):
+        qiproject_xml = os.path.join(self.path, "qiproject.xml")
+        if not os.path.exists(qiproject_xml):
+            return
+        tree = qixml.read(qiproject_xml)
+        project_elems = tree.findall("project")
+        for project_elem in project_elems:
+            src = qixml.parse_required_attr(project_elem, "src", xml_path=qiproject_xml)
+            self.subprojects.append(src)
 
     def xml_elem(self):
         res = etree.Element("project")
