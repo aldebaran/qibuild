@@ -153,7 +153,7 @@ class SyncTestCase(unittest.TestCase):
         manifest_src = os.path.join(self.tmp, "src", "manifest")
         xml = """
 <manifest>
-    <remote name="origin" revision="release-1.12" />
+    <remote fetch="git@foo" name="origin" revision="release-1.12" />
 </manifest>
 """
         manifest_xml = os.path.join(manifest_src, "manifest.xml")
