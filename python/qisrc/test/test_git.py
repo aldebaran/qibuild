@@ -265,5 +265,21 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         readme = read_readme(bar_src)
         self.assertEqual(readme, "bar v2 on master\n")
 
+    def test_set_tracking_banch_newly_created(self):
+        bar_url = create_git_repo(self.tmp, "bar")
+        work = os.path.join(self.tmp, "work")
+        bar_src = os.path.join(work, "bar")
+        git = qisrc.git.Git(bar_src)
+        git.clone(bar_url)
+
+        upstream_bar = os.path.join(self.tmp, "src", "bar")
+        upstream_git = qisrc.git.Git(upstream_bar)
+        upstream_git.checkout("-b", "release")
+        upstream_git.push(bar_url, "release:release")
+
+        git.set_tracking_branch("release", "origin")
+
+
+
 if __name__ == "__main__":
     unittest.main()

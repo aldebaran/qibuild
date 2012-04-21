@@ -188,6 +188,8 @@ class Git:
         """
         if remote_branch is None:
             remote_branch = branch
+        # Just in case the branch just has been created
+        self.call("fetch")
         self.call("branch", branch, quiet=True, raises=False)
         self.call("branch",
             "--set-upstream", branch, "%s/%s" % (remote_name, remote_branch),
