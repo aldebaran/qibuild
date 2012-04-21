@@ -47,6 +47,27 @@ class SyncTestCase(unittest.TestCase):
         self.assertEqual(libqi.path,
                          os.path.join(worktree.root, "lib/libqi"))
 
+    def test_sync_two_remotes(self):
+        create_git_repo(self.tmp, "a/a_project.git")
+        create_git_repo(self.tmp, "b/b_project.git")
+        remote_a = os.path.join(self.tmp, "srv", "a")
+        remote_b = os.path.join(self.tmp, "srv", "b")
+        manifest_src = os.path.join(self.tmp, "src", "manifest")
+        xml = """
+<manifest>
+    <remote name="a" fetch="{remote_a}" />
+    <remote name="b" fetch="{remote_b}" />
+    <project name="a_project.git" remote="a" />
+    <project name="b_project.git" remote="b" />
+</manifest>
+"""
+        xml = xml.format(remote_a=remote_a, remote_b=remote_b)
+        manifest = os.path.join(self.tmp, "manifest.xml")
+        with open(manifest, "w") as fp:
+            fp.write(xml)
+        worktree = qisrc.worktree.create(self.tmp)
+        qisrc.sync.sync_projects(worktree, manifest)
+
     def test_git_manifest_sync(self):
         create_git_repo(self.tmp, "qi/libqi")
         manifest_url = create_git_repo(self.tmp, "manifest")

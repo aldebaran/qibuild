@@ -74,6 +74,7 @@ def sync_projects(worktree, manifest_location):
         clone_project(worktree, p_url,
                       src=p_src,
                       branch=p_revision,
+                      remote=p_remote,
                       skip_if_exists=True)
         p_path = worktree.get_project(p_src).path
         if project.review:
@@ -123,7 +124,8 @@ def pull_projects(worktree, rebase=False):
         print indent(err, 2)
 
 
-def clone_project(worktree, url, src=None, branch=None, skip_if_exists=False):
+def clone_project(worktree, url, src=None, branch=None, remote="origin",
+    skip_if_exists=False):
     """ Add a project to a worktree given its url.
 
     If src is not given, it will be guessed from the url
@@ -168,8 +170,8 @@ def clone_project(worktree, url, src=None, branch=None, skip_if_exists=False):
     qibuild.sh.mkdir(dirname, recursive=True)
     git = qisrc.git.Git(path)
     if branch:
-        git.clone(url, "-b", branch)
+        git.clone(url, "-b", branch, "-o", remote)
     else:
-        git.clone(url)
+        git.clone(url, "-o", remote)
     if should_add:
         worktree.add_project(path)
