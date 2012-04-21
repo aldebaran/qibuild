@@ -71,6 +71,16 @@ def parse_list_attr(tree, name):
     res = tree.get(name, "")
     return res.split()
 
+def parse_required_attr(tree, name):
+    """ Raise an exception if an attribute it missing in a
+    Node
+    """
+    value = tree.get(name)
+    if not value:
+        mess = "node %s must have a '%s' attribute" % (tree.tag, name)
+        raise_parse_error(mess)
+    return value
+
 
 
 def read(xml_path):

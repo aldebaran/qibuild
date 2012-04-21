@@ -88,6 +88,38 @@ class ManifestTestCase(unittest.TestCase):
         self.assertEqual(foo.review, True)
         self.assertEqual(foo.review_url, "http://gerrit/foo")
 
+    def test_no_remote_fetch(self):
+        xml = """
+<manifest>
+    <remote url="git@foo" />
+    <project name="bar" />
+</manifest>
+"""
+        xml_in = StringIO(xml)
+        error = None
+        try:
+            manifest = qisrc.manifest.Manifest(xml_in)
+        except Exception, e:
+            error = e
+        self.assertFalse(error is None)
+        self.assertTrue("remote must have a 'fetch' attribute" in str(error), error)
+
+    def test_no_project_name(self):
+        xml = """
+<manifest>
+    <remote fetch="git@foo" />
+    <project />
+</manifest>
+"""
+        xml_in = StringIO(xml)
+        error = None
+        try:
+            manifest = qisrc.manifest.Manifest(xml_in)
+        except Exception, e:
+            error = e
+        self.assertFalse(error is None)
+        self.assertTrue("project must have a 'name' attribute" in str(error), error)
+
 
 
 if __name__ == "__main__":

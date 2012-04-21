@@ -78,7 +78,7 @@ class Project:
         self.review_url = None
 
     def parse(self, xml_element):
-        self.name = xml_element.get("name")
+        self.name = qixml.parse_required_attr(xml_element, "name")
         self.path = xml_element.get("path")
         self.revision = xml_element.get("revision")
         self.worktree_name = xml_element.get("worktree_name")
@@ -99,7 +99,7 @@ class Remote:
         self.name = xml_element.get("name")
         if not self.name:
             self.name = "origin"
-        self.fetch = xml_element.get("fetch")
+        self.fetch = qixml.parse_required_attr(xml_element, "fetch")
         self.review = xml_element.get("review")
         self.revision = xml_element.get("revision")
         if not self.revision:
