@@ -27,7 +27,7 @@ def do(args):
     qiwt = qisrc.open_worktree(args.worktree)
     logger = logging.getLogger(__name__)
     for project in qiwt.git_projects:
-        logger.info("Running `%s` for %s", " ".join(args.command), project.name)
+        logger.info("Running `%s` for %s", " ".join(args.command), project.src)
         try:
             qibuild.command.call(args.command, cwd=project.path)
         except qibuild.command.CommandFailedException:
