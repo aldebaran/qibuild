@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" List all git repositories and exit
+""" List the state of all git repositories and exit
 """
 
 import os
