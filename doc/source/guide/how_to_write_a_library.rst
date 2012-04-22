@@ -47,8 +47,8 @@ This is what your layout should look like::
           |__ CMakeLists.txt
           |__ foo_test.cpp
 
-* The full path to the public header is ``foo/foo/foo.hpp``. Note that the name
-  of the root directory is ``libfoo``
+* The full path to the public header is ``libfoo/foo/foo.hpp``. Note that the name
+  of the root directory is ``fooproject``
 
 * The private code is put in a ``src`` sub-directory. Private and public
   directories are separated, it's easy to search only in public headers.
@@ -108,25 +108,25 @@ With the proposed layout, you have something like::
   foooproject
   |__ libfoo
   |    |__ foo
-  |    |    |__ foo.hpp
-  |    libbar
+  |         |__ foo.hpp
+  |__ libbar
   |    |__ bar
-  |        |__ bar.hpp
+  |         |__ bar.hpp
   |__ foobar
-      |__ foobar.cpp
+       |__ foobar.cpp
 
-You may want to get rid of the useless redundancy foo/foo, bar/bar, and do this
+You may want to get rid of the libfoo/foo, libbar/bar redundancy  and do this
 instead::
 
   fooproject
   |__ foo
   |   |__ foo.hpp
-  |   bar
+  |__ bar
   |   |__ bar.hpp
-  foobar
+  |__ foobar
       |__ foobar.cpp
 
-But, let's assume you have
+But, let's assume you make a mistake, and write
 
 .. code-block:: cmake
 
@@ -142,15 +142,16 @@ In the first layout, you will have an error during compile time, looking like::
 
   bar/bar.hpp : no such file or directory
 
-(because the include directory that has been staged for foo is different from
-the include directory that has been staged for bar) But, using the second
-layout, you will have an error during link time, looking like::
+because the include directory that has been staged for foo is different from
+the include directory that has been staged for bar. Using the second layout,
+you will have an error during link time, looking like::
 
   undefined reference to `bar_func'
 
-(because the include directory that was staged was always the same: lib)
+because the include directory that was staged was always the same: fooproject.
+The additional nesting level helps you catch this king of errors early.
 
-.. note:: For large libraries, also consider using submodles. The
+.. note:: For large libraries, also consider using submodules. The
    documentation can be found :ref:`here <using-submodules>`
 
 .. FIXME
