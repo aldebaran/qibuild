@@ -9,12 +9,14 @@
 import os
 import re
 import sys
+import logging
 import urlparse
 
 import qisrc.git
 import qibuild.interact
 import qibuild.config
 
+LOGGER = logging.getLogger(__name__)
 
 def parse_git_url(url):
     """ Parse a git url. Return a tuple: username, server, port
@@ -74,31 +76,24 @@ def check_gerrit_connection(username, server, gerrit_ssh_port=29418):
         return False
     return True
 
-def ask_username():
-    """ Just a helper for guess_user_name
-
-    """
-    res = qibuild.interact.ask_string("Please enter your username ")
-    if res:
-        return res
-    return
-
-def guess_user_name(server, gerrit_ssh_port=29418):
-    """" Guess the username to use by trying to
-    log in to the server with the current user name
+def ask_gerrit_username(server, gerrit_ssh_port=29418):
+    """" Run a wizard to try to configure gerrit access
 
     If that fails, ask the user for its username
     If that fails, give up and suggest upload the public key
 
     """
+    LOGGER.info("Configuring gerrit ssh access ...")
     # works on UNIX and git bash:
     username = os.environ.get("USERNAME")
     if not username:
-        username = ask_username()
+        username = qibuild.interact.ask_string("Please enter your username")
         if not username:
             return
-
+    LOGGER.info("Checking gerrit connection with %s@%s:%i",
+        username, server, gerrit_ssh_port)
     if check_gerrit_connection(username, server, gerrit_ssh_port):
+        LOGGER.info("Success")
         return username
 
     print "Could not connect to ssh using username", username
@@ -106,7 +101,7 @@ def guess_user_name(server, gerrit_ssh_port=29418):
     if not try_other:
         return
 
-    username = ask_username()
+    username = qibuild.interact.ask_string("Please enter your username ")
     if not username:
         return
 
@@ -133,13 +128,13 @@ def setup_project(project_path, project_name, review_url, branch):
     if access:
         username = access.username
     else:
-        username = guess_user_name(server)
+        username = ask_gerrit_username(server)
         if not username:
-            print "qisrc: could not find your gerrit username"
-            print "You will not be able to submit for code review"
             return
-        qibuild_cfg.set_server_access(server, username)
-        qibuild_cfg.write()
+
+    # Add it to config so we ask only once
+    qibuild_cfg.set_server_access(server, username)
+    qibuild_cfg.write()
 
     # Set a remote named 'gerrit'
     remote_url = http_to_ssh(review_url, project_name, username)
