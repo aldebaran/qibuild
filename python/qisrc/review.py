@@ -20,7 +20,13 @@ def parse_git_url(url):
     """ Parse a git url. Return a tuple: username, server, port
 
     """
-    match = re.match(r"(ssh://)?(?P<username>[a-zA-Z0-9\._-]+)@(?P<server>[a-zA-Z0-9\._-]+)(:(?P<port>\d+))?", url)
+    match = re.match(r"""
+        (ssh://)?
+        (?P<username>[a-zA-Z0-9\._-]+)
+        @
+        (?P<server>[a-zA-Z0-9\._-]+)
+        (:(?P<port>\d+))?
+    """, url, re.VERBOSE)
     if not match:
         return None
     groupdict = match.groupdict()
