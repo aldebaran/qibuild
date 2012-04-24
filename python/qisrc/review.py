@@ -8,6 +8,7 @@
 
 import os
 import re
+import sys
 import urlparse
 
 import qisrc.git
@@ -47,7 +48,10 @@ def fetch_gerrit_hook(path, username, server, port):
 
     """
     git_hooks_dir = os.path.join(path, ".git", "hooks")
-    cmd = ["scp", "-P", str(port),
+    if sys.platform.startswith("win"):
+        # scp on git bash does not handle DOS paths:
+        git_hooks_dir = qibuild.sh.to_posix_path(git_hooks_dir, fix_drive=True)
+    cmd = ["scp", "-P" , str(port),
         "%s@%s:hooks/commit-msg" % (username, server),
         git_hooks_dir]
     qibuild.command.call(cmd, quiet=True)

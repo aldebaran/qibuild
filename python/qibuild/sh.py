@@ -392,20 +392,20 @@ def run(program, args):
 
     os.execvp(program, real_args)
 
-def to_posix_path(path):
+def to_posix_path(path, fix_drive=False):
     """
     Returns a POSIX path from a DOS path
-
-    Useful because cmake *needs* POSIX paths.
-
-    Guidelines:
-        * always use os.path insternally
-        * convert to POSIX path at the very last moment
+    :param fix_drive: if True, will replace c: by /c/
+    (ala mingw)
 
     """
     res = os.path.expanduser(path)
     res = os.path.abspath(res)
     res = path.replace("\\", "/")
+    if fix_drive:
+        (drive, rest) = os.path.splitdrive(res)
+        letter = drive[0]
+        return "/" + letter + rest
     return res
 
 def to_dos_path(path):
