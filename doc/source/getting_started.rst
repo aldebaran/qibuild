@@ -318,3 +318,31 @@ Here’s what a complete ``.config/qi/qibuild.xml`` would look like to use MinGW
 .. note:: here you have to setup a complete msys environnement before being
    able to use qibuild.
 
+Configuring qiBuild for XCode 4.0 and latest
+++++++++++++++++++++++++++++++++++++++++++++
+
+First of all you need to intall XCode4.
+
+* You must have a developper account to download the command line tools after installing XCode.
+  Preferences -> Download -> Components -> Command Line Tools
+
+.. image:: /pics/install-command-line-tools.png
+
+* Install the latest CMake from http://www.cmake.org/cmake/resources/software.html using dmg image.
+  At the end of the install, install Command Line Links:
+
+.. image:: /pics/cmake-install-command-links.png
+
+* You may have the following error:
+
+.. code-block:: console
+
+  xcode-select: Error: No Xcode folder is set. Run xcode-select -switch <xcode_folder_path> to set the path to the Xcode folder.
+
+  To fix it, open Terminal and configure your XCode4 using the following command:
+
+.. code-block:: console
+
+  $ xcode-select -switch <xcode_folder_path>
+
+.. note:: Your <xcode_folder_path> should be /Applications/Xcode.app/Contents/Developer
