@@ -53,22 +53,22 @@ def build_parser(parser):
     """ Parser settings for every action doing builds
     """
     group = parser.add_argument_group("build configuration arguments")
-    group.add_argument("--release", action="store_const", const="release",
+    group.add_argument("--release", action="store_const", const="Release",
         dest="build_type",
-        help="Build in release (set CMAKE_BUILD_TYPE=RELEASE)")
-    group.add_argument("--debug", action="store_const", const="debug",
+        help="Build in release (set CMAKE_BUILD_TYPE=Release)")
+    group.add_argument("--debug", action="store_const", const="Debug",
         dest="build_type",
-        help="Build in debug (set CMAKE_BUILD_TYPE=DEBUG)")
+        help="Build in debug (set CMAKE_BUILD_TYPE=Debug)")
     group.add_argument("--build-type", action="store",
         dest="build_type",
-        help="CMAKE_BUILD_TYPE usually DEBUG or RELEASE")
+        help="CMAKE_BUILD_TYPE usually Debug or Release")
     group.add_argument("--cmake-generator", action="store",
         help="Specify the CMake generator")
     group.add_argument("-j", dest="num_jobs", type=int,
         help="Number of jobs to use")
     parser.set_defaults(debug=True)
     parser.set_defaults(num_jobs=1)
-    parser.set_defaults(build_type="debug")
+    parser.set_defaults(build_type="Debug")
 
 def project_parser(parser):
     """ Parser settings for every action using several toc projects

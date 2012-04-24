@@ -177,7 +177,7 @@ def update_project(project, toc):
 
     # add CMAKE_BUILD_TYPE cmake flags
     if toc.build_type:
-        project.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (toc.build_type.upper()))
+        project.cmake_flags.append("CMAKE_BUILD_TYPE=%s" % (toc.build_type))
 
     # add cmake flags
     if toc.user_cmake_flags:

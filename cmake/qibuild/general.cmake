@@ -58,15 +58,9 @@ if (NOT QI_SDK_DIR)
   qi_info("QI_SDK_DIR: ${QI_SDK_DIR}")
 endif()
 
-#force buildtype to be Upper case
-if (DEFINED CMAKE_BUILD_TYPE)
-  string(TOUPPER "${CMAKE_BUILD_TYPE}" "_BUILD_TYPE")
-  qi_set_global(CMAKE_BUILD_TYPE "${_BUILD_TYPE}")
-endif()
-
 #ensure CMAKE_BUILD_TYPE is either Debug or Release
 if (CMAKE_BUILD_TYPE STREQUAL "")
-  qi_set_global(CMAKE_BUILD_TYPE "RELEASE")
+  qi_set_global(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 include("qibuild/find")

@@ -95,7 +95,7 @@ class Toc(WorkTree):
             path_hints=None,
             config=None,
             qibuild_cfg=None,
-            build_type="debug",
+            build_type="Debug",
             cmake_flags=None,
             cmake_generator=None,
             active_projects=None,
@@ -144,7 +144,7 @@ class Toc(WorkTree):
 
         self.build_type = build_type
         if not self.build_type:
-            self.build_type = "debug"
+            self.build_type = "Debug"
 
         self.cmake_generator   = cmake_generator
         self.build_folder_name = None
@@ -266,11 +266,11 @@ class Toc(WorkTree):
         else:
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
 
-        if not self.using_visual_studio and self.build_type != "debug":
+        if not self.using_visual_studio and self.build_type != "Debug":
             # When using cmake + visual studio, sharing the same build dir with
             # several build config is mandatory.
             # Otherwise, it's not a good idea, so we always specify it
-            # when it's not "debug" (the default)
+            # when it's not "Debug" (the default)
             res.append(self.build_type)
 
         self.build_folder_name = "-".join(res)
