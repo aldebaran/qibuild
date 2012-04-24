@@ -43,6 +43,22 @@ class ManifestTestCase(unittest.TestCase):
         self.assertEquals(libqi.fetch_url, "git@git.aldebaran.lan:qi/libqi.git")
         self.assertEquals(libqi.path, "lib/libqi")
 
+    def test_trailing_slash(self):
+        xml = """
+<manifest>
+    <remote name="origin" fetch="git@foo" />
+    <project name="foo1" path="foo" />
+    <project name="foo2" path="foo/" />
+</manifest>
+"""
+        xml_in = StringIO(xml)
+        error = None
+        try:
+            manifest = qisrc.manifest.Manifest(xml_in)
+        except Exception, e:
+            error = e
+        self.assertFalse(error is None)
+        self.assertTrue("two projects with the same path" in str(error))
 
     def test_various_url_formats(self):
         xml = """

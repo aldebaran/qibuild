@@ -8,6 +8,7 @@
 
 import posixpath
 
+import qibuild.sh
 import qixml
 
 def git_url_join(remote, name):
@@ -24,6 +25,9 @@ def git_url_join(remote, name):
 
 class Manifest():
     def __init__(self, xml_path):
+        # Used to check that we do not defined two projects
+        # with the same path
+        self._paths = dict()
         self.tree = qixml.read(xml_path)
         self.projects = list()
         self.remotes = list()
@@ -63,6 +67,12 @@ class Manifest():
             project.fetch_url = git_url_join(remote.fetch, project.name)
             if project.review:
                 project.review_url = git_url_join(remote.review, project.name)
+            conflicting_name = self._paths.get(project.path)
+            if conflicting_name:
+                mess  = "Found two projects with the same path: %s\n" % project.path
+                mess += "%s and %s" % (project.name, conflicting_name)
+                raise Exception(mess)
+            self._paths[project.path] = project.name
             self.projects.append(project)
 
 
@@ -79,9 +89,12 @@ class Project:
 
     def parse(self, xml_element):
         self.name = qixml.parse_required_attr(xml_element, "name")
-        self.path = xml_element.get("path")
-        if not self.path:
+        xml_path = xml_element.get("path")
+        if not xml_path:
             self.path = self.name.replace(".git", "")
+        else:
+            self.path = qibuild.sh.to_posix_path(xml_path)
+            self.path = posixpath.normpath(xml_path)
         self.revision = xml_element.get("revision")
         self.worktree_name = xml_element.get("worktree_name")
         self.review = qixml.parse_bool_attr(xml_element, "review")
