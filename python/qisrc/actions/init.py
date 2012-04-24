@@ -12,21 +12,27 @@ import qisrc
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.worktree_parser(parser)
-    parser.add_argument("manifest_url")
+    parser.add_argument("manifest_url", nargs="?")
     parser.add_argument("manifest_name", nargs="?",
         help="Name of the manifest. Useful if you have several manifests")
     parser.add_argument("-b", "--branch", dest="branch",
         help="Use this branch for the manifest and all the projects")
     parser.set_defaults(manifest_name="default", branch="master")
+    parser.add_argument("--force", dest="force", action="store_true",
+        help="By-pass some safety checks")
+    parser.set_defaults(force=False)
 
 def do(args):
     """Main entry point"""
     if args.worktree:
         worktree_root = args.worktree
+        worktree_root = qibuild.sh.to_native_path(worktree_root)
     else:
         worktree_root = os.getcwd()
     manifest_src = "manifest/%s" % args.manifest_name
-    worktree = qisrc.worktree.create(worktree_root)
+    worktree = qisrc.worktree.create(worktree_root, force=args.force)
+    if not args.manifest_url:
+        return
     manifest_url = args.manifest_url
     branch = args.branch
     manifest = qisrc.sync.fetch_manifest(worktree,

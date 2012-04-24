@@ -161,6 +161,38 @@ class WorktreeTestCase(unittest.TestCase):
         self.assertEquals(git_srcs, ["bar"])
 
 
+    def test_nested_worktrees(self):
+        # Create a worktree in work, with a project named
+        # foo
+        work = os.path.join(self.tmp, "work")
+        qibuild.sh.mkdir(work)
+        worktree = qisrc.worktree.create(work)
+        foo = os.path.join(work, "foo")
+        qibuild.sh.mkdir(foo)
+        worktree.add_project(foo)
+        foo_test = os.path.join(foo, "test")
+        qibuild.sh.mkdir(foo_test)
+
+        # Try to create a worktree in foo/test
+        error = None
+        try:
+            test_worktree = qisrc.worktree.create(foo_test)
+        except Exception, e:
+            error = e
+        self.assertFalse(error is None)
+        self.assertTrue("There is already a worktree" in str(error), error)
+        test_dot_qi = os.path.join(foo_test, ".qi")
+        self.assertFalse(os.path.exists(test_dot_qi))
+
+        # Use the force:
+        test_worktree = qisrc.worktree.create(foo_test, force=True)
+
+        self.assertEquals([p.src for p in worktree.projects], ["foo"])
+        self.assertEquals(test_worktree.projects, list())
+
+        # Try to create a worktree in the same place should not raise
+        worktree2 = qisrc.worktree.create(work)
+
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)

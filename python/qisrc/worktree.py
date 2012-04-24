@@ -207,11 +207,13 @@ def open_worktree(worktree=None):
     return WorkTree(worktree)
 
 
-def guess_worktree():
+def guess_worktree(cwd=None):
     """Look for parent directories until a .qi dir is found somewhere.
 
     """
-    head = os.getcwd()
+    if cwd is None:
+        cwd = os.getcwd()
+    head = cwd
     while True:
         d = os.path.join(head, ".qi")
         if os.path.isdir(d):
@@ -224,10 +226,17 @@ def guess_worktree():
 
 
 
-def create(directory):
+def create(directory, force=False):
     """Create a new Qi work tree in the given directory
 
     """
+    if not force:
+        parent_worktree = guess_worktree(directory)
+        if parent_worktree:
+            if parent_worktree != directory:
+                mess  = "There is already a worktree in %s\n" % parent_worktree
+                mess += "Use --force if you are sure you want to create nested worktrees"
+                raise Exception(mess)
     to_create = os.path.join(directory, ".qi")
     qibuild.sh.mkdir(to_create, recursive=True)
     qi_xml = os.path.join(directory, ".qi", "qibuild.xml")
