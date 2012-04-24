@@ -59,12 +59,9 @@ def sync_projects(worktree, manifest_location):
     manifest = qisrc.manifest.Manifest(manifest_location)
     if not manifest.projects:
         return
-    pad = " " * max([len(p.name) for p in manifest.projects])
     project_count = len(manifest.projects)
     for i, project in enumerate(manifest.projects):
-        sys.stdout.write("Syncing project %i on %i (%s)" %
-            (i+1, project_count, project.name) + pad + "\r")
-        sys.stdout.flush()
+        print "Syncing project %i on %i (%s)" % (i+1, project_count, project.name)
         # Use the same branch for the project as the branch
         # for the manifest, unless explicitely set:
         p_revision = project.revision
