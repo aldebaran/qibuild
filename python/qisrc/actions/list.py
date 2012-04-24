@@ -22,5 +22,7 @@ def configure_parser(parser):
 def do(args):
     """ Main method """
     qiwt = qisrc.open_worktree(args.worktree)
-    for git_project in qiwt.git_projects:
-       print git_project.src
+    print "Projects in :", qiwt.root
+    print
+    for project in qiwt.projects:
+       print project.src
