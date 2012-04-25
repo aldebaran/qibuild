@@ -34,5 +34,7 @@ def do(args):
         raise Exception(mess)
 
     for manifest_project in manifest_projects:
+        git = qisrc.git.Git(manifest_project.path)
+        git.pull(quiet=True)
         manifest_xml = os.path.join(manifest_project.path, "manifest.xml")
         qisrc.sync.sync_projects(worktree, manifest_xml)
