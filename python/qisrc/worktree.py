@@ -159,14 +159,14 @@ class WorkTree:
     def add_project(self, src):
         """
         Add a project to a worktree
-        :param src: path to the worktree, can be absolute,
-            or relative to the worktree root
+        :param src: path to the project, can be absolute,
+                    or relative to the worktree root
 
         """
+        # Coming from user, can be an abspath:
         if os.path.isabs(src):
             src = os.path.relpath(src, self.root)
             src = qibuild.sh.to_posix_path(src)
-        # Coming from user, can be an abspath:
         p_srcs = [p.src for p in self.projects]
         if src in p_srcs:
             mess  = "Project in %s already in worktree in %s" % (src, self.root)
@@ -178,6 +178,34 @@ class WorkTree:
         root_elem.append(project.xml_elem())
         self.dump()
         self.load()
+
+    def remove_project(self, src, from_disk=False):
+        """
+        Remove a project from a worktree
+        :param src: path to the project, can be absolute,
+                    or relative to the worktree root
+        :param from_disk: also erase project files from disk
+
+
+        """
+        # Coming from user, can be an abspath:
+        if os.path.isabs(src):
+            src = os.path.relpath(src, self.root)
+            src = qibuild.sh.to_posix_path(src)
+        p_srcs = [p.src for p in self.projects]
+        if src not in p_srcs:
+            raise Exception("No such project: %s" % src)
+        root_elem = self.xml_tree.getroot()
+        for project_elem in root_elem.findall("project"):
+            if project_elem.get("src") == src:
+                if from_disk:
+                    to_remove = self.get_project(src).path
+                    qibuild.sh.rm(to_remove)
+                root_elem.remove(project_elem)
+        self.dump()
+        self.load()
+
+
 
     def __repr__(self):
         res = "<worktree in %s>" % self.root

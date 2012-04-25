@@ -63,6 +63,35 @@ class WorktreeTestCase(unittest.TestCase):
         git_foo = worktree.get_project("foo")
         self.assertEquals(git_foo.src, "foo")
 
+    def test_remove_project(self):
+        xml = "<worktree />"
+        worktree = self.create_worktee(xml)
+        foo_src = os.path.join(worktree.root, "foo")
+        qibuild.sh.mkdir(foo_src)
+        worktree.add_project("foo")
+        self.assertEquals(len(worktree.projects), 1)
+        foo = worktree.get_project("foo")
+        self.assertEquals(foo.src, "foo")
+        error = None
+        try:
+            worktree.remove_project("bar")
+        except Exception, e:
+            error = e
+        self.assertFalse(error is None)
+        self.assertTrue("No such project" in str(error), error)
+
+        worktree.remove_project("foo")
+        self.assertEquals(worktree.projects, list())
+
+        worktree.add_project("foo")
+        self.assertEquals(len(worktree.projects), 1)
+        self.assertEquals(worktree.projects[0].src, "foo")
+
+        worktree.remove_project("foo", from_disk=True)
+        self.assertEquals(worktree.projects, list())
+        self.assertFalse(os.path.exists(foo_src))
+
+
 
     def test_get_manifest_projects(self):
         xml = """
