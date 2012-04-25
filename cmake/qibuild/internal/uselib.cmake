@@ -135,13 +135,16 @@ function(_qi_use_lib_internal name)
   endif()
 
 
+  # Sort include dirs, add dependencies, link with the targets
+  # and add correct compile definitions
+  set(_inc_dirs)
   foreach(_pkg ${${_key}})
     string(TOUPPER ${_pkg} _U_PKG)
 
     if (DEFINED ${_U_PKG}_INCLUDE_DIRS)
-      include_directories(${${_U_PKG}_INCLUDE_DIRS})
+      _qi_list_append_uniq(_inc_dirs ${${_U_PKG}_INCLUDE_DIRS})
     elseif(DEFINED ${_U_PKG}_INCLUDE_DIR)
-      include_directories(${${_U_PKG}_INCLUDE_DIR})
+      _qi_list_append_uniq(_inc_dirs ${${_U_PKG}_INCLUDE_DIR})
     endif()
 
     if (DEFINED ${_U_PKG}_LIBRARIES)
@@ -169,5 +172,9 @@ function(_qi_use_lib_internal name)
             COMPILE_DEFINITIONS "${_to_add}")
       endif()
     endif()
+  endforeach()
+
+  foreach(_inc_dir ${_inc_dirs})
+    include_directories(${_inc_dir})
   endforeach()
 endfunction()
