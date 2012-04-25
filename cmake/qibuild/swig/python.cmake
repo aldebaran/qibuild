@@ -36,8 +36,6 @@ function(qi_swig_wrap_python module_name interface_file)
   endif()
 
   include("UseSWIG")
-  #find_package(SWIG REQUIRED)
-  #include(${SWIG_USE_FILE})
 
   set_source_files_properties(${interface_file} PROPERTIES CPLUSPLUS ON)
   # tell swig that the generated module name is ${module_name}.py
@@ -53,12 +51,20 @@ function(qi_swig_wrap_python module_name interface_file)
 
   ##
   # Deal with dependencies:
+  set(_inc_dirs)
   foreach (_dep ${ARG_DEPENDS})
     find_package(${_dep} NO_MODULE QUIET)
     find_package(${_dep} REQUIRED)
-    include_directories(
-      ${${_dep}_INCLUDE_DIR}
-      ${${_dep}_INCLUDE_DIRS})
+    if(${_dep}_INCLUDE_DIR)
+      _qi_list_append_path(_inc_dirs ${${_dep}_INCLUDE_DIR})
+    endif()
+    if(${_dep}_INCLUDE_DIRS)
+      _qi_list_append_path(_inc_dirs ${${_dep}_INCLUDE_DIRS})
+    endif()
+  endforeach()
+
+  foreach(_inc_dir ${_inc_dirs})
+    include_directories(${_inc_dir})
   endforeach()
 
   find_package(PYTHON)
