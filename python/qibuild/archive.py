@@ -97,12 +97,9 @@ def extract_tar(archive_path, dest_dir):
     # Set correct owner, mtime and filemode on directories.
     for tarinfo in directories:
         dirpath = os.path.join(dest_dir, tarinfo.name)
-        try:
-            archive.chown(tarinfo, dirpath)
-            archive.utime(tarinfo, dirpath)
-            archive.chmod(tarinfo, dirpath)
-        except tarfile.ExtractError:
-            raise
+        archive.chown(tarinfo, dirpath)
+        archive.utime(tarinfo, dirpath)
+        archive.chmod(tarinfo, dirpath)
 
     archive.close()
     LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
@@ -127,6 +124,7 @@ def extract_zip(archive_path, dest_dir):
     # (or so we hope)
     orig_topdir = members[0].filename.split(posixpath.sep)[0]
     size = len(members)
+    directories = list()
     for (i, member) in enumerate(members):
         member_top_dir = member.filename.split(posixpath.sep)[0]
         if i != 0 and member_top_dir != orig_topdir:
@@ -148,15 +146,31 @@ def extract_zip(archive_path, dest_dir):
                 qibuild.sh.mkdir(to_create, recursive=True)
                 continue
         archive.extract(member, path=dest_dir)
-        # Fix permision on extracted file:
-        to_chmod = os.path.join(dest_dir, member.filename)
-        new_st = member.external_attr >> 16L
-        os.chmod(to_chmod, new_st)
+        # Fix permision on extracted file unless it is a directory
+        if member.filename.endswith("/"):
+            directories.append(member)
+            new_path = os.path.join(dest_dir, member.filename)
+            qibuild.sh.mkdir(new_path, recursive=True)
+            new_st = 0777
+        else:
+            new_path = os.path.join(dest_dir, member.filename)
+            new_st = member.external_attr >> 16L
+        os.chmod(new_path, new_st)
 
         percent = float(i) / size * 100
         if sys.stdout.isatty():
             sys.stdout.write("Done: %.0f%%\r" % percent)
             sys.stdout.flush()
+
+    # Reverse sort directories, and then fix perm on these
+    directories.sort(key=operator.attrgetter('filename'))
+    directories.reverse()
+
+    for zipinfo in directories:
+        dirpath = os.path.join(dest_dir, zipinfo.filename)
+        new_st = zipinfo.external_attr >> 16L
+        os.chmod(dirpath, new_st)
+
     archive.close()
     LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
     res = os.path.join(dest_dir, orig_topdir)
