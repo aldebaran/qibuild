@@ -18,8 +18,8 @@ def configure_parser(parser):
     parser.add_argument("--interactive", action="store_true",
         help="start a wizard to help you configuring qibuild")
     parser.add_argument("--force", action="store_true", help="force the init")
-    parser.add_argument("--cmake-generator",
-        help="Choose a default cmake generator")
+    parser.add_argument("--config",
+        help="Choose a default config for this worktree")
     parser.set_defaults(
         cmake_generator="Unix Makefiles")
 
@@ -43,12 +43,24 @@ def do(args):
     # Safe to be called: only creates the .qi/ repertory
     qibuild.toc.create(work_tree)
 
-    # Safe to be called now that we've created it :)
+    try:
+        toc = qibuild.toc.toc_open(work_tree)
+    except qibuild.toc.WrongDefaultException:
+        pass
+
+
+    toc_cfg_path = os.path.join(work_tree, ".qi", "qibuild.xml")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
+    qibuild_cfg.read_local_config(toc_cfg_path)
+    qibuild_cfg.local.defaults.config = args.config
+    qibuild_cfg.write_local_config(toc_cfg_path)
+
+    # Safe to be called now that we've created it
+    # and that we know we don't have a wrong defaut config:
     toc = qibuild.toc.toc_open(work_tree)
 
     if not args.interactive:
         return
 
     qibuild.wizard.run_config_wizard(toc)
-
-

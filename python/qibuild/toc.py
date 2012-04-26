@@ -37,6 +37,17 @@ class TocException(Exception):
     def __str__(self):
         return self._message
 
+class WrongDefaultException(Exception):
+    """ Custom exception.
+    Caught only by qibuild init
+
+    """
+    def __init__(self, message):
+        self._message = message
+
+    def __str__(self):
+        return self._message
+
 class ConfigureFailed(Exception):
     def __init__(self, project, message=None):
         self.project = project
@@ -192,9 +203,18 @@ class Toc(WorkTree):
  * No custom cmake file for config {active_config} found.
    (looked in {local_cmake})
 """
-                    raise TocException(mess.format(active_config=self.active_config,
-                        local_cmake = local_cmake,
-                        tc_names = qitoolchain.get_tc_names()))
+                    mess =  mess.format(active_config=self.active_config,
+                                local_cmake = local_cmake,
+                                tc_names = qitoolchain.get_tc_names())
+                    if self.active_config == self.config.local.defaults.config:
+                        mess += """Note: this is your default config
+You may want to run:
+ * `qibuild init --force`  (to re-initialize your worktree and not use any toolchain)
+ * `qibuild init --force` --config=<config> (to use a different toolchain by default)
+ """
+                        raise WrongDefaultException(mess)
+                    else:
+                        raise Exception(mess)
 
         # Useful vars to cope with Visual Studio quirks
         self.using_visual_studio = "Visual Studio" in self.cmake_generator
