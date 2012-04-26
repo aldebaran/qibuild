@@ -148,6 +148,11 @@ def extract_zip(archive_path, dest_dir):
                 qibuild.sh.mkdir(to_create, recursive=True)
                 continue
         archive.extract(member, path=dest_dir)
+        # Fix permision on extracted file:
+        to_chmod = os.path.join(dest_dir, member.filename)
+        new_st = member.external_attr >> 16L
+        os.chmod(to_chmod, new_st)
+
         percent = float(i) / size * 100
         if sys.stdout.isatty():
             sys.stdout.write("Done: %.0f%%\r" % percent)
@@ -204,6 +209,8 @@ def zip_win(directory):
             full_path = os.path.join(root, filename)
             rel_path = os.path.relpath(full_path, directory)
             arcname  = os.path.join(os.path.basename(directory), rel_path)
+            info = zipfile.ZipInfo(arcname)
+            info.external_attr = os.stat(full_path).st_mode << 16L
             archive.write(full_path, arcname)
     archive.close()
     return archive_name

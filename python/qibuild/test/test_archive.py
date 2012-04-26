@@ -91,6 +91,27 @@ class ArchiveTestCase(unittest.TestCase):
         ls_r = qibuild.sh.ls_r(dest)
         self.assertEquals(ls_r, ["src/ro1/ro2/a"])
 
+    def test_extract_preserve_executables_from_zip(self):
+        zip = qibuild.command.find_program("zip")
+        if not zip:
+            return
+        src = os.path.join(self.tmp, "src")
+        os.mkdir(src)
+        a_exe = os.path.join(src, "a.exe")
+        with open(a_exe, "w") as fp:
+            fp.write("a_exe\n")
+        st_700 = stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR
+        os.chmod(a_exe, st_700)
+        qibuild.command.call(["zip", "-r", "src.zip", "src"],
+            cwd=self.tmp)
+        archive = os.path.join(self.tmp, "src.zip")
+        dest = os.path.join(self.tmp, "dest")
+        os.mkdir(dest)
+        qibuild.archive.extract_zip(archive, dest)
+        dest_exe = os.path.join(dest, "src", "a.exe")
+        st_mode = os.stat(dest_exe).st_mode
+        self.assertEquals(st_mode, 0100700)
+
     def test_extract_change_topdir(self):
         src = os.path.join(self.tmp, "src")
         os.mkdir(src)
