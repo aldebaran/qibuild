@@ -9,7 +9,6 @@
 import os
 import tempfile
 import unittest
-from xml.etree import ElementTree
 
 import qibuild
 import qibuild.archive
@@ -243,12 +242,17 @@ class FeedTestCase(unittest.TestCase):
         ctc_path = os.path.join(self.tmp, "ctc")
         ctc_xml  = self.configure_xml("ctc.xml", ctc_path)
 
+        qibuild_cfg = qibuild.config.QiBuildConfig()
         tc = qitoolchain.Toolchain("ctc")
-        tc.parse_feed(ctc_xml)
+        qitoolchain.feed.parse_feed(tc, ctc_xml, qibuild_cfg)
+
+        # Check that configuration is correctly set:
+        self.assertFalse(qibuild_cfg.configs.get("ctc") is None)
+        self.assertEquals(qibuild_cfg.configs["ctc"].cmake.generator, "Unix Makefiles")
+
+        # Check that generated toolchain file is correct:
         tc_file = get_tc_file_contents(tc)
-
         package_names = [p.name for p in tc.packages]
-
         self.assertTrue("naoqi-geode-ctc" in package_names)
         cross_tc_path = os.path.join(ctc_path, "toolchain-geode.cmake")
         cross_tc_path = qibuild.sh.to_posix_path(cross_tc_path)
@@ -386,9 +390,6 @@ class FeedTestCase(unittest.TestCase):
         tc = qitoolchain.Toolchain("test")
         feed_url = "file://" + qibuild.sh.to_posix_path(a_feed)
         tc.parse_feed(feed_url)
-
-
-
 
 if __name__ == "__main__":
     unittest.main()

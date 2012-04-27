@@ -149,6 +149,8 @@ class Toolchain:
         # Stored in general config file when using self.parse_feed,
         # updated by self.load_config()
         self.feed = None
+        # Set by self.parse_feed
+        self.cmake_generator = None
 
         # Add self to the list of known toolchains:
         if not self.name in get_tc_names():
@@ -322,7 +324,10 @@ class Toolchain:
 
         """
         # Delegate this to qitoolchain.feed module
-        qitoolchain.feed.parse_feed(self, feed, dry_run=dry_run)
+        qibuild_cfg = qibuild.config.QiBuildConfig()
+        qibuild_cfg.read()
+        qitoolchain.feed.parse_feed(self, feed, qibuild_cfg, dry_run=dry_run)
+        qibuild_cfg.write()
 
         # Update configuration so we keep which was
         # the last used feed

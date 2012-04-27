@@ -75,6 +75,9 @@ def handle_package(package, package_tree, toolchain):
         handle_local_package(package, package_tree)
     if package_tree.get("toolchain_file"):
         handle_toochain_file(package, package_tree)
+    cmake_generator = package_tree.get("cmake_generator")
+    if cmake_generator:
+        toolchain.cmake_generator = cmake_generator
 
 def handle_remote_package(feed, package, package_tree, toolchain):
     """ Set package.path of the given package,
@@ -211,7 +214,7 @@ class ToolchainFeedParser:
                 self.parse(feed_url)
 
 
-def parse_feed(toolchain, feed, dry_run=False):
+def parse_feed(toolchain, feed, qibuild_cfg, dry_run=False):
     """ Helper for toolchain.parse_feed
 
     """
@@ -260,3 +263,11 @@ def parse_feed(toolchain, feed, dry_run=False):
             print error
         sys.exit(2)
 
+    # Finally, if the feed contains a cmake_generator,
+    # add it to the qibuild config
+    if toolchain.cmake_generator:
+        config = qibuild.config.Config()
+        config.name = toolchain.name
+        config.cmake.generator = toolchain.cmake_generator
+        qibuild_cfg.add_config(config)
+        qibuild_cfg.write()

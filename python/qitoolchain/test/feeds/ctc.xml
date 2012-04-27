@@ -2,5 +2,6 @@
     <package  name="naoqi-geode-ctc"
         directory="."
         toolchain_file = "toolchain-geode.cmake"
+        cmake_generator="Unix Makefiles"
     />
 </toolchain>
