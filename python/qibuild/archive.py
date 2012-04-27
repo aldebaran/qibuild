@@ -147,6 +147,7 @@ def extract_zip(archive_path, dest_dir):
                 continue
         archive.extract(member, path=dest_dir)
         # Fix permision on extracted file unless it is a directory
+        # or if we are on windows
         if member.filename.endswith("/"):
             directories.append(member)
             new_path = os.path.join(dest_dir, member.filename)
@@ -155,7 +156,9 @@ def extract_zip(archive_path, dest_dir):
         else:
             new_path = os.path.join(dest_dir, member.filename)
             new_st = member.external_attr >> 16L
-        os.chmod(new_path, new_st)
+        # permissions are meaningless on windows, here only the exension counts
+        if not sys.platform.startswith("win"):
+            os.chmod(new_path, new_st)
 
         percent = float(i) / size * 100
         if sys.stdout.isatty():
