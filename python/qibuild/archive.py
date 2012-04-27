@@ -223,8 +223,6 @@ def zip_win(directory):
             full_path = os.path.join(root, filename)
             rel_path = os.path.relpath(full_path, directory)
             arcname  = os.path.join(os.path.basename(directory), rel_path)
-            info = zipfile.ZipInfo(arcname)
-            info.external_attr = os.stat(full_path).st_mode << 16L
             archive.write(full_path, arcname)
     archive.close()
     return archive_name
