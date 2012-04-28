@@ -98,7 +98,6 @@ def extract_tar(archive_path, dest_dir):
     for tarinfo in directories:
         dirpath = os.path.join(dest_dir, tarinfo.name)
         archive.chown(tarinfo, dirpath)
-        archive.utime(tarinfo, dirpath)
         archive.chmod(tarinfo, dirpath)
 
     archive.close()
