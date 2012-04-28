@@ -49,14 +49,6 @@ def do(args):
             mess += " ".join(bad_chars)
             raise Exception(mess)
 
-    known_generators = qibuild.cmake.get_known_cmake_generators()
-    cmake_generator = args.cmake_generator
-    if cmake_generator and cmake_generator not in known_generators:
-        mess  = "Invalid CMake generator: %s\n" % args.cmake_generator
-        mess += "Known generators are:"
-        mess += "\n * " + "\n * ".join(known_generators)
-        raise Exception(mess)
-
     toc = None
 
     if args.default:
