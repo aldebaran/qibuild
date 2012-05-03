@@ -291,7 +291,7 @@ You may want to run:
             # several build config is mandatory.
             # Otherwise, it's not a good idea, so we always specify it
             # when it's not "Debug" (the default)
-            res.append(self.build_type)
+            res.append(self.build_type.lower())
 
         self.build_folder_name = "-".join(res)
 
