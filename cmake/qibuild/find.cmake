@@ -157,11 +157,23 @@ endfunction()
 #!
 # Search for a library
 #
-# Note: if the library has a different name in debug and in release,
+# If the library has a different name in debug and in release,
 # you should use::
 #
 #   flib(foo DEBUG     foo_d)
 #   flib(foo OPTIMIZED foo)
+#
+# If the library has different names, you should call flib() just once ::
+#
+#  flib(foo foo foo3 foo3.4)
+#
+# If you want to link with several libraries in one step (for instance
+# foo-bar depends on foo-core but you just want to do
+# ``qi_use_lib(.. FOO)``, you must call flib() several times::
+#
+#  flib(foo foo-bar)
+#  flib(foo foo-core)
+#
 #
 # \arg:prefix  The prefix of the exported variables.
 #              Must match the argument of ``clean()`` and ``export()``
