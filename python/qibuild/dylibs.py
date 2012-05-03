@@ -33,8 +33,8 @@ def fix_dylibs(sdk_dir, paths=None):
         for framework in frameworks:
             src  = os.path.join(path    , framework)
             dest = os.path.join(sdk_dir, framework)
-            if not os.path.exists(dest):
-                os.symlink(src, dest)
+            qibuild.sh.rm(dest)
+            os.symlink(src, dest)
         lib_dir = os.path.join(path, "lib")
         if not os.path.exists(lib_dir):
             continue
@@ -43,5 +43,5 @@ def fix_dylibs(sdk_dir, paths=None):
         for dylib in dylibs:
             src  = os.path.join(path   , "lib", dylib)
             dest = os.path.join(sdk_dir, "lib", dylib)
-            if not os.path.exists(dest):
-                os.symlink(src, dest)
+            qibuild.sh.rm(dest)
+            os.symlink(src, dest)
