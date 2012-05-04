@@ -111,6 +111,20 @@ class GitTestCase(unittest.TestCase):
         readme = read_readme(bar_src)
         self.assertEqual(readme, "bar on release-1.12\n")
 
+    def test_get_current_branch(self):
+        bar_url = create_git_repo(self.tmp, "bar")
+        work = os.path.join(self.tmp, "work")
+        qibuild.sh.mkdir(work)
+        bar_src = os.path.join(work, "bar")
+        git = qisrc.git.Git(bar_src)
+        git.clone(bar_url)
+        self.assertEqual(git.get_current_branch(), "master")
+        push_readme_v2(self.tmp, "bar", "master")
+        git.pull()
+        self.assertEqual(git.get_current_branch(), "master")
+        git.checkout("-f", "HEAD~1")
+        self.assertEqual(git.get_current_branch(), None)
+
 
 class GitUpdateBranchTestCase(unittest.TestCase):
     def setUp(self):

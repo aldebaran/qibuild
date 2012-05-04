@@ -74,6 +74,8 @@ class Git:
         lines = out.splitlines()
         if len(lines) < 1:
             return None
+        if status != 0:
+            return None
         return lines[0]
 
     def get_current_branch(self):
