@@ -6,6 +6,7 @@
 
 """
 
+import qixml
 from xml.etree import ElementTree as etree
 
 class Depends:
@@ -23,13 +24,9 @@ class SphinxDoc:
         self.depends = list()
 
     def parse(self, element):
-        self.name = element.get("name")
-        self.src  = element.get("src")
-        dest = element.get("dest")
-        if dest is None:
-            self.dest = self.name
-        else:
-            self.dest = dest
+        self.name = qixml.parse_required_attr(element, "name")
+        self.src  = element.get("src", ".")
+        self.dest = element.get("dest", self.name)
         depends_elements = element.findall("depends")
         for depends_element in depends_elements:
             depends = Depends()
@@ -44,13 +41,9 @@ class DoxyDoc:
         self.depends = list()
 
     def parse(self, element):
-        self.name = element.get("name")
-        self.src  = element.get("src")
-        dest = element.get("dest")
-        if dest is None:
-            self.dest = self.name
-        else:
-            self.dest = dest
+        self.name = qixml.parse_required_attr(element, "name")
+        self.src = element.get("src", ".")
+        self.dest = element.get("dest", self.name)
         depends_elements = element.findall("depends")
         for depends_element in depends_elements:
             depends = Depends()

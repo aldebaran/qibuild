@@ -16,8 +16,6 @@ def configure_parser(parser):
     """ Configure parser for this action """
     qibuild.parsers.default_parser(parser)
     parser.add_argument("--work-tree", dest="worktree")
-    parser.add_argument("output_dir", nargs="?",
-        help="Where to generate the docs")
     parser.add_argument("--Werror", dest="werror",
         action="store_true",
         help="treat warnings as errors")
@@ -25,6 +23,14 @@ def configure_parser(parser):
         action="store_true",
         help="be quiet when building")
     parser.add_argument("--version")
+    parser.add_argument("name", nargs="?",
+        help="project to build")
+    parser.add_argument("-o", "--output-dir", dest="output_dir",
+        help="Where to generate the docs")
+    parser.add_argument("--all",  dest="all", action="store_true",
+        help="Force building of every project")
+    parser.set_defaults(all=False)
+
 
 
 def do(args):
@@ -53,6 +59,11 @@ def do(args):
         opts["quiet"] = True
     if args.werror:
         opts["werror"] = True
-    builder.build(opts)
-
-
+    if args.name:
+        builder.build_single(args.name, opts)
+    else:
+        project_name = builder.project_from_cwd()
+        if project_name and not args.all:
+            builder.build_single(project_name, opts)
+        else:
+            builder.build_all(opts)

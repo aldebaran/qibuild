@@ -20,6 +20,9 @@ def configure_file(in_file, out_file,  opts=None,
     If append_file is not None, append the contents of the file to
         the the output
 
+    If the file already exists and the contents of the file already are
+    correct, do not write it
+
     """
     if not os.path.exists(in_file):
         return
@@ -32,5 +35,11 @@ def configure_file(in_file, out_file,  opts=None,
             out_text += fp.read()
     base_path = os.path.dirname(out_file)
     qibuild.sh.mkdir(base_path, recursive=True)
+    if os.path.exists(out_file):
+        # Do not write if contents are correct:
+        with open(out_file, "r") as fp:
+            contents = fp.read()
+        if contents == out_text:
+            return
     with open(out_file, "w") as fp:
         fp.write(out_text)

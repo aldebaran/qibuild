@@ -6,6 +6,7 @@
 
 """
 import os
+import logging
 
 import qisrc
 import qibuild
@@ -13,6 +14,8 @@ from qibuild.dependencies_solver import topological_sort
 import qidoc.config
 import qidoc.sphinx
 import qidoc.doxygen
+
+LOGGER = logging.getLogger(__name__)
 
 
 
@@ -54,16 +57,33 @@ class QiDocBuilder:
         res = dict()
         for doxydoc in self.doxydocs.values():
             doxy_tree[doxydoc.name] = doxydoc.depends
+            # Check that every dep exists:
+            for dep in doxydoc.depends:
+                if self.get_doc("doxygen", dep) is None:
+                    mess  = "Could not find doxygen doc dep: %s\n" % dep
+                    mess += "(brought by: %s)" % doxydoc.name
+                    LOGGER.warning(mess)
+                    doxydoc.depends.remove(dep)
+
         for sphinxdoc in self.sphinxdocs.values():
             sphinx_tree[sphinxdoc.name] = sphinxdoc.depends
+            # Check that every dep exists:
+            for dep in sphinxdoc.depends:
+                if self.get_doc("sphinx", dep) is None:
+                    mess  = "Could not find sphinx doc dep %s\n" % dep
+                    mess += "(brought by: %s)" % sphinxdoc.name
+                    LOGGER.warning(mess)
+                    sphinxdoc.depends.remove(dep)
 
         res["doxygen"] = doxy_tree
         res["sphinx"]  = sphinx_tree
         return res
 
 
-    def build(self, opts):
-        """ Main method: build everything
+    def configure_all(self, opts):
+        """ Configure every projects.
+
+        Always called before building anything
 
         """
         version = opts.get("version")
@@ -82,7 +102,7 @@ class QiDocBuilder:
                     project_name=doxydoc.name,
                     doxytags_path=self.doxytags_path,
                     doxygen_mapping=doxygen_mapping)
-            qidoc.doxygen.build(doxydoc.src, doxydoc.dest, opts)
+
             tag_file = os.path.join(self.doxytags_path, doxydoc.name + ".tag")
             # Store full path here because we'll need to compute
             # a relative path later
@@ -97,7 +117,37 @@ class QiDocBuilder:
                 doxylink,
                 opts)
             qidoc.sphinx.gen_download_zips(sphinxdoc.src)
+
+    def build_all(self, opts):
+        """ Build everything
+
+        """
+        self.configure_all(opts)
+        doxydocs = self.sort_doxygen()
+        for doxydoc in doxydocs:
+            qidoc.doxygen.build(doxydoc.src, doxydoc.dest, opts)
+        sphinxdocs = self.sort_sphinx()
+        for sphinxdoc in sphinxdocs:
             qidoc.sphinx.build(sphinxdoc.src, sphinxdoc.dest, opts)
+
+
+    def build_single(self, project, opts):
+        """ Used to build a single project
+
+        """
+        sphinx = self.get_doc("sphinx", project)
+        doxy   = self.get_doc("doxygen", project)
+
+        if sphinx is None and doxy is None:
+            raise Exception("No such project: %s" % project)
+
+        self.configure_all(opts)
+
+        if sphinx:
+            qidoc.sphinx.build(sphinx.src, sphinx.dest, opts)
+        if doxy:
+            qidoc.doxygen.build(doxy.src, doxy.dest, opts)
+
 
     def sort_doxygen(self):
         """ Get a list of doxygen docs to build
@@ -159,9 +209,9 @@ class QiDocBuilder:
 
         """
         if type_ == "doxygen":
-            return self.doxydocs[name]
+            return self.doxydocs.get(name)
         if type_ == "sphinx":
-            return self.sphinxdocs[name]
+            return self.sphinxdocs.get(name)
 
     def _load_doc_projects(self):
         """ Explore the qibuild projects, building the
@@ -175,18 +225,25 @@ class QiDocBuilder:
             (doxydocs, sphinxdocs) = qidoc.config.parse_project_config(qiproj_xml)
             # Fixup src, dest attributes:
             for doxydoc in doxydocs:
-                doxydoc.src = os.path.join(project.path, doxydoc.src)
-                doxydoc.dest = os.path.join(self.out_dir, doxydoc.dest)
+                self.set_paths(project, doxydoc)
                 self.check_collision(doxydoc, "doxygen")
                 self.doxydocs[doxydoc.name] = doxydoc
             for sphinxdoc in sphinxdocs:
-                sphinxdoc.src = os.path.join(project.path, sphinxdoc.src)
-                sphinxdoc.dest = os.path.join(self.out_dir, sphinxdoc.dest)
+                self.set_paths(project, sphinxdoc)
                 self.check_collision(sphinxdoc, "sphinx")
                 self.sphinxdocs[sphinxdoc.name] = sphinxdoc
             # Check if the project is a template project:
             self.check_template(project.path, qiproj_xml)
 
+
+    def set_paths(self, worktree_project, doc_project):
+        """ Set src and dest attributes of the doc project
+
+        """
+        src = os.path.join(worktree_project.path, doc_project.src)
+        doc_project.src = qibuild.sh.to_native_path(src)
+        dest = os.path.join(self.out_dir, doc_project.dest)
+        doc_project.dest = qibuild.sh.to_native_path(dest)
 
     def check_collision(self, project, doc_type):
         """" Check for collision between doc projects
@@ -224,6 +281,19 @@ class QiDocBuilder:
             raise Exception(mess)
         self.templates_path = p_path
 
+    def project_from_cwd(self, cwd=None):
+        """ Get a doc project name from the current working dir
+
+        """
+        if not cwd:
+            cwd = os.getcwd()
+
+        for doxydoc in self.doxydocs.values():
+            if doxydoc.src in cwd:
+                return doxydoc.name
+        for sphinxdoc in self.sphinxdocs.values():
+            if sphinxdoc.src in cwd:
+                return sphinxdoc.name
 
 
 def find_qidoc_root(cwd=None):

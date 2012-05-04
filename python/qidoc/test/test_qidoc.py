@@ -43,10 +43,22 @@ class TestQiDoc(unittest.TestCase):
     def test_build(self):
         opts = dict()
         opts["version"] = 1.42
-        self.qidoc_builder.build(opts)
+        self.qidoc_builder.build_all(opts)
         submodule_zip = os.path.join(self.out_dir,
             "qibuild", "_downloads", "submodule.zip")
         self.assertTrue(os.path.exists(submodule_zip))
+
+    @pytest.mark.slow
+    def test_build_single_dox(self):
+        opts = dict()
+        opts["version"] = "1.42"
+        self.qidoc_builder.build_single("libqi", opts)
+
+    @pytest.mark.slow
+    def test_build_single_sphinx(self):
+        opts = dict()
+        opts["version"] = "1.42"
+        self.qidoc_builder.build_single("qibuild", opts)
 
     def test_cfg_parse(self):
         qibuild_sphinx = self.qidoc_builder.sphinxdocs["qibuild"]
