@@ -71,7 +71,6 @@ def push_readme_v2(tmp, path, branch):
     tmp_srv = os.path.join(tmp, "srv", path)
     git = qisrc.git.Git(tmp_src)
     git.checkout("-f", branch)
-    readme = os.path.join(tmp_src, "README")
     write_readme(tmp_src, "%s v2 on %s\n" % (path, branch))
     git.commit("-a", "-m", "README v2")
     git.push(tmp_srv, "%s:%s" % (branch, branch))
@@ -190,16 +189,22 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         git.clone(bar_url)
 
         # Create conflicting changes
-        write_readme(bar_src, "unstaged changes\n", append=True)
+        write_readme(bar_src, "conflicting changes\n", append=True)
+        git.commit("-a", "-m", "conflicting changes")
         push_readme_v2(self.tmp, "bar", "master")
 
-        # Update branch: master should still have the unstaged changes
+        # Updating branch should fail
         err = git.update_branch("master", "origin")
         self.assertFalse(err is None)
-        self.assertTrue("Merge conflict in README" in err)
+        self.assertTrue("Merge conflict in README" in err, err)
 
+        # But we should be back at our previous commit
         readme = read_readme(bar_src)
-        self.assertEqual(readme, "bar\nunstaged changes\n")
+        self.assertEqual(readme, "bar\nconflicting changes\n")
+
+        self.assertEqual(git.get_current_branch(), "master")
+        rebase_apply = os.path.join(git.repo, ".git", "rebase_apply")
+        self.assertFalse(os.path.exists(rebase_apply))
 
     def test_untracked_files(self):
         bar_url = create_git_repo(self.tmp, "bar")
@@ -226,7 +231,7 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         readme = read_readme(bar_src)
         self.assertEqual(readme, "bar v2 on master\n")
 
-    def test_untracked_conflict(self):
+    def test_untracked_would_be_overwritten(self):
         bar_url = create_git_repo(self.tmp, "bar")
         work = os.path.join(self.tmp, "work")
         qibuild.sh.mkdir(work)
@@ -250,7 +255,8 @@ class GitUpdateBranchTestCase(unittest.TestCase):
 
         err = git.update_branch("master", "origin")
         self.assertFalse(err is None)
-        print err
+        self.assertTrue("untracked working tree files" in err)
+        self.assertEqual(git.get_current_branch(), "master")
 
     def test_wrong_branch_unstaged(self):
         bar_url = create_git_repo(self.tmp, "bar")
@@ -278,6 +284,28 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         git.checkout("-f", "master")
         readme = read_readme(bar_src)
         self.assertEqual(readme, "bar v2 on master\n")
+
+    def test_wrong_branch_with_conflicts(self):
+        bar_url = create_git_repo(self.tmp, "bar")
+        work = os.path.join(self.tmp, "work")
+        qibuild.sh.mkdir(work)
+        bar_src = os.path.join(work, "bar")
+        git = qisrc.git.Git(bar_src)
+        git.clone(bar_url)
+
+        # Create conflicting changes
+        write_readme(bar_src, "conflicting changes\n", append=True)
+        git.commit("-a", "-m", "conflicting changes")
+        push_readme_v2(self.tmp, "bar", "master")
+
+        # Checkout an other branch
+        git.checkout("-b", "next")
+
+        # Try to update master while being on an other branch:
+        err = git.update_branch("master", "origin")
+        self.assertFalse(err is None)
+        self.assertTrue("Merge is not fast-forward" in err)
+
 
     def test_set_tracking_banch_newly_created(self):
         bar_url = create_git_repo(self.tmp, "bar")

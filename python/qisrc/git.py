@@ -236,17 +236,52 @@ class Git:
 
         Return an string if something went wrong
         """
-        with self.change_branch(branch):
-            try:
-                with self.stash_changes():
-                    (out, err) = self.pull("--rebase", quiet=True, raises=False)
-                    if out != 0:
-                        return err
-            except Exception, e:
-                self.call("reset", "--hard", "HEAD~1")
-                self.call("stash", "apply")
-                return str(e)
+        if not remote_branch:
+            remote_branch = branch
+        remote_branch = "%s/%s" % (remote_name, remote_branch)
+        if not self.get_current_branch():
+            return "Not currently on any branch"
+        if self.get_current_branch() != branch:
+            return self.update_branch_if_ff(branch, remote_branch)
+        (retcode, out) = self.call("pull", "--rebase", raises=False)
+        if retcode != 0:
+            self.call("rebase", "--abort", quiet=True, raises=False)
+            return out
 
+
+    def update_branch_if_ff(self, local_branch, remote_branch):
+        """ Update a local branch with a remote branch if the
+        merge is fast-forward
+
+        """
+        self.fetch("--all")
+        (retcode, out) = self.call("show-ref", "--verify",
+            "refs/heads/%s" % local_branch,
+            raises=False)
+        if retcode != 0:
+            return out
+        local_sha1 = out.split()[0]
+        (retcode, out) = self.call("show-ref", "--verify",
+            "refs/remotes/%s" % remote_branch,
+            raises=False)
+        if retcode != 0:
+            return out
+        remote_sha1 = out.split()[0]
+        (retcode, out) = self.call("merge-base", local_sha1, remote_sha1,
+            raises=False)
+        if retcode != 0:
+            return out
+        common_ancestor = out.strip()
+
+        if common_ancestor != local_sha1:
+            mess  = "Could not update %s with %s\n" % (local_branch, remote_branch)
+            mess += "Merge is not fast-forward"
+            return mess
+        # Safe to checkout the branch, run merge and then go back
+        # to where we were:
+        with self.change_branch(local_branch):
+            print "Updating %s with %s ..." % (local_branch, remote_branch)
+            self.call("merge", "-v", remote_sha1)
 
 
 def open(repo):
