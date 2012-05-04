@@ -37,5 +37,5 @@ def do(args):
     branch = args.branch
     manifest = qisrc.sync.fetch_manifest(worktree,
         manifest_url, branch=branch, src=manifest_src)
-    qisrc.sync.sync_projects(worktree, manifest)
-    worktree.set_manifest_project(manifest_src)
+    qisrc.sync.sync_projects(worktree, manifest, update_branch=False, setup_review=True)
+    worktree.set_manifest_project(manifest_src,)

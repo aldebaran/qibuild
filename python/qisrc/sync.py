@@ -48,11 +48,14 @@ def fetch_manifest(worktree, manifest_git_url, branch="master", src="manifest/de
     return manifest_xml
 
 
-def sync_projects(worktree, manifest_location):
+def sync_projects(worktree, manifest_location, setup_review=True, update_branch=True):
     """ Synchronize a worktree with a manifest,
     cloning any missing repository, setting the correct
     remote and tracking branch on every repository
-    Also set up the project for review
+
+    :param setup_review: Also set up the project for review
+    :param update_branch: Also update local branches when possible (fast-forward,
+        pull --rebase without conflicts)
 
     """
     errors = list()
@@ -74,12 +77,15 @@ def sync_projects(worktree, manifest_location):
                       remote=p_remote,
                       skip_if_exists=True)
         p_path = worktree.get_project(p_src).path
-        if project.review:
+        if project.review and setup_review:
             qisrc.review.setup_project(p_path, project.name, project.review_url, p_revision)
         git = qisrc.git.Git(p_path)
         git.set_remote(p_remote, p_url)
         git.set_tracking_branch(p_revision, p_remote)
-        error = git.update_branch(p_revision, p_revision)
+        if update_branch:
+            error = git.update_branch(p_revision, p_revision)
+        else:
+            error = None
         if error:
             errors.append((p_src, error))
     if not errors:
