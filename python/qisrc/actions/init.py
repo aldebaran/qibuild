@@ -20,7 +20,9 @@ def configure_parser(parser):
     parser.set_defaults(manifest_name="default", branch="master")
     parser.add_argument("--force", dest="force", action="store_true",
         help="By-pass some safety checks")
-    parser.set_defaults(force=False)
+    parser.add_argument("--no-review", dest="setup_review", action="store_false",
+        help="Do not setup code review")
+    parser.set_defaults(force=False, setup_review=True)
 
 def do(args):
     """Main entry point"""
@@ -37,5 +39,7 @@ def do(args):
     branch = args.branch
     manifest = qisrc.sync.fetch_manifest(worktree,
         manifest_url, branch=branch, src=manifest_src)
-    qisrc.sync.sync_projects(worktree, manifest, update_branch=False, setup_review=True)
+    qisrc.sync.sync_projects(worktree, manifest,
+        update_branch=False,
+        setup_review=args.setup_review)
     worktree.set_manifest_project(manifest_src,)

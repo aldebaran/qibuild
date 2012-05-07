@@ -258,6 +258,66 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         self.assertTrue("untracked working tree files" in err)
         self.assertEqual(git.get_current_branch(), "master")
 
+    def test_unstaged_changes_conflict(self):
+        bar_url = create_git_repo(self.tmp, "bar")
+        work = os.path.join(self.tmp, "work")
+        qibuild.sh.mkdir(work)
+        bar_src = os.path.join(work, "bar")
+        git = qisrc.git.Git(bar_src)
+        git.clone(bar_url)
+
+        # Create unstaged, conflicting changes
+        readme = os.path.join(bar_src, "README")
+        with open(readme, "a") as fp:
+            fp.write("Unstaged changes\n")
+        push_readme_v2(self.tmp, "bar", "master")
+
+        err = git.update_branch("master", "origin")
+        self.assertFalse(err is None)
+        self.assertTrue("Merge conflict in README" in err)
+        self.assertTrue("Some unstaged changes were in conflict" in err)
+        self.assertTrue(git.get_current_branch(), "master")
+        rebase_apply = os.path.join(git.repo, ".git", "rebase_apply")
+        self.assertFalse(os.path.exists(rebase_apply))
+
+    def test_unstaged_changes_no_conflict(self):
+        bar_url = create_git_repo(self.tmp, "bar")
+        work = os.path.join(self.tmp, "work")
+        qibuild.sh.mkdir(work)
+        bar_src = os.path.join(work, "bar")
+        git = qisrc.git.Git(bar_src)
+        git.clone(bar_url)
+
+        # Create unstaged, non-conflicting changes
+        readme = os.path.join(bar_src, "README")
+        with open(readme, "w") as fp:
+            fp.write("Unstaged changes\n")
+
+        upstream_src = os.path.join(self.tmp, "src", "bar")
+        upstream_file = os.path.join(upstream_src, "a_file")
+        with open(upstream_file, "w") as fp:
+            fp.write("upstream file\n")
+        upstream_git = qisrc.git.Git(upstream_src)
+        upstream_git.call("add", "a_file")
+        upstream_git.call("commit", "-m", "Add a file")
+        upstream_git.call("push", bar_url, "master:master")
+
+        err = git.update_branch("master", "origin")
+        self.assertTrue(err is None)
+
+        # Check that upstream file is here
+        a_file = os.path.join(bar_src, "a_file")
+        self.assertTrue(os.path.exists(a_file))
+
+        # Check that unstaged changes are here:
+        readme = read_readme(bar_src)
+        self.assertEqual(readme, "Unstaged changes\n")
+
+        self.assertTrue(git.get_current_branch(), "master")
+        rebase_apply = os.path.join(git.repo, ".git", "rebase_apply")
+        self.assertFalse(os.path.exists(rebase_apply))
+
+
     def test_wrong_branch_unstaged(self):
         bar_url = create_git_repo(self.tmp, "bar")
         work = os.path.join(self.tmp, "work")

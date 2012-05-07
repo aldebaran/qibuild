@@ -83,7 +83,7 @@ def sync_projects(worktree, manifest_location, setup_review=True, update_branch=
         git.set_remote(p_remote, p_url)
         git.set_tracking_branch(p_revision, p_remote)
         if update_branch:
-            error = git.update_branch(p_revision, p_revision)
+            error = git.update_branch(p_revision, p_remote, p_revision)
         else:
             error = None
         if error:
@@ -94,8 +94,8 @@ def sync_projects(worktree, manifest_location, setup_review=True, update_branch=
     for (src, err) in errors:
         print src
         print "-" * len(src)
-        print
         print indent(err, 2)
+        print
 
 
 def pull_projects(worktree, rebase=False):

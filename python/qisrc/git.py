@@ -191,7 +191,7 @@ class Git:
         if remote_branch is None:
             remote_branch = branch
         # Just in case the branch just has been created
-        self.call("fetch", remote_name)
+        self.call("fetch", remote_name, quiet=True)
         self.call("branch", branch, quiet=True, raises=False)
         self.call("branch",
             "--set-upstream", branch, "%s/%s" % (remote_name, remote_branch),
@@ -229,7 +229,6 @@ class Git:
         if retcode != 0:
             raise Exception(out)
 
-
     def update_branch(self, branch, remote_name, remote_branch=None):
         """ Update the given branch to match the given remote branch
 
@@ -243,18 +242,24 @@ class Git:
             return "Not currently on any branch"
         if self.get_current_branch() != branch:
             return self.update_branch_if_ff(branch, remote_branch)
-        (retcode, out) = self.call("pull", "--rebase", raises=False)
-        if retcode != 0:
+        try:
+            with self.stash_changes():
+                (retcode, out) = self.call("pull", "--rebase", raises=False)
+                if retcode != 0:
+                    self.call("rebase", "--abort", quiet=True, raises=False)
+                    return out
+        except Exception, err:
             self.call("rebase", "--abort", quiet=True, raises=False)
-            return out
-
+            res = "Some unstaged changes were in conflict: "
+            res +=  str(err)
+            return res
 
     def update_branch_if_ff(self, local_branch, remote_branch):
         """ Update a local branch with a remote branch if the
         merge is fast-forward
 
         """
-        self.fetch("--all")
+        self.fetch("--all", quiet=True)
         (retcode, out) = self.call("show-ref", "--verify",
             "refs/heads/%s" % local_branch,
             raises=False)
@@ -275,8 +280,11 @@ class Git:
 
         if common_ancestor != local_sha1:
             mess  = "Could not update %s with %s\n" % (local_branch, remote_branch)
-            mess += "Merge is not fast-forward"
+            mess += "Merge is not fast-forward and you are not on %s" % local_branch
             return mess
+        if local_sha1 == remote_sha1:
+            # Nothing to do
+            return
         # Safe to checkout the branch, run merge and then go back
         # to where we were:
         with self.change_branch(local_branch):
