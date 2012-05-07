@@ -61,9 +61,25 @@ def do(args):
         opts["werror"] = True
     if args.name:
         builder.build_single(args.name, opts)
-    else:
-        project_name = builder.project_from_cwd()
-        if project_name and not args.all:
-            builder.build_single(project_name, opts)
-        else:
-            builder.build_all(opts)
+        return
+
+    # Build all if:
+    #   user asked with --all,
+    #   or a worktree has been given (so no point in using cwd())
+    #   or we are at the root of the worktree.
+    if args.all \
+        or args.worktree \
+        or os.getcwd() == worktree:
+        builder.build_all(opts)
+        return
+
+    project_name = builder.project_from_cwd()
+    if not project_name:
+        # Not at the root, and could not guess current
+        # project: raise
+        mess  = "Could not guess project from current working directory\n"
+        mess += "Please go to the subdirectory of a project\n"
+        mess += "or specify a project name on the command line"
+        raise Exception(mess)
+
+    builder.build_single(project_name, opts)
