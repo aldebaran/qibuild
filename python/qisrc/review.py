@@ -149,7 +149,7 @@ def setup_project(project_path, project_name, review_url, branch):
 
 
 
-def update(project_path, branch, review=True, dry_run=False):
+def push(project_path, branch, review=True, dry_run=False):
     """ Push the changes for review.
     Unless review is False, in this case, simply update
     the remote gerrit branch

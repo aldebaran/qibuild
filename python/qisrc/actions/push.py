@@ -27,6 +27,6 @@ def do(args):
     """ Main entry point """
     git_path = qisrc.worktree.git_project_path_from_cwd()
     git = qisrc.git.Git(git_path)
-    qisrc.review.update(git_path, git.get_current_branch(),
+    qisrc.review.push(git_path, git.get_current_branch(),
         review=args.review, dry_run=args.dry_run)
 

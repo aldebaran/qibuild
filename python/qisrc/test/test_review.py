@@ -38,10 +38,10 @@ def test_parse_git_url():
     assert res == ("john2", "bar2.baz_smap-eggs.com", "42")
 
 
-def test_update():
+def test_push():
     with mock.patch('qibuild.command.call') as fake_command:
-        qisrc.review.update("foo", "master")
+        qisrc.review.push("foo", "master")
         assert fake_command.call_args[0][0] == ["git", "push", "gerrit", "master:refs/for/master"]
         fake_command.reset()
-        qisrc.review.update("foo", "master", review=False)
+        qisrc.review.push("foo", "master", review=False)
         assert fake_command.call_args[0][0] == ["git", "push", "gerrit", "master:master"]
