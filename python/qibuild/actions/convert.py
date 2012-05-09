@@ -122,7 +122,7 @@ def fix_root_cmake(cmakelists, project_name, dry_run=True):
 
 cmake_minimum_required(VERSION 2.8)
 project({project_name})
-include(qibuild.cmake)
+find_package(qibuild)
 
 # qi_create_lib(...)
 
