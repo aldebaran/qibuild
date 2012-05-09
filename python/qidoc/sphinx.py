@@ -45,7 +45,9 @@ def configure(src, dest, templates, intersphinx_mapping, doxylink, opts):
     opts["doxylink"] = str(rel_doxylink)
     opts["intersphinx_mapping"] = str(intersphinx_mapping)
     opts["themes_path"] = os.path.join(templates, "sphinx", "_themes")
+    opts["themes_path"] = qibuild.sh.to_posix_path(opts["themes_path"])
     opts["ext_path"] = os.path.join(templates, "sphinx", "tools")
+    opts["ext_path"] = qibuild.sh.to_posix_path(opts["ext_path"])
 
     conf_py_out = os.path.join(src, "qidoc", "conf.py")
     qidoc.templates.configure_file(conf_py_tmpl, conf_py_out,
