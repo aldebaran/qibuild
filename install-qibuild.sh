@@ -7,6 +7,8 @@
 # Create a simple launcher for QiBuild scipts.
 # They will install in /usr/local/bin, but
 # sources will stay where they are.
+# Note: on distros where /usr/bin/python is Python 3, you should
+# set PYTHON env var to python2
 
 DESTDIR="/usr/local/bin"
 
@@ -18,6 +20,10 @@ create_launcher() {
   shift
   args="$@"
 
+  if [ -z $PYTHON ]; then
+    PYTHON=python
+  fi
+
   if readlink -f . >/dev/null 2>/dev/null ; then
       p=$(dirname "$(readlink -f '$0' 2>/dev/null)")
   else
@@ -25,8 +31,8 @@ create_launcher() {
   fi
   #echo "QiBuild directory: $p"
 
-  echo '#!/bin/sh'                                                     >  "${DESTDIR}/${name}"
-  echo "PYTHONPATH=\"$p/python\" python \"${p}/${full_path}\" $args \"\$@\"" >> "${DESTDIR}/${name}"
+  echo '#!/bin/sh'                                   >  "${DESTDIR}/${name}"
+  echo "$PYTHON \"${p}/${full_path}\" $args \"\$@\"" >> "${DESTDIR}/${name}"
   chmod 755 "${DESTDIR}/${name}"
   echo "installed: ${DESTDIR}/${name}"
 }
@@ -37,7 +43,7 @@ if ! mkdir -p "${DESTDIR}" 2>/dev/null ; then
   localinst=yes
 fi
 
-if ! touch "${DESTDIR}"/.tmp_test ; then
+if ! touch "${DESTDIR}"/.tmp_test 2>/dev/null ; then
   localinst=yes
 else
   rm -f "${DESTDIR}/.tmp_test"
@@ -46,11 +52,11 @@ fi
 if [ "$localinst" = "yes" ] ; then
   echo WARNING: ${DESTDIR} is not writable
   echo =====================
-  echo installing into ~/bin
-  echo You should add ~/bin to your PATH
+  echo installing into ~/.local/bin
+  echo You should add ~/.local/bin to your PATH
   echo =====================
   echo
-  DESTDIR=~/bin
+  DESTDIR=~/.local/bin
   mkdir -p "${DESTDIR}"
 fi
 
