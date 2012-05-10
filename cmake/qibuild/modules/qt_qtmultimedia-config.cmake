@@ -9,5 +9,6 @@ set(_suffix "QTMULTIMEDIA")
 set(_libame "QtMultimedia")
 
 qt_flib(${_suffix} ${_libame})
+qi_set_global(QT_QTMULTIMEDIA_DEPENDS "ALSALIB")
 export_lib(QT_${_suffix})
 set(_ROOT_DIR)

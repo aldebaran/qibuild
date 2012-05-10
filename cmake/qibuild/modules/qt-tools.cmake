@@ -11,6 +11,10 @@
 # Note: when cross-compiling, you should set QT_USE_QMAKE
 # to false so that we do not use qmake from the system.
 
+if(DEFINED _QIBUILD_QT_TOOLS)
+  return()
+endif()
+
 if(NOT DEFINED QT_USE_QMAKE)
   find_program(QT_QMAKE qmake)
   if(QT_QMAKE)
@@ -38,3 +42,5 @@ else()
 endif()
 
 include(Qt4Macros)
+
+qi_set_global(_QIBUILD_QT_TOOLS TRUE)
