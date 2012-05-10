@@ -18,6 +18,10 @@ def configure_parser(parser):
 def do(args):
     """ Main method """
     tc_names = qitoolchain.get_tc_names()
+    if not tc_names:
+        print "No toolchain yet"
+        print "Use `qitoolchain create` to create a new toolchain"
+        return
     print "Known toolchains:"
     for tc_name in tc_names:
         print "  ", tc_name
