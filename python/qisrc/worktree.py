@@ -16,6 +16,17 @@ from qixml import etree
 
 LOGGER = logging.getLogger("WorkTree")
 
+
+class NotInWorktree(Exception):
+    """ Just a custom exception """
+    def __str__(self):
+        return """ Could not guess worktree from current working directory
+  Here is what you can do :
+     - try from a valid work tree
+     - specify an existing work tree with --work-tree PATH
+     - create a new work tree with `qibuild init`
+"""
+
 class WorkTree:
     """ This class represent a :term:`worktree`
 
@@ -239,11 +250,7 @@ def open_worktree(worktree=None):
     if not worktree:
         worktree = guess_worktree()
     if worktree is None:
-        raise Exception("Could not find a work tree\n "
-            "Here is what you can do :\n"
-            " - try from a valid work tree\n"
-            " - specify an existing work tree with \"--work-tree PATH\"\n"
-            " - create a new work tree with \"qibuild init\"")
+        raise NotInWorktree()
     if not os.path.exists(worktree):
         mess =  "Cannot open a worktree from %s\n" % worktree
         mess += "This path does not exist"

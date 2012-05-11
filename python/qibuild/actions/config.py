@@ -6,6 +6,7 @@
 import os
 import subprocess
 
+import qisrc
 import qibuild
 import qibuild.wizard
 
@@ -15,20 +16,27 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     parser.add_argument("--edit", action="store_true",
         help="edit the configuration")
+    parser.add_argument("--local", action="store_true", dest="is_local",
+        help="only display or edit the local configuration")
     parser.add_argument("--wizard", action="store_true",
         help="run a wizard to edit the configuration")
+    parser.set_defaults(local=False)
 
 def do(args):
     """Main entry point"""
     toc = None
     try:
         toc = qibuild.toc.toc_open(args.worktree, args)
-    except qibuild.toc.TocException:
+    except qisrc.worktree.NotInWorktree:
         pass
 
     if args.wizard:
         qibuild.wizard.run_config_wizard(toc)
         return
+
+    is_local = args.is_local
+    if is_local and not toc:
+        raise Exception("Cannot use --local when not in a worktree")
 
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read()
@@ -41,17 +49,22 @@ def do(args):
             qibuild_cfg.write()
 
         full_path = qibuild.command.find_program(editor)
-        subprocess.call([full_path, qibuild.config.get_global_cfg_path()])
+        if is_local:
+            cfg_path = toc.config_path
+        else:
+            cfg_path = qibuild.config.get_global_cfg_path()
+        subprocess.call([full_path, cfg_path])
         return
 
     if not toc:
         print qibuild_cfg
         return
 
-    print "General configuration"
-    print "---------------------"
-    print qibuild.config.indent(str(toc.config))
-    print
+    if not is_local:
+        print "General configuration"
+        print "---------------------"
+        print qibuild.config.indent(str(toc.config))
+        print
 
     print "Local configuration"
     print "-------------------"
