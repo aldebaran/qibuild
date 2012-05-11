@@ -6,6 +6,7 @@
 """
 
 import os
+import sys
 import logging
 
 import qidoc.command
@@ -98,5 +99,11 @@ def build(src, dest, opts):
         cmd.append("-W")
     if opts.get("quiet"):
         cmd.append("-q")
+    # by-pass sphinx-build bug on mac:
+    if sys.platform == "darwin":
+        env = os.environ.copy()
+        env["LC_ALL"] = "en_US.UTF-8"
+    else:
+        env = None
     cmd.extend([os.path.join(src, "source"), dest])
-    qidoc.command.call(cmd, cwd=src)
+    qidoc.command.call(cmd, cwd=src, env=env)
