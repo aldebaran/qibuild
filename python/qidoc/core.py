@@ -6,6 +6,7 @@
 
 """
 import os
+import webbrowser
 import logging
 
 import qisrc
@@ -148,6 +149,30 @@ class QiDocBuilder:
         if doxy:
             qidoc.doxygen.build(doxy.src, doxy.dest, opts)
 
+
+    def open_main(self):
+        """ Used to open main doc. We assume one of the project
+        as a dest equals to "."
+
+        """
+        index_html = os.path.join(self.out_dir, "index.html")
+        print "Opening", index_html, "in a web browser"
+        webbrowser.open(index_html)
+
+    def open_single(self, project):
+        """ User to open a single doc
+
+        """
+
+        doc_proj = self.get_doc("sphinx", project)
+        if not doc_proj:
+            doc_proj = self.get_doc("doxygen", project)
+        if not doc_proj:
+            raise Exception("No such project: %s" % project)
+
+        index_html = os.path.join(doc_proj.dest, "index.html")
+        print "Opening", index_html, "in a web browser"
+        webbrowser.open(index_html)
 
     def sort_doxygen(self):
         """ Get a list of doxygen docs to build
