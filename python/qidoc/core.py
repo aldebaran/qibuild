@@ -6,6 +6,7 @@
 
 """
 import os
+import sys
 import webbrowser
 import logging
 
@@ -157,6 +158,8 @@ class QiDocBuilder:
         """
         index_html = os.path.join(self.out_dir, "index.html")
         print "Opening", index_html, "in a web browser"
+        if sys.platform == "darwin":
+            index_html = "file://" + index_html
         webbrowser.open(index_html)
 
     def open_single(self, project):
@@ -172,6 +175,8 @@ class QiDocBuilder:
 
         index_html = os.path.join(doc_proj.dest, "index.html")
         print "Opening", index_html, "in a web browser"
+        if sys.platform == "darwin":
+            index_html = "file://" + index_html
         webbrowser.open(index_html)
 
     def sort_doxygen(self):
