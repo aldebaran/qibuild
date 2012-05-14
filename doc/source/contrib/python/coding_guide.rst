@@ -30,15 +30,15 @@ General
 
 * Please use a spell checker when you write comments. Typos in
   comments are annoying and distractive, typos in doc strings are
-  bad because we may generate public documentation from those
-  doc strings one day.
+  bad because we generate public documentation from some of those
+  doc strings.
 
 Doc strings
 ------------
 
 Right now the state of the docstrings inside qiBuild are quite a mess.
-But you should try to write docstrings as if all of then were going
-to be use with `sphinx autodoc extension <http://sphinx.pocoo.org/ext/autodoc.html>`_.
+But you should try to write docstrings as if all of them were going
+to be used with `sphinx autodoc extension <http://sphinx.pocoo.org/ext/autodoc.html>`_.
 
 So the canonical docstring should look like:
 
@@ -63,7 +63,7 @@ For easy code re-use
 
 * ``import foo`` must never fails, unless there's a necessary module that could
   not be found. But do not catch the ImportError unless it is necessary, for
-  example to deal with optional dependencies, for instance::
+  instance to deal with optional dependencies ::
 
     import required_module
 
@@ -281,7 +281,7 @@ message.
 
 * Wording should look like::
 
-    Could not < descritiion for what went wrong >
+    Could not < description of what went wrong >
     <Detailed explanation>
     Please < suggestion of a solution >
 
@@ -390,7 +390,7 @@ to do something smart by default
 no choice but to ask)
 
 And when you ask, make sure the default action (pressing enter) will
-do the smart thing by default.
+do the smart thing.
 
 Most people will not pay attention to the questions, (and they do not
 have to), so make the default obvious.
