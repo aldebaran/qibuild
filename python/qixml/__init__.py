@@ -43,7 +43,7 @@ def raise_parse_error(message, xml_path=None, tree=None):
     mess += message
     raise Exception(mess)
 
-def parse_bool_attr(tree, name):
+def parse_bool_attr(tree, name, default=False):
     """ Parse a boolean attribute of an elelement
     Return True is the attribute exists and is
      "1" or "true".
@@ -53,15 +53,15 @@ def parse_bool_attr(tree, name):
 
     """
     res = tree.get(name)
-    if res is None:
-        return False
     if res in ["true", "1"]:
         return True
     if res in ["false", "0"]:
         return False
-    raise_parse_error("Expecting value in [true, false, 0, 1] "
-        "for attribute %s" % name,
-        tree=tree)
+    if res is not None:
+        raise_parse_error("Expecting value in [true, false, 0, 1] "
+            "for attribute %s" % name,
+            tree=tree)
+    return default
 
 def parse_list_attr(tree, name):
     """ Parse a list attribute
