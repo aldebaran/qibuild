@@ -8,13 +8,17 @@
 
 """
 
+import logging
 import subprocess
+
+LOGGER = logging.getLogger(__name__)
 
 def call(cmd, cwd=None, env=None, quiet=False):
     """ Execute a command, printing only the warnings
     and the errors
 
     """
+    LOGGER.debug(cmd)
     if not quiet:
         subprocess.check_call(cmd, cwd=cwd, env=env)
         return
