@@ -18,7 +18,7 @@ def configure_parser(parser):
     qibuild.parsers.worktree_parser(parser)
     parser.add_argument("--no-review", action="store_false", dest="review",
         help="Do not go through code review")
-    parser.add_argument("--dry-run", action="store_true", dest="dry_run",
+    parser.add_argument("-n", "--dry-run", action="store_true", dest="dry_run",
         help="Dry run")
     parser.set_defaults(review=True, dry_run=False)
 
