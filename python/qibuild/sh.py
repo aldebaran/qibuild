@@ -9,6 +9,7 @@
 
 import os
 import sys
+import contextlib
 import time
 import errno
 import stat
@@ -464,8 +465,17 @@ class TempDir:
                 return
         rm(self._temp_dir)
 
-
-
+@contextlib.contextmanager
+def change_cwd(directory):
+    """ Change the current working dir """
+    if not os.path.exists(directory):
+        mess  = "Cannot change working dir to '%s'\n" % directory
+        mess += "This path does not exist"
+        raise Exception(mess)
+    previous_cwd = os.getcwd()
+    os.chdir(directory)
+    yield
+    os.chdir(previous_cwd)
 
 def is_runtime(filename):
     """ Filter function to only install runtime components of packages
