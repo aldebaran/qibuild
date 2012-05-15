@@ -16,10 +16,10 @@ LOGGER = logging.getLogger(__name__)
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.worktree_parser(parser)
-    parser.add_argument("--interactive", action="store_true",
+    parser.add_argument("-i", "--interactive", action="store_true",
         help="start a wizard to help you configuring qibuild")
-    parser.add_argument("--force", action="store_true", help="force the init")
-    parser.add_argument("--config",
+    parser.add_argument("-f", "--force", action="store_true", help="force the init")
+    parser.add_argument("-c", "--config",
         help="Choose a default config for this worktree")
     parser.set_defaults(
         cmake_generator="Unix Makefiles")

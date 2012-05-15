@@ -18,7 +18,7 @@ def configure_parser(parser):
     parser.add_argument("-b", "--branch", dest="branch",
         help="Use this branch for the manifest and all the projects")
     parser.set_defaults(manifest_name="default", branch="master")
-    parser.add_argument("--force", dest="force", action="store_true",
+    parser.add_argument("-f", "--force", dest="force", action="store_true",
         help="By-pass some safety checks")
     parser.add_argument("--no-review", dest="setup_review", action="store_false",
         help="Do not setup code review")
