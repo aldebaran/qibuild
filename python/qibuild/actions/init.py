@@ -42,7 +42,7 @@ def do(args):
         worktree = os.getcwd()
 
     # Safe to be called: only creates the .qi/ repertory
-    qibuild.toc.create(worktree)
+    qibuild.toc.create(worktree, force=args.force)
 
     try:
         toc = qibuild.toc.toc_open(worktree)
@@ -59,21 +59,7 @@ def do(args):
 
     # Safe to be called now that we've created it
     # and that we know we don't have a wrong defaut config:
-        toc = qibuild.toc.toc_open(worktree)
-    except qibuild.toc.WrongDefaultException:
-        pass
-
-
-    toc_cfg_path = os.path.join(work_tree, ".qi", "qibuild.xml")
-    qibuild_cfg = qibuild.config.QiBuildConfig()
-    qibuild_cfg.read()
-    qibuild_cfg.read_local_config(toc_cfg_path)
-    qibuild_cfg.local.defaults.config = args.config
-    qibuild_cfg.write_local_config(toc_cfg_path)
-
-    # Safe to be called now that we've created it
-    # and that we know we don't have a wrong defaut config:
-    toc = qibuild.toc.toc_open(work_tree)
+    toc = qibuild.toc.toc_open(worktree)
 
     if not args.interactive:
         return

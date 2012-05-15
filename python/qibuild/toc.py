@@ -680,16 +680,11 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
     return toc
 
 
-def create(directory):
+def create(directory, force=False):
     """ Create a new toc worktree inside a work tree
 
     """
-    qisrc.worktree.create(directory)
-
-
-
-
-
+    qisrc.worktree.create(directory, force=force)
 
 def _advise_using_configure(self, project):
     """Just throw a nice exception because
