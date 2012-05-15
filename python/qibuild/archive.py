@@ -171,7 +171,8 @@ def extract_zip(archive_path, dest_dir):
     for zipinfo in directories:
         dirpath = os.path.join(dest_dir, zipinfo.filename)
         new_st = zipinfo.external_attr >> 16L
-        os.chmod(dirpath, new_st)
+        if not sys.platform.startswith("win"):
+            os.chmod(dirpath, new_st)
 
     archive.close()
     LOGGER.debug("%s extracted to %s", archive_path, dest_dir)
