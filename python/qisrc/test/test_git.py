@@ -62,19 +62,27 @@ def create_git_repo(tmp, path, with_release_branch=False):
     git.call("push", tmp_srv, "release-1.12:release-1.12")
     return tmp_srv
 
+def push_file(tmp, path, name, contents, branch="master"):
+    """ Push a file to the given url. Assumes the repository
+    has been created with create_git_repo with the same
+    path
+
+    """
+    tmp_src = os.path.join(tmp, "src", path)
+    tmp_srv = os.path.join(tmp, "srv", path + ".git")
+    git = qisrc.git.Git(tmp_src)
+    git.checkout("-f", branch)
+    with open(os.path.join(tmp_src, name), "w") as fp:
+        fp.write(contents)
+    git.add(name)
+    git.commit("-m", "added %s" % name)
+    git.push(tmp_srv, "%s:%s" % (branch, branch))
 
 def push_readme_v2(tmp, path, branch):
     """ Push version 2 of the readme to the git repo in the given branch
 
     """
-    tmp_src = os.path.join(tmp, "src", path)
-    tmp_srv = os.path.join(tmp, "srv", path)
-    git = qisrc.git.Git(tmp_src)
-    git.checkout("-f", branch)
-    write_readme(tmp_src, "%s v2 on %s\n" % (path, branch))
-    git.commit("-a", "-m", "README v2")
-    git.push(tmp_srv, "%s:%s" % (branch, branch))
-
+    push_file(tmp, path, "README", "%s v2 on %s\n" % (path, branch), branch=branch)
 
 
 class GitTestCase(unittest.TestCase):

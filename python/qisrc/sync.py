@@ -29,7 +29,8 @@ def fetch_manifest(worktree, manifest_git_url, branch="master", src="manifest/de
 
     :param manifest_git_url: A git repository containing a
         'manifest.xml' file, ala repo
-    :parm branch: The branch to use
+    :param branch: The branch to use
+    :param src: The path where to store the clone of the manifest
 
     Note: every changes made by the user directly in the manifest repo
     will be lost!
@@ -44,8 +45,12 @@ def fetch_manifest(worktree, manifest_git_url, branch="master", src="manifest/de
     git.checkout("-f", branch, quiet=True)
     git.fetch(quiet=True)
     git.reset("--hard", "origin/%s" % branch, quiet=True)
-    manifest_xml = os.path.join(manifest.path, "manifest.xml")
-    return manifest_xml
+    manifest_file = os.path.join(manifest.path, "manifest.xml")
+    if not os.path.exists(manifest_file):
+        mess  = "Could not find a file named manifest.xml"
+        mess += "in the repository: %s\n" % manifest_git_url
+        raise Exception(mess)
+    return manifest_file
 
 
 def sync_projects(worktree, manifest_location, setup_review=True, update_branch=True):
