@@ -11,7 +11,7 @@ What's new in qiBuild 1.14
 
 * Much better support of XCode and compilation on mac in general
 
-* Using ustream's CMake files for Qt and Boost.
+* Using upstream's CMake files for Qt and Boost.
 
 * Fixed performance issues when calling ``cmake ..`` (something you often
   do when using QtCreator, for instance) after the first `qibuild configure`.
