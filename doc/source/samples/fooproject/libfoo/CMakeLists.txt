@@ -8,7 +8,9 @@ qi_create_lib(foo
   SHARED
 )
 
-qi_use_lib(foo)
+
+# Add dependencies to the foo library here:
+# qi_use_lib(foo ... )
 
 qi_install_header(KEEP_RELATIVE_PATHS foo/foo.hpp)
 
