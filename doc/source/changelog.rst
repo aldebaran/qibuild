@@ -3,6 +3,61 @@
 Changelog
 =========
 
+
+1.16
+----
+
+
+Command line
++++++++++++++
+
+* Add a lot of short options ("-n" for "--dry-run", "-f" for "--force")
+* ``qibuild init``: add a ``--config`` argument to set the default config used by
+  the worktree
+* ``qidoc`` by-pass sphinx-build bug on mac
+* ``qidoc`` make it work on archlinux  (using sphinx-build2 by default)
+* Add ``qidoc open`` to view generated documentation in a web browser
+* ``qitoolchain list`` better error message when there is no toolchain
+* ``qidoc build`` improve argument parsing, smarter when no argument is given,
+  can build a doc project by passing its name
+* Add ``qisrc remove-project``
+* Add ``qisrc add-project`` : projects are no longer automatically added in the wortree.
+  (Should probably be merged with ``qisrc add``)
+* Add ``qisrc ls``: to list the projects paths
+* Add ``qicd`` (inspired by ``roscd``)
+* ``qisrc init`` can now be used with a git url (git@foo:manifest.git) (ala repo)
+* ``qisrc init`` : add ``-p,  --profile`` option to choose from several profiles  (different xml files in the git url)
+* ``qisrc init`` : add ``-b, --branch`` option to choose a branch in the manifest url
+* Add ``qsrc sync`` : configure local and remote branches, automatically setup code review
+* Add ``qisrc push`` : upload changes to code review
+* Remove ``qisrc fetch``, use ``qisrc init`` instead
+
+
+CMake
+++++++
+
+* qibuild cmake modules
+
+ * add modules for openssl, libevent_openssl
+
+Python
++++++++
+
+* :py:func:`qibuild.config.read` add ``create_if_missing`` option
+* ``install-qibuild.sh`` now installs ``qibuild`` scripts in ``~/.local/bin``
+* :py:meth:`qisrc.git.Git.call` fix using ``quiet=True`` with ``raises=False``
+* :py:meth:`qisrc.git.get_current_branch` : return None when in 'detached HEAD' state
+* Add :py:mod:`qixml` to help XML parsing, get rid of ``lxml`` dependency
+* :py:func:`qibuild.command.call` add ``quiet`` option
+
+Misc
++++++
+
+* Now using `tox <http://tox.readthedocs.org/en/latest/>` to run the tests on Jenkins,
+  get rid of ``run_tests.py``
+* Now using `py.test <http://pytest.org/latest/>` to write the automatic tests
+
+
 1.14
 ----
 
