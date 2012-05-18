@@ -1,0 +1,46 @@
+.. _qibuild-relnotes-1.12.1:
+
+What's new in qibuild 1.12.1
+-----------------------------
+
+CMake
++++++
+
+It is now much easier to port an existing CMake project to ``qibuild``
+
+Just use
+
+.. code-block:: cmake
+
+   project(myproject)
+   find_package(qibuild)
+
+
+(No need for the ``qibuild.cmake`` file everywhere)
+
+Configuration files
++++++++++++++++++++
+
+Every configuration file used by qiBuild is now in XML.
+
+``QI_WORK_TREE/.qi/qibuild.cfg`` is deprecated, use ``QI_WORK_TREE/.qi/qibuild.xml``
+and ``~/.config/qi/qibuild.xml`` instead.
+
+``<project>/qibuild.manifest`` is deprecated, use ``<project>/qiproject.xml>`` instead.
+
+Note that conversion is done by qiBuild on the fly, but the XML file are only written
+if they do not exist.
+
+
+qidoc
++++++
+
+* Add a new tool called ``qidoc``.
+
+``qidoc`` lets you build nice documentation by using sphinx and doxygen
+projects spread across several repositories, while keeping the
+global settings (stylesheets, templates, etc.) in on place
+
+.. warning:: qidoc is still a work in progress. It is used to build
+   Aldebaran documentation, but the tool itself is quite hard to use
+   for anything else right now

@@ -11,6 +11,8 @@
   design/index
   other_build_frameworks
   relnotes
+  changelog
+  news/1.12.1
 
 
 .. _qibuild-documentation:
