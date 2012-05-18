@@ -17,12 +17,14 @@ def configure_parser(parser):
         help="Name of the manifest. Useful if you have several manifests")
     parser.add_argument("-b", "--branch", dest="branch",
         help="Use this branch for the manifest and all the projects")
+    parser.add_argument("-p", "--profile", dest="profile",
+        help="Use the given profile. Assume <profile>.xml exists")
     parser.set_defaults(manifest_name="default", branch="master")
     parser.add_argument("-f", "--force", dest="force", action="store_true",
         help="By-pass some safety checks")
     parser.add_argument("--no-review", dest="setup_review", action="store_false",
         help="Do not setup code review")
-    parser.set_defaults(force=False, setup_review=True)
+    parser.set_defaults(force=False, setup_review=True, profile="default")
 
 def do(args):
     """Main entry point"""
@@ -38,8 +40,9 @@ def do(args):
     manifest_url = args.manifest_url
     branch = args.branch
     manifest = qisrc.sync.fetch_manifest(worktree,
-        manifest_url, branch=branch, src=manifest_src)
+        manifest_url, branch=branch, src=manifest_src,
+        profile=args.profile)
     qisrc.sync.sync_projects(worktree, manifest,
         update_branch=False,
         setup_review=args.setup_review)
-    worktree.set_manifest_project(manifest_src,)
+    worktree.set_manifest_project(manifest_src, args.profile)

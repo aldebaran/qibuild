@@ -38,7 +38,8 @@ def do(args):
     for manifest_project in manifest_projects:
         git = qisrc.git.Git(manifest_project.path)
         git.pull(quiet=True)
-        manifest_xml = os.path.join(manifest_project.path, "manifest.xml")
+        manifest_filename = manifest_project.profile + ".xml"
+        manifest_xml = os.path.join(manifest_project.path, manifest_filename)
         qisrc.sync.sync_projects(worktree, manifest_xml,
             update_branch=args.update_branch,
             setup_review=args.setup_review)

@@ -24,7 +24,9 @@ def indent(text, num):
     lines = [" " * num + l for l in lines]
     return "\n".join(lines)
 
-def fetch_manifest(worktree, manifest_git_url, branch="master", src="manifest/default"):
+def fetch_manifest(worktree, manifest_git_url, branch="master",
+    profile="default",
+    src="manifest/default"):
     """ Fetch the manifest for a worktree
 
     :param manifest_git_url: A git repository containing a
@@ -45,9 +47,10 @@ def fetch_manifest(worktree, manifest_git_url, branch="master", src="manifest/de
     git.checkout("-f", branch, quiet=True)
     git.fetch(quiet=True)
     git.reset("--hard", "origin/%s" % branch, quiet=True)
-    manifest_file = os.path.join(manifest.path, "manifest.xml")
+    filename = profile + ".xml"
+    manifest_file = os.path.join(manifest.path, filename)
     if not os.path.exists(manifest_file):
-        mess  = "Could not find a file named manifest.xml"
+        mess  = "Could not find a file named '%s' " % filename
         mess += "in the repository: %s\n" % manifest_git_url
         raise Exception(mess)
     return manifest_file

@@ -61,7 +61,7 @@ class WorkTree:
         """
         return [p for p in self.projects if p.manifest]
 
-    def set_manifest_project(self, src):
+    def set_manifest_project(self, src, profile="default"):
         """ Mark a project as being a manifest project
 
         """
@@ -71,6 +71,7 @@ class WorkTree:
         for project_elem in project_elems:
             if project_elem.get("src") == src:
                 project_elem.set("manifest", "true")
+                project_elem.set("profile", profile)
                 break
         self.dump()
         self.load()
@@ -316,10 +317,12 @@ class Project:
         self.git_project = None
         self.subprojects = list()
         self.manifest = False
+        self.profile = None
 
     def parse(self, xml_elem):
         self.src = qixml.parse_required_attr(xml_elem, "src")
         self.manifest = qixml.parse_bool_attr(xml_elem, "manifest")
+        self.profile = xml_elem.get("profile", "default")
 
     def parse_qiproject_xml(self):
         qiproject_xml = os.path.join(self.path, "qiproject.xml")
@@ -338,6 +341,8 @@ class Project:
             res.set("git_project", self.git_project)
         if self.manifest:
             res.set("manifest", "true")
+        if self.profile:
+            res.set("profile", self.profile)
         return res
 
     def __repr__(self):

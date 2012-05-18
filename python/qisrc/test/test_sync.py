@@ -11,7 +11,9 @@ import qisrc.sync
 import qisrc.git
 import qibuild.sh
 
-from qisrc.test.test_git import create_git_repo, read_readme
+from qisrc.test.test_git import create_git_repo
+from qisrc.test.test_git import read_readme
+from qisrc.test.test_git import push_file
 
 
 
@@ -70,9 +72,7 @@ class SyncTestCase(unittest.TestCase):
 
     def test_git_manifest_sync(self):
         create_git_repo(self.tmp, "qi/libqi")
-        manifest_url = create_git_repo(self.tmp, "manifest")
-        manifest_src = os.path.join(self.tmp, "src", "manifest")
-        manifest_xml = os.path.join(manifest_src, "manifest.xml")
+        manifest_url = create_git_repo(self.tmp, "manifest.git")
         xml = """
 <manifest>
     <remote name="origin"
@@ -85,12 +85,7 @@ class SyncTestCase(unittest.TestCase):
 </manifest>
 """
         xml = xml.format(tmp=self.tmp)
-        with open(manifest_xml, "w") as fp:
-            fp.write(xml)
-        git = qisrc.git.Git(manifest_src)
-        git.call("add", "manifest.xml")
-        git.call("commit", "-m", "added manifest.xml")
-        git.call("push", manifest_url, "master:master")
+        push_file(self.tmp, "manifest.git", "default.xml", xml)
         worktree = qisrc.worktree.create(self.tmp)
         fetched_manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
         with open(fetched_manifest, "r") as fp:
@@ -102,19 +97,14 @@ class SyncTestCase(unittest.TestCase):
         qisrc.sync.sync_projects(worktree, fetched_manifest)
 
     def test_git_manifest_sync_branch(self):
-        # FIXME: this code is very confusing.
-        # What we have here are two branches in the manifest repo:
+        # Two branches in the manifest repo:
         #  - master:  3 projects: naoqi, libnaoqi and doc
         #  - release-1.12: 2 projects: naoqi and doc, but doc stays with the
         #   'master' branch
-        manifest_url = create_git_repo(self.tmp, "manifest", with_release_branch=True)
+        manifest_url = create_git_repo(self.tmp, "manifest.git", with_release_branch=True)
         create_git_repo(self.tmp, "naoqi", with_release_branch=True)
         create_git_repo(self.tmp, "libnaoqi")
         create_git_repo(self.tmp, "doc")
-        manifest_src = os.path.join(self.tmp, "src", "manifest")
-        manifest_xml = os.path.join(manifest_src, "manifest.xml")
-        git = qisrc.git.Git(manifest_src)
-        git.checkout("-f", "master")
         xml = """
 <manifest>
     <remote name="origin" fetch="{tmp}/srv" />
@@ -124,12 +114,8 @@ class SyncTestCase(unittest.TestCase):
 </manifest>
 """
         xml = xml.format(tmp=self.tmp)
-        with open(manifest_xml, "w") as fp:
-            fp.write(xml)
-        git.call("add", "manifest.xml")
-        git.call("commit", "-m", "added manifest.xml")
-        git.call("push", manifest_url, "master:master")
-        git.checkout("release-1.12")
+        push_file(self.tmp, "manifest.git", "default.xml", xml)
+
         xml = """
 <manifest>
     <remote name="origin" fetch="{tmp}/srv" revision="release-1.12" />
@@ -138,11 +124,8 @@ class SyncTestCase(unittest.TestCase):
 </manifest>
 """
         xml = xml.format(tmp=self.tmp)
-        with open(manifest_xml, "w") as fp:
-            fp.write(xml)
-        git.call("add", "manifest.xml")
-        git.call("commit", "-m", "fixed manifest.xml for 1.12")
-        git.call("push", manifest_url, "release-1.12:release-1.12")
+        push_file(self.tmp, "manifest.git", "default.xml", xml, branch="release-1.12")
+
         master_root  = os.path.join(self.tmp, "work", "master")
         release_root = os.path.join(self.tmp, "work", "release-1.12")
         qibuild.sh.mkdir(master_root,  recursive=True)
@@ -177,13 +160,7 @@ class SyncTestCase(unittest.TestCase):
     <remote fetch="git@foo" name="origin" revision="release-1.12" />
 </manifest>
 """
-        manifest_xml = os.path.join(manifest_src, "manifest.xml")
-        with open(manifest_xml, "w") as fp:
-            fp.write(xml)
-        git = qisrc.git.Git(manifest_src)
-        git.add("manifest.xml")
-        git.commit("-m", "add manifest.xml")
-        git.push(manifest_url, "release-1.12:release-1.12")
+        push_file(self.tmp, "manifest", "default.xml", xml, branch="release-1.12")
         worktree = qisrc.worktree.create(self.tmp)
         qisrc.sync.clone_project(worktree, manifest_url)
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url, branch="release-1.12")
