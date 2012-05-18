@@ -30,6 +30,8 @@ class QiDocBuilder:
         self.worktree = qisrc.worktree.open_worktree(in_dir)
         self.in_dir = in_dir
         self.out_dir = out_dir
+        # Set during configure_all()
+        self.opts = dict()
 
         self.templates_path = None
         self.sphinxdocs = dict()
@@ -92,6 +94,7 @@ class QiDocBuilder:
         if not version:
             raise Exception("opts dict must at least contain a 'version' key")
 
+        self.opts = opts.copy()
         qibuild.sh.mkdir(self.doxytags_path, recursive=True)
         doxylink = dict()
 
@@ -185,7 +188,8 @@ class QiDocBuilder:
         """
         deps_tree = self.deps_tree["doxygen"]
         doc_names = topological_sort(deps_tree, self.doxydocs.keys())
-        return [self.get_doc("doxygen", d) for d in doc_names]
+        res = [self.get_doc("doxygen", d) for d in doc_names]
+        return res
 
     def sort_sphinx(self):
         """ Get a list of sphinx docs to build, in the
@@ -194,7 +198,8 @@ class QiDocBuilder:
         """
         deps_tree = self.deps_tree["sphinx"]
         doc_names = topological_sort(deps_tree, self.sphinxdocs.keys())
-        return [self.get_doc("sphinx", d) for d in doc_names]
+        res = [self.get_doc("sphinx", d) for d in doc_names]
+        return res
 
     def get_intersphinx_mapping(self, name):
         """ Get the relevant intersphinx_mapping for

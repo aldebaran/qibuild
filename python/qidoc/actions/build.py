@@ -25,12 +25,17 @@ def configure_parser(parser):
     parser.add_argument("--version")
     parser.add_argument("name", nargs="?",
         help="project to build")
+    parser.add_argument("--release", dest="release",
+        action="store_true",
+        help="build in release mode")
+    parser.add_argument("-D", dest="flags",
+        action="append",
+        help="Add some sphinx compile flags")
     parser.add_argument("-o", "--output-dir", dest="output_dir",
         help="Where to generate the docs")
     parser.add_argument("--all",  dest="all", action="store_true",
         help="Force building of every project")
-    parser.set_defaults(all=False)
-
+    parser.set_defaults(all=False, release=False)
 
 
 def do(args):
@@ -59,6 +64,15 @@ def do(args):
         opts["quiet"] = True
     if args.werror:
         opts["werror"] = True
+
+    opts["release"] = args.release
+
+    flags = args.flags or list()
+    if args.release:
+        flags.insert(0, "build_type=release")
+
+    opts["flags"] = flags
+
     if args.name:
         builder.build_single(args.name, opts)
         return

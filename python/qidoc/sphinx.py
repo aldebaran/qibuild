@@ -99,11 +99,17 @@ def build(src, dest, opts):
         cmd.append("-W")
     if opts.get("quiet"):
         cmd.append("-q")
+    for flag in opts.get("flags", list()):
+        cmd.extend(["-D", flag])
+    cmd.extend([os.path.join(src, "source"), dest])
+
+    env = os.environ.copy()
+    release = opts.get("release", False)
+    if release:
+        env["build_type"] = "release"
+    else:
+        env["build_type"] = "internal"
     # by-pass sphinx-build bug on mac:
     if sys.platform == "darwin":
-        env = os.environ.copy()
         env["LC_ALL"] = "en_US.UTF-8"
-    else:
-        env = None
-    cmd.extend([os.path.join(src, "source"), dest])
     qidoc.command.call(cmd, cwd=src, env=env)
