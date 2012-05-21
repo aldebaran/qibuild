@@ -41,7 +41,7 @@ to disable the check, using the pylint error code:
 
 .. code-block:: python
 
-    # pylint: disable-mgs=E1101
+    # pylint: disable-msg=E1101
 
 Running test suite
 ------------------

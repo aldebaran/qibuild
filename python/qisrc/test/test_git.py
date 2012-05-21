@@ -382,7 +382,7 @@ class GitUpdateBranchTestCase(unittest.TestCase):
 def test_git_get_local_branches(tmpdir):
     tmpdir = tmpdir.strpath
     git = qisrc.git.Git(tmpdir)
-    # pylint: disable-msg=E1011
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception):
         git.get_local_branches()
     write_readme(tmpdir, "readme\n")
