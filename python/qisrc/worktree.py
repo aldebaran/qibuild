@@ -93,23 +93,38 @@ class WorkTree:
         """
         projects_elem = self.xml_tree.findall("project")
         for project_elem in projects_elem:
-            is_git = False
             project = Project()
             project.parse(project_elem)
             self.set_path(project)
             project.parse_qiproject_xml()
             self.projects.append(project)
-            if os.path.exists(os.path.join(project.path, ".git")):
-                is_git = True
-                self.git_projects.append(project)
-                project.git_project = project
-            for sub_project_src in project.subprojects:
-                sub_project = Project()
-                sub_project.src = os.path.join(project.src, sub_project_src)
-                self.set_path(sub_project)
-                if is_git:
-                    sub_project.git_project = project
-                self.projects.append(sub_project)
+
+        # Now parse the subprojects
+        res = self.projects[:]
+        for project in self.projects:
+            self._rec_parse_sub_projects(project, res)
+        self.projects = res[:]
+
+
+    def _rec_parse_sub_projects(self, project, res):
+        """ Recursively parse every project and subproject,
+        filling up the res list
+
+        """
+        is_git = False
+        if os.path.exists(os.path.join(project.path, ".git")):
+            is_git = True
+            self.git_projects.append(project)
+            project.git_project = project
+        for sub_project_src in project.subprojects:
+            sub_project = Project()
+            sub_project.src = os.path.join(project.src, sub_project_src)
+            self.set_path(sub_project)
+            sub_project.parse_qiproject_xml()
+            if is_git:
+                sub_project.git_project = project
+            res.append(sub_project)
+            self._rec_parse_sub_projects(sub_project, res)
 
     def set_path(self, project):
         """ Set the path attribute of a project

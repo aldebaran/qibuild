@@ -226,5 +226,39 @@ class WorktreeTestCase(unittest.TestCase):
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
 
+
+def test_nested_qiprojects(tmpdir):
+    a_project = tmpdir.mkdir("a")
+    worktree_xml = tmpdir.mkdir(".qi").join("worktree.xml")
+    worktree_xml.write("""
+<worktree>
+    <project src="a" />
+</worktree>
+""")
+
+    a_xml = a_project.join("qiproject.xml")
+    a_xml.write("""
+<project name="a">
+    <project src="b" />
+</project>
+""")
+
+    b_project = a_project.mkdir("b")
+    b_xml = b_project.join("qiproject.xml")
+    b_xml.write("""
+<project name="b">
+    <project src="c" />
+</project>
+""")
+
+    c_project = b_project.mkdir("c")
+    c_xml = c_project.join("qiproject.xml")
+    c_xml.write('<project name="c" />\n')
+
+    worktree = qisrc.worktree.open_worktree(tmpdir.strpath)
+    assert len(worktree.projects) == 3
+
+
+
 if __name__ == "__main__":
     unittest.main()
