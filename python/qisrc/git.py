@@ -143,6 +143,21 @@ class Git:
         """ Wrapper for git remote """
         return self.call("remote", *args, **kwargs)
 
+
+    def get_local_branches(self):
+        """ Get the list of the local branches in a dict
+        master -> tracking branch
+
+        """
+        (status, out) = self.call("branch", raises=False)
+        if status != 0:
+            mess  = "Could not get the list of local branches\n"
+            mess += "Error was: %s" % out
+            raise Exception(mess)
+        lines = out.splitlines()
+        # Remove the star and the indentation:
+        return [x[2:] for x in lines]
+
     def is_valid(self):
         """ Check if the worktree is a valid git tree
         """
@@ -181,18 +196,24 @@ class Git:
 
     def set_tracking_branch(self, branch, remote_name, remote_branch=None):
         """
-        If tracks is given, make sure it tracks the given remote,
-        defaulting with a remote branch with the same name,
-        so that `git pull` works afterwards
-        If the worktree is not clean, dont' do it, but
-        return the git error message.
+        Create a or update the configuration of a branch to track
+        a given remote branch
+
+        :param branch: the branch to be created, or to set configuration for
+        :param remote_name: the name of the remove ('origin' in most cases)
+        :param remote_branch: the name of the remote to track. If not given
+            will be the same of the branch name
 
         """
         if remote_branch is None:
             remote_branch = branch
-        # Just in case the branch just has been created
+        # Fetch just in case the branch just has been created
         self.call("fetch", remote_name, quiet=True)
-        self.call("branch", branch, quiet=True, raises=False)
+
+        # If the branch does not exist yet, create it at the right commit
+        if not branch in self.get_local_branches():
+            self.call("branch", branch, "%s/%s" % (remote_name, remote_branch),
+                quiet=True)
         self.call("branch",
             "--set-upstream", branch, "%s/%s" % (remote_name, remote_branch),
              quiet=True)

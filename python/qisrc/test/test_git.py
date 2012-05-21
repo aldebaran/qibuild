@@ -5,6 +5,7 @@
 import os
 import tempfile
 import unittest
+import pytest
 
 import qisrc.git
 import qibuild.sh
@@ -71,7 +72,10 @@ def push_file(tmp, path, name, contents, branch="master"):
     tmp_src = os.path.join(tmp, "src", path)
     tmp_srv = os.path.join(tmp, "srv", path + ".git")
     git = qisrc.git.Git(tmp_src)
-    git.checkout("-f", branch)
+    if branch in git.get_local_branches():
+        git.checkout("-f", branch)
+    else:
+        git.checkout("-b", branch)
     with open(os.path.join(tmp_src, name), "w") as fp:
         fp.write(contents)
     git.add(name)
@@ -375,20 +379,41 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         self.assertTrue("Merge is not fast-forward" in err)
 
 
-    def test_set_tracking_banch_newly_created(self):
-        bar_url = create_git_repo(self.tmp, "bar")
-        work = os.path.join(self.tmp, "work")
-        bar_src = os.path.join(work, "bar")
-        git = qisrc.git.Git(bar_src)
-        git.clone(bar_url)
+def test_git_get_local_branches(tmpdir):
+    tmpdir = tmpdir.strpath
+    git = qisrc.git.Git(tmpdir)
+    # pylint: disable-msg=E1011
+    with pytest.raises(Exception):
+        git.get_local_branches()
+    write_readme(tmpdir, "readme\n")
+    git.call("init")
+    git.call("add", ".")
+    git.commit("-m", "initial commit")
+    assert git.get_local_branches() == ["master"]
+    git.checkout("-b", "devel")
+    assert git.get_local_branches() == ["devel", "master"]
 
-        upstream_bar = os.path.join(self.tmp, "src", "bar")
-        upstream_git = qisrc.git.Git(upstream_bar)
-        upstream_git.checkout("-b", "release")
-        upstream_git.push(bar_url, "release:release")
 
-        git.set_tracking_branch("release", "origin")
+def test_set_tracking_branch(tmpdir):
+    tmpdir = tmpdir.strpath
+    bar_url = create_git_repo(tmpdir, "bar")
+    work = os.path.join(tmpdir, "work")
+    bar_src = os.path.join(work, "bar")
+    git = qisrc.git.Git(bar_src)
+    git.clone(bar_url)
 
+    push_file(tmpdir, "bar", "README", "README on release",  branch="release")
+    push_file(tmpdir, "bar", "README", "README on master", branch="master")
+    git.update_branch("master", "origin")
+
+    git.set_tracking_branch("release", "origin")
+    err = git.update_branch("release", "origin")
+    assert err is None
+
+    # Thos should work out of the box
+    git.pull()
+    git.checkout("release")
+    git.pull()
 
 
 if __name__ == "__main__":
