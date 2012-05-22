@@ -181,7 +181,7 @@ class Toolchain:
             res += "\n"
         return res
 
-    def remove(self):
+    def remove(self, force_remove=False):
         """ Remove a toolchain
 
         Clean cache, remove all packages, remove self from configurations
@@ -197,7 +197,19 @@ class Toolchain:
 
         cfg_path = self._get_config_path()
         qibuild.sh.rm(cfg_path)
-
+        if force_remove:
+            # With the current design and implementation of qitoolchain, all
+            # packages are stored in the following 'tc_path'.
+            #
+            # This is due to the fact that 'qitoolchain add-package' currently
+            # only accept tarballs as input which is extracted under:
+            # <tc_path>/<package-name>
+            #
+            # So, recursively removing 'tc_path' is currently enough to
+            # ensure that the whole toolchain, including locally added packages,
+            # is removed.
+            tc_path = qitoolchain.toolchain.get_default_packages_path(self.name)
+            qibuild.sh.rm(tc_path)
 
     def _get_config_path(self):
         """ Returns path to self configuration file
