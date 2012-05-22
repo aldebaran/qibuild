@@ -36,6 +36,34 @@ to run the tests, so not all features of ``set_test_properties`` are handled ...
 Also, ``qibuild test`` is optimized to be used with `Jenkins <http://jenkins-ci.org/>`_,
 **not** with upstream's ``CDash``.
 
+Caveats
++++++++
+
+If you are using ``add_test()`` directly, make sure
+the second argument is **the full path** of the tests you are building
+
+.. code-block:: cmake
+
+     # Bad : `qibuild test` won't know where ``test_foo`` is:
+     add_executable(test_foo test_foo.cpp)
+     add_test(test_foo test_foo)
+
+     # OK: we set the RUNTIME_OUTPUT_PROPERTIES and use it:
+     set(_out "${CMAKE_CURRENT_BINARY_DIR}")
+     add_executable(${name}  ${${name}_SRC})
+     set_target_properties("${name}" PROPERTIES
+         RUNTIME_OUTPUT_DIRECTORY         "${_out}"
+     )
+     add_test(${name} "${_out}/${name}")
+
+     # OK: does the same as above but with just one line ;)
+     qi_create_test(test_foo test_foo.cpp)
+
+
+You should always call ``enable_testing()`` for ``qibuild test`` to work.
+If you don't want to build any test, you should set ``BUILD_TESTS=OFF``.
+
+
 qibuild test features
 ~~~~~~~~~~~~~~~~~~~~~
 
