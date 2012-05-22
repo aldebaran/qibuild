@@ -72,7 +72,7 @@ Note: some tests are slow to run, you can mark them with
 
   @pytest.mark.slow
   def test_slow_command(self):
-    # something long going on here ...
+      # something long going on here ...
 
 And then run the tests with
 
@@ -80,3 +80,57 @@ And then run the tests with
 
     cd python/
     py.test -k -slow
+
+
+Running only some tests
++++++++++++++++++++++++
+
+You can use ``py.test`` (or ``py.test2``) with
+
+  * Just for a given python package:
+
+  .. code-block:: console
+
+      cd python
+      py.test qisrc
+
+  * Just for a given test file:
+
+  .. code-block:: console
+
+     py.test qisrc/test/test_git.py
+
+  * Just for a given test name:
+
+  .. code-block:: console
+
+     py.test qisrc/test/test_git.py -k set_tracking_branch
+
+Note about ipdb
+++++++++++++++++
+
+
+If you are using ``ipdb`` to insert break points in the code like this:
+
+.. code-block:: python
+
+    # in foo.py
+    def test_my_complicated_function():
+        import ipdb; ipdb.set_trace()
+
+
+You will get an error message like this if you run
+
+.. code-block:: console
+
+  $ py.test foo.py
+  ValueError: fallback required, but not specified
+
+(This may be a bug in ``ipdb``, ``py.test`` or both ...)
+
+The solution is to use the ``-s`` option of py.test:
+
+
+.. code-block:: console
+
+  $ py.test foo.py -s
