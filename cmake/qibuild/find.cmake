@@ -64,9 +64,9 @@
 #
 # So this variable can be used directly in the ``target_link_libraries()`` call
 #
-# .. seealso:
-#  :ref:`writing-a-config-cmake` section for a detailed tutorial on how to write a ``-config.cmake`` file.
+# .. seealso::
 #
+#  * :ref:`writing-a-config-cmake`
 if (_QI_LIBFIND_CMAKE_)
   return()
 endif()
