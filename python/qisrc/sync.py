@@ -67,7 +67,7 @@ def sync_projects(worktree, manifest_location, setup_review=True, update_branch=
 
     """
     errors = list()
-    manifest = qisrc.manifest.Manifest(manifest_location)
+    manifest = qisrc.manifest.load(manifest_location)
     if not manifest.projects:
         return
     project_count = len(manifest.projects)

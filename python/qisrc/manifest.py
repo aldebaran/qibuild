@@ -2,10 +2,11 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Set of tools to qibuild manifests
+""" Set of tools to parse qisrc manifests
 
 """
 
+import os
 import posixpath
 
 import qibuild.sh
@@ -23,43 +24,102 @@ def git_url_join(remote, name):
         return remote + ":" + name
     return posixpath.join(remote, name)
 
-class Manifest():
-    def __init__(self, xml_path):
-        # Used to check that we do not defined two projects
-        # with the same path
-        self._paths = dict()
-        self.tree = qixml.read(xml_path)
-        self.projects = list()
-        self.remotes = list()
-        self.parse_remotes()
-        self.parse_projects()
+def load(manifest_xml):
+    """ Load a manifest XML file
 
-    def parse_remotes(self):
-        remote_elems = self.tree.findall("remote")
+    """
+    manifest = Manifest()
+    manifest.parse(manifest_xml)
+    res = manifest
+    merge_projects(manifest)
+    return res
+
+
+def merge_projects(manifest):
+    """ Merge recursively the projects coming from the sub manifests,
+    filtering out what is inside the blacklist
+
+    """
+    for sub_manifest in manifest.sub_manifests:
+        merge_projects(sub_manifest)
+        for sub_project in sub_manifest.projects:
+            if sub_project.name in manifest.blacklist:
+                continue
+            manifest.projects.append(sub_project)
+
+class Manifest():
+    """ A class to represent the contents of a manifest XML
+    file.
+
+    Do not use directly, use load() instead, this class
+    won't be fully initialized until merge_projects() has
+    been called
+
+    """
+    def __init__(self):
+        self.remotes = dict()
+        self.projects = list()
+        self.blacklist = list()
+        self.sub_manifests = list()
+        self.xml_path = None
+
+        # Used to track conflicts
+        self._paths = dict()
+
+    def parse(self, xml_path):
+        """ Recursive function. This is also called on each
+        sub manifest, so that self.sub_manifests contains
+        fully initialized Manifest() objects when this function
+        returns
+
+        """
+        self.xml_path = xml_path
+        tree = qixml.read(xml_path)
+        remote_elems = tree.findall("remote")
         for remote_elem in remote_elems:
             remote = Remote()
             remote.parse(remote_elem)
-            self.remotes.append(remote)
-
-    def get_remote(self, name="origin"):
-        matches = [r for r in self.remotes if r.name == name]
-        if matches:
-            return matches[0]
-        return None
+            self.remotes[remote.name] = remote
+        project_elems = tree.findall("project")
+        for project_elem in project_elems:
+            project = Project()
+            project.parse(project_elem)
+            self.projects.append(project)
+        blacklist_elems = tree.findall("blacklist")
+        for blacklist_elem in blacklist_elems:
+            name = blacklist_elem.get("name")
+            if name:
+                self.blacklist.append(name)
+        manifest_elems = tree.findall("manifest")
+        for manifest_elem in manifest_elems:
+            manifest_url = manifest_elem.get("url")
+            if manifest_url:
+                dirname = os.path.dirname(xml_path)
+                sub_manifest_xml = os.path.join(dirname, manifest_url)
+                sub_manifest = Manifest()
+                sub_manifest.xml_path = sub_manifest_xml
+                sub_manifest.parse(sub_manifest.xml_path)
+                self.sub_manifests.append(sub_manifest)
+        self.update_projects()
 
     def get_project(self, name):
+        """ Get a project given its name.
+
+        Mainly used by tests
+        """
         matches = [p for p in self.projects if p.name == name]
         if matches:
             return matches[0]
         return None
 
-    def parse_projects(self):
-        project_elems = self.tree.findall("project")
-        for project_elem in project_elems:
-            project = Project()
-            project.parse(project_elem)
+    def update_projects(self):
+        """ Update the project list, setting project.revision,
+        project.fetch_url and so on, using the already parsed remotes
+
+        """
+        for project in self.projects:
             p_remote = project.remote
-            remote = self.get_remote(p_remote)
+            remote = self.remotes.get(p_remote)
             if not remote:
                 continue
             if not project.revision:
@@ -73,10 +133,18 @@ class Manifest():
                 mess += "%s and %s" % (project.name, conflicting_name)
                 raise Exception(mess)
             self._paths[project.path] = project.name
-            self.projects.append(project)
 
+    def __repr__(self):
+        res = "<Manifest from %s\n" % self.xml_path
+        res += "   remotes: %s\n" % self.remotes
+        res += "   projects: %s\n" % self.projects
+        return res
 
 class Project:
+    """ Wrapper for the <project> tag inside a manifest
+    XML file
+
+    """
     def __init__(self):
         self.name = None
         self.path = None
@@ -102,8 +170,17 @@ class Project:
         if not self.remote:
             self.remote = "origin"
 
+    def __repr__(self):
+        res = "<Project %s remote: %s fetch: %s review:%s>" % \
+            (self.name, self.remote, self.fetch_url, self.review_url)
+        return res
+
 
 class Remote:
+    """ Wrapper for the <remote> tag inside a manifest
+    XML file
+
+    """
     def __init__(self):
         self.name = None
         self.fetch = None
@@ -119,3 +196,8 @@ class Remote:
         self.revision = xml_element.get("revision")
         if not self.revision:
             self.revision = "master"
+
+    def __repr__(self):
+        res = "<Remote %s fetch: %s on %s, review:%s>" % \
+            (self.name, self.fetch, self.revision, self.review)
+        return res

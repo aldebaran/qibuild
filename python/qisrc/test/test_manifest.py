@@ -7,8 +7,6 @@ from StringIO import StringIO
 
 import qisrc.manifest
 
-
-
 class ManifestTestCase(unittest.TestCase):
 
     def test_parse(self):
@@ -21,7 +19,7 @@ class ManifestTestCase(unittest.TestCase):
 </manifest>
 """
         xml_in = StringIO(xml)
-        manifest = qisrc.manifest.Manifest(xml_in)
+        manifest = qisrc.manifest.load(xml_in)
         self.assertEquals(len(manifest.projects), 0)
 
     def test_simple_parse(self):
@@ -37,7 +35,7 @@ class ManifestTestCase(unittest.TestCase):
 </manifest>
 """
         xml_in = StringIO(xml)
-        manifest = qisrc.manifest.Manifest(xml_in)
+        manifest = qisrc.manifest.load(xml_in)
         self.assertEquals(len(manifest.projects), 1)
         libqi = manifest.projects[0]
         self.assertEquals(libqi.fetch_url, "git@git.aldebaran.lan:qi/libqi.git")
@@ -54,7 +52,7 @@ class ManifestTestCase(unittest.TestCase):
         xml_in = StringIO(xml)
         error = None
         try:
-            manifest = qisrc.manifest.Manifest(xml_in)
+            manifest = qisrc.manifest.load(xml_in)
         except Exception, e:
             error = e
         self.assertFalse(error is None)
@@ -76,7 +74,7 @@ class ManifestTestCase(unittest.TestCase):
 </manifest>
 """
         xml_in = StringIO(xml)
-        manifest = qisrc.manifest.Manifest(xml_in)
+        manifest = qisrc.manifest.load(xml_in)
         ssh_bar = manifest.get_project("ssh-bar.git")
         self.assertEquals(ssh_bar.fetch_url, "git@foo:ssh-bar.git")
 
@@ -99,7 +97,7 @@ class ManifestTestCase(unittest.TestCase):
 </manifest>
 """
         xml_in = StringIO(xml)
-        manifest = qisrc.manifest.Manifest(xml_in)
+        manifest = qisrc.manifest.load(xml_in)
         foo = manifest.get_project("foo")
         self.assertEqual(foo.review, True)
         self.assertEqual(foo.review_url, "http://gerrit/foo")
@@ -114,7 +112,7 @@ class ManifestTestCase(unittest.TestCase):
         xml_in = StringIO(xml)
         error = None
         try:
-            manifest = qisrc.manifest.Manifest(xml_in)
+            manifest = qisrc.manifest.load(xml_in)
         except Exception, e:
             error = e
         self.assertFalse(error is None)
@@ -130,7 +128,7 @@ class ManifestTestCase(unittest.TestCase):
         xml_in = StringIO(xml)
         error = None
         try:
-            manifest = qisrc.manifest.Manifest(xml_in)
+            manifest = qisrc.manifest.load(xml_in)
         except Exception, e:
             error = e
         self.assertFalse(error is None)
@@ -144,9 +142,110 @@ class ManifestTestCase(unittest.TestCase):
 </manifest>
 """
         xml_in = StringIO(xml)
-        manifest = qisrc.manifest.Manifest(xml_in)
+        manifest = qisrc.manifest.load(xml_in)
         project = manifest.get_project("bar/foo.git")
         self.assertEqual(project.path, "bar/foo")
+
+
+
+
+def test_parse_other_remote(tmpdir):
+    all_xml = """
+<manifest>
+  <remote fetch="ssh://git@all"
+          review="http://gerrit" />
+  <project name="a" review="true" />
+  <project name="b" />
+  <project name="private" />
+
+</manifest>
+"""
+
+    other_xml = """
+<manifest>
+  <remote fetch="ssh://git@other" />
+  <manifest url="all.xml" />
+  <project name="c" />
+</manifest>
+"""
+
+    all_manifest = tmpdir.join("all.xml")
+    all_manifest.write(all_xml)
+    other_manifest = tmpdir.join("other.xml")
+    other_manifest.write(other_xml)
+
+    all = qisrc.manifest.load(all_manifest.strpath)
+    assert len(all.projects) == 3
+
+    other = qisrc.manifest.load(other_manifest.strpath)
+    assert len(other.projects) == 4
+    c = other.get_project("c")
+    assert c.fetch_url == "ssh://git@other/c"
+    a = other.get_project("a")
+    assert a.fetch_url == "ssh://git@all/a"
+
+def test_parse_blacklist(tmpdir):
+    all_xml = """
+<manifest>
+  <remote fetch="ssh://git@all"
+          review="http://gerrit" />
+  <project name="a" review="true" />
+  <project name="b" />
+  <project name="private" />
+
+</manifest>
+"""
+
+    public_xml = """
+<manifest>
+  <manifest url="all.xml" />
+  <blacklist name="private" />
+</manifest>
+"""
+
+    all_manifest = tmpdir.join("all.xml")
+    all_manifest.write(all_xml)
+    public_manifest = tmpdir.join("public.xml")
+    public_manifest.write(public_xml)
+
+    all = qisrc.manifest.load(all_manifest.strpath)
+    assert len(all.projects) == 3
+
+    public = qisrc.manifest.load(public_manifest.strpath)
+    assert len(public.projects) == 2
+
+
+def test_parse_deep_recurse(tmpdir):
+    a_xml = tmpdir.join("a.xml")
+    a_xml.write("""
+<manifest>
+  <remote fetch="ssh://git@all" />
+  <project name="a" />
+  <manifest url="b.xml" />
+</manifest>
+""")
+
+    b_xml = tmpdir.join("b.xml")
+    b_xml.write("""
+<manifest>
+  <remote fetch="ssh://git@all" />
+  <project name="b" />
+  <manifest url="c.xml" />
+</manifest>
+""")
+
+
+    c_xml = tmpdir.join("c.xml")
+    c_xml.write("""
+<manifest>
+  <remote fetch="ssh://git@all" />
+  <project name="c" />
+</manifest>
+""")
+
+    a_manifest = qisrc.manifest.load(a_xml.strpath)
+
+    assert len(a_manifest.projects) == 3
 
 
 
