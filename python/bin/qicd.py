@@ -29,20 +29,24 @@ patch_sys_path()
 import qisrc
 
 def main():
-    if len(sys.argv) < 2:
-        sys.stderr.write("Wrong number of arguments\n")
-        sys.exit(2)
     try:
         worktree = qisrc.worktree.open_worktree()
     except Exception:
         sys.stderr.write("Not in a worktree")
         sys.exit(2)
+    if len(sys.argv) < 2:
+        sys.stdout.write(worktree.root + "\n")
+        sys.exit(0)
     token = sys.argv[1]
     for project in worktree.projects:
         match = re.search("^(.*?/)?%s" % token, project.src)
         if match:
             sys.stdout.write(project.path + "\n")
             sys.exit(0)
+    # no match
+    sys.stderr.write("no match for %s\n" % token)
+    sys.stdout.write(worktree.root + "\n")
+    sys.exit(0)
 
 
 if __name__ == "__main__":
