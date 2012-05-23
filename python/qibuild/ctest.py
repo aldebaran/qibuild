@@ -54,7 +54,8 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
 
     """
     timeout = properties.get("TIMEOUT")
-    timeout = int(timeout)
+    if timeout:
+        timeout = int(timeout)
     # we will merge the build env coming from toc
     # config with the env coming from CMake config,
     # assuming that cmake is always right
@@ -128,9 +129,8 @@ def run_tests(project, build_env, test_name=None):
     results_dir = os.path.join(project.directory, "build-tests",
         "results")
 
-    all_tests = list()
+    all_tests = parse_ctest_test_files(build_dir)
     tests = list()
-    parse_ctest_test_files(all_tests, build_dir, list())
     if test_name:
         tests = [x for x in all_tests if x[0] == test_name]
         if not tests:
@@ -206,10 +206,21 @@ def write_xml(xml_out, test_res):
     with open(xml_out, "w") as fp:
         fp.write(to_write)
 
-def parse_ctest_test_files(tests, root, subdirs):
-    """ Recursively parse CTestTestfile.cmake,
-    filling up the tests and subdirs lists passed as first
-    argument
+
+def parse_ctest_test_files(build_dir):
+    """ Recursively parse CTestTestfile.cmake.
+    Returns a list of lists of 3 elements:
+        [name, cmd, properties]
+
+    """
+    tests = list()
+    subdirs = list()
+    _parse_ctest_test_files(build_dir, tests, subdirs)
+    return tests
+
+def _parse_ctest_test_files(root, tests, subdirs):
+    """ Helper for parse_ctest_test_files.
+    We will fill up the tests and subdirs parameters as we go.
 
     """
     ctest_test_file = os.path.join(root, "CTestTestfile.cmake")
@@ -217,27 +228,35 @@ def parse_ctest_test_files(tests, root, subdirs):
         return list()
     with open(ctest_test_file, "r") as fp:
         lines = fp.readlines()
-    cur_test = None
-    cur_cmd = None
-    for line in lines:
+
+    current_test = None
+    for i, line in enumerate(lines):
         match = re.match("SUBDIRS\((.*)\)", line)
         if match:
             subdir = match.groups()[0]
             subdirs.append(subdir)
-        match = re.match("ADD_TEST\((\w+) (.*)\)", line)
+            current_test = None
+            continue
+        match = re.match("ADD_TEST\(([a-zA-Z0-9_-]*) (.*)\)", line)
         if match:
             groups = match.groups()
-            cur_test = groups[0]
+            current_test = groups[0]
             args = groups[1]
-            cur_cmd = shlex.split(args)
-        match = re.match("SET_TESTS_PROPERTIES\((\w+) PROPERTIES (.*)\)", line)
+            test_cmd = shlex.split(args)
+            tests.append([current_test, test_cmd, dict()])
+            continue
+        match = re.match("SET_TESTS_PROPERTIES\(([a-zA-Z0-9_-]*) PROPERTIES (.*)\)", line)
         if match:
             groups = match.groups()
-            test_name = groups[0]
-            if test_name != cur_test:
-                mess  = "Could not parse %s\n", ctest_test_file
-                mess += "ADD_TEST was called with '%s'\n" % cur_test
-                mess +="but SET_TESTS_PROPERTIES was called with '%s'\n" % test_name
+            if current_test is None:
+                mess  = "Expecting ADD_TEST before SET_TESTS_PROPERTIES\n"
+                mess += "in %s:%i" % (ctest_test_file, i+1)
+                raise Exception(mess)
+            name = groups[0]
+            if name != current_test:
+                mess  = "SET_TESTS_PROPERTIES called with wrong name\n"
+                mess += "Expecting %s, got %s\n" % (current_test, name)
+                mess += "in %s:%i" % (ctest_test_file, i+1)
                 raise Exception(mess)
             properties = groups[1]
             properties = shlex.split(properties)
@@ -246,47 +265,10 @@ def parse_ctest_test_files(tests, root, subdirs):
                 key = properties[2*i]
                 value = properties[2*i+1]
                 test_properties[key] = value
-            tests.append((cur_test, cur_cmd, test_properties))
-            cur_cmd = None
-            cur_test = None
+            # Just erase everything if there are two calls to set_test_properties()
+            tests[-1][2] = test_properties
+            current_test = None
 
     for subdir in subdirs:
         new_root = os.path.join(root, subdir)
-        parse_ctest_test_files(tests, new_root, list())
-
-
-
-def test_parse():
-    """ Just a quick test.
-    Put it in a unittest test case looks a bit overkill
-
-    """
-    with qibuild.sh.TempDir() as tmp:
-        build_dir = os.path.join(tmp, "build")
-        os.mkdir(build_dir)
-        ctest_test_file = os.path.join(build_dir, "CTestTestfile.cmake")
-        with open(ctest_test_file, "w") as fp:
-            fp.write(""" # CMake generated Testfile ...
-# ...
-# ...
-SUBDIRS(a)
-ADD_TEST(test_root "path/to/test_root")
-SET_TESTS_PROPERTIES(test_root PROPERTIES TIMEOUT "20" ENVIRONMENT "SPAM=EGGS")
-""")
-
-        a = os.path.join(build_dir, "a")
-        os.mkdir(a)
-        a_ctest_test_file = os.path.join(a, "CTestTestfile.cmake")
-        with open(a_ctest_test_file, "w") as fp:
-            fp.write(""" # CMake generate Testfile ...
-# ...
-# ...
-ADD_TEST(a_gtest "/path/to/a_gtest" "--gtest_output=xml:/path/to/a.xml")
-SET_TESTS_PROPERTIES(a_gtest PROPERTIES TIMEOUT "20")
-""")
-        tests = list()
-        subdirs = list()
-        parse_ctest_test_files(tests, build_dir, subdirs)
-        print tests
-
-
+        _parse_ctest_test_files(new_root, tests, list())
