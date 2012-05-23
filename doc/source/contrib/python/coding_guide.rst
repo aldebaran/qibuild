@@ -54,6 +54,70 @@ So the canonical docstring should look like:
 
         """
 
+But please do not put too much in the doc string, we want to keep
+the code readable.
+
+.. code-block:: python
+
+    # Bad: too much stuff here
+
+    def foo(bar, baz):
+        """ Does this and that
+        :param bar: ...
+        :param baz: ...
+
+        :raise: MyError if ...
+        :return: True if ...
+
+        .. seealso:
+
+            * :ref:`this-other-topic`
+
+        Example ::
+
+          bar = Bar()
+          baz = Baz()
+          f = foo(bar, baz)
+
+        """
+
+Rather use the modularity of ``autodoc``:
+
+.. code-block:: python
+
+    # OK: still readable
+
+    def foo(bar, baz):
+        """ Does this and that
+        :param bar: ...
+        :param baz: ...
+
+        :raise: MyError if ...
+        :return: True if ...
+
+
+        """
+
+
+.. code-block:: rst
+
+  .. autofunction:: qibuild.toc.toc_open
+
+  .. seealso:
+
+    * :ref:`this-other-topic`
+
+   Example
+
+   .. code-block:: python
+
+        bar = Bar()
+        baz = Baz()
+        f = foo(bar, baz)
+
+
+
+
 For easy code re-use
 --------------------
 
@@ -396,3 +460,39 @@ Most people will not pay attention to the questions, (and they do not
 have to), so make the default obvious.
 
 (See for instance how ``qibuild config --wizard`` does it)
+
+
+Adding new tests
+-----------------
+
+For historical reasons, lots of the qibuild tests still are using
+``unittest``
+
+
+You should add your new test using ``py.test`` instead.
+
+Basically, for each python module there should be a matching
+test module ::
+
+  qisrc/foo.py
+  qisrc/test/test_foo.py
+
+
+Also, when adding a new action, a good idea is to try to write the
+functionnality of your action thinking of it as a library, then add tests for
+the library, and only then add the action.
+
+This makes writing tests much easier, and also makes refactoring easier.
+
+An other way of saying this is that you should usually not find yourself using
+`qibuild.run_action` *inside* the qibuild project, it's rather meant
+to be used from a release script, for instance.
+
+.. code-block:: python
+
+    def continuous_tests():
+        qibuild.run_action("qisrc.actions.pull")
+        qibuild.run_action("qibuild.actions.configure")
+        qibuild.run_action("qibuild.actions.make")
+        qibuild.run_action("qibuild.actions.test")
+
