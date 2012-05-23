@@ -4,5 +4,5 @@
 
 clean(QPOASES)
 fpath(QPOASES QProblem.hpp PATH_SUFFIXES qpoases)
-flib(QPOASES qpoases)
+flib(QPOASES qpOASES)
 export_lib(QPOASES)
