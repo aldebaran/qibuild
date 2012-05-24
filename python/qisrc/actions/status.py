@@ -44,6 +44,16 @@ def _pad(szold, sznew):
         return ""
     return " " * (szold - sznew)
 
+def stat_tracking_remote(git, branch, tracking):
+    behind = 0
+    ahead = 0
+    (ret, out) = git.call("rev-list", "--left-right", "%s..%s" % (tracking, branch), raises=False)
+    if ret == 0:
+        ahead = len(out.split())
+    (ret, out) = git.call("rev-list", "--left-right", "%s..%s" % (branch, tracking), raises=False)
+    if ret == 0:
+        behind = len(out.split())
+    return (ahead, behind)
 
 def do(args):
     """ Main method """
@@ -68,6 +78,15 @@ def do(args):
         i = i + 1
         if git.is_valid():
             clean = git.is_clean(untracked=args.untracked_files)
+
+            #clean worktree, but is the current branch sync with the remote one?
+            if clean:
+                branch = git.get_current_branch()
+                tracking = git.get_tracking_branch()
+                (ahead, behind) = stat_tracking_remote(git, branch, tracking)
+                if ahead != 0 or behind != 0:
+                    clean = False
+
             if args.show_branch or not clean:
                 gitrepo.append(git_project)
             if not clean:
@@ -84,7 +103,13 @@ def do(args):
             tracking = git.get_tracking_branch()
             line = _add_pad(max_len, shortpath, " : %s tracking %s" %
                 (branch, tracking))
+            (ahead, behind) = stat_tracking_remote(git, branch, tracking)
             LOGGER.info(line)
+            if ahead:
+                print(" ## Your branch is %d commits ahead" % ahead)
+            if behind:
+                print(" ## Your branch is %d commits behind" % behind)
+
         if not git.is_clean(untracked=args.untracked_files):
             if args.untracked_files:
                 (status_, out) = git.call("status", "-s", raises=False)
