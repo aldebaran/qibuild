@@ -49,6 +49,9 @@ def do(args):
             mess += " ".join(bad_chars)
             raise Exception(mess)
 
+    if tc_name == "system":
+        raise Exception("'system' is a reserved name")
+
     toc = None
 
     if args.default:

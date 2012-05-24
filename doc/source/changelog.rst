@@ -19,13 +19,15 @@ Command line
 * mechanism to copy dlls inside the build dir and create the symlinks
   at the end of the compilation is now done by the qibuild executable,
   and NOT from the CMakeList.
-* ``qibuild help`` sort available actions by name
+* ``qibuild help``: sort available actions by name
 * ``qibuild test``: small bug fix for ``--test-name``
 * ``qibuild config --wizard``: fix unsetting build dir or sdk dir
 * ``qibuid config --wizard:``: fix generator discovery for cmake 2.8.6 under windows
-*  ``qibuild configure`` nicer error message when cmake segfaults
+* ``qibuild configure``: nicer error message when cmake segfaults
 * ``qibuild configure``: add ``--debug-trycompile`` option
-* ``qidoc`` fix for archlinux
+* ``qidoc``: fix for archlinux
+* ``qibuild configure``: you can now use ``-c system`` if you have a default
+  config in your worktree but still do not want to use it
 
 CMake
 +++++

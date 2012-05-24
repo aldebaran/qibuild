@@ -152,6 +152,9 @@ class Toc(WorkTree):
             self.config = config
         self.config.read_local_config(self.config_path)
         self.active_config = self.config.active_config
+        # Special case if "--system" was used:
+        if config == "system":
+            self.active_config = None
 
         self.build_type = build_type
         if not self.build_type:
