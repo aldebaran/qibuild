@@ -2,9 +2,12 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 function(_qi_list_append_uniq _list)
-  set(${_list} ${${_list}} ${ARGN})
-  list(SORT ${_list})
-  list(REMOVE_DUPLICATES ${_list})
+  foreach(_pif ${ARGN})
+    list(FIND ${_list} ${_pif} _found)
+    if(_found STREQUAL "-1")
+      set(${_list} ${${_list}} ${_pif})
+    endif()
+  endforeach()
   set(${_list} ${${_list}} PARENT_SCOPE)
 endfunction()
 
@@ -20,8 +23,3 @@ function(_qi_list_append_path _list)
   set(${_list} ${${_list}} PARENT_SCOPE)
 endfunction()
 
-
-function(_qi_list_append_cache _name _value)
-  _qi_list_append_uniq(${_name} ${_value})
-  set(${_name} ${${_name}} CACHE INTERNAL "" FORCE)
-endfunction()
