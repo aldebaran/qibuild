@@ -28,6 +28,7 @@ Command line
 * ``qisrc init`` can now be used with a git url (git@foo:manifest.git) (ala repo)
 * ``qisrc init`` : add ``-p,  --profile`` option to choose from several profiles  (different xml files in the git url)
 * ``qisrc init`` : add ``-b, --branch`` option to choose a branch in the manifest url
+* ``qisrc status`` : now also display a message when the current branch is ahead or behind the remote branch
 * Add ``qsrc sync`` : configure local and remote branches, automatically setup code review
 * Add ``qisrc push`` : upload changes to code review
 * Remove ``qisrc fetch``, use ``qisrc init`` instead
@@ -36,9 +37,9 @@ Command line
 CMake
 ++++++
 
-* qibuild cmake modules
+* qibuild cmake modules:
 
- * add modules for openssl, libevent_openssl
+  * added openssl, libevent_openssl
 
 Python
 +++++++
