@@ -44,3 +44,4 @@ def do(args):
         profile=args.profile)
     qisrc.sync.init_worktree(worktree, manifest, setup_review=args.setup_review)
     worktree.set_manifest_project(manifest_src, args.profile)
+    return worktree
