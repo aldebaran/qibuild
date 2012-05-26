@@ -5,6 +5,8 @@
 """ Collection of parser fonctions for various actions
 """
 
+import qisrc.parsers
+
 def log_parser(parser):
     """ Given a parser, add the options controlling log
     """
@@ -35,9 +37,8 @@ def default_parser(parser):
 def worktree_parser(parser):
     """ Parser settings for every action using a work tree.
     """
-    default_parser(parser)
-    parser.add_argument("--work-tree", dest="worktree",
-        help="Use a specific work tree path.")
+    # Just an alias:
+    qisrc.parsers.worktree_parser(parser)
 
 def toc_parser(parser):
     """ Parser settings for every action using a toc dir
