@@ -293,7 +293,7 @@ You may want to run:
 
         self.build_folder_name = "-".join(res)
 
-    def get_project(self, project_name):
+    def get_project(self, project_name, raises=True):
         """ Get a project from a name.
 
         :return: A vali :py:class:`qibuild.project.Project` instance
@@ -303,9 +303,10 @@ You may want to run:
         res = [p for p in self.projects if p.name == project_name]
         if len(res) == 1:
             return res[0]
-        else:
+        if raises:
             raise TocException("No such project: %s" % project_name)
-
+        else:
+            return None
 
     def get_sdk_dirs(self, project_name):
         """ Return a list of sdk needed to build a project.
