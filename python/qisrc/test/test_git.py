@@ -63,23 +63,25 @@ def create_git_repo(tmp, path, with_release_branch=False):
     git.call("push", tmp_srv, "release-1.12:release-1.12")
     return tmp_srv
 
-def push_file(tmp, path, name, contents, branch="master"):
+def push_file(tmp, git_path, filename, contents, branch="master"):
     """ Push a file to the given url. Assumes the repository
     has been created with create_git_repo with the same
     path
 
     """
-    tmp_src = os.path.join(tmp, "src", path)
-    tmp_srv = os.path.join(tmp, "srv", path + ".git")
+    tmp_src = os.path.join(tmp, "src", git_path)
+    tmp_srv = os.path.join(tmp, "srv", git_path + ".git")
     git = qisrc.git.Git(tmp_src)
     if branch in git.get_local_branches():
         git.checkout("-f", branch)
     else:
         git.checkout("-b", branch)
-    with open(os.path.join(tmp_src, name), "w") as fp:
+    dirname = os.path.dirname(filename)
+    qibuild.sh.mkdir(os.path.join(tmp_src, dirname), recursive=True)
+    with open(os.path.join(tmp_src, filename), "w") as fp:
         fp.write(contents)
-    git.add(name)
-    git.commit("-m", "added %s" % name)
+    git.add(filename)
+    git.commit("-m", "added %s" % filename)
     git.push(tmp_srv, "%s:%s" % (branch, branch))
 
 def push_readme_v2(tmp, path, branch):
