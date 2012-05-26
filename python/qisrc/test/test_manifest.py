@@ -52,7 +52,7 @@ class ManifestTestCase(unittest.TestCase):
         xml_in = StringIO(xml)
         error = None
         try:
-            manifest = qisrc.manifest.load(xml_in)
+            qisrc.manifest.load(xml_in)
         except Exception, e:
             error = e
         self.assertFalse(error is None)
@@ -112,7 +112,7 @@ class ManifestTestCase(unittest.TestCase):
         xml_in = StringIO(xml)
         error = None
         try:
-            manifest = qisrc.manifest.load(xml_in)
+            qisrc.manifest.load(xml_in)
         except Exception, e:
             error = e
         self.assertFalse(error is None)
@@ -128,7 +128,7 @@ class ManifestTestCase(unittest.TestCase):
         xml_in = StringIO(xml)
         error = None
         try:
-            manifest = qisrc.manifest.load(xml_in)
+            qisrc.manifest.load(xml_in)
         except Exception, e:
             error = e
         self.assertFalse(error is None)
