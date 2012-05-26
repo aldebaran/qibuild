@@ -35,6 +35,15 @@ And make sure ``~/.local/bin`` is in your ``PATH``
 
 On mac, make sure ``cmake`` is in your path.
 
+Note that if you are in a distribution where Python3 is the default,
+you should use
+
+.. code-block:: console
+
+   PYTHON=python2 ./install-qibuild.sh
+
+instead
+
 Windows
 +++++++
 
