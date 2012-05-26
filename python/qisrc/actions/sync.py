@@ -40,9 +40,7 @@ def sync_all(worktree, args):
     """
     manifest_projects = worktree.get_manifest_projects()
     if not manifest_projects:
-        mess  = "Could not find any manifest project for worktree in %s \n" % worktree.root
-        mess += "Try calling `qisrc init MANIFEST_URL`"
-        raise Exception(mess)
+        raise qisrc.manifest.NoManifest(worktree)
     # Re-synchronize everything:
     for manifest_project in manifest_projects:
         print "Updating", manifest_project.src, "..."

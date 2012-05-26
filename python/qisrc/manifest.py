@@ -12,6 +12,15 @@ import posixpath
 import qibuild.sh
 import qixml
 
+class NoManifest(Exception):
+    def __init__(self, worktree):
+        self.worktree = worktree
+    def __str__(self):
+        res  = "Could not find any manifest project for worktree in %s \n" % \
+            self.worktree.root
+        res += "Try calling `qisrc init MANIFEST_URL`"
+        return res
+
 def git_url_join(remote, name):
     """ Join a remote ref with a name
 
