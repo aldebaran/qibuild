@@ -11,10 +11,6 @@
 # Note: when cross-compiling, you should set QT_USE_QMAKE
 # to false so that we do not use qmake from the system.
 
-if(DEFINED _QIBUILD_QT_TOOLS)
-  return()
-endif()
-
 if(NOT DEFINED QT_USE_QMAKE)
   find_program(QT_QMAKE qmake)
   if(QT_QMAKE)
@@ -27,7 +23,7 @@ endif()
 if(QT_USE_QMAKE)
   # Use upstream cmake files:
   find_package(Qt4 COMPONENTS "")
-  include("${QT_USE_FILE}")
+  include(Qt4Macros)
   return()
 endif()
 
@@ -42,5 +38,3 @@ else()
 endif()
 
 include(Qt4Macros)
-
-qi_set_global(_QIBUILD_QT_TOOLS TRUE)
