@@ -118,7 +118,7 @@ class EnvSetter():
                              shell=True)
         (out, err) = process.communicate()
         if process.returncode != 0:
-            mess  = "Calling %s failed\n", bat_file
+            mess  = "Calling %s failed\n" % bat_file
             mess += "Error was: %s" % err
             raise Exception(mess)
 
