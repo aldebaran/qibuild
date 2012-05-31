@@ -23,7 +23,8 @@ Command line
 * Add ``qisrc remove-project``
 * Add ``qisrc add-project`` : projects are no longer automatically added in the wortree.
   (Should probably be merged with ``qisrc add``)
-* Add ``qisrc ls``: to list the projects paths
+* Add ``qisrc ls`` list the projects paths of a worktree
+* Add ``qisrc grep`` to grep on every porject of a worktree
 * Add ``qicd`` (inspired by ``roscd``)
 * ``qisrc init`` can now be used with a git url (git@foo:manifest.git) (ala repo)
 * ``qisrc init`` : add ``-p,  --profile`` option to choose from several profiles  (different xml files in the git url)
