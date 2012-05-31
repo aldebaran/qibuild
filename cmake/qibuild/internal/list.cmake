@@ -2,10 +2,10 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 function(_qi_list_append_uniq _list)
-  foreach(_pif ${ARGN})
-    list(FIND ${_list} ${_pif} _found)
+  foreach(_elem ${ARGN})
+    list(FIND ${_list} ${_elem} _found)
     if(_found STREQUAL "-1")
-      set(${_list} ${${_list}} ${_pif})
+      set(${_list} ${${_list}} ${_elem})
     endif()
   endforeach()
   set(${_list} ${${_list}} PARENT_SCOPE)
