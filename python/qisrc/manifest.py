@@ -51,9 +51,7 @@ class Manifest():
     """ A class to represent the contents of a manifest XML
     file.
 
-    Do not use directly, use load() instead, this class
-    won't be fully initialized until merge_projects() has
-    been called
+    Do not use instanciate directly, use :py:meth:`load` instead.
 
     """
     def __init__(self):

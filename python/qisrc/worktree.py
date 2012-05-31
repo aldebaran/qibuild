@@ -161,8 +161,8 @@ class WorkTree:
                 self.buildable_projects.append(project)
 
     def get_project(self, src, raises=False):
-        """
-        Get a project.
+        """ Get a project
+
         :param src: a absolute path, or a path relative to the worktree
         :param raises: Raises if project is not found
         :returns:  a :py:class:`Project` instance or None if raises is
@@ -184,8 +184,8 @@ class WorkTree:
         return res
 
     def add_project(self, src):
-        """
-        Add a project to a worktree
+        """ Add a project to a worktree
+
         :param src: path to the project, can be absolute,
                     or relative to the worktree root
 
@@ -207,8 +207,8 @@ class WorkTree:
         self.load()
 
     def remove_project(self, src, from_disk=False):
-        """
-        Remove a project from a worktree
+        """ Remove a project from a worktree
+
         :param src: path to the project, can be absolute,
                     or relative to the worktree root
         :param from_disk: also erase project files from disk

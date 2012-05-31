@@ -4,5 +4,8 @@ qisrc modules
 .. toctree::
     :maxdepth: 1
 
-    manifest
     git
+    manifest
+    worktree
+    sync
+    review

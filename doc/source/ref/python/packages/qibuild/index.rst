@@ -1,18 +1,17 @@
 qibuild modules
 ===============
 
-High level layer
-----------------
+Building projects
+-----------------
 
 .. toctree::
    :maxdepth: 1
 
    toc
    project
-   worktree
    dependencies_solver
 
-Command line parsing
+Parsing command line
 ---------------------
 
 .. toctree::

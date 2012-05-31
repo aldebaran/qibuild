@@ -52,7 +52,7 @@ def http_to_ssh(url, project_name, username, gerrit_ssh_port=29418):
 
 
 def fetch_gerrit_hook(path, username, server, port):
-    """ Fetch the commint-msg hook from gerrit
+    """ Fetch the ``commit-msg`` hook from gerrit
 
     """
     git_hooks_dir = os.path.join(path, ".git", "hooks")
@@ -77,7 +77,7 @@ def check_gerrit_connection(username, server, gerrit_ssh_port=29418):
     return True
 
 def ask_gerrit_username(server, gerrit_ssh_port=29418):
-    """" Run a wizard to try to configure gerrit access
+    """ Run a wizard to try to configure gerrit access
 
     If that fails, ask the user for its username
     If that fails, give up and suggest upload the public key
@@ -111,9 +111,11 @@ def ask_gerrit_username(server, gerrit_ssh_port=29418):
 
 def setup_project(project_path, project_name, review_url, branch):
     """ Setup a project for code review.
-     - Figure out the user name
-     - Add a remote called 'gerrit'
-     - Add the hook
+
+     * Figure out the user name
+     * Add a remote called 'gerrit'
+     * Add the hook
+
     """
     git = qisrc.git.Git(project_path)
     # Extract server from url:
