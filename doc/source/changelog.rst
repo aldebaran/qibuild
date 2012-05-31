@@ -17,13 +17,14 @@ Command line
 * ``qidoc`` by-pass sphinx-build bug on mac
 * ``qidoc`` make it work on archlinux  (using sphinx-build2 by default)
 * Add ``qidoc open`` to view generated documentation in a web browser
+* Add ``qidoc list`` list the known documentation projects in a wortree
 * ``qitoolchain list`` better error message when there is no toolchain
 * ``qidoc build`` improve argument parsing, smarter when no argument is given,
   can build a doc project by passing its name
 * Add ``qisrc remove-project``
 * Add ``qisrc add-project`` : projects are no longer automatically added in the wortree.
   (Should probably be merged with ``qisrc add``)
-* Add ``qisrc ls`` list the projects paths of a worktree
+* Add ``qisrc list`` list the projects paths of a worktree
 * Add ``qisrc grep`` to grep on every porject of a worktree
 * Add ``qicd`` (inspired by ``roscd``)
 * ``qisrc init`` can now be used with a git url (git@foo:manifest.git) (ala repo)
