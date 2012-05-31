@@ -26,7 +26,7 @@ class QiDocBuilder:
     projects
 
     """
-    def __init__(self, in_dir, out_dir):
+    def __init__(self, in_dir, out_dir="build-doc"):
         self.worktree = qisrc.worktree.open_worktree(in_dir)
         self.in_dir = in_dir
         self.out_dir = out_dir
