@@ -38,6 +38,10 @@ qisrc.worktree.WorkTree
 
   .. automethod:: remove_project
 
+  .. automethod:: set_git_project_config
+
+  .. automethod:: set_project_review
+
 
 Other functions in this module
 ------------------------------

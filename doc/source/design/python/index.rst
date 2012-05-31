@@ -4,6 +4,7 @@
     overviews/parsing_cmdline
     overviews/handling_build_configurations
     overviews/handling_cmake_flags
+    overviews/parsing_manifests
     overviews/parsing_toolchain_feeds
 
 
@@ -70,7 +71,7 @@ Concepts
 
   **worktree**
     A worktree is simply a directory tree containing a ``.qi`` folder
-    as its root. No more, no less.
+    as its root.
 
 .. seealso:
 
@@ -79,8 +80,15 @@ Concepts
 Worktrees can be nested, although this is not recommended
 (situation can get a little confused if you do so)
 
-A worktree should also contain a ``qibuild.xml`` configuration
-file.
+A worktree should also contain a ``.qi/worktree.xml`` configuration
+file, used to track the projects inside the worktree.
+
+.. seealso::
+
+   * :ref:`worktree-xml-syntax`
+
+A worktree can also contain a ``.qi/qibuild.xml`` configuration
+file, used to store specific build settings for this worktree
 
 .. seealso::
 
@@ -202,6 +210,7 @@ how the qibuild command line tools work under the hood.
   * :ref:`parsing-cmdline`
   * :ref:`handling-build-configurations`
   * :ref:`parsing-toolchain-feeds`
+  * :ref:`parsing-manifests`
   * :ref:`handling-cmake-flags`
 
 
