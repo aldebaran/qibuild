@@ -431,6 +431,16 @@ def to_native_path(path):
     return path
 
 
+def is_path_inside(a, b):
+    """ Returns True if a is inside b
+
+    >>> is_path_inside("foo/bar", "foo")
+    True
+    >>> is_path_inside("gui/bar/libfoo", "lib")
+    False
+    """
+    return os.path.commonprefix([a, b]) == b
+
 class TempDir:
     """This is a nice wrapper around tempfile module.
 
