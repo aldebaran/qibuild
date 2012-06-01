@@ -43,7 +43,7 @@ class SyncTestCase(unittest.TestCase):
 """
         xml = xml.format(tmp=self.tmp)
         manifest = StringIO(xml)
-        qisrc.sync.sync_projects(worktree, manifest)
+        qisrc.sync.init_worktree(worktree, manifest)
         self.assertEqual(len(worktree.projects), 1)
         libqi = worktree.projects[0]
         self.assertEqual(libqi.path,
@@ -68,7 +68,7 @@ class SyncTestCase(unittest.TestCase):
         with open(manifest, "w") as fp:
             fp.write(xml)
         worktree = qisrc.worktree.create(self.tmp)
-        qisrc.sync.sync_projects(worktree, manifest)
+        qisrc.sync.init_worktree(worktree, manifest)
 
     def test_git_manifest_sync(self):
         create_git_repo(self.tmp, "qi/libqi")
@@ -91,10 +91,10 @@ class SyncTestCase(unittest.TestCase):
         with open(fetched_manifest, "r") as fp:
             fetched_xml = fp.read()
         self.assertEqual(fetched_xml, xml)
-        qisrc.sync.sync_projects(worktree, fetched_manifest)
+        qisrc.sync.init_worktree(worktree, fetched_manifest)
         # And do it a second time, checking that we don't get an
         # 'directory not empty' git failure
-        qisrc.sync.sync_projects(worktree, fetched_manifest)
+        qisrc.sync.init_worktree(worktree, fetched_manifest)
 
     def test_git_manifest_sync_branch(self):
         # Two branches in the manifest repo:
@@ -136,20 +136,23 @@ class SyncTestCase(unittest.TestCase):
             branch="master")
         release_manifest = qisrc.sync.fetch_manifest(release_wt, manifest_url,
             branch="release-1.12")
-        qisrc.sync.sync_projects(master_wt,  master_manifest)
-        qisrc.sync.pull_projects(master_wt)
-        qisrc.sync.sync_projects(release_wt, release_manifest)
-        qisrc.sync.pull_projects(release_wt)
+        qisrc.sync.init_worktree(master_wt,  master_manifest)
+        qisrc.sync.init_worktree(release_wt, release_manifest)
         release_srcs = [p.src for p in release_wt.projects]
         self.assertEqual(release_srcs, ["doc", "manifest/default", "naoqi"])
         naoqi_release = release_wt.get_project("naoqi")
         readme = read_readme(naoqi_release.path)
         self.assertEqual(readme, "naoqi on release-1.12\n")
+        self.assertEqual(naoqi_release.remote, "origin")
+        self.assertEqual(naoqi_release.branch, "release-1.12")
+
         master_srcs = [p.src for p in master_wt.projects]
         self.assertEqual(master_srcs, ["doc", "lib/libnaoqi", "manifest/default", "naoqi"])
         naoqi_master = master_wt.get_project("naoqi")
         readme = read_readme(naoqi_master.path)
         self.assertEqual(readme, "naoqi\n")
+        self.assertEqual(naoqi_master.remote, "origin")
+        self.assertEqual(naoqi_master.branch, "master")
 
 
     def test_manifest_wrong_revision(self):
@@ -164,7 +167,7 @@ class SyncTestCase(unittest.TestCase):
         worktree = qisrc.worktree.create(self.tmp)
         qisrc.sync.clone_project(worktree, manifest_url)
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url, branch="release-1.12")
-        qisrc.sync.sync_projects(worktree, manifest)
+        qisrc.sync.init_worktree(worktree, manifest)
         worktree.set_manifest_project("manifest/default")
         manifest_projects = worktree.get_manifest_projects()
         self.assertEqual(len(manifest_projects), 1)

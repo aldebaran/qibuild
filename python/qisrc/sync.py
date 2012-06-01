@@ -18,11 +18,6 @@ import qisrc.git
 
 LOGGER = logging.getLogger(__name__)
 
-def indent(text, num):
-    """ Indent a piece of text """
-    lines = text.splitlines()
-    lines = [" " * num + l for l in lines]
-    return "\n".join(lines)
 
 def fetch_manifest(worktree, manifest_git_url, branch="master",
     profile="default",
@@ -56,15 +51,12 @@ def fetch_manifest(worktree, manifest_git_url, branch="master",
     return manifest_file
 
 
-def sync_projects(worktree, manifest_location, setup_review=True, update_branch=True):
-    """ Synchronize a worktree with a manifest,
-    cloning any missing repository, setting the correct
+def init_worktree(worktree, manifest_location, setup_review=True):
+    """ (re)-intianlize a worktree given a manifest location.
+    Clonie any missing repository, set the correct
     remote and tracking branch on every repository
 
-    :param setup_review: Also set up the project for review
-    :param update_branch: Also update local branches when possible (fast-forward,
-        pull --rebase without conflicts)
-
+    :param setup_review: Also set up the projects for review
     """
     errors = list()
     manifest = qisrc.manifest.load(manifest_location)
@@ -72,7 +64,7 @@ def sync_projects(worktree, manifest_location, setup_review=True, update_branch=
         return
     project_count = len(manifest.projects)
     for i, project in enumerate(manifest.projects):
-        print "Syncing project %i on %i (%s)" % (i+1, project_count, project.name)
+        print "Configuring project %i on %i (%s)" % (i+1, project_count, project.name)
         # Use the same branch for the project as the branch
         # for the manifest, unless explicitely set:
         p_revision = project.revision
@@ -84,55 +76,15 @@ def sync_projects(worktree, manifest_location, setup_review=True, update_branch=
                       branch=p_revision,
                       remote=p_remote,
                       skip_if_exists=True)
-        p_path = worktree.get_project(p_src).path
+        wt_project = worktree.get_project(p_src)
+        p_path = wt_project.path
         if project.review and setup_review:
+            worktree.set_project_review(p_src, True)
             qisrc.review.setup_project(p_path, project.name, project.review_url, p_revision)
         git = qisrc.git.Git(p_path)
         git.set_remote(p_remote, p_url)
         git.set_tracking_branch(p_revision, p_remote)
-        if update_branch:
-            error = git.update_branch(p_revision, p_remote, p_revision)
-        else:
-            error = None
-        if error:
-            errors.append((p_src, error))
-    if not errors:
-        return
-    LOGGER.error("Fail to sync some projects")
-    for (src, err) in errors:
-        print src
-        print "-" * len(src)
-        print indent(err, 2)
-        print
-
-
-def pull_projects(worktree, rebase=False):
-    """ Pull every project in a worktree
-
-    """
-    errors = list()
-    projects = [p for p in worktree.git_projects if not p.manifest]
-    pad = " " * max([len(p.src) for p in projects])
-    project_count = len(projects)
-    for i, project in enumerate(projects):
-        sys.stdout.write("Pulling project %i on %i (%s)" %
-            (i+1, project_count, project.src) + pad + "\r")
-        sys.stdout.flush()
-        git = qisrc.git.open(project.path)
-        if rebase:
-            (retcode, out) = git.pull("--rebase", raises=False)
-        else:
-            (retcode, out) = git.pull(raises=False)
-        if retcode != 0:
-            errors.append((project.src, out))
-    if not errors:
-        return
-    LOGGER.error("Fail to pull some projects")
-    for (src, err) in errors:
-        print src
-        print "-" * len(src)
-        print
-        print indent(err, 2)
+        worktree.set_git_project_config(p_src, p_remote, p_revision)
 
 
 def clone_project(worktree, url, src=None, branch=None, remote="origin",

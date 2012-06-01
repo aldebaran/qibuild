@@ -6,6 +6,7 @@
 
 """
 import os
+import sys
 import contextlib
 import subprocess
 
@@ -269,6 +270,7 @@ class Git:
                 if retcode != 0:
                     self.call("rebase", "--abort", quiet=True, raises=False)
                     return out
+                sys.stdout.write(out)
         except Exception, err:
             self.call("rebase", "--abort", quiet=True, raises=False)
             res = "Some unstaged changes were in conflict: "

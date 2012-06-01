@@ -262,7 +262,5 @@ def test_nested_qiprojects(tmpdir):
     c_proj = worktree.get_project("a/b/c")
     assert c_proj.git_project.src == a_proj.src
 
-
-
 if __name__ == "__main__":
     unittest.main()

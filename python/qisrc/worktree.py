@@ -72,18 +72,37 @@ class WorkTree:
         """
         return [p for p in self.projects if p.manifest]
 
+    def update_project_config(self, src, key, value):
+        """ Update the project configuration """
+        for elem in self.xml_tree.findall("project"):
+            if elem.get("src") == src:
+                elem.set(key, value)
+
     def set_manifest_project(self, src, profile="default"):
         """ Mark a project as being a manifest project
 
         """
-        project = self.get_project(src)
-        project.manifest = True
-        project_elems = self.xml_tree.findall("project")
-        for project_elem in project_elems:
-            if project_elem.get("src") == src:
-                project_elem.set("manifest", "true")
-                project_elem.set("profile", profile)
-                break
+        project = self.get_project(src, raises=True)
+        self.update_project_config(project.src, "manifest", "true")
+        self.update_project_config(project.src, "profile", profile)
+        self.dump()
+        self.load()
+
+    def set_git_project_config(self, src, remote, branch):
+        """ Set the 'remote' and the 'branch' attributes of a
+        project config so that `qisrc sync` can work afterwards
+
+        """
+        project = self.get_project(src, raises=True)
+        self.update_project_config(project.src, "remote", remote)
+        self.update_project_config(project.src, "branch", branch)
+        self.dump()
+        self.load()
+
+    def set_project_review(self, src, review):
+        """ Mark a project as being under code review """
+        project = self.get_project(src, raises=True)
+        self.update_project_config(project.src, "review", "true")
         self.dump()
         self.load()
 
@@ -256,7 +275,7 @@ def open_worktree(worktree=None):
     return WorkTree(worktree)
 
 
-def guess_worktree(cwd=None):
+def guess_worktree(cwd=None, raises=False):
     """Look for parent directories until a .qi dir is found somewhere.
 
     """
@@ -270,7 +289,10 @@ def guess_worktree(cwd=None):
         (head, _tail) = os.path.split(head)
         if not _tail:
             break
-    return None
+    if raises:
+        raise NotInWorktree()
+    else:
+        return None
 
 
 
@@ -337,12 +359,18 @@ class Project:
         self.git_project = None
         self.subprojects = list()
         self.manifest = False
+        self.remote = None
+        self.branch = None
         self.profile = None
+        self.review = False
 
     def parse(self, xml_elem):
         self.src = qixml.parse_required_attr(xml_elem, "src")
         self.manifest = qixml.parse_bool_attr(xml_elem, "manifest")
+        self.review = qixml.parse_bool_attr(xml_elem, "review")
         self.profile = xml_elem.get("profile", "default")
+        self.remote = xml_elem.get("remote", "origin")
+        self.branch = xml_elem.get("branch", "master")
 
     def parse_qiproject_xml(self):
         qiproject_xml = os.path.join(self.path, "qiproject.xml")
@@ -361,8 +389,14 @@ class Project:
             res.set("git_project", self.git_project)
         if self.manifest:
             res.set("manifest", "true")
+        if self.review:
+            res.set("review", "true")
         if self.profile:
             res.set("profile", self.profile)
+        if self.remote:
+            res.set("remote", self.remote)
+        if self.branch:
+            res.set("branch", self.branch)
         return res
 
     def __repr__(self):
