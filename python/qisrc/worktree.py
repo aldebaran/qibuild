@@ -122,9 +122,7 @@ class WorkTree:
         filling up the res list
 
         """
-        is_git = False
         if os.path.exists(os.path.join(project.path, ".git")):
-            is_git = True
             self.git_projects.append(project)
             project.git_project = project
         for sub_project_src in project.subprojects:
@@ -132,8 +130,8 @@ class WorkTree:
             sub_project.src = os.path.join(project.src, sub_project_src)
             self.set_path(sub_project)
             sub_project.parse_qiproject_xml()
-            if is_git:
-                sub_project.git_project = project
+            if project.git_project:
+                sub_project.git_project = project.git_project
             res.append(sub_project)
             self._rec_parse_sub_projects(sub_project, res)
 

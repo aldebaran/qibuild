@@ -229,6 +229,7 @@ class WorktreeTestCase(unittest.TestCase):
 
 def test_nested_qiprojects(tmpdir):
     a_project = tmpdir.mkdir("a")
+    a_project.mkdir(".git")
     worktree_xml = tmpdir.mkdir(".qi").join("worktree.xml")
     worktree_xml.write("""
 <worktree>
@@ -257,6 +258,9 @@ def test_nested_qiprojects(tmpdir):
 
     worktree = qisrc.worktree.open_worktree(tmpdir.strpath)
     assert len(worktree.projects) == 3
+    a_proj = worktree.get_project("a")
+    c_proj = worktree.get_project("a/b/c")
+    assert c_proj.git_project.src == a_proj.src
 
 
 
