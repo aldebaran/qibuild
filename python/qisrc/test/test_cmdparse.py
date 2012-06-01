@@ -46,7 +46,8 @@ def parse_args(*args):
     parser = argparse.ArgumentParser()
     parser.add_argument("--worktree")
     parser.add_argument("projects", nargs="*")
-    parser.add_argument("--all", action="store_true")
+    parser.add_argument("-a", "--all", action="store_true")
+    parser.add_argument("-s", "--single", action="store_true")
     parsed_args = parser.parse_args(args=args)
     res = qisrc.cmdparse.projects_from_args(parsed_args)
     return [x.src for x in res]
@@ -143,3 +144,25 @@ def test_one_arg(tmpdir):
         with pytest.raises(Exception) as e:
             parse_args("lib/libbar/src")
         assert "Could not find any project" in str(e)
+
+
+def test_single(tmpdir):
+    worktree = create_worktree(tmpdir)
+    spam = tmpdir.join("spam")
+    with qibuild.sh.change_cwd(spam.strpath):
+        assert parse_args("-s") == ["spam"]
+        assert parse_args() == ["spam", "spam/eggs"]
+
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        parse_args("-s", "lib/libfoo", "spam/eggs")
+
+    assert "Using --single with several projects does not make sense" in str(e)
+
+    with qibuild.sh.change_cwd(worktree.root):
+        # pylint: disable-msg=E1101
+        with pytest.raises(Exception) as e:
+            parse_args("-s", "lib")
+        assert "No project in 'lib'" in str(e)
+
+        assert parse_args("spam/eggs", "-s") == ["spam/eggs"]

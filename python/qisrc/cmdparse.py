@@ -23,17 +23,18 @@ def guess_current_project(worktree, cwd):
         if qibuild.sh.is_path_inside(cwd, project.path):
             return project
 
-def projects_from_cwd(worktree, cwd):
+def projects_from_cwd(worktree, cwd, single=False):
     """ Used when --worktree was not specified.
 
     Return every projects found in the given cwd
 
     """
     relpath = os.path.relpath(cwd, worktree.root)
-    # First, returns all the projects in the given subdirectory:
-    res = projects_in_subdir(worktree, cwd, raises=False)
-    if res:
-        return res
+    if not single:
+        # First, returns all the projects in the given subdirectory:
+        res = projects_in_subdir(worktree, cwd, raises=False)
+        if res:
+            return res
 
     # Then, assume we are in a project subdir
     proj = guess_current_project(worktree, cwd)
@@ -46,17 +47,21 @@ def projects_from_cwd(worktree, cwd):
     raise Exception(mess)
 
 
-def parse_project_arg(worktree, project_arg):
+def parse_project_arg(worktree, project_arg, single=False):
     """ Used to parse one 'project arg'
     Can be :
         * an absolute path
         * the path of the project relative to the worktree
+    Result will be:
+        * all the projects in the given subdir (unles single is True)
+        * a project returned by worktree.get_project()
 
     """
-    as_path = qibuild.sh.to_native_path(project_arg)
-    if os.path.exists(as_path):
-        res = projects_in_subdir(worktree, as_path, raises=True)
-        return res
+    if not single:
+        as_path = qibuild.sh.to_native_path(project_arg)
+        if os.path.exists(as_path):
+            res = projects_in_subdir(worktree, as_path, raises=True)
+            return res
 
     # Now assume it is a project src
     project = worktree.get_project(project_arg, raises=True)
@@ -101,13 +106,18 @@ def projects_from_args(args):
         root = qisrc.worktree.guess_worktree(raises=True)
         worktree = qisrc.worktree.open_worktree(root)
 
+
     if not args.projects:
         if worktree_was_explicit or args.all:
             return worktree.projects
-        return projects_from_cwd(worktree, cwd)
+        return projects_from_cwd(worktree, cwd, single=args.single)
+
+    if args.single:
+        if len(args.projects) != 1:
+            raise Exception("Using --single with several projects does not make sense")
 
     res = list()
     for project_arg in args.projects:
-        projects = parse_project_arg(worktree, project_arg)
+        projects = parse_project_arg(worktree, project_arg, single=args.single)
         res.extend(projects)
     return res
