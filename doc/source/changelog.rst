@@ -46,7 +46,7 @@ CMake
 
 * qibuild cmake modules:
 
-  * added qtmultimedia, qt_phonon, eigen3
+  * added qtopengl, qtmultimedia, qt_phonon, eigen3
   * now using upstream ``FindQt4.cmake`` to find `qt` when `qmake` is in PATH.
   * now using using ``FindBoost.cmake``
   * zeromq:   add dependency on RT for linux
