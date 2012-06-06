@@ -53,6 +53,8 @@ def configure_parser(parser):
     parser.add_argument("--internal", dest="internal",
         action="store_true",
         help = "Include internal libs in package")
+    group.add_argument("--include-deps", action="store_true", dest="include_deps",
+        help="Include dependencies when making the package (off by the default)")
     parser.set_defaults(
         cmake_flags=["CMAKE_INSTALL_PREFIX='/'"],
         compress=True,

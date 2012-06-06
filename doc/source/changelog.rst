@@ -25,6 +25,7 @@ Command line
 * ``qibuid config --wizard:``: fix generator discovery for cmake 2.8.6 under windows
 * ``qibuild configure``: nicer error message when cmake segfaults
 * ``qibuild configure``: add ``--debug-trycompile`` option
+* ``qibuild package`` : add ``--include-deps`` option
 * ``qidoc``: fix for archlinux
 * ``qibuild configure``: you can now use ``-c system`` if you have a default
   config in your worktree but still do not want to use it
