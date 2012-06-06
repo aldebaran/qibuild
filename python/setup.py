@@ -33,7 +33,7 @@ package_data = {
 
 
 setup(name = 'qibuild',
-      version = "1.12.4",
+      version = "1.12.5",
       description = "The qiBuild Framework",
       author = "Aldebaran Robotics",
       author_email = "qibuild-dev@aldebaran-robotics.com",
