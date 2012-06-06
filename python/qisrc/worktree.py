@@ -147,6 +147,7 @@ class WorkTree:
         for sub_project_src in project.subprojects:
             sub_project = Project()
             sub_project.src = os.path.join(project.src, sub_project_src)
+            sub_project.src = qibuild.sh.to_posix_path(sub_project.src)
             self.set_path(sub_project)
             sub_project.parse_qiproject_xml()
             if project.git_project:
