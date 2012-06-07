@@ -248,8 +248,7 @@ def zip_unix(directory):
     return full_archive_name
 
 def zip( directory):
-    """Zip a directory, using .tar.gz or .zip according to the current
-    platform
+    """Zip a directory, using .zip on Windows or .tar.gz otherwise.
 
     """
     if sys.platform.startswith("win"):
