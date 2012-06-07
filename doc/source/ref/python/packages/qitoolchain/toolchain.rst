@@ -1,5 +1,5 @@
-qitoolchain.toolchain -- Handling binary packages
-==================================================
+qitoolchain.toolchain -- Managing toolchains
+============================================
 
 .. py:module:: qitoolchain.toolchain
 
