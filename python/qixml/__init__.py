@@ -44,7 +44,7 @@ def raise_parse_error(message, xml_path=None, tree=None):
     raise Exception(mess)
 
 def parse_bool_attr(tree, name, default=False):
-    """ Parse a boolean attribute of an elelement
+    """ Parse a boolean attribute of an element
 
       * Return True is the attribute exists and is
         "1" or "true".
@@ -65,6 +65,26 @@ def parse_bool_attr(tree, name, default=False):
             "for attribute %s" % name,
             tree=tree)
     return default
+
+def parse_int_attr(tree, name, default=None):
+    """ Parse a integer from a xml element
+
+    """
+    res = tree.get(name)
+    if not res:
+        if default is None:
+            mess = "node %s must have a '%s' attribute" % (tree.tag, name)
+            raise_parse_error(mess, tree=tree)
+        else:
+            return default
+    try:
+        res = int(res)
+    except ValueError:
+        mess = "Could not parse attribue '%s' from node %s \n" % (name, tree.tag)
+        mess += "Excepting an integer, got: %s" % res
+        raise_parse_error(mess, tree=tree)
+    return res
+
 
 def parse_list_attr(tree, name):
     """ Parse a list attribute
