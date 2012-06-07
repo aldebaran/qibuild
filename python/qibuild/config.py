@@ -431,14 +431,14 @@ class QiBuildConfig:
         # Active CMake config:
         self.cmake  = CMake()
 
-    def read(self, cfg_path=None, create_if_mssing=False):
+    def read(self, cfg_path=None, create_if_missing=False):
         """ Read from a config location
 
         """
         if not cfg_path:
             cfg_path = get_global_cfg_path()
             if not os.path.exists(cfg_path):
-                if create_if_mssing:
+                if create_if_missing:
                     dirname = os.path.dirname(cfg_path)
                     qibuild.sh.mkdir(dirname, recursive=True)
                     with open(cfg_path, "w") as fp:
@@ -910,7 +910,7 @@ def get_build_env():
 
     """
     qibuild_cfg = QiBuildConfig()
-    qibuild_cfg.read(create_if_mssing=True)
+    qibuild_cfg.read(create_if_missing=True)
     envsetter = qibuild.envsetter.EnvSetter()
     envsetter.read_config(qibuild_cfg)
     return envsetter.get_build_env()

@@ -125,7 +125,7 @@ def setup_project(project_path, project_name, review_url, branch):
 
     # Get username
     qibuild_cfg = qibuild.config.QiBuildConfig()
-    qibuild_cfg.read(create_if_mssing=True)
+    qibuild_cfg.read(create_if_missing=True)
     access = qibuild_cfg.get_server_access(server)
     if access:
         username = access.username

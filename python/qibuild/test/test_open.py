@@ -82,7 +82,7 @@ class OpenTestCase(unittest.TestCase):
 """)
 
         qibuild_cfg = qibuild.config.QiBuildConfig()
-        qibuild_cfg.read(global_cfg, create_if_mssing=False)
+        qibuild_cfg.read(global_cfg, create_if_missing=False)
         local_cfg = StringIO.StringIO(r"""
 <qibuild version="1">
   <defaults config="mingw" />
@@ -105,7 +105,7 @@ class OpenTestCase(unittest.TestCase):
   <ide name="QtCreator" path="C:\QtSDK\bin\QtCreator" />
 </qibuild>
 """)
-        qibuild_cfg.read(global_cfg, create_if_mssing=False)
+        qibuild_cfg.read(global_cfg, create_if_missing=False)
         local_cfg = StringIO.StringIO(r"""
 <qibuild version="1">
   <defaults config="mingw" />
