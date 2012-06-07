@@ -15,7 +15,7 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
-    parser.add_argument("--target", help="Special target to build")
+    parser.add_argument("-t", "--target", help="Special target to build")
     parser.add_argument("--rebuild", "-r", action="store_true", default=False)
 
 def do(args):
