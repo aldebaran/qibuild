@@ -45,11 +45,14 @@ def raise_parse_error(message, xml_path=None, tree=None):
 
 def parse_bool_attr(tree, name, default=False):
     """ Parse a boolean attribute of an elelement
-    Return True is the attribute exists and is
-     "1" or "true".
-    Returns False if:
-        - the attribute does not exist
-        - the attribute exist and is "0" or "false"
+
+      * Return True is the attribute exists and is
+        "1" or "true".
+      * Returns False if the attribute exist and is
+        "0" or "false"
+      * If the attribute does not exists and default is given,
+        returns `default`
+      * Otherwise raise an exception
 
     """
     res = tree.get(name)
