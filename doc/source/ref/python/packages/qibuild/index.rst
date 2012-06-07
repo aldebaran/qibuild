@@ -29,6 +29,7 @@ Tools
 
    cmake
    build
+   install
    ctest
    envsetter
    command
