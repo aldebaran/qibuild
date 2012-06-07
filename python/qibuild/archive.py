@@ -65,7 +65,9 @@ def extract_tar(archive_path, dest_dir):
     orig_topdir = members[0].name.split(posixpath.sep)[0]
     if orig_topdir == ".":
         archive_name = os.path.basename(archive_path)
-        archive_name = archive_name.split(".")[0]
+        archive_name = archive_name.rsplit(".", 1)[0]
+        if archive_name.endswith(".tar"):
+            archive_name = archive_name.rsplit(".", 1)[0]
         dest_dir = os.path.join(dest_dir, archive_name)
     done = 0
     # Extract directories with a safe mode.
