@@ -64,7 +64,7 @@ def build_parser(parser):
     group.add_argument("--build-type", action="store",
         dest="build_type",
         help="CMAKE_BUILD_TYPE usually Debug or Release")
-    group.add_argument("--cmake-generator", action="store",
+    group.add_argument("-G", "--cmake-generator", action="store",
         help="Specify the CMake generator")
     group.add_argument("-j", dest="num_jobs", type=int,
         help="Number of jobs to use")
