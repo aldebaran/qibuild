@@ -31,6 +31,7 @@ Tools
    build
    install
    ctest
+   deploy
    envsetter
    command
    config
