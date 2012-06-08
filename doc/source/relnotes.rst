@@ -28,6 +28,10 @@ wortkree
      <project src="lib" />
   </project>
 
+qibuild
+++++++
+
+* Add ``qibuild deploy`` to deploy code to a remote target
 
 qisrc
 +++++

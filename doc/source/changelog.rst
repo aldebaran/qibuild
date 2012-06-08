@@ -34,6 +34,7 @@ Command line
 * Add ``qsrc sync`` : configure local and remote branches, automatically setup code review
 * Add ``qisrc push`` : upload changes to code review
 * Remove ``qisrc fetch``, use ``qisrc init`` instead
+* Add ``qibuild deploy``, to deploy code to a remote device
 
 
 CMake
