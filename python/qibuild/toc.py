@@ -541,7 +541,7 @@ You may want to run:
             raise TestsFailed(project, summary)
 
 
-    def install_project(self, project, destdir, runtime=False):
+    def install_project(self, project, destdir, runtime=False, num_jobs=1):
         """ Install the project
 
         :param project: project name.
@@ -558,15 +558,17 @@ You may want to run:
         self.build_env["DESTDIR"] = destdir
         try:
             if runtime:
-                self.install_project_runtime(project, destdir)
+                self.install_project_runtime(project, destdir, num_jobs=num_jobs)
             else:
                 cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
-                        "--target", "install"]
+                        "--target", "install", "--"]
+                if num_jobs > 1 and "make" in self.cmake_generator.lower():
+                    cmd += [ "-j%d" % num_jobs]
                 qibuild.command.call(cmd, env=self.build_env)
         except CommandFailedException:
             raise InstallFailed(project)
 
-    def install_project_runtime(self, project, destdir):
+    def install_project_runtime(self, project, destdir, num_jobs=1):
         """Install runtime component of a project to a destdir """
         runtime_components = [
              "binary",
@@ -580,7 +582,9 @@ You may want to run:
             self.build_env["DESTDIR"] = destdir
             cmake_args = list()
             cmake_args += ["-DCOMPONENT=%s" % component]
-            cmake_args += ["-P", "cmake_install.cmake"]
+            cmake_args += ["-P", "cmake_install.cmake", "--"]
+            if num_jobs > 1 and "make" in self.cmake_generator.lower():
+                cmake_args += [ "-j%d" % num_jobs]
             LOGGER.debug("Installing %s", component)
             qibuild.command.call(["cmake"] + cmake_args,
                 cwd=project.build_directory,

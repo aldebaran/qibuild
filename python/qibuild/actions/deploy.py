@@ -37,5 +37,5 @@ def do(args):
     with qibuild.sh.TempDir() as destdir:
         qibuild.install.install_projects(toc, destdir, runtime=True,
                                          prefix="/",
-                                         include_deps=True)
+                                         include_deps=True, num_jobs=args.num_jobs)
         qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)

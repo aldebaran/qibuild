@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def install_projects(toc, destdir, prefix="/",
-                     runtime=True, include_deps=True):
+                     runtime=True, include_deps=True, num_jobs=1):
     """ Install some toc projects.
 
     :param toc: a :py:class:`qibuild.toc.Toc` object.
@@ -68,8 +68,8 @@ def install_projects(toc, destdir, prefix="/",
         project = toc.get_project(project_name)
         # Build target preinstall on the project (not always called for some reason)
         if not toc.using_visual_studio and not toc.cmake_generator == "Xcode":
-            toc.build_project(project, target="preinstall")
-        toc.install_project(project,  destdir, runtime=runtime)
+            toc.build_project(project, target="preinstall", num_jobs=num_jobs)
+        toc.install_project(project,  destdir, runtime=runtime, num_jobs=num_jobs)
 
     if not include_deps:
         return

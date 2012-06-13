@@ -34,5 +34,5 @@ def do(args):
     toc      = qibuild.toc_open(args.worktree, args)
     qibuild.install.install_projects(toc, args.destdir, runtime=args.runtime,
                                      prefix=args.prefix,
-                                     include_deps=args.include_deps)
+                                     include_deps=args.include_deps, num_jobs=args.num_jobs)
 
