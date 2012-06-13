@@ -56,6 +56,7 @@ function(qi_create_bin name)
 
   cmake_parse_arguments(ARG "NO_RPATH;NO_INSTALL;EXCLUDE_FROM_ALL" "SUBFOLDER" "SRC;DEPENDS;SUBMODULE" ${ARGN})
 
+  message(STATUS "Binary: ${name}")
   set(ARG_SRC "${ARG_UNPARSED_ARGUMENTS}" "${ARG_SRC}")
   qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
   qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
@@ -190,6 +191,7 @@ function(qi_create_lib name)
     "SUBFOLDER"
     "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
+  message(STATUS "Library: ${name}")
   if (ARG_NOBINDLL)
     # Kept here for historical reason: TODO: fix this in qibuild/compat.
     qi_deprecated("Use of NOBINDLL is deprectated")
