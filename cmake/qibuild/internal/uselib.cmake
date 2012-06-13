@@ -101,7 +101,8 @@ endfunction()
 # to search for static libs set XXX_STATIC=ON before calling qi_use_lib.
 #
 # \arg:name The target to add dependencies to
-# \argn: dependencies, like the DEPENDS group, argn and DEPENDS will be merged
+# \argn: dependencies, like the DEPENDS group, argn and DEPENDS will be merged.
+# If the ASSUME_SYSTEM_INCLUDE option is given, the compiler will consider the include directory of each dependencies as system include directories.
 # \group:DEPENDS The list of dependencies
 function(_qi_use_lib_internal name)
   STRING(REGEX MATCH "@" _at_in_name ${name})
@@ -110,7 +111,7 @@ function(_qi_use_lib_internal name)
     Target names must not contain the '@' character
     ")
   endif()
-  cmake_parse_arguments(ARG "" "" "DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "ASSUME_SYSTEM_INCLUDE" "" "DEPENDS" ${ARGN})
   set(ARG_DEPENDS ${ARG_UNPARSED_ARGUMENTS} ${ARG_DEPENDS})
   string(TOUPPER "${name}" _U_name)
 
@@ -179,6 +180,10 @@ function(_qi_use_lib_internal name)
   endforeach()
 
   foreach(_inc_dir ${_inc_dirs})
-    include_directories(${_inc_dir})
+    if(${ARG_ASSUME_SYSTEM_INCLUDE})
+      include_directories(SYSTEM ${_inc_dir})
+    else()
+      include_directories(${_inc_dir})
+    endif()
   endforeach()
 endfunction()
