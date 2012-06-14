@@ -451,7 +451,8 @@ You may want to run:
             raise ConfigureFailed(project, message=mess)
 
 
-    def build_project(self, project, incredibuild=False, num_jobs=1, target=None, rebuild=False):
+    def build_project(self, project, incredibuild=False,
+                      num_jobs=1, target=None, rebuild=False):
         """ Build a project.
 
         Usually we will simply can ``cmake --build``, but for incredibuild
@@ -470,24 +471,18 @@ You may want to run:
         if rebuild:
             cmd += ["--clean-first"]
         cmd += [ "--" ]
-        # In order to use incredibuild, we have to do this small hack:
-        if self.using_visual_studio:
+        cmd += num_jobs_to_args(num_jobs, self.cmake_generator)
+        if self.using_visual_studio and incredibuild:
+            # In order to use incredibuild, we have to do this small hack:
+            # (CMake --build will still call devenv.com instead of BuildConsole.exe)
             sln_files = glob.glob(build_dir + "/*.sln")
             assert len(sln_files) == 1, "Expecting only one sln, got %s" % sln_files
-            if incredibuild:
-                sln_file = sln_files[0]
-                cmd = ["BuildConsole.exe", sln_file]
-                cmd += ["/cfg=%s|Win32" % self.build_type]
-                cmd += ["/nologo"]
-                if target:
-                    cmd += ["/target=%s" % target]
-            else:
-                if num_jobs > 1 and "visual studio" in self.cmake_generator.lower():
-                    cmd += ["/m:%d" % num_jobs]
-
-        if num_jobs > 1 and "make" in self.cmake_generator.lower():
-            cmd += [ "-j%d" % num_jobs]
-
+            sln_file = sln_files[0]
+            cmd = ["BuildConsole.exe", sln_file]
+            cmd += ["/cfg=%s|Win32" % self.build_type]
+            cmd += ["/nologo"]
+            if target:
+                cmd += ["/target=%s" % target]
         try:
             qibuild.command.call(cmd, env=self.build_env)
         except CommandFailedException:
@@ -540,7 +535,6 @@ You may want to run:
         else:
             raise TestsFailed(project, summary)
 
-
     def install_project(self, project, destdir, runtime=False, num_jobs=1):
         """ Install the project
 
@@ -562,8 +556,7 @@ You may want to run:
             else:
                 cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
                         "--target", "install", "--"]
-                if num_jobs > 1 and "make" in self.cmake_generator.lower():
-                    cmd += [ "-j%d" % num_jobs]
+                cmd += num_jobs_to_args(num_jobs, self.cmake_generator)
                 qibuild.command.call(cmd, env=self.build_env)
         except CommandFailedException:
             raise InstallFailed(project)
@@ -583,8 +576,7 @@ You may want to run:
             cmake_args = list()
             cmake_args += ["-DCOMPONENT=%s" % component]
             cmake_args += ["-P", "cmake_install.cmake", "--"]
-            if num_jobs > 1 and "make" in self.cmake_generator.lower():
-                cmake_args += [ "-j%d" % num_jobs]
+            cmake_args += num_jobs_to_args(num_jobs, self.cmake_generator)
             LOGGER.debug("Installing %s", component)
             qibuild.command.call(["cmake"] + cmake_args,
                 cwd=project.build_directory,
@@ -684,6 +676,34 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
     toc.solve_deps = (not single)
     return toc
 
+def num_jobs_to_args(num_jobs, cmake_generator):
+    """ Convert a number of jobs to a list of cmake args
+
+    >>> num_jobs_to_args(3, "Unix Makefiles")
+    ["-j", "3"]
+
+    >>> num_jobs_to_args(3, "NMake Makefiles"
+    Error: -j is not supported for NMake, use Jom
+
+    >>> num_jobs_to_args(3, "Visual Studio")
+    Warning: -j is ignored for Visual Studio
+
+    """
+
+    if num_jobs == 1:
+        return list()
+    if cmake_generator == "Unix Makefiles":
+        return ["-j", str(num_jobs)]
+    if cmake_generator == "NMake Makefiles":
+        mess   = "-j is not supported for %s\n" % cmake_generator
+        mess += "On windows, you can use Jom instead to compile "
+        mess += "with multiple processors"
+        raise Exception(mess)
+    if "Visual Studio" in cmake_generator or \
+        cmake_generator == "Xcode" or \
+        "JOM" in cmake_generator:
+        LOGGER.warning("-j is ignored when used with %s", cmake_generator)
+        return list()
 
 def create(directory, force=False):
     """ Create a new toc worktree inside a work tree
