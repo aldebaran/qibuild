@@ -54,6 +54,12 @@ def install_projects(toc, destdir, prefix="/",
         # this is because we do NOT mess with os.environ ...
         # This is why we need to re-read env from toc.build_env so that no warning
         # appears.
+        cprefix = qibuild.cmake.get_cached_var(project.build_directory, "CMAKE_INSTALL_PREFIX")
+
+        if cprefix == prefix:
+            LOGGER.debug("Skipping configuration of project %s, CMAKE_INSTALL_PREFIX is already correct" % project_name)
+            continue
+
         qibuild.cmake.cmake(project.directory, project.build_directory,
             ['-DCMAKE_INSTALL_PREFIX=%s' % prefix],
             clean_first=False,
