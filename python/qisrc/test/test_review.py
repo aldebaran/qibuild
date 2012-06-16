@@ -3,7 +3,7 @@
 ## found in the COPYING file.
 
 import os
-import mock
+import pytest
 
 import qibuild.interact
 import qisrc.git
@@ -38,10 +38,27 @@ def test_parse_git_url():
     assert res == ("john2", "bar2.baz_smap-eggs.com", "42")
 
 
-def test_push():
-    with mock.patch('qibuild.command.call') as fake_command:
-        qisrc.review.push("foo", "master")
-        assert fake_command.call_args[0][0] == ["git", "push", "gerrit", "master:refs/for/master"]
-        fake_command.reset()
-        qisrc.review.push("foo", "master", review=False)
-        assert fake_command.call_args[0][0] == ["git", "push", "gerrit", "master:master"]
+def test_push(tmpdir):
+    foo_url = create_git_repo(tmpdir.strpath, "foo")
+    work = tmpdir.mkdir("work")
+    foo_src = work.mkdir("foo")
+    foo_src = foo_src.strpath
+    git = qisrc.git.Git(foo_src)
+    git.clone(foo_url)
+
+    # this should work:
+    qisrc.review.push(foo_src, "master")
+    (retcode, out) = git.call("ls-remote", "origin", raises=False)
+    assert retcode == 0
+    assert "refs/for/master" not in out
+    assert "refs/heads/master" in out
+
+    gerrit_url = create_git_repo(tmpdir.strpath, "foo-gerrit")
+    git.call("remote", "add", "gerrit", gerrit_url)
+    git.set_config("review.remote", "gerrit")
+    git.checkout("-b", "next")
+    qisrc.review.push(foo_src, "next")
+    (retcode, out) = git.call("ls-remote", "gerrit", raises=False)
+    assert retcode == 0
+    assert "refs/for/next" in out
+    assert "refs/heads/next" not in out

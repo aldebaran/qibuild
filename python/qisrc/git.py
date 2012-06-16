@@ -66,6 +66,12 @@ class Git:
             return None
         return out.strip()
 
+    def set_config(self, name, value):
+        """ Set a new config value.
+        Will be created if it does not exist
+        """
+        self.call("config", name, value)
+
     def get_current_ref(self, ref="HEAD"):
         """ return the current ref
         git symbolic-ref HEAD

@@ -141,6 +141,9 @@ def setup_project(project_path, project_name, review_url, branch):
     # Set a remote named 'gerrit'
     remote_url = http_to_ssh(review_url, project_name, username)
     git.set_remote("gerrit", remote_url)
+    # Configure review.remote in git/config so that
+    # qisrc push knows what to do:
+    git.set_config("review.remote", "gerrit")
 
     # Install the hook
     commit_hook = os.path.join(project_path, ".git", "hooks", "commit-msg")
@@ -149,8 +152,6 @@ def setup_project(project_path, project_name, review_url, branch):
     (username, server, port) = parse_git_url(remote_url)
     fetch_gerrit_hook(project_path, username, server, port)
 
-
-
 def push(project_path, branch, review=True, dry_run=False):
     """ Push the changes for review.
     Unless review is False, in this case, simply update
@@ -158,9 +159,16 @@ def push(project_path, branch, review=True, dry_run=False):
 
     """
     git = qisrc.git.Git(project_path)
-    args = ["gerrit"]
+    review_remote = git.get_config("review.remote")
+    args = list()
     if dry_run:
         args.append("--dry-run")
+    if not review_remote:
+        # Repository not configured for code review:
+        # we just follow the normal 'git push' behavior
+        git.push(*args)
+        return
+    args.append(review_remote)
     if review:
         args.append("%s:refs/for/%s" % (branch, branch))
     else:
