@@ -10,10 +10,10 @@ Use -- to seprate qisrc arguments from the arguments of the command.
 """
 
 import sys
-import qibuild.log
 
 import qisrc
 import qibuild
+from qibuild import ui
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -25,14 +25,22 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     qiwt = qisrc.open_worktree(args.worktree)
-    logger = qibuild.log.get_logger(__name__)
+    errors = list()
+    ui.info(ui.green, "Running `%s` on every project" % " ".join(args.command))
     for project in qiwt.git_projects:
-        logger.info("Running `%s` for %s", " ".join(args.command), project.src)
+        command = args.command[:]
+        ui.info(ui.blue, "::", ui.reset, ui.bold, project.src)
         try:
-            qibuild.command.call(args.command, cwd=project.path)
+            qibuild.command.call(command, cwd=project.path)
         except qibuild.command.CommandFailedException:
             if args.ignore_errors:
+                errors.append(project)
                 continue
             else:
                 raise
+    if not errors:
+        return
+    ui.error("Command failed on the following projects:")
+    for project in errors:
+        ui.info(ui.bold, " - ", project.src)
 
