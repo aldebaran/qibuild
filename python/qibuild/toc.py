@@ -66,12 +66,10 @@ class BuildFailed(Exception):
         return "Error occured when building project %s" % self.project.name
 
 class TestsFailed(Exception):
-    def __init__(self, project, summary):
+    def __init__(self, project):
         self.project = project
-        self.summary = summary
     def __str__(self):
         res  = "Error occured when testing project %s\n" % self.project.name
-        res += self.summary
         return res
 
 class InstallFailed(Exception):
@@ -528,12 +526,10 @@ You may want to run:
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
             _advise_using_configure(self, project)
-        (res, summary) = qibuild.ctest.run_tests(project, self.build_env,
+        res = qibuild.ctest.run_tests(project, self.build_env,
             test_name=test_name)
-        if res:
-            LOGGER.info(summary)
-        else:
-            raise TestsFailed(project, summary)
+        if not res:
+            raise TestsFailed(project)
 
     def install_project(self, project, destdir, prefix="/", runtime=False, num_jobs=1):
         """ Install the project

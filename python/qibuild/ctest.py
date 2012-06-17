@@ -14,11 +14,10 @@ import datetime
 import errno
 import signal
 import shlex
-import qibuild.log
 
 import qibuild
+from qibuild import ui
 
-LOGGER = qibuild.log.get_logger(__name__)
 
 def _str_from_signal(code):
     """ Returns a nice string describing the signal
@@ -116,13 +115,7 @@ def run_tests(project, build_env, test_name=None):
     Always write some XML files in build-test/results
     (even if they were no tests to run at all)
 
-    :return: (ok, summary) where ok is True if all
-             test passed, and summary is a nice summary
-             of what happened::
-
-                ran 10 tests, 2 failures:
-                    * test_foo
-                    * test_bar
+    :return: a boolean to indicate if test was sucessful
 
     """
     build_dir = project.build_directory
@@ -152,24 +145,33 @@ def run_tests(project, build_env, test_name=None):
     fail_tests = list()
     for (i, test) in enumerate(tests):
         (test_name, cmd, properties) = test
-        sys.stdout.write("Running %i/%i %s ... " % (i+1, len(tests), test_name))
+        ui.info(ui.green, " * ", ui.reset, ui.bold,
+                "(%2i/%2i)" % (i+1, len(tests)),
+                ui.blue, test_name.ljust(25), end="")
         sys.stdout.flush()
         test_res = run_test(build_dir, test_name, cmd, properties, build_env)
         if test_res.ok:
-            sys.stdout.write("[OK]\n")
+            ui.info(ui.green, "[OK]")
         else:
             ok = False
-            sys.stdout.write("[FAIL]\n")
+            ui.info(ui.red, "[FAIL]")
             print test_res.out
             fail_tests.append(test_name)
         xml_out = os.path.join(results_dir, test_name + ".xml")
         if not os.path.exists(xml_out):
             write_xml(xml_out, test_res)
-    summary  = "Ran %i tests, %i failures\n" % (len(tests), len(fail_tests))
-    for fail_test in fail_tests:
-        summary += "  * %s\n" % fail_test
 
-    return (ok, summary)
+
+    if ok:
+        ui.info("Ran %i tests" % len(tests))
+        ui.info("All pass. Congrats!")
+        return True
+
+    ui.error("Ran %i tests, %i failures" %
+                  (len(tests), len(fail_tests)))
+    for fail_test in fail_tests:
+        ui.info(ui.bold, " -", ui.blue, fail_test)
+    return False
 
 
 def write_xml(xml_out, test_res):
