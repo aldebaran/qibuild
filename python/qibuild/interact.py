@@ -97,4 +97,17 @@ def ask_program(message):
             continue
         return full_path
 
+def get_editor():
+    """Find the editor searching the environment, lastly ask the user.
 
+    Returns the editor.
+    """
+    editor = os.environ.get("VISUAL")
+    if not editor:
+        editor = os.environ.get("EDITOR")
+    if not editor:
+        # Ask the user to choose, and store the answer so
+        # that we never ask again
+        print "Could not find the editor to use."
+        editor = qibuild.interact.ask_program("Please enter an editor")
+    return editor

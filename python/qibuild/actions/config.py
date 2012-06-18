@@ -36,14 +36,7 @@ def do(args):
     if args.edit:
         editor = qibuild_cfg.defaults.env.editor
         if not editor:
-            editor = os.environ.get("VISUAL")
-        if not editor:
-            editor = os.environ.get("EDITOR")
-        if not editor:
-            # Ask the user to choose, and store the answer so
-            # that we never ask again
-            print "Could not find the editor to use."
-            editor = qibuild.interact.ask_program("Please enter an editor")
+            editor = qibuild.interact.get_editor()
             qibuild_cfg.defaults.env.editor = editor
             qibuild_cfg.write()
 
@@ -72,6 +65,3 @@ def do(args):
         print "  Projects:"
         for project in projects:
             print qibuild.config.indent(str(project.config), 2)
-
-
-
