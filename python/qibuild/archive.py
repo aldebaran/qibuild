@@ -37,7 +37,7 @@ class InvalidArchive(Exception):
     def __str__(self):
         return self._message
 
-def extract_tar(archive_path, dest_dir):
+def extract_tar(archive_path, dest_dir, quiet=False):
     """ Extract a .tar.gz archive
 
     :return: path to the extracted archive
@@ -87,7 +87,7 @@ def extract_tar(archive_path, dest_dir):
             tarinfo.mode = 0700
         archive.extract(tarinfo, dest_dir)
         done += 1
-        if sys.stdout.isatty():
+        if sys.stdout.isatty() and not quiet:
             percent = float(done) /size * 100
             sys.stdout.write("Done: %.0f%%\r" % percent)
             sys.stdout.flush()
@@ -111,7 +111,7 @@ def extract_tar(archive_path, dest_dir):
     return res
 
 
-def extract_zip(archive_path, dest_dir):
+def extract_zip(archive_path, dest_dir, quiet=False):
     """ Extract a zip archive
     :return: path to the extracted archive
              (dest_dir/topdir)
@@ -162,7 +162,7 @@ def extract_zip(archive_path, dest_dir):
             os.chmod(new_path, new_st)
 
         percent = float(i) / size * 100
-        if sys.stdout.isatty():
+        if sys.stdout.isatty() and not quiet:
             sys.stdout.write("Done: %.0f%%\r" % percent)
             sys.stdout.flush()
 
@@ -181,7 +181,7 @@ def extract_zip(archive_path, dest_dir):
     res = os.path.join(dest_dir, orig_topdir)
     return res
 
-def extract(archive_path, directory, topdir=None):
+def extract(archive_path, directory, topdir=None, quiet=False):
     """Extract an archive, calling extract_zip or extract_tar
     when necessary
 
@@ -206,7 +206,7 @@ def extract(archive_path, directory, topdir=None):
             qibuild.sh.rm(res)
             shutil.move(extracted, res)
         else:
-            res = extract_fun(archive_path, directory)
+            res = extract_fun(archive_path, directory, quiet=quiet)
         return res
     except Exception, err:
         mess = "Error occured when extracting %s\n" % archive_path
