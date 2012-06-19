@@ -23,7 +23,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     url = args.url
-    (username, several, path) = qibuild.deploy.parse_url(args.url)
+    (username, server, remote_directory) = qibuild.deploy.parse_url(args.url)
     toc = qibuild.toc_open(args.worktree, args)
     rsync = qibuild.command.find_program("rsync", env=toc.build_env)
     use_rsync = False
@@ -34,8 +34,9 @@ def do(args):
         if not scp:
             raise Exception("Could not find rsync or scp")
 
-    with qibuild.sh.TempDir() as destdir:
-        qibuild.install.install_projects(toc, destdir, runtime=True,
-                                         prefix="/",
-                                         include_deps=True, num_jobs=args.num_jobs)
-        qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)
+    destdir = os.path.join("~/.local/share/qi", "deploy", toc.active_config, remote_directory)
+    destdir = qibuild.sh.to_native_path(destdir)
+    qibuild.install.install_projects(toc, destdir, runtime=True,
+                                     prefix="/",
+                                     include_deps=True, num_jobs=args.num_jobs)
+    qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)
