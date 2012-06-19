@@ -111,3 +111,8 @@ qi_debug("CMAKE_MODULE_PATH     = ${CMAKE_MODULE_PATH}")
 qi_debug("CMAKE_INCLUDE_PATH    = ${CMAKE_INCLUDE_PATH}")
 qi_debug("CMAKE_SYSTEM_LIBRARY_PATH = ${CMAKE_SYSTEM_LIBRARY_PATH}")
 
+
+# Small option to deactivate targets created by qi_add_test et al.
+option(BUILD_TESTS
+  "If OFF, no test will be built, and `qibuild test` won't run any test"
+  ON)
