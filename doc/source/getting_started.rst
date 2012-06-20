@@ -14,8 +14,8 @@ Python 2.7 is the preferred version, but qiBuild should work fine on python
 CMake version 2.8.3 is the preferred version, but you should not have any
 problem with CMake 2.6. On Windows, choose to add CMake to your ``%PATH%.``
 
-On windows, to use scripts written in Python, you have to put ``C:\Python2.x`` and
-``c:\Python2.x\Scripts`` in your ``PATH``.
+On windows, to use scripts written in Python, you have to put ``C:\Python2x`` and
+``c:\Python2x\Scripts`` in your ``PATH``.
 
 Installation
 ------------
