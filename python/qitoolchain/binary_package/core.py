@@ -46,7 +46,7 @@ class BinaryPackage:
         If the metadata has not been cached yet, then it is read/laoded and
         cached in the instance.
 
-        The metadata is stored in a dictionary, which has the following layout:
+        The metadata is stored in a dictionary, which has the following layout::
 
           metadata = {
             name,

@@ -6,7 +6,6 @@ qitoolchain modules
 
     toolchain
     feed
+    binary_package/index
     remote
     version
-
-

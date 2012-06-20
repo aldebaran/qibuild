@@ -27,6 +27,13 @@ update NAME
 add-package -c TOOLCHAIN_NAME PACKAGE_NAME PACKAGE_PATH
   add a new package to the given toolchain
 
+import-package -c TOOLCHAIN_NAME [PACKAGE_NAME] PACKAGE_PATH
+  import a binary package into the given toolchain
+
+  Current supported binary package formats:
+
+  * Gentoo
+
 remove-package -c TOOLCHAIN_NAME PACKAGE_NAME
   remove the package from the toolcain
 
@@ -42,4 +49,6 @@ like this:
     <defaults config=NAME />
   </qibuild>
 
-
+Note: the ``import-package`` action may take benefit from *portage*
+(see: http://www.gentoo.org/proj/en/portage/index.xml) if it is found on your
+system.
