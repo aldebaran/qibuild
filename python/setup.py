@@ -15,6 +15,7 @@ packages = [
     "qidoc.actions",
     "qitoolchain",
     "qitoolchain.actions",
+    "qitoolchain.binary_package",
 ]
 
 scripts = [
