@@ -48,6 +48,7 @@ def deploy(local_directory, remote_url, port=22, use_rsync=True):
             "--archive",  # presevre symlinks et all
             "--update",   # only copy newer files
             "--progress", # print a progress bar
+            "--checksum", # verify checksum instead of size and date
             "-e", "ssh -p %d" % port, # custom ssh port
             local_directory, remote_url
         ]
