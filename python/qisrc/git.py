@@ -156,7 +156,7 @@ class Git:
         master -> tracking branch
 
         """
-        (status, out) = self.call("branch", raises=False)
+        (status, out) = self.call("branch", "--no-color", raises=False)
         if status != 0:
             mess  = "Could not get the list of local branches\n"
             mess += "Error was: %s" % out
