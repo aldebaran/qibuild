@@ -75,6 +75,7 @@ def handle_package(package, package_tree, toolchain):
         handle_local_package(package, package_tree)
     if package_tree.get("toolchain_file"):
         handle_toochain_file(package, package_tree)
+    package.sysroot = package_tree.get("sysroot")
     cmake_generator = package_tree.get("cmake_generator")
     if cmake_generator:
         toolchain.cmake_generator = cmake_generator

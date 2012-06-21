@@ -261,6 +261,11 @@ class FeedTestCase(unittest.TestCase):
         self.assertTrue(expected in tc_file,
             "Did not find %s\n in\n %s" % (expected, tc_file))
 
+        # Check that the sysroot is correct:
+        self.assertEquals(tc.get_sysroot(),
+            os.path.join(ctc_path, "sysroot"))
+
+
     def test_ctc_nonfree(self):
         self.setup_srv()
 

@@ -86,13 +86,18 @@ def get_tc_config_path():
 
 class Package():
     """ A package simply has a name and a path.
-    It may also be associated to a toolchain file, relative to its path
+    It may also be associated to a toolchain file, relative to its path,
+    or a sysroot, also relative to its path
 
     """
-    def __init__(self, name, path, toolchain_file=None):
+    def __init__(self, name, path, toolchain_file=None, sysroot=None):
         self.name = name
         self.path = path
         self.toolchain_file = toolchain_file
+        self.sysroot = None
+        if sysroot:
+            self.sysroot = os.path.join(self.path, sysroot)
+
         # Quick hack for now
         self.depends = list()
 
@@ -100,6 +105,8 @@ class Package():
         res = "<Package %s in %s"  % (self.name, self.path)
         if self.toolchain_file:
             res += " (using toolchain from %s)" % self.toolchain_file
+        if self.sysroot:
+            res += "  (sysroot: %s)" % self.sysroot
         res += ">"
         return res
 
@@ -108,6 +115,8 @@ class Package():
         res += "\n  in %s" % self.path
         if self.toolchain_file:
             res += "\n  using %s toolchain file" % self.toolchain_file
+        if self.sysroot:
+            res += "\n sysroot: " + self.sysroot
         return res
 
     def __eq__(self, other):
@@ -259,8 +268,9 @@ class Toolchain:
                     mess += "(from '%s')\n" % config_path
                     mess += "Package %s has no 'path' setting" % package_name
                     raise Exception(mess)
-                package_tc_file = package_conf.get('toolchain_file')
-                package = Package(package_name, package_path, package_tc_file)
+                package = Package(package_name, package_path,
+                                  toolchain_file=package_conf.get('toolchain_file'),
+                                  sysroot=package_conf.get('sysroot'))
                 self.packages.append(package)
 
         self.update_toolchain_file()
@@ -279,6 +289,11 @@ class Toolchain:
             'package "%s"' % package.name,
             "toolchain_file",
             package.toolchain_file)
+        if package.sysroot:
+            qibuild.configstore.update_config(config_path,
+            'package "%s"' % package.name,
+            "sysroot",
+            package.sysroot)
         self.load_config()
 
     def remove_package(self, name):
@@ -363,6 +378,16 @@ class Toolchain:
         package = [p for p in self.packages if p.name == package_name][0]
         package_path = package.path
         return package_path
+
+    def get_sysroot(self):
+        """ Get the sysroot of the toolchain.
+        Assume that one and exactly one of the packages inside
+        the toolchain has a 'sysroot' attribute
+
+        """
+        for package in self.packages:
+            if package.sysroot:
+                return package.sysroot
 
     def install_package(self, package_name, destdir, runtime=False):
         """ Install a package to a destdir.
