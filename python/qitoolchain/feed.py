@@ -45,7 +45,7 @@ def tree_from_feed(feed_location):
             fp = qitoolchain.remote.open_remote_location(feed_location)
         tree = ElementTree.ElementTree()
         tree.parse(fp)
-    except Exception, e:
+    except Exception:
         mess  = "Could not parse %s\n" % feed_location
         LOGGER.error(mess)
         raise
@@ -125,7 +125,7 @@ def handle_remote_package(feed, package, package_tree, toolchain):
         if os.path.exists(dest):
             qibuild.sh.rm(dest)
         try:
-            extracted = qibuild.archive.extract(package_archive, packages_path, topdir=package_name)
+            qibuild.archive.extract(package_archive, packages_path, topdir=package_name)
         except qibuild.archive.InvalidArchive, err:
             mess = str(err)
             mess += "\nPlease fix the archive and try again"
