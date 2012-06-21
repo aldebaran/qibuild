@@ -309,6 +309,15 @@ def create(directory, force=False):
                 mess  = "There is already a worktree in %s\n" % parent_worktree
                 mess += "Use --force if you are sure you want to create nested worktrees"
                 raise Exception(mess)
+
+        git_project = git_project_path_from_cwd(directory)
+        if git_project:
+            mess  = "Trying to create a worktree inside a git project\n"
+            mess += "(in %s)\n" % git_project
+            mess += "This is disabled by default, use --force "
+            mess += "if you really know what you are doing"
+            raise Exception(mess)
+
     to_create = os.path.join(directory, ".qi")
     qibuild.sh.mkdir(to_create, recursive=True)
     qi_xml = os.path.join(directory, ".qi", "qibuild.xml")
@@ -339,12 +348,14 @@ def project_path_from_cwd():
     res = os.path.dirname(qiproj_xml)
     return res
 
-def git_project_path_from_cwd():
+def git_project_path_from_cwd(cwd=None):
     """ Get the path to the git repo of the current
     project using cwd
 
     """
-    head = os.getcwd()
+    if not cwd:
+        cwd = os.getcwd()
+    head = cwd
     while True:
         if os.path.exists(os.path.join(head, ".git")):
             break
