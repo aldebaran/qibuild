@@ -73,15 +73,8 @@ def cmake(source_dir, build_dir, cmake_args, clean_first=True, env=None):
     if not os.path.exists(source_dir):
         raise Exception("source dir: %s does not exist, aborting")
 
-    # When calling qibuild configure, we know that the directory
-    # exists, (for instance because we've just generated the dependencies.cmake file)
-    # but when calling 'qibuild install', we call cmake to
-    # set CMAKE_INSTALL_PREFIX of "/", but we do NOT know if the build
-    # directory exists...
     if not os.path.exists(build_dir):
         mess  = "Could not find build directory: %s \n" % build_dir
-        mess += "If you were trying to install the project, make sure "
-        mess += "that you have configured and built it first"
         raise Exception(mess)
 
     # Always remove CMakeCache

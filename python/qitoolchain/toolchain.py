@@ -7,6 +7,7 @@ A set of packages and a toolchain file
 """
 
 import os
+import logging
 import ConfigParser
 
 import qibuild
@@ -16,6 +17,7 @@ import qitoolchain
 CONFIG_PATH = "~/.config/qi/"
 CACHE_PATH  = "~/.cache/qi"
 SHARE_PATH  = "~/.local/share/qi/"
+LOGGER = logging.getLogger(__name__)
 
 
 def get_default_packages_path(tc_name):
@@ -397,10 +399,10 @@ class Toolchain:
         installed
 
         """
+        LOGGER.info("installing %s to %s", package_name, destdir)
         package_path = self.get(package_name)
         if runtime:
             qibuild.sh.install(package_path, destdir,
                 filter_fun=qibuild.sh.is_runtime)
         else:
             qibuild.sh.install(package_path, destdir)
-

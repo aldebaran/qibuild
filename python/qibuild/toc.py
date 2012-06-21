@@ -535,7 +535,7 @@ You may want to run:
         else:
             raise TestsFailed(project, summary)
 
-    def install_project(self, project, destdir, runtime=False, num_jobs=1):
+    def install_project(self, project, destdir, prefix="/", runtime=False, num_jobs=1):
         """ Install the project
 
         :param project: project name.
@@ -549,17 +549,42 @@ You may want to run:
 
         """
         build_dir = project.build_directory
+        # DESTDIR=/tmp/foo and CMAKE_PREFIX="/usr/local" means
+        # dest = /tmp/foo/usr/local
+        prefix = prefix[1:]
+        destdir = qibuild.sh.to_native_path(destdir)
         self.build_env["DESTDIR"] = destdir
-        try:
-            if runtime:
-                self.install_project_runtime(project, destdir, num_jobs=num_jobs)
-            else:
-                cmd = ["cmake", "--build", build_dir, "--config", self.build_type,
-                        "--target", "install", "--"]
-                cmd += num_jobs_to_args(num_jobs, self.cmake_generator)
-                qibuild.command.call(cmd, env=self.build_env)
-        except CommandFailedException:
-            raise InstallFailed(project)
+        LOGGER.info("Installing %s to %s", project.name, destdir)
+        dest = os.path.join(destdir, prefix)
+        dest = qibuild.sh.to_native_path(dest)
+        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
+        if not os.path.exists(cmake_cache):
+            mess  = """Could not install project {project.name}
+It appears the project has not been configured.
+({cmake_cache} does not exist)
+Try configuring and building the project first.
+"""
+            mess = mess.format(config=self.active_config,
+                project=project, cmake_cache=cmake_cache)
+            raise Exception(mess)
+
+        cprefix = qibuild.cmake.get_cached_var(build_dir, "CMAKE_INSTALL_PREFIX")
+        if cprefix != prefix:
+            qibuild.cmake.cmake(project.directory, project.build_directory,
+                ['-DCMAKE_INSTALL_PREFIX=%s' % prefix],
+                clean_first=False,
+                env=self.build_env)
+        else:
+            mess = "Skipping configuration of project %s\n" % project.name
+            mess += "CMAKE_INSTALL_PREFIX is already correct"
+            LOGGER.debug(mess)
+
+        if runtime:
+            self.install_project_runtime(project, destdir, num_jobs=num_jobs)
+        else:
+            if not self.using_visual_studio and not self.cmake_generator == "Xcode":
+                self.build_project(project, target="preinstall", num_jobs=num_jobs)
+            self.build_project(project, target="install")
 
     def install_project_runtime(self, project, destdir, num_jobs=1):
         """Install runtime component of a project to a destdir """

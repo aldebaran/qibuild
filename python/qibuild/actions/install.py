@@ -31,8 +31,22 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    toc      = qibuild.toc_open(args.worktree, args)
-    qibuild.install.install_projects(toc, args.destdir, runtime=args.runtime,
-                                     prefix=args.prefix,
-                                     include_deps=args.include_deps, num_jobs=args.num_jobs)
+    toc = qibuild.toc_open(args.worktree, args)
+    # Compute final destination:
+    prefix = args.prefix[1:]
+    destdir = qibuild.sh.to_native_path(args.destdir)
+    dest = os.path.join(destdir, prefix)
 
+    # Resolve deps:
+    (project_names, package_names, _) = toc.resolve_deps(runtime=args.runtime)
+
+    # Install packages to destdir:
+    if args.include_deps:
+        for package_name in package_names:
+            toc.toolchain.install_package(package_name, dest, runtime=args.runtime)
+
+    for project_name in project_names:
+        project = toc.get_project(project_name)
+        toc.install_project(project,  args.destdir,
+                            prefix=args.prefix, runtime=args.runtime,
+                            num_jobs=args.num_jobs)
