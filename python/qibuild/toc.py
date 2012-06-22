@@ -17,6 +17,7 @@ import operator
 
 import qisrc
 import qibuild
+import qibuild.gdb
 import qitoolchain
 
 from qibuild.project  import Project
@@ -531,7 +532,9 @@ You may want to run:
         if not res:
             raise TestsFailed(project)
 
-    def install_project(self, project, destdir, prefix="/", runtime=False, num_jobs=1):
+    def install_project(self, project, destdir, prefix="/",
+                        runtime=False, num_jobs=1,
+                        split_debug=False):
         """ Install the project
 
         :param project: project name.
@@ -542,6 +545,8 @@ You may want to run:
         :param runtime: Whether to install the project as a runtime
            package or not.
            (see :ref:`cmake-install` section for the details)
+        :package split_debug: split the debug symbols out of the binaries
+            useful for `qibuild deploy`
 
         """
         build_dir = project.build_directory
@@ -582,6 +587,11 @@ Try configuring and building the project first.
             self.install_project_runtime(project, destdir, num_jobs=num_jobs)
         else:
             self.build_project(project, target="install")
+
+        if split_debug:
+            if self.using_visual_studio:
+                raise Exception("split debug not supported on Visual Studio")
+            qibuild.gdb.split_debug(destdir)
 
     def install_project_runtime(self, project, destdir, num_jobs=1):
         """Install runtime component of a project to a destdir """

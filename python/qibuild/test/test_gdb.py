@@ -35,16 +35,14 @@ def pytest_funcarg__toc_release(request):
     request.addfinalizer(clean_test_dir)
     return toc
 
-def run_gdb(toc):
-    debugme_proj = toc.get_project("debugme")
-    build_dir = debugme_proj.build_directory
-    gdb_ini = os.path.join(build_dir, "gdb.ini")
+def run_gdb(base_dir):
+    gdb_ini = os.path.join(base_dir, "gdb.ini")
     with open(gdb_ini, "w") as fp:
         fp.write("""file {binary}
 run
 bt
 q
-""".format(binary=os.path.join(build_dir, "sdk/bin/debugme")))
+""".format(binary=os.path.join(base_dir, "bin/debugme")))
     cmd = ["gdb", "-batch", "-x",  gdb_ini]
     process = subprocess.Popen(cmd,
         stdout = subprocess.PIPE,
@@ -56,7 +54,7 @@ def test_normal_debug(toc):
     proj = toc.get_project("debugme")
     toc.configure_project(proj)
     toc.build_project(proj)
-    (out, _)  = run_gdb(toc)
+    (out, _)  = run_gdb(proj.sdk_directory)
     assert "in foo () at " in out
     assert "main.cpp" in out
 
@@ -65,14 +63,25 @@ def test_split_debug(toc):
     toc.configure_project(proj)
     toc.build_project(proj)
     qibuild.gdb.split_debug(proj.sdk_directory)
-    (out, _) = run_gdb(toc)
+    (out, _) = run_gdb(proj.sdk_directory)
     assert "in foo () at " in out
     assert "main.cpp" in out
+
+def test_split_debug_install(toc, tmpdir):
+    tmpdir = tmpdir.strpath
+    proj = toc.get_project("debugme")
+    toc.configure_project(proj)
+    toc.build_project(proj)
+    toc.install_project(proj, tmpdir, split_debug=True, runtime=True)
+    (out, _) = run_gdb(tmpdir)
+    assert "in foo () at " in out
+    assert "main.cpp" in out
+
 
 def test_gdb_release(toc_release):
     proj = toc_release.get_project("debugme")
     toc_release.configure_project(proj)
     toc_release.build_project(proj)
-    (out, err) = run_gdb(toc_release)
+    (out, err) = run_gdb(proj.sdk_directory)
     assert "No stack" in err
     assert "in foo () at " not in out

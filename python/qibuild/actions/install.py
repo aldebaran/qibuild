@@ -27,6 +27,8 @@ def configure_parser(parser):
         help="Include dependencies when installing (this is the default)")
     group.add_argument("--no-include-deps", action="store_false", dest="include_deps",
         help="Ignore dependencies when installing (use with caution)")
+    group.add_argument("--split-debug", action="store_true", dest="split_debug",
+        help="Split the debug symbols out of the binaries")
     parser.set_defaults(runtime=False, prefix="/", include_deps=True)
 
 def do(args):
@@ -49,4 +51,5 @@ def do(args):
         project = toc.get_project(project_name)
         toc.install_project(project,  args.destdir,
                             prefix=args.prefix, runtime=args.runtime,
-                            num_jobs=args.num_jobs)
+                            num_jobs=args.num_jobs,
+                            split_debug=args.split_debug)
