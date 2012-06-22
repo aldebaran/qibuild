@@ -579,11 +579,12 @@ Try configuring and building the project first.
             mess += "CMAKE_INSTALL_PREFIX is already correct"
             LOGGER.debug(mess)
 
+        if not self.using_visual_studio and not self.cmake_generator == "Xcode":
+            self.build_project(project, target="preinstall", num_jobs=num_jobs)
+
         if runtime:
             self.install_project_runtime(project, destdir, num_jobs=num_jobs)
         else:
-            if not self.using_visual_studio and not self.cmake_generator == "Xcode":
-                self.build_project(project, target="preinstall", num_jobs=num_jobs)
             self.build_project(project, target="install")
 
     def install_project_runtime(self, project, destdir, num_jobs=1):
