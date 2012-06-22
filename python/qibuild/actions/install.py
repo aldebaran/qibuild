@@ -7,7 +7,7 @@
 import os
 import logging
 
-import qibuild.install
+import qibuild
 
 LOGGER = logging.getLogger(__name__)
 
