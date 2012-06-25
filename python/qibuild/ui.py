@@ -36,7 +36,7 @@ class _Color:
 
 _esc = "\033["
 
-reset     = _Color(_esc + "39;49;00m")
+reset     = _Color(_esc + "0m")
 bold      = _Color(_esc + "1m")
 faint     = _Color(_esc + "2m")
 standout  = _Color(_esc + "3m")
@@ -101,7 +101,7 @@ def _msg(*tokens, **kwargs):
     if with_color:
         res += reset.code
     res += end
-    if _console:
+    if _console and with_color:
         _console.write_color(res)
     else:
         fp.write(res)
