@@ -5,13 +5,13 @@
 
 import os
 import shutil
-import logging
+import qibuild.log
 
 import qisrc
 import qibuild
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def copy_helper(project_name, directory):
     """Create a new project in the specified directory.

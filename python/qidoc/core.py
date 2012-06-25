@@ -8,7 +8,7 @@
 import os
 import sys
 import webbrowser
-import logging
+import qibuild.log
 
 import qisrc
 import qibuild
@@ -17,7 +17,7 @@ import qidoc.config
 import qidoc.sphinx
 import qidoc.doxygen
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 
 

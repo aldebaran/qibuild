@@ -14,11 +14,11 @@ import datetime
 import errno
 import signal
 import shlex
-import logging
+import qibuild.log
 
 import qibuild
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def _str_from_signal(code):
     """ Returns a nice string describing the signal

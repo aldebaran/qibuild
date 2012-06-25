@@ -8,11 +8,11 @@
 
 import os
 import sys
-import logging
+import qibuild.log
 import copy
 import operator
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 try:
     import argparse
@@ -151,7 +151,7 @@ def main_wrapper(module, args):
                 sys.exit(0)
         if args.backtrace:
             raise
-        logger = logging.getLogger("\n") # small hack
+        logger = qibuild.log.get_logger("\n") # small hack
         logger.error(str(e))
         sys.exit(2)
 

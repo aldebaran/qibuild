@@ -7,13 +7,13 @@
 
 import os
 import sys
-import logging
+import qibuild.log
 
 import qidoc.command
 import qidoc.templates
 import qibuild.sh
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def configure(src, dest, templates, intersphinx_mapping, doxylink, opts):
     """ Configure a sphinx repo

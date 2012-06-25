@@ -7,12 +7,12 @@
 
 import os
 import sys
-import logging
+import qibuild.log
 
 import qibuild
 import qisrc
 
-LOGGER = logging.getLogger("qisrc.status")
+LOGGER = qibuild.log.get_logger("qisrc.status")
 
 def configure_parser(parser):
     """Configure parser for this action """

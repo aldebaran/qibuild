@@ -9,14 +9,14 @@
 import os
 import re
 import sys
-import logging
+import qibuild.log
 import urlparse
 
 import qisrc.git
 import qibuild.interact
 import qibuild.config
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def parse_git_url(url):
     """ Parse a git url. Return a tuple: username, server, port

@@ -8,12 +8,12 @@
 
 import os
 import re
-import logging
+import qibuild.log
 import subprocess
 
 import qibuild.sh
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def fix_dylibs(sdk_dir, paths=None):
     """ Create symlinks to every framework

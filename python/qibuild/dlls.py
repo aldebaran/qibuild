@@ -8,9 +8,9 @@
 import os
 import qibuild
 
-import logging
+import qibuild.log
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def fix_dlls(sdk_dir, build_env=None, paths=None, mingw=False):
     """ Copy the dlls fron the toolchains and the other build dirs

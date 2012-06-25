@@ -5,11 +5,11 @@
 """Install a project and its dependencies """
 
 import os
-import logging
+import qibuild.log
 
 import qibuild
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 
 def configure_parser(parser):

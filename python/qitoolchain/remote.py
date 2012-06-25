@@ -12,12 +12,12 @@ import sys
 import ftplib
 import urlparse
 import urllib2
-import logging
+import qibuild.log
 import StringIO
 
 import qibuild
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def callback(total, done):
     """ Called during download """

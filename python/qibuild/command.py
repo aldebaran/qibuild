@@ -9,14 +9,14 @@
 import os
 import sys
 import contextlib
-import logging
+import qibuild.log
 import subprocess
 import threading
 import Queue
 
 import qibuild
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 
 # Quick hack: in order to be able to configure how

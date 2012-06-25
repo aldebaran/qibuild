@@ -8,7 +8,7 @@
 
 import os
 import sys
-import logging
+import qibuild.log
 import hashlib
 import urlparse
 from xml.etree import ElementTree
@@ -16,7 +16,7 @@ from xml.etree import ElementTree
 import qibuild
 import qitoolchain
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 
 def raise_parse_error(package_tree, feed, message):

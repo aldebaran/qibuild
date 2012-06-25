@@ -8,10 +8,10 @@
 
 """
 
-import logging
+import qibuild.log
 import subprocess
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def call(cmd, cwd=None, env=None, quiet=False):
     """ Execute a command, printing only the warnings

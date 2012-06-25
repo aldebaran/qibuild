@@ -9,12 +9,12 @@ If a feed url is given, use this feed instead of the recorded one
 to update the given toolchain.
 """
 
-import logging
+import qibuild.log
 
 import qibuild
 import qitoolchain
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 
 def configure_parser(parser):

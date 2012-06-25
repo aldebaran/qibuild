@@ -15,10 +15,10 @@ import errno
 import stat
 import shutil
 import tempfile
-import logging
+import qibuild.log
 import subprocess
 
-LOGGER = logging.getLogger("buildtool.sh")
+LOGGER = qibuild.log.get_logger("buildtool.sh")
 
 def mkdir(dest_dir, recursive=False):
     """ Recursive mkdir (do not fail if file exists) """

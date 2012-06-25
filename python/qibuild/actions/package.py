@@ -5,11 +5,11 @@
 
 import os
 import sys
-import logging
+import qibuild.log
 
 import qibuild
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 
 def get_package_name(project,

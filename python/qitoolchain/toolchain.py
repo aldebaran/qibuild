@@ -7,7 +7,7 @@ A set of packages and a toolchain file
 """
 
 import os
-import logging
+import qibuild.log
 import ConfigParser
 
 import qibuild
@@ -17,7 +17,7 @@ import qitoolchain
 CONFIG_PATH = "~/.config/qi/"
 CACHE_PATH  = "~/.cache/qi"
 SHARE_PATH  = "~/.local/share/qi/"
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 
 def get_default_packages_path(tc_name):

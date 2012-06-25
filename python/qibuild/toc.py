@@ -12,7 +12,7 @@ import sys
 import glob
 import platform
 import signal
-import logging
+import qibuild.log
 import operator
 
 import qisrc
@@ -24,7 +24,7 @@ from qisrc.worktree import WorkTree
 from qibuild.command  import CommandFailedException
 from qibuild.dependencies_solver import DependenciesSolver
 
-LOGGER = logging.getLogger("qibuild.toc")
+LOGGER = qibuild.log.get_logger("qibuild.toc")
 
 
 class TocException(Exception):

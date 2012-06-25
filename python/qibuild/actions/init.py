@@ -4,13 +4,13 @@
 """Initialize a new toc worktree """
 
 import os
-import logging
+import qibuild.log
 
 import qisrc
 import qibuild
 import qibuild.wizard
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 
 def configure_parser(parser):

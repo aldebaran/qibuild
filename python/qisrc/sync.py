@@ -8,7 +8,7 @@
 
 import os
 import sys
-import logging
+import qibuild.log
 
 import qibuild.sh
 
@@ -16,7 +16,7 @@ import qisrc.manifest
 import qisrc.review
 import qisrc.git
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 
 def fetch_manifest(worktree, manifest_git_url, branch="master",

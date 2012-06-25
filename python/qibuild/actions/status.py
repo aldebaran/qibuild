@@ -9,12 +9,12 @@ import os
 import glob
 import time
 import datetime
-import logging
+import qibuild.log
 
 import qisrc
 import qibuild
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def usage():
     "Specific usage"

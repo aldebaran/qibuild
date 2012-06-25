@@ -9,7 +9,7 @@
 
 import os
 import sys
-import logging
+import qibuild.log
 import qibuild
 import qisrc
 

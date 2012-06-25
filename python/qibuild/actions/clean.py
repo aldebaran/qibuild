@@ -10,7 +10,7 @@ You can specify a list of build directory names to cleanup.
 
 import os
 import glob
-import logging
+import qibuild.log
 
 import qisrc
 import qibuild
@@ -53,7 +53,7 @@ def list_build_folder(path, bdirs, worktree):
 
 def do(args):
     """Main entry point"""
-    logger   = logging.getLogger(__name__)
+    logger   = qibuild.log.get_logger(__name__)
     qiwt     = qisrc.open_worktree(args.worktree)
 
     if args.force:

@@ -16,7 +16,7 @@ import os
 import sys
 import copy
 import posixpath
-import logging
+import qibuild.log
 import operator
 import tarfile
 import shutil
@@ -26,7 +26,7 @@ import qibuild
 
 
 
-LOGGER = logging.getLogger("buildtool.archive")
+LOGGER = qibuild.log.get_logger("buildtool.archive")
 
 class InvalidArchive(Exception):
     """Just a custom exception """

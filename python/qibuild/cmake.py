@@ -1,12 +1,12 @@
 import os
 import re
 import subprocess
-import logging
+import qibuild.log
 
 import qibuild.command
 import qibuild.sh
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def get_known_cmake_generators():
     """ Get the list of known cmake generators.

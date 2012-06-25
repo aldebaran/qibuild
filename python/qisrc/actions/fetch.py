@@ -21,12 +21,12 @@ The url should point to a xml file looking like
 """
 
 import os
-import logging
+import qibuild.log
 
 import qisrc
 import qibuild
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """

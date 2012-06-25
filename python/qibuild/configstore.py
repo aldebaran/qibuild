@@ -35,7 +35,7 @@ You can use:
 
 import os
 import shlex
-import logging
+import qibuild.log
 import ConfigParser
 
 import qibuild
@@ -74,7 +74,7 @@ class ConfigStore:
     Note: there is no set() value, use update_config
     instead.
     """
-    logger = logging.getLogger("qibuild.configstore")
+    logger = qibuild.log.get_logger("qibuild.configstore")
 
     def __init__(self):
         self.root = dict()

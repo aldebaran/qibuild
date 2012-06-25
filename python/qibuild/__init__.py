@@ -9,7 +9,7 @@ and building projects.
 
 import os
 import sys
-import logging
+import qibuild.log
 
 from qibuild import archive
 from qibuild import build

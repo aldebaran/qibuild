@@ -20,12 +20,12 @@ The :py:class:`toc` object is able to:
 """
 
 import os
-import logging
+import qibuild.log
 
 import qibuild.sh
 import qixml
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = qibuild.log.get_logger(__name__)
 
 
 class Project:

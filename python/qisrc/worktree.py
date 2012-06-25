@@ -7,14 +7,14 @@
 """
 
 import os
-import logging
+import qibuild.log
 import operator
 
 import qibuild.sh
 import qixml
 from qixml import etree
 
-LOGGER = logging.getLogger("WorkTree")
+LOGGER = qibuild.log.get_logger("WorkTree")
 
 
 class NotInWorktree(Exception):

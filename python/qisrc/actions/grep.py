@@ -9,7 +9,7 @@ Options are the same as in git grep
 """
 
 import sys
-import logging
+import qibuild.log
 
 import qisrc
 import qibuild
@@ -24,7 +24,7 @@ def do(args):
     """ Main entry point """
     qiwt = qisrc.open_worktree(args.worktree)
     git_grep_opts = args.git_grep_opts
-    logger = logging.getLogger(__name__)
+    logger = qibuild.log.get_logger(__name__)
     retcode = 0
     for project in qiwt.git_projects:
         print "Looking in", project.src, "..."

@@ -6,7 +6,7 @@
 
 """
 
-import logging
+import qibuild.log
 import qibuild
 import qibuild.cmdparse
 
@@ -20,7 +20,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    logger   = logging.getLogger(__name__)
+    logger   = qibuild.log.get_logger(__name__)
     toc      = qibuild.toc.toc_open(args.worktree, args)
 
     (project_names, _package_names, _not_found) = toc.resolve_deps()
