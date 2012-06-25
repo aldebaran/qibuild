@@ -27,9 +27,12 @@ def do(args):
     qiwt = qisrc.open_worktree(args.worktree)
     errors = list()
     ui.info(ui.green, "Running `%s` on every project" % " ".join(args.command))
+    c = 0
+    count = len(qiwt.git_projects)
     for project in qiwt.git_projects:
+        c += 1
         command = args.command[:]
-        ui.info(ui.blue, "::", ui.reset, ui.bold, project.src)
+        ui.info(ui.green, "*", ui.reset, "(%d/%d)" % (c, count), ui.blue, project.src)
         try:
             qibuild.command.call(command, cwd=project.path)
         except qibuild.command.CommandFailedException:

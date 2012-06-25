@@ -65,7 +65,7 @@ def do(args):
         if project.git_project:
             git_projects.add(project.git_project)
 
-    ui.info("Synchronizing projects ...")
+    ui.info(ui.green, "Synchronizing projects ...")
     git_projects = list(git_projects)
     git_projects.sort(key = operator.attrgetter("src"))
     errors = list()
@@ -73,7 +73,7 @@ def do(args):
     for i, project in enumerate(git_projects):
         if project_count != 1:
             ui.info(
-                ui.bold, "(%2i/%2i)" %  (i+1, project_count),
+                ui.green, "*", ui.reset, "(%2i/%2i)" %  (i+1, project_count),
                 ui.blue, project.src)
         else:
             ui.info(ui.bold, "Pulling ", ui.blue, project.src)
