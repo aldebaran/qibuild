@@ -16,8 +16,8 @@ import qibuild.log
 import qisrc
 import qisrc.cmdparse
 import qibuild
+from qibuild import ui
 
-LOGGER = qibuild.log.get_logger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -43,7 +43,7 @@ def sync_all(worktree, args):
         raise qisrc.manifest.NoManifest(worktree)
     # Re-synchronize everything:
     for manifest_project in manifest_projects:
-        print "Updating", manifest_project.src, "..."
+        ui.info(ui.green, "Updating", manifest_project.src, "...")
         git = qisrc.git.Git(manifest_project.path)
         git.pull(quiet=True)
         manifest_filename = manifest_project.profile + ".xml"
@@ -65,24 +65,28 @@ def do(args):
         if project.git_project:
             git_projects.add(project.git_project)
 
+    ui.info("Synchronizing projects ...")
     git_projects = list(git_projects)
     git_projects.sort(key = operator.attrgetter("src"))
     errors = list()
     project_count = len(git_projects)
     for i, project in enumerate(git_projects):
         if project_count != 1:
-            LOGGER.info("Pulling project %i on %s %s", i+1, project_count, project.src)
+            ui.info(
+                ui.bold, "(%2i/%2i)" %  (i+1, project_count),
+                ui.blue, project.src)
         else:
-            LOGGER.info("Pulling %s",  project.src)
+            ui.info(ui.bold, "Pulling ", ui.blue, project.src)
         git = qisrc.git.open(project.path)
         error = git.update_branch(project.branch, project.remote)
         if error:
             errors.append((project.src, error))
     if not errors:
         return
-    LOGGER.error("Fail to sync some projects")
+    print
+    ui.error("Fail to sync some projects")
     for (src, err) in errors:
-        print src
+        ui.info(ui.blue, src)
         print "-" * len(src)
-        print
         print indent(err, 2)
+        print

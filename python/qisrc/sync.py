@@ -8,15 +8,12 @@
 
 import os
 import sys
-import qibuild.log
 
 import qibuild.sh
-
 import qisrc.manifest
 import qisrc.review
 import qisrc.git
-
-LOGGER = qibuild.log.get_logger(__name__)
+from qibuild import ui
 
 
 def fetch_manifest(worktree, manifest_git_url, branch="master",
@@ -63,8 +60,11 @@ def init_worktree(worktree, manifest_location, setup_review=True):
     if not manifest.projects:
         return
     project_count = len(manifest.projects)
+    ui.info("Initializing worktree ...")
     for i, project in enumerate(manifest.projects):
-        print "Configuring project %i on %i (%s)" % (i+1, project_count, project.name)
+        ui.info(
+            ui.bold, "(%2i/%2i)" % (i+1, project_count),
+            ui.blue, project.name)
         # Use the same branch for the project as the branch
         # for the manifest, unless explicitely set:
         p_revision = project.revision
@@ -112,7 +112,7 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin",
             raise Exception(mess)
         else:
             if os.path.exists(project.path):
-                LOGGER.debug("Found project in %s, skipping" % src)
+                ui.debug("Found project in %s, skipping" % src)
                 return
             # Some one erase the project manually without telling qiworktree
             should_add = False
@@ -120,7 +120,7 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin",
     path = os.path.join(worktree.root, src)
     if os.path.exists(path):
         if skip_if_exists:
-            LOGGER.debug("Adding project in %s", src)
+            ui.debug("Adding project in %s", src)
             worktree.add_project(src)
             return
         else:
@@ -128,7 +128,7 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin",
             mess += "This path already exists\n"
             raise Exception(mess)
 
-    LOGGER.info("Git clone: %s -> %s", url, path)
+    ui.info(ui.green, "Git clone: %s -> %s" % (url, path))
     dirname = os.path.dirname(path)
     qibuild.sh.mkdir(dirname, recursive=True)
     git = qisrc.git.Git(path)
