@@ -11,6 +11,8 @@ Changelog
 Command line
 +++++++++++++
 
+
+* Nicer output for a few commands like ``qibuild test``.
 * Add a lot of short options ("-n" for "--dry-run", "-f" for "--force")
 * ``qibuild init``: add a ``--config`` argument to set the default config used by
   the worktree
@@ -53,6 +55,8 @@ Python
 * :py:meth:`qisrc.git.get_current_branch` : return None when in 'detached HEAD' state
 * Add :py:mod:`qixml` to help XML parsing, get rid of ``lxml`` dependency
 * :py:func:`qibuild.command.call` add ``quiet`` option
+* Remove usage of ``qibuild.log`` and ``logging.py`` to display nice colorized messages
+  to the console, use ``qibuild.ui`` module.
 
 Misc
 +++++

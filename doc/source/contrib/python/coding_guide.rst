@@ -287,21 +287,35 @@ A small example::
   qibuild.command.call(cmd, env=build_env)
 
 
-Logging
--------
+Output messages to the user
+-----------------------------
 
-* Usage of the logging module is advised. It enables you to display nice,
-  colorful messages to the user, helps to debug with the ``-v`` option, has a
-  nice syntax...
-  Please do not use print unless you have a very good reason to.
+* Please use ``qibuild.ui`` to print nice message to the user and not
+  just ``print``.
+  This makes it easier to distinguish between real messages and
+  the quick ``printf`` you add for debugging.
 
-* Get a logger with::
+* Speaking of debug, the tricky parts of qibuild contains some calls to
+  ``qibuild.ui.debug`` that are only triggered when using ``-v, --verbose``.
+  Don't hesitate to use that, especially when something tricky is going on
+  but you do not want to tell the user about it.
 
-    import logging
+* Note that *lots* of qibuild code uses code like
 
-    LOGGER = logging.getLogger(__name__)
+.. code-block:: python
 
-This makes sure the names of the loggers are always consistent with the source code.
+  import qibuild.log
+
+  logger = qibuild.log.get_logger(__name__)
+
+  logger.info("Building :%s", project.name)
+
+This is a relic of an old time when we were using ``logging.py``
+and a custom log handler to output messages to the console.
+
+There is a compatibility layer to make this kind of code use
+``qibuild.ui``, but for new code you should really not use
+``qibuild.log.get_logger``
 
 Debugging
 ---------

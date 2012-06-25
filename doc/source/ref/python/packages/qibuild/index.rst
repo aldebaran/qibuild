@@ -36,6 +36,6 @@ Tools
    config
    archive
    sh
-   log
+   ui
    interact
    wizard
