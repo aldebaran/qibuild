@@ -107,25 +107,27 @@ def _msg(*tokens, **kwargs):
         fp.write(res)
         fp.flush()
 
-def error(*tokens):
+def error(*tokens, **kwargs):
     """ Print an error message """
     tokens = [bold, red, "[ERROR]: "] + list(tokens)
-    _msg(*tokens, fp=sys.stderr)
+    kwargs["fp"] = sys.stderr
+    _msg(*tokens, **kwargs)
 
-def warning(*tokens):
+def warning(*tokens, **kwargs):
     """ Print a warning message """
     tokens = [brown, "[WARN ]: "] + list(tokens)
-    _msg(*tokens, fp=sys.stdout)
+    kwargs["fp"] = sys.stderr
+    _msg(*tokens, **kwargs)
 
-def info(*tokens):
+def info(*tokens, **kwargs):
     """ Print an informative message """
     if CONFIG["quiet"]:
         return
-    _msg(*tokens, fp=sys.stdout)
+    _msg(*tokens, **kwargs)
 
-def debug(*tokens):
+def debug(*tokens, **kwargs):
     """ Print a debug message """
     if not CONFIG["verbose"]:
         return
     tokens = [blue, "[DEBUG]: "] + list(tokens)
-    _msg(*tokens, fp=sys.stdout)
+    _msg(*tokens, **kwargs)
