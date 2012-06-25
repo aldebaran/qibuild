@@ -62,6 +62,8 @@ qiBuild contains work from
 
 * gclient http://code.google.com/p/gclient/ (BSD)
 
+* pygments http://pygments.org/ (BSD)
+
 Maintainers
 ------------
 
