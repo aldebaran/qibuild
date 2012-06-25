@@ -30,6 +30,7 @@ Tools
    cmake
    build
    ctest
+   gdb
    deploy
    envsetter
    command

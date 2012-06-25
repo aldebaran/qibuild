@@ -1,9 +1,10 @@
 <worktree>
-  <project name="foo" src="foo" />
-  <project name="hello" src="hello" />
-  <project name="stagelib" src="stagelib" />
-  <project name="uselib" src="uselib" />
-  <project name="world" src="world" />
-  <project name="footool" src="footool" />
-  <project name="bar" src="bar" />
+  <project src="bar" />
+  <project src="debugme" />
+  <project src="foo" />
+  <project src="footool" />
+  <project src="hello" />
+  <project src="stagelib" />
+  <project src="uselib" />
+  <project src="world" />
 </worktree>
