@@ -112,15 +112,14 @@ def run_tests(project, build_env, test_name=None):
 
     :param test_name: If given, only run this test
 
-    Always write some XML files in build-test/results
+    Always write some XML files in build-<config>/test-results
     (even if they were no tests to run at all)
 
     :return: a boolean to indicate if test was sucessful
 
     """
     build_dir = project.build_directory
-    results_dir = os.path.join(project.directory, "build-tests",
-        "results")
+    results_dir = os.path.join(project.build_directory, "test-results")
 
     all_tests = parse_ctest_test_files(build_dir)
     tests = list()

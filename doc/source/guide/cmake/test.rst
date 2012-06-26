@@ -37,7 +37,7 @@ If you have ``gtest`` installed, you can use
 
 This will automatically add the `--xml-output` option
 to store the results of the test as XML files in
-``foo/build-tests/results``, which is useful when
+``foo/build-<config>/tests-results``, which is useful when
 you are doing continuous integration.
 
 If you need to run the same executable with different

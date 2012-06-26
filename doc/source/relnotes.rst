@@ -6,6 +6,10 @@ qiBuild release notes
 What's new in qiBuild 1.16
 ---------------------------
 
+general
++++++++
+
+* Output of most commands are now more colorful and more readable
 
 wortkree
 ++++++++
@@ -29,9 +33,10 @@ wortkree
   </project>
 
 qibuild
-++++++
+++++++++
 
-* Add ``qibuild deploy`` to deploy code to a remote target
+* Add ``qibuild deploy`` to deploy code to a remote target, and easy
+  remote debugging.
 
 qisrc
 +++++
@@ -90,7 +95,15 @@ the start of the argument ::
   qicd foo -> bar/foo
   qicd foo-g -> gui/foo-gui
 
-* qitoolchain is now able to import binary packages into a cross-toolchain.
+cmake
++++++
+
+* ``qibuild configure`` no longer creates a ``build-tests`` folder at the root of the project,
+  the folder in whih the XML files are generated is now in ``build-<config>/test-results``
+
+  .. seealso::
+
+     * :ref:`qibuild-ctest`
 
 Previous release notes
 ----------------------
