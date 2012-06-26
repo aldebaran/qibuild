@@ -132,7 +132,7 @@ def configure_local_settings(toc):
 
     """
     print
-    print "Found a worktree in", toc.worktree
+    print "Found a worktree in", toc.worktree.root
     answer = qibuild.interact.ask_yes_no(
         "Do you want to configure settings for this worktree",
         default=True)
