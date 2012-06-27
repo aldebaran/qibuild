@@ -33,6 +33,46 @@ General
   bad because we generate public documentation from some of those
   doc strings.
 
+
+Always specify optional arguments explicitly
+----------------------------------------------
+
+When you have a function looking like ::
+
+    def foo(project, config=None):
+        """ run foo on the given project
+
+        """
+
+Python will let you use ``foo(my_proj, "linux32")``,
+automatically converting the regular argument ``linux32`` into the
+optional argument named ``config``
+
+Please don't do that and use the explicit form instead ::
+
+      # in bar.py
+
+      # BAD : second argument is in fact an optional
+      # argument
+      foo(my_proj, "linux32")
+
+      # OK: the optional argument is explicit:
+      foo(my_proj, config="linux32")
+
+
+This can cause problems if someone ever changes the ``foo`` function and adds a
+new optional argument *before* ``config``::
+
+    def foo(project, clean=False, config=None):
+        """ run foo on the given project
+        :param clean: ...
+
+        """
+
+The line in ``bar.py`` will call ``foo()`` with ``clean="linux32"``
+and ``config=None``, leading to interesting bugs.
+
+
 Doc strings
 ------------
 
