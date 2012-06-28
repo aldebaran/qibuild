@@ -29,6 +29,8 @@ Command line
 * ``qidoc``: fix for archlinux
 * ``qibuild configure``: you can now use ``-c system`` if you have a default
   config in your worktree but still do not want to use it
+* qitolchain: add ``import-package`` action able to import binary packages into
+  a cross-toolchain.
 
 CMake
 +++++
@@ -60,7 +62,19 @@ Python
 * add :py:func:`qibuild.sh.is_executable_binary`
 * :py:mod:`qisrc.git` : rewrite
 * :py:func:`qibuild.cmdparse.run_action` : allow adding ``--quiet-commands``
-
+* add :py:func:`qitoolchain.binary_package` : provide functions to open binary
+  packages
+* add :py:func:`qitoolchain.binary_package.core` : abstract class for binary
+  package provided by standard Linux distribution
+* add :py:func:`qottolchain.binary_package.gentoo` : binary package class for
+  *Gentoo* package (does not depends on *portage*)
+* add :py:func:`qottolchain.binary_package.gentoo_portage` : binary package
+  class for *Gentoo* package taking benefit from *portage*
+* :py:func: `qibuild.archive.extract` , :py:func: `qibuild.archive.extract_zip` ,
+  :py:func: `qibuild.archive.extract_tar` : add ``quiet`` keyword argument
+  allowing non-verbose extraction
+* :py:func: `qibuild.archive.extract_tar` : fix archive name guessing
+* :py:func: `qibuild.interact` : add ``get_editor`` function
 
 Misc
 ++++
