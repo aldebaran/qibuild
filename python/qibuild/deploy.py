@@ -120,6 +120,27 @@ def _generate_run_gdbserver_binary(dest, remote, gdb_listen, remote_dir):
                                              'remote_dir' : remote_dir })
     os.chmod(os.path.join(dest, "remote_gdbserver.sh"), 0755)
 
+def _uniq(seq, idfun=None):
+   # order preserving
+   if idfun is None:
+       def idfun(x): return x
+   seen = {}
+   result = []
+   for item in seq:
+       marker = idfun(item)
+       if marker in seen: continue
+       seen[marker] = 1
+       result.append(item)
+   return result
+
+def _get_subfolder(directory):
+    res = list()
+    for root, dirs, files in os.walk(directory):
+        new_root = os.path.abspath(root)
+        if not os.path.basename(new_root).startswith(".debug"):
+            res.append(new_root)
+    return res
+
 
 def _generate_solib_search_path(toc, project_name):
     """ generate the solib_search_path useful for gdb """
@@ -132,12 +153,12 @@ def _generate_solib_search_path(toc, project_name):
     for p in r_project_names:
         ppath = toc.get_project(p).build_directory
         ppath = os.path.join(ppath, "deploy", "lib")
-        res.append(ppath)
+        res.extend(_get_subfolder(ppath))
     for p in _package_names:
         ppath = toc.toolchain.get(p)
         ppath = os.path.join(ppath, "lib")
-        res.append(ppath)
-    return res
+        res.extend(_get_subfolder(ppath))
+    return _uniq(res)
 
 def generate_debug_scripts(toc, project_name, url):
     """ generate all scripts needed for debug """
