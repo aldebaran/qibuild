@@ -16,6 +16,7 @@ What's new in qiBuild 1.14
 * Fixed performance issues when calling ``cmake ..`` (something you often
   do when using QtCreator, for instance) after the first `qibuild configure`.
 
+* qitoolchain is now able to import binary packages into a cross-toolchain.
 
 Previous release notes
 ----------------------
