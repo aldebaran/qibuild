@@ -65,7 +65,7 @@ _CMAKE_TPL_EPILOGUE = """
 export_lib({prefix})
 """
 
-_MESSAGE_START = "Importintg '{1}' in the toolchain '{0}' ..."
+_MESSAGE_START = "Importing '{1}' in the toolchain '{0}' ..."
 
 _MESSAGE_END = "Package '{1}' has successfully been added to the toolchain '{0}'."
 
