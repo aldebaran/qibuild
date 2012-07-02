@@ -724,7 +724,7 @@ def num_jobs_to_args(num_jobs, cmake_generator):
 
     if num_jobs == 1:
         return list()
-    if cmake_generator == "Unix Makefiles":
+    if "Unix Makefiles" in  cmake_generator:
         return ["-j", str(num_jobs)]
     if cmake_generator == "NMake Makefiles":
         mess   = "-j is not supported for %s\n" % cmake_generator
@@ -736,6 +736,8 @@ def num_jobs_to_args(num_jobs, cmake_generator):
         "JOM" in cmake_generator:
         LOGGER.warning("-j is ignored when used with %s", cmake_generator)
         return list()
+    LOGGER.warning("cannot parse -j into a cmake option for generator: %s" % cmake_generator)
+    return list()
 
 def create(directory, force=False):
     """ Create a new toc worktree inside a work tree
