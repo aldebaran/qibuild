@@ -121,17 +121,22 @@ def _generate_run_gdbserver_binary(dest, remote, gdb_listen, remote_dir):
     os.chmod(os.path.join(dest, "remote_gdbserver.sh"), 0755)
 
 def _uniq(seq, idfun=None):
-   # order preserving
-   if idfun is None:
-       def idfun(x): return x
-   seen = {}
-   result = []
-   for item in seq:
-       marker = idfun(item)
-       if marker in seen: continue
-       seen[marker] = 1
-       result.append(item)
-   return result
+    """ Make sure no two same elements end up in the
+    given sequence, using the idfun passed as parameter
+
+    Note that the order is preserved
+
+    """
+    if idfun is None:
+        idfun = lambda x:x
+    seen = {}
+    result = []
+    for item in seq:
+        marker = idfun(item)
+        if marker in seen: continue
+        seen[marker] = 1
+        result.append(item)
+    return result
 
 def _get_subfolder(directory):
     res = list()
