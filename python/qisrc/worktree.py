@@ -299,29 +299,32 @@ def guess_worktree(cwd=None, raises=False):
 
 
 def create(directory, force=False):
-    """Create a new Qi work tree in the given directory
+    """Create a new Qi work tree in the given directory.
+
+    If already in a worktre, will do nothing, unless
+    force is True, and then will re-initialize the worktree.
 
     """
     if not force:
         parent_worktree = guess_worktree(directory)
         if parent_worktree:
             if parent_worktree != directory:
-                mess  = "There is already a worktree in %s\n" % parent_worktree
-                mess += "Use --force if you are sure you want to create nested worktrees"
-                raise Exception(mess)
+                if not force:
+                    qibuild.ui.warning("""{0} is already in a worktee
+(in {1})
+Use --force if you want to re-initialize the worktree""".format(directory, parent_worktree))
+                    return
 
         git_project = git_project_path_from_cwd(directory)
         if git_project:
             mess  = "Trying to create a worktree inside a git project\n"
             mess += "(in %s)\n" % git_project
-            mess += "This is disabled by default, use --force "
-            mess += "if you really know what you are doing"
             raise Exception(mess)
 
     to_create = os.path.join(directory, ".qi")
     qibuild.sh.mkdir(to_create, recursive=True)
     qi_xml = os.path.join(directory, ".qi", "qibuild.xml")
-    if not os.path.exists(qi_xml):
+    if not os.path.exists(qi_xml) or force:
         with open(qi_xml, "w") as fp:
             fp.write("<qibuild />\n")
     return open_worktree(directory)

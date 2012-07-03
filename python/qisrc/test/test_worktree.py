@@ -203,25 +203,20 @@ class WorktreeTestCase(unittest.TestCase):
         foo_test = os.path.join(foo, "test")
         qibuild.sh.mkdir(foo_test)
 
-        # Try to create a worktree in foo/test
-        error = None
-        try:
-            test_worktree = qisrc.worktree.create(foo_test)
-        except Exception, e:
-            error = e
-        self.assertFalse(error is None)
-        self.assertTrue("There is already a worktree" in str(error), error)
+        # Try to create a worktree in foo/test: should
+        # do nothing
+        test_worktree = qisrc.worktree.create(foo_test)
         test_dot_qi = os.path.join(foo_test, ".qi")
         self.assertFalse(os.path.exists(test_dot_qi))
+        worktree2 = qisrc.worktree.open_worktree(work)
+        worktree2.get_project("foo")
 
         # Use the force:
-        test_worktree = qisrc.worktree.create(foo_test, force=True)
-
-        self.assertEquals([p.src for p in worktree.projects], ["foo"])
-        self.assertEquals(test_worktree.projects, list())
+        worktree3 = qisrc.worktree.create(foo_test, force=True)
+        self.assertEquals(worktree3.projects, list())
 
         # Try to create a worktree in the same place should not raise
-        worktree2 = qisrc.worktree.create(work)
+        worktree4 = qisrc.worktree.create(work)
 
 
     def tearDown(self):
@@ -274,11 +269,8 @@ def test_create_in_git_dir(tmpdir):
     # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qisrc.worktree.create(work.strpath)
-    assert "--force" in e.value.message
     assert "inside a git project" in e.value.message
 
-    worktree = qisrc.worktree.create(work.strpath, force=True)
-    assert worktree.root == work.strpath
 
 if __name__ == "__main__":
     unittest.main()
