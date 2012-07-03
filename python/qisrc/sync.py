@@ -118,6 +118,7 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin",
             should_add = False
 
     path = os.path.join(worktree.root, src)
+    path = qibuild.sh.to_native_path(path)
     if os.path.exists(path):
         if skip_if_exists:
             ui.debug("Adding project in %s", src)
