@@ -62,7 +62,7 @@ def do(args):
 
     git_projects = set()
     for project in projects:
-        if project.git_project:
+        if project.git_project and not project.manifest:
             git_projects.add(project.git_project)
 
     ui.info(ui.green, "Synchronizing projects ...")
