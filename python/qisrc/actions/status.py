@@ -60,11 +60,16 @@ def do(args):
     qiwt = qisrc.open_worktree(args.worktree)
     gitrepo = list()
     dirty = list()
-    sz = len(qiwt.git_projects)
+
+    git_projects = qiwt.git_projects
+    manifests = qiwt.get_manifest_projects()
+    git_projects = list(set(git_projects) - set(manifests))
+
+    sz = len(git_projects)
     i = 1
     oldsz = 0
     incorrect_projs = list()
-    for git_project in qiwt.git_projects:
+    for git_project in git_projects:
         git = qisrc.git.open(git_project.path)
         if sys.stdout.isatty():
             src = git_project.src
@@ -122,9 +127,9 @@ def do(args):
             print "\n".join(nlines)
 
 
-    max_branch_len = max([len(x[1]) for x in incorrect_projs])
-    max_branch_len = max([max_branch_len, len("Current")])
     if incorrect_projs:
+        max_branch_len = max([len(x[1]) for x in incorrect_projs])
+        max_branch_len = max([max_branch_len, len("Current")])
         print
         print " ## Warning: some projects are not on the expected branch"
         LOGGER.info("Project ".ljust(max_len) + "Current".ljust(max_branch_len + 3) + "Manifest")
