@@ -72,6 +72,26 @@ new optional argument *before* ``config``::
 The line in ``bar.py`` will call ``foo()`` with ``clean="linux32"``
 and ``config=None``, leading to interesting bugs.
 
+Use the standard library
+-------------------------
+
+There are lots of good modules in the Python standard library:
+http://docs.python.org/library/
+
+Please have a look here before re-inventing the wheel.
+
+Some examples:
+
+* `pprint <http://docs.python.org/library/pprint.html>`_, instead of trying to rewrite complex ``__str__`` functions
+
+* `itertools <http://docs.python.org/library/itertools.html>`_, instead of writing for loops.
+
+* ``my_string.ljust()``  instead of writing custom padding code
+
+* ``max(my_list)`` instead of writing a loop to compute the biggest element
+
+* ``set(a_list) - set(blacklist)`` instead of writing a loop to remove the blacklist elements from the list
+
 
 Doc strings
 ------------
@@ -533,7 +553,7 @@ test module ::
 
 
 Also, when adding a new action, a good idea is to try to write the
-functionnality of your action thinking of it as a library, then add tests for
+functionality of your action thinking of it as a library, then add tests for
 the library, and only then add the action.
 
 This makes writing tests much easier, and also makes refactoring easier.
