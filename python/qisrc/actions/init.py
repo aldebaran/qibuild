@@ -39,6 +39,8 @@ def do(args):
         return
     manifest_url = args.manifest_url
     branch = args.branch
+    if not manifest_url:
+        return worktree
     manifest_is_a_regular_file = False
     if os.path.isfile(manifest_url):
         manifest = manifest_url
