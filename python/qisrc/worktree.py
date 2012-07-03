@@ -313,7 +313,7 @@ def create(directory, force=False):
                     qibuild.ui.warning("""{0} is already in a worktee
 (in {1})
 Use --force if you want to re-initialize the worktree""".format(directory, parent_worktree))
-                    return
+                    return open_worktree(parent_worktree)
 
         git_project = git_project_path_from_cwd(directory)
         if git_project:
