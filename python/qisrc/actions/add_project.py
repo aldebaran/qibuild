@@ -6,6 +6,8 @@
 
 """
 
+import os
+
 import qisrc
 import qibuild
 
@@ -20,5 +22,7 @@ def do(args):
     """Main entry point"""
     src = args.src
     src = qibuild.sh.to_native_path(src)
+    if not os.path.exists(src):
+        raise Exception("%s does not exists" % src)
     worktree = qisrc.open_worktree(args.worktree)
     worktree.add_project(src)
