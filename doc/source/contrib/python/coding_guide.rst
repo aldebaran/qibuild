@@ -33,9 +33,24 @@ General
   bad because we generate public documentation from some of those
   doc strings.
 
+Do not just copy/paste code from the Internet
+----------------------------------------------
+
+It's perfectly fine to look on the Internet for a solution
+of your problem.
+
+If you find a snippet of code you want to copy/paste, please:
+
+* check the license if any (qiBuild must stay BSD compatible, so
+  no GPL code, please)
+* format it first
+* fix the style if necessary
+* cite the origin of your code, either in a comment, or for
+  bigger code, in the README.rst
+
 
 Always specify optional arguments explicitly
-----------------------------------------------
+--------------------------------------------
 
 When you have a function looking like ::
 
@@ -90,7 +105,7 @@ Some examples:
 
 * ``max(my_list)`` instead of writing a loop to compute the biggest element
 
-* ``set(a_list) - set(blacklist)`` instead of writing a loop to remove the blacklist elements from the list
+* ``my_list = set(a_list_with_duplicates)`` to remove the duplicates from a list.
 
 
 Doc strings
