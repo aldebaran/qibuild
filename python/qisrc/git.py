@@ -201,7 +201,7 @@ class Git:
         self.call("remote", "rm",  name, quiet=True, raises=False)
         self.call("remote", "add", name, url, quiet=True)
 
-    def set_tracking_branch(self, branch, remote_name, remote_branch=None):
+    def set_tracking_branch(self, branch, remote_name, fetch_first=True, remote_branch=None):
         """
         Create a or update the configuration of a branch to track
         a given remote branch
@@ -210,12 +210,15 @@ class Git:
         :param remote_name: the name of the remove ('origin' in most cases)
         :param remote_branch: the name of the remote to track. If not given
             will be the same of the branch name
+        :param fetch_first: if you know you just have fetched, (such as when running
+            qisrc sync -a), set this to ``False`` to save some time
 
         """
         if remote_branch is None:
             remote_branch = branch
-        # Fetch just in case the branch just has been created
-        self.call("fetch", remote_name, quiet=True)
+        if fetch_first:
+            # Fetch just in case the branch just has been created
+            self.call("fetch", remote_name, quiet=True)
 
         # If the branch does not exist yet, create it at the right commit
         if not branch in self.get_local_branches():
@@ -257,12 +260,16 @@ class Git:
         if retcode != 0:
             raise Exception(out)
 
-    def update_branch(self, branch, remote_name, remote_branch=None):
+    def update_branch(self, branch, remote_name, remote_branch=None, fetch_first=True):
         """ Update the given branch to match the given remote branch
 
+        :param fetch_first: if you know you just have fetched, (such as when running
+            qisrc sync -a), set this to ``False`` to save some time
 
         Return an string if something went wrong
         """
+        if fetch_first:
+            self.call("fetch")
         if not remote_branch:
             remote_branch = branch
         remote_branch = "%s/%s" % (remote_name, remote_branch)
@@ -272,7 +279,7 @@ class Git:
             return self.update_branch_if_ff(branch, remote_branch)
         try:
             with self.stash_changes():
-                (retcode, out) = self.call("pull", "--rebase", raises=False)
+                (retcode, out) = self.call("rebase", remote_branch, raises=False)
                 if retcode != 0:
                     self.call("rebase", "--abort", quiet=True, raises=False)
                     return out
@@ -288,7 +295,6 @@ class Git:
         merge is fast-forward
 
         """
-        self.fetch("--all", quiet=True)
         (retcode, out) = self.call("show-ref", "--verify",
             "refs/heads/%s" % local_branch,
             raises=False)

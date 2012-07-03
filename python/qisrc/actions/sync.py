@@ -56,9 +56,10 @@ def do(args):
     worktree = qisrc.open_worktree(args.worktree)
     projects = qisrc.cmdparse.projects_from_args(args)
 
+    should_fetch_first = True
     if len(projects) == len(worktree.projects):
-        # User asked for a long operation:
         sync_all(worktree, args)
+        should_fetch_first = False
 
     git_projects = set()
     for project in projects:
@@ -78,7 +79,8 @@ def do(args):
         else:
             ui.info(ui.bold, "Pulling ", ui.blue, project.src)
         git = qisrc.git.open(project.path)
-        error = git.update_branch(project.branch, project.remote)
+        error = git.update_branch(project.branch, project.remote,
+                                 fetch_first=should_fetch_first)
         if error:
             errors.append((project.src, error))
     if not errors:
