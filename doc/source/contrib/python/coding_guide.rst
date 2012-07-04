@@ -375,22 +375,25 @@ Output messages to the user
   Don't hesitate to use that, especially when something tricky is going on
   but you do not want to tell the user about it.
 
-* Note that *lots* of qibuild code uses code like
+* In the past, we were using ``logging.py`` and a custom log handler to output
+  messages to the console. This was causing lots of problems, and we added
+  a compatibility layer to avoid having to modify to much code.
+  But please do not use ``qibuild.log`` in new code:
 
 .. code-block:: python
+
+  # Don't do this:
 
   import qibuild.log
 
   logger = qibuild.log.get_logger(__name__)
-
   logger.info("Building :%s", project.name)
 
-This is a relic of an old time when we were using ``logging.py``
-and a custom log handler to output messages to the console.
+  # Do this instead:
 
-There is a compatibility layer to make this kind of code use
-``qibuild.ui``, but for new code you should really not use
-``qibuild.log.get_logger``
+  import qibuild.ui
+  qibuild.ui.info("Building", project.name)
+
 
 Debugging
 ---------
