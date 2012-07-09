@@ -35,14 +35,23 @@ function(_qi_install_internal)
     get_filename_component(_abs_path "${f}" ABSOLUTE)
     if(IS_DIRECTORY ${_abs_path})
       list(APPEND _dirs_to_install ${f})
-    else()
+    elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${f}" OR EXISTS "${f}")
+      list(APPEND _files_to_install "${f}")
+    elseif("(${f}" MATCHES "\\*")
       file(${_glob_keyword} _file_to_install RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${f})
       if(NOT _file_to_install)
         qi_error(
-"Error when parsing qi_install arguments:
-  '${f}' does not match any files")
+          "Error when parsing qi_install arguments:
+          '${f}'glob does not match any files")
       endif()
       list(APPEND _files_to_install ${_file_to_install})
+    else()
+      get_source_file_property(_generated "${f}" GENERATED)
+      if(_generated)
+        # nothing
+      else()
+        qi_error("${f} does not exist and is not marked as a generated source")
+      endif()
     endif()
   endforeach()
 
