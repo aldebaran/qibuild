@@ -216,17 +216,24 @@ class Git:
         """
         if remote_branch is None:
             remote_branch = branch
+        tracked = self.get_tracking_branch(branch=branch)
+        remote_ref = "%s/%s" % (remote_name, remote_branch)
+        if tracked is not None:
+            if tracked != remote_ref:
+                mess = "%s will not track %s instead of %s"
+                mess = mess % (branch, remote_ref, tracked)
+                qibuild.ui.warning(mess)
+            else:
+                return
+
         if fetch_first:
             # Fetch just in case the branch just has been created
             self.call("fetch", remote_name, quiet=True)
 
         # If the branch does not exist yet, create it at the right commit
         if not branch in self.get_local_branches():
-            self.call("branch", branch, "%s/%s" % (remote_name, remote_branch),
-                quiet=True)
-        self.call("branch",
-            "--set-upstream", branch, "%s/%s" % (remote_name, remote_branch),
-             quiet=True)
+            self.call("branch", branch, remote_ref, quiet=True)
+        self.call("branch", "--set-upstream", branch, remote_ref, quiet=True)
 
 
     @contextlib.contextmanager
