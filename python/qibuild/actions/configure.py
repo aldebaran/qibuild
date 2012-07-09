@@ -6,8 +6,8 @@
 
 """
 
-import qibuild.log
 import qibuild
+from qibuild import ui
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -49,7 +49,6 @@ def do(args):
     if args.werror:
         args.cmake_flags.append("QI_WERROR=ON")
 
-    logger   = qibuild.log.get_logger(__name__)
     toc      = qibuild.toc_open(args.worktree, args)
 
     (project_names, _, _) = toc.resolve_deps()
@@ -62,9 +61,15 @@ def do(args):
         print "--debug-trycompile ON"
 
     if toc.active_config:
-        logger.info("Active configuration: %s", toc.active_config)
+        qibuild.ui.info(ui.green, "Active configuration:", ui.blue, toc.active_config)
+
+    project_count = len(projects)
+    i = 0
     for project in projects:
-        logger.info("Configuring %s", project.name)
+        i = i + 1
+        ui.info(ui.green, "*", ui.reset, "(%i/%i)" %  (i, project_count),
+                ui.green, "Configuring",
+                ui.blue, project.name)
         toc.configure_project(project,
             clean_first=args.clean_first,
             debug_trycompile=args.debug_trycompile)

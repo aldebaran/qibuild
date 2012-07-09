@@ -77,7 +77,7 @@ def do(args):
                 ui.green, "*", ui.reset, "(%2i/%2i)" %  (i+1, project_count),
                 ui.blue, project.src)
         else:
-            ui.info(ui.bold, "Pulling ", ui.blue, project.src)
+            ui.info(ui.bold, "Pulling", ui.blue, project.src)
         git = qisrc.git.open(project.path)
         error = git.update_branch(project.branch, project.remote,
                                  fetch_first=should_fetch_first)
