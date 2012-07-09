@@ -14,6 +14,7 @@ DOCUMENTED_FILES=[
     "tests",
     "submodule",
     "option",
+    "codegen",
     "find",
     "flags",
     "swig/python"

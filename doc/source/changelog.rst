@@ -46,6 +46,8 @@ CMake
 
   * added openssl, libevent_openssl
 
+* added :cmake:function:`qi_generate_src`,  :cmake:function:`qi_generate_header`
+
 Python
 +++++++
 

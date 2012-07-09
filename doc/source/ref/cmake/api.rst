@@ -23,6 +23,7 @@ qibuild CMake API functions
    api/target
    api/stage
    api/install
+   api/codegen
    api/submodule
    api/tests
    api/log

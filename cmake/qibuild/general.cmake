@@ -71,6 +71,7 @@ include("qibuild/target")
 include("qibuild/submodule")
 include("qibuild/stage")
 include("qibuild/option")
+include("qibuild/codegen")
 
 # Find libraries from self sdk dir before everything else.
 qi_prepend_uniq_global(CMAKE_FIND_ROOT_PATH "${QI_SDK_DIR}")
