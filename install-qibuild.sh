@@ -25,16 +25,26 @@ create_launcher() {
   fi
 
   if readlink -f . >/dev/null 2>/dev/null ; then
-      p=$(dirname "$(readlink -f '$0' 2>/dev/null)")
+      p=$(dirname "$(readlink -f ${0} 2>/dev/null)")
   else
-      p=$(pwd)
+      p=$(dirname "${0}")
   fi
   #echo "QiBuild directory: $p"
 
-  echo '#!/bin/sh'                                   >  "${DESTDIR}/${name}"
-  echo "$PYTHON \"${p}/${full_path}\" $args \"\$@\"" >> "${DESTDIR}/${name}"
+  cat <<EOF >"${DESTDIR}/${name}"
+#!/bin/sh
+
+QIBUILDDIR="${p}"
+
+PYTHON=\$(for pybin in python python2 ; do
+    \${pybin} --version 2>&1 | grep -q "2\.[6-7]\.*" &&
+    echo \${pybin} && break ;
+  done)
+
+\$PYTHON "\${QIBUILDDIR}/${full_path}" ${args} "\$@"
+EOF
   chmod 755 "${DESTDIR}/${name}"
-  echo "installed: ${DESTDIR}/${name}"
+  echo "Installed: ${DESTDIR}/${name}"
 }
 
 
@@ -71,3 +81,4 @@ create_launcher python/bin/qibuild      qc           configure
 create_launcher python/bin/qibuild      qm           make
 create_launcher python/bin/qisrc        qp           pull --rebase
 create_launcher python/bin/qibuild      qo           open
+echo "Make sure ${DESTDIR} is in your PATH."
