@@ -15,6 +15,9 @@
 #    qi_generate_src(${_output} SRC ${_input} COMMAND my_script ${_input} > ${_output})
 #    qi_create_bin(my_bin ${_output} main.c)
 #
+# Note that the base dir of the output will automatically be created, so
+# you do not have to worry about it in your script.
+#
 # \arg:out the resulting source file
 # \group:SRC a group of sources to take as input
 # \group:COMMAND the command to run to generate the source file
@@ -29,6 +32,8 @@ function(qi_generate_src out)
   endif()
   list(GET ARG_COMMAND 0 _cmd)
   list(REMOVE_AT ARG_COMMAND 0)
+  get_filename_component(_out_dir ${out} PATH)
+  file(MAKE_DIRECTORY ${_out_dir})
   add_custom_command(OUTPUT ${out}
                      COMMENT "${_comment}"
                      COMMAND ${_cmd}
@@ -48,6 +53,12 @@ endfunction()
 #    COMMAND my_script ${_input} -o ${_generated_h})
 #   qi_create_bin(foo ${_generated_h} main.c)
 #   qi_install_header(${_generated_h})
+#
+# Notes:
+#  * the base dir of the header will automatically be created, so
+#    you do not have to worry about it in your script.
+#  * ``include_directories()`` will be called with the directory where
+#    the header is generated.
 #
 #
 # \arg:out the resulting source file
