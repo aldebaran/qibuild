@@ -80,7 +80,7 @@ def do(args):
             ui.info(ui.bold, "Pulling", ui.blue, project.src)
         git = qisrc.git.open(project.path)
         error = git.update_branch(project.branch, project.remote,
-                                 fetch_first=should_fetch_first)
+                                 fetch_first=True)
         if error:
             errors.append((project.src, error))
     if not errors:
