@@ -33,7 +33,7 @@ set(_TESTS_RESULTS_FOLDER "${CMAKE_CURRENT_BINARY_DIR}/test-results" CACHE INTER
 # \group:DEPENDS the dependencies of the test
 # \param:TIMEOUT the timeout of the test
 # \group:ARGUMENTS arguments to be passed to the executable
-# \flag:INSTALL wether the test should be installed (false by default)
+# \flag:SLOW mark the test as slow, so that it is only run with ``qibuild test --slow``
 # \argn: source files (will be merged with the SRC group of arguments)
 function(qi_create_test name)
   if (DEFINED BUILD_TESTS AND NOT BUILD_TESTS)
@@ -41,7 +41,12 @@ function(qi_create_test name)
     qi_set_global(QI_${name}_TARGET_DISABLED TRUE)
     return()
   endif()
-  cmake_parse_arguments(ARG "INSTALL" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+  cmake_parse_arguments(ARG "SLOW" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+  if(ARG_SLOW)
+    set(_slow "SLOW")
+  else()
+    set(_slow "")
+  endif()
   qi_create_bin(${name} SRC ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS} NO_INSTALL)
   if(ARG_DEPENDS)
     qi_use_lib(${name} ${ARG_DEPENDS})
@@ -49,6 +54,7 @@ function(qi_create_test name)
   qi_add_test(${name} ${name}
     TIMEOUT ${ARG_TIMEOUT}
     ARGUMENTS ${ARG_ARGUMENTS}
+    ${_slow}
   )
 endfunction()
 
@@ -70,6 +76,7 @@ endfunction()
 #
 # \arg:name name of the test
 # \flag:NO_ADD_TEST Do not call add_test, just create the binary
+# \flag:SLOW mark the test as slow, so that it is only run with ``qibuild test --slow``
 # \argn: source files, like the SRC group, argn and SRC will be merged
 # \param:TIMEOUT The timeout of the test
 # \group:SRC Sources
@@ -118,7 +125,12 @@ function(qi_create_gtest name)
 
   # create tests_results folder if it does not exist
   file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
-  cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+  cmake_parse_arguments(ARG "SLOW;NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+  if(ARG_SLOW)
+    set(_slow "SLOW")
+  else()
+    set(_slow "")
+  endif()
 
   # First, create the target
   qi_create_bin(${name} SRC ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS} NO_INSTALL)
@@ -145,6 +157,7 @@ function(qi_create_gtest name)
   qi_add_test(${name} ${name}
     TIMEOUT ${ARG_TIMEOUT}
     ARGUMENTS ${_args}
+    ${_slow}
   )
 endfunction()
 
@@ -164,8 +177,10 @@ endfunction()
 # \arg:target_name The name of the binary to use
 # \param:TIMEOUT The timeout of the test
 # \group:ARGUMENTS Arguments to be passed to the executable
+# \flag:SLOW mark the test as slow, so that it is only run with ``qibuild test --slow``
+#
 function(qi_add_test test_name target_name)
-  cmake_parse_arguments(ARG "" "TIMEOUT" "ARGUMENTS" ${ARGN})
+  cmake_parse_arguments(ARG "SLOW" "TIMEOUT" "ARGUMENTS" ${ARGN})
 
   if(NOT ARG_TIMEOUT)
     set(ARG_TIMEOUT 20)
@@ -187,6 +202,12 @@ function(qi_add_test test_name target_name)
   set_tests_properties(${test_name} PROPERTIES
     TIMEOUT ${ARG_TIMEOUT}
   )
+
+  if(ARG_SLOW)
+    set_tests_properties(${test_name} PROPERTIES COST 100)
+  else()
+    set_tests_properties(${test_name} PROPERTIES COST 1)
+  endif()
 
   # HACK for apple until the .dylib problems are fixed...
   if(APPLE)

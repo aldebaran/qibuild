@@ -69,6 +69,7 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
         name=test_name,
         cwd=build_dir,
         env=env)
+    cost = properties.get("COST")
 
     res = TestResult(test_name)
     start = datetime.datetime.now()
@@ -107,7 +108,7 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
     return res
 
 
-def run_tests(project, build_env, test_name=None):
+def run_tests(project, build_env, test_name=None, slow=False):
     """ Called by :py:meth:`qibuild.toc.Toc.test_project`
 
     :param test_name: If given, only run this test
@@ -123,6 +124,7 @@ def run_tests(project, build_env, test_name=None):
 
     all_tests = parse_ctest_test_files(build_dir)
     tests = list()
+    slow_tests = list()
     if test_name:
         tests = [x for x in all_tests if x[0] == test_name]
         if not tests:
@@ -132,7 +134,17 @@ def run_tests(project, build_env, test_name=None):
                 mess += "  * " + x[0] + "\n"
             raise Exception(mess)
     else:
-        tests = all_tests[:]
+        for test in all_tests:
+            (name, cmd_, properties) = test
+            cost = properties.get("COST")
+            if not slow and cost and float(cost) > 50:
+                ui.debug("Skipping test", name, "because cost",
+                         "(%s)"% cost, "is greater than 50")
+                slow_tests.append(name)
+                continue
+            tests.append(test)
+
+
 
     if not tests:
         # Create a fake test result to keep CI jobs happy:
@@ -163,6 +175,9 @@ def run_tests(project, build_env, test_name=None):
 
     if ok:
         ui.info("Ran %i tests" % len(tests))
+        if slow_tests and not slow:
+            ui.info("Note: %i" % len(slow_tests),
+                    "slow tests did not run, use --slow to run them")
         ui.info("All pass. Congrats!")
         return True
 

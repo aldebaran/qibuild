@@ -517,7 +517,7 @@ You may want to run:
             qibuild.dylibs.fix_dylibs(sdk_dir, paths=paths)
 
 
-    def test_project(self, project, test_name=None):
+    def test_project(self, project, test_name=None, slow=False):
         """Run qibuild.ctest on a project
 
         :param test_name: if given, only this test will run
@@ -528,7 +528,7 @@ You may want to run:
         if not os.path.exists(cmake_cache):
             _advise_using_configure(self, project)
         res = qibuild.ctest.run_tests(project, self.build_env,
-            test_name=test_name)
+            test_name=test_name, slow=slow)
         if not res:
             raise TestsFailed(project)
 
