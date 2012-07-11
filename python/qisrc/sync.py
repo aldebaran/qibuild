@@ -84,6 +84,10 @@ def init_worktree(worktree, manifest_location, setup_review=True):
         git = qisrc.git.Git(p_path)
         git.set_remote(p_remote, p_url)
         git.set_tracking_branch(p_revision, p_remote)
+        cur_branch = git.get_current_branch()
+        if cur_branch != p_revision:
+            ui.warning("Project", project.name, "is on", cur_branch,
+                "should be in", p_revision)
         worktree.set_git_project_config(p_src, p_remote, p_revision)
 
 
