@@ -46,6 +46,7 @@ CMake
 * qibuild cmake modules:
 
   * added openssl, libevent_openssl
+  * rename dbus into dbus-1, and dbus-glib into dbus-glib-1
 
 * added :cmake:function:`qi_generate_src`,  :cmake:function:`qi_generate_header`
 * :cmake:function:`qi_create_gtest` and :cmake:function:`qi_create_test` now
