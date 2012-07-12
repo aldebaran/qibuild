@@ -153,9 +153,10 @@ def test_single(tmpdir):
         assert parse_args("-s") == ["spam"]
         assert parse_args() == ["spam", "spam/eggs"]
 
-    # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
-        parse_args("-s", "lib/libfoo", "spam/eggs")
+    with qibuild.sh.change_cwd(worktree.root):
+        # pylint: disable-msg=E1101
+        with pytest.raises(Exception) as e:
+            parse_args("-s", "lib/libfoo", "spam/eggs")
 
     assert "Using --single with several projects does not make sense" in str(e)
 
