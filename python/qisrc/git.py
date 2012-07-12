@@ -6,7 +6,6 @@
 
 """
 import os
-import sys
 import contextlib
 import subprocess
 
@@ -51,6 +50,8 @@ class Git:
                 stderr=subprocess.STDOUT,
                 **kwargs)
             out = process.communicate()[0]
+            # Don't want useless blank lines
+            out = out.rstrip("\n")
             return (process.returncode, out)
         else:
             qibuild.command.call(cmd, **kwargs)
@@ -220,7 +221,7 @@ class Git:
         remote_ref = "%s/%s" % (remote_name, remote_branch)
         if tracked is not None:
             if tracked != remote_ref:
-                mess = "%s will not track %s instead of %s"
+                mess = "%s will now track %s instead of %s"
                 mess = mess % (branch, remote_ref, tracked)
                 qibuild.ui.warning(mess)
             else:
@@ -235,103 +236,143 @@ class Git:
             self.call("branch", branch, remote_ref, quiet=True)
         self.call("branch", "--set-upstream", branch, remote_ref, quiet=True)
 
-
-    @contextlib.contextmanager
-    def change_branch(self, branch):
-        """ Change branch if not currently on the correct branch,
-        then go back to where we were
-
-        """
-        current_branch = self.get_current_branch()
-        if current_branch == branch:
-            yield
-            return
-        with self.stash_changes():
-            self.checkout(branch, quiet=True)
-            yield
-            self.checkout(current_branch, quiet=True)
-
-
-    @contextlib.contextmanager
-    def stash_changes(self):
-        """ Stash changes, do something, then try to apply.
-
-        If something went wrong, returns the error message
-        """
-        if self.is_clean(untracked=False):
-            yield
-            return
-        self.call("stash", quiet=True)
-        yield
-        (retcode, out) = self.call("stash", "apply", quiet=True, raises=False)
-        if retcode != 0:
-            raise Exception(out)
-
-    def update_branch(self, branch, remote_name, remote_branch=None, fetch_first=True):
+    def update_branch(self, *args, **kwargs):
         """ Update the given branch to match the given remote branch
 
+        :param branch: the local branch to update
+        :param remote_name: the name of the remote
+        :param remote_branch: the remote branch to update (by default, same name as
+                             the local branch)
         :param fetch_first: if you know you just have fetched, (such as when running
             qisrc sync -a), set this to ``False`` to save some time
 
-        Return an string if something went wrong
-        """
-        if fetch_first:
-            self.call("fetch")
-        if not remote_branch:
-            remote_branch = branch
-        remote_branch = "%s/%s" % (remote_name, remote_branch)
-        if not self.get_current_branch():
-            return "Not currently on any branch"
-        if self.get_current_branch() != branch:
-            return self.update_branch_if_ff(branch, remote_branch)
-        try:
-            with self.stash_changes():
-                (retcode, out) = self.call("rebase", remote_branch, raises=False)
-                if retcode != 0:
-                    self.call("rebase", "--abort", quiet=True, raises=False)
-                    return out
-                sys.stdout.write(out)
-        except Exception, err:
-            self.call("rebase", "--abort", quiet=True, raises=False)
-            res = "Some unstaged changes were in conflict: "
-            res +=  str(err)
-            return res
-
-    def update_branch_if_ff(self, local_branch, remote_branch):
-        """ Update a local branch with a remote branch if the
-        merge is fast-forward
+        Return an string describing what happened.
+        The string will be empty iv everything went fine.
 
         """
-        (retcode, out) = self.call("show-ref", "--verify",
-            "refs/heads/%s" % local_branch,
-            raises=False)
-        if retcode != 0:
-            return out
-        local_sha1 = out.split()[0]
-        (retcode, out) = self.call("show-ref", "--verify",
-            "refs/remotes/%s" % remote_branch,
-            raises=False)
-        if retcode != 0:
-            return out
-        remote_sha1 = out.split()[0]
-        (retcode, out) = self.call("merge-base", local_sha1, remote_sha1,
-            raises=False)
-        if retcode != 0:
-            return out
-        common_ancestor = out.strip()
+        return _update_branch(self, *args, **kwargs)
 
-        if common_ancestor != local_sha1:
-            mess  = "Could not update %s with %s\n" % (local_branch, remote_branch)
-            mess += "Merge is not fast-forward and you are not on %s" % local_branch
-            return mess
-        if local_sha1 == remote_sha1:
-            # Nothing to do
-            return
-        # Safe to checkout the branch, run merge and then go back
-        # to where we were:
-        with self.change_branch(local_branch):
-            print "Updating %s with %s ..." % (local_branch, remote_branch)
-            self.call("merge", "-v", remote_sha1)
+
+def _update_branch(git, branch, remote_name,
+                   remote_branch=None, fetch_first=True):
+    """ Helper for git.update_branch
+
+    """
+    class Status:
+        pass
+    status = Status()
+    status.mess = ""
+    if not git.get_current_branch():
+        return "Not currently on any branch"
+    if fetch_first:
+        (ret, out) = git.call("fetch", remote_name, raises=False)
+        if out:
+            print out
+        if ret != 0:
+            status.mess += "Fetch failed\n"
+            status.mess += out
+            import ipdb; ipdb.set_trace()
+            return status.mess
+    if not remote_branch:
+        remote_branch = branch
+    remote_ref = "%s/%s" % (remote_name, remote_branch)
+    if git.get_current_branch() != branch:
+        _update_branch_if_ff(git, status, branch, remote_ref)
+        return status.mess
+    with _stash_changes(git, status):
+        (ret, out) = git.call("rebase", remote_ref, raises=False)
+        if ret != 0:
+            print "Rebasing failed!"
+            print "Calling rebase --abort"
+            status.mess += "Could not rebase\n"
+            status.mess += out
+            (ret, out) = git.call("rebase", "--abort", raises=False)
+            if ret != 0:
+                status.mess += "rebase --abort failed!\n"
+                status.mess += out
+    return status.mess
+
+###
+# Internal functions used by _update_branch()
+
+@contextlib.contextmanager
+def _stash_changes(git, status):
+    """ Stash changes. To be used in a 'with' statement """
+    if git.is_clean(untracked=False):
+        yield
+        return
+    (ret, out) = git.call("stash", raises=False)
+    if ret != 0:
+        status.mess += "Stashing changes failed\n"
+        status.mess += out
+    yield
+    (ret, out) = git.call("stash", "pop", raises=False)
+    if ret != 0:
+        status.mess = "Stashing back changes failed\n"
+        status.mess += out
+
+@contextlib.contextmanager
+def _change_branch(git, status, branch):
+    """ Change branch. To be used in a 'with' statement """
+    current_branch = git.get_current_branch()
+    if current_branch == branch:
+        yield
+        return
+    with _stash_changes(git, status):
+        (ret, out) = git.call("checkout", branch, raises=False)
+        if ret != 0:
+            status.mess += "Checkout to %s failed\n" % branch
+            status.mess += out
+        yield
+        (ret, out) = git.call("checkout", current_branch, raises=False)
+        if ret != 0:
+            status.mess += "Checkout back to %s failed\n" % current_branch
+            status.mess += out
+
+def _update_branch_if_ff(git, status, local_branch, remote_ref):
+    """ Update a local branch with a remote branch if the
+    merge is fast-forward
+
+    """
+    (ret, out) = git.call("show-ref", "--verify",
+                           "refs/heads/%s" % local_branch,
+                           raises=False)
+    if ret != 0:
+        status.mess += "Calling show-ref --verify failed\n"
+        status.mess += out
+        return
+    local_sha1 = out.split()[0]
+    (ret, out) = git.call("show-ref", "--verify",
+                                "refs/remotes/%s" % remote_ref,
+                                raises=False)
+    if ret != 0:
+        status.mess += "Calling show-ref --verify failed\n"
+        status.mess += out
+        return
+
+    remote_sha1 = out.split()[0]
+    (retcode, out) = git.call("merge-base", local_sha1, remote_sha1,
+                               raises=False)
+    if retcode != 0:
+        status.mess += "Calling merge-base failed"
+        status.mess += out
+        return
+    common_ancestor = out.strip()
+    if common_ancestor != local_sha1:
+        status.mess += "Could not update %s with %s\n" % (local_branch, remote_ref)
+        status.mess += "Merge is not fast-forward and you are not on %s" % local_branch
+        return
+    if local_sha1 == remote_sha1:
+        # Nothing to do
+        return
+    print "Updating %s with %s ..." % (local_branch, remote_ref)
+    # Safe to checkout the branch, run merge and then go back
+    # to where we were:
+    with _change_branch(git, status, local_branch):
+        (ret, out) = git.call("merge", "-v", remote_sha1, raises=False)
+        if ret != 0:
+            status.mess += "Merging %s with %s failed" % (local_branch, remote_ref)
+            status.mess += out
 
 
 def open(repo):

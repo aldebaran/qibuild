@@ -91,4 +91,3 @@ def do(args):
         ui.info(ui.blue, src)
         print "-" * len(src)
         print indent(err, 2)
-        print

@@ -189,7 +189,8 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         push_readme_v2(self.tmp, "bar", "master")
 
         # Update, check that master is up to date
-        git.update_branch("master", "origin")
+        err = git.update_branch("master", "origin")
+        self.assertFalse(err)
         git.checkout("master")
         readme = read_readme(bar_src)
         self.assertEqual(readme, "bar v2 on master\n")
@@ -209,7 +210,7 @@ class GitUpdateBranchTestCase(unittest.TestCase):
 
         # Updating branch should fail
         err = git.update_branch("master", "origin")
-        self.assertFalse(err is None)
+        self.assertTrue(err)
         self.assertTrue("Merge conflict in README" in err, err)
 
         # But we should be back at our previous commit
@@ -236,7 +237,7 @@ class GitUpdateBranchTestCase(unittest.TestCase):
 
         # Update branch, untracked files should still be here
         err = git.update_branch("master", "origin")
-        self.assertTrue(err is None)
+        self.assertFalse(err)
 
         self.assertTrue(os.path.exists(a_file))
         with open(a_file, "r") as fp:
@@ -268,7 +269,7 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         upstream_git.call("push", bar_url, "master:master")
 
         err = git.update_branch("master", "origin")
-        self.assertFalse(err is None)
+        self.assertTrue(err)
         self.assertTrue("untracked working tree files" in err)
         self.assertEqual(git.get_current_branch(), "master")
 
@@ -287,12 +288,14 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         push_readme_v2(self.tmp, "bar", "master")
 
         err = git.update_branch("master", "origin")
-        self.assertFalse(err is None)
+        self.assertTrue(err)
         self.assertTrue("Merge conflict in README" in err)
-        self.assertTrue("Some unstaged changes were in conflict" in err)
+        self.assertTrue("Stashing back changes failed" in err)
         self.assertTrue(git.get_current_branch(), "master")
         rebase_apply = os.path.join(git.repo, ".git", "rebase_apply")
         self.assertFalse(os.path.exists(rebase_apply))
+        readme = read_readme(bar_src)
+        self.assertTrue(readme, "Unstaged changes\n")
 
     def test_unstaged_changes_no_conflict(self):
         bar_url = create_git_repo(self.tmp, "bar")
@@ -317,7 +320,7 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         upstream_git.call("push", bar_url, "master:master")
 
         err = git.update_branch("master", "origin")
-        self.assertTrue(err is None)
+        self.assertFalse(err)
 
         # Check that upstream file is here
         a_file = os.path.join(bar_src, "a_file")
@@ -346,7 +349,7 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         push_readme_v2(self.tmp, "bar", "master")
 
         err = git.update_branch("master", "origin")
-        self.assertTrue(err is None)
+        self.assertFalse(err)
 
         # Check we are still on next with our
         # unstaged changes back
@@ -377,7 +380,7 @@ class GitUpdateBranchTestCase(unittest.TestCase):
 
         # Try to update master while being on an other branch:
         err = git.update_branch("master", "origin")
-        self.assertFalse(err is None)
+        self.assertTrue(err)
         self.assertTrue("Merge is not fast-forward" in err)
 
 
@@ -410,7 +413,7 @@ def test_set_tracking_branch(tmpdir):
 
     git.set_tracking_branch("release", "origin")
     err = git.update_branch("release", "origin")
-    assert err is None
+    assert not err
 
     # Thos should work out of the box
     git.pull()
