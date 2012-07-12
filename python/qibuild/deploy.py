@@ -82,7 +82,11 @@ def deploy(local_directory, remote_url, port=22, use_rsync=True):
         # created
         local_directory = local_directory + "/."
         cmd = ["rsync",
-            "--archive",  # presevre symlinks et all
+            "--recursive",
+            "--links",
+            "--perms",
+            "--times",
+            "--specials",
             "--update",   # only copy newer files
             "--progress", # print a progress bar
             "--checksum", # verify checksum instead of size and date
