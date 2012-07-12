@@ -16,6 +16,7 @@ Command line
 * Add a lot of short options ("-n" for "--dry-run", "-f" for "--force")
 * ``qibuild init``: add a ``--config`` argument to set the default config used by
   the worktree
+* ``qibuild test``: add ``--slow`` option
 * ``qidoc`` by-pass sphinx-build bug on mac
 * ``qidoc`` make it work on archlinux  (using sphinx-build2 by default)
 * Add ``qidoc open`` to view generated documentation in a web browser
@@ -47,11 +48,13 @@ CMake
   * added openssl, libevent_openssl
 
 * added :cmake:function:`qi_generate_src`,  :cmake:function:`qi_generate_header`
+* :cmake:function:`qi_create_gtest` and :cmake:function:`qi_create_test` now
+  can use the ``SLOW`` keyword so that tests are not run by default.
 
 Python
 +++++++
 
-* :py:func:`qibuild.config.read` add ``create_if_missing`` option
+* :py:meth:`qibuild.config.QiBuildConfig.read`: add ``create_if_missing`` option
 * ``install-qibuild.sh`` now installs ``qibuild`` scripts in ``~/.local/bin``
 * :py:meth:`qisrc.git.Git.call` fix using ``quiet=True`` with ``raises=False``
 * :py:meth:`qisrc.git.get_current_branch` : return None when in 'detached HEAD' state
