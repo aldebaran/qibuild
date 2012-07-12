@@ -271,7 +271,6 @@ def _update_branch(git, branch, remote_name,
         if ret != 0:
             status.mess += "Fetch failed\n"
             status.mess += out
-            import ipdb; ipdb.set_trace()
             return status.mess
     if not remote_branch:
         remote_branch = branch
