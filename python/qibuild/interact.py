@@ -10,20 +10,28 @@
 import os
 
 import qibuild
+from qibuild import ui
+
+def read_input():
+    """ Read input from the user
+
+    """
+    ui.info(ui.green, "> ", end="")
+    return raw_input()
 
 
 def ask_choice(choices, input_text):
     """Ask the user to choose from a list of choices
 
     """
-    print "::", input_text
+    ui.info(ui.green, "::", ui.reset, input_text)
     for i, choice in enumerate(choices):
-        print "  ", (i+1), choice
+        ui.info("  ", ui.blue, str(i+1), ui.reset, choice)
     keep_asking = True
     res = None
     while keep_asking:
         try:
-            answer = raw_input("> ")
+            answer = read_input()
         except KeyboardInterrupt:
             break
         if not answer:
@@ -44,11 +52,11 @@ def ask_choice(choices, input_text):
 def ask_yes_no(question, default=False):
     """Ask the user to answer by yes or no"""
     if default:
-        print "::", question, "(Y/n)?"
+        ui.info(ui.green, "::", ui.reset, question, "(Y/n)?")
     else:
-        print "::", question, "(y/N)?"
+        ui.info(ui.green, "::", ui.reset, question, "(y/N)?")
     try:
-        answer = raw_input("> ")
+        answer = read_input()
     except KeyboardInterrupt:
         answer = "n"
     if not default:
@@ -63,9 +71,9 @@ def ask_string(question, default=None):
     """
     if default:
         question += " (%s)" % default
-    print "::", question
+    ui.info(ui.green, "::", ui.reset, question)
     try:
-        answer = raw_input("> ")
+        answer = read_input()
     except KeyboardInterrupt:
         return default
     if not answer:
@@ -88,11 +96,11 @@ def ask_program(message):
             break
         full_path = qibuild.sh.to_native_path(full_path)
         if not os.path.exists(full_path):
-            print "%s does not exists!" % full_path
+            ui.error("%s does not exists!" % full_path)
             keep_going = ask_yes_no("continue")
             continue
         if not os.access(full_path, os.X_OK):
-            print "%s is not a valid executable!" % full_path
+            ui.error("%s is not a valid executable!" % full_path)
             keep_going = ask_yes_no("continue")
             continue
         return full_path
@@ -108,6 +116,6 @@ def get_editor():
     if not editor:
         # Ask the user to choose, and store the answer so
         # that we never ask again
-        print "Could not find the editor to use."
+        ui.warn("Could not find the editor to use.")
         editor = qibuild.interact.ask_program("Please enter an editor")
     return editor

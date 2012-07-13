@@ -8,6 +8,7 @@
 
 import os
 
+from qibuild import ui
 import qibuild
 import qitoolchain
 
@@ -97,20 +98,20 @@ def configure_qtcreator(qibuild_cfg):
     build_env = qibuild.config.get_build_env()
     qtcreator_path = qibuild.command.find_program("qtcreator", env=build_env)
     if qtcreator_path:
-        print "Found QtCreator: ", qtcreator_path
+        ui.info(ui.green, "::", ui.reset,  "Found QtCreator:", qtcreator_path)
         mess  = "Do you want to use qtcreator from %s ?\n" % qtcreator_path
         mess += "Answer 'no' if you installed qtcreator from Nokia's installer"
         answer = qibuild.interact.ask_yes_no(mess, default=True)
         if not answer:
             qtcreator_path = None
     else:
-        print "QtCreator NOT found"
+        ui.warning("QtCreator not found")
     if not qtcreator_path:
         qtcreator_path = qibuild.interact.ask_program(
             "Please enter full qtcreator path")
     if not qtcreator_path:
-        print "Not adding config for QtCreator"
-        print "qibuild open will not work"
+        ui.warning("Not adding config for QtCreator",
+                   "qibuild open will not work", sep="\n")
         return
     ide.path = qtcreator_path
     qibuild_cfg.add_ide(ide)
@@ -132,7 +133,7 @@ def configure_local_settings(toc):
 
     """
     print
-    print "Found a worktree in", toc.worktree.root
+    ui.info(ui.green, "::", ui.reset,  "Found a worktree in", toc.worktree.root)
     answer = qibuild.interact.ask_yes_no(
         "Do you want to configure settings for this worktree",
         default=True)
@@ -140,7 +141,8 @@ def configure_local_settings(toc):
         return
     tc_names = qitoolchain.get_tc_names()
     if tc_names:
-        print "Found the following toolchains: ", ", ".join(tc_names)
+        ui.info(ui.green, "::", ui.reset,
+                "Found the following toolchains: ", ", ".join(tc_names))
         answer = qibuild.interact.ask_yes_no(
             "Use one of these toolchains by default",
             default=True)
@@ -160,7 +162,8 @@ def configure_local_settings(toc):
         build_dir = qibuild.interact.ask_string("Path to a build directory")
         build_dir = os.path.expanduser(build_dir)
         full_path = os.path.join(toc.worktree.root, build_dir)
-        print "Will use", full_path, "as a root for all build directories"
+        ui.info(ui.green, "::", ui.reset,
+                "Will use", full_path, "as a root for all build directories")
     toc.config.local.build.build_dir = build_dir
     toc.save_config()
 
@@ -172,7 +175,8 @@ def configure_local_settings(toc):
         sdk_dir = qibuild.interact.ask_string("Path to a SDK directory")
         sdk_dir = os.path.expanduser(sdk_dir)
         full_path = os.path.join(toc.worktree.root, sdk_dir)
-        print "Will use", full_path, "as a unique SDK directory"
+        ui.info(ui.green, "::", ui.reset,
+                "Will use", full_path, "as a unique SDK directory")
     toc.config.local.build.sdk_dir = sdk_dir
     toc.save_config()
 
