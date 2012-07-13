@@ -95,7 +95,7 @@ def _msg(*tokens, **kwargs):
             if with_color:
                 res += token.code
         else:
-            res += token
+            res += str(token)
             res += sep
     # always reset:
     if with_color:
