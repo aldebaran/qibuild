@@ -28,6 +28,7 @@ create_launcher() {
       p=$(dirname "$(readlink -f ${0} 2>/dev/null)")
   else
       p=$(dirname "${0}")
+      p=$PWD/$p
   fi
   #echo "QiBuild directory: $p"
 
