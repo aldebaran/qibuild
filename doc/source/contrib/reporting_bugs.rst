@@ -62,10 +62,10 @@ For instance:
     ...
 
     Traceback (most recent call last):
-    File "/home/dmerejkowsky/work/qi/qibuild/python/bin/qibuild", line 61, in <module>
+    File "qibuild/python/bin/qibuild", line 61, in <module>
     ...
 
-    File "/home/dmerejkowsky/work/qi/qibuild/python/qibuild/cmake.py", line 76, in cmake
+    File "qibuild/python/qibuild/cmake.py", line 76, in cmake
     ...
 
     Could not frobnicate baz:
