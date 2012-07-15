@@ -82,7 +82,7 @@ if(NOT WITH_DOCS)
 endif()
 
 # Generate man pages and documentation with sphinx:
-find_program(_sphinx_build sphinx-build2 sphinx-build)
+find_program(_sphinx_build NAMES sphinx-build2 sphinx-build)
 if(NOT _sphinx_build)
   message(STATUS "Please install python-sphinx to generate "
   "documentation and man pages"
