@@ -7,7 +7,7 @@ qiBuild reference documentation
 .. toctree::
    :maxdepth: 1
 
-   man/index
+   manpages/index
    cmake/api
    cfg/index
    python/index
