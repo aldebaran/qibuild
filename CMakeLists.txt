@@ -98,6 +98,7 @@ else()
     DIRECTORY    ${CMAKE_BINARY_DIR}/man1
     DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/man/
     PATTERN      ".doctrees" EXCLUDE
+    PATTERN      "_sources" EXCLUDE
   )
 endif()
 
@@ -118,5 +119,6 @@ if(_sphinx_build)
     DIRECTORY ${CMAKE_BINARY_DIR}/doc/html
     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/qibuild/doc
     PATTERN      ".doctrees" EXCLUDE
+    PATTERN      "_sources" EXCLUDE
   )
 endif()
