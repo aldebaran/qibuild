@@ -16,7 +16,6 @@ Command line
 * Add a lot of short options ("-n" for "--dry-run", "-f" for "--force")
 * ``qibuild init``: add a ``--config`` argument to set the default config used by
   the worktree
-* ``qibuild test``: add ``--slow`` option
 * ``qidoc`` by-pass sphinx-build bug on mac
 * ``qidoc`` make it work on archlinux  (using sphinx-build2 by default)
 * Add ``qidoc open`` to view generated documentation in a web browser
@@ -38,6 +37,9 @@ Command line
 * Add ``qisrc push`` : upload changes to code review
 * Remove ``qisrc fetch``, use ``qisrc init`` instead
 * Add ``qibuild deploy``, to deploy code to a remote device
+* ``qibuild test``: add ``--slow`` option
+* ``qibuild test``: add ``-n, --dry-run`` to  just list the test names
+* ``qibuild test``: ``--test-name`` has been removed, use ``-k PATTERN``
 
 
 CMake
