@@ -65,9 +65,14 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
         for key_value in cmake_env:
             key, value = key_value.split("=")
             env[key] = value
+    working_dir = properties.get("WORKING_DIRECTORY")
+    if working_dir:
+        cwd=working_dir
+    else:
+        cwd=build_dir
     process_thread = qibuild.command.ProcessThread(cmd,
         name=test_name,
-        cwd=build_dir,
+        cwd=cwd,
         env=env)
 
     res = TestResult(test_name)
