@@ -69,7 +69,6 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
         name=test_name,
         cwd=build_dir,
         env=env)
-    cost = properties.get("COST")
 
     res = TestResult(test_name)
     start = datetime.datetime.now()
@@ -108,7 +107,7 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
     return res
 
 
-def run_tests(project, build_env, test_name=None, slow=False):
+def run_tests(project, build_env, pattern=None, slow=False, dry_run=False):
     """ Called by :py:meth:`qibuild.toc.Toc.test_project`
 
     :param test_name: If given, only run this test
@@ -125,10 +124,10 @@ def run_tests(project, build_env, test_name=None, slow=False):
     all_tests = parse_ctest_test_files(build_dir)
     tests = list()
     slow_tests = list()
-    if test_name:
-        tests = [x for x in all_tests if x[0] == test_name]
+    if pattern:
+        tests = [x for x in all_tests if re.search(pattern, x[0])]
         if not tests:
-            mess  = "No such test: %s\n" % test_name
+            mess  = "No tests matching %s\n" % pattern
             mess += "Known tests are:\n"
             for x in all_tests:
                 mess += "  * " + x[0] + "\n"
@@ -144,14 +143,22 @@ def run_tests(project, build_env, test_name=None, slow=False):
                 continue
             tests.append(test)
 
-
-
     if not tests:
         # Create a fake test result to keep CI jobs happy:
         fake_test_res = TestResult("compilation")
         fake_test_res.ok = True
         xml_out = os.path.join(results_dir, "compilation.xml")
         write_xml(xml_out, fake_test_res)
+        ui.warning("No tests found for project", project.name)
+        return
+
+    if dry_run:
+        ui.info(ui.green, "List of tests for", project.name)
+        for (test_name, _, _) in tests:
+            ui.info(ui.green, " * ", ui.reset, test_name)
+        return
+
+    ui.info(ui.green, "Testing", project.name, "...")
     ok = True
     fail_tests = list()
     for (i, test) in enumerate(tests):

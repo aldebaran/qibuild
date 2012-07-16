@@ -461,7 +461,7 @@ You may want to run:
         build_dir = project.build_directory
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
-            _advise_using_configure(self, project)
+            advise_using_configure(self, project)
 
         cmd = ["cmake", "--build", build_dir, "--config", self.build_type]
         if target:
@@ -515,22 +515,6 @@ You may want to run:
         if sys.platform == "darwin":
             import qibuild.dylibs
             qibuild.dylibs.fix_dylibs(sdk_dir, paths=paths)
-
-
-    def test_project(self, project, test_name=None, slow=False):
-        """Run qibuild.ctest on a project
-
-        :param test_name: if given, only this test will run
-
-        """
-        build_dir = project.build_directory
-        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
-        if not os.path.exists(cmake_cache):
-            _advise_using_configure(self, project)
-        res = qibuild.ctest.run_tests(project, self.build_env,
-            test_name=test_name, slow=slow)
-        if not res:
-            raise TestsFailed(project)
 
     def install_project(self, project, destdir, prefix="/",
                         runtime=False, num_jobs=1,
@@ -745,7 +729,7 @@ def create(directory, force=False):
     """
     qisrc.worktree.create(directory, force=force)
 
-def _advise_using_configure(self, project):
+def advise_using_configure(self, project):
     """Just throw a nice exception because
     CMakeCache.txt was not found.
 
