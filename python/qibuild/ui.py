@@ -95,8 +95,11 @@ def _msg(*tokens, **kwargs):
             if with_color:
                 res += token.code
         else:
-            res += str(token)
-            res += sep
+            if sep == " " and token == "\n":
+                res += "\n"
+            else:
+                res += str(token)
+                res += sep
     # always reset:
     if with_color:
         res += reset.code
