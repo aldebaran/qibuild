@@ -53,14 +53,22 @@ def get_known_cmake_generators():
         res.append(generator.strip())
     return res
 
-def get_cached_var(build_dir, var):
-    """ get a variable from cmake cache """
+def get_cached_var(build_dir, var, default=None):
+    """Get a variable from cmake cache
+
+    :param build_dir: CMakeCache.txt file directory
+    :param var:       Requested variable
+    :param default:   Default value if not found (default: None)
+
+    :return: the variable value
+
+    """
     cmakecache = os.path.join(build_dir, "CMakeCache.txt")
     if not os.path.exists(cmakecache):
         mess  = "Could not find CMakeCache.txt in %s" % build_dir
         raise Exception(mess)
     res = read_cmake_cache(cmakecache)
-    return res[var]
+    return res.get(var, default)
 
 def cmake(source_dir, build_dir, cmake_args, clean_first=True, env=None):
     """Call cmake with from a build dir for a source dir.
@@ -213,4 +221,3 @@ def get_cmake_qibuild_dir():
     mess  = "Could not find qibuild cmake framework path\n"
     mess += "Please file a bug report with the details of your installation"
     raise Exception(mess)
-

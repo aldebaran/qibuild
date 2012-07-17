@@ -575,7 +575,18 @@ Try configuring and building the project first.
         if split_debug:
             if self.using_visual_studio:
                 raise Exception("split debug not supported on Visual Studio")
-            qibuild.gdb.split_debug(destdir)
+            objcopy = qibuild.cmake.get_cached_var(project.build_directory, "CMAKE_OBJCOPY")
+            if objcopy is None:
+                objcopy = qibuild.command.find_program("objcopy", env=self.build_env)
+
+            if not objcopy:
+                mess  = """\
+Could not split debug symbols from binaries for project {project.name}.
+Could not find objcopy executable.\
+"""
+                qibuild.ui.warning(mess.format(project=project))
+            else:
+                qibuild.gdb.split_debug(destdir, objcopy=objcopy)
 
     def install_project_runtime(self, project, destdir, num_jobs=1):
         """Install runtime component of a project to a destdir """
@@ -785,5 +796,3 @@ def handle_old_qibuild_xml(worktree):
     qibuild.sh.mkdir(os.path.dirname(global_path), recursive=True)
     with open(global_path, "w") as fp:
         fp.write(global_xml)
-
-
