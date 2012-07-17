@@ -97,7 +97,7 @@ def deploy(local_directory, remote_url, port=22, use_rsync=True):
         qibuild.command.call(cmd)
     else:
         # Default to scp
-        qibuild.command.call(["scp", "-p", str(port), "-r",
+        qibuild.command.call(["scp", "-P", str(port), "-r",
             local_directory, remote_url])
 
 
