@@ -68,8 +68,8 @@ quality as possible.
 
 In order to do that, we never hesitate to:
 
-  * do massive refactoring (the Python API is not stable yet at all)
-  * change the config files format (they are not stable either yet)
+* do massive refactoring (the Python API is not stable yet at all)
+* change the config files format (they are not stable either yet)
 
 An other good thing about TDD is that is also tells you when to just
 stop coding, thus preventing feature creep.
@@ -82,7 +82,12 @@ pass, you know you can stop coding.
 Links
 -----
 
-* TDD in 'dive into python book'
+* `Chapter about unit testing from the "Dive Into Python book"
+  <http://www.diveintopython.net/unit_testing/diving_in.html>`_
+* `What Killed Smalltalk Could Kill Ruby, too
+  <http://www.youtube.com/watch?v=YX3iRjKj7C0>`_
+  (A fasinating talk by Robert Martin at RailsConf 09, about programming in general,
+  with a focus on unit testing at the end)
 
 .. seealso::
 
