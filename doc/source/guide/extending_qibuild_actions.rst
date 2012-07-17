@@ -32,11 +32,7 @@ Quick example of a generic action:::
 
   """Add some eggs !"""
 
-  import argparse
-  import logging
   import qibuild
-
-  LOGGER = logging.getLogger(__name__)
 
   def configure_parser(parser):
       """Configure parser for this action """
@@ -49,7 +45,7 @@ Quick example of a generic action:::
 
   def do(args):
     """Main entry point"""
-    LOGGER.info("adding %i eggs", args.num_eggs)
+    qibuild.ui.info("adding %i eggs" % args.num_eggs)
 
 
 The call to ``qibuild.parsers.default_parser`` is mandatory:

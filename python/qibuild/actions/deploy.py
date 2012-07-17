@@ -7,11 +7,10 @@
 import os
 import logging
 
+from qibuild import ui
 import qibuild
 import qibuild.sh
 import qibuild.deploy
-
-LOGGER = logging.getLogger()
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -32,7 +31,7 @@ def do(args):
     if rsync:
         use_rsync = True
     else:
-        LOGGER.warning("Please install rsync to get faster synchronisation")
+        ui.warning("Please install rsync to get faster synchronisation")
         scp = qibuild.command.find_program("scp", env=toc.build_env)
         if not scp:
             raise Exception("Could not find rsync or scp")

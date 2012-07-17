@@ -9,10 +9,10 @@
 import os
 import logging
 
+from qibuild import ui
 import qibuild.sh
 import qibuild.command
 
-LOGGER = logging.getLogger()
 
 def split_debug(base_dir, objcopy=None):
     """ Split the debug information out of all the binaries in
@@ -66,7 +66,7 @@ def split_debug(base_dir, objcopy=None):
         if os.path.exists(dest):
             stdst = os.stat(dest)
         if stdst and stsrc.st_mtime == stdst.st_mtime:
-            LOGGER.info("Debug info up-to-date for %s" % os.path.relpath(src, base_dir))
+            ui.info("Debug info up-to-date for %s" % os.path.relpath(src, base_dir))
             continue
         for cmd in to_run:
             retcode = 0
@@ -75,9 +75,9 @@ def split_debug(base_dir, objcopy=None):
             retcode += qibuild.command.call(cmd, ignore_ret_code=True, quiet=True)
         if retcode == 0:
             os.utime(dest, (stsrc.st_atime, stsrc.st_mtime))
-            LOGGER.info("Debug info extracted for %s" % os.path.relpath(src, base_dir))
+            ui.info("Debug info extracted for %s" % os.path.relpath(src, base_dir))
         else:
-            LOGGER.error("Error while extracting debug for %s" % os.path.relpath(src, base_dir))
+            ui.error("Error while extracting debug for %s" % os.path.relpath(src, base_dir))
 
 if __name__ == "__main__":
     import sys

@@ -13,11 +13,8 @@ Briefly, you should create a file named ``spam.py`` looking like:
 
   """Add some eggs !"""
 
-  import argparse
-  import logging
   import qibuild
 
-  LOGGER = logging.getLogger(__name__)
 
   def configure_parser(parser):
       """Configure parser for this action """
@@ -30,7 +27,7 @@ Briefly, you should create a file named ``spam.py`` looking like:
 
   def do(args):
     """Main entry point"""
-    LOGGER.info("adding %i eggs", args.num_eggs)
+    qibuild.ui.info("adding %i eggs" % args.num_eggs)
 
 
 
