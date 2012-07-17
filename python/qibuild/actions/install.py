@@ -22,7 +22,7 @@ def configure_parser(parser):
         help="value of CMAKE_INSTALL_PREFIX, defaults to '/'")
     group.add_argument("destdir", metavar="DESTDIR")
     group.add_argument("--runtime", action="store_true",
-        help="install runtime componenents only")
+        help="install runtime components only")
     group.add_argument("--include-deps", action="store_true", dest="include_deps",
         help="Include dependencies when installing (this is the default)")
     group.add_argument("--no-include-deps", action="store_false", dest="include_deps",
