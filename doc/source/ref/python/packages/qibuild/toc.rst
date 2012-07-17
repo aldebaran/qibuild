@@ -56,8 +56,6 @@ You can get one using :py:meth:`Toc.get_project` method
 
 .. automethod:: Toc.install_project
 
-.. automethod:: Toc.test_project
-
 .. _toc-attributes:
 
 Attributes
