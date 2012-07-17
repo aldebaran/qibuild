@@ -9,6 +9,5 @@ qiBuild Python packages documentation
     qisrc/index
     qibuild/index
     qitoolchain/index
-    qisrc/index
     qixml/index
 
