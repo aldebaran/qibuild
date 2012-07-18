@@ -51,7 +51,7 @@ function(qi_stage_lib target)
   _qi_internal_stage_lib(${target} ${ARGN})
 endfunction()
 
-#! Generate a 'name'-config.cmake, allowing other project to find the library.
+#! Generate a 'name'-config.cmake, allowing other projects to find the library.
 # This library does not have to be a cmake target, it's a header only library.
 # \arg:target a target created with qi_create_lib
 # \group:DEPRECATED specify a deprecated message. This message will be displayed
@@ -73,7 +73,19 @@ function(qi_stage_header_only_lib target)
   _qi_internal_stage_header_only_lib(${target} ${ARGN})
 endfunction()
 
-#! not implemented yet
+#! Generate a 'name'-config.cmake, allowing other projects
+# to find the binary
+#
+# Example ::
+#
+#   # in foo/CMakeLists.txt
+#   qi_create_bin(foo foo.cpp)
+#   qi_stage_bin(foo)
+#
+#   # in bar/CMakeLists.txt:
+#   find_package(foo)
+#   # Do something with ${FOO_EXECUTABLE}
+# \arg: target  the name of a target
 function(qi_stage_bin target)
   if(NOT TARGET "${target}")
     qi_error("When calling qi_stage_bin(${target})
