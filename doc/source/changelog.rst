@@ -64,6 +64,7 @@ Python
 * Added :py:mod:`qibuild.gdb` to allow stripping debug symbols out of the libraries
 * Added :py:mod:`qibuild.ui` for tools to interact with the user
 * Added :py:mod:`qixml` to help XML parsing, get rid of ``lxml`` dependency
+* Added :py:func:`qisrc.git.get_repo_root`
 * Renamed `qisrc.worktree.worktree_open` to :py:func:`qisrc.worktree.open_worktree`
 * Renamed ``qibuild.worktree`` to :py:mod:`qisrc.worktree`
 * :py:meth:`qibuild.config.QiBuildConfig.read`: learned ``create_if_missing`` option

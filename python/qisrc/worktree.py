@@ -11,6 +11,7 @@ import qibuild.log
 import operator
 
 import qibuild.sh
+import qisrc.git
 import qixml
 from qixml import etree
 
@@ -358,14 +359,7 @@ def git_project_path_from_cwd(cwd=None):
     """
     if not cwd:
         cwd = os.getcwd()
-    head = cwd
-    while True:
-        if os.path.exists(os.path.join(head, ".git")):
-            break
-        (head, _tail) = os.path.split(head)
-        if not _tail:
-            return None
-    return head
+    return qisrc.git.get_repo_root(cwd)
 
 class Project:
     def __init__(self, src=None):

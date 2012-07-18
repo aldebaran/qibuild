@@ -373,6 +373,20 @@ def _update_branch_if_ff(git, status, local_branch, remote_ref):
             status.mess += "Merging %s with %s failed" % (local_branch, remote_ref)
             status.mess += out
 
+def get_repo_root(path):
+    """ Return the root dir of a git worktree given a path
+
+    :return None: if no .git was found
+
+    """
+    head = path
+    while True:
+        if os.path.exists(os.path.join(head, ".git")):
+            break
+        (head, tail) = os.path.split(head)
+        if not tail:
+            return None
+    return head
 
 def open(repo):
     """ Open a new worktree
