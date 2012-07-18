@@ -388,6 +388,23 @@ def get_repo_root(path):
             return None
     return head
 
+def is_submodule(path):
+    """ Tell if the given path is a submodule
+
+    """
+    repo_root = get_repo_root(path)
+    if not repo_root:
+        return False
+    git = Git(repo_root)
+    (retcode, out) = git.call("submodule", "status", raises=False)
+    if retcode != 0:
+        return False
+    lines = out.splitlines()
+    submodules = [x.split()[-1] for x in lines]
+    rel_path = os.path.relpath(path, repo_root)
+    return rel_path in submodules
+
+
 def open(repo):
     """ Open a new worktree
     """

@@ -65,6 +65,7 @@ Python
 * Added :py:mod:`qibuild.ui` for tools to interact with the user
 * Added :py:mod:`qixml` to help XML parsing, get rid of ``lxml`` dependency
 * Added :py:func:`qisrc.git.get_repo_root`
+* Added :py:func:`qisrc.git.is_submodule`
 * Renamed `qisrc.worktree.worktree_open` to :py:func:`qisrc.worktree.open_worktree`
 * Renamed ``qibuild.worktree`` to :py:mod:`qisrc.worktree`
 * :py:meth:`qibuild.config.QiBuildConfig.read`: learned ``create_if_missing`` option

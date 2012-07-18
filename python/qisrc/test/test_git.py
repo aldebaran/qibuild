@@ -63,6 +63,21 @@ def create_git_repo(tmp, path, with_release_branch=False):
     git.call("push", tmp_srv, "release-1.12:release-1.12")
     return tmp_srv
 
+
+def create_git_repo_with_submodules(tmp):
+    """ Return a foo.git url matching a repository
+    contaning a submodule in bar/
+
+    """
+    bar_url = create_git_repo(tmp, "bar")
+    foo_url = create_git_repo(tmp, "foo")
+    foo_src = os.path.join(tmp, "src", "foo")
+    foo_git = qisrc.git.Git(foo_src)
+    foo_git.call("submodule", "add", bar_url, "bar")
+    foo_git.call("commit", "-m", "add bar submodule")
+    foo_git.call("push", foo_url, "master:master")
+    return foo_url
+
 def push_file(tmp, git_path, filename, contents, branch="master"):
     """ Push a file to the given url. Assumes the repository
     has been created with create_git_repo with the same
@@ -419,6 +434,17 @@ def test_set_tracking_branch(tmpdir):
     git.pull()
     git.checkout("release")
     git.pull()
+
+
+def test_submodules(tmpdir):
+    foo_url = create_git_repo_with_submodules(tmpdir.strpath)
+    work = tmpdir.mkdir("work")
+    foo = work.mkdir("foo")
+    git = qisrc.git.Git(foo.strpath)
+    git.clone(foo_url)
+    bar = foo.join("bar")
+    assert qisrc.git.is_submodule(bar.strpath)
+    assert not qisrc.git.is_submodule(foo.strpath)
 
 
 if __name__ == "__main__":

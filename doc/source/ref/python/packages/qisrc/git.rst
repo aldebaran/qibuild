@@ -15,3 +15,5 @@ Other functions in this module
 ------------------------------
 
 .. autofunction:: get_repo_root
+
+.. autofunction:: is_submodule
