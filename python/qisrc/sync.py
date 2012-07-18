@@ -125,9 +125,13 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin",
     path = qibuild.sh.to_native_path(path)
     if os.path.exists(path):
         if skip_if_exists:
-            ui.debug("Adding project in %s", src)
-            worktree.add_project(src)
-            return
+            if qisrc.git.is_submodule(path):
+                ui.warning("erasing submodule: ", path)
+                qibuild.sh.rm(path)
+            else:
+                ui.debug("Adding project in %s", src)
+                worktree.add_project(src)
+                return
         else:
             mess  = "Could not add project from %s in %s\n" % (url, src)
             mess += "This path already exists\n"

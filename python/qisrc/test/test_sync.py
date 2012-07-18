@@ -12,6 +12,7 @@ import qisrc.git
 import qibuild.sh
 
 from qisrc.test.test_git import create_git_repo
+from qisrc.test.test_git import create_git_repo_with_submodules
 from qisrc.test.test_git import read_readme
 from qisrc.test.test_git import push_file
 
@@ -172,6 +173,47 @@ class SyncTestCase(unittest.TestCase):
         manifest_path = manifest_projects[0].path
         readme = read_readme(manifest_path)
         self.assertEqual(readme, "manifest on release-1.12\n")
+
+
+    def test_nested_git_projs(self):
+        manifest_url = create_git_repo(self.tmp, "manifest")
+        create_git_repo(self.tmp, "bar")
+        create_git_repo(self.tmp, "foo")
+        xml = """
+<manifest>
+    <remote name="origin" fetch="{tmp}/srv" />
+    <project name="bar.git" path="bar" />
+    <project name="foo.git" path="bar/foo"/>
+</manifest>
+"""
+        xml = xml.format(tmp=self.tmp)
+        push_file(self.tmp, "manifest", "default.xml", xml)
+
+        worktree = qisrc.worktree.create(self.tmp)
+        manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
+        qisrc.sync.init_worktree(worktree, manifest)
+        worktree.set_manifest_project("manifest/default")
+        self.assertEqual(worktree.git_projects[0].src, "bar")
+        self.assertEqual(worktree.git_projects[1].src, "bar/foo")
+
+    def test_submodules(self):
+        manifest_url = create_git_repo(self.tmp, "manifest")
+        create_git_repo_with_submodules(self.tmp)
+        xml = """
+<manifest>
+    <remote name="origin" fetch="{tmp}/srv" />
+    <project name="foo.git" path="foo" />
+    <project name="bar.git" path="foo/bar"/>
+</manifest>
+"""
+        xml = xml.format(tmp=self.tmp)
+        push_file(self.tmp, "manifest", "default.xml", xml)
+        work = os.path.join(self.tmp, "work")
+        worktree = qisrc.worktree.create(work)
+        manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
+        qisrc.sync.init_worktree(worktree, manifest)
+        self.assertEqual(len(worktree.git_projects), 3)
+
 
 
 if __name__ == "__main__":
