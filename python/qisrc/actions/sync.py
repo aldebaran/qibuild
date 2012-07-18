@@ -10,6 +10,7 @@
 """
 
 import os
+import sys
 import operator
 import qibuild.log
 
@@ -91,3 +92,4 @@ def do(args):
         ui.info(ui.blue, src)
         print "-" * len(src)
         print indent(err, 2)
+    sys.exit(1)
