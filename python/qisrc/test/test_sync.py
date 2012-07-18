@@ -54,7 +54,6 @@ class SyncTestCase(unittest.TestCase):
         create_git_repo(self.tmp, "b/b_project.git")
         remote_a = os.path.join(self.tmp, "srv", "a")
         remote_b = os.path.join(self.tmp, "srv", "b")
-        manifest_src = os.path.join(self.tmp, "src", "manifest")
         xml = """
 <manifest>
     <remote name="a" fetch="{remote_a}" />
@@ -157,7 +156,6 @@ class SyncTestCase(unittest.TestCase):
 
     def test_manifest_wrong_revision(self):
         manifest_url = create_git_repo(self.tmp, "manifest", with_release_branch=True)
-        manifest_src = os.path.join(self.tmp, "src", "manifest")
         xml = """
 <manifest>
     <remote fetch="git@foo" name="origin" revision="release-1.12" />
