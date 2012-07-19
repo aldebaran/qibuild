@@ -26,10 +26,11 @@ http://www.aldebaran-robotics.com/documentation/qibuild/index.html
 Installation
 ------------
 
-Note that right now this methods are meant for qibuild git users only, so that
+Note that right now these methods are meant for qibuild git users only, so that
 they can update qibuild by just pulling the git repository.
 
-Some "real" packaging is in progress, stay tuned!
+If you wish to package qibuild for your distribution, have a look
+at the INSTALL file.
 
 Linux, Mac
 +++++++++++
