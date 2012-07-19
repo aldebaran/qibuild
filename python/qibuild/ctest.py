@@ -105,6 +105,10 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
             res.ok = True
         else:
             res.ok = False
+            try:
+                process.kill()
+            except:
+                pass
             if retcode > 0:
                 res.message = "Return code: %i" % retcode
             else:
