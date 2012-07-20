@@ -28,51 +28,6 @@ _MESSAGE_START = "Importing '{1}' in the toolchain '{0}' ..."
 
 _MESSAGE_END = "Package '{1}' has successfully been added to the toolchain '{0}'."
 
-def _fix_pkgtree(root_dir):
-    """ Make the package tree comply with qiBuild.
-
-    """
-    for item in os.listdir(os.path.join(root_dir, 'usr')):
-        src = os.path.join(root_dir, 'usr', item)
-        dst = os.path.join(root_dir, item)
-        if os.path.exists(dst):
-            mess = "Destination already exists"
-            raise Exception(mess)
-        qibuild.sh.mv(src, dst)
-    qibuild.sh.rm(os.path.join(root_dir, 'usr'))
-    return
-
-def _convert_to_qibuild(qipkg_dir, package, package_names):
-    """ Convert a binary package into a qiBuild package.
-
-    :return: path to the qiBuild package
-
-    """
-    with qibuild.sh.TempDir() as work_dir:
-        root_dir = package.extract(work_dir)
-        _checks = _check_for_cmake_module(root_dir, package_names)
-        cmake_found, from_pkg, from_qibuild = _checks
-        prefix_ = os.path.join(work_dir, 'usr') + os.sep
-        if cmake_found:
-            if len(from_pkg) > 0:
-                list_ = [ x.replace(prefix_, '') for x in from_pkg ]
-                list_ = ''.join([ '  {0}\n'.format(x) for x in list_ ])
-                print _CMAKE_MODULE_PKG_LIST.format(package_names[0], list_)
-            if len(from_qibuild) > 0:
-                list_ = ''.join([ '  {0}\n'.format(x) for x in from_pkg ])
-                print _CMAKE_MODULE_QIBUILD_LIST.format(package_names[0], list_)
-        else:
-            _generate_cmake_module(root_dir, package_names)
-
-        _fix_pkgtree(root_dir)
-        qipkg_path = qibuild.archive.zip(root_dir)
-        qipkg_file = os.path.basename(qipkg_path)
-        qibuild.sh.mv(qipkg_path, qipkg_dir)
-        qipkg_path = os.path.join(qipkg_dir, qipkg_file)
-        qipkg_path = os.path.abspath(qipkg_path)
-    return qipkg_path
-
-
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.toc_parser(parser)
@@ -104,8 +59,9 @@ def do(args):
     if package_name is None:
         package_name = package_metadata['name']
 
-    package_names = [ package_name, package_metadata['name'] ]
-    package_names = list(set(package_names))
+    package_names = [ package_metadata['name'] ]
+    if not package_name in package_names:
+        package_names.insert(0, package_name)
 
     # extract it to the default packages path of the toolchain
     tc_packages_path = qitoolchain.toolchain.get_default_packages_path(tc.name)
@@ -113,8 +69,17 @@ def do(args):
     qibuild.sh.rm(dest)
     qibuild.ui.info(_MESSAGE_START.format(tc.name, package_name))
     with qibuild.sh.TempDir() as tmp:
-        qibuild_pkg = _convert_to_qibuild(tmp, package, package_names)
-        extracted = qibuild.archive.extract(qibuild_pkg, tmp, quiet=True)
+        conversion  = qitoolchain.binary_package.convert_to_qibuild(tmp, package, package_names)
+        qibuild_pkg = conversion[0]
+        modules_from_pkg     = conversion[1]
+        modules_from_qibuild = conversion[2]
+        if len(modules_from_pkg) > 0:
+            list_ = "".join(["  {0}\n".format(x) for x in modules_from_pkg])
+            print _CMAKE_MODULE_PKG_LIST.format(package_name, list_)
+        if len(modules_from_qibuild) > 0:
+            list_ = "".join(["  {0}\n".format(x) for x in modules_from_qibuild])
+            print _CMAKE_MODULE_PKG_LIST.format(package_name, list_)
+        extracted   = qibuild.archive.extract(qibuild_pkg, tmp, quiet=True)
         qibuild.sh.install(extracted, dest, quiet=True)
     qibuild_package = qitoolchain.Package(package_name, dest)
     tc.add_package(qibuild_package)
