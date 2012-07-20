@@ -26,6 +26,8 @@ def ask_choice(choices, input_text):
     """
     ui.info(ui.green, "::", ui.reset, input_text)
     for i, choice in enumerate(choices):
+        if i == 0:
+            choice += " \t(default)"
         ui.info("  ", ui.blue, str(i+1), ui.reset, choice)
     keep_asking = True
     res = None
