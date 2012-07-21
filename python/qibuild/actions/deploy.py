@@ -26,6 +26,9 @@ def do(args):
     url = args.url
     (username, server, remote_directory) = qibuild.deploy.parse_url(url)
     toc = qibuild.toc_open(args.worktree, args)
+    if toc.active_config:
+        ui.info(ui.green, "Active configuration: ",
+                ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))
     rsync = qibuild.command.find_program("rsync", env=toc.build_env)
     use_rsync = False
     if rsync:
@@ -38,18 +41,45 @@ def do(args):
 
     # Resolve deps:
     (project_names, package_names, _) = toc.resolve_deps(runtime=True)
+    projects = [toc.get_project(name) for name in project_names]
 
-    # Deploy packages: install all of them in the same temp dir, they
-    # deploy this temp dir to the target
     if not args.single:
-        with qibuild.sh.TempDir() as tmp:
+        ui.info(ui.green, "The following projects")
+        for project_name in project_names:
+            ui.info(ui.green, " *", ui.blue, project_name)
+        if not args.single and package_names:
+            ui.info(ui.green, "and the following packages")
             for package_name in package_names:
+                ui.info(" *", ui.blue, package_name)
+        ui.info(ui.green, "will be deployed to", ui.blue, url)
+    else:
+        ui.info(ui.green, "Deploying project", ui.blue, project,
+                ui.green, "to", ui.blue, url)
+
+    # Deploy packages: install all of them in the same temp dir, then
+    # deploy this temp dir to the target
+    if not args.single and package_names:
+        print
+        ui.info(ui.green, ":: ", "Deploying packages")
+        with qibuild.sh.TempDir() as tmp:
+            for (i, package_name) in enumerate(package_names):
+                ui.info(ui.green, "*", ui.reset,
+                        "(%i/%i)" % (i+1, len(package_names)),
+                        ui.green, "Deploying package", ui.blue, package_name,
+                        ui.green, "to", ui.blue, url)
                 toc.toolchain.install_package(package_name, tmp, runtime=True)
             qibuild.deploy.deploy(tmp, args.url, use_rsync=use_rsync, port=args.port)
+        print
 
+    ui.info(ui.green, ":: ", "Deploying projects")
     # Deploy projects: install them inside a 'deploy' dir inside the build dir,
     # then deploy this dir to the target
-    for project_name in project_names:
+    for (i, project) in enumerate(projects):
+        ui.info(ui.green, "*", ui.reset,
+                "(%i/%i)" % (i+1, len(projects)),
+                ui.green, "Deploying project", ui.blue, project.name,
+                ui.green, "to", ui.blue, url)
+
         project = toc.get_project(project_name)
         destdir = os.path.join(project.build_directory, "deploy")
         project = toc.get_project(project_name)

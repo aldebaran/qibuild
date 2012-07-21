@@ -55,10 +55,9 @@ def do(args):
         ui.info(ui.green, "(runtime components only)")
 
     # Install packages to destdir:
-    if args.include_deps:
-        if package_names:
-            print
-            ui.info(ui.green, ":: ", "Installing packages")
+    if args.include_deps and package_names:
+        print
+        ui.info(ui.green, ":: ", "Installing packages")
         for (i, package_name) in enumerate(package_names):
             ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i+1, len(package_names)),
                     ui.green, "Installing package", ui.blue, package_name)
