@@ -5,12 +5,9 @@
 """Install a project and its dependencies """
 
 import os
-import qibuild.log
 
+from qibuild import ui
 import qibuild
-
-LOGGER = qibuild.log.get_logger(__name__)
-
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -42,13 +39,39 @@ def do(args):
     # Resolve deps:
     (project_names, package_names, _) = toc.resolve_deps(runtime=args.runtime)
 
+    if toc.active_config:
+        ui.info(ui.green, "Active configuration: ",
+                ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))
+
+    ui.info(ui.green, "The following projects")
+    for project_name in project_names:
+        ui.info(ui.green, " *", ui.blue, project_name)
+    if args.include_deps and package_names:
+        ui.info(ui.green, "and the following packages")
+        for package_name in package_names:
+            ui.info(" *", ui.blue, package_name)
+    ui.info(ui.green, "will be installed to", ui.blue, dest)
+    if args.runtime:
+        ui.info(ui.green, "(runtime components only)")
+
     # Install packages to destdir:
     if args.include_deps:
-        for package_name in package_names:
-            toc.toolchain.install_package(package_name, dest, runtime=args.runtime)
+        if package_names:
+            print
+            ui.info(ui.green, ":: ", "Installing packages")
+        for (i, package_name) in enumerate(package_names):
+            ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i+1, len(package_names)),
+                    ui.green, "Installing package", ui.blue, package_name)
 
-    for project_name in project_names:
-        project = toc.get_project(project_name)
+            toc.toolchain.install_package(package_name, dest, runtime=args.runtime)
+        print
+
+    # Install projects to destdir:
+    ui.info(ui.green, ":: ", "Installing projects")
+    projects = [toc.get_project(name) for name in project_names]
+    for (i, project) in enumerate(projects):
+        ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i+1, len(projects)),
+                ui.green, "Installing project", ui.blue, project.name)
         toc.install_project(project,  args.destdir,
                             prefix=args.prefix, runtime=args.runtime,
                             num_jobs=args.num_jobs,

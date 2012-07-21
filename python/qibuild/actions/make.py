@@ -6,7 +6,7 @@
 
 """
 
-import qibuild.log
+from qibuild import ui
 import qibuild
 import qibuild.cmdparse
 
@@ -20,25 +20,25 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    logger   = qibuild.log.get_logger(__name__)
-    toc      = qibuild.toc.toc_open(args.worktree, args)
+    toc = qibuild.toc.toc_open(args.worktree, args)
 
     (project_names, _package_names, _not_found) = toc.resolve_deps()
     use_incredibuild = toc.config.build.incredibuild
 
     if toc.active_config:
-        logger.info("Active configuration: %s (%s)", toc.active_config, toc.build_type)
+        ui.info(ui.green, "Active configuration: ",
+                ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))
+    projects = [toc.get_project(name) for name in project_names]
 
-    for project_names in project_names:
-        project = toc.get_project(project_names)
+    project_count = len(projects)
+    i = 0
+    for project in projects:
+        i += 1
         if args.target:
-            logger.info("Building target %s in project %s for config %s (%s)",
-                args.target, project.name, toc.build_folder_name, toc.build_type)
+            mess = "Building target %s for" % args.target
         else:
-            logger.info("Building %s for config %s (%s)", project.name, toc.build_folder_name, toc.build_type)
+            mess = "Building"
+        ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, project_count),
+                ui.green, mess, project.name)
         toc.build_project(project, target=args.target, num_jobs=args.num_jobs,
             incredibuild=use_incredibuild, rebuild=args.rebuild)
-
-
-
-

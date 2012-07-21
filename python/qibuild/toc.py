@@ -539,7 +539,6 @@ You may want to run:
         prefix = prefix[1:]
         destdir = qibuild.sh.to_native_path(destdir)
         self.build_env["DESTDIR"] = destdir
-        LOGGER.info("Installing %s to %s", project.name, destdir)
         dest = os.path.join(destdir, prefix)
         dest = qibuild.sh.to_native_path(dest)
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")

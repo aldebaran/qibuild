@@ -399,7 +399,6 @@ class Toolchain:
         installed
 
         """
-        LOGGER.info("installing %s to %s", package_name, destdir)
         package_path = self.get(package_name)
         if runtime:
             qibuild.sh.install(package_path, destdir,
