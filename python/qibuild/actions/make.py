@@ -39,6 +39,6 @@ def do(args):
         else:
             mess = "Building"
         ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, project_count),
-                ui.green, mess, project.name)
+                ui.green, mess, ui.blue, project.name)
         toc.build_project(project, target=args.target, num_jobs=args.num_jobs,
             incredibuild=use_incredibuild, rebuild=args.rebuild)
