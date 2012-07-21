@@ -5,7 +5,6 @@
 """Deploy code to a remote target """
 
 import os
-import logging
 
 from qibuild import ui
 import qibuild
@@ -52,9 +51,6 @@ def do(args):
             for package_name in package_names:
                 ui.info(" *", ui.blue, package_name)
         ui.info(ui.green, "will be deployed to", ui.blue, url)
-    else:
-        ui.info(ui.green, "Deploying project", ui.blue, project,
-                ui.green, "to", ui.blue, url)
 
     # Deploy packages: install all of them in the same temp dir, then
     # deploy this temp dir to the target
@@ -71,7 +67,8 @@ def do(args):
             qibuild.deploy.deploy(tmp, args.url, use_rsync=use_rsync, port=args.port)
         print
 
-    ui.info(ui.green, ":: ", "Deploying projects")
+    if not args.single:
+        ui.info(ui.green, ":: ", "Deploying projects")
     # Deploy projects: install them inside a 'deploy' dir inside the build dir,
     # then deploy this dir to the target
     for (i, project) in enumerate(projects):
@@ -79,14 +76,11 @@ def do(args):
                 "(%i/%i)" % (i+1, len(projects)),
                 ui.green, "Deploying project", ui.blue, project.name,
                 ui.green, "to", ui.blue, url)
-
-        project = toc.get_project(project_name)
         destdir = os.path.join(project.build_directory, "deploy")
-        project = toc.get_project(project_name)
         #create folder for project without install rules
         qibuild.sh.mkdir(destdir, recursive=True)
         toc.install_project(project, destdir, prefix="/",
                             runtime=True, num_jobs=args.num_jobs,
                             split_debug=True)
         qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)
-        qibuild.deploy.generate_debug_scripts(toc, project_name, args.url)
+        qibuild.deploy.generate_debug_scripts(toc, project.name, args.url)
