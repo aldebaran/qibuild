@@ -28,6 +28,7 @@ Tools
    :maxdepth: 1
 
    cmake
+   cmake_modules
    build
    ctest
    gdb
