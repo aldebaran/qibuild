@@ -293,11 +293,11 @@ def do(args):
     tc_packages_path = qitoolchain.toolchain.get_default_packages_path(tc.name)
     dest = os.path.join(tc_packages_path, package_name)
     qibuild.sh.rm(dest)
-    LOGGER.info(_MESSAGE_START.format(tc.name, package_name))
+    qibuild.ui.info(_MESSAGE_START.format(tc.name, package_name))
     with qibuild.sh.TempDir() as tmp:
         qibuild_pkg = _convert_to_qibuild(tmp, package, package_names)
         extracted = qibuild.archive.extract(qibuild_pkg, tmp, quiet=True)
         qibuild.sh.install(extracted, dest, quiet=True)
     qibuild_package = qitoolchain.Package(package_name, dest)
     tc.add_package(qibuild_package)
-    LOGGER.info(_MESSAGE_END.format(tc.name, package_name))
+    qibuild.ui.info(_MESSAGE_END.format(tc.name, package_name))
