@@ -49,7 +49,7 @@ qisrc
 * new command to pull every repository, clone missing repositories, configure
   repositories  for code review called ``qisrc sync``
 
-* support for code review with ``qisrc update``
+* support for code review with ``qisrc push``
 
 qidoc
 +++++
