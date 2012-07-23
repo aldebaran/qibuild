@@ -203,13 +203,16 @@ class FeedTestCase(unittest.TestCase):
         packages_dir = os.path.join(this_dir, "packages")
         contents = os.listdir(packages_dir)
         for filename in contents:
+            if not os.path.isdir(os.path.join(packages_dir, filename)):
+                continue
             if filename.endswith(".tar.gz"):
                 continue
             if filename.endswith(".zip"):
                 continue
             package_dir = os.path.join(packages_dir, filename)
-            archive = qibuild.archive.zip(package_dir)
-            qibuild.sh.install(archive, self.srv, quiet=True)
+            for algo in ["zip", "gzip"]:
+                archive = qibuild.archive.compress(package_dir, algo=algo)
+                qibuild.sh.install(archive, self.srv, quiet=True)
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
@@ -399,7 +402,7 @@ class FeedTestCase(unittest.TestCase):
         a_file = os.path.join(a_package, "a_file")
         with open(a_file, "w") as fp:
             fp.write("This file is not empty\n")
-        archive = qibuild.archive.zip(a_package)
+        archive = qibuild.archive.compress(a_package)
         package_name = os.path.basename(archive)
 
         # Create a fake feed:
@@ -422,4 +425,3 @@ class FeedTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

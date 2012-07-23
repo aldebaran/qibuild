@@ -36,7 +36,7 @@ class ArchiveTestCase(unittest.TestCase):
         c = os.path.join(a, "c")
         with open(c, "w") as fp:
             fp.write("c\n")
-        archive = qibuild.archive.zip(a)
+        archive = qibuild.archive.compress(a)
         dest = os.path.join(self.tmp, "dest")
         os.mkdir(dest)
         qibuild.archive.extract(archive, dest)
@@ -55,7 +55,7 @@ class ArchiveTestCase(unittest.TestCase):
             fp.write("ro\n")
         # 200:
         os.chmod(ro, stat.S_IRUSR)
-        archive = qibuild.archive.zip(a)
+        archive = qibuild.archive.compress(a)
         dest = os.path.join(self.tmp, "dest")
         os.mkdir(dest)
         qibuild.archive.extract(archive, dest)
@@ -84,7 +84,7 @@ class ArchiveTestCase(unittest.TestCase):
         # RO dir inside an other RO dir
         os.chmod(ro2, stat.S_IRUSR | stat.S_IXUSR)
         os.chmod(ro1, stat.S_IRUSR | stat.S_IXUSR)
-        archive = qibuild.archive.zip(src)
+        archive = qibuild.archive.compress(src)
         dest = os.path.join(self.tmp, "dest")
         os.mkdir(dest)
         qibuild.archive.extract(archive, dest)
@@ -107,42 +107,10 @@ class ArchiveTestCase(unittest.TestCase):
         archive = os.path.join(self.tmp, "src.zip")
         dest = os.path.join(self.tmp, "dest")
         os.mkdir(dest)
-        qibuild.archive.extract_zip(archive, dest)
+        qibuild.archive.extract(archive, dest)
         dest_exe = os.path.join(dest, "src", "a.exe")
         st_mode = os.stat(dest_exe).st_mode
         self.assertEquals(st_mode, 0100700)
-
-    def test_extract_change_topdir(self):
-        src = os.path.join(self.tmp, "src")
-        os.mkdir(src)
-        a_long_dir = os.path.join(src, "a_long_dir")
-        os.mkdir(a_long_dir)
-        b = os.path.join(a_long_dir, "b")
-        with open(b, "w") as fp:
-            fp.write("b\n")
-        dest = os.path.join(self.tmp, "dest")
-        os.mkdir(dest)
-        tar_gz = qibuild.archive.zip_unix(a_long_dir)
-        qibuild.archive.extract(tar_gz, dest, topdir="a")
-        a = os.path.join(dest, "a")
-        ls_r = qibuild.sh.ls_r(a)
-        self.assertEquals(ls_r, ["b"])
-        a_zip = qibuild.archive.zip_win(a_long_dir)
-        qibuild.archive.extract(a_zip, dest, topdir="aa")
-        aa = os.path.join(dest, "aa")
-        ls_r = qibuild.sh.ls_r(aa)
-        self.assertEquals(ls_r, ["b"])
-
-    def test_extract_change_topdir_already_correct(self):
-        src = os.path.join(self.tmp, "src")
-        os.mkdir(src)
-        a_dir = os.path.join(src, "a")
-        os.mkdir(a_dir)
-        tar_gz = qibuild.archive.zip_unix(a_dir)
-        dest = os.path.join(self.tmp, "dest")
-        qibuild.archive.extract(tar_gz, dest, topdir="a")
-        ls_r = qibuild.sh.ls_r(dest)
-        self.assertEquals(ls_r, ["a/"])
 
     def test_extract_with_symlink(self):
         if sys.platform.startswith("win"):
@@ -156,34 +124,10 @@ class ArchiveTestCase(unittest.TestCase):
             fp.write("a_file\n")
         a_link = os.path.join(a_dir, "a_link")
         os.symlink("a_file", a_link)
-        tar_gz = qibuild.archive.zip_unix(a_dir)
+        tar_gz = qibuild.archive.compress(a_dir, algo="gzip")
         dest = os.path.join(self.tmp, "dest")
         os.mkdir(dest)
-        qibuild.archive.extract(tar_gz, dest)
-        ls_r = qibuild.sh.ls_r(dest)
-        self.assertEquals(ls_r,
-            ['a_dir/a_file', 'a_dir/a_link'])
-        dest_link = os.path.join(dest, "a_dir", "a_link")
-        self.assertTrue(os.path.islink(dest_link))
-        dest_target = os.readlink(dest_link)
-        self.assertEquals(dest_target, "a_file")
-
-    def test_extract_with_symlink_and_change_topdir(self):
-        if sys.platform.startswith("win"):
-            return
-        src = os.path.join(self.tmp, "src")
-        os.mkdir(src)
-        a_long_dir = os.path.join(src, "a_long_dir")
-        os.mkdir(a_long_dir)
-        a_file = os.path.join(a_long_dir, "a_file")
-        with open(a_file, "w") as fp:
-            fp.write("a_file\n")
-        a_link = os.path.join(a_long_dir, "a_link")
-        os.symlink("a_file", a_link)
-        tar_gz = qibuild.archive.zip_unix(a_long_dir)
-        dest = os.path.join(self.tmp, "dest")
-        os.mkdir(dest)
-        qibuild.archive.extract(tar_gz, dest, topdir="a_dir")
+        qibuild.archive.extract(tar_gz, dest, algo="gzip")
         ls_r = qibuild.sh.ls_r(dest)
         self.assertEquals(ls_r,
             ['a_dir/a_file', 'a_dir/a_link'])
