@@ -96,10 +96,10 @@ def handle_remote_package(feed, package, package_tree, toolchain):
     archive_name = hashlib.sha1(package_url).hexdigest()
     top = archive_name[:2]
     rest = archive_name[2:]
-    if package_url.endswith(".tar.gz"):
-        rest += ".tar.gz"
-    if package_url.endswith(".zip"):
-        rest += ".zip"
+    extension = package_url.rsplit(".", 1)[1]
+    if package_url.endswith(".tar." + extension):
+        rest += ".tar"
+    rest += "." + extension
     output = toolchain.cache
     output = os.path.join(output, top)
     message = (ui.green, "Downloading", ui.blue, package_url)
@@ -113,6 +113,7 @@ def handle_remote_package(feed, package, package_tree, toolchain):
     packages_path = qitoolchain.toolchain.get_default_packages_path(toolchain.name)
     should_skip = False
     dest = os.path.join(packages_path, package_name)
+    dest = os.path.abspath(dest)
     if not os.path.exists(dest):
         should_skip = False
     else:
@@ -124,7 +125,16 @@ def handle_remote_package(feed, package, package_tree, toolchain):
         if os.path.exists(dest):
             qibuild.sh.rm(dest)
         try:
-            qibuild.archive.extract(package_archive, packages_path, topdir=package_name)
+            algo = qibuild.archive.guess_algo(package_archive)
+            extract_path = qibuild.archive.extract(package_archive, packages_path, algo=algo)
+            extract_path = os.path.abspath(extract_path)
+            if extract_path != dest:
+                src = extract_path
+                dst = dest
+                qibuild.sh.mkdir(dst, recursive=True)
+                qibuild.sh.rm(dst)
+                qibuild.sh.mv(src, dst)
+                qibuild.sh.rm(src)
         except qibuild.archive.InvalidArchive, err:
             mess = str(err)
             mess += "\nPlease fix the archive and try again"

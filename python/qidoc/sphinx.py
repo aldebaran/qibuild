@@ -66,7 +66,7 @@ def gen_download_zips(src):
         for directory in directories:
             zipme = os.path.join(root, directory, ".zipme")
             if os.path.exists(zipme):
-                qibuild.archive.zip_win(os.path.join(root, directory))
+                qibuild.archive.compress(os.path.join(root, directory), algo="zip")
 
 
 def build(src, dest, opts):

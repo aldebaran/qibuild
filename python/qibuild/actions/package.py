@@ -114,11 +114,10 @@ def do(args):
 
     if args.compress:
         LOGGER.info("Compressing package")
-        archive = qibuild.archive.zip(destdir)
+        archive = qibuild.archive.compress(destdir, algo="zip")
         LOGGER.info("Package generated in %s", archive)
         # Now, clean the destdir.
         qibuild.sh.rm(destdir)
         return archive
     else:
         return destdir
-
