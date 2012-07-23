@@ -7,7 +7,6 @@
 """
 
 import os
-import logging
 
 from qibuild import ui
 import qibuild.sh
@@ -40,7 +39,9 @@ def split_debug(base_dir, objcopy=None):
             if os.path.basename(root) == ".debug":
                 continue
             for filename in filenames:
-                res.append(os.path.join(root, filename))
+                full_path = os.path.join(root, filename)
+                if qibuild.sh.is_binary(filename):
+                    res.append(full_path)
         return res
     binaries = list()
     bin_dir = os.path.join(base_dir, "bin")
