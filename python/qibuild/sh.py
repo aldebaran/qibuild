@@ -548,6 +548,17 @@ def is_runtime(filename):
     return True
 
 
+def is_binary(file_path):
+    """ Returns True if the file is binary
+
+    """
+    with open(file_path, 'rb') as fp:
+        data = fp.read(1024)
+        if not data:
+            return False
+        if b'\0' in data:
+            return True
+        return False
 
 def is_executable_binary(file_path):
     """ Returns true if the file:
@@ -558,11 +569,4 @@ def is_executable_binary(file_path):
         return False
     if not os.access(file_path, os.X_OK):
         return False
-    with open(file_path, 'rb') as fp:
-        data = fp.read(1024)
-        if not data:
-            return False
-        if b'\0' in data:
-            return True
-        return False
-
+    return is_binary(file_path)
