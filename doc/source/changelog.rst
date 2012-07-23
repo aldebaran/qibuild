@@ -54,6 +54,8 @@ CMake
 * Added :cmake:function:`qi_generate_src`,  :cmake:function:`qi_generate_header`
 * :cmake:function:`qi_create_gtest` and :cmake:function:`qi_create_test` learned
   the ``SLOW`` keyword so that tests are not run by default.
+* :cmake:function:`qi_use_lib` learned the ``ASSUME_SYSTEM_INCLUDE`` flag
+  to use ``-isystem`` on the dependencies
 
 Python
 +++++++

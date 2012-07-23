@@ -186,7 +186,10 @@ endfunction()
 #
 # \arg:name The target to add dependencies to.
 # \argn: dependencies
-#
+# \flag:ASSUME_SYSTEM_INCLUDE  Use ``-isystem`` for
+#       including dependencies.
+#       Useful for instance to ignore warnings coming
+#       from 3rd party headers.
 #
 function(qi_use_lib name)
   if(QI_${name}_TARGET_DISABLED)
