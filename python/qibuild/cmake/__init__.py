@@ -8,6 +8,7 @@ import qibuild.sh
 
 LOGGER = qibuild.log.get_logger(__name__)
 
+
 def get_known_cmake_generators():
     """ Get the list of known cmake generators.
     Assume cmake is in PATH, or path to cmake is correctly
@@ -18,8 +19,10 @@ def get_known_cmake_generators():
     cmake = qibuild.command.find_program("cmake", env=build_env)
     if not cmake:
         raise Exception("Could not find cmake executable\n"
-          "Please install it if necessary and re-run `qibuild config --wizard`")
-    process = subprocess.Popen([cmake, "--help"],
+                        "Please install it if necessary and re-run "
+                        "`qibuild config --wizard`")
+    process = subprocess.Popen(
+        [cmake, "--help"],
         stdout=subprocess.PIPE)
     (out, _err) = process.communicate()
     intersting = False
@@ -31,7 +34,7 @@ def get_known_cmake_generators():
         # handle lines like that:
         # Generator = "blalblalba"
         #       files.
-        if len(line) >=3:
+        if len(line) >= 3:
             if line[2] == ' ' and not "=" in line:
                 continue
         if line == magic_line:
@@ -53,6 +56,7 @@ def get_known_cmake_generators():
         res.append(generator.strip())
     return res
 
+
 def get_cached_var(build_dir, var, default=None):
     """Get a variable from cmake cache
 
@@ -69,6 +73,7 @@ def get_cached_var(build_dir, var, default=None):
         raise Exception(mess)
     res = read_cmake_cache(cmakecache)
     return res.get(var, default)
+
 
 def cmake(source_dir, build_dir, cmake_args, clean_first=True, env=None):
     """Call cmake with from a build dir for a source dir.
@@ -107,7 +112,6 @@ def cmake(source_dir, build_dir, cmake_args, clean_first=True, env=None):
     # the current working dir.
     cmake_args += [source_dir]
     qibuild.command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
-
 
 
 def read_cmake_cache(cache_path):
@@ -153,7 +157,8 @@ def check_root_cmake_list(cmake_list_file, project_name):
     for (i, line) in enumerate(lines):
         if re.match(r'^\s*project\s*\(', line, re.IGNORECASE):
             project_line_number = i
-        if re.match(r'^\s*include\s*\(.*qibuild\.cmake.*\)', line, re.IGNORECASE):
+        if re.match(r'^\s*include\s*\(.*qibuild\.cmake.*\)', line,
+                    re.IGNORECASE):
             include_line_number = i
 
     if project_line_number is None:
@@ -168,8 +173,8 @@ project({project_name})
 find_package(qibuild)
 
 """.format(
-        cmake_list_file=cmake_list_file,
-        project_name=project_name)
+            cmake_list_file=cmake_list_file,
+            project_name=project_name)
         LOGGER.warning(mess)
         return
 
@@ -195,6 +200,7 @@ Please exchange the following lines:
             project_line=lines[project_line_number])
         LOGGER.warning(mess)
 
+
 def get_cmake_qibuild_dir():
     """Get the path to cmake modules.
 
@@ -211,8 +217,9 @@ def get_cmake_qibuild_dir():
         return res
 
     # Then, assume we are in a toolchain or/in a SDK, with
-    # the following layout sdk/share/cmake/qibuild, sdk/lib/python2.x/site-packages/qibuild
-    sdk_dir = os.path.join(qibuild.QIBUILD_ROOT_DIR, "..",  "..", "..", "..")
+    # the following layout sdk/share/cmake/qibuild,
+    # sdk/lib/python2.x/site-packages/qibuild
+    sdk_dir = os.path.join(qibuild.QIBUILD_ROOT_DIR, "..", "..", "..", "..")
     sdk_dir = qibuild.sh.to_native_path(sdk_dir)
     res = os.path.join(sdk_dir, "share", "cmake")
     if os.path.isdir(res):
