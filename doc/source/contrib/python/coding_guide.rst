@@ -368,6 +368,27 @@ A small example::
   qibuild.command.call(cmd, env=build_env)
 
 
+Platform-dependent code
+-----------------------
+
+Please use::
+
+  import qibuild
+  platform = qibuild.get_platform()
+
+  if platform == "linux":
+     do_linux()
+  elif platform == "mac":
+    do_mac()
+  elif platform == "windows":
+    do_windows()
+
+
+And do not use ``sys.platform`` directly. This way
+if when we add a new supported platform to ``qibuild``, we will
+know where to patch the code.
+
+
 Output messages to the user
 -----------------------------
 
