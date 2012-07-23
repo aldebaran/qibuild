@@ -40,7 +40,7 @@ def split_debug(base_dir, objcopy=None):
                 continue
             for filename in filenames:
                 full_path = os.path.join(root, filename)
-                if qibuild.sh.is_binary(filename):
+                if qibuild.sh.is_binary(full_path):
                     res.append(full_path)
         return res
     binaries = list()
