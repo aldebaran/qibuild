@@ -78,6 +78,29 @@ Python
 * :py:func:`qibuild.command.call` learned ``quiet`` option
 * Usage of ``qibuild.log`` and ``logging.py`` has been deprecated, use :py:mod:`qibuild.ui` instead
 * ``qibuild.toc.test_project`` has been removed, use :py:mod:`qibuild.ctest` instead
+* :py:meth:`qisrc.git.get_current_branch` : return None when in 'detached HEAD' state
+* Add :py:mod:`qixml` to help XML parsing, get rid of ``lxml`` dependency
+* :py:func:`qibuild.command.call` add ``quiet`` option
+* Remove usage of ``qibuild.log`` and ``logging.py`` to display nice colorized messages
+  to the console, use ``qibuild.ui`` module.
+* Refactoring of the whole module ``qibuild.archive``:
+  * Removed APIs:
+    * :py:func:`qibuild.archive.extracted_name`
+    * :py:func:`qibuild.archive.archive_name`
+  * New APIs:
+    * :py:func:`qibuild.archive.compress`: include ``algo`` option, which is set to  ``zip``
+      when unspecified
+  * Updated APIs:
+    * :py:func:`qibuild.archive.extract`:
+      * support for the ``topdir`` option is deprecated
+      * add ``algo`` option, when unspecified ``algo`` is set to ``zip``
+      * still compatible with the previous APIs
+  * Deprecated APIs:
+    * :py:func:`qibuild.archive.extract_tar`: use :py:func:`qibuild.archive.extract` instead
+    * :py:func:`qibuild.archive.extract_zip`: use :py:func:`qibuild.archive.extract` instead
+    * :py:func:`qibuild.archive.zip`: use :py:func:`qibuild.archive.compress` instead
+    * :py:func:`qibuild.archive.zip_unix`: use :py:func:`qibuild.archive.compress` instead
+    * :py:func:`qibuild.archive.zip_win`: use :py:func:`qibuild.archive.compress` instead
 
 Misc
 +++++
