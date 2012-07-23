@@ -85,23 +85,25 @@ Python
 * Remove usage of ``qibuild.log`` and ``logging.py`` to display nice colorized messages
   to the console, use ``qibuild.ui`` module.
 * Refactoring of the whole module ``qibuild.archive``:
+  * Non-compatible APIs
   * Removed APIs:
     * :py:func:`qibuild.archive.extracted_name`
     * :py:func:`qibuild.archive.archive_name`
-  * New APIs:
-    * :py:func:`qibuild.archive.compress`: include ``algo`` option, which is set to  ``zip``
-      when unspecified
-  * Updated APIs:
-    * :py:func:`qibuild.archive.extract`:
-      * support for the ``topdir`` option is deprecated
-      * add ``algo`` option, when unspecified ``algo`` is set to ``zip``
-      * still compatible with the previous APIs
-  * Deprecated APIs:
     * :py:func:`qibuild.archive.extract_tar`: use :py:func:`qibuild.archive.extract` instead
     * :py:func:`qibuild.archive.extract_zip`: use :py:func:`qibuild.archive.extract` instead
     * :py:func:`qibuild.archive.zip`: use :py:func:`qibuild.archive.compress` instead
     * :py:func:`qibuild.archive.zip_unix`: use :py:func:`qibuild.archive.compress` instead
     * :py:func:`qibuild.archive.zip_win`: use :py:func:`qibuild.archive.compress` instead
+  * New APIs:
+    * :py:func:`qibuild.archive.compress`: include ``algo`` option, which is set
+      to  ``zip`` when unspecified
+    * :py:func:`qibuild.archive.guess_algo`: guessing the compression method
+      from the archive extension
+  * Updated APIs:
+    * :py:func:`qibuild.archive.extract`:
+      * support for the ``topdir`` option has been removed
+      * add ``algo`` option, when unspecified ``algo`` is set to ``zip`` on all platform
+* Added :py:mod:`qibuild.cmake.modules` to handle CMake module generation
 
 Misc
 +++++
