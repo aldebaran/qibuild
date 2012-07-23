@@ -119,7 +119,7 @@ class NotInPath(Exception):
         return mess
 
 
-def find_program(executable, env=None):
+def find_program(executable, env=None, raises=False):
     """Get the full path of an executable by
     looking at PATH environment variable
     (and PATHEXT on windows)
@@ -143,6 +143,8 @@ def find_program(executable, env=None):
                 with_ext = full_path + ext
                 if os.access(with_ext, os.X_OK):
                     return qibuild.sh.to_native_path(with_ext)
+    if raises:
+        raise NotInPath(executable, env=env)
     return None
 
 
