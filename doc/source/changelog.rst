@@ -41,6 +41,7 @@ Command line
 * ``qibuild test``: ``--test-name`` has been removed, use ``-k PATTERN``
 * Removed ``qisrc fetch``, use ``qisrc init`` instead
 * Removed ``qisrc pull``, use ``qisrc sync`` instead
+* Added ``qitoolchain convert-package``, to turn a binary package into a qiBuild package
 
 CMake
 ++++++

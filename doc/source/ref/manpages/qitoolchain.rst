@@ -24,11 +24,22 @@ init NAME [FEED_URL]
 update NAME
   update a toolchain using the last feed
 
+convert-package [NAME] PACKAGE_PATH
+
+  turn a package (binary archive or install directory) into a qiBuild package
+
+  Current supported binary package formats:
+
+  * Gentoo
+
 add-package -c TOOLCHAIN_NAME PACKAGE_NAME PACKAGE_PATH
-  add a new package to the given toolchain
+  add a new qiBuild package to the given toolchain
 
 import-package -c TOOLCHAIN_NAME [PACKAGE_NAME] PACKAGE_PATH
   import a binary package into the given toolchain
+
+  Convert the binary package to a qiBuild package and automatically
+  add it to the toochain.
 
   Current supported binary package formats:
 
