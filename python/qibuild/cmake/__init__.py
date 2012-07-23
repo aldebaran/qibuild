@@ -1,3 +1,11 @@
+## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
+
+"""This module contains function to handle CMake managed project.
+
+"""
+
 import os
 import re
 import subprocess
@@ -16,21 +24,20 @@ def get_known_cmake_generators():
 
     """
     build_env = qibuild.config.get_build_env()
-    cmake = qibuild.command.find_program("cmake", env=build_env)
-    if not cmake:
-        raise Exception("Could not find cmake executable\n"
-                        "Please install it if necessary and re-run "
-                        "`qibuild config --wizard`")
-    process = subprocess.Popen(
-        [cmake, "--help"],
-        stdout=subprocess.PIPE)
+    cmake_    = qibuild.command.find_program("cmake", env=build_env)
+    if not cmake_:
+        message = """\
+Could not find cmake executable
+Please install it if necessary and re-run `qibuild config --wizard`\
+"""
+        raise Exception(message)
+    process = subprocess.Popen([cmake_, "--help"], stdout=subprocess.PIPE)
     (out, _err) = process.communicate()
-    intersting = False
+    intersting  = False
     intersting_lines = list()
     magic_line = "The following generators are available on this platform:"
     # pylint: disable-msg=E1103
     for line in out.splitlines():
-
         # handle lines like that:
         # Generator = "blalblalba"
         #       files.

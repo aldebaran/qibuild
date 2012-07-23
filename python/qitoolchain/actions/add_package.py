@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 
 """Add a new package to a toolchain
+
 """
 
 import os
@@ -10,9 +11,6 @@ import qibuild.log
 
 import qibuild
 import qitoolchain
-
-LOGGER = qibuild.log.get_logger(__name__)
-
 
 def configure_parser(parser):
     """Configure parser for this action """

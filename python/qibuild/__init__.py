@@ -34,6 +34,11 @@ from qibuild.cmdparse import run_action
 QIBUILD_ROOT_DIR  = os.path.dirname(os.path.abspath(__file__))
 
 def get_platform():
+    """Return the platform name
+
+    :return: the platform name string
+
+    """
     if sys.platform.startswith("linux"):
         return "linux"
     if sys.platform.startswith("win"):

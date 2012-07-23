@@ -26,33 +26,35 @@ except ImportError:
 if WITH_PORTAGE:
     from qitoolchain.binary_package.gentoo_portage import GentooPackage
 else:
-    from qitoolchain.binary_package.gentoo         import GentooPackage
+    from qitoolchain.binary_package.gentoo import GentooPackage
 
 _PKG_TYPES = {
-    'gentoo'    : {
-        'extension' : '.tbz2',
-        'class'     : GentooPackage,
-        },
+    'gentoo': {
+        'extension': '.tbz2',
+        'class': GentooPackage,
+    },
     # Not yet implemented, so use the default Package class
-    'debian'    : {
-        'extension' : '.deb',
-        'class'     : BinaryPackage,
-        },
-    'redhat'    : {
-        'extension' : '.rpm',
-        'class'     : BinaryPackage,
-        },
-    'archlinux' : {
-        'extension' : '.pkg.tar.xz',
-        'class'     : BinaryPackage,
-        },
-    }
+    'debian': {
+        'extension': '.deb',
+        'class': BinaryPackage,
+    },
+    'redhat': {
+        'extension': '.rpm',
+        'class': BinaryPackage,
+    },
+    'archlinux': {
+        'extension': '.pkg.tar.xz',
+        'class': BinaryPackage,
+    },
+}
+
 
 def _guess_package_type(package_path):
     for typename, data in _PKG_TYPES.iteritems():
         if package_path.endswith(data.get('extension')):
             return  typename
     return None
+
 
 def open_package(package_path):
     """ Open the given binary package.
@@ -61,7 +63,7 @@ def open_package(package_path):
 
     """
     if not os.path.exists(package_path):
-        mess = "No such file or directory: package_path"
+        mess = "No such file or directory: {0}".format(package_path)
         raise SystemError(mess)
     package = None
     typename = _guess_package_type(package_path)

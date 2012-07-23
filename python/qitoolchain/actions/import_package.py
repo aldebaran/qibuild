@@ -6,14 +6,11 @@
 """
 
 import os
-import qibuild.log
 import subprocess
 
 import qibuild
 import qitoolchain
 import qitoolchain.binary_package
-
-LOGGER = qibuild.log.get_logger(__name__)
 
 _CMAKE_MODULE_PKG_LIST = """
 Package {0} already provides the following CMake module(s):
