@@ -61,6 +61,7 @@ def init_worktree(worktree, manifest_location, setup_review=True):
         return
     project_count = len(manifest.projects)
     ui.info(ui.green, "Initializing worktree ...")
+    setup_ok = True
     for i, project in enumerate(manifest.projects):
         ui.info(
             ui.green, "*", ui.reset, "(%2i/%2i)" % (i+1, project_count),
@@ -78,9 +79,11 @@ def init_worktree(worktree, manifest_location, setup_review=True):
                       skip_if_exists=True)
         wt_project = worktree.get_project(p_src)
         p_path = wt_project.path
-        if project.review and setup_review:
+        if project.review and setup_review and setup_ok:
             worktree.set_project_review(p_src, True)
-            qisrc.review.setup_project(p_path, project.name, project.review_url, p_revision)
+            # If setup failed once, no point in trying for every project
+            setup_ok = qisrc.review.setup_project(p_path, project.name,
+                                                  project.review_url, p_revision)
         git = qisrc.git.Git(p_path)
         git.set_remote(p_remote, p_url)
         git.set_tracking_branch(p_revision, p_remote)
@@ -93,6 +96,8 @@ def init_worktree(worktree, manifest_location, setup_review=True):
                 ui.warning("Project", project.name, "is on", cur_branch,
                     "but should be on", p_revision)
         worktree.set_git_project_config(p_src, p_remote, p_revision)
+    if not setup_ok:
+        qisrc.review.warn_gerrit()
 
 
 def clone_project(worktree, url, src=None, branch=None, remote="origin",

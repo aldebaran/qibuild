@@ -12,11 +12,10 @@ import sys
 import qibuild.log
 import urlparse
 
+from qibuild import ui
 import qisrc.git
 import qibuild.interact
 import qibuild.config
-
-LOGGER = qibuild.log.get_logger(__name__)
 
 def parse_git_url(url):
     """ Parse a git url. Return a tuple: username, server, port
@@ -83,20 +82,20 @@ def ask_gerrit_username(server, gerrit_ssh_port=29418):
     If that fails, give up and suggest upload the public key
 
     """
-    LOGGER.info("Configuring gerrit ssh access ...")
+    ui.info(ui.green, "Configuring gerrit ssh access ...")
     # works on UNIX and git bash:
     username = os.environ.get("USERNAME")
     if not username:
         username = qibuild.interact.ask_string("Please enter your username")
         if not username:
             return
-    LOGGER.info("Checking gerrit connection with %s@%s:%i",
-        username, server, gerrit_ssh_port)
+    ui.info("Checking gerrit connection with %s@%s:%i" %
+            (username, server, gerrit_ssh_port))
     if check_gerrit_connection(username, server, gerrit_ssh_port):
-        LOGGER.info("Success")
+        ui.info("Success")
         return username
 
-    print "Could not connect to ssh using username", username
+    ui.warning("Could not connect to ssh using username", username)
     try_other = qibuild.interact.ask_yes_no("Do you want to try with an other username ?")
     if not try_other:
         return
@@ -108,6 +107,15 @@ def ask_gerrit_username(server, gerrit_ssh_port=29418):
     if check_gerrit_connection(username, server, gerrit_ssh_port):
         return username
 
+def warn_gerrit():
+    """ Emit a warning telling the user that:
+     * connection to gerrit will fail
+     * qisrc push won't work
+
+    """
+    ui.warning("""Failed to configure gerrit connection
+`qisrc push` won't work
+When you have resolved this problem, just re-run ``qisrc sync -a``""")
 
 def setup_project(project_path, project_name, review_url, branch):
     """ Setup a project for code review.
@@ -115,6 +123,9 @@ def setup_project(project_path, project_name, review_url, branch):
      * Figure out the user name
      * Add a remote called 'gerrit'
      * Add the hook
+
+     :return: a boolean to tell wether it's worth trying
+              for other projects
 
     """
     git = qisrc.git.Git(project_path)
@@ -132,7 +143,7 @@ def setup_project(project_path, project_name, review_url, branch):
     else:
         username = ask_gerrit_username(server)
         if not username:
-            return
+            return False
 
     # Add it to config so we ask only once
     qibuild_cfg.set_server_access(server, username)
@@ -148,9 +159,12 @@ def setup_project(project_path, project_name, review_url, branch):
     # Install the hook
     commit_hook = os.path.join(project_path, ".git", "hooks", "commit-msg")
     if os.path.exists(commit_hook):
-        return
+        return True
+    ui.info("Configuring project for code review ...", end="")
     (username, server, port) = parse_git_url(remote_url)
     fetch_gerrit_hook(project_path, username, server, port)
+    ui.info(ui.green, "[OK]")
+    return True
 
 def push(project_path, branch, review=True, dry_run=False):
     """ Push the changes for review.
