@@ -2,7 +2,8 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-"""Import a binary package into a toolchain.
+"""Import a package (binary archive or install directory) into a qiBuild package
+and add it to a toolchain.
 
 """
 
@@ -11,7 +12,8 @@ import subprocess
 
 import qibuild
 import qitoolchain
-import qitoolchain.binary_package as binpkg
+from qitoolchain.binary_package import open_package
+from qitoolchain.binary_package import convert_to_qibuild
 
 
 def configure_parser(parser):
@@ -19,12 +21,16 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     parser.add_argument("package_name", metavar='NAME',
                         help="The name of the package", nargs='?')
-    parser.add_argument("package_path", metavar='BINPKGPATH',
-                        help="The path to the package")
+    parser.add_argument("package_path", metavar='PACKAGE_PATH',
+                        help="""\
+The path to the package (archive  or root install directory) to be convert.
+If PACKAGE_PATH points to a directory, then NAME is a mandatory.""")
     parser.add_argument("-d", "--directory", dest="dest_dir",
                         metavar='DESTDIR', help="""\
 destination directory of the qiBuild package after convertsion
 (default: aside the original package)""")
+    parser.add_argument("-b", "--batch", dest="batch", action="store_true",
+                        default=False, help="enable non-interactive mode")
     return
 
 
@@ -42,6 +48,8 @@ def do(args):
     package_name = args.package_name
     package_path = os.path.abspath(args.package_path)
     dest_dir     = args.dest_dir
+    interactive  = not args.batch
+    other_names  = list()
     if dest_dir is None:
         dest_dir = os.path.dirname(package_path)
     if os.path.isdir(package_path):
@@ -70,9 +78,9 @@ Importing '{1}' in the toolchain {0} ...
     qibuild.ui.info(message)
     # conversion into qiBuild
     with qibuild.sh.TempDir() as tmp:
-        conversion = binpkg.convert_to_qibuild(tmp, package, package_name,
-                                               other_names=other_names,
-                                               interactive=True)
+        conversion = convert_to_qibuild(tmp, package, package_name,
+                                        other_names=other_names,
+                                        interactive=interactive)
         qibuild_package_path = conversion[0]
         modules_package      = conversion[1]
         modules_qibuild      = conversion[2]
