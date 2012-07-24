@@ -40,3 +40,10 @@ Tools
    ui
    interact
    wizard
+
+Test tools
+
+.. toctree::
+   :maxdepth: 1
+
+   test/index

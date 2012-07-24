@@ -13,57 +13,7 @@ import unittest
 import mock
 
 import qibuild.wizard
-
-class FakeInteract:
-    """ A class to control qibuild.interact behavior
-
-    Answers must be a dict: message -> answer
-    message must be a part of the message
-    answer can be a boolean (for ask_yes_no), and string
-    (for ask_path or ask_string), or a string that must
-    match one of the choices, for (ask_choice)
-
-    Note that if you do not specify an answer for
-    ask_yes_no, the default will be used.
-
-    Any other non specifed answer will raise an exception
-    """
-    def __init__(self, answers):
-        self.answers = answers
-
-    def find_answer(self, message, choices=None, default=None):
-        keys = self.answers.keys()
-        for key in keys:
-            if key in message.lower():
-                if not choices:
-                    return self.answers[key]
-                answer = self.answers[key]
-                if answer in choices:
-                    return answer
-                else:
-                    mess  = "Would answer %s\n" % answer
-                    mess += "But choices are: %s\n" % choices
-                    raise Exception(mess)
-        if default is not None:
-            return default
-        mess  = "Could not find answer for\n  :: %s\n" % message
-        mess += "Known keys are: %s" % ", ".join(keys)
-        raise Exception(mess)
-
-    def ask_choice(self, choices, message):
-        return self.find_answer(message, choices)
-
-    def ask_yes_no(self, message, default=False):
-        return self.find_answer(message, default=default)
-
-    def ask_path(self, message):
-        return self.find_answer(message)
-
-    def ask_string(self, message):
-        return self.find_answer(message)
-
-    def ask_program(self, message):
-        return self.find_answer(message)
+from qibuild.test.test_interact import FakeInteract
 
 
 class ConfigWizardTestCase(unittest.TestCase):

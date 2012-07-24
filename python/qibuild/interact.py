@@ -53,18 +53,19 @@ def ask_choice(choices, input_text):
 
 def ask_yes_no(question, default=False):
     """Ask the user to answer by yes or no"""
-    if default:
-        ui.info(ui.green, "::", ui.reset, question, "(Y/n)?")
-    else:
-        ui.info(ui.green, "::", ui.reset, question, "(y/N)?")
-    try:
+    while True:
+        if default:
+            ui.info(ui.green, "::", ui.reset, question, "(Y/n)?")
+        else:
+            ui.info(ui.green, "::", ui.reset, question, "(y/N)?")
         answer = read_input()
-    except KeyboardInterrupt:
-        answer = "n"
-    if not default:
-        return answer == "y"
-    else:
-        return answer != "n"
+        if answer in ["y", "yes", "Yes"]:
+            return True
+        if answer in ["n", "no", "No"]:
+            return False
+        if not answer:
+            return default
+        ui.warning("Please anwser by 'yes' or 'no'")
 
 def ask_string(question, default=None):
     """Ask the user to enter something.
