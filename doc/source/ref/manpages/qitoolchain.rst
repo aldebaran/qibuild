@@ -36,7 +36,7 @@ add-package -c TOOLCHAIN_NAME PACKAGE_NAME PACKAGE_PATH
   add a new qiBuild package to the given toolchain
 
 import-package -c TOOLCHAIN_NAME [PACKAGE_NAME] PACKAGE_PATH
-  import a binary package into the given toolchain
+  import a package (binary archive or install directory) into a qiBuild package
 
   Convert the binary package to a qiBuild package and automatically
   add it to the toochain.

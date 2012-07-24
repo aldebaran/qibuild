@@ -42,6 +42,10 @@ Command line
 * Removed ``qisrc fetch``, use ``qisrc init`` instead
 * Removed ``qisrc pull``, use ``qisrc sync`` instead
 * Added ``qitoolchain convert-package``, to turn a binary package into a qiBuild package
+* Added ``qitoolchain convert-package``, to turn a binary package or  package
+  directory into a qiBuild package
+* ``qitoolchain import-package`` learned ``--batch``
+* ``qitoolchain import-package`` learned to import package directory
 
 CMake
 ++++++
@@ -138,9 +142,9 @@ Command line
 * ``qibuild package`` : learned ``--include-deps`` option
 * ``qidoc``: fix for archlinux
 * ``qibuild configure``: learned use ``-c system`` where ther is a default config
-   in ther current worktree but user still wants to use no toolchain.
-* ``qitoolchain`` learned ``import-package`` : import binary packages into
-  a cross-toolchain.
+  in ther current worktree but user still wants to use no toolchain.
+* Added ``qitoolchain import-package`` to import binary packages into a
+  cross-toolchain.
 
 CMake
 +++++
