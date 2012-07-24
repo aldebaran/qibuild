@@ -47,11 +47,16 @@ instead
 Windows
 +++++++
 
-Just run ``install-qibuild.bat``:
+Make sure ``python.exe`` is in your PATH first.
+
+Then run ``install-qibuild.bat``:
 
 .. code-block:: console
 
   c:\path\to\qibuild> install-qibuild.bat
+
+Then make sure the ``Scripts`` directory next to
+your Python installation is in your PATH too.
 
 If you have bash available on your system, and want to use qiBuild from there,
 you should also be able to use the .sh script. (Be careful if you are using
