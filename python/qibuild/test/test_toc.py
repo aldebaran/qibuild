@@ -14,6 +14,45 @@ import qisrc
 import qibuild
 import qitoolchain
 
+class TestToc():
+    """ A class that opens a toc object
+    in qibuild/test
+
+    To be used in a with statement so that every
+    build dir is cleaned afterwards
+
+    """
+    def __init__(self, build_type="Debug"):
+        test_dir = os.path.abspath(os.path.dirname(__file__))
+        worktree = qisrc.worktree.open_worktree(test_dir)
+        self.toc = qibuild.toc.Toc(worktree, build_type=build_type)
+
+    def clean(self):
+        """ Clean every build dir """
+        for project in self.toc.worktree.projects:
+            build_dirs = os.listdir(project.path)
+            build_dirs = [x for x in build_dirs if x.startswith("build")]
+            build_dirs = [os.path.join(project.path, x) for x in build_dirs]
+            for build_dir in build_dirs:
+                qibuild.sh.rm(build_dir)
+
+    def __enter__(self):
+        return self.toc
+
+    def __exit__(self, type, value, tb):
+        self.clean()
+
+def pytest_funcarg__toc(request):
+    res = TestToc()
+    request.addfinalizer(res.clean)
+    return res
+
+def pytest_funcarg__toc_release(request):
+    res = TestToc(config="release")
+    request.addfinalizer(res.clean)
+    return res
+
+
 class TocTestCase(unittest.TestCase):
 
     def setUp(self):
