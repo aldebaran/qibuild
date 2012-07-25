@@ -12,12 +12,11 @@ import sys
 import ftplib
 import urlparse
 import urllib2
-import qibuild.log
 import StringIO
 
+from qibuild import ui
 import qibuild
 
-LOGGER = qibuild.log.get_logger(__name__)
 
 def callback(total, done):
     """ Called during download """
@@ -141,8 +140,7 @@ def download(url, output_dir,
         return dest_name
 
     if message:
-        LOGGER.info(message)
-
+        ui.info(*message)
     try:
         dest_file = open(dest_name, "wb")
     except Exception, e:

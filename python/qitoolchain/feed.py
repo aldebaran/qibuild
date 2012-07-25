@@ -13,10 +13,10 @@ import hashlib
 import urlparse
 from xml.etree import ElementTree
 
+from qibuild import ui
 import qibuild
 import qitoolchain
 
-LOGGER = qibuild.log.get_logger(__name__)
 
 
 def raise_parse_error(package_tree, feed, message):
@@ -46,8 +46,7 @@ def tree_from_feed(feed_location):
         tree = ElementTree.ElementTree()
         tree.parse(fp)
     except Exception:
-        mess  = "Could not parse %s\n" % feed_location
-        LOGGER.error(mess)
+        ui.error("Could not parser", feed_location)
         raise
     finally:
         if fp:
@@ -104,14 +103,14 @@ def handle_remote_package(feed, package, package_tree, toolchain):
         rest += ".zip"
     output = toolchain.cache
     output = os.path.join(output, top)
-    message = "Getting package %s from %s" % (package_name, package_url)
+    message = (ui.green, "Downloading", ui.blue, package_url)
     package_archive = qitoolchain.remote.download(package_url,
         output,
         output_name=rest,
         clobber=False,
         message=message)
 
-    LOGGER.info("Toolchain %s: adding package %s", toolchain.name, package.name)
+    ui.info(ui.green, "Adding package", ui.blue, package.name)
     packages_path = qitoolchain.toolchain.get_default_packages_path(toolchain.name)
     should_skip = False
     dest = os.path.join(packages_path, package_name)
@@ -253,7 +252,7 @@ def parse_feed(toolchain, feed, qibuild_cfg, dry_run=False):
             mess  = "could guess package path from this configuration:\n"
             mess += ElementTree.tostring(package_tree)
             mess += "Please make sure you have at least an url or a directory\n"
-            LOGGER.warning(mess)
+            ui.warning(mess)
             continue
         if not dry_run:
             toolchain.add_package(package)
