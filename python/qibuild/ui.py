@@ -11,6 +11,7 @@
 """
 
 import sys
+import datetime
 
 ON_WIN = sys.platform.startswith("win")
 
@@ -73,6 +74,7 @@ CONFIG = {
     "verbose" : False,
     "quiet" : False,
     "color" : True,
+    "timestamp" : False
 }
 
 
@@ -87,7 +89,11 @@ def _msg(*tokens, **kwargs):
     with_color = CONFIG["color"]
     if ON_WIN and not HAS_PYREADLINE or not fp.isatty():
         with_color = False
-    res = ""
+    if CONFIG["timestamp"]:
+        now = datetime.datetime.now()
+        res = now.strftime("[%Y-%m-%d %H:%M:%S] ")
+    else:
+        res = ""
     for i, token in enumerate(tokens):
         if not token:
             continue

@@ -17,6 +17,8 @@ def log_parser(parser):
         help="Only output error messages")
     group.add_argument("--no-color", dest="color", action="store_false",
         help="Do not use color")
+    group.add_argument("--time-stamp", dest="timestamp", action="store_true",
+        help="Add timestamps before each log message")
     group.add_argument("--color", dest = "color", action = "store_false",
                        help = "Colorize output. This is the default")
 

@@ -12,6 +12,7 @@ def configure_logging(args):
     qibuild.ui.CONFIG["color"] = args.color
     qibuild.ui.CONFIG["verbose"] = args.verbose
     qibuild.ui.CONFIG["quiet"] = args.quiet
+    qibuild.ui.CONFIG["timestamp"] = args.timestamp
 
 def get_current_log_level():
     pass
