@@ -60,6 +60,7 @@ def do(args):
     qiwt = qisrc.open_worktree(args.worktree)
     gitrepo = list()
     dirty = list()
+    incorrect = list()
 
     git_projects = qiwt.git_projects
     manifests = qiwt.get_manifest_projects()
@@ -90,6 +91,7 @@ def do(args):
                 branch = git.get_current_branch()
                 if branch != git_project.branch:
                     incorrect_projs.append((git_project.src, branch, git_project.branch))
+                    incorrect.append(git_project)
                 tracking = git.get_tracking_branch()
                 (ahead, behind) = stat_tracking_remote(git, branch, tracking)
                 if ahead != 0 or behind != 0:
@@ -126,15 +128,16 @@ def do(args):
             nlines = [ x[:3] + shortpath + "/" + x[3:] for x in out.splitlines() if len(x.strip()) > 0 ]
             print "\n".join(nlines)
 
-
+    max_len = _max_len(qiwt.root, incorrect)
+    max_len = max([max_len, len("Project")])
     if incorrect_projs:
         max_branch_len = max([len(x[1]) for x in incorrect_projs])
         max_branch_len = max([max_branch_len, len("Current")])
         print
         print " ## Warning: some projects are not on the expected branch"
-        LOGGER.info("Project ".ljust(max_len) + "Current".ljust(max_branch_len + 3) + "Manifest")
+        LOGGER.info("Project".ljust(max_len + 3) + "Current".ljust(max_branch_len + 3) + "Manifest")
         for (project, local_branch, manifest_branch) in incorrect_projs:
-            LOGGER.info(project.ljust(max_len) + local_branch.ljust(max_branch_len + 3) + manifest_branch)
+            LOGGER.info(project.ljust(max_len + 3) + local_branch.ljust(max_branch_len + 3) + manifest_branch)
 
     if not args.untracked_files:
         print
