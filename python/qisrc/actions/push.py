@@ -5,11 +5,9 @@
 """ Push changes for review
 
 """
-
-
-import os
 import sys
-import qibuild.log
+
+from qibuild import ui
 import qibuild
 import qisrc
 
@@ -27,6 +25,10 @@ def do(args):
     """ Main entry point """
     git_path = qisrc.worktree.git_project_path_from_cwd()
     git = qisrc.git.Git(git_path)
-    qisrc.review.push(git_path, git.get_current_branch(),
-        review=args.review, dry_run=args.dry_run)
+    current_branch = git.get_current_branch()
+    if not current_branch:
+        ui.error("Not currently on any branch")
+        sys.exit(2)
+    qisrc.review.push(git_path, current_branch,
+                      review=args.review, dry_run=args.dry_run)
 
