@@ -7,135 +7,264 @@
 """
 
 import os
-import sys
 import stat
-import errno
-import unittest
-import tempfile
+
+import pytest
 
 import qibuild
 
-class ArchiveTestCase(unittest.TestCase):
-    def setUp(self):
-        self.tmp = tempfile.mkdtemp(prefix="tmp-archive-test")
-
-    def tearDown(self):
-        qibuild.sh.rm(self.tmp)
-
-    def test_zip_extract(self):
-        # Create some files in the temp dir:
-        src = os.path.join(self.tmp, "src")
-        os.mkdir(src)
-        # Create a empty dir called a, and two files named
-        # b and c
-        a = os.path.join(src, "a")
-        os.mkdir(a)
-        b = os.path.join(a, "b")
-        with open(b, "w") as fp:
-            fp.write("b\n")
-        c = os.path.join(a, "c")
-        with open(c, "w") as fp:
-            fp.write("c\n")
-        archive = qibuild.archive.compress(a)
-        dest = os.path.join(self.tmp, "dest")
-        os.mkdir(dest)
-        qibuild.archive.extract(archive, dest)
-        ls_r = qibuild.sh.ls_r(dest)
-        self.assertEquals(ls_r, ["a/b", "a/c"])
-
-    def test_zip_extract_ro(self):
-        src = os.path.join(self.tmp, "src")
-        os.mkdir(src)
-        # Create a empty dir called a, and two files named
-        # b and c
-        a = os.path.join(src, "a")
-        os.mkdir(a)
-        ro = os.path.join(a, "ro")
-        with open(ro, "w") as fp:
-            fp.write("ro\n")
-        # 200:
-        os.chmod(ro, stat.S_IRUSR)
-        archive = qibuild.archive.compress(a)
-        dest = os.path.join(self.tmp, "dest")
-        os.mkdir(dest)
-        qibuild.archive.extract(archive, dest)
-        ls_r = qibuild.sh.ls_r(dest)
-        self.assertEquals(ls_r, ["a/ro"])
-        dest_ro = os.path.join(dest, "a", "ro")
-        # check that the dest is readonly:
-        error = None
-        try:
-            open(dest_ro, "w")
-        except IOError, e:
-            error = e
-        self.assertFalse(error is None)
-        self.assertEquals(error.errno,  errno.EACCES)
-
-    def test_zip_extract_ro_dir(self):
-        src = os.path.join(self.tmp, "src")
-        os.mkdir(src)
-        ro1 = os.path.join(src, "ro1")
-        os.mkdir(ro1)
-        ro2 = os.path.join(ro1, "ro2")
-        os.mkdir(ro2)
-        a = os.path.join(ro2, "a")
-        with open(a, "w") as fp:
-            fp.write("a\n")
-        # RO dir inside an other RO dir
-        os.chmod(ro2, stat.S_IRUSR | stat.S_IXUSR)
-        os.chmod(ro1, stat.S_IRUSR | stat.S_IXUSR)
-        archive = qibuild.archive.compress(src)
-        dest = os.path.join(self.tmp, "dest")
-        os.mkdir(dest)
-        qibuild.archive.extract(archive, dest)
-        ls_r = qibuild.sh.ls_r(dest)
-        self.assertEquals(ls_r, ["src/ro1/ro2/a"])
-
-    def test_extract_preserve_executables_from_zip(self):
-        zip = qibuild.command.find_program("zip")
-        if not zip:
-            return
-        src = os.path.join(self.tmp, "src")
-        os.mkdir(src)
-        a_exe = os.path.join(src, "a.exe")
-        with open(a_exe, "w") as fp:
-            fp.write("a_exe\n")
-        st_700 = stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR
-        os.chmod(a_exe, st_700)
-        qibuild.command.call(["zip", "-r", "src.zip", "src"],
-            cwd=self.tmp)
-        archive = os.path.join(self.tmp, "src.zip")
-        dest = os.path.join(self.tmp, "dest")
-        os.mkdir(dest)
-        qibuild.archive.extract(archive, dest)
-        dest_exe = os.path.join(dest, "src", "a.exe")
-        st_mode = os.stat(dest_exe).st_mode
-        self.assertEquals(st_mode, 0100700)
-
-    def test_extract_with_symlink(self):
-        if sys.platform.startswith("win"):
-            return
-        src = os.path.join(self.tmp, "src")
-        os.mkdir(src)
-        a_dir = os.path.join(src, "a_dir")
-        os.mkdir(a_dir)
-        a_file = os.path.join(a_dir, "a_file")
-        with open(a_file, "w") as fp:
-            fp.write("a_file\n")
-        a_link = os.path.join(a_dir, "a_link")
-        os.symlink("a_file", a_link)
-        tar_gz = qibuild.archive.compress(a_dir, algo="gzip")
-        dest = os.path.join(self.tmp, "dest")
-        os.mkdir(dest)
-        qibuild.archive.extract(tar_gz, dest, algo="gzip")
-        ls_r = qibuild.sh.ls_r(dest)
-        self.assertEquals(ls_r,
-            ['a_dir/a_file', 'a_dir/a_link'])
-        dest_link = os.path.join(dest, "a_dir", "a_link")
-        self.assertTrue(os.path.islink(dest_link))
-        dest_target = os.readlink(dest_link)
-        self.assertEquals(dest_target, "a_file")
+from qibuild.archive import compress
+from qibuild.archive import extract
+from qibuild.archive import guess_algo
 
 
-if __name__ == "__main__":
-    unittest.main()
+## zip does not support:
+## - symlinks (they are dereferenced during the archive creation)
+## - read-only directory
+
+
+# def guess_algo(archive):
+def test_guess_algo():
+    extension = {
+        'zip': ["zip"],
+        'gzip': ["gz", "tgz", "tar.gz"],
+        'bzip2': ["bz2", "tbz2", "tar.bz2"],
+        'xz': ["xz", "tar.xz"],
+        }
+    basename  = ["archive",
+                 "archive.{0}",
+                 "/tmp.{0}/archive",
+                 "/tmp.{0}/archive.{0}"]
+    for algo, exts in extension.iteritems():
+        for base_ in basename:
+            for padding in extension.values():
+                filename = base_.format(padding[0])
+                for ext_ in exts:
+                    filename += "." + ext_
+                    res = guess_algo(filename)
+                    assert res == algo
+    for ext in ["tar", "Z", "tar.Z", "foo", "tar.foo"]:
+        for base_ in basename:
+            for padding in extension.values():
+                filename = ".".join([base_.format(padding[0]), ext])
+                res = guess_algo(filename)
+                assert res == ext.rsplit(".", 1)[-1]
+    return
+
+
+
+
+def _test_compress_extract(tmpdir, algo, extension, compress_func, extract_func):
+    ## Create the test archive
+    srcdir   = tmpdir.mkdir("src")
+    dstdir   = tmpdir.mkdir("dst")
+    srcdir.mkdir("a")
+    srcdir.join("a").join("1.txt").write("1")
+    srcdir.join("a").join("2.txt").write("2")
+    srcdir.mkdir("b")
+    srcdir.join("b").join("3.txt").write("3")
+    ## ... with symlinks
+    srcdir.join("linkto_a").mksymlinkto("a")
+    srcdir.join("linkto_b_3.txt").mksymlinkto("b/3.txt")
+    srcdir.join("b").join("4.txt").mksymlinkto("3.txt")
+    srcdir.join("b").join("linkto_a_from_b").mksymlinkto("../a")
+    ## ... with ro file
+    srcdir.mkdir("e")
+    srcdir.join("e").join("ro_file.txt").write("ro-file")
+    srcdir.join("e").join("ro_file.txt").chmod(0444)
+    ## ... with ro dir
+    srcdir.mkdir("ro_dir")
+    srcdir.join("ro_dir").join("in_ro_dir.txt").write("ro-dir")
+    srcdir.join("ro_dir").join("in_ro_dir.txt").chmod(0444)
+    srcdir.join("ro_dir").chmod(0555)
+    ## ... with executable
+    srcdir.mkdir("bin")
+    srcdir.join("bin").join("rw_bip").write("bip")
+    srcdir.join("bin").join("rw_bip").chmod(0755)
+    srcdir.join("bin").join("ro_bip").write("bop")
+    srcdir.join("bin").join("ro_bip").chmod(0555)
+    ## Pre-assert
+    archive_base_ = tmpdir.join("arch").strpath
+    archive_path_ = compress_func(srcdir.strpath, archive=archive_base_, algo=algo)
+    extract_path_ = extract_func(archive_path_, dstdir.strpath, algo=algo)
+    dstdir   = dstdir.join(os.path.basename(extract_path_))
+    archpath = tmpdir.join(os.path.basename(archive_path_))
+    src_ls_r = [x.strpath.split(srcdir.strpath + os.sep, 1)[-1] for x in srcdir.visit(sort=True)]
+    dst_ls_r = [x.strpath.split(dstdir.strpath + os.sep, 1)[-1] for x in dstdir.visit(sort=True)]
+    assert srcdir.join("linkto_a").check(exists=1, dir=1, link=1)
+    assert srcdir.join("linkto_b_3.txt").check(exists=1, file=1, link=1)
+    assert srcdir.join("b").join("linkto_a_from_b").check(exists=1, dir=1, link=1)
+    assert srcdir.join("b").join("4.txt").check(exists=1, file=1, link=1)
+    ## Tests
+    ## archive existence
+    assert archpath.strpath == archive_base_ + extension
+    assert archpath.strpath == archive_path_
+    print archive_path_
+    assert archpath.check(exists=1, file=1, link=0)
+    ## content
+    assert dstdir.join("a").check(exists=1, dir=1, link=0)
+    assert dstdir.join("a").join("1.txt").check(exists=1, file=1, link=0)
+    assert dstdir.join("a").join("2.txt").check(exists=1, file=1, link=0)
+    assert dstdir.join("b").check(exists=1, dir=1, link=0)
+    assert dstdir.join("b").join("3.txt").check(exists=1, file=1, link=0)
+    assert dstdir.join("e").check(exists=1, dir=1, link=0)
+    assert dstdir.join("e").join("ro_file.txt").check(exists=1, file=1, link=0)
+    assert dstdir.join("ro_dir").check(exists=1, dir=1, link=0)
+    assert dstdir.join("ro_dir").join("in_ro_dir.txt").check(exists=1, file=1, link=0)
+    assert dstdir.join("bin").check(exists=1, dir=1, link=0)
+    assert dstdir.join("bin").join("rw_bip").check(exists=1, file=1, link=0)
+    assert dstdir.join("bin").join("ro_bip").check(exists=1, file=1, link=0)
+    print "src:"
+    print "\n".join(["  %s" % x for x in src_ls_r])
+    print "dst:"
+    print "\n".join(["  %s" % x for x in dst_ls_r])
+    if algo == "zip" and compress_func == compress:
+        # Current implementation of qibuild.archive.compress does not
+        # dereference symlinks to directory, but just skip them. So:
+        # - symlink to file become a file;
+        # - symlink to directory is excluded from archiving.
+        #
+        # So, just remove all entry through a symlink directory from the
+        # source file list.
+        #
+        # Note: Unlikely, zip binary dereference all symlinks:
+        #       - symlink to file become a file;
+        #       - symlink to directory become a directory;
+        src_ls_r = [x for x in src_ls_r if not "linkto_a" in x]
+    assert set(src_ls_r) == set(dst_ls_r)
+    ## mode/permissions
+    assert stat.S_IMODE(dstdir.join("e").join("ro_file.txt").stat().mode) == 0444
+    assert stat.S_IMODE(dstdir.join("ro_dir").join("in_ro_dir.txt").stat().mode) == 0444
+    if not algo == "zip" or not compress_func == compress:
+        # Current implementation of qibuild.archive.compress does not
+        # support read-only directory.
+        #
+        # So, just skip the test.
+        #
+        # Note: Unlikely, zip binary keeps permissions on files and directories
+        #       (see "zipinfo -l").
+        assert stat.S_IMODE(dstdir.join("ro_dir").stat().mode) == 0555
+    assert stat.S_IMODE(dstdir.join("bin").join("rw_bip").stat().mode) == 0755
+    assert stat.S_IMODE(dstdir.join("bin").join("ro_bip").stat().mode) == 0555
+    ## symlinks
+    # Current implementation of qibuild.archive.compress does not
+    # dereference symlinks to directory, but just skip them. So:
+    # - symlink to file become a file;
+    # - symlink to directory is excluded from archiving.
+    #
+    # So, skip the sy;mlink-specific tests.
+    #
+    # Note: Unlikely, zip binary dereference all symlinks:
+    #       - symlink to file become a file;
+    #       - symlink to directory become a directory;
+    assert dstdir.join("linkto_b_3.txt").check(exists=1)
+    assert dstdir.join("linkto_b_3.txt").check(exists=1, file=1)
+    if not algo == "zip":
+        assert dstdir.join("linkto_b_3.txt").check(exists=1, file=1, link=1)
+        assert dstdir.join("linkto_b_3.txt").readlink() == "b/3.txt"
+    assert dstdir.join("b").join("4.txt").check(exists=1)
+    assert dstdir.join("b").join("4.txt").check(exists=1, file=1)
+    if not algo == "zip":
+        assert dstdir.join("b").join("4.txt").check(exists=1, file=1, link=1)
+        assert dstdir.join("b").join("4.txt").readlink() == "3.txt"
+    if not algo == "zip" or not compress_func == compress:
+        assert dstdir.join("linkto_a").check(exists=1)
+        assert dstdir.join("linkto_a").check(exists=1, dir=1)
+    if not algo == "zip":
+        assert dstdir.join("linkto_a").check(exists=1, dir=1, link=1)
+        assert dstdir.join("linkto_a").readlink() == "a"
+    if not algo == "zip" or not compress_func == compress:
+        assert dstdir.join("b").join("linkto_a_from_b").check(exists=1)
+        assert dstdir.join("b").join("linkto_a_from_b").check(exists=1, dir=1)
+    if not algo == "zip":
+        assert dstdir.join("b").join("linkto_a_from_b").check(exists=1, dir=1, link=1)
+        assert dstdir.join("b").join("linkto_a_from_b").readlink() == "../a"
+    return
+
+
+def extern_compress(directory, archive=None, algo="zip", quiet=False):
+    if archive is None:
+        archive = directory
+    if algo == "zip":
+        prog = "zip"
+        if not archive.endswith(".zip"):
+            archive += ".zip"
+        cmd = ["-r", archive, os.path.basename(directory)]
+        cwd = os.path.dirname(directory)
+    else:
+        prog = "tar"
+        if algo == "tar" and not archive.endswith(".tar"):
+            archive += ".tar"
+        elif algo == "gzip" and not archive.endswith(".tar.gz"):
+            archive += ".tar.gz"
+        elif algo == "bzip2" and not archive.endswith(".tar.bz2"):
+            archive += ".tar.bz2"
+        elif algo == "xz" and not archive.endswith(".tar.xz"):
+            archive += ".tar.xz"
+        cmd = []
+        if algo != "tar":
+            cmd += ["--{0}".format(algo)]
+        cmd += ["-cf", archive]
+        cmd += ["-C", os.path.dirname(directory)]
+        cmd += [os.path.basename(directory)]
+        cwd = None
+    cmd.insert(0, qibuild.command.find_program(prog, raises=True))
+    qibuild.command.call(cmd, cwd=cwd)
+    return archive
+
+def extern_extract(archive, directory, algo="zip", quiet=False):
+    if algo == "zip":
+        prog = "unzip"
+        cmd = ["-x", archive]
+        cwd = directory
+    else:
+        prog = "tar"
+        cmd = []
+        if algo != "tar":
+            cmd += ["--{0}".format(algo)]
+        cmd += ["-xf", archive]
+        cmd += ["-C", directory]
+        cwd = None
+    cmd.insert(0, qibuild.command.find_program(prog, raises=True))
+    qibuild.command.call(cmd, cwd=cwd)
+    if len(os.listdir(directory)) == 1:
+        directory = os.path.join(directory, os.listdir(directory)[0])
+    return directory
+
+
+# pylint: disable-msg=E1101
+@pytest.mark.parametrize(("algo", "extension", "compress_func", "extract_func"), [
+        ("zip",   ".zip",     compress, extract),
+        ("gzip",  ".tar.gz",  compress, extract),
+        ("bzip2", ".tar.bz2", compress, extract),
+        ("xz",    ".tar.xz",  compress, extract),
+        ("tar",   ".tar",     compress, extract),
+
+        ("zip",   ".zip",     extern_compress, extract),
+        ("gzip",  ".tar.gz",  extern_compress, extract),
+        ("bzip2", ".tar.bz2", extern_compress, extract),
+        ("xz",    ".tar.xz",  extern_compress, extract),
+        ("tar",   ".tar",     extern_compress, extract),
+
+        ("zip",   ".zip",     compress, extern_extract),
+        ("gzip",  ".tar.gz",  compress, extern_extract),
+        ("bzip2", ".tar.bz2", compress, extern_extract),
+        ("xz",    ".tar.xz",  compress, extern_extract),
+        ("tar",   ".tar",     compress, extern_extract),
+])
+def test_compress_extract_valid(tmpdir, algo, extension, compress_func, extract_func):
+    _test_compress_extract(tmpdir, algo, extension, compress_func, extract_func)
+    return
+
+
+# pylint: disable-msg=E1101
+@pytest.mark.parametrize(("algo", "extension"), [
+        ("foo", ".foo"),
+        ("foo", ".tar.foo"),
+])
+def test_compress_extract_invalid(tmpdir, algo, extension):
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        _test_compress_extract(tmpdir, algo, extension, compress, extract)
+    assert e.typename == "CommandFailedException"
+    return
