@@ -9,3 +9,4 @@ qisrc modules
     worktree
     sync
     review
+    test/index
