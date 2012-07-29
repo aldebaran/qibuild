@@ -9,28 +9,20 @@
 import os
 import sys
 import contextlib
+import qibuild.log
 import subprocess
-import time
-import datetime
 import threading
 import Queue
 
 import qibuild
-import qibuild.log
+
 LOGGER = qibuild.log.get_logger(__name__)
 
 
 # Quick hack: in order to be able to configure how
 # qibuild.command works, we have to use this
 # global variable
-CONFIG = {
-    "quiet_commands" : False,
-    "stats" : True
-}
-
-# Global variable to track the commands that have been called,
-# and how much time it took to run them.
-STATS = list()
+CONFIG = dict()
 
 class ProcessThread(threading.Thread):
     """ A simple way to run commands.
@@ -195,9 +187,6 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=None):
     # so quiet will be ignored
     if sys.platform.startswith("win") and sys.version_info < (2, 7):
         quiet_command = False
-    if CONFIG.get("stats"):
-        start_time = time.time()
-
     if not quiet_command:
         returncode = subprocess.call(cmd, env=env, cwd=cwd)
     else:
@@ -208,12 +197,6 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=None):
             if err is not None:
                 ring_buffer.append(err)
         returncode = cmdline.returncode
-
-    if CONFIG.get("stats"):
-        stop_time = time.time()
-        delta = datetime.timedelta(seconds=(stop_time - start_time))
-        STATS.append((cmd, delta))
-
 
     if ignore_ret_code:
         return returncode
