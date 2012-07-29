@@ -1,3 +1,4 @@
+PYTHON    ?= python
 all:
-	python tools/gen_cmake_doc.py ..
+	$(PYTHON) tools/gen_cmake_doc.py ..
 	qidoc build
