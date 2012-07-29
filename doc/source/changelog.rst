@@ -81,9 +81,9 @@ Python
 Misc
 +++++
 
-* Now using `tox <http://tox.readthedocs.org/en/latest/>` to run the tests on Jenkins,
+* Now using `tox <http://tox.readthedocs.org/en/latest/>`_ to run the tests on Jenkins,
   get rid of ``run_tests.py``
-* Now using `py.test <http://pytest.org/latest/>` to write the automatic tests
+* Now using `py.test <http://pytest.org/latest/>`_ to write the automatic tests
 
 
 1.14
