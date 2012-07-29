@@ -15,6 +15,7 @@ import qibuild.sh
 
 from qisrc.test.test_git import create_git_repo
 from qisrc.test.test_git import create_git_repo_with_submodules
+from qisrc.test.test_git import create_broken_submodules
 from qisrc.test.test_git import read_readme
 from qisrc.test.test_git import push_file
 
@@ -217,6 +218,23 @@ class SyncTestCase(unittest.TestCase):
         qisrc.sync.init_worktree(worktree, manifest)
         self.assertEqual(len(worktree.git_projects), 3)
 
+    def test_broken_submodules(self):
+        manifest_url = create_git_repo(self.tmp, "manifest")
+        create_broken_submodules(self.tmp)
+        xml = """
+<manifest>
+    <remote name="origin" fetch="{tmp}/srv" />
+    <project name="foo.git" path="foo" />
+    <project name="bar.git" path="foo/bar"/>
+</manifest>
+"""
+        xml = xml.format(tmp=self.tmp)
+        push_file(self.tmp, "manifest", "default.xml", xml)
+        work = os.path.join(self.tmp, "work")
+        worktree = qisrc.worktree.create(work)
+        manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
+        qisrc.sync.init_worktree(worktree, manifest)
+        self.assertEqual(len(worktree.git_projects), 3)
 
 
 if __name__ == "__main__":

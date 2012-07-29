@@ -37,7 +37,7 @@ def create_git_repo(tmp, path, with_release_branch=False):
     """ Create a empty git repository, which just
     what is enough so that it is possible to clone it
 
-    Rerturn a valid git url.
+    Return a valid git url.
     """
     tmp_srv = os.path.join(tmp, "srv", path + ".git")
     qibuild.sh.mkdir(tmp_srv, recursive=True)
@@ -77,6 +77,18 @@ def create_git_repo_with_submodules(tmp):
     foo_git.call("commit", "-m", "add bar submodule")
     foo_git.call("push", foo_url, "master:master")
     return foo_url
+
+def create_broken_submodules(tmp):
+    """ Return an URL where there will be a registered submodule,
+    but no .gitmodules (it happens)
+
+    """
+    foo_url = create_git_repo_with_submodules(tmp)
+    foo_src = os.path.join(tmp, "src", "foo")
+    foo_git = qisrc.git.Git(foo_src)
+    foo_git.call("rm", ".gitmodules")
+    foo_git.call("commit", "-m", "trying to remove submodules, but in a bad way")
+    foo_git.call("push", foo_url, "master:master")
 
 def push_file(tmp, git_path, filename, contents, branch="master"):
     """ Push a file to the given url. Assumes the repository

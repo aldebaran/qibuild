@@ -9,6 +9,7 @@ import os
 import contextlib
 import subprocess
 
+from qibuild import ui
 import qibuild.config
 
 class Git:
@@ -415,13 +416,21 @@ def is_submodule(path):
     if not repo_root:
         return False
     git = Git(repo_root)
-    (retcode, out) = git.call("submodule", "status", raises=False)
-    if retcode != 0:
-        return False
-    lines = out.splitlines()
-    submodules = [x.split()[-1] for x in lines]
-    rel_path = os.path.relpath(path, repo_root)
-    return rel_path in submodules
+    (retcode, out) = git.call("submodule", raises=False)
+    if retcode == 0:
+        if not out:
+            return False
+        else:
+            lines = out.splitlines()
+            submodules = [x.split()[-1] for x in lines]
+            rel_path = os.path.relpath(path, repo_root)
+            return rel_path in submodules
+    else:
+        ui.warning("git submodules configuration is broken for",
+                   repo_root, "!",
+                   "\nError was: ", ui.reset, "\n", "  " + out)
+        # clone_project will just erase it and create a git repo instead
+        return True
 
 
 def open(repo):
