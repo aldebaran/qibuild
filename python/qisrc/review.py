@@ -108,9 +108,10 @@ def ask_gerrit_username(server, gerrit_ssh_port=29418):
         return username
 
 def warn_gerrit():
-    """ Emit a warning telling the user that:
-     * connection to gerrit will fail
-     * qisrc push won't work
+    """Emit a warning telling the user that:
+
+    * connection to gerrit has failed
+    * qisrc push won't work
 
     """
     ui.warning("""Failed to configure gerrit connection
