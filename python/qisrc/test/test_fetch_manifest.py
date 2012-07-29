@@ -16,6 +16,8 @@ def create_worktree(tmpdir):
     return qisrc.worktree.create(work)
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_fetch_manifest(tmpdir):
     tmpdir = tmpdir.strpath
     manifest_url = create_git_repo(tmpdir, "manifest")
@@ -34,6 +36,8 @@ def test_fetch_manifest(tmpdir):
     with open(manifest_xml, "r") as fp:
         assert fp.read() == xml
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_fetch_manifest_no_default(tmpdir):
     tmpdir = tmpdir.strpath
     manifest_url = create_git_repo(tmpdir, "manifest")
@@ -47,6 +51,8 @@ def test_fetch_manifest_no_default(tmpdir):
     assert "Could not find a file named 'default.xml'" in str(e)
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_fetch_manifest_custom_profile(tmpdir):
     tmpdir = tmpdir.strpath
     manifest_url = create_git_repo(tmpdir, "manifest")

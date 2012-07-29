@@ -5,9 +5,10 @@
 import os
 import subprocess
 
+import pytest
+
 import qibuild
 import qibuild.gdb
-
 from qibuild.test.test_toc import TestToc
 
 
@@ -26,6 +27,8 @@ q
     return process.communicate()
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_normal_debug():
     with TestToc() as toc:
         proj = toc.get_project("debugme")
@@ -35,6 +38,8 @@ def test_normal_debug():
         assert "in foo () at " in out
         assert "main.cpp" in out
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_split_debug():
     with TestToc() as toc:
         proj = toc.get_project("debugme")
@@ -45,6 +50,8 @@ def test_split_debug():
         assert "in foo () at " in out
         assert "main.cpp" in out
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_split_debug_install(tmpdir):
     with TestToc() as toc:
         tmpdir = tmpdir.strpath
@@ -57,6 +64,8 @@ def test_split_debug_install(tmpdir):
         assert "main.cpp" in out
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_gdb_release():
     with TestToc(build_type="Release") as toc:
         proj = toc.get_project("debugme")

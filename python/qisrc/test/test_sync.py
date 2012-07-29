@@ -7,6 +7,8 @@ import tempfile
 import unittest
 from StringIO import StringIO
 
+import pytest
+
 import qisrc.sync
 import qisrc.git
 import qibuild.sh
@@ -17,7 +19,8 @@ from qisrc.test.test_git import read_readme
 from qisrc.test.test_git import push_file
 
 
-
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 class SyncTestCase(unittest.TestCase):
     def setUp(self):
         qibuild.command.CONFIG["quiet"] = True

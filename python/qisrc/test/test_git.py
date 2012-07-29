@@ -106,6 +106,8 @@ def push_readme_v2(tmp, path, branch):
     push_file(tmp, path, "README", "%s v2 on %s\n" % (path, branch), branch=branch)
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 class GitTestCase(unittest.TestCase):
     def setUp(self):
         qibuild.command.CONFIG["quiet"] = True
@@ -154,6 +156,8 @@ class GitTestCase(unittest.TestCase):
         self.assertEqual(git.get_current_branch(), None)
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 class GitUpdateBranchTestCase(unittest.TestCase):
     def setUp(self):
         qibuild.command.CONFIG["quiet"] = True
@@ -399,6 +403,8 @@ class GitUpdateBranchTestCase(unittest.TestCase):
         self.assertTrue("Merge is not fast-forward" in err)
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_git_get_local_branches(tmpdir):
     tmpdir = tmpdir.strpath
     git = qisrc.git.Git(tmpdir)
@@ -414,6 +420,8 @@ def test_git_get_local_branches(tmpdir):
     assert git.get_local_branches() == ["devel", "master"]
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_set_tracking_branch(tmpdir):
     tmpdir = tmpdir.strpath
     bar_url = create_git_repo(tmpdir, "bar")
@@ -430,12 +438,14 @@ def test_set_tracking_branch(tmpdir):
     err = git.update_branch("release", "origin")
     assert not err
 
-    # Thos should work out of the box
+    # This should work out of the box
     git.pull()
     git.checkout("release")
     git.pull()
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_submodules(tmpdir):
     foo_url = create_git_repo_with_submodules(tmpdir.strpath)
     work = tmpdir.mkdir("work")
@@ -445,7 +455,3 @@ def test_submodules(tmpdir):
     bar = foo.join("bar")
     assert qisrc.git.is_submodule(bar.strpath)
     assert not qisrc.git.is_submodule(foo.strpath)
-
-
-if __name__ == "__main__":
-    unittest.main()

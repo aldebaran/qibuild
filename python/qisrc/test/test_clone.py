@@ -4,8 +4,9 @@
 
 import os
 import unittest
-
 import tempfile
+
+import pytest
 
 import qisrc
 import qisrc.sync
@@ -13,6 +14,8 @@ import qibuild
 from qisrc.test.test_git import create_git_repo
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 class CloneProjectTestCase(unittest.TestCase):
     def setUp(self):
         qibuild.command.CONFIG["quiet"] = True
