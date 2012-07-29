@@ -262,7 +262,8 @@ def _update_branch(git, branch, remote_name,
         pass
     status = Status()
     status.mess = ""
-    if not git.get_current_branch():
+    current_branch = git.get_current_branch()
+    if not current_branch:
         return "Not currently on any branch"
     if fetch_first:
         (ret, out) = git.call("fetch", remote_name, raises=False)
@@ -275,10 +276,14 @@ def _update_branch(git, branch, remote_name,
     if not remote_branch:
         remote_branch = branch
     remote_ref = "%s/%s" % (remote_name, remote_branch)
-    if git.get_current_branch() != branch:
+    if current_branch != branch:
         _update_branch_if_ff(git, status, branch, remote_ref)
         return status.mess
     with _stash_changes(git, status):
+        # _stash_changes can fail if we think the repo is clean,
+        # but first stash fails for some reason ...
+        if status.mess:
+            return status.mess
         (ret, out) = git.call("rebase", remote_ref, raises=False)
         if ret != 0:
             print "Rebasing failed!"
@@ -286,9 +291,20 @@ def _update_branch(git, branch, remote_name,
             status.mess += "Could not rebase\n"
             status.mess += out
             (ret, out) = git.call("rebase", "--abort", raises=False)
-            if ret != 0:
+            if ret == 0:
+                return status.mess
+            else:
                 status.mess += "rebase --abort failed!\n"
                 status.mess += out
+                return status.mess
+    if status.mess:
+        # Stashing back failse: calling rebase --abort
+        print "Stasthing back changes failed"
+        print "Calling rebase --abort"
+        (ret, out) = git.call("rebase", "--abort", raises=False)
+        if ret != 0:
+            status.mess += "rebase --abort failed!\n"
+            status.mess += out
     return status.mess
 
 ###
@@ -305,6 +321,9 @@ def _stash_changes(git, status):
         status.mess += "Stashing changes failed\n"
         status.mess += out
     yield
+    # If first stash fails, no need to try stash pop:
+    if status.mess:
+        return
     (ret, out) = git.call("stash", "pop", raises=False)
     if ret != 0:
         status.mess = "Stashing back changes failed\n"
