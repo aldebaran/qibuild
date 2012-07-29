@@ -80,7 +80,7 @@ def create_git_repo_with_submodules(tmp):
 
 def push_file(tmp, git_path, filename, contents, branch="master"):
     """ Push a file to the given url. Assumes the repository
-    has been created with create_git_repo with the same
+    has been created with :py:func:`create_git_repo` with the same
     path
 
     """
