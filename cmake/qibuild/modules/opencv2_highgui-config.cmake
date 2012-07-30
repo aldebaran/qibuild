@@ -5,4 +5,4 @@
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 include("${_ROOT_DIR}/opencv2utils.cmake")
 
-opencv2_flib(highgui DPENDS core)
+opencv2_flib(highgui DEPENDS core)
