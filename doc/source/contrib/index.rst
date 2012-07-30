@@ -8,3 +8,4 @@ Contributing to qiBuild
    cmake/coding_guide
    python/coding_guide
    cooking
+   writing_new_tests
