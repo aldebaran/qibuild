@@ -102,7 +102,7 @@ def do(args):
             if not clean:
                 dirty.append(git_project)
 
-    LOGGER.info("Dirty projects: %d/%d", len(dirty), len(qiwt.git_projects))
+    LOGGER.info("Dirty projects: %d/%d", len(dirty), len(git_projects))
 
     max_len = _max_len(qiwt.root, gitrepo)
     for git_project in gitrepo:
