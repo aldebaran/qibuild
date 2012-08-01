@@ -45,17 +45,18 @@ Command line
 CMake
 ++++++
 
+* Added :cmake:function:`qi_generate_src`,  :cmake:function:`qi_generate_header`
+* Added :cmake:function:`qi_swig_wrap_java`
+* :cmake:function:`qi_create_gtest` and :cmake:function:`qi_create_test` learned
+  the ``SLOW`` keyword so that tests are not run by default.
+* :cmake:function:`qi_use_lib` learned the ``ASSUME_SYSTEM_INCLUDE`` flag
+  to use ``-isystem`` on the dependencies
+
 * qibuild cmake modules:
 
   * Added ``openssl``, ``libevent_openssl``
   * Renamed dbus into dbus-1, and dbus-glib into dbus-glib-1
   * ``qi_use_lib(OPENGL)`` now uses upstream's ``FindOpenGL.cmake``
-
-* Added :cmake:function:`qi_generate_src`,  :cmake:function:`qi_generate_header`
-* :cmake:function:`qi_create_gtest` and :cmake:function:`qi_create_test` learned
-  the ``SLOW`` keyword so that tests are not run by default.
-* :cmake:function:`qi_use_lib` learned the ``ASSUME_SYSTEM_INCLUDE`` flag
-  to use ``-isystem`` on the dependencies
 
 Python
 +++++++
@@ -118,7 +119,7 @@ Command line
 CMake
 +++++
 
-* Add :cmake:function:`qi_sanitize_compile_flags`
+* Added :cmake:function:`qi_sanitize_compile_flags`
 * :cmake:function:`qi_use_lib` Now sorts and remove duplicates of include dirs
 * :cmake:function:`qi_stage_lib`: learned ``CUSTOM_CODE`` keyword
 * :cmake:function:`qi_stage_bin` is now implemented

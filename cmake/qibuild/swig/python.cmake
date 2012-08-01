@@ -5,8 +5,8 @@
 
 include(CMakeParseArguments)
 
-#! Python wrapper for swig
-# ========================
+#! CMake wrapper for swig / Python
+# ================================
 
 
 

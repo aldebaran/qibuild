@@ -17,7 +17,8 @@ DOCUMENTED_FILES=[
     "codegen",
     "find",
     "flags",
-    "swig/python"
+    "swig/python",
+    "swig/java"
 ]
 
 import re
