@@ -309,6 +309,14 @@ class FeedTestCase(unittest.TestCase):
         self.assertTrue("boost" in package_names)
         self.assertTrue("naoqi" in package_names)
 
+    def test_blacklist(self):
+        self.setup_srv()
+        full_noboost_xml = os.path.join(self.srv, "full-noboost.xml")
+        tc = qitoolchain.Toolchain("full-no-boost")
+        tc.parse_feed(full_noboost_xml)
+        package_names = [p.name for p in tc.packages]
+        self.assertFalse("boost" in package_names)
+
     def test_master_maint(self):
         self.setup_srv()
         master_xml = os.path.join(self.srv, "master.xml")

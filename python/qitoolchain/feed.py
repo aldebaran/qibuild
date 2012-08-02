@@ -168,7 +168,13 @@ class ToolchainFeedParser:
         self.packages = list()
         # A dict name -> version used to only keep the latest
         # version
+        self.blacklist = list()
         self._versions = dict()
+
+    def get_packages(self):
+        """ Get the parsed packages """
+        res = [x for x in self.packages if not x.get("name") in self.blacklist]
+        return res
 
     def append_package(self, package_tree):
         """ Add a package to self.packages.
@@ -212,6 +218,13 @@ class ToolchainFeedParser:
                 if not "://" in feed_url:
                     feed_url = urlparse.urljoin(feed, feed_url)
                 self.parse(feed_url)
+        select_tree = tree.find("select")
+        if select_tree is not None:
+            blacklist_trees = select_tree.findall("blacklist")
+            for blacklist_tree in blacklist_trees:
+                name = blacklist_tree.get("name")
+                if name:
+                    self.blacklist.append(name)
 
 
 def parse_feed(toolchain, feed, qibuild_cfg, dry_run=False):
@@ -224,7 +237,7 @@ def parse_feed(toolchain, feed, qibuild_cfg, dry_run=False):
         toolchain.remove_package(package_name)
     parser = ToolchainFeedParser()
     parser.parse(feed)
-    package_trees = parser.packages
+    package_trees = parser.get_packages()
     errors = list()
     for package_tree in package_trees:
         package = qitoolchain.Package(None, None)

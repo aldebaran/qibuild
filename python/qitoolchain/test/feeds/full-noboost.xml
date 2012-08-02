@@ -1,0 +1,6 @@
+<toolchain>
+  <feed url="@srv_url@/full.xml" />
+  <select>
+    <blacklist name="boost" />
+  </select>
+</toolchain>
