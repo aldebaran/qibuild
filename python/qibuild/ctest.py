@@ -45,7 +45,7 @@ class TestResult:
         self.message = ""
 
 
-def run_test(build_dir, test_name, cmd, properties, build_env):
+def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False):
     """ Run a test.
 
     :return: (res, output) where res is a string describing wether
@@ -73,7 +73,8 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
     process_thread = qibuild.command.ProcessThread(cmd,
         name=test_name,
         cwd=cwd,
-        env=env)
+        env=env,
+        verbose=verbose)
 
     res = TestResult(test_name)
     start = datetime.datetime.now()
@@ -116,8 +117,8 @@ def run_test(build_dir, test_name, cmd, properties, build_env):
     return res
 
 
-def run_tests(project, build_env, pattern=None, slow=False, dry_run=False):
-    """ Called by :py:meth:`qibuild.toc.Toc.test_project`
+def run_tests(project, build_env, pattern=None, verbose=False, slow=False, dry_run=False):
+    """ Called by `qibuild test`
 
     :param test_name: If given, only run this test
 
@@ -175,14 +176,18 @@ def run_tests(project, build_env, pattern=None, slow=False, dry_run=False):
         ui.info(ui.green, " * ", ui.reset, ui.bold,
                 "(%2i/%2i)" % (i+1, len(tests)),
                 ui.blue, test_name.ljust(25), end="")
+        if verbose:
+            print
         sys.stdout.flush()
-        test_res = run_test(build_dir, test_name, cmd, properties, build_env)
+        test_res = run_test(build_dir, test_name, cmd, properties,
+                            build_env,verbose=verbose)
         if test_res.ok:
             ui.info(ui.green, "[OK]")
         else:
             ok = False
             ui.info(ui.red, "[FAIL]")
-            print test_res.out
+            if not verbose:
+                print test_res.out
             fail_tests.append(test_name)
         xml_out = os.path.join(results_dir, test_name + ".xml")
         if not os.path.exists(xml_out):

@@ -33,7 +33,7 @@ class ProcessThread(threading.Thread):
     object in self.process
 
     """
-    def __init__(self, cmd, name=None, cwd=None, env=None):
+    def __init__(self, cmd, name=None, verbose=False, cwd=None, env=None):
         if name is None:
             thread_name = "ProcessThread"
         else:
@@ -45,6 +45,7 @@ class ProcessThread(threading.Thread):
         self.out = ""
         self.process = None
         self.exception = ""
+        self.verbose = verbose
 
     def run(self):
         LOGGER.debug("starting %s", self.cmd)
@@ -59,7 +60,10 @@ class ProcessThread(threading.Thread):
             return
 
         while self.process.poll() is None:
-            self.out += self.process.stdout.readline()
+            line = self.process.stdout.readline()
+            self.out +=  line
+            if self.verbose:
+                sys.stdout.write(line)
 
 
 class CommandFailedException(Exception):

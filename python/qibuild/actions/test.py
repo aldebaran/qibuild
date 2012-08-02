@@ -23,6 +23,8 @@ def configure_parser(parser):
                         help="Just list what tests would be run")
     parser.add_argument("--slow", action="store_true",
                         help="Also run slow tests")
+    parser.add_argument("-V", action="store_true", dest="verbose_tests",
+                        help="verbose tests")
     parser.set_defaults(slow=False)
 
 def do(args):
@@ -41,7 +43,8 @@ def do(args):
 
     res = qibuild.ctest.run_tests(project, toc.build_env,
             pattern=args.pattern, slow=args.slow,
-            dry_run=args.dry_run)
+            dry_run=args.dry_run,
+            verbose=args.verbose_tests)
     if not res:
         sys.exit(1)
 
