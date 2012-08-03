@@ -51,6 +51,12 @@ qisrc
 
 * support for code review with ``qisrc push``
 
+* removed ``qisrc fetch``, use ``qisrc init`` instead. The manifest should
+  now be given as a git repository and not an url.
+
+* removed ``qisrc pull``, use ``qisrc sync`` instead
+
+
 qidoc
 +++++
 

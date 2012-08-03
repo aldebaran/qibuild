@@ -40,7 +40,7 @@ Command line
 * ``qibuild test``: learned ``-n, --dry-run`` to  just list the test names
 * ``qibuild test``: ``--test-name`` has been removed, use ``-k PATTERN``
 * Removed ``qisrc fetch``, use ``qisrc init`` instead
-
+* Removed ``qisrc pull``, use ``qisrc sync`` instead
 
 CMake
 ++++++
