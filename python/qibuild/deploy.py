@@ -94,11 +94,10 @@ def deploy(local_directory, remote_url, port=22, use_rsync=True):
             "-e", "ssh -p %d" % port, # custom ssh port
             local_directory, remote_url
         ]
-        qibuild.command.call(cmd)
     else:
         # Default to scp
-        qibuild.command.call(["scp", "-P", str(port), "-r",
-            local_directory, remote_url])
+        cmd = ["scp", "-P", str(port), "-r", local_directory, remote_url]
+    qibuild.command.call(cmd)
 
 
 def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_address=""):
