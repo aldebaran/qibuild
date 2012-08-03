@@ -89,13 +89,16 @@ class Package():
     or a sysroot, also relative to its path
 
     """
-    def __init__(self, name, path, toolchain_file=None, sysroot=None):
+    def __init__(self, name, path, toolchain_file=None, sysroot=None, cross_gdb=None):
         self.name = name
         self.path = path
         self.toolchain_file = toolchain_file
         self.sysroot = None
+        self.cross_gdb = None
         if sysroot:
             self.sysroot = os.path.join(self.path, sysroot)
+        if cross_gdb:
+            self.cross_gdb = os.path.join(self.path, cross_gdb)
 
         # Quick hack for now
         self.depends = list()
@@ -106,6 +109,8 @@ class Package():
             res += " (using toolchain from %s)" % self.toolchain_file
         if self.sysroot:
             res += "  (sysroot: %s)" % self.sysroot
+        if self.cross_gdb:
+            res += "  (cross-gdb: %s)" % self.cross_gdb
         res += ">"
         return res
 
@@ -115,7 +120,9 @@ class Package():
         if self.toolchain_file:
             res += "\n  using %s toolchain file" % self.toolchain_file
         if self.sysroot:
-            res += "\n sysroot: " + self.sysroot
+            res += "\n  sysroot: " + self.sysroot
+        if self.cross_gdb:
+            res += "\n  cross-gdb: " + self.cross_gdb
         return res
 
     def __eq__(self, other):
@@ -269,7 +276,8 @@ class Toolchain:
                     raise Exception(mess)
                 package = Package(package_name, package_path,
                                   toolchain_file=package_conf.get('toolchain_file'),
-                                  sysroot=package_conf.get('sysroot'))
+                                  sysroot=package_conf.get('sysroot'),
+                                  cross_gdb=package_conf.get('cross_gdb'))
                 self.packages.append(package)
 
         self.update_toolchain_file()
@@ -387,6 +395,16 @@ class Toolchain:
         for package in self.packages:
             if package.sysroot:
                 return package.sysroot
+
+    def get_cross_gdb(self):
+        """ Get the cross-gdb path from the toolchain.
+        Assume that one and exactly one of the packages inside
+        the toolchain has a 'cross_gdb' attribute
+
+        """
+        for package in self.packages:
+            if package.cross_gdb:
+                return package.cross_gdb
 
     def install_package(self, package_name, destdir, runtime=False):
         """ Install a package to a destdir.
