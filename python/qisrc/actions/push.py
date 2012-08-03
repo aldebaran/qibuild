@@ -18,6 +18,8 @@ def configure_parser(parser):
         help="Do not go through code review")
     parser.add_argument("-n", "--dry-run", action="store_true", dest="dry_run",
         help="Dry run")
+    parser.add_argument("--cc", "--reviewers", action="append", dest="reviewers",
+        help="Add reviewers")
     parser.set_defaults(review=True, dry_run=False)
 
 
@@ -30,5 +32,6 @@ def do(args):
         ui.error("Not currently on any branch")
         sys.exit(2)
     qisrc.review.push(git_path, current_branch,
-                      review=args.review, dry_run=args.dry_run)
+                      review=args.review, dry_run=args.dry_run,
+                      reviewers=args.reviewers)
 

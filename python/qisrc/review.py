@@ -167,10 +167,13 @@ def setup_project(project_path, project_name, review_url, branch):
     ui.info(ui.green, "[OK]")
     return True
 
-def push(project_path, branch, review=True, dry_run=False):
+def push(project_path, branch, review=True, dry_run=False, reviewers=None):
     """ Push the changes for review.
+
     Unless review is False, in this case, simply update
     the remote gerrit branch
+
+    :param reviewers: A list of reviewers to invite to review
 
     """
     git = qisrc.git.Git(project_path)
@@ -186,6 +189,11 @@ def push(project_path, branch, review=True, dry_run=False):
     args.append(review_remote)
     if review:
         args.append("%s:refs/for/%s" % (branch, branch))
+        if reviewers:
+            receive_pack = "git receive-pack"
+            for reviewer in reviewers:
+                receive_pack += " --reviewer=%s" % reviewer
+            args = ["--receive-pack=%s" % receive_pack] + args
     else:
         args.append("%s:%s" % (branch, branch))
     git.push(*args)
