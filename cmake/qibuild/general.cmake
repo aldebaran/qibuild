@@ -118,6 +118,13 @@ option(BUILD_TESTS
   "If OFF, no test will be built, and `qibuild test` won't run any test"
   ON)
 
+# change default for CMAKE_INSTALL_PREFIX
+# (it's c:\program files\<project> on Windows, and
+# /usr/local elsewhere)
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  qi_set_global(CMAKE_INSTALL_PREFIX "/")
+endif()
+
 # Always create an install rule, so that `qibuild install` never
 # fails
 install(CODE "")

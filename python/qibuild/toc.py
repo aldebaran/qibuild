@@ -536,10 +536,10 @@ You may want to run:
         build_dir = project.build_directory
         # DESTDIR=/tmp/foo and CMAKE_PREFIX="/usr/local" means
         # dest = /tmp/foo/usr/local
-        prefix = prefix[1:]
         destdir = qibuild.sh.to_native_path(destdir)
         self.build_env["DESTDIR"] = destdir
-        dest = os.path.join(destdir, prefix)
+        # Must make sure prefix is not seen as an absolute path here:
+        dest = os.path.join(destdir, prefix[1:])
         dest = qibuild.sh.to_native_path(dest)
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
