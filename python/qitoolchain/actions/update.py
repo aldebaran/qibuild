@@ -9,13 +9,9 @@ If a feed url is given, use this feed instead of the recorded one
 to update the given toolchain.
 """
 
-import qibuild.log
-
+from qibuild import ui
 import qibuild
 import qitoolchain
-
-LOGGER = qibuild.log.get_logger(__name__)
-
 
 def configure_parser(parser):
     """ Configure parser for this action """
@@ -35,33 +31,27 @@ def do(args):
     feed = args.feed
     tc_name = args.name
     dry_run = args.dry_run
-
-    known_tc_names = qitoolchain.toolchain.get_tc_names()
     if tc_name:
-        if not tc_name in known_tc_names:
-            mess  = "No such toolchain: '%s'\n" % tc_name
-            mess += "Known toolchains are: %s" % known_tc_names
-            raise Exception(mess)
+        toolchain = qitoolchain.get_toolchain(tc_name)
         if not feed:
             feed = qitoolchain.toolchain.get_tc_feed(tc_name)
             if not feed:
                 mess  = "Could not find feed for toolchain %s\n" % tc_name
                 mess += "Pleas check configuration or specifiy a feed on the command line\n"
                 raise Exception(mess)
-
-        LOGGER.info("Updating toolchain %s using %s", tc_name, feed)
-        toolchain = qitoolchain.Toolchain(tc_name)
+        ui.info(ui.green, "Updating toolchain", tc_name, "with", feed)
         toolchain.parse_feed(feed, dry_run=dry_run)
     else:
-        for tc_name in qitoolchain.get_tc_names():
+        tc_names = qitoolchain.get_tc_names()
+        i = 0
+        for tc_name in tc_names:
+            i += 1
             tc_feed = qitoolchain.toolchain.get_tc_feed(tc_name)
+            ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, len(tc_names)),
+                    ui.green, "Updating", ui.blue, tc_name)
             if not tc_feed:
-                LOGGER.info("No feed found for %s, skipping", tc_name)
-                print
+                ui.warning("No feed found for %s, skipping" % tc_name)
                 continue
-            LOGGER.info("###\n## Updating toolchain %s using %s\n##\n",
-                tc_name, tc_feed)
+            ui.info(ui.green, "Reading", tc_feed)
             toolchain = qitoolchain.Toolchain(tc_name)
             toolchain.parse_feed(tc_feed, dry_run=dry_run)
-            print
-

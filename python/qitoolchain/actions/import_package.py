@@ -274,6 +274,9 @@ def do(args):
     - Add the qiBuild package from cache to toolchain
 
     """
+    tc_name = qitoolchain.toolchain_name_from_args(args)
+    tc = qitoolchain.get_toolchain(tc_name)
+
     package_name = args.package_name
     package_path = args.package_path
 
@@ -288,7 +291,6 @@ def do(args):
     package_names = [ package_name, package_metadata['name'] ]
     package_names = list(set(package_names))
 
-    tc = qitoolchain.get_toolchain(args)
     # extract it to the default packages path of the toolchain
     tc_packages_path = qitoolchain.toolchain.get_default_packages_path(tc.name)
     dest = os.path.join(tc_packages_path, package_name)

@@ -8,6 +8,7 @@ packages
 
 """
 
+from qibuild import ui
 import qibuild
 
 from qitoolchain.toolchain import Toolchain, Package
@@ -18,8 +19,9 @@ from qitoolchain import version
 
 
 
-def get_toolchain(args):
+def toolchain_name_from_args(args):
     """ Get a toolchain from the result of an argument parsing
+    (using a worktree parser)
 
     """
     tc_name = args.config
@@ -37,5 +39,16 @@ def get_toolchain(args):
             mess += "Please specify a configuration with -c \n"
             raise Exception(mess)
         tc_name = active_config
+    return tc_name
 
+
+def get_toolchain(tc_name):
+    """ Get an existing tolchain using its """
+    tc_names = get_tc_names()
+    if not tc_name in tc_names:
+        mess  = "No such toolchain: %s\n" % tc_name
+        mess += "Known toolchains are:\n"
+        for name in tc_names:
+            mess +=  "  * " + name + "\n"
+        raise Exception(mess)
     return Toolchain(tc_name)

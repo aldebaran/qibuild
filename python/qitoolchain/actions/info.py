@@ -21,10 +21,7 @@ def do(args):
     tc_names = qitoolchain.get_tc_names()
     tc_name = args.name
     if tc_name:
-        if not tc_name in qitoolchain.get_tc_names():
-            print "No such toolchain: ", tc_name
-            return
-        toolchain = qitoolchain.Toolchain(tc_name)
+        toolchain = qitoolchain.get_toolchain(tc_name)
         print toolchain
     else:
         for tc_name in tc_names:

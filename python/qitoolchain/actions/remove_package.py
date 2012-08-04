@@ -3,14 +3,12 @@
 ## found in the COPYING file.
 
 """Remove a package from a toolchain
+
 """
 
-import qibuild.log
-
+from qibuild import ui
 import qibuild
 import qitoolchain
-
-LOGGER = qibuild.log.get_logger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -26,7 +24,8 @@ def do(args):
 
     """
     package_name = args.package_name
-    tc = qitoolchain.get_toolchain(args)
-
-    LOGGER.info("Removing package %s from toolchain %s", package_name, tc.name)
+    tc_name = qitoolchain.toolchain_name_from_args(args)
+    tc = qitoolchain.get_toolchain(tc_name)
+    ui.info(ui.green, "Removing package", ui.blue, package_name,
+            ui.green, "from toolchain", ui.blue, tc.name)
     tc.remove_package(package_name)

@@ -6,12 +6,9 @@
 
 """
 
-import sys
-
 from qibuild import ui
 import qibuild
 import qitoolchain
-
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -25,13 +22,8 @@ def configure_parser(parser):
 
 def do(args):
     """ Main entry point  """
-    tc_name  = args.name
     force_rm = args.force_remove
-    if not tc_name in qitoolchain.get_tc_names():
-        ui.warning("No such toolchain: %s" % tc_name)
-        sys.exit(0)
-
-    toolchain = qitoolchain.Toolchain(tc_name)
-    ui.info(ui.green, "Removing toolchain", ui.blue, tc_name, ui.green, "...")
-    toolchain.remove(force_remove=force_rm)
+    tc = qitoolchain.get_toolchain(args.name)
+    ui.info(ui.green, "Removing toolchain", ui.blue, tc.name)
+    tc.remove(force_remove=force_rm)
     ui.info(ui.green, "done")

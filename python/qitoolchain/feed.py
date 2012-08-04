@@ -8,7 +8,6 @@
 
 import os
 import sys
-import qibuild.log
 import hashlib
 import urlparse
 from xml.etree import ElementTree
