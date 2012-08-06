@@ -69,7 +69,7 @@ def parse_valgrind(valgrind_log, tst):
             tst.message += "Invalid read " + r.group(1) + "\n"
 
 
-def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, valgrind=False):
+def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, valgrind=False, nightmare=False):
     """ Run a test.
 
     :return: (res, output) where res is a string describing wether
@@ -95,7 +95,6 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, va
     else:
         cwd = build_dir
     ncmd = cmd
-
     if valgrind:
         env['VALGRIND'] = '1'
         valgrind_log = os.path.join(build_dir, test_name + "valgrind_output.log")
@@ -106,7 +105,8 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, va
         cwd=cwd,
         env=env,
         verbose=verbose)
-
+    if nightmare:
+        ncmd.extend(["--gtest_shuffle", "--gtest_repeat=20"])
     res = TestResult(test_name)
     start = datetime.datetime.now()
     process_thread.start()
@@ -150,7 +150,8 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, va
     return res
 
 
-def run_tests(project, build_env, pattern=None, verbose=False, slow=False, dry_run=False, valgrind=False):
+def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
+              dry_run=False, valgrind=False, nightmare=False):
     """ Called by :py:meth:`qibuild.toc.Toc.test_project`
 
     :param test_name: If given, only run this test
@@ -213,7 +214,7 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False, dry_r
             print
         sys.stdout.flush()
         test_res = run_test(build_dir, test_name, cmd, properties, build_env,
-                            valgrind=valgrind, verbose=verbose)
+                            valgrind=valgrind, verbose=verbose, nightmare=nightmare)
         if test_res.ok:
             ui.info(ui.green, "[OK]")
         else:
