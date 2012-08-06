@@ -33,6 +33,9 @@ General
   bad because we generate public documentation from some of those
   doc strings.
 
+* The `Google Python Style Guide <http://google-styleguide.googlecode.com/svn/trunk/pyguide.html>`_ contains
+  lots of useful things, please read it.
+
 Do not just copy/paste code from the Internet
 ----------------------------------------------
 
