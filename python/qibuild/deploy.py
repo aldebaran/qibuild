@@ -39,7 +39,7 @@ if ! [ "$#" -eq "1" ] ; then
 fi
 
 echo "to connect to this gdbserver launch the following command in another terminal:"
-echo "  %(cross_gdb)s -x \"${here}/setup_target.gdb\" \"${here}/deploy/${1}\""
+echo "  %(gdb)s -x \"${here}/setup_target.gdb\" \"${here}/deploy/${1}\""
 echo ""
 
 #echo ssh %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
@@ -120,7 +120,8 @@ def _generate_run_gdbserver_binary(dest, remote, gdb_listen, remote_dir):
     with open(os.path.join(dest, "remote_gdbserver.sh"), "w+") as f:
         f.write(FILE_REMOTE_GDBSERVER_SH % { 'remote' : remote,
                                              'gdb_listen' : gdb_listen,
-                                             'remote_dir' : remote_dir })
+                                             'remote_dir' : remote_dir,
+                                             'gdb' : "gdb" })
     os.chmod(os.path.join(dest, "remote_gdbserver.sh"), 0755)
 
 def _uniq(seq):
