@@ -44,8 +44,32 @@ class TestResult:
         # Short description of what went wrong
         self.message = ""
 
+def parse_valgrind(valgrind_log, tst):
+    """
+    parse valgrind logs and extract interesting errors.
+    """
+    leak_fd_regex      = re.compile("==\d+== FILE DESCRIPTORS: (\d+)")
+    invalid_read_regex = re.compile("==\d+== Invalid read of size (\d+)")
+    with open(valgrind_log, "r") as f:
+        lines = f.readlines()
 
-def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False):
+    for l in lines:
+        tst.out += l
+        r = leak_fd_regex.search(l)
+        if r:
+            fdopen = int(r.group(1))
+            # 4: in/out/err + valgrind_log
+            if fdopen > 4:
+                tst.ok = False
+                tst.message += "Error file descriptors leaks:" + str(fdopen - 4) + "\n"
+            continue
+        r = invalid_read_regex.search(l)
+        if r:
+            tst.ok = False
+            tst.message += "Invalid read " + r.group(1) + "\n"
+
+
+def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, valgrind=False):
     """ Run a test.
 
     :return: (res, output) where res is a string describing wether
@@ -70,7 +94,13 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False):
         cwd=working_dir
     else:
         cwd=build_dir
-    process_thread = qibuild.command.ProcessThread(cmd,
+    ncmd = cmd
+
+    if valgrind:
+        valgrind_log = os.path.join(build_dir, test_name + "valgrind_output.log")
+        ncmd = [ "valgrind", "--track-fds=yes", "--log-file=%s" % valgrind_log ]
+        ncmd.extend(cmd)
+    process_thread = qibuild.command.ProcessThread(ncmd,
         name=test_name,
         cwd=cwd,
         env=env,
@@ -89,7 +119,7 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False):
         exception = process_thread.exception
         mess  = "Could not run test: %s\n" % test_name
         mess += "Error was: %s\n" % exception
-        mess += "Full command was: %s\n" % " ".join(cmd)
+        mess += "Full command was: %s\n" % " ".join(ncmd)
         if isinstance(exception, OSError):
             # pylint: disable-msg=E1101
             if exception.errno == errno.ENOENT:
@@ -114,11 +144,13 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False):
                 res.message = "Return code: %i" % retcode
             else:
                 res.message = _str_from_signal(-retcode)
+    if valgrind:
+        parse_valgrind(valgrind_log, res)
     return res
 
 
-def run_tests(project, build_env, pattern=None, verbose=False, slow=False, dry_run=False):
-    """ Called by `qibuild test`
+def run_tests(project, build_env, pattern=None, verbose=False, slow=False, dry_run=False, valgrind=False):
+    """ Called by :py:meth:`qibuild.toc.Toc.test_project`
 
     :param test_name: If given, only run this test
 
@@ -179,8 +211,8 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False, dry_r
         if verbose:
             print
         sys.stdout.flush()
-        test_res = run_test(build_dir, test_name, cmd, properties,
-                            build_env,verbose=verbose)
+        test_res = run_test(build_dir, test_name, cmd, properties, build_env,
+                            valgrind=valgrind, verbose=verbose)
         if test_res.ok:
             ui.info(ui.green, "[OK]")
         else:
@@ -192,7 +224,6 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False, dry_r
         xml_out = os.path.join(results_dir, test_name + ".xml")
         if not os.path.exists(xml_out):
             write_xml(xml_out, test_res)
-
 
     if ok:
         ui.info("Ran %i tests" % len(tests))

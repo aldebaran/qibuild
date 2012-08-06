@@ -25,6 +25,8 @@ def configure_parser(parser):
                         help="Also run slow tests")
     parser.add_argument("-V", action="store_true", dest="verbose_tests",
                         help="verbose tests")
+    parser.add_argument("--valgrind", dest="valgrind", action="store_true",
+                        help="run tests under valgrind")
     parser.set_defaults(slow=False)
 
 def do(args):
@@ -43,8 +45,6 @@ def do(args):
 
     res = qibuild.ctest.run_tests(project, toc.build_env,
             pattern=args.pattern, slow=args.slow,
-            dry_run=args.dry_run,
-            verbose=args.verbose_tests)
+            dry_run=args.dry_run, valgrind=args.valgrind, verbose=args.verbose_tests)
     if not res:
         sys.exit(1)
-
