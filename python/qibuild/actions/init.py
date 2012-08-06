@@ -4,13 +4,14 @@
 """Initialize a new toc worktree """
 
 import os
-import qibuild.log
+import sys
 
+from qibuild import ui
 import qisrc
 import qibuild
 import qibuild.wizard
+import qitoolchain
 
-LOGGER = qibuild.log.get_logger(__name__)
 
 
 def configure_parser(parser):
@@ -26,29 +27,41 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    # If user did not specify a worktree, make sure he is not
-    # trying to create nested worktrees (there's nothing wrong in
-    # having nested worktree, but it may be confusing a little bit)
-    if not args.worktree:
-        old_worktree = qisrc.worktree.guess_worktree()
-        if old_worktree and os.path.exists(old_worktree) and not args.force:
-            raise Exception("You already have a qi worktree in : %s.\n" % (old_worktree) +
-                        "Use --force if you know what you are doing "
-                        "and really want to create a new worktree here.")
 
-    # Use getcwd() if no worktree was given
     worktree = args.worktree
     if not worktree:
         worktree = os.getcwd()
 
-    # Safe to be called: only creates the .qi/ repertory
-    qibuild.toc.create(worktree, force=args.force)
+    if args.config:
+        # Just make sure the user choose a valid default toolchain
+        qitoolchain.get_toolchain(args.config)
 
+    worktree = qibuild.sh.to_native_path(worktree)
+    parent_worktree = qisrc.worktree.guess_worktree(worktree)
+    if parent_worktree:
+        if parent_worktree != worktree:
+            # Refuse to create nested worktrees
+            ui.error("""A qi worktree already exists in {parent_worktree}
+Refusing to create a nested worktree in {worktree}
+Use:
+    qibuild init -f -w {parent_worktree}
+If you want to re-initialize the worktree in {parent_worktree}
+""".format(worktree=worktree, parent_worktree=parent_worktree))
+            sys.exit(1)
+        else:
+            # Refuse to re-initalize the worktree unless "-f" is given
+            if not args.force:
+                ui.warning("There is already a worktree in", worktree, "\n"
+                           "Use --force if you want to re-initialize this worktree")
+                return
+
+    qibuild.toc.create(worktree, force=args.force)
+    # User maybe re-running qibuild init because it has a
+    # bad default exception ...
     try:
         toc = qibuild.toc.toc_open(worktree)
     except qibuild.toc.WrongDefaultException:
         pass
-
 
     toc_cfg_path = os.path.join(worktree, ".qi", "qibuild.xml")
     qibuild_cfg = qibuild.config.QiBuildConfig()

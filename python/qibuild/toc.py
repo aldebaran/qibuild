@@ -203,9 +203,14 @@ class Toc:
                     if self.active_config == self.config.local.defaults.config:
                         mess += """Note: this is your default config
 You may want to run:
- * `qibuild init --force`  (to re-initialize your worktree and not use any toolchain)
- * `qibuild init --force` --config=<config> (to use a different toolchain by default)
+
+  qibuild init --force -w {worktree.root}
+(to re-initialize your worktree and not use any toolchain)
+
+  qibuild init --force -w {worktree.root} --config=<config>
+(to use a different toolchain by default)
  """
+                        mess = mess.format(worktree=self.worktree)
                         raise WrongDefaultException(mess)
                     else:
                         raise Exception(mess)
