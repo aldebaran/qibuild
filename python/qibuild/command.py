@@ -61,7 +61,16 @@ class ProcessThread(threading.Thread):
 
         while self.process.poll() is None:
             line = self.process.stdout.readline()
-            self.out +=  line
+            self.out += line
+            if self.verbose:
+                sys.stdout.write(line)
+        #program is finished, does not mean we read all lines
+        #read them!
+        while True:
+            line = self.process.stdout.readline()
+            if line == "":
+                break
+            self.out += line
             if self.verbose:
                 sys.stdout.write(line)
 
