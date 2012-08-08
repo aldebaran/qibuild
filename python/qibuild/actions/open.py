@@ -6,8 +6,11 @@
 
 """
 import os
+import sys
 import glob
 import subprocess
+
+from qibuild import ui
 import qibuild
 
 SUPPORTED_IDES = ["QtCreator", "Visual Studio", "Xcode"]
@@ -58,13 +61,25 @@ def get_ide(qibuild_cfg):
 
 def do(args):
     """Main entry point """
-    toc      = qibuild.toc.toc_open(args.worktree, args)
+    toc = qibuild.toc.toc_open(args.worktree, args)
     if not args.project:
         project_name = qibuild.project.project_from_cwd()
     else:
         project_name = args.project
 
     project = toc.get_project(project_name)
+    if not os.path.exists(project.build_directory):
+        ui.error("""It looks like your project has not been configured yet
+(The build directory: '%s' does not exists)""" %
+        project.build_directory)
+        answer = qibuild.interact.ask_yes_no(
+            "Do you want me to run qibuild configure for you",
+            default=True)
+        if not answer:
+            sys.exit(2)
+        else:
+            qibuild.run_action("qibuild.actions.configure",
+                [project.name, "--config", toc.active_config])
 
     error_message = "Could not open project %s\n" % project_name
     qibuild_cfg = qibuild.config.QiBuildConfig(user_config=toc.active_config)
