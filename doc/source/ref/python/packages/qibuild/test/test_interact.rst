@@ -28,7 +28,7 @@ looking like:
 
         """
 
-        coffee = qibuild.interact.ask_yes_no("Do you want coffee ?")
+        coffee = qibuild.interact.ask_yes_no("Do you want some coffee?")
         if coffee:
             serve_coffee()
         else:

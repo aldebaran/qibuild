@@ -55,17 +55,17 @@ def ask_yes_no(question, default=False):
     """Ask the user to answer by yes or no"""
     while True:
         if default:
-            ui.info(ui.green, "::", ui.reset, question, "(Y/n)?")
+            ui.info(ui.green, "::", ui.reset, question, " (Y/n)")
         else:
-            ui.info(ui.green, "::", ui.reset, question, "(y/N)?")
+            ui.info(ui.green, "::", ui.reset, question, " (y/N)")
         answer = read_input()
-        if answer in ["y", "yes", "Yes"]:
+        if answer.lower() in ["y", "yes"]:
             return True
-        if answer in ["n", "no", "No"]:
+        if answer.lower() in ["n", "no"]:
             return False
         if not answer:
             return default
-        ui.warning("Please anwser by 'yes' or 'no'")
+        ui.warning("Please answer by 'yes' or 'no'")
 
 def ask_string(question, default=None):
     """Ask the user to enter something.
@@ -100,11 +100,11 @@ def ask_program(message):
         full_path = qibuild.sh.to_native_path(full_path)
         if not os.path.exists(full_path):
             ui.error("%s does not exists!" % full_path)
-            keep_going = ask_yes_no("continue")
+            keep_going = ask_yes_no("continue?")
             continue
         if not os.access(full_path, os.X_OK):
             ui.error("%s is not a valid executable!" % full_path)
-            keep_going = ask_yes_no("continue")
+            keep_going = ask_yes_no("continue?")
             continue
         return full_path
 

@@ -68,7 +68,7 @@ def do(args):
 (The build directory: '%s' does not exists)""" %
         project.build_directory)
         answer = qibuild.interact.ask_yes_no(
-            "Do you want me to run qibuild configure for you",
+            "Do you want me to run qibuild configure for you?",
             default=True)
         if not answer:
             sys.exit(2)

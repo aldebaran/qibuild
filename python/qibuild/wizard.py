@@ -70,7 +70,7 @@ def ask_incredibuild(qibuild_cfg):
 
     """
     build_env = qibuild.config.get_build_env()
-    answer = qibuild.interact.ask_yes_no("Do you want to use IncrediBuild ?", False)
+    answer = qibuild.interact.ask_yes_no("Do you want to use IncrediBuild?", False)
     if not answer:
         return
 
@@ -99,7 +99,7 @@ def configure_qtcreator(qibuild_cfg):
     qtcreator_path = qibuild.command.find_program("qtcreator", env=build_env)
     if qtcreator_path:
         ui.info(ui.green, "::", ui.reset,  "Found QtCreator:", qtcreator_path)
-        mess  = "Do you want to use qtcreator from %s ?\n" % qtcreator_path
+        mess  = "Do you want to use qtcreator from %s?\n" % qtcreator_path
         mess += "Answer 'no' if you installed qtcreator from Nokia's installer"
         answer = qibuild.interact.ask_yes_no(mess, default=True)
         if not answer:
@@ -135,7 +135,7 @@ def configure_local_settings(toc):
     print
     ui.info(ui.green, "::", ui.reset,  "Found a worktree in", toc.worktree.root)
     answer = qibuild.interact.ask_yes_no(
-        "Do you want to configure settings for this worktree",
+        "Do you want to configure settings for this worktree?",
         default=True)
     if not answer:
         return
@@ -153,7 +153,7 @@ def configure_local_settings(toc):
                 toc.config.local.defaults.config = default
                 toc.save_config()
     answer = qibuild.interact.ask_yes_no(
-        "Do you want to use a unique build dir "
+        "Do you want to use a unique build dir?"
         "(mandatory when using Eclipse)",
         default=False)
 
@@ -169,7 +169,7 @@ def configure_local_settings(toc):
 
     sdk_dir = None
     answer = qibuild.interact.ask_yes_no(
-        "Do you want to use a unique SDK dir",
+        "Do you want to use a unique SDK dir?",
         default=False)
     if answer:
         sdk_dir = qibuild.interact.ask_string("Path to a SDK directory")
