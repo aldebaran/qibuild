@@ -339,7 +339,7 @@ def find_qidoc_root(cwd=None):
         cwd = os.getcwd()
     dirname = None
     while dirname or cwd:
-        if os.path.exists(os.path.join(cwd, ".qi", "qibuild.xml")):
+        if os.path.exists(os.path.join(cwd, ".qi", "worktree.xml")):
             return cwd
         (new_cwd, dirname) = os.path.split(cwd)
         if new_cwd == cwd:
