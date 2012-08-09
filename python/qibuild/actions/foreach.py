@@ -19,7 +19,8 @@ def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.worktree_parser(parser)
     parser.add_argument("command", metavar="COMMAND", nargs="+")
-    parser.add_argument("--ignore-errors", action="store_true", help="continue on error")
+    parser.add_argument("--continue", "--ignore-errors", dest="ignore_errors",
+                        action="store_true", help="continue on error")
 
 def do(args):
     """Main entry point"""
