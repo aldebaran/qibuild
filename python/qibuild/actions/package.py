@@ -77,7 +77,7 @@ def _do_package(args, project_name, destdir, debug):
 
     qibuild.run_action("qibuild.actions.configure", build_args + ["--no-clean-first"],
         forward_args=args)
-    qibuild.run_action("qibuild.actions.make", build_args,
+    qibuild.run_action("qibuild.actions.make", build_args + ["--no-fix-shared-libs"],
         forward_args=args)
     qibuild.run_action("qibuild.actions.install", build_args + [destdir],
         forward_args=args)
@@ -106,7 +106,7 @@ def do(args):
     else:
         qibuild.run_action("qibuild.actions.configure", [project_name, "--no-clean-first"],
             forward_args=args)
-        qibuild.run_action("qibuild.actions.make", [project_name],
+        qibuild.run_action("qibuild.actions.make", [project_name, "--no-fix-shared-libs"],
             forward_args=args)
         qibuild.run_action("qibuild.actions.install", [project_name, destdir],
             forward_args=args)

@@ -456,11 +456,19 @@ You may want to run:
 
 
     def build_project(self, project, incredibuild=False,
-                      num_jobs=1, target=None, rebuild=False):
+                      num_jobs=1, target=None, rebuild=False,
+                      fix_shared_libs=True):
         """ Build a project.
 
         Usually we will simply can ``cmake --build``, but for incredibuild
         we need to call `BuildConsole.exe` with an sln.
+
+        :param fix_shared_libs: Wether we should try to fix the shared
+                                libraries so that newly compiled
+                                executables can run wihtout setting
+                                PATH or LD_LIBRARY_PAT.
+                                True by default, but is set to False
+                                during `qibuild package` for instance
 
         """
         build_dir = project.build_directory
@@ -492,7 +500,8 @@ You may want to run:
         except CommandFailedException:
             raise BuildFailed(project)
 
-        self.fix_shared_libs(project)
+        if fix_shared_libs:
+            self.fix_shared_libs(project)
 
 
     def fix_shared_libs(self, project):
@@ -569,12 +578,13 @@ Try configuring and building the project first.
             LOGGER.debug(mess)
 
         if not self.using_visual_studio and not self.cmake_generator == "Xcode":
-            self.build_project(project, target="preinstall", num_jobs=num_jobs)
+            self.build_project(project, target="preinstall", num_jobs=num_jobs,
+                               fix_shared_libs=False)
 
         if runtime:
             self.install_project_runtime(project, destdir, num_jobs=num_jobs)
         else:
-            self.build_project(project, target="install")
+            self.build_project(project, target="install", fix_shared_libs=False)
 
         if split_debug:
             if self.using_visual_studio:
