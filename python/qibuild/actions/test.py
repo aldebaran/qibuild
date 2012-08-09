@@ -28,6 +28,8 @@ def configure_parser(parser):
                         help="run tests under valgrind")
     parser.add_argument("--nightmare", dest="nightmare", action="store_true",
                         help="run tests in shuffle and 20 times (apply only to gtest)")
+    parser.add_argument("--test-args", dest="test_args",
+                        help="Pass extra argument to test binary")
     parser.set_defaults(slow=False)
 
 def do(args):
@@ -43,6 +45,7 @@ def do(args):
     res = qibuild.ctest.run_tests(project, toc.build_env,
             pattern=args.pattern, slow=args.slow,
             dry_run=args.dry_run, valgrind=args.valgrind,
-            verbose=args.verbose_tests, nightmare=args.nightmare)
+            verbose=args.verbose_tests, nightmare=args.nightmare,
+            test_args=args.test_args)
     if not res:
         sys.exit(1)

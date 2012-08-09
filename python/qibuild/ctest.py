@@ -151,7 +151,7 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, va
 
 
 def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
-              dry_run=False, valgrind=False, nightmare=False):
+              dry_run=False, valgrind=False, nightmare=False, test_args=None):
     """ Called by :py:meth:`qibuild.toc.Toc.test_project`
 
     :param test_name: If given, only run this test
@@ -178,6 +178,8 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
             raise Exception(mess)
     else:
         for test in all_tests:
+            if test_args is not None:
+              test[1] += test_args.split()
             (name, cmd_, properties) = test
             cost = properties.get("COST")
             if not slow and cost and float(cost) > 50:
