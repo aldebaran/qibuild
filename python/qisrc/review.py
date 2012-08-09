@@ -96,7 +96,7 @@ def ask_gerrit_username(server, gerrit_ssh_port=29418):
         return username
 
     ui.warning("Could not connect to ssh using username", username)
-    try_other = qibuild.interact.ask_yes_no("Do you want to try with an other username?")
+    try_other = qibuild.interact.ask_yes_no("Do you want to try with another username?")
     if not try_other:
         return
 

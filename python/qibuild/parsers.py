@@ -46,17 +46,16 @@ def toc_parser(parser):
     """ Parser settings for every action using a toc dir
     """
     worktree_parser(parser)
-    parser.add_argument('-c', '--config',
-        help='The configuration to use. '
-             'If a toolchain exists with the same name '
-             'exists it will be used. '
-             'The settings from [config "<name>"] sections will '
-             'also be used')
+    parser.add_argument("-c", "--config",
+        help="The configuration to use. "
+             "It should match the name of a toolchain. "
+             "The settings from <worktree>/.qi/<config>.cmake will "
+             "also be used")
 
 def build_parser(parser):
     """ Parser settings for every action doing builds
     """
-    group = parser.add_argument_group("build configuration arguments")
+    group = parser.add_argument_group("build configuration options")
     group.add_argument("--release", action="store_const", const="Release",
         dest="build_type",
         help="Build in release (set CMAKE_BUILD_TYPE=Release)")

@@ -14,7 +14,7 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.project_parser(parser)
     qibuild.parsers.build_parser(parser)
-    group = parser.add_argument_group("install arguments")
+    group = parser.add_argument_group("install options")
     group.add_argument("--prefix", metavar="PREFIX",
         help="value of CMAKE_INSTALL_PREFIX, defaults to '/'")
     group.add_argument("destdir", metavar="DESTDIR")

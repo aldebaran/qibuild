@@ -14,7 +14,7 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
-    group = parser.add_argument_group("cmake arguments")
+    group = parser.add_argument_group("configure options")
     group.add_argument("--build-directory", dest="build_directory",
         action="store",
         help="override the default build directory used by cmake")
