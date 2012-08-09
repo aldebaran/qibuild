@@ -18,6 +18,7 @@ import shlex
 import qibuild
 from qibuild import ui
 
+import multiprocessing
 
 def _str_from_signal(code):
     """ Returns a nice string describing the signal
@@ -151,7 +152,8 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, va
 
 
 def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
-              dry_run=False, valgrind=False, nightmare=False, test_args=None):
+              dry_run=False, valgrind=False, nightmare=False, test_args=None,
+              num_jobs=1):
     """ Called by :py:meth:`qibuild.toc.Toc.test_project`
 
     :param test_name: If given, only run this test
@@ -205,31 +207,18 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
         return
 
     ui.info(ui.green, "Testing", project.name, "...")
-    ok = True
-    fail_tests = list()
-    for (i, test) in enumerate(tests):
-        (test_name, cmd, properties) = test
-        ui.info(ui.green, " * ", ui.reset, ui.bold,
-                "(%2i/%2i)" % (i+1, len(tests)),
-                ui.blue, test_name.ljust(25), end="")
-        if verbose:
-            print
-        sys.stdout.flush()
-        test_res = run_test(build_dir, test_name, cmd, properties, build_env,
-                            valgrind=valgrind, verbose=verbose, nightmare=nightmare)
-        if test_res.ok:
-            ui.info(ui.green, "[OK]")
-        else:
-            ok = False
-            ui.info(ui.red, "[FAIL]", test_res.message)
-            if not verbose:
-                print test_res.out
-            fail_tests.append(test_name)
-        xml_out = os.path.join(results_dir, test_name + ".xml")
-        if not os.path.exists(xml_out):
-            write_xml(xml_out, test_res)
 
-    if ok:
+    pool = multiprocessing.Pool(processes=num_jobs)
+    manager = multiprocessing.Manager()
+    test_fail = manager.list()
+    args = [   (x, len(tests), test_fail, verbose, build_dir,
+                build_env, valgrind, nightmare, results_dir)
+      for x in enumerate(tests)
+      ]
+    pool.map(handle_test, args)
+    pool.close()
+    pool.join()
+    if len(test_fail) == 0 :
         ui.info("Ran %i tests" % len(tests))
         if slow_tests and not slow:
             ui.info("Note: %i" % len(slow_tests),
@@ -238,11 +227,38 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
         return True
 
     ui.error("Ran %i tests, %i failures" %
-                  (len(tests), len(fail_tests)))
-    for fail_test in fail_tests:
+                  (len(tests), len(test_fail)))
+    for fail_test in test_fail:
         ui.info(ui.bold, " -", ui.blue, fail_test)
     return False
 
+
+
+def handle_test(test):
+    """
+    Handle one test as a pool task.
+    In case of failure, append test name to test_fail.
+    """
+    ((i, (test_name, cmd, properties)),test_count, test_fail, verbose,
+      build_dir, build_env, valgrind, nightmare, results_dir) = test
+    ui.info(ui.green, " * ", ui.reset, ui.bold,
+            "(%2i/%2i)" % (i+1, test_count),
+            ui.blue, test_name.ljust(25), end="")
+    if verbose:
+        print
+    sys.stdout.flush()
+    test_res = run_test(build_dir, test_name, cmd, properties, build_env,
+                            valgrind=valgrind, verbose=verbose, nightmare=nightmare)
+    if test_res.ok:
+        ui.info(ui.green, "[OK]")
+    else:
+        ui.info(ui.red, "[FAIL]", test_res.message)
+        if not verbose:
+            print test_res.out
+        test_fail.append(test_name)
+    xml_out = os.path.join(results_dir, test_name + ".xml")
+    if not os.path.exists(xml_out):
+        write_xml(xml_out, test_res)
 
 def write_xml(xml_out, test_res):
     """ Write a XUnit XML file
