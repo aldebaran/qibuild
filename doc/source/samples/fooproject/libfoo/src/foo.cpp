@@ -1,5 +1,5 @@
 #include <foo/foo.hpp>
-#include "src/foo_private.hpp"
+#include "foo_p.hpp"
 
 int public_method()
 {

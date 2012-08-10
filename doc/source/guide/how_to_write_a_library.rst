@@ -16,7 +16,7 @@ You have the following files:
 
 * ``foo.cpp`` : implementation of the ``foo.hpp`` functions
 
-* ``foo_private.hpp``: private header of the ``foo`` library. This one may
+* ``foo_p.hpp``: private header of the ``foo`` library. This one may
   include third-party headers (say ``zeromq.h),`` without having the
   ``foo.hpp`` header depending on ``zeromq.h,`` which is nice for the users of
   your library. If you link statically with ``zeromq,`` users of ``foo`` won't
@@ -24,7 +24,7 @@ You have the following files:
   (well, this is true if ``foo`` is a dynamic library, but that's an other
   topic)
 
-* ``foo_private.cpp`` : private implementation.
+* ``foo_p.cpp`` : private implementation.
 
 * ``test_foo.cpp`` : You would not dare writing a library without unit tests,
   would you?
@@ -41,8 +41,8 @@ This is what your layout should look like::
       |   |__ foo.hpp
       |__ src
       |   |__ foo.cpp
-      |   |__ foo_private.hpp
-      |   |__ foo_private.cpp
+      |   |__ foo_p.hpp
+      |   |__ foo_p.cpp
       |__ test
           |__ CMakeLists.txt
           |__ foo_test.cpp

@@ -1,4 +1,4 @@
-#include "src/foo_private.hpp"
+#include "src/foo_p.hpp"
 
 int private_method()
 {

@@ -2,9 +2,9 @@ include_directories(".")
 
 qi_create_lib(foo
   SRC foo/foo.hpp
-      foo/foo.cpp
-      src/foo_private.hpp
-      src/foo_private.cpp
+      src/foo.cpp
+      src/foo_p.hpp
+      src/foo_p.cpp
   SHARED
 )
 
