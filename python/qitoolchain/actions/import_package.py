@@ -201,7 +201,7 @@ def _generate_cmake_module(root_dir, module_names):
     with open(cmake_module_path, 'w') as fout:
         fout.write(content)
 
-    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg = qibuild.config.QiBuildConfig(create_if_missing=True)
     qibuild_cfg.read()
     editor = qibuild_cfg.defaults.env.editor
     if not editor:
