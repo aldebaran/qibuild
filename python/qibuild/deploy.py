@@ -38,8 +38,9 @@ if ! [ "$#" -eq "1" ] ; then
   exit 1
 fi
 
-echo "to connect to this gdbserver launch the following command in another terminal:"
-echo "  %(gdb)s -x \"${here}/setup_target.gdb\" \"${here}/deploy/${1}\""
+echo ""
+echo "To connect to this gdbserver launch the following command in another terminal:"
+echo "  %(gdb)s -x \"${here}/setup_target.gdb\" \"${here}/${1}\""
 echo ""
 
 #echo ssh %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
@@ -113,16 +114,18 @@ def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_a
                                         })
 
 
-def _generate_run_gdbserver_binary(dest, remote, gdb_listen, remote_dir):
+def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir):
     """ generate a script that run a program on the robot in gdbserver """
     if remote_dir == "":
         remote_dir = "."
-    with open(os.path.join(dest, "remote_gdbserver.sh"), "w+") as f:
+    remote_gdb_script_path = os.path.join(dest, "remote_gdbserver.sh")
+    with open(remote_gdb_script_path, "w+") as f:
         f.write(FILE_REMOTE_GDBSERVER_SH % { 'remote' : remote,
                                              'gdb_listen' : gdb_listen,
                                              'remote_dir' : remote_dir,
-                                             'gdb' : "gdb" })
-    os.chmod(os.path.join(dest, "remote_gdbserver.sh"), 0755)
+                                             'gdb' : gdb })
+    os.chmod(remote_gdb_script_path, 0755)
+    return remote_gdb_script_path
 
 def _uniq(seq):
     """ Make sure no two same elements end up in the
@@ -167,21 +170,43 @@ def _generate_solib_search_path(toc, project_name):
         res.extend(_get_subfolder(ppath))
     return _uniq(res)
 
-def generate_debug_scripts(toc, project_name, url):
+def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
     """ generate all scripts needed for debug """
     (username, server, remote_directory) = qibuild.deploy.parse_url(url)
 
     destdir = toc.get_project(project_name).build_directory
+    if deploy_dir:
+        destdir = deploy_dir
 
     solib_search_path = _generate_solib_search_path(toc, project_name)
     sysroot = None
+    gdb = None
+    message = None
     if toc.toolchain:
         sysroot = toc.toolchain.get_sysroot()
-    if not sysroot:
+    if sysroot:
+        # assume cross-toolchain
+        gdb = toc.toolchain.get_cross_gdb()
+        if gdb:
+            message = "Cross-build. Using the cross-debugger provided by the toolchain."
+        else:
+            message = "Remote debugging not available: No cross-debugger found in the cross-toolchain"
+    else:
+        # assume native toolchain
         sysroot = "\"\""
-    _generate_setup_gdb(destdir,
-                        sysroot=sysroot,
+        gdb = find_program("gdb")
+        if gdb:
+            message = "Native build. Using the debugger provided by the system."
+        else:
+            message = "Debugging not available: No debugger found in the system."
+    if not gdb:
+        return (None, message)
+    if toc.toolchain:
+        sysroot=toc.toolchain.get_sysroot()
+    _generate_setup_gdb(destdir, sysroot=sysroot,
                         solib_search_path=solib_search_path,
                         remote_gdb_address="%s:2159" % server)
-    _generate_run_gdbserver_binary(destdir, remote="%s@%s" % (username, server),
-                                  gdb_listen=":2159", remote_dir=remote_directory)
+    gdb_script = _generate_run_gdbserver_binary(destdir, gdb=gdb, gdb_listen=":2159",
+                                                remote="%s@%s" % (username, server),
+                                                remote_dir=remote_directory)
+    return (gdb_script, message)
