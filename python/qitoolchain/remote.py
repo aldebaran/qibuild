@@ -104,11 +104,9 @@ def open_remote_location(location):
         return authenticated_urlopen(location)
 
 
-def download(url, output_dir,
-    output_name=None,
-    callback=callback,
-    clobber=True,
-    message=None):
+def download(url, output_dir, output_name=None,
+            callback=callback, clobber=True,
+            message=None):
     """ Download a file from an url, and save it
     in output_dir.
 
@@ -118,8 +116,8 @@ def download(url, output_dir,
     :param callback: callback to use to show download progress.
         By default :py:func:`qitoolchain.remote.callback` is called
 
-    :param message: a message to print right before displaying progress
-        bar.
+    :param message: a list of arguments for :py:func:`qibuild.ui.info'
+        Will be printed right before the progress bar.
 
     :param clobber: If False, the file won't be overwritten if it
         already exists (True by default)
