@@ -192,7 +192,7 @@ def download(url, output_dir,
                     callback(size, xferd)
                 dest_file.write(data)
     except Exception, e:
-        error  = "Could not dowload file from %s\n to %s\n" % (url, dest_name)
+        error  = "Could not download file from %s\n to %s\n" % (url, dest_name)
         error += "Error was: %s" % e
     finally:
         dest_file.close()
