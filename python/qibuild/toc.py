@@ -250,14 +250,23 @@ You may want to run:
 
         """
         self.set_build_folder_name()
+        seen = dict()
 
         # self.buildable_projects has been set by WorkTree.__init__
         for worktree_project in self.worktree.buildable_projects:
             # Promote the simple worktree project (just a name an a src dir),
             # inside a full qibuild.project.Project object
             # (with CMake flags, build dir, et al.)
-            qibuild_project = qibuild.project.Project(worktree_project.path)
+            project_path = worktree_project.path
+            qibuild_project = qibuild.project.Project(project_path)
+            project_name = qibuild_project.name
+            if project_name in seen:
+                mess  = "Found two qibuild projects with the same name (%s)\n" % qibuild_project.name
+                mess += "  * in %s\n" % seen[qibuild_project.name]
+                mess += "  * in %s\n" % project_path
+                raise Exception(mess)
             self.projects.append(qibuild_project)
+            seen[project_name] = project_path
 
         # Small warning here: when we update the projects, we do NOT
         # have the complete list of the projects, their dependencies,
