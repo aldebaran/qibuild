@@ -8,11 +8,11 @@
 
 import os
 import sys
-import qibuild.log
 import copy
 import operator
 
-LOGGER = qibuild.log.get_logger(__name__)
+from qibuild import ui
+
 
 try:
     import argparse
@@ -89,6 +89,7 @@ def run_action(module_name, args=None, forward_args=None):
     """
     if not args:
         args = list()
+    ui.debug("running", module_name, " ".join(args))
     action_name  = module_name.split(".")[-1]
     package_name = ".".join(module_name.split(".")[:-1])
     try:
@@ -148,8 +149,7 @@ def main_wrapper(module, args):
                 sys.exit(0)
         if args.backtrace:
             raise
-        logger = qibuild.log.get_logger("\n") # small hack
-        logger.error(str(e))
+        ui.error(e)
         sys.exit(2)
 
 def _dump_arguments(name, args):
@@ -164,7 +164,7 @@ def _dump_arguments(name, args):
         output += "  %s%s = %s\n" % (str(k), pad, str(v))
     if output[-1] == "\n":
         output = output[:-1]
-    LOGGER.debug("[%s] arguments:\n%s", name, output)
+    ui.debug("[%s] arguments:\n%s", name, output)
 
 def root_command_main(name, parser, modules, args=None, return_if_no_action=False):
     """name : name of the main program

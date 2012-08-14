@@ -186,8 +186,6 @@ class DependenciesSolver:
         for package in self.packages:
             mess += "  " + package.name + "\n"
 
-        self.logger.debug(mess)
-
         # Assert that all the names are known projects:
         for name in names:
             if name not in project_names:
@@ -202,10 +200,6 @@ class DependenciesSolver:
         for package in self.packages:
             to_sort[package.name] = package.depends
 
-        if runtime:
-            self.logger.debug("Sorting runtime projects: %s", ",".join(to_sort))
-        else:
-            self.logger.debug("Sorting buildable projects: %s", ",".join(to_sort))
         sorted_names = topological_sort(to_sort, names)
 
         # Append what is left in sorted names, looking first in

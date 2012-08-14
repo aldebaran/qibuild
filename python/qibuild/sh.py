@@ -303,7 +303,7 @@ def rmtree(path):
       remove(os.remove, fullpath)
     else:
       # Recurse.
-      rm(fullpath)
+      rmtree(fullpath)
 
   remove(os.rmdir, path)
 

@@ -10,6 +10,7 @@ import os
 import qibuild.log
 import operator
 
+from qibuild import ui
 import qibuild.sh
 import qisrc.git
 import qixml
@@ -274,7 +275,9 @@ def open_worktree(worktree=None):
         mess =  "Cannot open a worktree from %s\n" % worktree
         mess += "This path does not exist"
         raise Exception(mess)
-    return WorkTree(worktree)
+    res = WorkTree(worktree)
+    ui.debug("Opening worktree in", worktree)
+    return res
 
 
 def guess_worktree(cwd=None, raises=False):

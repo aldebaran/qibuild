@@ -12,9 +12,9 @@ import sys
 import glob
 import platform
 import signal
-import qibuild.log
 import operator
 
+from qibuild import ui
 import qisrc
 import qibuild
 import qibuild.gdb
@@ -24,8 +24,6 @@ from qibuild.project  import Project
 from qisrc.worktree import WorkTree
 from qibuild.command  import CommandFailedException
 from qibuild.dependencies_solver import DependenciesSolver
-
-LOGGER = qibuild.log.get_logger("qibuild.toc")
 
 
 class TocException(Exception):
@@ -344,7 +342,7 @@ You may want to run:
             # FIXME: right now there are tons of case where you could have missing
             # projects. (using a cross-toolchain, or an Aldebaran SDK)
             # Put this back later.
-            # LOGGER.warning("Could not find projects %s", ", ".join(not_found))
+            # ui.warning("Could not find projects", ", ".join(not_found))
             pass
 
         # Remove self from the list:
@@ -355,7 +353,7 @@ You may want to run:
             project = self.get_project(project_name)
             dirs.append(project.get_sdk_dir())
 
-        LOGGER.debug("sdk_dirs for %s : %s", project_name, dirs)
+        ui.debug("sdk_dirs for", project_name, ":", " ".join(dirs))
         return dirs
 
 
@@ -575,7 +573,7 @@ Try configuring and building the project first.
         else:
             mess = "Skipping configuration of project %s\n" % project.name
             mess += "CMAKE_INSTALL_PREFIX is already correct"
-            LOGGER.debug(mess)
+            ui.debug(mess)
 
         if not self.using_visual_studio and not self.cmake_generator == "Xcode":
             self.build_project(project, target="preinstall", num_jobs=num_jobs,
@@ -618,7 +616,7 @@ Could not find objcopy executable.\
             cmake_args += ["-DCOMPONENT=%s" % component]
             cmake_args += ["-P", "cmake_install.cmake", "--"]
             cmake_args += num_jobs_to_args(num_jobs, self.cmake_generator)
-            LOGGER.debug("Installing %s", component)
+            ui.debug("Installing", component)
             qibuild.command.call(["cmake"] + cmake_args,
                 cwd=project.build_directory,
                 env=self.build_env,
@@ -639,12 +637,12 @@ def _projects_from_args(toc, args):
     toc_p_names = [p.name for p in toc.projects]
     if hasattr(args, "all") and args.all:
         # Pretend the user has asked for all the known projects
-        LOGGER.debug("select: All projects have been selected")
+        ui.debug("select: All projects have been selected")
         return (toc_p_names, False)
 
     if hasattr(args, "projects"):
         if args.projects:
-            LOGGER.debug("select: projects list from arguments: %s", ",".join(args.projects))
+            ui.debug("select: projects list from arguments: %s", ",".join(args.projects))
             return ([args.projects, args.single])
         else:
             from_cwd = None
@@ -653,10 +651,10 @@ def _projects_from_args(toc, args):
             except:
                 pass
             if from_cwd:
-                LOGGER.debug("select: projects from cwd: %s", from_cwd)
+                ui.debug("select: projects from cwd: %s", from_cwd)
                 return ([from_cwd], args.single)
             else:
-                LOGGER.debug("select: default to all projects")
+                ui.debug("select: default to all projects")
                 return (toc_p_names, args.single)
     else:
         return (list(), False)
@@ -712,8 +710,8 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
 
     (active_projects, single) =  _projects_from_args(toc, args)
     toc.active_projects = active_projects
-    LOGGER.debug("active projects: %s", ".".join(toc.active_projects))
-    LOGGER.debug("single: %s", str(single))
+    ui.debug("active projects: %s", ".".join(toc.active_projects))
+    ui.debug("single: %s", str(single))
     toc.solve_deps = (not single)
     return toc
 
@@ -743,9 +741,9 @@ def num_jobs_to_args(num_jobs, cmake_generator):
     if "Visual Studio" in cmake_generator or \
         cmake_generator == "Xcode" or \
         "JOM" in cmake_generator:
-        LOGGER.warning("-j is ignored when used with %s", cmake_generator)
+        ui.warning("-j is ignored when used with", cmake_generator)
         return list()
-    LOGGER.warning("cannot parse -j into a cmake option for generator: %s" % cmake_generator)
+    ui.warning("cannot parse -j into a cmake option for generator: %s" % cmake_generator)
     return list()
 
 def create(directory, force=False):
