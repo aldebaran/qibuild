@@ -53,7 +53,7 @@ class Project:
         you just have to add this directory to CMAKE_FIND_ROOT_PATH
 
         """
-        return os.path.join(self.build_directory, "sdk")
+        return self.sdk_directory
 
     def load_config(self):
         """ Update project dependency list """
