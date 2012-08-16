@@ -15,8 +15,8 @@ def test_simple_parse(tmpdir):
 /usr/share/cmake-2.8/Modules/CMakeUnixFindMake.cmake(16):  MARK_AS_ADVANCED(CMAKE_MAKE_PROGRAM )
 @worktree@/lib/gtest/build-sys-linux-x86_64/CMakeFiles/CMakeSystem.cmake(3):  SET(CMAKE_SYSTEM Linux-3.4.8-1-ARCH )
 @qibuild_root@/qibuild/internal/install.cmake(64):  install(FILES ${_file} COMPONENT ${ARG_COMPONENT} DESTINATION ${ARG_DESTINATION}/${ARG_SUBFOLDER}/${_file_subdir} )
-/home/dmerejkowsky/src/master/tools/qibuild/cmake/qibuild/internal/stage.cmake(73):  set(_deps ${ARG_DEPENDS} )
-/home/dmerejkowsky/src/master/tools/qibuild/cmake/qibuild/internal/stage.cmake(74):  set(_dest_dir ${CMAKE_BINARY_DIR}/redist-cmake )
+@qibuild_root@/qibuild/internal/stage.cmake(73):  set(_deps ${ARG_DEPENDS} )
+@qibuild_root@/qibuild/internal/stage.cmake(74):  set(_dest_dir ${CMAKE_BINARY_DIR}/redist-cmake )
 @qibuild_root@/qibuild/internal/install.cmake(63):  get_filename_component(_file_subdir ${_file} PATH )
 @qibuild_root@/qibuild/internal/install.cmake(63):  get_filename_component(_file_subdir ${_file} PATH )
 """
