@@ -11,11 +11,10 @@ import re
 import subprocess
 import qibuild.log
 
+from qibuild import ui
 import qibuild.command
 import qibuild.sh
-
-LOGGER = qibuild.log.get_logger(__name__)
-
+import qibuild.cmake.profile
 
 def get_known_cmake_generators():
     """ Get the list of known cmake generators.
@@ -82,7 +81,8 @@ def get_cached_var(build_dir, var, default=None):
     return res.get(var, default)
 
 
-def cmake(source_dir, build_dir, cmake_args, clean_first=True, env=None):
+def cmake(source_dir, build_dir, cmake_args, env=None,
+          clean_first=True, profile=False):
     """Call cmake with from a build dir for a source dir.
     cmake_args are added on the command line.
 
@@ -118,7 +118,22 @@ def cmake(source_dir, build_dir, cmake_args, clean_first=True, env=None):
     # Add path to source to the list of args, and set buildir for
     # the current working dir.
     cmake_args += [source_dir]
-    qibuild.command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
+    if not profile:
+        qibuild.command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
+        return
+    # importing here in order to not create circular dependencies:
+    cmake_log = os.path.join(build_dir, "cmake.log")
+    fp = open(cmake_log, "w")
+    ui.info(ui.green, "Running cmake for profiling ...")
+    subprocess.call(["cmake"] + cmake_args, cwd=build_dir, env=env,
+                   stdout=fp, stderr=fp)
+    fp.close()
+    qibuild_dir = get_cmake_qibuild_dir()
+    ui.info(ui.green, "Analyzing cmake logs ...")
+    profile = qibuild.cmake.profile.parse_cmake_log(cmake_log, qibuild_dir)
+    outdir = os.path.join(build_dir, "profile")
+    qibuild.cmake.profile.gen_annotations(profile, outdir, qibuild_dir)
+    ui.info(ui.green, "Annotations generated in", outdir)
 
 
 def read_cmake_cache(cache_path):
@@ -182,7 +197,7 @@ find_package(qibuild)
 """.format(
             cmake_list_file=cmake_list_file,
             project_name=project_name)
-        LOGGER.warning(mess)
+        ui.warning(mess)
         return
 
     if include_line_number is None:
@@ -205,7 +220,7 @@ Please exchange the following lines:
             project_line_number=project_line_number,
             include_line=lines[include_line_number],
             project_line=lines[project_line_number])
-        LOGGER.warning(mess)
+        ui.warning(mess)
 
 
 def get_cmake_qibuild_dir():

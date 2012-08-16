@@ -400,9 +400,8 @@ You may want to run:
             return dep_solver.solve(self.active_projects,
                                     runtime=runtime)
 
-    def configure_project(self, project,
-        clean_first=True,
-        debug_trycompile=False):
+    def configure_project(self, project, clean_first=True,
+                         debug_trycompile=False, profile=False):
         """ Call cmake with correct options.
 
         :param clean_first: If False, do not delete CMake cache.
@@ -410,6 +409,8 @@ You may want to run:
             `qibuild configure`.
         :param debug_trycompile: If True, will pass --debug-trycompile.
             Useful when detecting compiler fails
+        :param profile: If Ture, will run cmake --trace, and then
+            generate some stats.
 
         """
         if not os.path.exists(project.directory):
@@ -438,6 +439,9 @@ You may want to run:
         if debug_trycompile:
             cmake_args.append("--debug-trycompile")
 
+        if profile:
+            cmake_args.append("--trace")
+
         if "MinGW" in self.cmake_generator:
             paths = self.build_env["PATH"].split(os.pathsep)
             paths_withoutsh = list()
@@ -451,7 +455,8 @@ You may want to run:
                           project.build_directory,
                           cmake_args,
                           clean_first=clean_first,
-                          env=self.build_env)
+                          env=self.build_env,
+                          profile=profile)
         except CommandFailedException, e:
             if e.returncode == -signal.SIGSEGV:
                 mess = "CMake crashed. "

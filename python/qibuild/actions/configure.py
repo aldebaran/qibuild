@@ -33,6 +33,8 @@ def configure_parser(parser):
     group.add_argument("--werror", dest="werror",
         action="store_true",
         help="tread warnings as error")
+    parser.add_argument("--profile", dest="profile", action="store_true",
+        help="profile cmake execution")
     parser.set_defaults(clean_first=True,
         effective_cplusplus=False,
         werror=False)
@@ -72,6 +74,7 @@ def do(args):
                 ui.blue, project.name)
         toc.configure_project(project,
             clean_first=args.clean_first,
-            debug_trycompile=args.debug_trycompile)
+            debug_trycompile=args.debug_trycompile,
+            profile=args.profile)
 
 
