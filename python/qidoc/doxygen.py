@@ -8,9 +8,9 @@
 
 import os
 
-import qidoc.command
 import qidoc.templates
 
+from qibuild import ui
 import qibuild
 
 def configure(src, templates, opts,
@@ -64,12 +64,9 @@ def build(src, dest, opts):
 
     configure() should have been called first
     """
-    print
-    print "###"
-    print "# Building doxygen ", src
-    print
+    ui.info(ui.green, "Building doxygen", src)
     cmd = ["doxygen", "Doxyfile.qidoc"]
-    qidoc.command.call(cmd, cwd=src, quiet=opts.get("quiet"))
+    qibuild.command.call(cmd, cwd=src)
     build_html = os.path.join(src, "build-doc", "html")
     qibuild.sh.install(build_html, dest, quiet=True)
 

@@ -7,13 +7,11 @@
 
 import os
 import sys
-import qibuild.log
 
-import qidoc.command
+from qibuild import ui
 import qidoc.templates
 import qibuild.sh
 
-LOGGER = qibuild.log.get_logger(__name__)
 
 def configure(src, dest, templates, intersphinx_mapping, doxylink, opts):
     """ Configure a sphinx repo
@@ -40,7 +38,7 @@ def configure(src, dest, templates, intersphinx_mapping, doxylink, opts):
     if not os.path.exists(conf_py_in):
         mess = "Could not configure sphinx sources in:%s \n" % src
         mess += "qidoc/conf.in.py does not exists"
-        LOGGER.warning(mess)
+        ui.warning(mess)
         return
 
     opts["doxylink"] = str(rel_doxylink)
@@ -77,10 +75,7 @@ def build(src, dest, opts):
     configure() should have been called first
 
     """
-    print
-    print "###"
-    print "# Building sphinx ", src, "->", dest
-    print
+    ui.info(ui.green, "Building sphinx", src)
     config_path = os.path.join(src, "qidoc")
     # Try with sphinx-build2 (for arch), then fall back on
     # sphinx-build
@@ -112,4 +107,4 @@ def build(src, dest, opts):
     # by-pass sphinx-build bug on mac:
     if sys.platform == "darwin":
         env["LC_ALL"] = "en_US.UTF-8"
-    qidoc.command.call(cmd, cwd=src, env=env)
+    qibuild.command.call(cmd, cwd=src, env=env)

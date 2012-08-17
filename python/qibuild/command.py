@@ -9,14 +9,12 @@
 import os
 import sys
 import contextlib
-import qibuild.log
 import subprocess
 import threading
 import Queue
 
+from qibuild import ui
 import qibuild
-
-LOGGER = qibuild.log.get_logger(__name__)
 
 
 # Quick hack: in order to be able to configure how
@@ -48,7 +46,7 @@ class ProcessThread(threading.Thread):
         self.verbose = verbose
 
     def run(self):
-        LOGGER.debug("starting %s", self.cmd)
+        ui.debug("Calling:", " ".join(self.cmd))
         try:
             self.process = subprocess.Popen(self.cmd,
                 stdout=subprocess.PIPE,
@@ -188,7 +186,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=None):
             raise Exception("Trying to to run %s in non-existing %s" %
                 (" ".join(cmd), cwd))
 
-    LOGGER.debug("Calling %s", " ".join(cmd))
+    ui.debug("Calling:", " ".join(cmd))
     ring_buffer = RingBuffer(300)
 
     returncode = 0
@@ -294,7 +292,7 @@ class CommandLine:
                 queue.put((pipe_name, line))
             if not pipe.closed:
                 pipe.close()
-        LOGGER.debug("Starting: %s", " ".join(self.cmd))
+        ui.debug("Calling:", " ".join(self.cmd))
         process =  subprocess.Popen(
             self.cmd,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,

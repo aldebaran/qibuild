@@ -7,18 +7,17 @@
 """
 import os
 import sys
+import pprint
 import webbrowser
-import qibuild.log
 
 import qisrc
+
+from qibuild import ui
 import qibuild
 from qibuild.dependencies_solver import topological_sort
 import qidoc.config
 import qidoc.sphinx
 import qidoc.doxygen
-
-LOGGER = qibuild.log.get_logger(__name__)
-
 
 
 class QiDocBuilder:
@@ -40,6 +39,7 @@ class QiDocBuilder:
         # Will fill up self.templates_path, self.sphinxdocs and self.doxydocs
         self._load_doc_projects()
         self.deps_tree = self.get_deps_tree()
+        ui.debug("QiDocBuilder dep tree: ", pprint.pformat(self.deps_tree))
 
         if not self.templates_path:
             mess  = "Could not find any template repo\n"
@@ -66,7 +66,7 @@ class QiDocBuilder:
                 if self.get_doc("doxygen", dep) is None:
                     mess  = "Could not find doxygen doc dep: %s\n" % dep
                     mess += "(brought by: %s)" % doxydoc.name
-                    LOGGER.warning(mess)
+                    ui.warning(mess)
                     doxydoc.depends.remove(dep)
 
         for sphinxdoc in self.sphinxdocs.values():
@@ -76,7 +76,7 @@ class QiDocBuilder:
                 if self.get_doc("sphinx", dep) is None:
                     mess  = "Could not find sphinx doc dep %s\n" % dep
                     mess += "(brought by: %s)" % sphinxdoc.name
-                    LOGGER.warning(mess)
+                    ui.warning(mess)
                     sphinxdoc.depends.remove(dep)
 
         res["doxygen"] = doxy_tree
