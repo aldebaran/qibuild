@@ -33,14 +33,12 @@ class Git:
            * if raises is False, no exception will be raise if command
              fails, and a (retcode, output) tuple will be returned.
         """
-        build_env = qibuild.config.get_build_env()
         if not "cwd" in kwargs.keys():
             kwargs["cwd"] = self.repo
-        if not "env" in kwargs.keys():
-            kwargs["env"] = build_env
         if not "quiet" in kwargs.keys():
             kwargs["quiet"] = False
-        cmd = ["git"]
+        git = qibuild.command.find_program("git", raises=True)
+        cmd = [git]
         cmd.extend(args)
         raises = kwargs.get("raises")
         if raises is False:

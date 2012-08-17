@@ -22,6 +22,9 @@ import qibuild
 # global variable
 CONFIG = dict()
 
+# Cache for find_program()
+_FIND_PROGRAM_CACHE = dict()
+
 class ProcessThread(threading.Thread):
     """ A simple way to run commands.
 
@@ -127,24 +130,34 @@ def find_program(executable, env=None, raises=False):
     :return: None if program was not found,
       the full path to executable otherwize
     """
+    if executable in _FIND_PROGRAM_CACHE:
+        return _FIND_PROGRAM_CACHE[executable]
     full_path = None
-    if env:
-        env_path = env.get("PATH", "")
-    else:
-        env_path = os.environ["PATH"]
+    res = None
+    if not env:
+        env = qibuild.config.get_build_env()
+        if not env:
+            env = os.environ
+    env_path = env.get("PATH", "")
     for path in env_path.split(os.pathsep):
         path = qibuild.sh.to_native_path(path)
         full_path = os.path.join(path, executable)
         if os.access(full_path, os.X_OK) and os.path.isfile(full_path):
-            return full_path
+            res = full_path
+            break
         pathext = os.environ.get("PATHEXT")
         if pathext:
             for ext in pathext.split(";"):
                 with_ext = full_path + ext
                 if os.access(with_ext, os.X_OK):
-                    return qibuild.sh.to_native_path(with_ext)
-    if raises:
-        raise NotInPath(executable, env=env)
+                    res = qibuild.sh.to_native_path(with_ext)
+                    break
+    if res:
+        _FIND_PROGRAM_CACHE[executable] = res
+        return res
+    else:
+        if raises:
+            raise NotInPath(executable, env=env)
     return None
 
 
