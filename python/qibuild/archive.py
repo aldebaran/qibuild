@@ -27,12 +27,13 @@ import os
 import sys
 import posixpath
 import operator
-import shutil
 import subprocess
 import zipfile
 
 import qibuild
 
+
+KNOWN_ALGOS = ["zip", "tar", "gzip", "bzip2", "xz"]
 
 class InvalidArchive(Exception):
     """Just a custom exception """
@@ -42,6 +43,19 @@ class InvalidArchive(Exception):
 
     def __str__(self):
         return self._message
+
+
+def _check_algo(algo):
+    """ Check that the algo is known
+
+    """
+    if algo in KNOWN_ALGOS:
+        return
+    mess = "Unknown algorithm: %s\n" % algo
+    mess += "Known algorithms are: \n"
+    for algorithm in KNOWN_ALGOS:
+        mess += " * " + algorithm + "\n"
+    raise Exception(mess)
 
 
 def _compress_zip(directory, archive_basepath, quiet, verbose):
@@ -153,6 +167,7 @@ def _extract_zip(archive, directory, quiet, verbose):
     res = os.path.join(directory, orig_topdir)
     return res
 
+
 # pylint: disable-msg=R0913
 def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None):
     """Generate a tar command line
@@ -218,7 +233,14 @@ def _compress_tar(directory, archive_basepath, algo, quiet, verbose):
     qibuild.ui.debug("Compressing %s to %s", directory, archive_path)
     verbosity = not quiet or verbose
     cmd = _get_tar_command("compress", algo, archive_path, directory, verbosity)
-    output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    try:
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        mess  = "Could not compress directory %s\n" % directory
+        mess += "(algo: %s)\n" % algo
+        mess += "Calling tar failed\n"
+        mess += e.output
+        raise Exception(mess)
     if verbosity:
         for line in output:
             print line.strip()
@@ -270,7 +292,13 @@ def _extract_tar(archive, directory, algo, quiet, verbose):
     cmd = _get_tar_command("extract", algo, archive, directory, verbosity,
                            add_opts=opts)
     qibuild.sh.mkdir(directory)
-    output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    try:
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        mess  = "Could not extract %s to %s\n" % (archive, directory)
+        mess += "Calling tar failed\n"
+        mess += e.output
+        raise Exception(mess)
     if verbosity:
         for line in output:
             print line.strip()
@@ -288,6 +316,7 @@ def compress(directory, archive=None, algo="zip", quiet=False, verbose=False):
     :return: path to the generated archive (archive_basepath.tar.*)
 
     """
+    _check_algo(algo)
     directory = qibuild.sh.to_native_path(directory)
     directory = os.path.abspath(directory)
     if archive is None:
@@ -308,12 +337,12 @@ def compress(directory, archive=None, algo="zip", quiet=False, verbose=False):
     return archive_path
 
 
-def extract(archive, directory, algo="zip", quiet=False, verbose=False):
+def extract(archive, directory, algo=None, quiet=False, verbose=False):
     """Extract a an archive into directory
 
     :param archive:   path of the archive
     :param directory: extract location
-    :param algo:      uncompression method (default: zip)
+    :param algo:      uncompression method (default: guessed from the archive name)
     :param quiet:     quiet mode
     :param topdir:    name of top directory of the extracted content
                       (deprecated)
@@ -321,6 +350,10 @@ def extract(archive, directory, algo="zip", quiet=False, verbose=False):
     :return: path to the extracted archive (directory/topdir)
 
     """
+    if algo:
+        _check_algo(algo)
+    else:
+        algo = guess_algo(archive)
     directory = qibuild.sh.to_native_path(directory)
     directory = os.path.abspath(directory)
     archive   = qibuild.sh.to_native_path(archive)

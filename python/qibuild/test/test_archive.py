@@ -266,5 +266,15 @@ def test_compress_extract_invalid(tmpdir, algo, extension):
     # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         _test_compress_extract(tmpdir, algo, extension, compress, extract)
-    assert e.typename == "CommandFailedException"
-    return
+    assert "Unknown algorithm: foo" in e.value.message
+    assert "Known algorithms are"   in e.value.message
+
+def test_extract_invalid(tmpdir):
+    srcdir   = tmpdir.mkdir("src")
+    destdir = tmpdir.mkdir("dest")
+    archive = srcdir.join("empty.tar.gz")
+    archive.write("")
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        qibuild.archive.extract(archive.strpath, destdir.strpath)
+    assert "tar failed" in e.value.message
