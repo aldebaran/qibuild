@@ -67,24 +67,28 @@ class TocTestCase(unittest.TestCase):
         self.hello_project.build_directory = "src/hello/build"
         self.hello_project.depends = ["world"]
         self.toc = qibuild.toc.toc_open(self.tmp)
+        self.toc.active_config = "test"
 
     def test_src_deps(self):
         self.toc.projects = [self.hello_project, self.world_project]
+        self.toc.update_projects()
         hello_sdk_dirs = self.toc.get_sdk_dirs("hello")
-        self.assertEquals(hello_sdk_dirs, ["src/world/build/sdk"])
+        self.assertEquals(hello_sdk_dirs, ["src/world/build-test/sdk"])
 
     def test_package_wins_on_project(self):
         self.toc.projects = [self.hello_project, self.world_project]
         self.toc.packages = [self.world_package]
+        self.toc.update_projects()
         hello_sdk_dirs = self.toc.get_sdk_dirs("hello")
         self.assertEquals(hello_sdk_dirs, list())
 
     def test_package_wins_on_project_unless_user_asked(self):
         self.toc.projects = [self.hello_project, self.world_project]
         self.toc.packages = [self.world_package]
+        self.toc.update_projects()
         self.toc.active_projects = ["world", "hello"]
         hello_sdk_dirs = self.toc.get_sdk_dirs("hello")
-        self.assertEquals(hello_sdk_dirs, ["src/world/build/sdk"])
+        self.assertEquals(hello_sdk_dirs, ["src/world/build-test/sdk"])
         workd_sdk_dirs = self.toc.get_sdk_dirs("world")
         self.assertEquals(workd_sdk_dirs, list())
 
@@ -131,8 +135,6 @@ class TocTestCase(unittest.TestCase):
         a_sdk_dir = sdk_dirs["a"]
         b_sdk_dir = sdk_dirs["b"]
         self.assertTrue(a_sdk_dir != b_sdk_dir)
-
-
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
