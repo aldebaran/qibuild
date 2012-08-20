@@ -7,11 +7,8 @@
 """
 
 import os
-import subprocess
 
 import qibuild
-import qitoolchain
-import qitoolchain.binary_package
 from qitoolchain.binary_package import open_package
 from qitoolchain.binary_package import convert_to_qibuild
 

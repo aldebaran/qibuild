@@ -8,7 +8,6 @@ packages
 
 """
 
-from qibuild import ui
 import qibuild
 
 from qitoolchain.toolchain import Toolchain, Package

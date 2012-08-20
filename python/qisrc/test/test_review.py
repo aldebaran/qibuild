@@ -2,10 +2,6 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-import os
-import pytest
-
-import qibuild.interact
 import qisrc.git
 import qisrc.review
 from qisrc.test.test_git import create_git_repo

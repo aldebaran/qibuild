@@ -6,9 +6,7 @@
 
 """
 
-import os
 import re
-import sys
 import qibuild.log
 
 LOGGER = qibuild.log.get_logger(__name__)

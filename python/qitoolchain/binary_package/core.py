@@ -14,7 +14,6 @@ All qiBuild packages should have the same layout.
 """
 
 import pprint
-import types
 
 class BinaryPackageException(Exception):
     """Just a custom exception

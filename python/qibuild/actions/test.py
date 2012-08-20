@@ -8,7 +8,6 @@
 import os
 import sys
 
-from qibuild import ui
 import qibuild
 
 def configure_parser(parser):

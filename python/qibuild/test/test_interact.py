@@ -59,7 +59,7 @@ class FakeInteract:
         if self.answers_type == "dict":
             return self.find_answer(message, choices=choices, default=default)
         else:
-            self.answer_index +=1
+            self.answer_index += 1
             return self.answers[self.answer_index]
 
 

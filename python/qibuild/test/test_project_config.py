@@ -6,7 +6,6 @@
 
 """
 
-import os
 import qibuild
 import unittest
 from StringIO import StringIO
@@ -47,6 +46,3 @@ class ProjectConfigTestClass(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-

@@ -9,7 +9,6 @@ A set of packages and a toolchain file
 import os
 import ConfigParser
 
-from qibuild import ui
 import qibuild
 import qibuild.configstore
 import qitoolchain

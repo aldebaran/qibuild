@@ -3,7 +3,6 @@
 ## found in the COPYING file.
 """Display the current config """
 
-import os
 import subprocess
 
 import qisrc

@@ -8,7 +8,6 @@
 """
 
 import qibuild
-import qitoolchain
 
 def configure_parser(parser):
     """Configure parser for this action """

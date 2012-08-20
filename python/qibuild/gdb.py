@@ -33,9 +33,9 @@ def split_debug(base_dir, objcopy=None):
     """
     if objcopy is None:
         objcopy = "objcopy"
-    def _get_binaries(dir):
+    def _get_binaries(path):
         res = list()
-        for root, directories, filenames in os.walk(dir):
+        for root, _, filenames in os.walk(path):
             if os.path.basename(root) == ".debug":
                 continue
             for filename in filenames:
@@ -83,4 +83,3 @@ def split_debug(base_dir, objcopy=None):
 if __name__ == "__main__":
     import sys
     split_debug(sys.argv[1])
-

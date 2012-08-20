@@ -154,6 +154,8 @@ class Manifest:
 
 class Defaults:
     def __init__(self):
+        # An editor name to use by default
+        self.editor = None
         # An ide name to use by default
         self.ide = None
         # A cmake config to use by default (for intance, a CMake generator)
@@ -830,7 +832,7 @@ def convert_qibuild_cfg(qibuild_cfg):
         qibuild_cfg.local.build.sdk_dir = sdk_dir
     incredibuild_str = ini_cfg.get("general.build.incredibuild", default="")
     if incredibuild_str.lower() in ["y", "yes", "1", "true", "on"]:
-            qibuild_cfg.build.incredibuild = True
+        qibuild_cfg.build.incredibuild = True
 
     manifest_url = ini_cfg.get("manifest.url")
     if manifest_url:

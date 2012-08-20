@@ -9,8 +9,6 @@ Example:
 Use -- to seprate qisrc arguments from the arguments of the command.
 """
 
-import sys
-
 import qisrc
 import qibuild
 from qibuild import ui
@@ -46,4 +44,3 @@ def do(args):
     ui.error("Command failed on the following projects:")
     for project in errors:
         ui.info(ui.bold, " - ", project.src)
-

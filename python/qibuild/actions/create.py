@@ -4,7 +4,6 @@
 """Create a new project """
 
 import os
-import shutil
 import qibuild.log
 
 import qisrc

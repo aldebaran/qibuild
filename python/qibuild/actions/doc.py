@@ -6,7 +6,6 @@
 
 """
 
-import qibuild
 import qidoc.actions.build
 
 def configure_parser(parser):
@@ -16,4 +15,3 @@ def configure_parser(parser):
 def do(args):
     """ Main entry point """
     qidoc.actions.build.do(args)
-

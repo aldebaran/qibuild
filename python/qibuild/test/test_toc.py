@@ -118,7 +118,7 @@ class TocTestCase(unittest.TestCase):
         toc = qibuild.toc.toc_open(self.tmp)
         hello_proj = toc.get_project("hello")
 
-        sdk_dirs= dict()
+        sdk_dirs = dict()
         for config in ["a", "b"]:
             # Create custom a.cmake a b.cmake files so that
             # toc does not complain
@@ -143,4 +143,3 @@ class TocTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

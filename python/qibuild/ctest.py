@@ -91,9 +91,9 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, va
             env[key] = value
     working_dir = properties.get("WORKING_DIRECTORY")
     if working_dir:
-        cwd=working_dir
+        cwd = working_dir
     else:
-        cwd=build_dir
+        cwd = build_dir
     ncmd = cmd
 
     if valgrind:

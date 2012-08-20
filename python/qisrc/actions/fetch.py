@@ -20,10 +20,8 @@ The url should point to a xml file looking like
 
 """
 
-import os
 import qibuild.log
 
-import qisrc
 import qibuild
 
 LOGGER = qibuild.log.get_logger(__name__)
@@ -43,5 +41,3 @@ def do(args):
 
     """
     print "Use qisrc sync instead"
-
-

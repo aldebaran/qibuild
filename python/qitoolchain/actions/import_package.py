@@ -8,7 +8,6 @@ and add it to a toolchain.
 """
 
 import os
-import subprocess
 
 import qibuild
 import qitoolchain

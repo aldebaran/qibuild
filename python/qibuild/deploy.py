@@ -116,7 +116,7 @@ def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_a
 def _generate_run_gdbserver_binary(dest, remote, gdb_listen, remote_dir):
     """ generate a script that run a program on the robot in gdbserver """
     if remote_dir == "":
-        remote_dir="."
+        remote_dir = "."
     with open(os.path.join(dest, "remote_gdbserver.sh"), "w+") as f:
         f.write(FILE_REMOTE_GDBSERVER_SH % { 'remote' : remote,
                                              'gdb_listen' : gdb_listen,
@@ -173,10 +173,10 @@ def generate_debug_scripts(toc, project_name, url):
 
     destdir = toc.get_project(project_name).build_directory
 
-    solib_search_path=_generate_solib_search_path(toc, project_name)
+    solib_search_path = _generate_solib_search_path(toc, project_name)
     sysroot = None
     if toc.toolchain:
-        sysroot=toc.toolchain.get_sysroot()
+        sysroot = toc.toolchain.get_sysroot()
     if not sysroot:
         sysroot = "\"\""
     _generate_setup_gdb(destdir,
