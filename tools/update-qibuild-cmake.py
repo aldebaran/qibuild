@@ -10,6 +10,7 @@ import os
 import argparse
 import subprocess
 import shutil
+import qibuild
 
 def update_qibuild_cmake(template_path, git_repo):
     """ Update qibuild.cmake files in a git repo.
@@ -21,7 +22,7 @@ def update_qibuild_cmake(template_path, git_repo):
 
     """
     try:
-        out = subprocess.check_output(["git", "status"], cwd=git_repo)
+        out = qibuild.command.check_output(["git", "status"], cwd=git_repo)
     except subprocess.CalledProcessError, e:
         mess  = "Could not run git status in %s\n" % git_repo
         mess += "Error was:\n"
@@ -33,7 +34,7 @@ def update_qibuild_cmake(template_path, git_repo):
         mess += out
         raise Exception(mess)
 
-    out = subprocess.check_output(["git", "ls-files"], cwd=git_repo)
+    out = qibuild.command.check_output(["git", "ls-files"], cwd=git_repo)
     filenames = out.splitlines()
     for filename in filenames:
         basename = os.path.basename(filename)
@@ -58,5 +59,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

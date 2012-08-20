@@ -234,7 +234,7 @@ def _compress_tar(directory, archive_basepath, algo, quiet, verbose):
     verbosity = not quiet or verbose
     cmd = _get_tar_command("compress", algo, archive_path, directory, verbosity)
     try:
-        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        output = qibuild.command.check_output(cmd, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
         mess  = "Could not compress directory %s\n" % directory
         mess += "(algo: %s)\n" % algo
@@ -293,7 +293,7 @@ def _extract_tar(archive, directory, algo, quiet, verbose):
                            add_opts=opts)
     qibuild.sh.mkdir(directory)
     try:
-        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        output = qibuild.command.check_output(cmd, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
         mess  = "Could not extract %s to %s\n" % (archive, directory)
         mess += "Calling tar failed\n"
