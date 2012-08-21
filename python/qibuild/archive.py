@@ -77,7 +77,7 @@ def _compress_zip(directory, archive_basepath, quiet, verbose):
             rel_path  = os.path.relpath(full_path, directory)
             arcname   = os.path.join(os.path.basename(directory), rel_path)
             if sys.stdout.isatty() and not quiet:
-                sys.stdout.write("adding {0}".format(rel_path))
+                sys.stdout.write("adding {0}\n".format(rel_path))
                 sys.stdout.flush()
             archive.write(full_path, arcname)
     archive.close()
