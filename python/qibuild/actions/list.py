@@ -7,6 +7,7 @@
 """
 
 import os
+import re
 
 
 from qibuild import ui
@@ -20,6 +21,8 @@ def configure_parser(parser):
                         help="sort by names")
     parser.add_argument("-p", action="store_false", dest="names",
                         help="sort by path")
+    parser.add_argument("pattern", metavar="PATTERN", nargs="?",
+                        help="pattern to be matched")
     parser.set_defaults(names=True)
 
 
@@ -32,9 +35,13 @@ def do(args):
         project.directory = os.path.relpath(project.directory, toc.worktree.root)
     max_name = max([len(x.name)      for x in projects])
     max_src  = max([len(x.directory) for x in projects])
-    if args.names:
-        for project in projects:
-            ui.info(ui.green, " * ", ui.blue, project.name.ljust(max_name + 2), ui.reset, project.directory)
-    else:
-        for project in projects:
-            ui.info(ui.green, " * ", ui.blue, project.directory.ljust(max_src + 2), ui.reset, project.name)
+    regex = args.pattern
+    if args.pattern:
+        regex = re.compile(regex)
+    for project in projects:
+        if args.names:
+            items = (project.name.ljust(max_name + 2), project.directory)
+        else:
+            items = (project.directory.ljust(max_src + 2), project.name)
+        if not regex or regex.search(items[0]) or regex.search(items[1]):
+            ui.info(ui.green, " * ", ui.blue, items[0], ui.reset, project.directory, items[1])
