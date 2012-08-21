@@ -529,8 +529,10 @@ You may want to run:
         for package in self.packages:
             paths.append(package.path)
 
-        sdk_dirs = self.get_sdk_dirs(project.name)
-        paths.extend(sdk_dirs)
+        unique_sdk_dir = self.config.local.build.sdk_dir
+        if not unique_sdk_dir:
+            sdk_dirs = self.get_sdk_dirs(project.name)
+            paths.extend(sdk_dirs)
 
         if sys.platform.startswith("win"):
             mingw = "mingw" in self.cmake_generator.lower()
