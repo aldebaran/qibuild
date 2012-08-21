@@ -373,20 +373,17 @@ def guess_algo(archive):
     :return: the compression algorithm name
 
     """
-    if sys.platform.startswith("win"):
+    extension = archive.rsplit(".", 1)[1]
+    if "zip" in extension:
         algo = "zip"
+    elif "gz" in extension:
+        algo = "gzip"
+    elif "bz2" in extension:
+        algo = "bzip2"
+    elif "xz" in extension:
+        algo = "xz"
     else:
-        extension = archive.rsplit(".", 1)[1]
-        if "zip" in extension:
-            algo = "zip"
-        elif "gz" in extension:
-            algo = "gzip"
-        elif "bz2" in extension:
-            algo = "bzip2"
-        elif "xz" in extension:
-            algo = "xz"
-        else:
-            algo = extension
+        algo = extension
     return algo
 
 
