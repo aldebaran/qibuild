@@ -25,10 +25,10 @@ def do(args):
     """ Main method """
     qiwt  = qisrc.open_worktree(args.worktree)
     regex = args.pattern
-    if args.pattern is not None:
+    if args.pattern:
         regex = re.compile(regex)
     print "Projects in :", qiwt.root
     print
     for project in qiwt.projects:
-        if regex is None or regex.search(project.src) is not None:
+        if not regex or regex.search(project.src):
             print project.src
