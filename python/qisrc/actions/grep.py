@@ -32,7 +32,9 @@ def do(args):
     logger = qibuild.log.get_logger(__name__)
     retcode = 0
     for project in qiwt.git_projects:
-        print "Looking in", project.src, "..."
+        qibuild.ui.info(qibuild.ui.green,
+                        "Looking in", project.src, "...",
+                        qibuild.ui.reset)
         git = qisrc.git.Git(project.path)
         (status, out) = git.call("grep", *git_grep_opts, raises=False)
         print out
