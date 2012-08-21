@@ -32,7 +32,7 @@ try:
 except ImportError:
     from qibuild.external import argparse
 
-import qibuild.cmdparse
+import qibuild.script
 import qibuild.config
 
 

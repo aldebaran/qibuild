@@ -14,7 +14,6 @@ import qibuild.log
 from qibuild import archive
 from qibuild import build
 from qibuild import cmake
-from qibuild import cmdparse
 from qibuild import command
 from qibuild import config
 from qibuild import configstore
@@ -23,12 +22,13 @@ from qibuild import envsetter
 from qibuild import interact
 from qibuild import log
 from qibuild import parsers
+from qibuild import script
 from qibuild import sh
 from qibuild import toc
 
 
-from qibuild.toc      import toc_open
-from qibuild.cmdparse import run_action
+from qibuild.toc    import toc_open
+from qibuild.script import run_action
 
 
 QIBUILD_ROOT_DIR  = os.path.dirname(os.path.abspath(__file__))

@@ -31,7 +31,7 @@ try:
 except ImportError:
     from qibuild.external import argparse
 
-import qibuild.cmdparse
+import qibuild.script
 
 def print_version():
     """Print qibuild root cmake path.
@@ -47,13 +47,13 @@ def print_version():
 
 def main():
     parser = argparse.ArgumentParser()
-    modules = qibuild.cmdparse.action_modules_from_package("qibuild.actions")
+    modules = qibuild.script.action_modules_from_package("qibuild.actions")
 
     if len(sys.argv) == 2 and sys.argv[1] == '--version':
         print_version()
         sys.exit(0)
 
-    qibuild.cmdparse.root_command_main("qibuild", parser, modules)
+    qibuild.script.root_command_main("qibuild", parser, modules)
 
 if __name__ == "__main__":
     main()

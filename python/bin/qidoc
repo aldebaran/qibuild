@@ -38,8 +38,8 @@ except ImportError:
 
 def main():
     parser = argparse.ArgumentParser()
-    modules = qibuild.cmdparse.action_modules_from_package("qidoc.actions")
-    qibuild.cmdparse.root_command_main("qibuild", parser, modules)
+    modules = qibuild.script.action_modules_from_package("qidoc.actions")
+    qibuild.script.root_command_main("qibuild", parser, modules)
 
 if __name__ == "__main__":
     main()

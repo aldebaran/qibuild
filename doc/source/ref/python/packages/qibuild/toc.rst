@@ -28,14 +28,6 @@ Initialisation
 .. automethod:: Toc.__init__
 
 
-.. _toc-dependencies-resolution:
-
-Dependency resolution
-+++++++++++++++++++++
-
-.. automethod:: Toc.resolve_deps
-
-
 .. _toc-compilation-methods:
 
 Compilation related methods
@@ -130,7 +122,7 @@ Typical usage from an action is:
 
     def do(args):
         toc = qibuild.toc.toc_open(args.work_tree, args)
-        (project_names, _package_names, _not_found) = toc.resolve_deps()
+        (project_names, package_names) = qibuild.cmake.deps_from_args(toc, args)
 
         for project_name in project_nanes:
             project = toc.get_project(project_name)

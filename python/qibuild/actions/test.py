@@ -30,12 +30,8 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    toc      = qibuild.toc_open(args.worktree, args)
-    if not args.project:
-        project_name = qibuild.project.project_from_cwd()
-    else:
-        project_name = args.project
-    project = toc.get_project(project_name)
+    toc = qibuild.toc_open(args.worktree, args)
+    project = qibuild.cmdparse.project_from_args(toc, args)
 
     build_dir = project.build_directory
     cmake_cache = os.path.join(build_dir, "CMakeCache.txt")

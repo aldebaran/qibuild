@@ -40,31 +40,30 @@ def do(args):
             raise Exception("Could not find rsync or scp")
 
     # Resolve deps:
-    (project_names, package_names, _) = toc.resolve_deps(runtime=True)
-    projects = [toc.get_project(name) for name in project_names]
+    (packages, projects) = qibuild.cmdparse.deps_from_args(toc, args)
 
     if not args.single:
         ui.info(ui.green, "The following projects")
-        for project_name in project_names:
-            ui.info(ui.green, " *", ui.blue, project_name)
-        if not args.single and package_names:
+        for project in projects:
+            ui.info(ui.green, " *", ui.blue, project.name)
+        if not args.single and packages:
             ui.info(ui.green, "and the following packages")
-            for package_name in package_names:
-                ui.info(" *", ui.blue, package_name)
+            for package in packages:
+                ui.info(" *", ui.blue, package.name)
         ui.info(ui.green, "will be deployed to", ui.blue, url)
 
     # Deploy packages: install all of them in the same temp dir, then
     # deploy this temp dir to the target
-    if not args.single and package_names:
+    if not args.single and packages:
         print
         ui.info(ui.green, ":: ", "Deploying packages")
         with qibuild.sh.TempDir() as tmp:
-            for (i, package_name) in enumerate(package_names):
+            for (i, package) in enumerate(packages):
                 ui.info(ui.green, "*", ui.reset,
-                        "(%i/%i)" % (i+1, len(package_names)),
-                        ui.green, "Deploying package", ui.blue, package_name,
+                        "(%i/%i)" % (i+1, len(package.names)),
+                        ui.green, "Deploying package", ui.blue, package.name,
                         ui.green, "to", ui.blue, url)
-                toc.toolchain.install_package(package_name, tmp, runtime=True)
+                toc.toolchain.install_package(package.name, tmp, runtime=True)
             qibuild.deploy.deploy(tmp, args.url, use_rsync=use_rsync, port=args.port)
         print
 

@@ -1,7 +1,7 @@
-qibuild.cmdparse -- Parsing command line
-========================================
+qibuild.script -- Tools for qibuild scripts
+===========================================
 
-.. py:module:: qibuild.cmdparse
+.. py:module:: qibuild.script
 
 
 For instance, after
@@ -57,8 +57,8 @@ Example of usage:
 .. code-block:: python
 
       parser = argparse.ArgumentParser()
-      modules = qibuild.cmdparse.action_modules_from_package("qibuild.actions")
-      qibuild.cmdparse.root_command_main("qibuild", parser, modules)
+      modules = qibuild.script.action_modules_from_package("qibuild.actions")
+      qibuild.script.root_command_main("qibuild", parser, modules)
 
 
 .. seealso::

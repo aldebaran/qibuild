@@ -26,7 +26,7 @@ To every cmake code that is generated, and what CMake flags are passed.
 Command line parsing
 ---------------------
 
-This is done by :py:func:`qibuild.cmdparse.root_command_main` from
+This is done by :py:func:`qibuild.script.root_command_main` from
 ``bin/qibuild`` script.
 
 We look for every module in ``qibuild.actions``, and find the ``configure.py`` module.
@@ -341,7 +341,7 @@ name is guessed from the current working directory.
     # has still occurred, because we need to know about the packages
     # in the toolchain, the names of the projects in the work tree,
     # and so on.
-    (project_names, _, _) = toc.resolve_deps()
+    (packages, projects) = qibuild.cmdparse.deps_from_args()
 
 
     # qibuild.toc

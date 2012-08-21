@@ -62,12 +62,7 @@ def get_ide(qibuild_cfg):
 def do(args):
     """Main entry point """
     toc = qibuild.toc.toc_open(args.worktree, args)
-    if not args.project:
-        project_name = qibuild.project.project_from_cwd()
-    else:
-        project_name = args.project
-
-    project = toc.get_project(project_name)
+    project = qibuild.cmdparse.project_from_args(toc, args)
     if not os.path.exists(project.build_directory):
         ui.error("""It looks like your project has not been configured yet
 (The build directory: '%s' does not exists)""" %
@@ -81,7 +76,7 @@ def do(args):
             qibuild.run_action("qibuild.actions.configure",
                 [project.name, "--config", toc.active_config])
 
-    error_message = "Could not open project %s\n" % project_name
+    error_message = "Could not open project %s\n" % project.name
     qibuild_cfg = qibuild.config.QiBuildConfig(user_config=toc.active_config)
     qibuild_cfg.read()
     qibuild_cfg.read_local_config(toc.config_path)

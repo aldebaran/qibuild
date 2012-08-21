@@ -281,24 +281,34 @@ def handle_old_manifest(directory):
             with open(project_xml, "w") as fp:
                 fp.write(xml)
 
-def project_from_cwd():
-    """Return a project name from the current working directory
+def project_from_dir(directory=None, raises=True):
+    """Return a project name from a directory.
 
     """
-    head = os.getcwd()
+    if not directory:
+        head = os.getcwd()
+    else:
+        head = directory
+    tail = None
     qiproj_xml = None
     while True:
-        qiproj_xml = os.path.join(head, "qiproject.xml")
-        if os.path.exists(qiproj_xml):
+        candidate = os.path.join(head, "qiproject.xml")
+        if os.path.exists(candidate):
+            qiproj_xml = candidate
             break
-        (head, _tail) = os.path.split(head)
-        if not _tail:
+        (head, tail) = os.path.split(head)
+        if not tail:
             break
     if not qiproj_xml:
-        mess  = "Could not guess project name from current working directory\n"
-        mess += "(No qiproject.xml found in the parent directories\n"
-        mess += "Please go inside a project, or specify the project name "
-        mess += "from the command line"
+        if raises:
+            mess  = "Could not guess project name from current working directory: "
+            mess += "'%s'\n" % os.getcwd()
+            mess += "(No qiproject.xml found in the parent directories)\n"
+            mess += "Please go inside a project, or specify the project name "
+            mess += "from the command line"
+            raise Exception(mess)
+        else:
+            return None
 
     xml_elem = qixml.read(qiproj_xml)
     return xml_elem.getroot().get("name")

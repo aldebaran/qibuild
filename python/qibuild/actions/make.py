@@ -26,15 +26,13 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     toc = qibuild.toc.toc_open(args.worktree, args)
-
-    (project_names, _package_names, _not_found) = toc.resolve_deps()
+    (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
     use_incredibuild = toc.config.build.incredibuild
 
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
         ui.info(ui.green, "Active configuration: ",
                 ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))
-    projects = [toc.get_project(name) for name in project_names]
 
     project_count = len(projects)
     i = 0

@@ -373,15 +373,18 @@ class Toolchain:
         with open(config_path, "w") as fp:
             config.write(fp)
 
-    def get(self, package_name):
+    def get(self, package_name, raises=True):
         """ Get the path to a package
 
         """
         package_names = [p.name for p in self.packages]
         if package_name not in package_names:
-            mess  = "Could not get %s from toolchain %s\n" % (package_name, self.name)
-            mess += "No such package"
-            raise Exception(mess)
+            if raises:
+                mess  = "Could not get %s from toolchain %s\n" % (package_name, self.name)
+                mess += "No such package"
+                raise Exception(mess)
+            else:
+                return None
         package = [p for p in self.packages if p.name == package_name][0]
         package_path = package.path
         return package_path

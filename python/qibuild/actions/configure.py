@@ -51,11 +51,8 @@ def do(args):
     if args.werror:
         args.cmake_flags.append("QI_WERROR=ON")
 
-    toc      = qibuild.toc_open(args.worktree, args)
-
-    (project_names, _, _) = toc.resolve_deps()
-
-    projects = [toc.get_project(name) for name in project_names]
+    toc = qibuild.toc_open(args.worktree, args)
+    (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
     if args.build_directory:
         projects[0].set_custom_build_directory(args.build_directory)
 

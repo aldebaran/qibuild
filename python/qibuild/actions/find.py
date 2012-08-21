@@ -28,15 +28,10 @@ def do(args):
     """Main entry point """
     toc = qibuild.toc.toc_open(args.worktree, args)
     package = args.package
-    project_name = args.project_name
-    if not project_name:
-        project_name = qibuild.project.project_from_cwd()
-
-
-    project = toc.get_project(project_name)
+    project = qibuild.cmdparse.project_from_args(toc, args)
     cmake_cache = os.path.join(project.build_directory, "CMakeCache.txt")
     if not os.path.exists(cmake_cache):
-        print "Could not find CMakeCache for project %s" % project_name
+        print "Could not find CMakeCache for project %s" % project.name
         print "Try using `qibuild configure` first"
         sys.exit(2)
     cache = qibuild.cmake.read_cmake_cache(cmake_cache)

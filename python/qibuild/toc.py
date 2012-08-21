@@ -103,9 +103,7 @@ class Toc:
             qibuild_cfg=None,
             build_type="Debug",
             cmake_flags=None,
-            cmake_generator=None,
-            active_projects=None,
-            solve_deps=True):
+            cmake_generator=None):
         """
         Create a new Toc object. Most of the keyargs come directly from
         the command line. (--worktree, --debug, -c, etc.)
@@ -118,8 +116,14 @@ class Toc:
         :param cmake_flags:     optional additional cmake flags
         :param cmake_generator: optional cmake generator
                          (defaults to Unix Makefiles)
-        :param active_projects: the projects excplicitely specified by user
         """
+        # Set during qibuild.cmdparse.projects_from_args and
+        # used by get_sdk_dirs().
+        # Why? Assume you have hello depending on world, which is both
+        # a project and a pacakge.
+        # qc hello  -> get_sdk_dirs('hello') = []
+        # qc world hello -> get_sdk_dirs('hello') = ["world/build/sdk"]
+        self.active_projects = list()
         self.worktree = worktree
         # The local config file in which to write
         dot_qi = os.path.join(self.worktree.root, ".qi")
@@ -160,15 +164,6 @@ class Toc:
         # List of objects of type qibuild.project.Project,
         # this is updated using WorkTree.buildable_projects
         self.projects          = list()
-
-        # The list of projects the user asked for from command
-        # line.
-        # Set by toc_open()
-        if not active_projects:
-            self.active_projects = list()
-        else:
-            self.active_projects = active_projects
-        self.solve_deps = solve_deps
 
         # Set cmake generator if user has not set if in Toc ctor:
         if not self.cmake_generator:
@@ -212,6 +207,10 @@ You may want to run:
                         raise WrongDefaultException(mess)
                     else:
                         raise Exception(mess)
+        if self.toolchain:
+            self.packages = self.toolchain.packages
+        else:
+            self.packages = list()
 
         # Useful vars to cope with Visual Studio quirks
         self.using_visual_studio = "Visual Studio" in self.cmake_generator
@@ -338,7 +337,6 @@ You may want to run:
         if project_name not in known_project_names:
             raise TocException("%s is not a buildable project" % project_name)
 
-        # Here do not honor self.solve_deps or the software won't compile :)
         dep_solver = DependenciesSolver(projects=self.projects, packages=self.packages,
             active_projects=self.active_projects)
         (r_project_names, _package_names, not_found) = dep_solver.solve([project_name])
@@ -357,7 +355,6 @@ You may want to run:
         # Remove self from the list:
         r_project_names.remove(project_name)
 
-
         for project_name in r_project_names:
             project = self.get_project(project_name)
             dirs.append(project.get_sdk_dir())
@@ -365,40 +362,6 @@ You may want to run:
         ui.debug("sdk_dirs for", project_name, ":", " ".join(dirs))
         return dirs
 
-
-    def resolve_deps(self, runtime=False):
-        """ Return a tuple of three lists:
-        (projects, packages, not_foud), see :py:mod:`qibuild.dependencies_solver`
-        for more information.
-
-        Note that the result depends on how the Toc object has been built.
-
-        For instance, assuming you have 'hello' depending on 'world', and
-        'world' is also a package, you will get:
-
-        (['hello'], ['world'], [])  if user used
-
-        .. code-block:: console
-
-           $ qibuild configure hello
-
-        but:
-
-        (['world', 'hello], [], []) if user used:
-
-        .. code-block:: console
-
-           $ qibuild configure world hello
-
-        """
-        if not self.solve_deps:
-            return (self.active_projects, list(), list())
-        else:
-            dep_solver = DependenciesSolver(projects=self.projects,
-                                            packages=self.packages,
-                                            active_projects=self.active_projects)
-            return dep_solver.solve(self.active_projects,
-                                    runtime=runtime)
 
     def configure_project(self, project, clean_first=True,
                          debug_trycompile=False, profile=False):
@@ -639,43 +602,6 @@ Could not find objcopy executable.\
                 )
 
 
-
-def _projects_from_args(toc, args):
-    """
-    Cases handled:
-      - nothing specified: get the project from the cwd
-      - args.single: do not resolve dependencies
-      - args.all: return all projects
-    Returns a tuple (project_names, single):
-        project_names: the actual list for project
-        single: user specified --single
-    """
-    toc_p_names = [p.name for p in toc.projects]
-    if hasattr(args, "all") and args.all:
-        # Pretend the user has asked for all the known projects
-        ui.debug("select: All projects have been selected")
-        return (toc_p_names, False)
-
-    if hasattr(args, "projects"):
-        if args.projects:
-            ui.debug("select: projects list from arguments: %s", ",".join(args.projects))
-            return ([args.projects, args.single])
-        else:
-            from_cwd = None
-            try:
-                from_cwd = qibuild.project.project_from_cwd()
-            except:
-                pass
-            if from_cwd:
-                ui.debug("select: projects from cwd: %s", from_cwd)
-                return ([from_cwd], args.single)
-            else:
-                ui.debug("select: default to all projects")
-                return (toc_p_names, args.single)
-    else:
-        return (list(), False)
-
-
 def toc_open(worktree_root, args=None, qibuild_cfg=None):
     """ Creates a :py:class:`Toc` object.
 
@@ -723,12 +649,6 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
                cmake_flags=cmake_flags,
                cmake_generator=cmake_generator,
                qibuild_cfg=qibuild_cfg)
-
-    (active_projects, single) =  _projects_from_args(toc, args)
-    toc.active_projects = active_projects
-    ui.debug("active projects: %s", ".".join(toc.active_projects))
-    ui.debug("single: %s", str(single))
-    toc.solve_deps = (not single)
     return toc
 
 def num_jobs_to_args(num_jobs, cmake_generator):

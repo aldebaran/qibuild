@@ -108,6 +108,9 @@ Python
       * support for the ``topdir`` option has been removed
       * add ``algo`` option, when unspecified ``algo`` is set to ``zip`` on all platform
 * Added :py:mod:`qibuild.cmake.modules` to handle CMake module generation
+* Renamed :py:mod:`qibuild.cmdparse` to :py:mod:`qibuild.script`
+* :py:mod:`qibuild.cmdparse` now centralize the parsing of qibuild actions arguments
+   (guessing project from working directory and so on)
 
 Misc
 +++++

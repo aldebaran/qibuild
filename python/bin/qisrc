@@ -30,12 +30,12 @@ try:
     import argparse
 except ImportError:
     from qibuild.external import argparse
-import qibuild.cmdparse
+import qibuild.script
 
 def main():
     parser = argparse.ArgumentParser()
-    modules = qibuild.cmdparse.action_modules_from_package("qisrc.actions")
-    qibuild.cmdparse.root_command_main("qisrc", parser, modules)
+    modules = qibuild.script.action_modules_from_package("qisrc.actions")
+    qibuild.script.root_command_main("qisrc", parser, modules)
 
 if __name__ == "__main__":
     main()

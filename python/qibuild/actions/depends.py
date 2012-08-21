@@ -8,7 +8,6 @@
 
 import qibuild
 import qibuild.ui
-from qibuild.dependencies_solver import DependenciesSolver
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -16,32 +15,47 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("depends arguments")
-    parser.add_argument("--reverse", "-r", action="store_true", help="display reverse dependencies")
-    parser.add_argument("--deep", action="store_true", help="display all dependencies using a depth traversal")
+    group.add_argument("--reverse", "-r", action="store_true",
+                       help="display reverse dependencies")
+    group.add_argument("--deep", action="store_true",
+                        help="display all dependencies using a depth traversal")
 
-def get_reverse_deps(toc, project_name):
-    bproject_names = []
-    rproject_names = []
+def get_reverse_deps(toc, project):
+    bproject_names = list()
+    rproject_names = list()
     for p in toc.projects:
-        dep_solver = DependenciesSolver(projects=toc.projects, packages=toc.packages, active_projects=toc.active_projects)
-        (bp, _, _) = dep_solver.solve([p.name], runtime=False)
-        (rp, _, _) = dep_solver.solve([p.name], runtime=True)
-        if project_name in bp:
+        (_, p_rdeps) = qibuild.cmdparse.get_deps(toc, [p], runtime=True)
+        (_, p_bdeps) = qibuild.cmdparse.get_deps(toc, [p], build_deps=True)
+        if project.name in [x.name for x in p_bdeps]:
             bproject_names.append(p.name)
-        if project_name in rp:
+        if project.name in [x.name for x in p_rdeps]:
             rproject_names.append(p.name)
     return (bproject_names, rproject_names, set(), set())
 
-def get_deps(toc, project_name):
-    dep_solver = DependenciesSolver(projects=toc.projects, packages=toc.packages, active_projects=toc.active_projects)
-    (bproject_names, bpackage_names, _) = dep_solver.solve([project_name], runtime=False)
-    (rproject_names, rpackage_names, _) = dep_solver.solve([project_name], runtime=True)
-    return (bproject_names, rproject_names, bpackage_names, rpackage_names)
+def get_deps(toc, project):
+    (bpackages, bprojects) = qibuild.cmdparse.get_deps(toc, [project], build_deps=True)
+    (rpackages, rprojects) = qibuild.cmdparse.get_deps(toc, [project], runtime=True)
+
+    return ([x.name for x in bprojects], [x.name for x in rprojects],
+            [x.name for x in bpackages], [x.name for x in rpackages])
 
 def do(args):
     """Main entry point"""
-    logger   = qibuild.log.get_logger(__name__)
-    toc      = qibuild.toc_open(args.worktree, args)
+    if args.deep and args.reverse:
+        qibuild.ui.error("you can't use --deep with --reverse.")
+        exit(1)
+    toc = qibuild.toc_open(args.worktree, args)
+    if args.deep:
+        (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
+    else:
+        # small hack:
+        if args.projects:
+            args.project = args.projects[0]
+        else:
+            args.projects = None
+        project = qibuild.cmdparse.project_from_args(toc, args)
+        projects = [project]
+
 
     qibuild.ui.info("legend:",
                     qibuild.ui.red  , "buildtime",
@@ -49,28 +63,26 @@ def do(args):
                     qibuild.ui.green, "runtime")
     qibuild.ui.info()
 
-    active_projects = toc.active_projects
-    if args.deep and not args.reverse:
-        (active_projects, _, _) = toc.resolve_deps()
-    elif args.deep and args.reverse:
-        qibuild.ui.error("you can't use --deep with --reverse.")
-        exit(1)
-    for pname in active_projects:
-        project = toc.get_project(pname)
+
+    for project in projects:
         if args.reverse:
-            qibuild.ui.info(qibuild.ui.green, "*", qibuild.ui.blue, project.name, qibuild.ui.reset, "reverse dependencies:")
+            qibuild.ui.info(qibuild.ui.green, "*",
+                            qibuild.ui.blue, project.name, qibuild.ui.reset,
+                            "reverse dependencies:")
         else:
-            qibuild.ui.info(qibuild.ui.green, "*", qibuild.ui.blue, project.name, qibuild.ui.reset, "dependencies:")
+            qibuild.ui.info(qibuild.ui.green, "*",
+                            qibuild.ui.blue, project.name, qibuild.ui.reset,
+                            "dependencies:")
 
         if args.reverse:
             (bproject_names, rproject_names,
-             bpackage_names, rpackage_names) = get_reverse_deps(toc, pname)
+             bpackage_names, rpackage_names) = get_reverse_deps(toc, project)
         else:
             (bproject_names, rproject_names,
-             bpackage_names, rpackage_names) = get_deps(toc, pname)
+             bpackage_names, rpackage_names) = get_deps(toc, project)
 
-        bproject_names = set(bproject_names) - set([pname])
-        rproject_names = set(rproject_names) - set([pname])
+        bproject_names = set(bproject_names) - set([project.name])
+        rproject_names = set(rproject_names) - set([project.name])
 
         brproject_names = set(bproject_names).intersection(set(rproject_names))
         brpackage_names = set(bpackage_names).intersection(set(rpackage_names))
