@@ -5,12 +5,9 @@
 
 import os
 import sys
-import qibuild.log
 
+from qibuild import ui
 import qibuild
-
-LOGGER = qibuild.log.get_logger(__name__)
-
 
 def get_package_name(project,
     version=None,
@@ -70,17 +67,25 @@ def _do_package(args, project_name, destdir, debug):
     something else
 
     """
+    build_type= ""
     if debug:
+        build_type = "debug"
         build_args = ["--debug",  project_name]
     else:
+        build_type = "release"
         build_args = ["--release", project_name]
 
+    ui.info(ui.green, "> Configuring ... (%s)" % build_type)
     qibuild.run_action("qibuild.actions.configure", build_args + ["--no-clean-first"],
         forward_args=args)
+    print
+    ui.info(ui.green, "> Building ... (%s)" % build_type)
     qibuild.run_action("qibuild.actions.make", build_args + ["--no-fix-shared-libs"],
         forward_args=args)
+    ui.info(ui.green, "> Installing ... (%s)" % build_type)
     qibuild.run_action("qibuild.actions.install", build_args + [destdir],
         forward_args=args)
+    print
 
 def do(args):
     """Main entry point"""
@@ -104,18 +109,23 @@ def do(args):
         _do_package(args, project_name, destdir, debug=True)
         _do_package(args, project_name, destdir, debug=False)
     else:
+        ui.info(ui.green, "> Configuring ...")
         qibuild.run_action("qibuild.actions.configure", [project_name, "--no-clean-first"],
             forward_args=args)
+        print
+        ui.info(ui.green, "> Building ...")
         qibuild.run_action("qibuild.actions.make", [project_name, "--no-fix-shared-libs"],
             forward_args=args)
+        print
+        ui.info(ui.green, "> Installing ...")
         qibuild.run_action("qibuild.actions.install", [project_name, destdir],
             forward_args=args)
-
+        print
 
     if args.compress:
-        LOGGER.info("Compressing package")
-        archive = qibuild.archive.compress(destdir, algo="zip")
-        LOGGER.info("Package generated in %s", archive)
+        ui.info(ui.green, "> Compressing package ...")
+        archive = qibuild.archive.compress(destdir, algo="zip", quiet=True)
+        ui.info(ui.green, "Package generated in", ui.reset, ui.bold, archive)
         # Now, clean the destdir.
         qibuild.sh.rm(destdir)
         return archive

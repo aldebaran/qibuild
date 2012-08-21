@@ -62,8 +62,9 @@ def do(args):
     if args.debug_trycompile:
         print "--debug-trycompile ON"
 
+    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
-        qibuild.ui.info(ui.green, "Active configuration:", ui.blue, toc.active_config)
+        ui.info(ui.green, "Active configuration:", ui.blue, toc.active_config)
 
     project_count = len(projects)
     i = 0

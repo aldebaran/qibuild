@@ -30,6 +30,7 @@ def do(args):
     (project_names, _package_names, _not_found) = toc.resolve_deps()
     use_incredibuild = toc.config.build.incredibuild
 
+    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
         ui.info(ui.green, "Active configuration: ",
                 ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))

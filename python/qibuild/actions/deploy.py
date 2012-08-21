@@ -25,6 +25,7 @@ def do(args):
     url = args.url
     (username, server, remote_directory) = qibuild.deploy.parse_url(url)
     toc = qibuild.toc_open(args.worktree, args)
+    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
         ui.info(ui.green, "Active configuration: ",
                 ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))
