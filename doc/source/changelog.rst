@@ -59,7 +59,7 @@ CMake
 
 * qibuild cmake modules:
 
-  * Added ``openssl``, ``libevent_openssl``
+  * Added ``openssl``, ``libevent_openssl``, ``qt_qtdbus``
   * Renamed dbus into dbus-1, and dbus-glib into dbus-glib-1
   * ``qi_use_lib(OPENGL)`` now uses upstream's ``FindOpenGL.cmake``
 
