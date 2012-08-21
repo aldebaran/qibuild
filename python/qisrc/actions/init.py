@@ -42,6 +42,10 @@ def do(args):
     if not manifest_url:
         return worktree
     manifest_is_a_regular_file = False
+    qibuild.ui.info(qibuild.ui.green, "initializing worktree:",
+                    qibuild.ui.blue, worktree_root,
+                    qibuild.ui.green, "using profile:",
+                    qibuild.ui.blue, args.profile)
     if os.path.isfile(manifest_url):
         manifest = manifest_url
         manifest_is_a_regular_file = True
