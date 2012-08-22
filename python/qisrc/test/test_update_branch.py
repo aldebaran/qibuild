@@ -6,6 +6,7 @@ from qisrc.test.fake_git import FakeGit
 
 def test_simple():
     git = FakeGit("repo")
+    git.add_result("submodule", 0, "")
     git.add_result("symbolic-ref", 0, "refs/heads/master")
     git.add_result("fetch", 0, "")
     git.add_result("status", 0, "")
@@ -16,6 +17,7 @@ def test_simple():
 
 def test_wrong_branch_fast_forward():
     git = FakeGit("repo")
+    git.add_result("submodule", 0, "")
     git.add_result("symbolic-ref", 0, "refs/heads/next")
     git.add_result("symbolic-ref", 0, "refs/heads/next")
     git.add_result("status", 0, "")
@@ -32,6 +34,7 @@ def test_wrong_branch_fast_forward():
 
 def test_wrong_branch_non_fast_foward():
     git = FakeGit("repo")
+    git.add_result("submodule", 0, "")
     git.add_result("symbolic-ref", 0, "refs/heads/next")
     git.add_result("fetch", 0, "")
     git.add_result("show-ref", 0, "local_sha1")
@@ -44,6 +47,7 @@ def test_wrong_branch_non_fast_foward():
 
 def test_wrong_branch_not_clean():
     git = FakeGit("repo")
+    git.add_result("submodule", 0, "")
     git.add_result("symbolic-ref", 0, "refs/heads/next")
     git.add_result("symbolic-ref", 0, "refs/heads/next")
     git.add_result("status", 0, "Unstaged changes\n M foo.txt\n")
@@ -62,6 +66,7 @@ def test_wrong_branch_not_clean():
 
 def test_first_stash_fails():
     git = FakeGit("repo")
+    git.add_result("submodule", 0, "")
     git.add_result("fetch", 0, "")
     git.add_result("symbolic-ref", 0, "refs/heads/master")
     # sometime stash can fails even if git status says the repo is not clean
@@ -73,6 +78,7 @@ def test_first_stash_fails():
 
 def test_stash_pop_fails():
     git = FakeGit("repo")
+    git.add_result("submodule", 0, "")
     git.add_result("fetch", 0, "")
     git.add_result("symbolic-ref", 0, "refs/heads/master")
     git.add_result("status", 1, "Unstaged changes\n M foo.txt\n")
@@ -88,6 +94,7 @@ def test_stash_pop_fails():
 
 def test_rebase_fails():
     git = FakeGit("repo")
+    git.add_result("submodule", 0, "")
     git.add_result("fetch", 0, "")
     git.add_result("symbolic-ref", 0, "refs/heads/master")
     git.add_result("status", 0, "")
@@ -99,6 +106,7 @@ def test_rebase_fails():
 
 def test_rebase_abort_fails():
     git = FakeGit("repo")
+    git.add_result("submodule", 0, "")
     git.add_result("fetch", 0, "")
     git.add_result("symbolic-ref", 0, "refs/heads/master")
     git.add_result("status", 0, "")
@@ -112,9 +120,27 @@ def test_rebase_abort_fails():
 
 def test_fetch_fails():
     git = FakeGit("repo")
+    git.add_result("submodule", 0, "")
     git.add_result("symbolic-ref", 0, "refs/heads/master")
     git.add_result("fetch", 2, "could not resolve hostname github.com")
     error = git.update_branch("master", "origin")
     assert "Fetch failed" in error
     assert "github.com" in error
     git.check()
+
+def test_submodules():
+    git = FakeGit("repo")
+    git.add_result("submodule", 0, "24faae bar (heads/master)\n")
+    git.add_result("submodule", 0, "")
+    git.add_result("symbolic-ref", 0, "refs/heads/master")
+    git.add_result("fetch", 0, "")
+    git.add_result("status", 0, "")
+    git.add_result("rebase", 0, "")
+    git.update_branch("master", "origin")
+    git.check()
+
+def test_broken_submodules():
+    git = FakeGit("repo")
+    git.add_result("submodule", 1, "no submodule mapping found for path 'bar'\n")
+    error = git.update_branch("master", "origin")
+    assert "Broken submodules" in error

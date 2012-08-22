@@ -200,7 +200,7 @@ class SyncTestCase(unittest.TestCase):
         self.assertEqual(worktree.git_projects[0].src, "bar")
         self.assertEqual(worktree.git_projects[1].src, "bar/foo")
 
-    def test_submodules(self):
+    def test_erasing_submodules_with_manifest_should_raise(self):
         manifest_url = create_git_repo(self.tmp, "manifest")
         create_git_repo_with_submodules(self.tmp)
         xml = """
@@ -215,8 +215,10 @@ class SyncTestCase(unittest.TestCase):
         work = os.path.join(self.tmp, "work")
         worktree = qisrc.worktree.create(work)
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
-        qisrc.sync.init_worktree(worktree, manifest)
-        self.assertEqual(len(worktree.git_projects), 3)
+        # pylint: disable-msg=E1101
+        with pytest.raises(Exception) as e:
+            qisrc.sync.init_worktree(worktree, manifest)
+        assert "path already exists" in str(e.value)
 
     def test_broken_submodules(self):
         manifest_url = create_git_repo(self.tmp, "manifest")
@@ -225,7 +227,6 @@ class SyncTestCase(unittest.TestCase):
 <manifest>
     <remote name="origin" fetch="{tmp}/srv" />
     <project name="foo.git" path="foo" />
-    <project name="bar.git" path="foo/bar"/>
 </manifest>
 """
         xml = xml.format(tmp=self.tmp)
@@ -233,8 +234,10 @@ class SyncTestCase(unittest.TestCase):
         work = os.path.join(self.tmp, "work")
         worktree = qisrc.worktree.create(work)
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
-        qisrc.sync.init_worktree(worktree, manifest)
-        self.assertEqual(len(worktree.git_projects), 3)
+        # pylint: disable-msg=E1101
+        with pytest.raises(Exception) as e:
+            qisrc.sync.init_worktree(worktree, manifest)
+        assert "Broken submodules" in str(e.value)
 
 
 if __name__ == "__main__":

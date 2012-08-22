@@ -3,73 +3,49 @@
 ## found in the COPYING file.
 
 import os
-import unittest
-import tempfile
-
 import pytest
 
 import qisrc
-import qisrc.sync
-import qibuild
+from qisrc.sync import clone_project
 from qisrc.test.test_git import create_git_repo
+from qisrc.test.test_git import create_git_repo_with_submodules
 
+def create_worktree(tmpdir):
+    work = tmpdir.mkdir("work")
+    return qisrc.worktree.open_worktree(work.strpath)
 
-# pylint: disable-msg=E1101
-@pytest.mark.slow
-class CloneProjectTestCase(unittest.TestCase):
-    def setUp(self):
-        qibuild.command.CONFIG["quiet"] = True
-        self.tmp = tempfile.mkdtemp(prefix="test-qisrc-sync")
-        qibuild.sh.mkdir(self.tmp)
-        self.srv = os.path.join(self.tmp, "srv")
-        qibuild.sh.mkdir(self.srv)
-        worktree_root = os.path.join(self.tmp, "work")
-        qibuild.sh.mkdir(worktree_root)
-        self.worktree = qisrc.worktree.open_worktree(worktree_root)
+def test_simple(tmpdir):
+    bar_url = create_git_repo(tmpdir.strpath, "bar")
+    worktree = create_worktree(tmpdir)
+    clone_project(worktree, bar_url)
+    assert len(worktree.git_projects) == 1
+    assert worktree.git_projects[0].src == "bar"
 
-    def tearDown(self):
-        qibuild.command.CONFIG["false"] = True
-        qibuild.sh.rm(self.tmp)
+def test_project_already_exists(tmpdir):
+    bar_url = create_git_repo(tmpdir.strpath, "bar")
+    baz_url = create_git_repo(tmpdir.strpath, "baz")
+    worktree = create_worktree(tmpdir)
+    clone_project(worktree, bar_url, src="bar")
+    # pylint: disable-msg=E1101
+    with  pytest.raises(Exception) as e:
+        qisrc.sync.clone_project(worktree, baz_url, src="bar")
+    assert "already registered" in str(e.value)
 
-    def test_simple_clone(self):
-        bar_url = create_git_repo(self.tmp, "bar")
-        qisrc.sync.clone_project(self.worktree, bar_url)
-        self.assertEqual(self.worktree.git_projects[0].src, "bar")
+def test_path_already_exists(tmpdir):
+    bar_url = create_git_repo(tmpdir.strpath, "bar")
+    worktree = create_worktree(tmpdir)
+    tmpdir.join("work").mkdir("bar")
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        clone_project(worktree, bar_url)
+    assert "already exists" in str(e.value)
+    clone_project(worktree, bar_url, src="baz")
+    assert worktree.git_projects[0].src == "baz"
 
-    def test_clone_skipping(self):
-        bar_url = create_git_repo(self.tmp, "bar")
-        qisrc.sync.clone_project(self.worktree, bar_url)
-        self.assertEqual(self.worktree.git_projects[0].src, "bar")
-        qisrc.sync.clone_project(self.worktree, bar_url, skip_if_exists=True)
-        self.assertEqual(len(self.worktree.git_projects), 1)
-        self.assertEqual(self.worktree.git_projects[0].src, "bar")
-
-    def test_clone_project_already_exists(self):
-        bar_url = create_git_repo(self.tmp, "bar")
-        baz_url = create_git_repo(self.tmp, "baz")
-        qisrc.sync.clone_project(self.worktree, bar_url, src="bar")
-        error = None
-        try:
-            qisrc.sync.clone_project(self.worktree, baz_url, src="bar")
-        except Exception, e:
-            error = e
-        self.assertFalse(error is None)
-        self.assertTrue("already registered" in str(error))
-
-    def test_clone_path_already_exists(self):
-        bar_url = create_git_repo(self.tmp, "bar")
-        conflicting_path = os.path.join(self.worktree.root, "bar")
-        qibuild.sh.mkdir(conflicting_path)
-        error = None
-        try:
-            qisrc.sync.clone_project(self.worktree, bar_url)
-        except Exception, e:
-            error = e
-
-        self.assertFalse(error is None)
-        self.assertTrue("already exists" in str(error), error)
-        qisrc.sync.clone_project(self.worktree, bar_url, src="baz")
-        self.assertEqual(self.worktree.git_projects[0].src, "baz")
-
-if __name__ == "__main__":
-    unittest.main()
+def test_init_submodules(tmpdir):
+    foo_url = create_git_repo_with_submodules(tmpdir.strpath)
+    worktree = create_worktree(tmpdir)
+    clone_project(worktree, foo_url)
+    foo = worktree.get_project("foo")
+    bar_readme = os.path.join(foo.path, "bar", "README")
+    assert os.path.exists(bar_readme)

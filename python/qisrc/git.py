@@ -60,8 +60,7 @@ class Git:
         Return None if not found
 
         """
-        (status, out) = self.call("config", "--get", name,
-            raises=False)
+        (status, out) = self.call("config", "--get", name, raises=False)
         if status != 0:
             return None
         return out.strip()
@@ -149,6 +148,30 @@ class Git:
     def remote(self, *args, **kwargs):
         """ Wrapper for git remote """
         return self.call("remote", *args, **kwargs)
+
+    def update_submodules(self, raises=True):
+        """ Update submodule, cloning them if necessary """
+        # This will fail if some pushed a broken submodule
+        # (ie git metadata does not match .gitmodules)
+        res, out = self.call("submodule", "status", raises=False)
+        if res != 0:
+            mess  = "Broken submodules configuration detected for %s\n" % self.repo
+            mess += "git status returned %s\n" % out
+            if raises:
+                raise Exception(mess)
+            else:
+                return mess
+        if not out:
+            return
+        res, out = self.call("submodule", "update", "--init", "--recursive",
+                            raises=False)
+        if res == 0:
+            return
+        mess  = "Failed to update submodules\n"
+        mess += out
+        if raises:
+            raise Exception(mess)
+        return mess
 
 
     def get_local_branches(self):
@@ -249,6 +272,9 @@ class Git:
         The string will be empty iv everything went fine.
 
         """
+        mess = self.update_submodules(raises=False)
+        if mess:
+            return mess
         return _update_branch(self, *args, **kwargs)
 
 
