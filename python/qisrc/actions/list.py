@@ -7,12 +7,12 @@
 """
 
 import re
-import qibuild.log
+import os
 
-LOGGER = qibuild.log.get_logger(__name__)
-
+from qibuild import ui
 import qisrc
 import qibuild
+import qibuild.interact
 
 
 def configure_parser(parser):
@@ -23,12 +23,30 @@ def configure_parser(parser):
 
 def do(args):
     """ Main method """
-    qiwt  = qisrc.open_worktree(args.worktree)
+    worktree = qisrc.open_worktree(args.worktree)
     regex = args.pattern
     if args.pattern:
         regex = re.compile(regex)
-    print "Projects in :", qiwt.root
-    print
-    for project in qiwt.projects:
+    mess = [ui.green, "Projects in :", ui.reset, ui.bold, worktree.root]
+    if args.pattern:
+        mess.extend([ui.green, "matching", args.pattern])
+    ui.info(*mess)
+    to_remove = list()
+    for project in worktree.projects:
         if not regex or regex.search(project.src):
-            print project.src
+           ui.info(ui.green, " *", ui.blue, project.src)
+           if not os.path.exists(project.path):
+               to_remove.append(project.src)
+    if not to_remove:
+        return
+    mess = "The following projects:\n"
+    for rm in to_remove:
+        mess += " * " + rm + "\n"
+    mess += "are registered in the worktree, but their paths no longer exists"
+    ui.warning(mess)
+    answer = qibuild.interact.ask_yes_no("Do you want to remove them", default=True)
+    if not answer:
+        return
+    for rm in to_remove:
+        ui.info(ui.green, "Removing", rm)
+        worktree.remove_project(rm)
