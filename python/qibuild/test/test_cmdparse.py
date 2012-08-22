@@ -6,9 +6,12 @@ import argparse
 import os
 import contextlib
 
+import mock
 import pytest
 
 import qibuild.cmdparse
+import qibuild.interact
+from qibuild.test.test_interact import FakeInteract
 
 class FakePackage():
     def __init__(self, name):
@@ -20,6 +23,7 @@ class FakeToolchain():
         self.packages = list()
         for package in packages:
             self.packages.append(FakePackage(package))
+        self.toolchain_file = "toolchain.cmake"
 
     def get(self, name, raises=False):
         matches = [x for x in self.packages if x.name == name]
@@ -210,3 +214,51 @@ def test_project_from_args(tmpdir):
         proj = parse_args(toc, one_proj=True)
         assert proj == "spam"
 
+def test_add_missing_with_cmake_user_enter_default(tmpdir):
+    toc = create_toc(tmpdir)
+    tmpdir.join("other").join("qiproject.xml").write('<project name="other" />\n')
+    tmpdir.join("other").join("CMakeLists.txt").write("\n")
+    fake_interact = FakeInteract({})
+    with change_cwd(toc, "other"):
+        with mock.patch("qibuild.interact", fake_interact):
+            proj = parse_args(toc)
+            other = toc.get_project("other")
+            assert other.name == "other"
+
+def test_add_missing_with_cmake_user_enter_no(tmpdir):
+    toc = create_toc(tmpdir)
+    tmpdir.join("other").join("qiproject.xml").write('<project name="other" />\n')
+    tmpdir.join("other").join("CMakeLists.txt").write("\n")
+    # Check that we get a real error
+    fake_interact = FakeInteract({"to the worktree":False})
+    with change_cwd(toc, "other"):
+        with mock.patch("qibuild.interact", fake_interact):
+            # pylint: disable-msg=E1101
+            with pytest.raises(Exception) as e:
+                proj = parse_args(toc)
+            assert "No such project" in str(e.value)
+
+def test_add_missing_no_cmake(tmpdir):
+    toc = create_toc(tmpdir)
+    tmpdir.join("other").join("qiproject.xml").write('<project name="other" />\n')
+    fake_interact = FakeInteract({})
+    with change_cwd(toc, "other"):
+        with mock.patch("qibuild.interact", fake_interact):
+            # pylint: disable-msg=E1101
+            with pytest.raises(Exception) as e:
+                parse_args(toc)
+            assert "CMakeLists.txt file at the root" in str(e.value)
+            assert "qibuild convert" in str(e.value)
+
+def test_add_missing_bad_parent_proj(tmpdir):
+    toc = create_toc(tmpdir)
+    tmpdir.join("other").join("qiproject.xml").write('<project name="other" />\n')
+    toc.worktree.add_project("other")
+    subproj = tmpdir.join("other").mkdir("subproj")
+    subproj.join("CMakeLists.txt").write("")
+    subproj.join("qiproject.xml").write('<project name="subproj" />\n')
+    fake_interact = FakeInteract({})
+    with change_cwd(toc, "other/subproj"):
+        with mock.patch("qibuild.interact", fake_interact):
+            proj = parse_args(toc)
+            assert toc.get_project("subproj")

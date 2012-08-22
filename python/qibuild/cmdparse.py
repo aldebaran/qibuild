@@ -58,14 +58,14 @@ def parse_project_arg(toc, arg):
     """
     as_path = qibuild.sh.to_native_path(arg)
     if os.path.exists(as_path):
-        p_name = qibuild.project.project_from_dir(as_path, raises=False)
+        p_name = qibuild.project.project_from_dir(toc, directory=as_path, raises=False)
         if p_name:
             return toc.get_project(p_name)
     else:
         # Try a relative path to to root:
         as_path = os.path.join(toc.worktree.root, arg)
         if os.path.exists(as_path):
-            p_name = qibuild.project.project_from_dir(as_path, raises=False)
+            p_name = qibuild.project.project_from_dir(toc, directory=as_path, raises=False)
             if p_name:
                 return toc.get_project(p_name)
 
@@ -84,7 +84,7 @@ def project_from_args(toc, args):
 
     """
     if not args.project:
-        project_arg = qibuild.project.project_from_dir()
+        project_arg = qibuild.project.project_from_dir(toc)
     else:
         project_arg = args.project
     return parse_project_arg(toc, project_arg)
@@ -118,7 +118,7 @@ def deps_from_args(toc, args):
     else:
         if os.getcwd() == toc.worktree.root:
             return(toc.packages, toc.projects)
-        project_args = [qibuild.project.project_from_dir()]
+        project_args = [qibuild.project.project_from_dir(toc)]
 
     # Now project_names is the list of explicitely asked projects
     # or a list of one element containing the guessed project name

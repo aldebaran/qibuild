@@ -20,13 +20,10 @@ The :py:class:`toc` object is able to:
 """
 
 import os
-import qibuild.log
 
+from qibuild import ui
 import qibuild.sh
 import qixml
-
-LOGGER = qibuild.log.get_logger(__name__)
-
 
 class Project:
     """ Store information about a :term:`project`
@@ -132,8 +129,8 @@ def version_from_directory(project_dir):
     match = re.match('^set\(%s_VERSION\s+"?(.*?)"?\s*\)' % up_name,
                      contents)
     if not match:
-        LOGGER.warning("Invalid version.cmake. Should have a line looking like\n"
-           "set(%s_VERSION <VERSION>)",  up_name)
+        ui.warning("Invalid version.cmake. Should have a line looking like\n"
+           "set(%s_VERSION <VERSION>)" % up_name)
         return None
     return match.groups()[0]
 
@@ -281,14 +278,13 @@ def handle_old_manifest(directory):
             with open(project_xml, "w") as fp:
                 fp.write(xml)
 
-def project_from_dir(directory=None, raises=True):
+def project_from_dir(toc, directory=None, raises=True):
     """Return a project name from a directory.
 
     """
     if not directory:
-        head = os.getcwd()
-    else:
-        head = directory
+        directory = os.getcwd()
+    head = directory
     tail = None
     qiproj_xml = None
     while True:
@@ -309,6 +305,116 @@ def project_from_dir(directory=None, raises=True):
             raise Exception(mess)
         else:
             return None
-
     xml_elem = qixml.read(qiproj_xml)
-    return xml_elem.getroot().get("name")
+    project_name = xml_elem.getroot().get("name")
+    if toc.get_project(project_name, raises=False):
+        return project_name
+    mess = """Found a valid qiproject.xml ('{qiproj_xml}')
+while trying to guess a buildable project from the current working dir ('{cwd}')
+But the project name: '{project_name}' does not match any buildable toc project"""
+    mess = mess.format(qiproj_xml=qiproj_xml, cwd=directory, project_name=project_name)
+    ui.warning(mess)
+    project_path = os.path.dirname(qiproj_xml)
+    res = add_missing_buildable_project(toc, project_name, project_path)
+    return res
+
+
+def add_missing_buildable_project(toc, project_name, project_path):
+    """ Do something when we found a qiproject.xml
+    but the project is not a buildable project
+
+    Possible reasons:
+
+      * we need to create a CMakeLists.txt file
+      * we need to patch the qiproject.xml of a parent qibuild project
+      * we need to add the project to worktree.xml instead
+
+    If any case, ask the user before doing anything, but by default
+    try our best so that the command can continue
+
+    """
+    check_parent_project(toc, project_name, project_path)
+    check_worktree(toc, project_name, project_path)
+    check_missing_cmake(toc, project_name, project_path)
+    return toc.get_project(project_name).name
+
+def check_missing_cmake(toc, project_name, project_path):
+    """ Check if the qibuild project was not found because there
+    there was a missing CMakeLists.txt file
+
+    """
+    cmake_lists = os.path.join(project_path, "CMakeLists.txt")
+    if os.path.exists(cmake_lists):
+        return
+    mess = """The project in {project_path}
+does not have a CMakeLists.txt file at the root.
+
+If this is really supposed to be a buildable project, you can run
+   `qibuild convert`  to create a CMakeLists.txt"""
+    raise Exception(mess.format(project_path=project_path))
+
+def check_parent_project(toc, project_name, project_path):
+    """ Check if the qibuild project was not found because
+    there was a missing
+    <project src= ... />  in the parent qiproject.xml file
+
+    """
+    parent_proj = get_parent_project(toc, project_path)
+    if not parent_proj:
+        return
+    parent_qiproj = os.path.join(parent_proj.path, "qiproject.xml")
+    if not os.path.exists(parent_qiproj):
+        return
+    question = "Add the path to project %s to its parent qiproject.xml"
+    question = question % (project_name)
+    answer = qibuild.interact.ask_yes_no(question, default=True)
+    if answer:
+        ui.info("Patching", parent_qiproj)
+        tree = qixml.read(parent_qiproj)
+        child_src = os.path.relpath(project_path, parent_proj.path)
+        child_src = qibuild.sh.to_posix_path(child_src)
+        to_add = qixml.etree.Element("project")
+        to_add.set("src", child_src)
+        tree.getroot().append(to_add)
+        qixml.write(tree, parent_qiproj)
+        toc.projects = list()
+        toc.worktree.load()
+        toc.update_projects()
+
+def check_worktree(toc, project_name, project_path):
+    """ Check if the qibbuild project was not found
+    because the project source is not registered in the
+    current worktree
+
+    return True if the problem was fixed
+
+    """
+    wt_proj = toc.worktree.get_project(project_path, raises=False)
+    if wt_proj:
+        return
+    question = "Add the path to the project %s to the worktree in %s"
+    answer = qibuild.interact.ask_yes_no(question % (project_name, toc.worktree.root),
+                                         default=True)
+    if answer:
+        toc.worktree.add_project(project_path)
+        toc.update_projects()
+
+def get_parent_project(toc, directory):
+    """ Get the full path of a project using cwd
+
+    """
+    head = os.path.dirname(directory)
+    tail = None
+    qiproj_xml = None
+    while True:
+        qiproj_xml = os.path.join(head, "qiproject.xml")
+        if os.path.exists(qiproj_xml):
+            break
+        (head, tail) = os.path.split(head)
+        if not tail:
+            break
+    if qiproj_xml:
+        parent_path = os.path.dirname(qiproj_xml)
+        return toc.worktree.get_project(parent_path, raises=False)
+    else:
+        return None
