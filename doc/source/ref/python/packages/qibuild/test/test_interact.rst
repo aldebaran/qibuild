@@ -51,7 +51,7 @@ The idea is to use a mock object for  this:
 
    def test_serve_breakfast():
         fake_interact = FakeInteract([True])
-        with mock.patch('qibuild.interact') as fake_interact:
+        with mock.patch('qibuild.interact', fake_interact):
             # Every called to `qibuild.interact.ask_*` will be replaced
             # by fake_interact.get_answer()
             # do something with serve_breakfast(), we know that

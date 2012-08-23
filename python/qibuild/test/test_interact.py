@@ -40,20 +40,40 @@ class FakeInteract:
         raise Exception(mess)
 
     def ask_choice(self, choices, message):
-        return self._get_answer(message, choices)
-
+        print "::", message
+        for choice in choices:
+            print "* ", choice
+        answer = self._get_answer(message, choices)
+        print ">", answer
+        return answer
 
     def ask_yes_no(self, message, default=False):
-        return self._get_answer(message, default=default)
+        print "::", message,
+        if default:
+            print "(Y/n)"
+        else:
+            print "(y/N)"
+        answer = self._get_answer(message, default=default)
+        print ">", answer
+        return answer
 
     def ask_path(self, message):
-        return self._get_answer(message)
+        print "::", message
+        answer = self._get_answer(message)
+        print ">", answer
+        return answer
 
     def ask_string(self, message):
-        return self._get_answer(message)
+        print "::", message
+        answer = self._get_answer(message)
+        print ">", answer
+        return answer
 
     def ask_program(self, message):
-        return self._get_answer(message)
+        print "::", message
+        answer =  self._get_answer(message)
+        print ">", answer
+        return answer
 
     def _get_answer(self, message, choices=None, default=None):
         if self.answers_type == "dict":
