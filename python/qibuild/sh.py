@@ -439,7 +439,15 @@ def is_path_inside(a, b):
     >>> is_path_inside("gui/bar/libfoo", "lib")
     False
     """
-    return os.path.commonprefix([a, b]) == b
+    a_split = a.split(os.path.sep)
+    b_split = b.split(os.path.sep)
+    if len(a_split) < len(b_split):
+        return False
+    for (a_part, b_part) in zip(a_split, b_split):
+        if a_part != b_part:
+            return False
+    return True
+
 
 class TempDir:
     """This is a nice wrapper around tempfile module.
