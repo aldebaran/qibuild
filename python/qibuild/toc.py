@@ -306,7 +306,7 @@ You may want to run:
     def get_project(self, project_name, raises=True):
         """ Get a project from a name.
 
-        :return: A vali :py:class:`qibuild.project.Project` instance
+        :return: A valid :py:class:`qibuild.project.Project` instance
         :raise: a TocException if the project was not found
 
         """
@@ -317,6 +317,19 @@ You may want to run:
             raise TocException("No such project: %s" % project_name)
         else:
             return None
+
+    def get_package(self, package_name, raises=True):
+        """
+        :return: A valid :py:class:`qitoolchain.toolchain.Package` instance
+        :raise: a TocException if the project was not found
+
+        """
+        res = [p for p in self.packages if p.name == package_name]
+        if len(res) == 1:
+            return res[0]
+        if raises:
+            raise TocException("No such package: %s" % package_name)
+        return None
 
     def get_sdk_dirs(self, project_name):
         """ Return a list of sdk needed to build a project.

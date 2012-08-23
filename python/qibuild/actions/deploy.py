@@ -60,7 +60,7 @@ def do(args):
         with qibuild.sh.TempDir() as tmp:
             for (i, package) in enumerate(packages):
                 ui.info(ui.green, "*", ui.reset,
-                        "(%i/%i)" % (i+1, len(package.names)),
+                        "(%i/%i)" % (i+1, len(package.name)),
                         ui.green, "Deploying package", ui.blue, package.name,
                         ui.green, "to", ui.blue, url)
                 toc.toolchain.install_package(package.name, tmp, runtime=True)

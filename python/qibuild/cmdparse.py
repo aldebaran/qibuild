@@ -45,7 +45,7 @@ def get_deps(toc, projects, single=False, runtime=False, build_deps=False):
         if name in orig_list:
             r_projects.append(toc.get_project(name))
         elif name in package_names:
-            r_packages.append(toc.toolchain.get(name))
+            r_packages.append(toc.get_package(name))
         elif name in project_names:
             r_projects.append(toc.get_project(name))
     return (r_packages, r_projects)
