@@ -10,6 +10,7 @@
 import os
 
 import qibuild
+from qibuild import ui
 from qibuild.dependencies_solver import topological_sort
 
 def get_deps(toc, projects, single=False, runtime=False, build_deps=False):
@@ -109,15 +110,17 @@ def deps_from_args(toc, args):
           deps (both runtime and buildtime)
 
     """
+    wt_root = toc.worktree.root
     if args.all:
         return(toc.ackages, toc.projects)
     if args.worktree and not args.projects:
-        return(toc.packages, toc.projects)
+        mess  = "Specifying a project name is mandatory when using --worktree"
+        raise Exception(mess)
     if args.projects:
         project_args = args.projects
     else:
-        if os.getcwd() == toc.worktree.root:
-            return(toc.packages, toc.projects)
+        if os.getcwd() == wt_root:
+            no_project_args_on_root(toc.worktree)
         project_args = [qibuild.project.project_from_dir(toc)]
 
     # Now project_names is the list of explicitely asked projects
@@ -129,3 +132,39 @@ def deps_from_args(toc, args):
                     runtime=args.runtime, build_deps=args.build_deps)
     return deps
 
+
+def no_project_args_on_root(worktree):
+    """ Called when user ran a qibuild command at the top
+    of a worktree.
+
+
+    """
+    wt_root = worktree.root
+    qiproj_xml = os.path.join(wt_root, "qiproject.xml")
+    if os.path.exists(qiproj_xml):
+        mess  = """ Found a qiproject.xml at the root of the worktree
+(in {qiproj_xml})
+
+This is not recommended. You should create your worktree at
+the parent directory instead
+
+Please remove {dot_qi} and run:
+
+    cd {parent}
+    qibuild init
+
+to do so
+"""
+        parent = os.path.join(wt_root, "..")
+        parent = os.path.abspath(parent)
+        mess = mess.format(qiproj_xml=qiproj_xml, wt_root=wt_root,
+                           parent=parent,
+                           dot_qi=os.path.join(wt_root, ".qi"))
+
+        ui.warning(mess, end="")
+    else:
+        mess = """No project specified
+Please specify the name or the path of a project
+or go to the subdirectory of a project
+Tip: use `qibuild list' to get the list of known projects"""
+        raise Exception(mess)

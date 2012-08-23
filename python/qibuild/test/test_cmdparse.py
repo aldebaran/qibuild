@@ -124,9 +124,11 @@ def parse_args(toc, *args, **kwargs):
 
 def test_explicit_toc(tmpdir):
     toc = create_toc(tmpdir, packages=["gtest", "png12"])
-    # no project name -> default to all
-    (_, projs) = parse_args(toc, "--worktree", toc.worktree.root)
-    assert len(projs) == 6
+    # no project name -> raises
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        parse_args(toc, "--worktree", toc.worktree.root)
+    assert e.value.message == "Specifying a project name is mandatory when using --worktree"
 
     # invalid name:
     # pylint: disable-msg=E1101
@@ -143,6 +145,16 @@ def test_explicit_toc(tmpdir):
     (packages, projects) = parse_args(toc, "--worktree", toc.worktree.root, "libfoo")
     assert projects == ["libbar", "libfoo"]
     assert packages == ["gtest", "png12"]
+
+
+def test_on_root(tmpdir):
+    toc = create_toc(tmpdir)
+    with change_cwd(toc, "."):
+        # pylint: disable-msg=E1101
+        with pytest.raises(Exception) as e:
+            parse_args(toc)
+        assert "No project specified" in str(e.value)
+
 
 def test_guessing(tmpdir):
     toc = create_toc(tmpdir)
