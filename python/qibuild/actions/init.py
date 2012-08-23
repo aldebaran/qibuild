@@ -75,6 +75,8 @@ If you want to re-initialize the worktree in {parent_worktree}
     toc = qibuild.toc.toc_open(worktree)
 
     if not args.interactive:
+        ui.info(ui.green, "New worktree created in", ui.reset, ui.bold,
+                toc.worktree.root)
         return
 
     qibuild.wizard.run_config_wizard(toc)

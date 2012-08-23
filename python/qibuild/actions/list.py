@@ -7,6 +7,7 @@
 """
 
 import os
+import sys
 import re
 
 
@@ -29,8 +30,10 @@ def configure_parser(parser):
 def do(args):
     """ Main method """
     toc = qibuild.toc.toc_open(args.worktree, args)
-    ui.info(ui.green, "qibuild projects in:", ui.blue, toc.worktree.root)
     projects = toc.projects[:]
+    if not projects:
+        on_empty_toc(toc)
+    ui.info(ui.green, "qibuild projects in:", ui.blue, toc.worktree.root)
     for project in projects:
         project.directory = os.path.relpath(project.directory, toc.worktree.root)
     max_name = max([len(x.name)      for x in projects])
@@ -45,3 +48,17 @@ def do(args):
             items = (project.directory.ljust(max_src + 2), project.name)
         if not regex or regex.search(items[0]) or regex.search(items[1]):
             ui.info(ui.green, " * ", ui.blue, items[0], ui.reset, project.directory, items[1])
+
+
+def on_empty_toc(toc):
+    mess = """The worktree in {worktree.root}
+does not contain any buildable project.
+
+Please use:
+    * `qisrc init` to fetch some sources
+    * `qibuild create` to create a new qibuild project from scratch
+    * `qibuild convert` to convert an exixting CMake project to
+       a qibuild project
+"""
+    ui.warning(mess.format(worktree=toc.worktree))
+    sys.exit(0)

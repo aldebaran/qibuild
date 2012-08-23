@@ -8,6 +8,7 @@
 
 import re
 import os
+import sys
 
 from qibuild import ui
 import qisrc
@@ -24,6 +25,8 @@ def configure_parser(parser):
 def do(args):
     """ Main method """
     worktree = qisrc.open_worktree(args.worktree)
+    if not worktree.projects:
+        on_empty_worktree(worktree)
     regex = args.pattern
     if args.pattern:
         regex = re.compile(regex)
@@ -50,3 +53,14 @@ def do(args):
     for rm in to_remove:
         ui.info(ui.green, "Removing", rm)
         worktree.remove_project(rm)
+
+def on_empty_worktree(worktree):
+    mess = """The worktree in {worktree.root}
+does not contain any project.
+
+Please use:
+    * `qisrc init` to fetch some sources
+    * `qisrc add` to register a new project path to this worktree
+"""
+    ui.warning(mess.format(worktree=worktree))
+    sys.exit(0)
