@@ -194,7 +194,7 @@ def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
     else:
         # assume native toolchain
         sysroot = "\"\""
-        gdb = find_program("gdb")
+        gdb = qibuild.command.find_program("gdb")
         if gdb:
             message = "Native build. Using the debugger provided by the system."
         else:
