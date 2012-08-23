@@ -4,8 +4,8 @@ Changelog
 =========
 
 
-1.16
-----
+Upcoming release
+-----------------
 
 
 Command line
@@ -16,24 +16,39 @@ Command line
 * Added a lot of short options ("-n" for "--dry-run", "-f" for "--force")
 * ``qibuild init``: add a ``--config`` argument to set the default config used by
   the worktree
+* ``qibuild``: improve argument parsing.
+
+  * Do not configure everything when running ``qibuild configure`` from an unknown subdirectory
+  * Automatically add projects to the worktree when running ``qibuild configure`` for a project
+    not yet added to the worktree
+  * qibuild commands now accepts both project names and project paths
+
+* ``qibuild``: change dependency resolution
+
+  * Now take both build dependencies and runtime dependencies into account by default.
+    Use ``--build-deps`` to get only the build dependencies.
+
 * ``qidoc`` by-pass sphinx-build bug on mac
 * ``qidoc`` make it work on archlinux  (using sphinx-build2 by default)
 * Added ``qidoc open`` to view generated documentation in a web browser
-* Added ``qidoc list`` list the known documentation projects in a wortree
+* Added ``qidoc list`` list the known documentation projects in a worktree
 * ``qitoolchain list`` better error message when there is no toolchain
 * ``qidoc build`` improve argument parsing, smarter when no argument is given,
   can build a doc project by passing its name
-* Added ``qisrc remove-project``
-* Added ``qisrc add-project`` : projects are no longer automatically added in the wortree.
-  (Should probably be merged with ``qisrc add``)
+* Added ``qisrc remove``
 * Added ``qisrc list`` list the projects paths of a worktree
-* Added ``qisrc grep`` to grep on every porject of a worktree
+* Added ``qisrc grep`` to grep on every project of a worktree
 * Added ``qicd`` (inspired by ``roscd``)
 * ``qisrc init`` can now be used with a git url (git@foo:manifest.git) (ala repo)
 * ``qisrc init`` : add ``-p,  --profile`` option to choose from several profiles  (different xml files in the git url)
 * ``qisrc init`` : add ``-b, --branch`` option to choose a branch in the manifest url
 * ``qisrc status`` : now also display a message when the current branch is ahead or behind the remote branch
-* Added ``qsrc sync`` : configure local and remote branches, automatically setup code review
+* Added ``qsrc sync``
+
+  * configure local and remote branches
+  * automatically setup code review
+  * automatically synchronize git submodules
+
 * Added ``qisrc push`` : upload changes to code review
 * Added ``qibuild deploy``, to deploy code to a remote device
 * ``qibuild test``: learned ``--slow``
@@ -82,15 +97,18 @@ Python
 * :py:meth:`qisrc.git.Git.get_current_branch` : return None when in 'detached HEAD' state
 * :py:func:`qibuild.command.call` learned ``quiet`` option
 * Usage of ``qibuild.log`` and ``logging.py`` has been deprecated, use :py:mod:`qibuild.ui` instead
-* ``qibuild.toc.test_project`` has been removed, use :py:mod:`qibuild.ctest` instead
+* ``toc.test_project`` has been removed, use :py:mod:`qibuild.ctest` instead
+* ``toc.resolve_deps`` has been removed, use :py:func:`qibuild.cmdparse.deps_from_args` instead
 * :py:meth:`qisrc.git.get_current_branch` : return None when in 'detached HEAD' state
 * Add :py:mod:`qixml` to help XML parsing, get rid of ``lxml`` dependency
 * :py:func:`qibuild.command.call` add ``quiet`` option
 * Remove usage of ``qibuild.log`` and ``logging.py`` to display nice colorized messages
   to the console, use ``qibuild.ui`` module.
 * Refactoring of the whole module ``qibuild.archive``:
+
   * Non-compatible APIs
   * Removed APIs:
+
     * :py:func:`qibuild.archive.extracted_name`
     * :py:func:`qibuild.archive.archive_name`
     * :py:func:`qibuild.archive.extract_tar`: use :py:func:`qibuild.archive.extract` instead
@@ -99,14 +117,19 @@ Python
     * :py:func:`qibuild.archive.zip_unix`: use :py:func:`qibuild.archive.compress` instead
     * :py:func:`qibuild.archive.zip_win`: use :py:func:`qibuild.archive.compress` instead
   * New APIs:
+
     * :py:func:`qibuild.archive.compress`: include ``algo`` option, which is set
       to  ``zip`` when unspecified
     * :py:func:`qibuild.archive.guess_algo`: guessing the compression method
       from the archive extension
+
   * Updated APIs:
+
     * :py:func:`qibuild.archive.extract`:
+
       * support for the ``topdir`` option has been removed
       * add ``algo`` option, when unspecified ``algo`` is set to ``zip`` on all platform
+
 * Added :py:mod:`qibuild.cmake.modules` to handle CMake module generation
 * Renamed :py:mod:`qibuild.cmdparse` to :py:mod:`qibuild.script`
 * :py:mod:`qibuild.cmdparse` now centralize the parsing of qibuild actions arguments

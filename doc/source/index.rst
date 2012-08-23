@@ -1,5 +1,3 @@
-
-
 .. toctree::
   :hidden:
 
@@ -11,7 +9,6 @@
   design/index
   other_build_frameworks
   relnotes
-  changelog
   news/index
 
 
@@ -138,6 +135,9 @@ updates concerning your changes.
 
    contrib/writing_documentation
 
+If you are using qibuild from the git repository,
+have a look at the :ref:`qibuild-cooking` section
+first.
 
 
 qiBuild design

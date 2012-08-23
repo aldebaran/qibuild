@@ -7,6 +7,4 @@ Contributing to qiBuild
    reporting_bugs
    cmake/coding_guide
    python/coding_guide
-
-
-
+   cooking

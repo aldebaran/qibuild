@@ -13,3 +13,6 @@ What's new in qiBuild 1.14
 * Fixed performance issues when calling ``cmake ..`` (something you often
   do when using QtCreator, for instance) after the first `qibuild configure`.
 
+* Added support for other 3rd party binary packages. You can now use
+  `qibuild import-package` to import a gentoo binary packages to a qibuild
+  toolchain.
