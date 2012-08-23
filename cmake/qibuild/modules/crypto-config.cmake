@@ -11,3 +11,5 @@ else()
   flib(CRYPTO ssl)
 endif()
 export_lib(CRYPTO)
+qi_warning("The crypto-config.cmake module is deprecated,
+use qi_use_lib(... OPENSSL) instead")
