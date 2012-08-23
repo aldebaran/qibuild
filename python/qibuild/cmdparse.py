@@ -112,7 +112,7 @@ def deps_from_args(toc, args):
     """
     wt_root = toc.worktree.root
     if args.all:
-        return(toc.ackages, toc.projects)
+        return(toc.packages, toc.projects)
     if args.worktree and not args.projects:
         mess  = "Specifying a project name is mandatory when using --worktree"
         raise Exception(mess)
