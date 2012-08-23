@@ -301,6 +301,11 @@ class Toolchain:
             'package "%s"' % package.name,
             "sysroot",
             package.sysroot)
+        if package.cross_gdb:
+            qibuild.configstore.update_config(config_path,
+            'package "%s"' % package.name,
+            "cross_gdb",
+            package.cross_gdb)
         self.load_config()
 
     def remove_package(self, name):
