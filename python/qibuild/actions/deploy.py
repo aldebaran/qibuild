@@ -72,6 +72,7 @@ def do(args):
         ui.info(ui.green, ":: ", "Deploying projects")
     # Deploy projects: install them inside a 'deploy' dir inside the build dir,
     # then deploy this dir to the target
+    deployed_list = list()
     for (i, project) in enumerate(projects):
         ui.info(ui.green, "*", ui.reset,
                 "(%i/%i)" % (i+1, len(projects)),
@@ -84,4 +85,35 @@ def do(args):
                             runtime=True, num_jobs=args.num_jobs,
                             split_debug=True)
         qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)
-        qibuild.deploy.generate_debug_scripts(toc, project.name, args.url)
+        gdb_script, message = qibuild.deploy.generate_debug_scripts(toc, project.name,
+                                                                    args.url,
+                                                                    deploy_dir=destdir)
+
+        bindir = os.path.join(destdir, "bin")
+        binaries = list()
+        if os.path.exists(bindir):
+            binaries = [x for x in os.listdir(bindir)]
+            binaries = [x for x in binaries if os.path.isfile(os.path.join(bindir, x))]
+            binaries = [os.path.join("bin", x) for x in binaries]
+        deployed_list.append((project, binaries, gdb_script, message))
+    ui.info(ui.green, ":: ", "Deployed projects")
+    for (i, deployed) in enumerate(deployed_list):
+        project, binaries, gdb_script, message = deployed
+        if not binaries:
+            ui.info(ui.green, "*", ui.reset,
+                    "(%i/%i)" % (i+1, len(projects)),
+                    ui.green, "Project", ui.blue, project.name,
+                    ui.green, "- No executable deployed")
+            continue
+        binaries = "\n".join(["    %s" % bin_ for bin_ in binaries])
+        ui.info(ui.green, "*", ui.reset,
+                "(%i/%i)" % (i+1, len(projects)),
+                ui.green, "Project", ui.blue, project.name,
+                ui.green, "- Deployed binaries:",
+                ui.reset, "\n%s" % binaries)
+        if gdb_script:
+            ui.info(ui.green, "*", ui.reset,
+                    "To remotely debug a binary from the above list, run:")
+            ui.info("    %s <binary>" % gdb_script)
+        else:
+            ui.warning(message)
