@@ -78,22 +78,33 @@ class ProcessThread(threading.Thread):
 
 class CommandFailedException(Exception):
     """Custom exception """
-    def __init__(self, cmd, returncode, cwd=None):
+    def __init__(self, cmd, returncode, cwd=None, stdout=None, stderr=None):
         self.cmd = cmd
+        self.cwd = cwd
         if cwd is None:
             self.cwd = os.getcwd()
-        else:
-            self.cwd = cwd
         self.returncode = returncode
+        self.stdout = stdout
+        if stdout is None:
+            self.stdout = ""
+        self.stderr = stderr
+        if stderr is None:
+            self.stderr = ""
 
     def __str__(self):
         mess  = """The following command failed
 {cmd}
 Return code is {returncode}
 Working dir was {cwd}
+Stdout:
+{stdout}
+Stderr:
+{stderr}
 """
-        return mess.format(cmd=self.cmd, returncode=self.returncode, cwd=self.cwd)
-
+        stdout = "\n".join(["    " + line for line in self.stdout.split("\n")])
+        stderr = "\n".join(["    " + line for line in self.stderr.split("\n")])
+        return mess.format(cmd=self.cmd, returncode=self.returncode, cwd=self.cwd,
+                           stdout=stdout, stderr=stderr)
 
 class ProcessCrashedError(Exception):
     """An other custom exception, used by call_background """
