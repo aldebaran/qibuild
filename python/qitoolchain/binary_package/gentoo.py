@@ -59,5 +59,8 @@ class GentooPackage(BinaryPackage):
         if not os.path.exists(dest_dir):
             mess = 'No such file or directory: %s' % dest_dir
             raise Exception(mess)
-        root_dir =  qibuild.archive.extract(self.path, dest_dir, algo="bzip2", quiet=True)
+        discard_pattern = "trailing garbage after EOF ignored"
+        root_dir =  qibuild.archive._extract_tar(self.path, dest_dir, algo="bzip2",
+                                                 quiet=True, verbose=False,
+                                                 output_filter=discard_pattern)
         return root_dir
