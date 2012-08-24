@@ -22,8 +22,8 @@ Installation
 
 Get the source code from github: https://github.com/aldebaran/qibuild
 
-Linux, mac
-++++++++++
+Linux
++++++
 
 Simply run:
 
@@ -33,7 +33,39 @@ Simply run:
 
 And make sure ``~/.local/bin`` is in your ``PATH``
 
-On mac, make sure ``cmake`` is in your path.
+Also install ``CMake`` and the various tools for compiling
+
+.. code-block:: console
+
+  # On ubuntu
+  $ sudo apt-get install cmake build-essential
+
+Mac
++++
+
+On Mac, install ``CMake`` from CMake website:
+http://www.cmake.org/cmake/resources/software.html
+
+During CMake installation, you will be asked to choose a
+path to install command line links:
+
+.. image:: /pics/cmake-install-command-links.png
+
+Just choose the default path.
+
+(qibuild cannot work without CMake installed this way)
+
+Then install XCode.
+
+Starting with XCode4, the command line compile tools
+(gcc, make, and so on), are not installed by default and CMake cannot
+work without them.
+
+Go to Preferences/Downloads/Components and install
+the command line tools form here:
+
+.. image:: /pics/install-command-line-tools.png
+
 
 Note that if you are in a distribution where Python3 is the default,
 you should use
