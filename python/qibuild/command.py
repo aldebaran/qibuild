@@ -172,12 +172,14 @@ def find_program(executable, env=None, raises=False):
     return None
 
 
+## Implementation widely inspired by the python-2.7 one.
 def check_output(*popenargs, **kwargs):
     """Run command with arguments and return its output as a byte string.
 
-    If the exit code was non-zero it raises a CalledProcessError.  The
-    CalledProcessError object will have the return code in the returncode
-    attribute and output in the output attribute.
+    If the exit code was non-zero it raises a CommandFailedException. The
+    CommandFailedException object will have the return code in the returncode
+    attribute, output in the stdout attribute and error in the stderr
+    attribute.
 
     The arguments are the same as for the Popen constructor.  Example:
 
@@ -192,20 +194,27 @@ def check_output(*popenargs, **kwargs):
     ...              stderr=STDOUT)
     'ls: non_existent_file: No such file or directory\n'
     """
+    cwd = kwargs.get('cwd')
     if sys.version_info <= (2, 7):
         if 'stdout' in kwargs:
             raise ValueError('stdout argument not allowed, it will be overridden.')
         process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
-        output, unused_err = process.communicate()
+        output, error = process.communicate()
         retcode = process.poll()
         if retcode:
             cmd = kwargs.get("args")
             if cmd is None:
                 cmd = popenargs[0]
-                raise subprocess.CalledProcessError(retcode, cmd, output=output)
-        return output
+            raise CommandFailedException(cmd, retcode, cwd=cwd,
+                                         stdout=output, stderr=error)
     else:
-        return subprocess.check_output(*popenargs, **kwargs)
+        try:
+            output = subprocess.check_output(*popenargs, **kwargs)
+        except subprocess.CalledProcessError as err:
+            raise CommandFailedException(err.cmd, err.returncode,
+                                         cwd=cwd, stdout=err.output)
+    return output
+
 
 
 def check_is_in_path(executable, build_env=None):
