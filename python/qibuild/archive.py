@@ -208,7 +208,7 @@ def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None):
     return cmd
 
 
-def _compress_tar(directory, archive_basepath, algo, quiet, verbose):
+def _compress_tar(directory, archive_basepath, algo, quiet, verbose, output_filter=None):
     """Compress directory in a .tar.* archive
 
     :param directory:        directory to add to the archive
@@ -242,12 +242,13 @@ def _compress_tar(directory, archive_basepath, algo, quiet, verbose):
         mess += e.output
         raise Exception(mess)
     if verbosity:
-        for line in output:
-            print line.strip()
+        for line in output.split():
+            if output_filter and not re.search(output_filter, line):
+                print line.strip()
     return archive_path
 
 
-def _extract_tar(archive, directory, algo, quiet, verbose):
+def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):
     """Extract a .tar.* archive into directory
 
     :param archive:   path of the archive
@@ -300,8 +301,9 @@ def _extract_tar(archive, directory, algo, quiet, verbose):
         mess += e.output
         raise Exception(mess)
     if verbosity:
-        for line in output:
-            print line.strip()
+        for line in output.split():
+            if output_filter and not re.search(output_filter, line):
+                print line.strip()
     return destdir
 
 
