@@ -24,6 +24,7 @@ To enforce platform interoperability, zip archive does:
 """
 
 import os
+import re
 import sys
 import posixpath
 import operator
@@ -63,11 +64,16 @@ def _compress_zip(directory, archive_basepath, quiet, verbose):
 
     :param directory:        directory to add to the archive
     :param archive_basepath: output archive basepath (without extension)
-    :param quiet:            quiet mode
+    :param quiet:            quiet mode (print nothing)
 
     :return: path to the generated archive (archive_basepath.zip)
 
     """
+    if quiet and verbose:
+        mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
+Please set only one of these two options to 'True'
+"""
+        raise ValueError(mess)
     archive_path = archive_basepath + ".zip"
     qibuild.ui.debug("Compressing %s to %s", directory, archive_path)
     archive = zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED)
@@ -90,11 +96,17 @@ def _extract_zip(archive, directory, quiet, verbose):
 
     :param archive:   path of the archive
     :param directory: extract location
-    :param quiet:     quiet mode
+    :param quiet:     quiet mode (print nothing)
+    :param verbose:   verbose mode (print all the archive content)
 
     :return: path to the extracted archive (directory/topdir)
 
     """
+    if quiet and verbose:
+        mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
+Please set only one of these two options to 'True'
+"""
+        raise ValueError(mess)
     qibuild.ui.debug("Extracting %s to %s", archive, directory)
     archive_ = zipfile.ZipFile(archive)
     members  = archive_.infolist()
@@ -214,11 +226,18 @@ def _compress_tar(directory, archive_basepath, algo, quiet, verbose, output_filt
     :param directory:        directory to add to the archive
     :param archive_basepath: output archive basepath (without extension)
     :param algo:             compression method
-    :param quiet:            quiet mode
+    :param quiet:            quiet mode (print nothing)
+    :param verbose:          verbose mode (print all the archive content)
+    :param output_filter:    regex aplied on all outputs
 
     :return: path to the generated archive (archive_basepath.tar.*)
 
     """
+    if quiet and verbose:
+        mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
+Please set only one of these two options to 'True'
+"""
+        raise ValueError(mess)
     archive_path = archive_basepath + ".tar"
     if algo == "tar":
         pass
@@ -231,19 +250,21 @@ def _compress_tar(directory, archive_basepath, algo, quiet, verbose, output_filt
     else:
         archive_path += "." + algo
     qibuild.ui.debug("Compressing %s to %s", directory, archive_path)
-    verbosity = not quiet or verbose
-    cmd = _get_tar_command("compress", algo, archive_path, directory, verbosity)
+    cmd = _get_tar_command("compress", algo, archive_path, directory, quiet)
     try:
-        output = qibuild.command.check_output(cmd, stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as e:
+        if verbose:
+            printed = qibuild.command.check_output(cmd, stderr=subprocess.STDOUT)
+        else:
+            unused_output, printed = qibuild.command.check_output_error(cmd)
+    except qibuild.command.CommandFailedException as err:
         mess  = "Could not compress directory %s\n" % directory
         mess += "(algo: %s)\n" % algo
         mess += "Calling tar failed\n"
-        mess += e.output
+        mess += str(err)
         raise Exception(mess)
-    if verbosity:
-        for line in output.split():
-            if output_filter and not re.search(output_filter, line):
+    if not quiet:
+        for line in str(printed).split("\n"):
+            if not output_filter or not re.search(output_filter, line):
                 print line.strip()
     return archive_path
 
@@ -254,11 +275,18 @@ def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):
     :param archive:   path of the archive
     :param directory: extract location
     :param algo:      uncompression method
-    :param quiet:     quiet mode
+    :param quiet:     quiet mode (print nothing)
+    :param verbose:   verbose mode (print all the archive content)
+    :param output_filter:  regex aplied on all outputs
 
     :return: path to the extracted archive (directory/topdir)
 
     """
+    if quiet and verbose:
+        mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
+Please set only one of these two options to 'True'
+"""
+        raise ValueError(mess)
     # Because "zip" is the standard qiBuild archive format,
     # do no fancy things but calling "tar", with its default
     # outputs (no progress bar).
@@ -289,20 +317,21 @@ def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):
         destdir   = directory
     else:
         destdir   = os.path.join(directory, topdir)
-    verbosity = not quiet or verbose
-    cmd = _get_tar_command("extract", algo, archive, directory, verbosity,
-                           add_opts=opts)
+    cmd = _get_tar_command("extract", algo, archive, directory, quiet, add_opts=opts)
     qibuild.sh.mkdir(directory)
     try:
-        output = qibuild.command.check_output(cmd, stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as e:
+        if verbose:
+            printed = qibuild.command.check_output(cmd, stderr=subprocess.STDOUT)
+        else:
+            unused_output, printed = qibuild.command.check_output_error(cmd)
+    except qibuild.command.CommandFailedException as err:
         mess  = "Could not extract %s to %s\n" % (archive, directory)
         mess += "Calling tar failed\n"
-        mess += e.output
+        mess += str(err)
         raise Exception(mess)
-    if verbosity:
-        for line in output.split():
-            if output_filter and not re.search(output_filter, line):
+    if not quiet:
+        for line in str(printed).split("\n"):
+            if not output_filter or not re.search(output_filter, line):
                 print line.strip()
     return destdir
 
@@ -313,11 +342,17 @@ def compress(directory, archive=None, algo="zip", quiet=False, verbose=False):
     :param directory: directory to add to the archive
     :param archive:   output archive basepath
     :param algo:      compression method (default: zip)
-    :param quiet:     quiet mode (default: True)
+    :param quiet:     silent mode (default: False)
+    :param verbose:   verbose mode, print all the archive content (default: False)
 
     :return: path to the generated archive (archive_basepath.tar.*)
 
     """
+    if quiet and verbose:
+        mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
+Please set only one of these two options to 'True'
+"""
+        raise ValueError(mess)
     _check_algo(algo)
     directory = qibuild.sh.to_native_path(directory)
     directory = os.path.abspath(directory)
@@ -345,9 +380,8 @@ def extract(archive, directory, algo=None, quiet=False, verbose=False):
     :param archive:   path of the archive
     :param directory: extract location
     :param algo:      uncompression method (default: guessed from the archive name)
-    :param quiet:     quiet mode
-    :param topdir:    name of top directory of the extracted content
-                      (deprecated)
+    :param quiet:     silent mode (default: False)
+    :param verbose:   verbose mode, print all the archive content (default: False)
 
     :return: path to the extracted archive (directory/topdir)
 
