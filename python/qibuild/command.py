@@ -216,6 +216,51 @@ def check_output(*popenargs, **kwargs):
     return output
 
 
+def check_output_error(*popenargs, **kwargs):
+    """Run command with arguments and return its output and error as a byte string.
+
+    If the exit code was non-zero it raises a CalledProcessError.  The
+    CalledProcessError object will have the return code in the returncode
+    attribute and error concatened at the end of output in the output attribute.
+
+    The arguments are the same as for the Popen constructor.  Examples:
+
+    >>> check_output_error(["tar", "tf", "foo.tbz2"])
+    ('./\n./usr/\n./usr/bin/\n./usr/bin/foo\n',
+     '\nbzip2: (stdin): trailing garbage after EOF ignored\n')
+
+    >>> try:
+    ...     qibuild.command.check_output_error(['tar', '--bzip2', '-tf', 'foo.tar.gz'])
+    ... except subprocess.CalledProcessError as e:
+    ...     print e
+    The following command failed
+    ['tar', '--bzip2', '-tf', 'foo.tar.gz']
+    Return code is 2
+    Working dir was /tmp
+    Stdout:
+
+    Stderr:
+        bzip2: (stdin) is not a bzip2 file.
+        tar: Child returned status 2
+        tar: Error is not recoverable: exiting now
+
+    The stdout and stderr arguments are not allowed as they are used internally.
+
+    """
+    if 'stdout' in kwargs:
+        raise ValueError('stdout argument not allowed, it will be overridden.')
+    if 'stderr' in kwargs:
+        raise ValueError('stderr argument not allowed, it will be overridden.')
+    process = subprocess.Popen(stdout=subprocess.PIPE, stderr=subprocess.PIPE, *popenargs, **kwargs)
+    output, error = process.communicate()
+    retcode = process.poll()
+    if retcode:
+        cmd = kwargs.get("args")
+        if cmd is None:
+            cmd = popenargs[0]
+        raise CommandFailedException(cmd, retcode, stdout=output, stderr=error)
+    return (output, error)
+
 
 def check_is_in_path(executable, build_env=None):
     """Check that the given executable is to be found in %PATH%"""
