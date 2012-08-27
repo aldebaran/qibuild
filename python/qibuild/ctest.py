@@ -97,6 +97,7 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, va
     ncmd = cmd
 
     if valgrind:
+        env['VALGRIND'] = '1'
         valgrind_log = os.path.join(build_dir, test_name + "valgrind_output.log")
         ncmd = [ "valgrind", "--track-fds=yes", "--log-file=%s" % valgrind_log ]
         ncmd.extend(cmd)
