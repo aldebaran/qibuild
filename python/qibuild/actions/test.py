@@ -17,9 +17,9 @@ def configure_parser(parser):
     parser.add_argument("project", nargs="?")
     parser.add_argument("-k", "--pattern", dest="pattern",
                         help="Filter tests matching this pattern")
-    parser.add_argument("-n" , "--dry-run", dest="dry_run",
+    parser.add_argument("-l", "--list", dest="dry_run",
                         action="store_true",
-                        help="Just list what tests would be run")
+                        help="List what tests would be run")
     parser.add_argument("--slow", action="store_true",
                         help="Also run slow tests")
     parser.add_argument("-V", action="store_true", dest="verbose_tests",
