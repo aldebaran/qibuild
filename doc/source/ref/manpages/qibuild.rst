@@ -54,6 +54,9 @@ package PROJECT
   Generate a pre-compiled archive of the project.
   Archive will be generated in ``QI_WORK_TREE/package/``
 
+deploy [PROJECT] URL
+  Deploy a project on the remote target reachable at URL
+
 
 OPTIONS
 -------

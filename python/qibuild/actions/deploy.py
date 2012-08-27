@@ -2,7 +2,23 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-"""Deploy code to a remote target """
+"""Deploy project(s) on a remote target
+
+All deployed material is installed in the location 'path' on
+the target 'hostname'.
+
+Examples:
+
+  qibuild deploy foobar john@mytarget:deployed
+
+Installs everything on the target 'mytarget' in the
+'deployed' directory from the 'john' 's home.
+
+  qibuild deploy foobar john@mytarget:/tmp/foobar
+
+Installs everything on the target 'mytarget' in the
+'/tmp/foobar' directory.
+"""
 
 import os
 
@@ -16,7 +32,7 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.project_parser(parser)
     qibuild.parsers.build_parser(parser)
-    parser.add_argument("url", help="remote url: user@hostname:path")
+    parser.add_argument("url", help="remote target url: user@hostname:path")
     parser.add_argument("-p", "--port", help="port", type=int)
     parser.set_defaults(port=22)
 
