@@ -149,7 +149,7 @@ def update_project(project, toc):
     if singlebdir:
         singlebdir = os.path.expanduser(singlebdir)
         if not os.path.isabs(singlebdir):
-            singlebdir = os.path.join(toc.worktree.root.root, singlebdir)
+            singlebdir = os.path.join(toc.worktree.root, singlebdir)
         bname = os.path.join("build-%s" % (toc.build_folder_name), project.name)
         project.build_directory = os.path.normpath(os.path.join(singlebdir, bname))
     else:
