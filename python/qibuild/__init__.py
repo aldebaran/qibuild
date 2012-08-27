@@ -14,6 +14,7 @@ import qibuild.log
 from qibuild import archive
 from qibuild import build
 from qibuild import cmake
+from qibuild import cmdparse
 from qibuild import command
 from qibuild import config
 from qibuild import configstore
