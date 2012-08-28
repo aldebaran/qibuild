@@ -37,6 +37,8 @@ import-package -c TOOLCHAIN_NAME [PACKAGE_NAME] PACKAGE_PATH
 remove-package -c TOOLCHAIN_NAME PACKAGE_NAME
   remove the package from the toolcain
 
+Note: to use host native toolchain (i.e. the default compiler installed on the system),
+you should pass the ``-c system`` option.
 
 Note: to use a toolchain, you must pass the ``-c`` option to your
 ``qibuild`` action, or set a default toolchain in the
