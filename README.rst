@@ -68,5 +68,5 @@ qiBuild contains work from
 Maintainers
 ------------
 
-Dimitri Merejkowsky <dmerejkowsky@aldebaran-robotics.com>
-Cedric Gestes <gestes@aldebaran-robotics.com>
+* Dimitri Merejkowsky <dmerejkowsky@aldebaran-robotics.com>
+* Cedric Gestes <gestes@aldebaran-robotics.com>
