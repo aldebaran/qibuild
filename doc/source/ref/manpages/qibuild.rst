@@ -35,8 +35,8 @@ create PROJECT
 
 
 All following command accept a ``-c,--config`` argument which should be
-the name a a toolchain.
-(see :ref:`qitoolchain-man-page`)
+the name a a toolchain (``-c system`` to use the native toolchain).
+See :ref:`qitoolchain-man-page`.
 
 configure [PROJECT]
   Configure a project.
@@ -101,4 +101,3 @@ EXIT STATUS
 
 2
     Failure
-
