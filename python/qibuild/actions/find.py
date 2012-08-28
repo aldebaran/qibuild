@@ -19,7 +19,7 @@ def configure_parser(parser):
     parser.add_argument("--libs",
         help="Ouputs required linnker flags")
     parser.add_argument("package")
-    parser.add_argument("project_name", nargs="?", metavar="project",
+    parser.add_argument("project", nargs="?", metavar="project",
         help="The name of a project")
     parser.set_defaults(quiet=True)
 
