@@ -21,7 +21,7 @@ https://groups.google.com/a/aldebaran-robotics.com/group/qibuild-dev/topics
 Documentation
 -------------
 
-http://www.aldebaran-robotics.com/documentation/qibuild/index.html
+http://developer.aldebaran-robotics.com/doc/qibuild/
 
 Installation
 ------------
