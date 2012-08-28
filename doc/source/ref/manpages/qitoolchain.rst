@@ -25,7 +25,6 @@ update NAME
   update a toolchain using the last feed
 
 convert-package [NAME] PACKAGE_PATH
-
   turn a package (binary archive or install directory) into a qiBuild package
 
   Current supported binary package formats:
