@@ -130,7 +130,7 @@ def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, va
     if process_thread.isAlive():
         process.terminate()
         res.ok = False
-        res.message =  "Timed out (%i s)" % timeout
+        res.message =  "Timed out (%is)" % timeout
     else:
         retcode = process.returncode
         if retcode == 0:
@@ -219,7 +219,7 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
             ui.info(ui.green, "[OK]")
         else:
             ok = False
-            ui.info(ui.red, "[FAIL]")
+            ui.info(ui.red, "[FAIL]", test_res.message)
             if not verbose:
                 print test_res.out
             fail_tests.append(test_name)
