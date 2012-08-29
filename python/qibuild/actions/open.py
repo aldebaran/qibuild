@@ -73,8 +73,10 @@ def do(args):
         if not answer:
             sys.exit(2)
         else:
-            qibuild.run_action("qibuild.actions.configure",
-                [project.name, "--config", toc.active_config])
+            args = [project.name]
+            if toc.active_config:
+              args.extend(["--config", toc.active_config])
+            qibuild.run_action("qibuild.actions.configure", args)
 
     error_message = "Could not open project %s\n" % project.name
     qibuild_cfg = qibuild.config.QiBuildConfig(user_config=toc.active_config)
