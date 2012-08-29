@@ -31,7 +31,7 @@ The CMake framework is composed of two parts:
 
 But of course, the main feature of the qiBuild CMake
 framework is to allow you to easily manage dependencies
-between project.
+between projects.
 
 For a more detailed description of how this works,
 please read the :ref:`qibuild-cmake-design` section.
