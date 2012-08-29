@@ -18,9 +18,9 @@ import qibuild
 def configure_parser(parser):
     """ Configure parser for this action """
     qibuild.parsers.toc_parser(parser)
-    parser.add_argument("-n", action="store_true", dest="names",
+    parser.add_argument("-n", "--names", action="store_true", dest="names",
                         help="sort by names")
-    parser.add_argument("-p", action="store_false", dest="names",
+    parser.add_argument("-p", "--paths", action="store_false", dest="names",
                         help="sort by path")
     parser.add_argument("pattern", metavar="PATTERN", nargs="?",
                         help="pattern to be matched")
@@ -47,7 +47,7 @@ def do(args):
         else:
             items = (project.directory.ljust(max_src + 2), project.name)
         if not regex or regex.search(items[0]) or regex.search(items[1]):
-            ui.info(ui.green, " * ", ui.blue, items[0], ui.reset, project.directory, items[1])
+            ui.info(ui.green, " * ", ui.blue, items[0], ui.reset, items[1])
 
 
 def on_empty_toc(toc):
