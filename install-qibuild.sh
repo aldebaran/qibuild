@@ -80,6 +80,5 @@ create_launcher python/bin/qicd.py      qicd.py
 #aliases
 create_launcher python/bin/qibuild      qc           configure
 create_launcher python/bin/qibuild      qm           make
-create_launcher python/bin/qisrc        qp           pull --rebase
 create_launcher python/bin/qibuild      qo           open
 echo "Make sure ${DESTDIR} is in your PATH."
