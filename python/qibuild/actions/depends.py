@@ -52,7 +52,7 @@ def do(args):
         if args.projects:
             args.project = args.projects[0]
         else:
-            args.projects = None
+            args.project = None
         project = qibuild.cmdparse.project_from_args(toc, args)
         projects = [project]
 
