@@ -567,7 +567,7 @@ Try configuring and building the project first.
             mess += "CMAKE_INSTALL_PREFIX is already correct"
             ui.debug(mess)
 
-        if not self.using_visual_studio and not self.cmake_generator == "Xcode":
+        if "Unix Makefiles" in self.cmake_generator:
             self.build_project(project, target="preinstall", num_jobs=num_jobs,
                                fix_shared_libs=False)
 
