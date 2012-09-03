@@ -81,18 +81,20 @@ def _fix_package_tree(root_dir):
     """ Make the package tree comply with qiBuild.
 
     """
-    usr_dir = os.path.join(root_dir, 'usr')
-    if not os.path.exists(usr_dir):
+    # move stuff from usr/lib to lib
+    # this is just for qibuild deploy to work,
+    # we could do better with cmake.
+    usr_lib = os.path.join(root_dir, "usr/lib")
+    if not os.path.exists(usr_lib):
         return
-    for item in os.listdir(usr_dir):
-        src = os.path.join(root_dir, 'usr', item)
-        dst = os.path.join(root_dir, item)
-        if os.path.exists(dst):
-            mess = "Destination already exists"
-            raise Exception(mess)
-        qibuild.sh.mv(src, dst)
-    qibuild.sh.rm(os.path.join(root_dir, 'usr'))
-    return
+    lib_dir = os.path.join(root_dir, "lib")
+    qibuild.sh.mkdir(lib_dir)
+
+    for (root, directories, filenames) in os.walk(usr_lib):
+        for filename in filenames:
+            src = os.path.join(root, filename)
+            print "mv", src, "->", lib_dir
+            qibuild.sh.mv(src, lib_dir)
 
 
 def convert_to_qibuild(package, package_metadata=None,
