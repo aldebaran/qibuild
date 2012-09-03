@@ -269,6 +269,11 @@ def test_compress_extract_invalid(tmpdir, algo, extension):
     assert "Unknown algorithm: foo" in e.value.message
     assert "Known algorithms are"   in e.value.message
 
+def test_compress_broken_symlink(tmpdir):
+    src = tmpdir.mkdir("src")
+    broken_symlink = os.symlink("/does/not/exist", src.join("broken").strpath)
+    res = qibuild.archive.compress(src.strpath, algo="zip")
+
 def test_extract_invalid(tmpdir):
     srcdir   = tmpdir.mkdir("src")
     destdir = tmpdir.mkdir("dest")

@@ -85,7 +85,8 @@ Please set only one of these two options to 'True'
             if sys.stdout.isatty() and not quiet:
                 sys.stdout.write("adding {0}\n".format(rel_path))
                 sys.stdout.flush()
-            archive.write(full_path, arcname)
+            if not qibuild.sh.broken_symlink(full_path):
+                archive.write(full_path, arcname)
     archive.close()
     return archive_path
 
