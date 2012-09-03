@@ -11,6 +11,7 @@ import os
 import qibuild
 from qitoolchain.binary_package import open_package
 from qitoolchain.binary_package import convert_to_qibuild
+from qibuild.cmake.modules import add_cmake_module_to_archive
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -25,8 +26,6 @@ If PACKAGE_PATH points to a directory, then NAME is a mandatory.""")
                         metavar='DESTDIR',
                         help="qiBuild package destination directory \
                               (default: aside the original package)")
-    parser.add_argument("-b", "--batch", dest="batch", action="store_true",
-                        default=False, help="enable non-interactive mode")
     return
 
 
@@ -44,7 +43,6 @@ def do(args):
     package_name = args.package_name
     package_path = os.path.abspath(args.package_path)
     dest_dir     = args.dest_dir
-    interactive  = not args.batch
     other_names  = list()
     if dest_dir is None:
         dest_dir = os.path.dirname(package_path)
@@ -70,12 +68,8 @@ Converting '{0}' into a qiBuild package ...
     qibuild.ui.info(message)
 
     with qibuild.sh.TempDir() as tmp:
-        conversion = convert_to_qibuild(tmp, package, package_name,
-                                        other_names=other_names,
-                                        interactive=interactive)
-        qibuild_package_path = conversion[0]
-        modules_package      = conversion[1]
-        modules_qibuild      = conversion[2]
+        qibuild_package_path = convert_to_qibuild(package, output_dir=tmp)
+        add_cmake_module_to_archive(qibuild_package_path, package.name)
         src = os.path.abspath(qibuild_package_path)
         dst = os.path.join(dest_dir, os.path.basename(qibuild_package_path))
         dst = os.path.abspath(dst)

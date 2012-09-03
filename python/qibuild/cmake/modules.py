@@ -10,6 +10,7 @@ import os
 import re
 import sys
 
+from qibuild import ui
 import qibuild
 
 
@@ -97,7 +98,7 @@ def find_cmake_module_in(path_list):
     return modules
 
 
-def find_matching_qibuild_cmake_module(names):
+def find_matching_qibuild_cmake_module(package_name):
     """Return the list of CMake modules provided by qiBuild and matching names.
 
     :param names: list of names used for matching
@@ -109,16 +110,14 @@ def find_matching_qibuild_cmake_module(names):
     root = os.path.join(root, 'cmake', 'qibuild', 'modules')
     root = os.path.abspath(root)
     path_list = qibuild.sh.ls_r(root)
-    names = [re.sub("^lib", "(lib)?", name) for name in names]
-    names = [re.sub("[^a-zA-Z0-9]+", ".*?", name) for name in names]
-    names = list(set(names))
+    #name = re.sub("^lib", "(lib)?", name)
+    #name = re.sub("[^a-zA-Z0-9]+", ".*?", name)
     modules = find_cmake_module_in(path_list)
-    modules = _find_path_best_matches(modules, names)
+    modules = _find_path_best_matches(modules, [package_name])
     return modules
 
 
-def check_for_module_generation(names, root_dir=None, path_list=None,
-                                modules_package=None, modules_qibuild=None):
+def check_for_module_generation(package_root, package_name):
     """Return the status of the search of matching CMake modules already
     provided by either the package itself or qiBuild.
 
@@ -140,19 +139,14 @@ def check_for_module_generation(names, root_dir=None, path_list=None,
                         list of modules provided by qiBuild)
 
     """
-    if modules_package is None and modules_qibuild is None:
-        if path_list is None:
-            if root_dir is None:
-                mess = "Wrong call: at least 1 argument should be not 'None'"
-                raise Exception(mess)
-            path_list = qibuild.sh.ls_r(root_dir)
-        modules_package = find_cmake_module_in(path_list)
-        modules_qibuild = find_matching_qibuild_cmake_module(names)
-        prefix = r".*?" + os.sep + "?usr" + os.sep
-        # pep8-ignore: E501
-        modules_package = [re.sub(prefix, "", item) for item in modules_package]
-        # pep8-ignore: E501
-        modules_qibuild = [re.sub(prefix, "", item) for item in modules_qibuild]
+    path_list = qibuild.sh.ls_r(package_root)
+    modules_package = find_cmake_module_in(path_list)
+    modules_qibuild = find_matching_qibuild_cmake_module(package_name)
+    prefix = r".*?" + os.sep + "?usr" + os.sep
+    # pep8-ignore: E501
+    modules_package = [re.sub(prefix, "", item) for item in modules_package]
+    # pep8-ignore: E501
+    modules_qibuild = [re.sub(prefix, "", item) for item in modules_qibuild]
     status = "nonexistent"
     if modules_qibuild:
         status = "provided_by_qibuild"
@@ -161,7 +155,7 @@ def check_for_module_generation(names, root_dir=None, path_list=None,
     return (status, modules_package, modules_qibuild)
 
 
-def show_exiting_modules(name, modules_package, modules_qibuild):
+def show_existing_modules(name, modules_package, modules_qibuild):
     """Print the CMake modules found in the package itself or provided by
     qiBuild for this package.
 
@@ -187,17 +181,17 @@ qiBuild already provides the following CMake module(s) for the package '{0}':
     return
 
 
-def _generate_template(name, prefix, header, libraries):
+def _generate_template(name, header, libraries):
     """Generate a template of CMake module.
 
     :param name:      package name
-    :param prefix:    CMake module prefix
     :param header:    header location (used by 'fpath')
     :param libraries: list of libraries  (used by 'flib')
 
     :return: the template string of the CMake module
 
     """
+    prefix = name.upper()
     # pep8-ignore: E501
     content = """\
 ## ----------------------------------------------------------------------------
@@ -236,7 +230,7 @@ export_lib({prefix})
 """.format(prefix=prefix)
     return content
 
-def _ask_template_info(name, prefix, headers, libraries):
+def _ask_module_info(name, headers, libraries):
     """Interactively get the required CMake module data.
 
     :param name:        package name
@@ -249,15 +243,7 @@ def _ask_template_info(name, prefix, headers, libraries):
     """
     patterns = [name]
     question = "Enter the package name:"
-    name     = qibuild.interact.ask_string(question, default=name)
-    patterns.append(name)
-    patterns = list(set(patterns))
-    question = "Do you want to use '{0}' as CMake module name?"
-    question = question.format(prefix)
-    answer   = qibuild.interact.ask_yes_no(question, default=True)
-    if not answer:
-        question = "Enter the CMake module name (uppercase):"
-        prefix   = qibuild.interact.ask_string(question, default=prefix)
+    name = qibuild.interact.ask_string(question, default=name)
     header = None
     if len(headers) > 0:
         patterns = [pattern.lower() for pattern in patterns]
@@ -283,7 +269,7 @@ Which libraries do you want to declare in the CMake module?\
             answer   = qibuild.interact.ask_yes_no(question, default=True)
             if answer:
                 libs.append([lib_static_shared[0]])
-    return (name, prefix, header, libs)
+    return (name, header, libs)
 
 def _edit_template(name, template, package_path_list):
     """Handle interactive edition of the CMake module template.
@@ -326,90 +312,72 @@ Press enter to launch the editor.\
                 module_file.write(template)
             qibuild.command.call([editor_path, cmake_module])
             with open(cmake_module, 'r') as module_file:
-                template = module_file.read()
-    return template
+                module = module_file.read()
+    return module
 
 
 # pylint: disable-msg=R0913
-def generate_template(name, prefix, headers, libraries, path_list=None,
-                      interactive=True):
+def generate_module(name, headers, libraries, path_list=None):
     """Generate a template of CMake module from all information passed.
 
     :param name:        package name
-    :param prefix:      CMake module prefix
     :param header:      header location (used by 'fpath')
     :param libraries:   list of libraries  (used by 'flib')
     :param path_list:   list of the content of the package
                         (default: None)
-    :param interactive: enable user interaction
-                        (default: True)
-
     :return: the tuple (package name,
-                        CMake module prefix,
                         template string of the CMake module)
 
     """
     libs     = None
     header   = None
-    if prefix is None:
-        prefix = name
-    prefix   = prefix.upper()
-    if interactive:
-        template_data = _ask_template_info(name, prefix, headers, libraries)
-        name, prefix, header, libs = template_data
+    if ui.CONFIG["interactive"]:
+        template_data = _ask_module_info(name, headers, libraries)
+        name, header, libs = template_data
     if header is None and len(headers) > 0:
         header = headers[0]
     if libs is None:
         libs = libraries
-    prefix  = prefix.upper()
-    template = _generate_template(name, prefix, header, libs)
-    if interactive:
-        template = _edit_template(name, template, path_list)
-    return (name, prefix, template)
+    template = _generate_template(name, header, libs)
+    if ui.CONFIG["interactive"]:
+        module = _edit_template(name, template, path_list)
+    return module
 
 
-def generate_template_from_directory(directory, name, prefix=None,
-                                     path_list=None, interactive=True):
+def add_cmake_module_to_directory(directory, name):
     """Generate a template of CMake module from the content of directory.
 
     :param directory:   base directory of the package
     :param name:        package name
-    :param prefix:      CMake module prefix
-                        (default: None)
-    :param path_list:   list of the content of the package
-                        (default: None)
-    :param interactive: enable user interaction
-                        (default: True)
-
-    :return: the tuple (package name,
-                        CMake module prefix,
-                        template string of the CMake module)
-
     """
-    if path_list is None:
-        path_list = qibuild.sh.ls_r(directory)
+    status, modules_package, modules_qibuild = \
+        check_for_module_generation(directory, name)
+    if status != "nonexistent":
+        show_existing_modules(name, modules_package, modules_qibuild)
+        if ui.CONFIG["interactive"]:
+            answer = qibuild.interact.ask_yes_no("""\
+Do you want to generate a new CMake module for {0}?\
+""".format(name), default=False)
+            if not answer:
+                return
+        else:
+            return
+    path_list = qibuild.sh.ls_r(directory)
     headers   = _find_headers(path_list)
     libraries = _find_libraries(path_list)
-    module    = generate_template(name, prefix, headers, libraries,
-                                  path_list=path_list, interactive=interactive)
-    return module
+    module    = generate_module(name, headers, libraries, path_list=path_list)
+    write_cmake_module(directory, name, module)
 
 
-def generate_template_from_archive(archive, name=None, prefix=None,
-                                   interactive=True):
+def add_cmake_module_to_archive(archive, name):
     """Generate a template of CMake module from an archive.
+    The archive is updated in-place
 
     :param archive:     archive path of the package
     :param name:        package name
                         (default: None)
     :param prefix:      CMake module prefix
                         (default: None)
-    :param interactive: enable user interaction
-                        (default: True)
-
-    :return: the tuple (package name,
-                        CMake module prefix,
-                        template string of the CMake module)
 
     """
     algo   = qibuild.archive.guess_algo(archive)
@@ -419,113 +387,26 @@ def generate_template_from_archive(archive, name=None, prefix=None,
         root_dir = qibuild.archive.extract(archive, work_dir, algo=algo, quiet=True)
         if name is None:
             name = os.path.basename(root_dir)
-        module = generate_template_from_directory(root_dir, name,
-                                                  prefix=prefix,
-                                                  interactive=interactive)
-        return module
+        add_cmake_module_to_directory(root_dir, name)
+        res = qibuild.archive.compress(work_dir)
+        qibuild.sh.mv(res, archive)
 
 
-class CMakeModule(object):
-    """ A class to handle CMake module generation
+def write_cmake_module(package_root, name, contents):
+    """Write the CMake module content in the right location.
+
+    This writes the CMake module in::
+
+      base_dir/prefix/share/cmake/self.prefix.lower()/self.prefix.lower()-config.cmake
+
+    :param base_dir: root directory (the package installation DESTDIR)
+    :return: the path of the generated CMake module
 
     """
-    __slots__ = ("name", "prefix", "template")
-
-    def __init__(self, name=None, prefix=None, template=None):
-        self.name     = name
-        self.prefix   = prefix
-        self.template = template
-
-    def generate_template(self, name, prefix, headers, libraries,
-                          path_list=None, interactive=True):
-        """Generate a template of CMake module from all information passed.
-
-        :param name:        package name
-        :param prefix:      CMake module prefix
-        :param header:      header location (used by 'fpath')
-        :param libraries:   list of libraries  (used by 'flib')
-        :param path_list:   list of the content of the package
-                            (default: None)
-        :param interactive: enable user interaction
-                            (default: True)
-
-        """
-        template = generate_template(name, prefix, headers, libraries,
-                                     path_list=path_list,
-                                     interactive=interactive)
-        self.name     = template[0]
-        self.prefix   = template[1]
-        self.template = template[2]
-
-    def generate_from_directory(self, directory, name, prefix=None,
-                                path_list=None, interactive=True):
-        """Generate a template of CMake module from the content of directory.
-
-        :param directory:   base directory of the package
-        :param name:        package name
-        :param prefix:      CMake module prefix
-                            (default: None)
-        :param path_list:   list of the content of the package
-                            (default: None)
-        :param interactive: enable user interaction
-                            (default: True)
-
-        """
-        template = generate_template_from_directory(directory, name,
-                                                    prefix=prefix,
-                                                    path_list=path_list,
-                                                    interactive=interactive)
-        self.name     = template[0]
-        self.prefix   = template[1]
-        self.template = template[2]
-
-    def generate_from_archive(self, archive, name=None, prefix=None,
-                              interactive=True):
-        """Generate a template of CMake module from an archive.
-
-        :param archive:     archive path of the package
-        :param name:        package name
-                            (default: None)
-        :param prefix:      CMake module prefix
-                            (default: None)
-        :param interactive: enable user interaction
-                            (default: True)
-
-        """
-        template = generate_template_from_archive(archive, name=name,
-                                                  prefix=prefix,
-                                                  interactive=interactive)
-        self.name     = template[0]
-        self.prefix   = template[1]
-        self.template = template[2]
-
-    def write(self, base_dir, prefix=None):
-        """Write the CMake module content in the right location.
-
-        This writes the CMake module in::
-
-          base_dir/prefix/share/cmake/self.prefix.lower()/self.prefix.lower()-config.cmake
-
-        :param base_dir: root directory (the package installation DESTDIR)
-        :param prefix:   installation prefix (e.g. /usr on Linux)
-                         (default: None)
-
-        :return: the path of the generated CMake module
-
-        """
-        if self.template is None:
-            message = "No CMake module to write"
-            qibuild.ui.info(message)
-            return None
-        module_filename = "{0}-config.cmake".format(self.prefix.lower())
-        if prefix is not None:
-            module_dir = os.path.join(base_dir, prefix)
-        else:
-            module_dir = base_dir
-        # pep8-ignore: E501
-        module_dir  = os.path.join(module_dir, "share", "cmake", self.prefix.lower())
-        module_path = os.path.join(module_dir, module_filename)
-        qibuild.sh.mkdir(module_dir, recursive=True)
-        with open(module_path, "w") as module_file:
-            module_file.write(self.template)
-        return module_path
+    module_name = name + ".config.cmake"
+    module_path = os.path.join(package_root, "share", "cmake", name)
+    qibuild.sh.mkdir(module_path, recursive=True)
+    module_path = os.path.join(module_path, module_name)
+    with open(module_path, "w") as module_file:
+        module_file.write(contents)
+    return module_path

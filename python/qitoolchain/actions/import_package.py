@@ -13,6 +13,9 @@ import qibuild
 import qitoolchain
 from qitoolchain.binary_package import open_package
 from qitoolchain.binary_package import convert_to_qibuild
+from qibuild.cmake.modules import add_cmake_module_to_archive
+from qibuild.cmake.modules import find_matching_qibuild_cmake_module
+from qibuild.cmake.modules import find_cmake_module_in
 
 
 def configure_parser(parser):
@@ -28,8 +31,6 @@ If PACKAGE_PATH points to a directory, then NAME is a mandatory.""")
                         metavar='DESTDIR', help="""\
 destination directory of the qiBuild package after convertsion
 (default: aside the original package)""")
-    parser.add_argument("-b", "--batch", dest="batch", action="store_true",
-                        default=False, help="enable non-interactive mode")
     return
 
 
@@ -47,7 +48,6 @@ def do(args):
     package_name = args.package_name
     package_path = os.path.abspath(args.package_path)
     dest_dir     = args.dest_dir
-    interactive  = not args.batch
     other_names  = list()
     if dest_dir is None:
         dest_dir = os.path.dirname(package_path)
@@ -77,12 +77,9 @@ Importing '{1}' in the toolchain {0} ...
     qibuild.ui.info(message)
     # conversion into qiBuild
     with qibuild.sh.TempDir() as tmp:
-        conversion = convert_to_qibuild(tmp, package, package_name,
-                                        other_names=other_names,
-                                        interactive=interactive)
-        qibuild_package_path = conversion[0]
-        modules_package      = conversion[1]
-        modules_qibuild      = conversion[2]
+        qibuild_package_path = convert_to_qibuild(package, output_dir=tmp)
+        add_cmake_module_to_archive(qibuild_package_path,
+                                                          package.name)
         src = os.path.abspath(qibuild_package_path)
         dst = os.path.join(dest_dir, os.path.basename(qibuild_package_path))
         dst = os.path.abspath(dst)
@@ -98,8 +95,9 @@ Importing '{1}' in the toolchain {0} ...
     tc.add_package(qibuild_package)
     # end :)
     package_content = qibuild.sh.ls_r(package_dest)
-    modules_list = qibuild.cmake.modules.find_cmake_module_in(package_content)
+    modules_list = find_cmake_module_in(package_content)
     modules_list = [os.path.join(package_dest, cmake_) for cmake_ in modules_list]
+    modules_qibuild = find_matching_qibuild_cmake_module(package.name)
     modules_list.extend(modules_qibuild)
     modules_list = ["  {0}".format(module_) for module_ in modules_list]
     modules_list = "\n".join(modules_list)

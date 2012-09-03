@@ -38,9 +38,10 @@ class BinaryPackage:
         self.type     = package_type
         self.path     = package_path
         self.metadata = None
+        self.name = None
 
-    def get_metadata(self):
-        """ Return the metadata.
+    def load(self):
+        """ Set self.metadata and self.name
 
         If the metadata has not been cached yet, then it is read/laoded and
         cached in the instance.
@@ -64,7 +65,31 @@ class BinaryPackage:
         :return: the metadata dictionary
 
         """
+        if self.metadata is not None:
+            return
+        self._load()
+        if not "name" in self.metadata:
+            raise Exception("Failed to load package. "
+                            "Expecting at least a 'name' key "
+                            "in package metadata")
+        self.name = self.metadata["name"]
+
+    def get_metadata(self):
+        """ Get the metadata from the package.
+
+        """
+        # Cache the result inside the Package instance:
+        if self.metadata is not None:
+            return self.metadata
+        self.load()
+        return self.metadata
+
+    def _load(self):
+        """ Each binary package should at least implement this.
+
+        """
         raise NotImplementedError()
+
 
     def extract(self, dest_dir):
         """ Extract the binary package content, without the metadata.

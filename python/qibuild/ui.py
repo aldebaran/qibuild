@@ -69,12 +69,16 @@ fuscia     = fuchsia
 
 
 # Global variable to store qibuild.ui configuration
+# Useful settings when running qibuild on a buildfarm:
+#    CONFIG['timestamps'] = True
+#    CONFIG['interative'] = False
 
 CONFIG = {
     "verbose" : False,
     "quiet" : False,
     "color" : True,
-    "timestamp" : False
+    "timestamp" : False,
+    "interactive" : True,
 }
 
 

@@ -56,15 +56,13 @@ class GentooPackage(GentooNoPortagePackage):
     def __init__(self, package_path):
         GentooNoPortagePackage.__init__(self, package_path)
 
-    def get_metadata(self):
+    def _load(self):
         """ Read the metadata from the binary package and store them in the
         instance.
 
         :return: the metadata dictionary
 
         """
-        if self.metadata is not None:
-            return self.metadata
         with qibuild.sh.TempDir() as work_dir:
             pkg = portage.xpak.tbz2(self.path)
             pkg.decompose(work_dir, cleanup=0)
@@ -94,4 +92,3 @@ class GentooPackage(GentooNoPortagePackage):
             'dependencies' : dependency,
             }
         self.metadata = metadata
-        return self.metadata

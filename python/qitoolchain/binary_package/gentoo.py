@@ -29,15 +29,13 @@ class GentooPackage(BinaryPackage):
     def __init__(self, package_path):
         BinaryPackage.__init__(self, 'gentoo', package_path)
 
-    def get_metadata(self):
+    def _load(self):
         """ Guess the metadata from the package file name and store it in the
         instance.
 
         :return: the metadata dictionary
 
         """
-        if self.metadata is not None:
-            return self.metadata
         pkg_pf = os.path.basename(self.path)[:-5]
         match = self._RE_PF.search(pkg_pf)
         pkg_metadata = {
@@ -46,7 +44,6 @@ class GentooPackage(BinaryPackage):
             'revision'     : match.groupdict()['rev'],
             }
         self.metadata = pkg_metadata
-        return self.metadata
 
     def extract(self, dest_dir):
         """ Extract the Gentoo binary package content, without the metadata.
