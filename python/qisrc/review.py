@@ -188,6 +188,7 @@ def push(project_path, branch, review=True, dry_run=False, reviewers=None):
         return
     args.append(review_remote)
     if review:
+        ui.info('Pushing code to gerrit for review.')
         args.append("%s:refs/for/%s" % (branch, branch))
         if reviewers:
             receive_pack = "git receive-pack"
