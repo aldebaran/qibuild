@@ -6,13 +6,15 @@
 
 """
 
+import qisrc
 import qibuild
 import qitoolchain
 
+from qibuild import ui
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.default_parser(parser)
+    qibuild.parsers.worktree_parser(parser)
 
 
 def do(args):
@@ -22,8 +24,19 @@ def do(args):
         print "No toolchain yet"
         print "Use `qitoolchain create` to create a new toolchain"
         return
+    default_toc_name = None
+    try:
+        worktree = qisrc.worktree.open_worktree(args.worktree)
+        toc = qibuild.toc.Toc(worktree)
+        default_toc_name = toc.config.local.defaults.config
+    except qisrc.worktree.NotInWorktree, e:
+        pass
     print "Known toolchains:"
     for tc_name in tc_names:
-        print "  ", tc_name
+        print "* " if tc_name == default_toc_name else "  ", tc_name
     print
+    if default_toc_name is not None:
+        ui.info("Worktree", ui.green, worktree.root, ui.reset, "is using",
+                ui.blue, default_toc_name, ui.reset,
+                "as its default toolchain.")
     print "Use ``qitoolchain info <tc_name>`` for more info"
