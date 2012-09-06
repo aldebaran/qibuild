@@ -7,17 +7,19 @@
 Necessary to by-pass some small ctest shortcomings.
 """
 
-import os
-import sys
-import re
+import Queue
 import datetime
 import errno
-import signal
+import os
+import re
 import shlex
+import signal
+import sys
+import threading
+import time
 
 import qibuild
 from qibuild import ui
-
 
 def _str_from_signal(code):
     """ Returns a nice string describing the signal
@@ -31,18 +33,50 @@ def _str_from_signal(code):
         return "%i" % code
 
 
+class QueueTimeout(Queue.Queue):
+    def join(self):
+        while self.unfinished_tasks:
+            time.sleep(1)
+
+
 class TestResult:
     """ Just a small class to store the results for a test
 
     """
-    def __init__(self, test_name):
+    def __init__(self, test_name, test_number, test_count, **kwargs):
         self.test_name = test_name
         self.time = 0
-        self.ok   = False
-        # Output of the executable of the test
+        self.ok = False
         self.out = ""
-        # Short description of what went wrong
         self.message = ""
+        self.verbose = kwargs.get('verbose', False)
+        self.result_dir = kwargs.get('result_dir', None)
+
+        count = "(%2i/%2i)" % (test_number + 1, test_count)
+        self.line = [ui.green, " * ", ui.reset, ui.bold, count, ui.blue,
+                     self.test_name.ljust(25)]
+        if os.isatty(1):
+            tmp = [i for i in self.line if isinstance(i, str)]
+            ui.info(*(tmp + ['[start]']))
+
+    def print_result(self):
+        if self.ok:
+            ui.info(*(self.line + [ui.green, "[OK]"]))
+        else:
+            ok = False
+            ui.info(*(self.line + [ui.red, "[FAIL]", self.message]))
+            if qibuild.command.SIGINT_EVENT.is_set():
+                pass
+            elif not self.verbose and self.out:
+                print self.out
+            else:
+                print '\tno output\n'
+        sys.stdout.flush()
+        if self.result_dir is not None:
+            xml_out = os.path.join(self.result_dir, self.test_name + ".xml")
+            if not os.path.exists(xml_out):
+                write_xml(xml_out, self)
+
 
 def parse_valgrind(valgrind_log, tst):
     """
@@ -69,89 +103,147 @@ def parse_valgrind(valgrind_log, tst):
             tst.message += "Invalid read " + r.group(1) + "\n"
 
 
-def run_test(build_dir, test_name, cmd, properties, build_env, verbose=False, valgrind=False, nightmare=False):
-    """ Run a test.
+class Test:
+    def __init__(self, build_dir, test_name, cmd, properties, build_env,
+                 test_number, test_count, **kwargs):
+        self.build_dir, self.test_name, self.cmd = build_dir, test_name, cmd
+        self.properties, self.build_env = properties, build_env
+        self.test_number, self.test_count = test_number, test_count
 
-    :return: (res, output) where res is a string describing wether
-      the test was sucessul, and output is the output of the test
+        # keyword arguments
+        self.verbose = kwargs.get('verbose', False)
+        self.valgrind = kwargs.get('valgrind', False)
+        self.nightmare = kwargs.get('nightmare', False)
 
-    """
-    timeout = properties.get("TIMEOUT")
-    if timeout:
-        timeout = int(timeout)
-    # we will merge the build env coming from toc
-    # config with the env coming from CMake config,
-    # assuming that cmake is always right
-    env = build_env.copy()
-    cmake_env = properties.get("ENVIRONMENT")
-    if cmake_env:
-        cmake_env = cmake_env.split(";")
-        for key_value in cmake_env:
-            key, value = key_value.split("=")
-            env[key] = value
-    working_dir = properties.get("WORKING_DIRECTORY")
-    if working_dir:
-        cwd = working_dir
-    else:
-        cwd = build_dir
-    ncmd = cmd
-    if valgrind:
-        env['VALGRIND'] = '1'
-        valgrind_log = os.path.join(build_dir, test_name + "valgrind_output.log")
-        ncmd = [ "valgrind", "--track-fds=yes", "--log-file=%s" % valgrind_log ]
-        ncmd.extend(cmd)
-    process_thread = qibuild.command.ProcessThread(ncmd,
-        name=test_name,
-        cwd=cwd,
-        env=env,
-        verbose=verbose)
-    if nightmare:
-        ncmd.extend(["--gtest_shuffle", "--gtest_repeat=20"])
-    res = TestResult(test_name)
-    start = datetime.datetime.now()
-    process_thread.start()
-    process_thread.join(timeout)
-    end = datetime.datetime.now()
-    delta = end - start
-    res.time = float(delta.microseconds) / 10**6 + delta.seconds
+    def run(self, output_queue):
+        """ Run a test.
 
-    process = process_thread.process
-    if not process:
-        exception = process_thread.exception
-        mess  = "Could not run test: %s\n" % test_name
-        mess += "Error was: %s\n" % exception
-        mess += "Full command was: %s\n" % " ".join(ncmd)
-        if isinstance(exception, OSError):
-            # pylint: disable-msg=E1101
-            if exception.errno == errno.ENOENT:
-                mess += "Are you sure you have built the tests?"
-        raise Exception(mess)
-    res.out = process_thread.out
-    if process_thread.isAlive():
-        process.terminate()
-        res.ok = False
-        res.message =  "Timed out (%is)" % timeout
-    else:
-        retcode = process.returncode
-        if retcode == 0:
-            res.ok = True
+        """
+        timeout = self.properties.get("TIMEOUT")
+        res = TestResult(self.test_name, self.test_number, self.test_count,
+                         verbose=self.verbose)
+        if timeout:
+            timeout = int(timeout)
+        # we will merge the build env coming from toc
+        # config with the env coming from CMake config,
+        # assuming that cmake is always right
+        env = self.build_env.copy()
+        cmake_env = self.properties.get("ENVIRONMENT")
+        if cmake_env:
+            cmake_env = cmake_env.split(";")
+            for key_value in cmake_env:
+                key, value = key_value.split("=")
+                env[key] = value
+        working_dir = self.properties.get("WORKING_DIRECTORY")
+        if working_dir:
+            cwd = working_dir
         else:
-            res.ok = False
-            try:
-                process.kill()
-            except:
-                pass
+            cwd = self.build_dir
+        ncmd = self.cmd
+        if self.valgrind:
+            env['VALGRIND'] = '1'
+            valgrind_log = os.path.join(self.build_dir, self.test_name + "valgrind_output.log")
+            ncmd = [ "valgrind", "--track-fds=yes", "--log-file=%s" % valgrind_log ]
+            ncmd.extend(self.cmd)
+        process = qibuild.command.Process(ncmd,
+            name=self.test_name,
+            cwd=cwd,
+            env=env,
+            verbose=self.verbose)
+        if self.nightmare:
+            ncmd.extend(["--gtest_shuffle", "--gtest_repeat=20"])
+        start = datetime.datetime.now()
+        process.run(timeout)
+        end = datetime.datetime.now()
+        delta = end - start
+        res.time = float(delta.microseconds) / 10**6 + delta.seconds
+
+        ui.debug('Treating result of', self.cmd)
+        if process.exception is not None:
+            exception = process.exception
+            mess  = "Could not run test: %s\n" % self.test_name
+            mess += "Error was: %s\n" % exception
+            mess += "Full command was: %s\n" % " ".join(ncmd)
+            if isinstance(exception, OSError):
+                # pylint: disable-msg=E1101
+                if exception.errno == errno.ENOENT:
+                    mess += "Are you sure you have built the tests?"
+            raise Exception(mess)
+        res.out = process.out
+        res.ok = process.return_type == qibuild.command.Process.OK
+        if process.return_type == qibuild.command.Process.INTERRUPTED:
+            res.message = "Interrupted"
+        elif process.return_type == qibuild.command.Process.TIME_OUT:
+            res.message = "Timed out (%is)" % timeout
+        elif process.return_type == qibuild.command.Process.ZOMBIE:
+            res.message = "Zombie (Timeout = %is)" % timeout
+        elif process.return_type == qibuild.command.Process.FAILED:
+            retcode = process.returncode
             if retcode > 0:
                 res.message = "Return code: %i" % retcode
             else:
                 res.message = _str_from_signal(-retcode)
-    if valgrind:
-        parse_valgrind(valgrind_log, res)
-    return res
+        if self.valgrind:
+            parse_valgrind(valgrind_log, res)
+        ui.debug('Putting result in result queue.')
+        output_queue.put(res)
 
+
+class TestWorker(threading.Thread):
+    def __init__(self, in_queue, out_queue):
+        threading.Thread.__init__(self)
+        self.daemon = True
+        self.in_queue = in_queue
+        self.out_queue = out_queue
+
+    def run(self):
+        while not qibuild.command.SIGINT_EVENT.is_set():
+            self.test = self.in_queue.get()
+            self.test.run(self.out_queue)
+            self.test = None
+            self.in_queue.task_done()
+
+
+class TestResultWorker(threading.Thread):
+    def __init__(self, queue, failed_tests):
+        threading.Thread.__init__(self)
+        self.queue = queue
+        self.failed_tests = failed_tests
+        self.daemon = True
+        self.total, self.failed = 0, 0
+
+    def run(self):
+        while True:
+            item = self.queue.get()
+            item.print_result()
+            self.total += 1
+            if not item.ok:
+                self.failed += 1
+                self.failed_tests.put(item.test_name)
+            self.queue.task_done()
+
+    def global_result(self):
+        return (self.total, self.failed)
+
+
+def sigint_handler(signum, frame):
+    def double_sigint(signum, frame):
+        def triple_sigint(signum, frame):
+            ui.warning('Exiting main program without caring (may leave ' + \
+                       'zombies and the like).')
+            sys.exit(1)
+        ui.warning('OK, killing every process (hard method). ' + \
+                   'This may take some time too.')
+        qibuild.command.DOUBLE_SIGINT_EVENT.set()
+        signal.signal(signal.SIGINT, triple_sigint)
+    ui.warning('Received keyboard interrupt. Killing all processes ' + \
+               '(soft method). This may take few seconds.')
+    qibuild.command.SIGINT_EVENT.set()
+    signal.signal(signal.SIGINT, double_sigint)
 
 def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
-              dry_run=False, valgrind=False, nightmare=False, test_args=None):
+              dry_run=False, valgrind=False, nightmare=False, test_args=None,
+              num_jobs=1):
     """ Called by :py:meth:`qibuild.toc.Toc.test_project`
 
     :param test_name: If given, only run this test
@@ -164,7 +256,7 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
     """
     build_dir = project.build_directory
     results_dir = os.path.join(project.build_directory, "test-results")
-
+    signal.signal(signal.SIGINT, sigint_handler)
     all_tests = parse_ctest_test_files(build_dir)
     tests = list()
     slow_tests = list()
@@ -205,44 +297,35 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
         return
 
     ui.info(ui.green, "Testing", project.name, "...")
-    ok = True
-    fail_tests = list()
-    for (i, test) in enumerate(tests):
+    in_queue, out_queue = QueueTimeout(), Queue.Queue()
+    failed_tests = Queue.Queue()
+    output_worker, thread_list = TestResultWorker(out_queue, failed_tests), []
+    output_worker.start()
+    for it in range(num_jobs):
+        thread_list.append(TestWorker(in_queue, out_queue))
+        thread_list[-1].start()
+    for i, test in enumerate(tests):
         (test_name, cmd, properties) = test
-        ui.info(ui.green, " * ", ui.reset, ui.bold,
-                "(%2i/%2i)" % (i+1, len(tests)),
-                ui.blue, test_name.ljust(25), end="")
-        if verbose:
-            print
-        sys.stdout.flush()
-        test_res = run_test(build_dir, test_name, cmd, properties, build_env,
-                            valgrind=valgrind, verbose=verbose, nightmare=nightmare)
-        if test_res.ok:
-            ui.info(ui.green, "[OK]")
-        else:
-            ok = False
-            ui.info(ui.red, "[FAIL]", test_res.message)
-            if not verbose:
-                print test_res.out
-            fail_tests.append(test_name)
-        xml_out = os.path.join(results_dir, test_name + ".xml")
-        if not os.path.exists(xml_out):
-            write_xml(xml_out, test_res)
+        in_queue.put(Test(build_dir, test_name, cmd, properties, build_env,
+                          i, len(tests), valgrind=valgrind, verbose=verbose,
+                          nightmare=nightmare))
+    in_queue.join()
+    out_queue.join()
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-    if ok:
-        ui.info("Ran %i tests" % len(tests))
+    total, failed = output_worker.global_result()
+    if failed == 0:
+        ui.info("Ran %i tests" % total)
         if slow_tests and not slow:
             ui.info("Note: %i" % len(slow_tests),
                     "slow tests did not run, use --slow to run them")
         ui.info("All pass. Congrats!")
         return True
 
-    ui.error("Ran %i tests, %i failures" %
-                  (len(tests), len(fail_tests)))
-    for fail_test in fail_tests:
-        ui.info(ui.bold, " -", ui.blue, fail_test)
+    ui.error("Ran %i tests, %i failures" % (total, failed))
+    while not failed_tests.empty():
+        ui.info(ui.bold, " -", ui.blue, failed_tests.get())
     return False
-
 
 def write_xml(xml_out, test_res):
     """ Write a XUnit XML file
@@ -267,8 +350,7 @@ def write_xml(xml_out, test_res):
           <![CDATA[ {out} ]]>
     </failure>
 """
-        failure = failure.format(out=test_res.out,
-            message=test_res.message)
+    failure = failure.format(out=test_res.out, message=test_res.message)
     to_write = to_write.format(num_failures=num_failures,
                                testsuite_name="test", # nothing clever to put here :/
                                testcase_name=test_res.test_name,

@@ -10,12 +10,12 @@ import os
 import sys
 import contextlib
 import subprocess
+import signal
 import threading
 import Queue
 
 from qibuild import ui
 import qibuild
-
 
 # Quick hack: in order to be able to configure how
 # qibuild.command works, we have to use this
@@ -25,55 +25,112 @@ CONFIG = dict()
 # Cache for find_program()
 _FIND_PROGRAM_CACHE = dict()
 
-class ProcessThread(threading.Thread):
+SIGINT_EVENT = threading.Event()
+DOUBLE_SIGINT_EVENT = threading.Event()
+
+class Process:
     """ A simple way to run commands.
 
-    The thread will terminate when the command terminates
-
-    The full log is available in self.out, and the subprocess.Popen
-    object in self.process
-
+    Command will be started by run according to timeout parameter (not
+    specified == no timeout). If it firstly send a SIGTERM signal to the
+    process and wait 5 seconds for it to terminate alone (timeout). If it
+    doesn't stop by itself, it will kill the group of process (created with
+    subprocess) to exterminate it. Process is then considered to be a zombie.
     """
+
+    OK          = 0
+    FAILED      = 1
+    TIME_OUT    = 2
+    ZOMBIE      = 3
+    INTERRUPTED = 4
+
     def __init__(self, cmd, name=None, verbose=False, cwd=None, env=None):
         if name is None:
-            thread_name = "ProcessThread"
+            thread_name = "Process"
         else:
-            thread_name = "ProcessThread<%s>" % name
-        threading.Thread.__init__(self, name=thread_name)
+            thread_name = "Process<%s>" % name
         self.cmd = cmd
         self.cwd = cwd
         self.env = env
         self.out = ""
-        self.process = None
-        self.exception = ""
+        self._process = None
+        self.exception = None
         self.verbose = verbose
+        self.return_type = Process.FAILED
 
-    def run(self):
-        ui.debug("Calling:", " ".join(self.cmd))
-        try:
-            self.process = subprocess.Popen(self.cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                cwd=self.cwd,
-                env=self.env)
-        except Exception, e:
-            self.exception = e
+    def run(self, timeout=None):
+        def target():
+            ui.debug("Starting thread.")
+            ui.debug("Calling:", " ".join(self.cmd))
+            try:
+                opt = dict()
+                if os.name == 'posix':
+                    opts = {'preexec_fn': os.setsid}
+                elif os.name == 'nt':
+                    opts = {
+                        'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP,
+                    }
+                self._process = subprocess.Popen(self.cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    cwd=self.cwd,
+                    env=self.env,
+                    **opts)
+            except Exception, e:
+                self.exception = e
+                return
+            self.out = self._process.communicate()[0]
+            self.returncode = self._process.returncode
+            if self.returncode == 0:
+                self.return_type = Process.OK
+            ui.debug("Thread terminated.")
+
+        self._thread = threading.Thread(target=target)
+        self._thread.start()
+        while ((timeout is None or 0 < timeout) and self._thread.is_alive() and
+               not SIGINT_EVENT.is_set()):
+            self._thread.join(1)
+            if timeout is not None:
+                timeout -= 1
+        if not self._thread.is_alive():
             return
+        elif SIGINT_EVENT.is_set():
+            self._interrupt()
+        else:
+            self._kill_subprocess()
 
-        while self.process.poll() is None:
-            line = self.process.stdout.readline()
-            self.out += line
-            if self.verbose:
-                sys.stdout.write(line)
-        #program is finished, does not mean we read all lines
-        #read them!
-        while True:
-            line = self.process.stdout.readline()
-            if line == "":
-                break
-            self.out += line
-            if self.verbose:
-                sys.stdout.write(line)
+    def _kill_subprocess(self):
+        if self._thread and self._process:
+            ui.debug('Terminating process.')
+            self._process.terminate()
+            self.return_type = Process.TIME_OUT
+            self._thread.join(5)
+            if self._thread.is_alive():
+                self._destroy_zombie()
+
+    def _interrupt(self):
+        if self._process:
+            os.kill(self._process.pid, signal.SIGINT)
+            os.kill(self._process.pid, signal.SIGINT)
+            timeout = 5
+            while 0 < timeout and not DOUBLE_SIGINT_EVENT.is_set():
+                self._thread.join(1)
+                timeout -= 1
+            if self._thread.is_alive():
+                self._destroy_zombie()
+        self.return_type = Process.INTERRUPTED
+
+    def _destroy_zombie(self):
+        ui.debug('Process was a zombie...')
+        if not self._process:
+            pass
+        elif os.name == 'posix':
+            os.killpg(self._process.pid, signal.SIGKILL)
+        elif os.name == 'nt':
+            # pylint: disable-msg=E1101
+            os.kill(self._process.pid, signal.CTRL_BREAK_EVENT)
+        self.return_type = Process.ZOMBIE
+        self._thread.join()
 
 
 class CommandFailedException(Exception):
