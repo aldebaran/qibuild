@@ -106,7 +106,7 @@ A package can be associated to a toolchain file.
 
 For instance, you may have a simple package ``foobar`` containing the result
 of the installation of the ``bar`` executable and the ``foo libaray``,
-requiring now toolchain file at all, or a complex package name ``geode-ctc``
+requiring no toolchain file at all, or a complex package name ``geode-ctc``
 containg some libs in  ``ctc/sysroot/usr/lib``, and a cross-compiler in
 ``ctc/cross``, and a toolchain file forcing the compiler to be
 ``ctc/cross/bin/gcc``, and setting CMAKE_FIND_ROOT_PATH to ``ctc/sysroot``.
@@ -117,7 +117,7 @@ containg some libs in  ``ctc/sysroot/usr/lib``, and a cross-compiler in
     A toolchain is simply a collection of :term:`packages <package>`
 
   **feed**
-    A feed is a smiple XML file describing a toolchain: its location,
+    A feed is a simple XML file describing a toolchain: its location,
     and the packages that are in it.
 
 
