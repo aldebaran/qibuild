@@ -117,6 +117,7 @@ qi_debug("CMAKE_SYSTEM_LIBRARY_PATH = ${CMAKE_SYSTEM_LIBRARY_PATH}")
 option(BUILD_TESTS
   "If OFF, no test will be built, and `qibuild test` won't run any test"
   ON)
+option(QI_NIGHTLY_TESTS "triggers building of nightly tests" OFF)
 
 # change default for CMAKE_INSTALL_PREFIX
 # (it's c:\program files\<project> on Windows, and
