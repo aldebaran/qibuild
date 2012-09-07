@@ -232,8 +232,6 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
         ui.info(ui.bold, " -", ui.blue, fail_test)
     return False
 
-
-
 def handle_test(test):
     """
     Handle one test as a pool task.
@@ -241,18 +239,17 @@ def handle_test(test):
     """
     ((i, (test_name, cmd, properties)),test_count, test_fail, verbose,
       build_dir, build_env, valgrind, nightmare, results_dir) = test
-    ui.info(ui.green, " * ", ui.reset, ui.bold,
-            "(%2i/%2i)" % (i+1, test_count),
-            ui.blue, test_name.ljust(25), end="")
-    if verbose:
-        print
-    sys.stdout.flush()
+    message = [ui.green, " * ", ui.reset, ui.bold,
+               "(%2i/%2i)" % (i+1, test_count), ui.blue, test_name.ljust(25)]
+    ui.info(*([it for it in message if isinstance(it, str)] + ["[start]"]))
     test_res = run_test(build_dir, test_name, cmd, properties, build_env,
-                            valgrind=valgrind, verbose=verbose, nightmare=nightmare)
+                        valgrind=valgrind, verbose=verbose, nightmare=nightmare)
     if test_res.ok:
-        ui.info(ui.green, "[OK]")
+        ui.info(*(message + [ui.green, "[OK]"]))
+        if verbose:
+            print test_res.out
     else:
-        ui.info(ui.red, "[FAIL]", test_res.message)
+        ui.info(*(message + [ui.red, "[FAIL]", test_res.message]))
         if not verbose:
             print test_res.out
         test_fail.append(test_name)
