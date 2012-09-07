@@ -391,6 +391,15 @@ And do not use ``sys.platform`` directly. This way
 if when we add a new supported platform to ``qibuild``, we will
 know where to patch the code.
 
+Using this is also a good way to do it ::
+
+  import os
+
+  if os.name() == 'posix':
+     # POSIX code
+  elif os.name() == 'nt':
+     # Windows specific code
+
 
 Output messages to the user
 -----------------------------
