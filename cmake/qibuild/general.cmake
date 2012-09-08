@@ -37,11 +37,11 @@ include("qibuild/set")
 # Make sure custom -config.cmake files are found *before* the
 # one in the system (useful for using qibuild/modules/gtest-config.cmake,
 # and not /usr/share/cmake/modules/FindGTest.cmake)
-qi_append_uniq_global(CMAKE_FIND_ROOT_PATH "${_ROOT_DIR}/modules/")
+qi_persistent_append_uniq(CMAKE_FIND_ROOT_PATH "${_ROOT_DIR}/modules/")
 
 #include new cmake modules, when using old cmake
 if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
-  qi_append_uniq_global(CMAKE_MODULE_PATH "${_ROOT_DIR}/upstream-backports")
+  qi_persistent_append_uniq(CMAKE_MODULE_PATH "${_ROOT_DIR}/upstream-backports")
 endif()
 
 set(QI_ROOT_DIR ${_ROOT_DIR})

@@ -145,7 +145,7 @@ function(fpath prefix name0)
 
   find_path(${name0}_INCLUDE ${name0} ${ARG_UNPARSED_ARGUMENTS})
   if (${name0}_INCLUDE)
-    qi_append_uniq_global(${prefix}_INCLUDE_DIRS ${${name0}_INCLUDE})
+    qi_persistent_append_uniq(${prefix}_INCLUDE_DIRS ${${name0}_INCLUDE})
   endif()
 
   qi_debug("LIBFIND: RESULT: ${${name0}_INCLUDE}")

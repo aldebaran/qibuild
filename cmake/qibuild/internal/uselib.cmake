@@ -161,7 +161,7 @@ function(_qi_use_lib_internal name)
     endif()
 
     if ((DEFINED "${_U_PKG}_TARGET") AND (TARGET "${${_U_PKG}_TARGET}"))
-      qi_append_uniq_global(${_U_name}_TARGET_DEPENDS ${${_U_PKG}_TARGET})
+      qi_persistent_append_uniq(${_U_name}_TARGET_DEPENDS ${${_U_PKG}_TARGET})
       add_dependencies(${name} ${${_U_PKG}_TARGET})
     endif()
 
