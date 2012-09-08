@@ -559,7 +559,6 @@ def broken_symlink(file_path):
     """ Returns True if the file is a broken symlink
 
     """
-    import ipdb; ipdb.set_trace()
     return os.path.lexists(file_path) and not os.path.exists(file_path)
 
 def is_binary(file_path):
