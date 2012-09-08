@@ -74,7 +74,7 @@ include("qibuild/option")
 include("qibuild/codegen")
 
 # Find libraries from self sdk dir before everything else.
-qi_prepend_uniq_global(CMAKE_FIND_ROOT_PATH "${QI_SDK_DIR}")
+qi_persistent_prepend_uniq(CMAKE_FIND_ROOT_PATH "${QI_SDK_DIR}")
 
 _qi_autostrap_update()
 
