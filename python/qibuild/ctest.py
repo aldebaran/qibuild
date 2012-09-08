@@ -8,7 +8,6 @@ Necessary to by-pass some small ctest shortcomings.
 """
 
 import os
-import sys
 import re
 import datetime
 import errno
@@ -210,6 +209,7 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
 
     pool = multiprocessing.Pool(processes=num_jobs)
     manager = multiprocessing.Manager()
+    # pylint: disable-msg=E1101
     test_fail = manager.list()
     args = [   (x, len(tests), test_fail, verbose, build_dir,
                 build_env, valgrind, nightmare, results_dir)
