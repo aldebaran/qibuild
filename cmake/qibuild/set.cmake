@@ -66,31 +66,37 @@ endfunction()
 
 # write the variable into cache, variable wont be visible
 macro(qi_set_global name)
-  set("${name}" ${ARGN} CACHE INTERNAL "" FORCE)
+  qi_deprecated("qi_set_global is deprecated use 'qi_persistent_set' or 'qi_global_set' instead")
+  qi_persistent_set("${name}" ${ARGN})
 endmacro()
 
 # write the variable into cache
 macro(qi_set_cache name)
+  qi_deprecated("qi_set_cache is deprecated use 'set(${name} ${ARGN} CACHE STRING \"\" FORCE)' instead")
   set("${name}" ${ARGN} CACHE STRING "" FORCE)
 endmacro()
 
 # write the variable into cache, mark as an advanced variable
 macro(qi_set_advanced_cache name)
+  qi_deprecated("qi_set_cache is deprecated use 'set(${name} ${ARGN} CACHE STRING \"\" FORCE)' and then 'mark_as_advanced(${name})' instead")
   set("${name}" ${ARGN} CACHE STRING "" FORCE)
   mark_as_advanced("${name}")
 endmacro()
 
 macro(qi_append_global _name _value)
+  qi_deprecated("qi_append_global is deprecated use 'qi_persistent_append' or 'qi_global_append' instead")
   list(APPEND "${_name}" ${_value} ${ARGN})
   set("${_name}" "${${_name}}" CACHE INTERNAL "" FORCE)
 endmacro()
 
 macro(qi_prepend_global _name _value)
+  qi_deprecated("qi_prepend_global is deprecated use 'qi_persistent_prepend' or 'qi_global_prepend' instead")
   list(INSERT "${_name}" 0 ${_value} ${ARGN})
   set("${_name}" "${${_name}}" CACHE INTERNAL "" FORCE)
 endmacro()
 
 macro(qi_append_uniq_global _name)
+  qi_deprecated("qi_append_uniq_global is deprecated use 'qi_persistent_append_uniq' or 'qi_global_append_uniq' instead")
   foreach(_value ${ARGN})
     list(FIND "${_name}" ${_value} _found)
     if (_found STREQUAL "-1")
@@ -101,6 +107,7 @@ macro(qi_append_uniq_global _name)
 endmacro()
 
 macro(qi_prepend_uniq_global _name _value)
+  qi_deprecated("qi_prepend_uniq_global is deprecated use 'qi_persistent_prepend_uniq' or 'qi_global_prepend_uniq' instead")
   list(FIND "${_name}" ${_value} _found)
   if (_found STREQUAL "-1")
     list(INSERT "${_name}" 0 ${_value} ${ARGN})
@@ -109,6 +116,7 @@ macro(qi_prepend_uniq_global _name _value)
 endmacro()
 
 macro(qi_uniq_global _name)
+  qi_deprecated("qi_uniq_global is deprecated")
   if (${_name})
     list(REVERSE ${_name})
     list(REMOVE_DUPLICATES ${_name})
