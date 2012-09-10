@@ -30,8 +30,8 @@ set(_TESTS_RESULTS_FOLDER "${CMAKE_CURRENT_BINARY_DIR}/test-results" CACHE INTER
 # \arg:name the name of the test and the target
 # \group:SRC  sources of the test
 # \group:DEPENDS the dependencies of the test
-# \param:TIMEOUT the timeout of the test. Not that TIMEOUT >= 20 causes
-#                the test to be disabled unless QI_NIGHTLY_TESTS is ON
+# \param:TIMEOUT the timeout of the test.
+# \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
 # \group:ARGUMENTS arguments to be passed to the executable
 # \argn: source files (will be merged with the SRC group of arguments)
 function(qi_create_test name)
@@ -40,11 +40,9 @@ function(qi_create_test name)
     qi_set_global(QI_${name}_TARGET_DISABLED TRUE)
     return()
   endif()
-  cmake_parse_arguments(ARG "" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
-  if("${ARG_TIMEOUT}" GREATER 19)
-    if(NOT ${QI_NIGHTLY_TESTS})
-      return()
-    endif()
+  cmake_parse_arguments(ARG "NIGHTLY" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+  if(ARG_NIGHTLY AND NOT ${QI_NIGHTLY_TESTS})
+    return()
   endif()
   qi_create_bin(${name} SRC ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS} NO_INSTALL)
   if(ARG_DEPENDS)
@@ -74,6 +72,7 @@ endfunction()
 #
 # \arg:name name of the test
 # \flag:NO_ADD_TEST Do not call add_test, just create the binary
+# \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
 # \argn: source files, like the SRC group, argn and SRC will be merged
 # \param:TIMEOUT The timeout of the test
 # \group:SRC Sources
@@ -122,11 +121,9 @@ function(qi_create_gtest name)
 
   # create tests_results folder if it does not exist
   file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
-  cmake_parse_arguments(ARG "NO_ADD_TEST" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
-  if("${ARG_TIMEOUT}" GREATER 19)
-    if(NOT ${QI_NIGHTLY_TESTS})
-      return()
-    endif()
+  cmake_parse_arguments(ARG "NO_ADD_TEST;NIGHTLY" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+  if(ARG_NIGHTLY AND NOT ${QI_NIGHTLY_TESTS})
+    return()
   endif()
 
   # First, create the target
@@ -172,14 +169,12 @@ endfunction()
 # \arg:test_name The name of the test
 # \arg:target_name The name of the binary to use
 # \param:TIMEOUT The timeout of the test
+# \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
 # \group:ARGUMENTS Arguments to be passed to the executable
 function(qi_add_test test_name target_name)
-  cmake_parse_arguments(ARG "" "TIMEOUT" "ARGUMENTS" ${ARGN})
-
-  if("${ARG_TIMEOUT}" GREATER 19)
-    if(NOT ${QI_NIGHTLY_TESTS})
-      return()
-    endif()
+  cmake_parse_arguments(ARG "NIGHTLY" "TIMEOUT" "ARGUMENTS" ${ARGN})
+  if(ARG_NIGHTLY AND NOT ${QI_NIGHTLY_TESTS})
+    return()
   endif()
 
   if(NOT ARG_TIMEOUT)
