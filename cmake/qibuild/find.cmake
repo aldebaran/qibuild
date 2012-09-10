@@ -281,9 +281,8 @@ endfunction()
 #   export_lib_pkgconfig(FOO)
 #
 function(export_lib_pkgconfig prefix)
-  qi_set_cache(${prefix}_INCLUDE_DIRS "${${prefix}_INCLUDE_DIRS}")
-  qi_set_cache(${prefix}_LIBRARIES    "${${prefix}_LIBRARIES}")
-  #qi_set_cache(${prefix}_DEFINITIONS "${${prefix}_CFLAGS_OTHER}")
+  set(${prefix}_INCLUDE_DIRS "${${prefix}_INCLUDE_DIRS}" CACHE STRING "" FORCE)
+  set(${prefix}_LIBRARIES    "${${prefix}_LIBRARIES}" CACHE STRING "" FORCE)
 
   # Finally, display informations if not in quiet mode
   qi_verbose("library ${prefix}:" )
@@ -371,5 +370,3 @@ function(_qi_call_fphsa prefix)
   qi_set_global(${prefix}_PACKAGE_FOUND ${${prefix}_FOUND})
   qi_set_global(${prefix}_SEARCHED TRUE)
 endfunction()
-
-
