@@ -42,6 +42,7 @@ class Process:
     TIME_OUT    = 2
     ZOMBIE      = 3
     INTERRUPTED = 4
+    NOT_RUN     = 5
 
     def __init__(self, cmd, name=None, verbose=False, cwd=None, env=None):
         if name is None:
@@ -77,6 +78,7 @@ class Process:
                     **opts)
             except Exception, e:
                 self.exception = e
+                self.return_type = Process.NOT_RUN
                 return
             self.out = self._process.communicate()[0]
             self.returncode = self._process.returncode

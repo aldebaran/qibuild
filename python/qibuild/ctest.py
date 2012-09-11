@@ -51,6 +51,7 @@ class TestResult:
         self.test_name = test_name
         self.time = 0
         self.ok = False
+        self.not_run = False
         self.out = ""
         self.message = ""
         self.verbose = kwargs.get('verbose', False)
@@ -172,6 +173,8 @@ class Test:
         res.time = float(delta.microseconds) / 10**6 + delta.seconds
 
         ui.debug('Treating result of', self.cmd)
+        res.out = process.out
+        res.ok = process.return_type == qibuild.command.Process.OK
         if process.exception is not None:
             exception = process.exception
             mess  = "Could not run test: %s\n" % self.test_name
@@ -181,11 +184,12 @@ class Test:
                 # pylint: disable-msg=E1101
                 if exception.errno == errno.ENOENT:
                     mess += "Are you sure you have built the tests?"
-            raise Exception(mess)
-        res.out = process.out
-        res.ok = process.return_type == qibuild.command.Process.OK
+            res.out = mess + '\n'
         if process.return_type == qibuild.command.Process.INTERRUPTED:
             res.message = "Interrupted"
+        elif process.return_type == qibuild.command.Process.NOT_RUN:
+            res.message = "Not run"
+            res.not_run = True
         elif process.return_type == qibuild.command.Process.TIME_OUT:
             res.message = "Timed out (%is)" % timeout
         elif process.return_type == qibuild.command.Process.ZOMBIE:
@@ -232,7 +236,7 @@ class TestResultWorker(threading.Thread):
             self.total += 1
             if not item.ok:
                 self.failed += 1
-                self.failed_tests.put(item.test_name)
+                self.failed_tests.put((item.test_name, item.not_run))
             self.queue.task_done()
 
     def global_result(self):
@@ -331,7 +335,11 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
 
     ui.error("Ran %i tests, %i failures" % (total, failed))
     while not failed_tests.empty():
-        ui.info(ui.bold, " -", ui.blue, failed_tests.get())
+        test_name, not_run = failed_tests.get()
+        message = [ui.bold, " -", ui.blue, test_name]
+        if not_run:
+            message.extend([ui.red, '(Not Run)'])
+        ui.info(*message)
     return False
 
 def write_xml(xml_out, test_res):
