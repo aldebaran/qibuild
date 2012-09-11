@@ -1,29 +1,26 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Set of tools to handle sphinx projects
-
-"""
+"""Set of tools to handle sphinx projects."""
 
 import os
 import sys
 
-from qibuild import ui
-import qidoc.templates
 import qibuild.sh
+import qidoc.templates
 
+from qibuild import ui
 
 def configure(src, dest, templates, intersphinx_mapping, doxylink, opts):
-    """ Configure a sphinx repo
+    """Configure a sphinx repo
 
-    The sphix repo MUST have a src/source/ directory
-    (NOT the default of sphinx-quickstart)
+    The sphix repo MUST have a src/source/ directory (NOT the default of
+    sphinx-quickstart)
 
     The conf.py will be put in src/qidoc/conf.py
     concatening the contents of the templates with the conf.py from
     src/qidoc/conf.in.py, so that you can put src/source/conf.py
-    under version control
-
+    under version control.
     """
     # Rebuild a doxylink dict with relative paths
     rel_doxylink = doxylink.copy()
@@ -55,10 +52,8 @@ def configure(src, dest, templates, intersphinx_mapping, doxylink, opts):
 
 
 def gen_download_zips(src):
-    """ Process sources of the documentation, looking for
-    every directory containing a .zipme, and
-    copying it do src/_zips/
-
+    """Process sources of the documentation, looking for every directory
+    containing a .zipme, and copying it do src/_zips/
     """
     zips_path = os.path.join(src, "_zips")
     qibuild.sh.mkdir(zips_path)
@@ -71,10 +66,9 @@ def gen_download_zips(src):
 
 
 def build(src, dest, opts):
-    """ Run sphinx-build on a sphinx repo
+    """Run sphinx-build on a sphinx repo.
 
     configure() should have been called first
-
     """
     ui.info(ui.green, "Building sphinx", src)
     config_path = os.path.join(src, "qidoc")

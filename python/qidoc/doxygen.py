@@ -8,20 +8,20 @@
 
 import os
 
+import qibuild
 import qidoc.templates
 
 from qibuild import ui
-import qibuild
 
 def configure(src, templates, opts,
     project_name=None,
     doxytags_path=None,
     doxygen_mapping=None):
-    """ Configure a doxygen project
+    """Configure a doxygen project
 
-    Will we generate a Doxyfile.qidoc file
-    (with header.html. footer.html and doxygen.css if necessary),
-    so that you can keep a Doxyfile under version control
+    Will we generate a Doxyfile.qidoc file (with header.html. footer.html and
+    doxygen.css if necessary), so that you can keep a Doxyfile under version
+    control.
     """
     for name in ["Doxyfile.in", "header.in.html", "footer.in.html"]:
         if name == "Doxyfile.in":
@@ -69,5 +69,3 @@ def build(src, dest, opts):
     qibuild.command.call(cmd, cwd=src)
     build_html = os.path.join(src, "build-doc", "html")
     qibuild.sh.install(build_html, dest, quiet=True)
-
-

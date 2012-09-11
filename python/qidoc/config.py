@@ -52,10 +52,7 @@ class DoxyDoc:
 
 
 def parse_project_config(config_path):
-    """ Parse a config file, returns a  tuple
-    of lists (SphinxDoc, DoxyDoc)
-
-    """
+    """Parse a config file, returns a  tuple of lists (SphinxDoc, DoxyDoc)."""
     tree = etree.ElementTree()
     try:
         tree.parse(config_path)
@@ -79,9 +76,7 @@ def parse_project_config(config_path):
     return (doxydocs, sphinxdocs)
 
 def is_template(qiproj_xml):
-    """ Check whether a project is a template repo
-
-    """
+    """Check whether a project is a template repo."""
     tree = etree.ElementTree()
     tree.parse(qiproj_xml)
     root = tree.getroot()

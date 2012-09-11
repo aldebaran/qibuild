@@ -2,9 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" List the doc projects of the given worktree
-
-"""
+"""List the doc projects of the given worktree."""
 
 import operator
 import os
@@ -13,13 +11,13 @@ import qibuild
 import qidoc.core
 
 def configure_parser(parser):
-    """ Configure parser for this action """
+    """Configure parser for this action."""
     qibuild.parsers.default_parser(parser)
     parser.add_argument("--work-tree", dest="worktree")
 
 
 def do(args):
-    """ Main entry point """
+    """Main entry point"""
     worktree = args.worktree
     worktree = qidoc.core.find_qidoc_root(worktree)
     if not worktree:

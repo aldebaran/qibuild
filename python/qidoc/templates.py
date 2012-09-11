@@ -2,17 +2,14 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" A set of tools to handle templates
-
-"""
+"""A set of tools to handle templates."""
 
 import os
+
 import qibuild.sh
 
-
-def configure_file(in_file, out_file,  opts=None,
-    append_file=None):
-    """ Configure file from in_path to out_path,
+def configure_file(in_file, out_file,  opts=None, append_file=None):
+    """Configure file from in_path to out_path,
 
     If opts is not None, use string.format() with the
          contents of contents of the opts dictionnary
@@ -21,8 +18,7 @@ def configure_file(in_file, out_file,  opts=None,
         the the output
 
     If the file already exists and the contents of the file already are
-    correct, do not write it
-
+    correct, do not write it.
     """
     if not os.path.exists(in_file):
         return
