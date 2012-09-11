@@ -39,6 +39,9 @@ class QueueTimeout(Queue.Queue):
             time.sleep(1)
 
 
+MULTIPLE_JOBS = threading.Event()
+
+
 class TestResult:
     """ Just a small class to store the results for a test
 
@@ -55,7 +58,7 @@ class TestResult:
         count = "(%2i/%2i)" % (test_number + 1, test_count)
         self.line = [ui.green, " * ", ui.reset, ui.bold, count, ui.blue,
                      self.test_name.ljust(25)]
-        if os.isatty(1):
+        if os.isatty(1) and MULTIPLE_JOBS.is_set():
             tmp = [i for i in self.line if isinstance(i, str)]
             ui.info(*(tmp + ['[start]']))
 
@@ -300,6 +303,9 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
         for (test_name, _, _) in tests:
             ui.info(ui.green, " * ", ui.reset, test_name)
         return
+
+    if 1 < num_jobs:
+        MULTIPLE_JOBS.set()
 
     ui.info(ui.green, "Testing", project.name, "...")
     in_queue, out_queue = QueueTimeout(), Queue.Queue()
