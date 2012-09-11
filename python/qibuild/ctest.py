@@ -59,15 +59,14 @@ class TestResult:
         count = "(%2i/%2i)" % (test_number + 1, test_count)
         self.line = [ui.green, " * ", ui.reset, ui.bold, count, ui.blue,
                      self.test_name.ljust(25)]
-        if os.isatty(1):
-            _LOCK.acquire()
-            ui.info(*self.line, end='')
-            if _MULTIPLE_JOBS:
-                ui.info(ui.blue, '[start]')
-                _LOCK.release()
+        _LOCK.acquire()
+        ui.info(*self.line, end='')
+        if _MULTIPLE_JOBS and sys.stdout.isatty():
+            ui.info(ui.blue, '[start]')
+            _LOCK.release()
 
     def print_result(self):
-        if _MULTIPLE_JOBS:
+        if _MULTIPLE_JOBS and sys.stdout.isatty():
             _LOCK.acquire()
             ui.info(*self.line, end='')
         if self.ok:
