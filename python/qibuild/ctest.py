@@ -39,7 +39,8 @@ class QueueTimeout(Queue.Queue):
             time.sleep(1)
 
 
-MULTIPLE_JOBS = threading.Event()
+_LOCK = threading.Lock()
+_MULTIPLE_JOBS = False
 
 
 class TestResult:
@@ -58,16 +59,22 @@ class TestResult:
         count = "(%2i/%2i)" % (test_number + 1, test_count)
         self.line = [ui.green, " * ", ui.reset, ui.bold, count, ui.blue,
                      self.test_name.ljust(25)]
-        if os.isatty(1) and MULTIPLE_JOBS.is_set():
-            tmp = [i for i in self.line if isinstance(i, str)]
-            ui.info(*(tmp + ['[start]']))
+        if os.isatty(1):
+            _LOCK.acquire()
+            ui.info(*self.line, end='')
+            if _MULTIPLE_JOBS:
+                ui.info(ui.blue, '[start]')
+                _LOCK.release()
 
     def print_result(self):
+        if _MULTIPLE_JOBS:
+            _LOCK.acquire()
+            ui.info(*self.line, end='')
         if self.ok:
-            ui.info(*(self.line + [ui.green, "[OK]"]))
+            ui.info(ui.green, "[OK]")
         else:
             ok = False
-            ui.info(*(self.line + [ui.red, "[FAIL]", self.message]))
+            ui.info(ui.red, "[FAIL]", self.message)
             if qibuild.command.SIGINT_EVENT.is_set():
                 pass
             elif not self.verbose and self.out:
@@ -81,6 +88,7 @@ class TestResult:
             # a GTest created by qi_create_gtest()
             if not os.path.exists(xml_out):
                 write_xml(xml_out, self)
+        _LOCK.release()
 
 
 def parse_valgrind(valgrind_log, tst):
@@ -306,7 +314,8 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
         return
 
     if 1 < num_jobs:
-        MULTIPLE_JOBS.set()
+        global _MULTIPLE_JOBS
+        _MULTIPLE_JOBS = True
 
     ui.info(ui.green, "Testing", project.name, "...")
     in_queue, out_queue = QueueTimeout(), Queue.Queue()
