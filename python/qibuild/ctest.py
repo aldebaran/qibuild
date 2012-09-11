@@ -125,8 +125,9 @@ class Test:
 
         """
         timeout = self.properties.get("TIMEOUT")
+        result_dir = os.path.join(self.build_dir, "test-results")
         res = TestResult(self.test_name, self.test_number, self.test_count,
-                         verbose=self.verbose)
+                         verbose=self.verbose, result_dir=result_dir)
         if timeout:
             timeout = int(timeout)
         # we will merge the build env coming from toc
