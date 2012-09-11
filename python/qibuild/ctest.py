@@ -74,6 +74,8 @@ class TestResult:
         sys.stdout.flush()
         if self.result_dir is not None:
             xml_out = os.path.join(self.result_dir, self.test_name + ".xml")
+            # Sometimes the XML already exists. For instance if it comes from
+            # a GTest created by qi_create_gtest()
             if not os.path.exists(xml_out):
                 write_xml(xml_out, self)
 
@@ -282,8 +284,11 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
             tests.append(test)
 
     if not tests:
-        # Create a fake test result to keep CI jobs happy:
-        fake_test_res = TestResult("compilation")
+        # Small hack. Since we configure all our CI jobs
+        # to parse XML files in build-test/results,
+        # we need to always have an XML, even if no test
+        # was defined.
+        fake_test_res = TestResult("compilation", 0, 1)
         fake_test_res.ok = True
         xml_out = os.path.join(results_dir, "compilation.xml")
         write_xml(xml_out, fake_test_res)
