@@ -26,7 +26,6 @@ CONFIG = dict()
 _FIND_PROGRAM_CACHE = dict()
 
 SIGINT_EVENT = threading.Event()
-DOUBLE_SIGINT_EVENT = threading.Event()
 
 class Process:
     """ A simple way to run commands.
@@ -109,15 +108,8 @@ class Process:
                 self._destroy_zombie()
 
     def _interrupt(self):
-        if self._process:
-            os.kill(self._process.pid, signal.SIGINT)
-            os.kill(self._process.pid, signal.SIGINT)
-            timeout = 5
-            while 0 < timeout and not DOUBLE_SIGINT_EVENT.is_set():
-                self._thread.join(1)
-                timeout -= 1
-            if self._thread.is_alive():
-                self._destroy_zombie()
+        if self._process and self._thread.is_alive():
+            self._destroy_zombie()
         self.return_type = Process.INTERRUPTED
 
     def _destroy_zombie(self):

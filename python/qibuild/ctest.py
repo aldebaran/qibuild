@@ -242,16 +242,11 @@ class TestResultWorker(threading.Thread):
 
 def sigint_handler(signum, frame):
     def double_sigint(signum, frame):
-        def triple_sigint(signum, frame):
-            ui.warning('Exiting main program without caring (may leave ' + \
-                       'zombies and the like).')
-            sys.exit(1)
-        ui.warning('OK, killing every process (hard method). ' + \
-                   'This may take some time too.')
-        qibuild.command.DOUBLE_SIGINT_EVENT.set()
-        signal.signal(signal.SIGINT, triple_sigint)
+        ui.warning('Exiting main program without caring (may leave ' + \
+                   'zombies and the like).')
+        sys.exit(1)
     ui.warning('Received keyboard interrupt. Killing all processes ' + \
-               '(soft method). This may take few seconds.')
+               '. This may take few seconds.')
     qibuild.command.SIGINT_EVENT.set()
     signal.signal(signal.SIGINT, double_sigint)
 
