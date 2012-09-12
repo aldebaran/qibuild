@@ -32,7 +32,7 @@ def contains_debug_info(filename, objdump=None):
     return (retcode == 0)
 
 
-def split_debug(base_dir, objcopy=None):
+def split_debug(base_dir, objcopy=None, objdump=None):
     """ Split the debug information out of all the binaries in
     lib/ and bin/
 
@@ -52,6 +52,8 @@ def split_debug(base_dir, objcopy=None):
     """
     if objcopy is None:
         objcopy = "objcopy"
+    if objdump is None:
+        objdump = "objdump"
     def _get_binaries(path):
         res = list()
         for root, _, filenames in os.walk(path):
@@ -70,7 +72,7 @@ def split_debug(base_dir, objcopy=None):
 
     for src in binaries:
         rel_name = os.path.relpath(src, base_dir)
-        if not contains_debug_info(src):
+        if not contains_debug_info(src, objdump=objdump):
             ui.info(ui.green, "Already stripped", rel_name)
             continue
         src_stat = os.stat(src)

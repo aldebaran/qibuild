@@ -250,3 +250,23 @@ def get_cmake_qibuild_dir():
     mess  = "Could not find qibuild cmake framework path\n"
     mess += "Please file a bug report with the details of your installation"
     raise Exception(mess)
+
+
+def get_binutil(name, cmake_var=None, build_dir=None, build_env=None):
+    """ Get a tool from the binutils package.
+    First, look for it in the CMake cache, else look for it in the
+    system.
+
+    Note that after a call to CMAKE_FORCE_C_COMPILER() in a CMake
+    toolchain file, CMAKE_AR, CMAKE_OBJDUMP et al. should be correctly
+    set in cache.
+
+    """
+    res = None
+    if not cmake_var:
+        cmake_var = "CMAKE_" + name.upper()
+    if build_dir:
+        res =  get_cached_var(build_dir, cmake_var)
+    if res:
+        return res
+    return qibuild.command.find_program(name, env=build_env)
