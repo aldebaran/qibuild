@@ -88,7 +88,6 @@ def deploy(local_directory, remote_url, port=22, use_rsync=True):
             "--perms",
             "--times",
             "--specials",
-            "--update",   # only copy newer files
             "--progress", # print a progress bar
             "--checksum", # verify checksum instead of size and date
             "--exclude=.debug/",

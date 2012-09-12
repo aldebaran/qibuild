@@ -32,9 +32,16 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.project_parser(parser)
     qibuild.parsers.build_parser(parser)
-    parser.add_argument("url", help="remote target url: user@hostname:path")
-    parser.add_argument("-p", "--port", help="port", type=int)
-    parser.set_defaults(port=22)
+    group = parser.add_argument_group("deploy options")
+    group.add_argument("url", help="remote target url: user@hostname:path")
+    group.add_argument("-p", "--port", help="port", type=int)
+    group.add_argument("--split-debug", action="store_true",
+                        dest="split_debug", help="split debug symbols. "
+                        "Enable remote debuging")
+    group.add_argument("--no-split-debug", action="store_false",
+                        dest="split_debug", help="do not split debug symbols. "
+                        "Remote debugging won't work")
+    parser.set_defaults(port=22, split_debug=True)
 
 def do(args):
     """Main entry point"""
@@ -98,8 +105,10 @@ def do(args):
         qibuild.sh.mkdir(destdir, recursive=True)
         toc.install_project(project, destdir, prefix="/",
                             runtime=True, num_jobs=args.num_jobs,
-                            split_debug=True)
+                            split_debug=args.split_debug)
         qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)
+        if not args.split_debug:
+            continue
         gdb_script, message = qibuild.deploy.generate_debug_scripts(toc, project.name,
                                                                     args.url,
                                                                     deploy_dir=destdir)
@@ -111,6 +120,8 @@ def do(args):
             binaries = [x for x in binaries if os.path.isfile(os.path.join(bindir, x))]
             binaries = [os.path.join("bin", x) for x in binaries]
         deployed_list.append((project, binaries, gdb_script, message))
+    if not args.split_debug:
+        return
     ui.info(ui.green, ":: ", "Deployed projects")
     for (i, deployed) in enumerate(deployed_list):
         project, binaries, gdb_script, message = deployed
