@@ -11,11 +11,10 @@ import qibuild.sh
 def configure_file(in_file, out_file,  opts=None, append_file=None):
     """Configure file from in_path to out_path,
 
-    If opts is not None, use string.format() with the
-         contents of contents of the opts dictionnary
+    If opts is not None, use string.format() with the contents of contents of
+    the opts dictionnary.
 
-    If append_file is not None, append the contents of the file to
-        the the output
+    If append_file is not None, append the contents of the file to the output.
 
     If the file already exists and the contents of the file already are
     correct, do not write it.

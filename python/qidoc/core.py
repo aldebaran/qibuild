@@ -25,119 +25,133 @@ class QiDocBuilder:
     def __init__(self, in_dir, out_dir="build-doc"):
         self.worktree = qisrc.worktree.open_worktree(in_dir)
 
-        self.in_dir, self.out_dir, self.opts = in_dir, out_dir, dict()
+        self.in_dir, self.out_dir = in_dir, out_dir
         self.templates_path, self.docs = None, dict()
 
         self._load_doc_projects()
         self.doxytags_path = os.path.join(self.out_dir, "doxytags")
 
-    def configure_all(self, opts):
+    def configure_all(self, opts, project=None):
         """Configure every projects.
 
         Always called before building anything.
         """
         if 'version' not in opts:
-            raise Exception("opts dict must at least contain a 'version' key")
+            raise VersionKeyMissingError(opts)
 
-        self.opts = opts.copy()
         qibuild.sh.mkdir(self.doxytags_path, recursive=True)
         doxylink = dict()
 
-        doxydocs = self.sort_doxygen()
-        for doxydoc in doxydocs:
-            doxygen_mapping = self.get_doxygen_mapping(doxydoc.name)
-            qidoc.doxygen.configure(doxydoc.src,
-                    self.templates_path,
-                    opts,
-                    project_name=doxydoc.name,
-                    doxytags_path=self.doxytags_path,
-                    doxygen_mapping=doxygen_mapping)
+        if project is not None:
+            if project not in self.docs:
+                raise NoSuchProjectError(project)
+            self.docs[name].configure(opts)
+            return
+        for doc in self.docs.values():
+            doc.configure(opts)
 
-            tag_file = os.path.join(self.doxytags_path, doxydoc.name + ".tag")
-            # Store full path here because we'll need to compute
-            # a relative path later
-            doxylink[doxydoc.name] = (tag_file, doxydoc.dest)
+# FIXME: dead code
+#        doxydocs = self.sort_doxygen()
+#        for doxydoc in doxydocs:
+#            doxygen_mapping = self.get_doxygen_mapping(doxydoc.name)
+#            qidoc.doxygen.configure(doxydoc.src,
+#                    self.templates_path,
+#                    opts,
+#                    project_name=doxydoc.name,
+#                    doxytags_path=self.doxytags_path,
+#                    doxygen_mapping=doxygen_mapping)
+#
+#            tag_file = os.path.join(self.doxytags_path, doxydoc.name + ".tag")
+#            # Store full path here because we'll need to compute
+#            # a relative path later
+#            doxylink[doxydoc.name] = (tag_file, doxydoc.dest)
+#
+#        sphinxdocs = self.sort_sphinx()
+#        for sphinxdoc in sphinxdocs:
+#            intersphinx_mapping = self.get_intersphinx_mapping(sphinxdoc.name)
+#            qidoc.sphinx.configure(sphinxdoc.src, sphinxdoc.dest,
+#                self.templates_path,
+#                intersphinx_mapping,
+#                doxylink,
+#                opts)
+#            qidoc.sphinx.gen_download_zips(sphinxdoc.src)
 
-        sphinxdocs = self.sort_sphinx()
-        for sphinxdoc in sphinxdocs:
-            intersphinx_mapping = self.get_intersphinx_mapping(sphinxdoc.name)
-            qidoc.sphinx.configure(sphinxdoc.src, sphinxdoc.dest,
-                self.templates_path,
-                intersphinx_mapping,
-                doxylink,
-                opts)
-            qidoc.sphinx.gen_download_zips(sphinxdoc.src)
-
-    def build_all(self, opts):
+    def build(self, opts, project=None):
         """Build everything."""
-        self.configure_all(opts)
-        doxydocs = self.sort_doxygen()
-        for doxydoc in doxydocs:
-            qidoc.doxygen.build(doxydoc.src, doxydoc.dest, opts)
-        sphinxdocs = self.sort_sphinx()
-        for sphinxdoc in sphinxdocs:
-            qidoc.sphinx.build(sphinxdoc.src, sphinxdoc.dest, opts)
+        self.configure(opts, project=project)
 
-    def build_single(self, project, opts):
-        """Used to build a single project."""
-        if project not in self.docs:
-            raise NoSuchProjectError(project)
-        self.configure_all(opts)
-        self.docs[project].build(opts)
+        # We don't check that project exists because configure method should
+        # already have checked this.
+        if project is not None:
+            self.docs[name].build(opts)
+            return
 
-    def open_main(self):
-        """Used to open main doc. We assume one of the project as a dest
-        equals to `.`
-        """
-        index_html = os.path.join(self.out_dir, "index.html")
-        ui.info("Opening", index_html, "in a web browser")
-        if sys.platform == "darwin":
-            index_html = "file://" + index_html
-        webbrowser.open(index_html)
+        for doc in self.docs.values():
+            doc.build(opts)
 
-    def open_single(self, project):
-        """ User to open a single doc."""
-        doc_proj = self.get_doc("sphinx", project)
-        if not doc_proj:
-            doc_proj = self.get_doc("doxygen", project)
-        if not doc_proj:
-            raise Exception("No such project: %s" % project)
+# FIXME: dead code
+#    def build_single(self, project, opts):
+#        """Used to build a single project."""
+#        if project not in self.docs:
+#            raise NoSuchProjectError(project)
+#        self.configure_all(opts)
+#        self.docs[project].build(opts)
 
-        index_html = os.path.join(doc_proj.dest, "index.html")
-        ui.info("Opening", index_html, "in a web browser")
-        if sys.platform == "darwin":
-            index_html = "file://" + index_html
-        webbrowser.open(index_html)
+# FIXME: move this in qidoc.docs.{sphinx.SphinxDoc,doxygen.Doxygen}
+#    def open_main(self):
+#        """Used to open main doc. We assume one of the project as a dest
+#        equals to `.`
+#        """
+#        index_html = os.path.join(self.out_dir, "index.html")
+#        ui.info("Opening", index_html, "in a web browser")
+#        if sys.platform == "darwin":
+#            index_html = "file://" + index_html
+#        webbrowser.open(index_html)
+#
+#    def open_single(self, project):
+#        """ User to open a single doc."""
+#        doc_proj = self.get_doc("sphinx", project)
+#        if not doc_proj:
+#            doc_proj = self.get_doc("doxygen", project)
+#        if not doc_proj:
+#            raise Exception("No such project: %s" % project)
+#
+#        index_html = os.path.join(doc_proj.dest, "index.html")
+#        ui.info("Opening", index_html, "in a web browser")
+#        if sys.platform == "darwin":
+#            index_html = "file://" + index_html
+#        webbrowser.open(index_html)
 
-    def get_intersphinx_mapping(self, name):
-        """Get the relevant intersphinx_mapping for the given name."""
-        res = dict()
-        deps_tree = self.deps_tree["sphinx"]
-        doc_names = topological_sort(deps_tree, [name])
-        docs = [self.get_doc("sphinx", d) for d in doc_names]
-        for doc in docs:
-            # Remove self from the list:
-            if doc.name != name:
-                res[doc.name] = (doc.dest, None)
-        return res
-
-    def get_doxygen_mapping(self, name):
-        """Get the relevant Doxygen TAGFILES setting."""
-        doc = self.get_doc("doxygen", name)
-        res = dict()
-        deps_tree = self.deps_tree["doxygen"]
-        dep_doc_names = topological_sort(deps_tree, [name])
-        dep_docs = [self.get_doc("doxygen", d) for d in dep_doc_names]
-        for dep_doc in dep_docs:
-            # Remove self from the list
-            if dep_doc.name == name:
-                continue
-            doxytag_file = os.path.join(self.doxytags_path,
-                dep_doc.name + ".tag")
-            dep_dest = dep_doc.dest
-            rel_path = os.path.relpath(dep_dest, doc.dest)
-            res[doxytag_file] = rel_path
-        return res
+# FIXME: dead code.
+#    def get_intersphinx_mapping(self, name):
+#        """Get the relevant intersphinx_mapping for the given name."""
+#        res = dict()
+#        deps_tree = self.deps_tree["sphinx"]
+#        doc_names = topological_sort(deps_tree, [name])
+#        docs = [self.get_doc("sphinx", d) for d in doc_names]
+#        for doc in docs:
+#            # Remove self from the list:
+#            if doc.name != name:
+#                res[doc.name] = (doc.dest, None)
+#        return res
+#
+#    def get_doxygen_mapping(self, name):
+#        """Get the relevant Doxygen TAGFILES setting."""
+#        doc = self.get_doc("doxygen", name)
+#        res = dict()
+#        deps_tree = self.deps_tree["doxygen"]
+#        dep_doc_names = topological_sort(deps_tree, [name])
+#        dep_docs = [self.get_doc("doxygen", d) for d in dep_doc_names]
+#        for dep_doc in dep_docs:
+#            # Remove self from the list
+#            if dep_doc.name == name:
+#                continue
+#            doxytag_file = os.path.join(self.doxytags_path,
+#                dep_doc.name + ".tag")
+#            dep_dest = dep_doc.dest
+#            rel_path = os.path.relpath(dep_dest, doc.dest)
+#            res[doxytag_file] = rel_path
+#        return res
 
     def _load_doc_projects(self):
         """Explore the qibuild projects, building the sphinxdocs and doxydocs
@@ -148,13 +162,15 @@ class QiDocBuilder:
             if not os.path.exists(qiproj_xml):
                 continue
             docs = qidoc.config.parse_project_config(qiproj_xml)
-            # Fixup src, dest attributes:
             for doc in docs:
                 self._set_paths(project, doc)
                 if doc.name in self.docs:
                     raise ProjectNameCollisionError(self.docs[doc.name], doc)
                 self.docs[doc.name] = doc
+                self.docs[doc.name].docs = self.docs
             self.check_template(project.path, qiproj_xml)
+        if not self.templates_path:
+            raise NoTemplateRepositoryError()
 
     def _set_paths(self, worktree_project, doc_project):
         """Set src and dest attributes of the doc project."""
@@ -173,8 +189,6 @@ class QiDocBuilder:
             return
         if self.templates_path:
             raise TemplateProjectAlreadyExistsError(p_path, self.template_path)
-        if not p_path:
-            raise NoTemplateRepositoryError()
         self.templates_path = p_path
 
     def project_from_cwd(self, cwd=None):
@@ -196,6 +210,7 @@ class QiDocBuilder:
             keys.append(k)
             groups.append(sorted(g))
         return zip(keys, groups)
+
 
 class ProjectNameCollisionError(Exception):
     def __init__(self, project1, project2):
@@ -237,3 +252,14 @@ class NoSuchProjectError(Exception):
 
     def __str__(self):
         return 'No such project: {project}'.format(project = project)
+
+
+class VersionKeyMissingError(Exception):
+    def __init__(self, opts):
+        self.opts = opts
+
+    def __str__(self):
+        return '''Opts dictionary must at least contain a 'version' key.
+It was containing the following keys: {keys}'''.format(
+            keys = ', '.join(sorted(self.opts.keys()))
+        )
