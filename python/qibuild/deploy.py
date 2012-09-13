@@ -50,33 +50,49 @@ ssh %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
 def parse_url(remote_url):
     """ Parse a remote url
 
-    :return: a tuple: (username, host, path)
+    :return: a tuple: (remote, server, remote_dir)
+
+    Examples:
+
+    >>> parse_url('nao@10.0.253.181:deploy')
+    ('nao@10.0.253.181', '10.0.253.181', 'deploy')
+    >>> parse_url('10.0.253.181:deploy')
+    ('10.0.253.181', '10.0.253.181', 'deploy')
+    >>> parse_url('10.0.253.181:')
+    ('10.0.253.181', '10.0.253.181', '')
+    >>> parse_url('10.0.253.181')
+    Traceback (most recent call last):
+        ...
+        raise Exception(mess)
+
+    Note that the if the user plays with the "hostname" option in its
+    .ssh/config, the "server" part might not be a valid hostname. In such a
+    case, the deploy will work (thanks to ssh) but the remote debugging will
+    not.
 
     """
+
     match = re.match(r"""
-        ((?P<username>[a-zA-Z0-9\._-]+)@)?
-        (?P<server>[a-zA-Z0-9\._-]+)
+        (?P<remote>
+         ((?P<username>[a-zA-Z0-9\._-]+)@)?
+         (?P<server>[a-zA-Z0-9\._-]+))
         :
-        (?P<path>[a-zA-A0-9\.~_/-]*)
+        (?P<remote_dir>[a-zA-A0-9\.~_/-]*)$
         """, remote_url, re.VERBOSE)
+    # note: this regexp does not support having weird chars (such as @ or ?)
+    # or spaces in remote_dir. At least it will complain.
     if not match:
         mess  = "Invalid remote url: %s\n" % remote_url
-        mess += "Remote url should look like user@host:path"
+        mess += "Remote url should look like user@host:path or host:path"
         raise Exception(mess)
     groupdict = match.groupdict()
-    username = groupdict["username"]
-    if not username:
-        username = os.environ.get("USERNAME")
-    server = groupdict["server"]
-    path = groupdict["path"]
-    return (username, server, path)
+    return (groupdict["remote"], groupdict["server"], groupdict["remote_dir"])
 
 
 def deploy(local_directory, remote_url, port=22, use_rsync=True):
     """ Deploy a local directory to a remote url
 
     """
-    (username, server, path) = parse_url(remote_url)
     if use_rsync:
         # This is required for rsync to do the right thing,
         # otherwise the basename of local_directory gets
@@ -171,7 +187,7 @@ def _generate_solib_search_path(toc, project_name):
 
 def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
     """ generate all scripts needed for debug """
-    (username, server, remote_directory) = qibuild.deploy.parse_url(url)
+    (remote, server, remote_directory) = qibuild.deploy.parse_url(url)
 
     destdir = toc.get_project(project_name).build_directory
     if deploy_dir:
@@ -206,6 +222,6 @@ def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
                         solib_search_path=solib_search_path,
                         remote_gdb_address="%s:2159" % server)
     gdb_script = _generate_run_gdbserver_binary(destdir, gdb=gdb, gdb_listen=":2159",
-                                                remote="%s@%s" % (username, server),
+                                                remote=remote,
                                                 remote_dir=remote_directory)
     return (gdb_script, message)

@@ -9,14 +9,13 @@ import qibuild.deploy
 
 def test_parse_url():
     res = qibuild.deploy.parse_url("john42-bar@foo.bar.com:some/really_strange-path")
-    assert res == ("john42-bar", "foo.bar.com", "some/really_strange-path")
+    assert res == ("john42-bar@foo.bar.com", "foo.bar.com", "some/really_strange-path")
     res = qibuild.deploy.parse_url("john@foo:")
-    assert res == ("john", "foo", "")
+    assert res == ("john@foo", "foo", "")
+    res = qibuild.deploy.parse_url("foo:lol")
+    assert res == ("foo", "foo", "lol")
     # pylint: disable-msg=E1101
     with pytest.raises(Exception):
         qibuild.deploy.parse_url("john@bar")
-
-def test_parse_url_no_username(monkeypatch):
-    monkeypatch.setenv("USERNAME", "john")
-    res = qibuild.deploy.parse_url("foo.bar:")
-    assert res == ("john", "foo.bar", "")
+    with pytest.raises(Exception):
+        qibuild.deploy.parse_url("john@bar:lol ")

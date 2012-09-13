@@ -46,7 +46,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     url = args.url
-    (username, server, remote_directory) = qibuild.deploy.parse_url(url)
+    qibuild.deploy.parse_url(url) # throws if url is invalid
     toc = qibuild.toc_open(args.worktree, args)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
