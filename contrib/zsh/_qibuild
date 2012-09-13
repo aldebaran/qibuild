@@ -1,0 +1,103 @@
+#compdef qibuild
+
+typeset -A opt_args
+
+_qibuild_configs() {
+  local -a configs
+  configs=( "system" $(qitoolchain list | grep "   " | tr -d ' ') )
+  typeset -U configs
+  compadd "$@" -a configs
+}
+
+_qibuild_projects() {
+  local -a projects
+  projects=( $(qibuild list | sed -n "s/ \*  \([a-z0-9_-]*\).*/\1/p") )
+  typeset -U projects
+  compadd "$@" -a projects
+}
+
+_qibuild_opts_actions=(
+  "1:action:(clean config configure convert create depends deploy doc find foreach init install list make open package status test -h --help)"
+)
+
+_qibuild_opts_projects=(
+  "*:projects:_qibuild_projects"
+)
+
+_qibuild_opts_actions_global=(
+  "-h[show this help message and exit]"
+  "--help[show this help message and exit]"
+  "-w[Use a specific work tree path]:worktree:_directories"
+  "--worktree[Use a specific work tree path]:worktree:_directories"
+  "--work-tree[Use a specific work tree path]:worktree:_directories"
+  "-c[The configuration to use. It should match the name of a toolchain. The settings from <worktree>/.qi/<config>.cmake will also be used]:config:_qibuild_configs"
+  "--config[The configuration to use. It should match the name of a toolchain. The settings from <worktree>/.qi/<config>.cmake will also be used]:config:_qibuild_configs"
+  "-v[Output debug messages]"
+  "--verbose[Output debug messages]"
+  "--quiet[Only output error messages]"
+  "-q[Only output error messages]"
+  "--no-color[Do not use color]"
+  "--time-stamp[Add timestamps before each log message]"
+  "--color[Colorize output. This is the default]"
+  "--backtrace[Display backtrace on error]"
+  "--pdb[Use pdb on error]"
+  "--quiet-commands[Do not print command outputs]"
+  "--release[Build in release (set CMAKE_BUILD_TYPE=Release)]"
+  "--debug[Build in debug (set CMAKE_BUILD_TYPE=Debug)]"
+  "--build-type[CMAKE_BUILD_TYPE usually Debug or Release]:buildtype:(Debug Release)"
+  "-G[Specify the CMake generator]:cmakegenerator:(\"Unix Makefiles\" Ninja)"
+  "-j[Number of jobs to use]"
+  "-a[Work on all projects]"
+  "--all[Work on all projects]"
+  "-s[Work on specified projects without taking dependencies into account.]"
+  "--single[Work on specified projects without taking dependencies into account.]"
+  "--build-deps[Work on specified projects by ignoring the runtime deps. Useful when you have lots of runtime plugins you don't want to compile for instance]"
+  "--runtime[Work on specified projects by using only the runtime deps. Mostly used by qibuild install --runtime]"
+)
+
+_qibuild_opts_actions_make=(
+  "-t[Special target to build]:targets:(THIS IS NOT YET SUPPORTED)"
+  "--target[Special target to build]:targets:(THIS IS NOT YET SUPPORTED)"
+  "--rebuild[]"
+  "-r[]"
+  "--no-fix-shared-libs[Do not try to fix shared libraries after build. Used by \`qibuild package\`]"
+)
+
+_qibuild_action_none() {
+  _values -w "option" \
+    "*clean[Clean build directories.]" \
+    "*config[Display the current config]" \
+    "*configure[Configure a project]" \
+    "*convert[Convert an existing project to a qiBuild project]" \
+    "*create[Create a new project]" \
+    "*depends[Display dependencies of projects]" \
+    "*deploy[Deploy project(s) on a remote target]" \
+    "*doc[Alias for qidoc.actions.build]" \
+    "*find[Find a package]" \
+    "*foreach[Run the same command on each buildable project.]" \
+    "*init[Initialize a new toc worktree]" \
+    "*install[Install a project and its dependencies]" \
+    "*list[List the name and path of every buildable project]" \
+    "*make[Build a project]" \
+    "*open[Open a project with an IDE]" \
+    "*package[Generate a binary sdk]" \
+    "*status[Display the status of each project]" \
+    "*test[Launch automatic tests]"
+}
+
+_qibuild() {
+  case $words[2] in
+    make*)
+      _arguments -s : \
+        "$_qibuild_opts_actions[@]" \
+        "$_qibuild_opts_actions_global[@]" \
+        "$_qibuild_opts_actions_make[@]" \
+        "$_qibuild_opts_projects[@]"
+      ;;
+    *)
+      _qibuild_action_none
+      ;;
+  esac
+}
+
+_qibuild "$@"
