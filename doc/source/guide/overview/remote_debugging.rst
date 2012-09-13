@@ -93,8 +93,6 @@ should be more or less the same for other IDEs.
 * Open QtCreator and select the ``connect to a remote gdb server`` option
 
 .. image:: /pics/qtcreator-remote-debugging-menu.png
-    :width:  100 %
-
 
 * Configure the remote debugging settings:
 
