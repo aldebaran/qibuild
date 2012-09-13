@@ -2,9 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Set of tools to handle doxygen projects
-
-"""
+"""Set of tools to handle doxygen projects."""
 
 import os
 
@@ -13,10 +11,8 @@ import qidoc.templates
 
 from qibuild import ui
 
-def configure(src, templates, opts,
-    project_name=None,
-    doxytags_path=None,
-    doxygen_mapping=None):
+def configure(src, templates, opts, project_name=None, doxytags_path=None,
+              doxygen_mapping=None):
     """Configure a doxygen project
 
     Will we generate a Doxyfile.qidoc file (with header.html. footer.html and
