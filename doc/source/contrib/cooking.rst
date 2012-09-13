@@ -64,7 +64,7 @@ qibuild
 
 .. seealso::
 
-    * :ref:`qibuild-remote-device`
+    * :ref:`qibuild-remote-debugging`
 
 
 qicd

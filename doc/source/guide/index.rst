@@ -28,6 +28,7 @@ qibuild Overview
 * :ref:`qibuild-building-project`
 * :ref:`qibuild-testing-project`
 * :ref:`qibuild-packaging-project`
+* :ref:`qibuild-remote-debugging`
 * :ref:`qibuild-managing-deps`
 
 

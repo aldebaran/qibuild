@@ -36,6 +36,8 @@ Here we are only dealing with the details for:
 qiBuild is known to work fine with these IDEs, there may be some work to do to
 be able to use XCode or Eclipse. Patches and tutorials welcome !
 
+.. _qibuild-qtcreator:
+
 qiBuild and QtCreator
 +++++++++++++++++++++
 
