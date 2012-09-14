@@ -35,14 +35,7 @@ create_launcher() {
   cat <<EOF >"${DESTDIR}/${name}"
 #!/bin/sh
 
-QIBUILDDIR="${p}"
-
-PYTHON=\$(for pybin in python python2 ; do
-    \${pybin} --version 2>&1 | grep -q "2\.[6-7]\.*" &&
-    echo \${pybin} && break ;
-  done)
-
-\$PYTHON "\${QIBUILDDIR}/${full_path}" ${args} "\$@"
+python "${p}/${full_path}" ${args} "\$@"
 EOF
   chmod 755 "${DESTDIR}/${name}"
   echo "Installed: ${DESTDIR}/${name}"

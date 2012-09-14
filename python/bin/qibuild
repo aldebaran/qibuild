@@ -10,6 +10,18 @@
 import sys
 import os
 
+if __name__ == '__main__':
+    if sys.version_info.major != 2:
+        print('[WARN ]: the script was not run using Python 2, will try to ' \
+              'find it.')
+        res = 1
+        try:
+            import subprocess
+            res = subprocess.call(['python2'] + sys.argv)
+        except OSError as e:
+            print(e)
+        sys.exit(res)
+
 # sys.path
 def patch_sys_path():
     """
@@ -41,8 +53,8 @@ def print_version():
 
     """
     import qibuild
-    print "qibuild version 1.16"
-    print "Using cmake code from", qibuild.cmake.get_cmake_qibuild_dir()
+    print("qibuild version 1.16")
+    print("Using cmake code from", qibuild.cmake.get_cmake_qibuild_dir())
 
 
 def main():
