@@ -2,6 +2,26 @@
 
 typeset -A opt_args
 
+_qibuild_find_worktree() {
+  local index file
+  for ((index=0; index < $#@; index++))
+  do
+    case $@[index] in
+      -w|--worktree|--work-tree)
+        file=${~@[index+1]}
+        if [ -d $file/.qi ];
+        then
+          WORKTREE=$file
+        else
+          WORKTREE=""
+        fi
+        ;;
+      *)
+        ;;
+    esac
+  done
+}
+
 _qibuild_configs() {
   local -a configs
   configs=( "system" $(qitoolchain list | grep "   " | tr -d ' ') )
@@ -10,8 +30,14 @@ _qibuild_configs() {
 }
 
 _qibuild_projects() {
-  local -a projects
-  projects=( $(qibuild list | sed -n "s/ \*  \([a-z0-9_-]*\).*/\1/p") )
+  local -a projects worktree
+  _qibuild_find_worktree $words
+  if [ -n "$WORKTREE" ];
+  then
+    projects=( $(qibuild list -w $WORKTREE | sed -n "s/ \*  \([a-z0-9_-]*\).*/\1/p") )
+  else
+    projects=( $(qibuild list | sed -n "s/ \*  \([a-z0-9_-]*\).*/\1/p") )
+  fi
   typeset -U projects
   compadd "$@" -a projects
 }
