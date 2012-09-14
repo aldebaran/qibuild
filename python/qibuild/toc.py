@@ -612,6 +612,7 @@ The following tools were not found: {missing}\
         for component in runtime_components:
             self.build_env["DESTDIR"] = destdir
             cmake_args = list()
+            cmake_args += ["-DBUILD_TYPE=%s" % self.build_type]
             cmake_args += ["-DCOMPONENT=%s" % component]
             cmake_args += ["-P", "cmake_install.cmake", "--"]
             cmake_args += num_jobs_to_args(num_jobs, self.cmake_generator)
