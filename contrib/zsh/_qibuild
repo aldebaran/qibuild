@@ -87,9 +87,8 @@ _qibuild_action_none() {
 
 _qibuild() {
   case $words[2] in
-    make*)
+    make)
       _arguments -s : \
-        "$_qibuild_opts_actions[@]" \
         "$_qibuild_opts_actions_global[@]" \
         "$_qibuild_opts_actions_make[@]" \
         "$_qibuild_opts_projects[@]"
