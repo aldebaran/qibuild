@@ -18,8 +18,9 @@ from qibuild import ui
 class QiDocBuilder:
     """A class to handle doc generation of several projects."""
 
-    def __init__(self, in_dir, out_dir=None):
+    def __init__(self, projects, in_dir, out_dir=None):
         self.worktree = qisrc.worktree.open_worktree(in_dir)
+        self.projects, self.projects_to_build = projects, []
 
         self.templates_path, self.docs, self.in_dir = None, dict(), in_dir
         if not out_dir:
@@ -62,8 +63,10 @@ class QiDocBuilder:
         if project is not None:
             self.docs[project].build(self.docs, opts)
             return
-        for doc in self.docs.values():
-            doc.build(self.docs, opts)
+        if len(self.projects) == len(self.docs.keys()):
+            ui.warning('Building the whole worktree.')
+        for doc in self.projects_to_build:
+            self.docs[doc.name].build(self.docs, opts)
 
     def open(self, project=None):
         '''Opens a project in browser.'''
@@ -93,6 +96,8 @@ class QiDocBuilder:
                     raise ProjectNameCollisionError(self.docs[doc.name], doc)
                 self.docs[doc.name] = doc
                 self.docs[doc.name].docs = self.docs
+                if project.src in [prj.src for prj in self.projects]:
+                    self.projects_to_build.append(doc)
             self.check_template(project.path, qiproj_xml)
         if not self.templates_path:
             raise NoTemplateRepositoryError()
