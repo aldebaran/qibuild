@@ -1,3 +1,8 @@
+import os
+
+import qibuild
+import qidoc.templates
+
 from qidoc.docs.documentation import Documentation, ConfigureFailed
 
 class DoxygenDoc(Documentation):
@@ -5,15 +10,17 @@ class DoxygenDoc(Documentation):
 
     def get_mapping(self, docs, **kwargs):
         res = dict()
-        for dep in self.dependencies:
+        for dep_name in self.dependencies:
+            dep = docs[dep_name]
             doxytag_file = os.path.join(kwargs['doxytags_path'],
                                         dep.name + ".tag")
-            res[doxytag_file] = os.path.realpath(dep.dest, self.dest)
+            res[doxytag_file] = (os.path.realpath(dep.dest), self.dest)
         return res
 
-    def _configure(self, opts, **kwargs):
+    def _configure(self, docs, opts, **kwargs):
         try:
             templates = kwargs['templates']
+            doxytags_path = kwargs['doxytags_path']
         except KeyError as e:
             raise ConfigureFailed(self.name,
                 'Keyword argument `{opt}` is missing'.format(opt = e)
@@ -30,11 +37,11 @@ class DoxygenDoc(Documentation):
             opts['OUTPUT_DIRECTORY'] = 'build-doc'
             opts['GENERATE_TAGFILE'] = ''
             if doxytags_path:
-                tag_file = os.path.join(doxytags_path, project_name + '.tag')
+                tag_file = os.path.join(doxytags_path, self.name + '.tag')
                 opts['GENERATE_TAGFILE'] = tag_file
 
             # tag files for dependencies.
-            tagfiles = list()
+            tagfiles, doxygen_mapping = list(), self.get_mapping(docs, **kwargs)
             if doxygen_mapping:
                 for (k, v) in doxygen_mapping.iteritems():
                     tagfiles.append("%s=%s" % (k, v))
@@ -42,10 +49,13 @@ class DoxygenDoc(Documentation):
 
             append_file = None
             if name == "Doxyfile.in":
-                append_file = os.path.join(src, "Doxyfile.in")
+                append_file = os.path.join(self.src, "Doxyfile.in")
             qidoc.templates.configure_file(in_file, out_file,
                                            append_file=append_file,
                                            opts=opts)
+
+        tag_file = os.path.join(doxytags_path, self.name + ".tag")
+        kwargs['doxylink'][self.name] = (tag_file, self.dest)
 
         # Also copy the css:
         qibuild.sh.install(
@@ -53,8 +63,7 @@ class DoxygenDoc(Documentation):
             os.path.join(self.src, "doxygen.css"),
             quiet=True)
 
-    def _build(self, opts, **kwargs):
-        ui.info(ui.green, "Building doxygen", self.src)
+    def _build(self, docs, opts, **kwargs):
         cmd = ["doxygen", "Doxyfile.qidoc"]
         qibuild.command.call(cmd, cwd=self.src)
         build_html = os.path.join(self.src, "build-doc", "html")

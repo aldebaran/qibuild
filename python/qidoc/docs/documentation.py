@@ -2,6 +2,8 @@
 import abc
 import qixml
 
+from qibuild import ui
+
 class MissingDependencyError(Exception):
     def __init__(self, doc, dep):
         self.doc, self.dep = doc, dep
@@ -39,7 +41,7 @@ class Documentation:
 
     def __init__(self, element):
         self.name, self.src, self.dest, self.dependencies = None, None, None, []
-        self.configured, self.built, self.docs = False, False, None
+        self._configured, self._built, self.docs = False, False, None
         self._parse(element)
 
     def _parse(self, element):
@@ -50,31 +52,34 @@ class Documentation:
         for depends_element in depends_elements:
             self.dependencies.append(depends_element.get('name'))
 
-    def configure(self):
-        if self.configured:
+    def configure(self, docs, opts, **kwargs):
+        if self._configured:
             return
-        if self.configured is None:
+        if self._configured is None:
             # We have a cycle in the dependencies, user should check his
             # configuration. FIXME: Report better error.
             mess = 'Cycle in dependencies detected. '
             mess += 'Check your configuration.'
             raise Exception(mess)
-        self.configured = None
+        self._configured = None
         for dependency in self.dependencies:
-            if dependency.name not in docs:
+            if dependency not in docs:
                 raise MissingDependencyError(self, dependency)
-            docs[dependency].configure()
-        self._configure()
-        self.configured = True
+            docs[dependency].configure(docs, opts, **kwargs)
+        ui.debug('Configuring', self.type_name(), 'project', self.name)
+        self._configure(docs, opts, **kwargs)
+        self._configured = True
 
-    def build(self):
-        if self.built:
+    def build(self, docs, opts, **kwargs):
+        if self._built:
             return
         for dependency in self.dependencies:
             if dependency not in docs:
                 raise MissingDependencyError(self, dependency)
-            docs[dependency.name].build()
-        self._build()
+            docs[dependency].build(docs, opts, **kwargs)
+        ui.info('Building', self.type_name(), 'project', self.name)
+        self._build(docs, opts, **kwargs)
+        self._built = True
 
     def __cmp__(self, other):
         res = cmp(self.type_name(), other.type_name())
@@ -91,9 +96,9 @@ class Documentation:
         pass
 
     @abc.abstractmethod
-    def _configure(self, opts, **kwargs):
+    def _configure(self, docs, opts, **kwargs):
         pass
 
     @abc.abstractmethod
-    def _build(self, opts, **kwargs):
+    def _build(self, docs, opts, **kwargs):
         pass

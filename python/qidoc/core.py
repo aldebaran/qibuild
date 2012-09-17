@@ -17,21 +17,23 @@ import qidoc.sphinx
 import qisrc
 
 from qibuild import ui
-# FIXME: dead code. from qibuild.dependencies_solver import topological_sort
 
 class QiDocBuilder:
     """A class to handle doc generation of several projects."""
 
-    def __init__(self, in_dir, out_dir="build-doc"):
+    def __init__(self, in_dir, out_dir=None):
         self.worktree = qisrc.worktree.open_worktree(in_dir)
 
-        self.in_dir, self.out_dir = in_dir, out_dir
-        self.templates_path, self.docs = None, dict()
+        self.templates_path, self.docs, self.in_dir = None, dict(), in_dir
+        if not out_dir:
+            self.out_dir = os.path.join(self.worktree.root, "build-doc")
+        else:
+            self.out_dir = qibuild.sh.to_native_path(out_dir)
 
         self._load_doc_projects()
         self.doxytags_path = os.path.join(self.out_dir, "doxytags")
 
-    def configure_all(self, opts, project=None):
+    def configure(self, opts, project=None):
         """Configure every projects.
 
         Always called before building anything.
@@ -40,41 +42,19 @@ class QiDocBuilder:
             raise VersionKeyMissingError(opts)
 
         qibuild.sh.mkdir(self.doxytags_path, recursive=True)
-        doxylink = dict()
 
+        kwargs = {
+            'doxytags_path': self.doxytags_path,
+            'templates': self.templates_path,
+            'doxylink': dict(),
+        }
         if project is not None:
             if project not in self.docs:
                 raise NoSuchProjectError(project)
-            self.docs[name].configure(opts)
+            self.docs[project].configure(self.docs, opts, **kwargs)
             return
         for doc in self.docs.values():
-            doc.configure(opts)
-
-# FIXME: dead code
-#        doxydocs = self.sort_doxygen()
-#        for doxydoc in doxydocs:
-#            doxygen_mapping = self.get_doxygen_mapping(doxydoc.name)
-#            qidoc.doxygen.configure(doxydoc.src,
-#                    self.templates_path,
-#                    opts,
-#                    project_name=doxydoc.name,
-#                    doxytags_path=self.doxytags_path,
-#                    doxygen_mapping=doxygen_mapping)
-#
-#            tag_file = os.path.join(self.doxytags_path, doxydoc.name + ".tag")
-#            # Store full path here because we'll need to compute
-#            # a relative path later
-#            doxylink[doxydoc.name] = (tag_file, doxydoc.dest)
-#
-#        sphinxdocs = self.sort_sphinx()
-#        for sphinxdoc in sphinxdocs:
-#            intersphinx_mapping = self.get_intersphinx_mapping(sphinxdoc.name)
-#            qidoc.sphinx.configure(sphinxdoc.src, sphinxdoc.dest,
-#                self.templates_path,
-#                intersphinx_mapping,
-#                doxylink,
-#                opts)
-#            qidoc.sphinx.gen_download_zips(sphinxdoc.src)
+            doc.configure(self.docs, opts, **kwargs)
 
     def build(self, opts, project=None):
         """Build everything."""
@@ -83,19 +63,10 @@ class QiDocBuilder:
         # We don't check that project exists because configure method should
         # already have checked this.
         if project is not None:
-            self.docs[name].build(opts)
+            self.docs[project].build(self.docs, opts)
             return
-
         for doc in self.docs.values():
-            doc.build(opts)
-
-# FIXME: dead code
-#    def build_single(self, project, opts):
-#        """Used to build a single project."""
-#        if project not in self.docs:
-#            raise NoSuchProjectError(project)
-#        self.configure_all(opts)
-#        self.docs[project].build(opts)
+            doc.build(self.docs, opts)
 
 # FIXME: move this in qidoc.docs.{sphinx.SphinxDoc,doxygen.Doxygen}
 #    def open_main(self):
@@ -121,37 +92,6 @@ class QiDocBuilder:
 #        if sys.platform == "darwin":
 #            index_html = "file://" + index_html
 #        webbrowser.open(index_html)
-
-# FIXME: dead code.
-#    def get_intersphinx_mapping(self, name):
-#        """Get the relevant intersphinx_mapping for the given name."""
-#        res = dict()
-#        deps_tree = self.deps_tree["sphinx"]
-#        doc_names = topological_sort(deps_tree, [name])
-#        docs = [self.get_doc("sphinx", d) for d in doc_names]
-#        for doc in docs:
-#            # Remove self from the list:
-#            if doc.name != name:
-#                res[doc.name] = (doc.dest, None)
-#        return res
-#
-#    def get_doxygen_mapping(self, name):
-#        """Get the relevant Doxygen TAGFILES setting."""
-#        doc = self.get_doc("doxygen", name)
-#        res = dict()
-#        deps_tree = self.deps_tree["doxygen"]
-#        dep_doc_names = topological_sort(deps_tree, [name])
-#        dep_docs = [self.get_doc("doxygen", d) for d in dep_doc_names]
-#        for dep_doc in dep_docs:
-#            # Remove self from the list
-#            if dep_doc.name == name:
-#                continue
-#            doxytag_file = os.path.join(self.doxytags_path,
-#                dep_doc.name + ".tag")
-#            dep_dest = dep_doc.dest
-#            rel_path = os.path.relpath(dep_dest, doc.dest)
-#            res[doxytag_file] = rel_path
-#        return res
 
     def _load_doc_projects(self):
         """Explore the qibuild projects, building the sphinxdocs and doxydocs
