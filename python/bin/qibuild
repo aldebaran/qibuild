@@ -11,7 +11,12 @@ import sys
 import os
 
 if __name__ == '__main__':
-    if sys.version_info.major != 2:
+    try:
+        major = sys.version_info.major
+    except AttributeError:
+        # Python < 2.7
+        major = sys.version_info[0]
+    if major != 2:
         print('[WARN ]: the script was not run using Python 2, will try to ' \
               'find it.')
         res = 1
