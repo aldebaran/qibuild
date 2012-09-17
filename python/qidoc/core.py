@@ -141,11 +141,14 @@ class QiDocBuilder:
         '''Returns a grouped list of documentations available and sorted, in
         tuples (documentation_type_name, documentations).'''
         keys, groups, grouper = [], [], lambda d: d.type_name()
-        for key, group in itertools.groupby(sorted(self.docs.values()),
-                                            key=grouper):
+        lst = sorted(self.projects_to_build)
+        for key, group in itertools.groupby(lst, key=grouper):
             keys.append(key)
             groups.append(sorted(group))
         return zip(keys, groups)
+
+    def is_in_project(self):
+        return len(self.projects) != len(self.worktree.projects)
 
 
 class ProjectNameCollisionError(Exception):

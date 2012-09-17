@@ -4,6 +4,8 @@
 
 """List the doc projects of the given worktree."""
 
+import os
+
 import qibuild
 import qidoc.core
 import qisrc.cmdparse
@@ -20,9 +22,18 @@ def do(args):
     projects = qisrc.cmdparse.projects_from_args(args)
     builder = qidoc.core.QiDocBuilder(projects, args.worktree)
 
-    ui.info("List of qidoc projects in", builder.worktree.root, end='\n\n')
+    ui.info(ui.blue, "List of qidoc projects in", ui.red,
+            builder.worktree.root, end='')
+    if builder.is_in_project():
+        if len(projects) == 1:
+            ui.info(ui.blue, '[ project:', ui.green, projects[0].src, ui.blue,
+                    ']', end='')
+        else:
+            ui.info(ui.blue, '[ several projects in current directory ]', end='')
+    ui.info('', end='\n\n')
     for doc_type, docs in builder.documentations_list():
-        ui.info(doc_type.title(), 'documentation:')
+        ui.info(ui.blue, doc_type.title(), 'documentation:')
         for doc in docs:
-            ui.info(' -', doc.name)
+            ui.info(ui.green, '  *', ui.blue, doc.name.ljust(25), ui.red,
+                    os.path.relpath(doc.src, builder.worktree.root))
         ui.info('')
