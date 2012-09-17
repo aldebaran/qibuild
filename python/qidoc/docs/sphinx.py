@@ -81,3 +81,13 @@ class SphinxDoc(Documentation):
         if sys.platform == "darwin":
             env["LC_ALL"] = "en_US.UTF-8"
         qibuild.command.call(cmd, cwd=self.src, env=env)
+
+        # Generates a zip of the files.
+        zips_path = os.path.join(self.src, "_zips")
+        qibuild.sh.mkdir(zips_path)
+        for (root, directories, _files) in os.walk(self.src):
+            for directory in directories:
+                zipme = os.path.join(root, directory, ".zipme")
+                if os.path.exists(zipme):
+                    qibuild.archive.compress(os.path.join(root, directory),
+                                             algo="zip", quiet=True)
