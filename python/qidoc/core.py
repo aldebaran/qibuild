@@ -66,30 +66,18 @@ class QiDocBuilder:
         for doc in self.docs.values():
             doc.build(self.docs, opts)
 
-# FIXME: move this in qidoc.docs.{sphinx.SphinxDoc,doxygen.Doxygen}
-#    def open_main(self):
-#        """Used to open main doc. We assume one of the project as a dest
-#        equals to `.`
-#        """
-#        index_html = os.path.join(self.out_dir, "index.html")
-#        ui.info("Opening", index_html, "in a web browser")
-#        if sys.platform == "darwin":
-#            index_html = "file://" + index_html
-#        webbrowser.open(index_html)
-#
-#    def open_single(self, project):
-#        """ User to open a single doc."""
-#        doc_proj = self.get_doc("sphinx", project)
-#        if not doc_proj:
-#            doc_proj = self.get_doc("doxygen", project)
-#        if not doc_proj:
-#            raise Exception("No such project: %s" % project)
-#
-#        index_html = os.path.join(doc_proj.dest, "index.html")
-#        ui.info("Opening", index_html, "in a web browser")
-#        if sys.platform == "darwin":
-#            index_html = "file://" + index_html
-#        webbrowser.open(index_html)
+    def open(self, project=None):
+        '''Opens a project in browser.'''
+        out_dir = self.out_dir
+        if project is not None:
+            if project not in self.docs:
+                raise NoSuchProjectError(project)
+            out_dir = self.docs[project].dest
+        index_html = os.path.join(out_dir, "index.html")
+        ui.info("Opening", index_html, "in a web browser")
+        if sys.platform == "darwin":
+            index_html = "file://" + index_html
+        webbrowser.open(index_html)
 
     def _load_doc_projects(self):
         """Explore the qibuild projects, building the sphinxdocs and doxydocs
@@ -129,18 +117,6 @@ class QiDocBuilder:
             raise TemplateProjectAlreadyExistsError(p_path, self.templates_path)
         self.templates_path = p_path
 
-# FIXME: dead code, remove me
-#    def project_from_cwd(self, cwd=None):
-#        """Get a doc project name from the current working dir"""
-#        if not cwd:
-#            cwd = os.getcwd()
-#        for doxydoc in self.doxydocs.values():
-#            if doxydoc.src in cwd:
-#                return doxydoc.name
-#        for sphinxdoc in self.sphinxdocs.values():
-#            if sphinxdoc.src in cwd:
-#                return sphinxdoc.name
-#
     def documentations_list(self):
         '''Returns a grouped list of documentations available and sorted, in
         tuples (documentation_type_name, documentations).'''
