@@ -6,7 +6,6 @@
 
 import itertools
 import os
-import pprint
 import sys
 import webbrowser
 
@@ -121,14 +120,18 @@ class QiDocBuilder:
         '''Returns a grouped list of documentations available and sorted, in
         tuples (documentation_type_name, documentations).'''
         keys, groups, grouper = [], [], lambda d: d.type_name()
-        for k, g in itertools.groupby(sorted(self.docs.values()), key=grouper):
-            keys.append(k)
-            groups.append(sorted(g))
+        for key, group in itertools.groupby(sorted(self.docs.values()),
+                                            key=grouper):
+            keys.append(key)
+            groups.append(sorted(group))
         return zip(keys, groups)
 
 
 class ProjectNameCollisionError(Exception):
+    '''When two projects have the same name.'''
+
     def __init__(self, project1, project2):
+        Exception.__init__(self)
         self.project1, self.project2 = project1, project2
 
     def __str__(self):
@@ -143,7 +146,10 @@ Please check your configuration.""".format(
 
 
 class TemplateProjectAlreadyExistsError(Exception):
+    '''There are two different projects for templates.'''
+
     def __init__(self, path, existing_path):
+        Exception.__init__(self)
         self.path, self.existing_path = path, existing_path
 
     def __str__(self):
@@ -155,6 +161,8 @@ Please check your configuration.""".format(
 
 
 class NoTemplateRepositoryError(Exception):
+    '''There is no template repository in documentation directory.'''
+
     def __str__(self):
         return '''Could not find any template repository.
 Please make sure that one of the qiproject.xml looks like:
@@ -162,7 +170,10 @@ Please make sure that one of the qiproject.xml looks like:
 
 
 class NoSuchProjectError(Exception):
+    '''The project requested doesn't exist.'''
+
     def __init__(self, project):
+        Exception.__init__(self)
         self.project = project
 
     def __str__(self):
@@ -170,7 +181,10 @@ class NoSuchProjectError(Exception):
 
 
 class VersionKeyMissingError(Exception):
+    '''Version key is not set in options for build.'''
+
     def __init__(self, opts):
+        Exception.__init__(self)
         self.opts = opts
 
     def __str__(self):

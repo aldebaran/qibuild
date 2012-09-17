@@ -4,8 +4,6 @@
 
 """Build documentation."""
 
-import os
-
 import qibuild
 import qidoc.core
 

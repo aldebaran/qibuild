@@ -3,10 +3,13 @@ import os
 import qibuild
 import qidoc.templates
 
-from qidoc.docs.documentation import Documentation, ConfigureFailed
+from qidoc.docs.documentation import Documentation, ConfigureFailedError
 
 class DoxygenDoc(Documentation):
-    def type_name(self): return 'doxygen'
+    '''This class configures and build a project of type doxygen.'''
+
+    def type_name(self):
+        return 'doxygen'
 
     def get_mapping(self, docs, **kwargs):
         res = dict()
@@ -21,9 +24,9 @@ class DoxygenDoc(Documentation):
         try:
             templates = kwargs['templates']
             doxytags_path = kwargs['doxytags_path']
-        except KeyError as e:
-            raise ConfigureFailed(self.name,
-                'Keyword argument `{opt}` is missing'.format(opt = e)
+        except KeyError as err:
+            raise ConfigureFailedError(self.name,
+                'Keyword argument `{opt}` is missing'.format(opt = err)
             )
         for name in ['Doxyfile.in', 'header.in.html', 'footer.in.html']:
             if name == 'Doxyfile.in':
@@ -43,8 +46,8 @@ class DoxygenDoc(Documentation):
             # tag files for dependencies.
             tagfiles, doxygen_mapping = list(), self.get_mapping(docs, **kwargs)
             if doxygen_mapping:
-                for (k, v) in doxygen_mapping.iteritems():
-                    tagfiles.append("%s=%s" % (k, v))
+                for (key, value) in doxygen_mapping.iteritems():
+                    tagfiles.append("%s=%s" % (key, value))
             opts["TAGFILES"] = " ".join(tagfiles)
 
             append_file = None

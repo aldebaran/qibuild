@@ -4,11 +4,14 @@ import sys
 import qibuild
 import qidoc.templates
 
-from qidoc.docs.documentation import Documentation, ConfigureFailed
+from qidoc.docs.documentation import Documentation, ConfigureFailedError
 from qibuild import ui
 
 class SphinxDoc(Documentation):
-    def type_name(self): return 'sphinx'
+    '''This class builds and configures sphinx projects.'''
+
+    def type_name(self):
+        return 'sphinx'
 
     def get_mapping(self, docs, **kwargs):
         res = dict()
@@ -20,9 +23,9 @@ class SphinxDoc(Documentation):
         try:
             templates = kwargs['templates']
             doxylink = kwargs['doxylink'].copy()
-        except KeyError as e:
-            raise ConfigureFailed(self.name,
-                'Keyword argument `{opt}` is missing.'.format(opt = e)
+        except KeyError as err:
+            raise ConfigureFailedError(self.name,
+                'Keyword argument `{opt}` is missing.'.format(opt = err)
             )
         rel_doxylink = dict()
         for (name, (tag_file, prefix)) in doxylink.iteritems():

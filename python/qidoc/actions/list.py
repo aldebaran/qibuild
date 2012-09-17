@@ -4,9 +4,6 @@
 
 """List the doc projects of the given worktree."""
 
-import operator
-import os
-
 import qibuild
 import qidoc.core
 

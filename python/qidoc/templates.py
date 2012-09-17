@@ -21,20 +21,20 @@ def configure_file(in_file, out_file,  opts=None, append_file=None):
     """
     if not os.path.exists(in_file):
         return
-    with open(in_file, "r") as fp:
-        in_text = fp.read()
+    with open(in_file, "r") as file_p:
+        in_text = file_p.read()
     if opts:
         out_text = in_text.format(**opts)
     if append_file:
-        with open(append_file, "r") as fp:
-            out_text += fp.read()
+        with open(append_file, "r") as file_p:
+            out_text += file_p.read()
     base_path = os.path.dirname(out_file)
     qibuild.sh.mkdir(base_path, recursive=True)
     if os.path.exists(out_file):
         # Do not write if contents are correct:
-        with open(out_file, "r") as fp:
-            contents = fp.read()
+        with open(out_file, "r") as file_p:
+            contents = file_p.read()
         if contents == out_text:
             return
-    with open(out_file, "w") as fp:
-        fp.write(out_text)
+    with open(out_file, "w") as file_p:
+        file_p.write(out_text)

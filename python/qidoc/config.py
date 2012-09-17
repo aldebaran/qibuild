@@ -4,14 +4,12 @@
 
 """Handling qidoc config files."""
 
-from xml.etree import ElementTree as etree
-
-import qixml
-
 from qidoc.docs.doxygen import DoxygenDoc
 from qidoc.docs.sphinx import SphinxDoc
+from xml.etree import ElementTree as etree
 
 def _get_by_documentation_type(root, tree_name, doc_class, docs):
+    '''Browse a path to find specific type of documentation.'''
     for tree in root.findall(tree_name):
         docs.append(doc_class(tree))
 
@@ -20,9 +18,9 @@ def parse_project_config(config_path):
     tree = etree.ElementTree()
     try:
         tree.parse(config_path)
-    except Exception, e:
+    except Exception, err:
         mess  = "Could not parse config from %s\n" % config_path
-        mess += "Error was: %s" % e
+        mess += "Error was: %s" % err
         raise Exception(mess)
     root, docs = tree.getroot(), []
     _get_by_documentation_type(root, 'doxydoc', DoxygenDoc, docs)

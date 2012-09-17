@@ -5,7 +5,10 @@ import qixml
 from qibuild import ui
 
 class MissingDependencyError(Exception):
+    '''The dependency of a documentation is missing.'''
+
     def __init__(self, doc, dep):
+        Exception.__init__(self)
         self.doc, self.dep = doc, dep
 
     def __str__(self):
@@ -14,8 +17,11 @@ class MissingDependencyError(Exception):
         )
 
 
-class ConfigureFailed(Exception):
+class ConfigureFailedError(Exception):
+    '''Configuration of tje project failed.'''
+
     def __init__(self, project_name, reason):
+        Exception.__init__(self)
         self.project_name, self.reason = project_name, reason
 
     def __str__(self):
@@ -25,8 +31,11 @@ Reason: {reason}'''.format(
         )
 
 
-class BuildFailed(Exception):
+class BuildFailedError(Exception):
+    '''Build of the project failed.'''
+
     def __init__(self, project_name, reason):
+        Exception.__init__(self)
         self.project_name, self.reason = project_name, reason
 
     def __str__(self):
@@ -36,7 +45,27 @@ Reason: {reason}'''.format(
         )
 
 
+class DependencyCycleError(Exception):
+    '''The is a cycle in dependency graph, example:
+         * A depends on B
+         * B depends on C
+         * C depends on A
+    '''
+
+    def __str__(self):
+        return 'Cycle in dependencies detected. Check your configuration.'
+
+
 class Documentation:
+    '''
+    This class is the mother of all documentation projects. It manages all the
+    dependencies and the target of the builds.
+
+    It is an abstract class, you can't  instanciate it. Instead you should
+    instanciate one of its subclasses (that must implement every abstract
+    method bellow).
+    '''
+
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, element):
@@ -45,6 +74,9 @@ class Documentation:
         self._parse(element)
 
     def _parse(self, element):
+        '''
+        This function parses XML configuration for the documentation project.
+        '''
         self.name = qixml.parse_required_attr(element, "name")
         self.src = element.get("src", ".")
         self.dest = element.get("dest", self.name)
@@ -53,14 +85,14 @@ class Documentation:
             self.dependencies.append(depends_element.get('name'))
 
     def configure(self, docs, opts, **kwargs):
+        '''
+        This is the main configure for the project, it will call configure of
+        dependencies and then configure the project (subclass).
+        '''
         if self._configured:
             return
         if self._configured is None:
-            # We have a cycle in the dependencies, user should check his
-            # configuration. FIXME: Report better error.
-            mess = 'Cycle in dependencies detected. '
-            mess += 'Check your configuration.'
-            raise Exception(mess)
+            raise DependencyCycleError()
         self._configured = None
         for dependency in self.dependencies:
             if dependency not in docs:
@@ -71,6 +103,10 @@ class Documentation:
         self._configured = True
 
     def build(self, docs, opts, **kwargs):
+        '''
+        Like configure, this calls the build method of dependencies before
+        building itself.
+        '''
         if self._built:
             return
         for dependency in self.dependencies:
@@ -82,6 +118,7 @@ class Documentation:
         self._built = True
 
     def __cmp__(self, other):
+        '''Comapres type names (sphinx, doxygen).'''
         res = cmp(self.type_name(), other.type_name())
         if not res:
             res = cmp(self.name, other.name)
@@ -89,6 +126,10 @@ class Documentation:
 
     @abc.abstractmethod
     def type_name(self):
+        '''
+        This function must return a string representing the type of the
+        documentation, for example: sphinx or doxygen.
+        '''
         pass
 
     @abc.abstractmethod
@@ -97,8 +138,16 @@ class Documentation:
 
     @abc.abstractmethod
     def _configure(self, docs, opts, **kwargs):
+        '''
+        This is the self configuration. It is called when all the dependencies
+        are configured.
+        '''
         pass
 
     @abc.abstractmethod
     def _build(self, docs, opts, **kwargs):
+        '''
+        This function should build the project. All its dependencies are
+        already built when this method is called.
+        '''
         pass

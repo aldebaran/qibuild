@@ -4,8 +4,6 @@
 
 """Open the current documentation in a web browser."""
 
-import os
-
 import qibuild
 import qidoc.core
 
