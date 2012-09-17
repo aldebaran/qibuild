@@ -1,3 +1,7 @@
 <project name="qibuild">
-  <sphinxdoc name="qibuild" src="doc" />
+  <sphinxdoc name="qibuild" src="doc">
+    <depends name="libqi" />
+    <depends name="libalcommon" />
+    <depends name="libalvision" />
+  </sphinxdoc>
 </project>
