@@ -75,6 +75,22 @@ class QiDocBuilder:
             if project not in self.docs:
                 raise NoSuchProjectError(project)
             out_dir = self.docs[project].dest
+        elif len(self.projects) != len(self.worktree.projects):
+            ui.info(ui.blue, 'Please choose in the following list:')
+            for (i, doc) in enumerate(self.projects_to_build):
+                ui.info(' ', ui.red, str(i + 1), ui.blue, doc.name)
+            res = None
+            while res is None:
+                try:
+                    ui.info(ui.blue, 'Select one:', end='')
+                    selected = int(raw_input())
+                except ValueError:
+                    continue
+                except (KeyboardInterrupt, EOFError):
+                    sys.exit(1)
+                if 0 < selected <= len(self.projects_to_build):
+                    res = selected - 1
+            out_dir = self.projects_to_build[res].dest
         index_html = os.path.join(out_dir, "index.html")
         ui.info("Opening", index_html, "in a web browser")
         if sys.platform == "darwin":
