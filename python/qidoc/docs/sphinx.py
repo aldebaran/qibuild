@@ -5,6 +5,7 @@ import qibuild
 import qidoc.templates
 
 from qidoc.docs.documentation import Documentation, ConfigureFailed
+from qibuild import ui
 
 class SphinxDoc(Documentation):
     def type_name(self): return 'sphinx'
@@ -33,7 +34,7 @@ class SphinxDoc(Documentation):
         conf_py_tmpl = os.path.join(templates, "sphinx", "conf.in.py")
         conf_py_in = os.path.join(self.src, "qidoc", "conf.in.py")
         if not os.path.exists(conf_py_in):
-            mess = "Could not configure sphinx sources in:%s \n" % src
+            mess = "Could not configure sphinx sources in:%s \n" % self.src
             mess += "qidoc/conf.in.py does not exists"
             ui.warning(mess)
             return

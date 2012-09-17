@@ -12,8 +12,6 @@ import webbrowser
 
 import qibuild
 import qidoc.config
-import qidoc.doxygen
-import qidoc.sphinx
 import qisrc
 
 from qibuild import ui
@@ -128,20 +126,21 @@ class QiDocBuilder:
         if not is_template:
             return
         if self.templates_path:
-            raise TemplateProjectAlreadyExistsError(p_path, self.template_path)
+            raise TemplateProjectAlreadyExistsError(p_path, self.templates_path)
         self.templates_path = p_path
 
-    def project_from_cwd(self, cwd=None):
-        """Get a doc project name from the current working dir"""
-        if not cwd:
-            cwd = os.getcwd()
-        for doxydoc in self.doxydocs.values():
-            if doxydoc.src in cwd:
-                return doxydoc.name
-        for sphinxdoc in self.sphinxdocs.values():
-            if sphinxdoc.src in cwd:
-                return sphinxdoc.name
-
+# FIXME: dead code, remove me
+#    def project_from_cwd(self, cwd=None):
+#        """Get a doc project name from the current working dir"""
+#        if not cwd:
+#            cwd = os.getcwd()
+#        for doxydoc in self.doxydocs.values():
+#            if doxydoc.src in cwd:
+#                return doxydoc.name
+#        for sphinxdoc in self.sphinxdocs.values():
+#            if sphinxdoc.src in cwd:
+#                return sphinxdoc.name
+#
     def documentations_list(self):
         '''Returns a grouped list of documentations available and sorted, in
         tuples (documentation_type_name, documentations).'''
@@ -191,7 +190,7 @@ class NoSuchProjectError(Exception):
         self.project = project
 
     def __str__(self):
-        return 'No such project: {project}'.format(project = project)
+        return 'No such project: {project}'.format(project = self.project)
 
 
 class VersionKeyMissingError(Exception):

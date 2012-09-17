@@ -46,20 +46,20 @@ def do(args):
     builder.build(opts, project=(args.project if args.project else None))
     return
     # FIXME: Function stops here, dead code but replacing doesn't do exactly
-    # what it did.
+    # what it used to do.
     # Build all if:
     #   user asked with --all,
     #   or a worktree has been given (so no point in using cwd())
     #   or we are at the root of the worktree.
-    if args.all or args.worktree or os.getcwd() == worktree:
-        builder.build(opts)
-        return
-    project_name = builder.project_from_cwd()
-    if not project_name:
-        # Not at the root, and could not guess current
-        # project: raise
-        mess  = "Could not guess project from current working directory\n"
-        mess += "Please go to the subdirectory of a project\n"
-        mess += "or specify a project name on the command line"
-        raise Exception(mess)
-    builder.build_single(project_name, opts)
+#    if args.all or args.worktree or os.getcwd() == worktree:
+#        builder.build(opts)
+#        return
+#    project_name = builder.project_from_cwd()
+#    if not project_name:
+#        # Not at the root, and could not guess current
+#        # project: raise
+#        mess  = "Could not guess project from current working directory\n"
+#        mess += "Please go to the subdirectory of a project\n"
+#        mess += "or specify a project name on the command line"
+#        raise Exception(mess)
+#    builder.build_single(project_name, opts)
