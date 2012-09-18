@@ -16,7 +16,6 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("make options")
-    group.add_argument("-t", "--target", help="Special target to build")
     group.add_argument("--rebuild", "-r", action="store_true", default=False)
     group.add_argument("--no-fix-shared-libs",  action="store_false",
                         dest="fix_shared_libs",
@@ -38,12 +37,8 @@ def do(args):
     i = 0
     for project in projects:
         i += 1
-        if args.target:
-            mess = "Building target %s for" % args.target
-        else:
-            mess = "Building"
         ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, project_count),
-                ui.green, mess, ui.blue, project.name)
-        toc.build_project(project, target=args.target, num_jobs=args.num_jobs,
+                ui.green, "Building", ui.blue, project.name)
+        toc.build_project(project, num_jobs=args.num_jobs,
                           incredibuild=use_incredibuild, rebuild=args.rebuild,
                           fix_shared_libs=args.fix_shared_libs)

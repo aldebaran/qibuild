@@ -12,7 +12,8 @@ Command line
 +++++++++++++
 
 
-* Nicer output for a few commands like ``qibuild test``.
+* Nicer output for all commands.
+* ``qibuild make`` get rid of confusing and useless "--target" option
 * Added a lot of short options ("-n" for "--dry-run", "-f" for "--force")
 * ``qibuild init``: add a ``--config`` argument to set the default config used by
   the worktree
