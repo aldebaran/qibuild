@@ -36,7 +36,8 @@ _qibuild_projects() {
   then
     projects=( $(qibuild list -w $WORKTREE | sed -n "s/ \*  \([a-z0-9_-]*\).*/\1/p") )
   else
-    projects=( $(qibuild list | sed -n "s/ \*  \([a-z0-9_-]*\).*/\1/p") )
+    # remove output, as it will show ugly errors outside of worktrees
+    projects=( $(qibuild list 2> /dev/null | sed -n "s/ \*  \([a-z0-9_-]*\).*/\1/p") )
   fi
   typeset -U projects
   compadd "$@" -a projects
