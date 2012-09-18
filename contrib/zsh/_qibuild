@@ -114,6 +114,13 @@ _qibuild_opts_actions_configure=(
   "--werror[tread warnings as error]"
 )
 
+_qibuild_opts_actions_deploy=(
+  "-p[port]"
+  "--port[port]"
+  "--split-debug[split debug symbols. Enable remote debuging]"
+  "--no-split-debug[do not split debug symbols. Remote debugging won't work]"
+)
+
 _qibuild_action_none() {
   _values -w "action" \
     "*clean[Clean build directories.]" \
@@ -148,11 +155,28 @@ _qibuild() {
         "$_qibuild_opts_projects[@]"
       ;;
 
-    clean | config | convert | create | depends | deploy | doc | find | 'foreach' | init | install | list | open | package | status | test)
-      _arguments -s :  \
+    clean | config | convert | create | depends | doc | find | 'foreach' | init | install | list | package | status | 'test')
+      _arguments -s : \
         "$_qibuild_opts_global[@]" \
         "$_qibuild_opts_toc[@]" \
         "*:arguments:_files"  #todo: only take build prefix
+      ;;
+
+    deploy)
+      _arguments -s : \
+        "$_qibuild_opts_global[@]" \
+        "$_qibuild_opts_toc[@]" \
+        "$_qibuild_opts_projects[@]" \
+        "$_qibuild_opts_build[@]" \
+        "$_qibuild_opts_actions_deploy[@]"
+      ;;
+
+    open)
+      _arguments -s : \
+        "$_qibuild_opts_global[@]" \
+        "$_qibuild_opts_toc[@]" \
+        "$_qibuild_opts_build[@]" \
+        "$_qibuild_opts_projects[@]"
       ;;
 
     make)
