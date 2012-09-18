@@ -159,6 +159,7 @@ _qibuild() {
       _arguments -s : \
         "$_qibuild_opts_global[@]" \
         "$_qibuild_opts_toc[@]" \
+        "$_qibuild_opts_build[@]" \
         "$_qibuild_opts_project[@]" \
         "$_qibuild_opts_projects[@]" \
         "$_qibuild_opts_actions_make[@]"
