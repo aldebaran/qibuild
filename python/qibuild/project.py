@@ -202,7 +202,8 @@ def generate_path_conf(project, toc):
     towrite += "# dependencies found in qiproject.xml\n"
     towrite += "\n"
 
-    dep_sdk_dirs = toc.get_sdk_dirs(project.name)
+    (_, projects) = qibuild.cmdparse.get_deps(toc, [project], runtime=True)
+    dep_sdk_dirs = [x.sdk_directory for x in projects]
 
     for sdk_dir in dep_sdk_dirs:
         towrite += qibuild.sh.to_posix_path(sdk_dir) + "\n"
