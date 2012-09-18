@@ -114,6 +114,12 @@ _qibuild_opts_actions_configure=(
   "--werror[tread warnings as error]"
 )
 
+_qibuild_opts_actions_config=(
+  "--edit[edit the configuration]"
+  "--local[only display or edit the local configuration]"
+  "--wizard[run a wizard to edit the configuration]"
+)
+
 _qibuild_opts_actions_deploy=(
   "-p[port]"
   "--port[port]"
@@ -155,7 +161,14 @@ _qibuild() {
         "$_qibuild_opts_projects[@]"
       ;;
 
-    clean | config | convert | create | depends | doc | find | 'foreach' | init | install | list | package | status | 'test')
+    config)
+      _arguments -s : \
+        "$_qibuild_opts_global[@]" \
+        "$_qibuild_opts_toc[@]" \
+        "$_qibuild_opts_actions_config[@]"
+      ;;
+
+    clean | convert | create | depends | doc | find | 'foreach' | init | install | list | package | status | 'test')
       _arguments -s : \
         "$_qibuild_opts_global[@]" \
         "$_qibuild_opts_toc[@]" \
