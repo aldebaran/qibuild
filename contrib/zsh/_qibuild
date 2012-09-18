@@ -101,8 +101,6 @@ _qibuild_opts_global=(
 )
 
 _qibuild_opts_actions_make=(
-  "-t[Special target to build]:targets:(THIS IS NOT YET SUPPORTED)"
-  "--target[Special target to build]:targets:(THIS IS NOT YET SUPPORTED)"
   "--rebuild[]"
   "-r[]"
   "--no-fix-shared-libs[Do not try to fix shared libraries after build. Used by \`qibuild package\`]"
