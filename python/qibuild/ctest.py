@@ -294,6 +294,8 @@ def _parse_ctest_test_files(root, tests, subdirs):
     """ Helper for parse_ctest_test_files.
     We will fill up the tests and subdirs parameters as we go.
 
+    Warning: CTestTestfile.cmake is at the build directory root only if the root
+             CmakeLists.txt call enable_testing and not a sub CmakeLists.txt
     """
     ctest_test_file = os.path.join(root, "CTestTestfile.cmake")
     if not os.path.exists(ctest_test_file):
