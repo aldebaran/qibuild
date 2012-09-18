@@ -42,6 +42,13 @@ _qibuild_projects() {
   compadd "$@" -a projects
 }
 
+_qibuild_cmake_generators() {
+  local -a generators
+  generators=( "Ninja" "Unix Makefiles" )
+  typeset -U generators
+  compadd "$@" -a generators
+}
+
 _qibuild_opts_actions=(
   "1:action:(clean config configure convert create depends deploy doc find foreach init install list make open package status test -h --help)"
 )
@@ -71,7 +78,8 @@ _qibuild_opts_build=(
   "--release[Build in release (set CMAKE_BUILD_TYPE=Release)]"
   "--debug[Build in debug (set CMAKE_BUILD_TYPE=Debug)]"
   "--build-type[CMAKE_BUILD_TYPE usually Debug or Release]:buildtype:(Debug Release)"
-  "-G[Specify the CMake generator]:cmakegenerator:(\"Unix Makefiles\" Ninja)"
+  "-G[Specify the CMake generator]:cmakegenerator:_qibuild_cmake_generators"
+  "--cmake-generator[Specify the CMake generator]:cmakegenerator:_qibuild_cmake_generators"
   "-j[Number of jobs to use]"
 )
 
