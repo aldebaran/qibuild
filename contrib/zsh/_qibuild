@@ -67,6 +67,8 @@ _qibuild_opts_project=(
 )
 
 _qibuild_opts_toc=(
+  "-h[show this help message and exit]"
+  "--help[show this help message and exit]"
   "-w[Use a specific work tree path]:worktree:_directories"
   "--worktree[Use a specific work tree path]:worktree:_directories"
   "--work-tree[Use a specific work tree path]:worktree:_directories"
