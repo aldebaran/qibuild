@@ -46,6 +46,6 @@ def do(args):
             pattern=args.pattern, slow=args.slow,
             dry_run=args.dry_run, valgrind=args.valgrind,
             verbose=args.verbose_tests, nightmare=args.nightmare,
-            test_args=args.test_args)
+            test_args=args.test_args, num_jobs=args.num_jobs)
     if not res:
         sys.exit(1)
