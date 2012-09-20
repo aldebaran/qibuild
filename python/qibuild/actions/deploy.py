@@ -106,6 +106,7 @@ def do(args):
         toc.install_project(project, destdir, prefix="/",
                             runtime=True, num_jobs=args.num_jobs,
                             split_debug=args.split_debug)
+        ui.info(ui.green, "Sending binaries to target ...")
         qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)
         if not args.split_debug:
             continue

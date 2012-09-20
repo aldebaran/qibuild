@@ -73,7 +73,7 @@ def split_debug(base_dir, objcopy=None, objdump=None):
     for src in binaries:
         rel_name = os.path.relpath(src, base_dir)
         if not contains_debug_info(src, objdump=objdump):
-            ui.info(ui.green, "Already stripped", rel_name)
+            ui.info("-- Already stripped", rel_name)
             continue
         src_stat = os.stat(src)
         dirname, basename = os.path.split(src)
@@ -87,7 +87,7 @@ def split_debug(base_dir, objcopy=None, objdump=None):
         try:
             for cmd in to_run:
                 qibuild.command.check_output(cmd, stderr=subprocess.STDOUT)
-            ui.info(ui.green, "Debug info extracted for", rel_name)
+            ui.info("-- Debug info extracted for", rel_name)
         except qibuild.command.CommandFailedException as e:
             ui.error("Error while extracting debug for %s" % os.path.relpath(src, base_dir))
             ui.error(str(e))

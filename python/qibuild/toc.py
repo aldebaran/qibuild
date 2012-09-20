@@ -585,6 +585,7 @@ Try configuring and building the project first.
         if split_debug:
             if self.using_visual_studio:
                 raise Exception("split debug not supported on Visual Studio")
+            ui.info(ui.green, "Splitting debug symbols from binaries ...")
             tool_paths = dict()
             for name in ["objcopy", "objdump"]:
                 tool_path = qibuild.cmake.get_binutil(name,
