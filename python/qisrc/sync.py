@@ -75,8 +75,12 @@ def init_worktree(worktree, manifest_location, setup_review=True):
         p_src = project.path
         wt_project = worktree.get_project(p_src)
         if not wt_project:
-            wt_project = clone_project(worktree, p_url, src=p_src, branch=p_revision,
-                                       remote=p_remote)
+            # Maybe we just need to add the project to the worktree:
+            wt_project = add_if_missing(worktree, p_src, p_remote, p_url)
+            if not wt_project:
+                wt_project = clone_project(worktree, p_url, src=p_src,
+                                           branch=p_revision,
+                                           remote=p_remote)
         p_path = wt_project.path
         if project.review and setup_review and setup_ok:
             worktree.set_project_review(p_src, True)
@@ -117,7 +121,8 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin"):
     conflict_project = worktree.get_project(src, raises=False)
     if conflict_project:
         mess  = "Could not add project from %s in %s\n" % (url, src)
-        mess += "This path is already registered for worktree in %s\n" % worktree.root
+        mess += "This path is already registered for worktree in %s\n" % \
+                worktree.root
         raise Exception(mess)
 
     path = os.path.join(worktree.root, src)
@@ -138,4 +143,24 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin"):
     git.update_submodules()
     if should_add:
         worktree.add_project(path)
+    return worktree.get_project(src)
+
+def add_if_missing(worktree, src, remote_name, remote_url):
+    """ Add a project to a worktree if src is a already a git repo with
+    the correct remote url
+
+    (can happen when someone runs qisrc remove then qisrc sync ...)
+    """
+    path = os.path.join(worktree.root, src)
+    if not os.path.exists(path):
+        return
+    git_dir = os.path.join(path, ".git")
+    if not os.path.exists(git_dir):
+        raise Exception("%s already exists and is not a git repository" % path)
+    if qisrc.git.is_submodule(path):
+        repo_root = qisrc.git.get_repo_root(os.path.dirname(path))
+        raise Exception("%s is already a submodule of %s" % (path, repo_root))
+    git = qisrc.git.Git(path)
+    git.set_remote(remote_name, remote_url)
+    worktree.add_project(src)
     return worktree.get_project(src)

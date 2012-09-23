@@ -218,7 +218,7 @@ class SyncTestCase(unittest.TestCase):
         # pylint: disable-msg=E1101
         with pytest.raises(Exception) as e:
             qisrc.sync.init_worktree(worktree, manifest)
-        assert "path already exists" in str(e.value)
+        assert "is already a submodule of" in str(e.value)
 
     def test_broken_submodules(self):
         manifest_url = create_git_repo(self.tmp, "manifest")
@@ -238,6 +238,93 @@ class SyncTestCase(unittest.TestCase):
         with pytest.raises(Exception) as e:
             qisrc.sync.init_worktree(worktree, manifest)
         assert "Broken submodules" in str(e.value)
+
+    def test_git_exists_but_not_registered(self):
+        manifest_url = create_git_repo(self.tmp, "manifest")
+        bar_url = create_git_repo(self.tmp, "bar")
+        xml = """
+<manifest>
+    <remote name="origin" fetch="{tmp}/srv" />
+    <project name="bar.git" path="bar"/>
+</manifest>
+"""
+        xml = xml.format(tmp=self.tmp)
+        push_file(self.tmp, "manifest", "default.xml", xml)
+        work = os.path.join(self.tmp, "work")
+        worktree = qisrc.worktree.create(work)
+        bar_src = os.path.join(work, "bar")
+        bar_git = qisrc.git.Git(bar_src)
+        bar_git.clone(bar_url)
+        manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
+        qisrc.sync.init_worktree(worktree, manifest)
+        bar_proj = worktree.get_project("bar")
+
+    def test_git_exists_but_no_remote(self):
+        manifest_url = create_git_repo(self.tmp, "manifest")
+        bar_url = create_git_repo(self.tmp, "bar")
+        xml = """
+<manifest>
+    <remote name="origin" fetch="{tmp}/srv" />
+    <project name="bar.git" path="bar"/>
+</manifest>
+"""
+        xml = xml.format(tmp=self.tmp)
+        push_file(self.tmp, "manifest", "default.xml", xml)
+        work = os.path.join(self.tmp, "work")
+        worktree = qisrc.worktree.create(work)
+        bar_src = os.path.join(work, "bar")
+        os.mkdir(bar_src)
+        bar_git = qisrc.git.Git(bar_src)
+        bar_git.init()
+        manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
+        qisrc.sync.init_worktree(worktree, manifest)
+        bar_proj = worktree.get_project("bar")
+        assert bar_git.get_config("remote.origin.url") == bar_url
+
+    def test_git_exists_but_wrong_remote(self):
+        manifest_url = create_git_repo(self.tmp, "manifest")
+        bar_url = create_git_repo(self.tmp, "bar")
+        xml = """
+<manifest>
+    <remote name="origin" fetch="{tmp}/srv" />
+    <project name="bar.git" path="bar"/>
+</manifest>
+"""
+        xml = xml.format(tmp=self.tmp)
+        push_file(self.tmp, "manifest", "default.xml", xml)
+        work = os.path.join(self.tmp, "work")
+        worktree = qisrc.worktree.create(work)
+        bar_src = os.path.join(work, "bar")
+        os.mkdir(bar_src)
+        bar_git = qisrc.git.Git(bar_src)
+        bar_git.init()
+        bar_git.set_config("remote.origin.url", "git@foo/foo.git")
+        manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
+        qisrc.sync.init_worktree(worktree, manifest)
+        bar_proj = worktree.get_project("bar")
+        assert bar_git.get_config("remote.origin.url") == bar_url
+
+    def test_path_exists_but_not_a_git_repo(self):
+        manifest_url = create_git_repo(self.tmp, "manifest")
+        bar_url = create_git_repo(self.tmp, "bar")
+        xml = """
+<manifest>
+    <remote name="origin" fetch="{tmp}/srv" />
+    <project name="bar.git" path="bar"/>
+</manifest>
+"""
+        xml = xml.format(tmp=self.tmp)
+        push_file(self.tmp, "manifest", "default.xml", xml)
+        work = os.path.join(self.tmp, "work")
+        worktree = qisrc.worktree.create(work)
+        bar_src = os.path.join(work, "bar")
+        os.mkdir(bar_src)
+        manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
+        # pylint: disable-msg=E1101
+        with pytest.raises(Exception) as e:
+            qisrc.sync.init_worktree(worktree, manifest)
+        assert "already exists" in e.value.message
+        assert "not a git repository" in e.value.message
 
 
 if __name__ == "__main__":

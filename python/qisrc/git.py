@@ -436,24 +436,36 @@ def is_submodule(path):
     """ Tell if the given path is a submodule
 
     """
-    repo_root = get_repo_root(path)
-    if not repo_root:
+    if not os.path.isdir(path):
         return False
-    git = Git(repo_root)
-    (retcode, out) = git.call("submodule", raises=False)
+
+    # Two cases:
+    # * submodule not initialized -> path will be an empty dir
+    # * submodule initialized  -> path/.git will be a file
+    #   looking like:
+    #       gitdir: ../../.git/modules/bar
+    contents = os.listdir(path)
+    if contents:
+        dot_git = os.path.join(path, ".git")
+        if os.path.isdir(dot_git):
+            return False
+        parent_repo_root = get_repo_root(os.path.dirname(path))
+    else:
+        parent_repo_root = get_repo_root(path)
+    parent_git = Git(parent_repo_root)
+    (retcode, out) = parent_git.call("submodule", raises=False)
     if retcode == 0:
         if not out:
             return False
         else:
             lines = out.splitlines()
-            submodules = [x.split()[-1] for x in lines]
-            rel_path = os.path.relpath(path, repo_root)
+            submodules = [x.split()[1] for x in lines]
+            rel_path = os.path.relpath(path, parent_repo_root)
             return rel_path in submodules
     else:
         ui.warning("git submodules configuration is broken for",
-                   repo_root, "!",
+                   parent_repo_root, "!",
                    "\nError was: ", ui.reset, "\n", "  " + out)
-        # clone_project will just erase it and create a git repo instead
         return True
 
 

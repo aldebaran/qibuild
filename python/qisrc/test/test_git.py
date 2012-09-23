@@ -467,3 +467,5 @@ def test_submodules(tmpdir):
     bar = foo.join("bar")
     assert qisrc.git.is_submodule(bar.strpath)
     assert not qisrc.git.is_submodule(foo.strpath)
+    git.update_submodules()
+    assert qisrc.git.is_submodule(bar.strpath)
