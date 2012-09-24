@@ -133,6 +133,15 @@ class Manifest():
                 project.revision = remote.revision
             project.fetch_url = git_url_join(remote.fetch, project.name)
             if project.review:
+                if not remote.review:
+                    mess = """ \
+Project {project.name} was configured for review
+but the associated remote ({remote.name}) has
+no review url set.\
+"""
+                    mess = mess.format(remote=remote, project=project)
+                    raise Exception(mess)
+
                 project.review_url = git_url_join(remote.review, project.name)
             conflicting_name = self._paths.get(project.path)
             if conflicting_name:

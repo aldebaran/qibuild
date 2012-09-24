@@ -5,6 +5,8 @@
 import unittest
 from StringIO import StringIO
 
+import pytest
+
 import qisrc.manifest
 
 class ManifestTestCase(unittest.TestCase):
@@ -246,6 +248,21 @@ def test_parse_deep_recurse(tmpdir):
     a_manifest = qisrc.manifest.load(a_xml.strpath)
 
     assert len(a_manifest.projects) == 3
+
+def test_bad_review_config():
+    xml = """
+<manifest>
+  <remote fetch="ssh://git@example.com" />
+  <project name="bar/bar.git" review="true" />
+</manifest>
+"""
+    xml_in = StringIO(xml)
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        manifest = qisrc.manifest.load(xml_in)
+    assert "was configured for review" in e.value.message
+    assert "no review url set" in e.value.message
+
 
 
 
