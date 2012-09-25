@@ -3,116 +3,61 @@
 ## found in the COPYING file.
 
 import os
-import tempfile
-import unittest
+
 import pytest
 
-import qidoc.core
 import qibuild
 
 
 def check_tools():
-    """ Check if sphinx-build and doxygen are installed.
-    If not, we will skip the test_build test
+    """ Check if all the tools are installed.
+
+    If not return a string describing what is missing
 
     """
+    mess = ""
     executables = dict()
-    for name in ["sphinx-build", "sphinx-build2", "doxygen", "dot"]:
+    try:
+        import pyparsing
+    except ImportError:
+        mess += "please install pyparsing for doxylink to work"
+
+    for name in ["sphinx-build", "sphinx-build2",
+                 "doxygen", "dot", "linkchecker"]:
         executables[name] = qibuild.command.find_program(name)
 
-    res = executables["sphinx-build"] or executables["sphinx-build2"]
-    res = res and executables["doxygen"]
-    res = res and executables["dot"]
-    return res
+    if "sphinx-build" not in executables and "sphinx-build2" not in executables:
+        mess += "sphinx-build not found"
 
-class TestQiDoc(unittest.TestCase):
-    def setUp(self):
-        self.tmp = tempfile.mkdtemp(prefix="tmp-qidoc")
-        self.in_dir  = os.path.join(self.tmp, "in")
-        self.out_dir = os.path.join(self.tmp, "out")
-        this_dir = os.path.dirname(__file__)
-        qibuild.sh.install(os.path.join(this_dir, "in"),
-            self.in_dir, quiet=True)
-        self.qidoc_builder = qidoc.core.QiDocBuilder(self.in_dir, self.out_dir)
+    if "doxygen" not in executables:
+        mess += "doxygen not found"
 
-    def tearDown(self):
-        qibuild.sh.rm(self.tmp)
+    if "dot" not in executables:
+        mess += "graphviz not installed, dot executable not found"
 
-    @pytest.mark.slow
-    @unittest.skipUnless(check_tools(), "Some required tools are not installed")
-    def test_build(self):
-        opts = dict()
-        opts["version"] = 1.42
-        self.qidoc_builder.build_all(opts)
-        submodule_zip = os.path.join(self.out_dir,
-            "qibuild", "_downloads", "submodule.zip")
-        self.assertTrue(os.path.exists(submodule_zip))
+    if "linkchecker" not in executables:
+        mess += "linkchecker is not installed"
 
-    @pytest.mark.slow
-    def test_build_single_dox(self):
-        opts = dict()
-        opts["version"] = "1.42"
-        self.qidoc_builder.build_single("libqi", opts)
-
-    @pytest.mark.slow
-    def test_build_single_sphinx(self):
-        opts = dict()
-        opts["version"] = "1.42"
-        self.qidoc_builder.build_single("qibuild", opts)
-
-    def test_cfg_parse(self):
-        qibuild_sphinx = self.qidoc_builder.sphinxdocs["qibuild"]
-        self.assertEqual(qibuild_sphinx.name, "qibuild")
-        self.assertEqual(qibuild_sphinx.src ,
-            os.path.join(self.in_dir, "qibuild", "doc"))
-
-        doc_sphinx = self.qidoc_builder.sphinxdocs["doc"]
-        self.assertEqual(doc_sphinx.depends, ["qibuild"])
+    if mess:
+        print mess
+        return False
+    else:
+        return True
 
 
-        libalcommon = self.qidoc_builder.doxydocs["libalcommon"]
-        libalvision = self.qidoc_builder.doxydocs["libalvision"]
-        self.assertEqual(libalcommon.name, "libalcommon")
-        self.assertEqual(libalvision.name, "libalvision")
-        self.assertEqual(libalcommon.src ,
-            os.path.join(self.in_dir, "libnaoqi", "libalcommon"))
-        self.assertEqual(libalvision.src ,
-            os.path.join(self.in_dir, "libnaoqi", "libalvision"))
-        self.assertEqual(libalcommon.dest,
-            os.path.join(self.out_dir, "ref", "libalcommon"))
-        self.assertEqual(libalvision.dest,
-            os.path.join(self.out_dir, "ref", "libalvision"))
+def pytest_funcarg__src_doc(request):
+    this_dir = os.path.dirname(__file__)
+    src_dir = os.path.join(this_dir, "in")
+    def clean():
+        build_doc = os.path.join(src_dir, "build-doc")
+        qibuild.sh.rm(build_doc)
+    request.addfinalizer(clean)
+    return src_dir
 
-
-
-    def test_sorting(self):
-        docs = self.qidoc_builder.sort_sphinx()
-        names = [d.name for d in docs]
-        self.assertEqual(names, ['qibuild', 'doc'])
-
-        docs = self.qidoc_builder.sort_doxygen()
-        names = [d.name for d in docs]
-        self.assertEqual(names, ['libqi', 'libalcommon', 'libalvision'])
-
-    def test_intersphinx_mapping(self):
-        mapping = self.qidoc_builder.get_intersphinx_mapping("doc")
-        self.assertEqual(mapping,
-            {"qibuild": (os.path.join(self.out_dir, "qibuild"),
-                         None)}
-        )
-
-    def test_doxygen_mapping(self):
-        mapping = self.qidoc_builder.get_doxygen_mapping("libalvision")
-        expected = {
-            os.path.join(self.out_dir, "doxytags", "libalcommon.tag"):
-                "../libalcommon",
-            os.path.join(self.out_dir, "doxytags", "libqi.tag"):
-              "../libqi",
-        }
-        self.assertEqual(mapping, expected)
-
-
-
-
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.slow()
+def test_qidoc(src_doc):
+    if not check_tools():
+        return
+    args = ["-w", src_doc]
+    qibuild.script.run_action("qidoc.actions.build", args)
+    # XXX: should check for broken links in build-doc
