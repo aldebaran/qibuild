@@ -5,6 +5,12 @@
 clean(PTHREAD)
 fpath(PTHREAD "pthread.h")
 
+if(ANDROID)
+  qi_set_global(PTHREAD_LIBRARIES "")
+  export_lib(PTHREAD)
+  return()
+endif()
+
 # Use upstream FindThreads.cmake to correctly set -lpthread or
 # -pthread
 find_package(Threads QUIET)
