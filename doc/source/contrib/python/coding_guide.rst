@@ -395,9 +395,9 @@ Using this is also a good way to do it ::
 
   import os
 
-  if os.name() == 'posix':
+  if os.name == 'posix':
      # POSIX code
-  elif os.name() == 'nt':
+  elif os.name == 'nt':
      # Windows specific code
 
 
