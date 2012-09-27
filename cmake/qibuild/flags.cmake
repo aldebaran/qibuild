@@ -51,7 +51,8 @@ function(qi_sanitize_compile_flags)
     # add_definitions("-ansi")
 
     # Activate warnings
-    add_definitions("-Wall -Wno-unused-parameter")
+    add_definitions("-Wall -Wno-unused-parameter -Werror=return-type")
+
 
     if (ARGS_HIDDEN_SYMBOLS)
       add_definitions("-fvisibility=hidden")
@@ -68,4 +69,3 @@ function(qi_sanitize_compile_flags)
   endif()
 
 endfunction()
-
