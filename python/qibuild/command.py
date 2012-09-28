@@ -96,15 +96,16 @@ class CommandFailedException(Exception):
 {cmd}
 Return code is {returncode}
 Working dir was {cwd}
-Stdout:
-{stdout}
-Stderr:
-{stderr}
 """
-        stdout = "\n".join(["    " + line for line in self.stdout.split("\n")])
-        stderr = "\n".join(["    " + line for line in self.stderr.split("\n")])
-        return mess.format(cmd=self.cmd, returncode=self.returncode, cwd=self.cwd,
-                           stdout=stdout, stderr=stderr)
+        mess = mess.format(cmd=self.cmd, returncode=self.returncode,
+                           cwd=self.cwd)
+        if self.stdout:
+            mess += "Stdout: \n"
+            mess  = "\n".join(["    " + line for line in self.stdout.split("\n")])
+        if self.stderr:
+            mess += "Stderr: \n"
+            mess  = "\n".join(["    " + line for line in self.stderr.split("\n")])
+        return mess
 
 class ProcessCrashedError(Exception):
     """An other custom exception, used by call_background """
