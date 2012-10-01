@@ -48,6 +48,7 @@ function(_qi_install_internal)
     else()
       get_source_file_property(_generated "${f}" GENERATED)
       if(_generated)
+        list(APPEND _files_to_install ${f})
         # nothing
       else()
         qi_error("${f} does not exist and is not marked as a generated source")
