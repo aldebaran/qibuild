@@ -254,12 +254,9 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
 """
     custom_cmake_code = ""
     config = toc.active_config
-    if config:
-        local_dir = os.path.join(toc.worktree.root, ".qi")
-        local_cmake = os.path.join(local_dir, "%s.cmake" % config)
-        if os.path.exists(local_cmake):
-            custom_cmake_code += 'include("%s")\n' % \
-                qibuild.sh.to_posix_path(local_cmake)
+    if toc.local_cmake:
+        to_include = qibuild.sh.to_posix_path(toc.local_cmake)
+        custom_cmake_code += 'include("%s")\n' % to_include
 
     cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
     cmake_qibuild_dir = qibuild.sh.to_posix_path(cmake_qibuild_dir)

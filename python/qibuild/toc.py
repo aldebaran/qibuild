@@ -148,6 +148,13 @@ class Toc:
         if config == "system":
             self.active_config = None
 
+        self.local_cmake = None
+        if self.active_config:
+            local_dir = os.path.join(worktree.root, ".qi")
+            local_cmake = os.path.join(local_dir, "%s.cmake" % self.active_config)
+            if os.path.exists(local_cmake):
+                self.local_cmake = local_cmake
+
         self.build_type = build_type
         if not self.build_type:
             self.build_type = "Debug"

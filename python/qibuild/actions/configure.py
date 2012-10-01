@@ -42,7 +42,8 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     if args.build_directory and not args.single:
-        raise Exception("You should use --single when specifying a build directory")
+        raise Exception("You should use --single "
+                        "when specifying a build directory")
 
     if not args.cmake_flags:
         args.cmake_flags = list()
@@ -62,6 +63,9 @@ def do(args):
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
         ui.info(ui.green, "Active configuration:", ui.blue, toc.active_config)
+    if toc.local_cmake:
+        ui.info(ui.green, "Using custom CMake file:", ui.reset,
+                ui.bold, toc.local_cmake)
 
     project_count = len(projects)
     i = 0
