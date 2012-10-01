@@ -30,7 +30,7 @@ endif()
 
 # Using a qt package from a desktop toolchain:
 # look for moc, uic and rcc in the package before
-# inclduing Qt4Macros
+# including Qt4Macros
 find_program(QT_MOC_EXECUTABLE moc)
 find_program(QT_UIC_EXECUTABLE uic)
 find_program(QT_RCC_EXECUTABLE rcc)
