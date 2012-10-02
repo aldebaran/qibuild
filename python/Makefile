@@ -36,6 +36,16 @@ check-error:
 	@echo " => Checked only for pylint errors"
 	@echo "    Use make check-all for running a full pylint check"
 
+coverage:
+	@echo running tests for coverage
+# cd .. is required for the Jenkins plugin to work
+	@(cd .. ; $(PYTHON) -m pytest python --cov=python \
+										--cov-config=coverage.ini \
+										--cov-report=html \
+										--cov-report=term)
+	@echo " => Open $(shell cd .. ; pwd)/htmlcov/index.html for more details"
+
+
 check:
 	@echo ":: Running tests: $(TEST_MODULES)"
 	@$(PYTHON) -m pytest $(TEST_MODULES)
