@@ -18,10 +18,9 @@ from qibuild import ui
 import qisrc
 import qibuild
 import qibuild.gdb
+import qibuild.project
 import qitoolchain
 
-from qibuild.project  import Project
-from qisrc.worktree import WorkTree
 from qibuild.command  import CommandFailedException
 from qibuild.dependencies_solver import DependenciesSolver
 
@@ -579,7 +578,6 @@ Try configuring and building the project first.
         if split_debug:
             if self.using_visual_studio:
                 raise Exception("split debug not supported on Visual Studio")
-            tools = ["objcopy", "objdump"]
             tool_paths = dict()
             for name in ["objcopy", "objdump"]:
                 tool_path = qibuild.cmake.get_binutil(name,
