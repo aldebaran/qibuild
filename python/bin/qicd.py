@@ -18,8 +18,6 @@ if __name__ == '__main__':
         # Python < 2.7
         major = sys.version_info[0]
     if major != 2:
-        print('[WARN ]: the script was not run using Python 2, will try to ' \
-              'find it.')
         res = 1
         try:
             import subprocess

@@ -17,8 +17,8 @@ if __name__ == '__main__':
         # Python < 2.7
         major = sys.version_info[0]
     if major != 2:
-        print('[WARN ]: the script was not run using Python 2, will try to ' \
-              'find it.')
+        sys.stderr.write("[WARN ]: the script was not run using Python 2, "
+                         "will try to find it.\n")
         res = 1
         try:
             import subprocess
@@ -57,9 +57,11 @@ def print_version():
     overkill
 
     """
-    import qibuild
-    print("qibuild version 1.16")
-    print("Using cmake code from", qibuild.cmake.get_cmake_qibuild_dir())
+    import qibuild.cmake
+    cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
+    sys.stdout.write("""qiBuild version 1.16
+Using cmake code from {cmake_qibuild_dir}
+""".format(cmake_qibuild_dir=cmake_qibuild_dir))
 
 
 def main():
