@@ -76,7 +76,7 @@ endfunction()
 # \argn: source files, like the SRC group, argn and SRC will be merged
 # \param:TIMEOUT The timeout of the test
 # \group:SRC Sources
-# \group:DEPENDS Dependencies to pass to use_lib
+# \group:DEPENDS Dependencies to pass to qi_use_lib
 # \group:ARGUMENTS Arguments to pass to add_test (to your test program)
 #
 function(qi_create_gtest name)
