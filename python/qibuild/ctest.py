@@ -73,7 +73,6 @@ class TestResult:
         if self.ok:
             ui.info(ui.green, "[OK]")
         else:
-            ok = False
             ui.info(ui.red, "[FAIL]", self.message)
             if qibuild.command.SIGINT_EVENT.is_set():
                 pass
@@ -222,25 +221,25 @@ class TestWorker(threading.Thread):
 
 
 class TestResultWorker(threading.Thread):
-    def __init__(self, queue, failed_tests):
+    def __init__(self, queue):
         threading.Thread.__init__(self)
         self.queue = queue
-        self.failed_tests = failed_tests
         self.daemon = True
+        self.res = list()
         self.total, self.failed = 0, 0
 
     def run(self):
         while True:
             item = self.queue.get()
             item.print_result()
+            self.res.append(item)
             self.total += 1
             if not item.ok:
                 self.failed += 1
-                self.failed_tests.put((item.test_name, item.not_run))
             self.queue.task_done()
 
     def global_result(self):
-        return (self.total, self.failed)
+        return self.res
 
 
 def sigint_handler(signum, frame):
@@ -267,7 +266,6 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
 
     """
     build_dir = project.build_directory
-    results_dir = os.path.join(project.build_directory, "test-results")
     signal.signal(signal.SIGINT, sigint_handler)
     all_tests = parse_ctest_test_files(build_dir)
     tests = list()
@@ -309,8 +307,8 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
 
     ui.info(ui.green, "Testing", project.name, "...")
     in_queue, out_queue = QueueTimeout(), Queue.Queue()
-    failed_tests = Queue.Queue()
-    output_worker, thread_list = TestResultWorker(out_queue, failed_tests), []
+    output_worker = TestResultWorker(out_queue)
+    thread_list = list()
     output_worker.start()
     for it in range(num_jobs):
         thread_list.append(TestWorker(in_queue, out_queue))
@@ -324,8 +322,10 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
     out_queue.join()
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-    total, failed = output_worker.global_result()
-    if failed == 0:
+    results = output_worker.global_result()
+    total = len(results)
+    failed = [x for x in results if not x.ok]
+    if not failed:
         ui.info("Ran %i tests" % total)
         if slow_tests and not slow:
             ui.info("Note: %i" % len(slow_tests),
@@ -333,13 +333,12 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
         ui.info("All pass. Congrats!")
         return True
 
-    ui.error("Ran %i tests, %i failures" % (total, failed))
-    while not failed_tests.empty():
-        test_name, not_run = failed_tests.get()
-        message = [ui.bold, " -", ui.blue, test_name]
-        if not_run:
-            message.extend([ui.red, '(Not Run)'])
-        ui.info(*message)
+    ui.error("Ran %i tests, %i failures" % (total, len(failed)))
+    padding = max([len(x.test_name) for x in failed])
+    for res in failed:
+        ui.info(ui.bold, " -", ui.blue,
+                res.test_name.ljust(padding + 5),
+                ui.red, res.message)
     return False
 
 def write_xml(xml_out, test_res):
