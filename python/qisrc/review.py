@@ -49,7 +49,6 @@ def http_to_ssh(url, project_name, username, gerrit_ssh_port=29418):
     return res
 
 
-
 def fetch_gerrit_hook(path, username, server, port):
     """ Fetch the ``commit-msg`` hook from gerrit
 
@@ -167,6 +166,23 @@ def setup_project(project_path, project_name, review_url, branch):
     ui.info(ui.green, "[OK]")
     return True
 
+def guess_emails(git, reviewers):
+    """ Fix the reviewer list.
+
+    Complete the email addresses with the committer email's domain name
+    when just the reviewer username is given, using the domain name of the
+    'user.email' setting from the given git.
+
+    :return: the list of reviewers' email
+
+    """
+    domain_name = git.get_config("user.email")
+    domain_name = domain_name.rsplit("@")[1]
+    for idx, reviewer in enumerate(reviewers):
+        if "@" not in reviewer:
+            reviewers[idx] = reviewer + "@" + domain_name
+    return reviewers
+
 def push(project_path, branch, review=True, dry_run=False, reviewers=None):
     """ Push the changes for review.
 
@@ -191,6 +207,7 @@ def push(project_path, branch, review=True, dry_run=False, reviewers=None):
         ui.info('Pushing code to gerrit for review.')
         args.append("%s:refs/for/%s" % (branch, branch))
         if reviewers:
+            reviewers = guess_emails(git, reviewers)
             receive_pack = "git receive-pack"
             for reviewer in reviewers:
                 receive_pack += " --reviewer=%s" % reviewer
