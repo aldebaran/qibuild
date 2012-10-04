@@ -11,7 +11,7 @@ import qibuild.sh
 def configure_file(in_file, out_file,  opts=None, append_file=None):
     """Configure file from in_path to out_path,
 
-    If opts is not None, use string.format() with the contents of contents of
+    If opts is not None, use string.format() with the contents of
     the opts dictionnary.
 
     If append_file is not None, append the contents of the file to the output.
