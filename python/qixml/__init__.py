@@ -3,7 +3,8 @@
 ## found in the COPYING file.
 
 
-""" Common tools for XML
+""" This is just a set of convenience functions to be used with
+`The ElemtTree XML API <http://docs.python.org/library/xml.etree.elementtree.html>`_
 
 """
 
