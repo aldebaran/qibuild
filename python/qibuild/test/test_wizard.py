@@ -248,14 +248,12 @@ class ConfigWizardTestCase(unittest.TestCase):
             "unique build dir" : True,
             "unique sdk dir"   : True,
             "path to a build dir" : "build",
-            "path to a sdk dir"   : "sdk",
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
         worktree = os.path.join(self.tmp, "worktree")
         self.run_wizard(toc=self.toc)
         self.assertEqual(self.toc.config.local.build.build_dir, "build")
-        self.assertEqual(self.toc.config.local.build.sdk_dir,   "sdk")
 
     def test_full_wizard(self):
         self.setup_platform("windows")
@@ -302,16 +300,13 @@ class ConfigWizardTestCase(unittest.TestCase):
             "generator" : "Unix Makefiles",
             "ide" : "Eclipse CDT",
             "unique build dir" : True,
-            "unique sdk dir"   : True,
             "path to a build dir" : "build",
-            "path to a sdk dir"   : "sdk",
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
         old_toc = qibuild.toc.toc_open(self.tmp)
         self.run_wizard(toc=old_toc)
         self.assertEqual(old_toc.config.local.build.build_dir, "build")
-        self.assertEqual(old_toc.config.local.build.sdk_dir,   "sdk")
 
         self.interact_patcher.stop()
         self.setup_answers({

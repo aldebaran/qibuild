@@ -167,18 +167,6 @@ def configure_local_settings(toc):
     toc.config.local.build.build_dir = build_dir
     toc.save_config()
 
-    sdk_dir = None
-    answer = qibuild.interact.ask_yes_no(
-        "Do you want to use a unique SDK dir?",
-        default=False)
-    if answer:
-        sdk_dir = qibuild.interact.ask_string("Path to a SDK directory")
-        sdk_dir = os.path.expanduser(sdk_dir)
-        full_path = os.path.join(toc.worktree.root, sdk_dir)
-        ui.info(ui.green, "::", ui.reset,
-                "Will use", full_path, "as a unique SDK directory")
-    toc.config.local.build.sdk_dir = sdk_dir
-    toc.save_config()
 
 
 def run_config_wizard(toc):
