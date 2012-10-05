@@ -7,12 +7,11 @@
 
 import os
 import sys
-import qibuild.log
 
+from qibuild import ui
 import qibuild
 import qisrc
 
-LOGGER = qibuild.log.get_logger("qisrc.status")
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -25,24 +24,6 @@ def configure_parser(parser):
         dest="show_branch",
         action="store_true",
         help="display branch and tracking branch for each repository")
-
-def _max_len(wt, projects):
-    """ Helper function to display status """
-    max_len = 0
-    for p in projects:
-        shortpath = os.path.relpath(p.src, wt)
-        if len(shortpath) > max_len:
-            max_len = len(shortpath)
-    return max_len
-
-def _add_pad(max_len, k, v):
-    pad = " " * (max_len - len(k))
-    return "%s%s%s" % (str(k), pad, str(v))
-
-def _pad(szold, sznew):
-    if sznew > szold:
-        return ""
-    return " " * (szold - sznew)
 
 def stat_tracking_remote(git, branch, tracking):
     behind = 0
@@ -66,22 +47,22 @@ def do(args):
     manifests = qiwt.get_manifest_projects()
     git_projects = list(set(git_projects) - set(manifests))
 
-    sz = len(git_projects)
+    num_projs = len(git_projects)
+    max_len = max([len(p.src) for p in git_projects])
     i = 1
-    oldsz = 0
     incorrect_projs = list()
+    not_on_a_branch = list()
     for git_project in git_projects:
         git = qisrc.git.open(git_project.path)
         if sys.stdout.isatty():
             src = git_project.src
-            to_write = "checking (%d/%d)" % (i, sz)
-            to_write += src
-            to_write += _pad(oldsz, len(src))
+            to_write = "Checking (%d/%d) " % (i, num_projs)
+            to_write += src.ljust(max_len)
             sys.stdout.write(to_write + "\r")
             sys.stdout.flush()
-            oldsz = len(src)
-            if i == sz:
-                print "checking (%d/%d): done" % (i, sz), _pad(oldsz, 2)
+            if i == num_projs:
+                ui.info("Checking (%d/%d):" % (num_projs, num_projs), "done",
+                        " " * max_len)
         i = i + 1
         if git.is_valid():
             clean = git.is_clean(untracked=args.untracked_files)
@@ -89,6 +70,9 @@ def do(args):
             #clean worktree, but is the current branch sync with the remote one?
             if clean:
                 branch = git.get_current_branch()
+                if branch is None:
+                    not_on_a_branch.append(git_project.src)
+                    continue
                 if branch != git_project.branch:
                     incorrect_projs.append((git_project.src, branch, git_project.branch))
                     incorrect.append(git_project)
@@ -102,23 +86,22 @@ def do(args):
             if not clean:
                 dirty.append(git_project)
 
-    LOGGER.info("Dirty projects: %d/%d", len(dirty), len(git_projects))
+    ui.info("\n", ui.brown, "Dirty projects", len(dirty), "/", len(git_projects))
 
-    max_len = _max_len(qiwt.root, gitrepo)
     for git_project in gitrepo:
         git = qisrc.git.open(git_project.path)
         shortpath = os.path.relpath(git_project.path, qiwt.root)
         if git.is_valid():
             branch = git.get_current_branch()
             tracking = git.get_tracking_branch()
-            line = _add_pad(max_len, shortpath, " : %s tracking %s" %
-                (branch, tracking))
             (ahead, behind) = stat_tracking_remote(git, branch, tracking)
-            LOGGER.info(line)
+            ui.info(ui.green, "*", ui.reset,
+                    ui.blue, shortpath.ljust(max_len), ui.reset,
+                    ui.green, ":", branch, "tracking", tracking)
             if ahead:
-                print(" ## Your branch is %d commits ahead" % ahead)
+                ui.info(ui.bold, "Your branch is", ahead, ui.reset, "commits ahead")
             if behind:
-                print(" ## Your branch is %d commits behind" % behind)
+                ui.info(ui.bold, "Your branch is", behind, ui.reset, "commits behind")
 
         if not git.is_clean(untracked=args.untracked_files):
             if args.untracked_files:
@@ -128,18 +111,27 @@ def do(args):
             nlines = [ x[:3] + shortpath + "/" + x[3:] for x in out.splitlines() if len(x.strip()) > 0 ]
             print "\n".join(nlines)
 
-    max_len = _max_len(qiwt.root, incorrect)
     max_len = max([max_len, len("Project")])
     if incorrect_projs:
+        ui.info()
         max_branch_len = max([len(x[1]) for x in incorrect_projs])
         max_branch_len = max([max_branch_len, len("Current")])
-        print
-        print " ## Warning: some projects are not on the expected branch"
-        LOGGER.info("Project".ljust(max_len + 3) + "Current".ljust(max_branch_len + 3) + "Manifest")
+        ui.warning("Some projects are not on the expected branch")
+        ui.info(ui.blue, " " *2, "Project".ljust(max_len + 3), ui.reset,
+                ui.green, "Current".ljust(max_branch_len + 3),
+                "Manifest")
         for (project, local_branch, manifest_branch) in incorrect_projs:
-            LOGGER.info(project.ljust(max_len + 3) + local_branch.ljust(max_branch_len + 3) + manifest_branch)
+            ui.info(ui.green, " *", ui.reset,
+                    ui.blue, project.ljust(max_len + 3),
+                    ui.green, local_branch.ljust(max_branch_len + 3),
+                    ui.green, manifest_branch)
+
+    if not_on_a_branch:
+        ui.info()
+        ui.warning("Som projects are not on any branch")
+        for project in not_on_a_branch:
+            ui.info(ui.green, " *", ui.reset, ui.blue, project)
 
     if not args.untracked_files:
-        print
-        print("Tips: use -u to show untracked files")
+        ui.info("Tips: use -u to show untracked files")
 
