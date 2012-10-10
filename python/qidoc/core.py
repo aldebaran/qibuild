@@ -75,23 +75,19 @@ class QiDocBuilder:
             if project not in self.docs:
                 raise NoSuchProjectError(project)
             out_dir = self.docs[project].dest
+        if len(self.projects_to_build) == 1:
+            out_dir = self.projects_to_build[0].dest
         elif len(self.projects) != len(self.worktree.projects):
-            ui.info(ui.blue, 'Please choose in the following list:')
-            for (i, doc) in enumerate(self.projects_to_build):
-                ui.info(' ', ui.red, str(i + 1), ui.blue, doc.name)
-            res = None
-            while res is None:
-                try:
-                    ui.info(ui.blue, 'Select one:', end='')
-                    selected = int(raw_input())
-                except ValueError:
-                    continue
-                except (KeyboardInterrupt, EOFError):
-                    sys.exit(1)
-                if 0 < selected <= len(self.projects_to_build):
-                    res = selected - 1
-            out_dir = self.projects_to_build[res].dest
+            p_names = [p.name for p in self.projects_to_build]
+            p_name = qibuild.interact.ask_choice(p_names,
+                                                 "Please choose in the following list")
+            if p_name:
+                out_dir = self.docs[p_name].dest
         index_html = os.path.join(out_dir, "index.html")
+        if not os.path.exists(index_html):
+            raise Exception("""\
+Could not find an index.html in {out_dir}
+Try running `qidoc build`""".format(out_dir=out_dir))
         ui.info("Opening", index_html, "in a web browser")
         if sys.platform == "darwin":
             index_html = "file://" + index_html
