@@ -14,6 +14,7 @@ packages = [
     "qibuild.cmake",
     "qidoc",
     "qidoc.actions",
+    "qidoc.docs",
     "qitoolchain",
     "qitoolchain.actions",
     "qitoolchain.binary_package",
