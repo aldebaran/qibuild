@@ -48,7 +48,7 @@ coverage:
 
 check: pylint-error
 	@echo ":: Running tests: $(TEST_MODULES)"
-	@$(PYTHON) -m pytest $(TEST_MODULES)
+	@$(PYTHON) -m pytest $(TEST_MODULES) --junitxml=../tests.xml
 
 check-fast:
 	@echo ":: Runnig fasts tests: $(TEST_MODULES)"
