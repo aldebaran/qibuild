@@ -39,16 +39,18 @@ pylint-error:
 coverage:
 	@echo running tests for coverage
 # cd .. is required for the Jenkins plugin to work
-	@(cd .. ; $(PYTHON) -m pytest python --cov=python \
-										--cov-config=coverage.ini \
-										--cov-report=xml \
-										--cov-report=html)
+	@(cd .. ; $(PYTHON) -m pytest python \
+					--junitxml=tests.xml \
+				    --cov=python \
+					--cov-config=coverage.ini \
+					--cov-report=xml \
+					--cov-report=html)
 	@echo " => Open $(shell cd .. ; pwd)/htmlcov/index.html for more details"
 
 
 check: pylint-error
 	@echo ":: Running tests: $(TEST_MODULES)"
-	@$(PYTHON) -m pytest $(TEST_MODULES) --junitxml=../tests.xml
+	@$(PYTHON) -m pytest $(TEST_MODULES)
 
 check-fast:
 	@echo ":: Runnig fasts tests: $(TEST_MODULES)"
