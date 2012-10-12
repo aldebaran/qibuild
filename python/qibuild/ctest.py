@@ -19,6 +19,7 @@ import threading
 import time
 
 import qibuild
+import qibuild.config
 from qibuild import ui
 
 def _str_from_signal(code):
@@ -252,7 +253,7 @@ def sigint_handler(signum, frame):
     qibuild.command.SIGINT_EVENT.set()
     signal.signal(signal.SIGINT, double_sigint)
 
-def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
+def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
               dry_run=False, valgrind=False, nightmare=False, test_args=None,
               num_jobs=1):
     """ Called by :py:meth:`qibuild.toc.Toc.test_project`
@@ -265,6 +266,8 @@ def run_tests(project, build_env, pattern=None, verbose=False, slow=False,
     :return: a boolean to indicate if test was sucessful
 
     """
+    if not build_env:
+        build_env = qibuild.config.get_build_env()
     build_dir = project.build_directory
     signal.signal(signal.SIGINT, sigint_handler)
     all_tests = parse_ctest_test_files(build_dir)
