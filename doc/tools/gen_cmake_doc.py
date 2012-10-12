@@ -12,6 +12,7 @@ DOCUMENTED_FILES=[
     "stage",
     "install",
     "tests",
+    "perf",
     "submodule",
     "option",
     "codegen",

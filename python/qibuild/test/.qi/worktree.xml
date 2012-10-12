@@ -7,4 +7,5 @@
   <project src="stagelib" />
   <project src="uselib" />
   <project src="world" />
+  <project src="perf" />
 </worktree>

@@ -23,6 +23,7 @@ from qibuild import envsetter
 from qibuild import interact
 from qibuild import log
 from qibuild import parsers
+from qibuild import performance
 from qibuild import script
 from qibuild import sh
 from qibuild import toc

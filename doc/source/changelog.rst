@@ -54,6 +54,7 @@ Command line
 * Added ``qibuild deploy``, to deploy code to a remote device
 * ``qibuild test``: learned ``--slow``
 * ``qibuild test``: learned ``-n, --dry-run`` to  just list the test names
+* ``qibuild test``: learned ``--perf`` to run performance tests
 * ``qibuild test``: ``--test-name`` has been removed, use ``-k PATTERN``
 * Removed ``qisrc fetch``, use ``qisrc init`` instead
 * Removed ``qisrc pull``, use ``qisrc sync`` instead
@@ -68,6 +69,7 @@ CMake
 
 * Added :cmake:function:`qi_generate_src`,  :cmake:function:`qi_generate_header`
 * Added :cmake:function:`qi_swig_wrap_java`
+* Added :cmake:function:`qi_create_perf_test`
 * :cmake:function:`qi_create_gtest` and :cmake:function:`qi_create_test` learned
   the ``SLOW`` keyword so that tests are not run by default.
 * :cmake:function:`qi_use_lib` learned the ``ASSUME_SYSTEM_INCLUDE`` flag

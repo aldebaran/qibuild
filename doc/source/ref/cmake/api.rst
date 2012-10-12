@@ -26,6 +26,7 @@ qibuild CMake API functions
    api/codegen
    api/submodule
    api/tests
+   api/perf
    api/log
    api/option
    api/find
