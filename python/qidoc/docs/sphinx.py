@@ -72,10 +72,10 @@ class SphinxDoc(Documentation):
             cmd.extend(["-c", config_path])
         if opts.get("werror"):
             cmd.append("-W")
-        if opts.get("quiet"):
-            cmd.append("-q")
         for flag in opts.get("flags", list()):
             cmd.extend(["-D", flag])
+        if not opts.get('verbose'):
+            cmd.append('-q')
         cmd.extend([os.path.join(self.src, "source"), self.dest])
         env = os.environ.copy()
         release = opts.get("release", False)

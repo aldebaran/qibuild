@@ -20,8 +20,6 @@ def configure_parser(parser):
                        metavar="version", help="Documentation build version.")
     group.add_argument("--Werror", dest="werror", action="store_true",
                        help="treat warnings as errors", default=False)
-    group.add_argument("--quiet-build", dest="quiet_build", action="store_true",
-                       help="be quiet when building", default=False)
     group.add_argument("--release", dest="release", action="store_true",
                        default=False, help="build in release mode")
     group.add_argument("-D", dest="flags", action="append",
@@ -37,7 +35,6 @@ def do(args):
     builder = qidoc.core.QiDocBuilder(projects, args.worktree, args.output_dir)
     opts = dict()
     opts['version'] = args.version if args.version else '0.42'
-    opts['quiet'] = args.quiet_build
     opts["werror"] = args.werror
     opts["release"] = args.release
     flags = args.flags or list()
@@ -45,4 +42,5 @@ def do(args):
         flags.insert(0, "build_type=release")
     opts["flags"] = flags
     opts['pdb'] = args.pdb
+    opts['verbose'] = args.verbose
     builder.build(opts, project=(args.project if args.project else None))

@@ -1,4 +1,3 @@
-
 import abc
 import qixml
 
@@ -113,7 +112,8 @@ class Documentation:
             if dependency not in docs:
                 raise MissingDependencyError(self, dependency)
             docs[dependency].build(docs, opts, **kwargs)
-        ui.info('Building', self.type_name(), 'project', self.name)
+        ui.info(ui.green, 'Building', self.type_name(), 'project', ui.blue,
+                self.name, ui.green, ' -> ', ui.purple, self.dest)
         self._build(docs, opts, **kwargs)
         self._built = True
 

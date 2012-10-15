@@ -40,6 +40,7 @@ class DoxygenDoc(Documentation):
             opts['OUTPUT_DIRECTORY'] = 'build-doc'
             opts['GENERATE_TAGFILE'] = ''
             opts['INTERNAL_DOCS'] = 'NO' if opts['release'] else 'YES'
+            opts['QUIET'] = 'NO' if opts['verbose'] else 'YES'
             if doxytags_path:
                 tag_file = os.path.join(doxytags_path, self.name + '.tag')
                 opts['GENERATE_TAGFILE'] = tag_file
