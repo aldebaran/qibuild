@@ -5,8 +5,8 @@
 """Build documentation."""
 
 import qibuild
-import qisrc.cmdparse
 import qidoc.core
+import qisrc.cmdparse
 
 def configure_parser(parser):
     """Configure parser for this action."""
@@ -44,4 +44,5 @@ def do(args):
     if args.release:
         flags.insert(0, "build_type=release")
     opts["flags"] = flags
+    opts['pdb'] = args.pdb
     builder.build(opts, project=(args.project if args.project else None))

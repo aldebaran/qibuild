@@ -37,7 +37,7 @@ class SphinxDoc(Documentation):
         conf_py_tmpl = os.path.join(templates, "sphinx", "conf.in.py")
         conf_py_in = os.path.join(self.src, "qidoc", "conf.in.py")
         if not os.path.exists(conf_py_in):
-            mess = "Could not configure sphinx sources in:%s \n" % self.src
+            mess = "Could not configure sphinx sources in: %s\n" % self.src
             mess += "qidoc/conf.in.py does not exists"
             ui.warning(mess)
             return
@@ -66,6 +66,8 @@ class SphinxDoc(Documentation):
             if not sphinx_build:
                 raise Exception("sphinx-build not in path, please install it")
             cmd = [sphinx_build]
+        if opts.get('pdb'):
+            cmd.append('-P')
         if os.path.exists(os.path.join(config_path, "conf.py")):
             cmd.extend(["-c", config_path])
         if opts.get("werror"):
