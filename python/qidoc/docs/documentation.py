@@ -12,7 +12,7 @@ class MissingDependencyError(Exception):
 
     def __str__(self):
         return 'Couldn\'t find dependency {dep} for documentation {doc}.'.format(
-            dep = self.dep, doc = self.doc,
+            dep = self.dep, doc = self.doc.name,
         )
 
 
