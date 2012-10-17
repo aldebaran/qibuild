@@ -34,7 +34,7 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     group = parser.add_argument_group("deploy options")
     group.add_argument("url", help="remote target url: user@hostname:path")
-    group.add_argument("-p", "--port", help="port", type=int)
+    group.add_argument("--port", help="port", type=int)
     group.add_argument("--split-debug", action="store_true",
                         dest="split_debug", help="split debug symbols. "
                         "Enable remote debuging")

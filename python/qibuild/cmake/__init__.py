@@ -14,7 +14,7 @@ import qibuild.log
 from qibuild import ui
 import qibuild.command
 import qibuild.sh
-import qibuild.cmake.profile
+import qibuild.cmake.profiling
 
 def get_known_cmake_generators():
     """ Get the list of known cmake generators.
@@ -82,7 +82,7 @@ def get_cached_var(build_dir, var, default=None):
 
 
 def cmake(source_dir, build_dir, cmake_args, env=None,
-          clean_first=True, profile=False):
+          clean_first=True, profiling=False):
     """Call cmake with from a build dir for a source dir.
     cmake_args are added on the command line.
 
@@ -118,7 +118,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     # Add path to source to the list of args, and set buildir for
     # the current working dir.
     cmake_args += [source_dir]
-    if not profile:
+    if not profiling:
         qibuild.command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
         return
     # importing here in order to not create circular dependencies:
@@ -130,9 +130,9 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     fp.close()
     qibuild_dir = get_cmake_qibuild_dir()
     ui.info(ui.green, "Analyzing cmake logs ...")
-    profile = qibuild.cmake.profile.parse_cmake_log(cmake_log, qibuild_dir)
+    profiling_res = qibuild.cmake.profiling.parse_cmake_log(cmake_log, qibuild_dir)
     outdir = os.path.join(build_dir, "profile")
-    qibuild.cmake.profile.gen_annotations(profile, outdir, qibuild_dir)
+    qibuild.cmake.profiling.gen_annotations(profiling_res, outdir, qibuild_dir)
     ui.info(ui.green, "Annotations generated in", outdir)
 
 

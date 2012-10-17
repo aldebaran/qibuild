@@ -18,9 +18,9 @@ import qibuild
 def configure_parser(parser):
     """ Configure parser for this action """
     qibuild.parsers.toc_parser(parser)
-    parser.add_argument("-n", "--names", action="store_true", dest="names",
+    parser.add_argument("--names", action="store_true", dest="names",
                         help="sort by names")
-    parser.add_argument("-p", "--paths", action="store_false", dest="names",
+    parser.add_argument("--paths", action="store_false", dest="names",
                         help="sort by path")
     parser.add_argument("pattern", metavar="PATTERN", nargs="?",
                         help="pattern to be matched")
