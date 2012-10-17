@@ -325,7 +325,3 @@ class SyncTestCase(unittest.TestCase):
             qisrc.sync.init_worktree(worktree, manifest)
         assert "already exists" in e.value.message
         assert "not a git repository" in e.value.message
-
-
-if __name__ == "__main__":
-    unittest.main()
