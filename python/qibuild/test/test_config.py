@@ -11,7 +11,10 @@ import unittest
 import tempfile
 from StringIO import StringIO
 
+import pytest
+
 import qibuild
+import qixml
 
 
 def cfg_from_string(str, user_config=None):
@@ -540,9 +543,16 @@ rdepends = spam eggs
         qibuild.sh.rm(self.tmp)
 
 
+def test_default_profile():
+    xml = """
+<qibuild version="1">
+ <defaults profile="foo" />
+</qibuild>
+"""
+    local_cfg = qibuild.config.LocalSettings()
+    local_cfg.parse(qixml.read(StringIO(xml)).getroot())
+    assert local_cfg.defaults.profile == "foo"
+
+
 if __name__ == "__main__":
     unittest.main()
-
-
-
-

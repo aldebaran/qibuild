@@ -51,6 +51,9 @@ def toc_parser(parser):
              "It should match the name of a toolchain. "
              "The settings from <worktree>/.qi/<config>.cmake will "
              "also be used")
+    parser.add_argument("-p", "--profile",
+        help="A profile to use. "
+             "It should match a declaration in .qi/worktree.xml")
 
 def build_parser(parser):
     """ Parser settings for every action doing builds

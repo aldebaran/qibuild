@@ -19,6 +19,8 @@ import qisrc
 import qibuild
 import qibuild.gdb
 import qibuild.project
+import qibuild.profile
+
 import qitoolchain
 
 from qibuild.command  import CommandFailedException
@@ -46,6 +48,28 @@ class WrongDefaultException(Exception):
 
     def __str__(self):
         return self._message
+
+class NoSuchProfile(Exception):
+    """ The profile specified by the user cannot be found """
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return """ Could not find profile {name}.
+Please check your configuration (<worktree>/.qi/qibuild.xml) \
+""".format(name=self.name)
+
+class WrongDefaultProfile(Exception):
+    """ The default profile specified by the user cannot be found """
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return """ Could not find profile {name}.
+Note: This is your default profile. Please remove this from the
+`defaults` section, or change it.
+""".format(name=self.name)
+
 
 class ConfigureFailed(Exception):
     def __init__(self, project, message=None):
@@ -102,6 +126,7 @@ class Toc:
             qibuild_cfg=None,
             build_type="Debug",
             cmake_flags=None,
+            profile=None,
             cmake_generator=None):
         """
         Create a new Toc object. Most of the keyargs come directly from
@@ -232,10 +257,38 @@ You may want to run:
         else:
             self.user_cmake_flags = list()
 
+        self.user_profile = profile
+        self.apply_profile()
+
         # Finally, update the build configuration of all the projects
         # (this way we are sure that the build configuration is the same for
         # every project)
         self.update_projects()
+
+    def apply_profile(self):
+        """ Apply a profile, adding cmake flags coming from -p command
+        line argument
+
+        """
+        is_default = False
+        profile_name = self.user_profile
+        if not profile_name:
+            default_profile = self.config.local.defaults.profile
+            if default_profile:
+                is_default = True
+                profile_name = default_profile
+
+        if not profile_name:
+            return
+        profiles = qibuild.profile.parse_profiles(self.config_path)
+        match = profiles.get(profile_name)
+        if match:
+            self.user_cmake_flags = match.cmake_flags + self.user_cmake_flags
+        else:
+            if is_default:
+                raise WrongDefaultProfile(profile_name)
+            else:
+                raise NoSuchProfile(profile_name)
 
 
     def save_config(self):
@@ -656,6 +709,9 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
     config = None
     if hasattr(args, 'config'):
         config   = args.config
+    profile = None
+    if hasattr(args, 'profile'):
+        profile = args.profile
 
     build_type = None
     if hasattr(args, 'build_type'):
@@ -672,6 +728,7 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
     worktree = qisrc.worktree.open_worktree(worktree_root)
     toc = Toc(worktree,
                config=config,
+               profile=profile,
                build_type=build_type,
                cmake_flags=cmake_flags,
                cmake_generator=cmake_generator,
