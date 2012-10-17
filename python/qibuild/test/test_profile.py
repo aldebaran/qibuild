@@ -85,3 +85,12 @@ def test_wrong_default_profile(tmpdir):
     with pytest.raises(qibuild.toc.WrongDefaultProfile):
         qibuild.toc.Toc(worktree)
 
+def test_add_profile(tmpdir):
+    worktree = qisrc.worktree.create(tmpdir.strpath)
+    qibuild_xml = tmpdir.join(".qi").join("qibuild.xml")
+    profile = qibuild.profile.Profile("foo")
+    profile.cmake_flags = ["FOO=BAR"]
+    qibuild.profile.add_profile(qibuild_xml.strpath, profile)
+    parsed = qibuild.profile.parse_profiles(qibuild_xml.strpath)
+    assert len(parsed) == 1
+    assert parsed["foo"] == profile

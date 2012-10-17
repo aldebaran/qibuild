@@ -15,6 +15,7 @@ import operator
 import qibuild.log
 
 import qisrc
+from qisrc.sync_build_profiles import sync_build_profiles
 import qisrc.cmdparse
 import qibuild
 from qibuild import ui
@@ -50,6 +51,7 @@ def sync_all(worktree, args):
         manifest_filename = manifest_project.profile + ".xml"
         manifest_xml = os.path.join(manifest_project.path, manifest_filename)
         qisrc.sync.init_worktree(worktree, manifest_xml, setup_review=args.setup_review)
+        sync_build_profiles(worktree, manifest_xml)
 
 
 def do(args):

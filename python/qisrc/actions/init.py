@@ -8,6 +8,7 @@ import os
 
 import qibuild
 import qisrc
+from qisrc.sync_build_profiles import sync_build_profiles
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -54,6 +55,7 @@ def do(args):
             manifest_url, branch=branch, src=manifest_src,
             profile=args.profile)
     qisrc.sync.init_worktree(worktree, manifest, setup_review=args.setup_review)
+    sync_build_profiles(worktree, manifest)
     if not manifest_is_a_regular_file:
         worktree.set_manifest_project(manifest_src, args.profile)
     return worktree
