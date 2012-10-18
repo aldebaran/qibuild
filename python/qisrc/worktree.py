@@ -197,7 +197,7 @@ class WorkTree:
             if not raises:
                 return None
             mess  = "No project in '%s'\n" % src
-            mess += "Know projects are in %s" % ", ".join(p_srcs)
+            mess += "Known projects are in %s" % ", ".join(p_srcs)
             raise Exception(mess)
         match = [p for p in self.projects if p.src == src]
         res = match[0]
