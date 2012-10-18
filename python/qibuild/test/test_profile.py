@@ -14,7 +14,11 @@ def write_foo_profile(tmpdir):
 <qibuild version="1">
  <profiles>
    <profile name="foo">
-    <cmake flags="ENABLE_FOO=ON" />
+    <cmake>
+      <flags>
+        <flag name="ENABLE_FOO">ON</flag>
+      </flags>
+    </cmake>
    </profile>
   </profiles>
 </qibuild>
@@ -59,7 +63,11 @@ def test_using_default_profile(tmpdir):
  <defaults profile="foo" />
  <profiles>
    <profile name="foo">
-    <cmake flags="ENABLE_FOO=ON" />
+    <cmake>
+      <flags>
+       <flag name="ENABLE_FOO">ON</flag>
+      </flags>
+    </cmake>
    </profile>
   </profiles>
 </qibuild>
@@ -75,9 +83,7 @@ def test_wrong_default_profile(tmpdir):
 <qibuild version="1">
  <defaults profile="bar" />
  <profiles>
-   <profile name="foo">
-    <cmake flags="ENABLE_FOO=ON" />
-   </profile>
+   <profile name="foo" />
   </profiles>
 </qibuild>
 """)

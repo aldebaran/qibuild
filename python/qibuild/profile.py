@@ -22,13 +22,20 @@ class Profile:
         elem = qixml.etree.Element("profile")
         elem.set("name",  self.name)
         if self.cmake_flags:
-            cmake = qixml.etree.Element("cmake")
-            cmake.set("flags", "  ".join(self.cmake_flags))
-            elem.append(cmake)
+            cmake_elem = qixml.etree.Element("cmake")
+            flags_elem = qixml.etree.Element("flags")
+            cmake_elem.append(flags_elem)
+            for flag in self.cmake_flags:
+                (key, value) = flag.split("=")
+                flag_elem = qixml.etree.Element("flag")
+                flag_elem.set("name", key)
+                flag_elem.text = value
+                flags_elem.append(flag_elem)
+            elem.append(cmake_elem)
         return elem
 
     def __eq__(self, other):
-        return set(self.cmake_flags) == set(other.cmake_flags)
+        return self.cmake_flags == other.cmake_flags
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -49,7 +56,15 @@ def parse_profiles(xml_path):
         cmake_elem = profile_elem.find("cmake")
         if cmake_elem is None:
             continue
-        profile.cmake_flags = qixml.parse_list_attr(cmake_elem, "flags")
+        flags_elem = cmake_elem.find("flags")
+        if flags_elem is None:
+            continue
+        flag_elems = flags_elem.findall("flag")
+        for flag_elem in flag_elems:
+            key = qixml.parse_required_attr(flag_elem, "name")
+            value = flag_elem.text.strip()
+            to_add = "%s=%s" % (key, value)
+            profile.cmake_flags.append(to_add)
     return res
 
 def add_profile(xml_path, profile):

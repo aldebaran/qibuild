@@ -30,7 +30,11 @@ def test_remote_updated(tmpdir):
 <manifest>
   <profiles>
     <profile name="foo">
-     <cmake flags="FOO=BAR" />
+      <cmake>
+        <flags>
+          <flag name="FOO">BAR</flag>
+        </flags>
+      </cmake>
     </profile>
   </profiles>
 </manifest>
@@ -40,7 +44,11 @@ def test_remote_updated(tmpdir):
 <manifest>
   <profiles>
     <profile name="foo">
-     <cmake flags="SPAM=EGGS" />
+      <cmake>
+        <flags>
+          <flag name="SPAM">EGGS</flag>
+        </flags>
+      </cmake>
     </profile>
   </profiles>
 </manifest>
@@ -61,7 +69,11 @@ def test_same_remote(tmpdir):
 <manifest>
   <profiles>
     <profile name="foo">
-     <cmake flags="FOO=BAR" />
+      <cmake>
+        <flags>
+          <flag name="FOO">BAR</flag>
+        </flags>
+      </cmake>
     </profile>
   </profiles>
 </manifest>
@@ -71,7 +83,11 @@ def test_same_remote(tmpdir):
 <manifest>
   <profiles>
     <profile name="foo">
-     <cmake flags="FOO=BAR" />
+      <cmake>
+        <flags>
+          <flag name="FOO">BAR</flag>
+        </flags>
+      </cmake>
     </profile>
   </profiles>
 </manifest>
