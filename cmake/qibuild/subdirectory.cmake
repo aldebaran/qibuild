@@ -4,6 +4,9 @@
 
 include(CMakeParseArguments)
 
+#! Subdirectory
+# =============
+
 #!
 # Include a subdirectory if all the options are ON
 # \arg:subdir The subdirectory that should be added to the build

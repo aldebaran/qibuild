@@ -10,7 +10,7 @@ qibuild.ctest.run_tests
 .. autofunction:: qibuild.ctest.run_tests
 
 
-qibuild.ctest.run_test
+qibuild.ctest.Test.run
 ----------------------
 
-.. autofunction:: qibuild.ctest.run_test
+.. automethod:: qibuild.ctest.Test.run

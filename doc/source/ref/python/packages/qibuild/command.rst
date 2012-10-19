@@ -45,7 +45,7 @@ Running process in the background
 
 .. autofunction:: call_background
 
-.. autoclass:: ProcessThread
+.. autoclass:: Process
 
 
 Exceptions
