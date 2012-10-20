@@ -257,21 +257,21 @@ You may want to run:
         else:
             self.user_cmake_flags = list()
 
-        self.user_profile = profile
-        self.apply_profile()
+        self.profile = None
+        self.apply_profile(profile)
 
         # Finally, update the build configuration of all the projects
         # (this way we are sure that the build configuration is the same for
         # every project)
         self.update_projects()
 
-    def apply_profile(self):
+    def apply_profile(self, user_profile):
         """ Apply a profile, adding cmake flags coming from -p command
         line argument
 
         """
         is_default = False
-        profile_name = self.user_profile
+        profile_name = user_profile
         if not profile_name:
             default_profile = self.config.local.defaults.profile
             if default_profile:
@@ -284,6 +284,7 @@ You may want to run:
         match = profiles.get(profile_name)
         if match:
             self.user_cmake_flags = match.cmake_flags + self.user_cmake_flags
+            self.profile = profile_name
         else:
             if is_default:
                 raise WrongDefaultProfile(profile_name)
@@ -352,6 +353,8 @@ You may want to run:
             res.append(self.active_config)
         else:
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
+        if self.profile:
+            res.append("%s" % self.profile)
 
         if not self.using_visual_studio and self.build_type != "Debug":
             # When using cmake + visual studio, sharing the same build dir with
