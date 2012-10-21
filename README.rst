@@ -57,8 +57,6 @@ qiBuild contains work from
 * argparse http://pypi.python.org/pypi/argparse/
   (licensed under Python software foundation license version 2)
 
-* xmlrunner http://www.rittau.org/python/xmlrunner.py (public domain)
-
 * cmake http://www.cmake.org/cmake/project/license.html (BSD)
 
 * gclient http://code.google.com/p/gclient/ (BSD)
