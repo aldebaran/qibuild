@@ -6,8 +6,7 @@ clean(PTHREAD)
 fpath(PTHREAD "pthread.h")
 
 if(ANDROID)
-  qi_set_global(PTHREAD_LIBRARIES "")
-  export_lib(PTHREAD)
+  export_header(PTHREAD)
   return()
 endif()
 
