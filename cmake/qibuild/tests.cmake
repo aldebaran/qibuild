@@ -181,18 +181,24 @@ function(qi_add_test test_name target_name)
     set(ARG_TIMEOUT 20)
   endif()
 
-  set(_bin_path ${QI_SDK_DIR}/${QI_SDK_BIN}/${target_name})
+  if(TARGET ${target_name})
+    set(_bin_path ${QI_SDK_DIR}/${QI_SDK_BIN}/${target_name})
 
-  if(MSVC AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(_bin_path ${_bin_path}_d)
+    if(MSVC AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+      set(_bin_path ${_bin_path}_d)
+    endif()
+
+    add_test(${test_name} ${_bin_path} ${ARG_ARGUMENTS})
+    set_target_properties(${target_name} PROPERTIES FOLDER "tests")
+  # If test is not a binary, assume it is a test script
+  else()
+    # Just in case user specified a relative path:
+    get_filename_component(_full_path ${target_name} ABSOLUTE)
+    if (NOT EXISTS ${_full_path})
+      qi_error("${target_name} is not a target nor an existing path")
+    endif()
+    add_test(${test_name} ${_full_path} ${ARG_ARGUMENTS})
   endif()
-
-  add_test(${test_name} ${_bin_path} ${ARG_ARGUMENTS})
-
-  # Be nice with Visual Studio users:
-  set_target_properties(${target_name}
-    PROPERTIES
-      FOLDER "tests")
 
   set_tests_properties(${test_name} PROPERTIES
     TIMEOUT ${ARG_TIMEOUT}
