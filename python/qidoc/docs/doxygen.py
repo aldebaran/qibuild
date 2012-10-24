@@ -49,7 +49,8 @@ class DoxygenDoc(Documentation):
             tagfiles, doxygen_mapping = list(), self.get_mapping(docs, **kwargs)
             if doxygen_mapping:
                 for (key, value) in doxygen_mapping.iteritems():
-                    tagfiles.append("%s=%s" % (key, value))
+                    rel_path = os.path.relpath(value[0], self.dest)
+                    tagfiles.append("%s=%s" % (key, rel_path))
             opts["TAGFILES"] = " ".join(tagfiles)
 
             append_file = None
