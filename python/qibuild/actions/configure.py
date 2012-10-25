@@ -62,8 +62,8 @@ def do(args):
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
         ui.info(ui.green, "Active configuration:", ui.blue, toc.active_config)
-    if toc.profile:
-        ui.info(ui.green, "Using profile:", ui.blue, toc.profile)
+    for profile in toc.profiles:
+        ui.info(ui.green, "Using profile:", ui.blue, profile)
     if toc.local_cmake:
         ui.info(ui.green, "Using custom CMake file:", ui.reset,
                 ui.bold, toc.local_cmake)

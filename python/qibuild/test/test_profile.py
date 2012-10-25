@@ -8,88 +8,63 @@ import qisrc.worktree
 import qibuild.toc
 
 
-def write_foo_profile(tmpdir):
-    qibuild_xml = tmpdir.join(".qi").join("qibuild.xml")
+def open_toc_with_profiles(tmpdir, profiles=None, flags=None):
+    dot_qi = tmpdir.mkdir(".qi")
+    qibuild_xml = dot_qi.join("qibuild.xml")
     qibuild_xml.write("""
 <qibuild version="1">
- <profiles>
-   <profile name="foo">
-    <cmake>
-      <flags>
-        <flag name="ENABLE_FOO">ON</flag>
-      </flags>
-    </cmake>
-   </profile>
+  <profiles>
+    <profile name="foo">
+      <cmake>
+        <flags>
+          <flag name="WITH_FOO">ON</flag>
+        </flags>
+      </cmake>
+    </profile>
+    <profile name="bar">
+      <cmake>
+        <flags>
+          <flag name="WITH_BAR">ON</flag>
+        </flags>
+      </cmake>
+    </profile>
   </profiles>
 </qibuild>
 """)
+    worktree = qisrc.worktree.open_worktree(tmpdir.strpath)
+    toc = qibuild.toc.Toc(worktree, cmake_flags=flags, profiles=profiles)
+    return toc
 
 
-def test_default_toc(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
-    toc = qibuild.toc.Toc(worktree)
+def test_profiles_nothing_specified(tmpdir):
+    toc = open_toc_with_profiles(tmpdir)
     assert toc.user_cmake_flags == list()
+    assert "foo" not in toc.build_folder_name
+    assert "bar" not in toc.build_folder_name
 
-def test_passing_flags_on_command_line(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
-    toc = qibuild.toc.Toc(worktree, cmake_flags=["FOO=BAR"])
-    assert toc.user_cmake_flags == ["FOO=BAR"]
+def test_one_profile(tmpdir):
+    toc = open_toc_with_profiles(tmpdir, profiles=["foo"])
+    assert toc.user_cmake_flags == ["WITH_FOO=ON"]
+    assert "foo" in toc.build_folder_name
+    assert "bar" not in toc.build_folder_name
 
-def test_using_profile(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
-    write_foo_profile(tmpdir)
-    toc = qibuild.toc.Toc(worktree, profile="foo")
-    assert toc.user_cmake_flags == ["ENABLE_FOO=ON"]
+def test_two_profiles(tmpdir):
+    toc = open_toc_with_profiles(tmpdir, profiles=["foo", "bar"])
+    assert toc.user_cmake_flags == ["WITH_FOO=ON", "WITH_BAR=ON"]
+    assert "foo" in toc.build_folder_name
+    assert "bar" in toc.build_folder_name
 
-def test_no_such_profile(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
-    write_foo_profile(tmpdir)
+def test_profile_and_flags(tmpdir):
+    toc = open_toc_with_profiles(tmpdir, profiles=["foo"], flags=["WITH_FOO=OFF"])
+    # Note: we *could* detect that the user is overiding profiles flags from the
+    # command line, and has conflicting options, but it's probably best to
+    # let CMake use the last setting and be done with it.
+    assert toc.user_cmake_flags == ["WITH_FOO=ON", "WITH_FOO=OFF"]
+
+def test_non_existing_profile(tmpdir):
     # pylint: disable-msg=E1101
     with pytest.raises(qibuild.toc.NoSuchProfile):
-        qibuild.toc.Toc(worktree, profile="bar")
-
-def test_using_profile_with_cmake_flags(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
-    write_foo_profile(tmpdir)
-    toc = qibuild.toc.Toc(worktree, profile="foo",
-                          cmake_flags=["ENABLE_BAR=ON"])
-    assert toc.user_cmake_flags == ["ENABLE_FOO=ON", "ENABLE_BAR=ON"]
-
-def test_using_default_profile(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
-    qibuild_xml = tmpdir.join(".qi").join("qibuild.xml")
-    qibuild_xml.write("""
-<qibuild version="1">
- <defaults profile="foo" />
- <profiles>
-   <profile name="foo">
-    <cmake>
-      <flags>
-       <flag name="ENABLE_FOO">ON</flag>
-      </flags>
-    </cmake>
-   </profile>
-  </profiles>
-</qibuild>
-""")
-    toc = qibuild.toc.Toc(worktree)
-    assert toc.user_cmake_flags == ["ENABLE_FOO=ON"]
-
-
-def test_wrong_default_profile(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
-    qibuild_xml = tmpdir.join(".qi").join("qibuild.xml")
-    qibuild_xml.write("""
-<qibuild version="1">
- <defaults profile="bar" />
- <profiles>
-   <profile name="foo" />
-  </profiles>
-</qibuild>
-""")
-    # pylint: disable-msg=E1101
-    with pytest.raises(qibuild.toc.WrongDefaultProfile):
-        qibuild.toc.Toc(worktree)
+        toc = open_toc_with_profiles(tmpdir, profiles=["doesnotexist"])
 
 def test_add_profile(tmpdir):
     worktree = qisrc.worktree.create(tmpdir.strpath)

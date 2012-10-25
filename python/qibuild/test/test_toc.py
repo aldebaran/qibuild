@@ -10,6 +10,8 @@ import os
 import tempfile
 import unittest
 
+import pytest
+
 import qisrc
 import qibuild
 import qitoolchain
@@ -138,8 +140,6 @@ class TocTestCase(unittest.TestCase):
 
     def tearDown(self):
         qibuild.sh.rm(self.tmp)
-
-
 
 if __name__ == "__main__":
     unittest.main()

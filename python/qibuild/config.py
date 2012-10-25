@@ -302,27 +302,20 @@ class LocalDefaults:
     def __init__(self):
         # An config name to use by default
         self.config = None
-        # A profile to use by default
-        self.profile = None
 
     def parse(self, tree):
         self.config = tree.get("config")
-        self.profile = tree.get("profile")
 
     def tree(self):
         tree = etree.Element("defaults")
         if self.config:
             tree.set("config", self.config)
-        if self.profile:
-            tree.set("profile", self.profile)
         return tree
 
     def __str__(self):
         res = ""
         if self.config:
             res += "default config: %s\n" % self.config
-        if self.profile:
-            res += "default profile: %s\n" % self.profile
         return res
 
 class LocalBuild:

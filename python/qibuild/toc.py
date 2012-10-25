@@ -51,24 +51,19 @@ class WrongDefaultException(Exception):
 
 class NoSuchProfile(Exception):
     """ The profile specified by the user cannot be found """
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, toc, profile_name):
+        self.toc = toc
+        self.profile_name = profile_name
 
     def __str__(self):
+        qibuild_xml = self.toc.config_path
+        profiles = qibuild.profile.parse_profiles(qibuild_xml)
         return """ Could not find profile {name}.
-Please check your configuration (<worktree>/.qi/qibuild.xml) \
-""".format(name=self.name)
-
-class WrongDefaultProfile(Exception):
-    """ The default profile specified by the user cannot be found """
-    def __init__(self, name):
-        self.name = name
-
-    def __str__(self):
-        return """ Could not find profile {name}.
-Note: This is your default profile. Please remove this from the
-`defaults` section, or change it.
-""".format(name=self.name)
+Known profiles are: {profiles}
+Please check your worktree configuration in:
+{qibuild_xml} \
+""".format(name=self.profile_name, qibuild_xml=qibuild_xml,
+           profiles=profiles.keys())
 
 
 class ConfigureFailed(Exception):
@@ -126,7 +121,7 @@ class Toc:
             qibuild_cfg=None,
             build_type="Debug",
             cmake_flags=None,
-            profile=None,
+            profiles=None,
             cmake_generator=None):
         """
         Create a new Toc object. Most of the keyargs come directly from
@@ -257,40 +252,33 @@ You may want to run:
         else:
             self.user_cmake_flags = list()
 
-        self.profile = None
-        self.apply_profile(profile)
+        self.profiles = list()
+        self.apply_profiles(profiles)
 
         # Finally, update the build configuration of all the projects
         # (this way we are sure that the build configuration is the same for
         # every project)
         self.update_projects()
 
-    def apply_profile(self, user_profile):
+    def apply_profiles(self, profile_names):
         """ Apply a profile, adding cmake flags coming from -p command
-        line argument
+        line arguments.
 
         """
-        is_default = False
-        profile_name = user_profile
-        if not profile_name:
-            default_profile = self.config.local.defaults.profile
-            if default_profile:
-                is_default = True
-                profile_name = default_profile
-
-        if not profile_name:
+        if not profile_names:
             return
+        cmake_flags = list()
         profiles = qibuild.profile.parse_profiles(self.config_path)
-        match = profiles.get(profile_name)
-        if match:
-            self.user_cmake_flags = match.cmake_flags + self.user_cmake_flags
-            self.profile = profile_name
-        else:
-            if is_default:
-                raise WrongDefaultProfile(profile_name)
+        for profile_name in profile_names:
+            match = profiles.get(profile_name)
+            if not match:
+                raise NoSuchProfile(self, profile_name)
             else:
-                raise NoSuchProfile(profile_name)
+                cmake_flags.extend(match.cmake_flags)
+                self.profiles.append(profile_name)
 
+        # Re-add custom CMake flags (comfing from -D arguments) at the end:
+        self.user_cmake_flags = cmake_flags + self.user_cmake_flags
 
     def save_config(self):
         """ Save configuration. You should call this after changing
@@ -353,8 +341,8 @@ You may want to run:
             res.append(self.active_config)
         else:
             res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
-        if self.profile:
-            res.append("%s" % self.profile)
+        for profile in self.profiles:
+            res.append(profile)
 
         if not self.using_visual_studio and self.build_type != "Debug":
             # When using cmake + visual studio, sharing the same build dir with
@@ -712,9 +700,9 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
     config = None
     if hasattr(args, 'config'):
         config   = args.config
-    profile = None
-    if hasattr(args, 'profile'):
-        profile = args.profile
+    profiles = None
+    if hasattr(args, 'profiles'):
+        profiles = args.profiles
 
     build_type = None
     if hasattr(args, 'build_type'):
@@ -731,7 +719,7 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
     worktree = qisrc.worktree.open_worktree(worktree_root)
     toc = Toc(worktree,
                config=config,
-               profile=profile,
+               profiles=profiles,
                build_type=build_type,
                cmake_flags=cmake_flags,
                cmake_generator=cmake_generator,
