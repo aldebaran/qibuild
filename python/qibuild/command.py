@@ -65,7 +65,10 @@ class Process:
             try:
                 opt = dict()
                 if os.name == 'posix':
-                    opts = {'preexec_fn': os.setsid}
+                    opts = {
+                        'preexec_fn': os.setsid,
+                        'close_fds': True
+                    }
                 elif os.name == 'nt':
                     opts = {
                         'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP,
