@@ -3,8 +3,8 @@
 ## found in the COPYING file.
 
 import qibuild
-from qibuild.cmake.profile import parse_cmake_log
-from qibuild.cmake.profile import gen_annotations
+from qibuild.cmake.profiling import parse_cmake_log
+from qibuild.cmake.profiling import gen_annotations
 
 
 def test_simple_parse(tmpdir):
