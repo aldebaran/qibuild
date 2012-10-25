@@ -156,6 +156,7 @@ class Test:
         ncmd = self.cmd
         if self.valgrind:
             env['VALGRIND'] = '1'
+            timeout *= 10
             valgrind_log = os.path.join(self.build_dir, self.test_name + "valgrind_output.log")
             ncmd = [ "valgrind", "--track-fds=yes", "--log-file=%s" % valgrind_log ]
             ncmd.extend(self.cmd)
