@@ -75,6 +75,8 @@ CMake
   the ``SLOW`` keyword so that tests are not run by default.
 * :cmake:function:`qi_use_lib` learned the ``ASSUME_SYSTEM_INCLUDE`` flag
   to use ``-isystem`` on the dependencies
+* :cmake:function:`qi_create_config_h` learned to use ``configure_file`` flags
+  such as ``@ONLY``
 
 * qibuild cmake modules:
 

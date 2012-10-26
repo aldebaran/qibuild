@@ -316,15 +316,26 @@ endfunction()
 #
 #   qi_create_config_h(_out config.h.in foo/config.h)
 #
+# Note that both arguments must be *relative* paths
+#
 # \arg:OUT_PATH Path to the generated file
 # \arg:source The source file
 # \arg:dest The destination
+# \argn: passed to the configure_file() called
 function(qi_create_config_h OUT_PATH source dest)
-  configure_file("${source}" "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}" ESCAPE_QUOTES)
-  include_directories("${CMAKE_CURRENT_BINARY_DIR}/include/")
-  get_filename_component(_folder "${dest}" PATH)
-  install(FILES       "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}"
+  get_filename_component(_src_full ${source} ABSOLUTE)
+  if(NOT EXISTS ${_src_full})
+    qi_error("Template for creating header does not exist: ${_src_full}")
+  endif()
+  get_filename_component(_dest_dir ${dest} PATH)
+  set(_inc_dir "${CMAKE_CURRENT_BINARY_DIR}/include")
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/${_dest_dir})
+  get_filename_component(_dest_name ${dest} NAME)
+  set(_dest_full ${CMAKE_CURRENT_BINARY_DIR}/include/${dest})
+  configure_file("${_src_full}" "${_dest_full}" ${ARGN})
+  include_directories("${_inc_dir}")
+  install(FILES       "${_dest_full}"
           COMPONENT   "header"
-          DESTINATION "${QI_SDK_INCLUDE}/${_folder}")
-  set(${OUT_PATH} "${CMAKE_CURRENT_BINARY_DIR}/include/${dest}" PARENT_SCOPE)
+          DESTINATION "${QI_SDK_INCLUDE}/${_dest_dir}")
+  set(${OUT_PATH} "${_dest_full}" PARENT_SCOPE)
 endfunction()
