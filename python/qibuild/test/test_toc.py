@@ -24,10 +24,11 @@ class TestToc():
     build dir is cleaned afterwards
 
     """
-    def __init__(self, build_type="Debug"):
+    def __init__(self, build_type="Debug", cmake_flags=None):
         test_dir = os.path.abspath(os.path.dirname(__file__))
         worktree = qisys.worktree.open_worktree(test_dir)
-        self.toc = qibuild.toc.Toc(worktree, build_type=build_type)
+        self.toc = qibuild.toc.Toc(worktree, build_type=build_type,
+                                   cmake_flags=cmake_flags)
 
     def clean(self):
         """ Clean every build dir """

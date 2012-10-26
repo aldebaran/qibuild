@@ -10,3 +10,6 @@ qi_create_config_h(_out ${CMAKE_CURRENT_SOURCE_DIR}/config.in.h foo/config.h)
 qi_create_bin(foo main.cpp)
 message(STATUS "_out: ${_out}")
 
+if(WITH_EXTRA_INSTALL_RULE)
+  qi_install_header(${_out} KEEP_RELATIVE_PATHS)
+endif()
