@@ -20,6 +20,10 @@ import qibuild
 import qitoolchain
 
 
+def is_url(location):
+    """ Check that a given location is an URL """
+    return "://" in location
+
 
 def raise_parse_error(package_tree, feed, message):
     """ Raise a nice pasing error about the given
@@ -44,7 +48,10 @@ def tree_from_feed(feed_location):
         if os.path.exists(feed_location):
             fp = open(feed_location, "r")
         else:
-            fp = qisys.remote.open_remote_location(feed_location)
+            if is_url(feed_location):
+                fp = qisys.remote.open_remote_location(feed_location)
+            else:
+                raise Exception("Feed location is not an existing path nor an url")
         tree = ElementTree.ElementTree()
         tree.parse(fp)
     except Exception:
