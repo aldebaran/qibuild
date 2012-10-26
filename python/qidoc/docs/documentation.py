@@ -1,7 +1,7 @@
 import abc
 import qixml
 
-from qibuild import ui
+from qisys import ui
 
 class MissingDependencyError(Exception):
     '''The dependency of a documentation is missing.'''

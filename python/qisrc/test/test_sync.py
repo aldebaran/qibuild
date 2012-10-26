@@ -11,7 +11,7 @@ import pytest
 
 import qisrc.sync
 import qisrc.git
-import qibuild.sh
+import qisys.sh
 
 from qisrc.test.test_git import create_git_repo
 from qisrc.test.test_git import create_git_repo_with_submodules
@@ -24,17 +24,17 @@ from qisrc.test.test_git import push_file
 @pytest.mark.slow
 class SyncTestCase(unittest.TestCase):
     def setUp(self):
-        qibuild.command.CONFIG["quiet"] = True
+        qisys.command.CONFIG["quiet"] = True
         self.tmp = tempfile.mkdtemp(prefix="test-qisrc-sync")
-        qibuild.sh.mkdir(self.tmp)
+        qisys.sh.mkdir(self.tmp)
 
     def tearDown(self):
-        qibuild.command.CONFIG["quiet"] = False
-        qibuild.sh.rm(self.tmp)
+        qisys.command.CONFIG["quiet"] = False
+        qisys.sh.rm(self.tmp)
 
     def test_local_manifest_sync(self):
         create_git_repo(self.tmp, "qi/libqi")
-        worktree = qisrc.worktree.create(self.tmp)
+        worktree = qisys.worktree.create(self.tmp)
         xml = """
 <manifest>
     <remote name="origin"
@@ -71,7 +71,7 @@ class SyncTestCase(unittest.TestCase):
         manifest = os.path.join(self.tmp, "manifest.xml")
         with open(manifest, "w") as fp:
             fp.write(xml)
-        worktree = qisrc.worktree.create(self.tmp)
+        worktree = qisys.worktree.create(self.tmp)
         qisrc.sync.init_worktree(worktree, manifest)
 
     def test_git_manifest_sync(self):
@@ -90,7 +90,7 @@ class SyncTestCase(unittest.TestCase):
 """
         xml = xml.format(tmp=self.tmp)
         push_file(self.tmp, "manifest.git", "default.xml", xml)
-        worktree = qisrc.worktree.create(self.tmp)
+        worktree = qisys.worktree.create(self.tmp)
         fetched_manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
         with open(fetched_manifest, "r") as fp:
             fetched_xml = fp.read()
@@ -132,10 +132,10 @@ class SyncTestCase(unittest.TestCase):
 
         master_root  = os.path.join(self.tmp, "work", "master")
         release_root = os.path.join(self.tmp, "work", "release-1.12")
-        qibuild.sh.mkdir(master_root,  recursive=True)
-        qibuild.sh.mkdir(release_root, recursive=True)
-        master_wt  = qisrc.worktree.create(master_root)
-        release_wt = qisrc.worktree.create(release_root)
+        qisys.sh.mkdir(master_root,  recursive=True)
+        qisys.sh.mkdir(release_root, recursive=True)
+        master_wt  = qisys.worktree.create(master_root)
+        release_wt = qisys.worktree.create(release_root)
         master_manifest  = qisrc.sync.fetch_manifest(master_wt,  manifest_url,
             branch="master")
         release_manifest = qisrc.sync.fetch_manifest(release_wt, manifest_url,
@@ -167,7 +167,7 @@ class SyncTestCase(unittest.TestCase):
 </manifest>
 """
         push_file(self.tmp, "manifest", "default.xml", xml, branch="release-1.12")
-        worktree = qisrc.worktree.create(self.tmp)
+        worktree = qisys.worktree.create(self.tmp)
         qisrc.sync.clone_project(worktree, manifest_url)
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url, branch="release-1.12")
         qisrc.sync.init_worktree(worktree, manifest)
@@ -193,7 +193,7 @@ class SyncTestCase(unittest.TestCase):
         xml = xml.format(tmp=self.tmp)
         push_file(self.tmp, "manifest", "default.xml", xml)
 
-        worktree = qisrc.worktree.create(self.tmp)
+        worktree = qisys.worktree.create(self.tmp)
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
         qisrc.sync.init_worktree(worktree, manifest)
         worktree.set_manifest_project("manifest/default")
@@ -213,7 +213,7 @@ class SyncTestCase(unittest.TestCase):
         xml = xml.format(tmp=self.tmp)
         push_file(self.tmp, "manifest", "default.xml", xml)
         work = os.path.join(self.tmp, "work")
-        worktree = qisrc.worktree.create(work)
+        worktree = qisys.worktree.create(work)
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
         # pylint: disable-msg=E1101
         with pytest.raises(Exception) as e:
@@ -232,7 +232,7 @@ class SyncTestCase(unittest.TestCase):
         xml = xml.format(tmp=self.tmp)
         push_file(self.tmp, "manifest", "default.xml", xml)
         work = os.path.join(self.tmp, "work")
-        worktree = qisrc.worktree.create(work)
+        worktree = qisys.worktree.create(work)
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)
         # pylint: disable-msg=E1101
         with pytest.raises(Exception) as e:
@@ -251,7 +251,7 @@ class SyncTestCase(unittest.TestCase):
         xml = xml.format(tmp=self.tmp)
         push_file(self.tmp, "manifest", "default.xml", xml)
         work = os.path.join(self.tmp, "work")
-        worktree = qisrc.worktree.create(work)
+        worktree = qisys.worktree.create(work)
         bar_src = os.path.join(work, "bar")
         bar_git = qisrc.git.Git(bar_src)
         bar_git.clone(bar_url)
@@ -271,7 +271,7 @@ class SyncTestCase(unittest.TestCase):
         xml = xml.format(tmp=self.tmp)
         push_file(self.tmp, "manifest", "default.xml", xml)
         work = os.path.join(self.tmp, "work")
-        worktree = qisrc.worktree.create(work)
+        worktree = qisys.worktree.create(work)
         bar_src = os.path.join(work, "bar")
         os.mkdir(bar_src)
         bar_git = qisrc.git.Git(bar_src)
@@ -293,7 +293,7 @@ class SyncTestCase(unittest.TestCase):
         xml = xml.format(tmp=self.tmp)
         push_file(self.tmp, "manifest", "default.xml", xml)
         work = os.path.join(self.tmp, "work")
-        worktree = qisrc.worktree.create(work)
+        worktree = qisys.worktree.create(work)
         bar_src = os.path.join(work, "bar")
         os.mkdir(bar_src)
         bar_git = qisrc.git.Git(bar_src)
@@ -316,7 +316,7 @@ class SyncTestCase(unittest.TestCase):
         xml = xml.format(tmp=self.tmp)
         push_file(self.tmp, "manifest", "default.xml", xml)
         work = os.path.join(self.tmp, "work")
-        worktree = qisrc.worktree.create(work)
+        worktree = qisys.worktree.create(work)
         bar_src = os.path.join(work, "bar")
         os.mkdir(bar_src)
         manifest = qisrc.sync.fetch_manifest(worktree, manifest_url)

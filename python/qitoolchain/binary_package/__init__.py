@@ -15,7 +15,7 @@ All qiBuild packages should have the same layout.
 
 import os
 
-import qibuild
+import qisys
 from qitoolchain.binary_package.core import BinaryPackage
 from qitoolchain.binary_package.core import BinaryPackageException
 
@@ -88,13 +88,13 @@ def _fix_package_tree(root_dir):
     if not os.path.exists(usr_lib):
         return
     lib_dir = os.path.join(root_dir, "lib")
-    qibuild.sh.mkdir(lib_dir)
+    qisys.sh.mkdir(lib_dir)
 
     for (root, directories, filenames) in os.walk(usr_lib):
         for filename in filenames:
             src = os.path.join(root, filename)
             print "mv", src, "->", lib_dir
-            qibuild.sh.mv(src, lib_dir)
+            qisys.sh.mv(src, lib_dir)
 
 
 def convert_to_qibuild(package, package_metadata=None,
@@ -127,11 +127,11 @@ def convert_to_qibuild(package, package_metadata=None,
             if value:
                 output_name += "-" + value
         output_name += ".zip"
-    qibuild.sh.mkdir(output_dir, recursive=True)
+    qisys.sh.mkdir(output_dir, recursive=True)
     output_path = os.path.join(output_dir, output_name)
-    with qibuild.sh.TempDir() as work_dir:
+    with qisys.sh.TempDir() as work_dir:
         root_dir = package.extract(work_dir)
         _fix_package_tree(root_dir)
-        res = qibuild.archive.compress(root_dir, algo="zip", quiet=True)
-        qibuild.sh.mv(res, output_path)
+        res = qisys.archive.compress(root_dir, algo="zip", quiet=True)
+        qisys.sh.mv(res, output_path)
     return output_path

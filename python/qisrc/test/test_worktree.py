@@ -11,8 +11,9 @@ import tempfile
 import unittest
 import pytest
 
-import qibuild.sh
-import qisrc.worktree
+import qisys.sh
+import qisys.worktree
+import qisrc
 
 class WorktreeTestCase(unittest.TestCase):
     def setUp(self):
@@ -24,11 +25,11 @@ class WorktreeTestCase(unittest.TestCase):
 
         """
         dot_qi = os.path.join(self.tmp, ".qi")
-        qibuild.sh.mkdir(dot_qi)
+        qisys.sh.mkdir(dot_qi)
         worktree_xml = os.path.join(dot_qi, "worktree.xml")
         with open(worktree_xml, "w") as fp:
             fp.write(xml)
-        worktree = qisrc.worktree.open_worktree(self.tmp)
+        worktree = qisys.worktree.open_worktree(self.tmp)
         return worktree
 
     def test_read_projects(self):
@@ -54,12 +55,12 @@ class WorktreeTestCase(unittest.TestCase):
         xml = "<worktree />"
         worktree = self.create_worktee(xml)
         worktree.add_project("foo")
-        qibuild.sh.mkdir(
+        qisys.sh.mkdir(
             os.path.join(self.tmp, "foo", ".git"),
             recursive=True)
 
         # Re-open worktre, check that foo is in git_projects
-        worktree = qisrc.open_worktree(self.tmp)
+        worktree = qisys.worktree.open_worktree(self.tmp)
         self.assertEquals(len(worktree.git_projects), 1)
         git_foo = worktree.get_project("foo")
         self.assertEquals(git_foo.src, "foo")
@@ -68,7 +69,7 @@ class WorktreeTestCase(unittest.TestCase):
         xml = "<worktree />"
         worktree = self.create_worktee(xml)
         foo_src = os.path.join(worktree.root, "foo")
-        qibuild.sh.mkdir(foo_src)
+        qisys.sh.mkdir(foo_src)
         worktree.add_project("foo")
         self.assertEquals(len(worktree.projects), 1)
         foo = worktree.get_project("foo")
@@ -145,8 +146,8 @@ class WorktreeTestCase(unittest.TestCase):
 </worktree>
 """
         bar = os.path.join(self.tmp, "bar")
-        qibuild.sh.mkdir(bar)
-        qibuild.sh.mkdir(os.path.join(bar, ".git"))
+        qisys.sh.mkdir(bar)
+        qisys.sh.mkdir(os.path.join(bar, ".git"))
         with open(os.path.join(bar, "qiproject.xml"), "w") as fp:
             fp.write("""
 <project name="bar">
@@ -157,32 +158,32 @@ class WorktreeTestCase(unittest.TestCase):
         # bar contains two buildable projects:
         # bar-gui in bar/gui and libbar in bar/lib
         bar_gui = os.path.join(self.tmp, bar, "gui")
-        qibuild.sh.mkdir(bar_gui)
+        qisys.sh.mkdir(bar_gui)
         with open(os.path.join(bar_gui, "CMakeLists.txt"), "w") as fp:
             fp.write("project(bar-gui)\n")
         with open(os.path.join(bar_gui, "qiproject.xml"), "w") as fp:
             fp.write('<project name="bar-gui"/>\n')
         bar_lib = os.path.join(self.tmp, bar, "lib")
-        qibuild.sh.mkdir(bar_lib)
+        qisys.sh.mkdir(bar_lib)
         with open(os.path.join(bar_lib, "CMakeLists.txt"), "w") as fp:
             fp.write("project(libbar)\n")
         with open(os.path.join(bar_lib, "qiproject.xml"), "w") as fp:
             fp.write('<project name="libbar"/>\n')
 
         libfoo = os.path.join(self.tmp, "lib", "libfoo")
-        qibuild.sh.mkdir(libfoo, recursive=True)
+        qisys.sh.mkdir(libfoo, recursive=True)
         with open(os.path.join(libfoo, "CMakeLists.txt"), "w") as fp:
             fp.write("project(libfoo)\n")
         with open(os.path.join(libfoo, "qiproject.xml"), "w") as fp:
             fp.write('<project name="libfoo"/> \n')
 
         dot_qi = os.path.join(self.tmp, ".qi")
-        qibuild.sh.mkdir(dot_qi)
+        qisys.sh.mkdir(dot_qi)
         worktree_xml = os.path.join(dot_qi, "worktree.xml")
         with open(worktree_xml, "w") as fp:
             fp.write(xml)
 
-        worktree = qisrc.worktree.WorkTree(self.tmp)
+        worktree = qisys.worktree.WorkTree(self.tmp)
         build_srcs = [p.src for p in worktree.buildable_projects]
         self.assertEquals(build_srcs, ["bar/gui", "bar/lib", "lib/libfoo"])
         srcs = [p.src for p in worktree.projects]
@@ -195,32 +196,32 @@ class WorktreeTestCase(unittest.TestCase):
         # Create a worktree in work, with a project named
         # foo
         work = os.path.join(self.tmp, "work")
-        qibuild.sh.mkdir(work)
-        worktree = qisrc.worktree.create(work)
+        qisys.sh.mkdir(work)
+        worktree = qisys.worktree.create(work)
         foo = os.path.join(work, "foo")
-        qibuild.sh.mkdir(foo)
+        qisys.sh.mkdir(foo)
         worktree.add_project(foo)
         foo_test = os.path.join(foo, "test")
-        qibuild.sh.mkdir(foo_test)
+        qisys.sh.mkdir(foo_test)
 
         # Try to create a worktree in foo/test: should
         # do nothing
-        test_worktree = qisrc.worktree.create(foo_test)
+        test_worktree = qisys.worktree.create(foo_test)
         test_dot_qi = os.path.join(foo_test, ".qi")
         self.assertFalse(os.path.exists(test_dot_qi))
-        worktree2 = qisrc.worktree.open_worktree(work)
+        worktree2 = qisys.worktree.open_worktree(work)
         worktree2.get_project("foo")
 
         # Use the force:
-        worktree3 = qisrc.worktree.create(foo_test, force=True)
+        worktree3 = qisys.worktree.create(foo_test, force=True)
         self.assertEquals(worktree3.projects, list())
 
         # Try to create a worktree in the same place should not raise
-        worktree4 = qisrc.worktree.create(work)
+        worktree4 = qisys.worktree.create(work)
 
 
     def tearDown(self):
-        qibuild.sh.rm(self.tmp)
+        qisys.sh.rm(self.tmp)
 
 
 def test_nested_qiprojects(tmpdir):
@@ -252,7 +253,7 @@ def test_nested_qiprojects(tmpdir):
     c_xml = c_project.join("qiproject.xml")
     c_xml.write('<project name="c" />\n')
 
-    worktree = qisrc.worktree.open_worktree(tmpdir.strpath)
+    worktree = qisys.worktree.open_worktree(tmpdir.strpath)
     assert len(worktree.projects) == 3
     a_proj = worktree.get_project("a")
     c_proj = worktree.get_project("a/b/c")
@@ -268,7 +269,7 @@ def test_create_in_git_dir(tmpdir):
     work = a_git.mkdir("work")
     # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
-        qisrc.worktree.create(work.strpath)
+        qisys.worktree.create(work.strpath)
     assert "inside a git project" in e.value.message
 
 

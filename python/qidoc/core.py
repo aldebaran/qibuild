@@ -9,24 +9,23 @@ import os
 import sys
 import webbrowser
 
-import qibuild
+import qisys
 import qidoc.config
-import qisrc
 
-from qibuild import ui
+from qisys import ui
 
 class QiDocBuilder:
     """A class to handle doc generation of several projects."""
 
     def __init__(self, projects, in_dir, out_dir=None):
-        self.worktree = qisrc.worktree.open_worktree(in_dir)
+        self.worktree = qisys.worktree.open_worktree(in_dir)
         self.projects, self.projects_to_build = projects, []
 
         self.templates_path, self.docs, self.in_dir = None, dict(), in_dir
         if not out_dir:
             self.out_dir = os.path.join(self.worktree.root, "build-doc")
         else:
-            self.out_dir = qibuild.sh.to_native_path(out_dir)
+            self.out_dir = qisys.sh.to_native_path(out_dir)
 
         self._load_doc_projects()
         self.doxytags_path = os.path.join(self.out_dir, "doxytags")
@@ -39,7 +38,7 @@ class QiDocBuilder:
         if 'version' not in opts:
             raise VersionKeyMissingError(opts)
 
-        qibuild.sh.mkdir(self.doxytags_path, recursive=True)
+        qisys.sh.mkdir(self.doxytags_path, recursive=True)
 
         kwargs = {
             'doxytags_path': self.doxytags_path,
@@ -79,7 +78,7 @@ class QiDocBuilder:
             out_dir = self.projects_to_build[0].dest
         elif len(self.projects) != len(self.worktree.projects):
             p_names = [p.name for p in self.projects_to_build]
-            p_name = qibuild.interact.ask_choice(p_names,
+            p_name = qisys.interact.ask_choice(p_names,
                                                  "Please choose in the following list")
             if p_name:
                 out_dir = self.docs[p_name].dest
@@ -117,9 +116,9 @@ Try running `qidoc build`""".format(out_dir=out_dir))
     def _set_paths(self, worktree_project, doc_project):
         """Set src and dest attributes of the doc project."""
         src = os.path.join(worktree_project.path, doc_project.src)
-        doc_project.src = qibuild.sh.to_native_path(src)
+        doc_project.src = qisys.sh.to_native_path(src)
         dest = os.path.join(self.out_dir, doc_project.dest)
-        doc_project.dest = qibuild.sh.to_native_path(dest)
+        doc_project.dest = qisys.sh.to_native_path(dest)
 
     def check_template(self, p_path, qiproj_xml):
         """Check whether a project is a template project. If no templates

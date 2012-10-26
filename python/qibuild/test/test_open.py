@@ -15,7 +15,7 @@ import qibuild.actions.open
 class OpenTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.ask_patcher = mock.patch('qibuild.interact.ask_choice')
+        self.ask_patcher = mock.patch('qisys.interact.ask_choice')
         self.ask_mock = self.ask_patcher.start()
 
     def test_no_ide_in_conf(self):

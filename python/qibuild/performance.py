@@ -11,8 +11,8 @@ import signal
 import sys
 import csv
 
-import qibuild
-from qibuild import ui
+from qisys import ui
+import qisys
 
 def sigint_handler(signum, frame):
     def double_sigint(signum, frame):
@@ -21,7 +21,7 @@ def sigint_handler(signum, frame):
         sys.exit(1)
     ui.warning('Received keyboard interrupt. Killing all processes ' + \
                '. This may take few seconds.')
-    qibuild.command.SIGINT_EVENT.set()
+    qisys.command.SIGINT_EVENT.set()
     signal.signal(signal.SIGINT, double_sigint)
 
 def run_perfs(project, pattern=None, dry_run=False):
@@ -66,10 +66,10 @@ def run_perfs(project, pattern=None, dry_run=False):
         bin = os.path.join(project.sdk_directory, "bin", name)
         cmd.insert(0, bin)
         test_result = os.path.join(project.build_directory, "perf-results")
-        qibuild.sh.mkdir(test_result)
+        qisys.sh.mkdir(test_result)
         output_xml = os.path.join(test_result, name + ".xml")
         cmd.extend(["--output", output_xml])
-        qibuild.command.call(cmd)
+        qisys.command.call(cmd)
 
 def parse_perflist_files(build_dir):
     """ Looks for perflist.txt in build_dir.

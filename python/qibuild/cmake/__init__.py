@@ -9,11 +9,11 @@
 import os
 import re
 import subprocess
-import qibuild.log
+import qisys.log
 
-from qibuild import ui
-import qibuild.command
-import qibuild.sh
+from qisys import ui
+import qisys.command
+import qisys.sh
 import qibuild.cmake.profiling
 
 def get_known_cmake_generators():
@@ -23,7 +23,7 @@ def get_known_cmake_generators():
 
     """
     build_env = qibuild.config.get_build_env()
-    cmake_    = qibuild.command.find_program("cmake", env=build_env)
+    cmake_    = qisys.command.find_program("cmake", env=build_env)
     if not cmake_:
         message = """\
 Could not find cmake executable
@@ -100,7 +100,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     # Always remove CMakeCache
     if clean_first:
         cache = os.path.join(build_dir, "CMakeCache.txt")
-        qibuild.sh.rm(cache)
+        qisys.sh.rm(cache)
 
     # Check that no one has made an in-source build
     in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
@@ -119,7 +119,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     # the current working dir.
     cmake_args += [source_dir]
     if not profiling:
-        qibuild.command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
+        qisys.command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
         return
     # importing here in order to not create circular dependencies:
     cmake_log = os.path.join(build_dir, "cmake.log")
@@ -234,7 +234,7 @@ def get_cmake_qibuild_dir():
     # and the cmake code in qibuild/cmake
     # (using qibuild from sources)
     res = os.path.join(qibuild.QIBUILD_ROOT_DIR, "..", "..", "cmake")
-    res = qibuild.sh.to_native_path(res)
+    res = qisys.sh.to_native_path(res)
     if os.path.isdir(res):
         return res
 
@@ -242,7 +242,7 @@ def get_cmake_qibuild_dir():
     # the following layout sdk/share/cmake/qibuild,
     # sdk/lib/python2.x/site-packages/qibuild
     sdk_dir = os.path.join(qibuild.QIBUILD_ROOT_DIR, "..", "..", "..", "..")
-    sdk_dir = qibuild.sh.to_native_path(sdk_dir)
+    sdk_dir = qisys.sh.to_native_path(sdk_dir)
     res = os.path.join(sdk_dir, "share", "cmake")
     if os.path.isdir(res):
         return res
@@ -269,4 +269,4 @@ def get_binutil(name, cmake_var=None, build_dir=None, build_env=None):
         res =  get_cached_var(build_dir, cmake_var)
     if res:
         return res
-    return qibuild.command.find_program(name, env=build_env)
+    return qisys.command.find_program(name, env=build_env)

@@ -4,13 +4,15 @@
 
 """Build documentation."""
 
+import qisys
 import qibuild
+import qibuild.parsers
 import qidoc.core
 import qisrc.cmdparse
 
 def configure_parser(parser):
     """Configure parser for this action."""
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     qibuild.parsers.project_parser(parser)
 
     parser.add_argument('project', nargs='?', help='Project to build.')

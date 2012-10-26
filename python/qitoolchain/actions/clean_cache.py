@@ -7,14 +7,14 @@
 import os
 import sys
 
-from qibuild import ui
-import qibuild
+from qisys import ui
+import qisys
 import qitoolchain
 
 
 def configure_parser(parser):
     """ Configure parser for this action """
-    qibuild.parsers.default_parser(parser)
+    qisys.parsers.default_parser(parser)
     parser.add_argument("name", nargs="?", metavar="NAME",
         help="Name of the toolchain")
     parser.add_argument("--dry-run", action="store_true", dest="dry_run",
@@ -46,5 +46,5 @@ def do(args):
     for (i, dir_to_rm) in enumerate(dirs_to_rm):
         sys.stdout.write("Removing package %i / %i\r" % ((i+1), num_dirs))
         sys.stdout.flush()
-        qibuild.sh.rm(dir_to_rm)
+        qisys.sh.rm(dir_to_rm)
     ui.info(ui.green, "done")

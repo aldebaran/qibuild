@@ -46,13 +46,13 @@ patch_sys_path()
 try:
     import argparse
 except ImportError:
-    from qibuild.external import argparse
-import qibuild.script
+    from qisys.external import argparse
+import qisys.script
 
 def main():
     parser = argparse.ArgumentParser()
-    modules = qibuild.script.action_modules_from_package("qisrc.actions")
-    qibuild.script.root_command_main("qisrc", parser, modules)
+    modules = qisys.script.action_modules_from_package("qisrc.actions")
+    qisys.script.root_command_main("qisrc", parser, modules)
 
 if __name__ == "__main__":
     main()

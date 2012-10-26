@@ -6,7 +6,7 @@
 
 """
 
-from qibuild import ui
+from qisys import ui
 import qibuild
 import qibuild.cmdparse
 

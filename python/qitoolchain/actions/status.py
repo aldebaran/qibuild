@@ -7,11 +7,11 @@
 
 """
 
-import qibuild
+import qisys
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.default_parser(parser)
+    qisys.parsers.default_parser(parser)
     parser.add_argument("name", nargs="?",
         help="Name of the toolchain to print. Default: all")
     parser.add_argument("--list", action="store_true",
@@ -23,8 +23,8 @@ def do(args):
     print "`qitoolchain status` is deprecated"
     print "use `qitoolchain list` or `qitoolchain info` instead"
     if args.list:
-        qibuild.run_action("qitoolchain.actions.list",
+        qisys.script.run_action("qitoolchain.actions.list",
             forward_args=args)
     else:
-        qibuild.run_action("qitoolchain.actions.info",
+        qisys.script.run_action("qitoolchain.actions.info",
             forward_args=args)

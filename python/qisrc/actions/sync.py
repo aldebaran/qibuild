@@ -12,18 +12,20 @@
 import os
 import sys
 import operator
-import qibuild.log
+import qisys.log
 
 import qisrc
 from qisrc.sync_build_profiles import sync_build_profiles
+import qisrc.parsers
 import qisrc.cmdparse
+import qibuild.parsers
 import qibuild
-from qibuild import ui
+from qisys import ui
 
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisrc.parsers.worktree_parser(parser)
     qibuild.parsers.project_parser(parser)
     parser.add_argument("--no-review", dest="setup_review", action="store_false",
         help="Do not setup projects for review")
@@ -56,7 +58,7 @@ def sync_all(worktree, args):
 
 def do(args):
     """Main entry point"""
-    worktree = qisrc.open_worktree(args.worktree)
+    worktree = qisys.worktree.open_worktree(args.worktree)
     projects = qisrc.cmdparse.projects_from_args(args)
 
     should_fetch_first = True

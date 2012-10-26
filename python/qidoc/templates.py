@@ -6,7 +6,7 @@
 
 import os
 
-import qibuild.sh
+import qisys.sh
 
 def configure_file(in_file, out_file,  opts=None, append_file=None):
     """Configure file from in_path to out_path,
@@ -29,7 +29,7 @@ def configure_file(in_file, out_file,  opts=None, append_file=None):
         with open(append_file, "r") as file_p:
             out_text += file_p.read()
     base_path = os.path.dirname(out_file)
-    qibuild.sh.mkdir(base_path, recursive=True)
+    qisys.sh.mkdir(base_path, recursive=True)
     if os.path.exists(out_file):
         # Do not write if contents are correct:
         with open(out_file, "r") as file_p:

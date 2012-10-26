@@ -10,21 +10,20 @@ import re
 import os
 import sys
 
-from qibuild import ui
-import qisrc
-import qibuild
-import qibuild.interact
+from qisys import ui
+import qisys.parsers
+import qisys.interact
 
 
 def configure_parser(parser):
     """ Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("pattern", metavar="PATTERN", nargs="?",
                         help="pattern to be matched")
 
 def do(args):
     """ Main method """
-    worktree = qisrc.open_worktree(args.worktree)
+    worktree = qisys.worktree.open_worktree(args.worktree)
     if not worktree.projects:
         on_empty_worktree(worktree)
     regex = args.pattern
@@ -47,7 +46,7 @@ def do(args):
         mess += " * " + rm + "\n"
     mess += "are registered in the worktree, but their paths no longer exists"
     ui.warning(mess)
-    answer = qibuild.interact.ask_yes_no("Do you want to remove them", default=True)
+    answer = qisys.interact.ask_yes_no("Do you want to remove them", default=True)
     if not answer:
         return
     for rm in to_remove:

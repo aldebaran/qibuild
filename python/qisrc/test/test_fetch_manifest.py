@@ -5,15 +5,15 @@
 import os
 import pytest
 
-import qibuild.sh
+import qisys.sh
 import qisrc.sync
 from qisrc.test.test_git import create_git_repo
 from qisrc.test.test_git import push_file
 
 def create_worktree(tmpdir):
     work = os.path.join(tmpdir, "work")
-    qibuild.sh.mkdir(work)
-    return qisrc.worktree.create(work)
+    qisys.sh.mkdir(work)
+    return qisys.worktree.create(work)
 
 
 # pylint: disable-msg=E1101

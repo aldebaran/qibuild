@@ -4,7 +4,7 @@
 
 """ Just some tests for ui """
 
-import qibuild.ui as ui
+import qisys.ui as ui
 
 def main():
     ui.info(ui.red, "This is a an error message\n",

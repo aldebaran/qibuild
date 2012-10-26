@@ -11,7 +11,7 @@ import sys
 import re
 
 
-from qibuild import ui
+from qisys import ui
 import qibuild
 
 

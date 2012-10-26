@@ -26,7 +26,7 @@ To every cmake code that is generated, and what CMake flags are passed.
 Command line parsing
 ---------------------
 
-This is done by :py:func:`qibuild.script.root_command_main` from
+This is done by :py:func:`qisys.script.root_command_main` from
 ``bin/qibuild`` script.
 
 We look for every module in ``qibuild.actions``, and find the ``configure.py`` module.

@@ -8,8 +8,8 @@ import sys
 import unittest
 import tempfile
 
-import qibuild.sh
-import qibuild.command
+import qisys.sh
+import qisys.command
 import qidoc.templates
 
 
@@ -18,7 +18,7 @@ class TestQiDocTemplates(unittest.TestCase):
         self.tmp = tempfile.mkdtemp(suffix="test-qidoc-templates")
 
     def tearDown(self):
-        qibuild.sh.rm(self.tmp)
+        qisys.sh.rm(self.tmp)
 
     def test_configure_file(self):
         in_path = os.path.join(self.tmp, "conf.py.in")
@@ -51,7 +51,7 @@ version = 1.14
         # Call `sync` so that we avoid false positives
         # because of filesystem cache
         if not sys.platform.startswith("win32"):
-            qibuild.command.call(["sync"])
+            qisys.command.call(["sync"])
         qidoc.templates.configure_file(in_path, out_path, {"version" : "1.14"})
         with open(out_path, "r") as fp:
             out_contents = fp.read()

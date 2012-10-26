@@ -12,6 +12,7 @@ import tempfile
 import unittest
 import mock
 
+import qisys
 import qibuild.wizard
 from qibuild.test.test_interact import FakeInteract
 
@@ -28,7 +29,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.get_platform = self.get_platform_patcher.start()
         self.get_tc_names_patcher = mock.patch('qitoolchain.get_tc_names')
         self.get_tc_names = self.get_tc_names_patcher.start()
-        self.find_patcher = mock.patch('qibuild.command.find_program')
+        self.find_patcher = mock.patch('qisys.command.find_program')
         self.find_program = self.find_patcher.start()
         self.get_generators_patcher = mock.patch('qibuild.cmake.get_known_cmake_generators')
         self.get_generators = self.get_generators_patcher.start()
@@ -59,7 +60,7 @@ class ConfigWizardTestCase(unittest.TestCase):
             fp.write(xml)
 
     def setup_find_program(self, programs):
-        """ Set the return value of qibuild.command.find_program
+        """ Set the return value of qisys.command.find_program
         for this test
 
         """
@@ -68,12 +69,12 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.find_program.side_effect = fake_find
 
     def setup_answers(self, answers):
-        """ Set the return value of qibuild.interact.ask_*
+        """ Set the return value of qisys.interact.ask_*
         for this test
 
         """
         fake_interact = FakeInteract(answers)
-        self.interact_patcher = mock.patch('qibuild.interact', fake_interact)
+        self.interact_patcher = mock.patch('qisys.interact', fake_interact)
         self.interact_patcher.start()
 
     def setup_generators(self, generators):
@@ -326,7 +327,7 @@ class ConfigWizardTestCase(unittest.TestCase):
             "sdk_dir is '%s', should be None or empty" % sdk_dir)
 
     def tearDown(self):
-        qibuild.sh.rm(self.tmp)
+        qisys.sh.rm(self.tmp)
         # pylint: disable-msg=E1103
         self.get_platform.stop()
         self.get_tc_names_patcher.stop()

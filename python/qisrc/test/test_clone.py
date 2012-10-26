@@ -5,6 +5,7 @@
 import os
 import pytest
 
+import qisys
 import qisrc
 from qisrc.sync import clone_project
 from qisrc.test.test_git import create_git_repo
@@ -12,7 +13,7 @@ from qisrc.test.test_git import create_git_repo_with_submodules
 
 def create_worktree(tmpdir):
     work = tmpdir.mkdir("work")
-    return qisrc.worktree.open_worktree(work.strpath)
+    return qisys.worktree.open_worktree(work.strpath)
 
 def test_simple(tmpdir):
     bar_url = create_git_repo(tmpdir.strpath, "bar")

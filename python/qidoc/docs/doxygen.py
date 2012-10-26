@@ -1,6 +1,6 @@
 import os
 
-import qibuild
+import qisys
 import qidoc.templates
 
 from qidoc.docs.documentation import Documentation, ConfigureFailedError
@@ -64,13 +64,13 @@ class DoxygenDoc(Documentation):
         kwargs['doxylink'][self.name] = (tag_file, self.dest)
 
         # Also copy the css:
-        qibuild.sh.install(
+        qisys.sh.install(
             os.path.join(templates, "doxygen", "doxygen.css"),
             os.path.join(self.src, "doxygen.css"),
             quiet=True)
 
     def _build(self, docs, opts, **kwargs):
         cmd = ["doxygen", "Doxyfile.qidoc"]
-        qibuild.command.call(cmd, cwd=self.src)
+        qisys.command.call(cmd, cwd=self.src)
         build_html = os.path.join(self.src, "build-doc", "html")
-        qibuild.sh.install(build_html, self.dest, quiet=True)
+        qisys.sh.install(build_html, self.dest, quiet=True)

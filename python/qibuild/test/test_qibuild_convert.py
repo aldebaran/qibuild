@@ -11,7 +11,7 @@ import unittest
 import pytest
 import tempfile
 
-import qisrc
+import qisys
 import qibuild
 import qibuild.actions.convert
 
@@ -37,74 +37,74 @@ class QiBuildConvertTestCase(unittest.TestCase):
             return fp.read()
 
     def tearDown(self):
-        qibuild.sh.rm(self.tmp)
+        qisys.sh.rm(self.tmp)
 
     def test_convert_1_10(self):
         src_1_10 = os.path.join(self.tmp, "src", "1.10")
-        qibuild.sh.install(
+        qisys.sh.install(
             os.path.join(self.test_dir, "src", "1.10"),
             src_1_10,
             quiet=True)
-        worktree = qisrc.worktree.create(self.tmp)
+        worktree = qisys.worktree.create(self.tmp)
         worktree.add_project(src_1_10)
-        qibuild.run_action("qibuild.actions.convert",
+        qisys.script.run_action("qibuild.actions.convert",
             [src_1_10, "--go"])
-        qibuild.run_action("qibuild.actions.init",
+        qisys.script.run_action("qibuild.actions.init",
             ["--work-tree", self.tmp])
-        qibuild.run_action("qibuild.actions.configure",
+        qisys.script.run_action("qibuild.actions.configure",
             ["--work-tree", self.tmp, "foo_1_10"])
-        qibuild.run_action("qibuild.actions.make",
+        qisys.script.run_action("qibuild.actions.make",
             ["--work-tree", self.tmp, "foo_1_10"])
 
     def test_convert_1_12(self):
         src_1_12 = os.path.join(self.tmp, "src", "1.12")
-        qibuild.sh.install(
+        qisys.sh.install(
             os.path.join(self.test_dir, "src", "1.12"),
             src_1_12,
             quiet=True)
-        worktree = qisrc.worktree.create(self.tmp)
+        worktree = qisys.worktree.create(self.tmp)
         worktree.add_project(src_1_12)
-        qibuild.run_action("qibuild.actions.convert",
+        qisys.script.run_action("qibuild.actions.convert",
             [src_1_12, "--go"])
-        qibuild.run_action("qibuild.actions.init",
+        qisys.script.run_action("qibuild.actions.init",
             ["--work-tree", self.tmp])
-        qibuild.run_action("qibuild.actions.configure",
+        qisys.script.run_action("qibuild.actions.configure",
             ["--work-tree", self.tmp, "foo_1_12"])
-        qibuild.run_action("qibuild.actions.make",
+        qisys.script.run_action("qibuild.actions.make",
             ["--work-tree", self.tmp, "foo_1_12"])
 
     def test_convert_pure_cmake(self):
         src_pure_cmake = os.path.join(self.tmp, "src", "pure_cmake")
-        qibuild.sh.install(
+        qisys.sh.install(
             os.path.join(self.test_dir, "src", "pure_cmake"),
             src_pure_cmake,
             quiet=True)
-        worktree = qisrc.worktree.create(self.tmp)
+        worktree = qisys.worktree.create(self.tmp)
         worktree.add_project(src_pure_cmake)
-        qibuild.run_action("qibuild.actions.convert",
+        qisys.script.run_action("qibuild.actions.convert",
             [src_pure_cmake, "--go"])
-        qibuild.run_action("qibuild.actions.init",
+        qisys.script.run_action("qibuild.actions.init",
             ["--work-tree", self.tmp])
-        qibuild.run_action("qibuild.actions.configure",
+        qisys.script.run_action("qibuild.actions.configure",
             ["--work-tree", self.tmp, "pure_cmake"])
-        qibuild.run_action("qibuild.actions.make",
+        qisys.script.run_action("qibuild.actions.make",
             ["--work-tree", self.tmp, "pure_cmake"])
 
     def test_convert_no_cmake(self):
         src_no_cmake = os.path.join(self.tmp, "src", "no_cmake")
-        qibuild.sh.install(
+        qisys.sh.install(
             os.path.join(self.test_dir, "src", "no_cmake"),
             src_no_cmake,
             quiet=True)
-        worktree = qisrc.worktree.create(self.tmp)
+        worktree = qisys.worktree.create(self.tmp)
         worktree.add_project(src_no_cmake)
-        qibuild.run_action("qibuild.actions.convert",
+        qisys.script.run_action("qibuild.actions.convert",
             [src_no_cmake, "--go"])
-        qibuild.run_action("qibuild.actions.init",
+        qisys.script.run_action("qibuild.actions.init",
             ["--work-tree", self.tmp])
-        qibuild.run_action("qibuild.actions.configure",
+        qisys.script.run_action("qibuild.actions.configure",
             ["--work-tree", self.tmp, "no_cmake"])
-        qibuild.run_action("qibuild.actions.make",
+        qisys.script.run_action("qibuild.actions.make",
             ["--work-tree", self.tmp, "no_cmake"])
 
 

@@ -13,6 +13,8 @@ http://www.gentoo.org/proj/en/portage/index.xml
 import os
 import re
 import portage
+
+import qisys
 import qibuild
 from qitoolchain.binary_package.gentoo import GentooPackage as GentooNoPortagePackage
 
@@ -63,7 +65,7 @@ class GentooPackage(GentooNoPortagePackage):
         :return: the metadata dictionary
 
         """
-        with qibuild.sh.TempDir() as work_dir:
+        with qisys.sh.TempDir() as work_dir:
             pkg = portage.xpak.tbz2(self.path)
             pkg.decompose(work_dir, cleanup=0)
             arch, arch_variant = _get_pkg_arch(work_dir)

@@ -5,7 +5,7 @@
 """
 topological_sort
 """
-import qibuild.log
+import qisys.log
 
 __all__ = [ "DagError", "assert_dag", "topological_sort" ]
 
@@ -145,7 +145,7 @@ class DependenciesSolver:
     """This class is able to resolve dependencies between projects
 
     """
-    logger = qibuild.log.get_logger(__name__)
+    logger = qisys.log.get_logger(__name__)
 
     def __init__(self, projects=None, packages=None, active_projects=None):
         self.projects = list()

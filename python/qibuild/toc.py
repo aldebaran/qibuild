@@ -14,8 +14,9 @@ import platform
 import signal
 import operator
 
-from qibuild import ui
-import qisrc
+from qisys import ui
+import qisys
+import qisys.envsetter
 import qibuild
 import qibuild.gdb
 import qibuild.project
@@ -23,7 +24,7 @@ import qibuild.profile
 
 import qitoolchain
 
-from qibuild.command  import CommandFailedException
+from qisys.command  import CommandFailedException
 from qibuild.dependencies_solver import DependenciesSolver
 
 
@@ -102,7 +103,7 @@ class Toc:
 
     .. code-block:: python
 
-        worktree = qisrc.open_worktree("/path/to/src")
+        worktree = qisys.worktree.open_worktree("/path/to/src")
         toc = Toc(worktree=worktree, build_type="release")
 
         # Look for the foo project in the worktree
@@ -127,7 +128,7 @@ class Toc:
         Create a new Toc object. Most of the keyargs come directly from
         the command line. (--worktree, --debug, -c, etc.)
 
-        :param worktree:  see :py:meth:`qisrc.worktree.WorkTree.__init__`
+        :param worktree:  see :py:meth:`qisys.worktree.WorkTree.__init__`
         :param qibuild_cfg: a  :py:class:`qibuild.config.QiBuildConfig` instance
                             if not given, a new one will be created
         :param build_type: a build type, could be debug or release
@@ -146,7 +147,7 @@ class Toc:
         self.worktree = worktree
         # The local config file in which to write
         dot_qi = os.path.join(self.worktree.root, ".qi")
-        qibuild.sh.mkdir(dot_qi)
+        qisys.sh.mkdir(dot_qi)
         self.config_path =  os.path.join(dot_qi, "qibuild.xml")
         if not os.path.exists(self.config_path):
             with open(self.config_path, "w") as fp:
@@ -183,7 +184,7 @@ class Toc:
         self.build_folder_name = None
 
         # Set build environment
-        envsetter = qibuild.envsetter.EnvSetter()
+        envsetter = qisys.envsetter.EnvSetter()
         envsetter.read_config(self.config)
         self.build_env =  envsetter.get_build_env()
 
@@ -534,7 +535,7 @@ You may want to run:
             if target:
                 cmd += ["/target=%s" % target]
         try:
-            qibuild.command.call(cmd, env=self.build_env)
+            qisys.command.call(cmd, env=self.build_env)
         except CommandFailedException:
             raise BuildFailed(project)
 
@@ -590,11 +591,11 @@ You may want to run:
         build_dir = project.build_directory
         # DESTDIR=/tmp/foo and CMAKE_PREFIX="/usr/local" means
         # dest = /tmp/foo/usr/local
-        destdir = qibuild.sh.to_native_path(destdir)
+        destdir = qisys.sh.to_native_path(destdir)
         self.build_env["DESTDIR"] = destdir
         # Must make sure prefix is not seen as an absolute path here:
         dest = os.path.join(destdir, prefix[1:])
-        dest = qibuild.sh.to_native_path(dest)
+        dest = qisys.sh.to_native_path(dest)
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
             mess  = """Could not install project {project.name}
@@ -667,7 +668,7 @@ The following tools were not found: {missing}\
             cmake_args += ["-P", "cmake_install.cmake", "--"]
             cmake_args += num_jobs_to_args(num_jobs, self.cmake_generator)
             ui.debug("Installing", component)
-            qibuild.command.call(["cmake"] + cmake_args,
+            qisys.command.call(["cmake"] + cmake_args,
                 cwd=project.build_directory,
                 env=self.build_env,
                 )
@@ -676,7 +677,7 @@ The following tools were not found: {missing}\
 def toc_open(worktree_root, args=None, qibuild_cfg=None):
     """ Creates a :py:class:`Toc` object.
 
-    :param worktree: The worktree to be used. (see :py:class:`qisrc.worktree.WorkTree`)
+    :param worktree: The worktree to be used. (see :py:class:`qisys.worktree.WorkTree`)
     :param args: an ``argparse.NameSpace`` object containing
      the arguments passed from the comand line.
     :param qibuild_cfg: A (:py:class:`qibuild.config.QiBuildConfig` instance) to use.
@@ -716,7 +717,7 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
     if hasattr(args, 'cmake_generator'):
         cmake_generator = args.cmake_generator
 
-    worktree = qisrc.worktree.open_worktree(worktree_root)
+    worktree = qisys.worktree.open_worktree(worktree_root)
     toc = Toc(worktree,
                config=config,
                profiles=profiles,
@@ -761,7 +762,7 @@ def create(directory, force=False):
     """ Create a new toc worktree inside a work tree
 
     """
-    qisrc.worktree.create(directory, force=force)
+    qisys.worktree.create(directory, force=force)
 
 def advise_using_configure(self, project):
     """Just throw a nice exception because
@@ -816,6 +817,6 @@ def handle_old_qibuild_xml(worktree):
         # Refuse to try to merge back global configs ...
         # FIXME: add an error message here?
         return
-    qibuild.sh.mkdir(os.path.dirname(global_path), recursive=True)
+    qisys.sh.mkdir(os.path.dirname(global_path), recursive=True)
     with open(global_path, "w") as fp:
         fp.write(global_xml)

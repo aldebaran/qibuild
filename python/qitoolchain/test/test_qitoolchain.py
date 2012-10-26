@@ -13,7 +13,7 @@ import unittest
 import mock
 
 import qibuild
-import qibuild.archive
+import qisys.archive
 import qitoolchain
 
 def get_tc_file_contents(tc):
@@ -44,7 +44,7 @@ class QiToolchainTestCase(unittest.TestCase):
         self.get_cfg_path.return_value = os.path.join(self.tmp, "qibuild.xml")
 
     def tearDown(self):
-        qibuild.sh.rm(self.tmp)
+        qisys.sh.rm(self.tmp)
         self.cfg_patcher.stop()
 
 
@@ -193,7 +193,7 @@ class FeedTestCase(unittest.TestCase):
 
     def setup_srv(self):
         this_dir = os.path.dirname(__file__)
-        this_dir = qibuild.sh.to_native_path(this_dir)
+        this_dir = qisys.sh.to_native_path(this_dir)
         feeds_dir = os.path.join(this_dir, "feeds")
         contents = os.listdir(feeds_dir)
         for filename in contents:
@@ -211,11 +211,11 @@ class FeedTestCase(unittest.TestCase):
                 continue
             package_dir = os.path.join(packages_dir, filename)
             for algo in ["zip", "gzip"]:
-                archive = qibuild.archive.compress(package_dir, algo=algo)
-                qibuild.sh.install(archive, self.srv, quiet=True)
+                archive = qisys.archive.compress(package_dir, algo=algo)
+                qisys.sh.install(archive, self.srv, quiet=True)
 
     def tearDown(self):
-        qibuild.sh.rm(self.tmp)
+        qisys.sh.rm(self.tmp)
         self.cfg_patcher.stop()
 
     def configure_xml(self, name, dest):
@@ -228,12 +228,12 @@ class FeedTestCase(unittest.TestCase):
 
         """
         this_dir = os.path.dirname(__file__)
-        this_dir = qibuild.sh.to_native_path(this_dir)
+        this_dir = qisys.sh.to_native_path(this_dir)
         src = os.path.join(this_dir, "feeds", name)
         dest = os.path.join(self.tmp, dest)
-        qibuild.sh.mkdir(dest, recursive=True)
+        qisys.sh.mkdir(dest, recursive=True)
         dest = os.path.join(dest, name)
-        srv_path = qibuild.sh.to_posix_path(self.srv)
+        srv_path = qisys.sh.to_posix_path(self.srv)
         srv_url = "file://" + srv_path
         with open(src, "r") as fp:
             lines = fp.readlines()
@@ -254,7 +254,7 @@ class FeedTestCase(unittest.TestCase):
         package_names = [p.name for p in tc.packages]
 
         self.assertTrue("naoqi-sdk" in package_names)
-        self.assertTrue(qibuild.sh.to_posix_path(sdk_path) in tc_file)
+        self.assertTrue(qisys.sh.to_posix_path(sdk_path) in tc_file)
 
     def test_ctc(self):
         # Generate a fake ctc in self.tmp
@@ -274,7 +274,7 @@ class FeedTestCase(unittest.TestCase):
         package_names = [p.name for p in tc.packages]
         self.assertTrue("naoqi-geode-ctc" in package_names)
         cross_tc_path = os.path.join(ctc_path, "toolchain-geode.cmake")
-        cross_tc_path = qibuild.sh.to_posix_path(cross_tc_path)
+        cross_tc_path = qisys.sh.to_posix_path(cross_tc_path)
         expected  = 'include("%s")' % cross_tc_path
 
         self.assertTrue(expected in tc_file,
@@ -307,7 +307,7 @@ class FeedTestCase(unittest.TestCase):
 
         ctc_path = tc.get("naoqi-geode-ctc")
         cross_tc_path = os.path.join(ctc_path, "toolchain-geode.cmake")
-        cross_tc_path = qibuild.sh.to_posix_path(cross_tc_path)
+        cross_tc_path = qisys.sh.to_posix_path(cross_tc_path)
         self.assertTrue(os.path.exists(cross_tc_path))
         expected  = 'include("%s")' % cross_tc_path
 
@@ -402,7 +402,7 @@ class FeedTestCase(unittest.TestCase):
         a_file = os.path.join(a_package, "a_file")
         with open(a_file, "w") as fp:
             fp.write("This file is not empty\n")
-        archive = qibuild.archive.compress(a_package)
+        archive = qisys.archive.compress(a_package)
         package_name = os.path.basename(archive)
 
         # Create a fake feed:
@@ -420,7 +420,7 @@ class FeedTestCase(unittest.TestCase):
             fp.write(to_write)
 
         tc = qitoolchain.Toolchain("test")
-        feed_url = "file://" + qibuild.sh.to_posix_path(a_feed)
+        feed_url = "file://" + qisys.sh.to_posix_path(a_feed)
         tc.parse_feed(feed_url)
 
 if __name__ == "__main__":

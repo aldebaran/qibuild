@@ -9,9 +9,10 @@ A set of packages and a toolchain file
 import os
 import ConfigParser
 
-import qibuild
+import qisys
 import qibuild.configstore
 import qitoolchain
+import qitoolchain.feed
 
 CONFIG_PATH = "~/.config/qi/"
 CACHE_PATH  = "~/.cache/qi"
@@ -21,7 +22,7 @@ def get_default_packages_path(tc_name):
     """ Get a default path to store extracted packages
 
     """
-    default_root = qibuild.sh.to_native_path(SHARE_PATH)
+    default_root = qisys.sh.to_native_path(SHARE_PATH)
     default_root = os.path.join(default_root, "toolchains")
     config = ConfigParser.ConfigParser()
     cfg_path = get_tc_config_path()
@@ -33,7 +34,7 @@ def get_default_packages_path(tc_name):
         except ConfigParser.NoOptionError:
             pass
     res = os.path.join(root, tc_name)
-    qibuild.sh.mkdir(res, recursive=True)
+    qisys.sh.mkdir(res, recursive=True)
     return res
 
 def get_tc_names():
@@ -77,8 +78,8 @@ def get_tc_config_path():
 
 
     """
-    config_path = qibuild.sh.to_native_path(CONFIG_PATH)
-    qibuild.sh.mkdir(config_path, recursive=True)
+    config_path = qisys.sh.to_native_path(CONFIG_PATH)
+    qisys.sh.mkdir(config_path, recursive=True)
     config_path = os.path.join(config_path, "toolchains.cfg")
     return config_path
 
@@ -201,7 +202,7 @@ class Toolchain:
 
         Clean cache, remove all packages, remove self from configurations
         """
-        qibuild.sh.rm(self.cache)
+        qisys.sh.rm(self.cache)
 
         cfg_path = get_tc_config_path()
         config = ConfigParser.RawConfigParser()
@@ -211,7 +212,7 @@ class Toolchain:
             config.write(fp)
 
         cfg_path = self._get_config_path()
-        qibuild.sh.rm(cfg_path)
+        qisys.sh.rm(cfg_path)
         if force_remove:
             # With the current design and implementation of qitoolchain, all
             # packages are stored in the following 'tc_path'.
@@ -224,15 +225,15 @@ class Toolchain:
             # ensure that the whole toolchain, including locally added packages,
             # is removed.
             tc_path = qitoolchain.toolchain.get_default_packages_path(self.name)
-            qibuild.sh.rm(tc_path)
+            qisys.sh.rm(tc_path)
 
     def _get_config_path(self):
         """ Returns path to self configuration file
 
         """
-        config_path = qibuild.sh.to_native_path(CONFIG_PATH)
+        config_path = qisys.sh.to_native_path(CONFIG_PATH)
         config_path = os.path.join(config_path, "toolchains")
-        qibuild.sh.mkdir(config_path, recursive=True)
+        qisys.sh.mkdir(config_path, recursive=True)
         config_path = os.path.join(config_path, self.name + ".cfg")
         return config_path
 
@@ -243,7 +244,7 @@ class Toolchain:
         config_path = get_tc_config_path()
         config = ConfigParser.ConfigParser()
         config.read(config_path)
-        cache_path = qibuild.sh.to_native_path(CACHE_PATH)
+        cache_path = qisys.sh.to_native_path(CACHE_PATH)
         cache_path = os.path.join(cache_path, "toolchains")
         if config.has_section("default"):
             try:
@@ -252,7 +253,7 @@ class Toolchain:
             except ConfigParser.NoOptionError:
                 pass
         cache_path = os.path.join(cache_path, self.name)
-        qibuild.sh.mkdir(cache_path, recursive=True)
+        qisys.sh.mkdir(cache_path, recursive=True)
         return cache_path
 
     def load_config(self):
@@ -335,10 +336,10 @@ class Toolchain:
 
         for package in self.packages:
             if package.toolchain_file:
-                tc_file = qibuild.sh.to_posix_path(package.toolchain_file)
+                tc_file = qisys.sh.to_posix_path(package.toolchain_file)
                 lines.append('include("%s")\n' % tc_file)
         for package in self.packages:
-            package_path = qibuild.sh.to_posix_path(package.path)
+            package_path = qisys.sh.to_posix_path(package.path)
             lines.append('list(INSERT CMAKE_FIND_ROOT_PATH 0 "%s")\n' % package_path)
             # For some reason CMAKE_FRAMEWORK_PATH does not follow CMAKE_FIND_ROOT_PATH
             # (well, you seldom use frameworks when cross-compiling ...), so we
@@ -424,7 +425,7 @@ class Toolchain:
         """
         package_path = self.get(package_name)
         if runtime:
-            qibuild.sh.install(package_path, destdir,
-                filter_fun=qibuild.sh.is_runtime)
+            qisys.sh.install(package_path, destdir,
+                filter_fun=qisys.sh.is_runtime)
         else:
-            qibuild.sh.install(package_path, destdir)
+            qisys.sh.install(package_path, destdir)

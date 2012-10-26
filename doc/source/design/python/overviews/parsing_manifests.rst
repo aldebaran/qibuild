@@ -221,12 +221,12 @@ If we see them has beeing under code review, we call
 :py:meth:`qisrc.review.setup_project`
 
 Once this is done, we call
-:py:meth:`worktree.set_project_review() <qisrc.worktree.WorkTree.set_project_review>`
+:py:meth:`worktree.set_project_review() <qisys.worktree.WorkTree.set_project_review>`
 so that ``qisrc push`` does not have to parse the manifest again to
 see wether or not the project is under code review.
 
 If we see new projects, we add them to the worktree using
 :py:meth:`qisrc.sync.clone_project` and then call
-:py:meth:`worktree.set_git_project_config() <qisrc.worktree.WorkTree.set_git_project_config>` so that ``qisrc sync`` does not have to parse the manifest again
+:py:meth:`worktree.set_git_project_config() <qisys.worktree.WorkTree.set_git_project_config>` so that ``qisrc sync`` does not have to parse the manifest again
 to get what is the remote branch we should synchronize with.
 

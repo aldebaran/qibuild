@@ -9,28 +9,7 @@ and building projects.
 
 import os
 import sys
-import qibuild.log
 
-from qibuild import archive
-from qibuild import build
-from qibuild import cmake
-from qibuild import cmdparse
-from qibuild import command
-from qibuild import config
-from qibuild import configstore
-from qibuild import ctest
-from qibuild import envsetter
-from qibuild import interact
-from qibuild import log
-from qibuild import parsers
-from qibuild import performance
-from qibuild import script
-from qibuild import sh
-from qibuild import toc
-
-
-from qibuild.toc    import toc_open
-from qibuild.script import run_action
 
 
 QIBUILD_ROOT_DIR  = os.path.dirname(os.path.abspath(__file__))
@@ -47,3 +26,32 @@ def get_platform():
         return "windows"
     if sys.platform == "darwin":
         return "mac"
+
+from qibuild.toc import toc_open
+
+
+##
+# Backward compat layer for qisys starts here:
+
+from qisys.script import run_action
+
+from qisys import archive
+from qisys import command
+from qisys import envsetter
+from qisys import interact
+from qisys import log
+from qisys import script
+from qisys import sh
+from qisys import ui
+
+##
+# Auto-imports: FIXME: remove it
+from qibuild import build
+from qibuild import cmake
+from qibuild import cmdparse
+from qibuild import config
+from qibuild import configstore
+from qibuild import ctest
+from qibuild import parsers
+from qibuild import performance
+from qibuild import toc

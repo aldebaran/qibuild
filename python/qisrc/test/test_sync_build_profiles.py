@@ -2,15 +2,16 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 from StringIO import StringIO
+
 import mock
 
-import qisrc
-
+import qisys
+import qisys.worktree
 import qibuild.profile
 import qisrc.sync_build_profiles
 
 def test_remote_added(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
+    worktree = qisys.worktree.create(tmpdir.strpath)
     xml = """
 <manifest>
   <profiles>
@@ -25,7 +26,7 @@ def test_remote_added(tmpdir):
     assert "foo" in profiles
 
 def test_remote_updated(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
+    worktree = qisys.worktree.create(tmpdir.strpath)
     xml = """
 <manifest>
   <profiles>
@@ -54,7 +55,7 @@ def test_remote_updated(tmpdir):
 </manifest>
 """)
     # Just a warning for now ...
-    with mock.patch("qibuild.ui.warning") as warning_mock:
+    with mock.patch("qisys.ui.warning") as warning_mock:
         qisrc.sync_build_profiles.sync_build_profiles(worktree, StringIO(xml))
 
     assert warning_mock.called
@@ -64,7 +65,7 @@ def test_remote_updated(tmpdir):
     assert "foo" in profiles
 
 def test_same_remote(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
+    worktree = qisys.worktree.create(tmpdir.strpath)
     xml = """
 <manifest>
   <profiles>
@@ -93,7 +94,7 @@ def test_same_remote(tmpdir):
 </manifest>
 """)
     # Just a warning for now ...
-    with mock.patch("qibuild.ui.warning") as warning_mock:
+    with mock.patch("qisys.ui.warning") as warning_mock:
         qisrc.sync_build_profiles.sync_build_profiles(worktree, StringIO(xml))
 
     assert not warning_mock.called

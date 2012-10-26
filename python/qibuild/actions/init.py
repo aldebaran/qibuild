@@ -6,7 +6,8 @@
 import os
 import sys
 
-from qibuild import ui
+from qisys import ui
+import qisys
 import qisrc
 import qibuild
 import qibuild.wizard
@@ -36,8 +37,8 @@ def do(args):
         # Just make sure the user choose a valid default toolchain
         qitoolchain.get_toolchain(args.config)
 
-    worktree = qibuild.sh.to_native_path(worktree)
-    parent_worktree = qisrc.worktree.guess_worktree(worktree)
+    worktree = qisys.sh.to_native_path(worktree)
+    parent_worktree = qisys.worktree.guess_worktree(worktree)
     if parent_worktree:
         if parent_worktree != worktree:
             # Refuse to create nested worktrees

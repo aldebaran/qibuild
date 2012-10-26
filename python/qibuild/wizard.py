@@ -8,7 +8,8 @@
 
 import os
 
-from qibuild import ui
+from qisys import ui
+import qisys
 import qibuild
 import qitoolchain
 
@@ -17,7 +18,7 @@ def guess_cmake(qibuild_cfg):
 
     """
     build_env = qibuild.config.get_build_env()
-    cmake = qibuild.command.find_program("cmake", env=build_env)
+    cmake = qisys.command.find_program("cmake", env=build_env)
     platform = qibuild.get_platform()
     if platform == "windows":
         # FIXME: loook for it in registry
@@ -31,7 +32,7 @@ def guess_cmake(qibuild_cfg):
         return cmake
 
     print "CMake not found"
-    cmake = qibuild.interact.ask_program("Please enter full CMake path")
+    cmake = qisys.interact.ask_program("Please enter full CMake path")
     if not cmake:
         raise Exception("qiBuild cannot work without CMake\n"
             "Please install CMake if necessary and re-run this wizard\n")
@@ -46,7 +47,7 @@ def ask_cmake_generator():
 
     """
     cmake_generators = qibuild.cmake.get_known_cmake_generators()
-    cmake_generator = qibuild.interact.ask_choice(cmake_generators,
+    cmake_generator = qisys.interact.ask_choice(cmake_generators,
         "Please choose a generator")
 
     return cmake_generator
@@ -61,7 +62,7 @@ def ask_ide(qibuild_cfg):
         ides.append("Visual Studio")
     if platform == "mac":
         ides.append("Xcode")
-    ide = qibuild.interact.ask_choice(ides,
+    ide = qisys.interact.ask_choice(ides,
         "Please choose an IDE")
     return ide
 
@@ -70,17 +71,17 @@ def ask_incredibuild(qibuild_cfg):
 
     """
     build_env = qibuild.config.get_build_env()
-    answer = qibuild.interact.ask_yes_no("Do you want to use IncrediBuild?", False)
+    answer = qisys.interact.ask_yes_no("Do you want to use IncrediBuild?", False)
     if not answer:
         return
 
-    build_console = qibuild.command.find_program("BuildConsole.exe", env=build_env)
+    build_console = qisys.command.find_program("BuildConsole.exe", env=build_env)
     if build_console:
         print "Found BuildConsole.exe:", build_console
         qibuild_cfg.build.incredibuild = True
         return
 
-    build_console = qibuild.interact.ask_program("Please enter full BuildConsole.exe path")
+    build_console = qisys.interact.ask_program("Please enter full BuildConsole.exe path")
     if not build_console:
         print "Cannot use Incredibuild without knowing the path to BuildConsole.exe"
         return
@@ -96,18 +97,18 @@ def configure_qtcreator(qibuild_cfg):
     ide = qibuild.config.IDE()
     ide.name = "QtCreator"
     build_env = qibuild.config.get_build_env()
-    qtcreator_path = qibuild.command.find_program("qtcreator", env=build_env)
+    qtcreator_path = qisys.command.find_program("qtcreator", env=build_env)
     if qtcreator_path:
         ui.info(ui.green, "::", ui.reset,  "Found QtCreator:", qtcreator_path)
         mess  = "Do you want to use qtcreator from %s?\n" % qtcreator_path
         mess += "Answer 'no' if you installed qtcreator from Nokia's installer"
-        answer = qibuild.interact.ask_yes_no(mess, default=True)
+        answer = qisys.interact.ask_yes_no(mess, default=True)
         if not answer:
             qtcreator_path = None
     else:
         ui.warning("QtCreator not found")
     if not qtcreator_path:
-        qtcreator_path = qibuild.interact.ask_program(
+        qtcreator_path = qisys.interact.ask_program(
             "Please enter full qtcreator path")
     if not qtcreator_path:
         ui.warning("Not adding config for QtCreator",
@@ -134,7 +135,7 @@ def configure_local_settings(toc):
     """
     print
     ui.info(ui.green, "::", ui.reset,  "Found a worktree in", toc.worktree.root)
-    answer = qibuild.interact.ask_yes_no(
+    answer = qisys.interact.ask_yes_no(
         "Do you want to configure settings for this worktree?",
         default=True)
     if not answer:
@@ -143,23 +144,23 @@ def configure_local_settings(toc):
     if tc_names:
         ui.info(ui.green, "::", ui.reset,
                 "Found the following toolchains: ", ", ".join(tc_names))
-        answer = qibuild.interact.ask_yes_no(
+        answer = qisys.interact.ask_yes_no(
             "Use one of these toolchains by default",
             default=True)
         if answer:
-            default = qibuild.interact.ask_choice(tc_names,
+            default = qisys.interact.ask_choice(tc_names,
                 "Choose a toolchain to use by default")
             if default:
                 toc.config.local.defaults.config = default
                 toc.save_config()
-    answer = qibuild.interact.ask_yes_no(
+    answer = qisys.interact.ask_yes_no(
         "Do you want to use a unique build dir?"
         "(mandatory when using Eclipse)",
         default=False)
 
     build_dir = None
     if answer:
-        build_dir = qibuild.interact.ask_string("Path to a build directory")
+        build_dir = qisys.interact.ask_string("Path to a build directory")
         build_dir = os.path.expanduser(build_dir)
         full_path = os.path.join(toc.worktree.root, build_dir)
         ui.info(ui.green, "::", ui.reset,
@@ -180,7 +181,7 @@ def run_config_wizard(toc):
         qibuild_cfg_path = qibuild.config.get_global_cfg_path()
         if not os.path.exists(qibuild_cfg_path):
             to_create = os.path.dirname(qibuild_cfg_path)
-            qibuild.sh.mkdir(to_create, recursive=True)
+            qisys.sh.mkdir(to_create, recursive=True)
             with open(qibuild_cfg_path, "w") as fp:
                 fp.write('<qibuild version="1" />\n')
         qibuild_cfg.read()

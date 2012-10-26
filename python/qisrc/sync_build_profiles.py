@@ -7,7 +7,7 @@
 """
 import os
 
-from qibuild import ui
+from qisys import ui
 import qibuild.profile
 
 def sync_build_profiles(worktree, xml_path):

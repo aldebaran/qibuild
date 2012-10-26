@@ -10,7 +10,7 @@ import mock
 import pytest
 
 import qibuild.cmdparse
-import qibuild.interact
+import qisys.interact
 from qibuild.test.test_interact import FakeInteract
 
 class FakePackage():
@@ -232,7 +232,7 @@ def test_add_missing_with_cmake_user_enter_default(tmpdir):
     tmpdir.join("other").join("CMakeLists.txt").write("\n")
     fake_interact = FakeInteract({})
     with change_cwd(toc, "other"):
-        with mock.patch("qibuild.interact", fake_interact):
+        with mock.patch("qisys.interact", fake_interact):
             proj = parse_args(toc)
             other = toc.get_project("other")
             assert other.name == "other"
@@ -244,7 +244,7 @@ def test_add_missing_with_cmake_user_enter_no(tmpdir):
     # Check that we get a real error
     fake_interact = FakeInteract({"to the worktree":False})
     with change_cwd(toc, "other"):
-        with mock.patch("qibuild.interact", fake_interact):
+        with mock.patch("qisys.interact", fake_interact):
             # pylint: disable-msg=E1101
             with pytest.raises(Exception) as e:
                 proj = parse_args(toc)
@@ -255,7 +255,7 @@ def test_add_missing_no_cmake(tmpdir):
     tmpdir.join("other").join("qiproject.xml").write('<project name="other" />\n')
     fake_interact = FakeInteract({})
     with change_cwd(toc, "other"):
-        with mock.patch("qibuild.interact", fake_interact):
+        with mock.patch("qisys.interact", fake_interact):
             # pylint: disable-msg=E1101
             with pytest.raises(Exception) as e:
                 parse_args(toc)
@@ -271,6 +271,6 @@ def test_add_missing_bad_parent_proj(tmpdir):
     subproj.join("qiproject.xml").write('<project name="subproj" />\n')
     fake_interact = FakeInteract({})
     with change_cwd(toc, "other/subproj"):
-        with mock.patch("qibuild.interact", fake_interact):
+        with mock.patch("qisys.interact", fake_interact):
             proj = parse_args(toc)
             assert toc.get_project("subproj")

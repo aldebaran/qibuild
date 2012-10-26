@@ -6,14 +6,15 @@
 
 import os
 
-from qibuild import ui
+from qisys import ui
 import qisrc.sync
-import qibuild
+import qisys
+import qisys.parsers
 
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("path_or_url",  metavar="[URL|PATH]",
                         help="git url or path of project")
     group = parser.add_argument_group("git options")
@@ -24,11 +25,11 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    worktree = qisrc.worktree.open_worktree(args.worktree)
+    worktree = qisys.worktree.open_worktree(args.worktree)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, worktree.root)
     if os.path.exists(args.path_or_url):
         path = args.path_or_url
-        path = qibuild.sh.to_native_path(path)
+        path = qisys.sh.to_native_path(path)
         worktree.add_project(path)
         return
     url = args.path_or_url

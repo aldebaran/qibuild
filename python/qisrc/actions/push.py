@@ -7,13 +7,13 @@
 """
 import sys
 
-from qibuild import ui
-import qibuild
+from qisys import ui
+import qisys
 import qisrc
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("--no-review", action="store_false", dest="review",
         help="Do not go through code review")
     parser.add_argument("-n", "--dry-run", action="store_true", dest="dry_run",
@@ -25,7 +25,7 @@ def configure_parser(parser):
 
 def do(args):
     """ Main entry point """
-    git_path = qisrc.worktree.git_project_path_from_cwd()
+    git_path = qisys.worktree.git_project_path_from_cwd()
     git = qisrc.git.Git(git_path)
     current_branch = git.get_current_branch()
     if not current_branch:

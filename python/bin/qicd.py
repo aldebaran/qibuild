@@ -46,7 +46,7 @@ import qisrc
 def main():
     """ Main entry point """
     try:
-        worktree = qisrc.worktree.open_worktree()
+        worktree = qisys.worktree.open_worktree()
     except Exception:
         sys.stderr.write("Not in a worktree\n")
         sys.exit(2)

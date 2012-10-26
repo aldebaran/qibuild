@@ -6,7 +6,9 @@
 import os
 import sys
 
-from qibuild import ui
+from qisys import ui
+import qisys
+import qisys.archive
 import qibuild
 
 def get_package_name(project, version=None, config=None):
@@ -74,20 +76,20 @@ def _do_package(args, project_name, destdir, debug):
         build_args = ["--release", project_name]
 
     ui.info(ui.green, "> Configuring ... (%s)" % build_type)
-    qibuild.run_action("qibuild.actions.configure", build_args + ["--no-clean-first"],
+    qisys.script.run_action("qibuild.actions.configure", build_args + ["--no-clean-first"],
         forward_args=args)
     print
     ui.info(ui.green, "> Building ... (%s)" % build_type)
-    qibuild.run_action("qibuild.actions.make", build_args + ["--no-fix-shared-libs"],
+    qisys.script.run_action("qibuild.actions.make", build_args + ["--no-fix-shared-libs"],
         forward_args=args)
     ui.info(ui.green, "> Installing ... (%s)" % build_type)
-    qibuild.run_action("qibuild.actions.install", build_args + [destdir],
+    qisys.script.run_action("qibuild.actions.install", build_args + [destdir],
         forward_args=args)
     print
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc_open(args.worktree, args)
+    toc = qibuild.toc.toc_open(args.worktree, args)
     config = toc.active_config
     project = qibuild.cmdparse.project_from_args(toc, args)
     package_name = get_package_name(project, version=args.version, config=config)
@@ -103,24 +105,24 @@ def do(args):
         _do_package(args, project.name, destdir, debug=False)
     else:
         ui.info(ui.green, "> Configuring ...")
-        qibuild.run_action("qibuild.actions.configure", [project.name, "--no-clean-first"],
+        qisys.script.run_action("qibuild.actions.configure", [project.name, "--no-clean-first"],
             forward_args=args)
         print
         ui.info(ui.green, "> Building ...")
-        qibuild.run_action("qibuild.actions.make", [project.name, "--no-fix-shared-libs"],
+        qisys.script.run_action("qibuild.actions.make", [project.name, "--no-fix-shared-libs"],
             forward_args=args)
         print
         ui.info(ui.green, "> Installing ...")
-        qibuild.run_action("qibuild.actions.install", [project.name, destdir],
+        qisys.script.run_action("qibuild.actions.install", [project.name, destdir],
             forward_args=args)
         print
 
     if args.compress:
         ui.info(ui.green, "> Compressing package ...")
-        archive = qibuild.archive.compress(destdir, algo="zip", quiet=True)
+        archive = qisys.archive.compress(destdir, algo="zip", quiet=True)
         ui.info(ui.green, "Package generated in", ui.reset, ui.bold, archive)
         # Now, clean the destdir.
-        qibuild.sh.rm(destdir)
+        qisys.sh.rm(destdir)
         return archive
     else:
         return destdir

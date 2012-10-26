@@ -10,7 +10,8 @@ import sys
 import glob
 import subprocess
 
-from qibuild import ui
+from qisys import ui
+import qisys
 import qibuild
 
 SUPPORTED_IDES = ["QtCreator", "Visual Studio", "Xcode"]
@@ -51,7 +52,7 @@ def get_ide(qibuild_cfg):
 
     supported_names = [x.name for x in supported_ides]
     # Several IDEs, ask the user to choose
-    ide_name = qibuild.interact.ask_choice(supported_names,
+    ide_name = qisys.interact.ask_choice(supported_names,
         "Please choose an ide to use")
     if not ide_name:
         return None
@@ -67,7 +68,7 @@ def do(args):
         ui.error("""It looks like your project has not been configured yet
 (The build directory: '%s' does not exists)""" %
         project.build_directory)
-        answer = qibuild.interact.ask_yes_no(
+        answer = qisys.interact.ask_yes_no(
             "Do you want me to run qibuild configure for you?",
             default=True)
         if not answer:
@@ -76,7 +77,7 @@ def do(args):
             args = [project.name]
             if toc.active_config:
               args.extend(["--config", toc.active_config])
-            qibuild.run_action("qibuild.actions.configure", args)
+            qisys.script.run_action("qibuild.actions.configure", args)
 
     error_message = "Could not open project %s\n" % project.name
     qibuild_cfg = qibuild.config.QiBuildConfig(user_config=toc.active_config)

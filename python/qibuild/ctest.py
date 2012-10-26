@@ -18,9 +18,10 @@ import sys
 import threading
 import time
 
+import qisys
+from qisys import ui
 import qibuild
 import qibuild.config
-from qibuild import ui
 
 def _str_from_signal(code):
     """ Returns a nice string describing the signal
@@ -75,7 +76,7 @@ class TestResult:
             ui.info(ui.green, "[OK]")
         else:
             ui.info(ui.red, "[FAIL]", self.message)
-            if qibuild.command.SIGINT_EVENT.is_set():
+            if qisys.command.SIGINT_EVENT.is_set():
                 pass
             elif not self.verbose and self.out:
                 print self.out
@@ -160,7 +161,7 @@ class Test:
             valgrind_log = os.path.join(self.build_dir, self.test_name + "valgrind_output.log")
             ncmd = [ "valgrind", "--track-fds=yes", "--log-file=%s" % valgrind_log ]
             ncmd.extend(self.cmd)
-        process = qibuild.command.Process(ncmd,
+        process = qisys.command.Process(ncmd,
             name=self.test_name,
             cwd=cwd,
             env=env,
@@ -175,7 +176,7 @@ class Test:
 
         ui.debug('Treating result of', self.cmd)
         res.out = process.out
-        res.ok = process.return_type == qibuild.command.Process.OK
+        res.ok = process.return_type == qisys.command.Process.OK
         if process.exception is not None:
             exception = process.exception
             mess  = "Could not run test: %s\n" % self.test_name
@@ -186,16 +187,16 @@ class Test:
                 if exception.errno == errno.ENOENT:
                     mess += "Are you sure you have built the tests?"
             res.out = mess + '\n'
-        if process.return_type == qibuild.command.Process.INTERRUPTED:
+        if process.return_type == qisys.command.Process.INTERRUPTED:
             res.message = "Interrupted"
-        elif process.return_type == qibuild.command.Process.NOT_RUN:
+        elif process.return_type == qisys.command.Process.NOT_RUN:
             res.message = "Not run"
             res.not_run = True
-        elif process.return_type == qibuild.command.Process.TIME_OUT:
+        elif process.return_type == qisys.command.Process.TIME_OUT:
             res.message = "Timed out (%is)" % timeout
-        elif process.return_type == qibuild.command.Process.ZOMBIE:
+        elif process.return_type == qisys.command.Process.ZOMBIE:
             res.message = "Zombie (Timeout = %is)" % timeout
-        elif process.return_type == qibuild.command.Process.FAILED:
+        elif process.return_type == qisys.command.Process.FAILED:
             retcode = process.returncode
             if retcode > 0:
                 res.message = "Return code: %i" % retcode
@@ -215,7 +216,7 @@ class TestWorker(threading.Thread):
         self.out_queue = out_queue
 
     def run(self):
-        while not qibuild.command.SIGINT_EVENT.is_set():
+        while not qisys.command.SIGINT_EVENT.is_set():
             self.test = self.in_queue.get()
             self.test.run(self.out_queue)
             self.test = None
@@ -251,7 +252,7 @@ def sigint_handler(signum, frame):
         sys.exit(1)
     ui.warning('Received keyboard interrupt. Killing all processes ' + \
                '. This may take few seconds.')
-    qibuild.command.SIGINT_EVENT.set()
+    qisys.command.SIGINT_EVENT.set()
     signal.signal(signal.SIGINT, double_sigint)
 
 def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
@@ -374,7 +375,7 @@ def write_xml(xml_out, test_res):
                                testcase_name=test_res.test_name,
                                failure=failure,
                                time=test_res.time)
-    qibuild.sh.mkdir(os.path.dirname(xml_out), recursive=True)
+    qisys.sh.mkdir(os.path.dirname(xml_out), recursive=True)
     with open(xml_out, "w") as fp:
         fp.write(to_write)
 

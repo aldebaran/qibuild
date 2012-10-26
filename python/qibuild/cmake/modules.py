@@ -10,7 +10,8 @@ import os
 import re
 import sys
 
-from qibuild import ui
+from qisys import ui
+import qisys
 import qibuild
 
 
@@ -109,7 +110,7 @@ def find_matching_qibuild_cmake_module(package_name):
     root = qibuild.__path__[0].rsplit(os.sep, 2)[0]
     root = os.path.join(root, 'cmake', 'qibuild', 'modules')
     root = os.path.abspath(root)
-    path_list = qibuild.sh.ls_r(root)
+    path_list = qisys.sh.ls_r(root)
     #name = re.sub("^lib", "(lib)?", name)
     #name = re.sub("[^a-zA-Z0-9]+", ".*?", name)
     modules = find_cmake_module_in(path_list)
@@ -139,7 +140,7 @@ def check_for_module_generation(package_root, package_name):
                         list of modules provided by qiBuild)
 
     """
-    path_list = qibuild.sh.ls_r(package_root)
+    path_list = qisys.sh.ls_r(package_root)
     modules_package = find_cmake_module_in(path_list)
     modules_qibuild = find_matching_qibuild_cmake_module(package_name)
     prefix = r".*?" + os.sep + "?usr" + os.sep
@@ -170,14 +171,14 @@ def show_existing_modules(name, modules_package, modules_qibuild):
 Package '{0}' already provides the following CMake module(s):
 {1}
 """.format(name, modules)
-        qibuild.ui.info(message)
+        qisys.ui.info(message)
     if len(modules_qibuild) > 0:
         modules = "\n".join(["  {0}".format(x) for x in modules_qibuild])
         message = """\
 qiBuild already provides the following CMake module(s) for the package '{0}':
 {1}
 """.format(name, modules)
-        qibuild.ui.info(message)
+        qisys.ui.info(message)
     return
 
 
@@ -243,7 +244,7 @@ def _ask_module_info(name, headers, libraries):
     """
     patterns = [name]
     question = "Enter the package name:"
-    name = qibuild.interact.ask_string(question, default=name)
+    name = qisys.interact.ask_string(question, default=name)
     header = None
     if len(headers) > 0:
         patterns = [pattern.lower() for pattern in patterns]
@@ -254,7 +255,7 @@ def _ask_module_info(name, headers, libraries):
             headers.remove(header_)
             headers.insert(0, header_)
             question = "Which is the main header?"
-            header   = qibuild.interact.ask_choice(headers, question)
+            header   = qisys.interact.ask_choice(headers, question)
         except IndexError:
             pass
     libs = None
@@ -263,10 +264,10 @@ def _ask_module_info(name, headers, libraries):
         question = """\
 Which libraries do you want to declare in the CMake module?\
 """
-        qibuild.ui.info(question)
+        qisys.ui.info(question)
         for lib_static_shared in libraries:
             question = ", ".join(lib_static_shared)
-            answer   = qibuild.interact.ask_yes_no(question, default=True)
+            answer   = qisys.interact.ask_yes_no(question, default=True)
             if answer:
                 libs.append([lib_static_shared[0]])
     return (name, header, libs)
@@ -284,13 +285,13 @@ def _edit_template(name, template, package_path_list):
     """
     # pep8-ignore: E501
     question = "Edit generated CMake module for {0} (highly recommended)?".format(name)
-    answer   = qibuild.interact.ask_yes_no(question, default=True)
+    answer   = qisys.interact.ask_yes_no(question, default=True)
     if answer:
         answer = False
         if package_path_list is not None:
             # pep8-ignore: E501
             question = "Would you like to list the package content before?".format(name)
-            answer   = qibuild.interact.ask_yes_no(question, default=True)
+            answer   = qisys.interact.ask_yes_no(question, default=True)
         if answer:
             message = """\
 Package content:
@@ -298,19 +299,19 @@ Package content:
 
 Press enter to launch the editor.\
 """.format("\n".join(["  " + x for x in package_path_list]))
-            qibuild.ui.info(message)
-            qibuild.interact.read_input()
+            qisys.ui.info(message)
+            qisys.interact.read_input()
         qibuild_cfg = qibuild.config.QiBuildConfig()
         qibuild_cfg.read()
         editor = qibuild_cfg.defaults.env.editor
         if not editor:
-            editor = qibuild.interact.get_editor()
-        editor_path = qibuild.command.find_program(editor)
-        with qibuild.sh.TempDir() as tmp_dir:
+            editor = qisys.interact.get_editor()
+        editor_path = qisys.command.find_program(editor)
+        with qisys.sh.TempDir() as tmp_dir:
             cmake_module = os.path.join(tmp_dir, 'tmp-module.cmake')
             with open(cmake_module, 'w') as module_file:
                 module_file.write(template)
-            qibuild.command.call([editor_path, cmake_module])
+            qisys.command.call([editor_path, cmake_module])
             with open(cmake_module, 'r') as module_file:
                 module = module_file.read()
     return module
@@ -355,14 +356,14 @@ def add_cmake_module_to_directory(directory, name):
     if status != "nonexistent":
         show_existing_modules(name, modules_package, modules_qibuild)
         if ui.CONFIG["interactive"]:
-            answer = qibuild.interact.ask_yes_no("""\
+            answer = qisys.interact.ask_yes_no("""\
 Do you want to generate a new CMake module for {0}?\
 """.format(name), default=False)
             if not answer:
                 return
         else:
             return
-    path_list = qibuild.sh.ls_r(directory)
+    path_list = qisys.sh.ls_r(directory)
     headers   = _find_headers(path_list)
     libraries = _find_libraries(path_list)
     module    = generate_module(name, headers, libraries, path_list=path_list)
@@ -380,16 +381,16 @@ def add_cmake_module_to_archive(archive, name):
                         (default: None)
 
     """
-    algo   = qibuild.archive.guess_algo(archive)
+    algo   = qisys.archive.guess_algo(archive)
     module = None
-    with qibuild.sh.TempDir() as work_dir:
+    with qisys.sh.TempDir() as work_dir:
         # pep8-ignore: E501
-        root_dir = qibuild.archive.extract(archive, work_dir, algo=algo, quiet=True)
+        root_dir = qisys.archive.extract(archive, work_dir, algo=algo, quiet=True)
         if name is None:
             name = os.path.basename(root_dir)
         add_cmake_module_to_directory(root_dir, name)
-        res = qibuild.archive.compress(work_dir)
-        qibuild.sh.mv(res, archive)
+        res = qisys.archive.compress(work_dir)
+        qisys.sh.mv(res, archive)
 
 
 def write_cmake_module(package_root, name, contents):
@@ -405,7 +406,7 @@ def write_cmake_module(package_root, name, contents):
     """
     module_name = name + ".config.cmake"
     module_path = os.path.join(package_root, "share", "cmake", name)
-    qibuild.sh.mkdir(module_path, recursive=True)
+    qisys.sh.mkdir(module_path, recursive=True)
     module_path = os.path.join(module_path, module_name)
     with open(module_path, "w") as module_file:
         module_file.write(contents)

@@ -6,7 +6,8 @@ import os
 
 import pytest
 
-import qibuild
+import qisys
+import qisys.script
 
 
 def check_tools():
@@ -24,7 +25,7 @@ def check_tools():
 
     for name in ["sphinx-build", "sphinx-build2",
                  "doxygen", "dot", "linkchecker"]:
-        executables[name] = qibuild.command.find_program(name)
+        executables[name] = qisys.command.find_program(name)
 
     if "sphinx-build" not in executables and "sphinx-build2" not in executables:
         mess += "sphinx-build not found"
@@ -50,7 +51,7 @@ def pytest_funcarg__src_doc(request):
     src_dir = os.path.join(this_dir, "in")
     def clean():
         build_doc = os.path.join(src_dir, "build-doc")
-        qibuild.sh.rm(build_doc)
+        qisys.sh.rm(build_doc)
     request.addfinalizer(clean)
     return src_dir
 
@@ -59,5 +60,5 @@ def test_qidoc(src_doc):
     if not check_tools():
         return
     args = ["-w", src_doc]
-    qibuild.script.run_action("qidoc.actions.build", args)
+    qisys.script.run_action("qidoc.actions.build", args)
     # XXX: should check for broken links in build-doc

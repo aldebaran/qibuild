@@ -6,7 +6,7 @@
 
 """
 
-import qibuild
+import qisys
 
 def make(build_dir, num_jobs=None, target=None):
     """ Launch make from a build dir.
@@ -18,7 +18,7 @@ def make(build_dir, num_jobs=None, target=None):
         cmd += ["-j%i" % num_jobs]
     if target:
         cmd.append(target)
-    qibuild.command.call(cmd, cwd=build_dir)
+    qisys.command.call(cmd, cwd=build_dir)
 
 
 def nmake(build_dir, target=None):
@@ -29,7 +29,7 @@ def nmake(build_dir, target=None):
     cmd = ["nmake"]
     if target:
         cmd.append(target)
-    qibuild.command.call(cmd, cwd=build_dir)
+    qisys.command.call(cmd, cwd=build_dir)
 
 
 
@@ -49,4 +49,4 @@ def msbuild(sln_file, build_type="Debug", target=None, num_jobs=None):
 
     cmd += [sln_file]
 
-    qibuild.command.call(cmd)
+    qisys.command.call(cmd)

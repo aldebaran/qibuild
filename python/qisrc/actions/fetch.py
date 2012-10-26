@@ -20,15 +20,14 @@ The url should point to a xml file looking like
 
 """
 
-import qibuild.log
+import qisys.log
+import qisys.parsers
 
-import qibuild
-
-LOGGER = qibuild.log.get_logger(__name__)
+LOGGER = qisys.log.get_logger(__name__)
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("url",
         nargs = "?",
         metavar="URL",

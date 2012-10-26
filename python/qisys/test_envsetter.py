@@ -11,7 +11,7 @@ import os
 import sys
 import unittest
 
-import qibuild
+import qisys
 
 
 class EnvSetterTestCase(unittest.TestCase):
@@ -42,14 +42,14 @@ class EnvSetterTestCase(unittest.TestCase):
 
     def test_create_new_env(self):
         # Check that envsetter is able to create new env vars
-        envsetter = qibuild.envsetter.EnvSetter()
+        envsetter = qisys.envsetter.EnvSetter()
         envsetter.set_env_var("WITH_SPAM", "ON")
         build_env = envsetter.get_build_env()
         self.assertTrue(build_env.get("WITH_SPAM", "ON"))
 
     def test_prepend_to_path(self):
         previous_path = os.environ["PATH"]
-        envsetter = qibuild.envsetter.EnvSetter()
+        envsetter = qisys.envsetter.EnvSetter()
         envsetter.prepend_to_path(self.unlikely)
         build_env = envsetter.get_build_env()
         self.assertEquals(os.environ["PATH"], previous_path)
@@ -59,7 +59,7 @@ class EnvSetterTestCase(unittest.TestCase):
     def test_prepend_to_path_twice_the_same(self):
         # adding the same path twice should be a no-op
         previous_path = os.environ["PATH"]
-        envsetter = qibuild.envsetter.EnvSetter()
+        envsetter = qisys.envsetter.EnvSetter()
         envsetter.prepend_to_path(self.unlikely)
         path_env1 = envsetter.get_build_env()["PATH"]
         envsetter.prepend_to_path(self.unlikely)
@@ -71,7 +71,7 @@ class EnvSetterTestCase(unittest.TestCase):
     def test_prepend_to_path_multi(self):
         # Adding a directory containing os.path.sep should
         # do the smart thing:
-        envsetter = qibuild.envsetter.EnvSetter()
+        envsetter = qisys.envsetter.EnvSetter()
         to_add = self.unlikely + os.path.pathsep + self.absurd
         envsetter.prepend_to_path(to_add)
         env_path = envsetter.get_build_env()["PATH"]
@@ -82,7 +82,7 @@ class EnvSetterTestCase(unittest.TestCase):
     def test_prepend_to_path_several_times(self):
         # adding two different paths should work
         previous_path = os.environ["PATH"]
-        envsetter = qibuild.envsetter.EnvSetter()
+        envsetter = qisys.envsetter.EnvSetter()
         envsetter.prepend_to_path(self.unlikely)
         envsetter.prepend_to_path(self.absurd)
         path_env = envsetter.get_build_env()["PATH"]
@@ -93,7 +93,7 @@ class EnvSetterTestCase(unittest.TestCase):
     def test_no_side_effects(self):
         # messing up with the return value of EnvSetter
         # should not change envsetter.get_build_env()
-        envsetter = qibuild.envsetter.EnvSetter()
+        envsetter = qisys.envsetter.EnvSetter()
         build_env = envsetter.get_build_env()
         build_env["spam"] = "eggs"
         self.assertTrue(envsetter.get_build_env().get("spam") is None)
@@ -102,7 +102,7 @@ class EnvSetterTestCase(unittest.TestCase):
         def test_source_bat(self):
             vc_path  = r'c:\microsoft\vc\bin'
             lib_path = r'c:\microsoft\vc\lib'
-            with qibuild.sh.TempDir() as tmp:
+            with qisys.sh.TempDir() as tmp:
                 sourceme = os.path.join(tmp, "sourceme.bat")
                 to_write = r"""@echo hello world
 set PATH=%PATH%;{}
@@ -110,7 +110,7 @@ set LIBPATH={}
 """.format(vc_path, lib_path)
                 with open(sourceme, "w") as fp:
                     fp.write(to_write)
-                envsetter = qibuild.envsetter.EnvSetter()
+                envsetter = qisys.envsetter.EnvSetter()
                 envsetter.source_bat(sourceme)
                 build_env = envsetter.get_build_env()
                 # simple assert:

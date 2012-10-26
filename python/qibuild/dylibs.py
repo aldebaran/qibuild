@@ -8,12 +8,12 @@
 
 import os
 import re
-import qibuild.log
+import qisys.log
 import subprocess
 
-import qibuild.sh
+import qisys.sh
 
-LOGGER = qibuild.log.get_logger(__name__)
+LOGGER = qisys.log.get_logger(__name__)
 
 def fix_dylibs(sdk_dir, paths=None):
     """ Create symlinks to every framework
@@ -25,7 +25,7 @@ def fix_dylibs(sdk_dir, paths=None):
 
     """
     # This directory may not exist, so create it:
-    qibuild.sh.mkdir(os.path.join(sdk_dir, "lib"), recursive=True)
+    qisys.sh.mkdir(os.path.join(sdk_dir, "lib"), recursive=True)
 
     for path in paths:
         frameworks = os.listdir(path)
@@ -33,7 +33,7 @@ def fix_dylibs(sdk_dir, paths=None):
         for framework in frameworks:
             src  = os.path.join(path    , framework)
             dest = os.path.join(sdk_dir, framework)
-            qibuild.sh.rm(dest)
+            qisys.sh.rm(dest)
             os.symlink(src, dest)
         lib_dir = os.path.join(path, "lib")
         if not os.path.exists(lib_dir):
@@ -43,5 +43,5 @@ def fix_dylibs(sdk_dir, paths=None):
         for dylib in dylibs:
             src  = os.path.join(path   , "lib", dylib)
             dest = os.path.join(sdk_dir, "lib", dylib)
-            qibuild.sh.rm(dest)
+            qisys.sh.rm(dest)
             os.symlink(src, dest)

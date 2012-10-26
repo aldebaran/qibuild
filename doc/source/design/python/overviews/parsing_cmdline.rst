@@ -27,7 +27,7 @@ Briefly, you should create a file named ``spam.py`` looking like:
 
   def do(args):
     """Main entry point"""
-    qibuild.ui.info("adding %i eggs" % args.num_eggs)
+    qisys.ui.info("adding %i eggs" % args.num_eggs)
 
 
 
@@ -45,8 +45,8 @@ You will see it uses :
 .. code-block:: python
 
 
-    modules = qibuild.script.action_modules_from_package("qibuild.actions")
-    qibuild.script.root_command_main("qibuild", parser, modules)
+    modules = qisys.script.action_modules_from_package("qibuild.actions")
+    qisys.script.root_command_main("qibuild", parser, modules)
 
 
 The first line will look for every Python module in the ``qibuild.actions`` package
@@ -61,7 +61,7 @@ So if you ever wanted to add an action outside ``qibuild.actions`` package, you 
 .. code-block:: python
 
     import spam
-    qibuild.script.root_command_main("qibuild", parser, modules + [spam])
+    qisys.script.root_command_main("qibuild", parser, modules + [spam])
 
 
 So what does the ``root_command_main`` do?
@@ -76,7 +76,7 @@ The parser will then be updated.
 .. code-block:: python
 
     parser = argparse.ArgumentParser()
-    qibuild.script.root_command_main("qibuild", parser)
+    qisys.script.root_command_main("qibuild", parser)
 
 Basically, we will call:
 

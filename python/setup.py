@@ -6,7 +6,7 @@ from distutils.core import setup
 
 packages = [
     "qibuild",
-    "qibuild.external",
+    "qisys.external",
     "qisrc",
     "qisrc.actions",
     "qibuild",

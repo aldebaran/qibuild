@@ -7,7 +7,8 @@
 import re
 import os
 
-import qibuild.command
+import qisys.command
+import qibuild.deploy
 from qibuild.dependencies_solver import DependenciesSolver
 
 FILE_SETUP_GDB  = """\
@@ -113,7 +114,7 @@ def deploy(local_directory, remote_url, port=22, use_rsync=True):
     else:
         # Default to scp
         cmd = ["scp", "-P", str(port), "-r", local_directory, remote_url]
-    qibuild.command.call(cmd)
+    qisys.command.call(cmd)
 
 
 def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_address=""):
@@ -209,7 +210,7 @@ def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
     else:
         # assume native toolchain
         sysroot = "\"\""
-        gdb = qibuild.command.find_program("gdb")
+        gdb = qisys.command.find_program("gdb")
         if gdb:
             message = "Native build. Using the debugger provided by the system."
         else:

@@ -12,7 +12,10 @@ import hashlib
 import urlparse
 from xml.etree import ElementTree
 
-from qibuild import ui
+from qisys import ui
+import qisys
+import qisys.remote
+import qisys.version
 import qibuild
 import qitoolchain
 
@@ -41,7 +44,7 @@ def tree_from_feed(feed_location):
         if os.path.exists(feed_location):
             fp = open(feed_location, "r")
         else:
-            fp = qitoolchain.remote.open_remote_location(feed_location)
+            fp = qisys.remote.open_remote_location(feed_location)
         tree = ElementTree.ElementTree()
         tree.parse(fp)
     except Exception:
@@ -104,7 +107,7 @@ def handle_remote_package(feed, package, package_tree, toolchain):
     output = toolchain.cache
     output = os.path.join(output, top)
     message = (ui.green, "Downloading", ui.blue, package_url)
-    package_archive = qitoolchain.remote.download(package_url,
+    package_archive = qisys.remote.download(package_url,
         output,
         output_name=rest,
         clobber=False,
@@ -124,19 +127,19 @@ def handle_remote_package(feed, package, package_tree, toolchain):
             should_skip = True
     if not should_skip:
         if os.path.exists(dest):
-            qibuild.sh.rm(dest)
+            qisys.sh.rm(dest)
         try:
-            algo = qibuild.archive.guess_algo(package_archive)
-            extract_path = qibuild.archive.extract(package_archive, packages_path, algo=algo)
+            algo = qisys.archive.guess_algo(package_archive)
+            extract_path = qisys.archive.extract(package_archive, packages_path, algo=algo)
             extract_path = os.path.abspath(extract_path)
             if extract_path != dest:
                 src = extract_path
                 dst = dest
-                qibuild.sh.mkdir(dst, recursive=True)
-                qibuild.sh.rm(dst)
-                qibuild.sh.mv(src, dst)
-                qibuild.sh.rm(src)
-        except qibuild.archive.InvalidArchive, err:
+                qisys.sh.mkdir(dst, recursive=True)
+                qisys.sh.rm(dst)
+                qisys.sh.mv(src, dst)
+                qisys.sh.rm(src)
+        except qisys.archive.InvalidArchive, err:
             mess = str(err)
             mess += "\nPlease fix the archive and try again"
             raise Exception(mess)
@@ -152,7 +155,7 @@ def handle_local_package(package, package_tree):
     directory = package_tree.get("directory")
     feed_root = os.path.dirname(feed)
     package_path = os.path.join(feed_root, directory)
-    package_path = qibuild.sh.to_native_path(package_path)
+    package_path = qisys.sh.to_native_path(package_path)
     package.path = package_path
 
 
@@ -167,7 +170,7 @@ def handle_toochain_file(package, package_tree):
     if not "://" in toolchain_file:
         package.toolchain_file = os.path.join(package_path, toolchain_file)
     else:
-        tc_file = qitoolchain.remote.download(toolchain_file, package_path)
+        tc_file = qisys.remote.download(toolchain_file, package_path)
         package.toolchain_file = tc_file
 
 class ToolchainFeedParser:
@@ -204,7 +207,7 @@ class ToolchainFeedParser:
                 # if version not defined, don't keep it
                 return
             prev_version = self._versions[name]
-            if qitoolchain.version.compare(prev_version, version) > 0:
+            if qisys.version.compare(prev_version, version) > 0:
                 return
             else:
                 self.packages = [x for x in self.packages if x.get("name") != name]
@@ -257,7 +260,7 @@ def parse_feed(toolchain, feed, qibuild_cfg, dry_run=False):
             # Check that url can be opened
             fp = None
             try:
-                fp = qitoolchain.remote.open_remote_location(package_url)
+                fp = qisys.remote.open_remote_location(package_url)
             except Exception, e:
                 error = "Could not add %s from %s\n" % (package_name, package_url)
                 error += "Error was: %s" % e

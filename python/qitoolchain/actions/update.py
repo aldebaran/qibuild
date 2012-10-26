@@ -9,7 +9,7 @@ If a feed url is given, use this feed instead of the recorded one
 to update the given toolchain.
 """
 
-from qibuild import ui
+from qisys import ui
 import qibuild
 import qitoolchain
 

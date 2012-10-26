@@ -11,14 +11,14 @@ Options are the same as in git grep, e.g.:
 """
 
 import sys
-import qibuild.log
 
+import qisys
 import qisrc
-import qibuild
+import qisrc.parsers
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisrc.parsers.worktree_parser(parser)
     parser.add_argument("git_grep_opts", metavar="-- git grep options", nargs="*",
                         help="git grep options preceeded with -- to escape the leading '-'")
     parser.add_argument("pattern", metavar="PATTERN",
@@ -26,15 +26,14 @@ def configure_parser(parser):
 
 def do(args):
     """ Main entry point """
-    qiwt = qisrc.open_worktree(args.worktree)
+    qiwt = qisys.worktree.open_worktree(args.worktree)
     git_grep_opts = args.git_grep_opts
     git_grep_opts.append(args.pattern)
-    logger = qibuild.log.get_logger(__name__)
     retcode = 0
     for project in qiwt.git_projects:
-        qibuild.ui.info(qibuild.ui.green,
+        qisys.ui.info(qisys.ui.green,
                         "Looking in", project.src, "...",
-                        qibuild.ui.reset)
+                        qisys.ui.reset)
         git = qisrc.git.Git(project.path)
         (status, out) = git.call("grep", *git_grep_opts, raises=False)
         print out

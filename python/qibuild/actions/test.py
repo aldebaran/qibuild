@@ -9,6 +9,8 @@ import os
 import sys
 
 import qibuild
+import qibuild.ctest
+import qibuild.performance
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -36,7 +38,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc_open(args.worktree, args)
+    toc = qibuild.toc.toc_open(args.worktree, args)
     project = qibuild.cmdparse.project_from_args(toc, args)
 
     build_dir = project.build_directory

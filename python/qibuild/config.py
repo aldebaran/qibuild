@@ -14,6 +14,7 @@ from StringIO import StringIO
 
 import qibuild
 import qixml
+import qisys.interact
 from qixml import etree
 
 
@@ -22,7 +23,7 @@ def get_global_cfg_path():
 
     """
     res = "~/.config/qi/qibuild.xml"
-    res = qibuild.sh.to_native_path(res)
+    res = qisys.sh.to_native_path(res)
     return res
 
 def indent(text, num=1):
@@ -442,7 +443,7 @@ class QiBuildConfig:
             if not os.path.exists(cfg_path):
                 if create_if_missing:
                     dirname = os.path.dirname(cfg_path)
-                    qibuild.sh.mkdir(dirname, recursive=True)
+                    qisys.sh.mkdir(dirname, recursive=True)
                     with open(cfg_path, "w") as fp:
                         fp.write('<qibuild />\n')
         try:
@@ -584,7 +585,7 @@ class QiBuildConfig:
             splitted_paths = default_env_path.split(os.pathsep)
         else:
             splitted_paths = list()
-        to_add = qibuild.sh.to_native_path(to_add)
+        to_add = qisys.sh.to_native_path(to_add)
         if to_add not in splitted_paths:
             splitted_paths.insert(0, to_add)
         self.defaults.env.path = os.pathsep.join(splitted_paths)
@@ -913,6 +914,6 @@ def get_build_env():
     """
     qibuild_cfg = QiBuildConfig()
     qibuild_cfg.read(create_if_missing=True)
-    envsetter = qibuild.envsetter.EnvSetter()
+    envsetter = qisys.envsetter.EnvSetter()
     envsetter.read_config(qibuild_cfg)
     return envsetter.get_build_env()

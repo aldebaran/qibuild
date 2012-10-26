@@ -8,7 +8,7 @@ Toolchain packages and known configurations will be fetched from an URL.
 
 """
 
-from qibuild import ui
+from qisys import ui
 import qibuild
 import qitoolchain
 

@@ -5,7 +5,7 @@
 import os
 import stat
 
-import qibuild.sh
+import qisys.sh
 
 def test_install_ro(tmpdir):
     tmp = tmpdir.strpath
@@ -17,11 +17,11 @@ def test_install_ro(tmpdir):
     # 200:
     os.chmod(ro, stat.S_IRUSR)
     dest = os.path.join(tmp, "dest")
-    qibuild.sh.install(src, dest)
+    qisys.sh.install(src, dest)
 
 def test_is_path_inside():
-   assert qibuild.sh.is_path_inside("foo/bar", "foo")
-   assert qibuild.sh.is_path_inside("foo/bar", "foo/bar")
-   assert qibuild.sh.is_path_inside("foo", "foo/bar") is False
-   assert qibuild.sh.is_path_inside("lib/libfoobar", "lib/libfoo") is False
-   assert qibuild.sh.is_path_inside("gui/bar/libfoo", "lib") is False
+   assert qisys.sh.is_path_inside("foo/bar", "foo")
+   assert qisys.sh.is_path_inside("foo/bar", "foo/bar")
+   assert qisys.sh.is_path_inside("foo", "foo/bar") is False
+   assert qisys.sh.is_path_inside("lib/libfoobar", "lib/libfoo") is False
+   assert qisys.sh.is_path_inside("gui/bar/libfoo", "lib") is False

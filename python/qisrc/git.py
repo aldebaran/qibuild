@@ -9,7 +9,8 @@ import os
 import contextlib
 import subprocess
 
-from qibuild import ui
+from qisys import ui
+import qisys
 import qibuild.config
 
 class Git:
@@ -37,7 +38,7 @@ class Git:
             kwargs["cwd"] = self.repo
         if not "quiet" in kwargs.keys():
             kwargs["quiet"] = False
-        git = qibuild.command.find_program("git", raises=True)
+        git = qisys.command.find_program("git", raises=True)
         cmd = [git]
         cmd.extend(args)
         raises = kwargs.get("raises")
@@ -53,7 +54,7 @@ class Git:
             out = out.rstrip("\n")
             return (process.returncode, out)
         else:
-            qibuild.command.call(cmd, **kwargs)
+            qisys.command.call(cmd, **kwargs)
 
     def get_config(self, name):
         """ Get a git config value.
@@ -245,7 +246,7 @@ class Git:
             if tracked != remote_ref:
                 mess = "%s will now track %s instead of %s"
                 mess = mess % (branch, remote_ref, tracked)
-                qibuild.ui.warning(mess)
+                qisys.ui.warning(mess)
             else:
                 return
 

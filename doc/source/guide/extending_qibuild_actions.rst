@@ -45,7 +45,7 @@ Quick example of a generic action:::
 
   def do(args):
     """Main entry point"""
-    qibuild.ui.info("adding %i eggs" % args.num_eggs)
+    qisys.ui.info("adding %i eggs" % args.num_eggs)
 
 
 The call to ``qibuild.parsers.default_parser`` is mandatory:

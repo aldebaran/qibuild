@@ -9,9 +9,9 @@
 import os
 import subprocess
 
-from qibuild import ui
-import qibuild.sh
-import qibuild.command
+from qisys import ui
+import qisys.sh
+import qisys.command
 
 def is_elf(filename):
     """ Check that a file is in the efl format
@@ -78,7 +78,7 @@ def split_debug(base_dir, objcopy=None, objdump=None):
         src_stat = os.stat(src)
         dirname, basename = os.path.split(src)
         debug_dir = os.path.join(dirname, ".debug")
-        qibuild.sh.mkdir(debug_dir)
+        qisys.sh.mkdir(debug_dir)
         dest = os.path.join(src, debug_dir, basename)
         to_run = list()
         to_run.append([objcopy, "--only-keep-debug", src, dest])
@@ -86,9 +86,9 @@ def split_debug(base_dir, objcopy=None, objdump=None):
                                 "--add-gnu-debuglink=%s" % dest, src])
         try:
             for cmd in to_run:
-                qibuild.command.check_output(cmd, stderr=subprocess.STDOUT)
+                qisys.command.check_output(cmd, stderr=subprocess.STDOUT)
             ui.info("-- Debug info extracted for", rel_name)
-        except qibuild.command.CommandFailedException as e:
+        except qisys.command.CommandFailedException as e:
             ui.error("Error while extracting debug for %s" % os.path.relpath(src, base_dir))
             ui.error(str(e))
         # After the commands have run, utime of the file has changed, causing

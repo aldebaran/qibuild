@@ -22,9 +22,9 @@ Installs everything on the target 'mytarget' in the
 
 import os
 
-from qibuild import ui
+from qisys import ui
 import qibuild
-import qibuild.sh
+import qisys.sh
 import qibuild.deploy
 
 def configure_parser(parser):
@@ -47,18 +47,18 @@ def do(args):
     """Main entry point"""
     url = args.url
     qibuild.deploy.parse_url(url) # throws if url is invalid
-    toc = qibuild.toc_open(args.worktree, args)
+    toc = qibuild.toc.toc_open(args.worktree, args)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
         ui.info(ui.green, "Active configuration: ",
                 ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))
-    rsync = qibuild.command.find_program("rsync", env=toc.build_env)
+    rsync = qisys.command.find_program("rsync", env=toc.build_env)
     use_rsync = False
     if rsync:
         use_rsync = True
     else:
         ui.warning("Please install rsync to get faster synchronisation")
-        scp = qibuild.command.find_program("scp", env=toc.build_env)
+        scp = qisys.command.find_program("scp", env=toc.build_env)
         if not scp:
             raise Exception("Could not find rsync or scp")
 
@@ -80,7 +80,7 @@ def do(args):
     if not args.single and packages:
         print
         ui.info(ui.green, ":: ", "Deploying packages")
-        with qibuild.sh.TempDir() as tmp:
+        with qisys.sh.TempDir() as tmp:
             for (i, package) in enumerate(packages):
                 ui.info(ui.green, "*", ui.reset,
                         "(%i/%i)" % (i+1, len(package.name)),
@@ -102,7 +102,7 @@ def do(args):
                 ui.green, "to", ui.blue, url)
         destdir = os.path.join(project.build_directory, "deploy")
         #create folder for project without install rules
-        qibuild.sh.mkdir(destdir, recursive=True)
+        qisys.sh.mkdir(destdir, recursive=True)
         toc.install_project(project, destdir, prefix="/",
                             runtime=True, num_jobs=args.num_jobs,
                             split_debug=args.split_debug)

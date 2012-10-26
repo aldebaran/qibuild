@@ -9,7 +9,7 @@
 import os
 import posixpath
 
-import qibuild.sh
+import qisys.sh
 import qixml
 
 class NoManifest(Exception):
@@ -177,7 +177,7 @@ class Project:
         if not xml_path:
             self.path = self.name.replace(".git", "")
         else:
-            self.path = qibuild.sh.to_posix_path(xml_path)
+            self.path = qisys.sh.to_posix_path(xml_path)
             self.path = posixpath.normpath(xml_path)
         self.revision = xml_element.get("revision")
         self.worktree_name = xml_element.get("worktree_name")

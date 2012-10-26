@@ -35,7 +35,7 @@ You can use:
 
 import os
 import shlex
-import qibuild.log
+import qisys.log
 import ConfigParser
 
 import qibuild
@@ -47,8 +47,8 @@ def get_config_dir():
 
     """
     # TODO: handle non-UNIX platforms?
-    root = qibuild.sh.to_native_path("~/.config/qi")
-    qibuild.sh.mkdir(root, recursive=True)
+    root = qisys.sh.to_native_path("~/.config/qi")
+    qisys.sh.mkdir(root, recursive=True)
     return root
 
 def get_config_path():
@@ -74,7 +74,7 @@ class ConfigStore:
     Note: there is no set() value, use update_config
     instead.
     """
-    logger = qibuild.log.get_logger("qibuild.configstore")
+    logger = qisys.log.get_logger("qibuild.configstore")
 
     def __init__(self):
         self.root = dict()
@@ -264,7 +264,7 @@ def update_config(config_path, section, key, value):
         parser.set(section, key, value)
     if type(value) == type([""]):
         parser.set(section, key, " ".join(value))
-    qibuild.sh.mkdir(os.path.dirname(config_path), recursive=True)
+    qisys.sh.mkdir(os.path.dirname(config_path), recursive=True)
     with open(config_path, "w") as config_file:
         parser.write(config_file)
 

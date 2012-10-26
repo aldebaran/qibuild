@@ -10,7 +10,7 @@ import qibuild
 import qidoc.core
 import qisrc.cmdparse
 
-from qibuild import ui
+from qisys import ui
 
 def configure_parser(parser):
     """Configure parser for this action."""

@@ -7,16 +7,15 @@
 """
 
 import os
-import qibuild.log
+import qisys.log
 import operator
 
-from qibuild import ui
-import qibuild.sh
-import qisrc.git
+from qisys import ui
+import qisys.sh
 import qixml
 from qixml import etree
 
-LOGGER = qibuild.log.get_logger("WorkTree")
+LOGGER = qisys.log.get_logger("WorkTree")
 
 
 class NotInWorktree(Exception):
@@ -56,7 +55,7 @@ class WorkTree:
         dot_qi = os.path.join(self.root, ".qi")
         worktree_xml = os.path.join(dot_qi, "worktree.xml")
         if not os.path.exists(worktree_xml):
-            qibuild.sh.mkdir(dot_qi)
+            qisys.sh.mkdir(dot_qi)
             with open(worktree_xml, "w") as fp:
                 fp.write("<worktree />\n")
         if os.path.exists(worktree_xml):
@@ -114,7 +113,7 @@ class WorkTree:
 
         """
         dot_qi = os.path.join(self.root, ".qi")
-        qibuild.sh.mkdir(dot_qi, recursive=True)
+        qisys.sh.mkdir(dot_qi, recursive=True)
         worktree_xml = os.path.join(self.root, ".qi", "worktree.xml")
         qixml.write(self.xml_tree, worktree_xml)
 
@@ -149,7 +148,7 @@ class WorkTree:
         for sub_project_src in project.subprojects:
             sub_project = Project()
             sub_project.src = os.path.join(project.src, sub_project_src)
-            sub_project.src = qibuild.sh.to_posix_path(sub_project.src)
+            sub_project.src = qisys.sh.to_posix_path(sub_project.src)
             self.set_path(sub_project)
             sub_project.parse_qiproject_xml()
             if project.git_project:
@@ -162,7 +161,7 @@ class WorkTree:
 
         """
         p_path = os.path.join(self.root, project.src)
-        project.path = qibuild.sh.to_native_path(p_path)
+        project.path = qisys.sh.to_native_path(p_path)
 
 
     def parse_buildable_projects(self):
@@ -191,7 +190,7 @@ class WorkTree:
         """
         if os.path.isabs(src):
             src = os.path.relpath(src, self.root)
-            src = qibuild.sh.to_posix_path(src)
+            src = qisys.sh.to_posix_path(src)
         p_srcs = [p.src for p in self.projects]
         if not src in p_srcs:
             if not raises:
@@ -213,7 +212,7 @@ class WorkTree:
         # Coming from user, can be an abspath:
         if os.path.isabs(src):
             src = os.path.relpath(src, self.root)
-            src = qibuild.sh.to_posix_path(src)
+            src = qisys.sh.to_posix_path(src)
         p_srcs = [p.src for p in self.projects]
         if src in p_srcs:
             mess  = "Could not add project to worktree\n"
@@ -240,7 +239,7 @@ class WorkTree:
         # Coming from user, can be an abspath:
         if os.path.isabs(src):
             src = os.path.relpath(src, self.root)
-            src = qibuild.sh.to_posix_path(src)
+            src = qisys.sh.to_posix_path(src)
         p_srcs = [p.src for p in self.projects]
         if src not in p_srcs:
             raise Exception("No such project: %s" % src)
@@ -249,7 +248,7 @@ class WorkTree:
             if project_elem.get("src") == src:
                 if from_disk:
                     to_remove = self.get_project(src).path
-                    qibuild.sh.rm(to_remove)
+                    qisys.sh.rm(to_remove)
                 root_elem.remove(project_elem)
         self.dump()
         self.load()
@@ -316,7 +315,7 @@ def create(directory, force=False):
         if parent_worktree:
             if parent_worktree != directory:
                 if not force:
-                    qibuild.ui.warning("""{0} is already in a worktee
+                    qisys.ui.warning("""{0} is already in a worktee
 (in {1})
 Use --force if you want to re-initialize the worktree""".format(directory, parent_worktree))
                     return open_worktree(parent_worktree)
@@ -328,7 +327,7 @@ Use --force if you want to re-initialize the worktree""".format(directory, paren
             raise Exception(mess)
 
     to_create = os.path.join(directory, ".qi")
-    qibuild.sh.mkdir(to_create, recursive=True)
+    qisys.sh.mkdir(to_create, recursive=True)
     qi_xml = os.path.join(directory, ".qi", "qibuild.xml")
     if not os.path.exists(qi_xml) or force:
         with open(qi_xml, "w") as fp:
@@ -340,6 +339,7 @@ def git_project_path_from_cwd(cwd=None):
     project using cwd
 
     """
+    import qisrc.git
     if not cwd:
         cwd = os.getcwd()
     return qisrc.git.get_repo_root(cwd)

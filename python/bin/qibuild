@@ -46,9 +46,9 @@ patch_sys_path()
 try:
     import argparse
 except ImportError:
-    from qibuild.external import argparse
+    from qisys.external import argparse
 
-import qibuild.script
+import qisys.script
 
 def print_version():
     """Print qibuild root cmake path.
@@ -66,13 +66,13 @@ Using cmake code from {cmake_qibuild_dir}
 
 def main():
     parser = argparse.ArgumentParser()
-    modules = qibuild.script.action_modules_from_package("qibuild.actions")
+    modules = qisys.script.action_modules_from_package("qibuild.actions")
 
     if len(sys.argv) == 2 and sys.argv[1] == '--version':
         print_version()
         sys.exit(0)
 
-    qibuild.script.root_command_main("qibuild", parser, modules)
+    qisys.script.root_command_main("qibuild", parser, modules)
 
 if __name__ == "__main__":
     main()

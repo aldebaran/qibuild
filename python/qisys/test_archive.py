@@ -11,11 +11,11 @@ import stat
 
 import pytest
 
-import qibuild
+import qisys
 
-from qibuild.archive import compress
-from qibuild.archive import extract
-from qibuild.archive import guess_algo
+from qisys.archive import compress
+from qisys.archive import extract
+from qisys.archive import guess_algo
 
 
 ## zip does not support:
@@ -119,7 +119,7 @@ def _test_compress_extract(tmpdir, algo, extension, compress_func, extract_func)
     print "dst:"
     print "\n".join(["  %s" % x for x in dst_ls_r])
     if algo == "zip" and compress_func == compress:
-        # Current implementation of qibuild.archive.compress does not
+        # Current implementation of qisys.archive.compress does not
         # dereference symlinks to directory, but just skip them. So:
         # - symlink to file become a file;
         # - symlink to directory is excluded from archiving.
@@ -136,7 +136,7 @@ def _test_compress_extract(tmpdir, algo, extension, compress_func, extract_func)
     assert stat.S_IMODE(dstdir.join("e").join("ro_file.txt").stat().mode) == 0444
     assert stat.S_IMODE(dstdir.join("ro_dir").join("in_ro_dir.txt").stat().mode) == 0444
     if not algo == "zip" or not compress_func == compress:
-        # Current implementation of qibuild.archive.compress does not
+        # Current implementation of qisys.archive.compress does not
         # support read-only directory.
         #
         # So, just skip the test.
@@ -147,7 +147,7 @@ def _test_compress_extract(tmpdir, algo, extension, compress_func, extract_func)
     assert stat.S_IMODE(dstdir.join("bin").join("rw_bip").stat().mode) == 0755
     assert stat.S_IMODE(dstdir.join("bin").join("ro_bip").stat().mode) == 0555
     ## symlinks
-    # Current implementation of qibuild.archive.compress does not
+    # Current implementation of qisys.archive.compress does not
     # dereference symlinks to directory, but just skip them. So:
     # - symlink to file become a file;
     # - symlink to directory is excluded from archiving.
@@ -208,8 +208,8 @@ def extern_compress(directory, archive=None, algo="zip", quiet=False):
         cmd += ["-C", os.path.dirname(directory)]
         cmd += [os.path.basename(directory)]
         cwd = None
-    cmd.insert(0, qibuild.command.find_program(prog, raises=True))
-    qibuild.command.call(cmd, cwd=cwd)
+    cmd.insert(0, qisys.command.find_program(prog, raises=True))
+    qisys.command.call(cmd, cwd=cwd)
     return archive
 
 def extern_extract(archive, directory, algo="zip", quiet=False):
@@ -225,8 +225,8 @@ def extern_extract(archive, directory, algo="zip", quiet=False):
         cmd += ["-xf", archive]
         cmd += ["-C", directory]
         cwd = None
-    cmd.insert(0, qibuild.command.find_program(prog, raises=True))
-    qibuild.command.call(cmd, cwd=cwd)
+    cmd.insert(0, qisys.command.find_program(prog, raises=True))
+    qisys.command.call(cmd, cwd=cwd)
     if len(os.listdir(directory)) == 1:
         directory = os.path.join(directory, os.listdir(directory)[0])
     return directory
@@ -272,7 +272,7 @@ def test_compress_extract_invalid(tmpdir, algo, extension):
 def test_compress_broken_symlink(tmpdir):
     src = tmpdir.mkdir("src")
     broken_symlink = os.symlink("/does/not/exist", src.join("broken").strpath)
-    res = qibuild.archive.compress(src.strpath, algo="zip")
+    res = qisys.archive.compress(src.strpath, algo="zip")
 
 def test_extract_invalid(tmpdir):
     srcdir   = tmpdir.mkdir("src")
@@ -281,5 +281,5 @@ def test_extract_invalid(tmpdir):
     archive.write("")
     # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
-        qibuild.archive.extract(archive.strpath, destdir.strpath)
+        qisys.archive.extract(archive.strpath, destdir.strpath)
     assert "tar failed" in e.value.message

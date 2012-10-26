@@ -255,7 +255,7 @@ In this case you should use the built-in ``tmpdir`` from ``py.test``
       qibuild_xml = dot_qi.join("qibuild.xml")
       qibuild_xml.write("....")
 
-      worktree = qisrc.worktree.open(work.strpath)
+      worktree = qisys.worktree.open(work.strpath)
 
 
 Note that ``tmpdir`` is  a  ``py.._path.local.LocaPath`` instance (from the

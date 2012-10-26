@@ -10,12 +10,12 @@ import os
 import re
 import sys
 import difflib
-import qibuild.log
+import qisys.log
 from xml.etree import ElementTree as etree
 
 import qibuild
 
-LOGGER = qibuild.log.get_logger(__name__)
+LOGGER = qisys.log.get_logger(__name__)
 
 def guess_project_name(source_dir):
     """ Try to guess the project name
@@ -229,7 +229,7 @@ def clean_up(args):
                     print "Would remove", full_path
                 else:
                     print "Removing", full_path
-                    qibuild.sh.rm(full_path)
+                    qisys.sh.rm(full_path)
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -256,7 +256,7 @@ def do(args):
     """Main entry point """
     if not args.source_dir:
         args.source_dir = os.getcwd()
-    args.source_dir = qibuild.sh.to_native_path(args.source_dir)
+    args.source_dir = qisys.sh.to_native_path(args.source_dir)
 
     if not args.project_name:
         args.project_name = guess_project_name(args.source_dir)

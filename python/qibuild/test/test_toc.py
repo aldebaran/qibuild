@@ -12,7 +12,7 @@ import unittest
 
 import pytest
 
-import qisrc
+import qisys
 import qibuild
 import qitoolchain
 
@@ -26,7 +26,7 @@ class TestToc():
     """
     def __init__(self, build_type="Debug"):
         test_dir = os.path.abspath(os.path.dirname(__file__))
-        worktree = qisrc.worktree.open_worktree(test_dir)
+        worktree = qisys.worktree.open_worktree(test_dir)
         self.toc = qibuild.toc.Toc(worktree, build_type=build_type)
 
     def clean(self):
@@ -36,7 +36,7 @@ class TestToc():
             build_dirs = [x for x in build_dirs if x.startswith("build")]
             build_dirs = [os.path.join(project.path, x) for x in build_dirs]
             for build_dir in build_dirs:
-                qibuild.sh.rm(build_dir)
+                qisys.sh.rm(build_dir)
 
     def __enter__(self):
         return self.toc
@@ -59,7 +59,7 @@ class TocTestCase(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="test-feed")
-        qibuild.sh.mkdir(os.path.join(self.tmp, "qi"))
+        qisys.sh.mkdir(os.path.join(self.tmp, "qi"))
         self.world_package = qitoolchain.Package("world", "package/world")
         self.world_project = qibuild.project.Project("src/world")
         self.world_project.name = "world"
@@ -96,7 +96,7 @@ class TocTestCase(unittest.TestCase):
 
     def test_custom_sdk_dir(self):
         dot_qi = os.path.join(self.tmp, ".qi")
-        qibuild.sh.mkdir(dot_qi, recursive=True)
+        qisys.sh.mkdir(dot_qi, recursive=True)
         qibuild_xml = os.path.join(dot_qi, "qibuild.xml")
         with open(qibuild_xml, "w") as fp:
             fp.write("""
@@ -107,7 +107,7 @@ class TocTestCase(unittest.TestCase):
 )
         # Create a project named hello
         hello_src = os.path.join(self.tmp, "hello")
-        qibuild.sh.mkdir(hello_src)
+        qisys.sh.mkdir(hello_src)
         qiproj_xml = os.path.join(hello_src, "qiproject.xml")
         with open(qiproj_xml, "w") as fp:
             fp.write('<project name="hello" />\n')
@@ -115,7 +115,7 @@ class TocTestCase(unittest.TestCase):
         with open(hello_cmake, "w") as fp:
             fp.write("project(hello)\n")
 
-        worktree = qisrc.worktree.open_worktree(self.tmp)
+        worktree = qisys.worktree.open_worktree(self.tmp)
         worktree.add_project(hello_src)
         toc = qibuild.toc.toc_open(self.tmp)
         hello_proj = toc.get_project("hello")
@@ -139,7 +139,7 @@ class TocTestCase(unittest.TestCase):
         self.assertTrue(a_sdk_dir != b_sdk_dir)
 
     def tearDown(self):
-        qibuild.sh.rm(self.tmp)
+        qisys.sh.rm(self.tmp)
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,7 @@
-qibuild.script -- Tools for qibuild scripts
-===========================================
+qisys.script -- Tools for qisys scripts
+==========================================
 
-.. py:module:: qibuild.script
+.. py:module:: qisys.script
 
 
 For instance, after
@@ -57,8 +57,8 @@ Example of usage:
 .. code-block:: python
 
       parser = argparse.ArgumentParser()
-      modules = qibuild.script.action_modules_from_package("qibuild.actions")
-      qibuild.script.root_command_main("qibuild", parser, modules)
+      modules = qisys.script.action_modules_from_package("qibuild.actions")
+      qisys.script.root_command_main("qibuild", parser, modules)
 
 
 .. seealso::

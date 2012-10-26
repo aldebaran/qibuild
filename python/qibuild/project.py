@@ -21,9 +21,11 @@ The :py:class:`toc` object is able to:
 
 import os
 
-from qibuild import ui
-import qibuild.sh
+from qisys import ui
+import qisys.sh
 import qixml
+
+import qibuild
 
 class Project:
     """ Store information about a :term:`project`
@@ -167,7 +169,7 @@ def update_project(project, toc):
         bname = "sdk-%s" % (toc.build_folder_name)
         project.sdk_directory = os.path.normpath(os.path.join(project.sdk_directory, bname))
         project._custom_sdk_dir = True
-        cmake_sdk_dir = qibuild.sh.to_posix_path(project.sdk_directory)
+        cmake_sdk_dir = qisys.sh.to_posix_path(project.sdk_directory)
         project.cmake_flags.append("QI_SDK_DIR=%s" % (cmake_sdk_dir))
     else:
         #normal sdk dir in buildtree
@@ -185,7 +187,7 @@ def update_project(project, toc):
     # add the toolchain file:
     if toc.toolchain is not None:
         tc_file = toc.toolchain.toolchain_file
-        toolchain_path = qibuild.sh.to_posix_path(tc_file)
+        toolchain_path = qisys.sh.to_posix_path(tc_file)
         project.cmake_flags.append('CMAKE_TOOLCHAIN_FILE=%s' % toolchain_path)
 
     # lastly, add a correct -DCMAKE_MODULE_PATH
@@ -206,10 +208,10 @@ def generate_path_conf(project, toc):
     dep_sdk_dirs = [x.sdk_directory for x in projects]
 
     for sdk_dir in dep_sdk_dirs:
-        towrite += qibuild.sh.to_posix_path(sdk_dir) + "\n"
+        towrite += qisys.sh.to_posix_path(sdk_dir) + "\n"
 
     path_dconf = os.path.join(project.sdk_directory, "share", "qi")
-    qibuild.sh.mkdir(path_dconf, recursive=True)
+    qisys.sh.mkdir(path_dconf, recursive=True)
 
     path_conf = os.path.join(path_dconf, "path.conf")
     with open(path_conf, "w") as fp:
@@ -255,11 +257,11 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
     custom_cmake_code = ""
     config = toc.active_config
     if toc.local_cmake:
-        to_include = qibuild.sh.to_posix_path(toc.local_cmake)
+        to_include = qisys.sh.to_posix_path(toc.local_cmake)
         custom_cmake_code += 'include("%s")\n' % to_include
 
     cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
-    cmake_qibuild_dir = qibuild.sh.to_posix_path(cmake_qibuild_dir)
+    cmake_qibuild_dir = qisys.sh.to_posix_path(cmake_qibuild_dir)
     dep_sdk_dirs = toc.get_sdk_dirs(project.name)
 
     dep_to_add = ""
@@ -270,7 +272,7 @@ list(FIND CMAKE_FIND_ROOT_PATH "{sdk_dir}" _found)
 if(_found STREQUAL "-1")
     list(INSERT CMAKE_FIND_ROOT_PATH 0 "{sdk_dir}")
 endif()
-""".format(sdk_dir=qibuild.sh.to_posix_path(sdk_dir))
+""".format(sdk_dir=qisys.sh.to_posix_path(sdk_dir))
 
     to_write = to_write.format(
         cmake_qibuild_dir  = cmake_qibuild_dir,
@@ -278,7 +280,7 @@ endif()
         custom_cmake_code = custom_cmake_code
     )
 
-    qibuild.sh.mkdir(project.build_directory, recursive=True)
+    qisys.sh.mkdir(project.build_directory, recursive=True)
 
     dep_cmake = os.path.join(project.build_directory, "dependencies.cmake")
 
@@ -388,12 +390,12 @@ def check_parent_project(toc, project_name, project_path):
         return
     question = "Add the path to project %s to its parent qiproject.xml"
     question = question % (project_name)
-    answer = qibuild.interact.ask_yes_no(question, default=True)
+    answer = qisys.interact.ask_yes_no(question, default=True)
     if answer:
         ui.info("Patching", parent_qiproj)
         tree = qixml.read(parent_qiproj)
         child_src = os.path.relpath(project_path, parent_proj.path)
-        child_src = qibuild.sh.to_posix_path(child_src)
+        child_src = qisys.sh.to_posix_path(child_src)
         to_add = qixml.etree.Element("project")
         to_add.set("src", child_src)
         tree.getroot().append(to_add)
@@ -414,7 +416,7 @@ def check_worktree(toc, project_name, project_path):
     if wt_proj:
         return
     question = "Add the path to the project %s to the worktree in %s"
-    answer = qibuild.interact.ask_yes_no(question % (project_name, toc.worktree.root),
+    answer = qisys.interact.ask_yes_no(question % (project_name, toc.worktree.root),
                                          default=True)
     if answer:
         toc.worktree.add_project(project_path)

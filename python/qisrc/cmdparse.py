@@ -9,8 +9,8 @@
 
 import os
 
-import qisrc.worktree
-import qibuild.sh
+import qisys.worktree
+import qisys.sh
 
 def guess_current_project(worktree, cwd):
     """ Guess the current project using a worktree and the
@@ -20,7 +20,7 @@ def guess_current_project(worktree, cwd):
     projects = worktree.projects[:]
     projects.reverse()
     for project in projects:
-        if qibuild.sh.is_path_inside(cwd, project.path):
+        if qisys.sh.is_path_inside(cwd, project.path):
             return project
 
 def projects_from_cwd(worktree, cwd, single=False):
@@ -58,7 +58,7 @@ def parse_project_arg(worktree, project_arg, single=False):
 
     """
     if not single:
-        as_path = qibuild.sh.to_native_path(project_arg)
+        as_path = qisys.sh.to_native_path(project_arg)
         if os.path.exists(as_path):
             res = projects_in_subdir(worktree, as_path, raises=True)
             return res
@@ -78,7 +78,7 @@ def projects_in_subdir(worktree, subdir, raises=False):
     res = list()
     projects = worktree.projects[:]
     for project in projects:
-        if qibuild.sh.is_path_inside(project.src, relpath):
+        if qisys.sh.is_path_inside(project.src, relpath):
             res.append(project)
     if not res and raises:
         mess  = "Could not find any project in '%s'\n" % relpath
@@ -100,11 +100,11 @@ def projects_from_args(args):
     worktree_was_explicit = False
     cwd = os.getcwd()
     if args.worktree:
-        worktree = qisrc.worktree.open_worktree(args.worktree)
+        worktree = qisys.worktree.open_worktree(args.worktree)
         worktree_was_explicit = True
     else:
-        root = qisrc.worktree.guess_worktree(raises=True)
-        worktree = qisrc.worktree.open_worktree(root)
+        root = qisys.worktree.guess_worktree(raises=True)
+        worktree = qisys.worktree.open_worktree(root)
 
 
     if not args.projects:

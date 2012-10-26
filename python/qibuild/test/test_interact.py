@@ -2,11 +2,11 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-import qibuild.interact
+import qisys.interact
 import mock
 
 class FakeInteract:
-    """ A class to tests code depending on qibuild.interact
+    """ A class to tests code depending on qisys.interact
 
     """
     def __init__(self, answers):
@@ -85,15 +85,15 @@ class FakeInteract:
 
 def test_fake_interat_list():
     fake_interact = FakeInteract([False, "coffee!"])
-    with mock.patch('qibuild.interact', fake_interact):
-        assert qibuild.interact.ask_yes_no("tea?") is False
-        assert qibuild.interact.ask_string("then what?") == "coffee!"
+    with mock.patch('qisys.interact', fake_interact):
+        assert qisys.interact.ask_yes_no("tea?") is False
+        assert qisys.interact.ask_string("then what?") == "coffee!"
 
 def test_fake_interat_dict():
     fake_interact = FakeInteract({"coffee" : "y", "tea" : "n"})
-    with mock.patch('qibuild.interact', fake_interact):
-        assert qibuild.interact.ask_yes_no("Do you like tea?") == "n"
-        assert qibuild.interact.ask_yes_no("Do you like coffee?") == "y"
+    with mock.patch('qisys.interact', fake_interact):
+        assert qisys.interact.ask_yes_no("Do you like tea?") == "n"
+        assert qisys.interact.ask_yes_no("Do you like coffee?") == "y"
 
 
 def test_ask_yes_no():
@@ -102,19 +102,19 @@ def test_ask_yes_no():
         m.side_effect = ["y", "yes", "Yes", "n", "no", "No"]
         expected_res  = [True, True, True, False, False, False]
         for res in expected_res:
-            actual = qibuild.interact.ask_yes_no("coffee?")
+            actual = qisys.interact.ask_yes_no("coffee?")
             assert actual == res
 
 def test_ask_yes_no_default():
     """ Test that just pressing enter returns the default value """
     with mock.patch('__builtin__.raw_input') as m:
         m.side_effect = ["", ""]
-        assert qibuild.interact.ask_yes_no("coffee?", default=True)  is True
-        assert qibuild.interact.ask_yes_no("coffee?", default=False) is False
+        assert qisys.interact.ask_yes_no("coffee?", default=True)  is True
+        assert qisys.interact.ask_yes_no("coffee?", default=False) is False
 
 def test_ask_yes_no_wrong_input():
     """ Test that we keep asking when answer does not make sense """
     with mock.patch('__builtin__.raw_input') as m:
         m.side_effect = ["coffee!", "n"]
-        assert qibuild.interact.ask_yes_no("tea?") is False
+        assert qisys.interact.ask_yes_no("tea?") is False
         assert m.call_count == 2

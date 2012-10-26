@@ -7,18 +7,22 @@
 """
 
 
+import argparse
 import os
 import difflib
 
 import pytest
 import unittest
+
+import qisys
+import qisys.script
+import qisys.worktree
 import qibuild
+import qibuild.cmdparse
+import qibuild.cmake
+import qibuild.parsers
+import qibuild.toc
 
-
-try:
-    import argparse
-except ImportError:
-    from qibuild.external import argparse
 
 
 # pylint: disable-msg=E1101
@@ -39,7 +43,7 @@ class QiBuildTestCase(unittest.TestCase):
         self._run_action('clean', '-f')
 
     def _run_action(self, action, *args):
-        qibuild.run_action("qibuild.actions.%s" % action, args,
+        qisys.script.run_action("qibuild.actions.%s" % action, args,
             forward_args=self.args)
     def get_build_dir(self, project_name):
         """ Get the build dir of a project
@@ -117,7 +121,7 @@ class QiBuildTestCase(unittest.TestCase):
     def test_using_tool_for_install(self):
         self._run_action("configure", "bar")
         self._run_action("make", "bar")
-        with qibuild.sh.TempDir() as tmp:
+        with qisys.sh.TempDir() as tmp:
             self._run_action("install", "bar", tmp)
             foo_out = os.path.join(tmp, "share", "foo", "foo.out")
             self.assertTrue(os.path.exists(foo_out))
@@ -146,7 +150,7 @@ class QiBuildTestCase(unittest.TestCase):
         self.assertEquals(cache_before["BAR_DEPENDS"] , "eggs;spam")
 
         # run cmake .. and check the cache did not change
-        qibuild.command.call(["cmake", ".."], cwd=build_dir)
+        qisys.command.call(["cmake", ".."], cwd=build_dir)
         with open(cmake_cache, "r") as fp:
             txt_after = fp.readlines()
             txt_after = [l for l in txt_after if "ADVANCED" not in l]

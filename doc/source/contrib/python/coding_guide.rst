@@ -354,7 +354,7 @@ Instead, use a copy of ``os.environ``, for instance::
   cmd_env["SPAM"] = "eggs"
   # Assuming foobar need SPAM environment variable set to 'eggs'
   cmd = ["foobar"]
-  qibuild.command.call(foobar, env=cmd_env)
+  qisys.command.call(foobar, env=cmd_env)
 
 
 In more complex cases, especially when handling the
@@ -368,7 +368,7 @@ A small example::
   envsetter.prepend_to_path(r"c:\Program Files\Foobar\bin")
   build_env = envsetter.get_build_env()
   cmd = ["foobar", "/spam:eggs"]
-  qibuild.command.call(cmd, env=build_env)
+  qisys.command.call(cmd, env=build_env)
 
 
 Platform-dependent code
@@ -404,34 +404,34 @@ Using this is also a good way to do it ::
 Output messages to the user
 -----------------------------
 
-* Please use ``qibuild.ui`` to print nice message to the user and not
+* Please use ``qisys.ui`` to print nice message to the user and not
   just ``print``.
   This makes it easier to distinguish between real messages and
   the quick ``printf`` you add for debugging.
 
 * Speaking of debug, the tricky parts of qibuild contains some calls to
-  ``qibuild.ui.debug`` that are only triggered when using ``-v, --verbose``.
+  ``qisys.ui.debug`` that are only triggered when using ``-v, --verbose``.
   Don't hesitate to use that, especially when something tricky is going on
   but you do not want to tell the user about it.
 
 * In the past, we were using ``logging.py`` and a custom log handler to output
   messages to the console. This was causing lots of problems, and we added
   a compatibility layer to avoid having to modify to much code.
-  But please do not use ``qibuild.log`` in new code:
+  But please do not use ``qisys.log`` in new code:
 
 .. code-block:: python
 
   # Don't do this:
 
-  import qibuild.log
+  import qisys.log
 
-  logger = qibuild.log.get_logger(__name__)
+  logger = qisys.log.get_logger(__name__)
   logger.info("Building :%s", project.name)
 
   # Do this instead:
 
-  import qibuild.ui
-  qibuild.ui.info("Building", project.name)
+  import qisys.ui
+  qisys.ui.info("Building", project.name)
 
 
 Debugging

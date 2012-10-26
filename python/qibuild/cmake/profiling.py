@@ -10,7 +10,7 @@ import re
 import os
 import pickle
 
-import qibuild.sh
+import qisys.sh
 import qibuild.cmake
 
 LOG_RE = re.compile("(.*?)\((\d+)\):")
@@ -67,6 +67,6 @@ def gen_annotations(profile, out, qibuild_dir):
             lines[line_no-1] = new_line
         new_filename = os.path.join(out, filename)
         new_dirname = os.path.dirname(new_filename)
-        qibuild.sh.mkdir(new_dirname, recursive=True)
+        qisys.sh.mkdir(new_dirname, recursive=True)
         with open(new_filename, "w") as fp:
             fp.writelines(lines)

@@ -8,11 +8,11 @@
 
 import os
 
-import qibuild.sh
+import qisys.sh
 import qisrc.manifest
 import qisrc.review
 import qisrc.git
-from qibuild import ui
+from qisys import ui
 
 
 def fetch_manifest(worktree, manifest_git_url, branch="master",
@@ -114,9 +114,9 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin"):
         src = url.split("/")[-1].replace(".git", "")
     if os.path.isabs(src):
         src = os.path.relpath(src, worktree.root)
-        src = qibuild.sh.to_posix_path(src)
+        src = qisys.sh.to_posix_path(src)
     else:
-        src = qibuild.sh.to_posix_path(src)
+        src = qisys.sh.to_posix_path(src)
 
     conflict_project = worktree.get_project(src, raises=False)
     if conflict_project:
@@ -126,7 +126,7 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin"):
         raise Exception(mess)
 
     path = os.path.join(worktree.root, src)
-    path = qibuild.sh.to_native_path(path)
+    path = qisys.sh.to_native_path(path)
     if os.path.exists(path):
         mess  = "Could not add project from %s in %s\n" % (url, src)
         mess += "This path already exists\n"
@@ -134,7 +134,7 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin"):
 
     ui.info(ui.green, "Git clone: %s -> %s" % (url, path))
     dirname = os.path.dirname(path)
-    qibuild.sh.mkdir(dirname, recursive=True)
+    qisys.sh.mkdir(dirname, recursive=True)
     git = qisrc.git.Git(path)
     if branch:
         git.clone(url, "-b", branch, "-o", remote)

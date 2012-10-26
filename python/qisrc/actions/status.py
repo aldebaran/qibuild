@@ -8,14 +8,14 @@
 import os
 import sys
 
-from qibuild import ui
-import qibuild
+from qisys import ui
+import qisys
 import qisrc
 
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("--untracked-files", "-u",
         dest="untracked_files",
         action="store_true",
@@ -38,7 +38,7 @@ def stat_tracking_remote(git, branch, tracking):
 
 def do(args):
     """ Main method """
-    qiwt = qisrc.open_worktree(args.worktree)
+    qiwt = qisys.worktree.open_worktree(args.worktree)
     gitrepo = list()
     dirty = list()
     incorrect = list()

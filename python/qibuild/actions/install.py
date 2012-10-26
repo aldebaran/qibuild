@@ -6,7 +6,8 @@
 
 import os
 
-from qibuild import ui
+from qisys import ui
+import qisys
 import qibuild
 
 def configure_parser(parser):
@@ -28,10 +29,10 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc_open(args.worktree, args)
+    toc = qibuild.toc.toc_open(args.worktree, args)
     # Compute final destination:
     prefix = args.prefix[1:]
-    destdir = qibuild.sh.to_native_path(args.destdir)
+    destdir = qisys.sh.to_native_path(args.destdir)
     dest = os.path.join(destdir, prefix)
 
     # Resolve deps:

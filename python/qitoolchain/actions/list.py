@@ -6,11 +6,11 @@
 
 """
 
-import qisrc
+import qisys
 import qibuild
 import qitoolchain
 
-from qibuild import ui
+from qisys import ui
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -26,10 +26,10 @@ def do(args):
         return
     default_toc_name = None
     try:
-        worktree = qisrc.worktree.open_worktree(args.worktree)
+        worktree = qisys.worktree.open_worktree(args.worktree)
         toc = qibuild.toc.Toc(worktree)
         default_toc_name = toc.config.local.defaults.config
-    except qisrc.worktree.NotInWorktree, e:
+    except qisys.worktree.NotInWorktree, e:
         pass
     print "Known toolchains:"
     for tc_name in tc_names:

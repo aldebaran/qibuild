@@ -1,7 +1,7 @@
-qibuild.archive -- Manage .tar.gz and .zip files
+qisys.archive -- Manage .tar.gz and .zip files
 ================================================
 
-.. automodule:: qibuild.archive
+.. automodule:: qisys.archive
    :members:
 
 .. autofunction:: compress

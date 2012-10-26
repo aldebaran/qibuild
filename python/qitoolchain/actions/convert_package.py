@@ -8,6 +8,7 @@
 
 import os
 
+import qisys
 import qibuild
 from qitoolchain.binary_package import open_package
 from qitoolchain.binary_package import convert_to_qibuild
@@ -65,17 +66,17 @@ a package name must be passed to the command line.
     message = """
 Converting '{0}' into a qiBuild package ...
 """.format(package_path)
-    qibuild.ui.info(message)
+    qisys.ui.info(message)
 
-    with qibuild.sh.TempDir() as tmp:
+    with qisys.sh.TempDir() as tmp:
         qibuild_package_path = convert_to_qibuild(package, output_dir=tmp)
         add_cmake_module_to_archive(qibuild_package_path, package.name)
         src = os.path.abspath(qibuild_package_path)
         dst = os.path.join(dest_dir, os.path.basename(qibuild_package_path))
         dst = os.path.abspath(dst)
-        qibuild.sh.mkdir(dest_dir, recursive=True)
-        qibuild.sh.rm(dst)
-        qibuild.sh.mv(src, dst)
+        qisys.sh.mkdir(dest_dir, recursive=True)
+        qisys.sh.rm(dst)
+        qisys.sh.mv(src, dst)
         qibuild_package_path = dst
     message = """\
 Conversion succedded.
@@ -86,4 +87,4 @@ qiBuild package:
 You can add this qiBuild package to a toolchain using:
   qitoolchain -c <toolchain name> {0} {1}\
 """.format(package_name, qibuild_package_path)
-    qibuild.ui.info(message)
+    qisys.ui.info(message)

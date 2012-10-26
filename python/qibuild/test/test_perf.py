@@ -10,6 +10,7 @@ import pytest
 
 import qibuild
 import qibuild.test
+import qibuild.performance
 from qibuild.test.test_toc import TestToc
 
 

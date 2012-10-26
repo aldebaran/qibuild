@@ -10,19 +10,19 @@ Use -- to seprate qisrc arguments from the arguments of the command.
 """
 
 import qisrc
-import qibuild
-from qibuild import ui
+import qisys
+from qisys import ui
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("command", metavar="COMMAND", nargs="+")
     parser.add_argument("--ignore-errors", "--continue",
         action="store_true", help="continue on error")
 
 def do(args):
     """Main entry point"""
-    qiwt = qisrc.open_worktree(args.worktree)
+    qiwt = qisys.worktree.open_worktree(args.worktree)
     errors = list()
     ui.info(ui.green, "Running `%s` on every project" % " ".join(args.command))
     c = 0
@@ -32,8 +32,8 @@ def do(args):
         command = args.command[:]
         ui.info(ui.green, "*", ui.reset, "(%d/%d)" % (c, count), ui.blue, project.src)
         try:
-            qibuild.command.call(command, cwd=project.path)
-        except qibuild.command.CommandFailedException:
+            qisys.command.call(command, cwd=project.path)
+        except qisys.command.CommandFailedException:
             if args.ignore_errors:
                 errors.append(project)
                 continue

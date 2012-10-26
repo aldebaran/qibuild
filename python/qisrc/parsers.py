@@ -4,10 +4,8 @@
 
 """ Common parsers for qisrc actions """
 
-import qibuild.parsers
+import qisys.parsers
 
 def worktree_parser(parser):
-    qibuild.parsers.default_parser(parser)
-    parser.add_argument("-w", "--worktree", "--work-tree", dest="worktree",
-        help="Use a specific work tree path.")
+    qisys.parsers.worktree_parser(parser)
 

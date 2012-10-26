@@ -8,7 +8,12 @@
 
 import os
 
+import qisys
+import qisys.archive
+import qisys.worktree
 import qibuild
+import qibuild.toc
+import qibuild.parsers
 import qitoolchain
 
 def configure_parser(parser):
@@ -34,10 +39,10 @@ def do(args):
     # extract it to the default packages path of the toolchain
     tc_packages_path = qitoolchain.toolchain.get_default_packages_path(tc.name)
     dest = os.path.join(tc_packages_path, package_name)
-    qibuild.sh.rm(dest)
-    with qibuild.sh.TempDir() as tmp:
-        extracted = qibuild.archive.extract(package_path, tmp)
-        qibuild.sh.install(extracted, dest, quiet=True)
+    qisys.sh.rm(dest)
+    with qisys.sh.TempDir() as tmp:
+        extracted = qisys.archive.extract(package_path, tmp)
+        qisys.sh.install(extracted, dest, quiet=True)
 
     package = qitoolchain.Package(package_name, dest)
     tc.add_package(package)

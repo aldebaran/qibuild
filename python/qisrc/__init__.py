@@ -4,6 +4,9 @@
 
 """ This package contains the qisrc actions """
 
-from qisrc import git
-from qisrc import worktree
-from qisrc.worktree import open_worktree
+
+##
+# Backward compat layer for qisys
+
+from qisys import worktree
+from qisys.worktree import open_worktree

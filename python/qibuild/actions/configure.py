@@ -6,8 +6,9 @@
 
 """
 
+from qisys import ui
 import qibuild
-from qibuild import ui
+import qibuild.cmake
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -51,7 +52,7 @@ def do(args):
     if args.werror:
         args.cmake_flags.append("QI_WERROR=ON")
 
-    toc = qibuild.toc_open(args.worktree, args)
+    toc = qibuild.toc.toc_open(args.worktree, args)
     (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
     if args.build_directory:
         projects[0].set_custom_build_directory(args.build_directory)

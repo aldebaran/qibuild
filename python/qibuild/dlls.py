@@ -8,9 +8,9 @@
 import os
 import qibuild
 
-import qibuild.log
+import qisys.log
 
-LOGGER = qibuild.log.get_logger(__name__)
+LOGGER = qisys.log.get_logger(__name__)
 
 def fix_dlls(sdk_dir, build_env=None, paths=None, mingw=False):
     """ Copy the dlls fron the toolchains and the other build dirs
@@ -21,7 +21,7 @@ def fix_dlls(sdk_dir, build_env=None, paths=None, mingw=False):
     if not paths:
         return
     dest = os.path.join(sdk_dir, "bin")
-    qibuild.sh.mkdir(dest, recursive=True)
+    qisys.sh.mkdir(dest, recursive=True)
     dlls_to_copy = list()
     for path in paths:
         bin_dir = os.path.join(path, "bin")
@@ -49,7 +49,7 @@ def fix_dlls(sdk_dir, build_env=None, paths=None, mingw=False):
 
     for dll_to_copy in dlls_to_copy:
         try:
-            qibuild.sh.safe_copy(dll_to_copy, dest)
+            qisys.sh.safe_copy(dll_to_copy, dest)
         except Exception, e:
             mess  = "Could not copy %s to %s\n" % (dll_to_copy, dest)
             mess += "Error was: %s\n" % e

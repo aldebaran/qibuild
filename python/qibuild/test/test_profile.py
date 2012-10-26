@@ -4,7 +4,7 @@
 
 import pytest
 
-import qisrc.worktree
+import qisys.worktree
 import qibuild.toc
 
 
@@ -31,7 +31,7 @@ def open_toc_with_profiles(tmpdir, profiles=None, flags=None):
   </profiles>
 </qibuild>
 """)
-    worktree = qisrc.worktree.open_worktree(tmpdir.strpath)
+    worktree = qisys.worktree.open_worktree(tmpdir.strpath)
     toc = qibuild.toc.Toc(worktree, cmake_flags=flags, profiles=profiles)
     return toc
 
@@ -67,7 +67,7 @@ def test_non_existing_profile(tmpdir):
         toc = open_toc_with_profiles(tmpdir, profiles=["doesnotexist"])
 
 def test_add_profile(tmpdir):
-    worktree = qisrc.worktree.create(tmpdir.strpath)
+    worktree = qisys.worktree.create(tmpdir.strpath)
     qibuild_xml = tmpdir.join(".qi").join("qibuild.xml")
     profile = qibuild.profile.Profile("foo")
     profile.cmake_flags = ["FOO=BAR"]

@@ -22,7 +22,7 @@ def update_qibuild_cmake(template_path, git_repo):
 
     """
     try:
-        out = qibuild.command.check_output(["git", "status"], cwd=git_repo)
+        out = qisys.command.check_output(["git", "status"], cwd=git_repo)
     except subprocess.CalledProcessError, e:
         mess  = "Could not run git status in %s\n" % git_repo
         mess += "Error was:\n"
@@ -34,7 +34,7 @@ def update_qibuild_cmake(template_path, git_repo):
         mess += out
         raise Exception(mess)
 
-    out = qibuild.command.check_output(["git", "ls-files"], cwd=git_repo)
+    out = qisys.command.check_output(["git", "ls-files"], cwd=git_repo)
     filenames = out.splitlines()
     for filename in filenames:
         basename = os.path.basename(filename)

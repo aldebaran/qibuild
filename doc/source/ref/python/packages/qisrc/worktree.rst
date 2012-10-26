@@ -1,10 +1,10 @@
-qisrc.worktree -- Using a :term:`worktree`
+qisys.worktree -- Using a :term:`worktree`
 ============================================
 
 
-.. py:module:: qisrc.worktree
+.. py:module:: qisys.worktree
 
-qisrc.worktree.WorkTree
+qisys.worktree.WorkTree
 -------------------------
 
 
@@ -46,7 +46,7 @@ qisrc.worktree.WorkTree
 Other functions in this module
 ------------------------------
 
-qisrc.worktree.open_worktree
+qisys.worktree.open_worktree
 +++++++++++++++++++++++++++++++
 
 .. autofunction:: open_worktree
@@ -57,7 +57,7 @@ Typical usage from an action is:
 
     # To handle --work-tree option
     def configure_parser(parser):
-        qisrc.worktree.worktree_parser(parser)
+        qisys.worktree.worktree_parser(parser)
 
     def do(args):
         qiwt = qisrc.open_worktree(args.work_tree)

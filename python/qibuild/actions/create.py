@@ -4,13 +4,13 @@
 """Create a new project """
 
 import os
-import qibuild.log
+import qisys.log
 
 import qisrc
 import qibuild
 
 
-LOGGER = qibuild.log.get_logger(__name__)
+LOGGER = qisys.log.get_logger(__name__)
 
 def copy_helper(project_name, directory):
     """Create a new project in the specified directory.
@@ -42,7 +42,7 @@ def do(args):
     # Try to open a worktree.
     # If not, ask the user if he wants to create one:
     qiwt = None
-    qiwt = qisrc.open_worktree(args.worktree)
+    qiwt = qisys.worktree.open_worktree(args.worktree)
 
     project_name = args.project_name
     project_path = os.path.join(qiwt.root, project_name)
@@ -53,11 +53,11 @@ def do(args):
     copy_helper(project_name, project_path)
 
     if args.git:
-        qibuild.command.call(["git", "init"], cwd=project_path)
+        qisys.command.call(["git", "init"], cwd=project_path)
         with open(os.path.join(project_path, ".gitignore"), "w") as fp:
             fp.write("build-*\n")
-        qibuild.command.call(["git" , "add" , "."], cwd=project_path)
-        qibuild.command.call(["git" , "commit" , "-m" , "initial commit"], cwd=project_path)
+        qisys.command.call(["git" , "add" , "."], cwd=project_path)
+        qisys.command.call(["git" , "commit" , "-m" , "initial commit"], cwd=project_path)
 
     LOGGER.info("New project initialized in %s", project_path)
     qiwt.add_project(project_path)

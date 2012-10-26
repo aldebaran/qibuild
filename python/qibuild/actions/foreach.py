@@ -9,7 +9,7 @@ For instance
   qibuild --ignore-errors -- ls -l
 """
 
-import qibuild.log
+import qisys.log
 
 import qisrc
 import qibuild
@@ -24,13 +24,13 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    qiwt = qisrc.open_worktree(args.worktree)
-    logger = qibuild.log.get_logger(__name__)
+    qiwt = qisys.worktree.open_worktree(args.worktree)
+    logger = qisys.log.get_logger(__name__)
     for project in qiwt.buildable_projects:
         logger.info("Running `%s` for %s", " ".join(args.command), project.src)
         try:
-            qibuild.command.call(args.command, cwd=project.path)
-        except qibuild.command.CommandFailedException, err:
+            qisys.command.call(args.command, cwd=project.path)
+        except qisys.command.CommandFailedException, err:
             if args.ignore_errors:
                 logger.error(str(err))
                 continue

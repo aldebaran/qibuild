@@ -7,7 +7,7 @@
 """
 
 import qibuild
-import qibuild.ui
+import qisys.ui
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -42,9 +42,9 @@ def get_deps(toc, project):
 def do(args):
     """Main entry point"""
     if args.deep and args.reverse:
-        qibuild.ui.error("you can't use --deep with --reverse.")
+        qisys.ui.error("you can't use --deep with --reverse.")
         exit(1)
-    toc = qibuild.toc_open(args.worktree, args)
+    toc = qibuild.toc.toc_open(args.worktree, args)
     if args.deep:
         (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
     else:
@@ -57,21 +57,21 @@ def do(args):
         projects = [project]
 
 
-    qibuild.ui.info("legend:",
-                    qibuild.ui.red  , "buildtime",
-                    qibuild.ui.white, "buildtime+runtime",
-                    qibuild.ui.green, "runtime")
-    qibuild.ui.info()
+    qisys.ui.info("legend:",
+                    qisys.ui.red  , "buildtime",
+                    qisys.ui.white, "buildtime+runtime",
+                    qisys.ui.green, "runtime")
+    qisys.ui.info()
 
 
     for project in projects:
         if args.reverse:
-            qibuild.ui.info(qibuild.ui.green, "*",
-                            qibuild.ui.blue, project.name, qibuild.ui.reset,
+            qisys.ui.info(qisys.ui.green, "*",
+                            qisys.ui.blue, project.name, qisys.ui.reset,
                             "reverse dependencies:")
         else:
-            qibuild.ui.info(qibuild.ui.green, "*",
-                            qibuild.ui.blue, project.name, qibuild.ui.reset,
+            qisys.ui.info(qisys.ui.green, "*",
+                            qisys.ui.blue, project.name, qisys.ui.reset,
                             "dependencies:")
 
         if args.reverse:
@@ -93,11 +93,11 @@ def do(args):
         bpackage_names = set(bpackage_names) - set(brpackage_names)
         rpackage_names = set(rpackage_names) - set(brpackage_names)
 
-        qibuild.ui.info("  projects:",
-                        qibuild.ui.red  , " ".join(bproject_names),
-                        qibuild.ui.white, " ".join(brproject_names),
-                        qibuild.ui.green, " ".join(rproject_names))
-        qibuild.ui.info("  packages:",
-                        qibuild.ui.red  , " ".join(bpackage_names),
-                        qibuild.ui.white, " ".join(brpackage_names),
-                        qibuild.ui.green, " ".join(rpackage_names))
+        qisys.ui.info("  projects:",
+                        qisys.ui.red  , " ".join(bproject_names),
+                        qisys.ui.white, " ".join(brproject_names),
+                        qisys.ui.green, " ".join(rproject_names))
+        qisys.ui.info("  packages:",
+                        qisys.ui.red  , " ".join(bpackage_names),
+                        qisys.ui.white, " ".join(brpackage_names),
+                        qisys.ui.green, " ".join(rpackage_names))

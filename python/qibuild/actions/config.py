@@ -5,6 +5,7 @@
 
 import subprocess
 
+import qisys
 import qisrc
 import qibuild
 import qibuild.wizard
@@ -26,7 +27,7 @@ def do(args):
     toc = None
     try:
         toc = qibuild.toc.toc_open(args.worktree, args)
-    except qisrc.worktree.NotInWorktree:
+    except qisys.worktree.NotInWorktree:
         pass
 
     if args.wizard:
@@ -43,11 +44,11 @@ def do(args):
     if args.edit:
         editor = qibuild_cfg.defaults.env.editor
         if not editor:
-            editor = qibuild.interact.get_editor()
+            editor = qisys.interact.get_editor()
             qibuild_cfg.defaults.env.editor = editor
             qibuild_cfg.write()
 
-        full_path = qibuild.command.find_program(editor)
+        full_path = qisys.command.find_program(editor)
         if is_local:
             cfg_path = toc.config_path
         else:

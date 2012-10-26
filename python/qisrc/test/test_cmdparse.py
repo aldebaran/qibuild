@@ -5,17 +5,17 @@
 import argparse
 import pytest
 
-import qisrc.worktree
+import qisys.worktree
 import qisrc.cmdparse
 
-import qibuild.sh
+import qisys.sh
 
 def create_worktree(tmpdir):
     """ Helper function: Create a nice worktree with
     several git projects
 
     """
-    worktree = qisrc.worktree.create(tmpdir.strpath)
+    worktree = qisys.worktree.create(tmpdir.strpath)
     my_gui = tmpdir.mkdir("gui").mkdir("my_gui")
     worktree.add_project(my_gui.strpath)
     lib = tmpdir.mkdir("lib")
@@ -68,7 +68,7 @@ def test_worktree_given(tmpdir):
 def test_using_all(tmpdir):
     worktree = create_worktree(tmpdir)
     libbar = tmpdir.join("lib").join("libbar").join("src")
-    with qibuild.sh.change_cwd(libbar.strpath):
+    with qisys.sh.change_cwd(libbar.strpath):
         res = parse_args("--all")
         assert res == ["gui/my_gui", "lib/libbar", "lib/libfoo", "spam", "spam/eggs"]
 
@@ -76,21 +76,21 @@ def test_no_arg(tmpdir):
     worktree = create_worktree(tmpdir)
     # subdir of a project:
     libbar = tmpdir.join("lib").join("libbar").join("src")
-    with qibuild.sh.change_cwd(libbar.strpath):
+    with qisys.sh.change_cwd(libbar.strpath):
         res = parse_args()
         assert res == ["lib/libbar"]
     # directory containing several projects
     lib = tmpdir.join("lib")
-    with qibuild.sh.change_cwd(lib.strpath):
+    with qisys.sh.change_cwd(lib.strpath):
         res = parse_args()
         assert res == ["lib/libbar", "lib/libfoo"]
     # root of the worktree:
-    with qibuild.sh.change_cwd(worktree.root):
+    with qisys.sh.change_cwd(worktree.root):
         res = parse_args()
         assert res == ["gui/my_gui", "lib/libbar", "lib/libfoo", "spam", "spam/eggs"]
     # other
     other = tmpdir.join("other")
-    with qibuild.sh.change_cwd(other.strpath):
+    with qisys.sh.change_cwd(other.strpath):
         # pylint: disable-msg=E1101
         with pytest.raises(Exception) as e:
             parse_args()
@@ -99,17 +99,17 @@ def test_no_arg(tmpdir):
 def test_one_arg(tmpdir):
     worktree = create_worktree(tmpdir)
     # As a path (1)
-    with qibuild.sh.change_cwd(worktree.root):
+    with qisys.sh.change_cwd(worktree.root):
         res = parse_args("lib")
         assert res == ["lib/libbar", "lib/libfoo"]
     # As a path (2)
     gui = tmpdir.join("gui")
-    with qibuild.sh.change_cwd(gui.strpath):
+    with qisys.sh.change_cwd(gui.strpath):
         res = parse_args("../lib")
         assert res == ["lib/libbar", "lib/libfoo"]
     # As a project name:
     gui = tmpdir.join("gui")
-    with qibuild.sh.change_cwd(gui.strpath):
+    with qisys.sh.change_cwd(gui.strpath):
         res = parse_args("lib/libbar")
         assert res == ["lib/libbar"]
     # Non existing project name:
@@ -119,7 +119,7 @@ def test_one_arg(tmpdir):
     assert "No project in" in str(e)
     # Subdir of a project should also raise when it's explicit
     # (ie, not guessed from cwd):
-    with qibuild.sh.change_cwd(worktree.root):
+    with qisys.sh.change_cwd(worktree.root):
         # pylint: disable-msg=E1101
         with pytest.raises(Exception) as e:
             parse_args("lib/libbar/src")
@@ -128,15 +128,15 @@ def test_one_arg(tmpdir):
 def test_single(tmpdir):
     worktree = create_worktree(tmpdir)
     spam = tmpdir.join("spam")
-    with qibuild.sh.change_cwd(spam.strpath):
+    with qisys.sh.change_cwd(spam.strpath):
         assert parse_args("-s") == ["spam"]
         assert parse_args() == ["spam", "spam/eggs"]
-    with qibuild.sh.change_cwd(worktree.root):
+    with qisys.sh.change_cwd(worktree.root):
         # pylint: disable-msg=E1101
         with pytest.raises(Exception) as e:
             parse_args("-s", "lib/libfoo", "spam/eggs")
     assert "Using --single with several projects does not make sense" in str(e)
-    with qibuild.sh.change_cwd(worktree.root):
+    with qisys.sh.change_cwd(worktree.root):
         # pylint: disable-msg=E1101
         with pytest.raises(Exception) as e:
             parse_args("-s", "lib")
