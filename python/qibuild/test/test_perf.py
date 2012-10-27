@@ -14,6 +14,8 @@ import qibuild.performance
 from qibuild.test.test_toc import TestToc
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_cmake_parsing():
     with TestToc() as toc:
         proj = toc.get_project("perf")
@@ -34,6 +36,8 @@ def test_cmake_parsing():
         assert actual_tests == expected_tests
 
 
+# pylint: disable-msg=E1101
+@pytest.mark.slow
 def test_perf():
     with TestToc() as toc:
         proj = toc.get_project("perf")
