@@ -11,15 +11,14 @@
 """
 
 import sys
+import os
 import datetime
-
-ON_WIN = sys.platform.startswith("win")
 
 # Try using pyreadline so that we can
 # have colors on windows, too.
 _console = None
 HAS_PYREADLINE = True
-if ON_WIN:
+if os.name == 'nt':
     try:
         # pylint: disable-msg=F0401
         from pyreadline.console import Console
@@ -93,7 +92,7 @@ def _msg(*tokens, **kwargs):
     sep = kwargs.get("sep", " ")
     end = kwargs.get("end", "\n")
     with_color = CONFIG["color"]
-    if ON_WIN and not HAS_PYREADLINE or not fp.isatty():
+    if os.name == 'nt' and not HAS_PYREADLINE or not fp.isatty():
         with_color = False
     if CONFIG["timestamp"]:
         now = datetime.datetime.now()

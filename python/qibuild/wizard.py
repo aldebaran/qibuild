@@ -7,6 +7,7 @@
 """
 
 import os
+import sys
 
 from qisys import ui
 import qisys
@@ -17,20 +18,13 @@ def guess_cmake(qibuild_cfg):
     """ Try to find cmake
 
     """
+    # FIXME: loook for it in registry on windows
+    # FIXME: look for it in /Applications on mac
     build_env = qibuild.config.get_build_env()
     cmake = qisys.command.find_program("cmake", env=build_env)
-    platform = qibuild.get_platform()
-    if platform == "windows":
-        # FIXME: loook for it in registry
-        pass
-    if platform == "mac":
-        # FIXME: hard-code some path in /Applications
-        pass
-
     if cmake:
         print "Found CMake:" , cmake
         return cmake
-
     print "CMake not found"
     cmake = qisys.interact.ask_program("Please enter full CMake path")
     if not cmake:
@@ -57,10 +51,9 @@ def ask_ide(qibuild_cfg):
 
     """
     ides = ["QtCreator", "Eclipse CDT"]
-    platform = qibuild.get_platform()
-    if platform == "windows":
+    if sys.platform.startswith("win"):
         ides.append("Visual Studio")
-    if platform == "mac":
+    if sys.platform == "darwin":
         ides.append("Xcode")
     ide = qisys.interact.ask_choice(ides,
         "Please choose an IDE")
@@ -195,7 +188,7 @@ def run_config_wizard(toc):
     if ide:
         configure_ide(qibuild_cfg, ide)
 
-    if qibuild.get_platform() == "windows":
+    if sys.platform.startswith("win"):
         ask_incredibuild(qibuild_cfg)
 
     qibuild_cfg.write()

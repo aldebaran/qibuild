@@ -20,7 +20,4 @@ DOC:
 Compat:
   * Improve compatibility with rosbuild
 
-Python:
-  * remove qibuild.get_platform and use os.name instead
-  * remove ON_WIN and use os.name == 'nt' instead
 

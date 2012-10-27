@@ -376,29 +376,26 @@ Platform-dependent code
 
 Please use::
 
-  import qibuild
-  platform = qibuild.get_platform()
 
-  if platform == "linux":
-     do_linux()
-  elif platform == "mac":
-    do_mac()
-  elif platform == "windows":
-    do_windows()
+    # Windows vs everything else:
+    import os
+    if os.name == "posix":
+        do_posix() # mac, linux
+    if os.name == 'nt':
+        do_windows()
 
+    # Discriminate platform per platform:
+    import sys
 
-And do not use ``sys.platform`` directly. This way
-if when we add a new supported platform to ``qibuild``, we will
-know where to patch the code.
-
-Using this is also a good way to do it ::
-
-  import os
-
-  if os.name == 'posix':
-     # POSIX code
-  elif os.name == 'nt':
-     # Windows specific code
+    if sys.platform.startswith("win"):
+        # win32 or win64
+        do_win()
+    else if sys.platform.startswith("linux"):
+        # linux, linux2 or linux3
+        do_linux()
+    else if sys.platform == "darwin":
+        # mac
+        do_mac()
 
 
 Output messages to the user
