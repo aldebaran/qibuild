@@ -12,20 +12,15 @@ qiBuild:
 * configstore: merge dependencies and cflags properly
 * fix install component (only have two components: runtime and devel)
 
-qiSrc:
-
-* qisrc add should be able to read a base git url. For instance,
-  qisrc add foo/bar.git, should read a setting and clone git://example.com:foo/bar.git
-
 
 DOC:
  * Add a troubleshooting section and/or a FAQ
 
-Install:
-  * root's cmake list should honor CMAKE_INSTALL_PREFIX setting.
-  * qibuild.get_cmake_root_path() could use cmake instead of
-  trusting qibuild/config.py
 
 Compat:
   * Improve compatibility with rosbuild
+
+Python:
+  * remove qibuild.get_platform and use os.name instead
+  * remove ON_WIN and use os.name == 'nt' instead
 
