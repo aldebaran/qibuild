@@ -13,7 +13,7 @@ from qisrc.sync_build_profiles import sync_build_profiles
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
-    parser.add_argument("manifest_url")
+    parser.add_argument("manifest_url", nargs="?")
     parser.add_argument("manifest_name", nargs="?",
         help="Name of the manifest. Useful if you have several manifests")
     parser.add_argument("-b", "--branch", dest="branch",
