@@ -30,38 +30,40 @@ if ON_WIN:
 # ANSI color codes, as classes,
 # so that we can use ::
 #
-#  qisys.ui.msg("qisys.ui.bold, "This is bold", qisys.ui.reset)`
+#  qisys.ui.msg(qisys.ui.bold, "This is bold", qisys.ui.reset)
 class _Color:
-    def __init__(self, code):
-        self.code = code
+    def __init__(self, code, modifier=None):
+        self.code = '\033[%d' % code
+        if modifier is not None:
+            self.code += ';%dm' % modifier
+        else:
+            self.code += 'm'
 
-_esc = "\033["
+reset     = _Color(0)
+bold      = _Color(1)
+faint     = _Color(2)
+standout  = _Color(3)
+underline = _Color(4)
+blink     = _Color(5)
+overline  = _Color(6)
 
-reset     = _Color(_esc + "0m")
-bold      = _Color(_esc + "1m")
-faint     = _Color(_esc + "2m")
-standout  = _Color(_esc + "3m")
-underline = _Color(_esc + "4m")
-blink     = _Color(_esc + "5m")
-overline  = _Color(_esc + "6m")
+black      = _Color(30)
+darkred    = _Color(31)
+darkgreen  = _Color(32)
+brown      = _Color(33)
+darkblue   = _Color(34)
+purple     = _Color(35)
+teal       = _Color(36)
+lightgray  = _Color(37)
 
-black      = _Color(_esc + "30m")
-darkred    = _Color(_esc + "31m")
-darkgreen  = _Color(_esc + "32m")
-brown      = _Color(_esc + "33m")
-darkblue   = _Color(_esc + "34m")
-purple     = _Color(_esc + "35m")
-teal       = _Color(_esc + "36m")
-lightgray  = _Color(_esc + "37m")
-
-darkgray   = _Color(_esc + "30;1m")
-red        = _Color(_esc + "31;1m")
-green      = _Color(_esc + "32;1m")
-yellow     = _Color(_esc + "33;1m")
-blue       = _Color(_esc + "34;1m")
-fuchsia    = _Color(_esc + "35;1m")
-turquoise  = _Color(_esc + "36;1m")
-white      = _Color(_esc + "37;1m")
+darkgray   = _Color(30, 1)
+red        = _Color(31, 1)
+green      = _Color(32, 1)
+yellow     = _Color(33, 1)
+blue       = _Color(34, 1)
+fuchsia    = _Color(35, 1)
+turquoise  = _Color(36, 1)
+white      = _Color(37, 1)
 
 darkteal   = turquoise
 darkyellow = brown
