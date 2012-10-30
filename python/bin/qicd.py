@@ -41,13 +41,13 @@ def patch_sys_path():
 
 patch_sys_path()
 
-import qisrc
+import qisys.worktree
 
 def main():
     """ Main entry point """
     try:
         worktree = qisys.worktree.open_worktree()
-    except Exception:
+    except Exception, e:
         sys.stderr.write("Not in a worktree\n")
         sys.exit(2)
     if len(sys.argv) < 2:
