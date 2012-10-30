@@ -99,9 +99,9 @@ def do(args):
                     ui.blue, shortpath.ljust(max_len), ui.reset,
                     ui.green, ":", branch, "tracking", tracking)
             if ahead:
-                ui.info(ui.bold, "Your branch is", ahead, ui.reset, "commits ahead")
+                ui.info(ui.bold, "Your branch is", ahead, "commits ahead")
             if behind:
-                ui.info(ui.bold, "Your branch is", behind, ui.reset, "commits behind")
+                ui.info(ui.bold, "Your branch is", behind, "commits behind")
 
         if not git.is_clean(untracked=args.untracked_files):
             if args.untracked_files:
