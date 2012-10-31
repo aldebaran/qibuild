@@ -203,6 +203,9 @@ class Test:
             else:
                 res.message = _str_from_signal(-retcode)
         if self.valgrind:
+            if not os.path.isfile(valgrind_log):
+                ui.warning("The valgrind log file does not exist")
+                return
             parse_valgrind(valgrind_log, res)
         ui.debug('Putting result in result queue.')
         output_queue.put(res)
@@ -268,6 +271,9 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
     :return: a boolean to indicate if test was sucessful
 
     """
+    if valgrind:
+        if not qisys.command.find_program("valgrind"):
+            raise Exception("valgrind was not found on the system")
     if not build_env:
         build_env = qibuild.config.get_build_env()
     build_dir = project.build_directory
