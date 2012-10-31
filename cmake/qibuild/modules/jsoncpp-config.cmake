@@ -3,6 +3,6 @@
 ## found in the COPYING file.
 
 clean(JSONCPP)
-fpath(JSONCPP json/json.h)
+fpath(JSONCPP jsoncpp/json/json.h)
 flib(JSONCPP jsoncpp)
 export_lib(JSONCPP)
