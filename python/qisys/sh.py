@@ -166,8 +166,8 @@ def install(src, dest, filter_fun=None, quiet=False):
         mess += '%s does not exist' % src
         raise Exception(mess)
 
-    src  = to_native_path(src)
-    dest = to_native_path(dest)
+    src  = to_native_path(src, normcase=False)
+    dest = to_native_path(dest, normcase=False)
     LOGGER.debug("Installing %s -> %s", src, dest)
     #pylint: disable-msg=E0102
     # (function IS already defined, that's the point!)
@@ -416,13 +416,15 @@ def to_dos_path(path):
     res = path.replace("/", "\\")
     return res
 
-def to_native_path(path):
+def to_native_path(path, normcase=True):
     """Return an absolute, native path from a path,
-    (and all lower-case on case-insensitive filesystems)
+    :param normcase: make sure the path is all lower-case on
+                     case-insensitive filesystems
 
     """
     path = os.path.expanduser(path)
-    path = os.path.normcase(path)
+    if normcase:
+        path = os.path.normcase(path)
     path = os.path.normpath(path)
     path = os.path.abspath(path)
     path = os.path.realpath(path)
