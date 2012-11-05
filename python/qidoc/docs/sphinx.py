@@ -57,6 +57,15 @@ class SphinxDoc(Documentation):
 
     def _build(self, docs, opts, **kwargs):
         config_path = os.path.join(self.src, "qidoc")
+        # Generates a zip of the files.
+        zips_path = os.path.join(self.src, "_zips")
+        qisys.sh.mkdir(zips_path)
+        for (root, directories, _files) in os.walk(self.src):
+            for directory in directories:
+                zipme = os.path.join(root, directory, ".zipme")
+                if os.path.exists(zipme):
+                    qisys.archive.compress(os.path.join(root, directory),
+                                             algo="zip", quiet=True)
         # Try with sphinx-build2 (for arch), then fall back on
         # sphinx-build
         sphinx_build2 = qisys.command.find_program("sphinx-build2")
@@ -89,12 +98,3 @@ class SphinxDoc(Documentation):
             env["LC_ALL"] = "en_US.UTF-8"
         qisys.command.call(cmd, cwd=self.src, env=env)
 
-        # Generates a zip of the files.
-        zips_path = os.path.join(self.src, "_zips")
-        qisys.sh.mkdir(zips_path)
-        for (root, directories, _files) in os.walk(self.src):
-            for directory in directories:
-                zipme = os.path.join(root, directory, ".zipme")
-                if os.path.exists(zipme):
-                    qisys.archive.compress(os.path.join(root, directory),
-                                             algo="zip", quiet=True)
