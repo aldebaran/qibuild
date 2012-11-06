@@ -64,6 +64,9 @@ class QiBuildTestCase(unittest.TestCase):
     def test_configure(self):
         self._run_action("configure", "world")
 
+    def test_configure_all(self):
+        self._run_action("configure", "--all")
+
     def test_make(self):
         self._run_action("configure", "hello")
         self._run_action("make", "hello")
