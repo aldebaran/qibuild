@@ -51,7 +51,7 @@ your are not going to write good software.
 Note that it is perfectly reasonable to also add the specifications in
 the qibuild documentation even before writing the tests, that's a good
 way to get feedback. It may seem strange to start by writing the
-documentation, but we also fint this technique very effective.
+documentation, but we also find this technique very effective.
 
 Last, but not least, writing the tests first makes you think about the
 *interface* of the new code you are going to write, which is also a good thing:
