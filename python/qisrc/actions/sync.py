@@ -53,6 +53,11 @@ def do(args):
         else:
             ui.info(ui.bold, "Pulling", ui.blue, project.src)
 
+        if not project.branch or not project.remote:
+            ui.info(ui.green, "Project", ui.blue, project.src, ui.green, "not configured "
+                    "in any manifest, skipping")
+            continue
+
         git = qisrc.git.Git(project.path)
         error = git.update_branch(project.branch, project.remote,
                                  fetch_first=True)
