@@ -154,13 +154,13 @@ class ProjectNameCollisionError(Exception):
         self.project1, self.project2 = project1, project2
 
     def __str__(self):
-        return """Two {doc_type} projects have the same name: {name}
+        return """Two projects have the same name: {name}
 First project is in: {path1} ({type1})
 Second project is in: {path2} ({type2})
 Please check your configuration.""".format(
             name = self.project1.name,
-            path1 = self.project1.path, type1 = self.project1.type_name(),
-            path2 = self.project2.path, type2 = self.project2.type_name(),
+            path1 = self.project1.src, type1 = self.project1.type_name(),
+            path2 = self.project2.src, type2 = self.project2.type_name(),
         )
 
 
