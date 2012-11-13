@@ -17,31 +17,31 @@ Right now only ``git`` is supported
 COMMANDS
 --------
 
+Commands:
 
-Useful commands:
-
-pull
-  Run ``git pull`` on every project
+add [--src ...] [[--branch|-b] ...] [URL|PATH]
+  Add a new project to a worktree.
 
 foreach -- *COMMAND* *COMMAND ARGS*
-  Run the COMMAND on each project
+  Run the same command on each source project.
 
-add *URL*
-  Get the project sources from the given URL and add it to the
-  work tree
+grep [pattern] [-- git grep options]
+  Run git grep on every project.
 
-fetch *MANIFEST*
-  Fetch all the project sources using a manifest URL
+init [[--branch|-b] ...] [[--profile|-p] ...] [--force|-f] [--no-review] MANIFEST_URL [MANIFEST_NAME]
+  Init a new qisrc workspace.
 
-The manifest file should look like::
+list [PATTERN]
+  List the names and paths of every project, or those matching a pattern.
 
-  <manifest>
-    <project
-      name="foo"
-      url="git@git.example.com:foo.git"
-    />
-    <project
-      name="bar"
-      url="git@git.example.com:bar.git"
-    />
-  </manifest>
+push [--no-review] [-n|--dry-run] [[--cc|--reviewers] ...]
+  Push changes for review.
+
+remove [--from-disk] [SRC]
+  Remove a project from a worktree.
+
+status [-u|--untracked-files] [-b|--show-branch]
+  List the state of all git repositories and exit.
+
+sync [--no-review]
+  Synchronize the given worktree with its manifests.
