@@ -28,8 +28,8 @@ Rationale
 Write a failing test first
 +++++++++++++++++++++++++++
 
-Having a test that fails at first if a good thing, because you can know the
-test is actually testing something, and is not doing a complex version of
+Having a test that fails at first is a good thing, because you can know the
+test is actually testing something, and is not doing a sophisticated version of
 
 .. code-block:: python
 
