@@ -148,7 +148,7 @@ def configure_local_settings(toc):
                 toc.save_config()
     answer = qisys.interact.ask_yes_no(
         "Do you want to use a unique build dir?"
-        "(mandatory when using Eclipse)",
+        " (mandatory when using Eclipse)",
         default=False)
 
     build_dir = None
