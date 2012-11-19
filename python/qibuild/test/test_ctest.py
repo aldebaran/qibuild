@@ -4,6 +4,7 @@
 
 import pytest
 from qibuild.ctest import parse_ctest_test_files
+from qibuild.ctest import TestResult
 
 def test_parse_simple(tmpdir):
     root_ctest = tmpdir.join("CTestTestfile.cmake")
@@ -52,3 +53,23 @@ SET_TESTS_PROPERTIES(bar PROPERTIES SPAM EGGS)
         parse_ctest_test_files(tmpdir.strpath)
     assert "SET_TESTS_PROPERTIES called with wrong name" in e.value.message
 
+def test_verbosity(tmpdir, capsys):
+    test = TestResult("test", 0, 1, verbose=True)
+    test.ok = False
+    test.print_result()
+    out, err = capsys.readouterr()
+    assert "no output" in out
+
+    test2 = TestResult("test", 0, 1, verbose=True)
+    test2.ok = False
+    test2.out = "on output"
+    test2.print_result()
+    out, err = capsys.readouterr()
+    assert "on output" in out
+
+    test3 = TestResult("test", 0, 1, verbose=False)
+    test3.ok = False
+    test3.out = "output"
+    test3.print_result()
+    out, err = capsys.readouterr()
+    assert "output" not in out

@@ -78,10 +78,11 @@ class TestResult:
             ui.info(ui.red, "[FAIL]", self.message)
             if qisys.command.SIGINT_EVENT.is_set():
                 pass
-            elif not self.verbose and self.out:
-                print self.out
-            else:
-                print '\tno output\n'
+            elif self.verbose:
+                if self.out:
+                    print self.out
+                else:
+                    print '\tno output\n'
         sys.stdout.flush()
         if self.result_dir is not None:
             xml_out = os.path.join(self.result_dir, self.test_name + ".xml")
