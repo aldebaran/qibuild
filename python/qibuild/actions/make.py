@@ -6,6 +6,8 @@
 
 """
 
+import os
+
 from qisys import ui
 import qibuild
 import qibuild.cmdparse
@@ -25,6 +27,20 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     toc = qibuild.toc.toc_open(args.worktree, args)
+
+    # Force single to False to check all dependencies.
+    is_single = args.single
+    args.single = False
+    (_, all_projects) = qibuild.cmdparse.deps_from_args(toc, args)
+    for project in all_projects:
+        build_dir = project.build_directory
+        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
+        if not os.path.exists(cmake_cache):
+            qibuild.toc.check_configure(toc, project)
+
+
+    # Reset single at the initial value.
+    args.single = is_single
     (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
     use_incredibuild = toc.config.build.incredibuild
 

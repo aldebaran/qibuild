@@ -782,6 +782,14 @@ def advise_using_configure(self, project):
 
     raise TocException(mess)
 
+def check_configure(toc, project):
+    """ Check if we need to run qibuild configure
+    before make
+    """
+    build_dir = project.build_directory
+    cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
+    if not os.path.exists(cmake_cache):
+        advise_using_configure(toc, project)
 
 def handle_old_qibuild_cfg(worktree):
     """ Handle processing a qibuild.cfg file,
