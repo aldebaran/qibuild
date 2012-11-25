@@ -253,10 +253,12 @@ class WorkTree:
         self.dump()
         self.load()
 
-
-
     def __repr__(self):
-        res = "<worktree in %s>" % self.root
+        res  = "<Worktree in %s\n" % self.root
+        res += repr_list_projects(self.projects)
+        res += repr_list_projects(self.git_projects, "git_projects")
+        res += repr_list_projects(self.git_projects, "buildable_projects")
+        res += ">\n"
         return res
 
 
@@ -392,5 +394,22 @@ class Project:
         return res
 
     def __repr__(self):
-        res = "<Project in %s>" % (self.src)
+        res  = "<Project in %s\n" % (self.src)
+        res += "   path: %s\n" % (self.path)
+        #res += "   git_project: %s\n" % (self.git_project)
+        res += "   subprojects: %s\n" if len(self.subprojects) else ""
+        res += "   is a manifest\n" if self.manifest else ""
+        res += "   on %s/%s\n" % (self.remote, self.branch)
+        res += "   profile: %s\n" % (self.profile)
+        res += "   is reviewed\n" if self.review else ""
+        res += ">\n"
         return res
+
+def repr_list_projects(projects, name = "projects"):
+    res = ""
+    if len(projects):
+       res += name
+       for i, project in enumerate(projects):
+          res += "(%s) %s, " % (i, project.src)
+       res += "\n"
+    return res
