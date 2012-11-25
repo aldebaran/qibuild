@@ -48,16 +48,24 @@ def fetch_manifest(worktree, manifest_git_url, branch="master",
         raise Exception(mess)
     return manifest_file
 
+def fetch_load_manifest(worktree, manifest_git_url, branch="master",
+    profile="default",
+    src="manifest/default"):
+    """ Fetch the manifest and load it.
+    Return a Manifest with the fetched manifest
+    """
+    manifest_file = fetch_manifest(worktree, manifest_git_url, branch, profile, src)
+    return qisrc.manifest.load(manifest_file)
 
-def init_worktree(worktree, manifest_location, setup_review=True):
-    """ (re)-intianlize a worktree given a manifest location.
+
+def init_worktree(worktree, manifest, setup_review=True):
+    """ (re)-initialize a worktree given a manifest.
     Clonie any missing repository, set the correct
     remote and tracking branch on every repository
 
     :param setup_review: Also set up the projects for review
     """
     errors = list()
-    manifest = qisrc.manifest.load(manifest_location)
     if not manifest.projects:
         return
     project_count = len(manifest.projects)

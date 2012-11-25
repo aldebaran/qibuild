@@ -51,9 +51,10 @@ def do(args):
         manifest = manifest_url
         manifest_is_a_regular_file = True
     else:
-        manifest = qisrc.sync.fetch_manifest(worktree,
+        fetched_manifest = qisrc.sync.fetch_manifest(worktree,
             manifest_url, branch=branch, src=manifest_src,
             profile=args.profile)
+        manifest = qisrc.manifest.load(fetched_manifest)
     qisrc.sync.init_worktree(worktree, manifest, setup_review=args.setup_review)
     sync_build_profiles(worktree, manifest)
     if not manifest_is_a_regular_file:
