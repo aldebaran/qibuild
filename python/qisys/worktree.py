@@ -100,9 +100,8 @@ class WorkTree:
         self.dump()
         self.load()
 
-    def set_project_review(self, src, review):
+    def set_project_review(self, project):
         """ Mark a project as being under code review """
-        project = self.get_project(src, raises=True)
         self.update_project_config(project.src, "review", "true")
         self.dump()
         self.load()

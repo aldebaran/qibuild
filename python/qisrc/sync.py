@@ -83,7 +83,7 @@ def init_worktree(worktree, manifest_location, setup_review=True):
                                            remote=p_remote)
         p_path = wt_project.path
         if project.review and setup_review and setup_ok:
-            worktree.set_project_review(p_src, True)
+            worktree.set_project_review(project)
             # If setup failed once, no point in trying for every project
             setup_ok = qisrc.review.setup_project(p_path, project.name,
                                                   project.review_url, p_revision)
