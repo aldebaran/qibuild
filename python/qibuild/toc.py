@@ -64,7 +64,7 @@ Known profiles are: {profiles}
 Please check your worktree configuration in:
 {qibuild_xml} \
 """.format(name=self.profile_name, qibuild_xml=qibuild_xml,
-           profiles=profiles.keys())
+           profiles=', '.join(sorted(profiles.keys())))
 
 
 class ConfigureFailed(Exception):
