@@ -9,4 +9,5 @@
   <project src="world" />
   <project src="perf" />
   <project src="config_h" />
+  <project src="submodule" />
 </worktree>
