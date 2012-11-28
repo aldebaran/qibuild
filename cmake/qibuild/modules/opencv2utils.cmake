@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-set(_cv_versions "2.3.1")
+set(_cv_versions "2.3.1" "2.4.3")
 
 function(opencv2_flib name)
   cmake_parse_arguments(ARG "" "" "DEPENDS" ${ARGN})
