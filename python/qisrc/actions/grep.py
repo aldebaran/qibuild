@@ -36,7 +36,8 @@ def do(args):
                         qisys.ui.reset)
         git = qisrc.git.Git(project.path)
         (status, out) = git.call("grep", *git_grep_opts, raises=False)
-        print out
+        if out != "":
+          print out
         if status != 0:
             retcode = 1
     sys.exit(retcode)
