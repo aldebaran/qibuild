@@ -7,7 +7,6 @@ from qibuild.test.test_toc import TestToc
 
 # pylint: disable-msg=E1101
 @pytest.mark.slow
-@pytest.mark.xfail
 def test_build():
     with TestToc() as toc:
         proj = toc.get_project("submodule")

@@ -43,8 +43,10 @@ function(qi_submodule_create name)
   qi_abspath(_SRC ${_SRC})
   # Note: this function may be called more that once, that why we
   # ADD values inside cache if they are already here.
-  qi_global_set(${_OUT_src}           ${${_OUT_src}}           ${_SRC})
-  qi_global_set(${_OUT_depends}       ${${_OUT_depends}}       ${ARG_DEPENDS})
+  qi_global_get(_OUT_src_content ${_OUT_src})
+  qi_global_get(_OUT_depends_content ${_OUT_depends})
+  qi_global_set(${_OUT_src} ${_OUT_src_content} ${_SRC})
+  qi_global_set(${_OUT_depends} ${_OUT_depends_content} ${ARG_DEPENDS})
 endfunction()
 
 
