@@ -15,5 +15,5 @@ qi_submodule_add(mysubmodule SRC mylibboostfeature.cpp myprivateboostheader.hpp 
                           IF WITH_BOOST)
 
 # this creates a binary that have a dependencies on Qt and boost (if WITH_BOOST is set)
-# sources are taken from the submodule
+# sources are taken from the submodule. Dependencies are linked with when appropriate.
 qi_create_bin(mybin SUBMODULE mysubmodule)
