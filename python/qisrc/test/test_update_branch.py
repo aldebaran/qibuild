@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import pytest
 from qisrc.test.fake_git import FakeGit
 
 def test_simple():
@@ -102,6 +103,20 @@ def test_rebase_fails():
     git.add_result("rebase", 0, "")
     error = git.update_branch("master", "origin")
     assert "Conflict in foo.txt" in error
+    git.check()
+
+@pytest.mark.xfail
+def test_stash_then_rebase_fails():
+    git = FakeGit("repo")
+    git.add_result("submodule", 0, "")
+    git.add_result("fetch", 0, "")
+    git.add_result("symbolic-ref", 0, "refs/heads/master")
+    git.add_result("status", 1, "Unstaged changes\n M foo.txt\n")
+    git.add_result("stash", 0, "")
+    git.add_result("rebase", 1, "Conflict in foo.txt")
+    git.add_result("stash", 0, "") # qisrc should stash pop
+    error = git.update_branch("master", "origin")
+    #assert "Conflict in foo.txt" in error
     git.check()
 
 def test_rebase_abort_fails():
