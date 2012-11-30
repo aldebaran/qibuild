@@ -52,8 +52,7 @@ def sync_all(worktree, args):
         git.pull(quiet=True)
         manifest_filename = manifest_project.profile + ".xml"
         manifest_xml = os.path.join(manifest_project.path, manifest_filename)
-        manifest = qisrc.manifest.load(manifest_xml)
-        qisrc.sync.init_worktree(worktree, manifest, setup_review=args.setup_review)
+        qisrc.sync.init_worktree(worktree, manifest_xml, setup_review=args.setup_review)
         sync_build_profiles(worktree, manifest_xml)
 
 
