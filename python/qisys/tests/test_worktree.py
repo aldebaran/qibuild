@@ -13,7 +13,6 @@ import pytest
 
 import qisys.sh
 import qisys.worktree
-import qisrc
 
 class WorktreeTestCase(unittest.TestCase):
     def setUp(self):
@@ -259,18 +258,6 @@ def test_nested_qiprojects(tmpdir):
     c_proj = worktree.get_project("a/b/c")
     assert c_proj.git_project.src == a_proj.src
 
-
-def test_create_in_git_dir(tmpdir):
-    a_git = tmpdir.mkdir("a_git_project")
-    a_manifest = tmpdir.join("a_manifest.xml")
-    a_manifest.write("<manifest />")
-    git = qisrc.git.Git(a_git.strpath)
-    git.init()
-    work = a_git.mkdir("work")
-    # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
-        qisys.worktree.create(work.strpath)
-    assert "inside a git project" in e.value.message
 
 
 if __name__ == "__main__":
