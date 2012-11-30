@@ -80,42 +80,22 @@ class Manifest():
         """
         self.xml_path = xml_path
         tree = qixml.read(xml_path)
+
         remote_elems = tree.findall("remote")
         for remote_elem in remote_elems:
-            remote = Remote()
-            remote.parse(remote_elem)
+            remote = remote_parse(remote_elem)
             self.remotes[remote.name] = remote
-        project_elems = tree.findall("project")
-        for project_elem in project_elems:
-            project = Project()
-            project.parse(project_elem)
-            self.projects.append(project)
-        blacklist_elems = tree.findall("blacklist")
-        for blacklist_elem in blacklist_elems:
-            name = blacklist_elem.get("name")
-            if name:
-                self.blacklist.append(name)
-        manifest_elems = tree.findall("manifest")
-        for manifest_elem in manifest_elems:
-            manifest_url = manifest_elem.get("url")
-            if manifest_url:
-                dirname = os.path.dirname(xml_path)
-                sub_manifest_xml = os.path.join(dirname, manifest_url)
-                sub_manifest = Manifest()
-                sub_manifest.xml_path = sub_manifest_xml
-                sub_manifest.parse(sub_manifest.xml_path)
-                self.sub_manifests.append(sub_manifest)
+
+        projects = parse_projects(tree)
+        self.projects.extend(projects)
+
+        blacklists = parse_blacklists(tree)
+        self.blacklist.extend(blacklists)
+
+        sub_manifests = parse_manifests(tree, xml_path)
+        self.sub_manifests.extend(sub_manifests)
+
         self.update_projects()
-
-    def get_project(self, name):
-        """ Get a project given its name.
-
-        Mainly used by tests
-        """
-        matches = [p for p in self.projects if p.name == name]
-        if matches:
-            return matches[0]
-        return None
 
     def update_projects(self):
         """ Update the project list, setting project.revision,
@@ -123,8 +103,7 @@ class Manifest():
 
         """
         for project in self.projects:
-            p_remote = project.remote
-            remote = self.remotes.get(p_remote)
+            remote = self.remotes.get(project.remote)
             if not remote:
                 continue
             if not project.revision:
@@ -153,6 +132,22 @@ no review url set.\
         res += "   remotes: %s\n" % self.remotes
         res += "   projects: %s\n" % self.projects
         return res
+
+def parse_manifests(tree, xml_path):
+    sub_manifests = list()
+    manifest_elems = tree.findall("manifest")
+    for manifest_elem in manifest_elems:
+        manifest_url = manifest_elem.get("url")
+        if manifest_url:
+            dirname = os.path.dirname(xml_path)
+            sub_manifest_xml = os.path.join(dirname, manifest_url)
+            sub_manifest = Manifest()
+            sub_manifest.xml_path = sub_manifest_xml
+            sub_manifest.parse(sub_manifest.xml_path)
+            sub_manifests.append(sub_manifest)
+
+    return sub_manifests
+
 
 class Project:
     """ Wrapper for the <project> tag inside a manifest
@@ -189,6 +184,16 @@ class Project:
             (self.name, self.remote, self.fetch_url, self.review_url)
         return res
 
+def parse_projects(tree):
+    projects = list()
+    project_elems = tree.findall("project")
+    for project_elem in project_elems:
+        project = Project()
+        project.parse(project_elem)
+        projects.append(project)
+
+    return projects
+
 
 class Remote:
     """ Wrapper for the <remote> tag inside a manifest
@@ -215,3 +220,18 @@ class Remote:
         res = "<Remote %s fetch: %s on %s, review:%s>" % \
             (self.name, self.fetch, self.revision, self.review)
         return res
+
+def remote_parse(xml_element):
+    remote = Remote()
+    remote.parse(xml_element)
+    return remote
+
+def parse_blacklists(tree):
+    blacklists = list()
+    blacklist_elems = tree.findall("blacklist")
+    for blacklist_elem in blacklist_elems:
+        name = blacklist_elem.get("name")
+        if name:
+            blacklists.append(name)
+    return blacklists
+

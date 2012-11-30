@@ -9,6 +9,17 @@ import pytest
 
 import qisrc.manifest
 
+from xml.etree import ElementTree as etree
+
+def get_project(manifest, name):
+    """ Get a project given its name.
+
+    """
+    matches = [p for p in manifest.projects if p.name == name]
+    if matches:
+        return matches[0]
+    return None
+
 class ManifestTestCase(unittest.TestCase):
 
     def test_parse(self):
@@ -77,16 +88,16 @@ class ManifestTestCase(unittest.TestCase):
 """
         xml_in = StringIO(xml)
         manifest = qisrc.manifest.load(xml_in)
-        ssh_bar = manifest.get_project("ssh-bar.git")
+        ssh_bar = get_project(manifest, "ssh-bar.git")
         self.assertEquals(ssh_bar.fetch_url, "git@foo:ssh-bar.git")
 
-        ssh_url_bar = manifest.get_project("ssh-url-bar.git")
+        ssh_url_bar = get_project(manifest, "ssh-url-bar.git")
         self.assertEquals(ssh_url_bar.fetch_url, "ssh://git@foo/ssh-url-bar.git")
 
-        http_bar = manifest.get_project("http-bar.git")
+        http_bar = get_project(manifest, "http-bar.git")
         self.assertEquals(http_bar.fetch_url, "http://foo/http-bar.git")
 
-        local_bar = manifest.get_project("local-bar.git")
+        local_bar = get_project(manifest, "local-bar.git")
         self.assertEquals(local_bar.fetch_url, "/path/to/foo/local-bar.git")
 
 
@@ -100,7 +111,7 @@ class ManifestTestCase(unittest.TestCase):
 """
         xml_in = StringIO(xml)
         manifest = qisrc.manifest.load(xml_in)
-        foo = manifest.get_project("foo")
+        foo = get_project(manifest, "foo")
         self.assertEqual(foo.review, True)
         self.assertEqual(foo.review_url, "http://gerrit/foo")
 
@@ -145,7 +156,7 @@ class ManifestTestCase(unittest.TestCase):
 """
         xml_in = StringIO(xml)
         manifest = qisrc.manifest.load(xml_in)
-        project = manifest.get_project("bar/foo.git")
+        project = get_project(manifest, "bar/foo.git")
         self.assertEqual(project.path, "bar/foo")
 
 
@@ -181,9 +192,9 @@ def test_parse_other_remote(tmpdir):
 
     other = qisrc.manifest.load(other_manifest.strpath)
     assert len(other.projects) == 4
-    c = other.get_project("c")
+    c = get_project(other, "c")
     assert c.fetch_url == "ssh://git@other/c"
-    a = other.get_project("a")
+    a = get_project(other, "a")
     assert a.fetch_url == "ssh://git@all/a"
 
 def test_parse_blacklist(tmpdir):
@@ -282,6 +293,41 @@ def test_git_url_join():
     remote = "bipbip"
     result = qisrc.manifest.git_url_join(remote, name)
     assert result == "bipbip/pouet"
+
+def test_parse_projects():
+    tree = etree.fromstring("<manifest />")
+    assert qisrc.manifest.parse_projects(tree) == list()
+
+    tree = etree.fromstring("<manifest><project name=\"foo\" /></manifest>")
+    projects = qisrc.manifest.parse_projects(tree)
+    assert len(projects) == 1
+    assert projects[0].name == "foo"
+
+    tree = etree.fromstring("<manifest><project name=\"foo\" /><project name=\"bar\" /></manifest>")
+    projects = qisrc.manifest.parse_projects(tree)
+    assert len(projects) == 2
+    assert projects[0].name == "foo"
+    assert projects[1].name == "bar"
+
+def test_parse_blacklists():
+    tree = etree.fromstring("<manifest />")
+    assert qisrc.manifest.parse_blacklists(tree) == list()
+
+    tree = etree.fromstring("<manifest><blacklist name=\"foo\" /></manifest>")
+    blacklists = qisrc.manifest.parse_blacklists(tree)
+    assert len(blacklists) == 1
+    assert blacklists[0] == "foo"
+
+    tree = etree.fromstring("<manifest><blacklist name=\"foo\" /><blacklist /></manifest>")
+    blacklists = qisrc.manifest.parse_blacklists(tree)
+    assert len(blacklists) == 1
+    assert blacklists[0] == "foo"
+
+    tree = etree.fromstring("<manifest><blacklist name=\"foo\" /><blacklist name=\"bar\" /></manifest>")
+    blacklists = qisrc.manifest.parse_blacklists(tree)
+    assert len(blacklists) == 2
+    assert blacklists[0] == "foo"
+    assert blacklists[1] == "bar"
 
 
 if __name__ == "__main__":
