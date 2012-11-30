@@ -11,7 +11,7 @@ from qisys import ui
 import qibuild.profile
 
 def sync_build_profiles(worktree, xml_path):
-    """ Sync a worktree by reading new profiles fomr a manifest
+    """ Sync a worktree by reading new profiles from a manifest
 
     """
     ui.info(ui.green, "Synchronizing build profiles ...")

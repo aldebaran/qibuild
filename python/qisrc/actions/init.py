@@ -48,14 +48,15 @@ def do(args):
                     qisys.ui.green, "using profile:",
                     qisys.ui.blue, args.profile)
     if os.path.isfile(manifest_url):
-        manifest = manifest_url
+        manifest_file = manifest_url
         manifest_is_a_regular_file = True
     else:
-        manifest = qisrc.sync.fetch_manifest(worktree,
+        manifest_file = qisrc.sync.fetch_manifest(worktree,
             manifest_url, branch=branch, src=manifest_src,
             profile=args.profile)
+        manifest = qisrc.manifest.load(manifest_file)
     qisrc.sync.init_worktree(worktree, manifest, setup_review=args.setup_review)
-    sync_build_profiles(worktree, manifest)
+    sync_build_profiles(worktree, manifest_file)
     if not manifest_is_a_regular_file:
         worktree.set_manifest_project(manifest_src, args.profile)
     return worktree
