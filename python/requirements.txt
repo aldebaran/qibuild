@@ -10,7 +10,7 @@ Sphinx==1.1.3
 
 # For tests
 mock==1.0.0
-pytest==2.2.4
+pytest>=2.3.0
 pyparsing==1.5.2  # for doxylink
 
 # For coverage
