@@ -169,6 +169,7 @@ class Test:
             verbose=self.verbose)
         if self.nightmare:
             ncmd.extend(["--gtest_shuffle", "--gtest_repeat=20"])
+            timeout = timeout * 20
         start = datetime.datetime.now()
         process.run(timeout)
         end = datetime.datetime.now()
