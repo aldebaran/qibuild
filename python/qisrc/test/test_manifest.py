@@ -264,6 +264,24 @@ def test_bad_review_config():
     assert "no review url set" in e.value.message
 
 
+def test_git_url_join():
+    remote = "http://blabla"
+    name   = "pouet"
+
+    result = qisrc.manifest.git_url_join(remote, name)
+    assert result == "http://blabla/pouet"
+
+    remote = "ssh://blabla"
+    result = qisrc.manifest.git_url_join(remote, name)
+    assert result == "ssh://blabla/pouet"
+
+    remote = "nao@robot"
+    result = qisrc.manifest.git_url_join(remote, name)
+    assert result == "nao@robot:pouet"
+
+    remote = "bipbip"
+    result = qisrc.manifest.git_url_join(remote, name)
+    assert result == "bipbip/pouet"
 
 
 if __name__ == "__main__":
