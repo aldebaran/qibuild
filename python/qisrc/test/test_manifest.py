@@ -329,6 +329,21 @@ def test_parse_blacklists():
     assert blacklists[0] == "foo"
     assert blacklists[1] == "bar"
 
+def test_parse_remotes():
+    tree = etree.fromstring("<manifest />")
+    assert qisrc.manifest.parse_remotes(tree) == list()
+
+    tree = etree.fromstring("<manifest><remote name=\"foo\" fetch=\"a\" /></manifest>")
+    remotes = qisrc.manifest.parse_remotes(tree)
+    assert len(remotes) == 1
+    assert remotes[0].name == "foo"
+
+    tree=etree.fromstring("<manifest><remote name=\"foo\" fetch=\"a\" /><remote name=\"bar\" fetch=\"a\" /></manifest>")
+    remotes = qisrc.manifest.parse_remotes(tree)
+    assert len(remotes) == 2
+    assert remotes[0].name == "foo"
+    assert remotes[1].name == "bar"
+
 
 if __name__ == "__main__":
     unittest.main()

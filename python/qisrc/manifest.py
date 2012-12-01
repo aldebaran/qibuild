@@ -81,9 +81,8 @@ class Manifest():
         self.xml_path = xml_path
         tree = qixml.read(xml_path)
 
-        remote_elems = tree.findall("remote")
-        for remote_elem in remote_elems:
-            remote = remote_parse(remote_elem)
+        remotes = parse_remotes(tree)
+        for remote in remotes:
             self.remotes[remote.name] = remote
 
         projects = parse_projects(tree)
@@ -175,9 +174,7 @@ class Project:
         self.revision = xml_element.get("revision")
         self.worktree_name = xml_element.get("worktree_name")
         self.review = qixml.parse_bool_attr(xml_element, "review")
-        self.remote = xml_element.get("remote")
-        if not self.remote:
-            self.remote = "origin"
+        self.remote = xml_element.get("remote", default="origin")
 
     def __repr__(self):
         res = "<Project %s remote: %s fetch: %s review:%s>" % \
@@ -207,24 +204,25 @@ class Remote:
         self.revision = None
 
     def parse(self, xml_element):
-        self.name = xml_element.get("name")
-        if not self.name:
-            self.name = "origin"
+        self.name = xml_element.get("name", default="origin")
         self.fetch = qixml.parse_required_attr(xml_element, "fetch")
         self.review = xml_element.get("review")
-        self.revision = xml_element.get("revision")
-        if not self.revision:
-            self.revision = "master"
+        self.revision = xml_element.get("revision", default="master")
 
     def __repr__(self):
         res = "<Remote %s fetch: %s on %s, review:%s>" % \
             (self.name, self.fetch, self.revision, self.review)
         return res
 
-def remote_parse(xml_element):
-    remote = Remote()
-    remote.parse(xml_element)
-    return remote
+def parse_remotes(tree):
+    remotes = list()
+    remote_elems = tree.findall("remote")
+    for remote_elem in remote_elems:
+        remote = Remote()
+        remote.parse(remote_elem)
+        remotes.append(remote)
+
+    return remotes
 
 def parse_blacklists(tree):
     blacklists = list()
