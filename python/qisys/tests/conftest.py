@@ -1,5 +1,6 @@
 import pytest
 
+# pylint: disable-msg=E1101
 @pytest.fixture()
 def worktree(tmpdir):
     from qisys.worktree import WorkTree

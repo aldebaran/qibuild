@@ -20,6 +20,7 @@ PYMODULES ?= qisys qibuild qitoolchain qisrc qidoc qixml \
 	bin/qitoolchain
 
 PYTHON    ?= python
+PIP       ?= pip
 
 all: pylint-error check
 
@@ -59,3 +60,7 @@ check-fast:
 doc:
 	@$(PYTHON) ../doc/tools/gen_cmake_doc.py ..
 	@$(PYTHON) -c "from sphinx import main; main()" -b html ../doc/source ../doc/build/html
+
+upgrade-python:
+	@echo ":: Update python modules with $(PIP)"
+	@$(PIP) install --user --upgrade --requirement requirements.txt
