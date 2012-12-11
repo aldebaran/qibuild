@@ -53,23 +53,33 @@ SET_TESTS_PROPERTIES(bar PROPERTIES SPAM EGGS)
         parse_ctest_test_files(tmpdir.strpath)
     assert "SET_TESTS_PROPERTIES called with wrong name" in e.value.message
 
-def test_verbosity(tmpdir, capsys):
-    test = TestResult("test", 0, 1, verbose=True)
-    test.ok = False
-    test.print_result()
-    out, err = capsys.readouterr()
-    assert "no output" in out
-
-    test2 = TestResult("test", 0, 1, verbose=True)
+# pylint: disable-msg=E1101
+@pytest.mark.skipif('"dead locks"')
+def test_failing_output_tests_always_printed(capsys):
+    test1 = TestResult("test", 0, 2, verbose=False)
+    test2 = TestResult("test", 1, 2, verbose=False)
+    test1.ok = True
+    test1.out = "test1"
     test2.ok = False
-    test2.out = "on output"
+    test2.out = "test2"
+    test1.print_result()
     test2.print_result()
     out, err = capsys.readouterr()
-    assert "on output" in out
+    assert "test1" not in out
+    assert "test2" in out
 
-    test3 = TestResult("test", 0, 1, verbose=False)
-    test3.ok = False
-    test3.out = "output"
-    test3.print_result()
+
+# pylint: disable-msg=E1101
+@pytest.mark.skipif('"dead locks"')
+def test_passing_test_printed_when_verbose(capsys):
+    test1 = TestResult("test", 0, 2, verbose=True)
+    test2 = TestResult("test", 1, 2, verbose=True)
+    test1.ok = True
+    test1.out = "test1"
+    test2.ok = False
+    test2.out = "test2"
+    test1.print_result()
+    test2.print_result()
     out, err = capsys.readouterr()
-    assert "output" not in out
+    assert "test1" in out
+    assert "test2" in out

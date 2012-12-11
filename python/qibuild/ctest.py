@@ -74,15 +74,13 @@ class TestResult:
             ui.info(*self.line, end='')
         if self.ok:
             ui.info(ui.green, "[OK]")
+            if self.verbose:
+                print self.out
         else:
             ui.info(ui.red, "[FAIL]", self.message)
             if qisys.command.SIGINT_EVENT.is_set():
                 pass
-            elif self.verbose:
-                if self.out:
-                    print self.out
-                else:
-                    print '\tno output\n'
+            print self.out
         sys.stdout.flush()
         if self.result_dir is not None:
             xml_out = os.path.join(self.result_dir, self.test_name + ".xml")
@@ -178,6 +176,10 @@ class Test:
 
         ui.debug('Treating result of', self.cmd)
         res.out = process.out
+        # Sometimes the procees did not have any output,
+        # but we still want to let the user know it ran
+        if not process.out:
+            res.out = "<no output>"
         res.ok = process.return_type == qisys.command.Process.OK
         if process.exception is not None:
             exception = process.exception
