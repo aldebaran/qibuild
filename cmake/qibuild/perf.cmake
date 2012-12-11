@@ -13,12 +13,20 @@ include(CMakeParseArguments)
 # named "--output <out.xml>" and generate such a file.
 # You can for instance use the qiperf library for that.
 #
+# Notes:
+#  * The test won't be built if BUILD_PERFS_TESTS is OFF
+#
 # \arg:name Name of the test. A target of this name will be created
 # \group:SRC Sources of the perf executable
 # \group:DEPENDS Dependencies to pass to qi_use_lib
 # \group:ARGUMENTS arguments to be passed to the executable
 #
 function(qi_create_perf_test name)
+  if (DEFINED BUILD_PERFS_TESTS AND NOT BUILD_PERFS_TESTS)
+    qi_debug("Perf test(${name}) disabled by BUILD_PERFS_TESTS=OFF")
+    qi_set_global(QI_${name}_TARGET_DISABLED TRUE)
+    return()
+  endif()
   cmake_parse_arguments(ARG "" "" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
   set(_src ${ARG_UNPARSED_ARGUMENTS} ${ARG_SRC})
   set(_deps ${ARG_DEPENDS})
