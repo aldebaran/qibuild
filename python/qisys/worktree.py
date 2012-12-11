@@ -161,9 +161,7 @@ class WorkTree:
             False and project is not found
 
         """
-        if os.path.isabs(src):
-            src = os.path.relpath(src, self.root)
-            src = qisys.sh.to_posix_path(src)
+        src = to_relative_path(self.root, src)
         p_srcs = [p.src for p in self.projects]
         if not src in p_srcs:
             if not raises:
@@ -183,9 +181,7 @@ class WorkTree:
 
         """
         # Coming from user, can be an abspath:
-        if os.path.isabs(src):
-            src = os.path.relpath(src, self.root)
-            src = qisys.sh.to_posix_path(src)
+        src = to_relative_path(self.root, src)
         p_srcs = [p.src for p in self.projects]
         if src in p_srcs:
             mess  = "Could not add project to worktree\n"
@@ -210,9 +206,7 @@ class WorkTree:
 
         """
         # Coming from user, can be an abspath:
-        if os.path.isabs(src):
-            src = os.path.relpath(src, self.root)
-            src = qisys.sh.to_posix_path(src)
+        src = to_relative_path(self.root, src)
         p_srcs = [p.src for p in self.projects]
         if src not in p_srcs:
             raise Exception("No such project: %s" % src)
@@ -385,3 +379,9 @@ def repr_list_projects(projects, name = "projects"):
           res += "(%s) %s, " % (i, project.src)
        res += "\n"
     return res
+
+def to_relative_path(root, path):
+    if os.path.isabs(path):
+        path = os.path.relpath(path, start=root)
+        path = qisys.sh.to_posix_path(path)
+    return path
