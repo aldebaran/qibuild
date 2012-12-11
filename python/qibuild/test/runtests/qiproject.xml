@@ -1,0 +1,6 @@
+<project name="runtests">
+  <!-- Add your project dependencies here -->
+  <!--
+  <depends buildtime="true" runtime="true" names="foo" />
+  -->
+</project>

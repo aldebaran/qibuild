@@ -10,4 +10,5 @@
   <project src="perf" />
   <project src="config_h" />
   <project src="submodule" />
+  <project src="runtests" />
 </worktree>
