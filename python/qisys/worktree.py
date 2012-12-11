@@ -38,15 +38,11 @@ class WorkTree:
         """
         self.root = root
         self.projects = list()
-        self.git_projects = list()
-        self.buildable_projects = list()
         self.load()
 
     def load(self):
         """ Load the worktree.xml file. """
         self.projects = list()
-        self.git_projects = list()
-        self.buildable_projects = list()
         dot_qi = os.path.join(self.root, ".qi")
         worktree_xml = os.path.join(dot_qi, "worktree.xml")
         if not os.path.exists(worktree_xml):
@@ -56,17 +52,25 @@ class WorkTree:
         if os.path.exists(worktree_xml):
             self.xml_tree = qixml.read(worktree_xml)
             self.parse_projects()
-            self.parse_buildable_projects()
 
         self.projects.sort(key=operator.attrgetter("src"))
-        self.buildable_projects.sort(key=operator.attrgetter("src"))
-        self.git_projects.sort(key=operator.attrgetter("src"))
+
+    @property
+    def git_projects(self):
+        """ Get the projects which are git projects. """
+        git_projects = [p for p in self.projects if p.is_git()]
+        return git_projects
+
+    @property
+    def buildable_projects(self):
+        """ Get the projects considered as buildable projects. """
+        buildable_projects = [p for p in self.projects if p.is_buildable()]
+        return buildable_projects
 
     def get_manifest_projects(self):
-        """ Get the projects mark as beeing 'manifest' projects
-
-        """
-        return [p for p in self.projects if p.manifest]
+        """ Get the projects mark as beeing 'manifest' projects. """
+        manifest_projects = [p for p in self.projects if p.manifest]
+        return manifest_projects
 
     def update_project_config(self, src, key, value):
         """ Update the project configuration. """
@@ -108,10 +112,7 @@ class WorkTree:
         qixml.write(self.xml_tree, worktree_xml)
 
     def parse_projects(self):
-        """ Parse .qi/worktree.xml, resolve subprojects, set the
-        git_project attribute of every project
-
-        """
+        """ Parse .qi/worktree.xml, resolve subprojects. """
         projects_elem = self.xml_tree.findall("project")
         for project_elem in projects_elem:
             project = Project()
@@ -132,8 +133,7 @@ class WorkTree:
         filling up the res list.
 
         """
-        if os.path.exists(os.path.join(project.path, ".git")):
-            self.git_projects.append(project)
+        if project.is_git():
             project.git_project = project
         for sub_project_src in project.subprojects:
             sub_project = Project()
@@ -151,21 +151,6 @@ class WorkTree:
         p_path = os.path.join(self.root, project.src)
         project.path = qisys.sh.to_native_path(p_path)
 
-
-    def parse_buildable_projects(self):
-        """ Iterate through every project.
-
-        If project contains a qirpoject.xml and a CMakeLists.txt
-        file, add it to the list
-
-        """
-        for project in self.projects:
-            p_path = project.path
-            qiproj_xml = os.path.join(p_path, "qiproject.xml")
-            cmake_lists = os.path.join(p_path, "CMakeLists.txt")
-            if os.path.exists(qiproj_xml) and \
-                os.path.exists(cmake_lists):
-                self.buildable_projects.append(project)
 
     def get_project(self, src, raises=False):
         """ Get a project
@@ -244,8 +229,6 @@ class WorkTree:
     def __repr__(self):
         res  = "<Worktree in %s\n" % self.root
         res += repr_list_projects(self.projects)
-        res += repr_list_projects(self.git_projects, "git_projects")
-        res += repr_list_projects(self.git_projects, "buildable_projects")
         res += ">\n"
         return res
 
@@ -287,9 +270,6 @@ def guess_worktree(cwd=None, raises=False):
         raise NotInWorktree()
     else:
         return None
-
-
-
 
 def create(directory, force=False):
     """Create a new Qi work tree in the given directory.
@@ -375,6 +355,15 @@ class Project:
         if self.branch:
             res.set("branch", self.branch)
         return res
+
+    def is_git(self):
+        git_dir = os.path.join(self.path, ".git")
+        return os.path.exists(git_dir)
+
+    def is_buildable(self):
+        qiproj_xml = os.path.join(self.path, "qiproject.xml")
+        cmake_lists = os.path.join(self.path, "CMakeLists.txt")
+        return os.path.exists(qiproj_xml) and os.path.exists(cmake_lists)
 
     def __repr__(self):
         res  = "<Project in %s\n" % (self.src)
