@@ -19,7 +19,7 @@ LOGGER = qisys.log.get_logger("WorkTree")
 
 
 class NotInWorktree(Exception):
-    """ Just a custom exception """
+    """ Just a custom exception. """
     def __str__(self):
         return """ Could not guess worktree from current working directory
   Here is what you can do :
@@ -29,9 +29,7 @@ class NotInWorktree(Exception):
 """
 
 class WorkTree:
-    """ This class represent a :term:`worktree`
-
-    """
+    """ This class represent a :term:`worktree`. """
     def __init__(self, root):
         """
         Construct a new worktree
@@ -45,10 +43,7 @@ class WorkTree:
         self.load()
 
     def load(self):
-        """
-        Load the worktree.xml file
-
-        """
+        """ Load the worktree.xml file. """
         self.projects = list()
         self.git_projects = list()
         self.buildable_projects = list()
@@ -74,15 +69,13 @@ class WorkTree:
         return [p for p in self.projects if p.manifest]
 
     def update_project_config(self, src, key, value):
-        """ Update the project configuration """
+        """ Update the project configuration. """
         for elem in self.xml_tree.findall("project"):
             if elem.get("src") == src:
                 elem.set(key, value)
 
     def set_manifest_project(self, src, profile="default"):
-        """ Mark a project as being a manifest project
-
-        """
+        """ Mark a project as being a manifest project. """
         project = self.get_project(src, raises=True)
         self.update_project_config(project.src, "manifest", "true")
         self.update_project_config(project.src, "profile", profile)
@@ -101,17 +94,14 @@ class WorkTree:
         self.load()
 
     def set_project_review(self, src):
-        """ Mark a project as being under code review """
+        """ Mark a project as being under code review. """
         project = self.get_project(src)
         self.update_project_config(project.src, "review", "true")
         self.dump()
         self.load()
 
     def dump(self):
-        """
-        Dump self to the worktree.xml file
-
-        """
+        """ Dump self to the worktree.xml file. """
         dot_qi = os.path.join(self.root, ".qi")
         qisys.sh.mkdir(dot_qi, recursive=True)
         worktree_xml = os.path.join(self.root, ".qi", "worktree.xml")
@@ -139,7 +129,7 @@ class WorkTree:
 
     def _rec_parse_sub_projects(self, project, res):
         """ Recursively parse every project and subproject,
-        filling up the res list
+        filling up the res list.
 
         """
         if os.path.exists(os.path.join(project.path, ".git")):
@@ -157,9 +147,7 @@ class WorkTree:
             self._rec_parse_sub_projects(sub_project, res)
 
     def set_path(self, project):
-        """ Set the path attribute of a project
-
-        """
+        """ Set the path attribute of a project. """
         p_path = os.path.join(self.root, project.src)
         project.path = qisys.sh.to_native_path(p_path)
 
@@ -284,9 +272,7 @@ def open_worktree(worktree=None):
 
 
 def guess_worktree(cwd=None, raises=False):
-    """Look for parent directories until a .qi dir is found somewhere.
-
-    """
+    """ Look for parent directories until a .qi dir is found somewhere. """
     if cwd is None:
         cwd = os.getcwd()
     head = cwd
@@ -337,10 +323,7 @@ Use --force if you want to re-initialize the worktree""".format(directory, paren
     return open_worktree(directory)
 
 def git_project_path_from_cwd(cwd=None):
-    """ Get the path to the git repo of the current
-    project using cwd
-
-    """
+    """ Get the path to the git repo of the current project using cwd. """
     import qisrc.git
     if not cwd:
         cwd = os.getcwd()
