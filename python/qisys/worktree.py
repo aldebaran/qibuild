@@ -72,6 +72,10 @@ class WorkTree:
         manifest_projects = [p for p in self.projects if p.manifest]
         return manifest_projects
 
+    def have_project(self, src):
+        srcs = [p.src for p in self.projects]
+        return src in srcs
+
     def update_project_config(self, src, key, value):
         """ Update the project configuration. """
         for elem in self.xml_tree.findall("project"):
@@ -162,12 +166,11 @@ class WorkTree:
 
         """
         src = to_relative_path(self.root, src)
-        p_srcs = [p.src for p in self.projects]
-        if not src in p_srcs:
+        if not self.have_project(src):
             if not raises:
                 return None
             mess  = "No project in '%s'\n" % src
-            mess += "Known projects are in %s" % ", ".join(p_srcs)
+            mess += "Known projects are in %s" % ", ".join([p.src for p in self.projects])
             raise Exception(mess)
         match = [p for p in self.projects if p.src == src]
         res = match[0]
@@ -182,8 +185,7 @@ class WorkTree:
         """
         # Coming from user, can be an abspath:
         src = to_relative_path(self.root, src)
-        p_srcs = [p.src for p in self.projects]
-        if src in p_srcs:
+        if self.have_project(src):
             mess  = "Could not add project to worktree\n"
             mess += "Path %s is already registered\n" % src
             mess += "Current worktree: %s" % self.root
@@ -208,7 +210,7 @@ class WorkTree:
         # Coming from user, can be an abspath:
         src = to_relative_path(self.root, src)
         p_srcs = [p.src for p in self.projects]
-        if src not in p_srcs:
+        if not self.have_project(src):
             raise Exception("No such project: %s" % src)
         root_elem = self.xml_tree.getroot()
         for project_elem in root_elem.findall("project"):
