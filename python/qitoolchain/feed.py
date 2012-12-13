@@ -48,7 +48,7 @@ def tree_from_feed(feed_location):
         tree = ElementTree.ElementTree()
         tree.parse(fp)
     except Exception:
-        ui.error("Could not parser", feed_location)
+        ui.error("Could not parse", feed_location)
         raise
     finally:
         if fp:
