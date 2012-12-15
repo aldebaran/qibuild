@@ -176,6 +176,8 @@ def install(src, dest, filter_fun=None, quiet=False):
             return True
 
     if os.path.isdir(src):
+        if src == dest:
+            raise Exception("source and destination are the same directory")
         for (root, dirs, files) in os.walk(src):
             _handle_dirs (src, dest, root, dirs,  filter_fun, quiet)
             _handle_files(src, dest, root, files, filter_fun, quiet)
@@ -185,6 +187,8 @@ def install(src, dest, filter_fun=None, quiet=False):
         # simply copy the file.
         if os.path.isdir(dest):
             dest = os.path.join(dest, os.path.basename(src))
+        if src == dest:
+            raise Exception("source and destination are the same file")
         mkdir(os.path.dirname(dest), recursive=True)
         if sys.stdout.isatty() and not quiet:
             print "-- Installing %s" % dest

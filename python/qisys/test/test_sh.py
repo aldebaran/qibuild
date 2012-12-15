@@ -4,6 +4,7 @@
 
 import os
 import stat
+import pytest
 
 import qisys.sh
 
@@ -18,6 +19,17 @@ def test_install_ro(tmpdir):
     os.chmod(ro, stat.S_IRUSR)
     dest = os.path.join(tmp, "dest")
     qisys.sh.install(src, dest)
+
+def test_install_on_self(tmpdir):
+    a_file = tmpdir.join("a")
+    a_file.write("")
+    # pytlint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        qisys.sh.install(a_file.strpath, tmpdir.strpath)
+    assert "are the same file" in e.value.message
+    with pytest.raises(Exception) as e:
+        qisys.sh.install(tmpdir.strpath, tmpdir.strpath)
+    assert "are the same directory" in e.value.message
 
 def test_is_path_inside():
    assert qisys.sh.is_path_inside("foo/bar", "foo")
