@@ -36,6 +36,9 @@ def configure_parser(parser):
         help="tread warnings as error")
     parser.add_argument("--profiling", dest="profiling", action="store_true",
         help="profile cmake execution")
+    parser.add_argument("--summarize-options", dest="summarize_options",
+                        action="store_true",
+                        help="summarize build options at the end")
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
                         werror=False, profiling=False)
 
@@ -80,3 +83,5 @@ def do(args):
             clean_first=args.clean_first,
             debug_trycompile=args.debug_trycompile,
             profiling=args.profiling)
+        if args.summarize_options:
+            project.summarize_options()

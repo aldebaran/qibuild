@@ -74,6 +74,20 @@ class Project:
         if not self._custom_sdk_dir:
             self.sdk_directory = os.path.join(self.build_directory, "sdk")
 
+    def summarize_options(self):
+        """ Display all the options coming from various WITH_*
+        and ENABLE_* arguments
+
+        """
+        print "-- Build options: "
+        cache_path = os.path.join(self.build_directory, "CMakeCache.txt")
+        cache = qibuild.cmake.read_cmake_cache(cache_path)
+        opt_keys = [x for x in cache if x.startswith(("WITH_", "ENABLE_"))]
+        opt_keys.sort()
+        padding = max([len(x) for x in opt_keys]) + 3
+        for key in opt_keys:
+            print "  {} : {}".format(key.ljust(padding), cache[key])
+
 
     def __str__(self):
         res = ""
