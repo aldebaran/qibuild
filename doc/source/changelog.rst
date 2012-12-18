@@ -107,9 +107,10 @@ CMake
 
 * qibuild cmake modules:
 
-  * Added ``hdf5``, ``openssl``, ``libevent_openssl``, ``qt_qtdbus``,
-    ``qt_qttest``, ``boost_test_exec_monitor``, ``rrd``, ``rrd_th``,
-    ``jsoncpp``, ``zbar``
+  * Added ``hdf5``, ``openssl``, ``libevent_openssl``,
+    ``qt_qtdbus``, ``qt_qttest``,
+    ``boost_test_exec_monitor``, ``boost_timer``, ``boost_chrono``,
+    ``rrd``, ``rrd_th``, ``jsoncpp``, ``zbar``
   * Renamed dbus into dbus-1, and dbus-glib into dbus-glib-1
   * ``qi_use_lib(OPENGL)`` now uses upstream's ``FindOpenGL.cmake``
   * ogre-tools: Allow to use more than one plugin.

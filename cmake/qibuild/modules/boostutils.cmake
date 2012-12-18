@@ -23,6 +23,7 @@ function(boost_flib _libname)
     qi_set_global(${_prefix}_DEFINITIONS  "BOOST_ALL_NO_LIB")
   endif()
   find_package(Boost COMPONENTS "${_libname}" QUIET)
+
   qi_set_global(${_prefix}_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
   qi_set_global(${_prefix}_LIBRARIES    ${Boost_LIBRARIES})
   export_lib(${_prefix})
