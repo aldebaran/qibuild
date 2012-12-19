@@ -27,12 +27,15 @@ def _str_from_signal(code):
     """ Returns a nice string describing the signal
 
     """
+    if os.name == "nt":
+        # windows ret code are usually displayed
+        # in hexa:
+        return "0x%X" % (2 ** 32 - code)
     if code == signal.SIGSEGV:
         return "Segmentation fault"
     if code == signal.SIGABRT:
         return "Aborted"
-    else:
-        return "%i" % code
+    return "%i" % code
 
 
 class QueueTimeout(Queue.Queue):
