@@ -554,7 +554,8 @@ You may want to run:
         paths = list()
 
         for package in self.packages:
-            paths.append(package.path)
+            if package.name in project.rdepends:
+                paths.append(package.path)
 
         unique_sdk_dir = self.config.local.build.sdk_dir
         if not unique_sdk_dir:
