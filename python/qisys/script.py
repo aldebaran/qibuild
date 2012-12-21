@@ -248,14 +248,6 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
     module = action_modules[pargs.action]
     _dump_arguments(module.__name__, pargs)
     main_wrapper(module, pargs)
-
-    import random
-    this_dir = os.path.dirname(__file__)
-    filenames = os.listdir(os.path.join(this_dir, 'foo'))
-    filename = random.choice(filenames)
-    with open(os.path.join(this_dir, 'foo', filename)) as f:
-        print f.read()
-
     return True
 
 
