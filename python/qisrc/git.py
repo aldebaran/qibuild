@@ -391,28 +391,30 @@ def is_ff(git, status, local_sha1, remote_sha1):
     common_ancestor = out.strip()
     return common_ancestor == local_sha1
 
+def get_ref_sha1(git, ref, status):
+    """Return the sha1 from a ref. None if not found."""
+    (ret, sha1) = git.call("show-ref", "--verify", "--hash",
+                           ref, raises=False)
+
+    if ret == 0:
+        return sha1
+
+    status.mess += "Get sha1 failed.\n"
+    status.mess += sha1
+    return None
+
 def _update_branch_if_ff(git, status, local_branch, remote_ref):
     """ Update a local branch with a remote branch if the
     merge is fast-forward
 
     """
-    (ret, out) = git.call("show-ref", "--verify",
-                           "refs/heads/%s" % local_branch,
-                           raises=False)
-    if ret != 0:
-        status.mess += "Calling show-ref --verify failed\n"
-        status.mess += out
+    local_sha1 = get_ref_sha1(git, "refs/heads/%s" % local_branch, status)
+    if local_sha1 is None:
         return
-    local_sha1 = out.split()[0]
 
-    (ret, out) = git.call("show-ref", "--verify",
-                                "refs/remotes/%s" % remote_ref,
-                                raises=False)
-    if ret != 0:
-        status.mess += "Calling show-ref --verify failed\n"
-        status.mess += out
+    remote_sha1 = get_ref_sha1(git, "refs/remotes/%s" % remote_ref, status)
+    if remote_sha1 is None:
         return
-    remote_sha1 = out.split()[0]
 
     result_ff = is_ff(git, status, local_sha1, remote_sha1)
     if result_ff is None:

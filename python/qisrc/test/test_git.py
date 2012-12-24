@@ -522,3 +522,12 @@ def test_is_ff(tmpdir):
     assert qisrc.git.is_ff(git, status, A_sha1, B_sha1) == True
     assert qisrc.git.is_ff(git, status, B_sha1, A_sha1) == False
     assert qisrc.git.is_ff(git, status, A_sha1, A_sha1) == True
+
+def test_get_ref_sha1(tmpdir):
+    a_git = tmpdir.mkdir("a_git_project")
+    git = qisrc.git.open(a_git.strpath)
+
+    assert git.is_valid() == False
+
+    git.init()
+    assert git.is_valid() == True
