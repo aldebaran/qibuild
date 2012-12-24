@@ -190,11 +190,10 @@ class Git:
         return [x[2:] for x in lines]
 
     def is_valid(self):
-        """ Check if the worktree is a valid git tree
-        """
+        """Check if the worktree is a valid git tree."""
         if not os.path.isdir(self.repo):
             return False
-        (status, out) = self.call("show-ref", "--quiet", raises=False)
+        (status, out) = self.call("rev-parse", "--is-inside-work-tree", raises=False)
         return status == 0
 
     def is_clean(self, untracked=True):
