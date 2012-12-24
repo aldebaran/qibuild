@@ -422,19 +422,19 @@ def _update_branch_if_ff(git, status, local_branch, remote_ref):
             status.mess += out
 
 def get_repo_root(path):
-    """ Return the root dir of a git worktree given a path
+    """Return the root dir of a git worktree given a path.
 
-    :return None: if no .git was found
-
+    :return None: if it's not a git work tree.
     """
-    head = path
-    while True:
-        if os.path.exists(os.path.join(head, ".git")):
-            break
-        (head, tail) = os.path.split(head)
-        if not tail:
-            return None
-    return head
+    if os.path.isfile(path):
+        path = os.path.dirname(path)
+    if not os.path.isdir(path):
+        return None
+
+    git = Git(path)
+    (ret, out) = git.call("rev-parse", "--show-toplevel", raises=False)
+
+    return out if ret == 0 else None
 
 def is_submodule(path):
     """ Tell if the given path is a submodule

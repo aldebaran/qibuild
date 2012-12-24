@@ -481,3 +481,15 @@ def test_create_in_git_dir(tmpdir):
     with pytest.raises(Exception) as e:
         qisys.worktree.create(work.strpath)
     assert "inside a git project" in e.value.message
+
+def test_get_repo_root(tmpdir):
+    a_nogit = tmpdir.mkdir("a_nogit_project")
+    a_git = tmpdir.mkdir("a_git_project")
+    git = qisrc.git.Git(a_git.strpath)
+    git.init()
+    work = a_git.mkdir("work")
+
+    assert qisrc.git.get_repo_root(a_nogit.strpath) == None
+    assert qisrc.git.get_repo_root(a_git.strpath)   == a_git.strpath
+    assert qisrc.git.get_repo_root(work.strpath)    == a_git.strpath
+    assert qisrc.git.get_repo_root(os.path.join(tmpdir.strpath, "pouet")) == None
