@@ -8,7 +8,7 @@ from qisrc.test.fake_git import FakeGit
 def test_simple():
     git = FakeGit("repo")
     git.add_result("submodule", 0, "")
-    git.add_result("symbolic-ref", 0, "refs/heads/master")
+    git.add_result("symbolic-ref", 0, "master")
     git.add_result("fetch", 0, "")
     git.add_result("status", 0, "")
     git.add_result("rebase", 0, "")
@@ -69,7 +69,7 @@ def test_first_stash_fails():
     git = FakeGit("repo")
     git.add_result("submodule", 0, "")
     git.add_result("fetch", 0, "")
-    git.add_result("symbolic-ref", 0, "refs/heads/master")
+    git.add_result("symbolic-ref", 0, "master")
     # sometime stash can fails even if git status says the repo is not clean
     git.add_result("status", 1, "Unstaged changes\n submodule bar\n")
     git.add_result("stash", 1, "nothing to stash\n")
@@ -81,7 +81,7 @@ def test_stash_pop_fails():
     git = FakeGit("repo")
     git.add_result("submodule", 0, "")
     git.add_result("fetch", 0, "")
-    git.add_result("symbolic-ref", 0, "refs/heads/master")
+    git.add_result("symbolic-ref", 0, "master")
     git.add_result("status", 1, "Unstaged changes\n M foo.txt\n")
     git.add_result("stash", 0, "")
     # Assume foo.txt is created during rebase
@@ -97,7 +97,7 @@ def test_rebase_fails():
     git = FakeGit("repo")
     git.add_result("submodule", 0, "")
     git.add_result("fetch", 0, "")
-    git.add_result("symbolic-ref", 0, "refs/heads/master")
+    git.add_result("symbolic-ref", 0, "master")
     git.add_result("status", 0, "")
     git.add_result("rebase", 1, "Conflict in foo.txt")
     git.add_result("rebase", 0, "")
@@ -110,7 +110,7 @@ def test_stash_then_rebase_fails():
     git = FakeGit("repo")
     git.add_result("submodule", 0, "")
     git.add_result("fetch", 0, "")
-    git.add_result("symbolic-ref", 0, "refs/heads/master")
+    git.add_result("symbolic-ref", 0, "master")
     git.add_result("status", 1, "Unstaged changes\n M foo.txt\n")
     git.add_result("stash", 0, "")
     git.add_result("rebase", 1, "Conflict in foo.txt")
@@ -123,7 +123,7 @@ def test_rebase_abort_fails():
     git = FakeGit("repo")
     git.add_result("submodule", 0, "")
     git.add_result("fetch", 0, "")
-    git.add_result("symbolic-ref", 0, "refs/heads/master")
+    git.add_result("symbolic-ref", 0, "master")
     git.add_result("status", 0, "")
     git.add_result("rebase", 1, "Conflict in foo.txt")
     # Not sure why rebase --abort could fail ...
@@ -136,7 +136,7 @@ def test_rebase_abort_fails():
 def test_fetch_fails():
     git = FakeGit("repo")
     git.add_result("submodule", 0, "")
-    git.add_result("symbolic-ref", 0, "refs/heads/master")
+    git.add_result("symbolic-ref", 0, "master")
     git.add_result("fetch", 2, "could not resolve hostname github.com")
     error = git.update_branch("master", "origin")
     assert "Fetch failed" in error
@@ -147,7 +147,7 @@ def test_submodules():
     git = FakeGit("repo")
     git.add_result("submodule", 0, "24faae bar (heads/master)\n")
     git.add_result("submodule", 0, "")
-    git.add_result("symbolic-ref", 0, "refs/heads/master")
+    git.add_result("symbolic-ref", 0, "master")
     git.add_result("fetch", 0, "")
     git.add_result("status", 0, "")
     git.add_result("rebase", 0, "")

@@ -72,12 +72,12 @@ class Git:
         """
         self.call("config", name, value)
 
-    def get_current_ref(self, ref="HEAD"):
+    def get_current_ref(self, ref="HEAD", short=False):
         """ return the current ref
         git symbolic-ref HEAD
         else: git name-rev --name-only --always HEAD
         """
-        (status, out) = self.call("symbolic-ref", ref, raises=False)
+        (status, out) = self.call("symbolic-ref", ref, "--short" if short else "", raises=False)
         lines = out.splitlines()
         if len(lines) < 1:
             return None
@@ -87,10 +87,10 @@ class Git:
 
     def get_current_branch(self):
         """ return the current branch """
-        branch = self.get_current_ref()
+        branch = self.get_current_ref(short=True)
         if not branch:
             return branch
-        return branch[11:]
+        return branch
 
 
     def get_tracking_branch(self, branch=None):
