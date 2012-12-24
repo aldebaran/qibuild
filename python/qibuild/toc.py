@@ -496,7 +496,7 @@ You may want to run:
 
     def build_project(self, project, incredibuild=False,
                       num_jobs=1, target=None, rebuild=False,
-                      fix_shared_libs=True):
+                      fix_shared_libs=True, verbose_make=False):
         """ Build a project.
 
         Usually we will simply can ``cmake --build``, but for incredibuild
@@ -522,6 +522,8 @@ You may want to run:
         if rebuild:
             cmd += ["--clean-first"]
         cmd += [ "--" ]
+        if verbose_make:
+            cmd += [ "VERBOSE=1" ]
         cmd += num_jobs_to_args(num_jobs, self.cmake_generator)
         if self.using_visual_studio and incredibuild:
             # In order to use incredibuild, we have to do this small hack:

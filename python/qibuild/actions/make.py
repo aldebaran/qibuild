@@ -23,6 +23,8 @@ def configure_parser(parser):
                         dest="fix_shared_libs",
                         help="Do not try to fix shared libraries after build. "
                              "Used by `qibuild package`")
+    group.add_argument("--verbose-make", action="store_true", default=False,
+                       help="Set verbose for make. It will print the executed commands.")
 
 def do(args):
     """Main entry point"""
@@ -57,4 +59,5 @@ def do(args):
                 ui.green, "Building", ui.blue, project.name)
         toc.build_project(project, num_jobs=args.num_jobs,
                           incredibuild=use_incredibuild, rebuild=args.rebuild,
-                          fix_shared_libs=args.fix_shared_libs)
+                          fix_shared_libs=args.fix_shared_libs,
+                          verbose_make=args.verbose_make)
