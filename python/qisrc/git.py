@@ -111,6 +111,21 @@ class Git:
         """ Wrapper for git add """
         return self.call("add", *args, **kwargs)
 
+    def branch(self, *args, **kwargs):
+        """Wrapper for git branch."""
+        return self.call("branch", *args, **kwargs)
+
+    def checkout(self, *args, **kwargs):
+        """ Wrapper for git checkout """
+        return self.call("checkout", *args, **kwargs)
+
+    def clone(self, *args, **kwargs):
+        """ Wrapper for git clone """
+        args = list(args)
+        args.append(self.repo)
+        kwargs["cwd"] = None
+        return self.call("clone", *args, **kwargs)
+
     def commit(self, *args, **kwargs):
         """ Wrapper for git commit """
         return self.call("commit", *args, **kwargs)
@@ -123,24 +138,9 @@ class Git:
         """ Wrapper for git init """
         return self.call("init", *args, **kwargs)
 
-    def reset(self, *args, **kwargs):
-        """ Wrapper for git reset """
-        return self.call("reset", *args, **kwargs)
-
-    def checkout(self, *args, **kwargs):
-        """ Wrapper for git checkout """
-        return self.call("checkout", *args, **kwargs)
-
     def pull(self, *args, **kwargs):
         """ Wrapper for git pull """
         return self.call("pull", *args, **kwargs)
-
-    def clone(self, *args, **kwargs):
-        """ Wrapper for git clone """
-        args = list(args)
-        args.append(self.repo)
-        kwargs["cwd"] = None
-        return self.call("clone", *args, **kwargs)
 
     def push(self, *args, **kwargs):
         """ Wrapper for git push """
@@ -149,6 +149,10 @@ class Git:
     def remote(self, *args, **kwargs):
         """ Wrapper for git remote """
         return self.call("remote", *args, **kwargs)
+
+    def reset(self, *args, **kwargs):
+        """ Wrapper for git reset """
+        return self.call("reset", *args, **kwargs)
 
     def update_submodules(self, raises=True):
         """ Update submodule, cloning them if necessary """
@@ -180,7 +184,7 @@ class Git:
         master -> tracking branch
 
         """
-        (status, out) = self.call("branch", "--no-color", raises=False)
+        (status, out) = self.branch("--no-color", raises=False)
         if status != 0:
             mess  = "Could not get the list of local branches\n"
             mess += "Error was: %s" % out
@@ -221,8 +225,8 @@ class Git:
         in_conf = self.get_config("remote.%s.url" % name)
         if in_conf and in_conf == url:
             return
-        self.call("remote", "rm",  name, quiet=True, raises=False)
-        self.call("remote", "add", name, url, quiet=True)
+        self.remote("rm",  name, quiet=True, raises=False)
+        self.remote("add", name, url, quiet=True)
 
     def set_tracking_branch(self, branch, remote_name, fetch_first=True, remote_branch=None):
         """
@@ -251,12 +255,12 @@ class Git:
 
         if fetch_first:
             # Fetch just in case the branch just has been created
-            self.call("fetch", remote_name, quiet=True)
+            self.fetch(remote_name, quiet=True)
 
         # If the branch does not exist yet, create it at the right commit
         if not branch in self.get_local_branches():
-            self.call("branch", branch, remote_ref, quiet=True)
-        self.call("branch", "--set-upstream", branch, remote_ref, quiet=True)
+            self.branch(branch, remote_ref, quiet=True)
+        self.branch("--set-upstream", branch, remote_ref, quiet=True)
 
     def update_branch(self, *args, **kwargs):
         """ Update the given branch to match the given remote branch
@@ -291,7 +295,7 @@ def _update_branch(git, branch, remote_name,
     if not current_branch:
         return "Not currently on any branch"
     if fetch_first:
-        (ret, out) = git.call("fetch", remote_name, raises=False)
+        (ret, out) = git.fetch(remote_name, raises=False)
         if out:
             print out
         if ret != 0:
@@ -362,12 +366,12 @@ def _change_branch(git, status, branch):
         yield
         return
     with _stash_changes(git, status):
-        (ret, out) = git.call("checkout", branch, raises=False)
+        (ret, out) = git.checkout(branch, raises=False)
         if ret != 0:
             status.mess += "Checkout to %s failed\n" % branch
             status.mess += out
         yield
-        (ret, out) = git.call("checkout", current_branch, raises=False)
+        (ret, out) = git.checkout(current_branch, raises=False)
         if ret != 0:
             status.mess += "Checkout back to %s failed\n" % current_branch
             status.mess += out
