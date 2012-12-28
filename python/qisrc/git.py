@@ -8,6 +8,7 @@
 import os
 import contextlib
 import subprocess
+import functools
 
 from qisys import ui
 import qisys
@@ -61,7 +62,7 @@ class Git:
         Return None if not found
 
         """
-        (status, out) = self.call("config", "--get", name, raises=False)
+        (status, out) = self.config("--get", name, raises=False)
         if status != 0:
             return None
         return out.strip()
@@ -70,7 +71,7 @@ class Git:
         """ Set a new config value.
         Will be created if it does not exist
         """
-        self.call("config", name, value)
+        self.config(name, value)
 
     def get_current_ref(self, ref="HEAD"):
         """ return the current ref
@@ -107,17 +108,17 @@ class Git:
             return "%s/%s" % (remote, merge[11:])
         return "%s/%s" % (remote, merge)
 
-    def add(self, *args, **kwargs):
-        """ Wrapper for git add """
-        return self.call("add", *args, **kwargs)
-
-    def branch(self, *args, **kwargs):
-        """Wrapper for git branch."""
-        return self.call("branch", *args, **kwargs)
-
-    def checkout(self, *args, **kwargs):
-        """ Wrapper for git checkout """
-        return self.call("checkout", *args, **kwargs)
+    def __getattr__(self, name):
+        """Generate generic wrapper for call."""
+        # If you want to specialize one, remove it from whitelist and write it
+        # by hand (see clone).
+        # Only porcelain here.
+        whitelist = ("add", "branch", "checkout", "commit", "config", "fetch",
+                     "init", "merge", "pull", "push", "rebase", "remote",
+                     "reset", "stash", "status", "submodule")
+        if name in whitelist:
+            return functools.partial(self.call, name)
+        raise AttributeError
 
     def clone(self, *args, **kwargs):
         """ Wrapper for git clone """
@@ -126,39 +127,11 @@ class Git:
         kwargs["cwd"] = None
         return self.call("clone", *args, **kwargs)
 
-    def commit(self, *args, **kwargs):
-        """ Wrapper for git commit """
-        return self.call("commit", *args, **kwargs)
-
-    def fetch(self, *args, **kwargs):
-        """ Wrapper for git fetch """
-        return self.call("fetch", *args, **kwargs)
-
-    def init(self, *args, **kwargs):
-        """ Wrapper for git init """
-        return self.call("init", *args, **kwargs)
-
-    def pull(self, *args, **kwargs):
-        """ Wrapper for git pull """
-        return self.call("pull", *args, **kwargs)
-
-    def push(self, *args, **kwargs):
-        """ Wrapper for git push """
-        return self.call("push", *args, **kwargs)
-
-    def remote(self, *args, **kwargs):
-        """ Wrapper for git remote """
-        return self.call("remote", *args, **kwargs)
-
-    def reset(self, *args, **kwargs):
-        """ Wrapper for git reset """
-        return self.call("reset", *args, **kwargs)
-
     def update_submodules(self, raises=True):
         """ Update submodule, cloning them if necessary """
         # This will fail if some pushed a broken submodule
         # (ie git metadata does not match .gitmodules)
-        res, out = self.call("submodule", "status", raises=False)
+        res, out = self.submodule("status", raises=False)
         if res != 0:
             mess  = "Broken submodules configuration detected for %s\n" % self.repo
             mess += "git status returned %s\n" % out
@@ -168,7 +141,7 @@ class Git:
                 return mess
         if not out:
             return
-        res, out = self.call("submodule", "update", "--init", "--recursive",
+        res, out = self.submodule("update", "--init", "--recursive",
                             raises=False)
         if res == 0:
             return
@@ -208,9 +181,9 @@ class Git:
             :param untracked: will return True even if there are untracked files.
         """
         if untracked:
-            (status, out) = self.call("status", "-s", raises=False)
+            (status, out) = self.status("-s", raises=False)
         else:
-            (status, out) = self.call("status", "-suno", raises=False)
+            (status, out) = self.status("-suno", raises=False)
         lines = [l for l in out.splitlines() if len(l.strip()) != 0 ]
         if len(lines) > 0:
             return False
@@ -313,13 +286,13 @@ def _update_branch(git, branch, remote_name,
         # but first stash fails for some reason ...
         if status.mess:
             return status.mess
-        (ret, out) = git.call("rebase", remote_ref, raises=False)
+        (ret, out) = git.rebase(remote_ref, raises=False)
         if ret != 0:
             print "Rebasing failed!"
             print "Calling rebase --abort"
             status.mess += "Could not rebase\n"
             status.mess += out
-            (ret, out) = git.call("rebase", "--abort", raises=False)
+            (ret, out) = git.rebase("--abort", raises=False)
             if ret == 0:
                 return status.mess
             else:
@@ -330,7 +303,7 @@ def _update_branch(git, branch, remote_name,
         # Stashing back failse: calling rebase --abort
         print "Stasthing back changes failed"
         print "Calling rebase --abort"
-        (ret, out) = git.call("rebase", "--abort", raises=False)
+        (ret, out) = git.rebase("--abort", raises=False)
         if ret != 0:
             status.mess += "rebase --abort failed!\n"
             status.mess += out
@@ -345,7 +318,7 @@ def _stash_changes(git, status):
     if git.is_clean(untracked=False):
         yield
         return
-    (ret, out) = git.call("stash", raises=False)
+    (ret, out) = git.stash(raises=False)
     if ret != 0:
         status.mess += "Stashing changes failed\n"
         status.mess += out
@@ -353,7 +326,7 @@ def _stash_changes(git, status):
     # If first stash fails, no need to try stash pop:
     if status.mess:
         return
-    (ret, out) = git.call("stash", "pop", raises=False)
+    (ret, out) = git.stash("pop", raises=False)
     if ret != 0:
         status.mess = "Stashing back changes failed\n"
         status.mess += out
@@ -428,7 +401,7 @@ def _update_branch_if_ff(git, status, local_branch, remote_ref):
     # Safe to checkout the branch, run merge and then go back
     # to where we were:
     with _change_branch(git, status, local_branch):
-        (ret, out) = git.call("merge", "-v", remote_sha1, raises=False)
+        (ret, out) = git.merge("-v", remote_sha1, raises=False)
         if ret != 0:
             status.mess += "Merging %s with %s failed" % (local_branch, remote_ref)
             status.mess += out
@@ -469,7 +442,7 @@ def is_submodule(path):
     else:
         parent_repo_root = get_repo_root(path)
     parent_git = Git(parent_repo_root)
-    (retcode, out) = parent_git.call("submodule", raises=False)
+    (retcode, out) = parent_git.submodule(raises=False)
     if retcode == 0:
         if not out:
             return False
