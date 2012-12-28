@@ -53,7 +53,7 @@ def do(args):
     incorrect_projs = list()
     not_on_a_branch = list()
     for git_project in git_projects:
-        git = qisrc.git.open(git_project.path)
+        git = qisrc.git.Git(git_project.path)
         if sys.stdout.isatty():
             src = git_project.src
             to_write = "Checking (%d/%d) " % (i, num_projs)
@@ -89,7 +89,7 @@ def do(args):
     ui.info("\n", ui.brown, "Dirty projects", len(dirty), "/", len(git_projects))
 
     for git_project in gitrepo:
-        git = qisrc.git.open(git_project.path)
+        git = qisrc.git.Git(git_project.path)
         shortpath = os.path.relpath(git_project.path, qiwt.root)
         if git.is_valid():
             branch = git.get_current_branch()

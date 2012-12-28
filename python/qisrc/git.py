@@ -483,10 +483,3 @@ def is_submodule(path):
                    parent_repo_root, "!",
                    "\nError was: ", ui.reset, "\n", "  " + out)
         return True
-
-
-def open(repo):
-    """ Open a new worktree
-    """
-    git = Git(repo)
-    return git

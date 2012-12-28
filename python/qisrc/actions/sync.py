@@ -84,7 +84,7 @@ def do(args):
                 ui.blue, project.src)
         else:
             ui.info(ui.bold, "Pulling", ui.blue, project.src)
-        git = qisrc.git.open(project.path)
+        git = qisrc.git.Git(project.path)
         error = git.update_branch(project.branch, project.remote,
                                  fetch_first=True)
         if error:

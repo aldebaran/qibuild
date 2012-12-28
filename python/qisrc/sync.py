@@ -34,7 +34,7 @@ def fetch_manifest(worktree, manifest_git_url, branch="master",
         clone_project(worktree, manifest_git_url, src=src)
         manifest = worktree.get_project(src)
     # Make sure manifest project is on the correct, up to date branch:
-    git = qisrc.git.open(manifest.path)
+    git = qisrc.git.Git(manifest.path)
     git.set_remote("origin", manifest_git_url)
     git.set_tracking_branch(branch, "origin")
     git.checkout("-f", branch, quiet=True)

@@ -498,7 +498,7 @@ def test_is_ff(tmpdir):
     a_git = tmpdir.mkdir("a_git_project")
     a_src = a_git.strpath
 
-    git = qisrc.git.open(a_src)
+    git = qisrc.git.Git(a_src)
     git.init()
     write_readme(a_src, "readme\n")
     git.add(".")
@@ -525,7 +525,7 @@ def test_is_ff(tmpdir):
 
 def test_get_ref_sha1(tmpdir):
     a_git = tmpdir.mkdir("a_git_project")
-    git = qisrc.git.open(a_git.strpath)
+    git = qisrc.git.Git(a_git.strpath)
 
     assert git.is_valid() == False
 
