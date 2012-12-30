@@ -14,90 +14,279 @@ def configure_parser(parser):
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
-    group = parser.add_argument_group("depends arguments")
-    group.add_argument("--reverse", "-r", action="store_true",
-                       help="display reverse dependencies")
-    group.add_argument("--deep", action="store_true",
-                        help="display all dependencies using a depth traversal")
+    group = parser.add_argument_group("depends arguments",
+        description="Shows project and package dependencies."
+            "\nUse --runtime, --single, and --reverse to control"
+            "the dependencies to examine. Default usage shows "
+            "compressed, recursive, build time dependencies. "
+            "\nUse --tree or --graph to control the output format."
+            "\nFor best results with --graph, use:\nqibuild depends"
+            "--graph | dot -Tpng -oout.png -Goverlap=scale -Gsplines=true")
+    group.add_argument("--reverse", action="store_true", default=False,
+                       help="show projects that depend on the current project")
+    group.add_argument("--tree", action="store_true", default=False,
+                        help="output in text tree format showing paths")
+    group.add_argument("--graph", action="store_true",
+                        help="output in format suitable for the \"dot\" "
+                        "graphing tool")
 
-def get_reverse_deps(toc, project):
-    bproject_names = list()
-    rproject_names = list()
-    for p in toc.projects:
-        (_, p_rdeps) = qibuild.cmdparse.get_deps(toc, [p], runtime=True)
-        (_, p_bdeps) = qibuild.cmdparse.get_deps(toc, [p], build_deps=True)
-        if project.name in [x.name for x in p_bdeps]:
-            bproject_names.append(p.name)
-        if project.name in [x.name for x in p_rdeps]:
-            rproject_names.append(p.name)
-    return (bproject_names, rproject_names, set(), set())
+class DependencyRelationship:
+    """ helper class to separate dependency search from display """
+    def __init__(self, from_name, to_name):
+        self.from_name = from_name
+        self.to_name = to_name
+        self.path = ""
+        self.is_package = False
+        self.is_known = False
+        self.depth = 0
 
-def get_deps(toc, project):
-    (bpackages, bprojects) = qibuild.cmdparse.get_deps(toc, [project], build_deps=True)
-    (rpackages, rprojects) = qibuild.cmdparse.get_deps(toc, [project], runtime=True)
+    def __str__(self):
+        return "Dependency from %s to %s, is_package: %s, is_known: %s, depth: %s" % (
+            self.from_name, self.to_name, self.is_package, self.is_known, self.depth)
 
-    return ([x.name for x in bprojects], [x.name for x in rprojects],
-            [x.name for x in bpackages], [x.name for x in rpackages])
+    def same_as(self, other):
+        """ return true if from_name and to_name are the same """
+        return (other.from_name == self.from_name and
+            other.to_name == self.to_name)
+
+def get_deps(toc, project, single, runtime, reverse):
+    """ create a list of DependencyRelationship objects ready for display """
+    if reverse:
+        (packages, projects) =  (set(), toc.projects)
+    else:
+        if not runtime:
+            (packages, projects) = qibuild.cmdparse.get_deps(
+                toc, [project], build_deps=True)
+        else:
+            (packages, projects) = qibuild.cmdparse.get_deps(
+                toc, [project], runtime=True)
+
+    # hack, remove self from projects
+    projects = [x for x in projects if x.name is not project.name]
+
+    if reverse:
+        collected_dependencies = collect_dependencies_reverse(
+            project, projects, single, runtime)
+    else:
+        collected_dependencies = collect_dependencies(
+            project, projects, packages, single, runtime)
+
+    return collected_dependencies
+
+def print_deps_tree(dependency_relationships):
+    """ --tree style output formatter """
+    if len(dependency_relationships) == 0:
+        qisys.ui.info("None")
+        return
+    max_name = max(
+        [len(x.to_name + "    "*x.depth) for x in dependency_relationships])
+    for dep in dependency_relationships:
+        color = qisys.ui.blue
+        if dep.is_package:
+            color = qisys.ui.white
+        if not dep.is_known:
+            color = qisys.ui.red
+        item = "  " + "    "*dep.depth + dep.to_name
+        qisys.ui.info(color, item.ljust(max_name+2), qisys.ui.reset, dep.path)
+
+def separate_into_groups(dependency_relationships):
+    """ split into sorted logical groups """
+    projects = list()
+    projects_bad = list()
+    packages = list()
+    packages_bad = list()
+
+    for dep in dependency_relationships:
+        if dep.is_package:
+            if dep.is_known:
+                packages.append(dep.path)
+            elif not dep.is_known:
+                packages_bad.append(dep.to_name)
+        else:
+            if dep.is_known:
+                projects.append(dep.path)
+            elif not dep.is_known:
+                projects_bad.append(dep.to_name)
+
+    projects = sorted(set(projects))
+    projects_bad = sorted(set(projects_bad))
+    packages = sorted(set(packages))
+    packages_bad = sorted(set(packages_bad))
+    return (projects, projects_bad, packages, packages_bad)
+
+
+def print_deps_compressed(dependency_relationships):
+    """ default simple compressed output formatter """
+    if len(dependency_relationships) == 0:
+        qisys.ui.info("None")
+        return
+
+    (projects, projects_bad, packages, packages_bad) = separate_into_groups(
+        dependency_relationships)
+
+    if (len(projects) + len(projects_bad) > 0):
+        qisys.ui.info(qisys.ui.reset, "  Projects")
+        for project in projects:
+            qisys.ui.info(qisys.ui.white, "    " + project)
+        for project in projects_bad:
+            qisys.ui.info(qisys.ui.red, "    " + project)
+    if (len(packages) + len(packages_bad) > 0):
+        qisys.ui.info(qisys.ui.reset, "  Packages")
+        for package in packages:
+            qisys.ui.info(qisys.ui.white, "    " + package)
+        for package in packages_bad:
+            qisys.ui.info(qisys.ui.red, "    " + package)
+
+def print_deps_graph(root_name, label, dependency_relationships):
+    """ --graph output, suitable for dot """
+    # header
+    qisys.ui.info(qisys.ui.reset, "digraph", qisys.ui.green,
+                  "\"" + root_name + "\"", qisys.ui.reset, "{")
+    qisys.ui.info(qisys.ui.reset, "  label=",
+        qisys.ui.green, "\"" + label + "\"")
+
+    cleaned = list()
+    # TODO cleaner duplicate removal (depth could be different)
+    for dep in dependency_relationships:
+        if not next( (y for y in cleaned if y.same_as(dep)), None):
+            cleaned.append(dep)
+    dependency_relationships = cleaned
+
+    # Show unique packages as rectangles
+    package_names = sorted(set(
+        [x.to_name for x in dependency_relationships if x.is_package]))
+    for package_name in package_names:
+        qisys.ui.info(qisys.ui.reset, "  \"" + package_name + "\" [shape=box]")
+
+    for dep in dependency_relationships:
+        src_color = qisys.ui.blue
+        if dep.from_name == root_name:
+            src_color = qisys.ui.green
+
+        dest_color = qisys.ui.blue
+        line_type = ""
+        if dep.is_package:
+            dest_color = qisys.ui.white
+        if not dep.is_known:
+            dest_color = qisys.ui.red
+            line_type = "[style=dotted]"
+        qisys.ui.info(src_color, "  " + "  "*dep.depth,
+                "\"" + dep.from_name + "\"",
+                qisys.ui.reset, "->",
+                dest_color, "\"" + dep.to_name + "\"",
+                qisys.ui.reset, line_type)
+    qisys.ui.info(qisys.ui.reset, "}")
+
+def collect_dependencies_reverse(project, projects, single, runtime, depth=0):
+    """ recursively collects projects that depends on the current project """
+    collected_dependencies = list()
+    for proj in projects:
+        dependency = None
+        depends = list()
+        if runtime:
+            depends = proj.rdepends
+        else:
+            depends = proj.depends
+        if project.name in depends:
+            dependency = DependencyRelationship(project.name, proj.name)
+            dependency.is_known = True
+            dependency.path = proj.directory
+            dependency.depth = depth
+            collected_dependencies.append(dependency)
+            if not single:
+                sub = collect_dependencies_reverse(
+                    proj, projects, False, runtime, depth+1)
+                collected_dependencies.extend(sub)
+    return collected_dependencies
+
+def package_names_first(dependency_names, package_names):
+    """ put package names first """
+    dep_packages = sorted(
+        [x for x in dependency_names if x in package_names])
+    dep_projects = sorted(
+        [x for x in dependency_names if x not in package_names])
+    dep_packages.extend(dep_projects)
+    return dep_packages
+
+def collect_dependencies(project, projects, packages, single, runtime, depth=0):
+    """ recursively collect dependent projects and packages S"""
+    if depth > 99:
+        qisys.ui.error("Probable recursion problem: ", project.name)
+        exit(1)
+
+    # Look at runtime dependencies if runtime
+    if runtime:
+        dependency_names = project.rdepends
+    else:
+        dependency_names = project.depends
+    package_names = [package.name for package in packages]
+    dependency_names = package_names_first(dependency_names, package_names)
+    collected_dependencies = list()
+
+    # Go through them and gather information
+    for dependency_name in dependency_names:
+        dependency = DependencyRelationship(project.name, dependency_name)
+        dependency.depth = depth
+        next_item = None
+
+        if dependency_name in package_names:
+            dependency.is_package = True
+            # find package, so that we can get its path
+            match = next(
+                (x for x in packages if x.name == dependency_name), None)
+            if match:
+                dependency.path = match.path
+                dependency.is_known = True
+        else:
+            # find project, so that we can get its directory
+            match = next(
+                (x for x in projects if x.name == dependency_name), None)
+            if match:
+                dependency.path = match.directory
+                dependency.is_known = True
+                next_item = match
+        collected_dependencies.append(dependency)
+
+        if not single and next_item:
+            collected_dependencies.extend(
+                collect_dependencies(next_item, projects, packages,
+                                     False, runtime, depth+1))
+    return collected_dependencies
+
 
 def do(args):
-    """Main entry point"""
-    if args.deep and args.reverse:
-        qisys.ui.error("you can't use --deep with --reverse.")
-        exit(1)
+    """Main entry point for depends action"""
     toc = qibuild.toc.toc_open(args.worktree, args)
-    if args.deep:
-        (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
+
+    # small hack:
+    if args.projects:
+        args.project = args.projects[0]
     else:
-        # small hack:
-        if args.projects:
-            args.project = args.projects[0]
+        args.project = None
+
+    project = qibuild.cmdparse.project_from_args(toc, args)
+    collected_dependencies = get_deps(
+        toc, project, args.single, args.runtime, args.reverse)
+
+    # create title
+    label = project.name
+    if args.runtime:
+        label = label + " run time"
+    else:
+        label = label + " build time"
+    if args.single:
+        label = label + " direct"
+    if args.reverse:
+        label = label + " reverse dependencies"
+    else:
+        label = label + " dependencies"
+
+    # display
+    if args.graph:
+        print_deps_graph(project.name, label, collected_dependencies)
+    else:
+        qisys.ui.info(qisys.ui.green, label)
+        if args.tree:
+            print_deps_tree(collected_dependencies)
         else:
-            args.project = None
-        project = qibuild.cmdparse.project_from_args(toc, args)
-        projects = [project]
-
-
-    qisys.ui.info("legend:",
-                    qisys.ui.red  , "buildtime",
-                    qisys.ui.white, "buildtime+runtime",
-                    qisys.ui.green, "runtime")
-    qisys.ui.info()
-
-
-    for project in projects:
-        if args.reverse:
-            qisys.ui.info(qisys.ui.green, "*",
-                            qisys.ui.blue, project.name, qisys.ui.reset,
-                            "reverse dependencies:")
-        else:
-            qisys.ui.info(qisys.ui.green, "*",
-                            qisys.ui.blue, project.name, qisys.ui.reset,
-                            "dependencies:")
-
-        if args.reverse:
-            (bproject_names, rproject_names,
-             bpackage_names, rpackage_names) = get_reverse_deps(toc, project)
-        else:
-            (bproject_names, rproject_names,
-             bpackage_names, rpackage_names) = get_deps(toc, project)
-
-        bproject_names = set(bproject_names) - set([project.name])
-        rproject_names = set(rproject_names) - set([project.name])
-
-        brproject_names = set(bproject_names).intersection(set(rproject_names))
-        brpackage_names = set(bpackage_names).intersection(set(rpackage_names))
-
-        bproject_names = set(bproject_names) - set(brproject_names)
-        rproject_names = set(rproject_names) - set(brproject_names)
-
-        bpackage_names = set(bpackage_names) - set(brpackage_names)
-        rpackage_names = set(rpackage_names) - set(brpackage_names)
-
-        qisys.ui.info("  projects:",
-                        qisys.ui.red  , " ".join(bproject_names),
-                        qisys.ui.white, " ".join(brproject_names),
-                        qisys.ui.green, " ".join(rproject_names))
-        qisys.ui.info("  packages:",
-                        qisys.ui.red  , " ".join(bpackage_names),
-                        qisys.ui.white, " ".join(brpackage_names),
-                        qisys.ui.green, " ".join(rpackage_names))
+            print_deps_compressed(collected_dependencies)
