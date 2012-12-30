@@ -376,6 +376,21 @@ def _change_branch(git, status, branch):
             status.mess += "Checkout back to %s failed\n" % current_branch
             status.mess += out
 
+def is_ff(git, status, local_sha1, remote_sha1):
+    """Check local_sha1 is fast-forward with remote_sha1.
+    Return True / False or None in case of error with merge-base.
+    """
+
+    (retcode, out) = git.call("merge-base", local_sha1, remote_sha1,
+                               raises=False)
+    if retcode != 0:
+        status.mess += "Calling merge-base failed"
+        status.mess += out
+        return None
+
+    common_ancestor = out.strip()
+    return common_ancestor == local_sha1
+
 def _update_branch_if_ff(git, status, local_branch, remote_ref):
     """ Update a local branch with a remote branch if the
     merge is fast-forward
@@ -389,6 +404,7 @@ def _update_branch_if_ff(git, status, local_branch, remote_ref):
         status.mess += out
         return
     local_sha1 = out.split()[0]
+
     (ret, out) = git.call("show-ref", "--verify",
                                 "refs/remotes/%s" % remote_ref,
                                 raises=False)
@@ -396,22 +412,16 @@ def _update_branch_if_ff(git, status, local_branch, remote_ref):
         status.mess += "Calling show-ref --verify failed\n"
         status.mess += out
         return
-
     remote_sha1 = out.split()[0]
-    (retcode, out) = git.call("merge-base", local_sha1, remote_sha1,
-                               raises=False)
-    if retcode != 0:
-        status.mess += "Calling merge-base failed"
-        status.mess += out
+
+    result_ff = is_ff(git, status, local_sha1, remote_sha1)
+    if result_ff is None:
         return
-    common_ancestor = out.strip()
-    if common_ancestor != local_sha1:
+    if result_ff is False:
         status.mess += "Could not update %s with %s\n" % (local_branch, remote_ref)
         status.mess += "Merge is not fast-forward and you are not on %s" % local_branch
         return
-    if local_sha1 == remote_sha1:
-        # Nothing to do
-        return
+
     print "Updating %s with %s ..." % (local_branch, remote_ref)
     # Safe to checkout the branch, run merge and then go back
     # to where we were:

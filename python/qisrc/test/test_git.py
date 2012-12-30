@@ -493,3 +493,32 @@ def test_get_repo_root(tmpdir):
     assert qisrc.git.get_repo_root(a_git.strpath)   == a_git.strpath
     assert qisrc.git.get_repo_root(work.strpath)    == a_git.strpath
     assert qisrc.git.get_repo_root(os.path.join(tmpdir.strpath, "pouet")) == None
+
+def test_is_ff(tmpdir):
+    a_git = tmpdir.mkdir("a_git_project")
+    a_src = a_git.strpath
+
+    git = qisrc.git.open(a_src)
+    git.init()
+    write_readme(a_src, "readme\n")
+    git.add(".")
+    git.commit("-m", "initial commit")
+    git.call("branch", "A")
+
+    write_readme(a_src, "readme2\n")
+    git.add(".")
+    git.commit("-m", "second commit")
+    git.call("branch", "B")
+
+    (ret, out) = git.call("show-ref", "--verify", "refs/heads/A", raises=False)
+    A_sha1 = out.split()[0]
+    (ret, out) = git.call("show-ref", "--verify", "refs/heads/B", raises=False)
+    B_sha1 = out.split()[0]
+
+    class Status:
+        pass
+    status = Status()
+    status.mess = ""
+    assert qisrc.git.is_ff(git, status, A_sha1, B_sha1) == True
+    assert qisrc.git.is_ff(git, status, B_sha1, A_sha1) == False
+    assert qisrc.git.is_ff(git, status, A_sha1, A_sha1) == True
