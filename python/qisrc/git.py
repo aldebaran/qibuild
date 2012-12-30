@@ -114,7 +114,7 @@ class Git:
         # by hand (see clone).
         # Only porcelain here.
         whitelist = ("add", "branch", "checkout", "commit", "config", "fetch",
-                     "init", "merge", "pull", "push", "rebase", "remote",
+                     "init", "log", "merge", "pull", "push", "rebase", "remote",
                      "reset", "stash", "status", "submodule")
         if name in whitelist:
             return functools.partial(self.call, name)
