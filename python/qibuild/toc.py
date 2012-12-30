@@ -522,8 +522,6 @@ You may want to run:
         if rebuild:
             cmd += ["--clean-first"]
         cmd += [ "--" ]
-        if verbose_make:
-            cmd += [ "VERBOSE=1" ]
         cmd += num_jobs_to_args(num_jobs, self.cmake_generator)
         if self.using_visual_studio and incredibuild:
             # In order to use incredibuild, we have to do this small hack:
@@ -536,8 +534,12 @@ You may want to run:
             cmd += ["/nologo"]
             if target:
                 cmd += ["/target=%s" % target]
+
+        make_env = self.build_env.copy()
+        if verbose_make:
+            make_env["VERBOSE"] = "1"
         try:
-            qisys.command.call(cmd, env=self.build_env)
+            qisys.command.call(cmd, env=make_env)
         except CommandFailedException:
             raise BuildFailed(project)
 
