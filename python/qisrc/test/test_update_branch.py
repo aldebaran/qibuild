@@ -105,6 +105,7 @@ def test_rebase_fails():
     assert "Conflict in foo.txt" in error
     git.check()
 
+# pylint: disable-msg=E1101
 @pytest.mark.xfail
 def test_stash_then_rebase_fails():
     git = FakeGit("repo")
