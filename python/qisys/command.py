@@ -64,7 +64,7 @@ class Process:
             ui.debug("Starting thread.")
             ui.debug("Calling:", " ".join(self.cmd))
             try:
-                opt = dict()
+                opts = dict()
                 if os.name == 'posix':
                     opts = {
                         'preexec_fn': os.setsid,
