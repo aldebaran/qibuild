@@ -46,10 +46,6 @@ class Process:
     NOT_RUN     = 5
 
     def __init__(self, cmd, name=None, verbose=False, cwd=None, env=None):
-        if name is None:
-            thread_name = "Process"
-        else:
-            thread_name = "Process<%s>" % name
         self.cmd = cmd
         self.cwd = cwd
         self.env = env
