@@ -4,13 +4,12 @@
 
 """ Generate and load snapshot. """
 
-import os
-
 from qisys import ui
 
 import qisys
 
 import qisrc.git
+import qisrc.snapshot
 
 def configure_parser(parser):
     """Configure parser for this action."""
@@ -21,6 +20,8 @@ def configure_parser(parser):
                         action="store_true")
     parser.add_argument("-f", "--force", help="Force reset even if working dir "
                         "is not clean.", action="store_true")
+    parser.add_argument("-m", "--manifest", help="Use manifest instead of "
+                        "current state.", action="store_true")
     parser.add_argument("path", help="A path to store or load informations.")
 
 def do(args):
@@ -30,49 +31,8 @@ def do(args):
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, worktree.root)
 
     if args.load:
-        load_snapshot(worktree, args.path, args.force)
+        qisrc.snapshot.load_snapshot(worktree, args.path, args.force)
         return
 
-    generate_snapshot(worktree, args.path)
-
-def generate_snapshot(worktree, path):
-    if os.path.exists(path) and not os.path.isfile(path):
-        return
-    with open(path, 'w') as f:
-        for project in worktree.projects:
-            if not project.is_git():
-                continue
-            git = qisrc.git.Git(project.path)
-            (returncode, sha1) = git.log("--pretty=format:%H", "-1", raises=False)
-            if returncode != 0:
-                ui.info(ui.red, sha1)
-                continue
-            f.write(project.src + ":" + sha1 + '\n')
-            ui.info(ui.green, project.src, ui.reset, ui.bold, sha1)
-
-def load_snapshot(worktree, path, force):
-    if not os.path.isfile(path):
-        return
-    with open(path, 'r') as f:
-        for line in f:
-            (src, sha1) = line.split(":")
-            src = src.strip()
-            sha1 = sha1.strip()
-            ui.info(ui.green, src, sha1)
-
-            project = worktree.get_project(src)
-
-            if project is None:
-                ui.info(ui.red, src, "is not a project.")
-                continue
-
-            if not project.is_git():
-                ui.info(ui.red, src, "is not a git project.")
-                continue
-
-            git_project = qisrc.git.Git(project.path)
-            if not git_project.is_clean() and not force:
-                ui.info(ui.red, project.src, "is not clean, reset --hard aborted.\n"
-                        "Use --force to force the reset.")
-                continue
-            git_project.reset("--hard", sha1)
+    qisrc.snapshot.generate_snapshot(worktree, args.path,
+        manifest=args.manifest)
