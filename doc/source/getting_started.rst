@@ -248,6 +248,52 @@ For instance:
     </defaults>
   </qibuild>
 
+Using Ninja
++++++++++++
+
+`Ninja <http://martine.github.com/ninja/>`_ is a small build system with a focus on speed.
+
+``Ninja`` is supported by ``CMake`` since 2.8.10, and by ``QtCreator``
+since 2.6.1
+
+Support for ``Ninja`` is still experimental, but by using it
+you should experience faster compilations, especially during incremental
+builds.
+
+First, get ninja from github and compile it:
+
+.. code-block:: console
+
+    $ git clone git://github.com/martine/ninja.git
+    $ cd ninja
+    $ python ./bootstrap.py
+
+.. note:: On Windows, you need to run this form the Visual Studio command
+    prompt so that cl.exe can be found, or, if you are using mingw,
+    from a mingw command prompt
+
+Then make sure that ``ninja`` is in your PATH.
+
+To use it, edit ``.config/qi/qibuild.xml`` to look like:
+
+.. code-block:: xml
+
+    <qibuild version="1">
+      <build />
+      <defaults>
+        <cmake generator="Ninja" />
+      </defaults>
+    </qibuild>
+
+Or just re-run ``qibuild config --wizard``
+
+
+Notes:
+
+* starting with ``ninja`` 1.1.0, you can get the same
+  output you used to have when using makefiles by setting
+  the ``NINJA_STATUS`` environment variable to ``"[%p] "``
+  (note the trailing space)
 
 Configuring qiBuild for Eclipse CDT
 +++++++++++++++++++++++++++++++++++
