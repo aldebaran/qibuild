@@ -151,7 +151,7 @@ def read_cmake_cache(cache_path):
             continue
         if not line:
             continue
-        match = re.match(r"([a-zA-Z-_]+):(\w+)=(.*)", line)
+        match = re.match(r"([a-zA-Z0-9-_]+):(\w+)=(.*)", line)
         if not match:
             continue
         else:
