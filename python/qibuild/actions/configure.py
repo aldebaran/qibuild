@@ -1,4 +1,4 @@
-## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+## Copyright (c) 2012, 2013 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
@@ -41,6 +41,14 @@ def configure_parser(parser):
                         help="summarize build options at the end")
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
                         werror=False, profiling=False)
+    if not parser.epilog:
+        parser.epilog = ""
+    parser.epilog += """
+Note:
+    if CMAKE_INSTALL_PREFIX is set during configure, it will be necessary to
+    repeat it at install (for further details, see: qibuild install --help).
+"""
+
 
 def do(args):
     """Main entry point"""

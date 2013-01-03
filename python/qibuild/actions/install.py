@@ -1,4 +1,4 @@
-## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+## Copyright (c) 2012, 2013 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
@@ -26,6 +26,14 @@ def configure_parser(parser):
     group.add_argument("--split-debug", action="store_true", dest="split_debug",
         help="Split the debug symbols out of the binaries")
     parser.set_defaults(runtime=False, prefix="/", include_deps=True)
+    if not parser.epilog:
+        parser.epilog = ""
+    parser.epilog += """
+Warning:
+    If CMAKE_INSTALL_PREFIX was set during configure, it is necessary to repeat
+    it at install using the '--prefix' option.
+"""
+
 
 def do(args):
     """Main entry point"""

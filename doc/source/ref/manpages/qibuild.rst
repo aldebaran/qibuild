@@ -57,6 +57,13 @@ package PROJECT
 deploy [PROJECT] URL
   Deploy a project on the remote target reachable at URL
 
+.. note::
+
+  if ``CMAKE_INSTALL_PREFIX`` is set at ``configure``, it will be necessary to
+  repeat it at ``install``.
+
+  For further details, refer to the help of those two commands.
+
 
 OPTIONS
 -------
