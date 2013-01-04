@@ -84,7 +84,10 @@ endfunction()
 #                         behavior)
 #
 function(qi_install_conf)
-  _qi_install_internal(${ARGN} COMPONENT conf  DESTINATION ${QI_SDK_CONF})
+  if(NOT DEFINED SYSCONFDIR)
+    set(SYSCONFDIR "${QI_SDK_CONF}")
+  endif()
+  _qi_install_internal(${ARGN} COMPONENT conf  DESTINATION "${SYSCONFDIR}")
 endfunction()
 
 #! Install CMake module files.

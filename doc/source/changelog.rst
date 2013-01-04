@@ -80,6 +80,30 @@ CMake
   to use ``-isystem`` on the dependencies
 * :cmake:function:`qi_create_config_h` learned to use ``configure_file`` flags
   such as ``@ONLY``
+* :cmake:function:`qi_install_conf` learned to install configuration files in a
+  SYSCONDIR outside the CMAKE_INSTALL_PREFIX subtree.
+
+  .. code-block:: console
+
+    $ qibuild configure foo
+    $ qibuild install foo --prefix=/usr /tmp/without_sysconfdir
+    $ tree /tmp/without_sysconfdir
+    /tmp/without_sysconfdir/
+        usr/
+            etc/
+                foo.conf
+            lib/
+                libfoo.so
+
+    $ qibuild configure foo -D SYSCONFDIR=/etc
+    $ qibuild install foo --prefix=/usr /tmp/with_sysconfdir
+    $ tree /tmp/with_sysconfdir
+    /tmp/with_sysconfdir/
+        etc/
+            foo.conf
+        usr/
+            lib/
+                libfoo.so
 
 * qibuild cmake modules:
 
