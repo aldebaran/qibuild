@@ -695,7 +695,7 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
     and calls Toc constructor accordingly (see :py:meth:`Toc.__init__`)
 
     """
-    # Not that args can come from:
+    # Note that args can come from:
     #    - a worktree parser
     #    - a toc parser
     #    - a build parser

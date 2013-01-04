@@ -33,7 +33,7 @@ def configure_parser(parser):
         help="activate warnings from the 'Effective C++' book (gcc only)")
     group.add_argument("--werror", dest="werror",
         action="store_true",
-        help="tread warnings as error")
+        help="treat warnings as error")
     parser.add_argument("--profiling", dest="profiling", action="store_true",
         help="profile cmake execution")
     parser.add_argument("--summarize-options", dest="summarize_options",
