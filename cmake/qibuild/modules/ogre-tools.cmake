@@ -39,7 +39,7 @@ function(configure_ogre)
   # FIXME: put configuration files in etc/ rather that in bin/
 
   cmake_parse_arguments(ARG "" "APPLICATION_NAME;RENDER_PLUGIN"
-    "SRC_RESOURCES_PATHS;INSTALLED_RESOURCES_PATHS" ${ARGN})
+    "SRC_RESOURCES_PATHS;INSTALLED_RESOURCES_PATHS;PLUGINS" ${ARGN})
 
   # Set CMAKE_FIND_LIBRARY_PREFIXES so that RenderSystem_GL.so is found
   # (there is not libRendeSystem_GL.so)
@@ -59,12 +59,26 @@ function(configure_ogre)
   file(WRITE  "${_plugins_cfg}" "# Defines Ogre plugins to load\n")
   file(APPEND "${_plugins_cfg}" "PluginFolder=${_ogre_plugins_folder}\n")
   file(APPEND "${_plugins_cfg}" "Plugin=${ARG_RENDER_PLUGIN}\n")
+  foreach(_plugin ${ARG_PLUGINS})
+    set(_backup ${CMAKE_FIND_LIBRARY_PREFIXES})
+    set(CMAKE_FIND_LIBRARY_PREFIXES "")
+    find_library(_ogre_plugin NAMES ${ARG_RENDER_PLUGIN}
+                              PATH_SUFFIXES "OGRE")
+    set(CMAKE_FIND_LIBRARY_PREFIXES ${_backup})
+    if(NOT _ogre_plugin)
+      qi_error("Could not find library for plugin: '${_plugin}'")
+    endif()
+    file(APPEND "${_plugins_cfg}" "Plugin=${_plugin}\n")
+  endforeach()
 
   if(WIN32)
     set(_plugins_d_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/${ARG_APPLICATION_NAME}/ogre/plugins_d.cfg")
     file(WRITE  "${_plugins_d_cfg}" "# Defines Ogre plugins to load\n")
     file(APPEND "${_plugins_d_cfg}" "PluginFolder=${_ogre_plugins_folder}\n")
     file(APPEND "${_plugins_d_cfg}" "Plugin=${ARG_RENDER_PLUGIN}_d\n")
+    foreach(_plugin ${ARG_PLUGINS})
+      file(APPEND "${_plugins_d_cfg}" "Plugin=${_plugin}_d\n")
+    endforeach()
   endif()
 
   set(_resources_cfg "${QI_SDK_DIR}/${QI_SDK_CONF}/${ARG_APPLICATION_NAME}/ogre/resources.cfg")

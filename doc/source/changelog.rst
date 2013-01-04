@@ -112,6 +112,7 @@ CMake
     ``jsoncpp``, ``zbar``
   * Renamed dbus into dbus-1, and dbus-glib into dbus-glib-1
   * ``qi_use_lib(OPENGL)`` now uses upstream's ``FindOpenGL.cmake``
+  * ogre-tools: Allow to use more than one plugin.
 
 Python
 +++++++
