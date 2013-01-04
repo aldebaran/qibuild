@@ -89,7 +89,7 @@ class Project:
         opt_keys.sort()
         padding = max(len(x) for x in opt_keys) + 3
         for key in opt_keys:
-            print "  {} : {}".format(key.ljust(padding), cache[key])
+            print "  %s : %s" % (key.ljust(padding), cache[key])
 
     def __str__(self):
         res = ""
