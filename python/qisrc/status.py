@@ -74,8 +74,8 @@ def check_state(project, untracked):
     if not state_project.sync_and_clean:
         out = git.get_status(untracked)
         if out is not None:
-            state_project.status = [ x[:3]
-                    for x in out.splitlines() if len(x.strip()) > 0 ]
+            state_project.status = [ x for x in out.splitlines() if
+                    len(x.strip()) > 0 ]
 
     return state_project
 
@@ -97,8 +97,8 @@ def print_state(project, max_len):
 
     if not project.sync_and_clean:
         if project.status is not None:
-            nlines = [ x + project.project.src + "/"
-                    + x for x in project.status ]
+            nlines = [ x[:3] + project.project.src + "/"
+                    + x[3:] for x in project.status ]
             print "\n".join(nlines)
 
 def print_incorrect_projs(projects, max_len):
