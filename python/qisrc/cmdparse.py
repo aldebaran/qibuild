@@ -11,6 +11,10 @@ import os
 
 import qisys.worktree
 import qisys.sh
+import qisys.cmdparse
+import qisrc.groups
+
+import xml.etree.ElementTree as etree
 
 def guess_current_project(worktree, cwd):
     """ Guess the current project using a worktree and the
@@ -85,7 +89,6 @@ def projects_in_subdir(worktree, subdir, raises=False):
         raise Exception(mess)
     return res
 
-
 def projects_from_args(args):
     """
     Return a list of projects to use.
@@ -97,27 +100,36 @@ def projects_from_args(args):
       * otherwise return all the projects found inside the current working dir
       * otherwise raise an exception
     """
-    worktree_was_explicit = False
-    cwd = os.getcwd()
-    if args.worktree:
-        worktree = qisys.worktree.open_worktree(args.worktree)
-        worktree_was_explicit = True
-    else:
-        root = qisys.worktree.guess_worktree(raises=True)
-        worktree = qisys.worktree.open_worktree(root)
+    (worktree_was_explicit, worktree) = qisys.cmdparse.worktree_from_args(args)
 
+    projects = list(set(args.projects).union(projects_from_groups(args,
+                                                                  worktree)))
 
-    if not args.projects:
+    if not projects:
         if worktree_was_explicit or args.all:
             return worktree.projects
+
+        cwd = os.getcwd()
         return projects_from_cwd(worktree, cwd, single=args.single)
 
     if args.single:
-        if len(args.projects) != 1:
+        if len(projects) != 1:
             raise Exception("Using --single with several projects does not make sense")
 
     res = list()
-    for project_arg in args.projects:
-        projects = parse_project_arg(worktree, project_arg, single=args.single)
-        res.extend(projects)
+    for project_arg in projects:
+        projects_elem = parse_project_arg(worktree, project_arg, single=args.single)
+        res.extend(projects_elem)
     return res
+
+def projects_from_groups(args, worktree):
+    projects = set()
+
+    groups = qisrc.groups.get_groups(worktree)
+    if groups is None:
+        return projects
+
+    for group_name in args.groups:
+        projects = projects.union(set(groups.projects(group_name)))
+
+    return projects

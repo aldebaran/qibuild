@@ -27,6 +27,8 @@ def configure_parser(parser):
     """Configure parser for this action """
     qisrc.parsers.worktree_parser(parser)
     qibuild.parsers.project_parser(parser)
+    qisrc.parsers.groups_parser(parser)
+
     parser.add_argument("--no-review", dest="setup_review", action="store_false",
         help="Do not setup projects for review")
     parser.set_defaults(setup_review=True)

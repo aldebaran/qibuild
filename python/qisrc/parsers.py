@@ -9,3 +9,7 @@ import qisys.parsers
 def worktree_parser(parser):
     qisys.parsers.worktree_parser(parser)
 
+def groups_parser(parser):
+    """Parsers settings for groups."""
+    parser.add_argument("-g", "--group", dest="groups", action="append",
+                        help="Specify a group of projects.")
