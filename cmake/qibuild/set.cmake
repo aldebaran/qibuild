@@ -50,6 +50,7 @@ function(qi_persistent_append_uniq _name)
       qi_persistent_append("${_name}" ${_value})
     endif()
   endforeach()
+  set("${_name}" "${${_name}}" PARENT_SCOPE)
 endfunction()
 
 function(qi_persistent_prepend_uniq _name)
@@ -59,6 +60,7 @@ function(qi_persistent_prepend_uniq _name)
       qi_persistent_prepend("${_name}" ${_value})
     endif()
   endforeach()
+  set("${_name}" "${${_name}}" PARENT_SCOPE)
 endfunction()
 
 ## DEPRECATED ##
