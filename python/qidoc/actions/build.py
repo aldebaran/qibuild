@@ -4,7 +4,8 @@
 
 """Build documentation."""
 
-import qisys
+import qisys.parsers
+import qisys.worktree
 import qibuild
 import qibuild.parsers
 import qidoc.core
@@ -33,7 +34,8 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point."""
-    projects = qisrc.cmdparse.projects_from_args(args)
+    worktree = qisys.worktree.open_worktree(args.worktree)
+    projects = qisrc.cmdparse.projects_from_args(args, worktree)
     builder = qidoc.core.QiDocBuilder(projects, args.worktree, args.output_dir)
     opts = dict()
     opts['version'] = args.version if args.version else '0.42'

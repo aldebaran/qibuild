@@ -8,12 +8,10 @@ import qisys.worktree
 
 def worktree_from_args(args):
     if args.worktree:
-        worktree_was_explicit = True
         root = args.worktree
     else:
-        worktree_was_explicit = False
         root = qisys.worktree.guess_worktree(raises=True)
 
     worktree = qisys.worktree.open_worktree(args.worktree)
 
-    return (worktree_was_explicit, worktree)
+    return worktree

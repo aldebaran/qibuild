@@ -89,7 +89,7 @@ def projects_in_subdir(worktree, subdir, raises=False):
         raise Exception(mess)
     return res
 
-def projects_from_args(args):
+def projects_from_args(args, worktree):
     """
     Return a list of projects to use.
 
@@ -100,13 +100,11 @@ def projects_from_args(args):
       * otherwise return all the projects found inside the current working dir
       * otherwise raise an exception
     """
-    (worktree_was_explicit, worktree) = qisys.cmdparse.worktree_from_args(args)
-
     projects = list(set(args.projects).union(projects_from_groups(args,
                                                                   worktree)))
 
     if not projects:
-        if worktree_was_explicit or args.all:
+        if args.worktree or args.all:
             return worktree.projects
 
         cwd = os.getcwd()

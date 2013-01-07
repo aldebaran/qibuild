@@ -62,12 +62,10 @@ def sync_all(worktree, args):
 def do(args):
     """Main entry point"""
     worktree = qisys.worktree.open_worktree(args.worktree)
-    projects = qisrc.cmdparse.projects_from_args(args)
+    projects = qisrc.cmdparse.projects_from_args(args, worktree)
 
-    should_fetch_first = True
     if len(projects) == len(worktree.projects):
         sync_all(worktree, args)
-        should_fetch_first = False
 
     git_projects = set()
     for project in projects:
@@ -93,10 +91,10 @@ def do(args):
             errors.append((project.src, error))
     if not errors:
         return
-    print
+
     ui.error("Fail to sync some projects")
     for (src, err) in errors:
         ui.info(ui.blue, src)
-        print "-" * len(src)
-        print indent(err, 2)
+        ui.info("-" * len(src))
+        ui.info(indent(err, 2))
     sys.exit(1)

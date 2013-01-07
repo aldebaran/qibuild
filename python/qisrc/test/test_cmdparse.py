@@ -42,7 +42,8 @@ def parse_args(*args):
     parser.add_argument("-a", "--all", action="store_true")
     parser.add_argument("-s", "--single", action="store_true")
     parsed_args = parser.parse_args(args=args)
-    res = qisrc.cmdparse.projects_from_args(parsed_args)
+    worktree = qisys.worktree.open_worktree(parsed_args.worktree)
+    res = qisrc.cmdparse.projects_from_args(parsed_args, worktree)
     return [x.src for x in res]
 
 def test_guess_current_project(tmpdir):
