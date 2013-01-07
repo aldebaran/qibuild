@@ -123,7 +123,7 @@ def projects_from_args(args, worktree):
 def projects_from_groups(args, worktree):
     projects = set()
 
-    if not args.groups:
+    if not hasattr(args, "groups") or not args.groups:
         return projects
 
     groups = qisrc.groups.get_groups(worktree)
