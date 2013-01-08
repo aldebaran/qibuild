@@ -16,11 +16,11 @@ def configure_parser(parser):
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("depends arguments",
         description="Shows project and package dependencies."
-            "\nUse --runtime, --single, and --reverse to control"
+            "\nUse --runtime, --single, and --reverse to control "
             "the dependencies to examine. Default usage shows "
             "compressed, recursive, build time dependencies. "
             "\nUse --tree or --graph to control the output format."
-            "\nFor best results with --graph, use:\nqibuild depends"
+            "\nFor best results with --graph, use:\nqibuild depends "
             "--graph | dot -Tpng -oout.png -Goverlap=scale -Gsplines=true")
     group.add_argument("--reverse", action="store_true", default=False,
                        help="show projects that depend on the current project")
@@ -209,7 +209,7 @@ def package_names_first(dependency_names, package_names):
     return dep_packages
 
 def collect_dependencies(project, projects, packages, single, runtime, depth=0):
-    """ recursively collect dependent projects and packages S"""
+    """ recursively collect dependent projects and packages """
     if depth > 99:
         qisys.ui.error("Probable recursion problem: ", project.name)
         exit(1)
