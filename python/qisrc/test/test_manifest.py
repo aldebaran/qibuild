@@ -197,37 +197,6 @@ def test_parse_other_remote(tmpdir):
     a = get_project(other, "a")
     assert a.fetch_url == "ssh://git@all/a"
 
-def test_parse_blacklist(tmpdir):
-    all_xml = """
-<manifest>
-  <remote fetch="ssh://git@all"
-          review="http://gerrit" />
-  <project name="a" review="true" />
-  <project name="b" />
-  <project name="private" />
-
-</manifest>
-"""
-
-    public_xml = """
-<manifest>
-  <manifest url="all.xml" />
-  <blacklist name="private" />
-</manifest>
-"""
-
-    all_manifest = tmpdir.join("all.xml")
-    all_manifest.write(all_xml)
-    public_manifest = tmpdir.join("public.xml")
-    public_manifest.write(public_xml)
-
-    all = qisrc.manifest.load(all_manifest.strpath)
-    assert len(all.projects) == 3
-
-    public = qisrc.manifest.load(public_manifest.strpath)
-    assert len(public.projects) == 2
-
-
 def test_parse_deep_recurse(tmpdir):
     a_xml = tmpdir.join("a.xml")
     a_xml.write("""
@@ -293,57 +262,6 @@ def test_git_url_join():
     remote = "bipbip"
     result = qisrc.manifest.git_url_join(remote, name)
     assert result == "bipbip/pouet"
-
-def test_parse_projects():
-    tree = etree.fromstring("<manifest />")
-    assert qisrc.manifest.parse_projects(tree) == list()
-
-    tree = etree.fromstring("<manifest><project name=\"foo\" /></manifest>")
-    projects = qisrc.manifest.parse_projects(tree)
-    assert len(projects) == 1
-    assert projects[0].name == "foo"
-
-    tree = etree.fromstring("<manifest><project name=\"foo\" /><project name=\"bar\" /></manifest>")
-    projects = qisrc.manifest.parse_projects(tree)
-    assert len(projects) == 2
-    assert projects[0].name == "foo"
-    assert projects[1].name == "bar"
-
-def test_parse_blacklists():
-    tree = etree.fromstring("<manifest />")
-    assert qisrc.manifest.parse_blacklists(tree) == list()
-
-    tree = etree.fromstring("<manifest><blacklist name=\"foo\" /></manifest>")
-    blacklists = qisrc.manifest.parse_blacklists(tree)
-    assert len(blacklists) == 1
-    assert blacklists[0] == "foo"
-
-    tree = etree.fromstring("<manifest><blacklist name=\"foo\" /><blacklist /></manifest>")
-    blacklists = qisrc.manifest.parse_blacklists(tree)
-    assert len(blacklists) == 1
-    assert blacklists[0] == "foo"
-
-    tree = etree.fromstring("<manifest><blacklist name=\"foo\" /><blacklist name=\"bar\" /></manifest>")
-    blacklists = qisrc.manifest.parse_blacklists(tree)
-    assert len(blacklists) == 2
-    assert blacklists[0] == "foo"
-    assert blacklists[1] == "bar"
-
-def test_parse_remotes():
-    tree = etree.fromstring("<manifest />")
-    assert qisrc.manifest.parse_remotes(tree) == list()
-
-    tree = etree.fromstring("<manifest><remote name=\"foo\" fetch=\"a\" /></manifest>")
-    remotes = qisrc.manifest.parse_remotes(tree)
-    assert len(remotes) == 1
-    assert remotes[0].name == "foo"
-
-    tree=etree.fromstring("<manifest><remote name=\"foo\" fetch=\"a\" /><remote name=\"bar\" fetch=\"a\" /></manifest>")
-    remotes = qisrc.manifest.parse_remotes(tree)
-    assert len(remotes) == 2
-    assert remotes[0].name == "foo"
-    assert remotes[1].name == "bar"
-
 
 if __name__ == "__main__":
     unittest.main()

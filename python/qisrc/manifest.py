@@ -12,6 +12,8 @@ import posixpath
 import qisys.sh
 import qixml
 
+import qisys.xml_parser
+
 class NoManifest(Exception):
     def __init__(self, worktree):
         self.worktree = worktree
@@ -22,9 +24,7 @@ class NoManifest(Exception):
         return res
 
 def git_url_join(remote, name):
-    """ Join a remote ref with a name
-
-    """
+    """Join a remote ref with a name."""
     if remote.startswith(("http://", "ssh://")):
         return posixpath.join(remote, name)
     if "@" in remote:
@@ -32,127 +32,96 @@ def git_url_join(remote, name):
     return posixpath.join(remote, name)
 
 def load(manifest_xml):
-    """ Load a manifest XML file
-
-    """
-    manifest = Manifest()
-    manifest.parse(manifest_xml)
-    res = manifest
+    """Load a manifest XML file."""
+    manifest = Manifest(manifest_xml)
+    manifest.parse()
     merge_projects(manifest)
-    return res
-
+    return manifest
 
 def merge_projects(manifest):
-    """ Merge recursively the projects coming from the sub manifests,
-    filtering out what is inside the blacklist
-
-    """
+    """Merge recursively the projects coming from the sub manifests."""
     for sub_manifest in manifest.sub_manifests:
         merge_projects(sub_manifest)
-        for sub_project in sub_manifest.projects:
-            if sub_project.name in manifest.blacklist:
-                continue
-            manifest.projects.append(sub_project)
+        manifest.projects.extend(sub_manifest.projects)
 
-class Manifest():
+class Manifest(qisys.xml_parser.RootXMLParser):
     """ A class to represent the contents of a manifest XML
     file.
 
     Do not use instanciate directly, use :py:meth:`load` instead.
 
     """
-    def __init__(self):
+    def __init__(self, xml_path):
+        self.xml_path = xml_path
+        tree = qixml.read(xml_path)
+        root = tree.getroot()
+
+        qisys.xml_parser.RootXMLParser.__init__(self, root)
+
         self.remotes = dict()
         self.projects = list()
-        self.blacklist = list()
         self.sub_manifests = list()
-        self.xml_path = None
 
         # Used to track conflicts
         self._paths = dict()
 
-    def parse(self, xml_path):
-        """ Recursive function. This is also called on each
-        sub manifest, so that self.sub_manifests contains
-        fully initialized Manifest() objects when this function
-        returns
+    def _parse_remote(self, element):
+        remote = Remote()
+        remote.parse(element)
+        self.remotes[remote.name] = remote
 
-        """
-        self.xml_path = xml_path
-        tree = qixml.read(xml_path)
+    def _parse_project(self, element):
+        project = Project()
+        project.parse(element)
+        self.projects.append(project)
 
-        remotes = parse_remotes(tree)
-        for remote in remotes:
-            self.remotes[remote.name] = remote
+    def _parse_manifest(self, element):
+        url = element.get("url")
+        if not url:
+            return
 
-        projects = parse_projects(tree)
-        self.projects.extend(projects)
+        dirname = os.path.dirname(self.xml_path)
+        submanifest_path = os.path.join(dirname, url)
 
-        blacklists = parse_blacklists(tree)
-        self.blacklist.extend(blacklists)
+        submanifest = Manifest(submanifest_path)
+        submanifest.parse()
+        self.sub_manifests.append(submanifest)
 
-        sub_manifests = parse_manifests(tree, xml_path)
-        self.sub_manifests.extend(sub_manifests)
-
-        self.update_projects()
-
-    def update_projects(self):
-        """ Update the project list, setting project.revision,
-        project.fetch_url and so on, using the already parsed remotes
-
-        """
+    def _parse_epilogue(self):
         for project in self.projects:
-            remote = self.remotes.get(project.remote)
-            if not remote:
-                continue
-            if not project.revision:
-                project.revision = remote.revision
-            project.fetch_url = git_url_join(remote.fetch, project.name)
-            if project.review:
-                if not remote.review:
-                    mess = """ \
+            update_project(project, self.remotes, self._paths)
+
+def update_project(project, remotes, paths):
+    """ Update the project list, setting project.revision,
+    project.fetch_url and so on, using the already parsed remotes
+
+    """
+    remote = remotes.get(project.remote)
+    if not remote:
+        return
+    if not project.revision:
+        project.revision = remote.revision
+    project.fetch_url = git_url_join(remote.fetch, project.name)
+    if project.review:
+        if not remote.review:
+            mess = """ \
 Project {project.name} was configured for review
 but the associated remote ({remote.name}) has
 no review url set.\
 """
-                    mess = mess.format(remote=remote, project=project)
-                    raise Exception(mess)
+            mess = mess.format(remote=remote, project=project)
+            raise Exception(mess)
 
-                project.review_url = git_url_join(remote.review, project.name)
-            conflicting_name = self._paths.get(project.path)
-            if conflicting_name:
-                mess  = "Found two projects with the same path: %s\n" % project.path
-                mess += "%s and %s" % (project.name, conflicting_name)
-                raise Exception(mess)
-            self._paths[project.path] = project.name
-
-    def __repr__(self):
-        res = "<Manifest from %s\n" % self.xml_path
-        res += "   remotes: %s\n" % self.remotes
-        res += "   projects: %s\n" % self.projects
-        return res
-
-def parse_manifests(tree, xml_path):
-    sub_manifests = list()
-    manifest_elems = tree.findall("manifest")
-    for manifest_elem in manifest_elems:
-        manifest_url = manifest_elem.get("url")
-        if manifest_url:
-            dirname = os.path.dirname(xml_path)
-            sub_manifest_xml = os.path.join(dirname, manifest_url)
-            sub_manifest = Manifest()
-            sub_manifest.xml_path = sub_manifest_xml
-            sub_manifest.parse(sub_manifest.xml_path)
-            sub_manifests.append(sub_manifest)
-
-    return sub_manifests
-
+        project.review_url = git_url_join(remote.review, project.name)
+    conflicting_name = paths.get(project.path)
+    if conflicting_name:
+        mess  = "Found two projects with the same path: %s\n" % project.path
+        mess += "%s and %s" % (project.name, conflicting_name)
+        raise Exception(mess)
+    paths[project.path] = project.name
 
 class Project:
-    """ Wrapper for the <project> tag inside a manifest
-    XML file
-
-    """
+    """Wrapper for the <project> tag inside a manifest XML file."""
     def __init__(self):
         self.name = None
         self.path = None
@@ -181,22 +150,8 @@ class Project:
             (self.name, self.remote, self.fetch_url, self.review_url)
         return res
 
-def parse_projects(tree):
-    projects = list()
-    project_elems = tree.findall("project")
-    for project_elem in project_elems:
-        project = Project()
-        project.parse(project_elem)
-        projects.append(project)
-
-    return projects
-
-
 class Remote:
-    """ Wrapper for the <remote> tag inside a manifest
-    XML file
-
-    """
+    """Wrapper for the <remote> tag inside a manifest XML file."""
     def __init__(self):
         self.name = None
         self.fetch = None
@@ -213,23 +168,3 @@ class Remote:
         res = "<Remote %s fetch: %s on %s, review:%s>" % \
             (self.name, self.fetch, self.revision, self.review)
         return res
-
-def parse_remotes(tree):
-    remotes = list()
-    remote_elems = tree.findall("remote")
-    for remote_elem in remote_elems:
-        remote = Remote()
-        remote.parse(remote_elem)
-        remotes.append(remote)
-
-    return remotes
-
-def parse_blacklists(tree):
-    blacklists = list()
-    blacklist_elems = tree.findall("blacklist")
-    for blacklist_elem in blacklist_elems:
-        name = blacklist_elem.get("name")
-        if name:
-            blacklists.append(name)
-    return blacklists
-
