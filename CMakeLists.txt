@@ -12,26 +12,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(qiBuild NONE)
 
-option(WITH_DOCS "Build documentation with sphinx" ON)
-
-find_program(PYTHON_EXECUTABLE NAMES python2 python python.exe
-  PATHS
-    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath]
-    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.7\\InstallPath]
-)
-
-
-if(NOT PYTHON_EXECUTABLE)
-  message(STATUS
-    "
-    Could not find python executable.
-
-    Please check your setup.
-
-    "
-  )
-  message(FATAL_ERROR "")
-endif()
+option(QIBUILD_CMAKE_ONLY "Only install the CMake framework" OFF)
 
 # Install CMake code where it belongs
 set(_qibuild_cmake_install_dest)
@@ -54,6 +35,30 @@ install(
   DESTINATION
     "${_qibuild_cmake_install_dest}"
 )
+
+if(QIBUILD_CMAKE_ONLY)
+  return()
+endif()
+
+option(WITH_DOCS "Build documentation with sphinx" ON)
+
+find_program(PYTHON_EXECUTABLE NAMES python2 python python.exe
+  PATHS
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath]
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.7\\InstallPath]
+)
+
+if(NOT PYTHON_EXECUTABLE)
+  message(STATUS
+    "
+    Could not find python executable.
+
+    Please check your setup.
+
+    "
+  )
+  message(FATAL_ERROR "")
+endif()
 
 # Useful for python script to work later:
 set(ENV{PYTHONPATH} "${CMAKE_SOURCE_DIR}/python")

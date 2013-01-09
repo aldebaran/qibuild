@@ -51,20 +51,24 @@ On linux
 If you want to package qibuild for a linux distribution, you have to take care
 of the following:
 
-  - Install the python part of qibuild (for the command line to work)
   - Install the CMake part of qibuild (to use qibuild CMake function without depending on the command line)
-  - Install the HTML documentation
-  - Install the man pages of qibuild
+  - Optionaly install (driven by the QIBUILD_CMAKE_ONLY CMake flag):
+    - the python part of qibuild (for the command line to work)
+    - optionaly build and install the documentation (driven by the WITH_DOCS CMake flag):
+      - the HTML documentation
+      - the man pages of qibuild
 
 This is taken care of by the ``CMakeLists.txt`` at the root of the qibuild repository
 
 It will:
 
-  - find the correct python version  (python2.6 or 2.7), configure a setup.py file and
-    run ``setup.py install``
   - install the cmake part of qibuild to /usr/share/cmake/qibuild/
-  - run sphinx-build to build the html documentation of qibuild to /usr/share/qibuild/doc/html/
-  - run sphinx-build to build the man pages
+  - if the CMake flag QIBUILD_CMAKE_ONLY is OFF (defaults is OFF):
+    - find the correct python version  (python2.6 or 2.7), configure a setup.py file and
+      run ``setup.py install``
+    - if the CMake flag WITH_DOCS is ON (default is ON):
+      - run sphinx-build to build the html documentation of qibuild to /usr/share/qibuild/doc/html/
+      - run sphinx-build to build the man pages
 
 On other platforms
 ++++++++++++++++++
