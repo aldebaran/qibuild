@@ -49,9 +49,9 @@ coverage:
 	@echo " => Open $(shell cd .. ; pwd)/htmlcov/index.html for more details"
 
 
-check: pylint-error
+check:
 	@echo ":: Running tests: $(TEST_MODULES)"
-	@$(PYTHON) -m pytest $(TEST_MODULES)
+	@$(PYTHON) -m pytest $(PYTEST_ARGS) $(TEST_MODULES)
 
 check-fast:
 	@echo ":: Runnig fasts tests: $(TEST_MODULES)"
