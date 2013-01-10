@@ -9,8 +9,11 @@ set(_suffix "QTMULTIMEDIA")
 set(_libame "QtMultimedia")
 
 qt_flib(${_suffix} ${_libame})
+set(_qtmultimedia_depends "QT_QTCORE;QT_QTGUI")
 if(UNIX AND NOT APPLE)
-  qi_set_global(QT_QTMULTIMEDIA_DEPENDS "ALSALIB")
+  list(APPEND _qtmultimedia_depends  "ALSALIB")
 endif()
+qi_set_global(QT_QTMULTIMEDIA_DEPENDS ${_qtmultimedia_depends})
+
 export_lib(QT_${_suffix})
 set(_ROOT_DIR)
