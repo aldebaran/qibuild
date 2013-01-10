@@ -96,7 +96,7 @@ def open_remote_location(location):
             pass
         Transfer.data = ""
         #pylint: disable-msg=E1103
-        cmd = "RETR " + url_split.path
+        cmd = "RETR " + url_split.path[1:]
         def retr_callback(data):
             Transfer.data += data
         ftp.retrbinary(cmd, retr_callback)
@@ -169,7 +169,7 @@ def download(url, output_dir,
             class Tranfert:
                 pass
             #pylint: disable-msg=E1103
-            size = ftp.size(url_split.path)
+            size = ftp.size(url_split.path[1:])
             Tranfert.xferd = 0
             def retr_callback(data):
                 Tranfert.xferd += len(data)
@@ -177,7 +177,7 @@ def download(url, output_dir,
                     callback(size, Tranfert.xferd)
                 dest_file.write(data)
             #pylint: disable-msg=E1103
-            cmd = "RETR " + url_split.path
+            cmd = "RETR " + url_split.path[1:]
             ftp.retrbinary(cmd, retr_callback)
         else:
             url_obj = authenticated_urlopen(url)
