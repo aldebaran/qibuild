@@ -230,6 +230,7 @@ class ConfigWizardTestCase(unittest.TestCase):
             "generator" : "Unix Makefiles",
             "ide" : "QtCreator",
             "toolchain" : "linux64",
+            "configure settings for this worktree" : True,
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(["linux32", "linux64"])
@@ -247,6 +248,7 @@ class ConfigWizardTestCase(unittest.TestCase):
             "ide" : "Eclipse CDT",
             "unique build dir" : True,
             "unique sdk dir"   : True,
+            "configure settings for this worktree" : True,
             "path to a build dir" : "build",
         })
         self.setup_generators(["Unix Makefiles"])
@@ -263,6 +265,7 @@ class ConfigWizardTestCase(unittest.TestCase):
             "generator" : "Visual Studio 10",
             "ide" : "Visual Studio",
             "use on of these toolchains by default" : True,
+            "configure settings for this worktree" : True,
             "toolchain to use by default": "win32-vs2010",
         })
         self.setup_generators(["Visual Studio 10"])
@@ -270,23 +273,6 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.run_wizard(toc=self.toc)
         self.assertEqual(self.toc.config.local.defaults.config, "win32-vs2010")
         self.assertEqual(self.toc.config.defaults.cmake.generator, "Visual Studio 10")
-
-
-    def test_incredibuild(self):
-        self.setup_platform("win32")
-        self.setup_find_program({
-            "cmake"  : r"c:\Program Files\CMake\bin\cmake.exe",
-        })
-        self.setup_answers({
-            "generator" : "Visual Studio 10",
-            "ide" : "Visual Studio",
-            "use incredibuild" : True,
-            "buildconsole.exe path" : "/c/Program Files/Xoreax/BuildConsole.exe"
-        })
-        self.setup_generators(["Visual Studio 10"])
-        cfg = self.run_wizard()
-        self.assertEqual(cfg.build.incredibuild, True)
-        self.assertTrue("Xoreax" in cfg.defaults.env.path)
 
     def test_unsetting_unique_build_dir(self):
         self.setup_platform("linux")
@@ -298,6 +284,7 @@ class ConfigWizardTestCase(unittest.TestCase):
             "generator" : "Unix Makefiles",
             "ide" : "Eclipse CDT",
             "unique build dir" : True,
+            "configure settings for this worktree" : True,
             "path to a build dir" : "build",
         })
         self.setup_generators(["Unix Makefiles"])
@@ -311,6 +298,7 @@ class ConfigWizardTestCase(unittest.TestCase):
             "generator" : "Unix Makefiles",
             "ide" : "Eclipse CDT",
             "unique build dir" : False,
+            "configure settings for this worktree" : True,
             "unique sdk dir"   : False,
         })
         new_toc = qibuild.toc.toc_open(self.tmp)

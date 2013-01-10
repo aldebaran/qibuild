@@ -130,7 +130,7 @@ def configure_local_settings(toc):
     ui.info(ui.green, "::", ui.reset,  "Found a worktree in", toc.worktree.root)
     answer = qisys.interact.ask_yes_no(
         "Do you want to configure settings for this worktree?",
-        default=True)
+        default=False)
     if not answer:
         return
     tc_names = qitoolchain.get_tc_names()
@@ -187,9 +187,6 @@ def run_config_wizard(toc):
     ide = ask_ide(qibuild_cfg)
     if ide:
         configure_ide(qibuild_cfg, ide)
-
-    if sys.platform.startswith("win"):
-        ask_incredibuild(qibuild_cfg)
 
     qibuild_cfg.write()
 
