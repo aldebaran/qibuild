@@ -67,6 +67,7 @@ Command line
 * ``qitoolchain import-package`` learned to import package directory
 * :cmake:function:`qi_add_test` can now handle test script as target instead of binary.
 * ``qibuild make`` learned ``--verbose-make``
+* ``qisrc`` learned ``reset``
 
 CMake
 ++++++
