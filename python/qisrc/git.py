@@ -1,4 +1,5 @@
 ## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
@@ -113,9 +114,9 @@ class Git:
         # If you want to specialize one, remove it from whitelist and write it
         # by hand (see clone).
         # Only porcelain here.
-        whitelist = ("add", "branch", "checkout", "commit", "config", "fetch",
-                     "init", "log", "merge", "pull", "push", "rebase", "remote",
-                     "reset", "stash", "status", "submodule")
+        whitelist = ("add", "branch", "checkout", "clean", "commit", "config",
+                     "fetch", "init", "log", "merge", "pull", "push", "rebase",
+                     "remote", "reset", "stash", "status", "submodule")
         if name in whitelist:
             return functools.partial(self.call, name)
         raise AttributeError
