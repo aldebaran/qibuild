@@ -120,7 +120,10 @@ def run_action(module_name, args=None, forward_args=None):
         raise Exception(mess)
 
     parser.error = error
-    parsed_args = parser.parse_args(args=args, namespace=forward_args)
+    if forward_args:
+        parsed_args = parser.parse_args(args=args, namespace=copy.deepcopy(forward_args))
+    else:
+        parsed_args = parser.parse_args(args=args)
 
     return module.do(parsed_args)
 
