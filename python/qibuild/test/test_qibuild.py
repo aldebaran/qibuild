@@ -2,9 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-"""Automatic testing for qibuild
-
-"""
+"""Automatic testing for qibuild."""
 
 
 import argparse
@@ -40,23 +38,19 @@ class QiBuildTestCase(unittest.TestCase):
             self.args.pdb = True
         self.args.worktree = self.test_dir
         # Run qibuild clean
-        self._run_action('clean', '-f')
+        self._run_action('clean', '--force', '--all')
 
     def _run_action(self, action, *args):
         qisys.script.run_action("qibuild.actions.%s" % action, args,
             forward_args=self.args)
     def get_build_dir(self, project_name):
-        """ Get the build dir of a project
-
-        """
+        """Get the build dir of a project."""
         toc = qibuild.toc.toc_open(self.test_dir, args=self.args)
         project = toc.get_project(project_name)
         return project.build_directory
 
     def get_cmake_cache(self, project_name):
-        """ Get the CMake cache path of the given project
-
-        """
+        """Get the CMake cache path of the given project."""
         build_dir = self.get_build_dir(project_name)
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         return cmake_cache
