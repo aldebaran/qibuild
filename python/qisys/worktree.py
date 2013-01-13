@@ -73,8 +73,8 @@ class WorkTree:
         return manifest_projects
 
     def has_project(self, src):
-        srcs = [p.src for p in self.projects]
-        return src in srcs
+        srcs = [p.src.lower() for p in self.projects]
+        return src.lower() in srcs
 
     def update_project_config(self, src, key, value):
         """ Update the project configuration. """
