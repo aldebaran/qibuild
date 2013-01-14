@@ -3,6 +3,15 @@
 Changelog
 =========
 
+1.14.1
+------
+
+Command line
+++++++++++++
+
+* fix using ``qitolchain`` with an ftp server configured with a
+  "root directory" in ``.config/qi/qibuild.xml``
+
 1.14
 ----
 
