@@ -27,7 +27,7 @@ def parse_cmake_log(input, qibuild_dir):
             if not match:
                 continue
             (filename, line_no) = match.groups()
-            if not qibuild_dir in filename:
+            if not qibuild_dir.replace(os.sep,'/') in filename:
                 continue
             # 9 is len("/qibuild/")
             filename = filename[len(qibuild_dir) + 9:]
