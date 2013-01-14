@@ -180,6 +180,15 @@ Misc
 * Now using `py.test <http://pytest.org/latest/>`_ to write the automatic tests
 
 
+1.14.1
+------
+
+Command line
+++++++++++++
+
+* fix using ``qitolchain`` with an ftp server configured with a
+  "root directory" in ``.config/qi/qibuild.xml``
+
 1.14
 ----
 
