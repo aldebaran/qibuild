@@ -287,12 +287,16 @@ function(qi_create_lib name)
     qi_install_target("${name}" SUBFOLDER "${ARG_SUBFOLDER}")
   endif()
 
+  if(NOT DEFINED QI_INSTALL_NAME_DIR)
+    set(QI_INSTALL_NAME_DIR "@executable_path/../lib")
+  endif()
   if(APPLE)
     set_target_properties("${name}"
       PROPERTIES
-        INSTALL_NAME_DIR "@executable_path/../lib"
+      # Contrary to what the cmake doc says,
+      # this is the only variable that works on mac:
+        INSTALL_NAME_DIR ${QI_INSTALL_NAME_DIR}
         BUILD_WITH_INSTALL_RPATH 1
-
     )
   endif()
 
