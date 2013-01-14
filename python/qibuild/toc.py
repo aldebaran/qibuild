@@ -542,7 +542,10 @@ You may want to run:
 
         make_env = self.build_env.copy()
         if verbose_make:
-            make_env["VERBOSE"] = "1"
+            if "Makefiles" in self.cmake_generator:
+                make_env["VERBOSE"] = "1"
+            if self.cmake_generator == "Ninja":
+                cmd.append("-v")
         try:
             qisys.command.call(cmd, env=make_env)
         except CommandFailedException:
