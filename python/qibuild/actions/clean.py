@@ -4,82 +4,58 @@
 
 """ Clean build directories.
 
-By default all build directories for all projects are removed.
-You can specify a list of build directory names to cleanup.
+By default all build directories for the current configuration
+will be deleted for the specified project and its dependencies.
+
+Use -s to clean the current project only
+Use -c to choose a config
+Use -f to force the clean
 """
 
 import os
-import glob
-import qisys.log
 
-import qisrc
+import qisys
+from qisys import ui
 import qibuild
+import qibuild.cmdparse
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.parsers.worktree_parser(parser)
-    parser.add_argument("--force", "-f", dest="force", action="store_true", help="force the cleanup")
-    parser.add_argument("build_directories", nargs="*", help="build directory to cleanup")
+    qibuild.parsers.toc_parser(parser)
+    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.project_parser(parser)
+    parser.add_argument("--force", "-f", dest="force", action="store_true", help="force the clean")
 
-def cleanup(path, bdirs, worktree, doit=False):
-    """ remove all buildable directory of a project """
-    if not len(bdirs):
-        bdirs = glob.glob(os.path.join(path, "build-*"))
-    else:
-        bdirs = [ os.path.join(path, x) for x in bdirs ]
-    for bdir in bdirs:
-        if os.path.isdir(bdir):
-            if doit:
-                print " ", os.path.relpath(bdir, worktree)
-                qisys.sh.rm(bdir)
-
-def list_build_folder(path, bdirs, worktree):
-    """ list all buildable directory of a project
-        return a map:
-             { 'build-titi' : 'projectname',
-               'build-tutu' : 'projectname' }
-    """
-    result = dict()
-    if not len(bdirs):
-        bdirs = glob.glob(os.path.join(path, "build-*"))
-    else:
-        bdirs = [ os.path.join(path, x) for x in bdirs ]
-    for bdir in bdirs:
-        if os.path.isdir(bdir):
-            bname = os.path.basename(bdir)
-            dirname = os.path.basename(os.path.dirname(os.path.relpath(bdir, worktree)))
-            lst = result.get(bname)
-            if not lst:
-                result[bname] = list()
-            result[bname].append(dirname)
-    return result
-
+def get_build_dirs(projects):
+    """ Returns a list of existing build directories """
+    bdirs = []
+    for project in projects:
+        if os.path.isdir(project.build_directory):
+            bdirs.append(project.build_directory)
+    return bdirs
 
 def do(args):
     """Main entry point"""
-    logger   = qisys.log.get_logger(__name__)
-    qiwt     = qisys.worktree.open_worktree(args.worktree)
+    toc = qibuild.toc.toc_open(args.worktree, args)
+    (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
 
-    if args.force:
-        logger.info("preparing to remove:")
-    else:
-        logger.info("Build directory that will be removed (use -f to apply):")
-    folders = dict()
-    for project in qiwt.buildable_projects:
-        result = list_build_folder(project.path, args.build_directories, qiwt.root)
-        for k, v in result.iteritems():
-            if folders.get(k):
-                folders[k].extend(v)
-            else:
-                folders[k] = v
-    for k, v in folders.iteritems():
-        logger.info(k)
-        print " ", ",".join(v)
-        # for p in v:
-        #     print "  %s" % p
+    bdirs = get_build_dirs(projects)
+    bdir_count = len(bdirs)
 
-    if args.force:
-        logger.info("")
-        logger.info("removing:")
-        for project in qiwt.buildable_projects:
-            cleanup(project.path, args.build_directories, qiwt.root, args.force)
+    if bdir_count == 0:
+        ui.info(ui.green, "No directories to clean")
+    elif not args.force:
+        ui.info(ui.green, "Build directories that will be removed", ui.reset, ui.bold, "(use -f to apply):")
+
+    for i, bdir in enumerate(bdirs):
+        if args.force:
+            ui.info(ui.green, "*", ui.reset,
+                "(%i/%i)" % (i+1, bdir_count),
+                ui.green, "Cleaning", ui.reset, bdir)
+
+            # delete the build directory
+            qisys.sh.rm(bdir)
+        else:
+            ui.info(ui.green, "*", ui.reset,
+                "(%i/%i)" % (i+1, bdir_count),
+                ui.reset, bdir)

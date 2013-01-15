@@ -11,7 +11,8 @@ Upcoming release
 Command line
 +++++++++++++
 
-
+* ``qibuild clean``: syntax closer to other commands, cleans deep by default and
+   respects ``--config`` ``--single`` and [project] options
 * Nicer output for all commands.
 * ``qibuild configure``: add a ``--summarize-options`` argument to
    print a summary of the build options at the end of the configuration
