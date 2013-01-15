@@ -214,7 +214,7 @@ Manifest XML parsing
 This is done by :py:meth:`qisrc.manifest.load` method.
 
 We parse the XML in order to find every project, read what
-branch they need to track, what are there URLs, and wether
+branch they need to track, what are there URLs, and whether
 or not they are under code review.
 
 If we see them has beeing under code review, we call
@@ -223,7 +223,7 @@ If we see them has beeing under code review, we call
 Once this is done, we call
 :py:meth:`worktree.set_project_review() <qisys.worktree.WorkTree.set_project_review>`
 so that ``qisrc push`` does not have to parse the manifest again to
-see wether or not the project is under code review.
+see whether or not the project is under code review.
 
 If we see new projects, we add them to the worktree using
 :py:meth:`qisrc.sync.clone_project` and then call

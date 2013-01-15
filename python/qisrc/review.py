@@ -124,7 +124,7 @@ def setup_project(project_path, project_name, review_url, branch):
      * Add a remote called 'gerrit'
      * Add the hook
 
-     :return: a boolean to tell wether it's worth trying
+     :return: a boolean to tell whether it's worth trying
               for other projects
 
     """

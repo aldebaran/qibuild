@@ -5,7 +5,7 @@
 clean(ODE)
 fpath(ODE ode/ode.h)
 if(UNIX)
-  # Check wether we should define -DdDOUBLE
+  # Check whether we should define -DdDOUBLE
   find_program(_ode_config ode-config QUIET)
   if(_ode_config)
     # execute ode-config --cflags

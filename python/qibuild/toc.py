@@ -505,7 +505,7 @@ You may want to run:
         Usually we will simply can ``cmake --build``, but for incredibuild
         we need to call `BuildConsole.exe` with an sln.
 
-        :param fix_shared_libs: Wether we should try to fix the shared
+        :param fix_shared_libs: Whether we should try to fix the shared
                                 libraries so that newly compiled
                                 executables can run wihtout setting
                                 PATH or LD_LIBRARY_PAT.

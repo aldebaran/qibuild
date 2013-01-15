@@ -63,7 +63,7 @@ qisrc.manifest.Project
 
   .. py:attribute:: review
 
-     Wether the project is under code review
+     Whether the project is under code review
 
   .. py:attribute:: remote
 

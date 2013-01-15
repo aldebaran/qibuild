@@ -109,7 +109,7 @@ def convert_to_qibuild(package, package_metadata=None,
                        the basename of the binaray package
     :package output_name: the archive name of the qiBuild package,
                           computed from the metadat if not given
-    :param gen_cmake: wether we should try to generate a CMake module for
+    :param gen_cmake: whether we should try to generate a CMake module for
                       this package
     :return: path to the converted qiBuild package
 

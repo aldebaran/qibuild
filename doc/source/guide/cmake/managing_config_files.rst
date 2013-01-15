@@ -9,7 +9,7 @@ You may want to:
 
 * Put ``foo.cfg`` into version control
 
-* Configure ``foo.cfg`` with CMake (maybe the contents of foo.cfg depends on wether
+* Configure ``foo.cfg`` with CMake (maybe the contents of foo.cfg depends on whether
   you are on windows or on linux ...)
 
 Also, it could be convenient if there was a unique way for the foo executable
