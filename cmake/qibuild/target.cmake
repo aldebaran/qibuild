@@ -84,7 +84,9 @@ function(qi_create_bin name)
 
   add_executable("${name}" ${_SRC})
 
-  qi_use_lib("${name}" ${ARG_DEPENDS})
+  if (NOT "${ARG_DEPENDS}" STREQUAL "")
+    qi_use_lib("${name}" ${ARG_DEPENDS})
+  endif()
 
   #make install rules
   if(NOT ARG_NO_INSTALL)
@@ -254,7 +256,9 @@ function(qi_create_lib name)
     endif()
   endif()
 
-  qi_use_lib("${name}" ${ARG_DEPENDS})
+  if (NOT "${ARG_DEPENDS}" STREQUAL "")
+    qi_use_lib("${name}" ${ARG_DEPENDS})
+  endif()
 
   if (MSVC)
     # always postfix debug lib/bin with _d ...
