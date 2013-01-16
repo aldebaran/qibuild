@@ -17,6 +17,8 @@ include(CMakeParseArguments)
 #     for instance, if ``module_name`` equals foo, `foo.i` must contain:
 #     ``%module foo``
 #
+# For further details about the install locations, refer to :cmake:function:`qi_install_python`.
+#
 # \arg:module_name the target name
 # \arg:interface_file the swig interface file (extension is .i)
 # \group:SRC The list of source files
@@ -114,74 +116,8 @@ function(qi_swig_wrap_python module_name interface_file)
     )
   endif()
 
-  # Re-create install rules:
-  install(TARGETS ${_swig_target}
-    COMPONENT python
-    LIBRARY DESTINATION "${QI_SDK_LIB}"
-    RUNTIME DESTINATION "${QI_SDK_LIB}"
-  )
+  qi_install_python(TARGETS ${_swig_target})
 
-  # On windows, we are going to put the .py and the .pyd in lib/
-  # but the .dll on which the .pyd depends are in bin/
-  # This causes no problem when the .pyd is used in an embedded interpreter,
-  # but to be able to use the .pyd "standalone", we have to iter through the
-  # dependencies of the .pyd, and install the dlls in lib/ too
-  # This trick can only works with mingw, right now...
-  # TODO: make it work for visual studio?
-  # TODO: factor this with post-copy-dlls.cmake ?
-  if(WIN32 AND NOT MSVC)
-    set(_libs)
-
-    string(TOUPPER "${_swig_target}" _U_target)
-    foreach(_dep ${${_U_target}_DEPENDS})
-      string(TOUPPER ${_dep} _U_dep)
-      set(_dep_libs ${${_U_dep}_LIBRARIES})
-
-      cmake_parse_arguments(ARG "" "" "optimized;debug" ${_dep_libs})
-      if(ARG_debug)
-          list(APPEND _libs ${ARG_debug})
-      endif()
-      cmake_parse_arguments(ARG "" "" "general" ${_dep_libs})
-      if(ARG_general)
-          list(APPEND _libs ${ARG_general})
-      endif()
-    endforeach()
-
-    if(_libs)
-      list(REMOVE_DUPLICATES _libs)
-    endif()
-
-    set(_dlls)
-    foreach(_lib ${_libs})
-      string(REGEX MATCH "\\.dll$" _match "${_lib}")
-      if(_match)
-        list(APPEND _dlls ${_lib})
-      endif()
-      string(REGEX MATCH "\\.dll\\.a$" _match ${_lib})
-      if(_match)
-        string(REPLACE ".dll.a" ".dll" _dll ${_lib})
-        if(EXISTS "${_dll}")
-          list(APPEND _dlls ${_dll})
-        else()
-          # maybe the dll.a is in lib/ and the dll in bin/
-          string(REPLACE "/${QI_SDK_LIB}/" "/${QI_SDK_BIN}/" _dll "${_dll}")
-          if(EXISTS "${_dll}")
-            list(APPEND _dlls ${_dll})
-          endif()
-        endif()
-      endif()
-    endforeach()
-
-    install(FILES ${_dlls}
-      COMPONENT python
-      DESTINATION "${QI_SDK_LIB}"
-    )
-  endif()
-
-  install(FILES "${QI_SDK_DIR}/${QI_SDK_LIB}/${module_name}.py"
-    COMPONENT python
-    DESTINATION "${QI_SDK_LIB}"
-  )
-
+  qi_install_python("${QI_SDK_DIR}/${QI_SDK_LIB}/${module_name}.py")
 
 endfunction()

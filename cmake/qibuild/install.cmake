@@ -201,3 +201,68 @@ endfunction()
 function(qi_install_library)
   _qi_install_internal(${ARGN} COMPONENT lib DESTINATION ${QI_SDK_LIB})
 endfunction()
+
+#! install python module.
+# The destination depends on the platform and will be set with regard to it:
+#
+# * on Windows: *<prefix>/Lib/site-packages*
+# * on Unix   : *<prefix>/lib/python<python version>/site-packages*
+#
+# .. note::
+#
+#   The *python version* is automatically computed.
+#
+# But the user can use ``PYTHON_INSTALL_SCHEME=...`` to modify the installation layout.
+# The valid values for ``PYTHON_INSTALL_SCHEME`` are:
+#
+# * ``NONE``  : install python modules in the default libdir instead;
+# * ``DEBIAN``: install python modules in: *<LIBDIR>/python<VERSION>/dist-packages*
+#   (only on Linux).
+#
+# \argn:                 A list of files : directories and globs on files are accepted.
+# \param: TARGETS        A list of targets (in the common CMake meaning).
+# \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \flag: RECURSE         Whether glob should be recursive.
+# \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
+#                        (False by default because this is NOT the standard CMake
+#                        behavior).
+#
+function(qi_install_python)
+
+  cmake_parse_arguments(ARG "" "COMPONENT;DESTINATION" "TARGETS" ${ARGN})
+
+  # Read the python version from the headers:
+  file(STRINGS "${PYTHON_INCLUDE_DIRS}/patchlevel.h" _python_version_full REGEX "PY_VERSION")
+  string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" _python_version_full "${_python_version_full}")
+  string(REGEX MATCH "^[0-9]+\\.[0-9]+" _python_version_major "${_python_version_full}")
+
+  # Set the python site-packages location
+  if(DEFINED PYTHON_INSTALL_SCHEME AND "${PYTHON_INSTALL_SCHEME}" STREQUAL "NONE")
+    set(_qi_sdk_python_site_packages "${QI_SDK_LIB}")
+  else()
+    if(WIN32)
+      set(_qi_sdk_python_site_packages "${QI_SDK_LIB}/Lib/site-packages")
+    else()
+      if(NOT APPLE AND DEFINED PYTHON_INSTALL_SCHEME AND "${PYTHON_INSTALL_SCHEME}" STREQUAL "DEBIAN")
+        set(_qi_sdk_python_site_packages "${QI_SDK_LIB}/python${_python_version_major}/dist-packages")
+      else()
+        set(_qi_sdk_python_site_packages "${QI_SDK_LIB}/python${_python_version_major}/site-packages")
+      endif()
+    endif()
+  endif()
+
+  if("${ARG_TARGETS}" STREQUAL "")
+    _qi_install_internal(${ARG_UNPARSED_ARGUMENTS}
+      COMPONENT python
+      DESTINATION "${_qi_sdk_python_site_packages}"
+    )
+  else()
+    cmake_parse_arguments(ARG "RECURSE;KEEP_RELATIVE_PATHS" "IF;COMPONENT;DESTINATION;SUBFOLDER" "" ${ARGN})
+    install(${ARG_UNPARSED_ARGUMENTS}
+      COMPONENT python
+      LIBRARY DESTINATION "${_qi_sdk_python_site_packages}"
+      RUNTIME DESTINATION "${_qi_sdk_python_site_packages}"
+    )
+  endif()
+
+endfunction()

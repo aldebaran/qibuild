@@ -75,6 +75,7 @@ CMake
 
 * Added :cmake:function:`qi_generate_src`,  :cmake:function:`qi_generate_header`
 * Added :cmake:function:`qi_swig_wrap_java`
+* Added :cmake:function:`qi_install_python`
 * Added :cmake:function:`qi_create_perf_test`
 * :cmake:function:`qi_create_gtest` and :cmake:function:`qi_create_test` learned
   the ``SLOW`` keyword so that tests are not run by default.
@@ -107,6 +108,8 @@ CMake
             lib/
                 libfoo.so
 
+* :cmake:function:`qi_swig_wrap_python` learned to install python modules in the
+  standard location
 * qibuild cmake modules:
 
   * Added ``hdf5``, ``openssl``, ``libevent_openssl``,
