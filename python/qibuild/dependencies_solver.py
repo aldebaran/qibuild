@@ -181,7 +181,7 @@ class DependenciesSolver:
         for project in self.projects:
             mess += "  " + project.name + "\n"
             mess += "   deps: " +  ",".join(project.depends) + "\n"
-            mess += "  rdeps: " +  ",".join(project.depends) + "\n"
+            mess += "  rdeps: " +  ",".join(project.rdepends) + "\n"
         mess += "Packages:\n"
         for package in self.packages:
             mess += "  " + package.name + "\n"
