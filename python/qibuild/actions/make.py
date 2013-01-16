@@ -31,7 +31,6 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     toc = qibuild.toc.toc_open(args.worktree, args)
-    raise Exception("Kaboom", do.__name__)
 
     # Force single to False to check all dependencies.
     is_single = args.single
