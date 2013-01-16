@@ -62,7 +62,7 @@ You could end up write something like
 
 .. code-block:: cmake
 
-    # foobar/bar/CMakeLists.txt
+    # foobar/foo/CMakeLists.txt
     qi_create_lib(foo bar.cpp)
     qi_stage_lib(foo)
 
@@ -112,8 +112,8 @@ The fix is easy: make sure you stage the ``foo`` library **before** using it:
 
     # foobar/ CMakeLists.txt
     project(foobar)
-    add_subdirectory(bar)
     add_subdirectory(foo)
+    add_subdirectory(bar)
 
 .. _qibuild-compile-warnings:
 
