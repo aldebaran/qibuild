@@ -382,7 +382,7 @@ You may want to run:
             raise TocException("No such package: %s" % package_name)
         return None
 
-    def get_sdk_dirs(self, project_name):
+    def get_sdk_dirs(self, project_name, runtime=False):
         """ Return a list of sdk needed to build a project.
 
         Iterate through the dependencies.
@@ -403,7 +403,7 @@ You may want to run:
 
         dep_solver = DependenciesSolver(projects=self.projects, packages=self.packages,
             active_projects=self.active_projects)
-        (r_project_names, _package_names, not_found) = dep_solver.solve([project_name])
+        (r_project_names, _package_names, not_found) = dep_solver.solve([project_name], runtime)
 
         # Nothing to do with with the packages:
         # SDK dirs from toolchain are managed by the toolchain file in
@@ -569,7 +569,7 @@ You may want to run:
 
         unique_sdk_dir = self.config.local.build.sdk_dir
         if not unique_sdk_dir:
-            sdk_dirs = self.get_sdk_dirs(project.name)
+            sdk_dirs = self.get_sdk_dirs(project.name, runtime=True)
             paths.extend(sdk_dirs)
 
         if sys.platform.startswith("win"):
