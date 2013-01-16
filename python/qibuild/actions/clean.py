@@ -34,6 +34,7 @@ def get_build_dirs(projects):
             bdirs.append(project.build_directory)
     return bdirs
 
+@ui.timer("qibuild clean")
 def do(args):
     """Main entry point"""
     toc = qibuild.toc.toc_open(args.worktree, args)

@@ -9,6 +9,7 @@
 import os
 
 from qisys import ui
+
 import qibuild
 import qibuild.cmdparse
 
@@ -26,9 +27,11 @@ def configure_parser(parser):
     group.add_argument("--verbose-make", action="store_true", default=False,
                        help="Set verbose for make. It will print the executed commands.")
 
+@ui.timer("qibuild make")
 def do(args):
     """Main entry point"""
     toc = qibuild.toc.toc_open(args.worktree, args)
+    raise Exception("Kaboom", do.__name__)
 
     # Force single to False to check all dependencies.
     is_single = args.single

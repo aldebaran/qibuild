@@ -59,6 +59,7 @@ def sync_all(worktree, args):
         sync_build_profiles(worktree, manifest_xml)
 
 
+@ui.timer("Synchronizing worktree")
 def do(args):
     """Main entry point"""
     worktree = qisys.worktree.open_worktree(args.worktree)

@@ -49,7 +49,7 @@ Note:
     repeat it at install (for further details, see: qibuild install --help).
 """
 
-
+@ui.timer("qibuild configure")
 def do(args):
     """Main entry point"""
     if args.build_directory and not args.single:

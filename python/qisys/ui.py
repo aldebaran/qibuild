@@ -13,6 +13,7 @@
 import sys
 import os
 import datetime
+import functools
 
 # Try using pyreadline so that we can
 # have colors on windows, too.
@@ -145,3 +146,56 @@ def debug(*tokens, **kwargs):
         return
     tokens = [blue, "[DEBUG]: "] + list(tokens)
     _msg(*tokens, **kwargs)
+
+class timer:
+    """ To be used as a decorator,
+    or as a with statement:
+
+    >>> @timer("something")
+        def do_something():
+            foo()
+            bar()
+    # Or:
+    >>> with timer("something")
+        foo()
+        bar()
+
+    This will print:
+    'something took 2h 33m 42s'
+
+    """
+    def __init__(self, description):
+        self.description = description
+        self.start_time = None
+        self.stop_time = None
+        self.elapsed_time = None
+
+    def __call__(self, func, *args, **kwargs):
+        @functools.wraps(func)
+        def res(*args, **kwargs):
+            self.start()
+            func(*args, **kwargs)
+            self.stop()
+        return res
+
+    def __enter__(self):
+        self.start()
+        return self
+
+    def __exit__(self, *unused):
+        self.stop()
+
+    def start(self):
+        """ Start the timer """
+        self.start_time = datetime.datetime.now()
+
+    def stop(self):
+        """ Stop the timer and emit a nice log """
+        end_time = datetime.datetime.now()
+        elapsed_time = end_time - self.start_time
+        elapsed_seconds = elapsed_time.total_seconds()
+        hours, remainder = divmod(int(elapsed_seconds), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        as_str = "%sh %sm %ss" % (hours, minutes, seconds)
+        if CONFIG['timestamp']:
+            info("%s took %s" % (self.description, as_str))

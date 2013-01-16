@@ -440,6 +440,8 @@ You may want to run:
             generate some stats.
 
         """
+        timer = ui.timer("configure %s" % project.name)
+        timer.start()
         if not os.path.exists(project.directory):
             raise TocException("source dir: %s does not exist, aborting" % project.directory)
         cmake_file = os.path.join(project.directory, "CMakeLists.txt")
@@ -484,6 +486,7 @@ You may want to run:
                           clean_first=clean_first,
                           env=self.build_env,
                           profiling=profiling)
+            timer.stop()
         except CommandFailedException, e:
             if e.returncode == -signal.SIGSEGV:
                 mess = "CMake crashed. "
@@ -510,6 +513,8 @@ You may want to run:
                                 during `qibuild package` for instance
 
         """
+        timer = ui.timer("make %s" % project.name)
+        timer.start()
         build_dir = project.build_directory
         cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
         if not os.path.exists(cmake_cache):
@@ -545,6 +550,7 @@ You may want to run:
 
         if fix_shared_libs:
             self.fix_shared_libs(project)
+        timer.stop()
 
 
     def fix_shared_libs(self, project):
