@@ -35,9 +35,6 @@
 #   - those files are installed at the correct place
 # \example:ogre
 function(configure_ogre)
-  # FIXME: install rules
-  # FIXME: put configuration files in etc/ rather that in bin/
-
   cmake_parse_arguments(ARG "" "APPLICATION_NAME;RENDER_PLUGIN"
     "SRC_RESOURCES_PATHS;INSTALLED_RESOURCES_PATHS;PLUGINS" ${ARGN})
 
@@ -62,7 +59,7 @@ function(configure_ogre)
   foreach(_plugin ${ARG_PLUGINS})
     set(_backup ${CMAKE_FIND_LIBRARY_PREFIXES})
     set(CMAKE_FIND_LIBRARY_PREFIXES "")
-    find_library(_ogre_plugin NAMES ${ARG_RENDER_PLUGIN}
+    find_library(_ogre_plugin NAMES ${_plugin}
                               PATH_SUFFIXES "OGRE")
     set(CMAKE_FIND_LIBRARY_PREFIXES ${_backup})
     if(NOT _ogre_plugin)
@@ -92,8 +89,11 @@ function(configure_ogre)
   # A custom plugins.cfg with no PluginFolder section
   set(_inst_plugins "${CMAKE_CURRENT_BINARY_DIR}/plugins.cfg")
   file(WRITE  "${_inst_plugins}" "#Defines ogre plugins to load\n")
-  file(APPEND "${_inst_plugins}" "Plugin=${ARG_RENDER_PLUGIN}\n")
   file(APPEND "${_inst_plugins}" "PluginFolder=@sdk@/lib/OGRE\n")
+  file(APPEND "${_inst_plugins}" "Plugin=${ARG_RENDER_PLUGIN}\n")
+  foreach(_plugin ${ARG_PLUGINS})
+    file(APPEND "${_inst_plugins}" "Plugin=${_plugin}\n")
+  endforeach()
 
   # A custon resource.cfg with the installed PATH
   set(_inst_resources "${CMAKE_CURRENT_BINARY_DIR}/resources.cfg")
