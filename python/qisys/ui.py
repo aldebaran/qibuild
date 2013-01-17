@@ -193,7 +193,7 @@ class timer:
         """ Stop the timer and emit a nice log """
         end_time = datetime.datetime.now()
         elapsed_time = end_time - self.start_time
-        elapsed_seconds = elapsed_time.total_seconds()
+        elapsed_seconds = elapsed_time.seconds
         hours, remainder = divmod(int(elapsed_seconds), 3600)
         minutes, seconds = divmod(remainder, 60)
         as_str = "%sh %sm %ss" % (hours, minutes, seconds)
