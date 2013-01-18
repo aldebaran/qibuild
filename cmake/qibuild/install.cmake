@@ -231,10 +231,30 @@ function(qi_install_python)
 
   cmake_parse_arguments(ARG "" "COMPONENT;DESTINATION" "TARGETS" ${ARGN})
 
+  #XXX: this will only work if python headers have been found
+  # we can either have found them via qibuild-specific wrapper
+  # python-config.cmake or via upstream's FindPythonLib.cmake:
+  # In the first case, PYTHON_INCLUDE_DIRS (plural) will be
+  # defined, otherwize it will be PYTHON_INCLUDE_DIR (singular)
+  set(_python_inc_dir)
+  set(_python_headers_found TRUE)
+  if(DEFINED PYTHON_INCLUDE_DIRS)
+    set(_python_inc_dir ${PYTHON_INCLUDE_DIRS})
+  elseif(DEFINED PYTHON_INCLUDE_DIR)
+    set(_python_inc_dir ${PYTHON_INCLUDE_DIR})
+  else()
+    set(_python_headers_found FALSE)
+  endif()
+
   # Read the python version from the headers:
-  file(STRINGS "${PYTHON_INCLUDE_DIRS}/patchlevel.h" _python_version_full REGEX "PY_VERSION")
-  string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" _python_version_full "${_python_version_full}")
-  string(REGEX MATCH "^[0-9]+\\.[0-9]+" _python_version_major "${_python_version_full}")
+  if(_python_headers_found)
+    file(STRINGS "${_python_inc_dir}/patchlevel.h" _python_version_full REGEX "PY_VERSION")
+    string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" _python_version_full "${_python_version_full}")
+    string(REGEX MATCH "^[0-9]+\\.[0-9]+" _python_version_major "${_python_version_full}")
+  else()
+    qi_warning("Could not fing python headers, assuming version 2.7")
+    set(_python_version_major "2.7")
+  endif()
 
   # Set the python site-packages location
   if(DEFINED PYTHON_INSTALL_SCHEME AND "${PYTHON_INSTALL_SCHEME}" STREQUAL "NONE")
