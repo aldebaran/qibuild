@@ -18,6 +18,8 @@ from qisys import ui
 import qisys
 import qisys.envsetter
 import qibuild
+import qibuild.dlls
+import qibuild.dylibs
 import qibuild.gdb
 import qibuild.project
 import qibuild.profile
@@ -382,7 +384,7 @@ You may want to run:
             raise TocException("No such package: %s" % package_name)
         return None
 
-    def get_sdk_dirs(self, project_name, runtime=False):
+    def get_sdk_dirs(self, project_name):
         """ Return a list of sdk needed to build a project.
 
         Iterate through the dependencies.
@@ -403,7 +405,7 @@ You may want to run:
 
         dep_solver = DependenciesSolver(projects=self.projects, packages=self.packages,
             active_projects=self.active_projects)
-        (r_project_names, _package_names, not_found) = dep_solver.solve([project_name], runtime)
+        (r_project_names, _package_names, not_found) = dep_solver.solve([project_name])
 
         # Nothing to do with with the packages:
         # SDK dirs from toolchain are managed by the toolchain file in
@@ -562,28 +564,19 @@ You may want to run:
         environment variable
 
         """
-        sdk_dir   = project.sdk_directory
-
-        paths = list()
-
-        for package in self.packages:
-            if package.name in project.rdepends:
-                paths.append(package.path)
-
+        (packages, projects) = qibuild.cmdparse.get_deps(self, [project])
+        # remove the project given as parameter from the list:
+        projects = [p for p in projects if p.name != project.name]
         unique_sdk_dir = self.config.local.build.sdk_dir
         if not unique_sdk_dir:
-            sdk_dirs = self.get_sdk_dirs(project.name, runtime=True)
-            paths.extend(sdk_dirs)
-
+            dep_sdk_dirs = [x.sdk_directory for x in projects]
+        dep_sdk_dirs.extend(p.path for p in packages)
         if sys.platform.startswith("win"):
             mingw = "mingw" in self.cmake_generator.lower()
-            import qibuild.dlls
-            qibuild.dlls.fix_dlls(sdk_dir, paths=paths,
-                mingw=mingw,
-                build_env=self.build_env)
+            qibuild.dlls.fix_dlls(project.sdk_directory, paths=dep_sdk_dirs,
+                                  mingw=mingw, build_env=self.build_env)
         if sys.platform == "darwin":
-            import qibuild.dylibs
-            qibuild.dylibs.fix_dylibs(sdk_dir, paths=paths)
+            qibuild.dylibs.fix_dylibs(project.sdk_directory, paths=dep_sdk_dirs)
 
     def install_project(self, project, destdir, prefix="/",
                         runtime=False, num_jobs=1,
