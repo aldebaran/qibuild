@@ -148,6 +148,9 @@ function(qi_create_gtest name)
   # then, arguments coming from the user:
   list(APPEND _args  ${ARG_ARGUMENTS})
 
+  if (ARG_NO_ADD_TEST)
+    return()
+  endif()
   qi_add_test(${name} ${name}
     TIMEOUT ${ARG_TIMEOUT}
     ARGUMENTS ${_args}
