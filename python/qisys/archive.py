@@ -109,7 +109,12 @@ Please set only one of these two options to 'True'
 """
         raise ValueError(mess)
     qisys.ui.debug("Extracting %s to %s", archive, directory)
-    archive_ = zipfile.ZipFile(archive)
+    try:
+        archive_ = zipfile.ZipFile(archive)
+    except zipfile.BadZipfile:
+        mess = 'ZIP file seems corrupted. Try removing it and relaunch command.\n'
+        mess += '              rm ' + archive + '\n'
+        raise Exception(mess)
     members  = archive_.infolist()
     # There is always the top dir as the first element of the archive
     # (or so we hope)
