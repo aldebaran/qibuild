@@ -14,7 +14,7 @@ with :cmake:function:`qi_create_lib`, provided that you call
 .. code-block:: cmake
 
 
-   include_directories(".")
+   include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
    qi_create_lib(foo foo/foo.cpp foo/foo.hpp)
    qi_stage_lib(foo)
 
