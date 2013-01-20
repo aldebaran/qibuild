@@ -147,18 +147,23 @@ class Toc:
         # qc world hello -> get_sdk_dirs('hello') = ["world/build/sdk"]
         self.active_projects = list()
         self.worktree = worktree
+        self.cmake_generator   = cmake_generator
+        self.build_folder_name = None
+        self.build_type = build_type if build_type else "Debug"
+        # List of objects of type qibuild.project.Project,
+        # this is updated using WorkTree.buildable_projects
+        self.projects          = list()
+
         # The local config file in which to write
-        dot_qi = os.path.join(self.worktree.root, ".qi")
-        qisys.sh.mkdir(dot_qi)
-        self.config_path =  os.path.join(dot_qi, "qibuild.xml")
+        qisys.sh.mkdir(worktree.dot_qi)
+
+        # Perform format conversion if necessary
+        self.config_path = worktree.qibuild_xml
         if not os.path.exists(self.config_path):
             with open(self.config_path, "w") as fp:
                 fp.write("<qibuild />\n")
 
-        # Perform format conversion if necessary
-        handle_old_qibuild_cfg(self.worktree.root)
         handle_old_qibuild_xml(self.worktree.root)
-
         # Handle config:
         if not qibuild_cfg:
             self.config = qibuild.config.QiBuildConfig(config)
@@ -173,28 +178,18 @@ class Toc:
 
         self.local_cmake = None
         if self.active_config:
-            local_dir = os.path.join(worktree.root, ".qi")
-            local_cmake = os.path.join(local_dir, "%s.cmake" % self.active_config)
+            local_dir = worktree.dot_qi
+            local_cmake = os.path.join(local_dir,
+                                       "%s.cmake" % self.active_config)
             if os.path.exists(local_cmake):
                 self.local_cmake = local_cmake
-
-        self.build_type = build_type
-        if not self.build_type:
-            self.build_type = "Debug"
-
-        self.cmake_generator   = cmake_generator
-        self.build_folder_name = None
 
         # Set build environment
         envsetter = qisys.envsetter.EnvSetter()
         envsetter.read_config(self.config)
         self.build_env =  envsetter.get_build_env()
 
-        # List of objects of type qibuild.project.Project,
-        # this is updated using WorkTree.buildable_projects
-        self.projects          = list()
-
-        # Set cmake generator if user has not set if in Toc ctor:
+        # Set cmake generator if user has not set it in Toc ctor:
         if not self.cmake_generator:
             self.cmake_generator = self.config.cmake.generator
             if not self.cmake_generator:
@@ -210,7 +205,7 @@ class Toc:
                 self.packages  = self.toolchain.packages
             else:
                 # The config does not match a toolchain
-                local_dir = os.path.join(self.worktree.root, ".qi")
+                local_dir = self.worktree.dot_qi
                 local_cmake = os.path.join(local_dir, "%s.cmake" % self.active_config)
                 if not os.path.exists(local_cmake):
                     mess  = """Invalid configuration {active_config}
@@ -706,34 +701,14 @@ def toc_open(worktree_root, args=None, qibuild_cfg=None):
     # ...
     # or simply not given :)
 
-    config = None
-    if hasattr(args, 'config'):
-        config   = args.config
-    profiles = None
-    if hasattr(args, 'profiles'):
-        profiles = args.profiles
-
-    build_type = None
-    if hasattr(args, 'build_type'):
-        build_type = args.build_type
-
-    cmake_flags = list()
-    if hasattr(args,'cmake_flags'):
-        cmake_flags = args.cmake_flags
-
-    cmake_generator = None
-    if hasattr(args, 'cmake_generator'):
-        cmake_generator = args.cmake_generator
+    kwargs = dict()
+    for arg in ("config", "profiles", "build_type", "cmake_flags",
+                "cmake_generator"):
+        if hasattr(args, arg):
+            kwargs[arg] = getattr(args, arg)
 
     worktree = qisys.worktree.open_worktree(worktree_root)
-    toc = Toc(worktree,
-               config=config,
-               profiles=profiles,
-               build_type=build_type,
-               cmake_flags=cmake_flags,
-               cmake_generator=cmake_generator,
-               qibuild_cfg=qibuild_cfg)
-    return toc
+    return Toc(worktree, **kwargs)
 
 def num_jobs_to_args(num_jobs, cmake_generator):
     """ Convert a number of jobs to a list of cmake args
@@ -798,19 +773,6 @@ def check_configure(toc, project):
     cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
     if not os.path.exists(cmake_cache):
         advise_using_configure(toc, project)
-
-def handle_old_qibuild_cfg(worktree):
-    """ Handle processing a qibuild.cfg file,
-    transforming it to a qibuild.xml file on the fly
-
-    """
-    qibuild_xml = os.path.join(worktree, ".qi", "qibuild.xml")
-    if not os.path.exists(qibuild_xml):
-        qibuild_cfg = os.path.join(worktree, ".qi", "qibuild.cfg")
-        if os.path.exists(qibuild_cfg):
-            xml = qibuild.config.convert_qibuild_cfg(qibuild_cfg)
-            with open(qibuild_xml, "w") as fp:
-                fp.write(xml)
 
 def handle_old_qibuild_xml(worktree):
     """ Handle processing an old qibuild.xml  file,

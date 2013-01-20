@@ -43,10 +43,9 @@ class WorkTree:
     def load(self):
         """ Load the worktree.xml file. """
         self.projects = list()
-        dot_qi = os.path.join(self.root, ".qi")
-        worktree_xml = os.path.join(dot_qi, "worktree.xml")
+        worktree_xml = os.path.join(self.dot_qi, "worktree.xml")
         if not os.path.exists(worktree_xml):
-            qisys.sh.mkdir(dot_qi)
+            qisys.sh.mkdir(self.dot_qi)
             with open(worktree_xml, "w") as fp:
                 fp.write("<worktree />\n")
         if os.path.exists(worktree_xml):
@@ -54,6 +53,16 @@ class WorkTree:
             self.parse_projects()
 
         self.projects.sort(key=operator.attrgetter("src"))
+
+    @property
+    def dot_qi(self):
+        """Get the dot_qi directory."""
+        return os.path.join(self.root, ".qi")
+
+    @property
+    def qibuild_xml(self):
+        """Get the path to qibuild.xml."""
+        return os.path.join(self.dot_qi, "qibuild.xml")
 
     @property
     def git_projects(self):
@@ -110,8 +119,7 @@ class WorkTree:
 
     def dump(self):
         """ Dump self to the worktree.xml file. """
-        dot_qi = os.path.join(self.root, ".qi")
-        qisys.sh.mkdir(dot_qi, recursive=True)
+        qisys.sh.mkdir(self.dot_qi, recursive=True)
         worktree_xml = os.path.join(self.root, ".qi", "worktree.xml")
         qixml.write(self.xml_tree, worktree_xml)
 
