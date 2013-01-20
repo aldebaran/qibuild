@@ -41,10 +41,7 @@ def do(args):
     toc = qibuild.toc.toc_open(args.worktree, args)
     project = qibuild.cmdparse.project_from_args(toc, args)
 
-    build_dir = project.build_directory
-    cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
-    if not os.path.exists(cmake_cache):
-        qibuild.toc.advise_using_configure(toc, project)
+    qibuild.toc.check_configure(toc, project)
 
     if args.perf:
         res = qibuild.performance.run_perfs(project,

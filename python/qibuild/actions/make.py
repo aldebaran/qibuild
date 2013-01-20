@@ -37,11 +37,7 @@ def do(args):
     args.single = False
     (_, all_projects) = qibuild.cmdparse.deps_from_args(toc, args)
     for project in all_projects:
-        build_dir = project.build_directory
-        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
-        if not os.path.exists(cmake_cache):
-            qibuild.toc.check_configure(toc, project)
-
+        qibuild.toc.check_configure(toc, project)
 
     # Reset single at the initial value.
     args.single = is_single

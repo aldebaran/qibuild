@@ -29,12 +29,9 @@ def do(args):
     toc = qibuild.toc.toc_open(args.worktree, args)
     package = args.package
     project = qibuild.cmdparse.project_from_args(toc, args)
-    cmake_cache = os.path.join(project.build_directory, "CMakeCache.txt")
-    if not os.path.exists(cmake_cache):
-        print "Could not find CMakeCache for project %s" % project.name
-        print "Try using `qibuild configure` first"
-        sys.exit(2)
-    cache = qibuild.cmake.read_cmake_cache(cmake_cache)
+    qibuild.toc.check_configure(toc, project)
+
+    cache = qibuild.cmake.read_cmake_cache(project.cmakecache_path)
     u_package = package.upper()
 
     u_package_dir = cache.get(u_package + "_DIR")

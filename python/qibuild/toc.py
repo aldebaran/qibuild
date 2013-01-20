@@ -512,12 +512,9 @@ You may want to run:
         """
         timer = ui.timer("make %s" % project.name)
         timer.start()
-        build_dir = project.build_directory
-        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
-        if not os.path.exists(cmake_cache):
-            advise_using_configure(self, project)
+        check_configure(self, project)
 
-        cmd = ["cmake", "--build", build_dir, "--config", self.build_type]
+        cmd = ["cmake", "--build", project.build_directory, "--config", self.build_type]
         if target:
             cmd += ["--target", target]
 
@@ -528,7 +525,7 @@ You may want to run:
         if self.using_visual_studio and incredibuild:
             # In order to use incredibuild, we have to do this small hack:
             # (CMake --build will still call devenv.com instead of BuildConsole.exe)
-            sln_files = glob.glob(build_dir + "/*.sln")
+            sln_files = glob.glob(project.build_directory + "/*.sln")
             assert len(sln_files) == 1, "Expecting only one sln, got %s" % sln_files
             sln_file = sln_files[0]
             cmd = ["BuildConsole.exe", sln_file]
@@ -591,7 +588,6 @@ You may want to run:
             useful for `qibuild deploy`
 
         """
-        build_dir = project.build_directory
         # DESTDIR=/tmp/foo and CMAKE_PREFIX="/usr/local" means
         # dest = /tmp/foo/usr/local
         destdir = qisys.sh.to_native_path(destdir)
@@ -599,18 +595,11 @@ You may want to run:
         # Must make sure prefix is not seen as an absolute path here:
         dest = os.path.join(destdir, prefix[1:])
         dest = qisys.sh.to_native_path(dest)
-        cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
-        if not os.path.exists(cmake_cache):
-            mess  = """Could not install project {project.name}
-It appears the project has not been configured.
-({cmake_cache} does not exist)
-Try configuring and building the project first.
-"""
-            mess = mess.format(config=self.active_config,
-                project=project, cmake_cache=cmake_cache)
-            raise Exception(mess)
 
-        cprefix = qibuild.cmake.get_cached_var(build_dir, "CMAKE_INSTALL_PREFIX")
+        check_configure(self, project)
+
+        cprefix = qibuild.cmake.get_cached_var(project.build_directory,
+                                               "CMAKE_INSTALL_PREFIX")
         if cprefix != prefix:
             qibuild.cmake.cmake(project.directory, project.build_directory,
                 ['-DCMAKE_INSTALL_PREFIX=%s' % prefix],
@@ -763,9 +752,7 @@ def check_configure(toc, project):
     """ Check if we need to run qibuild configure
     before make
     """
-    build_dir = project.build_directory
-    cmake_cache = os.path.join(build_dir, "CMakeCache.txt")
-    if not os.path.exists(cmake_cache):
+    if not project.is_configured():
         advise_using_configure(toc, project)
 
 def handle_old_qibuild_xml(worktree):

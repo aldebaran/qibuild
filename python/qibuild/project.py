@@ -46,6 +46,13 @@ class Project:
 
         self.load_config()
 
+    @property
+    def cmakecache_path(self):
+        return os.path.join(self.build_directory, "CMakeCache.txt")
+
+    def is_configured(self):
+        return os.path.exists(self.cmakecache_path)
+
     def get_sdk_dir(self):
         """ Return the SDK dir of the project.
         To use the project build results, from an other project,
@@ -80,8 +87,7 @@ class Project:
 
         """
         print "-- Build options: "
-        cache_path = os.path.join(self.build_directory, "CMakeCache.txt")
-        cache = qibuild.cmake.read_cmake_cache(cache_path)
+        cache = qibuild.cmake.read_cmake_cache(self.cmakecache_path)
         opt_keys = [x for x in cache if x.startswith(("WITH_", "ENABLE_"))]
         if not opt_keys:
             print "  <no options found>"
