@@ -741,12 +741,6 @@ def num_jobs_to_args(num_jobs, cmake_generator):
     ui.warning("cannot parse -j into a cmake option for generator: %s" % cmake_generator)
     return list()
 
-def create(directory, force=False):
-    """ Create a new toc worktree inside a work tree
-
-    """
-    qisys.worktree.create(directory, force=force)
-
 def advise_using_configure(self, project):
     """Just throw a nice exception because
     CMakeCache.txt was not found.
