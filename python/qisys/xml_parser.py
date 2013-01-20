@@ -33,6 +33,9 @@ class RootXMLParser:
             # We only want to parse win tag in easy tag.
             if 'easy' in self.backtrace:
                 print 'Win text:', element.text
+
+    A parser class should not have an attribute with the name of an xml
+    attribute unless it wants to grab them.
     """
 
     def __init__(self, root):
@@ -52,6 +55,7 @@ class RootXMLParser:
         if root is None:
             root = self._root
             self._parse_prologue()
+            self._parse_attributes()
         self.backtrace.append(root.tag)
         for child in root:
             method_name = "_parse_{tagname}".format(tagname = child.tag)
@@ -93,3 +97,43 @@ class RootXMLParser:
         parsing of the file.
         """
         pass
+
+    def _parse_attributes(self):
+        """
+        You can overload this function to get attribute of root before parsing
+        his children. Attributes will be a dictionnary.
+        """
+        for attr in self._root.attrib:
+            if hasattr(self, attr):
+                default_value = getattr(self, attr)
+                type_value = type(default_value)
+
+                new_value = self._get_value_for_type(type_value,
+                        self._root.attrib[attr])
+                setattr(self, attr, new_value)
+
+        self._post_parse_attributes()
+
+    def _post_parse_attributes(self):
+        """
+        You can overload this function to add post treatment to parsing of
+        attributes. Attributes will be a dictionnary.
+        """
+        pass
+
+    def _get_value_for_type(self, type_value, value):
+        if type_value == bool:
+            if value.lower() in ["true", "1"]:
+                return True
+            if value.lower() in ["false", "0"]:
+                return False
+            mess = "Waiting for a boolean but value is '%s'." % value
+            raise Exception(mess)
+
+        return value
+
+def check_needed(node_name, attribute_name, value):
+    if value is None:
+        mess = "Node '%s' must have a '%s' attribute." % (node_name,
+                                                               attribute_name)
+        raise Exception(mess)

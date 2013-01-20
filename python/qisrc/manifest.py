@@ -66,13 +66,13 @@ class Manifest(qisys.xml_parser.RootXMLParser):
         self._paths = dict()
 
     def _parse_remote(self, element):
-        remote = Remote()
-        remote.parse(element)
+        remote = Remote(element)
+        remote.parse()
         self.remotes[remote.name] = remote
 
     def _parse_project(self, element):
-        project = Project()
-        project.parse(element)
+        project = Project(element)
+        project.parse()
         self.projects.append(project)
 
     def _parse_manifest(self, element):
@@ -120,49 +120,42 @@ no review url set.\
         raise Exception(mess)
     paths[project.path] = project.name
 
-class Project:
+class Project(qisys.xml_parser.RootXMLParser):
     """Wrapper for the <project> tag inside a manifest XML file."""
-    def __init__(self):
+    def __init__(self, root):
+        qisys.xml_parser.RootXMLParser.__init__(self, root)
         self.name = None
         self.path = None
         self.review = False
-        self.remote = None
+        self.remote = "origin"
         self.revision = None
         # Set during manifest parsing
         self.fetch_url = None
         self.review_url = None
 
-    def parse(self, xml_element):
-        self.name = qixml.parse_required_attr(xml_element, "name")
-        xml_path = xml_element.get("path")
-        if not xml_path:
+    def _post_parse_attributes(self):
+        qisys.xml_parser.check_needed("project", "name", self.name)
+        if not self.path:
             self.path = self.name.replace(".git", "")
         else:
-            self.path = qisys.sh.to_posix_path(xml_path)
-            self.path = posixpath.normpath(xml_path)
-        self.revision = xml_element.get("revision")
-        self.worktree_name = xml_element.get("worktree_name")
-        self.review = qixml.parse_bool_attr(xml_element, "review")
-        self.remote = xml_element.get("remote", default="origin")
+            self.path = posixpath.normpath(self.path)
 
     def __repr__(self):
         res = "<Project %s remote: %s fetch: %s review:%s>" % \
             (self.name, self.remote, self.fetch_url, self.review_url)
         return res
 
-class Remote:
+class Remote(qisys.xml_parser.RootXMLParser):
     """Wrapper for the <remote> tag inside a manifest XML file."""
-    def __init__(self):
-        self.name = None
+    def __init__(self, root):
+        qisys.xml_parser.RootXMLParser.__init__(self, root)
+        self.name = "origin"
         self.fetch = None
         self.review = None
-        self.revision = None
+        self.revision = "master"
 
-    def parse(self, xml_element):
-        self.name = xml_element.get("name", default="origin")
-        self.fetch = qixml.parse_required_attr(xml_element, "fetch")
-        self.review = xml_element.get("review")
-        self.revision = xml_element.get("revision", default="master")
+    def _post_parse_attributes(self):
+        qisys.xml_parser.check_needed("remote", "fetch", self.fetch)
 
     def __repr__(self):
         res = "<Remote %s fetch: %s on %s, review:%s>" % \

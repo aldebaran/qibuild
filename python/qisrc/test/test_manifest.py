@@ -129,7 +129,7 @@ class ManifestTestCase(unittest.TestCase):
         except Exception, e:
             error = e
         self.assertFalse(error is None)
-        self.assertTrue("remote must have a 'fetch' attribute" in str(error), error)
+        self.assertTrue("Node 'remote' must have a 'fetch' attribute" in str(error), error)
 
     def test_no_project_name(self):
         xml = """
@@ -145,7 +145,7 @@ class ManifestTestCase(unittest.TestCase):
         except Exception, e:
             error = e
         self.assertFalse(error is None)
-        self.assertTrue("project must have a 'name' attribute" in str(error), error)
+        self.assertTrue("'project' must have a 'name' attribute" in str(error), error)
 
     def test_no_project_path(self):
         xml = """
