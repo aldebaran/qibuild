@@ -172,7 +172,12 @@ endfunction()
 
 function(create_gtest)
   qi_deprecated("create_gtest is deprecated:
-    use qi_create_gtest instead")
+    use qi_create_gtest instead.
+  Note that some keyword arguments change:
+  old:
+    create_gtest(foo DEPENDENCIES bar)
+  new:
+    qi_create_gtest(foo DEPENDS bar)")
   _fix_flags(_new_args DEPENDENCIES DEPENDS ${ARGN})
   qi_create_gtest(${_new_args})
 endfunction()
