@@ -14,6 +14,7 @@ from qisys import ui
 import qisys.sh
 import qixml
 from qixml import etree
+import qisys.xml_parser
 
 LOGGER = qisys.log.get_logger("WorkTree")
 
@@ -130,8 +131,8 @@ class WorkTree:
         """ Parse .qi/worktree.xml, resolve subprojects. """
         projects_elem = self.xml_tree.findall("project")
         for project_elem in projects_elem:
-            project = Project(self)
-            project.parse(project_elem)
+            project = Project(self, xml_elem=project_elem)
+            project.parse()
             project.parse_qiproject_xml()
             self.projects.append(project)
 
@@ -149,9 +150,9 @@ class WorkTree:
         if project.is_git():
             project.git_project = project
         for sub_project_src in project.subprojects:
-            sub_project = Project(self)
-            sub_project.src = os.path.join(project.src, sub_project_src)
-            sub_project.src = qisys.sh.to_posix_path(sub_project.src)
+            src = os.path.join(project.src, sub_project_src)
+            src = qisys.sh.to_posix_path(src)
+            sub_project = Project(self, src=src)
             sub_project.parse_qiproject_xml()
             if project.git_project:
                 sub_project.git_project = project.git_project
@@ -193,8 +194,7 @@ class WorkTree:
             mess += "Current worktree: %s" % self.root
             raise Exception(mess)
 
-        project = Project(self)
-        project.src = src
+        project = Project(self, src=src)
         root_elem = self.xml_tree.getroot()
         root_elem.append(project.xml_elem())
         self.dump()
@@ -303,8 +303,9 @@ def git_project_path_from_cwd(cwd=None):
         cwd = os.getcwd()
     return qisrc.git.get_repo_root(cwd)
 
-class Project:
-    def __init__(self, worktree, src=None):
+class Project(qisys.xml_parser.RootXMLParser):
+    def __init__(self, worktree, src=None, xml_elem=None):
+        qisys.xml_parser.RootXMLParser.__init__(self, xml_elem)
         self.worktree = worktree
         self.src = src
         self.git_project = None
@@ -326,13 +327,8 @@ class Project:
         """Give the path to the qiproject.xml."""
         return os.path.join(self.path, "qiproject.xml")
 
-    def parse(self, xml_elem):
-        self.src = qixml.parse_required_attr(xml_elem, "src")
-        self.manifest = qixml.parse_bool_attr(xml_elem, "manifest")
-        self.review = qixml.parse_bool_attr(xml_elem, "review")
-        self.profile = xml_elem.get("profile", "default")
-        self.remote = xml_elem.get("remote", "origin")
-        self.branch = xml_elem.get("branch", "master")
+    def _post_parse_attributes(self):
+        qisys.xml_parser.check_needed("project", "src", self.src)
 
     def parse_qiproject_xml(self):
         if not os.path.exists(self.qiproject_xml):
