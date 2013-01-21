@@ -132,8 +132,15 @@ class RootXMLParser:
 
         return value
 
-def check_needed(node_name, attribute_name, value):
-    if value is None:
-        mess = "Node '%s' must have a '%s' attribute." % (node_name,
+    def check_needed(self, attribute_name, node_name=None, value=None):
+        if node_name is None:
+            node_name = self.__class__.__name__.lower()
+
+        if value is None:
+            if hasattr(self, attribute_name):
+                value = getattr(self, attribute_name)
+
+        if value is None:
+            mess = "Node '%s' must have a '%s' attribute." % (node_name,
                                                                attribute_name)
-        raise Exception(mess)
+            raise Exception(mess)

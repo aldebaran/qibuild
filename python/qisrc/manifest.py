@@ -134,7 +134,7 @@ class Project(qisys.xml_parser.RootXMLParser):
         self.review_url = None
 
     def _post_parse_attributes(self):
-        qisys.xml_parser.check_needed("project", "name", self.name)
+        self.check_needed("name")
         if not self.path:
             self.path = self.name.replace(".git", "")
         else:
@@ -155,7 +155,7 @@ class Remote(qisys.xml_parser.RootXMLParser):
         self.revision = "master"
 
     def _post_parse_attributes(self):
-        qisys.xml_parser.check_needed("remote", "fetch", self.fetch)
+        self.check_needed("fetch")
 
     def __repr__(self):
         res = "<Remote %s fetch: %s on %s, review:%s>" % \

@@ -328,7 +328,7 @@ class Project(qisys.xml_parser.RootXMLParser):
         return os.path.join(self.path, "qiproject.xml")
 
     def _post_parse_attributes(self):
-        qisys.xml_parser.check_needed("project", "src", self.src)
+        self.check_needed("src")
 
     def parse_qiproject_xml(self):
         if not os.path.exists(self.qiproject_xml):
