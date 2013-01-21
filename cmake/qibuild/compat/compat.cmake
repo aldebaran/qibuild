@@ -225,7 +225,7 @@ function(use module)
 
   # Last case: user-defined .cmake module file.
   qi_deprecated("use() is deprecated
-   Simply use find_package() instead.
+  Simply use find_package() instead.
   Old:
     create_cmake(foo)
     use(foo)
