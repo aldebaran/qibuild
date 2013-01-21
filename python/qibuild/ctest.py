@@ -131,6 +131,7 @@ class Test:
         self.verbose = kwargs.get('verbose', False)
         self.valgrind = kwargs.get('valgrind', False)
         self.nightmare = kwargs.get('nightmare', False)
+        self.cpu_mask = kwargs.get('cpu_mask', -1)
 
     def run(self, output_queue):
         """ Run a test.
@@ -162,8 +163,13 @@ class Test:
             env['VALGRIND'] = '1'
             timeout *= 10
             valgrind_log = os.path.join(self.build_dir, self.test_name + "valgrind_output.log")
+            tmp = ncmd
             ncmd = [ "valgrind", "--track-fds=yes", "--log-file=%s" % valgrind_log ]
-            ncmd.extend(self.cmd)
+            ncmd.extend(tmp)
+        if self.cpu_mask != -1:
+            tmp = ncmd
+            ncmd = ['taskset', str(self.cpu_mask)]
+            ncmd.extend(tmp)
         process = qisys.command.Process(ncmd,
             cwd=cwd,
             env=env,
@@ -267,7 +273,7 @@ def sigint_handler(signum, frame):
 
 def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
               dry_run=False, valgrind=False, nightmare=False, test_args=None,
-              coverage=False, num_jobs=1):
+              coverage=False, num_jobs=1, num_cpus=-1):
     """ Called by :py:meth:`qibuild.toc.Toc.test_project`
 
     :param test_name: If given, only run this test
@@ -284,6 +290,11 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
     if coverage:
         if not qisys.command.find_program("gcovr"):
             raise Exception("You must install gcovr before use coverage option!")
+    if num_cpus != -1:
+        if not qisys.command.find_program("taskset"):
+            raise Exception("taskset was not found on the system")
+        # get effective CPU count
+        cpu_count = int(os.sysconf('SC_NPROCESSORS_ONLN'))
     if not build_env:
         build_env = qibuild.config.get_build_env()
     build_dir = project.build_directory
@@ -334,11 +345,18 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
     for it in range(num_jobs):
         thread_list.append(TestWorker(in_queue, out_queue))
         thread_list[-1].start()
+    cur_cpu = 0
     for i, test in enumerate(tests):
         (test_name, cmd, properties) = test
+        cpu_mask = -1
+        if num_cpus != -1:
+          cpu_mask = 0
+          for j in range(num_cpus):
+            cpu_mask |= 1 << cur_cpu
+            cur_cpu = (1 + cur_cpu)%cpu_count
         in_queue.put(Test(build_dir, test_name, cmd, properties, build_env,
                           i, len(tests), valgrind=valgrind, verbose=verbose,
-                          nightmare=nightmare))
+                          nightmare=nightmare, cpu_mask=cpu_mask))
     in_queue.join()
     out_queue.join()
     signal.signal(signal.SIGINT, signal.SIG_IGN)

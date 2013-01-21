@@ -36,6 +36,8 @@ def configure_parser(parser):
                         help="run perfs tests instead of pure tests.")
     parser.add_argument("--coverage", dest="coverage", action="store_true",
                         help="run coverage")
+    parser.add_argument("--ncpu", dest="ncpu", default=-1, type=int,
+                        help="set number of CPU each test is allowed to use (linux)")
 
     parser.set_defaults(slow=False)
 
@@ -57,6 +59,6 @@ def do(args):
                 dry_run=args.dry_run, valgrind=args.valgrind,
                 verbose=args.verbose_tests, nightmare=args.nightmare,
                 test_args=args.test_args, coverage=args.coverage,
-                num_jobs=args.num_jobs)
+                num_jobs=args.num_jobs, num_cpus=args.ncpu)
         if not res:
             sys.exit(1)

@@ -16,6 +16,7 @@ Command line
 * ``qisrc grep`` learned ``-path``.
 * ``qisrc clean`` learned ``-z`` to clean build dir through toolchains and
   profiles.
+* ``qibuild test``: learned ``--ncpu`` to restrict the number of CPUs a test can use using taskset if available
 
 CMake
 +++++
