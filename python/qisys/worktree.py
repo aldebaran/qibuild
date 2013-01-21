@@ -43,13 +43,12 @@ class WorkTree:
     def load(self):
         """ Load the worktree.xml file. """
         self.projects = list()
-        worktree_xml = os.path.join(self.dot_qi, "worktree.xml")
-        if not os.path.exists(worktree_xml):
+        if not os.path.exists(self.worktree_xml):
             qisys.sh.mkdir(self.dot_qi)
-            with open(worktree_xml, "w") as fp:
+            with open(self.worktree_xml, "w") as fp:
                 fp.write("<worktree />\n")
-        if os.path.exists(worktree_xml):
-            self.xml_tree = qixml.read(worktree_xml)
+        if os.path.exists(self.worktree_xml):
+            self.xml_tree = qixml.read(self.worktree_xml)
             self.parse_projects()
 
         self.projects.sort(key=operator.attrgetter("src"))
@@ -58,6 +57,11 @@ class WorkTree:
     def dot_qi(self):
         """Get the dot_qi directory."""
         return os.path.join(self.root, ".qi")
+
+    @property
+    def worktree_xml(self):
+        """Get the worktree_xml path."""
+        return os.path.join(self.dot_qi, "worktree.xml")
 
     @property
     def qibuild_xml(self):
@@ -82,7 +86,7 @@ class WorkTree:
         return manifest_projects
 
     def has_project(self, src):
-        srcs = [p.src.lower() for p in self.projects]
+        srcs = (p.src.lower() for p in self.projects)
         return src.lower() in srcs
 
     def update_project_config(self, src, key, value):
@@ -120,16 +124,14 @@ class WorkTree:
     def dump(self):
         """ Dump self to the worktree.xml file. """
         qisys.sh.mkdir(self.dot_qi, recursive=True)
-        worktree_xml = os.path.join(self.root, ".qi", "worktree.xml")
-        qixml.write(self.xml_tree, worktree_xml)
+        qixml.write(self.xml_tree, self.worktree_xml)
 
     def parse_projects(self):
         """ Parse .qi/worktree.xml, resolve subprojects. """
         projects_elem = self.xml_tree.findall("project")
         for project_elem in projects_elem:
-            project = Project()
+            project = Project(self)
             project.parse(project_elem)
-            self.set_path(project)
             project.parse_qiproject_xml()
             self.projects.append(project)
 
@@ -139,7 +141,6 @@ class WorkTree:
             self._rec_parse_sub_projects(project, res)
         self.projects = res[:]
 
-
     def _rec_parse_sub_projects(self, project, res):
         """ Recursively parse every project and subproject,
         filling up the res list.
@@ -148,21 +149,14 @@ class WorkTree:
         if project.is_git():
             project.git_project = project
         for sub_project_src in project.subprojects:
-            sub_project = Project()
+            sub_project = Project(self)
             sub_project.src = os.path.join(project.src, sub_project_src)
             sub_project.src = qisys.sh.to_posix_path(sub_project.src)
-            self.set_path(sub_project)
             sub_project.parse_qiproject_xml()
             if project.git_project:
                 sub_project.git_project = project.git_project
             res.append(sub_project)
             self._rec_parse_sub_projects(sub_project, res)
-
-    def set_path(self, project):
-        """ Set the path attribute of a project. """
-        p_path = os.path.join(self.root, project.src)
-        project.path = qisys.sh.to_native_path(p_path)
-
 
     def get_project(self, src, raises=False):
         """ Get a project
@@ -199,7 +193,7 @@ class WorkTree:
             mess += "Current worktree: %s" % self.root
             raise Exception(mess)
 
-        project = Project()
+        project = Project(self)
         project.src = src
         root_elem = self.xml_tree.getroot()
         root_elem.append(project.xml_elem())
@@ -217,7 +211,6 @@ class WorkTree:
         """
         # Coming from user, can be an abspath:
         src = to_relative_path(self.root, src)
-        p_srcs = [p.src for p in self.projects]
         if not self.has_project(src):
             raise Exception("No such project: %s" % src)
         root_elem = self.xml_tree.getroot()
@@ -259,17 +252,16 @@ def open_worktree(worktree=None):
 
 
 def guess_worktree(cwd=None, raises=False):
-    """ Look for parent directories until a .qi dir is found somewhere. """
+    """Look for parent directories until a .qi dir is found somewhere."""
     if cwd is None:
         cwd = os.getcwd()
     head = cwd
-    while True:
+    _tail = True
+    while _tail:
         d = os.path.join(head, ".qi")
         if os.path.isdir(d):
             return head
         (head, _tail) = os.path.split(head)
-        if not _tail:
-            break
     if raises:
         raise NotInWorktree()
     else:
@@ -284,13 +276,11 @@ def create(directory, force=False):
     """
     if not force:
         parent_worktree = guess_worktree(directory)
-        if parent_worktree:
-            if parent_worktree != directory:
-                if not force:
-                    qisys.ui.warning("""{0} is already in a worktee
+        if parent_worktree and parent_worktree != directory:
+            qisys.ui.warning("""{0} is already in a worktee
 (in {1})
 Use --force if you want to re-initialize the worktree""".format(directory, parent_worktree))
-                    return open_worktree(parent_worktree)
+            return open_worktree(parent_worktree)
 
         git_project = git_project_path_from_cwd(directory)
         if git_project:
@@ -314,16 +304,27 @@ def git_project_path_from_cwd(cwd=None):
     return qisrc.git.get_repo_root(cwd)
 
 class Project:
-    def __init__(self, src=None):
+    def __init__(self, worktree, src=None):
+        self.worktree = worktree
         self.src = src
-        self.path = None
         self.git_project = None
         self.subprojects = list()
         self.manifest = False
-        self.remote = None
-        self.branch = None
-        self.profile = None
+        self.remote = "origin"
+        self.branch = "master"
+        self.profile = "default"
         self.review = False
+
+    @property
+    def path(self):
+        """Give the path in native form."""
+        path = os.path.join(self.worktree.root, self.src)
+        return qisys.sh.to_native_path(path)
+
+    @property
+    def qiproject_xml(self):
+        """Give the path to the qiproject.xml."""
+        return os.path.join(self.path, "qiproject.xml")
 
     def parse(self, xml_elem):
         self.src = qixml.parse_required_attr(xml_elem, "src")
@@ -334,13 +335,12 @@ class Project:
         self.branch = xml_elem.get("branch", "master")
 
     def parse_qiproject_xml(self):
-        qiproject_xml = os.path.join(self.path, "qiproject.xml")
-        if not os.path.exists(qiproject_xml):
+        if not os.path.exists(self.qiproject_xml):
             return
-        tree = qixml.read(qiproject_xml)
+        tree = qixml.read(self.qiproject_xml)
         project_elems = tree.findall("project")
         for project_elem in project_elems:
-            src = qixml.parse_required_attr(project_elem, "src", xml_path=qiproject_xml)
+            src = qixml.parse_required_attr(project_elem, "src", xml_path=self.qiproject_xml)
             self.subprojects.append(src)
 
     def xml_elem(self):
@@ -365,9 +365,8 @@ class Project:
         return os.path.exists(git_dir)
 
     def is_buildable(self):
-        qiproj_xml = os.path.join(self.path, "qiproject.xml")
         cmake_lists = os.path.join(self.path, "CMakeLists.txt")
-        return os.path.exists(qiproj_xml) and os.path.exists(cmake_lists)
+        return os.path.exists(self.qiproject_xml) and os.path.exists(cmake_lists)
 
     def __repr__(self):
         res  = "<Project in %s\n" % (self.src)
