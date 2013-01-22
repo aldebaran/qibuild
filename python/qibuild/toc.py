@@ -567,6 +567,7 @@ You may want to run:
         (packages, projects) = qibuild.cmdparse.get_deps(self, [project])
         # remove the project given as parameter from the list:
         projects = [p for p in projects if p.name != project.name]
+        dep_sdk_dirs = list()
         unique_sdk_dir = self.config.local.build.sdk_dir
         if not unique_sdk_dir:
             dep_sdk_dirs = [x.sdk_directory for x in projects]
