@@ -209,3 +209,40 @@ function(qi_use_lib name)
   endif()
   _qi_use_lib_internal(${name} ${ARGN})
 endfunction()
+
+#! Make sure configuration and data files in the
+#  given directory can be found by
+#  ``qi::findData()`` in this project or
+#   any dependency
+#
+# For this to work, configuration files should be
+# in ``etc`` and data files in ``share``
+#
+# Note that this function does not create any install rule
+#
+# \arg:directory (optional): the directory to
+#                 register, relative to
+#                 CMAKE_CURRENT_SOURCE_DIR. Defaults
+#                 to CMAKE_CURRENT_SOURCE_DIR
+function(qi_stage_dir)
+  set(_path_conf "${QI_SDK_DIR}/${QI_SDK_SHARE}/qi/path.conf")
+  set(_dirs)
+  if(EXISTS "${_path_conf}")
+    file(STRINGS "${_path_conf}" _dirs)
+  endif()
+  # fixme: error when more than one arg
+  if(${ARGV1})
+    qi_error("qi_stage_dir must be called with zero or one argument")
+  endif()
+  if(ARGV0)
+    get_filename_component(_to_stage ${ARGV0} ABSOLUTE)
+  else()
+    set(_to_stage "${CMAKE_CURRENT_SOURCE_DIR}")
+  endif()
+  _qi_list_append_uniq(_dirs ${_to_stage})
+  # re-create the file:
+  file(WRITE "${_path_conf}" "")
+  foreach(_dir ${_dirs})
+    file(APPEND "${_path_conf}" "${_dir}\n")
+  endforeach()
+endfunction()
