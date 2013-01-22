@@ -188,7 +188,7 @@ endfunction()
 #                  sdk/lib/<subfolder>
 # \group:SRC The list of source files (private headers and sources)
 # \group:SUBMODULE Submodule to include in the lib
-# \group:DEP List of dependencies
+# \group:DEPENDS List of dependencies
 # \example:target
 function(qi_create_lib name)
   cmake_parse_arguments(ARG
