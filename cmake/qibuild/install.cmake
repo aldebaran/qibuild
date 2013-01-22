@@ -183,7 +183,7 @@ function(qi_install_program)
 
   foreach(name ${ARG_UNPARSED_ARGUMENTS})
     #TODO: what should be the real source here?
-    install(PROGRAMS    "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}"
+    install(PROGRAMS    "${name}"
             COMPONENT   binary
             DESTINATION "${QI_SDK_BIN}/${ARG_SUBFOLDER}")
   endforeach()
