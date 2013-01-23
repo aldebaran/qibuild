@@ -36,9 +36,13 @@ function(qt_flib _suffix _libame)
   flib(QT_${_suffix} OPTIMIZED NAMES "${_libame}" "${_libame}4"  PATH_SUFFIXES qt4)
   flib(QT_${_suffix} DEBUG     NAMES "${_libame}" "${_libame}d4" PATH_SUFFIXES qt4)
 
+  # we don't wand to find the headers in .Frameworks/Headers:
+  set(_back ${CMAKE_FIND_FRAMEWORK})
+  set(CMAKE_FIND_FRAMEWORK NEVER)
   #we want to be able to #include <QtLib>
   fpath(QT_${_suffix} ${_libame} PATH_SUFFIXES qt4 )
 
   #we want to be able to #include <QtLib/QtLib>
   fpath(QT_${_suffix} ${_libame} PATH_SUFFIXES ${_libame} qt4/${_libame})
+  set(CMAKE_FIND_FRAMEWORK ${_back})
 endfunction()
