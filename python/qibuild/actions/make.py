@@ -26,6 +26,9 @@ def configure_parser(parser):
                              "Used by `qibuild package`")
     group.add_argument("--verbose-make", action="store_true", default=False,
                        help="Set verbose for make. It will print the executed commands.")
+    group.add_argument("--coverity", action="store_true", default=False,
+                       help="Build using cov-build. Ensure you have "
+                       "cov-analisys installed on your machine.")
 
 @ui.timer("qibuild make")
 def do(args):
@@ -58,4 +61,5 @@ def do(args):
         toc.build_project(project, num_jobs=args.num_jobs,
                           incredibuild=use_incredibuild, rebuild=args.rebuild,
                           fix_shared_libs=args.fix_shared_libs,
-                          verbose_make=args.verbose_make)
+                          verbose_make=args.verbose_make,
+                          coverity=args.coverity)

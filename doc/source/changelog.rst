@@ -11,6 +11,7 @@ Upcoming release
 Command line
 +++++++++++++
 
+* ``qibuild make``: add ``--coverity`` option to build with cov-analisys.
 * ``qibuild clean``: syntax closer to other commands, cleans deep by default and
    respects ``--config`` ``--single`` and [project] options
 * Nicer output for all commands.

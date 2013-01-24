@@ -17,6 +17,7 @@ import operator
 from qisys import ui
 import qisys
 import qisys.envsetter
+import qisys.sh
 import qibuild
 import qibuild.dlls
 import qibuild.dylibs
@@ -496,7 +497,7 @@ You may want to run:
 
     def build_project(self, project, incredibuild=False,
                       num_jobs=1, target=None, rebuild=False,
-                      fix_shared_libs=True, verbose_make=False):
+                      fix_shared_libs=True, verbose_make=False, coverity=False):
         """ Build a project.
 
         Usually we will simply can ``cmake --build``, but for incredibuild
@@ -514,7 +515,16 @@ You may want to run:
         timer.start()
         check_configure(self, project)
 
-        cmd = ["cmake", "--build", project.build_directory, "--config", self.build_type]
+        cmd = []
+        if coverity:
+            if not qisys.command.find_program("cov-build"):
+                raise Exception("cov-build was not found on the system")
+            cov_dir = os.path.join(project.build_directory, "coverity")
+            qisys.sh.mkdir(cov_dir)
+            cmd += ["cov-build", "--dir", cov_dir]
+
+        cmd += ["cmake", "--build", project.build_directory, "--config", self.build_type]
+
         if target:
             cmd += ["--target", target]
 
