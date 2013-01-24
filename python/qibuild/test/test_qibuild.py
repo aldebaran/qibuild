@@ -83,8 +83,8 @@ class QiBuildTestCase(unittest.TestCase):
         # Read cache and check that DEPENDS value are here
         cmake_cache = self.get_cmake_cache("uselib")
         cache = qibuild.cmake.read_cmake_cache(cmake_cache)
-        self.assertEquals(cache["D_DEPENDS"], "a;b")
-        self.assertEquals(cache["E_DEPENDS"], "d;cc;a;b")
+        self.assertEquals(cache["D_DEPENDS"], "A;B")
+        self.assertEquals(cache["E_DEPENDS"], "D;A;B;CC")
         self._run_action("make", "uselib")
 
         self.assertRaises(Exception,
@@ -139,23 +139,15 @@ class QiBuildTestCase(unittest.TestCase):
 
         # Read cache and check that DEPENDS value are here
         cache_before = qibuild.cmake.read_cmake_cache(cmake_cache)
-        with open(cmake_cache, "r") as fp:
-            txt_before = fp.readlines()
-            txt_before = [l for l in txt_before if "ADVANCED" not in l]
 
-        self.assertEquals(cache_before["EGGS_DEPENDS"], "spam")
-        self.assertEquals(cache_before["BAR_DEPENDS"] , "eggs;spam")
+        assert cache_before["EGGS_DEPENDS"] == "SPAM"
+        assert cache_before["BAR_DEPENDS"] == "EGGS;SPAM"
 
         # run cmake .. and check the cache did not change
         qisys.command.call(["cmake", ".."], cwd=build_dir)
-        with open(cmake_cache, "r") as fp:
-            txt_after = fp.readlines()
-            txt_after = [l for l in txt_after if "ADVANCED" not in l]
+        cache_after = qibuild.cmake.read_cmake_cache(cmake_cache)
 
-        diff = ""
-        for line in difflib.unified_diff(txt_before, txt_after, fromfile='before', tofile='after'):
-            diff += line
-        self.assertEquals(diff, "", "Diff non empty\n%s" % diff)
+        assert cache_before == cache_after
 
 
 if __name__ == "__main__":
