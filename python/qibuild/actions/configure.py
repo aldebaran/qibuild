@@ -34,9 +34,9 @@ def configure_parser(parser):
     group.add_argument("--werror", dest="werror",
         action="store_true",
         help="treat warnings as error")
-    parser.add_argument("--profiling", dest="profiling", action="store_true",
+    group.add_argument("--profiling", dest="profiling", action="store_true",
         help="profile cmake execution")
-    parser.add_argument("--summarize-options", dest="summarize_options",
+    group.add_argument("--summarize-options", dest="summarize_options",
                         action="store_true",
                         help="summarize build options at the end")
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
@@ -67,9 +67,6 @@ def do(args):
     (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
     if args.build_directory:
         projects[0].set_custom_build_directory(args.build_directory)
-
-    if args.debug_trycompile:
-        print "--debug-trycompile ON"
 
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
