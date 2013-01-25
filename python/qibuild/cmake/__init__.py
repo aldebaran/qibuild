@@ -121,7 +121,6 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     if not profiling:
         qisys.command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
         return
-    # importing here in order to not create circular dependencies:
     cmake_log = os.path.join(build_dir, "cmake.log")
     fp = open(cmake_log, "w")
     ui.info(ui.green, "Running cmake for profiling ...")
