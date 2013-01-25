@@ -133,11 +133,13 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
         ui.info(ui.green, "Running cmake for profiling ...")
     if trace_cmake:
         ui.info(ui.green, "Running cmake with --trace ...")
-    subprocess.call(["cmake"] + cmake_args, cwd=build_dir, env=env,
+    retcode = subprocess.call(["cmake"] + cmake_args, cwd=build_dir, env=env,
                    stdout=fp, stderr=fp)
     fp.close()
+    if retcode != 0:
+        ui.error("CMake failed, see log for details")
+    ui.info(ui.green, "CMake trace saved in", ui.reset, ui.bold, cmake_log)
     if not profiling:
-        ui.info("CMake trace saved in", cmake_log)
         return
     qibuild_dir = get_cmake_qibuild_dir()
     ui.info(ui.green, "Analyzing cmake logs ...")
