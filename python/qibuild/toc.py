@@ -463,11 +463,6 @@ You may want to run:
 
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
-        if debug_trycompile:
-            cmake_args.append("--debug-trycompile")
-
-        if profiling:
-            cmake_args.append("--trace")
 
         if "MinGW" in self.cmake_generator:
             paths = self.build_env["PATH"].split(os.pathsep)
@@ -478,12 +473,11 @@ You may want to run:
             self.build_env["PATH"] = os.pathsep.join(paths_withoutsh)
 
         try:
-            qibuild.cmake.cmake(project.directory,
-                          project.build_directory,
-                          cmake_args,
-                          clean_first=clean_first,
-                          env=self.build_env,
-                          profiling=profiling)
+            qibuild.cmake.cmake(project.directory, project.build_directory,
+                                cmake_args, env=self.build_env,
+                                clean_first=clean_first,
+                                debug_trycompile=debug_trycompile,
+                                profiling=profiling)
             timer.stop()
         except CommandFailedException, e:
             if e.returncode == -signal.SIGSEGV:

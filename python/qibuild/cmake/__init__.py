@@ -82,7 +82,8 @@ def get_cached_var(build_dir, var, default=None):
 
 
 def cmake(source_dir, build_dir, cmake_args, env=None,
-          clean_first=True, profiling=False):
+          clean_first=True, profiling=False,
+          debug_trycompile=False):
     """Call cmake with from a build dir for a source dir.
     cmake_args are added on the command line.
 
@@ -102,6 +103,13 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
         cache = os.path.join(build_dir, "CMakeCache.txt")
         qisys.sh.rm(cache)
 
+    if debug_trycompile:
+        ui.info(ui.green, "Running CMake with --debug-trycompile")
+        cmake_args.append("--debug-trycompile")
+
+    if profiling:
+        ui.info(ui.green, "Running CMake with --trace")
+        cmake_args.append("--trace")
     # Check that no one has made an in-source build
     in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
     if os.path.exists(in_source_cache):
@@ -123,7 +131,6 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
         return
     cmake_log = os.path.join(build_dir, "cmake.log")
     fp = open(cmake_log, "w")
-    ui.info(ui.green, "Running cmake for profiling ...")
     subprocess.call(["cmake"] + cmake_args, cwd=build_dir, env=env,
                    stdout=fp, stderr=fp)
     fp.close()
