@@ -39,8 +39,12 @@ def configure_parser(parser):
     group.add_argument("--summarize-options", dest="summarize_options",
                         action="store_true",
                         help="summarize build options at the end")
+    group.add_argument("--trace-cmake", dest="trace_cmake",
+                      action="store_true",
+                      help="run cmake in trace mode")
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
-                        werror=False, profiling=False)
+                        werror=False, profiling=False,
+                        trace_cmake=False)
     if not parser.epilog:
         parser.epilog = ""
     parser.epilog += """
@@ -76,6 +80,11 @@ def do(args):
     if toc.local_cmake:
         ui.info(ui.green, "Using custom CMake file:", ui.reset,
                 ui.bold, toc.local_cmake)
+    if args.debug_trycompile:
+        ui.info(ui.green, "Using cmake --debug-trycompile")
+    if args.trace_cmake:
+        ui.info(ui.green, "Tracing CMake execution")
+
 
     project_count = len(projects)
     i = 0
@@ -87,6 +96,6 @@ def do(args):
         toc.configure_project(project,
             clean_first=args.clean_first,
             debug_trycompile=args.debug_trycompile,
-            profiling=args.profiling)
+            profiling=args.profiling,trace_cmake=args.trace_cmake)
         if args.summarize_options:
             project.summarize_options()

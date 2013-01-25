@@ -426,7 +426,8 @@ You may want to run:
 
 
     def configure_project(self, project, clean_first=True,
-                         debug_trycompile=False, profiling=False):
+                         debug_trycompile=False, profiling=False,
+                         trace_cmake=False):
         """ Call cmake with correct options.
 
         :param clean_first: If False, do not delete CMake cache.
@@ -477,7 +478,8 @@ You may want to run:
                                 cmake_args, env=self.build_env,
                                 clean_first=clean_first,
                                 debug_trycompile=debug_trycompile,
-                                profiling=profiling)
+                                profiling=profiling,
+                                trace_cmake=trace_cmake)
             timer.stop()
         except CommandFailedException, e:
             if e.returncode == -signal.SIGSEGV:

@@ -82,8 +82,8 @@ def get_cached_var(build_dir, var, default=None):
 
 
 def cmake(source_dir, build_dir, cmake_args, env=None,
-          clean_first=True, profiling=False,
-          debug_trycompile=False):
+          clean_first=True, profiling=False, debug_trycompile=False,
+          trace_cmake=False):
     """Call cmake with from a build dir for a source dir.
     cmake_args are added on the command line.
 
@@ -104,12 +104,10 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
         qisys.sh.rm(cache)
 
     if debug_trycompile:
-        ui.info(ui.green, "Running CMake with --debug-trycompile")
         cmake_args.append("--debug-trycompile")
-
-    if profiling:
-        ui.info(ui.green, "Running CMake with --trace")
+    if profiling or trace_cmake:
         cmake_args.append("--trace")
+
     # Check that no one has made an in-source build
     in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
     if os.path.exists(in_source_cache):
@@ -126,14 +124,21 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     # Add path to source to the list of args, and set buildir for
     # the current working dir.
     cmake_args += [source_dir]
-    if not profiling:
+    if not profiling and not trace_cmake:
         qisys.command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
         return
     cmake_log = os.path.join(build_dir, "cmake.log")
     fp = open(cmake_log, "w")
+    if profiling:
+        ui.info(ui.green, "Running cmake for profiling ...")
+    if trace_cmake:
+        ui.info(ui.green, "Running cmake with --trace ...")
     subprocess.call(["cmake"] + cmake_args, cwd=build_dir, env=env,
                    stdout=fp, stderr=fp)
     fp.close()
+    if not profiling:
+        ui.info("CMake trace saved in", cmake_log)
+        return
     qibuild_dir = get_cmake_qibuild_dir()
     ui.info(ui.green, "Analyzing cmake logs ...")
     profiling_res = qibuild.cmake.profiling.parse_cmake_log(cmake_log, qibuild_dir)

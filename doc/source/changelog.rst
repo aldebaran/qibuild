@@ -17,6 +17,7 @@ Command line
 * Nicer output for all commands.
 * ``qibuild configure``: add a ``--summarize-options`` argument to
    print a summary of the build options at the end of the configuration
+* ``qibuild configure``: add  ``--trace-cmake`` to trace CMake function calls
 * ``qibuild make`` get rid of confusing and useless "--target" option
 * Added a lot of short options ("-n" for "--dry-run", "-f" for "--force")
 * ``qibuild init``: add a ``--config`` argument to set the default config used by
