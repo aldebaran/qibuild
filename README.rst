@@ -67,4 +67,5 @@ Maintainers
 ------------
 
 * Dimitri Merejkowsky <dmerejkowsky@aldebaran-robotics.com>
+* Nicolas Cornu <ncornu@aldebaran-robotics.com>
 * Cedric Gestes <gestes@aldebaran-robotics.com>
