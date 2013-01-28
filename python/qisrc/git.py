@@ -311,7 +311,7 @@ def _update_branch(git, branch, remote_name,
                 return status.mess
     if status.mess:
         # Stashing back failse: calling rebase --abort
-        print "Stasthing back changes failed"
+        print "Stashing back changes failed"
         print "Calling rebase --abort"
         (ret, out) = git.rebase("--abort", raises=False)
         if ret != 0:
