@@ -389,7 +389,7 @@ def add_cmake_module_to_archive(archive, name):
         if name is None:
             name = os.path.basename(root_dir)
         add_cmake_module_to_directory(root_dir, name)
-        res = qisys.archive.compress(work_dir)
+        res = qisys.archive.compress(root_dir)
         qisys.sh.mv(res, archive)
 
 
