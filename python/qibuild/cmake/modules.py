@@ -286,34 +286,35 @@ def _edit_template(name, template, package_path_list):
     # pep8-ignore: E501
     question = "Edit generated CMake module for {0} (highly recommended)?".format(name)
     answer   = qisys.interact.ask_yes_no(question, default=True)
+    if not answer:
+        return template
+    answer = False
+    if package_path_list is not None:
+        # pep8-ignore: E501
+        question = "Would you like to list the package content before?".format(name)
+        answer   = qisys.interact.ask_yes_no(question, default=True)
     if answer:
-        answer = False
-        if package_path_list is not None:
-            # pep8-ignore: E501
-            question = "Would you like to list the package content before?".format(name)
-            answer   = qisys.interact.ask_yes_no(question, default=True)
-        if answer:
-            message = """\
+        message = """\
 Package content:
 {0}
 
 Press enter to launch the editor.\
 """.format("\n".join(["  " + x for x in package_path_list]))
-            qisys.ui.info(message)
-            qisys.interact.read_input()
-        qibuild_cfg = qibuild.config.QiBuildConfig()
-        qibuild_cfg.read()
-        editor = qibuild_cfg.defaults.env.editor
-        if not editor:
-            editor = qisys.interact.get_editor()
-        editor_path = qisys.command.find_program(editor)
-        with qisys.sh.TempDir() as tmp_dir:
-            cmake_module = os.path.join(tmp_dir, 'tmp-module.cmake')
-            with open(cmake_module, 'w') as module_file:
-                module_file.write(template)
-            qisys.command.call([editor_path, cmake_module])
-            with open(cmake_module, 'r') as module_file:
-                module = module_file.read()
+        qisys.ui.info(message)
+        qisys.interact.read_input()
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
+    editor = qibuild_cfg.defaults.env.editor
+    if not editor:
+        editor = qisys.interact.get_editor()
+    editor_path = qisys.command.find_program(editor)
+    with qisys.sh.TempDir() as tmp_dir:
+        cmake_module = os.path.join(tmp_dir, 'tmp-module.cmake')
+        with open(cmake_module, 'w') as module_file:
+            module_file.write(template)
+        qisys.command.call([editor_path, cmake_module])
+        with open(cmake_module, 'r') as module_file:
+            module = module_file.read()
     return module
 
 
