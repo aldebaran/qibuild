@@ -6,11 +6,10 @@
 """
 
 import qisys.parsers
-import qisrc.parsers
 
 log_parser = qisys.parsers.log_parser
 default_parser  = qisys.parsers.default_parser
-worktree_parser = qisrc.parsers.worktree_parser
+worktree_parser = qisys.parsers.worktree_parser
 
 
 
@@ -49,13 +48,8 @@ def build_parser(parser):
     parser.set_defaults(build_type="Debug")
 
 def project_parser(parser):
-    """ Parser settings for every action using several toc projects
-    """
-    group = parser.add_argument_group("dependency resolution options")
-    group.add_argument("-a", "--all", action="store_true",
-        help="Work on all projects")
-    group.add_argument("-s", "--single", action="store_true",
-        help="Work on specified projects without taking dependencies into account.")
+    """Parser settings for every action using several toc projects."""
+    group = qisys.parsers.project_parser(parser)
     group.add_argument("--build-deps", action="store_true",
         help="Work on specified projects by ignoring the runtime deps. "
              "Useful when you have lots of runtime plugins you don't want to compile "
@@ -63,5 +57,4 @@ def project_parser(parser):
     group.add_argument("--runtime", action="store_true",
         help="Work on specified projects by using only the runtime deps. "
              "Mostly used by qibuild install --runtime")
-    parser.add_argument("projects", nargs="*", metavar="PROJECT", help="Project name(s)")
-    parser.set_defaults(single=False, build_deps=False, projects = list())
+    parser.set_defaults(build_deps=False)

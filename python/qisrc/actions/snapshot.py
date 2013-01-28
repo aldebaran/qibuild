@@ -14,6 +14,7 @@ import qisrc.snapshot
 def configure_parser(parser):
     """Configure parser for this action."""
     qisys.parsers.worktree_parser(parser)
+    qisys.parsers.project_parser(parser)
     parser.add_argument("--generate", help="Generate a snapshot file from "
                         "the current state.", action="store_true")
     parser.add_argument("--load", help="Load a snapshot on a current worktree.",

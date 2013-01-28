@@ -11,10 +11,12 @@ import qisys.interact
 import qisrc.git
 import qisrc.snapshot
 import qisrc.status
+import qisrc.cmdparse
 
 def configure_parser(parser):
     """Configure parser for this action."""
     qisys.parsers.worktree_parser(parser)
+    qisys.parsers.project_parser(parser)
     parser.add_argument("-f", "--force", help="If not set only a dry-run is"
                         "done.", action="store_true")
     parser.add_argument("-c", "--clean", action="store_true",
@@ -26,8 +28,8 @@ def do(args):
     worktree = qisys.worktree.open_worktree(args.worktree)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, worktree.root)
 
-    for project in worktree.projects:
-        if not project.is_git():
+    for project in qisrc.cmdparse.projects_from_args(args, worktree):
+        if qisrc.git.get_repo_root(project.path) is None:
             continue
 
         state_project = qisrc.status.check_state(project, False)

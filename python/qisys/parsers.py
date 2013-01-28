@@ -2,13 +2,11 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Collection of parser fonctions for various actions
-"""
+"""Collection of parser fonctions for various actions."""
 
 
 def log_parser(parser):
-    """ Given a parser, add the options controlling log
-    """
+    """Given a parser, add the options controlling log."""
     group = parser.add_argument_group("logging options")
     group.add_argument("-v", "--verbose", dest="verbose", action="store_true",
          help="Output debug messages")
@@ -24,8 +22,7 @@ def log_parser(parser):
     parser.set_defaults(verbose=False, quiet=False, color=True)
 
 def default_parser(parser):
-    """ Parser settings for every action
-    """
+    """Parser settings for every action."""
     # Every action should have access to a proper log
     log_parser(parser)
     # Every action can use  --pdb and --backtrace
@@ -36,10 +33,19 @@ def default_parser(parser):
         help="Do not print command outputs")
 
 def worktree_parser(parser):
-    """ Parser settings for every action using a work tree.
-    """
+    """Parser settings for every action using a work tree."""
     default_parser(parser)
     parser.add_argument("-w", "--worktree", "--work-tree", dest="worktree",
         help="Use a specific work tree path.")
 
+def project_parser(parser):
+    """Parser settings for every action using projects."""
+    group = parser.add_argument_group("projects specifications options")
+    group.add_argument("-a", "--all", action="store_true",
+        help="Work on all projects")
+    group.add_argument("-s", "--single", action="store_true",
+        help="Work on specified projects without taking dependencies into account.")
+    parser.add_argument("projects", nargs="*", metavar="PROJECT", help="Project name(s)")
+    parser.set_defaults(single=False, projects = list())
+    return group
 
