@@ -31,6 +31,8 @@ if os.name == 'nt':
 # so that we can use ::
 #
 #  qisys.ui.msg(qisys.ui.bold, "This is bold", qisys.ui.reset)
+
+
 class _Color:
     def __init__(self, code, modifier=None):
         self.code = '\033[%d' % code
@@ -76,13 +78,12 @@ fuscia     = fuchsia
 #    CONFIG['interative'] = False
 
 CONFIG = {
-    "verbose" : False,
-    "quiet" : False,
-    "color" : True,
-    "timestamp" : False,
-    "interactive" : True,
+    "verbose": False,
+    "quiet": False,
+    "color": True,
+    "timestamp": False,
+    "interactive": True,
 }
-
 
 
 def _msg(*tokens, **kwargs):
@@ -95,31 +96,29 @@ def _msg(*tokens, **kwargs):
     with_color = CONFIG["color"]
     if os.name == 'nt' and not HAS_PYREADLINE or not fp.isatty():
         with_color = False
+    res = list()  # Initialize result list, to be concatenated before printing
     if CONFIG["timestamp"]:
         now = datetime.datetime.now()
-        res = now.strftime("[%Y-%m-%d %H:%M:%S] ")
-    else:
-        res = ""
-    for i, token in enumerate(tokens):
-        if not token:
-            continue
+        res.append(now.strftime("[%Y-%m-%d %H:%M:%S] "))
+    for token in tokens:
         if isinstance(token, _Color):
             if with_color:
-                res += token.code
+                res.append(token.code)
         else:
             if sep == " " and token == "\n":
-                res += "\n"
+                res.append("\n")
             else:
-                res += str(token)
-                res += sep
+                res.append(str(token))
+                res.append(sep)
     # always reset:
     if with_color:
-        res += reset.code
-    res += end
+        res.append(reset.code)
+    res.append(end)
+    stringres = ''.join(res)
     if _console and with_color:
-        _console.write_color(res)
+        _console.write_color(stringres)
     else:
-        fp.write(res)
+        fp.write(stringres)
         fp.flush()
 
 def error(*tokens, **kwargs):
