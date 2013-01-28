@@ -86,6 +86,9 @@ Some string functions you will always use:
   `rjust <http://docs.python.org/2/library/stdtypes.html#str.rjust>`_
   instead of writing custom padding code
 
+* Always precise object when creating it. Use `foo = list()` instead of `foo = []`.
+  `bar = set()` instead of `bar = {}`, etc.
+
 Some more specific rules
 ------------------------
 
@@ -146,6 +149,8 @@ Doc strings
 Right now the state of the docstrings inside qiBuild is quite a mess. But you
 should try to write docstrings as if all of them were going to be used with
 `sphinx autodoc extension <http://sphinx.pocoo.org/ext/autodoc.html>`_.
+
+Follow `PEP257 <http://www.python.org/dev/peps/pep-0257/>`_.
 
 So the canonical docstring should look like:
 
@@ -642,3 +647,21 @@ from a release script, for instance.
         qibuild.run_action("qibuild.actions.configure")
         qibuild.run_action("qibuild.actions.make")
         qibuild.run_action("qibuild.actions.test")
+
+Using external programs
+^^^^^^^^^^^^^^^^^^^^^^^
+
+To call external programs use the helpers in qisys.
+
+And when possible use long options.
+
+.. code-block:: sh
+
+   # BAD
+   grep -rniIEoC3 foo
+
+   # GOOD
+   grep --recursive --line-number --ignore-case --binary-files=without-match \
+   --extended-regexp --only-matching --context=3 foo
+
+It is a more readable script.
