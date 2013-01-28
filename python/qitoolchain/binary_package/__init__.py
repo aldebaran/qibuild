@@ -16,6 +16,8 @@ All qiBuild packages should have the same layout.
 import os
 
 import qisys
+import qisys.sh
+import qisys.ui
 from qitoolchain.binary_package.core import BinaryPackage
 from qitoolchain.binary_package.core import BinaryPackageException
 
@@ -84,17 +86,22 @@ def _fix_package_tree(root_dir):
     # move stuff from usr/lib to lib
     # this is just for qibuild deploy to work,
     # we could do better with cmake.
-    usr_lib = os.path.join(root_dir, "usr/lib")
-    if not os.path.exists(usr_lib):
+    usr_dir = os.path.join(root_dir, "usr")
+    if not os.path.exists(usr_dir):
         return
-    lib_dir = os.path.join(root_dir, "lib")
-    qisys.sh.mkdir(lib_dir)
 
-    for (root, directories, filenames) in os.walk(usr_lib):
-        for filename in filenames:
+    for (root, dirs, files) in os.walk(usr_dir):
+       for directory in dirs:
+            dst = os.path.join(root, directory)
+            dst = dst.replace(usr_dir, root_dir)
+            qisys.ui.info("mkdir", dst)
+            qisys.sh.mkdir(dst)
+       for filename in files:
             src = os.path.join(root, filename)
-            print "mv", src, "->", lib_dir
-            qisys.sh.mv(src, lib_dir)
+            dst = src.replace(usr_dir, root_dir)
+            qisys.ui.info("mv", src, "->", dst)
+            qisys.sh.mv(src, dst)
+    qisys.sh.rm(usr_dir)
 
 
 def convert_to_qibuild(package, package_metadata=None,
