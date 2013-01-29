@@ -115,7 +115,7 @@ CMake
 * qibuild cmake modules:
 
   * Added ``hdf5``, ``openssl``, ``libevent_openssl``,
-    ``qt_qtdbus``, ``qt_qttest``,
+    ``qt_qtdbus``, ``qt_qttest``, ``boost_unit_test_framework``,
     ``boost_test_exec_monitor``, ``boost_timer``, ``boost_chrono``,
     ``rrd``, ``rrd_th``, ``jsoncpp``, ``zbar``
   * Renamed dbus into dbus-1, and dbus-glib into dbus-glib-1
