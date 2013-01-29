@@ -18,6 +18,7 @@ from qisys import ui
 import qisys
 import qisys.envsetter
 import qisys.sh
+import qisys.worktree
 import qibuild
 import qibuild.dlls
 import qibuild.dylibs
