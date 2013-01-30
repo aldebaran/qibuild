@@ -20,14 +20,7 @@ class OpenTestCase(unittest.TestCase):
 
     def test_no_ide_in_conf(self):
         empty_cfg = qibuild.config.QiBuildConfig()
-        error = None
-        try:
-            qibuild.actions.open.get_ide(empty_cfg)
-        except Exception, e:
-            error = e
-        self.assertFalse(error is None)
-        self.assertTrue("Could not find any IDE in configuration" in error.message)
-        self.assertFalse(self.ask_mock.called)
+        self.assertEqual(qibuild.actions.open.get_ide(empty_cfg), None)
 
     def test_qt_creator_in_conf(self):
         qibuild_cfg = qibuild.config.QiBuildConfig()

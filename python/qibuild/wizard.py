@@ -50,13 +50,15 @@ def ask_ide(qibuild_cfg):
     """ Ask the user to choose an IDE
 
     """
-    ides = ["QtCreator", "Eclipse CDT"]
+    ides = ["None", "QtCreator", "Eclipse CDT"]
     if sys.platform.startswith("win"):
         ides.append("Visual Studio")
     if sys.platform == "darwin":
         ides.append("Xcode")
     ide = qisys.interact.ask_choice(ides,
         "Please choose an IDE")
+    if ide is "None":
+        return None
     return ide
 
 def ask_incredibuild(qibuild_cfg):

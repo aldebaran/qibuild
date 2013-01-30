@@ -24,15 +24,15 @@ def configure_parser(parser):
 
 
 def get_ide(qibuild_cfg):
-    """ Return an IDE to use
-
-    """
+    """Return an IDE to use."""
     known_ides = qibuild_cfg.ides.values()
     ide_names  = qibuild_cfg.ides.keys()
     if not known_ides:
-        mess  =  "Could not find any IDE in configuration\n"
-        mess +=  "Please use `qibuild config --wizard` or `qibuild config --edit`"
-        raise Exception(mess)
+        ui.info("As there is no IDE configured for you, you can not use",
+ui.blue, "qibuild open")
+        ui.info("If you want to add one type", ui.blue, "qibuild config \
+--wizard")
+        return None
 
     # Remove the one that are not supported:
     supported_ides = [x for x in known_ides if x.name in SUPPORTED_IDES]
@@ -61,7 +61,7 @@ def get_ide(qibuild_cfg):
 
 
 def do(args):
-    """Main entry point """
+    """Main entry point."""
     toc = qibuild.toc.toc_open(args.worktree, args)
     project = qibuild.cmdparse.project_from_args(toc, args)
     if not os.path.exists(project.build_directory):
