@@ -9,6 +9,7 @@ import qisys
 import qisrc
 import qibuild
 import qibuild.wizard
+from qisys import ui
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -63,12 +64,12 @@ def do(args):
     if not is_local:
         print "General configuration"
         print "---------------------"
-        print qibuild.config.indent(str(toc.config))
+        print ui.indent(str(toc.config))
         print
 
     print "Local configuration"
     print "-------------------"
-    print qibuild.config.indent(str(toc.config.local))
+    print ui.indent(str(toc.config.local))
 
     print
     print "Projects configuration"
@@ -77,4 +78,4 @@ def do(args):
     if projects:
         print "  Projects:"
         for project in projects:
-            print qibuild.config.indent(str(project.config), 2)
+            print ui.indent(str(project.config), num=4)

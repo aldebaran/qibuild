@@ -146,6 +146,12 @@ def debug(*tokens, **kwargs):
     tokens = [blue, "[DEBUG]: "] + list(tokens)
     _msg(*tokens, **kwargs)
 
+def indent(text, num=2):
+    """ Indent a piece of text """
+    lines = text.splitlines()
+    lines = (" " * num + l for l in lines)
+    return "\n".join(lines)
+
 class timer:
     """ To be used as a decorator,
     or as a with statement:

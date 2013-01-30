@@ -16,6 +16,7 @@ import qibuild
 import qixml
 import qisys.interact
 from qixml import etree
+from qisys import ui
 
 
 def get_global_cfg_path():
@@ -25,14 +26,6 @@ def get_global_cfg_path():
     res = "~/.config/qi/qibuild.xml"
     res = qisys.sh.to_native_path(res)
     return res
-
-def indent(text, num=1):
-    """ Helper for __str__ methods
-
-    """
-    return "\n".join(["  " * num + l for l in text.splitlines()])
-
-
 
 # Using hand-written 'class to xml' stuff is not that
 # hard and actually works quite well
@@ -189,10 +182,10 @@ class Defaults:
             res += "  defaults.ide: %s\n" % self.ide
         cmake_str = str(self.cmake)
         if cmake_str:
-            res += indent(cmake_str) + "\n"
+            res += ui.indent(cmake_str) + "\n"
         env_str = str(self.env)
         if env_str:
-            res += indent(env_str) + "\n"
+            res += ui.indent(env_str) + "\n"
         return res
 
 class Access:
@@ -252,7 +245,7 @@ class Server:
         access_str = str(self.access)
         if access_str:
             res += "\n"
-            res += indent(access_str)
+            res += ui.indent(access_str)
         return res
 
 class LocalSettings:
@@ -287,15 +280,15 @@ class LocalSettings:
         defaults_str = str(self.defaults)
         if defaults_str:
             res += "default settings for this worktree:\n"
-            res += indent(defaults_str) + "\n"
+            res += ui.indent(defaults_str) + "\n"
         build_str = str(self.build)
         if build_str:
             res += "build settings for this worktree:\n"
-            res += indent(build_str) + "\n"
+            res += ui.indent(build_str) + "\n"
         manifest_str = str(self.manifest)
         if manifest_str:
             res += "qisrc manifest:\n"
-            res += indent(manifest_str) + "\n"
+            res += ui.indent(manifest_str) + "\n"
         return res
 
 
@@ -387,11 +380,11 @@ class Config:
             res += "  ide: %s\n" % self.ide
         env_str = str(self.env)
         if env_str:
-            res += indent(env_str)
+            res += ui.indent(env_str)
             res += "\n"
         cmake_str = str(self.cmake)
         if cmake_str:
-            res += indent(cmake_str)
+            res += ui.indent(cmake_str)
             res += "\n"
         return res
 
@@ -659,19 +652,19 @@ class QiBuildConfig:
         build_str = str(self.build)
         if build_str:
             res += "build:\n"
-            res += indent(build_str) + "\n"
+            res += ui.indent(build_str) + "\n"
             res += "\n"
         defaults_str = str(self.defaults)
         if defaults_str:
             res += "defaults:\n"
-            res += indent(defaults_str) + "\n"
+            res += ui.indent(defaults_str) + "\n"
             res += "\n"
         configs = self.configs.values()
         configs.sort(key = operator.attrgetter('name'))
         if configs:
             res += "configs:\n"
             for config in configs:
-                res += indent(str(config))
+                res += ui.indent(str(config))
                 res += "\n"
             res += "\n"
         ides = self.ides.values()
@@ -679,7 +672,7 @@ class QiBuildConfig:
         if ides:
             res += "ides:\n"
             for ide in ides:
-                res += indent(str(ide))
+                res += ui.indent(str(ide))
                 res += "\n"
             res += "\n"
         servers = self.servers.values()
@@ -687,7 +680,7 @@ class QiBuildConfig:
         if servers:
             res += "servers:\n"
             for server in servers:
-                res += indent(str(server))
+                res += ui.indent(str(server))
                 res += "\n"
         return res
 
@@ -779,12 +772,12 @@ class ProjectConfig:
             res += "\n"
             res += "  depends: \n"
             for depends in self.depends:
-                res += indent(depends, 2)
+                res += ui.indent(depends, num=4)
                 res += "\n"
         if self.rdepends:
             res += "  rdepends: \n"
             for rdepends in self.rdepends:
-                res += indent(rdepends, 2)
+                res += ui.indent(rdepends, num=4)
                 res += "\n"
         return res
 

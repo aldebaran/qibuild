@@ -33,12 +33,6 @@ def configure_parser(parser):
         help="Do not setup projects for review")
     parser.set_defaults(setup_review=True)
 
-def indent(text, num):
-    """ Indent a piece of text """
-    lines = text.splitlines()
-    lines = [" " * num + l for l in lines]
-    return "\n".join(lines)
-
 def sync_all(worktree, args):
     """ Fetch any manifest project, re init everything,
     re-create branch configurations, review setup and so on
@@ -97,5 +91,5 @@ def do(args):
     for (src, err) in errors:
         ui.info(ui.blue, src)
         ui.info("-" * len(src))
-        ui.info(indent(err, 2))
+        ui.info(ui.indent(err, num=2))
     sys.exit(1)
