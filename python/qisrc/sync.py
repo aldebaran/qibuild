@@ -7,6 +7,7 @@
 """
 
 import os
+import operator
 
 import qisys.sh
 import qisrc.manifest
@@ -14,6 +15,7 @@ import qisrc.review
 import qisrc.git
 from qisys import ui
 
+from qisrc.sync_build_profiles import sync_build_profiles
 
 def fetch_manifest(worktree, manifest_git_url, branch="master",
     profile="default",
@@ -172,3 +174,35 @@ def add_if_missing(worktree, src, remote_name, remote_url):
     git.set_remote(remote_name, remote_url)
     worktree.add_project(src)
     return worktree.get_project(src)
+
+def sync_all(worktree, args):
+    """ Fetch any manifest project, re init everything,
+    re-create branch configurations, review setup and so on
+
+    """
+    manifest_projects = worktree.get_manifest_projects()
+    if not manifest_projects:
+        raise qisrc.manifest.NoManifest(worktree)
+    # Re-synchronize everything:
+    for manifest_project in manifest_projects:
+        ui.info(ui.green, "Updating", manifest_project.src, "...")
+        git = qisrc.git.Git(manifest_project.path)
+        git.pull(quiet=True)
+        manifest_filename = manifest_project.profile + ".xml"
+        manifest_xml = os.path.join(manifest_project.path, manifest_filename)
+        manifest = qisrc.manifest.load(manifest_xml)
+        qisrc.sync.init_worktree(worktree, manifest, setup_review=args.setup_review)
+        sync_build_profiles(worktree, manifest_xml)
+
+def get_toplevel_git_projects(projects):
+    """Return a list of git_projects without submodules and without manifests."""
+    git_projects = set()
+    for project in projects:
+        if project.git_project and not project.manifest:
+            git_projects.add(project.git_project)
+
+    git_projects = list(git_projects)
+    git_projects.sort(key = operator.attrgetter("src"))
+
+    return git_projects
+

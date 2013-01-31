@@ -10,7 +10,6 @@ from StringIO import StringIO
 import pytest
 
 import qisrc.sync
-import qisrc.actions.sync
 import qisrc.git
 import qisys.sh
 
@@ -349,5 +348,5 @@ def test_get_toplevel_git_projects(tmpdir):
     worktree = qisys.worktree.create(work)
     manifest = qisrc.sync.fetch_load_manifest(worktree, manifest_url)
 
-    projects = qisrc.actions.sync.get_toplevel_git_projects(worktree.projects)
+    projects = qisrc.sync.get_toplevel_git_projects(worktree.projects)
     assert len(projects) == 1
