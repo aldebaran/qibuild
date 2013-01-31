@@ -177,6 +177,12 @@ def guess_emails(git, reviewers):
 
     """
     domain_name = git.get_config("user.email")
+    if not domain_name:
+        message = "Error: no user.email entry in the git configuration.\n"
+        message += "    Set your git configuration:\n"
+        message += "    $ git config --global user.name \"John Doe\"\n"
+        message += "    $ git config --global user.email \"john.doe@noname.org\"\n"
+        raise Exception(message)
     domain_name = domain_name.rsplit("@")[1]
     for idx, reviewer in enumerate(reviewers):
         if "@" not in reviewer:
