@@ -10,6 +10,7 @@ from StringIO import StringIO
 import pytest
 
 import qisrc.sync
+import qisrc.actions.sync
 import qisrc.git
 import qisys.sh
 
@@ -330,3 +331,22 @@ class SyncTestCase(unittest.TestCase):
             qisrc.sync.init_worktree(worktree, manifest)
         assert "already exists" in e.value.message
         assert "not a git repository" in e.value.message
+
+def test_get_toplevel_git_projects(tmpdir):
+    manifest_url = create_git_repo(tmpdir.strpath, "manifest")
+    create_git_repo_with_submodules(tmpdir.strpath)
+    xml = """
+<manifest>
+<remote name="origin" fetch="{tmp}/srv" />
+<project name="foo.git" path="foo" />
+<project name="bar.git" path="foo/bar"/>
+</manifest>
+"""
+    xml = xml.format(tmp=tmpdir.strpath)
+    push_file(tmpdir.strpath, "manifest", "default.xml", xml)
+    work = tmpdir.join("work").strpath
+    worktree = qisys.worktree.create(work)
+    manifest = qisrc.sync.fetch_load_manifest(worktree, manifest_url)
+
+    projects = qisrc.actions.sync.get_toplevel_git_projects(worktree.projects)
+    assert len(projects) == 1

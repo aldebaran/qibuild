@@ -52,6 +52,17 @@ def sync_all(worktree, args):
         qisrc.sync.init_worktree(worktree, manifest, setup_review=args.setup_review)
         sync_build_profiles(worktree, manifest_xml)
 
+def get_toplevel_git_projects(projects):
+    """Return a list of git_projects without submodules and without manifests."""
+    git_projects = set()
+    for project in projects:
+        if project.git_project and not project.manifest:
+            git_projects.add(project.git_project)
+
+    git_projects = list(git_projects)
+    git_projects.sort(key = operator.attrgetter("src"))
+
+    return git_projects
 
 @ui.timer("Synchronizing worktree")
 def do(args):
@@ -62,14 +73,9 @@ def do(args):
     if len(projects) == len(worktree.projects):
         sync_all(worktree, args)
 
-    git_projects = set()
-    for project in projects:
-        if project.git_project and not project.manifest:
-            git_projects.add(project.git_project)
-
     ui.info(ui.green, "Synchronizing projects ...")
-    git_projects = list(git_projects)
-    git_projects.sort(key = operator.attrgetter("src"))
+    git_projects = get_toplevel_git_projects(projects)
+
     errors = list()
     project_count = len(git_projects)
     for i, project in enumerate(git_projects):
