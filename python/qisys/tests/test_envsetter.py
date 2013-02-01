@@ -11,7 +11,8 @@ import os
 import sys
 import unittest
 
-import qisys
+import qisys.sh
+import qisys.envsetter
 
 
 class EnvSetterTestCase(unittest.TestCase):

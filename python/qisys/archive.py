@@ -31,7 +31,9 @@ import operator
 import subprocess
 import zipfile
 
-import qisys
+import qisys.sh
+import qisys.command
+from qisys import ui
 
 
 KNOWN_ALGOS = ["zip", "tar", "gzip", "bzip2", "xz"]
@@ -75,7 +77,7 @@ Please set only one of these two options to 'True'
 """
         raise ValueError(mess)
     archive_path = archive_basepath + ".zip"
-    qisys.ui.debug("Compressing %s to %s", directory, archive_path)
+    ui.debug("Compressing %s to %s", directory, archive_path)
     archive = zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED)
     for root, _, filenames in os.walk(directory):
         for filename in filenames:
@@ -108,7 +110,7 @@ def _extract_zip(archive, directory, quiet, verbose):
 Please set only one of these two options to 'True'
 """
         raise ValueError(mess)
-    qisys.ui.debug("Extracting %s to %s", archive, directory)
+    ui.debug("Extracting %s to %s", archive, directory)
     try:
         archive_ = zipfile.ZipFile(archive)
     except zipfile.BadZipfile:
@@ -181,7 +183,7 @@ Please set only one of these two options to 'True'
             os.chmod(dirpath, new_st)
 
     archive_.close()
-    qisys.ui.debug("%s extracted in %s", archive, directory)
+    ui.debug("%s extracted in %s", archive, directory)
     res = os.path.join(directory, orig_topdir)
     return res
 
@@ -255,7 +257,7 @@ Please set only one of these two options to 'True'
         archive_path += ".xz"
     else:
         archive_path += "." + algo
-    qisys.ui.debug("Compressing %s to %s", directory, archive_path)
+    ui.debug("Compressing %s to %s", directory, archive_path)
     cmd = _get_tar_command("compress", algo, archive_path, directory, quiet)
     try:
         if verbose:
@@ -296,7 +298,7 @@ Please set only one of these two options to 'True'
     # Because "zip" is the standard qiBuild archive format,
     # do no fancy things but calling "tar", with its default
     # outputs (no progress bar).
-    qisys.ui.debug("Extracting %s to %s", archive, directory)
+    ui.debug("Extracting %s to %s", archive, directory)
     # first, list the archive and check the topdir of its content
     tar       = qisys.command.find_program("tar")
     list_cmd  = [tar, "--list", "--file", archive]
