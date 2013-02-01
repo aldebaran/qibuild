@@ -10,6 +10,8 @@ import pytest
 import qisrc.git
 import qisys.sh
 
+from qisys.tests.conftest import worktree
+
 def read_readme(src):
     """ Returns the contents for the README file
     Useful to check on what branch we are
@@ -531,3 +533,11 @@ def test_get_ref_sha1(tmpdir):
 
     git.init()
     assert git.is_valid() == True
+
+def test_add_git_project(tmpdir, worktree):
+    worktree.add_project("foo")
+    foo_dir = tmpdir.join("work").mkdir("foo").strpath
+    git = qisrc.git.Git(foo_dir).init()
+    wt = qisys.worktree.open_worktree(tmpdir.join("work").strpath)
+    assert len(qisrc.git.get_git_projects(wt)) == 1
+    assert worktree.get_project("foo").src == "foo"

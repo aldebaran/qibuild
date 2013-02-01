@@ -18,7 +18,7 @@ def generate_snapshot(worktree, path, manifest=False):
         return
     with open(path, 'w') as f:
         for project in worktree.projects:
-            if not project.is_git():
+            if not qisrc.git.is_git(project.path):
                 continue
 
             # Check the state of the project and print warning.
@@ -59,7 +59,7 @@ def load_snapshot(worktree, path, force):
             state_project = qisrc.status.check_state(project, False)
             print_state(state_project)
 
-            if not project.is_git():
+            if not qisrc.git.is_git(project.path):
                 ui.info(ui.red, src, "is not a git project.")
                 continue
 

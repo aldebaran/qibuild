@@ -203,8 +203,9 @@ class SyncTestCase(unittest.TestCase):
         manifest = qisrc.sync.fetch_load_manifest(worktree, manifest_url)
         qisrc.sync.init_worktree(worktree, manifest)
         worktree.set_manifest_project("manifest/default")
-        self.assertEqual(worktree.git_projects[0].src, "bar")
-        self.assertEqual(worktree.git_projects[1].src, "bar/foo")
+        git_projects = qisrc.git.get_git_projects(worktree)
+        self.assertEqual(git_projects[0].src, "bar")
+        self.assertEqual(git_projects[1].src, "bar/foo")
 
     def test_erasing_submodules_with_manifest_should_raise(self):
         manifest_url = create_git_repo(self.tmp, "manifest")

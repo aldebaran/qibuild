@@ -466,3 +466,12 @@ def is_submodule(path):
                    parent_repo_root, "!",
                    "\nError was: ", ui.reset, "\n", "  " + out)
         return True
+
+def is_git(path):
+    """Return true if path is in a git work-tree."""
+    return get_repo_root(path) == path
+
+def get_git_projects(worktree):
+    """Return projects wich are git projects."""
+    git_projects = [p for p in worktree.projects if is_git(p.path)]
+    return git_projects

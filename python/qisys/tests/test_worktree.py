@@ -50,20 +50,6 @@ class WorktreeTestCase(unittest.TestCase):
         foo = worktree.get_project("foo")
         self.assertEquals(foo.src, "foo")
 
-    def test_add_git_project(self):
-        xml = "<worktree />"
-        worktree = self.create_worktee(xml)
-        worktree.add_project("foo")
-        qisys.sh.mkdir(
-            os.path.join(self.tmp, "foo", ".git"),
-            recursive=True)
-
-        # Re-open worktre, check that foo is in git_projects
-        worktree = qisys.worktree.open_worktree(self.tmp)
-        self.assertEquals(len(worktree.git_projects), 1)
-        git_foo = worktree.get_project("foo")
-        self.assertEquals(git_foo.src, "foo")
-
     def test_remove_project(self):
         xml = "<worktree />"
         worktree = self.create_worktee(xml)
@@ -146,7 +132,6 @@ class WorktreeTestCase(unittest.TestCase):
 """
         bar = os.path.join(self.tmp, "bar")
         qisys.sh.mkdir(bar)
-        qisys.sh.mkdir(os.path.join(bar, ".git"))
         with open(os.path.join(bar, "qiproject.xml"), "w") as fp:
             fp.write("""
 <project name="bar">
@@ -187,8 +172,6 @@ class WorktreeTestCase(unittest.TestCase):
         self.assertEquals(build_srcs, ["bar/gui", "bar/lib", "lib/libfoo"])
         srcs = [p.src for p in worktree.projects]
         self.assertEquals(srcs, ["bar", "bar/gui", "bar/lib", "lib/libfoo", "manifest/default"])
-        git_srcs = [p.src for p in worktree.git_projects]
-        self.assertEquals(git_srcs, ["bar"])
 
 
     def test_nested_worktrees(self):

@@ -70,12 +70,6 @@ class WorkTree:
         return os.path.join(self.dot_qi, "qibuild.xml")
 
     @property
-    def git_projects(self):
-        """ Get the projects which are git projects. """
-        git_projects = [p for p in self.projects if p.is_git()]
-        return git_projects
-
-    @property
     def buildable_projects(self):
         """ Get the projects considered as buildable projects. """
         buildable_projects = [p for p in self.projects if p.is_buildable()]

@@ -30,7 +30,7 @@ def do(args):
     git_grep_opts = args.git_grep_opts
     git_grep_opts.append(args.pattern)
     retcode = 0
-    for project in qiwt.git_projects:
+    for project in qisrc.git.get_git_projects(qiwt):
         qisys.ui.info(qisys.ui.green,
                         "Looking in", project.src, "...",
                         qisys.ui.reset)

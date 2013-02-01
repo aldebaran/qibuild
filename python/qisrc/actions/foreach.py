@@ -25,12 +25,11 @@ def do(args):
     qiwt = qisys.worktree.open_worktree(args.worktree)
     errors = list()
     ui.info(ui.green, "Running `%s` on every project" % " ".join(args.command))
-    c = 0
-    count = len(qiwt.git_projects)
-    for project in qiwt.git_projects:
-        c += 1
+    git_projects = qisrc.git.get_git_projects(qiwt)
+    count = len(git_projects)
+    for i, project in enumerate(git_projects, start=1):
         command = args.command[:]
-        ui.info(ui.green, "*", ui.reset, "(%d/%d)" % (c, count), ui.blue, project.src)
+        ui.info(ui.green, "*", ui.reset, "(%d/%d)" % (i, count), ui.blue, project.src)
         try:
             qisys.command.call(command, cwd=project.path)
         except qisys.command.CommandFailedException:
