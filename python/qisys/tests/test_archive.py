@@ -63,11 +63,12 @@ def _test_compress_extract(tmpdir, algo, extension, compress_func, extract_func)
     srcdir.join("a").join("2.txt").write("2")
     srcdir.mkdir("b")
     srcdir.join("b").join("3.txt").write("3")
-    ## ... with symlinks
-    srcdir.join("linkto_a").mksymlinkto("a")
-    srcdir.join("linkto_b_3.txt").mksymlinkto("b/3.txt")
-    srcdir.join("b").join("4.txt").mksymlinkto("3.txt")
-    srcdir.join("b").join("linkto_a_from_b").mksymlinkto("../a")
+    if os.name != 'nt':
+        ## ... with symlinks
+        srcdir.join("linkto_a").mksymlinkto("a")
+        srcdir.join("linkto_b_3.txt").mksymlinkto("b/3.txt")
+        srcdir.join("b").join("4.txt").mksymlinkto("3.txt")
+        srcdir.join("b").join("linkto_a_from_b").mksymlinkto("../a")
     ## ... with ro file
     srcdir.mkdir("e")
     srcdir.join("e").join("ro_file.txt").write("ro-file")
@@ -270,6 +271,9 @@ def test_compress_extract_invalid(tmpdir, algo, extension):
     assert "Known algorithms are"   in e.value.message
 
 def test_compress_broken_symlink(tmpdir):
+    # Windows doesn't support symlink
+    if os.name == 'nt':
+        return
     src = tmpdir.mkdir("src")
     broken_symlink = os.symlink("/does/not/exist", src.join("broken").strpath)
     res = qisys.archive.compress(src.strpath, algo="zip")

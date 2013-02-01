@@ -20,8 +20,7 @@ def test_remote_added(tmpdir):
 </manifest>
 """
     qisrc.sync_build_profiles.sync_build_profiles(worktree, StringIO(xml))
-    qibuild_xml = tmpdir.join(".qi/qibuild.xml")
-    profiles = qibuild.profile.parse_profiles(qibuild_xml.strpath)
+    profiles = qibuild.profile.parse_profiles(worktree.qibuild_xml)
     assert len(profiles) == 1
     assert "foo" in profiles
 
@@ -40,7 +39,7 @@ def test_remote_updated(tmpdir):
   </profiles>
 </manifest>
 """
-    qibuild_xml = tmpdir.join(".qi/qibuild.xml")
+    qibuild_xml = tmpdir.join(".qi", "qibuild.xml")
     qibuild_xml.write("""
 <manifest>
   <profiles>
@@ -60,7 +59,7 @@ def test_remote_updated(tmpdir):
 
     assert warning_mock.called
 
-    profiles = qibuild.profile.parse_profiles(qibuild_xml.strpath)
+    profiles = qibuild.profile.parse_profiles(worktree.qibuild_xml)
     assert len(profiles) == 1
     assert "foo" in profiles
 
@@ -79,7 +78,7 @@ def test_same_remote(tmpdir):
   </profiles>
 </manifest>
 """
-    qibuild_xml = tmpdir.join(".qi/qibuild.xml")
+    qibuild_xml = tmpdir.join(".qi", "qibuild.xml")
     qibuild_xml.write("""
 <manifest>
   <profiles>

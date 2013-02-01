@@ -32,8 +32,11 @@ def test_install_on_self(tmpdir):
     assert "are the same directory" in e.value.message
 
 def test_is_path_inside():
-   assert qisys.sh.is_path_inside("foo/bar", "foo")
-   assert qisys.sh.is_path_inside("foo/bar", "foo/bar")
-   assert qisys.sh.is_path_inside("foo", "foo/bar") is False
-   assert qisys.sh.is_path_inside("lib/libfoobar", "lib/libfoo") is False
-   assert qisys.sh.is_path_inside("gui/bar/libfoo", "lib") is False
+   assert qisys.sh.is_path_inside(os.path.join("foo", "bar"), "foo")
+   assert qisys.sh.is_path_inside(os.path.join("foo", "bar"),
+                                  os.path.join("foo", "bar"))
+   assert qisys.sh.is_path_inside("foo", os.path.join("foo", "bar")) is False
+   assert qisys.sh.is_path_inside(os.path.join("lib", "libfoobar"),
+                                  os.path.join("lib", "libfoo")) is False
+   assert qisys.sh.is_path_inside(os.path.join("gui", "bar", "libfoo"),
+                                  "lib") is False

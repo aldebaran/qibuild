@@ -34,7 +34,7 @@ class SyncTestCase(unittest.TestCase):
         qisys.sh.rm(self.tmp)
 
     def test_local_manifest_sync(self):
-        create_git_repo(self.tmp, "qi/libqi")
+        create_git_repo(self.tmp, os.path.join("qi", "libqi"))
         worktree = qisys.worktree.create(self.tmp)
         xml = """
 <manifest>
@@ -54,7 +54,7 @@ class SyncTestCase(unittest.TestCase):
         self.assertEqual(len(worktree.projects), 1)
         libqi = worktree.projects[0]
         self.assertEqual(libqi.path,
-                         os.path.join(worktree.root, "lib/libqi"))
+                         os.path.join(worktree.root, "lib", "libqi"))
 
     def test_sync_two_remotes(self):
         create_git_repo(self.tmp, "a/a_project.git")

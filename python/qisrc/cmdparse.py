@@ -82,7 +82,11 @@ def projects_in_subdir(worktree, subdir, raises=False):
     res = list()
     projects = worktree.projects[:]
     for project in projects:
-        if qisys.sh.is_path_inside(project.src, relpath):
+        if os.name == 'nt':
+            project_src = project.src.replace("/", "\\")
+        else:
+            project_src = project.src
+        if qisys.sh.is_path_inside(project_src, relpath):
             res.append(project)
     if not res and raises:
         mess  = "Could not find any project in '%s'\n" % relpath

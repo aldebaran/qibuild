@@ -429,7 +429,7 @@ def get_repo_root(path):
     git = Git(path)
     (ret, out) = git.call("rev-parse", "--show-toplevel", raises=False)
 
-    return out if ret == 0 else None
+    return out.replace('/', os.sep) if ret == 0 else None
 
 def is_submodule(path):
     """ Tell if the given path is a submodule

@@ -17,6 +17,8 @@ import shutil
 import tempfile
 import qisys.log
 import subprocess
+import ntpath
+import posixpath
 
 LOGGER = qisys.log.get_logger("buildtool.sh")
 
@@ -405,7 +407,7 @@ def to_posix_path(path, fix_drive=False):
     """
     res = os.path.expanduser(path)
     res = os.path.abspath(res)
-    res = path.replace("\\", "/")
+    res = path.replace(ntpath.sep, posixpath.sep)
     if fix_drive:
         (drive, rest) = os.path.splitdrive(res)
         letter = drive[0]
@@ -417,7 +419,7 @@ def to_dos_path(path):
     Useful because people sometimes use forward slash in
     environment variable, for instance
     """
-    res = path.replace("/", "\\")
+    res = path.replace(posixpath.sep, ntpath.sep)
     return res
 
 def to_native_path(path, normcase=True):
