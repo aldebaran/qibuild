@@ -244,6 +244,9 @@ def open_worktree(worktree=None):
     ui.debug("Opening worktree in", worktree)
     return res
 
+def is_worktree(path):
+    path = os.path.join(path, ".qi")
+    return os.path.isdir(path)
 
 def guess_worktree(cwd=None, raises=False):
     """Look for parent directories until a .qi dir is found somewhere."""
@@ -252,8 +255,7 @@ def guess_worktree(cwd=None, raises=False):
     head = cwd
     _tail = True
     while _tail:
-        d = os.path.join(head, ".qi")
-        if os.path.isdir(d):
+        if is_worktree(head):
             return head
         (head, _tail) = os.path.split(head)
     if raises:
@@ -282,9 +284,9 @@ Use --force if you want to re-initialize the worktree""".format(directory, paren
             mess += "(in %s)\n" % git_project
             raise Exception(mess)
 
-    to_create = os.path.join(directory, ".qi")
-    qisys.sh.mkdir(to_create, recursive=True)
-    qi_xml = os.path.join(directory, ".qi", "qibuild.xml")
+    dot_qi = os.path.join(directory, ".qi")
+    qisys.sh.mkdir(dot_qi, recursive=True)
+    qi_xml = os.path.join(dot_qi, "qibuild.xml")
     if not os.path.exists(qi_xml) or force:
         with open(qi_xml, "w") as fp:
             fp.write("<qibuild />\n")

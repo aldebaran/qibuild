@@ -15,7 +15,7 @@ def sync_build_profiles(worktree, xml_path):
 
     """
     ui.info(ui.green, "Synchronizing build profiles ...")
-    local_xml = os.path.join(worktree.root, ".qi", "qibuild.xml")
+    local_xml = worktree.qibuild_xml
     remote_xml = xml_path
     local = qibuild.profile.parse_profiles(local_xml)
     remote = qibuild.profile.parse_profiles(remote_xml)
