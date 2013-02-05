@@ -71,6 +71,8 @@ Command line
 * :cmake:function:`qi_add_test` can now handle test script as target instead of binary.
 * ``qibuild make`` learned ``--verbose-make``
 * ``qisrc`` learned ``reset``
+* ``qisrc`` learned ``snapshot``
+* ``qisrc snapshot`` learned ``--fetch`` and ``--no-fetch``
 
 CMake
 ++++++

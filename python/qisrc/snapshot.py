@@ -12,9 +12,10 @@ import qisrc.git
 import qisrc.status
 import qisys.interact
 
-def generate_snapshot(worktree, path, manifest=False):
+def generate_snapshot(worktree, path, manifest=False, fetch=False):
     """Generate a snapshot file."""
     if os.path.exists(path) and not os.path.isfile(path):
+        ui.error(path, "is not a file.")
         return
     with open(path, 'w') as f:
         for project in worktree.projects:
@@ -26,6 +27,11 @@ def generate_snapshot(worktree, path, manifest=False):
             print_state(state_project)
 
             git = qisrc.git.Git(project.path)
+
+            if fetch:
+                ui.info("Fetching...")
+                git.fetch("-a")
+
             if manifest:
                 (returncode, sha1) = git.log("--pretty=format:%H",
                                              "-1", project.branch, raises=False)
@@ -39,9 +45,10 @@ def generate_snapshot(worktree, path, manifest=False):
             f.write(project.src + ":" + sha1 + '\n')
             ui.info(ui.green, project.src, ui.reset, ui.bold, sha1)
 
-def load_snapshot(worktree, path, force):
+def load_snapshot(worktree, path, force, fetch=False):
     """Load a snapshot file and reset projects."""
     if not os.path.isfile(path):
+        ui.error(path, "is not a file.")
         return
     with open(path, 'r') as f:
         for line in f:
@@ -64,6 +71,11 @@ def load_snapshot(worktree, path, force):
                 continue
 
             git_project = qisrc.git.Git(project.path)
+            if fetch:
+                ui.info("Fetching...")
+                if force:
+                    git_project.fetch("a")
+
             if (not state_project.sync_and_clean
                    or state_project.incorrect_proj
                    or state_project.not_on_a_branch) and not force:

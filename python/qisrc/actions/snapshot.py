@@ -23,6 +23,10 @@ def configure_parser(parser):
                         "is not clean.", action="store_true")
     parser.add_argument("-m", "--manifest", help="Use manifest instead of "
                         "current state.", action="store_true")
+    parser.add_argument("--fetch", action="store_true", default=True,
+                        help="Fetch before snapshot.")
+    parser.add_argument("--no-fetch", action="store_false", dest="fetch",
+                        help="Do not fetch before snapshot.")
     parser.add_argument("path", help="A path to store or load informations.")
 
 def do(args):
@@ -32,8 +36,9 @@ def do(args):
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, worktree.root)
 
     if args.load:
-        qisrc.snapshot.load_snapshot(worktree, args.path, args.force)
+        qisrc.snapshot.load_snapshot(worktree, args.path, args.force,
+                                     fetch=args.fetch)
         return
 
     qisrc.snapshot.generate_snapshot(worktree, args.path,
-        manifest=args.manifest)
+        manifest=args.manifest, fetch=args.fetch)
