@@ -42,7 +42,7 @@ function(_qi_install_internal)
       if(NOT _file_to_install)
         qi_error(
           "Error when parsing qi_install arguments:
-          '${f}'glob does not match any files")
+          '${f}' glob does not match any file")
       endif()
       list(APPEND _files_to_install ${_file_to_install})
     else()
