@@ -25,7 +25,7 @@ def configure_parser(parser):
     parser.add_argument("--slow", action="store_true",
                         help="Also run slow tests")
     parser.add_argument("-V", dest="verbose_tests", action="store_true",
-                        help="verbose tests")
+                        help="display tests output")
     parser.add_argument("--valgrind", dest="valgrind", action="store_true",
                         help="run tests under valgrind")
     parser.add_argument("--nightmare", dest="nightmare", action="store_true",
