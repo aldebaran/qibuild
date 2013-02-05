@@ -21,6 +21,10 @@ def configure_parser(parser):
                         "done.", action="store_true")
     parser.add_argument("-c", "--clean", action="store_true",
                         help="Remove untracked files and directories.")
+    parser.add_argument("--fetch", action="store_true", default=True,
+                        help="Fetch before reset")
+    parser.add_argument("--no-fetch", action="store_false", dest="fetch",
+                        help="Don't fetch before reset")
 
 def do(args):
     """Main entry points."""
@@ -55,6 +59,11 @@ def do(args):
             ui.info("Checkout %s" % state_project.project.branch)
             if args.force:
                 git.checkout(state_project.project.branch)
+
+        if args.fetch:
+            ui.info("Fetching...")
+            if args.force:
+                git.fetch("-a")
 
         if args.force:
             git.reset("--hard", git.get_tracking_branch())
