@@ -49,7 +49,7 @@ def do(args):
                if os.path.exists(project.path):
                    mess.extend([ui.fuchsia, ui.bold, project.path])
                else:
-                   mess.extend([ui.bold, ui.red, "No exist!"])
+                   mess.extend([ui.bold, ui.red, "Can not find source directory!"])
            ui.info(*mess)
            if not os.path.exists(project.path):
                to_remove.append(project.src)
