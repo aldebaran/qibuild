@@ -13,6 +13,7 @@ import subprocess
 import signal
 import threading
 import Queue
+import collections
 
 from qisys import ui
 import qisys
@@ -356,7 +357,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=None):
                 (" ".join(cmd), cwd))
 
     ui.debug("Calling:", " ".join(cmd))
-    ring_buffer = RingBuffer(300)
+    ring_buffer = collections.deque(maxlen=300)
 
     returncode = 0
     if quiet:
@@ -383,8 +384,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=None):
 
     if returncode != 0:
         if quiet_command:
-            lines = ring_buffer.get()
-            for line in lines:
+            for line in ring_buffer:
                 sys.stdout.write(line)
                 sys.stdout.flush()
         # Raise correct exception
@@ -499,41 +499,3 @@ def configure_call(args):
 
     """
     CONFIG["quiet"] = getattr(args, "quiet_commands", False)
-
-
-class RingBuffer:
-    """Quick'n dirty implementation of a ring buffer
-
-    >>> rb = RingBuffer(4)
-    >>> rb.append(1)
-    >>> rb.get()
-    [1]
-    >>> rb.append(2); rb.append(3); rb.append(4)
-    >>> rb.get()
-    [1, 2, 3, 4]
-    >>> rb.append(5)
-    >>> rb.get()
-    [2, 3, 4, 5]
-    >>> rb.append(6)
-    >>> rb.get()
-    [3, 4, 5, 6]
-
-    """
-    def __init__(self, size):
-        self.size = size
-        self._data = list()
-        self._full = False
-        self._index = 0
-
-    def append(self, x):
-        if self._full:
-            self._data[self._index] = x
-        else:
-            self._data.append(x)
-            if len(self._data) == self.size:
-                self._full = True
-        self._index = (self._index + 1) % self.size
-
-    def get(self):
-        return self._data[self._index:] + \
-               self._data[:self._index]
