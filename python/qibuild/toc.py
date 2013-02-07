@@ -722,7 +722,8 @@ def num_jobs_to_args(num_jobs, cmake_generator):
 
     if num_jobs == 1:
         return list()
-    if "Unix Makefiles" in  cmake_generator:
+    if "Unix Makefiles" in cmake_generator or \
+       "Ninja" in cmake_generator:
         return ["-j", str(num_jobs)]
     if cmake_generator == "NMake Makefiles":
         mess   = "-j is not supported for %s\n" % cmake_generator
