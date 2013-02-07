@@ -66,7 +66,7 @@ modify ``src/bar/CMakeLists.txt`` too look like:
 
    cmake_minimum_required(VERSION 2.8)
    project(bar)
-   include("qibuild.cmake")
+   find_package(qibuild)
 
    list(APPEND CMAKE_FIND_ROOT_PATH
     ${CMAKE_SOURCE_DIR}/cmake/modules)

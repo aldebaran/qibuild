@@ -79,10 +79,11 @@ qibuild
 
 .. code-block:: cmake
 
-  include(${CMAKE_CURRENT_SOURCE_DIR}/qibuild.cmake)
+  find_package(qibuild)
 
-User has to copy/paste a qibuild.cmake files everywhere, but this file can
-update itself.
+If ``qibuild`` is installed on the system, it just works,
+but the qibuild command line tool is also smart
+enough to pass ``-Dqibuild_DIR`` when necessary.
 
 Code generation
 +++++++++++++++
