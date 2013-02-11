@@ -23,10 +23,11 @@ def test_install_ro(tmpdir):
 def test_install_on_self(tmpdir):
     a_file = tmpdir.join("a")
     a_file.write("")
-    # pytlint: disable-msg=E1101
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qisys.sh.install(a_file.strpath, tmpdir.strpath)
     assert "are the same file" in e.value.message
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qisys.sh.install(tmpdir.strpath, tmpdir.strpath)
     assert "are the same directory" in e.value.message

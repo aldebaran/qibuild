@@ -10,7 +10,7 @@ import pytest
 import qisrc.git
 import qisys.sh
 
-from qisys.tests.conftest import worktree
+from qisys.test.conftest import worktree
 
 def read_readme(src):
     """ Returns the contents for the README file
