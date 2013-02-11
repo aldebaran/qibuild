@@ -13,6 +13,7 @@ import qisys.log
 
 import qisrc
 import qibuild
+import qibuild.project
 
 LOGGER = qisys.log.get_logger(__name__)
 
@@ -51,6 +52,6 @@ def list_build_dir(path):
 def do(args):
     """Main entry point"""
     qiwt = qisys.worktree.open_worktree(args.worktree)
-    for project in qiwt.buildable_projects:
+    for project in qibuild.project.build_projects(qiwt):
         LOGGER.info("%s", project.src)
         list_build_dir(project.path)

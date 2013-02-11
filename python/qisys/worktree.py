@@ -69,12 +69,6 @@ class WorkTree:
         """Get the path to qibuild.xml."""
         return os.path.join(self.dot_qi, "qibuild.xml")
 
-    @property
-    def buildable_projects(self):
-        """ Get the projects considered as buildable projects. """
-        buildable_projects = [p for p in self.projects if p.is_buildable()]
-        return buildable_projects
-
     def get_manifest_projects(self):
         """ Get the projects mark as beeing 'manifest' projects. """
         manifest_projects = [p for p in self.projects if p.manifest]
@@ -355,10 +349,6 @@ class Project(qisys.xml_parser.RootXMLParser):
     def is_git(self):
         git_dir = os.path.join(self.path, ".git")
         return os.path.exists(git_dir)
-
-    def is_buildable(self):
-        cmake_lists = os.path.join(self.path, "CMakeLists.txt")
-        return os.path.exists(self.qiproject_xml) and os.path.exists(cmake_lists)
 
     def __repr__(self):
         res  = "<Project in %s\n" % (self.src)

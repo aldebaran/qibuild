@@ -300,11 +300,11 @@ You may want to run:
         seen = dict()
 
         # self.buildable_projects has been set by WorkTree.__init__
-        for worktree_project in self.worktree.buildable_projects:
+        for build_project in qibuild.project.build_projects(self.worktree):
             # Promote the simple worktree project (just a name an a src dir),
             # inside a full qibuild.project.Project object
             # (with CMake flags, build dir, et al.)
-            project_path = worktree_project.path
+            project_path = build_project.path
             qibuild_project = qibuild.project.Project(project_path)
             project_name = qibuild_project.name
             if project_name in seen:

@@ -168,8 +168,6 @@ class WorktreeTestCase(unittest.TestCase):
             fp.write(xml)
 
         worktree = qisys.worktree.WorkTree(self.tmp)
-        build_srcs = [p.src for p in worktree.buildable_projects]
-        self.assertEquals(build_srcs, ["bar/gui", "bar/lib", "lib/libfoo"])
         srcs = [p.src for p in worktree.projects]
         self.assertEquals(srcs, ["bar", "bar/gui", "bar/lib", "lib/libfoo", "manifest/default"])
 

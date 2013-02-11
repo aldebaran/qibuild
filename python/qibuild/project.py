@@ -27,6 +27,14 @@ import qixml
 
 import qibuild
 
+def is_buildable(worktree_project):
+    cmake_lists = os.path.join(worktree_project.path, "CMakeLists.txt")
+    return os.path.exists(worktree_project.qiproject_xml) and os.path.exists(cmake_lists)
+
+def build_projects(worktree):
+    build_projects = [p for p in worktree.projects if is_buildable(p)]
+    return build_projects
+
 class Project:
     """ Store information about a :term:`project`
 
