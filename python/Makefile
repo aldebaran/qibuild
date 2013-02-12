@@ -26,13 +26,11 @@ all: pylint-error check
 
 pylint-full:
 	@echo ":: Running pylint: $(PYMODULES)"
-	@pylint -f colorized --rcfile pylint.rc $(PYMODULES) --ignore=external 2>&1 || \
-		exit 1 || exit 0
+	@pylint --rcfile pylint.rc $(PYMODULES) 2>&1 || exit 1 || exit 0
 
 pylint-error:
 	@echo ":: Running pylint --errors-only: $(PYMODULES)"
-	@pylint --include-ids=y -f colorized --errors-only --rcfile pylint.rc \
-		$(PYMODULES) --ignore=external 2>&1 || \
+	@pylint --errors-only --rcfile pylint.rc $(PYMODULES) 2>&1 || \
 		exit 1 || exit 0
 	@echo " => Checked only for pylint errors"
 	@echo "    Use make check-all for running a full pylint check"

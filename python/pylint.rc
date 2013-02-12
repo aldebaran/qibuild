@@ -12,7 +12,7 @@ profile=no
 
 # Add <file or directory> to the black list. It should be a base name, not a
 # path. You may set this option multiple times.
-ignore=CVS
+ignore=external
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -40,7 +40,7 @@ disable=C0103
 
 # Set the output format. Available formats are text, parseable, colorized, msvs
 # (visual studio) and html
-output-format=text
+output-format=colorized
 
 # Include message's id in output
 include-ids=yes
