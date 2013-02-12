@@ -11,7 +11,6 @@ import time
 import datetime
 import qisys.log
 
-import qisrc
 import qibuild
 import qibuild.project
 

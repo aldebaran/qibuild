@@ -6,7 +6,6 @@
 
 """
 import os
-import qibuild
 
 import qisys.log
 

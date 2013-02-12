@@ -11,7 +11,6 @@ For instance
 
 import qisys.log
 
-import qisrc
 import qibuild
 import qibuild.project
 

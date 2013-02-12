@@ -38,9 +38,6 @@ import shlex
 import qisys.log
 import ConfigParser
 
-import qibuild
-
-
 def get_config_dir():
     """ Get a suitable directory to find all the
     config files

@@ -6,9 +6,7 @@
 
 """
 
-import qisrc
 import qisys
-
 
 def configure_parser(parser):
     """ Configure parser for this action """

@@ -5,7 +5,6 @@
 """ Synchronize local and remote profiles
 
 """
-import os
 
 from qisys import ui
 import qibuild.profile

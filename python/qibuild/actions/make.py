@@ -6,8 +6,6 @@
 
 """
 
-import os
-
 from qisys import ui
 
 import qibuild

@@ -6,7 +6,6 @@
 import os
 import qisys.log
 
-import qisrc
 import qibuild
 
 

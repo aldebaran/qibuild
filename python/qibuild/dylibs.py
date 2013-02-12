@@ -7,9 +7,7 @@
 """
 
 import os
-import re
 import qisys.log
-import subprocess
 
 import qisys.sh
 

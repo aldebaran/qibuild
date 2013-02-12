@@ -14,8 +14,6 @@ import qisys.sh
 import qisys.cmdparse
 import qisrc.groups
 
-import xml.etree.ElementTree as etree
-
 def guess_current_project(worktree, cwd):
     """ Guess the current project using a worktree and the
     current working directory

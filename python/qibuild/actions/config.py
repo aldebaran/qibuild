@@ -6,7 +6,6 @@
 import subprocess
 
 import qisys
-import qisrc
 import qibuild
 import qibuild.wizard
 from qisys import ui

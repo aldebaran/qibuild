@@ -9,15 +9,14 @@
 
 """
 
-import os
 import sys
 import qisys.log
 
-import qisrc
+import qisys.parsers
+import qisrc.git
+import qisrc.sync
 import qisrc.parsers
 import qisrc.cmdparse
-import qibuild.parsers
-import qibuild
 from qisys import ui
 
 

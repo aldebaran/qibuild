@@ -11,7 +11,6 @@ import os
 import pickle
 
 import qisys.sh
-import qibuild.cmake
 
 LOG_RE = re.compile("(.*?)\((\d+)\):")
 

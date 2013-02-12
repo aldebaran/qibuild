@@ -8,7 +8,6 @@ import sys
 
 from qisys import ui
 import qisys
-import qisrc
 import qibuild
 import qibuild.wizard
 import qitoolchain

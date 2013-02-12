@@ -5,7 +5,6 @@
 """ Launch automatic tests
 """
 
-import os
 import sys
 
 import qibuild
