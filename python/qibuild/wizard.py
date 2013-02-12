@@ -46,7 +46,7 @@ def ask_cmake_generator():
 
     return cmake_generator
 
-def ask_ide(qibuild_cfg):
+def ask_ide():
     """ Ask the user to choose an IDE
 
     """
@@ -186,7 +186,7 @@ def run_config_wizard(toc):
     generator = ask_cmake_generator()
     qibuild_cfg.defaults.cmake.generator = generator
 
-    ide = ask_ide(qibuild_cfg)
+    ide = ask_ide()
     if ide:
         configure_ide(qibuild_cfg, ide)
 

@@ -164,7 +164,6 @@ class Test:
             ncmd = [ "valgrind", "--track-fds=yes", "--log-file=%s" % valgrind_log ]
             ncmd.extend(self.cmd)
         process = qisys.command.Process(ncmd,
-            name=self.test_name,
             cwd=cwd,
             env=env,
             verbose=self.verbose)

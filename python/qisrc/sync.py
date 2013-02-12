@@ -96,7 +96,7 @@ def init_worktree(worktree, manifest, setup_review=True):
             worktree.set_project_review(p_src)
             # If setup failed once, no point in trying for every project
             setup_ok = qisrc.review.setup_project(p_path, project.name,
-                                                  project.review_url, p_revision)
+                                                  project.review_url)
         git = qisrc.git.Git(p_path)
         git.set_remote(p_remote, p_url)
         git.set_tracking_branch(p_revision, p_remote)

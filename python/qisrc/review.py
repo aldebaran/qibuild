@@ -117,7 +117,7 @@ def warn_gerrit():
 `qisrc push` won't work
 When you have resolved this problem, just re-run ``qisrc sync -a``""")
 
-def setup_project(project_path, project_name, review_url, branch):
+def setup_project(project_path, project_name, review_url):
     """ Setup a project for code review.
 
      * Figure out the user name

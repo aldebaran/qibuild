@@ -388,10 +388,10 @@ def add_missing_buildable_project(toc, project_name, project_path):
     """
     check_parent_project(toc, project_name, project_path)
     check_worktree(toc, project_name, project_path)
-    check_missing_cmake(toc, project_name, project_path)
+    check_missing_cmake(project_path)
     return toc.get_project(project_name).name
 
-def check_missing_cmake(toc, project_name, project_path):
+def check_missing_cmake(project_path):
     """ Check if the qibuild project was not found because there
     there was a missing CMakeLists.txt file
 

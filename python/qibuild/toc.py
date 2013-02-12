@@ -673,14 +673,12 @@ The following tools were not found: {missing}\
                 )
 
 
-def toc_open(worktree_root, args=None, qibuild_cfg=None):
+def toc_open(worktree_root, args=None):
     """ Creates a :py:class:`Toc` object.
 
     :param worktree: The worktree to be used. (see :py:class:`qisys.worktree.WorkTree`)
     :param args: an ``argparse.NameSpace`` object containing
      the arguments passed from the comand line.
-    :param qibuild_cfg: A (:py:class:`qibuild.config.QiBuildConfig` instance) to use.
-     If None, we built a new instance to store in ``toc.config``
 
     You should always use this function to call Toc methods from
     a qibuild :term:`action`.

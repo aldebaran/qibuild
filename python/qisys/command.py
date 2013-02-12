@@ -46,7 +46,7 @@ class Process:
     INTERRUPTED = 4
     NOT_RUN     = 5
 
-    def __init__(self, cmd, name=None, verbose=False, cwd=None, env=None):
+    def __init__(self, cmd, verbose=False, cwd=None, env=None):
         self.cmd = cmd
         self.cwd = cwd
         self.env = env
