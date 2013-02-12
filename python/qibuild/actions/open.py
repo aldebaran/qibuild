@@ -113,7 +113,7 @@ def do(args):
         ide_path = ide.path
         if not ide_path:
             ide_path = 'qtcreator'
-        cmake_list = os.path.join(project.directory, "CMakeLists.txt")
+        cmake_list = os.path.join(project.path, "CMakeLists.txt")
         if not os.access(ide_path, os.X_OK):
             mess  = "Invalid configuration dectected!\n"
             mess += "QtCreator path (%s) is not a valid path\n" % ide_path

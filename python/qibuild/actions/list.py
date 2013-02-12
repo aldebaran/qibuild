@@ -35,17 +35,17 @@ def do(args):
         on_empty_toc(toc)
     ui.info(ui.green, "qibuild projects in:", ui.blue, toc.worktree.root)
     for project in projects:
-        project.directory = os.path.relpath(project.directory, toc.worktree.root)
+        project.path = os.path.relpath(project.path, toc.worktree.root)
     max_name = max([len(x.name)      for x in projects])
-    max_src  = max([len(x.directory) for x in projects])
+    max_src  = max([len(x.path) for x in projects])
     regex = args.pattern
     if args.pattern:
         regex = re.compile(regex)
     for project in projects:
         if args.names:
-            items = (project.name.ljust(max_name + 2), project.directory)
+            items = (project.name.ljust(max_name + 2), project.path)
         else:
-            items = (project.directory.ljust(max_src + 2), project.name)
+            items = (project.path.ljust(max_src + 2), project.name)
         if not regex or regex.search(items[0]) or regex.search(items[1]):
             ui.info(ui.green, " * ", ui.blue, items[0], ui.reset, items[1])
 

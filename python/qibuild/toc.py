@@ -442,12 +442,13 @@ You may want to run:
         """
         timer = ui.timer("configure %s" % project.name)
         timer.start()
-        if not os.path.exists(project.directory):
-            raise TocException("source dir: %s does not exist, aborting" % project.directory)
-        cmake_file = os.path.join(project.directory, "CMakeLists.txt")
+        if not os.path.exists(project.path):
+            raise TocException("source dir: %s does not exist, aborting" %
+                    project.path)
+        cmake_file = os.path.join(project.path)
         if not os.path.exists(cmake_file):
             mess = """{project.name} does not look like a valid CMake project!
-        (No CMakeLists.txt in {project.directory})
+        (No CMakeLists.txt in {project.path)
         """.format(project=project)
             raise TocException(mess)
 
@@ -475,7 +476,7 @@ You may want to run:
             self.build_env["PATH"] = os.pathsep.join(paths_withoutsh)
 
         try:
-            qibuild.cmake.cmake(project.directory, project.build_directory,
+            qibuild.cmake.cmake(project.path, project.build_directory,
                                 cmake_args, env=self.build_env,
                                 clean_first=clean_first,
                                 debug_trycompile=debug_trycompile,
@@ -608,7 +609,7 @@ You may want to run:
         cprefix = qibuild.cmake.get_cached_var(project.build_directory,
                                                "CMAKE_INSTALL_PREFIX")
         if cprefix != prefix:
-            qibuild.cmake.cmake(project.directory, project.build_directory,
+            qibuild.cmake.cmake(project.path, project.build_directory,
                 ['-DCMAKE_INSTALL_PREFIX=%s' % prefix],
                 clean_first=False,
                 env=self.build_env)

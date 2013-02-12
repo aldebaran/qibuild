@@ -26,7 +26,7 @@ def get_package_name(project, version=None, config=None):
         res.append(version)
     else:
         # Try to get it from project/version.cmake:
-        version = qibuild.project.version_from_directory(project.directory)
+        version = qibuild.project.version_from_directory(project.path)
         if version:
             res.append(version)
 

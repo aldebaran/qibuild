@@ -190,7 +190,7 @@ def collect_dependencies_reverse(project, projects, single, runtime, depth=0):
         if project.name in depends:
             dependency = DependencyRelationship(project.name, proj.name)
             dependency.is_known = True
-            dependency.path = proj.directory
+            dependency.path = proj.path
             dependency.depth = depth
             collected_dependencies.append(dependency)
             if not single:
@@ -242,7 +242,7 @@ def collect_dependencies(project, projects, packages, single, runtime, depth=0):
             match = next(
                 (x for x in projects if x.name == dependency_name), None)
             if match:
-                dependency.path = match.directory
+                dependency.path = match.path
                 dependency.is_known = True
                 next_item = match
         collected_dependencies.append(dependency)

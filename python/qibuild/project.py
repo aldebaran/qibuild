@@ -39,9 +39,9 @@ class Project:
     """ Store information about a :term:`project`
 
     """
-    def __init__(self, directory):
+    def __init__(self, path):
         self.name = None
-        self.directory  = directory
+        self.path  = path
         self.depends    = list()
         self.rdepends   = list()
         self.config     = qibuild.config.ProjectConfig()
@@ -71,8 +71,8 @@ class Project:
 
     def load_config(self):
         """ Update project dependency list """
-        handle_old_manifest(self.directory)
-        project_xml = os.path.join(self.directory, "qiproject.xml")
+        handle_old_manifest(self.path)
+        project_xml = os.path.join(self.path, "qiproject.xml")
         if not os.path.exists(project_xml):
             return
         self.config.read(project_xml)
@@ -108,7 +108,7 @@ class Project:
     def __str__(self):
         res = ""
         res += "Project: %s\n" % (self.name)
-        res += "  directory       = %s\n" % self.directory
+        res += "  path            = %s\n" % self.path
         res += "  depends         = %s\n" % self.depends
         res += "  rdepends        = %s\n" % self.rdepends
         res += "  build_directory = %s\n" % self.build_directory
@@ -116,7 +116,7 @@ class Project:
         return res
 
     def __repr__(self):
-        res = "<Project %s in %s>" % (self.name, self.directory)
+        res = "<Project %s in %s>" % (self.name, self.path)
         return res
 
 def name_from_directory(project_dir):
@@ -186,7 +186,7 @@ def update_project(project, toc):
         project.build_directory = os.path.normpath(os.path.join(singlebdir, bname))
     else:
         bname = "build-%s" % (toc.build_folder_name)
-        project.build_directory = os.path.join(project.directory, bname)
+        project.build_directory = os.path.join(project.path, bname)
 
 
     # Handle single sdk dir
