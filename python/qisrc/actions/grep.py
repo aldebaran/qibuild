@@ -37,7 +37,7 @@ def do(args):
         git = qisrc.git.Git(project.path)
         (status, out) = git.call("grep", *git_grep_opts, raises=False)
         if out != "":
-          print out
+            print out
         if status != 0:
             retcode = 1
     sys.exit(retcode)

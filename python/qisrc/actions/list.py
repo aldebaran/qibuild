@@ -42,17 +42,17 @@ def do(args):
 
     for project in worktree.projects:
         if not regex or regex.search(project.src):
-           src = project.src.ljust(max_length)
-           mess = [ui.green, " *", ui.blue, src]
-           if args.with_path:
-               mess.extend([ui.yellow, "==>"])
-               if os.path.exists(project.path):
-                   mess.extend([ui.fuchsia, ui.bold, project.path])
-               else:
-                   mess.extend([ui.bold, ui.red, "Can not find source directory!"])
-           ui.info(*mess)
-           if not os.path.exists(project.path):
-               to_remove.append(project.src)
+            src = project.src.ljust(max_length)
+            mess = [ui.green, " *", ui.blue, src]
+            if args.with_path:
+                mess.extend([ui.yellow, "==>"])
+                if os.path.exists(project.path):
+                    mess.extend([ui.fuchsia, ui.bold, project.path])
+                else:
+                    mess.extend([ui.bold, ui.red, "Can not find source directory!"])
+            ui.info(*mess)
+            if not os.path.exists(project.path):
+                to_remove.append(project.src)
 
     if not to_remove:
         return

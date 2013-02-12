@@ -55,7 +55,7 @@ def gen_annotations(profile, out, qibuild_dir):
         orig_filename = os.path.join(qibuild_dir, "qibuild",
                                      filename)
         with open(orig_filename, "r") as fp:
-           lines = fp.readlines()
+            lines = fp.readlines()
         lines = [" "  * (pad + 1) + x for x in lines]
         file_stats = profile[filename]
         total_hits = sum(file_stats.values())

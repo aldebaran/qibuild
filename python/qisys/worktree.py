@@ -365,10 +365,10 @@ class Project(qisys.xml_parser.RootXMLParser):
 def repr_list_projects(projects, name = "projects"):
     res = ""
     if len(projects):
-       res += name
-       for i, project in enumerate(projects):
-          res += "(%s) %s, " % (i, project.src)
-       res += "\n"
+        res += name
+        for i, project in enumerate(projects):
+            res += "(%s) %s, " % (i, project.src)
+        res += "\n"
     return res
 
 def to_relative_path(root, path):

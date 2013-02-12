@@ -76,7 +76,7 @@ def do(args):
         else:
             args = [project.name]
             if toc.active_config:
-              args.extend(["--config", toc.active_config])
+                args.extend(["--config", toc.active_config])
             qisys.script.run_action("qibuild.actions.configure", args)
 
     error_message = "Could not open project %s\n" % project.name

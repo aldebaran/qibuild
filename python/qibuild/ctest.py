@@ -298,7 +298,7 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
     else:
         for test in all_tests:
             if test_args is not None:
-              test[1] += test_args.split()
+                test[1] += test_args.split()
             (name, cmd_, properties) = test
             cost = properties.get("COST")
             if not slow and cost and float(cost) > 50:
