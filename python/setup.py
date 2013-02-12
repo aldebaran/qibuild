@@ -16,6 +16,8 @@ packages = [
     "qidoc",
     "qidoc.actions",
     "qidoc.docs",
+    "qilinguist",
+    "qilinguist.actions",
     "qitoolchain",
     "qitoolchain.actions",
     "qitoolchain.binary_package",
@@ -24,6 +26,7 @@ packages = [
 
 scripts = [
     "bin/qidoc",
+    "bin/qilinguist",
     "bin/qisrc",
     "bin/qibuild",
     "bin/qitoolchain",

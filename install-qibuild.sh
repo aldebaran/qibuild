@@ -68,6 +68,7 @@ create_launcher python/bin/qibuild      qibuild
 create_launcher python/bin/qitoolchain  qitoolchain
 create_launcher python/bin/qisrc        qisrc
 create_launcher python/bin/qidoc        qidoc
+create_launcher python/bin/qilinguist   qilinguist
 create_launcher python/bin/qicd.py      qicd.py
 
 #aliases

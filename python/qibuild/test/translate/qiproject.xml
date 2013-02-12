@@ -1,0 +1,3 @@
+<project name="translate">
+  <translate domain="translate" linguas="de_DE fr_FR en_US" tr="gettext"/>
+</project>

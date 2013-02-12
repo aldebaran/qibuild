@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+
+## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
+
+"""QiLinguist command line tool.
+"""
+
+# sys.path
+
+import os
+import sys
+
+if __name__ == '__main__':
+    try:
+        major = sys.version_info.major
+    except AttributeError:
+        # Python < 2.7
+        major = sys.version_info[0]
+    if major != 2:
+        print('[WARN ]: the script was not run using Python 2, will try to ' \
+              'find it.')
+        res = 1
+        try:
+            import subprocess
+            res = subprocess.call(['python2'] + sys.argv)
+        except OSError as e:
+            print(e)
+        sys.exit(res)
+
+def patch_sys_path():
+    """
+    Add self sources to sys.path, so that directly using this script
+    from the sources works
+
+    """
+    this_dir = os.path.dirname(__file__)
+    to_add =  os.path.join(this_dir, "..")
+    to_add = os.path.abspath(to_add)
+    sys.path.insert(0, to_add)
+
+
+patch_sys_path()
+
+try:
+    import argparse
+except ImportError:
+    from qibuild.external import argparse
+import qibuild.script
+
+def main():
+    parser = argparse.ArgumentParser()
+    modules = qibuild.script.action_modules_from_package("qilinguist.actions")
+    qibuild.script.root_command_main("qilinguist", parser, modules)
+
+if __name__ == "__main__":
+    main()
