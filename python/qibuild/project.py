@@ -39,7 +39,8 @@ class Project:
     """ Store information about a :term:`project`
 
     """
-    def __init__(self, path):
+    def __init__(self, toc, path):
+        self.toc  = toc
         self.name = None
         self.path  = path
         self.depends    = list()
@@ -48,8 +49,8 @@ class Project:
 
         #build related settings
         self.cmake_flags     = list()
-        self.build_directory = None
         self.sdk_directory   = None
+        self._custom_build_dir = None
         self._custom_sdk_dir = False
 
         self.load_config()
@@ -57,6 +58,24 @@ class Project:
     @property
     def cmakecache_path(self):
         return os.path.join(self.build_directory, "CMakeCache.txt")
+
+    @property
+    def build_directory(self):
+        if self._custom_build_dir:
+            return self._custom_build_dir
+
+        # Handle custom global build directory containing all projects
+        bname = "build-%s" % self.toc.get_build_folder_name()
+
+        singlebdir = self.toc.config.local.build.build_dir
+        if singlebdir:
+            singlebdir = os.path.expanduser(singlebdir)
+            if not os.path.isabs(singlebdir):
+                singlebdir = os.path.join(self.toc.worktree.root, singlebdir)
+            bname = os.path.join(bname, self.name)
+            return os.path.normpath(os.path.join(singlebdir, bname))
+
+        return os.path.join(self.path, bname)
 
     def is_configured(self):
         return os.path.exists(self.cmakecache_path)
@@ -81,9 +100,8 @@ class Project:
         self.rdepends = self.config.rdepends
 
     def set_custom_build_directory(self, build_dir):
-        """ could be used to override the default build_directory
-        """
-        self.build_directory = build_dir
+        """Could be used to override the default build_directory."""
+        self._custom_build_dir = build_dir
 
         #detect single sdk directory for multiple projects
         if not self._custom_sdk_dir:
@@ -176,19 +194,6 @@ def update_project(project, toc):
     among all the projects.
 
     """
-    # Handle custom global build directory containing all projects
-    bname = "build-%s" % toc.get_build_folder_name()
-    singlebdir = toc.config.local.build.build_dir
-    if singlebdir:
-        singlebdir = os.path.expanduser(singlebdir)
-        if not os.path.isabs(singlebdir):
-            singlebdir = os.path.join(toc.worktree.root, singlebdir)
-        bname = os.path.join(bname, project.name)
-        project.build_directory = os.path.normpath(os.path.join(singlebdir, bname))
-    else:
-        project.build_directory = os.path.join(project.path, bname)
-
-
     # Handle single sdk dir
     sdk_dir = toc.config.local.build.sdk_dir
     if sdk_dir:

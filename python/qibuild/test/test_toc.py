@@ -62,15 +62,15 @@ class TocTestCase(unittest.TestCase):
         self.tmp = tempfile.mkdtemp(prefix="test-feed")
         qisys.sh.mkdir(os.path.join(self.tmp, "qi"))
         self.world_package = qitoolchain.Package("world", "package/world")
-        self.world_project = qibuild.project.Project("src/world")
+        self.world_project = qibuild.project.Project(None, "src/world")
         self.world_project.name = "world"
-        self.hello_project = qibuild.project.Project("src/hello")
+        self.hello_project = qibuild.project.Project(None, "src/hello")
         self.hello_project.name = "hello"
-        self.world_project.build_directory = "src/world/build"
-        self.hello_project.build_directory = "src/hello/build"
         self.hello_project.depends = ["world"]
         self.toc = qibuild.toc.toc_open(self.tmp)
         self.toc.active_config = "test"
+        self.world_project.toc = self.toc
+        self.hello_project.toc = self.toc
 
     def test_src_deps(self):
         self.toc.projects = [self.hello_project, self.world_project]

@@ -303,7 +303,7 @@ You may want to run:
             # inside a full qibuild.project.Project object
             # (with CMake flags, build dir, et al.)
             project_path = build_project.path
-            qibuild_project = qibuild.project.Project(project_path)
+            qibuild_project = qibuild.project.Project(self, project_path)
             project_name = qibuild_project.name
             if project_name in seen:
                 mess  = "Found two qibuild projects with the same name (%s)\n" % qibuild_project.name
