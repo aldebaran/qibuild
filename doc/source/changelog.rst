@@ -73,6 +73,7 @@ Command line
 * ``qisrc`` learned ``reset``
 * ``qisrc`` learned ``snapshot``
 * ``qisrc snapshot`` learned ``--fetch`` and ``--no-fetch``
+* ``qisrc grep`` learned ``-path``
 
 CMake
 ++++++
