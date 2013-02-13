@@ -39,20 +39,20 @@ def open_toc_with_profiles(tmpdir, profiles=None, flags=None):
 def test_profiles_nothing_specified(tmpdir):
     toc = open_toc_with_profiles(tmpdir)
     assert toc.user_cmake_flags == list()
-    assert "foo" not in toc.build_folder_name
-    assert "bar" not in toc.build_folder_name
+    assert "foo" not in toc.get_build_folder_name()
+    assert "bar" not in toc.get_build_folder_name()
 
 def test_one_profile(tmpdir):
     toc = open_toc_with_profiles(tmpdir, profiles=["foo"])
     assert toc.user_cmake_flags == ["WITH_FOO=ON"]
-    assert "foo" in toc.build_folder_name
-    assert "bar" not in toc.build_folder_name
+    assert "foo" in toc.get_build_folder_name()
+    assert "bar" not in toc.get_build_folder_name()
 
 def test_two_profiles(tmpdir):
     toc = open_toc_with_profiles(tmpdir, profiles=["foo", "bar"])
     assert toc.user_cmake_flags == ["WITH_FOO=ON", "WITH_BAR=ON"]
-    assert "foo" in toc.build_folder_name
-    assert "bar" in toc.build_folder_name
+    assert "foo" in toc.get_build_folder_name()
+    assert "bar" in toc.get_build_folder_name()
 
 def test_profile_and_flags(tmpdir):
     toc = open_toc_with_profiles(tmpdir, profiles=["foo"], flags=["WITH_FOO=OFF"])

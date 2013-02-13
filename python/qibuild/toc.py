@@ -150,7 +150,6 @@ class Toc:
         self.active_projects = list()
         self.worktree = worktree
         self.cmake_generator   = cmake_generator
-        self.build_folder_name = None
         self.build_type = build_type if build_type else "Debug"
         # List of objects of type qibuild.project.Project,
         # this is updated using WorkTree.buildable_projects
@@ -296,7 +295,6 @@ You may want to run:
         build config, and the same build folder
 
         """
-        self.set_build_folder_name()
         seen = dict()
 
         # self.buildable_projects has been set by WorkTree.__init__
@@ -363,10 +361,6 @@ You may want to run:
 
         build_dir = '-'.join(res)
         return build_dir
-
-    def set_build_folder_name(self):
-        """Set the build dir name to the default."""
-        self.build_folder_name = self.get_build_folder_name()
 
     def get_project(self, project_name, raises=True):
         """ Get a project from a name.

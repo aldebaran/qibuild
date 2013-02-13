@@ -177,7 +177,7 @@ def update_project(project, toc):
 
     """
     # Handle custom global build directory containing all projects
-    bname = "build-%s" % toc.build_folder_name
+    bname = "build-%s" % toc.get_build_folder_name()
     singlebdir = toc.config.local.build.build_dir
     if singlebdir:
         singlebdir = os.path.expanduser(singlebdir)
@@ -196,7 +196,7 @@ def update_project(project, toc):
             project.sdk_directory = sdk_dir
         else:
             project.sdk_directory = os.path.join(toc.worktree.root, sdk_dir)
-        bname = "sdk-%s" % (toc.build_folder_name)
+        bname = "sdk-%s" % (toc.get_build_folder_name())
         project.sdk_directory = os.path.normpath(os.path.join(project.sdk_directory, bname))
         project._custom_sdk_dir = True
         cmake_sdk_dir = qisys.sh.to_posix_path(project.sdk_directory)
