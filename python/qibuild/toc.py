@@ -326,7 +326,7 @@ You may want to run:
         self.projects.sort(key=operator.attrgetter('name'))
 
 
-    def set_build_folder_name(self):
+    def get_build_folder_name(self, config=None, profiles=None, build_type=None):
         """Get a reasonable build folder.
         The point is to be sure we don't have two incompatible build configurations
         using the same build dir.
@@ -337,21 +337,36 @@ You may want to run:
         """
         res = list()
 
-        if self.active_config:
+        if config:
+            res.append(config)
+        elif self.active_config:
             res.append(self.active_config)
         else:
-            res.append("sys-%s-%s" % (platform.system().lower(), platform.machine().lower()))
-        for profile in self.profiles:
-            res.append(profile)
+            res.append("sys-%s-%s" % (platform.system().lower(),
+                                                    platform.machine().lower()))
 
-        if not self.using_visual_studio and self.build_type != "Debug":
+        if profiles:
+            res.extend(profiles)
+        else:
+            for profile in self.profiles:
+                res.append(profile)
+
+        if not self.using_visual_studio:
             # When using cmake + visual studio, sharing the same build dir with
             # several build config is mandatory.
             # Otherwise, it's not a good idea, so we always specify it
             # when it's not "Debug" (the default)
-            res.append(self.build_type.lower())
+            if build_type and build_type != "Debug":
+                res.append(build_type.lower())
+            elif self.build_type != "Debug":
+                res.append(self.build_type.lower())
 
-        self.build_folder_name = "-".join(res)
+        build_dir = '-'.join(res)
+        return build_dir
+
+    def set_build_folder_name(self):
+        """Set the build dir name to the default."""
+        self.build_folder_name = self.get_build_folder_name()
 
     def get_project(self, project_name, raises=True):
         """ Get a project from a name.
