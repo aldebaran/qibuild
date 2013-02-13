@@ -51,7 +51,6 @@ class Project:
 
         #build related settings
         self.cmake_flags     = list()
-        self.sdk_directory   = None
         self._custom_build_dir = None
         self._custom_sdk_dir = False
 
@@ -79,6 +78,13 @@ class Project:
 
         return os.path.join(self.path, bname)
 
+    @property
+    def sdk_directory(self):
+        if self._custom_sdk_dir:
+            return self._custom_sdk_dir
+
+        return os.path.join(self.build_directory, "sdk")
+
     def is_configured(self):
         return os.path.exists(self.cmakecache_path)
 
@@ -96,10 +102,6 @@ class Project:
     def set_custom_build_directory(self, build_dir):
         """Could be used to override the default build_directory."""
         self._custom_build_dir = build_dir
-
-        #detect single sdk directory for multiple projects
-        if not self._custom_sdk_dir:
-            self.sdk_directory = os.path.join(self.build_directory, "sdk")
 
     def summarize_options(self):
         """ Display all the options coming from various WITH_*
@@ -192,18 +194,13 @@ def update_project(project, toc):
     sdk_dir = toc.config.local.build.sdk_dir
     if sdk_dir:
         if os.path.isabs(sdk_dir):
-            project.sdk_directory = sdk_dir
+            project._custom_sdk_dir = sdk_dir
         else:
-            project.sdk_directory = os.path.join(toc.worktree.root, sdk_dir)
+            project._custom_sdk_dir = os.path.join(toc.worktree.root, sdk_dir)
         bname = "sdk-%s" % (toc.get_build_folder_name())
-        project.sdk_directory = os.path.normpath(os.path.join(project.sdk_directory, bname))
-        project._custom_sdk_dir = True
+        project._custom_sdk_dir = os.path.normpath(os.path.join(project._custom_sdk_dir, bname))
         cmake_sdk_dir = qisys.sh.to_posix_path(project.sdk_directory)
         project.cmake_flags.append("QI_SDK_DIR=%s" % (cmake_sdk_dir))
-    else:
-        #normal sdk dir in buildtree
-        project.sdk_directory   = os.path.join(project.build_directory, "sdk")
-
 
     # add CMAKE_BUILD_TYPE cmake flags
     if toc.build_type:
