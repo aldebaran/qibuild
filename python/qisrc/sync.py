@@ -198,9 +198,8 @@ def get_toplevel_git_projects(projects):
     """Return a sorted list of git_projects without submodules and without
     manifests.
     """
-    git_projects = (x.git_project for x in projects if x.git_project and not x.manifest)
-
-    git_projects = list(set(git_projects))
+    git_projects = {x.git_project for x in projects if x.git_project and not x.manifest}
+    git_projects = list(git_projects)
 
     git_projects.sort(key = operator.attrgetter("src"))
 
