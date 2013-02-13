@@ -177,15 +177,15 @@ def update_project(project, toc):
 
     """
     # Handle custom global build directory containing all projects
+    bname = "build-%s" % toc.build_folder_name
     singlebdir = toc.config.local.build.build_dir
     if singlebdir:
         singlebdir = os.path.expanduser(singlebdir)
         if not os.path.isabs(singlebdir):
             singlebdir = os.path.join(toc.worktree.root, singlebdir)
-        bname = os.path.join("build-%s" % (toc.build_folder_name), project.name)
+        bname = os.path.join(bname, project.name)
         project.build_directory = os.path.normpath(os.path.join(singlebdir, bname))
     else:
-        bname = "build-%s" % (toc.build_folder_name)
         project.build_directory = os.path.join(project.path, bname)
 
 
