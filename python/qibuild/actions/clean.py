@@ -20,23 +20,20 @@ import qibuild
 import qibuild.cmdparse
 
 def configure_parser(parser):
-    """Configure parser for this action"""
+    """Configure parser for this action."""
     qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     parser.add_argument("--force", "-f", dest="force", action="store_true", help="force the clean")
 
 def get_build_dirs(projects):
-    """ Returns a list of existing build directories """
-    bdirs = []
-    for project in projects:
-        if os.path.isdir(project.build_directory):
-            bdirs.append(project.build_directory)
+    """Returns a list of existing build directories."""
+    bdirs = [project.build_directory for project in projects if os.path.isdir(project.build_directory)]
     return bdirs
 
 @ui.timer("qibuild clean")
 def do(args):
-    """Main entry point"""
+    """Main entry point."""
     toc = qibuild.toc.toc_open(args.worktree, args)
     (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
 
@@ -48,15 +45,15 @@ def do(args):
     elif not args.force:
         ui.info(ui.green, "Build directories that will be removed", ui.reset, ui.bold, "(use -f to apply):")
 
-    for i, bdir in enumerate(bdirs):
+    for i, bdir in enumerate(bdirs, start=1):
         if args.force:
             ui.info(ui.green, "*", ui.reset,
-                "(%i/%i)" % (i+1, bdir_count),
+                "(%i/%i)" % (i, bdir_count),
                 ui.green, "Cleaning", ui.reset, bdir)
 
             # delete the build directory
             qisys.sh.rm(bdir)
         else:
             ui.info(ui.green, "*", ui.reset,
-                "(%i/%i)" % (i+1, bdir_count),
+                "(%i/%i)" % (i, bdir_count),
                 ui.reset, bdir)
