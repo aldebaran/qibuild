@@ -3,13 +3,54 @@
 Changelog
 =========
 
-
 Upcoming release
------------------
-
+----------------
 
 Command line
-+++++++++++++
+++++++++++++
+
+* Add ``qilinguist``.
+* ``qisrc reset`` learn ``--fetch``  and ``--no-fetch``.
+* ``qisrc snapshot`` learn ``--fetch``  and ``--no-fetch``.
+* ``qisrc list`` learn ``--with-path``.
+* ``qisrc grep`` learned ``-path``.
+
+CMake
++++++
+
+* Added :cmake:function:`qi_state_dir`
+
+Python
+++++++
+
+* Add :py:func:`qisrc.sync.get_toplevel_git_projects` to ignore submodules
+  in a project list.
+* Add functions for handle build projects in qibuild and remove them from
+  :py:mod:`qisys.worktree`.
+
+  * :py:func:`qibuild.project.is_buildable`.
+  * :py:func:`qibuild.project.build_projects`.
+
+* Add functions for handle git projects from :py:mod:`qisys.worktree` to
+  :py:mod:`qisrc.git`.
+
+  * :py:func:`qisrc.git.is_git`.
+  * :py:func:`qisrc.git.get_git_projects`.
+
+* :py:func:`qibuild.parsers.build_parser` has been split.
+
+  * :py:func:`qisrc.parsers.build_type_parser` is for know the type of build
+    and so the name of the build directory.
+  * :py:func:`qisrc.parsers.build_parser` extend the previous one and add
+    option for build projects (as ``-j``).
+
+* Remove :py:mod:`qibuild.archive` use :py:mod:`qisys.archive` instead.
+
+V2.0
+----
+
+Command line
+++++++++++++
 
 * ``qibuild make``: add ``--coverity`` option to build with cov-analisys.
 * ``qibuild clean``: syntax closer to other commands, cleans deep by default and
@@ -68,12 +109,9 @@ Command line
   directory into a qiBuild package
 * ``qitoolchain import-package`` learned ``--batch``
 * ``qitoolchain import-package`` learned to import package directory
-* :cmake:function:`qi_add_test` can now handle test script as target instead of binary.
 * ``qibuild make`` learned ``--verbose-make``
 * ``qisrc`` learned ``reset``
 * ``qisrc`` learned ``snapshot``
-* ``qisrc snapshot`` learned ``--fetch`` and ``--no-fetch``
-* ``qisrc grep`` learned ``-path``
 
 CMake
 ++++++
@@ -125,6 +163,7 @@ CMake
   * Renamed dbus into dbus-1, and dbus-glib into dbus-glib-1
   * ``qi_use_lib(OPENGL)`` now uses upstream's ``FindOpenGL.cmake``
   * ogre-tools: Allow to use more than one plugin.
+* :cmake:function:`qi_add_test` can now handle test script as target instead of binary.
 
 Python
 +++++++
