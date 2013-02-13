@@ -16,6 +16,8 @@ The :py:class:`toc` object is able to:
    by the qibuild CMake framework
    (see :py:func:`bootstrap_project`)
 
+To use the project build results, from an other project,
+you just have to add sdk directory to CMAKE_FIND_ROOT_PATH
 
 """
 
@@ -79,14 +81,6 @@ class Project:
 
     def is_configured(self):
         return os.path.exists(self.cmakecache_path)
-
-    def get_sdk_dir(self):
-        """ Return the SDK dir of the project.
-        To use the project build results, from an other project,
-        you just have to add this directory to CMAKE_FIND_ROOT_PATH
-
-        """
-        return self.sdk_directory
 
     def load_config(self):
         """ Update project dependency list """

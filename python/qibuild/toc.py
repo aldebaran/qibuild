@@ -429,7 +429,7 @@ You may want to run:
 
         for project_name in r_project_names:
             project = self.get_project(project_name)
-            dirs.append(project.get_sdk_dir())
+            dirs.append(project.sdk_directory)
 
         ui.debug("sdk_dirs for", project_name, ":", " ".join(dirs))
         return dirs

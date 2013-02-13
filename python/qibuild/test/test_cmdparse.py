@@ -195,7 +195,7 @@ def test_project_wins_when_explicit(tmpdir):
     toc = create_toc(tmpdir, ["libbar"])
     (_, projects) = parse_args(toc, "libbar", "libfoo")
     assert projects == ["libbar", "libfoo"]
-    bar_sdk_dir = toc.get_project("libbar").get_sdk_dir()
+    bar_sdk_dir = toc.get_project("libbar").sdk_directory
     assert  toc.get_sdk_dirs("libfoo") == [bar_sdk_dir]
 
 def test_using_opts(tmpdir):
