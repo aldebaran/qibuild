@@ -49,6 +49,7 @@ Python
   the build directory.
 * Remove :py:func:`qibuild.toc.set_build_folder_name` and
   ``qibuild.toc.Toc.build_folder_name``
+* Add :py:func:`qibuild.toc.has_project`.
 
 V2.0
 ----

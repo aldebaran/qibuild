@@ -362,6 +362,12 @@ You may want to run:
         build_dir = '-'.join(res)
         return build_dir
 
+    def has_project(self, project_name):
+        """Return if we can found project_name in the toc projects."""
+        known_project_names = (p.name for p in self.projects)
+
+        return project_name in known_project_names
+
     def get_project(self, project_name, raises=True):
         """ Get a project from a name.
 
@@ -403,15 +409,12 @@ You may want to run:
         of projects
 
         """
-        dirs = list()
-
-        known_project_names = [p.name for p in self.projects]
-        if project_name not in known_project_names:
+        if not self.has_project(project_name):
             raise TocException("%s is not a buildable project" % project_name)
 
         dep_solver = DependenciesSolver(projects=self.projects, packages=self.packages,
             active_projects=self.active_projects)
-        (r_project_names, _package_names, not_found) = dep_solver.solve([project_name])
+        (r_project_names, _, not_found) = dep_solver.solve([project_name])
 
         # Nothing to do with with the packages:
         # SDK dirs from toolchain are managed by the toolchain file in
@@ -427,9 +430,7 @@ You may want to run:
         # Remove self from the list:
         r_project_names.remove(project_name)
 
-        for project_name in r_project_names:
-            project = self.get_project(project_name)
-            dirs.append(project.sdk_directory)
+        dirs = [self.get_project(x).sdk_directory for x in r_project_names]
 
         ui.debug("sdk_dirs for", project_name, ":", " ".join(dirs))
         return dirs
