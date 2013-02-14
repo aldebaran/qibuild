@@ -42,6 +42,9 @@ def configure_parser(parser):
     group.add_argument("--trace-cmake", dest="trace_cmake",
                       action="store_true",
                       help="run cmake in trace mode")
+    parser.add_argument("--coverage", dest="coverage",
+        action="store_true",
+        help="activate coverage support (gcc only)")
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
                         werror=False, profiling=False,
                         trace_cmake=False)
@@ -94,6 +97,8 @@ def do(args):
         toc.configure_project(project,
             clean_first=args.clean_first,
             debug_trycompile=args.debug_trycompile,
-            profiling=args.profiling,trace_cmake=args.trace_cmake)
+            trace_cmake=args.trace_cmake,
+            coverage=args.coverage,
+            profiling=args.profiling)
         if args.summarize_options:
             project.summarize_options()

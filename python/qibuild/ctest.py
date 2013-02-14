@@ -22,6 +22,7 @@ import qisys
 from qisys import ui
 import qibuild
 import qibuild.config
+import qibuild.gcov
 
 def _str_from_signal(code):
     """ Returns a nice string describing the signal
@@ -266,7 +267,7 @@ def sigint_handler(signum, frame):
 
 def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
               dry_run=False, valgrind=False, nightmare=False, test_args=None,
-              num_jobs=1):
+              coverage=False, num_jobs=1):
     """ Called by :py:meth:`qibuild.toc.Toc.test_project`
 
     :param test_name: If given, only run this test
@@ -280,6 +281,9 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
     if valgrind:
         if not qisys.command.find_program("valgrind"):
             raise Exception("valgrind was not found on the system")
+    if coverage:
+        if not qisys.command.find_program("gcovr"):
+            raise Exception("You must install gcovr before use coverage option!")
     if not build_env:
         build_env = qibuild.config.get_build_env()
     build_dir = project.build_directory
@@ -342,6 +346,8 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
     results = output_worker.global_result()
     total = len(results)
     failed = [x for x in results if not x.ok]
+    if coverage:
+        qibuild.gcov.generate_coverage_xml_report(project)
     if not failed:
         ui.info("Ran %i tests" % total)
         if slow_tests and not slow:

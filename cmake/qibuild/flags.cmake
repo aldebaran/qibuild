@@ -69,3 +69,13 @@ function(qi_sanitize_compile_flags)
   endif()
 
 endfunction()
+
+if (QI_COVERAGE)
+  message(STATUS "COVERAGE ENABLE")
+  set(CMAKE_C_FLAGS             "${CMAKE_C_FLAGS} --coverage" CACHE INTERNAL "" FORCE)
+  set(CMAKE_CXX_FLAGS           "${CMAKE_CXX_FLAGS} --coverage" CACHE INTERNAL "" FORCE)
+  set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS} --coverage" CACHE INTERNAL "" FORCE)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage" CACHE INTERNAL "" FORCE)
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage" CACHE INTERNAL "" FORCE)
+endif()
+

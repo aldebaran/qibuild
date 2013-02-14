@@ -17,3 +17,4 @@ pytest-cov==1.6
 # For coverage
 cov-core==1.7
 coverage==3.6
+gcovr==2.4

@@ -437,8 +437,8 @@ You may want to run:
 
 
     def configure_project(self, project, clean_first=True,
-                         debug_trycompile=False, profiling=False,
-                         trace_cmake=False):
+                         trace_cmake=False, debug_trycompile=False, 
+                         coverage=False, profiling=False):
         """ Call cmake with correct options.
 
         :param clean_first: If False, do not delete CMake cache.
@@ -476,6 +476,14 @@ You may want to run:
 
         cmake_args.extend(["-D" + x for x in cmake_flags])
 
+        if coverage:
+            cmake_args.append("-DQI_COVERAGE:BOOL=TRUE")
+
+        if debug_trycompile:
+            cmake_args.append("--debug-trycompile")
+
+        if profiling:
+            cmake_args.append("--trace")
 
         if "MinGW" in self.cmake_generator:
             paths = self.build_env["PATH"].split(os.pathsep)

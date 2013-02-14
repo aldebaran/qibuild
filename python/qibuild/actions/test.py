@@ -7,9 +7,11 @@
 
 import sys
 
+import qisys
 import qibuild
 import qibuild.ctest
 import qibuild.performance
+import qibuild.gcov
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -32,6 +34,8 @@ def configure_parser(parser):
                         help="Pass extra argument to test binary")
     parser.add_argument("--perf", dest="perf", action="store_true",
                         help="run perfs tests instead of pure tests.")
+    parser.add_argument("--coverage", dest="coverage", action="store_true",
+                        help="run coverage")
 
     parser.set_defaults(slow=False)
 
@@ -52,6 +56,7 @@ def do(args):
                 pattern=args.pattern, slow=args.slow,
                 dry_run=args.dry_run, valgrind=args.valgrind,
                 verbose=args.verbose_tests, nightmare=args.nightmare,
-                test_args=args.test_args, num_jobs=args.num_jobs)
+                test_args=args.test_args, coverage=args.coverage,
+                num_jobs=args.num_jobs)
         if not res:
             sys.exit(1)

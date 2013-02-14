@@ -1,0 +1,6 @@
+<project name="cov">
+  <!-- Add your project dependencies here -->
+  <!--
+  <depends buildtime="true" runtime="true" names="foo" />
+  -->
+</project>
