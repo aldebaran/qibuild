@@ -70,7 +70,7 @@ def do(args):
     toc = qibuild.toc.toc_open(args.worktree, args)
     (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
     if args.build_directory:
-        projects[0].set_custom_build_directory(args.build_directory)
+        projects[0].build_directory = args.build_directory
 
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:

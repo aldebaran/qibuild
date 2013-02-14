@@ -51,7 +51,6 @@ class Project:
 
         #build related settings
         self.cmake_flags     = list()
-        self._custom_build_dir = None
         self._custom_sdk_dir = False
 
         self.load_config()
@@ -62,8 +61,6 @@ class Project:
 
     @property
     def build_directory(self):
-        if self._custom_build_dir:
-            return self._custom_build_dir
 
         # Handle custom global build directory containing all projects
         bname = "build-%s" % self.toc.get_build_folder_name()
@@ -98,10 +95,6 @@ class Project:
         self.name = self.config.name
         self.depends  = self.config.depends
         self.rdepends = self.config.rdepends
-
-    def set_custom_build_directory(self, build_dir):
-        """Could be used to override the default build_directory."""
-        self._custom_build_dir = build_dir
 
     def summarize_options(self):
         """ Display all the options coming from various WITH_*
