@@ -333,33 +333,9 @@ You may want to run:
         build-linux-release
         build-cross-debug ...
         """
-        res = list()
-
-        if config:
-            res.append(config)
-        elif self.active_config:
-            res.append(self.active_config)
-        else:
-            res.append("sys-%s-%s" % (platform.system().lower(),
-                                                    platform.machine().lower()))
-
-        if profiles:
-            res.extend(profiles)
-        else:
-            for profile in self.profiles:
-                res.append(profile)
-
-        if not self.using_visual_studio:
-            # When using cmake + visual studio, sharing the same build dir with
-            # several build config is mandatory.
-            # Otherwise, it's not a good idea, so we always specify it
-            # when it's not "Debug" (the default)
-            if build_type and build_type != "Debug":
-                res.append(build_type.lower())
-            elif self.build_type != "Debug":
-                res.append(self.build_type.lower())
-
-        build_dir = '-'.join(res)
+        build_dir = qibuild.toc.get_build_folder_name(config=self.active_config,
+                profiles=self.profiles, build_type=self.build_type,
+                visual_studio=self.using_visual_studio)
         return build_dir
 
     def has_project(self, project_name):
@@ -804,3 +780,28 @@ def handle_old_qibuild_xml(worktree):
     qisys.sh.mkdir(os.path.dirname(global_path), recursive=True)
     with open(global_path, "w") as fp:
         fp.write(global_xml)
+
+def get_build_folder_name(config=None, profiles=None, build_type=None,
+                          visual_studio=False):
+    """Get a build folder name from a config, profiles and a build_type."""
+    res = list()
+
+    if config:
+        res.append(config)
+    else:
+        res.append("sys-%s-%s" % (platform.system().lower(),
+                                                    platform.machine().lower()))
+
+    if profiles:
+        res.extend(profiles)
+
+    if not visual_studio:
+        # When using cmake + visual studio, sharing the same build dir with
+        # several build config is mandatory.
+        # Otherwise, it's not a good idea, so we always specify it
+        # when it's not "Debug" (the default)
+        if build_type and build_type != "Debug":
+            res.append(build_type.lower())
+
+    build_dir = '-'.join(res)
+    return build_dir

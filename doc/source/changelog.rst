@@ -45,8 +45,10 @@ Python
     option for build projects (as ``-j``).
 
 * Remove :py:mod:`qibuild.archive` use :py:mod:`qisys.archive` instead.
-* Add a function :py:func:`qibuild.toc.get_build_folder_name` to get the name of
-  the build directory.
+* Add :py:func:`qibuild.toc.get_build_folder_name` to get the name of a build
+  directory from some informations.
+* Add :py:func:`qibuild.toc.Toc.get_build_folder_name` to get the name of
+  the build directory from a toc.
 * Remove :py:func:`qibuild.toc.set_build_folder_name` and
   ``qibuild.toc.Toc.build_folder_name``
 * Add :py:func:`qibuild.toc.has_project`.
