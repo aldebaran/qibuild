@@ -1,4 +1,4 @@
-## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+## Copyright (c) 2012, 2013 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file
 
@@ -23,8 +23,8 @@ def test_update(toc, trad):
     assert os.path.exists(pot_file)
 
 def test_release(toc, trad):
-    fr_FR_mo_file = os.path.join(trad.path, "po", "share", "locale", "fr_FR", "LC_MESSAGES", "translate.mo")
-    en_US_mo_file = os.path.join(trad.path, "po", "share", "locale", "fr_FR", "LC_MESSAGES", "translate.mo")
+    fr_FR_mo_file = os.path.join(trad.path, "po", "share", "locale", "translate", "fr_FR", "LC_MESSAGES", "translate.mo")
+    en_US_mo_file = os.path.join(trad.path, "po", "share", "locale", "translate", "fr_FR", "LC_MESSAGES", "translate.mo")
     assert not os.path.exists(fr_FR_mo_file)
     assert not os.path.exists(en_US_mo_file)
     qisys.script.run_action("qilinguist.actions.update",
@@ -125,7 +125,7 @@ def test_cplusplus_sdk_workflow(toc, trad):
 
     ## check binary output
     binary = os.path.join(trad.sdk_directory, "bin", "translate")
-    dictPath = os.path.join(trad.path, "po", "share", "locale")
+    dictPath = os.path.join(trad.path, "po", "share", "locale", "translate")
     env = os.environ.copy()
     env["LANGUAGE"] = "fr_FR.UTF-8"
     cmd = [binary, dictPath]
@@ -164,14 +164,14 @@ def test_cplusplus_install_workflow(toc, trad, tmpdir):
     toc.install_project(trad, tmpdir.strpath)
 
     ## check mo files
-    fr_FR_mo_file = tmpdir.join("share", "locale", "fr_FR", "LC_MESSAGES", "translate.mo").strpath
-    en_US_mo_file = tmpdir.join("share", "locale", "en_US", "LC_MESSAGES", "translate.mo").strpath
+    fr_FR_mo_file = tmpdir.join("share", "locale", "translate", "fr_FR", "LC_MESSAGES", "translate.mo").strpath
+    en_US_mo_file = tmpdir.join("share", "locale", "translate", "en_US", "LC_MESSAGES", "translate.mo").strpath
     assert os.path.exists(fr_FR_mo_file)
     assert os.path.exists(en_US_mo_file)
 
     ## check binary output
     binary = tmpdir.join("bin", "translate").strpath
-    dictPath = tmpdir.join("share", "locale").strpath
+    dictPath = tmpdir.join("share", "locale", "translate").strpath
     env = os.environ.copy()
     env["LANGUAGE"] = "fr_FR.UTF-8"
     cmd = [binary, dictPath]

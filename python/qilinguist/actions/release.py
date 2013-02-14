@@ -1,4 +1,4 @@
-## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+## Copyright (c) 2012, 2013 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
@@ -24,7 +24,7 @@ def process_with_gettext(project):
     domain = qilinguist.config.get_domain_from_qiproject(project)
 
     # get output directory
-    base_output_dir = os.path.join(project.path, "po", "share", "locale")
+    base_output_dir = os.path.join(project.path, "po", "share", "locale", domain)
     # get input directory
     input_dir = os.path.join(project.path, "po")
     for l in locale:
@@ -33,7 +33,7 @@ def process_with_gettext(project):
         # get output file
         output_dir = os.path.join(base_output_dir, l, "LC_MESSAGES")
         output_file = domain + ".mo"
-        qilinguist.qigettext.generate_mo_file(input_file, output_file, input_dir, output_dir)
+        qilinguist.qigettext.generate_mo_file(input_file, output_file, domain, input_dir, output_dir)
 
 def process_with_qt(project):
     # get locale
