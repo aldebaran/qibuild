@@ -81,9 +81,9 @@ def do(args):
         print
         ui.info(ui.green, ":: ", "Deploying packages")
         with qisys.sh.TempDir() as tmp:
-            for (i, package) in enumerate(packages):
+            for (i, package) in enumerate(packages, start=1):
                 ui.info(ui.green, "*", ui.reset,
-                        "(%i/%i)" % (i+1, len(package.name)),
+                        "(%i/%i)" % (i, len(package.name)),
                         ui.green, "Deploying package", ui.blue, package.name,
                         ui.green, "to", ui.blue, url)
                 toc.toolchain.install_package(package.name, tmp, runtime=True)
@@ -95,9 +95,9 @@ def do(args):
     # Deploy projects: install them inside a 'deploy' dir inside the build dir,
     # then deploy this dir to the target
     deployed_list = list()
-    for (i, project) in enumerate(projects):
+    for (i, project) in enumerate(projects, start=1):
         ui.info(ui.green, "*", ui.reset,
-                "(%i/%i)" % (i+1, len(projects)),
+                "(%i/%i)" % (i, len(projects)),
                 ui.green, "Deploying project", ui.blue, project.name,
                 ui.green, "to", ui.blue, url)
         destdir = os.path.join(project.build_directory, "deploy")
@@ -124,17 +124,17 @@ def do(args):
     if not args.split_debug:
         return
     ui.info(ui.green, ":: ", "Deployed projects")
-    for (i, deployed) in enumerate(deployed_list):
+    for (i, deployed) in enumerate(deployed_list, start=1):
         project, binaries, gdb_script, message = deployed
         if not binaries:
             ui.info(ui.green, "*", ui.reset,
-                    "(%i/%i)" % (i+1, len(projects)),
+                    "(%i/%i)" % (i, len(projects)),
                     ui.green, "Project", ui.blue, project.name,
                     ui.green, "- No executable deployed")
             continue
         binaries = "\n".join(["    %s" % bin_ for bin_ in binaries])
         ui.info(ui.green, "*", ui.reset,
-                "(%i/%i)" % (i+1, len(projects)),
+                "(%i/%i)" % (i, len(projects)),
                 ui.green, "Project", ui.blue, project.name,
                 ui.green, "- Deployed binaries:",
                 ui.reset, "\n%s" % binaries)

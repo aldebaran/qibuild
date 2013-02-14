@@ -73,9 +73,9 @@ def init_worktree(worktree, manifest, setup_review=True):
     project_count = len(manifest.projects)
     ui.info(ui.green, "Initializing worktree ...")
     setup_ok = True
-    for i, project in enumerate(manifest.projects):
+    for i, project in enumerate(manifest.projects, start=1):
         ui.info(
-            ui.green, "*", ui.reset, "(%2i/%2i)" % (i+1, project_count),
+            ui.green, "*", ui.reset, "(%2i/%2i)" % (i, project_count),
             ui.blue, project.name)
         # Use the same branch for the project as the branch
         # for the manifest, unless explicitely set:

@@ -65,8 +65,8 @@ def do(args):
     if args.include_deps and packages:
         print
         ui.info(ui.green, ":: ", "Installing packages")
-        for (i, package) in enumerate(packages):
-            ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i+1, len(packages)),
+        for (i, package) in enumerate(packages, start=1):
+            ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, len(packages)),
                     ui.green, "Installing package", ui.blue, package.name)
 
             toc.toolchain.install_package(package.name, dest, runtime=args.runtime)
@@ -74,8 +74,8 @@ def do(args):
 
     # Install projects to destdir:
     ui.info(ui.green, ":: ", "Installing projects")
-    for (i, project) in enumerate(projects):
-        ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i+1, len(projects)),
+    for (i, project) in enumerate(projects, start=1):
+        ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, len(projects)),
                 ui.green, "Installing project", ui.blue, project.name)
         toc.install_project(project,  args.destdir,
                             prefix=args.prefix, runtime=args.runtime,

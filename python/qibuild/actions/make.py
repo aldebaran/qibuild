@@ -51,9 +51,7 @@ def do(args):
                 ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))
 
     project_count = len(projects)
-    i = 0
-    for project in projects:
-        i += 1
+    for i, project in enumerate(projects, start=1):
         ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, project_count),
                 ui.green, "Building", ui.blue, project.name)
         toc.build_project(project, num_jobs=args.num_jobs,

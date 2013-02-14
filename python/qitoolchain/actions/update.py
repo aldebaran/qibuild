@@ -43,9 +43,7 @@ def do(args):
         toolchain.parse_feed(feed, dry_run=dry_run)
     else:
         tc_names = qitoolchain.get_tc_names()
-        i = 0
-        for tc_name in tc_names:
-            i += 1
+        for i, tc_name in enumerate(tc_names, start=1):
             tc_feed = qitoolchain.toolchain.get_tc_feed(tc_name)
             ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, len(tc_names)),
                     ui.green, "Updating", ui.blue, tc_name)

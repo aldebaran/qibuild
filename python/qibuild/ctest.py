@@ -417,7 +417,7 @@ def _parse_ctest_test_files(root, tests, subdirs):
         lines = fp.readlines()
 
     current_test = None
-    for i, line in enumerate(lines):
+    for i, line in enumerate(lines, start=1):
         match = re.match("SUBDIRS\((.*)\)", line)
         if match:
             subdir = match.groups()[0]
@@ -437,20 +437,20 @@ def _parse_ctest_test_files(root, tests, subdirs):
             groups = match.groups()
             if current_test is None:
                 mess  = "Expecting ADD_TEST before SET_TESTS_PROPERTIES\n"
-                mess += "in %s:%i" % (ctest_test_file, i+1)
+                mess += "in %s:%i" % (ctest_test_file, i)
                 raise Exception(mess)
             name = groups[0]
             if name != current_test:
                 mess  = "SET_TESTS_PROPERTIES called with wrong name\n"
                 mess += "Expecting %s, got %s\n" % (current_test, name)
-                mess += "in %s:%i" % (ctest_test_file, i+1)
+                mess += "in %s:%i" % (ctest_test_file, i)
                 raise Exception(mess)
             properties = groups[1]
             properties = shlex.split(properties)
             test_properties = dict()
-            for i in range(0, len(properties)/2):
-                key = properties[2*i]
-                value = properties[2*i+1]
+            for j in range(0, len(properties)/2):
+                key = properties[2*j]
+                value = properties[2*j+1]
                 test_properties[key] = value
             # Just erase everything if there are two calls to set_test_properties()
             tests[-1][2] = test_properties

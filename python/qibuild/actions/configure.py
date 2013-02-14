@@ -87,9 +87,7 @@ def do(args):
 
 
     project_count = len(projects)
-    i = 0
-    for project in projects:
-        i = i + 1
+    for i, project in enumerate(projects, start=1):
         ui.info(ui.green, "*", ui.reset, "(%i/%i)" %  (i, project_count),
                 ui.green, "Configuring",
                 ui.blue, project.name)
