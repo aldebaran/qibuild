@@ -60,8 +60,11 @@ class Project:
         return os.path.join(self.build_directory, "CMakeCache.txt")
 
     @property
-    def build_directory(self):
+    def qiproject_xml(self):
+        return os.path.join(self.path, "qiproject.xml")
 
+    @property
+    def build_directory(self):
         # Handle custom global build directory containing all projects
         bname = "build-%s" % self.toc.get_build_folder_name()
 
@@ -88,10 +91,9 @@ class Project:
     def load_config(self):
         """ Update project dependency list """
         handle_old_manifest(self.path)
-        project_xml = os.path.join(self.path, "qiproject.xml")
-        if not os.path.exists(project_xml):
+        if not os.path.exists(self.qiproject_xml):
             return
-        self.config.read(project_xml)
+        self.config.read(self.qiproject_xml)
         self.name = self.config.name
         self.depends  = self.config.depends
         self.rdepends = self.config.rdepends
