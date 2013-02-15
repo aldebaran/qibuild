@@ -11,7 +11,7 @@ Command line
 
 * Add ``qilinguist``.
 * ``qisrc reset`` learn ``--fetch``  and ``--no-fetch``.
-* ``qisrc snapshot`` learn ``--fetch``  and ``--no-fetch``.
+* ``qisrc snapshot`` learn ``--fetch``, ``--no-fetch`` and ``--tag``.
 * ``qisrc list`` learn ``--with-path``.
 * ``qisrc grep`` learned ``-path``.
 

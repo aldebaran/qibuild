@@ -23,6 +23,7 @@ def configure_parser(parser):
                         "is not clean.", action="store_true")
     parser.add_argument("-m", "--manifest", help="Use manifest instead of "
                         "current state.", action="store_true")
+    parser.add_argument("-t", "--tag", help="Use a specific tag.")
     parser.add_argument("--fetch", action="store_true", default=True,
                         help="Fetch before snapshot.")
     parser.add_argument("--no-fetch", action="store_false", dest="fetch",
@@ -41,4 +42,4 @@ def do(args):
         return
 
     qisrc.snapshot.generate_snapshot(worktree, args.path,
-        manifest=args.manifest, fetch=args.fetch)
+        manifest=args.manifest, tag=args.tag, fetch=args.fetch)

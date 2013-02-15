@@ -12,7 +12,7 @@ import qisrc.git
 import qisrc.status
 import qisys.interact
 
-def generate_snapshot(worktree, path, manifest=False, fetch=False):
+def generate_snapshot(worktree, path, manifest=False, tag=None, fetch=False):
     """Generate a snapshot file."""
     if os.path.exists(path) and not os.path.isfile(path):
         ui.error(path, "is not a file.")
@@ -35,6 +35,9 @@ def generate_snapshot(worktree, path, manifest=False, fetch=False):
             if manifest:
                 (returncode, sha1) = git.log("--pretty=format:%H",
                                              "-1", project.branch, raises=False)
+            elif tag:
+                (returncode, sha1) = git.call("show-ref", "--verify", "--tags",
+                                     "--hash", "refs/tags/" + tag, raises=False)
             else:
                 (returncode, sha1) = git.log("--pretty=format:%H",
                                              "-1", raises=False)
