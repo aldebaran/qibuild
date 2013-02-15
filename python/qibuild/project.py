@@ -426,7 +426,7 @@ def check_parent_project(toc, project_name, project_path):
         toc.update_projects()
 
 def check_worktree(toc, project_name, project_path):
-    """ Check if the qibbuild project was not found
+    """ Check if the qibuild project was not found
     because the project source is not registered in the
     current worktree
 
@@ -444,9 +444,7 @@ def check_worktree(toc, project_name, project_path):
         toc.update_projects()
 
 def get_parent_project(toc, directory):
-    """ Get the full path of a project using cwd
-
-    """
+    """Get the full path of a project using cwd."""
     head = os.path.dirname(directory)
     tail = None
     qiproj_xml = None
@@ -462,3 +460,19 @@ def get_parent_project(toc, directory):
         return toc.worktree.get_project(parent_path, raises=False)
     else:
         return None
+
+def is_build_dir(project, directory):
+    """Check if directory can be a build dir of project."""
+    parts = directory.split("-")
+    if len(parts) == 0:
+        return False
+
+    if not parts.pop(0) == "build":
+        return False
+
+    is_build_dir1 = qibuild.toc.is_build_folder_name(parts,
+                                               project.toc.worktree.qibuild_xml)
+    is_build_dir2 = qibuild.toc.is_build_folder_name(parts,
+                                                        project.toc.config_path)
+
+    return is_build_dir1 or is_build_dir2

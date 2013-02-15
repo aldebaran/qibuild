@@ -324,7 +324,7 @@ You may want to run:
         self.projects.sort(key=operator.attrgetter('name'))
 
 
-    def get_build_folder_name(self, config=None, profiles=None, build_type=None):
+    def get_build_folder_name(self):
         """Get a reasonable build folder.
         The point is to be sure we don't have two incompatible build configurations
         using the same build dir.
@@ -413,7 +413,7 @@ You may want to run:
 
 
     def configure_project(self, project, clean_first=True,
-                         trace_cmake=False, debug_trycompile=False, 
+                         trace_cmake=False, debug_trycompile=False,
                          coverage=False, profiling=False):
         """ Call cmake with correct options.
 
@@ -805,3 +805,41 @@ def get_build_folder_name(config=None, profiles=None, build_type=None,
 
     build_dir = '-'.join(res)
     return build_dir
+
+def is_build_folder_name(parts, profiles_path=None):
+    """Check if the parts list match a build folder name."""
+
+    configs = qitoolchain.toolchain.get_tc_names()
+    if profiles_path is None:
+        profiles = list()
+    else:
+        profiles = qibuild.profile.parse_profiles(profiles_path).keys()
+    build_types=["release"]
+
+    if len(parts) == 0:
+        return False
+
+    if parts[0] == "sys":
+        if len(parts) < 3:
+            return False
+        if not parts[1] == platform.system().lower() or not parts[2] == platform.machine().lower():
+            return False
+        else:
+            parts = parts[3:]
+    elif parts[0] in configs:
+        parts = parts[1:]
+    else:
+        return False
+
+    while len(parts) != 0 and parts[0] in profiles:
+        parts = parts[1:]
+
+    if len(parts) == 0:
+        return True
+
+    if parts[0].lower() not in build_types:
+        return False
+    else:
+        parts = parts[1:]
+
+    return len(parts) == 0

@@ -14,6 +14,8 @@ Command line
 * ``qisrc snapshot`` learn ``--fetch``, ``--no-fetch`` and ``--tag``.
 * ``qisrc list`` learn ``--with-path``.
 * ``qisrc grep`` learned ``-path``.
+* ``qisrc clean`` learned ``-z`` to clean build dir through toolchains and
+  profiles.
 
 CMake
 +++++
