@@ -365,7 +365,7 @@ class Toolchain:
         """
         # Delegate this to qitoolchain.feed module
         qibuild_cfg = qibuild.config.QiBuildConfig()
-        qibuild_cfg.read()
+        qibuild_cfg.read(create_if_missing=True)
         qitoolchain.feed.parse_feed(self, feed, qibuild_cfg, dry_run=dry_run)
         qibuild_cfg.write()
 
