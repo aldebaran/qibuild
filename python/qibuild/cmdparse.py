@@ -112,15 +112,20 @@ def deps_from_args(toc, args):
           deps (both runtime and buildtime)
 
     """
+    try:
+        params = vars(args)
+    except ValueError:
+        # maybe args is already a dict:
+        params = args.copy()
     wt_root = toc.worktree.root
-    if args.all:
+    if params.get('all'):
         deps = get_deps(toc, toc.projects, build_deps=True)
         return deps
-    if args.worktree and not args.projects:
+    if params.get('worktree') and not params.get('projects'):
         mess  = "Specifying a project name is mandatory when using --worktree"
         raise Exception(mess)
-    if args.projects:
-        project_args = args.projects
+    if params.get('projects'):
+        project_args = params.get('projects')
     else:
         if os.getcwd() == wt_root:
             no_project_args_on_root(toc.worktree)
@@ -131,8 +136,9 @@ def deps_from_args(toc, args):
     # from cwd
     projects = [parse_project_arg(toc, x) for x in project_args]
     toc.active_projects = [x.name for x in projects]
-    deps = get_deps(toc, projects, single=args.single,
-                    runtime=args.runtime, build_deps=args.build_deps)
+    deps = get_deps(toc, projects, single=params.get('single'),
+                    runtime=params.get('runtime'),
+                    build_deps=params.get('build_deps'))
     return deps
 
 
