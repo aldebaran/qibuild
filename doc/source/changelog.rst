@@ -6,6 +6,9 @@ Changelog
 Upcoming release
 ----------------
 
+V2.1
+----
+
 Command line
 ++++++++++++
 
