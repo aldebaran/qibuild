@@ -65,3 +65,25 @@ For instance
 
 Here runtime dependencies are ``foo,`` ``bar`` and ``spam``, and buildtime dependencies are just
 ``foo`` and ``bar``.
+
+translate node
+--------------
+
+This is the configuration for adding translations to your source code.
+This configuration is used by ``qilinguist`` to generate translation file
+ and install rules.
+
+
+The file will look like:
+
+.. code-block:: xml
+
+<project name="hello">
+  <translate domain="hello" linguas="fr_FR en_US" tr="gettext" />
+</project>
+
+Tags definitions:
+
+  * **domain**: The name of the generated dictionary.
+  * **linguas**: A list of all locales supported.
+  * **tr**: Defined if you use gettext or QT internationalization (value can be: "gettext" or "qt").
