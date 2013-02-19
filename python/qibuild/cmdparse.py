@@ -114,7 +114,7 @@ def deps_from_args(toc, args):
     """
     try:
         params = vars(args)
-    except ValueError:
+    except TypeError, ValueError:
         # maybe args is already a dict:
         params = args.copy()
     wt_root = toc.worktree.root
