@@ -5,6 +5,7 @@
  */
 
 #include <iostream>
+#include <locale>
 #ifdef WITH_INTL
   #include <libintl.h>
   #define _(string) gettext(string)
@@ -14,7 +15,6 @@
   #define textdomain(a)
 #endif
 
-#include <locale>
 
 int main(int argc, char *argv[])
 {
