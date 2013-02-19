@@ -39,22 +39,28 @@ function(qi_add_optional_package name)
   set(_desc "${ARGN}")
   string(TOUPPER "${name}" _U_name)
 
-  # if already set by user, do nothing:
   if(DEFINED "WITH_${_U_name}")
-    return()
-  endif()
-
-  option("WITH_${_U_name}" "${_desc}" OFF)
-
-  # else, set the value of the option using the
-  # result of find_package
-
-  find_package("${_U_name}" QUIET)
-
-  if(${_U_name}_PACKAGE_FOUND)
-    set("WITH_${_U_name}" ON CACHE BOOL "${_desc}" FORCE)
+    # this can happen if the flag has been set by user, or
+    # if we are coming from  `cmake ..`
+    if(WITH_${_U_name})
+      # re-find the package, in case the
+      # -config contains some macros:
+      find_package("${_U_name}" QUIET)
+    else()
+      # user forced WITH_* to OFF:
+      return()
+    endif()
   else()
-    set("WITH_${_U_name}" OFF CACHE BOOL "${_desc}" FORCE)
+    message(STATUS "looking for ${_U_name} for the first time")
+    # call option() with the correct default value.
+    # note that this will automatically set the WITH_* variable
+    # in the cache
+    find_package("${_U_name}")
+    if(${_U_name}_PACKAGE_FOUND)
+      option("WITH_${_U_name}" "${_desc}" ON)
+    else()
+      option("WITH_${_U_name}" "${_desc}" OFF)
+    endif()
   endif()
 endfunction()
 
