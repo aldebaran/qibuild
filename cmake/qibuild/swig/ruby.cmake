@@ -18,6 +18,7 @@ include(UseSWIG)
 #   %module Foo
 ##############
 function(qi_wrap_ruby module_name interface_file)
+  message(STATUS "Swig/ruby: ${module_name}")
 
   ##
   # Parse args:

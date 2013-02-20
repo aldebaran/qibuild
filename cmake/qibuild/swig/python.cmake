@@ -25,6 +25,7 @@ include(CMakeParseArguments)
 # \group:DEPENDS The list of dependencies
 #
 function(qi_swig_wrap_python module_name interface_file)
+  message(STATUS "Swig/python: ${module_name}")
   cmake_parse_arguments(ARG "" "" "SRC;DEPENDS" ${ARGN})
   set(_srcs ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
 

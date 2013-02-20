@@ -22,6 +22,7 @@
 #
 function(qi_swig_wrap_java name interface_file)
   cmake_parse_arguments(ARG "CPP" "PACKAGE" "SRC;DEPENDS" ${ARGN})
+  message(STATUS "Swig/java: ${module_name}")
 
   find_package(Java REQUIRED QUIET)
   find_package(JNI REQUIRED)
