@@ -25,6 +25,11 @@ function(boost_flib _libname)
   find_package(Boost COMPONENTS "${_libname}" QUIET)
 
   qi_set_global(${_prefix}_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
-  qi_set_global(${_prefix}_LIBRARIES    ${Boost_LIBRARIES})
+  # Some boost libraries are only header
+  if(${Boost_LIBRARIES})
+    qi_set_global(${_prefix}_LIBRARIES    ${Boost_LIBRARIES})
+  else()
+    qi_set_global(${_prefix}_LIBRARIES    "")
+  endif()
   export_lib(${_prefix})
 endfunction()
