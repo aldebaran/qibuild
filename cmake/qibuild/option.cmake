@@ -51,11 +51,10 @@ function(qi_add_optional_package name)
       return()
     endif()
   else()
-    message(STATUS "looking for ${_U_name} for the first time")
     # call option() with the correct default value.
     # note that this will automatically set the WITH_* variable
     # in the cache
-    find_package("${_U_name}")
+    find_package("${_U_name}" QUIET)
     if(${_U_name}_PACKAGE_FOUND)
       option("WITH_${_U_name}" "${_desc}" ON)
     else()
