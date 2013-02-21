@@ -19,7 +19,7 @@ def test_simple(tmpdir):
     bar_url = create_git_repo(tmpdir.strpath, "bar")
     worktree = create_worktree(tmpdir)
     clone_project(worktree, bar_url)
-    git_projects = qisrc.git.get_git_projects(worktree)
+    git_projects = qisrc.git.get_git_projects(worktree.projects)
     assert len(git_projects) == 1
     assert git_projects[0].src == "bar"
 
@@ -42,7 +42,7 @@ def test_path_already_exists(tmpdir):
         clone_project(worktree, bar_url)
     assert "already exists" in str(e.value)
     clone_project(worktree, bar_url, src="baz")
-    assert qisrc.git.get_git_projects(worktree)[0].src == "baz"
+    assert qisrc.git.get_git_projects(worktree.projects)[0].src == "baz"
 
 def test_init_submodules(tmpdir):
     foo_url = create_git_repo_with_submodules(tmpdir.strpath)

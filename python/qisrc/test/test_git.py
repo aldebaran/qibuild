@@ -539,5 +539,5 @@ def test_add_git_project(tmpdir, worktree):
     foo_dir = tmpdir.join("work").mkdir("foo").strpath
     git = qisrc.git.Git(foo_dir).init()
     wt = qisys.worktree.open_worktree(tmpdir.join("work").strpath)
-    assert len(qisrc.git.get_git_projects(wt)) == 1
+    assert len(qisrc.git.get_git_projects(wt.projects)) == 1
     assert worktree.get_project("foo").src == "foo"

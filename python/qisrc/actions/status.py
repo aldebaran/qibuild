@@ -29,7 +29,7 @@ def do(args):
     """Main method."""
     qiwt = qisys.worktree.open_worktree(args.worktree)
 
-    git_projects = qisrc.git.get_git_projects(qiwt)
+    git_projects = qisrc.git.get_git_projects(qiwt.projects)
     manifests = qiwt.get_manifest_projects()
     git_projects = list(set(git_projects) - set(manifests))
 

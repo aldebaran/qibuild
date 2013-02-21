@@ -25,7 +25,7 @@ def do(args):
     qiwt = qisys.worktree.open_worktree(args.worktree)
     errors = list()
     ui.info(ui.green, "Running `%s` on every project" % " ".join(args.command))
-    git_projects = qisrc.git.get_git_projects(qiwt)
+    git_projects = qisrc.git.get_git_projects(qiwt.projects)
     count = len(git_projects)
     for i, project in enumerate(git_projects, start=1):
         command = args.command[:]

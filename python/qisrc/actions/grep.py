@@ -42,7 +42,7 @@ def do(args):
     git_grep_opts.append(args.pattern)
 
     retcode = 0
-    for project in qisrc.git.get_git_projects(qiwt):
+    for project in qisrc.git.get_git_projects(qiwt.projects):
         ui.info(ui.green, "Looking in", project.src, "...")
         git = qisrc.git.Git(project.path)
         (status, out) = git.call("grep", *git_grep_opts, raises=False)

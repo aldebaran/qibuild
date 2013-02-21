@@ -471,7 +471,7 @@ def is_git(path):
     """Return true if path is in a git work-tree."""
     return get_repo_root(path) == path
 
-def get_git_projects(worktree):
+def get_git_projects(projects):
     """Return projects wich are git projects."""
-    git_projects = [p for p in worktree.projects if is_git(p.path)]
+    git_projects = [p for p in projects if is_git(p.path)]
     return git_projects
