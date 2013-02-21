@@ -320,7 +320,7 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
         ui.info(ui.green, "List of tests for", project.name)
         for (test_name, _, _) in tests:
             ui.info(ui.green, " * ", ui.reset, test_name)
-        return
+        return True
 
     if 1 < num_jobs:
         global _MULTIPLE_JOBS
