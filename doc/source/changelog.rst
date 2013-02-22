@@ -3,9 +3,6 @@
 Changelog
 =========
 
-Upcoming release
-----------------
-
 V2.1
 ----
 
