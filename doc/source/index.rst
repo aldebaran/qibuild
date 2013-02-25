@@ -1,10 +1,8 @@
 .. toctree::
   :hidden:
 
-  getting_started
-  qibuild_in_five_minutes
+  tutos/index
   ref/index
-  guide/index
   contrib/index
   design/index
   other/index
@@ -40,22 +38,6 @@ qiBuild is composed of two parts:
 * the qibuild/qitoolchain command line tools, that helps build projects while
   taking dependencies into account and generate re-distributable binary
   packages
-
-
-Getting started with qiBuild
-----------------------------
-
-First, please follow the tutorial in the :ref:`qibuild-getting-started` section.
-
-You can now read the :ref:`qibuild-in-five-minutes` section if you want to dig
-in right now.
-
-qiBuild programming guide
---------------------------
-
-
-Please follow the :ref:`qibuild-guide` for a more progressive, comprehensive course.
-
 
 References
 ----------
