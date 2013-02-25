@@ -2,13 +2,13 @@ import os
 
 import xml.etree.ElementTree as etree
 
-import qisys.xml_parser
+import qisys.qixml
 
 from qisys import ui
 
-class Groups(qisys.xml_parser.RootXMLParser):
+class Groups(qisys.qixml.RootXMLParser):
     def __init__(self, root):
-        qisys.xml_parser.RootXMLParser.__init__(self, root)
+        super(Groups, self).__init__(root)
         self.groups = dict()
 
     def _parse_group(self, element):
@@ -36,9 +36,9 @@ class Groups(qisys.xml_parser.RootXMLParser):
 
         return projects
 
-class Group(qisys.xml_parser.RootXMLParser):
+class Group(qisys.qixml.RootXMLParser):
     def __init__(self, root, name):
-        qisys.xml_parser.RootXMLParser.__init__(self, root)
+        super(Group, self).__init__(root)
         self.name = name
         self.subgroups = list()
         self.projects = list()

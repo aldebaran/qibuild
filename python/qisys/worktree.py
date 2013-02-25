@@ -14,7 +14,6 @@ from qisys import ui
 import qisys.sh
 import qisys.qixml
 from qisys.qixml import etree
-import qisys.xml_parser
 
 LOGGER = qisys.log.get_logger("WorkTree")
 
@@ -293,9 +292,9 @@ def git_project_path_from_cwd(cwd=None):
         cwd = os.getcwd()
     return qisrc.git.get_repo_root(cwd)
 
-class Project(qisys.xml_parser.RootXMLParser):
+class Project(qisys.qixml.RootXMLParser):
     def __init__(self, worktree, src=None, xml_elem=None):
-        qisys.xml_parser.RootXMLParser.__init__(self, xml_elem)
+        super(Project, self).__init__(xml_elem)
         self.worktree = worktree
         self.src = src
         self.git_project = None

@@ -12,8 +12,6 @@ import posixpath
 import qisys.sh
 import qisys.qixml
 
-import qisys.xml_parser
-
 class NoManifest(Exception):
     def __init__(self, worktree):
         self.worktree = worktree
@@ -44,7 +42,7 @@ def merge_projects(manifest):
         merge_projects(sub_manifest)
         manifest.projects.extend(sub_manifest.projects)
 
-class Manifest(qisys.xml_parser.RootXMLParser):
+class Manifest(qisys.qixml.RootXMLParser):
     """ A class to represent the contents of a manifest XML
     file.
 
@@ -56,7 +54,7 @@ class Manifest(qisys.xml_parser.RootXMLParser):
         tree = qisys.qixml.read(xml_path)
         root = tree.getroot()
 
-        qisys.xml_parser.RootXMLParser.__init__(self, root)
+        super(Manifest, self).__init__(root)
 
         self.remotes = dict()
         self.projects = list()
@@ -120,10 +118,10 @@ no review url set.\
         raise Exception(mess)
     paths[project.path] = project.name
 
-class Project(qisys.xml_parser.RootXMLParser):
+class Project(qisys.qixml.RootXMLParser):
     """Wrapper for the <project> tag inside a manifest XML file."""
     def __init__(self, root):
-        qisys.xml_parser.RootXMLParser.__init__(self, root)
+        super(Project, self).__init__(root)
         self.name = None
         self.path = None
         self.review = False
@@ -145,10 +143,10 @@ class Project(qisys.xml_parser.RootXMLParser):
             (self.name, self.remote, self.fetch_url, self.review_url)
         return res
 
-class Remote(qisys.xml_parser.RootXMLParser):
+class Remote(qisys.qixml.RootXMLParser):
     """Wrapper for the <remote> tag inside a manifest XML file."""
     def __init__(self, root):
-        qisys.xml_parser.RootXMLParser.__init__(self, root)
+        super(Remote, self).__init__(root)
         self.name = "origin"
         self.fetch = None
         self.review = None
