@@ -7,7 +7,7 @@
   guide/index
   contrib/index
   design/index
-  other_build_frameworks
+  other/index
 
 
 .. _qibuild-documentation:
