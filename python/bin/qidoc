@@ -46,10 +46,7 @@ patch_sys_path()
 
 import qisys.script
 
-try:
-    import argparse
-except ImportError:
-    from qisys.external import argparse
+import argparse
 
 
 def main():

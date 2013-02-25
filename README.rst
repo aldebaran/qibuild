@@ -38,9 +38,6 @@ Else, get `pip <http://www.pip-installer.org>`_ and run::
 qiBuild contains work from
 ---------------------------
 
-* argparse http://pypi.python.org/pypi/argparse/
-  (licensed under Python software foundation license version 2)
-
 * cmake http://www.cmake.org/cmake/project/license.html (BSD)
 
 * gclient http://code.google.com/p/gclient/ (BSD)

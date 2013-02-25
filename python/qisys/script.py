@@ -8,16 +8,13 @@
 
 import os
 import sys
+import argparse
 import copy
 import operator
 
 from qisys import ui
 
 
-try:
-    import argparse
-except ImportError:
-    from qisys.external import argparse
 
 import qisys.command
 

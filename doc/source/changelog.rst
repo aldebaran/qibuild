@@ -6,6 +6,11 @@ Changelog
 V2.1
 ----
 
+General
+--------
+
+Remove compatibility with python 2.6
+
 Command line
 ++++++++++++
 

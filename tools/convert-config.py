@@ -27,10 +27,7 @@ def patch_sys_path():
 patch_sys_path()
 
 
-try:
-    import argparse
-except ImportError:
-    from qibuild.external import argparse
+import argparse
 
 import qisys.script
 import qibuild.config
