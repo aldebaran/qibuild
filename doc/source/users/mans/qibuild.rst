@@ -1,4 +1,4 @@
-.. _qibuild-man-page:
+.. _qibuild2-man-page:
 
 qibuild man page
 ================

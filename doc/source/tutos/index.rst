@@ -1,6 +1,8 @@
 .. toctree::
-  tutos/getting_started
-  tutos/qibuild_in_five_minutes
+  :hidden:
+
+  getting_started
+  qibuild_in_five_minutes
 
 .. _qibuild-documentation:
 

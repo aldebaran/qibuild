@@ -1,0 +1,55 @@
+{% extends "defindex.html" %}
+{% block bodyclass %}main-index{% endblock %}
+
+{% block body %}
+
+  <img class="bigimgtitle" src="{{ pathto('_static/index_naodoc.png', 1) }}" alt="NAO documentation" title="NAO documentation"/>
+
+  <div id="whatsnew">
+    <p>v{{ version }}</p>
+    <a class="biglink" href="{{ pathto("changelog") }}">Changelog</a><br/>
+  </div>
+
+  <table class="contentstable">
+    <tr>
+      <td width="50%">
+         <a class="bigimg" href="{{ pathto("users/index") }}" > <img class="bigimg" src="{{ pathto('_static/index_nao.png', 1) }}" alt="Users" title="Users"/> </a>  <div>
+          <ul>
+            <li><a class="biglink" href="{{ pathto("overview") }}" >Overview</a></li>
+            <li><a class="biglink" href="{{ pathto("tutos/index") }}" >Getting started</a></li>
+            <li><a class="biglink" href="{{ pathto("ref/manpages/qibuild") }}" >QiBuild</a></li>
+            <li><a class="biglink" href="{{ pathto("ref/manpages/qisrc") }}" >QiSrc</a></li>
+            <li><a class="biglink" href="{{ pathto("ref/manpages/qitoolchain") }}">QiToolchain</a></li>
+          </ul>
+        </div>
+      </td>
+
+      <td width="50%">
+        <a class="bigimg" href="{{ pathto("dev/index") }}" > <img class="bigimg" src="{{ pathto('_static/index_programming.png', 1) }}" alt="Projects Manager" title="Projects Manager"/> </a>   <div>
+        <div>
+        <ul>
+          <li><a class="biglink" href="{{ pathto("ref/cmake/api") }}" >CMake Usage</a></li>
+          <li><a class="biglink" href="{{ pathto("ref/cfg/index") }}" >Dive into configuration files</a></li>
+        </ul>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td width="50%">
+        <a class="bigimg" href="{{ pathto("software/index") }}" > <img class="bigimg" src="{{ pathto('_static/index_software.png', 1) }}" alt="Developpers" title="Developpers"/> </a>   <div>
+
+        <div>
+        <ul>
+          <li><a class="biglink" href="{{ pathto("contrib/index") }}" >Contributing</a></li>
+          <li><a class="biglink" href="{{ pathto("ref/python/index") }}" >Python API</a></li>
+          <li><a class="biglink" href="{{ pathto("design/index") }}" >Qibuild internals</a></li>
+        </ul>
+        </div>
+      </td>
+
+      <td width="50%"></td>
+    </tr>
+  </table>
+
+{% endblock %}
+
