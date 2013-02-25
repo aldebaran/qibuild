@@ -32,7 +32,10 @@ def git_url_join(remote, name):
 def load(manifest_xml):
     """Load a manifest XML file."""
     manifest = Manifest(manifest_xml)
-    manifest.parse()
+    parser = ManifestParser(manifest)
+    tree = qisys.qixml.read(manifest_xml)
+    root = tree.getroot()
+    parser.parse(root)
     merge_projects(manifest)
     return manifest
 
@@ -42,7 +45,7 @@ def merge_projects(manifest):
         merge_projects(sub_manifest)
         manifest.projects.extend(sub_manifest.projects)
 
-class Manifest(qisys.qixml.XMLParser):
+class Manifest(object):
     """ A class to represent the contents of a manifest XML
     file.
 
@@ -51,11 +54,6 @@ class Manifest(qisys.qixml.XMLParser):
     """
     def __init__(self, xml_path):
         self.xml_path = xml_path
-        tree = qisys.qixml.read(xml_path)
-        root = tree.getroot()
-
-        super(Manifest, self).__init__(root)
-
         self.remotes = dict()
         self.projects = list()
         self.sub_manifests = list()
@@ -63,31 +61,41 @@ class Manifest(qisys.qixml.XMLParser):
         # Used to track conflicts
         self._paths = dict()
 
+class ManifestParser(qisys.qixml.XMLParser):
+    def __init__(self, target):
+
+        super(ManifestParser, self).__init__(target)
+
     def _parse_remote(self, element):
-        remote = Remote(element)
-        remote.parse()
-        self.remotes[remote.name] = remote
+        remote = Remote()
+        parser = RemoteParser(remote)
+        parser.parse(element)
+        self.target.remotes[remote.name] = remote
 
     def _parse_project(self, element):
-        project = Project(element)
-        project.parse()
-        self.projects.append(project)
+        project = ManifestProject()
+        parser = ProjectParser(project)
+        parser.parse(element)
+        self.target.projects.append(project)
 
     def _parse_manifest(self, element):
         url = element.get("url")
         if not url:
             return
 
-        dirname = os.path.dirname(self.xml_path)
+        dirname = os.path.dirname(self.target.xml_path)
         submanifest_path = os.path.join(dirname, url)
 
         submanifest = Manifest(submanifest_path)
-        submanifest.parse()
-        self.sub_manifests.append(submanifest)
+        parser = ManifestParser(submanifest)
+        tree = qisys.qixml.read(submanifest_path)
+        root = tree.getroot()
+        parser.parse(root)
+        self.target.sub_manifests.append(submanifest)
 
     def _parse_epilogue(self):
-        for project in self.projects:
-            update_project(project, self.remotes, self._paths)
+        for project in self.target.projects:
+            update_project(project, self.target.remotes, self.target._paths)
 
 def update_project(project, remotes, paths):
     """ Update the project list, setting project.revision,
@@ -118,10 +126,9 @@ no review url set.\
         raise Exception(mess)
     paths[project.path] = project.name
 
-class Project(qisys.qixml.XMLParser):
-    """Wrapper for the <project> tag inside a manifest XML file."""
-    def __init__(self, root):
-        super(Project, self).__init__(root)
+
+class ManifestProject(object):
+    def __init__(self):
         self.name = None
         self.path = None
         self.review = False
@@ -130,30 +137,38 @@ class Project(qisys.qixml.XMLParser):
         # Set during manifest parsing
         self.fetch_url = None
         self.review_url = None
-
-    def _post_parse_attributes(self):
-        self.check_needed("name")
-        if not self.path:
-            self.path = self.name.replace(".git", "")
-        else:
-            self.path = posixpath.normpath(self.path)
-
     def __repr__(self):
         res = "<Project %s remote: %s fetch: %s review:%s>" % \
             (self.name, self.remote, self.fetch_url, self.review_url)
         return res
 
-class Remote(qisys.qixml.XMLParser):
-    """Wrapper for the <remote> tag inside a manifest XML file."""
-    def __init__(self, root):
-        super(Remote, self).__init__(root)
+class ProjectParser(qisys.qixml.XMLParser):
+    """Wrapper for the <project> tag inside a manifest XML file."""
+    def __init__(self, target):
+        super(ProjectParser, self).__init__(target)
+
+    def _post_parse_attributes(self):
+        self.check_needed("name", node_name="project")
+        if not self.target.path:
+            self.target.path = self.target.name.replace(".git", "")
+        else:
+            self.target.path = posixpath.normpath(self.target.path)
+
+class Remote(object):
+    def __init__(self):
         self.name = "origin"
         self.fetch = None
         self.review = None
         self.revision = "master"
 
+
+class RemoteParser(qisys.qixml.XMLParser):
+    """Wrapper for the <remote> tag inside a manifest XML file."""
+    def __init__(self, root):
+        super(RemoteParser, self).__init__(root)
+
     def _post_parse_attributes(self):
-        self.check_needed("fetch")
+        self.check_needed("fetch", node_name="remote")
 
     def __repr__(self):
         res = "<Remote %s fetch: %s on %s, review:%s>" % \

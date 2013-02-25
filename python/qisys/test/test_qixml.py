@@ -73,5 +73,28 @@ def test_parse_required_attr():
     tree = etree.fromstring("<foo bar=\"foo\" />")
     assert qisys.qixml.parse_required_attr(tree, "bar") == "foo"
 
+def test_xml_parser():
+    tree = etree.fromstring("""
+<foo
+    bar="baz"
+    spam="eggs"
+/>
+""")
+    class Foo:
+        def __init__(self):
+            self.bar = None
+            self.spam = None
+            self.quzz = 42
+
+    class FooParser(qisys.qixml.XMLParser):
+        def __init__(self, target):
+            super(FooParser, self).__init__(target)
 
 
+    foo = Foo()
+    foo_parser = FooParser(foo)
+    foo_parser.parse(tree)
+
+    assert foo.quzz == 42
+    assert foo.bar == "baz"
+    assert foo.spam == "eggs"

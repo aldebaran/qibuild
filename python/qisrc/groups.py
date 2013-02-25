@@ -6,16 +6,9 @@ import qisys.qixml
 
 from qisys import ui
 
-class Groups(qisys.qixml.XMLParser):
-    def __init__(self, root):
-        super(Groups, self).__init__(root)
+class Groups(object):
+    def __init__(self):
         self.groups = dict()
-
-    def _parse_group(self, element):
-        group_name = element.attrib['name']
-        group = Group(element, group_name)
-        group.parse()
-        self.groups[group.name] = group
 
     def projects(self, group_name):
         return self.subgroups_group(group_name)
@@ -36,18 +29,34 @@ class Groups(qisys.qixml.XMLParser):
 
         return projects
 
-class Group(qisys.qixml.XMLParser):
-    def __init__(self, root, name):
-        super(Group, self).__init__(root)
+class GroupsParser(qisys.qixml.XMLParser):
+    def __init__(self, target):
+        super(GroupsParser, self).__init__(target)
+
+    def _parse_group(self, element):
+        group_name = element.attrib['name']
+        group = Group(group_name)
+        parser = GroupParser(group)
+        parser.parse(element)
+        self.target.groups[group.name] = group
+
+
+
+class Group(object):
+    def __init__(self, name):
         self.name = name
         self.subgroups = list()
         self.projects = list()
 
+class GroupParser(qisys.qixml.XMLParser):
+    def __init__(self, target):
+        super(GroupParser, self).__init__(target)
+
     def _parse_project(self, element):
-        self.projects.append(element.attrib['name'])
+        self.target.projects.append(element.attrib['name'])
 
     def _parse_group(self, element):
-        self.subgroups.append(element.attrib['name'])
+        self.target.subgroups.append(element.attrib['name'])
 
 def get_root(worktree):
     file = os.path.join(worktree.root, ".qi", "groups.xml")

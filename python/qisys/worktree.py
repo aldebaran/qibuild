@@ -118,8 +118,9 @@ class WorkTree:
         """ Parse .qi/worktree.xml, resolve subprojects. """
         projects_elem = self.xml_tree.findall("project")
         for project_elem in projects_elem:
-            project = Project(self, xml_elem=project_elem)
-            project.parse()
+            project = WorktreeProject(self)
+            parser = ProjectParser(project)
+            parser.parse(project_elem)
             project.parse_qiproject_xml()
             self.projects.append(project)
 
@@ -139,7 +140,7 @@ class WorkTree:
         for sub_project_src in project.subprojects:
             src = os.path.join(project.src, sub_project_src)
             src = qisys.sh.to_posix_path(src)
-            sub_project = Project(self, src=src)
+            sub_project = WorktreeProject(self, src=src)
             sub_project.parse_qiproject_xml()
             if project.git_project:
                 sub_project.git_project = project.git_project
@@ -181,9 +182,10 @@ class WorkTree:
             mess += "Current worktree: %s" % self.root
             raise Exception(mess)
 
-        project = Project(self, src=src)
+        project = WorktreeProject(self, src=src)
+        parser = ProjectParser(project)
         root_elem = self.xml_tree.getroot()
-        root_elem.append(project.xml_elem())
+        root_elem.append(parser.xml_elem())
         self.dump()
         self.load()
 
@@ -292,9 +294,8 @@ def git_project_path_from_cwd(cwd=None):
         cwd = os.getcwd()
     return qisrc.git.get_repo_root(cwd)
 
-class Project(qisys.qixml.XMLParser):
-    def __init__(self, worktree, src=None, xml_elem=None):
-        super(Project, self).__init__(xml_elem)
+class WorktreeProject(object):
+    def __init__(self, worktree, src=None):
         self.worktree = worktree
         self.src = src
         self.git_project = None
@@ -316,9 +317,6 @@ class Project(qisys.qixml.XMLParser):
         """Give the path to the qiproject.xml."""
         return os.path.join(self.path, "qiproject.xml")
 
-    def _post_parse_attributes(self):
-        self.check_needed("src")
-
     def parse_qiproject_xml(self):
         if not os.path.exists(self.qiproject_xml):
             return
@@ -327,23 +325,6 @@ class Project(qisys.qixml.XMLParser):
         for project_elem in project_elems:
             src = qisys.qixml.parse_required_attr(project_elem, "src", xml_path=self.qiproject_xml)
             self.subprojects.append(src)
-
-    def xml_elem(self):
-        res = etree.Element("project")
-        res.set("src", self.src)
-        if self.git_project:
-            res.set("git_project", self.git_project)
-        if self.manifest:
-            res.set("manifest", "true")
-        if self.review:
-            res.set("review", "true")
-        if self.profile:
-            res.set("profile", self.profile)
-        if self.remote:
-            res.set("remote", self.remote)
-        if self.branch:
-            res.set("branch", self.branch)
-        return res
 
     def is_git(self):
         git_dir = os.path.join(self.path, ".git")
@@ -360,6 +341,32 @@ class Project(qisys.qixml.XMLParser):
         res += "   is reviewed\n" if self.review else ""
         res += ">\n"
         return res
+
+class ProjectParser(qisys.qixml.XMLParser):
+    def __init__(self, target):
+        super(ProjectParser, self).__init__(target)
+
+
+    def _post_parse_attributes(self):
+        self.check_needed("src")
+
+    def xml_elem(self):
+        res = etree.Element("project")
+        res.set("src", self.target.src)
+        if self.target.git_project:
+            res.set("git_project", self.target.git_project)
+        if self.target.manifest:
+            res.set("manifest", "true")
+        if self.target.review:
+            res.set("review", "true")
+        if self.target.profile:
+            res.set("profile", self.target.profile)
+        if self.target.remote:
+            res.set("remote", self.target.remote)
+        if self.target.branch:
+            res.set("branch", self.target.branch)
+        return res
+
 
 def repr_list_projects(projects, name = "projects"):
     res = ""

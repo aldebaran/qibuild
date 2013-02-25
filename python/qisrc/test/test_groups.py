@@ -15,8 +15,9 @@ def test_parser():
 
     root = etree.fromstring(file)
 
-    groups = qisrc.groups.Groups(root)
-    groups.parse()
+    groups = qisrc.groups.Groups()
+    parser = qisrc.groups.GroupsParser(groups)
+    parser.parse(root)
 
     assert groups.projects('c') == list()
     assert set(groups.projects('d')) - set(['bar', 'foo']) == set()

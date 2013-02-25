@@ -178,25 +178,29 @@ class XMLParser(object):
 
     A parser class should not have an attribute with the name of an xml
     attribute unless it wants to grab them.
+
     """
 
-    def __init__(self, root):
+    def __init__(self, target):
         """ Initialize the XMLParser with a root element.
 
         :param root: The root element.
-        """
-        self._root, self.backtrace = root, []
 
-    def parse(self, root=None):
+        """
+        self.target = target
+        self._root = None
+        self.backtrace = list()
+
+    def parse(self, root):
         """ This function iterates on the children of the element (or the root if an
         element is not given) and call ``_parse_TAGNAME`` functions.
 
         :param root: The root element that should be parsed.
+
         """
-        if root is None:
-            root = self._root
-            self._parse_prologue()
-            self._parse_attributes()
+        self._root = root
+        self._parse_prologue()
+        self._parse_attributes()
         self.backtrace.append(root.tag)
         for child in root:
             method_name = "_parse_{tagname}".format(tagname = child.tag)
@@ -212,8 +216,7 @@ class XMLParser(object):
                 raise TypeError(mess)
             method(self, child)
         self.backtrace.pop()
-        if root is self._root:
-            self._parse_epilogue()
+        self._parse_epilogue()
 
     def _parse_unknown_element(self, element, err):
         """ This function will by default ignore unknown elements. You can overload
@@ -221,6 +224,7 @@ class XMLParser(object):
 
         :param element: The unknown element.
         :param err: The error message.
+
         """
         pass
 
@@ -244,13 +248,12 @@ class XMLParser(object):
 
         """
         for attr in self._root.attrib:
-            if hasattr(self, attr):
-                default_value = getattr(self, attr)
+            if hasattr(self.target, attr):
+                default_value = getattr(self.target, attr)
                 type_value = type(default_value)
-
                 new_value = self._get_value_for_type(type_value,
                         self._root.attrib[attr])
-                setattr(self, attr, new_value)
+                setattr(self.target, attr, new_value)
 
         self._post_parse_attributes()
 
@@ -274,11 +277,11 @@ class XMLParser(object):
 
     def check_needed(self, attribute_name, node_name=None, value=None):
         if node_name is None:
-            node_name = self.__class__.__name__.lower()
+            node_name = self.target.__class__.__name__.lower()
 
         if value is None:
-            if hasattr(self, attribute_name):
-                value = getattr(self, attribute_name)
+            if hasattr(self.target, attribute_name):
+                value = getattr(self.target, attribute_name)
 
         if value is None:
             mess = "Node '%s' must have a '%s' attribute." % (node_name,

@@ -22,7 +22,7 @@ def get_project(manifest, name):
 
 class ManifestTestCase(unittest.TestCase):
 
-    def test_parse(self):
+    def test_parse_no_projects(self):
         xml = """
 <manifest>
     <remote name="origin"
