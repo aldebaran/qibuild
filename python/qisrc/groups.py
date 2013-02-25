@@ -6,7 +6,7 @@ import qisys.qixml
 
 from qisys import ui
 
-class Groups(qisys.qixml.RootXMLParser):
+class Groups(qisys.qixml.XMLParser):
     def __init__(self, root):
         super(Groups, self).__init__(root)
         self.groups = dict()
@@ -36,7 +36,7 @@ class Groups(qisys.qixml.RootXMLParser):
 
         return projects
 
-class Group(qisys.qixml.RootXMLParser):
+class Group(qisys.qixml.XMLParser):
     def __init__(self, root, name):
         super(Group, self).__init__(root)
         self.name = name

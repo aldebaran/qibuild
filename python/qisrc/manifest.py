@@ -42,7 +42,7 @@ def merge_projects(manifest):
         merge_projects(sub_manifest)
         manifest.projects.extend(sub_manifest.projects)
 
-class Manifest(qisys.qixml.RootXMLParser):
+class Manifest(qisys.qixml.XMLParser):
     """ A class to represent the contents of a manifest XML
     file.
 
@@ -118,7 +118,7 @@ no review url set.\
         raise Exception(mess)
     paths[project.path] = project.name
 
-class Project(qisys.qixml.RootXMLParser):
+class Project(qisys.qixml.XMLParser):
     """Wrapper for the <project> tag inside a manifest XML file."""
     def __init__(self, root):
         super(Project, self).__init__(root)
@@ -143,7 +143,7 @@ class Project(qisys.qixml.RootXMLParser):
             (self.name, self.remote, self.fetch_url, self.review_url)
         return res
 
-class Remote(qisys.qixml.RootXMLParser):
+class Remote(qisys.qixml.XMLParser):
     """Wrapper for the <remote> tag inside a manifest XML file."""
     def __init__(self, root):
         super(Remote, self).__init__(root)

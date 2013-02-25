@@ -140,20 +140,22 @@ def write(xml_obj, output):
     tree.write(output)
 
 
-class RootXMLParser(object):
-    """
-    This class provides an easy interface to parse XML tags element by element.
+class XMLParser(object):
+    """ This class provides an easy interface to parse XML tags element by element.
     To work with it, you must inherit from this class and define methods on tags
     you want to parse.
 
-    Example XML:
+    Example:
+
+    .. code-block:: xml
+
         <foo>
-            <bar attr1="fooooooo">Some content!</bar>
-            <easy><win>Yes!</win></easy>
-            <win>Nooooooooooooooooooooooooooooooooo!</win>
+          <bar attr1="fooooooo">Some content!</bar>
+          <easy><win>Yes!</win></easy>
+          <win>Nooooooooooooooooooooooooooooooooo!</win>
         </foo>
 
-    Root of the XML is foo. When :func:`RootXMLParser.parse` is called, it
+    Root of the XML is foo. When :func:`XMLParser.parse` is called, it
     will try to call ``_parse_TAGNAME`` where tag name is the actual name of the
     tag you want to parse. It takes the element as a parameter.
 
@@ -161,7 +163,7 @@ class RootXMLParser(object):
     sub-trees. You always have :member:`backtrace` to know from where you came
     in ``_parse_TAGNAME``. Here is a complete example of a usage on XML above:
 
-    class Foo(RootXMLParser):
+    class Foo(XMLParser):
         def _parse_bar(self, element):
             print 'Attribute attr1:', element.attrib['attr1']
             print 'Content:', element.text
@@ -179,15 +181,14 @@ class RootXMLParser(object):
     """
 
     def __init__(self, root):
-        """Initialize the RootXMLParser with a root element.
+        """ Initialize the XMLParser with a root element.
 
         :param root: The root element.
         """
         self._root, self.backtrace = root, []
 
     def parse(self, root=None):
-        """
-        This function iterates on the childs of the element (or the root if an
+        """ This function iterates on the children of the element (or the root if an
         element is not given) and call ``_parse_TAGNAME`` functions.
 
         :param root: The root element that should be parsed.
@@ -215,8 +216,7 @@ class RootXMLParser(object):
             self._parse_epilogue()
 
     def _parse_unknown_element(self, element, err):
-        """
-        This function will by default ignore unknown elements. You can overload
+        """ This function will by default ignore unknown elements. You can overload
         it to change its behavior.
 
         :param element: The unknown element.
@@ -225,23 +225,23 @@ class RootXMLParser(object):
         pass
 
     def _parse_prologue(self):
-        """
-        You can overload this function to do something before the beginning of
+        """ You can overload this function to do something before the beginning of
         parsing of the file.
+
         """
         pass
 
     def _parse_epilogue(self):
-        """
-        You can overload this function to do something after the end of the
+        """ You can overload this function to do something after the end of the
         parsing of the file.
+
         """
         pass
 
     def _parse_attributes(self):
-        """
-        You can overload this function to get attribute of root before parsing
-        his children. Attributes will be a dictionnary.
+        """ You can overload this function to get attribute of root before parsing
+        its children. Attributes will be a dictionnary.
+
         """
         for attr in self._root.attrib:
             if hasattr(self, attr):
@@ -255,9 +255,9 @@ class RootXMLParser(object):
         self._post_parse_attributes()
 
     def _post_parse_attributes(self):
-        """
-        You can overload this function to add post treatment to parsing of
+        """ You can overload this function to add post treatment to parsing of
         attributes. Attributes will be a dictionnary.
+
         """
         pass
 

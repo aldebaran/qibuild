@@ -292,7 +292,7 @@ def git_project_path_from_cwd(cwd=None):
         cwd = os.getcwd()
     return qisrc.git.get_repo_root(cwd)
 
-class Project(qisys.qixml.RootXMLParser):
+class Project(qisys.qixml.XMLParser):
     def __init__(self, worktree, src=None, xml_elem=None):
         super(Project, self).__init__(xml_elem)
         self.worktree = worktree
