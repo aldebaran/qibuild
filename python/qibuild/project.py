@@ -25,7 +25,7 @@ import os
 
 from qisys import ui
 import qisys.sh
-import qixml
+import qisys.qixml
 
 import qibuild
 
@@ -349,7 +349,7 @@ def project_from_dir(toc, directory=None, raises=True):
             raise Exception(mess)
         else:
             return None
-    xml_elem = qixml.read(qiproj_xml)
+    xml_elem = qisys.qixml.read(qiproj_xml)
     project_name = xml_elem.getroot().get("name")
     if toc.get_project(project_name, raises=False):
         return project_name
@@ -414,13 +414,13 @@ def check_parent_project(toc, project_name, project_path):
     answer = qisys.interact.ask_yes_no(question, default=True)
     if answer:
         ui.info("Patching", parent_qiproj)
-        tree = qixml.read(parent_qiproj)
+        tree = qisys.qixml.read(parent_qiproj)
         child_src = os.path.relpath(project_path, parent_proj.path)
         child_src = qisys.sh.to_posix_path(child_src)
-        to_add = qixml.etree.Element("project")
+        to_add = qisys.qixml.etree.Element("project")
         to_add.set("src", child_src)
         tree.getroot().append(to_add)
-        qixml.write(tree, parent_qiproj)
+        qisys.qixml.write(tree, parent_qiproj)
         toc.projects = list()
         toc.worktree.load()
         toc.update_projects()

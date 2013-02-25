@@ -1,5 +1,5 @@
 import abc
-import qixml
+import qisys.qixml
 
 from qisys import ui
 
@@ -76,7 +76,7 @@ class Documentation:
         '''
         This function parses XML configuration for the documentation project.
         '''
-        self.name = qixml.parse_required_attr(element, "name")
+        self.name = qisys.qixml.parse_required_attr(element, "name")
         self.src = element.get("src", ".")
         self.dest = element.get("dest", self.name)
         depends_elements = element.findall("depends")

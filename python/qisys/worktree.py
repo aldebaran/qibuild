@@ -12,8 +12,8 @@ import operator
 
 from qisys import ui
 import qisys.sh
-import qixml
-from qixml import etree
+import qisys.qixml
+from qisys.qixml import etree
 import qisys.xml_parser
 
 LOGGER = qisys.log.get_logger("WorkTree")
@@ -49,7 +49,7 @@ class WorkTree:
             with open(self.worktree_xml, "w") as fp:
                 fp.write("<worktree />\n")
         if os.path.exists(self.worktree_xml):
-            self.xml_tree = qixml.read(self.worktree_xml)
+            self.xml_tree = qisys.qixml.read(self.worktree_xml)
             self.parse_projects()
 
         self.projects.sort(key=operator.attrgetter("src"))
@@ -113,7 +113,7 @@ class WorkTree:
     def dump(self):
         """ Dump self to the worktree.xml file. """
         qisys.sh.mkdir(self.dot_qi, recursive=True)
-        qixml.write(self.xml_tree, self.worktree_xml)
+        qisys.qixml.write(self.xml_tree, self.worktree_xml)
 
     def parse_projects(self):
         """ Parse .qi/worktree.xml, resolve subprojects. """
@@ -323,10 +323,10 @@ class Project(qisys.xml_parser.RootXMLParser):
     def parse_qiproject_xml(self):
         if not os.path.exists(self.qiproject_xml):
             return
-        tree = qixml.read(self.qiproject_xml)
+        tree = qisys.qixml.read(self.qiproject_xml)
         project_elems = tree.findall("project")
         for project_elem in project_elems:
-            src = qixml.parse_required_attr(project_elem, "src", xml_path=self.qiproject_xml)
+            src = qisys.qixml.parse_required_attr(project_elem, "src", xml_path=self.qiproject_xml)
             self.subprojects.append(src)
 
     def xml_elem(self):

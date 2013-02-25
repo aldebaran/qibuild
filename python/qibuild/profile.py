@@ -7,7 +7,7 @@
 
 """
 
-import qixml
+import qisys.qixml
 
 class Profile:
     """ A profile is just a set of CMake flags for now.
@@ -19,15 +19,15 @@ class Profile:
         self.cmake_flags = list()
 
     def elem(self):
-        elem = qixml.etree.Element("profile")
+        elem = qisys.qixml.etree.Element("profile")
         elem.set("name",  self.name)
         if self.cmake_flags:
-            cmake_elem = qixml.etree.Element("cmake")
-            flags_elem = qixml.etree.Element("flags")
+            cmake_elem = qisys.qixml.etree.Element("cmake")
+            flags_elem = qisys.qixml.etree.Element("flags")
             cmake_elem.append(flags_elem)
             for flag in self.cmake_flags:
                 (key, value) = flag.split("=")
-                flag_elem = qixml.etree.Element("flag")
+                flag_elem = qisys.qixml.etree.Element("flag")
                 flag_elem.set("name", key)
                 flag_elem.text = value
                 flags_elem.append(flag_elem)
@@ -46,11 +46,11 @@ def parse_profiles(xml_path):
     name -> Profile
     """
     res = dict()
-    tree = qixml.read(xml_path)
+    tree = qisys.qixml.read(xml_path)
     root = tree.getroot()
     profile_elems = root.findall("profiles/profile")
     for profile_elem in profile_elems:
-        profile_name = qixml.parse_required_attr(profile_elem, "name")
+        profile_name = qisys.qixml.parse_required_attr(profile_elem, "name")
         profile = Profile(profile_name)
         res[profile_name] = profile
         cmake_elem = profile_elem.find("cmake")
@@ -61,7 +61,7 @@ def parse_profiles(xml_path):
             continue
         flag_elems = flags_elem.findall("flag")
         for flag_elem in flag_elems:
-            key = qixml.parse_required_attr(flag_elem, "name")
+            key = qisys.qixml.parse_required_attr(flag_elem, "name")
             value = flag_elem.text.strip()
             to_add = "%s=%s" % (key, value)
             profile.cmake_flags.append(to_add)
@@ -71,11 +71,11 @@ def add_profile(xml_path, profile):
     """ Add a new profile to an XML file
 
     """
-    tree = qixml.read(xml_path)
+    tree = qisys.qixml.read(xml_path)
     root = tree.getroot()
     profiles = root.find("profiles")
     if profiles is None:
-        profiles = qixml.etree.Element("profiles")
+        profiles = qisys.qixml.etree.Element("profiles")
         root.append(profiles)
     profiles.append(profile.elem())
-    qixml.write(tree, xml_path)
+    qisys.qixml.write(tree, xml_path)

@@ -13,9 +13,9 @@ import operator
 from StringIO import StringIO
 
 import qibuild
-import qixml
+import qisys.qixml
 import qisys.interact
-from qixml import etree
+from qisys.qixml import etree
 from qisys import ui
 
 
@@ -69,7 +69,7 @@ class IDE:
     def parse(self, tree):
         name = tree.get("name")
         if not name:
-            qixml.raise_parse_error("ide node should have a name attribute",
+            qisys.qixml.raise_parse_error("ide node should have a name attribute",
                 tree=tree)
         self.name = name
         self.path = tree.get("path")
@@ -94,7 +94,7 @@ class Build:
         self.incredibuild = False
 
     def parse(self, tree):
-        self.incredibuild = qixml.parse_bool_attr(tree, "incredibuild")
+        self.incredibuild = qisys.qixml.parse_bool_attr(tree, "incredibuild")
 
     def tree(self):
         tree = etree.Element("build")
@@ -225,7 +225,7 @@ class Server:
     def parse(self, tree):
         name = tree.get("name")
         if not name:
-            qixml.raise_parse_error("server node should have a name attribute",
+            qisys.qixml.raise_parse_error("server node should have a name attribute",
                 tree=tree)
         self.name = name
         access_tree = tree.find("access")
@@ -351,7 +351,7 @@ class Config:
     def parse(self, tree):
         name = tree.get("name")
         if not name:
-            qixml.raise_parse_error("'config' node must have a 'name' attribute",
+            qisys.qixml.raise_parse_error("'config' node must have a 'name' attribute",
                 tree=tree)
         self.name = name
         self.ide = tree.get("ide")
@@ -488,7 +488,7 @@ class QiBuildConfig:
     def write_local_config(self, local_xml_path):
         """ Dump local settings to a xml file """
         local_tree = self.local.tree()
-        qixml.write(local_tree, local_xml_path)
+        qisys.qixml.write(local_tree, local_xml_path)
 
     def merge_configs(self):
         """ Merge various configs
@@ -645,7 +645,7 @@ class QiBuildConfig:
             server_tree = server.tree()
             qibuild_tree.append(server_tree)
 
-        qixml.write(qibuild_tree, xml_path)
+        qisys.qixml.write(qibuild_tree, xml_path)
 
     def __str__(self):
         res = ""
@@ -709,20 +709,20 @@ class ProjectConfig:
         # Read name
         root = self.tree.getroot()
         if root.tag != "project":
-            qixml.raise_parse_error("Root node must be 'project'",
+            qisys.qixml.raise_parse_error("Root node must be 'project'",
                 xml_path=cfg_path)
         name = root.get("name")
         if not name:
-            qixml.raise_parse_error("'project' node must have a 'name' attribute",
+            qisys.qixml.raise_parse_error("'project' node must have a 'name' attribute",
                 xml_path=cfg_path)
         self.name = name
 
         # Read depends:
         depends_trees = self.tree.findall("depends")
         for depends_tree in depends_trees:
-            buildtime = qixml.parse_bool_attr(depends_tree, "buildtime")
-            runtime   = qixml.parse_bool_attr(depends_tree, "runtime")
-            dep_names = qixml.parse_list_attr(depends_tree, "names")
+            buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
+            runtime   = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
+            dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
             if buildtime:
                 for dep_name in dep_names:
                     self.depends.add(dep_name)
@@ -763,7 +763,7 @@ class ProjectConfig:
             build_tree.set("names", " ".join(build_only))
             project_tree.append(build_tree)
 
-        qixml.write(self.tree, location)
+        qisys.qixml.write(self.tree, location)
 
     def __str__(self):
         res = ""
@@ -886,7 +886,7 @@ def convert_project_manifest(qibuild_manifest):
     ini_cfg.read(qibuild_manifest)
     p_names = ini_cfg.get("project", default=dict()).keys()
     if len(p_names) != 1:
-        qixml.raise_parse_error("File should countain exactly one [project] section",
+        qisys.qixml.raise_parse_error("File should countain exactly one [project] section",
             xml_path=qibuild_manifest)
     name = p_names[0]
     project = ProjectConfig()

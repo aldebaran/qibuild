@@ -10,7 +10,7 @@ import os
 import posixpath
 
 import qisys.sh
-import qixml
+import qisys.qixml
 
 import qisys.xml_parser
 
@@ -53,7 +53,7 @@ class Manifest(qisys.xml_parser.RootXMLParser):
     """
     def __init__(self, xml_path):
         self.xml_path = xml_path
-        tree = qixml.read(xml_path)
+        tree = qisys.qixml.read(xml_path)
         root = tree.getroot()
 
         qisys.xml_parser.RootXMLParser.__init__(self, root)

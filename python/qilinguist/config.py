@@ -5,7 +5,7 @@
 """Handling qilinguist config files."""
 
 import os
-import qixml
+import qisys.qixml
 from qisys import ui
 
 def parse_potfiles_in(prefix, file_path):
@@ -44,7 +44,7 @@ def get_domain_from_qiproject(project):
     """Get the textdomain for gettext.
     If no project or translate tag is found return str().
     If no domain is found in translate tag, <project_name> is return."""
-    xml_elem = qixml.read(project.qiproject_xml)
+    xml_elem = qisys.qixml.read(project.qiproject_xml)
     root = xml_elem.getroot()
     if root.tag != "project":
         ui.error("No tag project in qiproject.xml for project", project.src)
@@ -65,7 +65,7 @@ def get_locale_from_qiproject(project):
     """Get a list of supported locale.
     If no project or translate tag is found return list().
     If no locale is found in translate tag, ["en_US"] is return."""
-    xml_elem = qixml.read(project.qiproject_xml)
+    xml_elem = qisys.qixml.read(project.qiproject_xml)
     root = xml_elem.getroot()
     if root.tag != "project":
         ui.error("No tag project in qiproject.xml for project", project.src)
@@ -85,7 +85,7 @@ def get_locale_from_qiproject(project):
 def get_tr_framework(project):
     """Get tr framework.
     Return gettext if using gettext, qt if using qt, str() otherwise."""
-    xml_elem = qixml.read(project.qiproject_xml)
+    xml_elem = qisys.qixml.read(project.qiproject_xml)
     root = xml_elem.getroot()
     if root.tag != "project":
         ui.error("No tag project in qiproject.xml for project " + project.src)
