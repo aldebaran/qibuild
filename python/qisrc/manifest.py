@@ -161,6 +161,11 @@ class Remote(object):
         self.review = None
         self.revision = "master"
 
+    def __repr__(self):
+        res = "<Remote %s fetch: %s on %s, review:%s>" % \
+            (self.name, self.fetch, self.revision, self.review)
+        return res
+
 
 class RemoteParser(qisys.qixml.XMLParser):
     """Wrapper for the <remote> tag inside a manifest XML file."""
@@ -170,7 +175,3 @@ class RemoteParser(qisys.qixml.XMLParser):
     def _post_parse_attributes(self):
         self.check_needed("fetch", node_name="remote")
 
-    def __repr__(self):
-        res = "<Remote %s fetch: %s on %s, review:%s>" % \
-            (self.name, self.fetch, self.revision, self.review)
-        return res

@@ -69,6 +69,7 @@ def get_groups(worktree):
     root = get_root(worktree)
     if root is None:
         return None
-    groups = Groups(root)
-    groups.parse()
+    groups = Groups()
+    parser = GroupsParser(groups)
+    parser.parse(root)
     return groups
