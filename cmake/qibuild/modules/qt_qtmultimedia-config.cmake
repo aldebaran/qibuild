@@ -6,9 +6,9 @@ get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 include("${_ROOT_DIR}/qtutils.cmake")
 
 set(_suffix "QTMULTIMEDIA")
-set(_libame "QtMultimedia")
+set(_libname "QtMultimedia")
 
-qt_flib(${_suffix} ${_libame})
+qt_flib(${_suffix} ${_libname})
 set(_qtmultimedia_depends "QT_QTCORE;QT_QTGUI")
 if(UNIX AND NOT APPLE)
   list(APPEND _qtmultimedia_depends  "ALSALIB")

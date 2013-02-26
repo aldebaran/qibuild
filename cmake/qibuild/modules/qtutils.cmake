@@ -12,7 +12,7 @@
 
 include(qibuild/modules/qt-tools)
 
-function(qt_flib _suffix _libame)
+function(qt_flib _suffix _libname)
   if(QT_USE_QMAKE)
     # Use upstream cmake files
     find_package(Qt4 COMPONENTS ${_libname} REQUIRED)
@@ -27,22 +27,26 @@ function(qt_flib _suffix _libame)
       set(QT_${_suffix}_INCLUDE_DIRS FALSE PARENT_SCOPE)
       set(QT_${_suffix}_PACKAGE_FOUND FALSE PARENT_SCOPE)
     endif()
-    qi_persistent_append_uniq(QT_${_suffix}_LIBRARIES    "${QT_LIBRARIES}")
+    qi_persistent_set(QT_${_suffix}_LIBRARIES    "${QT_LIBRARIES}")
     set(QT_${_suffix}_LIBRARIES ${QT_${_suffix}_LIBRARIES} PARENT_SCOPE)
     return()
   endif()
 
 
-  flib(QT_${_suffix} OPTIMIZED NAMES "${_libame}" "${_libame}4"  PATH_SUFFIXES qt4)
-  flib(QT_${_suffix} DEBUG     NAMES "${_libame}" "${_libame}d4" PATH_SUFFIXES qt4)
+  if(UNIX)
+    flib(QT_${_suffix} NAMES "${_libname}" PATH_SUFFIXES qt4)
+  else()
+    flib(QT_${_suffix} OPTIMIZED NAMES  "${_libname}4"  PATH_SUFFIXES qt4)
+    flib(QT_${_suffix} DEBUG     NAMES  "${_libname}d4" PATH_SUFFIXES qt4)
+  endif()
 
   # we don't wand to find the headers in .Frameworks/Headers:
   set(_back ${CMAKE_FIND_FRAMEWORK})
   set(CMAKE_FIND_FRAMEWORK NEVER)
   #we want to be able to #include <QtLib>
-  fpath(QT_${_suffix} ${_libame} PATH_SUFFIXES qt4 )
+  fpath(QT_${_suffix} ${_libname} PATH_SUFFIXES qt4 )
 
   #we want to be able to #include <QtLib/QtLib>
-  fpath(QT_${_suffix} ${_libame} PATH_SUFFIXES ${_libame} qt4/${_libame})
+  fpath(QT_${_suffix} ${_libname} PATH_SUFFIXES ${_libname} qt4/${_libname})
   set(CMAKE_FIND_FRAMEWORK ${_back})
 endfunction()
