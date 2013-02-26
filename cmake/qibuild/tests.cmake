@@ -86,39 +86,6 @@ function(qi_create_gtest name)
     return()
   endif()
 
-  if(NOT DEFINED GTEST_PACKAGE_FOUND)
-    find_package(GTEST NO_MODULE)
-    if(NOT GTEST_PACKAGE_FOUND)
-      qi_set_global(GTEST_PACKAGE_FOUND FALSE)
-    endif()
-  endif()
-
-  if(NOT GTEST_PACKAGE_FOUND)
-    if(NOT QI_CREATE_GTEST_WARNED)
-      qi_info("GTest was not found:
-      qi_create_gtest will create no target
-      ")
-      qi_set_global(QI_CREATE_GTEST_WARNED TRUE)
-    endif()
-    qi_set_global(QI_${name}_TARGET_DISABLED TRUE)
-    return()
-  endif()
-
-  set(_using_qibuild_gtest TRUE)
-  # Make sure we are using the qibuild flavored gtest
-  # package:
-  find_package(gtest_main QUIET)
-  if(NOT GTEST_MAIN_PACKAGE_FOUND)
-    set(_using_qibuild_gtest FALSE)
-    if(NOT QI_GTEST_QIBUID_WARNED)
-      qi_info("Could not find qibuild flavored gtest. (not GTEST_MAIN package)
-      Please use a qibuild port of gtest or be ready to
-      experience weird link errors ...
-      ")
-      qi_set_global(QI_GTEST_QIBUID_WARNED TRUE)
-    endif()
-  endif()
-
   # create tests_results folder if it does not exist
   file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
   cmake_parse_arguments(ARG "NO_ADD_TEST;NIGHTLY" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
@@ -128,10 +95,7 @@ function(qi_create_gtest name)
 
   # First, create the target
   qi_create_bin(${name} SRC ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS} NO_INSTALL)
-  qi_use_lib(${name} GTEST ${ARG_DEPENDS})
-  if(${_using_qibuild_gtest})
-    qi_use_lib(${name} GTEST_MAIN)
-  endif()
+  qi_use_lib(${name} GTEST GTEST_MAIN ${ARG_DEPENDS})
 
   # Build a correct xml output name
   set(_xml_output "${_TESTS_RESULTS_FOLDER}/${name}.xml")
