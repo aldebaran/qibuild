@@ -5,11 +5,6 @@
 """ This package contains the qisrc actions """
 
 
-##
-# Backward compat layer for qisys
-
-from qisys import worktree
-from qisys.worktree import open_worktree
 
 import os
 QISRC_ROOT_DIR  = os.path.dirname(os.path.abspath(__file__))

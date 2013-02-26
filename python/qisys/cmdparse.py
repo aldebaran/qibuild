@@ -7,11 +7,7 @@ import qisys.worktree
 """Parsing of commands arguments."""
 
 def worktree_from_args(args):
-    if args.worktree:
-        root = args.worktree
-    else:
-        root = qisys.worktree.guess_worktree(raises=True)
-
-    worktree = qisys.worktree.open_worktree(args.worktree)
-
-    return worktree
+    print "worktree_from_args is deprecated"
+    print "use qisys.actions.get_worktree instead"
+    import qisys.actions
+    return qisys.actions.get_worktree(args)

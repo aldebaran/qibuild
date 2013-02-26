@@ -247,13 +247,7 @@ class XMLParser(object):
         its children. Attributes will be a dictionnary.
 
         """
-        for attr in self._root.attrib:
-            if hasattr(self.target, attr):
-                default_value = getattr(self.target, attr)
-                type_value = type(default_value)
-                new_value = self._get_value_for_type(type_value,
-                        self._root.attrib[attr])
-                setattr(self.target, attr, new_value)
+        apply_xml_attributes(self.target, self._root)
 
         self._post_parse_attributes()
 
@@ -263,17 +257,6 @@ class XMLParser(object):
 
         """
         pass
-
-    def _get_value_for_type(self, type_value, value):
-        if type_value == bool:
-            if value.lower() in ["true", "1"]:
-                return True
-            if value.lower() in ["false", "0"]:
-                return False
-            mess = "Waiting for a boolean but value is '%s'." % value
-            raise Exception(mess)
-
-        return value
 
     def check_needed(self, attribute_name, node_name=None, value=None):
         if node_name is None:
@@ -287,3 +270,29 @@ class XMLParser(object):
             mess = "Node '%s' must have a '%s' attribute." % (node_name,
                                                                attribute_name)
             raise Exception(mess)
+
+
+def apply_xml_attributes(target, elem):
+    """ For each attribute of the xml element,
+    set the attribute in the target if this one
+    already exists, while matching the type
+
+    """
+    for attr in elem.attrib:
+        if hasattr(target, attr):
+            default_value = getattr(target, attr)
+            type_value = type(default_value)
+            new_value = _get_value_for_type(type_value, elem.attrib[attr])
+            setattr(target, attr, new_value)
+
+
+def _get_value_for_type(type_value, value):
+    if type_value == bool:
+        if value.lower() in ["true", "1"]:
+            return True
+        if value.lower() in ["false", "0"]:
+            return False
+        mess = "Waiting for a boolean but value is '%s'." % value
+        raise Exception(mess)
+
+    return value

@@ -58,5 +58,7 @@ def do(args):
     qisrc.sync.init_worktree(worktree, manifest, setup_review=args.setup_review)
     sync_build_profiles(worktree, manifest_file)
     if not manifest_is_a_regular_file:
-        worktree.set_manifest_project(manifest_src, args.profile)
+        #worktree.set_manifest_project(manifest_src, args.profile)
+        # FIXME
+        pass
     return worktree

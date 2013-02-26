@@ -7,7 +7,7 @@
 import os
 
 from qisys import ui
-import qisys
+import qisys.worktree
 import qilinguist.qigettext
 import qilinguist.qtlinguist
 import qilinguist.config
@@ -122,7 +122,7 @@ def process_with_qt(project):
 
 def do(args):
   """Main entry point"""
-  worktree = qisrc.open_worktree(args.worktree)
+  worktree = qisys.worktree.open_worktree(args.worktree)
   projects = qisrc.cmdparse.projects_from_args(args, worktree)
   for project in projects:
       qiproject_path = project.qiproject_xml

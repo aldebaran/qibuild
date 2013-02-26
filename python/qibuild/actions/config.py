@@ -27,7 +27,7 @@ def do(args):
     toc = None
     try:
         toc = qibuild.toc.toc_open(args.worktree, args)
-    except qisys.worktree.NotInWorktree:
+    except qisys.worktree.NotInWorkTree:
         pass
 
     if args.wizard:

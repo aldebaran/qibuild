@@ -29,14 +29,14 @@ def do(args):
         worktree = qisys.worktree.open_worktree(args.worktree)
         toc = qibuild.toc.Toc(worktree)
         default_toc_name = toc.config.local.defaults.config
-    except qisys.worktree.NotInWorktree, e:
+    except qisys.worktree.NotInWorkTree, e:
         pass
     print "Known toolchains:"
     for tc_name in tc_names:
         print "* " if tc_name == default_toc_name else "  ", tc_name
     print
     if default_toc_name is not None:
-        ui.info("Worktree", ui.green, worktree.root, ui.reset, "is using",
+        ui.info("WorkTree", ui.green, worktree.root, ui.reset, "is using",
                 ui.blue, default_toc_name, ui.reset,
                 "as its default toolchain.")
     print "Use ``qitoolchain info <tc_name>`` for more info"
