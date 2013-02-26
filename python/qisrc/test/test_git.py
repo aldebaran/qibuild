@@ -9,6 +9,7 @@ import pytest
 
 import qisrc.git
 import qisys.sh
+import qisys.command
 
 from qisys.test.conftest import worktree
 
@@ -534,10 +535,11 @@ def test_get_ref_sha1(tmpdir):
     git.init()
     assert git.is_valid() == True
 
-def test_add_git_project(tmpdir, worktree):
+def test_add_git_project(worktree):
     worktree.add_project("foo")
-    foo_dir = tmpdir.join("work").mkdir("foo").strpath
+    foo_dir = os.path.join(worktree.root, "foo")
+    qisys.sh.mkdir(foo_dir)
     git = qisrc.git.Git(foo_dir).init()
-    wt = qisys.worktree.open_worktree(tmpdir.join("work").strpath)
+    wt = qisys.worktree.open_worktree(worktree.root)
     assert len(qisrc.git.get_git_projects(wt.projects)) == 1
     assert worktree.get_project("foo").src == "foo"

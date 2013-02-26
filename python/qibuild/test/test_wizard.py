@@ -15,7 +15,7 @@ import mock
 
 import qisys
 import qibuild.wizard
-from qibuild.test.test_interact import FakeInteract
+from qisys.test.fake_interact import FakeInteract
 
 
 class ConfigWizardTestCase(unittest.TestCase):
@@ -73,7 +73,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         for this test
 
         """
-        fake_interact = FakeInteract(answers)
+        fake_interact = FakeInteract()
+        fake_interact.answers = answers
         self.interact_patcher = mock.patch('qisys.interact', fake_interact)
         self.interact_patcher.start()
 

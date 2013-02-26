@@ -1,7 +1,5 @@
-import pytest
+import os
 
-def test_worktree(tmpdir, worktree):
-    assert worktree.root == str(tmpdir.join("work"))
+def test_worktree(worktree):
     assert len(worktree.projects) == 0
-    assert tmpdir.join("work").join(".qi").join("worktree.xml").check(file=1)
-
+    assert os.path.exists(worktree.qibuild_xml)

@@ -1,24 +1,33 @@
-## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
 
-import qisys.interact
-import mock
-
-class FakeInteract:
+class FakeInteract(object):
     """ A class to tests code depending on qisys.interact
 
     """
-    def __init__(self, answers):
+    def __init__(self):
         self.answers_type = None
         self.answer_index = -1
-        if type(answers) == type(dict()):
+        self._answers = None
+        self.questions = list()
+
+    @property
+    # pylint: disable-msg=E0202
+    def answers(self):
+        if self._answers is None:
+            raise Exception("FakeInteract non initialize")
+        return self._answers
+
+    # pylint: disable-msg=E1101
+    # pylint: disable-msg=E0202
+    @answers.setter
+    # pylint: disable-msg=E0102
+    def answers(self, value):
+        if type(value) == type(dict()):
             self.answers_type = "dict"
-        elif type(answers) == type(list()):
+        elif type(value) == type(list()):
             self.answers_type = "list"
         else:
-            raise Exception("Unknow answer type: " + type(answers))
-        self.answers = answers
+            raise Exception("Unknow answer type: " + type(value))
+        self._answers = value
 
     def find_answer(self, message, choices=None, default=None):
         keys = self.answers.keys()
@@ -76,45 +85,13 @@ class FakeInteract:
         return answer
 
     def _get_answer(self, message, choices=None, default=None):
+        question = dict()
+        question['message'] = message
+        question['choices'] = choices
+        question['default'] = default
+        self.questions.append(question)
         if self.answers_type == "dict":
             return self.find_answer(message, choices=choices, default=default)
         else:
             self.answer_index += 1
             return self.answers[self.answer_index]
-
-
-def test_fake_interat_list():
-    fake_interact = FakeInteract([False, "coffee!"])
-    with mock.patch('qisys.interact', fake_interact):
-        assert qisys.interact.ask_yes_no("tea?") is False
-        assert qisys.interact.ask_string("then what?") == "coffee!"
-
-def test_fake_interat_dict():
-    fake_interact = FakeInteract({"coffee" : "y", "tea" : "n"})
-    with mock.patch('qisys.interact', fake_interact):
-        assert qisys.interact.ask_yes_no("Do you like tea?") == "n"
-        assert qisys.interact.ask_yes_no("Do you like coffee?") == "y"
-
-
-def test_ask_yes_no():
-    """ Test that you can answer with several types of common answers """
-    with mock.patch('__builtin__.raw_input') as m:
-        m.side_effect = ["y", "yes", "Yes", "n", "no", "No"]
-        expected_res  = [True, True, True, False, False, False]
-        for res in expected_res:
-            actual = qisys.interact.ask_yes_no("coffee?")
-            assert actual == res
-
-def test_ask_yes_no_default():
-    """ Test that just pressing enter returns the default value """
-    with mock.patch('__builtin__.raw_input') as m:
-        m.side_effect = ["", ""]
-        assert qisys.interact.ask_yes_no("coffee?", default=True)  is True
-        assert qisys.interact.ask_yes_no("coffee?", default=False) is False
-
-def test_ask_yes_no_wrong_input():
-    """ Test that we keep asking when answer does not make sense """
-    with mock.patch('__builtin__.raw_input') as m:
-        m.side_effect = ["coffee!", "n"]
-        assert qisys.interact.ask_yes_no("tea?") is False
-        assert m.call_count == 2
