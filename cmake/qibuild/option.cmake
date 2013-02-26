@@ -61,6 +61,8 @@ function(qi_add_optional_package name)
     else()
       option("WITH_${_U_name}" "${_desc}" OFF)
     endif()
+    # re-set PACKAGE_FOUND to not break qi_use_lib
+    qi_set_global(${_U_name}_PACKAGE_FOUND FALSE)
   endif()
 endfunction()
 
