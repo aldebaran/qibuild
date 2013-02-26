@@ -36,6 +36,7 @@ class Git:
            * if raises is False, no exception will be raise if command
              fails, and a (retcode, output) tuple will be returned.
         """
+        ui.debug("git", " ".join(args))
         if not "cwd" in kwargs.keys():
             kwargs["cwd"] = self.repo
         if not "quiet" in kwargs.keys():
