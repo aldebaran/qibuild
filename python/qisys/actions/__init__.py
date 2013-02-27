@@ -4,6 +4,7 @@
 
 import os
 import qisys.worktree
+from qisys.parsers import WorkTreeProjectParser
 
 
 
@@ -19,8 +20,7 @@ def get_worktree(args):
         wt_root = qisys.worktree.guess_worktree(raises=True)
     return qisys.worktree.open_worktree(wt_root)
 
-def get_projects(args):
+def get_projects(worktree, args):
     """ Get a list of worktree projects from the command line """
-    res = list()
-    if not args.projects:
-
+    parser = WorkTreeProjectParser(worktree)
+    return parser.parse_args(args)
