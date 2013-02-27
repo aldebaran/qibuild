@@ -62,10 +62,14 @@ def do(args):
             raise Exception(mess)
 
     if tc_name in qitoolchain.get_tc_names():
-        ui.warning(tc_name, "already exists,",
-                   "removing previous toolchain and creating a new one")
         toolchain = qitoolchain.Toolchain(tc_name)
-        toolchain.remove()
+        if feed and toolchain.feed != feed:
+            ui.warning(tc_name, "already exists but points to a different feed,",
+                   "removing previous toolchain and creating a new one")
+            toolchain.remove()
+        else:
+            ui.info(tc_name, "already exists,",
+                   "updating without removing")
 
     toolchain = qitoolchain.Toolchain(tc_name)
     if feed:
