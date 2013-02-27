@@ -7,9 +7,10 @@
 """
 
 import os
-import unittest
+
 import py
 import pytest
+import mock
 
 import qisys.sh
 import qisys.worktree
@@ -39,8 +40,6 @@ def test_add_project(worktree):
     foo = worktree.get_project("foo")
     assert foo.src == "foo"
 
-def test_wt2(worktree):
-    pass
 
 def test_remove_project(worktree):
     # pylint: disable-msg=E1101
@@ -134,4 +133,10 @@ def test_check_not_in_git(tmpdir):
         qisys.worktree.open_worktree(b.strpath)
     assert "inside a git project" in e.value.message
 
+
+def test_observers_are_notified(worktree):
+    mock_observer = mock.Mock()
+    worktree.register(mock_observer)
+    foo_proj = worktree.create_project("foo")
+    assert mock_observer.on_project_added.called
 

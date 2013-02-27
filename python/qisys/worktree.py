@@ -6,6 +6,7 @@
 
 """
 
+import abc
 import os
 import ntpath
 import posixpath
@@ -42,11 +43,20 @@ class WorkTree(object):
         :param allow_nested: Allow nested worktrees.
 
         """
+        self._observers = list()
         self.root = root
         self.projects = list()
         self.load()
         if sanity_check:
             self.check()
+
+
+    def register(self, observer):
+        """ Called when an observer wants to be notified
+        about project changes
+
+        """
+        self._observers.append(observer)
 
     def load(self):
         """ Load the worktree.xml file. """
@@ -205,6 +215,8 @@ worktree root: {1}
         root_elem.append(parser.xml_elem())
         self.dump()
         self.load()
+        for observer in self._observers:
+            observer.on_project_added(project)
         return project
 
     def remove_project(self, src, from_disk=False):
@@ -226,8 +238,11 @@ worktree root: {1}
                     to_remove = self.get_project(src).path
                     qisys.sh.rm(to_remove)
                 root_elem.remove(project_elem)
+        project = self.get_project(src)
         self.dump()
         self.load()
+        for observer in self._observers:
+            observer.on_project_removed(project)
 
     def normalize_path(self, path):
         """ Make sure the path is a POSIX path, relative to
@@ -355,3 +370,23 @@ def guess_worktree(cwd=None, raises=False):
         raise NotInWorkTree()
     else:
         return None
+
+class WorkTreeObserver():
+    """ To be subclasses for objects willing to be
+    notified when a prroject is added or removed from
+    the worktree
+
+    """
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def on_project_added(self, project):
+        """ Called when a project has been added to the worktree
+        """
+        pass
+
+    @abc.abstractmethod
+    def on_project_removed(self, project):
+        """ Called when a project has been removed from the worktree
+        """
+        pass
