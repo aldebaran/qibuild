@@ -9,7 +9,7 @@ import sys
 
 from qisys import ui
 import qisys
-import qisrc
+import qisrc.parsers
 import qisrc.status
 
 
@@ -25,12 +25,11 @@ def configure_parser(parser):
         dest="show_branch",
         action="store_true",
         help="display branch and tracking branch for each repository")
-    parser.set_defaults(all=True)
 
 def do(args):
     """Main method."""
-    git_worktree = qisrc.actions.get_git_worktree(args)
-    git_projects = qisrc.actions.get_git_projects(git_worktree, args)
+    git_worktree = qisrc.parsers.get_git_worktree(args)
+    git_projects = qisrc.parsers.get_git_projects(git_worktree, args)
 
     num_projs = len(git_projects)
     max_len = max([len(p.src) for p in git_projects])

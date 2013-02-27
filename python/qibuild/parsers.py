@@ -61,3 +61,49 @@ def project_parser(parser, positional=True):
         help="Work on specified projects by using only the runtime deps. "
              "Mostly used by qibuild install --runtime")
     parser.set_defaults(build_deps=False)
+
+def get_build_worktree(args):
+    """ Get a build worktree to use """
+    worktree = qisys.parsers.get_worktree(args)
+    build_worktree = qibuild.worktree.BuildWorkTree(worktree)
+    return build_worktree
+
+def get_build_projects(build_worktree, args):
+    """ Get a list of build projects to use """
+    parser = BuildProjectParser(build_worktree)
+    return parser.parse_args(args)
+
+
+##
+# Implementation details
+
+class BuildProjectParser(qisys.parsers.AbstractProjectParser):
+    """ Implements AbstractProjectParser for a BuildWorkTree """
+
+    def __init__(self, build_worktree):
+        self.build_worktree = build_worktree
+
+    def all_projects(self):
+        return self.build_worktree.projects
+
+    def parse_no_args(self):
+        """ Try to find the closest worktree project that
+        mathes the current directory
+
+        """
+        # look for a couple CMakeLists.txt, qiproject.xml in the
+        # parent dirs:
+
+        # auto-add
+
+    def parse_one_arg(self, arg):
+        """ Accept both an absolute path matching a worktree project,
+        or a project src
+
+        """
+        project = self.build_worktree.get_build_project(arg, raises=True)
+        if args.single:
+            return [project]
+        deps = self.build_worktree.get_deps(project, runtime=args.runtime,
+                                            build_beps_only=args.build_deps_only)
+        return deps

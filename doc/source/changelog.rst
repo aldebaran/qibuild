@@ -356,7 +356,7 @@ Command line
 * ``qibuild help``: sort available actions by name
 * ``qibuild test``: small bug fix for ``--test-name``
 * ``qibuild config --wizard``: fix unsetting build dir or sdk dir
-* ``qibuid config --wizard:``: fix generator discovery for cmake 2.8.6 under windows
+* ``qibuild config --wizard:``: fix generator discovery for cmake 2.8.6 under windows
 * ``qibuild configure``: nicer error message when cmake segfaults
 * ``qibuild configure``: learned ``--debug-trycompile`` option
 * ``qibuild package`` : learned ``--include-deps`` option

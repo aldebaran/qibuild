@@ -132,7 +132,7 @@ Excerpt:
             # Reading the default config name, merging the default and global
             # config file, and getting the default config to use from the config
             # files is done by the qibuild.config.QiBuildConfig class
-            self.config = qibuid.config.QiBuildConfig(config)
+            self.config = qibuild.config.QiBuildConfig(config)
             self.active_config = self.config.active_config
 
             # Set cmake generator if user has not set it in Toc ctor:

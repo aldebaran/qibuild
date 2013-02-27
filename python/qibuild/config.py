@@ -556,7 +556,7 @@ class QiBuildConfig:
 
     def set_default_editor(self, editor):
         """ Set a new editor to use by default
-        (Useful for qibuid config --edit)
+        (Useful for qibuild config --edit)
 
         """
         self.defaults.editor = editor

@@ -2,6 +2,20 @@ import os
 
 import qisys.worktree
 
+class NotInAGitRepo(Exception):
+    """ Custom exception when user did not
+    specify any git repo ond the command line
+    and we did not manage to guess one frome the
+    working dir
+
+    """
+    def __str__(self):
+        return """ Could not guess git repository from current working directory
+  Here is what you can do :
+     - try from a valid git repository
+     - specify a repository path on the command line
+"""
+
 class GitWorkTree(qisys.worktree.WorkTree):
     """ Stores a list of git projects """
     def __init__(self, worktree):
@@ -36,12 +50,12 @@ class GitWorkTree(qisys.worktree.WorkTree):
             git_projects.append(git_project)
         return git_projects
 
-    def get_git_project(self, src, auto_add=False):
+    def get_git_project(self, path, raises=False, auto_add=False):
         """ Get a git project by its sources """
-        worktree_project  = self.worktee.get_project(src, raises=False)
-        # find the closest git project
+        src = self.worktree.normalize_path(path)
         for git_project in self.git_projects:
-            if src in
+            if git_project.src == src:
+                return git_project
 
     @property
     def git_xml(self):
@@ -50,6 +64,9 @@ class GitWorkTree(qisys.worktree.WorkTree):
             with open(git_xml_path, "w") as fp:
                 fp.write("""<git />""")
         return git_xml_path
+
+    def __repr__(self):
+        return "<GitWorkTree in %s>" % self.root
 
 
 class GitProject(qisys.worktree.WorkTreeProject):

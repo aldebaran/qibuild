@@ -62,6 +62,27 @@ def project_parser(parser, positional=True, short=True):
     return group
 
 
+def get_worktree(args):
+    """ Get a worktree right after argument parsing.
+
+    If --worktree was not given, try to guess it from
+    the current working directory
+
+    """
+    wt_root = args.worktree
+    if not wt_root:
+        wt_root = qisys.worktree.guess_worktree(raises=True)
+    return qisys.worktree.open_worktree(wt_root)
+
+def get_projects(worktree, args):
+    """ Get a list of worktree projects from the command line """
+    parser = WorkTreeProjectParser(worktree)
+    return parser.parse_args(args)
+
+
+##
+# Implemation details
+
 class AbstractProjectParser:
     """ Helper for get_projects() methods """
     __metaclass__ = abc.ABCMeta
@@ -107,7 +128,8 @@ class WorkTreeProjectParser(AbstractProjectParser):
         mathes the current directory
 
         """
-        parent_project = self._find_parent_project(os.getcwd())
+        parent_project = find_parent_project(self.worktree.projects,
+                                              os.getcwd())
         if parent_project:
             return [parent_project]
 
@@ -128,10 +150,10 @@ class WorkTreeProjectParser(AbstractProjectParser):
         return [project]
 
 
-    def _find_parent_project(self, path):
-        """ Find the parent project of a given path """
-        projects = self.worktree.projects[:]
-        projects.reverse()
-        for project in projects:
-            if qisys.sh.is_path_inside(path, project.path):
-                return project
+def find_parent_project(projects, path):
+    """ Find the parent project of a given path """
+    projs = projects[:]
+    projs.reverse()
+    for project in projs:
+        if qisys.sh.is_path_inside(path, project.path):
+            return project
