@@ -62,7 +62,7 @@ def fetch_load_manifest(worktree, manifest_git_url, branch="master",
 
 def init_worktree(worktree, manifest, setup_review=True):
     """ (re)-initialize a worktree given a manifest.
-    Clonie any missing repository, set the correct
+    Clone any missing repository, set the correct
     remote and tracking branch on every repository
 
     :param setup_review: Also set up the projects for review
