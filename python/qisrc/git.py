@@ -292,11 +292,19 @@ def _update_branch(git, branch, remote_name,
     if current_branch != branch:
         _update_branch_if_ff(git, status, branch, remote_ref)
         return status.mess
+
+    # prevent unwanted rebases
+    (local_sha1, remote_sha1) = _get_local_and_remote_sha1s(
+        git, status, current_branch, remote_ref)
+    if local_sha1 == remote_sha1:
+        return
+
     with _stash_changes(git, status):
         # _stash_changes can fail if we think the repo is clean,
         # but first stash fails for some reason ...
         if status.mess:
             return status.mess
+
         (ret, out) = git.rebase(remote_ref, raises=False)
         if ret != 0:
             print "Rebasing failed!"
@@ -364,7 +372,8 @@ def is_ff(git, status, local_sha1, remote_sha1):
     """Check local_sha1 is fast-forward with remote_sha1.
     Return True / False or None in case of error with merge-base.
     """
-
+    if local_sha1 == remote_sha1:
+        return True
     (retcode, out) = git.call("merge-base", local_sha1, remote_sha1,
                                raises=False)
     if retcode != 0:
@@ -387,17 +396,24 @@ def get_ref_sha1(git, ref, status):
     status.mess += sha1
     return None
 
+def _get_local_and_remote_sha1s(git, status, local_branch, remote_ref):
+    """ get the sha1s """
+    local_sha1 = get_ref_sha1(git, "refs/heads/%s" % local_branch, status)
+    remote_sha1 = get_ref_sha1(git, "refs/remotes/%s" % remote_ref, status)
+    return (local_sha1, remote_sha1)
+
 def _update_branch_if_ff(git, status, local_branch, remote_ref):
     """ Update a local branch with a remote branch if the
     merge is fast-forward
 
     """
-    local_sha1 = get_ref_sha1(git, "refs/heads/%s" % local_branch, status)
-    if local_sha1 is None:
+    (local_sha1, remote_sha1) = _get_local_and_remote_sha1s(
+        git, status, local_branch, remote_ref)
+
+    if local_sha1 is None or remote_sha1 is None:
         return
 
-    remote_sha1 = get_ref_sha1(git, "refs/remotes/%s" % remote_ref, status)
-    if remote_sha1 is None:
+    if local_sha1 == remote_sha1:
         return
 
     result_ff = is_ff(git, status, local_sha1, remote_sha1)
