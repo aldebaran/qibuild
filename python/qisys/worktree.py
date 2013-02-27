@@ -7,6 +7,8 @@
 """
 
 import os
+import ntpath
+import posixpath
 import qisys.log
 import operator
 
@@ -203,6 +205,7 @@ worktree root: {1}
         root_elem.append(parser.xml_elem())
         self.dump()
         self.load()
+        return project
 
     def remove_project(self, src, from_disk=False):
         """ Remove a project from a worktree
@@ -308,6 +311,9 @@ Found an invalid sub project: {1}
 """.format(self.qiproject_xml, sub_src, full_path))
             self.subprojects.append(sub_src)
 
+    def __repr__(self):
+        return "<WorkTreeProject in %s>" % self.src
+
 
 class ProjectParser(qisys.qixml.XMLParser):
     def __init__(self, target):
@@ -349,5 +355,3 @@ def guess_worktree(cwd=None, raises=False):
         raise NotInWorkTree()
     else:
         return None
-
-
