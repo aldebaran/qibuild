@@ -116,7 +116,7 @@ def update_po_file(input_file, update_file, input_dir=None, update_dir=None):
     """
     # init command sorted update_file
     # update update (do nothing if update_file already up to date)
-    cmd = ["msgmerge", "--sort-output", "--update"]
+    cmd = ["msgmerge", "--sort-output", "--update", "--backup=off"]
 
     if input_dir:
         cmd.extend(["--directory", input_dir])
