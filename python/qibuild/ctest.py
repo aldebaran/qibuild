@@ -303,7 +303,11 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
     tests = list()
     slow_tests = list()
     if pattern:
-        tests = [x for x in all_tests if re.search(pattern, x[0])]
+        try:
+            tests = [x for x in all_tests if re.search(pattern, x[0])]
+        except Exception as e:
+            mess = "Invalid pattern \"{}\": {}".format(pattern, e)
+            raise Exception(mess)
         if not tests:
             mess  = "No tests matching %s\n" % pattern
             mess += "Known tests are:\n"

@@ -41,7 +41,11 @@ def run_perfs(project, pattern=None, dry_run=False):
     tests = list()
 
     if pattern:
-        tests = [x for x in all_tests if re.search(pattern, x[0])]
+        try:
+            tests = [x for x in all_tests if re.search(pattern, x[0])]
+        except Exception as e:
+            mess = "Invalid pattern \"{}\": {}".format(pattern, e)
+            raise Exception(mess)
         if not tests:
             mess = "No performance tests matching %s\n" % pattern
             mess += "Known performance tests are:\n"
