@@ -1,4 +1,4 @@
-import qisys.parser
+import qisys.parsers
 import qisys.worktree
 
 import pytest
@@ -18,8 +18,8 @@ def test_raises_when_not_in_worktree(tmpdir, args):
 
 def test_guess_current_project(worktree, args):
     libbar = worktree.create_project("lib/libbar")
-    spam = worktree.create_project("spam")
-    egss = worktree.create_project("spam/eggs")
+    worktree.create_project("spam")
+    worktree.create_project("spam/eggs")
     tmpdir = worktree.tmpdir
 
     # Simple check: when in the top dir of a project

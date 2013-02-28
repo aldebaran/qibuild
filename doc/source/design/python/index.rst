@@ -77,7 +77,7 @@ Concepts
 
    * :py:mod:`qibuild.worktree`
 
-Worktrees can be nested, although this is not recommended
+WorkTrees can be nested, although this is not recommended
 (situation can get a little confused if you do so)
 
 A worktree should also contain a ``.qi/worktree.xml`` configuration

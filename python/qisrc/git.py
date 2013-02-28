@@ -15,8 +15,7 @@ from qisys import ui
 import qisys
 import qisys.command
 
-
-class Git:
+class Git(object):
     """ The Git represent a git tree """
     def __init__(self, repo):
         """ :param repo: The path to the tree """
@@ -121,7 +120,7 @@ class Git:
                      "remote", "reset", "stash", "status", "submodule")
         if name in whitelist:
             return functools.partial(self.call, name)
-        raise AttributeError
+        raise AttributeError("Git instance has no attribute '%s'" % name)
 
     def clone(self, *args, **kwargs):
         """ Wrapper for git clone """
@@ -217,20 +216,17 @@ class Git:
         self.remote("rm", name, quiet=True, raises=False)
         self.remote("add", name, url, quiet=True)
 
-    def set_tracking_branch(self, branch, remote_name, fetch_first=True,
-        remote_branch=None):
-        """
-        Create a or update the configuration of a branch to track
+    def set_tracking_branch(self, branch, remote_name, fetch_first=True, remote_branch=None):
+        """ Update the configuration of a branch to track
         a given remote branch
 
-        :param branch: the branch to be created, or to set configuration for
+        :param branch: the branch to set configuration for
         :param remote_name: the name of the remove ('origin' in most cases)
         :param remote_branch: the name of the remote to track. If not given
             will be the same of the branch name
-        :param fetch_first: if you know you just have fetched, (such as when running
-            qisrc sync -a), set this to ``False`` to save some time
-
         """
+        if not branch in self.get_local_branches():
+            self.branch(branch)
         if remote_branch is None:
             remote_branch = branch
         tracked = self.get_tracking_branch(branch=branch)
@@ -242,15 +238,9 @@ class Git:
                 qisys.ui.warning(mess)
             else:
                 return
-
-        if fetch_first:
-            # Fetch just in case the branch just has been created
-            self.fetch(remote_name, quiet=True)
-
-        # If the branch does not exist yet, create it at the right commit
-        if not branch in self.get_local_branches():
-            self.branch(branch, remote_ref, quiet=True)
-        self.branch("--set-upstream", branch, remote_ref, quiet=True)
+        remote = self.set_config("branch.%s.remote" % branch, remote_name)
+        merge  = self.set_config("branch.%s.merge" % branch,
+                                 "refs/heads/%s" % remote_branch)
 
     def update_branch(self, *args, **kwargs):
         """ Update the given branch to match the given remote branch
@@ -270,6 +260,9 @@ class Git:
         if mess:
             return mess
         return _update_branch(self, *args, **kwargs)
+
+    def __repr__(self):
+        return "<Git repo in %s>" % self.repo
 
 
 def _update_branch(git, branch, remote_name,

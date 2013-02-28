@@ -10,13 +10,14 @@ import sys
 from qisys import ui
 import qisys
 import qisrc.parsers
+import qibuild.parsers
 import qisrc.status
 
 
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
-    qisys.parsers.project_parser(parser)
+    qibuild.parsers.project_parser(parser)
     parser.add_argument("--untracked-files", "-u",
         dest="untracked_files",
         action="store_true",
@@ -25,6 +26,8 @@ def configure_parser(parser):
         dest="show_branch",
         action="store_true",
         help="display branch and tracking branch for each repository")
+    parser.add_argument("--build-deps", action="store_true",
+        help="take build dependencies into account")
 
 def do(args):
     """Main method."""

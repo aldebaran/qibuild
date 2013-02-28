@@ -6,6 +6,7 @@
 """
 
 import qisys.parsers
+import qibuild.worktree
 
 log_parser = qisys.parsers.log_parser
 default_parser  = qisys.parsers.default_parser
@@ -53,7 +54,8 @@ def build_parser(parser):
 def project_parser(parser, positional=True):
     """Parser settings for every action using several toc projects."""
     group = qisys.parsers.project_parser(parser, positional=positional, short=False)
-    group.add_argument("--build-deps", action="store_true",
+    group.add_argument("--no-runtime", "--build-deps-only",
+        action="store_true", dest="build_deps_only",
         help="Work on specified projects by ignoring the runtime deps. "
              "Useful when you have lots of runtime plugins you don't want to compile "
              "for instance")
@@ -96,14 +98,14 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
 
         # auto-add
 
-    def parse_one_arg(self, arg):
+    def parse_one_project(self, args, project_arg):
         """ Accept both an absolute path matching a worktree project,
         or a project src
 
         """
-        project = self.build_worktree.get_build_project(arg, raises=True)
+        project = self.build_worktree.get_build_project(project_arg, raises=True)
         if args.single:
             return [project]
         deps = self.build_worktree.get_deps(project, runtime=args.runtime,
-                                            build_beps_only=args.build_deps_only)
+                                            build_deps_only=args.build_deps_only)
         return deps

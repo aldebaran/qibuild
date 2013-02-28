@@ -4,14 +4,19 @@ import xml.etree.ElementTree as etree
 import qisrc.groups
 
 def test_parser():
-    file = """<groups>
-    <group name="a">
-    <project name="b" /><project name="c" /><group name="d" />
-    </group>
-    <group name="d">
-    <project name="foo" /><project name="bar" />
-    </group>
-    </groups>"""
+    file = """
+<groups>
+  <group name="a">
+    <project name="b" />
+    <project name="c" />
+    <group name="d" />
+  </group>
+  <group name="d">
+    <project name="foo" />
+    <project name="bar" />
+  </group>
+</groups>
+"""
 
     root = etree.fromstring(file)
 

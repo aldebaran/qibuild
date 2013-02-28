@@ -189,6 +189,8 @@ class XMLParser(object):
         """
         self.target = target
         self._root = None
+        self._ignore = list()
+        self._required = list()
         self.backtrace = list()
 
     def parse(self, root):
@@ -248,7 +250,8 @@ class XMLParser(object):
 
         """
         apply_xml_attributes(self.target, self._root)
-
+        for name in self._required:
+            self.check_needed(name)
         self._post_parse_attributes()
 
     def _post_parse_attributes(self):
@@ -267,9 +270,58 @@ class XMLParser(object):
                 value = getattr(self.target, attribute_name)
 
         if value is None:
-            mess = "Node '%s' must have a '%s' attribute." % (node_name,
+            mess = "Node '%s' must have a '%s' attribute" % (node_name,
                                                                attribute_name)
             raise Exception(mess)
+
+    def xml_elem(self, node_name=None):
+        """ Get the xml representation of the target
+
+        Will set attributes of the node using attributes of the target,
+        except if _dump_<attribute> class exits
+
+        """
+        if not node_name:
+            node_name = self.target.__class__.__name__.lower()
+        res = etree.Element(node_name)
+
+        def is_public(name):
+            return not name.startswith("_")
+
+        def is_serializable(value):
+            # no way to guess that from etree api:
+            return type(value) in (bool, str, int)
+
+        target_dir = dir(self.target)
+        for member in target_dir:
+            if not is_public(member):
+                continue
+            if member in self._ignore:
+                continue
+            method = None
+            method_name = "_write_%s" % member
+            try:
+                method = getattr(self, method_name)
+            except AttributeError:
+                pass
+            if method:
+                if method.func_code.co_argcount != 2:
+                    mess = "Handler for member `%s' must take" % member
+                    mess += " two arguments. (method: %s, takes " % method_name
+                    mess += "%d argument(s))" % method.func_code.co_argcount
+                    raise TypeError(mess)
+                method(res)
+                continue
+            member_value = getattr(self.target, member)
+            if is_serializable(member_value):
+                if type(member_value) == bool:
+                    if member_value:
+                        res.set(member, "true")
+                    else:
+                        res.set(member, "false")
+                else:
+                    res.set(member, str(member_value))
+        return res
 
 
 def apply_xml_attributes(target, elem):

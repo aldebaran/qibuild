@@ -21,3 +21,4 @@ def test_guess_git_repo(tmpdir, args):
         assert qisys.parsers.get_projects(worktree, args)[0].src == "foo/bar"
         assert qisrc.parsers.get_git_projects(git_worktree, args)[0].src == "foo"
 
+

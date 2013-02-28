@@ -9,5 +9,5 @@ import qisys.worktree
 def worktree_from_args(args):
     print "worktree_from_args is deprecated"
     print "use qisys.actions.get_worktree instead"
-    import qisys.actions
-    return qisys.actions.get_worktree(args)
+    import qisys.parsers
+    return qisys.parsers.get_worktree(args)

@@ -4,7 +4,7 @@ from qisys.test.conftest import *
 import qisys.worktree
 import qibuild.worktree
 
-class TestBuildWorkTree(qibuild.worktree.BuildWorktree):
+class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
     """ A subclass of qisrc.worktree.WorkTree that
     can create git projects
 
@@ -27,14 +27,12 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorktree):
         if not src:
             src = name
         proj_path = self.tmpdir.mkdir(src)
-        self.worktree.add_project(src)
 
+        # FIXME: use new syntax
         xml = """ \
-<project>
-  <qibuild name="{name}" >
-    <depends buildtime="true" runtime="false" names="{buildtime_names}" />
-    <depends buildtime="false" runtime="true" names="{runtime_names}" />
-  </qibuild>
+<project name="{name}" >
+  <depends buildtime="true" runtime="false" names="{buildtime_names}" />
+  <depends buildtime="false" runtime="true" names="{runtime_names}" />
 </project>
 """
         xml = xml.format(name=name,
@@ -42,9 +40,10 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorktree):
                         runtime_names=" ".join(rdepends),
                         )
         proj_path.join("qiproject.xml").write(xml)
-        build_project = qibuild.worktree.BuildProject(proj_path.strpath)
-        return build_project
+        self.worktree.add_project(src)
+        return self.get_build_project(src)
 
+# pylint: disable-msg=E1101
 @pytest.fixture
 def build_worktree(request):
     tmp = tempfile.mkdtemp(prefix="tmp-test-worktree")

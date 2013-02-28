@@ -62,7 +62,6 @@ def test_remove_project(worktree):
     assert not os.path.exists(foo_src.strpath)
 
 
-
 def test_nested_qiprojects(tmpdir):
     a_project = tmpdir.mkdir("a")
     worktree_xml = tmpdir.mkdir(".qi").join("worktree.xml")
@@ -97,15 +96,14 @@ def test_nested_qiprojects(tmpdir):
         ["a", "a/b", "a/b/c"]
 
 
-def test_check_registered_path_exist(tmpdir, interact):
+def test_non_exiting_path_are_removed(tmpdir, interact):
     # all projects registered should exist:
     wt = qisys.worktree.create(tmpdir.strpath)
     a_path = tmpdir.mkdir("a")
     wt.add_project(a_path.strpath)
     a_path.remove()
-    interact.answers = {"remove" : True}
-    qisys.worktree.open_worktree(tmpdir.strpath)
-    assert "Do you want to remove" in interact.questions[0]["message"]
+    wt2 = qisys.worktree.open_worktree(tmpdir.strpath)
+    assert wt2.projects == list()
 
 
 def test_check_subprojects_exist(tmpdir):
@@ -140,3 +138,19 @@ def test_observers_are_notified(worktree):
     foo_proj = worktree.create_project("foo")
     assert mock_observer.on_project_added.called
 
+
+def test_add_nested_projects(worktree):
+    worktree.create_project("foo")
+    tmpdir = worktree.tmpdir
+    spam = tmpdir.mkdir("spam")
+    spam.join("qiproject.xml").write(""" \
+<project>
+  <project src="eggs" />
+</project>
+""")
+    spam.mkdir("eggs")
+    worktree.add_project("spam")
+    assert [p.src for p in worktree.projects] == ["foo", "spam", "spam/eggs"]
+
+    worktree.remove_project("spam")
+    assert [p.src for p in worktree.projects] == ["foo"]

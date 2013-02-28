@@ -10,14 +10,11 @@ import abc
 import os
 import ntpath
 import posixpath
-import qisys.log
-import operator
 
 from qisys import ui
 import qisys.command
 import qisys.sh
 import qisys.qixml
-from qisys.qixml import etree
 
 
 class WorkTreeError(Exception):
@@ -45,11 +42,12 @@ class WorkTree(object):
         """
         self._observers = list()
         self.root = root
+        self.cache = self.load_cache()
+        # Re-parse every qiproject.xml to visit the subprojects
         self.projects = list()
-        self.load()
+        self.load_projects()
         if sanity_check:
             self.check()
-
 
     def register(self, observer):
         """ Called when an observer wants to be notified
@@ -58,19 +56,19 @@ class WorkTree(object):
         """
         self._observers.append(observer)
 
-    def load(self):
+    def load_cache(self):
         """ Load the worktree.xml file. """
         self.projects = list()
         if not os.path.exists(self.worktree_xml):
             qisys.sh.mkdir(self.dot_qi)
             with open(self.worktree_xml, "w") as fp:
                 fp.write("<worktree />\n")
-        if os.path.exists(self.worktree_xml):
-            self.xml_tree = qisys.qixml.read(self.worktree_xml)
-            self.parse_projects()
-
-        self.projects.sort(key=operator.attrgetter("src"))
-        self.check()
+        cache = WorkTreeCache(self.worktree_xml)
+        # Remove non-existing sources
+        for src in cache.get_srcs():
+            if not os.path.exists(os.path.join(self.root, src)):
+                cache.remove_src(src)
+        return cache
 
     def check(self):
         """ Perform a few sanity checks """
@@ -90,28 +88,6 @@ worktree root: {1}
 (in {1})
 """.format(self.root, parent_worktree))
 
-        non_existing = list()
-        # Check that every source exists
-        for project in self.projects:
-            if not os.path.exists(project.path):
-                non_existing.append(project)
-
-        if not non_existing:
-            return
-
-        mess = ["The following projects:\n"]
-        for project  in non_existing:
-            mess.extend([ui.green, " *", ui.blue, project.src, "\n"])
-        mess.extend([ui.reset, ui.brown])
-        mess.append("are registered in the worktree, but their paths no longer exists.")
-        ui.warning(*mess)
-        answer = qisys.interact.ask_yes_no("Do you want to remove them", default=True)
-        if not answer:
-            return
-        for project  in non_existing:
-            ui.info(ui.green, "Removing", ui.reset, project.src)
-            self.remove_project(project.path)
-
     @property
     def dot_qi(self):
         """Get the dot_qi directory."""
@@ -125,41 +101,29 @@ worktree root: {1}
     @property
     def qibuild_xml(self):
         """Get the path to .qi/qibuild.xml """
-        # XXX: This should be in BuildWorktree, but then
-        # we have a coupling between BuildWorktree and GitWorkTree ....
         return os.path.join(self.dot_qi, "qibuild.xml")
 
+    def has_project(self, path):
+        src = self.normalize_path(path)
+        srcs = (p.src for p in self.projects)
+        return src in srcs
 
-        """ Get the qibuild.xml path """
-        # qisrc needs that when it syncs build profiles,
-        # and the relationships between qisrc and qibuild are not
-        # obvious for now ...
-        return os.path.join(self.dot_qi, "qibuild.xml")
+    def load_projects(self):
+        """ For every project in cache, re-read the subprojects and
+        and them to the list
 
-    def has_project(self, src):
-        srcs = (p.src.lower() for p in self.projects)
-        return src.lower() in srcs
-
-    def dump(self):
-        """ Dump self to the worktree.xml file. """
-        qisys.sh.mkdir(self.dot_qi, recursive=True)
-        qisys.qixml.write(self.xml_tree, self.worktree_xml)
-
-    def parse_projects(self):
-        """ Parse .qi/worktree.xml, resolve subprojects. """
-        projects_elem = self.xml_tree.findall("project")
-        for project_elem in projects_elem:
-            project = WorkTreeProject(self)
-            parser = ProjectParser(project)
-            parser.parse(project_elem)
+        """
+        self.projects = list()
+        srcs = self.cache.get_srcs()
+        for src in srcs:
+            project = WorkTreeProject(self, src)
             project.parse_qiproject_xml()
             self.projects.append(project)
 
-        # Now parse the subprojects
         res = self.projects[:]
         for project in self.projects:
             self._rec_parse_sub_projects(project, res)
-        self.projects = res[:]
+        self.projects = res
 
     def _rec_parse_sub_projects(self, project, res):
         """ Recursively parse every project and subproject,
@@ -169,7 +133,7 @@ worktree root: {1}
         for sub_project_src in project.subprojects:
             src = os.path.join(project.src, sub_project_src)
             src = qisys.sh.to_posix_path(src)
-            sub_project = WorkTreeProject(self, src=src)
+            sub_project = WorkTreeProject(self, src)
             sub_project.parse_qiproject_xml()
             res.append(sub_project)
             self._rec_parse_sub_projects(sub_project, res)
@@ -194,53 +158,42 @@ worktree root: {1}
         res = match[0]
         return res
 
-    def add_project(self, src):
+    def add_project(self, path):
         """ Add a project to a worktree
 
         :param src: path to the project, can be absolute,
                     or relative to the worktree root
 
         """
-        # Coming from user, can be an abspath:
-        src = self.normalize_path(src)
+        src = self.normalize_path(path)
         if self.has_project(src):
             mess  = "Could not add project to worktree\n"
             mess += "Path %s is already registered\n" % src
             mess += "Current worktree: %s" % self.root
             raise WorkTreeError(mess)
-
-        project = WorkTreeProject(self, src=src)
-        parser = ProjectParser(project)
-        root_elem = self.xml_tree.getroot()
-        root_elem.append(parser.xml_elem())
-        self.dump()
-        self.load()
+        self.cache.add_src(src)
+        self.load_projects()
+        project = self.get_project(src)
         for observer in self._observers:
             observer.on_project_added(project)
         return project
 
-    def remove_project(self, src, from_disk=False):
+    def remove_project(self, path, from_disk=False):
         """ Remove a project from a worktree
 
         :param src: path to the project, can be absolute,
                     or relative to the worktree root
         :param from_disk: also erase project files from disk
 
-
         """
-        src = self.normalize_path(src)
+        src = self.normalize_path(path)
         if not self.has_project(src):
             raise WorkTreeError("No such project: %s" % src)
-        root_elem = self.xml_tree.getroot()
-        for project_elem in root_elem.findall("project"):
-            if project_elem.get("src") == src:
-                if from_disk:
-                    to_remove = self.get_project(src).path
-                    qisys.sh.rm(to_remove)
-                root_elem.remove(project_elem)
         project = self.get_project(src)
-        self.dump()
-        self.load()
+        if from_disk:
+            qisys.sh.rm(project.path)
+        self.cache.remove_src(src)
+        self.load_projects()
         for observer in self._observers:
             observer.on_project_removed(project)
 
@@ -293,7 +246,7 @@ def create(directory, force=False):
 
 
 class WorkTreeProject(object):
-    def __init__(self, worktree, src=None):
+    def __init__(self, worktree, src):
         self.worktree = worktree
         self.src = src
         self.subprojects = list()
@@ -328,20 +281,6 @@ Found an invalid sub project: {1}
 
     def __repr__(self):
         return "<WorkTreeProject in %s>" % self.src
-
-
-class ProjectParser(qisys.qixml.XMLParser):
-    def __init__(self, target):
-        super(ProjectParser, self).__init__(target)
-
-    def _post_parse_attributes(self):
-        self.check_needed("src")
-
-    def xml_elem(self):
-        res = etree.Element("project")
-        res.set("src", self.target.src)
-        return res
-
 
 def repr_list_projects(projects, name = "projects"):
     res = ""
@@ -390,3 +329,36 @@ class WorkTreeObserver():
         """ Called when a project has been removed from the worktree
         """
         pass
+
+class WorkTreeCache:
+    """ Cache the paths to all the projects registered
+    in a worktree
+
+    """
+    def __init__(self, xml_path):
+        self.xml_path = xml_path
+        self.xml_root = qisys.qixml.read(xml_path).getroot()
+
+    def add_src(self, src):
+        """ Add a new source to the cache """
+        project_elem = qisys.qixml.etree.Element("project")
+        project_elem.set("src", src)
+        self.xml_root.append(project_elem)
+        qisys.qixml.write(self.xml_root, self.xml_path)
+
+    def remove_src(self, src):
+        """ Remove one source from the cache """
+        projects_elem = self.xml_root.findall("project")
+        for project_elem in projects_elem:
+            if project_elem.get("src") == src:
+                self.xml_root.remove(project_elem)
+        qisys.qixml.write(self.xml_root, self.xml_path)
+
+    def get_srcs(self):
+        """ Get all the sources registered in the cache """
+        srcs = list()
+        projects_elem = self.xml_root.findall("project")
+        for project_elem in projects_elem:
+            srcs.append(qisys.qixml.parse_required_attr(project_elem, "src"))
+        srcs.sort()
+        return srcs

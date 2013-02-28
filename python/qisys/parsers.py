@@ -94,7 +94,7 @@ class AbstractProjectParser:
         pass
 
     @abc.abstractmethod
-    def parse_one_arg(self):
+    def parse_one_project(self, args, project_arg):
         pass
 
     @abc.abstractmethod
@@ -102,16 +102,17 @@ class AbstractProjectParser:
         pass
 
     def parse_args(self, args):
+        self.args = args
         if args.all:
             return self.all_projects()
         project_args = args.projects
         if not args.projects:
             return self.parse_no_args()
         res = list()
-        for arg in project_args:
+        for project_arg in project_args:
             # parsing one arg can result in several projets
             # (for instance if there are deps)
-            res.extend(self.parse_one_arg(arg))
+            res.extend(self.parse_one_project(args, project_arg))
         return res
 
 class WorkTreeProjectParser(AbstractProjectParser):
@@ -133,20 +134,20 @@ class WorkTreeProjectParser(AbstractProjectParser):
         if parent_project:
             return [parent_project]
 
-    def parse_one_arg(self, arg):
+    def parse_one_project(self, args, project_arg):
         """ Accept both an absolute path matching a worktree project,
         or a project src
 
         """
         # assume absolute path
-        as_path = qisys.sh.to_native_path(arg)
+        as_path = qisys.sh.to_native_path(project_arg)
         if os.path.exists(as_path):
-            parent_project = self._find_parent_project(as_path)
+            parent_project = find_parent_project(self.worktree.projects, as_path)
             if parent_project:
                 return [parent_project]
 
         # Now assume it is a project src
-        project = self.worktree.get_project(arg, raises=True)
+        project = self.worktree.get_project(project_arg, raises=True)
         return [project]
 
 

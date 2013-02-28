@@ -73,7 +73,7 @@ def test_parse_required_attr():
     tree = etree.fromstring("<foo bar=\"foo\" />")
     assert qisys.qixml.parse_required_attr(tree, "bar") == "foo"
 
-def test_xml_parser():
+def test_simple_xml_parser():
     tree = etree.fromstring("""
 <foo
     bar="baz"
@@ -98,3 +98,64 @@ def test_xml_parser():
     assert foo.quzz == 42
     assert foo.bar == "baz"
     assert foo.spam == "eggs"
+
+def test_required_attr():
+    tree = etree.fromstring("<foo />")
+    class Foo:
+        pass
+
+    class FooParser(qisys.qixml.XMLParser):
+        def __init__(self, target):
+            super(FooParser, self).__init__(target)
+            self._required = ["bar"]
+
+    foo = Foo()
+    foo_parser = FooParser(foo)
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        foo_parser.parse(tree)
+    assert e.value.message == "Node 'foo' must have a 'bar' attribute"
+
+
+def test_complex_xml_parser():
+
+    class BarParser(qisys.qixml.XMLParser):
+        def __init__(self, target):
+            super(BarParser, self).__init__(target)
+
+    class FooParser(qisys.qixml.XMLParser):
+        def __init__(self, target):
+            super(FooParser, self).__init__(target)
+
+        def _write_bar(self, elem):
+            parser = BarParser(self.target.bar)
+            bar_elem = parser.xml_elem()
+            elem.append(bar_elem)
+
+        def _parse_bar(self, elem):
+            parser = BarParser(self.target.bar)
+            parser.parse(elem)
+
+    class Bar:
+        def __init__(self):
+            self.baz = None
+
+    class Foo:
+        def __init__(self):
+            self.bar = Bar()
+            self.spam = None
+            self.eggs = None
+
+    foo = Foo()
+    foo.bar.baz = "Baz!"
+    foo.spam = 42
+    foo.eggs = True
+    parser = FooParser(foo)
+    foo_xml = parser.xml_elem()
+
+    foo2 = Foo()
+    parser = FooParser(foo2)
+    parser.parse(foo_xml)
+    assert foo2.bar.baz == "Baz!"
+    foo.spam == 42
+    foo.eggs == True

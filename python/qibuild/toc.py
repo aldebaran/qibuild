@@ -121,7 +121,7 @@ class Toc:
         toc.build_project(foo)
 
     """
-    def __init__(self, worktree,
+    def __init__(self, build_worktree,
             config=None,
             qibuild_cfg=None,
             build_type="Debug",
