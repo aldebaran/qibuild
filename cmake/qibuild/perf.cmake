@@ -40,7 +40,11 @@ function(qi_create_perf_test name)
 
   set(_out_file ${_perf_dir}/${name}.xml)
   # add it to the list, to be run with qibuild test --perf
-  set(_to_write "${name}")
+  if (MSVC AND DEBUG)
+    set(_to_write "${name}_d")
+  else()
+    set(_to_write "${name}")
+  endif()
   if (NOT "${_args}" STREQUAL "")
     set(_to_write "${_to_write};${_args}")
   endif()
