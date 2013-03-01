@@ -1,7 +1,7 @@
 .. _qibuild-overview:
 
-What is qibuild?
-================
+What is qibuild
+===============
 
 qiBuild aims to make compilation of your sources easy. It manages dependencies
 between projects and supports cross-compilation.
@@ -26,8 +26,8 @@ qiBuild is composed of two parts:
   packages
 
 
-Is qibuild the only one build framework?
-=========================================
+Is qibuild the only one build framework
+=======================================
 
 Of course not!
 

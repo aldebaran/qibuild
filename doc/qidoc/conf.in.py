@@ -19,3 +19,5 @@ man_pages = [
     ('ref/man/qitoolchain', 'qitoolchain', u'Hanlde sets of pre-compiled packges',
      [u'Aldebaran Robotics'], 1)
 ]
+
+html_static_path = ['../source/_static']

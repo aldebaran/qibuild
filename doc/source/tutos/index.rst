@@ -1,20 +1,28 @@
-.. toctree::
-  :hidden:
-
-  getting_started
-  qibuild_in_five_minutes
-
-.. _qibuild-documentation:
+.. _qibuild-getting-started:
 
 Getting started with qiBuild
 ----------------------------
 
-First, please follow the tutorial in the :ref:`qibuild-getting-started` section.
+First, please follow the beginner tutorial:
 
-You can now read the :ref:`qibuild-in-five-minutes` section if you want to dig
-in right now.
+.. toctree::
+  :maxdepth: 2
+
+  getting_started
+
+When you have read the last one you can do deeper with:
+
+.. toctree::
+  :maxdepth: 2
+
+  qibuild_in_five_minutes
 
 qiBuild programming guide
 --------------------------
 
-Please follow the :ref:`qibuild-guide` for a more progressive, comprehensive course.
+Endly, you got a more progressive and comprehensive course:
+
+.. toctree::
+  :maxdepth: 2
+
+  guide/index
