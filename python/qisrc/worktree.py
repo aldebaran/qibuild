@@ -31,9 +31,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self._root_xml = qisys.qixml.read(self.git_xml).getroot()
         self._load()
         worktree.register(self)
+        self._manifests = list()
 
     def _load(self):
         self.git_projects = self._load_git_projects()
+
 
     def _load_git_projects(self):
         """ Build a list of git projects using the
@@ -53,6 +55,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             git_projects.append(git_project)
             git_project.apply_config()
         return git_projects
+
 
     def get_git_project(self, path, raises=False, auto_add=False):
         """ Get a git project by its sources """
@@ -82,6 +85,58 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     def on_project_removed(self, project):
         self._load()
+
+    def on_git_xml_changed(self):
+        """ Called when git.xml has changed
+        (for instance, we've are syncing with a manifest)
+
+        """
+        # Check if we need to clone new repositories
+        self._root_xml = qisys.qixml.read(self.git_xml).getroot()
+        for xml_elem in self._root_xml.findall("project"):
+            src = xml_elem.get("src")
+            if self.worktree.has_project(src):
+                continue
+            else:
+                self._clone_missing(src, xml_elem)
+        self._load()
+        # Check if we need to remove repositories
+        for worktree_project in self.worktree.projects:
+            src = worktree_project.src
+            path = worktree_project.path
+            git_project = self.get_git_project(src)
+            xml_elem = self._get_elem(src)
+            if xml_elem is None:
+                self._remove_if_clean(git_project)
+        self._load()
+
+    def _clone_missing(self, src, xml_elem):
+        """ Called when .qi/git.xml has changed and
+        new projects have come up
+
+        """
+        # add_project caused self._load() to be called,
+        # but the path was not a valid git project yet
+        # so the GitProject does not exist yet
+        worktree_project = self.worktree.add_project(src)
+        git_project = GitProject(self, worktree_project)
+        git_parser = GitProjectParser(git_project)
+        git_parser.parse(xml_elem)
+        clone_url = git_project.clone_url
+        if not clone_url:
+            return
+        git = qisrc.git.Git(git_project.path)
+        git.clone(clone_url,
+                    "--branch", git_project.default_branch.name,
+                    "--origin", git_project.default_branch.tracks)
+
+    def _remove_if_clean(self, project):
+        """ Called when .qi/git.xml has changed and
+        a project has been removed
+
+        """
+        ### FIXME: warn first
+        qisys.sh.rm(project.path)
 
     def on_project_added(self, project):
         self._load()
@@ -155,14 +210,31 @@ class GitProject(object):
             git.set_tracking_branch(branch.name, branch.tracks,
                                     remote_branch=branch.remote_branch)
 
-
-
     @property
     def review(self):
         for remote in self.remotes:
             if remote.review:
                 return True
         return False
+
+    @property
+    def default_branch(self):
+        for branch in self.branches:
+            if branch.default:
+                return branch
+
+    @property
+    def clone_url(self):
+        default_branch = self.default_branch
+        if not default_branch:
+            return None
+        tracked = default_branch.tracks
+        if not tracked:
+            return None
+        for remote in self.remotes:
+            if remote.name == tracked:
+                return remote.url
+        return None
 
     def __repr__(self):
         return "<GitProject in %s>" % self.src
@@ -185,6 +257,7 @@ class Branch(object):
         self.name = None
         self.tracks = None
         self.remote_branch = None
+        self.default = False
 
     def __repr__(self):
         return "<Branch %s (tracks: %s)>" % (self.name, self.tracks)

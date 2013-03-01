@@ -78,9 +78,6 @@ class TestGitServer(object):
         repo = self.manifest.get_repo(project)
         return repo
 
-
-
-
 class TestGit(qisrc.git.Git):
     """ the Git class with a few other helpfull methods """
     def __init__(self, repo):

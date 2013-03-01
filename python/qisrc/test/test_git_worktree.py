@@ -86,3 +86,46 @@ def test_sync_git_configs(git_worktree):
 
     foo.add_branch("feature", tracks="upstream", remote_branch="remote_branch")
     assert git.get_tracking_branch("feature") == "upstream/remote_branch"
+
+def test_clones_when_missing(git_server, git_worktree):
+    foo_repo = git_server.create_repo("foo.git")
+    git_xml_path = git_worktree.git_xml
+    with open(git_xml_path, "w") as fp:
+        fp.write(""" \
+<git>
+  <project src="foo" >
+    <remote name="origin" url="{}" />
+    <branch name="master" default="true" tracks="origin" />
+  </project>
+</git>
+""".format(foo_repo.remote_url))
+    git_worktree.on_git_xml_changed()
+    assert git_worktree.get_git_project("foo")
+
+def test_moving_projects(git_server, git_worktree):
+    foo_repo = git_server.create_repo("foo.git")
+    git_xml_path = git_worktree.git_xml
+    with open(git_xml_path, "w") as fp:
+        fp.write(""" \
+<git>
+  <project src="foo" >
+    <remote name="origin" url="{}" />
+    <branch name="master" default="true" tracks="origin" />
+  </project>
+</git>
+""".format(foo_repo.remote_url))
+    git_worktree.on_git_xml_changed()
+
+    with open(git_xml_path, "w") as fp:
+        fp.write(""" \
+<git>
+  <project src="bar" >
+    <remote name="origin" url="{}" />
+    <branch name="master" default="true" tracks="origin" />
+  </project>
+</git>
+""".format(foo_repo.remote_url))
+    git_worktree.on_git_xml_changed()
+    assert len(git_worktree.git_projects) == 1
+
+

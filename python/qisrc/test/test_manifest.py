@@ -11,16 +11,16 @@ def test_simple_read(tmpdir):
     manifest_xml.write(""" \
 <manifest>
   <remote name="origin" url="git@example.com" />
-  <repo project="foo/bar.git" src="lib/bar" />
+  <repo project="foo/bar.git" src="lib/bar" default_branch="next" />
 </manifest>
 """)
-    manifest = qisrc.manifest.Manifest()
-    manifest.parse(manifest_xml.strpath)
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
 
     assert len(manifest.repos) == 1
     bar = manifest.repos[0]
     assert bar.src == "lib/bar"
     assert bar.remote_url == "git@example.com:foo/bar.git"
+    assert bar.default_branch == "next"
 
 def test_no_matching_remote(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -30,10 +30,9 @@ def test_no_matching_remote(tmpdir):
   <repo project="foo/bar.git" src="lib/bar" remote="invalid" />
 </manifest>
 """)
-    manifest = qisrc.manifest.Manifest()
     # pylint: disable-msg: E1101
     with pytest.raises(qisrc.manifest.ManifestError) as e:
-        manifest.parse(manifest_xml.strpath)
+        qisrc.manifest.Manifest(manifest_xml.strpath)
     assert e.value.message == "No matching remote: invalid for repo foo/bar.git"
 
 def test_review_projects(tmpdir):
@@ -45,8 +44,7 @@ def test_review_projects(tmpdir):
   <repo project="foo/bar.git" src="lib/bar" remote="gerrit" />
 </manifest>
 """)
-    manifest = qisrc.manifest.Manifest()
-    manifest.parse(manifest_xml.strpath)
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert len(manifest.repos) == 1
     bar = manifest.repos[0]
     assert bar.src == "lib/bar"
@@ -70,8 +68,7 @@ def test_groups(tmpdir):
   </groups>
 </manifest>
 """)
-    manifest = qisrc.manifest.Manifest()
-    manifest.parse(manifest_xml.strpath)
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     git_projects = manifest.get_repos(group="qim")
     assert len(git_projects) == 2
     assert git_projects[0].remote_url == "git@example.com:qi/libqi.git"
