@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Handling synchronization of a worktree with a manifest
+""" Handling synchronization of a worktree with some manifests
 
 """
 
@@ -12,7 +12,7 @@ import qisys.qixml
 import qisrc.git
 import qisrc.manifest
 
-class ManifestsWorkTree(object):
+class WorkTreeSyncer(object):
     """ Handle the manifests of a worktree
 
     Stores the git url of the manifests and the groups that
@@ -46,7 +46,7 @@ class ManifestsWorkTree(object):
 
         """
         root = qisys.qixml.read(self.manifests_xml).getroot()
-        parser = ManifestsWorkTreeParser(self)
+        parser = WorkTreeSyncerParser(self)
         parser.parse(root)
         manifests = self.manifests.values()
         if not manifests:
@@ -58,7 +58,7 @@ class ManifestsWorkTree(object):
 
     def dump_manifests(self):
         """ Save the manifests in .qi/manifests.xml """
-        parser = ManifestsWorkTreeParser(self)
+        parser = WorkTreeSyncerParser(self)
         xml = parser.xml_elem()
         qisys.qixml.write(xml, self.manifests_xml)
 
@@ -133,7 +133,7 @@ class ManifestsWorkTree(object):
         git.clone(url, "--branch", branch)
 
     def __repr__(self):
-        return "<ManifestsWorkTree in %s>" % self.git_worktree.root
+        return "<WorkTreeSyncer in %s>" % self.git_worktree.root
 
 
 class LocalManifestSettings(object):
@@ -148,9 +148,9 @@ class LocalManifestSettings(object):
 ##
 # Parsing
 
-class ManifestsWorkTreeParser(qisys.qixml.XMLParser):
+class WorkTreeSyncerParser(qisys.qixml.XMLParser):
     def __init__(self, target):
-        super(ManifestsWorkTreeParser, self).__init__(target)
+        super(WorkTreeSyncerParser, self).__init__(target)
         self._ignore = ["manifests_xml", "manifests_root"]
 
     def _parse_manifest(self, elem):

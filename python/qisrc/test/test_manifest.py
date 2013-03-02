@@ -30,7 +30,7 @@ def test_no_matching_remote(tmpdir):
   <repo project="foo/bar.git" src="lib/bar" remote="invalid" />
 </manifest>
 """)
-    # pylint: disable-msg: E1101
+    # pylint: disable-msg=E1101
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert e.value.message == "No matching remote: invalid for repo foo/bar.git"

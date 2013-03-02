@@ -37,10 +37,12 @@ class Manifest(object):
         self.groups = qisrc.groups.Groups()
         self.load()
 
+    # pylint: disable-msg=E0213
     def change_config(func):
         """ Decorator for every function that changes the configuration """
         @functools.wraps(func)
         def new_func(self, *args, **kwargs):
+            # pylint: disable-msg=E1102
             res = func(self, *args, **kwargs)
             self.dump()
             # mandatory to re-compute project.remote_url,

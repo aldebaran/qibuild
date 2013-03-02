@@ -1,9 +1,10 @@
 import os
+import functools
 
 from qisys import ui
 import qisys.worktree
 import qisrc.git
-import qisrc.manifests_worktree
+import qisrc.sync
 
 class NotInAGitRepo(Exception):
     """ Custom exception when user did not
@@ -34,16 +35,16 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         worktree.register(self)
         self.git_projects = list()
         self.load_git_projects()
-        self._manifest_worktree = qisrc.manifests_worktree.ManifestsWorkTree(self)
+        self._syncer = qisrc.sync.WorkTreeSyncer(self)
         self.load_manifests()
 
     def add_manifest(self, name, manifest_url, groups=None):
         """ Add a new manifest to this worktree """
-        self._manifest_worktree.add_manifest(name, manifest_url, groups=groups)
+        self._syncer.add_manifest(name, manifest_url, groups=groups)
 
     def load_manifests(self):
         """ Load the manifests """
-        self._manifest_worktree.load_manifests()
+        self._syncer.load_manifests()
 
     def load_git_projects(self):
         """ Build a list of git projects using the
@@ -177,11 +178,14 @@ class GitProject(object):
     def path(self):
         return os.path.join(self.git_worktree.root, self.src)
 
+    # pylint: disable-msg=E0213
     def change_config(func):
         """ Decorator for every function that changes the git configuration
 
         """
+        @functools.wraps(func)
         def new_func(self, *args, **kwargs):
+            # pylint: disable-msg=E1102
             res = func(self, *args, **kwargs)
             self.apply_config()
             self.git_worktree.save_project_config(self)
