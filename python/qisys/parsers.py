@@ -72,7 +72,7 @@ def get_worktree(args):
     wt_root = args.worktree
     if not wt_root:
         wt_root = qisys.worktree.guess_worktree(raises=True)
-    return qisys.worktree.open_worktree(wt_root)
+    return qisys.worktree.WorkTree(wt_root)
 
 def get_projects(worktree, args):
     """ Get a list of worktree projects from the command line """

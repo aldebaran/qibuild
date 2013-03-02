@@ -10,6 +10,7 @@ import abc
 import os
 import ntpath
 import posixpath
+import warnings
 
 from qisys import ui
 import qisys.command
@@ -217,11 +218,13 @@ worktree root: {1}
 
 
 def open_worktree(directory):
-    print "qisys.worktree.open_worktree is deprecated, use WorkTree instead"
+    warnings.warn("qisys.worktree.open_worktree is deprecated, "
+                 "use WorkTree instead", stacklevel=2)
     return WorkTree(directory)
 
 def create(directory):
-    print "qisys.worktree.create is deprecated, use WorkTree instead"
+    warnings.warn("qisys.worktree.create is deprecated, "
+                 "use WorkTree instead", stacklevel=2)
     return WorkTree(directory)
 
 class WorkTreeProject(object):

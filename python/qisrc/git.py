@@ -123,12 +123,13 @@ class Git(object):
             return branch
         return branch[11:]
 
+
     def get_tracking_branch(self, branch=None):
         if not branch:
             branch = self.get_current_branch()
 
         remote = self.get_config("branch.%s.remote" % branch)
-        merge = self.get_config("branch.%s.merge" % branch)
+        merge  = self.get_config("branch.%s.merge" % branch)
         if not remote:
             return None
         if not merge:
@@ -156,10 +157,6 @@ class Git(object):
         kwargs["cwd"] = None
         return self.call("clone", *args, **kwargs)
 
-    def cherry_pick(self, *args, **kwargs):
-        """ Wrapper for git cherry-pick """
-        return self.call("cherry-pick", *args, **kwargs)
-
     def update_submodules(self, raises=True):
         """ Update submodule, cloning them if necessary """
         # This will fail if some pushed a broken submodule
@@ -178,11 +175,12 @@ class Git(object):
                             raises=False)
         if res == 0:
             return
-        mess = "Failed to update submodules\n"
+        mess  = "Failed to update submodules\n"
         mess += out
         if raises:
             raise Exception(mess)
         return mess
+
 
     def get_local_branches(self):
         """ Get the list of the local branches in a dict
@@ -191,7 +189,7 @@ class Git(object):
         """
         (status, out) = self.branch("--no-color", raises=False)
         if status != 0:
-            mess = "Could not get the list of local branches\n"
+            mess  = "Could not get the list of local branches\n"
             mess += "Error was: %s" % out
             raise Exception(mess)
         lines = out.splitlines()
@@ -210,8 +208,7 @@ class Git(object):
         if untracked:
             (status, out) = self.status("--porcelain", raises=False)
         else:
-            (status, out) = self.status("--porcelain", "--untracked-files=no",
-                                                            raises=False)
+            (status, out) = self.status("--porcelain", "--untracked-files=no", raises=False)
 
         return out if status == 0 else None
 
@@ -226,7 +223,7 @@ class Git(object):
         if out is None:
             return None
 
-        lines = [l for l in out.splitlines() if len(l.strip()) != 0]
+        lines = [l for l in out.splitlines() if len(l.strip()) != 0 ]
         if len(lines) > 0:
             return False
         return True
@@ -240,7 +237,7 @@ class Git(object):
         in_conf = self.get_config("remote.%s.url" % name)
         if in_conf and in_conf == url:
             return
-        self.remote("rm", name, quiet=True, raises=False)
+        self.remote("rm",  name, quiet=True, raises=False)
         self.remote("add", name, url, quiet=True)
 
     def set_tracking_branch(self, branch, remote_name, fetch_first=True, remote_branch=None):
@@ -256,207 +253,78 @@ class Git(object):
             self.branch(branch)
         if remote_branch is None:
             remote_branch = branch
-        tracked = self.get_tracking_branch(branch=branch)
-        remote_ref = "%s/%s" % (remote_name, remote_branch)
         self.set_config("branch.%s.remote" % branch, remote_name)
         self.set_config("branch.%s.merge" % branch,
                         "refs/heads/%s" % remote_branch)
 
-    def update_branch(self, *args, **kwargs):
-        """ Update the given branch to match the given remote branch
-
-        :param branch: the local branch to update
-        :param remote_name: the name of the remote
-        :param remote_branch: the remote branch to update (by default, same name as
-                             the local branch)
-        :param fetch_first: if you know you just have fetched, (such as when running
-            qisrc sync -a), set this to ``False`` to save some time
-
-        Return an string describing what happened.
-        The string will be empty iv everything went fine.
+    def require_clean_worktree(self):
+        """ Check that the git tree is clean
+        :return: a string descrbing why we are not clean,
+        or an empty sting if we are
 
         """
-        mess = self.update_submodules(raises=False)
-        if mess:
-            return mess
-        return _update_branch(self, *args, **kwargs)
+        # Taken from /usr/lib/git-core/git-sh-setup
+        return ""
+
+    def sync(self, git_project, branch_name=None,
+             stash_first=False, rebase_devel=True):
+        """ git pull --rebase on steroids:
+
+         * abort if repo is not clean
+
+         * update submodules and detect broken submodules configs
+
+         * if no dev occured (master == origin/master),
+           reset master to the remote
+
+         * if on the correct branch, rebase it
+
+         * if on a devel branch, and 'rebase_devel' is true,
+           update the master branch and tries to rebase
+
+        Return a tuple (status, message), where status can be:
+            - None: sync was skipped, but there was no error
+            - False: sync failed
+            - True: sync suceeded
+        """
+        if branch_name is None:
+            branch = git_project.default_branch
+            if not branch:
+                return None, "No branch given, and no branch configured by default"
+        else:
+            branch = git_project.get_branch(branch_name)
+
+        current_branch = self.get_current_branch()
+        if not current_branch:
+            return None, "Not on any branch"
+
+        if current_branch != branch.name and not rebase_devel:
+            return None, "Not on the correct branch. " + \
+                         "On %s but should be on %s" % (current_branch, branch.name)
+
+        if not stash_first:
+            error = self.require_clean_worktree()
+            if error:
+                return None, error
+
+        with self.transaction() as transaction:
+            if branch.tracks:
+                self.fetch(branch.tracks)
+                self.rebase(branch.name, branch.tracks)
+            else:
+                # No remote given, maybe this will work:
+                self.fetch()
+                self.rebase(branch_name)
+
+        if transaction.ok:
+            return True, ""
+        else:
+            return False,  transaction.output
+
 
     def __repr__(self):
         return "<Git repo in %s>" % self.repo
 
-
-def _update_branch(git, branch, remote_name,
-                   remote_branch=None, fetch_first=True):
-    """ Helper for git.update_branch
-
-    """
-    class Status:
-        pass
-    status = Status()
-    status.mess = ""
-    current_branch = git.get_current_branch()
-    if not current_branch:
-        return "Not currently on any branch"
-    if fetch_first:
-        (ret, out) = git.fetch(remote_name, raises=False)
-        if out:
-            print out
-        if ret != 0:
-            status.mess += "Fetch failed\n"
-            status.mess += out
-            return status.mess
-    if not remote_branch:
-        remote_branch = branch
-    remote_ref = "%s/%s" % (remote_name, remote_branch)
-    if current_branch != branch:
-        _update_branch_if_ff(git, status, branch, remote_ref)
-        return status.mess
-
-    # prevent unwanted rebases
-    (local_sha1, remote_sha1) = _get_local_and_remote_sha1s(
-        git, status, current_branch, remote_ref)
-    if local_sha1 == remote_sha1:
-        return
-
-    with _stash_changes(git, status):
-        # _stash_changes can fail if we think the repo is clean,
-        # but first stash fails for some reason ...
-        if status.mess:
-            return status.mess
-
-        (ret, out) = git.rebase(remote_ref, raises=False)
-        if ret != 0:
-            print "Rebasing failed!"
-            print "Calling rebase --abort"
-            status.mess += "Could not rebase\n"
-            status.mess += out
-            (ret, out) = git.rebase("--abort", raises=False)
-            if ret == 0:
-                return status.mess
-            else:
-                status.mess += "rebase --abort failed!\n"
-                status.mess += out
-                return status.mess
-    if status.mess:
-        # Stashing back failse: calling rebase --abort
-        print "Stashing back changes failed"
-        print "Calling rebase --abort"
-        (ret, out) = git.rebase("--abort", raises=False)
-        if ret != 0:
-            status.mess += "rebase --abort failed!\n"
-            status.mess += out
-    return status.mess
-
-###
-# Internal functions used by _update_branch()
-
-
-@contextlib.contextmanager
-def _stash_changes(git, status):
-    """ Stash changes. To be used in a 'with' statement """
-    if git.is_clean(untracked=False):
-        yield
-        return
-    (ret, out) = git.stash(raises=False)
-    if ret != 0:
-        status.mess += "Stashing changes failed\n"
-        status.mess += out
-    yield
-    # If first stash fails, no need to try stash pop:
-    if status.mess:
-        return
-    (ret, out) = git.stash("pop", raises=False)
-    if ret != 0:
-        status.mess = "Stashing back changes failed\n"
-        status.mess += out
-
-
-@contextlib.contextmanager
-def _change_branch(git, status, branch):
-    """ Change branch. To be used in a 'with' statement """
-    current_branch = git.get_current_branch()
-    if current_branch == branch:
-        yield
-        return
-    with _stash_changes(git, status):
-        (ret, out) = git.checkout(branch, raises=False)
-        if ret != 0:
-            status.mess += "Checkout to %s failed\n" % branch
-            status.mess += out
-        yield
-        (ret, out) = git.checkout(current_branch, raises=False)
-        if ret != 0:
-            status.mess += "Checkout back to %s failed\n" % current_branch
-            status.mess += out
-
-
-def is_ff(git, status, local_sha1, remote_sha1):
-    """Check local_sha1 is fast-forward with remote_sha1.
-    Return True / False or None in case of error with merge-base.
-    """
-    if local_sha1 == remote_sha1:
-        return True
-    (retcode, out) = git.call("merge-base", local_sha1, remote_sha1,
-                               raises=False)
-    if retcode != 0:
-        status.mess += "Calling merge-base failed"
-        status.mess += out
-        return None
-
-    common_ancestor = out.strip()
-    return common_ancestor == local_sha1
-
-
-def get_ref_sha1(git, ref, status):
-    """Return the sha1 from a ref. None if not found."""
-    (ret, sha1) = git.call("show-ref", "--verify", "--hash",
-                           ref, raises=False)
-
-    if ret == 0:
-        return sha1
-
-    status.mess += "Get sha1 failed.\n"
-    status.mess += sha1
-    return None
-
-def _get_local_and_remote_sha1s(git, status, local_branch, remote_ref):
-    """ get the sha1s """
-    local_sha1 = get_ref_sha1(git, "refs/heads/%s" % local_branch, status)
-    remote_sha1 = get_ref_sha1(git, "refs/remotes/%s" % remote_ref, status)
-    return (local_sha1, remote_sha1)
-
-def _update_branch_if_ff(git, status, local_branch, remote_ref):
-    """ Update a local branch with a remote branch if the
-    merge is fast-forward
-
-    """
-    (local_sha1, remote_sha1) = _get_local_and_remote_sha1s(
-        git, status, local_branch, remote_ref)
-
-    if local_sha1 is None or remote_sha1 is None:
-        return
-
-    if local_sha1 == remote_sha1:
-        return
-
-    result_ff = is_ff(git, status, local_sha1, remote_sha1)
-    if result_ff is None:
-        return
-    if result_ff is False:
-        status.mess += "Could not update %s with %s\n" % (local_branch,
-                remote_ref)
-        status.mess += "Merge is not fast-forward and you are not on %s" % local_branch
-        return
-
-    print "Updating %s with %s ..." % (local_branch, remote_ref)
-    # Safe to checkout the branch, run merge and then go back
-    # to where we were:
-    with _change_branch(git, status, local_branch):
-        (ret, out) = git.merge("-v", remote_sha1, raises=False)
-        if ret != 0:
-            status.mess += "Merging %s with %s failed" % (local_branch,
-                                                                    remote_ref)
-            status.mess += out
 
 
 def get_repo_root(path):
@@ -473,7 +341,6 @@ def get_repo_root(path):
     (ret, out) = git.call("rev-parse", "--show-toplevel", raises=False)
 
     return out.replace('/', os.sep) if ret == 0 else None
-
 
 def is_submodule(path):
     """ Tell if the given path is a submodule
@@ -511,11 +378,9 @@ def is_submodule(path):
                    "\nError was: ", ui.reset, "\n", "  " + out)
         return True
 
-
 def is_git(path):
     """Return true if path is in a git work-tree."""
     return get_repo_root(path) == path
-
 
 def get_git_projects(projects):
     """Return projects which are git projects."""

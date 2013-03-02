@@ -144,7 +144,7 @@ class RepoConfig(object):
 
 
     def __repr__(self):
-        res = "<Project %s in %s" %  (self.project, self.src)
+        res = "<Repo %s in %s" %  (self.project, self.src)
         if self.default_branch:
             res += " default: %s>" % self.default_branch
         return res

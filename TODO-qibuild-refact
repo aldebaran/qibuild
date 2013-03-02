@@ -1,8 +1,5 @@
 * move FakeGit inside qisrc.tests.conftests
 
-* use git transactions in update_branch()
-
 * rename qisrc.manifest.Manifest -> qisrc.manifest.RemoteManifest
 
-* qisrc.GitProject.add_remote -> configure_remote()
-* qisrc.GitProject.add_branch -> configure_branch()
+* use qisys.ui.info_count everywhere

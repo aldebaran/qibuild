@@ -36,14 +36,14 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.git_projects = list()
         self.load_git_projects()
         self._syncer = qisrc.sync.WorkTreeSyncer(self)
-        self.load_manifests()
 
     def add_manifest(self, name, manifest_url, groups=None):
         """ Add a new manifest to this worktree """
         self._syncer.add_manifest(name, manifest_url, groups=groups)
 
-    def load_manifests(self):
+    def sync(self):
         """ Load the manifests """
+        # Note that load_manifests is called by WorkTreeSyncer ctor
         self._syncer.load_manifests()
 
     def load_git_projects(self):
@@ -105,7 +105,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     def clone_missing(self, repo):
         """ Add a new project  """
-        ui.info(ui.green, "Cloning", repo.remote_url, "->", repo.src)
+        ui.info(ui.green, "Adding", repo.project, "->", repo.src)
         worktree_project = self.worktree.add_project(repo.src)
         # add_project caused self.load_git_projects() to be called,
         # but the path was not a valid git project yet
@@ -119,12 +119,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.save_project_config(git_project)
         self.load_git_projects()
 
-    def move_repo(self, project, new_src):
+    def move_repo(self, repo, new_src):
         """ Move a project in the worktree (same remote url, different
         src)
 
         """
-        ui.warning("Project ", project.src, "moved to", new_src)
+        project = self.get_git_project(repo.src)
+        ui.info(ui.warning, "Moving ", project.src, "to", new_src)
         new_path = os.path.join(self.root, new_src)
         if os.path.exists(new_path):
             ui.error(new_path, "already exists")
@@ -136,13 +137,19 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             qisys.sh.mkdir(new_base_dir, recursive=True)
             os.rename(project.path, new_path)
         except Exception as e:
-            ui.error("Error when moving", project.path, "to", new_path,
+            ui.error("Error when moving", project.src, "to", new_path,
                      "\n", e , "\n",
-                     "Repository left in", project.path)
+                     "Repository left in", project.src)
             return
-
         project.src = new_src
         self.save_project_config(project)
+
+    def remove_repo(self, project):
+        """ Remove a project from the worktree """
+        ui.info(ui.green, "Removing", project.src)
+        # not sure when to use from_disk here ...
+        self.worktree.remove_project(project.src)
+
 
     def _get_elem(self, src):
         for xml_elem in self._root_xml.findall("project"):
@@ -237,6 +244,14 @@ class GitProject(object):
                               remote_branch=repo.default_branch, default=True)
         self.configure_remote(repo.remote, repo.remote_url)
 
+    def get_branch(self, branch_name):
+        """ Get the branch matching the name
+        :return: None if not found
+
+        """
+        for branch in self.branches:
+            if branch.name == branch_name:
+                return branch
 
     def apply_config(self):
         """ Apply configuration to the underlying git

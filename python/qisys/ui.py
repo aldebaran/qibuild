@@ -79,7 +79,7 @@ fuscia     = fuchsia
 
 
 CONFIG = {
-    "verbose": False,
+    "verbose": os.environ.get("VERBOSE"),
     "quiet": False,
     "color": True,
     "timestamp": False,
@@ -153,6 +153,22 @@ def info(*tokens, **kwargs):
         return
     _msg(*tokens, **kwargs)
 
+def info_count(i, n, *rest):
+    """ Same as info, but displays a nice counter
+    coler will be reset
+    >>> count(0, 4)
+     * (1 on 5)
+    >>> count(4, 12)
+     * ( 4 on 12)
+    >>> count(4, 10)
+     * (10 on 12)
+
+    """
+    num_digits = len(str(n)) # lame, I know
+    counter_format = "(%{}d on %d)".format(num_digits)
+    counter_str = counter_format % (i+1, n)
+    info(green, " * ", reset, bold, counter_str, reset, *rest)
+
 def debug(*tokens, **kwargs):
     """ Print a debug message """
     if not CONFIG["verbose"]:
@@ -168,6 +184,12 @@ def indent(text, num=2):
     """Indent a piece of text."""
     lines = text.splitlines()
     return '\n'.join(indent_iterable(lines, num=num))
+
+def tabs(num):
+    """ Compute a blank tab """
+    return "  " * num
+
+
 
 class timer:
     """ To be used as a decorator,

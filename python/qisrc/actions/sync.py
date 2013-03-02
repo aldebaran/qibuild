@@ -10,66 +10,68 @@
 """
 
 import sys
-import qisys.log
 
+from qisys import ui
 import qisys.parsers
 import qisrc.git
 import qisrc.sync
 import qisrc.parsers
-import qisrc.cmdparse
-from qisys import ui
+import qibuild.parsers
 
 
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
-    qisys.parsers.project_parser(parser)
-    qisrc.parsers.groups_parser(parser)
+    qibuild.parsers.project_parser(parser)
 
     parser.add_argument("--no-review", dest="setup_review", action="store_false",
         help="Do not setup projects for review")
-    parser.set_defaults(setup_review=True)
+    parser.add_argument("--rebase-devel", action="store_true",
+        help="Rebase devel branches. For advanced users only")
+    parser.set_defaults(setup_review=True, all=True)
 
 @ui.timer("Synchronizing worktree")
 def do(args):
     """Main entry point"""
-    worktree = qisys.worktree.open_worktree(args.worktree)
-    projects = qisrc.cmdparse.projects_from_args(args, worktree)
+    git_worktree = qisrc.parsers.get_git_worktree(args)
+    # At this point we know that:
+    #   - missing projects have been cloned
+    #   - every repo that uses gerrit has been configured
+    #   - every branch is configured correctly
+    git_projects = qisrc.parsers.get_git_projects(git_worktree, args)
+    skipped = list()
+    failed = list()
+    ui.info(ui.green, "Syncing projects ...")
+    for (i, git_project) in enumerate(git_projects):
+        ui.info_count(i, len(git_projects),
+                      ui.blue, git_project.src)
 
-    if len(projects) == len(worktree.projects):
-        qisrc.sync.sync_all(worktree, args)
+        git = qisrc.git.Git(git_project.path)
+        (status, out) = git.sync(git_project, rebase_devel=args.rebase_devel)
+        if status is None:
+            ui.info(ui.brown, "  [skipped]")
+            skipped.append((git_project.src, out))
+        if status is False:
+            ui.info(ui.red, "  [failed]")
+            failed.append((git_project.src, out))
+        if out:
+            print ui.indent(out, num=2)
 
-    ui.info(ui.green, "Synchronizing projects ...")
-    git_projects = qisrc.sync.get_toplevel_git_projects(projects)
+    if failed:
+        print
+        ui.error("Failed to sync some projects")
+        display_errors(failed)
 
-    errors = list()
-    project_count = len(git_projects)
+    if skipped:
+        print
+        ui.warning("Skipped some projects")
+        display_errors(skipped)
 
-    for i, project in enumerate(git_projects, start=1):
-        if project_count != 1:
-            ui.info(
-                ui.green, "*", ui.reset, "(%2i/%2i)" % (i, project_count),
-                ui.blue, project.src)
-        else:
-            ui.info(ui.bold, "Pulling", ui.blue, project.src)
+    if failed:
+        sys.exit(1)
 
-        if not project.branch or not project.remote:
-            ui.info(ui.green, "Project", ui.blue, project.src, ui.green, "not configured "
-                    "in any manifest, skipping")
-            continue
-
-        git = qisrc.git.Git(project.path)
-        error = git.update_branch(project.branch, project.remote,
-                                 fetch_first=True)
-        if error:
-            errors.append((project.src, error))
-
-    if not errors:
-        return
-
-    ui.error("Fail to sync some projects")
+def display_errors(errors):
     for (src, err) in errors:
         ui.info(ui.blue, src)
-        ui.info("-" * len(src))
+        ui.info(ui.blue, "-" * len(src))
         ui.info(ui.indent(err, num=2))
-    sys.exit(1)
