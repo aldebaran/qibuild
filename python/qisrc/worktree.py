@@ -118,17 +118,30 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.save_project_config(git_project)
         self.load_git_projects()
 
-    def remove_if_clean(self, project):
-
-        """ Called when .qi/git.xml has changed and
-        a project has been removed
+    def move_repo(self, project, new_src):
+        """ Move a project in the worktree (same remote url, different
+        src)
 
         """
-        ### FIXME:
-        # use from_disk ?
-        # detect remanes and move instead of cloning ?
-        # if git is clean, simply copy the .git dir in the new clone ?
-        self.worktree.remove_project(project.src)
+        ui.warning("Project ", project.src, "moved to", new_src)
+        new_path = os.path.join(self.root, new_src)
+        if os.path.exists(new_path):
+            ui.error(new_path, "already exists")
+            ui.error("If you are sure there is nothing valuable here, "
+                     "remove this directory and try again")
+            return
+        new_base_dir = os.path.dirname(new_path)
+        try:
+            qisys.sh.mkdir(new_base_dir, recursive=True)
+            os.rename(project.path, new_path)
+        except Exception as e:
+            ui.error("Error when moving", project.path, "to", new_path,
+                     "\n", e , "\n",
+                     "Repository left in", project.path)
+            return
+
+        project.src = new_src
+        self.save_project_config(project)
 
     def _get_elem(self, src):
         for xml_elem in self._root_xml.findall("project"):
@@ -136,10 +149,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                 return xml_elem
 
     def _set_elem(self, src, new_elem):
+        # remove it first if it exits
         for xml_elem in self._root_xml.findall("project"):
             if xml_elem.get("src") == src:
                 self._root_xml.remove(xml_elem)
-                self._root_xml.append(new_elem)
+        self._root_xml.append(new_elem)
 
     def save_project_config(self, project):
         """ Save the project instance in .qi/git.xml """
@@ -155,10 +169,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 class GitProject(object):
     def __init__(self, git_worktree, worktree_project):
         self.git_worktree = git_worktree
-        self.path = worktree_project.path
         self.src = worktree_project.src
         self.branches = list()
         self.remotes = list()
+
+    @property
+    def path(self):
+        return os.path.join(self.git_worktree.root, self.src)
 
     def change_config(func):
         """ Decorator for every function that changes the git configuration
@@ -189,7 +206,7 @@ class GitProject(object):
     @change_config
     def configure_branch(self, name, tracks="origin",
                          remote_branch=None, default=True):
-        if self.default_branch and self.default_branch != name:
+        if self.default_branch and self.default_branch.name != name:
             ui.warning("default branch changed",
                         self.default_branch.name, "->", name)
         branch_found = False
@@ -298,7 +315,7 @@ class BranchParser(qisys.qixml.XMLParser):
 class GitProjectParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(GitProjectParser, self).__init__(target)
-        self._ignore = ["worktree", "path", "review"]
+        self._ignore = ["worktree", "path", "review", "clone_url"]
         self._required = ["src"]
 
     def _parse_remote(self, elem):

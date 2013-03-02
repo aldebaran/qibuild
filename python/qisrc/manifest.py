@@ -6,6 +6,7 @@
 
 """
 
+import functools
 import posixpath
 
 import qisys.sh
@@ -36,6 +37,17 @@ class Manifest(object):
         self.groups = qisrc.groups.Groups()
         self.load()
 
+    def change_config(func):
+        """ Decorator for every function that changes the configuration """
+        @functools.wraps(func)
+        def new_func(self, *args, **kwargs):
+            res = func(self, *args, **kwargs)
+            self.dump()
+            # mandatory to re-compute project.remote_url,
+            # project.review and so on
+            self.load()
+            return res
+        return new_func
 
     def load(self):
         """ (re)-parse the xml configuration file """
@@ -92,15 +104,15 @@ class Manifest(object):
             if remote.name == name:
                 return remote
 
+    @change_config
     def add_remote(self, name, url, review=False):
         """ Add a new remote to the manifest. """
         remote = qisrc.worktree.Remote()
         remote.name = name
         remote.url = url
         self.remotes.append(remote)
-        self.dump()
-        self.load()
 
+    @change_config
     def add_repo(self, project_name, src, remote_name=None,
                  default_branch="master"):
         """ Add a new repo to the manifest. """
@@ -110,8 +122,14 @@ class Manifest(object):
         repo.remote = remote_name
         repo.default_branch = default_branch
         self.repos.append(repo)
-        self.dump()
-        self.load()
+
+    @change_config
+    def remove_repo(self, project_name):
+        """ Remove a repo from the manifest """
+        matching_repo = self.get_repo(project_name)
+        if not matching_repo:
+            raise Exception("No such repo:", project_name)
+        self.repos.remove(matching_repo)
 
 class RepoConfig(object):
     def __init__(self):

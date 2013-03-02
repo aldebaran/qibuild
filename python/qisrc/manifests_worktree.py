@@ -16,7 +16,8 @@ class ManifestsWorkTree(object):
     """ Handle the manifests of a worktree
 
     Stores the git url of the manifests and the groups that
-    should be used
+    should be used, synchronizes the local manfifests with the git
+    worktree
 
     """
     def __init__(self, git_worktree):
@@ -109,7 +110,6 @@ class ManifestsWorkTree(object):
             ui.info(ui.green, " * ",
                     ui.reset, ui.bold, "(%d / %d)" % (i, len(repos)),
                     ui.reset, ui.bold, repo.src)
-
             self.sync_manifest_repo(repo)
 
     def sync_manifest_repo(self, repo):
@@ -119,11 +119,10 @@ class ManifestsWorkTree(object):
         if not git_project:
             self.git_worktree.clone_missing(repo)
             return
-        if git_project.src == repo.src:
-            git_project.sync(repo)
-        else:
+        if git_project.src != repo.src:
             # Project has moved:
             self.git_worktree.move_repo(git_project, repo.src)
+        git_project.sync(repo)
 
     def clone_manifest(self, name, url, branch="master"):
         """ Clone a new manifest in .qi/manifests/<name>
@@ -133,6 +132,8 @@ class ManifestsWorkTree(object):
         git = qisrc.git.Git(manifest_repo)
         git.clone(url, "--branch", branch)
 
+    def __repr__(self):
+        return "<ManifestsWorkTree in %s>" % self.git_worktree.root
 
 
 class LocalManifestSettings(object):

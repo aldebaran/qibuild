@@ -55,7 +55,7 @@ def test_remove_project(worktree):
     assert worktree.projects == list()
 
     worktree.add_project("foo")
-    assert (worktree.projects[0].src, "foo")
+    assert worktree.projects[0].src == "foo"
 
     worktree.remove_project("foo", from_disk=True)
     assert worktree.projects == list()

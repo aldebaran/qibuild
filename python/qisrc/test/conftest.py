@@ -98,12 +98,20 @@ class TestGitServer(object):
         old_src = repo.src
         repo.src = new_src
         self.manifest.dump()
+        self.push_manifest("%s: moved %s -> %s" % (project, old_src, new_src))
+        self.manifest.load()
+
+    def push_manifest(self, message):
+        """ Push new manifest.xml version """
         manifest_repo = self.root.join("src", "manifest")
         git = qisrc.git.Git(manifest_repo.strpath)
-        git.commit("--all", "--message", "%s: moved %s -> %s" %
-                   (projectc, old_src, new_src))
+        git.commit("--all", "--message", message)
         git.push("origin", "master:master")
-        self.manifest.load()
+
+    def remove_repo(self, project):
+        """ Remove a repo from the manifest """
+        self.manifest.remove_repo(project)
+        self.push_manifest("removed %s" % project)
 
     def push_file(self, project, filename, contents):
         """ Push a new file with the given contents to the given project

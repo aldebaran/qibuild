@@ -13,12 +13,10 @@ def test_guess_git_repo(tmpdir, args):
 </project>
 """)
     worktree.add_project("foo")
-    git_worktree = qisrc.worktree.GitWorkTree(worktree)
     git = qisrc.git.Git(foo.strpath)
     git.init()
+    git_worktree = qisrc.worktree.GitWorkTree(worktree)
 
     with qisys.sh.change_cwd(bar.strpath):
         assert qisys.parsers.get_projects(worktree, args)[0].src == "foo/bar"
         assert qisrc.parsers.get_git_projects(git_worktree, args)[0].src == "foo"
-
-

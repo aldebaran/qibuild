@@ -63,3 +63,6 @@ doc:
 upgrade-python:
 	@echo ":: Update python modules with $(PIP)"
 	@$(PIP) install --user --upgrade --requirement requirements.txt
+
+refact:
+	py.test qisrc/test qisys/test --cov qisrc --cov qisys

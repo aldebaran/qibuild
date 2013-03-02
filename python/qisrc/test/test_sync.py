@@ -11,9 +11,34 @@ def test_new_repos(git_worktree, git_server):
     git_worktree.add_manifest("default", manifest_url)
     assert git_worktree.get_git_project("foo")
 
-def test_moving_repos(git_worktree, git_server):
+def test_moving_repos_simple_case(git_worktree, git_server):
     git_server.create_repo("foo.git")
     manifest_url = git_server.manifest_url
     git_worktree.add_manifest("default", manifest_url)
-    git_server.move_repo("foo.git", "foo", "lib/foo")
-    git.worktree.load_manifests()
+    git_server.move_repo("foo.git", "lib/foo")
+    git_worktree.load_manifests()
+    assert git_worktree.get_git_project("lib/foo")
+
+def test_moving_repos_rename_fails(git_worktree, git_server):
+    git_server.create_repo("foo.git")
+    manifest_url = git_server.manifest_url
+    git_worktree.add_manifest("default", manifest_url)
+    git_server.move_repo("foo.git", "lib/foo")
+    # create a file named "lib" to make the rename fail
+    lib = git_worktree.tmpdir.join("lib")
+    lib.write("")
+    git_worktree.load_manifests()
+    assert not git_worktree.get_git_project("lib/foo")
+    assert git_worktree.get_git_project("foo")
+    lib.remove()
+    git_worktree.load_manifests()
+    assert  git_worktree.get_git_project("lib/foo")
+    assert not git_worktree.get_git_project("foo")
+
+def test_removing_repos(git_worktree, git_server):
+    git_server.create_repo("foo.git")
+    manifest_url = git_server.manifest_url
+    git_worktree.add_manifest("default", manifest_url)
+    git_server.remove_repo("foo.git")
+    git_worktree.load_manifests()
+    assert not git_worktree.get_git_project("foo")
