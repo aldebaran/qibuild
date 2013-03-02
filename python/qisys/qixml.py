@@ -8,6 +8,8 @@
 
 """
 
+from qisys import ui
+
 HAS_LXML = False
 from xml.etree import ElementTree as etree
 
@@ -290,7 +292,7 @@ class XMLParser(object):
 
         def is_serializable(value):
             # no way to guess that from etree api:
-            return type(value) in (bool, str, int)
+            return type(value) in (list, bool, str, int)
 
         target_dir = dir(self.target)
         for member in target_dir:
@@ -319,6 +321,8 @@ class XMLParser(object):
                         res.set(member, "true")
                     else:
                         res.set(member, "false")
+                if type(member_value) == list:
+                    res.set(member, " ".join(member_value))
                 else:
                     res.set(member, str(member_value))
         return res
@@ -335,7 +339,11 @@ def apply_xml_attributes(target, elem):
             default_value = getattr(target, attr)
             type_value = type(default_value)
             new_value = _get_value_for_type(type_value, elem.attrib[attr])
-            setattr(target, attr, new_value)
+            try:
+                setattr(target, attr, new_value)
+            except AttributeError:
+                ui.warning("Could not set", attr, "on", target, "with value",
+                            new_value)
 
 
 def _get_value_for_type(type_value, value):
@@ -346,5 +354,6 @@ def _get_value_for_type(type_value, value):
             return False
         mess = "Waiting for a boolean but value is '%s'." % value
         raise Exception(mess)
-
+    if type_value == list:
+        return value.split(" ")
     return value

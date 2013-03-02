@@ -77,19 +77,31 @@ fuscia     = fuchsia
 #    CONFIG['timestamps'] = True
 #    CONFIG['interative'] = False
 
+
 CONFIG = {
     "verbose": False,
     "quiet": False,
     "color": True,
     "timestamp": False,
     "interactive": True,
+    "record": False  # used for testing
 }
 
+
+_MESSAGES = list()
+
+def find_message(message_part):
+    """ Testing only """
+    for message in _MESSAGES:
+        if message_part in message:
+            return message
 
 def _msg(*tokens, **kwargs):
     """ Helper method for error, warning, info, debug
 
     """
+    if CONFIG["record"]:
+        CONFIG["color"] = False
     fp = kwargs.get("fp", sys.stdout)
     sep = kwargs.get("sep", " ")
     end = kwargs.get("end", "\n")
@@ -115,6 +127,8 @@ def _msg(*tokens, **kwargs):
         res.append(reset.code)
     res.append(end)
     stringres = ''.join(res)
+    if CONFIG["record"]:
+        _MESSAGES.append(stringres)
     if _console and with_color:
         _console.write_color(stringres)
     else:

@@ -1,7 +1,9 @@
 import os
 
+from qisys import ui
 import qisys.worktree
 import qisrc.git
+import qisrc.manifests_worktree
 
 class NotInAGitRepo(Exception):
     """ Custom exception when user did not
@@ -24,25 +26,31 @@ def open_git_worktree(root):
     return git_worktree
 
 class GitWorkTree(qisys.worktree.WorkTreeObserver):
-    """ Stores a list of git projects """
+    """ Stores a list of git projects and a list of manifests """
     def __init__(self, worktree):
         self.worktree = worktree
         self.root = worktree.root
         self._root_xml = qisys.qixml.read(self.git_xml).getroot()
-        self._load()
         worktree.register(self)
-        self._manifests = list()
+        self.git_projects = list()
+        self.load_git_projects()
+        self._manifest_worktree = qisrc.manifests_worktree.ManifestsWorkTree(self)
+        self.load_manifests()
 
-    def _load(self):
-        self.git_projects = self._load_git_projects()
+    def add_manifest(self, name, manifest_url, groups=None):
+        """ Add a new manifest to this worktree """
+        self._manifest_worktree.add_manifest(name, manifest_url, groups=groups)
 
+    def load_manifests(self):
+        """ Load the manifests """
+        self._manifest_worktree.load_manifests()
 
-    def _load_git_projects(self):
+    def load_git_projects(self):
         """ Build a list of git projects using the
         xml configuration
 
         """
-        git_projects = list()
+        self.git_projects = list()
         for worktree_project in self.worktree.projects:
             project_src = worktree_project.src
             if not qisrc.git.is_git(worktree_project.path):
@@ -52,10 +60,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             if git_elem is not None:
                 git_parser = GitProjectParser(git_project)
                 git_parser.parse(git_elem)
-            git_projects.append(git_project)
+            self.git_projects.append(git_project)
             git_project.apply_config()
-        return git_projects
-
 
     def get_git_project(self, path, raises=False, auto_add=False):
         """ Get a git project by its sources """
@@ -63,6 +69,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         for git_project in self.git_projects:
             if git_project.src == src:
                 return git_project
+
+    def find_url(self, remote_url):
+        """ Look for a project configured with the given url """
+        for git_project in self.git_projects:
+            if git_project.clone_url == remote_url:
+                return git_project
+
 
     @property
     def git_xml(self):
@@ -78,68 +91,44 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         elem.set("src", src)
         self._root_xml.append(elem)
         qisys.qixml.write(self._root_xml, self.git_xml)
-        # This will trigger the call to self._load()
+        # This will trigger the call to self.load_git_projects()
         self.worktree.add_project(src)
         new_proj = self.get_git_project(src)
         return new_proj
 
     def on_project_removed(self, project):
-        self._load()
+        self.load_git_projects()
 
-    def on_git_xml_changed(self):
-        """ Called when git.xml has changed
-        (for instance, we've are syncing with a manifest)
+    def on_project_added(self, project):
+        self.load_git_projects()
 
-        """
-        # Check if we need to clone new repositories
-        self._root_xml = qisys.qixml.read(self.git_xml).getroot()
-        for xml_elem in self._root_xml.findall("project"):
-            src = xml_elem.get("src")
-            if self.worktree.has_project(src):
-                continue
-            else:
-                self._clone_missing(src, xml_elem)
-        self._load()
-        # Check if we need to remove repositories
-        for worktree_project in self.worktree.projects:
-            src = worktree_project.src
-            path = worktree_project.path
-            git_project = self.get_git_project(src)
-            xml_elem = self._get_elem(src)
-            if xml_elem is None:
-                self._remove_if_clean(git_project)
-        self._load()
-
-    def _clone_missing(self, src, xml_elem):
-        """ Called when .qi/git.xml has changed and
-        new projects have come up
-
-        """
-        # add_project caused self._load() to be called,
+    def clone_missing(self, repo):
+        """ Add a new project  """
+        ui.info(ui.green, "Cloning", repo.remote_url, "->", repo.src)
+        worktree_project = self.worktree.add_project(repo.src)
+        # add_project caused self.load_git_projects() to be called,
         # but the path was not a valid git project yet
         # so the GitProject does not exist yet
-        worktree_project = self.worktree.add_project(src)
         git_project = GitProject(self, worktree_project)
-        git_parser = GitProjectParser(git_project)
-        git_parser.parse(xml_elem)
-        clone_url = git_project.clone_url
-        if not clone_url:
-            return
         git = qisrc.git.Git(git_project.path)
-        git.clone(clone_url,
-                    "--branch", git_project.default_branch.name,
-                    "--origin", git_project.default_branch.tracks)
+        git.clone(repo.remote_url, "--recursive",
+                  "--branch", repo.default_branch,
+                  "--origin", repo.remote)
+        git_project.sync(repo)
+        self.save_project_config(git_project)
+        self.load_git_projects()
 
-    def _remove_if_clean(self, project):
+    def remove_if_clean(self, project):
+
         """ Called when .qi/git.xml has changed and
         a project has been removed
 
         """
-        ### FIXME: warn first
-        qisys.sh.rm(project.path)
-
-    def on_project_added(self, project):
-        self._load()
+        ### FIXME:
+        # use from_disk ?
+        # detect remanes and move instead of cloning ?
+        # if git is clean, simply copy the .git dir in the new clone ?
+        self.worktree.remove_project(project.src)
 
     def _get_elem(self, src):
         for xml_elem in self._root_xml.findall("project"):
@@ -152,7 +141,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                 self._root_xml.remove(xml_elem)
                 self._root_xml.append(new_elem)
 
-    def on_git_config_changed(self, project):
+    def save_project_config(self, project):
+        """ Save the project instance in .qi/git.xml """
         parser = GitProjectParser(project)
         project_xml = parser.xml_elem(node_name="project")
         self._set_elem(project.src, project_xml)
@@ -177,26 +167,55 @@ class GitProject(object):
         def new_func(self, *args, **kwargs):
             res = func(self, *args, **kwargs)
             self.apply_config()
-            self.git_worktree.on_git_config_changed(self)
+            self.git_worktree.save_project_config(self)
             return res
         return new_func
 
     @change_config
-    def add_remote(self, name, url=None):
-        remote = Remote()
-        remote.name = name
-        remote.url = url
-        self.remotes.append(remote)
+    def configure_remote(self, name, url=None):
+        remote_found = False
+        for remote in self.remotes:
+            if remote.name == name:
+                remote_found = True
+                if remote.url != url:
+                    ui.warning("remote url changed", url, "->", remote.url)
+                    remote.url = url
+        if not remote_found:
+            remote = Remote()
+            remote.name = name
+            remote.url = url
+            self.remotes.append(remote)
 
     @change_config
-    def add_branch(self, name, tracks=None, remote_branch=None):
-        branch = Branch()
-        branch.name = name
-        branch.tracks = tracks
-        branch.remote_branch = remote_branch
-        self.branches.append(branch)
-        self.apply_config()
-        self.git_worktree.on_git_config_changed(self)
+    def configure_branch(self, name, tracks="origin",
+                         remote_branch=None, default=True):
+        if self.default_branch and self.default_branch != name:
+            ui.warning("default branch changed",
+                        self.default_branch.name, "->", name)
+        branch_found = False
+        for branch in self.branches:
+            if branch.name == name:
+                branch_found = True
+                if branch.tracks != tracks:
+                    ui.warning(branch.name, "now tracks", tracks,
+                              "instead of", branch.tracks)
+                    branch.tracks = tracks
+                branch.default_branch = default
+        if not branch_found:
+            branch = Branch()
+            branch.name = name
+            branch.tracks = tracks
+            branch.remote_branch = remote_branch
+            branch.default = default
+            self.branches.append(branch)
+        return branch
+
+    @change_config
+    def sync(self, repo):
+        self.configure_branch(repo.default_branch, tracks=repo.remote,
+                              remote_branch=repo.default_branch, default=True)
+        self.configure_remote(repo.remote, repo.remote_url)
+
 
     def apply_config(self):
         """ Apply configuration to the underlying git

@@ -469,6 +469,10 @@ def is_path_inside(a, b):
             return False
     return True
 
+def is_empty(path):
+    """ Check if a path is empty """
+    return os.listdir(path) == list()
+
 
 class TempDir:
     """This is a nice wrapper around tempfile module.

@@ -20,6 +20,7 @@ class Git(object):
     def __init__(self, repo):
         """ :param repo: The path to the tree """
         self.repo = repo
+        self._transaction = None
 
     def call(self, *args, **kwargs):
         """
@@ -33,9 +34,27 @@ class Git(object):
 
            * if cwd is not given it will be self.repo instead
            * if env is not given it will be read from the config file
-           * if raises is False, no exception will be raise if command
+           * if raises is False, no exception will be raised if command
              fails, and a (retcode, output) tuple will be returned.
         """
+        if not self._transaction:
+            return self._call(*args, **kwargs)
+
+        if not self._transaction.ok:
+            # Do not run any more  command if transaction failed:
+            return
+
+        # Force raises to False
+        kwargs["raises"] = False
+        (retcode, out) = self._call(*args, **kwargs)
+        if retcode != 0:
+            self._transaction.ok = False
+            self._transaction.output += "git %s failed\n" % (" ".join(args))
+            self._transaction.output += out
+
+
+    def _call(self, *args, **kwargs):
+        """ Helper for self.call """
         ui.debug("git", " ".join(args))
         if not "cwd" in kwargs.keys():
             kwargs["cwd"] = self.repo
@@ -59,6 +78,14 @@ class Git(object):
             return (process.returncode, out)
         else:
             qisys.command.call(cmd, **kwargs)
+
+    @contextlib.contextmanager
+    def transaction(self):
+        """ Start a series of git commands """
+        self._transaction = Transaction()
+        yield self._transaction
+        self._transaction = None
+
 
     def get_config(self, name):
         """ Get a git config value.
@@ -231,16 +258,9 @@ class Git(object):
             remote_branch = branch
         tracked = self.get_tracking_branch(branch=branch)
         remote_ref = "%s/%s" % (remote_name, remote_branch)
-        if tracked is not None:
-            if tracked != remote_ref:
-                mess = "%s will now track %s instead of %s"
-                mess = mess % (branch, remote_ref, tracked)
-                qisys.ui.warning(mess)
-            else:
-                return
-        remote = self.set_config("branch.%s.remote" % branch, remote_name)
-        merge  = self.set_config("branch.%s.merge" % branch,
-                                 "refs/heads/%s" % remote_branch)
+        self.set_config("branch.%s.remote" % branch, remote_name)
+        self.set_config("branch.%s.merge" % branch,
+                        "refs/heads/%s" % remote_branch)
 
     def update_branch(self, *args, **kwargs):
         """ Update the given branch to match the given remote branch
@@ -501,3 +521,9 @@ def get_git_projects(projects):
     """Return projects which are git projects."""
     git_projects = [p for p in projects if is_git(p.path)]
     return git_projects
+
+class Transaction:
+    """ Used to simplify chaining git commands """
+    def __init__(self):
+        self.ok = True
+        self.output = ""

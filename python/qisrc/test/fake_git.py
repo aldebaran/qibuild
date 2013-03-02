@@ -66,8 +66,14 @@ class FakeGit(qisrc.git.Git):
                 mess += "but was only called %s times" % (call_index)
                 raise Exception(mess)
 
+    def called(self, cmd):
+        """ Return True if the command was called """
+        for (call_args, _) in self.calls:
+            if call_args[0] == cmd:
+                return True
+        return False
 
-    def call(self, *args, **kwargs):
+    def _call(self, *args, **kwargs):
         """ Look for the return of the command in the list.
         If not found, assume it succeeds.
 
@@ -79,7 +85,7 @@ class FakeGit(qisrc.git.Git):
             return (retcode, out)
         else:
             if retcode != 0:
-                raise Exception("%s failed" % args)
+                raise Exception("%s failed" % " ".join(args))
 
 
 def test_persistent_config():

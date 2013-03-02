@@ -5,8 +5,15 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-def test_simple_sync(tmpdir, git_server, git_worktree):
+def test_new_repos(git_worktree, git_server):
     git_server.create_repo("foo.git")
-    git_worktree.add_manifest(git_server.manifest)
-    git_worktree.sync()
-    assert len(git_worktree.projects) == 1
+    manifest_url = git_server.manifest_url
+    git_worktree.add_manifest("default", manifest_url)
+    assert git_worktree.get_git_project("foo")
+
+def test_moving_repos(git_worktree, git_server):
+    git_server.create_repo("foo.git")
+    manifest_url = git_server.manifest_url
+    git_worktree.add_manifest("default", manifest_url)
+    git_server.move_repo("foo.git", "foo", "lib/foo")
+    git.worktree.load_manifests()

@@ -159,3 +159,23 @@ def test_complex_xml_parser():
     assert foo2.bar.baz == "Baz!"
     foo.spam == 42
     foo.eggs == True
+
+def test_list_attr():
+    class Foo:
+        def __init__(self):
+            self.names = list()
+
+    class FooParser(qisys.qixml.XMLParser):
+        def __init__(self, target):
+            super(FooParser, self).__init__(target)
+
+    foo = Foo()
+    foo.names = ["a", "b"]
+    parser = FooParser(foo)
+    xml_elem = parser.xml_elem()
+    print qisys.qixml.etree.tostring(xml_elem)
+    foo2 = Foo()
+    parser = FooParser(foo2)
+    parser.parse(xml_elem)
+    assert foo2.names == ["a", "b"]
+

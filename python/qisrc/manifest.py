@@ -63,20 +63,22 @@ class Manifest(object):
         xml_elem = parser.xml_elem()
         qisys.qixml.write(xml_elem, self.manifest_xml)
 
-    def get_repos(self, group=None):
+    def get_repos(self, groups=None):
         """ Get the repositories inside the given group
         Retrun all repositories when no group is given
 
         """
-        if not group:
+        if not groups:
             return self.repos
-        repos = list()
-        project_names = self.groups.projects(group)
-        for project_name in project_names:
-            matching_repo = self.get_repo(project_name)
-            if matching_repo:
-                repos.append(matching_repo)
-        return repos
+
+        repos = dict()
+        for group in groups:
+            project_names = self.groups.projects(group)
+            for project_name in project_names:
+                matching_repo = self.get_repo(project_name)
+                if matching_repo:
+                    repos[project_name] = matching_repo
+        return repos.values()
 
     def get_repo(self, project):
         """ Get a repository given the project name (foo/bar.git) """

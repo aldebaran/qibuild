@@ -6,6 +6,7 @@ import py
 import pytest
 import mock
 
+from qisys import ui
 import qisys.sh
 import qisys.interact
 import qisys.worktree
@@ -76,3 +77,15 @@ def args(request):
 
     """
     return TestNamespace()
+
+
+
+@pytest.fixture
+def record_messages(request):
+    """ Configure qisys.ui to record the messges sent to the user """
+    ui.CONFIG["record"] = True
+    ui._MESSAGES = list()
+    def reset():
+        ui.CONFIG["record"] = False
+        ui._MESSAGES = list()
+    request.addfinalizer(reset)

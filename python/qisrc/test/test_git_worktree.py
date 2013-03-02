@@ -1,6 +1,11 @@
+from qisys import ui
 import qisys.qixml
 import qisys.worktree
 import qisrc.worktree
+
+
+import mock
+
 
 def test_read_git_configs(tmpdir, test_git):
     tmpdir.mkdir("foo")
@@ -55,8 +60,8 @@ def test_read_git_configs(tmpdir, test_git):
 
 def test_git_configs_are_persistent(git_worktree):
     foo = git_worktree.create_git_project("foo")
-    foo.add_remote("upstream", url="git@srv:bar.git")
-    foo.add_branch("master", tracks="upstream")
+    foo.configure_remote("upstream", url="git@srv:bar.git")
+    foo.configure_branch("master", tracks="upstream")
 
     def check_config(foo):
         assert len(foo.remotes) == 1
@@ -76,56 +81,26 @@ def test_git_configs_are_persistent(git_worktree):
 
 def test_sync_git_configs(git_worktree):
     foo = git_worktree.create_git_project("foo")
-    foo.add_remote("upstream", url="git@srv:bar.git")
+    foo.configure_remote("upstream", url="git@srv:bar.git")
 
     git = qisrc.git.Git(foo.path)
     assert git.get_config("remote.upstream.url") == "git@srv:bar.git"
 
-    foo.add_branch("master", tracks="upstream")
+    foo.configure_branch("master", tracks="upstream")
     assert git.get_tracking_branch("master") == "upstream/master"
 
-    foo.add_branch("feature", tracks="upstream", remote_branch="remote_branch")
+    foo.configure_branch("feature", tracks="upstream",
+                         remote_branch="remote_branch")
     assert git.get_tracking_branch("feature") == "upstream/remote_branch"
 
-def test_clones_when_missing(git_server, git_worktree):
-    foo_repo = git_server.create_repo("foo.git")
-    git_xml_path = git_worktree.git_xml
-    with open(git_xml_path, "w") as fp:
-        fp.write(""" \
-<git>
-  <project src="foo" >
-    <remote name="origin" url="{}" />
-    <branch name="master" default="true" tracks="origin" />
-  </project>
-</git>
-""".format(foo_repo.remote_url))
-    git_worktree.on_git_xml_changed()
-    assert git_worktree.get_git_project("foo")
-
-def test_moving_projects(git_server, git_worktree):
-    foo_repo = git_server.create_repo("foo.git")
-    git_xml_path = git_worktree.git_xml
-    with open(git_xml_path, "w") as fp:
-        fp.write(""" \
-<git>
-  <project src="foo" >
-    <remote name="origin" url="{}" />
-    <branch name="master" default="true" tracks="origin" />
-  </project>
-</git>
-""".format(foo_repo.remote_url))
-    git_worktree.on_git_xml_changed()
-
-    with open(git_xml_path, "w") as fp:
-        fp.write(""" \
-<git>
-  <project src="bar" >
-    <remote name="origin" url="{}" />
-    <branch name="master" default="true" tracks="origin" />
-  </project>
-</git>
-""".format(foo_repo.remote_url))
-    git_worktree.on_git_xml_changed()
-    assert len(git_worktree.git_projects) == 1
-
-
+def test_warn_on_change(git_worktree, record_messages):
+    foo = git_worktree.create_git_project("foo")
+    foo.configure_remote("origin", "git@srv:foo.git")
+    foo.configure_branch("master", tracks="origin", default=True)
+    foo.configure_remote("origin", "git@srv:libfoo.git")
+    assert ui.find_message("remote url changed")
+    foo.configure_branch("next", default=True)
+    assert ui.find_message("default branch changed")
+    foo.configure_remote("gerrit", "http://gerrit/libfoo.git")
+    foo.configure_branch("next", tracks="gerrit")
+    assert ui.find_message("now tracks gerrit instead")

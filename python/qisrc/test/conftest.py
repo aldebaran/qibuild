@@ -5,6 +5,8 @@ import qisrc.git
 import qisrc.worktree
 import qisrc.manifest
 
+from qisrc.test.fake_git import FakeGit
+
 class TestGitWorkTree(qisrc.worktree.GitWorkTree):
     """ A subclass of qisrc.worktree.WorkTree that
     can create git projects
@@ -55,12 +57,16 @@ class TestGitServer(object):
         self.srv = root.mkdir("srv")
         self.src = root.mkdir("src")
         self.work = root.mkdir("work")
-        manifest_xml = root.join("manifest.xml")
-        manifest_xml.write("<manifest />")
+
+        # Manifest itself can not be handled as a normal repo:
+        self.create_repo("manifest.git", add_to_manifest=False)
+        self.push_file("manifest.git", "manifest.xml", "<manifest />")
+        manifest_xml = root.join("src", "manifest", "manifest.xml")
         self.manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
         self.manifest.add_remote("origin", self.srv.strpath)
+        self.manifest_url = self.srv.join("manifest.git").strpath
 
-    def create_repo(self, project, src=None):
+    def create_repo(self, project, src=None, add_to_manifest=True):
         """ Create a new repo and add it to the manifest """
         if not src:
             src = project.replace(".git", "")
@@ -74,9 +80,48 @@ class TestGitServer(object):
         git.set_remote("origin", repo_srv.strpath)
         git.push("origin", "master:master")
 
+        if not add_to_manifest:
+            return
+
         self.manifest.add_repo(project, src)
         repo = self.manifest.get_repo(project)
+
+        manifest_repo = self.root.join("src", "manifest")
+        git = qisrc.git.Git(manifest_repo.strpath)
+        git.commit("--all", "--message", "add %s" % src)
+        git.push("origin", "master:master")
         return repo
+
+    def move_repo(self, project, new_src):
+        """ Change a repo location """
+        repo = self.manifest.get_repo(project)
+        old_src = repo.src
+        repo.src = new_src
+        self.manifest.dump()
+        manifest_repo = self.root.join("src", "manifest")
+        git = qisrc.git.Git(manifest_repo.strpath)
+        git.commit("--all", "--message", "%s: moved %s -> %s" %
+                   (projectc, old_src, new_src))
+        git.push("origin", "master:master")
+        self.manifest.load()
+
+    def push_file(self, project, filename, contents):
+        """ Push a new file with the given contents to the given project
+        It is assumed that the project has beed created
+
+        """
+        src = project.replace(".git", "")
+        repo_src = self.src.join(src)
+        to_write = repo_src.join(filename)
+        if to_write.check(file=True):
+            message = "Update %s" % filename
+        else:
+            message = "Add %s" % filename
+        repo_src.join(filename).write(contents)
+        git = qisrc.git.Git(repo_src.strpath)
+        git.add(filename)
+        git.commit("--message", message)
+        git.push("origin", "master:master")
 
 class TestGit(qisrc.git.Git):
     """ the Git class with a few other helpfull methods """
@@ -123,3 +168,8 @@ def git_server(request):
     srv_root = py.path.local(tmp)
     git_srv = TestGitServer(srv_root)
     return git_srv
+
+# pylint: disable-msg=E1101
+@pytest.fixture
+def mock_git(request):
+    return FakeGit("repo")

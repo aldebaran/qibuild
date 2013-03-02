@@ -91,17 +91,18 @@ worktree root: {1}
     @property
     def dot_qi(self):
         """Get the dot_qi directory."""
-        return os.path.join(self.root, ".qi")
+        res = os.path.join(self.root, ".qi")
+        qisys.sh.mkdir(res)
+        return res
 
     @property
     def worktree_xml(self):
         """Get the path to .qi/worktree.xml """
-        return os.path.join(self.dot_qi, "worktree.xml")
-
-    @property
-    def qibuild_xml(self):
-        """Get the path to .qi/qibuild.xml """
-        return os.path.join(self.dot_qi, "qibuild.xml")
+        worktree_xml = os.path.join(self.dot_qi, "worktree.xml")
+        if not os.path.exists(worktree_xml):
+            with open(worktree_xml, "w") as fp:
+                fp.write("<worktree />")
+        return worktree_xml
 
     def has_project(self, path):
         src = self.normalize_path(path)
@@ -215,35 +216,13 @@ worktree root: {1}
         return res
 
 
-def open_worktree(root):
-    """ Open a qi worktree.
+def open_worktree(directory):
+    print "qisys.worktree.open_worktree is deprecated, use WorkTree instead"
+    return WorkTree(directory)
 
-    :return: a valid :py:class:`WorkTree` instance.
-
-    """
-    if not os.path.exists(root):
-        mess =  "Cannot open a worktree from %s\n" % root
-        mess += "This path does not exist"
-        raise WorkTreeError(mess)
-    res = WorkTree(root)
-    return res
-
-
-def create(directory, force=False):
-    """Create a new Qi work tree in the given directory.
-
-    If already in a worktre, will do nothing, unless
-    force is True, and then will re-initialize the worktree.
-
-    """
-    dot_qi = os.path.join(directory, ".qi")
-    qisys.sh.mkdir(dot_qi, recursive=True)
-    qi_xml = os.path.join(dot_qi, "qibuild.xml")
-    if not os.path.exists(qi_xml) or force:
-        with open(qi_xml, "w") as fp:
-            fp.write("<qibuild />\n")
-    return open_worktree(directory)
-
+def create(directory):
+    print "qisys.worktree.create is deprecated, use WorkTree instead"
+    return WorkTree(directory)
 
 class WorkTreeProject(object):
     def __init__(self, worktree, src):

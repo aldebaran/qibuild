@@ -69,7 +69,7 @@ def test_groups(tmpdir):
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
-    git_projects = manifest.get_repos(group="qim")
+    git_projects = manifest.get_repos(groups=["qim"])
     assert len(git_projects) == 2
     assert git_projects[0].remote_url == "git@example.com:qi/libqi.git"
     assert git_projects[1].remote_url == "git@example.com:qi/libqimessaging.git"
