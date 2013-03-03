@@ -113,6 +113,14 @@ class TestGitServer(object):
         self.manifest.remove_repo(project)
         self.push_manifest("removed %s" % project)
 
+    def create_group(self, name, projects):
+        """ Add a group to the manifest """
+        for project in projects:
+            self.create_repo(project)
+        self.manifest.configure_group(name, projects)
+        self.push_manifest("add group %s" % name)
+
+
     def push_file(self, project, filename, contents):
         """ Push a new file with the given contents to the given project
         It is assumed that the project has beed created

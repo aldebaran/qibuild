@@ -12,7 +12,6 @@ import qisys.qixml
 import qisrc.git
 import qisrc.manifest
 
-import operator
 
 def compute_repo_diff(old_repos, new_repos):
     """ Comupte the work that needs to be done
@@ -57,9 +56,18 @@ class WorkTreeSyncer(object):
     """
     def __init__(self, git_worktree):
         self.git_worktree = git_worktree
+        # Read manifest configuration now, before any
+        # new manifest is cloned or updated
         self.manifests = dict()
-        self.load_manifests()
-
+        root = qisys.qixml.read(self.manifests_xml).getroot()
+        parser = WorkTreeSyncerParser(self)
+        parser.parse(root)
+        # backup old repos configuration now, so that
+        # we know what to sync
+        self.old_repos = self.get_old_repos()
+        self.new_repos = list() # set by sync_manifests
+        self.sync_manifests()
+        self.dump_manifests()
 
     @property
     def manifests_xml(self):
@@ -76,24 +84,27 @@ class WorkTreeSyncer(object):
         qisys.sh.mkdir(res)
         return res
 
-    def load_manifests(self):
-        """ Load every manifest, inspect changes, and
-        updates the worktree
+    def sync_manifests(self):
+        """ Update every manifest, inspect changes, and updates the
+        git worktree accordingly
 
         """
-        root = qisys.qixml.read(self.manifests_xml).getroot()
-        parser = WorkTreeSyncerParser(self)
-        parser.parse(root)
         manifests = self.manifests.values()
         if not manifests:
             return
         ui.info(ui.green, "Update manifests ...")
-        for (i, local_manifest) in enumerate(self.manifests.values(), start=1):
-            ui.info(ui.green, " * ",
-                    ui.reset, ui.bold, "(%d on %d)" % (i, len(self.manifests)),
-                    ui.reset, ui.blue, local_manifest.name,
-                    ui.reset, ui.bold, "(%s)" % local_manifest.branch)
+        for i, local_manifest in enumerate(self.manifests.values()):
+            ui.info_count(i, len(self.manifests),
+                          ui.reset, ui.blue, local_manifest.name,
+                          ui.reset, ui.bold, "(%s)" % local_manifest.branch)
+            if local_manifest.groups:
+                ui.info(ui.bold, ui.tabs(2), "Using groups:",
+                        ui.reset, ui.green, ", ".join(local_manifest.groups))
             self._sync_manifest(local_manifest)
+        self.new_repos = self.get_new_repos()
+        self._sync_manifest_repos()
+        # re-read self.old_repos so we can do several syncs:
+        self.old_repos = self.get_old_repos()
 
     def dump_manifests(self):
         """ Save the manifests in .qi/manifests.xml """
@@ -102,7 +113,7 @@ class WorkTreeSyncer(object):
         qisys.qixml.write(xml, self.manifests_xml)
 
 
-    def add_manifest(self, name, url, groups=None, branch="master"):
+    def configure_manifest(self, name, url, groups=None, branch="master"):
         """ Add a manifest to the list. Will be stored in
         .qi/manifests/<name>
 
@@ -113,9 +124,9 @@ class WorkTreeSyncer(object):
         to_add.groups = groups
         to_add.branch = branch
         self.manifests[name] = to_add
-        self.dump_manifests()
         self.clone_manifest(to_add)
-        self.load_manifests()
+        self.sync_manifests()
+        self.dump_manifests()
 
     def read_remote_manifest(self, local_manifest):
         """ Read the manifest file in .qi/manifests/<name>/manifest.xml
@@ -129,21 +140,39 @@ class WorkTreeSyncer(object):
         repos = remote_manifest.get_repos(groups=groups)
         return repos
 
+    def get_old_repos(self):
+        """ Backup all repos configuartion before any synchronisation
+        for compute_repo_diff to have the correct value
+
+        """
+        old_repos = list()
+        for manifest in self.manifests.values():
+            old_repos_expected = self.read_remote_manifest(manifest)
+            # The git projects may not match the previous repo config,
+            # for instance the user removed a project by accident, or
+            # a rename failed, or the project has not been cloned yet,
+            # so make sure old_repos matches the worktree state:
+            for old_repo in old_repos_expected:
+                old_project = self.git_worktree.find_url(old_repo.remote_url)
+                if old_project:
+                    old_repo.src = old_project.src
+                    old_repos.append(old_repo)
+        return old_repos
+
+    def get_new_repos(self):
+        """ Read all the repos coming from all the manifests
+
+        """
+        all_new_repos = list()
+        for manifest in self.manifests.values():
+            new_repos = self.read_remote_manifest(manifest)
+            all_new_repos.extend(new_repos)
+        return all_new_repos
+
 
     def _sync_manifest(self, local_manifest):
         """ Update the local manifest clone with the remote """
         manifest_repo = os.path.join(self.manifests_root, local_manifest.name)
-        old_repos_expected = self.read_remote_manifest(local_manifest)
-        # The git projects may not match the previous repo config,
-        # for instance the user removed a project by accident, or
-        # a rename failed, or the project has not been cloned yet,
-        # so make sure old_repos matches the worktree state:
-        old_repos = list()
-        for old_repo in old_repos_expected:
-            old_project = self.git_worktree.find_url(old_repo.remote_url)
-            if old_project:
-                old_repo.src = old_project.src
-                old_repos.append(old_repo)
         git = qisrc.git.Git(manifest_repo)
         with git.transaction() as transaction:
             git.fetch("origin")
@@ -153,15 +182,13 @@ class WorkTreeSyncer(object):
             ui.warning("Update failed")
             ui.info(transaction.output)
             return
-        new_repos = self.read_remote_manifest(local_manifest)
-        self._sync_manifest_repos(old_repos, new_repos)
 
 
-    def _sync_manifest_repos(self, old_repos, new_repos):
+    def _sync_manifest_repos(self):
         """ Sync the remote repo configurations with the git worktree """
         # Compute the work that needs to be done:
         (to_add, to_move, to_rm) = \
-            compute_repo_diff(old_repos, new_repos)
+            compute_repo_diff(self.old_repos, self.new_repos)
 
         if to_add:
             ui.info(ui.tabs(2), ui.green , "To add:")
@@ -191,7 +218,7 @@ class WorkTreeSyncer(object):
         for repo in to_rm:
             self.git_worktree.remove_repo(repo)
 
-        for repo in new_repos:
+        for repo in self.new_repos:
             git_project = self.git_worktree.get_git_project(repo.src)
             # may not work if the moving failed for instance
             if git_project:
@@ -214,8 +241,9 @@ class WorkTreeSyncer(object):
 
         """
         manifest_repo = os.path.join(self.manifests_root, manifest.name)
-        git = qisrc.git.Git(manifest_repo)
-        git.clone(manifest.url, "--branch", manifest.branch, quiet=True)
+        if not os.path.exists(manifest_repo):
+            git = qisrc.git.Git(manifest_repo)
+            git.clone(manifest.url, "--branch", manifest.branch, quiet=True)
 
     def __repr__(self):
         return "<WorkTreeSyncer in %s>" % self.git_worktree.root
@@ -236,7 +264,8 @@ class LocalManifest(object):
 class WorkTreeSyncerParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(WorkTreeSyncerParser, self).__init__(target)
-        self._ignore = ["manifests_xml", "manifests_root"]
+        self._ignore = ["manifests_xml", "manifests_root",
+                        "old_repos", "new_repos"]
 
     def _parse_manifest(self, elem):
         manifest_settings = LocalManifest()

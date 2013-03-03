@@ -67,7 +67,7 @@ def check_state(project, untracked):
             state_project.not_on_a_branch = True
             return state_project
 
-        if state_project.current_branch != project.branch:
+        if state_project.current_branch != project.default_branch:
             state_project.incorrect_proj = True
 
         (state_project.ahead, state_project.behind) = stat_tracking_remote(git,
@@ -129,7 +129,7 @@ def print_incorrect_projs(projects, max_len):
             ui.info(ui.green, " *", ui.reset,
                     ui.blue,  project.project.src.ljust(max_len + 3),
                     ui.green, project.current_branch.ljust(max_branch_len + 3),
-                    ui.green, project.project.branch)
+                    ui.green, project.project.default_branch)
 
 def print_not_on_a_branch(projects):
     """Print list of projects not on a branch."""

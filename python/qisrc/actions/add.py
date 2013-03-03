@@ -6,10 +6,9 @@
 
 import os
 
-from qisys import ui
-import qisrc.sync
 import qisys
 import qisys.parsers
+import qisrc.git
 
 
 def configure_parser(parser):
@@ -22,11 +21,11 @@ def configure_parser(parser):
                         "If not given, will be guessed from the git url "
                         "and the working dir")
     group.add_argument("-b", "--branch")
+    parser.set_defaults(branch="master")
 
 def do(args):
     """Main entry point"""
-    worktree = qisys.worktree.open_worktree(args.worktree)
-    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, worktree.root)
+    worktree = qisys.parsers.get_worktree(args)
     if os.path.exists(args.path_or_url):
         path = args.path_or_url
         path = qisys.sh.to_native_path(path)
@@ -37,4 +36,10 @@ def do(args):
     if not src:
         gitname = url.split("/")[-1].replace(".git", "")
         src = os.path.join(os.getcwd(), gitname)
-    qisrc.sync.clone_project(worktree, url, src=src, branch=args.branch)
+    worktree.add_project(src)
+    worktree_proj = worktree.get_project(src)
+    proj_path = worktree_proj.path
+    if os.path.exists(proj_path):
+        raise Exception("%s already exists" % proj_path)
+    git = qisrc.git.Git(proj_path)
+    git.clone(url, "--branch", args.branch)

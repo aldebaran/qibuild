@@ -71,6 +71,7 @@ def do(args):
         sys.exit(1)
 
 def display_errors(errors):
+    """ Helper function to display a summary at the end """
     for (src, err) in errors:
         ui.info(ui.blue, src)
         ui.info(ui.blue, "-" * len(src))

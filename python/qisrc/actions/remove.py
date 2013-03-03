@@ -7,6 +7,7 @@
 """
 
 import qisys
+import qisys.parsers
 
 def configure_parser(parser):
     """ Configure parser for this action """
@@ -20,6 +21,5 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     src = args.src
-    src = qisys.sh.to_native_path(src)
-    worktree = qisys.worktree.open_worktree(args.worktree)
+    worktree = qisys.parsers.get_worktree(args)
     worktree.remove_project(src, from_disk=args.from_disk)

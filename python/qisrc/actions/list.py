@@ -46,29 +46,8 @@ def do(args):
             mess = [ui.green, " *", ui.blue, src]
             if args.with_path:
                 mess.extend([ui.yellow, "==>"])
-                if os.path.exists(project.path):
-                    mess.extend([ui.fuchsia, ui.bold, project.path])
-                else:
-                    mess.extend([ui.bold, ui.red, "Can not find source directory!"])
+                mess.extend([ui.fuchsia, ui.bold, project.path])
             ui.info(*mess)
-            if not os.path.exists(project.path):
-                to_remove.append(project.src)
-
-    if not to_remove:
-        return
-
-    mess = ["The following projects:\n"]
-    for rm in to_remove:
-        mess.extend([ui.green, " *", ui.blue, rm, "\n"])
-    mess.append(ui.reset)
-    mess.append("are registered in the worktree, but their paths no longer exists.")
-    ui.warning(*mess)
-    answer = qisys.interact.ask_yes_no("Do you want to remove them", default=True)
-    if not answer:
-        return
-    for rm in to_remove:
-        ui.info(ui.green, "Removing", rm)
-        worktree.remove_project(rm)
 
 def on_empty_worktree(worktree):
     mess = """The worktree in {worktree.root}

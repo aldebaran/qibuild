@@ -97,6 +97,7 @@ def parse_list_attr(tree, name):
     res = tree.get(name, "")
     return res.split()
 
+
 def parse_required_attr(tree, name, xml_path=None):
     """ Raise an exception if an attribute it missing in a
     Node
@@ -322,7 +323,8 @@ class XMLParser(object):
                     else:
                         res.set(member, "false")
                 if type(member_value) == list:
-                    res.set(member, " ".join(member_value))
+                    if member_value:
+                        res.set(member, " ".join(member_value))
                 else:
                     res.set(member, str(member_value))
         return res

@@ -106,6 +106,9 @@ class Manifest(object):
             if remote.name == name:
                 return remote
 
+    # Following methods are mainly use for testing,
+    # but could be useful for othe use cases anyway
+
     @change_config
     def add_remote(self, name, url, review=False):
         """ Add a new remote to the manifest. """
@@ -132,6 +135,11 @@ class Manifest(object):
         if not matching_repo:
             raise Exception("No such repo:", project_name)
         self.repos.remove(matching_repo)
+
+    @change_config
+    def configure_group(self, name, projects):
+        """ Configure a group """
+        self.groups.configure_group(name, projects)
 
 class RepoConfig(object):
     def __init__(self):
@@ -184,6 +192,10 @@ class ManifestParser(qisys.qixml.XMLParser):
             parser = qisrc.worktree.RemoteParser(remote)
             remote_elem = parser.xml_elem()
             elem.append(remote_elem)
+
+    def _write_groups(self, elem):
+        parser = qisrc.groups.GroupsParser(self.target.groups)
+        elem.append(parser.xml_elem())
 
 class RepoConfigParser(qisys.qixml.XMLParser):
     def __init__(self, target):

@@ -173,9 +173,13 @@ def test_list_attr():
     foo.names = ["a", "b"]
     parser = FooParser(foo)
     xml_elem = parser.xml_elem()
-    print qisys.qixml.etree.tostring(xml_elem)
-    foo2 = Foo()
-    parser = FooParser(foo2)
+    foo = Foo()
+    parser = FooParser(foo)
     parser.parse(xml_elem)
-    assert foo2.names == ["a", "b"]
-
+    assert foo.names == ["a", "b"]
+    foo.names = list()
+    xml_elem = parser.xml_elem()
+    foo = Foo()
+    parser = FooParser(foo)
+    parser.parse(xml_elem)
+    assert foo.names == list()

@@ -15,6 +15,7 @@
 
   or just make something more explicit ...
 
-* worktree_syncer.add_manifest -> worktree_syncer.configure_manifest()
-
 * qisrc init with a file
+
+* XMLParser.xml_elem() -> dump()
+* XMLParser._write_foo()  -> _dump_foo()

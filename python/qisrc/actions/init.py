@@ -35,7 +35,9 @@ def do(args):
     workrtee = qisys.worktree.WorkTree(root)
     git_worktree = qisrc.worktree.GitWorkTree(workrtee)
     if args.manifest_url:
-        git_worktree.add_manifest(args.manifest_name, args.manifest_url)
+        git_worktree.configure_manifest(args.manifest_name,
+                                        args.manifest_url,
+                                        args.groups)
     ui.info(ui.green, "New qisrc worktree initialized in",
             ui.reset, ui.bold, root)
 

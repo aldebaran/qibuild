@@ -27,3 +27,15 @@ def test_parser():
     assert groups.projects('c') == list()
     assert set(groups.projects('d')) - set(['bar', 'foo']) == set()
     assert set(groups.projects('a')) - set(['bar', 'foo', 'b', 'c', 'd']) == set()
+
+def test_writer():
+    groups = qisrc.groups.Groups()
+    groups.configure_group("mygroup", ["a", "b"])
+
+    parser = qisrc.groups.GroupsParser(groups)
+    root = parser.xml_elem()
+    groups = qisrc.groups.Groups()
+    parser = qisrc.groups.GroupsParser(groups)
+    parser.parse(root)
+    assert groups.projects("mygroup") == ["a", "b"]
+

@@ -37,14 +37,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.load_git_projects()
         self._syncer = qisrc.sync.WorkTreeSyncer(self)
 
-    def add_manifest(self, name, manifest_url, groups=None):
+    def configure_manifest(self, name, manifest_url, groups=None):
         """ Add a new manifest to this worktree """
-        self._syncer.add_manifest(name, manifest_url, groups=groups)
+        self._syncer.configure_manifest(name, manifest_url, groups=groups)
 
     def sync(self):
         """ Load the manifests """
-        # Note that load_manifests is called by WorkTreeSyncer ctor
-        self._syncer.load_manifests()
+        self._syncer.sync_manifests()
 
     def load_git_projects(self):
         """ Build a list of git projects using the

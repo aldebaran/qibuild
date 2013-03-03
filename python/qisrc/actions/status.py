@@ -17,7 +17,6 @@ import qisrc.status
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
-    qibuild.parsers.project_parser(parser)
     parser.add_argument("--untracked-files", "-u",
         dest="untracked_files",
         action="store_true",
@@ -26,13 +25,11 @@ def configure_parser(parser):
         dest="show_branch",
         action="store_true",
         help="display branch and tracking branch for each repository")
-    parser.add_argument("--build-deps", action="store_true",
-        help="take build dependencies into account")
 
 def do(args):
     """Main method."""
     git_worktree = qisrc.parsers.get_git_worktree(args)
-    git_projects = qisrc.parsers.get_git_projects(git_worktree, args)
+    git_projects = git_worktree.git_projects
 
     num_projs = len(git_projects)
     max_len = max([len(p.src) for p in git_projects])

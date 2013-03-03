@@ -23,3 +23,4 @@ def test_pushing_files(tmpdir, git_server):
     git.pull()
 
     assert foo_clone.join("README").read() == "This is foo\n"
+

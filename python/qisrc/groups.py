@@ -13,6 +13,11 @@ class Groups(object):
     def projects(self, group_name):
         return self.subgroups_group(group_name)
 
+    def configure_group(self, name, projects):
+        group = Group(name)
+        group.projects = projects
+        self.groups[name] = group
+
     def subgroups_group(self, group_name, projects=None):
         if projects is None:
             projects = list()
@@ -40,6 +45,10 @@ class GroupsParser(qisys.qixml.XMLParser):
         parser.parse(element)
         self.target.groups[group.name] = group
 
+    def _write_groups(self, element):
+        for group in self.target.groups.values():
+            parser = GroupParser(group)
+            element.append(parser.xml_elem())
 
 
 class Group(object):
@@ -57,6 +66,17 @@ class GroupParser(qisys.qixml.XMLParser):
 
     def _parse_group(self, element):
         self.target.subgroups.append(element.attrib['name'])
+
+    def _write_subgroups(self, element):
+        for subgroup in self.target.subgroups:
+            parser = GroupParser(subgroup)
+            element.append(parser.xml_elem())
+
+    def _write_projects(self, element):
+        for project in self.target.projects:
+            project_elem = qisys.qixml.etree.Element("project")
+            project_elem.set("name", project)
+            element.append(project_elem)
 
 def get_root(worktree):
     file = os.path.join(worktree.root, ".qi", "groups.xml")
