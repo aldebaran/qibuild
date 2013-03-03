@@ -3,3 +3,18 @@
 * rename qisrc.manifest.Manifest -> qisrc.manifest.RemoteManifest
 
 * use qisys.ui.info_count everywhere
+
+* parser.get_* functions should be usable with **kwargs too:
+
+  def get_worktree(args=None, **kwargs):
+    options = dict()
+    if args:
+      options = vars(args[0])
+    else:
+      options = kwargs
+
+  or just make something more explicit ...
+
+* worktree_syncer.add_manifest -> worktree_syncer.configure_manifest()
+
+* qisrc init with a file
