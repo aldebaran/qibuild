@@ -2,22 +2,23 @@ import qisys.sh
 import qisys.script
 import qisys.worktree
 
-def test_qisrc_rm(tmpdir, monkeypatch):
-    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
-    foo = tmpdir.mkdir("foo")
-    worktree.add_project("foo")
-    monkeypatch.chdir(tmpdir)
-    qisys.script.run_action("qisrc.actions.remove", ["foo"])
-    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
+def test_qisrc_remove_exsiting(qisrc_action):
+    worktree = qisrc_action.worktree
+    foo_proj = worktree.create_project("foo")
+    qisrc_action("remove", "foo")
+    worktree = qisrc_action.worktree
     assert not worktree.get_project("foo")
-    assert foo.check(dir=True)
+    assert worktree.tmpdir.join("foo").check(dir=True)
 
-def test_qisrc_rm_from_disk(tmpdir, monkeypatch):
-    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
-    foo = tmpdir.mkdir("foo")
-    worktree.add_project("foo")
-    monkeypatch.chdir(tmpdir)
-    qisys.script.run_action("qisrc.actions.remove", ["foo", "--from-disk"])
-    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
+def test_qisrc_remove_existing_from_disk(qisrc_action):
+    worktree = qisrc_action.worktree
+    worktree.create_project("foo")
+    qisrc_action("remove", "foo", "--from-disk")
+    worktree = qisrc_action.worktree
     assert not worktree.get_project("foo")
-    assert not foo.check(dir=True)
+    assert not worktree.tmpdir.join("foo").check(dir=True)
+
+def test_qisrc_fails_when_not_exists(qisrc_action):
+    qisrc_action("init")
+    error = qisrc_action("remove", "foo", raises=True)
+    assert "No such project: foo" in error

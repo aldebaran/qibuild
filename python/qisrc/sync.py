@@ -54,7 +54,7 @@ class WorkTreeSyncer(object):
     worktree
 
     """
-    def __init__(self, git_worktree):
+    def __init__(self, git_worktree, sync_first=True):
         self.git_worktree = git_worktree
         # Read manifest configuration now, before any
         # new manifest is cloned or updated
@@ -62,12 +62,14 @@ class WorkTreeSyncer(object):
         root = qisys.qixml.read(self.manifests_xml).getroot()
         parser = WorkTreeSyncerParser(self)
         parser.parse(root)
-        # backup old repos configuration now, so that
-        # we know what to sync
-        self.old_repos = self.get_old_repos()
-        self.new_repos = list() # set by sync_manifests
-        self.sync_manifests()
-        self.dump_manifests()
+        self.old_repos = list()
+        self.new_repos = list()
+        if sync_first:
+            # backup old repos configuration now, so that
+            # we know what to sync
+            self.old_repos = self.get_old_repos()
+            self.sync_manifests()
+            self.dump_manifests()
 
     @property
     def manifests_xml(self):
@@ -118,6 +120,8 @@ class WorkTreeSyncer(object):
         .qi/manifests/<name>
 
         """
+        # Backup before sync in case sync_first was non used,
+        self.old_repos = self.get_old_repos()
         to_add = LocalManifest()
         to_add.name = name
         to_add.url = url
@@ -126,6 +130,15 @@ class WorkTreeSyncer(object):
         self.manifests[name] = to_add
         self.clone_manifest(to_add)
         self.sync_manifests()
+        self.dump_manifests()
+
+    def remove_manifest(self, name):
+        """ Remove a manifest from the list """
+        if not name in self.manifests:
+            raise Exception("No such manifest: %s", name)
+        del self.manifests[name]
+        to_rm = os.path.join(self.manifests_root, name)
+        qisys.sh.rm(to_rm)
         self.dump_manifests()
 
     def read_remote_manifest(self, local_manifest):

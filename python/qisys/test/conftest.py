@@ -1,4 +1,3 @@
-import argparse
 import os
 import tempfile
 
@@ -83,9 +82,63 @@ def args(request):
 @pytest.fixture
 def record_messages(request):
     """ Configure qisys.ui to record the messges sent to the user """
-    ui.CONFIG["record"] = True
-    ui._MESSAGES = list()
-    def reset():
+    recorder = MessageRecorder()
+    request.addfinalizer(recorder.stop)
+    return recorder
+
+class MessageRecorder():
+    def __init__(self):
+        ui.CONFIG["record"] = True
+        ui._MESSAGES = list()
+
+    def stop(self):
         ui.CONFIG["record"] = False
         ui._MESSAGES = list()
-    request.addfinalizer(reset)
+
+    def reset(self):
+        ui._MESSAGES = list()
+
+
+class TestAction(object):
+    """ Helper class to test actions
+    Make sure cwd is in a temporary directory,
+    and provide a nicer syntax for qisys.script.run_action
+    """
+    def __init__(self, package):
+        self.tmp = tempfile.mkdtemp(prefix="tmp-test-qisrc-")
+        self.old_cwd = os.getcwd()
+        self.chdir(self.tmp)
+        self.package = package
+
+    def chdir(self, directory):
+        try:
+            directory = directory.strpath
+        except AttributeError:
+            pass
+        os.chdir(directory)
+
+    def __call__(self, action, *args, **kwargs):
+        module_name = "%s.%s" % (self.package, action)
+        cwd = kwargs.get("cwd")
+        if cwd:
+            self.chdir(cwd)
+        if kwargs.get("raises"):
+        # pylint: disable-msg=E1101
+            with pytest.raises(Exception) as error:
+                qisys.script.run_action(module_name, args)
+            return error.value.message
+        else:
+            qisys.script.run_action(module_name, args)
+
+    def reset(self):
+        os.chdir(self.old_cwd)
+        qisys.sh.rm(self.tmp)
+
+    @property
+    def tmpdir(self):
+        # pylint: disable-msg=E1101
+        return py.path.local(self.tmp)
+
+    @property
+    def worktree(self):
+        return TestWorkTree(self.tmp)

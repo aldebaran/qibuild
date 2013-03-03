@@ -21,10 +21,12 @@ def groups_parser(parser):
     parser.add_argument("-g", "--group", dest="groups", action="append",
                         help="Specify a group of projects.")
 
-def get_git_worktree(args):
-    """ Get a git worktree to use """
+def get_git_worktree(args, sync_first=True):
+    """ Get a git worktree to use
+
+    """
     worktree = qisys.parsers.get_worktree(args)
-    git_worktree = qisrc.worktree.GitWorkTree(worktree)
+    git_worktree = qisrc.worktree.GitWorkTree(worktree, sync_first=sync_first)
     return git_worktree
 
 

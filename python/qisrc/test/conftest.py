@@ -4,6 +4,7 @@ from qisys.test.conftest import *
 import qisrc.git
 import qisrc.worktree
 import qisrc.manifest
+import qisys.script
 
 from qisrc.test.fake_git import FakeGit
 
@@ -13,7 +14,7 @@ class TestGitWorkTree(qisrc.worktree.GitWorkTree):
 
     """
     def __init__(self, root):
-        worktree = qisys.worktree.create(root)
+        worktree = qisys.worktree.WorkTree(root)
         super(TestGitWorkTree, self).__init__(worktree)
         self.root = root
 
@@ -189,3 +190,18 @@ def git_server(request):
 @pytest.fixture
 def mock_git(request):
     return FakeGit("repo")
+
+# pylint: disable-msg=E1101
+@pytest.fixture
+def qisrc_action(request):
+    res = QiSrcAction()
+    request.addfinalizer(res.reset)
+    return res
+
+class QiSrcAction(TestAction):
+    def __init__(self):
+        super(QiSrcAction, self).__init__("qisrc.actions")
+
+    @property
+    def git_worktree(self):
+        return TestGitWorkTree(self.tmp)

@@ -19,3 +19,5 @@
 
 * XMLParser.xml_elem() -> dump()
 * XMLParser._write_foo()  -> _dump_foo()
+
+* add qisys.actions.list()

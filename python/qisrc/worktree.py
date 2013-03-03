@@ -28,18 +28,22 @@ def open_git_worktree(root):
 
 class GitWorkTree(qisys.worktree.WorkTreeObserver):
     """ Stores a list of git projects and a list of manifests """
-    def __init__(self, worktree):
+    def __init__(self, worktree, sync_first=False):
         self.worktree = worktree
         self.root = worktree.root
         self._root_xml = qisys.qixml.read(self.git_xml).getroot()
         worktree.register(self)
         self.git_projects = list()
         self.load_git_projects()
-        self._syncer = qisrc.sync.WorkTreeSyncer(self)
+        self._syncer = qisrc.sync.WorkTreeSyncer(self, sync_first=sync_first)
 
     def configure_manifest(self, name, manifest_url, groups=None):
         """ Add a new manifest to this worktree """
         self._syncer.configure_manifest(name, manifest_url, groups=groups)
+
+    def remove_manifest(self, name):
+        """ Remove the given manifest from this worktree """
+        self._syncer.remove_manifest(name)
 
     def sync(self):
         """ Load the manifests """
@@ -84,6 +88,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             with open(git_xml_path, "w") as fp:
                 fp.write("""<git />""")
         return git_xml_path
+
+    @property
+    def manifests(self):
+        return self._syncer.manifests
 
     def add_git_project(self, src):
         """ Add a new git project """
