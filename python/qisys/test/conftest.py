@@ -126,7 +126,7 @@ class TestAction(object):
         # pylint: disable-msg=E1101
             with pytest.raises(Exception) as error:
                 qisys.script.run_action(module_name, args)
-            return error.value.message
+            return str(error.value)
         else:
             qisys.script.run_action(module_name, args)
 

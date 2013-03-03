@@ -19,6 +19,8 @@ Examples:
 from qisys import ui
 import qisrc.parsers
 
+import sys
+
 def configure_parser(parser):
     qisrc.parsers.worktree_parser(parser)
     qisrc.parsers.groups_parser(parser)
@@ -31,8 +33,8 @@ def configure_parser(parser):
                         help="check that a manifest is correct: path")
     group.add_argument("--list", action="store_true",
                         help="list the manifests")
-    group.add_argument("name_or_path", metavar="NAME", nargs="?")
-    group.add_argument("url", metavar="URL", nargs="?")
+    group.add_argument("name", metavar="NAME", nargs="?")
+    group.add_argument("url_or_path", metavar="URL", nargs="?")
 
 
 
@@ -64,30 +66,37 @@ def list_manifests(git_worktree):
 
 
 def remove_manifest(git_worktree, args):
-    if not args.name_or_path:
+    if not args.name:
         raise Exception("Please specify a name when using --remove")
     name = args.name_or_path
-    check_manifest(git_worktree, name)
+    check_exists(git_worktree, name)
     git_worktree.remove_manifest(name)
 
 def add_manifest(git_worktree, args):
-    if not args.name_or_path or not args.url:
+    if not args.name or not args.url_or_path:
         raise Exception("Please specify a name and a url when using --add")
-    name = args.name_or_path
+    name = args.name
     url = args.url
     git_worktree.configure_manifest(name, url, groups=args.groups)
 
 def configure_manifest(git_worktree, args):
-    name = args.name_or_path
-    check_manifest(git_worktree, name)
-    if args.url:
-        url = args.url
+    name = args.name
+    check_exists(git_worktree, name)
+    if args.url_or_path:
+        url = args.url_or_path
     else:
         url = git_worktree.manifests[name].url
     git_worktree.configure_manifest(name, url, groups=args.groups)
 
+def check_manifest(git_worktree, args):
+    if not args.name:
+        raise Exception("Please specify a name and a path when using --check")
+    name = args.name
+    check_exists(git_worktree, name)
+    xml_path = args.url_or_path
+    git_worktree.check_manifest(name, xml_path)
 
-def check_manifest(git_worktree, name):
+def check_exists(git_worktree, name):
     if not name in git_worktree.manifests:
         ui.error("No such manifest:", name)
         ui.info("""

@@ -45,6 +45,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         """ Remove the given manifest from this worktree """
         self._syncer.remove_manifest(name)
 
+    def check_manifest(self, name, xml_path):
+        """ Run a sync using just the xml file given as parameter """
+        self._syncer.sync_from_manifest_file(name, xml_path)
+
     def sync(self):
         """ Load the manifests """
         self._syncer.sync_manifests()

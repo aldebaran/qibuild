@@ -104,7 +104,7 @@ class WorkTreeSyncer(object):
                         ui.reset, ui.green, ", ".join(local_manifest.groups))
             self._sync_manifest(local_manifest)
         self.new_repos = self.get_new_repos()
-        self._sync_manifest_repos()
+        self._sync_repos(self.old_repos, self.new_repos)
         # re-read self.old_repos so we can do several syncs:
         self.old_repos = self.get_old_repos()
 
@@ -141,13 +141,14 @@ class WorkTreeSyncer(object):
         qisys.sh.rm(to_rm)
         self.dump_manifests()
 
-    def read_remote_manifest(self, local_manifest):
+    def read_remote_manifest(self, local_manifest, manifest_xml=None):
         """ Read the manifest file in .qi/manifests/<name>/manifest.xml
         using the settings in .qi/manifest.xml (to know the name and the groups
         to use)
         """
-        manifest_xml = os.path.join(self.manifests_root, local_manifest.name,
-                                    "manifest.xml")
+        if not manifest_xml:
+            manifest_xml = os.path.join(self.manifests_root,
+                                        local_manifest.name, "manifest.xml")
         remote_manifest = qisrc.manifest.Manifest(manifest_xml)
         groups = local_manifest.groups
         repos = remote_manifest.get_repos(groups=groups)
@@ -160,6 +161,7 @@ class WorkTreeSyncer(object):
         """
         old_repos = list()
         for manifest in self.manifests.values():
+
             old_repos_expected = self.read_remote_manifest(manifest)
             # The git projects may not match the previous repo config,
             # for instance the user removed a project by accident, or
@@ -197,11 +199,11 @@ class WorkTreeSyncer(object):
             return
 
 
-    def _sync_manifest_repos(self):
+    def _sync_repos(self, old_repos, new_repos):
         """ Sync the remote repo configurations with the git worktree """
         # Compute the work that needs to be done:
         (to_add, to_move, to_rm) = \
-            compute_repo_diff(self.old_repos, self.new_repos)
+            compute_repo_diff(old_repos, new_repos)
 
         if to_add:
             ui.info(ui.tabs(2), ui.green , "To add:")
@@ -223,7 +225,10 @@ class WorkTreeSyncer(object):
                         ui.reset, " -> ", ui.blue, new_src)
 
         for repo in to_add:
-            self.git_worktree.clone_missing(repo)
+            # maybe user created it alreaf, for instance with
+            # a sucessful `qisrc sync`
+            if not self.git_worktree.get_git_project(repo.src):
+                self.git_worktree.clone_missing(repo)
 
         for (repo, new_src) in to_move:
             self.git_worktree.move_repo(repo, new_src)
@@ -231,12 +236,11 @@ class WorkTreeSyncer(object):
         for repo in to_rm:
             self.git_worktree.remove_repo(repo)
 
-        for repo in self.new_repos:
+        for repo in new_repos:
             git_project = self.git_worktree.get_git_project(repo.src)
             # may not work if the moving failed for instance
             if git_project:
                 git_project.sync(repo)
-
 
     def sync_manifest_repo(self, repo):
         """ Sync one remote configuration with the git worktree """
@@ -248,6 +252,21 @@ class WorkTreeSyncer(object):
             # Project has moved:
             self.git_worktree.move_repo(git_project, repo.src)
         git_project.sync(repo)
+
+    def sync_from_manifest_file(self, name, xml_path):
+        """ Just synchronize the manifest coming from one xml file.
+        Used by qisrc manifest --check
+
+        """
+        # don't use self.old_repos and self.new_repos here,
+        # because we are only using one manifest
+        # Read groups from the manifests
+        local_manifest = self.manifests[name]
+        old_repos = self.read_remote_manifest(local_manifest)
+        new_repos = self.read_remote_manifest(local_manifest,
+                                              manifest_xml=xml_path)
+        self._sync_repos(old_repos, new_repos)
+
 
     def clone_manifest(self, manifest):
         """ Clone a new manifest in .qi/manifests/<name>
