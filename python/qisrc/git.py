@@ -15,6 +15,7 @@ from qisys import ui
 import qisys
 import qisys.command
 
+
 class Git:
     """ The Git represent a git tree """
     def __init__(self, repo):
@@ -95,13 +96,12 @@ class Git:
             return branch
         return branch[11:]
 
-
     def get_tracking_branch(self, branch=None):
         if not branch:
             branch = self.get_current_branch()
 
         remote = self.get_config("branch.%s.remote" % branch)
-        merge  = self.get_config("branch.%s.merge" % branch)
+        merge = self.get_config("branch.%s.merge" % branch)
         if not remote:
             return None
         if not merge:
@@ -147,12 +147,11 @@ class Git:
                             raises=False)
         if res == 0:
             return
-        mess  = "Failed to update submodules\n"
+        mess = "Failed to update submodules\n"
         mess += out
         if raises:
             raise Exception(mess)
         return mess
-
 
     def get_local_branches(self):
         """ Get the list of the local branches in a dict
@@ -161,7 +160,7 @@ class Git:
         """
         (status, out) = self.branch("--no-color", raises=False)
         if status != 0:
-            mess  = "Could not get the list of local branches\n"
+            mess = "Could not get the list of local branches\n"
             mess += "Error was: %s" % out
             raise Exception(mess)
         lines = out.splitlines()
@@ -180,7 +179,8 @@ class Git:
         if untracked:
             (status, out) = self.status("--porcelain", raises=False)
         else:
-            (status, out) = self.status("--porcelain", "--untracked-files=no", raises=False)
+            (status, out) = self.status("--porcelain", "--untracked-files=no",
+                                                            raises=False)
 
         return out if status == 0 else None
 
@@ -195,7 +195,7 @@ class Git:
         if out is None:
             return None
 
-        lines = [l for l in out.splitlines() if len(l.strip()) != 0 ]
+        lines = [l for l in out.splitlines() if len(l.strip()) != 0]
         if len(lines) > 0:
             return False
         return True
@@ -209,10 +209,11 @@ class Git:
         in_conf = self.get_config("remote.%s.url" % name)
         if in_conf and in_conf == url:
             return
-        self.remote("rm",  name, quiet=True, raises=False)
+        self.remote("rm", name, quiet=True, raises=False)
         self.remote("add", name, url, quiet=True)
 
-    def set_tracking_branch(self, branch, remote_name, fetch_first=True, remote_branch=None):
+    def set_tracking_branch(self, branch, remote_name, fetch_first=True,
+        remote_branch=None):
         """
         Create a or update the configuration of a branch to track
         a given remote branch
@@ -331,6 +332,7 @@ def _update_branch(git, branch, remote_name,
 ###
 # Internal functions used by _update_branch()
 
+
 @contextlib.contextmanager
 def _stash_changes(git, status):
     """ Stash changes. To be used in a 'with' statement """
@@ -350,6 +352,7 @@ def _stash_changes(git, status):
         status.mess = "Stashing back changes failed\n"
         status.mess += out
 
+
 @contextlib.contextmanager
 def _change_branch(git, status, branch):
     """ Change branch. To be used in a 'with' statement """
@@ -368,6 +371,7 @@ def _change_branch(git, status, branch):
             status.mess += "Checkout back to %s failed\n" % current_branch
             status.mess += out
 
+
 def is_ff(git, status, local_sha1, remote_sha1):
     """Check local_sha1 is fast-forward with remote_sha1.
     Return True / False or None in case of error with merge-base.
@@ -383,6 +387,7 @@ def is_ff(git, status, local_sha1, remote_sha1):
 
     common_ancestor = out.strip()
     return common_ancestor == local_sha1
+
 
 def get_ref_sha1(git, ref, status):
     """Return the sha1 from a ref. None if not found."""
@@ -420,7 +425,8 @@ def _update_branch_if_ff(git, status, local_branch, remote_ref):
     if result_ff is None:
         return
     if result_ff is False:
-        status.mess += "Could not update %s with %s\n" % (local_branch, remote_ref)
+        status.mess += "Could not update %s with %s\n" % (local_branch,
+                remote_ref)
         status.mess += "Merge is not fast-forward and you are not on %s" % local_branch
         return
 
@@ -430,8 +436,10 @@ def _update_branch_if_ff(git, status, local_branch, remote_ref):
     with _change_branch(git, status, local_branch):
         (ret, out) = git.merge("-v", remote_sha1, raises=False)
         if ret != 0:
-            status.mess += "Merging %s with %s failed" % (local_branch, remote_ref)
+            status.mess += "Merging %s with %s failed" % (local_branch,
+                                                                    remote_ref)
             status.mess += out
+
 
 def get_repo_root(path):
     """Return the root dir of a git worktree given a path.
@@ -447,6 +455,7 @@ def get_repo_root(path):
     (ret, out) = git.call("rev-parse", "--show-toplevel", raises=False)
 
     return out.replace('/', os.sep) if ret == 0 else None
+
 
 def is_submodule(path):
     """ Tell if the given path is a submodule
@@ -484,9 +493,11 @@ def is_submodule(path):
                    "\nError was: ", ui.reset, "\n", "  " + out)
         return True
 
+
 def is_git(path):
     """Return true if path is in a git work-tree."""
     return get_repo_root(path) == path
+
 
 def get_git_projects(projects):
     """Return projects wich are git projects."""

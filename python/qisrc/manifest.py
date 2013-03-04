@@ -21,6 +21,7 @@ class NoManifest(Exception):
         res += "Try calling `qisrc init MANIFEST_URL`"
         return res
 
+
 def git_url_join(remote, name):
     """Join a remote ref with a name."""
     if remote.startswith(("http://", "ssh://")):
@@ -28,6 +29,7 @@ def git_url_join(remote, name):
     if "@" in remote:
         return remote + ":" + name
     return posixpath.join(remote, name)
+
 
 def load(manifest_xml):
     """Load a manifest XML file."""
@@ -39,11 +41,13 @@ def load(manifest_xml):
     merge_projects(manifest)
     return manifest
 
+
 def merge_projects(manifest):
     """Merge recursively the projects coming from the sub manifests."""
     for sub_manifest in manifest.sub_manifests:
         merge_projects(sub_manifest)
         manifest.projects.extend(sub_manifest.projects)
+
 
 class Manifest(object):
     """ A class to represent the contents of a manifest XML
@@ -60,6 +64,7 @@ class Manifest(object):
 
         # Used to track conflicts
         self._paths = dict()
+
 
 class ManifestParser(qisys.qixml.XMLParser):
     def __init__(self, target):
@@ -97,6 +102,7 @@ class ManifestParser(qisys.qixml.XMLParser):
         for project in self.target.projects:
             update_project(project, self.target.remotes, self.target._paths)
 
+
 def update_project(project, remotes, paths):
     """ Update the project list, setting project.revision,
     project.fetch_url and so on, using the already parsed remotes
@@ -121,7 +127,7 @@ no review url set.\
         project.review_url = git_url_join(remote.review, project.name)
     conflicting_name = paths.get(project.path)
     if conflicting_name:
-        mess  = "Found two projects with the same path: %s\n" % project.path
+        mess = "Found two projects with the same path: %s\n" % project.path
         mess += "%s and %s" % (project.name, conflicting_name)
         raise Exception(mess)
     paths[project.path] = project.name
@@ -137,10 +143,12 @@ class ManifestProject(object):
         # Set during manifest parsing
         self.fetch_url = None
         self.review_url = None
+
     def __repr__(self):
-        res = "<Project %s remote: %s fetch: %s review:%s>" % \
-            (self.name, self.remote, self.fetch_url, self.review_url)
+        res = "<Project %s path: %s remote: %s fetch: %s review:%s>" % \
+            (self.name, self.path, self.remote, self.fetch_url, self.review_url)
         return res
+
 
 class ProjectParser(qisys.qixml.XMLParser):
     """Wrapper for the <project> tag inside a manifest XML file."""
@@ -153,6 +161,7 @@ class ProjectParser(qisys.qixml.XMLParser):
             self.target.path = self.target.name.replace(".git", "")
         else:
             self.target.path = posixpath.normpath(self.target.path)
+
 
 class Remote(object):
     def __init__(self):

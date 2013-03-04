@@ -17,6 +17,7 @@ from qisys import ui
 
 from qisrc.sync_build_profiles import sync_build_profiles
 
+
 def fetch_manifest(worktree, manifest_git_url, branch="master",
     profile="default",
     src="manifest/default"):
@@ -49,6 +50,7 @@ def fetch_manifest(worktree, manifest_git_url, branch="master",
         mess += "in the repository: %s\n" % manifest_git_url
         raise Exception(mess)
     return manifest_file
+
 
 def fetch_load_manifest(worktree, manifest_git_url, branch="master",
     profile="default",
@@ -138,7 +140,7 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin"):
     path = os.path.join(worktree.root, src)
     path = qisys.sh.to_native_path(path)
     if os.path.exists(path):
-        mess  = "Could not add project from %s in %s\n" % (url, src)
+        mess = "Could not add project from %s in %s\n" % (url, src)
         mess += "This path already exists\n"
         raise Exception(mess)
 
@@ -154,6 +156,7 @@ def clone_project(worktree, url, src=None, branch=None, remote="origin"):
     if should_add:
         worktree.add_project(path)
     return worktree.get_project(src)
+
 
 def add_if_missing(worktree, src, remote_name, remote_url):
     """ Add a project to a worktree if src is a already a git repo with
