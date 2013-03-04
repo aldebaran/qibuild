@@ -42,7 +42,7 @@ def create_git_repo(tmp, path, with_release_branch=False):
 
     Return a valid git url.
     """
-    tmp_srv = os.path.join(tmp, "srv", path + ".git")
+    tmp_srv = os.path.normpath(os.path.join(tmp, "srv", path + ".git"))
     qisys.sh.mkdir(tmp_srv, recursive=True)
     srv_git = qisrc.git.Git(tmp_srv)
     srv_git.call("init", "--bare")

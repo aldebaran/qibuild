@@ -285,7 +285,8 @@ class SyncTestCase(unittest.TestCase):
         manifest = qisrc.sync.fetch_load_manifest(worktree, manifest_url)
         qisrc.sync.init_worktree(worktree, manifest)
         bar_proj = worktree.get_project("bar")
-        assert bar_git.get_config("remote.origin.url") == bar_url
+        # git stores urls as posix even when given native paths
+        assert os.path.normpath(bar_git.get_config("remote.origin.url")) == bar_url
 
     def test_git_exists_but_wrong_remote(self):
         manifest_url = create_git_repo(self.tmp, "manifest")
@@ -308,7 +309,8 @@ class SyncTestCase(unittest.TestCase):
         manifest = qisrc.sync.fetch_load_manifest(worktree, manifest_url)
         qisrc.sync.init_worktree(worktree, manifest)
         bar_proj = worktree.get_project("bar")
-        assert bar_git.get_config("remote.origin.url") == bar_url
+        # git stores urls as posix even when given native paths
+        assert os.path.normpath(bar_git.get_config("remote.origin.url")) == bar_url
 
     def test_path_exists_but_not_a_git_repo(self):
         manifest_url = create_git_repo(self.tmp, "manifest")
