@@ -8,9 +8,10 @@
 int foo()
 {
   assert(false);
+  return 1;
 }
 
 int main()
 {
-  foo();
+  return foo();
 }
