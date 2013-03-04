@@ -129,6 +129,10 @@ class Git:
         kwargs["cwd"] = None
         return self.call("clone", *args, **kwargs)
 
+    def cherrypick(self, *args, **kwargs):
+        """ Wrapper for git cherry-pick """
+        return self.call("cherry-pick", *args, **kwargs)
+
     def update_submodules(self, raises=True):
         """ Update submodule, cloning them if necessary """
         # This will fail if some pushed a broken submodule
