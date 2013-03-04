@@ -12,6 +12,7 @@ import mock
 
 import qibuild.actions.open
 
+
 class OpenTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -43,7 +44,8 @@ class OpenTestCase(unittest.TestCase):
         except Exception, e:
             error = e
         self.assertFalse(error is None)
-        self.assertFalse("Could not find any IDE in configuration" in error.message)
+        self.assertFalse("Could not find any IDE in configuration" in
+            error.message)
         self.assertTrue("`qibuild open` only supports" in error.message)
 
     def test_two_ides(self):
@@ -107,7 +109,6 @@ class OpenTestCase(unittest.TestCase):
         ide = qibuild.actions.open.get_ide(qibuild_cfg)
         self.assertEqual(ide.name, "Visual Studio")
         self.assertFalse(self.ask_mock.called)
-
 
     def tearDown(self):
         self.ask_patcher.stop()

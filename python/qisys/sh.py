@@ -22,6 +22,7 @@ import posixpath
 
 LOGGER = qisys.log.get_logger("buildtool.sh")
 
+
 def mkdir(dest_dir, recursive=False):
     """ Recursive mkdir (do not fail if file exists) """
     try:
@@ -36,6 +37,7 @@ def mkdir(dest_dir, recursive=False):
         else:
             raise
 
+
 #pylint: disable-msg=C0103
 def ln(src, dst, symlink=True):
     """ ln (do not fail if file exists) """
@@ -49,6 +51,7 @@ def ln(src, dst, symlink=True):
             pass
         else:
             raise
+
 
 def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
     """Configure a file.
@@ -74,6 +77,7 @@ def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
             out_content = in_content.format(*args, **kwargs)
         with open(out_path, "w") as out_file:
             out_file.write(out_content)
+
 
 def _copy_link(src, dest, quiet):
     if not os.path.islink(src):
@@ -102,7 +106,7 @@ def _handle_dirs(src, dest, root, directories, filter_fun, quiet):
         to_filter = os.path.join(rel_root, directory)
         if not filter_fun(to_filter):
             continue
-        dsrc  = os.path.join(root, directory)
+        dsrc = os.path.join(root, directory)
         ddest = os.path.join(new_root, directory)
 
         if os.path.islink(dsrc):
@@ -111,6 +115,7 @@ def _handle_dirs(src, dest, root, directories, filter_fun, quiet):
             if os.path.lexists(ddest) and not os.path.isdir(ddest):
                 raise Exception("Expecting a directory but found a file: %s" % ddest)
             mkdir(ddest, recursive=True)
+
 
 def _handle_files(src, dest, root, files, filter_fun, quiet):
     """ Helper function used by install()
@@ -122,7 +127,7 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
     for f in files:
         if not filter_fun(os.path.join(rel_root, f)):
             continue
-        fsrc  = os.path.join(root, f)
+        fsrc = os.path.join(root, f)
         fdest = os.path.join(new_root, f)
         if os.path.islink(fsrc):
             mkdir(new_root, recursive=True)
@@ -168,7 +173,7 @@ def install(src, dest, filter_fun=None, quiet=False):
         mess += '%s does not exist' % src
         raise Exception(mess)
 
-    src  = to_native_path(src, normcase=False)
+    src = to_native_path(src, normcase=False)
     dest = to_native_path(dest, normcase=False)
     LOGGER.debug("Installing %s -> %s", src, dest)
     #pylint: disable-msg=E0102
@@ -199,6 +204,7 @@ def install(src, dest, filter_fun=None, quiet=False):
         rm(dest)
         shutil.copy(src, dest)
 
+
 def safe_copy(src, dest):
     """ Copy a source to a destination but
     do not overwrite dest if it is more recent than src
@@ -212,10 +218,11 @@ def safe_copy(src, dest):
         dest = os.path.join(dest, os.path.basename(src))
     if os.path.exists(dest):
         dest_mtime = os.stat(dest).st_mtime
-        src_mtime  = os.stat(src).st_mtime
+        src_mtime = os.stat(src).st_mtime
         if src_mtime < dest_mtime:
             return
     shutil.copy(src, dest)
+
 
 def rm(name):
     """This one can take a file or a directory.
@@ -235,6 +242,7 @@ def rm(name):
     else:
         LOGGER.debug("Removing %s", name)
         os.remove(name)
+
 
 # Taken from gclient source code (BSD license)
 def rmtree(path):
@@ -313,6 +321,7 @@ def rmtree(path):
 
     remove(os.rmdir, path)
 
+
 def mv(src, dest):
     """Move a file into a directory, but do not crash
     if dest/src exists
@@ -360,6 +369,7 @@ def ls_r(directory):
     res.sort()
     return res
 
+
 def which(program):
     """
     find program in the environment PATH
@@ -383,7 +393,7 @@ def run(program, args):
         run("python.exe", "toto.py")
 
     """
-    real_args = [ program ]
+    real_args = [program]
     real_args.extend(args)
 
     if sys.platform.startswith("win32"):
@@ -397,6 +407,7 @@ def run(program, args):
         return
 
     os.execvp(program, real_args)
+
 
 def to_posix_path(path, fix_drive=False):
     """
@@ -414,6 +425,7 @@ def to_posix_path(path, fix_drive=False):
         return "/" + letter + rest
     return res
 
+
 def to_dos_path(path):
     """Return a DOS path from a "windows with /" path.
     Useful because people sometimes use forward slash in
@@ -421,6 +433,7 @@ def to_dos_path(path):
     """
     res = path.replace(posixpath.sep, ntpath.sep)
     return res
+
 
 def to_native_path(path, normcase=True):
     """Return an absolute, native path from a path,
@@ -477,7 +490,7 @@ class TempDir:
 
     """
     def __init__(self, name="tmp"):
-        self._temp_dir = tempfile.mkdtemp(prefix=name+"-")
+        self._temp_dir = tempfile.mkdtemp(prefix=name + "-")
 
     def __enter__(self):
         return self._temp_dir
@@ -491,17 +504,19 @@ class TempDir:
                 return
         rm(self._temp_dir)
 
+
 @contextlib.contextmanager
 def change_cwd(directory):
     """ Change the current working dir """
     if not os.path.exists(directory):
-        mess  = "Cannot change working dir to '%s'\n" % directory
+        mess = "Cannot change working dir to '%s'\n" % directory
         mess += "This path does not exist"
         raise Exception(mess)
     previous_cwd = os.getcwd()
     os.chdir(directory)
     yield
     os.chdir(previous_cwd)
+
 
 def is_runtime(filename):
     """ Filter function to only install runtime components of packages
@@ -512,7 +527,7 @@ def is_runtime(filename):
     # would be better?
 
     basename = os.path.basename(filename)
-    basedir  = filename.split(os.path.sep)[0]
+    basedir = filename.split(os.path.sep)[0]
     if filename.startswith("bin"):
         if sys.platform.startswith("win"):
             if filename.endswith(".exe"):
@@ -563,11 +578,13 @@ def is_runtime(filename):
     # not enough
     return True
 
+
 def broken_symlink(file_path):
     """ Returns True if the file is a broken symlink
 
     """
     return os.path.lexists(file_path) and not os.path.exists(file_path)
+
 
 def is_binary(file_path):
     """ Returns True if the file is binary
@@ -580,6 +597,7 @@ def is_binary(file_path):
         if b'\0' in data:
             return True
         return False
+
 
 def is_executable_binary(file_path):
     """ Returns true if the file:

@@ -20,10 +20,10 @@ run
 bt
 q
 """.format(binary=os.path.join(base_dir, "bin/debugme")))
-    cmd = ["gdb", "-batch", "-x",  gdb_ini]
+    cmd = ["gdb", "-batch", "-x", gdb_ini]
     process = subprocess.Popen(cmd,
-        stdout = subprocess.PIPE,
-        stderr = subprocess.PIPE)
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
     return process.communicate()
 
 
@@ -34,9 +34,10 @@ def test_normal_debug():
         proj = toc.get_project("debugme")
         toc.configure_project(proj)
         toc.build_project(proj)
-        (out, _)  = run_gdb(proj.sdk_directory)
+        (out, _) = run_gdb(proj.sdk_directory)
         assert "in foo () at " in out
         assert "main.cpp" in out
+
 
 # pylint: disable-msg=E1101
 @pytest.mark.slow
@@ -49,6 +50,7 @@ def test_split_debug():
         (out, _) = run_gdb(proj.sdk_directory)
         assert "in foo () at " in out
         assert "main.cpp" in out
+
 
 # pylint: disable-msg=E1101
 @pytest.mark.slow

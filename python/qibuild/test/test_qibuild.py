@@ -7,7 +7,6 @@
 
 import argparse
 import os
-import difflib
 
 import pytest
 import unittest
@@ -20,7 +19,6 @@ import qibuild.cmdparse
 import qibuild.cmake
 import qibuild.parsers
 import qibuild.toc
-
 
 
 # pylint: disable-msg=E1101
@@ -43,6 +41,7 @@ class QiBuildTestCase(unittest.TestCase):
     def _run_action(self, action, *args):
         qisys.script.run_action("qibuild.actions.%s" % action, args,
             forward_args=self.args)
+
     def get_build_dir(self, project_name):
         """Get the build dir of a project."""
         toc = qibuild.toc.toc_open(self.test_dir, args=self.args)
@@ -110,7 +109,6 @@ class QiBuildTestCase(unittest.TestCase):
         except qibuild.toc.ConfigureFailed, e:
             error = e
         self.assertFalse(error is None)
-
 
     def test_package(self):
         self._run_action("package", "world")

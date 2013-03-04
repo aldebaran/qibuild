@@ -14,6 +14,7 @@ import qisys.sh
 
 LOG_RE = re.compile("(.*?)\((\d+)\):")
 
+
 def parse_cmake_log(input, qibuild_dir):
     """ Parse cmake logs
 
@@ -25,6 +26,7 @@ def parse_cmake_log(input, qibuild_dir):
             match = re.match(LOG_RE, line)
             if not match:
                 continue
+
             (filename, line_no) = match.groups()
             if not qibuild_dir.replace(os.sep,'/') in filename:
                 continue
@@ -42,6 +44,7 @@ def parse_cmake_log(input, qibuild_dir):
         pickle.dump(profile, fp)
     return profile
 
+
 def gen_annotations(profile, out, qibuild_dir):
     """ Write the files with the same layout , the same
     contents, and just a percentage of hits in the first
@@ -56,14 +59,13 @@ def gen_annotations(profile, out, qibuild_dir):
                                      filename)
         with open(orig_filename, "r") as fp:
             lines = fp.readlines()
-        lines = [" "  * (pad + 1) + x for x in lines]
+        lines = [" " * (pad + 1) + x for x in lines]
         file_stats = profile[filename]
-        total_hits = sum(file_stats.values())
+
         for (line_no, hits) in file_stats.iteritems():
-            percent = float(hits) / total_hits * 100
             orig_line = lines[line_no - 1]
-            new_line = str(hits).rjust(pad) + orig_line[pad+1:]
-            lines[line_no-1] = new_line
+            new_line = str(hits).rjust(pad) + orig_line[pad + 1:]
+            lines[line_no - 1] = new_line
         new_filename = os.path.join(out, filename)
         new_dirname = os.path.dirname(new_filename)
         qisys.sh.mkdir(new_dirname, recursive=True)

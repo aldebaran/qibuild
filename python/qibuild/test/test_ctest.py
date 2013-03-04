@@ -6,6 +6,7 @@ import pytest
 from qibuild.ctest import parse_ctest_test_files
 from qibuild.ctest import TestResult
 
+
 def test_parse_simple(tmpdir):
     root_ctest = tmpdir.join("CTestTestfile.cmake")
     root_ctest.write("""
@@ -23,13 +24,13 @@ SET_TESTS_PROPERTIES(test_bar PROPERTIES COST 53.2)
     assert tests == [
         ['test_foo', ['/path/to/test_foo', '--spam=eggs'],
                      {
-                       'COST' : '42.0',
-                       'WORKING_DIRECTORY' : "a/work/dir"
+                       'COST': '42.0',
+                       'WORKING_DIRECTORY': "a/work/dir"
                      }
         ],
         ['test_bar', ['/path/to/test_bar'],
                      {
-                        'COST' : '53.2'
+                        'COST': '53.2'
                     }
         ]
     ]
@@ -52,6 +53,7 @@ SET_TESTS_PROPERTIES(bar PROPERTIES SPAM EGGS)
     with pytest.raises(Exception) as e:
         parse_ctest_test_files(tmpdir.strpath)
     assert "SET_TESTS_PROPERTIES called with wrong name" in e.value.message
+
 
 # pylint: disable-msg=E1101
 @pytest.mark.skipif('"dead locks"')

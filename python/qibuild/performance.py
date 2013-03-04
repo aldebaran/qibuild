@@ -14,15 +14,17 @@ import csv
 from qisys import ui
 import qisys
 
+
 def sigint_handler(signum, frame):
     def double_sigint(signum, frame):
-        ui.warning('Exiting main program without caring (may leave ' + \
+        ui.warning('Exiting main program without caring (may leave ' +
                    'zombies and the like).')
         sys.exit(1)
-    ui.warning('Received keyboard interrupt. Killing all processes ' + \
+    ui.warning('Received keyboard interrupt. Killing all processes ' +
                '. This may take few seconds.')
     qisys.command.SIGINT_EVENT.set()
     signal.signal(signal.SIGINT, double_sigint)
+
 
 def run_perfs(project, pattern=None, dry_run=False):
     """ Called by qibuild test --perf
@@ -41,7 +43,7 @@ def run_perfs(project, pattern=None, dry_run=False):
     if pattern:
         tests = [x for x in all_tests if re.search(pattern, x[0])]
         if not tests:
-            mess  = "No performance tests matching %s\n" % pattern
+            mess = "No performance tests matching %s\n" % pattern
             mess += "Known performance tests are:\n"
             for x in all_tests:
                 mess += "  * " + x[0] + "\n"
@@ -70,6 +72,7 @@ def run_perfs(project, pattern=None, dry_run=False):
         output_xml = os.path.join(test_result, name + ".xml")
         cmd.extend(["--output", output_xml])
         qisys.command.call(cmd)
+
 
 def parse_perflist_files(build_dir):
     """ Looks for perflist.txt in build_dir.

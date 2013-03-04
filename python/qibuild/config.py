@@ -30,6 +30,7 @@ def get_global_cfg_path():
 # Using hand-written 'class to xml' stuff is not that
 # hard and actually works quite well
 
+
 class Env:
     def __init__(self):
         self.path = None
@@ -56,10 +57,11 @@ class Env:
         if self.path:
             res += "env.path: %s\n" % self.path
         if self.bat_file:
-            res += "env.bat_file: %s\n"  % self.bat_file
+            res += "env.bat_file: %s\n" % self.bat_file
         if self.editor:
-            res += "env.editor: %s\n"  % self.editor
+            res += "env.editor: %s\n" % self.editor
         return res
+
 
 class IDE:
     def __init__(self):
@@ -108,6 +110,7 @@ class Build:
             res += "incredibuild: %s\n" % self.incredibuild
         return res
 
+
 class CMake:
     def __init__(self):
         self.generator = None
@@ -126,6 +129,7 @@ class CMake:
         if self.generator:
             res += "cmake.generator: %s\n" % self.generator
         return res
+
 
 class Manifest:
     def __init__(self):
@@ -146,6 +150,7 @@ class Manifest:
             res += "url: %s\n" % self.url
         return res
 
+
 class Defaults:
     def __init__(self):
         # An editor name to use by default
@@ -164,7 +169,7 @@ class Defaults:
         cmake_tree = tree.find("cmake")
         if cmake_tree is not None:
             self.cmake.parse(cmake_tree)
-        self.ide    = tree.get("ide")
+        self.ide = tree.get("ide")
 
     def tree(self):
         tree = etree.Element("defaults")
@@ -187,6 +192,7 @@ class Defaults:
         if env_str:
             res += ui.indent(env_str) + "\n"
         return res
+
 
 class Access:
     def __init__(self):
@@ -216,6 +222,7 @@ class Access:
         if self.password:
             res += "password: XXXXX\n"
         return res
+
 
 class Server:
     def __init__(self):
@@ -247,6 +254,7 @@ class Server:
             res += "\n"
             res += ui.indent(access_str)
         return res
+
 
 class LocalSettings:
     def __init__(self):
@@ -342,7 +350,7 @@ class LocalBuild:
 
 class Config:
     def __init__(self):
-        self.name  = None
+        self.name = None
         # The name of an ide
         self.ide = None
         self.env = Env()
@@ -367,7 +375,7 @@ class Config:
         tree.set("name", self.name)
         if self.ide:
             tree.set("ide", self.ide)
-        env_tree  = self.env.tree()
+        env_tree = self.env.tree()
         tree.append(env_tree)
         cmake_tree = self.cmake.tree()
         tree.append(cmake_tree)
@@ -387,7 +395,6 @@ class Config:
             res += ui.indent(cmake_str)
             res += "\n"
         return res
-
 
 
 class QiBuildConfig:
@@ -419,13 +426,13 @@ class QiBuildConfig:
         self.active_config = None
 
         # Active env:
-        self.env     = Env()
+        self.env = Env()
 
         # Active IDE:
-        self.ide    = None
+        self.ide = None
 
         # Active CMake config:
-        self.cmake  = CMake()
+        self.cmake = CMake()
 
     def read(self, cfg_path=None, create_if_missing=False):
         """ Read from a config location
@@ -471,7 +478,7 @@ class QiBuildConfig:
             self.ides[ide.name] = ide
 
         # Parse servers:
-        server_trees =  self.tree.findall("server")
+        server_trees = self.tree.findall("server")
         for server_tree in server_trees:
             server = Server()
             server.parse(server_tree)
@@ -502,7 +509,7 @@ class QiBuildConfig:
                 self.active_config = default_config
 
         self.cmake.generator = self.defaults.cmake.generator
-        self.env.bat_file    = self.defaults.env.bat_file
+        self.env.bat_file = self.defaults.env.bat_file
         self.env.editor = self.defaults.env.editor
         self.env.path = self.defaults.env.path
         self.ide = None
@@ -534,7 +541,6 @@ class QiBuildConfig:
                 if matching_config_ide:
                     if self.ides.get(matching_config_ide):
                         self.ide = self.ides[matching_config_ide]
-
 
     def set_default_config(self, name):
         """ Set a new config to use by default
@@ -600,7 +606,8 @@ class QiBuildConfig:
             return None
         return server.access
 
-    def set_server_access(self, server_name, username, password=None, root=None):
+    def set_server_access(self, server_name, username,
+                            password=None, root=None):
         """ Configure access to a server """
         server = self.servers.get(server_name)
         if not server:
@@ -660,7 +667,7 @@ class QiBuildConfig:
             res += ui.indent(defaults_str) + "\n"
             res += "\n"
         configs = self.configs.values()
-        configs.sort(key = operator.attrgetter('name'))
+        configs.sort(key=operator.attrgetter('name'))
         if configs:
             res += "configs:\n"
             for config in configs:
@@ -668,7 +675,7 @@ class QiBuildConfig:
                 res += "\n"
             res += "\n"
         ides = self.ides.values()
-        ides.sort(key = operator.attrgetter('name'))
+        ides.sort(key=operator.attrgetter('name'))
         if ides:
             res += "ides:\n"
             for ide in ides:
@@ -676,7 +683,7 @@ class QiBuildConfig:
                 res += "\n"
             res += "\n"
         servers = self.servers.values()
-        servers.sort(key = operator.attrgetter('name'))
+        servers.sort(key=operator.attrgetter('name'))
         if servers:
             res += "servers:\n"
             for server in servers:
@@ -702,7 +709,7 @@ class ProjectConfig:
         try:
             self.tree.parse(cfg_path)
         except Exception, e:
-            mess  = "Could not parse config from %s\n" % cfg_path
+            mess = "Could not parse config from %s\n" % cfg_path
             mess += "Error was: %s" % str(e)
             raise Exception(mess)
 
@@ -738,14 +745,14 @@ class ProjectConfig:
         project_tree = self.tree.getroot()
         if not project_tree:
             project_tree = etree.Element("project")
-            self.tree = etree.ElementTree(element = project_tree)
+            self.tree = etree.ElementTree(element=project_tree)
         project_tree.set("name", self.name)
 
         both_deps = self.depends.intersection(self.rdepends)
         if both_deps:
             both_deps_tree = etree.Element("depends")
             both_deps_tree.set("buildtime", "true")
-            both_deps_tree.set("runtime"  , "true")
+            both_deps_tree.set("runtime" , "true")
             both_deps_tree.set("names", " ".join(both_deps))
             project_tree.append(both_deps_tree)
 
@@ -853,7 +860,6 @@ def convert_qibuild_cfg(qibuild_cfg):
     return (global_xml, local_xml)
 
 
-
 def convert_qibuild_xml(xml_path):
     """ Convert from previous version.
     (Between 1.12 and 1.12.1 XML had no 'version' attribute)
@@ -891,9 +897,9 @@ def convert_project_manifest(qibuild_manifest):
     name = p_names[0]
     project = ProjectConfig()
     project.name = name
-    depends  = ini_cfg.get("project.%s.depends"  % name, default="").split()
+    depends = ini_cfg.get("project.%s.depends"  % name, default="").split()
     rdepends = ini_cfg.get("project.%s.rdepends" % name, default="").split()
-    project.depends  = set(depends)
+    project.depends = set(depends)
     project.rdepends = set(rdepends)
     out = StringIO()
     project.write(out)

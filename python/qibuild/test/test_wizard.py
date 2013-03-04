@@ -31,7 +31,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.get_tc_names = self.get_tc_names_patcher.start()
         self.find_patcher = mock.patch('qisys.command.find_program')
         self.find_program = self.find_patcher.start()
-        self.get_generators_patcher = mock.patch('qibuild.cmake.get_known_cmake_generators')
+        self.get_generators_patcher = mock.patch(
+            'qibuild.cmake.get_known_cmake_generators')
         self.get_generators = self.get_generators_patcher.start()
         self.interact_patcher = None
         self.toc = qibuild.toc.toc_open(self.tmp)
@@ -97,12 +98,12 @@ class ConfigWizardTestCase(unittest.TestCase):
     def test_empty_conf_all_in_path(self):
         self.setup_platform("linux2")
         self.setup_find_program({
-            'cmake'  : '/usr/local/bin/cmake',
-            'qtcreator' : '/usr/local/bin/qtcreator'
+            'cmake': '/usr/local/bin/cmake',
+            'qtcreator': '/usr/local/bin/qtcreator'
         })
         self.setup_answers({
-            "generator" : "Unix Makefiles",
-            "ide"       : "QtCreator",
+            "generator": "Unix Makefiles",
+            "ide": "QtCreator",
         })
 
         self.setup_generators(["Unix Makefiles"])
@@ -117,10 +118,10 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.setup_platform("linux3")
         self.setup_find_program(dict())
         self.setup_answers({
-            "generator"  : "Unix Makefiles",
-            "ide"        : "QtCreator",
-            "cmake path" : "/home/john/.local/cmake/bin/cmake",
-            "qtcreator path" : "/home/john/QtSDK/bin/qtcreator",
+            "generator": "Unix Makefiles",
+            "ide": "QtCreator",
+            "cmake path": "/home/john/.local/cmake/bin/cmake",
+            "qtcreator path": "/home/john/QtSDK/bin/qtcreator",
         })
         self.setup_generators(["Unix Makefiles"])
 
@@ -136,12 +137,12 @@ class ConfigWizardTestCase(unittest.TestCase):
         # QtCreator in config, but now with correct path
         self.setup_platform("linux")
         self.setup_find_program({
-            "cmake" : "/usr/bin/cmake",
+            "cmake": "/usr/bin/cmake",
         })
         self.setup_answers({
-            "generator"  : "Unix Makefiles",
-            "ide"        : "QtCreator",
-            "qtcreator path" : "/home/john/QtSDK/bin/qtcreator"
+            "generator": "Unix Makefiles",
+            "ide": "QtCreator",
+            "qtcreator path": "/home/john/QtSDK/bin/qtcreator"
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_initial_config("""
@@ -160,14 +161,14 @@ class ConfigWizardTestCase(unittest.TestCase):
         # in ~/QtSDK
         self.setup_platform("linux")
         self.setup_find_program({
-            "cmake" : "/usr/bin/cmake",
-            "qtcreator" : "/usr/bin/qtcreator",
+            "cmake": "/usr/bin/cmake",
+            "qtcreator": "/usr/bin/qtcreator",
         })
         self.setup_answers({
-            "generator"  : "Unix Makefiles",
-            "ide"        : "QtCreator",
-            "use qtcreator from /usr/bin/qtcreator" : False,
-            "qtcreator path" : "/home/john/QtSDK/bin/qtcreator",
+            "generator": "Unix Makefiles",
+            "ide": "QtCreator",
+            "use qtcreator from /usr/bin/qtcreator": False,
+            "qtcreator path": "/home/john/QtSDK/bin/qtcreator",
         })
         self.setup_generators(["Unix Makefiles"])
         qibuild_cfg = self.run_wizard()
@@ -179,11 +180,11 @@ class ConfigWizardTestCase(unittest.TestCase):
     def test_visual_studio(self):
         self.setup_platform("win32")
         self.setup_find_program({
-            "cmake" : r"c:\Progam Files\CMake\bin\cmake.exe"
+            "cmake": r"c:\Progam Files\CMake\bin\cmake.exe"
         })
         self.setup_answers({
-            "generator" : "Visual Studio 10",
-            "ide"       : "Visual Studio"
+            "generator": "Visual Studio 10",
+            "ide": "Visual Studio"
         })
         self.setup_generators(["Unix Makefiles", "Visual Studio 10"])
         qibuild_cfg = self.run_wizard()
@@ -194,11 +195,11 @@ class ConfigWizardTestCase(unittest.TestCase):
     def test_xcode(self):
         self.setup_platform("darwin")
         self.setup_find_program({
-            "cmake" : "/Applications/CMake 2.8/Contents/MacOS/cmake",
+            "cmake": "/Applications/CMake 2.8/Contents/MacOS/cmake",
         })
         self.setup_answers({
-            "generator" : "Xcode",
-            "ide" : "Xcode",
+            "generator": "Xcode",
+            "ide": "Xcode",
         })
         self.setup_generators(["Unix Makefiles", "Xcode"])
         qibuild_cfg = self.run_wizard()
@@ -206,16 +207,15 @@ class ConfigWizardTestCase(unittest.TestCase):
         xcode = qibuild_cfg.ides['Xcode']
         self.assertEqual(xcode.name, 'Xcode')
 
-
     def test_local_settings_no_toolchain(self):
         self.setup_platform("linux")
         self.setup_find_program({
-            "cmake" : "/usr/bin/cmake",
-            "qtcreator" : "/usr/bin/qtcreator",
+            "cmake": "/usr/bin/cmake",
+            "qtcreator": "/usr/bin/qtcreator",
         })
         self.setup_answers({
-            "generator" : "Unix Makefiles",
-            "ide" : "QtCreator",
+            "generator": "Unix Makefiles",
+            "ide": "QtCreator",
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
@@ -224,14 +224,14 @@ class ConfigWizardTestCase(unittest.TestCase):
     def test_local_settings_choose_default_toolchain(self):
         self.setup_platform("linux")
         self.setup_find_program({
-            "cmake" : "/usr/bin/cmake",
-            "qtcreator" : "/usr/bin/qtcreator",
+            "cmake": "/usr/bin/cmake",
+            "qtcreator": "/usr/bin/qtcreator",
         })
         self.setup_answers({
-            "generator" : "Unix Makefiles",
-            "ide" : "QtCreator",
-            "toolchain" : "linux64",
-            "configure settings for this worktree" : True,
+            "generator": "Unix Makefiles",
+            "ide": "QtCreator",
+            "toolchain": "linux64",
+            "configure settings for this worktree": True,
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(["linux32", "linux64"])
@@ -241,16 +241,16 @@ class ConfigWizardTestCase(unittest.TestCase):
     def test_local_build_settings(self):
         self.setup_platform("linux")
         self.setup_find_program({
-            "cmake" : "/usr/bin/cmake",
-            "qtcreator" : "/usr/bin/qtcreator",
+            "cmake": "/usr/bin/cmake",
+            "qtcreator": "/usr/bin/qtcreator",
         })
         self.setup_answers({
-            "generator" : "Unix Makefiles",
-            "ide" : "Eclipse CDT",
-            "unique build dir" : True,
-            "unique sdk dir"   : True,
-            "configure settings for this worktree" : True,
-            "path to a build dir" : "build",
+            "generator": "Unix Makefiles",
+            "ide": "Eclipse CDT",
+            "unique build dir": True,
+            "unique sdk dir": True,
+            "configure settings for this worktree": True,
+            "path to a build dir": "build",
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
@@ -260,33 +260,34 @@ class ConfigWizardTestCase(unittest.TestCase):
     def test_full_wizard(self):
         self.setup_platform("win32")
         self.setup_find_program({
-            "cmake"  : r"c:\Program Files\CMake\bin\cmake.exe"
+            "cmake": r"c:\Program Files\CMake\bin\cmake.exe"
         })
         self.setup_answers({
-            "generator" : "Visual Studio 10",
-            "ide" : "Visual Studio",
-            "use on of these toolchains by default" : True,
-            "configure settings for this worktree" : True,
+            "generator": "Visual Studio 10",
+            "ide": "Visual Studio",
+            "use on of these toolchains by default": True,
+            "configure settings for this worktree": True,
             "toolchain to use by default": "win32-vs2010",
         })
         self.setup_generators(["Visual Studio 10"])
         self.setup_tc_names(["win32-vs2010"])
         self.run_wizard(toc=self.toc)
         self.assertEqual(self.toc.config.local.defaults.config, "win32-vs2010")
-        self.assertEqual(self.toc.config.defaults.cmake.generator, "Visual Studio 10")
+        self.assertEqual(self.toc.config.defaults.cmake.generator,
+            "Visual Studio 10")
 
     def test_unsetting_unique_build_dir(self):
         self.setup_platform("linux")
         self.setup_find_program({
-            "cmake" : "/usr/bin/cmake",
-            "qtcreator" : "/usr/bin/qtcreator",
+            "cmake": "/usr/bin/cmake",
+            "qtcreator": "/usr/bin/qtcreator",
         })
         self.setup_answers({
-            "generator" : "Unix Makefiles",
-            "ide" : "Eclipse CDT",
-            "unique build dir" : True,
-            "configure settings for this worktree" : True,
-            "path to a build dir" : "build",
+            "generator": "Unix Makefiles",
+            "ide": "Eclipse CDT",
+            "unique build dir": True,
+            "configure settings for this worktree": True,
+            "path to a build dir": "build",
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
@@ -296,16 +297,16 @@ class ConfigWizardTestCase(unittest.TestCase):
 
         self.interact_patcher.stop()
         self.setup_answers({
-            "generator" : "Unix Makefiles",
-            "ide" : "Eclipse CDT",
-            "unique build dir" : False,
-            "configure settings for this worktree" : True,
-            "unique sdk dir"   : False,
+            "generator": "Unix Makefiles",
+            "ide": "Eclipse CDT",
+            "unique build dir": False,
+            "configure settings for this worktree": True,
+            "unique sdk dir": False,
         })
         new_toc = qibuild.toc.toc_open(self.tmp)
         self.run_wizard(toc=new_toc)
         build_dir = new_toc.config.local.build.build_dir
-        sdk_dir   = new_toc.config.local.build.sdk_dir
+        sdk_dir = new_toc.config.local.build.sdk_dir
         self.assertFalse(build_dir,
             "build_dir is '%s', should be None or empty" % build_dir)
         self.assertFalse(sdk_dir,

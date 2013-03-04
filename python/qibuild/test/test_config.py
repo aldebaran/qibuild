@@ -33,6 +33,7 @@ def local_cfg_to_string(cfg):
     cfg.write_local_config(cfg_loc)
     return cfg_loc.getvalue()
 
+
 class QiBuildConfig(unittest.TestCase):
 
     def test_simple(self):

@@ -11,11 +11,10 @@ import platform
 import tempfile
 import unittest
 
-import pytest
-
 import qisys
 import qibuild
 import qitoolchain
+
 
 class TestToc():
     """ A class that opens a toc object
@@ -50,6 +49,7 @@ def pytest_funcarg__toc(request):
     res = TestToc()
     request.addfinalizer(res.clean)
     return res
+
 
 def pytest_funcarg__toc_release(request):
     res = TestToc(config="release")
@@ -129,6 +129,7 @@ class TocTestCase(unittest.TestCase):
             custom_cmake = os.path.join(dot_qi, config + ".cmake")
             with open(custom_cmake, "w") as fp:
                 fp.write("# Custom %s cmake config\n" % config)
+
             class FakeArgs:
                 pass
             args = FakeArgs()
@@ -143,15 +144,16 @@ class TocTestCase(unittest.TestCase):
     def tearDown(self):
         qisys.sh.rm(self.tmp)
 
+
 def test_is_build_folder_name():
     parts = ["sys", platform.system().lower()]
-    assert qibuild.toc.is_build_folder_name(parts) == False
+    assert qibuild.toc.is_build_folder_name(parts) is False
     parts.append(platform.machine().lower())
-    assert qibuild.toc.is_build_folder_name(parts) == True
+    assert qibuild.toc.is_build_folder_name(parts) is True
     parts.append("release")
-    assert qibuild.toc.is_build_folder_name(parts) == True
+    assert qibuild.toc.is_build_folder_name(parts) is True
     parts.append("foo")
-    assert qibuild.toc.is_build_folder_name(parts) == False
+    assert qibuild.toc.is_build_folder_name(parts) is False
 
 if __name__ == "__main__":
     unittest.main()
