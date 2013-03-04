@@ -24,7 +24,7 @@ if os.name == 'nt':
         # pylint: disable-msg=F0401
         from pyreadline.console import Console
         _console = Console()
-    except ImportError:
+    except:
         HAS_PYREADLINE = False
 
 # ANSI color codes, as classes,
