@@ -9,13 +9,14 @@ Toolchain packages and known configurations will be fetched from an URL.
 """
 
 from qisys import ui
+import qisys.parsers
 import qibuild
 import qitoolchain
 
 
 def configure_parser(parser):
     """ Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("name", metavar="NAME",
         help="Name of the toolchain")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",

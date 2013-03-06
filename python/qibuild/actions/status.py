@@ -50,7 +50,7 @@ def list_build_dir(path):
 
 def do(args):
     """Main entry point"""
-    qiwt = qisys.worktree.open_worktree(args.worktree)
-    for project in qibuild.project.build_projects(qiwt):
+    build_worktree = qibuild.parsers.get_build_worktree(args)
+    for project in build_worktree.build_projects:
         LOGGER.info("%s", project.src)
         list_build_dir(project.path)

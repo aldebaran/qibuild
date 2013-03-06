@@ -10,6 +10,7 @@ from qisys import ui
 import qisys.parsers
 import qilinguist.qigettext
 import qilinguist.qtlinguist
+import qilinguist.parsers
 import qilinguist.config
 import qisys.worktree
 import qisrc.cmdparse
@@ -56,8 +57,8 @@ def process_with_qt(project):
 def do(args):
   """Main entry point"""
 
-  worktree = qisys.worktree.open_worktree(args.worktree)
-  projects = qisrc.cmdparse.projects_from_args(args, worktree)
+  linguist_worktree = qilinguist.parsers.get_linguist_worktree(args)
+  projects = qilinguist.parsers.get_projects(linguist_worktree, args)
   for project in projects:
       if not os.path.exists(project.qiproject_xml):
           ui.error("No qiproject.xml for project " + project.src)

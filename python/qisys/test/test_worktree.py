@@ -27,7 +27,7 @@ def test_read_projects(tmpdir):
     <project src="lib/libqi" />
 </worktree>
 """)
-    worktree = qisys.worktree.open_worktree(tmpdir.strpath)
+    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     p_srcs = [p.src for p in worktree.projects]
     assert p_srcs == ["core/naoqi", "lib/libqi"]
 
@@ -90,7 +90,7 @@ def test_nested_qiprojects(tmpdir):
     c_xml = c_project.join("qiproject.xml")
     c_xml.write('<project name="c" />\n')
 
-    worktree = qisys.worktree.open_worktree(tmpdir.strpath)
+    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     assert len(worktree.projects) == 3
     assert [p.src for p in worktree.projects] == \
         ["a", "a/b", "a/b/c"]
@@ -102,7 +102,7 @@ def test_non_exiting_path_are_removed(tmpdir, interact):
     a_path = tmpdir.mkdir("a")
     wt.add_project(a_path.strpath)
     a_path.remove()
-    wt2 = qisys.worktree.open_worktree(tmpdir.strpath)
+    wt2 = qisys.worktree.WorkTree(tmpdir.strpath)
     assert wt2.projects == list()
 
 
@@ -128,7 +128,7 @@ def test_check_not_in_git(tmpdir):
     b = a_git.mkdir("b")
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.worktree.WorkTreeError) as e:
-        qisys.worktree.open_worktree(b.strpath)
+        qisys.worktree.WorkTree(b.strpath)
     assert "inside a git project" in e.value.message
 
 

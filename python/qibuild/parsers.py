@@ -8,15 +8,10 @@
 import qisys.parsers
 import qibuild.worktree
 
-log_parser = qisys.parsers.log_parser
-default_parser  = qisys.parsers.default_parser
-worktree_parser = qisys.parsers.worktree_parser
-
-
 
 def toc_parser(parser):
     """Parser settings for every action using a toc dir."""
-    worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("-c", "--config",
         help="The configuration to use. "
              "It should be the name of a toolchain or \"system\". "

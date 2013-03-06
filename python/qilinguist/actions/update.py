@@ -122,8 +122,8 @@ def process_with_qt(project):
 
 def do(args):
   """Main entry point"""
-  worktree = qisys.worktree.open_worktree(args.worktree)
-  projects = qisrc.cmdparse.projects_from_args(args, worktree)
+  linguist_worktree = qilinguist.parsers.get_linguist_worktree(args)
+  projects = qilinguist.parsers.get_projects(linguist_worktree, args)
   for project in projects:
       qiproject_path = project.qiproject_xml
       if not os.path.exists(qiproject_path):

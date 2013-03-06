@@ -26,7 +26,7 @@ class TestToc():
     """
     def __init__(self, build_type="Debug", cmake_flags=None):
         test_dir = os.path.abspath(os.path.dirname(__file__))
-        worktree = qisys.worktree.open_worktree(test_dir)
+        worktree = qisys.worktree.WorkTree(test_dir, sanity_check=False)
         self.toc = qibuild.toc.Toc(worktree, build_type=build_type,
                                    cmake_flags=cmake_flags)
 
@@ -117,7 +117,7 @@ class TocTestCase(unittest.TestCase):
         with open(hello_cmake, "w") as fp:
             fp.write("project(hello)\n")
 
-        worktree = qisys.worktree.open_worktree(self.tmp)
+        worktree = qisys.worktree.WorkTree(self.tmp, sanity_check=False)
         worktree.add_project(hello_src)
         toc = qibuild.toc.toc_open(self.tmp)
         hello_proj = toc.get_project("hello")

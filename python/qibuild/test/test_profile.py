@@ -31,7 +31,7 @@ def open_toc_with_profiles(tmpdir, profiles=None, flags=None):
   </profiles>
 </qibuild>
 """)
-    worktree = qisys.worktree.open_worktree(tmpdir.strpath)
+    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     toc = qibuild.toc.Toc(worktree, cmake_flags=flags, profiles=profiles)
     return toc
 

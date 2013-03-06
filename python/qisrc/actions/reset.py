@@ -29,7 +29,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry points."""
 
-    worktree = qisys.worktree.open_worktree(args.worktree)
+    worktree = qisrc.parsers.get_git_worktree(args)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, worktree.root)
 
     for project in qisrc.cmdparse.projects_from_args(args, worktree):

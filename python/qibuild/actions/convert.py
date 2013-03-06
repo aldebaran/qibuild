@@ -13,6 +13,7 @@ import difflib
 import qisys.log
 from xml.etree import ElementTree as etree
 
+import qisys.parsers
 import qibuild
 
 LOGGER = qisys.log.get_logger(__name__)
@@ -233,7 +234,7 @@ def clean_up(args):
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.default_parser(parser)
+    qisys.parsers.default_parser(parser)
     parser.add_argument("source_dir", nargs="?",
         help="Top source directory of the project. "
              "Defaults to current working directory.")

@@ -61,7 +61,7 @@ class NoSuchProfile(Exception):
         self.profile_name = profile_name
 
     def __str__(self):
-        qibuild_xml = self.toc.config_path
+        qibuild_xml = self.toc.qibuild_xml
         profiles = qibuild.profile.parse_profiles(qibuild_xml)
         return """ Could not find profile {name}.
 Known profiles are: {profiles}
@@ -101,13 +101,13 @@ class InstallFailed(Exception):
         return "Error occured when installing project %s" % self.project.name
 
 
-class Toc:
+class Toc(object):
     """
     Example of use:
 
     .. code-block:: python
 
-        worktree = qisys.worktree.open_worktree("/path/to/src")
+        build_worktree = qibuild.parsers.get_build_worktree()
         toc = Toc(worktree=worktree, build_type="release")
 
         # Look for the foo project in the worktree
@@ -121,7 +121,7 @@ class Toc:
         toc.build_project(foo)
 
     """
-    def __init__(self, build_worktree,
+    def __init__(self, worktree,
             config=None,
             qibuild_cfg=None,
             build_type="Debug",
@@ -158,11 +158,7 @@ class Toc:
         # The local config file in which to write
         qisys.sh.mkdir(worktree.dot_qi)
 
-        # Perform format conversion if necessary
-        self.config_path = worktree.qibuild_xml
-        if not os.path.exists(self.config_path):
-            with open(self.config_path, "w") as fp:
-                fp.write("<qibuild />\n")
+        # Perform format conversion if necessarVy
 
         handle_old_qibuild_xml(self.worktree.root)
         # Handle config:
@@ -171,7 +167,7 @@ class Toc:
             self.config.read()
         else:
             self.config = config
-        self.config.read_local_config(self.config_path)
+        self.config.read_local_config(self.qibuild_xml)
         self.active_config = self.config.active_config
         # Special case if "--system" was used:
         if config == "system":
@@ -259,6 +255,15 @@ You may want to run:
         # every project)
         self.update_projects()
 
+    @property
+    def qibuild_xml(self):
+        config_path = os.path.join(self.worktree.dot_qi, "qibuild.xml")
+        if not os.path.exists(config_path):
+            with open(config_path, "w") as fp:
+                fp.write("<qibuild />\n")
+        return config_path
+
+
     def apply_profiles(self, profile_names):
         """ Apply a profile, adding cmake flags coming from -p command
         line arguments.
@@ -267,7 +272,7 @@ You may want to run:
         if not profile_names:
             return
         cmake_flags = list()
-        profiles = qibuild.profile.parse_profiles(self.config_path)
+        profiles = qibuild.profile.parse_profiles(self.qibuild_xml)
         for profile_name in profile_names:
             match = profiles.get(profile_name)
             if not match:
@@ -284,7 +289,7 @@ You may want to run:
         self.config in order to make the changes permanent
 
         """
-        self.config.write_local_config(self.config_path)
+        self.config.write_local_config(self.qibuild_xml)
         self.config.write()
 
     def update_projects(self):
@@ -696,7 +701,7 @@ def toc_open(worktree_root, args=None):
         if hasattr(args, arg):
             kwargs[arg] = getattr(args, arg)
 
-    worktree = qisys.worktree.open_worktree(worktree_root)
+    worktree = qisys.parsers.get_worktree(args)
     return Toc(worktree, **kwargs)
 
 def num_jobs_to_args(num_jobs, cmake_generator):

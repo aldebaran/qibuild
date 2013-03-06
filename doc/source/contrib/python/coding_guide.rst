@@ -209,7 +209,7 @@ Rather use the modularity of ``autodoc``:
 
 .. code-block:: rst
 
-  .. autofunction:: qibuild.toc.toc_open
+  .. autofunction:: qisy.sh.mkdir
 
   .. seealso:
 

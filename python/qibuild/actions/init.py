@@ -8,6 +8,7 @@ import sys
 
 from qisys import ui
 import qisys
+import qisys.parsers
 import qibuild
 import qibuild.wizard
 import qitoolchain
@@ -16,7 +17,7 @@ import qitoolchain
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("-i", "--interactive", action="store_true",
         help="start a wizard to help you configuring qibuild")
     parser.add_argument("-f", "--force", action="store_true", help="force the init")

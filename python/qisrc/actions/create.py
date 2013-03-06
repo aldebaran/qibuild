@@ -41,7 +41,7 @@ def do(args):
     """"Create a new project """
     # Try to open a worktree.
     # If not, ask the user if he wants to create one:
-    qiwt = qisys.worktree.open_worktree(args.worktree)
+    qiwt = qisys.parsers.get_worktree(args)
 
     project_name = args.project_name
     project_path = os.path.join(qiwt.root, project_name)

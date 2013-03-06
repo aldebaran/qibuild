@@ -42,13 +42,14 @@ def patch_sys_path():
 patch_sys_path()
 
 import qisys.worktree
+import qisys.parsers
 
 def main():
     """ Main entry point """
     try:
-        worktree = qisys.worktree.open_worktree()
+        worktree = qisys.parsers.get_worktree({})
     except Exception as e:
-        sys.stderr.write("Not in a worktree\n")
+        sys.stderr.write(str(e))
         sys.exit(2)
     if len(sys.argv) < 2:
         print(worktree.root)

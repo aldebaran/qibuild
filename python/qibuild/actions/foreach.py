@@ -9,31 +9,20 @@ For instance
   qibuild --ignore-errors -- ls -l
 """
 
-import qisys.log
-
-import qibuild
-import qibuild.project
+import qisys.actions
+import qibuild.parsers
 
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("command", metavar="COMMAND", nargs="+")
     parser.add_argument("--continue", "--ignore-errors", dest="ignore_errors",
                         action="store_true", help="continue on error")
 
 def do(args):
     """Main entry point"""
-    qiwt = qisys.worktree.open_worktree(args.worktree)
-    logger = qisys.log.get_logger(__name__)
-    for project in qibuild.project.build_projects(qiwt):
-        logger.info("Running `%s` for %s", " ".join(args.command), project.src)
-        try:
-            qisys.command.call(args.command, cwd=project.path)
-        except qisys.command.CommandFailedException, err:
-            if args.ignore_errors:
-                logger.error(str(err))
-                continue
-            else:
-                raise
-
+    build_worktree = qibuild.parsers.get_build_worktree(args)
+    projects = build_worktree.build_projects
+    qisys.actions.foreach(projects, args.command,
+                          ignore_errors=args.ignore_errors)

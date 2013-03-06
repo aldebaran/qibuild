@@ -10,12 +10,12 @@ to update the given toolchain.
 """
 
 from qisys import ui
-import qibuild
+import qisys.parsers
 import qitoolchain
 
 def configure_parser(parser):
     """ Configure parser for this action """
-    qibuild.parsers.default_parser(parser)
+    qisys.parsers.default_parser(parser)
     parser.add_argument("name", nargs="?", metavar="NAME",
         help="Update only this toolchain")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",

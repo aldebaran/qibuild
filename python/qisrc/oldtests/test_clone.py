@@ -13,7 +13,7 @@ from qisrc.test.test_git import create_git_repo_with_submodules
 
 def create_worktree(tmpdir):
     work = tmpdir.mkdir("work")
-    return qisys.worktree.open_worktree(work.strpath)
+    return qisys.worktree.WorkTree(work.strpath)
 
 def test_simple(tmpdir):
     bar_url = create_git_repo(tmpdir.strpath, "bar")

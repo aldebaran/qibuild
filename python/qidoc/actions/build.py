@@ -9,6 +9,7 @@ import qisys.worktree
 import qibuild
 import qibuild.parsers
 import qidoc.core
+import qidoc.parsers
 import qisrc.cmdparse
 
 def configure_parser(parser):
@@ -34,7 +35,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point."""
-    worktree = qisys.worktree.open_worktree(args.worktree)
+    doc_worktree = qidoc.parsers.get_doc_worktree(args)
     projects = qisrc.cmdparse.projects_from_args(args, worktree)
     builder = qidoc.core.QiDocBuilder(projects, args.worktree, args.output_dir)
     opts = dict()

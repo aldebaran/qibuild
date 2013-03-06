@@ -62,14 +62,16 @@ def project_parser(parser, positional=True, short=True):
     return group
 
 
-def get_worktree(args):
+def get_worktree(args=None):
     """ Get a worktree right after argument parsing.
 
     If --worktree was not given, try to guess it from
     the current working directory
 
     """
-    wt_root = args.worktree
+    wt_root = None
+    if args:
+        wt_root = args.worktree
     if not wt_root:
         wt_root = qisys.worktree.guess_worktree(raises=True)
     return qisys.worktree.WorkTree(wt_root)
@@ -90,11 +92,11 @@ class AbstractProjectParser:
         pass
 
     @abc.abstractmethod
-    def parse_no_args(self):
+    def _parse_no_args(self):
         pass
 
     @abc.abstractmethod
-    def parse_one_project(self, args, project_arg):
+    def _parse_one_project(self, args, project_arg):
         pass
 
     @abc.abstractmethod
@@ -102,7 +104,12 @@ class AbstractProjectParser:
         pass
 
     def parse_args(self, args):
-        self.args = args
+        """ Parse arguments. args may be a
+        argparse.Namespace() object, or a dict
+
+        """
+        if isinstance(args, dict):
+            args = argparse.Namespace(**args)
         if args.all:
             return self.all_projects()
         project_args = args.projects

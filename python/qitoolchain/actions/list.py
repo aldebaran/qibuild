@@ -7,14 +7,14 @@
 """
 
 import qisys
-import qibuild
+import qisys.parsers
 import qitoolchain
 
 from qisys import ui
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
 
 
 def do(args):
@@ -26,7 +26,7 @@ def do(args):
         return
     default_toc_name = None
     try:
-        worktree = qisys.worktree.open_worktree(args.worktree)
+        worktree = qisys.parsers.get_worktree(args)
         toc = qibuild.toc.Toc(worktree)
         default_toc_name = toc.config.local.defaults.config
     except qisys.worktree.NotInWorkTree, e:

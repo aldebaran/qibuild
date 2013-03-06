@@ -13,12 +13,12 @@ Briefly, you should create a file named ``spam.py`` looking like:
 
   """Add some eggs !"""
 
-  import qibuild
+  import qisys.parsers
 
 
   def configure_parser(parser):
       """Configure parser for this action """
-      qibuild.parsers.default_parser(parser)
+      qisys.parsers.default_parser(parser)
       parser.add_argument("--num-eggs",
         help="Number of eggs to add",
         type=int)

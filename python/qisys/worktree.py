@@ -105,6 +105,8 @@ worktree root: {1}
                 fp.write("<worktree />")
         return worktree_xml
 
+
+
     def has_project(self, path):
         src = self.normalize_path(path)
         srcs = (p.src for p in self.projects)
@@ -216,16 +218,6 @@ worktree root: {1}
         res += ">\n"
         return res
 
-
-def open_worktree(directory):
-    warnings.warn("qisys.worktree.open_worktree is deprecated, "
-                 "use WorkTree instead", stacklevel=2)
-    return WorkTree(directory)
-
-def create(directory):
-    warnings.warn("qisys.worktree.create is deprecated, "
-                 "use WorkTree instead", stacklevel=2)
-    return WorkTree(directory)
 
 class WorkTreeProject(object):
     def __init__(self, worktree, src):

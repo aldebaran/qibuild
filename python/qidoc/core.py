@@ -18,7 +18,7 @@ class QiDocBuilder:
     """A class to handle doc generation of several projects."""
 
     def __init__(self, projects, in_dir, out_dir=None):
-        self.worktree = qisys.worktree.open_worktree(in_dir)
+        self.worktree = qisys.worktree.WorkTree(in_dir)
         self.projects, self.projects_to_build = projects, []
 
         self.templates_path, self.docs, self.in_dir = None, dict(), in_dir

@@ -30,7 +30,7 @@ qisys.worktree.WorkTree
 
   .. py:attribute:: git_projects
 
-     A list git repostories found in this worktree
+     A list git repositories found in this worktree
 
   .. automethod:: get_project
 
@@ -42,28 +42,3 @@ qisys.worktree.WorkTree
 
   .. automethod:: set_project_review
 
-
-Other functions in this module
-------------------------------
-
-qisys.worktree.open_worktree
-+++++++++++++++++++++++++++++++
-
-.. autofunction:: open_worktree
-
-Typical usage from an action is:
-
-.. code-block:: python
-
-    # To handle --work-tree option
-    def configure_parser(parser):
-        qisys.worktree.worktree_parser(parser)
-
-    def do(args):
-        qiwt = qisrc.open_worktree(args.work_tree)
-
-
-qibuild.worktree.guess_worktree
-+++++++++++++++++++++++++++++++
-
-.. autofunction:: guess_worktree

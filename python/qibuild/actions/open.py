@@ -82,7 +82,7 @@ def do(args):
     error_message = "Could not open project %s\n" % project.name
     qibuild_cfg = qibuild.config.QiBuildConfig(user_config=toc.active_config)
     qibuild_cfg.read()
-    qibuild_cfg.read_local_config(toc.config_path)
+    qibuild_cfg.read_local_config(toc.qibuild_xml)
     ide = get_ide(qibuild_cfg)
     if not ide:
         return

@@ -20,11 +20,6 @@ class NotInAGitRepo(Exception):
      - specify a repository path on the command line
 """
 
-def open_git_worktree(root):
-    """ Open an existing GitWorkTree """
-    worktree = qisys.worktree.open_worktree(root)
-    git_worktree = GitWorkTree(worktree)
-    return git_worktree
 
 class GitWorkTree(qisys.worktree.WorkTreeObserver):
     """ Stores a list of git projects and a list of manifests """

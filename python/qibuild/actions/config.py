@@ -50,7 +50,7 @@ def do(args):
 
         full_path = qisys.command.find_program(editor)
         if is_local:
-            cfg_path = toc.config_path
+            cfg_path = toc.qibuild_xml
         else:
             cfg_path = qibuild.config.get_global_cfg_path()
         subprocess.call([full_path, cfg_path])

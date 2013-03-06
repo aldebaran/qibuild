@@ -32,11 +32,11 @@ Quick example of a generic action:::
 
   """Add some eggs !"""
 
-  import qibuild
+  import qisys
 
   def configure_parser(parser):
       """Configure parser for this action """
-      qibuild.parsers.default_parser(parser)
+      qisys.parsers.default_parser(parser)
       parser.add_argument("--num-eggs",
         help="Number of eggs to add",
         type=int)
@@ -48,12 +48,8 @@ Quick example of a generic action:::
     qisys.ui.info("adding %i eggs" % args.num_eggs)
 
 
-The call to ``qibuild.parsers.default_parser`` is mandatory:
+The call to ``qisys.parsers.default_parser`` is mandatory:
 It handles the logging configuration, and all the debug options.
-
-There are a bunch of other functions available to configure the parsers in
-the ``qibuild.parsers`` package, depending on what you need to do, and, yes,
-they all call ``qibuild.parsers.default_parser`` for you :)
 
 
 Quick note : often you'll want an action with two words in it, for instance
