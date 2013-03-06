@@ -3,13 +3,30 @@
 Changelog
 =========
 
+Upcoming release
+----------------
+
+CMake
++++++
+
+* Keep ``CMAKE_FIND_ROOT_PATH`` clean during incremental builds
+* Fix using :cmake:function:`qi_add_optional_package` with a file defining some macros
+* ``boost``: support 1.53, adapt ``boost_flib`` for libraries being only headers
+
+Command line
+++++++++++++
+
+* ``qisrc sync``: Prevent unwanted rebases when we are already synced
+* Fix return code of ``qibuild test --list``
+* ``qilinguist``: Stop doing backup when merging catalog files
+
 V2.1
 ----
 
 General
---------
+++++++++
 
-Remove compatibility with python 2.6
+* Remove compatibility with python 2.6
 
 Command line
 ++++++++++++
@@ -19,8 +36,7 @@ Command line
 * ``qisrc snapshot`` learn ``--fetch``, ``--no-fetch`` and ``--tag``.
 * ``qisrc list`` learn ``--with-path``.
 * ``qisrc grep`` learned ``-path``.
-* ``qisrc clean`` learned ``-z`` to clean build dir through toolchains and
-  profiles.
+* ``qisrc clean`` learned ``-z`` to clean build dir through toolchains and profiles.
 * ``qibuild test``: learned ``--ncpu`` to restrict the number of CPUs a test can use using taskset if available
 
 CMake
