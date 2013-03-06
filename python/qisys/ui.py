@@ -157,17 +157,17 @@ def info_count(i, n, *rest):
     """ Same as info, but displays a nice counter
     coler will be reset
     >>> count(0, 4)
-     * (1 on 5)
+    * (1/5)
     >>> count(4, 12)
-     * ( 4 on 12)
+    * ( 4/12)
     >>> count(4, 10)
-     * (10 on 12)
+    * (10/12)
 
     """
     num_digits = len(str(n)) # lame, I know
-    counter_format = "(%{}d on %d)".format(num_digits)
+    counter_format = "(%{}d/%d)".format(num_digits)
     counter_str = counter_format % (i+1, n)
-    info(green, " * ", reset, bold, counter_str, reset, *rest)
+    info(green, "*", reset, counter_str, reset, *rest)
 
 def debug(*tokens, **kwargs):
     """ Print a debug message """
