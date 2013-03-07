@@ -327,10 +327,6 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
                 continue
             tests.append(test)
 
-    if not tests:
-        ui.warning("No tests found for project", project.name)
-        return
-
     if dry_run:
         ui.info(ui.green, "List of tests for", project.name)
         for (test_name, _, _) in tests:
@@ -340,6 +336,14 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
     if 1 < num_jobs:
         global _MULTIPLE_JOBS
         _MULTIPLE_JOBS = True
+
+    # Clean up test-results dir
+    result_dir = os.path.join(build_dir, "test-results")
+    qisys.sh.rm(result_dir)
+
+    if not tests:
+        ui.warning("No tests found for project", project.name)
+        return
 
     ui.info(ui.green, "Testing", project.name, "...")
     in_queue, out_queue = QueueTimeout(), Queue.Queue()
