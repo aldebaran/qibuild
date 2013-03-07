@@ -13,6 +13,7 @@ import functools
 
 from qisys import ui
 import qisys
+import qisys.command
 
 class Git:
     """ The Git represent a git tree """
