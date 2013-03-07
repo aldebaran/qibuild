@@ -56,6 +56,7 @@ class Git:
             out = process.communicate()[0]
             # Don't want useless blank lines
             out = out.rstrip("\n")
+            ui.debug("out:", out)
             return (process.returncode, out)
         else:
             qisys.command.call(cmd, **kwargs)
