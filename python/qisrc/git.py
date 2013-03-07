@@ -129,7 +129,7 @@ class Git:
         kwargs["cwd"] = None
         return self.call("clone", *args, **kwargs)
 
-    def cherrypick(self, *args, **kwargs):
+    def cherry_pick(self, *args, **kwargs):
         """ Wrapper for git cherry-pick """
         return self.call("cherry-pick", *args, **kwargs)
 
