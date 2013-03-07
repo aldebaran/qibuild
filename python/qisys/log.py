@@ -5,12 +5,16 @@
 """ Compatibility layer for old usage of logging.py
 
 """
+import os
 import qisys.ui
 
 
 def configure_logging(args):
+    verbose = os.environ.get("VERBOSE", False)
+    if not verbose:
+        verbose = args.verbose
     qisys.ui.CONFIG["color"] = args.color
-    qisys.ui.CONFIG["verbose"] = args.verbose
+    qisys.ui.CONFIG["verbose"] = verbose
     qisys.ui.CONFIG["quiet"] = args.quiet
     qisys.ui.CONFIG["timestamp"] = args.timestamp
 
