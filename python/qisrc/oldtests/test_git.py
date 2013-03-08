@@ -482,7 +482,7 @@ def test_create_in_git_dir(tmpdir):
     work = a_git.mkdir("work")
     # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
-        qisys.worktree.create(work.strpath)
+        qisys.worktree.WorkTree(work.strpath)
     assert "inside a git project" in e.value.message
 
 def test_get_repo_root(tmpdir):

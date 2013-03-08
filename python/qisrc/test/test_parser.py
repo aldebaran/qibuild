@@ -5,7 +5,7 @@ import qisrc.parsers
 import qisrc.worktree
 
 def test_guess_git_repo(tmpdir, args):
-    worktree = qisys.worktree.create(tmpdir.strpath)
+    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     foo = tmpdir.mkdir("foo")
     bar = foo.mkdir("bar")
     foo.join("qiproject.xml").write("""<project>

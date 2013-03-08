@@ -98,7 +98,7 @@ def test_nested_qiprojects(tmpdir):
 
 def test_non_exiting_path_are_removed(tmpdir, interact):
     # all projects registered should exist:
-    wt = qisys.worktree.create(tmpdir.strpath)
+    wt = qisys.worktree.WorkTree(tmpdir.strpath)
     a_path = tmpdir.mkdir("a")
     wt.add_project(a_path.strpath)
     a_path.remove()
@@ -108,7 +108,7 @@ def test_non_exiting_path_are_removed(tmpdir, interact):
 
 def test_check_subprojects_exist(tmpdir):
     # subprojets in qiproject.xml should exist
-    wt = qisys.worktree.create(tmpdir.strpath)
+    wt = qisys.worktree.WorkTree(tmpdir.strpath)
     a_path = tmpdir.mkdir("a")
     a_qiproject = a_path.join("qiproject.xml")
     a_qiproject.write(""" \

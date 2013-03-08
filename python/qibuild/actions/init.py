@@ -56,7 +56,7 @@ If you want to re-initialize the worktree in {parent_worktree}
                            "Use --force if you want to re-initialize this worktree")
                 return
 
-    qisys.worktree.create(worktree, force=args.force)
+    qisys.worktree.WorkTree(worktree, force=args.force)
 
     # User maybe re-running qibuild init because it has a
     # bad default exception ...

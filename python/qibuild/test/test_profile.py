@@ -67,7 +67,7 @@ def test_non_existing_profile(tmpdir):
         toc = open_toc_with_profiles(tmpdir, profiles=["doesnotexist"])
 
 def test_add_profile(tmpdir):
-    worktree = qisys.worktree.create(tmpdir.strpath)
+    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     qibuild_xml = tmpdir.join(".qi").join("qibuild.xml")
     profile = qibuild.profile.Profile("foo")
     profile.cmake_flags = ["FOO=BAR"]

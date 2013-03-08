@@ -23,7 +23,7 @@ PYMODULES ?= qisys qibuild qitoolchain qisrc qidoc qilinguist \
 PYTHON    ?= python
 PIP       ?= pip
 
-all: pylint-error check
+all: refact
 
 pylint-full:
 	@echo ":: Running pylint: $(PYMODULES)"
@@ -65,5 +65,5 @@ upgrade-python:
 	@$(PIP) install --user --upgrade --requirement requirements.txt
 
 refact:
-	-pylint --errors-only --rcfile pylint.rc qisys qisrc
-	py.test qisrc/test qisys/test
+	-pylint --errors-only --rcfile pylint.rc qisys qisrc qibuild qitoolchain
+	py.test qisrc/test qisys/test qibuild/test

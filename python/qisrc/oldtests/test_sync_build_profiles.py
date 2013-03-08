@@ -10,7 +10,7 @@ import qibuild.profile
 import qisrc.sync_build_profiles
 
 def test_remote_added(tmpdir):
-    worktree = qisys.worktree.create(tmpdir.strpath)
+    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write("""
 <manifest>
@@ -25,7 +25,7 @@ def test_remote_added(tmpdir):
     assert "foo" in profiles
 
 def test_remote_updated(tmpdir):
-    worktree = qisys.worktree.create(tmpdir.strpath)
+    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write("""
 <manifest>
@@ -65,7 +65,7 @@ def test_remote_updated(tmpdir):
     assert "foo" in profiles
 
 def test_same_remote(tmpdir):
-    worktree = qisys.worktree.create(tmpdir.strpath)
+    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write("""
 <manifest>

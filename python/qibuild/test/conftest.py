@@ -10,7 +10,7 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
 
     """
     def __init__(self, root):
-        worktree = qisys.worktree.create(root)
+        worktree = qisys.worktree.WorkTree(root)
         super(TestBuildWorkTree, self).__init__(worktree)
 
     @property

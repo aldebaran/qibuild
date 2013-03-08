@@ -4,13 +4,10 @@ import qisys.worktree
 import qisrc.worktree
 
 
-import mock
-
-
 def test_read_git_configs(tmpdir, test_git):
     tmpdir.mkdir("foo")
     tmpdir.mkdir("bar")
-    wt = qisys.worktree.create(tmpdir.strpath)
+    wt = qisys.worktree.WorkTree(tmpdir.strpath)
     foo_proj = wt.add_project("foo")
     bar_proj = wt.add_project("bar")
 
@@ -74,7 +71,7 @@ def test_git_configs_are_persistent(git_worktree):
         assert master.tracks == "upstream"
 
     check_config(foo)
-    wt2 = qisrc.worktree.open_git_worktree(git_worktree.tmpdir.strpath)
+    wt2 = qisrc.worktree.GitWorkTree(git_worktree.worktree)
     foo2 = wt2.get_git_project("foo")
     check_config(foo2)
 

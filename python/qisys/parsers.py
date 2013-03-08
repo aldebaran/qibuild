@@ -5,6 +5,7 @@
 """Collection of parser fonctions for various actions."""
 
 import abc
+import argparse
 import os
 
 import qisys.sh
@@ -92,11 +93,11 @@ class AbstractProjectParser:
         pass
 
     @abc.abstractmethod
-    def _parse_no_args(self):
+    def parse_no_args(self):
         pass
 
     @abc.abstractmethod
-    def _parse_one_project(self, args, project_arg):
+    def parse_one_project(self, args, project_arg):
         pass
 
     @abc.abstractmethod
@@ -110,9 +111,11 @@ class AbstractProjectParser:
         """
         if isinstance(args, dict):
             args = argparse.Namespace(**args)
+        # pylint: disable-msg=E1103
         if args.all:
             return self.all_projects()
         project_args = args.projects
+        # pylint: disable-msg=E1103
         if not args.projects:
             return self.parse_no_args()
         res = list()

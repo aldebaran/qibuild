@@ -13,7 +13,7 @@ from qisrc.test.test_git import push_file
 def create_worktree(tmpdir):
     work = os.path.join(tmpdir, "work")
     qisys.sh.mkdir(work)
-    return qisys.worktree.create(work)
+    return qisys.worktree.WorkTree(work)
 
 
 # pylint: disable-msg=E1101

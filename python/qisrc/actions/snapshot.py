@@ -33,12 +33,12 @@ def configure_parser(parser):
 def do(args):
     """Main entry point."""
     git_worktree = qisrc.parsers.get_git_worktree(args)
-    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, worktree.root)
+    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, git_worktree.root)
 
     if args.load:
-        qisrc.snapshot.load_snapshot(worktree, args.path, args.force,
+        qisrc.snapshot.load_snapshot(git_worktree, args.path, args.force,
                                      fetch=args.fetch)
         return
 
-    qisrc.snapshot.generate_snapshot(worktree, args.path,
+    qisrc.snapshot.generate_snapshot(git_worktree, args.path,
         manifest=args.manifest, tag=args.tag, fetch=args.fetch)
