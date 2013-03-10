@@ -67,7 +67,7 @@ def parse_profiles(xml_path):
         for flag_elem in flag_elems:
             key = qisys.qixml.parse_required_attr(flag_elem, "name")
             value = flag_elem.text.strip()
-            to_add = "%s=%s" % (key, value)
+            to_add = ((key, value))
             profile.cmake_flags.append(to_add)
     return res
 
