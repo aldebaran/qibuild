@@ -1,4 +1,4 @@
-## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+## Copyright (c) 2012, 2013 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
@@ -60,6 +60,27 @@ def get_domain_from_qiproject(project):
     if not domain:
         domain = xml_elem.find("project").get("name")
     return domain
+
+def get_name_from_qiproject(project):
+    """Get the application name for gettext.
+    If no project or translate tag is found return str().
+    If no domain is found in translate tag, <project_name> is return."""
+    xml_elem = qisys.qixml.read(project.qiproject_xml)
+    root = xml_elem.getroot()
+    if root.tag != "project":
+        ui.error("No tag project in qiproject.xml for project", project.src)
+        return str()
+
+    translate = root.find("translate")
+    if translate is None:
+        ui.warning("No tag translate in qiproject.xml for project", project.src)
+        return str()
+
+    # get domain
+    name = translate.get("name")
+    if not name:
+        name = xml_elem.find("project").get("name")
+    return name
 
 def get_locale_from_qiproject(project):
     """Get a list of supported locale.

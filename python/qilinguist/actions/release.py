@@ -22,9 +22,10 @@ def process_with_gettext(project):
     # get locale
     locale = qilinguist.config.get_locale_from_qiproject(project)
     domain = qilinguist.config.get_domain_from_qiproject(project)
+    app_name = qilinguist.config.get_name_from_qiproject(project)
 
     # get output directory
-    base_output_dir = os.path.join(project.path, "po", "share", "locale", domain)
+    base_output_dir = os.path.join(project.path, "po", "share", "locale", app_name)
     # get input directory
     input_dir = os.path.join(project.path, "po")
     for l in locale:
@@ -33,7 +34,7 @@ def process_with_gettext(project):
         # get output file
         output_dir = os.path.join(base_output_dir, l, "LC_MESSAGES")
         output_file = domain + ".mo"
-        qilinguist.qigettext.generate_mo_file(input_file, output_file, domain, input_dir, output_dir)
+        qilinguist.qigettext.generate_mo_file(input_file, output_file, app_name, input_dir, output_dir)
 
 def process_with_qt(project):
     # get locale

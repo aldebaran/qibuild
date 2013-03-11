@@ -1,4 +1,4 @@
-## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+## Copyright (c) 2012, 2013 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
@@ -70,7 +70,7 @@ def generate_po_file(project, domain, locale):
     # get input file
     input_file = os.path.join(project.path, "po", domain + ".pot")
     if not os.path.exists(input_file):
-        ui.error("You must call qitranslate init first")
+        ui.error("No pot file found. Maybe no translatable strings were found?")
         return
 
     # get output file

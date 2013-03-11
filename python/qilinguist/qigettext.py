@@ -21,8 +21,13 @@ def generate_pot_file(text_domain, input_files, output_file,
 
     """
     cmd = ["xgettext", "--default-domain=" + text_domain]
-    cmd.append("--keyword=_")
-
+    cmd.extend(["--keyword=_", "--keyword=translate:1,1t",
+               "--keyword=translate:1c,2,2t", "--keyword=translate:1,2,3t",
+               "--keyword=translate:1c,2,3,4t", "--keyword=gettext:1",
+               "--keyword=pgettext:1c,2", "--keyword=ngettext:1,2",
+               "--keyword=npgettext:1c,2,3", "--keyword=tr:1,1t",
+               "--keyword=tr:1c,2,2t", "--keyword=tr:1,2,3t",
+               "--keyword=tr:1c,2,3,4t"])
     # generate sorted output
     cmd.append("--sort-output")
 
@@ -50,7 +55,6 @@ def generate_po_file(input_file, output_file, locale, output_dir=None):
     :param output_file: Write output to specified PO file
     :param locale:      Set target locales
     :param output_dir:  Output file will be placed here
-
     """
     # init
     cmd = ["msginit", "--no-translator"]
