@@ -50,3 +50,41 @@ def msbuild(sln_file, build_type="Debug", target=None, num_jobs=None):
     cmd += [sln_file]
 
     qisys.command.call(cmd)
+
+def num_jobs_to_args(num_jobs, cmake_generator):
+    """ Convert a number of jobs to a list of cmake args
+
+    >>> num_jobs_to_args(3, "Unix Makefiles")
+    ["-j", "3"]
+
+    >>> num_jobs_to_args(3, "NMake Makefiles"
+    Error: -j is not supported for NMake, use Jom
+
+    >>> num_jobs_to_args(3, "Visual Studio")
+    Warning: -j is ignored for Visual Studio
+
+    """
+
+    if num_jobs == 1:
+        return list()
+    if "Unix Makefiles" in cmake_generator or \
+       "Ninja" in cmake_generator:
+        return ["-j", str(num_jobs)]
+    if cmake_generator == "NMake Makefiles":
+        mess   = "-j is not supported for %s\n" % cmake_generator
+        mess += "On windows, you can use Jom instead to compile "
+        mess += "with multiple processors"
+        raise Exception(mess)
+    if "Visual Studio" in cmake_generator or \
+        cmake_generator == "Xcode" or \
+        "JOM" in cmake_generator:
+        ui.warning("-j is ignored when used with", cmake_generator)
+        return list()
+    ui.warning("cannot parse -j into a cmake option for generator: %s" % cmake_generator)
+    return list()
+
+class BuildFailed(Exception):
+    def __init__(self, project):
+        self.project = project
+    def __str__(self):
+        return "Error occured when building project %s" % self.project.name
