@@ -26,8 +26,7 @@ class Profile:
             cmake_elem = qisys.qixml.etree.Element("cmake")
             flags_elem = qisys.qixml.etree.Element("flags")
             cmake_elem.append(flags_elem)
-            for flag in self.cmake_flags:
-                (key, value) = flag.split("=")
+            for (key, value) in self.cmake_flags:
                 flag_elem = qisys.qixml.etree.Element("flag")
                 flag_elem.set("name", key)
                 flag_elem.text = value
@@ -71,15 +70,71 @@ def parse_profiles(xml_path):
             profile.cmake_flags.append(to_add)
     return res
 
-def add_profile(xml_path, profile):
-    """ Add a new profile to an XML file
-
-    """
+def configure_build_profile(xml_path, name, flags):
+    """ Add a new profile to an XML file """
+    profile = Profile(name)
+    profile.cmake_flags = flags
     tree = qisys.qixml.read(xml_path)
     root = tree.getroot()
     profiles = root.find("profiles")
     if profiles is None:
         profiles = qisys.qixml.etree.Element("profiles")
         root.append(profiles)
+    for profile in profiles.findall("profile"):
+        if profile.get("name") == name:
+            profiles.remove(profile)
     profiles.append(profile.elem())
     qisys.qixml.write(tree, xml_path)
+
+def remove_build_profile(xml_path, name):
+    """ Remove a build profile from XML file """
+    tree = qisys.qixml.read(xml_path)
+    root = tree.getroot()
+    profiles = root.find("profiles")
+    if profiles is None:
+        raise NoProfile(xml_path)
+    match_elem = None
+    for profile in profiles:
+        if profile.get("name") == name:
+            match_elem = profile
+    if match_elem is None:
+        raise NoSuchProfile(xml_path, name)
+    profiles.remove(match_elem)
+    qisys.qixml.write(tree, xml_path)
+
+def get_cmake_flags(xml_path, profile_names):
+    cmake_flags = list()
+    profiles = parse_profiles(xml_path)
+    for profile_name in profile_names:
+        match = profiles.get(profile_name)
+        if not match:
+            raise NoSuchProfile(xml_path, profile_name)
+        else:
+            cmake_flags.extend(match.cmake_flags)
+    return cmake_flags
+
+
+class NoSuchProfile(Exception):
+    """ The profile specified by the user cannot be found """
+    def __init__(self, xml_file, profile_name):
+        self.profile_name = profile_name
+        self.xml_file = xml_file
+
+    def __str__(self):
+        profiles = parse_profiles(self.xml_file)
+        return """ Could not find profile {name}.
+Known profiles are: {profiles}
+Please check your worktree configuration in:
+{xml_file} \
+""".format(name=self.profile_name, xml_file=self.xml_file,
+           profiles=', '.join(sorted(profiles.keys())))
+
+class NoProfile(Exception):
+    """ The worktree does not contain any build profiles """
+    def __init__(self, xml_file, profile_name):
+        self.profile_name = profile_name
+        self.xml_file = xml_file
+
+    def __str__(self):
+        return "No profiles regisetered in %s" % self.xml_file
+

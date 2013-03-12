@@ -75,8 +75,17 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
                 continue
             build_project = BuildProject(self, wt_project)
             build_projects.append(build_project)
-            build_project.cmake_args = self.build_config.cmake_args[:]
         return build_projects
+
+    def configure_build_profile(self, name, flags):
+        """ Configure a build profile for the worktree """
+        qibuild.profile.configure_build_profile(self.qibuild_xml,
+                                                name, flags)
+
+
+    def remove_build_profile(self, name):
+        """ Remove a build profile for this worktree """
+        qibuild.profile.configure_build_profile(self.qibuild_xml, name)
 
 
 
@@ -119,6 +128,20 @@ class BuildProject(object):
             if build_type and build_type != "Debug":
                 parts.append(build_type.lower())
 
+        # FIXME: handle custom build dir
+        return os.path.join(self.path, "-".join(parts))
+
+    @property
+    def cmake_args(self):
+        return self.build_config.cmake_args(self.build_worktree)
+
+    def configure(self, **kwargs):
+        """ Delegate to qibuild.cmake """
+        # FIXME: done by write_dependencies
+        qisys.sh.mkdir(self.build_directory, recursive=True)
+        cmake_args = self.cmake_args
+        qibuild.cmake.cmake(self.path, self.build_directory,
+                            cmake_args, **kwargs)
 
 
     def parse_qiproject_xml(self):

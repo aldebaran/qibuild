@@ -40,5 +40,3 @@ def do(args):
                                         args.groups)
     ui.info(ui.green, "New qisrc worktree initialized in",
             ui.reset, ui.bold, root)
-
-

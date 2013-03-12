@@ -12,7 +12,6 @@ import qibuild.cmake
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("configure options")
@@ -42,7 +41,7 @@ def configure_parser(parser):
     group.add_argument("--trace-cmake", dest="trace_cmake",
                       action="store_true",
                       help="run cmake in trace mode")
-    parser.add_argument("--coverage", dest="coverage",
+    group.add_argument("--coverage", dest="coverage",
         action="store_true",
         help="activate coverage support (gcc only)")
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
@@ -69,36 +68,31 @@ def do(args):
         args.cmake_flags.append("QI_EFFECTIVE_CPP=ON")
     if args.werror:
         args.cmake_flags.append("QI_WERROR=ON")
+    if args.coverage:
+        args.cmake_flags.append("QI_COVERAGE=ON")
 
-    toc = qibuild.toc.toc_open(args.worktree, args)
-    (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
-    if args.build_directory:
-        projects[0].build_directory = args.build_directory
+    build_worktree = qibuild.parsers.get_build_worktree(args)
+    build_projects = qibuild.parsers.get_build_projects(build_worktree, args)
+    build_config = build_worktree.build_config
 
-    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
-    if toc.active_config:
-        ui.info(ui.green, "Active configuration:", ui.blue, toc.active_config)
-    for profile in toc.profiles:
+    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, build_worktree.root)
+    if build_config.toolchain_name:
+        ui.info(ui.green, "Using toolchain:", ui.blue, build_config.toolchain_name)
+    for profile in build_config.profiles:
         ui.info(ui.green, "Using profile:", ui.blue, profile)
-    if toc.local_cmake:
-        ui.info(ui.green, "Using custom CMake file:", ui.reset,
-                ui.bold, toc.local_cmake)
     if args.debug_trycompile:
         ui.info(ui.green, "Using cmake --debug-trycompile")
     if args.trace_cmake:
         ui.info(ui.green, "Tracing CMake execution")
 
 
-    project_count = len(projects)
-    for i, project in enumerate(projects, start=1):
-        ui.info(ui.green, "*", ui.reset, "(%i/%i)" %  (i, project_count),
-                ui.green, "Configuring",
-                ui.blue, project.name)
-        toc.configure_project(project,
-            clean_first=args.clean_first,
-            debug_trycompile=args.debug_trycompile,
-            trace_cmake=args.trace_cmake,
-            coverage=args.coverage,
-            profiling=args.profiling)
+    for i, build_project in enumerate(build_projects):
+        ui.info_count(i, len(build_projects),
+                      ui.blue, build_project.name)
+        import ipdb; ipdb.set_trace()
+        build_project.configure(clean_first=args.clean_first,
+                                debug_trycompile=args.debug_trycompile,
+                                trace_cmake=args.trace_cmake,
+                                profiling=args.profiling)
         if args.summarize_options:
-            project.summarize_options()
+            build_project.summarize_options()

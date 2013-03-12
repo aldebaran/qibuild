@@ -9,17 +9,6 @@ import qisys.parsers
 import qibuild.worktree
 
 
-def toc_parser(parser):
-    """Parser settings for every action using a toc dir."""
-    qisys.parsers.worktree_parser(parser)
-    parser.add_argument("-c", "--config",
-        help="The configuration to use. "
-             "It should be the name of a toolchain or \"system\". "
-             "The settings from <worktree>/.qi/<config>.cmake will "
-             "also be used")
-    parser.add_argument("-p", "--profile", dest="profiles", action="append",
-        help="A profile to use. "
-             "It should match a declaration in .qi/worktree.xml")
 
 def build_type_parser(parser, group=None):
     """Parser settings for build type."""
@@ -36,15 +25,28 @@ def build_type_parser(parser, group=None):
         help="CMAKE_BUILD_TYPE usually Debug or Release")
     parser.set_defaults(build_type="Debug")
 
-def build_parser(parser):
+def job_parser(parser, group=None):
     """Parser settings for every action doing builds."""
-    group = parser.add_argument_group("build configuration options")
-    build_type_parser(parser, group=group)
-    group.add_argument("-G", "--cmake-generator", action="store",
-        help="Specify the CMake generator")
     group.add_argument("-j", dest="num_jobs", type=int,
         help="Number of jobs to use")
     parser.set_defaults(num_jobs=1)
+
+def build_parser(parser):
+    """Parser settings for every action using a toc dir."""
+    group = parser.add_argument_group("build configuration options")
+    qisys.parsers.worktree_parser(parser)
+    job_parser(parser, group=group)
+    build_type_parser(parser, group=group)
+    group.add_argument("-G", "--cmake-generator", action="store",
+        help="Specify the CMake generator")
+    parser.add_argument("-c", "--config",
+        help="The configuration to use. "
+             "It should match the name of a toolchain. "
+             "The settings from <worktree>/.qi/<config>.cmake will "
+             "also be used")
+    parser.add_argument("-p", "--profile", dest="profiles", action="append",
+        help="A profile to use. "
+             "It should match a declaration in .qi/qibuild.xml")
 
 def project_parser(parser, positional=True):
     """Parser settings for every action using several toc projects."""
@@ -59,20 +61,45 @@ def project_parser(parser, positional=True):
              "Mostly used by qibuild install --runtime")
     parser.set_defaults(build_deps=False)
 
+# FIXME
+def toc_parser(parser):
+    pass
+
 def get_build_worktree(args):
-    """ Get a build worktree to use """
+    """ Get a build worktree to use from a argparse.Namespace
+    object
+
+    """
     worktree = qisys.parsers.get_worktree(args)
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
+    build_config = get_build_config(args)
+    build_worktree.build_config = build_config
     return build_worktree
 
 def get_build_projects(build_worktree, args):
-    """ Get a list of build projects to use """
+    """ Get a list of build projects to use from an argparse.Namespace
+    object
+
+    """
     parser = BuildProjectParser(build_worktree)
     return parser.parse_args(args)
 
 
+
 ##
 # Implementation details
+
+def get_build_config(args):
+    """ Get a CMakeBuildConfig object from an argparse.Namespace object
+
+    """
+    build_config = qibuild.build_config.CMakeBuildConfig()
+    build_config.build_type = args.build_type
+    if args.profiles:
+        build_config.profiles = args.profiles
+    build_config.toolchain_name = args.config
+    return build_config
+
 
 class BuildProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a BuildWorkTree """
