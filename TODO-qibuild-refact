@@ -21,3 +21,7 @@
 * XMLParser._write_foo()  -> _dump_foo()
 
 * add qisys.actions.list()
+
+* get rid of qibuild.toc.toc_parser()
+
+* read env, toolchain name et all from qibuild config files
