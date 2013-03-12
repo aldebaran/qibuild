@@ -14,6 +14,7 @@ import qisrc.worktree
 
 def configure_parser(parser):
     """Configure parser for this action """
+    qisys.parsers.default_parser(parser)
     qisrc.parsers.groups_parser(parser)
     parser.add_argument("manifest_url", nargs="?")
     parser.add_argument("manifest_name", nargs="?",

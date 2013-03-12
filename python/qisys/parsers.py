@@ -93,7 +93,7 @@ class AbstractProjectParser:
         pass
 
     @abc.abstractmethod
-    def parse_no_args(self):
+    def parse_no_project(self, args):
         pass
 
     @abc.abstractmethod
@@ -117,7 +117,7 @@ class AbstractProjectParser:
         project_args = args.projects
         # pylint: disable-msg=E1103
         if not args.projects:
-            return self.parse_no_args()
+            return self.parse_no_project(args)
         res = list()
         for project_arg in project_args:
             # parsing one arg can result in several projets
@@ -131,10 +131,10 @@ class WorkTreeProjectParser(AbstractProjectParser):
     def __init__(self, worktree):
         self.worktree = worktree
 
-    def all_projects(self):
+    def all_projects(self, args):
         return self.worktree.projects
 
-    def parse_no_args(self):
+    def parse_no_project(self, args):
         """ Try to find the closest worktree project that
         mathes the current directory
 

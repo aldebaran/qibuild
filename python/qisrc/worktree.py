@@ -32,9 +32,9 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.load_git_projects()
         self._syncer = qisrc.sync.WorkTreeSyncer(self, sync_first=sync_first)
 
-    def configure_manifest(self, name, manifest_url, groups=None):
+    def configure_manifest(self, name, manifest_url, groups=None, branch="master"):
         """ Add a new manifest to this worktree """
-        self._syncer.configure_manifest(name, manifest_url, groups=groups)
+        self._syncer.configure_manifest(name, manifest_url, groups=groups, branch=branch)
 
     def remove_manifest(self, name):
         """ Remove the given manifest from this worktree """
@@ -72,6 +72,9 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         for git_project in self.git_projects:
             if git_project.src == src:
                 return git_project
+        if auto_add:
+            self.worktree.add_project(path)
+            return self.get_git_project(path)
 
     def find_url(self, remote_url):
         """ Look for a project configured with the given url """

@@ -8,8 +8,7 @@
 
 from qisys import ui
 
-import qibuild
-import qibuild.cmdparse
+import qibuild.parsers
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -31,31 +30,11 @@ def configure_parser(parser):
 @ui.timer("qibuild make")
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc.toc_open(args.worktree, args)
-
-    # Force single to False to check all dependencies.
-    is_single = args.single
-    args.single = False
-    (_, all_projects) = qibuild.cmdparse.deps_from_args(toc, args)
-    for project in all_projects:
-        qibuild.toc.check_configure(toc, project)
-
-    # Reset single at the initial value.
-    args.single = is_single
-    (_, projects) = qibuild.cmdparse.deps_from_args(toc, args)
-    use_incredibuild = toc.config.build.incredibuild
-
-    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
-    if toc.active_config:
-        ui.info(ui.green, "Active configuration: ",
-                ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))
-
-    project_count = len(projects)
-    for i, project in enumerate(projects, start=1):
-        ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, project_count),
-                ui.green, "Building", ui.blue, project.name)
-        toc.build_project(project, num_jobs=args.num_jobs,
-                          incredibuild=use_incredibuild, rebuild=args.rebuild,
-                          fix_shared_libs=args.fix_shared_libs,
-                          verbose_make=args.verbose_make,
-                          coverity=args.coverity)
+    build_worktree = qibuild.parsers.get_build_worktree(args)
+    build_projects = qibuild.parsers.get_build_projects(build_worktree, args)
+    for i, build_project in enumerate(build_projects):
+        ui.info_count(i, len(build_projects),
+                      ui.blue, build_project.name)
+        build_project.build(num_jobs=args.num_jobs, rebuild=args.rebuild,
+                           fix_shared_libs=args.fix_shared_libs,
+                           verbose_make=args.verbose_make, coverity=args.coverity)

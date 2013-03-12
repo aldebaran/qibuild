@@ -56,3 +56,7 @@ def test_parse_one_arg(worktree, args):
     projects = qisys.parsers.get_projects(worktree, args)
     assert len(projects) == 1
     assert projects[0].src == "foo"
+
+def test_auto_add(worktree, args):
+    worktree.tmpdir.mkdir("foo")
+

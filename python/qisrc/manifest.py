@@ -63,6 +63,8 @@ class Manifest(object):
         for repo in self.repos:
             if not repo.remote:
                 repo.remote = "origin"
+            if not repo.default_branch:
+                repo.default_branch = "master"
             matching_remote = self.get_remote(repo.remote)
             if matching_remote:
                 repo.remote_url = git_url_join(matching_remote.url, repo.project)

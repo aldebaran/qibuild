@@ -5,6 +5,8 @@
 """ Collection of parser fonctions for various actions
 """
 
+import os
+
 import qisys.parsers
 import qibuild.worktree
 
@@ -107,18 +109,22 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
     def __init__(self, build_worktree):
         self.build_worktree = build_worktree
 
-    def all_projects(self):
-        return self.build_worktree.projects
+    def all_projects(self, args):
+        # solve deps
+        pass
 
-    def parse_no_args(self):
+    def parse_no_project(self, args):
         """ Try to find the closest worktree project that
         mathes the current directory
 
         """
-        # look for a couple CMakeLists.txt, qiproject.xml in the
-        # parent dirs:
-
-        # auto-add
+        name, path = project_name_and_path_from_cwd()
+        build_proj = self.build_worktree.get_build_project(name, raises=False)
+        if not build_proj:
+            # auto add the build project to the worktree:
+            self.build_worktree.worktree.add_project(path)
+            build_proj = self.build_worktree.get_build_project(name)
+        return self.parse_one_project(args, build_proj.name)
 
     def parse_one_project(self, args, project_arg):
         """ Accept both an absolute path matching a worktree project,
@@ -131,3 +137,28 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
         deps = self.build_worktree.get_deps(project, runtime=args.runtime,
                                             build_deps_only=args.build_deps_only)
         return deps
+
+
+def project_name_and_path_from_cwd():
+    """ Find the parent qibuild project of a given path """
+    head = os.getcwd()
+    tail = None
+    while True:
+        candidate = os.path.join(head, "qiproject.xml")
+        if not os.path.exists(candidate):
+            continue
+        tree = qisys.qixml.read(candidate)
+        # FIXME: support new syntax ?
+        # FIXME: use BuildProjectParser ?
+        name = tree.getroot().get("name")
+        if name:
+            return (name, head)
+        (head, tail) = os.path.split(head)
+        if not tail:
+            break
+    mess = """
+Could not guess qibuild project name from current working directory
+Please go inside a project, or specify the project name
+on the command line
+"""
+    raise Exception(mess)

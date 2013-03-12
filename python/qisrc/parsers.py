@@ -32,7 +32,7 @@ def get_git_worktree(args, sync_first=True):
 
 def get_git_projects(git_worktree, args):
     """ Get a list of git projects to use """
-    if args.build_deps:
+    if hasattr(args, "build_deps") and args.build_deps:
         build_worktree = qibuild.worktree.BuildWorkTree(git_worktree.worktree)
         parser = GitBuildProjectParser(git_worktree, build_worktree)
     else:
@@ -50,10 +50,10 @@ class GitProjectParser(qisys.parsers.AbstractProjectParser):
         self.wt_parser = qisys.parsers.WorkTreeProjectParser(git_worktree.worktree)
 
 
-    def all_projects(self):
+    def all_projects(self, args):
         return self.git_worktree.git_projects
 
-    def parse_no_args(self):
+    def parse_no_project(self, args):
         repo_root = qisrc.git.get_repo_root(os.getcwd())
         if not repo_root:
             raise qisrc.worktree.NotInAGitRepo()
@@ -82,7 +82,7 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
         self.git_parser = GitProjectParser(git_worktree)
         self.git_projects = self.git_worktree.git_projects
 
-    def all_projects(self):
+    def all_projects(self, args):
         return self.git_worktree.git_projects
 
     def parse_one_project(self, args, project_arg):
@@ -100,6 +100,6 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
             git_projects.append(git_project)
         return git_projects
 
-    def parse_no_args(self):
+    def parse_no_project(self, args):
         # solve deps
         pass

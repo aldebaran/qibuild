@@ -34,8 +34,11 @@ def configure_parser(parser):
     group.add_argument("--list", action="store_true",
                         help="list the manifests")
     group.add_argument("name", metavar="NAME", nargs="?")
+    group.add_argument("-b", "--branch",
+                       help="the branch to use when fetching the manifest from a "
+                            "git url")
     group.add_argument("url_or_path", metavar="URL", nargs="?")
-
+    parser.set_defaults(branch="master")
 
 
 def do(args):
@@ -68,7 +71,7 @@ def list_manifests(git_worktree):
 def remove_manifest(git_worktree, args):
     if not args.name:
         raise Exception("Please specify a name when using --remove")
-    name = args.name_or_path
+    name = args.name
     check_exists(git_worktree, name)
     git_worktree.remove_manifest(name)
 
@@ -76,8 +79,9 @@ def add_manifest(git_worktree, args):
     if not args.name or not args.url_or_path:
         raise Exception("Please specify a name and a url when using --add")
     name = args.name
-    url = args.url
-    git_worktree.configure_manifest(name, url, groups=args.groups)
+    url = args.url_or_path
+    git_worktree.configure_manifest(name, url, groups=args.groups,
+                                    branch=args.branch)
 
 def configure_manifest(git_worktree, args):
     name = args.name
@@ -86,7 +90,8 @@ def configure_manifest(git_worktree, args):
         url = args.url_or_path
     else:
         url = git_worktree.manifests[name].url
-    git_worktree.configure_manifest(name, url, groups=args.groups)
+    git_worktree.configure_manifest(name, url, groups=args.groups,
+                                    branch=args.branch)
 
 def check_manifest(git_worktree, args):
     if not args.name:

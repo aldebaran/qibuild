@@ -89,7 +89,6 @@ def do(args):
     for i, build_project in enumerate(build_projects):
         ui.info_count(i, len(build_projects),
                       ui.blue, build_project.name)
-        import ipdb; ipdb.set_trace()
         build_project.configure(clean_first=args.clean_first,
                                 debug_trycompile=args.debug_trycompile,
                                 trace_cmake=args.trace_cmake,
