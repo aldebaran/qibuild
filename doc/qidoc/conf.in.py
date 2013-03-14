@@ -11,6 +11,8 @@ html_additional_pages = {
         'index': 'index.html'
 }
 
+autodoc_member_order='bysource'
+
 man_pages = [
     ('ref/man/qisrc', 'qisrc', u'Handle several project sources',
      [u'Aldebaran Robotics'], 1),

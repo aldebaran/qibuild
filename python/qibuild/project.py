@@ -21,10 +21,16 @@ class BuildProject(object):
 
     @property
     def qiproject_xml(self):
+        """ Path to qiproject.xml """
         return os.path.join(self.path, "qiproject.xml")
 
     @property
     def build_directory(self):
+        """ Return a suitable build directory, depending on the
+        build setting of the worktree: the name of the toolchain,
+        the build profiles, and the build type (debug/release)
+
+        """
         parts = ["build"]
         toolchain = self.build_config.toolchain
         build_type = self.build_config.build_type
@@ -51,7 +57,13 @@ class BuildProject(object):
 
     @property
     def cmake_args(self):
+        """ The list of CMake arguments to use when configuring the
+        project.
+        Delegates to build_config.cmake_args
+
+        """
         return self.build_config.cmake_args(self.build_worktree)
+
 
     def configure(self, **kwargs):
         """ Delegate to qibuild.cmake """
@@ -60,6 +72,7 @@ class BuildProject(object):
         cmake_args = self.cmake_args
         qibuild.cmake.cmake(self.path, self.build_directory,
                             cmake_args, **kwargs)
+
 
     def build(self, num_jobs=1, rebuild=False, target=None, fix_shared_libs=True,
               verbose_make=False, coverity=False):

@@ -25,3 +25,5 @@
 * get rid of qibuild.toc.toc_parser()
 
 * read env, toolchain name et all from qibuild config files
+
+* qisrc.worktree.Remote -> qisrc.manifest.Remote

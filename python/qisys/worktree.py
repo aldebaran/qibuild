@@ -18,18 +18,6 @@ import qisys.sh
 import qisys.qixml
 
 
-class WorkTreeError(Exception):
-    """ Just a custom exception. """
-
-class NotInWorkTree(Exception):
-    """ Just a custom exception. """
-    def __str__(self):
-        return """ Could not guess worktree from current working directory
-  Here is what you can do :
-     - try from a valid work tree
-     - specify an existing work tree with --work-tree PATH
-     - create a new work tree with `qibuild init`
-"""
 
 class WorkTree(object):
     """ This class represent a :term:`worktree`. """
@@ -336,3 +324,16 @@ class WorkTreeCache:
             srcs.append(qisys.qixml.parse_required_attr(project_elem, "src"))
         srcs.sort()
         return srcs
+
+class WorkTreeError(Exception):
+    """ Just a custom exception. """
+
+class NotInWorkTree(Exception):
+    """ Just a custom exception. """
+    def __str__(self):
+        return """ Could not guess worktree from current working directory
+  Here is what you can do :
+     - try from a valid work tree
+     - specify an existing work tree with --work-tree PATH
+     - create a new work tree with `qibuild init`
+"""

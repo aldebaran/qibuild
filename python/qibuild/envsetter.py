@@ -1,2 +1,0 @@
-from qisys.envsetter import *
-

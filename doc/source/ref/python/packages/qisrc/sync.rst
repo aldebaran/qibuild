@@ -3,13 +3,31 @@ qisrc.sync -- Synchronize a worktree with a manifest
 
 .. automodule:: qisrc.sync
 
-qisrc.sync.fetch_manifest
+qisrc.sync.WorkTreeSyncer
 -------------------------
 
-.. autofunction:: fetch_manifest
+.. autoclass:: WorkTreeSyncer
+    :members:
 
-
-qisrc.sync.clone_project
+qisrc.sync.LocalManifest
 ------------------------
 
-.. autofunction:: clone_project
+
+.. py:class:: LocalManifest
+
+    .. py:attribute:: name
+
+        name of the manifest
+
+    .. py:attribute:: url
+
+        url of the manifest
+
+    .. py:attribute:: branch
+
+        branch of the manifest
+
+    .. py:attribute:: groups
+
+        a list of group names to use by default
+        (default is: all projects)

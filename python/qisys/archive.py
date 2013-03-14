@@ -5,21 +5,25 @@
 """This module contains functions to manipulate archives.
 
 This module can manipulate:
-- *.zip archives on all platforms
-- *.tar.gz and *.tar.bz2 archives on UNIX
-- *.tar.xz archive is only supported on Linux
+
+* ``*.zip`` archives on all platforms
+* ``*.tar.gz`` and ``*.tar.bz2`` archives on UNIX
+* ``*.tar.xz`` archive is only supported on Linux
 
 The default archive format is zip, to ensure platform interoperability,
 and also because this is the qiBuild package format.
 
 All archives should have a unique top directory.
 
-To enforce platform interoperability, zip archive does:
-- dereference symlinks, so:
-  - if the source symlink point to a file, the refered file is archived in place
-  - if the source symlink point to a directory, the directory is dropped from
+To enforce platform interoperability :
+
+* symlinks are dereferenced:
+
+  * if the source symlink point to a file, the pointed file is archived in place
+  * if the source symlink point to a directory, the directory is dropped from
     the archive
-- read-only directories are stored with write acces
+
+* read-only directories are stored with write access
 
 """
 

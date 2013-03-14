@@ -191,8 +191,36 @@ class GitProject(object):
         self.remotes = list()
 
     @property
-    def path(self):
-        return os.path.join(self.git_worktree.root, self.src)
+    def review(self):
+        """ Wether the project is under code review """
+        for remote in self.remotes:
+            if remote.review:
+                return True
+        return False
+
+    @property
+    def default_branch(self):
+        """ The default branch for this repository """
+        for branch in self.branches:
+            if branch.default:
+                return branch
+
+    @property
+    def clone_url(self):
+        """ The url to use when cloning this repository for
+        the first time
+
+        """
+        default_branch = self.default_branch
+        if not default_branch:
+            return None
+        tracked = default_branch.tracks
+        if not tracked:
+            return None
+        for remote in self.remotes:
+            if remote.name == tracked:
+                return remote.url
+        return None
 
     # pylint: disable-msg=E0213
     def change_config(func):
@@ -208,8 +236,18 @@ class GitProject(object):
             return res
         return new_func
 
+    @property
+    def path(self):
+        """ The full, native path to the underlying git repository """
+        return os.path.join(self.git_worktree.root, self.src)
+
+
     @change_config
     def configure_remote(self, name, url=None):
+        """ Configure a remote. If a remote with the same name
+        exists, its url will be overwritten
+
+        """
         remote_found = False
         for remote in self.remotes:
             if remote.name == name:
@@ -226,6 +264,10 @@ class GitProject(object):
     @change_config
     def configure_branch(self, name, tracks="origin",
                          remote_branch=None, default=True):
+        """ Configure a branch. If a branch with the same name
+        already exitsts, update its tracking remote.
+
+        """
         if self.default_branch and self.default_branch.name != name:
             ui.warning("default branch changed",
                         self.default_branch.name, "->", name)
@@ -249,6 +291,11 @@ class GitProject(object):
 
     @change_config
     def sync(self, repo):
+        """ Apply the configuration read from the "repo" setting
+        of a remote manifest.
+        Called by WorkTreeSyncer
+
+        """
         self.configure_branch(repo.default_branch, tracks=repo.remote,
                               remote_branch=repo.default_branch, default=True)
         self.configure_remote(repo.remote, repo.remote_url)
@@ -274,31 +321,6 @@ class GitProject(object):
             git.set_tracking_branch(branch.name, branch.tracks,
                                     remote_branch=branch.remote_branch)
 
-    @property
-    def review(self):
-        for remote in self.remotes:
-            if remote.review:
-                return True
-        return False
-
-    @property
-    def default_branch(self):
-        for branch in self.branches:
-            if branch.default:
-                return branch
-
-    @property
-    def clone_url(self):
-        default_branch = self.default_branch
-        if not default_branch:
-            return None
-        tracked = default_branch.tracks
-        if not tracked:
-            return None
-        for remote in self.remotes:
-            if remote.name == tracked:
-                return remote.url
-        return None
 
     def __repr__(self):
         return "<GitProject in %s>" % self.src

@@ -8,8 +8,14 @@ qibuild.parsers -- Parsers for qibuild actions
 Functions defined in this module
 --------------------------------
 
-.. autofunction:: toc_parser
+.. autofunction:: build_type_parser
+
+.. autofunction:: job_parser
 
 .. autofunction:: build_parser
 
 .. autofunction:: project_parser
+
+.. autofunction:: get_build_worktree
+
+.. autofunction:: get_build_projects

@@ -34,7 +34,10 @@ def job_parser(parser, group=None):
     parser.set_defaults(num_jobs=1)
 
 def build_parser(parser):
-    """Parser settings for every action using a toc dir."""
+    """Parser settings for every action doing build.
+    Calls build_type_parser and job_parser
+
+    """
     group = parser.add_argument_group("build configuration options")
     qisys.parsers.worktree_parser(parser)
     job_parser(parser, group=group)
@@ -51,7 +54,7 @@ def build_parser(parser):
              "It should match a declaration in .qi/qibuild.xml")
 
 def project_parser(parser, positional=True):
-    """Parser settings for every action using several toc projects."""
+    """Parser settings for every action using several build projects."""
     group = qisys.parsers.project_parser(parser, positional=positional, short=False)
     group.add_argument("--no-runtime", "--build-deps-only",
         action="store_true", dest="build_deps_only",

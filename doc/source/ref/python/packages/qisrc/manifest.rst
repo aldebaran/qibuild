@@ -7,77 +7,44 @@ qisrc.manifest -- Parsing manifest files
 
    * :ref:`qisrc-manifest-syntax`
 
-qisrc.manifest.load
--------------------
-
-.. autofunction:: load
-
 qisrc.manifest.Manifest
 -----------------------
 
 .. autoclass:: Manifest
+    :members:
 
-  .. py:attribute:: remotes
+qisrc.manifest.RepoConfig
+-------------------------
 
-     A list of :py:class:`Remote` objects
-
-  .. py:attribute:: projects
-
-     A list of :py:class:`Project` objects
-
-qisrc.manifest.Remote
----------------------
-
-.. autoclass:: Remote
-
-  .. py:attribute:: name
-
-      Name of the remote (default is 'origin')
-
-  .. py:attribute:: fetch
-
-     URL of the remote (for instance: git://example.com)
-
-  .. py:attribute:: revision
-
-     Branch to fetch by default (default is 'master')
-
-  .. py:attribute:: review
-
-     URL of the review server (for instance: http://gerrit:8080)
-
-qisrc.manifest.Project
-----------------------
-
-.. autoclass:: Project
-
-  .. py:attribute:: name
-
-     Name of the project. Will be joined with the remote
-     URL  (if remote is ``git@foo.com``, and name is ``bar/baz.git``,
-     final git URL will be ``git@foo.com:bar/baz.git``)
-
-  .. py:attribute:: path
-
-     Relative path in which to clone the project
-
-  .. py:attribute:: review
-
-     Whether the project is under code review
+.. autoclass:: RepoConfig
 
   .. py:attribute:: remote
 
-     The remote in which to read the URL ('origin' by default)
+      a ``Remote`` object
 
-  .. py:attribute:: revision
+  .. py:attribute:: src
 
-     The branch to clone and track  (the one from the matching remote by
-     default)
+      the relative path where this repository should
+      be cloned in the worktree
 
-  .. py:attribute:: fetch_url
+  .. py:attribute:: project
 
-     URL to be fetched
+      the name of the git project, the full url will
+      be computed by joining the remote url and the
+      project name
 
-  .. py:attribute:: review_url
+  .. py:attribute:: default_branch
 
-     URL to which we should upload the new changes
+      the default branch of this project. Should match
+      a branch in the remote
+
+  .. py:attribute:: remote_url
+
+      Computed during parsing
+
+  .. py:attribute:: review
+
+      wether the project is under code review.
+      Set during parsing
+
+

@@ -15,6 +15,7 @@ import qisrc.manifest
 
 def compute_repo_diff(old_repos, new_repos):
     """ Comupte the work that needs to be done
+
     :returns: a tuple (to_add, to_move, to_rm)
 
     """
@@ -255,7 +256,7 @@ class WorkTreeSyncer(object):
 
     def sync_from_manifest_file(self, name, xml_path):
         """ Just synchronize the manifest coming from one xml file.
-        Used by qisrc manifest --check
+        Used by ``qisrc manifest --check``
 
         """
         # don't use self.old_repos and self.new_repos here,
@@ -282,7 +283,10 @@ class WorkTreeSyncer(object):
 
 
 class LocalManifest(object):
-    """ Settings for a local manifests """
+    """ Settings for a local manifest
+
+
+    """
     def __init__(self):
         self.name = None
         self.url = None

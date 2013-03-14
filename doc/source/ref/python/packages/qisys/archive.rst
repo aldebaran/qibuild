@@ -1,5 +1,5 @@
 qisys.archive -- Manage .tar.gz and .zip files
-================================================
+==============================================
 
 .. automodule:: qisys.archive
    :members:

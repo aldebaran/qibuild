@@ -1,44 +1,80 @@
-qisys.worktree -- Using a :term:`worktree`
-============================================
+qisrc.worktree -- Managing git projects
+=======================================
 
 
-.. py:module:: qisys.worktree
-
-qisys.worktree.WorkTree
--------------------------
+.. py:module:: qisrc.worktree
 
 
-.. autoclass:: WorkTree
+qisrc.worktree.GitWorkTree
+--------------------------
 
-  .. automethod:: WorkTree.__init__
+.. autoclass:: GitWorkTree
+    :members:
 
 
-  .. py:attribute:: root
+qisrc.worktree.GitProject
+--------------------------
 
-     The root of the work tree.
+This class represent a git configuration.
 
-  .. py::attribute:: projects
+Every git configuration is stored in the worktree, in a
+``.qi/git.xml`` file.
 
-     A list of projects found is this worktree, as
-     read from ``.qi/worktree.xml``
+``qisrc`` then make sure the actual git repository matches the configuration stored
+in the file.  (That the branches and remotes exist, and the tracking branches
+are correctly set)
 
-  .. py:attribute:: buildable_projects
+``qisrc sync`` also reads the configuration from the remote manifest, and makes sure
+everything matches
 
-     A list of projects found in this worktree that
-     are buildable (They should have a ``qiproject.xml`` and
-     a ``CMakeLists.txt`` at their top directory)
+.. autoclass:: GitProject
+    :members:
 
-  .. py:attribute:: git_projects
+qisrc.worktree.Remote
+---------------------
 
-     A list git repositories found in this worktree
+.. py:class:: Remote
 
-  .. automethod:: get_project
+    A remote, as stored in the ``.qi/git.xml`` file
 
-  .. automethod:: add_project
+    .. py:attribute:: name
 
-  .. automethod:: remove_project
+      The name of the remote
 
-  .. automethod:: set_git_project_config
+    .. py:attribute:: url
 
-  .. automethod:: set_project_review
+      The url  of the remote
+      Note that in case of a ``gerrit`` repository, this will be
+      the public, ``http://`` url, ``qisrc push`` making sure we
+      use the ``ssh url`` when uploading patch sets.
 
+    .. py:attribute:: review
+
+      Wether the remote supports code review.
+        return res
+
+qisrc.worktree.Branch
+----------------------
+
+.. py:class:: Branch
+
+  .. py:attribute:: name
+
+    The name of the branch
+
+  .. py:attribute:: tracks
+
+    The name of the remote tracked by this
+    branch
+
+  .. py:attribute:: remote_branch
+
+    The name of the remote branch tracked by
+    this branch. Default is a remote with the same
+    name
+
+  .. py:attribute:: default
+
+     Wether this is the default branch.
+     ``qisrc sync``, will try to synchronize
+     this branch by default
