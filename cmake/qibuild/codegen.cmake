@@ -12,28 +12,31 @@
 #
 #    set(_input ${CMAKE_CURRENT_SOURCE_DIR}/input.data)
 #    set(_output ${CMAKE_CURRENT_BINARY_DIR}/generated.c)
-#    qi_generate_src(${_output} SRC ${_input} COMMAND my_script ${_input} > ${_output})
+#    qi_generate_src(${_output} SRC ${_input} COMMAND my_script ${_input} -o ${_output})
 #    qi_create_bin(my_bin ${_output} main.c)
 #
 # Note that the base dir of the output will automatically be created, so
 # you do not have to worry about it in your script.
 #
-# \arg:out the resulting source file
+# \arg:out the generated files in a list
 # \group:SRC a group of sources to take as input
-# \group:COMMAND the command to run to generate the source file
+# \group:COMMAND the command to run to generate the files
 # \arg:COMMENT a comment to be displayed while generating the source file
-#
-function(qi_generate_src out)
+function(qi_generate_src)
   cmake_parse_arguments(ARG "" "COMMENT" "SRC;COMMAND" ${ARGN})
-  set_source_files_properties(${out} PROPERTIES GENERATED TRUE)
+  set(out ${ARG_UNPARSED_ARGUMENTS})
+  foreach(_out_file ${out})
+    set_source_files_properties(${_out_file}
+        PROPERTIES GENERATED TRUE)
+    get_filename_component(_out_dir ${_out_file} PATH)
+    file(MAKE_DIRECTORY ${_out_dir})
+  endforeach()
   set(_comment "Generating ${out} ....")
   if(ARG_COMMENT)
     set(_comment ${ARG_COMMENT})
   endif()
   list(GET ARG_COMMAND 0 _cmd)
   list(REMOVE_AT ARG_COMMAND 0)
-  get_filename_component(_out_dir ${out} PATH)
-  file(MAKE_DIRECTORY ${_out_dir})
   add_custom_command(OUTPUT ${out}
                      COMMENT "${_comment}"
                      COMMAND ${_cmd}
