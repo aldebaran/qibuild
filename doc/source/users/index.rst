@@ -9,12 +9,8 @@ Introduction
 This part of the doc is made for you if you are an only user of **qibuild**.
 It means that you work on a project manage by **qibuild**.
 
-If you don't know what **qibuild** is, see the overview:
+If you don't know what **qibuild** is, see the :ref:`qibuild-overview`
 
-.. toctree::
-  :maxdepth: 2
-
-  overview
 
 You will learn to get sources, sync them, push commits and build them with
 cross-toolchain or not.
@@ -31,10 +27,3 @@ Some tutorials, to test step-by-step the process of managing **qibuild** project
 
   tutos/index
 
-And a partial documentation of command line interface. For a more complete
-documentation of command-line interface see; .
-
-.. toctree::
-  :maxdepth: 2
-
-  mans/index

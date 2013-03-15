@@ -11,6 +11,7 @@ qisys modules
     command
     interact
     qixml
+    remote
     parsers
     sh
     ui

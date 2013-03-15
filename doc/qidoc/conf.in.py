@@ -13,12 +13,18 @@ html_additional_pages = {
 
 autodoc_member_order='bysource'
 
+exclude_patterns = ['man/*']
+
 man_pages = [
-    ('ref/man/qisrc', 'qisrc', u'Handle several project sources',
+    ('man/qisrc', 'qisrc', u'Handle several project sources',
      [u'Aldebaran Robotics'], 1),
-    ('ref/man/qibuild', 'qibuild', u'Configure, build, install, package your project',
+    ('man/qibuild', 'qibuild', u'Configure, build, install, package your project',
      [u'Aldebaran Robotics'], 1),
-    ('ref/man/qitoolchain', 'qitoolchain', u'Hanlde sets of pre-compiled packges',
+    ('man/qitoolchain', 'qitoolchain', u'Hanlde sets of pre-compiled packges',
+     [u'Aldebaran Robotics'], 1),
+    ('man/qidoc', 'qidoc', u'Hanlde doxygen and sphinx projects',
+     [u'Aldebaran Robotics'], 1),
+    ('man/qilinguist', 'qilinguist', u'Translate projects using gettext or Qt linguist',
      [u'Aldebaran Robotics'], 1)
 ]
 

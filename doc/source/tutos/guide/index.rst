@@ -52,11 +52,6 @@ Advanced tutorials
 * :ref:`using-toolchains`
 * :ref:`extending-qibuild-actions`
 
-See also
---------
-
-* :ref:`qibuild-ref`
-* :ref:`qibuild-design`
 
 qiBuild tips and tricks
 -----------------------

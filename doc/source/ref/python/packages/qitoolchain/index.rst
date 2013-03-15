@@ -8,4 +8,3 @@ qitoolchain modules
     packages
     feed
     remote
-    version
