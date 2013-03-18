@@ -7,12 +7,14 @@ qisys modules
 
 
     archive
-    cmdparse
     command
+    envsetter
     interact
     qixml
     remote
     parsers
+    script
     sh
     ui
     version
+    worktree

@@ -1,5 +1,5 @@
-qibuild.interact -- Interacting with the user
-=============================================
+qisys.interact -- Interacting with the user
+===========================================
 
-.. automodule:: qibuild.interact
+.. automodule:: qisys.interact
    :members:

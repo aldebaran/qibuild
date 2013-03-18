@@ -114,35 +114,35 @@ CMake
 Python
 ++++++
 
-* Add :py:func:`qisrc.sync.get_toplevel_git_projects` to ignore submodules
+* Add ``qisrc.sync.get_toplevel_git_projects`` to ignore submodules
   in a project list.
 * Add functions for handle build projects in qibuild and remove them from
-  :py:mod:`qisys.worktree`.
+  ``qisys.worktree``.
 
-  * :py:func:`qibuild.project.is_buildable`.
-  * :py:func:`qibuild.project.build_projects`.
+  * ``qibuild.project.is_buildable``.
+  * ``qibuild.project.build_projects``.
 
-* Add functions for handle git projects from :py:mod:`qisys.worktree` to
-  :py:mod:`qisrc.git`.
+* Add functions for handle git projects from ``qisys.worktree`` to
+  ``qisrc.git``.
 
-  * :py:func:`qisrc.git.is_git`.
-  * :py:func:`qisrc.git.get_git_projects`.
+  * ``qisrc.git.is_git``.
+  * ``qisrc.git.get_git_projects``.
 
-* :py:func:`qibuild.parsers.build_parser` has been split.
+* ``qibuild.parsers.build_parser`` has been split.
 
-  * :py:func:`qisrc.parsers.build_type_parser` is for know the type of build
+  * ``qisrc.parsers.build_type_parser`` is for know the type of build
     and so the name of the build directory.
-  * :py:func:`qisrc.parsers.build_parser` extend the previous one and add
+  * ``qisrc.parsers.build_parser`` extend the previous one and add
     option for build projects (as ``-j``).
 
-* Remove :py:mod:`qibuild.archive` use :py:mod:`qisys.archive` instead.
-* Add :py:func:`qibuild.toc.get_build_folder_name` to get the name of a build
+* Remove ``qibuild.archive`` use ``qisys.archive`` instead.
+* Add ``qibuild.toc.get_build_folder_name`` to get the name of a build
   directory from some informations.
-* Add :py:func:`qibuild.toc.Toc.get_build_folder_name` to get the name of
+* Add ``qibuild.toc.Toc.get_build_folder_name`` to get the name of
   the build directory from a toc.
-* Remove :py:func:`qibuild.toc.set_build_folder_name` and
+* Remove ``qibuild.toc.set_build_folder_name`` and
   ``qibuild.toc.Toc.build_folder_name``
-* Add :py:func:`qibuild.toc.has_project`.
+* Add ``qibuild.toc.has_project``.
 
 V2.0
 ----
@@ -266,27 +266,27 @@ CMake
 Python
 +++++++
 
-* Added :py:mod:`qisrc.sync` for synchronizing a worktree with a manifest
-* Added :py:mod:`qisrc.review` for configuring a project to use gerrit
-* Added :py:mod:`qibuild.deploy` to handle deploying code to a remote target
-* Added :py:mod:`qibuild.gdb` to allow stripping debug symbols out of the libraries
-* Added :py:mod:`qibuild.ui` for tools to interact with the user
-* Added :py:mod:`qixml` to help XML parsing, get rid of ``lxml`` dependency
-* Added :py:func:`qisrc.git.get_repo_root`
-* Added :py:func:`qisrc.git.is_submodule`
-* Renamed `qisrc.worktree.worktree_open` to :py:func:`qisrc.worktree.open_worktree`
-* Renamed ``qibuild.worktree`` to :py:mod:`qisrc.worktree`
+* Added ``qisrc.sync`` for synchronizing a worktree with a manifest
+* Added ``qisrc.review`` for configuring a project to use gerrit
+* Added ``qibuild.deploy`` to handle deploying code to a remote target
+* Added ``qibuild.gdb`` to allow stripping debug symbols out of the libraries
+* Added ``qibuild.ui`` for tools to interact with the user
+* Added ``qixml`` to help XML parsing, get rid of ``lxml`` dependency
+* Added ``qisrc.git.get_repo_root``
+* Added ``qisrc.git.is_submodule``
+* Renamed `qisrc.worktree.worktree_open` to ``qisrc.worktree.open_worktree``
+* Renamed ``qibuild.worktree`` to ``qisrc.worktree``
 * :py:meth:`qibuild.config.QiBuildConfig.read`: learned ``create_if_missing`` option
 * ``install-qibuild.sh`` now installs ``qibuild`` scripts in ``~/.local/bin``
 * :py:meth:`qisrc.git.Git.call` fix using ``quiet=True`` with ``raises=False``
 * :py:meth:`qisrc.git.Git.get_current_branch` : return None when in 'detached HEAD' state
-* :py:func:`qibuild.command.call` learned ``quiet`` option
-* Usage of ``qibuild.log`` and ``logging.py`` has been deprecated, use :py:mod:`qibuild.ui` instead
-* ``toc.test_project`` has been removed, use :py:mod:`qibuild.ctest` instead
-* ``toc.resolve_deps`` has been removed, use :py:func:`qibuild.cmdparse.deps_from_args` instead
+* ``qibuild.command.call`` learned ``quiet`` option
+* Usage of ``qibuild.log`` and ``logging.py`` has been deprecated, use ``qibuild.ui`` instead
+* ``toc.test_project`` has been removed, use ``qibuild.ctest`` instead
+* ``toc.resolve_deps`` has been removed, use ``qibuild.cmdparse.deps_from_args`` instead
 * :py:meth:`qisrc.git.get_current_branch` : return None when in 'detached HEAD' state
-* Add :py:mod:`qixml` to help XML parsing, get rid of ``lxml`` dependency
-* :py:func:`qibuild.command.call` add ``quiet`` option
+* Add ``qixml`` to help XML parsing, get rid of ``lxml`` dependency
+* ``qibuild.command.call`` add ``quiet`` option
 * Remove usage of ``qibuild.log`` and ``logging.py`` to display nice colorized messages
   to the console, use ``qibuild.ui`` module.
 * Refactoring of the whole module ``qibuild.archive``:
@@ -294,30 +294,30 @@ Python
   * Non-compatible APIs
   * Removed APIs:
 
-    * :py:func:`qibuild.archive.extracted_name`
-    * :py:func:`qibuild.archive.archive_name`
-    * :py:func:`qibuild.archive.extract_tar`: use :py:func:`qibuild.archive.extract` instead
-    * :py:func:`qibuild.archive.extract_zip`: use :py:func:`qibuild.archive.extract` instead
-    * :py:func:`qibuild.archive.zip`: use :py:func:`qibuild.archive.compress` instead
-    * :py:func:`qibuild.archive.zip_unix`: use :py:func:`qibuild.archive.compress` instead
-    * :py:func:`qibuild.archive.zip_win`: use :py:func:`qibuild.archive.compress` instead
+    * ``qibuild.archive.extracted_name``
+    * ``qibuild.archive.archive_name``
+    * ``qibuild.archive.extract_tar``: use ``qibuild.archive.extract`` instead
+    * ``qibuild.archive.extract_zip``: use ``qibuild.archive.extract`` instead
+    * ``qibuild.archive.zip``: use ``qibuild.archive.compress`` instead
+    * ``qibuild.archive.zip_unix``: use ``qibuild.archive.compress`` instead
+    * ``qibuild.archive.zip_win``: use ``qibuild.archive.compress`` instead
   * New APIs:
 
-    * :py:func:`qibuild.archive.compress`: include ``algo`` option, which is set
+    * ``qibuild.archive.compress``: include ``algo`` option, which is set
       to  ``zip`` when unspecified
-    * :py:func:`qibuild.archive.guess_algo`: guessing the compression method
+    * ``qibuild.archive.guess_algo``: guessing the compression method
       from the archive extension
 
   * Updated APIs:
 
-    * :py:func:`qibuild.archive.extract`:
+    * ``qibuild.archive.extract``:
 
       * support for the ``topdir`` option has been removed
       * add ``algo`` option, when unspecified ``algo`` is set to ``zip`` on all platform
 
-* Added :py:mod:`qibuild.cmake.modules` to handle CMake module generation
-* Renamed :py:mod:`qibuild.cmdparse` to :py:mod:`qibuild.script`
-* :py:mod:`qibuild.cmdparse` now centralize the parsing of qibuild actions arguments
+* Added ``qibuild.cmake.modules`` to handle CMake module generation
+* Renamed ``qibuild.cmdparse`` to ``qibuild.script``
+* ``qibuild.cmdparse`` now centralize the parsing of qibuild actions arguments
    (guessing project from working directory and so on)
 
 Misc
@@ -392,23 +392,23 @@ CMake
 Python
 ++++++
 
-* add :py:func:`qibuild.sh.change_cwd`
-* add :py:func:`qibuild.sh.is_executable_binary`
-* :py:mod:`qisrc.git` : rewrite
-* :py:func:`qibuild.cmdparse.run_action` : allow adding ``--quiet-commands``
-* add :py:mod:`qitoolchain.binary_package` : provide functions to open binary
+* add ``qibuild.sh.change_cwd``
+* add ``qibuild.sh.is_executable_binary``
+* ``qisrc.git`` : rewrite
+* ``qibuild.cmdparse.run_action`` : allow adding ``--quiet-commands``
+* add ``qitoolchain.binary_package`` : provide functions to open binary
   packages
-* add :py:mod:`qitoolchain.binary_package.core` : abstract class for binary
+* add ``qitoolchain.binary_package.core`` : abstract class for binary
   package provided by standard Linux distribution
-* add :py:mod:`qitoolchain.binary_package.gentoo` : binary package class for
+* add ``qitoolchain.binary_package.gentoo`` : binary package class for
   *Gentoo* package (does not depends on *portage*)
-* add :py:mod:`qitoolchain.binary_package.gentoo_portage` : binary package
+* add ``qitoolchain.binary_package.gentoo_portage`` : binary package
   class for *Gentoo* package taking benefit from *portage*
-* :py:func:`qibuild.archive.extract` , :py:func: `qibuild.archive.extract_zip` ,
-  :py:func:`qibuild.archive.extract_tar` : add ``quiet`` keyword argument
+* ``qibuild.archive.extract`` , :py:func: `qibuild.archive.extract_zip` ,
+  ``qibuild.archive.extract_tar`` : add ``quiet`` keyword argument
   allowing non-verbose extraction
-* :py:func:`qibuild.archive.extract_tar` : fix archive name guessing
-* :py:func:`qibuild.interact` : add ``get_editor`` function
+* ``qibuild.archive.extract_tar`` : fix archive name guessing
+* ``qibuild.interact`` : add ``get_editor`` function
 
 Misc
 ++++

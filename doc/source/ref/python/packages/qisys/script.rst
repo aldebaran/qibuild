@@ -1,31 +1,7 @@
-qisys.script -- Tools for qisys scripts
+qisys.script -- Tools for qibuild scripts
 ==========================================
 
 .. py:module:: qisys.script
-
-
-For instance, after
-
-.. code-block:: console
-
-    $ qibuild make --release foo
-
-
-* look for a module named make.py
-* configure a parser using the configure_parser() of the make.py module
-* parse the arguments
-* call the do() method of make.py with
-
-  * arg.release = True
-  * arg.projects = ["foo"]
-
-The main function are:
-
-* :py:func:`run_action` to call an action
-* :py:func:`root_command_main` and `action_modules_from_package`
-   to generate a 'main' script, such as ``bin/qibuild``
-
-
 
 Functions defined in this module
 --------------------------------
@@ -47,7 +23,6 @@ Example of use
         qibuild.run_action("qibuild.actions.test",
           ["foo"], forward_args=args)
 
-
 .. autofunction:: root_command_main
 
 .. autofunction:: action_modules_from_package
@@ -59,8 +34,3 @@ Example of usage:
       parser = argparse.ArgumentParser()
       modules = qisys.script.action_modules_from_package("qibuild.actions")
       qisys.script.root_command_main("qibuild", parser, modules)
-
-
-.. seealso::
-
-   * :py:mod:`qibuild.parsers`

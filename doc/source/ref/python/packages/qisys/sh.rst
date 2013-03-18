@@ -1,5 +1,5 @@
-qibuild.sh -- Common filesystem operations
+qisys.sh -- Common filesystem operations
 ==========================================
 
-.. automodule:: qibuild.sh
+.. automodule:: qisys.sh
    :members:

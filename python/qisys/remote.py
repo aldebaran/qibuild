@@ -118,7 +118,7 @@ def download(url, output_dir, output_name=None,
     :param callback: callback to use to show download progress.
         By default :py:func:`qisys.remote.callback` is called
 
-    :param message: a list of arguments for :py:func:`qisys.ui.info'
+    :param message: a list of arguments for :py:func:`qisys.ui.info`
         Will be printed right before the progress bar.
 
     :param clobber: If False, the file won't be overwritten if it

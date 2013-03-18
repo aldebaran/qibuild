@@ -7,4 +7,3 @@ qitoolchain modules
     toolchain
     packages
     feed
-    remote
