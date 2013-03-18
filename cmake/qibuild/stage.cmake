@@ -210,7 +210,8 @@ function(qi_use_lib name)
   _qi_use_lib_internal(${name} ${ARGN})
 endfunction()
 
-#! Make sure configuration and data files in the
+#!
+#  Make sure configuration and data files in the
 #  given directory can be found by
 #  ``qi::findData()`` in this project or
 #  any dependency

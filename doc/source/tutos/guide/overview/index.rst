@@ -9,3 +9,4 @@ qiBuild overview
    testing_a_project
    packaging_a_project
    managing_deps
+   remote_debugging

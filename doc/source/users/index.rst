@@ -21,9 +21,3 @@ Projects Manager doc.
 This documentation is split in two parts.
 
 Some tutorials, to test step-by-step the process of managing **qibuild** projects.
-
-.. toctree::
-  :maxdepth: 2
-
-  tutos/index
-
