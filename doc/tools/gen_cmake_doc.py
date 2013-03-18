@@ -304,15 +304,11 @@ def gen_fun_rst(name, txt):
 
 
     res = """
-{name}
-{h2}
-
 {directive}
 {desc}
 {example}
 
 """.format(name=name,
-           h2="-"*len(name),
            directive=directive,
            desc=indent(desc, 2),
            example=example_rst)
@@ -378,7 +374,7 @@ def main():
     qibuild_dir = os.path.abspath(qibuild_dir)
     this_file = __file__
     this_dir = os.path.dirname(this_file)
-    cmake_api = os.path.join(this_dir, "../source/ref/cmake/api")
+    cmake_api = os.path.join(this_dir, "../source/advanced/cmake/api")
     cmake_api = os.path.abspath(cmake_api)
     if not os.path.exists(cmake_api):
         os.makedirs(cmake_api)

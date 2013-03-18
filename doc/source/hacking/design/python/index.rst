@@ -1,6 +1,7 @@
 .. toctree::
     :hidden:
 
+    overviews/worktree_and_projects
     overviews/parsing_cmdline
     overviews/handling_build_configurations
     overviews/handling_cmake_flags
@@ -196,10 +197,8 @@ Overviews
 You can read the following sections if you want to understand deeply
 how the qibuild command line tools work under the hood.
 
-  * :ref:`parsing-cmdline`
-  * :ref:`handling-build-configurations`
-  * :ref:`parsing-toolchain-feeds`
-  * :ref:`parsing-manifests`
-  * :ref:`handling-cmake-flags`
+.. toctree::
+    :maxdepth: 1
 
+    overviews/index
 

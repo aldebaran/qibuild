@@ -1,9 +1,6 @@
 .. toctree::
 
     changelog
-    contrib/index
-    design/index
-    overview/index
-    ref/index
-    tutos/index
-    users/index
+    beginner/index
+    advanced/index
+    hacking/index

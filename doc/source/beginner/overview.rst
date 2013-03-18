@@ -1,10 +1,8 @@
-.. _qibuild-overview:
-
-What is qiBuild?
-================
+qiBuild : the build framework
+=============================
 
 qiBuild is a generic framework that helps for managing several projects
-and their dependecies.
+and their dependencies.
 
 It comes with a set of tools:
 
@@ -82,8 +80,3 @@ qilinguist: Translating projects
 ``qilinguist`` makes it easier to use ``gettext`` in a CMake-based
 project
 
-
-
-.. toctree::
-
-    worktree_and_projects

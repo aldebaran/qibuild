@@ -3,7 +3,11 @@
 ## found in the COPYING file.
 
 
-#! Function to generate perf stats
+#! Functions to generate perf stats
+# =================================
+#
+# This is best used with ``qibuild test --perf`` and a tool
+# like codespeed
 
 include(CMakeParseArguments)
 

@@ -1,10 +1,17 @@
-.. _qibuild-in-five-minutes:
+qibuild tutorial
+================
 
-qiBuild in five minutes
-=======================
+Here you will learn how to use most of qibuild tools.
 
-First, please make sure you have follow the :ref:`qibuild-getting-started`
-tutorial.
+Starting from scratch, you will:
+
+ * get some projects source code
+ * get a toolchain with some precompiled dependencies
+ * configure and build the projects
+ * deploy them to your robot
+ * build the documentation
+
+
 
 Starting a new project from scratch
 ------------------------------------
