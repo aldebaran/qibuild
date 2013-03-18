@@ -1,5 +1,3 @@
-.. _qibuild-getting-started:
-
 Getting started with qiBuild
 ----------------------------
 

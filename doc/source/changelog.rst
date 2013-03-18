@@ -276,15 +276,15 @@ Python
 * Added ``qisrc.git.is_submodule``
 * Renamed `qisrc.worktree.worktree_open` to ``qisrc.worktree.open_worktree``
 * Renamed ``qibuild.worktree`` to ``qisrc.worktree``
-* :py:meth:`qibuild.config.QiBuildConfig.read`: learned ``create_if_missing`` option
+* ``qibuild.config.QiBuildConfig.read``: learned ``create_if_missing`` option
 * ``install-qibuild.sh`` now installs ``qibuild`` scripts in ``~/.local/bin``
-* :py:meth:`qisrc.git.Git.call` fix using ``quiet=True`` with ``raises=False``
-* :py:meth:`qisrc.git.Git.get_current_branch` : return None when in 'detached HEAD' state
+* ``qisrc.git.Git.call`` fix using ``quiet=True`` with ``raises=False``
+* ``qisrc.git.Git.get_current_branch`` : return None when in 'detached HEAD' state
 * ``qibuild.command.call`` learned ``quiet`` option
 * Usage of ``qibuild.log`` and ``logging.py`` has been deprecated, use ``qibuild.ui`` instead
 * ``toc.test_project`` has been removed, use ``qibuild.ctest`` instead
 * ``toc.resolve_deps`` has been removed, use ``qibuild.cmdparse.deps_from_args`` instead
-* :py:meth:`qisrc.git.get_current_branch` : return None when in 'detached HEAD' state
+* ``qisrc.git.get_current_branch`` : return None when in 'detached HEAD' state
 * Add ``qixml`` to help XML parsing, get rid of ``lxml`` dependency
 * ``qibuild.command.call`` add ``quiet`` option
 * Remove usage of ``qibuild.log`` and ``logging.py`` to display nice colorized messages

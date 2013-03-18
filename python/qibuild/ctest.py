@@ -290,15 +290,11 @@ def sigint_handler(signum, frame):
 def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
               dry_run=False, valgrind=False, nightmare=False, test_args=None,
               coverage=False, num_jobs=1, num_cpus=-1):
-    """ Called by :py:meth:`qibuild.toc.Toc.test_project`
+    """ Called by ``qibuild test``
 
     :param test_name: If given, only run this test
 
-    Always write some XML files in build-<config>/test-results
-    (even if they were no tests to run at all)
-
     :return: a boolean to indicate if test was sucessful
-
     """
     if valgrind:
         if not qisys.command.find_program("valgrind"):

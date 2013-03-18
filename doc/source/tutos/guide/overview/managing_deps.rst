@@ -11,8 +11,6 @@ Requirements
 We will assume you have a properly configured qiBuild
 worktree, and that you have managed to compile a basic project.
 
-Please make sure you have follow the
-:ref:`getting started tutorial <qibuild-getting-started>`.
 
 Overview
 --------

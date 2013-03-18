@@ -8,3 +8,9 @@ qisys.worktree.WorkTree
 
 .. autoclass:: WorkTree
     :members:
+
+qisys.worktree.WorkTreeProject
+------------------------------
+
+.. autoclass:: WorkTreeProject
+    :members:

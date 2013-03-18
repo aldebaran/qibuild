@@ -84,14 +84,6 @@ Basically, inside the code of an action, you should just:
 * Initialize a few objects
 * Call some methods from an other package.
 
-For instance, you can see that the code in `qibuild.actions.configure`,
-`qibuild.actions.make`, almost only deals with:
-
-* Constructing the :py:class:`qibuild.toc.Toc` object
-* Calling the Toc methods on the projects in the correct order.
-
-Also, the code for `qisrc.actions.sync` and `qisrc.actions.init` use
-in fact two packages: :py:mod:`qisrc.sync` and :py:mod:`qisrc.review`
 
 Use dependency injection when possible
 --------------------------------------
@@ -356,21 +348,4 @@ Testing code that compiles source code
 There are times where you really need a 'real' worktree
 and some real source code.
 
-In that case, you should use the directory ``python/qibuild/test``.
-
-It is a worktree that contains several small projects, that should
-compile quickly.
-
-Right now you have no choice but using the :py:mod:`qibuild.toc.Toc`
-object which is a bit painful to use.
-
-That's why you should use the :py:class:`qibuild.test.test_toc.TestToc` object
-which makes things a bit easier for you.
-
-See how it's done in ``qibuild.gdb`` for instance.
-
-Feel free to add new projects in this repository, but make sure
-to commit the changes in ``python/qibuild/test/.qi/worktree.xml``
-
-Please don't use ``qibuild.run_action`` in your automatic tests,
-this is fragile because it depends on the command line API.
+.. todo:: explain how to use the worktree in qibuild/python/qibuild/test

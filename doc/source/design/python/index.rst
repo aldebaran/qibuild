@@ -180,17 +180,6 @@ CMake framework.
     You cannot have two different build configurations sharing
     the same build directory.
 
-.. glossary::
-
-  **Toc**
-    A toc object is built from a working directory and a
-    list of command line arguments.
-    The name of the class comes from the first name of qibuild,
-    which was a recursive acronym: 'TOC means Obvious Compilation'
-
-.. seealso::
-
-   * :py:mod:`qibuild.toc`
 
 
 qibuild Python packages documentation

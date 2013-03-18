@@ -62,7 +62,7 @@ specify the ``help`` arguments when you configure your parser.
 
 
 If you think the new action is worth it, you can also patch
-the :ref:`qibuild-man-pages`
+the qibuild man pages.
 
 If you add a new executable, please add the corresponding man page
 in ``ref/man``.

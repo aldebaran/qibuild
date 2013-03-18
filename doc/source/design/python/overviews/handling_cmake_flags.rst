@@ -26,7 +26,7 @@ To every cmake code that is generated, and what CMake flags are passed.
 Command line parsing
 ---------------------
 
-This is done by :py:func:`qisys.script.root_command_main` from
+This is done by ``qisys.script.root_command_main`` from
 ``bin/qibuild`` script.
 
 We look for every module in ``qibuild.actions``, and find the ``configure.py`` module.
@@ -71,7 +71,7 @@ Building the toc object
         toc = qibuild.toc_open(args.worktree, args)
 
 
-The :py:class:`Toc <qibuild.toc.Toc>` object is built by the :py:func:`qibuild.toc.toc_open`
+The ``Toc <qibuild.toc.Toc>`` object is built by the ``qibuild.toc.toc_open``
 function.
 
 .. code-block:: python
@@ -106,7 +106,7 @@ thing.
 You may wonder why we we set the ``toc.active_projects`` here and not it Toc ctor.
 Well, that's an other story, so more on this later.
 
-Back to the :py:meth:`toc() <qibuild.toc.Toc.__init__>` call.
+Back to the ``toc() <qibuild.toc.Toc.__init__>`` call.
 
 Toc constructor does a *lot* of stuff (this comes from the fact that the Toc class is huge).
 
@@ -168,7 +168,7 @@ inside the `qibuild.project.Project` class.
 Computation of projects cmake flags
 -----------------------------------
 
-This is done by the :py:func:`qibuild.project.update_project` function during
+This is done by the ``qibuild.project.update_project`` function during
 the Toc construction
 
 
@@ -327,7 +327,7 @@ name is guessed from the current working directory.
 
 .. seealso::
 
-  * :py:meth:`qibuild.worktree.search_current_project_root`
+  * ``qibuild.worktree.search_current_project_root``
 
 
 .. code-block:: python
@@ -361,7 +361,7 @@ in the second case because of the ``active_projects`` argument passed to the ``D
 
 .. seealso::
 
-    * :py:class:`DependenciesSolver`
+    * ``DependenciesSolver``
 
 But the ``dependencies.cmake`` is different too.
 
