@@ -316,8 +316,6 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
             raise Exception(mess)
     else:
         for test in all_tests:
-            if test_args is not None:
-                test[1] += test_args.split()
             (name, cmd_, properties) = test
             cost = properties.get("COST")
             if not slow and cost and float(cost) > 50:
@@ -344,6 +342,10 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
     if not tests:
         ui.warning("No tests found for project", project.name)
         return
+
+    for test in all_tests:
+        if test_args is not None:
+            test[1] += test_args.split()
 
     ui.info(ui.green, "Testing", project.name, "...")
     in_queue, out_queue = QueueTimeout(), Queue.Queue()
