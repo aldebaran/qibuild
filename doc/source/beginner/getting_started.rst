@@ -124,31 +124,6 @@ Keep reading if you want to use other generators.
 Note that you can still re-run the config wizard anytime you want.
 
 
-Creating a work tree
---------------------
-
-You need to chose a qibuild "worktree".
-
-This path will be the root from where qiBuild searches to find the sources of
-your projects.
-
-In the following document, we will use the notation ``QI_WORK_TREE`` to refer
-to this path.
-
-Then go to this directory and run
-
-.. code-block:: console
-
-  $ qibuild init
-
-
-This will create a new qiBuild configuration file in your working directory, in
-``QI_WORK_TREE/.qi/qibuild.xml``.
-
-This file contains settings that will only used by this worktree.
-
-If you re-run ``qibuild config --wizard`` form a directory inside your worktree,
-the wizard will ask you if you want to configure settings for this worktree.
 
 
 Configuring qiBuild
