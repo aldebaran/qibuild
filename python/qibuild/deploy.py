@@ -78,7 +78,7 @@ def parse_url(remote_url):
          ((?P<username>[a-zA-Z0-9\._-]+)@)?
          (?P<server>[a-zA-Z0-9\._-]+))
         :
-        (?P<remote_dir>[a-zA-A0-9\.~_/-]*)$
+        (?P<remote_dir>[a-zA-Z0-9\.~_/-]*)$
         """, remote_url, re.VERBOSE)
     # note: this regexp does not support having weird chars (such as @ or ?)
     # or spaces in remote_dir. At least it will complain.
