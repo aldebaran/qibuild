@@ -6,7 +6,6 @@ qibuild internal overviews
 
     worktree_and_projects
     parsing_cmdline
-    handling_build_configurations
-    handling_cmake_flags
+    building_cmake_projects
     parsing_manifests
     parsing_toolchain_feeds

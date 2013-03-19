@@ -1,14 +1,3 @@
-.. toctree::
-    :hidden:
-
-    overviews/worktree_and_projects
-    overviews/parsing_cmdline
-    overviews/handling_build_configurations
-    overviews/handling_cmake_flags
-    overviews/parsing_manifests
-    overviews/parsing_toolchain_feeds
-
-
 .. _qibuild-python-design:
 
 qiBuild Python framework design
