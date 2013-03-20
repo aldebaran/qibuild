@@ -27,3 +27,6 @@
 * read env, toolchain name et all from qibuild config files
 
 * qisrc.worktree.Remote -> qisrc.manifest.Remote
+
+
+* remove all traces of incredibuild
