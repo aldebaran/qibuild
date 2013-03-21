@@ -103,9 +103,13 @@ class Process:
 
     def _kill_subprocess(self):
         if self._thread and self._process:
-            ui.debug('Terminating process.')
-            self._process.terminate()
             self.return_type = Process.TIME_OUT
+            ui.debug("Terminating process")
+            try:
+                self._process.terminate()
+            except Exception:
+                pass
+            ui.debug("Terminating process failed")
             self._thread.join(5)
             if self._thread.is_alive():
                 self._destroy_zombie()
