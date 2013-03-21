@@ -84,6 +84,7 @@ class Process:
             self.out = self._process.communicate()[0]
             self.returncode = self._process.returncode
             if self.returncode == 0:
+                ui.debug("Setting return code to Process.OK")
                 self.return_type = Process.OK
             ui.debug("Thread terminated.")
 
@@ -99,6 +100,7 @@ class Process:
         elif SIGINT_EVENT.is_set():
             self._interrupt()
         else:
+            ui.debug("Process timed out")
             self._kill_subprocess()
 
     def _kill_subprocess(self):
@@ -112,6 +114,7 @@ class Process:
             ui.debug("Terminating process failed")
             self._thread.join(5)
             if self._thread.is_alive():
+                ui.debug("Killing zombies")
                 self._destroy_zombie()
 
     def _interrupt(self):
@@ -120,7 +123,6 @@ class Process:
         self.return_type = Process.INTERRUPTED
 
     def _destroy_zombie(self):
-        ui.debug('Process was a zombie...')
         if not self._process:
             pass
         elif os.name == 'posix':
