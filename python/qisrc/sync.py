@@ -14,7 +14,7 @@ import qisrc.manifest
 
 
 def compute_repo_diff(old_repos, new_repos):
-    """ Comupte the work that needs to be done
+    """ Compute the work that needs to be done
 
     :returns: a tuple (to_add, to_move, to_rm)
 
@@ -51,7 +51,7 @@ class WorkTreeSyncer(object):
     """ Handle the manifests of a worktree
 
     Stores the git url of the manifests and the groups that
-    should be used, synchronizes the local manfifests with the git
+    should be used, synchronizes the local manifests with the git
     worktree
 
     """
@@ -121,7 +121,7 @@ class WorkTreeSyncer(object):
         .qi/manifests/<name>
 
         """
-        # Backup before sync in case sync_first was non used,
+        # Backup before sync in case sync_first was not used
         self.old_repos = self.get_old_repos()
         to_add = LocalManifest()
         to_add.name = name
@@ -156,7 +156,7 @@ class WorkTreeSyncer(object):
         return repos
 
     def get_old_repos(self):
-        """ Backup all repos configuartion before any synchronisation
+        """ Backup all repos configuration before any synchronisation
         for compute_repo_diff to have the correct value
 
         """
@@ -226,7 +226,7 @@ class WorkTreeSyncer(object):
                         ui.reset, " -> ", ui.blue, new_src)
 
         for repo in to_add:
-            # maybe user created it alreaf, for instance with
+            # maybe user created it already, for instance with
             # a sucessful `qisrc sync`
             if not self.git_worktree.get_git_project(repo.src):
                 self.git_worktree.clone_missing(repo)
