@@ -28,5 +28,6 @@
 
 * qisrc.worktree.Remote -> qisrc.manifest.Remote
 
-
 * remove all traces of incredibuild
+
+* add --reverse-deps
