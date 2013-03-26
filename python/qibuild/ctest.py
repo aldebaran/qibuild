@@ -159,6 +159,9 @@ class Test:
         else:
             cwd = self.build_dir
         ncmd = self.cmd
+        # Quick hack to re-add color on gtest tests
+        if sys.stdout.isatty():
+            env["GTEST_COLOR"] = "yes"
         if self.valgrind:
             env['VALGRIND'] = '1'
             timeout *= 10
