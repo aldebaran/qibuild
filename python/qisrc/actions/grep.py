@@ -16,11 +16,14 @@ import sys
 from qisys import ui
 import qisys
 import qisrc
+import qisys.parsers
 import qisrc.parsers
+import qisrc.cmdparse
 
 def configure_parser(parser):
     """Configure parser for this action."""
     qisrc.parsers.worktree_parser(parser)
+    qisys.parsers.project_parser(parser)
     parser.add_argument("--path", help="type of patch to print",
             default="project", choices=['none', 'absolute', 'worktree', 'project'])
     parser.add_argument("git_grep_opts", metavar="-- git grep options", nargs="*",
@@ -42,7 +45,9 @@ def do(args):
     git_grep_opts.append(args.pattern)
 
     retcode = 0
-    for project in qisrc.git.get_git_projects(qiwt.projects):
+    projects = qisrc.cmdparse.projects_from_args(args, qiwt)
+    projects = qisrc.git.get_git_projects(projects)
+    for project in projects:
         ui.info(ui.green, "Looking in", project.src, "...")
         git = qisrc.git.Git(project.path)
         (status, out) = git.call("grep", *git_grep_opts, raises=False)
