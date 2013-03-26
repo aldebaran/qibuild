@@ -13,7 +13,7 @@
 #
 
 
-set(_TESTS_RESULTS_FOLDER "${CMAKE_CURRENT_BINARY_DIR}/test-results" CACHE INTERNAL "" FORCE)
+set(_TESTS_RESULTS_FOLDER "${CMAKE_BINARY_DIR}/test-results" CACHE INTERNAL "" FORCE)
 
 
 #! Create a new test that can be run by CTest or `qibuild test`
