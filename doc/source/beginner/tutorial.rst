@@ -165,7 +165,7 @@ You can check with:
 
 .. code-block:: console
 
-   qitoolchain status
+   qitoolchain info
 
 Output should look like ::
 

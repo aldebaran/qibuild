@@ -130,7 +130,7 @@ You can check that your toolchain has been created with:
 
 .. code-block:: console
 
-   $ qitoolchain status
+   $ qitoolchain info
 
    Toolchain linux32
    No feed
@@ -150,7 +150,7 @@ You can check that your package has been added with:
 
 .. code-block:: console
 
-  $ qitoolchain status
+  $ qitoolchain info
 
   Toolchain linux32
   No feed
@@ -226,7 +226,7 @@ You can see that the feed has been stored in your qibuild configuration:
 
 .. code-block:: console
 
-  $ qitoolchain status
+  $ qitoolchain info
 
   Toolchain linux32
   Using feed from http://example.com/feed.xml
