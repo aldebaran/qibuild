@@ -88,9 +88,13 @@ class TestResult:
         sys.stdout.flush()
         if self.result_dir is not None:
             xml_out = os.path.join(self.result_dir, self.test_name + ".xml")
-            # Sometimes the XML already exists. For instance if it comes from
-            # a GTest created by qi_create_gtest()
-            if not os.path.exists(xml_out):
+
+            if os.path.exists(xml_out) and self.ok:
+                # Only trust gtest-generated XML if the test was sucessful
+                pass
+            else:
+                # If gtest crashes or timesout *after* the XML is written,
+                # make sure we have the information in the XML file
                 write_xml(xml_out, self)
         _LOCK.release()
 
