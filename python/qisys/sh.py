@@ -15,12 +15,11 @@ import errno
 import stat
 import shutil
 import tempfile
-import qisys.log
 import subprocess
 import ntpath
 import posixpath
 
-LOGGER = qisys.log.get_logger("buildtool.sh")
+from qisys import ui
 
 
 def mkdir(dest_dir, recursive=False):
@@ -175,7 +174,7 @@ def install(src, dest, filter_fun=None, quiet=False):
 
     src = to_native_path(src, normcase=False)
     dest = to_native_path(dest, normcase=False)
-    LOGGER.debug("Installing %s -> %s", src, dest)
+    ui.debug("Installing", src, "->", dest)
     #pylint: disable-msg=E0102
     # (function IS already defined, that's the point!)
     if filter_fun is None:
@@ -237,10 +236,10 @@ def rm(name):
     if not os.path.lexists(name):
         return
     if os.path.isdir(name) and not os.path.islink(name):
-        LOGGER.debug("Removing directory: %s", name)
+        ui.debug("Removing directory:", name)
         rmtree(name)
     else:
-        LOGGER.debug("Removing %s", name)
+        ui.debug("Removing", name)
         os.remove(name)
 
 
