@@ -148,14 +148,13 @@ def project_name_and_path_from_cwd():
     tail = None
     while True:
         candidate = os.path.join(head, "qiproject.xml")
-        if not os.path.exists(candidate):
-            continue
-        tree = qisys.qixml.read(candidate)
-        # FIXME: support new syntax ?
-        # FIXME: use BuildProjectParser ?
-        name = tree.getroot().get("name")
-        if name:
-            return (name, head)
+        if os.path.exists(candidate):
+            tree = qisys.qixml.read(candidate)
+            # FIXME: support new syntax ?
+            # FIXME: use BuildProjectParser ?
+            name = tree.getroot().get("name")
+            if name:
+                return (name, head)
         (head, tail) = os.path.split(head)
         if not tail:
             break
