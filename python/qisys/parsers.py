@@ -38,14 +38,18 @@ def worktree_parser(parser):
     parser.add_argument("-w", "--worktree", "--work-tree", dest="worktree",
         help="Use a specific work tree path.")
 
-def project_parser(parser):
+def project_parser(parser, positional=True):
     """Parser settings for every action using projects."""
     group = parser.add_argument_group("projects specifications options")
     group.add_argument("-a", "--all", action="store_true",
         help="Work on all projects")
     group.add_argument("-s", "--single", action="store_true",
         help="Work on specified projects without taking dependencies into account.")
-    parser.add_argument("projects", nargs="*", metavar="PROJECT", help="Project name(s)")
+    if positional:
+        parser.add_argument("projects", nargs="*", metavar="PROJECT", help="Project name(s)")
+    else:
+        group.add_argument("-p", "--project", dest="projects", action="append",
+                help="Project name(s)")
     parser.set_defaults(single=False, projects = list())
     return group
 
