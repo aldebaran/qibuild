@@ -20,6 +20,7 @@ def configure_parser(parser):
     parser.add_argument("command", metavar="COMMAND", nargs="+")
     parser.add_argument("--ignore-errors", "--continue",
         action="store_true", help="continue on error")
+    parser.add_argument("--dry-run", action="store_true", help="Dry run")
 
 def do(args):
     """Main entry point."""
@@ -39,7 +40,11 @@ def do(args):
         return
 
     # Print the command and the projects
-    ui.info(ui.green, "Running `%s` on " % " ".join(args.command), end="")
+    if args.dry_run:
+        ui.info(ui.green, "Would run", end="")
+    else:
+        ui.info(ui.green, "Running", end="")
+    ui.info(ui.green, "`%s` on" % " ".join(args.command), end="")
     if nbr_git_projects == nbr_all_git_projects:
         ui.info(ui.green, "all", end="")
     else:
@@ -50,6 +55,8 @@ def do(args):
     for i, project in enumerate(git_projects, start=1):
         command = args.command[:]
         ui.info(ui.green, "*", ui.reset, "(%d/%d)" % (i, count), ui.blue, project.src)
+        if args.dry_run:
+            continue
         try:
             qisys.command.call(command, cwd=project.path)
         except qisys.command.CommandFailedException:
