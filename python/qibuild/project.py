@@ -127,7 +127,7 @@ class BuildProject(object):
         parser.parse(xml_elem)
 
     def __repr__(self):
-        return "<BuildWorkTree %s in %s>" % (self.name, self.src)
+        return "<BuildProject %s in %s>" % (self.name, self.src)
 
 
 
