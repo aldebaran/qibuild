@@ -125,8 +125,8 @@ endfunction()
 #
 # This calls ``add_test()`` with the same arguments but:
 #
-#  * We look for the binary in sdk/bin, and we know
-#    there is a _d when using Visual Studio
+#  * We look for the binary in sdk/bin, as a target, or an external
+#    package, and we know there is a _d when using Visual Studio
 #  * We set a 'tests' folder property
 #  * We make sure necessary environment variables are set on mac
 #
@@ -134,7 +134,9 @@ endfunction()
 # :cmake:function:`qi_create_test` or :cmake:function:`qi_create_gtest` instead.
 #
 # \arg:test_name The name of the test
-# \arg:target_name The name of the binary to use
+# \arg:target_name The name of the binary to use. It can be a target name,
+#                  an absolute or relative path to an existing file,
+#                  or a package name providing a ${name}_EXECUTABLE variable.
 # \param:TIMEOUT The timeout of the test
 # \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
 # \group:ARGUMENTS Arguments to be passed to the executable
@@ -147,7 +149,10 @@ function(qi_add_test test_name target_name)
   if(NOT ARG_TIMEOUT)
     set(ARG_TIMEOUT 20)
   endif()
-
+  # Validate target_name. We expect one of:
+  # - A target name expected to be an executable with standard path.
+  # - A relative or absolute path to an existing binary.
+  # - A package name providing a ${name}_EXECUTABLE variable.
   if(TARGET ${target_name})
     set(_bin_path ${QI_SDK_DIR}/${QI_SDK_BIN}/${target_name})
 
@@ -157,12 +162,17 @@ function(qi_add_test test_name target_name)
 
     add_test(${test_name} ${_bin_path} ${ARG_ARGUMENTS})
     set_target_properties(${target_name} PROPERTIES FOLDER "tests")
-  # If test is not a binary, assume it is a test script
   else()
     # Just in case user specified a relative path:
     get_filename_component(_full_path ${target_name} ABSOLUTE)
-    if (NOT EXISTS ${_full_path})
-      qi_error("${target_name} is not a target nor an existing path")
+    if(NOT EXISTS ${_full_path})
+      # Try package
+      find_package(${target_name})
+      string(TOUPPER ${target_name}_EXECUTABLE _executable)
+      if(NOT ${_executable}) # If expects a variable name not content
+        qi_error("${target_name} is not a target, an existing file or a package providing ${target_name}_EXECUTABLE")
+      endif()
+      set(_full_path ${${_executable}})
     endif()
     add_test(${test_name} ${_full_path} ${ARG_ARGUMENTS})
   endif()
