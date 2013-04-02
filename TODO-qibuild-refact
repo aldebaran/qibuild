@@ -31,3 +31,5 @@
 * remove all traces of incredibuild
 
 * add --reverse-deps
+
+* get rid of qisys.log and the LOGGER instances
