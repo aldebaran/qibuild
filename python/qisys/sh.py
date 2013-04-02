@@ -21,6 +21,40 @@ import posixpath
 
 from qisys import ui
 
+def get_config_path(*args):
+    """ Get a config path to read or write some configuration.
+
+    :param args: a list of subfolders. Those will be created
+    when needed
+
+    """
+    return get_path(os.path.expanduser("~/.config"), *args)
+
+def get_cache_path(*args):
+    """ Get a config path to read or write some cached data
+
+    :param args: a list of subfolders. Those will be created
+    when needed
+
+    """
+    return get_path(os.path.expanduser("~/.cache"), *args)
+
+def get_share_path(*args):
+    """ Get a config path to read or write some persistent data
+
+    :param args: a list of subfolders. Those will be created
+    when needed
+
+    """
+    return get_path(os.path.expanduser("~/.local"), "share", *args)
+
+def get_path(*args):
+    """ Helper for get_*_path methods """
+    full_path = os.path.join(*args)
+    to_make = os.path.dirname(full_path)
+    mkdir(to_make, recursive=True)
+    return full_path
+
 
 def mkdir(dest_dir, recursive=False):
     """ Recursive mkdir (do not fail if file exists) """

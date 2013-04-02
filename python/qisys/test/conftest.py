@@ -99,13 +99,36 @@ class MessageRecorder():
         ui._MESSAGES = list()
 
 
+@pytest.fixture
+def tmpfiles(request):
+    """ Configure qisys.sh.get_*_path functions to return temporary
+    files instead
+
+    """
+    tmpdir = tempfile.mkdtemp(prefix="tmp-test-")
+    def clean():
+        qisys.sh.rm(tmpdir)
+    request.addfinalizer(clean)
+    def fake_get_path(*args):
+        prefix = args[0]
+        rest = args[1:]
+        full_path = os.path.join(tmpdir,
+                                 os.path.basename(prefix),
+                                 *rest)
+        to_make = os.path.dirname(full_path)
+        qisys.sh.mkdir(to_make, recursive=True)
+        return full_path
+    patcher = mock.patch("qisys.sh.get_path", fake_get_path)
+    patcher.start()
+    request.addfinalizer(patcher.stop)
+
 class TestAction(object):
     """ Helper class to test actions
     Make sure cwd is in a temporary directory,
     and provide a nicer syntax for qisys.script.run_action
     """
     def __init__(self, package):
-        self.tmp = tempfile.mkdtemp(prefix="tmp-test-qisrc-")
+        self.tmp = tempfile.mkdtemp(prefix="tmp-test-")
         self.old_cwd = os.getcwd()
         self.chdir(self.tmp)
         self.package = package
