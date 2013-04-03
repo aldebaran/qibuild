@@ -13,6 +13,7 @@ from StringIO import StringIO
 
 import qisys
 import qibuild
+import qibuild.config
 
 
 def cfg_from_string(str, user_config=None):
@@ -449,98 +450,6 @@ class QiBuildConfig(unittest.TestCase):
 """
         qibuild_cfg = cfg_from_string(xml,  user_config='win32-vs2010')
         self.assertEquals(qibuild_cfg.cmake.generator, "NMake Makefiles")
-
-
-class ConvertTestCase(unittest.TestCase):
-    def setUp(self):
-        self.tmp = tempfile.mkdtemp(prefix="tmp-configstore-test")
-        self.cfg_path = os.path.join(self.tmp, "conf.cfg")
-
-    def test_qibuild_cfg(self):
-        qibuild_cfg = r"""[general]
-config = vs2010
-cmake.generator = Unix Makefiles
-env.editor = vim
-env.ide = QtCreator
-env.path = c:\MinGW\bin;c:\Program Files\swig;
-env.bat_file = c:\path\to\vsvarsall.bat
-build.directory = "/path/to/build"
-build.sdk_dir   = "/path/to/sdk"
-build.incredibuild = yes
-env.qtcreator.path = "/path/to/qtcreator"
-
-[manifest]
-url = "http://example.com/foo.manifest"
-
-[config vs2010]
-cmake.generator = "Visual Studio 10"
-"""
-        with open(self.cfg_path, "w") as fp:
-            fp.write(qibuild_cfg)
-        (qibuild_xml, local_xml) = qibuild.config.convert_qibuild_cfg(self.cfg_path)
-        qibuild_cfg = cfg_from_string(qibuild_xml)
-        qibuild_cfg.read_local_config(StringIO(local_xml))
-        self.assertEqual(qibuild_cfg.defaults.cmake.generator, "Unix Makefiles")
-        self.assertEqual(qibuild_cfg.env.editor, "vim")
-        self.assertEqual(qibuild_cfg.ides["QtCreator"].path,
-            "/path/to/qtcreator")
-        self.assertEqual(qibuild_cfg.defaults.env.path,
-            r"c:\MinGW\bin;c:\Program Files\swig;")
-        self.assertEqual(qibuild_cfg.local.build.build_dir,
-            "/path/to/build")
-        self.assertEqual(qibuild_cfg.local.build.sdk_dir,
-            "/path/to/sdk")
-        self.assertEqual(qibuild_cfg.local.manifest.url,
-             "http://example.com/foo.manifest")
-        self.assertEqual(qibuild_cfg.configs["vs2010"].cmake.generator,
-            "Visual Studio 10")
-        self.assertEqual(qibuild_cfg.cmake.generator, "Visual Studio 10")
-
-        unix_cfg = cfg_from_string(qibuild_xml, "foo")
-        self.assertEqual(unix_cfg.cmake.generator, "Unix Makefiles")
-
-
-    def test_xml_no_version(self):
-        xml = """<qibuild>
-  <defaults config="linux32">
-    <cmake generator="Unix Makefiles" />
-    <env path="/opt/swig/bin" />
-  </defaults>
-  <config name="linux32">
-    <ide name="QtCreator" />
-  </config>
-  <ide name="QtCreator" path="/qtsdk/bin/qtcreator" />
-</qibuild>
-"""
-        with open(self.cfg_path, "w") as fp:
-            fp.write(xml)
-        (qibuild_xml, local_xml) = qibuild.config.convert_qibuild_xml(self.cfg_path)
-        qibuild_cfg = cfg_from_string(qibuild_xml)
-        qibuild_cfg.read_local_config(StringIO(local_xml))
-        self.assertEqual(qibuild_cfg.local.defaults.config, "linux32")
-
-
-
-    def test_project_manifest(self):
-        cfg = """[project foo]
-depends = bar baz
-rdepends = spam eggs
-"""
-        with open(self.cfg_path, "w") as fp:
-            fp.write(cfg)
-        project_xml = qibuild.config.convert_project_manifest(self.cfg_path)
-        with open(self.cfg_path, "w") as fp:
-            fp.write(project_xml)
-        project_cfg = qibuild.config.ProjectConfig()
-        project_cfg.read(self.cfg_path)
-        self.assertEqual(project_cfg.name, "foo")
-        self.assertEqual(project_cfg.depends, set(["bar", "baz"]))
-        self.assertEqual(project_cfg.rdepends, set(["spam", "eggs"]))
-
-
-    def tearDown(self):
-        qisys.sh.rm(self.tmp)
-
 
 if __name__ == "__main__":
     unittest.main()
