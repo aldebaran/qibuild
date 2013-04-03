@@ -33,3 +33,7 @@
 * add --reverse-deps
 
 * get rid of qisys.log and the LOGGER instances
+
+* rewrite qibuild.config using XMLParser
+
+* rename qibuild.config -> qibuild.xml_config ?
