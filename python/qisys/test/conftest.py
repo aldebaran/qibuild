@@ -99,7 +99,7 @@ class MessageRecorder():
         ui._MESSAGES = list()
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def tmpfiles(request):
     """ Configure qisys.sh.get_*_path functions to return temporary
     files instead
