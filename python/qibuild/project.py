@@ -129,6 +129,13 @@ class BuildProject(object):
     def __repr__(self):
         return "<BuildProject %s in %s>" % (self.name, self.src)
 
+    def __eq__(self, other):
+        return self.name == other.name and self.src == other.src
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
 
 
 class BuildProjectParser:

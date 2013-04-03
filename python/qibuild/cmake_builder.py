@@ -1,0 +1,2 @@
+class CMakeBuilder(object):
+    pass

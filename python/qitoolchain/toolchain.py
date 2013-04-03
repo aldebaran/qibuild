@@ -132,7 +132,7 @@ class Package():
     def __lt__(self, other):
         return self.name < other.name
 
-class Toolchain:
+class Toolchain(object):
     """ A toolchain is a set of packages
 
     If has a name that will later be used as 'build config'
@@ -373,7 +373,14 @@ class Toolchain:
             config.write(fp)
 
     def get(self, package_name, raises=True):
-        """ Get the path to a package
+        """ :deprecated: use get_package instead """
+        package = self.get_package(package_name, raises=raises)
+        if not package:
+            return None
+        return package.path
+
+    def get_package(self, package_name, raises=True):
+        """ Get a package object from the toolchain
 
         """
         package_names = [p.name for p in self.packages]
@@ -385,8 +392,7 @@ class Toolchain:
             else:
                 return None
         package = [p for p in self.packages if p.name == package_name][0]
-        package_path = package.path
-        return package_path
+        return package
 
     def get_sysroot(self):
         """ Get the sysroot of the toolchain.

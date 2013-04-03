@@ -37,3 +37,5 @@
 * rewrite qibuild.config using XMLParser
 
 * rename qibuild.config -> qibuild.xml_config ?
+
+* remove qitoolchain.get()

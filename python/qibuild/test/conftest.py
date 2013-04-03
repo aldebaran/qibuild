@@ -1,5 +1,6 @@
 # Make all fixtures from qisys.test available to qibuild.test
 from qisys.test.conftest import *
+from qitoolchain.test.conftest import *
 
 import qisys.worktree
 import qibuild.worktree

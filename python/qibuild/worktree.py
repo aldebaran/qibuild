@@ -29,6 +29,10 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
                 fp.write("<qibuild />\n")
         return config_path
 
+    @property
+    def toolchain(self):
+        return self.build_config.toolchain
+
     def get_build_project(self, name, raises=True):
         """ Get a build project given its name """
         for build_project in self.build_projects:
@@ -97,3 +101,12 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         local_settings.defaults.config = name
         tree = local_settings.tree()
         qisys.qixml.write(tree, self.qibuild_xml)
+
+    def set_active_config(self, active_config):
+        """ Set the config to use for this worktree
+        Should match a toolchain name, and will cause
+        seld.build_config to be updated
+
+        """
+        self.build_config.set_active_config(active_config)
+

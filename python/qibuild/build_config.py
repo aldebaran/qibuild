@@ -11,8 +11,8 @@ class CMakeBuildConfig(object):
 
     """
     def __init__(self, build_worktree):
+        self.active_config = None
         self.build_worktree = build_worktree
-        self.toolchain = None
         self.build_type = "Debug"
         self.user_flags = list()
         self.profiles = list()
@@ -29,6 +29,10 @@ class CMakeBuildConfig(object):
         if self._cmake_generator:
             return self._cmake_generator
         return self.qibuild_cfg.cmake.generator
+
+    @property
+    def toolchain(self):
+        return qitoolchain.get_toolchain(self.active_config)
 
     @cmake_generator.setter
     def cmake_generator(self, value):
@@ -74,7 +78,7 @@ class CMakeBuildConfig(object):
         if not default_config:
             return
         try:
-            self.toolchain = qitoolchain.get_toolchain(default_config)
+            qitoolchain.get_toolchain(default_config)
         except Exception, e:
             mess = """ \
 Incorrect config detected for worktree in {build_worktree.root}
@@ -87,4 +91,5 @@ but this does not match any toolchain name
         self.qibuild_cfg.set_active_config(default_config)
 
     def set_active_config(self, active_config):
+        self.active_config = active_config
         self.qibuild_cfg.set_active_config(active_config)

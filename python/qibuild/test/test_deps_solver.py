@@ -5,115 +5,31 @@
 
 """
 
-import unittest
 
 
-from qibuild.dependencies_solver import DependenciesSolver
+from qibuild.deps_solver import DepsSolver
 
 
-class Project:
-    def __init__(self, name):
-        self.name = name
-        self.depends = list()
-        self.rdepends = list()
+def test_simple_deps(build_worktree):
+    world = build_worktree.create_project("world")
+    hello = build_worktree.create_project("hello", depends=["world"])
 
-class Package:
-    def __init__(self, name):
-        self.name = name
-        self.depends = list()
+    deps_solver = DepsSolver(build_worktree)
+    assert deps_solver.get_dep_projects([world], ["build"]) == [world]
+    assert deps_solver.get_dep_projects([hello], ["build"]) == [world, hello]
 
-class DependenciesSolverTestCase(unittest.TestCase):
+def test_ignore_missing_deps(build_worktree):
+    world = build_worktree.create_project("world")
+    hello = build_worktree.create_project("hello", depends=["world", "foo"])
 
-    def test_bad_solve(self):
-        world = Project("world")
-        projects = [world]
-        packages = []
-        dep_solver = DependenciesSolver(projects=projects, packages=packages)
-        self.assertRaises(Exception, dep_solver.solve, "foo")
+    deps_solver = DepsSolver(build_worktree)
+    assert deps_solver.get_dep_projects([hello], ["build"]) == [world, hello]
 
-    def test_unknown_dep(self):
-        world = Project("world")
-        hello = Project("hello")
-        hello.depends = ["world"]
-        world.depends = ["not_found"]
-        projects = [world, hello]
-        packages = []
-        dep_solver = DependenciesSolver(projects=projects, packages=packages)
-        (projects, packages, not_found) = dep_solver.solve(["hello"])
-        self.assertEquals(projects,  ["world", "hello"])
-        self.assertEquals(packages,  [])
-        self.assertEquals(not_found, ["not_found"])
+def test_find_packages_in_toolchain(build_worktree, toolchains):
+    foo_tc = toolchains.create("foo")
+    world_package = toolchains.add_package("foo", "world")
+    hello = build_worktree.create_project("hello", depends=["world"])
+    build_worktree.set_active_config("foo")
 
-    def test_package_dep(self):
-        world = Package("world")
-        hello = Project("hello")
-        hello.depends = ["world"]
-        projects = [hello]
-        packages = [world]
-
-        dep_solver = DependenciesSolver(projects=projects, packages=packages)
-        (projects, packages, not_found) = dep_solver.solve(["hello"])
-        self.assertEquals(projects,  ["hello"])
-        self.assertEquals(packages,  ["world"])
-        self.assertEquals(not_found, [])
-
-    def test_project_dep(self):
-        world = Project("world")
-        hello = Project("hello")
-        hello.depends = ["world"]
-        projects = [hello, world]
-        packages = []
-
-        dep_solver = DependenciesSolver(projects=projects, packages=packages)
-        (projects, packages, not_found) = dep_solver.solve(["hello"])
-        self.assertEquals(projects,  ["world", "hello"])
-        self.assertEquals(packages,  [])
-        self.assertEquals(not_found, [])
-
-    def test_package_dep_wins_on_project_dep(self):
-        world_package = Package("world")
-        world_project = Project("world")
-        hello = Project("hello")
-        hello.depends = ["world"]
-        projects = [hello, world_project]
-        packages = [world_package]
-        dep_solver = DependenciesSolver(projects=projects, packages=packages)
-        (projects, packages, not_found) = dep_solver.solve(["hello"])
-        self.assertEquals(projects,  ["hello"])
-        self.assertEquals(packages,  ["world"])
-        self.assertEquals(not_found, [])
-
-    def test_package_dep_wins_on_project_dep_unless_user_asked(self):
-        world_package = Package("world")
-        world_project = Project("world")
-        hello = Project("hello")
-        hello.depends = ["world"]
-        projects = [hello, world_project]
-        packages = [world_package]
-        dep_solver = DependenciesSolver(projects=projects, packages=packages)
-        (projects, packages, not_found) = dep_solver.solve(["hello", "world"])
-        self.assertEquals(projects,  ["world", "hello"])
-        self.assertEquals(packages,  [])
-        self.assertEquals(not_found, [])
-
-    def test_runtime_args(self):
-        static_lib = Project("static-lib")
-        big_lib    = Project("big-lib")
-        my_exe     = Project("my-exe")
-
-        my_exe.depends = ["big-lib"]
-        my_exe.rdepends = ["big-lib"]
-
-        big_lib.depends = ["static-lib"]
-        big_lib.rdepends = []
-
-        projects = [static_lib, big_lib, my_exe]
-        packages = []
-        dep_solver = DependenciesSolver(projects=projects, packages=packages)
-        (projects, packages, not_found) = dep_solver.solve(["my-exe"], runtime=True)
-        self.assertEquals(projects,  ["big-lib", "my-exe"])
-        self.assertEquals(packages,  [])
-        self.assertEquals(not_found, [])
-
-if __name__ == "__main__":
-    unittest.main()
+    deps_solver = DepsSolver(build_worktree)
+    assert deps_solver.get_dep_packages([hello], ["build"]) == [world_package]
