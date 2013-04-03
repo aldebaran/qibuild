@@ -11,7 +11,7 @@ class BuildWorkTreeError(Exception):
     pass
 
 class BuildWorkTree(qisys.worktree.WorkTreeObserver):
-    """
+    """ Stores a list of projects that can be built using CMake
 
     """
     def __init__(self, worktree):
@@ -89,5 +89,11 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         """ Remove a build profile for this worktree """
         qibuild.profile.configure_build_profile(self.qibuild_xml, name)
 
-
-
+    def set_default_config(self, name):
+        """ Set the default toolchain for this worktree """
+        local_settings = qibuild.config.LocalSettings()
+        tree = qisys.qixml.read(self.qibuild_xml)
+        local_settings.parse(tree)
+        local_settings.defaults.config = name
+        tree = local_settings.tree()
+        qisys.qixml.write(tree, self.qibuild_xml)
