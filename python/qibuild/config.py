@@ -19,16 +19,12 @@ from qisys.qixml import etree
 from qisys import ui
 
 
+
 def get_global_cfg_path():
     """ Get path to global config file
 
     """
-    res = "~/.config/qi/qibuild.xml"
-    res = qisys.sh.to_native_path(res)
-    return res
-
-# Using hand-written 'class to xml' stuff is not that
-# hard and actually works quite well
+    return qisys.sh.get_config_path("qi", "qibuild.xml")
 
 
 class Env:
@@ -402,11 +398,10 @@ class QiBuildConfig:
     qibuild.xml configuration files
 
     """
-    def __init__(self, user_config=None):
+    def __init__(self):
         self.tree = etree.ElementTree()
         self.defaults = Defaults()
         self.build = Build()
-        self.user_config = user_config
 
         # Set by self.read_local_config()
         self.local = LocalSettings()
@@ -419,11 +414,6 @@ class QiBuildConfig:
 
         # A dicf of server name -> access:
         self.servers = dict()
-
-        # Either: None (in the general case)
-        #         The default config as read in the config file
-        #         The config set by the user
-        self.active_config = None
 
         # Active env:
         self.env = Env()
@@ -484,30 +474,6 @@ class QiBuildConfig:
             server.parse(server_tree)
             self.servers[server.name] = server
 
-        self.merge_configs()
-
-    def read_local_config(self, local_xml_path):
-        """ Apply a local configuration """
-        local_tree = etree.parse(local_xml_path)
-        self.local.parse(local_tree)
-        self.merge_configs()
-
-    def write_local_config(self, local_xml_path):
-        """ Dump local settings to a xml file """
-        local_tree = self.local.tree()
-        qisys.qixml.write(local_tree, local_xml_path)
-
-    def merge_configs(self):
-        """ Merge various configs
-
-        """
-        default_config = self.local.defaults.config
-        if self.user_config:
-            self.active_config = self.user_config
-        else:
-            if default_config:
-                self.active_config = default_config
-
         self.cmake.generator = self.defaults.cmake.generator
         self.env.bat_file = self.defaults.env.bat_file
         self.env.editor = self.defaults.env.editor
@@ -520,27 +486,44 @@ class QiBuildConfig:
             if matching_ide:
                 self.ide = matching_ide
 
-        if self.active_config:
-            matching_config = self.configs.get(self.active_config)
-            if matching_config:
-                # Prepend path from matching_config to self.env.path
-                defaults_env_path = self.defaults.env.path
-                config_env_path = matching_config.env.path
-                if config_env_path:
-                    self.env.path = config_env_path
-                    if defaults_env_path:
-                        self.env.path += os.path.pathsep + defaults_env_path
-                # Set bat file
-                if matching_config.env.bat_file:
-                    self.env.bat_file = matching_config.env.bat_file
-                # Set cmake settings from current config
-                if matching_config.cmake.generator:
-                    self.cmake.generator = matching_config.cmake.generator
-                # Set ide from current config
-                matching_config_ide = matching_config.ide
-                if matching_config_ide:
-                    if self.ides.get(matching_config_ide):
-                        self.ide = self.ides[matching_config_ide]
+    def read_local_config(self, local_xml_path):
+        """ Apply a local configuration """
+        local_tree = etree.parse(local_xml_path)
+        self.local.parse(local_tree)
+        default_config = self.local.defaults.config
+        if default_config:
+            self.set_active_config(default_config)
+
+    def write_local_config(self, local_xml_path):
+        """ Dump local settings to a xml file """
+        local_tree = self.local.tree()
+        qisys.qixml.write(local_tree, local_xml_path)
+
+    def set_active_config(self, config):
+        """ Merge various configs from <defaults> and the
+        selected <config > tag
+
+        """
+        matching_config = self.configs.get(config)
+        if matching_config:
+            # Prepend path from matching_config to self.env.path
+            defaults_env_path = self.defaults.env.path
+            config_env_path = matching_config.env.path
+            if config_env_path:
+                self.env.path = config_env_path
+                if defaults_env_path:
+                    self.env.path += os.path.pathsep + defaults_env_path
+            # Set bat file
+            if matching_config.env.bat_file:
+                self.env.bat_file = matching_config.env.bat_file
+            # Set cmake settings from current config
+            if matching_config.cmake.generator:
+                self.cmake.generator = matching_config.cmake.generator
+            # Set ide from current config
+            matching_config_ide = matching_config.ide
+            if matching_config_ide:
+                if self.ides.get(matching_config_ide):
+                    self.ide = self.ides[matching_config_ide]
 
     def set_default_config(self, name):
         """ Set a new config to use by default

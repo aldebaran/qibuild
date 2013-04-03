@@ -17,7 +17,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
     def __init__(self, worktree):
         self.worktree = worktree
         self.root = self.worktree.root
-        self.build_config = qibuild.build_config.CMakeBuildConfig()
+        self.build_config = qibuild.build_config.CMakeBuildConfig(self)
         self.build_projects = self._load_build_projects()
         worktree.register(self)
 

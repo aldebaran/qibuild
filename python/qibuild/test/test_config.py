@@ -18,8 +18,10 @@ import qibuild.config
 
 def cfg_from_string(str, user_config=None):
     cfg_loc = StringIO(str)
-    qibuild_cfg = qibuild.config.QiBuildConfig(user_config=user_config)
+    qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(cfg_loc)
+    if user_config:
+        qibuild_cfg.set_active_config(user_config)
     return qibuild_cfg
 
 
@@ -49,7 +51,6 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        self.assertTrue(qibuild_cfg.active_config is None)
         ide = qibuild_cfg.ides["qtcreator"]
         self.assertEquals(ide.name, "qtcreator")
         self.assertEquals(ide.path, "/path/to/qtcreator")
@@ -101,7 +102,6 @@ class QiBuildConfig(unittest.TestCase):
         qibuild_cfg = cfg_from_string(xml)
         qibuild_cfg.read_local_config(StringIO(local_xml))
         self.assertEquals(qibuild_cfg.local.defaults.config, "linux32")
-        self.assertEquals(qibuild_cfg.active_config, "linux32")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig32")
 
     def test_user_active_conf(self):
@@ -123,8 +123,7 @@ class QiBuildConfig(unittest.TestCase):
         qibuild_cfg = cfg_from_string(xml, user_config="linux64")
         qibuild_cfg.read_local_config(StringIO(local_xml))
         self.assertEquals(qibuild_cfg.local.defaults.config, "linux32")
-        self.assertEquals(qibuild_cfg.active_config, "linux64")
-        self.assertEquals(qibuild_cfg.env.path, "/path/to/swig64")
+        self.assertEquals(qibuild_cfg.env.path, "/path/to/swig32")
 
     def test_path_merging(self):
         xml = """
@@ -428,10 +427,18 @@ class QiBuildConfig(unittest.TestCase):
 
 
     def test_merge_settings_with_empty_active(self):
-        qibuild_cfg = qibuild.config.QiBuildConfig(user_config="win32-vs2010")
-        qibuild_cfg.defaults.cmake.generator = "NMake Makefiles"
-        qibuild_cfg.configs['win32-vs2010'] = qibuild.config.Config()
-        qibuild_cfg.merge_configs()
+        xml = """
+<qibuild version="1">
+  <defaults>
+      <cmake generator="NMake Makefiles" />
+  </defaults>
+
+  <config name="win32-vs2010" />
+</qibuild>
+"""
+        qibuild_cfg = cfg_from_string(xml)
+        self.assertEquals(qibuild_cfg.cmake.generator, "NMake Makefiles")
+        qibuild_cfg.set_active_config("win32-vs2010")
         self.assertEquals(qibuild_cfg.cmake.generator, "NMake Makefiles")
 
     def test_build_farm_config(self):

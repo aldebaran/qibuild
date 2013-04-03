@@ -77,7 +77,7 @@ def get_build_worktree(args):
     """
     worktree = qisys.parsers.get_worktree(args)
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
-    build_config = get_build_config(args)
+    build_config = get_build_config(build_worktree, args)
     build_worktree.build_config = build_config
     return build_worktree
 
@@ -90,19 +90,21 @@ def get_build_projects(build_worktree, args):
     return parser.parse_args(args)
 
 
-
 ##
 # Implementation details
 
-def get_build_config(args):
+def get_build_config(build_worktree, args):
     """ Get a CMakeBuildConfig object from an argparse.Namespace object
 
     """
-    build_config = qibuild.build_config.CMakeBuildConfig()
+    build_config = build_worktree.build_config
+    if args.config:
+        build_config.set_active_config(args.config)
     build_config.build_type = args.build_type
     if args.profiles:
         build_config.profiles = args.profiles
-    build_config.toolchain_name = args.config
+    if args.cmake_generator:
+        build_config.cmake_generator = args.cmake_generator
     return build_config
 
 

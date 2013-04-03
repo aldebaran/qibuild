@@ -1,3 +1,6 @@
+import qisys.qixml
+
+import qibuild.config
 import qibuild.profile
 import qitoolchain
 
@@ -7,31 +10,38 @@ class CMakeBuildConfig(object):
     that can affect the build
 
     """
-    # FIXME: what about qibuild config files ?
-    def __init__(self, toolchain_name=None,
-                 build_type="Debug", cmake_generator=None,
-                 user_flags=None, profiles=None):
-        if toolchain_name:
-            self.toolchain = qitoolchain.get_toolchain(toolchain_name)
-        else:
-            self.toolchain = None
-        self.build_type = build_type
-        self.cmake_generator = cmake_generator
-        if user_flags is None:
-            self.user_flags = list()
-        else:
-            self.user_flags = user_flags[:]
-        if profiles is None:
-            self.profiles = list()
-        else:
-            self.profiles = profiles[:]
+    def __init__(self, build_worktree):
+        self.build_worktree = build_worktree
+        self.toolchain = None
+        self.build_type = "Debug"
+        self.user_flags = list()
+        self.profiles = list()
+        self.qibuild_cfg = self.read_global_qibuild_settings()
+        self._cmake_generator = None
+        self.read_local_settings()
 
     @property
     def visual_studio(self):
-        return self.cmake_generator and \
-                "Visual Studio" in self.cmake_generator
+        return self.cmake_generator and "Visual Studio" in self.cmake_generator
 
-    def cmake_args(self, build_worktree):
+    @property
+    def cmake_generator(self):
+        if self._cmake_generator:
+            return self._cmake_generator
+        return self.qibuild_cfg.cmake.generator
+
+    @cmake_generator.setter
+    def cmake_generator(self, value):
+        self._cmake_generator = value
+
+    @property
+    def build_env(self):
+        envsetter = qisys.envsetter.EnvSetter()
+        envsetter.read_config(self.qibuild_cfg)
+        return envsetter.get_build_env()
+
+    @property
+    def cmake_args(self):
         """ Compute the CMake arguments to use, using the
         profiles registered in the given worktree
 
@@ -42,10 +52,39 @@ class CMakeBuildConfig(object):
         if self.toolchain:
             args.append("-DCMAKE_TOOLCHAIN_FILE=%s" % self.toolchain.toolchain_file)
         args.append("-DCMAKE_BUILD_TYPE=%s" % self.build_type)
-        cmake_flags = qibuild.profile.get_cmake_flags(build_worktree.qibuild_xml,
+        cmake_flags = qibuild.profile.get_cmake_flags(self.build_worktree.qibuild_xml,
                                                       self.profiles)
         for (name, value) in cmake_flags:
             args.append("-D%s=%s" % (name, value))
         for (name, value) in self.user_flags:
             args.append("-D%s=%s" % (name, value))
         return args
+
+
+    def read_global_qibuild_settings(self):
+        qibuild_cfg = qibuild.config.QiBuildConfig()
+        qibuild_cfg.read(create_if_missing=True)
+        return qibuild_cfg
+
+    def read_local_settings(self):
+        local_settings = qibuild.config.LocalSettings()
+        tree = qisys.qixml.read(self.build_worktree.qibuild_xml)
+        local_settings.parse(tree)
+        default_config = local_settings.defaults.config
+        if not default_config:
+            return
+        try:
+            self.toolchain = qitoolchain.get_toolchain(default_config)
+        except Exception, e:
+            mess = """ \
+Incorrect config detected for worktree in {build_worktree.root}
+Default config set in .qi/qibuild.xml is {default_config}
+but this does not match any toolchain name
+"""
+            mess = mess.format(build_worktree=self.build_worktree,
+                               default_config=default_config)
+            raise Exception(mess)
+        self.qibuild_cfg.set_active_config(default_config)
+
+    def set_active_config(self, active_config):
+        self.qibuild_cfg.set_active_config(active_config)
