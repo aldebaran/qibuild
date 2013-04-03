@@ -7,6 +7,7 @@
 """
 
 import os
+import functools
 import tempfile
 import unittest
 
@@ -25,6 +26,15 @@ def get_tc_file_contents(tc):
         contents = fp.read()
     return contents
 
+def fake_get_path(tmpdir, *args):
+    prefix = args[0]
+    rest = args[1:]
+    full_path = os.path.join(tmpdir,
+                                os.path.basename(prefix),
+                                *rest)
+    to_make = os.path.dirname(full_path)
+    qisys.sh.mkdir(to_make, recursive=True)
+    return full_path
 
 class QiToolchainTestCase(unittest.TestCase):
     def setUp(self):
@@ -33,9 +43,10 @@ class QiToolchainTestCase(unittest.TestCase):
 
         """
         self.tmp = tempfile.mkdtemp(prefix="test-qitoolchain")
-        qitoolchain.toolchain.CONFIG_PATH = os.path.join(self.tmp, "config")
-        qitoolchain.toolchain.CACHE_PATH  = os.path.join(self.tmp, "cache")
-        qitoolchain.toolchain.SHARE_PATH  = os.path.join(self.tmp, "share")
+
+        self.path_patcher = mock.patch("qisys.sh.get_path", functools.partial(
+            fake_get_path, self.tmp))
+        self.path_patcher.start()
         self.cfg_patcher = mock.patch('qibuild.config.get_global_cfg_path')
         qibuild_xml = os.path.join(self.tmp, "qibuild.xml")
         with open(qibuild_xml, "w") as fp:
@@ -46,12 +57,13 @@ class QiToolchainTestCase(unittest.TestCase):
     def tearDown(self):
         qisys.sh.rm(self.tmp)
         self.cfg_patcher.stop()
+        self.path_patcher.stop()
 
 
     def test_setup(self):
         # Check that we are not modifying normal config
         config_path = qitoolchain.get_tc_config_path()
-        expected = os.path.join(self.tmp, "config", "toolchains.cfg")
+        expected = os.path.join(self.tmp, ".config", "qi", "toolchains.cfg")
         self.assertEquals(config_path, expected)
 
         # Check that there are no toolchain yet
@@ -181,9 +193,8 @@ class FeedTestCase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="test-feed")
         self.srv = os.path.join(self.tmp, "srv")
-        qitoolchain.toolchain.CONFIG_PATH = os.path.join(self.tmp, "config")
-        qitoolchain.toolchain.CACHE_PATH  = os.path.join(self.tmp, "cache")
-        qitoolchain.toolchain.SHARE_PATH  = os.path.join(self.tmp, "share")
+        self.path_patcher = mock.patch("qisys.sh.get_path", fake_get_path)
+        self.path_patcher.start()
         self.cfg_patcher = mock.patch('qibuild.config.get_global_cfg_path')
         qibuild_xml = os.path.join(self.tmp, "qibuild.xml")
         with open(qibuild_xml, "w") as fp:
@@ -217,6 +228,7 @@ class FeedTestCase(unittest.TestCase):
     def tearDown(self):
         qisys.sh.rm(self.tmp)
         self.cfg_patcher.stop()
+        self.path_patcher.stop()
 
     def configure_xml(self, name, dest):
         """ Copy a xml file from the test dir to a

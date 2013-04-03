@@ -39,7 +39,7 @@ def toolchain_name_from_args(args):
 
 
 def get_toolchain(tc_name):
-    """ Get an existing tolchain using its """
+    """ Get an existing tolchain using its name """
     tc_names = get_tc_names()
     if not tc_name in tc_names:
         mess  = "No such toolchain: %s\n" % tc_name

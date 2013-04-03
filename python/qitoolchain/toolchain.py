@@ -10,20 +10,17 @@ import os
 import ConfigParser
 
 import qisys
+import qisys.sh
 import qibuild.configstore
 import qitoolchain
 import qitoolchain.feed
 
-CONFIG_PATH = "~/.config/qi/"
-CACHE_PATH  = "~/.cache/qi"
-SHARE_PATH  = "~/.local/share/qi/"
 
 def get_default_packages_path(tc_name):
     """ Get a default path to store extracted packages
 
     """
-    default_root = qisys.sh.to_native_path(SHARE_PATH)
-    default_root = os.path.join(default_root, "toolchains")
+    default_root = qisys.sh.get_share_path("qi", "toolchains")
     config = ConfigParser.ConfigParser()
     cfg_path = get_tc_config_path()
     config.read(cfg_path)
@@ -78,10 +75,7 @@ def get_tc_config_path():
 
 
     """
-    config_path = qisys.sh.to_native_path(CONFIG_PATH)
-    qisys.sh.mkdir(config_path, recursive=True)
-    config_path = os.path.join(config_path, "toolchains.cfg")
-    return config_path
+    return qisys.sh.get_config_path("qi", "toolchains.cfg")
 
 
 class Package():
@@ -231,11 +225,7 @@ class Toolchain:
         """ Returns path to self configuration file
 
         """
-        config_path = qisys.sh.to_native_path(CONFIG_PATH)
-        config_path = os.path.join(config_path, "toolchains")
-        qisys.sh.mkdir(config_path, recursive=True)
-        config_path = os.path.join(config_path, self.name + ".cfg")
-        return config_path
+        return qisys.sh.get_config_path("qi", "toolchains", self.name + ".cfg")
 
     def _get_cache_path(self):
         """ Returns path to self cache directory
@@ -244,8 +234,7 @@ class Toolchain:
         config_path = get_tc_config_path()
         config = ConfigParser.ConfigParser()
         config.read(config_path)
-        cache_path = qisys.sh.to_native_path(CACHE_PATH)
-        cache_path = os.path.join(cache_path, "toolchains")
+        cache_path = qisys.sh.get_cache_path("qi", "toolchains")
         if config.has_section("default"):
             try:
                 root_cfg = config.get("default", "root")
