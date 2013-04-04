@@ -219,7 +219,7 @@ def update_project(project, toc):
     # lastly, add a correct -DCMAKE_MODULE_PATH
     cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
     qibuild_dir = os.path.join(cmake_qibuild_dir, "qibuild")
-    project.cmake_flags.append("qibuild_DIR=%s" % qibuild_dir)
+    project.cmake_flags.insert(0, "qibuild_DIR=%s" % qibuild_dir)
 
 
 def generate_path_conf(project, toc):
