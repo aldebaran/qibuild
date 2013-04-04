@@ -53,3 +53,17 @@ def test_compute_sdk_dirs(build_worktree):
     assert deps_solver.get_sdk_dirs(hello, ["build"]) == [libworld.sdk_directory]
     assert deps_solver.get_sdk_dirs(hello, ["build", "runtime"]) == \
             [hello_plugin.sdk_directory, libworld.sdk_directory]
+
+def test_recurse_deps(build_worktree):
+    gtest = build_worktree.create_project("gtest")
+    libfoo = build_worktree.create_project("libfoo", depends=["gtest"])
+    bar = build_worktree.create_project("bar", depends=["libfoo"])
+    deps_solver = DepsSolver(build_worktree)
+    assert deps_solver.get_dep_projects([bar], ["build", "runtime"]) == [gtest, libfoo, bar]
+
+def test_empty_dep_is_single(build_worktree):
+    world = build_worktree.create_project("world")
+    hello = build_worktree.create_project("hello", depends=["world", "foo"])
+
+    deps_solver = DepsSolver(build_worktree)
+    assert deps_solver.get_dep_projects([hello], list()) == [hello]

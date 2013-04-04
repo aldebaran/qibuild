@@ -60,7 +60,7 @@ class DepsSolver(object):
     def _get_sorted_names(self, projects, dep_types):
         """ Helper for get_dep_* functions """
         to_sort = dict()
-        for project in projects:
+        for project in self.build_worktree.build_projects:
             deps = set()
             if "build" in dep_types:
                 deps = deps.union(project.depends)
