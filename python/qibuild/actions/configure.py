@@ -15,9 +15,6 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("configure options")
-    group.add_argument("--build-directory", dest="build_directory",
-        action="store",
-        help="override the default build directory used by cmake")
     group.add_argument("-D", dest="cmake_flags",
         action="append",
         help="additional cmake flags")
@@ -58,9 +55,6 @@ Note:
 @ui.timer("qibuild configure")
 def do(args):
     """Main entry point"""
-    if args.build_directory and not args.single:
-        raise Exception("You should use --single "
-                        "when specifying a build directory")
 
     if not args.cmake_flags:
         args.cmake_flags = list()
@@ -71,27 +65,15 @@ def do(args):
     if args.coverage:
         args.cmake_flags.append("QI_COVERAGE=ON")
 
-    build_worktree = qibuild.parsers.get_build_worktree(args)
-    build_projects = qibuild.parsers.get_build_projects(build_worktree, args)
-    build_config = build_worktree.build_config
+    cmake_builder = qibuild.parsers.get_cmake_builder(args)
 
-    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, build_worktree.root)
-    if build_config.toolchain_name:
-        ui.info(ui.green, "Using toolchain:", ui.blue, build_config.toolchain_name)
-    for profile in build_config.profiles:
-        ui.info(ui.green, "Using profile:", ui.blue, profile)
     if args.debug_trycompile:
         ui.info(ui.green, "Using cmake --debug-trycompile")
     if args.trace_cmake:
         ui.info(ui.green, "Tracing CMake execution")
 
-
-    for i, build_project in enumerate(build_projects):
-        ui.info_count(i, len(build_projects),
-                      ui.blue, build_project.name)
-        build_project.configure(clean_first=args.clean_first,
-                                debug_trycompile=args.debug_trycompile,
-                                trace_cmake=args.trace_cmake,
-                                profiling=args.profiling)
-        if args.summarize_options:
-            build_project.summarize_options()
+    cmake_builder.configure(clean_first=args.clean_first,
+                            debug_trycompile=args.debug_trycompile,
+                            trace_cmake=args.trace_cmake,
+                            profiling=args.profiling,
+                            summarize_options=args.summarize_options)

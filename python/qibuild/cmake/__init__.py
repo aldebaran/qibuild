@@ -83,7 +83,7 @@ def get_cached_var(build_dir, var, default=None):
 
 def cmake(source_dir, build_dir, cmake_args, env=None,
           clean_first=True, profiling=False, debug_trycompile=False,
-          trace_cmake=False):
+          trace_cmake=False, summarize_options=False):
     """Call cmake with from a build dir for a source dir.
     cmake_args are added on the command line.
 
@@ -126,6 +126,8 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     cmake_args += [source_dir]
     if not profiling and not trace_cmake:
         qisys.command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
+        if summarize_options:
+            display_options(build_dir)
         return
     cmake_log = os.path.join(build_dir, "cmake.log")
     fp = open(cmake_log, "w")
@@ -147,6 +149,23 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     outdir = os.path.join(build_dir, "profile")
     qibuild.cmake.profiling.gen_annotations(profiling_res, outdir, qibuild_dir)
     ui.info(ui.green, "Annotations generated in", outdir)
+
+
+def display_options(build_dir):
+    """ Display the options by looking in the CMake cache
+
+    """
+    cache_path = os.path.join(build_dir, "CMakeCache.txt")
+    print "-- Build options: "
+    cache = read_cmake_cache(cache_path)
+    opt_keys = [x for x in cache if x.startswith(("WITH_", "ENABLE_"))]
+    if not opt_keys:
+        print "  <no options found>"
+        return
+    opt_keys.sort()
+    padding = max(len(x) for x in opt_keys) + 3
+    for key in opt_keys:
+        print "  %s : %s" % (key.ljust(padding), cache[key])
 
 
 def read_cmake_cache(cache_path):
@@ -282,4 +301,4 @@ def get_binutil(name, cmake_var=None, build_dir=None, env=None):
         res =  get_cached_var(build_dir, cmake_var)
     if res:
         return res
-    return qisys.command.find_program(name, env=build_env)
+    return qisys.command.find_program(name, env=env)

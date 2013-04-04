@@ -22,7 +22,7 @@
 
 * add qisys.actions.list()
 
-* get rid of qibuild.toc.toc_parser()
+* get rid of qibuild.parsers.toc_parser()
 
 * read env, toolchain name et all from qibuild config files
 
@@ -39,3 +39,4 @@
 * rename qibuild.config -> qibuild.xml_config ?
 
 * remove qitoolchain.get()
+

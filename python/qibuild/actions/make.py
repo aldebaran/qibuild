@@ -12,7 +12,6 @@ import qibuild.parsers
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("make options")
@@ -30,11 +29,8 @@ def configure_parser(parser):
 @ui.timer("qibuild make")
 def do(args):
     """Main entry point"""
-    build_worktree = qibuild.parsers.get_build_worktree(args)
-    build_projects = qibuild.parsers.get_build_projects(build_worktree, args)
-    for i, build_project in enumerate(build_projects):
-        ui.info_count(i, len(build_projects),
-                      ui.blue, build_project.name)
-        build_project.build(num_jobs=args.num_jobs, rebuild=args.rebuild,
+
+    cmake_builder = qibuild.parsers.get_cmake_builder(args)
+    cmake_builder.build(num_jobs=args.num_jobs, rebuild=args.rebuild,
                            fix_shared_libs=args.fix_shared_libs,
                            verbose_make=args.verbose_make, coverity=args.coverity)

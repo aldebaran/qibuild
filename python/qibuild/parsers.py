@@ -7,8 +7,10 @@
 
 import os
 
+from qisys import ui
 import qisys.parsers
 import qibuild.worktree
+import qibuild.cmake_builder
 
 
 
@@ -79,6 +81,11 @@ def get_build_worktree(args):
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
     build_config = get_build_config(build_worktree, args)
     build_worktree.build_config = build_config
+    ui.info(ui.green, "Current build worktree:", ui.reset, ui.bold, build_worktree.root)
+    if build_config.toolchain:
+        ui.info(ui.green, "Using toolchain:", ui.blue, build_config.toolchain.name)
+    for profile in build_config.profiles:
+        ui.info(ui.green, "Using profile:", ui.blue, profile)
     return build_worktree
 
 def get_build_projects(build_worktree, args):
@@ -89,6 +96,16 @@ def get_build_projects(build_worktree, args):
     parser = BuildProjectParser(build_worktree)
     return parser.parse_args(args)
 
+def get_cmake_builder(args):
+    """ Get a CMakeBuilder object from the command line
+
+    """
+    build_worktree = get_build_worktree(args)
+    build_projects = get_build_projects(build_worktree, args)
+    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, build_projects)
+    if args.runtime:
+        cmake_builder.dep_types = ["runtime"]
+    return cmake_builder
 
 ##
 # Implementation details
@@ -105,6 +122,15 @@ def get_build_config(build_worktree, args):
         build_config.profiles = args.profiles
     if args.cmake_generator:
         build_config.cmake_generator = args.cmake_generator
+    if hasattr(args, "cmake_flags"):
+        # should be a list a strings looking like key=value
+        user_flags = list()
+        for flag_string in args.cmake_flags:
+            if "=" not in flag_string:
+                raise Exception("Expecting a flag looking like -Dkey=value")
+            (key, value) = flag_string.split("=")
+            user_flags.append((key, value))
+        build_config.user_flags = user_flags
     return build_config
 
 
@@ -115,8 +141,7 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
         self.build_worktree = build_worktree
 
     def all_projects(self, args):
-        # solve deps
-        pass
+        return self.build_worktree.build_projects
 
     def parse_no_project(self, args):
         """ Try to find the closest worktree project that
@@ -137,12 +162,7 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
 
         """
         project = self.build_worktree.get_build_project(project_arg, raises=True)
-        if args.single:
-            return [project]
-        deps = self.build_worktree.get_deps(project, runtime=args.runtime,
-                                            build_deps_only=args.build_deps_only)
-        return deps
-
+        return [project]
 
 def project_name_and_path_from_cwd():
     """ Find the parent qibuild project of a given path """

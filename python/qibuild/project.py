@@ -274,7 +274,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             self.build(target="preinstall", num_jobs=num_jobs, fix_shared_libs=False)
 
         if runtime:
-            self.install_runtime(destdir, num_jobs=num_jobs)
+            self.install_runtime(destdir)
         else:
             self.build(target="install", fix_shared_libs=False, env=build_env)
 
@@ -294,7 +294,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
         build_env["DESTDIR"] = destdir
         for component in runtime_components:
             cmake_args = list()
-            cmake_args += ["-DBUILD_TYPE=%s" % self.build_type]
+            cmake_args += ["-DBUILD_TYPE=%s" % self.build_config.build_type]
             cmake_args += ["-DCOMPONENT=%s" % component]
             cmake_args += ["-P", "cmake_install.cmake", "--"]
             ui.debug("Installing", component)

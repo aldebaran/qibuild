@@ -41,27 +41,6 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         if raises:
             raise BuildWorkTreeError("No such qibuild project: %s" % name)
 
-    def get_deps(self, top_project, runtime=False, build_deps_only=False):
-        """ Get the depencies of a project """
-        to_sort = dict()
-        if build_deps_only:
-            for project in self.build_projects:
-                to_sort[project.name] = project.depends
-        elif runtime:
-            for project in self.build_projects:
-                to_sort[project.name] = project.rdepends
-        else:
-            for project in self.build_projects:
-                to_sort[project.name] = project.rdepends.union(project.depends)
-
-        names = topological_sort(to_sort, [top_project.name])
-        deps = list()
-        for name in names:
-            dep_project = self.get_build_project(name, raises=False)
-            if dep_project:
-                deps.append(dep_project)
-        return deps
-
     def on_project_added(self, project):
         """ Called when a new project has been registered """
         self.build_projects = self._load_build_projects()
