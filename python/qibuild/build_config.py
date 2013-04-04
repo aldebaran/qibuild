@@ -1,3 +1,4 @@
+import os
 import qisys.qixml
 
 import qibuild.config
@@ -21,8 +22,23 @@ class CMakeBuildConfig(object):
         self.read_local_settings()
 
     @property
-    def visual_studio(self):
+    def using_visual_studio(self):
         return self.cmake_generator and "Visual Studio" in self.cmake_generator
+
+    @property
+    def local_cmake(self):
+        if not self.active_config:
+            return None
+        custom_cmake = os.path.join(self.build_worktree.root, ".qi",
+                                    self.active_config + ".cmake")
+        if os.path.exists(custom_cmake):
+            return custom_cmake
+        else:
+            return None
+
+    @property
+    def using_make(self):
+        return self.cmake_generator and "Unix Makefiles" in self.cmake_generator
 
     @property
     def cmake_generator(self):
@@ -32,7 +48,9 @@ class CMakeBuildConfig(object):
 
     @property
     def toolchain(self):
-        return qitoolchain.get_toolchain(self.active_config)
+        if self.active_config:
+            return qitoolchain.get_toolchain(self.active_config)
+        return None
 
     @cmake_generator.setter
     def cmake_generator(self, value):
@@ -79,7 +97,7 @@ class CMakeBuildConfig(object):
             return
         try:
             qitoolchain.get_toolchain(default_config)
-        except Exception, e:
+        except Exception:
             mess = """ \
 Incorrect config detected for worktree in {build_worktree.root}
 Default config set in .qi/qibuild.xml is {default_config}
@@ -89,6 +107,7 @@ but this does not match any toolchain name
                                default_config=default_config)
             raise Exception(mess)
         self.qibuild_cfg.set_active_config(default_config)
+        self.set_active_config(default_config)
 
     def set_active_config(self, active_config):
         self.active_config = active_config

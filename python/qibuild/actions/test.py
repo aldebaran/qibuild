@@ -54,7 +54,7 @@ def do(args):
                 dry_run=args.dry_run)
 
     else:
-        res = qibuild.ctest.run_tests(project, build_env=toc.build_env,
+        res = qibuild.ctest.run_tests(project, env=toc.build_env,
                 pattern=args.pattern, slow=args.slow,
                 dry_run=args.dry_run, valgrind=args.valgrind,
                 verbose=args.verbose_tests, nightmare=args.nightmare,

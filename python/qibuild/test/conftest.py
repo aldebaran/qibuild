@@ -41,6 +41,22 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
                         runtime_names=" ".join(rdepends),
                         )
         proj_path.join("qiproject.xml").write(xml)
+        cmake = """ \
+cmake_minimum_required(VERSION 2.8)
+project({name} C)
+find_package(qibuild)
+qi_create_bin({name} main.c)
+
+"""
+        cmake = cmake.format(name=name)
+        main_c = """ \
+int main()
+{
+  return 0;
+}
+"""
+        proj_path.join("CMakeLists.txt").write(cmake)
+        proj_path.join("main.c").write(main_c)
         self.worktree.add_project(src)
         return self.get_build_project(src)
 

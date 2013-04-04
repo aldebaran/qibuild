@@ -287,7 +287,7 @@ def sigint_handler(signum, frame):
     qisys.command.SIGINT_EVENT.set()
     signal.signal(signal.SIGINT, double_sigint)
 
-def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
+def run_tests(project, env=None, pattern=None, verbose=False, slow=False,
               dry_run=False, valgrind=False, nightmare=False, test_args=None,
               coverage=False, num_jobs=1, num_cpus=-1):
     """ Called by ``qibuild test``

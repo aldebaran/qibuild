@@ -11,7 +11,7 @@ import qisys.log
 
 LOGGER = qisys.log.get_logger(__name__)
 
-def fix_dlls(sdk_dir, build_env=None, paths=None, mingw=False):
+def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):
     """ Copy the dlls fron the toolchains and the other build dirs
     into a sdk directory, so that running the executable
     just works

@@ -322,10 +322,10 @@ def check_output_error(*popenargs, **kwargs):
     return (output, error)
 
 
-def check_is_in_path(executable, build_env=None):
+def check_is_in_path(executable, env=None):
     """Check that the given executable is to be found in %PATH%"""
-    if find_program(executable, env=build_env) is None:
-        raise NotInPath(executable, env=build_env)
+    if find_program(executable, env=env) is None:
+        raise NotInPath(executable, env=env)
 
 
 def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=None):

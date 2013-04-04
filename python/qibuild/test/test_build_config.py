@@ -1,3 +1,5 @@
+import os
+
 import qisys.sh
 import qibuild.build_config
 import qitoolchain.toolchain
@@ -101,3 +103,12 @@ def test_build_env(build_worktree):
     path = build_config.build_env["PATH"]
     assert r"c:\swig" in path
     assert r"c:\mingw\bin" in path
+
+def test_local_cmake(build_worktree, toolchains):
+    toolchains.create("foo")
+    foo_cmake = os.path.join(build_worktree.root, ".qi", "foo.cmake")
+    with open(foo_cmake, "w") as fp:
+        fp.write("")
+    build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
+    build_config.set_active_config("foo")
+    assert build_config.local_cmake == foo_cmake

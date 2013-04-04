@@ -265,7 +265,7 @@ def get_cmake_qibuild_dir():
     raise Exception(mess)
 
 
-def get_binutil(name, cmake_var=None, build_dir=None, build_env=None):
+def get_binutil(name, cmake_var=None, build_dir=None, env=None):
     """ Get a tool from the binutils package.
     First, look for it in the CMake cache, else look for it in the
     system.

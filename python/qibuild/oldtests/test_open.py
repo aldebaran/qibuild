@@ -91,7 +91,8 @@ class OpenTestCase(unittest.TestCase):
     def test_two_ides_matching_user_conf(self):
         # A default config in local config file,
         # but user used -c
-        qibuild_cfg = qibuild.config.QiBuildConfig(user_config="win32-vs2010")
+        qibuild_cfg = qibuild.config.QiBuildConfig()
+        qibuild_cfg.set_active_config("win32-vs2010")
         global_cfg = StringIO.StringIO(r"""
 <qibuild version="1">
   <config name="win32-vs2010" ide="Visual Studio" />
