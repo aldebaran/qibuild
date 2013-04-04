@@ -17,3 +17,9 @@ def test_setting_build_config_sets_projects_build_dir(build_worktree):
     build_worktree.build_config.build_type = "Release"
     world = build_worktree.get_build_project("world")
     assert "-release" in os.path.basename(world.build_directory)
+
+def test_changing_active_config_changes_projects_build_dir(build_worktree, toolchains):
+    world_proj = build_worktree.create_project("world")
+    toolchains.create("foo")
+    build_worktree.set_active_config("foo")
+    assert "foo" in  world_proj.build_directory
