@@ -101,7 +101,7 @@ class AbstractProjectParser:
         pass
 
     @abc.abstractmethod
-    def all_projects(self):
+    def all_projects(self, args):
         pass
 
     def parse_args(self, args):
@@ -113,7 +113,7 @@ class AbstractProjectParser:
             args = argparse.Namespace(**args)
         # pylint: disable-msg=E1103
         if args.all:
-            return self.all_projects()
+            return self.all_projects(args)
         project_args = args.projects
         # pylint: disable-msg=E1103
         if not args.projects:
