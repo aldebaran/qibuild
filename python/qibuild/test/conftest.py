@@ -91,10 +91,7 @@ def qibuild_action(request):
 class QiBuildAction(TestAction):
     def __init__(self):
         super(QiBuildAction, self).__init__("qibuild.actions")
-
-    @property
-    def build_worktree(self):
-        return TestBuildWorkTree(self.tmp)
+        self.build_worktree = TestBuildWorkTree(self.tmp)
 
     def add_test_project(self, name):
         return self.build_worktree.add_test_project(name)
