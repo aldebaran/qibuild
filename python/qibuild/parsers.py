@@ -58,14 +58,11 @@ def build_parser(parser):
 def project_parser(parser, positional=True):
     """Parser settings for every action using several build projects."""
     group = qisys.parsers.project_parser(parser, positional=positional, short=False)
-    group.add_argument("--no-runtime", "--build-deps-only",
-        action="store_true", dest="build_deps_only",
+    group.add_argument("--build-deps-only",
+        action="store_true", dest="build_only",
         help="Work on specified projects by ignoring the runtime deps. "
              "Useful when you have lots of runtime plugins you don't want to compile "
              "for instance")
-    group.add_argument("--runtime", action="store_true",
-        help="Work on specified projects by using only the runtime deps. "
-             "Mostly used by qibuild install --runtime")
     parser.set_defaults(build_deps=False)
 
 # FIXME
@@ -103,8 +100,12 @@ def get_cmake_builder(args):
     build_worktree = get_build_worktree(args)
     build_projects = get_build_projects(build_worktree, args)
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, build_projects)
-    if args.runtime:
-        cmake_builder.dep_types = ["runtime"]
+    if hasattr(args, "runtime_only") and args.runtime_only:
+        cmake_builder.solving_type = "runtime_only"
+    if args.build_only:
+        cmake_builder.solving_type = "build_only"
+    if args.single:
+        cmake_builder.solving_type = "single"
     return cmake_builder
 
 ##
@@ -122,7 +123,7 @@ def get_build_config(build_worktree, args):
         build_config.profiles = args.profiles
     if args.cmake_generator:
         build_config.cmake_generator = args.cmake_generator
-    if hasattr(args, "cmake_flags"):
+    if hasattr(args, "cmake_flags") and args.cmake_flags:
         # should be a list a strings looking like key=value
         user_flags = list()
         for flag_string in args.cmake_flags:

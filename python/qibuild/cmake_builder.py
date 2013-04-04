@@ -9,18 +9,19 @@ class CMakeBuilder(object):
         self.build_worktree = build_worktree
         self.projects = projects
         self.deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
-        self.dep_types = ["build", "runtime"]
+        self.solving_type = "default"
 
-    def configure(self, **kwargs):
-        """ Configure the projects in the correct order """
-        self.bootstrap_projects()
-        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
-
-        for i, project in enumerate(projects):
-            ui.info_count(i, len(projects),
-                          ui.green, "Configuring",
-                          ui.blue, project.name)
-            project.configure(**kwargs)
+    @property
+    def dep_types(self):
+        if self.solving_type == "default":
+            dep_types = ["build", "runtime"]
+        elif self.solving_type == "build_only":
+            dep_types = ["build"]
+        elif self.solving_type == "runtime_only":
+            dep_types = ["runtime"]
+        elif self.solving_type == "single":
+            dep_types = list()
+        return dep_types
 
     # pylint: disable-msg=E0213
     def need_configure(func):
@@ -38,16 +39,6 @@ class CMakeBuilder(object):
             return res
         return new_func
 
-    @need_configure
-    def build(self, **kwargs):
-        """ Build the projects in the correct order """
-        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
-        for i, project in enumerate(projects):
-            ui.info_count(i, len(projects),
-                          ui.green, "Building",
-                          ui.blue, project.name)
-            project.build(**kwargs)
-
     def bootstrap_projects(self):
         """ Write the dependencies.cmake and the qi/path.conf files for
         every project
@@ -60,15 +51,41 @@ class CMakeBuilder(object):
             sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "runtime"])
             project.write_qi_path_conf(sdk_dirs)
 
+    def configure(self, **kwargs):
+        """ Configure the projects in the correct order """
+        self.bootstrap_projects()
+        if self.solving_type == "single":
+            projects = self.projects
+        else:
+            projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+
+        for i, project in enumerate(projects):
+            ui.info_count(i, len(projects),
+                          ui.green, "Configuring",
+                          ui.blue, project.name)
+            project.configure(**kwargs)
+
+    @need_configure
+    def build(self, **kwargs):
+        """ Build the projects in the correct order """
+        if self.solving_type == "single":
+            projects = self.projects
+        else:
+            projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+        for i, project in enumerate(projects):
+            ui.info_count(i, len(projects),
+                          ui.green, "Building",
+                          ui.blue, project.name)
+            project.build(**kwargs)
+
     @need_configure
     def install(self, dest_dir, **kwargs):
         """ Install the projects and the packages to the dest_dir """
-        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+        if self.solving_type == "single":
+            projects = self.projects
+        else:
+            projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         packages = self.deps_solver.get_dep_packages(self.projects, self.dep_types)
-        # runtime boolean is actually a shorthand for dep_types == ["runtime"]
-        # FIXME: change the install() method to accept a list of dep types
-        # instead
-        runtime = self.dep_types == ["runtime"]
 
         # Compute the real path where to install the packages:
         prefix = kwargs.get("prefix", "/")
@@ -84,7 +101,8 @@ class CMakeBuilder(object):
                 ui.info(" *", ui.blue, package.name)
         ui.info(ui.green, "will be installed to", ui.blue, real_dest)
 
-        if runtime:
+        runtime_only = self.solving_type == "runtime_only"
+        if runtime_only:
             ui.info(ui.green, "(runtime components only)")
 
         if packages:
@@ -94,7 +112,7 @@ class CMakeBuilder(object):
             ui.info_count(i, len(projects),
                           ui.green, "Insalling",
                           ui.blue, package.name)
-            package.install(real_dest, runtime=runtime, **kwargs)
+            package.install(real_dest, runtime=runtime_only, **kwargs)
 
         print
         ui.info(ui.green, ":: ", "Installing projects")
@@ -102,7 +120,8 @@ class CMakeBuilder(object):
             ui.info_count(i, len(projects),
                           ui.green, "Insalling",
                           ui.blue, project.name)
-            project.install(dest_dir, runtime=runtime, **kwargs)
+            project.install(dest_dir, runtime=runtime_only, **kwargs)
+
 
 
 class NotConfigured(Exception):
