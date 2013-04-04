@@ -85,20 +85,30 @@ def get_build_worktree(args):
         ui.info(ui.green, "Using profile:", ui.blue, profile)
     return build_worktree
 
-def get_build_projects(build_worktree, args):
+def get_build_projects(build_worktree, args, solve_deps=True):
     """ Get a list of build projects to use from an argparse.Namespace
     object
 
     """
     parser = BuildProjectParser(build_worktree)
-    return parser.parse_args(args)
+    projects = parser.parse_args(args)
+    if not solve_deps or args.single:
+        return projects
+    if args.build_only:
+        dep_types = ["build"]
+    else:
+        dep_types = ["build", "runtime"]
+    deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
+    return deps_solver.get_dep_projects(projects, dep_types)
+
 
 def get_cmake_builder(args):
     """ Get a CMakeBuilder object from the command line
 
     """
     build_worktree = get_build_worktree(args)
-    build_projects = get_build_projects(build_worktree, args)
+    # dep solving will be made later by the CMakeBuilder
+    build_projects = get_build_projects(build_worktree, args, solve_deps=False)
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, build_projects)
     if hasattr(args, "runtime_only") and args.runtime_only:
         cmake_builder.solving_type = "runtime_only"
