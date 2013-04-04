@@ -6,6 +6,7 @@ import qisys.command
 import qisys.sh
 import qibuild.cmake
 import qibuild.build
+import qibuild.gdb
 
 class BuildProject(object):
     def __init__(self, build_worktree, worktree_project):
@@ -279,7 +280,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             self.build(target="install", fix_shared_libs=False, env=build_env)
 
         if split_debug:
-            self.split_debug()
+            self.split_debug(destdir)
 
     def install_runtime(self, destdir):
         build_env = self.build_env.copy()
@@ -300,6 +301,17 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             ui.debug("Installing", component)
             qisys.command.call(["cmake"] + cmake_args, cwd=self.build_directory,
                                env=build_env)
+
+    def deploy(self, url, split_debug=True, use_rsync=True, port=22):
+        """ Deploy the project to a remote url """
+        destdir = os.path.join(self.build_directory, "deploy")
+        #create folder for project without install rules
+        qisys.sh.mkdir(destdir, recursive=True)
+        self.install_runtime(destdir)
+        if split_debug:
+            self.split_debug(destdir)
+        ui.info(ui.green, "Sending binaries to target ...")
+        qibuild.deploy.deploy(destdir, url, use_rsync=use_rsync, port=port)
 
     def fix_shared_libs(self):
         # FIXME !

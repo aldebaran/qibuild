@@ -40,3 +40,5 @@
 
 * remove qitoolchain.get()
 
+* choose between destdir and dest_dir
+

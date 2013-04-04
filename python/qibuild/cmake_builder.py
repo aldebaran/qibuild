@@ -2,6 +2,7 @@ import os
 import functools
 
 from qisys import ui
+import qisys.sh
 import qibuild.deps_solver
 
 class CMakeBuilder(object):
@@ -33,7 +34,9 @@ class CMakeBuilder(object):
         def new_func(self, *args, **kwargs):
             projects = self.deps_solver.get_dep_projects(self.projects, ["build"])
             for project in projects:
-                if not os.path.exists(project.build_directory):
+                cmake_cache = os.path.join(project.build_directory,
+                                           "CMakeCache.txt")
+                if not os.path.exists(cmake_cache):
                     raise NotConfigured(project)
             res = func(self, *args, **kwargs)
             return res
@@ -122,6 +125,50 @@ class CMakeBuilder(object):
                           ui.blue, project.name)
             project.install(dest_dir, runtime=runtime_only, **kwargs)
 
+    @need_configure
+    def deploy(self, url, use_rsync=True, port=22, split_debug=True):
+        """ Deploy the project and the packages it depends to a remote url """
+        if self.solving_type == "single":
+            dep_packages = list()
+            dep_projects = self.projects
+        else:
+            dep_packages = self.deps_solver.get_dep_packages(self.projects,
+                                                             ["runtime"])
+            dep_projects = self.deps_solver.get_dep_projects(self.projects,
+                                                            ["runtime"])
+        ui.info(ui.green, "The following projects")
+        for project in dep_projects:
+            ui.info(ui.green, " *", ui.blue, project.name)
+        if dep_packages:
+            ui.info(ui.green, "and the following packages")
+            for package in dep_packages:
+                ui.info(" *", ui.blue, package.name)
+        ui.info(ui.green, "will be deployed to", ui.blue, url)
+
+        # Deploy packages: install all of them in the same temp dir, then
+        # deploy this temp dir to the target
+        if dep_packages:
+            print
+            ui.info(ui.green, ":: ", "Deploying packages")
+            with qisys.sh.TempDir() as tmp:
+                for i, package in enumerate(dep_packages):
+                    ui.info_count(i, len(dep_packages),
+                        ui.green, "Deploying package", ui.blue, package.name,
+                        ui.green, "to", ui.blue, url)
+                    package.install(tmp, runtime=True)
+                qibuild.deploy.deploy(tmp, url, use_rsync=use_rsync, port=port)
+
+
+        print
+        ui.info(ui.green, ":: ", "Deploying projects")
+        # Deploy projects: install them inside a 'deploy' dir inside the build dir,
+        # then deploy this dir to the target
+        for (i, project) in enumerate(dep_projects):
+            ui.info_count(i, len(dep_projects),
+                    ui.green, "Deploying project", ui.blue, project.name,
+                    ui.green, "to", ui.blue, url)
+            project.deploy(url)
+
 
 
 class NotConfigured(Exception):
@@ -131,7 +178,6 @@ class NotConfigured(Exception):
     def __str__(self):
         mess = """\
 The project {project.name} has not been configured yet.
-(The build directory {project.build_directory} does not exist)
 Please run `qibuild configure` first
 """
         return mess.format(project=self.project)

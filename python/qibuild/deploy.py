@@ -185,7 +185,7 @@ def _get_subfolder(directory):
     return res
 
 
-def _generate_solib_search_path(toc, project_name):
+def _generate_solib_search_path(oc, project_name):
     """ generate the solib_search_path useful for gdb """
     res = []
     dep_solver = DependenciesSolver(projects=toc.projects,

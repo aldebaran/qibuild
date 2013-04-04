@@ -98,6 +98,14 @@ class Package():
         # Quick hack for now
         self.depends = list()
 
+    def install(self, destdir, runtime=True):
+        """ Install the package to a destination """
+        if runtime:
+            qisys.sh.install(self.path, destdir,
+                filter_fun=qisys.sh.is_runtime)
+        else:
+            qisys.sh.install(self.path, destdir)
+
     def __repr__(self):
         res = "<Package %s in %s"  % (self.name, self.path)
         if self.toolchain_file:
@@ -414,17 +422,3 @@ class Toolchain(object):
             if package.cross_gdb:
                 return package.cross_gdb
 
-    def install_package(self, package_name, destdir, runtime=False):
-        """ Install a package to a destdir.
-
-        If a runtime is False, only the runtime files
-        (dynamic libraries, executables, config files) will be
-        installed
-
-        """
-        package_path = self.get(package_name)
-        if runtime:
-            qisys.sh.install(package_path, destdir,
-                filter_fun=qisys.sh.is_runtime)
-        else:
-            qisys.sh.install(package_path, destdir)
