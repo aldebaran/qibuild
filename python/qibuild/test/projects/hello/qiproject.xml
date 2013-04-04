@@ -1,0 +1,3 @@
+<project name="hello">
+  <depends runtime="true" buildtime="true" names="world"/>
+</project>

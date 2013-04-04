@@ -34,9 +34,7 @@ class CMakeBuilder(object):
         def new_func(self, *args, **kwargs):
             projects = self.deps_solver.get_dep_projects(self.projects, ["build"])
             for project in projects:
-                cmake_cache = os.path.join(project.build_directory,
-                                           "CMakeCache.txt")
-                if not os.path.exists(cmake_cache):
+                if not os.path.exists(project.cmake_cache):
                     raise NotConfigured(project)
             res = func(self, *args, **kwargs)
             return res

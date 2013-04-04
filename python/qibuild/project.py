@@ -25,6 +25,7 @@ class BuildProject(object):
         """ Path to qiproject.xml """
         return os.path.join(self.path, "qiproject.xml")
 
+
     @property
     def build_directory(self):
         """ Return a suitable build directory, depending on the
@@ -55,6 +56,10 @@ class BuildProject(object):
 
         # FIXME: handle custom build dir
         return os.path.join(self.path, "-".join(parts))
+
+    @property
+    def cmake_cache(self):
+        return os.path.join(self.build_directory, "CMakeCache.txt")
 
     @property
     def cmake_args(self):

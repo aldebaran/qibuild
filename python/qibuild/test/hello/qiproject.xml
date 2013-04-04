@@ -1,3 +1,0 @@
-<project name="hello">
-  <depends buildtime="true" names="world"/>
-</project>

@@ -7,6 +7,7 @@ import mock
 
 from qisys import ui
 import qisys.sh
+import qisys.script
 import qisys.interact
 import qisys.worktree
 

@@ -60,6 +60,17 @@ int main()
         self.worktree.add_project(src)
         return self.get_build_project(src)
 
+    def add_test_project(self, name):
+        """ Copy a project, reading the sources from qibuild/test/projects
+
+        """
+        this_dir = os.path.dirname(__file__)
+        src = os.path.join(this_dir, "projects", name)
+        dest = os.path.join(self.root, name)
+        qisys.sh.install(src, dest)
+        self.worktree.add_project(name)
+        return self.get_build_project(name)
+
 # pylint: disable-msg=E1101
 @pytest.fixture
 def build_worktree(request):
@@ -69,3 +80,21 @@ def build_worktree(request):
     request.addfinalizer(clean)
     wt = TestBuildWorkTree(tmp)
     return wt
+
+# pylint: disable-msg=E1101
+@pytest.fixture
+def qibuild_action(request):
+    res = QiBuildAction()
+    request.addfinalizer(res.reset)
+    return res
+
+class QiBuildAction(TestAction):
+    def __init__(self):
+        super(QiBuildAction, self).__init__("qibuild.actions")
+
+    @property
+    def build_worktree(self):
+        return TestBuildWorkTree(self.tmp)
+
+    def add_test_project(self, name):
+        return self.build_worktree.add_test_project(name)

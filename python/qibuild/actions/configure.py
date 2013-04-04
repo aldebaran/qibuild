@@ -7,8 +7,9 @@
 """
 
 from qisys import ui
-import qibuild
+
 import qibuild.cmake
+import qibuild.parsers
 
 def configure_parser(parser):
     """Configure parser for this action"""
