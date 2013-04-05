@@ -10,13 +10,13 @@ import os
 import re
 import sys
 import difflib
-import qisys.log
 from xml.etree import ElementTree as etree
 
+from qisys import ui
 import qisys.parsers
+
 import qibuild
 
-LOGGER = qisys.log.get_logger(__name__)
 
 def guess_project_name(source_dir):
     """ Try to guess the project name
@@ -25,14 +25,6 @@ def guess_project_name(source_dir):
     res = None
     qiproj_xml = os.path.join(source_dir, "qiproject.xml")
     res = name_from_xml(qiproj_xml)
-    if res:
-        return res
-    qibuild_manifest = os.path.join(source_dir, "qibuild.manifest")
-    res = name_from_cfg(qibuild_manifest)
-    if res:
-        return res
-    base_cfg = os.path.join(source_dir, "base.cfg")
-    res = name_from_cfg(base_cfg)
     if res:
         return res
     cmakelists = os.path.join(source_dir, "CMakeLists.txt")
@@ -69,25 +61,6 @@ def name_from_xml(xml_path):
 
     return name
 
-def name_from_cfg(cfg_path):
-    """ Get a name from a .cfg file
-
-    """
-    if not os.path.exists(cfg_path):
-        return None
-    config = qibuild.configstore.ConfigStore()
-    config.read(cfg_path)
-    projects = config.get("project")
-    if not projects:
-        return None
-    if len(projects) == 1:
-        return projects.keys()[0]
-
-    for (name, project) in projects.iteritems():
-        if project.get("depends"):
-            return name
-
-    return None
 
 def name_from_cmakelists(cmakelists):
     """ Get a project name from a CMakeLists.txt file
@@ -172,14 +145,14 @@ find_package(qibuild)
             new_lines.append(line)
 
     if dry_run:
-        print "Would patch", cmakelists
+        ui.info("Would patch", cmakelists)
         # Print a nice diff
         for line in difflib.unified_diff(old_lines, new_lines):
             sys.stdout.write(line)
         return
 
     with open(cmakelists, "w") as fp:
-        print "Patching", cmakelists
+        ui.info("Patching", cmakelists)
         fp.writelines(new_lines)
 
 def create_qiproj_xml(args):
@@ -207,30 +180,13 @@ def create_qiproj_xml(args):
     proj_elem.set("name", project_name)
     tree = etree.ElementTree(element=proj_elem)
     if args.dry_run:
-        print "Would create", qiproj_xml
-        print "with: "
-        print etree.tostring(proj_elem)
+        ui.info("Would create", qiproj_xml, "\n"
+               "with:", etree.tostring(proj_elem))
         return
 
-    print "Creating", qiproj_xml
+    ui.info("Creating", qiproj_xml)
     tree.write(qiproj_xml)
 
-def clean_up(args):
-    """ Clean up old qibuild.cmake, boostrap.cmake, qibuild.manifest
-    files
-
-    """
-    source_dir = args.source_dir
-    names_to_remove = ["qibuild.cmake", "bootstrap.cmake", "qibuild.manifest"]
-    for (root, _dirs, filenames) in os.walk(source_dir):
-        for filename in filenames:
-            if filename in names_to_remove:
-                full_path = os.path.join(root, filename)
-                if args.dry_run:
-                    print "Would remove", full_path
-                else:
-                    print "Removing", full_path
-                    qisys.sh.rm(full_path)
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -261,7 +217,7 @@ def do(args):
 
     if not args.project_name:
         args.project_name = guess_project_name(args.source_dir)
-        LOGGER.info("Detected project name: %s", args.project_name)
+        ui.info(ui.green, "Detected project name:", args.project_name)
 
     # Create qiproject.xml
     create_qiproj_xml(args)
@@ -275,8 +231,5 @@ def do(args):
     cmakelists = os.path.join(source_dir, "CMakeLists.txt")
     fix_root_cmake(cmakelists, project_name, dry_run=args.dry_run)
 
-    # Remove useless files
-    clean_up(args)
-
     if args.dry_run:
-        LOGGER.info("Re-run with `qibuild convert --go` to proceed")
+        ui.info(ui.green, "Re-run with `qibuild convert --go` to proceed")

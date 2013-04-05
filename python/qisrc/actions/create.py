@@ -4,13 +4,10 @@
 """Create a new project """
 
 import os
-import qisys.log
-import qisys.command
-import qisys.worktree
-import qisrc
-import qisrc.parsers
 
-LOGGER = qisys.log.get_logger(__name__)
+from qisys import ui
+import qisys.parsers
+import qibuild.parsers
 
 def copy_helper(project_name, directory):
     """Create a new project in the specified directory.
@@ -39,12 +36,10 @@ def configure_parser(parser):
 
 def do(args):
     """"Create a new project """
-    # Try to open a worktree.
-    # If not, ask the user if he wants to create one:
-    qiwt = qisys.parsers.get_worktree(args)
+    build_worktree = qibuild.parsers.get_build_worktree(args)
 
     project_name = args.project_name
-    project_path = os.path.join(qiwt.root, project_name)
+    project_path = os.path.join(build_worktree.root, project_name)
 
     if os.path.exists(project_path):
         raise Exception("%s already exists" % project_path)
@@ -58,5 +53,6 @@ def do(args):
         qisys.command.call(["git" , "add" , "."], cwd=project_path)
         qisys.command.call(["git" , "commit" , "-m" , "initial commit"], cwd=project_path)
 
-    LOGGER.info("New project initialized in %s", project_path)
-    qiwt.add_project(project_path)
+    ui.info(ui.green, "New project initialized in", ui.bold,  project_path)
+    build_worktree.worktree.add_project(project_path)
+    return build_worktree.get_build_project(project_name)

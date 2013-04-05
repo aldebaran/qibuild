@@ -6,13 +6,12 @@
 import subprocess
 
 import qisys
-import qibuild
+import qibuild.parsers
 import qibuild.wizard
 from qisys import ui
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     parser.add_argument("--edit", action="store_true",
         help="edit the configuration")
@@ -24,18 +23,18 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    toc = None
+    build_worktree = None
     try:
-        toc = qibuild.toc.toc_open(args.worktree, args)
+        build_worktree = qibuild.parsers.get_build_worktree(args)
     except qisys.worktree.NotInWorkTree:
         pass
 
     if args.wizard:
-        qibuild.wizard.run_config_wizard(toc)
+        qibuild.wizard.run_config_wizard(build_worktree)
         return
 
     is_local = args.is_local
-    if is_local and not toc:
+    if is_local and not build_worktree:
         raise Exception("Cannot use --local when not in a worktree")
 
     qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -50,31 +49,23 @@ def do(args):
 
         full_path = qisys.command.find_program(editor)
         if is_local:
-            cfg_path = toc.qibuild_xml
+            cfg_path = build_worktree.qibuild_xml
         else:
             cfg_path = qibuild.config.get_global_cfg_path()
         subprocess.call([full_path, cfg_path])
         return
 
-    if not toc:
+    if not build_worktree:
         print qibuild_cfg
         return
 
     if not is_local:
         print "General configuration"
         print "---------------------"
-        print ui.indent(str(toc.config))
+        print ui.indent(str(qibuild_cfg))
         print
 
     print "Local configuration"
     print "-------------------"
-    print ui.indent(str(toc.config.local))
+    print ui.indent(str(qibuild_cfg.local))
 
-    print
-    print "Projects configuration"
-    print "----------------------"
-    projects = toc.projects
-    if projects:
-        print "  Projects:"
-        for project in projects:
-            print ui.indent(str(project.config), num=4)

@@ -60,16 +60,22 @@ int main()
         self.worktree.add_project(src)
         return self.get_build_project(src)
 
-    def add_test_project(self, name):
-        """ Copy a project, reading the sources from qibuild/test/projects
+    def add_test_project(self, src, name=None):
+        """ Copy a project, reading the sources
+        from qibuild/test/projects
 
         """
+        if not name:
+            name = os.path.basename(src)
         this_dir = os.path.dirname(__file__)
-        src = os.path.join(this_dir, "projects", name)
-        dest = os.path.join(self.root, name)
-        qisys.sh.install(src, dest)
-        self.worktree.add_project(name)
-        return self.get_build_project(name)
+        src_path = os.path.join(this_dir, "projects", src)
+        dest_path = os.path.join(self.root, src)
+        qisys.sh.install(src_path, dest_path)
+        self.worktree.add_project(src)
+        # using raises=False for convert tests
+        return self.get_build_project(name, raises=False)
+
+
 
 # pylint: disable-msg=E1101
 @pytest.fixture
@@ -94,4 +100,19 @@ class QiBuildAction(TestAction):
         self.build_worktree = TestBuildWorkTree(self.tmp)
 
     def add_test_project(self, name):
+        """ Add a test project using a project path in
+        <this_dir>/projects/
+
+        """
         return self.build_worktree.add_test_project(name)
+
+    def create_project(self, name, **kwargs):
+        """ Delegates to TestBuildWorkTree.create_project """
+        return self.build_worktree.create_project(name, **kwargs)
+
+    def reload_worktree(self):
+        """ Reload the worktee. Useful when an *other* BuildWorkTree
+        has changed the cache
+
+        """
+        self.build_worktree = TestBuildWorkTree(self.tmp)

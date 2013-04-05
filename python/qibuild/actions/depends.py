@@ -6,12 +6,12 @@
 
 """
 
-import qibuild
 import qisys.ui
+import qibuild.deps_solver
+import qibuild.parsers
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("depends arguments",
@@ -22,6 +22,8 @@ def configure_parser(parser):
             "\nUse --tree or --graph to control the output format."
             "\nFor best results with --graph, use:\nqibuild depends "
             "--graph | dot -Tpng -oout.png -Goverlap=scale -Gsplines=true")
+    group.add_argument("--runtime", action="store_true", default=False,
+                       help="use runtime dependencies only")
     group.add_argument("--reverse", action="store_true", default=False,
                        help="show projects that depend on the current project")
     group.add_argument("--tree", action="store_true", default=False,
@@ -49,19 +51,20 @@ class DependencyRelationship:
         return (other.from_name == self.from_name and
             other.to_name == self.to_name)
 
-def get_deps(toc, project, single, runtime, reverse):
+def get_deps(build_worktree, project, single, runtime, reverse):
     """ create a list of DependencyRelationship objects ready for display """
+    deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
     if reverse:
-        (packages, projects) =  (set(), toc.projects)
+        (packages, projects) =  (set(), build_worktree.projects)
     else:
-        if not runtime:
-            (packages, projects) = qibuild.cmdparse.get_deps(
-                toc, [project], build_deps=True)
+        if runtime:
+            dep_types = ["build"]
         else:
-            (packages, projects) = qibuild.cmdparse.get_deps(
-                toc, [project], runtime=True)
+            dep_types = ["runtime"]
+        projects = deps_solver.get_dep_projects([project], dep_types)
+        packages = deps_solver.get_dep_packages([project], dep_types)
 
-    # hack, remove self from projects
+    # Remove self from projects
     projects = [x for x in projects if x.name is not project.name]
 
     if reverse:
@@ -256,17 +259,10 @@ def collect_dependencies(project, projects, packages, single, runtime, depth=0):
 
 def do(args):
     """Main entry point for depends action"""
-    toc = qibuild.toc.toc_open(args.worktree, args)
-
-    # small hack:
-    if args.projects:
-        args.project = args.projects[0]
-    else:
-        args.project = None
-
-    project = qibuild.cmdparse.project_from_args(toc, args)
+    build_worktree = qibuild.parsers.get_build_worktree(args)
+    project = qibuild.parsers.get_one_build_project(build_worktree, args)
     collected_dependencies = get_deps(
-        toc, project, args.single, args.runtime, args.reverse)
+        build_worktree, project, args.single, args.runtime, args.reverse)
 
     # create title
     label = project.name
