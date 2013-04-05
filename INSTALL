@@ -9,24 +9,26 @@ Use this method if you wish to use qibuild from the git repository.
 After this is done, you just have to pull the git repository to
 have an up-to-date qibuild.
 
-This is the preferred method right now ::
+This is the preferred method right now.
+
 
 Linux, Mac
-++++++++++
++++++++++++
 
-* Make sure ``~/.local/bin`` is in your $PATH environment variable
+Simply run::
 
+  ./install-qibuild.sh
 
 Windows
 +++++++
 
 
-* Make sure ``c:\Python27`` and ``c:\Python27\scripts`` are in the ``%PATH%``
-  environment variable (adapt these paths to reflect your Python's installation)
+* Make sure ``c:\Python27`` and ``c:\Python27\scripts`` are in ``%PATH%``
+  (adapt these paths to reflect your Python's installation)
 
-Then install ``pip <http://www.pip-installer.org>`_ and run::
+Then run::
 
-  pip install -e git://github.com/alderaban/qibuild.git
+  install-qibuild.bat
 
 
 qicd
@@ -34,6 +36,7 @@ qicd
 
 If you want to use `qicd` from your shell, you have to :
 
+* run install-qibuild.sh
 * source the ``python/bin/qicd.sh`` script in you ``~/.profile`` or similar
 
 (Tested with bash and zsh, works on mingwin's bash on Windows, too)
