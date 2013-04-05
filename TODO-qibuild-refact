@@ -42,3 +42,21 @@
 
 * choose between destdir and dest_dir
 
+* remove qisrc manifest from "local config"
+
+* `qibuild config` should list the available build profiles
+
+* implement conversion from old syntax
+
+* remove `--quiet-commands`
+
+* add group for every action parser
+
+* move qisys.ui.find_message to qisys.test.conftests
+
+* fix all doc strings ...
+
+* handle custom build dir
+
+* handle custom sdk dir ?
+
