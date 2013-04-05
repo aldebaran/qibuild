@@ -76,9 +76,12 @@ def get_build_worktree(args):
     """
     worktree = qisys.parsers.get_worktree(args)
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
+    ui.info(ui.green, "Current build worktree:", ui.reset, ui.bold, build_worktree.root)
+    if not hasattr(args, "config"):
+        # build_parser() has not been called, so do leave the default build_config
+        return build_worktree
     build_config = get_build_config(build_worktree, args)
     build_worktree.build_config = build_config
-    ui.info(ui.green, "Current build worktree:", ui.reset, ui.bold, build_worktree.root)
     if build_config.toolchain:
         ui.info(ui.green, "Using toolchain:", ui.blue, build_config.toolchain.name)
     for profile in build_config.profiles:
@@ -87,7 +90,8 @@ def get_build_worktree(args):
 
 def get_build_projects(build_worktree, args, solve_deps=True):
     """ Get a list of build projects to use from an argparse.Namespace
-    object
+    object. Useful when you do not need a CMakeBuilder.
+    You can choose wether or not to solve the dependencies
 
     """
     parser = BuildProjectParser(build_worktree)
@@ -101,6 +105,16 @@ def get_build_projects(build_worktree, args, solve_deps=True):
     deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
     return deps_solver.get_dep_projects(projects, dep_types)
 
+def get_one_build_project(build_worktree, args):
+    """ Get one build project from the command line.
+    (zero or one project name may be specified)
+
+    """
+    parser = BuildProjectParser(build_worktree)
+    projects = parser.parse_args(args)
+    if not len(projects) == 1:
+        raise Exception("This action can only work on one project")
+    return projects[0]
 
 def get_cmake_builder(args):
     """ Get a CMakeBuilder object from the command line
