@@ -2,7 +2,6 @@ import os
 
 import qisys.command
 import qisys.worktree
-from qibuild.dependencies_solver import topological_sort
 import qibuild.build
 import qibuild.build_config
 import qibuild.project
