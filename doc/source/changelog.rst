@@ -3,15 +3,14 @@
 Changelog
 =========
 
-Upcoming release
-----------------
+V2.2
+----
 
-CMake
-+++++
+General
++++++++
 
-* Keep ``CMAKE_FIND_ROOT_PATH`` clean during incremental builds
-* Fix using :cmake:function:`qi_add_optional_package` with a file defining some macros
-* ``boost``: support 1.53, adapt ``boost_flib`` for libraries being only headers
+* Update of the doc
+* Remove compatibility with python 2.6
 
 Command line
 ++++++++++++
@@ -19,14 +18,29 @@ Command line
 * ``qisrc sync``: Prevent unwanted rebases when we are already synced
 * Fix return code of ``qibuild test --list``
 * ``qilinguist``: Stop doing backup when merging catalog files
+* ``qibuild test`` learn ``--ncpu`` to restrict the number of CPUs
+* ``qisrc grep`` learn ``--project`` to run only on some specific project
+* Tests are now colored under a tty
+* ``qisrc foreach`` learn ``--project`` to run only on some specific project
+* ``qisrc foreach`` learn ``--dry-run`` to dry run the command
+
+CMake
++++++
+
+* Keep ``CMAKE_FIND_ROOT_PATH`` clean during incremental builds
+* Fix using :cmake:function:`qi_add_optional_package` with a file defining some macros
+* ``boost``: support 1.53, adapt ``boost_flib`` for libraries being only headers
+* Fix perf tests with VisualStudio
+
+Python
+++++++
+
+* Move ``qixml`` to ``qisys``
+* ``XMLParser`` now take a ``target``
+* ``qitoolchain`` now update toolchain instead of deleting and create
 
 V2.1
 ----
-
-General
-++++++++
-
-* Remove compatibility with python 2.6
 
 Command line
 ++++++++++++
