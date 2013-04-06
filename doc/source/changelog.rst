@@ -3,53 +3,125 @@
 Changelog
 =========
 
-v2.3
-----
-
-Command line
-++++++++++++
-
-* Add ``qisrc maintainer``
-* Fix ``qibuild clean -z`` behavior
-* Fix a bug where ``qbibuild make`` could create recursive symlinks
-* ``qibuild clean`` learned ``-x`` to remove build directories that match no known configurations
-* ``qibuild deploy`` now accepts url matching [[login]@]url[:[relative/path]] or url parseable with urlparse beginning with ssh:// only
-* ``qibuild deploy`` no longer accepts a ``--port`` option, specify the port
-  inside the url instead::
-
-    # old
-    qibuild deploy --port 23 user@host:path/to/remote/dir
-    # new
-    qibuild deploy ssh://user@host:32/full/path/to/remote/dir
-
-* ``qibuild deploy``: project is no more a positional argument
-* Positional url is no more mandatory in ``qibuild deploy``, and you
-  can now deploy to several urls at once
-* ``qibuild create`` no longer exists, use ``qisrc create instead``
-
-CMake
+V3.0
 -----
 
-* ``qi_add_test`` now also accepts a package name as test binary
-* qibuild cmake modules:
+General
+-------
 
-  * add ``boost-python``
-  * ``python-config.cmake`` now longer searches or python2.6, and does not
-    look for ``python_d`` even when building in debug. (this is required
-    to make ``boost-python`` work when using Visual Studio)
-  * bug fix when using ``find_package`` twice with a CMake module calling
-    ``pkg_search_module`` (for instance with ``qi_add_optional_package``)
+* Tons of bug fixes, massive Python refactoring
+
+Command line
++++++++++++++
+
+General
+~~~~~~~
+
+* Some actions that could only run on *all* projects learned a ``-p,--projects``
+  argument. You can now for instance use ``qibuild foreach -p hello -- <cmd>``
+  to run ``<cmd>`` on the ``hello`` project and its dependencies
+
+* It is now impossible to have nested worktrees.
+  * The ``--force`` option is gone
+  * ``qibuild init``, ``qisrc init``, will only run if the working
+    directory is empty
+
+qisrc
+~~~~~
+
+* ``qisrc init`` learned ``--groups`` to only clone some repositories
+* ``qisrc pull`` learned ``--build-deps``  to pull the build dependencies
+  of a project
+* ``qisrc sync`` now always clones the missing projects (even when not using
+  ``-a``)
+* ``qisrc sync`` now handles repositories renames
+* Since this option clashes with other qibuild option, you should now use
+  ``qibuild configure --no-runtime`` or ``qibuild configure --build-deps-only``
+  instead of ``qibuild configure --build-deps``
+* ``qisrc sync`` logic changed to be a bit more reliable and fail less often
+* ``qisrc push`` learned ``--username``, making it possible to use qisrc with
+  several users on the same repo
+* ``qisrc foreach`` learned ``--all``, to run on every projects (previously
+  it could only run on git projects)
+* add ``qisrc manifest``
+* ``qisrc init`` can now only be used once. To add a new manifest, run
+  ``qisrc manifest name url``. This makes it possible to change the groups,
+  too
+
+qibuild
+~~~~~~~
+
+* ``qibuild init -c`` is deprecated, use ``qitoolchain set-default`` instead
+* ``qibuild init --interactive`` is deprecated, use ``qibuild config --wizard`` instead
 
 
-Python
-++++++
 
-* Add ``qisrc.maintainer`` to manage maintainers from ``qiproject.xml``
-* Add ``qisys.ui.indent_iterable`` to indent list or any iterable
-* ``qisys.parsers.project_parser`` learned ``short`` option to disable -p of project
-* ``qibuild.parsers.project_parser`` learn ``positional``
-* Add ``qibuild.deploy.action.find_rsync_or_scp``
-* ``qibuild.deploy.parse_url`` return a dict
+Config files
+++++++++++++
+
+* Manifests are now cloned in ``.qi/manifests``, making it possible to
+  have code review on manifests repositories too
+* Syntax of ``qiproject.xml`` changed:
+
+.. code-block:: xml
+
+    <!-- old -->
+    <project name="foo">
+      <depends runtime="true" names="bar" />
+      <qidoc name="foo-doc" src="." />
+    </project>
+
+.. code-block:: xml
+
+    <!-- new -->
+    <project>
+      <qibuild name="foo">
+        <depends runtime="true" names="bar" />
+      </qibuild>
+
+      <qidoc name="foo-doc" />
+    </project>
+
+This is more consistent, and helps solving nasty bugs when using nested
+qibuild projects.
+
+* Syntax of the ``manifests.xml`` changed:
+
+.. code-block:: xml
+
+    <!-- old -->
+    <manifest>
+      <remote name="origin" fetch="git://example.com"
+              review="http://gerrit:8080" />
+      <project name="libfoo.git"
+               path="lib/libfoo"
+               revision="next"
+               review="true" />
+    </manifest>
+
+.. code-block:: xml
+
+    <!-- new -->
+    <manifest>
+      <remote name="origin" url="git://example.com" />
+      <remote name="gerrit" url="http://gerrit:8080" review="true" />
+
+      <repo src="lib/libfoo" default_branch="next" remote="gerrit" />
+    </manifest>
+
+* Note that in this case the ``next`` branch of the repo in ``lib/libfoo``
+  will track ``http://gerrit:8080/libfoo.git`` instead of
+  ``git://example.com``. This makes it possible to use gerrit only,
+  without any mirror, and it also means you don't have to wait for the
+  gerrit synchronization, which is hepful when using ``qisrc`` on a
+  buildfarm plugged to gerrit.
+
+
+* The default manifest in now called ``manifest.xml`` instead of ``default.xml`` to
+  ease the transition.
+
+* ``qisrc`` profiles are gone, we now use groups instead.
+
 
 V2.2
 ----
@@ -59,8 +131,6 @@ General
 
 * Update of the doc
 * Remove compatibility with python 2.6
-* You can now set the environment variable ``VERBOSE=1`` to trigger debug
-  messages
 
 Command line
 ++++++++++++
@@ -69,11 +139,10 @@ Command line
 * Fix return code of ``qibuild test --list``
 * ``qilinguist``: Stop doing backup when merging catalog files
 * ``qibuild test`` learn ``--ncpu`` to restrict the number of CPUs
-* Tests are now colored under a tty
 * ``qisrc grep`` learn ``--project`` to run only on some specific project
+* Tests are now colored under a tty
 * ``qisrc foreach`` learn ``--project`` to run only on some specific project
 * ``qisrc foreach`` learn ``--dry-run`` to dry run the command
-* Fix using ``qibuild deploy`` to a remote folder containing upper-case letters
 
 CMake
 +++++
@@ -82,8 +151,6 @@ CMake
 * Fix using :cmake:function:`qi_add_optional_package` with a file defining some macros
 * ``boost``: support 1.53, adapt ``boost_flib`` for libraries being only headers
 * Fix perf tests with VisualStudio
-* ``qi_create_gtest`` now only works with Aldebaran's fork of gtest
-* ``qi_generate_src`` can now generate several files with one command
 
 Python
 ++++++
