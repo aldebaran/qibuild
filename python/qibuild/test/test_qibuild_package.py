@@ -1,0 +1,28 @@
+import os
+
+from qibuild.test.conftest import QiBuildAction
+from qitoolchain.test.conftest import QiToolchainAction
+
+
+def test_simple(qibuild_action):
+    qibuild_action.add_test_project("world")
+    world_archive = qibuild_action("package", "world")
+    assert os.path.exists(world_archive)
+
+def test_using_toolchain(tmpdir, monkeypatch):
+    monkeypatch.chdir(tmpdir)
+    qibuild_action = QiBuildAction(worktree_root=tmpdir.strpath)
+    qitoolchain_action = QiToolchainAction(worktree_root=tmpdir.strpath)
+    build_worktree = qibuild_action.build_worktree
+    world_proj = qibuild_action.add_test_project("world")
+    qibuild_action.add_test_project("hello")
+    world_package = qibuild_action("package", "world")
+    qitoolchain_action("create", "foo")
+    qitoolchain_action("add-package", "-c", "foo", "world", world_package)
+    build_worktree.worktree.remove_project("world", from_disk=True)
+
+    # this should now fail (no world-config.cmake found)
+    qibuild_action("configure", "hello", raises=True)
+
+    # but this should pass:
+    qibuild_action("configure", "-c", "foo", "hello")

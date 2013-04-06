@@ -95,8 +95,9 @@ def qibuild_action(request):
     return res
 
 class QiBuildAction(TestAction):
-    def __init__(self):
-        super(QiBuildAction, self).__init__("qibuild.actions")
+    def __init__(self, worktree_root=None):
+        super(QiBuildAction, self).__init__("qibuild.actions",
+                                            worktree_root=worktree_root)
         self.build_worktree = TestBuildWorkTree(self.tmp)
 
     def add_test_project(self, name):

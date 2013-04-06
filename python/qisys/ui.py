@@ -189,8 +189,6 @@ def tabs(num):
     """ Compute a blank tab """
     return "  " * num
 
-
-
 class timer:
     """ To be used as a decorator,
     or as a with statement:

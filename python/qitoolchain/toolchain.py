@@ -422,3 +422,9 @@ class Toolchain(object):
             if package.cross_gdb:
                 return package.cross_gdb
 
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+

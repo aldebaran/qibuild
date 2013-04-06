@@ -128,8 +128,11 @@ class TestAction(object):
     Make sure cwd is in a temporary directory,
     and provide a nicer syntax for qisys.script.run_action
     """
-    def __init__(self, package):
-        self.tmp = tempfile.mkdtemp(prefix="tmp-test-")
+    def __init__(self, package, worktree_root=None):
+        if not worktree_root:
+            self.tmp = tempfile.mkdtemp(prefix="tmp-test-")
+        else:
+            self.tmp = worktree_root
         self.old_cwd = os.getcwd()
         self.chdir(self.tmp)
         self.package = package
@@ -142,7 +145,7 @@ class TestAction(object):
         os.chdir(directory)
 
     def __call__(self, action, *args, **kwargs):
-        module_name = "%s.%s" % (self.package, action)
+        module_name = "%s.%s" % (self.package, action.replace("-", "_"))
         cwd = kwargs.get("cwd")
         if cwd:
             self.chdir(cwd)
@@ -152,7 +155,7 @@ class TestAction(object):
                 qisys.script.run_action(module_name, args)
             return str(error.value)
         else:
-            qisys.script.run_action(module_name, args)
+            return qisys.script.run_action(module_name, args)
 
     def reset(self):
         os.chdir(self.old_cwd)

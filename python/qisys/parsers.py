@@ -51,7 +51,8 @@ def project_parser(parser, positional=True, short=True):
     group.add_argument("-s", "--single", action="store_true",
         help="Work on specified projects without taking dependencies into account.")
     if positional:
-        parser.add_argument("projects", nargs="*", metavar="PROJECT", help="Project name(s)")
+        group.add_argument("projects", nargs="*", metavar="PROJECT",
+                            help="Project name(s)")
     else:
         if short:
             group.add_argument("-p", "--project", dest="projects", action="append",
@@ -104,7 +105,7 @@ class AbstractProjectParser:
     def all_projects(self, args):
         pass
 
-    def parse_args(self, args):
+    def parse_args(self, args, default_all=False):
         """ Parse arguments. args may be a
         argparse.Namespace() object, or a dict
 
@@ -117,7 +118,10 @@ class AbstractProjectParser:
         project_args = args.projects
         # pylint: disable-msg=E1103
         if not args.projects:
-            return self.parse_no_project(args)
+            if default_all:
+                return self.all_projects(args)
+            else:
+                return self.parse_no_project(args)
         res = list()
         for project_arg in project_args:
             # parsing one arg can result in several projets

@@ -57,7 +57,7 @@ def build_parser(parser):
 
 def project_parser(parser, positional=True):
     """Parser settings for every action using several build projects."""
-    group = qisys.parsers.project_parser(parser, positional=positional, short=False)
+    group = qisys.parsers.project_parser(parser, positional=positional)
     group.add_argument("--build-deps-only",
         action="store_true", dest="build_only",
         help="Work on specified projects by ignoring the runtime deps. "
@@ -77,7 +77,7 @@ def get_build_worktree(args):
     worktree = qisys.parsers.get_worktree(args)
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
     ui.info(ui.green, "Current build worktree:", ui.reset, ui.bold, build_worktree.root)
-    if not hasattr(args, "config"):
+    if not hasattr(args, "build_type"):
         # build_parser() has not been called, so do leave the default build_config
         return build_worktree
     build_config = get_build_config(build_worktree, args)
@@ -88,14 +88,14 @@ def get_build_worktree(args):
         ui.info(ui.green, "Using profile:", ui.blue, profile)
     return build_worktree
 
-def get_build_projects(build_worktree, args, solve_deps=True):
+def get_build_projects(build_worktree, args, solve_deps=True, default_all=False):
     """ Get a list of build projects to use from an argparse.Namespace
     object. Useful when you do not need a CMakeBuilder.
     You can choose wether or not to solve the dependencies
 
     """
     parser = BuildProjectParser(build_worktree)
-    projects = parser.parse_args(args)
+    projects = parser.parse_args(args, default_all=default_all)
     if not solve_deps or args.single:
         return projects
     if args.build_only:

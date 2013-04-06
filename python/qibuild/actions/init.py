@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 """Initialize a new toc worktree """
 
+import argparse
 import os
 import sys
 
@@ -14,6 +15,11 @@ import qibuild.worktree
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
+    # backward-compat:
+    parser.add_argument("-c", "--config", help=argparse.SUPPRESS)
+    parser.add_argument("--interactive", action="store_true",
+                        help=argparse.SUPPRESS)
+    parser.set_defaults(interactive=False)
 
 def do(args):
     """Main entry point"""
@@ -22,3 +28,13 @@ def do(args):
         raise Exception("Please run this command from an empty directory")
     worktree = qisys.worktree.WorkTree(root)
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
+    if args.config:
+        ui.warning("`qibuild init -c` is deprecated", "\n",
+                   "Use `qitoolchain set-default` instead")
+        qisys.script.run_action("qitoolchain.actions.set_default",
+                                [args.config, "--worktree", build_worktree.root])
+    if args.interactive:
+        ui.warning("`qibuild init --interactive` is deprecated", "\n",
+                   "Use `qibuild config --wizard` instead")
+        qisys.script.run_action("qibuild.actions.config",
+                               ["--wizard", "--worktree", build_worktree.root])

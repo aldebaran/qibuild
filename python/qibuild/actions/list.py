@@ -9,15 +9,17 @@
 import os
 import sys
 import re
+import operator
 
 
 from qisys import ui
-import qibuild
+import qisys.parsers
+import qibuild.parsers
 
 
 def configure_parser(parser):
     """ Configure parser for this action """
-    qibuild.parsers.toc_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("--names", action="store_true", dest="names",
                         help="sort by names")
     parser.add_argument("--paths", action="store_false", dest="names",
@@ -29,28 +31,31 @@ def configure_parser(parser):
 
 def do(args):
     """ Main method """
-    toc = qibuild.toc.toc_open(args.worktree, args)
-    projects = toc.projects[:]
+    build_worktree = qibuild.parsers.get_build_worktree(args)
+    projects = build_worktree.build_projects
     if not projects:
-        on_empty_toc(toc)
-    ui.info(ui.green, "qibuild projects in:", ui.blue, toc.worktree.root)
-    for project in projects:
-        project.path = os.path.relpath(project.path, toc.worktree.root)
-    max_name = max([len(x.name)      for x in projects])
-    max_src  = max([len(x.path) for x in projects])
+        on_empty_worktree(build_worktree)
+        return
+    ui.info(ui.green, "qibuild projects in:", ui.blue, build_worktree.root)
+    max_name = max([len(x.name) for x in projects])
+    max_src  = max([len(x.src)  for x in projects])
     regex = args.pattern
     if args.pattern:
         regex = re.compile(regex)
+    if args.names:
+        projects.sort(key=operator.attrgetter("name"))
+    else:
+        projects.sort(key=operator.attrgetter("src"))
     for project in projects:
         if args.names:
             items = (project.name.ljust(max_name + 2), project.path)
         else:
-            items = (project.path.ljust(max_src + 2), project.name)
+            items = (project.src.ljust(max_src + 2), project.name)
         if not regex or regex.search(items[0]) or regex.search(items[1]):
             ui.info(ui.green, " * ", ui.blue, items[0], ui.reset, items[1])
 
 
-def on_empty_toc(toc):
+def on_empty_worktree(worktree):
     mess = """The worktree in {worktree.root}
 does not contain any buildable project.
 
@@ -60,5 +65,4 @@ Please use:
     * `qibuild convert` to convert an exixting CMake project to
        a qibuild project
 """
-    ui.warning(mess.format(worktree=toc.worktree))
-    sys.exit(0)
+    ui.warning(mess.format(worktree=worktree))
