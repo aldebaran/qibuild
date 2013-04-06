@@ -11,6 +11,8 @@ General
 
 * Update of the doc
 * Remove compatibility with python 2.6
+* You can now set the environment variable ``VERBOSE=1`` to trigger debug
+  messages
 
 Command line
 ++++++++++++
@@ -19,10 +21,11 @@ Command line
 * Fix return code of ``qibuild test --list``
 * ``qilinguist``: Stop doing backup when merging catalog files
 * ``qibuild test`` learn ``--ncpu`` to restrict the number of CPUs
-* ``qisrc grep`` learn ``--project`` to run only on some specific project
 * Tests are now colored under a tty
+* ``qisrc grep`` learn ``--project`` to run only on some specific project
 * ``qisrc foreach`` learn ``--project`` to run only on some specific project
 * ``qisrc foreach`` learn ``--dry-run`` to dry run the command
+* Fix using ``qibuild deploy`` to a remote folder containing upper-case letters
 
 CMake
 +++++
@@ -31,6 +34,8 @@ CMake
 * Fix using :cmake:function:`qi_add_optional_package` with a file defining some macros
 * ``boost``: support 1.53, adapt ``boost_flib`` for libraries being only headers
 * Fix perf tests with VisualStudio
+* ``qi_create_gtest`` now only works with Aldebaran's fork of gtest
+* ``qi_generate_src`` can now generate several files with one command
 
 Python
 ++++++
