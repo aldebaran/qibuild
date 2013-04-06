@@ -9,6 +9,7 @@ import sys
 
 from qisys import ui
 import qisys.worktree
+import qibuild.parsers
 import qibuild.worktree
 
 

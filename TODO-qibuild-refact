@@ -71,3 +71,5 @@
 * re-add qisrc foreach -p
 
 * re-add qisrc grep -p
+
+* qibuild_action("configure") -> qibuild_action.call("configure") ?

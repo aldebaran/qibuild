@@ -124,12 +124,14 @@ def configure_ide(qibuild_cfg, ide_name):
     ide.name = ide_name
     qibuild_cfg.add_ide(ide)
 
-def configure_local_settings(toc):
+def configure_local_settings(build_worktree):
     """ Configure local settings for this worktree
 
     """
     print
-    ui.info(ui.green, "::", ui.reset,  "Found a worktree in", toc.worktree.root)
+    worktree_root = build_worktree.root
+    ui.info(ui.green, "::", ui.reset,  "Found a worktree in", worktree_root)
+    qibuild_cfg = build_worktree.qibuild_cfg
     answer = qisys.interact.ask_yes_no(
         "Do you want to configure settings for this worktree?",
         default=False)
@@ -146,8 +148,8 @@ def configure_local_settings(toc):
             default = qisys.interact.ask_choice(tc_names,
                 "Choose a toolchain to use by default")
             if default:
-                toc.config.local.defaults.config = default
-                toc.save_config()
+                qibuild_cfg.local.defaults.config = default
+                qibuild_cfg.write_local_config(build_worktree.qibuild_xml)
     answer = qisys.interact.ask_yes_no(
         "Do you want to use a unique build dir?"
         " (mandatory when using Eclipse)",
@@ -157,20 +159,20 @@ def configure_local_settings(toc):
     if answer:
         build_dir = qisys.interact.ask_string("Path to a build directory")
         build_dir = os.path.expanduser(build_dir)
-        full_path = os.path.join(toc.worktree.root, build_dir)
+        full_path = os.path.join(worktree_root, build_dir)
         ui.info(ui.green, "::", ui.reset,
                 "Will use", full_path, "as a root for all build directories")
-    toc.config.local.build.build_dir = build_dir
-    toc.save_config()
+    qibuild_cfg.local.build.build_dir = build_dir
+    qibuild_cfg.write_local_config(build_worktree.qibuild_xml)
 
 
 
-def run_config_wizard(toc):
+def run_config_wizard(build_worktree=None):
     """ Run a nice interactive config wizard
 
     """
-    if toc:
-        qibuild_cfg = toc.config
+    if build_worktree:
+        qibuild_cfg = build_worktree.qibuild_cfg
     else:
         qibuild_cfg = qibuild.config.QiBuildConfig()
         qibuild_cfg_path = qibuild.config.get_global_cfg_path()
@@ -192,5 +194,5 @@ def run_config_wizard(toc):
 
     qibuild_cfg.write()
 
-    if toc:
-        configure_local_settings(toc)
+    if build_worktree:
+        configure_local_settings(build_worktree)

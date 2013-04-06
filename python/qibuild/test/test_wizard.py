@@ -35,7 +35,8 @@ class ConfigWizardTestCase(unittest.TestCase):
             'qibuild.cmake.get_known_cmake_generators')
         self.get_generators = self.get_generators_patcher.start()
         self.interact_patcher = None
-        self.toc = qibuild.toc.toc_open(self.tmp)
+        worktree = qisys.worktree.WorkTree(self.tmp, sanity_check=False)
+        self.build_worktree = qibuild.worktree.BuildWorkTree(worktree)
 
     def setup_platform(self, platform):
         """ Setup sys.platform
@@ -65,7 +66,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         for this test
 
         """
-        def fake_find(name, env=None):
+        def fake_find(name, raises=True, env=None):
             return programs.get(name)
         self.find_program.side_effect = fake_find
 
@@ -86,11 +87,11 @@ class ConfigWizardTestCase(unittest.TestCase):
         """
         self.get_generators.return_value = generators
 
-    def run_wizard(self, toc=None):
+    def run_wizard(self, build_worktree=None):
         """ Run the wizard, return the QiBuildConfig object
 
         """
-        qibuild.wizard.run_config_wizard(toc)
+        qibuild.wizard.run_config_wizard(build_worktree=build_worktree)
         qibuild_cfg = qibuild.config.QiBuildConfig()
         qibuild_cfg.read()
         return qibuild_cfg
@@ -219,7 +220,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
-        self.run_wizard(toc=self.toc)
+        self.run_wizard(build_worktree=self.build_worktree)
 
     def test_local_settings_choose_default_toolchain(self):
         self.setup_platform("linux")
@@ -235,8 +236,9 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(["linux32", "linux64"])
-        self.run_wizard(toc=self.toc)
-        self.assertEqual(self.toc.config.local.defaults.config, "linux64")
+        self.run_wizard(build_worktree=self.build_worktree)
+        self.assertEqual(self.build_worktree.qibuild_cfg.local.defaults.config,
+                         "linux64")
 
     def test_local_build_settings(self):
         self.setup_platform("linux")
@@ -254,8 +256,9 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
-        self.run_wizard(toc=self.toc)
-        self.assertEqual(self.toc.config.local.build.build_dir, "build")
+        self.run_wizard(build_worktree=self.build_worktree)
+        self.assertEqual(self.build_worktree.qibuild_cfg.local.build.build_dir,
+                         "build")
 
     def test_full_wizard(self):
         self.setup_platform("win32")
@@ -271,9 +274,10 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Visual Studio 10"])
         self.setup_tc_names(["win32-vs2010"])
-        self.run_wizard(toc=self.toc)
-        self.assertEqual(self.toc.config.local.defaults.config, "win32-vs2010")
-        self.assertEqual(self.toc.config.defaults.cmake.generator,
+        self.run_wizard(build_worktree=self.build_worktree)
+        self.assertEqual(self.build_worktree.qibuild_cfg.local.defaults.config,
+                         "win32-vs2010")
+        self.assertEqual(self.build_worktree.qibuild_cfg.defaults.cmake.generator,
             "Visual Studio 10")
 
     def test_unsetting_unique_build_dir(self):
@@ -291,9 +295,11 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
-        old_toc = qibuild.toc.toc_open(self.tmp)
-        self.run_wizard(toc=old_toc)
-        self.assertEqual(old_toc.config.local.build.build_dir, "build")
+        worktree = qisys.worktree.WorkTree(self.tmp, sanity_check=False)
+        old_build_worktree = qibuild.worktree.BuildWorkTree(worktree)
+        self.run_wizard(build_worktree=old_build_worktree)
+        self.assertEqual(old_build_worktree.qibuild_cfg.local.build.build_dir,
+                         "build")
 
         self.interact_patcher.stop()
         self.setup_answers({
@@ -303,10 +309,10 @@ class ConfigWizardTestCase(unittest.TestCase):
             "configure settings for this worktree": True,
             "unique sdk dir": False,
         })
-        new_toc = qibuild.toc.toc_open(self.tmp)
-        self.run_wizard(toc=new_toc)
-        build_dir = new_toc.config.local.build.build_dir
-        sdk_dir = new_toc.config.local.build.sdk_dir
+        new_build_worktree = qibuild.worktree.BuildWorkTree(worktree)
+        self.run_wizard(build_worktree=new_build_worktree)
+        build_dir = new_build_worktree.qibuild_cfg.local.build.build_dir
+        sdk_dir = new_build_worktree.qibuild_cfg.local.build.sdk_dir
         self.assertFalse(build_dir,
             "build_dir is '%s', should be None or empty" % build_dir)
         self.assertFalse(sdk_dir,

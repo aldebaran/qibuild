@@ -28,6 +28,10 @@ class CMakeBuilder(object):
     def build_config(self):
         return self.build_worktree.build_config
 
+    @property
+    def build_env(self):
+        return self.build_config.build_env
+
     # pylint: disable-msg=E0213
     def need_configure(func):
         """ Decorator for every function that expects a build directory to

@@ -12,15 +12,48 @@ import subprocess
 
 from qisys import ui
 import qisys
-import qibuild
+import qibuild.parsers
 
 SUPPORTED_IDES = ["QtCreator", "Visual Studio", "Xcode"]
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
-    parser.add_argument("project", nargs="?")
+    qibuild.parsers.project_parser(parser)
+
+def do(args):
+    """Main entry point."""
+    cmake_builder = qibuild.parsers.get_cmake_builder(args)
+    if len(cmake_builder.projects) != 1:
+        raise Exception("This action can only work on one project")
+    project = cmake_builder.projects[0]
+    if not os.path.exists(project.build_directory):
+        ui.error("""It looks like your project has not been configured yet
+(The build directory: '%s' does not exists)""" %
+        project.build_directory)
+        answer = qisys.interact.ask_yes_no(
+            "Do you want me to run qibuild configure for you?",
+            default=True)
+        if not answer:
+            sys.exit(2)
+        else:
+            cmake_builder.configure()
+
+    ide = get_ide(cmake_builder.build_config.qibuild_cfg)
+    if not ide:
+        return
+
+    if ide.name == "Visual Studio":
+        open_visual(project.build_directory)
+    elif ide.name == "Xcode":
+        open_xcode(project.build_directory)
+    elif ide.name == "QtCreator":
+        open_qtcreator(project, ide.path)
+    else:
+        # Not supported (yet) IDE:
+        mess  = "Invalid ide: %s\n" % ide.name
+        mess += "Supported IDES are: %s" % ", ".join(SUPPORTED_IDES)
+        raise Exception(mess)
 
 
 def get_ide(qibuild_cfg):
@@ -28,10 +61,8 @@ def get_ide(qibuild_cfg):
     known_ides = qibuild_cfg.ides.values()
     ide_names  = qibuild_cfg.ides.keys()
     if not known_ides:
-        ui.info("As there is no IDE configured for you, you can not use",
-ui.blue, "qibuild open")
-        ui.info("If you want to add one type", ui.blue, "qibuild config \
---wizard")
+        ui.warning("No IDE configured yet")
+        ui.info("Tips: use `qibuild config --wizard` to configure an IDE")
         return None
 
     # Remove the one that are not supported:
@@ -60,74 +91,49 @@ ui.blue, "qibuild open")
 
 
 
-def do(args):
-    """Main entry point."""
-    toc = qibuild.toc.toc_open(args.worktree, args)
-    project = qibuild.cmdparse.project_from_args(toc, args)
-    if not os.path.exists(project.build_directory):
-        ui.error("""It looks like your project has not been configured yet
-(The build directory: '%s' does not exists)""" %
-        project.build_directory)
-        answer = qisys.interact.ask_yes_no(
-            "Do you want me to run qibuild configure for you?",
-            default=True)
-        if not answer:
-            sys.exit(2)
-        else:
-            args = [project.name]
-            if toc.active_config:
-                args.extend(["--config", toc.active_config])
-            qisys.script.run_action("qibuild.actions.configure", args)
-
-    error_message = "Could not open project %s\n" % project.name
-    qibuild_cfg = qibuild.config.QiBuildConfig(user_config=toc.active_config)
-    qibuild_cfg.read()
-    qibuild_cfg.read_local_config(toc.qibuild_xml)
-    ide = get_ide(qibuild_cfg)
-    if not ide:
-        return
-
-    if ide.name == "Visual Studio":
-        sln_files = glob.glob(project.build_directory + "/*.sln")
+def open_visual(project):
+    sln_files = glob.glob(project.build_directory + "/*.sln")
         if len(sln_files) == 0:
             raise Exception(error_message +
                 "Do you have called qibuild configure with the proper --cmake-generator option?")
         elif len(sln_files) > 1:
-            raise Exception(error_message + "Expecting only one sln, got %s" % sln_files)
-        print "starting VisualStudio:"
-        print "%s %s" % ("start", sln_files[0])
-        subprocess.Popen(["start", sln_files[0]], shell=True)
-        return
+    print "starting VisualStudio:"
+    print "%s %s" % ("start", sln_files[0])
+    subprocess.Popen(["start", sln_files[0]], shell=True)
 
-    if ide.name == "Xcode":
-        projs = glob.glob(project.build_directory + "/*.xcodeproj")
-        if len(projs) == 0:
-            raise Exception(error_message +
-                "Do you have called qibuild configure with --cmake-generator=Xcode?")
-        elif len(projs) > 1:
-            raise Exception(error_message +
-                "Expecting only one xcode project file, got %s" % projs)
-        print "starting Xcode:"
-        print "%s %s" % ("open", projs[0])
-        subprocess.Popen(["open", projs[0]])
-        return
+def open_xcode(project):
+    projs = glob.glob(project.build_directory + "/*.xcodeproj")
+    if len(projs) == 0:
+        raise OpenError(project,
+                        "No .xcodeproj directory found\n"
+    elif len(projs) > 1:
+        raise OpenError(project,
+                       "Expecting only one xcode project file, got %s" % projs)
+    print "starting Xcode:"
+    print "%s %s" % ("open", projs[0])
+    subprocess.Popen(["open", projs[0]])
 
-    if ide.name == "QtCreator":
-        ide_path = ide.path
-        if not ide_path:
-            ide_path = 'qtcreator'
-        cmake_list = os.path.join(project.path, "CMakeLists.txt")
-        if not os.access(ide_path, os.X_OK):
-            mess  = "Invalid configuration dectected!\n"
-            mess += "QtCreator path (%s) is not a valid path\n" % ide_path
-            mess += "Please run `qibuild config --wizard\n"
-            raise Exception(mess)
-        print "starting QtCreator:"
-        print ide_path, cmake_list
-        subprocess.Popen([ide_path, cmake_list])
-        return
+def open_qtcreator(project, qtcreator_path=None):
+    if not qtcreator_path:
+        qtcreator_path = qisys.command.find_program("qtcreator")
+    cmake_list = os.path.join(project.path, "CMakeLists.txt")
+    if not qtcreator_path or not os.access(qtcreator_path, os.X_OK):
+        raise OpenError(project,
+                        "QtCreator path not configured properly\n"
+                        "Please run `qibuild config --wizard")
+    print "starting QtCreator:"
+    print qtcreator_path, cmake_list
+    subprocess.Popen([qtcreator_path, cmake_list])
 
-    # Not supported (yet) IDE:
-    mess  = "Invalid ide: %s\n" % ide.name
-    mess += "Supported IDES are: %s" % ", ".join(SUPPORTED_IDES)
-    raise Exception(mess)
+
+class OpenError(Exception):
+    def __init__(self, project, reason):
+        self.project = project
+        self.reason = reason
+
+    def __str__(self):
+        res = """ \
+Could not open {project.name}
+{reason}
+"""
+        return res.format(project=self.project, reason=self.reason)

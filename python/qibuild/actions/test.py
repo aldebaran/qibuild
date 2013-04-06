@@ -7,17 +7,15 @@
 
 import sys
 
-import qisys
-import qibuild
+import qibuild.parsers
 import qibuild.ctest
 import qibuild.performance
 import qibuild.gcov
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.parsers.toc_parser(parser)
     qibuild.parsers.build_parser(parser)
-    parser.add_argument("project", nargs="?")
+    qibuild.parsers.project_parser(parser)
     parser.add_argument("-k", "--pattern", dest="pattern",
                         help="Filter tests matching this pattern")
     parser.add_argument("-l", "--list", dest="dry_run", action="store_true",
@@ -39,26 +37,29 @@ def configure_parser(parser):
     parser.add_argument("--ncpu", dest="ncpu", default=-1, type=int,
                         help="set number of CPU each test is allowed to use (linux)")
 
-    parser.set_defaults(slow=False)
 
 def do(args):
     """Main entry point"""
-    toc = qibuild.toc.toc_open(args.worktree, args)
-    project = qibuild.cmdparse.project_from_args(toc, args)
-
-    qibuild.toc.check_configure(toc, project)
-
-    if args.perf:
-        res = qibuild.performance.run_perfs(project,
-                pattern=args.pattern,
-                dry_run=args.dry_run)
-
+    cmake_builder = qibuild.parsers.get_cmake_builder(args)
+    deps_solver = cmake_builder.deps_solver
+    if args.use_deps:
+        dep_types = ["build"]
     else:
-        res = qibuild.ctest.run_tests(project, env=toc.build_env,
-                pattern=args.pattern, slow=args.slow,
-                dry_run=args.dry_run, valgrind=args.valgrind,
-                verbose=args.verbose_tests, nightmare=args.nightmare,
-                test_args=args.test_args, coverage=args.coverage,
-                num_jobs=args.num_jobs, num_cpus=args.ncpu)
-        if not res:
-            sys.exit(1)
+        dep_types = list()
+    projects = deps_solver.get_dep_projects(cmake_builder.projects,
+                                           dep_types)
+    for project in projects:
+        if args.perf:
+            res = qibuild.performance.run_perfs(project,
+                    pattern=args.pattern,
+                    dry_run=args.dry_run)
+
+        else:
+            res = qibuild.ctest.run_tests(project, build_env=cmake_builder.build_env,
+                    pattern=args.pattern, slow=args.slow,
+                    dry_run=args.dry_run, valgrind=args.valgrind,
+                    verbose=args.verbose_tests, nightmare=args.nightmare,
+                    test_args=args.test_args, coverage=args.coverage,
+                    num_jobs=args.num_jobs, num_cpus=args.ncpu)
+    if not res:
+        sys.exit(1)

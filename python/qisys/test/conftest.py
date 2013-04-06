@@ -154,6 +154,12 @@ class TestAction(object):
             with pytest.raises(Exception) as error:
                 qisys.script.run_action(module_name, args)
             return str(error.value)
+        if kwargs.get("retcode"):
+            try:
+                qisys.script.run_action(module_name, args)
+            except SystemExit as e:
+                return e.code
+            return 0
         else:
             return qisys.script.run_action(module_name, args)
 

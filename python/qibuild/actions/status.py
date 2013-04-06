@@ -9,12 +9,10 @@ import os
 import glob
 import time
 import datetime
-import qisys.log
 
-import qibuild
-import qibuild.project
-
-LOGGER = qisys.log.get_logger(__name__)
+from qisys import ui
+import qisys.parsers
+import qibuild.parsers
 
 def usage():
     "Specific usage"
@@ -22,7 +20,17 @@ def usage():
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.toc_parser(parser)
+    qisys.parsers.worktree_parser(parser)
+    qibuild.parsers.project_parser(parser, positional=False)
+
+
+def do(args):
+    """Main entry point"""
+    build_worktree = qibuild.parsers.get_build_worktree(args)
+    for project in build_worktree.build_projects:
+        ui.info(project.src)
+        list_build_dir(project.path)
+
 
 def list_build_dir(path):
     """ list all buildable directory """
@@ -40,17 +48,11 @@ def list_build_dir(path):
             ddelta = datetime.timedelta(seconds = delta)
             todisplay = ""
             if ddelta.days > 0:
-                todisplay = "%d days, %d hours" % (ddelta.days, ddelta.seconds / 3600)
+                todisplay = "%d days, %d hours" % \
+                        (ddelta.days, ddelta.seconds / 3600)
             elif ddelta.seconds > 3600:
                 todisplay = "%d hours" % (ddelta.seconds / 3600)
             else:
                 todisplay = "%d minutes" % (ddelta.seconds / 60)
             pad = " " * (max_len - len(bdir))
-            print " %s%s: (%s)" % (os.path.basename(bdir), pad, todisplay)
-
-def do(args):
-    """Main entry point"""
-    build_worktree = qibuild.parsers.get_build_worktree(args)
-    for project in build_worktree.build_projects:
-        LOGGER.info("%s", project.src)
-        list_build_dir(project.path)
+            ui.info(" %s%s: (%s)" % (os.path.basename(bdir), pad, todisplay))
