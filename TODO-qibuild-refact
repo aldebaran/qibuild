@@ -66,3 +66,8 @@
 * replace old qibuild.dependencies_solver by ne
   qibuild.deps_solver
 
+* check that qibuild project names are unique
+
+* re-add qisrc foreach -p
+
+* re-add qisrc grep -p
