@@ -211,7 +211,7 @@ class FeedTestCase(unittest.TestCase):
             if filename.endswith(".xml"):
                 self.configure_xml(filename, self.srv)
 
-        packages_dir = os.path.join(this_dir, "packages")
+        packages_dir = os.path.join(this_dir, "feeds", "packages")
         contents = os.listdir(packages_dir)
         for filename in contents:
             if not os.path.isdir(os.path.join(packages_dir, filename)):

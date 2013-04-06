@@ -5,7 +5,7 @@ import qitoolchain
 import qitoolchain.toolchain
 
 class Toolchains():
-    """ A class to hepl qitoolchain testing """
+    """ A class to help qitoolchain testing """
     def __init__(self):
         tmpdir = tempfile.mkdtemp(prefix="test-qitoolchain")
         self.tmp = py.path.local(tmpdir)
