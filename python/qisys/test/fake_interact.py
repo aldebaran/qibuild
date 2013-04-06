@@ -13,7 +13,7 @@ class FakeInteract(object):
     # pylint: disable-msg=E0202
     def answers(self):
         if self._answers is None:
-            raise Exception("FakeInteract non initialize")
+            raise Exception("FakeInteract not initialized")
         return self._answers
 
     # pylint: disable-msg=E1101

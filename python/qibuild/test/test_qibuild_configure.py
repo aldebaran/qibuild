@@ -1,7 +1,14 @@
+import os
+import subprocess
+
 import qisys.command
 import qibuild.cmake
 
 import pytest
+
+
+# This modules also serves as a test for the
+# qibuild cmake API
 
 def test_simple(qibuild_action):
     # Just make sure that the basic stuff works
@@ -38,17 +45,17 @@ def test_qi_use_lib(qibuild_action):
 
 
 def test_qi_stage_lib_simple(qibuild_action):
-    stagelib_proj = qibuild_action.add_test_project("stagelib")
+    qibuild_action.add_test_project("stagelib")
     qibuild_action("configure", "stagelib")
 
 def test_qi_stage_lib_but_really_bin(qibuild_action):
-    stagelib_proj = qibuild_action.add_test_project("stagelib")
+    qibuild_action.add_test_project("stagelib")
     with pytest.raises(Exception):
         qibuild_action("configure", "stagelib",
                        "-DSHOULD_FAIL_STAGE_LIB_BUT_REALLY_BIN=ON")
 
 def test_qi_stage_lib_but_no_such_target(qibuild_action):
-    stagelib_proj = qibuild_action.add_test_project("stagelib")
+    qibuild_action.add_test_project("stagelib")
     with pytest.raises(Exception):
         qibuild_action("configure", "stagelib",
                        "-DSHOULD_FAIL_STAGE_NO_SUCH_TARGET")
@@ -68,3 +75,31 @@ def test_preserve_cache(qibuild_action):
     cache_after = qibuild.cmake.read_cmake_cache(foo_proj.cmake_cache)
 
     assert cache_before == cache_after
+
+def test_config_h(qibuild_action, tmpdir):
+    proj = qibuild_action.add_test_project("config_h")
+    qibuild_action("configure", "config_h")
+    qibuild_action("make", "config_h")
+    qibuild_action("install", "config_h", tmpdir.strpath)
+    foo = os.path.join(proj.sdk_directory, "bin", "foo")
+    process = subprocess.Popen([foo])
+    process.wait()
+    assert process.returncode == 42
+    assert tmpdir.join("include", "foo", "config.h").check(file=1)
+
+#pylint: disable-msg=E110V
+@pytest.mark.xfail
+def test_config_h_extra_install_rule(qibuild_action, tmpdir):
+    proj = qibuild_action.add_test_project("config_h")
+    qibuild_action("configure", "config_h", "-DWITH_EXTRA_INSTALL_RULE=ON")
+    qibuild_action("make", "config_h")
+    qibuild_action("install", "config_h", tmpdir.strpath)
+    full_config_h = os.path.join(proj.build_directory,
+            "include", "foo", "config.h")
+    full_config_h = os.path.join(tmpdir.strpath, full_config_h)
+    assert not os.path.exists(full_config_h)
+
+def test_submodule(qibuild_action):
+    qibuild_action.add_test_project("submodule")
+    qibuild_action("configure", "submodule")
+    qibuild_action("make", "submodule")

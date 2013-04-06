@@ -19,7 +19,9 @@ def configure_parser(parser):
     group.add_argument("dest_dir", metavar="DESTDIR")
     group.add_argument("--runtime", action="store_true", dest="runtime_only",
                        help="Only install the runtime components")
-    parser.set_defaults(runtime=False, prefix="/")
+    group.add_argument("--split-debug", action="store_true",
+                       help="Split debug symbols")
+    parser.set_defaults(runtime=False, prefix="/", split_debug=False)
     if not parser.epilog:
         parser.epilog = ""
     parser.epilog += """
@@ -33,4 +35,5 @@ def do(args):
     """Main entry point"""
     dest_dir = qisys.sh.to_native_path(args.dest_dir)
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
-    cmake_builder.install(dest_dir, prefix=args.prefix)
+    cmake_builder.install(dest_dir, prefix=args.prefix,
+                          split_debug=args.split_debug)
