@@ -73,7 +73,7 @@ worktree root: {1}
         # Check that we are not in an other worktree:
         parent_worktree = guess_worktree(self.root)
         if parent_worktree and parent_worktree != self.root:
-            raise WorkTreeError("""{0} is already in a worktee
+            raise WorkTreeError("""{0} is already in a worktree
 (in {1})
 """.format(self.root, parent_worktree))
 

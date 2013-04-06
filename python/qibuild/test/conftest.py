@@ -111,7 +111,7 @@ class QiBuildAction(TestAction):
         return self.build_worktree.create_project(name, **kwargs)
 
     def reload_worktree(self):
-        """ Reload the worktee. Useful when an *other* BuildWorkTree
+        """ Reload the worktree. Useful when an *other* BuildWorkTree
         has changed the cache
 
         """
