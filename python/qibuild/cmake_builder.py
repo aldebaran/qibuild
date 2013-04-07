@@ -44,6 +44,7 @@ class CMakeBuilder(object):
             for project in projects:
                 if not os.path.exists(project.cmake_cache):
                     raise NotConfigured(project)
+            # pylint: disable-msg=E1102
             res = func(self, *args, **kwargs)
             return res
         return new_func

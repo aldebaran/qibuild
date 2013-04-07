@@ -73,7 +73,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
 
     def remove_build_profile(self, name):
         """ Remove a build profile for this worktree """
-        qibuild.profile.configure_build_profile(self.qibuild_xml, name)
+        qibuild.profile.remove_build_profile(self.qibuild_xml, name)
 
     def set_default_config(self, name):
         """ Set the default toolchain for this worktree """
@@ -91,4 +91,3 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
 
         """
         self.build_config.set_active_config(active_config)
-

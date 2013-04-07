@@ -8,6 +8,7 @@ class Toolchains():
     """ A class to help qitoolchain testing """
     def __init__(self):
         tmpdir = tempfile.mkdtemp(prefix="test-qitoolchain")
+        # pylint: disable-msg=E1101
         self.tmp = py.path.local(tmpdir)
 
     def clean(self):
@@ -24,12 +25,14 @@ class Toolchains():
         toolchain.add_package(package)
         return package
 
+# pylint: disable-msg=E1101
 @pytest.fixture
 def toolchains(request):
     res = Toolchains()
     request.addfinalizer(res.clean)
     return res
 
+# pylint: disable-msg=E1101
 @pytest.fixture
 def qitoolchain_action(request):
     res = QiToolchainAction()

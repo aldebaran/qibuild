@@ -40,6 +40,7 @@ def test_qi_use_lib(qibuild_action):
     qibuild_action("make", "uselib")
 
     # Make sure it fails when it should
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception):
         qibuild_action("configure", "uselib", "-DSHOULD_FAIL=ON")
 
@@ -50,12 +51,14 @@ def test_qi_stage_lib_simple(qibuild_action):
 
 def test_qi_stage_lib_but_really_bin(qibuild_action):
     qibuild_action.add_test_project("stagelib")
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception):
         qibuild_action("configure", "stagelib",
                        "-DSHOULD_FAIL_STAGE_LIB_BUT_REALLY_BIN=ON")
 
 def test_qi_stage_lib_but_no_such_target(qibuild_action):
     qibuild_action.add_test_project("stagelib")
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception):
         qibuild_action("configure", "stagelib",
                        "-DSHOULD_FAIL_STAGE_NO_SUCH_TARGET")
@@ -87,7 +90,7 @@ def test_config_h(qibuild_action, tmpdir):
     assert process.returncode == 42
     assert tmpdir.join("include", "foo", "config.h").check(file=1)
 
-#pylint: disable-msg=E110V
+# pylint: disable-msg=E1101
 @pytest.mark.xfail
 def test_config_h_extra_install_rule(qibuild_action, tmpdir):
     proj = qibuild_action.add_test_project("config_h")

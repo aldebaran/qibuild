@@ -7,6 +7,7 @@
 """
 
 import qisys
+from qisys import ui
 
 def make(build_dir, num_jobs=None, target=None):
     """ Launch make from a build dir.

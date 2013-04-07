@@ -7,9 +7,8 @@
 """
 import os
 
-import qisys.log
-
-LOGGER = qisys.log.get_logger(__name__)
+from qisys import ui
+import qisys.sh
 
 def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):
     """ Copy the dlls fron the toolchains and the other build dirs
@@ -32,9 +31,9 @@ def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):
         dlls_to_copy.extend(dlls)
     if mingw:
         # Copy libgcc and mingw dll
-        if not build_env:
-            build_env = os.environ.copy()
-        env_path = build_env["PATH"]
+        if not env:
+            env = os.environ.copy()
+        env_path = env["PATH"]
         candidates = env_path.split(os.path.pathsep)
         for candidate in candidates:
             if not os.path.exists(candidate):
@@ -52,5 +51,4 @@ def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):
         except Exception, e:
             mess  = "Could not copy %s to %s\n" % (dll_to_copy, dest)
             mess += "Error was: %s\n" % e
-            LOGGER.warning(mess)
-
+            ui.warning(mess)

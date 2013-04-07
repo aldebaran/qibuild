@@ -52,7 +52,9 @@ class CMakeBuildConfig(object):
             return qitoolchain.get_toolchain(self.active_config)
         return None
 
+    # pylint: disable-msg=E1101
     @cmake_generator.setter
+    # pylint: disable-msg=E0102
     def cmake_generator(self, value):
         self._cmake_generator = value
 

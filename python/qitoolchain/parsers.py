@@ -1,3 +1,4 @@
+import qisys.worktree
 import qibuild.parsers
 
 import qitoolchain

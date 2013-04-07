@@ -16,7 +16,7 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
 
     @property
     def tmpdir(self):
-        # pylint: disable-msg=E1101
+        # pylint: disable-msg=E1103
         return py.path.local(self.root)
 
     def create_project(self, name, src=None, depends=None, rdepends=None):
@@ -77,7 +77,7 @@ int main()
 
 
 
-# pylint: disable-msg=E1101
+# pylint: disable-msg=E1103
 @pytest.fixture
 def build_worktree(request):
     tmp = tempfile.mkdtemp(prefix="tmp-test-worktree")
@@ -87,7 +87,7 @@ def build_worktree(request):
     wt = TestBuildWorkTree(tmp)
     return wt
 
-# pylint: disable-msg=E1101
+# pylint: disable-msg=E1103
 @pytest.fixture
 def qibuild_action(request):
     res = QiBuildAction()

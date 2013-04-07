@@ -10,14 +10,12 @@ class FakeInteract(object):
         self.questions = list()
 
     @property
-    # pylint: disable-msg=E0202
     def answers(self):
         if self._answers is None:
             raise Exception("FakeInteract not initialized")
         return self._answers
 
     # pylint: disable-msg=E1101
-    # pylint: disable-msg=E0202
     @answers.setter
     # pylint: disable-msg=E0102
     def answers(self, value):
