@@ -38,19 +38,19 @@ def parse_args_for_help(args):
      - name of the action on which help has been requested
        (or None if there was not any)
 
-    >>> parse_args_for_help("toc".split())
+    >>> parse_args_for_help("qibuild".split())
     (True, None)
-    >>> parse_args_for_help("toc foo".split())
+    >>> parse_args_for_help("qibuild foo".split())
     (False, None)
-    >>> parse_args_for_help("toc help".split())
+    >>> parse_args_for_help("qibuild help".split())
     (True, None)
-    >>> parse_args_for_help("toc help foo".split())
+    >>> parse_args_for_help("qibuild help foo".split())
     (True, 'foo')
-    >>> parse_args_for_help("toc foo --help".split())
+    >>> parse_args_for_help("qibuild foo --help".split())
     (True, 'foo')
-    >>> parse_args_for_help("toc foo -h".split())
+    >>> parse_args_for_help("qibuild foo -h".split())
     (True, 'foo')
-    >>> parse_args_for_help("toc -h foo".split())
+    >>> parse_args_for_help("qibuild -h foo".split())
     (True, 'foo')
     """
     def is_help(arg):
