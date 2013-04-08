@@ -72,4 +72,8 @@
 
 * re-add qisrc grep -p
 
-* qibuild_action("configure") -> qibuild_action.call("configure") ?
+* qibuild_action("configure")
+  -> qibuild_action.call("configure") ?
+  -> qibuild_action.configure("...") ?
+
+* qibuild deploy: fix gdb config files generation
