@@ -6,6 +6,7 @@
 
 """
 
+from qisys import ui
 import qisys.parsers
 import qitoolchain
 
@@ -18,13 +19,11 @@ def configure_parser(parser):
 
 def do(args):
     """ Main method """
-    tc_names = qitoolchain.get_tc_names()
-    tc_name = args.name
-    if tc_name:
-        toolchain = qitoolchain.get_toolchain(tc_name)
-        print toolchain
+    if args.name:
+        tc_names = [args.name]
     else:
-        for tc_name in tc_names:
-            toolchain = qitoolchain.Toolchain(tc_name)
-            print toolchain
-            print
+        tc_names = qitoolchain.get_tc_names()
+
+    for tc_name in tc_names:
+        toolchain = qitoolchain.get_toolchain(tc_name)
+        ui.info(str(toolchain))

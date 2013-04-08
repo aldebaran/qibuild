@@ -7,14 +7,16 @@
 """
 
 from qisys import ui
-import qibuild
-import qitoolchain
+import qisys.parsers
+import qitoolchain.parsers
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.toc_parser(parser)
+    qisys.parsers.worktree_parser(parser)
+    parser.add_argument("-c", "--config",
+                        help="name of the toolchain to use")
     parser.add_argument("package_name", metavar='NAME',
-        help="The name of the package to remove")
+                        help="The name of the package to remove")
 
 def do(args):
     """ Remove a project from a toolchain
@@ -24,8 +26,7 @@ def do(args):
 
     """
     package_name = args.package_name
-    tc_name = qitoolchain.toolchain_name_from_args(args)
-    tc = qitoolchain.get_toolchain(tc_name)
+    toolchain = qitoolchain.parsers.get_toolchain(args)
     ui.info(ui.green, "Removing package", ui.blue, package_name,
-            ui.green, "from toolchain", ui.blue, tc.name)
-    tc.remove_package(package_name)
+            ui.green, "from toolchain", ui.blue, toolchain.name)
+    toolchain.remove_package(package_name)

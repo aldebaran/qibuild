@@ -36,6 +36,10 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
     def toolchain(self):
         return self.build_config.toolchain
 
+    @property
+    def default_config(self):
+        return self.build_config.default_config
+
     def get_build_project(self, name, raises=True):
         """ Get a build project given its name """
         for build_project in self.build_projects:

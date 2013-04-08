@@ -9,14 +9,14 @@
 import os
 
 import qisys
-import qibuild
+import qisys.parsers
 from qitoolchain.binary_package import open_package
 from qitoolchain.binary_package import convert_to_qibuild
 from qibuild.cmake.modules import add_cmake_module_to_archive
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.toc_parser(parser)
+    qisys.parsers.default_parser(parser)
     parser.add_argument("package_name", metavar='NAME',
                         help="The name of the package", nargs='?')
     parser.add_argument("package_path", metavar='PACKAGE_PATH',

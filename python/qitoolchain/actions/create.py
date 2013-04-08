@@ -10,7 +10,7 @@ Toolchain packages and known configurations will be fetched from an URL.
 
 from qisys import ui
 import qisys.parsers
-import qibuild
+import qibuild.parsers
 import qitoolchain
 
 
@@ -51,15 +51,13 @@ def do(args):
     if tc_name == "system":
         raise Exception("'system' is a reserved name")
 
-    toc = None
+    build_worktree = None
 
     if args.default:
         try:
-            toc = qibuild.toc.toc_open(args.worktree)
-        except qibuild.toc.TocException, e:
-            mess = "You need to be in a valid toc worktree to use --default\n"
-            mess += "Exception was:\n"
-            mess += str(e)
+            build_worktree = qibuild.parsers.get_build_worktree(args)
+        except qisys.worktree.NotInWorkTree:
+            mess = "You need to be in a worktree to use --default"
             raise Exception(mess)
 
     if tc_name in qitoolchain.get_tc_names():
@@ -78,10 +76,10 @@ def do(args):
         toolchain.parse_feed(feed, dry_run=dry_run)
 
     if args.default:
-        toc.config.set_default_config(tc_name)
-        toc.save_config()
+        build_worktree.set_default_config(tc_name)
         ui.info("Now using toolchain", ui.blue, tc_name, ui.reset, "by default")
     else:
         ui.info(ui.green, "Now try using", "\n"
                 "  qibuild configure -c", ui.blue, tc_name, ui.green, "\n"
                 "  qibuild make -c",      ui.blue, tc_name)
+    return toolchain

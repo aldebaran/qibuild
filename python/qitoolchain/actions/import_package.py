@@ -10,7 +10,6 @@ and add it to a toolchain.
 import os
 
 import qisys
-import qibuild
 import qitoolchain
 from qitoolchain.binary_package import open_package
 from qitoolchain.binary_package import convert_to_qibuild
@@ -21,7 +20,9 @@ from qibuild.cmake.modules import find_cmake_module_in
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.toc_parser(parser)
+    qisys.parsers.worktree_parser(parser)
+    parser.add_argument("-c", "--config",
+                        help="name of the toolchain to use")
     parser.add_argument("package_name", metavar='NAME',
                         help="The name of the package", nargs='?')
     parser.add_argument("package_path", metavar='PACKAGE_PATH',
@@ -43,8 +44,7 @@ def do(args):
     - Add the qiBuild package from cache to toolchain
 
     """
-    tc_name = qitoolchain.toolchain_name_from_args(args)
-    tc = qitoolchain.get_toolchain(tc_name)
+    toolchain = qitoolchain.parsers.get_toolchain(args)
 
     package_name = args.package_name
     package_path = os.path.abspath(args.package_path)
@@ -69,12 +69,12 @@ a package name must be passed to the command line.
     other_names.append(package_name)
     other_names = list(set(other_names))
     # extract it to the default packages path of the toolchain
-    tc_packages_path = qitoolchain.toolchain.get_default_packages_path(tc.name)
+    tc_packages_path = qitoolchain.toolchain.get_default_packages_path(toolchain.name)
     package_dest = os.path.join(tc_packages_path, package_name)
     qisys.sh.rm(package_dest)
     message = """
 Importing '{1}' in the toolchain {0} ...
-""".format(tc.name, package_path)
+""".format(toolchain.name, package_path)
     qisys.ui.info(message)
     # conversion into qiBuild
     with qisys.sh.TempDir() as tmp:
@@ -93,7 +93,7 @@ Importing '{1}' in the toolchain {0} ...
         extracted = qisys.archive.extract(qibuild_package_path, tmp, quiet=True)
         qisys.sh.install(extracted, package_dest, quiet=True)
     qibuild_package = qitoolchain.Package(package_name, package_dest)
-    tc.add_package(qibuild_package)
+    toolchain.add_package(qibuild_package)
     # end :)
     package_content = qisys.sh.ls_r(package_dest)
     modules_list = find_cmake_module_in(package_content)
@@ -112,5 +112,5 @@ Package '{1}' has been added to the toolchain '{0}'.
 
 To use this package in your project, you may want to check out:
 {3}
-""".format(tc.name, package_name, qibuild_package_path, modules_list)
+""".format(toolchain.name, package_name, qibuild_package_path, modules_list)
     qisys.ui.info(message)

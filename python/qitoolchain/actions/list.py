@@ -6,12 +6,12 @@
 
 """
 
-import qisys
+from qisys import ui
+import qisys.worktree
 import qisys.parsers
 import qitoolchain
-import qibuild.toc
+import qibuild.parsers
 
-from qisys import ui
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -22,22 +22,24 @@ def do(args):
     """ Main method """
     tc_names = qitoolchain.get_tc_names()
     if not tc_names:
-        print "No toolchain yet"
-        print "Use `qitoolchain create` to create a new toolchain"
+        ui.info("No toolchain yet", "\n",
+                "Use `qitoolchain create` to create a new toolchain")
         return
-    default_toc_name = None
+    default_config = None
     try:
-        worktree = qisys.parsers.get_worktree(args)
-        toc = qibuild.toc.Toc(worktree)
-        default_toc_name = toc.config.local.defaults.config
-    except qisys.worktree.NotInWorkTree, e:
+        build_worktree = qibuild.parsers.get_build_worktree(args)
+        default_config = build_worktree.default_config
+    except qisys.worktree.NotInWorkTree:
         pass
-    print "Known toolchains:"
+    ui.info("Known toolchains:")
     for tc_name in tc_names:
-        print "* " if tc_name == default_toc_name else "  ", tc_name
+        if tc_name == default_config:
+            ui.info("*", tc_name)
+        else:
+            ui.info(" ", tc_name)
     print
-    if default_toc_name is not None:
-        ui.info("WorkTree", ui.green, worktree.root, ui.reset, "is using",
-                ui.blue, default_toc_name, ui.reset,
+    if default_config is not None:
+        ui.info("WorkTree", ui.green, build_worktree.root, ui.reset, "is using",
+                ui.blue, default_config, ui.reset,
                 "as its default toolchain.")
-    print "Use ``qitoolchain info <tc_name>`` for more info"
+    ui.info("Use ``qitoolchain info <tc_name>`` for more info")

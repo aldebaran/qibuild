@@ -17,6 +17,7 @@ class CMakeBuildConfig(object):
         self.build_type = "Debug"
         self.user_flags = list()
         self.profiles = list()
+        self._default_config = None
         self.qibuild_cfg = self.read_global_qibuild_settings()
         self._cmake_generator = None
         self.read_local_settings()
@@ -84,6 +85,11 @@ class CMakeBuildConfig(object):
             args.append("-D%s=%s" % (name, value))
         return args
 
+    @property
+    def default_config(self):
+        self.read_local_settings()
+        return self._default_config
+
 
     def read_global_qibuild_settings(self):
         qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -108,6 +114,7 @@ but this does not match any toolchain name
             mess = mess.format(build_worktree=self.build_worktree,
                                default_config=default_config)
             raise Exception(mess)
+        self._default_config = default_config
         self.qibuild_cfg.set_active_config(default_config)
         self.set_active_config(default_config)
 

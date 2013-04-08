@@ -20,7 +20,7 @@ def configure_parser(parser):
         help="Name of the toolchain")
     parser.add_argument("--dry-run", action="store_true", dest="dry_run",
         help="Print what would be done")
-    parser.add_argument("-f", action="store_false", dest="dry_run",
+    parser.add_argument("-f", "--force", action="store_false", dest="dry_run",
         help="Do the cleaning")
     parser.set_defaults(dry_run=True)
 
