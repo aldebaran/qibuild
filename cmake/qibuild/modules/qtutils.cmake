@@ -15,7 +15,7 @@ include(qibuild/modules/qt-tools)
 function(qt_flib _suffix _libname)
   if(QT_USE_QMAKE)
     # Use upstream cmake files
-    find_package(Qt4 COMPONENTS ${_libname} REQUIRED)
+    find_package(Qt4 COMPONENTS ${_libname})
     include("${QT_USE_FILE}")
     # if compoment has not been found, QT_${_suffix}_INCLUDE_DIR will be
     # set to NOT-FOUND, but QT_LIBRARIES will simply not contain the library ...
