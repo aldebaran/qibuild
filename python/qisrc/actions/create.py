@@ -39,7 +39,7 @@ def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args)
 
     project_name = args.project_name
-    project_path = os.path.join(build_worktree.root, project_name)
+    project_path = os.path.join(os.getcwd(), project_name)
 
     if os.path.exists(project_path):
         raise Exception("%s already exists" % project_path)

@@ -1,7 +1,7 @@
 import qisrc.git
 
 def test_simple(qibuild_action):
-    foo_proj = qibuild_action("create", "foo", worktree=qibuild_action.worktree)
+    foo_proj = qibuild_action("create", "foo")
     qibuild_action("configure", "foo")
 
 def test_with_git(qibuild_action):
@@ -14,3 +14,8 @@ def test_with_git(qibuild_action):
     assert ret == 0
     assert ".gitignore" in out
 
+def test_in_subdir(qibuild_action):
+    qibuild_action.tmpdir.mkdir("bar")
+    qibuild_action.chdir("bar")
+    foo_proj = qibuild_action("create", "foo")
+    assert foo_proj.src == "bar/foo"
