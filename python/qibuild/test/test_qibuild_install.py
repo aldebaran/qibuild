@@ -42,3 +42,18 @@ def test_using_compiled_tool_for_install(qibuild_action, tmpdir):
 
     foo_out = tmpdir.join("share", "foo", "foo.out")
     assert foo_out.check(file=True)
+
+def test_qi_install_cmake(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("installme")
+    qibuild_action("configure", "installme")
+    qibuild_action("make", "installme")
+    qibuild_action("install", "installme", tmpdir.strpath)
+    assert tmpdir.join("share", "data_star", "foo.dat").check(file=True)
+    assert tmpdir.join("share", "data_star", "bar.dat").check(file=True)
+    assert tmpdir.join("share", "recurse", "a_dir/a_file").check(file=True)
+    assert tmpdir.join("share", "recurse", "a_dir/b_dir/c_dir/d_file").check(file=True)
+
+def test_fails_early(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("installme")
+    qibuild_action("configure", "installme", "-DFAIL_EMPTY_GLOB=TRUE", raises=True)
+    qibuild_action("configure", "installme", "-DFAIL_NON_EXISTING=TRUE", raises=True)
