@@ -30,14 +30,17 @@ def get_git_worktree(args, sync_first=True):
     return git_worktree
 
 
-def get_git_projects(git_worktree, args):
+def get_git_projects(git_worktree, args, default_all=False):
     """ Get a list of git projects to use """
-    if hasattr(args, "build_deps") and args.build_deps:
+    if hasattr(args, "use_deps") and args.use_deps:
         build_worktree = qibuild.worktree.BuildWorkTree(git_worktree.worktree)
         parser = GitBuildProjectParser(git_worktree, build_worktree)
+        # do NOT forward default_all option
+        # (cd hello, qisrc sync --use-deps  must not run on all projects)
+        return parser.parse_args(args, default_all=False)
     else:
         parser = GitProjectParser(git_worktree)
-    return parser.parse_args(args)
+        return parser.parse_args(args, default_all=default_all)
 
 ##
 # Implementation details
@@ -74,32 +77,49 @@ class GitProjectParser(qisys.parsers.AbstractProjectParser):
 
 
 class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
+    """ Implements AbstractProjectParser for a GitWorkTree when
+    --use-deps is used.
+
+    """
     def __init__(self, git_worktree, build_worktree):
-        self.build_worktree = build_worktree
-        self.build_parser = qibuild.parsers.BuildProjectParser(build_worktree)
-        self.build_projects = self.build_worktree.build_projects
         self.git_worktree = git_worktree
-        self.git_parser = GitProjectParser(git_worktree)
-        self.git_projects = self.git_worktree.git_projects
+        self.build_worktree = build_worktree
+        self.parser = GitProjectParser(git_worktree)
 
     def all_projects(self, args):
+        """ Implements AbstractProjectParser.all_projects """
         return self.git_worktree.git_projects
 
     def parse_one_project(self, args, project_arg):
-        """ Parse one project:
+        """ Implements AbstractProjectParser.parse_one_project """
+        git_project = self.parser.parse_one_project(args, project_arg)[0]
+        return self.solve_deps(args, git_project)
 
-        Find all the build deps, then find every git project that contains
-        the build depencencies
+    def parse_no_project(self, args):
+        """ Implements AbstractProjectParser.parse_no_project """
+        git_project = self.parser.parse_no_project(args)[0]
+        return self.solve_deps(args, git_project)
+
+    def solve_deps(self, args, git_project):
+        """ Called when using `qisrc --use-deps`:
+
+        * find a git project as usual
+        * find the parent build project of this git project
+        * solve the dependencies
+        * find the git projects matching the dependencies
 
         """
-        build_projects =  self.build_parser.parse_one_project(args, project_arg)
+        build_project = qisys.parsers.find_parent_project(self.build_worktree.build_projects,
+                                                        git_project.path)
+        if not build_project:
+            return [git_project]
         git_projects = list()
+        deps_solver = qibuild.deps_solver.DepsSolver(self.build_worktree)
+        dep_types = qibuild.parsers.get_dep_types(args)
+        deps_solver.dep_types = dep_types
+        build_projects = deps_solver.get_dep_projects([build_project], dep_types)
         for build_project in build_projects:
-            git_project = qisys.parsers.find_parent_project(self.git_projects,
+            git_project = qisys.parsers.find_parent_project(self.git_worktree.git_projects,
                                                             build_project.path)
             git_projects.append(git_project)
         return git_projects
-
-    def parse_no_project(self, args):
-        # solve deps
-        pass

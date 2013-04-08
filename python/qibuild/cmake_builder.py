@@ -10,19 +10,16 @@ class CMakeBuilder(object):
         self.build_worktree = build_worktree
         self.projects = projects
         self.deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
-        self.solving_type = "default"
+        self.dep_types = ["build", "runtime"]
+
 
     @property
     def dep_types(self):
-        if self.solving_type == "default":
-            dep_types = ["build", "runtime"]
-        elif self.solving_type == "build_only":
-            dep_types = ["build"]
-        elif self.solving_type == "runtime_only":
-            dep_types = ["runtime"]
-        elif self.solving_type == "single":
-            dep_types = list()
-        return dep_types
+        return qibuild.deps_solver.dep_types
+
+    @dep_types.setter
+    def dep_types(self, value):
+        qibuild.deps_solver.dep_types = value
 
     @property
     def build_config(self):
@@ -64,7 +61,7 @@ class CMakeBuilder(object):
     def configure(self, **kwargs):
         """ Configure the projects in the correct order """
         self.bootstrap_projects()
-        if self.solving_type == "single":
+        if self.dep_types == list():
             projects = self.projects
         else:
             projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
@@ -78,7 +75,7 @@ class CMakeBuilder(object):
     @need_configure
     def build(self, **kwargs):
         """ Build the projects in the correct order """
-        if self.solving_type == "single":
+        if self.dep_types == list():
             projects = self.projects
         else:
             projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
@@ -91,7 +88,7 @@ class CMakeBuilder(object):
     @need_configure
     def install(self, dest_dir, **kwargs):
         """ Install the projects and the packages to the dest_dir """
-        if self.solving_type == "single":
+        if self.dep_types == list():
             projects = self.projects
         else:
             projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
@@ -111,7 +108,7 @@ class CMakeBuilder(object):
                 ui.info(" *", ui.blue, package.name)
         ui.info(ui.green, "will be installed to", ui.blue, real_dest)
 
-        runtime_only = self.solving_type == "runtime_only"
+        runtime_only = self.dep_types == ["runtime"]
         if runtime_only:
             ui.info(ui.green, "(runtime components only)")
 
@@ -135,7 +132,7 @@ class CMakeBuilder(object):
     @need_configure
     def deploy(self, url, use_rsync=True, port=22, split_debug=True):
         """ Deploy the project and the packages it depends to a remote url """
-        if self.solving_type == "single":
+        if self.dep_types == list():
             dep_packages = list()
             dep_projects = self.projects
         else:
@@ -175,8 +172,6 @@ class CMakeBuilder(object):
                     ui.green, "Deploying project", ui.blue, project.name,
                     ui.green, "to", ui.blue, url)
             project.deploy(url)
-
-
 
 class NotConfigured(Exception):
     def __init__(self, project):

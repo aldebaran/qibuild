@@ -66,4 +66,4 @@ upgrade-python:
 
 refact:
 	-pylint --errors-only --rcfile pylint.rc qisys qisrc qibuild qitoolchain
-	py.test qisrc/test qisys/test qibuild/test
+	py.test qisys/test qibuild/test qitoolchain/test qisrc/test

@@ -68,10 +68,6 @@ def project_parser(parser, positional=True):
                              "the runtime deps.")
     parser.set_defaults(build_only=False)
 
-# FIXME
-def toc_parser(parser):
-    pass
-
 def get_build_worktree(args):
     """ Get a build worktree to use from a argparse.Namespace
     object
@@ -119,6 +115,16 @@ def get_one_build_project(build_worktree, args):
         raise Exception("This action can only work on one project")
     return projects[0]
 
+def get_dep_types(args):
+    """ Get a list of dep types from the command line """
+    if hasattr(args, "runtime_only") and args.runtime_only:
+        return ["runtime"]
+    if args.build_only:
+        return ["build"]
+    if args.single:
+        return list()
+    return ["build", "runtime"]
+
 def get_cmake_builder(args):
     """ Get a CMakeBuilder object from the command line
 
@@ -127,12 +133,7 @@ def get_cmake_builder(args):
     # dep solving will be made later by the CMakeBuilder
     build_projects = get_build_projects(build_worktree, args, solve_deps=False)
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, build_projects)
-    if hasattr(args, "runtime_only") and args.runtime_only:
-        cmake_builder.solving_type = "runtime_only"
-    if args.build_only:
-        cmake_builder.solving_type = "build_only"
-    if args.single:
-        cmake_builder.solving_type = "single"
+    cmake_builder.dep_types = get_dep_types(args)
     return cmake_builder
 
 ##

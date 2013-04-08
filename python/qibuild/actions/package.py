@@ -65,12 +65,12 @@ def _do_package(cmake_builder, destdir, build_type="Release"):
     """
     cmake_builder.build_config.build_type = build_type
 
-    cmake_builder.solving_type == "build_only"
+    cmake_builder.dep_types == ["build"]
     ui.info(ui.blue, "::", ui.reset, ui.bold, "Configuring ... (%s)" % build_type)
     cmake_builder.configure()
     ui.info(ui.blue, "::", ui.reset, ui.bold, "Building    ... (%s)" % build_type)
     cmake_builder.build()
-    cmake_builder.solving_type == "single"
+    cmake_builder.dep_types == list()
     ui.info(ui.blue, "::", ui.reset, ui.bold, "Installing  ... (%s)" % build_type)
     cmake_builder.install(destdir)
 

@@ -17,10 +17,12 @@ from qisys import ui
 import qisys
 import qisrc
 import qisrc.parsers
+import qibuild.parsers
 
 def configure_parser(parser):
     """Configure parser for this action."""
     qisrc.parsers.worktree_parser(parser)
+    qibuild.parsers.project_parser(parser, positional=False)
     parser.add_argument("--path", help="type of patch to print",
             default="project", choices=['none', 'absolute', 'worktree', 'project'])
     parser.add_argument("git_grep_opts", metavar="-- git grep options", nargs="*",

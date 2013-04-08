@@ -4,6 +4,8 @@ import qisrc.git
 import qisrc.parsers
 import qisrc.worktree
 
+from qibuild.test.conftest import TestBuildWorkTree
+from qisrc.test.conftest import TestGitWorkTree
 def test_guess_git_repo(tmpdir, args):
     worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     foo = tmpdir.mkdir("foo")
@@ -20,3 +22,24 @@ def test_guess_git_repo(tmpdir, args):
     with qisys.sh.change_cwd(bar.strpath):
         assert qisys.parsers.get_projects(worktree, args)[0].src == "foo/bar"
         assert qisrc.parsers.get_git_projects(git_worktree, args)[0].src == "foo"
+
+def test_using_build_deps(tmpdir, args, monkeypatch):
+    build_worktree = TestBuildWorkTree(tmpdir.strpath)
+    foo = build_worktree.create_project("foo")
+    world = build_worktree.create_project("world")
+    hello = build_worktree.create_project("hello", depends=["world"])
+    git = qisrc.git.Git(foo.path)
+    git.init()
+    git = qisrc.git.Git(world.path)
+    git.init()
+    git = qisrc.git.Git(hello.path)
+    git.init()
+    git_worktree = TestGitWorkTree(tmpdir.strpath)
+    monkeypatch.chdir(tmpdir.join("hello"))
+    projs = qisrc.parsers.get_git_projects(git_worktree, args)
+    assert [x.src for x in projs] == ["hello"]
+    args.use_deps = True
+    projs = qisrc.parsers.get_git_projects(git_worktree, args)
+    assert [x.src for x in projs] == ["world", "hello"]
+    projs = qisrc.parsers.get_git_projects(git_worktree, args, default_all=True)
+    assert [x.src for x in projs] == ["world", "hello"]
