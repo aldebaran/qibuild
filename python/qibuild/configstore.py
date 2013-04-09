@@ -247,9 +247,6 @@ def update_config(config_path, section, key, value):
     Here you are just fixing *one* config file, that someone
     else will read later.
 
-    If you want to permanetely store Toc configuration, use
-    toc.update_config() instead.
-
     If value is a list, we will write a string separated by spaces
 
     """

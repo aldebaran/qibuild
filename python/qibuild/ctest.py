@@ -156,7 +156,7 @@ class Test:
                          verbose=self.verbose, result_dir=result_dir)
         if timeout:
             timeout = int(timeout)
-        # we will merge the build env coming from toc
+        # we will merge the build env coming from the build worktree
         # config with the env coming from CMake config,
         # assuming that cmake is always right
         env = self.build_env.copy()

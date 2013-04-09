@@ -144,7 +144,7 @@ class Toolchain(object):
     """ A toolchain is a set of packages
 
     If has a name that will later be used as 'build config'
-    by the toc object.
+    by the BuildWorkTree.
 
     It has a configuration in ~/.config/qi/toolchains/<name.cfg>
     looking like:
