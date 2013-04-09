@@ -75,3 +75,5 @@
   -> qibuild_action.configure("...") ?
 
 * qibuild deploy: fix gdb config files generation
+
+* remove qisrc snapshot --manifest
