@@ -65,5 +65,6 @@ upgrade-python:
 	@$(PIP) install --user --upgrade --requirement requirements.txt
 
 refact:
+	-pyflakes **/*.py
 	-pylint --errors-only --rcfile pylint.rc qisys qisrc qibuild qitoolchain
 	py.test qisys/test qibuild/test qitoolchain/test qisrc/test
