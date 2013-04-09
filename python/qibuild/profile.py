@@ -7,6 +7,7 @@
 
 """
 
+import os
 import qisys.qixml
 
 class Profile:
@@ -45,6 +46,9 @@ def parse_profiles(xml_path):
     """ Parse .qi/qibuild.xml. Return a dict
     name -> Profile
     """
+    if not os.path.exists(xml_path):
+        with open(xml_path, "w") as fp:
+            fp.write("<qibuild />")
     res = dict()
     tree = qisys.qixml.read(xml_path)
     root = tree.getroot()
