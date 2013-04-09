@@ -205,3 +205,6 @@ class QiSrcAction(TestAction):
     @property
     def git_worktree(self):
         return TestGitWorkTree(self.tmp)
+
+    def create_git_project(self, src, branch="master"):
+        return self.git_worktree.create_git_project(src, branch=branch)

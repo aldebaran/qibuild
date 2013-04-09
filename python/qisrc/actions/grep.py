@@ -14,8 +14,7 @@ import os
 import sys
 
 from qisys import ui
-import qisys
-import qisrc
+import qisrc.git
 import qisrc.parsers
 import qibuild.parsers
 
@@ -33,6 +32,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point."""
     git_worktree = qisrc.parsers.get_git_worktree(args)
+    git_projects = qisrc.parsers.get_git_projects(git_worktree, args, default_all=True)
     git_grep_opts = args.git_grep_opts
     if args.path == 'none':
         git_grep_opts.append("-h")
@@ -44,7 +44,7 @@ def do(args):
     git_grep_opts.append(args.pattern)
 
     retcode = 1
-    for project in git_worktree.git_projects:
+    for project in git_projects:
         ui.info(ui.green, "Looking in", project.src, "...")
         git = qisrc.git.Git(project.path)
         (status, out) = git.call("grep", *git_grep_opts, raises=False)
@@ -58,7 +58,7 @@ def do(args):
                     line_split[0] = os.path.join(prepend, line_split[0])
                     out_lines.append(":".join(line_split))
                 out = '\n'.join(out_lines)
-            print out
+            ui.info(out)
         if status == 0:
             retcode = 0
     sys.exit(retcode)
