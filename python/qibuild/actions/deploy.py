@@ -34,6 +34,7 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     group = parser.add_argument_group("deploy options")
     group.add_argument("url", help="remote target url: user@hostname:path")
+    group.add_argument("--url", dest="urls", action="append", help="urls")
     group.add_argument("--port", help="port", type=int)
     group.add_argument("--split-debug", action="store_true",
                         dest="split_debug", help="split debug symbols. "
@@ -47,6 +48,10 @@ def do(args):
     """Main entry point"""
     url = args.url
     qibuild.deploy.parse_url(url) # throws if url is invalid
+    if args.urls:
+        for url_elem in args.urls:
+            qibuild.deploy.parse_url(url_elem)
+
     toc = qibuild.toc.toc_open(args.worktree, args)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
@@ -74,6 +79,9 @@ def do(args):
             for package in packages:
                 ui.info(" *", ui.blue, package.name)
         ui.info(ui.green, "will be deployed to", ui.blue, url)
+        if args.urls:
+            for url_elem in args.urls:
+                ui.info(ui.blue, url_elem)
 
     # Deploy packages: install all of them in the same temp dir, then
     # deploy this temp dir to the target
@@ -86,8 +94,17 @@ def do(args):
                         "(%i/%i)" % (i, len(package.name)),
                         ui.green, "Deploying package", ui.blue, package.name,
                         ui.green, "to", ui.blue, url)
+                if args.urls:
+                    for url_elem in args.urls:
+                        ui.info(ui.green, "*", ui.reset,
+                                "(%i/%i)" % (i, len(package.name)),
+                                ui.green, "Deploying package", ui.blue, package.name,
+                                ui.green, "to", ui.blue, url_elem)
                 toc.toolchain.install_package(package.name, tmp, runtime=True)
             qibuild.deploy.deploy(tmp, args.url, use_rsync=use_rsync, port=args.port)
+            if args.urls:
+                for url_elem in args.urls:
+                    qibuild.deploy.deploy(tmp, url_elem, use_rsync=use_rsync, port=args.port)
         print
 
     if not args.single:
@@ -100,6 +117,12 @@ def do(args):
                 "(%i/%i)" % (i, len(projects)),
                 ui.green, "Deploying project", ui.blue, project.name,
                 ui.green, "to", ui.blue, url)
+        if args.urls:
+            for url_elem in args.urls:
+                ui.info(ui.green, "*", ui.reset,
+                        "(%i/%i)" % (i, len(projects)),
+                        ui.green, "Deploying project", ui.blue, project.name,
+                        ui.green, "to", ui.blue, url_elem)
         destdir = os.path.join(project.build_directory, "deploy")
         #create folder for project without install rules
         qisys.sh.mkdir(destdir, recursive=True)
@@ -108,6 +131,9 @@ def do(args):
                             split_debug=args.split_debug)
         ui.info(ui.green, "Sending binaries to target ...")
         qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)
+        if args.urls:
+            for url_elem in args.urls:
+                qibuild.deploy.deploy(destdir, url_elem, use_rsync=use_rsync, port=args.port)
         if not args.split_debug:
             continue
         gdb_script, message = qibuild.deploy.generate_debug_scripts(toc, project.name,
