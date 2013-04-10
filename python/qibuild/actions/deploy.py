@@ -40,13 +40,19 @@ def configure_parser(parser):
     group.add_argument("--no-split-debug", action="store_false",
                         dest="split_debug", help="do not split debug symbols. "
                         "Remote debugging won't work")
+    group.add_argument("--url", dest="urls", action="append", help="deploy to each given url.")
     parser.set_defaults(port=22, split_debug=True)
 
 def do(args):
     """Main entry point"""
-    url = args.url
-    qibuild.deploy.parse_url(url) # throws if url is invalid
+    if args.urls:
+        urls = args.urls + [args.url]
+    else:
+        urls = [args.url]
+
+    for url in urls:
+        qibuild.deploy.parse_url(url) # throws if url is invalid
 
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
-    cmake_builder.deploy(url)
-
+    for url in urls:
+        cmake_builder.deploy(url)
