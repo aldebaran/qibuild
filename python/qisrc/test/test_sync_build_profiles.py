@@ -1,7 +1,6 @@
 ## Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
-from StringIO import StringIO
 
 import mock
 
@@ -12,21 +11,23 @@ import qisrc.sync_build_profiles
 
 def test_remote_added(tmpdir):
     worktree = qisys.worktree.create(tmpdir.strpath)
-    xml = """
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write("""
 <manifest>
   <profiles>
     <profile name="foo" />
   </profiles>
 </manifest>
-"""
-    qisrc.sync_build_profiles.sync_build_profiles(worktree, StringIO(xml))
+""")
+    qisrc.sync_build_profiles.sync_build_profiles(worktree, manifest_xml.strpath)
     profiles = qibuild.profile.parse_profiles(worktree.qibuild_xml)
     assert len(profiles) == 1
     assert "foo" in profiles
 
 def test_remote_updated(tmpdir):
     worktree = qisys.worktree.create(tmpdir.strpath)
-    xml = """
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write("""
 <manifest>
   <profiles>
     <profile name="foo">
@@ -38,7 +39,7 @@ def test_remote_updated(tmpdir):
     </profile>
   </profiles>
 </manifest>
-"""
+""")
     qibuild_xml = tmpdir.join(".qi", "qibuild.xml")
     qibuild_xml.write("""
 <manifest>
@@ -55,7 +56,7 @@ def test_remote_updated(tmpdir):
 """)
     # Just a warning for now ...
     with mock.patch("qisys.ui.warning") as warning_mock:
-        qisrc.sync_build_profiles.sync_build_profiles(worktree, StringIO(xml))
+        qisrc.sync_build_profiles.sync_build_profiles(worktree, manifest_xml.strpath)
 
     assert warning_mock.called
 
@@ -65,7 +66,8 @@ def test_remote_updated(tmpdir):
 
 def test_same_remote(tmpdir):
     worktree = qisys.worktree.create(tmpdir.strpath)
-    xml = """
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write("""
 <manifest>
   <profiles>
     <profile name="foo">
@@ -77,7 +79,7 @@ def test_same_remote(tmpdir):
     </profile>
   </profiles>
 </manifest>
-"""
+""")
     qibuild_xml = tmpdir.join(".qi", "qibuild.xml")
     qibuild_xml.write("""
 <manifest>
@@ -94,6 +96,6 @@ def test_same_remote(tmpdir):
 """)
     # Just a warning for now ...
     with mock.patch("qisys.ui.warning") as warning_mock:
-        qisrc.sync_build_profiles.sync_build_profiles(worktree, StringIO(xml))
+        qisrc.sync_build_profiles.sync_build_profiles(worktree, manifest_xml.strpath)
 
     assert not warning_mock.called
