@@ -213,7 +213,7 @@ endfunction()
 #! Make sure configuration and data files in the
 #  given directory can be found by
 #  ``qi::findData()`` in this project or
-#   any dependency
+#  any dependency
 #
 # For this to work, configuration files should be
 # in ``etc`` and data files in ``share``
