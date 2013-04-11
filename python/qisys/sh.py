@@ -330,7 +330,7 @@ def mv(src, dest):
     if os.path.isdir(dest):
         dest = os.path.join(dest, os.path.basename(src))
     if os.path.exists(dest):
-        os.remove(dest)
+        rm(dest)
     shutil.move(src, dest)
 
 
