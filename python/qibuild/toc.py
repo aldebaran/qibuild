@@ -506,6 +506,8 @@ You may want to run:
         timer = ui.timer("make %s" % project.name)
         timer.start()
         check_configure(self, project)
+        if fix_shared_libs:
+            self.fix_shared_libs(project)
 
         cmd = []
         if coverity:
@@ -547,8 +549,6 @@ You may want to run:
         except CommandFailedException:
             raise BuildFailed(project)
 
-        if fix_shared_libs:
-            self.fix_shared_libs(project)
         timer.stop()
 
 
