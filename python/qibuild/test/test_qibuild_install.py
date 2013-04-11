@@ -43,6 +43,20 @@ def test_using_compiled_tool_for_install(qibuild_action, tmpdir):
     foo_out = tmpdir.join("share", "foo", "foo.out")
     assert foo_out.check(file=True)
 
+def test_compile_data(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("compile_data")
+    qibuild_action("configure", "compile_data")
+    qibuild_action("make", "compile_data")
+    qibuild_action("install", "compile_data", tmpdir.strpath)
+    assert tmpdir.join("share", "foo.out").check(file=True)
+
+def test_failing_compiler_makes_install_fail(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("compile_data")
+    qibuild_action("configure", "compile_data", "-DFAIL_COMPILER=ON")
+    qibuild_action("make", "compile_data")
+    error = qibuild_action("install", "compile_data", tmpdir.strpath, raises=True)
+    assert error
+
 def test_qi_install_cmake(qibuild_action, tmpdir):
     qibuild_action.add_test_project("installme")
     qibuild_action("configure", "installme")
