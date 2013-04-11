@@ -77,3 +77,10 @@
 * qibuild deploy: fix gdb config files generation
 
 * remove qisrc snapshot --manifest
+
+* always check CMake correctness (find_package(qibuild) *after* project)
+  > maybe this could be done in CMake instead ...
+
+* add a "path" type in argparse so we alwas convert to lower case
+  first on windows, and check for forbidden names
+  write a test for #11255
