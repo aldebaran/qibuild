@@ -1,4 +1,4 @@
-## Copyright (C) 2012 Aldebaran Robotics
+## Copyright (C) 2012, 2013 Aldebaran Robotics
 
 clean(ZBAR)
 fpath(ZBAR zbar.h)

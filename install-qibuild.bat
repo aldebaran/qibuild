@@ -1,4 +1,4 @@
-rem Copyright (c) 2012 Aldebaran Robotics. All rights reserved.
+rem Copyright (c) 2012, 2013 Aldebaran Robotics. All rights reserved.
 rem Use of this source code is governed by a BSD-style license that can be
 rem found in the COPYING file.
 @echo off
