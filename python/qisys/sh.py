@@ -25,7 +25,7 @@ def get_config_path(*args):
     """ Get a config path to read or write some configuration.
 
     :param args: a list of subfolders. Those will be created
-    when needed
+                 when needed
 
     """
     return get_path(os.path.expanduser("~/.config"), *args)
@@ -34,7 +34,7 @@ def get_cache_path(*args):
     """ Get a config path to read or write some cached data
 
     :param args: a list of subfolders. Those will be created
-    when needed
+                 when needed
 
     """
     return get_path(os.path.expanduser("~/.cache"), *args)
@@ -43,7 +43,7 @@ def get_share_path(*args):
     """ Get a config path to read or write some persistent data
 
     :param args: a list of subfolders. Those will be created
-    when needed
+                 when needed
 
     """
     return get_path(os.path.expanduser("~/.local"), "share", *args)

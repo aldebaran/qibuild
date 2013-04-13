@@ -22,6 +22,7 @@ General
   to run ``<cmd>`` on the ``hello`` project and its dependencies
 
 * It is now impossible to have nested worktrees.
+
   * The ``--force`` option is gone
   * ``qibuild init``, ``qisrc init``, will only run if the working
     directory is empty
@@ -176,7 +177,7 @@ Command line
 CMake
 +++++
 
-* Added :cmake:function:`qi_state_dir`
+* Added :cmake:function:`qi_stage_dir`
 
 Python
 ++++++
