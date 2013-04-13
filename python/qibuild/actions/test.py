@@ -36,6 +36,7 @@ def configure_parser(parser):
                         help="run coverage")
     parser.add_argument("--ncpu", dest="ncpu", default=-1, type=int,
                         help="set number of CPU each test is allowed to use (linux)")
+    parser.add_argument("--build-first", action="store_true", help="rebuild first")
 
 
 def do(args):
@@ -49,6 +50,8 @@ def do(args):
     projects = deps_solver.get_dep_projects(cmake_builder.projects,
                                            dep_types)
     for project in projects:
+        if args.build_first:
+            project.build()
         if args.perf:
             res = qibuild.performance.run_perfs(project,
                     pattern=args.pattern,
