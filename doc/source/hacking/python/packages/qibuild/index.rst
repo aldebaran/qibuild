@@ -5,14 +5,17 @@ qibuild modules
    :maxdepth: 1
 
    build
+   build_config
    cmake
+   cmake_builder
    cmake_modules
    config
    ctest
-   dependencies_solver
+   deps_solver
    deploy
    gdb
    parsers
    performance
    project
    wizard
+   worktree

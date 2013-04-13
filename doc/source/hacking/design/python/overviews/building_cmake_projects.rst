@@ -1,3 +1,5 @@
+.. _qibuild-overviews-building-cmake-projects:
+
 Building CMake projects
 =======================
 
@@ -69,24 +71,43 @@ This "raw" command parsing already took care of simple tasks, like
 making sure the ``--debug`` or ``--release`` arguments are converted
 to a proper ``CMAKE_BUILD_TYPE``.
 
+
 Command line parsing - second pass
 ----------------------------------
 
 
-Here the ``BuildWorkTree`` and the ``BuildProject`` objects
-are initialized using the results of the argument parsing:
+The goal is to get a correctly initialized :py:class:`.CMakeBuilder` object
+
+This is done in just a single line:
 
 .. code-block:: python
 
     # in qibuild.actions.configure
 
     def do(args):
-      build_worktree = qibuild.parsers.get_build_worktree(args)
-      build_projects = qibuild.parsers.get_build_projects(build_worktree, args)
+        cmake_builder = qibuild.parsers.get_cmake_builder(args)
 
 
 The ``get_`` functions in ``qibuild.parsers`` are here to factorize code
 that must be called in every action that uses a BuildWorkTree.
+
+The ``get_cmake_builder`` action looks like
+
+.. code-block:: python
+
+    # in qibuild.parsers
+
+
+    def get_cmake_builder(args):
+        """ Get a CMakeBuilder object from the command line
+
+        """
+        build_worktree = get_build_worktree(args)
+        # dep solving will be made later by the CMakeBuilder
+        build_projects = get_build_projects(build_worktree, args, solve_deps=False)
+        cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, build_projects)
+        cmake_builder.dep_types = get_dep_types(args)
+        return cmake_builder
 
 Here's what those functions do:
 
@@ -203,29 +224,32 @@ The goal here is to get a list of ``BuildProject`` objects to build.
   command line. If no build project is found, an error is raised.
 
 
+Note that at this point, no dependency solving has been done yet.
+Meaning that the ``projects`` list only contains the ``hello project``
+
+
+get_dep_types
++++++++++++++
+
+Here, ``get_dep_types`` is used to converting the ``--runtime``,
+``--build-deps-only``, ``--single`` arguments into a list of build types:
+
+* default: ``["build", "runtime"]``
+* ``--runtime``: ``["build", "runtime"]``
+* ``-s, --single`` : ``[]``
+* ``--build-deps-only`` : ``["build"]``
+
+Finally, ``CMakeBuilder.dep_types`` is set
+In our examples, no argument was specified at all, so the build and the
+runtime dependencies are going to be used.
+
+
 Configuring the project and its dependencies
 ---------------------------------------------
 
 
 Here's what the code looks like:
 
-.. code-block:: python
-
-  # in qibuild.actions.configure
-
-  cmake_builder = qibuild.build.CMakeBuilder(build_worktree,
-                                             build_projects)
-  qibuild.parsers.apply_args(cmake_builder, args)
-  cmake_builder.configure()
-
-
-
-.. code-block:: python
-
-  # in qibuild.parsers
-
-  def apply_args(cmake_builder, args):
-      cmake_builder.solving_type = args.solving_type
 
 .. code-block:: python
 
@@ -238,62 +262,17 @@ Here's what the code looks like:
           self.deps_solver = BuildDepsSolver(self)
 
 
-      @property
-      def build_config(self):
-          return self.build_worktree.build_config
-
-      @property
-      def cmake_generator(self):
-          return self.build_config.cmake_generator
-
-      @property
-      def build_env(self):
-        return self.build_config.build_env
-
-      @property
-      def num_jobs(self):
-          # transform the -j argument to a suitable integer,
-          # depending on the CMake generator
-
 
       def configure(self, **kwargs):
-          self._write_dependencies_cmake()
-          projects = self.dep_solver.get_projects(self.projects, self.solving_type)
+          self.bootstrap_projects()
+          projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
           for project in projects:
-              project.configure(env=self.build_env, **kwargs)
-
-      @need_configure
-      def build(self, **kwargs):
-          projects = self.dep_solver.get_projects(self.projects, self.solving_type)
-          for project in projects:
-              project.build(env=self.build_env, num_jobs=args.num_jobs, **kwargs)
-
-      @need_configure
-      def install(self, dest_dir):
-          projects = self.dep_solver.get_projects(self.projects, self.solving_type)
-          packages = self.dep_solver.get_packages(self.projects, self.solving_type)
-          for project in projects:
-              project.install(dest_dir)
-          runtime = (self.solving_type == "runtime")
-          for package in packages:
-              package.install(dest_dir, runtime=runtime)
-
-      def need_configure(self):
-          projects = self.dep_solver.get_projects(self.projects, "default")
-          for project in projects:
-              # check that the build directory exists
-              ...
-
-      def _write_dependencies_cmake(self):
-         """ Delegates to BuildProject.write_dependencies_cmake """
-          projects = self.dep_solver.get_projects(self.projects, "default")
-          for project in projects:
-              sdk_dirs = self.deps_solver.get_sdk_dirs(project)
-              project.write_dependencies_cmake(sdk_dirs)
+            project.configure(**kwargs)
 
 
 Note that the ``CMakeBuilder`` contains a ``BuildDepsSolver`` to delegates
 all the dependencies solving.
+
 
 For instance, configuring ``hello``, by default should call ``configure()`` on
 the ``world`` project, unless ``-s`` was specified.
@@ -302,6 +281,10 @@ Also, since ``hello`` has a runtime dependency on the ``bar`` package,
 ``qibuild install --runtime hello /tmp/hl`` should install both ``hello``
 and ``bar`` to ``/tmp/hl``
 
+Also note that ``CMakeBuilder`` delegates the actual call to ``cmake`` to
+the build project itself
+
+
 
 Generating the dependencies.cmake
 +++++++++++++++++++++++++++++++++
@@ -309,19 +292,19 @@ Generating the dependencies.cmake
 For the ``CMake`` call to work, a ``dependencies.cmake`` must be written
 in the build directory
 
-This is done by ``cmake_builder.write_dependencies_cmake``
+This is done by ``cmake_builder.bootstrap_projects``
 
 Here it is important that the ``dependencies.cmake`` always contains the list of every
 build dependencies, even if ``-s`` is used.
 
-That's why the solving type is set to ``default`` when calling ``update_projects``
 
 
 Calling CMake
 +++++++++++++
 
-Here ``deps_solver`` honors the ``solving_type``, so that when calling
-``qibuild configure -s hello``, ``world.configure()`` is not called.
+Here ``deps_solver`` uses ``self.dep_types``, so that when
+``qibuild configure -s hello``, is used,
+``world.configure()`` is not called.
 
 
 Installing
@@ -340,19 +323,45 @@ Then either:
 Building projects outside a qiBuild action
 ------------------------------------------
 
+This could be part of a continuous integration script, for instance:
+
 .. code-block:: python
 
-    def build_project(worktree_root, name):
-        # Could be part of a continuous integration script, for instance:
-        worktree = qisys.worktree.WorkTree(worktree_root)
-        build_worktree = BuildWorkTree(worktree)
-        build_config = CMakeBuildConfig(build_worktree.qibuild_xml)
-        # set build_config.toolchain_name or build_config.build_type here
-        # build_config.build_type = "Release"
-        build_worktree.build_config = build_worktree
-        project = build_worktree.get_build_project(name)
-        cmake_builder = CMakeBuilder(build_worktree, [project])
-        # set dep_solving type here
-        # build_worktree.dep_solving_type = "runtime_only"
-        cmake_builder.configure()
-        cmake_builder.build()
+      worktree = qisys.worktree.WorkTree(worktree_root)
+      build_worktree = BuildWorkTree(worktree)
+      build_config = build_worktree.build_config
+
+
+.. note::
+
+    Here the build_config has already been initialized from the
+    various config files, and default values, but you can still
+    use:
+
+    .. code-block:: python
+
+        build_config.set_active_config("mytoolchain")
+        build_config.build_type = "Release"
+
+
+
+.. code-block:: python
+
+
+      project = build_worktree.get_build_project(name)
+
+      cmake_builder = CMakeBuilder(build_worktree, [projet])
+
+      # Configure and build the build and runtime deps of the
+      # project:
+      cmake_builder.configure()
+      cmake_builder.build()
+
+
+If you then need to install the runtime parts only
+(to make a redistributable package for instance)
+
+.. code-block:: python
+
+      cmake_builder.dep_types = ["runtime"]
+      cmake_builder.install(destdir="package")

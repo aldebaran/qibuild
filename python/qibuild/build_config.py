@@ -7,8 +7,10 @@ import qitoolchain
 
 
 class CMakeBuildConfig(object):
-    """ Just a container for the various settings
-    that can affect the build
+    """ Compute a list of CMake flags from all the settings
+    that can affect the build  (the toolchain name, the build
+    profiles, etc ...)
+
 
     """
     def __init__(self, build_worktree):
@@ -24,10 +26,16 @@ class CMakeBuildConfig(object):
 
     @property
     def using_visual_studio(self):
+        " Whether we are using visual studio "
         return self.cmake_generator and "Visual Studio" in self.cmake_generator
 
     @property
     def local_cmake(self):
+        """ Path to the "custom" CMake file. Its content will be added
+        to the generated CMake files when running ``qibuild configure``
+
+        :return None: if the custom CMake file does not exist
+        """
         if not self.active_config:
             return None
         custom_cmake = os.path.join(self.build_worktree.root, ".qi",
@@ -39,16 +47,25 @@ class CMakeBuildConfig(object):
 
     @property
     def using_make(self):
+        """ Whether we are using make """
         return self.cmake_generator and "Unix Makefiles" in self.cmake_generator
 
     @property
     def cmake_generator(self):
+        """ The current CMake generator, either set by the user from the command
+        line or read from the qibuild configuration files
+
+        """
         if self._cmake_generator:
             return self._cmake_generator
         return self.qibuild_cfg.cmake.generator
 
     @property
     def toolchain(self):
+        """ The current toolchain, either set by the user from the command
+        line or read from the local qibuild settings
+
+        """
         if self.active_config:
             return qitoolchain.get_toolchain(self.active_config)
         return None
@@ -61,14 +78,18 @@ class CMakeBuildConfig(object):
 
     @property
     def build_env(self):
+        """ A dict defining the environnment used when building, as
+        read from qibuild configuration files.
+        ``os.environ`` will remain unchanged
+
+        """
         envsetter = qisys.envsetter.EnvSetter()
         envsetter.read_config(self.qibuild_cfg)
         return envsetter.get_build_env()
 
     @property
     def cmake_args(self):
-        """ Compute the CMake arguments to use, using the
-        profiles registered in the given worktree
+        """ The CMake arguments to use
 
         """
         args = list()
@@ -87,16 +108,19 @@ class CMakeBuildConfig(object):
 
     @property
     def default_config(self):
+        """ The default configuration, as read from the local build settings """
         self.read_local_settings()
         return self._default_config
 
 
     def read_global_qibuild_settings(self):
+        """ Read ``~/.config/qi/qibuild.xml`` """
         qibuild_cfg = qibuild.config.QiBuildConfig()
         qibuild_cfg.read(create_if_missing=True)
         return qibuild_cfg
 
     def read_local_settings(self):
+        """ Read ``<worktree>/.qi/qibuild.xml`` """
         local_settings = qibuild.config.LocalSettings()
         tree = qisys.qixml.read(self.build_worktree.qibuild_xml)
         local_settings.parse(tree)
@@ -119,5 +143,11 @@ but this does not match any toolchain name
         self.set_active_config(default_config)
 
     def set_active_config(self, active_config):
+        """ Set the active configuration. This should match an
+        existing toolchain name.
+
+        Used when running ``qibuild configure -c <config>``
+
+        """
         self.active_config = active_config
         self.qibuild_cfg.set_active_config(active_config)

@@ -15,6 +15,7 @@ class CMakeBuilder(object):
 
     @property
     def dep_types(self):
+        """ The list of dependencies to use """
         return qibuild.deps_solver.dep_types
 
     @dep_types.setter
@@ -23,10 +24,16 @@ class CMakeBuilder(object):
 
     @property
     def build_config(self):
+        """ The :py:class:`.CMakeBuildConfig` to use when building projects
+
+        """
         return self.build_worktree.build_config
 
     @property
     def build_env(self):
+        """ The environment used when building projects
+
+        """
         return self.build_config.build_env
 
     # pylint: disable-msg=E0213

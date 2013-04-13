@@ -126,7 +126,7 @@ def get_dep_types(args):
     return ["build", "runtime"]
 
 def get_cmake_builder(args):
-    """ Get a CMakeBuilder object from the command line
+    """ Get a :py:class:`.CMakeBuilder` object from the command line
 
     """
     build_worktree = get_build_worktree(args)

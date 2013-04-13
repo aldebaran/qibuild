@@ -87,8 +87,17 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     """Call cmake with from a build dir for a source dir.
     cmake_args are added on the command line.
 
-    If clean_first is True, we will remove cmake-generated files.
-    Useful when dependencies have changed.
+    :param env: defines the environnemt used when calling ``cmake``
+                ``os.environ`` will remain unchanged
+    :param clean_first: Clean the cmake cache
+    :param summarize_options: Whether to call :py:func:`display_options` at the end
+
+    For qibuild/CMake hackers:
+
+    :param profiling: Profile CMake executions
+    :param debug_trycompile: Call ``cmake`` with ``--debug-trycompile``
+    :param trace_cmake: Call ``cmake`` with ``--trace`` The resuls
+                        will be written in <build>/cmake.log
 
     """
     if not os.path.exists(source_dir):

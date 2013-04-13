@@ -178,7 +178,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             fp.write(to_write)
 
     def configure(self, **kwargs):
-        """ Delegate to qibuild.cmake """
+        """ Delegate to :py:func:`qibuild.cmake.cmake` """
         # FIXME: done by write_dependencies_cmake
         qisys.sh.mkdir(self.build_directory, recursive=True)
         cmake_args = self.cmake_args

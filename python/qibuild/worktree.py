@@ -26,6 +26,10 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
 
     @property
     def qibuild_xml(self):
+        """ Path to <worktree>/.qi/qibuild.xml
+        Will be created if it does not exist
+
+        """
         config_path = os.path.join(self.worktree.dot_qi, "qibuild.xml")
         if not os.path.exists(config_path):
             with open(config_path, "w") as fp:
@@ -34,14 +38,16 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
 
     @property
     def toolchain(self):
+        """ The toolchain to use """
         return self.build_config.toolchain
 
     @property
     def default_config(self):
+        """ The default config to use """
         return self.build_config.default_config
 
     def get_build_project(self, name, raises=True):
-        """ Get a build project given its name """
+        """ Get a :py:class:`.BuildProject` given its name """
         for build_project in self.build_projects:
             if build_project.name == name:
                 return build_project
@@ -90,8 +96,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
 
     def set_active_config(self, active_config):
         """ Set the config to use for this worktree
-        Should match a toolchain name, and will cause
-        seld.build_config to be updated
+        Should match a toolchain name
 
         """
         self.build_config.set_active_config(active_config)

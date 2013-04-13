@@ -1,6 +1,10 @@
 import qisys.sort
 
 class DepsSolver(object):
+    """ Solve dependencies across projects in a build worktree
+    and packages in a toolchain
+
+    """
     def __init__(self, build_worktree):
         self.build_worktree = build_worktree
 
