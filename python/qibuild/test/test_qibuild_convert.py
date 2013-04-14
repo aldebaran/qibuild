@@ -1,11 +1,9 @@
-import qisys.ui
-
 def test_no_cmake(qibuild_action, record_messages):
     qibuild_action.add_test_project("convert/no_cmake")
     qibuild_action.chdir("convert/no_cmake")
     qibuild_action("convert")
-    assert qisys.ui.find_message("Would create")
-    assert qisys.ui.find_message("--go")
+    assert record_messages.find("Would create")
+    assert record_messages.find("--go")
     record_messages.reset()
     qibuild_action("convert", "--go")
     qibuild_action("configure")

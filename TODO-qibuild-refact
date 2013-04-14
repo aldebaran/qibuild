@@ -52,8 +52,6 @@
 
 * add group for every action parser
 
-* move qisys.ui.find_message to qisys.test.conftests
-
 * fix all doc strings ...
 
 * handle custom build dir

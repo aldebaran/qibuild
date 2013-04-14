@@ -88,13 +88,9 @@ CONFIG = {
 }
 
 
+# used for testing
 _MESSAGES = list()
 
-def find_message(message_part):
-    """ Testing only """
-    for message in _MESSAGES:
-        if message_part in message:
-            return message
 
 def _msg(*tokens, **kwargs):
     """ Helper method for error, warning, info, debug

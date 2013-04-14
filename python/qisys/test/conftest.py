@@ -1,4 +1,5 @@
 import os
+import re
 import tempfile
 
 import py
@@ -82,7 +83,7 @@ def args(request):
 
 @pytest.fixture
 def record_messages(request):
-    """ Configure qisys.ui to record the messges sent to the user """
+    """ Configure qisys.ui to record the messages sent to the user """
     recorder = MessageRecorder()
     request.addfinalizer(recorder.stop)
     return recorder
@@ -99,6 +100,11 @@ class MessageRecorder():
     def reset(self):
         ui._MESSAGES = list()
 
+    def find(self, pattern):
+        regexp = re.compile(pattern)
+        for message in ui._MESSAGES:
+            if re.search(regexp, message):
+                return message
 
 @pytest.fixture(autouse=True)
 def tmpfiles(request):

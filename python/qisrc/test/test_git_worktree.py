@@ -1,4 +1,3 @@
-from qisys import ui
 import qisys.qixml
 import qisys.worktree
 import qisrc.worktree
@@ -95,9 +94,9 @@ def test_warn_on_change(git_worktree, record_messages):
     foo.configure_remote("origin", "git@srv:foo.git")
     foo.configure_branch("master", tracks="origin", default=True)
     foo.configure_remote("origin", "git@srv:libfoo.git")
-    assert ui.find_message("remote url changed")
+    assert record_messages.find("remote url changed")
     foo.configure_branch("next", default=True)
-    assert ui.find_message("default branch changed")
+    assert record_messages.find("default branch changed")
     foo.configure_remote("gerrit", "http://gerrit/libfoo.git")
     foo.configure_branch("next", tracks="gerrit")
-    assert ui.find_message("now tracks gerrit instead")
+    assert record_messages.find("now tracks gerrit instead")

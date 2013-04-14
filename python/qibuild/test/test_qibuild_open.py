@@ -1,4 +1,3 @@
-import qisys.ui
 import qibuild.config
 
 import mock
@@ -7,7 +6,7 @@ def test_no_ide_yet(qibuild_action, record_messages):
     qibuild_action.add_test_project("world")
     qibuild_action("configure", "world")
     qibuild_action("open", "world")
-    assert qisys.ui.find_message("No IDE configured yet")
+    assert record_messages.find("No IDE configured yet")
 
 def test_run_configure(qibuild_action, interact):
     qibuild_cfg = qibuild.config.QiBuildConfig()

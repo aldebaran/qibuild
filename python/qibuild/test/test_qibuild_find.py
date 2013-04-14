@@ -1,5 +1,3 @@
-import qisys.ui
-
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
 
@@ -10,7 +8,7 @@ def test_find_target_in_projet(qibuild_action, record_messages):
     qibuild_action("configure", "hello")
     record_messages.reset()
     qibuild_action("find", "hello", "world")
-    assert qisys.ui.find_message("WORLD_LIBRARIES")
+    assert record_messages.find("WORLD_LIBRARIES")
 
 def test_find_target_in_toolchain_package(tmpdir, monkeypatch,
                                           record_messages):
@@ -31,4 +29,4 @@ def test_find_target_in_toolchain_package(tmpdir, monkeypatch,
     qibuild_action("configure", "-c", "foo")
     qibuild_action("find", "world", "-c", "foo")
 
-    assert qisys.ui.find_message("WORLD_LIBRARIES")
+    assert record_messages.find("WORLD_LIBRARIES")

@@ -1,5 +1,4 @@
 import qisrc.git
-import qisys.ui
 
 import py
 
@@ -28,9 +27,9 @@ def test_all_by_default(qisrc_action, record_messages):
     record_messages.reset()
     rc = qisrc_action("grep", "spam", retcode=True)
     assert rc == 0
-    assert qisys.ui.find_message("foo")
-    assert qisys.ui.find_message("bar")
-    assert qisys.ui.find_message("this is spam")
+    assert record_messages.find("foo")
+    assert record_messages.find("bar")
+    assert record_messages.find("this is spam")
 
 def test_using_projects(qisrc_action):
     setup_projects(qisrc_action)

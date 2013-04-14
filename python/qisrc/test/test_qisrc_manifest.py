@@ -1,4 +1,3 @@
-from qisys import ui
 import qisrc.manifest
 
 def test_option_checking(qisrc_action):
@@ -16,17 +15,17 @@ def test_list_no_groups(qisrc_action, git_server, record_messages):
     manifest_url = git_server.manifest_url
     qisrc_action("init", manifest_url)
     qisrc_action("manifest", "--list")
-    assert ui.find_message(manifest_url)
-    assert not ui.find_message("groups")
+    assert record_messages.find(manifest_url)
+    assert not record_messages.find("groups")
 
 def test_list_groups(qisrc_action, git_server, record_messages):
     manifest_url = git_server.manifest_url
     git_server.create_group("mygroup", ["a", "b"])
     qisrc_action("init", manifest_url, "--group", "mygroup")
     qisrc_action("manifest", "--list")
-    assert ui.find_message(manifest_url)
-    assert ui.find_message("groups")
-    assert ui.find_message("mygroup")
+    assert record_messages.find(manifest_url)
+    assert record_messages.find("groups")
+    assert record_messages.find("mygroup")
 
 def test_add(qisrc_action, git_server):
     qisrc_action("init")
