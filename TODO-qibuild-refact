@@ -87,3 +87,4 @@
 * get rid of qibuild test ``--slow``, this makes no sense: the
   list of tests and wether they are nightly or not is managed from cmake
 
+* add qibuild test --failed
