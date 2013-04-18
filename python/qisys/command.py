@@ -155,7 +155,7 @@ class CommandFailedException(Exception):
 Return code is {returncode}
 Working dir was {cwd}
 """
-        mess = mess.format(cmd=self.cmd, returncode=self.returncode,
+        mess = mess.format(cmd=' '.join(self.cmd), returncode=self.returncode,
                            cwd=self.cwd)
         if self.stdout:
             mess += "Stdout: \n"
