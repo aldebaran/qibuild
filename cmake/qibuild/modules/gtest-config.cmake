@@ -15,5 +15,5 @@ else()
   flib(GTEST gtest_main)
 endif()
 
-qi_set_global(GTEST_DEPENDS "PTHREAD")
+qi_persistent_set(GTEST_DEPENDS "PTHREAD")
 export_lib(GTEST)

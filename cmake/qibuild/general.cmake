@@ -54,13 +54,13 @@ include("qibuild/internal/glob")
 include("qibuild/internal/autostrap")
 
 if (NOT QI_SDK_DIR)
-  qi_set_global(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk")
+  qi_persistent_set(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk")
   qi_info("QI_SDK_DIR: ${QI_SDK_DIR}")
 endif()
 
 #ensure CMAKE_BUILD_TYPE is either Debug or Release
 if (CMAKE_BUILD_TYPE STREQUAL "")
-  qi_set_global(CMAKE_BUILD_TYPE "Debug")
+  qi_persistent_set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 include("qibuild/find")
@@ -136,7 +136,7 @@ option(QI_NIGHTLY_TESTS "triggers building of nightly tests" OFF)
 # (it's c:\program files\<project> on Windows, and
 # /usr/local elsewhere)
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  qi_set_global(CMAKE_INSTALL_PREFIX "/")
+  qi_persistent_set(CMAKE_INSTALL_PREFIX "/")
 endif()
 
 # Always create an install rule, so that `qibuild install` never

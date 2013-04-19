@@ -5,5 +5,5 @@
 clean(HDF5)
 fpath(HDF5 hdf5.h)
 flib(HDF5 hdf5)
-qi_set_global(HDF5_DEPENDS "PTHREAD" "ZLIB" "M")
+qi_persistent_set(HDF5_DEPENDS "PTHREAD" "ZLIB" "M")
 export_lib(HDF5)

@@ -14,7 +14,7 @@ endif()
 # -pthread
 find_package(Threads QUIET)
 if(CMAKE_THREAD_LIBS_INIT)
-  qi_set_global(PTHREAD_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+  qi_persistent_set(PTHREAD_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
 else()
   flib(PTHREAD pthread pthreadVCE2)
 endif()

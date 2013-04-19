@@ -7,4 +7,4 @@ get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 include("${_ROOT_DIR}/boostutils.cmake")
 
 boost_flib("filesystem")
-qi_set_global(BOOST_FILESYSTEM_DEPENDS "BOOST_SYSTEM")
+qi_persistent_set(BOOST_FILESYSTEM_DEPENDS "BOOST_SYSTEM")

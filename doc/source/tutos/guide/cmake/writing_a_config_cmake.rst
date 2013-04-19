@@ -111,8 +111,8 @@ you should write a ``spam-config.cmake`` and use something like
 .. code-block:: cmake
 
    clean(FOO)
-   # caliing flib, fpath as usual
-   qi_set_global(FOO_DEPENDS spam)
+   # calling flib, fpath as usual
+   qi_persitent_set(FOO_DEPENDS spam)
    export_lib(FOO)
 
 

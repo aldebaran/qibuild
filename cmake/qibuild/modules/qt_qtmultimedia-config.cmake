@@ -13,7 +13,7 @@ set(_qtmultimedia_depends "QT_QTCORE;QT_QTGUI")
 if(UNIX AND NOT APPLE)
   list(APPEND _qtmultimedia_depends  "ALSALIB")
 endif()
-qi_set_global(QT_QTMULTIMEDIA_DEPENDS ${_qtmultimedia_depends})
+qi_persistent_set(QT_QTMULTIMEDIA_DEPENDS ${_qtmultimedia_depends})
 
 export_lib(QT_${_suffix})
 set(_ROOT_DIR)

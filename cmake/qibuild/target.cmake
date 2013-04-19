@@ -58,8 +58,8 @@ function(qi_create_bin name)
 
   message(STATUS "Binary: ${name}")
   set(ARG_SRC "${ARG_UNPARSED_ARGUMENTS}" "${ARG_SRC}")
-  qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
-  qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
+  qi_persistent_set("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
+  qi_persistent_set("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
 
   #no install rules can be generated for a target that is not always built
   if (ARG_EXCLUDE_FROM_ALL)
@@ -213,9 +213,9 @@ function(qi_create_lib name)
   #ARGN are sources too
   set(ARG_SRC ${ARG_UNPARSED_ARGUMENTS} ${ARG_SRC})
 
-  qi_set_global("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
-  qi_set_global("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
-  qi_set_global("${name}_INTERNAL"   "${ARG_INTERNAL}")
+  qi_persistent_set("${name}_SUBFOLDER" "${ARG_SUBFOLDER}")
+  qi_persistent_set("${name}_NO_INSTALL" ${ARG_NO_INSTALL})
+  qi_persistent_set("${name}_INTERNAL"   "${ARG_INTERNAL}")
 
 
   foreach(submodule ${ARG_SUBMODULE})

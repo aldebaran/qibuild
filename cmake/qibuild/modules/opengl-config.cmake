@@ -6,6 +6,6 @@
 
 clean(OPENGL)
 include(${CMAKE_ROOT}/Modules/FindOpenGL.cmake)
-qi_set_global(OPENGL_INCLUDE_DIRS ${OPENGL_INCLUDE_DIR})
-qi_set_global(OPENGL_LIBRARIES ${OPENGL_LIBRARIES})
+qi_persistent_set(OPENGL_INCLUDE_DIRS ${OPENGL_INCLUDE_DIR})
+qi_persistent_set(OPENGL_LIBRARIES ${OPENGL_LIBRARIES})
 export_lib(OPENGL)

@@ -214,7 +214,7 @@ function(flib prefix)
 
   if (${name}_LIB)
     list(APPEND ${prefix}_LIBRARIES ${_keyword} ${${name}_LIB})
-    qi_set_global(${prefix}_LIBRARIES ${${prefix}_LIBRARIES})
+    qi_persistent_set(${prefix}_LIBRARIES ${${prefix}_LIBRARIES})
   endif()
 
   qi_debug("LIBFIND: RESULT: ${${_modulelist}_LIB}")
@@ -244,9 +244,9 @@ function(fprogram prefix)
   endif()
 
   if (ARG_DEBUG)
-    qi_set_global(${name}_EXECUTABLE_DEBUG ${${prefix}_EXE})
+    qi_persistent_set(${name}_EXECUTABLE_DEBUG ${${prefix}_EXE})
   else()
-    qi_set_global(${name}_EXECUTABLE ${${prefix}_EXE})
+    qi_persistent_set(${name}_EXECUTABLE ${${prefix}_EXE})
   endif()
 
 endfunction()
@@ -367,6 +367,6 @@ function(_qi_call_fphsa prefix)
   # But, right after this, since foo-config.cmake HAS been found, CMake
   # re-set FOO_FOUND to TRUE.
   # So we set ${prefix}_PACKAGE_FOUND in cache...
-  qi_set_global(${prefix}_PACKAGE_FOUND ${${prefix}_FOUND})
-  qi_set_global(${prefix}_SEARCHED TRUE)
+  qi_persistent_set(${prefix}_PACKAGE_FOUND ${${prefix}_FOUND})
+  qi_persistent_set(${prefix}_SEARCHED TRUE)
 endfunction()

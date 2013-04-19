@@ -9,6 +9,6 @@ set(_suffix "QTOPENGL")
 set(_libame "QtOpenGL")
 
 qt_flib(${_suffix} ${_libame})
-qi_set_global(QT_QTOPENGL_DEPENDS "OPENGL")
+qi_persistent_set(QT_QTOPENGL_DEPENDS "OPENGL")
 export_lib(QT_${_suffix})
 set(_ROOT_DIR)

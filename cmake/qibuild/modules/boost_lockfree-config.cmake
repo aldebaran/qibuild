@@ -8,5 +8,5 @@ include("${_ROOT_DIR}/boostutils.cmake")
 
 if (Boost_VERSION GREATER 105300 OR Boost_VERSION EQUAL 105300)
 boost_flib("lockfree")
-qi_set_global(BOOST_LOCKFREE_DEPENDS BOOST_ATOMIC)
+qi_persistent_set(BOOST_LOCKFREE_DEPENDS BOOST_ATOMIC)
 endif()
