@@ -6,7 +6,7 @@ clean(PYTHON)
 # first, use fpath flib to get python from one of our pre-compiled packages
 # note than we patch Python.h to NOT autolink with python27_d.lib,
 # which prevent us from using boost_python
-fpath(PYTHON Python.h PATH_SUFFIXES "python2.7" "python2.6")
+fpath(PYTHON Python.h PATH_SUFFIXES "python2.7")
 flib(PYTHON NAMES python27 python2.7 Python)
 
 if(NOT PYTHON_LIBRARIES OR NOT PYTHON_INCLUDE_DIRS)
