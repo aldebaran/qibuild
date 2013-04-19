@@ -4,13 +4,10 @@
 
 clean(PYTHON)
 # first, use fpath flib to get python from one of our pre-compiled packages
+# note than we patch Python.h to NOT autolink with python27_d.lib,
+# which prevent us from using boost_python
 fpath(PYTHON Python.h PATH_SUFFIXES "python2.7" "python2.6")
-flib(PYTHON OPTIMIZED NAMES python27 python2.7
-                            python26 python2.6
-                            Python)
-flib(PYTHON DEBUG     NAMES python27_d python2.7
-                              python26_d python2.6
-                              Python)
+flib(PYTHON NAMES python27 python2.7 Python)
 
 if(NOT PYTHON_LIBRARIES OR NOT PYTHON_INCLUDE_DIRS)
   # If it does not work, use upstream cmake code
