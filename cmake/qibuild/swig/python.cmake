@@ -71,7 +71,7 @@ function(qi_swig_wrap_python module_name interface_file)
   endforeach()
 
   find_package(PYTHON)
-  include_directories(${PYTHON_INCLUDE_DIR})
+  include_directories(${PYTHON_INCLUDE_DIRS})
   # Since there is often a "lazy" include in the interface file:
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
