@@ -1,3 +1,5 @@
 <project name="qibuild">
   <sphinxdoc name="qibuild" src="doc" />
+  <maintainer email="dmerejkowsky@aldebaran-robotics.com">Dimitri Merejkowsky</maintainer>
+  <maintainer email="ncornu@aldebaran-robotics.com">Nicolas Cornu</maintainer>
 </project>
