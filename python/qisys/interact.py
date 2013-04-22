@@ -19,7 +19,7 @@ def read_input():
     return raw_input()
 
 
-def ask_choice(choices, input_text):
+def ask_choice(choices, input_text, return_int=False):
     """Ask the user to choose from a list of choices
 
     """
@@ -47,6 +47,9 @@ def ask_choice(choices, input_text):
             continue
         res = choices[index-1]
         keep_asking = False
+
+    if return_int:
+        return index-1
 
     return res
 
