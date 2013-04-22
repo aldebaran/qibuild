@@ -7,8 +7,12 @@
 """
 
 import sys
+import os
+import glob
+import platform
 
 from qisys import ui
+import qibuild.find
 import qibuild.parsers
 
 def configure_parser(parser):
@@ -19,11 +23,14 @@ def configure_parser(parser):
                         help="Outputs required compiler flags")
     parser.add_argument("--libs",
                         help="Ouputs required linnker flags")
+    parser.add_argument("--cmake", dest="cmake", action="store_true",
+                        help="Search in cmake cache")
     parser.add_argument("package")
 
-
-def do(args):
-    """Main entry point """
+def _use_cmake_cache(args):
+    """ Use cmake cache to get informations about searched package.
+        Mandatory to find package dependencies or include dir.
+    """
     build_worktree = qibuild.parsers.get_build_worktree(args)
     project = qibuild.parsers.get_one_build_project(build_worktree, args)
     package = args.package
@@ -44,3 +51,18 @@ def do(args):
             value = "<empty>"
         ui.info(ui.tabs(1), key, "\n",
                 ui.tabs(2), value)
+
+def _use_build_directories(args):
+    """ Print packages found with find().
+    """
+    build_worktree = qibuild.parsers.get_build_worktree(args)
+    projects = qibuild.parsers.get_build_projects(build_worktree, args)
+    path = qibuild.find.find(projects, args.package)
+    ui.info(path)
+
+def do(args):
+    """Main entry point """
+    if args.cmake:
+        _use_cmake_cache(args)
+    else:
+        _use_build_directories(args)
