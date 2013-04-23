@@ -88,3 +88,5 @@
   list of tests and wether they are nightly or not is managed from cmake
 
 * add qibuild test --failed
+
+* remove `qisys.command.CommandLine`, move `qisy.sh.run` to `qisys.command`
