@@ -328,7 +328,7 @@ def check_is_in_path(executable, env=None):
         raise NotInPath(executable, env=env)
 
 
-def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=None):
+def call(cmd, cwd=None, env=None, ignore_ret_code=False):
     """ Execute a command line.
 
     If ignore_ret_code is False:
@@ -363,38 +363,12 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=None):
                 (" ".join(cmd), cwd))
 
     ui.debug("Calling:", " ".join(cmd))
-    ring_buffer = collections.deque(maxlen=300)
 
-    returncode = 0
-    if quiet:
-        quiet_command = quiet
-    else:
-        quiet_command = CONFIG.get("quiet", False)
-    # This code won't work on windows with python < 2.7,
-    # so quiet will be ignored
-    if sys.platform.startswith("win") and sys.version_info < (2, 7):
-        quiet_command = False
-    if not quiet_command:
-        returncode = subprocess.call(cmd, env=env, cwd=cwd)
-    else:
-        cmdline = CommandLine(cmd, cwd=cwd, env=env)
-        for(out, err) in cmdline.execute():
-            if out is not None:
-                ring_buffer.append(out)
-            if err is not None:
-                ring_buffer.append(err)
-        returncode = cmdline.returncode
-
-    if ignore_ret_code:
-        return returncode
-
-    if returncode != 0:
-        if quiet_command:
-            for line in ring_buffer:
-                sys.stdout.write(line)
-                sys.stdout.flush()
-        # Raise correct exception
+    returncode = subprocess.call(cmd, env=env, cwd=cwd)
+    if returncode != 0 and not ignore_ret_code:
         raise CommandFailedException(cmd, returncode, cwd)
+
+    return returncode
 
 
 @contextlib.contextmanager
