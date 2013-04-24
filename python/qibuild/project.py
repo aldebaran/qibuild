@@ -22,13 +22,15 @@ you just have to add sdk directory to CMAKE_FIND_ROOT_PATH
 """
 
 import os
+import re
 
 from qisys import ui
 import qisys.sh
 import qisys.qixml
 
 import qibuild
-
+import qitoolchain.toolchain
+import platform
 
 def is_buildable(worktree_project):
     cmake_lists = os.path.join(worktree_project.path, "CMakeLists.txt")
@@ -471,19 +473,47 @@ def get_parent_project(toc, directory):
     else:
         return None
 
+def get_build_dirs(project, all_configs=False):
+    """Return a dictionary containing the build directory list
+    for the known and the unknown configurations::
 
-def is_build_dir(project, directory):
-    """Check if directory can be a build dir of project."""
-    parts = directory.split("-")
-    if len(parts) == 0:
-        return False
+      build_directories = {
+        'known_configs' = [],
+        'unknown_configs' = [],
+      }
 
-    if not parts.pop(0) == "build":
-        return False
+    Note: if all_configs if False, then the list of the unknown
+    configuration remains empty.
 
-    is_build_dir1 = qibuild.toc.is_build_folder_name(parts,
-                        project.toc.worktree.qibuild_xml)
-    is_build_dir2 = qibuild.toc.is_build_folder_name(parts,
-                         project.toc.config_path)
+    """
+    if not all_configs:
+        bdirs = list()
+        if os.path.isdir(project.build_directory):
+            bdirs.append(project.build_directory)
+        return {'known_configs': bdirs, 'unknown_configs': list()}
 
-    return is_build_dir1 or is_build_dir2
+    # build directory name pattern:
+    # 'build-<tc_name>[-<profile>]...[-release]'
+    profiles = qibuild.profile.parse_profiles(project.toc.worktree.qibuild_xml)
+    profiles = list(profiles.keys())
+    profiles = [re.escape(x) for x in profiles]
+    toolchains = qitoolchain.toolchain.get_tc_names()
+    toolchains.append("sys-%s-%s" % (platform.system().lower(),
+                                     platform.machine().lower()))
+    toolchains = [re.escape(x) for x in toolchains]
+    bdir_regex = r"^build"
+    bdir_regex += r"(-(" + "|".join(toolchains) + "))"
+    bdir_regex += r"(-(" + "|".join(profiles) + "))*"
+    bdir_regex += r"(-release)?$"
+    bdir_re = re.compile(bdir_regex)
+    ui.debug("matching:", bdir_regex)
+    dirs = os.listdir(project.path)
+    ret = {'known_configs': list(), 'unknown_configs': list()}
+    for bdir in dirs:
+        if bdir_re.match(bdir):
+            ret['known_configs'].append(bdir)
+        elif bdir.startswith("build-"):
+            ret['unknown_configs'].append(bdir)
+    for k in ret.keys():
+        ret[k] = [os.path.join(project.path, x) for x in ret[k]]
+    return ret

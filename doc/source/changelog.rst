@@ -10,6 +10,9 @@ Command line
 ++++++++++++
 
 * Add ``qisrc maintainer``
+* Fix ``qibuild clean -z`` behavior
+* ``qibuild clean`` learned ``-x`` to remove build directories that
+  match no known configurations
 
 Python
 ++++++

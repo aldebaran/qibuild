@@ -57,6 +57,9 @@ package PROJECT
 deploy [PROJECT] URL
   Deploy a project on the remote target reachable at URL
 
+clean [PROJECT]
+  Remove the build directories from the project source tree
+
 .. note::
 
   if ``CMAKE_INSTALL_PREFIX`` is set at ``configure``, it will be necessary to

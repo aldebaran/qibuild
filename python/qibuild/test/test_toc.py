@@ -145,15 +145,5 @@ class TocTestCase(unittest.TestCase):
         qisys.sh.rm(self.tmp)
 
 
-def test_is_build_folder_name():
-    parts = ["sys", platform.system().lower()]
-    assert qibuild.toc.is_build_folder_name(parts) is False
-    parts.append(platform.machine().lower())
-    assert qibuild.toc.is_build_folder_name(parts) is True
-    parts.append("release")
-    assert qibuild.toc.is_build_folder_name(parts) is True
-    parts.append("foo")
-    assert qibuild.toc.is_build_folder_name(parts) is False
-
 if __name__ == "__main__":
     unittest.main()
