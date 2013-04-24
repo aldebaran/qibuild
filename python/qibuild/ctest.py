@@ -76,6 +76,16 @@ class TestResult:
         if _MULTIPLE_JOBS and sys.stdout.isatty():
             _LOCK.acquire()
             ui.info(*self.line, end='')
+        try:
+            self._print_result()
+        except Exception, e:
+            ui.warning("Could not print result for", self.test_name, "\n",
+                       "error was:", e)
+        finally:
+            _LOCK.release()
+
+    def _print_result(self):
+        """ Helper for print_result """
         if self.ok:
             ui.info(ui.green, "[OK]")
             if self.verbose:
@@ -96,7 +106,6 @@ class TestResult:
                 # If gtest crashes or timesout *after* the XML is written,
                 # make sure we have the information in the XML file
                 write_xml(xml_out, self)
-        _LOCK.release()
 
 
 def parse_valgrind(valgrind_log, tst):
