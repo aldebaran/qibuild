@@ -1,7 +1,10 @@
 .. _qibuild-changelog:
 
+Changelog
+=========
+
 Incoming
-========
+--------
 
 Command line
 ++++++++++++
@@ -12,9 +15,6 @@ Python
 ++++++
 
 * Add ``qisrc.maintainer`` to manage maintainers from ``qiproject.xml``
-
-Changelog
-=========
 
 V2.2
 ----
