@@ -530,7 +530,7 @@ You may want to run:
             # In order to use incredibuild, we have to do this small hack:
             # (CMake --build will still call devenv.com instead of BuildConsole.exe)
             sln_files = glob.glob(project.build_directory + "/*.sln")
-            assert len(sln_files) == 1, "Expecting only one sln, got %s" % sln_files
+            assert len(sln_files) == 1, "Expecting exactly one sln, got %s" % sln_files
             sln_file = sln_files[0]
             cmd = ["BuildConsole.exe", sln_file]
             cmd += ["/cfg=%s|Win32" % self.build_type]

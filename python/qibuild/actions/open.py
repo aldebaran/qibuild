@@ -89,7 +89,10 @@ def do(args):
 
     if ide.name == "Visual Studio":
         sln_files = glob.glob(project.build_directory + "/*.sln")
-        if len(sln_files) != 1:
+        if len(sln_files) == 0:
+            raise Exception(error_message +
+                "Do you have called qibuild configure with the proper --cmake-generator option?")
+        elif len(sln_files) > 1:
             raise Exception(error_message + "Expecting only one sln, got %s" % sln_files)
         print "starting VisualStudio:"
         print "%s %s" % ("start", sln_files[0])
@@ -101,7 +104,7 @@ def do(args):
         if len(projs) == 0:
             raise Exception(error_message +
                 "Do you have called qibuild configure with --cmake-generator=Xcode?")
-        if len(projs) > 1:
+        elif len(projs) > 1:
             raise Exception(error_message +
                 "Expecting only one xcode project file, got %s" % projs)
         print "starting Xcode:"
