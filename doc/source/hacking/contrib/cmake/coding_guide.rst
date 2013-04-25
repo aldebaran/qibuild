@@ -323,3 +323,32 @@ Common mistakes
       set(CMAKE_MODULE_PATH)
     endif()
     list(APPEND CMAKE_MODULE_PATH "/path/to/something")
+
+* Do not use ``${PROJECT_NAME}``, or ``${CMAKE_PROJECT_NAME}``,
+  especially when not at the top ``CMakeLists.txt``::
+
+    # YES:
+    project(foo)
+    find_package(qibuild)
+
+    qi_create_lib(foo foo.cpp)
+    qi_use_lib(foo BAR BAZ)
+
+    # NO:
+    project(foo)
+    find_package(qibuild)
+
+    qi_create_lib(${PROJECT_NAME} foo.cpp)
+    qi_use_lib(${PROJECT_NAME} BAR BAZ)
+
+
+The small duplication (writing the name of the target ``foo`` 3 times)
+is OK, because:
+
+* otherwise you need to scroll to the top of the file to find out
+  the name of the library
+* ``PROJECT_NAME`` is something that ends up in the IDE, so it's not
+  a target name
+* calling ``project()`` calls the toolchain file to be parsed again
+  for no good reason
+* there's often more than one lib per project
