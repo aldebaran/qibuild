@@ -44,6 +44,25 @@ def configure_parser(parser):
                         "Remote debugging won't work")
     parser.set_defaults(port=22, split_debug=True)
 
+def find_rsync_or_scp(toc, raises=True):
+    """ Return True if rsync is present.
+    False if scp is present.
+    Otherwise raise or return None depending of raises argument.
+    """
+    rsync = qisys.command.find_program("rsync", env=toc.build_env)
+    if rsync:
+        return True
+
+    ui.warning("Please install rsync to get faster synchronisation")
+    scp = qisys.command.find_program("scp", env=toc.build_env)
+    if scp:
+        return False
+
+    if raises:
+        raise Exception("Could not find rsync nor scp")
+
+    return None
+
 def do(args):
     """Main entry point"""
     url = args.url
@@ -57,15 +76,8 @@ def do(args):
     if toc.active_config:
         ui.info(ui.green, "Active configuration: ",
                 ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))
-    rsync = qisys.command.find_program("rsync", env=toc.build_env)
-    use_rsync = False
-    if rsync:
-        use_rsync = True
-    else:
-        ui.warning("Please install rsync to get faster synchronisation")
-        scp = qisys.command.find_program("scp", env=toc.build_env)
-        if not scp:
-            raise Exception("Could not find rsync or scp")
+
+    use_rsync = find_rsync_or_scp(toc)
 
     # Resolve deps:
     (packages, projects) = qibuild.cmdparse.deps_from_args(toc, args)
