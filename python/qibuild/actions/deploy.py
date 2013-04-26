@@ -70,6 +70,8 @@ def do(args):
     if args.urls:
         urls.extend(args.urls)
 
+    urls = [qibuild.deploy.parse_url(x) for x in urls]
+
     toc = qibuild.toc.toc_open(args.worktree, args)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
@@ -94,7 +96,7 @@ def do(args):
 
         ui.info(ui.green, "will be deployed to")
         for url in urls:
-            ui.info(ui.blue, url)
+            ui.info(ui.blue, url["given"])
 
     # Deploy packages: install all of them in the same temp dir, then
     # deploy this temp dir to the target
@@ -107,8 +109,9 @@ def do(args):
                     ui.info(ui.green, "*", ui.reset,
                             "(%i/%i)" % (i, len(projects)),
                             ui.green, "Deploying package", ui.blue, package.name,
-                            ui.green, "to", ui.blue, url)
-                    qibuild.deploy.deploy(tmp, remote_url=url,
+                            ui.green, "to", ui.blue, url["given"])
+                    url_to_deploy = '%(login)s@%(url)s:%(dir)s' % url
+                    qibuild.deploy.deploy(tmp, remote_url=url_to_deploy,
                             port=args.port, use_rsync=use_rsync)
 
     if not args.single:
@@ -129,7 +132,8 @@ def do(args):
                             split_debug=args.split_debug)
         ui.info(ui.green, "Sending binaries to target...")
         for url in urls:
-            qibuild.deploy.deploy(destdir, remote_url=url,
+            url_to_deploy = '%(login)s@%(url)s:%(dir)s' % url
+            qibuild.deploy.deploy(destdir, remote_url=url_to_deploy,
                     port=args.port, use_rsync=use_rsync)
         if not args.split_debug:
             continue
