@@ -18,7 +18,7 @@ def toc_parser(parser):
     worktree_parser(parser)
     parser.add_argument("-c", "--config",
         help="The configuration to use. "
-             "It should match the name of a toolchain. "
+             "It should be the name of a toolchain or \"system\". "
              "The settings from <worktree>/.qi/<config>.cmake will "
              "also be used")
     parser.add_argument("-p", "--profile", dest="profiles", action="append",
