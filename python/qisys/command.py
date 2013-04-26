@@ -328,7 +328,7 @@ def check_is_in_path(executable, env=None):
         raise NotInPath(executable, env=env)
 
 
-def call(cmd, cwd=None, env=None, ignore_ret_code=False):
+def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
     """ Execute a command line.
 
     If ignore_ret_code is False:
@@ -364,7 +364,11 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False):
 
     ui.debug("Calling:", " ".join(cmd))
 
-    returncode = subprocess.call(cmd, env=env, cwd=cwd)
+    call_kwargs = {"env":env, "cwd":cwd}
+    if quiet:
+        call_kwargs["stdout"] = subprocess.PIPE
+    returncode = subprocess.call(cmd, **call_kwargs)
+
     if returncode != 0 and not ignore_ret_code:
         raise CommandFailedException(cmd, returncode, cwd)
 
