@@ -64,7 +64,7 @@ def find_rsync_or_scp(toc, raises=True):
     return None
 
 def do(args):
-    """Main entry point"""
+    """Main entry point."""
     url = args.url
     qibuild.deploy.parse_url(url) # throws if url is invalid
     if args.urls:
@@ -82,11 +82,13 @@ def do(args):
     # Resolve deps:
     (packages, projects) = qibuild.cmdparse.deps_from_args(toc, args)
 
+    # List projects, packages and urls related to deploy
     if not args.single:
         ui.info(ui.green, "The following projects")
         for project in projects:
             ui.info(ui.green, " *", ui.blue, project.name)
-        if not args.single and packages:
+
+        if packages:
             ui.info(ui.green, "and the following packages")
             for package in packages:
                 ui.info(" *", ui.blue, package.name)
@@ -98,7 +100,6 @@ def do(args):
     # Deploy packages: install all of them in the same temp dir, then
     # deploy this temp dir to the target
     if not args.single and packages:
-        print
         ui.info(ui.green, ":: ", "Deploying packages")
         with qisys.sh.TempDir() as tmp:
             for (i, package) in enumerate(packages, start=1):
@@ -117,7 +118,6 @@ def do(args):
             if args.urls:
                 for url_elem in args.urls:
                     qibuild.deploy.deploy(tmp, url_elem, use_rsync=use_rsync, port=args.port)
-        print
 
     if not args.single:
         ui.info(ui.green, ":: ", "Deploying projects")
@@ -141,7 +141,7 @@ def do(args):
         toc.install_project(project, destdir, prefix="/",
                             runtime=True, num_jobs=args.num_jobs,
                             split_debug=args.split_debug)
-        ui.info(ui.green, "Sending binaries to target ...")
+        ui.info(ui.green, "Sending binaries to target...")
         qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)
         if args.urls:
             for url_elem in args.urls:
@@ -170,7 +170,7 @@ def do(args):
                     ui.green, "Project", ui.blue, project.name,
                     ui.green, "- No executable deployed")
             continue
-        binaries = "\n".join(["    %s" % bin_ for bin_ in binaries])
+        binaries = '\n'.join(ui.indent_iterable(binaries))
         ui.info(ui.green, "*", ui.reset,
                 "(%i/%i)" % (i, len(projects)),
                 ui.green, "Project", ui.blue, project.name,

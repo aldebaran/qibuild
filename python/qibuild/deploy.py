@@ -91,9 +91,7 @@ def parse_url(remote_url):
 
 
 def deploy(local_directory, remote_url, port=22, use_rsync=True):
-    """ Deploy a local directory to a remote url
-
-    """
+    """Deploy a local directory to a remote url."""
     if use_rsync:
         # This is required for rsync to do the right thing,
         # otherwise the basename of local_directory gets
