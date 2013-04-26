@@ -19,6 +19,7 @@ Command line
   new
   qibuild deploy ssh://user@host:32/full/path/to/remote/dir
 * ``qibuild deploy``: project is no more a positional argument
+* Positional url is no more mandatory in ``qibuild deploy``
 
 Python
 ++++++

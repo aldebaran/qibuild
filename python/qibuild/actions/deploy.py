@@ -33,7 +33,7 @@ def configure_parser(parser):
     qibuild.parsers.project_parser(parser, positional=False)
     qibuild.parsers.build_parser(parser)
     group = parser.add_argument_group("deploy options")
-    group.add_argument("url", help="remote target url: user@hostname:path")
+    group.add_argument("url", nargs="?", help="remote target url: user@hostname:path")
     group.add_argument("--url", dest="urls", action="append", help="urls")
     group.add_argument("--split-debug", action="store_true", default=True,
                         dest="split_debug", help="split debug symbols. "
@@ -64,9 +64,12 @@ def find_rsync_or_scp(toc, raises=True):
 def do(args):
     """Main entry point."""
     urls = list()
-    urls.append(args.url)
+    if args.url:
+        urls.append(args.url)
     if args.urls:
         urls.extend(args.urls)
+    if len(urls) == 0:
+        ui.error("Please specify at least one url.")
 
     urls = [qibuild.deploy.parse_url(x) for x in urls]
 
@@ -136,7 +139,7 @@ def do(args):
         if not args.split_debug:
             continue
         gdb_script, message = qibuild.deploy.generate_debug_scripts(toc, project.name,
-                                                                    args.url,
+                                                                    urls[0],
                                                                     deploy_dir=destdir)
 
         bindir = os.path.join(destdir, "bin")

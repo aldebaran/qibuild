@@ -203,11 +203,10 @@ def _generate_solib_search_path(toc, project_name):
 
 def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
     """ generate all scripts needed for debug """
-    parts_url = qibuild.deploy.parse_url(url)
-    remote = parts_url["login"] + "@" + parts_url["url"]
-    server = parts_url["url"]
-    port   = parts_url.get("port", 22)
-    remote_directory = parts_url["dir"]
+    remote = url["login"] + "@" + url["url"]
+    server = url["url"]
+    port   = url.get("port", 22)
+    remote_directory = url["dir"]
 
     destdir = toc.get_project(project_name).build_directory
     if deploy_dir:
