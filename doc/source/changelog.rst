@@ -19,6 +19,7 @@ Python
 
 * Add ``qisrc.maintainer`` to manage maintainers from ``qiproject.xml``
 * Add ``qisys.ui.indent_iterable`` to indent list or any iterable
+* ``qisys.parsers.project_parser`` learned ``short`` option to disable -p of project
 
 V2.2
 ----
