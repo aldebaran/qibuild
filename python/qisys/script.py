@@ -140,6 +140,7 @@ def main_wrapper(module, args):
             print "### Exception:", e
             print "### Starting a debugger"
             try:
+                #pylint: disable-msg=F0401
                 import ipdb
                 ipdb.post_mortem(traceback)
                 sys.exit(0)
