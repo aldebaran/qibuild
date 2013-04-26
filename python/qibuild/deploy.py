@@ -45,8 +45,8 @@ echo "To connect to this gdbserver launch the following command in another termi
 echo "  %(gdb)s -x \"${here}/setup_target.gdb\" \"${here}/${1}\""
 echo ""
 
-#echo ssh %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
-ssh %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
+#echo ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
+ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
 """
 
 def parse_url(remote_url):
@@ -144,16 +144,17 @@ def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_a
                                         })
 
 
-def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir):
+def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir, port):
     """ generate a script that run a program on the robot in gdbserver """
     if remote_dir == "":
         remote_dir = "."
     remote_gdb_script_path = os.path.join(dest, "remote_gdbserver.sh")
     with open(remote_gdb_script_path, "w+") as f:
-        f.write(FILE_REMOTE_GDBSERVER_SH % { 'remote' : remote,
-                                             'gdb_listen' : gdb_listen,
-                                             'remote_dir' : remote_dir,
-                                             'gdb' : gdb })
+        f.write(FILE_REMOTE_GDBSERVER_SH % { 'remote': remote,
+                                             'gdb_listen': gdb_listen,
+                                             'remote_dir': remote_dir,
+                                             'gdb': gdb,
+                                             'port': port})
     os.chmod(remote_gdb_script_path, 0755)
     return remote_gdb_script_path
 
@@ -205,6 +206,7 @@ def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
     parts_url = qibuild.deploy.parse_url(url)
     remote = parts_url["login"] + "@" + parts_url["url"]
     server = parts_url["url"]
+    port   = parts_url.get("port", 22)
     remote_directory = parts_url["dir"]
 
     destdir = toc.get_project(project_name).build_directory
@@ -241,5 +243,6 @@ def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
                         remote_gdb_address="%s:2159" % server)
     gdb_script = _generate_run_gdbserver_binary(destdir, gdb=gdb, gdb_listen=":2159",
                                                 remote=remote,
-                                                remote_dir=remote_directory)
+                                                remote_dir=remote_directory,
+                                                port=port)
     return (gdb_script, message)
