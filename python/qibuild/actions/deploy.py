@@ -65,7 +65,10 @@ def find_rsync_or_scp(toc, raises=True):
 
 def do(args):
     """Main entry point."""
-    url = args.url
+    urls = list()
+    urls.append(args.url)
+    if args.urls:
+        urls.extend(args.urls)
 
     toc = qibuild.toc.toc_open(args.worktree, args)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
@@ -88,10 +91,10 @@ def do(args):
             ui.info(ui.green, "and the following packages")
             for package in packages:
                 ui.info(" *", ui.blue, package.name)
-        ui.info(ui.green, "will be deployed to", ui.blue, url)
-        if args.urls:
-            for url_elem in args.urls:
-                ui.info(ui.blue, url_elem)
+
+        ui.info(ui.green, "will be deployed to")
+        for url in urls:
+            ui.info(ui.blue, url)
 
     # Deploy packages: install all of them in the same temp dir, then
     # deploy this temp dir to the target
@@ -99,21 +102,14 @@ def do(args):
         ui.info(ui.green, ":: ", "Deploying packages")
         with qisys.sh.TempDir() as tmp:
             for (i, package) in enumerate(packages, start=1):
-                ui.info(ui.green, "*", ui.reset,
-                        "(%i/%i)" % (i, len(package.name)),
-                        ui.green, "Deploying package", ui.blue, package.name,
-                        ui.green, "to", ui.blue, url)
-                if args.urls:
-                    for url_elem in args.urls:
-                        ui.info(ui.green, "*", ui.reset,
-                                "(%i/%i)" % (i, len(package.name)),
-                                ui.green, "Deploying package", ui.blue, package.name,
-                                ui.green, "to", ui.blue, url_elem)
                 toc.toolchain.install_package(package.name, tmp, runtime=True)
-            qibuild.deploy.deploy(tmp, args.url, use_rsync=use_rsync, port=args.port)
-            if args.urls:
-                for url_elem in args.urls:
-                    qibuild.deploy.deploy(tmp, url_elem, use_rsync=use_rsync, port=args.port)
+                for url in urls:
+                    ui.info(ui.green, "*", ui.reset,
+                            "(%i/%i)" % (i, len(projects)),
+                            ui.green, "Deploying package", ui.blue, package.name,
+                            ui.green, "to", ui.blue, url)
+                    qibuild.deploy.deploy(tmp, remote_url=url,
+                            port=args.port, use_rsync=use_rsync)
 
     if not args.single:
         ui.info(ui.green, ":: ", "Deploying projects")
@@ -124,13 +120,7 @@ def do(args):
         ui.info(ui.green, "*", ui.reset,
                 "(%i/%i)" % (i, len(projects)),
                 ui.green, "Deploying project", ui.blue, project.name,
-                ui.green, "to", ui.blue, url)
-        if args.urls:
-            for url_elem in args.urls:
-                ui.info(ui.green, "*", ui.reset,
-                        "(%i/%i)" % (i, len(projects)),
-                        ui.green, "Deploying project", ui.blue, project.name,
-                        ui.green, "to", ui.blue, url_elem)
+                ui.green, "to", ui.blue, *[x["given"] for x in urls])
         destdir = os.path.join(project.build_directory, "deploy")
         #create folder for project without install rules
         qisys.sh.mkdir(destdir, recursive=True)
@@ -138,10 +128,9 @@ def do(args):
                             runtime=True, num_jobs=args.num_jobs,
                             split_debug=args.split_debug)
         ui.info(ui.green, "Sending binaries to target...")
-        qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)
-        if args.urls:
-            for url_elem in args.urls:
-                qibuild.deploy.deploy(destdir, url_elem, use_rsync=use_rsync, port=args.port)
+        for url in urls:
+            qibuild.deploy.deploy(destdir, remote_url=url,
+                    port=args.port, use_rsync=use_rsync)
         if not args.split_debug:
             continue
         gdb_script, message = qibuild.deploy.generate_debug_scripts(toc, project.name,
