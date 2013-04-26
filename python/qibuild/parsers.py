@@ -50,9 +50,9 @@ def build_parser(parser):
         help="Number of jobs to use")
     parser.set_defaults(num_jobs=1)
 
-def project_parser(parser):
+def project_parser(parser, positional=True):
     """Parser settings for every action using several toc projects."""
-    group = qisys.parsers.project_parser(parser)
+    group = qisys.parsers.project_parser(parser, positional=positional, short=False)
     group.add_argument("--build-deps", action="store_true",
         help="Work on specified projects by ignoring the runtime deps. "
              "Useful when you have lots of runtime plugins you don't want to compile "
