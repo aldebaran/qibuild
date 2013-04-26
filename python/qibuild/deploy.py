@@ -44,8 +44,8 @@ echo "To connect to this gdbserver launch the following command in another termi
 echo "  %(gdb)s -x \"${here}/setup_target.gdb\" \"${here}/${1}\""
 echo ""
 
-#echo ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
-ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
+#echo ssh %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
+ssh %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
 """
 
 def parse_url(remote_url):
@@ -73,39 +73,27 @@ def parse_url(remote_url):
 
     """
 
-    login = ''
-    url   = ''
-    port  = None
-    dir   = ''
+    match = re.match(r"""
+        (?P<remote>
+         ((?P<username>[a-zA-Z0-9\._-]+)@)?
+         (?P<server>[a-zA-Z0-9\._-]+))
+        :
+        (?P<remote_dir>[a-zA-Z0-9\.~_/-]*)$
+        """, remote_url, re.VERBOSE)
+    # note: this regexp does not support having weird chars (such as @ or ?)
+    # or spaces in remote_dir. At least it will complain.
+    if not match:
+        mess  = "Invalid remote url: %s\n" % remote_url
+        mess += "Remote url should look like user@host:path or host:path"
+        raise Exception(mess)
+    groupdict = match.groupdict()
+    return (groupdict["remote"], groupdict["server"], groupdict["remote_dir"])
 
-    parts = remote_url.split('@', 1)
-    if len(parts) == 1:
-        url = parts[0]
-    elif len(parts) == 2:
-        login      = parts[0]
-        url = parts[1]
-    else:
-        return (login, url, port, dir)
-
-    parts = url.split(':', 2)
-    if len(parts) == 1:
-        url = parts[0]
-    elif len(parts) == 2:
-        url = parts[0]
-        dir        = parts[1]
-    elif len(parts) == 3:
-        url = parts[0]
-        if parts[1] != "":
-            port   = int(parts[1])
-        dir        = parts[2]
-
-    ret = {'given':remote_url, 'login':login, 'url':url, 'dir':dir}
-    if port is not None:
-        ret["port"] = port
-    return ret
 
 def deploy(local_directory, remote_url, port=22, use_rsync=True):
-    """Deploy a local directory to a remote url."""
+    """ Deploy a local directory to a remote url
+
+    """
     if use_rsync:
         # This is required for rsync to do the right thing,
         # otherwise the basename of local_directory gets
@@ -142,17 +130,16 @@ def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_a
                                         })
 
 
-def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir, port):
+def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir):
     """ generate a script that run a program on the robot in gdbserver """
     if remote_dir == "":
         remote_dir = "."
     remote_gdb_script_path = os.path.join(dest, "remote_gdbserver.sh")
     with open(remote_gdb_script_path, "w+") as f:
-        f.write(FILE_REMOTE_GDBSERVER_SH % { 'remote': remote,
-                                             'gdb_listen': gdb_listen,
-                                             'remote_dir': remote_dir,
-                                             'gdb': gdb,
-                                             'port': port})
+        f.write(FILE_REMOTE_GDBSERVER_SH % { 'remote' : remote,
+                                             'gdb_listen' : gdb_listen,
+                                             'remote_dir' : remote_dir,
+                                             'gdb' : gdb })
     os.chmod(remote_gdb_script_path, 0755)
     return remote_gdb_script_path
 
@@ -201,11 +188,7 @@ def _generate_solib_search_path(toc, project_name):
 
 def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
     """ generate all scripts needed for debug """
-    parts_url = qibuild.deploy.parse_url(url)
-    remote = parts_url["login"] + "@" + parts_url["url"]
-    server = parts_url["url"]
-    port   = parts_url.get("port", 22)
-    remote_directory = parts_url["dir"]
+    (remote, server, remote_directory) = qibuild.deploy.parse_url(url)
 
     destdir = toc.get_project(project_name).build_directory
     if deploy_dir:
@@ -241,6 +224,5 @@ def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
                         remote_gdb_address="%s:2159" % server)
     gdb_script = _generate_run_gdbserver_binary(destdir, gdb=gdb, gdb_listen=":2159",
                                                 remote=remote,
-                                                remote_dir=remote_directory,
-                                                port=port)
+                                                remote_dir=remote_directory)
     return (gdb_script, message)
