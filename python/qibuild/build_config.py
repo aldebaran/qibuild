@@ -1,6 +1,8 @@
 import os
 import qisys.qixml
 
+
+from qisys import ui
 import qibuild.config
 import qibuild.profile
 import qitoolchain
@@ -23,6 +25,7 @@ class CMakeBuildConfig(object):
         self.qibuild_cfg = self.read_global_qibuild_settings()
         self._cmake_generator = None
         self.read_local_settings()
+        self.num_jobs = 1
 
     @property
     def using_visual_studio(self):

@@ -160,6 +160,8 @@ def get_build_config(build_worktree, args):
             (key, value) = flag_string.split("=")
             user_flags.append((key, value))
         build_config.user_flags = user_flags
+    if hasattr(args, "num_jobs"):
+        build_config.num_jobs = args.num_jobs
     return build_config
 
 
