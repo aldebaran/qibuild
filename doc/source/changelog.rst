@@ -18,6 +18,7 @@ Command line
   qibuild deploy --port 23 user@host:path/to/remote/dir
   new
   qibuild deploy ssh://user@host:32/full/path/to/remote/dir
+* ``qibuild deploy``: project is no more a positional argument
 
 Python
 ++++++

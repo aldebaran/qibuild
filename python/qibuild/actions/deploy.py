@@ -30,7 +30,7 @@ import qibuild.deploy
 def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.toc_parser(parser)
-    qibuild.parsers.project_parser(parser)
+    qibuild.parsers.project_parser(parser, positional=False)
     qibuild.parsers.build_parser(parser)
     group = parser.add_argument_group("deploy options")
     group.add_argument("url", help="remote target url: user@hostname:path")
