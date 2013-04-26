@@ -35,7 +35,6 @@ def configure_parser(parser):
     group = parser.add_argument_group("deploy options")
     group.add_argument("url", help="remote target url: user@hostname:path")
     group.add_argument("--url", dest="urls", action="append", help="urls")
-    group.add_argument("--port", help="port", type=int)
     group.add_argument("--split-debug", action="store_true",
                         dest="split_debug", help="split debug symbols. "
                         "Enable remote debuging")
@@ -44,68 +43,77 @@ def configure_parser(parser):
                         "Remote debugging won't work")
     parser.set_defaults(port=22, split_debug=True)
 
+def find_rsync_or_scp(toc, raises=True):
+    """ Return True if rsync is present.
+    False if scp is present.
+    Otherwise raise or return None depending of raises argument.
+    """
+    rsync = qisys.command.find_program("rsync", env=toc.build_env)
+    if rsync:
+        return True
+
+    ui.warning("Please install rsync to get faster synchronisation")
+    scp = qisys.command.find_program("scp", env=toc.build_env)
+    if scp:
+        return False
+
+    if raises:
+        raise Exception("Could not find rsync or scp")
+
+    return None
+
 def do(args):
-    """Main entry point"""
-    url = args.url
-    qibuild.deploy.parse_url(url) # throws if url is invalid
+    """Main entry point."""
+    urls = list()
+    urls.append(args.url)
     if args.urls:
-        for url_elem in args.urls:
-            qibuild.deploy.parse_url(url_elem)
+        urls.extend(args.urls)
+    if len(urls) == 0:
+        ui.error("Please specify at least one url.")
+
+    urls = [qibuild.deploy.parse_url(x) for x in urls]
 
     toc = qibuild.toc.toc_open(args.worktree, args)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
     if toc.active_config:
         ui.info(ui.green, "Active configuration: ",
                 ui.blue, "%s (%s)" % (toc.active_config, toc.build_type))
-    rsync = qisys.command.find_program("rsync", env=toc.build_env)
-    use_rsync = False
-    if rsync:
-        use_rsync = True
-    else:
-        ui.warning("Please install rsync to get faster synchronisation")
-        scp = qisys.command.find_program("scp", env=toc.build_env)
-        if not scp:
-            raise Exception("Could not find rsync or scp")
+
+    use_rsync = find_rsync_or_scp(toc)
 
     # Resolve deps:
     (packages, projects) = qibuild.cmdparse.deps_from_args(toc, args)
 
+    # List projects, packages and urls concerning the deploy
     if not args.single:
         ui.info(ui.green, "The following projects")
         for project in projects:
             ui.info(ui.green, " *", ui.blue, project.name)
-        if not args.single and packages:
+
+        if packages:
             ui.info(ui.green, "and the following packages")
             for package in packages:
                 ui.info(" *", ui.blue, package.name)
-        ui.info(ui.green, "will be deployed to", ui.blue, url)
-        if args.urls:
-            for url_elem in args.urls:
-                ui.info(ui.blue, url_elem)
+
+        ui.info(ui.green, "will be deployed to")
+        for url in urls:
+            ui.info(ui.blue, url["given"])
 
     # Deploy packages: install all of them in the same temp dir, then
     # deploy this temp dir to the target
     if not args.single and packages:
-        print
         ui.info(ui.green, ":: ", "Deploying packages")
         with qisys.sh.TempDir() as tmp:
             for (i, package) in enumerate(packages, start=1):
-                ui.info(ui.green, "*", ui.reset,
-                        "(%i/%i)" % (i, len(package.name)),
-                        ui.green, "Deploying package", ui.blue, package.name,
-                        ui.green, "to", ui.blue, url)
-                if args.urls:
-                    for url_elem in args.urls:
-                        ui.info(ui.green, "*", ui.reset,
-                                "(%i/%i)" % (i, len(package.name)),
-                                ui.green, "Deploying package", ui.blue, package.name,
-                                ui.green, "to", ui.blue, url_elem)
                 toc.toolchain.install_package(package.name, tmp, runtime=True)
-            qibuild.deploy.deploy(tmp, args.url, use_rsync=use_rsync, port=args.port)
-            if args.urls:
-                for url_elem in args.urls:
-                    qibuild.deploy.deploy(tmp, url_elem, use_rsync=use_rsync, port=args.port)
-        print
+                for url in urls:
+                    ui.info(ui.green, "*", ui.reset,
+                            "(%i/%i)" % (i, len(projects)),
+                            ui.green, "Deploying package", ui.blue, package.name,
+                            ui.green, "to", ui.blue, url["given"])
+                    url_to_deploy = '%(login)s@%(url)s:%(dir)s' % url
+                    qibuild.deploy.deploy(tmp, remote_url=url_to_deploy,
+                            port=url.get("port", 22), use_rsync=use_rsync)
 
     if not args.single:
         ui.info(ui.green, ":: ", "Deploying projects")
@@ -116,24 +124,18 @@ def do(args):
         ui.info(ui.green, "*", ui.reset,
                 "(%i/%i)" % (i, len(projects)),
                 ui.green, "Deploying project", ui.blue, project.name,
-                ui.green, "to", ui.blue, url)
-        if args.urls:
-            for url_elem in args.urls:
-                ui.info(ui.green, "*", ui.reset,
-                        "(%i/%i)" % (i, len(projects)),
-                        ui.green, "Deploying project", ui.blue, project.name,
-                        ui.green, "to", ui.blue, url_elem)
+                ui.green, "to", ui.blue, *[x["given"] for x in urls])
         destdir = os.path.join(project.build_directory, "deploy")
         #create folder for project without install rules
         qisys.sh.mkdir(destdir, recursive=True)
         toc.install_project(project, destdir, prefix="/",
                             runtime=True, num_jobs=args.num_jobs,
                             split_debug=args.split_debug)
-        ui.info(ui.green, "Sending binaries to target ...")
-        qibuild.deploy.deploy(destdir, args.url, use_rsync=use_rsync, port=args.port)
-        if args.urls:
-            for url_elem in args.urls:
-                qibuild.deploy.deploy(destdir, url_elem, use_rsync=use_rsync, port=args.port)
+        ui.info(ui.green, "Sending binaries to target...")
+        for url in urls:
+            url_to_deploy = '%(login)s@%(url)s:%(dir)s' % url
+            qibuild.deploy.deploy(destdir, remote_url=url_to_deploy,
+                    port=url.get("port", 22), use_rsync=use_rsync)
         if not args.split_debug:
             continue
         gdb_script, message = qibuild.deploy.generate_debug_scripts(toc, project.name,
@@ -158,7 +160,7 @@ def do(args):
                     ui.green, "Project", ui.blue, project.name,
                     ui.green, "- No executable deployed")
             continue
-        binaries = "\n".join(["    %s" % bin_ for bin_ in binaries])
+        binaries = ui.indentIterable(binaries)
         ui.info(ui.green, "*", ui.reset,
                 "(%i/%i)" % (i, len(projects)),
                 ui.green, "Project", ui.blue, project.name,
