@@ -12,6 +12,7 @@ http://www.gentoo.org/proj/en/portage/index.xml
 
 import os
 import re
+#pylint: disable-msg=F0401
 import portage
 
 import qisys

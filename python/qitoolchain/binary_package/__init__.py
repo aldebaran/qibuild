@@ -23,6 +23,7 @@ from qitoolchain.binary_package.core import BinaryPackageException
 
 WITH_PORTAGE = True
 try:
+    #pylint: disable-msg=F0401
     import portage
 except ImportError:
     WITH_PORTAGE = False
