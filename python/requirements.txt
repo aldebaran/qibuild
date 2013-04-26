@@ -1,9 +1,6 @@
 # For pylint:
-# Apparently there is a bug in logilab-astng 0.24:
-# pylint -E qibuild/envsetter.py
-# subprocess.Popen object has no 'returncode' member
-logilab-astng==0.23.0
-pylint==0.25
+logilab-astng==0.24.3
+pylint==0.28
 
 # For pyflakes (we use both)
 pyflakes==0.6.1
