@@ -22,6 +22,7 @@ Python
 * ``qisys.parsers.project_parser`` learned ``short`` option to disable -p of project
 * ``qibuild.parsers.project_parser`` learn ``positional``
 * Add ``qibuild.deploy.action.find_rsync_or_scp``
+* ``qibuild.deploy.parse_url`` return a dict
 
 V2.2
 ----

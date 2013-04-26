@@ -66,10 +66,6 @@ def find_rsync_or_scp(toc, raises=True):
 def do(args):
     """Main entry point."""
     url = args.url
-    qibuild.deploy.parse_url(url) # throws if url is invalid
-    if args.urls:
-        for url_elem in args.urls:
-            qibuild.deploy.parse_url(url_elem)
 
     toc = qibuild.toc.toc_open(args.worktree, args)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)

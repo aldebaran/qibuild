@@ -101,9 +101,10 @@ def parse_url(remote_url):
         if len(parts) == 2:
             dir = parts[1]
 
+    ret = {'given':remote_url, 'login':login, 'url':url, 'dir':dir}
     if port is not None:
         ret["port"] = port
-    return (login + "@" + url, url, dir)
+    return ret
 
 def deploy(local_directory, remote_url, port=22, use_rsync=True):
     """Deploy a local directory to a remote url."""
@@ -201,7 +202,10 @@ def _generate_solib_search_path(toc, project_name):
 
 def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
     """ generate all scripts needed for debug """
-    (remote, server, remote_directory) = qibuild.deploy.parse_url(url)
+    parts_url = qibuild.deploy.parse_url(url)
+    remote = parts_url["login"] + "@" + parts_url["url"]
+    server = parts_url["url"]
+    remote_directory = parts_url["dir"]
 
     destdir = toc.get_project(project_name).build_directory
     if deploy_dir:
