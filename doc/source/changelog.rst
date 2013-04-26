@@ -18,6 +18,7 @@ Python
 ++++++
 
 * Add ``qisrc.maintainer`` to manage maintainers from ``qiproject.xml``
+* Add ``qisys.ui.indent_iterable`` to indent list or any iterable
 
 V2.2
 ----
