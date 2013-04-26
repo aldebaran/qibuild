@@ -35,14 +35,12 @@ def configure_parser(parser):
     group = parser.add_argument_group("deploy options")
     group.add_argument("url", help="remote target url: user@hostname:path")
     group.add_argument("--url", dest="urls", action="append", help="urls")
-    group.add_argument("--port", help="port", type=int)
-    group.add_argument("--split-debug", action="store_true",
+    group.add_argument("--split-debug", action="store_true", default=True,
                         dest="split_debug", help="split debug symbols. "
                         "Enable remote debuging")
     group.add_argument("--no-split-debug", action="store_false",
                         dest="split_debug", help="do not split debug symbols. "
                         "Remote debugging won't work")
-    parser.set_defaults(port=22, split_debug=True)
 
 def find_rsync_or_scp(toc, raises=True):
     """ Return True if rsync is present.
@@ -112,7 +110,7 @@ def do(args):
                             ui.green, "to", ui.blue, url["given"])
                     url_to_deploy = '%(login)s@%(url)s:%(dir)s' % url
                     qibuild.deploy.deploy(tmp, remote_url=url_to_deploy,
-                            port=args.port, use_rsync=use_rsync)
+                            port=url.get("port", 22), use_rsync=use_rsync)
 
     if not args.single:
         ui.info(ui.green, ":: ", "Deploying projects")
@@ -134,7 +132,7 @@ def do(args):
         for url in urls:
             url_to_deploy = '%(login)s@%(url)s:%(dir)s' % url
             qibuild.deploy.deploy(destdir, remote_url=url_to_deploy,
-                    port=args.port, use_rsync=use_rsync)
+                    port=url.get("port", 22), use_rsync=use_rsync)
         if not args.split_debug:
             continue
         gdb_script, message = qibuild.deploy.generate_debug_scripts(toc, project.name,

@@ -13,6 +13,11 @@ Command line
 * Fix ``qibuild clean -z`` behavior
 * ``qibuild clean`` learned ``-x`` to remove build directories that match no known configurations
 * ``qibuild deploy`` now accept url matching [[login]@]url[:[relative/path]] or url parseable with urlparse beginning with ssh:// only
+* ``qibuild deploy`` no longe accepts a ``--port`` option, specify the port inside the url instead
+  old
+  qibuild deploy --port 23 user@host:path/to/remote/dir
+  new
+  qibuild deploy ssh://user@host:32/full/path/to/remote/dir
 
 Python
 ++++++
