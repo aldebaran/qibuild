@@ -35,18 +35,20 @@ FILE_REMOTE_GDBSERVER_SH = """\
 
 here=$(cd $(dirname $0) ; pwd)
 
-if ! [ "$#" -eq "1" ] ; then
+if [ "$#" -lt "1" ] ; then
   echo "please specify the binary to run"
   exit 1
 fi
 
+binary=$1
+shift 1
 echo ""
 echo "To connect to this gdbserver launch the following command in another terminal:"
-echo "  %(gdb)s -x \"${here}/setup_target.gdb\" \"${here}/${1}\""
+echo "  %(gdb)s -x \"${here}/setup_target.gdb\" \"${here}/${binary}\""
 echo ""
 
 #echo ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
-ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
+ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${binary} $*"
 """
 
 def parse_url(remote_url):
