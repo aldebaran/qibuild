@@ -105,12 +105,11 @@ def do(args):
         ui.info(ui.green, ":: ", "Deploying packages")
         with qisys.sh.TempDir() as tmp:
             for (i, package) in enumerate(packages, start=1):
+                ui.info("(%i/%i)" % (i, len(projects)),
+                        "Deploying package", ui.blue, package.name)
                 toc.toolchain.install_package(package.name, tmp, runtime=True)
                 for url in urls:
-                    ui.info(ui.green, "*", ui.reset,
-                            "(%i/%i)" % (i, len(projects)),
-                            ui.green, "Deploying package", ui.blue, package.name,
-                            ui.green, "to", ui.blue, url["given"])
+                    ui.info("To", ui.green, url["given"])
                     url_to_deploy = '%(login)s@%(url)s:%(dir)s' % url
                     qibuild.deploy.deploy(tmp, remote_url=url_to_deploy,
                             port=url.get("port", 22), use_rsync=use_rsync)
@@ -123,16 +122,15 @@ def do(args):
     for (i, project) in enumerate(projects, start=1):
         ui.info(ui.green, "*", ui.reset,
                 "(%i/%i)" % (i, len(projects)),
-                ui.green, "Deploying project", ui.blue, project.name,
-                ui.green, "to", ui.blue, *[x["given"] for x in urls])
+                ui.green, "Deploying project", ui.blue, project.name)
         destdir = os.path.join(project.build_directory, "deploy")
         #create folder for project without install rules
         qisys.sh.mkdir(destdir, recursive=True)
         toc.install_project(project, destdir, prefix="/",
                             runtime=True, num_jobs=args.num_jobs,
                             split_debug=args.split_debug)
-        ui.info(ui.green, "Sending binaries to target...")
         for url in urls:
+            ui.info("To ", ui.green, url["given"])
             url_to_deploy = '%(login)s@%(url)s:%(dir)s' % url
             qibuild.deploy.deploy(destdir, remote_url=url_to_deploy,
                     port=url.get("port", 22), use_rsync=use_rsync)
