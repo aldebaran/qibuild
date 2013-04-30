@@ -7,11 +7,7 @@
 """
 
 import os
-import qisys.log
-
 import qisys.sh
-
-LOGGER = qisys.log.get_logger(__name__)
 
 def fix_dylibs(sdk_dir, paths=None):
     """ Create symlinks to every framework
@@ -41,5 +37,9 @@ def fix_dylibs(sdk_dir, paths=None):
         for dylib in dylibs:
             src  = os.path.join(path   , "lib", dylib)
             dest = os.path.join(sdk_dir, "lib", dylib)
+            if os.path.islink(src):
+                # don't create recursive links
+                continue
+            # just re-create links if they already exist
             qisys.sh.rm(dest)
             os.symlink(src, dest)
