@@ -9,13 +9,17 @@ import qibuild.deploy
 
 def test_parse_url():
     res = qibuild.deploy.parse_url("john42-bar@foo.bar.com:some/really_strange-path")
-    assert res == ("john42-bar@foo.bar.com", "foo.bar.com", "some/really_strange-path")
+    assert res == {'given': "john42-bar@foo.bar.com:some/really_strange-path",
+            'login': 'john42-bar', 'url': "foo.bar.com", 'dir': 'some/really_strange-path'}
     res = qibuild.deploy.parse_url("john@foo:")
-    assert res == ("john@foo", "foo", "")
+    assert res == {'given': 'john@foo:', 'login':'john', 'url':'foo', 'dir': ''}
     res = qibuild.deploy.parse_url("foo:lol")
-    assert res == ("foo", "foo", "lol")
-    # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
-        qibuild.deploy.parse_url("john@bar")
-    with pytest.raises(Exception):
-        qibuild.deploy.parse_url("john@bar:lol ")
+    assert res == None
+
+    res = qibuild.deploy.parse_url("http://login@example.com:path")
+    assert res is None
+
+    res = qibuild.deploy.parse_url("ssh://login@example.com:1234/path")
+    assert res == {'given': "ssh://login@example.com:1234/path",
+            'login':'login', 'url':'example.com', 'dir':'/path', 'port':1234}
+
