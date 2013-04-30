@@ -77,7 +77,7 @@ def load_snapshot(worktree, path, force, fetch=False):
             if fetch:
                 ui.info("Fetching...")
                 if force:
-                    git_project.fetch("a")
+                    git_project.fetch("-a")
 
             if (not state_project.sync_and_clean
                    or state_project.incorrect_proj
