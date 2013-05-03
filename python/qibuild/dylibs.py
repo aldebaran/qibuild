@@ -22,6 +22,8 @@ def fix_dylibs(sdk_dir, paths=None):
     qisys.sh.mkdir(os.path.join(sdk_dir, "lib"), recursive=True)
 
     for path in paths:
+        if not os.path.exists(path):
+            continue
         frameworks = os.listdir(path)
         frameworks = [x for x in frameworks if x.endswith(".framework")]
         for framework in frameworks:
