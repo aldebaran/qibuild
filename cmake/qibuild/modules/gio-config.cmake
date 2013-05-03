@@ -2,9 +2,6 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-# TODO: manage cross compile
-
-clean(GIO)
 find_package(PkgConfig)
 if(UNIX AND NOT APPLE)
   pkg_check_modules(GIO gio-unix-2.0)
