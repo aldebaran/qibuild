@@ -2,7 +2,6 @@ import os
 import qisys.qixml
 
 
-from qisys import ui
 import qibuild.config
 import qibuild.profile
 import qitoolchain

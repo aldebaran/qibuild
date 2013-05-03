@@ -35,7 +35,7 @@ def test_runtime_deps(build_worktree):
     assert dep_projects == [hello_plugin, libworld, hello]
 
 def test_find_packages_in_toolchain(build_worktree, toolchains):
-    foo_tc = toolchains.create("foo")
+    toolchains.create("foo")
     world_package = toolchains.add_package("foo", "world")
     hello = build_worktree.create_project("hello", depends=["world"])
     build_worktree.set_active_config("foo")
@@ -49,7 +49,6 @@ def test_compute_sdk_dirs(build_worktree):
     hello = build_worktree.create_project("hello", depends=["libworld"],
                                                    rdepends=["hello-plugin"])
     deps_solver = DepsSolver(build_worktree)
-    dep_projects = deps_solver.get_dep_projects([hello], ["build", "runtime"])
     assert deps_solver.get_sdk_dirs(hello, ["build"]) == [libworld.sdk_directory]
     assert deps_solver.get_sdk_dirs(hello, ["build", "runtime"]) == \
             [hello_plugin.sdk_directory, libworld.sdk_directory]
@@ -62,7 +61,7 @@ def test_recurse_deps(build_worktree):
     assert deps_solver.get_dep_projects([bar], ["build", "runtime"]) == [gtest, libfoo, bar]
 
 def test_empty_dep_is_single(build_worktree):
-    world = build_worktree.create_project("world")
+    build_worktree.create_project("world")
     hello = build_worktree.create_project("hello", depends=["world", "foo"])
 
     deps_solver = DepsSolver(build_worktree)

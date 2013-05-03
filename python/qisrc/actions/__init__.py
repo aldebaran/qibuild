@@ -3,10 +3,3 @@
 ## found in the COPYING file.
 
 """ qisrc actcions """
-
-import os
-import qisys.actions
-import qisrc.worktree
-
-
-

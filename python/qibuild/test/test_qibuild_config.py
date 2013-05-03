@@ -1,6 +1,3 @@
-import qisys.command
-import qibuild.cmake
-
 import pytest
 
 def test_simple(qibuild_action):

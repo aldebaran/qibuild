@@ -8,7 +8,6 @@ from qisrc.test.conftest import TestGitWorkTree
 
 
 
-
 def test_sync_clones_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")

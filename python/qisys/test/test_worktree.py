@@ -135,7 +135,7 @@ def test_check_not_in_git(tmpdir):
 def test_observers_are_notified(worktree):
     mock_observer = mock.Mock()
     worktree.register(mock_observer)
-    foo_proj = worktree.create_project("foo")
+    worktree.create_project("foo")
     assert mock_observer.on_project_added.called
 
 

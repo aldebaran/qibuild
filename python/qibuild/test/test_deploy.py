@@ -4,7 +4,6 @@
 
 
 import pytest
-import qisys.sh
 import qibuild.deploy
 
 def test_parse_url():

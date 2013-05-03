@@ -3,5 +3,5 @@
 ## Sample python script
 ##
 
-if __main__ == "__name__":
+if __name__ == "__name__":
     print "myscript main"

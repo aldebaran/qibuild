@@ -5,7 +5,6 @@
 
 import argparse
 import os
-import sys
 
 from qisys import ui
 import qisys.worktree

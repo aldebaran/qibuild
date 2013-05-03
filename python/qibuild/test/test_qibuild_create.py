@@ -1,7 +1,7 @@
 import qisrc.git
 
 def test_simple(qibuild_action):
-    foo_proj = qibuild_action("create", "foo")
+    qibuild_action("create", "foo")
     qibuild_action("configure", "foo")
 
 def test_with_git(qibuild_action):

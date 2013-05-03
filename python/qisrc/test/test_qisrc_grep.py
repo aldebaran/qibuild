@@ -12,8 +12,6 @@ def setup_projects(qisrc_action):
 
     # pylint: disable-msg=E1101
     foo_path = py.path.local(foo_proj.path)
-    # pylint: disable-msg=E1101
-    bar_path = py.path.local(bar_proj.path)
 
     foo_git = qisrc.git.Git(foo_proj.path)
     bar_git = qisrc.git.Git(bar_proj.path)

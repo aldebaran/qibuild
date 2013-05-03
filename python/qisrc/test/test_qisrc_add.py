@@ -1,10 +1,5 @@
 import qisys.sh
 import qisys.script
-import qisys.worktree
-import qisrc.worktree
-
-
-import pytest
 
 def test_qisrc_add_dot(qisrc_action):
     tmpdir = qisrc_action.tmpdir

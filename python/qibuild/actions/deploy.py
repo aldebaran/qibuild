@@ -20,10 +20,7 @@ Installs everything on the target 'mytarget' in the
 '/tmp/foobar' directory.
 """
 
-import os
 
-from qisys import ui
-import qisys.sh
 import qibuild.parsers
 import qibuild.deploy
 

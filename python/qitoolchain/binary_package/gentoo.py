@@ -13,7 +13,6 @@ import os
 import re
 
 import qisys
-import qibuild
 from qitoolchain.binary_package.core import BinaryPackage
 
 class GentooPackage(BinaryPackage):

@@ -1,5 +1,4 @@
 * move FakeGit inside qisrc.tests.conftests
-
 * rename qisrc.manifest.Manifest -> qisrc.manifest.RemoteManifest
 
 * use qisys.ui.info_count everywhere
@@ -39,6 +38,8 @@
 * rename qibuild.config -> qibuild.xml_config ?
 
 * remove qitoolchain.get()
+
+* remove qitoolchain.remote
 
 * choose between destdir and dest_dir
 

@@ -51,14 +51,14 @@ def test_check_configure_has_been_called_before_building(build_worktree):
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, [hello_proj])
 
     # pylint: disable-msg=E1101
-    with pytest.raises(qibuild.cmake_builder.NotConfigured) as e:
+    with pytest.raises(qibuild.cmake_builder.NotConfigured):
         cmake_builder.build()
 
 def test_default_install(build_worktree, toolchains, tmpdir):
     hello_proj = build_worktree.create_project("hello", rdepends="bar")
-    foo_toolchain = toolchains.create("foo")
+    toolchains.create("foo")
     build_worktree.set_active_config("foo")
-    bar_package = toolchains.add_package("foo", "bar")
+    toolchains.add_package("foo", "bar")
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, [hello_proj])
     cmake_builder.configure()
     cmake_builder.build()

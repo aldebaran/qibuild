@@ -101,11 +101,6 @@ class OpenTestCase(unittest.TestCase):
 </qibuild>
 """)
         qibuild_cfg.read(global_cfg, create_if_missing=False)
-        local_cfg = StringIO.StringIO(r"""
-<qibuild version="1">
-  <defaults config="mingw" />
-</qibuild>
-""")
         qibuild_cfg.set_active_config("win32-vs2010")
         ide = qibuild.actions.open.get_ide(qibuild_cfg)
         self.assertEqual(ide.name, "Visual Studio")

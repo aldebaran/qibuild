@@ -16,7 +16,6 @@ import re
 import portage
 
 import qisys
-import qibuild
 from qitoolchain.binary_package.gentoo import GentooPackage as GentooNoPortagePackage
 
 _ARCH_VARIANT = r'-m(arch|cpu)=(\S+)\s'

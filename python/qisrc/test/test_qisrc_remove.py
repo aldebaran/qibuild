@@ -1,12 +1,11 @@
 import qisys.sh
 import qisys.script
-import qisys.worktree
 
 from qisys.test.conftest import TestWorkTree
 
 def test_qisrc_remove_exsiting(qisrc_action):
     worktree = qisrc_action.worktree
-    foo_proj = worktree.create_project("foo")
+    worktree.create_project("foo")
     qisrc_action("remove", "foo")
     worktree = TestWorkTree()
     assert not worktree.get_project("foo")

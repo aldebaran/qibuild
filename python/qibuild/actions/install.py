@@ -4,7 +4,6 @@
 
 """Install a project and its dependencies """
 
-import os
 
 import qisys.sh
 import qibuild.parsers

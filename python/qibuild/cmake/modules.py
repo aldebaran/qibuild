@@ -383,7 +383,6 @@ def add_cmake_module_to_archive(archive, name):
 
     """
     algo   = qisys.archive.guess_algo(archive)
-    module = None
     with qisys.sh.TempDir() as work_dir:
         # pep8-ignore: E501
         root_dir = qisys.archive.extract(archive, work_dir, algo=algo, quiet=True)

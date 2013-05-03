@@ -7,8 +7,6 @@
 """
 
 import re
-import os
-import sys
 
 from qisys import ui
 import qisys.parsers
@@ -37,7 +35,6 @@ def do(args):
     if args.pattern:
         mess.extend([ui.green, "matching", args.pattern])
     ui.info(*mess)
-    to_remove = list()
 
     # Compute max len of src to align path if needed.
     max_length = max((len(x.src) for x in worktree.projects))

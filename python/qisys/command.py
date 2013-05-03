@@ -13,7 +13,6 @@ import subprocess
 import signal
 import threading
 import Queue
-import collections
 
 from qisys import ui
 import qisys

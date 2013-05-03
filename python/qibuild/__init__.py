@@ -8,7 +8,6 @@ and building projects.
 """
 
 import os
-import sys
 
 QIBUILD_ROOT_DIR  = os.path.dirname(os.path.abspath(__file__))
 

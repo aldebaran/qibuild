@@ -11,7 +11,6 @@ Use -- to seprate qisrc arguments from the arguments of the command.
 
 import qisys.parsers
 import qisrc.parsers
-from qisys import ui
 
 def configure_parser(parser):
     """Configure parser for this action """

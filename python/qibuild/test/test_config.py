@@ -8,7 +8,6 @@
 
 import os
 import unittest
-import tempfile
 from StringIO import StringIO
 
 import qisys

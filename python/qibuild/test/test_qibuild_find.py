@@ -45,7 +45,6 @@ def test_find_target(qibuild_action, record_messages):
 def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
     qibuild_action = QiBuildAction()
     qitoolchain_action = QiToolchainAction()
-    build_worktree = qibuild_action.build_worktree
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
     world_package = qibuild_action("package", "world")

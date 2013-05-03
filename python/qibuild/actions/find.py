@@ -6,11 +6,6 @@
 
 """
 
-import sys
-import os
-import glob
-import platform
-
 from qisys import ui
 import qibuild.find
 import qibuild.parsers
@@ -36,7 +31,6 @@ def _use_cmake_cache(args):
     package = args.package
 
     cache = qibuild.cmake.read_cmake_cache(project.cmake_cache)
-    u_package = package.upper()
 
     keys = cache.keys()
     keys.sort()

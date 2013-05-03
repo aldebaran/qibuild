@@ -1,4 +1,3 @@
-import pytest
 import xml.etree.ElementTree as etree
 
 import qisrc.groups

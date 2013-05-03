@@ -6,55 +6,50 @@
 
 """
 
-import sys
 import os
 import glob
 import platform
-import qibuild
 
-from qisys import ui
-
-def _library_prefix(os):
+def _library_prefix(os_name):
     """ Return suitable library prefix used on current OS.
     """
-    if os is None:
-        os = platform.system()
-
-    if os == "Windows":
+    if os_name is None:
+        os_name = platform.system()
+    if os_name == "Windows":
         return ""
     return "lib"
 
-def _library_suffix(os, dynamic, debug):
+def _library_suffix(os_name, dynamic, debug):
     """ Return suitable library suffix used on current OS.
     """
 
     # Os variable can be forced for test purpose
-    if os is None:
-        os = platform.system()
+    if os_name is None:
+        os_name = platform.system()
 
     # On Windows system, debug libraries wears "_d" suffix.
     debug_suffix = ""
     if debug is True:
         debug_suffix = "_d"
 
-    if os == "Windows" and dynamic is True:
+    if os_name == "Windows" and dynamic is True:
         return debug_suffix + ".dll"
-    if os == "Windows" and dynamic is False:
+    if os_name == "Windows" and dynamic is False:
         return debug_suffix + ".lib"
-    if os == "Linux" and dynamic is True:
+    if os_name == "Linux" and dynamic is True:
         return ".so"
-    if os == "Linux" and dynamic is False:
+    if os_name == "Linux" and dynamic is False:
         return ".a"
-    if os == "Mac":
+    if os_name == "Mac":
         return ".dylib"
     return ""
 
-def _binary_suffix(os, dynamic, debug):
+def _binary_suffix(os_name, dynamic, debug):
     """ Return suitable binary suffix used on current OS.
     """
     # Os variable can be forced for test purpose
-    if os is None:
-        os = platform.system()
+    if os_name is None:
+        os_name = platform.system()
 
     # On Windows system, debug binaries wear "_d" suffix.
     debug_suffix = ""
@@ -62,7 +57,7 @@ def _binary_suffix(os, dynamic, debug):
         debug_suffix = "_d"
 
     # On Windows system, binaries wear ".exe" extention
-    if os == "Windows":
+    if os_name == "Windows":
         return debug_suffix + ".exe"
     return ""
 
@@ -82,12 +77,12 @@ def find(projects, package):
         for files in glob.glob(lib):
             return lib
 
-def binary_name(name, dynamic=True, debug=False, os=None):
+def binary_name(name, dynamic=True, debug=False, os_name=None):
     """ Return exact binary name for current OS.
     """
-    return name + _binary_suffix(os, dynamic, debug)
+    return name + _binary_suffix(os_name, dynamic, debug)
 
-def library_name(name, dynamic=True, debug=False, os=None):
+def library_name(name, dynamic=True, debug=False, os_name=None):
     """ Return exact library name for current OS.
     """
-    return _library_prefix(os) + name + _library_suffix(os, dynamic, debug)
+    return _library_prefix(os_name) + name + _library_suffix(os_name, dynamic, debug)

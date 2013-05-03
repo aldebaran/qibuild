@@ -10,9 +10,7 @@ import abc
 import os
 import ntpath
 import posixpath
-import warnings
 
-from qisys import ui
 import qisys.command
 import qisys.sh
 import qisys.qixml

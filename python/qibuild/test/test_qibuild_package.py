@@ -13,7 +13,7 @@ def test_using_toolchain(cd_to_tmpdir):
     qibuild_action = QiBuildAction()
     qitoolchain_action = QiToolchainAction()
     build_worktree = qibuild_action.build_worktree
-    world_proj = qibuild_action.add_test_project("world")
+    qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
     world_package = qibuild_action("package", "world")
     qitoolchain_action("create", "foo")
