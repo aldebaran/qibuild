@@ -9,10 +9,9 @@ def test_simple(qibuild_action):
     world_archive = qibuild_action("package", "world")
     assert os.path.exists(world_archive)
 
-def test_using_toolchain(tmpdir, monkeypatch):
-    monkeypatch.chdir(tmpdir)
-    qibuild_action = QiBuildAction(worktree_root=tmpdir.strpath)
-    qitoolchain_action = QiToolchainAction(worktree_root=tmpdir.strpath)
+def test_using_toolchain(cd_to_tmpdir):
+    qibuild_action = QiBuildAction()
+    qitoolchain_action = QiToolchainAction()
     build_worktree = qibuild_action.build_worktree
     world_proj = qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")

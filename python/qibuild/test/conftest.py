@@ -10,8 +10,9 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
     can create git projects
 
     """
-    def __init__(self, root):
-        worktree = qisys.worktree.WorkTree(root)
+    def __init__(self, worktree=None):
+        if not worktree:
+            worktree = TestWorkTree()
         super(TestBuildWorkTree, self).__init__(worktree)
 
     @property
@@ -79,26 +80,19 @@ int main()
 
 # pylint: disable-msg=E1103
 @pytest.fixture
-def build_worktree(request):
-    tmp = tempfile.mkdtemp(prefix="tmp-test-worktree")
-    def clean():
-        qisys.sh.rm(tmp)
-    request.addfinalizer(clean)
-    wt = TestBuildWorkTree(tmp)
-    return wt
+def build_worktree(cd_to_tmpdir):
+    return TestBuildWorkTree()
 
 # pylint: disable-msg=E1103
 @pytest.fixture
-def qibuild_action(request):
+def qibuild_action(cd_to_tmpdir):
     res = QiBuildAction()
-    request.addfinalizer(res.reset)
     return res
 
 class QiBuildAction(TestAction):
-    def __init__(self, worktree_root=None):
-        super(QiBuildAction, self).__init__("qibuild.actions",
-                                            worktree_root=worktree_root)
-        self.build_worktree = TestBuildWorkTree(self.tmp)
+    def __init__(self):
+        super(QiBuildAction, self).__init__("qibuild.actions")
+        self.build_worktree = TestBuildWorkTree()
 
     def add_test_project(self, name):
         """ Add a test project using a project path in
@@ -116,4 +110,8 @@ class QiBuildAction(TestAction):
         has changed the cache
 
         """
-        self.build_worktree = TestBuildWorkTree(self.tmp)
+        self.build_worktree = TestBuildWorkTree()
+
+    @property
+    def tmpdir(self):
+        return self.build_worktree.tmpdir

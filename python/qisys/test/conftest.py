@@ -26,8 +26,14 @@ class TestWorkTree(qisys.worktree.WorkTree):
     can create projects
 
     """
-    def __init__(self, root):
-        super(TestWorkTree, self).__init__(root)
+    def __init__(self, root=None):
+        if root is None:
+            # TestWorkTree is often used with cd_to_tmpdir fixture,
+            # so this is safe
+            self.root = os.getcwd()
+        else:
+            self.root = root
+        super(TestWorkTree, self).__init__(self.root)
 
     @property
     def tmpdir(self):
@@ -43,17 +49,14 @@ class TestWorkTree(qisys.worktree.WorkTree):
 
 # pylint: disable-msg=E1101
 @pytest.fixture
-def worktree(request):
+def worktree(cd_to_tmpdir):
     """ A new worktree in a temporary dir.
+    As a bonus, we also change working dir to the temporary dir.
     This object has the same methods as WorkTree, plus:
         * worktree.tmpdir  : get the tmpdir as a py.LocalPath object
         * worktree.create_project : to create projects on the fly
     """
-    tmp = tempfile.mkdtemp(prefix="tmp-test-worktree")
-    def clean():
-        qisys.sh.rm(tmp)
-    request.addfinalizer(clean)
-    wt = TestWorkTree(tmp)
+    wt = TestWorkTree()
     return wt
 
 # pylint: disable-msg=E1101
@@ -129,19 +132,21 @@ def tmpfiles(request):
     patcher.start()
     request.addfinalizer(patcher.stop)
 
+
+@pytest.fixture
+def cd_to_tmpdir(monkeypatch, tmpdir):
+    workdir = tmpdir.mkdir("work")
+    monkeypatch.chdir(workdir)
+    return workdir
+
 class TestAction(object):
     """ Helper class to test actions
     Make sure cwd is in a temporary directory,
     and provide a nicer syntax for qisys.script.run_action
     """
-    def __init__(self, package, worktree_root=None):
-        if not worktree_root:
-            self.tmp = tempfile.mkdtemp(prefix="tmp-test-")
-        else:
-            self.tmp = worktree_root
-        self.old_cwd = os.getcwd()
-        self.chdir(self.tmp)
+    def __init__(self, package):
         self.package = package
+        self.worktree = TestWorkTree()
 
     def chdir(self, directory):
         try:
@@ -168,16 +173,3 @@ class TestAction(object):
             return 0
         else:
             return qisys.script.run_action(module_name, args)
-
-    def reset(self):
-        os.chdir(self.old_cwd)
-        qisys.sh.rm(self.tmp)
-
-    @property
-    def tmpdir(self):
-        # pylint: disable-msg=E1101
-        return py.path.local(self.tmp)
-
-    @property
-    def worktree(self):
-        return TestWorkTree(self.tmp)

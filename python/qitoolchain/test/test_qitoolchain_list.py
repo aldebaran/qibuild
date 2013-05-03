@@ -5,9 +5,9 @@ def test_no_toolchain(qitoolchain_action, record_messages):
     qitoolchain_action("list")
     assert record_messages.find("No toolchain yet")
 
-def test_default_toolchain(tmpdir, record_messages):
-    qibuild_action = QiBuildAction(worktree_root=tmpdir.strpath)
-    qitoolchain_action = QiToolchainAction(worktree_root=tmpdir.strpath)
+def test_default_toolchain(cd_to_tmpdir, record_messages):
+    qibuild_action = QiBuildAction()
+    qitoolchain_action = QiToolchainAction()
     qitoolchain_action("create", "bar")
     qitoolchain_action("create", "foo", "--default")
     record_messages.reset()

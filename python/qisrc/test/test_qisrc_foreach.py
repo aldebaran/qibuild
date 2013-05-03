@@ -1,5 +1,4 @@
 def test_qisrc_foreach(qisrc_action, record_messages):
-    qisrc_action("init")
     worktree = qisrc_action.worktree
     worktree.create_project("not_in_git")
     git_worktree = qisrc_action.git_worktree

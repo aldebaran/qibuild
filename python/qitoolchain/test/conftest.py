@@ -34,17 +34,15 @@ def toolchains(request):
 
 # pylint: disable-msg=E1101
 @pytest.fixture
-def qitoolchain_action(request):
+def qitoolchain_action(cd_to_tmpdir):
     res = QiToolchainAction()
-    request.addfinalizer(res.reset)
     return res
 
 class QiToolchainAction(TestAction):
-    def __init__(self, worktree_root=None):
-        super(QiToolchainAction, self).__init__("qitoolchain.actions",
-                                                worktree_root=worktree_root)
+    def __init__(self):
+        super(QiToolchainAction, self).__init__("qitoolchain.actions")
+
     def get_test_package(self, name):
         # FIXME: handle mac, windows
         this_dir = os.path.dirname(__file__)
         return os.path.join(this_dir, "packages", name + ".zip")
-

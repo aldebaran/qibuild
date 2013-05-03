@@ -17,3 +17,6 @@ def test_record(record_messages):
     assert not record_messages.find("bar")
     record_messages.reset()
     assert not record_messages.find("foo")
+
+def test_cd_to_tmp(cd_to_tmpdir):
+    assert os.listdir(os.getcwd()) == list()

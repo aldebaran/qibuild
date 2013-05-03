@@ -13,10 +13,10 @@ class TestGitWorkTree(qisrc.worktree.GitWorkTree):
     can create git projects
 
     """
-    def __init__(self, root):
-        worktree = qisys.worktree.WorkTree(root)
+    def __init__(self, worktree=None):
+        if not worktree:
+            worktree = TestWorkTree()
         super(TestGitWorkTree, self).__init__(worktree)
-        self.root = root
 
     @property
     def tmpdir(self):
@@ -49,7 +49,7 @@ class TestGitServer(object):
         foo
         bar
  |__ work
-        # where we will create worktrees anh make our testing
+        # where we will create worktrees and make our testing
 
     """
 
@@ -161,13 +161,8 @@ class TestGit(qisrc.git.Git):
 
 # pylint: disable-msg=E1101
 @pytest.fixture
-def git_worktree(request):
-    tmp = tempfile.mkdtemp(prefix="tmp-test-worktree")
-    def clean():
-        qisys.sh.rm(tmp)
-    request.addfinalizer(clean)
-    wt = TestGitWorkTree(tmp)
-    return wt
+def git_worktree(cd_to_tmpdir):
+    return TestGitWorkTree()
 
 # pylint: disable-msg=E1101
 @pytest.fixture
@@ -176,14 +171,9 @@ def test_git(request):
 
 # pylint: disable-msg=E1101
 @pytest.fixture
-def git_server(request):
-    tmp = tempfile.mkdtemp(prefix="tmp-test-git-srv")
-    def clean():
-        qisys.sh.rm(tmp)
-    request.addfinalizer(clean)
+def git_server(tmpdir):
     # pylint: disable-msg=E1101
-    srv_root = py.path.local(tmp)
-    git_srv = TestGitServer(srv_root)
+    git_srv = TestGitServer(tmpdir.mkdir("git"))
     return git_srv
 
 # pylint: disable-msg=E1101
@@ -193,18 +183,23 @@ def mock_git(request):
 
 # pylint: disable-msg=E1101
 @pytest.fixture
-def qisrc_action(request):
-    res = QiSrcAction()
-    request.addfinalizer(res.reset)
-    return res
+def qisrc_action(cd_to_tmpdir):
+    return QiSrcAction()
 
 class QiSrcAction(TestAction):
     def __init__(self):
         super(QiSrcAction, self).__init__("qisrc.actions")
-
-    @property
-    def git_worktree(self):
-        return TestGitWorkTree(self.tmp)
+        self.root = self.worktree.root
+        self.git_worktree = TestGitWorkTree(worktree=self.worktree)
 
     def create_git_project(self, src, branch="master"):
         return self.git_worktree.create_git_project(src, branch=branch)
+
+    def reload_worktree(self):
+        self.worktree = TestWorkTree(root=self.root)
+        self.git_worktree = TestGitWorkTree(worktree=self.worktree)
+
+    @property
+    def tmpdir(self):
+        return self.git_worktree.tmpdir
+

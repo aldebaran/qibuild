@@ -90,3 +90,22 @@
 * add qibuild test --failed
 
 * remove `qisys.command.CommandLine`, move `qisy.sh.run` to `qisys.command`
+
+* remove worktree args from actions, just build then on
+  the fly when needed
+
+* also ?
+
+    class GitWorkTree():
+      def __init__(self, worktree=None):
+          if not worktree:
+            worktree = WorkTree()
+          else:
+            self.worktree = worktree
+
+    class WorkTree():
+      def __init__(self, root=None):
+        if not root:
+          self.root = os.getcwd()
+        else:
+          sel.root = root

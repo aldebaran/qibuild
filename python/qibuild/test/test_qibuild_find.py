@@ -10,11 +10,9 @@ def test_find_target_in_project_cmake(qibuild_action, record_messages):
     qibuild_action("find", "--cmake", "hello", "world")
     assert record_messages.find("WORLD_LIBRARIES")
 
-def test_find_target_in_toolchain_package_cmake(tmpdir, monkeypatch,
-                                          record_messages):
-    monkeypatch.chdir(tmpdir)
-    qibuild_action = QiBuildAction(worktree_root=tmpdir.strpath)
-    qitoolchain_action = QiToolchainAction(worktree_root=tmpdir.strpath)
+def test_find_target_in_toolchain_package_cmake(cd_to_tmpdir, record_messages):
+    qibuild_action = QiBuildAction()
+    qitoolchain_action = QiToolchainAction()
     build_worktree = qibuild_action.build_worktree
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
@@ -44,11 +42,9 @@ def test_find_target(qibuild_action, record_messages):
     qibuild_action("find", "hello", "libworld")
     assert record_messages.find(find.library_name("world")) is None
 
-def test_find_target_in_toolchain_package(tmpdir, monkeypatch,
-                                          record_messages):
-    monkeypatch.chdir(tmpdir)
-    qibuild_action = QiBuildAction(worktree_root=tmpdir.strpath)
-    qitoolchain_action = QiToolchainAction(worktree_root=tmpdir.strpath)
+def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
+    qibuild_action = QiBuildAction()
+    qitoolchain_action = QiToolchainAction()
     build_worktree = qibuild_action.build_worktree
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")

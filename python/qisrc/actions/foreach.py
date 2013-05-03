@@ -9,8 +9,8 @@ Example:
 Use -- to seprate qisrc arguments from the arguments of the command.
 """
 
-import qisrc
-import qisys
+import qisys.parsers
+import qisrc.parsers
 from qisys import ui
 
 def configure_parser(parser):
