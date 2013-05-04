@@ -11,7 +11,6 @@ import qisys.worktree
 import qilinguist.qigettext
 import qilinguist.qtlinguist
 import qilinguist.config
-import qisrc.cmdparse
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -123,7 +122,7 @@ def process_with_qt(project):
 def do(args):
   """Main entry point"""
   linguist_worktree = qilinguist.parsers.get_linguist_worktree(args)
-  projects = qilinguist.parsers.get_projects(linguist_worktree, args)
+  projects = qilinguist.parsers.get_linguist_projects(linguist_worktree, args)
   for project in projects:
       qiproject_path = project.qiproject_xml
       if not os.path.exists(qiproject_path):
