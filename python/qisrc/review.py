@@ -9,7 +9,6 @@
 import os
 import re
 import sys
-import qisys.log
 import urlparse
 
 from qisys import ui

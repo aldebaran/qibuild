@@ -447,25 +447,6 @@ Output messages to the user
   Don't hesitate to use that, especially when something tricky is going on
   but you do not want to tell the user about it.
 
-* In the past, we were using ``logging.py`` and a custom log handler to output
-  messages to the console. This was causing lots of problems, and we added
-  a compatibility layer to avoid having to modify to much code.
-  But please do not use ``qisys.log`` in new code:
-
-.. code-block:: python
-
-  # Don't do this:
-
-  import qisys.log
-
-  logger = qisys.log.get_logger(__name__)
-  logger.info("Building :%s", project.name)
-
-  # Do this instead:
-
-  import qisys.ui
-  qisys.ui.info("Building", project.name)
-
 
 Debugging
 ^^^^^^^^^

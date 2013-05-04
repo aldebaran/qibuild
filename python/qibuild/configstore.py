@@ -35,7 +35,6 @@ You can use:
 
 import os
 import shlex
-import qisys.log
 import ConfigParser
 
 def get_config_dir():
@@ -71,7 +70,6 @@ class ConfigStore:
     Note: there is no set() value, use update_config
     instead.
     """
-    logger = qisys.log.get_logger("qibuild.configstore")
 
     def __init__(self):
         self.root = dict()
@@ -193,7 +191,6 @@ class ConfigStore:
 
     def read(self, filename):
         """ read a configuration file """
-        self.logger.debug("loading: %s", filename)
         parser = ConfigParser.RawConfigParser()
         parser.read(filename)
         parsed_sections = parser.sections()

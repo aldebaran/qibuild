@@ -9,7 +9,6 @@
 import os
 import re
 import subprocess
-import qisys.log
 
 from qisys import ui
 import qisys.command
