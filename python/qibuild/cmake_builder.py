@@ -39,6 +39,11 @@ class CMakeBuilder(object):
         """
         return self.build_config.build_env
 
+    @property
+    def toolchain(self):
+        """ The :py:class:`.Toolchain` to use when building """
+        return self.build_config.toolchain
+
     # pylint: disable-msg=E0213
     def need_configure(func):
         """ Decorator for every function that expects a build directory to
@@ -182,6 +187,10 @@ class CMakeBuilder(object):
                     ui.green, "Deploying project", ui.blue, project.name,
                     ui.green, "to", ui.blue, url)
             project.deploy(url)
+
+        print
+        for project in self.projects:
+            qibuild.deploy.generate_debug_scripts(self, project.name, url)
 
 class NotConfigured(Exception):
     def __init__(self, project):
