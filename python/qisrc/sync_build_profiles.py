@@ -23,9 +23,9 @@ def sync_build_profiles(worktree, xml_path):
         ui.info(ui.green, " * New:", ui.blue, new_profile.name)
         qibuild.profile.configure_build_profile(local_xml,
                                                 new_profile.name,
-                                                new_profile.flags)
+                                                new_profile.cmake_flags)
     if updated_profiles:
-        mess = "The following profiles have been updated:\n"
+        mess = "The following profiles have been updated remotely:\n"
         for updated_profile in updated_profiles:
             mess += "  * " + updated_profile.name + "\n"
         ui.warning(mess)
