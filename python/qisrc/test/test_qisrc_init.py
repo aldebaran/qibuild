@@ -15,6 +15,7 @@ def test_no_manifest(cd_to_tmpdir):
 
 def test_fails_when_not_empty(cd_to_tmpdir):
     cd_to_tmpdir.mkdir(".qi")
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qisys.script.run_action("qisrc.actions.init")
     assert "empty directory" in str(e.value)

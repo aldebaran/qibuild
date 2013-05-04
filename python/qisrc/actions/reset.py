@@ -11,7 +11,7 @@ import qisys.interact
 import qisrc.git
 import qisrc.snapshot
 import qisrc.status
-import qisrc.cmdparse
+import qisrc.parsers
 
 def configure_parser(parser):
     """Configure parser for this action."""
@@ -29,10 +29,11 @@ def configure_parser(parser):
 def do(args):
     """Main entry points."""
 
-    worktree = qisrc.parsers.get_git_worktree(args)
-    ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, worktree.root)
+    git_worktree = qisrc.parsers.get_git_worktree(args)
+    git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
+                                                  default_all=True)
 
-    for project in qisrc.cmdparse.projects_from_args(args, worktree):
+    for project in git_projects:
         if qisrc.git.get_repo_root(project.path) is None:
             continue
 

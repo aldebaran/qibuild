@@ -13,12 +13,15 @@ class CMakeBuilder(object):
         self.dep_types = ["build", "runtime"]
 
 
+    # pylint: disable-msg=E0202
     @property
     def dep_types(self):
         """ The list of dependencies to use """
         return qibuild.deps_solver.dep_types
 
+    # pylint: disable-msg=E1101
     @dep_types.setter
+    # pylint: disable-msg=E0102
     def dep_types(self, value):
         qibuild.deps_solver.dep_types = value
 
