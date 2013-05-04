@@ -36,6 +36,7 @@ You can use:
 import os
 import shlex
 import ConfigParser
+import qisys.sh
 
 def get_config_dir():
     """ Get a suitable directory to find all the
