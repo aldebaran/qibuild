@@ -2,8 +2,9 @@
 logilab-astng==0.24.3
 pylint==0.28
 
-# For pyflakes (we use both)
-pyflakes==0.6.1
+# For running pyflakes and pylint
+# on a buildfarm (brings pep8 and pyflakes)
+flake8
 
 # For doc:
 Sphinx==1.1.3
