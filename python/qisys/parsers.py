@@ -143,10 +143,10 @@ class WorkTreeProjectParser(AbstractProjectParser):
         mathes the current directory
 
         """
-        parent_project = find_parent_project(self.worktree.projects,
-                                              os.getcwd())
-        if parent_project:
-            return [parent_project]
+        res = find_or_add(self.worktree)
+        if res:
+            return [res]
+
 
     def parse_one_project(self, args, project_arg):
         """ Accept both an absolute path matching a worktree project,
@@ -172,3 +172,24 @@ def find_parent_project(projects, path):
     for project in projs:
         if qisys.sh.is_path_inside(path, project.path):
             return project
+
+def find_or_add(worktree, cwd=None):
+    """ If we find a qiproject.xml in a path not
+    registered yet by looking in the parent
+    directories, we just add it to the list
+
+    """
+    if cwd is None:
+        cwd = os.getcwd()
+    head = cwd
+    tail = None
+    while True:
+        candidate = os.path.join(head, "qiproject.xml")
+        project = worktree.get_project(head)
+        if project:
+            return project
+        if os.path.exists(candidate):
+            return worktree.add_project(head)
+        (head, tail) = os.path.split(head)
+        if not tail:
+            break

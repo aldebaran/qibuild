@@ -111,11 +111,10 @@ worktree root: {1}
             project.parse_qiproject_xml()
             self.projects.append(project)
 
-        res = self.projects[:]
+        res = set(self.projects)
         for project in self.projects:
             self._rec_parse_sub_projects(project, res)
-        res.sort(key=operator.attrgetter("src"))
-        self.projects = res
+        self.projects = sorted(res, key=operator.attrgetter("src"))
 
     def _rec_parse_sub_projects(self, project, res):
         """ Recursively parse every project and subproject,
@@ -127,7 +126,7 @@ worktree root: {1}
             src = qisys.sh.to_posix_path(src)
             sub_project = WorkTreeProject(self, src)
             sub_project.parse_qiproject_xml()
-            res.append(sub_project)
+            res.add(sub_project)
             self._rec_parse_sub_projects(sub_project, res)
 
     def get_project(self, src, raises=False):
@@ -243,6 +242,15 @@ Found an invalid sub project: {1}
 
     def __repr__(self):
         return "<WorkTreeProject in %s>" % self.src
+
+    def __eq__(self, other):
+        return self.src == other.src
+
+    def __ne__(self, other):
+        return not (self.__eq__, other)
+
+    def __hash__(self):
+        return hash(self.src)
 
 def repr_list_projects(projects, name = "projects"):
     res = ""

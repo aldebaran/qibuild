@@ -6,8 +6,6 @@ import qibuild.build
 import qibuild.build_config
 import qibuild.project
 
-class BuildWorkTreeError(Exception):
-    pass
 
 class BuildWorkTree(qisys.worktree.WorkTreeObserver):
     """ Stores a list of projects that can be built using CMake
@@ -69,10 +67,9 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         """
         build_projects = list()
         for wt_project in self.worktree.projects:
-            if not os.path.exists(wt_project.qiproject_xml):
-                continue
-            build_project = qibuild.project.BuildProject(self, wt_project)
-            build_projects.append(build_project)
+            build_project = new_build_project(self, wt_project)
+            if build_project:
+                build_projects.append(build_project)
         return build_projects
 
     def configure_build_profile(self, name, flags):
@@ -100,3 +97,57 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
 
         """
         self.build_config.set_active_config(active_config)
+
+
+def new_build_project(build_worktree, project):
+    """ Cerate a new BuildProject from a worktree project.
+    Return None if there is no BuildProject here
+
+    """
+    if not os.path.exists(project.qiproject_xml):
+        return None
+    tree = qisys.qixml.read(project.qiproject_xml)
+    root = tree.getroot()
+    if root.get("version") == "3":
+        qibuild_elem = root.find("qibuild")
+        if qibuild_elem is None:
+            return None
+    else:
+        # qibuild2 used to check for a CMakeLists.txt
+        cmake_lists = os.path.join(project.path, "CMakeLists.txt")
+        if not os.path.exists(cmake_lists):
+            return None
+        qibuild_elem = root
+
+    name = qibuild_elem.get("name")
+    if not name:
+        raise BadProjectConfig(project.qiproject_xml,
+                               "Expecting a 'name' attribute")
+
+    build_project = qibuild.project.BuildProject(build_worktree, project)
+    build_project.name = name
+
+    depends_trees = qibuild_elem.findall("depends")
+
+    for depends_tree in depends_trees:
+        buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
+        runtime   = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
+        dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
+        if buildtime:
+            for dep_name in dep_names:
+                build_project.depends.add(dep_name)
+        if runtime:
+            for dep_name in dep_names:
+                build_project.rdepends.add(dep_name)
+    return build_project
+
+
+class BuildWorkTreeError(Exception):
+    pass
+
+class BadProjectConfig(Exception):
+    def __str__(self):
+        return """
+Incorrect configuration detected for project in {0}
+{1}
+""".format(*self.args)

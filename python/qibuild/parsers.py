@@ -179,12 +179,20 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
         mathes the current directory
 
         """
-        name, path = project_name_and_path_from_cwd()
-        build_proj = self.build_worktree.get_build_project(name, raises=False)
+        parser = qisys.parsers.WorkTreeProjectParser(self.build_worktree.worktree)
+        worktree_projects = parser.parse_no_project(args)
+        if not worktree_projects:
+            raise CouldNotGuessProjectName()
+
+        # WorkTreeProjectParser returns None or a list of one element
+        worktree_proj = worktree_projects[0]
+        build_proj = qibuild.worktree.new_build_project(self.build_worktree,
+                                                        worktree_proj)
         if not build_proj:
-            # auto add the build project to the worktree:
-            self.build_worktree.worktree.add_project(path)
-            build_proj = self.build_worktree.get_build_project(name)
+            raise CouldNotGuessProjectName()
+
+        self.build_worktree.build_projects.append(build_proj)
+
         return self.parse_one_project(args, build_proj.name)
 
     def parse_one_project(self, args, project_arg):
@@ -195,25 +203,10 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
         project = self.build_worktree.get_build_project(project_arg, raises=True)
         return [project]
 
-def project_name_and_path_from_cwd():
-    """ Find the parent qibuild project of a given path """
-    head = os.getcwd()
-    tail = None
-    while True:
-        candidate = os.path.join(head, "qiproject.xml")
-        if os.path.exists(candidate):
-            tree = qisys.qixml.read(candidate)
-            # FIXME: support new syntax ?
-            # FIXME: use BuildProjectParser ?
-            name = tree.getroot().get("name")
-            if name:
-                return (name, head)
-        (head, tail) = os.path.split(head)
-        if not tail:
-            break
-    mess = """
+class CouldNotGuessProjectName(Exception):
+    def __str__(self):
+        return """
 Could not guess qibuild project name from current working directory
 Please go inside a project, or specify the project name
 on the command line
 """
-    raise Exception(mess)

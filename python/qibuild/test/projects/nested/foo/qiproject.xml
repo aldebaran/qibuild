@@ -1,2 +1,4 @@
-<project name="nested-foo" />
+<project version="3" >
+  <qibuild name="foo-nested" />
+</project>
 

@@ -18,7 +18,6 @@ class BuildProject(object):
         # depends is a set at this point because they are not sorted yet
         self.depends = set()
         self.rdepends = set()
-        self.parse_qiproject_xml()
 
     @property
     def qiproject_xml(self):
@@ -340,6 +339,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
         ui.info(ui.green, "Sending binaries to target ...")
         qibuild.deploy.deploy(destdir, url, use_rsync=use_rsync, port=port)
 
+
     def fix_shared_libs(self):
         # FIXME !
         pass
@@ -367,12 +367,6 @@ The following tools were not found: {missing}\
             return
         qibuild.gdb.split_debug(destdir, **tool_paths)
 
-
-    def parse_qiproject_xml(self):
-        parser = BuildProjectParser(self)
-        xml_elem = qisys.qixml.read(self.qiproject_xml).getroot()
-        parser.parse(xml_elem)
-
     def __repr__(self):
         return "<BuildProject %s in %s>" % (self.name, self.src)
 
@@ -384,23 +378,5 @@ The following tools were not found: {missing}\
 
 
 
-
-class BuildProjectParser:
-    def __init__(self, target):
-        self.target = target
-
-    def parse(self, xml_elem):
-        # FIXME: support new syntax
-        self.target.name = qisys.qixml.parse_required_attr(xml_elem, "name")
-        # Read depends:
-        depends_trees = xml_elem.findall("depends")
-        for depends_tree in depends_trees:
-            buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
-            runtime   = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
-            dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
-            if buildtime:
-                for dep_name in dep_names:
-                    self.target.depends.add(dep_name)
-            if runtime:
-                for dep_name in dep_names:
-                    self.target.rdepends.add(dep_name)
+class BadProjectConfig(Exception):
+    pass

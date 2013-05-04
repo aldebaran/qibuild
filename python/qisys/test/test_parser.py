@@ -58,5 +58,38 @@ def test_parse_one_arg(worktree, args):
     assert projects[0].src == "foo"
 
 def test_auto_add(worktree, args):
-    worktree.tmpdir.mkdir("foo")
+    tmpdir = worktree.tmpdir
+    foo = tmpdir.mkdir("foo")
+    qiproject_xml = foo.join("qiproject.xml")
+    qiproject_xml.write("<project />")
+    with qisys.sh.change_cwd(foo.strpath):
+        args.projects = list()
+        projects = qisys.parsers.get_projects(worktree, args)
+        assert len(projects) == 1
+        assert projects[0].src == "foo"
 
+def test_auto_add_nested(worktree, args):
+    tmpdir = worktree.tmpdir
+    foo = worktree.create_project("foo")
+    bar = worktree.create_project("foo/bar")
+    baz = tmpdir.mkdir("foo", "bar", "baz")
+    qiproject_xml = baz.join("qiproject.xml")
+    qiproject_xml.write("<project />")
+    assert len(worktree.projects) == 2
+    with qisys.sh.change_cwd(baz.strpath):
+        args.projects = list()
+        projects = qisys.parsers.get_projects(worktree, args)
+        assert len(projects) == 1
+        assert projects[0].src == "foo/bar/baz"
+    assert len(worktree.projects) == 3
+
+    # But, now a clever guy adds <project src="baz" /> in
+    # bar/qiproject.xml:
+    bar_qiproject = tmpdir.join("foo", "bar", "qiproject.xml")
+    bar_qiproject.write("""
+<project>
+  <project src="baz" />
+</project>
+""")
+    worktree2 = qisys.worktree.WorkTree(tmpdir.strpath)
+    assert len(worktree2.projects) == 3

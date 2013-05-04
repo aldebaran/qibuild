@@ -177,11 +177,15 @@ def create_qiproj_xml(args):
             return
 
     proj_elem = etree.Element("project")
-    proj_elem.set("name", project_name)
+    proj_elem.set("version", "3")
     tree = etree.ElementTree(element=proj_elem)
+    qibuild_elem = etree.Element("qibuild")
+    qibuild_elem.set("name", project_name)
+    proj_elem.append(qibuild_elem)
+    qisys.qixml.indent(proj_elem)
     if args.dry_run:
         ui.info("Would create", qiproj_xml, "\n"
-               "with:", etree.tostring(proj_elem))
+               "with", "\n", etree.tostring(proj_elem))
         return
 
     ui.info("Creating", qiproj_xml)
