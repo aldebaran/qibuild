@@ -68,29 +68,29 @@ def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
     assert record_messages.find("libeggs") is None
 
 def test_library_name_abstraction():
-    assert find.library_name("foo", os="Windows") == "foo.dll"
-    assert find.library_name("foo", debug=True, os="Windows") == "foo_d.dll"
-    assert find.library_name("foo", dynamic=False, os="Windows") == "foo.lib"
-    assert find.library_name("foo", dynamic=False, debug=True, os="Windows") == "foo_d.lib"
+    assert find.library_name("foo", os_name="Windows") == "foo.dll"
+    assert find.library_name("foo", debug=True, os_name="Windows") == "foo_d.dll"
+    assert find.library_name("foo", dynamic=False, os_name="Windows") == "foo.lib"
+    assert find.library_name("foo", dynamic=False, debug=True, os_name="Windows") == "foo_d.lib"
 
-    assert find.library_name("foo", os="Linux") == "libfoo.so"
-    assert find.library_name("foo", debug=True, os="Linux") == "libfoo.so"
-    assert find.library_name("foo", dynamic=False, os="Linux") == "libfoo.a"
-    assert find.library_name("foo", dynamic=False, debug=True, os="Linux") == "libfoo.a"
+    assert find.library_name("foo", os_name="Linux") == "libfoo.so"
+    assert find.library_name("foo", debug=True, os_name="Linux") == "libfoo.so"
+    assert find.library_name("foo", dynamic=False, os_name="Linux") == "libfoo.a"
+    assert find.library_name("foo", dynamic=False, debug=True, os_name="Linux") == "libfoo.a"
 
-    assert find.library_name("foo", os="Mac") == "libfoo.dylib"
-    assert find.library_name("foo", debug=True, os="Mac") == "libfoo.dylib"
-    assert find.library_name("foo", dynamic=False, os="Mac") == "libfoo.dylib"
-    assert find.library_name("foo", dynamic=False, debug=True, os="Mac") == "libfoo.dylib"
+    assert find.library_name("foo", os_name="Mac") == "libfoo.dylib"
+    assert find.library_name("foo", debug=True, os_name="Mac") == "libfoo.dylib"
+    assert find.library_name("foo", dynamic=False, os_name="Mac") == "libfoo.dylib"
+    assert find.library_name("foo", dynamic=False, debug=True, os_name="Mac") == "libfoo.dylib"
 
-    assert find.library_name("foo", os="Bar") == "libfoo"
+    assert find.library_name("foo", os_name="Bar") == "libfoo"
 
 def test_binary_name_abstraction():
-    assert find.binary_name("foo", os="Windows") == "foo.exe"
-    assert find.binary_name("foo", os="Windows", debug=True) == "foo_d.exe"
+    assert find.binary_name("foo", os_name="Windows") == "foo.exe"
+    assert find.binary_name("foo", os_name="Windows", debug=True) == "foo_d.exe"
 
-    assert find.binary_name("foo", os="Mac") == "foo"
-    assert find.binary_name("foo", os="Mac", debug=True) == "foo"
+    assert find.binary_name("foo", os_name="Mac") == "foo"
+    assert find.binary_name("foo", os_name="Mac", debug=True) == "foo"
 
-    assert find.binary_name("foo", os="Linux") == "foo"
-    assert find.binary_name("foo", os="Linux", debug=True) == "foo"
+    assert find.binary_name("foo", os_name="Linux") == "foo"
+    assert find.binary_name("foo", os_name="Linux", debug=True) == "foo"

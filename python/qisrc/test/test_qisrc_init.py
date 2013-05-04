@@ -1,6 +1,8 @@
 import qisys.script
 from qisrc.test.conftest import TestGitWorkTree
 
+import pytest
+
 def test_in_new_directory(cd_to_tmpdir, git_server):
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
