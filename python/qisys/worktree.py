@@ -10,6 +10,7 @@ import abc
 import os
 import ntpath
 import posixpath
+import operator
 
 import qisys.command
 import qisys.sh
@@ -113,6 +114,7 @@ worktree root: {1}
         res = self.projects[:]
         for project in self.projects:
             self._rec_parse_sub_projects(project, res)
+        res.sort(key=operator.attrgetter("src"))
         self.projects = res
 
     def _rec_parse_sub_projects(self, project, res):
@@ -320,7 +322,6 @@ class WorkTreeCache:
         projects_elem = self.xml_root.findall("project")
         for project_elem in projects_elem:
             srcs.append(qisys.qixml.parse_required_attr(project_elem, "src"))
-        srcs.sort()
         return srcs
 
 class WorkTreeError(Exception):
