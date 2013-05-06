@@ -266,11 +266,8 @@ class Git(object):
         # Taken from /usr/lib/git-core/git-sh-setup
         return ""
 
-    def sync(self, git_project, branch_name=None,
-             stash_first=False, rebase_devel=True):
+    def sync_branch(self, branch, rebase_devel=True):
         """ git pull --rebase on steroids:
-
-         * abort if repo is not clean
 
          * update submodules and detect broken submodules configs
 
@@ -287,30 +284,15 @@ class Git(object):
             - False: sync failed
             - True: sync suceeded
         """
-        if branch_name is None:
-            branch = git_project.default_branch
-            if not branch:
-                return None, "No branch given, and no branch configured by default"
-        else:
-            branch = git_project.get_branch(branch_name)
-
-        current_branch = self.get_current_branch()
-        if not current_branch:
-            return None, "Not on any branch"
-
-        if current_branch != branch.name and not rebase_devel:
-            return None, "Not on the correct branch. " + \
-                         "On %s but should be on %s" % (current_branch, branch.name)
-
-        if not stash_first:
-            error = self.require_clean_worktree()
-            if error:
-                return None, error
+        remote_branch = branch.remote_branch
+        if not remote_branch:
+            remote_branch = branch.name
+        remote_ref = "%s/%s" % (branch.tracks, remote_branch)
 
         with self.transaction() as transaction:
             if branch.tracks:
                 self.fetch(branch.tracks)
-                self.rebase(branch.name, branch.tracks)
+                self.rebase(remote_ref, branch.name)
             else:
                 # No remote given, maybe this will work:
                 self.fetch()

@@ -124,7 +124,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         git.clone(repo.remote_url, "--recursive",
                   "--branch", repo.default_branch,
                   "--origin", repo.remote)
-        git_project.sync(repo)
+        git_project.apply_remote_config(repo)
         self.save_project_config(git_project)
         self.load_git_projects()
 
@@ -290,7 +290,7 @@ class GitProject(object):
         return branch
 
     @change_config
-    def sync(self, repo):
+    def apply_remote_config(self, repo):
         """ Apply the configuration read from the "repo" setting
         of a remote manifest.
         Called by WorkTreeSyncer
@@ -299,6 +299,30 @@ class GitProject(object):
         self.configure_branch(repo.default_branch, tracks=repo.remote,
                               remote_branch=repo.default_branch, default=True)
         self.configure_remote(repo.remote, repo.remote_url)
+
+    def sync(self, branch_name=None, **kwargs):
+        """ Synchronize remote changes with the underlying git repository
+        Calls py:meth:`qisys.git.Git.sync`
+
+        """
+        git = qisrc.git.Git(self.path)
+        if branch_name is None:
+            branch = self.default_branch
+            if not branch:
+                return None, "No branch given, and no branch configured by default"
+        else:
+            branch = git.get_branch(branch_name)
+
+        current_branch = git.get_current_branch()
+        if not current_branch:
+            return None, "Not on any branch"
+
+        if current_branch != branch.name and not rebase_devel:
+            return None, "Not on the correct branch. " + \
+                         "On %s but should be on %s" % (current_branch, branch.name)
+
+        return git.sync_branch(branch)
+
 
     def get_branch(self, branch_name):
         """ Get the branch matching the name

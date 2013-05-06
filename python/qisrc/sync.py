@@ -241,18 +241,7 @@ class WorkTreeSyncer(object):
             git_project = self.git_worktree.get_git_project(repo.src)
             # may not work if the moving failed for instance
             if git_project:
-                git_project.sync(repo)
-
-    def sync_manifest_repo(self, repo):
-        """ Sync one remote configuration with the git worktree """
-        project_url = repo.remote_url
-        git_project = self.git_worktree.find_url(project_url)
-        if not git_project:
-            return
-        if git_project.src != repo.src:
-            # Project has moved:
-            self.git_worktree.move_repo(git_project, repo.src)
-        git_project.sync(repo)
+                git_project.apply_remote_config(repo)
 
     def sync_from_manifest_file(self, name, xml_path):
         """ Just synchronize the manifest coming from one xml file.

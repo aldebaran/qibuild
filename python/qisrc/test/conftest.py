@@ -122,7 +122,8 @@ class TestGitServer(object):
         self.push_manifest("add group %s" % name)
 
 
-    def push_file(self, project, filename, contents):
+    def push_file(self, project, filename, contents,
+                  branch="master", force=False):
         """ Push a new file with the given contents to the given project
         It is assumed that the project has beed created
 
@@ -136,13 +137,22 @@ class TestGitServer(object):
             message = "Add %s" % filename
         repo_src.join(filename).write(contents)
         git = qisrc.git.Git(repo_src.strpath)
+        git.checkout("--force", "-B", branch)
         git.add(filename)
-        git.commit("--message", message)
-        git.push("origin", "master:master")
+        if force:
+            git.commit("--message", message, "--amend")
+        else:
+            git.commit("--message", message)
+        if force:
+            git.push("origin", "--force", "%s:%s" % (branch, branch))
+        else:
+            git.push("origin", "%s:%s" % (branch, branch))
 
 class TestGit(qisrc.git.Git):
     """ the Git class with a few other helpfull methods """
-    def __init__(self, repo):
+    def __init__(self, repo=None):
+        if repo is None:
+            repo = os.getcwd()
         super(TestGit, self).__init__(repo)
 
     @property
@@ -156,7 +166,20 @@ class TestGit(qisrc.git.Git):
         self.checkout("-b", branch)
         self.root.join(".gitignore").write("")
         self.add(".gitignore")
-        self.commit("-m", "initial commit")
+        self.commit("--message", "initial commit")
+
+    def read_file(self, path):
+        """ Read the contents of a file """
+        return self.root.join(path).read()
+
+    def commit_file(self, path, contents, message=None):
+        """ Commit a file. Path will be created if it does not exits """
+        file_path = self.root.join(path)
+        file_path.write(contents)
+        if not message:
+            message = "Create/update %s" % path
+        self.add(path)
+        self.commit("--message", message)
 
 
 # pylint: disable-msg=E1101

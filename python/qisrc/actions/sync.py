@@ -46,8 +46,7 @@ def do(args):
         ui.info_count(i, len(git_projects),
                       ui.blue, git_project.src)
 
-        git = qisrc.git.Git(git_project.path)
-        (status, out) = git.sync(git_project, rebase_devel=args.rebase_devel)
+        (status, out) = git_project.sync(rebase_devel=args.rebase_devel)
         if status is None:
             ui.info(ui.brown, "  [skipped]")
             skipped.append((git_project.src, out))

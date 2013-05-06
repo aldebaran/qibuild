@@ -8,6 +8,7 @@
 
 import qisrc.sync
 import qisrc.manifest
+import qisrc.git
 
 def make_repos(*args):
     res = list()
@@ -65,8 +66,6 @@ def test_compute_rm_add():
     assert len(to_rm) == 1
     assert to_rm[0].project == "bar.git"
 
-
-
 def test_stores_url_and_groups(git_worktree, git_server):
     manifest_url = git_server.manifest_url
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
@@ -80,7 +79,7 @@ def test_stores_url_and_groups(git_worktree, git_server):
     assert default_manifest.url == manifest_url
     assert default_manifest.groups == ["qim"]
 
-def test_pull_changes_when_syncing(git_worktree, git_server):
+def test_pull_manifest_changes_when_syncing(git_worktree, git_server):
     manifest_url = git_server.manifest_url
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
     worktree_syncer.configure_manifest("default", manifest_url)
@@ -92,7 +91,6 @@ def test_pull_changes_when_syncing(git_worktree, git_server):
     a_file = git_worktree.tmpdir.join(".qi", "manifests",
                                       "default", "a_file")
     assert a_file.read() == "some contents\n"
-
 
 def test_new_repos(git_worktree, git_server):
     git_server.create_repo("foo.git")
