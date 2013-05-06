@@ -296,7 +296,7 @@ class Git(object):
             else:
                 # No remote given, maybe this will work:
                 self.fetch()
-                self.rebase(branch_name)
+                self.rebase(branch.name)
 
         if transaction.ok:
             return True, ""
@@ -368,6 +368,29 @@ def get_git_projects(projects):
     """Return projects which are git projects."""
     git_projects = [p for p in projects if is_git(p.path)]
     return git_projects
+
+def name_from_url(url):
+    """ Return the project name from the url
+    Assume there project name is always in the form
+    "foo/bar.git"
+
+    >>> name_from_url("git@git:foo/bar.git")
+    'foo/bar.git'
+
+    """
+    if "://" in url:
+        url = url.split("://", 1)[-1]
+        if ":" in url:
+            port_and_rest = url.split(":")[-1]
+            return port_and_rest.split("/", 1)[-1]
+        else:
+            return url.split("/", 1)[-1]
+    else:
+        if ":" in url:
+            return url.split(":")[-1]
+        else:
+            return url.split("/")[-1]
+
 
 class Transaction:
     """ Used to simplify chaining git commands """
