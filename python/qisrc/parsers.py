@@ -42,6 +42,14 @@ def get_git_projects(git_worktree, args, default_all=False):
         parser = GitProjectParser(git_worktree)
         return parser.parse_args(args, default_all=default_all)
 
+def get_one_git_project(git_worktree, args):
+    parser = GitProjectParser(git_worktree)
+    projects = parser.parse_args(args)
+    if not len(projects) == 1:
+        raise Exception("This action can only work with one project")
+    return projects[0]
+
+
 ##
 # Implementation details
 
