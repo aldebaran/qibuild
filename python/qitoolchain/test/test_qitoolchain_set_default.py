@@ -1,7 +1,9 @@
-import qibuild.test.conftest
+from qibuild.test.conftest import TestBuildWorkTree
 
-def test_simple(qitoolchain_action, tmpdir):
+def test_simple(qitoolchain_action):
     qitoolchain_action("create", "foo")
-    build_worktree = qibuild.test.conftest.TestBuildWorkTree(tmpdir.strpath)
-    qitoolchain_action.chdir(tmpdir.strpath)
-    qitoolchain_action("set-default", "foo")
+    qitoolchain_action("set-default", "-c", "foo")
+    build_worktree = TestBuildWorkTree()
+    toolchain = build_worktree.toolchain
+    assert toolchain
+    assert toolchain.name == "foo"
