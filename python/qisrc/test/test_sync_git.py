@@ -1,8 +1,4 @@
-import qisrc.git
-from qisrc.worktree import Branch, Remote
-from qisrc.test.conftest import TestGitWorkTree
-
-import pytest
+from qisrc.git_config import Branch
 
 def create_foo(git_server, tmpdir, test_git):
     foo_git = test_git(tmpdir.join("foo").strpath)

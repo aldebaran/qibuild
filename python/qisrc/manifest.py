@@ -11,7 +11,7 @@ import posixpath
 
 import qisys.sh
 import qisys.qixml
-import qisrc.worktree
+import qisrc.git_config
 import qisrc.groups
 
 class ManifestError(Exception):
@@ -114,9 +114,10 @@ class Manifest(object):
     @change_config
     def add_remote(self, name, url, review=False):
         """ Add a new remote to the manifest. """
-        remote = qisrc.worktree.Remote()
+        remote = qisrc.git_config.Remote()
         remote.name = name
         remote.url = url
+        remote.review = review
         self.remotes.append(remote)
 
     @change_config
@@ -156,7 +157,10 @@ class RepoConfig(object):
     def __repr__(self):
         res = "<Repo %s in %s" %  (self.project, self.src)
         if self.default_branch:
-            res += " default: %s>" % self.default_branch
+            res += " default: %s" % self.default_branch
+        if self.review:
+            res += " (review)"
+        res += ">"
         return res
 
 ##
@@ -174,8 +178,8 @@ class ManifestParser(qisys.qixml.XMLParser):
         self.target.repos.append(repo_config)
 
     def _parse_remote(self, elem):
-        remote = qisrc.worktree.Remote()
-        parser = qisrc.worktree.RemoteParser(remote)
+        remote = qisrc.git_config.Remote()
+        parser = qisrc.git_config.RemoteParser(remote)
         parser.parse(elem)
         self.target.remotes.append(remote)
 
@@ -191,7 +195,7 @@ class ManifestParser(qisys.qixml.XMLParser):
 
     def _write_remotes(self, elem):
         for remote in self.target.remotes:
-            parser = qisrc.worktree.RemoteParser(remote)
+            parser = qisrc.git_config.RemoteParser(remote)
             remote_elem = parser.xml_elem()
             elem.append(remote_elem)
 

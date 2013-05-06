@@ -19,33 +19,68 @@ def compute_repo_diff(old_repos, new_repos):
     :returns: a tuple (to_add, to_move, to_rm)
 
     """
+    # FIXME: rewrite with just one loop?
+
     to_add = list()
     to_move = list()
     to_rm = list()
+    to_update = list()
 
-    # Look for the moves:
+
+    src_to_update = list()
+
+    # Compute lookup dicts
+    old_srcs = dict()
+    for repo in old_repos:
+        old_srcs[repo.src] = repo
+    new_srcs = dict()
+    for repo in new_repos:
+        new_srcs[repo.src] = repo
+    old_urls = dict()
+    for old_repo in old_repos:
+        old_urls[old_repo.remote_url] = old_repo
+    new_urls = dict()
+    for new_repo in new_repos:
+        new_urls[new_repo.remote_url] = new_repo
+
+    # Look for the updates: same src, different urls
+    for repo in old_repos:
+        old_url = repo.remote_url
+        new_repo = new_srcs.get(repo.src)
+        if not new_repo:
+            continue
+        new_url = new_repo.remote_url
+        if old_url != new_url:
+            src_to_update.append(repo.src)
+
+    # Look for the moves: same url, different src
     for old_repo in old_repos:
         for new_repo in new_repos:
             if old_repo.remote_url == new_repo.remote_url:
                 if old_repo.src != new_repo.src:
                     to_move.append((old_repo, new_repo.src))
 
-    old_dict = dict()
+    # Look for repos to remove
     for old_repo in old_repos:
-        old_dict[old_repo.remote_url] = old_repo
-    new_dict = dict()
-    for new_repo in new_repos:
-        new_dict[new_repo.remote_url] = new_repo
-
-    for old_repo in old_repos:
-        if not old_repo.remote_url in new_dict:
+        if old_repo.src in src_to_update:
+            continue
+        if not old_repo.remote_url in new_urls:
             to_rm.append(old_repo)
 
+    # Look for repos to add
     for new_repo in new_repos:
-        if not new_repo.remote_url in old_dict:
+        if new_repo.src in src_to_update:
+            continue
+        if not new_repo.remote_url in old_urls:
             to_add.append(new_repo)
 
-    return (to_add, to_move, to_rm)
+    to_update = list()
+    for src in src_to_update:
+        old_repo = old_srcs[src]
+        new_repo = new_srcs[src]
+        to_update.append((old_repo, new_repo))
+
+    return (to_add, to_move, to_rm, to_update)
 
 class WorkTreeSyncer(object):
     """ Handle the manifests of a worktree
@@ -202,21 +237,23 @@ class WorkTreeSyncer(object):
 
     def _sync_repos(self, old_repos, new_repos):
         """ Sync the remote repo configurations with the git worktree """
+        ##
+        # 1/ create, remove or move the git projects:
+
         # Compute the work that needs to be done:
-        (to_add, to_move, to_rm) = \
+        (to_add, to_move, to_rm, to_update) = \
             compute_repo_diff(old_repos, new_repos)
 
+        if to_rm:
+            ui.info(ui.tabs(2), "To remove:")
+            for repo in to_rm:
+                ui.info(ui.tabs(3),
+                        ui.red, "* ", ui.reset, ui.blue, repo.src)
         if to_add:
             ui.info(ui.tabs(2), ui.green , "To add:")
             for repo in to_add:
                 ui.info(ui.tabs(3),
                         ui.green, "* ", ui.reset, ui.blue, repo.src)
-
-        if to_rm:
-            ui.info(ui.tabs(2), "To remove:")
-            for repo in to_add:
-                ui.info(ui.tabs(3),
-                        ui.red, "* ", ui.reset, ui.blue, repo.src)
 
         if to_move:
             ui.info(ui.tabs(2), ui.brown, "To move:")
@@ -224,6 +261,22 @@ class WorkTreeSyncer(object):
                 ui.info(ui.tabs(3),
                         ui.brown, "* ", ui.reset, ui.blue, repo.src,
                         ui.reset, " -> ", ui.blue, new_src)
+
+        if to_update:
+            ui.info(ui.tabs(2), ui.green, "To update:")
+            for (old_repo, new_repo) in to_update:
+                ui.info(ui.tabs(2),
+                        ui.green, "* ",
+                        ui.reset, ui.blue, old_repo.src,
+                        ui.reset, ":", "\n",
+                        ui.tabs(3), ui.blue, old_repo.remote_url,
+                        ui.reset, " -> ", ui.blue, new_repo.remote_url)
+                if new_repo.review:
+                    ui.info(ui.tabs(3), ui.green, "(now using code review)")
+
+
+        for repo in to_rm:
+            self.git_worktree.remove_repo(repo)
 
         for repo in to_add:
             # maybe user created it already, for instance with
@@ -234,9 +287,9 @@ class WorkTreeSyncer(object):
         for (repo, new_src) in to_move:
             self.git_worktree.move_repo(repo, new_src)
 
-        for repo in to_rm:
-            self.git_worktree.remove_repo(repo)
 
+        ##
+        # 2/ Apply configuration to every new repositories
         for repo in new_repos:
             git_project = self.git_worktree.get_git_project(repo.src)
             # may not work if the moving failed for instance

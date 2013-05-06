@@ -43,20 +43,28 @@ class TestGitServer(object):
        # here be bare repos
        foo.git
        bar.git
+  |_ gerrit
+      # here be clones of bare repos,
+      # used to test qisrc review for instance
+      foo.git
+      bar.git
   |__ src
         # temporary clones use to populate the
-        # bare repos in srv/
+        # bare repos in srv/ and gerrit/
         foo
         bar
  |__ work
         # where we will create worktrees and make our testing
+        # (used by qisrc_action fixture for instanc
+
+    Two remotes are created by default: "origin" and "gerrit"
 
     """
-
     def __init__(self, root):
         self.root = root
         self.srv = root.mkdir("srv")
         self.src = root.mkdir("src")
+        self.gerrit = root.mkdir("gerrit")
         self.work = root.mkdir("work")
 
         # Manifest itself can not be handled as a normal repo:
@@ -65,17 +73,23 @@ class TestGitServer(object):
         manifest_xml = root.join("src", "manifest", "manifest.xml")
         self.manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
         self.manifest.add_remote("origin", self.srv.strpath)
+        self.manifest.add_remote("gerrit",  self.gerrit.strpath, review=True)
         self.manifest_url = self.srv.join("manifest.git").strpath
 
-    def create_repo(self, project, src=None, add_to_manifest=True):
+    def create_repo(self, project, src=None, add_to_manifest=True,
+                    review=False):
         """ Create a new repo and add it to the manifest """
         if not src:
             src = project.replace(".git", "")
-        repo_srv = self.srv.mkdir(project)
+
+        if review:
+            repo_srv = self.gerrit.mkdir(project)
+        else:
+            repo_srv = self.srv.mkdir(project)
         git = qisrc.git.Git(repo_srv.strpath)
         git.init("--bare")
 
-        repo_src = self.src.mkdir(src)
+        repo_src = self.src.ensure(src, dir=True)
         git = TestGit(repo_src.strpath)
         git.initialize()
         git.set_remote("origin", repo_srv.strpath)
@@ -84,7 +98,10 @@ class TestGitServer(object):
         if not add_to_manifest:
             return
 
-        self.manifest.add_repo(project, src)
+        if review:
+            self.manifest.add_repo(project, src, remote_name="gerrit")
+        else:
+            self.manifest.add_repo(project, src)
         repo = self.manifest.get_repo(project)
 
         manifest_repo = self.root.join("src", "manifest")
@@ -92,6 +109,10 @@ class TestGitServer(object):
         git.commit("--all", "--message", "add %s" % src)
         git.push("origin", "master:master")
         return repo
+
+    def get_repo(self, project):
+        """ Get a repo from the manifest """
+        return self.manifest.get_repo(project)
 
     def move_repo(self, project, new_src):
         """ Change a repo location """
@@ -107,6 +128,7 @@ class TestGitServer(object):
         manifest_repo = self.root.join("src", "manifest")
         git = qisrc.git.Git(manifest_repo.strpath)
         git.commit("--all", "--message", message)
+        git.call("show", "HEAD")
         git.push("origin", "master:master")
 
     def remove_repo(self, project):
@@ -121,6 +143,15 @@ class TestGitServer(object):
         self.manifest.configure_group(name, projects)
         self.push_manifest("add group %s" % name)
 
+    def use_review(self, project):
+        """ Switch a project to gerrit for code review """
+        self.create_repo(project, review=True, add_to_manifest=False)
+        repo = self.manifest.get_repo(project)
+        repo.review = True
+        repo.remote = "gerrit"
+        self.manifest.dump()
+        self.push_manifest("%s: now under code review" % project)
+        self.manifest.load()
 
     def push_file(self, project, filename, contents,
                   branch="master", force=False):
@@ -162,6 +193,9 @@ class TestGit(qisrc.git.Git):
 
     def initialize(self, branch="master"):
         """ Make sure there is at least one commit and one branch """
+        rc, out = self.call("show", raises=False)
+        if rc == 0:
+            return
         self.init()
         self.checkout("-b", branch)
         self.root.join(".gitignore").write("")
@@ -225,4 +259,3 @@ class QiSrcAction(TestAction):
     @property
     def tmpdir(self):
         return self.git_worktree.tmpdir
-

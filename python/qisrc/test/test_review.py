@@ -4,11 +4,6 @@
 
 import qisrc.git
 import qisrc.review
-#from qisrc.test.test_git import create_git_repo
-#keep pylint happy for now
-def create_git_repo(*args):
-    return None
-
 
 def test_http_to_ssh():
     res = qisrc.review.http_to_ssh("http://gerrit:8080", "foo/bar.git", "john")
@@ -37,27 +32,25 @@ def test_parse_git_url():
     assert res == ("john2", "bar2.baz_smap-eggs.com", "42")
 
 
-def test_push(tmpdir):
-    foo_url = create_git_repo(tmpdir.strpath, "foo")
-    work = tmpdir.mkdir("work")
-    foo_src = work.mkdir("foo")
-    foo_src = foo_src.strpath
-    git = qisrc.git.Git(foo_src)
-    git.clone(foo_url)
+def test_push(tmpdir, git_server):
+    foo_repo = git_server.create_repo("foo.git")
+    foo_src = tmpdir.mkdir("work").mkdir("foo").strpath
+    foo_git = qisrc.git.Git(foo_src)
+    foo_git.clone(foo_repo.remote_url)
 
     # this should work:
     qisrc.review.push(foo_src, "master")
-    (retcode, out) = git.call("ls-remote", "origin", raises=False)
+    (retcode, out) = foo_git.call("ls-remote", "origin", raises=False)
     assert retcode == 0
     assert "refs/for/master" not in out
     assert "refs/heads/master" in out
 
-    gerrit_url = create_git_repo(tmpdir.strpath, "foo-gerrit")
-    git.call("remote", "add", "gerrit", gerrit_url)
-    git.set_config("review.remote", "gerrit")
-    git.checkout("-b", "next")
+    gerrit_repo = git_server.create_repo("foo-gerrit.git")
+    foo_git.call("remote", "add", "gerrit", gerrit_repo.remote_url)
+    foo_git.set_config("review.remote", "gerrit")
+    foo_git.checkout("-b", "next")
     qisrc.review.push(foo_src, "next")
-    (retcode, out) = git.call("ls-remote", "gerrit", raises=False)
+    (retcode, out) = foo_git.call("ls-remote", "gerrit", raises=False)
     assert retcode == 0
     assert "refs/for/next" in out
     assert "refs/heads/next" not in out

@@ -1,10 +1,11 @@
 import os
-import functools
 
 from qisys import ui
 import qisys.worktree
 import qisrc.git
 import qisrc.sync
+import qisrc.git_config
+import qisrc.project
 
 class NotInAGitRepo(Exception):
     """ Custom exception when user did not
@@ -58,10 +59,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             project_src = worktree_project.src
             if not qisrc.git.is_git(worktree_project.path):
                 continue
-            git_project = GitProject(self, worktree_project)
+            git_project = qisrc.project.GitProject(self, worktree_project)
             git_elem = self._get_elem(project_src)
             if git_elem is not None:
-                git_parser = GitProjectParser(git_project)
+                git_parser = qisrc.git_config.GitProjectParser(git_project)
                 git_parser.parse(git_elem)
             self.git_projects.append(git_project)
             git_project.apply_config()
@@ -119,17 +120,16 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         # add_project caused self.load_git_projects() to be called,
         # but the path was not a valid git project yet
         # so the GitProject does not exist yet
-        git_project = GitProject(self, worktree_project)
+        git_project = qisrc.project.GitProject(self, worktree_project)
         git = qisrc.git.Git(git_project.path)
         git.clone(repo.remote_url, "--recursive",
                   "--branch", repo.default_branch,
                   "--origin", repo.remote)
-        git_project.apply_remote_config(repo)
         self.save_project_config(git_project)
         self.load_git_projects()
 
     def move_repo(self, repo, new_src):
-        """ Move a project in the worktree (same remote url, different
+        """ Move a project in the worktree (s-me remote url, different
         src)
 
         """
@@ -174,7 +174,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     def save_project_config(self, project):
         """ Save the project instance in .qi/git.xml """
-        parser = GitProjectParser(project)
+        parser = qisrc.git_config.GitProjectParser(project)
         project_xml = parser.xml_elem(node_name="project")
         self._set_elem(project.src, project_xml)
         qisys.qixml.write(self._root_xml, self.git_xml)
@@ -183,235 +183,3 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         return "<GitWorkTree in %s>" % self.root
 
 
-class GitProject(object):
-    def __init__(self, git_worktree, worktree_project):
-        self.git_worktree = git_worktree
-        self.src = worktree_project.src
-        self.branches = list()
-        self.remotes = list()
-
-    @property
-    def review(self):
-        """ Wether the project is under code review """
-        for remote in self.remotes:
-            if remote.review:
-                return True
-        return False
-
-    @property
-    def default_branch(self):
-        """ The default branch for this repository """
-        for branch in self.branches:
-            if branch.default:
-                return branch
-
-    @property
-    def clone_url(self):
-        """ The url to use when cloning this repository for
-        the first time
-
-        """
-        default_branch = self.default_branch
-        if not default_branch:
-            return None
-        tracked = default_branch.tracks
-        if not tracked:
-            return None
-        for remote in self.remotes:
-            if remote.name == tracked:
-                return remote.url
-        return None
-
-    # pylint: disable-msg=E0213
-    def change_config(func):
-        """ Decorator for every function that changes the git configuration
-
-        """
-        @functools.wraps(func)
-        def new_func(self, *args, **kwargs):
-            # pylint: disable-msg=E1102
-            res = func(self, *args, **kwargs)
-            self.apply_config()
-            self.git_worktree.save_project_config(self)
-            return res
-        return new_func
-
-    @property
-    def path(self):
-        """ The full, native path to the underlying git repository """
-        return os.path.join(self.git_worktree.root, self.src)
-
-
-    @change_config
-    def configure_remote(self, name, url=None):
-        """ Configure a remote. If a remote with the same name
-        exists, its url will be overwritten
-
-        """
-        remote_found = False
-        for remote in self.remotes:
-            if remote.name == name:
-                remote_found = True
-                if remote.url != url:
-                    ui.warning("remote url changed", url, "->", remote.url)
-                    remote.url = url
-        if not remote_found:
-            remote = Remote()
-            remote.name = name
-            remote.url = url
-            self.remotes.append(remote)
-
-    @change_config
-    def configure_branch(self, name, tracks="origin",
-                         remote_branch=None, default=True):
-        """ Configure a branch. If a branch with the same name
-        already exitsts, update its tracking remote.
-
-        """
-        if self.default_branch and self.default_branch.name != name:
-            ui.warning("default branch changed",
-                        self.default_branch.name, "->", name)
-        branch_found = False
-        for branch in self.branches:
-            if branch.name == name:
-                branch_found = True
-                if branch.tracks != tracks:
-                    ui.warning(branch.name, "now tracks", tracks,
-                              "instead of", branch.tracks)
-                    branch.tracks = tracks
-                branch.default_branch = default
-        if not branch_found:
-            branch = Branch()
-            branch.name = name
-            branch.tracks = tracks
-            branch.remote_branch = remote_branch
-            branch.default = default
-            self.branches.append(branch)
-        return branch
-
-    @change_config
-    def apply_remote_config(self, repo):
-        """ Apply the configuration read from the "repo" setting
-        of a remote manifest.
-        Called by WorkTreeSyncer
-
-        """
-        self.configure_branch(repo.default_branch, tracks=repo.remote,
-                              remote_branch=repo.default_branch, default=True)
-        self.configure_remote(repo.remote, repo.remote_url)
-
-    def sync(self, branch_name=None, **kwargs):
-        """ Synchronize remote changes with the underlying git repository
-        Calls py:meth:`qisys.git.Git.sync`
-
-        """
-        git = qisrc.git.Git(self.path)
-        if branch_name is None:
-            branch = self.default_branch
-            if not branch:
-                return None, "No branch given, and no branch configured by default"
-        else:
-            branch = git.get_branch(branch_name)
-
-        current_branch = git.get_current_branch()
-        if not current_branch:
-            return None, "Not on any branch"
-
-        if current_branch != branch.name and not rebase_devel:
-            return None, "Not on the correct branch. " + \
-                         "On %s but should be on %s" % (current_branch, branch.name)
-
-        return git.sync_branch(branch)
-
-
-    def get_branch(self, branch_name):
-        """ Get the branch matching the name
-        :return: None if not found
-
-        """
-        for branch in self.branches:
-            if branch.name == branch_name:
-                return branch
-
-    def apply_config(self):
-        """ Apply configuration to the underlying git
-        repository
-
-        """
-        git = qisrc.git.Git(self.path)
-        for remote in self.remotes:
-            git.set_remote(remote.name, remote.url)
-        for branch in self.branches:
-            git.set_tracking_branch(branch.name, branch.tracks,
-                                    remote_branch=branch.remote_branch)
-
-
-    def __repr__(self):
-        return "<GitProject in %s>" % self.src
-
-class Remote(object):
-    def __init__(self):
-        self.name = None
-        self.url = None
-        self.review = False
-
-    def __repr__(self):
-        res = "<Remote %s: %s" % (self.name, self.url)
-        if self.review:
-            res += " (review)"
-        res += ">"
-        return res
-
-class Branch(object):
-    def __init__(self):
-        self.name = None
-        self.tracks = None
-        self.remote_branch = None
-        self.default = False
-
-    def __repr__(self):
-        return "<Branch %s (tracks: %s)>" % (self.name, self.tracks)
-
-
-##
-# parsing
-
-class RemoteParser(qisys.qixml.XMLParser):
-    def __init__(self, target):
-        super(RemoteParser, self).__init__(target)
-        self._required = ["name"]
-
-class BranchParser(qisys.qixml.XMLParser):
-    def __init__(self, target):
-        super(BranchParser, self).__init__(target)
-        self._required = ["name"]
-
-class GitProjectParser(qisys.qixml.XMLParser):
-    def __init__(self, target):
-        super(GitProjectParser, self).__init__(target)
-        self._ignore = ["worktree", "path", "review", "clone_url"]
-        self._required = ["src"]
-
-    def _parse_remote(self, elem):
-        remote = Remote()
-        parser = RemoteParser(remote)
-        parser.parse(elem)
-        self.target.remotes.append(remote)
-
-    def _parse_branch(self, elem):
-        branch = Branch()
-        parser = BranchParser(branch)
-        parser.parse(elem)
-        self.target.branches.append(branch)
-
-    def _write_branches(self, elem):
-        for branch in self.target.branches:
-            parser = BranchParser(branch)
-            branch_xml = parser.xml_elem()
-            elem.append(branch_xml)
-
-    def _write_remotes(self, elem):
-        for remote in self.target.remotes:
-            parser = RemoteParser(remote)
-            remote_xml = parser.xml_elem()
-            elem.append(remote_xml)
