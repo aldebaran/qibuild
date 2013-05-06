@@ -14,20 +14,10 @@
 
   or just make something more explicit ...
 
-* qisrc init with a file
-
 * XMLParser.xml_elem() -> dump()
 * XMLParser._write_foo()  -> _dump_foo()
 
 * add qisys.actions.list()
-
-* get rid of qibuild.parsers.toc_parser()
-
-* read env, toolchain name et all from qibuild config files
-
-* qisrc.worktree.Remote -> qisrc.manifest.Remote
-
-* remove all traces of incredibuild
 
 * add --reverse-deps
 
@@ -44,8 +34,6 @@
 * remove qisrc manifest from "local config"
 
 * `qibuild config` should list the available build profiles
-
-* implement conversion from old syntax
 
 * remove `--quiet-commands`
 
@@ -90,11 +78,17 @@
 * remove worktree args from actions, just build then on
   the fly when needed
 
+* do not use xml stuff qisrc.worktree:
+  - qisrc.worktree.save_project_config -> project.save_config()
+  - add project.read_config() and do not build GitProjectParser in worktree ...
+  - move ProjectParser to qisrc.project
+
+
 * also ?
 
     class GitWorkTree():
       def __init__(self, worktree=None):
-          if not worktree:
+          if not eorktree:
             worktree = WorkTree()
           else:
             self.worktree = worktree
