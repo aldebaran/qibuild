@@ -24,3 +24,13 @@ def test_make_without_configure(qibuild_action):
     with pytest.raises(Exception) as e:
         qibuild_action("make", "-s", "hello")
     assert "The project world has not been configured yet" in str(e.value)
+
+
+def test_running_from_build_dir_incremental(qibuild_action):
+    qibuild_action.add_test_project("world")
+    hello_proj = qibuild_action.add_test_project("hello")
+    qibuild_action("configure", "hello")
+    qibuild_action("make", "hello")
+    qibuild_action("make", "hello")
+    hello = os.path.join(hello_proj.sdk_directory, "bin", "hello")
+    qisys.command.call([hello])

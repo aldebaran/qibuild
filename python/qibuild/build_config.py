@@ -32,6 +32,10 @@ class CMakeBuildConfig(object):
         return self.cmake_generator and "Visual Studio" in self.cmake_generator
 
     @property
+    def using_mingw(self):
+        return self.cmake_generator and "mingw" in self.cmake_generator.lower()
+
+    @property
     def local_cmake(self):
         """ Path to the "custom" CMake file. Its content will be added
         to the generated CMake files when running ``qibuild configure``

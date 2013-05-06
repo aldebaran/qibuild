@@ -71,7 +71,16 @@ class CMakeBuilder(object):
             sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build"])
             project.write_dependencies_cmake(sdk_dirs)
             sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "runtime"])
+
             project.write_qi_path_conf(sdk_dirs)
+
+    def pre_build(self, project):
+        """ Called before building a project """
+        sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "runtime"])
+        paths = sdk_dirs[:]
+        packages = self.deps_solver.get_dep_packages([project], ["build", "runtime"])
+        paths.extend([package.path for package in packages])
+        project.fix_shared_libs(paths)
 
     def configure(self, **kwargs):
         """ Configure the projects in the correct order """
@@ -98,6 +107,7 @@ class CMakeBuilder(object):
             ui.info_count(i, len(projects),
                           ui.green, "Building",
                           ui.blue, project.name)
+            self.pre_build(project)
             project.build(**kwargs)
 
     @need_configure

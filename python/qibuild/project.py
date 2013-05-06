@@ -1,4 +1,5 @@
 import os
+import sys
 import platform
 
 from qisys import ui
@@ -7,6 +8,7 @@ import qisys.sh
 import qibuild.cmake
 import qibuild.build
 import qibuild.gdb
+import qibuild.dylibs
 
 class BuildProject(object):
     def __init__(self, build_worktree, worktree_project):
@@ -192,7 +194,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
                             cmake_args, env=self.build_env, **kwargs)
 
 
-    def build(self, num_jobs=1, rebuild=False, target=None, fix_shared_libs=True,
+    def build(self, num_jobs=1, rebuild=False, target=None,
               verbose_make=False, coverity=False, env=None):
         """ Build the project """
         timer = ui.timer("make %s" % self.name)
@@ -233,8 +235,6 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
         except qisys.command.CommandFailedException:
             raise qibuild.build.BuildFailed(self)
 
-        if fix_shared_libs:
-            self.fix_shared_libs()
         timer.stop()
 
     def parse_num_jobs(self, num_jobs):
@@ -298,12 +298,12 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
 
         # Hack for http://www.cmake.org/Bug/print_bug_page.php?bug_id=13934
         if self.using_make:
-            self.build(target="preinstall", num_jobs=num_jobs, fix_shared_libs=False)
+            self.build(target="preinstall", num_jobs=num_jobs)
 
         if runtime:
             self.install_runtime(destdir)
         else:
-            self.build(target="install", fix_shared_libs=False, env=build_env)
+            self.build(target="install", env=build_env)
 
         if split_debug:
             self.split_debug(destdir)
@@ -340,9 +340,22 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
         qibuild.deploy.deploy(destdir, url, use_rsync=use_rsync, port=port)
 
 
-    def fix_shared_libs(self):
-        # FIXME !
-        pass
+    def fix_shared_libs(self, paths):
+        """ Do some magic so that shared libraries from other projects and
+        packages from toolchains are found
+
+        Called by CMakeBuilder before building
+
+        :param paths: a list of paths from which to look for dependencies
+
+        """
+        if sys.platform == "darwin":
+            qibuild.dylibs.fix_dylibs(self.sdk_directory, paths=paths)
+        if sys.platform == "win":
+            mingw = self.build_config.mingw
+            qibuild.dlls.fix_dlls(project.sdk_directory, paths=dep_sdk_dirs,
+                                  mingw=mingw, build_env=self.build_env)
+
 
     def split_debug(self, destdir):
         """ Split debug symbols after install """
