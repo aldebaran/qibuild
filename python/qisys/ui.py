@@ -95,10 +95,10 @@ def configure_logging(args):
     verbose = os.environ.get("VERBOSE", False)
     if not verbose:
         verbose = args.verbose
-    qisys.ui.CONFIG["color"] = args.color
-    qisys.ui.CONFIG["verbose"] = verbose
-    qisys.ui.CONFIG["quiet"] = args.quiet
-    qisys.ui.CONFIG["timestamp"] = args.timestamp
+    CONFIG["color"] = args.color
+    CONFIG["verbose"] = verbose
+    CONFIG["quiet"] = args.quiet
+    CONFIG["timestamp"] = args.timestamp
 
 def _msg(*tokens, **kwargs):
     """ Helper method for error, warning, info, debug
