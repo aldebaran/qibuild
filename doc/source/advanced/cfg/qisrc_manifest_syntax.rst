@@ -75,7 +75,7 @@ If ``path`` is not given, it will deduced from the ``name``
 
 (for instance the ``foo/bar.git`` will be cloned to ``foo/bar``.
 
-If ``review`` is true, you must have a ``review`` attribute in the matchin remote:
+If ``review`` is true, you must have a ``review`` attribute in the matching remote:
 
 The ssh git url will be decuded from the gerrit server url:
 
