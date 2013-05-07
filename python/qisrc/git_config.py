@@ -53,7 +53,7 @@ class BranchParser(qisys.qixml.XMLParser):
 class GitProjectParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(GitProjectParser, self).__init__(target)
-        self._ignore = ["worktree", "path", "clone_url"]
+        self._ignore = ["worktree", "path", "clone_url", "default_branch"]
         self._required = ["src"]
 
     def _parse_remote(self, elem):

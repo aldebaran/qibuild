@@ -100,3 +100,10 @@ def test_warn_on_change(git_worktree, record_messages):
     foo.configure_remote("gerrit", "http://gerrit/libfoo.git")
     foo.configure_branch("next", tracks="gerrit")
     assert record_messages.find("now tracks gerrit instead")
+
+def test_setting_default_branch(git_worktree):
+    foo = git_worktree.create_git_project("foo")
+    foo.configure_branch("master", default=False)
+    assert foo.default_branch is None
+    foo.configure_branch("master", default=True)
+    assert foo.default_branch.name == "master"

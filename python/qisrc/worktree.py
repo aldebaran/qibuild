@@ -181,5 +181,3 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     def __repr__(self):
         return "<GitWorkTree in %s>" % self.root
-
-

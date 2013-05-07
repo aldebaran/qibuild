@@ -97,7 +97,7 @@ class GitProject(object):
                     ui.warning(self.src, ":", branch.name, "now tracks", tracks,
                               "instead of", branch.tracks)
                     branch.tracks = tracks
-                branch.default_branch = default
+                branch.default = default
         if not branch_found:
             branch = qisrc.git_config.Branch()
             branch.name = name
