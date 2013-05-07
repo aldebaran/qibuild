@@ -183,3 +183,19 @@ def test_list_attr():
     parser = FooParser(foo)
     parser.parse(xml_elem)
     assert foo.names == list()
+
+
+def test_write_bool_attr():
+    class Foo:
+        def __init__(self):
+            self.bar = False
+
+    class FooParser(qisys.qixml.XMLParser):
+        def __init__(self, target):
+            super(FooParser, self).__init__(target)
+
+    foo = Foo()
+    foo.bar = True
+    parser = FooParser(foo)
+    xml_elem = parser.xml_elem()
+    bar = qisys.qixml.parse_bool_attr(xml_elem, "bar")

@@ -288,7 +288,7 @@ class XMLParser(object):
                         res.set(member, "true")
                     else:
                         res.set(member, "false")
-                if type(member_value) == list:
+                elif type(member_value) == list:
                     if member_value:
                         res.set(member, " ".join(member_value))
                 else:
