@@ -5,9 +5,10 @@
 
 import os
 import qisys.log
-
-import qibuild
-
+import qisys.command
+import qisys.worktree
+import qisrc
+import qisrc.parsers
 
 LOGGER = qisys.log.get_logger(__name__)
 
@@ -16,7 +17,7 @@ def copy_helper(project_name, directory):
 
     """
     # Read the templates for projects
-    template_dir = os.path.join(qibuild.QIBUILD_ROOT_DIR, "templates", "project")
+    template_dir = os.path.join(qisrc.QISRC_ROOT_DIR, "templates", "project")
     template_dir = os.path.abspath(template_dir)
 
     for file_name in os.listdir(template_dir):
@@ -28,7 +29,7 @@ def copy_helper(project_name, directory):
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.worktree_parser(parser)
+    qisrc.parsers.worktree_parser(parser)
     parser.add_argument("project_name",
         help="The name of the project. "
              "The project will be created in QI_WORK_TREE/<name> ")
@@ -40,7 +41,6 @@ def do(args):
     """"Create a new project """
     # Try to open a worktree.
     # If not, ask the user if he wants to create one:
-    qiwt = None
     qiwt = qisys.worktree.open_worktree(args.worktree)
 
     project_name = args.project_name
