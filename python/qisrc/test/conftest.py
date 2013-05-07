@@ -154,30 +154,30 @@ class TestGitServer(object):
         self.manifest.load()
 
     def push_file(self, project, filename, contents,
-                  branch="master", force=False):
+                  branch="master", fast_forward=True):
         """ Push a new file with the given contents to the given project
         It is assumed that the project has beed created
 
         """
         src = project.replace(".git", "")
         repo_src = self.src.join(src)
+        git = qisrc.git.Git(repo_src.strpath)
+        if not fast_forward:
+            git.reset("--hard", "HEAD~1")
         to_write = repo_src.join(filename)
         if to_write.check(file=True):
             message = "Update %s" % filename
         else:
             message = "Add %s" % filename
         repo_src.join(filename).write(contents)
-        git = qisrc.git.Git(repo_src.strpath)
         git.checkout("--force", "-B", branch)
         git.add(filename)
-        if force:
-            git.commit("--message", message, "--amend")
-        else:
-            git.commit("--message", message)
-        if force:
-            git.push("origin", "--force", "%s:%s" % (branch, branch))
-        else:
+        git.commit("--message", message)
+        if fast_forward:
             git.push("origin", "%s:%s" % (branch, branch))
+        else:
+            git.push("origin", "--force", "%s:%s" % (branch, branch))
+
 
 class TestGit(qisrc.git.Git):
     """ the Git class with a few other helpfull methods """

@@ -144,8 +144,9 @@ class Git(object):
         # by hand (see clone).
         # Only porcelain here.
         whitelist = ("add", "branch", "checkout", "clean", "commit", "config",
-                     "fetch", "init", "log", "merge", "pull", "push", "rebase",
-                     "remote", "reset", "stash", "status", "submodule")
+                     "diff", "fetch", "init", "log", "merge", "pull", "push",
+                     "rebase", "remote", "reset", "stash",
+                     "status", "submodule")
         if name in whitelist:
             return functools.partial(self.call, name)
         raise AttributeError("Git instance has no attribute '%s'" % name)
@@ -203,30 +204,31 @@ class Git(object):
         (status, out) = self.call("rev-parse", "--is-inside-work-tree", raises=False)
         return status == 0
 
-    def get_status(self, untracked=True):
-        """Return the output of status or None if it failed."""
-        if untracked:
-            (status, out) = self.status("--porcelain", raises=False)
+    def require_clean_worktree(self):
+        """ Taken from /usr/lib/git-core/git-sh-setup
+        return a tuple (bool, message) so that you can be more verbose
+        in case the worktree is not clean
+
+        """
+        message = ""
+        self.call("update-index", "--ignore-submodules", "--refresh", raises=False)
+        out, _ = self.call("diff-files", "--quiet", "--ignore-submodules", raises=False)
+        unstaged = False
+        if out != 0:
+            message = "You have unstaged changes"
+            unstaged = True
+        out, _ = self.call("diff-index", "--cached", "--ignore-submodules","HEAD",
+                           raises = False)
+        if out != 0:
+            if unstaged:
+                message += "Additionally, your index contains uncommited changes"
+            else:
+                message = "Your index contains uncommited changes"
+        if message:
+            return False, message
         else:
-            (status, out) = self.status("--porcelain", "--untracked-files=no", raises=False)
+            return True, ""
 
-        return out if status == 0 else None
-
-    def is_clean(self, untracked=True):
-        """
-        Returns true if working dir is clean.
-        (ie no untracked files, no unstaged changes)
-
-            :param untracked: will return True even if there are untracked files.
-        """
-        out = self.get_status(untracked)
-        if out is None:
-            return None
-
-        lines = [l for l in out.splitlines() if len(l.strip()) != 0 ]
-        if len(lines) > 0:
-            return False
-        return True
 
     def set_remote(self, name, url):
         """
@@ -257,22 +259,16 @@ class Git(object):
         self.set_config("branch.%s.merge" % branch,
                         "refs/heads/%s" % remote_branch)
 
-    def require_clean_worktree(self):
-        """ Check that the git tree is clean
-        :return: a string descrbing why we are not clean,
-        or an empty sting if we are
-
-        """
-        # Taken from /usr/lib/git-core/git-sh-setup
-        return ""
-
     def sync_branch(self, branch, rebase_devel=True):
         """ git pull --rebase on steroids:
 
+         * do not try anything if the worktree is not clean
+
          * update submodules and detect broken submodules configs
 
-         * if no dev occured (master == origin/master),
-           reset master to the remote
+         * if no development occurred (master == origin/master),
+           reset the local branch next to the remote
+           (don't try to rebase, maybe there was a push -f)
 
          * if on the correct branch, rebase it
 
@@ -282,27 +278,41 @@ class Git(object):
         Return a tuple (status, message), where status can be:
             - None: sync was skipped, but there was no error
             - False: sync failed
-            - True: sync suceeded
+            - True: sync succeeded
         """
         remote_branch = branch.remote_branch
         if not remote_branch:
             remote_branch = branch.name
         remote_ref = "%s/%s" % (branch.tracks, remote_branch)
 
-        with self.transaction() as transaction:
+        if branch.tracks:
+            fetch_cmd = ("fetch", branch.tracks)
+        else:
+            fetch_cmd = ("fetch")
+
+        ok, mess = self.require_clean_worktree()
+        if not ok:
+            return None, mess
+
+        rc, out = self.diff(branch.name, remote_ref, raises=False)
+        if rc == 0 and not out:
+            # No development was made on this branch: use reset --hard
+            update_cmd = ("reset", "--hard", remote_ref)
+        else:
             if branch.tracks:
-                self.fetch(branch.tracks)
-                self.rebase(remote_ref, branch.name)
+                update_cmd = ("rebase", remote_ref, branch.name)
             else:
-                # No remote given, maybe this will work:
-                self.fetch()
-                self.rebase(branch.name)
+                # This may fail depending on the user configuration
+                update_cmd = ("rebase", branch.name)
+
+        with self.transaction() as transaction:
+            self.call(*fetch_cmd)
+            self.call(*update_cmd)
 
         if transaction.ok:
             return True, ""
         else:
             return False,  transaction.output
-
 
     def __repr__(self):
         return "<Git repo in %s>" % self.repo

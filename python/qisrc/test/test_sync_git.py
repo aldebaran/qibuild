@@ -38,7 +38,7 @@ def test_rebase_by_default(git_server, tmpdir, test_git):
     assert rc == 0
     assert "Merge" not in head
 
-def test_abort_if_unclean(git_server, tmpdir, test_git):
+def test_skip_if_unclean(git_server, tmpdir, test_git):
     foo_git = create_foo(git_server, tmpdir, test_git)
     branch = Branch()
     branch.name = "master"
@@ -47,5 +47,19 @@ def test_abort_if_unclean(git_server, tmpdir, test_git):
     foo_git.sync_branch(branch)
     foo_git.root.join("README").write("changing README")
     (res, message) = foo_git.sync_branch(branch)
-    assert res is False
+    assert foo_git.read_file("README") == "changing README"
+    assert res is None
     assert "unstaged changes" in message
+
+def test_push_nonfastforward(git_server, tmpdir, test_git):
+    foo_git = create_foo(git_server, tmpdir, test_git)
+    branch = Branch()
+    branch.name = "master"
+    branch.tracks = "origin"
+    git_server.push_file("foo.git", "README", "README on master v1")
+    foo_git.sync_branch(branch)
+    git_server.push_file("foo.git", "README", "README on master v2",
+                         fast_forward=False)
+    (res, message) = foo_git.sync_branch(branch)
+    assert res is True
+    assert foo_git.read_file("README") == "README on master v2"
