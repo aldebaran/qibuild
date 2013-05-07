@@ -353,8 +353,8 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             qibuild.dylibs.fix_dylibs(self.sdk_directory, paths=paths)
         if sys.platform == "win":
             mingw = self.build_config.mingw
-            qibuild.dlls.fix_dlls(project.sdk_directory, paths=dep_sdk_dirs,
-                                  mingw=mingw, build_env=self.build_env)
+            qibuild.dlls.fix_dlls(self.sdk_directory, paths=paths,
+                                  mingw=mingw, env=self.build_env)
 
 
     def split_debug(self, destdir):
