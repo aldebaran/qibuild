@@ -4,7 +4,7 @@
 
 """ Tools to deploy files to remote targets"""
 
-import re
+import urlparse
 import os
 
 from qisys import ui
@@ -34,37 +34,30 @@ FILE_REMOTE_GDBSERVER_SH = """\
 
 here=$(cd $(dirname $0) ; pwd)
 
-if ! [ "$#" -eq "1" ] ; then
+if [ "$#" -lt "1" ] ; then
   echo "please specify the binary to run"
   exit 1
 fi
 
+binary=$1
+shift 1
 echo ""
 echo "To connect to this gdbserver launch the following command in another terminal:"
-echo "  %(gdb)s -x \"${here}/setup_target.gdb\" \"${here}/${1}\""
+echo "  %(gdb)s -x \"${here}/setup_target.gdb\" \"${here}/${binary}\""
 echo ""
 
-#echo ssh %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
-ssh %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
+#echo ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
+ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${binary} $*"
 """
 
 def parse_url(remote_url):
     """ Parse a remote url
 
-    :return: a tuple: (remote, server, remote_dir)
-
-    Examples:
-
-    >>> parse_url('nao@10.0.253.181:deploy')
-    ('nao@10.0.253.181', '10.0.253.181', 'deploy')
-    >>> parse_url('10.0.253.181:deploy')
-    ('10.0.253.181', '10.0.253.181', 'deploy')
-    >>> parse_url('10.0.253.181:')
-    ('10.0.253.181', '10.0.253.181', '')
-    >>> parse_url('10.0.253.181')
-    Traceback (most recent call last):
-        ...
-        raise Exception(mess)
+    Return a dict with the following keys:
+    * ``given`` : the remote url that was given
+    * ``login`` : the username to log with
+    * ``dir``   : the directory on the server
+    * ``url``   : the name of the server
 
     Note that the if the user plays with the "hostname" option in its
     .ssh/config, the "server" part might not be a valid hostname. In such a
@@ -73,27 +66,40 @@ def parse_url(remote_url):
 
     """
 
-    match = re.match(r"""
-        (?P<remote>
-         ((?P<username>[a-zA-Z0-9\._-]+)@)?
-         (?P<server>[a-zA-Z0-9\._-]+))
-        :
-        (?P<remote_dir>[a-zA-Z0-9\.~_/-]*)$
-        """, remote_url, re.VERBOSE)
-    # note: this regexp does not support having weird chars (such as @ or ?)
-    # or spaces in remote_dir. At least it will complain.
-    if not match:
-        mess  = "Invalid remote url: %s\n" % remote_url
-        mess += "Remote url should look like user@host:path or host:path"
-        raise Exception(mess)
-    groupdict = match.groupdict()
-    return (groupdict["remote"], groupdict["server"], groupdict["remote_dir"])
+    login = ''
+    url   = ''
+    port  = None
+    dir   = ''
 
+    o = urlparse.urlparse(remote_url)
+    if o.scheme == "ssh":
+        login = o.username
+        url = o.hostname
+        dir = o.path
+        port = o.port
+    elif o.scheme is not "":
+        # Scheme not supported
+        return None
+    else:
+        parts = remote_url.split('@', 1)
+        if len(parts) == 1:
+            url = parts[0]
+        elif len(parts) == 2:
+            login = parts[0]
+            url   = parts[1]
+
+        parts = url.split(':', 1)
+        url = parts[0]
+        if len(parts) == 2:
+            dir = parts[1]
+
+    ret = {'given':remote_url, 'login':login, 'url':url, 'dir':dir}
+    if port is not None:
+        ret["port"] = port
+    return ret
 
 def deploy(local_directory, remote_url, port=22, use_rsync=True):
-    """ Deploy a local directory to a remote url
-
-    """
+    """Deploy a local directory to a remote url."""
     if use_rsync:
         # This is required for rsync to do the right thing,
         # otherwise the basename of local_directory gets
@@ -130,16 +136,17 @@ def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_a
                                         })
 
 
-def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir):
+def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir, port):
     """ generate a script that run a program on the robot in gdbserver """
     if remote_dir == "":
         remote_dir = "."
     remote_gdb_script_path = os.path.join(dest, "remote_gdbserver.sh")
     with open(remote_gdb_script_path, "w+") as f:
-        f.write(FILE_REMOTE_GDBSERVER_SH % { 'remote' : remote,
-                                             'gdb_listen' : gdb_listen,
-                                             'remote_dir' : remote_dir,
-                                             'gdb' : gdb })
+        f.write(FILE_REMOTE_GDBSERVER_SH % { 'remote': remote,
+                                             'gdb_listen': gdb_listen,
+                                             'remote_dir': remote_dir,
+                                             'gdb': gdb,
+                                             'port': port})
     os.chmod(remote_gdb_script_path, 0755)
     return remote_gdb_script_path
 

@@ -5,6 +5,7 @@
 
 import os
 
+import qisrc
 from qisys import ui
 import qisys.parsers
 import qibuild.parsers

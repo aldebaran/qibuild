@@ -37,7 +37,7 @@ def get_xml_tree(project):
     tree = qisys.qixml.read(path)
     return tree
 
-def exist(project, name=None, email=None):
+def exists(project, name=None, email=None):
     maintainers = get(project)
 
     for maintainer in maintainers:
@@ -53,7 +53,7 @@ def get(project):
     return maintainers
 
 def remove(project, name=None, email=None):
-    if not exist(project, name=name, email=email):
+    if not exists(project, name=name, email=email):
         return False
 
     tree = get_xml_tree(project)
@@ -73,3 +73,16 @@ def clear(project):
     for maintainer in maintainers:
         remove(project, **maintainer)
     return True
+
+
+def add(project, name=None, email=None):
+    if exists(project, name=name, email=email):
+        return
+    tree = get_xml_tree(project)
+    root = tree.getroot()
+    maint_elem = etree.Element("maintainer")
+    maint_elem.set("email", email)
+    maint_elem.text = name
+    root.append(maint_elem)
+    qisys.qixml.write(tree, project.qiproject_xml)
+

@@ -6,7 +6,6 @@
 
 from qisys import ui
 import qisys.parsers
-import qisrc.cmdparse
 import qisrc.git
 import qisrc.maintainers
 
@@ -14,49 +13,90 @@ def configure_parser(parser):
     """Configure parser for this action."""
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser, positional=False)
-    parser.add_argument("--list", action="store_true", help="List all the maintainers")
-    parser.add_argument("--remove", action="store_true", help="Remove maintainers")
-    parser.add_argument("--clear", action="store_true", help="Remove all maintainers")
+    group = parser.add_argument_group("qisrc maintainers options")
+    group.add_argument("--add", action="store_const",
+                        dest="maintainers_action", const="add",
+                        help="Add a new maintainer")
+    group.add_argument("--list", action="store_const",
+                        dest="maintainers_action", const="list",
+                        help="List all the maintainers")
+    group.add_argument("--remove", action="store_const",
+                        dest="maintainers_action", const="remove",
+                        help="Remove maintainers")
+    group.add_argument("--clear", action="store_const",
+                        dest="maintainers_action", const="clear",
+                        help="Remove all maintainers")
+    group.add_argument("--name",
+                       help="Name of the maintainer to add or remove")
+    group.add_argument("--email",
+                       help="email of the maintainer to add or remove")
+    parser.set_defaults(maintainers_action="list")
 
 def do(args):
     """Main entry point."""
 
-    worktree = qisys.worktree.open_worktree(args.worktree)
-    projects = qisrc.cmdparse.projects_from_args(args, worktree)
+    worktree = qisys.parsers.get_worktree(args)
+    projects = qisys.parsers.get_projects(worktree, args)
 
-    # Parse list of maintainers
+    if args.maintainers_action == "add":
+        to_call = add_maintainer
+    if args.maintainers_action == "list":
+        to_call = list_maintainers
+    elif args.maintainers_action == "remove":
+        to_call = remove_maintainer
+    elif args.maintainers_action == "clear":
+        to_call = clear_maintainers
 
     for project in projects:
-        if args.remove:
-            maintainers = qisrc.maintainers.get(project)
-            if len(maintainers) == 0:
-                ui.info("There is no maintainer currently.")
-                continue
-            maintainers_string = ["None"]
-            maintainers_string.extend([qisrc.maintainers.to_str(**x) for x in maintainers])
-            num = qisys.interact.ask_choice(maintainers_string, "Which one do you want remove?", return_int=True)
-            if num == 0:
-                continue
-            maintainer = maintainers[num-1]
-            qisrc.maintainers.remove(project, **maintainer)
-            ui.info(ui.blue, qisrc.maintainers.to_str(**maintainer),
-                    ui.reset, "remove from maintainers")
-            continue
+        to_call(project, args)
 
-        if args.clear:
-            if qisrc.maintainers.clear(project):
-                ui.info("All maintainers removed")
-            else:
-                ui.info("There is no maintainer for this project")
-            continue
+def add_maintainer(project, args):
+    name = args.name
+    if not name:
+        name = qisys.interact.ask_string("name: ")
+        if not name:
+            return
+    email = args.email
+    if not email:
+        email = qisys.interact.ask_string("email: ")
+        if not email:
+            return
+    qisrc.maintainers.add(project, name=name, email=email)
 
-        # Fallback => list
-        maintainers = qisrc.maintainers.get(project)
 
-        if len(maintainers) > 0:
-            ui.info("Maintainers of", ui.green, project.src)
-        else:
-            ui.info("There is no maintainer configured for this project.")
-        for maintainer in maintainers:
-            maintainer_string = qisrc.maintainers.to_str(**maintainer)
-            ui.info("  ", ui.green, "* ", ui.reset, maintainer_string)
+
+def remove_maintainer(project, args):
+    maintainers = qisrc.maintainers.get(project)
+    if len(maintainers) == 0:
+        ui.info("No maintainer configured for this project")
+        return
+    maintainers_string = ["None"]
+    maintainers_string.extend(
+        [qisrc.maintainers.to_str(**x) for x in maintainers])
+    num = qisys.interact.ask_choice(maintainers_string,
+                                    "Which one do you want remove?",
+                                    return_int=True)
+    if num == 0:
+        return
+    maintainer = maintainers[num-1]
+    qisrc.maintainers.remove(project, **maintainer)
+    ui.info(ui.blue, qisrc.maintainers.to_str(**maintainer),
+            ui.reset, "removed from maintainers")
+
+def clear_maintainers(project, *unused_args):
+    if qisrc.maintainers.clear(project):
+        ui.info("All maintainers removed")
+    else:
+        ui.info("No maintainer configured for this project")
+
+
+def list_maintainers(project, *unused_args):
+    maintainers = qisrc.maintainers.get(project)
+
+    if len(maintainers) > 0:
+        ui.info("Maintainers of", ui.green, project.src)
+    else:
+        ui.info("No maintainer configured for this project")
+    for maintainer in maintainers:
+        maintainer_string = qisrc.maintainers.to_str(**maintainer)
+        ui.info("  ", ui.green, "* ", ui.reset, maintainer_string)

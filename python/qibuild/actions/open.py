@@ -93,22 +93,23 @@ def get_ide(qibuild_cfg):
 
 def open_visual(project):
     sln_files = glob.glob(project.build_directory + "/*.sln")
-        if len(sln_files) == 0:
-            raise Exception(error_message +
-                "Do you have called qibuild configure with the proper --cmake-generator option?")
-        elif len(sln_files) > 1:
+    if not sln_files:
+        raise OpenError(project, "No .sln file found\n"
+                        "Please make sure you are using a Visual Studio generator")
+    elif len(sln_files) > 1:
+        raise OpenError(project, "Expecting only one sln, got %s" % sln_files)
+
     print "starting VisualStudio:"
     print "%s %s" % ("start", sln_files[0])
     subprocess.Popen(["start", sln_files[0]], shell=True)
 
 def open_xcode(project):
     projs = glob.glob(project.build_directory + "/*.xcodeproj")
-    if len(projs) == 0:
-        raise OpenError(project,
-                        "No .xcodeproj directory found\n"
+    if not projs:
+        raise OpenError(project, "No .xcodeproj directory found\n")
     elif len(projs) > 1:
-        raise OpenError(project,
-                       "Expecting only one xcode project file, got %s" % projs)
+        raise OpenError(project, "Expecting only one xcode project file, "
+                                 "got %s" % projs)
     print "starting Xcode:"
     print "%s %s" % ("open", projs[0])
     subprocess.Popen(["open", projs[0]])

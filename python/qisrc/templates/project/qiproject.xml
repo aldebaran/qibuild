@@ -1,6 +1,12 @@
-<project name="@project_name@">
-  <!-- Add your project dependencies here -->
-  <!--
-  <depends buildtime="true" runtime="true" names="foo" />
+<project version="3">
+  <!-- Add your name and e-mail here
+    <maintainer email="...">Your Name</maintainer>
   -->
+
+  <qibuild name="@project_name@">
+    <!-- Add your project dependencies here
+    <depends buildtime="true" runtime="true" names="foo" />
+    -->
+ </qibuild>
+
 </project>
