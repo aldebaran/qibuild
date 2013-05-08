@@ -99,3 +99,9 @@
           self.root = os.getcwd()
         else:
           sel.root = root
+
+* replace interact.ask_choice(retrun_int) with
+  ask_choice(message, choices, display_fun, allow_none=False)
+  (calling display_fun on each choice to display them
+  to the user, returning either an element from the choices
+  list, or None if the user did not enter anything)
