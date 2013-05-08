@@ -1,5 +1,0 @@
-<project name="doc">
-  <sphinxdoc name="doc" src="." dest=".">
-    <depends name="qibuild" />
-  </sphinxdoc>
-</project>
