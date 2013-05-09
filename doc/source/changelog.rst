@@ -124,6 +124,54 @@ qibuild projects.
 * ``qisrc`` profiles are gone, we now use groups instead.
 
 
+v2.3
+----
+
+Command line
+++++++++++++
+
+* Add ``qisrc maintainer``
+* Fix ``qibuild clean -z`` behavior
+* Fix a bug where ``qbibuild make`` could create recursive symlinks
+* ``qibuild clean`` learned ``-x`` to remove build directories that match no known configurations
+* ``qibuild deploy`` now accepts url matching [[login]@]url[:[relative/path]] or url parseable with urlparse beginning with ssh:// only
+* ``qibuild deploy`` no longer accepts a ``--port`` option, specify the port
+  inside the url instead::
+
+    # old
+    qibuild deploy --port 23 user@host:path/to/remote/dir
+    # new
+    qibuild deploy ssh://user@host:32/full/path/to/remote/dir
+
+* ``qibuild deploy``: project is no more a positional argument
+* Positional url is no more mandatory in ``qibuild deploy``, and you
+  can now deploy to several urls at once
+* ``qibuild create`` no longer exists, use ``qisrc create instead``
+
+CMake
+-----
+
+* ``qi_add_test`` now also accepts a package name as test binary
+* qibuild cmake modules:
+
+  * add ``boost-python``
+  * ``python-config.cmake`` now longer searches or python2.6, and does not
+    look for ``python_d`` even when building in debug. (this is required
+    to make ``boost-python`` work when using Visual Studio)
+  * bug fix when using ``find_package`` twice with a CMake module calling
+    ``pkg_search_module`` (for instance with ``qi_add_optional_package``)
+
+
+Python
+++++++
+
+* Add ``qisrc.maintainer`` to manage maintainers from ``qiproject.xml``
+* Add ``qisys.ui.indent_iterable`` to indent list or any iterable
+* ``qisys.parsers.project_parser`` learned ``short`` option to disable -p of project
+* ``qibuild.parsers.project_parser`` learn ``positional``
+* Add ``qibuild.deploy.action.find_rsync_or_scp``
+* ``qibuild.deploy.parse_url`` return a dict
+
 V2.2
 ----
 
@@ -132,6 +180,8 @@ General
 
 * Update of the doc
 * Remove compatibility with python 2.6
+* You can now set the environment variable ``VERBOSE=1`` to trigger debug
+  messages
 
 Command line
 ++++++++++++
@@ -140,10 +190,11 @@ Command line
 * Fix return code of ``qibuild test --list``
 * ``qilinguist``: Stop doing backup when merging catalog files
 * ``qibuild test`` learn ``--ncpu`` to restrict the number of CPUs
-* ``qisrc grep`` learn ``--project`` to run only on some specific project
 * Tests are now colored under a tty
+* ``qisrc grep`` learn ``--project`` to run only on some specific project
 * ``qisrc foreach`` learn ``--project`` to run only on some specific project
 * ``qisrc foreach`` learn ``--dry-run`` to dry run the command
+* Fix using ``qibuild deploy`` to a remote folder containing upper-case letters
 
 CMake
 +++++
@@ -152,6 +203,8 @@ CMake
 * Fix using :cmake:function:`qi_add_optional_package` with a file defining some macros
 * ``boost``: support 1.53, adapt ``boost_flib`` for libraries being only headers
 * Fix perf tests with VisualStudio
+* ``qi_create_gtest`` now only works with Aldebaran's fork of gtest
+* ``qi_generate_src`` can now generate several files with one command
 
 Python
 ++++++
@@ -177,7 +230,7 @@ Command line
 CMake
 +++++
 
-* Added :cmake:function:`qi_stage_dir`
+* Added :cmake:function:`qi_state_dir`
 
 Python
 ++++++
