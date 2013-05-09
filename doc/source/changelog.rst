@@ -3,23 +3,43 @@
 Changelog
 =========
 
-Incoming
---------
+v2.3
+----
 
 Command line
 ++++++++++++
 
 * Add ``qisrc maintainer``
 * Fix ``qibuild clean -z`` behavior
+* Fix a bug where ``qbibuild make`` could create recursive symlinks
 * ``qibuild clean`` learned ``-x`` to remove build directories that match no known configurations
-* ``qibuild deploy`` now accept url matching [[login]@]url[:[relative/path]] or url parseable with urlparse beginning with ssh:// only
-* ``qibuild deploy`` no longe accepts a ``--port`` option, specify the port inside the url instead
-  old
-  qibuild deploy --port 23 user@host:path/to/remote/dir
-  new
-  qibuild deploy ssh://user@host:32/full/path/to/remote/dir
+* ``qibuild deploy`` now accepts url matching [[login]@]url[:[relative/path]] or url parseable with urlparse beginning with ssh:// only
+* ``qibuild deploy`` no longer accepts a ``--port`` option, specify the port
+  inside the url instead::
+
+    # old
+    qibuild deploy --port 23 user@host:path/to/remote/dir
+    # new
+    qibuild deploy ssh://user@host:32/full/path/to/remote/dir
+
 * ``qibuild deploy``: project is no more a positional argument
-* Positional url is no more mandatory in ``qibuild deploy``
+* Positional url is no more mandatory in ``qibuild deploy``, and you
+  can now deploy to several urls at once
+* ``qibuild create`` no longer exists, use ``qisrc create instead``
+
+CMake
+-----
+
+* ``qi_add_test`` now also accepts a package name as test binary
+* qibuild cmake modules:
+
+  * add ``boost-python``
+  * ``python-config.cmake`` now longer searches or python2.6, and does not
+    look for ``python_d`` even when building in debug. (this is required
+    to make ``boost-python`` work when using Visual Studio)
+  * bug fix when using ``find_package`` twice with a CMake module calling
+    ``pkg_search_module`` (for instance with ``qi_add_optional_package``)
+
 
 Python
 ++++++
