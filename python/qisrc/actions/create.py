@@ -5,10 +5,9 @@
 
 import os
 
-import qisrc
+import qisrc # for QISRC_ROOT_DIR
 from qisys import ui
 import qisys.parsers
-import qibuild.parsers
 
 def copy_helper(project_name, directory):
     """Create a new project in the specified directory.
@@ -27,7 +26,7 @@ def copy_helper(project_name, directory):
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qisrc.parsers.worktree_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     parser.add_argument("project_name",
         help="The name of the project. "
              "The project will be created in QI_WORK_TREE/<name> ")
@@ -37,7 +36,7 @@ def configure_parser(parser):
 
 def do(args):
     """"Create a new project """
-    build_worktree = qibuild.parsers.get_build_worktree(args)
+    worktree = qisys.parsers.get_worktree(args)
 
     project_name = args.project_name
     project_path = os.path.join(os.getcwd(), project_name)
@@ -55,5 +54,5 @@ def do(args):
         qisys.command.call(["git" , "commit" , "-m" , "initial commit"], cwd=project_path)
 
     ui.info(ui.green, "New project initialized in", ui.bold,  project_path)
-    build_worktree.worktree.add_project(project_path)
-    return build_worktree.get_build_project(project_name)
+    worktree.add_project(project_path)
+    return worktree.get_project(project_path)
