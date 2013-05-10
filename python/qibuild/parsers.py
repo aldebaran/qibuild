@@ -46,12 +46,10 @@ def build_parser(parser):
     build_type_parser(parser, group=group)
     group.add_argument("-G", "--cmake-generator", action="store",
         help="Specify the CMake generator")
-    parser.add_argument("-c", "--config",
+    group.add_argument("-c", "--config",
         help="The configuration to use. "
-             "It should match the name of a toolchain. "
-             "The settings from <worktree>/.qi/<config>.cmake will "
-             "also be used")
-    parser.add_argument("-p", "--profile", dest="profiles", action="append",
+             "It should be the name of a toolchain, or \"system\"")
+    group.add_argument("-p", "--profile", dest="profiles", action="append",
         help="A profile to use. "
              "It should match a declaration in .qi/qibuild.xml")
 
