@@ -104,4 +104,6 @@
   ask_choice(message, choices, display_fun, allow_none=False)
   (calling display_fun on each choice to display them
   to the user, returning either an element from the choices
-  list, or None if the user did not enter anything)
+  list, or None if the user did not enter anything and allow_none is True)
+
+* use qibuild.project.get_build_dirs() for qibuild find -a
