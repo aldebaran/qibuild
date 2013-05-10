@@ -1,3 +1,5 @@
+import os
+
 import qisys.command
 
 def check_ssh_connection():
@@ -23,7 +25,7 @@ def test_deploying_to_localhost(qibuild_action, tmpdir):
     if not check_ssh_connection():
         return
 
-    url = "localhost:%s" % tmpdir.strpath
+    url = "%s@localhost:%s" % (os.getlogin(), tmpdir.strpath)
 
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
@@ -40,7 +42,7 @@ def test_deploying_to_several_urls(qibuild_action, tmpdir):
     if not check_ssh_connection():
         return
 
-    url = "localhost:%s" % tmpdir.strpath
+    url = "%s@localhost:%s" % (os.getlogin(), tmpdir.strpath)
     first_url = "%s/first" % url
     second_url = "%s/second" % url
 

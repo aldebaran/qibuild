@@ -45,7 +45,7 @@ def create_trad():
         fr_file.write("""
 # French translations for qi package
 # Traductions fran\xc3\xa7aises du paquet qi.
-# Copyright (C) 2012 THE qi'S COPYRIGHT HOLDER
+# Copyright (C) 2012, 2013 THE qi'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the qi package.
 # Automatically generated, 2012.
 #
@@ -78,7 +78,7 @@ msgstr "O\xc3\xb9 est Brian ?"
 """)
         en_file.write("""
 # English translations for qi package.
-# Copyright (C) 2012 THE qi'S COPYRIGHT HOLDER
+# Copyright (C) 2012, 2013 THE qi'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the qi package.
 # Automatically generated, 2012.
 #
