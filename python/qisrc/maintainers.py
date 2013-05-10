@@ -4,11 +4,12 @@
 
 """Handling maintainers in git notes."""
 
-import qisrc.git
+import os
+from xml.etree import ElementTree as etree
 
+import qisrc.git
 import qisys.qixml
 
-from xml.etree import ElementTree as etree
 
 class ProjectXML(qisys.qixml.XMLParser):
     def __init__(self, target):
@@ -33,8 +34,11 @@ def get_xml_root(project):
     return tree.getroot()
 
 def get_xml_tree(project):
-    path = project.qiproject_xml
-    tree = qisys.qixml.read(path)
+    xml_path = project.qiproject_xml
+    if not os.path.exists(xml_path):
+        with open(xml_path, "w") as fp:
+            fp.write("""<project version="3" />\n""")
+    tree = qisys.qixml.read(xml_path)
     return tree
 
 def exists(project, name=None, email=None):

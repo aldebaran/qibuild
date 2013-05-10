@@ -222,10 +222,6 @@ class WorkTreeProject(object):
     def qiproject_xml(self):
         """Give the path to the qiproject.xml."""
         xml_path = os.path.join(self.path, "qiproject.xml")
-        if os.path.exists(xml_path):
-            return xml_path
-        with open(xml_path, "w") as fp:
-            fp.write("""<project version="3" />\n""")
         return xml_path
 
     def parse_qiproject_xml(self):

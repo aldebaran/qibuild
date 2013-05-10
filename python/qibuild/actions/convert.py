@@ -54,7 +54,14 @@ def name_from_xml(xml_path):
     if root.tag != "project":
         mess += "Root node must be 'project'"
         raise Exception(mess)
-    name = root.get('name')
+    if root.get("version") == "3":
+        project_elem = root.find("qbuild")
+        if not project_elem:
+            return
+    else:
+        project_elem = root
+
+    name = project_elem.get('name')
     if not name:
         mess += "'project' node must have a 'name' attribute"
         raise Exception(mess)
@@ -159,7 +166,6 @@ def create_qiproj_xml(args):
     """ Create a new qiproject.xml
 
     """
-
     source_dir = args.source_dir
     project_name = args.project_name
     qiproj_xml = os.path.join(source_dir, "qiproject.xml")

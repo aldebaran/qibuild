@@ -30,11 +30,12 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
             src = name
         proj_path = self.tmpdir.mkdir(src)
 
-        # FIXME: use new syntax
         xml = """ \
-<project name="{name}" >
-  <depends buildtime="true" runtime="false" names="{buildtime_names}" />
-  <depends buildtime="false" runtime="true" names="{runtime_names}" />
+<project version="3">
+  <qibuild name="{name}">
+    <depends buildtime="true" runtime="false" names="{buildtime_names}" />
+    <depends buildtime="false" runtime="true" names="{runtime_names}" />
+  </qibuild>
 </project>
 """
         xml = xml.format(name=name,
