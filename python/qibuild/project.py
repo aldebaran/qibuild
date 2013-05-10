@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import platform
 
@@ -9,6 +10,7 @@ import qibuild.cmake
 import qibuild.build
 import qibuild.gdb
 import qibuild.dylibs
+import qitoolchain.toolchain
 
 class BuildProject(object):
     def __init__(self, build_worktree, worktree_project):
@@ -379,6 +381,52 @@ The following tools were not found: {missing}\
             ui.warning(mess)
             return
         qibuild.gdb.split_debug(destdir, **tool_paths)
+
+    def get_build_dirs(self, all_configs=False):
+        """Return a dictionary containing the build directory list
+        for the known and the unknown configurations::
+
+            build_directories = {
+                'known_configs' = [],
+                'unknown_configs' = [],
+            }
+
+        Note: if all_configs if False, then the list of the unknown
+        configuration remains empty.
+
+        """
+        if not all_configs:
+            bdirs = list()
+            if os.path.isdir(self.build_directory):
+                bdirs.append(self.build_directory)
+            return {'known_configs': bdirs, 'unknown_configs': list()}
+
+        # build directory name pattern:
+        # 'build-<tc_name>[-<profile>]...[-release]'
+        qibuild_xml = self.build_worktree.qibuild_xml
+        profiles = qibuild.profile.parse_profiles(qibuild_xml)
+        profiles = list(profiles.keys())
+        profiles = [re.escape(x) for x in profiles]
+        toolchains = qitoolchain.toolchain.get_tc_names()
+        toolchains.append("sys-%s-%s" % (platform.system().lower(),
+                                        platform.machine().lower()))
+        toolchains = [re.escape(x) for x in toolchains]
+        bdir_regex = r"^build"
+        bdir_regex += r"(-(" + "|".join(toolchains) + "))"
+        bdir_regex += r"(-(" + "|".join(profiles) + "))*"
+        bdir_regex += r"(-release)?$"
+        bdir_re = re.compile(bdir_regex)
+        ui.debug("matching:", bdir_regex)
+        dirs = os.listdir(self.path)
+        ret = {'known_configs': list(), 'unknown_configs': list()}
+        for bdir in dirs:
+            if bdir_re.match(bdir):
+                ret['known_configs'].append(bdir)
+            elif bdir.startswith("build-"):
+                ret['unknown_configs'].append(bdir)
+        for k in ret.keys():
+            ret[k] = [os.path.join(self.path, x) for x in ret[k]]
+        return ret
 
     def __repr__(self):
         return "<BuildProject %s in %s>" % (self.name, self.src)
