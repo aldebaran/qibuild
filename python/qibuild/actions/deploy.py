@@ -48,7 +48,16 @@ def do(args):
         urls = [args.url]
 
     for url in urls:
-        qibuild.deploy.parse_url(url) # throws if url is invalid
+        # make sure every url is valid first
+        parsed = qibuild.deploy.parse_url(url)
+        if not parsed:
+            mess = """ Could not parse {0} as a valid deploy url.
+Supported formats are:
+   * <user>@<host>:<deploy-dir>
+   * ssh://<user>@<host>:<port>/<deploy-dir>
+"""
+            raise Exception(mess.format(url))
+
 
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
     for url in urls:

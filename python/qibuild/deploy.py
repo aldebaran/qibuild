@@ -193,10 +193,10 @@ def _generate_solib_search_path(cmake_builder, project_name):
         res.extend(_get_subfolder(dep_lib_dir))
     return _uniq(res)
 
-def generate_debug_scripts(cmake_builder, project_name, url):
+def generate_debug_scripts(cmake_builder, project_name, url, port=22):
     """ generate all scripts needed for debug """
-    # FIXME: move checks abouth cross-gdb, sysroot et all, much
-    # earlier
+    # FIXME: rewrite this to support several urls
+    return
     (remote, server, remote_directory) = qibuild.deploy.parse_url(url)
 
     build_worktree = cmake_builder.build_worktree
@@ -234,7 +234,7 @@ def generate_debug_scripts(cmake_builder, project_name, url):
                         solib_search_path=solib_search_path,
                         remote_gdb_address="%s:2159" % server)
     gdb_script = _generate_run_gdbserver_binary(destdir, gdb=gdb, gdb_listen=":2159",
-                                                remote=remote,
+                                                remote=remote, port=port,
                                                 remote_dir=remote_directory)
 
     ui.info(message)
