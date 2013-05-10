@@ -13,7 +13,7 @@ def test_parse_url():
     res = qibuild.deploy.parse_url("john@foo:")
     assert res == {'given': 'john@foo:', 'login':'john', 'url':'foo', 'dir': ''}
     res = qibuild.deploy.parse_url("foo:lol")
-    assert res == None
+    assert res is None
 
     res = qibuild.deploy.parse_url("http://login@example.com:path")
     assert res is None
