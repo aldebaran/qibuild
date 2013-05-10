@@ -35,7 +35,7 @@ create PROJECT
 
 
 All following command accept a ``-c,--config`` argument which should be
-the name a a toolchain (``-c system`` to use the native toolchain).
+the name of a toolchain (``-c system`` to use the native toolchain).
 See :ref:`qitoolchain-man-page`.
 
 configure [PROJECT]

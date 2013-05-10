@@ -11,7 +11,7 @@ Let use assume you want to use the ``foo`` library, and no
 modules, or because the ``foo`` project does not use CMake
 as a build system, or for whatever reason)
 
-In anycase, if you do have access to a ``foo-config.cmake`` of
+In any case, if you do have access to a ``foo-config.cmake`` of
 a ``FindFoo.cmake``, please just use it!
 
 Note that ``qi_use_lib(foo)`` does not need a specific
