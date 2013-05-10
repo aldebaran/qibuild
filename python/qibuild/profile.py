@@ -76,14 +76,14 @@ def configure_build_profile(xml_path, name, flags):
     profile.cmake_flags = flags
     tree = qisys.qixml.read(xml_path)
     root = tree.getroot()
-    profiles = root.find("profiles")
-    if profiles is None:
-        profiles = qisys.qixml.etree.Element("profiles")
-        root.append(profiles)
-    for profile in profiles.findall("profile"):
-        if profile.get("name") == name:
-            profiles.remove(profile)
-    profiles.append(profile.elem())
+    profiles_elem = root.find("profiles")
+    if profiles_elem is None:
+        profiles_elem = qisys.qixml.etree.Element("profiles")
+        root.append(profiles_elem)
+    for profile_elem in profiles_elem.findall("profile"):
+        if profile_elem.get("name") == name:
+            profiles_elem.remove(profile_elem)
+    profiles_elem.append(profile.elem())
     qisys.qixml.write(tree, xml_path)
 
 def remove_build_profile(xml_path, name):
