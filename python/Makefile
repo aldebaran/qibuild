@@ -36,21 +36,10 @@ pylint-error:
 	@echo " => Checked only for pylint errors"
 	@echo "    Use make check-all for running a full pylint check"
 
-coverage:
-	@echo running tests for coverage
-# cd .. is required for the Jenkins plugin to work
-	@(cd .. ; $(PYTHON) -m pytest python \
-					--junitxml=tests.xml \
-				    --cov=python \
-					--cov-config=coverage.ini \
-					--cov-report=xml \
-					--cov-report=html)
-	@echo " => Open $(shell cd .. ; pwd)/htmlcov/index.html for more details"
-
-
 check:
 	@echo ":: Running tests: $(TEST_MODULES)"
-	@$(PYTHON) -m pytest $(PYTEST_ARGS) $(TEST_MODULES)
+	@$(PYTHON) -m pytest $(PYTEST_ARGS) $(TEST_MODULES) \
+				  --cov=. --cov-report=html
 
 check-fast:
 	@echo ":: Runnig fasts tests: $(TEST_MODULES)"
