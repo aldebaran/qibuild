@@ -8,10 +8,13 @@ import qisrc.manifest
 import qisrc.git
 
 def make_repos(*args):
+    class Remote:
+        pass
     res = list()
     for (project, src) in args:
         repo = qisrc.manifest.RepoConfig()
-        repo.remote_url = "git://src/" + project
+        repo.remote = Remote()
+        repo.remote.url = "git://src/" + project
         repo.project = project
         repo.src = src
         res.append(repo)

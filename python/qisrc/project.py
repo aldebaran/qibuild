@@ -8,6 +8,7 @@ class GitProject(object):
     def __init__(self, git_worktree, worktree_project):
         self.git_worktree = git_worktree
         self.src = worktree_project.src
+        self.name = ""
         self.branches = list()
         self.remotes = list()
         self.review = False
@@ -18,6 +19,13 @@ class GitProject(object):
         for branch in self.branches:
             if branch.default:
                 return branch
+
+    @property
+    def review_remote(self):
+        """ The remote to use when doing code review """
+        for remote in self.remotes:
+            if remote.review:
+                return remote
 
     @property
     def clone_url(self):
@@ -57,27 +65,27 @@ class GitProject(object):
 
 
     @change_config
-    def configure_remote(self, name, url=None, review=False):
+    def configure_remote(self, remote):
         """ Configure a remote. If a remote with the same name
         exists, its url will be overwritten
 
         """
-        remote_found = False
-        for remote in self.remotes:
-            if remote.name == name:
-                remote_found = True
-                if remote.review != review and review:
-                    ui.info(self.src, "now under code review")
-                remote.review = review
-                if remote.url != url:
-                    ui.warning(self.src, ": remote url changed", url, "->", remote.url)
-                    remote.url = url
-        if not remote_found:
-            remote = qisrc.git_config.Remote()
-            remote.name = name
-            remote.url = url
-            remote.review = review
-            self.remotes.append(remote)
+        for previous_remote in self.remotes:
+            if previous_remote.name == remote.name:
+                self.update_remote(previous_remote, remote)
+                return
+        self.remotes.append(remote)
+
+    def update_remote(self, remote, new):
+        """ Helper for configure_remote """
+        if not remote.review and new.review:
+            ui.info(self.src, "is now under code review")
+        if remote.review and not new.review:
+            ui.warning(self.src, "is no longer code review")
+        if remote.url != new.url:
+            ui.warning(self.src, ": remote url changed", remote.url, "->", new.url)
+        self.remotes.remove(remote)
+        self.remotes.append(new)
 
     @change_config
     def configure_branch(self, name, tracks="origin",
@@ -114,14 +122,15 @@ class GitProject(object):
         Called by WorkTreeSyncer
 
         """
-        self.configure_branch(repo.default_branch, tracks=repo.remote,
+        self.name = repo.project
+        self.configure_branch(repo.default_branch, tracks=repo.remote.name,
                               remote_branch=repo.default_branch, default=True)
-        self.configure_remote(repo.remote, repo.remote_url, review=repo.review)
+        self.configure_remote(repo.remote)
         if repo.review:
-            ok = qisrc.review.setup_project(self.path, repo.project, repo.remote_url)
+            ok = qisrc.review.setup_project(self)
             if ok:
                 self.review = True
-                self.git_worktree.save_project_config(self)
+        self.git_worktree.save_project_config(self)
 
 
     def sync(self, branch_name=None, rebase_devel=False,

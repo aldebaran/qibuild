@@ -38,25 +38,25 @@ def compute_repo_diff(old_repos, new_repos):
         new_srcs[repo.src] = repo
     old_urls = dict()
     for old_repo in old_repos:
-        old_urls[old_repo.remote_url] = old_repo
+        old_urls[old_repo.remote.url] = old_repo
     new_urls = dict()
     for new_repo in new_repos:
-        new_urls[new_repo.remote_url] = new_repo
+        new_urls[new_repo.remote.url] = new_repo
 
     # Look for the updates: same src, different urls
     for repo in old_repos:
-        old_url = repo.remote_url
+        old_url = repo.remote.url
         new_repo = new_srcs.get(repo.src)
         if not new_repo:
             continue
-        new_url = new_repo.remote_url
+        new_url = new_repo.remote.url
         if old_url != new_url:
             src_to_update.append(repo.src)
 
     # Look for the moves: same url, different src
     for old_repo in old_repos:
         for new_repo in new_repos:
-            if old_repo.remote_url == new_repo.remote_url:
+            if old_repo.remote.url == new_repo.remote.url:
                 if old_repo.src != new_repo.src:
                     to_move.append((old_repo, new_repo.src))
 
@@ -64,14 +64,14 @@ def compute_repo_diff(old_repos, new_repos):
     for old_repo in old_repos:
         if old_repo.src in src_to_update:
             continue
-        if not old_repo.remote_url in new_urls:
+        if not old_repo.remote.url in new_urls:
             to_rm.append(old_repo)
 
     # Look for repos to add
     for new_repo in new_repos:
         if new_repo.src in src_to_update:
             continue
-        if not new_repo.remote_url in old_urls:
+        if not new_repo.remote.url in old_urls:
             to_add.append(new_repo)
 
     to_update = list()
@@ -204,7 +204,7 @@ class WorkTreeSyncer(object):
             # a rename failed, or the project has not been cloned yet,
             # so make sure old_repos matches the worktree state:
             for old_repo in old_repos_expected:
-                old_project = self.git_worktree.find_url(old_repo.remote_url)
+                old_project = self.git_worktree.find_url(old_repo.remote.url)
                 if old_project:
                     old_repo.src = old_project.src
                     old_repos.append(old_repo)
@@ -269,8 +269,8 @@ class WorkTreeSyncer(object):
                         ui.green, "* ",
                         ui.reset, ui.blue, old_repo.src,
                         ui.reset, ":", "\n",
-                        ui.tabs(3), ui.blue, old_repo.remote_url,
-                        ui.reset, " -> ", ui.blue, new_repo.remote_url)
+                        ui.tabs(3), ui.blue, old_repo.remote.url,
+                        ui.reset, " -> ", ui.blue, new_repo.remote.url)
                 if new_repo.review:
                     ui.info(ui.tabs(3), ui.green, "(now using code review)")
 

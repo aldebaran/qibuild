@@ -3,8 +3,12 @@
 ## found in the COPYING file.
 
 import qisrc.manifest
+import qisrc.review
 
 import pytest
+
+import mock
+
 
 def test_simple_read(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -19,7 +23,7 @@ def test_simple_read(tmpdir):
     assert len(manifest.repos) == 1
     bar = manifest.repos[0]
     assert bar.src == "lib/bar"
-    assert bar.remote_url == "git@example.com:foo/bar.git"
+    assert bar.remote.url == "git@example.com:foo/bar.git"
     assert bar.default_branch == "next"
 
 def test_no_matching_remote(tmpdir):
@@ -48,7 +52,7 @@ def test_review_projects(tmpdir):
     assert len(manifest.repos) == 1
     bar = manifest.repos[0]
     assert bar.src == "lib/bar"
-    assert bar.remote_url == "http://gerrit:8080/foo/bar.git"
+    assert bar.remote.url == "http://gerrit:8080/foo/bar.git"
     assert bar.review == True
 
 def test_groups(tmpdir):
@@ -71,5 +75,7 @@ def test_groups(tmpdir):
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     git_projects = manifest.get_repos(groups=["qim"])
     assert len(git_projects) == 2
-    assert git_projects[0].remote_url == "git@example.com:qi/libqi.git"
-    assert git_projects[1].remote_url == "git@example.com:qi/libqimessaging.git"
+    assert git_projects[0].remote.url == "git@example.com:qi/libqi.git"
+    assert git_projects[1].remote.url == "git@example.com:qi/libqimessaging.git"
+
+

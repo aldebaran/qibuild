@@ -6,8 +6,8 @@
 
 """
 
+import copy
 import functools
-import posixpath
 
 import qisys.sh
 import qisys.qixml
@@ -16,17 +16,6 @@ import qisrc.groups
 
 class ManifestError(Exception):
     pass
-
-
-def git_url_join(remote, name):
-    """Join a remote ref with a name."""
-    if remote.startswith(("http://", "ssh://")):
-        return posixpath.join(remote, name)
-    if "@" in remote:
-        return remote + ":" + name
-    return posixpath.join(remote, name)
-
-
 
 
 class Manifest(object):
@@ -45,7 +34,7 @@ class Manifest(object):
             # pylint: disable-msg=E1102
             res = func(self, *args, **kwargs)
             self.dump()
-            # mandatory to re-compute project.remote_url,
+            # mandatory to re-compute project.remote,
             # project.review and so on
             self.load()
             return res
@@ -60,19 +49,28 @@ class Manifest(object):
         parser = ManifestParser(self)
         parser.parse(root)
 
+        for remote in self.remotes:
+            remote.parse_url()
+
         for repo in self.repos:
-            if not repo.remote:
-                repo.remote = "origin"
+            if not repo.remote_name:
+                repo.remote_name = "origin"
             if not repo.default_branch:
                 repo.default_branch = "master"
-            matching_remote = self.get_remote(repo.remote)
-            if matching_remote:
-                repo.remote_url = git_url_join(matching_remote.url, repo.project)
-                if matching_remote.review:
-                    repo.review = True
-            else:
-                raise ManifestError("No matching remote: %s for repo %s" %
-                                  (repo.remote, repo.project))
+            self.set_remote(repo)
+
+    def set_remote(self, repo):
+        """ Set the remote of a repo from the list.
+        Assume all the remotes have already been read
+
+        """
+        matching_remote = self.get_remote(repo.remote_name)
+        if not matching_remote:
+            raise ManifestError("No matching remote: %s for repo %s" %
+                                (repo.remote_name, repo.project))
+        repo.remote = copy.copy(matching_remote)
+        repo.remote.url = matching_remote.prefix + repo.project
+
     def dump(self):
         """ write the xml configuration file """
         parser = ManifestParser(self)
@@ -127,7 +125,7 @@ class Manifest(object):
         repo = RepoConfig()
         repo.project = project_name
         repo.src = src
-        repo.remote = remote_name
+        repo.remote_name = remote_name
         repo.default_branch = default_branch
         self.repos.append(repo)
 
@@ -146,18 +144,22 @@ class Manifest(object):
 
 class RepoConfig(object):
     def __init__(self):
-        self.remote = None
         self.src = None
         self.project = None
         self.default_branch = None
-        self.remote_url = None
-        self.review = False
+        self.remote = None
+        self.remote_name = None
 
+    @property
+    def review(self):
+        return self.remote and self.remote.review
 
     def __repr__(self):
         res = "<Repo %s in %s" %  (self.project, self.src)
         if self.default_branch:
             res += " default: %s" % self.default_branch
+        if not self.remote:
+            res += " (no remote yet)"
         if self.review:
             res += " (review)"
         res += ">"
@@ -206,5 +208,19 @@ class ManifestParser(qisys.qixml.XMLParser):
 class RepoConfigParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(RepoConfigParser, self).__init__(target)
-        self._ignore = ["remote_url", "review"]
+        self._ignore = ["remote", "review"]
         self._required = ["project"]
+
+    # the 'remote' XML attribute matches an attribute named
+    # 'remote_name' in the RepoConfig class
+    def _parse_attributes(self):
+        self.target.project = self._root.get("project")
+        if not self.target.project:
+            raise ManifestParser("Missing 'project' attribute")
+        self.target.src = self._root.get("src")
+        self.target.default_branch = self._root.get("default_branch", "master")
+        self.target.remote_name = self._root.get("remote", "origin")
+
+    def _write_remote_name(self, elem):
+        if self.target.remote_name:
+            elem.set("remote", self.target.remote_name)

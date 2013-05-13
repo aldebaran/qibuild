@@ -217,7 +217,7 @@ We parse the XML in order to find every project, read what
 branch they need to track, what are there URLs, and whether
 or not they are under code review.
 
-If we see them has beeing under code review, we call
+If we see them as being under code review, we call
 ``qisrc.review.setup_project``
 
 Once this is done, we call

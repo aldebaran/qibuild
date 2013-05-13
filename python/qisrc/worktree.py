@@ -122,9 +122,9 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         # so the GitProject does not exist yet
         git_project = qisrc.project.GitProject(self, worktree_project)
         git = qisrc.git.Git(git_project.path)
-        git.clone(repo.remote_url, "--recursive",
+        git.clone(repo.remote.url, "--recursive",
                   "--branch", repo.default_branch,
-                  "--origin", repo.remote)
+                  "--origin", repo.remote.name)
         self.save_project_config(git_project)
         self.load_git_projects()
 

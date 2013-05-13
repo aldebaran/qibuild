@@ -92,8 +92,12 @@ class TestGitServer(object):
         repo_src = self.src.ensure(src, dir=True)
         git = TestGit(repo_src.strpath)
         git.initialize()
-        git.set_remote("origin", repo_srv.strpath)
-        git.push("origin", "master:master")
+        if review:
+            git.set_remote("gerrit", repo_srv.strpath)
+            git.push("gerrit", "master:master")
+        else:
+            git.set_remote("origin", repo_srv.strpath)
+            git.push("origin", "master:master")
 
         if not add_to_manifest:
             return
@@ -147,8 +151,7 @@ class TestGitServer(object):
         """ Switch a project to gerrit for code review """
         self.create_repo(project, review=True, add_to_manifest=False)
         repo = self.manifest.get_repo(project)
-        repo.review = True
-        repo.remote = "gerrit"
+        repo.remote_name = "gerrit"
         self.manifest.dump()
         self.push_manifest("%s: now under code review" % project)
         self.manifest.load()

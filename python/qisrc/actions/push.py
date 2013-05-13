@@ -27,7 +27,7 @@ def configure_parser(parser):
 
 def do(args):
     """ Main entry point """
-    git_worktree = qisrc.parsers.get_git_worktree(args)
+    git_worktree = qisrc.parsers.get_git_worktree(args, sync_first=False)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args)
     for git_project in git_projects:
         git = qisrc.git.Git(git_project.path)
@@ -35,6 +35,12 @@ def do(args):
         if not current_branch:
             ui.error("Not currently on any branch")
             sys.exit(2)
-        qisrc.review.push(git_project.path, current_branch,
-                        review=args.review, dry_run=args.dry_run,
-                        reviewers=args.reviewers)
+        if git_project.review:
+            qisrc.review.push(git_project, current_branch,
+                              bypass_review=(not args.review),
+                              dry_run=args.dry_run, reviewers=args.reviewers)
+        else:
+            if args.dry_run:
+                git.push("-n")
+            else:
+                git.push()

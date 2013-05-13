@@ -38,10 +38,6 @@ qisrc.manifest.RepoConfig
       the default branch of this project. Should match
       a branch in the remote
 
-  .. py:attribute:: remote_url
-
-      Computed during parsing
-
   .. py:attribute:: review
 
       wether the project is under code review.

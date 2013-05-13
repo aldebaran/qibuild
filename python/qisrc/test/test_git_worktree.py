@@ -2,6 +2,8 @@ import qisys.qixml
 import qisys.worktree
 import qisrc.worktree
 
+from qisrc.git_config import Remote
+
 
 def test_read_git_configs(tmpdir, test_git):
     tmpdir.mkdir("foo")
@@ -56,7 +58,10 @@ def test_read_git_configs(tmpdir, test_git):
 
 def test_git_configs_are_persistent(git_worktree):
     foo = git_worktree.create_git_project("foo")
-    foo.configure_remote("upstream", url="git@srv:bar.git")
+    upstream = Remote()
+    upstream.name = "upstream"
+    upstream.url = "git@srv:bar.git"
+    foo.configure_remote(upstream)
     foo.configure_branch("master", tracks="upstream")
 
     def check_config(foo):
@@ -77,7 +82,10 @@ def test_git_configs_are_persistent(git_worktree):
 
 def test_sync_git_configs(git_worktree):
     foo = git_worktree.create_git_project("foo")
-    foo.configure_remote("upstream", url="git@srv:bar.git")
+    upstream = Remote()
+    upstream.name = "upstream"
+    upstream.url = "git@srv:bar.git"
+    foo.configure_remote(upstream)
 
     git = qisrc.git.Git(foo.path)
     assert git.get_config("remote.upstream.url") == "git@srv:bar.git"
@@ -91,13 +99,22 @@ def test_sync_git_configs(git_worktree):
 
 def test_warn_on_change(git_worktree, record_messages):
     foo = git_worktree.create_git_project("foo")
-    foo.configure_remote("origin", "git@srv:foo.git")
+    origin = Remote()
+    origin.name = "origin"
+    origin.url =  "git@srv:foo.git"
+    foo.configure_remote(origin)
     foo.configure_branch("master", tracks="origin", default=True)
-    foo.configure_remote("origin", "git@srv:libfoo.git")
+    origin2 = Remote()
+    origin2.name = "origin"
+    origin2.url =  "git@srv:libfoo.git"
+    foo.configure_remote(origin2)
     assert record_messages.find("remote url changed")
     foo.configure_branch("next", default=True)
     assert record_messages.find("default branch changed")
-    foo.configure_remote("gerrit", "http://gerrit/libfoo.git")
+    gerrit = Remote()
+    gerrit.name = "gerrit"
+    gerrit.url =  "http://gerrit/libfoo.git"
+    foo.configure_remote(gerrit)
     foo.configure_branch("next", tracks="gerrit")
     assert record_messages.find("now tracks gerrit instead")
 
