@@ -5,12 +5,6 @@ qisrc.git_config -- Handling git configurations
 .. py:module:: qisrc.git_config
 
 
-qisrc.worktree.GitWorkTree
---------------------------
-
-.. autoclass:: GitWorkTree
-    :members:
-
 
 
 qisrc.worktree.Remote
@@ -34,7 +28,6 @@ qisrc.worktree.Remote
     .. py:attribute:: review
 
       Wether the remote supports code review.
-        return res
 
 qisrc.worktree.Branch
 ----------------------

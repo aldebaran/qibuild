@@ -1,5 +1,5 @@
-qisrc.project
-===============
+qisrc.project - git projects in a GitWorkTree
+==============================================
 
 .. py:module:: qisrc.project
 

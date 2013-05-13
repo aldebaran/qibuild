@@ -30,24 +30,25 @@ General
 qisrc
 ~~~~~
 
+* After ``qisrc init``, the projects under code review now
+  end up with only one remote instead of two.
 * ``qisrc init`` learned ``--groups`` to only clone some repositories
-* ``qisrc pull`` learned ``--build-deps``  to pull the build dependencies
   of a project
 * ``qisrc sync`` now always clones the missing projects (even when not using
   ``-a``)
 * ``qisrc sync`` now handles repositories renames
+* ``qisrc sync`` logic changed to be a bit more reliable and fail less often
+* ``qisrc foreach`` learned ``--all``, to run on every projects (previously
+  it could only run on git projects)
+* add ``qisrc manifest`` to manage the manifest used in a given worktree.
+* ``qisrc init`` can now only be used once. To add a new manifest, run
+  ``qisrc manifest --add name url``. This makes it possible to change the groups,
+  too
+* ``qisrc init --no-review`` is gone, this was seldom used anyway
+* ``qisrc sync`` learned ``--build-deps``  to pull the build dependencies
 * Since this option clashes with other qibuild option, you should now use
   ``qibuild configure --no-runtime`` or ``qibuild configure --build-deps-only``
   instead of ``qibuild configure --build-deps``
-* ``qisrc sync`` logic changed to be a bit more reliable and fail less often
-* ``qisrc push`` learned ``--username``, making it possible to use qisrc with
-  several users on the same repo
-* ``qisrc foreach`` learned ``--all``, to run on every projects (previously
-  it could only run on git projects)
-* add ``qisrc manifest``
-* ``qisrc init`` can now only be used once. To add a new manifest, run
-  ``qisrc manifest name url``. This makes it possible to change the groups,
-  too
 
 qibuild
 ~~~~~~~
@@ -92,7 +93,7 @@ qibuild projects.
 
     <!-- old -->
     <manifest>
-      <remote name="origin" fetch="git://example.com"
+      <remote name="origin" fetch="git@example.com"
               review="http://gerrit:8080" />
       <project name="libfoo.git"
                path="lib/libfoo"
@@ -104,24 +105,64 @@ qibuild projects.
 
     <!-- new -->
     <manifest>
-      <remote name="origin" url="git://example.com" />
-      <remote name="gerrit" url="http://gerrit:8080" review="true" />
+      <remote name="origin" url="git@example.com" />
+      <remote name="gerrit" url="ssh://gerrit:29418/" review="true" />
 
       <repo src="lib/libfoo" default_branch="next" remote="gerrit" />
     </manifest>
 
-* Note that in this case the ``next`` branch of the repo in ``lib/libfoo``
-  will track ``http://gerrit:8080/libfoo.git`` instead of
-  ``git://example.com``. This makes it possible to use gerrit only,
+* The gerrit ssh port is now no longer hard-coded, and you
+  should specify the ``ssh`` url, not the ``http`` url.
+* The ``next`` branch of the repo in ``lib/libfoo``
+  will track ``ssh://<username>@gerrit:29418/libfoo.git`` instead of
+  ``git@example.com:libfoo.git``. This makes it possible to use gerrit only,
   without any mirror, and it also means you don't have to wait for the
   gerrit synchronization, which is hepful when using ``qisrc`` on a
   buildfarm plugged to gerrit.
-
-
-* The default manifest in now called ``manifest.xml`` instead of ``default.xml`` to
+* The default manifest is now called ``manifest.xml`` instead of ``default.xml`` to
   ease the transition.
 
-* ``qisrc`` profiles are gone, we now use groups instead.
+* ``qisrc`` profiles are gone, use groups instead. Here's how you can make
+  it possible to only clone 2 of the 3 repositories declared in the manifest:
+
+.. code-block:: xml
+
+  <!-- in qibuild2 -->
+
+  <!-- manifest/default.xml -->
+
+    <manifest>
+      <project name="foo.git" />
+      <manifest url="bar.xml" />
+    </manifest>
+
+  <!-- manifest/bar.xml -->
+    <manifest>
+      <project name="bar.git" />
+      <project name="libbar.git" />
+    </manifest>
+
+Used with ``--profile bar``
+
+
+.. code-block:: xml
+
+  <!--in qibuild3 -->
+
+    <manifest>
+      <project name="foo.git" />
+      <project name="bar.git" />
+      <project name="libbar.git" />
+
+      <groups>
+        <group name="bar">
+          <project name="bar.git" />
+          <project name="libbar.git" />
+        </group>
+      </groups>
+    </manifest>
+
+Used with ``--group bar``
 
 
 v2.3
