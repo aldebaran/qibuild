@@ -1,5 +1,3 @@
-* rename qisrc.manifest.Manifest -> qisrc.manifest.RemoteManifest
-
 * use qisys.ui.info_count everywhere
 
 * parser.get_* functions should be usable with **kwargs too:
@@ -15,8 +13,6 @@
 
 * XMLParser.xml_elem() -> dump()
 * XMLParser._write_foo()  -> _dump_foo()
-
-* add qisys.actions.list()
 
 * add --reverse-deps
 
@@ -46,6 +42,7 @@
   storage
 
 * re-add qisrc foreach -p
+
 
 * qibuild_action("configure")
   -> qibuild_action.call("configure") ?
