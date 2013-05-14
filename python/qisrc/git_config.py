@@ -43,7 +43,7 @@ class Remote(object):
                         (?P<subfolder>)
                         """, re.VERBOSE)
         other_url = re.compile("""
-                        ((?P<protocol>(http|https|file))://)
+                        ((?P<protocol>(git|http|https|file))://)
                         (?P<server>[^:/]+)
                         (:(?P<port>\d+))?
                         """, re.VERBOSE)

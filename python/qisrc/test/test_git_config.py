@@ -12,6 +12,14 @@ def test_url_filepath():
     assert remote.prefix == "file://path/to/dir/"
     assert remote.protocol == "file"
 
+def test_url_git():
+    remote = Remote()
+    remote.url = "git://example.com"
+    remote.parse_url()
+    assert remote.prefix == "git://example.com/"
+    assert remote.protocol == "git"
+    assert remote.server == "example.com"
+
 def test_url_http():
     remote = Remote()
     remote.url = "http://review.corp:8080"
