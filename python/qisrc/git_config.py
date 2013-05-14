@@ -52,18 +52,20 @@ class Remote(object):
             self.protocol = "ssh"
             groupdict = match.groupdict()
             self.server = groupdict["server"]
+            port = groupdict.get("port")
+            if port:
+                self.port = int(port)
             username = groupdict.get("username")
             if username:
                 self.username = username
             else:
-                username = qisrc.review.get_gerrit_username(self.server, self.port)
+                username = qisrc.review.get_gerrit_username(self.server,
+                                                            ssh_port=self.port)
                 if not username:
                     raise Exception("Could not guess ssh username")
                 self.username = username
             prefix =  "ssh://%s@%s" % (username, self.server)
-            port = groupdict.get("port")
-            if port:
-                self.port = int(port)
+            if self.port:
                 prefix += ":%i" % self.port
             subfolder = groupdict.get("subfolder", "")
             prefix += subfolder

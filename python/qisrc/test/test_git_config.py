@@ -60,6 +60,7 @@ def test_gerrit_url_ssh_subfolder():
         remote.url = "ssh://review.corp:29418/a/subfolder"
         remote.parse_url()
         assert remote.prefix == "ssh://john@review.corp:29418/a/subfolder/"
+        assert remote.port == 29418
         remote.url = "ssh://review.corp:29418/a/subfolder/"
         remote.parse_url()
         assert remote.prefix == "ssh://john@review.corp:29418/a/subfolder/"
