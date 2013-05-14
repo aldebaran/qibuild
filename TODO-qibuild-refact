@@ -30,8 +30,6 @@
 
 * choose between destdir and dest_dir
 
-* remove qisrc manifest from "local config"
-
 * `qibuild config` should list the available build profiles
 
 * remove `--quiet-commands`

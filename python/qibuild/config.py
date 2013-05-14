@@ -127,26 +127,6 @@ class CMake:
         return res
 
 
-class Manifest:
-    def __init__(self):
-        self.url = None
-
-    def parse(self, tree):
-        self.url = tree.get("url")
-
-    def tree(self):
-        tree = etree.Element("manifest")
-        if self.url:
-            tree.set("url", self.url)
-        return tree
-
-    def __str__(self):
-        res = ""
-        if self.url:
-            res += "url: %s\n" % self.url
-        return res
-
-
 class Defaults:
     def __init__(self):
         # An editor name to use by default
@@ -256,7 +236,6 @@ class LocalSettings:
     def __init__(self):
         self.defaults = LocalDefaults()
         self.build = LocalBuild()
-        self.manifest = None
 
     def parse(self, tree):
         defaults_tree = tree.find("defaults")
@@ -265,18 +244,12 @@ class LocalSettings:
         build_tree = tree.find("build")
         if build_tree is not None:
             self.build.parse(build_tree)
-        manifest_tree = tree.find("manifest")
-        if manifest_tree is not None:
-            self.manifest = Manifest()
-            self.manifest.parse(manifest_tree)
 
     def tree(self):
         tree = etree.Element("qibuild")
         tree.set("version", "1")
         tree.append(self.defaults.tree())
         tree.append(self.build.tree())
-        if self.manifest:
-            tree.append(self.manifest.tree())
         return tree
 
     def __str__(self):
@@ -289,10 +262,6 @@ class LocalSettings:
         if build_str:
             res += "build settings for this worktree:\n"
             res += ui.indent(build_str) + "\n"
-        manifest_str = str(self.manifest)
-        if manifest_str:
-            res += "qisrc manifest:\n"
-            res += ui.indent(manifest_str) + "\n"
         return res
 
 
@@ -572,13 +541,6 @@ class QiBuildConfig:
             splitted_paths.insert(0, to_add)
         self.defaults.env.path = os.pathsep.join(splitted_paths)
 
-    def set_manifest_url(self, manifest_url):
-        """ Set a manifest url to use
-
-        """
-        if not self.local.manifest:
-            self.local.manifest = Manifest()
-        self.local.manifest.url = manifest_url
 
     def get_server_access(self, server_name):
         """ Return the access settings of a server
@@ -770,123 +732,6 @@ class ProjectConfig:
                 res += ui.indent(rdepends, num=4)
                 res += "\n"
         return res
-
-
-def convert_qibuild_cfg(qibuild_cfg):
-    """ Convert an old qibuild.cfg file
-    into two new strings:
-    (global_xml, local_xml)
-
-    """
-    ini_cfg = qibuild.configstore.ConfigStore()
-    ini_cfg.read(qibuild_cfg)
-    qibuild_cfg = QiBuildConfig()
-    general_config = ini_cfg.get("general.config")
-    if general_config:
-        qibuild_cfg.local.defaults.config = general_config
-    cmake_generator = ini_cfg.get("general.cmake.generator")
-    if cmake_generator:
-        qibuild_cfg.defaults.cmake.generator = cmake_generator
-    env_editor = ini_cfg.get("general.env.editor")
-    if env_editor:
-        qibuild_cfg.defaults.env.editor = env_editor
-    env_path = ini_cfg.get("general.env.path")
-    if env_path:
-        env_path = env_path.replace("\n", "")
-        qibuild_cfg.defaults.env.path = env_path
-    env_bat_file = ini_cfg.get("general.env.bat_file")
-    if env_bat_file:
-        qibuild_cfg.defaults.env.bat_file = env_bat_file
-    env_ide = ini_cfg.get("general.env.ide")
-    if env_ide:
-        qibuild_cfg.defaults.ide = env_ide
-        ide = IDE()
-        ide.name = env_ide
-        qibuild_cfg.ides[ide.name] = ide
-    qtcreator_path = ini_cfg.get("general.env.qtcreator.path")
-    if qtcreator_path:
-        if not qibuild_cfg.ides.get("QtCreator"):
-            qibuild_cfg.ides["QtCreator"] = IDE("QtCreator")
-        qibuild_cfg.ides["QtCreator"].path = qtcreator_path
-    build_dir = ini_cfg.get("general.build.directory")
-    if build_dir:
-        qibuild_cfg.local.build.build_dir = build_dir
-    sdk_dir = ini_cfg.get("general.build.sdk_dir")
-    if sdk_dir:
-        qibuild_cfg.local.build.sdk_dir = sdk_dir
-    incredibuild_str = ini_cfg.get("general.build.incredibuild", default="")
-    if incredibuild_str.lower() in ["y", "yes", "1", "true", "on"]:
-        qibuild_cfg.build.incredibuild = True
-
-    manifest_url = ini_cfg.get("manifest.url")
-    if manifest_url:
-        manifest = Manifest()
-        manifest.url = manifest_url
-        qibuild_cfg.local.manifest = manifest
-
-    for (name, _) in ini_cfg.get("config", default=dict()).iteritems():
-        config = Config()
-        config.name = name
-        cmake_generator = ini_cfg.get("config.%s.cmake.generator" % name)
-        if cmake_generator:
-            config.cmake.generator = cmake_generator
-        qibuild_cfg.configs[config.name] = config
-
-    out = StringIO()
-    qibuild_cfg.write(out)
-    global_xml = out.getvalue()
-
-    out = StringIO()
-    qibuild_cfg.write_local_config(out)
-    local_xml = out.getvalue()
-
-    return (global_xml, local_xml)
-
-
-def convert_qibuild_xml(xml_path):
-    """ Convert from previous version.
-    (Between 1.12 and 1.12.1 XML had no 'version' attribute)
-
-    """
-    tree = etree.ElementTree()
-    tree.parse(xml_path)
-    qibuild_cfg = QiBuildConfig()
-    qibuild_cfg.read(xml_path)
-    qibuild_cfg.read_local_config(xml_path)
-
-    out = StringIO()
-    qibuild_cfg.write(out)
-    global_xml = out.getvalue()
-
-    out = StringIO()
-    qibuild_cfg.write_local_config(out)
-    local_xml = out.getvalue()
-
-    return (global_xml, local_xml)
-
-
-def convert_project_manifest(qibuild_manifest):
-    """ Convert a on qibuild.manifest file
-    (ini format) into a new qibuild.manifest
-    file (xml format)
-
-    """
-    ini_cfg = qibuild.configstore.ConfigStore()
-    ini_cfg.read(qibuild_manifest)
-    p_names = ini_cfg.get("project", default=dict()).keys()
-    if len(p_names) != 1:
-        qisys.qixml.raise_parse_error("File should countain exactly one [project] section",
-            xml_path=qibuild_manifest)
-    name = p_names[0]
-    project = ProjectConfig()
-    project.name = name
-    depends = ini_cfg.get("project.%s.depends"  % name, default="").split()
-    rdepends = ini_cfg.get("project.%s.rdepends" % name, default="").split()
-    project.depends = set(depends)
-    project.rdepends = set(rdepends)
-    out = StringIO()
-    project.write(out)
-    return out.getvalue()
 
 
 def get_build_env():

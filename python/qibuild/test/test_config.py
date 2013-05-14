@@ -357,22 +357,6 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEqual(qibuild_cfg.local.build.build_dir,
             qisys.sh.to_native_path("/path/to/build"))
 
-    def test_set_manifest_url(self):
-        xml = """
-<qibuild version="1">
-</qibuild>
-"""
-        manifest_url = "http://example.com/qi/foo.xml"
-        qibuild_cfg = cfg_from_string(xml)
-        self.assertTrue(qibuild_cfg.local.manifest is None)
-        qibuild_cfg.set_manifest_url(manifest_url)
-        local_xml = local_cfg_to_string(qibuild_cfg)
-        new_conf = cfg_to_string(qibuild_cfg)
-        new_cfg = cfg_from_string(new_conf)
-        new_cfg.read_local_config(StringIO(local_xml))
-        self.assertFalse(new_cfg.local.manifest is None)
-        self.assertEqual(new_cfg.local.manifest.url, manifest_url)
-
 
     def test_get_server_access(self):
         xml = """

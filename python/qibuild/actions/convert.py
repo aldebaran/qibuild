@@ -172,16 +172,6 @@ def create_qiproj_xml(args):
     if os.path.exists(qiproj_xml):
         return
 
-    # use convert_project_manifest() so that depends and other settings
-    # are not lost
-    for cfg_name in ["qibuild.manifest", "base.cfg"]:
-        cfg_path = os.path.join(source_dir, cfg_name)
-        if os.path.exists(cfg_path):
-            xml = qibuild.config.convert_project_manifest(cfg_path)
-            with open(qiproj_xml, "w") as fp:
-                fp.write(xml)
-            return
-
     proj_elem = etree.Element("project")
     proj_elem.set("version", "3")
     tree = etree.ElementTree(element=proj_elem)
