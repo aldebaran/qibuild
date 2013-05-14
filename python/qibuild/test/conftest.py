@@ -28,7 +28,8 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
             rdepends = list()
         if not src:
             src = name
-        proj_path = self.tmpdir.mkdir(src)
+        proj_path = self.tmpdir.join(*src.split("/"))
+        proj_path.ensure(dir=True)
 
         xml = """ \
 <project version="3">
@@ -60,7 +61,7 @@ int main()
         proj_path.join("CMakeLists.txt").write(cmake)
         proj_path.join("main.c").write(main_c)
         self.worktree.add_project(src)
-        return self.get_build_project(src)
+        return self.get_build_project(name)
 
     def add_test_project(self, src, name=None):
         """ Copy a project, reading the sources
