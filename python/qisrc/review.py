@@ -113,7 +113,7 @@ def setup_project(project):
         return True
     ui.info("Configuring", project.src, "for code review ...", end="")
     if remote.protocol == "ssh":
-        fetch_gerrit_hook_ssh(project.path, username, server, ssh_port=ssh_port)
+        fetch_gerrit_hook_ssh(project.path, username, server, port=ssh_port)
     # FIXME: make it work with http too?
     ui.info(ui.green, "[OK]")
     return True
