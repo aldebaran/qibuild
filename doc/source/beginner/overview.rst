@@ -33,6 +33,8 @@ qiBuild is composed of two parts:
   taking dependencies into account and generate re-distributable binary
   packages
 
+
+
 Is qibuild the only one build framework?
 ++++++++++++++++++++++++++++++++++++++++
 
@@ -44,10 +46,18 @@ You can have a loot at
 .. toctree::
    :maxdepth: 1
 
-   other/cmake
-   other/rosbuild
-   other/qmake
-   other/autotools
+   qibuild/other/cmake
+   qibuild/other/rosbuild
+   qibuild/other/qmake
+   qibuild/other/autotools
+
+
+Going further with qibuild
+++++++++++++++++++++++++++
+
+Read more about qibuild in the :ref:`qibuild-tutorial`, or
+follow the :ref:`qibuild-guide`
+
 
 
 qisrc : Managing git projects
@@ -66,6 +76,12 @@ Notes:
    and you can still use ``git`` normally
 
 
+Tutorial
++++++++++
+
+See :ref:`qisrc-tutorial`
+
+
 qidoc : Building documentation
 ------------------------------
 
@@ -74,9 +90,19 @@ qidoc : Building documentation
 while making sure you can generate re-locatable HTML documentation
 
 
+Tutorial
+++++++++
+
+See :ref:`qidoc-tutorial`
+
+
 qilinguist: Translating projects
 ---------------------------------
 
 ``qilinguist`` makes it easier to use ``gettext`` in a CMake-based
 project
 
+Tutorial
+++++++++
+
+See :ref:`qilinguist-tutorial`

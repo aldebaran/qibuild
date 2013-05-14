@@ -3,13 +3,8 @@
 Creating a binary
 =================
 
-In this tutorial, we will learn how to create executables with the qiBuild
+In this tutorial, we will learn how to create executables using the qibuild
 framework
-
-Requirements
-------------
-
-We assume you have followed the :ref:`qibuild-getting-started` tutorial.
 
 Basic CMake
 -----------

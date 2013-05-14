@@ -1,6 +1,6 @@
 .. _qibuild-guide:
 
-qiBuild Programming guide
+qibuild Programming guide
 =========================
 
 

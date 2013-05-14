@@ -20,7 +20,7 @@ An minimal example may be
 
     <manifest>
       <remote fetch="git://example.com" />
-      <project name = "foo/bar.git" path="bar" />
+      <repo project="foo/bar.git" src="bar" />
     </manifest>
 
 
@@ -31,16 +31,17 @@ into ``QI_WORTREE/bar``
 manifest node
 -------------
 
-The ``manifest`` node accepts two types of children
+The ``manifest`` node accepts three types of children
 
-  * ``remote`` node
-  * ``project`` node
+* ``remote`` node
+* ``repo`` node
+* ``groups`` node
 
 
 remote node
 ------------
 
-The ``remote`` node *must* have a ``fetch`` attribute, that will
+The ``remote`` node *must* have a ``url`` attribute, that will
 be used as a base URL for every project.
 
 You can have several remotes with different names, like this:
@@ -48,51 +49,98 @@ You can have several remotes with different names, like this:
 .. code-block:: xml
 
   <manifest>
-    <remote name="public" fetch="git://github.com" />
-    <remote name="origin" fetch="git@git.aldebaran.com" />
-    <project
-      name="aldebaran/qibuild.git"
-      path="tools/qibuild"
+    <remote name="public" url="git://github.com" />
+    <remote name="origin" url="git@git.aldebaran.com" />
+    <repo
+      project="aldebaran/qibuild.git"
+      src="tools/qibuild"
       remote="public" />
-    <project
-      name="naoqi/naoqi.git"
-      path="naoqi"
+    <repo
+      project="naoqi/naoqi.git"
+      src="naoqi"
     />
   </manifest>
 
 * ``git@git.aldebaran.com:naoqi/naoqi.git`` will be cloned into ``naoqi``,
-   (because the default remote is ``public``)
+  (because the default remote is ``public``)
 
-* `git://github.com/aldebaran/qibuild.git`` will be cloned into ``tools/qibuild``.
+* ``git://github.com/aldebaran/qibuild.git`` will be cloned into ``tools/qibuild``.
+
+Many types of url are supported:
+
+* ``file://``
+* ``http://``
+* ``git://``
+* ``<username>@<host>`` when using ssh
+* ``ssh://<username>@<host>:<port>`` when using ssh on a non-standard port
 
 
-project node
-------------
+Additionally, if you are using gerrit with ssh, you can specify that
+the remote will be used for code review (This is useful to change
+``qisrc push`` behavior, so that changes are pushed to ``refs/for/master``
+)
 
-The ``project`` node *must* have a ``name`` attribute.
 
-If ``path`` is not given, it will deduced from the ``name``
 
-(for instance the ``foo/bar.git`` will be cloned to ``foo/bar``.
+.. code-block:: xml
 
-If ``review`` is true, you must have a ``review`` attribute in the matching remote:
+  <manifest>
+    <remote name="gerrit" url="ssh://review.corp.com:29418" review="true"/>
+  </manifest>
 
-The ssh git url will be decuded from the gerrit server url:
+
+Since when using gerrit, you have several usernames,
+the username is asked by ``qisrc`` when the manifest is parsed.
+
+repo node
+---------
+
+The ``repo`` node *must* have a ``project`` attribute.
+
+If also *must* have a ``remote`` attribute matching an exiting
+``remote`` node.
+
+If ``src`` is not given, it will deduced from the project name.
+(for instance the ``foo/bar.git`` repo will be cloned to ``foo/bar``)
+
 
 .. code-block:: xml
 
    <manifest>
-      <remote
-        fetch="git@foo.com"
-        review="http://gerrit:8080"
-      />
-      <project name="bar/baz.git" review="true"
+      <remote name="gerrit" url="ssh://review.corp.com:29418" review="true" />
+      <project name="bar/baz.git" remote="gerrit" />
     </manifest>
 
 
 Here ``qisrc init`` will try to create an ssh connection with
 ``git://<username>@gerrit:29418``, where ``username`` is read from the
 operating system first, or asked to the user.
+
+
+groups node
+-----------
+
+Group *must* have a *name* attribute.
+Then they contain a list of project name, and can include other groups.
+
+.. code-block:: xml
+
+  <groups>
+    <group name="testing">
+      <project name="gtest.git" />
+      <project name="gmock.git" />
+    </group>
+    <group name="core">
+      <group name="testing" />
+      <project name="libcore" />
+    </group>
+  </groups>
+
+Here we've defined a group named "testing", so that it's easy to
+get the ``gtest`` and ``gmock`` repositories together.
+
+If someone uses ``--group core``, he will get ``gtest``, ``gmock`` and
+``libcore``.
 
 .. seealso::
 
