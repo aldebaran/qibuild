@@ -229,6 +229,32 @@ class Git(object):
         else:
             return True, ""
 
+    def get_status(self, untracked=True):
+        """Return the output of status or None if it failed."""
+        if untracked:
+            (status, out) = self.status("--porcelain", raises=False)
+        else:
+            (status, out) = self.status("--porcelain", "--untracked-files=no",
+                                                            raises=False)
+
+        return out if status == 0 else None
+
+    def is_clean(self, untracked=True):
+        """
+        Returns true if working dir is clean.
+        (ie no untracked files, no unstaged changes)
+
+            :param untracked: will return True even if there are untracked files.
+        """
+        out = self.get_status(untracked)
+        if out is None:
+            return None
+
+        lines = [l for l in out.splitlines() if len(l.strip()) != 0]
+        if len(lines) > 0:
+            return False
+        return True
+
 
     def set_remote(self, name, url):
         """
