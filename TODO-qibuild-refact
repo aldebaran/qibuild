@@ -68,12 +68,6 @@
 * remove worktree args from actions, just build then on
   the fly when needed
 
-* do not use xml stuff qisrc.worktree:
-  - qisrc.worktree.save_project_config -> project.save_config()
-  - add project.read_config() and do not build GitProjectParser in worktree ...
-  - move ProjectParser to qisrc.project
-
-
 * also ?
 
     class GitWorkTree():

@@ -139,33 +139,3 @@ class BranchParser(qisys.qixml.XMLParser):
         super(BranchParser, self).__init__(target)
         self._required = ["name"]
 
-class GitProjectParser(qisys.qixml.XMLParser):
-    def __init__(self, target):
-        super(GitProjectParser, self).__init__(target)
-        self._ignore = ["worktree", "path", "clone_url",
-                        "default_branch", "review_url"]
-        self._required = ["src"]
-
-    def _parse_remote(self, elem):
-        remote = Remote()
-        parser = RemoteParser(remote)
-        parser.parse(elem)
-        self.target.remotes.append(remote)
-
-    def _parse_branch(self, elem):
-        branch = Branch()
-        parser = BranchParser(branch)
-        parser.parse(elem)
-        self.target.branches.append(branch)
-
-    def _write_branches(self, elem):
-        for branch in self.target.branches:
-            parser = BranchParser(branch)
-            branch_xml = parser.xml_elem()
-            elem.append(branch_xml)
-
-    def _write_remotes(self, elem):
-        for remote in self.target.remotes:
-            parser = RemoteParser(remote)
-            remote_xml = parser.xml_elem()
-            elem.append(remote_xml)

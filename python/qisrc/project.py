@@ -2,6 +2,7 @@ import os
 import functools
 
 from qisys import ui
+import qisys.qixml
 import qisrc.git_config
 
 class GitProject(object):
@@ -12,6 +13,14 @@ class GitProject(object):
         self.branches = list()
         self.remotes = list()
         self.review = False
+
+    def load_xml(self, xml_elem):
+        parser = GitProjectParser(self)
+        parser.parse(xml_elem)
+
+    def dump_xml(self):
+        parser = GitProjectParser(self)
+        return parser.xml_elem(node_name="project")
 
     @property
     def default_branch(self):
@@ -182,3 +191,36 @@ class GitProject(object):
 
     def __repr__(self):
         return "<GitProject in %s>" % self.src
+##
+# Parsing
+
+class GitProjectParser(qisys.qixml.XMLParser):
+    def __init__(self, target):
+        super(GitProjectParser, self).__init__(target)
+        self._ignore = ["worktree", "path", "clone_url",
+                        "default_branch", "review_url"]
+        self._required = ["src"]
+
+    def _parse_remote(self, elem):
+        remote = qisrc.git_config.Remote()
+        parser = qisrc.git_config.RemoteParser(remote)
+        parser.parse(elem)
+        self.target.remotes.append(remote)
+
+    def _parse_branch(self, elem):
+        branch = qisrc.git_config.Branch()
+        parser = qisrc.git_config.BranchParser(branch)
+        parser.parse(elem)
+        self.target.branches.append(branch)
+
+    def _write_branches(self, elem):
+        for branch in self.target.branches:
+            parser = qisrc.git_config.BranchParser(branch)
+            branch_xml = parser.xml_elem()
+            elem.append(branch_xml)
+
+    def _write_remotes(self, elem):
+        for remote in self.target.remotes:
+            parser = qisrc.git_config.RemoteParser(remote)
+            remote_xml = parser.xml_elem()
+            elem.append(remote_xml)

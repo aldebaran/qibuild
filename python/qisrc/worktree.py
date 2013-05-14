@@ -4,7 +4,6 @@ from qisys import ui
 import qisys.worktree
 import qisrc.git
 import qisrc.sync
-import qisrc.git_config
 import qisrc.project
 
 class NotInAGitRepo(Exception):
@@ -62,8 +61,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             git_project = qisrc.project.GitProject(self, worktree_project)
             git_elem = self._get_elem(project_src)
             if git_elem is not None:
-                git_parser = qisrc.git_config.GitProjectParser(git_project)
-                git_parser.parse(git_elem)
+                git_project.load_xml(git_elem)
             self.git_projects.append(git_project)
             git_project.apply_config()
 
@@ -174,8 +172,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     def save_project_config(self, project):
         """ Save the project instance in .qi/git.xml """
-        parser = qisrc.git_config.GitProjectParser(project)
-        project_xml = parser.xml_elem(node_name="project")
+        project_xml = project.dump_xml()
         self._set_elem(project.src, project_xml)
         qisys.qixml.write(self._root_xml, self.git_xml)
 
