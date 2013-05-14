@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 def test_read_deps(build_worktree):
     build_worktree.create_project("world")
     build_worktree.create_project("hello", depends=["world"])
@@ -23,3 +25,10 @@ def test_changing_active_config_changes_projects_build_dir(build_worktree, toolc
     toolchains.create("foo")
     build_worktree.set_active_config("foo")
     assert "foo" in  world_proj.build_directory
+
+def test_project_names_are_unique(build_worktree):
+    build_worktree.create_project("foo")
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        build_worktree.create_project("foo", src="bar/foo")
+    assert "two projects with the same name" in str(e.value)

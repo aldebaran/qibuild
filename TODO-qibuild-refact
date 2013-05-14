@@ -45,8 +45,6 @@
 * remove qibuild.configstore, use XML for toolchain
   storage
 
-* check that qibuild project names are unique
-
 * re-add qisrc foreach -p
 
 * qibuild_action("configure")

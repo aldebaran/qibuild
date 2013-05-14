@@ -15,7 +15,8 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         self.worktree = worktree
         self.root = self.worktree.root
         self.build_config = qibuild.build_config.CMakeBuildConfig(self)
-        self.build_projects = self._load_build_projects()
+        self.build_projects = list()
+        self._load_build_projects()
         worktree.register(self)
 
     @property
@@ -54,23 +55,23 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
 
     def on_project_added(self, project):
         """ Called when a new project has been registered """
-        self.build_projects = self._load_build_projects()
+        self._load_build_projects()
 
     def on_project_removed(self, project):
         """ Called when a build project has been removed """
-        self.build_projects = self._load_build_projects()
+        self._load_build_projects()
 
     def _load_build_projects(self):
         """ Create BuildProject for every buildable project in the
         worktree
 
         """
-        build_projects = list()
+        self.build_projects = list()
         for wt_project in self.worktree.projects:
             build_project = new_build_project(self, wt_project)
             if build_project:
-                build_projects.append(build_project)
-        return build_projects
+                self.check_unique_name(build_project)
+                self.build_projects.append(build_project)
 
     def configure_build_profile(self, name, flags):
         """ Configure a build profile for the worktree """
@@ -97,6 +98,18 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
 
         """
         self.build_config.set_active_config(active_config)
+
+    def check_unique_name(self, new_project):
+        for project in self.build_projects:
+            if project.name == new_project.name:
+                raise Exception("""\
+Found two projects with the same name ({project.name})
+In:
+* {project.path}
+* {new_project.path}
+""".format(project=project, new_project=new_project))
+
+
 
 
 def new_build_project(build_worktree, project):
