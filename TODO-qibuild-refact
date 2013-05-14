@@ -1,4 +1,3 @@
-* move FakeGit inside qisrc.tests.conftests
 * rename qisrc.manifest.Manifest -> qisrc.manifest.RemoteManifest
 
 * use qisys.ui.info_count everywhere
