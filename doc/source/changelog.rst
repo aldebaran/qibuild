@@ -270,7 +270,7 @@ Command line
 CMake
 +++++
 
-* Added :cmake:function:`qi_state_dir`
+* Added :cmake:function:`qi_stage_dir`
 
 Python
 ++++++
