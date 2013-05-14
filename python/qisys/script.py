@@ -245,7 +245,6 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
 
     pargs = parser.parse_args(args)
     ui.configure_logging(pargs)
-    qisys.command.configure_call(pargs)
     module = action_modules[pargs.action]
     _dump_arguments(module.__name__, pargs)
     main_wrapper(module, pargs)
