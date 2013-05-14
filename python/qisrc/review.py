@@ -29,6 +29,17 @@ def fetch_gerrit_hook_ssh(path, username, server, port=22):
     qisys.command.call(cmd, quiet=True)
 
 
+def check_gerrit_connection(username, server, ssh_port=29418):
+    """ Check that the user can connect to gerrit with ssh """
+    cmd = ["ssh", "-p", str(ssh_port),
+        "%s@%s" % (username, server),
+        "gerrit", "version"]
+    try:
+        qisys.command.call(cmd, quiet=True)
+    except qisys.command.CommandFailedException:
+        return False
+    return True
+
 def ask_gerrit_username(server, ssh_port=29418):
     """ Run a wizard to try to configure gerrit access
 
@@ -37,13 +48,30 @@ def ask_gerrit_username(server, ssh_port=29418):
 
     """
     ui.info(ui.green, "Configuring gerrit ssh access ...")
-    # works on UNIX and git bash:
-    current_user = os.environ.get("USERNAME")
-    username = qisys.interact.ask_string("Please enter your username",
-                                         default=current_user)
-    if username:
+    username = os.environ.get("USER")
+    if not username:
+        username = os.environ.get("USERNAME")
+        if not username:
+            username = qisys.interact.ask_string("Please enter your username")
+            if not username:
+                return
+    ui.info("Checking gerrit connection with %s@%s:%i" %
+            (username, server, ssh_port))
+    if check_gerrit_connection(username, server, ssh_port=ssh_port):
+        ui.info("Success")
         return username
-    return None
+
+    ui.warning("Could not connect to ssh using username", username)
+    try_other = qisys.interact.ask_yes_no("Do you want to try with another username?")
+    if not try_other:
+        return
+
+    username = qisys.interact.ask_string("Please enter your username")
+    if not username:
+        return
+
+    if check_gerrit_connection(username, server, ssh_port=ssh_port):
+        return username
 
 def get_gerrit_username(server, ssh_port):
     """ Get the username to use when using code review.
@@ -66,24 +94,12 @@ def get_gerrit_username(server, ssh_port):
     qibuild_cfg.write()
     return username
 
-def warn_gerrit():
-    """Emit a warning telling the user that:
-
-    * connection to gerrit has failed
-    * qisrc push won't work
-
-    """
-    ui.warning("""Failed to configure gerrit connection
-`qisrc push` won't work
-When you have resolved this problem, just re-run ``qisrc sync -a``""")
 
 def setup_project(project):
-    """ Setup a project for code review.
+    """ Setup a project for code review:
 
-     * Add the hook
-
-     :return: a boolean to tell whether it's worth trying
-              for other projects
+    If there is :py:class:`.Remote` configured for code review,
+    using the ssh protocol, use it to fetch the gerrit ``commit-msg`` hook
 
     """
     remote = project.review_remote
@@ -98,6 +114,7 @@ def setup_project(project):
     ui.info("Configuring", project.src, "for code review ...", end="")
     if remote.protocol == "ssh":
         fetch_gerrit_hook_ssh(project.path, username, server, ssh_port=ssh_port)
+    # FIXME: make it work with http too?
     ui.info(ui.green, "[OK]")
     return True
 
