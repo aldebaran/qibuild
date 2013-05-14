@@ -216,7 +216,7 @@ class RepoConfigParser(qisys.qixml.XMLParser):
     def _parse_attributes(self):
         self.target.project = self._root.get("project")
         if not self.target.project:
-            raise ManifestParser("Missing 'project' attribute")
+            raise ManifestError("Missing 'project' attribute")
         self.target.src = self._root.get("src")
         self.target.default_branch = self._root.get("default_branch", "master")
         self.target.remote_name = self._root.get("remote", "origin")
