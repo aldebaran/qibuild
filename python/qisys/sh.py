@@ -415,33 +415,6 @@ def which(program):
     return find_program(program)
 
 
-def run(program, args):
-    """ exec a process.
-
-    * linux: this will call exec and replace the current process
-    * windows: this will call spawn and wait till the end
-
-    Example::
-
-        run("python.exe", "toto.py")
-
-    """
-    real_args = [program]
-    real_args.extend(args)
-
-    if sys.platform.startswith("win32"):
-        retcode = 0
-        try:
-            retcode = subprocess.call(real_args)
-        except subprocess.CalledProcessError:
-            print "problem when calling", program
-            retcode = 2
-        sys.exit(retcode)
-        return
-
-    os.execvp(program, real_args)
-
-
 def to_posix_path(path, fix_drive=False):
     """
     Returns a POSIX path from a DOS path

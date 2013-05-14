@@ -65,8 +65,6 @@
 
 * add qibuild test --failed
 
-*  move `qisy.sh.run` to `qisys.command`
-
 * remove worktree args from actions, just build then on
   the fly when needed
 
