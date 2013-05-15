@@ -243,8 +243,6 @@ def _ask_module_info(name, headers, libraries):
 
     """
     patterns = [name]
-    question = "Enter the package name:"
-    name = qisys.interact.ask_string(question, default=name)
     header = None
     if len(headers) > 0:
         patterns = [pattern.lower() for pattern in patterns]
