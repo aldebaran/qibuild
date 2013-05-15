@@ -144,9 +144,13 @@ endfunction()
 
 
 
-#! Create a library
+#! Create a library or a module
 #
 # The target name should be unique.
+#
+# To build a module (library loaded at runtime), use::
+#
+#   qi_create_lib(myLib MODULE SRC ....)
 #
 # If you need your library to be static, use::
 #
@@ -171,6 +175,9 @@ endfunction()
 #
 # \arg:name the target name
 # \argn: sources files, like the SRC group, argn and SRC will be merged
+# \flag:STATIC force a static library
+# \flag:SHARED force a shared library
+# \flag:MODULE build a module (library loadable at runtime)
 # \flag:NO_INSTALL Do not create install rules for the target
 # \flag:EXCLUDE_FROM_ALL Do not include the target in the 'all' target,
 #                        This target will not be built by default, you will
@@ -192,7 +199,7 @@ endfunction()
 # \example:target
 function(qi_create_lib name)
   cmake_parse_arguments(ARG
-    "NOBINDLL;NO_INSTALL;NO_FPIC;SHARED;STATIC;INTERNAL"
+    "NOBINDLL;NO_INSTALL;NO_FPIC;SHARED;STATIC;MODULE;INTERNAL"
     "SUBFOLDER"
     "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
@@ -243,6 +250,9 @@ function(qi_create_lib name)
     set(_type "STATIC")
   endif()
 
+  if(ARG_MODULE)
+    set(_type "MODULE")
+  endif()
 
   qi_verbose("create lib ${name} ${_type}")
 
