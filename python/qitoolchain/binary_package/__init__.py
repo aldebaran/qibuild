@@ -72,7 +72,7 @@ def open_package(package_path):
         raise SystemError(mess)
     package = None
     typename = _guess_package_type(package_path)
-    if typename is None:
+    if not typename:
         mess = "Unknown package type"
         raise BinaryPackageException(mess)
     generator = _PKG_TYPES.get(typename).get('class')

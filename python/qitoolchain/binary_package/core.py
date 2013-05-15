@@ -65,7 +65,7 @@ class BinaryPackage:
         :return: the metadata dictionary
 
         """
-        if self.metadata is not None:
+        if self.metadata:
             return
         self._load()
         if not "name" in self.metadata:
@@ -79,7 +79,7 @@ class BinaryPackage:
 
         """
         # Cache the result inside the Package instance:
-        if self.metadata is not None:
+        if self.metadata:
             return self.metadata
         self.load()
         return self.metadata
