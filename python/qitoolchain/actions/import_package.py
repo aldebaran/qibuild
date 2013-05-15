@@ -50,10 +50,10 @@ def do(args):
     package_path = os.path.abspath(args.package_path)
     dest_dir     = args.dest_dir
     other_names  = list()
-    if dest_dir is None:
+    if not dest_dir:
         dest_dir = os.path.dirname(package_path)
     if os.path.isdir(package_path):
-        if package_name is None:
+        if not package_name:
             message = """
 Error: when turning an install directory into a qiBuild package,
 a package name must be passed to the command line.
@@ -63,7 +63,7 @@ a package name must be passed to the command line.
     else:
         package = open_package(package_path)
         package_metadata = package.get_metadata()
-        if package_name is None:
+        if not package_name:
             package_name = package_metadata['name']
             other_names.append(package_metadata['name'])
     package.name = package_name
@@ -81,7 +81,6 @@ Importing '{1}' in the toolchain {0} ...
     with qisys.sh.TempDir() as tmp:
         question = "Enter the package name:"
         package.name = qisys.interact.ask_string(question, default=package.name)
-
         qibuild_package_path = convert_to_qibuild(package, output_dir=tmp,
                                                   package_metadata={'name': package.name})
         add_cmake_module_to_archive(qibuild_package_path, package.name)
