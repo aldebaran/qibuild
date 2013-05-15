@@ -133,6 +133,8 @@ def convert_to_qibuild(package, package_metadata=None,
         for key in ['version', 'revision', 'arch', 'arch_variant']:
             value = metadata.get(key)
             if value:
+                if key == 'revision':
+                    value = "r" + value
                 output_name += "-" + value
         output_name += ".zip"
     qisys.sh.mkdir(output_dir, recursive=True)
