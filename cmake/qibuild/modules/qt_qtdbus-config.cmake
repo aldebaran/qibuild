@@ -6,7 +6,7 @@ get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 include("${_ROOT_DIR}/qtutils.cmake")
 
 set(_suffix "QTDBUS")
-set(_libame "QtDbus")
+set(_libame "QtDBus")
 
 qt_flib(${_suffix} ${_libame})
 if(UNIX AND NOT APPLE)
