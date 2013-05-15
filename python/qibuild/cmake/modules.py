@@ -404,7 +404,7 @@ def write_cmake_module(package_root, name, contents):
     :return: the path of the generated CMake module
 
     """
-    module_name = name + ".config.cmake"
+    module_name = name + "-config.cmake"
     module_path = os.path.join(package_root, "share", "cmake", name)
     qisys.sh.mkdir(module_path, recursive=True)
     module_path = os.path.join(module_path, module_name)
