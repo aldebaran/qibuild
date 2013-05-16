@@ -11,6 +11,7 @@ class LinguistWorkTree(qisys.worktree.WorkTreeObserver):
         self.root = worktree.root
         self.linguist_projects = list()
         self._load_linguist_projects()
+        worktree.register(self)
 
     def _load_linguist_projects(self):
         self.linguist_projects = list()
