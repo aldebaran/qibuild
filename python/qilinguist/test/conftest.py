@@ -8,7 +8,8 @@ class QiLinguistAction(TestAction):
     def __init__(self, worktree_root=None):
         super(QiLinguistAction, self).__init__("qilinguist.actions")
         self.build_worktree = TestBuildWorkTree()
-        self.trad = self.build_worktree.add_test_project("translate")
+        self.trad = self.build_worktree.add_test_project("translateme/gettext",
+                                                        name="translateme-gettext")
 
     def create_po(self, proj):
         fr_FR_po_file = os.path.join(proj.path, "po", "fr_FR.po")

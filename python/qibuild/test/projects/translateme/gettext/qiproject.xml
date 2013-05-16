@@ -1,5 +1,5 @@
 <project version="3">
-  <qibuild name="translate" />
+  <qibuild name="translateme-gettext" />
   <translate
     name="translate"
     domain="translate"
