@@ -189,8 +189,6 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
         if not build_proj:
             raise CouldNotGuessProjectName()
 
-        self.build_worktree.build_projects.append(build_proj)
-
         return self.parse_one_project(args, build_proj.name)
 
     def parse_one_project(self, args, project_arg):
