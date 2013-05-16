@@ -35,7 +35,8 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
                          "(looked in %s )" % input_file, "\n",
                          "Did you run qilinguist update?")
                 continue
-            output_file = os.path.join(self.po_path, locale + ".qm")
+            output_file = os.path.join(self.po_path,
+                                       self.name + "_" + locale + ".qm")
             cmd = ["lrelease", "-compress",
                    input_file, "-qm", output_file]
             qisys.command.call(cmd, cwd=self.path)
