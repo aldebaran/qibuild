@@ -1,3 +1,5 @@
 po/share
 *.po
 *.pot
+*.ts
+*.qm
