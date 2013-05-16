@@ -7,7 +7,7 @@ V3.0
 -----
 
 General
--------
++++++++
 
 * Tons of bug fixes, massive Python refactoring
 
@@ -61,6 +61,12 @@ qitoolchain
 ~~~~~~~~~~~
 
 * Add ``qitoolchain set-default``
+
+qilinguist
+~~~~~~~~~~~
+
+* ``qilinguist`` can now be called without any project name
+* Add ``qilinguist list``
 
 
 Config files
