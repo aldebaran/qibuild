@@ -1,4 +1,5 @@
-# Make all fixtures from qisys.test available to qibuild.test
+import subprocess
+
 from qisys.test.conftest import *
 from qitoolchain.test.conftest import *
 
@@ -73,7 +74,14 @@ int main()
         this_dir = os.path.dirname(__file__)
         src_path = os.path.join(this_dir, "projects", src)
         dest_path = os.path.join(self.root, src)
-        qisys.sh.install(src_path, dest_path)
+        # assume tests are run from a git clone of qibuild:
+        process = subprocess.Popen(["git", "ls-files", "."], cwd=src_path,
+                                   stdout=subprocess.PIPE)
+        (out, _) = process.communicate()
+        for filename in out.splitlines():
+            src_file = os.path.join(src_path, filename)
+            dest_file = os.path.join(dest_path, filename)
+            qisys.sh.install(src_file, dest_file, quiet=True)
         self.worktree.add_project(src)
         # using raises=False for convert tests
         return self.get_build_project(name, raises=False)
