@@ -63,7 +63,7 @@ class GettextProject(qilinguist.project.LinguistProject):
     def extract_pot_file(self):
         """Extract sentence from source file and generate POT file"""
         # get input files and directory
-        input_files = parse_potfiles_in(self.potfiles_in)
+        input_files = self.get_sources()
 
         cmd = ["xgettext", "--default-domain=" + self.domain]
         cmd.extend(["--keyword=_", "--keyword=translate:1,1t",
@@ -163,15 +163,3 @@ class GettextProject(qilinguist.project.LinguistProject):
 
     def __repr__(self):
         return "<GettextProject %s in %s>" % (self.name, self.src)
-
-def parse_potfiles_in(file_path):
-    """Parse POTFILES.in.
-
-    """
-    res = list()
-    with open(file_path, "r") as fp:
-        for line in fp:
-            if line.startswith("#"):
-                continue
-            res.append(line.strip())
-    return res

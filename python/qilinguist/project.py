@@ -37,6 +37,19 @@ class LinguistProject(object):
             raise Exception(mess.format(self.name, self.src))
         return res
 
+    def get_sources(self):
+        """ Parse po/POTFILES.in and return a list of filenames
+        relative to self.path
+
+        """
+        res = list()
+        with open(self.potfiles_in, "r") as fp:
+            for line in fp:
+                if line.startswith("#"):
+                    continue
+                res.append(line.strip())
+        return res
+
     @abc.abstractmethod
     def update(self):
         pass
