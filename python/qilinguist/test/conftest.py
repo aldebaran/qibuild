@@ -1,31 +1,93 @@
-import pytest
+import os
 
-def clean_trad(proj):
-    import os
-    import qisys.sh
-    pot_file = os.path.join(proj.path, "po", "translate.pot")
-    fr_FR_po_file = os.path.join(proj.path, "po", "fr_FR.po")
-    en_US_po_file = os.path.join(proj.path, "po", "en_US.po")
-    qisys.sh.rm(en_US_po_file)
-    qisys.sh.rm(fr_FR_po_file)
-    qisys.sh.rm(pot_file)
-    po_share = os.path.join(proj.path, "po", "share")
-    qisys.sh.rm(po_share)
+from qisys.test.conftest import *
+from qibuild.test.conftest import *
 
-@pytest.fixture()
-def toc(request):
-    from qibuild.test.test_toc import TestToc
-    test_toc = TestToc()
-    request.addfinalizer(test_toc.clean)
-    request.toc = test_toc.toc
-    return test_toc.toc
 
-@pytest.fixture()
-def trad(request):
-    import functools
-    proj = request.toc.get_project("translate")
-    clean_func = functools.partial(clean_trad, proj)
-    clean_func()
-    request.addfinalizer(clean_func)
-    return proj
+class QiLinguistAction(TestAction):
+    def __init__(self, worktree_root=None):
+        super(QiLinguistAction, self).__init__("qilinguist.actions")
+        self.build_worktree = TestBuildWorkTree()
+        self.trad = self.build_worktree.add_test_project("translate")
 
+    def create_po(self, proj):
+        fr_FR_po_file = os.path.join(proj.path, "po", "fr_FR.po")
+        en_US_po_file = os.path.join(proj.path, "po", "en_US.po")
+        fr_file = open(fr_FR_po_file, 'wb')
+        en_file = open(en_US_po_file, 'wb')
+        fr_file.write("""
+    # French translations for qi package
+    # Traductions fran\xc3\xa7aises du paquet qi.
+    # Copyright (C) 2012 THE qi'S COPYRIGHT HOLDER
+    # This file is distributed under the same license as the qi package.
+    # Automatically generated, 2012.
+    #
+    msgid ""
+    msgstr ""
+    "Project-Id-Version: qi 1.16\\n"
+    "Report-Msgid-Bugs-To: \\n"
+    "POT-Creation-Date: 2012-10-09 15:15+0200\\n"
+    "PO-Revision-Date: 2012-10-09 15:15+0200\\n"
+    "Last-Translator: Automatically generated\\n"
+    "Language-Team: none\\n"
+    "Language: fr\\n"
+    "MIME-Version: 1.0\\n"
+    "Content-Type: text/plain; charset=UTF-8\\n"
+    "Content-Transfer-Encoding: 8bit\\n"
+    "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
+    "X-Language: fr_FR\\n"
+
+    #: main.cpp:15
+    msgid "Brian is in the kitchen."
+    msgstr "Brian est dans la cuisine."
+
+    #: main.cpp:13
+    msgid "Hi, my name is NAO."
+    msgstr "Bonjour, mon nom est NAO."
+
+    #: main.cpp:14
+    msgid "Where is Brian?"
+    msgstr "O\xc3\xb9 est Brian ?"
+    """)
+        en_file.write("""
+    # English translations for qi package.
+    # Copyright (C) 2012 THE qi'S COPYRIGHT HOLDER
+    # This file is distributed under the same license as the qi package.
+    # Automatically generated, 2012.
+    #
+    msgid ""
+    msgstr ""
+    "Project-Id-Version: qi 1.16\\n"
+    "Report-Msgid-Bugs-To: \\n"
+    "POT-Creation-Date: 2012-10-09 15:15+0200\\n"
+    "PO-Revision-Date: 2012-10-09 15:15+0200\\n"
+    "Last-Translator: Automatically generated\\n"
+    "Language-Team: none\\n"
+    "Language: en_US\\n"
+    "MIME-Version: 1.0\\n"
+    "Content-Type: text/plain; charset=UTF-8\\n"
+    "Content-Transfer-Encoding: 8bit\\n"
+    "Plural-Forms: nplurals=2; plural=(n != 1);\\n"
+    "X-Language: en_US\\n"
+
+    #: main.cpp:15
+    msgid "Brian is in the kitchen."
+    msgstr "Brian is in the kitchen."
+
+    #: main.cpp:13
+    msgid "Hi, my name is NAO."
+    msgstr "Hi, my name is NAO."
+
+    #: main.cpp:14
+    msgid "Where is Brian?"
+    msgstr "Where is Brian?"
+
+    """)
+        fr_file.close()
+        en_file.close()
+
+
+@pytest.fixture
+def qilinguist_action(cd_to_tmpdir):
+    res = QiLinguistAction()
+    return res

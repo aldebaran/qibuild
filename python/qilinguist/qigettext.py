@@ -2,136 +2,176 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-"""Library to extract, generate, update and compile translatable sentences with gettext"""
+"""Library to extract, generate, update and compile translatable
+sentences with gettext
+
+"""
 
 import os
+import functools
+import subprocess
+
 from qisys import ui
-import qisys
 import qisys.command
+import qilinguist.project
 
-def generate_pot_file(text_domain, input_files, output_file,
-                      input_dir=None, output_dir=None):
-    """generate POT. Extract gettext strings from source files
+class GettextProject(qilinguist.project.LinguistProject):
 
-    :param text_domain: Use for output
-    :param input_file:  List of input file
-    :param output_file: Write output to specified file
-    :param input_dir:   Add directories to list for input files search
-    :param output_dir:  Output file will be placed here
+    def __init__(self, *args, **kwargs):
+        super(GettextProject, self).__init__(*args, **kwargs)
 
-    """
-    cmd = ["xgettext", "--default-domain=" + text_domain]
-    cmd.extend(["--keyword=_", "--keyword=translate:1,1t",
-               "--keyword=translate:1c,2,2t", "--keyword=translate:1,2,3t",
-               "--keyword=translate:1c,2,3,4t", "--keyword=gettext:1",
-               "--keyword=pgettext:1c,2", "--keyword=ngettext:1,2",
-               "--keyword=npgettext:1c,2,3", "--keyword=tr:1,1t",
-               "--keyword=tr:1c,2,2t", "--keyword=tr:1,2,3t",
-               "--keyword=tr:1c,2,3,4t"])
-    # generate sorted output
-    cmd.append("--sort-output")
 
-    # output files will be placed here
-    if output_dir:
-        cmd.extend(["--output-dir", output_dir])
+    @property
+    def pot_file(self):
+        return os.path.join(self.po_path, self.domain + ".pot")
 
-    # write output to specified file
-    cmd.extend(["--output", output_file])
+    def get_po_file(self, locale):
+        return os.path.join(self.po_path, locale + ".po")
 
-    # add directories to list for input files search
-    if input_dir:
-        cmd.extend(["--directory", input_dir])
+    @property
+    def mo_path(self):
+        mo_path = os.path.join(self.po_path, "share", "locale", self.name)
+        qisys.sh.mkdir(mo_path, recursive=True)
+        return mo_path
 
-    #  List of input file
-    if input_files:
+    def update(self):
+        """ Read the source files, generate the
+        template, generate the catalogs
+
+        """
+        self.extract_pot_file()
+
+        # for each locale generate or update PO file
+        for locale in self.linguas:
+            # check if PO file exists
+            output_file = self.get_po_file(locale)
+            if os.path.exists(output_file):
+                # Update PO file if it exists
+                self.update_po_file(locale)
+            else:
+                # generate PO file if it doesn't exist
+                self.generate_po_file(locale)
+
+    def release(self):
+        """ Compile every catalog """
+        mo_output_dir = os.path.join(self.path, "po",
+                                     "share", "locale", self.name)
+        qisys.sh.mkdir(mo_output_dir, recursive=True)
+        for locale in self.linguas:
+            self.generate_mo_file(locale)
+
+    def extract_pot_file(self):
+        """Extract sentence from source file and generate POT file"""
+        # get input files and directory
+        input_files = parse_potfiles_in(self.potfiles_in)
+
+        cmd = ["xgettext", "--default-domain=" + self.domain]
+        cmd.extend(["--keyword=_", "--keyword=translate:1,1t",
+                "--keyword=translate:1c,2,2t", "--keyword=translate:1,2,3t",
+                "--keyword=translate:1c,2,3,4t", "--keyword=gettext:1",
+                "--keyword=pgettext:1c,2", "--keyword=ngettext:1,2",
+                "--keyword=npgettext:1c,2,3", "--keyword=tr:1,1t",
+                "--keyword=tr:1c,2,2t", "--keyword=tr:1,2,3t",
+                "--keyword=tr:1c,2,3,4t"])
+        # generate sorted output
+        cmd.append("--sort-output")
+
+        cmd.extend(["--output-dir", self.po_path])
+        cmd.extend(["--output", self.pot_file])
+
+        # add directories to list for input files search
+        cmd.extend(["--directory", self.path])
         cmd.extend(input_files)
 
-    qisys.command.call(cmd)
+        qisys.command.call(cmd)
 
-def generate_po_file(input_file, output_file, locale, output_dir=None):
-    """generate PO file for locale
+    # pylint: disable-msg=E0213
+    def need_pot_file(func):
+        @functools.wraps(func)
+        def new_func(self, *args, **kwargs):
+            if not os.path.exists(self.pot_file):
+                ui.error("No pot file found. Maybe no translatable strings "
+                        "were found?")
+                return
+            #pylint: disable-msg=E1102
+            res = func(self, *args, **kwargs)
+            return res
+        return new_func
 
-    :param input_file:  Input POT file
-    :param output_file: Write output to specified PO file
-    :param locale:      Set target locales
-    :param output_dir:  Output file will be placed here
-    """
-    # init
-    cmd = ["msginit", "--no-translator"]
-    # set target locale
-    cmd.extend(["--locale", locale])
+    @need_pot_file
+    def update_po_file(self, locale):
+        """Update PO file from POT"""
+        update_file = self.get_po_file(locale)
 
-    out = output_dir if output_dir else ""
+        cmd = ["msgmerge", "--sort-output", "--update", "--backup=off"]
+        cmd.extend(["--directory", self.po_path])
+        cmd.append(update_file)
+        cmd.append(self.pot_file)
 
-    out = os.path.join(out, output_file)
-    # write output to specified PO file
-    cmd.extend(["--output-file", out])
+        ui.info(ui.green, "Updating", ui.reset, ui.bold,
+                os.path.relpath(update_file, self.path))
+        qisys.command.call(cmd, quiet=True)
 
-    # input POT file
-    cmd.extend(["--input", input_file])
+    def generate_po_file(self, locale):
+        """Generate PO file"""
+        output_file = self.get_po_file(locale)
 
-    ui.info(ui.green, "Creating", ui.reset, ui.bold, out)
-    qisys.command.call(cmd, quiet=True)
+        cmd = ["msginit", "--no-translator"]
+        cmd.extend(["--locale", locale])
+        cmd.extend(["--output-file", output_file])
+        cmd.extend(["--input", self.pot_file])
 
-def generate_mo_file(input_file, output_file, app_name, input_dir=None, output_dir=None):
-    """generate MO file
+        ui.info(ui.green, "Creating", ui.reset, ui.bold,
+                os.path.relpath(output_file, self.path))
+        # remove annoying stderr output
+        subprocess.check_call(cmd, stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT)
 
-    :param input_file:  Input PO file
-    :param output_file: Write output to specified file
-    :param input_dir:   Add directories to list for input files search
-    :param output_dir:  Output file will be placed here
 
-    """
-    # check PO file
-    cmd = ["msgfmt", "--check", "--statistics"]
+    def generate_mo_file(self, locale):
+        """ Generate .mo file for the given locale
 
-    out = os.path.join(output_dir, output_file) if output_dir else output_file
+        """
+        ui.info(ui.green, "Generating translation for", ui.reset,
+                ui.bold, locale)
+        input_file = self.get_po_file(locale)
+        if not os.path.exists(input_file):
+            ui.error("No .po found for locale: ", locale, "\n",
+                     "(looked in %s)" % input_file, "\n",
+                     "Did you run qilinguist update?")
+            return
 
-    to_make = os.path.dirname(out)
-    qisys.sh.mkdir(to_make, recursive=True)
+        output_file = os.path.join(self.mo_path, locale, "LC_MESSAGES",
+                                   self.domain + ".mo")
+        to_make = os.path.dirname(output_file)
+        qisys.sh.mkdir(to_make, recursive=True)
 
-    conf_file = os.path.join(input_dir, "share", "locale", app_name, ".confintl")
-    if not os.path.exists(conf_file):
+        cmd = ["msgfmt", "--check", "--statistics"]
+
+        # required by libqi:
+        conf_file = os.path.join(self.mo_path, ".confintl")
         with open(conf_file, "w") as fp:
             fp.write("# THIS FILE IS AUTOGENERATED\n"
-                     "#Do not delete or modify it\n"
-                     "# This file is used to find translation dictionaries\n")
+                    "#Do not delete or modify it\n"
+                    "# This file is used to find translation dictionaries\n")
 
-    # write output to specified MO file
-    cmd.extend(["--output-file", out])
+        cmd.extend(["--output-file", output_file])
+        cmd.extend(["--directory", self.po_path])
+        cmd.append(input_file)
 
-    if input_dir:
-        cmd.extend(["--directory", input_dir])
+        qisys.command.call(cmd)
 
-    # Input PO file
-    cmd.append(input_file)
+    def __repr__(self):
+        return "<GettextProject %s in %s>" % (self.name, self.src)
 
-    ui.info(ui.green, "Generating", ui.reset, ui.bold, out)
-    qisys.command.call(cmd)
-
-def update_po_file(input_file, update_file, input_dir=None, update_dir=None):
-    """update PO file from new POT
-
-    :param input_file:  Input POT file
-    :param update_file: Write output to specified file
-    :param input_dir:   Add directories to list for input files search
-    :param update_dir:  Output file will be placed here
+def parse_potfiles_in(file_path):
+    """Parse POTFILES.in.
 
     """
-    # init command sorted update_file
-    # update update (do nothing if update_file already up to date)
-    cmd = ["msgmerge", "--sort-output", "--update", "--backup=off"]
-
-    if input_dir:
-        cmd.extend(["--directory", input_dir])
-
-    update = os.path.join(update_dir, update_file) if update_dir else update_file
-
-    # write update to specified MO file
-    cmd.append(update)
-
-    # Input PO file
-    cmd.append(input_file)
-
-    ui.info(ui.green, "Updating", ui.reset, ui.bold, update)
-    qisys.command.call(cmd, quiet=True)
+    res = list()
+    with open(file_path, "r") as fp:
+        for line in fp:
+            if line.startswith("#"):
+                continue
+            res.append(line.strip())
+    return res

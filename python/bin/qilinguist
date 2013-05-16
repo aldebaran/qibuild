@@ -4,13 +4,12 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-"""QiLinguist command line tool.
+"""qilinguist command line tool.
+
 """
 
-# sys.path
-
-import os
 import sys
+import os
 
 if __name__ == '__main__':
     try:
@@ -19,8 +18,8 @@ if __name__ == '__main__':
         # Python < 2.7
         major = sys.version_info[0]
     if major != 2:
-        print('[WARN ]: the script was not run using Python 2, will try to ' \
-              'find it.')
+        sys.stderr.write("[WARN ]: the script was not run using Python 2, "
+                         "will try to find it.\n")
         res = 1
         try:
             import subprocess
@@ -29,6 +28,7 @@ if __name__ == '__main__':
             print(e)
         sys.exit(res)
 
+# sys.path
 def patch_sys_path():
     """
     Add self sources to sys.path, so that directly using this script
@@ -43,13 +43,15 @@ def patch_sys_path():
 
 patch_sys_path()
 
+
 import argparse
-import qibuild.script
+
+import qisys.script
 
 def main():
     parser = argparse.ArgumentParser()
-    modules = qibuild.script.action_modules_from_package("qilinguist.actions")
-    qibuild.script.root_command_main("qilinguist", parser, modules)
+    modules = qisys.script.action_modules_from_package("qilinguist.actions")
+    qisys.script.root_command_main("qilinguist", parser, modules)
 
 if __name__ == "__main__":
     main()

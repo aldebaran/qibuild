@@ -1,3 +1,8 @@
-<project name="translate">
-  <translate name="translate" domain="translate" linguas="fr_FR en_US" tr="gettext"/>
+<project version="3">
+  <qibuild name="translate" />
+  <translate
+    name="translate"
+    domain="translate"
+    linguas="fr_FR en_US"
+    tr="gettext"/>
 </project>
