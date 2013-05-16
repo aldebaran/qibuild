@@ -64,13 +64,14 @@ int main()
         self.worktree.add_project(src)
         return self.get_build_project(name)
 
-    def add_test_project(self, src, name=None):
+    def add_test_project(self, src):
         """ Copy a project, reading the sources
-        from qibuild/test/projects
+        from qibuild/test/projects/<src>
+
+        If qibuild project name cannot be read from qiproject.xml,
+        return None (useful for qibuild convert tests)
 
         """
-        if not name:
-            name = os.path.basename(src)
         this_dir = os.path.dirname(__file__)
         src_path = os.path.join(this_dir, "projects", src)
         dest_path = os.path.join(self.root, src)
@@ -82,9 +83,9 @@ int main()
             src_file = os.path.join(src_path, filename)
             dest_file = os.path.join(dest_path, filename)
             qisys.sh.install(src_file, dest_file, quiet=True)
-        self.worktree.add_project(src)
-        # using raises=False for convert tests
-        return self.get_build_project(name, raises=False)
+        worktree_project = self.worktree.add_project(src)
+        build_project = qibuild.worktree.new_build_project(self, worktree_project)
+        return build_project
 
 
 

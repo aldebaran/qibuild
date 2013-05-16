@@ -7,8 +7,7 @@ import qibuild.find
 
 def test_qt(qilinguist_action):
     build_worktree = TestBuildWorkTree()
-    project = build_worktree.add_test_project("translateme/qt",
-                                              name="translateme-qt")
+    project = build_worktree.add_test_project("translateme/qt")
     try:
         project.configure()
     except Exception:
