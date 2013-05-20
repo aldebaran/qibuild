@@ -94,7 +94,7 @@ def configure_manifest(git_worktree, args):
                                     branch=args.branch)
 
 def check_manifest(git_worktree, args):
-    if not args.name:
+    if not args.name or not args.url_or_path:
         raise Exception("Please specify a name and a path when using --check")
     name = args.name
     check_exists(git_worktree, name)

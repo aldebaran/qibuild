@@ -13,6 +13,8 @@ def test_option_checking(qisrc_action):
     assert "when using --remove" in error
     error = qisrc_action("manifest", "--check", raises=True)
     assert "when using --check" in error
+    error = qisrc_action("manifest", "--check", "foo", raises=True)
+    assert "when using --check" in error
 
 def test_list_no_groups(qisrc_action, git_server, record_messages):
     manifest_url = git_server.manifest_url
