@@ -15,7 +15,7 @@ def test_simple_read(tmpdir):
     manifest_xml.write(""" \
 <manifest>
   <remote name="origin" url="git@example.com" />
-  <repo project="foo/bar.git" src="lib/bar" default_branch="next" />
+  <repo project="foo/bar.git" src="lib/bar" branch="next" />
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
@@ -38,6 +38,21 @@ def test_no_matching_remote(tmpdir):
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert e.value.message == "No matching remote: invalid for repo foo/bar.git"
+
+def test_branch(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="bar.git" />
+  <repo project="foo.git" branch="devel" />
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    bar = manifest.repos[0]
+    foo = manifest.repos[1]
+    assert bar.default_branch == "master"
+    assert foo.default_branch == "devel"
 
 def test_review_projects(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")

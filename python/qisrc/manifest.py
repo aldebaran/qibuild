@@ -218,7 +218,7 @@ class RepoConfigParser(qisys.qixml.XMLParser):
         if not self.target.project:
             raise ManifestError("Missing 'project' attribute")
         self.target.src = self._root.get("src")
-        self.target.default_branch = self._root.get("default_branch", "master")
+        self.target.default_branch = self._root.get("branch", "master")
         self.target.remote_name = self._root.get("remote", "origin")
 
     def _write_remote_name(self, elem):
