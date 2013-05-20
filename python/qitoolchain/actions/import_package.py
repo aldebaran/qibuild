@@ -66,21 +66,22 @@ a package name must be passed to the command line.
         if package_name is None:
             package_name = package_metadata['name']
             other_names.append(package_metadata['name'])
+    package.name = package_name
     other_names.append(package_name)
     other_names = list(set(other_names))
-    # extract it to the default packages path of the toolchain
-    tc_packages_path = qitoolchain.toolchain.get_default_packages_path(toolchain.name)
-    package_dest = os.path.join(tc_packages_path, package_name)
-    qisys.sh.rm(package_dest)
+    tc_packages_path = qitoolchain.toolchain.get_default_packages_path(tc.name)
     message = """
 Importing '{1}' in the toolchain {0} ...
 """.format(toolchain.name, package_path)
     qisys.ui.info(message)
     # conversion into qiBuild
     with qisys.sh.TempDir() as tmp:
-        qibuild_package_path = convert_to_qibuild(package, output_dir=tmp)
-        add_cmake_module_to_archive(qibuild_package_path,
-                                                          package.name)
+        question = "Enter the package name:"
+        package.name = qisys.interact.ask_string(question, default=package.name)
+
+        qibuild_package_path = convert_to_qibuild(package, output_dir=tmp,
+                                                  package_metadata={'name': package.name})
+        add_cmake_module_to_archive(qibuild_package_path, package.name)
         src = os.path.abspath(qibuild_package_path)
         dst = os.path.join(dest_dir, os.path.basename(qibuild_package_path))
         dst = os.path.abspath(dst)
@@ -89,10 +90,12 @@ Importing '{1}' in the toolchain {0} ...
         qisys.sh.mv(src, dst)
         qibuild_package_path = dst
     # installation of the qiBuild package
+    package_dest = os.path.join(tc_packages_path, package.name)
+    qisys.sh.rm(package_dest)
     with qisys.sh.TempDir() as tmp:
         extracted = qisys.archive.extract(qibuild_package_path, tmp, quiet=True)
         qisys.sh.install(extracted, package_dest, quiet=True)
-    qibuild_package = qitoolchain.Package(package_name, package_dest)
+    qibuild_package = qitoolchain.Package(package.name, package_dest)
     toolchain.add_package(qibuild_package)
     # end :)
     package_content = qisys.sh.ls_r(package_dest)
@@ -112,5 +115,5 @@ Package '{1}' has been added to the toolchain '{0}'.
 
 To use this package in your project, you may want to check out:
 {3}
-""".format(toolchain.name, package_name, qibuild_package_path, modules_list)
+""".format(toolchain.name, package.name, qibuild_package_path, modules_list)
     qisys.ui.info(message)
