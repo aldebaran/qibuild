@@ -7,6 +7,7 @@ import stat
 import pytest
 
 import qisys.sh
+from qisrc.test.conftest import TestGit
 
 def test_install_ro(tmpdir):
     tmp = tmpdir.strpath
@@ -41,3 +42,16 @@ def test_is_path_inside():
                                   os.path.join("lib", "libfoo")) is False
    assert qisys.sh.is_path_inside(os.path.join("gui", "bar", "libfoo"),
                                   "lib") is False
+
+def test_copy_git_src(tmpdir):
+    src = tmpdir.mkdir("src")
+    dest = tmpdir.mkdir("dest")
+    foo_src = src.mkdir("foo")
+    foo_git = TestGit(foo_src.strpath)
+    foo_git.initialize()
+    foo_git.commit_file("a.txt", "a\n")
+    foo_git.commit_file("b.txt", "a\n")
+    foo_src.ensure("c.txt", file=True)
+    qisys.sh.copy_git_src(foo_src.strpath, dest.strpath)
+    assert dest.join("a.txt").check(file=True)
+    assert not dest.join("c.txt").check(file=True)

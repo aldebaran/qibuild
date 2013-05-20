@@ -75,14 +75,8 @@ int main()
         this_dir = os.path.dirname(__file__)
         src_path = os.path.join(this_dir, "projects", src)
         dest_path = os.path.join(self.root, src)
-        # assume tests are run from a git clone of qibuild:
-        process = subprocess.Popen(["git", "ls-files", "."], cwd=src_path,
-                                   stdout=subprocess.PIPE)
-        (out, _) = process.communicate()
-        for filename in out.splitlines():
-            src_file = os.path.join(src_path, filename)
-            dest_file = os.path.join(dest_path, filename)
-            qisys.sh.install(src_file, dest_file, quiet=True)
+        qisys.sh.copy_git_src(src_path, dest_path)
+
         worktree_project = self.worktree.add_project(src)
         build_project = qibuild.worktree.new_build_project(self, worktree_project)
         return build_project

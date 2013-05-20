@@ -256,6 +256,20 @@ def safe_copy(src, dest):
             return
     shutil.copy(src, dest)
 
+def copy_git_src(src, dest):
+    """ Copy a source to a destination but only copy the
+    files under version control.
+    Assumes that ``src`` is inside a git worktree
+
+    """
+    process = subprocess.Popen(["git", "ls-files", "."], cwd=src,
+                                stdout=subprocess.PIPE)
+    (out, _) = process.communicate()
+    for filename in out.splitlines():
+        src_file = os.path.join(src, filename)
+        dest_file = os.path.join(dest, filename)
+        install(src_file, dest_file, quiet=True)
+
 
 def rm(name):
     """This one can take a file or a directory.
