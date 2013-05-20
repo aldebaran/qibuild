@@ -318,6 +318,8 @@ class Toolchain(object):
             mess  = "Could not remove package %s from toolchain %s\n" % (name, self.name)
             mess += "No such package"
             raise Exception(mess)
+
+        qisys.sh.rm(self.get(name))
         config.remove_section(package_section)
 
         with open(cfg_path, "w") as fp:
