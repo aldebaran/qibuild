@@ -13,11 +13,16 @@ def check_ssh_connection():
     if not rsync:
         return False
 
-    retcode = qisys.command.call(["ssh", "localhost", "date"], ignore_ret_code=True)
+    retcode = qisys.command.call(["ssh", "localhost", "true"], ignore_ret_code=True)
     if retcode != 0:
         return False
 
     return True
+
+def get_ssh_url(tmpdir):
+    username = os.environ.get("LOGNAME")
+    url = "%s@localhost:%s" % (username, tmpdir.strpath)
+    return url
 
 
 def test_deploying_to_localhost(qibuild_action, tmpdir):
@@ -25,7 +30,7 @@ def test_deploying_to_localhost(qibuild_action, tmpdir):
     if not check_ssh_connection():
         return
 
-    url = "%s@localhost:%s" % (os.getlogin(), tmpdir.strpath)
+    url = get_ssh_url(tmpdir)
 
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
@@ -42,7 +47,7 @@ def test_deploying_to_several_urls(qibuild_action, tmpdir):
     if not check_ssh_connection():
         return
 
-    url = "%s@localhost:%s" % (os.getlogin(), tmpdir.strpath)
+    url = get_ssh_url(tmpdir)
     first_url = "%s/first" % url
     second_url = "%s/second" % url
 
