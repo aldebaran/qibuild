@@ -3,7 +3,7 @@ from qisrc.git_config import Branch
 def create_foo(git_server, tmpdir, test_git):
     foo_git = test_git(tmpdir.join("foo").strpath)
     foo_repo = git_server.create_repo("foo.git")
-    foo_git.clone(foo_repo.remote.url)
+    foo_git.clone(foo_repo.clone_url)
     return foo_git
 
 def test_up_to_date(git_server, tmpdir, test_git):

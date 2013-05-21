@@ -115,6 +115,14 @@ class Remote(object):
         res += ">"
         return res
 
+    def __eq__(self, other):
+        return self.name == other.name and \
+                self.url == other.url and \
+                self.review == other.review
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 class Branch(object):
     def __init__(self):
         self.name = None

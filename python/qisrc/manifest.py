@@ -52,24 +52,44 @@ class Manifest(object):
         for remote in self.remotes:
             remote.parse_url()
 
-        for repo in self.repos:
-            if not repo.remote_name:
-                repo.remote_name = "origin"
-            if not repo.default_branch:
-                repo.default_branch = "master"
-            self.set_remote(repo)
+        review_remotes = list()
+        for remote in self.remotes:
+            if remote.review:
+                review_remotes.append(remote)
 
-    def set_remote(self, repo):
+        if len(review_remotes) > 1:
+            mess = """ \
+Only one remote can be configured wih review="true", found {0}
+""".format(len(review_remotes))
+            raise ManifestError(mess)
+
+        srcs = dict()
+        for repo in self.repos:
+            if repo.src in srcs:
+                mess = """ \
+Found two projects sharing the same sources:
+* {0}
+* {1}
+""".format(srcs[repo.src], repo)
+                raise ManifestError(mess)
+
+            for remote_name in repo.remote_names:
+                self.set_remote(repo, remote_name)
+
+            srcs[repo.src] = repo
+
+    def set_remote(self, repo, remote_name):
         """ Set the remote of a repo from the list.
         Assume all the remotes have already been read
 
         """
-        matching_remote = self.get_remote(repo.remote_name)
+        matching_remote = self.get_remote(remote_name)
         if not matching_remote:
             raise ManifestError("No matching remote: %s for repo %s" %
-                                (repo.remote_name, repo.project))
-        repo.remote = copy.copy(matching_remote)
-        repo.remote.url = matching_remote.prefix + repo.project
+                                (remote_name, repo.project))
+        remote = copy.copy(matching_remote)
+        remote.url = matching_remote.prefix + repo.project
+        repo.remotes.append(remote)
 
     def dump(self):
         """ write the xml configuration file """
@@ -127,13 +147,13 @@ No such project: {1}
         self.remotes.append(remote)
 
     @change_config
-    def add_repo(self, project_name, src, remote_name=None,
+    def add_repo(self, project_name, src, remote_names,
                  default_branch="master"):
         """ Add a new repo to the manifest. """
         repo = RepoConfig()
         repo.project = project_name
         repo.src = src
-        repo.remote_name = remote_name
+        repo.remote_names = remote_names
         repo.default_branch = default_branch
         self.repos.append(repo)
 
@@ -154,20 +174,42 @@ class RepoConfig(object):
     def __init__(self):
         self.src = None
         self.project = None
-        self.default_branch = None
-        self.remote = None
-        self.remote_name = None
+        self.default_branch = "master"
+        self.remotes = list()
+        self.remote_names = None
+
+    @property
+    def review_remote(self):
+        for remote in self.remotes:
+            if remote.review:
+                return remote
+    @property
+    def default_remote(self):
+        """ Return the remote that will be used to clone
+        the project
+
+        """
+        if not self.remotes:
+            return None
+        # FIXME?
+        return self.remotes[0]
+
+    @property
+    def clone_url(self):
+        return self.default_remote.url
+
+    @property
+    def urls(self):
+        return [remote.url for remote in self.remotes]
 
     @property
     def review(self):
-        return self.remote and self.remote.review
+        return self.review_remote is not None
 
     def __repr__(self):
         res = "<Repo %s in %s" %  (self.project, self.src)
         if self.default_branch:
             res += " default: %s" % self.default_branch
-        if not self.remote:
-            res += " (no remote yet)"
         if self.review:
             res += " (review)"
         res += ">"
@@ -216,7 +258,11 @@ class ManifestParser(qisys.qixml.XMLParser):
 class RepoConfigParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(RepoConfigParser, self).__init__(target)
-        self._ignore = ["remote", "review"]
+        self._ignore = ["review_remote",
+                        "clone_url",
+                        "review",
+                        "urls",
+                        "remotes"]
         self._required = ["project"]
 
     # the 'remote' XML attribute matches an attribute named
@@ -225,10 +271,18 @@ class RepoConfigParser(qisys.qixml.XMLParser):
         self.target.project = self._root.get("project")
         if not self.target.project:
             raise ManifestError("Missing 'project' attribute")
-        self.target.src = self._root.get("src")
-        self.target.default_branch = self._root.get("branch", "master")
-        self.target.remote_name = self._root.get("remote", "origin")
+        src = self._root.get("src")
+        if src is None:
+            src = self.target.project.replace(".git", "")
+        self.target.src = src
 
-    def _write_remote_name(self, elem):
-        if self.target.remote_name:
-            elem.set("remote", self.target.remote_name)
+        self.target.default_branch = self._root.get("branch", "master")
+        remote_names = self._root.get("remotes")
+        if remote_names is None:
+            raise ManifestError("Missing 'remotes' attribute")
+        if remote_names == "":
+            raise ManifestError("Empty 'remotes' attribute")
+        self.target.remote_names =  remote_names.split()
+
+    def _write_remote_names(self, elem):
+        elem.set("remotes", " ".join(self.target.remote_names))

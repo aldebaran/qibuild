@@ -66,7 +66,7 @@ class TestGitServer(object):
         self.work = root.mkdir("work")
 
         # Manifest itself can not be handled as a normal repo:
-        self.create_repo("manifest.git", add_to_manifest=False)
+        self._create_repo("manifest.git")
         self.push_file("manifest.git", "manifest.xml", "<manifest />")
         manifest_xml = root.join("src", "manifest", "manifest.xml")
         self.manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
@@ -74,9 +74,24 @@ class TestGitServer(object):
         self.manifest.add_remote("gerrit",  self.gerrit.strpath, review=True)
         self.manifest_url = self.srv.join("manifest.git").strpath
 
-    def create_repo(self, project, src=None, add_to_manifest=True,
-                    review=False):
+    def create_repo(self, project, src=None, review=False):
         """ Create a new repo and add it to the manifest """
+        self._create_repo(project, src=src, review=False)
+        if review:
+            self._create_repo(project, src=src, review=True)
+            self.manifest.add_repo(project, src, ["origin", "gerrit"])
+        else:
+            self.manifest.add_repo(project, src, ["origin"])
+        repo = self.manifest.get_repo(project)
+
+        manifest_repo = self.root.join("src", "manifest")
+        git = qisrc.git.Git(manifest_repo.strpath)
+        git.commit("--all", "--message", "add %s" % src)
+        git.push("origin", "master:master")
+        return repo
+
+    def _create_repo(self, project, src=None, review=False):
+        """ Helper for self.create_repo """
         if not src:
             src = project.replace(".git", "")
 
@@ -97,20 +112,6 @@ class TestGitServer(object):
             git.set_remote("origin", repo_srv.strpath)
             git.push("origin", "master:master")
 
-        if not add_to_manifest:
-            return
-
-        if review:
-            self.manifest.add_repo(project, src, remote_name="gerrit")
-        else:
-            self.manifest.add_repo(project, src)
-        repo = self.manifest.get_repo(project)
-
-        manifest_repo = self.root.join("src", "manifest")
-        git = qisrc.git.Git(manifest_repo.strpath)
-        git.commit("--all", "--message", "add %s" % src)
-        git.push("origin", "master:master")
-        return repo
 
     def get_repo(self, project):
         """ Get a repo from the manifest """
@@ -147,9 +148,9 @@ class TestGitServer(object):
 
     def use_review(self, project):
         """ Switch a project to gerrit for code review """
-        self.create_repo(project, review=True, add_to_manifest=False)
+        self._create_repo(project, review=True)
         repo = self.manifest.get_repo(project)
-        repo.remote_name = "gerrit"
+        repo.remote_names.append("gerrit")
         self.manifest.dump()
         self.push_manifest("%s: now under code review" % project)
         self.manifest.load()

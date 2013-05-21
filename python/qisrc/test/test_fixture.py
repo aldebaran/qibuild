@@ -5,7 +5,7 @@ def test_git_server_creates_valid_urls(tmpdir, git_server):
     origin_url = git_server.manifest.get_remote("origin").url
     assert os.path.exists(origin_url)
     foo_repo = git_server.create_repo("foo.git")
-    foo_url = foo_repo.remote.url
+    foo_url = foo_repo.clone_url
     foo_clone = tmpdir.mkdir("foo")
     git = qisrc.git.Git(foo_clone.strpath)
     git.clone(foo_url)
@@ -14,7 +14,7 @@ def test_pushing_files(tmpdir, git_server):
     origin_url = git_server.manifest.get_remote("origin").url
     assert os.path.exists(origin_url)
     foo_repo = git_server.create_repo("foo.git")
-    foo_url = foo_repo.remote.url
+    foo_url = foo_repo.clone_url
     foo_clone = tmpdir.mkdir("foo")
     git = qisrc.git.Git(foo_clone.strpath)
     git.clone(foo_url)
@@ -24,20 +24,19 @@ def test_pushing_files(tmpdir, git_server):
 
     assert foo_clone.join("README").read() == "This is foo\n"
 
-
 def test_no_review_by_default(tmpdir, git_server):
     foo_repo = git_server.create_repo("foo.git")
-    assert foo_repo.remote.name == "origin"
-    assert foo_repo.remote.review is False
+    assert foo_repo.review is False
     origin = git_server.manifest.get_remote("origin")
     assert origin.review is False
 
 def test_create_review_repos(tmpdir, git_server):
     foo_repo = git_server.create_repo("foo", review=True)
-    assert foo_repo.remote.name == "gerrit"
-    assert foo_repo.review is True
-    gerrit = git_server.manifest.get_remote("origin")
-    assert gerrit.review is False
+    assert foo_repo.review_remote.name == "gerrit"
+    assert foo_repo.default_remote.name == "origin"
+    git = qisrc.git.Git(tmpdir.strpath)
+    rc, out = git.call("ls-remote", foo_repo.clone_url, raises=False)
+    assert rc == 0
 
 def test_new_project_under_review(tmpdir, git_server):
     foo_repo = git_server.create_repo("foo.git", review=False)
@@ -45,7 +44,10 @@ def test_new_project_under_review(tmpdir, git_server):
     git_server.use_review("foo.git")
     foo_repo = git_server.get_repo("foo.git")
     assert foo_repo.review is True
-    assert foo_repo.remote.name == "gerrit"
+    assert foo_repo.review_remote.name == "gerrit"
     git = qisrc.git.Git(tmpdir.strpath)
-    rc, out = git.call("ls-remote", foo_repo.remote.url, raises=False)
+    rc, out = git.call("ls-remote", foo_repo.clone_url, raises=False)
+    assert rc == 0
+    git = qisrc.git.Git(tmpdir.strpath)
+    rc, out = git.call("ls-remote", foo_repo.review_remote.url, raises=False)
     assert rc == 0

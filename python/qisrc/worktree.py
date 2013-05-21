@@ -75,12 +75,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             self.worktree.add_project(path)
             return self.get_git_project(path)
 
-    def find_url(self, remote_url):
-        """ Look for a project configured with the given url """
-        for git_project in self.git_projects:
-            if git_project.clone_url == remote_url:
-                return git_project
-
+    def find_repo(self, repo):
+        """ Look for a project configured with the given repo """
+        for url in repo.urls:
+            for git_project in self.git_projects:
+                for remote in git_project.remotes:
+                    if url == remote.url:
+                        return git_project
 
     @property
     def git_xml(self):
@@ -120,9 +121,9 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         # so the GitProject does not exist yet
         git_project = qisrc.project.GitProject(self, worktree_project)
         git = qisrc.git.Git(git_project.path)
-        git.clone(repo.remote.url, "--recursive",
+        git.clone(repo.default_remote.url, "--recursive",
                   "--branch", repo.default_branch,
-                  "--origin", repo.remote.name)
+                  "--origin", repo.default_remote.name)
         self.save_project_config(git_project)
         self.load_git_projects()
 

@@ -66,7 +66,7 @@ def test_check(qisrc_action, git_server):
     manifest = qisrc.manifest.Manifest(srv_xml.strpath)
     editable_path = qisrc_action.tmpdir.join("manifest.xml")
     manifest.manifest_xml = editable_path.strpath
-    manifest.add_repo("doestnotexists.git", "nowhere")
+    manifest.add_repo("doestnotexists.git", "nowhere", ["origin"])
     manifest.dump()
 
     error = qisrc_action("manifest", "--check", "default",

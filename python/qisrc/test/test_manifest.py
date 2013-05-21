@@ -15,7 +15,8 @@ def test_simple_read(tmpdir):
     manifest_xml.write(""" \
 <manifest>
   <remote name="origin" url="git@example.com" />
-  <repo project="foo/bar.git" src="lib/bar" branch="next" />
+  <repo project="foo/bar.git" src="lib/bar" branch="next"
+        remotes="origin" />
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
@@ -23,15 +24,71 @@ def test_simple_read(tmpdir):
     assert len(manifest.repos) == 1
     bar = manifest.repos[0]
     assert bar.src == "lib/bar"
-    assert bar.remote.url == "git@example.com:foo/bar.git"
+    assert bar.clone_url == "git@example.com:foo/bar.git"
     assert bar.default_branch == "next"
+
+def test_src_are_unique(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="foo/bar.git" src="lib/bar" branch="next"
+        remotes="origin" />
+  <repo project="bar/bar.git" src="lib/bar" branch="next"
+        remotes="origin" />
+</manifest>
+""")
+    # pylint: disable-msg=E1101
+    with pytest.raises(qisrc.manifest.ManifestError) as e:
+        qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert "Found two projects sharing the same sources" in str(e.value)
+
+def test_empty_src(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="foo/bar.git" branch="master" remotes="origin" />
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    bar = manifest.repos[0]
+    assert bar.src == "foo/bar"
+
+
+
+def test_no_remotes_attr(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="foo/bar.git" src="lib/bar"/>
+</manifest>
+""")
+    # pylint: disable-msg=E1101
+    with pytest.raises(qisrc.manifest.ManifestError) as e:
+        qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert e.value.message == "Missing 'remotes' attribute"
+
+def test_several_reviews(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="review1" url="git@example.com" review="true" />
+  <remote name="review2" url="git@example.com" review="true" />
+</manifest>
+""")
+    # pylint: disable-msg=E1101
+    with pytest.raises(qisrc.manifest.ManifestError) as e:
+        qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert "Only one" in str(e.value)
 
 def test_no_matching_remote(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
   <remote name="origin" url="git@example.com" />
-  <repo project="foo/bar.git" src="lib/bar" remote="invalid" />
+  <repo project="foo/bar.git" src="lib/bar" remotes="invalid" />
 </manifest>
 """)
     # pylint: disable-msg=E1101
@@ -44,8 +101,8 @@ def test_branch(tmpdir):
     manifest_xml.write(""" \
 <manifest>
   <remote name="origin" url="git@example.com" />
-  <repo project="bar.git" />
-  <repo project="foo.git" branch="devel" />
+  <repo project="bar.git" remotes="origin" />
+  <repo project="foo.git" branch="devel" remotes="origin" />
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
@@ -59,7 +116,7 @@ def test_invalid_group(tmpdir):
     manifest_xml.write(""" \
 <manifest>
   <remote name="origin" url="git@example.com" />
-  <repo project="foo.git" />
+  <repo project="foo.git" remotes="origin" />
   <groups>
     <group name="foo-group">
       <project name="foo.git" />
@@ -86,14 +143,36 @@ def test_review_projects(tmpdir):
 <manifest>
   <remote name="origin" url="git@example.com" />
   <remote name="gerrit" url="http://gerrit:8080" review="true" />
-  <repo project="foo/bar.git" src="lib/bar" remote="gerrit" />
+  <repo project="foo/bar.git" src="lib/bar" remotes="gerrit" />
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert len(manifest.repos) == 1
     bar = manifest.repos[0]
     assert bar.src == "lib/bar"
-    assert bar.remote.url == "http://gerrit:8080/foo/bar.git"
+    assert bar.clone_url == "http://gerrit:8080/foo/bar.git"
+    assert bar.review is True
+
+
+def test_review_projects_with_two_remotes(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <remote name="gerrit" url="http://gerrit:8080" review="true" />
+  <repo project="foo/bar.git" src="lib/bar" remotes="origin gerrit" />
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert len(manifest.repos) == 1
+    bar = manifest.repos[0]
+    assert bar.src == "lib/bar"
+    assert len(bar.remotes) == 2
+    origin_remote = bar.remotes[0]
+    gerrit_remote = bar.remotes[1]
+    assert origin_remote.name == "origin"
+    assert gerrit_remote.name == "gerrit"
+    assert bar.review_remote == gerrit_remote
     assert bar.review == True
 
 def test_groups(tmpdir):
@@ -101,9 +180,9 @@ def test_groups(tmpdir):
     manifest_xml.write(""" \
 <manifest>
   <remote name="origin" url="git@example.com" />
-  <repo project="qi/libqi.git" />
-  <repo project="qi/libqimessaging.git" />
-  <repo project="qi/naoqi.git" />
+  <repo project="qi/libqi.git" remotes="origin" />
+  <repo project="qi/libqimessaging.git" remotes="origin" />
+  <repo project="qi/naoqi.git" remotes="origin" />
 
   <groups>
     <group name="qim">
@@ -116,7 +195,7 @@ def test_groups(tmpdir):
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     git_projects = manifest.get_repos(groups=["qim"])
     assert len(git_projects) == 2
-    assert git_projects[0].remote.url == "git@example.com:qi/libqi.git"
-    assert git_projects[1].remote.url == "git@example.com:qi/libqimessaging.git"
+    assert git_projects[0].clone_url == "git@example.com:qi/libqi.git"
+    assert git_projects[1].clone_url == "git@example.com:qi/libqimessaging.git"
 
 

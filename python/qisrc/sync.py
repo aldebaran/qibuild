@@ -13,75 +13,6 @@ import qisrc.git
 import qisrc.manifest
 
 
-def compute_repo_diff(old_repos, new_repos):
-    """ Compute the work that needs to be done
-
-    :returns: a tuple (to_add, to_move, to_rm)
-
-    """
-    # FIXME: rewrite with just one loop?
-
-    to_add = list()
-    to_move = list()
-    to_rm = list()
-    to_update = list()
-
-
-    src_to_update = list()
-
-    # Compute lookup dicts
-    old_srcs = dict()
-    for repo in old_repos:
-        old_srcs[repo.src] = repo
-    new_srcs = dict()
-    for repo in new_repos:
-        new_srcs[repo.src] = repo
-    old_urls = dict()
-    for old_repo in old_repos:
-        old_urls[old_repo.remote.url] = old_repo
-    new_urls = dict()
-    for new_repo in new_repos:
-        new_urls[new_repo.remote.url] = new_repo
-
-    # Look for the updates: same src, different urls
-    for repo in old_repos:
-        old_url = repo.remote.url
-        new_repo = new_srcs.get(repo.src)
-        if not new_repo:
-            continue
-        new_url = new_repo.remote.url
-        if old_url != new_url:
-            src_to_update.append(repo.src)
-
-    # Look for the moves: same url, different src
-    for old_repo in old_repos:
-        for new_repo in new_repos:
-            if old_repo.remote.url == new_repo.remote.url:
-                if old_repo.src != new_repo.src:
-                    to_move.append((old_repo, new_repo.src))
-
-    # Look for repos to remove
-    for old_repo in old_repos:
-        if old_repo.src in src_to_update:
-            continue
-        if not old_repo.remote.url in new_urls:
-            to_rm.append(old_repo)
-
-    # Look for repos to add
-    for new_repo in new_repos:
-        if new_repo.src in src_to_update:
-            continue
-        if not new_repo.remote.url in old_urls:
-            to_add.append(new_repo)
-
-    to_update = list()
-    for src in src_to_update:
-        old_repo = old_srcs[src]
-        new_repo = new_srcs[src]
-        to_update.append((old_repo, new_repo))
-
-    return (to_add, to_move, to_rm, to_update)
-
 class WorkTreeSyncer(object):
     """ Handle the manifests of a worktree
 
@@ -204,7 +135,7 @@ class WorkTreeSyncer(object):
             # a rename failed, or the project has not been cloned yet,
             # so make sure old_repos matches the worktree state:
             for old_repo in old_repos_expected:
-                old_project = self.git_worktree.find_url(old_repo.remote.url)
+                old_project = self.git_worktree.find_repo(old_repo)
                 if old_project:
                     old_repo.src = old_project.src
                     old_repos.append(old_repo)
@@ -267,10 +198,7 @@ class WorkTreeSyncer(object):
             for (old_repo, new_repo) in to_update:
                 ui.info(ui.tabs(2),
                         ui.green, "* ",
-                        ui.reset, ui.blue, old_repo.src,
-                        ui.reset, ":", "\n",
-                        ui.tabs(3), ui.blue, old_repo.remote.url,
-                        ui.reset, " -> ", ui.blue, new_repo.remote.url)
+                        ui.reset, ui.blue, old_repo.src)
                 if new_repo.review:
                     ui.info(ui.tabs(3), ui.green, "(now using code review)")
 
@@ -335,6 +263,62 @@ class LocalManifest(object):
         self.branch = "master"
         self.groups = list()
 
+###
+# Compute updates
+
+
+
+def compute_repo_diff(old_repos, new_repos):
+    """ Compute the work that needs to be done
+
+    :returns: a tuple (to_add, to_move, to_rm)
+
+    """
+    to_add = list()
+    to_move = list()
+    to_rm = list()
+    to_update = list()
+
+    for new_repo in new_repos:
+        for old_repo in old_repos:
+            common_url = find_common_url(old_repo, new_repo)
+            if common_url:
+                if new_repo.src == old_repo.src:
+                    pass # nothing to do
+                else:
+                    to_move.append((old_repo, new_repo.src))
+                break
+        else:
+            # actually we are adding repos that
+            # only changed remotes, because we did not
+            #commpute to_update yet
+            to_add.append(new_repo)
+
+    for old_repo in old_repos:
+        for new_repo in new_repos:
+            if old_repo.src == new_repo.src:
+                if new_repo.remotes == old_repo.remotes:
+                    pass
+                else:
+                    to_update.append((old_repo, new_repo))
+                break
+        else:
+            if not old_repo in [x[0] for x in to_move]:
+                to_rm.append(old_repo)
+
+    really_to_add = list()
+    for repo in to_add:
+        if repo.src not in [x[0].src for x in to_update]:
+            really_to_add.append(repo)
+
+
+    return (really_to_add, to_move, to_rm, to_update)
+
+def find_common_url(repo_a, repo_b):
+    for url_a in repo_a.urls:
+        for url_b in repo_b.urls:
+            if url_a == url_b:
+                return url_b
 
 ##
 # Parsing

@@ -134,9 +134,10 @@ class GitProject(object):
 
         """
         self.name = repo.project
-        self.configure_branch(repo.default_branch, tracks=repo.remote.name,
+        for remote in repo.remotes:
+            self.configure_remote(remote)
+        self.configure_branch(repo.default_branch, tracks=repo.default_remote.name,
                               remote_branch=repo.default_branch, default=True)
-        self.configure_remote(repo.remote)
         if repo.review:
             ok = qisrc.review.setup_project(self)
             if ok:
