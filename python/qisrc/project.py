@@ -103,9 +103,11 @@ class GitProject(object):
         already exitsts, update its tracking remote.
 
         """
-        if self.default_branch and self.default_branch.name != name:
+        previous_default_branch = self.default_branch
+        if previous_default_branch and previous_default_branch.name != name:
             ui.warning(self.src, ": default branch changed",
-                        self.default_branch.name, "->", name)
+                        previous_default_branch.name, "->", name)
+            previous_default_branch.default = False
         branch_found = False
         for branch in self.branches:
             if branch.name == name:
