@@ -54,6 +54,32 @@ def test_branch(tmpdir):
     assert bar.default_branch == "master"
     assert foo.default_branch == "devel"
 
+def test_invalid_group(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="foo.git" />
+  <groups>
+    <group name="foo-group">
+      <project name="foo.git" />
+      <project name="bar.git" />
+    </group>
+  </groups>
+
+</manifest>
+""")
+    # pylint: disable-msg=E1101
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    with pytest.raises(qisrc.manifest.ManifestError) as e:
+        manifest.get_repos(groups=["foo-group"])
+    assert "foo-group" in str(e.value)
+    assert "bar.git" in str(e.value)
+    with pytest.raises(qisrc.manifest.ManifestError) as e:
+        manifest.get_repos(groups=["mygroup"])
+    assert "No such group: mygroup" in str(e.value)
+
+
 def test_review_projects(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \

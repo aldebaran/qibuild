@@ -2,6 +2,8 @@ import xml.etree.ElementTree as etree
 
 import qisrc.groups
 
+import pytest
+
 def test_parser():
     file = """
 <groups>
@@ -23,9 +25,12 @@ def test_parser():
     parser = qisrc.groups.GroupsParser(groups)
     parser.parse(root)
 
-    assert groups.projects('c') == list()
     assert set(groups.projects('d')) - set(['bar', 'foo']) == set()
     assert set(groups.projects('a')) - set(['bar', 'foo', 'b', 'c', 'd']) == set()
+
+    # pylint: disable-msg=E1101
+    with pytest.raises(qisrc.groups.GroupError):
+        groups.projects("c")
 
 def test_writer():
     groups = qisrc.groups.Groups()

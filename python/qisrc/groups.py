@@ -24,8 +24,7 @@ class Groups(object):
 
         group = self.groups.get(group_name)
         if group is None:
-            ui.debug(ui.green, group_name, ui.reset, "is not a known group.")
-            return projects
+            raise GroupError("No such group: %s" % group_name)
 
         projects.extend(group.projects)
 
@@ -93,3 +92,8 @@ def get_groups(worktree):
     parser = GroupsParser(groups)
     parser.parse(root)
     return groups
+
+
+class GroupError(Exception):
+    pass
+

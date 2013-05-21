@@ -83,9 +83,10 @@ def test_compute_updates():
     assert len(to_update) == 1
 
 def test_stores_url_and_groups(git_worktree, git_server):
+    git_server.create_group("mygroup", ["foo", "bar"])
     manifest_url = git_server.manifest_url
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
-    worktree_syncer.configure_manifest("default", manifest_url, groups=["qim"])
+    worktree_syncer.configure_manifest("default", manifest_url, groups=["mygroup"])
 
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
     manifests = worktree_syncer.manifests
@@ -93,7 +94,7 @@ def test_stores_url_and_groups(git_worktree, git_server):
     default_manifest = manifests["default"]
     assert default_manifest.name == "default"
     assert default_manifest.url == manifest_url
-    assert default_manifest.groups == ["qim"]
+    assert default_manifest.groups == ["mygroup"]
 
 def test_pull_manifest_changes_when_syncing(git_worktree, git_server):
     manifest_url = git_server.manifest_url

@@ -87,11 +87,19 @@ class Manifest(object):
 
         repos = dict()
         for group in groups:
-            project_names = self.groups.projects(group)
+
+            try:
+                project_names = self.groups.projects(group)
+            except qisrc.groups.GroupError as e:
+                raise ManifestError(str(e))
             for project_name in project_names:
                 matching_repo = self.get_repo(project_name)
                 if matching_repo:
                     repos[project_name] = matching_repo
+                else:
+                    raise ManifestError("""When reading group {0}:
+No such project: {1}
+""".format(group, project_name))
         return repos.values()
 
     def get_repo(self, project):
