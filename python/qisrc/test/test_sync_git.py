@@ -63,3 +63,21 @@ def test_push_nonfastforward(git_server, tmpdir, test_git):
     (res, message) = foo_git.sync_branch(branch)
     assert res is True
     assert foo_git.read_file("README") == "README on master v2"
+
+def test_run_abort_when_rebase_fails(git_server, tmpdir, test_git):
+    foo_git = create_foo(git_server, tmpdir, test_git)
+    branch = Branch()
+    branch.name = "master"
+    branch.tracks = "origin"
+    git_server.push_file("foo.git", "README", "README on master v1")
+    foo_git.sync_branch(branch)
+    git_server.push_file("foo.git", "README", "README on master v2",
+                         fast_forward=False)
+    foo_git.commit_file("unrelated.txt", "Unrelated changes")
+
+    (res, message) = foo_git.sync_branch(branch)
+    assert res is False
+    assert foo_git.get_current_branch() is not None
+    assert "Rebase failed" in message
+    assert foo_git.read_file("unrelated.txt") == "Unrelated changes"
+    assert foo_git.read_file("README") == "README on master v1"

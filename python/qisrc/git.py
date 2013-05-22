@@ -51,6 +51,7 @@ class Git(object):
             self._transaction.ok = False
             self._transaction.output += "git %s failed\n" % (" ".join(args))
             self._transaction.output += out
+        return (retcode, out)
 
 
     def _call(self, *args, **kwargs):
@@ -331,12 +332,21 @@ class Git(object):
                 # This may fail depending on the user configuration
                 update_cmd = ("rebase", branch.name)
 
+        update_successful = False
+        message = ""
         with self.transaction() as transaction:
             self.call(*fetch_cmd)
-            self.call(*update_cmd)
+            (rc, out) = self.call(*update_cmd)
+            if rc == 0:
+                update_successful = True
+            else:
+                # Continute the transaction even if last command failed
+                transaction.ok = True
+                message = "Rebase failed because of conflics"
+                self.call("rebase", "--abort")
 
         if transaction.ok:
-            return True, ""
+            return update_successful, message
         else:
             return False,  transaction.output
 
