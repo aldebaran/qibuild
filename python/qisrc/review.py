@@ -15,10 +15,12 @@ import qisys.interact
 import qibuild.config
 
 
-def fetch_gerrit_hook_ssh(path, username, server, port=22):
+def fetch_gerrit_hook_ssh(path, username, server, port=None):
     """ Fetch the ``commit-msg`` hook from gerrit
 
     """
+    if port is None:
+        port = 22
     git_hooks_dir = os.path.join(path, ".git", "hooks")
     if sys.platform.startswith("win"):
         # scp on git bash does not handle DOS paths:
