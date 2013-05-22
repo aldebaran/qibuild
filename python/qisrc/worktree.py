@@ -120,9 +120,16 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         # so the GitProject does not exist yet
         git_project = qisrc.project.GitProject(self, worktree_project)
         git = qisrc.git.Git(git_project.path)
-        git.clone(repo.default_remote.url, "--recursive",
-                  "--branch", repo.default_branch,
-                  "--origin", repo.default_remote.name)
+        if not os.path.exists(git_project.path):
+            git.clone(repo.default_remote.url, "--recursive",
+                    "--branch", repo.default_branch,
+                    "--origin", repo.default_remote.name)
+        else:
+            # Maybe the project was removed and is now added again
+            if not git.is_valid():
+                ui.warning("Wanted to add a project in", git_project.src, "\n",
+                           "But this path already exists and is not a git project")
+                return
         self.save_project_config(git_project)
         self.load_git_projects()
 
