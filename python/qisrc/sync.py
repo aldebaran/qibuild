@@ -310,7 +310,10 @@ def compute_repo_diff(old_repos, new_repos):
         for new_repo in new_repos:
             if old_repo.src == new_repo.src:
                 if new_repo.remotes == old_repo.remotes:
-                    pass
+                    if new_repo.default_branch == old_repo.default_branch:
+                        pass
+                    else:
+                        to_update.append((old_repo, new_repo))
                 else:
                     to_update.append((old_repo, new_repo))
                 break

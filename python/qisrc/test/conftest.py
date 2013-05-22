@@ -172,6 +172,17 @@ class TestGitServer(object):
         self.push_manifest("%s: now under code review" % project)
         self.manifest.load()
 
+    def change_branch(self, repo, new_branch):
+        repo_src = self.src.join(repo.src)
+        git = qisrc.git.Git(repo_src.strpath)
+        git.checkout("--force", "-B", new_branch)
+        for remote in repo.remotes:
+            git.push(remote.url, "%s:%s" % (new_branch, new_branch))
+        repo.default_branch = new_branch
+        self.manifest.dump()
+        self.push_manifest("%s on %s" % (repo.project, new_branch))
+        self.manifest.load()
+
     def push_file(self, project, filename, contents,
                   branch="master", fast_forward=True):
         """ Push a new file with the given contents to the given project

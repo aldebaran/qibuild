@@ -28,6 +28,7 @@ def configure_parser(parser):
 def do(args):
     """Main method."""
     git_worktree = qisrc.parsers.get_git_worktree(args)
+    git_worktree.sync()
     git_projects = git_worktree.git_projects
 
     num_projs = len(git_projects)
@@ -43,9 +44,7 @@ def do(args):
             sys.stdout.flush()
 
         state_project = qisrc.status.check_state(git_project, args.untracked_files)
-
-        if args.show_branch or not state_project.sync_and_clean:
-            state_projects.append(state_project)
+        state_projects.append(state_project)
 
     if sys.stdout.isatty():
         ui.info("Checking (%d/%d):" % (num_projs, num_projs), "done",

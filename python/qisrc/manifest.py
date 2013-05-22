@@ -286,3 +286,6 @@ class RepoConfigParser(qisys.qixml.XMLParser):
 
     def _write_remote_names(self, elem):
         elem.set("remotes", " ".join(self.target.remote_names))
+
+    def _write_default_branch(self, elem):
+        elem.set("branch", self.target.default_branch)

@@ -4,7 +4,12 @@ import qisrc.sync
 
 def make_repos(*args):
     res = list()
-    for (project_name, src, remote_names) in args:
+    for arg in args:
+        if len(arg) == 3:
+            project_name, src, remote_names = arg
+            default_branch = "master"
+        if len(arg) == 4:
+            project_name, src, remote_names, default_branch = arg
         repo = qisrc.manifest.RepoConfig()
         for remote_name in remote_names:
             remote = qisrc.git_config.Remote()
@@ -15,6 +20,7 @@ def make_repos(*args):
             repo.remotes.append(remote)
         repo.project = project_name
         repo.src = src
+        repo.default_branch = default_branch
         res.append(repo)
     return res
 
@@ -45,6 +51,25 @@ def test_adding_a_remote():
     assert to_move == list()
     assert to_rm == list()
     assert len(to_update) == 1
+
+def test_change_branch():
+    old = make_repos(
+        ("foo.git", "foo", ["origin"], "master"),
+        ("bar.git", "bar", ["origin"], "master"),
+
+    )
+    new = make_repos(
+        ("foo.git", "foo", ["origin"], "devel"),
+        ("bar.git", "bar", ["origin"], "master"),
+    )
+    (to_add, to_move, to_rm, to_update) = qisrc.sync.compute_repo_diff(old, new)
+    assert to_add == list()
+    assert to_move == list()
+    assert to_rm == list()
+    assert len(to_update) == 1
+    (foo_old, foo_new) = to_update[0]
+    assert foo_old.default_branch == "master"
+    assert foo_new.default_branch == "devel"
 
 def test_moving():
     old = make_repos(
