@@ -130,6 +130,15 @@ class TestGitServer(object):
         git.commit("--all", "--message", "add qibuild test project: %s" % src)
         git.push("origin", "master:master")
 
+    def add_build_profile(self, name, flags):
+        # avoid circular deps
+        import qibuild.profile
+        manifest_repo = self.root.join("src", "manifest")
+        manifest_xml = manifest_repo.join("manifest.xml")
+        qibuild.profile.configure_build_profile(manifest_xml.strpath,
+                                                name, flags)
+        self.push_manifest("Add %s build profile" % name)
+
     def get_repo(self, project):
         """ Get a repo from the manifest """
         return self.manifest.get_repo(project)

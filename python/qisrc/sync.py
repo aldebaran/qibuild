@@ -11,7 +11,7 @@ import os
 import qisys.qixml
 import qisrc.git
 import qisrc.manifest
-
+import qibuild.profile
 
 class WorkTreeSyncer(object):
     """ Handle the manifests of a worktree
@@ -72,6 +72,7 @@ class WorkTreeSyncer(object):
             else:
                 ui.info()
             self._sync_manifest(local_manifest)
+            self._sync_build_profiles(local_manifest)
         self.new_repos = self.get_new_repos()
         self._sync_repos(self.old_repos, self.new_repos)
         # re-read self.old_repos so we can do several syncs:
@@ -236,6 +237,29 @@ class WorkTreeSyncer(object):
                 git_project.apply_remote_config(repo)
         ui.info(" " * (max_src + 11), end="\r")
 
+    def _sync_build_profiles(self, local_manifest):
+        """ Synchronize the build profiles read from the given manifest """
+        ui.info(ui.green, "Synchronizing build profiles ...")
+        local_xml = os.path.join(self.git_worktree.root, ".qi", "qibuild.xml")
+        if not os.path.exists(local_xml):
+            with open(local_xml, "w") as fp:
+                fp.write("<qibuild />")
+        remote_xml = os.path.join(self.manifests_root,
+                                  local_manifest.name, "manifest.xml")
+        local = qibuild.profile.parse_profiles(local_xml)
+        remote = qibuild.profile.parse_profiles(remote_xml)
+        new_profiles, updated_profiles = compute_profile_updates(local, remote)
+        for new_profile in new_profiles:
+            ui.info(ui.green, " * New:", ui.blue, new_profile.name)
+            qibuild.profile.configure_build_profile(local_xml,
+                                                    new_profile.name,
+                                                    new_profile.cmake_flags)
+        if updated_profiles:
+            mess = "The following profiles have been updated remotely:\n"
+            for updated_profile in updated_profiles:
+                mess += "  * " + updated_profile.name + "\n"
+            ui.warning(mess)
+
     def sync_from_manifest_file(self, name, xml_path):
         """ Just synchronize the manifest coming from one xml file.
         Used by ``qisrc manifest --check``
@@ -259,6 +283,7 @@ class WorkTreeSyncer(object):
         if not os.path.exists(manifest_repo):
             git = qisrc.git.Git(manifest_repo)
             git.clone(manifest.url, "--branch", manifest.branch, quiet=True)
+
 
     def __repr__(self):
         return "<WorkTreeSyncer in %s>" % self.git_worktree.root
@@ -334,6 +359,25 @@ def find_common_url(repo_a, repo_b):
         for url_b in repo_b.urls:
             if url_a == url_b:
                 return url_b
+
+def compute_profile_updates(local_profiles, remote_profiles):
+    """ Compare a local set of profiles with a remote set.
+
+    Return a list of profiles to add, and a list of profiles
+    that have been updated.
+
+    """
+    # Note: no profile will ever be removed, I guess we don't care
+    new = list()
+    updated = list()
+    for remote_profile in remote_profiles.values():
+        if remote_profile.name in local_profiles:
+            local_profile = local_profiles.get(remote_profile.name)
+            if local_profile != remote_profile:
+                updated.append(remote_profile)
+        else:
+            new.append(remote_profile)
+    return new, updated
 
 ##
 # Parsing

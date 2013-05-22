@@ -5,6 +5,8 @@ import py
 import qisys.script
 import qisys.sh
 from qisrc.test.conftest import TestGitWorkTree
+from qibuild.test.conftest import TestBuildWorkTree
+import qibuild.profile
 
 
 
@@ -52,3 +54,12 @@ def test_sync_build_deps(qisrc_action, git_server):
     foo_proj = git_worktree.get_git_project("foo")
     foo_txt = os.path.join(foo_proj.path, "foo.txt")
     assert not os.path.exists(foo_txt)
+
+def test_sync_build_profiles(qisrc_action, git_server):
+    git_server.add_build_profile("foo", [("WITH_FOO", "ON")])
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    build_worktree = TestBuildWorkTree()
+    qibuild_xml = build_worktree.qibuild_xml
+    foo_profile = qibuild.profile.parse_profiles(qibuild_xml)["foo"]
+    assert foo_profile.name == "foo"
+    assert foo_profile.cmake_flags == [("WITH_FOO", "ON")]
