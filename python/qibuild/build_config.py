@@ -26,21 +26,13 @@ class CMakeBuildConfig(object):
         self.read_local_settings()
         self.num_jobs = 1
 
-    @property
-    def using_visual_studio(self):
-        " Whether we are using visual studio "
-        return self.cmake_generator and "Visual Studio" in self.cmake_generator
-
-    @property
-    def using_mingw(self):
-        return self.cmake_generator and "mingw" in self.cmake_generator.lower()
 
     @property
     def local_cmake(self):
         """ Path to the "custom" CMake file. Its content will be added
         to the generated CMake files when running ``qibuild configure``
 
-        :return None: if the custom CMake file does not exist
+        :returns: None if the custom CMake file does not exist
         """
         if not self.active_config:
             return None
@@ -52,9 +44,14 @@ class CMakeBuildConfig(object):
             return None
 
     @property
-    def using_make(self):
-        """ Whether we are using make """
-        return self.cmake_generator and "Unix Makefiles" in self.cmake_generator
+    def toolchain(self):
+        """ The current toolchain, either set by the user from the command
+        line or read from the local qibuild settings
+
+        """
+        if self.active_config:
+            return qitoolchain.get_toolchain(self.active_config)
+        return None
 
     @property
     def cmake_generator(self):
@@ -67,14 +64,18 @@ class CMakeBuildConfig(object):
         return self.qibuild_cfg.cmake.generator
 
     @property
-    def toolchain(self):
-        """ The current toolchain, either set by the user from the command
-        line or read from the local qibuild settings
+    def using_make(self):
+        """ Whether we are using make """
+        return self.cmake_generator and "Unix Makefiles" in self.cmake_generator
 
-        """
-        if self.active_config:
-            return qitoolchain.get_toolchain(self.active_config)
-        return None
+    @property
+    def using_visual_studio(self):
+        " Whether we are using visual studio "
+        return self.cmake_generator and "Visual Studio" in self.cmake_generator
+
+    @property
+    def using_mingw(self):
+        return self.cmake_generator and "mingw" in self.cmake_generator.lower()
 
     # pylint: disable-msg=E1101
     @cmake_generator.setter

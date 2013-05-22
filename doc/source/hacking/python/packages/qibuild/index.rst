@@ -16,6 +16,7 @@ qibuild modules
    gdb
    parsers
    performance
+   profile
    project
    wizard
    worktree

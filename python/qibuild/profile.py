@@ -12,7 +12,8 @@ import qisys.qixml
 
 class Profile:
     """ A profile is just a set of CMake flags for now.
-    If has a name you can specify when building using -p
+    If has a name you can specify when building using
+    ``qibuild configure --profile <name>``
 
     """
     def __init__(self, name):
@@ -103,6 +104,13 @@ def remove_build_profile(xml_path, name):
     qisys.qixml.write(tree, xml_path)
 
 def get_cmake_flags(xml_path, profile_names):
+    """ Get the full list of flags to use give a list of
+    build profiles.
+    Every profile in the list should exist.
+
+    :returns: a list of tuples ``(name, value)``
+
+    """
     cmake_flags = list()
     profiles = parse_profiles(xml_path)
     for profile_name in profile_names:
