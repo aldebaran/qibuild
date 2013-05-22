@@ -61,14 +61,16 @@ class WorkTreeSyncer(object):
         manifests = self.manifests.values()
         if not manifests:
             return
-        ui.info(ui.green, "Update manifests ...")
-        for i, local_manifest in enumerate(self.manifests.values()):
-            ui.info_count(i, len(self.manifests),
-                          ui.reset, ui.blue, local_manifest.name,
-                          ui.reset, ui.bold, "(%s)" % local_manifest.branch)
+        ui.info(ui.green, ":: Updating manifests ...")
+        for local_manifest in self.manifests.values():
+            ui.info(ui.tabs(1), ui.green, " * ",
+                    ui.reset, ui.blue, local_manifest.name,
+                    ui.reset, ui.bold, "(%s)" % local_manifest.branch,
+                    end="")
             if local_manifest.groups:
-                ui.info(ui.bold, ui.tabs(2), "Using groups:",
-                        ui.reset, ui.green, ", ".join(local_manifest.groups))
+                ui.info("groups", ", ".join(local_manifest.groups))
+            else:
+                ui.info()
             self._sync_manifest(local_manifest)
         self.new_repos = self.get_new_repos()
         self._sync_repos(self.old_repos, self.new_repos)
@@ -171,8 +173,12 @@ class WorkTreeSyncer(object):
         # 1/ create, remove or move the git projects:
 
         # Compute the work that needs to be done:
+        ui.info(ui.green, ":: Computing diff ...")
         (to_add, to_move, to_rm, to_update) = \
             compute_repo_diff(old_repos, new_repos)
+
+        if not to_rm and not to_add and not to_move and not to_update:
+            ui.info(ui.tabs(2), ui.green, "No changes")
 
         if to_rm:
             ui.info(ui.tabs(2), "To remove:")
@@ -217,11 +223,18 @@ class WorkTreeSyncer(object):
 
         ##
         # 2/ Apply configuration to every new repositories
+        ui.info(ui.green, ":: Configuring projects ...")
+        if not new_repos:
+            return
+        max_src = max([len(x.src) for x in new_repos])
         for repo in new_repos:
             git_project = self.git_worktree.get_git_project(repo.src)
             # may not work if the moving failed for instance
             if git_project:
+                ui.info(ui.green, "Configuring", ui.reset,
+                        ui.blue, git_project.src.ljust(max_src), end="\r")
                 git_project.apply_remote_config(repo)
+        ui.info(" " * (max_src + 11), end="\r")
 
     def sync_from_manifest_file(self, name, xml_path):
         """ Just synchronize the manifest coming from one xml file.

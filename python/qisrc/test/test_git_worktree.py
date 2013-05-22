@@ -63,6 +63,7 @@ def test_git_configs_are_persistent(git_worktree):
     upstream.url = "git@srv:bar.git"
     foo.configure_remote(upstream)
     foo.configure_branch("master", tracks="upstream")
+    foo.save_config()
 
     def check_config(foo):
         assert len(foo.remotes) == 1

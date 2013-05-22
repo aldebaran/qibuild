@@ -42,7 +42,7 @@ def do(args):
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args, default_all=True)
     skipped = list()
     failed = list()
-    ui.info(ui.green, "Syncing projects ...")
+    ui.info(ui.green, ":: Syncing projects ...")
     for (i, git_project) in enumerate(git_projects):
         ui.info_count(i, len(git_projects),
                       ui.blue, git_project.src)

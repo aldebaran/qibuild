@@ -63,7 +63,6 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             if git_elem is not None:
                 git_project.load_xml(git_elem)
             self.git_projects.append(git_project)
-            git_project.apply_config()
 
     def get_git_project(self, path, raises=False, auto_add=False):
         """ Get a git project by its sources """

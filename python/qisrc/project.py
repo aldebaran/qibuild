@@ -22,6 +22,10 @@ class GitProject(object):
         parser = GitProjectParser(self)
         return parser.xml_elem(node_name="project")
 
+    def save_config(self):
+        self.apply_config()
+        self.git_worktree.save_project_config(self)
+
     @property
     def default_branch(self):
         """ The default branch for this repository """
@@ -53,19 +57,6 @@ class GitProject(object):
                 return remote.url
         return None
 
-    # pylint: disable-msg=E0213
-    def change_config(func):
-        """ Decorator for every function that changes the git configuration
-
-        """
-        @functools.wraps(func)
-        def new_func(self, *args, **kwargs):
-            # pylint: disable-msg=E1102
-            res = func(self, *args, **kwargs)
-            self.apply_config()
-            self.git_worktree.save_project_config(self)
-            return res
-        return new_func
 
     @property
     def path(self):
@@ -73,7 +64,6 @@ class GitProject(object):
         return os.path.join(self.git_worktree.root, self.src)
 
 
-    @change_config
     def configure_remote(self, remote):
         """ Configure a remote. If a remote with the same name
         exists, its url will be overwritten
@@ -96,7 +86,6 @@ class GitProject(object):
         self.remotes.remove(remote)
         self.remotes.append(new)
 
-    @change_config
     def configure_branch(self, name, tracks="origin",
                          remote_branch=None, default=True):
         """ Configure a branch. If a branch with the same name
@@ -126,7 +115,6 @@ class GitProject(object):
             self.branches.append(branch)
         return branch
 
-    @change_config
     def apply_remote_config(self, repo):
         """ Apply the configuration read from the "repo" setting
         of a remote manifest.
@@ -142,7 +130,7 @@ class GitProject(object):
             ok = qisrc.review.setup_project(self)
             if ok:
                 self.review = True
-        self.git_worktree.save_project_config(self)
+        self.save_config()
 
 
     def sync(self, branch_name=None, rebase_devel=False,
