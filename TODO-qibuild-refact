@@ -94,19 +94,3 @@
 * to help qisrc manifest --check:
 
   * WorkTreeSyncer.configure_manifest() should only do some parsing
-
-* qisrc sync output should look like:
-
-   :: Updating manifests
-     * default groups: qimessaging, core
-
-   :: Computing work to do:
-      * 3 to be added, 2 to be removed, 1 to be moved
-
-      * (1/3) Adding ...
-      * (2/3) Adding ...
-
-    :: 4 projects need new configuration:
-
-      * (1/1) Updating bar
-          *  Configuring bar for code review ... [ok]
