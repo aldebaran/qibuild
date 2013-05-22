@@ -111,7 +111,24 @@ class TestGitServer(object):
         else:
             git.set_remote("origin", repo_srv.strpath)
             git.push("origin", "master:master")
+        return repo_src.strpath
 
+    def add_qibuild_test_project(self, src):
+        project_name = src + ".git"
+        repo_src = self._create_repo(project_name , src=src, review=False)
+        this_dir = os.path.dirname(__file__)
+        src_path = os.path.join(this_dir, "..", "..", "qibuild", "test", "projects", src)
+        qisys.sh.copy_git_src(src_path, repo_src)
+        git = TestGit(repo_src)
+        git.add(".")
+        git.commit("--message", "Add sources from qibuild test project %s" % src)
+        git.push("origin", "master:master")
+        self.manifest.add_repo(project_name, src, ["origin"])
+        repo = self.manifest.get_repo(project_name)
+        manifest_repo = self.root.join("src", "manifest")
+        git = qisrc.git.Git(manifest_repo.strpath)
+        git.commit("--all", "--message", "add qibuild test project: %s" % src)
+        git.push("origin", "master:master")
 
     def get_repo(self, project):
         """ Get a repo from the manifest """

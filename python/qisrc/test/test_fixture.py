@@ -1,6 +1,8 @@
 import os
 import qisrc.git
 
+from qibuild.test.conftest import TestBuildWorkTree
+
 def test_git_server_creates_valid_urls(tmpdir, git_server):
     origin_url = git_server.manifest.get_remote("origin").url
     assert os.path.exists(origin_url)
@@ -51,3 +53,9 @@ def test_new_project_under_review(tmpdir, git_server):
     git = qisrc.git.Git(tmpdir.strpath)
     rc, out = git.call("ls-remote", foo_repo.review_remote.url, raises=False)
     assert rc == 0
+
+def test_add_build_project(git_server, qisrc_action):
+    git_server.add_qibuild_test_project("world")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    build_worktree = TestBuildWorkTree()
+    assert build_worktree.get_build_project("world")
