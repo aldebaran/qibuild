@@ -38,3 +38,17 @@ def test_clone_new_repos(qisrc_action, git_server):
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("bar")
+
+def test_sync_build_deps(qisrc_action, git_server):
+    git_server.add_qibuild_test_project("world")
+    git_server.add_qibuild_test_project("hello")
+    git_server.create_repo("foo.git")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    git_server.push_file("foo.git", "foo.txt", "unrelated changes\n")
+    qisrc_action.chdir("hello")
+    qisrc_action("sync", "--use-deps")
+    qisrc_action.chdir(qisrc_action.root)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    foo_txt = os.path.join(foo_proj.path, "foo.txt")
+    assert not os.path.exists(foo_txt)
