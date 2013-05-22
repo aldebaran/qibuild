@@ -64,16 +64,15 @@ if [ "$localinst" = "yes" ] ; then
   mkdir -p "${DESTDIR}"
 fi
 
-create_launcher python/bin/qibuild      qibuild
-create_launcher python/bin/qitoolchain  qitoolchain
-create_launcher python/bin/qisrc        qisrc
-create_launcher python/bin/qidoc        qidoc
-create_launcher python/bin/qilinguist   qilinguist
-create_launcher python/bin/qicd.py      qicd.py
+create_launcher python/bin/qibuild      qibuild2
+create_launcher python/bin/qitoolchain  qitoolchain2
+create_launcher python/bin/qisrc        qisrc2
+create_launcher python/bin/qidoc        qidoc2
+create_launcher python/bin/qilinguist   qilinguist2
 
 #aliases
-create_launcher python/bin/qibuild      qc           configure
-create_launcher python/bin/qibuild      qd           deploy
-create_launcher python/bin/qibuild      qm           make
-create_launcher python/bin/qibuild      qo           open
+create_launcher python/bin/qibuild      qc2          configure
+create_launcher python/bin/qibuild      qd2          deploy
+create_launcher python/bin/qibuild      qm2          make
+create_launcher python/bin/qibuild      qo2          open
 echo "Make sure ${DESTDIR} is in your PATH."
