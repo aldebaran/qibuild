@@ -30,7 +30,7 @@ def test_pull_manifest_changes_when_syncing(git_worktree, git_server):
 
     # Push a random file
     git_server.push_file("manifest.git", "a_file", "some contents\n")
-    worktree_syncer.sync_manifests()
+    worktree_syncer.sync()
     a_file = git_worktree.tmpdir.join(".qi", "manifests",
                                       "default", "a_file")
     assert a_file.read() == "some contents\n"

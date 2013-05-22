@@ -93,13 +93,7 @@
 
 * to help qisrc manifest --check:
 
-  * WorkTreeSyncer should not sync in ctor, ctor should only do some parsing
-    and some checks  (which is nice for qisrc manifest --check)
-
   * WorkTreeSyncer.configure_manifest() should only do some parsing
-
-* WorkTreeSyncer.sync_manifests -> worktree_syncer.sync_repos()
-  (Makes more sense)
 
 * qisrc sync output should look like:
 

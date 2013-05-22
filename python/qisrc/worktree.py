@@ -23,14 +23,14 @@ class NotInAGitRepo(Exception):
 
 class GitWorkTree(qisys.worktree.WorkTreeObserver):
     """ Stores a list of git projects and a list of manifests """
-    def __init__(self, worktree, sync_first=False):
+    def __init__(self, worktree):
         self.worktree = worktree
         self.root = worktree.root
         self._root_xml = qisys.qixml.read(self.git_xml).getroot()
         worktree.register(self)
         self.git_projects = list()
         self.load_git_projects()
-        self._syncer = qisrc.sync.WorkTreeSyncer(self, sync_first=sync_first)
+        self._syncer = qisrc.sync.WorkTreeSyncer(self)
 
     def configure_manifest(self, name, manifest_url, groups=None, branch="master"):
         """ Add a new manifest to this worktree """
@@ -45,8 +45,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self._syncer.sync_from_manifest_file(name, xml_path)
 
     def sync(self):
-        """ Load the manifests """
-        self._syncer.sync_manifests()
+        """ Delegates to WorkTreeSyncer """
+        self._syncer.sync()
 
     def load_git_projects(self):
         """ Build a list of git projects using the

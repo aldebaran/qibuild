@@ -50,7 +50,7 @@ def test_new_project_under_code_review(git_worktree, git_server):
     assert foo.review is False
     git_server.use_review("foo")
     with mock.patch("qisrc.review.setup_project") as mock_setup:
-        worktree_syncer.sync_manifests()
+        worktree_syncer.sync()
     foo = git_worktree.get_git_project("foo")
     assert foo.review is True
     assert mock_setup.called_once

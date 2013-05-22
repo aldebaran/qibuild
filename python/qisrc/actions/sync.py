@@ -34,6 +34,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     git_worktree = qisrc.parsers.get_git_worktree(args)
+    git_worktree.sync()
     # At this point we know that:
     #   - missing projects have been cloned
     #   - every repo that uses gerrit has been configured

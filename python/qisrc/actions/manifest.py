@@ -42,7 +42,7 @@ def configure_parser(parser):
 
 
 def do(args):
-    git_worktree = qisrc.parsers.get_git_worktree(args, sync_first=False)
+    git_worktree = qisrc.parsers.get_git_worktree(args)
     if args.list:
         list_manifests(git_worktree)
     elif args.remove:

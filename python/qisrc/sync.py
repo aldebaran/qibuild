@@ -21,7 +21,7 @@ class WorkTreeSyncer(object):
     worktree
 
     """
-    def __init__(self, git_worktree, sync_first=True):
+    def __init__(self, git_worktree):
         self.git_worktree = git_worktree
         # Read manifest configuration now, before any
         # new manifest is cloned or updated
@@ -31,12 +31,12 @@ class WorkTreeSyncer(object):
         parser.parse(root)
         self.old_repos = list()
         self.new_repos = list()
-        if sync_first:
-            # backup old repos configuration now, so that
-            # we know what to sync
-            self.old_repos = self.get_old_repos()
-            self.sync_manifests()
-            self.dump_manifests()
+
+    def sync(self):
+        # backup old repos configuration now, so that
+        # we know what to sync
+        self.old_repos = self.get_old_repos()
+        self.sync_repos()
 
     @property
     def manifests_xml(self):
@@ -53,7 +53,7 @@ class WorkTreeSyncer(object):
         qisys.sh.mkdir(res)
         return res
 
-    def sync_manifests(self):
+    def sync_repos(self):
         """ Update every manifest, inspect changes, and updates the
         git worktree accordingly
 
@@ -74,6 +74,8 @@ class WorkTreeSyncer(object):
         self._sync_repos(self.old_repos, self.new_repos)
         # re-read self.old_repos so we can do several syncs:
         self.old_repos = self.get_old_repos()
+        # if everything went well, save the manifests configurations:
+        self.dump_manifests()
 
     def dump_manifests(self):
         """ Save the manifests in .qi/manifests.xml """
@@ -81,13 +83,11 @@ class WorkTreeSyncer(object):
         xml = parser.xml_elem()
         qisys.qixml.write(xml, self.manifests_xml)
 
-
     def configure_manifest(self, name, url, groups=None, branch="master"):
         """ Add a manifest to the list. Will be stored in
         .qi/manifests/<name>
 
         """
-        # Backup before sync in case sync_first was not used
         self.old_repos = self.get_old_repos()
         to_add = LocalManifest()
         to_add.name = name
@@ -96,8 +96,7 @@ class WorkTreeSyncer(object):
         to_add.branch = branch
         self.manifests[name] = to_add
         self.clone_manifest(to_add)
-        self.sync_manifests()
-        self.dump_manifests()
+        self.sync_repos()
 
     def remove_manifest(self, name):
         """ Remove a manifest from the list """

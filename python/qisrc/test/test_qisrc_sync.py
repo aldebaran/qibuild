@@ -30,3 +30,11 @@ def test_sync_skips_unconfigured_projects(qisrc_action, git_server, test_git):
     git.initialize()
     git_worktree.add_git_project(new_proj.strpath)
     qisys.script.run_action("qisrc.actions.sync")
+
+def test_clone_new_repos(qisrc_action, git_server):
+    git_server.create_repo("foo.git")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    git_server.create_repo("bar.git")
+    qisrc_action("sync")
+    git_worktree = TestGitWorkTree()
+    assert git_worktree.get_git_project("bar")

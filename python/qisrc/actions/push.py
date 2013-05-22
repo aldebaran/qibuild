@@ -27,7 +27,7 @@ def configure_parser(parser):
 
 def do(args):
     """ Main entry point """
-    git_worktree = qisrc.parsers.get_git_worktree(args, sync_first=False)
+    git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args)
     for git_project in git_projects:
         git = qisrc.git.Git(git_project.path)
