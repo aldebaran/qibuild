@@ -112,7 +112,7 @@ you should write a ``spam-config.cmake`` and use something like
 
    clean(FOO)
    # calling flib, fpath as usual
-   qi_persitent_set(FOO_DEPENDS spam)
+   qi_persistent_set(FOO_DEPENDS spam)
    export_lib(FOO)
 
 

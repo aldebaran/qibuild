@@ -115,8 +115,8 @@ This is done by something like
 
   # in internal/layout:
 
-  qi_persitent_set(QI_SDK_BIN "bin")
-  qi_persitent_set(QI_SDK_LIB "lib")
+  qi_persistent_set(QI_SDK_BIN "bin")
+  qi_persistent_set(QI_SDK_LIB "lib")
 
   # then, in target.cmake
 
