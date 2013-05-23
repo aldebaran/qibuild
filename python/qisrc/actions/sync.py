@@ -22,13 +22,11 @@ import qibuild.parsers
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
-    qibuild.parsers.project_parser(parser)
+    qisys.parsers.project_parser(parser)
 
-    parser.add_argument("--no-review", dest="setup_review", action="store_false",
-        help="Do not setup projects for review")
-    parser.add_argument("--rebase-devel", action="store_true",
-        help="Rebase devel branches. For advanced users only")
-    parser.set_defaults(setup_review=True)
+    group = parser.add_argument_group("qisrc sync options")
+    group.add_argument("--rebase-devel", action="store_true",
+                       help="Rebase development branches. Advanced users only")
 
 @ui.timer("Synchronizing worktree")
 def do(args):
@@ -39,7 +37,10 @@ def do(args):
     #   - missing projects have been cloned
     #   - every repo that uses gerrit has been configured
     #   - every branch is configured correctly
-    git_projects = qisrc.parsers.get_git_projects(git_worktree, args, default_all=True)
+    git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
+                                                  default_all=True,
+                                                  use_build_deps=True)
+
     skipped = list()
     failed = list()
     ui.info(ui.green, ":: Syncing projects ...")

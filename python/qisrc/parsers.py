@@ -30,17 +30,22 @@ def get_git_worktree(args):
     return git_worktree
 
 
-def get_git_projects(git_worktree, args, default_all=False):
+def get_git_projects(git_worktree, args,
+                     default_all=False,
+                     use_build_deps=False):
     """ Get a list of git projects to use """
-    if hasattr(args, "use_deps") and args.use_deps:
+    git_parser = GitProjectParser(git_worktree)
+
+    if use_build_deps:
+        # To avoid getting all the projects when no project is given
+        # and running from the subdir of a build project
+        if not at_top_worktree(git_worktree):
+            default_all = False
         build_worktree = qibuild.worktree.BuildWorkTree(git_worktree.worktree)
-        parser = GitBuildProjectParser(git_worktree, build_worktree)
-        # do NOT forward default_all option
-        # (cd hello, qisrc sync --use-deps  must not run on all projects)
-        return parser.parse_args(args, default_all=False)
+        build_parser = GitBuildProjectParser(git_worktree, build_worktree)
+        return build_parser.parse_args(args, default_all=default_all)
     else:
-        parser = GitProjectParser(git_worktree)
-        return parser.parse_args(args, default_all=default_all)
+        return git_parser.parse_args(args, default_all=default_all)
 
 def get_one_git_project(git_worktree, args):
     parser = GitProjectParser(git_worktree)
@@ -52,6 +57,10 @@ def get_one_git_project(git_worktree, args):
 
 ##
 # Implementation details
+
+def at_top_worktree(git_worktree):
+    """ Return True if we are at the root of the worktree """
+    return os.getcwd() == git_worktree.root
 
 class GitProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a GitWorkTree """
@@ -109,7 +118,7 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
         return self.solve_deps(args, git_project)
 
     def solve_deps(self, args, git_project):
-        """ Called when using `qisrc --use-deps`:
+        """ Called when use_build_deps is True
 
         * find a git project as usual
         * find the parent build project of this git project

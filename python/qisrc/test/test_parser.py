@@ -4,8 +4,13 @@ import qisrc.git
 import qisrc.parsers
 import qisrc.worktree
 
+from qisrc.parsers import get_git_projects
+
 from qibuild.test.conftest import TestBuildWorkTree
 from qisrc.test.conftest import TestGitWorkTree
+
+import pytest
+
 def test_guess_git_repo(tmpdir, args):
     worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     foo = tmpdir.mkdir("foo")
@@ -21,9 +26,9 @@ def test_guess_git_repo(tmpdir, args):
 
     with qisys.sh.change_cwd(bar.strpath):
         assert qisys.parsers.get_projects(worktree, args)[0].src == "foo/bar"
-        assert qisrc.parsers.get_git_projects(git_worktree, args)[0].src == "foo"
+        assert get_git_projects(git_worktree, args)[0].src == "foo"
 
-def test_using_build_deps(cd_to_tmpdir, monkeypatch, args):
+def setup_test():
     build_worktree = TestBuildWorkTree()
     foo = build_worktree.create_project("foo")
     world = build_worktree.create_project("world")
@@ -35,11 +40,56 @@ def test_using_build_deps(cd_to_tmpdir, monkeypatch, args):
     git = qisrc.git.Git(hello.path)
     git.init()
     git_worktree = TestGitWorkTree()
-    monkeypatch.chdir("hello")
-    projs = qisrc.parsers.get_git_projects(git_worktree, args)
-    assert [x.src for x in projs] == ["hello"]
-    args.use_deps = True
-    projs = qisrc.parsers.get_git_projects(git_worktree, args)
-    assert [x.src for x in projs] == ["world", "hello"]
-    projs = qisrc.parsers.get_git_projects(git_worktree, args, default_all=True)
-    assert [x.src for x in projs] == ["world", "hello"]
+    foo = git_worktree.get_git_project("foo")
+    hello = git_worktree.get_git_project("hello")
+    world = git_worktree.get_git_project("world")
+    return (foo, hello, world)
+
+def test_default_all(cd_to_tmpdir, args):
+    (foo, hello, world) = setup_test()
+    git_worktree = TestGitWorkTree()
+
+    # Getting projects list at the top of the worktree is OK when using
+    # default_all :
+    projs = get_git_projects(git_worktree, args, default_all=True)
+    assert projs == [foo, hello, world]
+
+    # It's not when default_all is false
+    # pylint: disable-msg=E1101
+    with pytest.raises(qisrc.worktree.NotInAGitRepo):
+        get_git_projects(git_worktree, args, default_all=False)
+
+def test_default_all_build_deps(cd_to_tmpdir, args):
+    (foo, hello, world) = setup_test()
+    git_worktree = TestGitWorkTree()
+
+    # Getting projects list at the top of the worktree is OK when using
+    # default_all and use_build_deps
+    projs = get_git_projects(git_worktree, args,
+                                           default_all=True,
+                                           use_build_deps=True)
+    assert projs == [foo, hello, world]
+
+    # It's not when default_all is false
+    # pylint: disable-msg=E1101
+    with pytest.raises(qisrc.worktree.NotInAGitRepo):
+        get_git_projects(git_worktree, args,
+                                       use_build_deps=True,
+                                       default_all=False)
+
+def test_build_deps(cd_to_tmpdir, args):
+    (foo, hello, world) = setup_test()
+    git_worktree = TestGitWorkTree()
+    with qisys.sh.change_cwd(cd_to_tmpdir.join("hello").strpath):
+        projs =  get_git_projects(git_worktree, args,
+                                  use_build_deps=True,
+                                  default_all=False)
+        assert projs == [world, hello]
+        projs = get_git_projects(git_worktree, args,
+                                 use_build_deps=True,
+                                 default_all=True)
+        assert projs == [world, hello]
+
+        args.single = True
+        projs =  get_git_projects(git_worktree, args, use_build_deps=True)
+        assert projs == [hello]

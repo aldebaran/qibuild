@@ -180,6 +180,12 @@ class GitProject(object):
                                     remote_branch=branch.remote_branch)
 
 
+    def __eq__(self, other):
+        return self.src == other.src
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return "<GitProject in %s>" % self.src
 ##

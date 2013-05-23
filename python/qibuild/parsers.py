@@ -117,7 +117,7 @@ def get_dep_types(args):
     """ Get a list of dep types from the command line """
     if hasattr(args, "runtime_only") and args.runtime_only:
         return ["runtime"]
-    if args.build_only:
+    if hasattr(args, "build_only") and args.build_only:
         return ["build"]
     if args.single:
         return list()

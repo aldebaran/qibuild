@@ -41,19 +41,31 @@ def test_clone_new_repos(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("bar")
 
-def test_sync_build_deps(qisrc_action, git_server):
+def test_uses_build_deps_by_default(qisrc_action, git_server):
     git_server.add_qibuild_test_project("world")
     git_server.add_qibuild_test_project("hello")
     git_server.create_repo("foo.git")
     qisrc_action("manifest", "--add", "default", git_server.manifest_url)
-    git_server.push_file("foo.git", "foo.txt", "unrelated changes\n")
+
+    # Crete some changes in foo and world
+    git_server.push_file("foo.git", "foo.txt", "unrelated changes")
+    git_server.push_file("world.git", "world.txt", "dependency has been updated")
+
+    # Sync hello
     qisrc_action.chdir("hello")
-    qisrc_action("sync", "--use-deps")
+    qisrc_action("sync")
     qisrc_action.chdir(qisrc_action.root)
     git_worktree = TestGitWorkTree()
+
+    # foo is not a dep, should not have changed:
     foo_proj = git_worktree.get_git_project("foo")
     foo_txt = os.path.join(foo_proj.path, "foo.txt")
     assert not os.path.exists(foo_txt)
+
+    # World is a dep of hello:
+    world_proj = git_worktree.get_git_project("world")
+    world_txt = os.path.join(world_proj.path, "world.txt")
+    assert os.path.exists(world_txt)
 
 def test_sync_build_profiles(qisrc_action, git_server):
     git_server.add_build_profile("foo", [("WITH_FOO", "ON")])
