@@ -18,7 +18,7 @@ include(CMakeParseArguments)
 # You can for instance use the qiperf library for that.
 #
 # Notes:
-#  * The test won't be built if BUILD_PERFS_TESTS is OFF
+#  * The test won't be built if BUILD_PERF_TESTS is OFF
 #
 # \arg:name Name of the test. A target of this name will be created
 # \group:SRC Sources of the perf executable
@@ -26,8 +26,8 @@ include(CMakeParseArguments)
 # \group:ARGUMENTS arguments to be passed to the executable
 #
 function(qi_create_perf_test name)
-  if (DEFINED BUILD_PERFS_TESTS AND NOT BUILD_PERFS_TESTS)
-    qi_debug("Perf test(${name}) disabled by BUILD_PERFS_TESTS=OFF")
+  if (DEFINED BUILD_PERF_TESTS AND NOT BUILD_PERF_TESTS)
+    qi_debug("Perf test(${name}) disabled by BUILD_PERF_TESTS=OFF")
     qi_persistent_set(QI_${name}_TARGET_DISABLED TRUE)
     return()
   endif()
