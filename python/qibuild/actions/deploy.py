@@ -68,10 +68,13 @@ def do(args):
         urls.append(args.url)
     if args.urls:
         urls.extend(args.urls)
-    if len(urls) == 0:
-        ui.error("Please specify at least one url.")
 
     urls = [qibuild.deploy.parse_url(x) for x in urls]
+    urls = [x for x in urls if x is not None]
+
+    if len(urls) == 0:
+        ui.error("Please specify at least one url.")
+        return
 
     toc = qibuild.toc.toc_open(args.worktree, args)
     ui.info(ui.green, "Current worktree:", ui.reset, ui.bold, toc.worktree.root)
@@ -110,7 +113,7 @@ def do(args):
                 toc.toolchain.install_package(package.name, tmp, runtime=True)
                 for url in urls:
                     ui.info("To", ui.green, url["given"])
-                    url_to_deploy = '%(login)s@%(url)s:%(dir)s' % url
+                    url_to_deploy = qibuild.deploy.build_url(url)
                     qibuild.deploy.deploy(tmp, remote_url=url_to_deploy,
                             port=url.get("port", 22), use_rsync=use_rsync)
 
@@ -131,7 +134,7 @@ def do(args):
                             split_debug=args.split_debug)
         for url in urls:
             ui.info("To ", ui.green, url["given"])
-            url_to_deploy = '%(login)s@%(url)s:%(dir)s' % url
+            url_to_deploy = qibuild.deploy.build_url(url)
             qibuild.deploy.deploy(destdir, remote_url=url_to_deploy,
                     port=url.get("port", 22), use_rsync=use_rsync)
         if not args.split_debug:

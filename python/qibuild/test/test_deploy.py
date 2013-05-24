@@ -13,8 +13,8 @@ def test_parse_url():
             'login': 'john42-bar', 'url': "foo.bar.com", 'dir': 'some/really_strange-path'}
     res = qibuild.deploy.parse_url("john@foo:")
     assert res == {'given': 'john@foo:', 'login':'john', 'url':'foo', 'dir': ''}
-    res = qibuild.deploy.parse_url("foo:lol")
-    assert res == None
+    res = qibuild.deploy.parse_url("example.com:path")
+    assert res == {'given': 'example.com:path', 'url': 'example.com', 'dir': 'path'}
 
     res = qibuild.deploy.parse_url("http://login@example.com:path")
     assert res is None
@@ -22,4 +22,8 @@ def test_parse_url():
     res = qibuild.deploy.parse_url("ssh://login@example.com:1234/path")
     assert res == {'given': "ssh://login@example.com:1234/path",
             'login':'login', 'url':'example.com', 'dir':'/path', 'port':1234}
+
+    res = qibuild.deploy.parse_url("ssh://example.com:1234/path")
+    assert res == {'given': "ssh://example.com:1234/path",
+            'url':'example.com', 'dir':'/path', 'port':1234}
 

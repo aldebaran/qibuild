@@ -7,6 +7,7 @@
 import re
 import os
 
+from qisys import ui
 import qisys.command
 import qibuild.deploy
 from qibuild.dependencies_solver import DependenciesSolver
@@ -76,7 +77,7 @@ def parse_url(remote_url):
 
     """
 
-    login = ''
+    login = None
     url   = ''
     port  = None
     dir   = ''
@@ -87,8 +88,8 @@ def parse_url(remote_url):
         url = o.hostname
         dir = o.path
         port = o.port
-    elif o.scheme is not "":
-        # Scheme not supported
+    elif "://" in remote_url:
+        ui.warning("scheme is not correct (%s)." % o.scheme)
         return None
     else:
         parts = remote_url.split('@', 1)
@@ -103,10 +104,18 @@ def parse_url(remote_url):
         if len(parts) == 2:
             dir = parts[1]
 
-    ret = {'given':remote_url, 'login':login, 'url':url, 'dir':dir}
+    ret = {'given':remote_url, 'url':url, 'dir':dir}
+    if login is not None:
+        ret["login"] = login
     if port is not None:
         ret["port"] = port
     return ret
+
+def build_url(url_dict):
+    """Build an url from a dict return by parse_url."""
+    url = url_dict['login']+'@' if url_dict.has_key('login') else ''
+    url += url_dict['url'] + ":" + url_dict['dir']
+    return url
 
 def deploy(local_directory, remote_url, port=22, use_rsync=True):
     """Deploy a local directory to a remote url."""
@@ -205,7 +214,8 @@ def _generate_solib_search_path(toc, project_name):
 
 def generate_debug_scripts(toc, project_name, url, deploy_dir=None):
     """ generate all scripts needed for debug """
-    remote = url["login"] + "@" + url["url"]
+    remote = url['login']+'@' if url.has_key('login') else ''
+    remote += url["url"]
     server = url["url"]
     port   = url.get("port", 22)
     remote_directory = url["dir"]
