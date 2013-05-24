@@ -5,8 +5,16 @@
 import os
 import subprocess
 
+import qisys.command
 import qibuild.gdb
 
+import pytest
+
+def check_gdb():
+    gdb = qisys.command.find_program("gdb", raises=False)
+    if not gdb:
+        return False
+    return True
 
 def run_gdb(base_dir):
     gdb_ini = os.path.join(base_dir, "gdb.ini")
@@ -24,6 +32,8 @@ q
 
 
 def test_normal_debug(qibuild_action):
+    if not check_gdb():
+        return
     proj = qibuild_action.add_test_project("debugme")
     qibuild_action("configure", "debugme")
     qibuild_action("make", "debugme")
@@ -33,6 +43,8 @@ def test_normal_debug(qibuild_action):
 
 
 def test_split_debug(qibuild_action):
+    if not check_gdb():
+        return
     proj = qibuild_action.add_test_project("debugme")
     qibuild_action("configure", "debugme")
     qibuild_action("make", "debugme")
@@ -43,6 +55,8 @@ def test_split_debug(qibuild_action):
 
 
 def test_split_debug_install(qibuild_action, tmpdir):
+    if not check_gdb():
+        return
     tmpdir = tmpdir.strpath
     qibuild_action.add_test_project("debugme")
     qibuild_action("configure", "debugme")
@@ -51,3 +65,15 @@ def test_split_debug_install(qibuild_action, tmpdir):
     (out, _) = run_gdb(tmpdir)
     assert "in foo () at " in out
     assert "main.cpp" in out
+
+def test_gdb_not_installed(qibuild_action, tmpdir, record_messages):
+    if check_gdb():
+        return
+    qibuild_action.add_test_project("debugme")
+    qibuild_action("configure", "debugme")
+    qibuild_action("make", "debugme")
+    qibuild_action("install" , "--runtime", "--split-debug",
+                    "debugme" , tmpdir.strpath)
+    assert record_messages.find("Could not split debug symbols")
+    assert tmpdir.check(dir=True)
+
