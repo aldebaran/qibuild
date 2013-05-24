@@ -20,18 +20,20 @@ def parse_cmake_log(input, qibuild_dir):
 
     Generate annotated source code for each cmake file in qibuild,
     """
+    # cmake log is written like c:/path/to/qibuild/cmake/
+    qibuild_dir = qisys.sh.to_posix_path(qibuild_dir)
     profile = dict()
     with open(input, "r") as fp:
         for line in fp:
             match = re.match(LOG_RE, line)
             if not match:
                 continue
-
             (filename, line_no) = match.groups()
-            if not qibuild_dir.replace(os.sep,'/') in filename:
+            if not qibuild_dir in filename:
                 continue
             # 9 is len("/qibuild/")
             filename = filename[len(qibuild_dir) + 9:]
+            filename = filename.replace("\\" , "/" )
             line_no = int(line_no)
             if not filename in profile:
                 profile[filename] = dict()

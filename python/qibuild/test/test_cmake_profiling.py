@@ -2,7 +2,11 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-import qibuild
+import os
+
+import qisys.sh
+import qibuild.cmake
+
 from qibuild.cmake.profiling import parse_cmake_log
 from qibuild.cmake.profiling import gen_annotations
 
@@ -21,7 +25,11 @@ def test_simple_parse(tmpdir):
 @qibuild_root@/qibuild/internal/install.cmake(63):  get_filename_component(_file_subdir ${_file} PATH )
 """
     qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
-    out = out.replace("@worktree@", "/path/to/worktree")
+    qibuild_dir = qisys.sh.to_posix_path(qibuild_dir)
+    if os.name == 'nt':
+        out = out.replace("@worktree@", "c:/path/to/worktree")
+    else:
+        out = out.replace("@worktree@", "/path/to/worktree")
     out = out.replace("@qibuild_root@",  qibuild_dir)
     cmake_log = tmpdir.join("cmake.log")
     cmake_log.write(out)
