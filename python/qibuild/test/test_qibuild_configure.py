@@ -87,7 +87,7 @@ def test_preserve_cache(qibuild_action):
             cache_after[k] = cache_after[k].lower()
     assert cache_before == cache_after
 
-def test_config_h(qibuild_action, tmpdir):
+def test_config_h_simple(qibuild_action, tmpdir):
     proj = qibuild_action.add_test_project("config_h")
     qibuild_action("configure", "config_h")
     qibuild_action("make", "config_h")
