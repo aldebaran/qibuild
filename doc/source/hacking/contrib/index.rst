@@ -1,10 +1,14 @@
 .. _qibuild-contrib:
 
 Contributing to qiBuild
-------------------------
+========================
 
 qiBuild development process take place on github:
 https://github.com/aldebaran/qibuild
+
+
+Reporting bugs
+--------------
 
 Please open an issue on github for every qibuild bug you may
 find, but make sure to read this first:
@@ -13,6 +17,24 @@ find, but make sure to read this first:
     :maxdepth: 1
 
     reporting_bugs
+
+TODO list
+----------
+
+If you want to contribute, but don't know
+what to do, you can have a look at the TODO:
+
+
+.. toctree::
+    :maxdepth: 1
+
+    todo
+
+Feel free to just add your own ideas to the list :)
+
+
+Submitting changes
+-------------------
 
 Please fork the project on github and make a merge request
 if you want to contribute.
@@ -43,6 +65,7 @@ before sending a merge request:
    :maxdepth: 1
 
    running_test_suite
+   writing_new_tests
 
 
 Please also make sure to submit documentation
@@ -52,16 +75,3 @@ updates concerning your changes.
    :maxdepth: 1
 
    writing_documentation
-
-If you are using qibuild from the git repository,
-have a look at the :ref:`qibuild-cooking` section
-first.
-
-.. toctree::
-   :hidden:
-
-   reporting_bugs
-   cmake/coding_guide
-   python/coding_guide
-   cooking
-   writing_new_tests
