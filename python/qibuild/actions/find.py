@@ -51,7 +51,8 @@ def _use_build_directories(args):
     """
     build_worktree = qibuild.parsers.get_build_worktree(args)
     projects = qibuild.parsers.get_build_projects(build_worktree, args)
-    path = qibuild.find.find(projects, args.package)
+    debug = build_worktree.build_config.debug
+    path = qibuild.find.find(projects, args.package, debug=debug)
     ui.info(path)
 
 def do(args):
