@@ -136,9 +136,9 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml, user_config="linux32")
-        excpected_path = qisys.sh.to_native_path("/path/to/swig32")
+        excpected_path = "/path/to/swig32"
         excpected_path += os.path.pathsep
-        excpected_path += qisys.sh.to_native_path("/path/to/foo")
+        excpected_path += "/path/to/foo"
         self.assertEquals(qibuild_cfg.env.path, excpected_path)
 
     def test_ide_selection(self):
@@ -352,10 +352,8 @@ class QiBuildConfig(unittest.TestCase):
         qibuild_cfg = cfg_from_string(xml)
         self.assertTrue(qibuild_cfg.build.incredibuild)
         qibuild_cfg.read_local_config(StringIO(local_xml))
-        self.assertEqual(qibuild_cfg.local.build.sdk_dir,
-            qisys.sh.to_native_path("/path/to/sdk"))
-        self.assertEqual(qibuild_cfg.local.build.build_dir,
-            qisys.sh.to_native_path("/path/to/build"))
+        self.assertEqual(qibuild_cfg.local.build.sdk_dir, "/path/to/sdk")
+        self.assertEqual(qibuild_cfg.local.build.build_dir, "/path/to/build")
 
 
     def test_get_server_access(self):
