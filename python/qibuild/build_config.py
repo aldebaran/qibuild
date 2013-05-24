@@ -64,6 +64,14 @@ class CMakeBuildConfig(object):
         return self.qibuild_cfg.cmake.generator
 
     @property
+    def debug(self):
+        """ Wether we are building in debug. True unless user
+        specified --release
+
+        """
+        return self.build_type == "Debug"
+
+    @property
     def using_make(self):
         """ Whether we are using make """
         return self.cmake_generator and "Unix Makefiles" in self.cmake_generator
