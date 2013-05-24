@@ -239,17 +239,19 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
 
         timer.stop()
 
-    def parse_num_jobs(self, num_jobs):
+    def parse_num_jobs(self, num_jobs, cmake_generator=None):
         """ Convert a number of jobs to a list of cmake args """
-        cmake_generator = qibuild.cmake.get_cached_var(self.build_directory, "CMAKE_GENERATOR")
+        if not cmake_generator:
+            cmake_generator = \
+                    qibuild.cmake.get_cached_var(self.build_directory, "CMAKE_GENERATOR")
         if num_jobs == 1:
             return list()
         if "Unix Makefiles" in cmake_generator or \
-        "Ninja" in cmake_generator:
+            "Ninja" in cmake_generator:
             return ["-j", str(num_jobs)]
         if cmake_generator == "NMake Makefiles":
             mess   = "-j is not supported for %s\n" % cmake_generator
-            mess += "On windows, you can use Jom instead to compile "
+            mess += "On Windows, you can use Jom or Ninja instead to compile "
             mess += "with multiple processors"
             raise Exception(mess)
         if "Visual Studio" in cmake_generator or \
@@ -257,7 +259,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             "JOM" in cmake_generator:
             ui.warning("-j is ignored when used with", cmake_generator)
             return list()
-        ui.warning("cannot parse -j into a cmake option for generator: %s" % cmake_generator)
+        ui.warning("Unknown generator: %s, ignoring -j option" % cmake_generator)
         return list()
 
 
