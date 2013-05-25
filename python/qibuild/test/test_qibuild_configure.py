@@ -78,6 +78,13 @@ def test_preserve_cache(qibuild_action):
     qisys.command.call(["cmake", ".."], cwd=foo_proj.build_directory)
     cache_after = qibuild.cmake.read_cmake_cache(foo_proj.cmake_cache)
 
+    if os.name == 'nt':
+        # no way to prevent CMake for storing c:\Users
+        # in the cache ...
+        for k in cache_before:
+            cache_before[k] = cache_before[k].lower()
+        for k in cache_after:
+            cache_after[k] = cache_after[k].lower()
     assert cache_before == cache_after
 
 def test_config_h(qibuild_action, tmpdir):
