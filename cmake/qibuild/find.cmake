@@ -361,6 +361,11 @@ function(_qi_call_fphsa prefix)
     find_package_handle_standard_args(${prefix} DEFAULT_MSG ${_to_check})
   endif()
 
+  # Check that headers and libs are consistent
+  _check_consistent(${prefix}
+                    INC ${prefix}_INCLUDE_DIRS
+                    LIB ${prefix}_LIBRARIES)
+
   # Right after find_package_handle_standard_args, ${prefix}_FOUND is
   # set correctly.
   # For instance, if foo/bar.h is not foud, FOO_FOUND is FALSE.
@@ -369,4 +374,60 @@ function(_qi_call_fphsa prefix)
   # So we set ${prefix}_PACKAGE_FOUND in cache...
   qi_persistent_set(${prefix}_PACKAGE_FOUND ${${prefix}_FOUND})
   qi_persistent_set(${prefix}_SEARCHED TRUE)
+endfunction()
+
+
+function(_check_consistent package)
+  cmake_parse_arguments(ARG "" "" "INC;LIB" ${ARGN})
+  if (NOT ARG_INC)
+    return()
+  endif()
+
+  if(NOT ARG_LIB)
+    return()
+  endif()
+
+  foreach(_inc ${ARG_INC})
+    foreach(_lib ${ARG_LIB})
+      # this should filter out args such as SYSTEM,
+      # general, debug, release
+      if(EXISTS ${_inc} AND EXISTS ${_lib})
+        _check_consistent_helper(${package} ${_inc} ${_lib})
+      endif()
+    endforeach()
+  endforeach()
+
+endfunction()
+
+function(_check_consistent_helper package include_path lib_path)
+  set(_inc_in_system)
+  set(_lib_in_system)
+  string(FIND ${include_path} "toolchains" _found)
+  if(${_found} EQUAL "-1")
+    set(_inc_in_system FALSE)
+  else()
+    set(_inc_in_system TRUE)
+  endif()
+
+  string(FIND ${lib_path} "toolchains" _found)
+  if(${_found} EQUAL "-1")
+    set(_lib_in_system FALSE)
+  else()
+    set(_lib_in_system TRUE)
+  endif()
+
+  if(${_lib_in_system} AND ${_inc_in_system})
+    # both in system: ok
+    return()
+  endif()
+
+  if(NOT ${_lib_in_system} AND NOT ${_inc_in_system})
+    # both in toolchain: ok
+    return()
+  endif()
+  qi_error("Inconsistent lib/header settings found for package ${package}:
+${include_path}
+${lib_path}
+")
+
 endfunction()
