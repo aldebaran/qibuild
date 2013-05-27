@@ -300,10 +300,6 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             mess += "CMAKE_INSTALL_PREFIX is already correct"
             ui.debug(mess)
 
-        # Hack for http://www.cmake.org/Bug/print_bug_page.php?bug_id=13934
-        if self.using_make:
-            self.build(target="preinstall", num_jobs=num_jobs)
-
         if runtime:
             self.install_runtime(destdir)
         else:
@@ -314,6 +310,13 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
 
     def install_runtime(self, destdir):
         build_env = self.build_env.copy()
+        build_env["DESTDIR"] = destdir
+
+        num_jobs = self.parse_num_jobs(self.build_config.num_jobs)
+        # Hack for http://www.cmake.org/Bug/print_bug_page.php?bug_id=13934
+        if self.using_make:
+            self.build(target="preinstall", num_jobs=num_jobs, env=build_env)
+
         runtime_components = [
              "binary",
              "data",
@@ -322,7 +325,6 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
              "python",
              "doc"
          ]
-        build_env["DESTDIR"] = destdir
         for component in runtime_components:
             cmake_args = list()
             cmake_args += ["-DBUILD_TYPE=%s" % self.build_config.build_type]
