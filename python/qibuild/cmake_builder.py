@@ -144,7 +144,7 @@ class CMakeBuilder(object):
             ui.info_count(i, len(projects),
                           ui.green, "Insalling",
                           ui.blue, package.name)
-            package.install(real_dest, runtime=runtime_only, **kwargs)
+            package.install(real_dest, runtime=runtime_only)
 
         print
         ui.info(ui.green, ":: ", "Installing projects")
@@ -212,4 +212,3 @@ The project {project.name} has not been configured yet.
 Please run `qibuild configure` first
 """
         return mess.format(project=self.project)
-

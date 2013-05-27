@@ -1,6 +1,9 @@
 import qisys.command
 
-def test_running_from_install_dir(qibuild_action, tmpdir):
+from qibuild.test.conftest import QiBuildAction
+from qitoolchain.test.conftest import QiToolchainAction
+
+def test_running_from_install_dir_dep_in_worktree(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
 
@@ -12,6 +15,29 @@ def test_running_from_install_dir(qibuild_action, tmpdir):
     qisys.command.call([hello.strpath])
 
     assert not tmpdir.join("include").check()
+
+def test_running_from_install_dir_dep_in_toolchain(cd_to_tmpdir):
+    # create a foo toolchain containing the world package
+    qibuild_action = QiBuildAction()
+    qitoolchain_action = QiToolchainAction()
+    build_worktree = qibuild_action.build_worktree
+    qibuild_action.add_test_project("world")
+    qibuild_action.add_test_project("hello")
+    world_package = qibuild_action("package", "world")
+    qitoolchain_action("create", "foo")
+    qitoolchain_action("add-package", "-c", "foo", "world", world_package)
+    build_worktree.worktree.remove_project("world", from_disk=True)
+
+    # install and run hello, (checking that the world lib is
+    # installed form the package of the toolchain)
+    qibuild_action("configure", "-c", "foo", "hello")
+    qibuild_action("make", "-c", "foo", "hello")
+    prefix = cd_to_tmpdir.mkdir("prefix")
+    qibuild_action("install", "-c", "foo", "hello", prefix.strpath)
+
+    hello = prefix.join("bin").join("hello")
+    qisys.command.call([hello.strpath])
+
 
 def test_devel_components_installed_by_default(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
