@@ -1,0 +1,5 @@
+<project>
+  <doxydoc name="a_doxy" src="a" />
+  <doxydoc name="b_doxy" src="b" dest="ref/b" depends="a" />
+  <sphinxdoc name="c_sphinx" src="c" depends="b_doxy" />
+</project>

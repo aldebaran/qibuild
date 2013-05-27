@@ -1,0 +1,3 @@
+PROJECT_NAME           = b_doxy
+PROJECT_NUMBER         = 0.42
+OUTPUT_DIRECTORY       = build-doc
