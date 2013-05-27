@@ -1,0 +1,5 @@
+<project>
+  <project src="a" />
+  <project src="b" />
+  <project src="c" />
+</project>

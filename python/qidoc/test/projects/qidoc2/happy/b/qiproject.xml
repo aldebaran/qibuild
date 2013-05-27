@@ -1,0 +1,5 @@
+<project>
+  <doxydoc name="b_doxy" dest="ref/b">
+    <depends name="a_doxy" />
+  </doxydoc>
+</project>

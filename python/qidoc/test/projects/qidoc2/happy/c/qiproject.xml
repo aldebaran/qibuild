@@ -1,0 +1,5 @@
+<project>
+  <sphinxdoc name="c_sphinx" >
+    <depend names="b_doxy" />
+  </sphinxdoc>
+</project>
