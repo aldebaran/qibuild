@@ -43,11 +43,11 @@ class LinguistWorkTree(qisys.worktree.WorkTreeObserver):
                                                            raises=False)
         if project_with_same_name:
             raise Exception("""\
-    Found two projects with the same name ({0})
-    In:
-    * {1}
-    * {2}
-    """.format(new_project.name,
+Found two projects with the same name ({0})
+In:
+* {1}
+* {2}
+""".format(new_project.name,
                project_with_same_name.path,
                new_project.path))
 

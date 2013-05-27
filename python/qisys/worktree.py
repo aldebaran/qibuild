@@ -237,7 +237,7 @@ class WorkTreeProject(object):
                 raise WorkTreeError(""" \
 Invalid qiproject.xml detected (in {0})
 Found an invalid sub project: {1}
-{2} does not exits
+{2} does not exist
 """.format(self.qiproject_xml, sub_src, full_path))
             self.subprojects.append(sub_src)
 
