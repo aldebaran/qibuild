@@ -28,7 +28,9 @@ Instead, only use qi_create_test and generate custom
 files instead (thus we no longer have to parse cmake-generated
 cmake code)
 
-It became easier to write code like this::
+It became easier to write code like this
+
+.. code-block:: cmake
 
   qi_create_test(... NIGHTLY)
   qi_create_test(.... PERF)
@@ -46,20 +48,22 @@ or any other tricks.
 However:
 
 * this means you can have problems with your headers install rules and not see them
-* this also means you cannot easily depdend of a project not using qibuild (even if it uses CMake),
+* this also means you cannot easily depend of a project not using qibuild (even if it uses CMake),
   or a project using autotools
 
 The solution is simple: After building a dependency, install it to ``QI_WOKTREE/root``  and
 just set ``CMAKE_INSTALL_PREFIX`` to ``QI_WOKTREE/root``
 
 This will work with any build system, (provided they have correct install rules), and will
-force peoploe to have correct install rules.
+force people to have correct install rules.
 
 Make it easier to use 3rd party cmake module
 ++++++++++++++++++++++++++++++++++++++++++++++
 
 
-Say you find a `foo-config.cmake` somewhere... If you try to do::
+Say you find a `foo-config.cmake` somewhere... If you try to do
+
+.. code-block:: cmake
 
   find_package(FOO)
 
@@ -71,7 +75,9 @@ This may or may not work: it depends of what the `foo-config.cmake` does:
 `qi_use_lib` , `qi_stage_lib` expects some variables (`FOO_INCLUDE_DIRS`, `FOO_LIBRARIES`) to be
 in the cache
 
-It may be cleaner to add a `qi_export` function::
+It may be cleaner to add a `qi_export` function
+
+.. code-block:: cmake
 
   find_package(FOO)
 
@@ -83,6 +89,34 @@ It may be cleaner to add a `qi_export` function::
   qi_export(foo
     LIBRARIES ${Foo_LIBRARY}
   )
+
+Make it easier to stage and use header-only libraries
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Basically, go from
+
+.. code-block:: cmake
+
+  find_package(EIGEN3)
+  include_directories(${EIGEN3_INCLUDE_DIRS})
+  include_directories("include")
+  qi_stage_header_only_lib(foo DEPENDS EIGEN3)
+
+
+To
+
+.. code-block:: cmake
+
+  qi_create_header_only_lib(foo ${public_headers})
+  qi_use_lib(foo EIGEN3)
+  qi_stage_lib(foo)
+
+
+where ``foo`` is a header-only library depending on
+``Eigen3``
+
+
+
 
 
 Command line
