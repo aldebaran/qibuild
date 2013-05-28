@@ -1,5 +1,7 @@
 import qisys.command
 
+import qibuild.find
+
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
 
@@ -11,8 +13,8 @@ def test_running_from_install_dir_dep_in_worktree(qibuild_action, tmpdir):
     qibuild_action("make", "hello")
     qibuild_action("install", "--runtime", "hello", tmpdir.strpath)
 
-    hello = tmpdir.join("bin").join("hello")
-    qisys.command.call([hello.strpath])
+    hello = qibuild.find.find_bin([tmpdir.strpath], "hello")
+    qisys.command.call([hello])
 
     assert not tmpdir.join("include").check()
 
@@ -35,8 +37,8 @@ def test_running_from_install_dir_dep_in_toolchain(cd_to_tmpdir):
     prefix = cd_to_tmpdir.mkdir("prefix")
     qibuild_action("install", "-c", "foo", "hello", prefix.strpath)
 
-    hello = prefix.join("bin").join("hello")
-    qisys.command.call([hello.strpath])
+    hello = qibuild.find.find_bin([prefix.strpath], "hello")
+    qisys.command.call([hello])
 
 
 def test_devel_components_installed_by_default(qibuild_action, tmpdir):

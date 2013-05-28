@@ -1,9 +1,9 @@
 import os
 
 import qisys.command
+import qibuild.find
 
 import pytest
-
 
 def test_running_from_build_dir(qibuild_action):
     # Running `qibuild configure hello` `qibuild make hello` and running
@@ -13,7 +13,7 @@ def test_running_from_build_dir(qibuild_action):
     hello_proj = qibuild_action.add_test_project("hello")
     qibuild_action("configure", "hello")
     qibuild_action("make", "hello")
-    hello = os.path.join(hello_proj.sdk_directory, "bin", "hello")
+    hello = qibuild.find.find_bin([hello_proj.sdk_directory], "hello")
     qisys.command.call([hello])
 
 def test_make_without_configure(qibuild_action):
@@ -32,5 +32,5 @@ def test_running_from_build_dir_incremental(qibuild_action):
     qibuild_action("configure", "hello")
     qibuild_action("make", "hello")
     qibuild_action("make", "hello")
-    hello = os.path.join(hello_proj.sdk_directory, "bin", "hello")
+    hello = qibuild.find.find_bin([hello_proj.sdk_directory], "hello")
     qisys.command.call([hello])

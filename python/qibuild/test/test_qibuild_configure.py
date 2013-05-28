@@ -92,8 +92,9 @@ def test_config_h_simple(qibuild_action, tmpdir):
     qibuild_action("configure", "config_h")
     qibuild_action("make", "config_h")
     qibuild_action("install", "config_h", tmpdir.strpath)
-    foo = os.path.join(proj.sdk_directory, "bin", "foo")
+    foo = qibuild.find.find_bin([tmpdir.strpath], "foo")
     process = subprocess.Popen([foo])
+
     process.wait()
     assert process.returncode == 42
     assert tmpdir.join("include", "foo", "config.h").check(file=1)
