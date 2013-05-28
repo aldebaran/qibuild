@@ -58,8 +58,7 @@ def test_setting_prefix(qibuild_action, tmpdir):
     qibuild_action("make", "hello")
     qibuild_action("install", "--prefix=/usr", "--runtime",
                    "hello", tmpdir.strpath)
-    hello = tmpdir.join("usr").join("bin").join("hello")
-    assert hello.check(file=True)
+    hello = qibuild.find.find([tmpdir.join("usr").strpath], "hello")
 
 def test_using_compiled_tool_for_install(qibuild_action, tmpdir):
     qibuild_action.add_test_project("footool")
