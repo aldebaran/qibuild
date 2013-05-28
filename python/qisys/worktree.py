@@ -196,7 +196,8 @@ worktree root: {1}
         if os.path.isabs(path):
             path = os.path.relpath(path, start=self.root)
         path = path.replace(ntpath.sep, posixpath.sep)
-        path = os.path.normcase(path)
+        if os.name == 'nt':
+            path = path.lower()
         return path
 
     def __repr__(self):

@@ -31,7 +31,14 @@ def test_read_projects(tmpdir):
     p_srcs = [p.src for p in worktree.projects]
     assert p_srcs == ["core/naoqi", "lib/libqi"]
 
-def test_add_project(worktree):
+def test_normalize_path(tmpdir):
+    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
+    foo_abs_path = tmpdir.join("bar").join("foo").strpath
+    assert worktree.normalize_path(foo_abs_path) == "bar/foo"
+    assert worktree.normalize_path("bar/foo") == "bar/foo"
+
+
+def test_add_project_simple(worktree):
     # pylint: disable-msg=E1101
     tmp = py.path.local(worktree.root)
     tmp.mkdir("foo")
