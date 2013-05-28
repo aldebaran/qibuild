@@ -9,6 +9,8 @@
 import os
 import platform
 
+import qisys.sh
+
 def find_lib(paths, name, debug=None, expect_one=True):
     """ Find a lib in a list of paths.
     :param: debug. If ``None``, looks for both debug and
@@ -137,6 +139,7 @@ def _binary_suffix(shared=True, debug=True, os_name=None):
 
 def _filter_candidates(name, candidates, expect_one=True):
     res = [x for x in candidates if os.path.exists(x)]
+    res = [qisys.sh.to_native_path(x) for x in res]
     if not expect_one:
         return res
     if expect_one and not res:
