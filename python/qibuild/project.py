@@ -10,6 +10,7 @@ import qibuild.cmake
 import qibuild.build
 import qibuild.gdb
 import qibuild.dylibs
+import qibuild.dlls
 import qitoolchain.toolchain
 
 class BuildProject(object):
@@ -357,8 +358,8 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
         """
         if sys.platform == "darwin":
             qibuild.dylibs.fix_dylibs(self.sdk_directory, paths=paths)
-        if sys.platform == "win":
-            mingw = self.build_config.mingw
+        if sys.platform.startswith("win"):
+            mingw = self.build_config.using_mingw
             qibuild.dlls.fix_dlls(self.sdk_directory, paths=paths,
                                   mingw=mingw, env=self.build_env)
 
