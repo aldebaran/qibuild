@@ -119,7 +119,7 @@ def test_cmake_option_build_test_on(qibuild_action):
     project = qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme", "-DBUILD_TESTS=ON")
     qibuild_action("make", "testme")
-    test_path = qibuild.find.find([project], "ok")
+    test_path = qibuild.find.find([project.sdk_directory], "ok")
     assert test_path is not None
     assert os.path.exists(test_path)
 
@@ -127,14 +127,14 @@ def test_cmake_option_build_test_off(qibuild_action):
     project = qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme", "-DBUILD_TESTS=OFF")
     qibuild_action("make", "testme")
-    test_path = qibuild.find.find([project], "ok")
-    assert test_path is None
+    test_path = qibuild.find.find([project.sdk_directory], "ok", expect_one=False)
+    assert not test_path
 
 def test_cmake_option_build_perf_test_on(qibuild_action):
     project = qibuild_action.add_test_project("perf")
     qibuild_action("configure", "perf", "-DBUILD_PERF_TESTS=ON")
     qibuild_action("make", "perf")
-    test_path = qibuild.find.find([project], "perf_spam")
+    test_path = qibuild.find.find([project.sdk_directory], "perf_spam")
     assert test_path is not None
     assert os.path.exists(test_path)
 
@@ -142,5 +142,5 @@ def test_cmake_option_build_perf_test_off(qibuild_action):
     project = qibuild_action.add_test_project("perf")
     qibuild_action("configure", "perf", "-DBUILD_PERF_TESTS=OFF")
     qibuild_action("make", "perf")
-    test_path = qibuild.find.find([project], "perf_spam")
-    assert test_path is None
+    test_path = qibuild.find.find([project.sdk_directory], "perf_spam", expect_one=False)
+    assert not test_path

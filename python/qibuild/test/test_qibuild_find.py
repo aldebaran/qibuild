@@ -38,9 +38,8 @@ def test_find_target_in_build_dir(qibuild_action, record_messages):
     qibuild_action("find", "hello", "world")
     assert record_messages.find(find.library_name("world"))
 
-    record_messages.reset()
-    qibuild_action("find", "hello", "libworld")
-    assert record_messages.find(find.library_name("world")) is None
+    rc = qibuild_action("find", "hello", "libworld", retcode=True)
+    assert rc == 1
 
 def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
     qibuild_action = QiBuildAction()
@@ -63,7 +62,6 @@ def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
     qibuild_action("find", "hello", "-c", "foo")
     assert record_messages.find(find.binary_name("hello"))
 
-    record_messages.reset()
-    qibuild_action("find", "libeggs", "-c", "foo")
-    assert record_messages.find("libeggs") is None
+    rc = qibuild_action("find", "libeggs", "-c", "foo", retcode=True)
+    assert rc == 1
 

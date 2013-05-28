@@ -6,6 +6,8 @@
 
 """
 
+import sys
+
 from qisys import ui
 import qibuild.find
 import qibuild.parsers
@@ -50,10 +52,16 @@ def _use_build_directories(args):
     """ Print packages found with find().
     """
     build_worktree = qibuild.parsers.get_build_worktree(args)
-    projects = qibuild.parsers.get_build_projects(build_worktree, args)
+    projects = qibuild.parsers.get_build_projects(build_worktree,
+                                                  args,
+                                                  default_all=True)
     debug = build_worktree.build_config.debug
-    path = qibuild.find.find(projects, args.package, debug=debug)
-    ui.info(path)
+    found = qibuild.find.find([p.sdk_directory for p in projects],
+                              args.package, debug=debug, expect_one=False)
+    if not found:
+        sys.exit(1)
+    for res in found:
+        ui.info(res)
 
 def do(args):
     """Main entry point """

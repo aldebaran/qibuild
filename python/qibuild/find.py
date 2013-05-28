@@ -9,6 +9,80 @@
 import os
 import platform
 
+def find_lib(paths, name, debug=None, expect_one=True):
+    """ Find a lib in a list of paths.
+    :param: debug. If ``None``, looks for both debug and
+                   release. If ``True``, only look for
+                   a library built in debug, if ``False``,
+                   only look for a library built in release.
+                   (This is only relevant on Windows)
+
+    """
+    candidates = set()
+    if debug is None:
+        debug_cases = [True, False]
+    else:
+        debug_cases = [debug]
+
+    for debug in debug_cases:
+        for shared in True, False:
+            lib_name = library_name(name, shared=shared, debug=debug)
+            for path in paths:
+                lib_path = os.path.join(path, "lib", lib_name)
+                candidates.add(lib_path)
+                if os.name == 'nt' and shared:
+                    # dlls can be in bin/ on windows:
+                    lib_path = os.path.join(path, "bin", lib_name)
+                    candidates.add(lib_path)
+
+    return _filter_candidates(name, candidates, expect_one=expect_one)
+
+
+def find_bin(paths, name, debug=None, expect_one=True):
+    """ Find a lib in a list of paths.
+    :param: debug. If ``None``, looks for both debug and
+                   release. If ``True``, only look for
+                   a binary built in debug, if ``False``,
+                   only look for a binary built in release.
+                   (This is only relevant on Windows)
+
+    """
+    candidates = set()
+    if debug is None:
+        debug_cases = [True, False]
+    else:
+        debug_cases = [debug]
+
+    for debug in debug_cases:
+        bin_name = binary_name(name, debug=debug)
+        for path in paths:
+            bin_path = os.path.join(path, "bin", bin_name)
+            candidates.add(bin_path)
+
+    return _filter_candidates(name, candidates, expect_one=expect_one)
+
+def find(paths, name, debug=True, expect_one=True):
+    """ Search a binary or a library given its name
+
+    """
+    bins = find_bin(paths, name, debug=debug, expect_one=False)
+    libs = find_lib(paths, name, debug=debug, expect_one=False)
+    candidates = bins + libs
+    return _filter_candidates(name, candidates, expect_one=expect_one)
+
+
+
+def binary_name(name, shared=True, debug=True, os_name=None):
+    """ Return exact binary name for current OS.
+    """
+    return name + _binary_suffix(shared=shared, debug=debug, os_name=os_name)
+
+def library_name(name, shared=True, debug=True, os_name=None):
+    """ Return exact library name for current OS.
+    """
+    return _library_prefix(os_name) + name + _library_suffix(shared=shared, debug=debug,
+                                                             os_name=os_name)
+
 def _library_prefix(os_name=None):
     """ Return suitable library prefix used on current OS.
     """
@@ -20,7 +94,7 @@ def _library_prefix(os_name=None):
     else:
         return "lib"
 
-def _library_suffix(dynamic, debug=True, os_name=None):
+def _library_suffix(shared=True, debug=True, os_name=None):
     """ Return suitable library suffix used on current OS.
     """
     # Os variable can be forced for test purpose
@@ -32,19 +106,19 @@ def _library_suffix(dynamic, debug=True, os_name=None):
     if debug is True:
         debug_suffix = "_d"
 
-    if os_name == "Windows" and dynamic is True:
+    if os_name == "Windows" and shared is True:
         return debug_suffix + ".dll"
-    if os_name == "Windows" and dynamic is False:
+    if os_name == "Windows" and shared is False:
         return debug_suffix + ".lib"
-    if os_name == "Linux" and dynamic is True:
+    if os_name == "Linux" and shared is True:
         return ".so"
-    if os_name in ("Linux", "Mac") and dynamic is False:
+    if os_name in ("Linux", "Mac") and shared is False:
         return ".a"
-    if os_name == "Mac" and dynamic:
+    if os_name == "Mac" and shared:
         return ".dylib"
     return ""
 
-def _binary_suffix(dynamic=True, debug=True, os_name=None):
+def _binary_suffix(shared=True, debug=True, os_name=None):
     """ Return suitable binary suffix used on current OS.
     """
     # Os variable can be forced for test purpose
@@ -56,46 +130,35 @@ def _binary_suffix(dynamic=True, debug=True, os_name=None):
     if debug is True:
         debug_suffix = "_d"
 
-    # On Windows system, binaries wear ".exe" extention
+    # On Windows system, binaries wear ".exe" extension
     if os_name == "Windows":
         return debug_suffix + ".exe"
     return ""
 
-def find(projects, name, debug=True):
-    """ Search package directly in build directories so,
-        this way, we are sure that returned path really point
-        on package.
-    """
-    as_lib = library_name(name, debug=debug)
-    for project in projects:
-        candidates = list()
-        sdk_directory = project.sdk_directory
-        bin_dir = os.path.join(sdk_directory, "bin")
-        bin_name = binary_name(name, debug=debug)
-        candidates.append(os.path.join(bin_dir, bin_name))
-        if os.name == 'nt':
-            # a dll is in bin too
-            lib_name = library_name(name, debug=debug, dynamic=True)
-            candidates.append(os.path.join(bin_dir, lib_name))
+def _filter_candidates(name, candidates, expect_one=True):
+    res = [x for x in candidates if os.path.exists(x)]
+    if not expect_one:
+        return res
+    if expect_one and not res:
+        raise NotFound(name)
+    if len(res) > 1:
+        raise MulipleFound(name, res)
+    return res[0]
 
-        for dynamic in True, False:
-            lib_dir = os.path.join(project.sdk_directory, "lib")
-            lib_name = library_name(name, debug=debug, dynamic=dynamic)
-            candidates.append(os.path.join(lib_dir, lib_name))
 
-        print candidates
-        for candidate in candidates:
-            if os.path.exists(candidate):
-                return candidate
+class NotFound(Exception):
+    def __init__(self, name):
+        self.name = name
+    def __str__(self):
+        return "%s not found" % self.name
 
-def binary_name(name, dynamic=True, debug=True, os_name=None):
-    """ Return exact binary name for current OS.
-    """
-    return name + _binary_suffix(dynamic=dynamic, debug=debug, os_name=os_name)
+class MulipleFound(Exception):
+    def __init__(self, name, res):
+        self.name = name
+        self.res = res
 
-def library_name(name, dynamic=True, debug=True, os_name=None):
-    """ Return exact library name for current OS.
-    """
-    return _library_prefix(os_name) + name + _library_suffix(dynamic=dynamic, debug=debug,
-                                                             os_name=os_name)
-
+    def __str__(self):
+        return """ \
+Expecting only one result for {0}, got {1}
+{2}
+""".format(self.name, len(self.res), "\n".join(self.res))

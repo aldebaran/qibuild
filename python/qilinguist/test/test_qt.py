@@ -25,7 +25,7 @@ def test_qt(qilinguist_action):
     tr_elem.text = "Bonjour, monde"
     qisys.qixml.write(root, fr_ts)
     qilinguist_action("release", "helloqt")
-    translateme = qibuild.find.find([project], "translateme")
+    translateme = qibuild.find.find([project.sdk_directory], "translateme")
     cmd = [translateme,
            os.path.join(project.path, "po"),
            "fr_FR"]
