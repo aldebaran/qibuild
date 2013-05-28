@@ -5,7 +5,18 @@
 import os
 import subprocess
 
+import qisys.command
+
+def check_gettext():
+    gettext = qisys.command.find_program("xgettext", raises=False)
+    if not gettext:
+        return False
+    return True
+
+
 def test_update(qilinguist_action):
+    if not check_gettext():
+        return
     trad = qilinguist_action.trad
     fr_FR_po_file = os.path.join(trad.path, "po", "fr_FR.po")
     en_US_po_file = os.path.join(trad.path, "po", "en_US.po")
@@ -19,6 +30,8 @@ def test_update(qilinguist_action):
     assert os.path.exists(pot_file)
 
 def test_release(qilinguist_action):
+    if not check_gettext():
+        return
     trad = qilinguist_action.trad
     fr_FR_mo_file = os.path.join(trad.path, "po", "share", "locale", "translate", "fr_FR", "LC_MESSAGES", "translate.mo")
     en_US_mo_file = os.path.join(trad.path, "po", "share", "locale", "translate", "fr_FR", "LC_MESSAGES", "translate.mo")
@@ -31,6 +44,8 @@ def test_release(qilinguist_action):
 
 
 def test_cplusplus_sdk_workflow(qilinguist_action):
+    if not check_gettext():
+        return
     trad = qilinguist_action.trad
     qilinguist_action.create_po(trad)
     qilinguist_action("update", "translate")
@@ -67,6 +82,8 @@ Brian is in the kitchen.
 
 
 def test_cplusplus_install_workflow(qilinguist_action, tmpdir):
+    if not check_gettext():
+        return
     trad = qilinguist_action.trad
     qilinguist_action.create_po(trad)
     qilinguist_action("update", "translate")
