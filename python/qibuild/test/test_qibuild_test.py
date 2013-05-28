@@ -1,3 +1,5 @@
+import os
+
 def test_various_outcomes(qibuild_action, record_messages):
     qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme")
@@ -12,7 +14,10 @@ def test_various_outcomes(qibuild_action, record_messages):
 
     record_messages.reset()
     rc = qibuild_action("test", "testme", "-k", "segfault", retcode=True)
-    assert record_messages.find("Segmentation fault")
+    if os.name == 'nt':
+        assert record_messages.find("Return code: 255")
+    else:
+        assert record_messages.find("Segmentation fault")
     assert rc == 1
 
     record_messages.reset()
