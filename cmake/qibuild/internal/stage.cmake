@@ -310,27 +310,19 @@ endfunction()
 #
 # accepted group of flags:
 #  DEPENDS
-#  DEFINITIONS
 #  INCLUDE_DIRS
 #  PATH_SUFFIXES
 # (those will be guessed if not given:
 # target_DEPENDS <- filled by qi_use_lib
 # target_INCLUDE_DIRS <- using get_directory_properties()
-# target_DEFINITIONS <- definitions are never guessed,
-# use stage_lib(foo DEFINITIONS "-DSPAM=EGGS") if you need this.
 function(_qi_set_vars target)
   string(TOUPPER ${target} _U_target)
   cmake_parse_arguments(ARG ""
     ""
-    "DEPENDS;DEFINITIONS;INCLUDE_DIRS;PATH_SUFFIXES"
+    "DEPENDS;INCLUDE_DIRS;PATH_SUFFIXES"
     ${ARGN})
   if(ARG_DEPENDS)
     set(${_U_target}_DEPENDS ${ARG_DEPENDS} PARENT_SCOPE)
-  endif()
-
-  if(ARG_DEFINITIONS)
-    string(REPLACE "\"" "\\\""  _defs ${ARG_DEFINITIONS})
-    set(${_U_target}_DEFINITIONS ${_defs} PARENT_SCOPE)
   endif()
 
   if(ARG_INCLUDE_DIRS)
@@ -424,7 +416,7 @@ function(_qi_internal_stage_lib target)
   cmake_parse_arguments(ARG
     "INTERNAL"
     "STAGED_NAME"
-    "DEPRECATED;INCLUDE_DIRS;DEFINITIONS;PATH_SUFFIXES;DEPENDS;CUSTOM_CODE"
+    "DEPRECATED;INCLUDE_DIRS;PATH_SUFFIXES;DEPENDS;CUSTOM_CODE"
     ${ARGN})
 
 
@@ -448,7 +440,7 @@ qi_create_lib(foo INTERNAL) instead
   endif()
 
   set(_new_args)
-  foreach(_arg INCLUDE_DIRS DEFINITIONS PATH_SUFFIXES DEPENDS)
+  foreach(_arg INCLUDE_DIRS PATH_SUFFIXES DEPENDS)
     if (DEFINED ARG_${_arg})
       list(APPEND _new_args "${_arg}" "${ARG_${_arg}}")
     endif()
@@ -486,7 +478,7 @@ endfunction()
 # Implements qi_stage_header_only_lib
 #
 function(_qi_internal_stage_header_only_lib target)
-  cmake_parse_arguments(ARG "INTERNAL" "" "DEPRECATED;INCLUDE_DIRS;DEFINITIONS;PATH_SUFFIXES;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "INTERNAL" "" "DEPRECATED;INCLUDE_DIRS;PATH_SUFFIXES;DEPENDS" ${ARGN})
   # dm: temp warning:
   if (${ARG_INTERNAL})
     qi_warning("Using qi_stage_header_only_lib(.. INTERNAL ..) is deprecated
@@ -506,7 +498,7 @@ function(_qi_internal_stage_header_only_lib target)
   endif()
 
   set(_new_args)
-  foreach(_arg INCLUDE_DIRS DEFINITIONS PATH_SUFFIXES DEPENDS)
+  foreach(_arg INCLUDE_DIRS PATH_SUFFIXES DEPENDS)
     if (DEFINED ARG_${_arg})
       list(APPEND _new_args "${_arg}" "${ARG_${_arg}}")
     endif()
