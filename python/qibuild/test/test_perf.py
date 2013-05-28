@@ -6,14 +6,17 @@ import os
 
 import qibuild.test
 import qibuild.performance
+import qibuild.find
 
 def test_cmake_parsing(qibuild_action):
     proj = qibuild_action.add_test_project("perf")
     qibuild_action("configure", "perf")
     qibuild_action("make", "perf")
+    perf_spam = qibuild.find.find_bin([proj.sdk_directory], "perf_spam", expect_one=True)
+    perf_eggs = qibuild.find.find_bin([proj.sdk_directory], "perf_eggs", expect_one=True)
     expected_tests = [
-        ["perf_spam"],
-        ["perf_eggs", "--foo", "bar"],
+        ["perf_spam", perf_spam],
+        ["perf_eggs", perf_eggs, "--foo", "bar"],
     ]
     actual_tests = qibuild.performance.parse_perflist_files(
         proj.build_directory)

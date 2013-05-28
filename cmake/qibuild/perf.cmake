@@ -38,17 +38,17 @@ function(qi_create_perf_test name)
 
   # create the executable:
   qi_create_bin(${name} ${_src} NO_INSTALL DEPENDS ${_deps})
+  set(_bin_path ${QI_SDK_DIR}/${QI_SDK_BIN}/${name})
+
+  if(MSVC AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(_bin_path ${_bin_path}_d)
+  endif()
 
   set(_perf_dir ${CMAKE_BINARY_DIR}/perf-results)
   file(MAKE_DIRECTORY ${_perf_dir})
 
-  set(_out_file ${_perf_dir}/${name}.xml)
   # add it to the list, to be run with qibuild test --perf
-  if (MSVC AND DEBUG)
-    set(_to_write "${name}_d")
-  else()
-    set(_to_write "${name}")
-  endif()
+  set(_to_write "${name};${_bin_path}")
   if (NOT "${_args}" STREQUAL "")
     set(_to_write "${_to_write};${_args}")
   endif()
