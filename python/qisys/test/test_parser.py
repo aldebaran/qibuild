@@ -57,7 +57,7 @@ def test_parse_one_arg(worktree, args):
     assert len(projects) == 1
     assert projects[0].src == "foo"
 
-def test_auto_add(worktree, args):
+def test_auto_add_simple(worktree, args):
     tmpdir = worktree.tmpdir
     foo = tmpdir.mkdir("foo")
     qiproject_xml = foo.join("qiproject.xml")
