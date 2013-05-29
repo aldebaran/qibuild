@@ -11,6 +11,7 @@ import unittest
 from StringIO import StringIO
 
 import qisys
+import qisys.sh
 import qibuild
 import qibuild.config
 
@@ -439,5 +440,26 @@ class QiBuildConfig(unittest.TestCase):
         qibuild_cfg = cfg_from_string(xml,  user_config='win32-vs2010')
         self.assertEquals(qibuild_cfg.cmake.generator, "NMake Makefiles")
 
-if __name__ == "__main__":
-    unittest.main()
+
+def test_recompute_cmake_generator(tmpdir):
+    global_xml = tmpdir.join("global.xml")
+    global_xml.write("""
+<qibuild>
+  <config name="a">
+    <cmake generator="A" />
+  </config>
+  <config name="b" />
+</qibuild>
+""")
+    local_xml = tmpdir.join("local.xml")
+    local_xml.write("""
+<qibuild>
+  <defaults config="a" />
+</qibuild>
+""")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(global_xml.strpath)
+    qibuild_cfg.read_local_config(local_xml.strpath)
+    assert qibuild_cfg.cmake.generator == "A"
+    qibuild_cfg.set_active_config("b")
+    assert qibuild_cfg.cmake.generator is None
