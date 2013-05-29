@@ -132,6 +132,9 @@ Command line
   * always convert to lower case
   * check for forbidden characters
 
+* make output more consistent (use the same color for the same thing
+  everywhere for starters), this probably means extending the ``qisys.ui`` API
+
 qibuild
 -------
 
@@ -160,7 +163,7 @@ qibuild
 
 * add qibuild test --failed
 
-* add `qibuild find -z` to look in every build dir
+* add ``qibuild find -z`` to look in every build dir
 
 qisrc
 -----
@@ -168,6 +171,17 @@ qisrc
 * remove ``qisrc snapshot --manifest``
 
 * fix ``qisrc manifest`` API
+
+* qisrc sync:
+
+  * display a progress bar when configuring projects
+  * implement ``--rebase-devel``
+
+* find a better ``qisrc manifest`` API. Do we really need to support
+  several manifests in the same worktree?
+
+* mirroring qisrc manifests. (Same repos, same review, but an other
+  "base URL")
 
 qitoolchain
 -----------
