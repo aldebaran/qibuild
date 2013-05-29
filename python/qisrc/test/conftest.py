@@ -70,8 +70,10 @@ class TestGitServer(object):
         self.push_file("manifest.git", "manifest.xml", "<manifest />")
         manifest_xml = root.join("src", "manifest", "manifest.xml")
         self.manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
-        self.manifest.add_remote("origin", self.srv.strpath)
-        self.manifest.add_remote("gerrit",  self.gerrit.strpath, review=True)
+        origin_url = "file://" + qisys.sh.to_posix_path(self.srv.strpath)
+        gerrit_url = "file://" + qisys.sh.to_posix_path(self.gerrit.strpath)
+        self.manifest.add_remote("origin", origin_url)
+        self.manifest.add_remote("gerrit", gerrit_url, review=True)
         self.manifest_url = self.srv.join("manifest.git").strpath
 
     def create_repo(self, project, src=None, review=False):
@@ -99,6 +101,8 @@ class TestGitServer(object):
             repo_srv = self.gerrit.mkdir(project)
         else:
             repo_srv = self.srv.mkdir(project)
+
+        repo_url = "file://" + qisys.sh.to_posix_path(repo_srv.strpath)
         git = qisrc.git.Git(repo_srv.strpath)
         git.init("--bare")
 
@@ -106,11 +110,12 @@ class TestGitServer(object):
         git = TestGit(repo_src.strpath)
         git.initialize()
         if review:
-            git.set_remote("gerrit", repo_srv.strpath)
-            git.push("gerrit", "master:master")
+            remote_name = "gerrit"
         else:
-            git.set_remote("origin", repo_srv.strpath)
-            git.push("origin", "master:master")
+            remote_name = "origin"
+
+        git.set_remote(remote_name, repo_url)
+        git.push(remote_name, "master:master")
         return repo_src.strpath
 
     def add_qibuild_test_project(self, src):

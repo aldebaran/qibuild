@@ -424,6 +424,12 @@ def name_from_url(url):
     'foo/bar.git'
 
     """
+    if url.startswith("file://"):
+        sep = "/"
+        if os.name == 'nt' and "\\"  in url:
+            sep = "\\"
+        return url.split(sep)[-1]
+
     if "://" in url:
         url = url.split("://", 1)[-1]
         if ":" in url:

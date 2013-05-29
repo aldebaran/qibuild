@@ -28,6 +28,17 @@ class Remote(object):
         self.port = None
 
     def parse_url(self):
+        if self.url.startswith("file://"):
+            prefix = self.url
+            sep = "/"
+            if os.name == 'nt' and "\\" in self.url:
+                sep = "\\"
+            if not prefix.endswith(sep):
+                prefix += sep
+            self.protocol = "file"
+            self.prefix = prefix
+            return
+
         full_ssh = re.compile("""
                         ssh://
                         ((?P<username>[^@]+)@)?
@@ -43,7 +54,7 @@ class Remote(object):
                         (?P<subfolder>)
                         """, re.VERBOSE)
         other_url = re.compile("""
-                        ((?P<protocol>(git|http|https|file))://)
+                        ((?P<protocol>(git|http|https))://)
                         (?P<server>[^:/]+)
                         (:(?P<port>\d+))?
                         """, re.VERBOSE)
@@ -90,6 +101,8 @@ class Remote(object):
         if match:
             groupdict = match.groupdict()
             self.protocol = groupdict["protocol"]
+            if self.protocol == "file://":
+                self.prefix = "foo"
             self.server = groupdict["server"]
             port = groupdict.get("port")
             if port:

@@ -34,8 +34,9 @@ def do(args):
     url = args.path_or_url
     src = args.src
     if not src:
-        gitname = url.split("/")[-1].replace(".git", "")
-        src = os.path.join(os.getcwd(), gitname)
+        gitname = qisrc.git.name_from_url(url)
+        src = gitname.replace(".git", "")
+        src = os.path.join(os.getcwd(), src)
     worktree.add_project(src)
     worktree_proj = worktree.get_project(src)
     proj_path = worktree_proj.path
