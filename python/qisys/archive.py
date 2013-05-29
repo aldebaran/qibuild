@@ -136,7 +136,7 @@ Please set only one of these two options to 'True'
             # something wrong: members do not have the
             # same basename
             mess  = "Invalid member %s in archive:\n" % member.filename
-            mess += "Every files sould be in the same top dir (%s != %s)" % \
+            mess += "Every file sould be in the same top dir (%s != %s)" % \
                 (orig_topdir, member_top_dir)
             raise InvalidArchive(mess)
         # By-pass buggy zipfile for python 2.6:
