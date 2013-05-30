@@ -116,6 +116,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.assertEqual(qtcreator.path, '/usr/local/bin/qtcreator')
 
     def test_empty_conf_nothing_in_path(self):
+        if os.name == 'nt':
+            return
         self.setup_platform("linux3")
         self.setup_find_program(dict())
         self.setup_answers({
