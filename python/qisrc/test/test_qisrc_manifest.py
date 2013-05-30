@@ -20,7 +20,8 @@ def test_list_no_groups(qisrc_action, git_server, record_messages):
     manifest_url = git_server.manifest_url
     qisrc_action("manifest", "--add", "default", manifest_url)
     qisrc_action("manifest", "--list")
-    assert record_messages.find(manifest_url)
+    found_url = record_messages.find("url")
+    assert "manifest.git"  in found_url
     assert not record_messages.find("groups:")
 
 def test_list_groups(qisrc_action, git_server, record_messages):
@@ -29,7 +30,8 @@ def test_list_groups(qisrc_action, git_server, record_messages):
     qisrc_action("manifest", "--add", "--group", "mygroup",
                  "default", manifest_url)
     qisrc_action("manifest", "--list")
-    assert record_messages.find(manifest_url)
+    found_url = record_messages.find("url")
+    assert "manifest.git"  in found_url
     assert record_messages.find("groups")
     assert record_messages.find("mygroup")
 
