@@ -193,14 +193,6 @@ class FeedTestCase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="test-feed")
         self.srv = os.path.join(self.tmp, "srv")
-        self.path_patcher = mock.patch("qisys.sh.get_path", fake_get_path)
-        self.path_patcher.start()
-        self.cfg_patcher = mock.patch('qibuild.config.get_global_cfg_path')
-        qibuild_xml = os.path.join(self.tmp, "qibuild.xml")
-        with open(qibuild_xml, "w") as fp:
-            fp.write("<qibuild />")
-        self.get_cfg_path = self.cfg_patcher.start()
-        self.get_cfg_path.return_value = os.path.join(self.tmp, "qibuild.xml")
 
     def setup_srv(self):
         this_dir = os.path.dirname(__file__)
@@ -227,8 +219,6 @@ class FeedTestCase(unittest.TestCase):
 
     def tearDown(self):
         qisys.sh.rm(self.tmp)
-        self.cfg_patcher.stop()
-        self.path_patcher.stop()
 
     def configure_xml(self, name, dest):
         """ Copy a xml file from the test dir to a
