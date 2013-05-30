@@ -1,6 +1,6 @@
 <toolchain>
     <package  name="naoqi-geode-ctc"
-        url ="@srv_url@/naoqi-geode-ctc-latest.tar.gz"
+        url ="@srv_url@/naoqi-geode-ctc-latest.zip"
         toolchain_file = "toolchain-geode.cmake"
     />
     <feed url="@srv_url@/nonfree.xml" />

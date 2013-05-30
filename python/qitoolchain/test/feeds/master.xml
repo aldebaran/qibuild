@@ -3,7 +3,7 @@
 
     <!-- special version just for master -->
     <package name="boost" version="1.44"
-      url="@srv_url@/boost-1.44-linux32.tar.gz"
+      url="@srv_url@/boost-1.44-linux32.zip"
     />
 
 </toolchain>

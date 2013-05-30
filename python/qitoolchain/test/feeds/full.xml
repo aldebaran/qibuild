@@ -1,10 +1,10 @@
 <toolchain>
     <package name="boost" version="1.42"
         arch="linux32"
-        url="@srv_url@/boost-1.42-linux32.tar.gz"
+        url="@srv_url@/boost-1.42-linux32.zip"
     />
     <package name="python" version="2.7"
         arch="linux32"
-        url="@srv_url@/python-2.7-linux32.tar.gz"
+        url="@srv_url@/python-2.7-linux32.zip"
     />
 </toolchain>

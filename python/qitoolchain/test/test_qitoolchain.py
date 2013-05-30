@@ -208,14 +208,11 @@ class FeedTestCase(unittest.TestCase):
         for filename in contents:
             if not os.path.isdir(os.path.join(packages_dir, filename)):
                 continue
-            if filename.endswith(".tar.gz"):
-                continue
             if filename.endswith(".zip"):
                 continue
             package_dir = os.path.join(packages_dir, filename)
-            for algo in ["zip", "gzip"]:
-                archive = qisys.archive.compress(package_dir, algo=algo)
-                qisys.sh.install(archive, self.srv, quiet=True)
+            archive = qisys.archive.compress(package_dir, algo="zip")
+            qisys.sh.install(archive, self.srv, quiet=True)
 
     def tearDown(self):
         qisys.sh.rm(self.tmp)
@@ -235,8 +232,10 @@ class FeedTestCase(unittest.TestCase):
         dest = os.path.join(self.tmp, dest)
         qisys.sh.mkdir(dest, recursive=True)
         dest = os.path.join(dest, name)
-        srv_path = qisys.sh.to_posix_path(self.srv)
-        srv_url = "file://" + srv_path
+        if os.name == 'nt':
+            srv_url = "file:///" + self.srv
+        else:
+            srv_url = "file://" + self.srv
         with open(src, "r") as fp:
             lines = fp.readlines()
         lines = [l.replace("@srv_url@", srv_url) for l in lines]
@@ -392,6 +391,12 @@ class FeedTestCase(unittest.TestCase):
         self.assertFalse("python" in get_tc_file_contents(tc2))
 
     def test_relative_url(self):
+        # urrlib.urlopen() only accepts file-urls like
+        # file:///C:\path\to\foo on windows, but
+        # paths are often POSIX on a server, so don't bother
+        # testing that on Windows
+        if os.name == 'nt':
+            return
         os.mkdir(self.srv)
         feeds = os.path.join(self.srv, "feeds")
         packages = os.path.join(self.srv, "packages")

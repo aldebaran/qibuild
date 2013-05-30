@@ -1,10 +1,10 @@
 <toolchain>
     <package name="naoqi" version="latest"
         arch="linux32"
-        url="@srv_url@/naoqi-latest-linux32.tar.gz"
+        url="@srv_url@/naoqi-latest-linux32.zip"
     />
     <package name="naoqi" version="latest"
         arch="linux64"
-        url="@srv_url@/naoqi-latest-linux64.tar.gz"
+        url="@srv_url@/naoqi-latest-linux64.zip"
     />
 </toolchain>
