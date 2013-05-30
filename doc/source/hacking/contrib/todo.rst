@@ -275,6 +275,9 @@ misc
   * qisys.command.archive -> http://docs.python.org/3/library/shutil.html#archiving-operations
 
 
+* Add convenience methods: ``CMakeBuilder.test()``, ``project.test()`` to wrap
+  ``qibuild.ctest.run_tests``
+
 qibuild2 leftovers cleanup
 ++++++++++++++++++++++++++
 
