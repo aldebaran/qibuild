@@ -1,6 +1,13 @@
+import os
+
 import qisrc.git
 from qisrc.git_config import Remote
 
+def test_native_paths(git_worktree):
+    foo = git_worktree.create_git_project("foo/bar")
+    assert os.path.exists(foo.path)
+    if os.name == 'nt':
+        assert "/" not in foo.path
 
 def test_appy_git_config(git_worktree):
     foo = git_worktree.create_git_project("foo")

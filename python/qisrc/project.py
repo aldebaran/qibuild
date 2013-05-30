@@ -61,7 +61,8 @@ class GitProject(object):
     @property
     def path(self):
         """ The full, native path to the underlying git repository """
-        return os.path.join(self.git_worktree.root, self.src)
+        res = os.path.join(self.git_worktree.root, self.src)
+        return qisys.sh.to_native_path(res)
 
 
     def configure_remote(self, remote):
