@@ -60,6 +60,12 @@ deploy [PROJECT] URL
 clean [PROJECT]
   Remove the build directories from the project source tree
 
+find [BINARY]
+  Search for artefact in worktree build directories
+
+run [PROGRAM]
+  Search for binary in worktree build directories and run it.
+
 .. note::
 
   if ``CMAKE_INSTALL_PREFIX`` is set at ``configure``, it will be necessary to

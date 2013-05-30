@@ -57,6 +57,7 @@ qibuild
 * ``qibuild init --interactive`` is deprecated, use ``qibuild config --wizard`` instead
 * ``qibuild test`` learned ``--build-first``
 * Add ``qibuild run``
+* Add ``qibuild find``
 
 qitoolchain
 ~~~~~~~~~~~
