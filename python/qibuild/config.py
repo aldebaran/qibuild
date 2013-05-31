@@ -10,13 +10,12 @@
 import os
 import operator
 
-from StringIO import StringIO
 
-import qibuild
-import qisys.qixml
-import qisys.interact
-from qisys.qixml import etree
 from qisys import ui
+
+import qisys.qixml
+import qisys.sh
+from qisys.qixml import etree
 
 
 
