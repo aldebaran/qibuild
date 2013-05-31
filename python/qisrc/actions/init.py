@@ -38,6 +38,8 @@ def do(args):
     if args.manifest_url:
         git_worktree.configure_manifest(args.manifest_name,
                                         args.manifest_url,
-                                        args.groups)
+                                        groups=args.groups,
+                                        branch=args.branch)
+
     ui.info(ui.green, "New qisrc worktree initialized in",
             ui.reset, ui.bold, root)

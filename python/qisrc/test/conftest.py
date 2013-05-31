@@ -75,6 +75,7 @@ class TestGitServer(object):
         self.manifest.add_remote("origin", origin_url)
         self.manifest.add_remote("gerrit", gerrit_url, review=True)
         self.manifest_url = self.srv.join("manifest.git").strpath
+        self.manifest_branch = "master"
 
     def create_repo(self, project, src=None, review=False):
         """ Create a new repo and add it to the manifest """
@@ -85,11 +86,8 @@ class TestGitServer(object):
         else:
             self.manifest.add_repo(project, src, ["origin"])
         repo = self.manifest.get_repo(project)
+        self.push_manifest("Add %s" % project)
 
-        manifest_repo = self.root.join("src", "manifest")
-        git = qisrc.git.Git(manifest_repo.strpath)
-        git.commit("--all", "--message", "add %s" % src)
-        git.push("origin", "master:master")
         return repo
 
     def _create_repo(self, project, src=None, review=False):
@@ -118,6 +116,11 @@ class TestGitServer(object):
         git.push(remote_name, "master:master")
         return repo_src.strpath
 
+    def switch_manifest_branch(self, branch):
+        self.manifest_branch = branch
+        self.push_manifest("Switch to %s" % branch, allow_empty=True)
+
+
     def add_qibuild_test_project(self, src):
         project_name = src + ".git"
         repo_src = self._create_repo(project_name , src=src, review=False)
@@ -130,10 +133,7 @@ class TestGitServer(object):
         git.push("origin", "master:master")
         self.manifest.add_repo(project_name, src, ["origin"])
         repo = self.manifest.get_repo(project_name)
-        manifest_repo = self.root.join("src", "manifest")
-        git = qisrc.git.Git(manifest_repo.strpath)
-        git.commit("--all", "--message", "add qibuild test project: %s" % src)
-        git.push("origin", "master:master")
+        self.push_manifest("Add qibuild test project: %s" % src)
 
     def add_build_profile(self, name, flags):
         # avoid circular deps
@@ -157,13 +157,17 @@ class TestGitServer(object):
         self.push_manifest("%s: moved %s -> %s" % (project, old_src, new_src))
         self.manifest.load()
 
-    def push_manifest(self, message):
+    def push_manifest(self, message, allow_empty=False):
         """ Push new manifest.xml version """
         manifest_repo = self.root.join("src", "manifest")
         git = qisrc.git.Git(manifest_repo.strpath)
-        git.commit("--all", "--message", message)
+        commit_args = ["--all", "--message", message]
+        if allow_empty:
+            commit_args.append("--allow-empty")
+        git.commit(*commit_args)
+        git.checkout("--force", "-B", self.manifest_branch)
         git.call("show", "HEAD")
-        git.push("origin", "master:master")
+        git.push("origin", "%s:%s" % (self.manifest_branch, self.manifest_branch))
 
     def remove_repo(self, project):
         """ Remove a repo from the manifest """

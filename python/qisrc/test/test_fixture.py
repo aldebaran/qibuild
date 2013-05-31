@@ -12,6 +12,16 @@ def test_git_server_creates_valid_urls(tmpdir, git_server):
     git = qisrc.git.Git(foo_clone.strpath)
     git.clone(foo_url)
 
+def test_switch_manifest_branch(tmpdir, git_server):
+    git_server.switch_manifest_branch("devel")
+    assert git_server.manifest_branch == "devel"
+    foo_clone = tmpdir.mkdir("foo")
+    git = qisrc.git.Git(foo_clone.strpath)
+    git.clone(git_server.manifest_url, "--branch",
+              git_server.manifest_branch)
+    assert git.get_current_branch() == "devel"
+
+
 def test_pushing_files(tmpdir, git_server):
     origin_url = git_server.manifest.get_remote("origin").url
     foo_repo = git_server.create_repo("foo.git")

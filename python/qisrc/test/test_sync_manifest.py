@@ -22,6 +22,19 @@ def test_stores_url_and_groups(git_worktree, git_server):
     assert default_manifest.url == manifest_url
     assert default_manifest.groups == ["mygroup"]
 
+def test_stores_branches(git_worktree, git_server):
+    git_server.switch_manifest_branch("devel")
+    manifest_url = git_server.manifest_url
+    worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
+    worktree_syncer.configure_manifest("default", manifest_url, branch="devel")
+    worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
+    manifests = worktree_syncer.manifests
+    assert len(manifests) == 1
+    default_manifest = manifests["default"]
+    assert default_manifest.name == "default"
+    assert default_manifest.url == manifest_url
+    assert default_manifest.branch == "devel"
+
 def test_pull_manifest_changes_when_syncing(git_worktree, git_server):
     manifest_url = git_server.manifest_url
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
@@ -34,6 +47,15 @@ def test_pull_manifest_changes_when_syncing(git_worktree, git_server):
     a_file = git_worktree.tmpdir.join(".qi", "manifests",
                                       "default", "a_file")
     assert a_file.read() == "some contents\n"
+
+def test_use_correct_manifest_branch(git_worktree, git_server):
+    git_server.switch_manifest_branch("devel")
+    manifest_url = git_server.manifest_url
+    worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
+    worktree_syncer.configure_manifest("default", manifest_url, branch="devel")
+    local_manifest = git_worktree.tmpdir.join(".qi", "manifests", "default")
+    git = qisrc.git.Git(local_manifest.strpath)
+    assert git.get_current_branch() == "devel"
 
 def test_new_repos(git_worktree, git_server):
     git_server.create_repo("foo.git")

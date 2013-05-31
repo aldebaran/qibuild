@@ -19,3 +19,13 @@ def test_fails_when_not_empty(cd_to_tmpdir):
     with pytest.raises(Exception) as e:
         qisys.script.run_action("qisrc.actions.init")
     assert "empty directory" in str(e.value)
+
+def test_use_branch(cd_to_tmpdir, git_server):
+    git_server.create_repo("foo.git")
+    git_server.switch_manifest_branch("devel")
+    git_server.create_repo("onlyindevel.git")
+    qisys.script.run_action("qisrc.actions.init",
+                            [git_server.manifest_url, "--branch", "devel"])
+
+    git_worktree = TestGitWorkTree()
+    assert len(git_worktree.git_projects) == 2
