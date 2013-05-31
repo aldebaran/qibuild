@@ -24,21 +24,6 @@ import qibuild
 import qibuild.config
 import qibuild.gcov
 
-def _str_from_signal(code):
-    """ Returns a nice string describing the signal
-
-    """
-    if os.name == "nt":
-        # windows ret code are usually displayed
-        # in hexa:
-        return "0x%X" % (2 ** 32 - code)
-    if code == signal.SIGSEGV:
-        return "Segmentation fault"
-    if code == signal.SIGABRT:
-        return "Aborted"
-    return "%i" % code
-
-
 class QueueTimeout(Queue.Queue):
     def join(self):
         while self.unfinished_tasks:
@@ -230,7 +215,7 @@ class Test:
             if retcode > 0:
                 res.message = "Return code: %i" % retcode
             else:
-                res.message = _str_from_signal(-retcode)
+                res.message = qisys.command.str_from_signal(-retcode)
         if self.valgrind:
             if not os.path.isfile(valgrind_log):
                 ui.warning("The valgrind log file does not exist")

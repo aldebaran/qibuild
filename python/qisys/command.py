@@ -132,6 +132,20 @@ class Process:
         self.return_type = Process.ZOMBIE
         self._thread.join()
 
+def str_from_signal(code):
+    """ Return a description about what happened when the
+    retcode of a program is less than zero
+
+    """
+    if os.name == "nt":
+        # windows ret code are usually displayed
+        # in hexa:
+        return "0x%X" % (2 ** 32 - code)
+    if code == signal.SIGSEGV:
+        return "Segmentation fault"
+    if code == signal.SIGABRT:
+        return "Aborted"
+    return "%i" % code
 
 class CommandFailedException(Exception):
     """Custom exception """

@@ -19,15 +19,16 @@ def test_run_failing_binary(qibuild_action):
 
 
     retcode = qibuild_action("run", "fail", retcode=True)
-    assert retcode > 0
+    assert retcode == 1
 
-def test_run_segfaulting_binary(qibuild_action):
+def test_run_segfaulting_binary(qibuild_action, record_messages):
     qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme")
     qibuild_action("make", "testme")
 
     retcode = qibuild_action("run", "segfault", retcode=True)
-    assert retcode == -11
+    assert record_messages.find("Process crashed")
+    assert retcode != 0
 
 def test_run_failure(qibuild_action):
     qibuild_action.add_test_project("testme")
