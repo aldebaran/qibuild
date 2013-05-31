@@ -121,6 +121,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         git_project = qisrc.project.GitProject(self, worktree_project)
         git = qisrc.git.Git(git_project.path)
         if not os.path.exists(git_project.path):
+            to_make = os.path.dirname(git_project.path)
+            qisys.sh.mkdir(to_make, recursive=True)
             git.clone(repo.default_remote.url, "--recursive",
                     "--branch", repo.default_branch,
                     "--origin", repo.default_remote.name)

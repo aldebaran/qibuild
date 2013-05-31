@@ -96,9 +96,9 @@ class TestGitServer(object):
             src = project.replace(".git", "")
 
         if review:
-            repo_srv = self.gerrit.mkdir(project)
+            repo_srv = self.gerrit.ensure(project, dir=True)
         else:
-            repo_srv = self.srv.mkdir(project)
+            repo_srv = self.srv.ensure(project, dir=True)
 
         repo_url = "file://" + qisys.sh.to_posix_path(repo_srv.strpath)
         git = qisrc.git.Git(repo_srv.strpath)
