@@ -28,6 +28,12 @@ class WorkTree(object):
         :param allow_nested: Allow nested worktrees.
 
         """
+        if not os.path.exists(root):
+            raise Exception(""" \
+Could not open WorkTree in {0}.
+This path does not exists
+""".format(root))
+
         self._observers = list()
         self.root = root
         self.cache = self.load_cache()

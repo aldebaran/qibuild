@@ -48,6 +48,14 @@ def test_add_project_simple(worktree):
     assert foo.src == "foo"
 
 
+def test_fails_when_root_does_not_exists(tmpdir):
+    non_exitsting = tmpdir.join("doesnotexist")
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        qisys.worktree.WorkTree(non_exitsting.strpath)
+    assert "does not exist" in str(e.value)
+
+
 def test_remove_project(worktree):
     # pylint: disable-msg=E1101
     tmp = py.path.local(worktree.root)
