@@ -124,7 +124,7 @@ def handle_remote_package(feed, package, package_tree, toolchain):
     packages_path = qitoolchain.toolchain.get_default_packages_path(toolchain.name)
     should_skip = False
     dest = os.path.join(packages_path, package_name)
-    dest = os.path.abspath(dest)
+    dest = qisys.sh.to_native_path(dest)
     if not os.path.exists(dest):
         should_skip = False
     else:
