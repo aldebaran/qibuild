@@ -27,6 +27,8 @@ def test_call_setup_review(git_worktree, git_server):
     bar = git_worktree2.get_git_project("bar")
     assert foo.review is True
     assert bar.review is False
+    assert foo.review_remote.name == "gerrit"
+    assert foo.default_remote.name == "origin"
 
 
 def test_does_not_store_if_setup_fails(git_worktree, git_server):

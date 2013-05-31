@@ -20,7 +20,6 @@ def test_simple_read(tmpdir):
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
-
     assert len(manifest.repos) == 1
     bar = manifest.repos[0]
     assert bar.src == "lib/bar"
@@ -137,6 +136,7 @@ def test_invalid_group(tmpdir):
     assert "No such group: mygroup" in str(e.value)
 
 
+
 def test_review_projects(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -172,8 +172,28 @@ def test_review_projects_with_two_remotes(tmpdir):
     gerrit_remote = bar.remotes[1]
     assert origin_remote.name == "origin"
     assert gerrit_remote.name == "gerrit"
+    assert gerrit_remote.review is True
     assert bar.review_remote == gerrit_remote
     assert bar.review == True
+    assert bar.default_remote.name == "origin"
+
+
+def test_default_remote(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <remote name="gerrit" url="http://gerrit:8080" review="true" />
+  <repo project="foo.git" src="foo" remotes="origin gerrit"
+        default_remote="gerrit" />
+  <repo project="bar.git" src="bar" remotes="origin gerrit" />
+  <repo project="baz.git" src="baz" remotes="origin" />
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert manifest.get_repo("foo.git").default_remote.name == "gerrit"
+    assert manifest.get_repo("bar.git").default_remote.name == "origin"
+    assert manifest.get_repo("baz.git").default_remote.name == "origin"
 
 def test_groups(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")

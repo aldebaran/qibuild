@@ -41,22 +41,19 @@ class GitProject(object):
                 return remote
 
     @property
+    def default_remote(self):
+        """ The remote to use by default """
+        for remote in self.remotes:
+            if remote.default:
+                return remote
+
+    @property
     def clone_url(self):
         """ The url to use when cloning this repository for
         the first time
 
         """
-        default_branch = self.default_branch
-        if not default_branch:
-            return None
-        tracked = default_branch.tracks
-        if not tracked:
-            return None
-        for remote in self.remotes:
-            if remote.name == tracked:
-                return remote.url
-        return None
-
+        return self.default_remote.url
 
     @property
     def path(self):
@@ -122,6 +119,10 @@ class GitProject(object):
         Called by WorkTreeSyncer
 
         """
+        previous_default = None
+        if self.default_remote:
+            previous_default = self.default_remote.name
+
         self.name = repo.project
         for remote in repo.remotes:
             self.configure_remote(remote)
@@ -131,6 +132,10 @@ class GitProject(object):
             ok = qisrc.review.setup_project(self)
             if ok:
                 self.review = True
+        new_default = self.default_remote.name
+        if previous_default is not None and previous_default != new_default:
+            ui.warning("Default remote changed", previous_default, "->",
+                                                 new_default)
         self.save_config()
 
 

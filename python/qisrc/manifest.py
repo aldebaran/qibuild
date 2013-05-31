@@ -89,6 +89,8 @@ Found two projects sharing the same sources:
                                 (remote_name, repo.project))
         remote = copy.copy(matching_remote)
         remote.url = matching_remote.prefix + repo.project
+        if remote.name == repo.default_remote_name:
+            remote.default = True
         repo.remotes.append(remote)
 
     def dump(self):
@@ -175,6 +177,7 @@ class RepoConfig(object):
         self.src = None
         self.project = None
         self.default_branch = "master"
+        self.default_remote_name = None
         self.remotes = list()
         self.remote_names = None
 
@@ -189,10 +192,9 @@ class RepoConfig(object):
         the project
 
         """
-        if not self.remotes:
-            return None
-        # FIXME?
-        return self.remotes[0]
+        for remote in self.remotes:
+            if remote.default:
+                return remote
 
     @property
     def clone_url(self):
@@ -259,6 +261,7 @@ class RepoConfigParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(RepoConfigParser, self).__init__(target)
         self._ignore = ["review_remote",
+                        "default_remote_name",
                         "clone_url",
                         "review",
                         "urls",
@@ -282,7 +285,12 @@ class RepoConfigParser(qisys.qixml.XMLParser):
             raise ManifestError("Missing 'remotes' attribute")
         if remote_names == "":
             raise ManifestError("Empty 'remotes' attribute")
-        self.target.remote_names =  remote_names.split()
+        remote_names = remote_names.split()
+        self.target.remote_names =  remote_names
+        self.target.default_remote_name = self._root.get("default_remote")
+        if not self.target.default_remote_name:
+            self.target.default_remote_name = remote_names[0]
+
 
     def _write_remote_names(self, elem):
         elem.set("remotes", " ".join(self.target.remote_names))

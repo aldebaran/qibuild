@@ -17,6 +17,7 @@ class Remote(object):
         self.name = None
         self.url = None
         self.review = False
+        self.default = False
 
         # used when joining the remote with a project name
         self.prefix = None
