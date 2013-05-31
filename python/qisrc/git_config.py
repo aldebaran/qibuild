@@ -155,6 +155,7 @@ class RemoteParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(RemoteParser, self).__init__(target)
         self._required = ["name"]
+        self._ignore = ["prefix", "protocol", "username", "server", "port"]
 
 class BranchParser(qisys.qixml.XMLParser):
     def __init__(self, target):
