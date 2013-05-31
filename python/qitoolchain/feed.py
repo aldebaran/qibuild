@@ -14,9 +14,10 @@ from xml.etree import ElementTree
 
 from qisys import ui
 import qisys
+import qisys.archive
 import qisys.remote
 import qisys.version
-import qibuild
+import qibuild.config
 import qitoolchain
 
 
