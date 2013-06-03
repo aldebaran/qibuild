@@ -1,5 +1,5 @@
 <project>
   <sphinxdoc name="c_sphinx" >
-    <depend names="b_doxy" />
+    <depends name="b_doxy" />
   </sphinxdoc>
 </project>

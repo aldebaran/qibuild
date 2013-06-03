@@ -7,6 +7,7 @@ import qisys.qixml
 
 from qidoc.sphinx_project import SphinxProject
 from qidoc.doxygen_project import DoxygenProject
+from qidoc.template_project import TemplateProject
 
 
 class DocWorkTree(qisys.worktree.WorkTreeObserver):
@@ -23,8 +24,21 @@ class DocWorkTree(qisys.worktree.WorkTreeObserver):
         for worktree_project in self.worktree.projects:
             doc_project = new_doc_project(self, worktree_project)
             if doc_project:
-                self.check_unique_name(doc_project)
+                if not isinstance(doc_project, TemplateProject):
+                    self.check_unique_name(doc_project)
                 self.doc_projects.append(doc_project)
+
+    @property
+    def template_project(self):
+        res = [x for x in self.doc_projects if isinstance(x, TemplateProject)]
+        if not res:
+            return None
+        if len(res) > 1:
+            mess = "Found multiple template projects\n"
+            for project in res:
+                mess += "  * " + project.path + "\n"
+            raise Exception(mess)
+        return res[0]
 
     def on_project_added(self, project):
         """ Called when a new project has been registered """
@@ -76,6 +90,16 @@ def new_doc_project(doc_worktree, project):
     else:
         return _new_doc_project_2(doc_worktree, project)
 
+def new_template_project(doc_worktree, project):
+    qiproject_xml = project.qiproject_xml
+    if not os.path.exists(qiproject_xml):
+        return None
+    tree = qisys.qixml.read(project.qiproject_xml)
+    root = tree.getroot()
+    if root.get("version") == "3":
+        return
+
+
 def _new_doc_project_3(doc_worktree, project):
     qiproject_xml = project.qiproject_xml
     tree = qisys.qixml.read(qiproject_xml)
@@ -86,6 +110,7 @@ def _new_doc_project_3(doc_worktree, project):
         raise BadProjectConfig(qiproject_xml,
                                "Expecting a 'type' attribute")
     return _new_doc_project(doc_worktree, project, qidoc_elem, doc_type)
+
 
 def _new_doc_project_2(doc_worktree, project):
     """ Parse qidoc2 syntax in case the 'src' attribute is not used,
@@ -98,6 +123,9 @@ def _new_doc_project_2(doc_worktree, project):
     qiproject_xml = project.qiproject_xml
     tree = qisys.qixml.read(qiproject_xml)
     root = tree.getroot()
+
+    if qisys.qixml.parse_bool_attr(root, "template_repo"):
+        return TemplateProject(doc_worktree, project)
 
     doc_elems = root.findall("sphinxdoc")
     doc_elems.extend(root.findall("doxydoc"))

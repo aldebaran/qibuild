@@ -1,4 +1,5 @@
 from qisys.test.conftest import *
+import qisys.qixml
 
 import qidoc.worktree
 
@@ -22,16 +23,18 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
             src = name
         proj_path = self.tmpdir.join(*src.split("/"))
         proj_path.ensure(dir=True)
-
-        xml = """ \
-<project version="3">
-  <qidoc name="{0}" type="{1}">
-    <depends names="{2}" />
-  </qidoc>
-</project>
-"""
-        xml = xml.format(name, doc_type, " ".join(depends))
-        proj_path.join("qiproject.xml").write(xml)
+        project_elem = qisys.qixml.etree.Element("project")
+        project_elem.set("version", "3")
+        qidoc_elem = qisys.qixml.etree.Element("qidoc")
+        qidoc_elem.set("name", name)
+        qidoc_elem.set("type", doc_type)
+        project_elem.append(qidoc_elem)
+        for dep_name in depends:
+            dep_elem = qisys.qixml.etree.Element("depends")
+            dep_elem.set("name", dep_name)
+            qidoc_elem.append(dep_elem)
+        qiproject_xml = proj_path.join("qiproject.xml").strpath
+        qisys.qixml.write(project_elem, qiproject_xml)
         self.worktree.add_project(src)
         return self.get_doc_project(name)
 
