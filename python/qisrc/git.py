@@ -410,11 +410,6 @@ def is_git(path):
     """Return true if path is in a git work-tree."""
     return get_repo_root(path) == path
 
-def get_git_projects(projects):
-    """Return projects wich are git projects."""
-    git_projects = [p for p in projects if is_git(p.path)]
-    return git_projects
-
 def name_from_url(url):
     """ Return the project name from the url
     Assume there project name is always in the form

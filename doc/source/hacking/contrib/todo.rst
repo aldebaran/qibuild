@@ -287,5 +287,3 @@ qibuild2 leftovers cleanup
 
 * remove qibuild.configstore, use XML for toolchain
   storage
-
-* remove qisrc.git.get_git_projects
