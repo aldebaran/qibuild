@@ -52,7 +52,7 @@ import argparse
 def main():
     parser = argparse.ArgumentParser()
     modules = qisys.script.action_modules_from_package("qidoc.actions")
-    qisys.script.root_command_main("qibuild", parser, modules)
+    qisys.script.root_command_main("qidoc", parser, modules)
 
 if __name__ == "__main__":
     main()

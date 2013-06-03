@@ -21,6 +21,9 @@ def convert_project(project):
     doc_elems = root_elem.findall("sphinxdoc")
     doc_elems.extend(root_elem.findall("doxydoc"))
 
+    if not doc_elems:
+        return
+
     for doc_elem in doc_elems:
         handle_src_attribute(project, root_elem, doc_elem)
 
@@ -31,6 +34,10 @@ def handle_src_attribute(project, root_elem, doc_elem):
     src = doc_elem.get("src")
     if not src:
         return
+    if src == ".":
+        del doc_elem.attrib["src"]
+        return
+
     subproject_src = posixpath.join(project.src, src)
     subproject = worktree.get_project(subproject_src)
     if not subproject:

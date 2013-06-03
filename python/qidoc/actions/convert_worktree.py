@@ -1,5 +1,6 @@
-""" Fix a qidoc2 worktree so that it is usable both with
-qidoc2 and qidoc3
+""" Fix a qidoc2 worktree.
+
+It will be usable both with qidoc2 and qidoc3 by default
 
 """
 

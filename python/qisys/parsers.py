@@ -9,6 +9,7 @@ import argparse
 import os
 
 import qisys.sh
+import qisys.worktree
 
 def log_parser(parser):
     """Given a parser, add the options controlling log."""
