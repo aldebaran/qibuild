@@ -30,6 +30,8 @@ class ProjectState():
         self.clean           = True
         self.ahead           = 0
         self.behind          = 0
+        self.ahead_manifest  = 0
+        self.behind_manifest = 0
         self.current_branch  = None
         self.tracking        = None
         self.valid           = True
@@ -71,6 +73,10 @@ def check_state(project, untracked):
 
         (state_project.ahead, state_project.behind) = stat_tracking_remote(git,
                 state_project.current_branch, state_project.tracking)
+        if state_project.incorrect_proj:
+            (state_project.ahead_manifest, state_project.behind_manifest) = stat_tracking_remote(
+                git, state_project.current_branch, "%s/%s" % (
+                project.default_remote.name, project.default_branch.name))
 
     if not state_project.sync_and_clean:
         out = git.get_status(untracked)
@@ -95,6 +101,13 @@ def print_state(project, max_len):
         if project.behind:
             ui.info(ui.bold, "Your branch is",
                     project.behind, "commits behind.")
+        if project.ahead_manifest:
+            ui.info(ui.bold, "Your branch is",
+                    project.ahead_manifest, "commits ahead manifest.")
+        if project.behind_manifest:
+            ui.info(ui.bold, "Your branch is",
+                    project.behind_manifest, "commits behind manifest.")
+
 
     if not project.sync_and_clean:
         if project.status is not None:

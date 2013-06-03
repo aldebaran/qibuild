@@ -64,3 +64,20 @@ def test_sync_before_checking(qisrc_action, git_server, record_messages):
     qisrc_action("status")
     assert record_messages.find("Some projects are not on the expected branch")
     assert record_messages.find(r"\* foo\s+master\s+devel")
+
+
+def test_print_distance_from_manifest(qisrc_action, git_server, record_messages):
+    foo_repo = git_server.create_repo("foo.git")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    foo_git = qisrc.git.Git(foo_proj.path)
+    foo_git.checkout("-b", "my_branch")
+
+    git_server.push_file("foo.git", "a.txt", "a change\n")
+    git_server.push_file("foo.git", "b.txt", "b change\n")
+    foo_git.fetch("origin")
+
+    record_messages.reset()
+    qisrc_action("status")
+    assert record_messages.find("Your branch is 2 commits behind manifest")
