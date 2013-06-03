@@ -49,7 +49,6 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
         """ Copy a project, reading sources from qidoc/test/projects
 
         Can return None when testing qidoc2 retro-compat
-
         """
         this_dir = os.path.dirname(__file__)
         src_path = os.path.join(this_dir, "projects", src)
@@ -62,7 +61,7 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
 
 class QiDocAction(TestAction):
     def __init__(self):
-        super(QiDocAction, self).__init__("qibuild.actions")
+        super(QiDocAction, self).__init__("qidoc.actions")
         self.doc_worktree = TestDocWorkTree()
 
     def add_test_project(self, *args, **kwargs):
@@ -84,9 +83,3 @@ def doc_worktree(cd_to_tmpdir):
 def qidoc_action(cd_to_tmpdir):
     res = QiDocAction()
     return res
-
-class QiBuildAction(TestAction):
-    def __init__(self):
-        super(QiBuildAction, self).__init__("qibuild.actions")
-        self.build_worktree = TestBuildWorkTree()
-
