@@ -239,6 +239,8 @@ class WorkTreeProject(object):
         for project_elem in project_elems:
             sub_src = qisys.qixml.parse_required_attr(project_elem, "src",
                                                 xml_path=self.qiproject_xml)
+            if sub_src == ".":
+                continue
             full_path = os.path.join(self.path, sub_src)
             if not os.path.exists(full_path):
                 raise WorkTreeError(""" \

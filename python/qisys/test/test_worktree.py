@@ -55,6 +55,17 @@ def test_fails_when_root_does_not_exists(tmpdir):
         qisys.worktree.WorkTree(non_exitsting.strpath)
     assert "does not exist" in str(e.value)
 
+def test_ignore_src_dot(tmpdir):
+    foo_path = tmpdir.mkdir("foo")
+    tmpdir.join("foo", "qiproject.xml").write("""
+<project>
+  <project src="." />
+</project>
+""")
+    worktree  = qisys.worktree.WorkTree(tmpdir.strpath)
+    worktree.add_project("foo")
+
+
 
 def test_remove_project(worktree):
     # pylint: disable-msg=E1101
