@@ -28,14 +28,12 @@ def extract_pot_file(project, domain):
         return
 
     # get input files and directory
+    input_dir = list()
     input_dir, input_files = qilinguist.config.parse_potfiles_in(project.path,
                                                                  potfiles_in_path)
 
     # get input directory
-    if input_dir:
-        input_dir = os.path.join(project.path, input_dir)
-    else:
-        input_dir = project.path
+    input_dir.append(project.path)
 
     # get output file
     output = domain + ".pot"

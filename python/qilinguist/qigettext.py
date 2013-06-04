@@ -39,8 +39,9 @@ def generate_pot_file(text_domain, input_files, output_file,
     cmd.extend(["--output", output_file])
 
     # add directories to list for input files search
-    if input_dir:
-        cmd.extend(["--directory", input_dir])
+    for idir in input_dir:
+        cmd.append("--directory")
+        cmd.append(idir)
 
     #  List of input file
     if input_files:
