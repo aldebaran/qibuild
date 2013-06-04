@@ -57,7 +57,7 @@ def indent(txt, indent_level):
     '    foo'
     """
     indent = "  " * indent_level
-    return "\n".join([indent + x for x in txt.splitlines()])
+    return "\n".join(indent + x for x in txt.splitlines())
 
 
 def clean_indent(txt):
@@ -66,7 +66,7 @@ def clean_indent(txt):
     parsing
 
     """
-    return "\n".join([x.strip() for x in txt.splitlines()])
+    return "\n".join(x.strip() for x in txt.splitlines())
 
 
 def parse_fun_block(txt):

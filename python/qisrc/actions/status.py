@@ -31,7 +31,7 @@ def do(args):
     git_projects = git_worktree.git_projects
 
     num_projs = len(git_projects)
-    max_len = max([len(p.src) for p in git_projects])
+    max_len = max(len(p.src) for p in git_projects)
     state_projects = list()
 
     for (i, git_project) in enumerate(git_projects, start = 1):
@@ -55,7 +55,7 @@ def do(args):
     for git_project in state_projects:
         qisrc.status.print_state(git_project, max_len)
 
-    max_len = max([max_len, len("Project")])
+    max_len = max(max_len, len("Project"))
     qisrc.status.print_incorrect_projs(state_projects, max_len)
 
     qisrc.status.print_not_on_a_branch(state_projects)

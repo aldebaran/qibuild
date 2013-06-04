@@ -166,14 +166,14 @@ def show_existing_modules(name, modules_package, modules_qibuild):
 
     """
     if len(modules_package) > 0:
-        modules = "\n".join(["  {0}".format(x) for x in modules_package])
+        modules = "\n".join("  {0}".format(x) for x in modules_package)
         message = """\
 Package '{0}' already provides the following CMake module(s):
 {1}
 """.format(name, modules)
         qisys.ui.info(message)
     if len(modules_qibuild) > 0:
-        modules = "\n".join(["  {0}".format(x) for x in modules_qibuild])
+        modules = "\n".join("  {0}".format(x) for x in modules_qibuild)
         message = """\
 qiBuild already provides the following CMake module(s) for the package '{0}':
 {1}
@@ -299,7 +299,7 @@ Package content:
 {0}
 
 Press enter to launch the editor.\
-""".format("\n".join(["  " + x for x in package_path_list]))
+""".format("\n".join("  " + x for x in package_path_list))
         qisys.ui.info(message)
         qisys.interact.read_input()
     qibuild_cfg = qibuild.config.QiBuildConfig()

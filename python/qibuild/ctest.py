@@ -382,7 +382,7 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
         return True
 
     ui.error("Ran %i tests, %i failures" % (total, len(failed)))
-    padding = max([len(x.test_name) for x in failed])
+    padding = max(len(x.test_name) for x in failed)
     for res in failed:
         ui.info(ui.bold, " -", ui.blue,
                 res.test_name.ljust(padding + 5),

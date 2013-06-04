@@ -89,6 +89,9 @@ Some string functions you will always use:
 * Always precise object when creating it. Use `foo = list()` instead of `foo = []`.
   `bar = set()` instead of `bar = {}`, etc.
 
+* You can compute max/min/join on any iterator, so no need to create a list, a generator is enough:
+  `max(len(x) for x in myiterable)`
+
 Some more specific rules
 ------------------------
 

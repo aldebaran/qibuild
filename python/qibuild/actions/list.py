@@ -35,8 +35,8 @@ def do(args):
         on_empty_worktree(build_worktree)
         return
     ui.info(ui.green, "qibuild projects in:", ui.blue, build_worktree.root)
-    max_name = max([len(x.name) for x in projects])
-    max_src  = max([len(x.src)  for x in projects])
+    max_name = max(len(x.name) for x in projects)
+    max_src  = max(len(x.src)  for x in projects)
     regex = args.pattern
     if args.pattern:
         regex = re.compile(regex)

@@ -149,7 +149,7 @@ worktree root: {1}
             if not raises:
                 return None
             mess  = "No project in '%s'\n" % src
-            mess += "Known projects are in %s" % ", ".join([p.src for p in self.projects])
+            mess += "Known projects are in %s" % ", ".join(p.src for p in self.projects)
             raise WorkTreeError(mess)
         match = [p for p in self.projects if p.src == src]
         res = match[0]

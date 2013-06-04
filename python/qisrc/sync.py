@@ -227,7 +227,7 @@ class WorkTreeSyncer(object):
         ui.info(ui.green, ":: Configuring projects ...")
         if not new_repos:
             return
-        max_src = max([len(x.src) for x in new_repos])
+        max_src = max(len(x.src) for x in new_repos)
         for repo in new_repos:
             git_project = self.git_worktree.get_git_project(repo.src)
             # may not work if the moving failed for instance

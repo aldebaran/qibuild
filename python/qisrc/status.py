@@ -120,8 +120,8 @@ def print_incorrect_projs(projects, max_len):
     incorrect_projs = [x for x in projects if x.incorrect_proj]
     if incorrect_projs:
         ui.info()
-        max_branch_len = max([len(x.current_branch) for x in incorrect_projs])
-        max_branch_len = max([max_branch_len, len("Current")])
+        max_branch_len = max(len(x.current_branch) for x in incorrect_projs)
+        max_branch_len = max(max_branch_len, len("Current"))
         ui.warning("Some projects are not on the expected branch")
         ui.info(ui.blue, " " *2, "Project".ljust(max_len + 3), ui.reset,
                 ui.green, "Current".ljust(max_branch_len + 3),

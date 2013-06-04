@@ -23,7 +23,7 @@ def do(args):
         return
     ui.info(ui.green, "Translatable projects in ",
             ui.reset, ui.blue, linguist_worktree.root)
-    max_name = max([len(x.name) for x in projects])
+    max_name = max(len(x.name) for x in projects)
     for project in projects:
         ui.info(ui.green, " * ",
                 ui.blue, project.name.ljust(max_name + 2),

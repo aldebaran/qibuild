@@ -172,10 +172,10 @@ Working dir was {cwd}
                            cwd=self.cwd)
         if self.stdout:
             mess += "Stdout: \n"
-            mess  = "\n".join(["    " + line for line in self.stdout.split("\n")])
+            mess  = "\n".join("    " + line for line in self.stdout.split("\n"))
         if self.stderr:
             mess += "Stderr: \n"
-            mess  = "\n".join(["    " + line for line in self.stderr.split("\n")])
+            mess  = "\n".join("    " + line for line in self.stderr.split("\n"))
         return mess
 
 class ProcessCrashedError(Exception):
