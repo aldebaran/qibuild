@@ -2,8 +2,9 @@ import os
 
 import qisys.sh
 
-from qidoc.test.conftest import TestDocWorkTree
 import qidoc.convert
+from qidoc.test.conftest import TestDocWorkTree
+from qibuild.test.conftest import TestBuildWorkTree
 
 def test_convert_handle_src(worktree):
     foo_proj = worktree.create_project("foo")
@@ -29,7 +30,7 @@ def test_convert_add_subprojects(worktree):
     bar_path = os.path.join(foo_proj.path, "bar")
     qisys.sh.mkdir(bar_path)
     xml = """
-<project>
+<project name="foo" >
   <doxydoc name="a_doxy" src="bar" />
 </project>
 """
@@ -42,6 +43,7 @@ def test_convert_add_subprojects(worktree):
     doc_projects = doc_worktree.doc_projects
     assert len(doc_projects) == 1
     assert doc_projects[0].src == "foo/bar"
+
 
 def test_convert_src_dot(worktree):
     foo_proj = worktree.create_project("foo")
@@ -59,4 +61,3 @@ def test_convert_src_dot(worktree):
     doc_projects = doc_worktree.doc_projects
     assert len(doc_projects) == 1
     assert doc_projects[0].src == "foo"
-

@@ -5,6 +5,11 @@ import qisys.qixml
 
 
 def convert_project(project):
+    """ Convert a qidoc2 project so it's still usable
+    in qidoc2 and qidoc3
+
+    :returns: True if a conversion happened
+    """
     worktree = project.worktree
     if not os.path.exists(project.qiproject_xml):
         return
@@ -28,6 +33,7 @@ def convert_project(project):
         handle_src_attribute(project, root_elem, doc_elem)
 
     qisys.qixml.write(root_elem, qiproject_xml)
+    return True
 
 def handle_src_attribute(project, root_elem, doc_elem):
     worktree = project.worktree
