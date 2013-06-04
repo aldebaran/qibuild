@@ -18,6 +18,7 @@ DOCUMENTED_FILES=[
     "codegen",
     "find",
     "flags",
+    "gettext",
     "swig/python",
     "swig/java",
     "subdirectory",
