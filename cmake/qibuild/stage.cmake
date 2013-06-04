@@ -104,11 +104,6 @@ function(qi_stage_bin target)
   _qi_internal_stage_bin(${target} ${ARGN})
 endfunction()
 
-#! not implemented yet
-function(qi_stage_script)
-  qi_error("qi_stage_script: not implemented")
-endfunction()
-
 #! stage a cmake file
 # For instance, assuming you have a foo-config.cmake file
 # containing my_awesome_function, you can do::
@@ -162,6 +157,42 @@ function(qi_stage_cmake module_file)
 
   qi_install_cmake("${module_file}" SUBFOLDER "${_module_name}")
 
+endfunction()
+
+
+#! Stage an executable script
+#
+# Will copy the script in stage binary directory, and stage a cmake file so
+# that others can locate it. Use like this::
+#
+#     qi_stage_script(src/myscript)
+#
+# And in other projects::
+#
+#     find_package(myscript)
+#     use_script_in_function(${MYSCRIPT_EXECUTABLE})
+#
+function(qi_stage_script file_name)
+  if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${module_file}")
+    qi_error("
+
+    Could not stage ${module_file}:
+    ${CMAKE_CURRENT_SOURCE_DIR}/${module_file}
+    does not exist
+    ")
+
+  endif()
+  get_filename_component(target "${file_name}" NAME)
+  _qi_internal_stage_script("${file_name}")
+  # Could not figure out how to make the copy only run when source changes.
+  add_custom_target(
+    copy_${target}
+    ALL
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${file_name}" "${QI_SDK_DIR}/${QI_SDK_BIN}"
+    )
+  # We need to copy once now, in case the file is needed at configure time.
+  file(COPY "${file_name}"
+        DESTINATION "${QI_SDK_DIR}/${QI_SDK_BIN}/")
 endfunction()
 
 
