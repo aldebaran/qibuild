@@ -5,6 +5,10 @@ CMake coding guide
 
 .. highlight:: cmake
 
+
+General
+-------
+
 * Keep the length of the line below 80 characters when possible, and when it
   does not hurt readability, and below 100 characters at any case.
 
@@ -53,7 +57,11 @@ CMake coding guide
   user cmake code) must start with qi, other should not start with qi (prefer
   using _qi for example).
 
-* The CMakeParseArguments module is very useful, please use it.
+* When writing a convenience function, not to be used outside, start the name
+  with an underscore, if you have a whole bunch of internal functions, put them
+  in a separated file, in the ``internal`` subdirectory.
+
+* The ``CMakeParseArguments`` module is very useful, please use it.
 
 * Please do not use C-like construct for strings spanning on several lines;
   rather use nice CMake feature for this::
@@ -71,6 +79,20 @@ CMake coding guide
     ")
 
   See `CMake Syntax <http://www.cmake.org/cmake/help/syntax.html>`_
+
+* Use the log functions carefully. The output of CMake must stay minimal (when
+  it gets too long, it is impossible for the user to see if something went
+  wrong)
+
+* If you run into a CMake warning, never ignore it. Fix your code or file a bug
+  report. (CMake warnings almost always mean there is a nasty bug somewhere)
+
+Documentation
+-------------
+
+In the CMake code
+++++++++++++++++++
+
 
 * Every function in the public API must have corresponding documentation. It
   works a bit like Doxygen, but with the python-sphinx syntax
@@ -111,6 +133,10 @@ The rest is straightforward
   indicates a "multi-value option" : the keyword will be followed by a list of
   values (see CMakeParseArguments)
 
+
+In sphinx
++++++++++
+
 * Note: if you add a completely new functionality, you may want to add the
   new functions in a new file. For instance ``qi_make_coffee`` in ``coffee.cmake``
   In this case you have to:
@@ -119,16 +145,6 @@ The rest is straightforward
   * add you file to the list of the documented files in ``doc/tools/gen_cmake_doc.py``
   * and of course adding a tutorial on how to make coffee with qibuild :)
 
-* When writing a convenience function, not to be used outside, start the name
-  with an underscore, if you have a whole bunch of internal functions, put them
-  in a separated file, in the ``internal`` subdirectory.
-
-* Use the log functions carefully. The output of CMake must stay minimal (when
-  it gets too long, it is impossible for the user to see if something went
-  wrong)
-
-* If you run into a CMake warning, never ignore it. Fix your code or file a bug
-  report. (CMake warnings almost always mean there is a nasty bug somewhere)
 
 Conditions and Variables
 ------------------------
