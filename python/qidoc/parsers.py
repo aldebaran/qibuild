@@ -7,7 +7,7 @@ def get_doc_worktree(args):
     return DocWorkTree(worktree)
 
 
-def get_doc_worktree(doc_worktree, args, default_all=False):
+def get_doc_projects(doc_worktree, args, default_all=False):
     parser = DocProjectParser(doc_worktree)
     return parser.parse_args(args, default_all=default_all)
 

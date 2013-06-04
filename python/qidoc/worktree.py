@@ -50,6 +50,8 @@ class DocWorkTree(qisys.worktree.WorkTreeObserver):
 
     def get_doc_project(self, name, raises=False):
         for project in self.doc_projects:
+            if isinstance(project, TemplateProject):
+                continue
             if project.name == name:
                 return project
         if raises:
