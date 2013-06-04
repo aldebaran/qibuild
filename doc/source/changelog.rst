@@ -214,7 +214,7 @@ CMake
     to make ``boost-python`` work when using Visual Studio)
   * bug fix when using ``find_package`` twice with a CMake module calling
     ``pkg_search_module`` (for instance with ``qi_add_optional_package``)
-
+  * Implement ``qi_stage_script`` which was present but empty.
 
 Python
 ++++++
