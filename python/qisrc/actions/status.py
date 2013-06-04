@@ -28,7 +28,6 @@ def configure_parser(parser):
 def do(args):
     """Main method."""
     git_worktree = qisrc.parsers.get_git_worktree(args)
-    git_worktree.sync()
     git_projects = git_worktree.git_projects
 
     num_projs = len(git_projects)

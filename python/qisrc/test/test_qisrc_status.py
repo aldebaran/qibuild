@@ -55,17 +55,6 @@ def test_not_on_any_branch(qisrc_action, record_messages):
     assert record_messages.find("not on any branch")
 
 
-def test_sync_before_checking(qisrc_action, git_server, record_messages):
-    foo_repo = git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
-    qisrc_action("status")
-    git_server.change_branch(foo_repo, "devel")
-    record_messages.reset()
-    qisrc_action("status")
-    assert record_messages.find("Some projects are not on the expected branch")
-    assert record_messages.find(r"\* foo\s+master\s+devel")
-
-
 def test_print_distance_from_manifest(qisrc_action, git_server, record_messages):
     foo_repo = git_server.create_repo("foo.git")
     qisrc_action("manifest", "--add", "default", git_server.manifest_url)
