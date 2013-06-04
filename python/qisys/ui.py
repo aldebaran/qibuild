@@ -157,7 +157,7 @@ def info(*tokens, **kwargs):
         return
     _msg(*tokens, **kwargs)
 
-def info_count(i, n, *rest):
+def info_count(i, n, *rest, **kwargs):
     """ Same as info, but displays a nice counter
     coler will be reset
     >>> count(0, 4)
@@ -171,7 +171,7 @@ def info_count(i, n, *rest):
     num_digits = len(str(n)) # lame, I know
     counter_format = "(%{}d/%d)".format(num_digits)
     counter_str = counter_format % (i+1, n)
-    info(green, "*", reset, counter_str, reset, *rest)
+    info(green, "*", reset, counter_str, reset, *rest, **kwargs)
 
 def debug(*tokens, **kwargs):
     """ Print a debug message """
