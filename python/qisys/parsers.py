@@ -80,6 +80,12 @@ def get_projects(worktree, args):
     parser = WorkTreeProjectParser(worktree)
     return parser.parse_args(args)
 
+def get_one_project(worktree, args):
+    parser = WorkTreeProjectParser(worktree)
+    projects = parser.parse_args(args)
+    if not len(projects) == 1:
+        raise Exception("This action can only work with one project")
+    return projects[0]
 
 ##
 # Implemation details

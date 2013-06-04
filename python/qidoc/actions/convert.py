@@ -16,7 +16,5 @@ def configure_parser(parser):
 
 def do(args):
     worktree = qisys.parsers.get_worktree(args)
-    for project in worktree.projects:
-        converted = qidoc.convert.convert_project(project)
-        if converted:
-            ui.info("Converted", project.qiproject_xml)
+    project = qisys.parsers.get_one_project(worktree, args)
+    qidoc.convert.convert_project(project)

@@ -11,6 +11,13 @@ def get_doc_projects(doc_worktree, args, default_all=False):
     parser = DocProjectParser(doc_worktree)
     return parser.parse_args(args, default_all=default_all)
 
+def get_one_doc_project(git_worktree, args):
+    parser = GitProjectParser(git_worktree)
+    projects = parser.parse_args(args)
+    if not len(projects) == 1:
+        raise Exception("This action can only work with one project")
+    return projects[0]
+
 ##
 # Implementation details
 
