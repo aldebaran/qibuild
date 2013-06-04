@@ -1,3 +1,5 @@
+import os
+
 from qisrc.git_config import Branch
 
 def create_foo(git_server, tmpdir, test_git):
@@ -50,6 +52,20 @@ def test_skip_if_unclean(git_server, tmpdir, test_git):
     assert foo_git.read_file("README") == "changing README"
     assert res is None
     assert "unstaged changes" in message
+
+def test_do_not_call_rebase_abort_when_reset_fails(git_server, tmpdir, test_git):
+    foo_git = create_foo(git_server, tmpdir, test_git)
+    branch = Branch()
+    branch.name = "master"
+    branch.tracks = "origin"
+    git_server.push_file("foo.git", "README", "README on master")
+    foo_path = foo_git.repo
+    index_lock = os.path.join(foo_path, ".git", "index.lock")
+    with open(index_lock, "w") as fp:
+        fp.write("")
+    (res, message) =  foo_git.sync_branch(branch)
+    assert res is False
+    assert "rebase --abort" not in message
 
 def test_push_nonfastforward(git_server, tmpdir, test_git):
     foo_git = create_foo(git_server, tmpdir, test_git)

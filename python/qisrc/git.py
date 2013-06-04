@@ -340,10 +340,13 @@ class Git(object):
             if rc == 0:
                 update_successful = True
             else:
-                # Continute the transaction even if last command failed
-                transaction.ok = True
-                message = "Rebase failed because of conflics"
-                self.call("rebase", "--abort")
+                if update_cmd[0] == "rebase":
+                    # run rebase --abort so that the user is left
+                    # in a clean state, making sure we
+                    # continue the transaction even if last command failed
+                    transaction.ok = True
+                    message = "Rebase failed because of conflics"
+                    self.call("rebase", "--abort")
 
         if transaction.ok:
             return update_successful, message

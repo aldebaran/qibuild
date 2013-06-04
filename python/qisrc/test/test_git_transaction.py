@@ -15,7 +15,7 @@ def test_transaction_fail(mock_git):
         mock_git.reset("--hard")
     mock_git.check()
     assert not transaction.ok
-    assert "reset --har" in transaction.output
+    assert "reset --hard" in transaction.output
     assert "no space left" in transaction.output
 
 def test_transaction_stop_at_first_failure(mock_git):
