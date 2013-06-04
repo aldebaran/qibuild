@@ -10,6 +10,7 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
         if not worktree:
             worktree = TestWorkTree()
         super(TestDocWorkTree, self).__init__(worktree)
+        self.add_test_project("templates")
 
     @property
     def tmpdir(self):

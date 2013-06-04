@@ -14,3 +14,5 @@ def test_create_projects(cd_to_tmpdir):
     assert bar_proj.name == "bar"
     assert bar_proj.doc_type == "sphinx"
     assert bar_proj.depends == ["foo"]
+
+    assert doc_worktree.template_project.src == "templates"

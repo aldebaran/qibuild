@@ -46,9 +46,11 @@ def handle_src_attribute(project, root_elem, doc_elem):
 
     subproject_src = posixpath.join(project.src, src)
     subproject = worktree.get_project(subproject_src)
-    if not subproject:
-        subproject = create_sub_project(worktree, root_elem, project, src)
-    subproject = create_doc_project(worktree, subproject, doc_elem)
+    if subproject:
+        subproject_path = subproject.path
+    else:
+        subproject_path = create_sub_project(worktree, root_elem, project, src)
+    create_doc_project(worktree, subproject_path, doc_elem)
     root_elem.remove(doc_elem)
 
 
@@ -59,17 +61,16 @@ def create_sub_project(worktree, root_elem, project, src):
     project_elem = qisys.qixml.etree.Element("project")
     project_elem.set("src", src)
     root_elem.append(project_elem)
-    subproject_src = posixpath.join(project.src, src)
-    return worktree.add_project(subproject_src)
+    return os.path.join(project.path, src)
 
 
-def create_doc_project(worktree, project, doc_elem):
+def create_doc_project(worktree, project_path, doc_elem):
     new_doc_elem = qisys.qixml.etree.Element(doc_elem.tag)
     new_doc_elem.set("name", doc_elem.get("name"))
     for depend_elem in doc_elem.findall("depends"):
         new_doc_elem.append(depend_elem)
-    qiproject_xml = project.qiproject_xml
+    qiproject_xml = os.path.join(project_path, "qiproject.xml")
     qisys.qixml.write(new_doc_elem, qiproject_xml)
     project_elem = qisys.qixml.etree.Element("project")
     project_elem.append(new_doc_elem)
-    qisys.qixml.write(project_elem, project.qiproject_xml)
+    qisys.qixml.write(project_elem, qiproject_xml)

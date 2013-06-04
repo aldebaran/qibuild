@@ -45,6 +45,7 @@ def test_convert_add_subprojects(worktree):
     assert doc_projects[0].src == "foo/bar"
 
 
+
 def test_convert_src_dot(worktree):
     foo_proj = worktree.create_project("foo")
     xml = """
@@ -61,3 +62,15 @@ def test_convert_src_dot(worktree):
     doc_projects = doc_worktree.doc_projects
     assert len(doc_projects) == 1
     assert doc_projects[0].src == "foo"
+
+def test_convert_template(worktree):
+    foo_proj = worktree.create_project("foo")
+    xml = """
+<project template_repo="true" />
+"""
+    with open(foo_proj.qiproject_xml, "w") as fp:
+        fp.write(xml)
+
+    doc_worktree = TestDocWorkTree()
+    doc_projects = doc_worktree.doc_projects
+    assert doc_worktree.template_project.src == "foo"
