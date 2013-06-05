@@ -30,6 +30,25 @@ exceptions:
 * There must be two lines between top-level definitions. One line between
   methods.
 
+
+* Do not initialize several variables on the same line, unless they come from
+  a tuple (for instance the return of a function, or a iteration on a directory)
+
+.. code-block:: python
+
+    # Yes:
+    ok, mess  = run_command()
+
+    for test_result in test_results:
+        outcome, message = res
+
+    # No:
+    ok, mess = False, ""
+
+    class Foo:
+        self.bar, self.baz = None, True
+
+
 * The `Google Python Style Guide <http://google-styleguide.googlecode.com/svn/trunk/pyguide.html>`_
   and `Pocoo Team Style Guide <http://www.pocoo.org/internal/styleguide/#styleguide>`_
   contain lots of useful things, please read them.
@@ -316,6 +335,52 @@ add some spam to the eggs somewhere else :)
 
 * If you want to shorten the name of a module, you can use ``as alias_name`` to
   rename it, but then you must keep it consistent across your whole project.
+
+Variable naming
+^^^^^^^^^^^^^^^^
+
+Without going to the extend of using Polish notation, it is useful
+to have a convention for variable naming, especially since
+Python has a dynamic type system, and to keep the code base
+consistent
+
+* Do not name variables you do not intend to use later:
+
+    .. code-block:: python
+
+      foo, _ = run_foobar()
+
+* Use plural for containers:
+
+    .. code-block:: python
+
+        # No:
+        result = set()
+
+        # Yes:
+        results = set()
+
+  This has the nice benefit of allowing you to have meaningful
+  "loop names":
+
+    .. code-block:: python
+
+        for result in results:
+          # ...
+
+* Use `_name` suffix when your are using a `.name` attribute
+
+    .. code-block:: python
+
+      # No:
+      my_projects = [x.name for x in projects]
+
+      # Yes:
+      my_project_names = [x.name for x in projects]
+
+
+* Use ``path`` when you have an absolute path, and ``src`` when you have
+  a relative, posix path
 
 File Paths
 ^^^^^^^^^^
