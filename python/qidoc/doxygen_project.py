@@ -6,3 +6,12 @@ class DoxygenProject(qidoc.project.DocProject):
                  depends=None):
         self.doc_type = "doxygen"
         super(DoxygenProject, self).__init__(doc_worktree, project, name, depends=depends)
+
+    def configure(self):
+        pass
+
+    def build(self):
+        pass
+
+    def install(self, destdir):
+        pass

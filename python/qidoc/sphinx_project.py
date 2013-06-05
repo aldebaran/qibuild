@@ -6,3 +6,12 @@ class SphinxProject(qidoc.project.DocProject):
                  depends=None):
         self.doc_type = "sphinx"
         super(SphinxProject, self).__init__(doc_worktree, project, name, depends=depends)
+
+    def configure(self):
+        pass
+
+    def build(self):
+        pass
+
+    def install(self, destdir):
+        pass
