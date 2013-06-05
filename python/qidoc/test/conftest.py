@@ -6,10 +6,12 @@ import qidoc.worktree
 class TestDocWorkTree(qidoc.worktree.DocWorkTree):
     """ A subclass of DocWorkTree that can create doc projects """
 
-    def __init__(self, worktree=None):
+    def __init__(self, worktree=None, qibuild2=False):
         if not worktree:
             worktree = TestWorkTree()
         super(TestDocWorkTree, self).__init__(worktree)
+
+    def add_templates(self):
         self.add_test_project("templates")
 
     @property

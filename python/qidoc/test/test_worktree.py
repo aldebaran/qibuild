@@ -17,5 +17,3 @@ def test_qidoc2_happy(qidoc_action):
 
     tmpl_proj = doc_worktree.template_project
     assert tmpl_proj.src == "qidoc2/templates"
-
-

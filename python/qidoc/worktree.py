@@ -157,6 +157,9 @@ def _new_doc_project_2(doc_worktree, project):
 
 def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
     qiproject_xml = project.qiproject_xml
+    if doc_type == "template":
+        return TemplateProject(doc_worktree, project)
+
     name = xml_elem.get("name")
     if not name:
         raise BadProjectConfig(qiproject_xml,
