@@ -14,6 +14,18 @@ class DocProject(object):
             depends = list()
         self.depends = list()
 
+    @abc.abstractmethod
+    def configure(self):
+        pass
+
+    @abc.abstractmethod
+    def build(self):
+        pass
+
+    @abc.abstractmethod
+    def install(self, destdir):
+        pass
+
     def __repr__(self):
         return "<%s %s in %s>" % (self.doc_type.capitalize() + "Project",
                                   self.name, self.src)

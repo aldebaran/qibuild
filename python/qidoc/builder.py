@@ -1,0 +1,3 @@
+class DocBuilder(object):
+    pass
+
