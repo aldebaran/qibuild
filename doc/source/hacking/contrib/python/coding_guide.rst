@@ -105,11 +105,13 @@ Some string functions you will always use:
   `rjust <http://docs.python.org/2/library/stdtypes.html#str.rjust>`_
   instead of writing custom padding code
 
-* Always precise object when creating it. Use `foo = list()` instead of `foo = []`.
-  `bar = set()` instead of `bar = {}`, etc.
+* Always precise object when creating it. Use ``foo = list()`` instead of ``foo = []``.
+  ``bar = dict()`` instead of ``bar = {}``, etc.
+
+* When copying a list, use ``my_copy = list(my_list)`` instead of ``my_copy = my_list[:]``
 
 * You can compute max/min/join on any iterator, so no need to create a list, a generator is enough:
-  `max(len(x) for x in myiterable)`
+  ``max(len(x) for x in myiterable)``
 
 Some more specific rules
 ------------------------
@@ -335,6 +337,80 @@ add some spam to the eggs somewhere else :)
 
 * If you want to shorten the name of a module, you can use ``as alias_name`` to
   rename it, but then you must keep it consistent across your whole project.
+
+
+Classes
+^^^^^^^^
+
+* Use new-style classes. We don't care of the overhead and this is the
+  default in Python3. This means you should inherit from ``object``
+  or a new-style class.
+
+* Avoid inheritance when you can and favor composition.
+  With the dynamic nature of Python and the fact that every method is
+  "virtual", it can quickly become a nightmare to follow the code flow.
+  Also, using composition makes it easier to test.
+
+* When you want to make sure a class follows an interface, use ``abc.ABCMeta``
+  instead of ``raise NotImplementedError``. This way you get the error when
+  the class is instantiated instead of when the method is called
+
+  .. code-block:: python
+
+    # Yes
+    class AbstractFoo(object):
+        __metaclass__ = abc.ABCMeta
+
+        @abc.abstractmethod
+        def foo(self):
+            pass
+
+        @abc.abstractmethod
+        def bar(self):
+            pass
+
+
+    # No:
+    class AbstractFoo:
+
+        def foo(self):
+            raise NotImplementedError()
+
+        def bar(self):
+            raise NotImplementedError()
+
+
+* The ``__init__`` method should only initialize the attributes.
+  When an attribute of a class is computed from an other attribute,
+  use a property instead:
+
+  .. code-block:: python
+
+      # Yes
+      class Foo(object):
+
+          def __init__(self, root, src):
+                self.root = root
+                self.src = src
+
+          @property
+          def path(self):
+              return os.path.join(self.root, self.src)
+
+
+
+      # No:
+      class Foo(object):
+
+          def __init__(self, root, src):
+                self.root = root
+                self.src = src
+                self.path = os.path.join(self.root, self.src)
+
+  * You will get an error if someone tries to set the ``path`` attribute
+
+  * You are sure that ``path`` will be updated when someone changes ``src``
+    after the object is initialized.
 
 Variable naming
 ^^^^^^^^^^^^^^^^

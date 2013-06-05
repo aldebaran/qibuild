@@ -365,6 +365,6 @@ is OK, because:
   the name of the library
 * ``PROJECT_NAME`` is something that ends up in the IDE, so it's not
   a target name
-* calling ``project()`` calls the toolchain file to be parsed again
+* calling ``project()`` causes the toolchain file to be parsed again
   for no good reason
 * there's often more than one lib per project
