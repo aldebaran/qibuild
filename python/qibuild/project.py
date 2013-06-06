@@ -48,7 +48,7 @@ class BuildProject(object):
                                         platform.machine().lower()))
         profiles = self.build_config.profiles
         for profile in profiles:
-            parts.append(profile.name)
+            parts.append(profile)
 
         # When using cmake + visual studio, sharing the same build dir with
         # several build config is mandatory.
