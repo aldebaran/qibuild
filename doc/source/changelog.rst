@@ -177,6 +177,11 @@ Used with ``--profile bar``
 
 Used with ``--group bar``
 
+CMake
++++++
+
+* MacOS libraries use ``@loader_path`` instead of ``@runtime_path`` for
+the default installed name.
 
 v2.3
 ----

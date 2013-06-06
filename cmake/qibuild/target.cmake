@@ -313,7 +313,7 @@ function(qi_create_lib name)
   endif()
 
   if(NOT DEFINED QI_INSTALL_NAME_DIR)
-    set(QI_INSTALL_NAME_DIR "@executable_path/../lib")
+    set(QI_INSTALL_NAME_DIR "@loader_path/../lib")
   endif()
   if(APPLE)
     set_target_properties("${name}"
