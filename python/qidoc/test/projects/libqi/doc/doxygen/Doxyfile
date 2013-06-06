@@ -1,0 +1,4 @@
+INPUT = ../..
+OUTPUT_DIRECTORY = build
+GENERATE_HTML = yes
+GENERATE_LATEX = no
