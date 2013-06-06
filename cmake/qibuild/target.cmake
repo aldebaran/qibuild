@@ -199,6 +199,7 @@ endfunction()
 #                        have to compile the target explicitly.
 #                        Warning: you will NOT be able to create install rules
 #                          for this target.
+# \flag:NO_RPATH Do not set a rpath to $ORIGIN/..lib when linking on linux.
 # \flag: INTERNAL  See below
 #
 # \flag:NO_FPIC Do not set -fPIC on static libraries (will be set for shared lib by CMake anyway)
@@ -210,7 +211,7 @@ endfunction()
 # \example:target
 function(qi_create_lib name)
   cmake_parse_arguments(ARG
-    "NOBINDLL;NO_INSTALL;NO_FPIC;SHARED;STATIC;MODULE;INTERNAL"
+    "NOBINDLL;NO_RPATH;NO_INSTALL;NO_FPIC;SHARED;STATIC;MODULE;INTERNAL"
     "SUBFOLDER"
     "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
@@ -323,6 +324,15 @@ function(qi_create_lib name)
         INSTALL_NAME_DIR ${QI_INSTALL_NAME_DIR}
         BUILD_WITH_INSTALL_RPATH 1
     )
+  endif()
+  if(UNIX AND NOT APPLE)
+    if(NOT ARG_NO_RPATH)
+      # Use a relative rpath at installation
+      set_target_properties("${name}"
+        PROPERTIES
+          INSTALL_RPATH "\$ORIGIN/../lib"
+      )
+    endif()
   endif()
 
 endfunction()

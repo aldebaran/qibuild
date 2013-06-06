@@ -182,6 +182,8 @@ CMake
 
 * MacOS libraries use ``@loader_path`` instead of ``@runtime_path`` for
 the default installed name.
+* Linux shared libraries are linked with a RPATH set to ``$ORIGIN/../lib``
+by default, as it was done for executables.
 
 v2.3
 ----
