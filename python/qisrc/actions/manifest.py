@@ -12,7 +12,7 @@ Examples:
   qisrc manifest my_manifest --groups my_group
 
   # checkt that a manifest is correct before pushing it:
-  qisrc manifest --check /path/to/manifest.xml
+  qisrc manifest --check manifest_name /path/to/manifest.xml
 
 """
 
@@ -103,7 +103,10 @@ def check_manifest(git_worktree, args):
 
 def check_exists(git_worktree, name):
     if not name in git_worktree.manifests:
-        ui.error("No such manifest:", name)
+        if name is None:
+            ui.error("No manifest specified")
+        else:
+            ui.error("No such manifest:", name)
         ui.info("""
 Tips:
 * Use `qisrc manifest --list` to see the list of the manifests

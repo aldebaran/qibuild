@@ -281,6 +281,8 @@ class WorkTreeSyncer(object):
         if not os.path.exists(manifest_repo):
             git = qisrc.git.Git(manifest_repo)
             git.clone(manifest.url, "--branch", manifest.branch, quiet=True)
+        else:
+            ui.warning("Manifest %s already exists." % manifest.name)
 
 
     def __repr__(self):
