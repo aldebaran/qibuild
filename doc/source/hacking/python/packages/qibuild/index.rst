@@ -13,6 +13,7 @@ qibuild modules
    ctest
    deps_solver
    deploy
+   find
    gdb
    parsers
    performance

@@ -12,12 +12,21 @@ import platform
 import qisys.sh
 
 def find_lib(paths, name, debug=None, expect_one=True):
-    """ Find a lib in a list of paths.
+    """ Find a library in a list of paths.
+
     :param: debug. If ``None``, looks for both debug and
                    release. If ``True``, only look for
                    a library built in debug, if ``False``,
                    only look for a library built in release.
                    (This is only relevant on Windows)
+
+    :param expect_one:
+        If True, raises:
+
+         * NotFound if no match is found
+         * MulipleFound if more than one match is found
+
+        Otherwise return a list of matches
 
     """
     candidates = set()
@@ -41,12 +50,21 @@ def find_lib(paths, name, debug=None, expect_one=True):
 
 
 def find_bin(paths, name, debug=None, expect_one=True):
-    """ Find a lib in a list of paths.
+    """ Find a binary in a list of paths.
+
     :param: debug. If ``None``, looks for both debug and
                    release. If ``True``, only look for
                    a binary built in debug, if ``False``,
                    only look for a binary built in release.
                    (This is only relevant on Windows)
+
+    :param expect_one:
+        If True, raises:
+
+         * NotFound if no match is found
+         * MulipleFound if more than one match is found
+
+        Otherwise return a list of matches
 
     """
     candidates = set()
