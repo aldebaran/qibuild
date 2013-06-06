@@ -44,36 +44,20 @@ def do(args):
     skipped = list()
     failed = list()
     ui.info(ui.green, ":: Syncing projects ...")
+    max_src = max(len(x.src) for x in git_projects)
     for (i, git_project) in enumerate(git_projects):
         ui.info_count(i, len(git_projects),
-                      ui.blue, git_project.src)
+                      ui.blue, git_project.src.ljust(max_src), end="\r")
 
         (status, out) = git_project.sync(rebase_devel=args.rebase_devel)
         if status is None:
-            ui.info(ui.brown, "  [skipped]")
+            ui.info("\n", ui.brown, "  [skipped]")
             skipped.append((git_project.src, out))
         if status is False:
-            ui.info(ui.red, "  [failed]")
+            ui.info("\n", ui.red, "  [failed]")
             failed.append((git_project.src, out))
         if out:
             print ui.indent(out, num=2)
 
     if failed:
-        print
-        ui.error("Failed to sync some projects")
-        display_errors(failed)
-
-    if skipped:
-        print
-        ui.warning("Skipped some projects")
-        display_errors(skipped)
-
-    if failed:
         sys.exit(1)
-
-def display_errors(errors):
-    """ Helper function to display a summary at the end """
-    for (src, err) in errors:
-        ui.info(ui.blue, src)
-        ui.info(ui.blue, "-" * len(src))
-        ui.info(ui.indent(err, num=2))

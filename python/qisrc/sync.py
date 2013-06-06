@@ -63,7 +63,7 @@ class WorkTreeSyncer(object):
             return
         ui.info(ui.green, ":: Updating manifests ...")
         for local_manifest in self.manifests.values():
-            ui.info(ui.tabs(1), ui.green, " * ",
+            ui.info(ui.green, "* ",
                     ui.reset, ui.blue, local_manifest.name,
                     ui.reset, ui.bold, "(%s)" % local_manifest.branch,
                     end="")
@@ -174,12 +174,11 @@ class WorkTreeSyncer(object):
         # 1/ create, remove or move the git projects:
 
         # Compute the work that needs to be done:
-        ui.info(ui.green, ":: Computing diff ...")
         (to_add, to_move, to_rm, to_update) = \
             compute_repo_diff(old_repos, new_repos)
 
-        if not to_rm and not to_add and not to_move and not to_update:
-            ui.info(ui.tabs(2), ui.green, "No changes")
+        if to_rm or to_add or to_move or to_update:
+            ui.info(ui.green, ":: Computing diff ...")
 
         if to_rm:
             for repo in to_rm:
@@ -214,7 +213,7 @@ class WorkTreeSyncer(object):
                     disp = False
                 self.git_worktree.clone_missing(repo)
 
-        if len(to_move):
+        if to_move:
             ui.info(ui.green, ":: Moving repositories ...")
         for (repo, new_src) in to_move:
             self.git_worktree.move_repo(repo, new_src)
@@ -230,14 +229,13 @@ class WorkTreeSyncer(object):
             git_project = self.git_worktree.get_git_project(repo.src)
             # may not work if the moving failed for instance
             if git_project:
-                ui.info(ui.green, "Configuring", ui.reset,
+                ui.info(ui.green, "* ", ui.white, "Configuring", ui.reset,
                         ui.blue, git_project.src.ljust(max_src), end="\r")
                 git_project.apply_remote_config(repo)
         ui.info(" " * (max_src + 11), end="\r")
 
     def _sync_build_profiles(self, local_manifest):
         """ Synchronize the build profiles read from the given manifest """
-        ui.info(ui.green, "Synchronizing build profiles ...")
         local_xml = os.path.join(self.git_worktree.root, ".qi", "qibuild.xml")
         if not os.path.exists(local_xml):
             with open(local_xml, "w") as fp:
@@ -247,6 +245,8 @@ class WorkTreeSyncer(object):
         local = qibuild.profile.parse_profiles(local_xml)
         remote = qibuild.profile.parse_profiles(remote_xml)
         new_profiles, updated_profiles = compute_profile_updates(local, remote)
+        if new_profiles or updated_profiles:
+            ui.info(ui.green, ":: Synchronizing build profiles ...")
         for new_profile in new_profiles:
             ui.info(ui.green, " * New:", ui.blue, new_profile.name)
             qibuild.profile.configure_build_profile(local_xml,
@@ -402,4 +402,3 @@ class LocalManifestParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(LocalManifestParser, self).__init__(target)
         self._required = ["name"]
-
