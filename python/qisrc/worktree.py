@@ -113,7 +113,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     def clone_missing(self, repo):
         """ Add a new project  """
-        ui.info(ui.green, "Adding", repo.project, "->", repo.src)
+        ui.info(ui.green, "* ", ui.white, repo.project, ui.green, "->", ui.white, repo.src)
         worktree_project = self.worktree.add_project(repo.src)
         # add_project caused self.load_git_projects() to be called,
         # but the path was not a valid git project yet
@@ -141,7 +141,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
         """
         project = self.get_git_project(repo.src)
-        ui.info(ui.warning, "Moving ", project.src, "to", new_src)
+        ui.info(ui.green, "* ", ui.warning, "moving ", project.src, "to", new_src)
         new_path = os.path.join(self.worktree.root, new_src)
         new_path = qisys.sh.to_native_path(new_path)
         if os.path.exists(new_path):

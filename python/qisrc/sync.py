@@ -182,31 +182,23 @@ class WorkTreeSyncer(object):
             ui.info(ui.tabs(2), ui.green, "No changes")
 
         if to_rm:
-            ui.info(ui.tabs(2), "To remove:")
             for repo in to_rm:
-                ui.info(ui.tabs(3),
-                        ui.red, "* ", ui.reset, ui.blue, repo.src)
+                ui.info(ui.red, "* ", ui.reset, "removing", ui.blue, repo.src)
         if to_add:
-            ui.info(ui.tabs(2), ui.green , "To add:")
             for repo in to_add:
-                ui.info(ui.tabs(3),
-                        ui.green, "* ", ui.reset, ui.blue, repo.src)
+                ui.info(ui.green, "* ", ui.reset, "adding", ui.blue, repo.src)
 
         if to_move:
-            ui.info(ui.tabs(2), ui.brown, "To move:")
             for (repo, new_src) in to_move:
-                ui.info(ui.tabs(3),
-                        ui.brown, "* ", ui.reset, ui.blue, repo.src,
-                        ui.reset, " -> ", ui.blue, new_src)
+                ui.info(ui.brown, "* ", ui.reset, "moving", ui.blue, repo.src,
+                        ui.reset, " to ", ui.blue, new_src)
 
         if to_update:
-            ui.info(ui.tabs(2), ui.green, "To update:")
             for (old_repo, new_repo) in to_update:
-                ui.info(ui.tabs(2),
-                        ui.green, "* ",
-                        ui.reset, ui.blue, old_repo.src)
+                ui.info(ui.green, "* ",
+                        ui.reset, "updating", ui.blue, old_repo.src)
                 if new_repo.review:
-                    ui.info(ui.tabs(3), ui.green, "(now using code review)")
+                    ui.info(ui.tabs(2), ui.green, "(now using code review)")
 
 
         for repo in to_rm:
@@ -215,9 +207,15 @@ class WorkTreeSyncer(object):
         for repo in to_add:
             # maybe user created it already, for instance with
             # a sucessful `qisrc sync`
+            disp = True
             if not self.git_worktree.get_git_project(repo.src):
+                if disp:
+                    ui.info(ui.green, ":: Cloning new repositories ...")
+                    disp = False
                 self.git_worktree.clone_missing(repo)
 
+        if len(to_move):
+            ui.info(ui.green, ":: Moving repositories ...")
         for (repo, new_src) in to_move:
             self.git_worktree.move_repo(repo, new_src)
 
