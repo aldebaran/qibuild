@@ -87,7 +87,7 @@ class GitProject(object):
     def configure_branch(self, name, tracks="origin",
                          remote_branch=None, default=True):
         """ Configure a branch. If a branch with the same name
-        already exitsts, update its tracking remote.
+        already exists, update its tracking remote.
 
         """
         previous_default_branch = self.default_branch
@@ -161,6 +161,10 @@ class GitProject(object):
             return None, "Not on the correct branch. " + \
                          "On %s but should be on %s" % (current_branch, branch.name)
 
+        if current_branch != branch.name and rebase_devel:
+            return git.sync_branch_devel(current_branch, branch)
+
+        # Here current_branch == branch.name
         return git.sync_branch(branch)
 
 

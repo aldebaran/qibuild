@@ -4,10 +4,10 @@ import py
 
 import qisys.script
 import qisys.sh
-from qisrc.test.conftest import TestGitWorkTree
+import qisrc.git
+from qisrc.test.conftest import TestGitWorkTree, TestGit
 from qibuild.test.conftest import TestBuildWorkTree
 import qibuild.profile
-
 
 
 def test_sync_clones_new_repos(qisrc_action, git_server):
@@ -83,3 +83,79 @@ def test_sync_build_profiles(qisrc_action, git_server):
     foo_profile = qibuild.profile.parse_profiles(qibuild_xml)["foo"]
     assert foo_profile.name == "foo"
     assert foo_profile.cmake_flags == [("WITH_FOO", "ON")]
+
+def test_sync_branch_devel(qisrc_action, git_server, test_git):
+    # This tests the case where everything goes smoothly
+    git_server.create_repo("foo.git")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    git_server.push_file("foo.git", "foo.txt", "a super change")
+    git_server.push_file("foo.git", "bar.txt", "a super bugfix")
+    git_worktree = TestGitWorkTree()
+
+    foo = git_worktree.get_git_project("foo")
+
+    test_git = TestGit(foo.path)
+    test_git.call("checkout", "-b", "devel")
+
+    test_git.commit_file("developing.txt", "like a boss")
+    git_server.push_file("foo.git", "foobar.txt", "some other change")
+    git_server.push_file("foo.git", "bigchange.txt", "some huge change")
+
+    qisrc_action("sync", "--rebase-devel")
+    test_git.call("checkout", "master")
+    # Check that master is fast-forwarded
+    bigchange_txt = os.path.join(foo.path, "bigchange.txt")
+    assert os.path.exists(bigchange_txt)
+
+    # Check rebase is done smoothly
+    test_git.call("checkout", "devel")
+    test_git.call("rebase", "master")
+    assert os.path.exists(bigchange_txt)
+    developing_txt = os.path.join(foo.path, "developing.txt")
+    assert os.path.exists(developing_txt)
+
+def test_sync_branch_devel_unclean(qisrc_action, git_server, test_git):
+    # Case where the worktree isn't clean
+
+    git_server.create_repo("foo.git")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    git_server.push_file("foo.git", "foo.txt", "a super change")
+    git_server.push_file("foo.git", "bar.txt", "a super bugfix")
+    git_worktree = TestGitWorkTree()
+
+    foo = git_worktree.get_git_project("foo")
+
+    test_git = TestGit(foo.path)
+    test_git.call("checkout", "-b", "devel")
+
+    test_git.commit_file("developing.txt", "like a boss")
+    git_server.push_file("foo.git", "foobar.txt", "some other change")
+
+    wip_txt = os.path.join(foo.path, "wip.txt")
+    open(wip_txt, 'w').close()
+
+    qisys.script.run_action("qisrc.actions.sync", ["--rebase-devel"])
+    # Master has been fast-forwarded and I haven't lost my WIP
+    assert os.path.exists(wip_txt)
+
+def test_sync_branch_devel_no_ff(qisrc_action, git_server, test_git):
+    # Case where master can't be fast-forwarded, does nothing except warning
+
+    git_server.create_repo("foo.git")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    git_server.push_file("foo.git", "foo.txt", "a super change")
+    git_worktree = TestGitWorkTree()
+
+    foo = git_worktree.get_git_project("foo")
+
+    test_git = TestGit(foo.path)
+    test_git.commit_file("foo.git", "div.txt", "diverging from master")
+    master_sha1 = test_git.get_ref_sha1("refs/heads/master")
+    test_git.call("checkout", "-b", "devel")
+
+    test_git.commit_file("developing.txt", "like a boss")
+    git_server.push_file("foo.git", "foobar.txt", "some other change")
+
+    qisrc_action("sync", "--rebase-devel")
+    # Master HEAD is untouched
+    assert test_git.get_ref_sha1("refs/heads/master") == master_sha1

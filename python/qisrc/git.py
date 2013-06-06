@@ -41,7 +41,7 @@ class Git(object):
             return self._call(*args, **kwargs)
 
         if not self._transaction.ok:
-            # Do not run any more  command if transaction failed:
+            # Do not run any more command if transaction failed:
             return
 
         # Force raises to False
@@ -256,7 +256,6 @@ class Git(object):
             return False
         return True
 
-
     def set_remote(self, name, url):
         """
         Set a new remote with the given name and url
@@ -286,7 +285,7 @@ class Git(object):
         self.set_config("branch.%s.merge" % branch,
                         "refs/heads/%s" % remote_branch)
 
-    def sync_branch(self, branch, rebase_devel=True):
+    def sync_branch(self, branch):
         """ git pull --rebase on steroids:
 
          * do not try anything if the worktree is not clean
@@ -298,9 +297,6 @@ class Git(object):
            (don't try to rebase, maybe there was a push -f)
 
          * if on the correct branch, rebase it
-
-         * if on a devel branch, and 'rebase_devel' is true,
-           update the master branch and tries to rebase
 
         Return a tuple (status, message), where status can be:
             - None: sync was skipped, but there was no error
@@ -345,13 +341,77 @@ class Git(object):
                     # in a clean state, making sure we
                     # continue the transaction even if last command failed
                     transaction.ok = True
-                    message = "Rebase failed because of conflics"
+                    message = "Rebase failed because of conflicts"
                     self.call("rebase", "--abort")
 
         if transaction.ok:
             return update_successful, message
         else:
-            return False,  transaction.output
+            return False, transaction.output
+
+    def is_ff(self, local_sha1, remote_sha1):
+        """Check local_sha1 is fast-forward with remote_sha1.
+        Return True / False or None in case of error with merge-base.
+        """
+        (retcode, out) = self.call("merge-base", local_sha1, remote_sha1,
+                                   raises=False)
+        if retcode != 0:
+            ui.error("Calling merge-base failed")
+            ui.error(out)
+            return
+        else:
+            common_ancestor = out.strip()
+            return common_ancestor == local_sha1
+
+    def get_ref_sha1(self, ref):
+        """Return the sha1 from a ref. None if not found."""
+        (ret, sha1) = self.call("show-ref", "--verify", "--hash",
+                               ref, raises=False)
+
+        if ret == 0:
+            return sha1
+
+    def sync_branch_devel(self, local_branch, master_branch):
+        """ Make sure master stays compatible with your development branch
+        Checks if your local master branch can be fast-forwarded to remote
+        Update master's HEAD if it's the case
+        """
+
+        if master_branch.tracks:
+            fetch_cmd = ("fetch", master_branch.tracks)
+        else:
+            fetch_cmd = ("fetch")
+        self.call(*fetch_cmd)
+
+        # First check if master can be fast-forwarded
+        local_sha1 = self.get_ref_sha1("refs/heads/%s" % master_branch.name)
+        if local_sha1 is None:
+            return
+
+        remote_ref = "refs/remotes/%s/%s" % \
+                     (master_branch.tracks, master_branch.name)
+        remote_sha1 = self.get_ref_sha1(remote_ref)
+
+        if remote_sha1 is None:
+            return
+
+        if local_sha1 == remote_sha1:
+            # Nothing to do, we're good
+            return True, ""
+        result_ff = self.is_ff(local_sha1, remote_sha1)
+        if result_ff:
+            ui.info("Branch %s can be fast-forwarded" % master_branch.name)
+        else:
+            return True, "Branch %s isn't fast-forward" % master_branch.name
+
+        # update master HEAD ref (only because we're fast-forward /!\)
+        reason = "qisrc Fast-forward to %s" % remote_sha1
+        master_head = "refs/heads/%s" % master_branch.name
+        self.call("update-ref", "-m", reason, master_head,
+        remote_sha1, local_sha1)
+        return True, "Fast-forwarded %s. Feel free to rebase on %s" % \
+                                        ((master_branch.name,) * 2)
+
 
     def __repr__(self):
         return "<Git repo in %s>" % self.repo
