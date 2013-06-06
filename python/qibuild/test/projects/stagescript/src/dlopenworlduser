@@ -1,0 +1,15 @@
+
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+import shlib
+
+wu = shlib.load_shlib('worlduser', True)
+
+if wu is None:
+  raise Exception("Could not load library")
+
+if wu.answer() != 42:
+  raise Exception("Call to wu failed")

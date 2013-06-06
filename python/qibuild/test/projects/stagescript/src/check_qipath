@@ -1,0 +1,5 @@
+
+import sys
+import os
+if len(os.environ.get('QI_PATH', '')) == 0:
+  raise Exception("Expected non-empty QI_PATH")
