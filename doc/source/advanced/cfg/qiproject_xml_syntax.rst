@@ -16,7 +16,7 @@ that you can have nested projects.
 
 .. code-block:: xml
 
-  <project>
+  <project version="3" />
     <project src="subfolder" />
   </project>
 
@@ -64,7 +64,7 @@ For instance
 
 .. code-block:: xml
 
-  <project >
+  <project version="3" >
     <qibuild name="hello">
       <depends buildtime="true" runtime="true" names="foo bar" />
       <depends runtime="true" names="spam" />
@@ -87,7 +87,7 @@ The file will look like:
 
 .. code-block:: xml
 
-  <project>
+  <project version="3" >
     <translate domain="hello" linguas="fr_FR en_US" tr="gettext" />
   </project>
 

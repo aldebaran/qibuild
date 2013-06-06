@@ -67,7 +67,9 @@ qibuild that there is a project named ``world`` in
 
 .. code-block:: xml
 
-   <project name="world" />
+    <project version="3">
+      <qibuild name="world" />
+    </project>
 
 The second one in ``QI_WORK_TREE/hello`` tells ``qibuild``
 there is a project named ``hello`` in ``QI_WORK_TREE/hello``,
@@ -75,10 +77,10 @@ and that it depends on the ``world`` project:
 
 .. code-block:: xml
 
-  <project name="hello">
-    <depends buildtime="true" runtime="true"
-      name="world"
-    />
+  <project version="3" >
+    <qibuild name="hello">
+      <depends buildtime="true" runtime="true" names="world" />
+    </qibuild>
   </project>
 
 You can see that configuring ``hello`` caused the ``world`` project to be

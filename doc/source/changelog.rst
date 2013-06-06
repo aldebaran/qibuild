@@ -89,7 +89,7 @@ Config files
 .. code-block:: xml
 
     <!-- new -->
-    <project>
+    <project version="3" >
       <qibuild name="foo">
         <depends runtime="true" names="bar" />
       </qibuild>
@@ -163,9 +163,9 @@ Used with ``--profile bar``
   <!--in qibuild3 -->
 
     <manifest>
-      <project name="foo.git" />
-      <project name="bar.git" />
-      <project name="libbar.git" />
+      <repo name="foo.git" />
+      <repo name="bar.git" />
+      <repo name="libbar.git" />
 
       <groups>
         <group name="bar">
