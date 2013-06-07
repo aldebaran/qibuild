@@ -166,7 +166,6 @@ class TestGitServer(object):
             commit_args.append("--allow-empty")
         git.commit(*commit_args)
         git.checkout("--force", "-B", self.manifest_branch)
-        git.call("show", "HEAD")
         git.push("origin", "%s:%s" % (self.manifest_branch, self.manifest_branch))
 
     def remove_repo(self, project):
