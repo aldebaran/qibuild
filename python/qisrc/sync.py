@@ -221,17 +221,25 @@ class WorkTreeSyncer(object):
 
         ##
         # 2/ Apply configuration to every new repositories
-        ui.info(ui.green, ":: Configuring projects ...")
-        if not new_repos:
-            return
-        max_src = max(len(x.src) for x in new_repos)
+        todo = list() # a list of tuples (project, repo)
         for repo in new_repos:
             git_project = self.git_worktree.get_git_project(repo.src)
             # may not work if the moving failed for instance
-            if git_project:
-                ui.info(ui.green, "* ", ui.white, "Configuring", ui.reset,
-                        ui.blue, git_project.src.ljust(max_src), end="\r")
-                git_project.apply_remote_config(repo)
+            if not git_project:
+                ui.warning("Skipping", repo.src)
+            else:
+                todo.append((git_project, repo))
+
+        if not todo:
+            return
+
+        ui.info(ui.green, ":: Configuring projects ...")
+        max_src = max([len(x[0].src) for x in todo])
+        n = len(todo)
+        for i, (project, repo) in enumerate(todo):
+            ui.info_count(i, n, ui.white, "Configuring", ui.reset,
+                          ui.blue, project.src.ljust(max_src), end="\r")
+            project.apply_remote_config(repo)
         ui.info(" " * (max_src + 11), end="\r")
 
     def _sync_build_profiles(self, local_manifest):

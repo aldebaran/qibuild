@@ -145,7 +145,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
         """
         project = self.get_git_project(repo.src)
-        ui.info(ui.green, "* ", ui.warning, "moving ", project.src, "to", new_src)
+        ui.info(ui.green, "* moving ", project.src, "to", new_src)
         new_path = os.path.join(self.worktree.root, new_src)
         new_path = qisys.sh.to_native_path(new_path)
         if os.path.exists(new_path):
