@@ -8,7 +8,7 @@ class DepsSolver(object):
     def __init__(self, build_worktree):
         self.build_worktree = build_worktree
 
-    def get_dep_projects(self, projects, dep_types):
+    def get_dep_projects(self, projects, dep_types, reverse=False):
         """ Solve the dependencies of the list of projects
 
         :param: dep_types A list of dependencies types
@@ -16,9 +16,11 @@ class DepsSolver(object):
         :return: a list of projects in the build worktree
 
         """
-        sorted_names = self._get_sorted_names(projects, dep_types)
+        sorted_names = self._get_sorted_names(projects, dep_types,
+                                              reverse=reverse)
 
         dep_projects = list()
+
         for name in sorted_names:
             dep_project = self.build_worktree.get_build_project(name, raises=False)
             if dep_project:
@@ -61,8 +63,19 @@ class DepsSolver(object):
         return res
 
 
-    def _get_sorted_names(self, projects, dep_types):
+    def _get_sorted_names(self, projects, dep_types, reverse=False):
         """ Helper for get_dep_* functions """
+        if reverse:
+            reverse_deps = set()
+            for project in self.build_worktree.build_projects:
+                if "build" in dep_types:
+                    if any(x.name in project.depends for x in projects):
+                        reverse_deps.add(project.name)
+                if "runtime" in dep_types:
+                    if any(x.name in project.rdepends for x in projects):
+                        reverse_deps.add(project.name)
+            return sorted(list(reverse_deps))
+
         to_sort = dict()
         for project in self.build_worktree.build_projects:
             deps = set()

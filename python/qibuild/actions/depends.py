@@ -55,7 +55,7 @@ def get_deps(build_worktree, project, single, runtime, reverse):
     """ create a list of DependencyRelationship objects ready for display """
     deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
     if reverse:
-        (packages, projects) =  (set(), build_worktree.projects)
+        (packages, projects) =  (set(), build_worktree.build_projects)
     else:
         if runtime:
             dep_types = ["build"]
@@ -200,6 +200,7 @@ def collect_dependencies_reverse(project, projects, single, runtime, depth=0):
                 sub = collect_dependencies_reverse(
                     proj, projects, False, runtime, depth+1)
                 collected_dependencies.extend(sub)
+
     return collected_dependencies
 
 def package_names_first(dependency_names, package_names):

@@ -66,3 +66,35 @@ def test_empty_dep_is_single(build_worktree):
 
     deps_solver = DepsSolver(build_worktree)
     assert deps_solver.get_dep_projects([hello], list()) == [hello]
+
+def test_simple_reverse_deps(build_worktree):
+    world = build_worktree.create_project("world")
+    hello = build_worktree.create_project("hello", depends=["world"])
+
+    deps_solver = DepsSolver(build_worktree)
+    assert deps_solver.get_dep_projects([world], ["build"], reverse=True) == \
+        [hello]
+    assert deps_solver.get_dep_projects([hello], ["build"], reverse=True) == \
+        []
+
+def test_complex_reverse_deps(build_worktree):
+    libworld = build_worktree.create_project("libworld")
+    libhello = build_worktree.create_project("libhello", depends=["libworld"])
+    hello_plugin = build_worktree.create_project("hello-plugin")
+    hello = build_worktree.create_project("hello",
+    depends=["libworld", "libhello"], rdepends=["hello-plugin"])
+
+    top_world = build_worktree.create_project("top_world", rdepends=["hello"])
+    deps_solver = DepsSolver(build_worktree)
+    assert deps_solver.get_dep_projects([top_world], ["build"], reverse=True) \
+        == []
+    assert deps_solver.get_dep_projects([hello], ["build"],
+        reverse=True) == []
+    assert deps_solver.get_dep_projects([hello], ["build", "runtime"],
+         reverse=True) == [top_world]
+
+    assert deps_solver.get_dep_projects([hello_plugin], ["runtime"],
+        reverse=True) == [hello]
+
+    assert deps_solver.get_dep_projects([libworld], ["build", "runtime"],
+        reverse=True) == [hello, libhello]
