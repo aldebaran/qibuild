@@ -152,6 +152,7 @@ function(qi_add_test test_name target_name)
   # Validate target_name. We expect one of:
   # - A target name expected to be an executable with standard path.
   # - A relative or absolute path to an existing binary.
+  # - A path that leads to an executable when using find_program
   # - A package name providing a ${name}_EXECUTABLE variable.
   if(TARGET ${target_name})
     set(_bin_path ${QI_SDK_DIR}/${QI_SDK_BIN}/${target_name})
@@ -163,8 +164,12 @@ function(qi_add_test test_name target_name)
     add_test(${test_name} ${_bin_path} ${ARG_ARGUMENTS})
     set_target_properties(${target_name} PROPERTIES FOLDER "tests")
   else()
+    find_program(_executable NAMES "${target_name}")
+    if (NOT _executable)
+      set(_executable ${target_name})
+    endif()
     # Just in case user specified a relative path:
-    get_filename_component(_full_path ${target_name} ABSOLUTE)
+    get_filename_component(_full_path ${_executable} ABSOLUTE)
     if(NOT EXISTS ${_full_path})
       # Try package
       find_package(${target_name})
