@@ -89,6 +89,8 @@ Found two projects sharing the same sources:
                                 (remote_name, repo.project))
         remote = copy.copy(matching_remote)
         remote.url = matching_remote.prefix + repo.project
+        if repo.default_branch is None:
+            repo.default_branch = remote.default_branch
         if remote.name == repo.default_remote_name:
             remote.default = True
         repo.remotes.append(remote)
@@ -176,7 +178,7 @@ class RepoConfig(object):
     def __init__(self):
         self.src = None
         self.project = None
-        self.default_branch = "master"
+        self.default_branch = None
         self.default_remote_name = None
         self.remotes = list()
         self.remote_names = None
@@ -279,7 +281,7 @@ class RepoConfigParser(qisys.qixml.XMLParser):
             src = self.target.project.replace(".git", "")
         self.target.src = src
 
-        self.target.default_branch = self._root.get("branch", "master")
+        self.target.default_branch = self._root.get("branch")
         remote_names = self._root.get("remotes")
         if remote_names is None:
             raise ManifestError("Missing 'remotes' attribute")

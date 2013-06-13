@@ -95,7 +95,7 @@ def test_no_matching_remote(tmpdir):
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert e.value.message == "No matching remote: invalid for repo foo/bar.git"
 
-def test_branch(tmpdir):
+def test_repo_branch(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
 <manifest>
@@ -109,6 +109,18 @@ def test_branch(tmpdir):
     foo = manifest.repos[1]
     assert bar.default_branch == "master"
     assert foo.default_branch == "devel"
+
+def test_remote_branch(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" default_branch="release" />
+  <repo project="bar.git" remotes="origin" />
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    bar = manifest.repos[0]
+    assert bar.default_branch == "release"
 
 def test_invalid_group(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
