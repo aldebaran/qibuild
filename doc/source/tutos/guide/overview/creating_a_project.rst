@@ -9,7 +9,7 @@ Navigate to your :term:`worktree` and type:
 
 .. code-block:: console
 
-  $ qibuild create foo
+  $ qisrc create foo
 
 Remember, for this to work on windows, you should have:
 

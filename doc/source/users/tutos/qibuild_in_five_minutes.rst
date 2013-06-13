@@ -21,7 +21,7 @@ Starting a new project from scratch
 
 .. code-block:: console
 
-    $ qibuild create foo
+    $ qisrc create foo
 
 
 * Configure and build the foo project
