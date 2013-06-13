@@ -126,16 +126,18 @@ class GitProject(object):
         self.name = repo.project
         for remote in repo.remotes:
             self.configure_remote(remote)
-        self.configure_branch(repo.default_branch, tracks=repo.default_remote.name,
-                              remote_branch=repo.default_branch, default=True)
+        if repo.default_branch and repo.default_remote:
+            self.configure_branch(repo.default_branch, tracks=repo.default_remote.name,
+                                remote_branch=repo.default_branch, default=True)
+            new_default = self.default_remote.name
+            if previous_default is not None and previous_default != new_default:
+                ui.warning("Default remote changed", previous_default, "->",
+                                                    new_default)
         if repo.review:
             ok = qisrc.review.setup_project(self)
             if ok:
                 self.review = True
-        new_default = self.default_remote.name
-        if previous_default is not None and previous_default != new_default:
-            ui.warning("Default remote changed", previous_default, "->",
-                                                 new_default)
+
         self.save_config()
 
 

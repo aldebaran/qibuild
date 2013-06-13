@@ -45,6 +45,7 @@ def test_apply_remote_config(git_worktree):
     gerrit.review = True
     foo_repo = RepoConfig()
     foo_repo.remotes = [origin, gerrit]
+    foo_repo.default_branch = "master"
     foo.apply_remote_config(foo_repo)
     assert foo_repo.default_remote == origin
     assert foo.review_remote == gerrit
@@ -86,6 +87,7 @@ def test_warn_on_default_change(git_worktree, record_messages):
     gitlab.name = "gitlab"
     gitlab.url = "git@gitlab:foo/libfoo.git"
     foo_repo = RepoConfig()
+    foo_repo.default_branch = "master"
     foo_repo.remotes = [gitlab, gitorious]
 
     foo.apply_remote_config(foo_repo)
@@ -99,10 +101,16 @@ def test_warn_on_default_change(git_worktree, record_messages):
     record_messages.reset()
     foo_repo = RepoConfig()
     foo_repo.remotes = [gitlab2, gitorious2]
+    foo_repo.default_branch = "master"
     foo.apply_remote_config(foo_repo)
     assert record_messages.find("Default remote changed")
     assert foo.default_remote.name == "gitlab"
 
+
+def test_no_default_branch(git_worktree):
+    foo_project = git_worktree.create_git_project("foo")
+    foo_repo = RepoConfig()
+    foo_project.apply_remote_config(foo_repo)
 
 
 def test_setting_default_branch(git_worktree):
