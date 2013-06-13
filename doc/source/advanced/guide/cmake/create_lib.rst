@@ -13,7 +13,7 @@ Requirements
 
 We assume you have a qiBuild project containing a executable named ``foo``.
 
-You can use ``qibuild create foo`` to get such a project.
+You can use ``qisrc create foo`` to get such a project.
 
 We are going to write a function called ``get_answer()`` that will return an
 integer.

@@ -59,7 +59,7 @@ does not contain any buildable project.
 
 Please use:
     * `qisrc init` to fetch some sources
-    * `qibuild create` to create a new qibuild project from scratch
+    * `qisrc create` to create a new qibuild project from scratch
     * `qibuild convert` to convert an exixting CMake project to
        a qibuild project
 """
