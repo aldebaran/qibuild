@@ -256,6 +256,15 @@ class Git(object):
             return False
         return True
 
+    def is_empty(self):
+        """ Returns true if there are no commit yet (between `git init` and
+        `git commit`
+
+        """
+        rc, _ = self.call("rev-parse", "--verify", "HEAD", raises=False)
+        return rc != 0
+
+
     def set_remote(self, name, url):
         """
         Set a new remote with the given name and url
@@ -268,6 +277,10 @@ class Git(object):
         self.remote("rm",  name, quiet=True, raises=False)
         self.remote("add", name, url, quiet=True)
 
+    def branch_exists(self, name):
+        rc, _ = self.call("show-ref", "--verify", "refs/heads/%s" % name, raises=False)
+        return rc == 0
+
     def set_tracking_branch(self, branch, remote_name, fetch_first=True, remote_branch=None):
         """ Update the configuration of a branch to track
         a given remote branch
@@ -277,10 +290,12 @@ class Git(object):
         :param remote_branch: the name of the remote to track. If not given
             will be the same of the branch name
         """
-        if not branch in self.get_local_branches():
-            self.branch(branch)
         if remote_branch is None:
             remote_branch = branch
+        if self.is_empty():
+            raise Exception("repo in %s has no commit yet" % self.repo)
+        if not self.branch_exists(branch):
+            self.branch(branch)
         self.set_config("branch.%s.remote" % branch, remote_name)
         self.set_config("branch.%s.merge" % branch,
                         "refs/heads/%s" % remote_branch)

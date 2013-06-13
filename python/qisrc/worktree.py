@@ -119,23 +119,30 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                 ui.blue, repo.src,
                 ui.white, "(%s)" % repo.default_branch)
         worktree_project = self.worktree.add_project(repo.src)
-        # add_project caused self.load_git_projects() to be called,
-        # but the path was not a valid git project yet
-        # so the GitProject does not exist yet
         git_project = qisrc.project.GitProject(self, worktree_project)
-        git = qisrc.git.Git(git_project.path)
-        if not os.path.exists(git_project.path):
-            to_make = os.path.dirname(git_project.path)
-            qisys.sh.mkdir(to_make, recursive=True)
-            git.clone(repo.default_remote.url, "--recursive",
-                    "--branch", repo.default_branch,
-                    "--origin", repo.default_remote.name)
-        else:
+        if os.path.exists(git_project.path):
+            git = qisrc.git.Git(git_project.path)
             # Maybe the project was removed and is now added again
             if not git.is_valid():
                 ui.warning("Wanted to add a project in", git_project.src, "\n",
                            "But this path already exists and is not a git project")
                 return
+            if git.is_empty():
+                ui.warning("Removing empty git project in", git_project.src)
+                qisys.sh.rm(git_project.path)
+                self._clone_missing(git_project, repo)
+            # If there is a valid git project, do nothing, it will be
+            # reconfigured if necessary
+        else:
+            self._clone_missing(git_project, repo)
+
+    def _clone_missing(self, git_project, repo):
+        to_make = os.path.dirname(git_project.path)
+        qisys.sh.mkdir(to_make, recursive=True)
+        git = qisrc.git.Git(git_project.path)
+        git.clone(repo.default_remote.url, "--recursive",
+                "--branch", repo.default_branch,
+                "--origin", repo.default_remote.name)
         self.save_project_config(git_project)
         self.load_git_projects()
 

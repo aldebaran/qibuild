@@ -113,3 +113,11 @@ def test_changing_manifest_groups(git_worktree, git_server):
                                     groups=["a_group", "foo_group"])
     git_projects = git_worktree.git_projects
     assert len(git_projects) == 4
+
+def test_add_on_empty(git_worktree, git_server):
+    foo = git_worktree.tmpdir.join("foo")
+    foo.ensure(dir=True)
+    foo_git = qisrc.git.Git(foo.strpath)
+    foo_git.init()
+    git_server.create_repo("foo")
+    git_worktree.configure_manifest("default", git_server.manifest_url)
