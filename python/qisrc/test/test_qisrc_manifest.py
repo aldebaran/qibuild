@@ -117,9 +117,9 @@ def test_check(qisrc_action, git_server):
     manifest.add_repo("doestnotexists.git", "nowhere", ["origin"])
     manifest.dump()
 
-    error = qisrc_action("manifest", "--check", "default",
-                         editable_path.strpath, raises=True)
-    assert "doestnotexists.git" in error
+    rc = qisrc_action("manifest", "--check", "default", editable_path.strpath,
+                 retcode=True)
+    assert rc != 0
     # running qisrc sync should still work:
     qisrc_action("sync")
 

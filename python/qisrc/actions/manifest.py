@@ -99,7 +99,9 @@ def check_manifest(git_worktree, args):
     name = args.name
     check_exists(git_worktree, name)
     xml_path = args.url_or_path
-    git_worktree.check_manifest(name, xml_path)
+    res = git_worktree.check_manifest(name, xml_path)
+    if not res:
+        sys.exit(1)
 
 def check_exists(git_worktree, name):
     if not name in git_worktree.manifests:

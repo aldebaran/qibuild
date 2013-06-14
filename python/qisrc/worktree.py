@@ -42,11 +42,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     def check_manifest(self, name, xml_path):
         """ Run a sync using just the xml file given as parameter """
-        self._syncer.sync_from_manifest_file(name, xml_path)
+        return self._syncer.sync_from_manifest_file(name, xml_path)
 
     def sync(self):
         """ Delegates to WorkTreeSyncer """
-        self._syncer.sync()
+        return self._syncer.sync()
 
     def load_git_projects(self):
         """ Build a list of git projects using the
@@ -112,7 +112,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.load_git_projects()
 
     def clone_missing(self, repo):
-        """ Add a new project  """
+        """ Add a new project.
+        :returns: a boolean telling if the clone succeeded
+
+        """
         ui.info(ui.green, "* ",
                 ui.blue, repo.project,
                 ui.green, "->",
@@ -126,29 +129,40 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             if not git.is_valid():
                 ui.warning("Wanted to add a project in", git_project.src, "\n",
                            "But this path already exists and is not a git project")
-                return
+                return False
             if git.is_empty():
                 ui.warning("Removing empty git project in", git_project.src)
                 qisys.sh.rm(git_project.path)
-                self._clone_missing(git_project, repo)
+                return self._clone_missing(git_project, repo)
             # If there is a valid git project, do nothing, it will be
             # reconfigured if necessary
         else:
-            self._clone_missing(git_project, repo)
+            return self._clone_missing(git_project, repo)
 
     def _clone_missing(self, git_project, repo):
+        branch = repo.default_branch
+        clone_url = repo.clone_url
         to_make = os.path.dirname(git_project.path)
         qisys.sh.mkdir(to_make, recursive=True)
         git = qisrc.git.Git(git_project.path)
         try:
-            git.clone(repo.default_remote.url, "--recursive",
-                    "--branch", repo.default_branch,
-                    "--origin", repo.default_remote.name)
+            git.clone(clone_url, "--recursive",
+                      "--branch", branch,
+                      "--origin", repo.default_remote.name)
         except:
             ui.error("Cloning repo failed")
-            return
+            return False
+        # old git versions (< 1.8) just trigger a warning when remote
+        # branch does not exist:
+        #    warning: Remote branch devel not found in upstream origin, using HEAD instead
+        # so, check the branch is correct
+        branch_ok = git.branch_exists(branch)
+        if not branch_ok:
+            ui.error("Remote branch", branch, "not found on", clone_url)
+            return False
         self.save_project_config(git_project)
         self.load_git_projects()
+        return True
 
     def move_repo(self, repo, new_src):
         """ Move a project in the worktree (s-me remote url, different
@@ -156,7 +170,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
         """
         project = self.get_git_project(repo.src)
-        ui.info(ui.green, "* moving ", project.src, "to", new_src)
+        ui.info(ui.green, "* ", ui.warning, "moving ", project.src, "to", new_src)
         new_path = os.path.join(self.worktree.root, new_src)
         new_path = qisys.sh.to_native_path(new_path)
         if os.path.exists(new_path):

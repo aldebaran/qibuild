@@ -33,10 +33,18 @@ class WorkTreeSyncer(object):
         self.new_repos = list()
 
     def sync(self):
+        """" Synchronize with a remote manifest:
+        * clone missing repos
+        * move repos that needs to be moved
+        * reconfigure remotes and default branches
+        * synchronizes build profiles
+        :returns: True in case of sucess, False otherwise
+
+        """
         # backup old repos configuration now, so that
         # we know what to sync
         self.old_repos = self.get_old_repos()
-        self.sync_repos()
+        return self.sync_repos()
 
     @property
     def manifests_xml(self):
@@ -58,6 +66,7 @@ class WorkTreeSyncer(object):
         git worktree accordingly
 
         """
+        res = True
         manifests = self.manifests.values()
         if not manifests:
             return
@@ -74,11 +83,12 @@ class WorkTreeSyncer(object):
             self._sync_manifest(local_manifest)
             self._sync_build_profiles(local_manifest)
         self.new_repos = self.get_new_repos()
-        self._sync_repos(self.old_repos, self.new_repos)
+        res = self._sync_repos(self.old_repos, self.new_repos)
         # re-read self.old_repos so we can do several syncs:
         self.old_repos = self.get_old_repos()
         # if everything went well, save the manifests configurations:
         self.dump_manifests()
+        return res
 
     def dump_manifests(self):
         """ Save the manifests in .qi/manifests.xml """
@@ -170,6 +180,7 @@ class WorkTreeSyncer(object):
 
     def _sync_repos(self, old_repos, new_repos):
         """ Sync the remote repo configurations with the git worktree """
+        res = True
         ##
         # 1/ create, remove or move the git projects:
 
@@ -211,13 +222,14 @@ class WorkTreeSyncer(object):
                 if disp:
                     ui.info(ui.green, ":: Cloning new repositories ...")
                     disp = False
-                self.git_worktree.clone_missing(repo)
+                if not self.git_worktree.clone_missing(repo):
+                    res = False
 
         if to_move:
             ui.info(ui.green, ":: Moving repositories ...")
         for (repo, new_src) in to_move:
-            self.git_worktree.move_repo(repo, new_src)
-
+            if not self.git_worktree.move_repo(repo, new_src):
+                res = False
 
         ##
         # 2/ Apply configuration to every new repositories
@@ -241,6 +253,7 @@ class WorkTreeSyncer(object):
                           ui.blue, project.src.ljust(max_src), end="\r")
             project.apply_remote_config(repo)
         ui.info(" " * (max_src + 11), end="\r")
+        return res
 
     def _sync_build_profiles(self, local_manifest):
         """ Synchronize the build profiles read from the given manifest """
@@ -278,7 +291,7 @@ class WorkTreeSyncer(object):
         old_repos = self.read_remote_manifest(local_manifest)
         new_repos = self.read_remote_manifest(local_manifest,
                                               manifest_xml=xml_path)
-        self._sync_repos(old_repos, new_repos)
+        return self._sync_repos(old_repos, new_repos)
 
 
     def clone_manifest(self, manifest):
