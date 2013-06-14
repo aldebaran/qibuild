@@ -49,6 +49,13 @@ def test_create_review_repos(tmpdir, git_server):
     rc, out = git.call("ls-remote", foo_repo.clone_url, raises=False)
     assert rc == 0
 
+def test_create_empty_repo(tmpdir, git_server):
+    foo_repo = git_server.create_repo("foo", empty=True)
+    git = qisrc.git.Git(tmpdir.strpath)
+    rc, out = git.call("ls-remote", foo_repo.clone_url, raises=False)
+    assert rc == 0
+    assert not out
+
 def test_new_project_under_review(tmpdir, git_server):
     foo_repo = git_server.create_repo("foo.git", review=False)
     assert foo_repo.review is False
