@@ -203,10 +203,10 @@ class WorkTreeSyncer(object):
         for repo in to_rm:
             self.git_worktree.remove_repo(repo)
 
+        disp = True
         for repo in to_add:
             # maybe user created it already, for instance with
             # a sucessful `qisrc sync`
-            disp = True
             if not self.git_worktree.get_git_project(repo.src):
                 if disp:
                     ui.info(ui.green, ":: Cloning new repositories ...")
