@@ -175,7 +175,7 @@ def info_count(i, n, *rest, **kwargs):
 
 def debug(*tokens, **kwargs):
     """ Print a debug message """
-    if not CONFIG["verbose"]:
+    if not CONFIG["verbose"] or CONFIG["record"]:
         return
     tokens = [blue, "[DEBUG]: "] + list(tokens)
     _msg(*tokens, **kwargs)
