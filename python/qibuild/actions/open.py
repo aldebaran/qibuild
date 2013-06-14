@@ -44,9 +44,9 @@ def do(args):
         return
 
     if ide.name == "Visual Studio":
-        open_visual(project.build_directory)
+        open_visual(project)
     elif ide.name == "Xcode":
-        open_xcode(project.build_directory)
+        open_xcode(project)
     elif ide.name == "QtCreator":
         open_qtcreator(project, ide.path)
     else:
