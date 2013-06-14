@@ -140,9 +140,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         to_make = os.path.dirname(git_project.path)
         qisys.sh.mkdir(to_make, recursive=True)
         git = qisrc.git.Git(git_project.path)
-        git.clone(repo.default_remote.url, "--recursive",
-                "--branch", repo.default_branch,
-                "--origin", repo.default_remote.name)
+        try:
+            git.clone(repo.default_remote.url, "--recursive",
+                    "--branch", repo.default_branch,
+                    "--origin", repo.default_remote.name)
+        except:
+            ui.error("Cloning repo failed")
+            return
         self.save_project_config(git_project)
         self.load_git_projects()
 

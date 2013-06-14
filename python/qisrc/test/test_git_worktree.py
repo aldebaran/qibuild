@@ -81,3 +81,20 @@ def test_git_configs_are_persistent(git_worktree):
     check_config(foo2)
 
 
+def test_clone_missing_simple(git_worktree, git_server):
+    foo_repo = git_server.create_repo("foo")
+    git_worktree.clone_missing(foo_repo)
+    assert len(git_worktree.git_projects) == 1
+
+def test_clone_missing_create_subdirs(git_worktree, git_server):
+    foo_repo = git_server.create_repo("foo", src="long/path/to/foo")
+    git_worktree.clone_missing(foo_repo)
+    assert len(git_worktree.git_projects) == 1
+    foo_proj = git_worktree.get_git_project("long/path/to/foo")
+    assert foo_proj
+
+def test_clone_missing_wrong_branch(git_worktree, git_server, record_messages):
+    foo_repo = git_server.create_repo("foo")
+    foo_repo.default_branch = "devel"
+    git_worktree.clone_missing(foo_repo)
+    assert not git_worktree.git_projects
