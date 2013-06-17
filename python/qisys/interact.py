@@ -101,7 +101,7 @@ def ask_program(message):
             break
         full_path = qisys.sh.to_native_path(full_path)
         if not os.path.exists(full_path):
-            ui.error("%s does not exists!" % full_path)
+            ui.error("%s does not exist" % full_path)
             keep_going = ask_yes_no("continue?")
             continue
         if not os.access(full_path, os.X_OK):
@@ -109,6 +109,21 @@ def ask_program(message):
             keep_going = ask_yes_no("continue?")
             continue
         return full_path
+
+
+def ask_app(message):
+    """ Ask the use to enter path to a .app """
+    keep_going = True
+    full_path = None
+    while keep_going:
+        full_path = ask_string(message)
+        if not full_path:
+            break
+        full_path = qisys.sh.to_native_path(full_path)
+        if not os.path.isdir(full_path):
+            ui.error("%s does not exist or is not a directory" % full_path)
+            keep_going = ask_yes_no("continue?")
+    return full_path
 
 def get_editor():
     """Find the editor searching the environment, lastly ask the user.
