@@ -118,13 +118,17 @@ def open_qtcreator(project, qtcreator_path=None):
     if not qtcreator_path:
         qtcreator_path = qisys.command.find_program("qtcreator")
     cmake_list = os.path.join(project.path, "CMakeLists.txt")
-    if not qtcreator_path or not os.access(qtcreator_path, os.X_OK):
+    if not qtcreator_path or not os.path.exists(qtcreator_path):
         raise OpenError(project,
                         "QtCreator path not configured properly\n"
                         "Please run `qibuild config --wizard")
     print "starting QtCreator:"
-    print qtcreator_path, cmake_list
-    subprocess.Popen([qtcreator_path, cmake_list])
+    if qtcreator_path.endswith((".app", ".app/")):
+        cmd = ["open", "-a", qtcreator_path, cmake_list]
+    else:
+        cmd = [qtcreator_path, cmake_list]
+    print " ".join(cmd)
+    subprocess.Popen(cmd)
 
 
 class OpenError(Exception):

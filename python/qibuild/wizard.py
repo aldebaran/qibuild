@@ -89,6 +89,13 @@ def configure_qtcreator(qibuild_cfg):
     """ Configure QtCreator
 
     """
+    if sys.platform == "darwin":
+        _configure_qtcreator_mac(qibuild_cfg)
+    else:
+        _configure_qtcreator(qibuild_cfg)
+
+def _configure_qtcreator(qibuild_cfg):
+    """ Helper for configure_qtcreator on Linux and Windows """
     ide = qibuild.config.IDE()
     ide.name = "QtCreator"
     build_env = qibuild.config.get_build_env()
@@ -110,6 +117,22 @@ def configure_qtcreator(qibuild_cfg):
                    "qibuild open will not work", sep="\n")
         return
     ide.path = qtcreator_path
+    qibuild_cfg.add_ide(ide)
+
+def _configure_qtcreator_mac(qibuild_cfg):
+    ide = qibuild.config.IDE()
+    ide.name = "QtCreator"
+    default_path = "/Applications/Qt Creator.app/"
+    if os.path.exists(default_path):
+        qtcreator_app_path = default_path
+    else:
+        ui.info("QtCreator.app not found in /Applications")
+        qtcreator_app_path = qisys.interact.ask_app("Please enter QtCreator app path")
+    if not qtcreator_app_path:
+        ui.warning("Not adding config for QtCreator",
+                   "qibuild open will not work", sep="\n")
+        return
+    ide.path = qtcreator_app_path
     qibuild_cfg.add_ide(ide)
 
 
