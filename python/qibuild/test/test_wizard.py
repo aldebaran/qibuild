@@ -97,6 +97,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         return qibuild_cfg
 
     def test_empty_conf_all_in_path(self):
+        if sys.platform == "darwin":
+            return
         self.setup_platform("linux2")
         self.setup_find_program({
             'cmake': '/usr/local/bin/cmake',
@@ -118,6 +120,8 @@ class ConfigWizardTestCase(unittest.TestCase):
     def test_empty_conf_nothing_in_path(self):
         if os.name == 'nt':
             return
+        if sys.platform == "darwin":
+            return
         self.setup_platform("linux3")
         self.setup_find_program(dict())
         self.setup_answers({
@@ -137,6 +141,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.assertEqual(defaults_env_path,  "/home/john/.local/cmake/bin")
 
     def test_qtcreator_in_conf(self):
+        if sys.platform == "darwin":
+            return
         # QtCreator in config, but now with correct path
         self.setup_platform("linux")
         self.setup_find_program({
@@ -162,6 +168,8 @@ class ConfigWizardTestCase(unittest.TestCase):
     def test_force_local_qtcreator(self):
         # /usr/bin/qtcreator exists, but we want to use the one
         # in ~/QtSDK
+        if sys.platform == "darwin":
+            return
         self.setup_platform("linux")
         self.setup_find_program({
             "cmake": "/usr/bin/cmake",
