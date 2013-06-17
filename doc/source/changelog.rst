@@ -183,8 +183,9 @@ Used with ``--group bar``
 CMake
 +++++
 
-* MacOS libraries use ``@loader_path`` instead of ``@runtime_path`` for
-  the default installed name.
+* MacOS: use rpath: libraries use an ``@rpath`` based directory for the default
+  installed name. Executables contain a rpath pointing to the root of the
+  install directory.
 * Linux shared libraries are linked with a RPATH set to ``$ORIGIN/../lib``
   by default, as it was done for executables.
 
