@@ -26,9 +26,15 @@ Simply run:
 
 .. code-block:: console
 
-  ./install-qibuild.sh
+  ./generate-sourceme.sh
 
-And make sure ``~/.local/bin`` is in your ``PATH``
+And add the following code to your
+``~/.profile`` or equivalent:
+
+
+.. code-block:: bash
+
+  source /path/to/work/tools/qibuild/sourceme.sh
 
 Also install ``CMake`` and the various tools for compiling
 
