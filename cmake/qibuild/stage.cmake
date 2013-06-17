@@ -26,8 +26,6 @@ include(qibuild/internal/uselib)
 #                 guessed from the previous calls to
 #                 include_directories()
 #                 Use this (whith care!) to override this behavior.
-# \group:DEFINITIONS list of compilation flags targets depending
-#                 of this library should use.
 # \group:PATH_SUFFIXES when your header is installed in foo/bar.h,
 #                 but you still need to do #include <bar.h>, you can
 #                 set PATH_SUFFIXES to 'foo'. Be careful to test the
@@ -63,8 +61,6 @@ endfunction()
 #                 guessed from the previous calls to
 #                 include_directories()
 #                 Use this (whith care!) to override this behavior.
-# \group:DEFINITIONS list of compilation flags targets depending
-#                 of this library should use.
 # \group:PATH_SUFFIXES when your header is installed in foo/bar.h,
 #                 but you still need to do #include <bar.h>, you can
 #                 set PATH_SUFFIXES to 'foo'. Be careful to test the
@@ -162,8 +158,8 @@ endfunction()
 
 #! Stage an executable script
 #
-# Will copy the script in stage binary directory, and stage a cmake file so
-# that others can locate it. Use like this::
+# Will stage a cmake file so
+# that others can locate the script. Use like this::
 #
 #     qi_stage_script(src/myscript)
 #
@@ -172,7 +168,19 @@ endfunction()
 #     find_package(myscript)
 #     use_script_in_function(${MYSCRIPT_EXECUTABLE})
 #
+# \arg:file_name Path to the script in source dir.
+# \flag:TRAMPOLINE If set, will generate a trampoline script in
+# sdk binary dir. Use this flag if your script uses any element
+# that is built.
+# \flag:PYTHON set if script is written in python
+# \group:DEPENDS list of target or packages this script depends on.
+#                Used for trampoline script generation only.
 function(qi_stage_script file_name)
+  cmake_parse_arguments(ARG
+  "TRAMPOLINE;PYTHON"
+  ""
+  "DEPENDS"
+  ${ARGN})
   if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${module_file}")
     qi_error("
 
@@ -180,19 +188,17 @@ function(qi_stage_script file_name)
     ${CMAKE_CURRENT_SOURCE_DIR}/${module_file}
     does not exist
     ")
-
   endif()
-  get_filename_component(target "${file_name}" NAME)
-  _qi_internal_stage_script("${file_name}")
-  # Could not figure out how to make the copy only run when source changes.
-  add_custom_target(
-    copy_${target}
-    ALL
-    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${file_name}" "${QI_SDK_DIR}/${QI_SDK_BIN}"
-    )
-  # We need to copy once now, in case the file is needed at configure time.
-  file(COPY "${file_name}"
-        DESTINATION "${QI_SDK_DIR}/${QI_SDK_BIN}/")
+  if(ARG_TRAMPOLINE)
+     if(ARG_PYTHON)
+        set(_PYTHON PYTHON)
+     endif()
+     get_filename_component(target "${file_name}" NAME)
+     _qi_internal_stage_script("${file_name}" "${QI_SDK_DIR}/${QI_SDK_BIN}/${target}")
+     qi_generate_trampoline("${target}" "${file_name}" DEPENDS ${ARG_DEPENDS} ${_PYTHON})
+  else()
+    _qi_internal_stage_script("${file_name}" "${CMAKE_CURRENT_SOURCE_DIR}/${file_name}")
+  endif()
 endfunction()
 
 
@@ -241,7 +247,8 @@ function(qi_use_lib name)
   _qi_use_lib_internal(${name} ${ARGN})
 endfunction()
 
-#! Make sure configuration and data files in the
+#!
+#  Make sure configuration and data files in the
 #  given directory can be found by
 #  ``qi::findData()`` in this project or
 #  any dependency

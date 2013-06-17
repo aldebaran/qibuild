@@ -19,9 +19,11 @@ def test_cmake_parsing():
         proj = toc.get_project("perf")
         toc.configure_project(proj)
         toc.build_project(proj)
+        perf_spam = os.path.join(proj.sdk_directory, "bin/perf_spam")
+        perf_eggs = os.path.join(proj.sdk_directory, "bin/perf_eggs")
         expected_tests = [
-            ["perf_spam"],
-            ["perf_eggs", "--foo", "bar"],
+            ["perf_spam", perf_spam],
+            ["perf_eggs", perf_eggs, "--foo", "bar"],
         ]
         actual_tests = qibuild.performance.parse_perflist_files(
             proj.build_directory)

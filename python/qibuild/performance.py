@@ -66,11 +66,10 @@ def run_perfs(project, pattern=None, dry_run=False):
         return
 
     ui.info(ui.green, "Running perfomance test for", project.name, "...")
-    for cmd in tests:
-        name = cmd.pop(0)
+    for test in tests:
+        name = test[0]
+        cmd = test[1:]
         ui.info(ui.green, " * ", ui.reset, name)
-        bin = os.path.join(project.sdk_directory, "bin", name)
-        cmd.insert(0, bin)
         test_result = os.path.join(project.build_directory, "perf-results")
         qisys.sh.mkdir(test_result)
         output_xml = os.path.join(test_result, name + ".xml")

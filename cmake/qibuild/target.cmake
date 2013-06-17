@@ -148,6 +148,8 @@ endfunction()
 #
 # The target name should be unique.
 #
+# **Static vs shared**
+#
 # To build a module (library loaded at runtime), use::
 #
 #   qi_create_lib(myLib MODULE SRC ....)
@@ -173,6 +175,19 @@ endfunction()
 #
 # Warning ! This is quite not the standard CMake behavior
 #
+# **Internal libs**
+#
+# If you use ``INTERNAL``, you will not be able to use the library after it
+# has been installed, even after ``qi_stage_lib()`` has been called
+#
+# Note that you may want to:
+#
+# * make sure no header install rules are created either
+# * use NO_INSTALL if your library is not needed at runtime either
+# * not stage the library at all
+#
+# You can by-pass this behavior by setting ``QI_INSTALL_INTERNAL`` to "ON"
+#
 # \arg:name the target name
 # \argn: sources files, like the SRC group, argn and SRC will be merged
 # \flag:STATIC force a static library
@@ -184,12 +199,9 @@ endfunction()
 #                        have to compile the target explicitly.
 #                        Warning: you will NOT be able to create install rules
 #                          for this target.
-# \flag: INTERNAL  By default, the library won't be installed, the
-#                  headers of the library won't be installed either, and
-#                  library cmake config file will not be generated, thus it will
-#                  be impossible to use the library from another project using
-#                  a package of the project.
-#                  You can by-pass this behavior by setting QI_INSTALL_INTERNAL to "ON"
+# \flag:NO_RPATH Do not set a rpath to $ORIGIN/..lib when linking on linux.
+# \flag: INTERNAL  See below
+#
 # \flag:NO_FPIC Do not set -fPIC on static libraries (will be set for shared lib by CMake anyway)
 # \param:SUBFOLDER The destination subfolder. The install rules generated will be
 #                  sdk/lib/<subfolder>
@@ -199,7 +211,7 @@ endfunction()
 # \example:target
 function(qi_create_lib name)
   cmake_parse_arguments(ARG
-    "NOBINDLL;NO_INSTALL;NO_FPIC;SHARED;STATIC;MODULE;INTERNAL"
+    "NOBINDLL;NO_RPATH;NO_INSTALL;NO_FPIC;SHARED;STATIC;MODULE;INTERNAL"
     "SUBFOLDER"
     "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
@@ -302,7 +314,7 @@ function(qi_create_lib name)
   endif()
 
   if(NOT DEFINED QI_INSTALL_NAME_DIR)
-    set(QI_INSTALL_NAME_DIR "@executable_path/../lib")
+    set(QI_INSTALL_NAME_DIR "@loader_path/../lib")
   endif()
   if(APPLE)
     set_target_properties("${name}"
@@ -312,6 +324,15 @@ function(qi_create_lib name)
         INSTALL_NAME_DIR ${QI_INSTALL_NAME_DIR}
         BUILD_WITH_INSTALL_RPATH 1
     )
+  endif()
+  if(UNIX AND NOT APPLE)
+    if(NOT ARG_NO_RPATH)
+      # Use a relative rpath at installation
+      set_target_properties("${name}"
+        PROPERTIES
+          INSTALL_RPATH "\$ORIGIN/../lib"
+      )
+    endif()
   endif()
 
 endfunction()
