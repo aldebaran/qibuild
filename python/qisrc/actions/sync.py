@@ -58,6 +58,6 @@ def do(args):
             failed.append((git_project.src, out))
         if out:
             print ui.indent(out, num=2)
-
+    print("\r")
     if failed or not sync_ok:
         sys.exit(1)
