@@ -83,6 +83,7 @@ def get_build_worktree(args):
         ui.info(ui.green, "Using toolchain:", ui.blue, build_config.toolchain.name)
     for profile in build_config.profiles:
         ui.info(ui.green, "Using profile:", ui.blue, profile)
+    ui.info(ui.green, "Build type:", ui.blue, build_config.build_type)
     return build_worktree
 
 def get_build_projects(build_worktree, args, solve_deps=True, default_all=False):
