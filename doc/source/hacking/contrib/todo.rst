@@ -135,6 +135,10 @@ Command line
 * make output more consistent (use the same color for the same thing
   everywhere for starters), this probably means extending the ``qisys.ui`` API
 
+* make ``qisrc init`` works with a local directory containing a worktree (maybe
+  ``qisrc clone``). but init seems better. "Are you a manifest git repo? No?
+  So clone all."
+
 qibuild
 -------
 
