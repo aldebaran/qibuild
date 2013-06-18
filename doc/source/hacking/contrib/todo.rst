@@ -124,7 +124,7 @@ Command line
 
 * remove `--quiet-commands`
 
-* add group for every action parser, or only dispaly the options
+* add group for every action parser, or only display the options
   specific to the given action when using `qibuild <action> --help`
 
 * add a "path" type in argparse so that (on Windows at least) we:
@@ -234,6 +234,7 @@ Renames
 
 * choose between destdir and dest_dir
 
+* qisrc.status.check_state(project, untracked) -> qisrc.status.check_state(project, untracked=False)
 
 tests
 +++++
