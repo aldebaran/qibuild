@@ -114,7 +114,7 @@ class AbstractProjectParser:
         project_args = args.projects
         # pylint: disable-msg=E1103
         if not args.projects:
-            if default_all:
+            if default_all and not args.single:
                 return self.all_projects(args)
             else:
                 return self.parse_no_project(args)

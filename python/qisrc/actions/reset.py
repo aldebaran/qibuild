@@ -25,6 +25,9 @@ def configure_parser(parser):
                         help="Fetch before reset")
     parser.add_argument("--no-fetch", action="store_false", dest="fetch",
                         help="Don't fetch before reset")
+    parser.add_argument("--tag", help="Reset everything to the given tag")
+    parser.add_argument("--snapshot", help="Reset everything using the given "
+                        "snapshot")
 
 def do(args):
     """Main entry points."""
@@ -32,19 +35,21 @@ def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
                                                   default_all=True)
+    snapshot = None
+    if args.snapshot:
+        snapshot = qisrc.snapshot.Snapshot()
+        snapshot.load(args.snapshot)
 
-    for project in git_projects:
-        if qisrc.git.get_repo_root(project.path) is None:
-            continue
+    for git_project in git_projects:
+        state_project = qisrc.status.check_state(git_project, False)
 
-        state_project = qisrc.status.check_state(project, False)
-
-        ui.info(ui.green, project.src, ui.reset, ui.bold,
+        ui.info(ui.green, git_project.src, ui.reset, ui.bold,
                 state_project.tracking)
 
-        qisrc.snapshot.print_state(state_project)
+        qisrc.status.print_state(state_project, False)
 
-        git = qisrc.git.Git(project.src)
+        src = git_project.src
+        git = qisrc.git.Git(git_project.path)
 
         if args.clean:
             ui.info("Remove untracked files and directories.")
@@ -56,15 +61,27 @@ def do(args):
             if args.force:
                 git.checkout(".")
 
+        branch = git_project.default_branch.name
         if state_project.incorrect_proj or state_project.not_on_a_branch:
-            ui.info("Checkout %s" % state_project.project.branch)
+            ui.info("Checkout", branch)
             if args.force:
-                git.checkout(state_project.project.branch)
+                git.checkout(branch)
 
         if args.fetch:
             ui.info("Fetching...")
             if args.force:
                 git.fetch("-a")
 
+        to_reset = None
+        if args.snapshot:
+            to_reset = snapshot.sha1s.get(src)
+            if not to_reset:
+                ui.warning(src, "not found in the snapshot")
+                continue
+        elif args.tag:
+            to_reset = args.tag
+        else:
+            to_reset = git.get_tracking_branch()
+
         if args.force:
-            git.reset("--hard", git.get_tracking_branch())
+            git.reset("--hard", to_reset)

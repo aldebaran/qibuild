@@ -202,7 +202,8 @@ class TestGitServer(object):
         self.manifest.load()
 
     def push_file(self, project, filename, contents,
-                  branch="master", fast_forward=True):
+                  branch="master", fast_forward=True,
+                  message=None):
         """ Push a new file with the given contents to the given project
         It is assumed that the project has beed created
 
@@ -213,10 +214,11 @@ class TestGitServer(object):
         if not fast_forward:
             git.reset("--hard", "HEAD~1")
         to_write = repo_src.join(filename)
-        if to_write.check(file=True):
-            message = "Update %s" % filename
-        else:
-            message = "Add %s" % filename
+        if not message:
+            if to_write.check(file=True):
+                message = "Update %s" % filename
+            else:
+                message = "Add %s" % filename
         repo_src.join(filename).write(contents)
         git.checkout("--force", "-B", branch)
         git.add(filename)

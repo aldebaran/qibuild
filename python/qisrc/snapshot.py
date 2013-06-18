@@ -4,7 +4,9 @@
 
 """Functions to generate and load snapshot."""
 
+
 import os
+import collections
 
 from qisys import ui
 
@@ -12,94 +14,59 @@ import qisrc.git
 import qisrc.status
 import qisys.interact
 
-def generate_snapshot(worktree, path, manifest=False, tag=None, fetch=False):
+class Snapshot(object):
+    """ Just a container for a git worktree snapshot """
+    def __init__(self):
+        self.sha1s = collections.OrderedDict()
+
+    def dump(self, output_path):
+        """ Dump the snapshot into a human readable file """
+        srcs = self.sha1s.keys()
+        with open(output_path, 'w') as fp:
+            for src in srcs:
+                fp.write(src + ":" + self.sha1s[src] + "\n")
+
+    def load(self, input_path):
+        """ Laod a snapshot from a file """
+        with open(input_path, 'r') as fp:
+            for line in fp:
+                (src, sha1) = line.split(":")
+                src = src.strip()
+                sha1 = sha1.strip()
+                self.sha1s[src] = sha1
+
+    def __eq__(self, other):
+        if not isinstance(other, Snapshot):
+            return False
+        return other.sha1s == self.sha1s
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+def generate_snapshot(git_worktree, output_path):
     """Generate a snapshot file."""
-    if os.path.exists(path) and not os.path.isfile(path):
-        ui.error(path, "is not a file.")
-        return
-    with open(path, 'w') as f:
-        for project in worktree.projects:
-            if not qisrc.git.is_git(project.path):
-                continue
+    snapshot = git_worktree.snapshot()
+    snapshot.dump(output_path)
+    ui.info(ui.green, "Snapshot generated in", ui.white, output_path)
 
-            # Check the state of the project and print warning.
-            state_project = qisrc.status.check_state(project, False)
-            print_state(state_project)
-
-            git = qisrc.git.Git(project.path)
-
-            if fetch:
-                ui.info("Fetching...")
-                git.fetch("-a")
-
-            if manifest:
-                (returncode, sha1) = git.log("--pretty=format:%H",
-                                             "-1", project.branch, raises=False)
-            elif tag:
-                (returncode, sha1) = git.call("show-ref", "--verify", "--tags",
-                                     "--hash", "refs/tags/" + tag, raises=False)
-            else:
-                (returncode, sha1) = git.log("--pretty=format:%H",
-                                             "-1", raises=False)
-
-            if returncode != 0:
-                ui.info(ui.red, sha1)
-                continue
-            f.write(project.src + ":" + sha1 + '\n')
-            ui.info(ui.green, project.src, ui.reset, ui.bold, sha1)
-
-def load_snapshot(worktree, path, force, fetch=False):
+def load_snapshot(git_worktree, input_path):
     """Load a snapshot file and reset projects."""
-    if not os.path.isfile(path):
-        ui.error(path, "is not a file.")
-        return
-    with open(path, 'r') as f:
-        for line in f:
-            (src, sha1) = line.split(":")
-            src = src.strip()
-            sha1 = sha1.strip()
-            ui.info(ui.green, src, sha1)
+    snapshot = Snapshot()
+    ui.info(ui.green, "Loading snapshot from", ui.white,  input_path)
+    snapshot.load(input_path)
+    failures = list()
+    for (src, sha1) in snapshot.sha1s.iteritems():
+        ui.info("Loading", src)
+        git_project = git_worktree.get_git_project(src, raises=True)
 
-            project = worktree.get_project(src)
+        git = qisrc.git.Git(git_project.path)
+        with git.transaction() as transaction:
+            git.fetch("--all")
+            git.reset("--hard", sha1)
+        if not transaction.ok:
+            failures.append(src)
 
-            if project is None:
-                ui.info(ui.red, src, "is not a project.")
-                continue
-
-            state_project = qisrc.status.check_state(project, False)
-            print_state(state_project)
-
-            if not qisrc.git.is_git(project.path):
-                ui.info(ui.red, src, "is not a git project.")
-                continue
-
-            git_project = qisrc.git.Git(project.path)
-            if fetch:
-                ui.info("Fetching...")
-                if force:
-                    git_project.fetch("-a")
-
-            if (not state_project.sync_and_clean
-                   or state_project.incorrect_proj
-                   or state_project.not_on_a_branch) and not force:
-                ui.info(ui.red, "git reset --hard aborted.\n"
-                                "Use --force to force the reset.")
-                if not qisys.interact.ask_yes_no("run git reset --hard ?"):
-                    continue
-
-            git_project.reset("--hard", sha1)
-
-def print_state(state_project):
-    if not state_project.sync_and_clean:
-        ui.warning(ui.red, state_project.project.src, ui.reset,
-            "is not clean or sync.")
-
-    if state_project.incorrect_proj:
-        ui.warning(ui.red, state_project.project.src, ui.reset, "is on",
-                ui.bold, state_project.current_branch,
-                ui.reset, "but manifest is on",
-                ui.bold, state_project.project.branch)
-
-    if state_project.not_on_a_branch:
-        ui.warning(ui.red, state_project.project.src, ui.reset,
-            "is not on a branch.")
+    if failures:
+        ui.warning("Loading failed for the following projects")
+        for failure in failures:
+            ui.warning(" * ", failure)

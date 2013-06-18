@@ -3,6 +3,7 @@ import os
 from qisys import ui
 import qisys.worktree
 import qisrc.git
+import qisrc.snapshot
 import qisrc.sync
 import qisrc.project
 
@@ -73,6 +74,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         if auto_add:
             self.worktree.add_project(path)
             return self.get_git_project(path)
+        if raises:
+            raise NoSuchGitProject(src)
 
     def find_repo(self, repo):
         """ Look for a project configured with the given repo """
@@ -93,6 +96,22 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
     @property
     def manifests(self):
         return self._syncer.manifests
+
+
+    def snapshot(self):
+        """ Return a :py:class`.Snapshot` of the current worktree state
+
+        """
+        snapshot = qisrc.snapshot.Snapshot()
+        for git_project in self.git_projects:
+            src = git_project.src
+            git = qisrc.git.Git(git_project.path)
+            rc, out = git.call("rev-parse", "HEAD", raises=False)
+            if rc != 0:
+                ui.error("git rev-parse HEAD failed for", src)
+                continue
+            snapshot.sha1s[src] = out.strip()
+        return snapshot
 
     def add_git_project(self, src):
         """ Add a new git project """
@@ -217,3 +236,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     def __repr__(self):
         return "<GitWorkTree in %s>" % self.root
+
+
+class NoSuchGitProject(Exception):
+    pass
