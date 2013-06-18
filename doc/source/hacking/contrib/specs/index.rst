@@ -1,0 +1,6 @@
+Specs
+=====
+
+.. toctree::
+
+    qidoc3

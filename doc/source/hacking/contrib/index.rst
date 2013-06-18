@@ -33,6 +33,19 @@ what to do, you can have a look at the TODO:
 Feel free to just add your own ideas to the list :)
 
 
+Specifications
++++++++++++++++
+
+This is for items on the TODO that are too large
+and require discussion before we start actually
+implementing them
+
+.. toctree::
+    :maxdepth: 1
+
+    specs/index
+
+
 Submitting changes
 -------------------
 
