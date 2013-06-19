@@ -281,7 +281,7 @@ class Git(object):
         rc, _ = self.call("show-ref", "--verify", "refs/heads/%s" % name, raises=False)
         return rc == 0
 
-    def set_tracking_branch(self, branch, remote_name, fetch_first=True, remote_branch=None):
+    def set_tracking_branch(self, branch, remote_name, remote_branch=None):
         """ Update the configuration of a branch to track
         a given remote branch
 
