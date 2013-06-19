@@ -1,5 +1,6 @@
 import os
 import qisrc.git
+from qisrc.test.conftest import TestGit
 
 import pytest
 def test_name_from_url_common():
@@ -50,3 +51,15 @@ def test_set_tracking_branch_existing_branch_tracking_other(tmpdir):
     git.commit("-m", "empty", "--allow-empty")
     git.set_tracking_branch("master", "origin")
     git.set_tracking_branch("master", "other")
+
+def test_changelog(cd_to_tmpdir):
+    git = TestGit()
+    git.initialize()
+    message_1 = "mess1"
+    git.commit_file("foo.txt", "foo\n", message=message_1)
+    message_2 = "mess2"
+    git.commit_file("foo.txt", "bar\n", message=message_2)
+    commits = git.get_log("HEAD~2", "HEAD")
+    assert len(commits) == 2
+    assert commits[0]["message"] == message_1
+    assert commits[1]["message"] == message_2

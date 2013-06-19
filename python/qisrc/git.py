@@ -427,6 +427,37 @@ class Git(object):
         return True, "Fast-forwarded %s. Feel free to rebase on %s" % \
                                         ((master_branch.name,) * 2)
 
+    def get_log(self, before_ref, after_ref):
+        """ Return a list of commits between two refspecs, in
+        natural order (most recent commits last)
+
+        Each commit is a dict containing, 'sha1' and 'message'
+
+        FIXME: parse author and date ?
+        """
+        # old git does not support -z and inists on adding \n
+        # between log entries, so we have no choice but choose
+        # a custom separator. '\f' looks safe enough
+        res = list()
+        rc, out = self.call("log", "--reverse",
+                            "--format=%H%n%B\f",
+                            "%s..%s" % (before_ref, after_ref),
+                            raises=False)
+        if rc != 0:
+            ui.error(out)
+            return res
+        for log_chunk in out.split('\f'):
+            if not log_chunk:
+                continue
+            log_chunk = log_chunk.strip()
+            sha1, message = log_chunk.split('\n', 1)
+            message = message.strip()
+            commit = {
+                "sha1" : sha1,
+                "message" : message,
+            }
+            res.append(commit)
+        return res
 
     def __repr__(self):
         return "<Git repo in %s>" % self.repo
