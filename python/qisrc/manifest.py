@@ -106,12 +106,15 @@ Found two projects sharing the same sources:
         Retrun all repositories when no group is given
 
         """
+        default_group = self.groups.default_group
         if not groups:
-            return self.repos
+            if default_group:
+                groups = [default_group.name]
+            else:
+                return self.repos
 
         repos = dict()
         for group in groups:
-
             try:
                 project_names = self.groups.projects(group)
             except qisrc.groups.GroupError as e:

@@ -9,6 +9,7 @@ from qisys import ui
 class Groups(object):
     def __init__(self):
         self.groups = dict()
+        self.default_group = None
 
     def projects(self, group_name):
         return self.subgroups_group(group_name)
@@ -43,6 +44,9 @@ class GroupsParser(qisys.qixml.XMLParser):
         parser = GroupParser(group)
         parser.parse(element)
         self.target.groups[group.name] = group
+        default = qisys.qixml.parse_bool_attr(element, "default", default=False)
+        if default:
+            self.target.default_group = group
 
     def _write_groups(self, element):
         for group in self.target.groups.values():
@@ -53,6 +57,7 @@ class GroupsParser(qisys.qixml.XMLParser):
 class Group(object):
     def __init__(self, name):
         self.name = name
+        self.default = False
         self.subgroups = list()
         self.projects = list()
 

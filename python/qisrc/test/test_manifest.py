@@ -231,3 +231,23 @@ def test_groups(tmpdir):
     assert git_projects[1].clone_url == "git@example.com:qi/libqimessaging.git"
 
 
+def test_default_group(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="a.git" remotes="origin" />
+  <repo project="b.git" remotes="origin" />
+  <repo project="c.git" remotes="origin" />
+
+  <groups>
+    <group name="a_group" default="true" >
+      <project name="a.git" />
+      <project name="b.git" />
+    </group>
+  </groups>
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    git_projects = manifest.get_repos()
+    assert len(git_projects) == 2
