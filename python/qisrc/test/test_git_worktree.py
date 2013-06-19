@@ -4,6 +4,7 @@ import qisrc.worktree
 
 from qisrc.git_config import Remote
 
+import pytest
 
 def test_read_git_configs(tmpdir, test_git):
     tmpdir.mkdir("foo")
@@ -98,3 +99,12 @@ def test_clone_missing_wrong_branch(git_worktree, git_server, record_messages):
     foo_repo.default_branch = "devel"
     git_worktree.clone_missing(foo_repo)
     assert not git_worktree.git_projects
+
+def test_clone_missing_evil_nested(git_worktree, git_server):
+    foo_bar_repo = git_server.create_repo("foo/bar")
+    git_server.push_file("foo/bar", "bar.txt", "bar\n")
+    foo_repo = git_server.create_repo("foo")
+    git_worktree.clone_missing(foo_bar_repo)
+    git_server.push_file("foo", "foo.txt", "foo\n")
+    git_worktree.clone_missing(foo_repo)
+    assert len(git_worktree.git_projects) == 2

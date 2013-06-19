@@ -121,3 +121,11 @@ def test_add_on_empty(git_worktree, git_server):
     foo_git.init()
     git_server.create_repo("foo")
     git_worktree.configure_manifest("default", git_server.manifest_url)
+
+
+def test_evil_nested(git_worktree, git_server):
+    foo_bar_repo = git_server.create_repo("foo/bar")
+    git_worktree.configure_manifest("default", git_server.manifest_url)
+    foo = git_server.create_repo("foo")
+    git_worktree.configure_manifest("default", git_server.manifest_url)
+    assert len(git_worktree.git_projects) == 2

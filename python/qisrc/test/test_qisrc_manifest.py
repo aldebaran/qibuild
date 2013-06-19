@@ -88,19 +88,16 @@ def test_re_add_removed_by_hand(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 3
 
-def test_re_add_sad_path(qisrc_action, git_server):
+def test_re_add_path_exists(qisrc_action, git_server):
     setup_re_add(qisrc_action, git_server)
     git_worktree = TestGitWorkTree()
     c_path = git_worktree.get_git_project("c").path
-
-    # something weird happened and c_path is no longer
-    # a git repo
     qisrc_action("manifest", "default", "--group", "mygroup")
     qisys.sh.rm(c_path)
     qisys.sh.mkdir(c_path)
     qisrc_action("manifest", "default")
     git_worktree = TestGitWorkTree()
-    assert len(git_worktree.git_projects) == 2
+    assert len(git_worktree.git_projects) == 3
 
 
 def test_check(qisrc_action, git_server):

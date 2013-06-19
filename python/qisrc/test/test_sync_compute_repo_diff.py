@@ -120,3 +120,13 @@ def test_changing_remote_url():
     assert to_move == list()
     assert len(to_update) == 1
     assert to_update[0] == (old[0], new[0])
+
+def test_evil_nested():
+    old = make_repos()
+    new = make_repos(
+        ("foo/bar.git", "foo/bar", ["origin"]),
+        ("foo.git", "foo", ["origin"]),
+    )
+    (to_add, to_move, to_rm, to_update) = qisrc.sync.compute_repo_diff(old, new)
+    assert to_add[0].src == "foo"
+    assert to_add[1].src == "foo/bar"

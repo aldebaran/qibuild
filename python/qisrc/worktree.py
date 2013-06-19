@@ -144,40 +144,24 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         git_project = qisrc.project.GitProject(self, worktree_project)
         if os.path.exists(git_project.path):
             git = qisrc.git.Git(git_project.path)
-            # Maybe the project was removed and is now added again
-            if not git.is_valid():
-                ui.warning("Wanted to add a project in", git_project.src, "\n",
-                           "But this path already exists and is not a git project")
-                return False
-            if git.is_empty():
+            if git.is_valid() and git.is_empty():
                 ui.warning("Removing empty git project in", git_project.src)
                 qisys.sh.rm(git_project.path)
-                return self._clone_missing(git_project, repo)
-            # If there is a valid git project, do nothing, it will be
-            # reconfigured if necessary
-        else:
-            return self._clone_missing(git_project, repo)
+        return self._clone_missing(git_project, repo)
 
     def _clone_missing(self, git_project, repo):
         branch = repo.default_branch
         clone_url = repo.clone_url
-        to_make = os.path.dirname(git_project.path)
-        qisys.sh.mkdir(to_make, recursive=True)
+        qisys.sh.mkdir(git_project.path, recursive=True)
         git = qisrc.git.Git(git_project.path)
-        try:
-            git.clone(clone_url, "--recursive",
-                      "--branch", branch,
-                      "--origin", repo.default_remote.name)
-        except:
-            ui.error("Cloning repo failed")
-            return False
-        # old git versions (< 1.8) just trigger a warning when remote
-        # branch does not exist:
-        #    warning: Remote branch devel not found in upstream origin, using HEAD instead
-        # so, check the branch is correct
-        branch_ok = git.branch_exists(branch)
-        if not branch_ok:
-            ui.error("Remote branch", branch, "not found on", clone_url)
+        with git.transaction() as transaction:
+            remote_name = repo.default_remote.name
+            git.init()
+            git.remote("add", remote_name, clone_url)
+            git.fetch(remote_name)
+            git.checkout("-b", branch, "%s/%s" % (remote_name, branch))
+        if not transaction.ok:
+            ui.error("Cloning repo failed", transaction.output)
             return False
         self.save_project_config(git_project)
         self.load_git_projects()

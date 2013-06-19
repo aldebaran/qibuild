@@ -6,12 +6,14 @@
 
 """
 
-from qisys import ui
 import os
+
+from qisys import ui
 import qisys.qixml
 import qisrc.git
 import qisrc.manifest
 import qibuild.profile
+
 
 class WorkTreeSyncer(object):
     """ Handle the manifests of a worktree
@@ -329,7 +331,7 @@ class LocalManifest(object):
 def compute_repo_diff(old_repos, new_repos):
     """ Compute the work that needs to be done
 
-    :returns: a tuple (to_add, to_move, to_rm)
+    :returns: a tuple (to_add, to_move, to_rm, to_update)
 
     """
     to_add = list()
@@ -371,9 +373,15 @@ def compute_repo_diff(old_repos, new_repos):
     for repo in to_add:
         if repo.src not in [x[0].src for x in to_update]:
             really_to_add.append(repo)
+    to_add = really_to_add
 
+    # sort everything by 'src':
+    for repo_list in [to_add, to_rm]:
+        repo_list.sort(key=lambda x: x.src)
+    for repo_list in [to_move, to_update]:
+        repo_list.sort(key=lambda x: x[0].src)
 
-    return (really_to_add, to_move, to_rm, to_update)
+    return (to_add, to_move, to_rm, to_update)
 
 def find_common_url(repo_a, repo_b):
     for url_a in repo_a.urls:
