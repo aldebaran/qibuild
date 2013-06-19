@@ -42,12 +42,18 @@ class Manifest(object):
 
     def load(self):
         """ (re)-parse the xml configuration file """
+        project_names = list()
         self.repos = list()
         self.remotes = list()
         self.groups = qisrc.groups.Groups()
         root = qisys.qixml.read(self.manifest_xml).getroot()
         parser = ManifestParser(self)
         parser.parse(root)
+
+        for repo in self.repos:
+            if repo.project in project_names:
+                raise ManifestError("%s found twice" % repo.project)
+            project_names.append(repo.project)
 
         for remote in self.remotes:
             remote.parse_url()
@@ -218,6 +224,7 @@ class RepoConfig(object):
         if self.default_branch:
             res += " default: %s" % self.default_branch
         if self.review:
+
             res += " (review)"
         res += ">"
         return res

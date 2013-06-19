@@ -42,6 +42,21 @@ def test_src_are_unique(tmpdir):
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Found two projects sharing the same sources" in str(e.value)
 
+
+def test_projects_are_unique(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="foo/bar.git" src="bar"  remotes="origin" />
+  <repo project="foo/bar.git" src="bar2" remotes="origin" />
+</manifest>
+""")
+    # pylint: disable-msg=E1101
+    with pytest.raises(qisrc.manifest.ManifestError) as e:
+        qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert "foo/bar.git found twice" in str(e.value)
+
 def test_empty_src(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
