@@ -56,7 +56,7 @@ def print_version():
     """
     import qibuild.cmake
     cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
-    sys.stdout.write("""qiBuild version 2.3
+    sys.stdout.write("""qiBuild version 2.4
 Using cmake code from {cmake_qibuild_dir}
 """.format(cmake_qibuild_dir=cmake_qibuild_dir))
 
