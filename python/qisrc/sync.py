@@ -84,6 +84,7 @@ class WorkTreeSyncer(object):
                 ui.info()
             self._sync_manifest(local_manifest)
             self._sync_build_profiles(local_manifest)
+            self._sync_groups(local_manifest)
         self.new_repos = self.get_new_repos()
         res = self._sync_repos(self.old_repos, self.new_repos)
         # re-read self.old_repos so we can do several syncs:
@@ -280,6 +281,21 @@ class WorkTreeSyncer(object):
             for updated_profile in updated_profiles:
                 mess += "  * " + updated_profile.name + "\n"
             ui.warning(mess)
+
+    def _sync_groups(self, local_manifest):
+        """ Synchronize the repsitories groups read from the given manifest """
+        # FIXME: what to do when there are several manifests with different
+        # groups in them?
+        remote_xml = os.path.join(self.manifests_root,
+                                  local_manifest.name, "manifest.xml")
+        remote_root_elem = qisys.qixml.read(remote_xml).getroot()
+        remote_groups_elem = remote_root_elem.find("groups")
+        if remote_groups_elem is None:
+            remote_groups_elem = qisys.qixml.etree.Element("groups")
+
+        groups_xml = os.path.join(self.git_worktree.root, ".qi", "groups.xml")
+        qisys.qixml.write(remote_groups_elem, groups_xml)
+
 
     def sync_from_manifest_file(self, name, xml_path):
         """ Just synchronize the manifest coming from one xml file.

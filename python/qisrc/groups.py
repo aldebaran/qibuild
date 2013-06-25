@@ -11,8 +11,8 @@ class Groups(object):
         self.groups = dict()
         self.default_group = None
 
-    def projects(self, group_name):
-        return self.subgroups_group(group_name)
+    def projects(self, group):
+        return self.subgroups_group(group)
 
     def configure_group(self, name, projects):
         group = Group(name)
@@ -98,7 +98,13 @@ def get_groups(worktree):
     parser.parse(root)
     return groups
 
+def save_groups(worktree, groups):
+    groups_xml_path = os.path.join(worktree.root, ".qi", "groups.xml")
+    parser = GroupsParser(groups)
+    groups_elem = parser.xml_elem()
+    qisys.qixml.write(groups_elem, groups_xml_path)
+
+
 
 class GroupError(Exception):
     pass
-

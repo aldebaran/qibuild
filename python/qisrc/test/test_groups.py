@@ -4,7 +4,7 @@ import qisrc.groups
 
 import pytest
 
-def test_parser():
+def test_parser_read():
     file = """
 <groups>
   <group name="a">
@@ -32,7 +32,7 @@ def test_parser():
     with pytest.raises(qisrc.groups.GroupError):
         groups.projects("c")
 
-def test_writer():
+def test_parser_write():
     groups = qisrc.groups.Groups()
     groups.configure_group("mygroup", ["a", "b"])
 
@@ -43,3 +43,9 @@ def test_writer():
     parser.parse(root)
     assert groups.projects("mygroup") == ["a", "b"]
 
+def test_save_groups(worktree):
+    groups = qisrc.groups.Groups()
+    groups.configure_group("mygroup", ["a", "b"])
+    qisrc.groups.save_groups(worktree, groups)
+    groups = qisrc.groups.get_groups(worktree)
+    assert groups.projects("mygroup") == ["a", "b"]

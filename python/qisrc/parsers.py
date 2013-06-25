@@ -32,9 +32,13 @@ def get_git_worktree(args):
 
 def get_git_projects(git_worktree, args,
                      default_all=False,
-                     use_build_deps=False):
+                     use_build_deps=False,
+                     groups=None):
     """ Get a list of git projects to use """
     git_parser = GitProjectParser(git_worktree)
+    groups = vars(args).get("groups")
+    if groups:
+        use_build_deps=False
 
     if use_build_deps:
         # To avoid getting all the projects when no project is given
@@ -44,8 +48,11 @@ def get_git_projects(git_worktree, args,
         build_worktree = qibuild.worktree.BuildWorkTree(git_worktree.worktree)
         build_parser = GitBuildProjectParser(git_worktree, build_worktree)
         return build_parser.parse_args(args, default_all=default_all)
-    else:
-        return git_parser.parse_args(args, default_all=default_all)
+
+    if groups:
+        return git_worktree.get_git_projects(groups=groups)
+
+    return git_parser.parse_args(args, default_all=default_all)
 
 def get_one_git_project(git_worktree, args):
     parser = GitProjectParser(git_worktree)

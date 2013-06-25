@@ -159,3 +159,17 @@ def test_sync_branch_devel_no_ff(qisrc_action, git_server, test_git):
     qisrc_action("sync", "--rebase-devel")
     # Master HEAD is untouched
     assert test_git.get_ref_sha1("refs/heads/master") == master_sha1
+
+def test_sync_dash_g(qisrc_action, git_server):
+
+    git_server.create_group("mygroup", ["a", "b"])
+    git_server.create_repo("other")
+    git_server.push_file("other", "other.txt", "change 1")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    git_server.push_file("other", "other.txt", "change 2")
+    qisrc_action("sync", "--group", "mygroup")
+
+    git_worktree = TestGitWorkTree()
+    other_proj = git_worktree.get_git_project("other")
+    other_git = TestGit(other_proj.path)
+    assert other_git.read_file("other.txt") == "change 1"

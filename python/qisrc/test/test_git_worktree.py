@@ -108,3 +108,15 @@ def test_clone_missing_evil_nested(git_worktree, git_server):
     git_server.push_file("foo", "foo.txt", "foo\n")
     git_worktree.clone_missing(foo_repo)
     assert len(git_worktree.git_projects) == 2
+
+
+def test_read_groups(git_worktree, git_server):
+    manifest_url = git_server.manifest_url
+    git_server.create_group("foobar", ["foo", "bar"])
+    git_server.create_group("mygroup", ["a", "b"])
+    git_server.create_repo("other")
+    git_worktree.configure_manifest("default", manifest_url)
+    expected_srcs = ["a", "b", "bar", "foo"]
+    expected = [git_worktree.get_git_project(x) for x in expected_srcs]
+    actual = git_worktree.get_git_projects(groups=["foobar", "mygroup"])
+    assert expected == actual

@@ -1,4 +1,5 @@
 import os
+import operator
 
 from qisys import ui
 import qisys.worktree
@@ -76,6 +77,27 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             return self.get_git_project(path)
         if raises:
             raise NoSuchGitProject(src)
+
+    def get_git_projects(self, groups=None):
+        """ Get the git projects matching a given group """
+        if not groups:
+            return self.git_projects
+        res = set()
+        git_project_names = dict()
+        group_names = groups
+        for git_project in self.git_projects:
+            git_project_names[git_project.name] = git_project
+        projects = list()
+        groups = qisrc.groups.get_groups(self.worktree)
+        for group_name in group_names:
+            project_names = groups.projects(group_name)
+            for project_name in project_names:
+                git_project = git_project_names.get(project_name)
+                if git_project:
+                    res.add(git_project)
+        res = list(res)
+        res.sort(key=operator.attrgetter("src"))
+        return res
 
     def find_repo(self, repo):
         """ Look for a project configured with the given repo """

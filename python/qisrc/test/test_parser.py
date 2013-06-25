@@ -9,6 +9,7 @@ from qisrc.parsers import get_git_projects
 from qibuild.test.conftest import TestBuildWorkTree
 from qisrc.test.conftest import TestGitWorkTree
 
+import mock
 import pytest
 
 def test_guess_git_repo(tmpdir, args):
@@ -93,3 +94,10 @@ def test_build_deps(cd_to_tmpdir, args):
         args.single = True
         projs =  get_git_projects(git_worktree, args, use_build_deps=True)
         assert projs == [hello]
+
+
+def test_groups(git_worktree, args):
+    git_worktree = mock.Mock()
+    args.groups = ["mygroup"]
+    get_git_projects(git_worktree, args)
+    assert git_worktree.get_git_projects.call_args_list == [mock.call(groups=["mygroup"])]
