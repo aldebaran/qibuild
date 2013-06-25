@@ -297,13 +297,17 @@ You may want to run:
         """
         seen = dict()
 
-        # self.buildable_projects has been set by WorkTree.__init__
+        # qibuild.project.buildable_projects() does not parse any XML files,
+        # hence the try/except in the middle of the loop
         for build_project in qibuild.project.build_projects(self.worktree):
             # Promote the simple worktree project (just a name an a src dir),
             # inside a full qibuild.project.Project object
             # (with CMake flags, build dir, et al.)
             project_path = build_project.path
-            qibuild_project = qibuild.project.Project(self, project_path)
+            try:
+                qibuild_project = qibuild.project.Project(self, project_path)
+            except Exception:
+                continue
             project_name = qibuild_project.name
             if project_name in seen:
                 mess  = "Found two qibuild projects with the same name (%s)\n" % qibuild_project.name

@@ -338,16 +338,23 @@ def project_from_dir(toc, directory=None, raises=True):
         directory = os.getcwd()
     head = directory
     tail = None
+    project_name = None
     qiproj_xml = None
     while True:
         candidate = os.path.join(head, "qiproject.xml")
         if os.path.exists(candidate):
             qiproj_xml = candidate
-            break
+            try:
+                xml_elem = qisys.qixml.read(qiproj_xml)
+            except:
+                pass
+            project_name = xml_elem.getroot().get("name")
+            if project_name:
+                break
         (head, tail) = os.path.split(head)
         if not tail:
             break
-    if not qiproj_xml:
+    if not project_name:
         if raises:
             mess = "Could not guess project name from current working directory: "
             mess += "'%s'\n" % os.getcwd()
@@ -357,8 +364,7 @@ def project_from_dir(toc, directory=None, raises=True):
             raise Exception(mess)
         else:
             return None
-    xml_elem = qisys.qixml.read(qiproj_xml)
-    project_name = xml_elem.getroot().get("name")
+
     if toc.get_project(project_name, raises=False):
         return project_name
     mess = """Found a valid qiproject.xml ('{qiproj_xml}')
