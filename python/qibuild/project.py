@@ -177,9 +177,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
 
         qisys.sh.mkdir(self.build_directory, recursive=True)
         dep_cmake = os.path.join(self.build_directory, "dependencies.cmake")
-
-        with open(dep_cmake, "w") as fp:
-            fp.write(to_write)
+        qisys.sh.write_file_if_different(to_write, dep_cmake)
 
     def configure(self, **kwargs):
         """ Delegate to :py:func:`qibuild.cmake.cmake` """
