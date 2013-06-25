@@ -85,6 +85,20 @@ def ln(src, dst, symlink=True):
         else:
             raise
 
+def write_file_if_different(data, out_path, mode="w"):
+    """ Write the data to out_path if the content is different
+    """
+    try:
+        with open(out_path, "r") as outr:
+            out_prev = outr.read()
+        if out_prev == data:
+            ui.debug("skipping write to %s: same content" % (out_path))
+            return
+    except:
+        pass
+    with open(out_path, mode) as out_file:
+        out_file.write(data)
+
 
 def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
     """Configure a file.
@@ -108,8 +122,7 @@ def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
             out_content = in_content
         else:
             out_content = in_content.format(*args, **kwargs)
-        with open(out_path, "w") as out_file:
-            out_file.write(out_content)
+        write_file_if_different(out_content, out_path)
 
 
 def _copy_link(src, dest, quiet):
