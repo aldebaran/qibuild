@@ -5,7 +5,7 @@ class DocProject(object):
     __metaclass__ = abc.ABCMeta
     doc_type = None
 
-    def __init__(self, doc_worktree, project, name, depends=None):
+    def __init__(self, doc_worktree, project, name, depends=None, dest=None):
         self.doc_worktree = doc_worktree
         self.name = name
         self.src = project.src
@@ -13,6 +13,7 @@ class DocProject(object):
         if not depends:
             depends = list()
         self.depends = list()
+        self.dest = dest
 
     @abc.abstractmethod
     def configure(self):

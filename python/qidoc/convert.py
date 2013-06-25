@@ -67,6 +67,9 @@ def create_sub_project(worktree, root_elem, project, src):
 def create_doc_project(worktree, project_path, doc_elem):
     new_doc_elem = qisys.qixml.etree.Element(doc_elem.tag)
     new_doc_elem.set("name", doc_elem.get("name"))
+    dest = doc_elem.get("dest")
+    if dest:
+        new_doc_elem.set("dest", dest)
     for depend_elem in doc_elem.findall("depends"):
         new_doc_elem.append(depend_elem)
     qiproject_xml = os.path.join(project_path, "qiproject.xml")

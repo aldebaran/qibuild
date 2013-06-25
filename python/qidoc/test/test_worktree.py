@@ -10,6 +10,7 @@ def test_qidoc2_happy(qidoc_action):
     doc_projects = doc_worktree.doc_projects
     assert len(doc_projects) == 4
     assert doc_projects[0].name == "a_doxy"
+    assert doc_projects[0].dest == "ref/a"
     assert doc_projects[1].name == "b_doxy"
     assert doc_projects[1].depends == ["a_doxy"]
     assert doc_projects[2].name == "c_sphinx"

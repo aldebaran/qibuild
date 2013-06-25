@@ -164,11 +164,12 @@ def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
     if not name:
         raise BadProjectConfig(qiproject_xml,
                                "Expecting a 'name' attribute")
+    dest = xml_elem.get("dest")
     doc_project = None
     if doc_type == "sphinx":
-        doc_project = SphinxProject(doc_worktree, project, name)
+        doc_project = SphinxProject(doc_worktree, project, name, dest=dest)
     elif doc_type == "doxygen":
-        doc_project = DoxygenProject(doc_worktree, project, name)
+        doc_project = DoxygenProject(doc_worktree, project, name, dest=dest)
     else:
         raise BadProjectConfig(qiproject_xml,
                                "Unknow doc type: %s", doc_type)
