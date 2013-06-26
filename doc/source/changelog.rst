@@ -181,9 +181,22 @@ CMake
 +++++
 
 * MacOS libraries use ``@loader_path`` instead of ``@runtime_path`` for
-the default installed name.
+  the default installed name.
 * Linux shared libraries are linked with a RPATH set to ``$ORIGIN/../lib``
-by default, as it was done for executables.
+  by default, as it was done for executables.
+
+v2.4
+----
+
+CMake
++++++
+
+* ``qi_stage_script`` is now implemented, and it's now possible to stage Python scripts too.
+* Add ``qi_generate_trampoline``
+* ``qi_add_test`` now also uses ``find_program`` to find test executable.
+* API break: you should now use ``BUILD_PERF_TESTS=OFF`` instead of ``BUILD_PERFS_TESTS=OFF``
+  when you do not want to build the performance tests
+* Fix using ``qi_add_perf_test`` on Windows when building in debug
 
 v2.3
 ----
