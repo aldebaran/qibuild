@@ -18,7 +18,8 @@ def parse_potfiles_in(prefix, file_path):
         for line in stream:
             filepath = line.split("#")[0]
             pathclean = filepath.strip('\n ')
-            path = pathclean.rsplit('/')
+            path = pathclean.rsplit('/', 1)
+            print path
             if len(path) == 2:
                 parent_path.append(os.path.join(prefix, path[0]))
                 filenames.append(path[1])
