@@ -35,6 +35,11 @@ def test_pushing_files(tmpdir, git_server):
 
     assert foo_clone.join("README").read() == "This is foo\n"
 
+def test_create_several_commits(git_server):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "foo.txt", "change 1")
+    git_server.push_file("foo.git", "foo.txt", "change 2")
+
 def test_no_review_by_default(tmpdir, git_server):
     foo_repo = git_server.create_repo("foo.git")
     assert foo_repo.review is False

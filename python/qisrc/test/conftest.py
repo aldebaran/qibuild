@@ -211,6 +211,7 @@ class TestGitServer(object):
         src = project.replace(".git", "")
         repo_src = self.src.join(src)
         git = qisrc.git.Git(repo_src.strpath)
+        git.checkout("--force", "-B", branch)
         if not fast_forward:
             git.reset("--hard", "HEAD~1")
         to_write = repo_src.join(filename)
@@ -220,7 +221,6 @@ class TestGitServer(object):
             else:
                 message = "Add %s" % filename
         repo_src.join(filename).write(contents)
-        git.checkout("--force", "-B", branch)
         git.add(filename)
         git.commit("--message", message)
         if fast_forward:
