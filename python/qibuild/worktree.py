@@ -134,8 +134,7 @@ def new_build_project(build_worktree, project):
 
     name = qibuild_elem.get("name")
     if not name:
-        raise BadProjectConfig(project.qiproject_xml,
-                               "Expecting a 'name' attribute")
+        return None
 
     build_project = qibuild.project.BuildProject(build_worktree, project)
     build_project.name = name
