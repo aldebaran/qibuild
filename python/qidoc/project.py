@@ -1,4 +1,7 @@
 import abc
+import os
+
+import qisys.sh
 
 class DocProject(object):
 
@@ -27,7 +30,25 @@ class DocProject(object):
     def install(self, destdir):
         pass
 
+    @property
+    def build_dir(self):
+        build_dir = os.path.join(self.path, "build-doc")
+        qisys.sh.mkdir(build_dir)
+        return build_dir
+
+    @property
+    def index_html(self):
+        return os.path.join(self.build_dir, "html", "index.html")
+
     def __repr__(self):
         return "<%s %s in %s>" % (self.doc_type.capitalize() + "Project",
                                   self.name, self.src)
+
+    def __eq__(self, other):
+        return self.doc_type == other.doc_type and \
+                self.src == other.src and \
+                self.name == other.name
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 

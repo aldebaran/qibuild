@@ -1,3 +1,6 @@
+import qisys.sort
+
+
 class DocBuilder(object):
     """ Build and install doc projects.
 
@@ -46,5 +49,14 @@ class DocBuilder(object):
         """
         if self.single:
             return [self.base_project]
-        else:
-            return self.deps_solver.get_deps(self.base_project)
+        projects = list()
+        dep_tree = dict()
+        for project in self.doc_worktree.doc_projects:
+            dep_tree[project.name] = project.depends
+        base_name = self.base_project.name
+        sorted_names = qisys.sort.topological_sort(dep_tree, [base_name])
+        for name in sorted_names:
+            project = self.doc_worktree.get_doc_project(name, raises=None)
+            if project:
+                projects.append(project)
+        return projects

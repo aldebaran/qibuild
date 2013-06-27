@@ -107,6 +107,8 @@ def _new_doc_project_3(doc_worktree, project):
     tree = qisys.qixml.read(qiproject_xml)
     root = tree.getroot()
     qidoc_elem = root.find("qidoc")
+    if qidoc_elem is None:
+        return None
     doc_type = qidoc_elem.get("type")
     if doc_type is None:
         raise BadProjectConfig(qiproject_xml,
