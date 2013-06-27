@@ -29,6 +29,10 @@ class BuildProject(object):
         """ Path to qiproject.xml """
         return os.path.join(self.path, "qiproject.xml")
 
+    @property
+    def cmake_qibuild_dir(self):
+        worktree = self.build_worktree.worktree
+        return qibuild.cmake.get_cmake_qibuild_dir(worktree=worktree)
 
     @property
     def build_directory(self):
@@ -157,7 +161,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             to_include = qisys.sh.to_posix_path(self.build_config.local_cmake)
             custom_cmake_code += 'include("%s")\n' % to_include
 
-        cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
+        cmake_qibuild_dir = self.cmake_qibuild_dir
         cmake_qibuild_dir = qisys.sh.to_posix_path(cmake_qibuild_dir)
         dep_to_add = ""
         for sdk_dir in sdk_dirs:
@@ -186,7 +190,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
         cmake_args = self.cmake_args
         # only required the first time, afterwards this setting is
         # written in the cache by dependencies.cmake
-        cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
+        cmake_qibuild_dir = self.cmake_qibuild_dir
         cmake_qibuild_dir = os.path.join(cmake_qibuild_dir, "qibuild")
         cmake_qibuild_dir = qisys.sh.to_posix_path(cmake_qibuild_dir)
         cmake_args.append("-Dqibuild_DIR=%s" % cmake_qibuild_dir)

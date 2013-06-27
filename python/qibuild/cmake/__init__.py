@@ -263,13 +263,24 @@ Please exchange the following lines:
         ui.warning(mess)
 
 
-def get_cmake_qibuild_dir():
+def get_cmake_qibuild_dir(worktree=None):
     """Get the path to cmake modules.
 
-    First, assume we are using qibuild from sources,
+    First, look fo a project named `qibuild` in the worktree, (if
+    a ``worktree`` was passed,
+    then, assume we are using qibuild from sources,
     then assume we are using an installed version of qibuild.
     """
-    # First, assume this file is not installed,
+    if worktree:
+        for project in worktree.projects:
+            if os.path.basename(project.src) == "qibuild":
+                candidate = os.path.join(project.path, "cmake")
+                qibuild_config = os.path.join(candidate, "qibuild", "qibuild-config.cmake")
+                if os.path.exists(qibuild_config):
+                    return candidate
+
+
+    # Assume this file is not installed,
     # so we have the python code in qibuild/python,
     # and the cmake code in qibuild/cmake
     # (using qibuild from sources)

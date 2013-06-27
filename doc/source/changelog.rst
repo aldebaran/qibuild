@@ -53,6 +53,9 @@ qisrc
 qibuild
 ~~~~~~~
 
+* ``qibuild`` now uses ``CMake`` code from the worktree. This makes it possible
+  to use a Python command line version ``qibuild`` different of the ``qibuild/cmake``
+  code.
 * ``qibuild init -c`` is deprecated, use ``qitoolchain set-default`` instead
 * ``qibuild init --interactive`` is deprecated, use ``qibuild config --wizard`` instead
 * ``qibuild test`` learned ``--build-first``
