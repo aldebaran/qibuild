@@ -2,6 +2,8 @@
 
 """
 
+import operator
+
 from qisys import ui
 import qisys.parsers
 import qidoc.parsers
@@ -15,5 +17,20 @@ def configure_parser(parser):
 
 def do(args):
     doc_worktree = qidoc.parsers.get_doc_worktree(args)
-    for doc_project in doc_worktree.doc_projects:
-        print doc_project.src
+    doc_projects = doc_worktree.doc_projects
+    if not doc_projects:
+        return
+    ui.info(ui.green, "qidoc projects in:", ui.blue, doc_worktree.root)
+    max_name = max(len(x.name) for x in doc_projects)
+    ui.info()
+    for doc_type in ["doxygen", "sphinx"]:
+        matching_projects = [x for x in doc_projects if x.doc_type == doc_type]
+        matching_projects.sort(key=operator.attrgetter("name"))
+        if not matching_projects:
+            continue
+        ui.info(ui.green, doc_type.capitalize(),
+                "projects")
+        for project in matching_projects:
+            ui.info(ui.green, " * ", ui.blue, project.name.ljust(max_name),
+                    "  ", ui.reset, project.path)
+        ui.info()
