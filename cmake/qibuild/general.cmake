@@ -31,6 +31,8 @@ endif()
 #get the current directory of the file
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 
+include("qibuild/version")
+message(STATUS "Using qibuild v${QIBUILD_VERSION}")
 include("qibuild/log")
 include("qibuild/set")
 
@@ -55,7 +57,6 @@ include("qibuild/internal/autostrap")
 
 if (NOT QI_SDK_DIR)
   qi_persistent_set(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk")
-  qi_info("QI_SDK_DIR: ${QI_SDK_DIR}")
 endif()
 
 #ensure CMAKE_BUILD_TYPE is either Debug or Release
