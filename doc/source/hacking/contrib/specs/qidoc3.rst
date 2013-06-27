@@ -8,7 +8,7 @@ General
 
 * usable without templates repo
 
-* generate everything in ``<project>/<build-doc>``:
+* generate everything in ``<project>/build-doc``:
   no longer required to mess with ``.gitignore``
 
 * add a ``html`` prefix everywhere (``<project>/build-doc/html``),
@@ -51,6 +51,7 @@ Standalone Doxygen
 Here what the files would look like
 
 .. code-block:: xml
+
   <!-- libfoo/qiproject.xml -->
 
   <project version="3" >
@@ -67,8 +68,9 @@ Here what the files would look like
   EXAMPLE_PATH = ...
 
 
-``INPUT`` is parsed and rewritten when the Doxyfile is generated in
-``build-doc`` ``OUTPUT_DIRECTORY`` is always re-set to ``.``
+* ``INPUT`` is parsed and rewritten when the Doxyfile is generated in
+  ``build-doc``
+* ``OUTPUT_DIRECTORY`` is always re-set to ``<build-doc>``
 
 
 * We also force ``GENERATE_LATEX=NO`` and ``GENERATE_HTML=YES``.
@@ -193,7 +195,7 @@ write the ``doxylink`` dict in the ``conf.py``
 
 .. code-block:: python
 
-    doxylink = { 'world' : ('<world>/<build-doc>/doxytags/world.tag', '<dest>') }
+    doxylink = { 'world' : ('<world>/build-doc/doxytags/world.tag', '<dest>') }
 
 
 Where ``<dest>`` is the path of the ``world`` doc, relative to the ``html``
