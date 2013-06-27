@@ -1,5 +1,7 @@
 class TemplateProject(object):
     def __init__(self, doc_worktree, worktree_project):
+        self.doc_type = "template"
+        self.name = "template"
         self.src = worktree_project.src
         self.path = worktree_project.path
         self.doc_worktree = doc_worktree
