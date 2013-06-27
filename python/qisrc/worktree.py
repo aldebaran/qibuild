@@ -152,6 +152,9 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
     def on_project_added(self, project):
         self.load_git_projects()
 
+    def on_project_moved(self, project):
+        self.load_git_projects()
+
     def clone_missing(self, repo):
         """ Add a new project.
         :returns: a boolean telling if the clone succeeded
@@ -190,7 +193,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         return True
 
     def move_repo(self, repo, new_src):
-        """ Move a project in the worktree (s-me remote url, different
+        """ Move a project in the worktree (same remote url, different
         src)
 
         """
@@ -215,8 +218,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                      "\n", e , "\n",
                      "Repository left in", project.src)
             return
+        self.worktree.move_project(project.src, new_src)
         project.src = new_src
         self.save_project_config(project)
+        return True
 
     def remove_repo(self, project):
         """ Remove a project from the worktree """

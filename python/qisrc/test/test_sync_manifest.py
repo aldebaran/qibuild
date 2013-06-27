@@ -6,6 +6,7 @@
 import qisrc.sync
 import qisrc.manifest
 import qisrc.git
+from qisrc.test.conftest import TestGitWorkTree
 
 
 def test_stores_url_and_groups(git_worktree, git_server):
@@ -129,3 +130,16 @@ def test_evil_nested(git_worktree, git_server):
     foo = git_server.create_repo("foo")
     git_worktree.configure_manifest("default", git_server.manifest_url)
     assert len(git_worktree.git_projects) == 2
+
+
+def test_moving_repos_sync_action(git_worktree, git_server, qisrc_action):
+    git_server.create_repo("lib/foo.git")
+    manifest_url = git_server.manifest_url
+    git_worktree.configure_manifest("default", manifest_url)
+    git_server.move_repo("lib/foo.git", "lib/bar")
+    qisrc_action("sync")
+    git_worktree = TestGitWorkTree()
+    assert not git_worktree.get_git_project("lib/foo")
+    assert git_worktree.get_git_project("lib/bar")
+    # Sync twice just to test that nothing happens
+    qisrc_action("sync")

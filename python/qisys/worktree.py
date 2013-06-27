@@ -158,7 +158,7 @@ worktree root: {1}
     def add_project(self, path):
         """ Add a project to a worktree
 
-        :param src: path to the project, can be absolute,
+        :param path: path to the project, can be absolute,
                     or relative to the worktree root
 
         """
@@ -178,7 +178,7 @@ worktree root: {1}
     def remove_project(self, path, from_disk=False):
         """ Remove a project from a worktree
 
-        :param src: path to the project, can be absolute,
+        :param path: path to the project, can be absolute,
                     or relative to the worktree root
         :param from_disk: also erase project files from disk
 
@@ -193,6 +193,24 @@ worktree root: {1}
         self.load_projects()
         for observer in self._observers:
             observer.on_project_removed(project)
+
+    def move_project(self, path, new_path):
+        """ Move a project from a worktree """
+        src = self.normalize_path(path)
+        new_src = self.normalize_path(new_path)
+        if not self.has_project(src):
+            raise WorkTreeError("No such project: %s" % src)
+        if self.has_project(new_src):
+            mess  = "Could not move project\n"
+            mess += "Path %s is already registered\n" % src
+            mess += "Current worktree: %s" % self.root
+        self.cache.remove_src(src)
+        self.cache.add_src(new_src)
+        self.load_projects()
+        project = self.get_project(src)
+        for observer in self._observers:
+            observer.on_project_moved(project)
+
 
     def normalize_path(self, path):
         """ Make sure the path is a POSIX path, relative to
@@ -292,7 +310,7 @@ def guess_worktree(cwd=None, raises=False):
 
 class WorkTreeObserver():
     """ To be subclasses for objects willing to be
-    notified when a prroject is added or removed from
+    notified when a project is added or removed from
     the worktree
 
     """
@@ -306,6 +324,12 @@ class WorkTreeObserver():
 
     @abc.abstractmethod
     def on_project_removed(self, project):
+        """ Called when a project has been removed from the worktree
+        """
+        pass
+
+    @abc.abstractmethod
+    def on_project_moved(self, project):
         """ Called when a project has been removed from the worktree
         """
         pass

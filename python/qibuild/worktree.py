@@ -61,6 +61,9 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         """ Called when a build project has been removed """
         self._load_build_projects()
 
+    def on_project_moved(self, project):
+        self._load_build_projects()
+
     def _load_build_projects(self):
         """ Create BuildProject for every buildable project in the
         worktree

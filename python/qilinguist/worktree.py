@@ -29,6 +29,10 @@ class LinguistWorkTree(qisys.worktree.WorkTreeObserver):
         """ Called when a build project has been removed """
         self._load_linguist_projects()
 
+    def on_project_moved(self, project):
+        """ Called when a build project has been moved """
+        self._load_linguist_projects()
+
     def get_linguist_project(self, name, raises=False):
         for project in self.linguist_projects:
             if project.name == name:
