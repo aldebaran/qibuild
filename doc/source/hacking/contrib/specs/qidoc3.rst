@@ -267,3 +267,67 @@ Build type
 
 This as an impact on both the implementation of the ``qidoc-ref`` directive,
 and on the templates.
+
+
+Examples
+---------
+
+If there is just one file, sphinx and doxygen can handle
+that just fine
+
+The problem appears when there is more than one file.
+
+Convention: one directory per example
+
+We want two things:
+
+ * Generate a zip with the sources of the examples
+
+ * Copy the source of the examples in an 'examples' directory
+   when we build the doc
+
+Syntax:
+
+
+::
+
+    foo-doc
+    |__ source
+    |   |__ index.rst
+    |__ samples
+        |__ a
+        |   |__ CMakeLists.txt
+        |   |__ a.cpp
+        |__ b
+           |__ CMakeLists.txt
+           |__ b.cpp
+
+
+.. code-block:: xml
+
+    <!-- top qiproject.xml -->
+
+    <project version="3" />
+
+      <qidoc name="foo" type="sphinx" />
+        <examples>
+          <example src="samples/a" />
+          <example src="samples/b" />
+        </examples>
+      </qidoc>
+
+    </project>
+
+
+Pre-build command
+------------------
+
+.. code-block:: xml
+
+    <project version="3" />
+
+      <qidoc name="foo" type="sphinx" />
+        <prebuild cmd="tool/gen_some_rst.py" />
+      </qidoc>
+
+    </project>
