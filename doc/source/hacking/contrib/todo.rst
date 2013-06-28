@@ -138,7 +138,7 @@ Command line
 * make ``qisrc init`` works with a local directory containing a worktree (maybe
   ``qisrc clone``). but init seems better. "Are you a manifest git repo? No?
   So clone all."
-  
+
 * make git dependency optional
 
 qibuild

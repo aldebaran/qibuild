@@ -34,6 +34,7 @@ Suggested layout
 Here what the files would look like
 
 .. code-block:: xml
+
   <!-- libfoo/qiproject.xml -->
 
   <project version="3" >
