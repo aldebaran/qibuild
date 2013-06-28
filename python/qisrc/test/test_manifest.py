@@ -266,3 +266,21 @@ def test_default_group(tmpdir):
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     git_projects = manifest.get_repos()
     assert len(git_projects) == 2
+
+def test_default_branch(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <branch default="devel" />
+  <repo project="foo/bar.git" src="lib/bar" remotes="origin" />
+  <repo project="foo/foo.git" src="lib/foo" remotes="origin" branch="tutu" />
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert len(manifest.repos) == 2
+    assert manifest.default_branch == "devel"
+    bar = manifest.repos[0]
+    assert bar.default_branch == "devel"
+    foo = manifest.repos[1]
+    assert foo.default_branch == "tutu"

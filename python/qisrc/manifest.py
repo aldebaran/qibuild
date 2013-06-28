@@ -23,6 +23,7 @@ class Manifest(object):
         self.manifest_xml = manifest_xml
         self.repos = list()
         self.remotes = list()
+        self.default_branch = None
         self.groups = qisrc.groups.Groups()
         self.load()
 
@@ -96,7 +97,10 @@ Found two projects sharing the same sources:
         remote = copy.copy(matching_remote)
         remote.url = matching_remote.prefix + repo.project
         if repo.default_branch is None:
-            repo.default_branch = remote.default_branch
+            if self.default_branch:
+                repo.default_branch = self.default_branch
+            else:
+                repo.default_branch = remote.default_branch
         if remote.name == repo.default_remote_name:
             remote.default = True
         repo.remotes.append(remote)
@@ -236,6 +240,8 @@ class ManifestParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(ManifestParser, self).__init__(target)
 
+    def _parse_branch(self, elem):
+        self.target.default_branch = elem.get("default")
 
     def _parse_repo(self, elem):
         repo_config = RepoConfig()
@@ -252,6 +258,9 @@ class ManifestParser(qisys.qixml.XMLParser):
     def _parse_groups(self, elem):
         parser = qisrc.groups.GroupsParser(self.target.groups)
         parser.parse(elem)
+
+    def _write_branch(self, elem):
+        elem.set("default", self.target.default_branch)
 
     def _write_repos(self, elem):
         for repo_config in self.target.repos:
