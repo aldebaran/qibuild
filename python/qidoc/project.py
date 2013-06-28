@@ -17,13 +17,14 @@ class DocProject(object):
             depends = list()
         self.depends = list()
         self.dest = dest
+        self.prebuild_script = None
 
     @abc.abstractmethod
     def configure(self, **kwargs):
         pass
 
     @abc.abstractmethod
-    def build(self):
+    def build(self, **kwargs):
         pass
 
     @abc.abstractmethod
@@ -51,4 +52,3 @@ class DocProject(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
-

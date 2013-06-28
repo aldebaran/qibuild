@@ -55,3 +55,9 @@ def test_build(doc_worktree):
     qi_sphinx.build()
 
     assert os.path.exists(qi_sphinx.index_html)
+
+def test_prebuild(doc_worktree):
+    doc_worktree.add_test_project("prebuild")
+    qi_sphinx = doc_worktree.get_doc_project("prebuild")
+    qi_sphinx.configure()
+    qi_sphinx.build(werror=True)

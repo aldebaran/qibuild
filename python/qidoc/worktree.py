@@ -159,6 +159,7 @@ def _new_doc_project_2(doc_worktree, project):
         doc_type = "sphinx"
     else:
         doc_type = "doxygen"
+
     return _new_doc_project(doc_worktree, project, doc_elem, doc_type)
 
 def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
@@ -170,6 +171,8 @@ def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
     if not name:
         raise BadProjectConfig(qiproject_xml,
                                "Expecting a 'name' attribute")
+
+
     dest = xml_elem.get("dest")
     doc_project = None
     if doc_type == "sphinx":
@@ -187,6 +190,13 @@ def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
             raise BadProjectConfig(qiproject_xml,
                                    "<depends> must have a 'name' attribute")
         doc_project.depends.append(depend_elem.get("name"))
+
+    prebuild = xml_elem.get("prebuild")
+    if prebuild is not None:
+        script = prebuild.get("script")
+        if script:
+            doc_project.prebuild_script = script
+
     return doc_project
 
 

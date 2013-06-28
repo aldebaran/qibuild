@@ -1,0 +1,5 @@
+<project version="3">
+  <qidoc type="sphinx" name="prebuild">
+    <prebuild script="tools/gen_rst.py" />
+  </qidoc>
+</project>

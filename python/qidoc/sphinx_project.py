@@ -14,7 +14,6 @@ class SphinxProject(qidoc.project.DocProject):
         super(SphinxProject, self).__init__(doc_worktree, project, name,
                                             depends=depends,
                                             dest=dest)
-
     @property
     def source_dir(self):
         return os.path.join(self.path, "source")
@@ -67,7 +66,8 @@ class SphinxProject(qidoc.project.DocProject):
         out_conf_py = os.path.join(self.build_dir, "conf.py")
         qisys.sh.write_file_if_different(conf, out_conf_py)
 
-    def build(self):
+
+    def build(self, werror=False):
         """ Run sphinx.main() with the correct arguments """
         try:
             import sphinx
@@ -80,10 +80,20 @@ class SphinxProject(qidoc.project.DocProject):
                 if path not in sys.path:
                     sys.path.insert(0, path)
 
-        sphinx.main(argv=[sys.executable,
-                          "-c", self.build_dir,
-                          "-b", "html",
-                          self.source_dir, html_dir])
+        cmd = [sys.executable,
+               "-c", self.build_dir,
+                "-b", "html"]
+        if werror:
+            cmd.append("-W")
+        cmd.extend([self.source_dir, html_dir])
+        rc = sphinx.main(argv=cmd)
+        if rc != 0:
+            raise SphinxBuildError(self)
 
     def install(self, destdir):
         pass
+
+
+class SphinxBuildError(Exception):
+    def __str__(self):
+        return "Error occured when building %s" % self.args[0].name
