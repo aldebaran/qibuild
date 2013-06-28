@@ -45,7 +45,11 @@ class DocWorkTree(qisys.worktree.WorkTreeObserver):
         self._load_doc_projects()
 
     def on_project_removed(self, project):
-        """ Called when a build project has been removed """
+        """ Called when a project has been removed """
+        self._load_doc_projects()
+
+    def on_project_moved(self, project):
+        """ Called when a project has moved """
         self._load_doc_projects()
 
     def get_doc_project(self, name, raises=False):
