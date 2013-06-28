@@ -1,5 +1,6 @@
 import qisys.parsers
 
+import qidoc.builder
 from qidoc.worktree import DocWorkTree, new_doc_project
 
 def get_doc_worktree(args):
@@ -68,7 +69,7 @@ class CouldNotGuessProjectName(Exception):
     def __str__(self):
         return """
 Could not guess doc project name from current working directory
-Please go inside a translatable project, or specify the project name
+Please go inside a doc project, or specify the project name
 on the command line
 """
 
