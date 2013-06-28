@@ -78,6 +78,9 @@ Here what the files would look like
   it does not matter. Also, always generating the XML is not that costly,
   even if it's currently only used by ``qiapidoc``
 
+* For the same reason, we alwas set ``GENERATE_TAGFILE``, even if the
+  doxyfile is standalone
+
 Standalone Sphinx
 -----------------
 
@@ -217,8 +220,7 @@ it's easy to generate the correct Python setting.
     qiapidoc_srcs = '<world>/build-doc/xml/'
 
 
-**FIXME** What happens if there are more than one ``Doxygen`` dep ?
-Should we change the syntax ?
+Note that there can be only one dependency, hence the following syntax:
 
 .. code-block:: xml
 

@@ -58,10 +58,10 @@ Here what the files would look like
   # libfoo/dox/Doxfile
 
   INPUT=../..
-  OUTPUT_DIRECTORY = build
-  GENERATE_HTML = yes
-  GENRATE_LATEX = no
 
+
+(No need for ``OUTPUT`` or ``GENERATE_*`` options, they will be set
+by ``qidoc`` automatically)
 
 
 Standalone sphinx
