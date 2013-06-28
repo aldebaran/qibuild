@@ -3,10 +3,18 @@ import qisys.parsers
 import qidoc.builder
 from qidoc.worktree import DocWorkTree, new_doc_project
 
+def build_doc_parser(parser):
+    """ Add options used during the building of the documentation """
+    group = parser.add_argument_group("doc build options")
+    group.add_argument("--version")
+    group.add_argument("--hosted", action="store_true", dest="hosted")
+    group.add_argument("--local", action="store_false", dest="hosted")
+    group.add_argument("--release", action="store_false", dest="debug")
+    parser.set_defaults(hosted=True, debug=True)
+
 def get_doc_worktree(args):
     worktree = qisys.parsers.get_worktree(args)
     return DocWorkTree(worktree)
-
 
 def get_doc_projects(doc_worktree, args, default_all=False):
     parser = DocProjectParser(doc_worktree)
@@ -25,6 +33,9 @@ def get_doc_builder(args):
     doc_builder = qidoc.builder.DocBuilder(doc_worktree)
     doc_builder.base_project = doc_project
     doc_builder.single = vars(args).get("single", False)
+    doc_builder.single = vars(args).get("version", "latest")
+    doc_builder.local = vars(args).get("hosted", True)
+    doc_builder.debug = vars(args).get("debug", True)
     return doc_builder
 
 ##

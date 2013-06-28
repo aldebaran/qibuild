@@ -17,6 +17,9 @@ class DocBuilder(object):
         self.single = False
         self.deps_solver = None
         self.base_project = None
+        self.version = "latest"
+        self.hosted = True
+        self.debug = True
 
     def configure(self):
         """ Configure the projects in the right order
@@ -24,7 +27,9 @@ class DocBuilder(object):
         """
         projects = self.get_dep_projects()
         for project in projects:
-            project.configure()
+            project.configure(version=self.version,
+                              hosted=self.hosted,
+                              debug=self.debug)
 
     def build(self):
         """ Build the projects in the right order,

@@ -20,7 +20,7 @@ class DoxygenProject(qidoc.project.DocProject):
     def out_doxyfile(self):
         return os.path.join(self.build_dir, "Doxyfile")
 
-    def configure(self):
+    def configure(self, **kwargs):
         """ Create a correct Doxyfile in self.build_dir.
 
         * Force OUTPUT_DIRECTORY
@@ -29,6 +29,7 @@ class DoxygenProject(qidoc.project.DocProject):
           have a template
 
         """
+        version = kwargs.get("version")
         in_conf = qidoc.doxygen.read_doxyfile(self.in_doxyfile)
         out_conf = in_conf.copy()
         out_path =  os.path.join(self.build_dir, "Doxyfile")
@@ -36,6 +37,8 @@ class DoxygenProject(qidoc.project.DocProject):
         out_conf["GENERATE_XML"] = "YES" # required by qiapidoc and doylink
         out_conf["GENERATE_HTML"] = "YES"
         out_conf["GENERATE_LATEX"] = "NO"
+        if version:
+            out_conf["PROJECT_NUMBER"] = version
 
         for path_key in ["INPUT", "EXAMPLE_PATH"]:
             in_value = in_conf.get(path_key)

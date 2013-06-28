@@ -19,7 +19,7 @@ class DocProject(object):
         self.dest = dest
 
     @abc.abstractmethod
-    def configure(self):
+    def configure(self, **kwargs):
         pass
 
     @abc.abstractmethod

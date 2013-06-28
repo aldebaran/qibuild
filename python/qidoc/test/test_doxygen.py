@@ -24,6 +24,12 @@ def test_rewrite_relative_paths(doc_worktree):
         os.path.join(foo_dox.path, "include/foo")
     )
 
+def test_with_version(doc_worktree):
+    foo_dox = doc_worktree.create_doxygen_project("foo")
+    foo_dox.configure(version="1.2.3")
+    conf = qidoc.doxygen.read_doxyfile(foo_dox.out_doxyfile)
+    assert conf["PROJECT_NUMBER"] == "1.2.3"
+
 def test_build(doc_worktree):
     doc_worktree.add_test_project("libqi")
     qi_dox = doc_worktree.get_doc_project("qi-api", raises=True)
