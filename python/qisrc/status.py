@@ -36,6 +36,7 @@ class ProjectState():
         self.tracking        = None
         self.valid           = True
         self.status          = None
+        self.manifest_branch = None
 
     @property
     def sync(self):
@@ -60,7 +61,8 @@ def check_state(project, untracked):
     state_project.clean = git.is_clean(untracked = untracked)
     state_project.current_branch = git.get_current_branch()
     state_project.tracking = git.get_tracking_branch()
-
+    if project.default_remote and project.default_branch:
+        state_project.manifest_branch = "%s/%s" % (project.default_remote.name, project.default_branch.name)
     #clean worktree, but is the current branch sync with the remote one?
     if state_project.clean:
         if state_project.current_branch is None:
@@ -86,6 +88,10 @@ def check_state(project, untracked):
 
     return state_project
 
+def _print_behind_ahead(branch, tracking, behindahead, numcommits):
+    ui.info(ui.bold, "Your branch", ui.green, branch, ui.reset, ui.bold ,"is",
+            numcommits, "commits %s branch" % (behindahead), ui.blue, tracking)
+
 def print_state(project, max_len):
     """Print a state project."""
     #shortpath = os.path.relpath(project.path, qiwt.root)
@@ -96,17 +102,13 @@ def print_state(project, max_len):
                 ui.green, ":", project.current_branch,
                     "tracking", project.tracking)
         if project.ahead:
-            ui.info(ui.bold, "Your branch is",
-                    project.ahead, "commits ahead.")
+            _print_behind_ahead(project.current_branch, project.tracking, "ahead", project.ahead)
         if project.behind:
-            ui.info(ui.bold, "Your branch is",
-                    project.behind, "commits behind.")
+            _print_behind_ahead(project.current_branch, project.tracking, "behind", project.behind)
         if project.ahead_manifest:
-            ui.info(ui.bold, "Your branch is",
-                    project.ahead_manifest, "commits ahead manifest.")
+            _print_behind_ahead(project.current_branch, project.manifest_branch, "ahead", project.ahead_manifest)
         if project.behind_manifest:
-            ui.info(ui.bold, "Your branch is",
-                    project.behind_manifest, "commits behind manifest.")
+            _print_behind_ahead(project.current_branch, project.manifest_branch, "behind", project.behind_manifest)
 
 
     if not project.sync_and_clean:
