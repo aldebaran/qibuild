@@ -7,6 +7,7 @@ import qisrc.sync
 import qisrc.manifest
 import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree
+import qisys.sh
 
 
 def test_stores_url_and_groups(git_worktree, git_server):
@@ -125,9 +126,9 @@ def test_add_on_empty(git_worktree, git_server):
 
 
 def test_evil_nested(git_worktree, git_server):
-    foo_bar_repo = git_server.create_repo("foo/bar")
+    git_server.create_repo("foo/bar")
     git_worktree.configure_manifest("default", git_server.manifest_url)
-    foo = git_server.create_repo("foo")
+    git_server.create_repo("foo")
     git_worktree.configure_manifest("default", git_server.manifest_url)
     assert len(git_worktree.git_projects) == 2
 
@@ -143,3 +144,15 @@ def test_moving_repos_sync_action(git_worktree, git_server, qisrc_action):
     assert git_worktree.get_git_project("lib/bar")
     # Sync twice just to test that nothing happens
     qisrc_action("sync")
+
+
+def test_rm_nested_repos_root(git_worktree, git_server, qisrc_action):
+    foo = git_server.create_repo("foo")
+    git_server.create_repo("foo/bar")
+    git_server.create_repo("foo/lol")
+    git_worktree.configure_manifest("default", git_server.manifest_url)
+    qisys.sh.rm(foo.src)
+    qisrc_action("sync")
+    assert git_worktree.get_git_project("foo")
+    assert git_worktree.get_git_project("foo/bar")
+    assert git_worktree.get_git_project("foo/lol")
