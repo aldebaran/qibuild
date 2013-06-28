@@ -169,6 +169,13 @@ qibuild
 
 * add ``qibuild find -z`` to look in every build dir
 
+* Better integration with QtCreator:
+  * Write our own plugin to avoid the "CMakeList" pop-up (it only re-runs
+    CMake to generate an XML code-blocks file, that is then re-parsed
+    by QtCreator)
+  * Match qitoolchain configs with QtCreator's kits
+  * Automatically configure tests when they take arguments
+
 qisrc
 -----
 
@@ -186,6 +193,9 @@ qisrc
 
 * mirroring qisrc manifests. (Same repos, same review, but an other
   "base URL")
+
+* use ``--depth``  option when cloning. May speed up the initial
+  clone
 
 qitoolchain
 -----------
