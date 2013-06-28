@@ -4,7 +4,11 @@
 {% block body %}
 
   <div id="whatsnew">
+    {% if version != "latest" %}
     <p>v{{ version }}</p>
+    {% else %}
+    <p>(latest)</p>
+    {% endif %}
     <a class="biglink" href="{{ pathto("changelog") }}">Changelog</a><br/>
   </div>
 
