@@ -21,13 +21,14 @@ def configure_parser(parser):
                         "done.", action="store_true")
     parser.add_argument("-c", "--clean", action="store_true",
                         help="Remove untracked files and directories.")
-    parser.add_argument("--fetch", action="store_true", default=True,
+    parser.add_argument("--fetch", action="store_true",
                         help="Fetch before reset")
     parser.add_argument("--no-fetch", action="store_false", dest="fetch",
                         help="Don't fetch before reset")
     parser.add_argument("--tag", help="Reset everything to the given tag")
     parser.add_argument("--snapshot", help="Reset everything using the given "
                         "snapshot")
+    parser.set_defaults(fetch=False)
 
 def do(args):
     """Main entry points."""

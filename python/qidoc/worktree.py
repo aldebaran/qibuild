@@ -191,7 +191,7 @@ def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
                                    "<depends> must have a 'name' attribute")
         doc_project.depends.append(depend_elem.get("name"))
 
-    prebuild = xml_elem.get("prebuild")
+    prebuild = xml_elem.find("prebuild")
     if prebuild is not None:
         script = prebuild.get("script")
         if script:

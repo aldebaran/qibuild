@@ -368,10 +368,8 @@ def main():
     """ Parses command line arguments
 
     """
-    if len(sys.argv) != 2:
-        print "Usage: gen_cmake_doc /path/to/qibuild"
-        sys.exit(1)
-    qibuild_dir = sys.argv[1]
+    # We know that qidoc build will set the correct cwd
+    qibuild_dir = ".."
     qibuild_dir = os.path.abspath(qibuild_dir)
     this_file = __file__
     this_dir = os.path.dirname(this_file)

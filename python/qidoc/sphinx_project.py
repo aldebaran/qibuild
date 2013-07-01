@@ -74,6 +74,14 @@ class SphinxProject(qidoc.project.DocProject):
         except ImportError, e:
             ui.error(e, "skipping build")
             return
+
+        if self.prebuild_script:
+            ui.info(ui.green, "Running pre-build-scipt:",
+                    ui.white, self.prebuild_script)
+            cmd = [sys.executable, self.prebuild_script]
+            qisys.command.call(cmd, cwd=self.path)
+            ui.info()
+
         html_dir = os.path.join(self.build_dir, "html")
         if self.template_project:
             for path in self.template_project.sys_path:

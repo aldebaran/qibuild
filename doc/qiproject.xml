@@ -1,3 +1,5 @@
 <project>
-  <sphinxdoc name="qibuild" />
+  <sphinxdoc name="qibuild">
+    <prebuild script="tools/gen_cmake_doc.py" />
+  </sphinxdoc>
 </project>

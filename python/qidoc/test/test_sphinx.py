@@ -35,7 +35,7 @@ def test_with_template(doc_worktree):
     # pylint: disable-msg=E1101
     foo_path = py.path.local(foo_sphinx.path)
     conf_py = foo_path.join("source", "conf.in.py").ensure(file=True)
-    settings = """ \
+    settings = """\
 # My custom settings
 
 project = "foo"
@@ -43,8 +43,12 @@ project = "foo"
     conf_py.write(settings)
     foo_sphinx.configure(version="1.2.3")
     conf_py = foo_path.join("build-doc", "conf.py").read()
-    assert conf_py.endswith(settings)
-    assert 'version = "1.2.3"' in conf_py
+    conf_dict = dict()
+    assert "# My custom settings" in conf_py
+    exec(conf_py, conf_dict)
+    assert conf_dict["version"] == "1.2.3"
+    expected = doc_worktree.template_project.themes_path
+    assert conf_dict["html_theme_path"] == [expected]
 
 
 def test_build(doc_worktree):
@@ -58,6 +62,13 @@ def test_build(doc_worktree):
 
 def test_prebuild(doc_worktree):
     doc_worktree.add_test_project("prebuild")
+    qi_sphinx = doc_worktree.get_doc_project("prebuild")
+    qi_sphinx.configure()
+    qi_sphinx.build(werror=True)
+
+
+def test_examples(doc_worktree):
+    doc_worktree.add_test_project("examples")
     qi_sphinx = doc_worktree.get_doc_project("prebuild")
     qi_sphinx.configure()
     qi_sphinx.build(werror=True)
