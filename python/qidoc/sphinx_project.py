@@ -96,4 +96,4 @@ class SphinxProject(qidoc.project.DocProject):
 
 class SphinxBuildError(Exception):
     def __str__(self):
-        return "Error occured when building %s" % self.args[0].name
+        return "Error occured when building doc project: %s" % self.args[0].name
