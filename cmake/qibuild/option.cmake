@@ -55,7 +55,7 @@ function(qi_add_optional_package name)
     # note that this will automatically set the WITH_* variable
     # in the cache
     find_package("${_U_name}" QUIET)
-    if(${_U_name}_PACKAGE_FOUND OR ${_U_name}_FOUND)
+    if(${_U_name}_PACKAGE_FOUND)
       option("WITH_${_U_name}" "${_desc}" ON)
     else()
       option("WITH_${_U_name}" "${_desc}" OFF)
@@ -64,3 +64,4 @@ function(qi_add_optional_package name)
     qi_persistent_set(${_U_name}_PACKAGE_FOUND FALSE)
   endif()
 endfunction()
+
