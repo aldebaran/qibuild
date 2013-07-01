@@ -1,0 +1,8 @@
+<project version="3">
+  <qidoc type="sphinx" name="examples">
+    <examples>
+      <example src="samples/a" />
+      <example src="samples/b" />
+    </examples>
+  </qidoc>
+</project>

@@ -197,6 +197,18 @@ def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
         if script:
             doc_project.prebuild_script = script
 
+    examples = list()
+    examples_elem = xml_elem.find("examples")
+    if examples_elem is not None:
+        for example_elem in examples_elem.findall("example"):
+            src = example_elem.get("src")
+            if src:
+                examples.append(src)
+            else:
+                raise BadProjectConfig(qiproject_xml,
+                                       "<example> must have a 'src' attribute")
+    doc_project.examples = examples
+
     return doc_project
 
 

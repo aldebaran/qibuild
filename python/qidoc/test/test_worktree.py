@@ -23,3 +23,10 @@ def test_prebuild(doc_worktree):
     prebuild_proj = doc_worktree.add_test_project("prebuild")
     assert prebuild_proj.name == "prebuild"
     assert prebuild_proj.prebuild_script == "tools/gen_rst.py"
+
+def test_examples(doc_worktree):
+    examples_proj = doc_worktree.add_test_project("examples")
+    assert examples_proj.name == "examples"
+    assert examples_proj.examples == [
+        "samples/a",
+        "samples/b"]

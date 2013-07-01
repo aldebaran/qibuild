@@ -2,6 +2,7 @@ import os
 import sys
 
 from qisys import ui
+import qisys.archive
 import qisys.sh
 import qidoc.project
 
@@ -11,6 +12,7 @@ class SphinxProject(qidoc.project.DocProject):
     def __init__(self, doc_worktree, project, name,
                  depends=None, dest=None):
         self.doc_type = "sphinx"
+        self.examples = list()
         super(SphinxProject, self).__init__(doc_worktree, project, name,
                                             depends=depends,
                                             dest=dest)
@@ -82,6 +84,8 @@ class SphinxProject(qidoc.project.DocProject):
             qisys.command.call(cmd, cwd=self.path)
             ui.info()
 
+        self.generate_examples_zips()
+
         html_dir = os.path.join(self.build_dir, "html")
         if self.template_project:
             for path in self.template_project.sys_path:
@@ -97,6 +101,11 @@ class SphinxProject(qidoc.project.DocProject):
         rc = sphinx.main(argv=cmd)
         if rc != 0:
             raise SphinxBuildError(self)
+
+    def generate_examples_zips(self):
+        for example_src in self.examples:
+            example_path = os.path.join(self.source_dir, example_src)
+            qisys.archive.compress(example_path, algo="zip", quiet=True)
 
     def install(self, destdir):
         pass

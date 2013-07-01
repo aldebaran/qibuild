@@ -68,7 +68,6 @@ def test_prebuild(doc_worktree):
 
 
 def test_examples(doc_worktree):
-    doc_worktree.add_test_project("examples")
-    qi_sphinx = doc_worktree.get_doc_project("prebuild")
-    qi_sphinx.configure()
-    qi_sphinx.build(werror=True)
+    examples_proj = doc_worktree.add_test_project("examples")
+    examples_proj.configure()
+    examples_proj.build(werror=True)
