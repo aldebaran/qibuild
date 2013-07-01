@@ -293,7 +293,8 @@ class Git(object):
         if remote_branch is None:
             remote_branch = branch
         if self.is_empty():
-            raise Exception("repo in %s has no commit yet" % self.repo)
+            ui.error("repo in %s has no commit yet" % self.repo)
+            return
         if not self.branch_exists(branch):
             self.branch(branch)
         self.set_config("branch.%s.remote" % branch, remote_name)
