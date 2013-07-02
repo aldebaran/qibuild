@@ -29,6 +29,20 @@ def configure_parser(parser):
     group.add_argument("--rebase-devel", action="store_true",
                        help="Rebase development branches. Advanced users only")
 
+def print_overview(total, skipped, failed):
+    out = [ ui.green, "Success:", ui.white, total - skipped - failed ]
+    if skipped:
+        out.append(ui.yellow)
+    else:
+        out.append(ui.blue)
+    out.extend(("Skipped:", ui.white, skipped))
+    if failed:
+        out.append(ui.red)
+    else:
+        out.append(ui.blue)
+    out.extend(("Failed:", ui.white, failed))
+    ui.info(*out)
+
 @ui.timer("Synchronizing worktree")
 def do(args):
     """Main entry point"""
@@ -55,6 +69,8 @@ def do(args):
             failed.append((git_project.src, out))
         if out:
             print ui.indent(out, num=2)
-    print("\r")
+    #clean the screen
+    ui.info_count(i, len(git_projects), ui.blue, " ".ljust(max_src), end="\r")
+    print_overview(len(git_projects), len(skipped), len(failed))
     if failed or not sync_ok:
         sys.exit(1)
