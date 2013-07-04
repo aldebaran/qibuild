@@ -12,7 +12,8 @@ def build_doc_parser(parser):
     group.add_argument("--hosted", action="store_true", dest="hosted")
     group.add_argument("--local", action="store_false", dest="hosted")
     group.add_argument("--release", action="store_false", dest="debug")
-    parser.set_defaults(hosted=True, debug=True)
+    group.add_argument("--werror", action="store_true", dest="werror")
+    parser.set_defaults(hosted=True, debug=True, werror=False)
 
 def get_doc_worktree(args):
     worktree = qisys.parsers.get_worktree(args)
@@ -41,6 +42,7 @@ def get_doc_builder(args):
     doc_builder.version = vars(args).get("version", "latest")
     doc_builder.local = vars(args).get("hosted", True)
     doc_builder.debug = vars(args).get("debug", True)
+    doc_builder.werror = vars(args).get("werror", False)
     return doc_builder
 
 ##

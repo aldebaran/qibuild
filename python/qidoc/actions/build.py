@@ -12,6 +12,7 @@ import qidoc.builder
 def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
+    qidoc.parsers.build_doc_parser(parser)
 
 
 def do(args):

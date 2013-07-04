@@ -43,7 +43,7 @@ class DocBuilder(object):
         for i, project in enumerate(projects):
             ui.info_count(i, len(projects),
                           ui.green, "Building", ui.blue, project.name)
-            project.build()
+            project.build(werror=self.werror)
 
     def install(self, destdir):
         """ Install the doc projects to a dest dir
