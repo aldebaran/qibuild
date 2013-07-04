@@ -1,5 +1,11 @@
-<project>
-  <sphinxdoc name="qibuild">
+<project version="3">
+  <qidoc name="qibuild" type="sphinx">
     <prebuild script="tools/gen_cmake_doc.py" />
-  </sphinxdoc>
+    <examples>
+      <example src="samples/foobar_pure_cmake" />
+      <example src="samples/foobar_qibuild" />
+      <example src="samples/fooproject" />
+      <example src="samples/helloworld" />
+    </examples>
+  </qidoc>
 </project>
