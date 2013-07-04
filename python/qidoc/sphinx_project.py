@@ -105,7 +105,7 @@ class SphinxProject(qidoc.project.DocProject):
         for example_src in self.examples:
             example_path = os.path.join(self.source_dir, example_src)
             real_dest = os.path.join(destdir, example_src)
-            qisys.sh.install(example_path, real_dest)
+            qisys.sh.install(example_path, real_dest, quiet=True)
 
         def non_hidden(src):
             return not src.startswith(".")
