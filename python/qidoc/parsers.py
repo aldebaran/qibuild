@@ -1,4 +1,6 @@
+from qisys import ui
 import qisys.parsers
+
 
 import qidoc.builder
 from qidoc.worktree import DocWorkTree, new_doc_project
@@ -14,7 +16,10 @@ def build_doc_parser(parser):
 
 def get_doc_worktree(args):
     worktree = qisys.parsers.get_worktree(args)
-    return DocWorkTree(worktree)
+    doc_worktree =  DocWorkTree(worktree)
+    ui.info(ui.green, "Current doc worktree:", ui.reset,
+            ui.bold, doc_worktree.root)
+    return doc_worktree
 
 def get_doc_projects(doc_worktree, args, default_all=False):
     parser = DocProjectParser(doc_worktree)
