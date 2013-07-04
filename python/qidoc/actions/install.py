@@ -1,0 +1,25 @@
+""" Install a doc project and its depencies.
+
+The index.html will be the one of the 'base project',
+other projects will be put in relative to their 'dest'
+attribute in the qiproject.xml
+
+"""
+
+import operator
+
+from qisys import ui
+import qisys.parsers
+import qidoc.parsers
+import qidoc.builder
+
+def configure_parser(parser):
+    qisys.parsers.worktree_parser(parser)
+    qisys.parsers.project_parser(parser)
+    group = parser.add_argument_group("qidoc install options")
+    group.add_argument("destdir")
+
+
+def do(args):
+    doc_builder = qidoc.parsers.get_doc_builder(args)
+    doc_builder.install(args.destdir)

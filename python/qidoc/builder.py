@@ -1,3 +1,5 @@
+import os
+
 from qisys import ui
 import qisys.sort
 
@@ -56,7 +58,7 @@ class DocBuilder(object):
             ui.info_count(i, len(projects),
                           ui.green, "Installing",
                           ui.blue, project.name,
-                          ui.reset, "-->", ui.white, real_dest)
+                          ui.reset, "->", ui.white, real_dest)
             project.install(real_dest)
 
     def get_dep_projects(self):

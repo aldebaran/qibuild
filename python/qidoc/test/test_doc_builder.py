@@ -20,12 +20,15 @@ def test_using_dash_s(doc_worktree):
 
 
 def test_base_project_install(doc_worktree, tmpdir):
-    qibuild_doc = doc_worktree.create_sphinx_project("qibuild", dest="ref/qibuild")
-    general_doc = doc_worktree.create_sphinx_project("general", depends=["qibuild"])
+    world_proj = doc_worktree.add_test_project("world")
+    hello_proj = doc_worktree.add_test_project("hello")
     doc_builder = DocBuilder(doc_worktree)
-    doc_builder.base_project = general_doc
-    general_inst = tmpdir.join("inst", "general")
+    hello_inst = tmpdir.join("inst", "hello")
+    doc_builder.base_project = hello_proj
     doc_builder.configure()
     doc_builder.build()
-    doc_builder.install(general_inst.strpath)
-    assert
+    doc_builder.install(hello_inst.strpath)
+    hello_index = hello_inst.join("index.html")
+    assert "hello" in hello_index.read()
+    world_index = hello_inst.join("ref/world/index.html")
+    assert "world" in world_index.read()
