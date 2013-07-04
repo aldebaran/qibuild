@@ -39,7 +39,10 @@ def get_doc_builder(args):
     doc_builder = qidoc.builder.DocBuilder(doc_worktree)
     doc_builder.base_project = doc_project
     doc_builder.single = vars(args).get("single", False)
-    doc_builder.version = vars(args).get("version", "latest")
+    version = vars(args).get("version")
+    if not version:
+        version = "latest"
+    doc_builder.version = version
     doc_builder.local = vars(args).get("hosted", True)
     doc_builder.debug = vars(args).get("debug", True)
     doc_builder.werror = vars(args).get("werror", False)
