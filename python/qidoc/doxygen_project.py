@@ -37,6 +37,7 @@ class DoxygenProject(qidoc.project.DocProject):
         out_conf["GENERATE_XML"] = "YES" # required by qiapidoc and doylink
         out_conf["GENERATE_HTML"] = "YES"
         out_conf["GENERATE_LATEX"] = "NO"
+        out_conf["PROJECT_NAME"] = in_conf.get("PROJECT_NAME", self.name)
         if version:
             out_conf["PROJECT_NUMBER"] = version
 
@@ -56,8 +57,7 @@ class DoxygenProject(qidoc.project.DocProject):
         qisys.command.call(cmd, cwd=self.build_dir)
 
     def install(self, destdir):
-        pass
-
+        qisys.sh.install(self.html_dir, destdir)
 
     def make_rel_paths(self, value):
         """ Transform a relative path to the source into an

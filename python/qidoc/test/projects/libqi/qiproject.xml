@@ -1,5 +1,4 @@
 <project version="3">
-
   <project src="doc/doxygen" />
   <project src="doc/sphinx" />
 </project>

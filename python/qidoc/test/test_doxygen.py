@@ -9,6 +9,7 @@ def test_forced_settings(doc_worktree):
     assert conf["OUTPUT_DIRECTORY"] == foo_dox.build_dir
     assert conf["GENERATE_LATEX"] == "NO"
     assert conf["GENERATE_XML"] == "YES"
+    assert conf["PROJECT_NAME"] == "foo"
 
 def test_rewrite_relative_paths(doc_worktree):
     foo_dox = doc_worktree.create_doxygen_project("foo")
@@ -29,6 +30,16 @@ def test_with_version(doc_worktree):
     foo_dox.configure(version="1.2.3")
     conf = qidoc.doxygen.read_doxyfile(foo_dox.out_doxyfile)
     assert conf["PROJECT_NUMBER"] == "1.2.3"
+
+def test_ovewrite_name(doc_worktree):
+    foo_dox = doc_worktree.create_doxygen_project("foo")
+    conf = dict()
+    conf["PROJECT_NAME"] = "foo_overwrite"
+    qidoc.doxygen.write_doxyfile(conf, foo_dox.in_doxyfile)
+    foo_dox.configure()
+    conf = qidoc.doxygen.read_doxyfile(foo_dox.out_doxyfile)
+    assert conf["PROJECT_NAME"] == "foo_overwrite"
+
 
 def test_build(doc_worktree):
     doc_worktree.add_test_project("libqi")

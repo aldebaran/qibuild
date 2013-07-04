@@ -52,9 +52,13 @@ class SphinxProject(qidoc.project.DocProject):
             ui.error("Could not read", in_conf_py, "\n", e)
             return
 
+        if "project" not in from_conf:
+            conf += '\nproject = "%s"\n' % self.name
+
         if "version" not in from_conf:
             if kwargs.get("version"):
                 conf += '\nversion = "%s"\n' % kwargs["version"]
+
 
         if "html_theme_path" not in from_conf and self.template_project:
             conf += '\nhtml_theme_path = ["%s"]\n' % self.template_project.themes_path
