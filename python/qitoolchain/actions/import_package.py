@@ -69,7 +69,7 @@ a package name must be passed to the command line.
     package.name = package_name
     other_names.append(package_name)
     other_names = list(set(other_names))
-    tc_packages_path = qitoolchain.toolchain.get_default_packages_path(tc.name)
+    tc_packages_path = qitoolchain.toolchain.get_default_packages_path(toolchain.name)
     message = """
 Importing '{1}' in the toolchain {0} ...
 """.format(toolchain.name, package_path)
