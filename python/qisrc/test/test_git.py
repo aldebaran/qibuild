@@ -27,10 +27,7 @@ def test_name_from_url_win():
 def test_set_tracking_branch_on_empty_repo(tmpdir):
     git = qisrc.git.Git(tmpdir.strpath)
     git.init()
-    # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
-        git.set_tracking_branch("master", "master", "origin")
-    assert "no commit yet" in str(e)
+    git.set_tracking_branch("master", "master", "origin")
 
 def test_set_tracking_branch_existing_branch_tracking_none(tmpdir):
     git = qisrc.git.Git(tmpdir.strpath)
