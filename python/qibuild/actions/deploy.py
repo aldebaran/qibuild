@@ -60,5 +60,6 @@ Supported formats are:
 
 
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
+    cmake_builder.build()
     for url in urls:
         cmake_builder.deploy(url)
