@@ -33,6 +33,18 @@ def test_install_on_self(tmpdir):
         qisys.sh.install(tmpdir.strpath, tmpdir.strpath)
     assert "are the same directory" in e.value.message
 
+
+def test_filter_hidden(tmpdir):
+    src = tmpdir.ensure("src", dir=True)
+    src.join("a_file").ensure(file=True)
+    src.join(".hidden").ensure(file=True)
+    dest = tmpdir.join("dest")
+    def non_hidden(src):
+        return not src.startswith(".")
+    qisys.sh.install(src.strpath, dest.strpath, filter_fun=non_hidden)
+    assert dest.join("a_file").check(file=True)
+    assert not dest.join(".hidden").check(file=True)
+
 def test_is_path_inside():
    assert qisys.sh.is_path_inside(os.path.join("foo", "bar"), "foo")
    assert qisys.sh.is_path_inside(os.path.join("foo", "bar"),

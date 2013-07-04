@@ -168,6 +168,8 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
 
     """
     rel_root = os.path.relpath(root, src)
+    if rel_root == ".":
+        rel_root = ""
     new_root = os.path.join(dest, rel_root)
 
     for f in files:
