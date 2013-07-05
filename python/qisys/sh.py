@@ -264,12 +264,20 @@ def safe_copy(src, dest):
     """
     if os.path.isdir(dest):
         dest = os.path.join(dest, os.path.basename(src))
-    if os.path.exists(dest):
-        dest_mtime = os.stat(dest).st_mtime
-        src_mtime = os.stat(src).st_mtime
-        if src_mtime < dest_mtime:
-            return
-    shutil.copy(src, dest)
+    if not up_to_date(dest, src):
+        shutil.copy(src, dest)
+
+def up_to_date(output_path, input_path):
+    """" Return True if output_path exists and is
+    more recent than input_path
+
+    """
+    if not os.path.exists(output_path):
+        return False
+    out_mtime = os.stat(output_path).st_mtime
+    in_mtime = os.stat(input_path).st_mtime
+    return out_mtime > in_mtime
+
 
 def copy_git_src(src, dest):
     """ Copy a source to a destination but only copy the
