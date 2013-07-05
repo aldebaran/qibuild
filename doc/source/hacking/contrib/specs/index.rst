@@ -5,3 +5,4 @@ Specs
    :maxdepth: 1
 
    qidoc3
+   qivenv
