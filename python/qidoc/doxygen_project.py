@@ -20,6 +20,10 @@ class DoxygenProject(qidoc.project.DocProject):
     def out_doxyfile(self):
         return os.path.join(self.build_dir, "Doxyfile")
 
+    @property
+    def tagfile(self):
+        return os.path.join(self.build_dir, self.name + ".tag")
+
     def configure(self, **kwargs):
         """ Create a correct Doxyfile in self.build_dir.
 
@@ -38,6 +42,9 @@ class DoxygenProject(qidoc.project.DocProject):
         out_conf["GENERATE_HTML"] = "YES"
         out_conf["GENERATE_LATEX"] = "NO"
         out_conf["PROJECT_NAME"] = in_conf.get("PROJECT_NAME", self.name)
+        out_conf["WARNINGS"] = "YES"
+        out_conf["QUIET"] = "YES"
+        out_conf["GENERATE_TAGFILE"] = self.tagfile
         if version:
             out_conf["PROJECT_NUMBER"] = version
 
