@@ -34,7 +34,6 @@ class DoxygenProject(qidoc.project.DocProject):
 
         """
         version = kwargs.get("version")
-        doxydeps = kwargs.get("doxydeps", list())
         in_conf = qidoc.doxygen.read_doxyfile(self.in_doxyfile)
         out_conf = in_conf.copy()
         out_path =  os.path.join(self.build_dir, "Doxyfile")
@@ -46,6 +45,12 @@ class DoxygenProject(qidoc.project.DocProject):
         out_conf["WARNINGS"] = "YES"
         out_conf["QUIET"] = "YES"
         out_conf["GENERATE_TAGFILE"] = self.tagfile
+        doxydeps = list()
+        # no need to recusre the dependencies here, doxygen does it for us
+        for dep_name in self.depends:
+            doc_project = self.doc_worktree.get_doc_project(dep_name, raises=False)
+            if doc_project and doc_project.doc_type == "doxygen":
+                doxydeps.append(doc_project)
         if doxydeps:
             out_conf["TAGFILES"] = ""
             for doxydep in doxydeps:

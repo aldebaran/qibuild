@@ -36,9 +36,6 @@ class DocBuilder(object):
             "debug"   : self.debug,
         }
         for project in projects:
-            if project.doc_type == "doxygen":
-                doxydeps = self.get_doxydeps(project)
-                configure_args["doxydeps"] = doxydeps
             project.configure(**configure_args)
 
     def build(self):
@@ -85,18 +82,3 @@ class DocBuilder(object):
             if project:
                 projects.append(project)
         return projects
-
-    def get_doxydeps(self, base_project):
-        """ Get the list of doxygen dependencies """
-        dep_tree = dict()
-        for project in self.doc_worktree.doc_projects:
-            doxy_deps = list()
-            for dep_name in project.depends:
-                dep_project = self.doc_worktree.get_doc_project(dep_name, raises=False)
-                if dep_project and dep_project.doc_type == "doxygen":
-                    doxy_deps.append(dep_name)
-            dep_tree[project.name] = doxy_deps
-        sorted_names = qisys.sort.topological_sort(dep_tree, [base_project.name])
-        # Remove self from the list:
-        sorted_names.remove(base_project.name)
-        return [self.doc_worktree.get_doc_project(x) for x in sorted_names]
