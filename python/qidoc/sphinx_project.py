@@ -5,6 +5,7 @@ from qisys import ui
 import qisys.archive
 import qisys.sh
 import qidoc.project
+import pprint
 
 
 class SphinxProject(qidoc.project.DocProject):
@@ -63,8 +64,35 @@ class SphinxProject(qidoc.project.DocProject):
         if "html_theme_path" not in from_conf and self.template_project:
             conf += '\nhtml_theme_path = ["%s"]\n' % self.template_project.themes_path
 
+        conf += self.append_doxylink_settings(conf)
+
         out_conf_py = os.path.join(self.build_dir, "conf.py")
         qisys.sh.write_file_if_different(conf, out_conf_py)
+
+
+    def append_doxylink_settings(self, conf):
+        """ Return a string representing the doxylink settings """
+        from_conf = dict()
+        exec(conf, from_conf)
+
+        res = ""
+        if "extensions" not in from_conf:
+            res += "extensions = list()\n"
+
+        res += '\nextensions.append("sphinxcontrib.doxylink")'
+        doxydeps = list()
+        for dep_name in self.depends:
+            doc_project = self.doc_worktree.get_doc_project(dep_name, raises=False)
+            if doc_project and doc_project.doc_type == "doxygen":
+                doxydeps.append(doc_project)
+
+        doxylink = dict()
+        for doxydep in doxydeps:
+            doxylink[doxydep.name] = (doxydep.tagfile, doxydep.html_dir)
+
+        res += "\ndoxylink = " + str(doxylink)
+
+        return res
 
 
     def build(self, **kwargs):

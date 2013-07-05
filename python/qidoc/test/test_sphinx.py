@@ -2,6 +2,9 @@ import os
 
 import py
 
+from qidoc.test.conftest import find_link
+import qidoc.builder
+
 def test_no_templates(doc_worktree):
     foo_sphinx = doc_worktree.create_sphinx_project("foo")
     # pylint: disable-msg=E1101
@@ -26,6 +29,7 @@ def test_sets_project_name_when_not_defined(doc_worktree):
     foo_sphinx.configure()
     conf_py = foo_path.join("build-doc", "conf.py")
     assert 'project = "foo"' in conf_py.read()
+
 
 
 def test_version(doc_worktree):
@@ -84,3 +88,14 @@ def test_examples(doc_worktree, tmpdir):
     examples_proj.install(dest.strpath)
     assert dest.join("samples", "a", "Makefile").check(file=True)
 
+def test_doxydeps(doc_worktree, tmpdir):
+    sphinx_proj = doc_worktree.add_test_project("libworld-sphinx")
+    doxy_proj   = doc_worktree.add_test_project("libworld")
+    doc_builder = qidoc.builder.DocBuilder(doc_worktree)
+    doc_builder.base_project = sphinx_proj
+    doc_builder.configure()
+    doc_builder.build()
+    link =  find_link(sphinx_proj.index_html, "answer()")
+    target = link.attrs["href"]
+    target_path = target.split("#")[0]
+    assert os.path.exists(target_path)
