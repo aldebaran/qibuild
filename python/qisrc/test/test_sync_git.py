@@ -97,3 +97,13 @@ def test_run_abort_when_rebase_fails(git_server, tmpdir, test_git):
     assert "Rebase failed" in message
     assert foo_git.read_file("unrelated.txt") == "Unrelated changes"
     assert foo_git.read_file("README") == "README on master v1"
+
+def test_fail_if_empty(tmpdir, test_git):
+    foo_git = test_git(tmpdir.strpath)
+    branch = Branch()
+    branch.name = "master"
+    branch.tracks = "origin"
+    foo_git.set_tracking_branch("master", "origin")  # repo empty: fails
+    (res, message) = foo_git.sync_branch(branch)
+    assert res is None
+    assert "no commits" in message

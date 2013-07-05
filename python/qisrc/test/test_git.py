@@ -2,7 +2,6 @@ import os
 import qisrc.git
 from qisrc.test.conftest import TestGit
 
-import pytest
 def test_name_from_url_common():
     examples = [
         ("git@git:foo/bar.git", "foo/bar.git"),
@@ -18,36 +17,46 @@ def test_name_from_url_common():
         actual = qisrc.git.name_from_url(url)
         assert actual == expected
 
+
 def test_name_from_url_win():
     if not os.name == 'nt':
         return
     url = r"file://c:\path\to\bar.git"
     assert qisrc.git.name_from_url(url) == "bar.git"
 
+
 def test_set_tracking_branch_on_empty_repo(tmpdir):
     git = qisrc.git.Git(tmpdir.strpath)
     git.init()
-    git.set_tracking_branch("master", "master", "origin")
+    ret = git.set_tracking_branch("master", "master", "origin")
+    assert ret is False
+
 
 def test_set_tracking_branch_existing_branch_tracking_none(tmpdir):
     git = qisrc.git.Git(tmpdir.strpath)
     git.init()
     git.commit("-m", "empty", "--allow-empty")
-    git.set_tracking_branch("master", "master", "origin")
+    ret = git.set_tracking_branch("master", "master", "origin")
+    assert ret is True
+
 
 def test_set_tracking_branch_existing_branch_tracking_ok(tmpdir):
     git = qisrc.git.Git(tmpdir.strpath)
     git.init()
     git.commit("-m", "empty", "--allow-empty")
     git.set_tracking_branch("master", "origin")
-    git.set_tracking_branch("master", "origin")
+    ret = git.set_tracking_branch("master", "origin")
+    assert ret is True
+
 
 def test_set_tracking_branch_existing_branch_tracking_other(tmpdir):
     git = qisrc.git.Git(tmpdir.strpath)
     git.init()
     git.commit("-m", "empty", "--allow-empty")
     git.set_tracking_branch("master", "origin")
-    git.set_tracking_branch("master", "other")
+    ret = git.set_tracking_branch("master", "other")
+    assert ret is True
+
 
 def test_changelog(cd_to_tmpdir):
     git = TestGit()

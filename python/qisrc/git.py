@@ -211,6 +211,9 @@ class Git(object):
         in case the worktree is not clean
 
         """
+        if self.is_empty():
+            return False, "Repository has no commits"
+
         message = ""
         self.call("update-index", "--ignore-submodules", "--refresh", raises=False)
         out, _ = self.call("diff-files", "--quiet", "--ignore-submodules", raises=False)
@@ -257,7 +260,7 @@ class Git(object):
         return True
 
     def is_empty(self):
-        """ Returns true if there are no commit yet (between `git init` and
+        """ Returns true if there are no commits yet (between `git init` and
         `git commit`
 
         """
@@ -293,13 +296,14 @@ class Git(object):
         if remote_branch is None:
             remote_branch = branch
         if self.is_empty():
-            ui.error("repo in %s has no commit yet" % self.repo)
-            return
+            ui.error("repo in %s has no commits yet" % self.repo)
+            return False
         if not self.branch_exists(branch):
             self.branch(branch)
         self.set_config("branch.%s.remote" % branch, remote_name)
         self.set_config("branch.%s.merge" % branch,
                         "refs/heads/%s" % remote_branch)
+        return True
 
     def sync_branch(self, branch):
         """ git pull --rebase on steroids:
