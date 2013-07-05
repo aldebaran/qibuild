@@ -103,7 +103,10 @@ class SphinxProject(qidoc.project.DocProject):
     def generate_examples_zips(self):
         for example_src in self.examples:
             example_path = os.path.join(self.source_dir, example_src)
-            qisys.archive.compress(example_path, algo="zip", quiet=True)
+            zip_path = os.path.join(self.source_dir, example_src + ".zip")
+            if not qisys.sh.up_to_date(zip_path, example_path):
+                ui.info("Generating", zip_path)
+                qisys.archive.compress(example_path, algo="zip", quiet=True)
 
     def install(self, destdir):
         for example_src in self.examples:
