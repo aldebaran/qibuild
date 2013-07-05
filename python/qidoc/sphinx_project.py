@@ -67,7 +67,7 @@ class SphinxProject(qidoc.project.DocProject):
         qisys.sh.write_file_if_different(conf, out_conf_py)
 
 
-    def build(self, werror=False):
+    def build(self, **kwargs):
         """ Run sphinx.main() with the correct arguments """
         try:
             import sphinx
@@ -93,7 +93,7 @@ class SphinxProject(qidoc.project.DocProject):
         cmd = [sys.executable,
                "-c", self.build_dir,
                 "-b", "html"]
-        if werror:
+        if kwargs.get("werror"):
             cmd.append("-W")
         cmd.extend([self.source_dir, html_dir])
         rc = sphinx.main(argv=cmd)

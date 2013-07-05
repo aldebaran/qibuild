@@ -51,7 +51,7 @@ class DoxygenProject(qidoc.project.DocProject):
         qidoc.doxygen.write_doxyfile(out_conf, self.out_doxyfile)
 
 
-    def build(self):
+    def build(self, **kwargs):
         """ Run doxygen from the build directory """
         cmd = ["doxygen", self.out_doxyfile]
         qisys.command.call(cmd, cwd=self.build_dir)
