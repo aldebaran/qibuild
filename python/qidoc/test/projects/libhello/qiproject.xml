@@ -1,0 +1,5 @@
+<project version="3">
+  <qidoc name="libhello" type="doxygen">
+    <depends name="libworld" />
+  </qidoc>
+</project>

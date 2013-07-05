@@ -1,0 +1,12 @@
+/** \mainpage libhello
+
+
+hello();
+
+world();
+
+
+
+*/
+
+// vim:filetype=doxygen

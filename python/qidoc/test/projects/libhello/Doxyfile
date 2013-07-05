@@ -1,0 +1,3 @@
+INPUT = hello.h
+QUIET = YES
+WARNINGS = YES
