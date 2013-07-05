@@ -1,4 +1,3 @@
 INPUT = .
 QUIET = YES
 WARNINGS = YES
-TAGFILES = /home/dmerejkowsky/src/qidoc3/tools/qibuild/python/qidoc/test/projects/libworld/build-doc/libworld.tag=/home/dmerejkowsky/src/qidoc3/tools/qibuild/python/qidoc/test/projects/libworld/build-doc/html/
