@@ -15,11 +15,14 @@ mock==1.0.1
 pytest==2.3.4
 pytest-cov==1.6
 pytest-runfailed==0.3
+# For qidoc tests
+BeautifulSoup4==4.2.1
 
 # For coverage
 cov-core==1.7
 coverage==3.6
 gcovr==2.4
+
 
 # For more checks, thanks pyflakes
 pyflakes==0.6.1

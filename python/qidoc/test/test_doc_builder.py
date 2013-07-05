@@ -45,3 +45,8 @@ def test_install_doxy(doc_worktree, tmpdir):
     doc_builder.install(inst_dir.strpath)
     assert "qi" in inst_dir.join("index.html").read()
 
+def test_get_doxydeps(doc_worktree):
+    libworld_proj = doc_worktree.add_test_project("libworld")
+    libhello_proj = doc_worktree.add_test_project("libhello")
+    doc_builder = DocBuilder(doc_worktree)
+    assert doc_builder.get_doxydeps(libhello_proj) == [libworld_proj]

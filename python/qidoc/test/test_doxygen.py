@@ -1,6 +1,8 @@
 import os
 
 import qidoc.doxygen
+import qidoc.builder
+from qidoc.test.conftest import find_link
 
 def test_forced_settings(doc_worktree):
     foo_dox = doc_worktree.create_doxygen_project("foo")
@@ -40,6 +42,19 @@ def test_ovewrite_name(doc_worktree):
     conf = qidoc.doxygen.read_doxyfile(foo_dox.out_doxyfile)
     assert conf["PROJECT_NAME"] == "foo_overwrite"
 
+
+def test_depends_on_doxygen(doc_worktree):
+    libworld_proj = doc_worktree.add_test_project("libworld")
+    libhello_proj = doc_worktree.add_test_project("libhello")
+    doc_builder = qidoc.builder.DocBuilder(doc_worktree)
+    doc_builder.base_project = libhello_proj
+    doc_builder.configure()
+    doc_builder.build()
+    hello_index = libhello_proj.index_html
+    link =  find_link(hello_index, "world()")
+    target = link.attrs["href"]
+    target_path = target.split("#")[0]
+    assert os.path.exists(target_path)
 
 def test_build(doc_worktree):
     doc_worktree.add_test_project("libqi")

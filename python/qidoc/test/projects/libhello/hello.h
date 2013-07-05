@@ -12,4 +12,10 @@
  */
 int hello();
 
+
+/**
+ * \fn bar()
+ *
+ * \return nothing
+ */
 int bar();

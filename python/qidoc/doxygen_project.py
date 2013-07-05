@@ -45,6 +45,8 @@ class DoxygenProject(qidoc.project.DocProject):
         out_conf["WARNINGS"] = "YES"
         out_conf["QUIET"] = "YES"
         out_conf["GENERATE_TAGFILE"] = self.tagfile
+
+        out_conf
         if version:
             out_conf["PROJECT_NUMBER"] = version
 

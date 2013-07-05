@@ -1,3 +1,5 @@
+import bs4
+
 from qisys.test.conftest import *
 import qisys.qixml
 
@@ -16,7 +18,7 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
 
     @property
     def tmpdir(self):
-        # pylint: disable-msg=E1103
+        # pylint: disable-msg=E1101
         return py.path.local(self.root)
 
     def create_doc_project(self, name, src=None,
@@ -80,7 +82,16 @@ class QiDocAction(TestAction):
     def create_doxygen_project(self, *args, **kwargs):
         return self.doc_worktree.create_doxygen_project(*args, **kwargs)
 
-# pylint: disable-msg=E1103
+
+def find_link(html_path, text):
+    with open(html_path, "r") as fp:
+        data = fp.read()
+    soup = bs4.BeautifulSoup(data)
+    return soup.find("a", text=text)
+
+
+
+# pylint: disable-msg=E1101
 @pytest.fixture
 def doc_worktree(cd_to_tmpdir):
     return TestDocWorkTree()
