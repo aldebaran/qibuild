@@ -65,6 +65,7 @@ class SphinxProject(qidoc.project.DocProject):
             conf += '\nhtml_theme_path = ["%s"]\n' % self.template_project.themes_path
 
         conf += self.append_doxylink_settings(conf)
+        conf += self.append_intersphinx_settings(conf)
 
         out_conf_py = os.path.join(self.build_dir, "conf.py")
         qisys.sh.write_file_if_different(conf, out_conf_py)
@@ -72,14 +73,7 @@ class SphinxProject(qidoc.project.DocProject):
 
     def append_doxylink_settings(self, conf):
         """ Return a string representing the doxylink settings """
-        from_conf = dict()
-        exec(conf, from_conf)
-
-        res = ""
-        if "extensions" not in from_conf:
-            res += "extensions = list()\n"
-
-        res += '\nextensions.append("sphinxcontrib.doxylink")'
+        res = self.append_extension(conf, "sphinxcontrib.doxylink")
         doxydeps = list()
         for dep_name in self.depends:
             doc_project = self.doc_worktree.get_doc_project(dep_name, raises=False)
@@ -91,9 +85,35 @@ class SphinxProject(qidoc.project.DocProject):
             doxylink[doxydep.name] = (doxydep.tagfile, doxydep.html_dir)
 
         res += "\ndoxylink = " + str(doxylink)
-
         return res
 
+    def append_intersphinx_settings(self, conf):
+        """ Return a string representing the intersphinx settings """
+        res = self.append_extension(conf, "sphinx.ext.intersphinx")
+        sphinx_deps = list()
+        for dep_name in self.depends:
+            doc_project = self.doc_worktree.get_doc_project(dep_name, raises=False)
+            if doc_project and doc_project.doc_type == "sphinx":
+                sphinx_deps.append(doc_project)
+
+        intersphinx_mapping = dict()
+        for sphinx_dep in sphinx_deps:
+            intersphinx_mapping[sphinx_dep.name] = (
+                sphinx_dep.html_dir,
+                os.path.join(sphinx_dep.html_dir, "objects.inv")
+            )
+
+        res += "\nintersphinx_mapping= " + str(intersphinx_mapping)
+        return res
+
+    def append_extension(self, conf, extension_name):
+        from_conf = dict()
+        exec(conf, from_conf)
+        res = ""
+        if "extensions" not in from_conf:
+            res += "extensions = list()\n"
+        res += '\nextensions.append("%s")' % extension_name
+        return res
 
     def build(self, **kwargs):
         """ Run sphinx.main() with the correct arguments """

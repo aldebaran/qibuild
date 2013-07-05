@@ -31,7 +31,6 @@ def test_sets_project_name_when_not_defined(doc_worktree):
     assert 'project = "foo"' in conf_py.read()
 
 
-
 def test_version(doc_worktree):
     foo_sphinx = doc_worktree.create_sphinx_project("foo")
     # pylint: disable-msg=E1101
@@ -96,6 +95,19 @@ def test_doxydeps(doc_worktree, tmpdir):
     doc_builder.configure()
     doc_builder.build()
     link =  find_link(sphinx_proj.index_html, "answer()")
+    target = link.attrs["href"]
+    target_path = target.split("#")[0]
+    assert os.path.exists(target_path)
+
+def test_intersphinx(doc_worktree, tmpdir):
+    world_proj = doc_worktree.add_test_project("world")
+    hello_proj = doc_worktree.add_test_project("hello")
+    doc_builder = qidoc.builder.DocBuilder(doc_worktree)
+    doc_builder.werror = True
+    doc_builder.base_project = hello_proj
+    doc_builder.configure()
+    doc_builder.build()
+    link =  find_link(hello_proj.index_html, "World intro")
     target = link.attrs["href"]
     target_path = target.split("#")[0]
     assert os.path.exists(target_path)
