@@ -5,6 +5,7 @@
 /**
  * \fn hello()
  *
+ * Calls world()
  * \return 42
  *
  *
