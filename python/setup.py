@@ -31,11 +31,11 @@ scripts = [
 ]
 
 package_data = {
- "qibuild" : ["templates/project/CMakeLists.txt",
-              "templates/project/main.cpp",
-              "templates/project/test.cpp",
-              "templates/project/qiproject.xml"
-              ]
+ "qisrc" : ["templates/project/CMakeLists.txt",
+            "templates/project/main.cpp",
+            "templates/project/test.cpp",
+            "templates/project/qiproject.xml"
+           ]
 }
 
 setup(name = 'qibuild',
