@@ -137,7 +137,10 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
                                                         git_project.path)
         if not build_project:
             return [git_project]
-        git_projects = list()
+        git_projects = set()
+        # Note: GitProject aren't really hashable, but find_parent_project
+        # doesn't return a new project, so using a set here will work
+        # to remove duplicates
         deps_solver = qibuild.deps_solver.DepsSolver(self.build_worktree)
         dep_types = qibuild.parsers.get_dep_types(args)
         deps_solver.dep_types = dep_types
@@ -145,5 +148,5 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
         for build_project in build_projects:
             git_project = qisys.parsers.find_parent_project(self.git_worktree.git_projects,
                                                             build_project.path)
-            git_projects.append(git_project)
-        return git_projects
+            git_projects.add(git_project)
+        return list(git_projects)

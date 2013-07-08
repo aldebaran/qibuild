@@ -101,3 +101,17 @@ def test_groups(git_worktree, args):
     args.groups = ["mygroup"]
     get_git_projects(git_worktree, args)
     assert git_worktree.get_git_projects.call_args_list == [mock.call(groups=["mygroup"])]
+
+
+def test_no_duplicate_deps(cd_to_tmpdir, args):
+    build_worktree = TestBuildWorkTree()
+    foo = build_worktree.create_project("foo", rdepends=["foo/bar"])
+    build_worktree.create_project("foo/bar")
+    git = qisrc.git.Git(foo.path)
+    git.init()
+    git_worktree = TestGitWorkTree()
+
+    with qisys.sh.change_cwd(cd_to_tmpdir.join("foo").strpath):
+        projs = get_git_projects(git_worktree, args, default_all=True,
+                                 use_build_deps=True)
+    assert projs == [foo]
