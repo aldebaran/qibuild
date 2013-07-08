@@ -1,0 +1,18 @@
+src/main/resources/
+
+# Ignore unpacked C++ librairies
+jni/*.so
+jni/*.a
+
+# Ignore compilation folder
+target/
+jni/nativeqimessaging.jar
+doc/
+
+# Ignore Eclipse configuration files
+.classpath
+.project
+.settings
+
+# Ignore native jar
+hellojavajni.jar

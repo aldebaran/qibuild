@@ -1,0 +1,9 @@
+<!--<project name="hellojava">
+  <depends runtime="true" buildtime="true" names="hellojavajni"/>
+</project>-->
+<project version="3">
+    <qibuild name="hellojava" type="maven">
+        <depends buildtime="true" runtime="true" names="hellojavajni" />
+    </qibuild>
+</project>
+
