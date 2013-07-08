@@ -27,6 +27,7 @@ class SphinxProject(qidoc.project.DocProject):
 
     def configure(self, **kwargs):
         """ Create a correct conf.py in self.build_dir """
+        rel_paths = kwargs.get("rel_paths", False)
         in_conf_py = os.path.join(self.source_dir, "conf.in.py")
         if os.path.exists(in_conf_py):
             if not self.template_project:
@@ -64,14 +65,14 @@ class SphinxProject(qidoc.project.DocProject):
         if "html_theme_path" not in from_conf and self.template_project:
             conf += '\nhtml_theme_path = ["%s"]\n' % self.template_project.themes_path
 
-        conf += self.append_doxylink_settings(conf)
-        conf += self.append_intersphinx_settings(conf)
+        conf += self.append_doxylink_settings(conf, rel_paths=rel_paths)
+        conf += self.append_intersphinx_settings(conf, rel_paths=rel_paths)
 
         out_conf_py = os.path.join(self.build_dir, "conf.py")
         qisys.sh.write_file_if_different(conf, out_conf_py)
 
 
-    def append_doxylink_settings(self, conf):
+    def append_doxylink_settings(self, conf, rel_paths=False):
         """ Return a string representing the doxylink settings """
         res = self.append_extension(conf, "sphinxcontrib.doxylink")
         doxydeps = list()
@@ -82,12 +83,16 @@ class SphinxProject(qidoc.project.DocProject):
 
         doxylink = dict()
         for doxydep in doxydeps:
-            doxylink[doxydep.name] = (doxydep.tagfile, doxydep.html_dir)
+            if rel_paths:
+                dep_path = os.path.relpath(doxydep.dest, self.dest)
+            else:
+                dep_path = os.path.relpath(doxydep.html_dir)
+            doxylink[doxydep.name] = (doxydep.tagfile, dep_path)
 
-        res += "\ndoxylink = " + str(doxylink)
+        res += "\ndoxylink = %s\n" % str(doxylink)
         return res
 
-    def append_intersphinx_settings(self, conf):
+    def append_intersphinx_settings(self, conf, rel_paths=False):
         """ Return a string representing the intersphinx settings """
         res = self.append_extension(conf, "sphinx.ext.intersphinx")
         sphinx_deps = list()
@@ -98,8 +103,13 @@ class SphinxProject(qidoc.project.DocProject):
 
         intersphinx_mapping = dict()
         for sphinx_dep in sphinx_deps:
+            if rel_paths:
+                dep_path = os.path.relpath(sphinx_dep.dest, self.dest)
+            else:
+                dep_path = sphinx_dep.html_dir
+
             intersphinx_mapping[sphinx_dep.name] = (
-                sphinx_dep.html_dir,
+                dep_path,
                 os.path.join(sphinx_dep.html_dir, "objects.inv")
             )
 

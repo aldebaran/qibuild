@@ -87,8 +87,10 @@ def find_link(html_path, text):
     with open(html_path, "r") as fp:
         data = fp.read()
     soup = bs4.BeautifulSoup(data)
-    return soup.find("a", text=text)
-
+    link = soup.find("a", text=text)
+    target = link.attrs["href"]
+    target_path = target.split("#")[0]
+    return target_path
 
 
 # pylint: disable-msg=E1101

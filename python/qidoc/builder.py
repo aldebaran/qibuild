@@ -59,10 +59,19 @@ class DocBuilder(object):
                 real_dest = destdir
             else:
                 real_dest = os.path.join(destdir, project.dest)
+            project.dest = real_dest
             ui.info_count(i, len(projects),
                           ui.green, "Installing",
                           ui.blue, project.name,
                           ui.reset, "->", ui.white, real_dest)
+            configure_args = {
+                "version"   : self.version,
+                "hosted"    : self.hosted,
+                "debug"     : self.debug,
+                "rel_paths" : True,
+            }
+            project.configure(**configure_args)
+            project.build()
             project.install(real_dest)
 
     def get_dep_projects(self):

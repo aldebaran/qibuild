@@ -34,6 +34,7 @@ class DoxygenProject(qidoc.project.DocProject):
 
         """
         version = kwargs.get("version")
+        rel_paths = kwargs.get("rel_paths", False)
         in_conf = qidoc.doxygen.read_doxyfile(self.in_doxyfile)
         out_conf = in_conf.copy()
         out_path =  os.path.join(self.build_dir, "Doxyfile")
@@ -54,7 +55,11 @@ class DoxygenProject(qidoc.project.DocProject):
         if doxydeps:
             out_conf["TAGFILES"] = ""
             for doxydep in doxydeps:
-                out_conf["TAGFILES"] += doxydep.tagfile + "=" + doxydep.html_dir + " "
+                if rel_paths:
+                    dep_path = os.path.relpath(doxydep.dest, self.dest)
+                else:
+                    dep_path = doxydep.html_dir
+                out_conf["TAGFILES"] += doxydep.tagfile + "=" + dep_path + " "
 
         if version:
             out_conf["PROJECT_NUMBER"] = version

@@ -268,6 +268,13 @@ Build type
 This as an impact on both the implementation of the ``qidoc-ref`` directive,
 and on the templates.
 
+Building and installing
+-----------------------
+
+When building: configure everything with absolute paths (easier)
+
+When installing: re-configure everything with relative paths before installing
+
 
 Examples
 ---------
