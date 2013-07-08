@@ -1,4 +1,5 @@
 project = u'qiBuild'
+version = '3.0'
 sys.path.insert(0, os.path.abspath('../tools'))
 # for autodoc
 sys.path.insert(0, os.path.abspath('../../python'))
