@@ -277,9 +277,6 @@ Found an invalid sub project: {1}
     def __ne__(self, other):
         return not (self.__eq__, other)
 
-    def __hash__(self):
-        return hash(self.src)
-
 def repr_list_projects(projects, name = "projects"):
     res = ""
     if len(projects):
