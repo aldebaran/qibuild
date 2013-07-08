@@ -1,7 +1,11 @@
-.. _qibuild2-man-page:
+qibuild
+=======
 
-qibuild man page
-================
+------------------------------------
+Compilation of C++ sources made easy
+------------------------------------
+
+:Manual section: 1
 
 
 SYNOPSIS
@@ -36,7 +40,6 @@ create PROJECT
 
 All following command accept a ``-c,--config`` argument which should be
 the name of a toolchain (``-c system`` to use the native toolchain).
-See :ref:`qitoolchain-man-page`.
 
 configure [PROJECT]
   Configure a project.
@@ -75,7 +78,7 @@ run [PROGRAM]
 
 .. note::
 
-  ``qiBuild configure`` support SYSCONFDIR.
+  ``qiBuild configure`` supports SYSCONFDIR.
 
   To set a SYSCONFDIR, just add the definition on the ``qibuild configure``
   command line.

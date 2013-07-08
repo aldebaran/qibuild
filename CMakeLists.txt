@@ -40,7 +40,7 @@ if(QIBUILD_CMAKE_ONLY)
   return()
 endif()
 
-option(WITH_DOCS "Build documentation with sphinx" ON)
+option(WITH_DOCS "Build man pages" ON)
 
 find_program(PYTHON_EXECUTABLE NAMES python2 python python.exe
   PATHS
@@ -86,44 +86,25 @@ if(NOT WITH_DOCS)
   return()
 endif()
 
-# Generate man pages and documentation with sphinx:
-find_program(_sphinx_build NAMES sphinx-build2 sphinx-build)
-if(NOT _sphinx_build)
-  message(STATUS "Please install python-sphinx to generate "
-  "documentation and man pages"
-  )
-else()
-  execute_process(COMMAND
-    ${_sphinx_build}
-    "-b" "man"
-    "${CMAKE_SOURCE_DIR}/doc/source"
-    "${CMAKE_BINARY_DIR}/man1"
-  )
-  install(
-    DIRECTORY    ${CMAKE_BINARY_DIR}/man1
-    DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/man/
-    PATTERN      ".doctrees" EXCLUDE
-    PATTERN      "_sources" EXCLUDE
-  )
+# Generate man pages with rst2man (part of docutils)
+find_program(_rst2man NAMES rst2man rst2man.py)
+if(NOT _rst2man)
+  message(STATUS "Please install docutils to generate man pages")
+  return()
 endif()
 
-if(_sphinx_build)
-  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc)
-  add_custom_target("html-doc"
-    ALL
-      ${PYTHON_EXECUTABLE}
-       "${CMAKE_SOURCE_DIR}/doc/tools/gen_cmake_doc.py"
-       "${CMAKE_SOURCE_DIR}"
-    COMMAND
-      ${_sphinx_build}
-      "-b" "html"
-      ${CMAKE_SOURCE_DIR}/doc/source
-      ${CMAKE_BINARY_DIR}/doc/html
+file(GLOB _man_srcs ${CMAKE_SOURCE_DIR}/doc/source/man/*.rst)
+set(_man_out "${CMAKE_BINARY_DIR}/man1")
+file(MAKE_DIRECTORY ${_man_out})
+set(_commands)
+foreach(_man_rst ${_man_srcs})
+  get_filename_component(_name ${_man_rst} NAME_WE)
+  list(APPEND _commands
+    COMMAND ${_rst2man} "${_man_rst}" "${_man_out}/${_name}.1"
   )
-  install(
-    DIRECTORY ${CMAKE_BINARY_DIR}/doc/html
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/qibuild/doc
-    PATTERN      ".doctrees" EXCLUDE
-    PATTERN      "_sources" EXCLUDE
-  )
-endif()
+endforeach()
+add_custom_target(man ALL ${_commands})
+install(
+  DIRECTORY    ${CMAKE_BINARY_DIR}/man1
+  DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/man/
+)

@@ -1,7 +1,11 @@
-.. _qisrc-man-page:
+qisrc
+=====
 
-qisrc man page
-==============
+------------------------------------
+Managing several git projects
+------------------------------------
+
+:Manual section: 1
 
 SYNOPSIS
 --------

@@ -1,7 +1,11 @@
-.. _qitoolchain-man-page:
+qitoolchain
+===========
 
-qitoolchain man page
-====================
+------------------------------------
+Managing pre-compiled binaries
+------------------------------------
+
+:Manual section: 1
 
 SYNOPSIS
 --------
@@ -53,9 +57,8 @@ you should pass the ``-c system`` option.
 Note: to use a toolchain, you must pass the ``-c`` option to your
 ``qibuild`` action, or set a default toolchain in the
 configuration file of you worktree (``QI_WORK_TREE/.qi/qibuild.xml``)
-like this:
+like this::
 
-.. code-block:: ini
 
   <qibuild version="1">
     <defaults config=NAME />
