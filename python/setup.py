@@ -17,6 +17,8 @@ packages = [
     "qitoolchain",
     "qitoolchain.actions",
     "qitoolchain.binary_package",
+    "qimvn",
+    "qimvn.actions"
 ]
 
 scripts = [
