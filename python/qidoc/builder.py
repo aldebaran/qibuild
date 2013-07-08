@@ -1,3 +1,4 @@
+from qisys import ui
 import qisys.sort
 
 
@@ -37,7 +38,9 @@ class DocBuilder(object):
 
         """
         projects = self.get_dep_projects()
-        for project in projects:
+        for i, project in enumerate(projects):
+            ui.info_count(i, len(projects),
+                          ui.green, "Building", ui.blue, project.name)
             project.build()
 
     def install(self, destdir):
@@ -45,8 +48,16 @@ class DocBuilder(object):
 
         """
         projects = self.get_dep_projects()
-        for project in projects:
-            project.install(destdir)
+        for i, project in enumerate(projects):
+            if i == len(projects) - 1:
+                real_dest = destdir
+            else:
+                real_dest = os.path.join(destdir, project.dest)
+            ui.info_count(i, len(projects),
+                          ui.green, "Installing",
+                          ui.blue, project.name,
+                          ui.reset, "-->", ui.white, real_dest)
+            project.install(real_dest)
 
     def get_dep_projects(self):
         """ Get the list of project deps

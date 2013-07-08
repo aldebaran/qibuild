@@ -21,12 +21,6 @@ class SphinxProject(qidoc.project.DocProject):
         return os.path.join(self.path, "source")
 
     @property
-    def html_dir(self):
-        html_dir = os.path.join(self.build_dir, "html")
-        qisys.sh.mkdir(html_dir)
-        return html_dir
-
-    @property
     def template_project(self):
         return self.doc_worktree.template_project
 
@@ -108,7 +102,15 @@ class SphinxProject(qidoc.project.DocProject):
             qisys.archive.compress(example_path, algo="zip", quiet=True)
 
     def install(self, destdir):
-        pass
+        for example_src in self.examples:
+            example_path = os.path.join(self.source_dir, example_src)
+            real_dest = os.path.join(destdir, example_src)
+            qisys.sh.install(example_path, real_dest)
+
+        def non_hidden(src):
+            return not src.startswith(".")
+
+        qisys.sh.install(self.html_dir, destdir, filter_fun=non_hidden)
 
 
 class SphinxBuildError(Exception):

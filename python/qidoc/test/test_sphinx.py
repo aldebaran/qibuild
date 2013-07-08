@@ -67,7 +67,11 @@ def test_prebuild(doc_worktree):
     qi_sphinx.build(werror=True)
 
 
-def test_examples(doc_worktree):
+def test_examples(doc_worktree, tmpdir):
     examples_proj = doc_worktree.add_test_project("examples")
     examples_proj.configure()
     examples_proj.build(werror=True)
+    dest = tmpdir.mkdir("dest")
+    examples_proj.install(dest.strpath)
+    assert dest.join("samples", "a", "Makefile").check(file=True)
+

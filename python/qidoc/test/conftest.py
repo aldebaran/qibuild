@@ -19,7 +19,9 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
         # pylint: disable-msg=E1103
         return py.path.local(self.root)
 
-    def create_doc_project(self, name, src=None, depends=None, doc_type="sphinx"):
+    def create_doc_project(self, name, src=None,
+                           depends=None, doc_type="sphinx",
+                           dest=None):
         if not depends:
             depends = list()
         if not src:
@@ -36,6 +38,8 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
             dep_elem = qisys.qixml.etree.Element("depends")
             dep_elem.set("name", dep_name)
             qidoc_elem.append(dep_elem)
+        if dest:
+            qidoc_elem.set("dest", dest)
         qiproject_xml = proj_path.join("qiproject.xml").strpath
         qisys.qixml.write(project_elem, qiproject_xml)
         self.worktree.add_project(src)

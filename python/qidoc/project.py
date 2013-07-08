@@ -15,6 +15,8 @@ class DocProject(object):
         self.path = project.path
         if not depends:
             depends = list()
+        if not dest:
+            dest = self.name
         self.depends = list()
         self.dest = dest
         self.prebuild_script = None
@@ -36,6 +38,12 @@ class DocProject(object):
         build_dir = os.path.join(self.path, "build-doc")
         qisys.sh.mkdir(build_dir)
         return build_dir
+
+    @property
+    def html_dir(self):
+        html_dir = os.path.join(self.build_dir, "html")
+        qisys.sh.mkdir(html_dir)
+        return html_dir
 
     @property
     def index_html(self):

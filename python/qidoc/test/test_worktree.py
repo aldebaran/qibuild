@@ -19,6 +19,11 @@ def test_qidoc2_happy(qidoc_action):
     tmpl_proj = doc_worktree.template_project
     assert tmpl_proj.src == "qidoc2/templates"
 
+def test_read_deps(doc_worktree):
+    world_proj = doc_worktree.add_test_project("world")
+    hello_proj = doc_worktree.add_test_project("hello")
+    assert hello_proj.depends == ["world"]
+
 def test_prebuild(doc_worktree):
     prebuild_proj = doc_worktree.add_test_project("prebuild")
     assert prebuild_proj.name == "prebuild"
