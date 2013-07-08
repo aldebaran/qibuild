@@ -173,3 +173,17 @@ def test_sync_dash_g(qisrc_action, git_server):
     other_proj = git_worktree.get_git_project("other")
     other_git = TestGit(other_proj.path)
     assert other_git.read_file("other.txt") == "change 1"
+
+def test_incorrect_branch_still_fetches(qisrc_action, git_server):
+    git_server.create_repo("foo.git")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("sync")
+    git_worktree = TestGitWorkTree()
+    foo = git_worktree.get_git_project("foo")
+    test_git = TestGit(foo.path)
+    test_git.checkout("-b", "wip")
+    git_server.push_file("foo.git", "foo.txt", "some change")
+    previous_sha1 = test_git.get_ref_sha1("refs/remotes/origin/master")
+    foo.sync()
+    new_sha1 = test_git.get_ref_sha1("refs/remotes/origin/master")
+    assert previous_sha1 != new_sha1

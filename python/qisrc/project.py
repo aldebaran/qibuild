@@ -157,9 +157,11 @@ class GitProject(object):
 
         current_branch = git.get_current_branch()
         if not current_branch:
+            git.fetch_default(branch)
             return None, "Not on any branch"
 
         if current_branch != branch.name and not rebase_devel:
+            git.fetch_default(branch)
             return None, "Not on the correct branch. " + \
                          "On %s but should be on %s" % (current_branch, branch.name)
 

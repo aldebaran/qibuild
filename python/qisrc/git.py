@@ -305,6 +305,14 @@ class Git(object):
                         "refs/heads/%s" % remote_branch)
         return True
 
+    def fetch_default(self, branch):
+        """ Fetch the default remote of branch """
+        if branch.tracks:
+            fetch_cmd = ("fetch", branch.tracks)
+        else:
+            fetch_cmd = ("fetch")
+        self.call(*fetch_cmd)
+
     def sync_branch(self, branch):
         """ git pull --rebase on steroids:
 
