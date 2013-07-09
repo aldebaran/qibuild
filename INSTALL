@@ -12,15 +12,24 @@ have an up-to-date qibuild.
 This is the preferred method right now.
 
 
-Linux, Mac
-+++++++++++
+Linux, Mac, Windows from ``git-bash`` or mingw
++++++++++++++++++++++++++++++++++++++++++++++++
 
 Simply run::
 
-  ./install-qibuild.sh
+  ./generate-sourceme.sh
 
-Windows
-+++++++
+And then patch your ``~/.profile`` to look like::
+
+  source /path/to/qibuild/sourceme.sh
+
+
+This makes it possible to use ``qibuild`` without
+setting ``PYTHONPATH``, and adds some tools to your shell,
+such as ``qicd``
+
+Windows from cmd.exe
++++++++++++++++++++++
 
 
 * Make sure ``c:\Python27`` and ``c:\Python27\scripts`` are in ``%PATH%``
@@ -31,15 +40,7 @@ Then run::
   install-qibuild.bat
 
 
-qicd
-++++
-
-If you want to use `qicd` from your shell, you have to :
-
-* run install-qibuild.sh
-* source the ``python/bin/qicd.sh`` script in you ``~/.profile`` or similar
-
-(Tested with bash and zsh, works on mingwin's bash on Windows, too)
+Net that you won't be able to use ``qicd`` from the ``cmd.exe``
 
 
 Packaging qibuild
