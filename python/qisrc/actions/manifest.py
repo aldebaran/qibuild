@@ -62,10 +62,12 @@ def list_manifests(git_worktree):
     ui.info(ui.green, "Manifests configured in",
             ui.reset, ui.bold, git_worktree.root)
     for name, manifest in git_worktree.manifests.iteritems():
-        ui.info(ui.green, " * ", ui.blue, name)
+        ui.info(ui.green, " * ", ui.blue, name,
+                ui.reset, "(on %s)" % manifest.branch)
         ui.info(ui.tabs(2), "url:", manifest.url)
         if manifest.groups:
             ui.info(ui.tabs(2), "groups:", ", ".join(manifest.groups))
+
 
 
 def remove_manifest(git_worktree, args):

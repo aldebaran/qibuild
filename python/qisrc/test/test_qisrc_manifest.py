@@ -35,6 +35,17 @@ def test_list_groups(qisrc_action, git_server, record_messages):
     assert record_messages.find("groups")
     assert record_messages.find("mygroup")
 
+def test_list_branch(qisrc_action, git_server, record_messages):
+    git_server.switch_manifest_branch("devel")
+    manifest_url = git_server.manifest_url
+    qisrc_action("manifest", "--add", "default", manifest_url,
+                 "--branch", "devel")
+    record_messages.reset()
+    qisrc_action("manifest", "--list")
+    found_url = record_messages.find("url")
+    assert "manifest.git"  in found_url
+    assert record_messages.find("devel")
+
 def test_add(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     qisrc_action("manifest", "--add", "mymanifest", manifest_url)
