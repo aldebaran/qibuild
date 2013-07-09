@@ -1,4 +1,5 @@
 import qibuild.cmake_builder
+import qibuild.parsers
 
 import mock
 import pytest
@@ -63,3 +64,11 @@ def test_default_install(build_worktree, toolchains, tmpdir):
     cmake_builder.configure()
     cmake_builder.build()
     cmake_builder.install(tmpdir.strpath)
+
+def test_runtime_single(build_worktree, args):
+    build_worktree.create_project("hello", rdepends="bar")
+    args.projects = ["hello"]
+    args.runtime_only = True
+    args.single = True
+    cmake_builder = qibuild.parsers.get_cmake_builder(args)
+    assert cmake_builder.dep_types == []

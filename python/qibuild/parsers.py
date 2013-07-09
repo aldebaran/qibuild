@@ -116,12 +116,12 @@ def get_one_build_project(build_worktree, args):
 
 def get_dep_types(args):
     """ Get a list of dep types from the command line """
+    if args.single:
+        return list()
     if hasattr(args, "runtime_only") and args.runtime_only:
         return ["runtime"]
     if hasattr(args, "build_only") and args.build_only:
         return ["build"]
-    if args.single:
-        return list()
     return ["build", "runtime"]
 
 def get_cmake_builder(args):
