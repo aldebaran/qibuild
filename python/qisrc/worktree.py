@@ -169,9 +169,17 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         git_project = qisrc.project.GitProject(self, worktree_project)
         if os.path.exists(git_project.path):
             git = qisrc.git.Git(git_project.path)
+            git_root = qisrc.git.get_repo_root(git_project.path)
+            if not git_root == git_project.path:
+                # Nested git projects:
+                return self._clone_missing(git_project, repo)
             if git.is_valid() and git.is_empty():
                 ui.warning("Removing empty git project in", git_project.src)
                 qisys.sh.rm(git_project.path)
+            else:
+                # Do nothing, the remote will be re-configured later
+                # anyway
+                return True
         return self._clone_missing(git_project, repo)
 
     def _clone_missing(self, git_project, repo):
@@ -179,14 +187,14 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         clone_url = repo.clone_url
         qisys.sh.mkdir(git_project.path, recursive=True)
         git = qisrc.git.Git(git_project.path)
-        with git.transaction() as transaction:
-            remote_name = repo.default_remote.name
+        remote_name = repo.default_remote.name
+        try:
             git.init()
             git.remote("add", remote_name, clone_url)
             git.fetch(remote_name)
             git.checkout("-b", branch, "%s/%s" % (remote_name, branch))
-        if not transaction.ok:
-            ui.error("Cloning repo failed", transaction.output)
+        except:
+            ui.error("Cloning repo failed")
             return False
         self.save_project_config(git_project)
         self.load_git_projects()

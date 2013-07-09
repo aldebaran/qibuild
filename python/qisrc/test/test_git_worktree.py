@@ -110,6 +110,22 @@ def test_clone_missing_evil_nested(git_worktree, git_server):
     assert len(git_worktree.git_projects) == 2
 
 
+def test_clone_missing_already_correct(git_worktree, git_server, record_messages):
+    foo_repo = git_server.create_repo("FooBar")
+    git_worktree.clone_missing(foo_repo)
+    git_worktree.worktree.remove_project("FooBar")
+    git_worktree.clone_missing(foo_repo)
+    assert record_messages.find("ERROR") is None
+
+def test_clone_missing_empty(git_worktree, git_server, record_messages):
+    foo_repo = git_server.create_repo("foo")
+    foo_path = git_worktree.tmpdir.ensure("foo", dir=True)
+    git = qisrc.git.Git(foo_path.strpath)
+    git.init()
+    git_worktree.clone_missing(foo_repo)
+    assert record_messages.find("WARN")
+
+
 def test_read_groups(git_worktree, git_server):
     manifest_url = git_server.manifest_url
     git_server.create_group("foobar", ["foo", "bar"])
