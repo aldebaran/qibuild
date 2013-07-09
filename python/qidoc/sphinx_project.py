@@ -63,7 +63,7 @@ class SphinxProject(qidoc.project.DocProject):
 
 
         if "html_theme_path" not in from_conf and self.template_project:
-            conf += '\nhtml_theme_path = ["%s"]\n' % self.template_project.themes_path
+            conf += '\nhtml_theme_path = [r"%s"]\n' % self.template_project.themes_path
 
         conf += self.append_doxylink_settings(conf, rel_paths=rel_paths)
         conf += self.append_intersphinx_settings(conf, rel_paths=rel_paths)
@@ -105,12 +105,13 @@ class SphinxProject(qidoc.project.DocProject):
         for sphinx_dep in sphinx_deps:
             if rel_paths:
                 dep_path = os.path.relpath(sphinx_dep.dest, self.dest)
+                dep_path = qisys.sh.to_posix_path(dep_path)
             else:
                 dep_path = sphinx_dep.html_dir
 
             intersphinx_mapping[sphinx_dep.name] = (
                 dep_path,
-                os.path.join(sphinx_dep.html_dir, "objects.inv")
+                os.path.join(r"%s" % sphinx_dep.html_dir, "objects.inv")
             )
 
         res += "\nintersphinx_mapping= " + str(intersphinx_mapping)
