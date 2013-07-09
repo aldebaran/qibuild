@@ -85,8 +85,9 @@ class SphinxProject(qidoc.project.DocProject):
         for doxydep in doxydeps:
             if rel_paths:
                 dep_path = os.path.relpath(doxydep.dest, self.dest)
+                dep_path = qisys.sh.to_posix_path(dep_path)
             else:
-                dep_path = os.path.relpath(doxydep.html_dir)
+                dep_path = r"%s"  % doxydep.html_dir
             doxylink[doxydep.name] = (doxydep.tagfile, dep_path)
 
         res += "\ndoxylink = %s\n" % str(doxylink)
