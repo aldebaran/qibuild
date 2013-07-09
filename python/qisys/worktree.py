@@ -12,10 +12,10 @@ import ntpath
 import posixpath
 import operator
 
+import qisys.project
 import qisys.command
 import qisys.sh
 import qisys.qixml
-
 
 
 class WorkTree(object):
@@ -99,7 +99,6 @@ worktree root: {1}
         return worktree_xml
 
 
-
     def has_project(self, path):
         src = self.normalize_path(path)
         srcs = (p.src for p in self.projects)
@@ -113,7 +112,7 @@ worktree root: {1}
         self.projects = list()
         srcs = self.cache.get_srcs()
         for src in srcs:
-            project = WorkTreeProject(self, src)
+            project = qisys.project.WorkTreeProject(self, src)
             project.parse_qiproject_xml()
             self.projects.append(project)
 
@@ -130,7 +129,7 @@ worktree root: {1}
         for sub_project_src in project.subprojects:
             src = os.path.join(project.src, sub_project_src)
             src = qisys.sh.to_posix_path(src)
-            sub_project = WorkTreeProject(self, src)
+            sub_project = qisys.project.WorkTreeProject(self, src)
             sub_project.parse_qiproject_xml()
             res.add(sub_project)
             self._rec_parse_sub_projects(sub_project, res)
@@ -230,52 +229,6 @@ worktree root: {1}
         res += ">\n"
         return res
 
-
-class WorkTreeProject(object):
-    def __init__(self, worktree, src):
-        self.worktree = worktree
-        self.src = src
-        self.subprojects = list()
-
-    @property
-    def path(self):
-        """Give the path in native form."""
-        path = os.path.join(self.worktree.root, self.src)
-        return qisys.sh.to_native_path(path)
-
-    @property
-    def qiproject_xml(self):
-        """Give the path to the qiproject.xml."""
-        xml_path = os.path.join(self.path, "qiproject.xml")
-        return xml_path
-
-    def parse_qiproject_xml(self):
-        if not os.path.exists(self.qiproject_xml):
-            return
-        tree = qisys.qixml.read(self.qiproject_xml)
-        project_elems = tree.findall("project")
-        for project_elem in project_elems:
-            sub_src = qisys.qixml.parse_required_attr(project_elem, "src",
-                                                      xml_path=self.qiproject_xml)
-            if sub_src == ".":
-                continue
-            full_path = os.path.join(self.path, sub_src)
-            if not os.path.exists(full_path):
-                raise WorkTreeError(""" \
-Invalid qiproject.xml detected (in {0})
-Found an invalid sub project: {1}
-{2} does not exist
-""".format(self.qiproject_xml, sub_src, full_path))
-            self.subprojects.append(sub_src)
-
-    def __repr__(self):
-        return "<WorkTreeProject in %s>" % self.src
-
-    def __eq__(self, other):
-        return self.src == other.src
-
-    def __ne__(self, other):
-        return not (self.__eq__, other)
 
 def repr_list_projects(projects, name = "projects"):
     res = ""
