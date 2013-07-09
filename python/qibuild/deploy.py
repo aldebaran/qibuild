@@ -7,6 +7,8 @@
 import urlparse
 import os
 
+from collections import OrderedDict
+
 from qisys import ui
 import qisys.command
 import qibuild.deploy
@@ -150,22 +152,6 @@ def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir, po
     os.chmod(remote_gdb_script_path, 0755)
     return remote_gdb_script_path
 
-def _uniq(seq):
-    """ Make sure no two same elements end up in the
-    given sequence, using the idfun passed as parameter
-
-    Note that the order is preserved
-
-    """
-    seen = set()
-    result = []
-    for item in seq:
-        if item in seen:
-            continue
-        seen.add(item)
-        result.append(item)
-    return result
-
 def _get_subfolder(directory):
     res = list()
     for root, dirs, files in os.walk(directory):
@@ -191,7 +177,8 @@ def _generate_solib_search_path(cmake_builder, project_name):
     for dep_package in dep_packages:
         dep_lib_dir = os.path.join(dep_package.path, "lib")
         res.extend(_get_subfolder(dep_lib_dir))
-    return _uniq(res)
+    # Idiom to sort an iterable preserving order
+    return list(OrderedDict.fromkeys(res))
 
 def generate_debug_scripts(cmake_builder, project_name, url, port=22):
     """ generate all scripts needed for debug """
