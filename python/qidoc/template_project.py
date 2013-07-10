@@ -22,9 +22,5 @@ class TemplateProject(object):
     def themes_path(self):
         return  os.path.join(self.path, "sphinx", "_themes")
 
-    @property
-    def sys_path(self):
-        return [os.path.join(self.path, "sphinx", "tools")]
-
     def __repr__(self):
         return "<TemplateProject in %s>" % self.src

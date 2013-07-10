@@ -148,11 +148,6 @@ class SphinxProject(qidoc.project.DocProject):
         self.generate_examples_zips()
 
         html_dir = os.path.join(self.build_dir, "html")
-        if self.template_project:
-            for path in self.template_project.sys_path:
-                if path not in sys.path:
-                    sys.path.insert(0, path)
-
         cmd = [sys.executable,
                "-c", self.build_dir,
                 "-b", "html"]
