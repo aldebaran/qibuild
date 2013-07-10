@@ -49,7 +49,10 @@ class SphinxProject(qidoc.project.DocProject):
 
         from_conf = dict()
         try:
+            # quick hack if conf.in.py used __file__
+            from_conf["__file__"] = in_conf_py
             exec(conf, from_conf)
+            conf = conf.replace("__file__", 'r"%s"' % in_conf_py)
         except Exception, e:
             ui.error("Could not read", in_conf_py, "\n", e)
             return

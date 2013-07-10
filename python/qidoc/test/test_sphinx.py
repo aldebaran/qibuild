@@ -41,6 +41,20 @@ def test_version(doc_worktree):
     conf_py = foo_path.join("build-doc", "conf.py").read()
     assert 'version = "1.2.3"' in conf_py
 
+
+def test_handles_dunder_file(doc_worktree):
+    foo_sphinx = doc_worktree.create_sphinx_project("foo")
+    # pylint: disable-msg=E1101
+    foo_path = py.path.local(foo_sphinx.path)
+    conf_py_path = foo_path.join("source", "conf.py").ensure(file=True)
+    conf_py_path.write("this_file = __file__\n")
+    foo_sphinx.configure(version="1.2.3")
+    conf_py = foo_path.join("build-doc", "conf.py").read()
+    new_conf = dict()
+    exec(conf_py, new_conf)
+    assert new_conf["this_file"] == conf_py_path.strpath
+
+
 def test_with_template(doc_worktree):
     foo_sphinx = doc_worktree.create_sphinx_project("foo")
     doc_worktree.add_templates()
