@@ -21,7 +21,7 @@ def get_paths(config=None):
         paths += [proj.sdk_directory]
     return paths
 
-def test_deploy(qibuild_action):
+def test_deploy(qibuild_action, local_repository):
     """ Test if directory where jar must be deployed exists.
     """
     qibuild_action.add_test_project("hellojavajni")
@@ -32,17 +32,17 @@ def test_deploy(qibuild_action):
     jarpath = jar.jar(jarname, ["hellojavajni"], get_paths())
     assert jarpath
 
-    deploy_path = "/tmp/test/maven/"
+    deploy_path = local_repository.replace("file://", "")
     artifactId = "hellojavajni"
     ver = "1.0"
-    assert deploy.deploy("com.test", ver, artifactId, jarname, "file://" + deploy_path) == 0
+    assert deploy.deploy("com.test", ver, artifactId, jarname, local_repository) == 0
     deploy_path = os.path.join(deploy_path, "com/test")
     deploy_path = os.path.join(deploy_path, artifactId)
     deploy_path = os.path.join(deploy_path, ver)
     deployed_jar = os.path.join(deploy_path, artifactId + "-" + ver + ".jar")
     assert os.path.exists(deployed_jar)
 
-def test_failing_deploy(qibuild_action):
+def test_failing_deploy(qibuild_action, local_repository):
     """ Test exceptions.
     """
     qibuild_action.add_test_project("hellojavajni")
@@ -53,16 +53,16 @@ def test_failing_deploy(qibuild_action):
     jarpath = jar.jar(jarname, ["hellojavajni"], get_paths())
     assert jarpath
 
-    deploy_path = "/tmp/test/maven/"
+    deploy_path = local_repository.replace("file://", "")
     artifactId = "hellojavajni"
     ver = "1.0"
     #pylint: disable-msg
     with pytest.raises(CommandFailedException) as e:
-        deploy.deploy("", ver, artifactId, jarname, "file://" + deploy_path)
+        deploy.deploy("", ver, artifactId, jarname, local_repository)
     assert e.value.returncode == 1
 
     with pytest.raises(CommandFailedException) as e:
-        deploy.deploy("com.test", ver, "", jarname, "file://" + deploy_path)
+        deploy.deploy("com.test", ver, "", jarname, local_repository)
     assert e.value.returncode == 1
 
     with pytest.raises(CommandFailedException) as e:
