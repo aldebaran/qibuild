@@ -64,4 +64,4 @@ class BuildFailed(Exception):
     def __init__(self, project):
         self.project = project
     def __str__(self):
-        return "Error occured when building project %s" % self.project.name
+        return "Error occurred when building project %s" % self.project.name

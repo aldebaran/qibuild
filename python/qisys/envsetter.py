@@ -14,7 +14,7 @@ import subprocess
 import qisys
 
 class EnvSetter():
-    r""" A class to manager environment variables
+    r""" A class to manage environment variables
 
     Typical usage::
 
