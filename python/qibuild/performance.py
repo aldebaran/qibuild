@@ -68,14 +68,24 @@ def run_perfs(project, pattern=None, dry_run=False):
     ui.info(ui.green, "Running perfomance test for", project.name, "...")
     for test in tests:
         name = test[0]
-        cmd = test[1:]
+        cmd = [test[1]]
+        try:
+            timeout = int(test[2])
+        except:
+            timeout = None
         ui.info(ui.green, " * ", ui.reset, name)
         test_result = os.path.join(project.build_directory, "perf-results")
         qisys.sh.mkdir(test_result)
         output_xml = os.path.join(test_result, name + ".xml")
         cmd.extend(["--output", output_xml])
-        qisys.command.call(cmd)
-
+        process = qisys.command.Process(cmd, verbose=True)
+        process.run(timeout)
+        print(process.out)
+        if timeout and process.return_type == qisys.command.Process.TIME_OUT:
+            print("Timed out (%is)" % timeout)
+        if process.return_type != qisys.command.Process.OK:
+            qisys.sh.rm(output_xml)
+            ui.info(ui.red, "Process exited unexpectedly, removed XML output")
 
 def parse_perflist_files(build_dir):
     """ Looks for perflist.txt in build_dir.
