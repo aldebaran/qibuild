@@ -190,12 +190,5 @@
   </build>
 
 
-  <repositories>
-    <repository>
-      <id>local-repository</id>
-    <name>Native</name>
-    <url>file:///tmp/maven/hellojavajni</url>
-    </repository>
-  </repositories>
 
 </project>
