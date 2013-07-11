@@ -14,19 +14,10 @@ import qisys.command
 
 from qisys import ui
 
-def jar(jar_path, files, config=None):
+def jar(jar_path, files, paths):
     """ Search each files using qibuild find and
         add them into a jar using qisys
     """
-    # Get project list
-    build_worktree = qibuild.parsers.get_build_worktree(None)
-    if config:
-        build_worktree.set_active_config(config)
-    projects = build_worktree.build_projects
-
-    paths = list()
-    for proj in projects:
-        paths += [proj.sdk_directory]
 
     # Create command line
     jar_path = qisys.sh.to_native_path(jar_path)

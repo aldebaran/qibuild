@@ -21,4 +21,14 @@ def configure_parser(parser):
 def do(args):
     """Main entry point """
     ui.debug("Creating jar '" + args.jarname + "'. Searching for", args.files)
-    return qimvn.jar.jar(args.jarname, args.files, config=args.config)
+
+    # Get project list
+    build_worktree = qibuild.parsers.get_build_worktree(args)
+    build_worktree.set_active_config(args.config)
+    projects = build_worktree.build_projects
+
+    paths = list()
+    for proj in projects:
+        paths += [proj.sdk_directory]
+
+    return qimvn.jar.jar(args.jarname, args.files, paths)

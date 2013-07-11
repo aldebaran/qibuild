@@ -1,11 +1,25 @@
 import pytest
 import os
+import qibuild.parsers
 
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
 from qimvn import deploy
 from qimvn import jar
 from qisys.command import CommandFailedException
+
+def get_paths(config=None):
+    """ Get project list
+    """
+    build_worktree = qibuild.parsers.get_build_worktree(None)
+    if config:
+        build_worktree.set_active_config(config)
+    projects = build_worktree.build_projects
+
+    paths = list()
+    for proj in projects:
+        paths += [proj.sdk_directory]
+    return paths
 
 def test_deploy(qibuild_action):
     """ Test if directory where jar must be deployed exists.
@@ -15,7 +29,7 @@ def test_deploy(qibuild_action):
     qibuild_action("make", "hellojavajni")
 
     jarname = "test.jar"
-    jarpath = jar.jar(jarname, ["hellojavajni"])
+    jarpath = jar.jar(jarname, ["hellojavajni"], get_paths())
     assert jarpath
 
     deploy_path = "/tmp/test/maven/"
@@ -36,7 +50,7 @@ def test_failing_deploy(qibuild_action):
     qibuild_action("make", "hellojavajni")
 
     jarname = "test.jar"
-    jarpath = jar.jar(jarname, ["hellojavajni"])
+    jarpath = jar.jar(jarname, ["hellojavajni"], get_paths())
     assert jarpath
 
     deploy_path = "/tmp/test/maven/"
