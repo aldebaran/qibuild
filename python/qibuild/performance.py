@@ -10,6 +10,7 @@ import re
 import signal
 import sys
 import csv
+from collections import OrderedDict
 
 from qisys import ui
 import qisys
@@ -66,15 +67,44 @@ def run_perfs(project, pattern=None, dry_run=False):
         return
 
     ui.info(ui.green, "Running perfomance test for", project.name, "...")
+    results = OrderedDict()
     for test in tests:
         name = test[0]
-        cmd = test[1:]
+        cmd = [test[1]]
+        try:
+            timeout = int(test[2])
+        except:
+            timeout = None
         ui.info(ui.green, " * ", ui.reset, name)
         test_result = os.path.join(project.build_directory, "perf-results")
         qisys.sh.mkdir(test_result)
         output_xml = os.path.join(test_result, name + ".xml")
         cmd.extend(["--output", output_xml])
-        qisys.command.call(cmd)
+        process = qisys.command.Process(cmd, verbose=True)
+        process.run(timeout)
+        print(process.out)
+        if timeout and process.return_type == qisys.command.Process.TIME_OUT:
+            print("Timed out (%is)" % timeout)
+        success = process.return_type == qisys.command.Process.OK
+        if not success:
+            qisys.sh.rm(output_xml)
+            ui.info(ui.red, "Process exited unexpectedly, removed XML output")
+        results[name] = success
+
+    # Recap results
+    failed = [x for x in results.values() if not x]
+    total = len(tests)
+    if not failed:
+        ui.info("Ran %i tests" % total)
+        ui.info("All pass. Congrats!")
+        return True
+    else:
+        ui.error("Ran %i tests, %i failures" % (total, len(failed)))
+        padding = max(len(x) for x in results.keys())
+        for test, success in results.items():
+            if not success:
+                ui.info(ui.bold, " -", ui.red, test.ljust(padding + 5))
+        return False
 
 
 def parse_perflist_files(build_dir):

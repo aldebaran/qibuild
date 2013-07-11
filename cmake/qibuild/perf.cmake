@@ -31,10 +31,14 @@ function(qi_create_perf_test name)
     qi_persistent_set(QI_${name}_TARGET_DISABLED TRUE)
     return()
   endif()
-  cmake_parse_arguments(ARG "" "" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+  cmake_parse_arguments(ARG "" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
   set(_src ${ARG_UNPARSED_ARGUMENTS} ${ARG_SRC})
   set(_deps ${ARG_DEPENDS})
   set(_args ${ARG_ARGUMENTS})
+
+  if(NOT ARG_TIMEOUT)
+    set(ARG_TIMEOUT 120)
+  endif()
 
   # create the executable:
   qi_create_bin(${name} ${_src} NO_INSTALL DEPENDS ${_deps})
@@ -52,7 +56,7 @@ function(qi_create_perf_test name)
   file(MAKE_DIRECTORY ${_perf_dir})
 
   # add it to the list, to be run with qibuild test --perf
-  set(_to_write "${name};${_bin_path}")
+  set(_to_write "${name};${_bin_path};${ARG_TIMEOUT}")
   if (NOT "${_args}" STREQUAL "")
     set(_to_write "${_to_write};${_args}")
   endif()
