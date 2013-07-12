@@ -7,7 +7,7 @@
 Highlight: instead of sections and values, the ConfigStore object
 uses nested dictionaries.
 
-This enables to store abritrary depth of configuration "trees".
+This enables to store arbitrary depth of configuration "trees".
 
 For instance, with
 

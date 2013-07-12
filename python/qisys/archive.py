@@ -136,7 +136,7 @@ Please set only one of these two options to 'True'
             # something wrong: members do not have the
             # same basename
             mess  = "Invalid member %s in archive:\n" % member.filename
-            mess += "Every file sould be in the same top dir (%s != %s)" % \
+            mess += "Every file must be in the same top dir (%s != %s)" % \
                 (orig_topdir, member_top_dir)
             raise InvalidArchive(mess)
         # By-pass buggy zipfile for python 2.6:
@@ -240,7 +240,7 @@ def _compress_tar(directory, archive_basepath, algo, quiet, verbose, output_filt
     :param algo:             compression method
     :param quiet:            quiet mode (print nothing)
     :param verbose:          verbose mode (print all the archive content)
-    :param output_filter:    regex aplied on all outputs
+    :param output_filter:    regex applied on all outputs
 
     :return: path to the generated archive (archive_basepath.tar.*)
 
@@ -289,7 +289,7 @@ def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):
     :param algo:      uncompression method
     :param quiet:     quiet mode (print nothing)
     :param verbose:   verbose mode (print all the archive content)
-    :param output_filter:  regex aplied on all outputs
+    :param output_filter:  regex applied on all outputs
 
     :return: path to the extracted archive (directory/topdir)
 

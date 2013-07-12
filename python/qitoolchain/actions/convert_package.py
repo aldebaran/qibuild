@@ -79,7 +79,7 @@ Converting '{0}' into a qiBuild package ...
         qisys.sh.mv(src, dst)
         qibuild_package_path = dst
     message = """\
-Conversion succedded.
+Conversion succeeded.
 
 qiBuild package:
   {1}

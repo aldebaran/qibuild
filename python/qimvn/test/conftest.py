@@ -3,7 +3,7 @@ from qisys.test.conftest import *
 from qitoolchain.test.conftest import *
 import qisys.qixml
 
-# Import usefull fixture from qibuild.test
+# Import useful fixture from qibuild.test
 from qibuild.test.conftest import qibuild_action
 from qibuild.test.conftest import record_messages
 

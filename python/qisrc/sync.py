@@ -40,7 +40,7 @@ class WorkTreeSyncer(object):
         * move repos that needs to be moved
         * reconfigure remotes and default branches
         * synchronizes build profiles
-        :returns: True in case of sucess, False otherwise
+        :returns: True in case of success, False otherwise
 
         """
         # backup old repos configuration now, so that
@@ -220,7 +220,7 @@ class WorkTreeSyncer(object):
         disp = True
         for repo in to_add:
             # maybe user created it already, for instance with
-            # a sucessful `qisrc sync`
+            # a successful `qisrc sync`
             if not self.git_worktree.get_git_project(repo.src):
                 if disp:
                     ui.info(ui.green, ":: Cloning new repositories ...")

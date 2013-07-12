@@ -230,7 +230,7 @@ class TestGitServer(object):
 
 
 class TestGit(qisrc.git.Git):
-    """ the Git class with a few other helpfull methods """
+    """ the Git class with a few other helpful methods """
     def __init__(self, repo=None):
         if repo is None:
             repo = os.getcwd()

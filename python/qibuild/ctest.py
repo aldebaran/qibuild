@@ -85,7 +85,7 @@ class TestResult:
             xml_out = os.path.join(self.result_dir, self.test_name + ".xml")
 
             if os.path.exists(xml_out) and self.ok:
-                # Only trust gtest-generated XML if the test was sucessful
+                # Only trust gtest-generated XML if the test was successful
                 pass
             else:
                 # If gtest crashes or timesout *after* the XML is written,
@@ -279,7 +279,7 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
 
     :param test_name: If given, only run this test
 
-    :return: a boolean to indicate if test was sucessful
+    :return: a boolean to indicate if test was successful
     """
     if valgrind:
         if not qisys.command.find_program("valgrind"):

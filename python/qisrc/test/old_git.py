@@ -52,7 +52,7 @@ def create_git_repo(tmp, path, with_release_branch=False):
     git = qisrc.git.Git(tmp_src)
     git.call("init")
     git.call("add", ".")
-    git.call("commit", "-m", "intial commit")
+    git.call("commit", "-m", "initial commit")
     git.call("push", tmp_srv, "master:master")
 
     if not with_release_branch:

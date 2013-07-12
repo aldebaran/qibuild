@@ -11,7 +11,7 @@ import qisrc.project
 class NotInAGitRepo(Exception):
     """ Custom exception when user did not
     specify any git repo ond the command line
-    and we did not manage to guess one frome the
+    and we did not manage to guess one from the
     working dir
 
     """

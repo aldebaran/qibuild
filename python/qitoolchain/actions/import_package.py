@@ -105,7 +105,7 @@ Importing '{1}' in the toolchain {0} ...
     modules_list = ["  {0}".format(module_) for module_ in modules_list]
     modules_list = "\n".join(modules_list)
     message = """\
-Import succedded.
+Import succeeded.
 
 qiBuild package:
   {2}

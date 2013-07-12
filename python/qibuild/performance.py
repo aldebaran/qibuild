@@ -66,7 +66,7 @@ def run_perfs(project, pattern=None, dry_run=False):
             ui.info(ui.green, " * ", ui.reset, x[0])
         return
 
-    ui.info(ui.green, "Running perfomance test for", project.name, "...")
+    ui.info(ui.green, "Running performance test for", project.name, "...")
     results = OrderedDict()
     for test in tests:
         name = test[0]

@@ -41,7 +41,7 @@
       <version>4.6</version>
       <scope>test</scope>
     </dependency>
-    <dependency> <!-- Dependency to native qimessaging library (embeded into a jar) -->
+    <dependency> <!-- Dependency to native qimessaging library (embedded into a jar) -->
       <groupId>com.test</groupId>
       <version>1.0-SNAPSHOT</version>
       <artifactId>hellojavajni</artifactId>

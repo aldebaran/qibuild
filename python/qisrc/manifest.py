@@ -66,7 +66,7 @@ class Manifest(object):
 
         if len(review_remotes) > 1:
             mess = """ \
-Only one remote can be configured wih review="true", found {0}
+Only one remote can be configured with review="true", found {0}
 """.format(len(review_remotes))
             raise ManifestError(mess)
 

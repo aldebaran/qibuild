@@ -25,7 +25,7 @@ def configure_parser(parser):
     parser.add_argument("--path", help="type of patch to print",
             default="project", choices=['none', 'absolute', 'worktree', 'project'])
     parser.add_argument("git_grep_opts", metavar="-- git grep options", nargs="*",
-                        help="git grep options preceeded with -- to escape the leading '-'")
+                        help="git grep options preceded with -- to escape the leading '-'")
     parser.add_argument("pattern", metavar="PATTERN",
                         help="pattern to be matched")
 
