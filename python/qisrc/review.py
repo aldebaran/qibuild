@@ -8,6 +8,7 @@
 
 import os
 import sys
+import subprocess
 
 from qisys import ui
 import qisrc.git
@@ -25,10 +26,18 @@ def fetch_gerrit_hook_ssh(path, username, server, port=None):
     if sys.platform.startswith("win"):
         # scp on git bash does not handle DOS paths:
         git_hooks_dir = qisys.sh.to_posix_path(git_hooks_dir, fix_drive=True)
-    cmd = ["scp", "-P" , str(port),
-        "%s@%s:hooks/commit-msg" % (username, server),
+    scp = qisys.command.find_program("scp", raises=False)
+    if not scp:
+        return False, "Could not find scp executable"
+    cmd = [scp, "-P" , str(port),
+        "%s@%s:hooks/commit-sg" % (username, server),
         git_hooks_dir]
-    qisys.command.call(cmd, quiet=True)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    (out, _) = process.communicate()
+    if process.returncode == 0:
+        return True, ""
+    else:
+        return False, out
 
 
 def check_gerrit_connection(username, server, ssh_port=29418):
@@ -115,7 +124,10 @@ def setup_project(project):
         return True
     ui.info("Configuring", project.src, "for code review ...", end="")
     if remote.protocol == "ssh":
-        fetch_gerrit_hook_ssh(project.path, username, server, port=ssh_port)
+        ok, out = fetch_gerrit_hook_ssh(project.path, username, server, port=ssh_port)
+        if not ok:
+            ui.info("\n", out, ui.red, "[FAILED]")
+            return False
     # FIXME: make it work with http too?
     ui.info(ui.green, "[OK]")
     return True
