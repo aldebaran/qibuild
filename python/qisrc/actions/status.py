@@ -29,6 +29,9 @@ def do(args):
     """Main method."""
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = git_worktree.git_projects
+    if not git_projects:
+        qisrc.worktree.on_empty_worktree(git_worktree)
+        return
 
     num_projs = len(git_projects)
     max_len = max(len(p.src) for p in git_projects)

@@ -51,6 +51,9 @@ def do(args):
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
                                                   default_all=True,
                                                   use_build_deps=True)
+    if not git_projects:
+        qisrc.worktree.on_empty_worktree(git_worktree)
+        return
 
     skipped = list()
     failed = list()

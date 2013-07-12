@@ -11,6 +11,7 @@ import re
 from qisys import ui
 import qisys.parsers
 import qisys.interact
+import qisrc.worktree
 
 
 def configure_parser(parser):
@@ -25,7 +26,7 @@ def do(args):
     """ Main method """
     worktree = qisys.parsers.get_worktree(args)
     if not worktree.projects:
-        on_empty_worktree(worktree)
+        qisrc.worktree.on_empty_worktree(worktree)
         return
 
     regex = args.pattern
@@ -47,13 +48,3 @@ def do(args):
                 mess.extend([ui.yellow, "==>"])
                 mess.extend([ui.fuchsia, ui.bold, project.path])
             ui.info(*mess)
-
-def on_empty_worktree(worktree):
-    mess = """The worktree in {worktree.root}
-does not contain any project.
-
-Tips:
-    * Use `qisrc init` to fetch some sources from a remote manifest
-    * Use `qisrc add` to register a new project path to this worktree
-"""
-    ui.warning(mess.format(worktree=worktree))
