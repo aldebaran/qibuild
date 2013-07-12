@@ -61,6 +61,9 @@ def do(args):
             if args.force:
                 git.checkout(".")
 
+        if not git_project.default_branch:
+            ui.info(git_project.src, "not in any manifest, skipping")
+            continue
         branch = git_project.default_branch.name
         if state_project.incorrect_proj or state_project.not_on_a_branch:
             ui.info("Checkout", branch)
