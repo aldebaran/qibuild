@@ -31,9 +31,6 @@ function(qi_sanitize_compile_flags)
     # Do not produce warnings when not using _s functions
     add_definitions("-D_CRT_SECURE_NO_DEPRECATE")
 
-    # Do not produce warnings when using POSIX functions
-    add_definitions("/wd4996")
-
     # Activate warnings
     # note that wchar.h causes warnings when using /Wall or /W4 ...
     add_definitions("/W3")
@@ -78,4 +75,3 @@ if (QI_COVERAGE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage" CACHE INTERNAL "" FORCE)
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} --coverage" CACHE INTERNAL "" FORCE)
 endif()
-
