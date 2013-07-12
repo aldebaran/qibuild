@@ -44,7 +44,9 @@ CMake
 * API break: you should now use ``BUILD_PERF_TESTS=OFF`` instead of ``BUILD_PERFS_TESTS=OFF``
   when you do not want to build the performance tests
 * Fix using ``qi_add_perf_test`` on Windows when building in debug
+* qibuild cmake modules:
 
+  * add ``qt_qtdeclarative``
 
 v2.3
 ----
