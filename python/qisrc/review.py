@@ -30,7 +30,7 @@ def fetch_gerrit_hook_ssh(path, username, server, port=None):
     if not scp:
         return False, "Could not find scp executable"
     cmd = [scp, "-P" , str(port),
-        "%s@%s:hooks/commit-sg" % (username, server),
+        "%s@%s:hooks/commit-msg" % (username, server),
         git_hooks_dir]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     (out, _) = process.communicate()
