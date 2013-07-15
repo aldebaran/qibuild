@@ -160,11 +160,6 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         :returns: a boolean telling if the clone succeeded
 
         """
-        ui.info(ui.green, "* ",
-                ui.blue, repo.project,
-                ui.green, "->",
-                ui.blue, repo.src,
-                ui.white, "(%s)" % repo.default_branch)
         worktree_project = self.worktree.add_project(repo.src)
         git_project = qisrc.project.GitProject(self, worktree_project)
         if os.path.exists(git_project.path):
