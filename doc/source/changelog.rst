@@ -3,6 +3,20 @@
 Changelog
 =========
 
+Incoming
+--------
+
+CMake
++++++
+
+* Add ``TIMEOUT`` argument to ``qi_create_perf_test``
+
+Python
+++++++
+
+* Perf tests now handle timeouts and failures.
+
+
 v2.4
 ----
 
@@ -42,7 +56,7 @@ Command line
 * ``qibuild create`` no longer exists, use ``qisrc create instead``
 
 CMake
------
++++++
 
 * ``qi_add_test`` now also accepts a package name as test binary
 * qibuild cmake modules:
