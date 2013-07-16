@@ -188,7 +188,6 @@ class QiToolchainTestCase(unittest.TestCase):
 
 
 
-
 class FeedTestCase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="test-feed")
@@ -429,6 +428,20 @@ class FeedTestCase(unittest.TestCase):
         tc = qitoolchain.Toolchain("test")
         feed_url = "file://" + qisys.sh.to_posix_path(a_feed)
         tc.parse_feed(feed_url)
+
+    def test_clean_cache(self):
+        self.setup_srv()
+
+        # Generate a fake ctc in self.tmp
+        ctc_path = os.path.join(self.tmp, "ctc")
+        ctc_xml  = self.configure_xml("ctc-nonfree.xml", ctc_path)
+        tc = qitoolchain.Toolchain("ctc")
+        tc.parse_feed(ctc_xml)
+
+        tc.clean_cache(dry_run=True)
+        self.assertTrue(len(os.listdir(tc.cache)) == 3)
+        tc.clean_cache(dry_run=False)
+        self.assertTrue(len(os.listdir(tc.cache)) == 1)
 
 if __name__ == "__main__":
     unittest.main()

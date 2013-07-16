@@ -7,6 +7,7 @@ A set of packages and a toolchain file
 """
 
 import os
+import sys
 import ConfigParser
 
 import qisys
@@ -14,6 +15,8 @@ import qisys.sh
 import qibuild.configstore
 import qitoolchain
 import qitoolchain.feed
+
+from qisys import ui
 
 
 def get_default_packages_path(tc_name):
@@ -423,6 +426,25 @@ class Toolchain(object):
         for package in self.packages:
             if package.cross_gdb:
                 return package.cross_gdb
+
+    def clean_cache(self, dry_run=False):
+        tc_cache = self.cache
+        dirs_to_rm = os.listdir(tc_cache)
+        dirs_to_rm = (os.path.join(tc_cache, x) for x in dirs_to_rm)
+        dirs_to_rm = [x for x in dirs_to_rm if os.path.isdir(x)]
+
+        num_dirs = len(dirs_to_rm)
+        ui.info(ui.green, "Cleaning cache for", ui.blue, self.name)
+        if dry_run:
+            ui.info("Would remove %i packages" % num_dirs)
+            ui.info("Use -f to proceed")
+            return
+
+        for (i, dir_to_rm) in enumerate(dirs_to_rm):
+            sys.stdout.write("Removing package %i / %i\r" % ((i + 1), num_dirs))
+            sys.stdout.flush()
+            qisys.sh.rm(dir_to_rm)
+        ui.info(ui.green, "\ndone")
 
     def __eq__(self, other):
         return self.name == other.name

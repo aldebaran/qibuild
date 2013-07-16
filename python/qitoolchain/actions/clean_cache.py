@@ -4,11 +4,6 @@
 
 """ Clean a toolchain cache """
 
-import os
-import sys
-
-from qisys import ui
-import qisys
 import qisys.parsers
 import qitoolchain
 
@@ -31,21 +26,4 @@ def do(args):
     """
     dry_run = args.dry_run
     tc = qitoolchain.get_toolchain(args.name)
-    tc_cache = tc.cache
-
-    dirs_to_rm = os.listdir(tc_cache)
-    dirs_to_rm = [os.path.join(tc_cache, x) for x in dirs_to_rm]
-    dirs_to_rm = [x for x in dirs_to_rm if os.path.isdir(x)]
-
-    num_dirs = len(dirs_to_rm)
-    ui.info(ui.green, "Cleaning cache for", ui.blue, tc.name)
-    if dry_run:
-        print "Would remove %i packages" % num_dirs
-        print "Use -f to proceed"
-        return
-
-    for (i, dir_to_rm) in enumerate(dirs_to_rm):
-        sys.stdout.write("Removing package %i / %i\r" % ((i+1), num_dirs))
-        sys.stdout.flush()
-        qisys.sh.rm(dir_to_rm)
-    ui.info(ui.green, "done")
+    tc.clean_cache(dry_run=dry_run)
