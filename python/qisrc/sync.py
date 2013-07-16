@@ -243,9 +243,7 @@ class WorkTreeSyncer(object):
         for repo in new_repos:
             git_project = self.git_worktree.get_git_project(repo.src)
             # may not work if the moving failed for instance
-            if not git_project:
-                ui.warning("Skipping", repo.src)
-            else:
+            if git_project:
                 todo.append((git_project, repo))
 
         if not todo:
