@@ -113,18 +113,22 @@ def do(args):
         return
 
     if ide.name == "QtCreator":
-        ide_path = ide.path
-        if not ide_path:
-            ide_path = 'qtcreator'
+        qtcreator_path = ide.path
+        if not qtcreator_path:
+            qtcreator_path = qisys.command.find_program("qtcreator", raises=True)
         cmake_list = os.path.join(project.path, "CMakeLists.txt")
-        if not os.access(ide_path, os.X_OK):
+        if not os.path.exists(qtcreator_path):
             mess  = "Invalid configuration dectected!\n"
-            mess += "QtCreator path (%s) is not a valid path\n" % ide_path
+            mess += "QtCreator path (%s) is not a valid path\n" % qtcreator_path
             mess += "Please run `qibuild config --wizard\n"
             raise Exception(mess)
         print "starting QtCreator:"
-        print ide_path, cmake_list
-        subprocess.Popen([ide_path, cmake_list])
+        if qtcreator_path.endswith((".app", ".app/")):
+            cmd = ["open", "-a", qtcreator_path, cmake_list]
+        else:
+            cmd = [qtcreator_path, cmake_list]
+        print " ".join(cmd)
+        subprocess.Popen(cmd)
         return
 
     # Not supported (yet) IDE:
