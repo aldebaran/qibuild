@@ -110,19 +110,15 @@ class MessageRecorder():
                 return message
 
 @pytest.fixture(autouse=True)
-def tmpfiles(request):
+def tmpfiles(request, tmpdir):
     """ Configure qisys.sh.get_*_path functions to return temporary
     files instead
-
     """
-    tmpdir = tempfile.mkdtemp(prefix="tmp-test-")
-    def clean():
-        qisys.sh.rm(tmpdir)
-    request.addfinalizer(clean)
+
     def fake_get_path(*args):
         prefix = args[0]
         rest = args[1:]
-        full_path = os.path.join(tmpdir,
+        full_path = os.path.join(tmpdir.strpath,
                                  os.path.basename(prefix),
                                  *rest)
         to_make = os.path.dirname(full_path)
