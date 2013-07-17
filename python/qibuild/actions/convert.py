@@ -146,10 +146,10 @@ find_package(qibuild)
         tmp_lines = new_lines[:]
         new_lines = list()
         for line in tmp_lines:
+            new_lines.append(line)
             regexp = re.compile(r'^\s*project\s*\((.*)\)', re.IGNORECASE)
             if re.match(regexp, line):
                 new_lines.append('find_package(qibuild)\n')
-            new_lines.append(line)
 
     if dry_run:
         ui.info("Would patch", cmakelists)
