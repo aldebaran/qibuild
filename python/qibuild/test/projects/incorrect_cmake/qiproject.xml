@@ -1,0 +1,3 @@
+<project version="3">
+  <qibuild name="incorrect_cmake" />
+</project>

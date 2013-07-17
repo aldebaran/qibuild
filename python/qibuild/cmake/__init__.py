@@ -127,7 +127,6 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
 
     # Check that the root CMakeLists file is correct
     root_cmake = os.path.join(source_dir, "CMakeLists.txt")
-    check_root_cmake_list(root_cmake, os.path.basename(source_dir))
 
     # Add path to source to the list of args, and set buildir for
     # the current working dir.
@@ -198,70 +197,6 @@ def read_cmake_cache(cache_path):
             (key, _type, value) = match.groups()
             res[key] = value
     return res
-
-
-def check_root_cmake_list(cmake_list_file, project_name):
-    """Check that the root CMakeLists.txt
-    is correct.
-
-    Those checks are necessary for cross-compilation to work well,
-    among other things.
-    """
-    # Check that the root CMakeLists contains a project() call
-    # The call to project() is necessary for cmake --build
-    # to work when used with Visual Studio generator.
-    lines = list()
-    with open(cmake_list_file, "r") as fp:
-        lines = fp.readlines()
-
-    project_line_number = None
-    include_line_number = None
-    for (i, line) in enumerate(lines):
-        if re.match(r'^\s*project\s*\(', line, re.IGNORECASE):
-            project_line_number = i
-        if re.match(r'^\s*include\s*\(.*qibuild\.cmake.*\)', line,
-                    re.IGNORECASE):
-            include_line_number = i
-
-    if project_line_number is None:
-        mess  = """Incorrect CMakeLists file detected !
-
-Missing call to project().
-Please fix this by editing {cmake_list_file}
-so that it looks like
-
-cmake_minimum_required(VERSION 2.8)
-project({project_name})
-find_package(qibuild)
-
-""".format(
-            cmake_list_file=cmake_list_file,
-            project_name=project_name)
-        ui.warning(mess)
-        return
-
-    if include_line_number is None:
-        # Using qibuild command line, but not the qiBuild framework:
-        # -> nothing to do ;)
-        return
-
-    if project_line_number > include_line_number:
-        mess  = """Incorrect CMakeLists file detected !
-
-The call to include(qibuild.cmake) should be AFTER the call to project()
-Please exchange the following lines:
-
-{cmake_list_file}:{include_line_number} {include_line}
-{cmake_list_file}:{project_line_number} {project_line}
-
-""".format(
-            cmake_list_file=cmake_list_file,
-            include_line_number=include_line_number,
-            project_line_number=project_line_number,
-            include_line=lines[include_line_number],
-            project_line=lines[project_line_number])
-        ui.warning(mess)
-
 
 def get_cmake_qibuild_dir(worktree=None):
     """Get the path to cmake modules.

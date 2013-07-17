@@ -2,6 +2,10 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+if(NOT PROJECT_NAME)
+  message(FATAL_ERROR "Please call find_package(qibuild) after project()")
+endif()
+
 # If someone is using qibuild configure, includes
 # the dependencies.cmake file
 if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)

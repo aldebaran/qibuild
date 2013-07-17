@@ -111,6 +111,11 @@ def test_config_h_extra_install_rule(qibuild_action, tmpdir):
     full_config_h = os.path.join(tmpdir.strpath, full_config_h)
     assert not os.path.exists(full_config_h)
 
+def test_detects_incorrect_cmake(qibuild_action):
+    proj = qibuild_action.add_test_project("incorrect_cmake")
+    qibuild_action("configure", "incorrect_cmake", raises=True)
+
+
 def test_submodule(qibuild_action):
     qibuild_action.add_test_project("submodule")
     qibuild_action("configure", "submodule")
