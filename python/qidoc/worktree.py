@@ -1,5 +1,4 @@
 import os
-import posixpath
 
 from qisys import ui
 import qisys.worktree

@@ -10,7 +10,6 @@ def convert_project(project):
 
     :returns: True if a conversion happened
     """
-    worktree = project.worktree
     if not os.path.exists(project.qiproject_xml):
         return
     qiproject_xml = project.qiproject_xml

@@ -40,7 +40,7 @@ def do(args):
         return
 
     if not args.force:
-        ui.info(ui.green, "Build directoris that will be removed",
+        ui.info(ui.green, "Build directories that will be removed",
                 ui.white, "(use -f to apply")
 
     for i, build_dir in enumerate(to_clean):

@@ -37,9 +37,8 @@ class DoxygenProject(qidoc.project.DocProject):
         rel_paths = kwargs.get("rel_paths", False)
         in_conf = qidoc.doxygen.read_doxyfile(self.in_doxyfile)
         out_conf = in_conf.copy()
-        out_path =  os.path.join(self.build_dir, "Doxyfile")
         out_conf["OUTPUT_DIRECTORY"] = self.build_dir
-        out_conf["GENERATE_XML"] = "YES" # required by qiapidoc and doylink
+        out_conf["GENERATE_XML"] = "YES"  # required by qiapidoc and doxylink
         out_conf["GENERATE_HTML"] = "YES"
         out_conf["GENERATE_LATEX"] = "NO"
         out_conf["PROJECT_NAME"] = in_conf.get("PROJECT_NAME", self.name)
@@ -47,7 +46,7 @@ class DoxygenProject(qidoc.project.DocProject):
         out_conf["QUIET"] = "YES"
         out_conf["GENERATE_TAGFILE"] = self.tagfile
         doxydeps = list()
-        # no need to recusre the dependencies here, doxygen does it for us
+        # no need to recurse the dependencies here, doxygen does it for us
         for dep_name in self.depends:
             doc_project = self.doc_worktree.get_doc_project(dep_name, raises=False)
             if doc_project and doc_project.doc_type == "doxygen":
@@ -73,7 +72,6 @@ class DoxygenProject(qidoc.project.DocProject):
 
         qidoc.doxygen.write_doxyfile(out_conf, self.out_doxyfile)
 
-
     def build(self, **kwargs):
         """ Run doxygen from the build directory """
         cmd = ["doxygen", self.out_doxyfile]
@@ -84,7 +82,7 @@ class DoxygenProject(qidoc.project.DocProject):
 
     def make_rel_paths(self, value):
         """ Transform a relative path to the source into an
-        absolute path (usable fram a build directory
+        absolute path (usable from a build directory)
 
         """
         res = list()
