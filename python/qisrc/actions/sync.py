@@ -65,10 +65,10 @@ def do(args):
 
         (status, out) = git_project.sync(rebase_devel=args.rebase_devel)
         if status is None:
-            ui.info("\n", ui.brown, "  [skipped]")
+            ui.info("\n", "\n", ui.brown, git_project.src, "  [skipped]")
             skipped.append((git_project.src, out))
         if status is False:
-            ui.info("\n", ui.red, "  [failed]")
+            ui.info("\n", "\n", git_project.src, ui.red, "  [failed]")
             failed.append((git_project.src, out))
         if out:
             print ui.indent(out, num=2)
