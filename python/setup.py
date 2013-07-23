@@ -39,7 +39,7 @@ package_data = {
 }
 
 setup(name = 'qibuild',
-      version = "2.4",
+      version = "2.5",
       description = "Compilation of C++ projects made easy!",
       author = "Aldebaran Robotics",
       author_email = "dmerejkowsky@aldebaran-robotics.com",
