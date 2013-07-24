@@ -197,6 +197,9 @@ CMake
   install directory.
 * Linux shared libraries are linked with a RPATH set to ``$ORIGIN/../lib``
   by default, as it was done for executables.
+* qibuild cmake modules:
+
+  * add ``psapi``
 
 v2.4
 ----
