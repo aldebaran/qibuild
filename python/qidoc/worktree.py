@@ -141,18 +141,10 @@ def _new_doc_project_2(doc_worktree, project):
         return
 
     if len(doc_elems) > 1:
-        ui.warning("Deprecated configuration detected", "\n",
-                   "(in %s)" % qiproject_xml, "\n",
-                   "Having several docs in the same qiproject.xml is "
-                   "no longer supported", "\n",
-                   "Please run qidoc convert-worktree")
         return
     doc_elem = doc_elems[0]
     if doc_elem.get("src") is not None:
-        ui.warning("Deprecated configuration detected", "\n",
-                   "(in %s)" % qiproject_xml, "\n",
-                   "The 'src' attribute is no longer supported", "\n",
-                   "Please run qidoc convert-worktree")
+        return
 
     if doc_elem.tag == "sphinxdoc":
         doc_type = "sphinx"
