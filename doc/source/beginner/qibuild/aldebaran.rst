@@ -76,7 +76,7 @@ Output should look like ::
   toolchain naoqi-sdk
     Using feed from /path/to/naoqi-sdk-1.12-linux32/toolchain.xml
     Packages:
-      naoqi-sdk-linux32
+      libnaoqi
       in /path/to/naoqi-sdk-1.12-linux32
 
 Here you can see that the toolchain is named ``naoqi-sdk``, so you have to:
@@ -113,7 +113,7 @@ and extract it, say in ``/path/to/atom/ctc``
 
 .. code-block:: console
 
-    $ qitoolchain create cross-atom /path/to/ctc/
+    $ qitoolchain create cross-atom /path/to/ctc/toolchain.xml
 
 
     $ qibuild configure -c cross-atom
