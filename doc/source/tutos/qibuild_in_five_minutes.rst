@@ -96,7 +96,7 @@ and extract it, say in ``/path/to/atom/ctc``
 
 .. code-block:: console
 
-    $ qitoolchain create cross-atom /path/to/ctc/
+    $ qitoolchain create cross-atom /path/to/ctc/toolchain.xml
 
 
     $ qibuild configure -c cross-atom
