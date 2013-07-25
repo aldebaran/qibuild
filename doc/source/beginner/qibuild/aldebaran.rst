@@ -4,7 +4,7 @@ Using qibuild with Aldebaran C++ SDKs
 =====================================
 
 For the Desktop
-+++++++++++++++
+---------------
 
 You can use the C++ packages on Visual Studio 2008 and 2010 (32 bits only),
 Mac and Linux.
@@ -36,17 +36,38 @@ First, get the C++ SDK and extract it, say in ``/path/to/cpp/sdk``
 
 
 For the robot
-++++++++++++++
+--------------
 
 
-You have to be on Linux to be able to compile code for the robot.
+You have to be on Linux or Mac to be able to compile code for the robot.
+
+This if often refer to as ``cross-compilation``.
+
+First, get the cross-toolchain that matches your robot
+version (atom for V4 and later, geode for previous version),
+and extract it, say in ``/path/to/atom/ctc``
+
+* Create a :term:`toolchain` using the :term:`feed` from the cross-toolchain
+
+.. code-block:: console
+
+    $ qitoolchain create cross-atom /path/to/ctc/toolchain.xml
+
+* Then configure and build as usual
+
+.. code-block:: console
+
+
+
+    $ qibuild configure -c cross-atom
+    $ qibuild make -c cross-atom
 
 Troubleshooting
 ----------------
 
 
 Cannot find alcommon
-~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++
 
 
 ::
@@ -92,29 +113,3 @@ Here you can see that the toolchain is named ``naoqi-sdk``, so you have to:
    $ qibuild make -c naoqi-sdk
 
 
-This if often refer to as ``cross-compilation``.
-
-First, get the cross-toolchain that matches your robot
-version (atom for V4 and later, geode for previous version),
-and extract it, say in ``/path/to/atom/ctc``
-
-
-.. note:: on linux64 you will have to install some 32bits libraries for the
-          cross-compiler to work.
-
-          On ubuntu, you should use something like:
-
-          .. code-block:: console
-
-              $ sudo apt-get install gcc-multilib libc6-dev libc6-i386
-
-
-* Create a :term:`toolchain` using the :term:`feed` from the cross-toolchain
-
-.. code-block:: console
-
-    $ qitoolchain create cross-atom /path/to/ctc/toolchain.xml
-
-
-    $ qibuild configure -c cross-atom
-    $ qibuild make -c cross-atom

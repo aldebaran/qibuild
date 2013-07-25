@@ -112,9 +112,10 @@ Using Aldebaran packages
 
 See:
 
-  .. toctree::
+.. toctree::
+  :maxdepth: 2
 
-    aldebaran
+  aldebaran
 
 Going further
 -------------
