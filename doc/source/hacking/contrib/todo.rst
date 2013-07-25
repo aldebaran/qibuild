@@ -170,6 +170,7 @@ qibuild
 * add ``qibuild find -z`` to look in every build dir
 
 * Better integration with QtCreator:
+
   * Write our own plugin to avoid the "CMakeList" pop-up (it only re-runs
     CMake to generate an XML code-blocks file, that is then re-parsed
     by QtCreator)

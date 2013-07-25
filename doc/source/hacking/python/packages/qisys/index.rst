@@ -10,9 +10,10 @@ qisys modules
     command
     envsetter
     interact
+    parsers
+    project
     qixml
     remote
-    parsers
     script
     sh
     ui

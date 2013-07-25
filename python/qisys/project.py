@@ -11,6 +11,12 @@ import qisys.qixml
 
 
 class WorkTreeProject(object):
+    """ A project is indentified by its path relative to its
+    worktree.
+
+    It can have nested subprojects
+
+    """
     def __init__(self, worktree, src):
         self.worktree = worktree
         self.src = src
@@ -29,6 +35,10 @@ class WorkTreeProject(object):
         return xml_path
 
     def parse_qiproject_xml(self):
+        """ Parse the qiproject.xml, filling the
+        subprojects list
+
+        """
         if not os.path.exists(self.qiproject_xml):
             return
         tree = qisys.qixml.read(self.qiproject_xml)

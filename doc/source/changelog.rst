@@ -13,6 +13,7 @@ General
 
 * The ``./install-qibuild.sh`` script is gone: its name was misleading,
   and it lead to bad stuff, like:
+
   * installing in ``/usr/local`` by default on mac (which causes problem on
     a multi-user machine)
   * being hard to know which qibuild version was used
