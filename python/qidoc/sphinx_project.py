@@ -29,10 +29,9 @@ class SphinxProject(qidoc.project.DocProject):
         """ Create a correct conf.py in self.build_dir """
         rel_paths = kwargs.get("rel_paths", False)
         in_conf_py = os.path.join(self.source_dir, "conf.in.py")
+        should_use_template = False
         if os.path.exists(in_conf_py):
-            if not self.template_project:
-                ui.warning("Found a conf.in.py but no template project found "
-                           "in the worktree")
+            should_use_template = True
         else:
             in_conf_py = os.path.join(self.source_dir, "conf.py")
             if not os.path.exists(in_conf_py):
@@ -42,10 +41,14 @@ class SphinxProject(qidoc.project.DocProject):
         with open(in_conf_py) as fp:
             conf = fp.read()
 
-        if self.template_project:
-            from_template = self.template_project.sphinx_conf
-            from_template = from_template.format(**kwargs)
-            conf = from_template + conf
+        if should_use_template:
+            if self.template_project:
+                from_template = self.template_project.sphinx_conf
+                from_template = from_template.format(**kwargs)
+                conf = from_template + conf
+            else:
+                ui.warning("Found a conf.in.py but no template project found "
+                           "in the worktree")
 
         from_conf = dict()
         try:
@@ -65,8 +68,9 @@ class SphinxProject(qidoc.project.DocProject):
                 conf += '\nversion = "%s"\n' % kwargs["version"]
 
 
-        if "html_theme_path" not in from_conf and self.template_project:
-            conf += '\nhtml_theme_path = [r"%s"]\n' % self.template_project.themes_path
+        if should_use_template and self.template_project:
+            if "html_theme_path" not in from_conf:
+                conf += '\nhtml_theme_path = [r"%s"]\n' % self.template_project.themes_path
 
         conf += self.append_doxylink_settings(conf, rel_paths=rel_paths)
         conf += self.append_intersphinx_settings(conf, rel_paths=rel_paths)
