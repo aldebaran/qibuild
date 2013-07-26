@@ -43,9 +43,17 @@ def do(args):
             git_grep_opts.append("--null")
     git_grep_opts.append(args.pattern)
 
+    if not git_projects:
+        qisrc.worktree.on_empty_worktree(git_worktree)
+        sys.exit(0)
+
+    max_src = max(len(x.src) for x in git_projects)
     retcode = 1
-    for project in git_projects:
-        ui.info(ui.green, "Looking in", project.src, "...")
+    for i, project in enumerate(git_projects):
+        ui.info_count(i, len(git_projects),
+                      ui.green, "Looking in",
+                      ui.blue, project.src.ljust(max_src),
+                      end="\r")
         git = qisrc.git.Git(project.path)
         (status, out) = git.call("grep", *git_grep_opts, raises=False)
         if out != "":
@@ -58,7 +66,9 @@ def do(args):
                     line_split[0] = os.path.join(prepend, line_split[0])
                     out_lines.append(":".join(line_split))
                 out = '\n'.join(out_lines)
-            ui.info(out)
+            ui.info("\n", ui.reset, out)
         if status == 0:
             retcode = 0
+    if not out:
+        ui.info(ui.reset)
     sys.exit(retcode)
