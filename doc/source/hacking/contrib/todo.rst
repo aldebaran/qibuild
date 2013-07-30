@@ -299,7 +299,5 @@ qibuild2 leftovers cleanup
 
 * remove qitoolchain.Toolchain.get
 
-* remove qitoolchain.remote
-
 * remove qibuild.configstore, use XML for toolchain
   storage
