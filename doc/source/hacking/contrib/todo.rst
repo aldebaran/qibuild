@@ -161,9 +161,6 @@ qibuild
 
 * qibuild deploy: fix gdb config files generation
 
-* always check CMake correctness (find_package(qibuild) *after* project)
-  > maybe this could be done in CMake instead ...
-
 * get rid of qibuild test ``--slow``, this makes no sense: the
   list of tests and wether they are nightly or not is managed from cmake
 
@@ -188,7 +185,6 @@ qisrc
 
 * qisrc sync:
 
-  * display a progress bar when configuring projects
   * implement ``--rebase-devel``
 
 * find a better ``qisrc manifest`` API. Do we really need to support
@@ -222,8 +218,6 @@ makes boost reappear in the toolchain.
 
 qidoc
 -----
-
-* Make it possible to use it without a ``templates`` repository
 
 
 Python
@@ -264,7 +258,7 @@ tests
   * qibuild_action.call("configure") ?
   * qibuild_action.configure("...") ?
 
-* fix running automatic tests on windows and mac
+* fix running automatic tests on mac
 
 misc
 ++++
