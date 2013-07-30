@@ -150,7 +150,7 @@ class CMakeBuilder(object):
         ui.info(ui.green, ":: ", "Installing projects")
         for i, project in enumerate(projects):
             ui.info_count(i, len(projects),
-                          ui.green, "Insalling",
+                          ui.green, "Installing",
                           ui.blue, project.name)
             project.install(dest_dir, runtime=runtime_only, **kwargs)
 
