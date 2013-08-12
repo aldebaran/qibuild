@@ -15,9 +15,9 @@ import urllib2
 import StringIO
 
 from qisys import ui
-import qisys
-import qibuild
+import qisys.sh
 
+import qibuild.config
 
 def callback(total, done):
     """ Called during download """
