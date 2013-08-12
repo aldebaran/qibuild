@@ -252,14 +252,15 @@ def parse_feed(toolchain, feed, qibuild_cfg, dry_run=False):
     """ Helper for toolchain.parse_feed
 
     """
-    # Reset toolchain.packages:
-    package_names = [package.name for package in toolchain.packages]
-    for package_name in package_names:
-        toolchain.remove_package(package_name)
     parser = ToolchainFeedParser()
     parser.parse(feed)
     package_trees = parser.get_packages()
     errors = list()
+
+    # Reset toolchain.packages:
+    package_names = [package.name for package in toolchain.packages]
+    for package_name in package_names:
+        toolchain.remove_package(package_name)
     for package_tree in package_trees:
         package = qitoolchain.Package(None, None)
         if dry_run:
