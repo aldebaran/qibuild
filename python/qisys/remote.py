@@ -77,7 +77,7 @@ def authenticated_urlopen(location):
     urllib2.install_opener(opener)
     return urllib2.urlopen(location)
 
-def open_remote_location(location):
+def open_remote_location(location, timeout=10):
     """ Open a file from an url
 
     :return: a file-like object
@@ -89,7 +89,7 @@ def open_remote_location(location):
     #pylint: disable-msg=E1103
     if url_split.scheme == "ftp":
         (username, password, root) = get_ftp_access(server_name)
-        ftp = ftplib.FTP(server_name, username, password)
+        ftp = ftplib.FTP(server_name, username, password, timeout=timeout)
         if root:
             ftp.cwd(root)
         class Transfer:
