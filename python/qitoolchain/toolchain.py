@@ -197,7 +197,10 @@ class Toolchain(object):
             res += "  Packages:\n"
         else:
             res += "No packages\n"
-        for package in self.packages:
+        # FIXME: the packages should be in the same order as in
+        # the feed
+        sorted_packages = sorted(self.packages)
+        for package in sorted_packages:
             res += " " * 4 + str(package).replace("\n", "\n" + " " * 4)
             res += "\n"
         return res
