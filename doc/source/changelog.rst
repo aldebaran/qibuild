@@ -3,6 +3,16 @@
 Changelog
 =========
 
+v2.6
+----
+
+CMake
++++++
+
+* qibuild cmake modules:
+
+  * add ``udev``
+
 v2.5
 ----
 
