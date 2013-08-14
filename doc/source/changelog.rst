@@ -202,6 +202,35 @@ CMake
 
   * add ``psapi``
 
+v2.6
+----
+
+CMake
++++++
+
+* qibuild cmake modules:
+
+  * add ``udev``
+
+v2.5
+----
+
+Command line
++++++++++++++
+
+* Perf tests now handle timeouts and failures.
+* Put back ``qibuild create`` as an alias for ``qisrc create`` (no need to break
+  the command line API here)
+* Fix using ``qisrc create`` when qibuild is installed
+* ``qitoolchain remove-package``: also remove data from the filesystem
+* ``qitoolchain import-package``: fix CMake module filename and qibuild package name
+* ``qitoolchain convert-package``: prepend "r" to the revision number
+
+CMake
++++++
+
+* Add ``TIMEOUT`` argument to ``qi_create_perf_test``
+
 v2.4
 ----
 
