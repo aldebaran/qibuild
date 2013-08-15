@@ -5,7 +5,7 @@
 #! Installing
 # ===========
 #
-# See general documentation here :ref:`cmake-install`
+# See general documentation in :ref:`cmake-install`
 #
 
 

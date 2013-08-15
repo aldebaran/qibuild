@@ -125,10 +125,10 @@ endfunction()
 #
 # This calls ``add_test()`` with the same arguments but:
 #
-#  * We look for the binary in sdk/bin, as a target, or an external
-#    package, and we know there is a _d when using Visual Studio
-#  * We set a 'tests' folder property
-#  * We make sure necessary environment variables are set on mac
+# * We look for the binary in sdk/bin, as a target, or an external
+#   package, and we know there is a``_d `` when using Visual Studio on debug
+# * We set a ``tests`` folder property
+# * We make sure necessary environment variables are set on mac
 #
 # This is a low-level function, you should rather use
 # :cmake:function:`qi_create_test` or :cmake:function:`qi_create_gtest` instead.

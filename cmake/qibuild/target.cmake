@@ -350,10 +350,10 @@ endfunction()
 # ${source} using ``configure_file``
 # In addition:
 #
-#  - Make sure the path where the header is generated is
-#    added to the include path
+# * Make sure the path where the header is generated is
+#   added to the include path
 #
-#  - Create the necessary install rules
+# * Create the necessary install rules
 #
 # If you need the header to be generated in a subdirectory
 # (recommended), simply use something like::

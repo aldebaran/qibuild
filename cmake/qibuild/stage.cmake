@@ -214,7 +214,7 @@ endfunction()
 #
 #  qi_create_bin(foo)
 #
-#  ...
+#  # ...
 #
 #  qi_use_lib(foo bar)
 #  if(UNIX)
