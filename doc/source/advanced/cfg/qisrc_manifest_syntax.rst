@@ -97,8 +97,8 @@ repo node
 
 The ``repo`` node *must* have a ``project`` attribute.
 
-If also *must* have a ``remote`` attribute matching an exiting
-``remote`` node.
+If also *must* have a ``remotes`` attribute matching some existing
+``remote`` nodes.
 
 If ``src`` is not given, it will deduced from the project name.
 (for instance the ``foo/bar.git`` repo will be cloned to ``foo/bar``)
@@ -107,8 +107,9 @@ If ``src`` is not given, it will deduced from the project name.
 .. code-block:: xml
 
    <manifest>
+      <remote name="origin" url="git://example.com" />
       <remote name="gerrit" url="ssh://review.corp.com:29418" review="true" />
-      <project name="bar/baz.git" remote="gerrit" />
+      <project name="bar/baz.git" remotes="origin gerrit" />
     </manifest>
 
 
@@ -116,11 +117,15 @@ Here ``qisrc init`` will try to create an ssh connection with
 ``git://<username>@gerrit:29418``, where ``username`` is read from the
 operating system first, or asked to the user.
 
+The repository will be configured with two remotes: ``origin``, and ``gerrit``,
+and the ``post-commit`` gerrit hook will be fetched automatically.
+
+
 
 groups node
 -----------
 
-Group *must* have a *name* attribute.
+Groups nodes *must* have a ``name`` attribute.
 Then they contain a list of project name, and can include other groups.
 
 .. code-block:: xml
@@ -139,7 +144,7 @@ Then they contain a list of project name, and can include other groups.
 Here we've defined a group named "testing", so that it's easy to
 get the ``gtest`` and ``gmock`` repositories together.
 
-If someone uses ``--group core``, he will get ``gtest``, ``gmock`` and
+If someone uses ``qisrc inint --group core``, he will get ``gtest``, ``gmock`` and
 ``libcore``.
 
 .. seealso::

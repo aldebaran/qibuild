@@ -22,11 +22,6 @@ Note: the presence of the file is not necessary for qibuild
 to find a work tree, only the ``.qi`` directory is used.
 
 
-When using nested worktrees (not recommended), the first
-``.qi/qibuild.xml`` file found is used.
-
-
-
 Global configration file
 ------------------------
 
@@ -61,7 +56,7 @@ The schema of the global xml file looks like this:
 
 
 Note the ``version`` attribute of the ``qibuild`` node.
-It will be used for backward compatibility in case the format syntax changes.
+It will be used for backward compatibility in case the format changes.
 
 It accepts:
 
@@ -78,66 +73,54 @@ build node
 
 The build node accepts the following attributes:
 
-**incredibuild**
-
-  A boolean for triggering use of incredibuild (Visual Studio only)
-  Will use ``BuildConsole.exe`` instead of ``cmake --build`` when
-  building projects.
-
-  For this to work qibuild must find ``BuildConsole.exe``, for instance
-  you can add ``C:\Program Files\Xoreax\IncrediBuild\`` to a
-  :ref:`qibuild-xml-node-env`.
-
 .. _qibuild-xml-node-defaults:
 
 defaults node
 ~~~~~~~~~~~~~
 
-The defaults node accepts two kinds children:
+The defaults node accepts two kinds of children:
 
 * :ref:`qibuild-xml-node-env`
 * :ref:`qibuild-xml-node-cmake`
 
-It also accepts a 'ide' attribute, which should match
-the 'name' attribute of a :ref:`qibuild-xml-node-ide`.
+It also accepts a ``ide`` attribute, which should match
+the ``name`` attribute of a :ref:`qibuild-xml-node-ide`.
 
 .. _qibuild-xml-node-env:
 
 env node
 ~~~~~~~~
 
-The 'env' node accepts the following attributes:
+The ``env`` node accepts the following attributes:
 
-* 'path' : A list of paths to be prepended to the PATH environment variable
-* 'bat_file: A .bat file that will be sourced to get new environment.
-  Very useful to use ``cl.exe`` from the command line
-* 'editor' : Used by ``qibuild config --edit``
+* ``path`` : A list of paths to be prepended to the PATH environment variable
+* ``bat_file``: A .bat file that will be sourced to get new environment.
+  This makes it possible to use ``cl.exe`` from the command line
+* ``editor`` : Used by ``qibuild config --edit``
 
 .. _qibuild-xml-node-cmake:
 
 cmake node
 ~~~~~~~~~~
 
-The 'cmake' node accepts the following attributes:
+The ``cmake`` node accepts the following attributes:
 
-**generator**
-
-  The CMake generator to use
+* ``generator`` The CMake generator to use
 
 .. _qibuild-xml-node-config:
 
 config node
 ~~~~~~~~~~~
 
-The config node must contain a 'name' attribute.
+The ``config`` node must contain a ``name`` attribute.
 
-It accepts the same kinds of children as the 'defaults' node does:
+It accepts the same kinds of children as the ``defaults`` node does:
 
 * :ref:`qibuild-xml-node-env`
 * :ref:`qibuild-xml-node-cmake`
 
 
-See :ref:`qibuild-config-merging` to see how the configuration
+See :ref:`qibuild-config-merging` to see how the configurations
 are merged
 
 .. _qibuild-xml-node-ide:
@@ -145,33 +128,29 @@ are merged
 ide node
 ~~~~~~~~
 
-The 'ide' node must contain a 'name' attribute.
+The ``ide`` node must contain a ``name`` attribute.
 
 It accepts the following attributes:
 
-**path**
-
-  The full path to the IDE. Used by ``qibuild open`` when using
-  QtCreator.
+* ``path`` The full path to the IDE. Used by ``qibuild open``
 
 .. _qibuild-xml-node-server:
 
 server node
 ~~~~~~~~~~~
 
-The 'server' node must contain a 'name' attribute.
+The ``server`` node must contain a ``name`` attribute.
 
-It accepts a child named 'access'.
+It accepts a child named ``access``
 
-The 'access' child accepts the following attributes:
+The ``access`` child accepts the following attributes:
 
-* **username**
-* **password**
-* **root**
-   When using ftp, this will be the root directory of
-   the ftp server.
+* ``username``
+* ``password``
+* ``root`` : When using ftp, this will be the root directory of
+  the ftp server.
 
-For instance to use 'john' username with password 'p4ssw0rd'
+For instance to use ``john`` username with password ``p4ssw0rd``
 on ``ftp://example.com`` using root ``pub``, you can use
 
 .. code-block:: xml
@@ -185,6 +164,11 @@ on ``ftp://example.com`` using root ``pub``, you can use
   </server>
 
 
+This is for instance used by ``qitoolchain`` in case you need
+a login/password to download packages and feeds.
+
+This is also where ``qisrc`` stores your gerrit username.
+
 
 Local Settings
 --------------
@@ -196,7 +180,6 @@ The schema of the local xml file looks like this:
     <qibuild version="1">
       <defaults />
       <build />
-      <manifest />
     </qibuild>
 
 
@@ -207,7 +190,6 @@ The root element accepts:
 
 * One or zero :ref:`qibuild-xml-node-local-defaults`
 * One or zero :ref:`qibuild-xml-node-local-build`
-* Any number of :ref:`manifest nodes <qibuild-xml-node-manifest>`
 
 
 .. _qibuild-xml-node-local-defaults:
@@ -215,17 +197,13 @@ The root element accepts:
 local defaults node
 ~~~~~~~~~~~~~~~~~~~
 
-The local 'defaults' node accepts the following attributes:
+The local ``defaults`` node accepts the following attributes:
 
-**config**
-
-  A configuration to use by default in this worktree
+* ``config`` : A configuration to use by default in this worktree
   (see :ref:`qibuild-config-merging`)
 
-**ide**
-
-  An IDE to use by default in this worktree. Can override
-  the default ide in :ref:`qibuild-xml-node-defaults`
+* ``ide`` : An IDE to use by default in this worktree. Can override
+  the default IDE in :ref:`qibuild-xml-node-defaults`
   (see :ref:`qibuild-config-merging`)
 
 .. _qibuild-xml-node-local-build:
@@ -233,43 +211,14 @@ The local 'defaults' node accepts the following attributes:
 local build node
 ~~~~~~~~~~~~~~~~
 
-The local 'build' nodes accepts the following attributes:
+The local ``build`` nodes accepts the following attributes:
 
-**build_dir**
-
-  Instead of creating a different build directory per project,
+* ``build_dir`` : Instead of creating a different build directory per project,
   (for instance ``~/src/hello/build-linux``), every build
   directory will be created under this directory, for instance
   ``/path/to/build.directory/build-linux/hello``
 
   Mandatory if you are using Eclipse CDT.
-
-**sdk_dir**
-
-  This is useful when you want all your projects to use the
-  same 'sdk' directory.
-
-  This means that all the results of the compilation will end
-  up in the same directory, rather that being spread over
-  all the projects.
-
-
-.. _qibuild-xml-node-manifest:
-
-manifest node
-~~~~~~~~~~~~~
-
-The 'manifest' node must have a 'url' attribute.
-
-For instance
-
-.. code-block:: xml
-
-   <manifest
-      url="http://example.com/feed.xml
-   />
-
-
 
 .. _qibuild-config-merging:
 
@@ -364,5 +313,4 @@ Here is what you could use:
 
 * When using ``-c vs2010``, ``%PATH%`` will look like:
   ``c:\swig\bin;...``
-
 
