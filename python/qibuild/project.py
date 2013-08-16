@@ -337,7 +337,7 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             qisys.command.call(["cmake"] + cmake_args, cwd=self.build_directory,
                                env=build_env)
 
-    def deploy(self, url, split_debug=True, use_rsync=True, port=22):
+    def deploy(self, url, split_debug=False, use_rsync=True, port=22):
         """ Deploy the project to a remote url """
         destdir = os.path.join(self.build_directory, "deploy")
         #create folder for project without install rules

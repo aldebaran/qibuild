@@ -30,15 +30,10 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     group = parser.add_argument_group("deploy options")
     group.add_argument("url", help="remote target url: user@hostname:path")
-    group.add_argument("--port", help="port", type=int)
-    group.add_argument("--split-debug", action="store_true",
-                        dest="split_debug", help="split debug symbols. "
-                        "Enable remote debuging")
-    group.add_argument("--no-split-debug", action="store_false",
-                        dest="split_debug", help="do not split debug symbols. "
-                        "Remote debugging won't work")
+    group.add_argument("--port", help="port", type=int, default=22)
+    group.add_argument("--split-debug", action="store_true", dest="split_debug",
+                        help="split debug symbols. Enable remote debuging")
     group.add_argument("--url", dest="urls", action="append", help="deploy to each given url.")
-    parser.set_defaults(port=22, split_debug=True)
 
 def do(args):
     """Main entry point"""
@@ -62,4 +57,4 @@ Supported formats are:
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
     cmake_builder.build()
     for url in urls:
-        cmake_builder.deploy(url)
+        cmake_builder.deploy(url, split_debug=args.split_debug)
