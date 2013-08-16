@@ -252,7 +252,7 @@ function(qi_install_python)
     string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" _python_version_full "${_python_version_full}")
     string(REGEX MATCH "^[0-9]+\\.[0-9]+" _python_version_major "${_python_version_full}")
   else()
-    qi_warning("Could not fing python headers, assuming version 2.7")
+    qi_warning("Could not find python headers, assuming version 2.7")
     set(_python_version_major "2.7")
   endif()
 
