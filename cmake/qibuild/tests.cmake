@@ -208,8 +208,6 @@ function(qi_add_test test_name target_name)
 
   set(_qi_add_test_args ${_qi_add_test_args} ${_cmd})
 
-  message(STATUS "_qi_add_test_args: ${_qi_add_test_args}")
-
   qi_run_py_script("${qibuild_DIR}/qi_add_test.py"
     ARGUMENTS ${_qi_add_test_args}
   )
