@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Collection of parser fonctions for various actions
+""" Collection of parser fonctions for qibuild actions
 """
 
 import os
