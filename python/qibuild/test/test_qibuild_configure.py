@@ -79,7 +79,7 @@ def test_preserve_cache(qibuild_action):
     cache_after = qibuild.cmake.read_cmake_cache(foo_proj.cmake_cache)
 
     if os.name == 'nt':
-        # no way to prevent CMake for storing c:\Users
+        # no way to prevent CMake from storing c:\Users
         # in the cache ...
         for k in cache_before:
             cache_before[k] = cache_before[k].lower()
