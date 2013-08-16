@@ -81,7 +81,7 @@ fuscia     = fuchsia
 CONFIG = {
     "verbose": os.environ.get("VERBOSE"),
     "quiet": False,
-    "color": True,
+    "color": "auto",
     "timestamp": False,
     "interactive": True,
     "record": False  # used for testing
@@ -100,18 +100,30 @@ def configure_logging(args):
     CONFIG["quiet"] = args.quiet
     CONFIG["timestamp"] = args.timestamp
 
+
+def config_color(fp):
+    config_color = CONFIG["color"]
+    if config_color.lower() == "never":
+        return False
+    if config_color.lower() == "always":
+        return True
+    # else: auto
+    if os.name == 'nt' and not HAS_PYREADLINE or not fp.isatty():
+        return False
+    else:
+        return True
+
+
 def _msg(*tokens, **kwargs):
     """ Helper method for error, warning, info, debug
 
     """
     if CONFIG["record"]:
-        CONFIG["color"] = False
+        CONFIG["color"] = "never"
     fp = kwargs.get("fp", sys.stdout)
     sep = kwargs.get("sep", " ")
     end = kwargs.get("end", "\n")
-    with_color = CONFIG["color"]
-    if os.name == 'nt' and not HAS_PYREADLINE or not fp.isatty():
-        with_color = False
+    with_color = config_color(fp)
     res = list()  # Initialize result list, to be concatenated before printing
     if CONFIG["timestamp"]:
         now = datetime.datetime.now()
