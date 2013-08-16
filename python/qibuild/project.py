@@ -11,6 +11,7 @@ import qibuild.build
 import qibuild.gdb
 import qibuild.dylibs
 import qibuild.dlls
+import qitest.runner
 import qitoolchain.toolchain
 
 class BuildProject(object):
@@ -332,6 +333,30 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             self.split_debug(destdir)
         ui.info(ui.green, "Sending binaries to target ...")
         qibuild.deploy.deploy(destdir, url, use_rsync=use_rsync, port=port)
+
+    def run_tests(self, **kwargs):
+        qitest_json = os.path.join(self.build_directory, "qitest.json")
+        if not os.path.exists(qitest_json):
+            return False, (ui.red, "No tests found for", ui.blue, self.name)
+        ui.info(ui.green, "Testing", self.name, "...")
+        tests = qitest.conf.parse_tests(qitest_json)
+        test_runner = qitest.runner.TestRunner(tests)
+        test_runner.cwd = self.build_directory
+        test_runner.env = self.build_env
+        test_runner.pattern = kwargs.get("pattern")
+        test_runner.perf = kwargs.get("perf")
+        test_runner.nightly = kwargs.get("nightly")
+        test_runner.coverage = kwargs.get("coverage")
+        test_runner.valgrind = kwargs.get("valgrind")
+        test_runner.verbose = kwargs.get("verbose_tests")
+        test_runner.num_cpus = kwargs.get("num_cpus")
+        test_runner.num_jobs = kwargs.get("num_jobs")
+
+        # FIXME: are those used ?
+        test_runner.test_args = kwargs.get("test_args")
+        test_runner.nightmare = kwargs.get("nightmare")
+
+        return test_runner.run()
 
 
     def fix_shared_libs(self, paths):
