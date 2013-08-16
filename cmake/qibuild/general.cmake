@@ -53,7 +53,6 @@ include("qibuild/subdirectory")
 include("qibuild/internal/layout")
 include("qibuild/internal/install")
 include("qibuild/internal/glob")
-include("qibuild/internal/autostrap")
 
 if (NOT QI_SDK_DIR)
   qi_persistent_set(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk")
@@ -79,7 +78,6 @@ include("qibuild/gettext")
 # Find libraries from self sdk dir before everything else.
 qi_persistent_prepend_uniq(CMAKE_FIND_ROOT_PATH "${QI_SDK_DIR}")
 
-_qi_autostrap_update()
 
 if (QI_T001CHAIN_COMPAT)
   include("qibuild/compat/compat")
