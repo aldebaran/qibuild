@@ -354,10 +354,6 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         test_runner.num_cpus = kwargs.get("num_cpus")
         test_runner.num_jobs = kwargs.get("num_jobs")
 
-        # FIXME: are those used ?
-        test_runner.test_args = kwargs.get("test_args")
-        test_runner.nightmare = kwargs.get("nightmare")
-
         return test_runner.run()
 
 
