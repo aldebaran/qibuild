@@ -18,8 +18,8 @@ class TestRunner(object):
 
     @property
     def tests(self):
-        print self._tests
-        return [x for x in self._tests if match_pattern(self.pattern, x["name"])]
+        res =  [x for x in self._tests if match_pattern(self.pattern, x["name"])]
+        return res
 
     @tests.setter
     def tests(self, value):
@@ -33,6 +33,8 @@ class TestRunner(object):
     def pattern(self, value):
         if value:
             self._pattern = re.compile(value)
+        else:
+            self._pattern = None
 
     def run(self):
         return True, (ui.green, "All pass. Congrats!")
