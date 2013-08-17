@@ -7,6 +7,7 @@
 """
 
 import argparse
+import os
 import sys
 
 from qisys import ui
@@ -34,8 +35,6 @@ def configure_parser(parser):
                         help="run tests under valgrind")
     group.add_argument("--nightmare", dest="nightmare", action="store_true",
                         help="run tests in shuffle and 20 times (apply only to gtest)")
-    group.add_argument("--test-args", dest="test_args",
-                        help="Pass extra argument to test binary")
     group.add_argument("--coverage", dest="coverage", action="store_true",
                         help="run coverage")
     group.add_argument("--ncpu", dest="num_cpus", default=-1, type=int,
@@ -51,6 +50,10 @@ def do(args):
     if args.nightly:
         ui.warning("--slow option has no effect\n",
                    "Use `qibuild configure -DQI_WITH_NIGHTLY_TESTS=ON` instead")
+
+    if args.nightmare:
+        os.environ["GTEST_REPEAT"] = "20"
+        os.environ["GTEST_SHUFFLE"] = "yes"
 
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
     deps_solver = cmake_builder.deps_solver

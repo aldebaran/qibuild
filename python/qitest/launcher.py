@@ -23,26 +23,22 @@ class ProcessTestLauncher(object):
     def __init__(self, suite_runner):
         self.suite_runner = suite_runner
         self.verbose = suite_runner.verbose
+        self.valgrind_log = None
 
     def launch(self, test):
         """ Implements TestLauncher.launch """
         res = qitest.result.TestResult(test)
-        timeout = test.get("timeout")
-        env = None
-        if self.suite_runner.env:
-            env = self.suite_runner.env.copy()
-            test_env = test.get("environment")
-            if test_env:
-                env.update(test_env)
-        if ui.CONFIG["color"] and test.get("gtest"):
-            env["GTEST_COLOR"] = "yes"
-        cwd = self.suite_runner.cwd
         cmd = test["cmd"]
         if not os.path.exists(cmd[0]):
             res.ok = False
             res.message = (ui.red, cmd[0], "no such file or directory")
             return res
-        test.get("working_directory", self.suite_runner.cwd)
+        self._update_test(test)
+
+        cmd = test["cmd"]
+        timeout = test["timeout"]
+        env = test["env"]
+        cwd = test["working_directory"]
         process = qisys.command.Process(cmd, cwd=cwd, env=env)
         start = datetime.datetime.now()
         process.run(timeout)
@@ -68,6 +64,51 @@ class ProcessTestLauncher(object):
 
         res.message = message
         return res
+
+
+    def _update_test(self, test):
+        """ Update the test given the settings on the test suite """
+        self._update_test_env(test)
+        self._update_test_cwd(test)
+        valgrind = self.suite_runner.valgrind
+        if valgrind:
+            self._with_valgrind(test)
+        num_cpus = self.suite_runner.num_cpus
+        if num_cpus != -1:
+            self._with_num_cpus(test, num_cpus)
+
+    def _update_test_env(self, test):
+        env = os.environ.copy()
+        if self.suite_runner.env:
+            env = self.suite_runner.env.copy()
+        test_env = test.get("environment")
+        if test_env:
+            env.update(test_env)
+        if ui.CONFIG["color"] and test.get("gtest"):
+            env["GTEST_COLOR"] = "yes"
+        test["env"] = env
+        # Quick hack:
+        gtest_repeat = env.get("GTEST_REPEAT", "1")
+        test["timeout"] = test["timeout"] * int(gtest_repeat)
+
+    def _update_test_cwd(self, test):
+        cwd = self.suite_runner.cwd
+        test["working_directory"] = test.get("working_directory",
+                                             self.suite_runner.cwd)
+
+    def _with_valgrind(self, test):
+        cwd = test["working_directory"]
+        self.valgrind_log = os.path.join(cwd, test["name"] + "_valgrind.log")
+        print self.valgrind_log
+        test["timeout"] = test["timeout"] * 10
+        test["cmd"] = ["valgrind", "--track-fds=yes",
+                       "--log-file=%s" % self.valgrind_log] + test["cmd"]
+
+    def _with_num_cpus(self, test, num_cpus):
+        # FIXME: every worker thread should have its cpu mask, but it's
+        # unclear what happens when you run -j3 -ncpu=2
+        pass
+
 
     def get_message(self, process, timeout=None):
         """ Human readable string describing the state of the process """

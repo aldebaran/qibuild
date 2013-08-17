@@ -14,6 +14,7 @@ class TestSuiteRunner(object):
         self.verbose = False
         self.perf = False
         self.nightly = False
+        self.nightmare = False
         self._tests = tests
         self._pattern = None
         self._coverage = False
@@ -62,6 +63,7 @@ class TestSuiteRunner(object):
             return
         if not qisys.command.find_program("valgrind"):
             raise Exception("valgrind was not found on the system")
+        self._valgrind = value
 
     @property
     def coverage(self):
