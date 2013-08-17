@@ -118,6 +118,7 @@ function(qi_create_gtest name)
   qi_add_test(${name} ${name}
     TIMEOUT ${ARG_TIMEOUT}
     ARGUMENTS ${_args}
+    GTEST
   )
 endfunction()
 
@@ -141,7 +142,7 @@ endfunction()
 # \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
 # \group:ARGUMENTS Arguments to be passed to the executable
 function(qi_add_test test_name target_name)
-  cmake_parse_arguments(ARG "PERF;NIGHTLY" "TIMEOUT" "ARGUMENTS" ${ARGN})
+  cmake_parse_arguments(ARG "PERF;NIGHTLY;GTEST" "TIMEOUT" "ARGUMENTS" ${ARGN})
 
   if(NOT ${QI_WITH_TESTS})
     return()
@@ -194,6 +195,10 @@ function(qi_add_test test_name target_name)
   set( _qi_add_test_args "--name" ${name})
   list(APPEND _qi_add_test_args "--output" ${CMAKE_BINARY_DIR}/qitest.json)
 
+  if (ARG_GTEST)
+    list(APPEND _qi_add_test_args "--gtest")
+  endif()
+
   if (ARG_TIMEOUT)
     list(APPEND _qi_add_test_args "--timeout" ${ARG_TIMEOUT})
   endif()
@@ -205,6 +210,7 @@ function(qi_add_test test_name target_name)
   if (ARG_PERF)
     list(APPEND _qi_add_test_args "--perf")
   endif()
+  list(APPEND _qi_add_test_args "--")
 
   set(_qi_add_test_args ${_qi_add_test_args} ${_cmd})
 
