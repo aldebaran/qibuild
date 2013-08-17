@@ -5,6 +5,7 @@ import threading
 from Queue import Queue
 
 from qisys import ui
+import qitest.result
 
 class TestQueue():
     """ A class able to run tests in parallel """
@@ -47,15 +48,26 @@ class TestQueue():
         Sets ``self.ok``
 
         """
+        if not self.tests:
+            ui.error("No tests were found.",
+                     "Did you run qibuild configure?")
+            self.ok = False
+            return
         num_tests = len(self.tests)
-        failed = [x for x in self.results.values() if not x[0]]
-        num_failed = len(failed)
-        self.ok = (num_failed == 0)
+        failures = [x for x in self.results.values() if not x.ok]
+        num_failed = len(failures)
+        self.ok = (not failures)
         if self.ok:
             ui.info("Ran %i tests" % num_tests)
             ui.info("All pass. Congrats!")
-        else:
-            ui.error("Ran %i tests, %i failures" % (num_tests, num_failed))
+            return
+        ui.error("Ran %i tests, %i failures" % (num_tests, num_failed))
+        max_len = max(len(x.test["name"]) for x in failures)
+        for i, failure in enumerate(failures):
+            ui.info_count(i, num_failed,
+                          ui.blue, failure.test["name"].ljust(max_len + 2),
+                          ui.reset, *failure.message)
+
 
 class TestWorker(threading.Thread):
     def __init__(self, queue, worker_index):
@@ -74,9 +86,10 @@ class TestWorker(threading.Thread):
             try:
                 result = self.launcher.launch(test)
             except Exception, e:
-                result = False, (ui.red, "Python exception during tests\n",
-                                 str(e))
-            self.test_logger.on_completed(test, index, result)
+                result = qitest.result.TestResult(test)
+                result.ok = False
+                result.message = (ui.red, "Python exception during tests:", str(e))
+            self.test_logger.on_completed(test, index, result.message)
             self.results[test["name"]] = result
             self.queue.task_done()
 
@@ -88,7 +101,10 @@ class TestLogger:
     def __init__(self, tests):
         self.mutex = Mutex()
         self.tests = tests
-        self.max_len = max((len(x["name"]) for x in self.tests))
+        try:
+            self.max_len = max((len(x["name"]) for x in self.tests))
+        except ValueError:
+            self.max_len = 0
         self.single_job = False
 
     def on_start(self, test, index):
@@ -99,9 +115,8 @@ class TestLogger:
         with self.mutex.acquire():
             self._info(test, index, ("starting ...",))
 
-    def on_completed(self, test, index, result):
+    def on_completed(self, test, index, message):
         """ Called when a test is over """
-        ok, message = result
         if self.single_job:
             ui.info(*message)
             return

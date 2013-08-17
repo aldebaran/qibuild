@@ -2,6 +2,7 @@ from qisys import ui
 import time
 import qitest.test_queue
 import qitest.launcher
+import qitest.result
 
 class DummyLauncher(qitest.launcher.TestLauncher):
     def __init__(self):
@@ -9,7 +10,9 @@ class DummyLauncher(qitest.launcher.TestLauncher):
 
     def launch(self, test):
         default_time = 0.2
-        default_result = True, (ui.green, "[OK]")
+        default_result = qitest.result.TestResult(test)
+        default_result.ok = True
+        default_result.message = (ui.green, "[OK]")
         sleep_time = default_time
         result = default_result
         fate = self.results.get(test["name"])
@@ -45,9 +48,12 @@ def test_queue_sad():
      {"name" : "five"},
     ]
     test_queue = qitest.test_queue.TestQueue(tests)
+    fail_result = qitest.result.TestResult(tests[1])
+    fail_result.ok = False
+    fail_result.message = (ui.red, "[FAIL]")
     dummy_launcher = DummyLauncher()
     dummy_launcher.results = {
-        "two" : {"result" : (False, (ui.red, "[FAIL]"))},
+        "two" : {"result" : fail_result},
         "three" : {"raises" : True},
         "four" : {"sleep_time" : 0.4},
     }
@@ -69,3 +75,10 @@ def test_one_job():
     test_queue.run(num_jobs=1)
     assert test_queue.ok
 
+def test_no_tests():
+    tests = list()
+    test_queue = qitest.test_queue.TestQueue(tests)
+    dummy_launcher = DummyLauncher()
+    test_queue.launcher = dummy_launcher
+    test_queue.run(num_jobs=1)
+    assert not test_queue.ok

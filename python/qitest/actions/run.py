@@ -64,8 +64,7 @@ def do(args):
     for project in projects:
         if args.build_first:
             project.build()
-        res, message = project.run_tests(**vars(args))
-        ui.info(*message)
+        res = project.run_tests(**vars(args))
 
     if not res:
         sys.exit(1)
