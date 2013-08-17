@@ -80,7 +80,7 @@ def run_perfs(project, pattern=None, dry_run=False):
         qisys.sh.mkdir(test_result)
         output_xml = os.path.join(test_result, name + ".xml")
         cmd.extend(["--output", output_xml])
-        process = qisys.command.Process(cmd, verbose=True)
+        process = qisys.command.Process(cmd)
         process.run(timeout)
         print(process.out)
         if timeout and process.return_type == qisys.command.Process.TIME_OUT:

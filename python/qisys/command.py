@@ -45,14 +45,13 @@ class Process:
     INTERRUPTED = 4
     NOT_RUN     = 5
 
-    def __init__(self, cmd, verbose=False, cwd=None, env=None):
+    def __init__(self, cmd, cwd=None, env=None):
         self.cmd = cmd
         self.cwd = cwd
         self.env = env
         self.out = ""
         self._process = None
         self.exception = None
-        self.verbose = verbose
         self.return_type = Process.FAILED
 
     def run(self, timeout=None):

@@ -174,8 +174,7 @@ class Test:
             ncmd.extend(tmp)
         process = qisys.command.Process(ncmd,
             cwd=cwd,
-            env=env,
-            verbose=self.verbose)
+            env=env)
         if self.nightmare:
             ncmd.extend(["--gtest_shuffle", "--gtest_repeat=20"])
             timeout = timeout * 20
