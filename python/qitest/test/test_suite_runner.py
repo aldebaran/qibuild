@@ -9,7 +9,7 @@ def test_match_patterns():
     test_foo_bar = { "name" : "test_foo_bar" }
     tests = [test_foo, test_bar, test_foo_bar]
 
-    test_runner = qitest.runner.TestRunner()
+    test_runner = qitest.runner.TestSuiteRunner()
     test_runner.tests = tests
     test_runner.pattern = "foo"
 
@@ -23,7 +23,7 @@ def test_match_patterns():
 
 
 def test_run(compiled_tests):
-    test_runner = qitest.runner.TestRunner()
+    test_runner = qitest.runner.TestSuiteRunner()
     test_runner.tests = compiled_tests
     test_runner.run()
-
+i
