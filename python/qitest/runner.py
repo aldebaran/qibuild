@@ -1,7 +1,7 @@
 import re
 from qisys import ui
 
-class TestRunner(object):
+class TestSuiteRunner(object):
     def __init__(self):
         self.num_jobs = 1
         self.cwd = None
@@ -14,7 +14,6 @@ class TestRunner(object):
         self._coverage = False
         self._valgrind = False
         self._num_cpus = -1
-
 
     @property
     def tests(self):

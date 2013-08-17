@@ -55,3 +55,17 @@ def test_queue_sad():
     test_queue.launcher = dummy_launcher
     test_queue.run(num_jobs=3)
     assert not test_queue.ok
+
+
+def test_one_job():
+    tests = [
+     {"name" : "one"},
+     {"name" : "two"},
+     {"name" : "three"},
+    ]
+    test_queue = qitest.test_queue.TestQueue(tests)
+    dummy_launcher = DummyLauncher()
+    test_queue.launcher = dummy_launcher
+    test_queue.run(num_jobs=1)
+    assert test_queue.ok
+

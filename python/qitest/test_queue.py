@@ -24,6 +24,8 @@ class TestQueue():
         for i, test in enumerate(self.tests):
             self.task_queue.put((test, i))
 
+        if num_jobs == 1:
+            self.test_logger.single_job = True
         threads = list()
 
         for i in range(0, num_jobs):
@@ -86,23 +88,31 @@ class TestLogger:
     def __init__(self, tests):
         self.mutex = Mutex()
         self.tests = tests
+        self.max_len = max((len(x["name"]) for x in self.tests))
+        self.single_job = False
 
     def on_start(self, test, index):
         """ Called when a test starts """
+        if self.single_job:
+            self._info(test, index, (), end="")
+            return
         with self.mutex.acquire():
             self._info(test, index, ("starting ...",))
 
     def on_completed(self, test, index, result):
         """ Called when a test is over """
         ok, message = result
+        if self.single_job:
+            ui.info(*message)
+            return
         with self.mutex.acquire():
             self._info(test, index, message)
 
-    def _info(self, test, index, message):
+    def _info(self, test, index, message, **kwargs):
         """ Helper method """
         ui.info_count(index, len(self.tests),
-                      ui.blue, test["name"],
-                      ui.reset, *message)
+                      ui.blue, test["name"].ljust(self.max_len + 2),
+                      ui.reset, *message, **kwargs)
 
 
 class Mutex:
