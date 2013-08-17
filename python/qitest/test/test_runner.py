@@ -22,9 +22,8 @@ def test_match_patterns():
     assert test_runner.tests == [test_foo, test_bar, test_foo_bar]
 
 
-def test_run(build_worktree):
-    testme_proj = build_worktree.add_test_project("testme")
-    testme_proj.configure()
-    testme_proj.build()
-    testme_proj.run_tests()
+def test_run(compiled_tests):
+    test_runner = qitest.runner.TestRunner()
+    test_runner.tests = compiled_tests
+    test_runner.run()
 
