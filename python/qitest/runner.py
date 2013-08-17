@@ -1,15 +1,20 @@
 import re
+import os
+
 from qisys import ui
+import qisys.command
+import qitest.launcher
+import qitest.test_queue
 
 class TestSuiteRunner(object):
-    def __init__(self):
+    def __init__(self, tests):
         self.num_jobs = 1
-        self.cwd = None
+        self.cwd = os.getcwd()
         self.env = None
         self.verbose = False
         self.perf = False
         self.nightly = False
-        self._tests = list()
+        self._tests = tests
         self._pattern = None
         self._coverage = False
         self._valgrind = False
@@ -17,12 +22,11 @@ class TestSuiteRunner(object):
 
     @property
     def tests(self):
-        res =  [x for x in self._tests if match_pattern(self.pattern, x["name"])]
+        res =  list()
+        res = [x for x in self._tests if match_pattern(self.pattern, x["name"])]
+        res = [x for x in res if x.get("perf", False) == self.perf]
+        res = [x for x in res if x.get("nightly", False) == self.nightly]
         return res
-
-    @tests.setter
-    def tests(self, value):
-        self._tests = value
 
     @property
     def pattern(self):
@@ -68,9 +72,16 @@ class TestSuiteRunner(object):
         if not qisys.command.find_program("gcovr"):
             raise Exception("please install gcovr in order to measure coverage")
 
-
     def run(self):
-        return True, (ui.green, "All pass. Congrats!")
+        """ Run all the tests.
+        Return True if and only if the whole suite passed.
+
+        """
+        test_queue = qitest.test_queue.TestQueue(self.tests)
+        launcher = qitest.launcher.ProcessTestLauncher(self)
+        test_queue.launcher = launcher
+        ok = test_queue.run(num_jobs=self.num_jobs)
+        return ok
 
 
 def match_pattern(pattern, name):

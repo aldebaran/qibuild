@@ -11,6 +11,8 @@ import qibuild.build
 import qibuild.gdb
 import qibuild.dylibs
 import qibuild.dlls
+import qitest.runner
+import qitest.conf
 import qitoolchain.toolchain
 
 class BuildProject(object):
@@ -334,13 +336,13 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         qibuild.deploy.deploy(destdir, url, use_rsync=use_rsync, port=port)
 
     def run_tests(self, **kwargs):
+        """ Run the tests for this project """
         qitest_json = os.path.join(self.build_directory, "qitest.json")
         if not os.path.exists(qitest_json):
             return False, (ui.red, "No tests found for", ui.blue, self.name)
         ui.info(ui.green, "Testing", self.name, "...")
         tests = qitest.conf.parse_tests(qitest_json)
-        import qitest.test_suite_runner
-        test_runner = qitest.runner.TestSuiteRunner()
+        test_runner = qitest.runner.TestSuiteRunner(tests)
         test_runner.cwd = self.build_directory
         test_runner.env = self.build_env
         test_runner.pattern = kwargs.get("pattern")
