@@ -73,7 +73,6 @@ include("qibuild/submodule")
 include("qibuild/stage")
 include("qibuild/option")
 include("qibuild/codegen")
-include("qibuild/perf")
 include("qibuild/gettext")
 
 # Find libraries from self sdk dir before everything else.
