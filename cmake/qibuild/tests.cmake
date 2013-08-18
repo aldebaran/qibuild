@@ -35,8 +35,7 @@ set(_TESTS_RESULTS_FOLDER "${CMAKE_BINARY_DIR}/test-results" CACHE INTERNAL "" F
 # \group:ARGUMENTS arguments to be passed to the executable
 # \argn: source files (will be merged with the SRC group of arguments)
 function(qi_create_test name)
-  if (DEFINED BUILD_TESTS AND NOT BUILD_TESTS)
-    qi_debug("Test(${name}) disabled by BUILD_TESTS=OFF")
+  if (DEFINED QI_WITH_TESTS AND NOT QI_WITH_TESTS)
     qi_persistent_set(QI_${name}_TARGET_DISABLED TRUE)
     return()
   endif()
@@ -80,8 +79,7 @@ endfunction()
 # \group:ARGUMENTS Arguments to pass to add_test (to your test program)
 #
 function(qi_create_gtest name)
-  if (DEFINED BUILD_TESTS AND NOT BUILD_TESTS)
-    qi_debug("Test(${name}) disabled by BUILD_TESTS=OFF")
+  if (DEFINED QI_WITH_TESTS AND NOT QI_WITH_TESTS)
     qi_persistent_set(QI_${name}_TARGET_DISABLED TRUE)
     return()
   endif()
@@ -144,7 +142,7 @@ endfunction()
 function(qi_add_test test_name target_name)
   cmake_parse_arguments(ARG "PERF;NIGHTLY;GTEST" "TIMEOUT" "ARGUMENTS" ${ARGN})
 
-  if(NOT ${QI_WITH_TESTS})
+  if(DEFINED QI_WITH_TESTS AND NOT QI_WITH_TESTS)
     return()
   endif()
 
