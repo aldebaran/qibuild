@@ -86,6 +86,15 @@ qilinguist
 * ``qilinguist`` can now be called without any project name
 * Add ``qilinguist list``
 
+qidoc
+~~~~~~
+
+* Now usable without a "templates" repository
+* Can choose the project to be at the root of the generated doc
+* Now only generates files in <project>/build-doc
+* New commands: ``qidoc clean``, ``qidoc install``
+
+
 
 Config files
 ++++++++++++
