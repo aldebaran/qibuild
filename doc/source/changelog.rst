@@ -37,6 +37,9 @@ General
   * ``qibuild init``, ``qisrc init``, will only run if the working
     directory is empty
 
+* ``qibuild deploy`` no longer strips the debug symbols by default. Use
+  ``--split-debug`` to do so.
+
 qisrc
 ~~~~~
 
