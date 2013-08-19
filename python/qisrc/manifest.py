@@ -239,6 +239,7 @@ class RepoConfig(object):
 class ManifestParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(ManifestParser, self).__init__(target)
+        self._ignore = ["manifest_xml"]
 
     def _parse_branch(self, elem):
         self.target.default_branch = elem.get("default")
