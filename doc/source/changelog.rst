@@ -63,67 +63,8 @@ qisrc
   ``qibuild configure --no-runtime`` or ``qibuild configure --build-deps-only``
   instead of ``qibuild configure --build-deps``
 
-qibuild
-~~~~~~~
-
-* ``qibuild`` now uses ``CMake`` code from the worktree. This makes it possible
-  to use a Python command line version ``qibuild`` different of the ``qibuild/cmake``
-  code.
-* ``qibuild init -c`` is deprecated, use ``qitoolchain set-default`` instead
-* ``qibuild init --interactive`` is deprecated, use ``qibuild config --wizard`` instead
-* ``qibuild test`` learned ``--build-first``
-* Add ``qibuild run``
-* Add ``qibuild find``
-
-qitoolchain
-~~~~~~~~~~~
-
-* Add ``qitoolchain set-default``
-
-qilinguist
-~~~~~~~~~~~
-
-* ``qilinguist`` can now be called without any project name
-* Add ``qilinguist list``
-
-qidoc
-~~~~~~
-
-* Now usable without a "templates" repository
-* Can choose the project to be at the root of the generated doc
-* Now only generates files in <project>/build-doc
-* New commands: ``qidoc clean``, ``qidoc install``
-
-
-
-Config files
-++++++++++++
-
 * Manifests are now cloned in ``.qi/manifests``, making it possible to
   have code review on manifests repositories too
-* Syntax of ``qiproject.xml`` changed:
-
-.. code-block:: xml
-
-    <!-- old -->
-    <project name="foo">
-      <depends runtime="true" names="bar" />
-      <qidoc name="foo-doc" src="." />
-    </project>
-
-.. code-block:: xml
-
-    <!-- new -->
-    <project version="3" >
-      <qibuild name="foo">
-        <depends runtime="true" names="bar" />
-      </qibuild>
-
-      <qidoc name="foo-doc" />
-    </project>
-
-This is more consistent, and helps solving nasty bugs when using nested
-qibuild projects.
 
 * Syntax of the ``manifests.xml`` changed:
 
@@ -201,6 +142,88 @@ Used with ``--profile bar``
     </manifest>
 
 Used with ``--group bar``
+
+qibuild
+~~~~~~~
+
+* ``qibuild`` now uses ``CMake`` code from the worktree. This makes it possible
+  to use a Python command line version ``qibuild`` different of the ``qibuild/cmake``
+  code.
+* ``qibuild init -c`` is deprecated, use ``qitoolchain set-default`` instead
+* ``qibuild init --interactive`` is deprecated, use ``qibuild config --wizard`` instead
+* ``qibuild test`` learned ``--build-first``
+* Add ``qibuild run``
+* Add ``qibuild find``
+
+* Syntax of ``qiproject.xml`` changed:
+
+.. code-block:: xml
+
+    <!-- old -->
+    <project name="foo">
+      <depends runtime="true" names="bar" />
+    </project>
+
+.. code-block:: xml
+
+    <!-- new -->
+    <project version="3" >
+      <qibuild name="foo">
+        <depends runtime="true" names="bar" />
+      </qibuild>
+
+    </project>
+
+This is more consistent, and helps solving nasty bugs when using nested
+qibuild projects.
+
+qitoolchain
+~~~~~~~~~~~
+
+* Add ``qitoolchain set-default``
+
+qilinguist
+~~~~~~~~~~~
+
+* ``qilinguist`` can now be called without any project name
+* Add ``qilinguist list``
+
+qidoc
+~~~~~~
+
+* Now usable without a "templates" repository
+* Can choose the project to be at the root of the generated doc
+* Now only generates files in <project>/build-doc
+* New commands: ``qidoc clean``, ``qidoc install``
+
+* Syntax of ``qiproject.xml`` changed:
+
+.. code-block:: xml
+
+    <!-- old -->
+    <! -- in foo/qiproject.xml -->
+    <project>
+      <sphinxdoc src="doc" name="foo-doc" />
+    </project>
+
+.. code-block:: xml
+
+    <!-- new -->
+    <! -- in foo/qiproject.xml -->
+    <project version="3" >
+      <project src="doc" />
+    </project>
+
+    <! -- in foo/doc/qiproject.xml -->
+    <project version="3" >
+      <qidoc type="sphinx" name="foo-doc" />
+    </project>
+
+
+Config files
+++++++++++++
+
+
 
 CMake
 +++++
