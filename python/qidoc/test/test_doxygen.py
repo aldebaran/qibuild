@@ -4,6 +4,18 @@ import qidoc.doxygen
 import qidoc.builder
 from qidoc.test.conftest import find_link
 
+def test_read_doxyfile(tmpdir):
+    doxyfile = tmpdir.join("Doxyfile")
+    doxyfile.write(
+r"""
+INPUT  =      foo \
+  include/foo.h
+# This is a comment
+SPAM=eggs
+""")
+    parsed = qidoc.doxygen.read_doxyfile(doxyfile.strpath)
+    assert parsed["INPUT"] == "foo   include/foo.h"
+
 def test_forced_settings(doc_worktree):
     foo_dox = doc_worktree.create_doxygen_project("foo")
     foo_dox.configure()

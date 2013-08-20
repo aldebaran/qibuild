@@ -17,6 +17,15 @@ def read_doxyfile(doxyfile):
     with open(doxyfile, "r") as fp:
         lines = fp.readlines()
 
+    # Handle lines ending with backshlash
+    contents = ""
+    for line in lines:
+        if line.endswith("\\\n"):
+            contents += line.strip()[:-1]
+        else:
+            contents += line
+
+    lines = contents.splitlines()
     for line in lines:
         if line.startswith("#"):
             continue
