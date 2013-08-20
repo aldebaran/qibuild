@@ -324,6 +324,7 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
 
     if dry_run:
         ui.info(ui.green, "List of tests for", project.name)
+        tests.sort()
         for (test_name, _, _) in tests:
             ui.info(ui.green, " * ", ui.reset, test_name)
         return True
