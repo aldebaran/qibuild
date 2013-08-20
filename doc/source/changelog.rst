@@ -220,11 +220,6 @@ qidoc
     </project>
 
 
-Config files
-++++++++++++
-
-
-
 CMake
 +++++
 
