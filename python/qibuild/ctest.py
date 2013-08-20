@@ -17,6 +17,7 @@ import signal
 import sys
 import threading
 import time
+import fnmatch
 
 import qisys
 from qisys import ui
@@ -301,7 +302,7 @@ def run_tests(project, build_env=None, pattern=None, verbose=False, slow=False,
     slow_tests = list()
     if pattern:
         try:
-            tests = [x for x in all_tests if re.search(pattern, x[0])]
+            tests = [x for x in all_tests if fnmatch.fnmatch(x[0], pattern)]
         except Exception as e:
             mess = "Invalid pattern \"{}\": {}".format(pattern, e)
             raise Exception(mess)
