@@ -2,9 +2,6 @@
 
 """
 
-import operator
-
-from qisys import ui
 import qisys.parsers
 import qidoc.parsers
 import qidoc.builder
