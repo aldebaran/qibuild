@@ -22,7 +22,7 @@ class DocBuilder(object):
         self.base_project = None
         self.version = "latest"
         self.hosted = True
-        self.debug = True
+        self.build_type = ""
         self.werror = False
 
     def configure(self):
@@ -33,7 +33,7 @@ class DocBuilder(object):
         configure_args = {
             "version" : self.version,
             "hosted"  : self.hosted,
-            "debug"   : self.debug,
+            "build_type"   : self.build_type,
         }
         for project in projects:
             project.configure(**configure_args)
@@ -67,7 +67,7 @@ class DocBuilder(object):
             configure_args = {
                 "version"   : self.version,
                 "hosted"    : self.hosted,
-                "debug"     : self.debug,
+                "build_type" : self.build_type,
                 "rel_paths" : True,
             }
             project.configure(**configure_args)
