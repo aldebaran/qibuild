@@ -14,7 +14,6 @@ import mock
 
 import qisys.sh
 import qisys.worktree
-import qisrc.git
 
 
 def test_read_projects(tmpdir):
@@ -146,17 +145,6 @@ def test_check_subprojects_exist(tmpdir):
     with pytest.raises(qisys.worktree.WorkTreeError) as e:
         wt.add_project("a")
     assert "invalid sub project" in e.value.message
-
-def test_check_not_in_git(tmpdir):
-    a_git = tmpdir.mkdir("a_git")
-    git = qisrc.git.Git(a_git.strpath)
-    git.init()
-    b = a_git.mkdir("b")
-    # pylint: disable-msg=E1101
-    with pytest.raises(qisys.worktree.WorkTreeError) as e:
-        qisys.worktree.WorkTree(b.strpath)
-    assert "inside a git project" in e.value.message
-
 
 def test_observers_are_notified(worktree):
     mock_observer = mock.Mock()

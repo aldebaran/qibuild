@@ -66,15 +66,6 @@ This path does not exists
 
     def check(self):
         """ Perform a few sanity checks """
-        # Check that we are not in a git project:
-        import qisrc.git
-        git_root = qisrc.git.get_repo_root(self.root)
-        if git_root:
-            raise WorkTreeError(""" Found a .qi inside a git project"
-git project: {0}
-worktree root: {1}
-""".format(git_root, self.root))
-
         # Check that we are not in an other worktree:
         parent_worktree = guess_worktree(self.root)
         if parent_worktree and parent_worktree != self.root:
