@@ -53,6 +53,7 @@ if __name__ == "__main__":
     install("qitoolchain")
     install("qibuild")
     install("qisrc")
+    install("qidoc")
 
 
 
