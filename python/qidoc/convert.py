@@ -64,7 +64,14 @@ def create_sub_project(worktree, root_elem, project, src):
 
 
 def create_doc_project(worktree, project_path, doc_elem):
-    new_doc_elem = qisys.qixml.etree.Element(doc_elem.tag)
+    doc_type = None
+    if doc_elem.tag == "doxydoc":
+        doc_type = "doxygen"
+    elif doc_elem.tag == "sphinxdoc":
+        doc_type = "sphinx"
+
+    new_doc_elem = qisys.qixml.etree.Element("qidoc")
+    new_doc_elem.set("type", doc_type)
     new_doc_elem.set("name", doc_elem.get("name"))
     dest = doc_elem.get("dest")
     if dest:
@@ -74,5 +81,6 @@ def create_doc_project(worktree, project_path, doc_elem):
     qiproject_xml = os.path.join(project_path, "qiproject.xml")
     qisys.qixml.write(new_doc_elem, qiproject_xml)
     project_elem = qisys.qixml.etree.Element("project")
+    project_elem.set("version", "3")
     project_elem.append(new_doc_elem)
     qisys.qixml.write(project_elem, qiproject_xml)
