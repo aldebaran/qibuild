@@ -28,7 +28,7 @@ class DoxygenProject(qidoc.project.DocProject):
         """ Create a correct Doxyfile in self.build_dir.
 
         * Force OUTPUT_DIRECTORY
-        * Rewrite INPUT and EXAMPLE_PATH
+        * Rewrite INPUT, EXAMPLE_PATH and IMAGE_PATH
         * Add @INCLUDE_PATH and @INCLUDE statements if we
           have a template
 
@@ -63,7 +63,7 @@ class DoxygenProject(qidoc.project.DocProject):
         if version:
             out_conf["PROJECT_NUMBER"] = version
 
-        for path_key in ["INPUT", "EXAMPLE_PATH"]:
+        for path_key in ["INPUT", "EXAMPLE_PATH", "IMAGE_PATH"]:
             in_value = in_conf.get(path_key)
             if not in_value:
                 continue
