@@ -10,6 +10,7 @@ and add it to a toolchain.
 import os
 
 import qisys
+import qisys.interact
 import qitoolchain
 from qitoolchain.binary_package import open_package
 from qitoolchain.binary_package import convert_to_qibuild
