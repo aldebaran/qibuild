@@ -4,6 +4,8 @@
 
 """Reset a repository to the manifest state."""
 
+import sys
+
 from qisys import ui
 import qisys.parsers
 import qisys.worktree
@@ -41,6 +43,7 @@ def do(args):
         snapshot = qisrc.snapshot.Snapshot()
         snapshot.load(args.snapshot)
 
+    errors = list()
     for git_project in git_projects:
         state_project = qisrc.status.check_state(git_project, False)
 
@@ -88,4 +91,15 @@ def do(args):
             to_reset = git.get_tracking_branch()
 
         if args.force:
-            git.reset("--hard", to_reset)
+            ui.info("reset", to_reset)
+            try:
+                git.reset("--hard", to_reset)
+            except:
+                errors.append(src)
+
+    if not errors:
+        return
+    ui.error("Failed to reset some projects")
+    for error in errors:
+        ui.error(" * ", error)
+    sys.exit(1)
