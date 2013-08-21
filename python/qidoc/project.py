@@ -49,6 +49,10 @@ class DocProject(object):
     def index_html(self):
         return os.path.join(self.build_dir, "html", "index.html")
 
+    @property
+    def template_project(self):
+        return self.doc_worktree.template_project
+
     def __repr__(self):
         return "<%s %s in %s>" % (self.doc_type.capitalize() + "Project",
                                   self.name, self.src)

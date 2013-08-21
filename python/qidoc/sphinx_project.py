@@ -21,9 +21,6 @@ class SphinxProject(qidoc.project.DocProject):
     def source_dir(self):
         return os.path.join(self.path, "source")
 
-    @property
-    def template_project(self):
-        return self.doc_worktree.template_project
 
     def configure(self, **kwargs):
         """ Create a correct conf.py in self.build_dir """

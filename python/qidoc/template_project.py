@@ -1,5 +1,7 @@
 import os
 
+import qidoc.doxygen
+
 class TemplateProject(object):
     def __init__(self, doc_worktree, worktree_project):
         self.doc_type = "template"
@@ -17,6 +19,24 @@ class TemplateProject(object):
             return ""
         with open(in_path, "r") as fp:
             return fp.read()
+
+    @property
+    def doxy_conf(self):
+        in_path = os.path.join(self.path,
+                               "doxygen", "Doxyfile.in")
+        conf = qidoc.doxygen.read_doxyfile(in_path)
+        filevars = [
+            ("HTML_HEADER", "header.html"),
+            ("HTML_FOOTER", "footer.html"),
+            ("HTML_STYLESHEET", "doxygen.css")
+        ]
+        for (var, filename) in filevars:
+            full_path = os.path.join(self.path, "doxygen", filename)
+            if os.path.exists(full_path):
+                conf[var] = full_path
+            else:
+                del conf[var]
+        return conf
 
     @property
     def themes_path(self):

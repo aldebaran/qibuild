@@ -1,3 +1,4 @@
+import collections
 import os
 
 import qisys.command
@@ -33,10 +34,15 @@ class DoxygenProject(qidoc.project.DocProject):
           have a template
 
         """
+        template_conf = collections.OrderedDict()
+        if self.template_project:
+            template_conf = self.template_project.doxy_conf.copy()
+
         version = kwargs.get("version")
         rel_paths = kwargs.get("rel_paths", False)
         in_conf = qidoc.doxygen.read_doxyfile(self.in_doxyfile)
-        out_conf = in_conf.copy()
+        out_conf = template_conf.copy()
+        out_conf.update(in_conf)
         out_conf["OUTPUT_DIRECTORY"] = self.build_dir
         out_conf["GENERATE_XML"] = "YES"  # required by qiapidoc and doxylink
         out_conf["GENERATE_HTML"] = "YES"
@@ -69,6 +75,7 @@ class DoxygenProject(qidoc.project.DocProject):
                 continue
             out_value = self.make_rel_paths(in_value)
             out_conf[path_key] = out_value
+
 
         qidoc.doxygen.write_doxyfile(out_conf, self.out_doxyfile)
 
