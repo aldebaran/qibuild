@@ -28,7 +28,7 @@ The doc project in {path} does no appear to have been built yet.
 ({index_html} does not exists.
 Try running  `qidoc build`
 """
-        mess.format(path=doc_project.path, index_html=index_html)
+        mess = mess.format(path=doc_project.path, index_html=index_html)
         ui.error(mess)
         sys.exit(1)
     if sys.platform == "darwin":
