@@ -67,6 +67,8 @@ def parse_url(remote_url):
     not.
 
     """
+    if "@" not in remote_url:
+        return None
 
     login = ''
     url   = ''

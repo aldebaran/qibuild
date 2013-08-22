@@ -22,3 +22,7 @@ def test_parse_url():
     assert res == {'given': "ssh://login@example.com:1234/path",
             'login':'login', 'url':'example.com', 'dir':'/path', 'port':1234}
 
+def test_project_like_urls_are_parsed_as_none():
+    res = qibuild.deploy.parse_url("foo")
+    assert res is None
+
