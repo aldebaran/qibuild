@@ -194,10 +194,11 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
         cmake_qibuild_dir = os.path.join(cmake_qibuild_dir, "qibuild")
         cmake_qibuild_dir = qisys.sh.to_posix_path(cmake_qibuild_dir)
         cmake_args.append("-Dqibuild_DIR=%s" % cmake_qibuild_dir)
-
-        qibuild.cmake.cmake(self.path, self.build_directory,
-                            cmake_args, env=self.build_env, **kwargs)
-
+        try:
+            qibuild.cmake.cmake(self.path, self.build_directory,
+                                cmake_args, env=self.build_env, **kwargs)
+        except qisys.command.CommandFailedException:
+            raise qibuild.build.ConfigureFailed(self)
 
     def build(self, num_jobs=1, rebuild=False, target=None,
               verbose_make=False, coverity=False, env=None):

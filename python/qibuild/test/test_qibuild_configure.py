@@ -53,7 +53,7 @@ def test_qi_stage_lib_simple(qibuild_action):
 def test_qi_stage_lib_but_really_bin(qibuild_action):
     qibuild_action.add_test_project("stagelib")
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qibuild.build.ConfigureFailed):
         qibuild_action("configure", "stagelib",
                        "-DSHOULD_FAIL_STAGE_LIB_BUT_REALLY_BIN=ON")
 
