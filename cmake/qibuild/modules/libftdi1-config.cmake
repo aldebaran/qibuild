@@ -7,4 +7,4 @@ clean(LIBFTDI1)
 fpath(LIBFTDI1 libftdi1/ftdi.h)
 flib(LIBFTDI1 ftdi1)
 
-export_lib(LIBFTDI)
+export_lib(LIBFTDI1)
