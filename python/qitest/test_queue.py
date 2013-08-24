@@ -1,6 +1,9 @@
 import contextlib
 import collections
+import traceback
 import time
+import StringIO
+import sys
 import threading
 from Queue import Queue
 
@@ -33,7 +36,6 @@ class TestQueue():
             worker = TestWorker(self.task_queue, i)
             worker.launcher = self.launcher
             worker.test_logger = self.test_logger
-            # No need for mutexes because of the GIL
             worker.results = self.results
             threads.append(worker)
             worker.start()
@@ -92,10 +94,20 @@ class TestWorker(threading.Thread):
             except Exception, e:
                 result = qitest.result.TestResult(test)
                 result.ok = False
-                result.message = (ui.red, "Python exception during tests:", str(e))
+                result.message = self.message_for_exception(e)
             self.test_logger.on_completed(test, index, result.message)
             self.results[test["name"]] = result
             self.queue.task_done()
+
+
+    def message_for_exception(self, exception):
+        tb = sys.exc_info()[2]
+        io = StringIO.StringIO()
+        traceback.print_tb(tb, file=io)
+        return (ui.red, "Python exception during tests:\n",
+                str(exception), "\n",
+                ui.reset,
+                io.getvalue())
 
 class TestLogger:
     """ Small class used to print what is going on during
