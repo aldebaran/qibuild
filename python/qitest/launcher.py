@@ -119,7 +119,7 @@ class ProcessTestLauncher(object):
         if process.return_type == qisys.command.Process.NOT_RUN:
             mess = "Not run"
             if process.exception is not None:
-                mess += ": " + process.exception
+                mess += ": " + str(process.exception)
             return mess
         if process.return_type == qisys.command.Process.TIME_OUT:
             return "Timed out (%is)" % timeout
