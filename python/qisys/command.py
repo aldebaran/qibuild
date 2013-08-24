@@ -18,11 +18,6 @@ from qisys import ui
 import qisys
 import qisys.envsetter
 
-# Quick hack: in order to be able to configure how
-# qisys.command works, we have to use this
-# global variable
-CONFIG = dict()
-
 # Cache for find_program()
 _FIND_PROGRAM_CACHE = dict()
 
