@@ -342,7 +342,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             return False, (ui.red, "No tests found for", ui.blue, self.name)
         ui.info(ui.green, "Testing", self.name, "...")
         tests = qitest.conf.parse_tests(qitest_json)
-        test_runner = qitest.runner.TestSuiteRunner(tests)
+        test_runner = qitest.runner.TestSuiteRunner(tests, project=self)
         test_runner.cwd = self.build_directory
         test_runner.env = self.build_env
         test_runner.pattern = kwargs.get("pattern")

@@ -22,6 +22,7 @@ class ProcessTestLauncher(object):
     """
     def __init__(self, suite_runner):
         self.suite_runner = suite_runner
+        self.project = self.suite_runner.project
         self.verbose = suite_runner.verbose
         self.valgrind_log = None
 
@@ -68,6 +69,7 @@ class ProcessTestLauncher(object):
 
     def _update_test(self, test):
         """ Update the test given the settings on the test suite """
+        self._update_test_cmd_for_project(test)
         self._update_test_env(test)
         self._update_test_cwd(test)
         valgrind = self.suite_runner.valgrind
@@ -76,6 +78,24 @@ class ProcessTestLauncher(object):
         num_cpus = self.suite_runner.num_cpus
         if num_cpus != -1:
             self._with_num_cpus(test, num_cpus)
+
+    def _update_test_cmd_for_project(self, test):
+        if not self.project:
+            return
+        test_results = os.path.join(self.project.build_directory,
+                                    "test-results")
+        perf_results = os.path.join(self.project.build_directory,
+                                    "perf-results")
+        if test.get("gtest"):
+            qisys.sh.mkdir(test_results)
+            output_xml = os.path.join(test_results, test["name"] + ".xml")
+            cmd = test["cmd"]
+            cmd.append("--gtest_output=xml:%s" % output_xml)
+        if test.get("perf"):
+            qisys.sh.mkdir(test_results)
+            output_xml = os.path.join(perf_results, test["name"] + ".xml")
+            cmd = test["cmd"]
+            cmd.extend(["--output", output_xml])
 
     def _update_test_env(self, test):
         env = os.environ.copy()
