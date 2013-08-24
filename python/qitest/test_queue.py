@@ -70,6 +70,10 @@ class TestQueue():
 
 
 class TestWorker(threading.Thread):
+    """ Implementation of a 'worker' thread. It will consume
+    the test queue, running the tests and logging the results
+
+    """
     def __init__(self, queue, worker_index):
         super(TestWorker, self).__init__(name="TestWorker#%i" % worker_index)
         self.queue = queue
@@ -99,7 +103,7 @@ class TestLogger:
 
     """
     def __init__(self, tests):
-        self.mutex = Mutex()
+        self.mutex = threading.Lock()
         self.tests = tests
         try:
             self.max_len = max((len(x["name"]) for x in self.tests))
@@ -112,7 +116,7 @@ class TestLogger:
         if self.single_job:
             self._info(test, index, (), end="")
             return
-        with self.mutex.acquire():
+        with self.mutex:
             self._info(test, index, ("starting ...",))
 
     def on_completed(self, test, index, message):
@@ -120,7 +124,7 @@ class TestLogger:
         if self.single_job:
             ui.info(*message)
             return
-        with self.mutex.acquire():
+        with self.mutex:
             self._info(test, index, message)
 
     def _info(self, test, index, message, **kwargs):
@@ -130,16 +134,3 @@ class TestLogger:
                       ui.reset, *message, **kwargs)
 
 
-class Mutex:
-    """ A mutex usable as a with statement.
-
-    """
-    # Sure this is not in the stdlib ?
-    def __init__(self):
-        self._mutex = threading.Lock()
-
-    @contextlib.contextmanager
-    def acquire(self):
-        self._mutex.acquire()
-        yield
-        self._mutex.release()
