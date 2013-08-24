@@ -39,7 +39,7 @@ function(qi_create_test name)
     qi_persistent_set(QI_${name}_TARGET_DISABLED TRUE)
     return()
   endif()
-  cmake_parse_arguments(ARG "NIGHTLY" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+  cmake_parse_arguments(ARG "NIGHTLY" "TIMEOUT;WORKING_DIRECTORY" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
   if(ARG_NIGHTLY AND NOT ${QI_NIGHTLY_TESTS})
     return()
   endif()
@@ -49,7 +49,9 @@ function(qi_create_test name)
   endif()
   qi_add_test(${name} ${name}
     TIMEOUT ${ARG_TIMEOUT}
+    WORKING_DIRECTORY ${ARG_WORKING_DIRECTORY}
     ARGUMENTS ${ARG_ARGUMENTS}
+
   )
 endfunction()
 
@@ -86,7 +88,7 @@ function(qi_create_gtest name)
 
   # create tests_results folder if it does not exist
   file(MAKE_DIRECTORY "${_TESTS_RESULTS_FOLDER}")
-  cmake_parse_arguments(ARG "NO_ADD_TEST;NIGHTLY" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+  cmake_parse_arguments(ARG "NO_ADD_TEST;NIGHTLY" "TIMEOUT;WORKING_DIRECTORY" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
   if(ARG_NIGHTLY AND NOT ${QI_NIGHTLY_TESTS})
     return()
   endif()
@@ -116,6 +118,7 @@ function(qi_create_gtest name)
   qi_add_test(${name} ${name}
     TIMEOUT ${ARG_TIMEOUT}
     ARGUMENTS ${_args}
+    WORKING_DIRECTORY ${ARG_WORKING_DIRECTORY}
     GTEST
   )
 endfunction()
@@ -139,7 +142,7 @@ function(qi_create_perf_test name)
     qi_persistent_set(QI_${name}_TARGET_DISABLED TRUE)
     return()
   endif()
-  cmake_parse_arguments(ARG "" "TIMEOUT" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+  cmake_parse_arguments(ARG "" "TIMEOUT;WORKING_DIRECTORY" "SRC;DEPENDS;ARGUMENTS" ${ARGN})
   set(_src ${ARG_UNPARSED_ARGUMENTS} ${ARG_SRC})
   set(_deps ${ARG_DEPENDS})
   set(_args ${ARG_ARGUMENTS})
@@ -169,6 +172,7 @@ function(qi_create_perf_test name)
     TIMEOUT ${ARG_TIMEOUT}
     ARGUMENTS ${_args}
     PERF
+    WORKING_DIRECTORY ${ARG_WORKING_DIRECTORY}
   )
 
 
@@ -194,7 +198,7 @@ endfunction()
 # \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
 # \group:ARGUMENTS Arguments to be passed to the executable
 function(qi_add_test test_name target_name)
-  cmake_parse_arguments(ARG "PERF;NIGHTLY;GTEST" "TIMEOUT" "ARGUMENTS" ${ARGN})
+  cmake_parse_arguments(ARG "PERF;NIGHTLY;GTEST" "TIMEOUT;WORKING_DIRECTORY" "ARGUMENTS" ${ARGN})
 
   if(DEFINED QI_WITH_TESTS AND NOT QI_WITH_TESTS)
     return()
@@ -247,6 +251,10 @@ function(qi_add_test test_name target_name)
 
   set( _qi_add_test_args "--name" ${test_name})
   list(APPEND _qi_add_test_args "--output" ${CMAKE_BINARY_DIR}/qitest.json)
+
+  if (ARG_WORKING_DIRECTORY)
+    list(APPEND _qi_add_test_args "--working-directory" ${ARG_WORKING_DIRECTORY})
+  endif()
 
   if (ARG_GTEST)
     list(APPEND _qi_add_test_args "--gtest")

@@ -17,6 +17,7 @@ def main():
     parser.add_argument("--nightly", action="store_true")
     parser.add_argument("--perf", action="store_true")
     parser.add_argument("--output", required=True)
+    parser.add_argument("--working-directory")
     parser.set_defaults(nightly=False, perf=False)
     args = parser.parse_args()
     output = args.output

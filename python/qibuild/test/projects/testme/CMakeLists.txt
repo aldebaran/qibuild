@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 project(runtests)
 
 find_package(qibuild)
-enable_testing()
+qi_create_test(cwd
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  ARGUMENTS ${CMAKE_SOURCE_DIR}
+  SRC cwd.cpp)
 qi_create_test(ok ok.cpp)
 qi_create_test(fail fail.cpp)
 qi_create_test(segfault segfault.cpp)
