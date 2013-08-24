@@ -7,7 +7,8 @@ import qitest.launcher
 import qitest.test_queue
 
 class TestSuiteRunner(object):
-    def __init__(self, tests):
+    def __init__(self, tests, project=None):
+        self.project = project
         self.num_jobs = 1
         self.cwd = os.getcwd()
         self.env = None
