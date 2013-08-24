@@ -1,5 +1,6 @@
 import contextlib
 import collections
+import signal
 import traceback
 import time
 import StringIO
@@ -8,6 +9,7 @@ import threading
 from Queue import Queue
 
 from qisys import ui
+import qisys.command
 import qitest.result
 
 class TestQueue():
@@ -19,9 +21,17 @@ class TestQueue():
         self.launcher = None
         self.results = collections.OrderedDict()
         self.ok = False
+        self._interrupted = False
+
 
     def run(self, num_jobs=1):
         """ Run all the tests """
+        signal.signal(signal.SIGINT, self.sigint_handler)
+        self._run(num_jobs=num_jobs)
+        signal.signal(signal.SIGINT, signal.default_int_handler)
+
+    def _run(self, num_jobs=1):
+        """ Helper function for ._run """
         if not self.launcher:
             ui.error("test launcher not set, cannot run tests")
             return
@@ -40,7 +50,14 @@ class TestQueue():
             threads.append(worker)
             worker.start()
 
-        self.task_queue.join()
+        # Do not use .join() so that this can be interrupted:
+        while self.task_queue.unfinished_tasks and \
+              not self._interrupted:
+            time.sleep(0.1)
+
+        for worker_thread in threads:
+            worker_thread.stop()
+
         self._summary()
 
     def _summary(self):
@@ -53,6 +70,9 @@ class TestQueue():
         if not self.tests:
             ui.error("No tests were found.",
                      "Did you run qibuild configure?")
+            self.ok = False
+            return
+        if self._interrupted:
             self.ok = False
             return
         num_tests = len(self.tests)
@@ -70,6 +90,25 @@ class TestQueue():
                           ui.blue, failure.test["name"].ljust(max_len + 2),
                           ui.reset, *failure.message)
 
+    def sigint_handler(self, *args):
+        """ Called when user press ctr+c during the test suite
+
+        * Tell qisys.command to kill every process still running
+        * Tell the tests_queue that is has been interrupted, and
+          stop all the test workers
+        * Setup a second sigint for when killing process failed
+
+        """
+        def double_sigint(signum, frame):
+            sys.exit("Exiting main program \n",
+                       "This may leave orphan processes")
+        qisys.command.SIGINT_EVENT.set()
+        ui.warning("\n!!!",
+                   "Interrupted by user, stopping every process.\n"
+                   "This may take a few seconds")
+        self._interrupted = True
+        signal.signal(signal.SIGINT, double_sigint)
+
 
 class TestWorker(threading.Thread):
     """ Implementation of a 'worker' thread. It will consume
@@ -83,9 +122,17 @@ class TestWorker(threading.Thread):
         self.launcher = None
         self.test_logger = None
         self.results = dict()
+        self._should_stop = False
+
+
+    def stop(self):
+        """ Tell the worker it should stop trying to read items from the queue """
+        self._should_stop = True
 
     def run(self):
         while not self.queue.empty():
+            if self._should_stop:
+                return
             test, index = self.queue.get()
             self.test_logger.on_start(test, index)
             result = None
