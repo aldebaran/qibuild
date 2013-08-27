@@ -30,7 +30,11 @@ function(_qi_add_test test_name target_name)
   endif()
 
   if(_srcs)
-    qi_create_bin(${target_name} SRC ${_srcs} DEPENDS ${ARG_DEPENDS})
+    set(_deps ${ARG_DEPENDS})
+    if(ARG_GTEST)
+      list(APPEND _deps GTEST GTEST_MAIN)
+    endif()
+    qi_create_bin(${target_name} SRC ${_srcs} DEPENDS ${_deps})
   endif()
 
   # Validate target_name. We expect one of:
