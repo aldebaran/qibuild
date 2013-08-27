@@ -337,11 +337,11 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
     def run_tests(self, **kwargs):
         """ Run the tests for this project """
-        qitest_json = os.path.join(self.build_directory, "qitest.json")
-        if not os.path.exists(qitest_json):
+        qitest_cmake = os.path.join(self.build_directory, "qitest.cmake")
+        if not os.path.exists(qitest_cmake):
             return False, (ui.red, "No tests found for", ui.blue, self.name)
         ui.info(ui.green, "Testing", self.name, "...")
-        tests = qitest.conf.parse_tests(qitest_json)
+        tests = qitest.conf.parse_qitest_cmake(qitest_cmake)
         test_runner = qitest.runner.TestSuiteRunner(tests, project=self)
         test_runner.cwd = self.build_directory
         test_runner.env = self.build_env
