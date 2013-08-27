@@ -22,9 +22,8 @@ def configure_parser(parser):
     group.add_argument("-l", "--list", dest="list", action="store_true",
                         help="Deprectated - List what tests would be run\n"
                              "Use `qitest list` instead")
-    # FIXME: supress from help instead
     group.add_argument("--slow", action="store_true", dest="nightly",
-                        help="Deprecated - Do not use")
+                        help=argparse.SUPPRESS)
     group.add_argument("--perf", dest="perf", action="store_true",
                         help="run perfs tests instead of pure tests.")
     group.add_argument("-k", "--pattern", dest="pattern",
