@@ -92,7 +92,7 @@ class ProcessTestLauncher(object):
             cmd = test["cmd"]
             cmd.append("--gtest_output=xml:%s" % output_xml)
         if test.get("perf"):
-            qisys.sh.mkdir(test_results)
+            qisys.sh.mkdir(perf_results)
             output_xml = os.path.join(perf_results, test["name"] + ".xml")
             cmd = test["cmd"]
             cmd.extend(["--output", output_xml])
