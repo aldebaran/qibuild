@@ -1,5 +1,6 @@
 import contextlib
 import collections
+import datetime
 import signal
 import traceback
 import time
@@ -22,13 +23,19 @@ class TestQueue():
         self.results = collections.OrderedDict()
         self.ok = False
         self._interrupted = False
+        self.elapsed_time = 0
 
 
     def run(self, num_jobs=1):
         """ Run all the tests """
         signal.signal(signal.SIGINT, self.sigint_handler)
+        start = datetime.datetime.now()
         self._run(num_jobs=num_jobs)
         signal.signal(signal.SIGINT, signal.default_int_handler)
+        end = datetime.datetime.now()
+        delta = end - start
+        self.elapsed_time = float(delta.microseconds) / 10**6 + delta.seconds
+        self._summary()
 
     def _run(self, num_jobs=1):
         """ Helper function for ._run """
@@ -58,7 +65,6 @@ class TestQueue():
         for worker_thread in threads:
             worker_thread.stop()
 
-        self._summary()
 
     def _summary(self):
         """ Display the tests results.
@@ -78,12 +84,14 @@ class TestQueue():
         num_tests = len(self.tests)
         failures = [x for x in self.results.values() if not x.ok]
         num_failed = len(failures)
+        message = "Ran %i tests in %is" % (num_tests, self.elapsed_time)
         self.ok = (not failures)
         if self.ok:
-            ui.info("Ran %i tests" % num_tests)
+            ui.info(message)
             ui.info("All pass. Congrats!")
             return
-        ui.error("Ran %i tests, %i failures" % (num_tests, num_failed))
+        ui.info(ui.red, message, "\n",
+                num_failed, "failures")
         max_len = max(len(x.test["name"]) for x in failures)
         for i, failure in enumerate(failures):
             ui.info_count(i, num_failed,
