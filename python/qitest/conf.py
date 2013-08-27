@@ -1,3 +1,4 @@
+import argparse
 import os
 import json
 
@@ -26,4 +27,26 @@ def add_test(output, **kwargs):
 def parse_tests(conf_path):
     with open(conf_path, "r") as fp:
         return json.load(fp)
+
+def parse_qitest_cmake(qitest_cmake_path):
+    tests = list()
+    with open(qitest_cmake_path, "r") as fp:
+        lines = fp.readlines()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("cmd", nargs="+")
+    parser.add_argument("--name", required=True)
+    parser.add_argument("--gtest", action="store_true",
+                        help="Tell qitest this is a test using gtest")
+    parser.add_argument("--timeout", type=int)
+    parser.add_argument("--nightly", action="store_true")
+    parser.add_argument("--perf", action="store_true")
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--working-directory")
+    parser.set_defaults(nightly=False, perf=False)
+    for line in lines:
+        line = line.strip()
+        args = parser.parse_args(args=line.split(";"))
+        test = vars(args)
+        tests.append(test)
+    return tests
 

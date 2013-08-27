@@ -17,7 +17,7 @@ endif()
 #  this will fail silently if the file does not exists
 #  this file is used by `qibuild test` and other commands
 #  later on and can ben patched from CMake
-file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/qitest.json)
+file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/qitest.cmake)
 
 get_filename_component(_this_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
 set(_qibuild_path ${_this_dir}/..)
