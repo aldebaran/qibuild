@@ -1,0 +1,51 @@
+v2.1
+----
+
+Command line
+++++++++++++
+
+* Add ``qilinguist``.
+* ``qisrc reset`` learn ``--fetch``  and ``--no-fetch``.
+* ``qisrc snapshot`` learn ``--fetch``, ``--no-fetch`` and ``--tag``.
+* ``qisrc list`` learn ``--with-path``.
+* ``qisrc grep`` learned ``-path``.
+* ``qisrc clean`` learned ``-z`` to clean build dir through toolchains and profiles.
+* ``qibuild test``: learned ``--ncpu`` to restrict the number of CPUs a test can use using taskset if available
+
+CMake
++++++
+
+* Added :cmake:function:`qi_stage_dir`
+
+Python
+++++++
+
+* Add ``qisrc.sync.get_toplevel_git_projects`` to ignore submodules
+  in a project list.
+* Add functions for handle build projects in qibuild and remove them from
+  ``qisys.worktree``.
+
+  * ``qibuild.project.is_buildable``.
+  * ``qibuild.project.build_projects``.
+
+* Add functions for handle git projects from ``qisys.worktree`` to
+  ``qisrc.git``.
+
+  * ``qisrc.git.is_git``.
+  * ``qisrc.git.get_git_projects``.
+
+* ``qibuild.parsers.build_parser`` has been split.
+
+  * ``qisrc.parsers.build_type_parser`` is for know the type of build
+    and so the name of the build directory.
+  * ``qisrc.parsers.build_parser`` extend the previous one and add
+    option for build projects (as ``-j``).
+
+* Remove ``qibuild.archive`` use ``qisys.archive`` instead.
+* Add ``qibuild.toc.get_build_folder_name`` to get the name of a build
+  directory from some informations.
+* Add ``qibuild.toc.Toc.get_build_folder_name`` to get the name of
+  the build directory from a toc.
+* Remove ``qibuild.toc.set_build_folder_name`` and
+  ``qibuild.toc.Toc.build_folder_name``
+* Add ``qibuild.toc.has_project``.

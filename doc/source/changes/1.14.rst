@@ -1,0 +1,78 @@
+v1.14
+-----
+
+Command line
++++++++++++++
+
+* Lots of bug fixes for XCode
+* Do not force CMAKE_BUILD_TYPE to be all upper-case. Now CMAKE_BUILD_TYPE equals
+  ("Debug" or "Release"). Note that the build folder name did not change
+  (It's still `build-<config>-release` when using `qibuild configure --release`)
+* Do not fail if default config is non existent
+* qitolchain: now can set cmake generator from the feed.
+* qitolchain: preserve permissions when using `.zip` packages on linux and mac
+* <echanism to copy dlls inside the build dir and create the symlinks
+  at the end of the compilation is now done by the qibuild executable,
+  and NOT from the CMakeList.
+* ``qibuild help``: sort available actions by name
+* ``qibuild test``: small bug fix for ``--test-name``
+* ``qibuild config --wizard``: fix unsetting build dir or sdk dir
+* ``qibuild config --wizard:``: fix generator discovery for cmake 2.8.6 under windows
+* ``qibuild configure``: nicer error message when cmake segfaults
+* ``qibuild configure``: learned ``--debug-trycompile`` option
+* ``qibuild package`` : learned ``--include-deps`` option
+* ``qidoc``: fix for archlinux
+* ``qibuild configure``: learned use ``-c system`` where ther is a default config
+  in ther current worktree but user still wants to use no toolchain.
+* Added ``qitoolchain import-package`` to import binary packages into a
+  cross-toolchain.
+
+CMake
++++++
+
+* Added :cmake:function:`qi_sanitize_compile_flags`
+* :cmake:function:`qi_use_lib` Now sorts and remove duplicates of include dirs
+* :cmake:function:`qi_stage_lib`: learned ``CUSTOM_CODE`` keyword
+* :cmake:function:`qi_stage_bin` is now implemented
+* :cmake:function:`qi_stage_header_only_lib` using ``DEPENDS`` did not work
+* :cmake:function:`qi_stage_lib`: changed the way ``STAGED_NAME`` works.
+* :cmake:function:`qi_use_lib`: optimized dependency handling
+
+* ``swig/python``: keep number of include dirs reasonable
+* ``target`` get rid of 'STAGE' args for ``qi_create_*`` functions
+* ``install``: support for macosx bundles
+
+* qibuild cmake modules:
+
+  * added qtopengl, qtmultimedia, qt_phonon, eigen3, iphlpapi
+  * now using upstream ``FindQt4.cmake`` to find `qt` when `qmake` is in PATH.
+  * now using using ``FindBoost.cmake``
+  * zeromq:   add dependency on RT for linux
+  * libevent: add dependency on RT for linux
+
+Python
+++++++
+
+* add ``qibuild.sh.change_cwd``
+* add ``qibuild.sh.is_executable_binary``
+* ``qisrc.git`` : rewrite
+* ``qibuild.cmdparse.run_action`` : allow adding ``--quiet-commands``
+* add ``qitoolchain.binary_package`` : provide functions to open binary
+  packages
+* add ``qitoolchain.binary_package.core`` : abstract class for binary
+  package provided by standard Linux distribution
+* add ``qitoolchain.binary_package.gentoo`` : binary package class for
+  *Gentoo* package (does not depends on *portage*)
+* add ``qitoolchain.binary_package.gentoo_portage`` : binary package
+  class for *Gentoo* package taking benefit from *portage*
+* ``qibuild.archive.extract`` , :py:func: `qibuild.archive.extract_zip` ,
+  ``qibuild.archive.extract_tar`` : add ``quiet`` keyword argument
+  allowing non-verbose extraction
+* ``qibuild.archive.extract_tar`` : fix archive name guessing
+* ``qibuild.interact`` : add ``get_editor`` function
+
+Misc
+++++
+
+* lots of documentation updates
+
