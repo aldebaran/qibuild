@@ -121,6 +121,13 @@ def test_submodule(qibuild_action):
     qibuild_action("configure", "submodule")
     qibuild_action("make", "submodule")
 
+def test_pycmd(qibuild_action):
+    pycmd_proj = qibuild_action.add_test_project("pycmd")
+    pycmd_proj.configure()
+    test_txt = os.path.join(pycmd_proj.build_directory, "test.txt")
+    with open(test_txt, "r") as fp:
+        assert fp.read() == "Written from Python\n"
+    qibuild_action("configure", "pycmd", "-DFAIL=TRUE", raises=True)
 def test_cmake_option_build_test_on(qibuild_action):
     project = qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme", "-DBUILD_TESTS=ON")

@@ -178,6 +178,15 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
             custom_cmake_code=custom_cmake_code
         )
 
+        import qibuild
+        qibuild_python = os.path.join(qibuild.__file__, "..", "..")
+        qibuild_python = os.path.abspath(qibuild_python)
+        qibuild_python = qisys.sh.to_posix_path(qibuild_python)
+        to_write += """
+set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
+""" % qibuild_python
+
+
         qisys.sh.mkdir(self.build_directory, recursive=True)
         dep_cmake = os.path.join(self.build_directory, "dependencies.cmake")
         qisys.sh.write_file_if_different(to_write, dep_cmake)

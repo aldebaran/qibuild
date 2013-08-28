@@ -63,6 +63,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
   qi_persistent_set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
+include("qibuild/python")
 include("qibuild/find")
 include("qibuild/flags")
 include("qibuild/tests")

@@ -16,6 +16,7 @@ DOCUMENTED_FILES=[
     "submodule",
     "option",
     "codegen",
+    "python",
     "find",
     "flags",
     "gettext",
