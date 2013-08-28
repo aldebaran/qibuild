@@ -66,24 +66,30 @@ def project_parser(parser, positional=True):
                              "the runtime deps.")
     parser.set_defaults(build_only=False)
 
-def get_build_worktree(args):
+def get_build_worktree(args, verbose=True):
     """ Get a build worktree to use from a argparse.Namespace
     object
 
     """
     worktree = qisys.parsers.get_worktree(args)
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
-    ui.info(ui.green, "Current build worktree:", ui.reset, ui.bold, build_worktree.root)
+    if verbose:
+        ui.info(ui.green, "Current build worktree:", ui.reset, ui.bold, build_worktree.root)
     if not hasattr(args, "build_type"):
         # build_parser() has not been called, so do leave the default build_config
         return build_worktree
     build_config = get_build_config(build_worktree, args)
     build_worktree.build_config = build_config
-    if build_config.toolchain:
-        ui.info(ui.green, "Using toolchain:", ui.blue, build_config.toolchain.name)
-    for profile in build_config.profiles:
-        ui.info(ui.green, "Using profile:", ui.blue, profile)
-    ui.info(ui.green, "Build type:", ui.blue, build_config.build_type)
+
+    if verbose:
+        if build_config.toolchain:
+            ui.info(ui.green, "Using toolchain:", ui.blue, build_config.toolchain.name)
+
+        for profile in build_config.profiles:
+            ui.info(ui.green, "Using profile:", ui.blue, profile)
+
+        ui.info(ui.green, "Build type:", ui.blue, build_config.build_type)
+
     return build_worktree
 
 def get_build_projects(build_worktree, args, solve_deps=True, default_all=False):

@@ -260,7 +260,7 @@ def collect_dependencies(project, projects, packages, single, runtime, depth=0):
 
 def do(args):
     """Main entry point for depends action"""
-    build_worktree = qibuild.parsers.get_build_worktree(args)
+    build_worktree = qibuild.parsers.get_build_worktree(args, verbose=(not args.graph))
     project = qibuild.parsers.get_one_build_project(build_worktree, args)
     collected_dependencies = get_deps(
         build_worktree, project, args.single, args.runtime, args.reverse)
