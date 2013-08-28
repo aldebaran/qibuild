@@ -7,3 +7,6 @@ CMake
 * qibuild cmake modules:
 
   * add ``udev``
+  * add ``psapi``
+  * add ``qt_qtdeclarative``
+  * fix ``sndfile`` on Visual Studio
