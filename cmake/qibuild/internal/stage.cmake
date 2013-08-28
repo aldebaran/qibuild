@@ -544,7 +544,7 @@ function(_qi_internal_stage_script script_path target_path)
   set(_res "${_res} ${_vars}")
   set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_l_target}-config.cmake")
   file(WRITE "${_sdk_file}" "${_res}")
-  _qi_install_redist_file("${_sdk_file}" "${target}", "${_l_target}")
+  _qi_install_redist_file("${_sdk_file}" "${target}" "${_l_target}")
 endfunction()
 
 #
