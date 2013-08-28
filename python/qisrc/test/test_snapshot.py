@@ -67,5 +67,12 @@ def test_always_fetch(git_worktree, git_server, tmpdir):
     assert local_sha1 == remote_sha1
 
 
-
-
+def test_load_fileobject(tmpdir):
+    snapshot = qisrc.snapshot.Snapshot()
+    snapshot.sha1s["foo"] = "d34db33f"
+    snapshot_txt = tmpdir.join("snap.txt").strpath
+    snapshot.dump(snapshot_txt)
+    snapshot2 = qisrc.snapshot.Snapshot()
+    with open(snapshot_txt) as f:
+        snapshot2.load(f)
+    assert snapshot2 == snapshot

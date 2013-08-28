@@ -4,15 +4,13 @@
 
 """Functions to generate and load snapshot."""
 
-
-import os
 import collections
 
 from qisys import ui
 
 import qisrc.git
 import qisrc.status
-import qisys.interact
+
 
 class Snapshot(object):
     """ Just a container for a git worktree snapshot """
@@ -26,14 +24,22 @@ class Snapshot(object):
             for src in srcs:
                 fp.write(src + ":" + self.sha1s[src] + "\n")
 
-    def load(self, input_path):
-        """ Laod a snapshot from a file """
-        with open(input_path, 'r') as fp:
-            for line in fp:
-                (src, sha1) = line.split(":")
-                src = src.strip()
-                sha1 = sha1.strip()
-                self.sha1s[src] = sha1
+    def load(self, input_file):
+        """ Load a snapshot from a file path or a file object """
+        # Try to open, else assume it's a file object
+        try:
+            fp = open(input_file, "r")
+        except TypeError:
+            fp = input_file
+        for line in fp:
+            (src, sha1) = line.split(":")
+            src = src.strip()
+            sha1 = sha1.strip()
+            self.sha1s[src] = sha1
+        try:
+            fp.close()
+        except AttributeError:
+            pass
 
     def __eq__(self, other):
         if not isinstance(other, Snapshot):
