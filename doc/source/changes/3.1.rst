@@ -1,0 +1,7 @@
+v3.1
+----
+
+CMake
++++++
+
+* Add ``qi_run_py_cmd``, ``qi_run_py_script``
