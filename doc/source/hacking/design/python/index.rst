@@ -73,10 +73,6 @@ WorkTrees can be nested, although this is not recommended
 A worktree should also contain a ``.qi/worktree.xml`` configuration
 file, used to track the projects inside the worktree.
 
-.. seealso::
-
-   * :ref:`worktree-xml-syntax`
-
 A worktree can also contain a ``.qi/qibuild.xml`` configuration
 file, used to store specific build settings for this worktree
 
