@@ -50,7 +50,9 @@ def build_parser(parser):
         help="The configuration to use. "
              "It should be the name of a toolchain, or \"system\"")
     group.add_argument("-p", "--profile", dest="profiles", action="append",
+        metavar="PROFILE",
         help="A profile to use. "
+             "It can appear several times. "
              "It should match a declaration in .qi/qibuild.xml")
 
 def project_parser(parser, positional=True):
