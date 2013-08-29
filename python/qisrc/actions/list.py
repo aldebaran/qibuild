@@ -7,44 +7,45 @@
 """
 
 import re
+import operator
 
 from qisys import ui
 import qisys.parsers
-import qisys.interact
 import qisrc.worktree
 
 
 def configure_parser(parser):
     """ Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
-    parser.add_argument("--with-path", action="store_true",
-                        help="Print the absolute path too.")
+    parser.add_argument("--names", action="store_true", dest="names",
+                        help="sort by names")
+    parser.add_argument("--paths", action="store_false", dest="names",
+                        help="sort by path")
     parser.add_argument("pattern", metavar="PATTERN", nargs="?",
                         help="pattern to be matched")
+    parser.set_defaults(names=True)
 
 def do(args):
     """ Main method """
-    worktree = qisys.parsers.get_worktree(args)
-    if not worktree.projects:
+    worktree = qisrc.parsers.get_git_worktree(args)
+    projects = worktree.git_projects
+    if not projects:
         qisrc.worktree.on_empty_worktree(worktree)
         return
-
+    ui.info(ui.green, "qisrc projects in:", ui.blue, worktree.root)
+    max_name = max(len(x.name) for x in projects)
+    max_src  = max(len(x.src)  for x in projects)
     regex = args.pattern
     if args.pattern:
         regex = re.compile(regex)
-    mess = [ui.green, "Projects in :", ui.reset, ui.bold, worktree.root]
-    if args.pattern:
-        mess.extend([ui.green, "matching", args.pattern])
-    ui.info(*mess)
-
-    # Compute max len of src to align path if needed.
-    max_length = max((len(x.src) for x in worktree.projects))
-
-    for project in worktree.projects:
-        if not regex or regex.search(project.src):
-            src = project.src.ljust(max_length)
-            mess = [ui.green, " *", ui.blue, src]
-            if args.with_path:
-                mess.extend([ui.yellow, "==>"])
-                mess.extend([ui.fuchsia, ui.bold, project.path])
-            ui.info(*mess)
+    if args.names:
+        projects.sort(key=operator.attrgetter("name"))
+    else:
+        projects.sort(key=operator.attrgetter("src"))
+    for project in projects:
+        if args.names:
+            items = (project.name.ljust(max_name + 2), project.path)
+        else:
+            items = (project.src.ljust(max_src + 2), project.name)
+        if not regex or regex.search(items[0]) or regex.search(items[1]):
+            ui.info(ui.green, " * ", ui.blue, items[0], ui.reset, items[1])
