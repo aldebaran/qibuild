@@ -21,7 +21,7 @@ def configure_parser(parser):
     parser.add_argument("--all", action="store_false", dest="git_only",
         help="consider all the projects")
     parser.add_argument("command", metavar="COMMAND", nargs="+")
-    parser.add_argument("--ignore-errors", "--continue",
+    parser.add_argument("-c", "--ignore-errors", "--continue",
         action="store_true", help="continue on error")
     parser.set_defaults(git_only=True)
 
