@@ -398,7 +398,11 @@ def write_xml(xml_out, test_res):
     """ Write a XUnit XML file
 
     """
-    to_write = """<?xml version="1.0" encoding="UTF-8"?>
+    if sys.platform.startswith("win"):
+        header = """<?xml version="1.0" encoding="ascii"?>"""
+    else:
+        header = """<?xml version="1.0" encoding="UTF-8"?>"""
+    to_write = header + """
 <testsuites tests="1" failures="{num_failures}" disabled="0" errors="0" time="{time}" name="All">
     <testsuite name="{testsuite_name}" tests="1" failures="{num_failures}" disabled="0" errors="0" time="{time}">
     <testcase name="{testcase_name}" status="run">
@@ -417,12 +421,31 @@ def write_xml(xml_out, test_res):
           <![CDATA[ {out} ]]>
     </failure>
 """
+
+    # Arbitrary limit output (~700 lines) to prevent from crashing on read
+    test_res.out = test_res.out[-16384:]
+
+    # Remove color before encoding
+    if os.getenv("GTEST_COLOR") or sys.stdout.isatty():
+        test_res.out = re.sub('\x1b[^m]*m', "", test_res.out)
+
+    # Windows output is most likely code page 850
+    if sys.platform.startswith("win"):
+        encoding = "ascii"
+    else:
+        encoding = "utf-8"
+    try:
+        test_res.out = test_res.out.decode(encoding, "ignore").encode(encoding)
+    except UnicodeDecodeError:
+        pass
+
     failure = failure.format(out=test_res.out, message=test_res.message)
     to_write = to_write.format(num_failures=num_failures,
                                testsuite_name="test", # nothing clever to put here :/
                                testcase_name=test_res.test_name,
                                failure=failure,
                                time=test_res.time)
+
     qisys.sh.mkdir(os.path.dirname(xml_out), recursive=True)
     with open(xml_out, "w") as fp:
         fp.write(to_write)
