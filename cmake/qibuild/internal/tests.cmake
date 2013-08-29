@@ -97,9 +97,6 @@ function(_qi_add_test test_name target_name)
 
   set(_qi_add_test_args ${_qi_add_test_args} ${_cmd})
 
-  #qi_run_py_script("${qibuild_DIR}/qi_add_test.py"
-    #ARGUMENTS ${_qi_add_test_args}
-  #)
   file(APPEND ${CMAKE_BINARY_DIR}/qitest.cmake "${_qi_add_test_args}\n")
 
   if(TARGET "${target_name}")
