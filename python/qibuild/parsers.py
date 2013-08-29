@@ -60,11 +60,11 @@ def project_parser(parser, positional=True):
     # NOT solve the deps by default (for instance for `qibuild test`)
     group.add_argument("--use-deps", action="store_true", dest="use_deps",
                        help="Force deps resolution")
-    group.add_argument("--build-deps-only", action="store_true",
-                       dest="build_only",
+    group.add_argument("--build-deps-only", action="store_const",
+                       const=["build"], dest="dep_types",
                        help="Work on specified projects by ignoring "
                              "the runtime deps.")
-    parser.set_defaults(build_only=False)
+    parser.set_defaults(dep_types=["build", "runtime", "test"])
 
 def get_build_worktree(args, verbose=True):
     """ Get a build worktree to use from a argparse.Namespace
@@ -102,10 +102,7 @@ def get_build_projects(build_worktree, args, solve_deps=True, default_all=False)
     projects = parser.parse_args(args, default_all=default_all)
     if not solve_deps or args.single:
         return projects
-    if args.build_only:
-        dep_types = ["build"]
-    else:
-        dep_types = ["build", "runtime"]
+    dep_types = get_dep_types(args)
     deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
     return deps_solver.get_dep_projects(projects, dep_types)
 
@@ -120,17 +117,17 @@ def get_one_build_project(build_worktree, args):
         raise Exception("This action can only work on one project")
     return projects[0]
 
-def get_dep_types(args):
+def get_dep_types(args, default=None):
     """ Get a list of dep types from the command line """
     if args.single:
         return list()
-    if hasattr(args, "runtime_only") and args.runtime_only:
-        return ["runtime"]
-    if hasattr(args, "build_only") and args.build_only:
-        return ["build"]
-    return ["build", "runtime"]
+    if not hasattr(args, "dep_types") or not args.dep_types:
+        return ["build", "runtime", "test"]
+    if args.dep_types == "default" and default:
+        return default
+    return args.dep_types
 
-def get_cmake_builder(args):
+def get_cmake_builder(args, default_dep_types=None):
     """ Get a :py:class:`.CMakeBuilder` object from the command line
 
     """
@@ -138,7 +135,7 @@ def get_cmake_builder(args):
     # dep solving will be made later by the CMakeBuilder
     build_projects = get_build_projects(build_worktree, args, solve_deps=False)
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, build_projects)
-    cmake_builder.dep_types = get_dep_types(args)
+    cmake_builder.dep_types = get_dep_types(args, default=default_dep_types)
     return cmake_builder
 
 ##

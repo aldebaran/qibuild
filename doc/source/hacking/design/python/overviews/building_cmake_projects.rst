@@ -123,8 +123,9 @@ get_build_worktree
 * A new BuildWorkTree is initialized. A list of ``BuildProject`` objects is
   built from every project in ``worktree.projects``, by inspecting the various
   ``qiproject.xml``  and looking for ``<qibuild>`` tags.
-  Note that at this moment ``build_project.depends`` and ``build_project.rdepends``
-  are **sets** of **names** because no dependency resolution has been done yet.
+  Note that at this moment ``build_project.build_depends``, ``build_project.run_depends``,
+  and ``build_project.test_depends`` are **sets** of **names** because no
+  dependency resolution has been done yet.
 
 * A new CMakeBuildConfig object is initialized, using the ``.qi/qibuild.xml`` file to
   read the default config that should be used. If the user has an incorrect

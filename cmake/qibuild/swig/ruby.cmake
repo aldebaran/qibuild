@@ -67,7 +67,7 @@ function(qi_wrap_ruby module_name interface_file)
 
   # Re-create install rules:
   install(TARGETS ${_swig_target}
-    COMPONENT python
+    COMPONENT runtime
     LIBRARY DESTINATION "${_SDK_LIB}"
     RUNTIME DESTINATION "${_SDK_LIB}"
   )

@@ -1,6 +1,12 @@
 v3.1
 ----
 
+qibuild
+++++++++
+
+* ``qibuild deploy`` now also deploys tests by default. Use
+  ``qibuild deploy --no-tests`` to get the previous behavior.
+
 CMake
 +++++
 

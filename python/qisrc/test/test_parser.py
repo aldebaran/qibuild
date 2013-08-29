@@ -33,7 +33,7 @@ def setup_test():
     build_worktree = TestBuildWorkTree()
     foo = build_worktree.create_project("foo")
     world = build_worktree.create_project("world")
-    hello = build_worktree.create_project("hello", depends=["world"])
+    hello = build_worktree.create_project("hello", build_depends=["world"])
     git = qisrc.git.Git(foo.path)
     git.init()
     git = qisrc.git.Git(world.path)
@@ -105,7 +105,7 @@ def test_groups(git_worktree, args):
 
 def test_no_duplicate_deps(cd_to_tmpdir, args):
     build_worktree = TestBuildWorkTree()
-    foo = build_worktree.create_project("foo", rdepends=["foo/bar"])
+    foo = build_worktree.create_project("foo", run_depends=["foo/bar"])
     build_worktree.create_project("foo/bar")
     git = qisrc.git.Git(foo.path)
     git.init()

@@ -16,11 +16,12 @@ def configure_parser(parser):
     group.add_argument("--prefix", metavar="PREFIX",
         help="value of CMAKE_INSTALL_PREFIX, defaults to '/'")
     group.add_argument("dest_dir", metavar="DESTDIR")
-    group.add_argument("--runtime", action="store_true", dest="runtime_only",
+    group.add_argument("--runtime", action="store_const", dest="dep_types",
+                       const=["runtime"],
                        help="Only install the runtime components")
     group.add_argument("--split-debug", action="store_true",
                        help="Split debug symbols")
-    parser.set_defaults(runtime=False, prefix="/", split_debug=False)
+    parser.set_defaults(prefix="/", split_debug=False, dep_types="default")
     if not parser.epilog:
         parser.epilog = ""
     parser.epilog += """
@@ -33,6 +34,19 @@ Warning:
 def do(args):
     """Main entry point"""
     dest_dir = qisys.sh.to_native_path(args.dest_dir)
-    cmake_builder = qibuild.parsers.get_cmake_builder(args)
+    cmake_builder = qibuild.parsers.get_cmake_builder(
+                                    args, default_dep_types=["build", "runtime"])
+    components = list()
+    if args.dep_types == "default":
+        components = None
+    else:
+        if "build" in args.dep_types:
+            components.append("devel")
+        if "runtime" in args.dep_types:
+            components.append("runtime")
+        if "test" in args.dep_types:
+            components.append("test")
+
     cmake_builder.install(dest_dir, prefix=args.prefix,
-                          split_debug=args.split_debug)
+                          split_debug=args.split_debug,
+                          components=components)

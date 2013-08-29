@@ -187,9 +187,9 @@ def collect_dependencies_reverse(project, projects, single, runtime, depth=0):
         dependency = None
         depends = list()
         if runtime:
-            depends = proj.rdepends
+            depends = proj.run_depends
         else:
-            depends = proj.depends
+            depends = proj.build_depends
         if project.name in depends:
             dependency = DependencyRelationship(project.name, proj.name)
             dependency.is_known = True
@@ -220,9 +220,9 @@ def collect_dependencies(project, projects, packages, single, runtime, depth=0):
 
     # Look at runtime dependencies if runtime
     if runtime:
-        dependency_names = project.rdepends
+        dependency_names = project.run_depends
     else:
-        dependency_names = project.depends
+        dependency_names = project.build_depends
     package_names = [package.name for package in packages]
     dependency_names = package_names_first(dependency_names, package_names)
     collected_dependencies = list()

@@ -56,7 +56,7 @@ def test_check_configure_has_been_called_before_building(build_worktree):
         cmake_builder.build()
 
 def test_check_configure_called_on_runtime_deps(build_worktree):
-    hello_proj = build_worktree.create_project("hello", rdepends=["bar"])
+    hello_proj = build_worktree.create_project("hello", run_depends=["bar"])
     build_worktree.create_project("bar")
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree,
                                                        [hello_proj])
@@ -70,7 +70,7 @@ def test_check_configure_called_on_runtime_deps(build_worktree):
         cmake_builder.build()
 
 def test_default_install(build_worktree, toolchains, tmpdir):
-    hello_proj = build_worktree.create_project("hello", rdepends="bar")
+    hello_proj = build_worktree.create_project("hello", run_depends="bar")
     toolchains.create("foo")
     build_worktree.set_active_config("foo")
     toolchains.add_package("foo", "bar")
@@ -80,7 +80,7 @@ def test_default_install(build_worktree, toolchains, tmpdir):
     cmake_builder.install(tmpdir.strpath)
 
 def test_runtime_single(build_worktree, args):
-    build_worktree.create_project("hello", rdepends="bar")
+    build_worktree.create_project("hello", run_depends="bar")
     args.projects = ["hello"]
     args.runtime_only = True
     args.single = True

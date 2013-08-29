@@ -31,7 +31,7 @@ def test_get_one_project(build_worktree, args):
 def test_default_all(build_worktree, args):
     world_proj = build_worktree.create_project("world")
     foo_proj   = build_worktree.create_project("foo")
-    hello_proj = build_worktree.create_project("hello", depends=["world"])
+    hello_proj = build_worktree.create_project("hello", build_depends=["world"])
     with qisys.sh.change_cwd(hello_proj.path):
         assert qibuild.parsers.get_build_projects(build_worktree, args) == \
                 [world_proj, hello_proj]

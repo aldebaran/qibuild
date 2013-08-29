@@ -193,4 +193,9 @@ function(qi_add_test test_name target_name)
       ENVIRONMENT "DYLD_LIBRARY_PATH=${QI_SDK_DIR}/${QI_SDK_LIB};DYLD_FRAMEWORK_PATH=${QI_SDK_DIR}"
     )
   endif()
+
+  if(TARGET ${target_name})
+    install(TARGETS "${target_name}" DESTINATION "bin" COMPONENT "test")
+  endif()
+
 endfunction()

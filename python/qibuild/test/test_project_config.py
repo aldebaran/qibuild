@@ -6,13 +6,13 @@
 
 """
 
-import qibuild
+from qibuild.config import ProjectConfig
 import unittest
 from StringIO import StringIO
 
 def cfg_from_string(str, user_config=None):
     cfg_loc = StringIO(str)
-    project_cfg = qibuild.config.ProjectConfig()
+    project_cfg = ProjectConfig()
     project_cfg.read(cfg_loc)
     return project_cfg
 
@@ -37,11 +37,33 @@ class ProjectConfigTestClass(unittest.TestCase):
     <depends buildtime="true"
         names="eggs"
     />
+    <depends testtime="true"
+        names="gtest"
+    />
 </project>
 """
         project_cfg = cfg_from_string(xml)
-        self.assertEqual(project_cfg.depends,  set(["bar", "baz", "eggs"]))
-        self.assertEqual(project_cfg.rdepends, set(["bar", "baz", "spam"]))
+        self.assertEqual(project_cfg.build_depends,  set(["bar", "baz", "eggs"]))
+        self.assertEqual(project_cfg.run_depends, set(["bar", "baz", "spam"]))
+        self.assertEqual(project_cfg.test_depends, set(["gtest"]))
+
+
+def test_write(tmpdir):
+    cfg = ProjectConfig()
+    cfg.name = "foobar"
+    cfg.build_depends = set(["foo", "bar"])
+    cfg.run_depends = set(["foo"])
+    cfg.test_depends = set(["foo", "bar", "gtest"])
+    xml = tmpdir.join("project.xml")
+    cfg.write(xml.strpath)
+
+    cfg2 = ProjectConfig()
+    cfg2.read(xml.strpath)
+
+    assert cfg2 == cfg
+
+
+
 
 
 if __name__ == "__main__":

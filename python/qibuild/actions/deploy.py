@@ -34,6 +34,11 @@ def configure_parser(parser):
     group.add_argument("--split-debug", action="store_true", dest="split_debug",
                         help="split debug symbols. Enable remote debuging")
     group.add_argument("--url", dest="urls", action="append", help="deploy to each given url.")
+    group.add_argument("--no-tests", action="store_const",
+                       const=["runtime"], dest="dep_types",
+                       help="Work on specified projects by ignoring "
+                            "the test deps")
+    parser.set_defaults(dep_types="default")
 
 def do(args):
     """Main entry point"""
@@ -53,8 +58,9 @@ Supported formats are:
 """
             raise Exception(mess.format(url))
 
+    cmake_builder = qibuild.parsers.get_cmake_builder(
+                                    args, default_dep_types=["test", "runtime"])
 
-    cmake_builder = qibuild.parsers.get_cmake_builder(args)
     cmake_builder.build()
     for url in urls:
         cmake_builder.deploy(url, split_debug=args.split_debug)

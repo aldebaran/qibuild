@@ -140,7 +140,7 @@ function(qi_create_script name source)
   configure_file("${source}" "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}" COPYONLY)
   if(NOT ARG_NO_INSTALL)
     install(PROGRAMS    "${QI_SDK_DIR}/${QI_SDK_BIN}/${ARG_SUBFOLDER}/${name}"
-            COMPONENT   binary
+            COMPONENT   runtime
             DESTINATION "${QI_SDK_BIN}/${ARG_SUBFOLDER}")
   endif()
 endfunction()
@@ -379,7 +379,7 @@ function(qi_create_config_h OUT_PATH source dest)
   configure_file("${_src_full}" "${_dest_full}" ${ARGN})
   include_directories("${_inc_dir}")
   install(FILES       "${_dest_full}"
-          COMPONENT   "header"
+          COMPONENT   devel
           DESTINATION "${QI_SDK_INCLUDE}/${_dest_dir}")
   set(${OUT_PATH} "${_dest_full}" PARENT_SCOPE)
 endfunction()

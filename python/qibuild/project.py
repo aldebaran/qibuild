@@ -21,8 +21,9 @@ class BuildProject(object):
         self.src = worktree_project.src
         self.name = None
         # depends is a set at this point because they are not sorted yet
-        self.depends = set()
-        self.rdepends = set()
+        self.build_depends = set()
+        self.run_depends = set()
+        self.test_depends = set()
 
     @property
     def qiproject_xml(self):
@@ -274,7 +275,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         return list()
 
 
-    def install(self, destdir, prefix="/", runtime=False, num_jobs=1,
+    def install(self, destdir, prefix="/", components=None, num_jobs=1,
                 split_debug=False):
         """ Install the project
 
@@ -311,46 +312,36 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             mess += "CMAKE_INSTALL_PREFIX is already correct"
             ui.debug(mess)
 
-        if runtime:
-            self.install_runtime(destdir)
+        # Hack for http://www.cmake.org/Bug/print_bug_page.php?bug_id=13934
+        if self.using_make:
+            self.build(target="preinstall", num_jobs=num_jobs, env=build_env)
+        if components:
+            for component in components:
+                self._install_component(destdir, component)
         else:
             self.build(target="install", env=build_env)
 
         if split_debug:
             self.split_debug(destdir)
 
-    def install_runtime(self, destdir):
+    def _install_component(self, destdir, component):
         build_env = self.build_env.copy()
         build_env["DESTDIR"] = destdir
 
-        num_jobs = self.parse_num_jobs(self.build_config.num_jobs)
-        # Hack for http://www.cmake.org/Bug/print_bug_page.php?bug_id=13934
-        if self.using_make:
-            self.build(target="preinstall", num_jobs=num_jobs, env=build_env)
-
-        runtime_components = [
-             "binary",
-             "data",
-             "conf",
-             "lib",
-             "python",
-             "doc"
-         ]
-        for component in runtime_components:
-            cmake_args = list()
-            cmake_args += ["-DBUILD_TYPE=%s" % self.build_config.build_type]
-            cmake_args += ["-DCOMPONENT=%s" % component]
-            cmake_args += ["-P", "cmake_install.cmake", "--"]
-            ui.debug("Installing", component)
-            qisys.command.call(["cmake"] + cmake_args, cwd=self.build_directory,
-                               env=build_env)
+        cmake_args = list()
+        cmake_args += ["-DBUILD_TYPE=%s" % self.build_config.build_type]
+        cmake_args += ["-DCOMPONENT=%s" % component]
+        cmake_args += ["-P", "cmake_install.cmake", "--"]
+        ui.debug("Installing", component)
+        qisys.command.call(["cmake"] + cmake_args, cwd=self.build_directory,
+                            env=build_env)
 
     def deploy(self, url, split_debug=False, use_rsync=True, port=22):
         """ Deploy the project to a remote url """
         destdir = os.path.join(self.build_directory, "deploy")
         #create folder for project without install rules
         qisys.sh.mkdir(destdir, recursive=True)
-        self.install_runtime(destdir)
+        self.install(destdir, components=["runtime", "test"])
         if split_debug:
             self.split_debug(destdir)
         ui.info(ui.green, "Sending binaries to target ...")

@@ -147,13 +147,15 @@ def new_build_project(build_worktree, project):
     for depends_tree in depends_trees:
         buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
         runtime   = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
+        testtime  = qisys.qixml.parse_bool_attr(depends_tree, "testtime")
         dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
-        if buildtime:
-            for dep_name in dep_names:
-                build_project.depends.add(dep_name)
-        if runtime:
-            for dep_name in dep_names:
-                build_project.rdepends.add(dep_name)
+        for dep_name in dep_names:
+            if buildtime:
+                build_project.build_depends.add(dep_name)
+            if runtime:
+                build_project.run_depends.add(dep_name)
+            if testtime:
+                build_project.test_depends.add(dep_name)
     return build_project
 
 

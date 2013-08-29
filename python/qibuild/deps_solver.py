@@ -69,10 +69,13 @@ class DepsSolver(object):
             reverse_deps = set()
             for project in self.build_worktree.build_projects:
                 if "build" in dep_types:
-                    if any(x.name in project.depends for x in projects):
+                    if any(x.name in project.build_depends for x in projects):
                         reverse_deps.add(project.name)
                 if "runtime" in dep_types:
-                    if any(x.name in project.rdepends for x in projects):
+                    if any(x.name in project.run_depends for x in projects):
+                        reverse_deps.add(project.name)
+                if "test" in dep_types:
+                    if any(x.name in project.test_depends for x in projects):
                         reverse_deps.add(project.name)
             return sorted(list(reverse_deps))
 
@@ -80,8 +83,10 @@ class DepsSolver(object):
         for project in self.build_worktree.build_projects:
             deps = set()
             if "build" in dep_types:
-                deps = deps.union(project.depends)
+                deps.update(project.build_depends)
             if "runtime" in dep_types:
-                deps = deps.union(project.rdepends)
+                deps.update(project.run_depends)
+            if "test" in dep_types:
+                deps.update(project.test_depends)
             to_sort[project.name] = deps
         return qisys.sort.topological_sort(to_sort, [x.name for x in projects])

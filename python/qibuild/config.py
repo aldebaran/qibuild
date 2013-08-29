@@ -646,8 +646,9 @@ class ProjectConfig:
     """
     def __init__(self):
         self.name = None
-        self.depends = set()
-        self.rdepends = set()
+        self.build_depends = set()
+        self.run_depends = set()
+        self.test_depends = set()
         self.tree = etree.ElementTree()
 
     def read(self, cfg_path):
@@ -677,64 +678,82 @@ class ProjectConfig:
         for depends_tree in depends_trees:
             buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
             runtime   = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
+            testtime  = qisys.qixml.parse_bool_attr(depends_tree, "testtime")
             dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
-            if buildtime:
-                for dep_name in dep_names:
-                    self.depends.add(dep_name)
-            if runtime:
-                for dep_name in dep_names:
-                    self.rdepends.add(dep_name)
+            for dep_name in dep_names:
+                if buildtime:
+                    self.build_depends.add(dep_name)
+                if runtime:
+                    self.run_depends.add(dep_name)
+                if testtime:
+                    self.test_depends.add(dep_name)
 
     def write(self, location):
         """ Write configuration back to a config file
 
         """
-        # FIXME: remove existing <depends> element first ...
         project_tree = self.tree.getroot()
         if not project_tree:
             project_tree = etree.Element("project")
             self.tree = etree.ElementTree(element=project_tree)
         project_tree.set("name", self.name)
 
-        both_deps = self.depends.intersection(self.rdepends)
-        if both_deps:
-            both_deps_tree = etree.Element("depends")
-            both_deps_tree.set("buildtime", "true")
-            both_deps_tree.set("runtime" , "true")
-            both_deps_tree.set("names", " ".join(both_deps))
-            project_tree.append(both_deps_tree)
+        for depend_elem in project_tree.findall("depends"):
+            project_tree.remove(depend_elem)
 
-        runtime_only = self.rdepends - self.depends
-        if runtime_only:
-            runtime_tree = etree.Element("depends")
-            runtime_tree.set("runtime", "true")
-            runtime_tree.set("names", " ".join(runtime_only))
-            project_tree.append(runtime_tree)
+        build_elem = etree.Element("depends")
+        build_elem.set("buildtime", "true")
+        build_elem.set("runtime", "false")
+        build_elem.set("testtime", "false")
+        build_elem.set("names", " ".join(self.build_depends))
+        project_tree.append(build_elem)
 
-        build_only = self.depends - self.rdepends
-        if build_only:
-            build_tree = etree.Element("depends")
-            build_tree.set("buildtime", "true")
-            build_tree.set("names", " ".join(build_only))
-            project_tree.append(build_tree)
+        run_elem = etree.Element("depends")
+        run_elem.set("buildtime", "false")
+        run_elem.set("runtime", "true")
+        run_elem.set("testtime", "false")
+        run_elem.set("names", " ".join(self.run_depends))
+        project_tree.append(run_elem)
+
+        test_elem = etree.Element("depends")
+        test_elem.set("buildtime", "false")
+        test_elem.set("runtime", "false")
+        test_elem.set("testtime", "true")
+        test_elem.set("names", " ".join(self.test_depends))
+        project_tree.append(test_elem)
+
 
         qisys.qixml.write(self.tree, location)
 
     def __str__(self):
         res = ""
         res += self.name
-        if self.depends:
+        if self.build_depends:
             res += "\n"
-            res += "  depends: \n"
-            for depends in self.depends:
-                res += ui.indent(depends, num=4)
+            res += "  build dependencies: \n"
+            for dep in self.build_depends:
+                res += ui.indent(dep, num=4)
                 res += "\n"
-        if self.rdepends:
-            res += "  rdepends: \n"
-            for rdepends in self.rdepends:
-                res += ui.indent(rdepends, num=4)
+        if self.runtime_depends:
+            res += "  runtime dependencies: \n"
+            for dep in self.runtime_depends:
+                res += ui.indent(dep, num=4)
+                res += "\n"
+        if self.test_depends:
+            res += "  test time dependencies: \n"
+            for dep in self.test_depends:
+                res += ui.indent(dep, num=4)
                 res += "\n"
         return res
+
+    def __eq__(self, other):
+        return other.name == self.name and \
+                other.build_depends == self.build_depends and \
+                other.run_depends == self.run_depends and \
+                other.test_depends == self.test_depends
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
 def get_build_env():

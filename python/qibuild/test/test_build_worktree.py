@@ -6,9 +6,9 @@ import pytest
 
 def test_read_deps(build_worktree):
     build_worktree.create_project("world")
-    build_worktree.create_project("hello", depends=["world"])
+    build_worktree.create_project("hello", build_depends=["world"])
     hello = build_worktree.get_build_project("hello")
-    assert hello.depends == set(["world"])
+    assert hello.build_depends == set(["world"])
 
 def test_setting_build_config_sets_projects_cmake_flags(build_worktree):
     build_worktree.create_project("world")

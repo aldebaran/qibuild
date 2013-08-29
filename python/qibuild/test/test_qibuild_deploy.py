@@ -46,7 +46,6 @@ def test_deploying_to_several_urls(qibuild_action, tmpdir):
     # Deploy to several directories.
     if not check_ssh_connection():
         return
-
     url = get_ssh_url(tmpdir)
     first_url = "%s/first" % url
     second_url = "%s/second" % url
@@ -61,3 +60,25 @@ def test_deploying_to_several_urls(qibuild_action, tmpdir):
     assert tmpdir.join("first").join("bin").check(dir=True)
     assert tmpdir.join("second").join("lib").check(dir=True)
     assert tmpdir.join("second").join("bin").check(dir=True)
+
+def test_deploy_test_deps(qibuild_action, tmpdir):
+    if not check_ssh_connection():
+        return
+    url = get_ssh_url(tmpdir)
+    qibuild_action.create_project("gtest")
+    qibuild_action.create_project("foo", test_depends=["gtest"])
+    qibuild_action("configure", "foo")
+    qibuild_action("make", "foo")
+    qibuild_action("deploy", "foo", url)
+    assert tmpdir.join("bin/gtest").check(file=True)
+
+def test_deploy_notests(qibuild_action, tmpdir):
+    if not check_ssh_connection():
+        return
+    url = get_ssh_url(tmpdir)
+    qibuild_action.create_project("gtest")
+    qibuild_action.create_project("foo", test_depends=["gtest"])
+    qibuild_action("configure", "foo")
+    qibuild_action("make", "foo")
+    qibuild_action("deploy", "foo", url, "--no-tests")
+    assert tmpdir.join("bin/gtest").check(file=False)

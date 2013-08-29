@@ -158,20 +158,19 @@ class CMakeBuilder(object):
             ui.info_count(i, len(projects),
                           ui.green, "Installing",
                           ui.blue, project.name)
-            project.install(dest_dir, runtime=runtime_only,
-                            split_debug=split_debug, **kwargs)
+            project.install(dest_dir, **kwargs)
 
     @need_configure
     def deploy(self, url, use_rsync=True, port=22, split_debug=False):
         """ Deploy the project and the packages it depends to a remote url """
-        if self.dep_types == list():
+        if self.dep_types == list(): # used -s
             dep_packages = list()
             dep_projects = self.projects
         else:
             dep_packages = self.deps_solver.get_dep_packages(self.projects,
-                                                             ["runtime"])
+                                                             self.dep_types)
             dep_projects = self.deps_solver.get_dep_projects(self.projects,
-                                                            ["runtime"])
+                                                             self.dep_types)
         ui.info(ui.green, "The following projects")
         for project in dep_projects:
             ui.info(ui.green, " *", ui.blue, project.name)

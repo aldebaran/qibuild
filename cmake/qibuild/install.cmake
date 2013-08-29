@@ -33,7 +33,7 @@ endfunction()
 #                        (False by default because this is NOT the standard CMake
 #                         behavior)
 function(qi_install_header)
-  _qi_install_internal(${ARGN} COMPONENT headers DESTINATION ${QI_SDK_INCLUDE})
+  _qi_install_internal(${ARGN} COMPONENT devel DESTINATION ${QI_SDK_INCLUDE})
 endfunction()
 
 
@@ -51,7 +51,7 @@ endfunction()
 #                         behavior)
 #
 function(qi_install_data)
-  _qi_install_internal(${ARGN} COMPONENT data  DESTINATION ${QI_SDK_SHARE})
+  _qi_install_internal(${ARGN} COMPONENT runtime  DESTINATION ${QI_SDK_SHARE})
 endfunction()
 
 #! Install application doc.
@@ -67,7 +67,7 @@ endfunction()
 #                         behavior)
 #
 function(qi_install_doc)
-  _qi_install_internal(${ARGN} COMPONENT doc   DESTINATION ${QI_SDK_DOC})
+  _qi_install_internal(${ARGN} COMPONENT devel   DESTINATION ${QI_SDK_DOC})
 endfunction()
 
 
@@ -87,7 +87,7 @@ function(qi_install_conf)
   if(NOT DEFINED SYSCONFDIR)
     set(SYSCONFDIR "${QI_SDK_CONF}")
   endif()
-  _qi_install_internal(${ARGN} COMPONENT conf  DESTINATION "${SYSCONFDIR}")
+  _qi_install_internal(${ARGN} COMPONENT runtime  DESTINATION "${SYSCONFDIR}")
 endfunction()
 
 #! Install CMake module files.
@@ -103,7 +103,7 @@ endfunction()
 #                         behavior)
 #
 function(qi_install_cmake)
-  _qi_install_internal(${ARGN} COMPONENT cmake DESTINATION ${QI_SDK_CMAKE})
+  _qi_install_internal(${ARGN} COMPONENT devel DESTINATION ${QI_SDK_CMAKE})
 endfunction()
 
 
@@ -149,12 +149,12 @@ function(qi_install_target)
 
   foreach (name ${ARG_UNPARSED_ARGUMENTS})
     install(TARGETS "${name}"
-            RUNTIME COMPONENT binary     DESTINATION ${_runtime_output}
-            LIBRARY COMPONENT lib        DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER}
-      PUBLIC_HEADER COMPONENT header     DESTINATION ${QI_SDK_INCLUDE}/${ARG_SUBFOLDER}
-           RESOURCE COMPONENT data       DESTINATION ${QI_SDK_SHARE}/${name}/${ARG_SUBFOLDER}
-            ARCHIVE COMPONENT static-lib DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER}
-            BUNDLE  COMPONENT binary     DESTINATION ".")
+            RUNTIME COMPONENT runtime     DESTINATION ${_runtime_output}
+            LIBRARY COMPONENT runtime        DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER}
+      PUBLIC_HEADER COMPONENT devel     DESTINATION ${QI_SDK_INCLUDE}/${ARG_SUBFOLDER}
+           RESOURCE COMPONENT runtime       DESTINATION ${QI_SDK_SHARE}/${name}/${ARG_SUBFOLDER}
+            ARCHIVE COMPONENT devel DESTINATION ${QI_SDK_LIB}/${ARG_SUBFOLDER}
+            BUNDLE  COMPONENT runtime     DESTINATION ".")
   endforeach()
 endfunction()
 
@@ -184,7 +184,7 @@ function(qi_install_program)
   foreach(name ${ARG_UNPARSED_ARGUMENTS})
     #TODO: what should be the real source here?
     install(PROGRAMS    "${name}"
-            COMPONENT   binary
+            COMPONENT   runtime
             DESTINATION "${QI_SDK_BIN}/${ARG_SUBFOLDER}")
   endforeach()
 endfunction()
@@ -199,7 +199,7 @@ endfunction()
 # \param: IF             Condition that should be verified for the install rules
 #                        to be active for example (IF WITH_ZEROMQ)
 function(qi_install_library)
-  _qi_install_internal(${ARGN} COMPONENT lib DESTINATION ${QI_SDK_LIB})
+  _qi_install_internal(${ARGN} COMPONENT runtime DESTINATION ${QI_SDK_LIB})
 endfunction()
 
 #! install python module.
@@ -273,13 +273,13 @@ function(qi_install_python)
 
   if("${ARG_TARGETS}" STREQUAL "")
     _qi_install_internal(${ARG_UNPARSED_ARGUMENTS}
-      COMPONENT python
+      COMPONENT runtime
       DESTINATION "${_qi_sdk_python_site_packages}"
     )
   else()
     cmake_parse_arguments(ARG "RECURSE;KEEP_RELATIVE_PATHS" "IF;COMPONENT;DESTINATION;SUBFOLDER" "" ${ARGN})
     install(${ARG_UNPARSED_ARGUMENTS}
-      COMPONENT python
+      COMPONENT runtime
       LIBRARY DESTINATION "${_qi_sdk_python_site_packages}"
       RUNTIME DESTINATION "${_qi_sdk_python_site_packages}"
     )
