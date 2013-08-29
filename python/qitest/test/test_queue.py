@@ -1,10 +1,10 @@
 from qisys import ui
 import time
 import qitest.test_queue
-import qitest.launcher
+import qitest.runner
 import qitest.result
 
-class DummyLauncher(qitest.launcher.TestLauncher):
+class DummyLauncher(qitest.runner.TestLauncher):
     def __init__(self):
         self.results = dict()
 

@@ -372,7 +372,6 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
     def run_tests(self, **kwargs):
         """ Run the tests for this project """
-        import ipdb; ipdb.set_trace()
         ui.info(ui.green, "Testing", self.name, "...")
         test_runner = qibuild.test_runner.ProjectTestRunner(self)
         test_runner.cwd = self.build_directory

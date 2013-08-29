@@ -128,9 +128,10 @@ def test_pycmd(qibuild_action):
     with open(test_txt, "r") as fp:
         assert fp.read() == "Written from Python\n"
     qibuild_action("configure", "pycmd", "-DFAIL=TRUE", raises=True)
+
 def test_cmake_option_build_test_on(qibuild_action):
     project = qibuild_action.add_test_project("testme")
-    qibuild_action("configure", "testme", "-DBUILD_TESTS=ON")
+    qibuild_action("configure", "testme", "-DQI_WITH_TESTS=ON")
     qibuild_action("make", "testme")
     test_path = qibuild.find.find([project.sdk_directory], "ok")
     assert test_path is not None
@@ -138,14 +139,14 @@ def test_cmake_option_build_test_on(qibuild_action):
 
 def test_cmake_option_build_test_off(qibuild_action):
     project = qibuild_action.add_test_project("testme")
-    qibuild_action("configure", "testme", "-DBUILD_TESTS=OFF")
+    qibuild_action("configure", "testme", "-DQI_WITH_TESTS=OFF")
     qibuild_action("make", "testme")
     test_path = qibuild.find.find([project.sdk_directory], "ok", expect_one=False)
     assert not test_path
 
 def test_cmake_option_build_perf_test_on(qibuild_action):
     project = qibuild_action.add_test_project("perf")
-    qibuild_action("configure", "perf", "-DBUILD_PERF_TESTS=ON")
+    qibuild_action("configure", "perf", "-DQI_WITH_PERF_TESTS=ON")
     qibuild_action("make", "perf")
     test_path = qibuild.find.find([project.sdk_directory], "perf_spam")
     assert test_path is not None
@@ -153,7 +154,7 @@ def test_cmake_option_build_perf_test_on(qibuild_action):
 
 def test_cmake_option_build_perf_test_off(qibuild_action):
     project = qibuild_action.add_test_project("perf")
-    qibuild_action("configure", "perf", "-DBUILD_PERF_TESTS=OFF")
+    qibuild_action("configure", "perf", "-DQI_WITH_PERF_TESTS=OFF")
     qibuild_action("make", "perf")
     test_path = qibuild.find.find([project.sdk_directory], "perf_spam", expect_one=False)
     assert not test_path
