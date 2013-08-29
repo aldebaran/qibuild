@@ -21,17 +21,3 @@ def test_match_patterns():
     assert test_runner.tests == [test_foo, test_bar, test_foo_bar]
 
 
-def test_run(compiled_tests):
-    test_runner = qitest.runner.TestSuiteRunner(compiled_tests)
-    ok = test_runner.run()
-    assert not ok
-
-
-def test_no_perf_by_default():
-    test_one = {"name" : "test_one"}
-    perf_one = {"name" : "perf_one", "perf": True}
-    test_two = {"name" : "test_two"}
-    test_runner = qitest.runner.TestSuiteRunner(
-        [test_one, perf_one, test_two]
-    )
-    test_runner.tests == [test_one, test_two]

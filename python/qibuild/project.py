@@ -1,7 +1,9 @@
+import argparse
+import json
 import os
+import platform
 import re
 import sys
-import platform
 
 from qisys import ui
 import qisys.command
@@ -11,8 +13,7 @@ import qibuild.build
 import qibuild.gdb
 import qibuild.dylibs
 import qibuild.dlls
-import qitest.runner
-import qitest.conf
+import qibuild.test_runner
 import qitoolchain.toolchain
 
 class BuildProject(object):
@@ -48,6 +49,10 @@ class BuildProject(object):
     @property
     def cmake_cache(self):
         return os.path.join(self.build_directory, "CMakeCache.txt")
+
+    @property
+    def qitest_json(self):
+        return os.path.join(self.build_directory, "qitest.json")
 
     @property
     def cmake_args(self):
@@ -191,6 +196,36 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
                                 cmake_args, env=self.build_env, **kwargs)
         except qisys.command.CommandFailedException as error:
             raise qibuild.build.ConfigureFailed(self, error)
+        # Write the qitest.json file:
+        tests = self.parse_qitest_cmake()
+        with open(self.qitest_json, "w") as fp:
+            json.dump(tests, fp, indent=2)
+
+    def parse_qitest_cmake(self):
+        """ The qitest.cmake is written from CMake """
+        qitest_cmake_path = os.path.join(self.build_directory, "qitest.cmake")
+        tests = list()
+        if not os.path.exists(qitest_cmake_path):
+            return list()
+        with open(qitest_cmake_path, "r") as fp:
+            lines = fp.readlines()
+        parser = argparse.ArgumentParser()
+        parser.add_argument("cmd", nargs="+")
+        parser.add_argument("--name", required=True)
+        parser.add_argument("--gtest", action="store_true",
+                            help="Tell qitest this is a test using gtest")
+        parser.add_argument("--timeout", type=int)
+        parser.add_argument("--nightly", action="store_true")
+        parser.add_argument("--perf", action="store_true")
+        parser.add_argument("--output", required=True)
+        parser.add_argument("--working-directory")
+        parser.set_defaults(nightly=False, perf=False)
+        for line in lines:
+            line = line.strip()
+            args = parser.parse_args(args=line.split(";"))
+            test = vars(args)
+            tests.append(test)
+        return tests
 
     def build(self, num_jobs=None, rebuild=False, target=None,
               coverity=False, env=None):
@@ -337,12 +372,8 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
     def run_tests(self, **kwargs):
         """ Run the tests for this project """
-        qitest_cmake = os.path.join(self.build_directory, "qitest.cmake")
-        if not os.path.exists(qitest_cmake):
-            return False, (ui.red, "No tests found for", ui.blue, self.name)
         ui.info(ui.green, "Testing", self.name, "...")
-        tests = qitest.conf.parse_qitest_cmake(qitest_cmake)
-        test_runner = qitest.runner.TestSuiteRunner(tests, project=self)
+        test_runner = qibuild.test_runner.ProjectTestRunner(self)
         test_runner.cwd = self.build_directory
         test_runner.env = self.build_env
         test_runner.pattern = kwargs.get("pattern")
@@ -351,11 +382,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         test_runner.coverage = kwargs.get("coverage")
         test_runner.valgrind = kwargs.get("valgrind")
         test_runner.verbose = kwargs.get("verbose_tests")
-        test_runner.num_cpus = kwargs.get("num_cpus")
-        test_runner.num_jobs = kwargs.get("num_jobs")
-
+        test_runner.num_cpus = kwargs.get("num_cpus", -1)
+        test_runner.num_jobs = kwargs.get("num_jobs", 1)
         return test_runner.run()
-
 
     def fix_shared_libs(self, paths):
         """ Do some magic so that shared libraries from other projects and

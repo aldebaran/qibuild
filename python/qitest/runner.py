@@ -1,34 +1,34 @@
+import abc
 import re
 import os
 
-from qisys import ui
-import qisys.command
 import qitest.launcher
 import qitest.test_queue
 
 class TestSuiteRunner(object):
-    def __init__(self, tests, project=None):
-        self.project = project
+    """ Interface for a class able to run a test suite """
+
+    def __init__(self, tests):
+        self.pattern = None
         self.num_jobs = 1
         self.cwd = os.getcwd()
         self.env = None
         self.verbose = False
-        self.perf = False
-        self.nightly = False
-        self.nightmare = False
         self._tests = tests
-        self._pattern = None
-        self._coverage = False
-        self._valgrind = False
-        self._num_cpus = -1
 
-    @property
-    def tests(self):
-        res =  list()
-        res = [x for x in self._tests if match_pattern(self.pattern, x["name"])]
-        res = [x for x in res if x.get("perf", False) == self.perf]
-        res = [x for x in res if x.get("nightly", False) == self.nightly]
-        return res
+    @abc.abstractproperty
+    def launcher(self):
+        pass
+
+    def run(self):
+        """ Run all the tests.
+        Return True if and only if the whole suite passed.
+
+        """
+        test_queue = qitest.test_queue.TestQueue(self.tests)
+        test_queue.launcher = self.launcher
+        ok = test_queue.run(num_jobs=self.num_jobs)
+        return ok
 
     @property
     def pattern(self):
@@ -42,49 +42,17 @@ class TestSuiteRunner(object):
             self._pattern = None
 
     @property
-    def num_cpus(self):
-        return self._num_cpus
+    def tests(self):
+        return [x for x in self._tests if match_pattern(self.pattern, x["name"])]
 
-    @num_cpus.setter
-    def num_cpus(self, value):
-        if value == -1:
-            return
-        if not qisys.command.find_program("taskset"):
-            mess = "taskset was not found on the system.\n"
-            mess += "Cannot set number of CPUs used by the tests"
-            raise Exception(mess)
+class TestLauncher(object):
+    """ Interface for a class able to launch a test. """
+    __metaclass__ = abc.ABCMeta
 
-    @property
-    def valgrind(self):
-        return self._valgrind
-
-    @valgrind.setter
-    def valgrind(self, value):
-        if not value:
-            return
-        if not qisys.command.find_program("valgrind"):
-            raise Exception("valgrind was not found on the system")
-        self._valgrind = value
-
-    @property
-    def coverage(self):
-        return self._coverage
-
-    @coverage.setter
-    def coverage(self, value):
-        if not qisys.command.find_program("gcovr"):
-            raise Exception("please install gcovr in order to measure coverage")
-
-    def run(self):
-        """ Run all the tests.
-        Return True if and only if the whole suite passed.
-
-        """
-        test_queue = qitest.test_queue.TestQueue(self.tests)
-        launcher = qitest.launcher.ProcessTestLauncher(self)
-        test_queue.launcher = launcher
-        ok = test_queue.run(num_jobs=self.num_jobs)
-        return ok
+    @abc.abstractmethod
+    def launch(self, test):
+        """ Should return a TestResult """
+        pass
 
 
 def match_pattern(pattern, name):
