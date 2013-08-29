@@ -5,13 +5,17 @@
 """ Launch automatic tests -- deprecated, use `qitest run` instead
 """
 
+import argparse
+import os
 import sys
 
 from qisys import ui
+import qibuild.parsers
 import qitest.actions.run
 
 def configure_parser(parser):
     """Configure parser for this action"""
+    qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("qibuild test options")
     group.add_argument("-l", "--list", dest="list", action="store_true",

@@ -100,5 +100,5 @@ endfunction()
 # \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
 # \group:ARGUMENTS Arguments to be passed to the executable
 function(qi_add_test test_name target_name)
-  _qi_add_test(${name} ${target_name} ${ARGN})
+  _qi_add_test(${test_name} ${target_name} ${ARGN})
 endfunction()

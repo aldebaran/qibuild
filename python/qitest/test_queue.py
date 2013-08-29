@@ -36,6 +36,7 @@ class TestQueue():
         delta = end - start
         self.elapsed_time = float(delta.microseconds) / 10**6 + delta.seconds
         self._summary()
+        return self.ok
 
     def _run(self, num_jobs=1):
         """ Helper function for ._run """

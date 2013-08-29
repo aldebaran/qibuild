@@ -78,6 +78,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         self.project = self.suite_runner.project
         self.verbose = self.suite_runner.verbose
         self.valgrind_log = None
+        self.perf_out = None
+        self.test_out = None
 
     def launch(self, test):
         """ Implements TestLauncher.launch """
@@ -117,6 +119,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             message = (ui.red, message)
 
         res.message = message
+        self._post_run(res, test)
         return res
 
 
@@ -141,14 +144,14 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
                                     "perf-results")
         if test.get("gtest"):
             qisys.sh.mkdir(test_results)
-            output_xml = os.path.join(test_results, test["name"] + ".xml")
+            self.test_out = os.path.join(test_results, test["name"] + ".xml")
             cmd = test["cmd"]
-            cmd.append("--gtest_output=xml:%s" % output_xml)
+            cmd.append("--gtest_output=xml:%s" % self.test_out)
         if test.get("perf"):
             qisys.sh.mkdir(perf_results)
-            output_xml = os.path.join(perf_results, test["name"] + ".xml")
+            self.perf_out = os.path.join(perf_results, test["name"] + ".xml")
             cmd = test["cmd"]
-            cmd.extend(["--output", output_xml])
+            cmd.extend(["--output", self.perf_out])
 
     def _update_test_env(self, test):
         env = os.environ.copy()
@@ -181,6 +184,11 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         # FIXME: every worker thread should have its cpu mask, but it's
         # unclear what happens when you run -j3 -ncpu=2
         pass
+
+    def _post_run(self, res, test):
+        if test.get("perf") and not res.ok:
+            qisys.sh.rm(self.perf_out)
+
 
 
     def get_message(self, process, timeout=None):
