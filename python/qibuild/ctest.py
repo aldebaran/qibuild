@@ -477,13 +477,13 @@ def _parse_ctest_test_files(root, tests, subdirs):
 
     current_test = None
     for i, line in enumerate(lines, start=1):
-        match = re.match("SUBDIRS\((.*)\)", line)
+        match = re.match("SUBDIRS\((.*)\)", line, re.IGNORECASE)
         if match:
             subdir = match.groups()[0]
             subdirs.append(subdir)
             current_test = None
             continue
-        match = re.match("ADD_TEST\(([a-zA-Z0-9_-]*) (.*)\)", line)
+        match = re.match("ADD_TEST\(([a-zA-Z0-9_-]*) (.*)\)", line, re.IGNORECASE)
         if match:
             groups = match.groups()
             current_test = groups[0]
@@ -491,7 +491,7 @@ def _parse_ctest_test_files(root, tests, subdirs):
             test_cmd = shlex.split(args)
             tests.append([current_test, test_cmd, dict()])
             continue
-        match = re.match("SET_TESTS_PROPERTIES\(([a-zA-Z0-9_-]*) PROPERTIES (.*)\)", line)
+        match = re.match("SET_TESTS_PROPERTIES\(([a-zA-Z0-9_-]*) PROPERTIES (.*)\)", line, re.IGNORECASE)
         if match:
             groups = match.groups()
             if current_test is None:
