@@ -49,6 +49,9 @@ def project_parser(parser, positional=True):
         help="Work on all projects")
     group.add_argument("-s", "--single", action="store_true",
         help="Work on specified projects without taking dependencies into account.")
+    group.add_argument("-g", "--group", dest="groups", action="append",
+                       help="Specify a group of projects.")
+
     if positional:
         group.add_argument("projects", nargs="*", metavar="PROJECT",
                             help="Project name(s)")
@@ -86,7 +89,7 @@ def get_one_project(worktree, args):
     return projects[0]
 
 ##
-# Implemation details
+# Implementation details
 
 class AbstractProjectParser:
     """ Helper for get_projects() methods """

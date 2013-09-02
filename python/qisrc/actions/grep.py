@@ -44,7 +44,7 @@ def do(args):
     git_grep_opts.append(args.pattern)
 
     if not git_projects:
-        qisrc.worktree.on_empty_worktree(git_worktree)
+        qisrc.worktree.on_no_matching_projects(git_worktree, groups=args.groups)
         sys.exit(0)
 
     max_src = max(len(x.src) for x in git_projects)

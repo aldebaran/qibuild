@@ -17,6 +17,7 @@ import qisrc.worktree
 def configure_parser(parser):
     """ Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
+    qisys.parsers.project_parser(parser)
     parser.add_argument("--names", action="store_true", dest="names",
                         help="sort by names")
     parser.add_argument("--paths", action="store_false", dest="names",
@@ -28,9 +29,9 @@ def configure_parser(parser):
 def do(args):
     """ Main method """
     worktree = qisrc.parsers.get_git_worktree(args)
-    projects = worktree.git_projects
+    projects = qisrc.parsers.get_git_projects(worktree, args, default_all=True)
     if not projects:
-        qisrc.worktree.on_empty_worktree(worktree)
+        qisrc.worktree.on_no_matching_projects(worktree, groups=args.groups)
         return
     ui.info(ui.green, "qisrc projects in:", ui.blue, worktree.root)
     max_name = max(len(x.name) for x in projects)

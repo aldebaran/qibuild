@@ -254,16 +254,22 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
     def __repr__(self):
         return "<GitWorkTree in %s>" % self.root
 
-def on_empty_worktree(worktree):
+def on_no_matching_projects(worktree, groups=None):
     """ What to do when we find an empty worktree """
-    mess = """The worktree in {worktree.root}
-does not contain any project.
-
+    if groups and len(groups) > 1:
+        mess = """The groups {groups} do not contain any project in the worktree {worktree.root}."""
+    elif groups and len(groups) == 1:
+        groups = groups[0]
+        mess = """The group {groups} does not contain any project in the worktree {worktree.root}."""
+    else:
+        mess = """The worktree in {worktree.root}
+does not contain any project."""
+    tips = """
 Tips:
     * Use `qisrc init` to fetch some sources from a remote manifest
     * Use `qisrc add` to register a new project path to this worktree
 """
-    ui.warning(mess.format(worktree=worktree))
+    ui.warning(mess.format(worktree=worktree, groups=groups) + tips)
 
 class NoSuchGitProject(Exception):
     pass

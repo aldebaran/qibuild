@@ -16,14 +16,12 @@ import qisys.parsers
 import qisrc.git
 import qisrc.sync
 import qisrc.parsers
-import qibuild.parsers
 
 
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
-    qisrc.parsers.groups_parser(parser)
 
     group = parser.add_argument_group("qisrc sync options")
     group.add_argument("--rebase-devel", action="store_true",
@@ -52,7 +50,7 @@ def do(args):
                                                   default_all=True,
                                                   use_build_deps=True)
     if not git_projects:
-        qisrc.worktree.on_empty_worktree(git_worktree)
+        qisrc.worktree.on_no_matching_projects(git_worktree, groups=args.groups)
         return
 
     skipped = list()

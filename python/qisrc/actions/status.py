@@ -34,7 +34,7 @@ def do(args):
                                                   default_all=True,
                                                   use_build_deps=True)
     if not git_projects:
-        qisrc.worktree.on_empty_worktree(git_worktree)
+        qisrc.worktree.on_no_matching_projects(git_worktree, groups=args.groups)
         return
 
     num_projs = len(git_projects)
