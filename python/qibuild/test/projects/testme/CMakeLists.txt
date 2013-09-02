@@ -8,8 +8,6 @@ qi_create_test(cwd
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   ARGUMENTS ${CMAKE_SOURCE_DIR}
   SRC cwd.cpp)
-qi_create_test(ok ok.cpp)
-qi_create_test(fail fail.cpp)
 qi_create_test(segfault segfault.cpp)
 qi_create_test(timeout timeout.cpp TIMEOUT 1)
 qi_create_test(spam spam.cpp)

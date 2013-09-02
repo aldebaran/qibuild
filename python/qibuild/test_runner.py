@@ -1,6 +1,8 @@
 import argparse
 import datetime
 import os
+import re
+import sys
 
 from qisys import ui
 import qisys.command
@@ -21,11 +23,28 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
         self._num_cpus = -1
         tests = qitest.conf.parse_tests(project.qitest_json)
         super(ProjectTestRunner, self).__init__(tests)
+        for directory in (self.test_results_dir,
+                          self.perf_results_dir):
+            qisys.sh.rm(directory)
+            qisys.sh.mkdir(directory)
 
     @property
     def launcher(self):
         """ Implements TestSuiteRunner.launcher """
         return ProcessTestLauncher(self)
+
+    @property
+    def test_results_dir(self):
+        res = os.path.join(self.project.build_directory,
+                           "test-results")
+        return res
+
+    @property
+    def perf_results_dir(self):
+        res = os.path.join(self.project.build_directory,
+                           "test-results")
+        return res
+
 
     @property
     def tests(self):
@@ -83,6 +102,10 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
     def launch(self, test):
         """ Implements TestLauncher.launch """
+        self.perf_out = os.path.join(self.suite_runner.perf_results_dir,
+                                     test["name"] + ".xml")
+        self.test_out = os.path.join(self.suite_runner.test_results_dir,
+                                     test["name"] + ".xml")
         res = qitest.result.TestResult(test)
         cmd = test["cmd"]
         if not os.path.exists(cmd[0]):
@@ -138,18 +161,13 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
     def _update_test_cmd_for_project(self, test):
         if not self.project:
             return
-        test_results = os.path.join(self.project.build_directory,
-                                    "test-results")
         perf_results = os.path.join(self.project.build_directory,
                                     "perf-results")
         if test.get("gtest"):
-            qisys.sh.mkdir(test_results)
-            self.test_out = os.path.join(test_results, test["name"] + ".xml")
             cmd = test["cmd"]
             cmd.append("--gtest_output=xml:%s" % self.test_out)
         if test.get("perf"):
             qisys.sh.mkdir(perf_results)
-            self.perf_out = os.path.join(perf_results, test["name"] + ".xml")
             cmd = test["cmd"]
             cmd.extend(["--output", self.perf_out])
 
@@ -186,9 +204,67 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         pass
 
     def _post_run(self, res, test):
-        if test.get("perf") and not res.ok:
+        if not res.ok:
+            # do not trust generated files:
             qisys.sh.rm(self.perf_out)
+            qisys.sh.rm(self.test_out)
 
+        if not res.ok or not os.path.exists(self.test_out):
+            self._write_xml(res, test, self.test_out)
+
+    def _write_xml(self, res, test, out_xml):
+        """ Make sure a Junit XML compatible file is written """
+
+        if sys.platform.startswith("win"):
+            header = """<?xml version="1.0" encoding="ascii"?>"""
+        else:
+            header = """<?xml version="1.0" encoding="UTF-8"?>"""
+        to_write = header + """
+    <testsuites tests="1" failures="{num_failures}" disabled="0" errors="0" time="{time}" name="All">
+        <testsuite name="{testsuite_name}" tests="1" failures="{num_failures}" disabled="0" errors="0" time="{time}">
+        <testcase name="{testcase_name}" status="run">
+        {failure}
+        </testcase>
+    </testsuite>
+    </testsuites>
+    """
+        if res.ok:
+            num_failures = "0"
+            failure = ""
+        else:
+            num_failures = "1"
+            failure = """
+        <failure message="{message}">
+            <![CDATA[ {out} ]]>
+        </failure>
+    """
+
+        # Arbitrary limit output (~700 lines) to prevent from crashing on read
+        res.out = res.out[-16384:]
+
+        # Remove color before encoding
+        if os.getenv("GTEST_COLOR") or sys.stdout.isatty():
+            res.out = re.sub('\x1b[^m]*m', "", res.out)
+
+        # Windows output is most likely code page 850
+        if sys.platform.startswith("win"):
+            encoding = "ascii"
+        else:
+            encoding = "utf-8"
+        try:
+            res.out = res.out.decode(encoding, "ignore").encode(encoding)
+        except UnicodeDecodeError:
+            pass
+
+        failure = failure.format(out=res.out, message=res.message)
+        to_write = to_write.format(num_failures=num_failures,
+                                testsuite_name="test", # nothing clever to put here :/
+                                testcase_name=test["name"],
+                                failure=failure,
+                                time=res.time)
+
+        with open(out_xml, "w") as fp:
+            fp.write(to_write)
 
 
     def get_message(self, process, timeout=None):
