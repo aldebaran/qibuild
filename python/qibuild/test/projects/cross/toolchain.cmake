@@ -1,0 +1,3 @@
+include(CMakeForceCompiler)
+CMAKE_FORCE_C_COMPILER("gcc" GNU)
+set(CMAKE_EXECUTABLE_FORMAT  ELF)

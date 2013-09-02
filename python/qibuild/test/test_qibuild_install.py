@@ -1,3 +1,6 @@
+import sys
+import os
+
 import qisys.command
 
 import qibuild.find
@@ -98,3 +101,19 @@ def test_fails_early(qibuild_action, tmpdir):
     qibuild_action.add_test_project("installme")
     qibuild_action("configure", "installme", "-DFAIL_EMPTY_GLOB=TRUE", raises=True)
     qibuild_action("configure", "installme", "-DFAIL_NON_EXISTING=TRUE", raises=True)
+
+
+def test_install_cross_unix_makefiles(qibuild_action, tmpdir):
+    install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles")
+
+def test_install_cross_ninja(qibuild_action, tmpdir):
+    install_cross(qibuild_action, tmpdir, cmake_generator="Ninja")
+
+def install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles"):
+    cross_proj = qibuild_action.add_test_project("cross")
+    toolchain_file = os.path.join(cross_proj.path, "toolchain.cmake")
+    qibuild_action("configure", "cross",
+                   "-G", cmake_generator,
+                   "-DCMAKE_TOOLCHAIN_FILE=%s" % toolchain_file)
+    qibuild_action("make", "cross",)
+    qibuild_action("install", "cross",  tmpdir.strpath)
