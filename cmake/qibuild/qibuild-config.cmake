@@ -12,11 +12,12 @@ if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
   include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
 endif()
 
-# remove perf_tests.txt create by a previous cmake run.
+# remove qi_tests.json
 # Note:
-#  this will fail silently if perf_tests does not exists
-#  this file is only used by qibuild test --perf
-file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/perflist.txt)
+#  this will fail silently if the file does not exists
+#  this file is used by `qibuild test` and other commands
+#  later on and can ben patched from CMake
+file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/qitest.json)
 
 get_filename_component(_this_dir ${CMAKE_CURRENT_LIST_FILE} PATH)
 set(_qibuild_path ${_this_dir}/..)
