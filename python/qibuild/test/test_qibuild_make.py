@@ -21,9 +21,8 @@ def test_make_without_configure(qibuild_action):
     qibuild_action.add_test_project("hello")
 
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qibuild.cmake_builder.NotConfigured):
         qibuild_action("make", "-s", "hello")
-    assert "The project world has not been configured yet" in str(e.value)
 
 
 def test_running_from_build_dir_incremental(qibuild_action):

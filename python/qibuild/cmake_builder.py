@@ -52,7 +52,7 @@ class CMakeBuilder(object):
         """
         @functools.wraps(func)
         def new_func(self, *args, **kwargs):
-            projects = self.deps_solver.get_dep_projects(self.projects, ["build"])
+            projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
             for project in projects:
                 if not os.path.exists(project.cmake_cache):
                     raise NotConfigured(project)
