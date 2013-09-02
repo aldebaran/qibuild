@@ -36,6 +36,7 @@ def do(args):
     dest_dir = qisys.sh.to_native_path(args.dest_dir)
     cmake_builder = qibuild.parsers.get_cmake_builder(
                                     args, default_dep_types=["build", "runtime"])
+    cmake_builder.build()
     components = list()
     if args.dep_types == "default":
         components = None

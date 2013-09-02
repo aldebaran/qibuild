@@ -312,9 +312,6 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             mess += "CMAKE_INSTALL_PREFIX is already correct"
             ui.debug(mess)
 
-        # Hack for http://www.cmake.org/Bug/print_bug_page.php?bug_id=13934
-        if self.using_make:
-            self.build(target="preinstall", num_jobs=num_jobs, env=build_env)
         if components:
             for component in components:
                 self._install_component(destdir, component)
@@ -341,7 +338,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         destdir = os.path.join(self.build_directory, "deploy")
         #create folder for project without install rules
         qisys.sh.mkdir(destdir, recursive=True)
+        self.build()
         self.install(destdir, components=["runtime", "test"])
+
         if split_debug:
             self.split_debug(destdir)
         ui.info(ui.green, "Sending binaries to target ...")
