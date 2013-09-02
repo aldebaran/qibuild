@@ -141,8 +141,17 @@ endfunction()
 # \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
 # \group:ARGUMENTS Arguments to be passed to the executable
 function(qi_add_test test_name target_name)
-  cmake_parse_arguments(ARG "NIGHTLY" "TIMEOUT" "ARGUMENTS" ${ARGN})
-  if(ARG_NIGHTLY AND NOT ${QI_NIGHTLY_TESTS})
+  cmake_parse_arguments(ARG "PERF;NIGHTLY" "TIMEOUT" "ARGUMENTS" ${ARGN})
+
+  if(NOT ${QI_WITH_TESTS})
+    return()
+  endif()
+
+  if(ARG_NIGHTLY AND NOT ${QI_WITH_NIGHTLY_TESTS})
+    return()
+  endif()
+
+  if(ARG_PERF AND NOT ${QI_WITH_PERF_TESTS})
     return()
   endif()
 
@@ -155,14 +164,12 @@ function(qi_add_test test_name target_name)
   # - A path that leads to an executable when using find_program
   # - A package name providing a ${name}_EXECUTABLE variable.
   if(TARGET ${target_name})
+    set_target_properties(${target_name} PROPERTIES FOLDER "tests")
     set(_bin_path ${QI_SDK_DIR}/${QI_SDK_BIN}/${target_name})
 
     if(MSVC AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
       set(_bin_path ${_bin_path}_d)
     endif()
-
-    add_test(${test_name} ${_bin_path} ${ARG_ARGUMENTS})
-    set_target_properties(${target_name} PROPERTIES FOLDER "tests")
   else()
     set(_executable "")
     find_program(_executable "${target_name}")
@@ -170,7 +177,7 @@ function(qi_add_test test_name target_name)
       set(_executable ${target_name})
     endif()
     # Just in case user specified a relative path:
-    get_filename_component(_full_path ${_executable} ABSOLUTE)
+    get_filename_component(_bin_path ${_executable} ABSOLUTE)
     if(NOT EXISTS ${_full_path})
       # Try package
       find_package(${target_name})
@@ -178,22 +185,35 @@ function(qi_add_test test_name target_name)
       if(NOT ${_executable}) # If expects a variable name not content
         qi_error("${target_name} is not a target, an existing file or a package providing ${target_name}_EXECUTABLE")
       endif()
-      set(_full_path ${${_executable}})
+      set(_bin_path ${${_executable}})
     endif()
-    add_test(${test_name} ${_full_path} ${ARG_ARGUMENTS})
   endif()
 
-  set_tests_properties(${test_name} PROPERTIES
-    TIMEOUT ${ARG_TIMEOUT}
+  set(_cmd ${_bin_path} ${ARG_ARGUMENTS})
+
+  set( _qi_add_test_args "--name" ${name})
+  list(APPEND _qi_add_test_args "--output" ${CMAKE_BINARY_DIR}/qitest.json)
+
+  if (ARG_TIMEOUT)
+    list(APPEND _qi_add_test_args "--timeout" ${ARG_TIMEOUT})
+  endif()
+
+  if (ARG_NIGHTLY)
+    list(APPEND _qi_add_test_args "--nightly")
+  endif()
+
+  if (ARG_PERF)
+    list(APPEND _qi_add_test_args "--perf")
+  endif()
+
+  set(_qi_add_test_args ${_qi_add_test_args} ${_cmd})
+
+  message(STATUS "_qi_add_test_args: ${_qi_add_test_args}")
+
+  qi_run_py_script("${qibuild_DIR}/qi_add_test.py"
+    ARGUMENTS ${_qi_add_test_args}
   )
-
-  # HACK for apple until the .dylib problems are fixed...
-  if(APPLE)
-    set_tests_properties(${test_name} PROPERTIES
-      ENVIRONMENT "DYLD_LIBRARY_PATH=${QI_SDK_DIR}/${QI_SDK_LIB};DYLD_FRAMEWORK_PATH=${QI_SDK_DIR}"
-    )
-  endif()
-
+  
   if(TARGET ${target_name})
     install(TARGETS "${target_name}" DESTINATION "bin" COMPONENT "test")
   endif()
