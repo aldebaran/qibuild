@@ -404,6 +404,7 @@ class QiBuildConfig:
                     qisys.sh.mkdir(dirname, recursive=True)
                     with open(cfg_path, "w") as fp:
                         fp.write('<qibuild />\n')
+        ui.debug("Reading config from", cfg_path)
         try:
             self.tree.parse(cfg_path)
         except Exception, e:
@@ -548,6 +549,7 @@ class QiBuildConfig:
 
         """
         server = self.servers.get(server_name)
+        ui.debug("access for", server_name, ":", server)
         if not server:
             return None
         return server.access
