@@ -42,7 +42,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
     @property
     def perf_results_dir(self):
         res = os.path.join(self.project.build_directory,
-                           "test-results")
+                           "perf-results")
         return res
 
 
