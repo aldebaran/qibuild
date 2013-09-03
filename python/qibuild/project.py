@@ -217,6 +217,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         parser.add_argument("--timeout", type=int)
         parser.add_argument("--nightly", action="store_true")
         parser.add_argument("--perf", action="store_true")
+        parser.add_argument("--output", required=True)
         parser.add_argument("--working-directory")
         parser.set_defaults(nightly=False, perf=False)
         for line in lines:

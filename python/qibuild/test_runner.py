@@ -85,6 +85,8 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @coverage.setter
     def coverage(self, value):
+        if not value:
+            return
         if not qisys.command.find_program("gcovr"):
             raise Exception("please install gcovr in order to measure coverage")
 
