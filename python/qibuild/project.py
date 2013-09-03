@@ -15,6 +15,7 @@ import qibuild.dylibs
 import qibuild.dlls
 import qibuild.test_runner
 import qitoolchain.toolchain
+import qitest.conf
 
 class BuildProject(object):
     def __init__(self, build_worktree, worktree_project):
@@ -217,7 +218,6 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         parser.add_argument("--timeout", type=int)
         parser.add_argument("--nightly", action="store_true")
         parser.add_argument("--perf", action="store_true")
-        parser.add_argument("--output", required=True)
         parser.add_argument("--working-directory")
         parser.set_defaults(nightly=False, perf=False)
         for line in lines:
@@ -340,6 +340,8 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         else:
             self.build(target="install", env=build_env)
 
+        self._install_qitest_json(destdir)
+
         if split_debug:
             self.split_debug(destdir)
 
@@ -354,6 +356,13 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         ui.debug("Installing", component)
         qisys.command.call(["cmake"] + cmake_args, cwd=self.build_directory,
                             env=build_env)
+
+    def _install_qitest_json(self, destdir):
+        if not os.path.exists(self.qitest_json):
+            return
+        tests = qitest.conf.parse_tests(self.qitest_json)
+        tests = qitest.conf.relocate_tests(self, tests)
+        qitest.conf.write_tests(tests, os.path.join(destdir, "qitest.json"))
 
     def deploy(self, url, port=22, split_debug=False,
                use_rsync=True, with_tests=True):

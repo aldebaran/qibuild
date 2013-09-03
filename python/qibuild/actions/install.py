@@ -21,6 +21,8 @@ def configure_parser(parser):
                        help="Only install the runtime components")
     group.add_argument("--split-debug", action="store_true",
                        help="Split debug symbols")
+    group.add_argument("--with-tests", action="store_true", dest="with_tests",
+                        help="Also install tests")
     parser.set_defaults(prefix="/", split_debug=False, dep_types="default")
     if not parser.epilog:
         parser.epilog = ""
@@ -38,7 +40,10 @@ def do(args):
                                     args, default_dep_types=["build", "runtime"])
     components = list()
     if args.dep_types == "default":
-        components = None
+        if args.with_tests:
+            components = ["test", "runtime"]
+        else:
+            components = None
     else:
         if "build" in args.dep_types:
             components.append("devel")

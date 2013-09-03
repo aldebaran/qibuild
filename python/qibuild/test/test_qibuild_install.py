@@ -119,3 +119,20 @@ def install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles"):
                    "-DCMAKE_TOOLCHAIN_FILE=%s" % toolchain_file)
     qibuild_action("make", "cross",)
     qibuild_action("install", "cross",  tmpdir.strpath)
+
+def test_running_tests_after_install(qibuild_action, tmpdir):
+    testme = qibuild_action.add_test_project("testme")
+    dest = tmpdir.join("dest")
+    testme.configure()
+    testme.build()
+    testme.install(dest.strpath, components=["test"])
+    qitest_json = dest.join("qitest.json")
+    assert qitest_json.check(file=True)
+    from qitest.actions.run import TestProject
+    test_project = TestProject(qitest_json.strpath)
+    test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
+    test_runner.pattern = "ok"
+    # FIXME: get rid of this ...
+    with qisys.sh.change_cwd(dest.strpath):
+        ok = test_runner.run()
+    assert ok

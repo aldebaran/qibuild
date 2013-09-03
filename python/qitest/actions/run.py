@@ -35,7 +35,8 @@ def do(args):
     test_runner.num_cpus = args.num_cpus
     test_runner.num_jobs = args.num_jobs
     res = test_runner.run()
-    sys.exit(res)
+    if not res:
+        sys.exit(1)
 
 
 class TestProject(object):

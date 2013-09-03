@@ -28,4 +28,29 @@ def parse_tests(conf_path):
     with open(conf_path, "r") as fp:
         return json.load(fp)
 
+def write_tests(tests, conf_path):
+    with open(conf_path, "w") as fp:
+        return json.dump(tests, fp, indent=2)
 
+def relocate_tests(project, tests):
+    """ Make sure the tests can be relocated to the dest directory """
+    new_tests = list()
+    for test in tests:
+        test["cmd"] = relocate_cmd(project, test["cmd"])
+        new_tests.append(test)
+    return new_tests
+
+def relocate_cmd(project, cmd):
+    """ Replace every absolute path by a relative path """
+    new_cmd = list()
+    for arg in cmd:
+        if os.path.isabs(arg):
+            relpath = os.path.relpath(arg, project.sdk_directory)
+            if relpath.startswith(".."):
+                # no choice but to keep it
+                new_cmd.append(arg)
+            else:
+                new_cmd.append(relpath)
+        else:
+            new_cmd.append(arg)
+    return new_cmd
