@@ -325,7 +325,12 @@ class Toolchain(object):
             mess += "No such package"
             raise Exception(mess)
 
-        qisys.sh.rm(self.get(name))
+        tc_path = qitoolchain.toolchain.get_default_packages_path(self.name)
+        # Do NOT use self.get here:
+        # what we want to remove is the location where the remote package
+        # will land, not where it is are right now
+        package_path = os.path.join(tc_path, name)
+        qisys.sh.rm(package_path)
         config.remove_section(package_section)
 
         with open(cfg_path, "w") as fp:
