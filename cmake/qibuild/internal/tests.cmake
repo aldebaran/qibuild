@@ -72,7 +72,6 @@ function(_qi_add_test test_name target_name)
   set(_cmd ${_bin_path} ${ARG_ARGUMENTS})
 
   set( _qi_add_test_args "--name" ${test_name})
-  list(APPEND _qi_add_test_args "--output" ${CMAKE_BINARY_DIR}/qitest.json)
 
   if(ARG_WORKING_DIRECTORY)
     list(APPEND _qi_add_test_args "--working-directory" ${ARG_WORKING_DIRECTORY})
