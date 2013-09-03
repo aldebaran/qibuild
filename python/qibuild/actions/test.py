@@ -11,32 +11,19 @@ import sys
 
 from qisys import ui
 import qibuild.parsers
+import qitest.parsers
 import qitest.actions.run
 
 def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
-    group = parser.add_argument_group("qibuild test options")
-    group.add_argument("-l", "--list", dest="list", action="store_true",
+    qitest.parsers.test_parser(parser, with_num_jobs=False)
+    parser.add_argument("-l", "--list", dest="list", action="store_true",
                         help="List what tests would be run")
-    group.add_argument("--slow", action="store_true", dest="nightly",
+    parser.add_argument("--slow", action="store_true", dest="nightly",
                         help=argparse.SUPPRESS)
-    group.add_argument("--perf", dest="perf", action="store_true",
-                        help="run perfs tests instead of pure tests.")
-    group.add_argument("-k", "--pattern", dest="pattern",
-                        help="Filter tests matching this pattern")
-    group.add_argument("-V", dest="verbose_tests", action="store_true",
-                        help="display tests output")
-    group.add_argument("--valgrind", dest="valgrind", action="store_true",
-                        help="run tests under valgrind")
-    group.add_argument("--nightmare", dest="nightmare", action="store_true",
-                        help="run tests in shuffle and 20 times (apply only to gtest)")
-    group.add_argument("--coverage", dest="coverage", action="store_true",
-                        help="run coverage")
-    group.add_argument("--ncpu", dest="num_cpus", default=-1, type=int,
-                        help="set number of CPU each test is allowed to use (linux)")
-    group.add_argument("--build-first", action="store_true", help="rebuild first")
+    parser.add_argument("--build-first", action="store_true", help="rebuild first")
 
 
 def do(args):
