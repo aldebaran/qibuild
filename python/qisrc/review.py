@@ -59,13 +59,11 @@ def ask_gerrit_username(server, ssh_port=29418):
 
     """
     ui.info(ui.green, "Configuring gerrit ssh access ...")
-    username = os.environ.get("USER")
+    username = qisys.sh.username()
     if not username:
-        username = os.environ.get("USERNAME")
+        username = qisys.interact.ask_string("Please enter your username")
         if not username:
-            username = qisys.interact.ask_string("Please enter your username")
-            if not username:
-                return
+            return
     ui.info("Checking gerrit connection with %s@%s:%i" %
             (username, server, ssh_port))
     if check_gerrit_connection(username, server, ssh_port=ssh_port):
