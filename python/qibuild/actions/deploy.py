@@ -61,6 +61,13 @@ Supported formats are:
     cmake_builder = qibuild.parsers.get_cmake_builder(
                                     args, default_dep_types=["test", "runtime"])
 
+    previous_dep_types = list(cmake_builder.dep_types)
+    if previous_dep_types == list(): # keep -s status
+        build_dep_types = list()
+    else:
+        build_dep_types = ["build", "runtime"]
+    cmake_builder.dep_types = build_dep_types
     cmake_builder.build()
+    cmake_builder.dep_types = previous_dep_types
     for url in urls:
         cmake_builder.deploy(url, split_debug=args.split_debug)

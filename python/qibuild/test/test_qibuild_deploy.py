@@ -1,6 +1,9 @@
 import os
 
 import qisys.command
+import qibuild.find
+
+import mock
 
 def check_ssh_connection():
     # check we can log in to locahost, and that
@@ -82,3 +85,14 @@ def test_deploy_notests(qibuild_action, tmpdir):
     qibuild_action("make", "foo")
     qibuild_action("deploy", "foo", url, "--no-tests")
     assert tmpdir.join("bin/gtest").check(file=False)
+
+
+def test_deploy_builds_build_deps(qibuild_action, tmpdir):
+    if not check_ssh_connection():
+        return
+    url = get_ssh_url(tmpdir)
+    foo_proj = qibuild_action.create_project("foo")
+    bar_proj = qibuild_action.create_project("bar", build_depends=["foo"])
+    qibuild_action("configure", "bar")
+    qibuild_action("deploy", "bar", url)
+    qibuild.find.find([foo_proj.sdk_directory], "foo", expect_one=True)
