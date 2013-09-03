@@ -55,6 +55,17 @@ def get_path(*args):
     mkdir(to_make, recursive=True)
     return full_path
 
+def username():
+    """ Get the current user name """
+    if os.name != 'nt':
+        import pwd
+        uid = os.getuid()
+        pw_info = pwd.getpwuid(uid)
+        if pw_info:
+            return pw_info.pw_name
+    username = os.environ.get("USERNAME")
+    if username:
+         return username
 
 def mkdir(dest_dir, recursive=False):
     """ Recursive mkdir (do not fail if file exists) """
