@@ -213,29 +213,36 @@ def get_cmake_qibuild_dir(worktree=None):
                 qibuild_config = os.path.join(candidate, "qibuild", "qibuild-config.cmake")
                 if os.path.exists(qibuild_config):
                     return candidate
+    res = find_installed_cmake_qibuild_dir(qibuild.QIBUILD_ROOT_DIR)
+    if not res:
+        mess  = "Could not find qibuild cmake framework path\n"
+        mess += "Please file a bug report with the details of your installation"
+        raise Exception(mess)
+    return res
 
 
-    # Assume this file is not installed,
-    # so we have the python code in qibuild/python,
-    # and the cmake code in qibuild/cmake
-    # (using qibuild from sources)
-    res = os.path.join(qibuild.QIBUILD_ROOT_DIR, "..", "..", "cmake")
-    res = qisys.sh.to_native_path(res)
-    if os.path.isdir(res):
-        return res
+def find_installed_cmake_qibuild_dir(python_dir):
+    ui.debug("looking for cmake code from", python_dir)
+    for candidate in [
+        # python in qibuild/python, cmake in qibuild/cmake
+        ("..", "..", "cmake"),
+        # python in lib/python-2.7/dist,site}-packages,
+        #  cmake in share/cmake/
+        #  (default pip)
+        ("..", "..", "..", "..", "share", "cmake"),
+        # python in local/lib/python-2.7/{dist,site}-packages,
+        # cmake in share/cmake
+        # (debian's pip)
+        ("..", "..", "..", "..", "..", "share", "cmake"),
+        ]:
+        rel_path = os.path.join(*candidate)
+        res = os.path.join(python_dir, rel_path)
+        res = qisys.sh.to_native_path(res)
+        qibuild_config = os.path.join(res, "qibuild", "qibuild-config.cmake")
+        ui.debug("trying", qibuild_config)
+        if os.path.exists(qibuild_config):
+            return res
 
-    # Then, assume we are in a toolchain or/in a SDK, with
-    # the following layout sdk/share/cmake/qibuild,
-    # sdk/lib/python2.x/site-packages/qibuild
-    sdk_dir = os.path.join(qibuild.QIBUILD_ROOT_DIR, "..", "..", "..", "..")
-    sdk_dir = qisys.sh.to_native_path(sdk_dir)
-    res = os.path.join(sdk_dir, "share", "cmake")
-    if os.path.isdir(res):
-        return res
-
-    mess  = "Could not find qibuild cmake framework path\n"
-    mess += "Please file a bug report with the details of your installation"
-    raise Exception(mess)
 
 
 def get_binutil(name, cmake_var=None, build_dir=None, env=None):
