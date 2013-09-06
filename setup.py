@@ -54,7 +54,7 @@ def get_qibuild_cmake_files():
 data_files = get_qibuild_cmake_files()
 
 setup(name="qibuild",
-      version="3.0.1",
+      version="3.1",
       description="Compilation of C++ projects made easy!",
       author="Aldebaran Robotics",
       author_email="dmerejkowsky@aldebaran-robotics.com",
