@@ -24,6 +24,7 @@ qibuild_dir=${qibuild_dir}
 
 # set path
 export PATH="\${qibuild_dir}/python/bin:\$PATH"
+export PYTHONPATH="\${qibuild_dir}/python:\$PYTHONPATH"
 
 # define aliases
 alias qc="qibuild configure"
@@ -34,7 +35,7 @@ alias qo="qibuild open"
 
 # helper functions
 function qicd {
-  p=\$(python \${qibuild_dir}/python/bin/qicd.py \$1)
+  p=\$(python \${qibuild_dir}/python/qicd.py \$1)
   if [[ \$? -ne 0 ]]; then
     return
   fi
