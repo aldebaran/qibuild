@@ -17,33 +17,19 @@ by default now, so you may need to install ``python 2`` first.
 Installation
 ------------
 
-Get the source code from github: https://github.com/aldebaran/qibuild
+Install ``qibuild`` with `pip <http://www.pip-installer.org/en/latest/>`_
+
+.. code-block:: console
+
+    pip install qibuild
 
 Linux, mac
-++++++++++
++++++++++++
 
-Simply run:
+It is recommended to install qibuild with ``qibuild install qibuild --user``
+in order to keep your system clean.
 
-.. code-block:: console
-
-  ./generate-sourceme.sh
-
-And add the following code to your
-``~/.profile`` or equivalent:
-
-
-.. code-block:: bash
-
-  source /path/to/work/tools/qibuild/sourceme.sh
-
-Also install ``CMake`` and the various tools for compiling
-
-If you are using the latest Ubuntu, you should install python2 by
-hand first.
-
-.. code-block:: console
-
-  sudo apt-get install python
+If you do so, make sure that ``$HOME/.local/bin`` is in your ``$PATH``
 
 Windows
 +++++++
@@ -52,12 +38,6 @@ Windows
 On windows, to use scripts written in Python, you have to put ``C:\Python2x`` and
 ``c:\Python2x\Scripts`` in your ``PATH``.
 
-
-Then run
-
-.. code-block:: console
-
-  install-qibuild.bat
 
 If you'd like to have nice colors in your console, you can install
 the Python readline library: http://pypi.python.org/pypi/pyreadline

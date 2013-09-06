@@ -14,7 +14,9 @@ General
   * being hard to know which qibuild version was used
 
 Instead, you should use ``./generate-sourceme.sh`` and patch your
-``~/.profile`` to include the generated ``sourceme.sh`` file.
+``~/.profile`` to include the generated ``sourceme.sh`` file if you
+want to use the latest ``git`` version of ``qibuild``, or just use
+``pip`` once ``qibuild`` is published on ``Pypi``
 
 Command line
 +++++++++++++

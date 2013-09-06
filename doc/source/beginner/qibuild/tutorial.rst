@@ -35,6 +35,18 @@ Then proceed with installing and configuring qibuild:
 
 
 
+Also install ``CMake`` and the various tools for compiling
+
+If you are using the latest Ubuntu, you should install python2 by
+hand first.
+
+.. code-block:: console
+
+  sudo apt-get install python
+
+
+
+
 Creating a worktree
 --------------------
 
@@ -122,6 +134,25 @@ Going further
 
 Follow the :ref:`qibuild-guide`
 
+Optional: install qicd
+++++++++++++++++++++++
+
+
+``qicd`` is a small shell function that lets you jump quickly
+from one project to an other inside your wortkree.
+
+If you have access to ``bash`` shell, you can patch your config file
+in order to use ``qicd``
+
+.. code-block:: sh
+
+  function qicd {
+    p=$(python -m 'qicd' $1)
+    if [[ $? -ne 0 ]]; then
+      return
+    fi
+    cd ${p}
+  }
 
 Troubleshooting
 ---------------
