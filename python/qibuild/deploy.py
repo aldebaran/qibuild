@@ -104,6 +104,11 @@ def parse_url(remote_url):
 
 def deploy(local_directory, remote_url, port=22, use_rsync=True):
     """Deploy a local directory to a remote url."""
+    # ensure destination directory exist before deploying data
+    if len(remote_url.split(":")) > 1:
+        remote_host, remote_dir = remote_url.rsplit(":", 1)
+        cmd = ["ssh", "-p", str(port), remote_host, "mkdir", "-p", remote_dir]
+        qisys.command.call(cmd)
     if use_rsync:
         # This is required for rsync to do the right thing,
         # otherwise the basename of local_directory gets
@@ -125,7 +130,6 @@ def deploy(local_directory, remote_url, port=22, use_rsync=True):
         # Default to scp
         cmd = ["scp", "-P", str(port), "-r", local_directory, remote_url]
     qisys.command.call(cmd)
-
 
 def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_address=""):
     """ generate a script that connect a local gdb to a gdbserver """
