@@ -1,5 +1,5 @@
 <project name="qibuild">
   <maintainer email="dmerejkowsky@aldebaran-robotics.com">Dimitri Merejkowsky</maintainer>
-  <maintainer email="ncornu@aldebaran-robotics.com">Nicolas Cornu</maintainer>
+  <maintainer email="vbarbaresi@aldebaran-robotics.com">Vincent Barbaresi</maintainer>
   <project src="doc" />
 </project>
