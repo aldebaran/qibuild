@@ -80,7 +80,7 @@ endfunction()
 # \group:ARGUMENTS arguments to be passed to the executable
 #
 function(qi_create_perf_test name)
-  _qi_add_test(${name} ${name} PERF_TEST ${ARGN})
+  _qi_add_test_internal(${name} ${name} PERF_TEST ${ARGN})
 endfunction()
 
 
@@ -100,7 +100,7 @@ endfunction()
 # \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
 # \group:ARGUMENTS Arguments to be passed to the executable
 function(qi_add_test test_name target_name)
-  _qi_add_test(${test_name} ${target_name} ${ARGN})
+  _qi_add_test_internal(${test_name} ${target_name} ${ARGN})
 endfunction()
 
 #! Add a test helper

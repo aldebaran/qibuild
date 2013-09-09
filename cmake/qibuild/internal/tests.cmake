@@ -1,4 +1,4 @@
-function(_qi_add_test test_name target_name)
+function(_qi_add_test_internal test_name target_name)
   cmake_parse_arguments(ARG
     "NO_ADD_TEST;NIGHTLY;PERF_TEST;GTEST_TEST"
     "TIMEOUT;WORKING_DIRECTORY"
