@@ -187,8 +187,8 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         try:
             qibuild.cmake.cmake(self.path, self.build_directory,
                                 cmake_args, env=self.build_env, **kwargs)
-        except qisys.command.CommandFailedException:
-            raise qibuild.build.ConfigureFailed(self)
+        except qisys.command.CommandFailedException as error:
+            raise qibuild.build.ConfigureFailed(self, error)
 
     def build(self, num_jobs=None, rebuild=False, target=None,
               coverity=False, env=None):

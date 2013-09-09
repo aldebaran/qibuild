@@ -67,7 +67,12 @@ class BuildFailed(Exception):
         return "Error occurred when building project %s" % self.project.name
 
 class ConfigureFailed(Exception):
-    def __init__(self, project):
+    def __init__(self, project, exception=None):
         self.project = project
+        self.exception = exception
     def __str__(self):
-        return "Error occurred when configuring project %s" % self.project.name
+        mess =  "Error occurred when configuring project %s" % self.project.name
+        returncode = self.exception.returncode
+        if (returncode < 0):
+            mess += " (%s)" % qisys.command.str_from_signal(-returncode)
+        return mess
