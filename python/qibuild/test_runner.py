@@ -182,6 +182,12 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             env.update(test_env)
         if ui.CONFIG["color"] and test.get("gtest"):
             env["GTEST_COLOR"] = "yes"
+        if os.name == 'nt':
+            env["PATH"] = os.path.join(project.sdk_directory, "bin") + ";" + \
+                          env["PATH"]
+        if os.name == "darwin":
+            env["DYLD_LIBRARY_PATH"] = os.path.join(project.sdk_directory, "lib") + ":" + \
+                          env["DYLD_LIBRARY_PATH"]
         test["env"] = env
         # Quick hack:
         gtest_repeat = env.get("GTEST_REPEAT", "1")
