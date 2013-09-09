@@ -78,6 +78,8 @@ class Git(object):
             ui.debug("out:", out)
             return (process.returncode, out)
         else:
+            if "raises" in kwargs:
+                del kwargs["raises"]
             qisys.command.call(cmd, **kwargs)
 
     @contextlib.contextmanager
