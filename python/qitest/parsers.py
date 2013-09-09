@@ -23,6 +23,8 @@ def test_parser(parser, with_num_jobs=True):
                         help="run coverage")
     group.add_argument("--ncpu", dest="num_cpus", default=-1, type=int,
                         help="set number of CPU each test is allowed to use (linux)")
+    group.add_argument("--nightly", action="store_true", dest="nightly")
+    parser.set_defaults(nightly=False)
     if with_num_jobs:
         group.add_argument("-j", dest="num_jobs", default=1, type=int,
                             help="Number of tests to run in parallel")
