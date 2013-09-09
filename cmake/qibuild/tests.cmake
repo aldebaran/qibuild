@@ -102,3 +102,17 @@ endfunction()
 function(qi_add_test test_name target_name)
   _qi_add_test(${test_name} ${target_name} ${ARGN})
 endfunction()
+
+#! Add a test helper
+# Creat a binary that will not be run as a test, but rather used
+# by an other test.
+# The binary will be deployed along with the actual tests.
+function(qi_create_test_helper name)
+  qi_create_bin(${name} NO_INSTALL ${ARGN})
+  if(TARGET ${name})
+    install(TARGETS ${name}
+            DESTINATION "bin"
+            COMPONENT "test")
+    set_target_properties(${name} PROPERTIES FOLDER tests)
+  endif()
+endfunction()
