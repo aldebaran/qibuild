@@ -13,4 +13,6 @@ qi_create_test(timeout timeout.cpp TIMEOUT 1)
 qi_create_test(spam spam.cpp)
 qi_create_test(encoding encoding.cpp)
 qi_create_test(nightly nightly.cpp NIGHTLY)
+qi_create_test(env env.cpp ENVIRONMENT
+  "FOO=BAR;SPAM=EGGS")
 qi_create_perf_test(perf perf.cpp PERF)
