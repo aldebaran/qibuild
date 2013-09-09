@@ -256,7 +256,7 @@ class WorkTreeSyncer(object):
             ui.info_count(i, n, ui.white, "Configuring", ui.reset,
                           ui.blue, project.src.ljust(max_src), end="\r")
             project.apply_remote_config(repo)
-        ui.info(" " * (max_src + 11), end="\r")
+        ui.info(" " * (max_src + 19), end="\r")
         return res
 
     def _sync_build_profiles(self, local_manifest):
