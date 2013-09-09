@@ -34,6 +34,7 @@ def do(args):
     test_runner.verbose = args.verbose_tests
     test_runner.num_cpus = args.num_cpus
     test_runner.num_jobs = args.num_jobs
+    test_runner.nightly = arg.nightly
     res = test_runner.run()
     if not res:
         sys.exit(1)
