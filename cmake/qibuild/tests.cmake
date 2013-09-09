@@ -62,7 +62,7 @@ endfunction()
 # \group:ARGUMENTS Arguments to pass to add_test (to your test program)
 #
 function(qi_create_gtest name)
-  qi_add_test(${name} ${name} GTEST ${ARGN})
+  qi_add_test(${name} ${name} GTEST_TEST ${ARGN})
 endfunction()
 
 #!
@@ -80,7 +80,7 @@ endfunction()
 # \group:ARGUMENTS arguments to be passed to the executable
 #
 function(qi_create_perf_test name)
-  _qi_add_test(${name} ${name} PERF ${ARGN})
+  _qi_add_test(${name} ${name} PERF_TEST ${ARGN})
 endfunction()
 
 

@@ -1,6 +1,6 @@
 function(_qi_add_test test_name target_name)
   cmake_parse_arguments(ARG
-    "NO_ADD_TEST;NIGHTLY;PERF;GTEST"
+    "NO_ADD_TEST;NIGHTLY;PERF_TEST;GTEST_TEST"
     "TIMEOUT;WORKING_DIRECTORY"
     "SRC;DEPENDS;ARGUMENTS" ${ARGN})
 
@@ -16,7 +16,7 @@ function(_qi_add_test test_name target_name)
     set(_should_return TRUE)
   endif()
 
-  if(ARG_PERF AND NOT QI_WITH_PERF_TESTS)
+  if(ARG_PERF_TEST AND NOT QI_WITH_PERF_TESTS)
     set(_should_return TRUE)
   endif()
 
@@ -31,7 +31,7 @@ function(_qi_add_test test_name target_name)
 
   if(_srcs)
     set(_deps ${ARG_DEPENDS})
-    if(ARG_GTEST)
+    if(ARG_GTEST_TEST)
       list(APPEND _deps GTEST GTEST_MAIN)
     endif()
     qi_create_bin(${target_name} SRC ${_srcs} DEPENDS ${_deps})
@@ -77,7 +77,7 @@ function(_qi_add_test test_name target_name)
     list(APPEND _qi_add_test_args "--working-directory" ${ARG_WORKING_DIRECTORY})
   endif()
 
-  if(ARG_GTEST)
+  if(ARG_GTEST_TEST)
     list(APPEND _qi_add_test_args "--gtest")
   endif()
 
@@ -89,7 +89,7 @@ function(_qi_add_test test_name target_name)
     list(APPEND _qi_add_test_args "--nightly")
   endif()
 
-  if(ARG_PERF)
+  if(ARG_PERF_TEST)
     list(APPEND _qi_add_test_args "--perf")
   endif()
   list(APPEND _qi_add_test_args "--")
