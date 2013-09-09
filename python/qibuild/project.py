@@ -219,11 +219,25 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         parser.add_argument("--nightly", action="store_true")
         parser.add_argument("--perf", action="store_true")
         parser.add_argument("--working-directory")
+        parser.add_argument("--env", action="append",
+                            dest="environment")
         parser.set_defaults(nightly=False, perf=False)
+        def log_error(message, line):
+            test_name = line.split(";")[1]
+            mess = "Could not parse test options for test: '%s'\n" % test_name
+            mess += "Error was: %s" % message
+            ui.error(mess)
         for line in lines:
+            parser.error = lambda message : log_error(message, line)
             line = line.strip()
-            args = parser.parse_args(args=line.split(";"))
+            try:
+                args = parser.parse_args(args=line.split(";"))
+            except SystemExit:
+                break
             test = vars(args)
+            as_list = test["environment"]
+            if as_list:
+                test["environment"] = dict(x.split("=") for x in as_list)
             tests.append(test)
         return tests
 

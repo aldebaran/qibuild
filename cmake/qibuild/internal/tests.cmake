@@ -2,7 +2,7 @@ function(_qi_add_test test_name target_name)
   cmake_parse_arguments(ARG
     "NO_ADD_TEST;NIGHTLY;PERF_TEST;GTEST_TEST"
     "TIMEOUT;WORKING_DIRECTORY"
-    "SRC;DEPENDS;ARGUMENTS" ${ARGN})
+    "SRC;DEPENDS;ARGUMENTS;ENVIRONMENT" ${ARGN})
 
   set(_srcs ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
 
@@ -88,6 +88,19 @@ function(_qi_add_test test_name target_name)
   if(ARG_NIGHTLY)
     list(APPEND _qi_add_test_args "--nightly")
   endif()
+
+  foreach(_keyval ${ARG_ENVIRONMENT})
+    string(REPLACE "=" ";" _splitted ${_keyval})
+    list(LENGTH _splitted _len)
+    if(${_len} EQUAL 2)
+      list(GET _splitted 0 _key)
+      list(GET _splitted 1 _val)
+      list(APPEND _qi_add_test_args "--env" ${_keyval})
+    else()
+      message(FATAL_ERROR "Expecting an expressiong looking like <key>=<value>,
+                           got ${_keyval} instead")
+    endif()
+  endforeach()
 
   if(ARG_PERF_TEST)
     list(APPEND _qi_add_test_args "--perf")
