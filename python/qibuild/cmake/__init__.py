@@ -146,7 +146,10 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
                    stdout=fp, stderr=fp)
     fp.close()
     if retcode != 0:
-        ui.error("CMake failed, see log for details")
+        mess = "CMake failed"
+        if retcode < 0:
+            mess += " (%s)" % qisys.command.str_from_signal(-retcode)
+        ui.error(mess)
     ui.info(ui.green, "CMake trace saved in", ui.reset, ui.bold, cmake_log)
     if not profiling:
         return
