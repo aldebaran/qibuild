@@ -53,6 +53,20 @@ class DocProject(object):
     def template_project(self):
         return self.doc_worktree.template_project
 
+    @property
+    def doxydeps(self):
+        res = list()
+        for dep_name in self.depends:
+            doc_project = self.doc_worktree.get_doc_project(dep_name, raises=False)
+            if doc_project and doc_project.doc_type == "doxygen":
+                res.append(doc_project)
+        return res
+
+    def append_doxy_xml_path(self, pathes):
+        for doxydep in self.doxydeps:
+            pathes.append(os.path.join(doxydep.build_dir, 'xml'))
+            doxydep.append_doxy_xml_path(pathes)
+
     def __repr__(self):
         return "<%s %s in %s>" % (self.doc_type.capitalize() + "Project",
                                   self.name, self.src)

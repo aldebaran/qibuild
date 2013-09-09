@@ -71,22 +71,27 @@ class SphinxProject(qidoc.project.DocProject):
 
         conf += self.append_doxylink_settings(conf, rel_paths=rel_paths)
         conf += self.append_intersphinx_settings(conf, rel_paths=rel_paths)
+        conf += self.append_qiapidoc_settings(conf, rel_paths=rel_paths)
 
         out_conf_py = os.path.join(self.build_dir, "conf.py")
         qisys.sh.write_file_if_different(conf, out_conf_py)
 
 
+    def append_qiapidoc_settings(self, conf, rel_paths=False):
+        """ Return a string representing the qiapidoc settings """
+        path_list = []
+        self.append_doxy_xml_path(path_list)
+        return (
+            "\nqiapidoc_srcs=["
+            + ','.join(map(lambda x: "'" + x + "'", path_list))
+            + "]\n")
+
     def append_doxylink_settings(self, conf, rel_paths=False):
         """ Return a string representing the doxylink settings """
         res = self.append_extension(conf, "sphinxcontrib.doxylink")
-        doxydeps = list()
-        for dep_name in self.depends:
-            doc_project = self.doc_worktree.get_doc_project(dep_name, raises=False)
-            if doc_project and doc_project.doc_type == "doxygen":
-                doxydeps.append(doc_project)
 
         doxylink = dict()
-        for doxydep in doxydeps:
+        for doxydep in self.doxydeps:
             if rel_paths:
                 dep_path = os.path.relpath(doxydep.dest, self.dest)
                 dep_path = qisys.sh.to_posix_path(dep_path)
