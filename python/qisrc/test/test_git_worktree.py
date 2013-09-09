@@ -102,6 +102,17 @@ def test_clone_missing_wrong_branch(git_worktree, git_server, record_messages):
     new_git_worktree = qisrc.worktree.GitWorkTree(git_worktree.worktree)
     assert not new_git_worktree.git_projects
 
+def test_network_error_while_cloning(git_worktree, git_server):
+    foo_repo = git_server.create_repo("foo")
+    srv_temp = git_server.root.join("srv.temp")
+    srv  = git_server.root.join("srv")
+    srv.rename(srv_temp)
+    git_worktree.clone_missing(foo_repo)
+    assert not git_worktree.git_projects
+    srv_temp.rename(srv)
+    git_worktree.clone_missing(foo_repo)
+    assert len(git_worktree.git_projects) == 1
+
 def test_clone_missing_evil_nested(git_worktree, git_server):
     foo_bar_repo = git_server.create_repo("foo/bar")
     git_server.push_file("foo/bar", "bar.txt", "bar\n")

@@ -192,6 +192,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             ui.error("Cloning repo failed")
             if git.is_empty():
                 qisys.sh.rm(git_project.path)
+            self.worktree.remove_project(repo.src)
             return False
         self.save_project_config(git_project)
         self.load_git_projects()
