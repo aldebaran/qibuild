@@ -99,6 +99,8 @@ def test_clone_missing_wrong_branch(git_worktree, git_server, record_messages):
     foo_repo.default_branch = "devel"
     git_worktree.clone_missing(foo_repo)
     assert not git_worktree.git_projects
+    new_git_worktree = qisrc.worktree.GitWorkTree(git_worktree.worktree)
+    assert not new_git_worktree.git_projects
 
 def test_clone_missing_evil_nested(git_worktree, git_server):
     foo_bar_repo = git_server.create_repo("foo/bar")
