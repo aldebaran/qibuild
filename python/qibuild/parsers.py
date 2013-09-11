@@ -183,6 +183,7 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
         mathes the current directory
 
         """
+        # step 1: find the closest buildable project
         parser = qisys.parsers.WorkTreeProjectParser(self.build_worktree.worktree)
         worktree_projects = parser.parse_no_project(args)
         if not worktree_projects:
@@ -190,9 +191,15 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
 
         # WorkTreeProjectParser returns None or a list of one element
         worktree_proj = worktree_projects[0]
-        build_proj = qibuild.worktree.new_build_project(self.build_worktree,
-                                                        worktree_proj)
+        build_proj = qisys.parsers.find_parent_project(self.build_worktree.build_projects,
+                                                       worktree_proj.path)
         if not build_proj:
+            # step 2: if we can't find, still look for a qiproject.xml not
+            # registered yet and add it to the worktree:
+            build_proj = qibuild.worktree.new_build_project(self.build_worktree,
+                                                            worktree_proj)
+        if not build_proj:
+            # give up:
             raise CouldNotGuessProjectName()
 
         return self.parse_one_project(args, build_proj.name)

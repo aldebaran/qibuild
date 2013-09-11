@@ -1,13 +1,28 @@
-import pytest
+import os
 
 import qisys.sh
 import qibuild.parsers
+
+import pytest
 
 def test_parse_one_arg(build_worktree, args):
     world = build_worktree.create_project("world")
     args.projects = ["world"]
     projects = qibuild.parsers.get_build_projects(build_worktree, args)
     assert projects == [world]
+
+
+def test_finds_parent_qibuild_project(build_worktree, args):
+    a_proj = build_worktree.create_project("a")
+    worktree = build_worktree.worktree
+    b_proj = worktree.create_project("a/b")
+    qiproject_xml = os.path.join(b_proj.path, "qiproject.xml")
+    with open(qiproject_xml, "w") as fp:
+        fp.write('<qibuild version="3" />\n')
+    with qisys.sh.change_cwd(b_proj.path):
+        projects = qibuild.parsers.get_build_projects(build_worktree, args)
+        assert projects == [a_proj]
+
 
 def test_set_generator(build_worktree, args):
     args.cmake_generator = "Ninja"
