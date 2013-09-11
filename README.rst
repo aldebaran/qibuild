@@ -21,34 +21,17 @@ https://groups.google.com/a/aldebaran-robotics.com/group/qibuild-dev/topics
 Documentation
 -------------
 
-http://developer.aldebaran-robotics.com/doc/qibuild/
+https://community.aldebaran-robotics.com/doc/qibuild/
 
 Installation
 ------------
 
-Note that right now these methods are meant for qibuild git users only, so that
-they can update qibuild by just pulling the git repository.
+Requirements: ``Python 2.7`` with ``pip``
 
-If you wish to package qibuild for your distribution, have a look
-at the INSTALL file.
+Just run::
 
-Linux, Mac
-+++++++++++
+  pip install qibuild
 
-Simply run::
-
-  ./install-qibuild.sh
-
-Windows
-+++++++
-
-
-* Make sure ``c:\Python27`` and ``c:\Python27\scripts`` are in ``%PATH%``
-  (adapt these paths to reflect your Python's installation)
-
-Then run::
-
-  install-qibuild.bat
 
 
 qiBuild contains work from
