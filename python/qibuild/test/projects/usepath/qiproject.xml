@@ -1,0 +1,6 @@
+<project version="3">
+  <qibuild name="usepath">
+    <depends runtime="true" names="stagepath" />
+ </qibuild>
+
+</project>

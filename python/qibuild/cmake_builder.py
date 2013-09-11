@@ -67,11 +67,17 @@ class CMakeBuilder(object):
 
         """
         projects = self.deps_solver.get_dep_projects(self.projects, ["build", "runtime"])
+        # subtle diffs here: dependencies.cmake must be written for *all* projects,
+        # with the build dependencies
         for project in projects:
             sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build"])
             project.write_dependencies_cmake(sdk_dirs)
-            sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "runtime"])
 
+        # path.conf must be written right before cmake is called, and with
+        # all the dependencies
+        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+        for project in projects:
+            sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "runtime", "test"])
             project.write_qi_path_conf(sdk_dirs)
 
     def pre_build(self, project):

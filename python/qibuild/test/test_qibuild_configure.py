@@ -150,3 +150,19 @@ def test_cmake_option_build_perf_test_off(qibuild_action):
     qibuild_action("make", "perf")
     test_path = qibuild.find.find([project.sdk_directory], "perf_spam", expect_one=False)
     assert not test_path
+
+
+def test_using_dash_s_with_path_conf(qibuild_action):
+    def read_path_conf(project):
+        path_conf_path = os.path.join(stagepath_proj.sdk_directory,
+                                      "share", "qi", "path.conf")
+        with open(path_conf_path, "r") as fp:
+            return fp.read()
+
+    stagepath_proj = qibuild_action.add_test_project("stagepath")
+    usepath_proj = qibuild_action.add_test_project("usepath")
+    qibuild_action("configure", "usepath")
+    path_conf_before = read_path_conf(stagepath_proj)
+    qibuild_action("configure", "-s", "usepath")
+    path_conf_after = read_path_conf(stagepath_proj)
+    assert path_conf_before == path_conf_after
