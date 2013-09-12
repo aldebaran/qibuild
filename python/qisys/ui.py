@@ -254,6 +254,6 @@ class timer:
         elapsed_seconds = elapsed_time.seconds
         hours, remainder = divmod(int(elapsed_seconds), 3600)
         minutes, seconds = divmod(remainder, 60)
-        as_str = "%sh %sm %ss" % (hours, minutes, seconds)
+        as_str = "%sh %sm %ss %dms" % (hours, minutes, seconds, elapsed_time.microseconds / 1000)
         if CONFIG['timestamp']:
             info("%s took %s" % (self.description, as_str))
