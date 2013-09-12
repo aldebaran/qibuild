@@ -141,19 +141,15 @@ class GitProject(object):
         self.save_config()
 
 
-    def sync(self, branch_name=None, rebase_devel=False,
-             **kwargs):
+    def sync(self, rebase_devel=False, **kwargs):
         """ Synchronize remote changes with the underlying git repository
         Calls py:meth:`qisys.git.Git.sync`
 
         """
         git = qisrc.git.Git(self.path)
-        if branch_name is None:
-            branch = self.default_branch
-            if not branch:
-                return None, "No branch given, and no branch configured by default"
-        else:
-            branch = git.get_branch(branch_name)
+        branch = self.default_branch
+        if not branch:
+            return None, "No branch given, and no branch configured by default"
 
         current_branch = git.get_current_branch()
         if not current_branch:
@@ -171,15 +167,6 @@ class GitProject(object):
         # Here current_branch == branch.name
         return git.sync_branch(branch)
 
-
-    def get_branch(self, branch_name):
-        """ Get the branch matching the name
-        :return: None if not found
-
-        """
-        for branch in self.branches:
-            if branch.name == branch_name:
-                return branch
 
     def apply_config(self):
         """ Apply configuration to the underlying git
