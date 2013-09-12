@@ -1,4 +1,3 @@
-import argparse
 import datetime
 import os
 import re
@@ -45,7 +44,6 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
                            "perf-results")
         return res
 
-
     @property
     def tests(self):
         """ Override TestSuiteRunner.test to filter perf and nightly tests """
@@ -90,6 +88,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
         if not qisys.command.find_program("gcovr"):
             raise Exception("please install gcovr in order to measure coverage")
 
+
 class ProcessTestLauncher(qitest.runner.TestLauncher):
     """ Implements TestLauncher using `qisys.command.Process```
 
@@ -126,7 +125,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         end = datetime.datetime.now()
         delta = end - start
 
-        res.time = float(delta.microseconds) / 10**6 + delta.seconds
+        res.time = float(delta.microseconds) / 10 ** 6 + delta.seconds
         res.out = process.out
         # Sometimes the process did not have any output,
         # but we still want to let the user know it ran
@@ -146,7 +145,6 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         res.message = message
         self._post_run(res, test)
         return res
-
 
     def _update_test(self, test):
         """ Update the test given the settings on the test suite """
@@ -183,10 +181,10 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         if ui.CONFIG["color"] and test.get("gtest"):
             env["GTEST_COLOR"] = "yes"
         if os.name == 'nt':
-            env["PATH"] = os.path.join(project.sdk_directory, "bin") + ";" + \
+            env["PATH"] = os.path.join(self.project.sdk_directory, "bin") + ";" + \
                           env["PATH"]
         if os.name == "darwin":
-            env["DYLD_LIBRARY_PATH"] = os.path.join(project.sdk_directory, "lib") + ":" + \
+            env["DYLD_LIBRARY_PATH"] = os.path.join(self.project.sdk_directory, "lib") + ":" + \
                           env["DYLD_LIBRARY_PATH"]
         test["env"] = env
         # Quick hack:
@@ -195,8 +193,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
     def _update_test_cwd(self, test):
         cwd = self.suite_runner.cwd
-        test["working_directory"] = test.get("working_directory",
-                                             self.suite_runner.cwd)
+        test["working_directory"] = test.get("working_directory", cwd)
 
     def _with_valgrind(self, test):
         cwd = test["working_directory"]
@@ -273,7 +270,6 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
         with open(out_xml, "w") as fp:
             fp.write(to_write)
-
 
     def get_message(self, process, timeout=None):
         """ Human readable string describing the state of the process """
