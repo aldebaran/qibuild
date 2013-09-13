@@ -41,7 +41,7 @@ def test_wrong_branch(qisrc_action, git_server, record_messages):
     bar = git_worktree.get_git_project("bar")
     foo_git = qisrc.git.Git(foo.path)
     foo_git.checkout("-B", "devel")
-    qisrc_action("status", "--show-branch")
+    qisrc_action("status")
     assert record_messages.find("Some projects are not on the expected branch")
     assert record_messages.find(r"\* foo\s+devel\s+master")
 
@@ -51,5 +51,5 @@ def test_not_on_any_branch(qisrc_action, record_messages):
     foo_git = qisrc.git.Git(foo.path)
     (rc, out) = foo_git.call("log", "-1", "HEAD", "--pretty=%H", raises=False)
     foo_git.checkout(out)
-    qisrc_action("status", "--show-branch")
+    qisrc_action("status")
     assert record_messages.find("not on any branch")

@@ -22,10 +22,6 @@ def configure_parser(parser):
         dest="untracked_files",
         action="store_true",
         help="display untracked files")
-    group.add_argument("--show-branch", "-b",
-        dest="show_branch",
-        action="store_true",
-        help="display branch and tracking branch for each repository")
 
 def do(args):
     """Main method."""
