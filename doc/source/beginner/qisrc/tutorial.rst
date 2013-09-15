@@ -202,21 +202,22 @@ to push the results under code review:
 
    scp -P 29418 john@gerrit:hooks/commit-msg .git/hooks
 
-And then to upload changes for review you have to write something like
+And then to upload changes for review you have run something like
 
 .. code-block:: console
 
    git push gerrit master:refs/for/master
 
-With ``qisrc``, all you have to do is to patch the ``default.xml`` to look like:
+You can get ``qisrc`` to perform this operations for you, by adding a
+new ``gerrit`` remote to the ``manifest.xml`` file:
 
 .. code-block:: xml
 
    <manifest>
-      <remote fetch="git@git.aldebaran.lan" review="http://gerrit:8080" />
-      <project name="qi/libqi.git" path="lib/libqi" review="true" />
+      <remote name="origin" url="git@git.aldebaran.lan" />
+      <remote name="gerrit" url="ssh://gerrit.aldebaran.lan:29418" />
+      <project name="qi/libqi.git" path="lib/libqi" remotes="origin gerrit" />
     </manifest>
 
 And then, ``qisrc sync`` will setup your project for code review, and using
 ``qisrc push`` will be able to upload your changes for code review.
-
