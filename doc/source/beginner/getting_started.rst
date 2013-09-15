@@ -26,7 +26,7 @@ Install ``qibuild`` with `pip <http://www.pip-installer.org/en/latest/>`_
 Linux, mac
 +++++++++++
 
-It is recommended to install qibuild with ``qibuild install qibuild --user``
+It is recommended to install qibuild with ``pip install qibuild --user``
 in order to keep your system clean.
 
 If you do so, make sure that ``$HOME/.local/bin`` is in your ``$PATH``
