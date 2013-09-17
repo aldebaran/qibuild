@@ -187,3 +187,18 @@ def test_incorrect_branch_still_fetches(qisrc_action, git_server):
     foo.sync()
     new_sha1 = test_git.get_ref_sha1("refs/remotes/origin/master")
     assert previous_sha1 != new_sha1
+
+
+def test_keeps_staged_changes(qisrc_action, git_server):
+    git_server.create_repo("foo.git")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("sync")
+    git_worktree = TestGitWorkTree()
+    foo = git_worktree.get_git_project("foo")
+    test_git = TestGit(foo.path)
+    staged_file = os.path.join(foo.path, "staged")
+    with open(staged_file, "w") as f:
+        f.write("I'm going to stage stuff")
+    test_git.add(staged_file)
+    foo.sync()
+    assert os.path.exists(staged_file)
