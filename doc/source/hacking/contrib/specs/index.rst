@@ -6,3 +6,4 @@ Specs
 
    qidoc3
    qivenv
+   handling_host_build_for_cross_compilation
