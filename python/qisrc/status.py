@@ -88,9 +88,16 @@ def check_state(project, untracked):
 
     return state_project
 
-def _print_behind_ahead(branch, tracking, behindahead, numcommits):
-    ui.info(ui.bold, "Your branch", ui.green, branch, ui.reset, ui.bold ,"is",
-            numcommits, "commits %s branch" % (behindahead), ui.blue, tracking)
+def _print_behind_ahead(branch, tracking, behind, ahead):
+    numcommits = ""
+    if behind:
+       numcommits += "-" + str(behind)
+    if behind and ahead:
+       numcommits += "/"
+    if ahead:
+       numcommits += "+" + str(ahead)
+    ui.info(ui.bold, "Your branch", ui.green, branch, ui.reset, ui.bold, "is",
+            numcommits, "commits from branch", ui.blue, tracking)
 
 def print_state(project, max_len):
     """Print a state project."""
@@ -101,14 +108,10 @@ def print_state(project, max_len):
                 ui.blue, project.project.src.ljust(max_len), ui.reset,
                 ui.green, ":", project.current_branch,
                     "tracking", project.tracking)
-        if project.ahead:
-            _print_behind_ahead(project.current_branch, project.tracking, "ahead", project.ahead)
-        if project.behind:
-            _print_behind_ahead(project.current_branch, project.tracking, "behind", project.behind)
-        if project.ahead_manifest:
-            _print_behind_ahead(project.current_branch, project.manifest_branch, "ahead", project.ahead_manifest)
-        if project.behind_manifest:
-            _print_behind_ahead(project.current_branch, project.manifest_branch, "behind", project.behind_manifest)
+        if project.ahead or project.behind:
+            _print_behind_ahead(project.current_branch, project.tracking, project.behind, project.ahead)
+        if project.ahead_manifest or project.behind_manifest:
+            _print_behind_ahead(project.current_branch, project.manifest_branch, project.behind_manifest, project.ahead_manifest)
 
 
     if not project.sync_and_clean:
