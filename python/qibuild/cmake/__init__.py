@@ -198,7 +198,7 @@ def read_cmake_cache(cache_path):
             res[key] = value
     return res
 
-def get_cmake_qibuild_dir(worktree=None):
+def get_cmake_qibuild_dir():
     """Get the path to cmake modules.
 
     First, look fo a project named `qibuild` in the worktree, (if
@@ -206,13 +206,6 @@ def get_cmake_qibuild_dir(worktree=None):
     then, assume we are using qibuild from sources,
     then assume we are using an installed version of qibuild.
     """
-    if worktree:
-        for project in worktree.projects:
-            if os.path.basename(project.src) == "qibuild":
-                candidate = os.path.join(project.path, "cmake")
-                qibuild_config = os.path.join(candidate, "qibuild", "qibuild-config.cmake")
-                if os.path.exists(qibuild_config):
-                    return candidate
     res = find_installed_cmake_qibuild_dir(qibuild.QIBUILD_ROOT_DIR)
     if not res:
         mess  = "Could not find qibuild cmake framework path\n"

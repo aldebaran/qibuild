@@ -31,8 +31,7 @@ class BuildProject(object):
 
     @property
     def cmake_qibuild_dir(self):
-        worktree = self.build_worktree.worktree
-        return qibuild.cmake.get_cmake_qibuild_dir(worktree=worktree)
+        return qibuild.cmake.get_cmake_qibuild_dir()
 
     @property
     def build_directory(self):
