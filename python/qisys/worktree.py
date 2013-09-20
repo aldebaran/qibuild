@@ -11,6 +11,7 @@ import os
 import ntpath
 import posixpath
 import operator
+import difflib
 
 import qisys.project
 import qisys.command
@@ -138,12 +139,16 @@ This path does not exists
         if not self.has_project(src):
             if not raises:
                 return None
+            result = {difflib.SequenceMatcher(a=src, b=x.src).ratio(): x.src for x in self.projects}
+            if not result:
+                mess = "There is no project in this work-tree."
+                raise WorkTreeError(mess)
+            project = result[max(result)]
             mess  = "No project in '%s'\n" % src
-            mess += "Known projects are in %s" % ", ".join(p.src for p in self.projects)
+            mess += "Did you mean: %s?" % project
             raise WorkTreeError(mess)
-        match = [p for p in self.projects if p.src == src]
-        res = match[0]
-        return res
+        match = (p for p in self.projects if p.src == src)
+        return match.next()
 
     def add_project(self, path):
         """ Add a project to a worktree

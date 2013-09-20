@@ -1,4 +1,5 @@
 import os
+import difflib
 
 import qisys.command
 import qisys.worktree
@@ -51,7 +52,10 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
             if build_project.name == name:
                 return build_project
         if raises:
-            raise BuildWorkTreeError("No such qibuild project: %s" % name)
+            result = {difflib.SequenceMatcher(a=name, b=x.name).ratio(): x.src for x in self.build_projects}
+            mess = "No such qibuild project: %s\n" % name
+            mess += "Did you mean: %s?" % result[max(result)]
+            raise BuildWorkTreeError(mess)
 
     def on_project_added(self, project):
         """ Called when a new project has been registered """
