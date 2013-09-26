@@ -32,7 +32,7 @@ def do(args):
     project = projects[0]
 
     if args.package_name:
-        package_name =  args.package_name
+        package_name = args.package_name
     else:
         package_name = project.name
     if args.version:
@@ -44,9 +44,10 @@ def do(args):
     # Clean the destdir just in case the package was already generated
     qisys.sh.rm(destdir)
 
-    if sys.platform.startswith("win"):
+    build_type = cmake_builder.build_config.build_type
+    if sys.platform.startswith("win") and build_type == "Release":
         _do_package(cmake_builder, destdir, build_type="Debug")
-    _do_package(cmake_builder, destdir, build_type="Release")
+    _do_package(cmake_builder, destdir, build_type=build_type)
 
     ui.info(ui.blue, "::", ui.reset, ui.bold, "Compressing package ...")
     archive = qisys.archive.compress(destdir, algo="zip", quiet=True)
