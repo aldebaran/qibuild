@@ -33,7 +33,6 @@ def job_parser(parser, group=None):
     """Parser settings for every action doing builds."""
     group.add_argument("-j", dest="num_jobs", type=int,
         help="Number of jobs to use")
-    parser.set_defaults(num_jobs=1)
 
 def build_parser(parser):
     """Parser settings for every action doing build.

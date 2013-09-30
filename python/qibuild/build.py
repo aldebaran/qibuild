@@ -41,7 +41,7 @@ def msbuild(sln_file, build_type="Debug", target=None, num_jobs=None):
 
     cmd = ["MSBuild.exe", msbuild_conf]
     cmd += ["/nologo"]
-    if num_jobs != None:
+    if num_jobs is not None:
         cmd.append("/m:%d" % int(num_jobs))
 
     if target is not None:
@@ -55,7 +55,7 @@ def num_jobs_to_args(num_jobs, cmake_generator):
     """ Convert a number of jobs to a list of cmake args
 
     """
-    if num_jobs == 1:
+    if num_jobs is None:
         return list()
     else:
         return ["-j", str(num_jobs)]

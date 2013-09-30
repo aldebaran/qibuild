@@ -37,7 +37,7 @@ def configure_parser(parser):
     parser.add_argument("--ncpu", dest="ncpu", default=-1, type=int,
                         help="set number of CPU each test is allowed to use (linux)")
     parser.add_argument("--build-first", action="store_true", help="rebuild first")
-
+    parser.set_defaults(num_jobs=1)
 
 def do(args):
     """Main entry point"""

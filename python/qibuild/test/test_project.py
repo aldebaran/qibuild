@@ -15,8 +15,9 @@ def test_parse_num_jobs_happy_path(build_worktree):
     hello = build_worktree.create_project("hello")
     assert hello.parse_num_jobs(3, cmake_generator="Unix Makefiles") ==  ["-j", "3"]
     assert hello.parse_num_jobs(2, cmake_generator="Ninja") ==  ["-j", "2"]
-    # 1 is the default value, but don't force -j1 when using Ninja
-    assert hello.parse_num_jobs(1, cmake_generator="Ninja") ==  list()
+    # Don't force -j1 when using Ninja
+    assert hello.parse_num_jobs(None, cmake_generator="Ninja") == list()
+    assert hello.parse_num_jobs(1, cmake_generator="Ninja") ==  ["-j", "1"]
 
 def test_parse_num_jobs_unsupported_generator(build_worktree):
     hello = build_worktree.create_project("hello")

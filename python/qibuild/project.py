@@ -234,7 +234,6 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         cmd += [ "--" ]
         cmd += self.parse_num_jobs(self.build_config.num_jobs)
 
-
         if not env:
             build_env = self.build_env.copy()
         else:
@@ -256,7 +255,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         if not cmake_generator:
             cmake_generator = \
                     qibuild.cmake.get_cached_var(self.build_directory, "CMAKE_GENERATOR")
-        if num_jobs == 1:
+        if num_jobs is None:
             return list()
         if "Unix Makefiles" in cmake_generator or \
             "Ninja" in cmake_generator:
