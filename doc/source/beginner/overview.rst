@@ -8,7 +8,7 @@ It comes with a set of tools:
 
 
 qibuild : C++ compilation made easy
-------------------------------------
+-----------------------------------
 
 
 qiBuild aims to make compilation of your sources easy. It manages dependencies
@@ -47,7 +47,7 @@ You can have a loot at
    :maxdepth: 1
 
    qibuild/other/cmake
-   qibuild/other/rosbuild
+   qibuild/other/ros
    qibuild/other/qmake
    qibuild/other/autotools
 
@@ -77,7 +77,7 @@ Notes:
 
 
 Tutorial
-+++++++++
+++++++++
 
 See :ref:`qisrc-tutorial`
 
@@ -97,7 +97,7 @@ See :ref:`qidoc-tutorial`
 
 
 qilinguist: Translating projects
----------------------------------
+--------------------------------
 
 ``qilinguist`` makes it easier to use ``gettext`` in a CMake-based
 project
