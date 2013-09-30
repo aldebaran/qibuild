@@ -147,7 +147,7 @@ class CMakeBuilder(object):
             print
             ui.info(ui.green, ":: ", "Installing packages")
         for i, package in enumerate(packages):
-            ui.info_count(i, len(projects),
+            ui.info_count(i, len(packages),
                           ui.green, "Installing",
                           ui.blue, package.name)
             package.install(real_dest, runtime=runtime_only)
