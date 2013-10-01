@@ -6,13 +6,12 @@ import os
 
 import qisys.sh
 import qibuild.test
-import qibuild.performance
 import qibuild.find
 
 
 def test_perf(qibuild_action):
     proj = qibuild_action.add_test_project("perf")
-    qibuild_action("configure", "perf")
+    qibuild_action("configure", "perf", "-DQI_WITH_PERF_TESTS=ON")
     qibuild_action("make", "perf")
     proj.run_tests(perf=True)
     for name in ["perf_spam", "perf_eggs"]:
