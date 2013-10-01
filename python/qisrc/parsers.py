@@ -111,6 +111,7 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
         self.git_worktree = git_worktree
         self.build_worktree = build_worktree
         self.parser = GitProjectParser(git_worktree)
+        self.build_parser = qibuild.parsers.BuildProjectParser(self.build_worktree)
 
     def all_projects(self, args):
         """ Implements AbstractProjectParser.all_projects """
@@ -119,7 +120,7 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
     def parse_one_project(self, args, project_arg):
         """ Implements AbstractProjectParser.parse_one_project """
         git_project = self.parser.parse_one_project(args, project_arg)[0]
-        return self.solve_deps(args, git_project)
+        return [git_project]
 
     def parse_no_project(self, args):
         """ Implements AbstractProjectParser.parse_no_project """
@@ -129,14 +130,16 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
     def solve_deps(self, args, git_project):
         """ Called when use_build_deps is True
 
-        * find a git project as usual
-        * find the parent build project of this git project
+        * find the current build project as qibuild would do
         * solve the dependencies
         * find the git projects matching the dependencies
 
         """
-        build_project = qisys.parsers.find_parent_project(self.build_worktree.build_projects,
-                                                        git_project.path)
+        build_project = None
+        try:
+            build_project =  self.build_parser.parse_no_project(args)[-1]
+        except qibuild.parsers.CouldNotGuessProjectName:
+            pass
         if not build_project:
             return [git_project]
         git_projects = list()  # Order matters

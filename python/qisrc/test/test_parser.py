@@ -95,6 +95,23 @@ def test_build_deps(cd_to_tmpdir, args):
         projs =  get_git_projects(git_worktree, args, use_build_deps=True)
         assert projs == [hello]
 
+def test_build_deps_not_top_dir(cd_to_tmpdir, args):
+    build_worktree = TestBuildWorkTree()
+    dep_proj = build_worktree.create_project("dep")
+    git = qisrc.git.Git(dep_proj.path)
+    git.init()
+    foo = build_worktree.create_project("foo", src="top/foo", build_depends=["dep"])
+    top_proj = build_worktree.worktree.add_project("top")
+    git = qisrc.git.Git(top_proj.path)
+    git.init()
+    git_worktree = TestGitWorkTree()
+    top_proj = git_worktree.get_git_project("top")
+    dep_proj = git_worktree.get_git_project("dep")
+    with qisys.sh.change_cwd(cd_to_tmpdir.join("top", "foo").strpath):
+        projs =  get_git_projects(git_worktree, args,
+                                  use_build_deps=True)
+        assert projs == [dep_proj, top_proj]
+
 
 def test_groups(git_worktree, args):
     git_worktree = mock.Mock()
