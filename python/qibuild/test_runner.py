@@ -138,6 +138,9 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             if self.verbose:
                 ui.info("\n", process.out)
             message = (ui.green, message)
+        elif process.return_type == qisys.command.Process.INTERRUPTED:
+            res.ok = None
+            message = (ui.brown, "interrupted")
         else:
             ui.info("\n", process.out)
             message = (ui.red, message)

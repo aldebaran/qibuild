@@ -65,6 +65,7 @@ class TestQueue():
 
         for worker_thread in threads:
             worker_thread.stop()
+            worker_thread.join()
 
 
     def _summary(self):
@@ -79,25 +80,23 @@ class TestQueue():
                      "Did you run qibuild configure?")
             self.ok = False
             return
-        if self._interrupted:
-            self.ok = False
-            return
-        num_tests = len(self.tests)
-        failures = [x for x in self.results.values() if not x.ok]
+        num_tests = len(self.results)
+        failures = [x for x in self.results.values() if x.ok is False]
         num_failed = len(failures)
         message = "Ran %i tests in %is" % (num_tests, self.elapsed_time)
-        self.ok = (not failures)
+        ui.info(message)
+        self.ok = (not failures) and not self._interrupted
         if self.ok:
-            ui.info(message)
-            ui.info("All pass. Congrats!")
+            ui.info(ui.green, "All pass. Congrats!")
             return
-        ui.info(ui.red, message, "\n",
-                num_failed, "failures")
-        max_len = max(len(x.test["name"]) for x in failures)
-        for i, failure in enumerate(failures):
-            ui.info_count(i, num_failed,
-                          ui.blue, failure.test["name"].ljust(max_len + 2),
-                          ui.reset, *failure.message)
+        if num_failed != 0:
+            ui.error(num_failed, "failures")
+        if failures:
+            max_len = max(len(x.test["name"]) for x in failures)
+            for i, failure in enumerate(failures):
+                ui.info_count(i, num_failed,
+                            ui.blue, failure.test["name"].ljust(max_len + 2),
+                            ui.reset, *failure.message)
 
     def sigint_handler(self, *args):
         """ Called when user press ctr+c during the test suite
@@ -151,7 +150,8 @@ class TestWorker(threading.Thread):
                 result = qitest.result.TestResult(test)
                 result.ok = False
                 result.message = self.message_for_exception(e)
-            self.test_logger.on_completed(test, index, result.message)
+            if not self._should_stop:
+                self.test_logger.on_completed(test, index, result.message)
             self.results[test["name"]] = result
             self.queue.task_done()
 
