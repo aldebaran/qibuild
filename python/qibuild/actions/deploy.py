@@ -67,7 +67,6 @@ Supported formats are:
     else:
         build_dep_types = ["build", "runtime"]
     cmake_builder.dep_types = build_dep_types
-    cmake_builder.build()
     cmake_builder.dep_types = previous_dep_types
     for url in urls:
         cmake_builder.deploy(url, split_debug=args.split_debug)

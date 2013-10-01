@@ -94,5 +94,6 @@ def test_deploy_builds_build_deps(qibuild_action, tmpdir):
     foo_proj = qibuild_action.create_project("foo")
     bar_proj = qibuild_action.create_project("bar", build_depends=["foo"])
     qibuild_action("configure", "bar")
+    qibuild_action("make", "bar")
     qibuild_action("deploy", "bar", url)
     qibuild.find.find([foo_proj.sdk_directory], "foo", expect_one=True)
