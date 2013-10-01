@@ -1,4 +1,5 @@
 import os
+import difflib
 
 from qisys import ui
 import qisys.worktree
@@ -58,7 +59,10 @@ class DocWorkTree(qisys.worktree.WorkTreeObserver):
             if project.name == name:
                 return project
         if raises:
-            raise Exception("No such doc project: %s" % name)
+            result = {difflib.SequenceMatcher(a=name, b=x.name).ratio(): x.name for x in self.doc_projects}
+            mess = "No such qidoc project: %s\n" % name
+            mess += "Did you mean: %s?" % result[max(result)]
+            raise Exception(mess)
         else:
             return None
 
