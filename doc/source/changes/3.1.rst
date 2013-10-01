@@ -1,13 +1,54 @@
 v3.1
-----
+====
 
 qibuild
-++++++++
+--------
 
-* ``qibuild deploy`` now also deploys tests by default. Use
-  ``qibuild deploy --no-tests`` to get the previous behavior.
+* ``qibuild deploy`` now also deploys tests
+* ``qibuild install``, ``qibuild deploy`` no longer call ``qibuild make`` first.
+* ``qibuild install``: fix printing of package numbers
+* Bug fix in ``path.conf`` generation: this fixes using ``qi_stage_dir`` and
+  ``qi::path::findConf`` in some corner cases
+* Fix using ``qibuild make -j1`` with Ninja
+* ``qibuild package``: build in debug by default on linux
+* Can now specify ``testtime`` dependencies
+
+.. code-block:: xml
+
+  <qibuild name="foo">
+    <depends buildtime="true" runtime="true" names="bar" />
+    <depends testtime="true" buildtime="true" names="bar" />
+  </qibuild>
+
+qisrc
+-----
+
+* Fix finding dependencies when the build project is not at the
+  top of the git project
+* Do not leave empty projects when cloning wrong branches
+* ``qisrc init`` : quieter clone
+* ``qisrc status``: remove ``--show-branch`` option, shorter output
+
+qidoc
+-----
+
+* Allow several doxygen sources for ``qiapidoc``
+
+misc
+----
+
+* UI: increase timer accuracy to ms
 
 CMake
-+++++
+-----
 
 * Add ``qi_run_py_cmd``, ``qi_run_py_script``
+* Only use one component at a time (``runtime``, ``devel``), instead of
+  using many of them (``binary``, ``lib``, ``static-lib``, ``header``, ``cmake``)
+
+
+Python
+-------
+
+* ``qisys.command.process``: remove unused ``verbose`` parameter
+* ``qisrc.git``: Fix bug when specifying ``raises`` to True in ``git.call``
