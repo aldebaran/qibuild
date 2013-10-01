@@ -69,7 +69,7 @@ catkin
 
 Catkin never wraps any CMake functionality and only provides additional CMake
 functionality. What you need to do in catkin is define what other packages need
-to know about your package. This is done by calling one macro: 
+to know about your package. This is done by calling one macro:
 
 .. code-block:: cmake
 
@@ -105,7 +105,7 @@ automatically when defining a library/executable:
 .. code-block:: cmake
 
   qi_create_lib()
-  qi_create_exe()
+  qi_create_bin()
 
 Using another package is then just a matter of calling:
 
@@ -181,6 +181,13 @@ qibuild
 
   qi_create_bin()
 
+Goes away from the CMake defaults:
+
+* ``@rpath`` on mac (actuall CMake 2.8.12 is going to do that by default too)
+* install ``rpath`` set to ``$ORIGIN/../lib`` on linux
+* ``_d`` prefix on VisualStudio when building in debug
+* install rules (force install in ``<prefix>/bin``)
+
 Adding libraries
 ++++++++++++++++
 
@@ -200,6 +207,13 @@ qibuild
 
   qi_create_lib()
 
+Goes away from the CMake defaults:
+
+* ``@rpath`` on mac (actuall CMake 2.8.12 is going to do that by default too)
+* install ``rpath`` set to relative to ``$ORIGIN`` on linux, so that
+  ``dlopen(<prefix>/lib/plugin/foo.so)``  finds the dependencies in
+  ``<prefix>/lib/libbar.so``
+
 Management of dependencies
 ++++++++++++++++++++++++++
 
@@ -211,8 +225,6 @@ ROS
 
 * 3rd party dependencies can be installed using rosdep, otherwise whatever is
   on the system is used.
-
-* tests can have their own dependencies
 
 
 qibuild
@@ -250,8 +262,20 @@ qibuild
   qi_create_lib(${PROJECT_NAME} ${LIST_OF_SOURCE_FILES})
   qi_use_lib(myproject BOOST_THREAD)
 
-Easy to use but requires the manual creation of one CMake file per 3rd party.    
+Easy to use but requires the manual creation of one CMake file per 3rd party.
+The flip side is that you can inherit dependencies:
 
+
+.. code-block:: cmake
+
+  qi_create_lib(foo)
+  qi_use_lib(foo bar)
+  qi_create_bin(baz)
+  qi_use_lib(baz foo)  # baz links with foo and bar
+
+
+(Something cmake 2.8.12 kinda does, but which much greater complexity
+because they handle all the corner cases)
 
 Python support
 ++++++++++++++
