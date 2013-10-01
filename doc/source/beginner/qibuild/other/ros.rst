@@ -17,18 +17,21 @@ First, qiBuild and the ROS build system have much in common.
 They are both based on CMake, and provide a set of tools to
 manage multiple projects, and dependencies between projects.
 
-Those CMake frameworks both have a public and a private API.
-
 What is in qiBuild and not in the ROS build ecosystem
 -----------------------------------------------------
 
 * Ability to create redistributable, pre-compiled packages. (ROS supports
   generation of Ubuntu, Fedora, Homebrew packages, though)
 
-* Easy cross-compilation
+* Easy cross-compilation (ROS only deals with cross-compilation through
+  provided CMake but does not deal with extra packages and different build
+  folders according to the architectures)
 
 * qitoolchain provides a clean way to package and use third-party dependencies
-  without touching the system, which will work on any Linux distribution.
+  without touching the system, which will work on any Linux distribution (ROS
+  deals with this by using existing infrastructures to create its own third
+  party packages when needed)
+
 
 What is in the ROS build ecosystem and not in qiBuild
 -----------------------------------------------------
@@ -36,23 +39,24 @@ What is in the ROS build ecosystem and not in qiBuild
 * ability to build sources in one common out of source build folder or in
   individual isolated build folders per projects.
 
-* Parallel builds of projects as only one build space is usualy used.
+* Parallel builds of projects when using one build space (default behavior).
 
-* Python support : automatic handling of $PYTHONPATH variable, of ``setup.py``,
-  no copy of sources
+* Python support : automatic handling of $PYTHONPATH variable, of
+  ``setup.py``, no copy of sources during build
 
 * special targets to build/run tests
 
 * no need to use external tools to build the sources, you can call
-  ``cmake && make`` from the command line after copying a specific
-  ``CMakeLists.txt`` file
+  ``cmake ../ && make`` from the command line after copying a specific
+  ``CMakeLists.txt`` file at the root of your workspace
 
 * tools to install/visualize dependencies
 
-* workspace chaining: you can create several workspace with several project
-  and use them by sourcing their ``setup.sh`` one after another
+* workspace chaining: you can create several workspaces with several projects
+  and use them by chaining appropriate environement variables (which is done on
+  Unix by sourcing a ``setup.sh`` file)
 
-* a release tool to automatically bump versions, create .deb packages
+* a release toolm ``bloom``, to automatically bump versions, create packages
 
 CMake equivalences
 ------------------
@@ -77,8 +81,8 @@ to know about your package. This is done by calling one macro:
 
 This will define the ``fooConfig.cmake`` and ``fooConfig-version.cmake`` files
 that other packages will need. For everything else, you need to write things
-explicitly, using standard CMake: nothing happens behind the scene. For
-example, to use a catkin package, you need to call:
+explicitly, using standard CMake. For example, to use a catkin package, you
+need to call:
 
 
 .. code-block:: cmake
@@ -87,10 +91,10 @@ example, to use a catkin package, you need to call:
   include_directories(${foo_INCLUDE_DIRS})
   target_link_libraries(bar ${foo_LIBRARIES})
 
-The folder hierarchy is then a ``src`` folder with all your sources, and it stays
-untouched. An out-of-source ``build`` folder that contains all the temporary files used
-for building and an out-of-source/out-of-build ``devel`` folder that contains an
- FHS compliant set of built libraries and executables.
+The folder hierarchy is then a ``src`` folder with all your sources, and it
+stays untouched. An out-of-source ``build`` folder that contains all the
+temporary files used for building and an out-of-source/out-of-build ``devel``
+folder that contains an FHS compliant set of built libraries and executables.
 
 qibuild
 ^^^^^^^
@@ -112,7 +116,7 @@ Using another package is then just a matter of calling:
 Each qiproject is built in the source folder in a ``build`` folder that is
 proper to a specific toolchain.
 
-Initialisation
+Initialization
 ++++++++++++++
 
 catkin
@@ -133,33 +137,6 @@ If ``qibuild`` is installed on the system, it just works,
 but the qibuild command line tool is also smart
 enough to pass ``-Dqibuild_DIR`` when necessary.
 
-Code generation
-+++++++++++++++
-
-catkin
-^^^^^^
-
-ROS includes some message generation packages in the ``genmsg`` package.
-Generated ROS files can be of three types (action, services, messages) and are
-of several bindings (whatever is installed but usually C++, Python, Lisp).
-
-.. code-block:: cmake
-
-  find_package(catkin REQUIRED genmsg ${MSG_PACKAGE_DEPENDENCIES})
-
-  add_action_files(DIRECTORY ${ACTION_DIRECTORY} FILES ${ACTION_FILES})
-  add_service_files(DIRECTORY ${SERVICE_DIRECTORY} FILES ${SERVICE_FILES})
-  add_message_files(DIRECTORY ${MESSAGE_DIRECTORY} FILES ${MESSAGE_FILES})
-
-  generate_messages(DEPENDENCIES ${MSG_PACKAGE_DEPENDENCIES})
-
-
-qibuild
-^^^^^^^
-
-N/A : loose coupling between the messaging library and the build framework.
-Could be implemented in qibuild/cmake ?
-
 Output paths
 ++++++++++++
 
@@ -174,6 +151,8 @@ that correspond to standard locations on your distro or OS.
 .. code-block:: cmake
 
   install(${EXEC_TARGET} ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+The output path ``devel`` is outside the build dir and outside the source dir.
 
 qibuild
 ^^^^^^^
@@ -227,10 +206,14 @@ Management of dependencies
 ROS
 ^^^
 
-* Looks for dependencies using the catkin_pkg library and package.xml
+* Looks for dependencies using the ``catkin_pkg`` library and meta-info stored
+  in a ``package.xml``
 
-* 3rd dependencies can be installed using rosdep, otherwise whatever is
+* 3rd party dependencies can be installed using rosdep, otherwise whatever is
   on the system is used.
+
+* tests can have their own dependencies
+
 
 qibuild
 ^^^^^^^
@@ -276,9 +259,9 @@ Python support
 catkin
 ^^^^^^
 
-Catkin only cares about Python code declared in using setuptools (that includes
-standard Python code, SWIG ...). Just write your ``setup.py`` and then call the
-following macro from your ``CMakeLists.txt``.
+Catkin only deals with Python using standard setuptools (and can therefore deal
+with standard Python code, SWIG ...). Just write your ``setup.py`` and then
+call the following macro from your ``CMakeLists.txt``.
 
 .. code-block:: cmake
 
@@ -300,13 +283,14 @@ qiBuild has direct support for SWIG projects:
     SRC bar.cpp
     DEPENDS ...)
 
-Using qiBuild with the ROS build ecosystem
-------------------------------------------
+Using qiBuild with the ROS build ecosystem at the same time
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Patching qiBuild/ROS to be able to **compile** other projects is probably
-doable, but maybe not that useful: a user probably just want to use one build
-systme at a time.
+If you create ROS packages in their own workspace and source the ``setup.sh``,
+all environment variables are set to enable using those ROS packages from any
+CMake project using ``find_package(catkin COMPONENTS foo)``, hence from qibuild
+projects too.
 
-On the other hand, if you compile ROS packages in their own workspace and source
-the setup.sh, all environment variables are set to enable using ROS packages from
-any CMake project, hence qiBuild projects too.
+qibuild projects have some limitations for now: they do not provide a
+``fooConfig-version.cmake`` file yet, and need to be ``find_package()``-ed from
+a qibuild project.
