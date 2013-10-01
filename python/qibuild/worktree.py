@@ -52,7 +52,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
             if build_project.name == name:
                 return build_project
         if raises:
-            result = {difflib.SequenceMatcher(a=name, b=x.name).ratio(): x.src for x in self.build_projects}
+            result = {difflib.SequenceMatcher(a=name, b=x.name).ratio(): x.name for x in self.build_projects}
             mess = "No such qibuild project: %s\n" % name
             mess += "Did you mean: %s?" % result[max(result)]
             raise BuildWorkTreeError(mess)
