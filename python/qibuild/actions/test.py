@@ -19,6 +19,7 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     qitest.parsers.test_parser(parser, with_num_jobs=False)
+    parser.set_defaults(num_jobs=1)
     parser.add_argument("-l", "--list", dest="list", action="store_true",
                         help="List what tests would be run")
     parser.add_argument("--slow", action="store_true", dest="nightly",
