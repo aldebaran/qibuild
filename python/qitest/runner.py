@@ -25,6 +25,7 @@ class TestSuiteRunner(object):
         Return True if and only if the whole suite passed.
 
         """
+        import ipdb; ipdb.set_trace()
         test_queue = qitest.test_queue.TestQueue(self.tests)
         test_queue.launcher = self.launcher
         ok = test_queue.run(num_jobs=self.num_jobs)
