@@ -27,13 +27,6 @@ What is in qiBuild and not in the ROS build ecosystem
 
 * Easy cross-compilation
 
-* Loosely coupling between the command line tools and the CMake framework:
-  you can use qibuild script to build pure-cmake projects, you do not need
-  the qibuild script to use CMake qibuild functions
-
-* Close to CMake standards: packages made with qiBuild do NOT depend
-  on the qibuild CMake framework.
-
 * qitoolchain provides a clean way to package and use third-party dependencies
   without touching the system, which will work on any Linux distribution.
 
@@ -70,8 +63,9 @@ Gist
 catkin
 ^^^^^^
 
-What you need to do in catkin is define what other packages need to know about
-your package. This is done by calling one macro: 
+Catkin never wraps any CMake functionality and only provides additional CMake
+functionality. What you need to do in catkin is define what other packages need
+to know about your package. This is done by calling one macro: 
 
 .. code-block:: cmake
 
@@ -81,9 +75,11 @@ your package. This is done by calling one macro:
                  LIBRARIES ${LIST_OF_LIBRARIES_TO_EXPORT}
   )
 
-This will define the ``fooConfig.cmake`` and ``fooConfig-version.cmake`` files that
-other packages will need. Everything else is just standard CMake. For example,
-to use a catkin package, you need to call:  
+This will define the ``fooConfig.cmake`` and ``fooConfig-version.cmake`` files
+that other packages will need. For everything else, you need to write things
+explicitly, using standard CMake: nothing happens behind the scene. For
+example, to use a catkin package, you need to call:
+
 
 .. code-block:: cmake
 
@@ -113,7 +109,8 @@ Using another package is then just a matter of calling:
 
   qi_use_lib(bar FOO)
 
-Each qiproject is built in source in a ``build`` folder.
+Each qiproject is built in the source folder in a ``build`` folder that is
+proper to a specific toolchain.
 
 Initialisation
 ++++++++++++++
@@ -142,8 +139,9 @@ Code generation
 catkin
 ^^^^^^
 
-Generated ROS files can be of three types (action, services, messages) and are of 
-several bindings (whatever is installed but usually C++, Python, Lisp).
+ROS includes some message generation packages in the ``genmsg`` package.
+Generated ROS files can be of three types (action, services, messages) and are
+of several bindings (whatever is installed but usually C++, Python, Lisp).
 
 .. code-block:: cmake
 
@@ -278,9 +276,9 @@ Python support
 catkin
 ^^^^^^
 
-Catkin uses the standard setuptools to deal with Python projects as they
-already handle SWIG, standard Python ... Just write your
-``setup.py`` and then call the following macro from your ``CMakeLists.txt``.
+Catkin only cares about Python code declared in using setuptools (that includes
+standard Python code, SWIG ...). Just write your ``setup.py`` and then call the
+following macro from your ``CMakeLists.txt``.
 
 .. code-block:: cmake
 
@@ -305,8 +303,9 @@ qiBuild has direct support for SWIG projects:
 Using qiBuild with the ROS build ecosystem
 ------------------------------------------
 
-Patching qiBuild/ROS to be able to **compile** other projects is probably doable,
-but maybe not that useful: if probably just want to use one build systme at a time.
+Patching qiBuild/ROS to be able to **compile** other projects is probably
+doable, but maybe not that useful: a user probably just want to use one build
+systme at a time.
 
 On the other hand, if you compile ROS packages in their own workspace and source
 the setup.sh, all environment variables are set to enable using ROS packages from
