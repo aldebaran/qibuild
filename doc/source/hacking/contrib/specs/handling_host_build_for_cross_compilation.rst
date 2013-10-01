@@ -1,16 +1,16 @@
 .. _handling-host-build-for-cross-compilation:
 
-[RFC] Handling host-build for cross-compilation
-===============================================
+Handling host-build for cross-compilation
+=========================================
 
 Use case
 --------
 
-A project providing both data for the _target_ and tools to generate this data.
+A project providing both data for the *target* and tools to generate this data.
 
 So:
 
-* the tools must be built to run on the _host_;
+* the tools must be built to run on the *host*;
 
 * the data generation, which is part of the cross-compilation run, should
   resolve the tools path;
@@ -18,7 +18,7 @@ So:
 qiBuild and CMake current state
 -------------------------------
 
-Currently, to cross-compile a project that depends on some _host_-tools, you
+Currently, to cross-compile a project that depends on some *host-tools*, you
 must run something like:
 
 .. code-block: console
@@ -36,7 +36,7 @@ CMake
 * CMake allows to search programs in some location, development files (headers
   and libraries) in others location.
 
-* CMake does not provide any way yet to express this _host build_ paradigm when
+* CMake does not provide any way yet to express this *host build* paradigm when
   executing a cross-compilation.
 
 * CMake does not allow to change the toolchain the during a build, nor use
@@ -48,7 +48,7 @@ qiBuild
 * qiBuild is executed at a higher level than CMake; qiBuild knows how to build
   projects' dependencies.
 
-* qiBuild currently does not have any _host build_ concept.
+* qiBuild currently does not have any *host build* concept.
 
 * qiBuild maintains separated staging areas (one per package and per build
   configuration).
@@ -57,12 +57,12 @@ qiBuild
 Specifications
 --------------
 
-This RFC addresses the _host build_ issue required to fully support
+This RFC addresses the *host build* issue required to fully support
 cross-compilation.
 
-This issue can also be expressed  like this: _the cross-build of a project may
-require some tools built for the host machine_. In other word a project may
-depends on some _host-tools_.
+This issue can also be expressed  like this: *the cross-build of a project may
+require some tools built for the host machine*. In other word a project may
+depends on some *host-tools*.
 
 So, some project may need to be built either:
 
@@ -91,7 +91,7 @@ RFC keypoints
 * This new property belongs to the project metadata, so will be stored in the
   ``qiproject.xml`` file.
 
-* The dependency against some _host_ tools/project should be declared in the
+* The dependency against some *host* tools/project should be declared in the
   ``qiproject.xml`` file:
 
   .. code-block:: xml
@@ -103,7 +103,7 @@ RFC keypoints
         <depends host="true" names="toolbar" />
       </project>
 
-* A project can depend on itself as a _host dependency_. In such case, this
+* A project can depend on itself as a *host dependency*. In such case, this
   must be declared in the ``qiproject.xml`` file:
 
   .. code-block:: xml
@@ -113,11 +113,11 @@ RFC keypoints
         <depends host="true" names="foo" />
       </project>
 
-* The _host_ dependencies will only be taken in account when using a
+* The *host* dependencies will only be taken in account when using a
   cross-toolchain.
 
-* When running a native build, the _host dependencies_ are merged into the
-  _buildtime dependency list_; the project itself dependency is dropped.
+* When running a native build, the *host dependencies* are merged into the
+  *buildtime dependency list*; the project itself dependency is dropped.
 
   The following:
 
@@ -147,23 +147,23 @@ RFC keypoints
 
   * in cross build, qiBuild will:
 
-    #. first run the _host build_ (ie. CMake configuration for the _host
-       build_ and native compilation),
+    #. first run the *host build* (ie. CMake configuration for the *host
+       build* and native compilation),
 
-    #. then run the _target build_ (ie. CMake configuration for the _cross
-       build_ and cross-compilation).
+    #. then run the *target build* (ie. CMake configuration for the *cross
+       build* and cross-compilation).
 
-* A toolchain should declare its type: _native_ or _cross_, as any other
+* A toolchain should declare its type: *native* or *cross*, as any other
   package metadata.
 
 * In every build, qiBuild must allow to specify the build configuration for the
-  _target_:
+  *target*:
 
   .. code-block:: console
 
       qibuild configure --config <target toolchain name>
 
-* In _cross build_, qiBuild must allow to specify the _host build_
+* In *cross build*, qiBuild must allow to specify the *host build*
   configuration:
 
   .. code-block:: console
@@ -171,10 +171,10 @@ RFC keypoints
       qibuild configure --config <target toolchain name> \
         --host-config-name <host toolchain name>
 
-* In _native build_, the _host build_ configuration is the _target build_
+* In *native build*, the *host build* configuration is the *target build*
   configuration, so it is not necessary to specify the former one.
 
-* qiBuild should allow to associate a _host configuration_ to a _target one_.
+* qiBuild should allow to associate a *host configuration* to a *target one*.
 
   .. code-block:: xml
 
@@ -184,10 +184,10 @@ RFC keypoints
         <host name="linux64"/>
       </config>
 
-* qiBuild should allow to build for the _host_ in _debug_ and for the _target_
-  in _release_, and vice-versa.
+* qiBuild should allow to build for the *host* in *debug* and for the *target*
+  in *release*, and vice-versa.
 
-  The following examples mix debug/release between _host_ and _target_ builds:
+  The following examples mix debug/release between _host* and *target* builds:
 
   .. code-block:: console
 
@@ -197,7 +197,7 @@ RFC keypoints
       qibuild configure --config <target toolchain name> --debug \
         --host-config-name <host toolchain name> --host-config-release
 
-* If the _host_ build type is not set, qiBuild should use the same the _target_
+* If the *host* build type is not set, qiBuild should use the same the *target*
   one.
 
   .. code-block:: console
@@ -214,8 +214,8 @@ RFC keypoints
       qibuild configure --config <target toolchain name> \
         --host-config-name <host toolchain name>
 
-* qiBuild should allow to use default _target configurations_ and default _host
-  configurations_; if not set, the default _host configuration_ is the
+* qiBuild should allow to use default *target configurations* and default *host
+  configurations*; if not set, the default *host configuration* is the
   ``system`` toolchain:
 
   .. code-block:: console
@@ -232,23 +232,23 @@ RFC keypoints
 Notes
 ~~~~~
 
-* qiBuild already knows if a toolchain is _native_ or _cross_.
+* qiBuild already knows if a toolchain is *native* or *cross*.
 
-  A _cross-toolchain_ (the cross-compiler package) has a ``host`` and a
+  A *cross-toolchain* (the cross-compiler package) has a ``host`` and a
   ``target`` metadata.
 
-* For a project, a _host build_ is a build whose the configuration uses the
+* For a project, a *host build* is a build whose the configuration uses the
   native compiler of the machine; in the simplest case, it the project will be
-  built using the _system_ toolchain.
+  built using the *system* toolchain.
 
-* The _host_ toolchain choice is solved like this:
+* The *host* toolchain choice is solved like this:
 
-  #. Use the _host_ toolchain set on the command line, if not:
+  #. Use the *host* toolchain set on the command line, if not:
 
-  #. Use the _host_ toolchain set in the toolchain configuration file as
-     property of the given _target_ toolchain, if not:
+  #. Use the *host* toolchain set in the toolchain configuration file as
+     property of the given *target* toolchain, if not:
 
-  #. Use the _system_ toolchain as the _host_ toolchain.
+  #. Use the *system* toolchain as the *host* toolchain.
 
 Full example
 ------------
