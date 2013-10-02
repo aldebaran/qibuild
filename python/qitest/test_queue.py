@@ -127,7 +127,6 @@ class TestWorker(threading.Thread):
         super(TestWorker, self).__init__(name="TestWorker#%i" % worker_index)
         self.queue = queue
         self.launcher = None
-        self.launcher = None
         self.test_logger = None
         self.results = dict()
         self._should_stop = False
