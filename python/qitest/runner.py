@@ -48,6 +48,11 @@ class TestLauncher(object):
     """ Interface for a class able to launch a test. """
     __metaclass__ = abc.ABCMeta
 
+    def __init__(self):
+        # Set by the test suite, the launcher may need to know about its woker
+        # index
+        self.worker_index = None
+
     @abc.abstractmethod
     def launch(self, test):
         """ Should return a TestResult """
