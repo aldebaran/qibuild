@@ -1,4 +1,5 @@
 import datetime
+import multiprocessing
 import os
 import re
 import sys
@@ -64,6 +65,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
             mess = "taskset was not found on the system.\n"
             mess += "Cannot set number of CPUs used by the tests"
             raise Exception(mess)
+        self._num_cpus = value
 
     @property
     def valgrind(self):
@@ -201,15 +203,15 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
     def _with_valgrind(self, test):
         cwd = test["working_directory"]
         self.valgrind_log = os.path.join(cwd, test["name"] + "_valgrind.log")
-        print self.valgrind_log
         test["timeout"] = test["timeout"] * 10
         test["cmd"] = ["valgrind", "--track-fds=yes",
                        "--log-file=%s" % self.valgrind_log] + test["cmd"]
 
     def _with_num_cpus(self, test, num_cpus):
-        # FIXME: every worker thread should have its cpu mask, but it's
-        # unclear what happens when you run -j3 -ncpu=2
-        pass
+        cpu_list = get_cpu_list(multiprocessing.cpu_count(),
+                                num_cpus, self.worker_index)
+        taskset_opts = ["-c", ",".join(str(i) for i in cpu_list)]
+        test["cmd"] = ["taskset"] + taskset_opts + test["cmd"]
 
     def _post_run(self, res, test):
         if not res.ok:
@@ -295,3 +297,11 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
                 return "[FAIL] Return code: %i" % retcode
             else:
                 return qisys.command.str_from_signal(-retcode)
+
+
+def get_cpu_list(total_cpus, num_cpus_per_test, worker_index):
+    cpu_list = list()
+    i = worker_index * num_cpus_per_test
+    cpu_list = range(i, i + num_cpus_per_test)
+    cpu_list = [i % total_cpus for i in cpu_list]
+    return cpu_list

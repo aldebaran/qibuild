@@ -53,6 +53,7 @@ class TestQueue():
         for i in range(0, num_jobs):
             worker = TestWorker(self.task_queue, i)
             worker.launcher = self.launcher
+            worker.launcher.worker_index = i
             worker.test_logger = self.test_logger
             worker.results = self.results
             threads.append(worker)
@@ -125,6 +126,7 @@ class TestWorker(threading.Thread):
     """
     def __init__(self, queue, worker_index):
         super(TestWorker, self).__init__(name="TestWorker#%i" % worker_index)
+        self.index = worker_index
         self.queue = queue
         self.launcher = None
         self.test_logger = None
