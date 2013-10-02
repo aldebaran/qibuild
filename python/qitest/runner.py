@@ -2,7 +2,6 @@ import abc
 import re
 import os
 
-import qitest.launcher
 import qitest.test_queue
 
 class TestSuiteRunner(object):
