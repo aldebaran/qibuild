@@ -3,6 +3,8 @@ import py
 
 import qibuild.cmake
 
+from qisys.test.conftest import skip_on_win
+
 def test_get_cmake_qibuild_dir_no_worktree():
     res = qibuild.cmake.get_cmake_qibuild_dir()
     assert os.path.exists(os.path.join(res, "qibuild/general.cmake"))
@@ -15,6 +17,7 @@ def test_pip_std_install(tmpdir):
     res = qibuild.cmake.find_installed_cmake_qibuild_dir(python_dir.strpath)
     assert res == cmake_dir.strpath
 
+@skip_on_win
 def test_pip_debian_install(tmpdir):
     local = tmpdir.mkdir("local")
     lib = tmpdir.mkdir("lib")
