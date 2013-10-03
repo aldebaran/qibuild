@@ -45,6 +45,16 @@ CMake
 * Add ``qi_run_py_cmd``, ``qi_run_py_script``
 * Only use one component at a time (``runtime``, ``devel``), instead of
   using many of them (``binary``, ``lib``, ``static-lib``, ``header``, ``cmake``)
+* This means you need to fix your code if you were not using ``qi_install_*``,
+  you have to fix your code
+
+.. code-block:: cmake
+
+  # Old:
+  install(FILES README DESTINATION . COMPONENT doc)
+
+  # New:
+  install(FILES README DESTINATION . COMPONENT runtime)
 
 
 Python
