@@ -335,12 +335,16 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         qisys.command.call(["cmake"] + cmake_args, cwd=self.build_directory,
                             env=build_env)
 
-    def deploy(self, url, split_debug=False, use_rsync=True, port=22):
+    def deploy(self, url, port=22, split_debug=False,
+               use_rsync=True, with_tests=True):
         """ Deploy the project to a remote url """
         destdir = os.path.join(self.build_directory, "deploy")
         #create folder for project without install rules
         qisys.sh.mkdir(destdir, recursive=True)
-        self.install(destdir, components=["runtime", "test"])
+        components=["runtime"]
+        if with_tests:
+            components.append("test")
+        self.install(destdir, components=components)
         if split_debug:
             self.split_debug(destdir)
         ui.info(ui.green, "Sending binaries to target ...")

@@ -8,11 +8,13 @@ import pytest
 def test_parse_one_arg(build_worktree, args):
     world = build_worktree.create_project("world")
     args.projects = ["world"]
+    args.dep_types = "default"
     projects = qibuild.parsers.get_build_projects(build_worktree, args)
     assert projects == [world]
 
 
 def test_finds_parent_qibuild_project(build_worktree, args):
+    args.dep_types = "default"
     a_proj = build_worktree.create_project("a")
     worktree = build_worktree.worktree
     b_proj = worktree.create_project("a/b")
@@ -44,6 +46,7 @@ def test_get_one_project(build_worktree, args):
     assert "one project" in str(e.value)
 
 def test_default_all(build_worktree, args):
+    args.dep_types = "default"
     world_proj = build_worktree.create_project("world")
     foo_proj   = build_worktree.create_project("foo")
     hello_proj = build_worktree.create_project("hello", build_depends=["world"])
@@ -58,3 +61,11 @@ def test_default_all(build_worktree, args):
     assert qibuild.parsers.get_build_projects(build_worktree, args,
                                               default_all=True) == \
             [world_proj, hello_proj]
+
+
+def test_using_dash_s(build_worktree, args):
+    args.dep_types = []
+    world_proj = build_worktree.create_project("world")
+    hello_proj = build_worktree.create_project("hello", build_depends=["world"])
+    with qisys.sh.change_cwd(hello_proj.path):
+        assert qibuild.parsers.get_build_projects(build_worktree, args) == [hello_proj]

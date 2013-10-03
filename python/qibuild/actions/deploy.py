@@ -32,13 +32,12 @@ def configure_parser(parser):
     group.add_argument("url", help="remote target url: user@hostname:path")
     group.add_argument("--port", help="port", type=int, default=22)
     group.add_argument("--split-debug", action="store_true", dest="split_debug",
-                        help="split debug symbols. Enable remote debuging")
-    group.add_argument("--url", dest="urls", action="append", help="deploy to each given url.")
-    group.add_argument("--no-tests", action="store_const",
-                       const=["runtime"], dest="dep_types",
-                       help="Work on specified projects by ignoring "
-                            "the test deps")
-    parser.set_defaults(dep_types="default")
+                       help="split debug symbols. Enable remote debuging")
+    group.add_argument("--url", dest="urls", action="append",
+                       help="deploy to each given url.")
+    group.add_argument("--with-tests", dest="with_tests", action="store_true",
+                       help="also deploy the tests")
+    parser.set_defaults(with_tests=False)
 
 def do(args):
     """Main entry point"""
@@ -59,14 +58,7 @@ Supported formats are:
             raise Exception(mess.format(url))
 
     cmake_builder = qibuild.parsers.get_cmake_builder(
-                                    args, default_dep_types=["test", "runtime"])
-
-    previous_dep_types = list(cmake_builder.dep_types)
-    if previous_dep_types == list(): # keep -s status
-        build_dep_types = list()
-    else:
-        build_dep_types = ["build", "runtime"]
-    cmake_builder.dep_types = build_dep_types
-    cmake_builder.dep_types = previous_dep_types
+                                    args, default_dep_types=["runtime"])
     for url in urls:
-        cmake_builder.deploy(url, split_debug=args.split_debug)
+        cmake_builder.deploy(url, split_debug=args.split_debug,
+                             with_tests=args.with_tests)

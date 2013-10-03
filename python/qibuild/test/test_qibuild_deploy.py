@@ -64,27 +64,18 @@ def test_deploying_to_several_urls(qibuild_action, tmpdir):
     assert tmpdir.join("second").join("lib").check(dir=True)
     assert tmpdir.join("second").join("bin").check(dir=True)
 
-def test_deploy_test_deps(qibuild_action, tmpdir):
+def test_deploying_tests(qibuild_action, tmpdir):
     if not check_ssh_connection():
         return
     url = get_ssh_url(tmpdir)
-    qibuild_action.create_project("gtest")
-    qibuild_action.create_project("foo", test_depends=["gtest"])
-    qibuild_action("configure", "foo")
-    qibuild_action("make", "foo")
-    qibuild_action("deploy", "foo", url)
-    assert tmpdir.join("bin/gtest").check(file=True)
-
-def test_deploy_notests(qibuild_action, tmpdir):
-    if not check_ssh_connection():
-        return
-    url = get_ssh_url(tmpdir)
-    qibuild_action.create_project("gtest")
-    qibuild_action.create_project("foo", test_depends=["gtest"])
-    qibuild_action("configure", "foo")
-    qibuild_action("make", "foo")
-    qibuild_action("deploy", "foo", url, "--no-tests")
-    assert tmpdir.join("bin/gtest").check(file=False)
+    qibuild_action.add_test_project("testme")
+    qibuild_action("configure", "testme")
+    qibuild_action("make", "testme")
+    # default is no tests:
+    qibuild_action("deploy", "testme", url)
+    assert tmpdir.join("bin/ok").check(file=False)
+    qibuild_action("deploy", "--with-tests", "testme", url)
+    assert tmpdir.join("bin/ok").check(file=True)
 
 
 def test_deploy_builds_build_deps(qibuild_action, tmpdir):

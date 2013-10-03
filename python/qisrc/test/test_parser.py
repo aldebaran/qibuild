@@ -79,6 +79,7 @@ def test_default_all_build_deps(cd_to_tmpdir, args):
                                        default_all=False)
 
 def test_build_deps(cd_to_tmpdir, args):
+    args.dep_types = "default"
     (foo, hello, world) = setup_test()
     git_worktree = TestGitWorkTree()
     with qisys.sh.change_cwd(cd_to_tmpdir.join("hello").strpath):
@@ -96,6 +97,7 @@ def test_build_deps(cd_to_tmpdir, args):
         assert projs == [hello]
 
 def test_build_deps_not_top_dir(cd_to_tmpdir, args):
+    args.dep_types = "default"
     build_worktree = TestBuildWorkTree()
     dep_proj = build_worktree.create_project("dep")
     git = qisrc.git.Git(dep_proj.path)
@@ -121,6 +123,7 @@ def test_groups(git_worktree, args):
 
 
 def test_no_duplicate_deps(cd_to_tmpdir, args):
+    args.dep_types = "default"
     build_worktree = TestBuildWorkTree()
     foo = build_worktree.create_project("foo", run_depends=["foo/bar"])
     build_worktree.create_project("foo/bar")

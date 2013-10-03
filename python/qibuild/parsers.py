@@ -65,7 +65,7 @@ def project_parser(parser, positional=True):
                        const=["build"], dest="dep_types",
                        help="Work on specified projects by ignoring "
                              "the runtime deps.")
-    parser.set_defaults(dep_types=["build", "runtime", "test"])
+    parser.set_defaults(dep_types="default")
 
 def get_build_worktree(args, verbose=True):
     """ Get a build worktree to use from a argparse.Namespace
@@ -120,11 +120,11 @@ def get_one_build_project(build_worktree, args):
 
 def get_dep_types(args, default=None):
     """ Get a list of dep types from the command line """
+    if not default:
+        default = ["build", "runtime", "test"]
     if args.single:
         return list()
-    if not hasattr(args, "dep_types") or not args.dep_types:
-        return ["build", "runtime", "test"]
-    if args.dep_types == "default" and default:
+    if not hasattr(args, "dep_types") or args.dep_types == "default":
         return default
     return args.dep_types
 

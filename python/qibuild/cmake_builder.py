@@ -161,7 +161,7 @@ class CMakeBuilder(object):
             project.install(dest_dir, **kwargs)
 
     @need_configure
-    def deploy(self, url, use_rsync=True, port=22, split_debug=False):
+    def deploy(self, url, use_rsync=True, port=22, split_debug=False, with_tests=False):
         """ Deploy the project and the packages it depends to a remote url """
         if self.dep_types == list(): # used -s
             dep_packages = list()
@@ -202,7 +202,7 @@ class CMakeBuilder(object):
             ui.info_count(i, len(dep_projects),
                     ui.green, "Deploying project", ui.blue, project.name,
                     ui.green, "to", ui.blue, url)
-            project.deploy(url, split_debug=split_debug)
+            project.deploy(url, split_debug=split_debug, with_tests=with_tests)
 
         print
         for project in self.projects:
