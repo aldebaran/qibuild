@@ -5,6 +5,7 @@ import qisys.command
 
 import qibuild.find
 
+from qisys.test.conftest import skip_on_win
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
 
@@ -109,6 +110,7 @@ def test_install_cross_unix_makefiles(qibuild_action, tmpdir):
 def test_install_cross_ninja(qibuild_action, tmpdir):
     install_cross(qibuild_action, tmpdir, cmake_generator="Ninja")
 
+@skip_on_win
 def install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles"):
     cross_proj = qibuild_action.add_test_project("cross")
     toolchain_file = os.path.join(cross_proj.path, "toolchain.cmake")
