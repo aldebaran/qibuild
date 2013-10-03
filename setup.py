@@ -28,6 +28,7 @@ scripts = [
     "python/bin/qisrc",
     "python/bin/qibuild",
     "python/bin/qitoolchain",
+    "python/bin/qimvn",
 ]
 
 package_data = {
