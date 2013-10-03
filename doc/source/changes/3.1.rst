@@ -4,7 +4,7 @@ v3.1
 qibuild
 --------
 
-* ``qibuild deploy`` now also deploys tests
+* ``qibuild deploy`` learned ``--with-tests`` to also deploy the tests
 * ``qibuild install``, ``qibuild deploy`` no longer call ``qibuild make`` first.
 * ``qibuild install``: fix printing of package numbers
 * Bug fix in ``path.conf`` generation: this fixes using ``qi_stage_dir`` and
