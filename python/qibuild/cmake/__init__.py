@@ -253,6 +253,6 @@ def get_binutil(name, cmake_var=None, build_dir=None, env=None):
         cmake_var = "CMAKE_" + name.upper()
     if build_dir:
         res =  get_cached_var(build_dir, cmake_var)
-    if res:
+    if res and not res.endswith("-NOTFOUND"):
         return res
     return qisys.command.find_program(name, env=env)
