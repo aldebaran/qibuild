@@ -218,18 +218,9 @@ def find_program(executable, env=None, raises=False):
             env = os.environ
     env_path = env.get("PATH", "")
     for path in env_path.split(os.pathsep):
-        path = qisys.sh.to_native_path(path)
-        full_path = os.path.join(path, executable)
-        if os.access(full_path, os.X_OK) and os.path.isfile(full_path):
-            res = full_path
+        res = _find_program_in_path(executable, path)
+        if res:
             break
-        pathext = os.environ.get("PATHEXT")
-        if pathext:
-            for ext in pathext.split(";"):
-                with_ext = full_path + ext
-                if os.access(with_ext, os.X_OK):
-                    res = qisys.sh.to_native_path(with_ext)
-                    break
     if res:
         _FIND_PROGRAM_CACHE[executable] = res
         return res
@@ -237,6 +228,29 @@ def find_program(executable, env=None, raises=False):
         if raises:
             raise NotInPath(executable, env=env)
     return None
+
+
+def _find_program_in_path_win(executable, path):
+    path_ext = os.environ["PATHEXT"]
+    extensions = path_ext.split(";")
+    extensions = [x.lower() for x in extensions]
+    extensions.append("")
+    for ext in extensions:
+        candidate = executable + ext
+        res = _check_access(candidate, path)
+        if res:
+            return res
+
+def _find_program_in_path(executable, path):
+    if os.name == 'nt':
+        return _find_program_in_path_win(executable, path)
+    else:
+        return _check_access(executable, path)
+
+def _check_access(executable, path):
+    full_path = os.path.join(path, executable)
+    if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
+        return full_path
 
 
 ## Implementation widely inspired by the python-2.7 one.
