@@ -52,7 +52,7 @@ class Process:
     def run(self, timeout=None):
         def target():
             ui.debug("Starting thread.")
-            ui.debug("Calling:", " ".join(self.cmd))
+            ui.debug("Calling:", subprocess.list2cmdline(self.cmd))
             try:
                 opts = dict()
                 if os.name == 'posix':
