@@ -117,7 +117,7 @@ class CMakeBuilder(object):
             project.build(**kwargs)
 
     @need_configure
-    def install(self, dest_dir, split_debug=False, **kwargs):
+    def install(self, dest_dir, **kwargs):
         """ Install the projects and the packages to the dest_dir """
         if self.dep_types == list():
             projects = self.projects
