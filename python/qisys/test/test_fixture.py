@@ -2,6 +2,8 @@ import os
 import qisys.sh
 from qisys import ui
 
+from qisys.test.conftest import skip_on_win
+
 def test_worktree(worktree):
     assert len(worktree.projects) == 0
     assert os.path.exists(worktree.worktree_xml)
@@ -20,3 +22,7 @@ def test_record(record_messages):
 
 def test_cd_to_tmp(cd_to_tmpdir):
     assert os.listdir(os.getcwd()) == list()
+
+@skip_on_win
+def test_skip_on_win():
+    assert os.name != 'nt'

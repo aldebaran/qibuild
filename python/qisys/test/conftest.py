@@ -47,6 +47,9 @@ class TestWorkTree(qisys.worktree.WorkTree):
         new_project = super(TestWorkTree, self).add_project(src)
         return new_project
 
+# Because sometimes the most popular OS in the world is not the best one ...
+skip_on_win = pytest.mark.skipif(os.name == 'nt', reason="cannot pass on windows")
+
 # pylint: disable-msg=E1101
 @pytest.fixture
 def worktree(cd_to_tmpdir):
