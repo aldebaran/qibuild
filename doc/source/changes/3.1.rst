@@ -38,6 +38,7 @@ misc
 ----
 
 * UI: increase timer accuracy to ms
+* now using ``py.test 2.4.1``
 
 CMake
 -----
