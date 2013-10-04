@@ -125,7 +125,7 @@ def test_running_tests_after_install(qibuild_action, tmpdir):
     dest = tmpdir.join("dest")
     testme.configure()
     testme.build()
-    testme.install(dest.strpath, components=["test"])
+    testme.install(dest.strpath, components=["test"], tests="tests")
     qitest_json = dest.join("qitest.json")
     assert qitest_json.check(file=True)
     from qitest.actions.run import TestProject

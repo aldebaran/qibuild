@@ -6,26 +6,25 @@ from qitoolchain.test.conftest import QiToolchainAction
 from qibuild.actions import run
 
 def test_run_target(qibuild_action):
-    qibuild_action.add_test_project("testme")
-    qibuild_action("configure", "testme")
-    qibuild_action("make", "testme")
+    project = qibuild_action.add_test_project("testme")
+    project.configure()
+    project.build(target="tests")
 
     retcode = qibuild_action("run", "ok", retcode=True)
     assert retcode == 0
 
 def test_run_failing_binary(qibuild_action):
-    qibuild_action.add_test_project("testme")
-    qibuild_action("configure", "testme")
-    qibuild_action("make", "testme")
-
+    project = qibuild_action.add_test_project("testme")
+    project.configure()
+    project.build(target="tests")
 
     retcode = qibuild_action("run", "fail", retcode=True)
     assert retcode == 1
 
 def test_run_segfaulting_binary(qibuild_action, record_messages):
-    qibuild_action.add_test_project("testme")
-    qibuild_action("configure", "testme")
-    qibuild_action("make", "testme")
+    project = qibuild_action.add_test_project("testme")
+    project.configure()
+    project.build(target="tests")
 
     retcode = qibuild_action("run", "segfault", retcode=True)
     if os.name != 'nt':
@@ -36,9 +35,9 @@ def test_run_segfaulting_binary(qibuild_action, record_messages):
     assert retcode != 0
 
 def test_run_failure(qibuild_action):
-    qibuild_action.add_test_project("testme")
-    qibuild_action("configure", "testme")
-    qibuild_action("make", "testme")
+    project = qibuild_action.add_test_project("testme")
+    project.configure()
+    project.build(target="tests")
 
     e = qibuild_action("run", "idontexist", raises=True)
     assert e == "idontexist not found"
