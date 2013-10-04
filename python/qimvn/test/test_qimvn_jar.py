@@ -38,9 +38,9 @@ def test_jar_creation(qibuild_action, qimvn_action):
 def test_package_multiple_target(qibuild_action, qimvn_action):
     """ Test if jar command can package multiple element.
     """
-    qibuild_action.add_test_project("testjni")
-    qibuild_action("configure", "testjni")
-    qibuild_action("make", "testjni")
+    project = qibuild_action.add_test_project("testjni")
+    project.configure()
+    project.build(target="tests")
 
     jarname = "test.jar"
     jarpath = jar.jar(jarname, ["one", "two", "three", "four"], get_paths())
@@ -62,9 +62,9 @@ def test_without_input_files(qibuild_action):
 def test_jar_path(qibuild_action, qimvn_action):
     """ Test if jar command can create jar in a specified directory
     """
-    qibuild_action.add_test_project("testjni")
-    qibuild_action("configure", "testjni")
-    qibuild_action("make", "testjni")
+    project = qibuild_action.add_test_project("testjni")
+    project.configure()
+    project.build(target="tests")
 
     jar_dirname = os.path.join(os.getcwd(), "./path/to/jar")
     jarname = "test.jar"
