@@ -6,8 +6,6 @@ function(_qi_add_test_internal test_name target_name)
 
   set(_srcs ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
 
-  set(_should_return FALSE)
-
   if(NOT QI_WITH_TESTS)
     set(_should_return TRUE)
   endif()
@@ -18,6 +16,17 @@ function(_qi_add_test_internal test_name target_name)
 
   if(ARG_PERF_TEST AND NOT QI_WITH_PERF_TESTS)
     set(_should_return TRUE)
+  endif()
+
+  if(ARG_NO_ADD_TEST)
+    qi_deprecated(WARNING "NO_ADD_TEST is deprecated, use qi_create_test_helper instead")
+    qi_create_test_helper(${target_name} ${_srcs})
+    set(_deps ${ARG_DEPENDS})
+    if(ARG_GTEST_TEST)
+      list(APPEND _deps GTEST GTEST_MAIN)
+    endif()
+    qi_use_lib(${target_name} ${_deps})
+    return()
   endif()
 
   if(NOT ARG_TIMEOUT)
