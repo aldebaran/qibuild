@@ -1,5 +1,0 @@
-* qitest run --nightly ? (get rid of that. Fork cmake with -DQI_NIGHTLY_TESTS=ON and rebuild ?)
-* --nightly run _only_ nightly tests, should run both nightly and non-nightly
-* how to deploy the qitest.json ? Append ? qitest run --url ?
-* re-add taskset (hard -> compute a rotating mask for each worker)
-* re-add valgrind log parsing
