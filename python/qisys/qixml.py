@@ -122,7 +122,7 @@ def read(xml_path):
     return tree
 
 
-def write(xml_obj, output):
+def write(xml_obj, output, **kwargs):
     """ Write an xml object to the given path
 
     If xml_obj is not an ElementTree but an
@@ -140,7 +140,7 @@ def write(xml_obj, output):
         tree = etree.ElementTree(element=xml_obj)
         root = xml_obj
     indent(root)
-    tree.write(output)
+    tree.write(output, **kwargs)
 
 
 class XMLParser(object):
