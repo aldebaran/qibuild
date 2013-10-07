@@ -397,7 +397,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         """ Run the tests for this project """
         ui.info(ui.green, "Testing", self.name, "...")
         test_runner = qibuild.test_runner.ProjectTestRunner(self)
-        test_runner.cwd = self.build_directory
+        test_runner.cwd = os.path.join(self.sdk_directory, "bin")
         test_runner.env = self.build_env
         test_runner.pattern = kwargs.get("pattern")
         test_runner.perf = kwargs.get("perf", False)
