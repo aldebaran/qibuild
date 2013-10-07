@@ -5,6 +5,7 @@ import re
 import sys
 
 from qisys import ui
+from qisys.qixml import etree
 import qisys.command
 import qitest.conf
 import qitest.runner
@@ -183,7 +184,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         test_env = test.get("environment")
         if test_env:
             env.update(test_env)
-        if ui.CONFIG["color"] and test.get("gtest"):
+        if ui.config_color(sys.stdout):
             env["GTEST_COLOR"] = "yes"
         if os.name == 'nt':
             env["PATH"] = os.path.join(self.project.sdk_directory, "bin") + ";" + \
@@ -224,57 +225,51 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
     def _write_xml(self, res, test, out_xml):
         """ Make sure a Junit XML compatible file is written """
-
-        if sys.platform.startswith("win"):
-            header = """<?xml version="1.0" encoding="ascii"?>"""
-        else:
-            header = """<?xml version="1.0" encoding="UTF-8"?>"""
-        to_write = header + """
-    <testsuites tests="1" failures="{num_failures}" disabled="0" errors="0" time="{time}" name="All">
-        <testsuite name="{testsuite_name}" tests="1" failures="{num_failures}" disabled="0" errors="0" time="{time}">
-        <testcase name="{testcase_name}" status="run">
-        {failure}
-        </testcase>
-    </testsuite>
-    </testsuites>
-    """
-        if res.ok:
-            num_failures = "0"
-            failure = ""
-        else:
-            num_failures = "1"
-            failure = """
-        <failure message="{message}">
-            <![CDATA[ {out} ]]>
-        </failure>
-    """
-
         # Arbitrary limit output (~700 lines) to prevent from crashing on read
         res.out = res.out[-16384:]
-
-        # Remove color before encoding
-        if os.getenv("GTEST_COLOR") or sys.stdout.isatty():
-            res.out = re.sub('\x1b[^m]*m', "", res.out)
+        res.out = re.sub('\x1b[^m]*m', "", res.out)
 
         # Windows output is most likely code page 850
         if sys.platform.startswith("win"):
             encoding = "ascii"
         else:
-            encoding = "utf-8"
+            encoding = "UTF-8"
         try:
-            res.out = res.out.decode(encoding, "ignore").encode(encoding)
+            res.out = res.out.decode(encoding, "ignore")
         except UnicodeDecodeError:
             pass
 
-        failure = failure.format(out=res.out, message=res.message)
-        to_write = to_write.format(num_failures=num_failures,
-                                testsuite_name="test", # nothing clever to put here :/
-                                testcase_name=test["name"],
-                                failure=failure,
-                                time=res.time)
 
-        with open(out_xml, "w") as fp:
-            fp.write(to_write)
+        if res.ok:
+            num_failures = "0"
+        else:
+            num_failures = "1"
+        message_as_string = " ".join(str(x) for x in res.message
+                                     if not isinstance(x, ui._Color))
+
+        root = etree.Element("testsuites")
+        root.set("tests", "1")
+        root.set("failures", num_failures)
+        root.set("disabled", "0")
+        root.set("errors", "0")
+        root.set("time", str(res.time))
+        root.set("name", "All")
+        test_suite = etree.SubElement(root, "testsuite")
+        test_suite.set("name", "test")
+        test_suite.set("tests", "1")
+        test_suite.set("failures", num_failures)
+        test_suite.set("disabled", "0")
+        test_suite.set("errors", "0")
+        test_suite.set("time", str(res.time))
+        test_case = etree.SubElement(test_suite, "test_case")
+        test_case.set("name", test["name"])
+        test_case.set("status", "run")
+        if not res.ok:
+            failure = etree.SubElement(test_case, "failure")
+            failure.set("message", message_as_string)
+            failure.text = res.out
+
+        qisys.qixml.write(root, out_xml, encoding=encoding)
 
     def get_message(self, process, timeout=None):
         """ Human readable string describing the state of the process """
