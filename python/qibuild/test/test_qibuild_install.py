@@ -125,6 +125,7 @@ def test_running_tests_after_install(qibuild_action, tmpdir):
     dest = tmpdir.join("dest")
     testme.configure()
     testme.build()
+    testme.build(target="tests")
     testme.install(dest.strpath, components=["test"], tests="tests")
     qitest_json = dest.join("qitest.json")
     assert qitest_json.check(file=True)
@@ -132,7 +133,6 @@ def test_running_tests_after_install(qibuild_action, tmpdir):
     test_project = TestProject(qitest_json.strpath)
     test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
     test_runner.pattern = "ok"
-    # FIXME: get rid of this ...
-    with qisys.sh.change_cwd(dest.strpath):
-        ok = test_runner.run()
+    test_runner.cwd = dest.strpath
+    ok = test_runner.run()
     assert ok

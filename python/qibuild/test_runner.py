@@ -111,14 +111,12 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         self.test_out = os.path.join(self.suite_runner.test_results_dir,
                                      test["name"] + ".xml")
         res = qitest.result.TestResult(test)
+        self._update_test(test)
         cmd = test["cmd"]
         if not os.path.exists(cmd[0]):
             res.ok = False
             res.message = (ui.red, cmd[0], "no such file or directory")
             return res
-        self._update_test(test)
-
-        cmd = test["cmd"]
         timeout = test["timeout"]
         env = test["env"]
         cwd = test["working_directory"]
@@ -155,6 +153,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
     def _update_test(self, test):
         """ Update the test given the settings on the test suite """
         self._update_test_cmd_for_project(test)
+        self._update_test_executable(test)
         self._update_test_env(test)
         self._update_test_cwd(test)
         valgrind = self.suite_runner.valgrind
@@ -176,6 +175,16 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             qisys.sh.mkdir(perf_results)
             cmd = test["cmd"]
             cmd.extend(["--output", self.perf_out])
+
+    def _update_test_executable(self, test):
+        """ Sometimes the path to the executable to run is a
+        relative path to the suite runner working directory
+
+        """
+        cmd = test["cmd"]
+        executable = cmd[0]
+        executable = os.path.join(self.suite_runner.cwd, cmd[0])
+        cmd[0] = executable
 
     def _update_test_env(self, test):
         env = os.environ.copy()
