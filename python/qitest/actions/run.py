@@ -27,6 +27,7 @@ def do(args):
     qitest_json = args.qitest_json
     test_project = TestProject(qitest_json)
     test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
+    test_runner.cwd = os.path.dirname(args.qitest_json)
     test_runner.pattern = args.pattern
     test_runner.perf = args.perf
     test_runner.coverage = args.coverage
