@@ -35,7 +35,7 @@ class TestQueue():
         end = datetime.datetime.now()
         delta = end - start
         self.elapsed_time = float(delta.microseconds) / 10**6 + delta.seconds
-        self._summary()
+        self.summary()
         return self.ok
 
     def _run(self, num_jobs=1):
@@ -69,7 +69,7 @@ class TestQueue():
             worker_thread.join()
 
 
-    def _summary(self):
+    def summary(self):
         """ Display the tests results.
 
         Called at the end of self.run()

@@ -10,14 +10,13 @@ qibuild modules
    cmake_builder
    cmake_modules
    config
-   ctest
    deps_solver
    deploy
    find
    gdb
    parsers
-   performance
    profile
    project
+   test_runner
    wizard
    worktree
