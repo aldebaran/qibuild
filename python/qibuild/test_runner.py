@@ -11,7 +11,7 @@ import qitest.conf
 import qitest.runner
 
 class ProjectTestRunner(qitest.runner.TestSuiteRunner):
-    """ Implements TestSuiteRunner for a qibuild/cmake project """
+    """ Implements :py:class:`.TestSuiteRunner` for a qibuild/cmake project """
 
     def __init__(self, project):
         self.project = project
@@ -93,7 +93,8 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
 
 class ProcessTestLauncher(qitest.runner.TestLauncher):
-    """ Implements TestLauncher using `qisys.command.Process```
+    """ Implements :py:class:`.TestLauncher` using
+    :py:class:`qisys.command.Process`
 
     """
     def __init__(self, project_runner):
@@ -105,7 +106,13 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         self.test_out = None
 
     def launch(self, test):
-        """ Implements TestLauncher.launch """
+        """ Implements :py:func:`qitest.runner.TestLauncher.launch`
+
+        Also make sure a Junit-like XML file is always written, even
+        if the test did not produce any XML file on its own or crashed
+        before being able to write one.
+
+        """
         self.perf_out = os.path.join(self.suite_runner.perf_results_dir,
                                      test["name"] + ".xml")
         self.test_out = os.path.join(self.suite_runner.test_results_dir,

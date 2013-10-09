@@ -17,6 +17,9 @@ class TestSuiteRunner(object):
 
     @abc.abstractproperty
     def launcher(self):
+        """ This function should return a :py:class:`.TestLauncher`
+
+        """
         pass
 
     def run(self):
@@ -55,7 +58,7 @@ class TestLauncher(object):
 
     @abc.abstractmethod
     def launch(self, test):
-        """ Should return a TestResult """
+        """ Should return a :py:class:`.TestResult` """
         pass
 
 

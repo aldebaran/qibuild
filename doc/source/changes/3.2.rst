@@ -1,0 +1,100 @@
+v3.2
+=====
+
+Command line
+------------
+
+* New command added: ``qitest``. This makes it possible to run the tests after
+  they have been deployed to a remote host (assuming qibuild is installed on the
+  remote host)
+
+.. code-block:: console
+
+  qibuild deploy --with-tests user@host:deploy
+  ssh use@host
+  cd deploy
+  qitest run qitest.json
+
+
+* Tests are no always configured (even the nightly tests), but are no longer
+  built by default
+
+.. code-block:: console
+
+    ## In qibuild 3.1
+
+    # running the normal tests (no performance tests, no nightly tests):
+    qibuild configure         # configure only the normal tests
+    qibuild make              # build only the normal tests
+    qibuild test              # does not build anything, you have to run `qibuild make` if
+                              # you changed the tests source code
+
+    # running the performance tests:
+    qibuild configure \
+       -DWITH_PERF_TESTS=ON   # re-configure the whole project
+    qibuild make              # re-build the normal test and the performance tests
+    qibuild test -- perf      # run the performance tests
+
+
+.. code-block:: console
+
+    ## In qibuild 3.2
+
+    # running the normal tests (no performance tests, no nightly tests):
+    qibuild configure        # configure all the tests
+    qibuild make             # does not build any tests
+    qibuild test             # build the normal tests and run them
+
+    # running the performance tests:
+    qibuild test --perf      # build the performance tests and run them
+
+
+* Better handling of concurrency:
+
+  * ``ctrl-c`` can no longer cause deadlocks.
+  * ``qibuild test`` displays a summary even when it has been interrupted
+  * Python exceptions raised during tests no longer cause deadlocks.
+
+Python
+------
+
+* Rewrite of the ``qibuild test`` implementation
+
+  * Removed ``qibuild.ctest`` and  ``qibuild.performance``
+  * Added ``qitest`` module, ``qibuild.test_runner`` and ``BuildProject.run_tests``
+
+CMake
+------
+
+* Added ``qi_create_test_helper`` : this will create an executable that
+  will be built when the tests are built, but is not an actual tests.
+  Useful to create several tests with the same executable but different arguments:
+
+.. code-block:: cmake
+
+    # old:
+
+    qi_create_test(foo foo.cpp NO_ADD_TEST)
+    qi_add_test(foo_bar foo ARGUMENTS --bar)
+    qi_add_test(foo_baz foo ARGUMENTS --baz)
+
+.. code-block:: cmake
+
+    # new:
+
+    qi_create_test_helper(foo foo.cpp)
+    qi_add_test(foo_bar foo ARGUMENTS --bar)
+    qi_add_test(foo_baz foo ARGUMENTS --baz)
+
+* 3 targets have been added by default: ``tests``, ``perf-tests``,
+  ``nightly-tests`` for the
+
+* Changed options:
+
+  ``BUILD_TESTS`` is no longer used, use ``QI_WITH_TESTS=OFF`` instead to
+  deactivate the tests completely (they won't even be configured)
+
+* The implementation no longer calls upstream's ``add_test``, which means:
+
+  * You cannot use ``ctest`` or ``make test`` to run the tests
+  * The call to ``enable_testing()`` is no longer necessary

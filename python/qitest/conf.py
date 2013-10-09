@@ -25,10 +25,16 @@ def add_test(output, **kwargs):
         json.dump(tests, fp, indent=2)
 
 def parse_tests(conf_path):
+    """ Parse the tests described in a qitest.json file.
+    Returns a list of dictionaries
+
+    """
     with open(conf_path, "r") as fp:
         return json.load(fp)
 
 def write_tests(tests, conf_path):
+    """ Write a list of tests to a config file
+    """
     with open(conf_path, "w") as fp:
         return json.dump(tests, fp, indent=2)
 
