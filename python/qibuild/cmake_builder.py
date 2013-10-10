@@ -91,10 +91,7 @@ class CMakeBuilder(object):
     def configure(self, **kwargs):
         """ Configure the projects in the correct order """
         self.bootstrap_projects()
-        if self.dep_types == list():
-            projects = self.projects
-        else:
-            projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
 
         for i, project in enumerate(projects):
             ui.info_count(i, len(projects),
@@ -105,10 +102,7 @@ class CMakeBuilder(object):
     @need_configure
     def build(self, **kwargs):
         """ Build the projects in the correct order """
-        if self.dep_types == list():
-            projects = self.projects
-        else:
-            projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         for i, project in enumerate(projects):
             ui.info_count(i, len(projects),
                           ui.green, "Building",
@@ -119,10 +113,7 @@ class CMakeBuilder(object):
     @need_configure
     def install(self, dest_dir, **kwargs):
         """ Install the projects and the packages to the dest_dir """
-        if self.dep_types == list():
-            projects = self.projects
-        else:
-            projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         packages = self.deps_solver.get_dep_packages(self.projects, self.dep_types)
 
         # Compute the real path where to install the packages:
@@ -163,14 +154,11 @@ class CMakeBuilder(object):
     @need_configure
     def deploy(self, url, use_rsync=True, port=22, split_debug=False, with_tests=False):
         """ Deploy the project and the packages it depends to a remote url """
-        if self.dep_types == list(): # used -s
-            dep_packages = list()
-            dep_projects = self.projects
-        else:
-            dep_packages = self.deps_solver.get_dep_packages(self.projects,
-                                                             self.dep_types)
-            dep_projects = self.deps_solver.get_dep_projects(self.projects,
-                                                             self.dep_types)
+
+        dep_packages = self.deps_solver.get_dep_packages(self.projects,
+                                                         self.dep_types)
+        dep_projects = self.deps_solver.get_dep_projects(self.projects,
+                                                         self.dep_types)
         ui.info(ui.green, "The following projects")
         for project in dep_projects:
             ui.info(ui.green, " *", ui.blue, project.name)
