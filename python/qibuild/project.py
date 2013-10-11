@@ -208,7 +208,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         except qisys.command.CommandFailedException:
             raise qibuild.build.ConfigureFailed(self)
 
-    def build(self, num_jobs=1, rebuild=False, target=None,
+    def build(self, num_jobs=None, rebuild=False, target=None,
               verbose_make=False, coverity=False, env=None):
         """ Build the project """
         timer = ui.timer("make %s" % self.name)

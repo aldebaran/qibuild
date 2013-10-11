@@ -24,7 +24,7 @@ class CMakeBuildConfig(object):
         self.qibuild_cfg = self.read_global_qibuild_settings()
         self._cmake_generator = None
         self.read_local_settings()
-        self.num_jobs = 1
+        self.num_jobs = None
 
 
     @property
