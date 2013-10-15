@@ -1,6 +1,8 @@
 import os
 import sys
 
+import xml.etree.ElementTree as etree
+
 import qisys.worktree
 import qibuild.worktree
 
@@ -42,6 +44,8 @@ def test_various_outcomes(qibuild_action, record_messages):
     result = os.path.join(result_dir, "encoding.xml")
     with open(result, "r") as f:
         content = f.read()
+    # Parsing XML shouldn't raise
+    etree.parse(result)
     # Decode shouldn't raise
     if sys.platform.startswith("win"):
         assert "flag" in content.decode("ascii")
