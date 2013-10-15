@@ -8,6 +8,7 @@
 
 """
 
+import re
 from qisys import ui
 
 HAS_LXML = False
@@ -325,3 +326,34 @@ def _get_value_for_type(type_value, value):
     if type_value == list:
         return value.split(" ")
     return value
+
+def remove_control_characters(input):
+    """  Remove control characters from the input strring.
+    Useful when trying to write raw strings from unknow location
+    to an XML file ::
+
+        as_bytes = open("wtf.txt").read()
+        as_bytes = qisys.qixml.remove_control_chars(bytes)
+        as_unicode = bytes.decode(errors="ignore")
+
+        # ...
+        element.text = as_unicode
+
+        tree.write(fp, encoding=...)
+
+    """
+    # taken from http://chase-seibert.github.io/blog/2011/05/20/stripping-control-characters-in-python.html
+
+    # unicode invalid characters
+    RE_XML_ILLEGAL = u'([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])' + \
+                        u'|' + \
+                        u'([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])' % \
+                        (unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff),
+                        unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff),
+                        unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff),
+                        )
+    input = re.sub(RE_XML_ILLEGAL, "", input)
+
+    # ascii control characters
+    input = re.sub(r"[\x01-\x1F\x7F]", "", input)
+    return input
