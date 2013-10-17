@@ -327,8 +327,8 @@ def _get_value_for_type(type_value, value):
         return value.split(" ")
     return value
 
-def remove_control_characters(input):
-    """  Remove control characters from the input strring.
+def sanitize_xml(val, replacement="?"):
+    """  Remove illegal XML characters from the input string.
     Useful when trying to write raw strings from unknow location
     to an XML file ::
 
@@ -342,18 +342,7 @@ def remove_control_characters(input):
         tree.write(fp, encoding=...)
 
     """
-    # taken from http://chase-seibert.github.io/blog/2011/05/20/stripping-control-characters-in-python.html
-
+    # taken from http://lsimons.wordpress.com/2011/03/17/stripping-illegal-characters-out-of-xml-in-python/
     # unicode invalid characters
-    RE_XML_ILLEGAL = u'([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])' + \
-                        u'|' + \
-                        u'([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])' % \
-                        (unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff),
-                        unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff),
-                        unichr(0xd800),unichr(0xdbff),unichr(0xdc00),unichr(0xdfff),
-                        )
-    input = re.sub(RE_XML_ILLEGAL, "", input)
-
-    # ascii control characters
-    input = re.sub(r"[\x01-\x1F\x7F]", "", input)
-    return input
+    _illegal_xml_chars_RE = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1F\uD800-\uDFFF\uFFFE\uFFFF]')
+    return _illegal_xml_chars_RE.sub(replacement, val)

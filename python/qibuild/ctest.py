@@ -427,7 +427,7 @@ def write_xml(xml_out, test_res):
     # Remove color before encoding
     if os.getenv("GTEST_COLOR") or sys.stdout.isatty():
         test_res.out = re.sub('\x1b[^m]*m', "", test_res.out)
-    test_res.out = qisys.qixml.remove_control_characters(test_res.out)
+    test_res.out = qisys.qixml.sanitize_xml(test_res.out)
     # Windows output is most likely code page 850
     if sys.platform.startswith("win"):
         encoding = "ascii"

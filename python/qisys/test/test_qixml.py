@@ -198,4 +198,11 @@ def test_write_bool_attr():
     foo.bar = True
     parser = FooParser(foo)
     xml_elem = parser.xml_elem()
-    bar = qisys.qixml.parse_bool_attr(xml_elem, "bar")
+    qisys.qixml.parse_bool_attr(xml_elem, "bar")
+
+
+def test_sanitize_xml():
+    invalid_xml = u'<failure message="\u001a\r\nflag\r\n" />'
+    valid_xml = qisys.qixml.sanitize_xml(invalid_xml)
+    assert "\r\nflag\r\n" in valid_xml
+    etree.fromstring(valid_xml)  # Doesn't raise
