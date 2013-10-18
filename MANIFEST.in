@@ -1,0 +1,2 @@
+include etc/qibuild.sh
+include README.rst
