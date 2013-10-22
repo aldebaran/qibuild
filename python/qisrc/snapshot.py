@@ -10,6 +10,7 @@ from qisys import ui
 
 import qisrc.git
 import qisrc.status
+import qisrc.reset
 
 
 class Snapshot(object):
@@ -60,19 +61,7 @@ def load_snapshot(git_worktree, input_path):
     snapshot = Snapshot()
     ui.info(ui.green, "Loading snapshot from", ui.white,  input_path)
     snapshot.load(input_path)
-    failures = list()
-    for (src, sha1) in snapshot.refs.iteritems():
+    for (src, ref) in snapshot.refs.iteritems():
         ui.info("Loading", src)
         git_project = git_worktree.get_git_project(src, raises=True)
-
-        git = qisrc.git.Git(git_project.path)
-        with git.transaction() as transaction:
-            git.fetch("--all")
-            git.reset("--hard", sha1)
-        if not transaction.ok:
-            failures.append(src)
-
-    if failures:
-        ui.warning("Loading failed for the following projects")
-        for failure in failures:
-            ui.warning(" * ", failure)
+        qisrc.reset.clever_reset_ref(git_project, ref)

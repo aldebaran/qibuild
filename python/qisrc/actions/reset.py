@@ -14,6 +14,7 @@ import qisrc.git
 import qisrc.snapshot
 import qisrc.status
 import qisrc.parsers
+import qisrc.reset
 
 def configure_parser(parser):
     """Configure parser for this action."""
@@ -23,10 +24,6 @@ def configure_parser(parser):
                         "done.", action="store_true")
     parser.add_argument("-c", "--clean", action="store_true",
                         help="Remove untracked files and directories.")
-    parser.add_argument("--fetch", action="store_true",
-                        help="Fetch before reset")
-    parser.add_argument("--no-fetch", action="store_false", dest="fetch",
-                        help="Don't fetch before reset")
     parser.add_argument("--tag", help="Reset everything to the given tag")
     parser.add_argument("--snapshot", help="Reset everything using the given "
                         "snapshot")
@@ -74,11 +71,6 @@ def do(args):
             if args.force:
                 git.checkout(branch)
 
-        if args.fetch:
-            ui.info("Fetching...")
-            if args.force:
-                git.fetch("-a")
-
         to_reset = None
         if args.snapshot:
             to_reset = snapshot.refs.get(src)
@@ -93,7 +85,7 @@ def do(args):
         if args.force:
             ui.info("reset", to_reset)
             try:
-                git.reset("--hard", to_reset)
+                qisrc.reset.clever_reset_ref(git_project, to_reset)
             except:
                 errors.append(src)
 
