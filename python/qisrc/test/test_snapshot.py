@@ -6,8 +6,8 @@ import pytest
 
 def test_dump_load(tmpdir):
     snapshot = qisrc.snapshot.Snapshot()
-    snapshot.sha1s["foo"] = "a42fb"
-    snapshot.sha1s["bar"] = "bccad"
+    snapshot.refs["foo"] = "a42fb"
+    snapshot.refs["bar"] = "bccad"
     snapshot_txt = tmpdir.join("snapshot.txt").strpath
     snapshot.dump(snapshot_txt)
     snapshot2 = qisrc.snapshot.Snapshot()
@@ -23,7 +23,7 @@ def test_generate_load(git_worktree, tmpdir):
     qisrc.snapshot.generate_snapshot(git_worktree, snapshot_txt)
     snapshot = qisrc.snapshot.Snapshot()
     snapshot.load(snapshot_txt)
-    foo_ref = snapshot.sha1s["foo"]
+    foo_ref = snapshot.refs["foo"]
 
     # Make a commit and an other diff
     foo_git.commit("--message", "empty", "--allow-empty")
@@ -58,7 +58,7 @@ def test_always_fetch(git_worktree, git_server, tmpdir):
     remote_sha1 = remote_sha1.split()[0]
 
     snapshot = qisrc.snapshot.Snapshot()
-    snapshot.sha1s["foo"] = remote_sha1
+    snapshot.refs["foo"] = remote_sha1
     snapshot_txt = tmpdir.join("snapshot.txt").strpath
     snapshot.dump(snapshot_txt)
 
@@ -69,7 +69,7 @@ def test_always_fetch(git_worktree, git_server, tmpdir):
 
 def test_load_fileobject(tmpdir):
     snapshot = qisrc.snapshot.Snapshot()
-    snapshot.sha1s["foo"] = "d34db33f"
+    snapshot.refs["foo"] = "d34db33f"
     snapshot_txt = tmpdir.join("snap.txt").strpath
     snapshot.dump(snapshot_txt)
     snapshot2 = qisrc.snapshot.Snapshot()

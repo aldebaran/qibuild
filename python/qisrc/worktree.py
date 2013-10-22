@@ -119,7 +119,6 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
     def manifests(self):
         return self._syncer.manifests
 
-
     def snapshot(self):
         """ Return a :py:class`.Snapshot` of the current worktree state
 
@@ -132,7 +131,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             if rc != 0:
                 ui.error("git rev-parse HEAD failed for", src)
                 continue
-            snapshot.sha1s[src] = out.strip()
+            snapshot.refs[src] = out.strip()
         return snapshot
 
     def add_git_project(self, src):

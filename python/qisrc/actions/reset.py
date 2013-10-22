@@ -81,7 +81,7 @@ def do(args):
 
         to_reset = None
         if args.snapshot:
-            to_reset = snapshot.sha1s.get(src)
+            to_reset = snapshot.refs.get(src)
             if not to_reset:
                 ui.warning(src, "not found in the snapshot")
                 continue

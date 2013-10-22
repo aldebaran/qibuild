@@ -15,14 +15,14 @@ import qisrc.status
 class Snapshot(object):
     """ Just a container for a git worktree snapshot """
     def __init__(self):
-        self.sha1s = collections.OrderedDict()
+        self.refs = collections.OrderedDict()
 
     def dump(self, output_path):
         """ Dump the snapshot into a human readable file """
-        srcs = self.sha1s.keys()
+        srcs = self.refs.keys()
         with open(output_path, 'w') as fp:
             for src in srcs:
-                fp.write(src + ":" + self.sha1s[src] + "\n")
+                fp.write(src + ":" + self.refs[src] + "\n")
 
     def load(self, input_file):
         """ Load a snapshot from a file path or a file object """
@@ -35,7 +35,7 @@ class Snapshot(object):
             (src, sha1) = line.split(":")
             src = src.strip()
             sha1 = sha1.strip()
-            self.sha1s[src] = sha1
+            self.refs[src] = sha1
         try:
             fp.close()
         except AttributeError:
@@ -44,7 +44,7 @@ class Snapshot(object):
     def __eq__(self, other):
         if not isinstance(other, Snapshot):
             return False
-        return other.sha1s == self.sha1s
+        return other.refs == self.refs
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -61,7 +61,7 @@ def load_snapshot(git_worktree, input_path):
     ui.info(ui.green, "Loading snapshot from", ui.white,  input_path)
     snapshot.load(input_path)
     failures = list()
-    for (src, sha1) in snapshot.sha1s.iteritems():
+    for (src, sha1) in snapshot.refs.iteritems():
         ui.info("Loading", src)
         git_project = git_worktree.get_git_project(src, raises=True)
 
