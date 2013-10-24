@@ -16,12 +16,13 @@
 # \arg:module_name the target name
 # \arg:interface_file the swig interface file (extension is .i)
 # \param:PACKAGE package name
+# \param:OUTDIR swig output directory
 # \flag:CPP whereare the lib is in C++
 # \group:SRC The list of source files
 # \group:DEPENDS The list of dependencies
 #
 function(qi_swig_wrap_java name interface_file)
-  cmake_parse_arguments(ARG "CPP" "PACKAGE" "SRC;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "CPP" "PACKAGE;OUTDIR" "SRC;DEPENDS" ${ARGN})
   message(STATUS "Swig/java: ${module_name}")
 
   find_package(Java REQUIRED QUIET)
@@ -45,7 +46,11 @@ function(qi_swig_wrap_java name interface_file)
   include("UseSWIG")
   include("UseJava")
 
-  set(_out_dir ${CMAKE_CURRENT_BINARY_DIR}/${name})
+  if(ARG_OUTDIR)
+    set(_out_dir ${ARG_OUTDIR})
+  else()
+    set(_out_dir ${CMAKE_CURRENT_BINARY_DIR}/${name})
+  endif()
   set(CMAKE_SWIG_OUTDIR ${_out_dir})
 
   ##
