@@ -227,6 +227,10 @@ def find_installed_cmake_qibuild_dir(python_dir):
         # cmake in share/cmake
         # (debian's pip)
         ("..", "..", "..", "..", "..", "share", "cmake"),
+        # python in Python27\Lib\{dist,site}-packages
+        # cmake in Python27\share\cmake
+        # (windows' pip)
+        ("..", "..", "..", "share", "cmake")
         ]:
         rel_path = os.path.join(*candidate)
         res = os.path.join(python_dir, rel_path)
