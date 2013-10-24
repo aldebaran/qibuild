@@ -160,11 +160,11 @@ class CMakeBuilder(object):
         dep_projects = self.deps_solver.get_dep_projects(self.projects,
                                                          self.dep_types)
         ui.info(ui.green, "The following projects")
-        for project in dep_projects:
+        for project in sorted(dep_projects, key=lambda project: project.name):
             ui.info(ui.green, " *", ui.blue, project.name)
         if dep_packages:
             ui.info(ui.green, "and the following packages")
-            for package in dep_packages:
+            for package in sorted(dep_packages, key=lambda package: package.name):
                 ui.info(" *", ui.blue, package.name)
         ui.info(ui.green, "will be deployed to", ui.blue, url)
 
