@@ -25,14 +25,14 @@ def configure_parser(parser):
     qisrc.parsers.worktree_parser(parser)
     qisrc.parsers.groups_parser(parser)
     group = parser.add_argument_group("manifest options")
-    group.add_argument("--add", action="store_true", dest="add",
-                        help="add a new manifest: name url")
-    group.add_argument("--rm", "--remove", action="store_true", dest="remove",
-                        help="remove a manifest: name")
-    group.add_argument("--check", action="store_true", dest="check",
-                        help="check that a manifest is correct: path")
-    group.add_argument("--list", action="store_true",
-                        help="list the manifests")
+    group.add_argument("--add", action="store_const", const="add",
+                        dest="manifest_action", help="add a new manifest: name url")
+    group.add_argument("--rm", "--remove", action="store_const", const="remove",
+                        dest="manifest_action", help="remove a manifest: name")
+    group.add_argument("--check", action="store_const", const="check",
+                        dest="manifest_action", help="check that a manifest is correct: path")
+    group.add_argument("--list", action="store_const", const="list",
+                        dest="manifest_action", help="list the manifests")
     group.add_argument("name", metavar="NAME", nargs="?")
     group.add_argument("-b", "--branch",
                        help="the branch to use when fetching the manifest from a "
@@ -43,13 +43,13 @@ def configure_parser(parser):
 
 def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
-    if args.list:
+    if args.manifest_action == "list":
         list_manifests(git_worktree)
-    elif args.remove:
+    elif args.manifest_action == "remove":
         remove_manifest(git_worktree, args)
-    elif args.add:
+    elif args.manifest_action == "add":
         add_manifest(git_worktree, args)
-    elif args.check:
+    elif args.manifest_action == "check":
         check_manifest(git_worktree, args)
     else:
         configure_manifest(git_worktree, args)
