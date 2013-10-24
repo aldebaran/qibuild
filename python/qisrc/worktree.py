@@ -228,6 +228,53 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.save_project_config(project)
         return True
 
+    def change_manifest_branch(self, name, branch):
+        """ Called by ``qisrc manifest --checkout``
+
+        For each project, checkout the branch if it is different than
+        the default branch of the manifest.
+
+        """
+        errors = list()
+        manifest_xml = os.path.join(self._syncer.manifests_root,
+                                    name, "manifest.xml")
+        manifest = qisrc.manifest.Manifest(manifest_xml)
+        manifest_default_branch = manifest.default_branch
+        for project in self.git_projects:
+            if project.default_branch is None:
+                continue
+            project_default_branch = project.default_branch.name
+            if project_default_branch == manifest_default_branch:
+                continue
+            ok, err = self._safe_checkout(project, project_default_branch)
+            if not ok:
+                errors.append((project.src, err))
+
+        if not errors:
+            return
+        ui.error("Failed to checkout some projects")
+        for (project, error) in errors:
+            ui.info(project, ":", error)
+
+    def _safe_checkout(self, project, branch):
+        """ Helper for self.change_manifest_branch """
+        git = qisrc.git.Git(project.path)
+        ui.info(ui.green, "::",
+                ui.reset, "checkout",
+                ui.blue, project.src,
+                ui.reset, ui.bold, "(%s)" % branch)
+        current_branch = git.get_current_branch()
+        if not current_branch:
+            return False, "not on any branch, skipping"
+        clean, error = git.require_clean_worktree()
+        if not clean:
+            return False, error
+        rc, out = git.checkout(branch, raises=False)
+        if rc != 0:
+            return False, "Checkout failed " + out
+        return True, None
+
+
     def remove_repo(self, project):
         """ Remove a project from the worktree """
         ui.info(ui.green, "Removing", project.src)

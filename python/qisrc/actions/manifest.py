@@ -33,6 +33,8 @@ def configure_parser(parser):
                         dest="manifest_action", help="check that a manifest is correct: path")
     group.add_argument("--list", action="store_const", const="list",
                         dest="manifest_action", help="list the manifests")
+    group.add_argument("--checkout", action="store_const", const="checkout",
+                        dest="manifest_action", help="checkout a new branch of the manifest")
     group.add_argument("name", metavar="NAME", nargs="?")
     group.add_argument("-b", "--branch",
                        help="the branch to use when fetching the manifest from a "
@@ -51,6 +53,8 @@ def do(args):
         add_manifest(git_worktree, args)
     elif args.manifest_action == "check":
         check_manifest(git_worktree, args)
+    elif args.manifest_action == "checkout":
+        change_manifest_branch(git_worktree, args)
     else:
         configure_manifest(git_worktree, args)
 
@@ -95,6 +99,17 @@ def configure_manifest(git_worktree, args):
     git_worktree.configure_manifest(name, url, groups=args.groups,
                                     branch=args.branch)
 
+def change_manifest_branch(git_worktree, args):
+    name = args.name
+    branch = args.branch
+    url = git_worktree.manifests[name].url
+    check_exists(git_worktree, name)
+    if not args.branch:
+        raise Exception("Please specify a branch when using --checkout")
+    git_worktree.configure_manifest(name, url, groups=args.groups,
+                                    branch=branch)
+    git_worktree.change_manifest_branch(name, branch)
+
 def check_manifest(git_worktree, args):
     if not args.name or not args.url_or_path:
         raise Exception("Please specify a name and a path when using --check")
@@ -104,6 +119,7 @@ def check_manifest(git_worktree, args):
     res = git_worktree.check_manifest(name, xml_path)
     if not res:
         sys.exit(1)
+
 
 def check_exists(git_worktree, name):
     if not name in git_worktree.manifests:
