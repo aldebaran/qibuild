@@ -219,9 +219,9 @@ def find_installed_cmake_qibuild_dir(python_dir):
     for candidate in [
         # python in qibuild/python, cmake in qibuild/cmake
         ("..", "..", "cmake"),
-        # python in lib/python-2.7/dist,site}-packages,
-        #  cmake in share/cmake/
-        #  (default pip)
+        # python in lib/python-2.7/{dist,site}-packages,
+        # cmake in share/cmake/
+        # (default pip)
         ("..", "..", "..", "..", "share", "cmake"),
         # python in local/lib/python-2.7/{dist,site}-packages,
         # cmake in share/cmake
