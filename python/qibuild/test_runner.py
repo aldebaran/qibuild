@@ -254,7 +254,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             res.out = res.out.decode(encoding, "ignore")
         except UnicodeDecodeError:
             pass
-
+        # Make sure there are no invalid data in the XML
+        res.out = qisys.qixml.sanitize_xml(res.out)
 
         if res.ok:
             num_failures = "0"
