@@ -190,7 +190,8 @@ class TestGitServer(object):
         self.push_manifest("%s: now under code review" % project)
         self.manifest.load()
 
-    def change_branch(self, repo, new_branch):
+    def change_branch(self, project, new_branch):
+        repo = self.get_repo(project)
         repo_src = self.src.join(repo.src)
         git = qisrc.git.Git(repo_src.strpath)
         git.checkout("--force", "-B", new_branch)

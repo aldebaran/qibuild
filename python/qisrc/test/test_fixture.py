@@ -82,7 +82,9 @@ def test_add_build_project(git_server, qisrc_action):
     assert build_worktree.get_build_project("world")
 
 def test_change_branch(git_server):
-    foo_repo = git_server.create_repo("foo.git")
+    git_server.create_repo("foo.git")
+    foo_repo = git_server.get_repo("foo.git")
     assert foo_repo.default_branch == "master"
-    git_server.change_branch(foo_repo, "devel")
+    git_server.change_branch("foo.git", "devel")
+    foo_repo = git_server.get_repo("foo.git")
     assert foo_repo.default_branch == "devel"
