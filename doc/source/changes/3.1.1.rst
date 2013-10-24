@@ -1,0 +1,35 @@
+v3.1.1
+======
+
+
+Packaging
+---------
+
+* Fix a bug when using qibuild from ``pip`` on Windows
+* Add missing files in the ``sdist`` archive
+
+
+qibuild
+-------
+
+* Fix ``num_jobs`` defaulting to 1 in some corner cases
+* Strip invalid characters when generating XML from ``qibuild test``
+
+qisrc
+-----
+
+* ``qisrc manifest`` learned ``--checkout`` to checkout to a new
+  branch of the manifest.
+  Usage ::
+
+    qisrc manifest default --checkout --branch team/dm/dev
+
+* You can now store refs in the ``snapshot`` file too.
+  (mainly useful for continuous integration)
+
+misc
+----
+
+* better report of called command arguments
+
+
