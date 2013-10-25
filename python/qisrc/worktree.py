@@ -228,48 +228,48 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.save_project_config(project)
         return True
 
-    def change_manifest_branch(self, name, branch):
-        """ Called by ``qisrc manifest --checkout``
+    def checkout(self, manifest_name, branch, force=False):
+        """ Called by ``qisrc checkout``
 
         For each project, checkout the branch if it is different than
         the default branch of the manifest.
 
         """
+        ui.info(ui.green, ":: Checkout projects ...")
         errors = list()
         manifest_xml = os.path.join(self._syncer.manifests_root,
-                                    name, "manifest.xml")
+                                    manifest_name, "manifest.xml")
         manifest = qisrc.manifest.Manifest(manifest_xml)
-        manifest_default_branch = manifest.default_branch
-        for project in self.git_projects:
+        max_src = max([len(x.src) for x in self.git_projects])
+        n = len(self.git_projects)
+        for i, project in enumerate(self.git_projects):
+            ui.info_count(i, n, ui.bold, "Checkout",
+                         ui.reset, ui.blue, project.src.ljust(max_src), end="\r")
             if project.default_branch is None:
                 continue
-            project_default_branch = project.default_branch.name
-            if project_default_branch == manifest_default_branch:
-                continue
-            ok, err = self._safe_checkout(project, project_default_branch)
+            branch_name = project.default_branch.name
+            ok, err = self._safe_checkout(project, branch_name, force=force)
             if not ok:
                 errors.append((project.src, err))
-
         if not errors:
             return
         ui.error("Failed to checkout some projects")
         for (project, error) in errors:
             ui.info(project, ":", error)
 
-    def _safe_checkout(self, project, branch):
-        """ Helper for self.change_manifest_branch """
+    def _safe_checkout(self, project, branch, force=False):
+        """ Helper for self.checkout """
         git = qisrc.git.Git(project.path)
-        ui.info(ui.green, "::",
-                ui.reset, "checkout",
-                ui.blue, project.src,
-                ui.reset, ui.bold, "(%s)" % branch)
         current_branch = git.get_current_branch()
         if not current_branch:
             return False, "not on any branch, skipping"
         clean, error = git.require_clean_worktree()
-        if not clean:
+        if not clean and not force:
             return False, error
-        rc, out = git.checkout(branch, raises=False)
+        checkout_args = [branch]
+        if force:
+            checkout_args.append("--force")
+        rc, out = git.checkout(*checkout_args, raises=False)
         if rc != 0:
             return False, "Checkout failed " + out
         return True, None
