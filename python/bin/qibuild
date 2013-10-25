@@ -48,7 +48,7 @@ import argparse
 import qisys.script
 
 def print_version():
-    sys.stdout.write("qiBuild version 3.1.1\n")
+    sys.stdout.write("qiBuild version 3.1.2\n")
 
 
 def main():

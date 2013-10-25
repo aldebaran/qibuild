@@ -1,0 +1,10 @@
+v3.1.2
+======
+
+
+
+qisrc
+-----
+
+* New command ``qisrc checkout`` : checkout the correct branch of the manifest,
+  then checkout the correct branch for every git repository in the worktree.
