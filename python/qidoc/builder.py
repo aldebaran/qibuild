@@ -48,6 +48,8 @@ class DocBuilder(object):
             ui.info_count(i, len(projects),
                           ui.green, "Building", ui.blue, project.name)
             project.build(werror=self.werror)
+            ui.info(ui.green, "Doc generated in",
+                    ui.reset, ui.bold, project.html_dir)
 
     def install(self, destdir):
         """ Install the doc projects to a dest dir
