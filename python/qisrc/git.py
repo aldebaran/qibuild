@@ -537,8 +537,8 @@ def is_submodule(path):
         return True
 
 def is_git(path):
-    """Return true if path is in a git work-tree."""
-    return get_repo_root(path) == path
+    """Return true if .git directory exists"""
+    return os.path.isdir(os.path.join(path, ".git"))
 
 def name_from_url(url):
     """ Return the project name from the url
