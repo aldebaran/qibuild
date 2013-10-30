@@ -232,8 +232,9 @@ class timer:
         @functools.wraps(func)
         def res(*args, **kwargs):
             self.start()
-            func(*args, **kwargs)
+            ret = func(*args, **kwargs)
             self.stop()
+            return ret
         return res
 
     def __enter__(self):
