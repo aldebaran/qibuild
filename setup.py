@@ -3,41 +3,7 @@
 ## found in the COPYING file.
 
 import os
-from distutils.core import setup
-
-packages = [
-    "qisys",
-    "qisys.actions",
-    "qisrc",
-    "qisrc.actions",
-    "qibuild",
-    "qibuild.actions",
-    "qibuild.cmake",
-    "qilinguist",
-    "qilinguist.actions",
-    "qitoolchain",
-    "qitoolchain.actions",
-    "qitoolchain.binary_package",
-    "qimvn",
-    "qimvn.actions"
-]
-
-scripts = [
-    "python/bin/qidoc",
-    "python/bin/qilinguist",
-    "python/bin/qisrc",
-    "python/bin/qibuild",
-    "python/bin/qitoolchain",
-    "python/bin/qimvn",
-]
-
-package_data = {
- "qisrc" : ["templates/project/CMakeLists.txt",
-            "templates/project/main.cpp",
-            "templates/project/test.cpp",
-            "templates/project/qiproject.xml"
-           ],
-}
+from setuptools import setup, find_packages
 
 def get_qibuild_cmake_files():
     res = list()
@@ -60,10 +26,19 @@ setup(name="qibuild",
       author="Aldebaran Robotics",
       author_email="dmerejkowsky@aldebaran-robotics.com",
       py_modules=['qicd'],
-      packages=packages,
-      package_dir={'': 'python'},
-      package_data=package_data,
+      packages=find_packages("python"),
+      package_dir={"": "python"},
+      include_package_data = True,
       data_files=data_files,
       license="BSD",
-      scripts=scripts
+      entry_points = {
+        "console_scripts" : [
+            "qidoc        = qisys.main:main",
+            "qilinguist   = qisys.main:main",
+            "qisrc        = qisys.main:main",
+            "qibuild      = qisys.main:main",
+            "qitoolchain  = qisys.main:main",
+            "qimvn        = qisys.main:main",
+        ]
+    }
 )
