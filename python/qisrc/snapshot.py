@@ -33,7 +33,11 @@ class Snapshot(object):
         except TypeError:
             fp = input_file
         for line in fp:
-            (src, sha1) = line.split(":")
+            try:
+                (src, sha1) = line.split(":")
+            except ValueError:
+                ui.error("could not parse", line)
+                continue
             src = src.strip()
             sha1 = sha1.strip()
             self.refs[src] = sha1
