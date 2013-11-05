@@ -24,7 +24,7 @@ An minimal example may be
     </manifest>
 
 
-Here the repository from ``git://example/foo/bar.git`` will be cloned
+Here the repository from ``git://example.com/foo/bar.git`` will be cloned
 into ``QI_WORTREE/bar``
 
 
@@ -54,7 +54,8 @@ You can have several remotes with different names, like this:
     <repo
       project="aldebaran/qibuild.git"
       src="tools/qibuild"
-      remote="public" />
+      remotes="public"
+    />
     <repo
       project="naoqi/naoqi.git"
       src="naoqi"
@@ -76,9 +77,9 @@ Many types of url are supported:
 
 
 Additionally, if you are using gerrit with ssh, you can specify that
-the remote will be used for code review (This is useful to change
+the remote will be used for code review (this is useful to change
 ``qisrc push`` behavior, so that changes are pushed to ``refs/for/master``
-)
+).
 
 
 
@@ -97,7 +98,7 @@ repo node
 
 The ``repo`` node *must* have a ``project`` attribute.
 
-If also *must* have a ``remotes`` attribute matching some existing
+It also *must* have a ``remotes`` attribute matching some existing
 ``remote`` nodes.
 
 If ``src`` is not given, it will deduced from the project name.
