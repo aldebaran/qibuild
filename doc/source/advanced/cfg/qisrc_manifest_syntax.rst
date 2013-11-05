@@ -19,8 +19,8 @@ An minimal example may be
 .. code-block:: xml
 
     <manifest>
-      <remote fetch="git://example.com" />
-      <repo project="foo/bar.git" src="bar" />
+      <remote name="origin" url="git://example.com" />
+      <repo project="foo/bar.git" remotes="origin" src="bar" />
     </manifest>
 
 
@@ -50,7 +50,7 @@ You can have several remotes with different names, like this:
 
   <manifest>
     <remote name="public" url="git://github.com" />
-    <remote name="origin" url="git@git.aldebaran.com" />
+    <remote name="origin" url="ssh://git@git.aldebaran.com" />
     <repo
       project="aldebaran/qibuild.git"
       src="tools/qibuild"
@@ -62,17 +62,18 @@ You can have several remotes with different names, like this:
     />
   </manifest>
 
-* ``git@git.aldebaran.com:naoqi/naoqi.git`` will be cloned into ``naoqi``,
-  (because the default remote is ``public``)
+* ``ssh://git@git.aldebaran.com/naoqi/naoqi.git`` will be cloned into ``naoqi``,
+  (because the default remote is ``origin``)
 
 * ``git://github.com/aldebaran/qibuild.git`` will be cloned into ``tools/qibuild``.
+  (because ``public`` is used as remote)
 
 Many types of url are supported:
 
 * ``file://``
 * ``http://``
 * ``git://``
-* ``<username>@<host>`` when using ssh
+* ``ssh://<username>@<host>`` when using ssh
 * ``ssh://<username>@<host>:<port>`` when using ssh on a non-standard port
 
 
@@ -115,11 +116,12 @@ If ``src`` is not given, it will deduced from the project name.
 
 
 Here ``qisrc init`` will try to create an ssh connection with
-``git://<username>@gerrit:29418``, where ``username`` is read from the
+``ssh://<username>@review.corp.com:29418``, where ``username`` is read from the
 operating system first, or asked to the user.
 
 The repository will be configured with two remotes: ``origin``, and ``gerrit``,
-and the ``post-commit`` gerrit hook will be fetched automatically.
+and the ``commit-msg`` gerrit hook will be fetched automatically from
+``<username>@<server>:hooks/commit-msg`` on the given port .
 
 
 
