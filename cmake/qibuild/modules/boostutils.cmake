@@ -23,6 +23,9 @@ function(boost_flib _libname)
     qi_persistent_set(${_prefix}_DEFINITIONS  "BOOST_ALL_NO_LIB")
   endif()
   find_package(Boost COMPONENTS "${_libname}" QUIET)
+  # fix compilation in cmake v2.8.11.2
+  # some of the qibuild cmake configs refer to this variable
+  set(Boost_VERSION "${Boost_VERSION}" PARENT_SCOPE)
 
   qi_persistent_set(${_prefix}_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
   if(DEFINED Boost_LIBRARIES)
