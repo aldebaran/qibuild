@@ -347,6 +347,8 @@ class Git(object):
         if not ok:
             return None, mess
 
+        # FIXME: this sometimes fails. Comparing sha1s should be
+        # more robust
         rc, out = self.diff(branch.name, remote_ref, raises=False)
         if rc == 0 and not out:
             # No development was made on this branch: use reset --hard
@@ -360,24 +362,27 @@ class Git(object):
 
         update_successful = False
         message = ""
-        with self.transaction() as transaction:
-            self.call(*fetch_cmd)
-            (rc, out) = self.call(*update_cmd)
-            if rc == 0:
-                update_successful = True
-            else:
-                if update_cmd[0] == "rebase":
-                    # run rebase --abort so that the user is left
-                    # in a clean state, making sure we
-                    # continue the transaction even if last command failed
-                    transaction.ok = True
-                    message = "Rebase failed because of conflicts"
-                    self.call("rebase", "--abort")
-
-        if transaction.ok:
-            return update_successful, message
+        (fetch_rc, fetch_out) = self.call(*fetch_cmd, raises=False)
+        if fetch_rc != 0:
+            return False, "Fetch failed:\n" + fetch_out
+        (update_rc, out) = self.call(*update_cmd, raises=False)
+        if update_rc == 0:
+            update_successful = True
         else:
-            return False, transaction.output
+            if update_cmd[0] == "rebase":
+                # run rebase --abort so that the user is left
+                # in a clean state
+                message = "Rebase failed because of conflicts"
+                (abort_rc, abort_out) = self.call("rebase", "--abort", raises=False)
+                if abort_rc == 0:
+                    return False, message
+                else:
+                    full_message = message
+                    full_message += "\nAdditionally, git rebase --abort failed"
+                    full_message += abort_out
+                    return False, full_message
+
+        return update_successful, message
 
     def is_ff(self, local_sha1, remote_sha1):
         """Check local_sha1 is fast-forward with remote_sha1.

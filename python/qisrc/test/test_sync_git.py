@@ -107,3 +107,14 @@ def test_fail_if_empty(tmpdir, test_git):
     (res, message) = foo_git.sync_branch(branch)
     assert res is None
     assert "no commits" in message
+
+def test_clean_error_when_fetch_fails(git_server, tmpdir, test_git):
+    foo_git = create_foo(git_server, tmpdir, test_git)
+    branch = Branch()
+    branch.name = "master"
+    branch.tracks = "origin"
+    git_server.push_file("foo.git", "README", "README on master")
+    git_server.srv.remove()
+    res, message = foo_git.sync_branch(branch)
+    assert res is False
+    assert "Fetch failed" in message
