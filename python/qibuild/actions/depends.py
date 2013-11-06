@@ -23,7 +23,9 @@ def configure_parser(parser):
             "\nFor best results with --graph, use:\nqibuild depends "
             "--graph | dot -Tpng -oout.png -Goverlap=scale -Gsplines=true")
     group.add_argument("--runtime", action="store_true", default=False,
-                       help="use runtime dependencies only")
+                       help="show runtime dependencies instead of build")
+    group.add_argument("--test", action="store_true", default=False,
+                       help="append test dependencies")
     group.add_argument("--reverse", action="store_true", default=False,
                        help="show projects that depend on the current project")
     group.add_argument("--tree", action="store_true", default=False,
@@ -53,16 +55,19 @@ class DependencyRelationship(object):
         return (other.from_name == self.from_name and
             other.to_name == self.to_name)
 
-def get_deps(build_worktree, project, single, runtime, reverse):
+def get_deps(build_worktree, project, single, runtime, testtime, reverse):
     """ create a list of DependencyRelationship objects ready for display """
     deps_solver = qibuild.deps.DepsSolver(build_worktree)
     if reverse:
-        (packages, projects) =  (set(), build_worktree.build_projects)
+        (packages, projects) = (set(), build_worktree.build_projects)
     else:
+
         if runtime:
-            dep_types = ["build"]
-        else:
             dep_types = ["runtime"]
+        else:
+            dep_types = ["build"]
+        if testtime:
+            dep_types.append("test")
         projects = deps_solver.get_dep_projects([project], dep_types)
         packages = deps_solver.get_dep_packages([project], dep_types)
 
@@ -74,7 +79,7 @@ def get_deps(build_worktree, project, single, runtime, reverse):
             project, projects, single, runtime)
     else:
         collected_dependencies = collect_dependencies(
-            project, projects, packages, single, runtime)
+            project, projects, packages, single, runtime, testtime)
 
     return collected_dependencies
 
@@ -214,7 +219,7 @@ def package_names_first(dependency_names, package_names):
     dep_packages.extend(dep_projects)
     return dep_packages
 
-def collect_dependencies(project, projects, packages, single, runtime, depth=0):
+def collect_dependencies(project, projects, packages, single, runtime, testtime, depth=0):
     """ recursively collect dependent projects and packages """
     if depth > 99:
         qisys.ui.error("Probable recursion problem: ", project.name)
@@ -225,6 +230,8 @@ def collect_dependencies(project, projects, packages, single, runtime, depth=0):
         dependency_names = project.run_depends
     else:
         dependency_names = project.build_depends
+    if testtime:
+        dependency_names = dependency_names.union(project.test_depends)
     package_names = [package.name for package in packages]
     dependency_names = package_names_first(dependency_names, package_names)
     collected_dependencies = list()
@@ -256,7 +263,7 @@ def collect_dependencies(project, projects, packages, single, runtime, depth=0):
         if not single and next_item:
             collected_dependencies.extend(
                 collect_dependencies(next_item, projects, packages,
-                                     False, runtime, depth+1))
+                                     False, runtime, testtime, depth+1))
     return collected_dependencies
 
 
@@ -265,7 +272,7 @@ def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args, verbose=(not args.graph))
     project = qibuild.parsers.get_one_build_project(build_worktree, args)
     collected_dependencies = get_deps(
-        build_worktree, project, args.direct, args.runtime, args.reverse)
+        build_worktree, project, args.direct, args.runtime, args.test, args.reverse)
 
     # create title
     label = project.name
@@ -273,6 +280,8 @@ def do(args):
         label = label + " run time"
     else:
         label = label + " build time"
+    if args.test:
+        label += " + test time"
     if args.direct:
         label = label + " direct"
     if args.reverse:
