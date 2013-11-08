@@ -16,6 +16,7 @@ import qisrc.parsers
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
+    qisrc.parsers.groups_parser(parser)
     parser.add_argument("--git", action="store_true", dest="git_only",
         help="consider only the git projects")
     parser.add_argument("--all", action="store_false", dest="git_only",
@@ -29,7 +30,7 @@ def do(args):
     """Main entry point"""
     if args.git_only:
         git_worktree = qisrc.parsers.get_git_worktree(args)
-        projects = git_worktree.git_projects
+        projects = git_worktree.get_git_projects(groups=args.groups)
     else:
         worktree = qisys.parsers.get_worktree(args)
         projects = worktree.projects
