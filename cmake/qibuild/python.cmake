@@ -13,7 +13,7 @@ endif()
 set(_QI_PYTHON_CMAKE TRUE)
 
 
-find_program(_python2_executable NAMES python2 python)
+find_program(PYTHON2_EXECUTABLE NAMES python2 python)
 
 function(_set_qibuild_python_path)
   if(WIN32)
@@ -60,7 +60,7 @@ function(qi_run_py_script script)
     ""
     ${ARGN})
 
-  if(NOT _python2_executable)
+  if(NOT PYTHON2_EXECUTABLE)
     qi_error("Could not find Python executable")
   endif()
 
@@ -74,7 +74,7 @@ function(qi_run_py_script script)
     list(APPEND _execute_process_args OUTPUT_VARIABLE ${ARG_OUTPUT_VARIABLE})
   endif()
   execute_process(COMMAND
-    ${_python2_executable} "${script}" ${ARG_ARGUMENTS}
+    ${PYTHON2_EXECUTABLE} "${script}" ${ARG_ARGUMENTS}
                   ERROR_VARIABLE _err
                   RESULT_VARIABLE _rc
                   ${_execute_process_args}
