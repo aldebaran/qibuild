@@ -86,9 +86,6 @@ CMake
     qi_add_test(foo_bar foo ARGUMENTS --bar)
     qi_add_test(foo_baz foo ARGUMENTS --baz)
 
-* 3 targets have been added by default: ``tests``, ``perf-tests``,
-  ``nightly-tests`` for the
-
 * Changed options:
 
   ``BUILD_TESTS`` is no longer used, use ``QI_WITH_TESTS=OFF`` instead to
