@@ -57,8 +57,12 @@ Supported formats are:
 """
             raise Exception(mess.format(url))
 
+    if args.with_tests:
+        default_dep_types = ["runtime", "test"]
+    else:
+        default_dep_types = ["runtime"]
     cmake_builder = qibuild.parsers.get_cmake_builder(
-                                    args, default_dep_types=["runtime"])
+                                    args, default_dep_types=default_dep_types)
     for url in urls:
         cmake_builder.deploy(url, split_debug=args.split_debug,
                              with_tests=args.with_tests)
