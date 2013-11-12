@@ -104,10 +104,13 @@ def parse_url(remote_url):
 
 def deploy(local_directory, remote_url, port=22, use_rsync=True):
     """Deploy a local directory to a remote url."""
+    parts = parse_url(remote_url)
+    if not parts.has_key("port"):
+        parts["port"]=port
     # ensure destination directory exist before deploying data
     if len(remote_url.split(":")) > 1:
-        remote_host, remote_dir = remote_url.rsplit(":", 1)
-        cmd = ["ssh", "-p", str(port), remote_host, "mkdir", "-p", remote_dir]
+        cmd = ["ssh", "-p", str(parts["port"]), parts["login"]+"@"+parts["url"], "mkdir", "-p",
+                parts["dir"]]
         qisys.command.call(cmd)
     if use_rsync:
         # This is required for rsync to do the right thing,
@@ -123,8 +126,8 @@ def deploy(local_directory, remote_url, port=22, use_rsync=True):
             "--progress", # print a progress bar
             "--checksum", # verify checksum instead of size and date
             "--exclude=.debug/",
-            "-e", "ssh -p %d" % port, # custom ssh port
-            local_directory, remote_url
+            "-e", "ssh -p %d" % parts["port"], # custom ssh port
+            local_directory, parts["login"]+"@"+parts["url"]+":"+parts["dir"]
         ]
     else:
         # Default to scp
