@@ -7,6 +7,7 @@ Changelog
     :maxdepth: 1
 
     changes/3.2
+    changes/3.1.2
     changes/3.1.1
     changes/3.1
     changes/3.0.1
