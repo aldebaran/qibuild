@@ -19,7 +19,7 @@ function(_qi_add_test_internal test_name target_name)
   endif()
 
   if(ARG_NO_ADD_TEST)
-    qi_deprecated(WARNING "NO_ADD_TEST is deprecated, use qi_create_test_helper instead")
+    qi_deprecated("NO_ADD_TEST is deprecated, use qi_create_test_helper instead")
     qi_create_test_helper(${target_name} ${_srcs})
     set(_deps ${ARG_DEPENDS})
     if(ARG_GTEST_TEST)

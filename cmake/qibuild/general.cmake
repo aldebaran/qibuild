@@ -132,6 +132,11 @@ option(QI_WITH_TESTS
 option(QI_WITH_PERF_TESTS "Triggers building of perf tests" OFF)
 option(QI_WITH_NIGHTLY_TESTS "triggers building of nightly tests" OFF)
 
+# For compatibility with qibuild 3.1
+qi_persistent_set(BUILD_TESTS ${QI_WITH_TESTS})
+qi_persistent_set(BUILD_PERF_TESTS ${QI_WITH_PERF_TESTS})
+qi_persistent_set(QI_NIGHTLY_TESTS ${QI_WITH_NIGHTLY_TESTS})
+
 # change default for CMAKE_INSTALL_PREFIX
 # (it's c:\program files\<project> on Windows, and
 # /usr/local elsewhere)
