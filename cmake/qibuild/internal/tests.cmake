@@ -43,7 +43,9 @@ function(_qi_add_test_internal test_name target_name)
     if(ARG_GTEST_TEST)
       list(APPEND _deps GTEST GTEST_MAIN)
     endif()
-    qi_create_bin(${target_name} SRC ${_srcs} DEPENDS ${_deps})
+    # Using NO_INSTALL because we don't want to be in the 'runtime'
+    # component like the other binaries
+    qi_create_bin(${target_name} SRC ${_srcs} DEPENDS ${_deps} NO_INSTALL)
   endif()
 
   # Validate target_name. We expect one of:

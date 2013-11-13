@@ -11,9 +11,8 @@ import qibuild.find
 
 def test_perf(qibuild_action):
     proj = qibuild_action.add_test_project("perf")
-    qibuild_action("configure", "perf")
+    qibuild_action("configure", "perf", "-DQI_WITH_PERF_TESTS=ON")
     qibuild_action("make", "perf")
-    proj.build(target="perf-tests")
     proj.run_tests(perf=True)
     for name in ["perf_spam", "perf_eggs"]:
         expected_path = os.path.join(proj.build_directory,
