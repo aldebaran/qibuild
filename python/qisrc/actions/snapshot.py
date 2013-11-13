@@ -16,7 +16,8 @@ def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
     group = parser.add_argument_group("qisrc snapshot options")
-    group.add_argument("snapshot_path", help="A path to store or load informations.")
+    group.add_argument("snapshot_path", help="Path to the output snapshot file. " +
+        "Use `qisrc reset --force --snapshot snapshot_path` to load a snapshot" )
 
 
 def do(args):
