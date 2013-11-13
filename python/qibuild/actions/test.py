@@ -19,13 +19,13 @@ def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
-    qitest.parsers.test_parser(parser, with_num_jobs=False)
-    parser.set_defaults(num_jobs=1)
-    parser.add_argument("-l", "--list", dest="list", action="store_true",
+    group = qitest.parsers.test_parser(parser, with_num_jobs=False)
+    group.add_argument("-l", "--list", dest="list", action="store_true",
                         help="List what tests would be run")
-    parser.add_argument("--slow", action="store_true", dest="nightly",
+    group.add_argument("--slow", action="store_true", dest="nightly",
                         help=argparse.SUPPRESS)
-    parser.add_argument("--build-first", action="store_true", help="rebuild first")
+    group.add_argument("--build-first", action="store_true", help="rebuild first")
+    parser.set_defaults(num_jobs=1)
 
 
 def do(args):

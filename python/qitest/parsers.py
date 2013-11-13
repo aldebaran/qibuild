@@ -28,3 +28,4 @@ def test_parser(parser, with_num_jobs=True):
     if with_num_jobs:
         group.add_argument("-j", dest="num_jobs", default=1, type=int,
                             help="Number of tests to run in parallel")
+    return group
