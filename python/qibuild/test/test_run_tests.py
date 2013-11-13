@@ -4,7 +4,7 @@ import qisys.qixml
 def test_run(build_worktree):
     testme = build_worktree.add_test_project("testme")
     testme.configure()
-    testme.build(target="tests")
+    testme.build()
     ok = testme.run_tests()
     assert not ok
     test_dir = os.path.join(testme.build_directory, "test-results")

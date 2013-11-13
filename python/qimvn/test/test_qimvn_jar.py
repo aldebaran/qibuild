@@ -40,7 +40,7 @@ def test_package_multiple_target(qibuild_action, qimvn_action):
     """
     project = qibuild_action.add_test_project("testjni")
     project.configure()
-    project.build(target="tests")
+    project.build()
 
     jarname = "test.jar"
     jarpath = jar.jar(jarname, ["one", "two", "three", "four"], get_paths())
@@ -64,7 +64,7 @@ def test_jar_path(qibuild_action, qimvn_action):
     """
     project = qibuild_action.add_test_project("testjni")
     project.configure()
-    project.build(target="tests")
+    project.build()
 
     jar_dirname = os.path.join(os.getcwd(), "./path/to/jar")
     jarname = "test.jar"
