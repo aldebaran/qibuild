@@ -10,6 +10,7 @@ import os
 import sys
 
 from qisys import ui
+import qisys.script
 import qibuild.parsers
 import qitest.parsers
 import qitest.actions.run
@@ -35,6 +36,13 @@ def do(args):
     if args.nightmare:
         os.environ["GTEST_REPEAT"] = "20"
         os.environ["GTEST_SHUFFLE"] = "yes"
+
+    if args.list:
+        build_worktree = qibuild.parsers.get_build_worktree(args)
+        project = qibuild.parsers.get_one_build_project(build_worktree, args)
+        json = os.path.join(project.build_directory, "qitest.json")
+        qisys.script.run_action("qitest.actions.list", [json])
+        return
 
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
     deps_solver = cmake_builder.deps_solver
