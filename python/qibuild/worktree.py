@@ -85,18 +85,19 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         qibuild.profile.configure_build_profile(self.qibuild_xml,
                                                 name, flags)
 
-
     def remove_build_profile(self, name):
         """ Remove a build profile for this worktree """
         qibuild.profile.remove_build_profile(self.qibuild_xml, name)
 
     def set_default_config(self, name):
         """ Set the default toolchain for this worktree """
-        local_settings = qibuild.config.LocalSettings()
         tree = qisys.qixml.read(self.qibuild_xml)
-        local_settings.parse(tree)
-        local_settings.defaults.config = name
-        tree = local_settings.tree()
+        root = tree.getroot()
+        defaults = root.find("defaults")
+        if defaults is None:
+            defaults = qisys.qixml.etree.Element("defaults")
+            root.append(defaults)
+        defaults.set("config", name)
         qisys.qixml.write(tree, self.qibuild_xml)
 
     def set_active_config(self, active_config):
