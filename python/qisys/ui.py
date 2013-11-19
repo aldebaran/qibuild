@@ -113,6 +113,22 @@ def config_color(fp):
     else:
         return True
 
+_enable_xterm_title = None
+
+def update_title(mystr):
+    global _enable_xterm_title
+    if _enable_xterm_title is None:
+        legal_terms = ["xterm", "xterm-color", "Eterm", "aterm", "rxvt", "screen",
+            "kterm", "rxvt-unicode", "gnome", "interix"]
+        _enable_xterm_title = sys.stdout.isatty() and \
+            'TERM' in os.environ and \
+            os.environ['TERM'] in legal_terms
+
+    if _enable_xterm_title:
+        mystr = '\x1b]0;%s\x07' % mystr
+
+        sys.stdout.write(mystr)
+        sys.stdout.flush()
 
 def _msg(*tokens, **kwargs):
     """ Helper method for error, warning, info, debug
@@ -125,6 +141,7 @@ def _msg(*tokens, **kwargs):
     end = kwargs.get("end", "\n")
     with_color = config_color(fp)
     res = list()  # Initialize result list, to be concatenated before printing
+    nocolorres = list()  # result list without colors
     if CONFIG["timestamp"]:
         now = datetime.datetime.now()
         res.append(now.strftime("[%Y-%m-%d %H:%M:%S] "))
@@ -135,14 +152,18 @@ def _msg(*tokens, **kwargs):
         else:
             if sep == " " and token == "\n":
                 res.append("\n")
+                nocolorres.append("\n")
             else:
                 res.append(str(token))
                 res.append(sep)
+                nocolorres.append(str(token))
+                nocolorres.append(sep)
     # always reset:
     if with_color:
         res.append(reset.code)
     res.append(end)
     stringres = ''.join(res)
+    stringnc = ''.join(nocolorres)
     if CONFIG["record"]:
         _MESSAGES.append(stringres)
     if _console and with_color:
@@ -150,6 +171,9 @@ def _msg(*tokens, **kwargs):
     else:
         fp.write(stringres)
         fp.flush()
+    # assume that if we want color, we are in a terminal and we also want title
+    if kwargs.get("update_title", False):
+        update_title(stringnc)
 
 def error(*tokens, **kwargs):
     """ Print an error message """
@@ -171,7 +195,7 @@ def info(*tokens, **kwargs):
 
 def info_count(i, n, *rest, **kwargs):
     """ Same as info, but displays a nice counter
-    coler will be reset
+    color will be reset
     >>> count(0, 4)
     * (1/5)
     >>> count(4, 12)

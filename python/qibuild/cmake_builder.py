@@ -106,7 +106,7 @@ class CMakeBuilder(object):
         for i, project in enumerate(projects):
             ui.info_count(i, len(projects),
                           ui.green, "Building",
-                          ui.blue, project.name)
+                          ui.blue, project.name, update_title=True)
             self.pre_build(project)
             project.build(**kwargs)
 
