@@ -300,6 +300,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self._set_elem(project.src, project_xml)
         qisys.qixml.write(self._root_xml, self.git_xml)
 
+    def save_git_config(self):
+        """ Save the worktree config in .qi/git.xml """
+        for project in self.git_projects:
+            project_xml = project.dump_xml()
+            self._set_elem(project.src, project_xml)
+        qisys.qixml.write(self._root_xml, self.git_xml)
+
     def __repr__(self):
         return "<GitWorkTree in %s>" % self.root
 

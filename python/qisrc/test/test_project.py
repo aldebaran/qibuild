@@ -47,6 +47,7 @@ def test_apply_remote_config(git_worktree):
     foo_repo.remotes = [origin, gerrit]
     foo_repo.default_branch = "master"
     foo.apply_remote_config(foo_repo)
+    foo.save_config()
     assert foo_repo.default_remote == origin
     assert foo.review_remote == gerrit
     # Check its persistent:

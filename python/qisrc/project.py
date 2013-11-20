@@ -139,8 +139,7 @@ class GitProject(object):
             ok = qisrc.review.setup_project(self)
             if ok:
                 self.review = True
-
-        self.save_config()
+        self.apply_config()
 
 
     def sync(self, rebase_devel=False, **kwargs):
