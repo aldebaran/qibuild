@@ -75,6 +75,8 @@ class GitProject(object):
 
     def update_remote(self, remote, new):
         """ Helper for configure_remote """
+        if remote == new:
+            return  # Be lazy
         if not remote.review and new.review:
             ui.info(self.src, "is now under code review")
         if remote.review and not new.review:
