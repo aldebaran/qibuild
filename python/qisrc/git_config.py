@@ -133,10 +133,12 @@ class Remote(object):
     def __eq__(self, other):
         return self.name == other.name and \
                 self.url == other.url and \
-                self.review == other.review
+                self.review is other.review and \
+                self.default is other.default
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
 
 class Branch(object):
     def __init__(self):
@@ -148,6 +150,14 @@ class Branch(object):
     def __repr__(self):
         return "<Branch %s (tracks: %s)>" % (self.name, self.tracks)
 
+    def __eq__(self, other):
+        return self.name == other.name and \
+               self.tracks == other.tracks and \
+               self.remote_branch == self.remote_branch and \
+               self.default is self.default
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 ##
 # parsing
