@@ -257,6 +257,7 @@ class WorkTreeSyncer(object):
                           ui.blue, project.src.ljust(max_src), end="\r")
             project.apply_remote_config(repo)
         ui.info(" " * (max_src + 19), end="\r")
+        self.git_worktree.save_git_config()
         return res
 
     def _sync_build_profiles(self, local_manifest):
