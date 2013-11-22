@@ -20,6 +20,7 @@ class CMakeBuildConfig(object):
         self.build_type = "Debug"
         self.user_flags = list()
         self.profiles = list()
+        self.verbose_make = False
         self._default_config = None
         self.qibuild_cfg = self.read_global_qibuild_settings()
         self._cmake_generator = None

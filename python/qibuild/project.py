@@ -102,6 +102,10 @@ class BuildProject(object):
     def using_make(self):
         return self.build_config.using_make
 
+    @property
+    def verbose_make(self):
+        return self.build_config.verbose_make
+
     def write_qi_path_conf(self, sdk_dirs):
         """ Write the <build>/sdk/share/qi/path.conf file. This file
         can be used for instance by qi::path::find() functions, to
@@ -209,7 +213,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             raise qibuild.build.ConfigureFailed(self)
 
     def build(self, num_jobs=None, rebuild=False, target=None,
-              verbose_make=False, coverity=False, env=None):
+              coverity=False, env=None):
         """ Build the project """
         timer = ui.timer("make %s" % self.name)
         timer.start()
@@ -238,11 +242,12 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             build_env = self.build_env.copy()
         else:
             build_env = env
-        if verbose_make:
-            if "Makefiles" in self.cmake_generator:
-                build_env["VERBOSE"] = "1"
-            if self.cmake_generator == "Ninja":
-                cmd.append("-v")
+        if self.verbose_make:
+            if self.cmake_generator:
+                if "Makefiles" in self.cmake_generator:
+                    build_env["VERBOSE"] = "1"
+                if self.cmake_generator == "Ninja":
+                    cmd.append("-v")
         try:
             qisys.command.call(cmd, env=build_env)
         except qisys.command.CommandFailedException:

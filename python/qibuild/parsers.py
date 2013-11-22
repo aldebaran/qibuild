@@ -53,6 +53,8 @@ def build_parser(parser):
         help="A profile to use. "
              "It can appear several times. "
              "It should match a declaration in .qi/qibuild.xml")
+    group.add_argument("--verbose-make", action="store_true", default=False,
+                       help="Print the executed commands while building")
 
 def project_parser(parser, positional=True):
     """Parser settings for every action using several build projects."""
@@ -154,6 +156,7 @@ def get_build_config(build_worktree, args):
         build_config.profiles = args.profiles
     if args.cmake_generator:
         build_config.cmake_generator = args.cmake_generator
+    build_config.verbose_make = args.verbose_make
     if hasattr(args, "cmake_flags") and args.cmake_flags:
         # should be a list a strings looking like key=value
         user_flags = list()
