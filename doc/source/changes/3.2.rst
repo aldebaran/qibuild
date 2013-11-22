@@ -100,3 +100,9 @@ CMake
 * qibuild cmake modules:
 
   * ``boostutils``: fix for cmake > 2.8.11
+
+qibuild make
+------------
+
+* Show what's currently building in the terminal title bar. Only Linux is
+  supported yet.
