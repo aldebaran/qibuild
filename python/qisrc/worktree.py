@@ -38,6 +38,9 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         """ Add a new manifest to this worktree """
         self._syncer.configure_manifest(name, manifest_url, groups=groups, branch=branch)
 
+    def configure_projects(self, projects):
+        self._syncer.configure_projects(projects)
+
     def remove_manifest(self, name):
         """ Remove the given manifest from this worktree """
         self._syncer.remove_manifest(name)

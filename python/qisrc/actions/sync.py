@@ -52,7 +52,7 @@ def do(args):
     if not git_projects:
         qisrc.worktree.on_no_matching_projects(git_worktree, groups=args.groups)
         return
-
+    git_worktree.configure_projects(git_projects)
     skipped = list()
     failed = list()
     ui.info(ui.green, ":: Syncing projects ...")
