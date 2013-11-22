@@ -93,6 +93,33 @@ class WorkTreeSyncer(object):
         self.dump_manifests()
         return res
 
+    def configure_projects(self, projects=None):
+        """ Configure the given projects so that the actual git config matches
+        the one coming from the manifest :
+
+        Configure default remotes, default branches and code review, then save config
+        To be called _after_ sync()
+        """
+        if projects is None:
+            projects = self.git_worktree.get_git_projects()
+        if not projects:
+            return
+        to_configure = list()
+        srcs = {project.src: project for project in projects}
+        for repo in self.new_repos:
+            if repo.src in srcs.keys():
+                to_configure.append(repo)
+        ui.info(ui.green, ":: Configuring projects ...")
+        max_src = max(len(x.src) for x in to_configure)
+        n = len(to_configure)
+        for i, repo in enumerate(to_configure):
+            ui.info_count(i, n, ui.white, "Configuring", ui.reset,
+                          ui.blue, repo.src.ljust(max_src), end="\r")
+            git_project = srcs[repo.src]
+            git_project.apply_remote_config(repo)
+        ui.info(" " * (max_src + 19), end="\r")
+        self.git_worktree.save_git_config()
+
     def dump_manifests(self):
         """ Save the manifests in .qi/manifests.xml """
         parser = WorkTreeSyncerParser(self)
@@ -113,6 +140,7 @@ class WorkTreeSyncer(object):
         self.manifests[name] = to_add
         self.clone_manifest(to_add)
         self.sync_repos()
+        self.configure_projects()
 
     def remove_manifest(self, name):
         """ Remove a manifest from the list """
@@ -237,27 +265,6 @@ class WorkTreeSyncer(object):
             if not self.git_worktree.move_repo(repo, new_src):
                 res = False
 
-        ##
-        # 2/ Apply configuration to every new repositories
-        todo = list() # a list of tuples (project, repo)
-        for repo in new_repos:
-            git_project = self.git_worktree.get_git_project(repo.src)
-            # may not work if the moving failed for instance
-            if git_project:
-                todo.append((git_project, repo))
-
-        if not todo:
-            return
-
-        ui.info(ui.green, ":: Configuring projects ...")
-        max_src = max([len(x[0].src) for x in todo])
-        n = len(todo)
-        for i, (project, repo) in enumerate(todo):
-            ui.info_count(i, n, ui.white, "Configuring", ui.reset,
-                          ui.blue, project.src.ljust(max_src), end="\r")
-            project.apply_remote_config(repo)
-        ui.info(" " * (max_src + 19), end="\r")
-        self.git_worktree.save_git_config()
         return res
 
     def _sync_build_profiles(self, local_manifest):
