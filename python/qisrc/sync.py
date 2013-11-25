@@ -254,10 +254,15 @@ class WorkTreeSyncer(object):
                     ui.green, "->",
                     ui.blue, repo.src,
                     ui.white, "(%s)" % repo.default_branch)
-            if self.git_worktree.get_git_project(repo.src):
+            project = self.git_worktree.get_git_project(repo.src)
+            if project:  # Repo is already there, re-apply config
+                project.apply_remote_config(repo)
                 continue
             if not self.git_worktree.clone_missing(repo):
                 res = False
+            else:
+                project = self.git_worktree.get_git_project(repo.src)
+                project.apply_remote_config(repo)
 
         if to_move:
             ui.info(ui.green, ":: Moving repositories ...")

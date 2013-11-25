@@ -41,6 +41,18 @@ def test_clone_new_repos(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("bar")
 
+
+def test_configure_new_repos(qisrc_action, git_server):
+    git_server.create_repo("foo.git")
+    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("sync")
+    git_server.create_repo("bar.git")
+    qisrc_action("sync", "foo")  # Sync only foo, but expect to clone bar
+    git_worktree = TestGitWorkTree()
+    bar = git_worktree.get_git_project("bar")
+    assert bar.default_remote
+
+
 def test_creates_required_subdirs(qisrc_action, git_server):
     git_server.create_repo("foo/bar.git")
     qisrc_action("manifest", "--add", "default", git_server.manifest_url)
