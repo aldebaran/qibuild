@@ -41,29 +41,7 @@ class BuildProject(object):
         the build profiles, and the build type (debug/release)
 
         """
-        parts = ["build"]
-        toolchain = self.build_config.toolchain
-        build_type = self.build_config.build_type
-        visual_studio = self.build_config.using_visual_studio
-        if toolchain:
-            parts.append(toolchain.name)
-        else:
-            parts.append("sys-%s-%s" % (platform.system().lower(),
-                                        platform.machine().lower()))
-        profiles = self.build_config.profiles
-        for profile in profiles:
-            parts.append(profile)
-
-        # When using cmake + visual studio, sharing the same build dir with
-        # several build config is mandatory.
-        # Otherwise, it's not a good idea, so we always specify it
-        # when it's not "Debug" (the default)
-        if not visual_studio:
-            if build_type and build_type != "Debug":
-                parts.append(build_type.lower())
-
-        # FIXME: handle custom build dir
-        return os.path.join(self.path, "-".join(parts))
+        return os.path.join(self.path, self.build_config.build_directory())
 
     @property
     def cmake_cache(self):

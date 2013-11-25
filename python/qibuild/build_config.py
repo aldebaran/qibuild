@@ -5,6 +5,7 @@ import qisys.qixml
 import qibuild.config
 import qibuild.profile
 import qitoolchain
+import platform
 
 
 class CMakeBuildConfig(object):
@@ -102,6 +103,30 @@ class CMakeBuildConfig(object):
         envsetter = qisys.envsetter.EnvSetter()
         envsetter.read_config(self.qibuild_cfg)
         return envsetter.get_build_env()
+
+    def build_directory(self, prefix="build"):
+        """ Return a suitable build directory, depending on the
+        build setting of the worktree: the name of the toolchain,
+        the build profiles, and the build type (debug/release)
+        """
+        parts = [prefix]
+        if self.toolchain:
+            parts.append(self.toolchain.name)
+        else:
+            parts.append("sys-%s-%s" % (platform.system().lower(),
+                                        platform.machine().lower()))
+            for profile in self.profiles:
+                parts.append(profile)
+
+            # When using cmake + visual studio, sharing the same build dir with
+            # several build config is mandatory.
+            # Otherwise, it's not a good idea, so we always specify it
+            # when it's not "Debug" (the default)
+            if not self.using_visual_studio:
+                if self.build_type and self.build_type != "Debug":
+                    parts.append(self.build_type.lower())
+        return "-".join(parts)
+
 
     @property
     def cmake_args(self):
