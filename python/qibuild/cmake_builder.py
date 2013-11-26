@@ -5,14 +5,23 @@ import operator
 from qisys import ui
 import qisys.sh
 import qibuild.deps_solver
+from qisys.abstractbuilder import AbstractBuilder
 
-class CMakeBuilder(object):
-    def __init__(self, build_worktree, projects):
+class CMakeBuilder(AbstractBuilder):
+    """ CMake driver.
+        Allow building multiples cmake projects together.
+        Dependencies can optionally be resolved and be taken into account.
+    """
+    def __init__(self, build_worktree, projects=list()):
         self.build_worktree = build_worktree
         self.projects = projects
         self.deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
         self.dep_types = ["build", "runtime"]
 
+    def add_project(self, project):
+        """ Add a project to the list of projects """
+        build_project = self.build_worktree.get_build_project(project)
+        self.projects.append(build_project)
 
     # pylint: disable-msg=E0202
     @property
@@ -89,7 +98,7 @@ class CMakeBuilder(object):
         paths.extend([package.path for package in packages])
         project.fix_shared_libs(paths)
 
-    def configure(self, **kwargs):
+    def configure(self, *args, **kwargs):
         """ Configure the projects in the correct order """
         self.bootstrap_projects()
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
@@ -101,7 +110,7 @@ class CMakeBuilder(object):
             project.configure(**kwargs)
 
     @need_configure
-    def build(self, **kwargs):
+    def build(self, *args, **kwargs):
         """ Build the projects in the correct order """
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         for i, project in enumerate(projects):
@@ -112,7 +121,7 @@ class CMakeBuilder(object):
             project.build(**kwargs)
 
     @need_configure
-    def install(self, dest_dir, **kwargs):
+    def install(self, dest_dir, *args, **kwargs):
         """ Install the projects and the packages to the dest_dir """
         installed = list()
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
