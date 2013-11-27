@@ -11,7 +11,6 @@
 import re
 from qisys import ui
 
-HAS_LXML = False
 from xml.etree import ElementTree as etree
 
 def indent(elem, level=0):
