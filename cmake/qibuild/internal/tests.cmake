@@ -1,6 +1,6 @@
 function(_qi_add_test_internal test_name target_name)
   cmake_parse_arguments(ARG
-    "NO_ADD_TEST;NIGHTLY;PERF_TEST;GTEST_TEST"
+    "NO_INSTALL;NO_ADD_TEST;NIGHTLY;PERF_TEST;GTEST_TEST"
     "TIMEOUT;WORKING_DIRECTORY"
     "SRC;DEPENDS;ARGUMENTS;ENVIRONMENT" ${ARGN})
 
@@ -125,7 +125,9 @@ function(_qi_add_test_internal test_name target_name)
 
   file(APPEND ${CMAKE_BINARY_DIR}/qitest.cmake "${_qi_add_test_args}\n")
 
-  if(TARGET "${target_name}")
-    install(TARGETS "${target_name}" DESTINATION "bin" COMPONENT "test")
+  if(NOT ARG_NO_INSTALL)
+    if(TARGET "${target_name}")
+      install(TARGETS "${target_name}" DESTINATION "bin" COMPONENT "test")
+    endif()
   endif()
 endfunction()
