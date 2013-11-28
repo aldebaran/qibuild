@@ -109,6 +109,8 @@ class WorkTreeSyncer(object):
         for repo in self.new_repos:
             if repo.src in srcs.keys():
                 to_configure.append(repo)
+        if not to_configure:
+            return
         ui.info(ui.green, ":: Configuring projects ...")
         max_src = max(len(x.src) for x in to_configure)
         n = len(to_configure)
