@@ -41,6 +41,8 @@ def do(args):
         if args.path == 'absolute' or args.path == 'worktree':
             git_grep_opts.append("-I")
             git_grep_opts.append("--null")
+    if ui.config_color(sys.stdout):
+        git_grep_opts.append("--color=always")
     git_grep_opts.append(args.pattern)
 
     if not git_projects:
