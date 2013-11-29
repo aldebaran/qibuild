@@ -233,8 +233,13 @@ def find_installed_cmake_qibuild_dir(python_dir):
         # python in Python27\Lib\{dist,site}-packages
         # cmake in Python27\share\cmake
         # (windows' pip)
-        ("..", "..", "..", "share", "cmake")
+        ("..", "..", "..", "share", "cmake"),
+        # python in qibuild.egg/qibuild,
+        # cmake in qibuild.egg/share/cmake
+        # (pip with setuptools)
+        ("..", "share", "cmake"),
         ]:
+
         rel_path = os.path.join(*candidate)
         res = os.path.join(python_dir, rel_path)
         res = qisys.sh.to_native_path(res)
