@@ -16,33 +16,52 @@ Components
 The various qi_install_* function deals with the components and respect the
 SDK layout for you.
 
-They also help you producing 'runtime' packages (containing just what is necessary
-to run your software), or 'development' packages (containing everything in the
-runtime package, plus all that is necessary to use your : headers, library,
-cmake config files, et al.)
 
-Runtime versus development installation
----------------------------------------
+There are 3 sort of dependencies in qibuild, which match 3 install
+components:
 
-Here are the components that will be used during a runtime install
+* ``build``: the dependencies required to build the software. (headers,
+  statics libraries, CMake files). You will need that if you want to generate
+  a package containing a pre-compiled library for other people to link with, for
+  instance.
 
-+---------------+---------------------------+------------------------------------+
-| component     |    function               | destination                        |
-+===============+===========================+====================================+
-| "binary"      |   qi_create_bin           | bin/                               |
-+---------------+---------------------------+------------------------------------+
-| "lib"         |   qi_create_lib(SHARED)   | lib/ on UNIX, bin/ on windows      |
-+---------------+---------------------------+------------------------------------+
-| "conf"        |   qi_install_conf         | etc/                               |
-+---------------+---------------------------+------------------------------------+
-| "data"        |   qi_install_data         | share/                             |
-+---------------+---------------------------+------------------------------------+
-| "doc"         |   qi_install_doc          | share/doc                          |
-+---------------+---------------------------+------------------------------------+
+* ``runtime``: the dependencies required to run the software. (executable,
+  dynamic libraries, data, config files)
 
-Note that :cmake:function:`qi_create_bin` and :cmake:function:`qi_create_lib` create the install
+* ``test`` : the dependencies required to test the software (the gtest library,
+  some test executables, ...)
+
+Install functions, destination, components
+-------------------------------------------
+
+Note that the ``qi_create_*`` and the ``qi_stage_lib`` functions create correct install
 rules for you by default.
-If you don't what the executable to be installed (because it's just a test, for instance, you can use:
+
++---------------------------+---------------+-------------------------------------------------------+
+|    function               | component     | destination                                           |
++===========================+===============+=======================================================+
+|   qi_create_bin           |  runtime      | bin/                                                  |
++---------------------------+---------------+-------------------------------------------------------+
+|   qi_create_lib(SHARED)   |  runtime      | lib/ on UNIX, bin/ on windows                         |
++---------------------------+---------------+-------------------------------------------------------+
+|   qi_install_conf         |  runtime      | etc/                                                  |
++---------------------------+---------------+-------------------------------------------------------+
+|   qi_install_data         |  runtime      | share/                                                |
++---------------------------+---------------+-------------------------------------------------------+
+|   qi_create_lib(STATIC)   |  build        | lib/                                                  |
++---------------------------+---------------+-------------------------------------------------------+
+|   qi_stage_lib(foo)       |  build        |  share/cmake/modules/foo/foo-config.cmake             |
++---------------------------+---------------+-------------------------------------------------------+
+|   qi_install_header       |  build        |  include/                                             |
++---------------------------+---------------+-------------------------------------------------------+
+|   qi_create_test_helper   |  test         | bin/                                                  |
++---------------------------+---------------+-------------------------------------------------------+
+
+Other use cases
+---------------
+
+If you don't want the executable to be installed
+(because it's just used at build time, for instance), you can use:
 
 .. code-block:: cmake
 
@@ -51,48 +70,10 @@ If you don't what the executable to be installed (because it's just a test, for 
 If you want to install an executable that is NOT the result of a compilation
 (for instance a script), you can use :cmake:function:`qi_install_program`
 
-
-When doing a normal install, you will get the previous component, plus
-the following ones
-
-+---------------+---------------------------+------------------------------------+
-| component     |   function                |  destination                       |
-+===============+===========================+====================================+
-| "static-lib", |   qi_create_lib(STATIC)   |  lib/                              |
-+---------------+---------------------------+------------------------------------+
-| "cmake"       |   qi_stage_lib            |  share/cmake/modules/              |
-+---------------+---------------------------+------------------------------------+
-| "header"      |   qi_install_header       |  include/                          |
-+---------------+---------------------------+------------------------------------+
-
 If you want to install something in your development install that does not fit
-in these components (say, an example), you can use the generic
-:cmake:function:`qi_install` function
-
-For instance
-
-.. code-block:: cmake
-
-  qi_install(foo_example bar_examples DESTINATION examples KEEP_RELATIVE_PATHS)
-
-will give you::
-
-  sources                       destination
-                                 examples
-  foo_example                    |__ foo_example
-  |__ CMakeLists                    |__ CMakeLists
-  |__ foo.cpp                       |__ foo.cpp
-  bar_example                       bar_example
-  |__ CMakeLists                    |__ CMakeLists
-  |__ bar.cpp                       |__ bar.cpp
-
-Also, to install a ``README`` at the root of your package you could do:
-
-.. code-block:: cmake
-
-  qi_install(doc/README DESTINATION ".")
-
-Since no component as been given, this files won't be in the runtime install.
+in these destinations (say, an example), you can use the generic
+:cmake:function:`qi_install` function with ``DESTINATION`` and ``COMPONENT``
+arguments.
 
 
 Special features
