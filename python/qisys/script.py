@@ -267,7 +267,7 @@ Please add something like:
 
     \"\"\" Short description of {module_name}
 
-    A longer desciption here....
+    A longer description here....
 
     \"\"\"
 
