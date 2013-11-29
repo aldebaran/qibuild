@@ -145,7 +145,7 @@ class SphinxProject(qidoc.project.DocProject):
             return
 
         if self.prebuild_script:
-            ui.info(ui.green, "Running pre-build-scipt:",
+            ui.info(ui.green, "Running pre-build script:",
                     ui.white, self.prebuild_script)
             cmd = [sys.executable, self.prebuild_script]
             qisys.command.call(cmd, cwd=self.path)
