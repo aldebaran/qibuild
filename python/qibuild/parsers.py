@@ -43,8 +43,6 @@ def build_parser(parser):
     qisys.parsers.worktree_parser(parser)
     job_parser(parser, group=group)
     build_type_parser(parser, group=group)
-    group.add_argument("-G", "--cmake-generator", action="store",
-        help="Specify the CMake generator")
     group.add_argument("-c", "--config",
         help="The configuration to use. "
              "It should be the name of a toolchain, or \"system\"")
@@ -154,7 +152,7 @@ def get_build_config(build_worktree, args):
     build_config.build_type = args.build_type
     if args.profiles:
         build_config.profiles = args.profiles
-    if args.cmake_generator:
+    if hasattr(args, "cmake_generator"):
         build_config.cmake_generator = args.cmake_generator
     build_config.verbose_make = args.verbose_make
     if hasattr(args, "cmake_flags") and args.cmake_flags:

@@ -16,6 +16,8 @@ def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("configure options")
+    group.add_argument("-G", "--cmake-generator", action="store",
+        help="Specify the CMake generator")
     group.add_argument("-D", dest="cmake_flags",
         action="append",
         help="additional cmake flags")
