@@ -85,7 +85,7 @@ class BuildProject(object):
 
     @property
     def cmake_generator(self):
-        return self.build_config.cmake_generator
+        return qibuild.cmake.get_cached_var(self.build_directory, "CMAKE_GENERATOR")
 
     @property
     def using_visual_studio(self):
