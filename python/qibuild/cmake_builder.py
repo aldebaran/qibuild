@@ -161,6 +161,17 @@ class CMakeBuilder(object):
     def deploy(self, url, use_rsync=True, port=22, split_debug=False, with_tests=False):
         """ Deploy the project and the packages it depends to a remote url """
 
+        # Deploy packages: install all of them in the same temp dir, then
+        # deploy this temp dir to the target
+        deploy_name = self.build_config.build_directory(prefix="deploy")
+        deploy_dir = os.path.join(self.build_worktree.root, ".qi", deploy_name)
+        if not os.path.isdir(deploy_dir):
+            qisys.sh.mkdir(deploy_dir)
+        deploy_manifest = os.path.join(deploy_dir, "deploy_manifest.txt")
+        if os.path.exists(deploy_manifest):
+            qisys.sh.rm(deploy_manifest)
+        to_deploy = list()
+
         dep_packages = self.deps_solver.get_dep_packages(self.projects,
                                                          self.dep_types)
         dep_projects = self.deps_solver.get_dep_projects(self.projects,
@@ -174,29 +185,42 @@ class CMakeBuilder(object):
                 ui.info(" *", ui.blue, package.name)
         ui.info(ui.green, "will be deployed to", ui.blue, url)
 
-        # Deploy packages: install all of them in the same temp dir, then
-        # deploy this temp dir to the target
         if dep_packages:
             print
             ui.info(ui.green, ":: ", "Deploying packages")
-            with qisys.sh.TempDir() as tmp:
-                for i, package in enumerate(dep_packages):
-                    ui.info_count(i, len(dep_packages),
-                        ui.green, "Deploying package", ui.blue, package.name,
-                        ui.green, "to", ui.blue, url)
-                    package.install(tmp, runtime=True)
-                qibuild.deploy.deploy(tmp, url, use_rsync=use_rsync, port=port)
-
+            for i, package in enumerate(dep_packages):
+                ui.info_count(i, len(dep_packages),
+                    ui.green, "Deploying package", ui.blue, package.name,
+                    ui.green, "to", ui.blue, url)
+                # Install package in local deploy dir
+                files = package.install(deploy_dir, runtime=True)
+                to_deploy.extend(files)
 
         print
         ui.info(ui.green, ":: ", "Deploying projects")
-        # Deploy projects: install them inside a 'deploy' dir inside the build dir,
-        # then deploy this dir to the target
+        # Deploy projects: install them inside a 'deploy' dir in the worktree
+        # root, then deploy this dir to the target
+
         for (i, project) in enumerate(dep_projects):
             ui.info_count(i, len(dep_projects),
                     ui.green, "Deploying project", ui.blue, project.name,
                     ui.green, "to", ui.blue, url)
-            project.deploy(url, split_debug=split_debug, with_tests=with_tests)
+
+            components = ["runtime"]
+            if with_tests:
+                components.append("test")
+                to_deploy.append("qitest.json")
+            # Install project in local deploy dir
+            installed = project.install(deploy_dir, components=components)
+            to_deploy.extend(installed)
+            if split_debug:
+                project.split_debug(deploy_dir)
+        # Write the list of files to be deployed
+        with open(deploy_manifest, "a") as f:
+            set_to_deploy = set(to_deploy)
+            f.write("\n".join(set_to_deploy))
+        qibuild.deploy.deploy(deploy_dir, url, use_rsync=use_rsync, port=port,
+                              filelist=deploy_manifest)
 
         print
         for project in self.projects:

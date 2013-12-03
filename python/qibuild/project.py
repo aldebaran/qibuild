@@ -391,21 +391,6 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         tests = qitest.conf.relocate_tests(self, tests)
         qitest.conf.write_tests(tests, os.path.join(destdir, "qitest.json"))
 
-    def deploy(self, url, port=22, split_debug=False,
-               use_rsync=True, with_tests=True):
-        """ Deploy the project to a remote url """
-        destdir = os.path.join(self.build_directory, "deploy")
-        #create folder for project without install rules
-        qisys.sh.mkdir(destdir, recursive=True)
-        components=["runtime"]
-        if with_tests:
-            components.append("test")
-        self.install(destdir, components=components)
-        if split_debug:
-            self.split_debug(destdir)
-        ui.info(ui.green, "Sending binaries to target ...")
-        qibuild.deploy.deploy(destdir, url, use_rsync=use_rsync, port=port)
-
     def run_tests(self, **kwargs):
         """ Run the tests for this project """
         ui.info(ui.green, "Testing", self.name, "...")
