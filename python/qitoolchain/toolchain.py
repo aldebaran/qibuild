@@ -104,10 +104,10 @@ class Package():
     def install(self, destdir, runtime=True):
         """ Install the package to a destination """
         if runtime:
-            qisys.sh.install(self.path, destdir,
-                filter_fun=qisys.sh.is_runtime)
+            return qisys.sh.install(self.path, destdir,
+                                    filter_fun=qisys.sh.is_runtime)
         else:
-            qisys.sh.install(self.path, destdir)
+            return qisys.sh.install(self.path, destdir)
 
     def __repr__(self):
         res = "<Package %s in %s"  % (self.name, self.path)
@@ -459,4 +459,3 @@ class Toolchain(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
