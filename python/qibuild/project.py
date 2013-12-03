@@ -17,6 +17,12 @@ import qibuild.test_runner
 import qitoolchain.toolchain
 import qitest.conf
 
+
+def read_install_manifest(filepath, rootdir):
+    with open(filepath, "r") as f:
+        return [filename.strip() for filename in f.readlines()]
+
+
 class BuildProject(object):
     def __init__(self, build_worktree, worktree_project):
         self.build_worktree = build_worktree
@@ -324,6 +330,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             useful for `qibuild deploy`
 
         """
+        installed = list()
         # DESTDIR=/tmp/foo and CMAKE_PREFIX="/usr/local" means
         # dest = /tmp/foo/usr/local
         destdir = qisys.sh.to_native_path(destdir)
@@ -350,14 +357,17 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             self.build(target="preinstall", num_jobs=num_jobs, env=build_env)
         if components:
             for component in components:
-                self._install_component(destdir, component)
+                files = self._install_component(destdir, component)
+                installed.extend(files)
         else:
             self.build(target="install", env=build_env)
-
+            manifest_path = os.path.join(self.build_directory, "install_manifest.txt")
+            installed.extend(read_install_manifest(manifest_path, destdir))
         self._install_qitest_json(destdir)
 
         if split_debug:
             self.split_debug(destdir)
+        return installed
 
     def _install_component(self, destdir, component):
         build_env = self.build_env.copy()
@@ -370,6 +380,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         ui.debug("Installing", component)
         qisys.command.call(["cmake"] + cmake_args, cwd=self.build_directory,
                             env=build_env)
+        manifest_path = os.path.join(self.build_directory, "install_manifest_%s.txt" % component)
+        installed = read_install_manifest(manifest_path, destdir)
+        return installed
 
     def _install_qitest_json(self, destdir):
         if not os.path.exists(self.qitest_json):

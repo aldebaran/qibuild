@@ -1,5 +1,6 @@
 import os
 import functools
+import operator
 
 from qisys import ui
 import qisys.sh
@@ -113,6 +114,7 @@ class CMakeBuilder(object):
     @need_configure
     def install(self, dest_dir, **kwargs):
         """ Install the projects and the packages to the dest_dir """
+        installed = list()
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         packages = self.deps_solver.get_dep_packages(self.projects, self.dep_types)
 
@@ -141,7 +143,8 @@ class CMakeBuilder(object):
             ui.info_count(i, len(packages),
                           ui.green, "Installing",
                           ui.blue, package.name)
-            package.install(real_dest, runtime=runtime_only)
+            files = package.install(real_dest, runtime=runtime_only)
+            installed.extend(files)
 
         print
         ui.info(ui.green, ":: ", "Installing projects")
@@ -149,7 +152,10 @@ class CMakeBuilder(object):
             ui.info_count(i, len(projects),
                           ui.green, "Installing",
                           ui.blue, project.name)
-            project.install(dest_dir, **kwargs)
+            files = project.install(dest_dir, **kwargs)
+            installed.extend(files)
+        return installed
+
 
     @need_configure
     def deploy(self, url, use_rsync=True, port=22, split_debug=False, with_tests=False):
@@ -160,11 +166,11 @@ class CMakeBuilder(object):
         dep_projects = self.deps_solver.get_dep_projects(self.projects,
                                                          self.dep_types)
         ui.info(ui.green, "The following projects")
-        for project in sorted(dep_projects, key=lambda project: project.name):
+        for project in sorted(dep_projects, key=operator.attrgetter("name")):
             ui.info(ui.green, " *", ui.blue, project.name)
         if dep_packages:
             ui.info(ui.green, "and the following packages")
-            for package in sorted(dep_packages, key=lambda package: package.name):
+            for package in sorted(dep_packages, key=operator.attrgetter("name")):
                 ui.info(" *", ui.blue, package.name)
         ui.info(ui.green, "will be deployed to", ui.blue, url)
 

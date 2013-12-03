@@ -153,6 +153,7 @@ def _handle_dirs(src, dest, root, directories, filter_fun, quiet):
     """ Helper function used by install()
 
     """
+    installed = list()
     rel_root = os.path.relpath(root, src)
     # To avoid filering './' stuff
     if rel_root == ".":
@@ -168,16 +169,19 @@ def _handle_dirs(src, dest, root, directories, filter_fun, quiet):
 
         if os.path.islink(dsrc):
             _copy_link(dsrc, ddest, quiet)
+            installed.append(directory)
         else:
             if os.path.lexists(ddest) and not os.path.isdir(ddest):
                 raise Exception("Expecting a directory but found a file: %s" % ddest)
             mkdir(ddest, recursive=True)
+        return installed
 
 
 def _handle_files(src, dest, root, files, filter_fun, quiet):
     """ Helper function used by install()
 
     """
+    installed = list()
     rel_root = os.path.relpath(root, src)
     if rel_root == ".":
         rel_root = ""
@@ -191,6 +195,8 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
         if os.path.islink(fsrc):
             mkdir(new_root, recursive=True)
             _copy_link(fsrc, fdest, quiet)
+            rel_path = os.path.join(rel_root, f)
+            installed.append(rel_path)
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
                 raise Exception("Expecting a file but found a directory: %s" % fdest)
@@ -201,6 +207,7 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
             # (following what `install` does, but not what `cp` does)
             rm(fdest)
             shutil.copy(fsrc, fdest)
+    return installed
 
 
 def install(src, dest, filter_fun=None, quiet=False):
@@ -224,8 +231,9 @@ def install(src, dest, filter_fun=None, quiet=False):
             |__ 4        -> 4.0
             |__ 4.0
 
-
+    Return the list of files installed (with relative paths)
     """
+    installed = list()
     # FIXME: add a `safe mode` ala install?
     if not os.path.exists(src):
         mess = "Could not install '%s' to '%s'\n" % (src, dest)
@@ -245,8 +253,9 @@ def install(src, dest, filter_fun=None, quiet=False):
         if src == dest:
             raise Exception("source and destination are the same directory")
         for (root, dirs, files) in os.walk(src):
-            _handle_dirs (src, dest, root, dirs,  filter_fun, quiet)
-            _handle_files(src, dest, root, files, filter_fun, quiet)
+            dirs = _handle_dirs (src, dest, root, dirs,  filter_fun, quiet)
+            files = _handle_files(src, dest, root, files, filter_fun, quiet)
+            installed.extend(files)
     else:
         # Emulate posix `install' behavior:
         # if dest is a dir, install in the directory, else
@@ -262,6 +271,8 @@ def install(src, dest, filter_fun=None, quiet=False):
         # (following what `install` does, but not what `cp` does)
         rm(dest)
         shutil.copy(src, dest)
+        installed.append(dest)
+    return installed
 
 
 def safe_copy(src, dest):

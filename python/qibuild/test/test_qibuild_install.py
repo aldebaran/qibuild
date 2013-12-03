@@ -135,3 +135,17 @@ def test_running_tests_after_install(qibuild_action, tmpdir):
     test_runner.cwd = dest.strpath
     ok = test_runner.run()
     assert ok
+
+
+def test_install_returns(qibuild_action, tmpdir):
+    installme = qibuild_action.add_test_project("installme")
+    dest = tmpdir.join("dest")
+    installme.configure()
+    installme.build()
+    installed = installme.install(dest.strpath)
+    assert set(installed) == {'/share/data_star/foo.dat',
+                             '/share/data_star/bar.dat',
+                             '/include/relative/foo/foo.h',
+                             '/include/relative/bar/bar.h',
+                             '/share/recurse/a_dir/b_dir/c_dir/d_file',
+                             '/share/recurse/a_dir/a_file'}
