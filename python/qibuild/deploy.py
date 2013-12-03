@@ -102,7 +102,7 @@ def parse_url(remote_url):
         ret["port"] = port
     return ret
 
-def deploy(local_directory, remote_url, port=22, use_rsync=True):
+def deploy(local_directory, remote_url, port=22, use_rsync=True, filelist=None):
     """Deploy a local directory to a remote url."""
     parts = parse_url(remote_url)
     if not parts.has_key("port"):
@@ -129,6 +129,8 @@ def deploy(local_directory, remote_url, port=22, use_rsync=True):
             "-e", "ssh -p %d" % parts["port"], # custom ssh port
             local_directory, parts["login"]+"@"+parts["url"]+":"+parts["dir"]
         ]
+        if filelist:
+            cmd.append("--files-from=%s" % filelist)
     else:
         # Default to scp
         cmd = ["scp", "-P", str(port), "-r", local_directory, remote_url]
