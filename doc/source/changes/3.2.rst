@@ -19,6 +19,13 @@ Command line
 qibuild
 --------
 
+* API break: ``--cmake-generator,-G`` option can now only be used
+  for ``qibuild configure``.
+
+  For the other build actions (``qibuild make``, ``qibuild install``, ...),
+  the CMake generator is now simply read from the CMake cache in the build
+  directory.
+
 * Faster ``qibuild deploy``: now using a single rsync call using a
   file list.
 
