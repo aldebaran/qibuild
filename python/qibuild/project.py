@@ -331,6 +331,8 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
         """
         installed = list()
+        if components is None:
+            components = list()
         # DESTDIR=/tmp/foo and CMAKE_PREFIX="/usr/local" means
         # dest = /tmp/foo/usr/local
         destdir = qisys.sh.to_native_path(destdir)
@@ -363,7 +365,8 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             self.build(target="install", env=build_env)
             manifest_path = os.path.join(self.build_directory, "install_manifest.txt")
             installed.extend(read_install_manifest(manifest_path, destdir))
-        self._install_qitest_json(destdir)
+        if "test" in components:
+            self._install_qitest_json(destdir)
 
         if split_debug:
             self.split_debug(destdir)
