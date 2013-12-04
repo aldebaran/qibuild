@@ -28,34 +28,18 @@ def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.project_parser(parser)
     qibuild.parsers.build_parser(parser)
-    group = parser.add_argument_group("deploy options")
-    group.add_argument("url", help="remote target url: user@hostname:path")
-    group.add_argument("--port", help="port", type=int, default=22)
+    qibuild.parsers.deploy_parser(parser)
+    group = parser.add_argument_group("qibuild specific deploy options")
     group.add_argument("--split-debug", action="store_true", dest="split_debug",
                        help="split debug symbols. Enable remote debuging")
-    group.add_argument("--url", dest="urls", action="append",
-                       help="deploy to each given url.")
     group.add_argument("--with-tests", dest="with_tests", action="store_true",
                        help="also deploy the tests")
     parser.set_defaults(with_tests=False)
 
 def do(args):
     """Main entry point"""
-    if args.urls:
-        urls = args.urls + [args.url]
-    else:
-        urls = [args.url]
 
-    for url in urls:
-        # make sure every url is valid first
-        parsed = qibuild.deploy.parse_url(url)
-        if not parsed:
-            mess = """ Could not parse {0} as a valid deploy url.
-Supported formats are:
-   * <user>@<host>:<deploy-dir>
-   * ssh://<user>@<host>:<port>/<deploy-dir>
-"""
-            raise Exception(mess.format(url))
+    urls = qibuild.parsers.get_deploy_urls(args)
 
     if args.with_tests:
         default_dep_types = ["runtime", "test"]
