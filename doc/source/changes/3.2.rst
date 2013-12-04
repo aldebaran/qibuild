@@ -15,20 +15,31 @@ Command line
   cd deploy
   qitest run qitest.json
 
-* Better handling of concurrency:
 
-  * ``ctrl-c`` can no longer cause deadlocks.
-  * ``qibuild test`` displays a summary even when it has been interrupted
-  * Python exceptions raised during tests no longer cause deadlocks.
+qibuild
+--------
+
+* Faster ``qibuild deploy``: now using a single rsync call using a
+  file list.
+
+* Show what is currently building in the title bar (linux only)
 
 * Better error message when CMake segfaults
 
-* cmake: check that headers and libs are consistent. (For instance, boost headers
-  found in ``/usr/include``, and boost libs in ``/path/to/toolchain/boost/lib``)
-
-
 * Sort projects and packages lists in qibuild deploy
 
+* ``qibuild test``:
+
+  * Now the same as ``qitest run <build>/qitest.json``
+  * ``ctrl-c`` can no longer cause deadlocks.
+  * Displays a summary even when it has been interrupted
+  * Python exceptions raised during tests no longer cause deadlocks.
+  * Tests are now run from ``<build>/sdk/bin`` by default.
+
+qitoolchain
+-----------
+
+* Fix ``qitoolchain set-default`` erasing profile settings
 
 qidoc
 -----
@@ -36,16 +47,15 @@ qidoc
 * Output where the doc has been built
 
 
-Packaging
-----------
-
-* Switch to ``setuptools``.
-
-  * Fixes using ``qidoc`` after using ``pip`` to install ``qibuild``
-  * Fixes using ``pip install qibuild`` on Windows
-
 qisrc
 -----
+
+* Faster ``qisrc sync``: only configures the projects we want to sync,
+  instead of all the projects in the worktree
+
+* ``qisrc foreach``: add ``-g,--group`` argument
+
+* ``qisrc grep`` : forward color options to ``git``
 
 * ``git.is_git``: optimize detection: does .git exist?
 
@@ -94,6 +104,8 @@ CMake
   * You cannot use ``ctest`` or ``make test`` to run the tests
   * The call to ``enable_testing()`` is no longer necessary
 
+* ``qi_add_test`` add ``NO_INSTALL``, ``WORKING_DIRECTORY`` and ``ENVIRONMENT`` options
+
 * ``qi_swig_java``: add ``OUTDIR`` parameter, used to specify where swig will
   generate data.
 
@@ -101,8 +113,11 @@ CMake
 
   * ``boostutils``: fix for cmake > 2.8.11
 
-qibuild make
-------------
+Packaging
+----------
 
-* Show what's currently building in the terminal title bar. Only Linux is
-  supported yet.
+* Switch to ``setuptools``.
+
+  * Fix using ``qidoc`` after using ``pip`` to install ``qibuild``
+  * Fix using ``pip install qibuild`` on Windows
+
