@@ -14,99 +14,38 @@
 
 include(qibuild/internal/tests)
 
-#! Create a new test that can be run by CTest or `qibuild test`
+#! Create a new test that can be run by ``qibuild test``
 #
 # Notes:
-#  * The resulting executable will not be installed
+#  * The test can be installed using ``qibuild install --with-tests``
 #  * The name of the test will always be the name of the target.
-#  * The test won't be built if BUILD_TESTS is OFF
-#
-# .. seealso::
-#
-#    * :ref:`qibuild-ctest`
+#  * The test won't be configured or built if QI_WITH_TESTS is OFF
 #
 # \arg:name the name of the test and the target
 # \group:SRC  sources of the test
 # \group:DEPENDS the dependencies of the test
 # \param:TIMEOUT the timeout of the test.
-# \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
+# \param:WORKING_DIRECTORY working directory used when runing the test:
+#                          default: ``<build>/sdk>/bin``
+# \flag: NIGHTLY: only compiled (and thus run) if QI_WITH_NIGHTLY_TESTS is ON
+# \flag: PERF: only compiled (and thus run) if QI_WITH_PERF_TESTS is ON
+#              It is assumed that the executable will understand an option
+#              named "--output <out.xml>" and generate such a file.
+#              You can for instance use the qiperf library for that.
 # \group:ARGUMENTS arguments to be passed to the executable
+# \group:ENVIRONMENT list of environment variables for the tests, in the form
+#                    "key1=value1;key2=value2"
 # \argn: source files (will be merged with the SRC group of arguments)
 function(qi_create_test name)
   qi_add_test(${name} ${name} ${ARGN})
 endfunction()
 
 
-#! This compiles and add a test using gtest that can be run by CTest or
-# `qibuild test`
-#
-# When running ctest, an XML xUnit file wiil be created in
-# ${CMAKE_SOURCE_DIR}/test-results/${test_name}.xml
-#
-# Notes:
-#
-#  * The test won't be built at all if GTest is not found.
-#  * The name of the test will always be the name of the target.
-#
-# .. seealso::
-#
-#    * :ref:`qibuild-ctest`
-#
-# \arg:name name of the test
-# \flag:NO_ADD_TEST Do not call add_test, just create the binary
-# \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
-# \argn: source files, like the SRC group, argn and SRC will be merged
-# \param:TIMEOUT The timeout of the test
-# \group:SRC Sources
-# \group:DEPENDS Dependencies to pass to qi_use_lib
-# \group:ARGUMENTS Arguments to pass to add_test (to your test program)
-#
-function(qi_create_gtest name)
-  qi_add_test(${name} ${name} GTEST_TEST ${ARGN})
-endfunction()
-
-#!
-# Create a perf test
-# It is assumed that the executable will understand an option
-# named "--output <out.xml>" and generate such a file.
-# You can for instance use the qiperf library for that.
-#
-# Notes:
-#  * The test won't be built if BUILD_PERF_TESTS is OFF
-#
-# \arg:name Name of the test. A target of this name will be created
-# \group:SRC Sources of the perf executable
-# \group:DEPENDS Dependencies to pass to qi_use_lib
-# \group:ARGUMENTS arguments to be passed to the executable
-#
-function(qi_create_perf_test name)
-  _qi_add_test_internal(${name} ${name} PERF_TEST ${ARGN})
-endfunction()
-
-
-#! Add a test using an existing binary
-#
-# * We look for the binary in sdk/bin, as a target, or an external
-#   package, and we know there is a``_d `` when using Visual Studio on debug
-# * We set a ``tests`` folder property
-#
-# This is a low-level function, you should rather use
-# :cmake:function:`qi_create_test` or :cmake:function:`qi_create_gtest` instead.
-#
-# \arg:test_name The name of the test
-# \arg:target_name The name of the binary to use. It can be a target name,
-#                  an absolute or relative path to an existing file,
-#                  or a package name providing a ${name}_EXECUTABLE variable.
-# \flag: NIGHTLY: only compiled (and thus run) if QI_NIGHTLY_TESTS is ON
-# \group:ARGUMENTS Arguments to be passed to the executable
-function(qi_add_test test_name target_name)
-  _qi_add_test_internal(${test_name} ${target_name} ${ARGN})
-endfunction()
-
 #! Add a test helper
-# Creat a binary that will not be run as a test, but rather used
+# Create a binary that will not be run as a test, but rather used
 # by an other test.
-# The binary will be deployed along with the actual tests.
+#
+# The helper can be installed along the proper tests using ``qibuild install --with-tests``
 function(qi_create_test_helper name)
   qi_create_bin(${name} NO_INSTALL ${ARGN})
   if(TARGET ${name})
@@ -115,4 +54,33 @@ function(qi_create_test_helper name)
             COMPONENT "test")
     set_target_properties(${name} PROPERTIES FOLDER tests)
   endif()
+endfunction()
+
+#! Add a test using an existing binary. Arguments are the same as
+#  :cmake:function:`qi_create_test`
+#
+# The ``target_name`` should match either:
+#   * a target
+#   * a binary found by ``find_program(${target_name})``
+#   * the name of a package defining ``${${target_name}_EXECUTABLE}}``
+#
+# This can be used for instance to create several tests with one target::
+#
+#      qi_create_test_helper(test_foo test_foo.cpp)
+#      qi_add_test(test_foo_one test_foo ARGUMENTS --one)
+#      qi_add_test(test_foo_two test_foo ARGUMENTS --two)
+#
+function(qi_add_test test_name target_name)
+  _qi_add_test_internal(${test_name} ${target_name} ${ARGN})
+endfunction()
+
+#! Same as :cmake:function:`qi_create_test`, excepts it adds a dependency
+# to the gtest libraries
+function(qi_create_gtest name)
+  qi_add_test(${name} ${name} GTEST_TEST ${ARGN})
+endfunction()
+
+#! Shortcut for :cmake:function:`qi_create_test(... PERF) <qi_create_test>`
+function(qi_create_perf_test name)
+  _qi_add_test_internal(${name} ${name} PERF_TEST ${ARGN})
 endfunction()

@@ -239,8 +239,8 @@ You do not need to read the `world-config.cmake` because you *know* the
 exported variables will always have the same name: `<target>_INCLUDE_DIRS` and `<target>_LIBRARIES`
 
 
-qibuild and CTest
-------------------
+qitest versus CTest
+--------------------
 
 
 See :ref:`qibuild-ctest`
