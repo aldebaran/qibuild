@@ -2,3 +2,4 @@ include etc/qibuild.sh
 include README.rst
 include doc/source/man/*.rst
 recursive-include python/qisrc/templates *
+recursive-include cmake/qibuild *
