@@ -167,7 +167,7 @@ class CMakeBuilder(AbstractBuilder):
 
 
     @need_configure
-    def deploy(self, url, use_rsync=True, port=22, split_debug=False, with_tests=False):
+    def deploy(self, url, use_rsync=True, split_debug=False, with_tests=False):
         """ Deploy the project and the packages it depends to a remote url """
 
         # Deploy packages: install all of them in the same temp dir, then
@@ -228,7 +228,7 @@ class CMakeBuilder(AbstractBuilder):
         with open(deploy_manifest, "a") as f:
             set_to_deploy = set(to_deploy)
             f.write("\n".join(set_to_deploy))
-        qibuild.deploy.deploy(deploy_dir, url, use_rsync=use_rsync, port=port,
+        qibuild.deploy.deploy(deploy_dir, url, use_rsync=use_rsync,
                               filelist=deploy_manifest)
 
         print

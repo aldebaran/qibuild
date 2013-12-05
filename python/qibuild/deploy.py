@@ -102,15 +102,16 @@ def parse_url(remote_url):
         ret["port"] = port
     return ret
 
-def deploy(local_directory, remote_url, port=22, use_rsync=True, filelist=None):
+def deploy(local_directory, remote_url, use_rsync=True, filelist=None):
     """Deploy a local directory to a remote url."""
     parts = parse_url(remote_url)
-    if not parts.has_key("port"):
-        parts["port"]=port
     # ensure destination directory exist before deploying data
     if len(remote_url.split(":")) > 1:
-        cmd = ["ssh", "-p", str(parts["port"]), parts["login"]+"@"+parts["url"], "mkdir", "-p",
-                parts["dir"]]
+        cmd = ["ssh"]
+        if parts.has_key("port"):
+            cmd.extend(["-p", str(parts["port"])])
+        cmd.extend([parts["login"]+"@"+parts["url"], "mkdir", "-p",
+                parts["dir"]])
         qisys.command.call(cmd)
     if use_rsync:
         # This is required for rsync to do the right thing,
@@ -125,10 +126,13 @@ def deploy(local_directory, remote_url, port=22, use_rsync=True, filelist=None):
             "--specials",
             "--progress", # print a progress bar
             "--checksum", # verify checksum instead of size and date
-            "--exclude=.debug/",
-            "-e", "ssh -p %d" % parts["port"], # custom ssh port
-            local_directory, parts["login"]+"@"+parts["url"]+":"+parts["dir"]
-        ]
+            "--exclude=.debug/"]
+        if parts.has_key("port"):
+            cmd.extend(["-e", "ssh -p %d" % parts["port"]]) # custom ssh port
+        else:
+            cmd.extend(["-e", "ssh"]) # custom ssh port
+        cmd.extend([local_directory, parts["login"]+"@"+parts["url"]+":"+parts["dir"]])
+
         if filelist:
             cmd.append("--files-from=%s" % filelist)
     else:
