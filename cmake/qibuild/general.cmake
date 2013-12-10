@@ -63,6 +63,17 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
   qi_persistent_set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  set(_default_debug_info ON)
+else()
+  set(_default_debug_info OFF)
+endif()
+
+option(QI_WITH_COVERAGE "Enable code coverage" OFF)
+option(QI_WITH_DEBUG_INFO "Default is to follow CMAKE_BUILD_TYPE"
+      ${_default_debug_info})
+option(QI_FORCE_32_BITS "Force 32bits build even when on 64bits" OFF)
+
 include("qibuild/python")
 include("qibuild/find")
 include("qibuild/flags")

@@ -42,11 +42,18 @@ def configure_parser(parser):
                       action="store_true",
                       help="run cmake in trace mode")
     group.add_argument("--coverage", dest="coverage",
-        action="store_true",
-        help="activate coverage support (gcc only)")
+                       action="store_true",
+                       help="activate coverage support (gcc only)")
+    group.add_argument("--32-bits", dest="force_32_bits",
+                       action="store_true", help="force 32 bits build")
+    group.add_argument("--with-debug-info", action="store_true", dest="debug_info",
+                        help="include debug information in binaries. Overrides --debug")
+    group.add_argument("--without-debug-info", action="store_false", dest="debug_info",
+                        help="remove debug information from binaries. Overrides --release")
+
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
                         werror=False, profiling=False,
-                        trace_cmake=False)
+                        trace_cmake=False, debug_info=None)
     if not parser.epilog:
         parser.epilog = ""
     parser.epilog += """
@@ -59,6 +66,7 @@ Note:
 def do(args):
     """Main entry point"""
 
+    # Convert 'helper' options into cmake flags
     if not args.cmake_flags:
         args.cmake_flags = list()
     if args.effective_cplusplus:
@@ -66,7 +74,14 @@ def do(args):
     if args.werror:
         args.cmake_flags.append("QI_WERROR=ON")
     if args.coverage:
-        args.cmake_flags.append("QI_COVERAGE=ON")
+        args.cmake_flags.append("QI_WITH_COVERAGE=ON")
+    # args.debug_info has 3 values: None (not set at all), True, False
+    if args.debug_info is True:
+        args.cmake_flags.append("QI_WITH_DEBUG_INFO=ON")
+    if args.debug_info is False:
+        args.cmake_flags.append("QI_WITH_DEBUG_INFO=OFF")
+    if args.force_32_bits:
+        args.cmake_flags.append("QI_FORCE_32_BITS=ON")
 
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
 
