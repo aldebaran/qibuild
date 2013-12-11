@@ -275,6 +275,7 @@ def check_output(*popenargs, **kwargs):
     ...              stderr=STDOUT)
     'ls: non_existent_file: No such file or directory\n'
     """
+    ui.debug("calling", *popenargs)
     cwd = kwargs.get('cwd')
     if sys.version_info <= (2, 7):
         if 'stdout' in kwargs:
@@ -294,6 +295,7 @@ def check_output(*popenargs, **kwargs):
         except subprocess.CalledProcessError as err:
             raise CommandFailedException(err.cmd, err.returncode,
                                          cwd=cwd, stdout=err.output)
+    ui.debug(output)
     return output
 
 
