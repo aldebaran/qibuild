@@ -7,7 +7,8 @@
 
 int foo()
 {
-  assert(false);
+  int *p = 0;
+  *p = 42;
   return 1;
 }
 
