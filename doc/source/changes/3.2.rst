@@ -26,6 +26,14 @@ qibuild
   the CMake generator is now simply read from the CMake cache in the build
   directory.
 
+* New configure options:
+
+  * ``--32bits`` : force 32bits build even on 64bits platform (linux only)
+  * ``--with-debug-info`` : force inclusion of debug symbols when building with ``--release``
+    (useful when using breakpad)
+  * ``--without-debug-info``: force exclusion of debug symbols when building with ``--debug``
+    (useful when making redistributable debug libraries for Visual Studio)
+
 * Faster ``qibuild deploy``: now using a single rsync call using a
   file list.
 
@@ -128,3 +136,7 @@ Packaging
   * Fix using ``qidoc`` after using ``pip`` to install ``qibuild``
   * Fix using ``pip install qibuild`` on Windows
 
+Contrib
+-------
+
+* Add a `colout <http://nojhan.github.io/colout/>`_ theme
