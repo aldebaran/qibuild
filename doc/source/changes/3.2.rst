@@ -51,6 +51,9 @@ qibuild
   * Python exceptions raised during tests no longer cause deadlocks.
   * Tests are now run from ``<build>/sdk/bin`` by default.
 
+* On Mac, ``.a`` files from packages are no longer installed when using
+  ``--runtime``
+
 qitoolchain
 -----------
 
