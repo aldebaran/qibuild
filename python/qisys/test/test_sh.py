@@ -4,6 +4,7 @@
 
 import os
 import stat
+import sys
 import pytest
 
 import qisys.sh
@@ -67,3 +68,10 @@ def test_copy_git_src(tmpdir):
     qisys.sh.copy_git_src(foo_src.strpath, dest.strpath)
     assert dest.join("a.txt").check(file=True)
     assert not dest.join("c.txt").check(file=True)
+
+def test_is_runtime():
+    assert qisys.sh.is_runtime("lib/libfoo.a") is False
+    assert qisys.sh.is_runtime("include/foo.h") is False
+    assert qisys.sh.is_runtime("lib/python2.7/Makefile") is True
+    if sys.platform == "darwin":
+        assert qisys.sh.is_runtime("lib/libfoo.dylib") is True

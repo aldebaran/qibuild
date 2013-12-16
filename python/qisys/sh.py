@@ -615,9 +615,9 @@ def is_runtime(filename):
         shared_lib_ext = ""
         if sys.platform.startswith("win"):
             shared_lib_ext = ".dll"
-        if sys.platform == "linux2":
+        if sys.platform.startswith("linux"):
             shared_lib_ext = ".so"
-        if sys.platform == "darwing":
+        if sys.platform == "darwin":
             shared_lib_ext = ".dylib"
         if shared_lib_ext in basename:
             return True
