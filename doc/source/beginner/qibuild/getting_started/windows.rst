@@ -66,25 +66,37 @@ Here is what a complete ``~/.config/.qi/qibuild.xml`` would look like to use Vis
 Then just open the ``.sln`` that will be generated in the build directory.
 
 
-For command line addicts (or people doing continuous integration who would like
-a better build output), you can also:
+If you want, you can also use an other generator than Visual Studio.
+You may build faster using an other generator, at the cost of not having an IDE
+to browse your source code.
 
-* Use ``<cmake_generator = "NMake Makefiles" />`` and use qibuild from the Visual
-  Studio command prompt.
+If you choose to do so, you should either:
 
-* Or, if you do not want to use the Visual Studio command prompt, you can
-  specify a ``.bat`` file to be ran by qibuild, like this
+* Run qibuild from the Visual Studio command prompt
+
+* Or specify a ``.bat`` file to be ran by qibuild, like this
+
 
 .. code-block:: xml
 
   <qibuild version="1">
     <defaults>
       <env bat_file="c:\Program Files\Microsoft Visual Studio 10\VC\vcvarsall.bat" />
-      <cmake generator = "NMake Makefiles" />
     </defaults>
   </qibuild>
 
 (the location of the ``.bat`` file depends on your setup)
+
+* Then, you can choose an other generator such as ``NMake Makefiles``, ``Jom`` or
+  ``Ninja``
+
+.. code-block:: xml
+
+  <qibuild version="1">
+    <defaults>
+      <cmake generator="Ninja" />
+   </defaults>
+  </qibuild>
 
 
 Configuring qiBuild for QtCreator
