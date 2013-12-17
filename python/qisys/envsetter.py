@@ -39,8 +39,10 @@ class EnvSetter():
     """
     # Note: always use .copy() when working with dict, else you end up
     # returning a *reference* to the directory ...
-    def __init__(self):
-        self._build_env = os.environ.copy()
+    def __init__(self, build_env=None):
+        if not build_env:
+            build_env = os.environ.copy()
+        self._build_env = build_env
 
     def get_build_env(self):
         """ Returns a dict containing the new environnment

@@ -194,21 +194,26 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         cmd[0] = executable
 
     def _update_test_env(self, test):
-        env = os.environ.copy()
+        build_env = os.environ.copy()
         if self.suite_runner.env:
-            env = self.suite_runner.env.copy()
+            build_env = self.suite_runner.env.copy()
         test_env = test.get("environment")
         if test_env:
-            env.update(test_env)
+            build_env.update(test_env)
+        envsetter = qisys.envsetter.EnvSetter(build_env=build_env)
         if ui.config_color(sys.stdout):
-            env["GTEST_COLOR"] = "yes"
+            envsetter.set_env_var("GTEST_COLOR", "yes")
+        sdk_dir = self.project.sdk_directory
         if os.name == 'nt':
-            env["PATH"] = os.path.join(self.project.sdk_directory, "bin") + ";" + \
-                          env["PATH"]
-        if os.name == "darwin":
-            env["DYLD_LIBRARY_PATH"] = os.path.join(self.project.sdk_directory, "lib") + ":" + \
-                          env["DYLD_LIBRARY_PATH"]
-        test["env"] = env
+            bin_dir = os.path.join(sdk_dir, "bin")
+            envsetter.prepend_to_path(bin_dir)
+        if sys.platform == "darwin":
+            lib_dir = os.path.join(sdk_dir, "lib")
+            envsetter.prepend_directory_to_variable(lib_dir, "DYLD_LIBRARY_PATH")
+            envsetter.prepend_directory_to_variable(sdk_dir, "DYLD_FRAMEWORK_PATH")
+        env = envsetter.get_build_env()
+        test["env"] =  env
+
         # Quick hack:
         gtest_repeat = env.get("GTEST_REPEAT", "1")
         test["timeout"] = test["timeout"] * int(gtest_repeat)

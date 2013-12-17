@@ -46,3 +46,4 @@ class TestProject(object):
     def __init__(self, qitest_json):
         self.qitest_json = qitest_json
         self.build_directory = os.path.dirname(qitest_json)
+        self.sdk_directory = os.path.join(self.build_directory)
