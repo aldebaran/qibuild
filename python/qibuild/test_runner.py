@@ -283,7 +283,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         test_suite.set("disabled", "0")
         test_suite.set("errors", "0")
         test_suite.set("time", str(res.time))
-        test_case = etree.SubElement(test_suite, "test_case")
+        test_case = etree.SubElement(test_suite, "testcase")
         test_case.set("name", test["name"])
         test_case.set("status", "run")
         if not res.ok:
