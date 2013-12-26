@@ -29,8 +29,7 @@ def test_behind(qisrc_action, git_server, record_messages):
     foo_git = qisrc.git.Git(foo.path)
     foo_git.fetch()
     qisrc_action("status")
-    behind = record_messages.find("commits")
-    assert "-1" in behind
+    assert record_messages.find("foo : master tracking -1")
 
 def test_wrong_branch(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")

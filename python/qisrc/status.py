@@ -88,7 +88,7 @@ def check_state(project, untracked):
 
     return state_project
 
-def _print_behind_ahead(branch, tracking, behind, ahead):
+def _print_behind_ahead(behind, ahead):
     numcommits = ""
     if behind:
        numcommits += "-" + str(behind)
@@ -96,29 +96,37 @@ def _print_behind_ahead(branch, tracking, behind, ahead):
        numcommits += "/"
     if ahead:
        numcommits += "+" + str(ahead)
-    ui.info(ui.bold, "Your branch", ui.green, branch, ui.reset, ui.bold, "is",
-            numcommits, "commits from branch", ui.blue, tracking)
+    return numcommits
 
 def print_state(project, max_len):
     """Print a state project."""
     #shortpath = os.path.relpath(project.path, qiwt.root)
 
     if project.valid:
-        ui.info(ui.green, "*", ui.reset,
-                ui.blue, project.project.src.ljust(max_len), ui.reset,
-                ui.green, ":", project.current_branch,
-                    "tracking", project.tracking)
         if project.ahead or project.behind:
-            _print_behind_ahead(project.current_branch, project.tracking, project.behind, project.ahead)
+            numcommits = _print_behind_ahead(project.behind, project.ahead)
+            ui.info(ui.green, "*", ui.reset,
+                    ui.blue, project.project.src.ljust(max_len), ui.reset,
+                    ui.green, ":", project.current_branch,
+                        "tracking", ui.reset, ui.bold, ui.red, numcommits, ui.green, project.tracking)
+        else:
+            ui.info(ui.green, "*", ui.reset,
+                    ui.blue, project.project.src.ljust(max_len), ui.reset,
+                    ui.green, ":", project.current_branch,
+                        "tracking", project.tracking)
         if project.ahead_manifest or project.behind_manifest:
-            _print_behind_ahead(project.current_branch, project.manifest_branch, project.behind_manifest, project.ahead_manifest)
+            numcommits = _print_behind_ahead(project.behind_manifest, project.ahead_manifest)
+            ui.info(ui.bold, "Your branch", ui.green, project.current_branch,
+                    ui.reset, ui.bold, "is", numcommits, "commits from branch",
+                    ui.blue, project.manifest_branch)
 
 
     if not project.sync_and_clean:
         if project.status is not None:
             nlines = [ x[:3] + project.project.src + "/"
                     + x[3:] for x in project.status ]
-            print "\n".join(nlines)
+            if nlines:
+                print "\n".join(nlines)
 
 def print_incorrect_projs(projects, max_len):
     """Print list of projets which are not on correct branch."""
