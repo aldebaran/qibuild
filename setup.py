@@ -22,7 +22,8 @@ data_files = get_qibuild_cmake_files()
 
 setup(name="qibuild",
       version="3.2.25.12",
-      description="Compilation of C++ projects made easy!",
+      description="The meta build framework",
+      url="https://community.aldebaran-robotics.com/doc/qibuild/",
       author="Aldebaran Robotics",
       author_email="dmerejkowsky@aldebaran-robotics.com",
       py_modules=['qicd'],
