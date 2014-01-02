@@ -1,0 +1,20 @@
+3.2.1
+=====
+
+Packaging
+----------
+
+* Fix URL and description in ``setup.py``
+* Include COPYING file in source distribution
+
+qisrc
+-----
+
+* ``qisrc status``: better output
+
+qitest
+------
+
+* Set ``DYLD_*`` variables on mac
+* Fix gtest XML syntax
+
