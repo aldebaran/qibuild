@@ -105,8 +105,7 @@ def test_examples(doc_worktree, tmpdir):
 def test_doxydeps(doc_worktree, tmpdir):
     sphinx_proj = doc_worktree.add_test_project("libworld-sphinx")
     doxy_proj   = doc_worktree.add_test_project("libworld")
-    doc_builder = qidoc.builder.DocBuilder(doc_worktree)
-    doc_builder.base_project = sphinx_proj
+    doc_builder = qidoc.builder.DocBuilder(doc_worktree, "libworld-sphinx")
     doc_builder.configure()
     doc_builder.build()
     link =  find_link(sphinx_proj.index_html, "answer()")
@@ -116,14 +115,25 @@ def test_doxydeps(doc_worktree, tmpdir):
     assert not os.path.isabs(link)
     assert tmpdir.join(link).check(file=True)
 
+def test_install_twice(doc_worktree, tmpdir):
+    world_proj = doc_worktree.add_test_project("world")
+    hello_proj = doc_worktree.add_test_project("hello")
+    doc_builder = qidoc.builder.DocBuilder(doc_worktree, "hello")
+    doc_builder.werror = True
+    dest1 = tmpdir.join("dest1")
+    doc_builder.install(dest1.strpath)
+    assert dest1.join("ref", "world", "index.html").check(file=True)
+    dest2 = tmpdir.join("dest2")
+    doc_builder.install(dest2.strpath)
+    assert dest2.join("ref", "world", "index.html").check(file=True)
+
 # Intersphinx randomly fails here
 @pytest.mark.skipif("True")
 def test_intersphinx(doc_worktree, tmpdir):
     world_proj = doc_worktree.add_test_project("world")
     hello_proj = doc_worktree.add_test_project("hello")
-    doc_builder = qidoc.builder.DocBuilder(doc_worktree)
+    doc_builder = qidoc.builder.DocBuilder(doc_worktree, "hello")
     doc_builder.werror = True
-    doc_builder.base_project = hello_proj
     doc_builder.configure()
     doc_builder.build()
     link =  find_link(hello_proj.index_html, "World intro")

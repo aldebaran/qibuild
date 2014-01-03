@@ -18,8 +18,27 @@ class DocProject(object):
         if not dest:
             dest = self.name
         self.depends = list()
-        self.dest = dest
         self.prebuild_script = None
+        self._dest = dest
+        self._is_base_project = False
+
+    @property
+    def is_base_project(self):
+        return self._is_base_project
+
+    @is_base_project.setter
+    def is_base_project(self, value):
+        self._is_base_project = value
+        if self._is_base_project:
+            self._dest = "."
+
+    @property
+    def dest(self):
+        return self._dest
+
+    @dest.setter
+    def dest(self, value):
+        self._dest = value
 
     @abc.abstractmethod
     def configure(self, **kwargs):

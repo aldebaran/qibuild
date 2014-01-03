@@ -58,8 +58,7 @@ def test_ovewrite_name(doc_worktree):
 def test_depends_on_doxygen(doc_worktree, tmpdir):
     libworld_proj = doc_worktree.add_test_project("libworld")
     libhello_proj = doc_worktree.add_test_project("libhello")
-    doc_builder = qidoc.builder.DocBuilder(doc_worktree)
-    doc_builder.base_project = libhello_proj
+    doc_builder = qidoc.builder.DocBuilder(doc_worktree, "libhello")
     doc_builder.configure()
     doc_builder.build()
     hello_index = libhello_proj.index_html

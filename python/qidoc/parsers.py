@@ -38,7 +38,7 @@ def get_doc_builder(args):
     doc_worktree = get_doc_worktree(args)
     doc_project = get_one_doc_project(doc_worktree, args)
     doc_builder = qidoc.builder.DocBuilder(doc_worktree)
-    doc_builder.base_project = doc_project
+    doc_builder.set_base_project(doc_project.name)
     doc_builder.single = vars(args).get("single", False)
     version = vars(args).get("version")
     if not version:

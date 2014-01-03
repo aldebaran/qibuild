@@ -15,15 +15,25 @@ class DocBuilder(object):
     directly from the build dir.
 
     """
-    def __init__(self, doc_worktree):
+    def __init__(self, doc_worktree, base_project_name=None):
         self.doc_worktree = doc_worktree
         self.single = False
         self.deps_solver = None
-        self.base_project = None
         self.version = "latest"
         self.hosted = True
         self.build_type = ""
         self.werror = False
+        self._base_project = None
+        if base_project_name:
+            self.set_base_project(base_project_name)
+
+    @property
+    def base_project(self):
+        return self._base_project
+
+    def set_base_project(self, name):
+        self._base_project = self.doc_worktree.get_doc_project(name, raises=True)
+        self._base_project.is_base_project = True
 
     def configure(self):
         """ Configure the projects in the right order
@@ -57,11 +67,7 @@ class DocBuilder(object):
         """
         projects = self.get_dep_projects()
         for i, project in enumerate(projects):
-            if i == len(projects) - 1:
-                real_dest = destdir
-            else:
-                real_dest = os.path.join(destdir, project.dest)
-            project.dest = real_dest
+            real_dest = os.path.join(destdir, project.dest)
             ui.info_count(i, len(projects),
                           ui.green, "Installing",
                           ui.blue, project.name,
