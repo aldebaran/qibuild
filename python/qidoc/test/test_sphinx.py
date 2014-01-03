@@ -116,7 +116,7 @@ def test_doxydeps(doc_worktree, tmpdir):
     assert not os.path.isabs(link)
     assert tmpdir.join(link).check(file=True)
 
-# "ntersphinx randomly fails here
+# Intersphinx randomly fails here
 @pytest.mark.skipif("True")
 def test_intersphinx(doc_worktree, tmpdir):
     world_proj = doc_worktree.add_test_project("world")
