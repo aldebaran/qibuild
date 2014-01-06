@@ -9,7 +9,7 @@ Examples:
   qisrc manifest --add my_manifest git@example/manifest.git
 
   # change the groups used by this manifest
-  qisrc manifest my_manifest --groups my_group
+  qisrc manifest my_manifest --group my_group
 
   # checkt that a manifest is correct before pushing it:
   qisrc manifest --check manifest_name /path/to/manifest.xml
