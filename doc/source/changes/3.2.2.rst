@@ -1,0 +1,8 @@
+v3.2.2
+======
+
+qidoc
+-----
+
+* Fix bug when installing documentation twice into two different
+  locations. (Reported by Atlas)
