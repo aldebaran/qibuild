@@ -224,6 +224,12 @@ class CMakeBuilder(AbstractBuilder):
             to_deploy.extend(installed)
             if split_debug:
                 project.split_debug(deploy_dir)
+        # Add debugging scripts
+        for project in self.projects:
+            scripts = qibuild.deploy.generate_debug_scripts(self, deploy_dir,
+                                                            project.name, url)
+            to_deploy.extend(scripts)
+
         # Write the list of files to be deployed
         with open(deploy_manifest, "a") as f:
             set_to_deploy = set(to_deploy)
@@ -232,8 +238,6 @@ class CMakeBuilder(AbstractBuilder):
                               filelist=deploy_manifest)
 
         print
-        for project in self.projects:
-            qibuild.deploy.generate_debug_scripts(self, project.name, url)
 
 class NotConfigured(Exception):
     def __init__(self, project):

@@ -137,11 +137,13 @@ def deploy(local_directory, remote_url, use_rsync=True, filelist=None):
             cmd.append("--files-from=%s" % filelist)
     else:
         # Default to scp
-        cmd = ["scp", "-P", str(port), "-r", local_directory, remote_url]
+        cmd = ["scp", "-r", local_directory, remote_url]
+        if parts.has_key("port"):
+            cmd.extend(["-p", str(parts["port"])])
     qisys.command.call(cmd)
 
 def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_address=""):
-    """ generate a script that connect a local gdb to a gdbserver """
+    """ generate a script that connects a local gdb to a gdbserver """
     source_file = os.path.abspath(os.path.join(dest, "setup.gdb"))
     with open(source_file, "w+") as f:
         f.write(FILE_SETUP_GDB % { 'sysroot'            : sysroot,
@@ -151,6 +153,7 @@ def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_a
         f.write(FILE_SETUP_TARGET_GDB % { 'source_file'        : source_file,
                                           'remote_gdb_address' : remote_gdb_address
                                         })
+    return ["setup_target.gdb", "setup.gdb"]
 
 
 def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir, port):
@@ -165,7 +168,7 @@ def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir, po
                                              'gdb': gdb,
                                              'port': port})
     os.chmod(remote_gdb_script_path, 0755)
-    return remote_gdb_script_path
+    return [os.path.basename(remote_gdb_script_path)]
 
 def _get_subfolder(directory):
     res = list()
@@ -195,15 +198,11 @@ def _generate_solib_search_path(cmake_builder, project_name):
     # Idiom to sort an iterable preserving order
     return list(OrderedDict.fromkeys(res))
 
-def generate_debug_scripts(cmake_builder, project_name, url, port=22):
+def generate_debug_scripts(cmake_builder, deploy_dir, project_name, url, port=22):
     """ generate all scripts needed for debug """
-    # FIXME: rewrite this to support several urls
-    return
-    (remote, server, remote_directory) = qibuild.deploy.parse_url(url)
-
-    build_worktree = cmake_builder.build_worktree
-    project = build_worktree.get_build_project(project_name)
-    destdir = os.path.join(project.build_directory, "deploy")
+    parts = qibuild.deploy.parse_url(url)
+    server = parts["url"]
+    remote_directory = parts["dir"]
 
     solib_search_path = _generate_solib_search_path(cmake_builder, project_name)
     sysroot = None
@@ -232,12 +231,15 @@ def generate_debug_scripts(cmake_builder, project_name, url, port=22):
         return None
     if toolchain:
         sysroot=toolchain.get_sysroot()
-    _generate_setup_gdb(destdir, sysroot=sysroot,
-                        solib_search_path=solib_search_path,
-                        remote_gdb_address="%s:2159" % server)
-    gdb_script = _generate_run_gdbserver_binary(destdir, gdb=gdb, gdb_listen=":2159",
-                                                remote=remote, port=port,
+
+    to_deploy = list()
+    setup_gdb = _generate_setup_gdb(deploy_dir, sysroot=sysroot,
+                                    solib_search_path=solib_search_path,
+                                    remote_gdb_address="%s:2159" % server)
+    gdb_script = _generate_run_gdbserver_binary(deploy_dir, gdb=gdb, gdb_listen=":2159",
+                                                remote=server, port=port,
                                                 remote_dir=remote_directory)
 
     ui.info(message)
-    return gdb_script
+    to_deploy = setup_gdb + gdb_script
+    return to_deploy
