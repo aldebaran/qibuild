@@ -120,10 +120,6 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         res = qitest.result.TestResult(test)
         self._update_test(test)
         cmd = test["cmd"]
-        if not os.path.exists(cmd[0]):
-            res.ok = False
-            res.message = (ui.red, cmd[0], "no such file or directory")
-            return res
         timeout = test["timeout"]
         env = test["env"]
         cwd = test["working_directory"]
@@ -220,9 +216,13 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
     def _update_test_cwd(self, test):
         cwd = self.suite_runner.cwd
-        test["working_directory"] = test.get("working_directory", cwd)
+        if test.get("working_directory") is None:
+            test["working_directory"] = cwd
+        print test["working_directory"]
 
     def _with_valgrind(self, test):
+        if not qisys.command.find_program("valgrind"):
+            raise Exception("valgrind was not found on the system")
         cwd = test["working_directory"]
         self.valgrind_log = os.path.join(cwd, test["name"] + "_valgrind.log")
         test["timeout"] = test["timeout"] * 10
@@ -236,6 +236,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         test["cmd"] = ["taskset"] + taskset_opts + test["cmd"]
 
     def _post_run(self, res, test):
+        if self.suite_runner.valgrind:
+            parse_valgrind(self.valgrind_log, res)
         if not res.ok:
             # do not trust generated files:
             qisys.sh.rm(self.perf_out)
@@ -322,3 +324,28 @@ def get_cpu_list(total_cpus, num_cpus_per_test, worker_index):
     cpu_list = range(i, i + num_cpus_per_test)
     cpu_list = [i % total_cpus for i in cpu_list]
     return cpu_list
+
+
+def parse_valgrind(valgrind_log, res):
+    """ Parse valgrind logs and extract interesting errors. """
+    message = ""
+    leak_fd_regex      = re.compile("==\d+== FILE DESCRIPTORS: (\d+)")
+    invalid_read_regex = re.compile("==\d+== Invalid read of size (\d+)")
+    with open(valgrind_log, "r") as f:
+        lines = f.readlines()
+
+    for l in lines:
+        res.out += l
+        r = leak_fd_regex.search(l)
+        if r:
+            fdopen = int(r.group(1))
+            # 4: in/out/err + valgrind_log
+            if fdopen > 4:
+                res.ok = False
+                message += "Error file descriptor leaks: " + str(fdopen - 4) + "\n"
+            continue
+        r = invalid_read_regex.search(l)
+        if r:
+            res.ok = False
+            message += "Invalid read " + r.group(1) + "\n"
+    ui.info(ui.red, message)

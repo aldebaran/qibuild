@@ -15,4 +15,5 @@ qi_create_test(encoding encoding.cpp)
 qi_create_test(nightly nightly.cpp NIGHTLY)
 qi_create_test(env env.cpp ENVIRONMENT
   "FOO=BAR;SPAM=EGGS")
+qi_create_test(fdleak fdleak.cpp)
 qi_create_perf_test(perf perf.cpp PERF)

@@ -38,6 +38,19 @@ def test_various_outcomes(qibuild_action, record_messages):
     with open(result, "r") as f:
         assert len(f.read()) < 17000
 
+    if qisys.command.find_program("valgrind"):
+        # Test one file descriptor leak with --valgrind
+        record_messages.reset()
+        rc = qibuild_action("test", "testme", "-k", "fdleak","--valgrind", retcode=True)
+        assert record_messages.find("file descriptor leaks: 1")
+        assert rc == 1
+
+        # Test for false positives with --valgrind
+        record_messages.reset()
+        rc = qibuild_action("test", "testme", "-k", "ok","--valgrind", retcode=True)
+        assert not record_messages.find("file descriptor leaks")
+        assert rc == 0
+
     rc = qibuild_action("test", "testme", "-k", "encoding", retcode=True)
     result_dir = get_result_dir()
     assert "encoding.xml" in os.listdir(result_dir)
