@@ -2,7 +2,7 @@ function(_qi_add_test_internal test_name target_name)
   cmake_parse_arguments(ARG
     "NO_INSTALL;NO_ADD_TEST;NIGHTLY;PERF_TEST;GTEST_TEST"
     "TIMEOUT;WORKING_DIRECTORY"
-    "SRC;DEPENDS;ARGUMENTS;ENVIRONMENT" ${ARGN})
+    "SRC;DEPENDS;SUBMODULE;ARGUMENTS;ENVIRONMENT" ${ARGN})
 
   set(_srcs ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
 
@@ -39,12 +39,13 @@ function(_qi_add_test_internal test_name target_name)
 
   if(_srcs)
     set(_deps ${ARG_DEPENDS})
+    set(_submodules ${ARG_SUBMODULE})
     if(ARG_GTEST_TEST)
       list(APPEND _deps GTEST GTEST_MAIN)
     endif()
     # Using NO_INSTALL because we don't want to be in the 'runtime'
     # component like the other binaries
-    qi_create_bin(${target_name} SRC ${_srcs} DEPENDS ${_deps} NO_INSTALL)
+    qi_create_bin(${target_name} SRC ${_srcs} DEPENDS ${_deps} SUBMODULE ${_submodules} NO_INSTALL)
   endif()
 
   # Validate target_name. We expect one of:
