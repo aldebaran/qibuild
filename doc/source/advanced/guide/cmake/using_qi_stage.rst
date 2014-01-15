@@ -30,8 +30,8 @@ how to fix it.
 Using qi_stage_lib with custom DEPENDS
 ++++++++++++++++++++++++++++++++++++++
 
-Let us assume you have a library named 'bar', depending on a private library named
-'foo'.
+Let us assume you have a library named 'bar', depending privately on a library
+named 'foo' and publicly on boost chrono.
 
 Your CMake code may look like this:
 
@@ -41,26 +41,28 @@ Your CMake code may look like this:
    qi_stage_lib(bar)
 
    qi_create_lib(foo foo/foo.hpp foo/foo.cpp)
-   qi_use_lib(foo bar)
+   qi_use_lib(foo bar boost_chrono)
    qi_stage_lib(foo)
 
 
 By default, the generated ``foo-config.cmake`` file will contain
-``FOO_DEPENDS=bar``, because of the call to :cmake:function:`qi_use_lib`
+``FOO_DEPENDS=bar;boost_chrono;boost_system``, thanks to the call to
+:cmake:function:`qi_use_lib` and because boost chrono itself depends on
+boost system.
 
 But if you really want to hide the ``bar`` dependency, you may build a package
 for other people to use where ``bar`` is not even installed.
 
 (The topic of private libraries is covered in the :ref:`qibuild-private-lib` section)
 
-So here you must make sure that ``FOO_DEPENDS`` is empty in the generated
-``foo-config.cmake`` file.
+So here you must make sure that the generated ``foo-config.cmake`` file does
+not list bar in ``FOO_DEPENDS``.
 
 To do this, you should set the ``DEPENDS`` argument of :cmake:function`qi_stage_lib`, like this:
 
 .. code-block:: cmake
 
-   qi_stage_lib(foo DEPENDS "")
+   qi_stage_lib(foo DEPENDS "boost_chrono;${BOOST_CHRONO_DEPENDS}")
 
 
 Using qi_stage_lib with INCLUDE_DIRS

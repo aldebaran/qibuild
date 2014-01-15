@@ -22,6 +22,8 @@ include(qibuild/internal/uselib)
 # \group:DEPENDS if not given, ${TARGET}_DEPENDS will be guessed from
 #                the previous calls to qi_use_lib().
 #                Use this (whith care!) to override this behavior.
+#                One should list all the (public) "direct" dependencies *and*
+#                their (public) dependencies.
 # \group:INCLUDE_DIRS if not given, ${TARGET}_INCLUDE_DIRS  will be
 #                 guessed from the previous calls to
 #                 include_directories()
@@ -57,6 +59,8 @@ endfunction()
 # \group:DEPENDS if not given, ${TARGET}_DEPENDS will be guessed from
 #                the previous calls to qi_use_lib().
 #                Use this (whith care!) to override this behavior.
+#                One should list all the (public) "direct" dependencies *and*
+#                their (public) dependencies.
 # \group:INCLUDE_DIRS if not given, ${TARGET}_INCLUDE_DIRS  will be
 #                 guessed from the previous calls to
 #                 include_directories()
