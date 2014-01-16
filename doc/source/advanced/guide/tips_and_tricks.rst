@@ -130,7 +130,7 @@ use :cmake:function:`qi_sanitize_compile_flags`
    find_package(qibuild)
    qi_sanitize_compile_flags()
 
-This will triggers compile warnings for all platform (cl.exe and gcc.exe)
+This will triggers compile warnings for all platforms (cl.exe and gcc.exe)
 
 You can then use
 

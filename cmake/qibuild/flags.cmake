@@ -21,8 +21,6 @@
 #       for shared libraries.
 #       Note that in this case, you should use qi/macro.hpp
 #       to export the symbols of your library.
-
-
 function(qi_sanitize_compile_flags)
   cmake_parse_arguments(ARGS "HIDDEN_SYMBOLS" "" "" ${ARGN})
   # cl.exe :

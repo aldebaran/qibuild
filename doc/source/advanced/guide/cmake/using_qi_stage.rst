@@ -58,7 +58,7 @@ for other people to use where ``bar`` is not even installed.
 So here you must make sure that the generated ``foo-config.cmake`` file does
 not list bar in ``FOO_DEPENDS``.
 
-To do this, you should set the ``DEPENDS`` argument of :cmake:function`qi_stage_lib`, like this:
+To do this, you should set the ``DEPENDS`` argument of :cmake:function:`qi_stage_lib`, like this:
 
 .. code-block:: cmake
 
