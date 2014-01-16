@@ -34,7 +34,6 @@ function(_qi_add_test_internal test_name target_name)
   endif()
 
   if(_should_return)
-    qi_persistent_set(QI_${target_name}_TARGET_DISABLED TRUE)
     return()
   endif()
 

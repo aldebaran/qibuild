@@ -233,18 +233,9 @@ endfunction()
 #       from 3rd party headers.
 #
 function(qi_use_lib name)
-  if(QI_${name}_TARGET_DISABLED)
-    qi_warning("When calling qi_use_lib(${name})
-
-    This target is disabled, ignoring this call
-    ")
-    return()
-  endif()
   if(NOT TARGET "${name}")
     qi_error("When calling qi_use_lib(${name})
     No such target: ${name}
-    Make sure you call qi_use_lib after qi_create_bin or
-    qi_create_lib
     ")
     return()
   endif()
