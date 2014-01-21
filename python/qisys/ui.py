@@ -115,20 +115,22 @@ def config_color(fp):
 
 _enable_xterm_title = None
 
-def update_title(mystr):
+def update_title(mystr, fp):
     global _enable_xterm_title
     if _enable_xterm_title is None:
-        legal_terms = ["xterm", "xterm-color", "Eterm", "aterm", "rxvt", "screen",
-            "kterm", "rxvt-unicode", "gnome", "interix"]
-        _enable_xterm_title = sys.stdout.isatty() and \
+        legal_terms = ["xterm", "xterm-color", "Eterm", "aterm", "rxvt",
+                "screen", "kterm", "rxvt-unicode", "gnome", "interix"]
+        # assume that if we want color, we are in a terminal and we also want
+        # title
+        _enable_xterm_title = config_color(fp) and \
             'TERM' in os.environ and \
             os.environ['TERM'] in legal_terms
 
     if _enable_xterm_title:
         mystr = '\x1b]0;%s\x07' % mystr
 
-        sys.stdout.write(mystr)
-        sys.stdout.flush()
+        fp.write(mystr)
+        fp.flush()
 
 def _msg(*tokens, **kwargs):
     """ Helper method for error, warning, info, debug
@@ -171,9 +173,8 @@ def _msg(*tokens, **kwargs):
     else:
         fp.write(stringres)
         fp.flush()
-    # assume that if we want color, we are in a terminal and we also want title
     if kwargs.get("update_title", False):
-        update_title(stringnc)
+        update_title(stringnc, fp)
 
 def error(*tokens, **kwargs):
     """ Print an error message """
