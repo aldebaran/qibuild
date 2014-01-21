@@ -47,7 +47,7 @@ equivalent with::
 Using the git repository
 -------------------------
 
-Create a `virtualenv <https://pypi.python.org/pypi/virtualenv>`_ and use
+Create a `virtualenv <https://www.virtualenv.org/en/latest/>`_ and use
 the ``--editable`` option of pip::
 
   virtualenv qibuild-env
