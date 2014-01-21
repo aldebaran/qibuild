@@ -154,7 +154,8 @@ def guess_emails(git, reviewers):
             reviewers[idx] = reviewer + "@" + domain_name
     return reviewers
 
-def push(project,  branch, bypass_review=False, dry_run=False, reviewers=None):
+def push(project,  branch, bypass_review=False, dry_run=False,
+         reviewers=None, topic=None):
     """ Push the changes for review.
 
     Unless review is False, in this case, simply update
@@ -173,7 +174,10 @@ def push(project,  branch, bypass_review=False, dry_run=False, reviewers=None):
         args.append("%s:%s" % (branch, branch))
     else:
         ui.info("Pushing code to", review_remote.name, "for review.")
-        args.append("%s:refs/for/%s" % (branch, branch))
+        remote_ref = "refs/for/%s" % branch
+        if topic:
+            remote_ref = "%s/%s" % (remote_ref, topic)
+        args.append("%s:%s" % (branch, remote_ref))
         if reviewers:
             reviewers = guess_emails(git, reviewers)
             receive_pack = "git receive-pack"

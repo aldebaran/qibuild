@@ -22,6 +22,8 @@ def configure_parser(parser):
     parser.add_argument("--cc", "--reviewers", action="append", dest="reviewers",
         help="Add reviewers (full email or just username "
              "if the domain is the same as yours)")
+    parser.add_argument("-t", "--topic", dest="topic",
+        help="Add a topic to your code review. Useful for grouping patches together")
     parser.set_defaults(review=True, dry_run=False)
 
 
@@ -38,7 +40,8 @@ def do(args):
         if git_project.review:
             qisrc.review.push(git_project, current_branch,
                               bypass_review=(not args.review),
-                              dry_run=args.dry_run, reviewers=args.reviewers)
+                              dry_run=args.dry_run, reviewers=args.reviewers,
+                              topic=args.topic)
         else:
             if args.dry_run:
                 git.push("-n")
