@@ -22,8 +22,11 @@ def log_parser(parser):
         help="Add timestamps before each log message")
     group.add_argument("--color", choices=["always", "never", "auto"],
         help="Colorize output, defaults to 'auto'")
+    group.add_argument("--title", choices=["always", "never", "auto"],
+        help="Update terminal title, defaults to 'auto'")
 
     parser.set_defaults(verbose=False, quiet=False, color="auto")
+    parser.set_defaults(verbose=False, quiet=False, title="auto")
 
 def default_parser(parser):
     """Parser settings for every action."""

@@ -82,6 +82,7 @@ CONFIG = {
     "verbose": os.environ.get("VERBOSE"),
     "quiet": False,
     "color": "auto",
+    "title": "auto",
     "timestamp": False,
     "interactive": True,
     "record": False  # used for testing
@@ -96,10 +97,24 @@ def configure_logging(args):
     if not verbose:
         verbose = args.verbose
     CONFIG["color"] = args.color
+    CONFIG["title"] = args.title
     CONFIG["verbose"] = verbose
     CONFIG["quiet"] = args.quiet
     CONFIG["timestamp"] = args.timestamp
 
+
+def config_title(fp):
+    config_title = CONFIG["title"]
+    if config_title.lower() == "never":
+        return False
+    if config_title.lower() == "always":
+        return True
+    # else: auto
+    legal_terms = ["xterm", "xterm-color", "Eterm", "aterm", "rxvt",
+            "screen", "kterm", "rxvt-unicode", "gnome", "interix"]
+    return fp.isatty() and \
+        'TERM' in os.environ and \
+        os.environ['TERM'] in legal_terms
 
 def config_color(fp):
     config_color = CONFIG["color"]
@@ -118,13 +133,7 @@ _enable_xterm_title = None
 def update_title(mystr, fp):
     global _enable_xterm_title
     if _enable_xterm_title is None:
-        legal_terms = ["xterm", "xterm-color", "Eterm", "aterm", "rxvt",
-                "screen", "kterm", "rxvt-unicode", "gnome", "interix"]
-        # assume that if we want color, we are in a terminal and we also want
-        # title
-        _enable_xterm_title = config_color(fp) and \
-            'TERM' in os.environ and \
-            os.environ['TERM'] in legal_terms
+        _enable_xterm_title = config_title(fp)
 
     if _enable_xterm_title:
         mystr = '\x1b]0;%s\x07' % mystr
