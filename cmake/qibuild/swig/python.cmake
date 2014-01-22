@@ -104,19 +104,6 @@ function(qi_swig_wrap_python module_name interface_file)
     set_target_properties(${_swig_target} PROPERTIES SUFFIX   ".pyd")
   endif()
 
-  if(MSVC)
-    # .dll compiled in debug with visual studio are not usable
-    # from python.exe, (unless you are very careful : the size of the ojbjects
-    # are not the same in debug or in release with visual studio), which
-    # can lead to hard to solve bugs.
-    # Here, we add an _d so we are sure a Visual Studio users cannot
-    # use their modules unless they have built them in release.
-    set_target_properties(${_swig_target}
-      PROPERTIES
-        DEBUG_POSTFIX "_d"
-    )
-  endif()
-
   qi_install_python(TARGETS ${_swig_target})
 
   qi_install_python("${QI_SDK_DIR}/${QI_SDK_LIB}/${module_name}.py")
