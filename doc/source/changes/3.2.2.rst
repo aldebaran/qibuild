@@ -6,3 +6,37 @@ qidoc
 
 * Fix bug when installing documentation twice into two different
   locations. (Reported by Atlas)
+
+qisys
+-----
+
+* Fix ``qisys.sh.is_runtime`` for python on Gentoo
+
+cmake
+-----
+
+* **Breaking change**: Remove support for disabled targets
+
+.. code-block:: cmake
+
+    # Old:
+    qi_create_test(foo foo.cpp)
+    qi_use_lib(foo BAR)
+
+    # New:
+
+    qi_create_test(foo foo.cpp)
+    if(TARGET foo)
+      qi_use_lib(foo BAR)
+    endif()
+
+    # Or:
+    qi_create_test(foo foo.cpp DEPENDS BAR)
+
+
+
+Previously ``qi_use_lib`` tried to detect when the target was
+disabled (for instance because of ``-DQI_WITH_TESTS=OFF``).
+
+This lead to hard to diagnose build failures during incremental
+builds, and this functionality has been removed.
