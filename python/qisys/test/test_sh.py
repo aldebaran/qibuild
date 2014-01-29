@@ -73,5 +73,7 @@ def test_is_runtime():
     assert qisys.sh.is_runtime("lib/libfoo.a") is False
     assert qisys.sh.is_runtime("include/foo.h") is False
     assert qisys.sh.is_runtime("lib/python2.7/Makefile") is True
+    assert qisys.sh.is_runtime("lib/python2.7/config/pyconfig.h") is True
+    assert qisys.sh.is_runtime("include/python2.7/pyconfig.h") is True
     if sys.platform == "darwin":
         assert qisys.sh.is_runtime("lib/libfoo.dylib") is True

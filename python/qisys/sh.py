@@ -609,8 +609,9 @@ def is_runtime(filename):
             return True
     if filename.startswith("lib"):
         # exception for python:
-        if "python" in filename and filename.endswith("Makefile"):
-            return True
+        if "python" in filename:
+            if filename.endswith(("Makefile", "pyconfig.h")):
+                return True
         # shared libraries
         shared_lib_ext = ""
         if sys.platform.startswith("win"):
