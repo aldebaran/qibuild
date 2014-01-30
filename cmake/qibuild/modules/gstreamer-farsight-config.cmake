@@ -1,5 +1,5 @@
 clean(GSTREAMER-FARSIGHT)
 fpath(GSTREAMER-FARSIGHT gst/farsight/fs-plugin.h PATH_SUFFIXES gstreamer-0.10)
-flib(GSTREAMER-FARSIGHT libgstfarsight-0.10)
+flib(GSTREAMER-FARSIGHT gstfarsight-0.10)
 qi_persistent_set(GSTREAMER-FARSIGHT_DEPENDS GSTREAMER)
 export_lib(GSTREAMER-FARSIGHT)
