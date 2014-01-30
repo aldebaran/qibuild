@@ -176,7 +176,7 @@ def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
         doc_project = DoxygenProject(doc_worktree, project, name, dest=dest)
     else:
         raise BadProjectConfig(qiproject_xml,
-                               "Unknow doc type: %s", doc_type)
+                               "Unknown doc type: %s" % doc_type)
 
     depends_elem = xml_elem.findall("depends")
     for depend_elem in depends_elem:
