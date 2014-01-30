@@ -48,7 +48,8 @@ class DoxygenProject(qidoc.project.DocProject):
         out_conf["GENERATE_HTML"] = "YES"
         out_conf["GENERATE_LATEX"] = "NO"
         out_conf["PROJECT_NAME"] = in_conf.get("PROJECT_NAME", self.name)
-        out_conf["WARNINGS"] = "YES"
+        if kwargs.get("warnings") is False:
+            out_conf["WARN_LOGFILE"] = os.path.join(self.build_dir, "warn.log")
         out_conf["QUIET"] = "YES"
         out_conf["GENERATE_TAGFILE"] = self.tagfile
         doxydeps = list()

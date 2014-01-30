@@ -23,6 +23,7 @@ class DocBuilder(object):
         self.hosted = True
         self.build_type = ""
         self.werror = False
+        self.warnings = True
         self._base_project = None
         if base_project_name:
             self.set_base_project(base_project_name)
@@ -44,6 +45,7 @@ class DocBuilder(object):
             "version" : self.version,
             "hosted"  : self.hosted,
             "build_type"   : self.build_type,
+            "warnings"     : self.warnings
         }
         for project in projects:
             project.configure(**configure_args)
