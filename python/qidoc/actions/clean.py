@@ -27,7 +27,10 @@ def do(args):
         # FIXME
         # this can create an empty build dir for nothing, so
         # we remove it if we don't need it
-        build_dir = doc_project.build_dir
+        try:
+            build_dir = doc_project.build_dir
+        except AttributeError:
+            continue
         if not os.path.exists(build_dir):
             continue
         if qisys.sh.is_empty(build_dir):
