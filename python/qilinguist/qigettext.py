@@ -66,13 +66,22 @@ class GettextProject(qilinguist.project.LinguistProject):
         input_files = self.get_sources()
 
         cmd = ["xgettext", "--default-domain=" + self.domain]
-        cmd.extend(["--keyword=_", "--keyword=translate:1,1t",
-                "--keyword=translate:1c,2,2t", "--keyword=translate:1,2,3t",
-                "--keyword=translate:1c,2,3,4t", "--keyword=gettext:1",
-                "--keyword=pgettext:1c,2", "--keyword=ngettext:1,2",
-                "--keyword=npgettext:1c,2,3", "--keyword=tr:1,1t",
-                "--keyword=tr:1c,2,2t", "--keyword=tr:1,2,3t",
-                "--keyword=tr:1c,2,3,4t"])
+        # See info xgettext 5.1.6
+        # https://www.gnu.org/software/gettext/manual/gettext.html#xgettext-Invocation
+        #cmd.extend(["--keyword=_", "--keyword=translate:1,1t",
+        #        "--keyword=translate:1c,2,2t", "--keyword=translate:1,2,3t",
+        #        "--keyword=translate:1c,2,3,4t", "--keyword=gettext:1",
+        #        "--keyword=pgettext:1c,2", "--keyword=ngettext:1,2",
+        #        "--keyword=npgettext:1c,2,3", "--keyword=tr:1,1t",
+        #        "--keyword=tr:1c,2,2t", "--keyword=tr:1,2,3t",
+        #        "--keyword=tr:1c,2,3,4t"])
+        # 4t are here for python because self count as an argument
+        cmd.extend([
+            "--keyword=translate:1,1t", "--keyword=translate:1,2t",
+            "--keyword=translate:1,3t", "--keyword=translate:1,4t",
+            "--keyword=tr:1,1t", "--keyword=tr:1,2t",
+            "--keyword=tr:1,3t", "--keyword=tr:1,4t"
+            ])
         # generate sorted output
         cmd.append("--sort-output")
 
