@@ -21,6 +21,9 @@ function(boost_flib _libname)
     # http://lists.boost.org/boost-users/2011/07/69515.php
     set(Boost_USE_STATIC_LIBS ON)
     qi_persistent_set(${_prefix}_DEFINITIONS  "BOOST_ALL_NO_LIB")
+  else()
+    set(Boost_USE_STATIC_LIBS OFF)
+    qi_persistent_set(${_prefix}_DEFINITIONS  "BOOST_ALL_DYN_LINK")
   endif()
   find_package(Boost COMPONENTS "${_libname}" QUIET)
   # fix compilation in cmake v2.8.11.2
