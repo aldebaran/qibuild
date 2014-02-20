@@ -77,6 +77,7 @@ class GettextProject(qilinguist.project.LinguistProject):
         #        "--keyword=tr:1c,2,3,4t"])
         # 4t are here for python because self count as an argument
         cmd.extend([
+            "--keyword=_:1",
             "--keyword=translate:1,1t", "--keyword=translate:1,2t",
             "--keyword=translate:1,3t", "--keyword=translate:1,4t",
             "--keyword=tr:1,1t", "--keyword=tr:1,2t",
