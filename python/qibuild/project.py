@@ -277,6 +277,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             build_env = self.build_env.copy()
         else:
             build_env = env
+        build_env = self.fix_env(build_env)
         if self.verbose_make:
             if self.cmake_generator:
                 if "Makefiles" in self.cmake_generator:
@@ -426,6 +427,16 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             qibuild.dlls.fix_dlls(self.sdk_directory, paths=paths,
                                   mingw=mingw, env=self.build_env)
 
+    def fix_env(self, env):
+        if sys.platform == "darwin":
+            # some projects run binaries during buildtime, they need this hack
+            # to find the toolchain libraries until we use cmake 2.8.12 on mac
+            lib_dir = os.path.join(self.sdk_directory, "lib")
+            envsetter = qisys.envsetter.EnvSetter(build_env=env)
+            envsetter.prepend_directory_to_variable(lib_dir, "DYLD_LIBRARY_PATH")
+            envsetter.prepend_directory_to_variable(self.sdk_directory, "DYLD_FRAMEWORK_PATH")
+            env = envsetter.get_build_env()
+        return env
 
     def split_debug(self, destdir):
         """ Split debug symbols after install """
