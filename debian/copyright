@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 The Debian packaging is:
 
-    Copyright (C) 2011 Aldebaran Robotics <qidev@aldebaran-robotics.com>
+    Copyright (C) 2011-2014 Aldebaran Robotics <qidev@aldebaran-robotics.com>
 
 and is licensed under the GPL version 3,
 see "/usr/share/common-licenses/GPL-3".

@@ -1,4 +1,4 @@
-## Copyright (C) 2011 Aldebaran Robotics
+## Copyright (C) 2011-2014 Aldebaran Robotics
 
 clean(LTTNG-UST)
 fpath(LTTNG-UST "lttng/tracepoint.h")

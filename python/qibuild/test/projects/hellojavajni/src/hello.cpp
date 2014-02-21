@@ -3,7 +3,7 @@
 ** Author(s):
 **  - Pierre ROULLON <proullon@aldebaran-robotics.com>
 **
-** Copyright (C) 2013 Aldebaran Robotics
+** Copyright (C) 2013-2014 Aldebaran Robotics
 */
 
 #include <hello.hpp>

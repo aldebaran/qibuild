@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2013 Aldebaran Robotics
+** Copyright (C) 2013-2014 Aldebaran Robotics
 */
 
 #ifndef _HELLOJAVA_HELLO_HPP_

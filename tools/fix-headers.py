@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 
-## Copyright (c) 2012, 2013 Aldebaran Robotics. All rights reserved.
+## Copyright (c) 2012-2014 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
 
 import sys
 
-HEADER = """## Copyright (C) 2011 Aldebaran Robotics
+HEADER = """## Copyright (C) 2011-2014 Aldebaran Robotics
 """
 
 def fix_file(filename):

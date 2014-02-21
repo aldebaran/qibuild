@@ -2,7 +2,7 @@
 ** Author(s):
 **  - Cedric GESTES <gestes@aldebaran-robotics.com>
 **
-** Copyright (C) 2010 Aldebaran Robotics
+** Copyright (C) 2010-2014 Aldebaran Robotics
 */
 
 #ifndef     MYLIB_H_
