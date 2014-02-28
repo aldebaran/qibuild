@@ -23,7 +23,7 @@
 # \group:COMMAND the command to run to generate the files
 # \arg:COMMENT a comment to be displayed while generating the source file
 function(qi_generate_src)
-  cmake_parse_arguments(ARG "" "COMMENT" "SRC;COMMAND" ${ARGN})
+  cmake_parse_arguments(ARG "" "COMMENT" "SRC;COMMAND;DEPENDS" ${ARGN})
   set(out ${ARG_UNPARSED_ARGUMENTS})
   foreach(_out_file ${out})
     set_source_files_properties(${_out_file}
@@ -41,7 +41,7 @@ function(qi_generate_src)
                      COMMENT "${_comment}"
                      COMMAND ${_cmd}
                      ARGS ${ARG_COMMAND}
-                     DEPENDS ${ARG_SRC}
+                     DEPENDS ${ARG_SRC} ${ARG_DEPENDS}
   )
 endfunction()
 
