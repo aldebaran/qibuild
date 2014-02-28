@@ -177,13 +177,13 @@ def _msg(*tokens, **kwargs):
     stringnc = ''.join(nocolorres)
     if CONFIG["record"]:
         _MESSAGES.append(stringres)
+    if kwargs.get("update_title", False):
+        update_title(stringnc, fp)
     if _console and with_color:
         _console.write_color(stringres)
     else:
         fp.write(stringres)
         fp.flush()
-    if kwargs.get("update_title", False):
-        update_title(stringnc, fp)
 
 def error(*tokens, **kwargs):
     """ Print an error message """
