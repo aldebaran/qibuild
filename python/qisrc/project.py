@@ -1,5 +1,4 @@
 import os
-import functools
 
 from qisys import ui
 import qisys.qixml
@@ -80,7 +79,7 @@ class GitProject(object):
         if not remote.review and new.review:
             ui.info(self.src, "is now under code review")
         if remote.review and not new.review:
-            ui.warning(self.src, "is no longer code review")
+            ui.warning(self.src, "is no longer under code review")
         if remote.url != new.url:
             ui.warning(self.src, ": remote url changed", remote.url, "->", new.url)
         self.remotes.remove(remote)
