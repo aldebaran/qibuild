@@ -112,9 +112,10 @@ find_package(qibuild)
 """
     template = template.format(project_name=project_name)
     if not os.path.exists(cmakelists):
-        with open(cmakelists, "w") as fp:
-            fp.write(template)
-            return
+        if not dry_run:
+            with open(cmakelists, "w") as fp:
+                fp.write(template)
+        return
 
     with open(cmakelists, "r") as fp:
         old_lines = fp.readlines()
