@@ -23,7 +23,7 @@ General
   => install only one doc, and it's this one that becomes the root
 
 * **FIXME**: Things that are just tools (CMake domain, NAOQi event domains,
-  ``doxylink``, ``qiapidoc``): how do we find it ?
+  ``doxylink``, ``qiapidoc``): how do we find it?
   Currently we hack ``sys.path`` in our ``conf.py`` or ``conf.in.py`` file,
   and it's tedious.
 

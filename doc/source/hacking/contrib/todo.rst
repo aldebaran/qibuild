@@ -14,7 +14,7 @@ CMake
 qi_stage_lib/qi_use_lib
 ++++++++++++++++++++++++
 
-* Handle package versions ?
+* Handle package versions?
 * Use new CMake 2.8.11 features
 * avoid using the cache for global variables and use global properties instead
 
@@ -157,7 +157,7 @@ qibuild
 
 * handle custom build dir
 
-* handle custom sdk dir ?
+* handle custom sdk dir?
 
 * qibuild deploy: fix gdb config files generation
 
@@ -237,7 +237,7 @@ Renames
 
 * rewrite qibuild.config using XMLParser
 
-* rename qibuild.config -> qibuild.xml_config ?
+* rename qibuild.config -> qibuild.xml_config?
 
 * choose between destdir and dest_dir
 
@@ -255,8 +255,8 @@ tests
 
 * Replace qibuild_action("configure") with a nicer syntax:
 
-  * qibuild_action.call("configure") ?
-  * qibuild_action.configure("...") ?
+  * qibuild_action.call("configure")?
+  * qibuild_action.configure("...")?
 
 * fix running automatic tests on mac
 
