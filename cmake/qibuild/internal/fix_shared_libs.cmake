@@ -15,7 +15,7 @@ function(_qi_fix_shared_libs)
   if(APPLE)
     qi_info("Creating symlinks in build dir ...")
 
-    set(_prefix_paths ${CMAKE_FIND_ROOT_PATH})
+    set(_prefix_paths ${CMAKE_PREFIX_PATH})
     list(REMOVE_DUPLICATES _prefix_paths)
 
     set(_dylibs)
@@ -57,7 +57,7 @@ function(_qi_fix_shared_libs)
   if(WIN32)
     qi_info("Copying dlls in build dir ...")
 
-    set(_prefix_paths ${CMAKE_FIND_ROOT_PATH})
+    set(_prefix_paths ${CMAKE_PREFIX_PATH})
     list(REMOVE_DUPLICATES _prefix_paths)
 
     set(_dlls)

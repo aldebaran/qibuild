@@ -6,7 +6,7 @@ include_directories(".")
 
 find_program(_python_executable
     NAMES python2 python python.exe
-    NO_CMAKE_FIND_ROOT_PATH)
+    NO_CMAKE_PREFIX_PATH)
   if (NOT _python_executable)
     qi_error("needs python executable in PATH")
   endif()

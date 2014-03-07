@@ -92,7 +92,7 @@ class QiToolchainTestCase(unittest.TestCase):
 
         # Check that generated toolchain file is correct
         tc_file = get_tc_file_contents(tc)
-        self.assertTrue('list(INSERT CMAKE_FIND_ROOT_PATH 0 "%s")' % "/path/to/foo"
+        self.assertTrue('list(INSERT CMAKE_PREFIX_PATH 0 "%s")' % "/path/to/foo"
             in tc_file, tc_file)
 
         # Check that adding the package twice does nothing
@@ -180,7 +180,7 @@ class QiToolchainTestCase(unittest.TestCase):
         self.assertTrue(b_cmake_index != 0)
 
         # Check that toolchain files are always written before
-        # CMAKE_FIND_ROOT_PATH
+        # CMAKE_PREFIX_PATH
         self.assertTrue(a_cmake_index < a_path_index)
         self.assertTrue(a_cmake_index < b_path_index)
         self.assertTrue(b_cmake_index < a_path_index)

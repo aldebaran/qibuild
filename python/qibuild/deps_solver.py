@@ -51,7 +51,7 @@ class DepsSolver(object):
     def get_sdk_dirs(self, project, dep_types):
         """ Get the list of build/sdk dirs on which the project depends
         Those will then be written in build/dependencies.cmake and added
-        to CMAKE_FIND_ROOT_PATH by qibuild-config.cmake
+        to CMAKE_PREFIX_PATH by qibuild-config.cmake
 
         """
         res = list()

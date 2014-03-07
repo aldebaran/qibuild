@@ -120,7 +120,7 @@ class BuildProject(object):
 
     def write_dependencies_cmake(self, sdk_dirs):
         """ Write the dependencies.cmake file. This will be read by
-        qibuild-config.cmake to set CMAKE_FIND_ROOT_PATH and
+        qibuild-config.cmake to set CMAKE_PREFIX_PATH and
         qibuild_DIR, so that just running `cmake ..` works
 
         """
@@ -146,9 +146,9 @@ endif()
 # Dependencies:
 {dep_to_add}
 
-# Store CMAKE_MODULE_PATH and CMAKE_FIND_ROOT_PATH in cache:
+# Store CMAKE_MODULE_PATH and CMAKE_PREFIX_PATH in cache:
 set(CMAKE_MODULE_PATH ${{CMAKE_MODULE_PATH}} CACHE INTERNAL ""  FORCE)
-set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
+set(CMAKE_PREFIX_PATH ${{CMAKE_PREFIX_PATH}} CACHE INTERNAL ""  FORCE)
 
 {custom_cmake_code}
 """
@@ -163,9 +163,9 @@ set(CMAKE_FIND_ROOT_PATH ${{CMAKE_FIND_ROOT_PATH}} CACHE INTERNAL ""  FORCE)
         for sdk_dir in sdk_dirs:
 
             dep_to_add += """
-    list(FIND CMAKE_FIND_ROOT_PATH "{sdk_dir}" _found)
+    list(FIND CMAKE_PREFIX_PATH "{sdk_dir}" _found)
     if(_found STREQUAL "-1")
-        list(INSERT CMAKE_FIND_ROOT_PATH 0 "{sdk_dir}")
+        list(INSERT CMAKE_PREFIX_PATH 0 "{sdk_dir}")
     endif()
     """.format(sdk_dir=qisys.sh.to_posix_path(sdk_dir))
 
