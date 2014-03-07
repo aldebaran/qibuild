@@ -5,6 +5,7 @@ cmake
 -----
 
 * _add_internal_test learn "SUBMODULE". So qi_create_test and qi_create_gtest too
+
 qidoc
 -----
 
