@@ -1,0 +1,14 @@
+v3.2.3
+======
+
+cmake
+-----
+
+* Stop using CMAKE_FIND_ROOT_PATH and use CMAKE_PREFIX_PATH instead.
+  It fixes CMake 2.8.12 compatibility on Windows.
+
+qisys
+-----
+
+* New meta builder AbstractBuilder object: create builders for all types of projects
+
