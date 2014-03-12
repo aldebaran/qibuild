@@ -4,11 +4,13 @@ import os
 import re
 import sys
 
+import qisys.sh
 from qisys import ui
 from qisys.qixml import etree
 import qisys.command
 import qitest.conf
 import qitest.runner
+
 
 class ProjectTestRunner(qitest.runner.TestSuiteRunner):
     """ Implements :py:class:`.TestSuiteRunner` for a qibuild/cmake project """
@@ -49,7 +51,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
     @property
     def tests(self):
         """ Override TestSuiteRunner.test to filter perf and nightly tests """
-        res =  super(ProjectTestRunner, self).tests
+        res = super(ProjectTestRunner, self).tests
         res = [x for x in res if x.get("perf", False) == self.perf]
         res = [x for x in res if x.get("nightly", False) == self.nightly]
         return res
