@@ -23,12 +23,12 @@ def fetch_gerrit_hook_ssh(path, username, server, port=None):
     if port is None:
         port = 22
     git_hooks_dir = os.path.join(path, ".git", "hooks")
-    if sys.platform.startswith("win"):
-        # scp on git bash does not handle DOS paths:
-        git_hooks_dir = qisys.sh.to_posix_path(git_hooks_dir, fix_drive=True)
     # Create the dir if doesn't exist (otherwise scp won't create it)
     if not os.path.isdir(git_hooks_dir):
         qisys.sh.mkdir(git_hooks_dir)
+    if sys.platform.startswith("win"):
+        # scp on git bash does not handle DOS paths:
+        git_hooks_dir = qisys.sh.to_posix_path(git_hooks_dir, fix_drive=True)
     scp = qisys.command.find_program("scp", raises=False)
     if not scp:
         return False, "Could not find scp executable"
