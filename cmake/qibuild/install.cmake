@@ -222,6 +222,7 @@ endfunction()
 # \argn:                 A list of files : directories and globs on files are accepted.
 # \param: TARGETS        A list of targets (in the common CMake meaning).
 # \param: SUBFOLDER      An optional subfolder in which to put the files.
+# \param: VERSION        Could be set to "3" if you want python3 instead of python2
 # \flag: RECURSE         Whether glob should be recursive.
 # \flag: KEEP_RELATIVE_PATHS  If true, relative paths will be preserved during installation.
 #                        (False by default because this is NOT the standard CMake
@@ -229,7 +230,7 @@ endfunction()
 #
 function(qi_install_python)
 
-  cmake_parse_arguments(ARG "" "COMPONENT;DESTINATION" "TARGETS" ${ARGN})
+  cmake_parse_arguments(ARG "" "COMPONENT;DESTINATION;VERSION;" "TARGETS" ${ARGN})
 
   #XXX: this will only work if python headers have been found
   # we can either have found them via qibuild-specific wrapper
@@ -238,13 +239,25 @@ function(qi_install_python)
   # defined, otherwize it will be PYTHON_INCLUDE_DIR (singular)
   set(_python_inc_dir)
   set(_python_headers_found TRUE)
-  if(DEFINED PYTHON_INCLUDE_DIRS)
-    set(_python_inc_dir ${PYTHON_INCLUDE_DIRS})
-  elseif(DEFINED PYTHON_INCLUDE_DIR)
-    set(_python_inc_dir ${PYTHON_INCLUDE_DIR})
+
+  if ("${ARG_VERSION}" STREQUAL "3")
+    if(DEFINED PYTHON3_INCLUDE_DIRS)
+      set(_python_inc_dir ${PYTHON3_INCLUDE_DIRS})
+    elseif(DEFINED PYTHON3_INCLUDE_DIR)
+      set(_python_inc_dir ${PYTHON3_INCLUDE_DIR})
+    else()
+      set(_python_headers_found FALSE)
+    endif()
   else()
-    set(_python_headers_found FALSE)
+    if(DEFINED PYTHON_INCLUDE_DIRS)
+      set(_python_inc_dir ${PYTHON_INCLUDE_DIRS})
+    elseif(DEFINED PYTHON_INCLUDE_DIR)
+      set(_python_inc_dir ${PYTHON_INCLUDE_DIR})
+    else()
+      set(_python_headers_found FALSE)
+    endif()
   endif()
+
 
   # Read the python version from the headers:
   if(_python_headers_found)
@@ -277,7 +290,7 @@ function(qi_install_python)
       DESTINATION "${_qi_sdk_python_site_packages}"
     )
   else()
-    cmake_parse_arguments(ARG "RECURSE;KEEP_RELATIVE_PATHS" "IF;COMPONENT;DESTINATION;SUBFOLDER" "" ${ARGN})
+    cmake_parse_arguments(ARG "RECURSE;KEEP_RELATIVE_PATHS" "IF;COMPONENT;DESTINATION;SUBFOLDER;VERSION" "" ${ARGN})
     install(${ARG_UNPARSED_ARGUMENTS}
       COMPONENT runtime
       LIBRARY DESTINATION "${_qi_sdk_python_site_packages}"
