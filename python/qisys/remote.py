@@ -166,6 +166,8 @@ def download(url, output_dir, output_name=None,
                 ftp.cwd(root)
             class Tranfert:
                 pass
+            # Set binary mode
+            ftp.voidcmd("TYPE I")
             #pylint: disable-msg=E1103
             size = ftp.size(url_split.path[1:])
             Tranfert.xferd = 0
