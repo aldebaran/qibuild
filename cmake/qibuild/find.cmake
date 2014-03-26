@@ -227,7 +227,7 @@ endfunction()
 # \arg:prefix Prefix of the variables to export. Must match the calls
 #             to ``clean()`` and ``export_bin()`` calls.
 function(fprogram prefix)
-  qi_debug("LIBFIND: FLIB (prefix=${prefix}, name=${name})")
+  qi_debug("LIBFIND: FPROGRAM (prefix=${prefix}, name=${name})")
   cmake_parse_arguments(ARG "DEBUG;OPTIMIZED" "" "NAMES" ${ARGN})
 
   set(ARG_NAMES ${ARG_UNPARSED_ARGUMENTS} ${ARG_NAMES})
