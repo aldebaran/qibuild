@@ -1,0 +1,8 @@
+v3.2.4
+======
+
+misc
+----
+
+* A few bugfixes, mainly one in qisys FTP that could cause trouble
+  when downloading from some FTP servers.
