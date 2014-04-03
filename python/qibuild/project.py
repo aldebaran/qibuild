@@ -10,6 +10,7 @@ import qisys.command
 import qisys.sh
 import qibuild.cmake
 import qibuild.build
+import qibuild.gcov
 import qibuild.gdb
 import qibuild.dylibs
 import qibuild.dlls
@@ -409,7 +410,10 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         test_runner.verbose = kwargs.get("verbose_tests")
         test_runner.num_cpus = kwargs.get("num_cpus", -1)
         test_runner.num_jobs = kwargs.get("num_jobs", 1)
-        return test_runner.run()
+        result = test_runner.run()
+        if test_runner.coverage:
+            qibuild.gcov.generate_coverage_xml_report(self)
+        return result
 
     def fix_shared_libs(self, paths):
         """ Do some magic so that shared libraries from other projects and

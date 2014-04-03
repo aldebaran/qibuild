@@ -92,6 +92,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
             return
         if not qisys.command.find_program("gcovr"):
             raise Exception("please install gcovr in order to measure coverage")
+        self._coverage = value
 
 
 class ProcessTestLauncher(qitest.runner.TestLauncher):

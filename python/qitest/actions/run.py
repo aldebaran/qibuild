@@ -13,6 +13,7 @@ import sys
 from qisys import ui
 import qisys.parsers
 import qibuild.test_runner
+import qibuild.gcov
 import qitest.parsers
 import qitest.actions.list
 
@@ -37,6 +38,8 @@ def do(args):
     test_runner.num_jobs = args.num_jobs
     test_runner.nightly = args.nightly
     res = test_runner.run()
+    if test_runner.coverage:
+        qibuild.gcov.generate_coverage_xml_report(test_runner.project)
     if not res:
         sys.exit(1)
 
@@ -45,5 +48,7 @@ class TestProject(object):
     """ A class to keep ProjectTestRunner happy """
     def __init__(self, qitest_json):
         self.qitest_json = qitest_json
-        self.build_directory = os.path.dirname(qitest_json)
-        self.sdk_directory = os.path.join(self.build_directory)
+        self.build_directory = os.path.abspath(os.path.dirname(qitest_json))
+        self.sdk_directory = os.path.join(self.build_directory, "sdk")
+        self.path = os.path.realpath(os.path.join(self.build_directory, ".."))
+        self.name = os.path.basename(self.path)

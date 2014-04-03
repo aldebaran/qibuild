@@ -13,6 +13,7 @@ from qisys import ui
 import qisys.command
 import qitest.result
 
+
 class TestQueue():
     """ A class able to run tests in parallel """
     def __init__(self, tests):
@@ -67,7 +68,6 @@ class TestQueue():
         for worker_thread in threads:
             worker_thread.stop()
             worker_thread.join()
-
 
     def summary(self):
         """ Display the tests results.
