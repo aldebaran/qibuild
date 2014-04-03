@@ -2,10 +2,16 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+function(boost_flib _prefix)
+  if(${ARGC} GREATER 1)
+    set(_libnames ${ARGN})
+  else()
+    set(_libnames ${_prefix})
+  endif()
 
-function(boost_flib _libname)
-  string(TOUPPER ${_libname} _prefix)
+  string(TOUPPER ${_prefix} _prefix)
   set(_prefix "BOOST_${_prefix}")
+
   clean(${_prefix})
   # Required so that FindBoost.cmake does not try to include this file
   set(Boost_NO_BOOST_CMAKE TRUE)
@@ -25,7 +31,15 @@ function(boost_flib _libname)
     set(Boost_USE_STATIC_LIBS OFF)
     qi_persistent_set(${_prefix}_DEFINITIONS  "BOOST_ALL_DYN_LINK")
   endif()
-  find_package(Boost COMPONENTS "${_libname}" QUIET)
+
+  foreach(_libname ${_libnames})
+    clean(Boost)
+    find_package(Boost COMPONENTS "${_libname}" QUIET)
+    if(Boost_FOUND)
+      break()
+    endif()
+  endforeach()
+
   # fix compilation in cmake v2.8.11.2
   # some of the qibuild cmake configs refer to this variable
   set(Boost_VERSION "${Boost_VERSION}" PARENT_SCOPE)
