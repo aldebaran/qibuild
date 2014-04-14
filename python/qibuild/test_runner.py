@@ -221,7 +221,6 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         cwd = self.suite_runner.cwd
         if test.get("working_directory") is None:
             test["working_directory"] = cwd
-        print test["working_directory"]
 
     def _with_valgrind(self, test):
         if not qisys.command.find_program("valgrind"):
