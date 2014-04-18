@@ -1,0 +1,12 @@
+v3.2.5
+======
+
+CMake
+-----
+
+* ``qi_generate_src`` fix when using relative sources
+* fix ``liburcu`` and ``liblttng_ust`` cmake config files
+
+* qitest:
+  * fix coverage that was never actually ran
+  * remove debug print
