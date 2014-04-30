@@ -42,6 +42,13 @@ equivalent with::
     cd ${p}
   }
 
+If you want to use ``qipython activate``, patch you ``~/.profile`` or
+equivalent with::
+
+  function qipyactivate {
+    sourceme = $(qipython activate)
+    source sourceme
+  }
 
 
 Using the git repository

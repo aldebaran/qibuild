@@ -115,3 +115,22 @@ function(qi_run_py_cmd cmd)
     set(${ARG_OUTPUT_VARIABLE} ${${ARG_OUTPUT_VARIABLE}} PARENT_SCOPE)
   endif()
 endfunction()
+
+
+#! Create a python extension
+function(qi_create_python_ext target)
+  add_library(${target} SHARED ${ARGN})
+  set_target_properties(${target}
+    PROPERTIES PREFIX ""
+    LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages
+  )
+
+  qi_use_lib(${target} PYTHON)
+  install(TARGETS ${target} DESTINATION lib/python2.7/site-packages
+         COMPONENT runtime)
+
+  # Register the target into the build dir for qipy
+  file(WRITE ${QI_SDK_DIR}/qi.pth
+    "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages/\n"
+  )
+endfunction()

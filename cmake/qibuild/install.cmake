@@ -259,15 +259,8 @@ function(qi_install_python)
   endif()
 
 
-  # Read the python version from the headers:
-  if(_python_headers_found)
-    file(STRINGS "${_python_inc_dir}/patchlevel.h" _python_version_full REGEX "PY_VERSION")
-    string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" _python_version_full "${_python_version_full}")
-    string(REGEX MATCH "^[0-9]+\\.[0-9]+" _python_version_major "${_python_version_full}")
-  else()
     qi_warning("Could not find python headers, assuming version 2.7")
-    set(_python_version_major "2.7")
-  endif()
+  set(_python_version_major "2.7")
 
   # Set the python site-packages location
   if(DEFINED PYTHON_INSTALL_SCHEME AND "${PYTHON_INSTALL_SCHEME}" STREQUAL "NONE")

@@ -38,9 +38,11 @@ setup(name="qibuild",
             "qilinguist   = qisys.main:main",
             "qisrc        = qisys.main:main",
             "qibuild      = qisys.main:main",
+            "qipy         = qisys.main:main",
             "qitest       = qisys.main:main",
             "qitoolchain  = qisys.main:main",
             "qimvn        = qisys.main:main",
+            "qipython     = qipy.qipython:main",
         ]
     }
 )

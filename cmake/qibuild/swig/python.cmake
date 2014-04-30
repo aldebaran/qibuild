@@ -108,4 +108,9 @@ function(qi_swig_wrap_python module_name interface_file)
 
   qi_install_python("${QI_SDK_DIR}/${QI_SDK_LIB}/${module_name}.py")
 
+  ## FIXME: factorize this with qi_create_python_ext
+  # Register the target into the build dir for qipy
+  file(WRITE ${QI_SDK_DIR}/qi.pth
+    "${QI_SDK_DIR}/${QI_SDK_LIB}\n"
+  )
 endfunction()

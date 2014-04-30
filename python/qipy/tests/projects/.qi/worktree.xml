@@ -1,0 +1,6 @@
+<worktree>
+  <project src="a_lib" />
+  <project src="b_ext" />
+  <project src="c_swig" />
+  <project src="../../../.." />
+</worktree>
