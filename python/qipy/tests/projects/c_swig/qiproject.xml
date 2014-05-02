@@ -1,4 +1,6 @@
 <project version="3">
-  <qibuild name="c_swig" />
+  <qibuild name="swig_eggs" />
+  <qipython name="c" />
 </project>
+
 

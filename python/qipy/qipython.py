@@ -19,15 +19,15 @@ def main():
     config = args.config
     py_args = args.py_args
     python_worktree = qipy.parsers.get_python_worktree(args)
-    venv_root = python_worktree.venv_path(args.config)
-    if not os.path.exists(venv_root):
+    venv_path = python_worktree.venv_path
+    if not os.path.exists(venv_path):
         sys.exit("Virtualenv for %s not found" % config)
     if py_args == ["activate"]:
-        sourceme = os.path.join(venv_root, "bin", "activate")
-        print sourceme
+        activate = python_worktree.bin_path("activate")
+        print activate
         sys.exit(0)
 
-    python_exe = os.path.join(venv_root, "bin", "python")
+    python_exe = python_worktree.python
     cmd = [python_exe] + py_args
     qisys.command.call(cmd)
 

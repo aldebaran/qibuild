@@ -15,4 +15,4 @@ def do(args):
         return
     ui.info(ui.green, "python projects in:", ui.blue, python_worktree.root)
     for project in python_projects:
-        ui.info(ui.green, " * ", ui.blue, project.src)
+        ui.info(ui.green, " * ", ui.blue, project.name)

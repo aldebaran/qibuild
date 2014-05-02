@@ -1,3 +1,4 @@
 <project version="3">
-  <qibuild name="b_ext" python="true" />
+  <qibuild  name="b" />
+  <qipython name="b" />
 </project>
