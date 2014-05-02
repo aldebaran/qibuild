@@ -8,6 +8,7 @@ import os
 import sys
 
 from qisys import ui
+import qisys.command
 import qisys.parsers
 import qisys.sh
 import qidoc.parsers
@@ -17,6 +18,7 @@ import webbrowser
 def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
+    parser.add_argument("-b", "--browser")
 
 def do(args):
     doc_worktree = qidoc.parsers.get_doc_worktree(args)
@@ -33,5 +35,8 @@ Try running  `qidoc build`
         sys.exit(1)
     if sys.platform == "darwin":
         index_html = "file://" + index_html
-    webbrowser.open(index_html)
-
+    if args.browser:
+        cmd = [args.browser, index_html]
+        qisys.command.call(cmd)
+    else:
+        webbrowser.open(index_html)
