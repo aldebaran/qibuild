@@ -29,19 +29,19 @@ class PythonBuilder(AbstractBuilder):
 
     def install(self, dest, *args, **kwargs):
         for project in self.projects:
-            ui.info(ui.green, " * ", ui.blue, project.src)
+            ui.info(ui.green, " * ", ui.blue, project.name)
             setup_py = os.path.join(project.path, "setup.py")
             cmd = [sys.executable, setup_py, "install", "--root", dest,
                 '--prefix=']
             qisys.command.call(cmd, cwd=project.path)
         # Also install a python wrapper so that everything goes smoothly
         to_write="""\
-    #!/bin/bash
-    SDK_DIR=$(dirname "$(readlink -f $0 2>/dev/null)")
-    export LD_LIBRARY_PATH=${SDK_DIR}/lib
-    export PYTHONPATH=${SDK_DIR}/lib/python2.7/site-packages/
-    python "$@"
-    """
+#!/bin/bash
+SDK_DIR=$(dirname "$(readlink -f $0 2>/dev/null)")
+export LD_LIBRARY_PATH=${SDK_DIR}/lib
+export PYTHONPATH=${SDK_DIR}/lib/python2.7/site-packages/
+python "$@"
+"""
         python_wrapper = os.path.join(dest, "python")
         with open(python_wrapper, "w") as fp:
             fp.write(to_write)

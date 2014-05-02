@@ -120,6 +120,7 @@ endfunction()
 #! Create a python extension
 function(qi_create_python_ext target)
   add_library(${target} SHARED ${ARGN})
+  message(STATUS "Python extension: ${target}")
   set_target_properties(${target}
     PROPERTIES PREFIX ""
     LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages
