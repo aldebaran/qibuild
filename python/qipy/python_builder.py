@@ -16,13 +16,14 @@ class PythonBuilder(AbstractBuilder):
     CMakeBuilder
 
     """
-    def __init__(self, python_worktree, build_worktree):
+    def __init__(self, python_worktree, build_worktree=None):
         self.python_worktree = python_worktree
         self.build_worktree = build_worktree
         self.projects = list()
 
     def configure(self, *args, **kwargs):
-        qipy.venv.configure_virtualenv(self.python_worktree, self.build_worktree)
+        qipy.venv.configure_virtualenv(self.python_worktree,
+                                       build_worktree=self.build_worktree)
 
     def build(self, *args, **kwargs):
         pass

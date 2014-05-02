@@ -4,8 +4,8 @@ import virtualenv
 from qisys import ui
 import qisys.command
 
-def configure_virtualenv(python_worktree, build_worktree):
-    worktree = build_worktree.worktree
+def configure_virtualenv(python_worktree, build_worktree=None):
+    worktree = python_worktree.worktree
     # create a new virtualenv
     venv_path = python_worktree.venv_path
     virtualenv.create_environment(python_worktree.venv_path)
@@ -18,7 +18,8 @@ def configure_virtualenv(python_worktree, build_worktree):
         cmd = [pip, "install", "--editable", "."]
         qisys.command.call(cmd, cwd=project.path)
 
-    handle_extensions(venv_path, python_worktree, build_worktree)
+    if build_worktree:
+        handle_extensions(venv_path, python_worktree, build_worktree)
 
 
 def handle_extensions(venv_path, python_worktree, build_worktree):
