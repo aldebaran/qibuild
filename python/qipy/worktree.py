@@ -84,6 +84,10 @@ Fond two project with the same name. (%s)
     def python(self):
         return self.bin_path("python")
 
+    def activate_this(self):
+        activate_this_dot_py = self.bin_path("activate_this.py")
+        execfile(activate_this_dot_py, { "__file__" : activate_this_dot_py })
+
 
 def new_python_project(worktree, project):
     qiproject_xml = project.qiproject_xml
