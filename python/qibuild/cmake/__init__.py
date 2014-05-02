@@ -238,6 +238,8 @@ def find_installed_cmake_qibuild_dir(python_dir):
         # cmake in qibuild.egg/share/cmake
         # (pip with setuptools)
         ("..", "share", "cmake"),
+        # pip on mac
+        (sys.prefix, "share", "cmake")
         ]:
 
         rel_path = os.path.join(*candidate)
