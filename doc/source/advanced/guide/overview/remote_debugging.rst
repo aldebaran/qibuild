@@ -19,14 +19,13 @@ Prerequisites
 
 Since ``qibuild deploy`` uses ``ssh``, you should make sure you can
 access your robot with ``ssh`` without typing your password over
-and over:
+and over and that ``rsync`` is installed.
 
 .. code-block:: console
 
     ssh-keygen
     ssh-copy-id nao@nao.local
 
-Also, for better results it is advised to install ``rsync``:
 
 .. code-block:: console
 

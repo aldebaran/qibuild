@@ -28,7 +28,7 @@ def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.project_parser(parser)
     qibuild.parsers.build_parser(parser)
-    qibuild.parsers.deploy_parser(parser)
+    qisys.parsers.deploy_parser(parser)
     group = parser.add_argument_group("qibuild specific deploy options")
     group.add_argument("--split-debug", action="store_true", dest="split_debug",
                        help="split debug symbols. Enable remote debuging")
@@ -39,7 +39,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
 
-    urls = qibuild.parsers.get_deploy_urls(args)
+    urls = qisys.parsers.get_deploy_urls(args)
 
     if args.with_tests:
         default_dep_types = ["runtime", "test"]

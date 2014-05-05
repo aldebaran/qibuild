@@ -54,31 +54,6 @@ def build_parser(parser):
     group.add_argument("--verbose-make", action="store_true", default=False,
                        help="Print the executed commands while building")
 
-def deploy_parser(parser):
-    group = parser.add_argument_group("deploy options")
-    group.add_argument("url", help="remote target url: user@hostname:path")
-    group.add_argument("--url", dest="urls", action="append",
-                       help="deploy to each given url.")
-    group.add_argument("--port", help="port", type=int, default=22)
-
-def get_deploy_urls(args):
-    if args.urls:
-        urls = args.urls + [args.url]
-    else:
-        urls = [args.url]
-
-    for url in urls:
-        # make sure every url is valid first
-        parsed = qibuild.deploy.parse_url(url)
-        if not parsed:
-            mess = """ Could not parse {0} as a valid deploy url.
-Supported formats are:
-   * <user>@<host>:<deploy-dir>
-   * ssh://<user>@<host>:<port>/<deploy-dir>
-"""
-            raise Exception(mess.format(url))
-    return urls
-
 
 def project_parser(parser, positional=True):
     """Parser settings for every action using several build projects."""

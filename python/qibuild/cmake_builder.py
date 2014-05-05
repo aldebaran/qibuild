@@ -167,7 +167,7 @@ class CMakeBuilder(AbstractBuilder):
 
 
     @need_configure
-    def deploy(self, url, use_rsync=True, split_debug=False, with_tests=False):
+    def deploy(self, url, split_debug=False, with_tests=False):
         """ Deploy the project and the packages it depends to a remote url """
 
         # Deploy packages: install all of them in the same temp dir, then
@@ -192,7 +192,7 @@ class CMakeBuilder(AbstractBuilder):
             ui.info(ui.green, "and the following packages")
             for package in sorted(dep_packages, key=operator.attrgetter("name")):
                 ui.info(" *", ui.blue, package.name)
-        ui.info(ui.green, "will be deployed to", ui.blue, url)
+        ui.info(ui.green, "will be deployed to", ui.blue, url.as_strirng)
 
         if dep_packages:
             print
@@ -200,7 +200,7 @@ class CMakeBuilder(AbstractBuilder):
             for i, package in enumerate(dep_packages):
                 ui.info_count(i, len(dep_packages),
                     ui.green, "Deploying package", ui.blue, package.name,
-                    ui.green, "to", ui.blue, url)
+                    ui.green, "to", ui.blue, url.as_strirng)
                 # Install package in local deploy dir
                 files = package.install(deploy_dir, runtime=True)
                 to_deploy.extend(files)
@@ -213,7 +213,7 @@ class CMakeBuilder(AbstractBuilder):
         for (i, project) in enumerate(dep_projects):
             ui.info_count(i, len(dep_projects),
                     ui.green, "Deploying project", ui.blue, project.name,
-                    ui.green, "to", ui.blue, url)
+                    ui.green, "to", ui.blue, url.as_strirng)
 
             components = ["runtime"]
             if with_tests:

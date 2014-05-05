@@ -207,6 +207,32 @@ def download(url, output_dir, output_name=None,
 
     return dest_name
 
+def deploy(local_directory, remote_url, filelist=None):
+    """Deploy a local directory to a remote url."""
+    # ensure destination directory exist before deploying data
+    cmd = ["ssh", "-p", str(remote_url.port),
+            "%s@%s" % (remote_url.user, urs,host),
+            "mdkdir", "-p", remote_url.remote_directory]
+    qisys.command.call(cmd)
+    # This is required for rsync to do the right thing,
+    # otherwise the basename of local_directory gets
+    # created
+    local_directory = local_directory + "/."
+    cmd = ["rsync",
+        "--recursive",
+        "--links",
+        "--perms",
+        "--times",
+        "--specials",
+        "--progress", # print a progress bar
+        "--checksum", # verify checksum instead of size and date
+        "--exclude=.debug/"]
+    cmd.extend(["-e", "ssh -p %d" % url.portn])
+    if filelist:
+        cmd.append("--files-from=%s" % filelist)
+    qisys.command.call(cmd)
+
+
 
 class URLParseError(Exception):
     def __int__(self, message):
