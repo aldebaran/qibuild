@@ -21,6 +21,7 @@ Installs everything on the target 'mytarget' in the
 """
 
 
+import qisys.parsers
 import qibuild.parsers
 import qisys.parsers
 import qibuild.deploy

@@ -48,8 +48,7 @@ echo "To connect to this gdbserver launch the following command in another termi
 echo "  %(gdb)s -x \"${here}/setup_target.gdb\" \"${here}/${binary}\""
 echo ""
 
-#echo ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
-ssh -p %(port)s %(remote)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${binary} $*"
+echo ssh -p %(port)s %(host)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
 """
 
 def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_address=""):
@@ -66,13 +65,14 @@ def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_a
     return ["setup_target.gdb", "setup.gdb"]
 
 
-def _generate_run_gdbserver_binary(dest, remote, gdb, gdb_listen, remote_dir, port):
+def _generate_run_gdbserver_binary(dest, host, gdb, gdb_listen, remote_dir,
+        port):
     """ generate a script that run a program on the robot in gdbserver """
-    if remote_dir == "":
+    if remote_dir is None:
         remote_dir = "."
     remote_gdb_script_path = os.path.join(dest, "remote_gdbserver.sh")
     with open(remote_gdb_script_path, "w+") as f:
-        f.write(FILE_REMOTE_GDBSERVER_SH % { 'remote': remote,
+        f.write(FILE_REMOTE_GDBSERVER_SH % { 'host': host,
                                              'gdb_listen': gdb_listen,
                                              'remote_dir': remote_dir,
                                              'gdb': gdb,
@@ -110,9 +110,8 @@ def _generate_solib_search_path(cmake_builder, project_name):
 
 def generate_debug_scripts(cmake_builder, deploy_dir, project_name, url, port=22):
     """ generate all scripts needed for debug """
-    parts = qibuild.deploy.parse_url(url)
-    server = parts["url"]
-    remote_directory = parts["dir"]
+    host = url.host
+    remote_directory = url.remote_directory
 
     solib_search_path = _generate_solib_search_path(cmake_builder, project_name)
     sysroot = None
@@ -145,9 +144,9 @@ def generate_debug_scripts(cmake_builder, deploy_dir, project_name, url, port=22
     to_deploy = list()
     setup_gdb = _generate_setup_gdb(deploy_dir, sysroot=sysroot,
                                     solib_search_path=solib_search_path,
-                                    remote_gdb_address="%s:2159" % server)
+                                    remote_gdb_address="%s:2159" % host)
     gdb_script = _generate_run_gdbserver_binary(deploy_dir, gdb=gdb, gdb_listen=":2159",
-                                                remote=server, port=port,
+                                                host=host, port=port,
                                                 remote_dir=remote_directory)
 
     ui.info(message)

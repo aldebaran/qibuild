@@ -4,6 +4,7 @@ import operator
 
 from qisys import ui
 import qisys.sh
+import qisys.remote
 import qibuild.deps_solver
 from qisys.abstractbuilder import AbstractBuilder
 
@@ -192,7 +193,7 @@ class CMakeBuilder(AbstractBuilder):
             ui.info(ui.green, "and the following packages")
             for package in sorted(dep_packages, key=operator.attrgetter("name")):
                 ui.info(" *", ui.blue, package.name)
-        ui.info(ui.green, "will be deployed to", ui.blue, url.as_strirng)
+        ui.info(ui.green, "will be deployed to", ui.blue, url.as_string)
 
         if dep_packages:
             print
@@ -200,7 +201,7 @@ class CMakeBuilder(AbstractBuilder):
             for i, package in enumerate(dep_packages):
                 ui.info_count(i, len(dep_packages),
                     ui.green, "Deploying package", ui.blue, package.name,
-                    ui.green, "to", ui.blue, url.as_strirng)
+                    ui.green, "to", ui.blue, url.as_string)
                 # Install package in local deploy dir
                 files = package.install(deploy_dir, runtime=True)
                 to_deploy.extend(files)
@@ -213,7 +214,7 @@ class CMakeBuilder(AbstractBuilder):
         for (i, project) in enumerate(dep_projects):
             ui.info_count(i, len(dep_projects),
                     ui.green, "Deploying project", ui.blue, project.name,
-                    ui.green, "to", ui.blue, url.as_strirng)
+                    ui.green, "to", ui.blue, url.as_string)
 
             components = ["runtime"]
             if with_tests:
@@ -234,8 +235,7 @@ class CMakeBuilder(AbstractBuilder):
         with open(deploy_manifest, "a") as f:
             set_to_deploy = set(to_deploy)
             f.write("\n".join(set_to_deploy))
-        qibuild.deploy.deploy(deploy_dir, url, use_rsync=use_rsync,
-                              filelist=deploy_manifest)
+        qisys.remote.deploy(deploy_dir, url, filelist=deploy_manifest)
 
         print
 
