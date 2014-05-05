@@ -8,6 +8,7 @@ downloading package or reading configs from URLs
 """
 
 import os
+import re
 import sys
 import ftplib
 import urlparse
@@ -207,3 +208,59 @@ def download(url, output_dir, output_name=None,
     return dest_name
 
 
+class URLParseError(Exception):
+    def __int__(self, message):
+        super(URLParseError).__int__(message)
+
+class URL(object):
+    def __init__(self, url_as_string):
+        self.as_string = url_as_string
+        self.user = None
+        self.host = None
+        self.port = None
+        self.remote_directory = None
+        self._parse(url_as_string)
+
+    def _parse(self, string):
+
+        modern_scheme = """
+ssh://
+(?P<user>[^@]+)        # user is anything but @
+@                      # mandatory @ separator
+(?P<host>[^:/]+)       # host is anything but : and /
+(:(?P<port>\d+))?      # optional port
+(/(?P<remote_dir>.*))? # optional remote directory
+"""
+        match = re.match(modern_scheme, string, re.VERBOSE)
+        if match:
+            self._handle_match(match)
+        else:
+            old_scheme = """
+(?P<user>[^@]+)        # user is anything but @, and optional
+@                      # mandatory @ separator
+(?P<host>[^:/]+)       # host is anything but : and /
+(
+  (:|/)?               # directory separator is either : or /
+  (?P<remote_dir>.*))? # remote directory is optional
+        """
+            match = re.match(old_scheme, string, re.VERBOSE)
+            if match:
+                self._handle_match(match)
+            else:
+                raise URLParseError(""" \
+Could not parse %s as a valid url.
+Supported schemes are
+
+  user@host:directory
+
+  ssh://user@host:port/directory
+""" % self.as_string)
+
+    def _handle_match(self, match):
+            dict = match.groupdict()
+            self.user = dict["user"]
+            self.host = dict["host"]
+            self.port = 22
+            if "port" in dict and dict["port"]:
+                self.port = int(dict["port"])
+            self.remote_directory = dict["remote_dir"] or None
