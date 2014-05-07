@@ -21,7 +21,7 @@ Some useful links:
 
 * `Learning about setup.py <https://docs.python.org/2/distutils/index.html>`_
 
-* `Learning abouth virtualenv <https://virtualenv.pypa.io/en/latest/>`_
+* `Learning about virtualenv <https://virtualenv.pypa.io/en/latest/>`_
 
 Your project should now be listed when running ``qipy list``
 
