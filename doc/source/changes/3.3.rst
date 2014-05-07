@@ -24,5 +24,7 @@ Command line
       qibuild deploy --url ssh://foo@bar:42/deploy
 
 
+CMake
+-----
 
-
+Add ``qi_create_python_ext``
