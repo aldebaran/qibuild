@@ -8,3 +8,4 @@ qiBuild tutorials
     qibuild/tutorial
     qidoc/tutorial
     qilinguist/tutorial
+    qipy/tutorial

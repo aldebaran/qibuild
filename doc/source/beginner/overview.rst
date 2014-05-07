@@ -106,3 +106,14 @@ Tutorial
 ++++++++
 
 See :ref:`qilinguist-tutorial`
+
+qipy: QiBuild and Python
+------------------------
+
+``qipy`` makes it possible to use Python extensions
+written in C/C++ with ``qibuild`` with pure Python libraries.
+
+Tutorial
++++++++++
+
+See :ref:`qipy-tutorial`

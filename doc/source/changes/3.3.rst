@@ -1,0 +1,28 @@
+v3.3
+====
+
+
+Command line
+------------
+
+* New command added: ``qipy``. This makes it possible to use Python extensions
+  written in C/C++ with ``qibuild`` with pure Python libraries.
+
+* **API break** ``qibuild deploy`` now has a mandatory ``--url`` argument, mostly
+  for saner parsing when using multiple urls.
+
+  .. code-block:: console
+
+      Old:
+
+      qibuild deploy foo foo@bar:deploy --url foo@baz:deploy
+      qibuild deploy --port 42 foo@bar:deploy
+
+      New:
+
+      qibuild deploy --url foo foo@bar --url foo@baz
+      qibuild deploy --url ssh://foo@bar:42/deploy
+
+
+
+
