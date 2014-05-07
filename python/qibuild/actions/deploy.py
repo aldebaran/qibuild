@@ -22,6 +22,7 @@ Installs everything on the target 'mytarget' in the
 
 
 import qibuild.parsers
+import qisys.parsers
 import qibuild.deploy
 
 def configure_parser(parser):
