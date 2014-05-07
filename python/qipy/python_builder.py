@@ -1,5 +1,6 @@
 import sys
 import os
+import subprocess
 
 from qisys import ui
 from qisys.abstractbuilder import AbstractBuilder
@@ -32,9 +33,11 @@ class PythonBuilder(AbstractBuilder):
         for project in self.projects:
             ui.info(ui.green, " * ", ui.blue, project.name)
             setup_py = os.path.join(project.path, "setup.py")
-            cmd = [sys.executable, setup_py, "install", "--root", dest,
-                '--prefix=']
-            qisys.command.call(cmd, cwd=project.path)
+            # cannot use /usr/bin/python in case we are in a virtualenv already
+            subprocess.check_call(["python",
+                                  setup_py, "install", "--root", dest,
+                                 '--prefix='],
+                                 cwd=project.path)
         # Also install a python wrapper so that everything goes smoothly
         to_write="""\
 #!/bin/bash
