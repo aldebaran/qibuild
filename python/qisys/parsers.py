@@ -71,7 +71,7 @@ def deploy_parser(parser):
                        help="deploy to each given url.", required=True)
 
 def get_deploy_urls(args):
-    return [qisys.remote.URS(x) for x in args.urls]
+    return [qisys.remote.URL(x) for x in args.urls]
 
 
 def get_worktree(args=None):
