@@ -14,7 +14,6 @@ import qipy.worktree
 
 def configure_parser(parser):
     qibuild.parsers.build_parser(parser)
-    # FIXME: add -r
     parser.add_argument("requirements", nargs="*")
 
 def do(args):
