@@ -9,7 +9,7 @@ import argparse
 import qisys.script
 
 def print_version(script_name):
-    sys.stdout.write("%s version 3.2.5\n" % script_name)
+    sys.stdout.write("%s version 3.3\n" % script_name)
 
 
 def main():
