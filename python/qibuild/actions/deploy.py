@@ -29,7 +29,7 @@ import qibuild.deploy
 def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.project_parser(parser)
-    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.cmake_build_parser(parser)
     qisys.parsers.deploy_parser(parser)
     group = parser.add_argument_group("qibuild specific deploy options")
     group.add_argument("--split-debug", action="store_true", dest="split_debug",

@@ -21,13 +21,7 @@ def get_one_python_project(python_worktree, args):
 
 def get_python_builder(args):
     build_worktree = qibuild.parsers.get_build_worktree(args)
-    build_config = qibuild.parsers.get_build_config(build_worktree, args)
-    build_worktree.build_config = build_config
-    config = build_config.active_config
-    if config is None:
-        config = "system"
-    python_worktree = qipy.parsers.get_python_worktree(args)
-    python_worktree.config = config
+    python_worktree = get_python_worktree(args)
     python_builder = qipy.python_builder.PythonBuilder(python_worktree,
                                                        build_worktree)
     return python_builder

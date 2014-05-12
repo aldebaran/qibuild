@@ -12,7 +12,7 @@ import qibuild.parsers
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.cmake_build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("make options")
     group.add_argument("--rebuild", "-r", action="store_true", default=False)

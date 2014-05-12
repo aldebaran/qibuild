@@ -11,7 +11,7 @@ import qibuild.parsers
 
 def configure_parser(parser):
     qisys.parsers.project_parser(parser)
-    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("dest")
 
 def do(args):

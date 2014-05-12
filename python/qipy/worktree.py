@@ -73,7 +73,8 @@ Fond two project with the same name. (%s)
 
     @property
     def venv_path(self):
-        res = os.path.join(self.worktree.dot_qi, "venvs", self.config)
+        res = os.path.join(self.worktree.dot_qi, "venvs",
+                           self.build_config.build_directory)
         return res
 
     @property
