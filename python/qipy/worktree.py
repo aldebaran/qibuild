@@ -9,11 +9,11 @@ import qisys.qixml
 import qipy.project
 
 class PythonWorkTree(qisys.worktree.WorkTreeObserver):
-    def __init__(self, worktree):
+    def __init__(self, worktree, config="system"):
         self.worktree = worktree
         self.python_projects = list()
         self._load_python_projects()
-        self.config = "system"
+        self.config = "default"
         worktree.register(self)
 
     def on_project_added(self, project):
@@ -74,7 +74,7 @@ Fond two project with the same name. (%s)
     @property
     def venv_path(self):
         res = os.path.join(self.worktree.dot_qi, "venvs",
-                           self.build_config.build_directory)
+                           self.config)
         return res
 
     @property

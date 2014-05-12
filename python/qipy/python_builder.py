@@ -20,18 +20,26 @@ class PythonBuilder(AbstractBuilder):
     def __init__(self, python_worktree, build_worktree=None):
         self.python_worktree = python_worktree
         self.build_worktree = build_worktree
+        if build_worktree:
+            build_config = self.build_worktree.build_config
+            self.build_name = build_config.build_directory(prefix="qipy")
+        else:
+            self.build_name = "default"
         self.projects = list()
 
     def configure(self, *args, **kwargs):
-        qipy.venv.configure_virtualenv(self.python_worktree,
+        qipy.venv.configure_virtualenv(self.build_name,
+                                       self.python_worktree,
                                        build_worktree=self.build_worktree)
 
     def build(self, *args, **kwargs):
         pass
 
     def install(self, dest, *args, **kwargs):
-        for project in self.projects:
-            ui.info(ui.green, " * ", ui.blue, project.name)
+        n = len(self.projects)
+        for i, project in enumerate(self.projects):
+            ui.info_count(i, n, ui.green, "Installing",
+                          ui.reset, ui.blue, project.name)
             setup_py = os.path.join(project.path, "setup.py")
             # cannot use /usr/bin/python in case we are in a virtualenv already
             subprocess.check_call(["python",
