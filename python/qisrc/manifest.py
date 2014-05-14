@@ -313,9 +313,17 @@ class RepoConfigParser(qisys.qixml.XMLParser):
         if not self.target.default_remote_name:
             self.target.default_remote_name = remote_names[0]
 
+        for upstream_elem in self._root.findall("upstream"):
+            name = qisys.qixml.parse_required_attr(upstream_elem, "name")
+            url = qisys.qixml.parse_required_attr(upstream_elem, "url")
+            upstream_remote = qisrc.git_config.Remote()
+            upstream_remote.name = name
+            upstream_remote.url = url
+            self.target.remotes.append(upstream_remote)
 
     def _write_remote_names(self, elem):
         elem.set("remotes", " ".join(self.target.remote_names))
 
     def _write_default_branch(self, elem):
         elem.set("branch", self.target.default_branch)
+

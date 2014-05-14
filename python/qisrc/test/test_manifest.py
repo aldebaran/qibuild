@@ -284,3 +284,19 @@ def test_default_branch(tmpdir):
     assert bar.default_branch == "devel"
     foo = manifest.repos[1]
     assert foo.default_branch == "tutu"
+
+
+def test_multiple_remotes(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="foo/bar.git" src="lib/bar" remotes="origin">
+    <upstream name="kernel-lts" url="git.kernel.org" />
+  </repo>
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert len(manifest.repos) == 1
+    foo = manifest.repos[0]
+    assert len(foo.remotes) == 2
