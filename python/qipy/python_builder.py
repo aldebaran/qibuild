@@ -20,15 +20,14 @@ class PythonBuilder(AbstractBuilder):
     def __init__(self, python_worktree, build_worktree=None):
         self.python_worktree = python_worktree
         self.build_worktree = build_worktree
-        if build_worktree:
-            build_config = self.build_worktree.build_config
-            self.build_name = build_config.build_directory(prefix="qipy")
-        else:
-            self.build_name = "default"
         self.projects = list()
 
+    @property
+    def config(self):
+        return self.python_worktree.config
+
     def configure(self, *args, **kwargs):
-        qipy.venv.configure_virtualenv(self.build_name,
+        qipy.venv.configure_virtualenv(self.config,
                                        self.python_worktree,
                                        build_worktree=self.build_worktree)
 
