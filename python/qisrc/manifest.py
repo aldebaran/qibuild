@@ -321,6 +321,8 @@ class RepoConfigParser(qisys.qixml.XMLParser):
             upstream_remote.url = url
             self.target.remotes.append(upstream_remote)
 
+
+
     def _write_remote_names(self, elem):
         elem.set("remotes", " ".join(self.target.remote_names))
 
