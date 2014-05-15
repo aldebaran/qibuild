@@ -128,7 +128,7 @@ class WorkTreeSyncer(object):
         xml = parser.xml_elem()
         qisys.qixml.write(xml, self.manifests_xml)
 
-    def configure_manifest(self, name, url, groups=None, branch="master"):
+    def configure_manifest(self, name, url, groups=None, branch="master", ref=None):
         """ Add a manifest to the list. Will be stored in
         .qi/manifests/<name>
 
@@ -139,6 +139,7 @@ class WorkTreeSyncer(object):
         to_add.url = url
         to_add.groups = groups
         to_add.branch = branch
+        to_add.ref = ref
         self.manifests[name] = to_add
         self.clone_manifest(to_add)
         self.sync_repos()
@@ -204,7 +205,11 @@ class WorkTreeSyncer(object):
         with git.transaction() as transaction:
             git.fetch("origin")
             git.checkout("-B", local_manifest.branch)
-            git.reset("--hard", "origin/%s" % local_manifest.branch)
+            if local_manifest.ref:
+                to_reset = local_manifest.ref
+                git.reset("--hard", to_reset)
+            else:
+                git.reset("--hard", "origin/%s" % local_manifest.branch)
         if not transaction.ok:
             ui.warning("Update failed")
             ui.info(transaction.output)
@@ -352,6 +357,16 @@ class LocalManifest(object):
         self.url = None
         self.branch = "master"
         self.groups = list()
+        self.ref = None # used for snaphots or in case you
+                        # don't want the head of a branch
+
+    def __eq__(self, other):
+        return self.name == other.name and \
+               self.url == other.url and \
+               self.groups == other.groups and \
+               self.ref == other.ref and \
+               self.branch == other.branch
+
 
 ###
 # Compute updates

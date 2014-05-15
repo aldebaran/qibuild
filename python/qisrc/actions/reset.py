@@ -40,6 +40,9 @@ def do(args):
         snapshot = qisrc.snapshot.Snapshot()
         snapshot.load(args.snapshot)
 
+    if snapshot.format_version == 1:
+        reset_manifests()
+
     errors = list()
     for git_project in git_projects:
         state_project = qisrc.status.check_state(git_project, False)
@@ -95,3 +98,11 @@ def do(args):
     for error in errors:
         ui.error(" * ", error)
     sys.exit(1)
+
+def reset_manifests(git_worktree, snapshot):
+    manifests = snapshot.manifests
+    for manifest in manifest.values():
+        git_worktree.configure_manifest(manifest.branch, manifest.url,
+                                        groups=manifest.groups,
+                                        branch=manifest.branch,
+                                        ref=manifest.ref)

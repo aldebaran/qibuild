@@ -34,9 +34,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.load_git_projects()
         self._syncer = qisrc.sync.WorkTreeSyncer(self)
 
-    def configure_manifest(self, name, manifest_url, groups=None, branch="master"):
+    def configure_manifest(self, name, manifest_url, groups=None,
+                           branch="master", ref=None):
         """ Add a new manifest to this worktree """
-        self._syncer.configure_manifest(name, manifest_url, groups=groups, branch=branch)
+        self._syncer.configure_manifest(name, manifest_url, groups=groups,
+                                        branch=branch, ref=ref)
 
     def configure_projects(self, projects):
         self._syncer.configure_projects(projects)
@@ -127,6 +129,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
         """
         snapshot = qisrc.snapshot.Snapshot()
+        for name, manifest in self.manifests.iteritems():
+            manifest_name = manifest.name
+            manifest_path = os.path.join(self.worktree.dot_qi, "manifests", name)
+            git = qisrc.git.Git(manifest_path)
+            rc, out = git.call("rev-parse", "HEAD", raises=False)
+            manifest.ref = out
+            snapshot.manifests[name] = manifest
         for git_project in self.git_projects:
             src = git_project.src
             git = qisrc.git.Git(git_project.path)
