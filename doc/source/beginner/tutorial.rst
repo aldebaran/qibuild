@@ -9,3 +9,4 @@ qiBuild tutorials
     qidoc/tutorial
     qilinguist/tutorial
     qipy/tutorial
+    qipkg/tutorial
