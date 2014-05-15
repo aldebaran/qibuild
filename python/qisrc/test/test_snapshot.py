@@ -109,3 +109,4 @@ def test_generate_load_json(tmpdir, git_server, git_worktree):
     snapshot2 = qisrc.snapshot.Snapshot()
     snapshot2.load(snapshot_json)
     assert snapshot2 == snapshot1
+
