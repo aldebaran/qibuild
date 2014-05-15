@@ -1,0 +1,17 @@
+v3.3.1
+======
+
+Command line
+------------
+
+* ``qipy`` now accepts ``-c``, ``-p`` arguments like other
+  qibuild commands
+
+* Add ``qipy deploy``
+
+* Add ``qipy sourceme``. Mostly useful in scripts, like
+
+  .. code-block:: console
+
+      source $(qipy sourceme --quiet)
+      # do something inside qipy's virtualenv
