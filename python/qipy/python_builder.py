@@ -1,5 +1,6 @@
 import sys
 import os
+import qisys.remote
 import subprocess
 
 from qisys import ui
@@ -57,3 +58,8 @@ python "$@"
         with open(python_wrapper, "w") as fp:
             fp.write(to_write)
         os.chmod(python_wrapper, 0755)
+
+    def deploy(self, url):
+        with qisys.sh.TempDir() as tmp:
+            self.install(tmp)
+            qisys.remote.deploy(tmp, url)
