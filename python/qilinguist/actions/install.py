@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Compile binary translations files
+""" Install binary translations files
 
 """
 
@@ -15,9 +15,11 @@ def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
+    parser.add_argument("destination")
 
 
 def do(args):
     """Main entry point"""
+    destination = args.destination
     builder = qilinguist.parsers.get_linguist_builder(args)
-    builder.build()
+    builder.install(destination)

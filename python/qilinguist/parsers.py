@@ -1,4 +1,5 @@
 import qisys.parsers
+import qilinguist.builder
 
 from qilinguist.worktree import LinguistWorkTree, new_linguist_project
 import qilinguist.builder
@@ -12,8 +13,12 @@ def get_linguist_projects(worktree, args, default_all=False):
     return parser.parse_args(args, default_all=default_all)
 
 def get_linguist_builder(args):
-    linguist_worktree = get_linguist_worktree(args)
-    return qilinguist.builder.QiLinguistBuilder(linguist_worktree)
+    worktree = get_linguist_worktree(args)
+    projects = get_linguist_projects(worktree, args)
+    builder = qilinguist.builder.QiLinguistBuilder(worktree)
+    builder.projects = projects
+    return builder
+
 
 
 

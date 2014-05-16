@@ -16,11 +16,13 @@ class QiLinguistBuilder(AbstractBuilder):
         self.projects.append(self.linguist_worktree.get_linguist_project(name))
 
     def configure(self, *args, **kwargs):
-        pass
+        for project in self.projects:
+            project.update()
 
     def build(self, *args, **kwargs):
-        for p in self.projects:
-            p.release()
+        for project in self.projects:
+            project.release()
 
-    def install(self, destname, *args, **kwargs):
-        raise NotImplementedError
+    def install(self, dest):
+        for project in self.projects:
+            project.install(dest)

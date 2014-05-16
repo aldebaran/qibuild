@@ -20,7 +20,5 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    linguist_worktree = qilinguist.parsers.get_linguist_worktree(args)
-    projects = qilinguist.parsers.get_linguist_projects(linguist_worktree, args)
-    for project in projects:
-        project.update()
+    builder = qilinguist.parsers.get_linguist_builder(args)
+    builder.configure()

@@ -41,5 +41,11 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
                    input_file, "-qm", output_file]
             qisys.command.call(cmd, cwd=self.path)
 
+    def install(self, destination):
+        full_dest = os.path.join(destination, "share", "locale")
+        def filter(f):
+            return f.endswith(".qm")
+        qisys.sh.install(self.po_path, full_dest, filter_fun=filter)
+
     def __repr__(self):
         return "<QtLinguistProject %s in %s>" % (self.name, self.src)
