@@ -67,7 +67,17 @@ def test_always_fetch(git_worktree, git_server, tmpdir):
     assert local_sha1 == remote_sha1
 
 
-def test_load_fileobject(tmpdir):
+def test_load_file_object(tmpdir):
+    snapshot = qisrc.snapshot.Snapshot()
+    snapshot.refs["foo"] = "d34db33f"
+    snapshot_txt = tmpdir.join("snap.txt").strpath
+    snapshot.dump(snapshot_txt)
+    snapshot2 = qisrc.snapshot.Snapshot()
+    with open(snapshot_txt) as fp:
+        snapshot2.load(fp)
+    assert snapshot2 == snapshot
+
+def test_load_file_path(tmpdir):
     snapshot = qisrc.snapshot.Snapshot()
     snapshot.refs["foo"] = "d34db33f"
     snapshot_txt = tmpdir.join("snap.txt").strpath
@@ -75,7 +85,6 @@ def test_load_fileobject(tmpdir):
     snapshot2 = qisrc.snapshot.Snapshot()
     snapshot2.load(snapshot_txt)
     assert snapshot2 == snapshot
-
 
 def test_stores_manifest_in_snapshot(git_server, git_worktree):
     git_server.create_repo("foo")

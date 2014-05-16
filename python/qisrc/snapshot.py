@@ -48,31 +48,34 @@ class Snapshot(object):
                     }
             json.dump(to_dump, fp, indent=2)
 
-    def load(self, input_file):
+    def load(self, source):
         """ Load a snapshot from a file path or a file object """
-        with open(input_file, "r") as fp:
-            # Try as json:
-            try:
-                parsed = json.load(fp)
-                self._load_json(parsed)
-            except ValueError:
-                self._load_deprecated(input_file)
+        # Try to open, else assume it's a file object
+        try:
+            fp = open(source, "r")
+            data = fp.read()
+        except TypeError:
+            data = source.read()
+        try:
+            parsed = json.loads(data)
+            self._load_json(parsed)
+        except ValueError:
+            self._load_deprecated(data)
+        try:
+            source.close()
+        except AttributeError:
+            pass
 
-    def _load_deprecated(self, input_file):
-        with open(input_file, "r") as fp:
-            for line in fp:
-                try:
-                    (src, sha1) = line.split(":")
-                except ValueError:
-                    ui.error("could not parse", line)
-                    continue
-                src = src.strip()
-                sha1 = sha1.strip()
-                self.refs[src] = sha1
+    def _load_deprecated(self, source):
+        for line in source.splitlines():
             try:
-                fp.close()
-            except AttributeError:
-                pass
+                (src, sha1) = line.split(":")
+            except ValueError:
+                ui.error("could not parse", line)
+                continue
+            src = src.strip()
+            sha1 = sha1.strip()
+            self.refs[src] = sha1
 
     def _load_json(self, parsed_json):
         self.format_version = parsed_json["format"]
