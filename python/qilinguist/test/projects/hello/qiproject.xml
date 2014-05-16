@@ -1,0 +1,4 @@
+<project version="3">
+  <qipython name="hello" />
+  <qilinguist name="hello" linguas="en_US fr_FR" tr="gettext" />
+</project>
