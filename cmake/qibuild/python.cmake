@@ -127,8 +127,7 @@ function(qi_create_python_ext target)
   )
 
   qi_use_lib(${target} PYTHON)
-  install(TARGETS ${target} DESTINATION lib/python2.7/site-packages
-         COMPONENT runtime)
+  qi_install_python(TARGETS ${target} COMPONENT runtime)
 
   # Register the target into the build dir for qipy
   file(WRITE ${QI_SDK_DIR}/qi.pth
