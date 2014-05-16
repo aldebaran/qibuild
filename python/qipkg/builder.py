@@ -14,8 +14,8 @@ from qibuild.cmake_builder import CMakeBuilder
 class PMLBuider(object):
     def __init__(self, pml_path,
                  cmake_builder,
-                 python_builder):
-
+                 python_builder,
+                 linguist_builder):
         self.pml_path = pml_path
         self.base_dir = os.path.dirname(self.pml_path)
         self.manifest_xml = os.path.join(self.base_dir, "manifest.xml")
@@ -24,10 +24,12 @@ class PMLBuider(object):
 
         self.cmake_builder = cmake_builder
         self.python_builder = python_builder
+        self.linguist_builder = linguist_builder
 
         self.build_worktree = self.cmake_builder.build_worktree
         self.python_worktree = self.python_builder.python_worktree
-        self.builders = [self.cmake_builder, self.python_builder]
+        self.linguist_worktree = linguist_builder.linguist_worktree
+        self.builders = [self.cmake_builder, self.python_builder, self.linguist_builder]
         self.worktree = self.build_worktree.worktree
 
         self.file_list = list()
@@ -57,6 +59,12 @@ class PMLBuider(object):
             name = qisys.qixml.parse_required_attr(qipython_elem, "name", pml_path)
             project = self.python_worktree.get_python_project(name)
             self.python_builder.projects.append(project)
+
+        qilinguist_elems = root.findall("qilinguist")
+        for qilinguist_elem in qilinguist_elems:
+            name = qisys.qixml.parse_required_attr(qilinguist_elem, "name", pml_path)
+            project = self.linguist_worktree.get_linguist_project(name)
+            self.linguist_builder.projects.append(project)
 
         # For top, ressource, dialog, behavior, add stuff to self.file_list
         behaviors = root.find("BehaviorDescriptions")

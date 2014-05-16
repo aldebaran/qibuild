@@ -9,6 +9,7 @@ import qipkg.builder
 
 import qibuild.parsers
 import qipy.parsers
+import qilinguist.parsers
 
 
 def pml_parser(parser):
@@ -23,4 +24,6 @@ def get_pml_builder(args):
     # the project names from the command line
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
     python_builder = qipy.parsers.get_python_builder(args)
-    return qipkg.builder.PMLBuider(pml_path, cmake_builder, python_builder)
+    linguist_builder = qilinguist.parsers.get_linguist_builder(args)
+    return qipkg.builder.PMLBuider(pml_path, cmake_builder,
+                                   python_builder, linguist_builder)
