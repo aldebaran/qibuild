@@ -63,23 +63,26 @@ def new_linguist_project(linguist_worktree, project):
     root = tree.getroot()
     if root.get("version") != "3":
         return None
-    translate_elem = root.find("translate")
-    if translate_elem is None:
-        return None
-    name = translate_elem.get("name")
+    elem = root.find("qilinguist")
+    if elem is None:
+        # try deprecated name too
+        elem = root.find("translate")
+        if elem is None:
+            return None
+    name = elem.get("name")
     if not name:
         raise BadProjectConfig(project.qiproject_xml,
                                "Expecting a 'name' attribute")
 
-    domain = translate_elem.get("domain")
+    domain = elem.get("domain")
     if not domain:
         domain = name
 
-    linguas = translate_elem.get("linguas").split()
+    linguas = elem.get("linguas").split()
     if not linguas:
         linguas = ["en_US"]
 
-    tr_framework = translate_elem.get("tr")
+    tr_framework = elem.get("tr")
     if not tr_framework:
         raise BadProjectConfig(project.qiproject_xml,
                                "Expecting a 'tr' attribute")
