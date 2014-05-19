@@ -123,8 +123,21 @@ function(qi_create_python_ext target)
   message(STATUS "Python extension: ${target}")
   set_target_properties(${target}
     PROPERTIES PREFIX ""
-    LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages
   )
+  if(UNIX)
+    set_target_properties(${target} PROPERTIES
+      SUFFIX ".so"
+      LIBRARY_OUTPUT_DIRECTORY ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages
+    )
+  endif()
+
+  if(WIN32)
+    set_target_properties(${target} PROPERTIES
+      SUFFIX ".pyd"
+      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages
+      RUNTIME_OUTPUT_DIRECTORY_DEBUG ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages
+    )
+  endif()
 
   qi_use_lib(${target} PYTHON)
   qi_install_python(TARGETS ${target} COMPONENT runtime)
