@@ -32,7 +32,7 @@ class Package(object):
     def make_package(self, pml_builder, output=None):
         stage_path = pml_builder.stage_path
         if not output:
-            name = pkg_name(self.manifest_xml)
+            name = pkg_name(self.manifest_xml) + ".pkg"
             output = os.path.join(os.getcwd(), name)
 
         archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
@@ -57,10 +57,10 @@ class Package(object):
 
 
 def pkg_name(manifest_xml):
-    "Return a tuple name, version"
+    "Return a string name-version"
     root = qisys.qixml.read(manifest_xml).getroot()
     uuid = root.get("uuid")
     version = root.get("version")
-    output_name = "%s-%s.pkg" % (uuid, version)
+    output_name = "%s-%s" % (uuid, version)
     return output_name
 
