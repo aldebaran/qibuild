@@ -45,3 +45,8 @@ Command line
 
       source $(qipy sourceme --quiet)
       # do something inside qipy's virtualenv
+
+CMake
+-----
+
+* Add ``qi_create_test_lib``

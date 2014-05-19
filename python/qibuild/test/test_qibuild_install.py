@@ -149,3 +149,10 @@ def test_install_returns(qibuild_action, tmpdir):
                              '/include/relative/bar/bar.h',
                              '/share/recurse/a_dir/b_dir/c_dir/d_file',
                              '/share/recurse/a_dir/a_file'}
+
+def test_install_test_libs(qibuild_action, tmpdir):
+    installme = qibuild_action.add_test_project("installme")
+    dest = tmpdir.join("dest")
+    installme.configure()
+    installme.build()
+    installme.install(dest.strpath, components=["runtime", "test"])

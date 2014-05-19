@@ -84,3 +84,18 @@ endfunction()
 function(qi_create_perf_test name)
   _qi_add_test_internal(${name} ${name} PERF_TEST ${ARGN})
 endfunction()
+
+function(qi_create_test_lib target_name)
+  qi_create_lib(${target_name} ${ARGN} NO_INSTALL)
+
+  if(WIN32)
+    set(_runtime_output ${QI_SDK_BIN})
+  else()
+    set(_runtime_output ${QI_SDK_LIB})
+  endif()
+
+  install(TARGETS ${target_name}
+    RUNTIME COMPONENT test DESTINATION ${_runtime_output}
+    LIBRARY COMPONENT test DESTINATION ${_runtime_output}
+  )
+endfunction()

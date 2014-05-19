@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(installme NONE)
+project(installme)
 
 find_package(qibuild)
 
@@ -20,3 +20,6 @@ endif()
 if (FAIL_NON_EXISTING)
   qi_install_data(nonexisting)
 endif()
+
+# test
+qi_create_test_lib(foo foo.cpp)
