@@ -12,11 +12,12 @@ def get_linguist_projects(worktree, args, default_all=False):
     parser = LinguistProjectParser(worktree)
     return parser.parse_args(args, default_all=default_all)
 
-def get_linguist_builder(args):
+def get_linguist_builder(args, with_projects=True):
     worktree = get_linguist_worktree(args)
-    projects = get_linguist_projects(worktree, args)
     builder = qilinguist.builder.QiLinguistBuilder(worktree)
-    builder.projects = projects
+    if with_projects:
+        projects = get_linguist_projects(worktree, args)
+        builder.projects = projects
     return builder
 
 
