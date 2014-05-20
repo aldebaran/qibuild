@@ -1,4 +1,4 @@
-""" Make all python projects available in the current build configuartion
+""" Make all python projects available in the current build configuration
 
 """
 import sys
