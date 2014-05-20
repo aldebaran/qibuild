@@ -27,10 +27,14 @@ class PythonBuilder(AbstractBuilder):
     def config(self):
         return self.python_worktree.config
 
-    def configure(self, *args, **kwargs):
+    def bootstrap(self, remote_packages=None):
         qipy.venv.configure_virtualenv(self.config,
                                        self.python_worktree,
-                                       build_worktree=self.build_worktree)
+                                       build_worktree=self.build_worktree,
+                                       remote_packages=remote_packages)
+
+    def configure(self, *args, **kwargs):
+        pass
 
     def build(self, *args, **kwargs):
         pass

@@ -1,10 +1,15 @@
 import os
+import subprocess
 import virtualenv
 
 from qisys import ui
 import qisys.command
 
-def configure_virtualenv(config, python_worktree,  build_worktree=None):
+def configure_virtualenv(config, python_worktree,  build_worktree=None,
+                         remote_packages=None):
+    if not remote_packages:
+        remote_packages = list()
+
     # create a new virtualenv
     python_worktree.config = config
     venv_path = python_worktree.venv_path
@@ -23,6 +28,12 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None):
     # Write a qi.pth file containing path to C/C++ extensions
     if build_worktree:
         handle_extensions(venv_path, python_worktree, build_worktree)
+
+    # Install the extension in the virtualenv
+    binaries_path = virtualenv.path_locations(venv_path)[-1]
+    pip_binary = os.path.join(binaries_path, "pip")
+    cmd = [pip_binary, "install"] + remote_packages
+    subprocess.check_call(cmd)
 
 
 def handle_extensions(venv_path, python_worktree, build_worktree):

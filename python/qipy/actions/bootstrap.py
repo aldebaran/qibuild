@@ -15,7 +15,8 @@ import qipy.worktree
 def configure_parser(parser):
     qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("requirements", nargs="*")
+    parser.set_defaults(requirements=["pip", "virtualenv", "ipython"])
 
 def do(args):
     python_builder = qipy.parsers.get_python_builder(args)
-    python_builder.configure()
+    python_builder.bootstrap(remote_packages=args.requirements)

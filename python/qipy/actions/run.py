@@ -1,6 +1,8 @@
 """ Run a python script from the virtualenv"""
 
 import os
+import subprocess
+import virtualenv
 
 from qisys import ui
 import qisys.interact
@@ -16,6 +18,7 @@ def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args)
     build_config = qibuild.parsers.get_build_config(build_worktree, args)
     worktree = build_worktree.worktree
+    cmd = args.command
 
     venvs_path = os.path.join(worktree.dot_qi,
                              "venvs")
@@ -23,8 +26,20 @@ def do(args):
     venv_root = os.path.join(venvs_path, name)
     if not os.path.exists(venv_root):
         err = "No Virtualenv found in %s\n" % (venv_root)
-        err += "Tring running `qipy configure`"
+        err += "Please run `qipy bootstrap`"
         raise Exception(err)
 
-    python_bin = os.path.join(venv_root, "bin", "python")
-    qisys.command.call([python_bin] + args.command)
+    binaries_path = virtualenv.path_locations(venv_root)[-1]
+    if not cmd:
+        cmd = [os.path.join(venv_root, binaries_path, "ipython")]
+    else:
+        if os.path.exists(cmd[0]):
+            bin_in_venv = None
+        else:
+            bin_in_venv = os.path.join(venv_root, binaries_path, cmd[0])
+        if bin_in_venv and os.path.exists(bin_in_venv):
+            cmd[0] = bin_in_venv
+        else:
+            cmd = [os.path.join(venv_root, binaries_path, "python")] + cmd
+    ui.debug("Calling", cmd)
+    subprocess.check_call(cmd)
