@@ -1,4 +1,5 @@
-""" Return the path to the activate file in the virtual
+""" Return the path to the activate file in the virtualenv
+
 Mostly useful in scripts:
 
     source $(qibuild sourceme)
