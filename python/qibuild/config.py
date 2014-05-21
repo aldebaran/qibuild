@@ -230,6 +230,21 @@ class Server:
             res += ui.indent(access_str)
         return res
 
+class WorkTree:
+    def __init__(self):
+        self.path = None
+
+    def parse(self, tree):
+        path = tree.get("path")
+        if not path:
+            qisys.qixml.raise_parse_error(
+                    "'worktree' node should have a 'path' attribute")
+        self.path = path
+
+    def tree(self):
+        tree = etree.Element("worktree")
+        tree.set("path", self.path)
+        return tree
 
 class LocalSettings:
     def __init__(self):
@@ -392,6 +407,9 @@ class QiBuildConfig:
         # Active CMake config:
         self.cmake = CMake()
 
+        # A dict of worktree, key being the path
+        self.worktrees = dict()
+
     def read(self, cfg_path=None, create_if_missing=False):
         """ Read from a config location
 
@@ -442,6 +460,13 @@ class QiBuildConfig:
             server = Server()
             server.parse(server_tree)
             self.servers[server.name] = server
+
+        # Parse worktrees
+        worktree_trees = self.tree.findall("worktree")
+        for worktree_tree in worktree_trees:
+            worktree = WorkTree()
+            worktree.parse(worktree_tree)
+            self.worktrees[worktree.path] = worktree
 
         self.cmake.generator = self.defaults.cmake.generator
         self.env.bat_file = self.defaults.env.bat_file
@@ -543,6 +568,11 @@ class QiBuildConfig:
             splitted_paths.insert(0, to_add)
         self.defaults.env.path = os.pathsep.join(splitted_paths)
 
+    def add_worktree(self, path):
+        to_add = WorkTree()
+        to_add.path = path
+        self.worktrees[path] = to_add
+
 
     def get_server_access(self, server_name):
         """ Return the access settings of a server
@@ -599,6 +629,10 @@ class QiBuildConfig:
         for server in servers:
             server_tree = server.tree()
             qibuild_tree.append(server_tree)
+        worktrees = self.worktrees.values()
+        for worktree in worktrees:
+            worktree_tree = worktree.tree()
+            qibuild_tree.append(worktree_tree)
 
         qisys.qixml.write(qibuild_tree, xml_path)
 

@@ -18,6 +18,8 @@ import qisys.command
 import qisys.sh
 import qisys.qixml
 
+import qibuild.config
+
 
 class WorkTree(object):
     """ This class represent a :term:`worktree`. """
@@ -43,6 +45,18 @@ This path does not exists
         self.load_projects()
         if sanity_check:
             self.check()
+        self.register_self()
+
+    def register_self(self):
+        """ Register to the global list of all worktrees  in
+        ~/.config/qi/qibuild.xml
+
+        """
+        qibuild_cfg = qibuild.config.QiBuildConfig()
+        to_read = qibuild.config.get_global_cfg_path()
+        qibuild_cfg.read(to_read)
+        qibuild_cfg.add_worktree(self.root)
+        qibuild_cfg.write()
 
     def register(self, observer):
         """ Called when an observer wants to be notified

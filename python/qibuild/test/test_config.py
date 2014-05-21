@@ -463,3 +463,16 @@ def test_recompute_cmake_generator(tmpdir):
     assert qibuild_cfg.cmake.generator == "A"
     qibuild_cfg.set_active_config("b")
     assert qibuild_cfg.cmake.generator is None
+
+def test_worktree_paths(tmpdir):
+    global_xml = tmpdir.join("global.xml")
+    global_xml.write("""
+<qibuild>
+    <worktree path="/path/to/a" />
+    <worktree path="/path/to/b" />
+</qibuild>
+""")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(global_xml.strpath)
+    assert "/path/to/a" in qibuild_cfg.worktrees
+    assert "/path/to/b" in qibuild_cfg.worktrees
