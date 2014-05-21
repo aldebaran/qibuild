@@ -259,7 +259,7 @@ function(qi_install_python)
   endif()
 
 
-    qi_warning("Could not find python headers, assuming version 2.7")
+  # Could not find python headers, assuming version 2.7
   set(_python_version_major "2.7")
 
   # Set the python site-packages location
