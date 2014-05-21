@@ -1,0 +1,32 @@
+v3.3.1
+=======
+
+CMake
+------
+* ``qi_create_python_ext`` now produce correct file extension for Mac and
+  Windows and uses ``qi_install_python``
+
+
+qisrc
+------
+
+* Snapshots are now in json instead of plain text, and
+  contain info about the manifests that were used
+
+.. code-block:: json
+
+    {
+      "format" : 1,
+      "manifests": {
+        "default": {
+          "name" : "default",
+          "url" : "git@git.example.com:manifest.git",
+          "ref" : "10b46884bf7201e729c27953044b71349b0e75af",
+          "branch": "master"
+        }
+      },
+      "refs": {
+        "a_path": "c1aa2e3d36fa7b52bc36a7aa844e9be7e5876d0e",
+        "b_path": "d69f2f515f649e564a1e3dbbafb4fddb9a43406f"
+      }
+    }
