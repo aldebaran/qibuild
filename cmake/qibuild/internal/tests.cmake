@@ -111,7 +111,7 @@ function(_qi_add_test_internal test_name target_name)
       list(GET _splitted 1 _val)
       list(APPEND _qi_add_test_args "--env" ${_keyval})
     else()
-      message(FATAL_ERROR "Expecting an expressiong looking like <key>=<value>,
+      message(FATAL_ERROR "Expecting an expression looking like <key>=<value>,
                            got ${_keyval} instead")
     endif()
   endforeach()
