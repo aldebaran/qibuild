@@ -178,19 +178,6 @@ endfunction()
 #
 # Warning ! This is quite not the standard CMake behavior
 #
-# **Internal libs**
-#
-# If you use ``INTERNAL``, you will not be able to use the library after it
-# has been installed, even after ``qi_stage_lib()`` has been called
-#
-# Note that you may want to:
-#
-# * make sure no header install rules are created either
-# * use NO_INSTALL if your library is not needed at runtime either
-# * not stage the library at all
-#
-# You can by-pass this behavior by setting ``QI_INSTALL_INTERNAL`` to "ON"
-#
 # \arg:name the target name
 # \argn: sources files, like the SRC group, argn and SRC will be merged
 # \flag:STATIC force a static library
@@ -203,8 +190,6 @@ endfunction()
 #                        Warning: you will NOT be able to create install rules
 #                          for this target.
 # \flag:NO_RPATH Do not set a rpath to $ORIGIN/..lib when linking on linux.
-# \flag: INTERNAL  See below
-#
 # \flag:NO_FPIC Do not set -fPIC on static libraries (will be set for shared lib by CMake anyway)
 # \param:SUBFOLDER The destination subfolder. The install rules generated will be
 #                  sdk/lib/<subfolder>
