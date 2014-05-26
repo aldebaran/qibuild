@@ -40,7 +40,7 @@ def do(args):
         snapshot = qisrc.snapshot.Snapshot()
         snapshot.load(args.snapshot)
 
-    if snapshot.format_version == 1:
+    if snapshot and snapshot.format_version == 1:
         reset_manifests()
 
     errors = list()
