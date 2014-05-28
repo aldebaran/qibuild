@@ -108,5 +108,6 @@ def load_snapshot(git_worktree, input_path):
     snapshot.load(input_path)
     for (src, ref) in snapshot.refs.iteritems():
         ui.info("Loading", src)
-        git_project = git_worktree.get_git_project(src, raises=True)
-        qisrc.reset.clever_reset_ref(git_project, ref)
+        git_project = git_worktree.get_git_project(src, raises=False)
+        if git_project:
+            qisrc.reset.clever_reset_ref(git_project, ref)
