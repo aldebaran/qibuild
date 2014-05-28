@@ -34,18 +34,6 @@ def test_generate_load(git_worktree, tmpdir):
     assert foo_ref_actual == foo_ref_expected
 
 
-def test_incorrect_snapshot(git_worktree, tmpdir):
-    foo_proj = git_worktree.create_git_project("foo")
-    snapshot_txt = tmpdir.join("snapshot.txt").strpath
-    qisrc.snapshot.generate_snapshot(git_worktree, snapshot_txt)
-    qisys.sh.rm(foo_proj.path)
-    git_worktree2 = TestGitWorkTree()
-    # pylint: disable-msg=E1101
-    with pytest.raises(qisrc.worktree.NoSuchGitProject) as e:
-        qisrc.snapshot.load_snapshot(git_worktree2, snapshot_txt)
-    assert e.value.args == ("foo",)
-
-
 def test_always_fetch(git_worktree, git_server, tmpdir):
     foo_repo = git_server.create_repo("foo.git")
     git_worktree.clone_missing(foo_repo)

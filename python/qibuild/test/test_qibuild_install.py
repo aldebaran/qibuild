@@ -142,7 +142,7 @@ def test_install_returns(qibuild_action, tmpdir):
     dest = tmpdir.join("dest")
     installme.configure()
     installme.build()
-    installed = installme.install(dest.strpath)
+    installed = installme.install(dest.strpath, components=["devel", "runtime"])
     assert set(installed) == {'/share/data_star/foo.dat',
                              '/share/data_star/bar.dat',
                              '/include/relative/foo/foo.h',
