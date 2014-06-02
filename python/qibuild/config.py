@@ -416,12 +416,12 @@ class QiBuildConfig:
         """
         if not cfg_path:
             cfg_path = get_global_cfg_path()
+        if create_if_missing:
             if not os.path.exists(cfg_path):
-                if create_if_missing:
-                    dirname = os.path.dirname(cfg_path)
-                    qisys.sh.mkdir(dirname, recursive=True)
-                    with open(cfg_path, "w") as fp:
-                        fp.write('<qibuild />\n')
+                dirname = os.path.dirname(cfg_path)
+                qisys.sh.mkdir(dirname, recursive=True)
+                with open(cfg_path, "w") as fp:
+                    fp.write('<qibuild />\n')
         ui.debug("Reading config from", cfg_path)
         try:
             self.tree.parse(cfg_path)

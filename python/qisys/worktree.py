@@ -54,7 +54,7 @@ This path does not exists
         """
         qibuild_cfg = qibuild.config.QiBuildConfig()
         to_read = qibuild.config.get_global_cfg_path()
-        qibuild_cfg.read(to_read)
+        qibuild_cfg.read(to_read, create_if_missing=True)
         qibuild_cfg.add_worktree(self.root)
         qibuild_cfg.write()
 
