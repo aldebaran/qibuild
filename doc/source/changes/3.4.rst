@@ -1,0 +1,9 @@
+v3.4
+====
+
+New commands
+-------------
+
+* ``qipkg``: see :ref:`qipkg_tutorial`
+
+* ``qipy``: see :ref:`qipy_tutorial`

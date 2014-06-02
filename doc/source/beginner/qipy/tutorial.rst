@@ -50,7 +50,8 @@ sources, and ``mymodule.i`` is the name of the swig interface file.
 
 
 Some useful links:
-* `Swig http://www.swig.org/`_
+
+* `Swig <http://www.swig.org/>`_
 
 * `virtualenv <https://virtualenv.pypa.io/en/latest/>`_
 

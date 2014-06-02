@@ -1,3 +1,5 @@
+.. _qipkg_tutorial:
+
 qipkg tutorial
 ===============
 
