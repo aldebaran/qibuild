@@ -12,7 +12,7 @@ from qisys import ui
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("--edit", action="store_true",
         help="edit the configuration")
     parser.add_argument("--local", action="store_true", dest="is_local",

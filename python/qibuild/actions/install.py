@@ -11,7 +11,7 @@ import qibuild.parsers
 def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.project_parser(parser)
-    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.cmake_build_parser(parser)
     group = parser.add_argument_group("install options")
     group.add_argument("--prefix", metavar="PREFIX",
         help="value of CMAKE_INSTALL_PREFIX, defaults to '/'")

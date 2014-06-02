@@ -4,13 +4,15 @@ import virtualenv
 from qisys import ui
 import qisys.command
 
-def configure_virtualenv(python_worktree, build_worktree=None):
-    worktree = python_worktree.worktree
+def configure_virtualenv(config, python_worktree,  build_worktree=None):
     # create a new virtualenv
+    python_worktree.config = config
     venv_path = python_worktree.venv_path
-    virtualenv.create_environment(python_worktree.venv_path)
     pip = python_worktree.pip
 
+    virtualenv.create_environment(python_worktree.venv_path)
+
+    # Install all Python projects using pip install -e .
     python_projects = python_worktree.python_projects
     for i, project in enumerate(python_projects):
         ui.info_count(i, len(python_projects),
@@ -18,6 +20,7 @@ def configure_virtualenv(python_worktree, build_worktree=None):
         cmd = [pip, "install", "--editable", "."]
         qisys.command.call(cmd, cwd=project.path)
 
+    # Write a qi.pth file containing path to C/C++ extensions
     if build_worktree:
         handle_extensions(venv_path, python_worktree, build_worktree)
 

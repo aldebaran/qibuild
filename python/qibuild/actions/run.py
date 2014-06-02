@@ -17,7 +17,7 @@ import qibuild.run
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("binary")
     parser.add_argument("bin_args", metavar="-- Binary arguments", nargs="*",
                         help="Binary arguments -- to escape the leading '-'")

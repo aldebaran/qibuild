@@ -13,7 +13,7 @@ import qipy.parsers
 import qipy.worktree
 
 def configure_parser(parser):
-    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("requirements", nargs="*")
 
 def do(args):

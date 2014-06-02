@@ -10,12 +10,13 @@ import os
 
 import qibuild.find
 import qibuild.parsers
+import qisys.parsers
 from qisys import ui
 from qimvn import deploy
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("package")
     parser.add_argument("--artifactId", required=True, dest="artifact_id", help="name")
     parser.add_argument("--url", required=True, dest="url", help="destination url")

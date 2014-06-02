@@ -1,5 +1,6 @@
 import sys
 import os
+import qisys.remote
 import subprocess
 
 from qisys import ui
@@ -22,16 +23,23 @@ class PythonBuilder(AbstractBuilder):
         self.build_worktree = build_worktree
         self.projects = list()
 
+    @property
+    def config(self):
+        return self.python_worktree.config
+
     def configure(self, *args, **kwargs):
-        qipy.venv.configure_virtualenv(self.python_worktree,
+        qipy.venv.configure_virtualenv(self.config,
+                                       self.python_worktree,
                                        build_worktree=self.build_worktree)
 
     def build(self, *args, **kwargs):
         pass
 
     def install(self, dest, *args, **kwargs):
-        for project in self.projects:
-            ui.info(ui.green, " * ", ui.blue, project.name)
+        n = len(self.projects)
+        for i, project in enumerate(self.projects):
+            ui.info_count(i, n, ui.green, "Installing",
+                          ui.reset, ui.blue, project.name)
             setup_py = os.path.join(project.path, "setup.py")
             # cannot use /usr/bin/python in case we are in a virtualenv already
             subprocess.check_call(["python",
@@ -50,3 +58,8 @@ python "$@"
         with open(python_wrapper, "w") as fp:
             fp.write(to_write)
         os.chmod(python_wrapper, 0755)
+
+    def deploy(self, url):
+        with qisys.sh.TempDir() as tmp:
+            self.install(tmp)
+            qisys.remote.deploy(tmp, url)

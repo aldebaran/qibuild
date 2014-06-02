@@ -16,7 +16,7 @@ import qibuild.parsers
 
 def configure_parser(parser):
     """Configure parser for this action"""
-    qibuild.parsers.build_parser(parser)
+    qibuild.parsers.cmake_build_parser(parser)
     qibuild.parsers.project_parser(parser)
     parser.add_argument("--pom", required=False, dest="pom", help="pom xml project file")
     parser.add_argument("--skip-test", action="store_const", const="True", dest="skip_test", help="Skip JUnit test")

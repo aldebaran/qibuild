@@ -25,8 +25,7 @@ def log_parser(parser):
     group.add_argument("--title", choices=["always", "never", "auto"],
         help="Update terminal title, defaults to 'auto'")
 
-    parser.set_defaults(verbose=False, quiet=False, color="auto")
-    parser.set_defaults(verbose=False, quiet=False, title="auto")
+    parser.set_defaults(verbose=False, quiet=False, color="auto", title="auto")
 
 def default_parser(parser):
     """Parser settings for every action."""
@@ -64,6 +63,26 @@ def project_parser(parser, positional=True):
     parser.set_defaults(single=False, projects = list())
     return group
 
+
+def build_parser(parser, group=None):
+    """Parser settings for builders."""
+    worktree_parser(parser)
+    if not group:
+        group = parser.add_argument_group("build type options")
+    group.add_argument("--release", action="store_const", const="Release",
+        dest="build_type",
+        help="Build in release")
+    group.add_argument("--debug", action="store_const", const="Debug",
+        dest="build_type",
+        help="Build in debug, default")
+    group.add_argument("-c", "--config",
+        help="The configuration to use. ")
+    group.add_argument("-p", "--profile", dest="profiles", action="append",
+        metavar="PROFILE",
+        help="A profile to use. "
+             "It can appear several times. "
+             "It should match a declaration in .qi/qibuild.xml")
+    parser.set_defaults(build_type="Debug")
 
 def deploy_parser(parser):
     group = parser.add_argument_group("deploy options")

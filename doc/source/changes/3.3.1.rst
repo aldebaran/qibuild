@@ -30,3 +30,18 @@ qisrc
         "b_path": "d69f2f515f649e564a1e3dbbafb4fddb9a43406f"
       }
     }
+
+Command line
+------------
+
+* ``qipy`` now accepts ``-c``, ``-p`` arguments like other
+  qibuild commands
+
+* Add ``qipy deploy``
+
+* Add ``qipy sourceme``. Mostly useful in scripts, like
+
+  .. code-block:: console
+
+      source $(qipy sourceme --quiet)
+      # do something inside qipy's virtualenv

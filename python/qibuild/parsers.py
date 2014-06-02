@@ -13,47 +13,14 @@ import qibuild.worktree
 import qibuild.cmake_builder
 
 
-
-def build_type_parser(parser, group=None):
-    """Parser settings for build type."""
-    if not group:
-        group = parser.add_argument_group("Build type options")
-    group.add_argument("--release", action="store_const", const="Release",
-        dest="build_type",
-        help="Build in release (set CMAKE_BUILD_TYPE=Release)")
-    group.add_argument("--debug", action="store_const", const="Debug",
-        dest="build_type",
-        help="Build in debug (set CMAKE_BUILD_TYPE=Debug)")
-    group.add_argument("--build-type", action="store",
-        dest="build_type",
-        help="CMAKE_BUILD_TYPE usually Debug or Release")
-    parser.set_defaults(build_type="Debug")
-
-def job_parser(parser, group=None):
-    """Parser settings for every action doing builds."""
-    group.add_argument("-j", dest="num_jobs", type=int,
-        help="Number of jobs to use")
-
-def build_parser(parser):
-    """Parser settings for every action doing build.
-    Calls build_type_parser and job_parser
-
-    """
-    group = parser.add_argument_group("build configuration options")
-    qisys.parsers.worktree_parser(parser)
-    job_parser(parser, group=group)
-    build_type_parser(parser, group=group)
-    group.add_argument("-c", "--config",
-        help="The configuration to use. "
-             "It should be the name of a toolchain, or \"system\"")
-    group.add_argument("-p", "--profile", dest="profiles", action="append",
-        metavar="PROFILE",
-        help="A profile to use. "
-             "It can appear several times. "
-             "It should match a declaration in .qi/qibuild.xml")
-    group.add_argument("--verbose-make", action="store_true", default=False,
-                       help="Print the executed commands while building")
-
+def cmake_build_parser(parser, group=None):
+        qisys.parsers.build_parser(parser, group=None)
+        if not group:
+            group = parser.add_argument_group("Build options")
+        parser.add_argument("-j", dest="num_jobs", type=int)
+        parser.add_argument("--build-type", action="store")
+        group.add_argument("--verbose-make", action="store_true", default=False,
+                        help="Print the executed commands while building")
 
 def project_parser(parser, positional=True):
     """Parser settings for every action using several build projects."""
@@ -140,9 +107,6 @@ def get_cmake_builder(args, default_dep_types=None):
     cmake_builder.dep_types = get_dep_types(args, default=default_dep_types)
     return cmake_builder
 
-##
-# Implementation details
-
 def get_build_config(build_worktree, args):
     """ Get a CMakeBuildConfig object from an argparse.Namespace object
 
@@ -155,7 +119,8 @@ def get_build_config(build_worktree, args):
         build_config.profiles = args.profiles
     if hasattr(args, "cmake_generator"):
         build_config.cmake_generator = args.cmake_generator
-    build_config.verbose_make = args.verbose_make
+    if hasattr(args, "verbose_make"):
+        build_config.verbose_make= args.verbose_make
     if hasattr(args, "cmake_flags") and args.cmake_flags:
         # should be a list a strings looking like key=value
         user_flags = list()
@@ -168,6 +133,9 @@ def get_build_config(build_worktree, args):
     if hasattr(args, "num_jobs"):
         build_config.num_jobs = args.num_jobs
     return build_config
+
+##
+# Implementation details
 
 
 class BuildProjectParser(qisys.parsers.AbstractProjectParser):
