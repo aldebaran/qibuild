@@ -7,3 +7,8 @@ New commands
 * ``qipkg``: see :ref:`qipkg_tutorial`
 
 * ``qipy``: see :ref:`qipy_tutorial`
+
+General
+-------
+
+* Worktrees now register themselves to the global config files
