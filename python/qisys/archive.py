@@ -98,7 +98,7 @@ Please set only one of these two options to 'True'
 
 
 # pylint: disable-msg=R0914
-def _extract_zip(archive, directory, quiet, verbose):
+def _extract_zip(archive, directory, quiet, verbose, strict_mode=True):
     """Extract a zip archive into directory
 
     :param archive:   path of the archive
@@ -138,7 +138,8 @@ Please set only one of these two options to 'True'
             mess  = "Invalid member %s in archive:\n" % member.filename
             mess += "Every file must be in the same top dir (%s != %s)" % \
                 (orig_topdir, member_top_dir)
-            raise InvalidArchive(mess)
+            if strict_mode:
+                raise InvalidArchive(mess)
         archive_.extract(member, path=directory)
         # Fix permision on extracted file unless it is a directory
         # or if we are on windows
@@ -375,7 +376,9 @@ Please set only one of these two options to 'True'
     return archive_path
 
 
-def extract(archive, directory, algo=None, quiet=False, verbose=False):
+def extract(archive, directory, algo=None,
+                     quiet=False, verbose=False,
+                     strict_mode=True):
     """Extract a an archive into directory
 
     :param archive:   path of the archive
@@ -396,7 +399,8 @@ def extract(archive, directory, algo=None, quiet=False, verbose=False):
     archive   = qisys.sh.to_native_path(archive)
     archive   = os.path.abspath(archive)
     if algo == "zip":
-        extract_location = _extract_zip(archive, directory, quiet, verbose)
+        extract_location = _extract_zip(archive, directory, quiet, verbose,
+                                        strict_mode=strict_mode)
     else:
         extract_location = _extract_tar(archive, directory, algo, quiet, verbose)
     return extract_location
