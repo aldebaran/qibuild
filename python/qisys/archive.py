@@ -139,17 +139,6 @@ Please set only one of these two options to 'True'
             mess += "Every file must be in the same top dir (%s != %s)" % \
                 (orig_topdir, member_top_dir)
             raise InvalidArchive(mess)
-        # By-pass buggy zipfile for python 2.6:
-        if sys.version_info < (2, 7):
-            if member.filename.endswith("/"):
-                # upstream buggy code would create an empty filename
-                # instead of a directory, thus preventing next members
-                # to be extracted
-                to_create = member.filename[:-1]
-                posix_dest_dir = qisys.sh.to_posix_path(directory)
-                to_create = posixpath.join(posix_dest_dir, to_create)
-                qisys.sh.mkdir(to_create, recursive=True)
-                continue
         archive_.extract(member, path=directory)
         # Fix permision on extracted file unless it is a directory
         # or if we are on windows
