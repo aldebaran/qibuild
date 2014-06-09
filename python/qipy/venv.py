@@ -55,6 +55,7 @@ def handle_extensions(venv_path, python_worktree, build_worktree):
                 if not to_write.endswith("\n"):
                     to_write += "\n"
 
-    qi_pth_dest = os.path.join(venv_path, "lib/python2.7/site-packages/qi.pth")
+    lib_path = virtualenv.path_locations(venv_path)[1]
+    qi_pth_dest = os.path.join(venv_path, lib_path, "site-packages/qi.pth")
     with open(qi_pth_dest, "w") as fp:
         fp.write(to_write)
