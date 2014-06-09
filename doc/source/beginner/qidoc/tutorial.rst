@@ -11,7 +11,7 @@ Building documentation with qidoc
 In the following tutorial, you will learn how to configure
 ``qidoc``, build the documentation and open it.
 
-.. contents:: Tabel of Contents
+.. contents:: Table of Contents
     :depth: 2
 
 Configuring qidoc
