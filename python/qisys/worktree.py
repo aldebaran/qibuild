@@ -145,7 +145,7 @@ This path does not exists
 
         :param src: a absolute path, or a path relative to the worktree
         :param raises: Raises if project is not found
-        :returns:  a :py:class:`WorkTreeProject` instance or None if raises is
+        :returns:  a :py:class:`.WorkTreeProject` instance or None if raises is
             False and project is not found
 
         """

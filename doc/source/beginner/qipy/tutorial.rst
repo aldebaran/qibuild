@@ -1,4 +1,4 @@
-.. _qipy_tutorial:
+.. _qipy-tutorial:
 
 Using Python with QiBuild projects
 ===================================
