@@ -388,7 +388,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
     ui.debug("Calling:", " ".join(cmd))
 
     call_kwargs = {"env":env, "cwd":cwd}
-    if quiet:
+    if quiet or ui.CONFIG.get("quiet"):
         call_kwargs["stdout"] = subprocess.PIPE
     returncode = subprocess.call(cmd, **call_kwargs)
 
