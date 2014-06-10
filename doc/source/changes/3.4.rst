@@ -8,6 +8,11 @@ New commands
 
 * ``qipy``: see :ref:`qipy-tutorial`
 
+qisrc
+-----
+
+* Support multiple remotes
+
 General
 -------
 
