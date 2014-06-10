@@ -47,7 +47,7 @@ class Package(object):
             for filename in filenames:
                 full_path = os.path.join(root, filename)
                 rel_path  = os.path.relpath(full_path, stage_path)
-                print "adding", full_path, filename
+                ui.info(ui.green, "adding", ui.reset, ui.bold, filename)
                 archive.write(full_path, rel_path)
         archive.close()
 

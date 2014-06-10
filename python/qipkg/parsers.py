@@ -23,7 +23,7 @@ def get_pml_builder(args):
     # here we build a CMakeBuilder from scratch becaues we won't read
     # the project names from the command line
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
-    python_builder = qipy.parsers.get_python_builder(args)
+    python_builder = qipy.parsers.get_python_builder(args, verbose=False)
     # and here for the same reason we do not try to get translatable projects
     # from the command line
     linguist_builder = qilinguist.parsers.get_linguist_builder(args,
