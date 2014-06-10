@@ -88,7 +88,7 @@ Please set only one of these two options to 'True'
             full_path = os.path.join(root, filename)
             rel_path  = os.path.relpath(full_path, directory)
             arcname   = os.path.join(os.path.basename(directory), rel_path)
-            if sys.stdout.isatty() and not quiet:
+            if not quiet:
                 sys.stdout.write("adding {0}\n".format(rel_path))
                 sys.stdout.flush()
             if not qisys.sh.broken_symlink(full_path):

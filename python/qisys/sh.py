@@ -200,7 +200,7 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
                 raise Exception("Expecting a file but found a directory: %s" % fdest)
-            if sys.stdout.isatty() and not quiet:
+            if not quiet:
                 print "-- Installing %s" % fdest
             mkdir(new_root, recursive=True)
             # We do not want to fail if dest exists but is read only
