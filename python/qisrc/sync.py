@@ -26,9 +26,8 @@ class WorkTreeSyncer(object):
     def __init__(self, git_worktree):
         self.git_worktree = git_worktree
         # Read manifest configuration now, before any
-        # new manifest is cloned or updated
-        self.manifests = dict()
-        root = qisys.qixml.read(self.manifests_xml).getroot()
+        self.manifest = LocalManifest()
+        root = qisys.qixml.read(self.manifest_xml).getroot()
         parser = WorkTreeSyncerParser(self)
         parser.parse(root)
         self.old_repos = list()
@@ -49,18 +48,25 @@ class WorkTreeSyncer(object):
         return self.sync_repos()
 
     @property
-    def manifests_xml(self):
-        manifests_xml_path = os.path.join(self.git_worktree.root,
-                                          ".qi", "manifests.xml")
-        if not os.path.exists(manifests_xml_path):
-            with open(manifests_xml_path, "w") as fp:
-                fp.write("<manifests />")
-        return manifests_xml_path
+    def manifest_xml(self):
+        # it's manifests (plural) for backward-compatible reasons
+        manifest_xml_path = os.path.join(self.git_worktree.root, ".qi", "manifests.xml")
+        if not os.path.exists(manifest_xml_path):
+            with open(manifest_xml_path, "w") as fp:
+                fp.write("<manifest />")
+        return manifest_xml_path
 
     @property
-    def manifests_root(self):
-        res = os.path.join(self.git_worktree.root, ".qi", "manifests")
-        qisys.sh.mkdir(res)
+    def manifest_repo(self):
+        # the repo is always in manifests/default for backward-compatible reasons
+        res = os.path.join(self.git_worktree.root, ".qi", "manifests", "default")
+        if not os.path.exists(res):
+            qisys.sh.mkdir(res, recursive=True)
+            git = qisrc.git.Git(res)
+            git.init()
+            manifest_xml = os.path.join(res, "manifest.xml")
+            with open(manifest_xml, "w") as fp:
+                fp.write("<manifest />")
         return res
 
     def sync_repos(self):
@@ -69,28 +75,23 @@ class WorkTreeSyncer(object):
 
         """
         res = True
-        manifests = self.manifests.values()
-        if not manifests:
-            return
-        ui.info(ui.green, ":: Updating manifests ...")
-        for local_manifest in self.manifests.values():
-            ui.info(ui.green, "* ",
-                    ui.reset, ui.blue, local_manifest.name,
-                    ui.reset, ui.bold, "(%s)" % local_manifest.branch,
-                    end="")
-            if local_manifest.groups:
-                ui.info("groups", ", ".join(local_manifest.groups))
-            else:
-                ui.info()
-            self._sync_manifest(local_manifest)
-            self._sync_build_profiles(local_manifest)
-            self._sync_groups(local_manifest)
+        ui.info(ui.green, ":: Updating manifest ...")
+        ui.info(ui.green, "* ",
+                ui.reset, ui.bold, "(%s)" % self.manifest.branch,
+                end="")
+        if self.manifest.groups:
+            ui.info("groups", ", ".join(self.manifest.groups))
+        else:
+            ui.info()
+        self._sync_manifest()
+        self._sync_build_profiles()
+        self._sync_groups()
         self.new_repos = self.get_new_repos()
         res = self._sync_repos(self.old_repos, self.new_repos)
         # re-read self.old_repos so we can do several syncs:
         self.old_repos = self.get_old_repos()
         # if everything went well, save the manifests configurations:
-        self.dump_manifests()
+        self.dump_manifest()
         return res
 
     def configure_projects(self, projects=None):
@@ -122,49 +123,36 @@ class WorkTreeSyncer(object):
         ui.info(" " * (max_src + 19), end="\r")
         self.git_worktree.save_git_config()
 
-    def dump_manifests(self):
-        """ Save the manifests in .qi/manifests.xml """
+    def dump_manifest(self):
+        """ Save the manifest config in .qi/manifest.xml """
         parser = WorkTreeSyncerParser(self)
         xml = parser.xml_elem()
-        qisys.qixml.write(xml, self.manifests_xml)
+        qisys.qixml.write(xml, self.manifest_xml)
 
-    def configure_manifest(self, name, url, groups=None, branch="master", ref=None):
+    def configure_manifest(self, url, branch="master", groups=None, ref=None):
         """ Add a manifest to the list. Will be stored in
         .qi/manifests/<name>
 
         """
         self.old_repos = self.get_old_repos()
-        to_add = LocalManifest()
-        to_add.name = name
-        to_add.url = url
-        to_add.groups = groups
-        to_add.branch = branch
-        to_add.ref = ref
-        self.manifests[name] = to_add
-        self.clone_manifest(to_add)
+        self.manifest.url = url
+        self.manifest.groups = groups
+        self.manifest.branch = branch
+        self.manifest.ref = ref
+        self._sync_manifest()
         res = self.sync_repos()
         self.configure_projects()
         return res
 
-    def remove_manifest(self, name):
-        """ Remove a manifest from the list """
-        if not name in self.manifests:
-            raise Exception("No such manifest: %s", name)
-        del self.manifests[name]
-        to_rm = os.path.join(self.manifests_root, name)
-        qisys.sh.rm(to_rm)
-        self.dump_manifests()
-
-    def read_remote_manifest(self, local_manifest, manifest_xml=None):
+    def read_remote_manifest(self, manifest_xml=None):
         """ Read the manifest file in .qi/manifests/<name>/manifest.xml
         using the settings in .qi/manifest.xml (to know the name and the groups
         to use)
         """
         if not manifest_xml:
-            manifest_xml = os.path.join(self.manifests_root,
-                                        local_manifest.name, "manifest.xml")
+            manifest_xml = os.path.join(self.manifest_repo, "manifest.xml")
         remote_manifest = qisrc.manifest.Manifest(manifest_xml)
-        groups = local_manifest.groups
+        groups = self.manifest.groups
         repos = remote_manifest.get_repos(groups=groups)
         return repos
 
@@ -174,47 +162,41 @@ class WorkTreeSyncer(object):
 
         """
         old_repos = list()
-        for manifest in self.manifests.values():
-
-            old_repos_expected = self.read_remote_manifest(manifest)
-            # The git projects may not match the previous repo config,
-            # for instance the user removed a project by accident, or
-            # a rename failed, or the project has not been cloned yet,
-            # so make sure old_repos matches the worktree state:
-            for old_repo in old_repos_expected:
-                old_project = self.git_worktree.find_repo(old_repo)
-                if old_project:
-                    old_repo.src = old_project.src
-                    old_repos.append(old_repo)
+        old_repos_expected = self.read_remote_manifest()
+        # The git projects may not match the previous repo config,
+        # for instance the user removed a project by accident, or
+        # a rename failed, or the project has not been cloned yet,
+        # so make sure old_repos matches the worktree state:
+        for old_repo in old_repos_expected:
+            old_project = self.git_worktree.find_repo(old_repo)
+            if old_project:
+                old_repo.src = old_project.src
+                old_repos.append(old_repo)
         return old_repos
 
     def get_new_repos(self):
         """ Read all the repos coming from all the manifests
 
         """
-        all_new_repos = list()
-        for manifest in self.manifests.values():
-            new_repos = self.read_remote_manifest(manifest)
-            all_new_repos.extend(new_repos)
-        return all_new_repos
+        new_repos = self.read_remote_manifest()
+        return new_repos
 
 
-    def _sync_manifest(self, local_manifest):
+    def _sync_manifest(self):
         """ Update the local manifest clone with the remote """
-        manifest_repo = os.path.join(self.manifests_root, local_manifest.name)
-        git = qisrc.git.Git(manifest_repo)
+        git = qisrc.git.Git(self.manifest_repo)
+        git.set_remote("origin", self.manifest.url)
         with git.transaction() as transaction:
             git.fetch("origin")
-            git.checkout("-B", local_manifest.branch)
-            if local_manifest.ref:
-                to_reset = local_manifest.ref
+            git.checkout("-B", self.manifest.branch)
+            if self.manifest.ref:
+                to_reset = self.manifest.ref
                 git.reset("--hard", to_reset)
             else:
-                git.reset("--hard", "origin/%s" % local_manifest.branch)
+                git.reset("--hard", "origin/%s" % self.manifest.branch)
         if not transaction.ok:
             ui.warning("Update failed")
             ui.info(transaction.output)
-            return
 
 
     def _sync_repos(self, old_repos, new_repos):
@@ -280,14 +262,13 @@ class WorkTreeSyncer(object):
 
         return res
 
-    def _sync_build_profiles(self, local_manifest):
+    def _sync_build_profiles(self):
         """ Synchronize the build profiles read from the given manifest """
         local_xml = os.path.join(self.git_worktree.root, ".qi", "qibuild.xml")
         if not os.path.exists(local_xml):
             with open(local_xml, "w") as fp:
                 fp.write("<qibuild />")
-        remote_xml = os.path.join(self.manifests_root,
-                                  local_manifest.name, "manifest.xml")
+        remote_xml = os.path.join(self.manifest_repo, "manifest.xml")
         local = qibuild.profile.parse_profiles(local_xml)
         remote = qibuild.profile.parse_profiles(remote_xml)
         new_profiles, updated_profiles = compute_profile_updates(local, remote)
@@ -304,12 +285,9 @@ class WorkTreeSyncer(object):
                 mess += "  * " + updated_profile.name + "\n"
             ui.warning(mess)
 
-    def _sync_groups(self, local_manifest):
+    def _sync_groups(self):
         """ Synchronize the repsitories groups read from the given manifest """
-        # FIXME: what to do when there are several manifests with different
-        # groups in them?
-        remote_xml = os.path.join(self.manifests_root,
-                                  local_manifest.name, "manifest.xml")
+        remote_xml = os.path.join(self.manifest_repo, "manifest.xml")
         remote_root_elem = qisys.qixml.read(remote_xml).getroot()
         remote_groups_elem = remote_root_elem.find("groups")
         if remote_groups_elem is None:
@@ -319,7 +297,7 @@ class WorkTreeSyncer(object):
         qisys.qixml.write(remote_groups_elem, groups_xml)
 
 
-    def sync_from_manifest_file(self, name, xml_path):
+    def sync_from_manifest_file(self, xml_path):
         """ Just synchronize the manifest coming from one xml file.
         Used by ``qisrc manifest --check``
 
@@ -327,22 +305,9 @@ class WorkTreeSyncer(object):
         # don't use self.old_repos and self.new_repos here,
         # because we are only using one manifest
         # Read groups from the manifests
-        local_manifest = self.manifests[name]
-        old_repos = self.read_remote_manifest(local_manifest)
-        new_repos = self.read_remote_manifest(local_manifest,
-                                              manifest_xml=xml_path)
+        old_repos = self.read_remote_manifest()
+        new_repos = self.read_remote_manifest(manifest_xml=xml_path)
         return self._sync_repos(old_repos, new_repos)
-
-
-    def clone_manifest(self, manifest):
-        """ Clone a new manifest in .qi/manifests/<name>
-
-        """
-        manifest_repo = os.path.join(self.manifests_root, manifest.name)
-        if not os.path.exists(manifest_repo):
-            git = qisrc.git.Git(manifest_repo)
-            git.clone(manifest.url, "--branch", manifest.branch, quiet=True)
-
 
     def __repr__(self):
         return "<WorkTreeSyncer in %s>" % self.git_worktree.root
@@ -354,7 +319,6 @@ class LocalManifest(object):
 
     """
     def __init__(self):
-        self.name = None
         self.url = None
         self.branch = "master"
         self.groups = list()
@@ -362,8 +326,7 @@ class LocalManifest(object):
                         # don't want the head of a branch
 
     def __eq__(self, other):
-        return self.name == other.name and \
-               self.url == other.url and \
+        return self.url == other.url and \
                self.groups == other.groups and \
                self.ref == other.ref and \
                self.branch == other.branch
@@ -460,22 +423,21 @@ def compute_profile_updates(local_profiles, remote_profiles):
 class WorkTreeSyncerParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(WorkTreeSyncerParser, self).__init__(target)
-        self._ignore = ["manifests_xml", "manifests_root",
+        self._ignore = ["manifest_xml", "manifest_repo",
                         "old_repos", "new_repos"]
 
     def _parse_manifest(self, elem):
-        manifest_settings = LocalManifest()
-        parser = LocalManifestParser(manifest_settings)
+        manifest = LocalManifest()
+        parser = LocalManifestParser(manifest)
         parser.parse(elem)
-        self.target.manifests[manifest_settings.name] = manifest_settings
+        self.target.manifest = manifest
 
-    def _write_manifests(self, elem):
-        for name in self.target.manifests:
-            parser = LocalManifestParser(self.target.manifests[name])
-            manifest_elem = parser.xml_elem(node_name="manifest")
-            elem.append(manifest_elem)
+    def _write_manifest(self, elem):
+        parser = LocalManifestParser(self.target.manifest)
+        manifest_elem = parser.xml_elem(node_name="manifest")
+        elem.append(manifest_elem)
 
 class LocalManifestParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(LocalManifestParser, self).__init__(target)
-        self._required = ["name"]
+        self._required = ["url", "branch"]

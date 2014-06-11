@@ -7,7 +7,7 @@ def test_checkout_happy(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
-    qisrc_action("manifest", "--add", "default", manifest_url)
+    qisrc_action("init", manifest_url)
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo.git", "devel")
     qisrc_action("checkout", "devel")
@@ -23,7 +23,7 @@ def test_checkout_preserve_changes_when_checkout_fails(qisrc_action, git_server)
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
     git_server.push_file("foo.git", "README.txt", "readme\n")
-    qisrc_action("manifest", "--add", "default", manifest_url)
+    qisrc_action("init", manifest_url)
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo.git", "devel")
     git_worktree = TestGitWorkTree()

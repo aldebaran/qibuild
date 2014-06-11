@@ -9,7 +9,7 @@ def test_sync_groups(git_worktree, git_server):
     git_server.create_repo("baz")
     manifest_url = git_server.manifest_url
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
-    worktree_syncer.configure_manifest("default", manifest_url)
+    worktree_syncer.configure_manifest(manifest_url)
 
     groups = qisrc.groups.get_groups(git_worktree)
     assert groups.projects("mygroup") == ["foo", "bar"]

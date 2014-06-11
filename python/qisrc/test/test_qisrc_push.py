@@ -3,7 +3,7 @@ import qisrc.git
 
 def test_not_under_code_review(qisrc_action, git_server):
     foo_repo = git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "defaut", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
     foo_git = TestGit(foo_proj.path)
@@ -15,7 +15,7 @@ def test_not_under_code_review(qisrc_action, git_server):
 
 def test_publish_changes(qisrc_action, git_server):
     foo_repo = git_server.create_repo("foo.git", review=True)
-    qisrc_action("manifest", "--add", "defaut", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
     foo_git = TestGit(foo_proj.path)

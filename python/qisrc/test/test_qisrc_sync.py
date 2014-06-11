@@ -13,7 +13,7 @@ import qibuild.profile
 def test_sync_clones_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     # pylint: disable-msg=E1101
     cwd = py.path.local(os.getcwd())
     assert not cwd.join("foo").join("README").check(file=True)
@@ -23,7 +23,7 @@ def test_sync_clones_new_repos(qisrc_action, git_server):
 
 def test_sync_skips_unconfigured_projects(qisrc_action, git_server, test_git):
     git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     git_worktree = TestGitWorkTree()
     # pylint: disable-msg=E1101
     cwd = py.path.local(os.getcwd())
@@ -35,7 +35,7 @@ def test_sync_skips_unconfigured_projects(qisrc_action, git_server, test_git):
 
 def test_clone_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     git_server.create_repo("bar.git")
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
@@ -44,7 +44,7 @@ def test_clone_new_repos(qisrc_action, git_server):
 
 def test_configure_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     qisrc_action("sync")
     git_server.create_repo("bar.git")
     qisrc_action("sync", "foo")  # Sync only foo, but expect to clone bar
@@ -55,7 +55,7 @@ def test_configure_new_repos(qisrc_action, git_server):
 
 def test_creates_required_subdirs(qisrc_action, git_server):
     git_server.create_repo("foo/bar.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("foo/bar")
@@ -65,7 +65,7 @@ def test_uses_build_deps_by_default(qisrc_action, git_server):
     git_server.add_qibuild_test_project("world")
     git_server.add_qibuild_test_project("hello")
     git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
 
     # Crete some changes in foo and world
     git_server.push_file("foo.git", "foo.txt", "unrelated changes")
@@ -89,7 +89,7 @@ def test_uses_build_deps_by_default(qisrc_action, git_server):
 
 def test_sync_build_profiles(qisrc_action, git_server):
     git_server.add_build_profile("foo", [("WITH_FOO", "ON")])
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     build_worktree = TestBuildWorkTree()
     qibuild_xml = build_worktree.qibuild_xml
     foo_profile = qibuild.profile.parse_profiles(qibuild_xml)["foo"]
@@ -99,7 +99,7 @@ def test_sync_build_profiles(qisrc_action, git_server):
 def test_sync_branch_devel(qisrc_action, git_server, test_git):
     # This tests the case where everything goes smoothly
     git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     git_server.push_file("foo.git", "foo.txt", "a super change")
     git_server.push_file("foo.git", "bar.txt", "a super bugfix")
     git_worktree = TestGitWorkTree()
@@ -130,7 +130,7 @@ def test_sync_branch_devel_unclean(qisrc_action, git_server, test_git):
     # Case where the worktree isn't clean
 
     git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     git_server.push_file("foo.git", "foo.txt", "a super change")
     git_server.push_file("foo.git", "bar.txt", "a super bugfix")
     git_worktree = TestGitWorkTree()
@@ -154,7 +154,7 @@ def test_sync_branch_devel_no_ff(qisrc_action, git_server, test_git):
     # Case where master can't be fast-forwarded, does nothing except warning
 
     git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     git_server.push_file("foo.git", "foo.txt", "a super change")
     git_worktree = TestGitWorkTree()
 
@@ -177,7 +177,7 @@ def test_sync_dash_g(qisrc_action, git_server):
     git_server.create_group("mygroup", ["a", "b"])
     git_server.create_repo("other")
     git_server.push_file("other", "other.txt", "change 1")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     git_server.push_file("other", "other.txt", "change 2")
     qisrc_action("sync", "--group", "mygroup")
 
@@ -188,7 +188,7 @@ def test_sync_dash_g(qisrc_action, git_server):
 
 def test_incorrect_branch_still_fetches(qisrc_action, git_server):
     git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
     foo = git_worktree.get_git_project("foo")
@@ -203,7 +203,7 @@ def test_incorrect_branch_still_fetches(qisrc_action, git_server):
 
 def test_keeps_staged_changes(qisrc_action, git_server):
     git_server.create_repo("foo.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
     foo = git_worktree.get_git_project("foo")

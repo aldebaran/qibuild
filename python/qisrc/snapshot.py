@@ -18,7 +18,7 @@ class Snapshot(object):
     """ Just a container for a git worktree snapshot """
     def __init__(self):
         self.refs = collections.OrderedDict()
-        self.manifests = dict()
+        self.manifest = qisrc.sync.LocalManifest()
         self.format_version = None
 
     def dump(self, output_path, deprecated_format=True):
@@ -38,12 +38,10 @@ class Snapshot(object):
         with open(output_path, "w") as fp:
             # Json does not know about classes, so
             # we are going to cheat a little
-            serializable_manifests = dict()
-            for key, value in self.manifests.iteritems():
-                serializable_manifests[key] = vars(value)
+            serializable_manifest = vars(self.manifest)
             to_dump = {
                     "format" : 1,
-                    "manifests" : serializable_manifests,
+                    "manifest" : serializable_manifest,
                     "refs" : self.refs
                     }
             json.dump(to_dump, fp, indent=2)
@@ -80,17 +78,14 @@ class Snapshot(object):
     def _load_json(self, parsed_json):
         self.format_version = parsed_json["format"]
         self.refs = parsed_json["refs"]
-        self.manifests = dict()
-        for manifest_name, manifest_json in parsed_json["manifests"].iteritems():
-            manifest = qisrc.sync.LocalManifest()
-            self.manifests[manifest_name] = manifest
-            for key, value in manifest_json.iteritems():
-                setattr(manifest, key, value)
+        manifest_json = parsed_json["manifest"]
+        for key, value in manifest_json.iteritems():
+            setattr(self.manifest, key, value)
 
     def __eq__(self, other):
         if not isinstance(other, Snapshot):
             return False
-        return other.refs == self.refs and other.manifests == self.manifests
+        return other.refs == self.refs and other.manifest == self.manifest
 
     def __ne__(self, other):
         return not self.__eq__(other)

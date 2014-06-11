@@ -19,11 +19,9 @@ def configure_parser(parser):
 def do(args):
     branch = args.branch
     git_worktree = qisrc.parsers.get_git_worktree(args)
-    for manifest in git_worktree.manifests.values():
-        name = manifest.name
-        groups = manifest.groups
-        branch = args.branch
-        git_worktree.configure_manifest(name, manifest.url,
-                                        groups=groups, branch=branch)
-        git_worktree.checkout(name, branch, force=args.force)
+    manifest = git_worktree.manifest
+    groups = manifest.groups
+    branch = args.branch
+    git_worktree.configure_manifest(manifest.url, groups=groups, branch=branch)
+    git_worktree.checkout(branch, force=args.force)
 
