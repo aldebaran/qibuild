@@ -142,8 +142,9 @@ class WorkTreeSyncer(object):
         to_add.ref = ref
         self.manifests[name] = to_add
         self.clone_manifest(to_add)
-        self.sync_repos()
+        res = self.sync_repos()
         self.configure_projects()
+        return res
 
     def remove_manifest(self, name):
         """ Remove a manifest from the list """

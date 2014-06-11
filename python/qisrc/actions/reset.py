@@ -41,7 +41,7 @@ def do(args):
         snapshot.load(args.snapshot)
 
     if snapshot and snapshot.format_version == 1:
-        reset_manifests()
+        reset_manifests(git_worktree, snapshot)
 
     errors = list()
     for git_project in git_projects:
@@ -101,8 +101,10 @@ def do(args):
 
 def reset_manifests(git_worktree, snapshot):
     manifests = snapshot.manifests
-    for manifest in manifest.values():
-        git_worktree.configure_manifest(manifest.branch, manifest.url,
-                                        groups=manifest.groups,
-                                        branch=manifest.branch,
-                                        ref=manifest.ref)
+    for manifest in manifests.values():
+        ok = git_worktree.configure_manifest(manifest.name, manifest.url,
+                                             groups=manifest.groups,
+                                             branch=manifest.branch,
+                                             ref=manifest.ref)
+        if not ok:
+            sys.exit(1)

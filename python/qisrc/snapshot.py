@@ -80,7 +80,6 @@ class Snapshot(object):
     def _load_json(self, parsed_json):
         self.format_version = parsed_json["format"]
         self.refs = parsed_json["refs"]
-        self.format_version = None
         self.manifests = dict()
         for manifest_name, manifest_json in parsed_json["manifests"].iteritems():
             manifest = qisrc.sync.LocalManifest()
