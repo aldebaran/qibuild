@@ -122,8 +122,6 @@ where ``foo`` is a header-only library depending on
 Command line
 ------------
 
-* remove `--quiet-commands`
-
 * add group for every action parser, or only display the options
   specific to the given action when using `qibuild <action> --help`
 
