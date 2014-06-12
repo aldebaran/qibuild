@@ -16,6 +16,7 @@ import urllib2
 import StringIO
 
 from qisys import ui
+import qisys.command
 import qisys.sh
 
 import qibuild.config
