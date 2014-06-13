@@ -259,7 +259,7 @@ class XMLParser(object):
 
         def is_serializable(value):
             # no way to guess that from etree api:
-            return type(value) in (list, bool, str, int)
+            return type(value) in (list, bool, str, unicode, int)
 
         target_dir = dir(self.target)
         for member in target_dir:
