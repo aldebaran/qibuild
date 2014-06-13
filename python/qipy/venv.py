@@ -41,10 +41,10 @@ def handle_extensions(venv_path, python_worktree, build_worktree):
     extensions_projects = list()
     build_projects = build_worktree.build_projects
     for project in python_worktree.python_projects:
-        matching_build_project = None
-        for build_project in build_projects:
-            if build_project.src == project.src:
-                extensions_projects.append(build_project)
+        parent_project = qisys.parsers.find_parent_project(build_projects,
+                                                           project.path)
+        if parent_project:
+            extensions_projects.append(parent_project)
 
     to_write = ""
     for project in extensions_projects:
