@@ -85,6 +85,6 @@ qiBuild package:
   {1}
 
 You can add this qiBuild package to a toolchain using:
-  qitoolchain -c <toolchain name> {0} {1}\
+  qitoolchain add-package -c <toolchain name> {0} {1}\
 """.format(package_name, qibuild_package_path)
     qisys.ui.info(message)
