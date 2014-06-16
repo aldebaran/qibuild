@@ -20,7 +20,8 @@ def configure_parser(parser):
 
 def do(args):
     doc_worktree = qidoc.parsers.get_doc_worktree(args)
-    doc_projects = qidoc.parsers.get_doc_projects(doc_worktree, args)
+    doc_builder = qidoc.parsers.get_doc_builder(args)
+    doc_projects = doc_builder.get_dep_projects()
 
     to_clean = list()
     for doc_project in doc_projects:
@@ -44,7 +45,7 @@ def do(args):
 
     if not args.force:
         ui.info(ui.green, "Build directories that will be removed",
-                ui.white, "(use -f to apply")
+                ui.white, "(use -f to apply)")
 
     for i, build_dir in enumerate(to_clean):
         if args.force:
