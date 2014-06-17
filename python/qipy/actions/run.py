@@ -12,6 +12,7 @@ import qipy.parsers
 
 def configure_parser(parser):
     qibuild.parsers.cmake_build_parser(parser)
+    parser.add_argument("--list", action="store_true", dest="dolist", default=False, help="List all available binaries in the virtualenv")
     parser.add_argument("command", metavar="COMMAND", nargs="*")
 
 def do(args):
@@ -30,6 +31,13 @@ def do(args):
         raise Exception(err)
 
     binaries_path = virtualenv.path_locations(venv_root)[-1]
+
+    if args.dolist:
+        for f in sorted(os.listdir(binaries_path)):
+            if os.path.isfile(os.path.join(binaries_path, f)):
+                print f
+        return
+
     if not cmd:
         cmd = [os.path.join(venv_root, binaries_path, "ipython")]
     else:
