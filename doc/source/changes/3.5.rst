@@ -1,0 +1,21 @@
+v3.5
+====
+
+qisrc
+-----
+
+Remove the possibility to have several manifests in one worktree, as a consequence,
+qisrc API changed quite a bit:
+
+``qisrc manifest --list``  -> ``qisrc info``
+``qisrc manifest default -g bar`` -> ``qisrc add-group, qisrc remove-group``
+``qisrc manifest --check default /path/to/xml`` -> ``qisrc check-manifest /path/to/xml``
+
+To help transition from 3.4, simply run ``tools/convert-3.4-worktree.py``
+
+
+cmake
+-----
+
+Add wrappers for ``bison`` and ``flex``
+
