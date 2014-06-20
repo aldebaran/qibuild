@@ -59,7 +59,7 @@ class DocBuilder(object):
         for i, project in enumerate(projects):
             ui.info_count(i, len(projects),
                           ui.green, "Building", ui.blue, project.name)
-            project.build(werror=self.werror)
+            project.build(werror=self.werror, build_type=self.build_type)
             ui.info(ui.green, "Doc generated in",
                     ui.reset, ui.bold, project.html_dir)
 
