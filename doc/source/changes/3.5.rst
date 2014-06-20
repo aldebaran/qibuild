@@ -4,14 +4,21 @@ v3.5
 qisrc
 -----
 
-Remove the possibility to have several manifests in one worktree, as a consequence,
-qisrc API changed quite a bit:
+* Remove the possibility to have several manifests in one worktree.
+  (this is harmless because most users only have one manifest anyway)
 
-``qisrc manifest --list``  -> ``qisrc info``
-``qisrc manifest default -g bar`` -> ``qisrc add-group, qisrc remove-group``
-``qisrc manifest --check default /path/to/xml`` -> ``qisrc check-manifest /path/to/xml``
+* ``qisrc manifest`` command is gone, its API was clumsy, instead use
+  the new ``qisrc`` commands, like this:
 
-To help transition from 3.4, simply run ``tools/convert-3.4-worktree.py``
+
++-------------------------------------------------+-----------------------------------------+
+| old                                             |   new                                   |
++=================================================+=========================================+
+| ``qisrc manifest --list``                       | ``qisrc info``                          |
+| ``qisrc manifest default -g bar``               | ``qisrc add-group, qisrc remove-group`` |
+| ``qisrc manifest --check default /path/to/xml`` | ``qisrc check-manifest /path/to/xml``   |
++-------------------------------------------------+-----------------------------------------+
+
 
 
 cmake
