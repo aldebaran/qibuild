@@ -74,14 +74,14 @@ class DocBuilder(object):
                           ui.green, "Installing",
                           ui.blue, project.name,
                           ui.reset, "->", ui.white, real_dest)
-            configure_args = {
+            options = {
                 "version"   : self.version,
                 "hosted"    : self.hosted,
                 "build_type" : self.build_type,
                 "rel_paths" : True,
             }
-            project.configure(**configure_args)
-            project.build()
+            project.configure(**options)
+            project.build(**options)
             project.install(real_dest)
 
     def get_dep_projects(self):
