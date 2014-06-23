@@ -15,14 +15,37 @@ qisrc
 | old                                             |   new                                   |
 +=================================================+=========================================+
 | ``qisrc manifest --list``                       | ``qisrc info``                          |
++-------------------------------------------------+-----------------------------------------+
 | ``qisrc manifest default -g bar``               | ``qisrc add-group, qisrc remove-group`` |
++-------------------------------------------------+-----------------------------------------+
 | ``qisrc manifest --check default /path/to/xml`` | ``qisrc check-manifest /path/to/xml``   |
 +-------------------------------------------------+-----------------------------------------+
 
 
 
+qidoc
+-----
+
+* Fix building doc in release
+* ``qidoc clean`` now also cleans dependencies
+
+qipy
+----
+
+* Fix ``qipy list``
+
+qipkg
+-----
+
+* Preserve files permissions when extracting
+
 cmake
 -----
 
-Add wrappers for ``bison`` and ``flex``
+* Add wrappers for ``bison`` and ``flex``
+* Add module for ``clang``
 
+misc
+----
+
+Hide output of commands when using ``--quiet``
