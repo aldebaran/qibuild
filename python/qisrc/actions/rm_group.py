@@ -15,8 +15,13 @@ def configure_parser(parser):
 
 def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
+    group = args.group
     manifest = git_worktree.manifest
     groups = copy.copy(git_worktree.manifest.groups)
-    groups.remove(args.group)
+    if group in groups:
+        groups.remove(args.group)
+    else:
+        ui.info("No such group:", group)
+        sys.exit(0)
     git_worktree.configure_manifest(manifest.url, groups=groups,
                                     branch=manifest.branch)

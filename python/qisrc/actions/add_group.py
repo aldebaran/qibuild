@@ -14,8 +14,13 @@ def configure_parser(parser):
 
 def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
+    group = args.group
     manifest = git_worktree.manifest
     groups = git_worktree.manifest.groups[:]
-    groups.append(args.group)
+    if group in groups:
+        ui.error("Group", group, "already in use")
+        sys.exit(1)
+    else:
+        groups.append(args.group)
     git_worktree.configure_manifest(manifest.url, groups=groups,
                                     branch=manifest.branch)
