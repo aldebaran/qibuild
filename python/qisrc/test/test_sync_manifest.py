@@ -45,12 +45,15 @@ def test_pull_manifest_changes_when_syncing(git_worktree, git_server):
 
 def test_use_correct_manifest_branch(git_worktree, git_server):
     git_server.switch_manifest_branch("devel")
+    # Push a random file to the 'devel' branch
+    git_server.push_file("manifest.git", "a_file", "some contents\n", branch="devel")
     manifest_url = git_server.manifest_url
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
     worktree_syncer.configure_manifest(manifest_url, branch="devel")
     local_manifest = git_worktree.tmpdir.join(".qi", "manifests", "default")
     git = qisrc.git.Git(local_manifest.strpath)
-    assert git.get_current_branch() == "devel"
+    a_file = git_worktree.tmpdir.join(".qi", "manifests", "default", "a_file")
+    assert a_file.read() == "some contents\n"
 
 def test_new_repos(git_worktree, git_server):
     git_server.create_repo("foo.git")

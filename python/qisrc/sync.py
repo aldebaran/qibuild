@@ -188,7 +188,6 @@ class WorkTreeSyncer(object):
         git.set_remote("origin", self.manifest.url)
         with git.transaction() as transaction:
             git.fetch("origin")
-            git.checkout("-B", self.manifest.branch)
             if self.manifest.ref:
                 to_reset = self.manifest.ref
                 git.reset("--hard", to_reset)
