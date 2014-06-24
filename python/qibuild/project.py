@@ -371,7 +371,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             self._install_qitest_json(destdir)
 
         if split_debug:
-            self.split_debug(destdir)
+            self.split_debug(destdir, file_list=installed)
         return installed
 
     def _install_component(self, destdir, component):
@@ -442,7 +442,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             env = envsetter.get_build_env()
         return env
 
-    def split_debug(self, destdir):
+    def split_debug(self, destdir, file_list):
         """ Split debug symbols after install """
         if self.using_visual_studio:
             raise Exception("split debug not supported on Visual Studio")
@@ -463,7 +463,10 @@ The following tools were not found: {missing}\
             mess = mess.format(name=self.name, missing = ", ".join(missing))
             ui.warning(mess)
             return
-        qibuild.gdb.split_debug(destdir, **tool_paths)
+        for filename in file_list:
+            full_path = os.path.join(destdir, filename[1:]) # remove starting /
+            if qibuild.gdb.is_elf(full_path):
+                qibuild.gdb.split_debug(full_path, **tool_paths)
 
     def get_build_dirs(self, all_configs=False):
         """Return a dictionary containing the build directory list
