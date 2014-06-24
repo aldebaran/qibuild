@@ -40,7 +40,7 @@ def do(args):
         snapshot = qisrc.snapshot.Snapshot()
         snapshot.load(args.snapshot)
 
-    if snapshot and snapshot.format_version == 1:
+    if snapshot and snapshot.format_version and snapshot.format_version >= 1:
         reset_manifest(git_worktree, snapshot, groups=args.groups)
 
     errors = list()

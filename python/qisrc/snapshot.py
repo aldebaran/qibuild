@@ -40,7 +40,7 @@ class Snapshot(object):
             # we are going to cheat a little
             serializable_manifest = vars(self.manifest)
             to_dump = {
-                    "format" : 1,
+                    "format" : 2,
                     "manifest" : serializable_manifest,
                     "refs" : self.refs
                     }
@@ -77,8 +77,13 @@ class Snapshot(object):
 
     def _load_json(self, parsed_json):
         self.format_version = parsed_json["format"]
+        if self.format_version == 1:
+            manifest_json = parsed_json["manifests"]["default"]
+        elif self.format_version == 2:
+            manifest_json = parsed_json["manifest"]
+        else:
+            raise Exception("unknown format: %s" % self.format_version)
         self.refs = parsed_json["refs"]
-        manifest_json = parsed_json["manifest"]
         for key, value in manifest_json.iteritems():
             setattr(self.manifest, key, value)
 
