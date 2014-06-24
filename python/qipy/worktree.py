@@ -47,10 +47,10 @@ class PythonWorkTree(qisys.worktree.WorkTreeObserver):
                 continue
             if new_project.name in seen_names:
                 mess = """ \
-Fond two project with the same name. (%s)
+Found two projects with the same name. (%s)
 %s
 %s
-""" % (new_project.name, seen_names[project.src], new_project.src)
+""" % (new_project.name, seen_names[new_project.name], new_project.src)
                 raise Exception(mess)
             self.python_projects.append(new_project)
             seen_names[new_project.name] = new_project.src
