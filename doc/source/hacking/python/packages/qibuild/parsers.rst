@@ -8,11 +8,7 @@ qibuild.parsers -- Parsers for qibuild actions
 Functions defined in this module
 --------------------------------
 
-.. autofunction:: build_type_parser
-
-.. autofunction:: job_parser
-
-.. autofunction:: build_parser
+.. autofunction:: cmake_build_parser
 
 .. autofunction:: project_parser
 

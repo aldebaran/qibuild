@@ -10,7 +10,7 @@ def test_reset_dash_f_simple(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     git_worktree = qisrc_action.git_worktree
     tmpdir = qisrc_action.tmpdir
-    git_worktree.configure_manifest("default", manifest_url)
+    git_worktree.configure_manifest(manifest_url)
     snapshot = tmpdir.join("snapshot").strpath
     qisrc.snapshot.generate_snapshot(git_worktree,
                                      snapshot,
@@ -22,7 +22,7 @@ def test_reset_clone_missing(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     git_worktree = qisrc_action.git_worktree
     tmpdir = qisrc_action.tmpdir
-    git_worktree.configure_manifest("default", manifest_url)
+    git_worktree.configure_manifest(manifest_url)
     snapshot = tmpdir.join("snapshot").strpath
     qisrc.snapshot.generate_snapshot(git_worktree,
                                      snapshot,
@@ -37,7 +37,7 @@ def test_fails_when_cloning_fails(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     git_worktree = qisrc_action.git_worktree
     tmpdir = qisrc_action.tmpdir
-    git_worktree.configure_manifest("default", manifest_url)
+    git_worktree.configure_manifest(manifest_url)
     snapshot = tmpdir.join("snapshot").strpath
     qisrc.snapshot.generate_snapshot(git_worktree,
                                      snapshot,

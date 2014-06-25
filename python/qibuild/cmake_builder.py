@@ -133,18 +133,19 @@ class CMakeBuilder(AbstractBuilder):
         prefix = prefix[1:]
         real_dest = os.path.join(dest_dir, prefix)
 
-        ui.info(ui.green, "The following projects")
-        for project in projects:
-            ui.info(ui.green, " *", ui.blue, project.name)
-        if packages:
-            ui.info(ui.green, "and the following packages")
-            for package in packages:
-                ui.info(" *", ui.blue, package.name)
-        ui.info(ui.green, "will be installed to", ui.blue, real_dest)
+        if projects:
+            ui.info(ui.green, "The following projects")
+            for project in projects:
+                ui.info(ui.green, " *", ui.blue, project.name)
+            if packages:
+                ui.info(ui.green, "and the following packages")
+                for package in packages:
+                    ui.info(" *", ui.blue, package.name)
+            ui.info(ui.green, "will be installed to", ui.blue, real_dest)
 
-        runtime_only = self.dep_types == ["runtime"]
-        if runtime_only:
-            ui.info(ui.green, "(runtime components only)")
+            runtime_only = self.dep_types == ["runtime"]
+            if runtime_only:
+                ui.info(ui.green, "(runtime components only)")
 
         if packages:
             print
@@ -156,14 +157,15 @@ class CMakeBuilder(AbstractBuilder):
             files = package.install(real_dest, runtime=runtime_only)
             installed.extend(files)
 
-        print
-        ui.info(ui.green, ":: ", "Installing projects")
-        for i, project in enumerate(projects):
-            ui.info_count(i, len(projects),
-                          ui.green, "Installing",
-                          ui.blue, project.name)
-            files = project.install(dest_dir, **kwargs)
-            installed.extend(files)
+        if projects:
+            print
+            ui.info(ui.green, ":: ", "Installing projects")
+            for i, project in enumerate(projects):
+                ui.info_count(i, len(projects),
+                            ui.green, "Installing",
+                            ui.blue, project.name)
+                files = project.install(dest_dir, **kwargs)
+                installed.extend(files)
         return installed
 
 

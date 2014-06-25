@@ -23,9 +23,9 @@ def get_one_python_project(python_worktree, args):
         raise Exception("This action can only work with one project")
     return projects[0]
 
-def get_python_builder(args):
+def get_python_builder(args, verbose=True):
     python_worktree = get_python_worktree(args)
-    build_worktree = qibuild.parsers.get_build_worktree(args, verbose=True)
+    build_worktree = qibuild.parsers.get_build_worktree(args, verbose=verbose)
     python_builder = qipy.python_builder.PythonBuilder(python_worktree,
                                                        build_worktree)
     return python_builder

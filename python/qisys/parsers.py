@@ -35,8 +35,6 @@ def default_parser(parser):
     group = parser.add_argument_group("debug options")
     group.add_argument("--backtrace", action="store_true", help="Display backtrace on error")
     group.add_argument("--pdb", action="store_true", help="Use pdb on error")
-    group.add_argument("--quiet-commands", action="store_true", dest="quiet_commands",
-        help="Do not print command outputs")
 
 def worktree_parser(parser):
     """Parser settings for every action using a work tree."""

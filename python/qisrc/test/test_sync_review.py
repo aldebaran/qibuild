@@ -15,7 +15,7 @@ def test_call_setup_review(git_worktree, git_server):
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
     with mock.patch("qisrc.review.setup_project") as mock_setup:
         mock_setup.return_value = True
-        worktree_syncer.configure_manifest("default", manifest_url)
+        worktree_syncer.configure_manifest(manifest_url)
     foo = git_worktree.get_git_project("foo")
     bar = git_worktree.get_git_project("bar")
     assert foo.review is True
@@ -37,7 +37,7 @@ def test_does_not_store_if_setup_fails(git_worktree, git_server):
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
     with mock.patch("qisrc.review.setup_project") as mock_setup:
         mock_setup.return_value = False
-        worktree_syncer.configure_manifest("default", manifest_url)
+        worktree_syncer.configure_manifest(manifest_url)
     git_worktree2 = TestGitWorkTree()
     foo = git_worktree2.get_git_project("foo")
     assert foo.review is False
@@ -47,7 +47,7 @@ def test_new_project_under_code_review(git_worktree, git_server):
     git_server.create_repo("foo", review=False)
     manifest_url = git_server.manifest_url
     worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
-    worktree_syncer.configure_manifest("default", manifest_url)
+    worktree_syncer.configure_manifest(manifest_url)
     foo = git_worktree.get_git_project("foo")
     assert foo.review is False
     git_server.use_review("foo")

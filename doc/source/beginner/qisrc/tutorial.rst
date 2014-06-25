@@ -208,7 +208,7 @@ And then to upload changes for review you have run something like
 
    git push gerrit master:refs/for/master
 
-You can get ``qisrc`` to perform this operations for you, by adding a
+You can get ``qisrc`` to perform these operations for you, by adding a
 new ``gerrit`` remote to the ``manifest.xml`` file:
 
 .. code-block:: xml
@@ -221,3 +221,20 @@ new ``gerrit`` remote to the ``manifest.xml`` file:
 
 And then, ``qisrc sync`` will setup your project for code review, and using
 ``qisrc push`` will be able to upload your changes for code review.
+
+Handling several remotes
+++++++++++++++++++++++++
+
+This is useful when you have a fork of an upstream project, and want to
+keep a reference to the upstream url.
+
+.. code-block:: xml
+
+  <manifest>
+    <remote name="origin" url="git@example.com" />
+    <repo project="foo/bar.git" src="lib/bar" remotes="origin">
+      <upstream name="my-upstream" url="git@somewhereelse.org" />
+    </repo>
+  </manifest>
+
+This will create a remote called ``my-upstream`` with the ``git@somewhereelse.org`` url.

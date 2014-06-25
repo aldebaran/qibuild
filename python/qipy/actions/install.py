@@ -1,4 +1,4 @@
-""" Install all python projects """
+""" Install the given python project """
 import os
 import sys
 

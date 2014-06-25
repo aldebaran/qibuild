@@ -35,7 +35,7 @@ def do(args):
         to_make = os.path.join(output_path, os.path.basename(pkg_name))
         output_path = os.path.join(output_path, pkg_name)
     qisys.sh.mkdir(to_make, recursive=True)
-    archive.extractall(output_path)
     archive.close()
+    qisys.archive.extract(pkg_path, output_path, algo="zip", strict_mode=False)
     ui.info(ui.green, "Package extracted to", ui.reset,
             ui.bold, output_path)

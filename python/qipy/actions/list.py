@@ -4,9 +4,10 @@ from qisys import ui
 
 import qisys.parsers
 import qipy.parsers
+import qibuild.parsers
 
 def configure_parser(parser):
-    qisys.parsers.worktree_parser(parser)
+    qibuild.parsers.cmake_build_parser(parser)
 
 def do(args):
     python_worktree = qipy.parsers.get_python_worktree(args)

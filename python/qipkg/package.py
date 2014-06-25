@@ -13,7 +13,7 @@ import qilinguist.builder
 import zipfile
 
 class Package(object):
-    """ A class representing a .pgk object """
+    """ A class representing a .pkg object """
 
     def __init__(self, pml_path):
         """ pml_path: the pml file used to build the package
@@ -47,7 +47,7 @@ class Package(object):
             for filename in filenames:
                 full_path = os.path.join(root, filename)
                 rel_path  = os.path.relpath(full_path, stage_path)
-                print "adding", full_path, filename
+                ui.info(ui.green, "adding", ui.reset, ui.bold, rel_path)
                 archive.write(full_path, rel_path)
         archive.close()
 

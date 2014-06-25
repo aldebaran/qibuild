@@ -54,6 +54,13 @@ function(qi_install_data)
   _qi_install_internal(${ARGN} COMPONENT runtime  DESTINATION ${QI_SDK_SHARE})
 endfunction()
 
+#! Install application test data. Useful when you want to run tests after having
+# deployed them
+# See :cmake:function:`qi_install_data` for the usage
+function(qi_install_test_data)
+  _qi_install_internal(${ARGN} COMPONENT test  DESTINATION ${QI_SDK_SHARE})
+endfunction()
+
 #! Install application doc.
 # The destination will be: **<prefix>/share/doc/**
 #

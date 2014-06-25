@@ -1,4 +1,4 @@
-.. _qipy_tutorial:
+.. _qipy-tutorial:
 
 Using Python with QiBuild projects
 ===================================
@@ -60,7 +60,7 @@ Some useful links:
 
 Your project should now be listed when running ``qipy list``
 
-Step two: Use `qipy configure`
+Step two: Use `qipy bootstrap`
 -------------------------------
 
 This will initialize a virtualenv in the wortkree, and should be run
@@ -78,3 +78,7 @@ Just use ``qipy run`` instead of ``python``
 
 ``qipy run [-c config] foo.py``
 
+If you have several commands to run, use something like
+
+``source $(qipy sourceme -q)`` to activate the virtualenv in your
+current session.

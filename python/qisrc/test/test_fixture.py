@@ -77,7 +77,7 @@ def test_new_project_under_review(tmpdir, git_server):
 
 def test_add_build_project(git_server, qisrc_action):
     git_server.add_qibuild_test_project("world")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     build_worktree = TestBuildWorkTree()
     assert build_worktree.get_build_project("world")
 

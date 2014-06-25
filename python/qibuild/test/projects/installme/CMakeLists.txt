@@ -23,3 +23,4 @@ endif()
 
 # test
 qi_create_test_lib(foo foo.cpp)
+qi_install_test_data(test_data.dat)

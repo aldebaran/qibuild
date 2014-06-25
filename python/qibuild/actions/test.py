@@ -41,7 +41,7 @@ def do(args):
         build_worktree = qibuild.parsers.get_build_worktree(args)
         project = qibuild.parsers.get_one_build_project(build_worktree, args)
         json = os.path.join(project.build_directory, "qitest.json")
-        qisys.script.run_action("qitest.actions.list", [json])
+        qisys.script.run_action("qitest.actions.list", [json], forward_args=args)
         return
 
     cmake_builder = qibuild.parsers.get_cmake_builder(args)

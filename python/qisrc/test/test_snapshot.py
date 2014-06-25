@@ -77,19 +77,16 @@ def test_load_file_path(tmpdir):
 def test_stores_manifest_in_snapshot(git_server, git_worktree):
     git_server.create_repo("foo")
     manifest_url = git_server.manifest_url
-    git_worktree.configure_manifest("my-manifest", manifest_url)
+    git_worktree.configure_manifest(manifest_url)
     snapshot = git_worktree.snapshot()
-    manifest = snapshot.manifests["my-manifest"]
+    manifest = snapshot.manifest
     assert manifest.url == manifest_url
-    assert manifest.name == "my-manifest"
 
 def test_generate_load_json(tmpdir, git_server, git_worktree):
     snapshot1 = qisrc.snapshot.Snapshot()
-    snapshot1.manifests = dict()
-    snapshot1.manifests["default"] = qisrc.sync.LocalManifest()
-    snapshot1.manifests["default"].name = "default"
-    snapshot1.manifests["default"].ref = "refs/heads/master"
-    snapshot1.manifests["default"].url = "foo@example.com"
+    snapshot1.manifest = qisrc.sync.LocalManifest()
+    snapshot1.manifest.ref = "refs/heads/master"
+    snapshot1.manifest.url = "foo@example.com"
     snapshot1.refs["a"] = "dead42"
     snapshot1.refs["b"] = "dead43"
     snapshot_json = tmpdir.join("snapshot.json").strpath

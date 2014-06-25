@@ -22,7 +22,7 @@ def test_untracked(qisrc_action, record_messages):
 def test_behind(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     git_worktree = TestGitWorkTree()
     foo = git_worktree.get_git_project("foo")
     git_server.push_file("foo.git", "new_file", "")
@@ -34,7 +34,7 @@ def test_behind(qisrc_action, git_server, record_messages):
 def test_wrong_branch(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
-    qisrc_action("manifest", "--add", "default", git_server.manifest_url)
+    qisrc_action("init", git_server.manifest_url)
     git_worktree = TestGitWorkTree()
     foo = git_worktree.get_git_project("foo")
     bar = git_worktree.get_git_project("bar")

@@ -48,7 +48,7 @@ def test_split_debug(qibuild_action):
     proj = qibuild_action.add_test_project("debugme")
     qibuild_action("configure", "debugme")
     qibuild_action("make", "debugme")
-    qibuild.gdb.split_debug(proj.sdk_directory)
+    qibuild.gdb.split_debug(os.path.join(proj.sdk_directory, "bin", "debugme"))
     (out, _) = run_gdb(proj.sdk_directory)
     assert "in foo () at " in out
     assert "main.cpp" in out
