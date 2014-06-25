@@ -1,11 +1,17 @@
 v3.5
 ====
 
+qibuild
+--------
+
+* Strip debug symbols from libraries only once
+
 qisrc
 -----
 
 * Remove the possibility to have several manifests in one worktree.
-  (this is harmless because most users only have one manifest anyway)
+  (this is harmless because most users only have one manifest anyway), but
+  it also means that the syntax of the snapshots files changed
 
 * ``qisrc manifest`` command is gone, its API was clumsy, instead use
   the new ``qisrc`` commands, like this:
@@ -44,6 +50,8 @@ cmake
 
 * Add wrappers for ``bison`` and ``flex``
 * Add module for ``clang``
+* Add module for ``bz2``
+* Add ``qi_install_test_data``
 
 misc
 ----
