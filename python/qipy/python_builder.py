@@ -45,11 +45,10 @@ class PythonBuilder(AbstractBuilder):
             ui.info_count(i, n, ui.green, "Installing",
                           ui.reset, ui.blue, project.name)
             setup_py = os.path.join(project.path, "setup.py")
-            # cannot use /usr/bin/python in case we are in a virtualenv already
-            subprocess.check_call(["python",
-                                  setup_py, "install", "--root", dest,
-                                 '--prefix='],
-                                 cwd=project.path)
+            python = self.python_worktree.python
+            subprocess.check_call([python, setup_py, "install",
+                                   "--root", dest, '--prefix='],
+                                   cwd=project.path)
         # Also install a python wrapper so that everything goes smoothly
         to_write="""\
 #!/bin/bash

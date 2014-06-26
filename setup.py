@@ -32,7 +32,6 @@ setup(name="qibuild",
       include_package_data = True,
       data_files=data_files,
       license="BSD",
-      install_requires=["virtualenv"],
       entry_points = {
         "console_scripts" : [
             "qidoc        = qisys.main:main",
