@@ -16,7 +16,7 @@ def configure_parser(parser):
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("depends arguments",
         description="Shows project and package dependencies."
-            "\nUse --runtime, --single, and --reverse to control "
+            "\nUse --runtime, --direct, and --reverse to control "
             "the dependencies to examine. Default usage shows "
             "compressed, recursive, build time dependencies. "
             "\nUse --tree or --graph to control the output format."
@@ -31,6 +31,8 @@ def configure_parser(parser):
     group.add_argument("--graph", action="store_true",
                         help="output in format suitable for the \"dot\" "
                         "graphing tool")
+    group.add_argument("--direct", action="store_true", default=False,
+                       help="only display direct dependencies")
 
 class DependencyRelationship:
     """ helper class to separate dependency search from display """
@@ -191,6 +193,7 @@ def collect_dependencies_reverse(project, projects, single, runtime, depth=0):
         else:
             depends = proj.build_depends
         if project.name in depends:
+            print "%s on %s" % (project.name, proj.name)
             dependency = DependencyRelationship(project.name, proj.name)
             dependency.is_known = True
             dependency.path = proj.path
@@ -263,7 +266,7 @@ def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args, verbose=(not args.graph))
     project = qibuild.parsers.get_one_build_project(build_worktree, args)
     collected_dependencies = get_deps(
-        build_worktree, project, args.single, args.runtime, args.reverse)
+        build_worktree, project, args.direct, args.runtime, args.reverse)
 
     # create title
     label = project.name
@@ -271,7 +274,7 @@ def do(args):
         label = label + " run time"
     else:
         label = label + " build time"
-    if args.single:
+    if args.direct:
         label = label + " direct"
     if args.reverse:
         label = label + " reverse dependencies"
