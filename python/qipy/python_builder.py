@@ -49,6 +49,8 @@ class PythonBuilder(AbstractBuilder):
                           ui.reset, ui.blue, project.name)
             setup_py = os.path.join(project.path, "setup.py")
             python = self.python_worktree.python
+            if not os.path.exists(python):
+                raise Exception("Please call `qipy bootstrap`")
             subprocess.check_call([python, setup_py, "install",
                                    "--root", dest, '--prefix='],
                                    cwd=project.path)
