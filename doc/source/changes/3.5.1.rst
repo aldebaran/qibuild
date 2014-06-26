@@ -1,0 +1,9 @@
+v3.5.1
+======
+
+Fixes for debian-based distributions
+
+* fix installation with pip install --user when python-virtualenv is already installed on the system
+* fix package generation, getting rid of the 'local' directory
+
+Note that ``qipkg`` actions now require ``qipy bootstrap`` to be called first
