@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Synchronize the given worktree with its manifests
+""" Synchronize the given worktree with its manifest
 
  * Clone any missing project
  * Configure projects for code review

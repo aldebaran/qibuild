@@ -1,4 +1,4 @@
-""" Add a group to the current worktree
+""" Remove a group from the current worktree
 
 """
 

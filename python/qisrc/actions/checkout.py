@@ -1,4 +1,6 @@
-""" Checkout a new manifest branch and every repository
+""" Change the branch of the manifest
+
+Also, checkout the the correct brannch for every git project
 in the worktree
 
 """

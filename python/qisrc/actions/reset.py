@@ -2,7 +2,11 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-"""Reset a repository to the manifest state."""
+"""Reset repositories to a clean state
+
+By default, make sure the repository is on the correct branch
+
+"""
 
 import sys
 
