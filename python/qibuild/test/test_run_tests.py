@@ -7,7 +7,7 @@ def test_run(build_worktree):
     testme.build()
     ok = testme.run_tests()
     assert not ok
-    test_dir = os.path.join(testme.build_directory, "test-results")
+    test_dir = os.path.join(testme.sdk_directory, "test-results")
     xml_files = os.listdir(test_dir)
     xml_files = [x for x in xml_files if x.endswith(".xml")]
     for xml_file in xml_files:

@@ -16,16 +16,11 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
     """ Implements :py:class:`.TestSuiteRunner` for a qibuild/cmake project """
 
     def __init__(self, project):
-        self.project = project
-        self.perf = False
-        self.nightly = False
-        self.nightmare = False
-        self._pattern = None
+        super(ProjectTestRunner, self).__init__(project)
         self._coverage = False
         self._valgrind = False
         self._num_cpus = -1
-        tests = qitest.conf.parse_tests(project.qitest_json)
-        super(ProjectTestRunner, self).__init__(tests)
+        tests = project.tests
         for directory in (self.test_results_dir,
                           self.perf_results_dir):
             qisys.sh.rm(directory)
@@ -38,22 +33,16 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @property
     def test_results_dir(self):
-        res = os.path.join(self.project.build_directory,
+        res = os.path.join(self.project.sdk_directory,
                            "test-results")
+        qisys.sh.mkdir(res, recursive=True)
         return res
 
     @property
     def perf_results_dir(self):
-        res = os.path.join(self.project.build_directory,
+        res = os.path.join(self.project.sdk_directory,
                            "perf-results")
-        return res
-
-    @property
-    def tests(self):
-        """ Override TestSuiteRunner.test to filter perf and nightly tests """
-        res = super(ProjectTestRunner, self).tests
-        res = [x for x in res if x.get("perf", False) == self.perf]
-        res = [x for x in res if x.get("nightly", False) == self.nightly]
+        qisys.sh.mkdir(res, recursive=True)
         return res
 
     @property
@@ -172,13 +161,10 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
     def _update_test_cmd_for_project(self, test):
         if not self.project:
             return
-        perf_results = os.path.join(self.project.build_directory,
-                                    "perf-results")
         if test.get("gtest"):
             cmd = test["cmd"]
             cmd.append("--gtest_output=xml:%s" % self.test_out)
         if test.get("perf"):
-            qisys.sh.mkdir(perf_results)
             cmd = test["cmd"]
             cmd.extend(["--output", self.perf_out])
 

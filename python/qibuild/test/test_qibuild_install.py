@@ -2,7 +2,7 @@ import sys
 import os
 
 import qisys.command
-
+import qitest.project
 import qibuild.find
 
 from qisys.test.conftest import skip_on_win
@@ -128,8 +128,7 @@ def test_running_tests_after_install(qibuild_action, tmpdir):
     testme.install(dest.strpath, components=["test"])
     qitest_json = dest.join("qitest.json")
     assert qitest_json.check(file=True)
-    from qitest.actions.run import TestProject
-    test_project = TestProject(qitest_json.strpath)
+    test_project = qitest.project.TestProject(qitest_json.strpath)
     test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
     test_runner.pattern = "ok"
     test_runner.cwd = dest.strpath

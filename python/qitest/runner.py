@@ -7,13 +7,16 @@ import qitest.test_queue
 class TestSuiteRunner(object):
     """ Interface for a class able to run a test suite """
 
-    def __init__(self, tests):
+    def __init__(self, project):
+        self.project = project
         self.pattern = None
         self.num_jobs = 1
         self.cwd = os.getcwd()
         self.env = None
         self.verbose = False
-        self._tests = tests
+        self.perf = False
+        self.nightly = False
+        self._tests = project.tests
 
     @abc.abstractproperty
     def launcher(self):
@@ -30,6 +33,8 @@ class TestSuiteRunner(object):
         test_queue = qitest.test_queue.TestQueue(self.tests)
         test_queue.launcher = self.launcher
         ok = test_queue.run(num_jobs=self.num_jobs)
+        if self.coverage:
+            qibuild.gcov.generate_coverage_xml_report(test_runner.project)
         return ok
 
     @property
@@ -45,7 +50,11 @@ class TestSuiteRunner(object):
 
     @property
     def tests(self):
-        return [x for x in self._tests if match_pattern(self.pattern, x["name"])]
+        res = [x for x in self._tests if match_pattern(self.pattern, x["name"])]
+        res = [x for x in res if x.get("perf", False) == self.perf]
+        res = [x for x in res if x.get("nightly", False) == self.nightly]
+        return res
+
 
 class TestLauncher(object):
     """ Interface for a class able to launch a test. """

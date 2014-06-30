@@ -15,10 +15,10 @@ def test_perf(qibuild_action):
     qibuild_action("make", "perf")
     proj.run_tests(perf=True)
     for name in ["perf_spam", "perf_eggs"]:
-        expected_path = os.path.join(proj.build_directory,
+        expected_path = os.path.join(proj.sdk_directory,
             "perf-results", name + ".xml")
         assert os.path.exists(expected_path)
     for name in ["perf_timeout", "perf_segv"]:
-        expected_path = os.path.join(proj.build_directory,
+        expected_path = os.path.join(proj.sdk_directory,
             "perf-results", name + ".xml")
         assert not os.path.exists(expected_path)

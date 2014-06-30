@@ -17,6 +17,7 @@ import qibuild.dlls
 import qibuild.test_runner
 import qitoolchain.toolchain
 import qitest.conf
+import qitest.project
 
 
 def read_install_manifest(filepath, rootdir):
@@ -80,7 +81,7 @@ class BuildProject(object):
 
     @property
     def qitest_json(self):
-        return os.path.join(self.build_directory, "qitest.json")
+        return os.path.join(self.sdk_directory, "qitest.json")
 
     @property
     def cmake_args(self):
@@ -101,7 +102,9 @@ class BuildProject(object):
     @property
     def sdk_directory(self):
         """ The sdk directory in the build directory """
-        return os.path.join(self.build_directory, "sdk")
+        res = os.path.join(self.build_directory, "sdk")
+        qisys.sh.mkdir(res, recursive=True)
+        return res
 
     @property
     def cmake_generator(self):
@@ -395,24 +398,17 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         tests = qitest.conf.relocate_tests(self, tests)
         qitest.conf.write_tests(tests, os.path.join(destdir, "qitest.json"))
 
+
     def run_tests(self, **kwargs):
-        """ Run the tests for this project """
-        ui.info(ui.green, "Testing", self.name, "...")
-        test_runner = qibuild.test_runner.ProjectTestRunner(self)
-        test_runner.cwd = os.path.join(self.sdk_directory, "bin")
-        test_runner.env = self.build_env
-        test_runner.pattern = kwargs.get("pattern")
-        test_runner.perf = kwargs.get("perf", False)
-        test_runner.nightly = kwargs.get("nightly", False)
-        test_runner.coverage = kwargs.get("coverage")
-        test_runner.valgrind = kwargs.get("valgrind")
-        test_runner.verbose = kwargs.get("verbose_tests")
-        test_runner.num_cpus = kwargs.get("num_cpus", -1)
-        test_runner.num_jobs = kwargs.get("num_jobs", 1)
-        result = test_runner.run()
-        if test_runner.coverage:
-            qibuild.gcov.generate_coverage_xml_report(self)
-        return result
+        test_project = self.to_test_project()
+        test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
+        for key, value in kwargs.iteritems():
+            if hasattr(test_runner, key):
+                setattr(test_runner, key, value)
+        return test_runner.run()
+
+    def to_test_project(self):
+        return qitest.project.TestProject(self.qitest_json)
 
     def fix_shared_libs(self, paths):
         """ Do some magic so that shared libraries from other projects and

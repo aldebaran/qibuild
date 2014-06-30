@@ -70,6 +70,5 @@ def get_result_dir():
     worktree = qisys.worktree.WorkTree(os.getcwd())
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
     testme = build_worktree.get_build_project("testme")
-    build_dir = testme.get_build_dirs()["known_configs"][0]
-    result_dir = os.path.join(build_dir, "test-results")
+    result_dir = os.path.join(testme.sdk_directory, "test-results")
     return result_dir
