@@ -41,11 +41,6 @@ include("qibuild/set")
 # and not /usr/share/cmake/modules/FindGTest.cmake)
 qi_persistent_append_uniq(CMAKE_PREFIX_PATH "${_ROOT_DIR}/modules/")
 
-#include new cmake modules, when using old cmake
-if(${CMAKE_VERSION} VERSION_LESS 2.8.3)
-  qi_persistent_append_uniq(CMAKE_MODULE_PATH "${_ROOT_DIR}/upstream-backports")
-endif()
-
 set(QI_ROOT_DIR ${_ROOT_DIR})
 set(QI_TEMPLATE_DIR ${_ROOT_DIR}/templates)
 
