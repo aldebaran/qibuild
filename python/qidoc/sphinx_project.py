@@ -161,6 +161,7 @@ class SphinxProject(qidoc.project.DocProject):
             cmd.append("-W")
         cmd.extend([self.source_dir, html_dir])
         os.environ["build_type"] = kwargs.get("build_type", "")
+        ui.debug("launching:", cmd)
         rc = sphinx.main(argv=cmd)
         if rc != 0:
             raise SphinxBuildError(self)
