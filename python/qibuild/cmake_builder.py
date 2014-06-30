@@ -7,6 +7,7 @@ import qisys.sh
 import qisys.remote
 import qibuild.deps_solver
 from qisys.abstractbuilder import AbstractBuilder
+from qibuild.project       import write_qi_path_conf
 
 class CMakeBuilder(AbstractBuilder):
     """ CMake driver.
@@ -84,12 +85,14 @@ class CMakeBuilder(AbstractBuilder):
             sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build"])
             project.write_dependencies_cmake(sdk_dirs)
 
+        qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
+
         # path.conf must be written right before cmake is called, and with
         # all the dependencies
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         for project in projects:
             sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "runtime", "test"])
-            project.write_qi_path_conf(sdk_dirs)
+            write_qi_path_conf(project.sdk_directory, qi_path_sdk_dirs)
 
     def pre_build(self, project):
         """ Called before building a project """
