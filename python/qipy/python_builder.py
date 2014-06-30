@@ -7,6 +7,7 @@ from qisys import ui
 from qisys.abstractbuilder import AbstractBuilder
 import qisys.command
 import qipy.venv
+from qibuild.project import write_qi_path_conf
 
 class PythonBuilder(AbstractBuilder):
     """
@@ -32,6 +33,8 @@ class PythonBuilder(AbstractBuilder):
                                        self.python_worktree,
                                        build_worktree=self.build_worktree,
                                        remote_packages=remote_packages)
+        qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
+        write_qi_path_conf(self.python_worktree.venv_path, qi_path_sdk_dirs)
 
     def configure(self, *args, **kwargs):
         pass
