@@ -199,11 +199,13 @@ endfunction()
 # \example:target
 function(qi_create_lib name)
   cmake_parse_arguments(ARG
-    "NOBINDLL;NO_RPATH;NO_INSTALL;NO_FPIC;SHARED;STATIC;MODULE;INTERNAL"
+    "NOBINDLL;NO_RPATH;NO_INSTALL;NO_FPIC;SHARED;STATIC;MODULE;INTERNAL;NO_LOG"
     "SUBFOLDER"
     "SRC;SUBMODULE;DEPENDS" ${ARGN})
 
-  message(STATUS "Library: ${name}")
+  if (NOT ARG_NO_LOG)
+    message(STATUS "Library: ${name}")
+  endif()
   if (ARG_NOBINDLL)
     # Kept here for historical reason: TODO: fix this in qibuild/compat.
     qi_deprecated("Use of NOBINDLL is deprectated")
