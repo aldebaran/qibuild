@@ -254,6 +254,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         res.out = res.out[-16384:]
         res.out = re.sub('\x1b[^m]*m', "", res.out)
 
+        message_as_string = " ".join(str(x) for x in res.message
+                                     if not isinstance(x, ui._Color))
         # Windows output is most likely code page 850
         if sys.platform.startswith("win"):
             encoding = "ascii"
@@ -261,6 +263,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             encoding = "UTF-8"
         try:
             res.out = res.out.decode(encoding, "ignore")
+            message_as_string = message_as_string.decode(encoding, "ignore")
         except UnicodeDecodeError:
             pass
         # Make sure there are no invalid data in the XML
@@ -270,8 +273,6 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             num_failures = "0"
         else:
             num_failures = "1"
-        message_as_string = " ".join(str(x) for x in res.message
-                                     if not isinstance(x, ui._Color))
 
         root = etree.Element("testsuites")
         root.set("tests", "1")
