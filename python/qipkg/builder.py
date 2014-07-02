@@ -11,7 +11,7 @@ from qipy.python_builder import PythonBuilder
 from qibuild.worktree import BuildWorkTree
 from qibuild.cmake_builder import CMakeBuilder
 
-class PMLBuider(object):
+class PMLBuilder(object):
     def __init__(self, pml_path,
                  cmake_builder,
                  python_builder,

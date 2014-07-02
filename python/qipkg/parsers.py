@@ -28,5 +28,5 @@ def get_pml_builder(args):
     # from the command line
     linguist_builder = qilinguist.parsers.get_linguist_builder(args,
             with_projects=False)
-    return qipkg.builder.PMLBuider(pml_path, cmake_builder,
+    return qipkg.builder.PMLBuilder(pml_path, cmake_builder,
                                    python_builder, linguist_builder)
