@@ -15,7 +15,11 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
     venv_path = python_worktree.venv_path
     pip = python_worktree.pip
 
-    virtualenv.create_environment(python_worktree.venv_path)
+    try:
+        virtualenv.create_environment(python_worktree.venv_path)
+    except:
+        ui.error("Failed to create virtualenv")
+        return
 
     # Install all Python projects using pip install -e .
     python_projects = python_worktree.python_projects
