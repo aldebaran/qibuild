@@ -51,19 +51,19 @@ class PMLBuilder(object):
         qibuild_elems = root.findall("qibuild")
         for qibuild_elem in qibuild_elems:
             name = qisys.qixml.parse_required_attr(qibuild_elem, "name", pml_path)
-            project = self.build_worktree.get_build_project(name)
+            project = self.build_worktree.get_build_project(name, raises=True)
             self.cmake_builder.projects.append(project)
 
         qipython_elems = root.findall("qipython")
         for qipython_elem in qipython_elems:
             name = qisys.qixml.parse_required_attr(qipython_elem, "name", pml_path)
-            project = self.python_worktree.get_python_project(name)
+            project = self.python_worktree.get_python_project(name, raises=True)
             self.python_builder.projects.append(project)
 
         qilinguist_elems = root.findall("qilinguist")
         for qilinguist_elem in qilinguist_elems:
             name = qisys.qixml.parse_required_attr(qilinguist_elem, "name", pml_path)
-            project = self.linguist_worktree.get_linguist_project(name)
+            project = self.linguist_worktree.get_linguist_project(name, raises=True)
             self.linguist_builder.projects.append(project)
 
         # For top, ressource, dialog, behavior, add stuff to self.file_list
