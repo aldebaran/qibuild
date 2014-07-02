@@ -36,8 +36,9 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
     # Install the extension in the virtualenv
     binaries_path = virtualenv.path_locations(venv_path)[-1]
     pip_binary = os.path.join(binaries_path, "pip")
-    cmd = [pip_binary, "install"] + remote_packages
-    subprocess.check_call(cmd)
+    if remote_packages:
+        cmd = [pip_binary, "install"] + remote_packages
+        subprocess.check_call(cmd)
 
 
 def handle_extensions(venv_path, python_worktree, build_worktree):
