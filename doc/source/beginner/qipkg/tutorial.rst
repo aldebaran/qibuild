@@ -16,11 +16,11 @@ you save your project and look like this:
 .. code-block:: xml
 
 
-  <package name="run_dialog">
+  <Package name="run_dialog">
 
     <!-- Some tags written and read by Choregraphe -->
 
-  </package>
+  </Package>
 
 A  ``manifest.xml`` should exist next to the pml file and should at least
 contain ::
@@ -48,15 +48,18 @@ If you need to include code written in C++ or Python, just add them to the
 
 .. code-block:: xml
 
-  <package>
+  <Package>
 
   <!-- choregraphe tags -->
     <qibuild name="foo" />
-    <qipy name="bar" />
+    <qipython name="bar" />
 
-  </package>
+  </Package>
 
 This assumes you have a ``qibuild`` CMake project named ``foo`` and a ``qipy`` project named
 ``bar`` in your worktree.
+
+Also note that to include python projects in your package, you should have called ``qipy bootstrap`` at
+least once.
 
 
