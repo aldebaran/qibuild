@@ -52,7 +52,7 @@ class PythonBuilder(AbstractBuilder):
             if not os.path.exists(python):
                 raise Exception("Please call `qipy bootstrap`")
             subprocess.check_call([python, setup_py, "install",
-                                   "--root", dest, '--prefix='],
+                                   "--root", dest, "--prefix=."],
                                    cwd=project.path)
         # Also install a python wrapper so that everything goes smoothly
         to_write="""\
