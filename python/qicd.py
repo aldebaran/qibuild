@@ -1,5 +1,7 @@
 import sys
 import os
+import difflib
+
 import qisys.parsers
 
 def main():
@@ -30,19 +32,13 @@ def find_best_match(worktree, token):
     are no '/' in token, else, the shortest src matching the token
 
     """
-    matches = list()
-    for project in worktree.projects:
-        if "/" in token:
-            to_match = project.src
-        else:
-            to_match = os.path.basename(project.src)
-        if token in to_match:
-            matches.append(project.path)
+    possibilities = [x.src for x in worktree.projects]
+    matches = difflib.get_close_matches(token, possibilities, cutoff=0)
+    if matches:
+        closest_src =  matches[0]
+        return worktree.get_project(closest_src).path
+    return None
 
-    matches.sort(key=len)
-    if not matches:
-        return None
-    return matches[0]
 
 if __name__ == "__main__":
     main()
