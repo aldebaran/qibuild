@@ -36,5 +36,6 @@ def _install_package(url, pkg_path):
     session = qi.Session()
     session.connect("tcp://%s:9559" % (url.host))
     package_manager = session.service("PackageManager")
-    ret = package_manager.install("/home/nao/%s" % os.path.basename(pkg_path))
+    ret = package_manager.install(
+            "/home/%s/%s" % (url.user, os.path.basename(pkg_path)))
     sys.exit(ret)
