@@ -16,6 +16,7 @@ class TestSuiteRunner(object):
         self.verbose = False
         self.perf = False
         self.nightly = False
+        self.coverage = False
         self._tests = project.tests
 
     @abc.abstractproperty
@@ -33,8 +34,6 @@ class TestSuiteRunner(object):
         test_queue = qitest.test_queue.TestQueue(self.tests)
         test_queue.launcher = self.launcher
         ok = test_queue.run(num_jobs=self.num_jobs)
-        if self.coverage:
-            qibuild.gcov.generate_coverage_xml_report(test_runner.project)
         return ok
 
     @property
