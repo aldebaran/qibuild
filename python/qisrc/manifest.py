@@ -8,6 +8,7 @@
 
 import copy
 import functools
+import StringIO
 
 import qisys.sh
 import qisys.qixml
@@ -186,6 +187,25 @@ No such project: {1}
     def configure_group(self, name, projects):
         """ Configure a group """
         self.groups.configure_group(name, projects)
+
+def from_git_repo(git_repo, ref):
+    git = qisrc.git.Git(git_repo)
+    rc, out = git.call("cat-file", "-p", ref + "^{tree}", raises=False)
+    if rc != 0:
+        return None
+    lines = out.splitlines()
+    manifest_line = None
+    for line in lines:
+        if line.endswith("\tmanifest.xml"):
+            manifest_line = line
+    if not manifest_line:
+        return None
+    manifest_blob_sha1 = manifest_line.split()[2]
+    rc, as_string = git.call("cat-file", "-p", manifest_blob_sha1, raises=False)
+    if rc !=0:
+        return None
+    source = StringIO.StringIO(as_string)
+    return Manifest(source)
 
 class RepoConfig(object):
     def __init__(self):

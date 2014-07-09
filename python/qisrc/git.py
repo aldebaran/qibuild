@@ -89,7 +89,6 @@ class Git(object):
         yield self._transaction
         self._transaction = None
 
-
     def get_config(self, name):
         """ Get a git config value.
         Return None if not found

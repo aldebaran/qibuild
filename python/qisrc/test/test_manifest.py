@@ -300,3 +300,13 @@ def test_multiple_remotes(tmpdir):
     assert len(manifest.repos) == 1
     foo = manifest.repos[0]
     assert len(foo.remotes) == 2
+
+def test_from_git_repo(git_server):
+    git_server.create_repo("foo")
+    git_server.switch_manifest_branch("devel")
+    git_server.create_repo("bar")
+    manifest_repo = git_server.root.join("src", "manifest").strpath
+    manifest = qisrc.manifest.from_git_repo(manifest_repo, "master")
+    assert len(manifest.repos) == 1
+    manifest = qisrc.manifest.from_git_repo(manifest_repo, "devel")
+    assert len(manifest.repos) == 2
