@@ -28,3 +28,7 @@ def main():
         sys.exit(0)
 
     qisys.script.root_command_main(script_name, parser, modules)
+
+if __name__ == "__main__":
+    sys.argv.pop(0)
+    main()
