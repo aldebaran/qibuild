@@ -13,7 +13,7 @@ def test_native_paths(git_worktree):
     if os.name == 'nt':
         assert "/" not in foo.path
 
-def test_appy_git_config(git_worktree):
+def test_apply_git_config(git_worktree):
     foo = git_worktree.create_git_project("foo")
     upstream = Remote()
     upstream.name = "upstream"
@@ -46,7 +46,8 @@ def test_apply_remote_config(git_worktree):
     foo_repo = RepoConfig()
     foo_repo.remotes = [origin, gerrit]
     foo_repo.default_branch = "master"
-    foo.apply_remote_config(foo_repo)
+    foo.read_remote_config(foo_repo)
+    foo.apply_config()
     foo.save_config()
     assert foo_repo.default_remote == origin
     assert foo.review_remote == gerrit
@@ -91,7 +92,8 @@ def test_warn_on_default_change(git_worktree, record_messages):
     foo_repo.default_branch = "master"
     foo_repo.remotes = [gitlab, gitorious]
 
-    foo.apply_remote_config(foo_repo)
+    foo.read_remote_config(foo_repo)
+    foo.apply_config()
     assert foo.default_remote.name == "gitorious"
 
     gitorious2 = copy.copy(gitorious)
@@ -103,7 +105,8 @@ def test_warn_on_default_change(git_worktree, record_messages):
     foo_repo = RepoConfig()
     foo_repo.remotes = [gitlab2, gitorious2]
     foo_repo.default_branch = "master"
-    foo.apply_remote_config(foo_repo)
+    foo.read_remote_config(foo_repo)
+    foo.apply_config()
     assert record_messages.find("Default remote changed")
     assert foo.default_remote.name == "gitlab"
 
@@ -111,7 +114,8 @@ def test_warn_on_default_change(git_worktree, record_messages):
 def test_no_default_branch(git_worktree):
     foo_project = git_worktree.create_git_project("foo")
     foo_repo = RepoConfig()
-    foo_project.apply_remote_config(foo_repo)
+    foo_project.read_remote_config(foo_repo)
+    foo_project.apply_config()
 
 
 def test_setting_default_branch(git_worktree):

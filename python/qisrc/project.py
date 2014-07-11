@@ -86,23 +86,26 @@ class GitProject(object):
         self.remotes.append(new)
 
     def configure_branch(self, name, tracks="origin",
-                         remote_branch=None, default=True):
+                         remote_branch=None, default=True,
+                         quiet=False):
         """ Configure a branch. If a branch with the same name
         already exists, update its tracking remote.
 
         """
         previous_default_branch = self.default_branch
         if previous_default_branch and previous_default_branch.name != name:
-            ui.warning(self.src, ": default branch changed",
-                        previous_default_branch.name, "->", name)
+            if not quiet:
+                ui.warning(self.src, ": default branch changed",
+                            previous_default_branch.name, "->", name)
             previous_default_branch.default = False
         branch_found = False
         for branch in self.branches:
             if branch.name == name:
                 branch_found = True
                 if branch.tracks != tracks:
-                    ui.warning(self.src, ":", branch.name, "now tracks", tracks,
-                              "instead of", branch.tracks)
+                    if not quiet:
+                        ui.warning(self.src, ":", branch.name, "now tracks", tracks,
+                                "instead of", branch.tracks)
                     branch.tracks = tracks
                 branch.default = default
         if not branch_found:
@@ -114,7 +117,7 @@ class GitProject(object):
             self.branches.append(branch)
         return branch
 
-    def apply_remote_config(self, repo):
+    def read_remote_config(self, repo, quiet=False):
         """ Apply the configuration read from the "repo" setting
         of a remote manifest.
         Called by WorkTreeSyncer
@@ -129,17 +132,17 @@ class GitProject(object):
             self.configure_remote(remote)
         if repo.default_branch and repo.default_remote:
             self.configure_branch(repo.default_branch, tracks=repo.default_remote.name,
-                                remote_branch=repo.default_branch, default=True)
+                                  remote_branch=repo.default_branch, default=True,
+                                  quiet=quiet)
             new_default = self.default_remote.name
             if previous_default is not None and previous_default != new_default:
-                ui.warning("Default remote changed", previous_default, "->",
-                                                    new_default)
+                if not quiet:
+                    ui.warning("Default remote changed", previous_default, "->",
+                                                        new_default)
         if repo.review:
             ok = qisrc.review.setup_project(self)
             if ok:
                 self.review = True
-        self.apply_config()
-
 
     def sync(self, rebase_devel=False, **kwargs):
         """ Synchronize remote changes with the underlying git repository

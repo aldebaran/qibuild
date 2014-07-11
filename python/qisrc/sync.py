@@ -67,6 +67,8 @@ class WorkTreeSyncer(object):
             manifest_xml = os.path.join(res, "manifest.xml")
             with open(manifest_xml, "w") as fp:
                 fp.write("<manifest />")
+            git.add(".")
+            git.commit("-m", "initial commit")
         return res
 
     def sync_repos(self):
@@ -119,7 +121,8 @@ class WorkTreeSyncer(object):
             ui.info_count(i, n, ui.white, "Configuring", ui.reset,
                           ui.blue, repo.src.ljust(max_src), end="\r")
             git_project = srcs[repo.src]
-            git_project.apply_remote_config(repo)
+            git_project.read_remote_config(repo)
+            git_project.apply_config()
         ui.info(" " * (max_src + 19), end="\r")
         self.git_worktree.save_git_config()
 
@@ -188,6 +191,7 @@ class WorkTreeSyncer(object):
         git.set_remote("origin", self.manifest.url)
         with git.transaction() as transaction:
             git.fetch("origin")
+            git.checkout("-B", self.manifest.branch)
             if self.manifest.ref:
                 to_reset = self.manifest.ref
                 git.reset("--hard", to_reset)
@@ -245,13 +249,15 @@ class WorkTreeSyncer(object):
                     ui.white, "(%s)" % repo.default_branch)
             project = self.git_worktree.get_git_project(repo.src)
             if project:  # Repo is already there, re-apply config
-                project.apply_remote_config(repo)
+                project.read_remote_config(repo)
+                project.apply_config()
                 continue
             if not self.git_worktree.clone_missing(repo):
                 res = False
             else:
                 project = self.git_worktree.get_git_project(repo.src)
-                project.apply_remote_config(repo)
+                project.read_remote_config(repo)
+                project.apply_config()
 
         if to_move:
             ui.info(ui.green, ":: Moving repositories ...")
