@@ -2,6 +2,7 @@ import os
 
 import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree
+from qisrc.test.conftest import TestGit
 
 def test_checkout_happy(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
@@ -38,3 +39,17 @@ def test_checkout_preserve_changes_when_checkout_fails(qisrc_action, git_server)
     # With --force:
     qisrc_action("checkout", "devel", "--force")
     assert foo_git.get_current_branch() == "devel"
+
+def test_checkout_creates_at_correct_place(qisrc_action, git_server):
+    manifest_url = git_server.manifest_url
+    git_server.create_repo("foo.git")
+    git_server.switch_manifest_branch("devel")
+    git_server.change_branch("foo.git", "devel")
+    git_server.push_file("foo.git", "foo.txt", "this is foo")
+    qisrc_action("init", manifest_url, "--branch", "devel")
+    qisrc_action("checkout", "master")
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    git.read_file("foo.txt")
+

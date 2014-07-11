@@ -252,7 +252,9 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             if project.default_branch is None:
                 continue
             branch_name = project.default_branch.name
-            ok, err = self._safe_checkout(project, branch_name, force=force)
+            remote_name = project.default_remote.name
+            ok, err = self._safe_checkout(project, branch_name, remote_name,
+                                          force=force)
             if not ok:
                 errors.append((project.src, err))
         if not errors:
@@ -261,7 +263,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         for (project, error) in errors:
             ui.info(project, ":", error)
 
-    def _safe_checkout(self, project, branch, force=False):
+    def _safe_checkout(self, project, branch, remote, force=False):
         """ Helper for self.checkout """
         git = qisrc.git.Git(project.path)
         current_branch = git.get_current_branch()
@@ -270,7 +272,12 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         clean, error = git.require_clean_worktree()
         if not clean and not force:
             return False, error
-        checkout_args = [branch]
+        ref = "%s/%s" % (remote, branch)
+        # Fetch if necessary:
+        rc, out = git.call("show-ref", ref, raises=False)
+        if rc != 0:
+            git.fetch(remote)
+        checkout_args = ["-B", branch, "--track", ref]
         if force:
             checkout_args.append("--force")
         rc, out = git.checkout(*checkout_args, raises=False)
