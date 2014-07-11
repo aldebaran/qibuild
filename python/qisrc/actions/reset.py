@@ -24,14 +24,11 @@ def configure_parser(parser):
     """Configure parser for this action."""
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
-    parser.add_argument("-f", "--force", help="If not set only a dry-run is"
-                        "done.", action="store_true")
-    parser.add_argument("-c", "--clean", action="store_true",
-                        help="Remove untracked files and directories.")
+    parser.add_argument("-f", "--force", action="store_true",
+                        help="Discard local changes")
     parser.add_argument("--tag", help="Reset everything to the given tag")
     parser.add_argument("--snapshot", help="Reset everything using the given "
                         "snapshot")
-    parser.set_defaults(fetch=False)
 
 def do(args):
     """Main entry points."""
@@ -48,35 +45,22 @@ def do(args):
         reset_manifest(git_worktree, snapshot, groups=args.groups)
 
     errors = list()
-    for git_project in git_projects:
-        state_project = qisrc.status.check_state(git_project, False)
-
-        ui.info(ui.green, git_project.src, ui.reset, ui.bold,
-                state_project.tracking)
-
-        qisrc.status.print_state(state_project, False)
-
+    for i, git_project in enumerate(git_projects):
+        ui.info_count(i, len(git_projects), "Reset", git_project.src)
         src = git_project.src
         git = qisrc.git.Git(git_project.path)
-
-        if args.clean:
-            ui.info("Remove untracked files and directories.")
-            if args.force:
-                git.clean("--force", "-d", "-x")
-
-        if not state_project.clean:
-            ui.info("Clean local changes.")
-            if args.force:
-                git.checkout(".")
-
+        ok, message = git.require_clean_worktree()
+        if not ok and not args.force:
+            ui.warning(message)
+            errors.append(src)
+            continue
+        git.checkout(".")
         if not git_project.default_branch:
-            ui.info(git_project.src, "not in any manifest, skipping")
+            ui.warning(git_project.src, "not in any manifest, skipping")
             continue
         branch = git_project.default_branch.name
-        if state_project.incorrect_proj or state_project.not_on_a_branch:
-            ui.info("Checkout", branch)
-            if args.force:
-                git.checkout(branch)
+        remote = git_project.default_remote.name
+        git.safe_checkout(branch, remote, force=True)
 
         to_reset = None
         if args.snapshot:
@@ -87,20 +71,17 @@ def do(args):
         elif args.tag:
             to_reset = args.tag
         else:
-            to_reset = git.get_tracking_branch()
-
-        if args.force:
-            ui.info("reset", to_reset)
-            try:
-                qisrc.reset.clever_reset_ref(git_project, to_reset)
-            except:
-                errors.append(src)
+            to_reset = "%s/%s" % (remote, branch)
+        try:
+            qisrc.reset.clever_reset_ref(git_project, to_reset)
+        except:
+            errors.append(src)
 
     if not errors:
         return
     ui.error("Failed to reset some projects")
     for error in errors:
-        ui.error(" * ", error)
+        ui.info(ui.red, " * ", error)
     sys.exit(1)
 
 def reset_manifest(git_worktree, snapshot, groups=None):

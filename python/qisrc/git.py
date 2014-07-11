@@ -480,6 +480,32 @@ class Git(object):
             res.append(commit)
         return res
 
+    def safe_checkout(self, branch, remote, force=False):
+        """ Checkout or create the branch next to the matching
+        remote branch.
+
+        Return either (True, None) if all went well, or
+        (False, error) in case of error
+        """
+        current_branch = self.get_current_branch()
+        if not current_branch:
+            return False, "not on any branch, skipping"
+        clean, error = self.require_clean_worktree()
+        if not clean and not force:
+            return False, error
+        ref = "%s/%s" % (remote, branch)
+        # Fetch if necessary:
+        rc, out = self.call("show-ref", ref, raises=False)
+        if rc != 0:
+            self.fetch(remote)
+        checkout_args = ["-B", branch, "--track", ref]
+        if force:
+            checkout_args.append("--force")
+        rc, out = self.checkout(*checkout_args, raises=False)
+        if rc != 0:
+            return False, "Checkout failed " + out
+        return True, None
+
     def __repr__(self):
         return "<Git repo in %s>" % self.repo
 

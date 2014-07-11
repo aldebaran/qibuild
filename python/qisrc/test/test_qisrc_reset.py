@@ -47,3 +47,4 @@ def test_fails_when_cloning_fails(qisrc_action, git_server):
     qisys.sh.rm(git_server.root.strpath)
     rc = qisrc_action("reset", "--snapshot", snapshot, "--force", retcode=True)
     assert rc == 1
+

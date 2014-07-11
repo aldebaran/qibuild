@@ -253,8 +253,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                 continue
             branch_name = project.default_branch.name
             remote_name = project.default_remote.name
-            ok, err = self._safe_checkout(project, branch_name, remote_name,
-                                          force=force)
+            git = qisrc.git.Git(project.path)
+            ok, err = git.safe_checkout(branch_name, remote_name, force=force)
             if not ok:
                 errors.append((project.src, err))
         if not errors:
@@ -263,27 +263,6 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         for (project, error) in errors:
             ui.info(project, ":", error)
 
-    def _safe_checkout(self, project, branch, remote, force=False):
-        """ Helper for self.checkout """
-        git = qisrc.git.Git(project.path)
-        current_branch = git.get_current_branch()
-        if not current_branch:
-            return False, "not on any branch, skipping"
-        clean, error = git.require_clean_worktree()
-        if not clean and not force:
-            return False, error
-        ref = "%s/%s" % (remote, branch)
-        # Fetch if necessary:
-        rc, out = git.call("show-ref", ref, raises=False)
-        if rc != 0:
-            git.fetch(remote)
-        checkout_args = ["-B", branch, "--track", ref]
-        if force:
-            checkout_args.append("--force")
-        rc, out = git.checkout(*checkout_args, raises=False)
-        if rc != 0:
-            return False, "Checkout failed " + out
-        return True, None
 
 
     def remove_repo(self, project):
