@@ -1,4 +1,5 @@
 import os
+import copy
 
 from qisys import ui
 import qisys.qixml
@@ -183,6 +184,11 @@ class GitProject(object):
             git.set_tracking_branch(branch.name, branch.tracks,
                                     remote_branch=branch.remote_branch)
 
+    def __deepcopy__(self, memo):
+        shallow_copy = copy.copy(self)
+        shallow_copy.branches = copy.copy(self.branches)
+        shallow_copy.remotes = copy.copy(self.remotes)
+        return shallow_copy
 
     def __eq__(self, other):
         return self.src == other.src

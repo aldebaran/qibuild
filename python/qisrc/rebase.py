@@ -1,5 +1,3 @@
-import copy
-
 from qisys import ui
 import qisrc.manifest
 
@@ -7,17 +5,7 @@ def rebase_worktree(git_worktree, git_projects, branch):
     if not git_projects:
         return
 
-    manifest_repo = git_worktree._syncer.manifest_repo
-    ref = "origin/" + branch
-    manifest = qisrc.manifest.from_git_repo(manifest_repo, ref)
-    groups = git_worktree._syncer.manifest.groups
-    repos = manifest.get_repos(groups=groups)
-    remote_projects = dict()
-    for repo in repos:
-        project = git_worktree.find_repo(repo)
-        remote_project = copy.deepcopy(project)
-        remote_project.read_remote_config(repo, quiet=True)
-        remote_projects[remote_project.src] = remote_project
+    remote_projects = git_worktree.get_projects_on_branch(branch)
 
     max_src = max(len(x.src) for x in git_projects)
     for i, git_project in enumerate(git_projects):
