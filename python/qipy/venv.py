@@ -16,7 +16,8 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
     pip = python_worktree.pip
 
     try:
-        virtualenv.create_environment(python_worktree.venv_path)
+        virtualenv.create_environment(python_worktree.venv_path,
+                                      site_packages=True)
     except:
         ui.error("Failed to create virtualenv")
         return
