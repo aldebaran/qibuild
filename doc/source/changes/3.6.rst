@@ -1,0 +1,67 @@
+v3.6
+====
+
+qibuild
+--------
+
+* Fix ``qibuild deploy --split-debug``
+* ``qibuild depend``: rename ``--single`` to ``--direct``
+
+qipkg
+-----
+
+*  ``qipkg deploy-package``: do not hardcode user name
+* Raise when projects are not found
+
+qipy
+----
+
+* Give access to global site-packages
+
+  .. note:: You will have to recreate a virtualenv with
+
+    .. code-block:: console
+
+       qipy clean -f
+       qipy bootstrap
+
+    for this change to be effective
+
+* Fix ``prefix`` parameter for ``install`` method
+* Fix error message when bootstrap has not been called yet
+
+
+qitest
+------
+
+* ``qitjest.json`` and test files reports are in ``build/sdk`` instead of
+  ``build/``
+
+* Fix ``qitest run --coverage``
+
+* Fix crash when generating XML on Windows when tests have not been built
+
+
+qitoolchain
+------------
+
+* Rewrite ``qitoolchain add-package``, ``qitoolchain import-package``
+
+  * Do not try to do any guesses
+  * Generate better ``-config.cmake`` files
+  * Ask less questions
+
+* Add ``qibuild gen-cmake-module``
+
+CMake
+-----
+
+* Fix Qt4Macros usage with CMake 3.0
+
+Misc
+----
+
+* ``qipy``: generate a ``path.conf`` for each virtualenv
+* ``path.conf`` now contains every sdk directory of the worktree
+
+* ``qicd``: use ``difflib`` to find closest matches
