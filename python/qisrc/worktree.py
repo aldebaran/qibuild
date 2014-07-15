@@ -272,6 +272,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         res = dict()
         ref = "origin/" + branch
         manifest = qisrc.manifest.from_git_repo(self._syncer.manifest_repo, ref)
+        if not manifest:
+            raise Exception("Could not read manifest on %s"% ref)
         groups = self._syncer.manifest.groups
         repos = manifest.get_repos(groups=groups)
         for repo in repos:
