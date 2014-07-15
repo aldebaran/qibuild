@@ -12,7 +12,7 @@
 # to false so that we do not use qmake from the system.
 
 if(NOT DEFINED QT_USE_QMAKE)
-  find_program(QT_QMAKE qmake)
+  find_program(QT_QMAKE NAMES qmake-qt4 qmake)
   if(QT_QMAKE)
     set(QT_USE_QMAKE TRUE CACHE INTERNAL "" FORCE)
   else()
@@ -28,9 +28,9 @@ else()
   # Using a qt package from a desktop toolchain:
   # look for moc, uic and rcc in the package before
   # including Qt4Macros
-  find_program(QT_MOC_EXECUTABLE moc)
-  find_program(QT_UIC_EXECUTABLE uic)
-  find_program(QT_RCC_EXECUTABLE rcc)
+  find_program(QT_MOC_EXECUTABLE NAMES moc-qt4 moc)
+  find_program(QT_UIC_EXECUTABLE NAMES uic-qt4 uic)
+  find_program(QT_RCC_EXECUTABLE NAMES rcc-qt4 rcc)
   include(Qt4Macros)
 endif()
 
