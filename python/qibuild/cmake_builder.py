@@ -225,10 +225,9 @@ class CMakeBuilder(AbstractBuilder):
                 components.append("test")
                 to_deploy.append("qitest.json")
             # Install project in local deploy dir
-            installed = project.install(deploy_dir, components=components)
+            installed = project.install(deploy_dir, components=components,
+                                        split_debug=split_debug)
             to_deploy.extend(installed)
-            if split_debug:
-                project.split_debug(deploy_dir)
         # Add debugging scripts
         for project in self.projects:
             scripts = qibuild.deploy.generate_debug_scripts(self, deploy_dir,
