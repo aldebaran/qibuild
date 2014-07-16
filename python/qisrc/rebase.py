@@ -30,4 +30,5 @@ def rebase_worktree(git_worktree, git_projects, branch):
         rc, out = git.call("rebase", ref, raises=False)
         if rc != 0:
             ui.info(ui.red, git_project.src, "  [failed]")
-            git.call("rebase", "--abort")
+            ui.info(out)
+            git.call("rebase", "--abort", raises=False)
