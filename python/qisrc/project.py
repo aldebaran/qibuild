@@ -186,8 +186,8 @@ class GitProject(object):
 
     def __deepcopy__(self, memo):
         shallow_copy = copy.copy(self)
-        shallow_copy.branches = copy.copy(self.branches)
-        shallow_copy.remotes = copy.copy(self.remotes)
+        shallow_copy.branches = copy.deepcopy(self.branches)
+        shallow_copy.remotes = copy.deepcopy(self.remotes)
         return shallow_copy
 
     def __eq__(self, other):
