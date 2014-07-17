@@ -91,7 +91,6 @@ class CMakeBuilder(AbstractBuilder):
         # all the dependencies
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         for project in projects:
-            sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "runtime", "test"])
             write_qi_path_conf(project.sdk_directory, qi_path_sdk_dirs)
 
     def pre_build(self, project):
