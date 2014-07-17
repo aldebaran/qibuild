@@ -103,7 +103,6 @@ class BuildProject(object):
     def sdk_directory(self):
         """ The sdk directory in the build directory """
         res = os.path.join(self.build_directory, "sdk")
-        qisys.sh.mkdir(res, recursive=True)
         return res
 
     @property
