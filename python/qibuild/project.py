@@ -101,7 +101,6 @@ class BuildProject(object):
     @property
     def sdk_directory(self):
         """ The sdk directory in the build directory """
-        # TODO: handle unique sdk dir?
         return os.path.join(self.build_directory, "sdk")
 
     @property
@@ -191,7 +190,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
     def configure(self, **kwargs):
         """ Delegate to :py:func:`qibuild.cmake.cmake` """
-        qisys.sh.mkdir(self.build_directory, recursive=True)
+        qisys.sh.mkdir(self.sdk_directory, recursive=True)
         cmake_args = self.cmake_args
         # only required the first time, afterwards this setting is
         # written in the cache by dependencies.cmake
