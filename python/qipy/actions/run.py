@@ -50,4 +50,4 @@ def do(args):
         else:
             cmd = [os.path.join(venv_root, binaries_path, "python")] + cmd
     ui.debug("Calling", cmd)
-    subprocess.check_call(cmd)
+    os.execv(cmd[0], cmd)
