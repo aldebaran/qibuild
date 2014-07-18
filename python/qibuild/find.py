@@ -11,7 +11,7 @@ import platform
 
 import qisys.sh
 
-def find_lib(paths, name, debug=None, expect_one=True):
+def find_lib(paths, name, debug=None, expect_one=True, shared=None):
     """ Find a library in a list of paths.
 
     :param: debug. If ``None``, looks for both debug and
@@ -35,8 +35,13 @@ def find_lib(paths, name, debug=None, expect_one=True):
     else:
         debug_cases = [debug]
 
+    if shared is None:
+        shared_cases = [True, False]
+    else:
+        shared_cases = [shared]
+
     for debug in debug_cases:
-        for shared in True, False:
+        for shared in shared_cases:
             lib_name = library_name(name, shared=shared, debug=debug)
             for path in paths:
                 lib_path = os.path.join(path, "lib", lib_name)
