@@ -41,6 +41,20 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         cmd = [pip_binary, "install"] + remote_packages
         subprocess.check_call(cmd)
 
+def find_script(venv_path, script_name):
+    """ Find a script given its name
+
+    First try in the virtualenv, then from $PATH
+    :return: None if not found
+
+    """
+    binaries_path = virtualenv.path_locations(venv_path)[-1]
+    candidate = os.path.join(binaries_path, script_name)
+    if os.path.exists(candidate):
+        return candidate
+    res = qisys.command.find_program(script_name)
+    if res:
+        return res
 
 def handle_extensions(venv_path, python_worktree, build_worktree):
     """ Check if there is a build project matching the given source """

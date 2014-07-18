@@ -39,15 +39,16 @@ def do(args):
         return
 
     if not cmd:
-        cmd = [os.path.join(venv_root, binaries_path, "ipython")]
+        cmd = ["ipython"]
+
+    if os.path.exists(cmd[0]):
+        # Assume it is a script we want to run
+        python_path = os.path.join(binaries_path, "python")
+        cmd.insert(0, python_path)
     else:
-        if os.path.exists(cmd[0]):
-            bin_in_venv = None
-        else:
-            bin_in_venv = os.path.join(venv_root, binaries_path, cmd[0])
-        if bin_in_venv and os.path.exists(bin_in_venv):
-            cmd[0] = bin_in_venv
-        else:
-            cmd = [os.path.join(venv_root, binaries_path, "python")] + cmd
-    ui.debug("Calling", cmd)
+        script_path = qipy.venv.find_script(venv_root, cmd[0])
+        if script_path:
+            cmd[0] = script_path
+
+    ui.debug("exec", cmd)
     os.execv(cmd[0], cmd)
