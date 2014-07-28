@@ -278,10 +278,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         repos = manifest.get_repos(groups=groups)
         for repo in repos:
             project = self.find_repo(repo)
-            # Make a copy so that we do not modify the projects in place
-            project_copy = copy.deepcopy(project)
-            project_copy.read_remote_config(repo, quiet=True)
-            res[project_copy.src] = project_copy
+            if project:
+                # Make a copy so that we do not modify the projects in place
+                project_copy = copy.deepcopy(project)
+                project_copy.read_remote_config(repo, quiet=True)
+                res[project_copy.src] = project_copy
         return res
 
     def remove_repo(self, project):
