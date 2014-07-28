@@ -498,7 +498,12 @@ class Git(object):
         rc, out = self.call("show-ref", ref, raises=False)
         if rc != 0:
             self.fetch(remote)
-        checkout_args = ["-B", branch, "--track", ref]
+        # If it is still not here, do not use --track
+        rc, out = self.call("show-ref", ref, raises=False)
+        if rc == 0:
+            checkout_args = ["-B", branch, "--track", ref]
+        else:
+            checkout_args = ["-B", branch]
         if force:
             checkout_args.append("--force")
         rc, out = self.checkout(*checkout_args, raises=False)

@@ -74,3 +74,11 @@ def test_get_repo_root(tmpdir):
     actual = qisrc.git.get_repo_root(subdir.strpath)
     expected = qisys.sh.to_native_path(root.strpath)
     assert actual == expected
+
+def test_safe_checkout(cd_to_tmpdir, git_server):
+    git_server.create_repo("foo.git")
+    git = TestGit()
+    git.clone(git_server.srv.join("foo.git").strpath)
+    ok, mess = git.safe_checkout("devel", "origin")
+    assert git.get_current_branch() == "devel"
+    assert ok
