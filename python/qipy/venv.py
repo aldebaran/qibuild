@@ -49,7 +49,11 @@ def find_script(venv_path, script_name):
 
     """
     binaries_path = virtualenv.path_locations(venv_path)[-1]
-    candidate = os.path.join(binaries_path, script_name)
+    if os.name == 'nt':
+        candidate = os.path.join(binaries_path,
+                                 script_name + ".exe")
+    else:
+        candidate = os.path.join(binaries_path, script_name)
     if os.path.exists(candidate):
         return candidate
     res = qisys.command.find_program(script_name)
