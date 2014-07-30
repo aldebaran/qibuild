@@ -6,7 +6,7 @@ from qisys import ui
 import qisys.command
 
 def configure_virtualenv(config, python_worktree,  build_worktree=None,
-                         remote_packages=None):
+                         remote_packages=None, site_packages=True):
     if not remote_packages:
         remote_packages = list()
 
@@ -17,7 +17,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
 
     try:
         virtualenv.create_environment(python_worktree.venv_path,
-                                      site_packages=True)
+                                      site_packages=site_packages)
     except:
         ui.error("Failed to create virtualenv")
         return
