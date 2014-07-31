@@ -525,6 +525,8 @@ def is_path_inside(a, b):
     >>> is_path_inside("gui/bar/libfoo", "lib")
     False
     """
+    a = to_native_path(a)
+    b = to_native_path(b)
     a_split = a.split(os.path.sep)
     b_split = b.split(os.path.sep)
     if len(a_split) < len(b_split):
