@@ -1,0 +1,12 @@
+v3.5.2
+======
+
+cmake
+------
+
+* ``qi_create_lib``: add ``NO_LOG`` option
+
+misc
+----
+
+* ``path.conf`` now contains every sdk directory of the worktree.
