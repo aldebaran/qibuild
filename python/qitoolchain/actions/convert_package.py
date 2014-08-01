@@ -8,6 +8,7 @@
 
 import os
 
+from qisys import ui
 import qisys
 import qisys.parsers
 from qitoolchain.convert import convert_package
