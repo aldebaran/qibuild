@@ -137,7 +137,7 @@ def _library_suffix(shared=True, debug=True, os_name=None):
         return debug_suffix + ".lib"
     if os_name == "Linux" and shared is True:
         return ".so"
-    if os_name in ("Linux", "Mac") and shared is False:
+    if os_name in ("Linux", "Darwin") and shared is False:
         return ".a"
     if os_name == "Darwin" and shared:
         return ".dylib"
