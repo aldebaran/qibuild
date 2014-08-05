@@ -32,7 +32,8 @@ def configure_parser(parser):
 def do(args):
     """Main entry point."""
     git_worktree = qisrc.parsers.get_git_worktree(args)
-    git_projects = qisrc.parsers.get_git_projects(git_worktree, args, default_all=True)
+    git_projects = qisrc.parsers.get_git_projects(git_worktree, args, default_all=True,
+                                                  use_build_deps=args.use_deps)
     git_grep_opts = args.git_grep_opts
     if args.path == 'none':
         git_grep_opts.append("-h")
