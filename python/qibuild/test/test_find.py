@@ -16,15 +16,15 @@ def test_library_name():
     assert library_name("foo", shared=True,  os_name="Linux") == "libfoo.so"
     assert library_name("foo", shared=False, os_name="Linux") == "libfoo.a"
 
-    assert library_name("foo", shared=True,  os_name="Mac") == "libfoo.dylib"
-    assert library_name("foo", shared=False, os_name="Mac") == "libfoo.a"
+    assert library_name("foo", shared=True,  os_name="Darwin") == "libfoo.dylib"
+    assert library_name("foo", shared=False, os_name="Darwin") == "libfoo.a"
 
 
 def test_binary_name():
     assert binary_name("foo", debug=False, os_name="Windows") == "foo.exe"
     assert binary_name("foo", debug=True,  os_name="Windows") == "foo_d.exe"
 
-    assert binary_name("foo", os_name="Mac") == "foo"
+    assert binary_name("foo", os_name="Darwin") == "foo"
     assert binary_name("foo", os_name="Linux") == "foo"
 
 
