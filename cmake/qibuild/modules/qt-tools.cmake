@@ -24,14 +24,41 @@ if(QT_USE_QMAKE)
   # Use upstream cmake files:
   find_package(Qt4 COMPONENTS "")
   include(Qt4Macros)
-  return()
+else()
+  # Using a qt package from a desktop toolchain:
+  # look for moc, uic and rcc in the package before
+  # including Qt4Macros
+  find_program(QT_MOC_EXECUTABLE moc)
+  find_program(QT_UIC_EXECUTABLE uic)
+  find_program(QT_RCC_EXECUTABLE rcc)
+  include(Qt4Macros)
 endif()
 
 
-# Using a qt package from a desktop toolchain:
-# look for moc, uic and rcc in the package before
-# including Qt4Macros
-find_program(QT_MOC_EXECUTABLE moc)
-find_program(QT_UIC_EXECUTABLE uic)
-find_program(QT_RCC_EXECUTABLE rcc)
-include(Qt4Macros)
+#! Generate qt.conf. Assumes qi_use_lib(... QT_QTCORE) has been called
+#
+function(qi_generate_qt_conf)
+  # First, find qt and generate qt.conf
+  # containing paths in the toolchain
+
+  list(GET QT_QTCORE_LIBRARIES 0 _lib)
+  if("${_lib}" STREQUAL "debug" OR "${_lib}" STREQUAL "optimized")
+    list(GET QT_QTCORE_LIBRARIES 1 _lib)
+  endif()
+
+  get_filename_component(_lib_path ${_lib} PATH)
+  set(_plugins_path ${_lib_path}/qt4/plugins)
+  file(WRITE "${QI_SDK_DIR}/${QI_SDK_BIN}/qt.conf"
+"[Paths]
+Plugins = ${_plugins_path}
+")
+
+  # Then, generate and install a qt.conf
+  # containing relative paths
+  file(WRITE "${CMAKE_BINARY_DIR}/qt.conf"
+"[Paths]
+Plugins = ../lib/qt4/plugins
+")
+  install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION bin COMPONENT runtime)
+
+endfunction()
