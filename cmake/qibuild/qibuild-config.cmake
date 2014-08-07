@@ -31,4 +31,3 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} CACHE INTERNAL ""  FORCE)
 # So that find_package(qibuild) works:
 set(qibuild_DIR ${_this_dir} CACHE INTERNAL "" FORCE)
 include(${_this_dir}/general.cmake)
-

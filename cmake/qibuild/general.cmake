@@ -32,7 +32,7 @@ endif()
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 
 include("qibuild/version")
-message(STATUS "Using qibuild v${QIBUILD_VERSION}")
+message(STATUS "Using qibuild ${QIBUILD_VERSION}")
 include("qibuild/log")
 include("qibuild/set")
 
