@@ -39,7 +39,7 @@ def get_server_access(server_name):
 
     """
     qibuild_cfg = qibuild.config.QiBuildConfig()
-    qibuild_cfg.read()
+    qibuild_cfg.read(create_if_missing=True)
     access = qibuild_cfg.get_server_access(server_name)
     return access
 
