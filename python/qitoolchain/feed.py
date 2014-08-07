@@ -215,7 +215,7 @@ class ToolchainFeedParser:
                 # if version not defined, don't keep it
                 return
             prev_version = self._versions[name]
-            if qisys.version.compare(prev_version, version) > 0:
+            if prev_version and qisys.version.compare(prev_version, version) > 0:
                 return
             else:
                 self.packages = [x for x in self.packages if x.get("name") != name]
