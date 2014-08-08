@@ -7,6 +7,23 @@ qibuild
 * Fix ``qibuild deploy --split-debug``
 * ``qibuild depend``: rename ``--single`` to ``--direct``
 
+qisrc
+-----
+
+* Add ``qisrc log``, ``qisrc diff`` to see the differences
+  from an other branch of the manifest
+* Add ``qisrc rebase`` to rebase on top of an other branch
+  of the manifest
+* ``qisrc checkout`` now creates the local branch at the correct
+  location
+* ``qisrc grep`` honors ``--build-deps`` option
+* Simplify ``qisrc reset``
+
+  * ``--clean`` is gone, you can run ``qisrc foreach git clean`` if needed
+  * less verbose
+  * checkout branches to the correct location
+  * better display of errors
+
 qipkg
 -----
 
