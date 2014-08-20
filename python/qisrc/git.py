@@ -105,6 +105,14 @@ class Git(object):
         """
         self.config(name, value)
 
+    def ls_files(self):
+        """ Calls git ls-files and returns a list """
+        (status, out) = self.call("ls-files", raises=False)
+        if status != 0:
+            return None
+        lines = out.splitlines()
+        return lines
+
     def get_current_ref(self, ref="HEAD"):
         """ return the current ref
         git symbolic-ref HEAD
