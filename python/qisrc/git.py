@@ -53,7 +53,6 @@ class Git(object):
             self._transaction.output += out
         return (retcode, out)
 
-
     def _call(self, *args, **kwargs):
         """ Helper for self.call """
         ui.debug("git", " ".join(args))
@@ -133,7 +132,6 @@ class Git(object):
             return branch
         return branch[11:]
 
-
     def get_tracking_branch(self, branch=None):
         if not branch:
             branch = self.get_current_branch()
@@ -191,7 +189,6 @@ class Git(object):
         if raises:
             raise Exception(mess)
         return mess
-
 
     def get_local_branches(self):
         """ Get the list of the local branches in a dict
@@ -275,7 +272,6 @@ class Git(object):
         """
         rc, _ = self.call("rev-parse", "--verify", "HEAD", raises=False)
         return rc != 0
-
 
     def set_remote(self, name, url):
         """
@@ -510,7 +506,6 @@ class Git(object):
         return "<Git repo in %s>" % self.repo
 
 
-
 def get_repo_root(path):
     """Return the root dir of a git worktree given a path.
 
@@ -526,6 +521,7 @@ def get_repo_root(path):
     if ret != 0:
         return None
     return qisys.sh.to_native_path(out)
+
 
 def is_submodule(path):
     """ Tell if the given path is a submodule
@@ -563,9 +559,11 @@ def is_submodule(path):
                    "\nError was: ", ui.reset, "\n", "  " + out)
         return True
 
+
 def is_git(path):
     """Return true if .git directory exists"""
     return os.path.isdir(os.path.join(path, ".git"))
+
 
 def name_from_url(url):
     """ Return the project name from the url
