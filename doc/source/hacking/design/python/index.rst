@@ -63,9 +63,9 @@ Concepts
     A worktree is simply a directory tree containing a ``.qi`` folder
     as its root.
 
-.. seealso:
+.. seealso::
 
-   * :py:mod:`qibuild.worktree`
+   * :py:mod:`qisys.worktree`
 
 WorkTrees can be nested, although this is not recommended
 (situation can get a little confused if you do so)
