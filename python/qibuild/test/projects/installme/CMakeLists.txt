@@ -17,6 +17,8 @@ if (FAIL_EMPTY_GLOB)
   qi_install_data(nonexisting/*)
 endif()
 
+qi_install_data(data/bar.dat SUBFOLDER sub)
+
 if (FAIL_NON_EXISTING)
   qi_install_data(nonexisting)
 endif()

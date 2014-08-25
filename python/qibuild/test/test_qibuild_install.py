@@ -148,6 +148,7 @@ def test_install_returns(qibuild_action, tmpdir):
                              '/include/relative/bar/bar.h',
                              '/share/recurse/a_dir/b_dir/c_dir/d_file',
                              '/share/recurse/a_dir/a_file',
+                             '/share/sub/bar.dat',
                              '/lib/python2.7/site-packages/py/foo.py'}
 
 def test_install_test_libs(qibuild_action, tmpdir):

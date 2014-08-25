@@ -57,9 +57,14 @@ function(_qi_install_internal)
     endif()
   endforeach()
 
+  if(ARG_SUBFOLDER)
+    set(_dest ${ARG_DESTINATION}/${ARG_SUBFOLDER})
+  else()
+    set(_dest ${ARG_DESTINATION})
+  endif()
   install(DIRECTORY ${_dirs_to_install}
     COMPONENT "${ARG_COMPONENT}"
-    DESTINATION "${ARG_DESTINATION}/${ARG_SUBFOLDER}"
+    DESTINATION "${_dest}"
         PATTERN "*.pyc" EXCLUDE
         PATTERN "__pycache__" EXCLUDE)
   if(${ARG_KEEP_RELATIVE_PATHS})
@@ -67,12 +72,12 @@ function(_qi_install_internal)
       get_filename_component(_file_subdir ${_file} PATH)
       install(FILES ${_file}
         COMPONENT "${ARG_COMPONENT}"
-        DESTINATION "${ARG_DESTINATION}/${ARG_SUBFOLDER}/${_file_subdir}")
+        DESTINATION "${_dest}/${_file_subdir}")
     endforeach()
   else()
     # Use standard cmake install() function
     install(FILES ${_files_to_install}
       COMPONENT "${ARG_COMPONENT}"
-      DESTINATION "${ARG_DESTINATION}/${ARG_SUBFOLDER}")
+      DESTINATION "${_dest}")
   endif()
 endfunction()
