@@ -5,7 +5,8 @@
 # install with support for directory, globbing and files.
 # this function know how to handle COMPONENT and KEEP_RELATIVE_PATHS
 function(_qi_install_internal)
-  cmake_parse_arguments(ARG "RECURSE;KEEP_RELATIVE_PATHS" "IF;COMPONENT;DESTINATION;SUBFOLDER" "" ${ARGN})
+  cmake_parse_arguments(ARG "RECURSE;KEEP_RELATIVE_PATHS;EXCLUDE"
+                            "IF;COMPONENT;DESTINATION;SUBFOLDER;PATTERN" "" ${ARGN})
   if(NOT ARG_DESTINATION)
     qi_error("Invalid arguments for qi_install. Missing DESTINATION argument")
   endif()
@@ -58,7 +59,9 @@ function(_qi_install_internal)
 
   install(DIRECTORY ${_dirs_to_install}
     COMPONENT "${ARG_COMPONENT}"
-    DESTINATION "${ARG_DESTINATION}/${ARG_SUBFOLDER}")
+    DESTINATION "${ARG_DESTINATION}/${ARG_SUBFOLDER}"
+        PATTERN "*.pyc" EXCLUDE
+        PATTERN "__pycache__" EXCLUDE)
   if(${ARG_KEEP_RELATIVE_PATHS})
     foreach(_file ${_files_to_install})
       get_filename_component(_file_subdir ${_file} PATH)
