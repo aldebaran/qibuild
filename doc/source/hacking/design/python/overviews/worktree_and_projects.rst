@@ -1,3 +1,5 @@
+.. _worktree-and-projects:
+
 Worktree and projects
 =====================
 
