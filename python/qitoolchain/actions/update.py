@@ -21,8 +21,6 @@ def configure_parser(parser):
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
         help="Use this feed location to update the toolchain.\n",
         nargs="?")
-    parser.add_argument("--dry-run", action="store_true",
-        help="Print what would be done")
 
 def do(args):
     """Main entry point
@@ -30,26 +28,26 @@ def do(args):
     """
     feed = args.feed
     tc_name = args.name
-    dry_run = args.dry_run
     if tc_name:
         toolchain = qitoolchain.get_toolchain(tc_name)
         if not feed:
-            feed = qitoolchain.toolchain.get_tc_feed(tc_name)
+            feed = toolchain.feed_url
             if not feed:
                 mess  = "Could not find feed for toolchain %s\n" % tc_name
-                mess += "Pleas check configuration or specifiy a feed on the command line\n"
+                mess += "Please check configuration or " \
+                        "specifiy a feed on the command line\n"
                 raise Exception(mess)
         ui.info(ui.green, "Updating toolchain", tc_name, "with", feed)
-        toolchain.parse_feed(feed, dry_run=dry_run)
+        toolchain.update(feed)
     else:
         tc_names = qitoolchain.get_tc_names()
         for i, tc_name in enumerate(tc_names, start=1):
-            tc_feed = qitoolchain.toolchain.get_tc_feed(tc_name)
-            ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, len(tc_names)),
-                    ui.green, "Updating", ui.blue, tc_name)
+            toolchain = qitoolchain.toolchain.Toolchain(tc_name)
+            tc_feed = toolchain.feed_url
             if not tc_feed:
                 ui.warning("No feed found for %s, skipping" % tc_name)
                 continue
+            ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, len(tc_names)),
+                    ui.green, "Updating", ui.blue, tc_name)
             ui.info(ui.green, "Reading", tc_feed)
-            toolchain = qitoolchain.Toolchain(tc_name)
-            toolchain.parse_feed(tc_feed, dry_run=dry_run)
+            toolchain.update(tc_feed)

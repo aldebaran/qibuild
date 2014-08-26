@@ -27,8 +27,6 @@ def configure_parser(parser):
     parser.add_argument("--default",
         help="Use this toolchain by default in this worktree",
         action="store_true")
-    parser.add_argument("--dry-run", action="store_true",
-        help="Print what would be done")
 
 def do(args):
     """Main entry point
@@ -36,7 +34,6 @@ def do(args):
     """
     feed = args.feed
     tc_name = args.name
-    dry_run = args.dry_run
 
     # Validate the name: must be a valid filename:
     bad_chars = r'<>:"/\|?*'
@@ -62,7 +59,7 @@ def do(args):
 
     if tc_name in qitoolchain.get_tc_names():
         toolchain = qitoolchain.Toolchain(tc_name)
-        if feed and toolchain.feed != feed:
+        if feed and toolchain.feed_url != feed:
             ui.warning(tc_name, "already exists but points to a different feed,",
                    "removing previous toolchain and creating a new one")
             toolchain.remove()
@@ -73,7 +70,7 @@ def do(args):
     toolchain = qitoolchain.Toolchain(tc_name)
     if feed:
         ui.info(ui.green, "Updating toolchain", tc_name, "with feed:", feed)
-        toolchain.parse_feed(feed, dry_run=dry_run)
+        toolchain.update(feed)
 
     if args.default:
         build_worktree.set_default_config(tc_name)

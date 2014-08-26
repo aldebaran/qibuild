@@ -18,7 +18,7 @@ def test_find_target_in_toolchain_package_cmake(cd_to_tmpdir, record_messages):
     qibuild_action.add_test_project("hello")
     world_package = qibuild_action("package", "world")
     qitoolchain_action("create", "foo")
-    qitoolchain_action("add-package", "-c", "foo", "world", world_package)
+    qitoolchain_action("add-package", "-c", "foo", world_package)
     build_worktree.worktree.remove_project("world", from_disk=True)
 
     record_messages.reset()
@@ -48,7 +48,7 @@ def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
     qibuild_action.add_test_project("hello")
     world_package = qibuild_action("package", "world")
     qitoolchain_action("create", "foo")
-    qitoolchain_action("add-package", "-c", "foo", "world", world_package)
+    qitoolchain_action("add-package", "-c", "foo", world_package)
 
     qibuild_action.chdir("hello")
     qibuild_action("configure", "-c", "foo")

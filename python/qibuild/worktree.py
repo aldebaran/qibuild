@@ -148,8 +148,10 @@ def new_build_project(build_worktree, project):
     if not name:
         return None
 
+
     build_project = qibuild.project.BuildProject(build_worktree, project)
     build_project.name = name
+    build_project.version = qibuild_elem.get("version", "0.1")
 
     depends_trees = qibuild_elem.findall("depends")
 

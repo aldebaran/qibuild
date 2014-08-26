@@ -17,8 +17,6 @@ def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("-c", "--config",
                         help="name of the toolchain to use")
-    parser.add_argument("package_name", metavar='NAME',
-                        help="The name of the package")
     parser.add_argument("package_path", metavar='PATH',
                         help="The path to the package")
 
@@ -31,16 +29,16 @@ def do(args):
 
     """
     toolchain = qitoolchain.parsers.get_toolchain(args)
-    package_name = args.package_name
     package_path = args.package_path
+    package = qitoolchain.qipackage.from_archive(package_path)
+
     # extract it to the default packages path of the toolchain
     tc_name = toolchain.name
     tc_packages_path = qitoolchain.toolchain.get_default_packages_path(tc_name)
-    dest = os.path.join(tc_packages_path, package_name)
+    dest = os.path.join(tc_packages_path, package.name)
     qisys.sh.rm(dest)
-    with qisys.sh.TempDir() as tmp:
-        extracted = qisys.archive.extract(package_path, tmp)
-        qisys.sh.install(extracted, dest, quiet=True)
+    qisys.archive.extract(package_path, dest, strict_mode=False)
+    package.path = dest
 
-    package = qitoolchain.Package(package_name, dest)
+    # add the package to the toolchain
     toolchain.add_package(package)

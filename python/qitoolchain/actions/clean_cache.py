@@ -13,17 +13,10 @@ def configure_parser(parser):
     qisys.parsers.default_parser(parser)
     parser.add_argument("name", nargs="?", metavar="NAME",
         help="Name of the toolchain")
-    parser.add_argument("--dry-run", action="store_true", dest="dry_run",
-        help="Print what would be done")
-    parser.add_argument("-f", "--force", action="store_false", dest="dry_run",
-        help="Do the cleaning")
-    parser.set_defaults(dry_run=True)
-
 
 def do(args):
     """ Main entry point
 
     """
-    dry_run = args.dry_run
     tc = qitoolchain.get_toolchain(args.name)
-    tc.clean_cache(dry_run=dry_run)
+    tc.clean_cache()

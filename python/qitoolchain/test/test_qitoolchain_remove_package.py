@@ -3,7 +3,7 @@ import qitoolchain.toolchain
 def test_simple(qitoolchain_action):
     qitoolchain_action("create", "foo")
     word_package = qitoolchain_action.get_test_package("world")
-    qitoolchain_action("add-package", "-c", "foo", "world", word_package)
+    qitoolchain_action("add-package", "-c", "foo", word_package)
     qitoolchain_action("remove-package", "-c", "foo", "world")
     foo = qitoolchain.get_toolchain("foo")
     assert foo.packages == list()

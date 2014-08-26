@@ -8,8 +8,8 @@ packages
 
 """
 
-from qitoolchain.toolchain import Toolchain, Package
-from qitoolchain.toolchain import get_tc_names, get_tc_config_path
+from qitoolchain.toolchain import Toolchain
+from qitoolchain.toolchain import get_tc_names
 
 def get_toolchain(tc_name):
     """ Get an existing tolchain using its name """

@@ -31,7 +31,7 @@ def test_running_from_install_dir_dep_in_toolchain(cd_to_tmpdir):
     qibuild_action.add_test_project("hello")
     world_package = qibuild_action("package", "world")
     qitoolchain_action("create", "foo")
-    qitoolchain_action("add-package", "-c", "foo", "world", world_package)
+    qitoolchain_action("add-package", "-c", "foo", world_package)
     build_worktree.worktree.remove_project("world", from_disk=True)
 
     # install and run hello, (checking that the world lib is
