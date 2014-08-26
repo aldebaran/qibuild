@@ -65,7 +65,7 @@ def _check_algo(algo):
     raise Exception(mess)
 
 
-def _compress_zip(directory, archive_basepath, quiet, verbose):
+def _compress_zip(directory, quiet=True, verbose=False, flat=False, output=None):
     """Compress directory in a .zip file
 
     :param directory:        directory to add to the archive
@@ -80,21 +80,26 @@ def _compress_zip(directory, archive_basepath, quiet, verbose):
 Please set only one of these two options to 'True'
 """
         raise ValueError(mess)
-    archive_path = archive_basepath + ".zip"
-    ui.debug("Compressing", directory, "to", archive_path)
-    archive = zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED)
+    ui.debug("Compressing", directory, "to", output)
+    archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
     for root, _, filenames in os.walk(directory):
         for filename in filenames:
             full_path = os.path.join(root, filename)
+            # Do not zip ourselves
+            if full_path == output:
+                continue
             rel_path  = os.path.relpath(full_path, directory)
-            arcname   = os.path.join(os.path.basename(directory), rel_path)
+            if flat:
+                arcname = rel_path
+            else:
+                arcname = os.path.join(os.path.basename(directory), rel_path)
             if not quiet:
                 sys.stdout.write("adding {0}\n".format(rel_path))
                 sys.stdout.flush()
             if not qisys.sh.broken_symlink(full_path):
                 archive.write(full_path, arcname)
     archive.close()
-    return archive_path
+    return output
 
 
 # pylint: disable-msg=R0914
@@ -222,7 +227,8 @@ def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None):
     return cmd
 
 
-def _compress_tar(directory, archive_basepath, algo, quiet, verbose, output_filter=None):
+def _compress_tar(directory, output=None, algo=None,
+                  quiet=True, verbose=False):
     """Compress directory in a .tar.* archive
 
     :param directory:        directory to add to the archive
@@ -230,7 +236,6 @@ def _compress_tar(directory, archive_basepath, algo, quiet, verbose, output_filt
     :param algo:             compression method
     :param quiet:            quiet mode (print nothing)
     :param verbose:          verbose mode (print all the archive content)
-    :param output_filter:    regex applied on all outputs
 
     :return: path to the generated archive (archive_basepath.tar.*)
 
@@ -240,19 +245,8 @@ def _compress_tar(directory, archive_basepath, algo, quiet, verbose, output_filt
 Please set only one of these two options to 'True'
 """
         raise ValueError(mess)
-    archive_path = archive_basepath + ".tar"
-    if algo == "tar":
-        pass
-    elif algo == "gzip":
-        archive_path += ".gz"
-    elif algo == "bzip2":
-        archive_path += ".bz2"
-    elif algo == "xz":
-        archive_path += ".xz"
-    else:
-        archive_path += "." + algo
-    ui.debug("Compressing", directory, "to", archive_path)
-    cmd = _get_tar_command("compress", algo, archive_path, directory, quiet)
+    ui.debug("Compressing", directory, "to", output)
+    cmd = _get_tar_command("compress", algo, output, directory, quiet)
     try:
         if verbose:
             printed = qisys.command.check_output(cmd, stderr=subprocess.STDOUT)
@@ -264,11 +258,7 @@ Please set only one of these two options to 'True'
         mess += "Calling tar failed\n"
         mess += str(err)
         raise Exception(mess)
-    if not quiet:
-        for line in str(printed).split("\n"):
-            if not output_filter or not re.search(output_filter, line):
-                print line.strip()
-    return archive_path
+    return output
 
 
 def _extract_tar(archive, directory, algo, quiet, verbose, output_filter=None):
@@ -338,14 +328,16 @@ Please set only one of these two options to 'True'
     return destdir
 
 
-def compress(directory, archive=None, algo="zip", quiet=False, verbose=False):
+def compress(directory, algo="zip", output=None, flat=False,
+            quiet=False, verbose=False):
     """Compress directory in an archive
 
     :param directory: directory to add to the archive
     :param archive:   output archive basepath
     :param algo:      compression method (default: zip)
-    :param quiet:     silent mode (default: False)
-    :param verbose:   verbose mode, print all the archive content (default: False)
+    :param quiet:     silent mode (default: False) :param verbose:   verbose
+    mode, print all the archive content (default: False) :param flat:      if
+    false, put all files in a common top dir
 
     :return: path to the generated archive (archive_basepath.tar.*)
 
@@ -358,23 +350,29 @@ Please set only one of these two options to 'True'
     _check_algo(algo)
     directory = qisys.sh.to_native_path(directory)
     directory = os.path.abspath(directory)
-    if archive is None:
-        archive = directory
-    else:
-        archive = qisys.sh.to_native_path(archive)
-    archive   = os.path.abspath(archive)
-    archive_basename = os.path.basename(archive)
+    if output is None:
+        output = get_default_output(directory, algo)
     if algo == "zip":
-        archive_basename = archive_basename.rsplit(".zip", 1)[0]
+        archive_path = _compress_zip(directory, quiet=quiet, verbose=verbose,
+                                     output=output, flat=flat)
     else:
-        archive_basename = archive_basename.rsplit(".tar", 1)[0]
-    archive_basepath = os.path.join(os.path.dirname(archive), archive_basename)
-    if algo == "zip":
-        archive_path = _compress_zip(directory, archive_basepath, quiet, verbose)
-    else:
-        archive_path = _compress_tar(directory, archive_basepath, algo, quiet, verbose)
+        archive_path = _compress_tar(directory, quiet=quiet, verbose=verbose,
+                                     output=output, algo=algo)
     return archive_path
 
+def get_default_output(directory, algo):
+    res = directory
+    if algo == "tar":
+        res += ".tar"
+    elif algo == "gzip":
+        res += ".tar.gz"
+    elif algo == "bzip2":
+        res += ".tar.bz2"
+    elif algo == "xz":
+        res += ".tar.xz"
+    elif algo == "zip":
+        res += ".zip"
+    return res
 
 def extract(archive, directory, algo=None,
                      quiet=False, verbose=False,

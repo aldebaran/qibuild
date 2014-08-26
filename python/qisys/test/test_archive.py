@@ -100,3 +100,13 @@ def test_extract_invalid_no_topdir(tmpdir):
         qisys.archive.extract(buggy_zip_path, dest.strpath)
     assert "same top dir" in str(e.value)
 
+def test_flat(tmpdir):
+    src = tmpdir.mkdir("src")
+    src.ensure("lib", "libfoo.so", file=True)
+    src.ensure("include", "foo.h", file=True)
+    src.ensure("qipackage.xml", file=True)
+    output = tmpdir.join("foo-0.1.zip")
+    res = qisys.archive.compress(src.strpath, output=output.strpath, flat=True)
+    dest = tmpdir.mkdir("dest").mkdir("foo")
+    qisys.archive.extract(res, dest.strpath, strict_mode=False)
+    assert dest.join("include", "foo.h").check(file=True)
