@@ -1,10 +1,13 @@
 """ Builder for pml files """
 import os
+import zipfile
 
 import qibuild.worktree
 
+from qisys import ui
 import qisys.qixml
 import qipkg.package
+import qibuild.breakpad
 
 from qipy.worktree import PythonWorkTree
 from qipy.python_builder import PythonBuilder
@@ -21,6 +24,7 @@ class PMLBuilder(object):
         self.manifest_xml = os.path.join(self.base_dir, "manifest.xml")
         if not os.path.exists(self.manifest_xml):
             raise Exception("%s does not exist" % self.manifest_xml)
+        self.pkg_name = pkg_name(self.manifest_xml)
 
         self.cmake_builder = cmake_builder
         self.python_builder = python_builder
@@ -32,7 +36,12 @@ class PMLBuilder(object):
         self.builders = [self.cmake_builder, self.python_builder, self.linguist_builder]
         self.worktree = self.build_worktree.worktree
 
-        self.file_list = list()
+        # Hack: we need to parse some cmake variables when generating the
+        # breakpad symbols, so we need to keep one build project around
+        self.build_project = None
+
+        self.pml_extra_files = list()
+        self.cpp_installed_files = list()
 
         self.load_pml(pml_path)
 
@@ -53,6 +62,7 @@ class PMLBuilder(object):
             name = qisys.qixml.parse_required_attr(qibuild_elem, "name", pml_path)
             project = self.build_worktree.get_build_project(name, raises=True)
             self.cmake_builder.projects.append(project)
+            self.build_project = project
 
         qipython_elems = root.findall("qipython")
         for qipython_elem in qipython_elems:
@@ -72,28 +82,28 @@ class PMLBuilder(object):
             for child in behaviors.findall("BehaviorDescription"):
                 src = child.get("src")
                 full_src = os.path.join(src, "behavior.xar")
-                self.file_list.append(full_src)
+                self.pml_extra_files.append(full_src)
 
         # Dialog
         dialogs = root.find("Dialogs")
         if dialogs is not None:
             for child in dialogs.findall("Dialog"):
                 src = child.get("src")
-                self.file_list.append(src)
+                self.pml_extra_files.append(src)
 
         # Resources
         resources = root.find("Resources")
         if resources is not None:
             for child in resources.findall("File"):
                 src = child.get("src")
-                self.file_list.append(src)
+                self.pml_extra_files.append(src)
 
         # Topics
         topics = root.find("Topics")
         if topics is not None:
             for child in topics.findall("Topic"):
                 src = child.get("src")
-                self.file_list.append(src)
+                self.pml_extra_files.append(src)
 
     def configure(self):
         for builder in self.builders:
@@ -108,11 +118,12 @@ class PMLBuilder(object):
         for builder in self.builders:
             if isinstance(builder, CMakeBuilder):
                 builder.dep_types=["runtime"]
-                builder.install(destination, components=["runtime"])
+                self.cpp_installed_files = builder.install(destination,
+                                                           components=["runtime"])
             else:
                 builder.install(destination)
-        # Also use file from file_list
-        for src in self.file_list:
+        # Also use file from pml_extra_files
+        for src in self.pml_extra_files:
             full_src = os.path.join(self.base_dir, src)
             rel_src = os.path.relpath(full_src, self.base_dir)
             full_dest = os.path.join(destination, rel_src)
@@ -126,7 +137,47 @@ class PMLBuilder(object):
         # waiting for qiys.remote.deploy_file
         # qisys.remote.deploy_file(package)
 
-    def make_package(self, output=None):
-        package = qipkg.package.Package(self.pml_path)
-        return package.make_package(self, output=output)
+    def make_package(self, output=None, with_breakpad=False):
+        if not output:
+            output = os.path.join(os.getcwd(), self.pkg_name + ".pkg")
 
+        archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
+        #  Add the manifest
+        manifest_xml = self.manifest_xml
+        archive.write(manifest_xml, "manifest.xml")
+
+        # Add everything from the staged path
+        self.install(self.stage_path)
+        for root,_, filenames in os.walk(self.stage_path):
+            for filename in filenames:
+                full_path = os.path.join(root, filename)
+                rel_path  = os.path.relpath(full_path, self.stage_path)
+                ui.info(ui.green, "adding", ui.reset, ui.bold, rel_path)
+                archive.write(full_path, rel_path)
+        archive.close()
+
+        if with_breakpad:
+            if not self.build_project:
+                raise Exception("No C++ projects found")
+            dirname = os.path.dirname(output)
+            symbols_archive = os.path.join(dirname, self.pkg_name + "-symbols.zip")
+            qibuild.breakpad.gen_symbol_archive(self.build_project,
+                                                output=symbols_archive,
+                                                base_dir=self.stage_path,
+                                                file_list=self.cpp_installed_files)
+        ui.info(ui.green, "Package generated in",
+                ui.reset, ui.bold, output)
+        if with_breakpad:
+            ui.info(ui.green, "Symbols generated in",
+                    ui.reset, ui.bold, symbols_archive)
+            return output, symbols_archive
+        else:
+            return output
+
+def pkg_name(manifest_xml):
+    "Return a string name-version"
+    root = qisys.qixml.read(manifest_xml).getroot()
+    uuid = root.get("uuid")
+    version = root.get("version")
+    output_name = "%s-%s" % (uuid, version)
+    return output_name

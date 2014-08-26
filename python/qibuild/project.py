@@ -375,6 +375,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
         if split_debug:
             self.split_debug(destdir, file_list=installed)
+
         return installed
 
     def _install_component(self, destdir, component):

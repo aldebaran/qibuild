@@ -15,11 +15,13 @@ def configure_parser(parser):
     """Configure parser for this action"""
     qipkg.parsers.pml_parser(parser)
     parser.add_argument("-o", "--output")
+    parser.add_argument("--with-breakpad", action="store_true")
+    parser.set_defaults(with_breakpad=False)
 
 
 def do(args):
     """Main entry point"""
     output = args.output
+    with_breakpad = args.with_breakpad
     pml_builder = qipkg.parsers.get_pml_builder(args)
-    package = qipkg.package.Package(args.pml_path)
-    return package.make_package(pml_builder, output=output)
+    return pml_builder.make_package(output=output, with_breakpad=with_breakpad)
