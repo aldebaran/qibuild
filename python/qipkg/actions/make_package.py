@@ -22,4 +22,4 @@ def do(args):
     output = args.output
     pml_builder = qipkg.parsers.get_pml_builder(args)
     package = qipkg.package.Package(args.pml_path)
-    package.make_package(pml_builder, output=output)
+    return package.make_package(pml_builder, output=output)
