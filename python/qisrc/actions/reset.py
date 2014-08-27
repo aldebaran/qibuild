@@ -35,7 +35,8 @@ def do(args):
 
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
-                                                  default_all=True)
+                                                  default_all=True,
+                                                  use_build_deps=True)
     snapshot = None
     if args.snapshot:
         snapshot = qisrc.snapshot.Snapshot()
