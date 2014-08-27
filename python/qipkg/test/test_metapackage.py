@@ -1,3 +1,5 @@
+import os
+
 import qipkg.metapackage
 
 def test_meta(worktree):
@@ -24,5 +26,7 @@ def test_meta(worktree):
     c_pml.write("""
 <package />
 """)
-    meta_pml = qipkg.metapackage.MetaPackage(meta_pml.strpath)
-    assert meta_pml.pml_paths == ["a/a.pml", "c/c.pml"]
+    meta_pml = qipkg.metapackage.MetaPackage(worktree, meta_pml.strpath)
+    expected_paths = ["a/a.pml", "c/c.pml"]
+    expected_paths = [os.path.join(tmpdir.strpath, x) for x in expected_paths]
+    assert meta_pml.pml_paths == expected_paths

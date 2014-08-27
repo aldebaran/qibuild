@@ -4,7 +4,8 @@ import zipfile
 import qisys.qixml
 
 class MetaPackage(object):
-    def __init__(self, mpml_path):
+    def __init__(self, worktree, mpml_path):
+        self.worktree = worktree
         self.mpml = mpml_path
         self.pml_paths = list()
         self.name = None
@@ -26,10 +27,11 @@ Root element must be <metapackage>
         for include_elem in include_elems:
             src = qisys.qixml.parse_required_attr(include_elem, "src",
                                                   xml_path=self.mpml)
+            src = os.path.join(self.worktree.root, src)
             if src.endswith(".pml"):
                 self.pml_paths.append(src)
             if src.endswith(".mpml"):
-                sub_meta = MetaPackage(src)
+                sub_meta = MetaPackage(self.worktree, src)
                 self.pml_paths.extend(sub_meta.pml_paths)
 
     def make_meta_package(self, packages, output=None):

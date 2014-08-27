@@ -39,7 +39,8 @@ def get_pml_builder(args):
 def get_pml_builders(args):
     res = list()
     if args.pml_path.endswith(".mpml"):
-        metapackage = qipkg.metapackage.MetaPackage(args.pml_path)
+        worktree = qisys.parsers.get_worktree(args)
+        metapackage = qipkg.metapackage.MetaPackage(worktree, args.pml_path)
         for pml_path in metapackage.pml_paths:
             new_args = copy.copy(args)
             new_args.pml_path = pml_path
