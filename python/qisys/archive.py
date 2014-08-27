@@ -335,11 +335,13 @@ def compress(directory, algo="zip", output=None, flat=False,
     :param directory: directory to add to the archive
     :param archive:   output archive basepath
     :param algo:      compression method (default: zip)
-    :param quiet:     silent mode (default: False) :param verbose:   verbose
-    mode, print all the archive content (default: False) :param flat:      if
-    false, put all files in a common top dir
+    :param quiet:     silent mode (default: False)
+    :param verbose:   verbose mode, print all the archive content
+                      (default: False)
+    :param flat:      if false, put all files in a common top dir
+                      (default: False)
 
-    :return: path to the generated archive (archive_basepath.tar.*)
+    :return: path to the generated archive
 
     """
     if quiet and verbose:
