@@ -45,14 +45,10 @@ class PMLBuilder(object):
 
         self.load_pml(pml_path)
 
-        # used to prepare deploying files and making packages,
-        # so it must always exist but also always start empty
         dot_qi = self.worktree.dot_qi
         build_config = self.cmake_builder.build_config
         name = build_config.build_directory(prefix="qipkg")
         self.stage_path = os.path.join(dot_qi, name)
-        qisys.sh.rm(self.stage_path)
-        qisys.sh.mkdir(self.stage_path, recursive=True)
 
     def load_pml(self, pml_path):
         tree= qisys.qixml.read(pml_path)
@@ -138,6 +134,10 @@ class PMLBuilder(object):
         # qisys.remote.deploy_file(package)
 
     def make_package(self, output=None, with_breakpad=False):
+        # Make sure self.stage_path exists and is empty
+        qisys.sh.rm(self.stage_path)
+        qisys.sh.mkdir(self.stage_path, recursive=True)
+        res = list()
         if not output:
             output = os.path.join(os.getcwd(), self.pkg_name + ".pkg")
 
@@ -170,9 +170,12 @@ class PMLBuilder(object):
         if with_breakpad:
             ui.info(ui.green, "Symbols generated in",
                     ui.reset, ui.bold, symbols_archive)
-            return output, symbols_archive
+            return [output, symbols_archive]
         else:
-            return output
+            return [output]
+
+    def __repr__(self):
+        return "<PMLBuilder in %s>" % self.pml_path
 
 def pkg_name(manifest_xml):
     "Return a string name-version"

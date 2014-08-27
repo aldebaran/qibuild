@@ -9,6 +9,7 @@ from qisys import ui
 import qisys.parsers
 import qipkg.parsers
 import qipkg.package
+import qipkg.metapackage
 
 
 def configure_parser(parser):
@@ -23,5 +24,13 @@ def do(args):
     """Main entry point"""
     output = args.output
     with_breakpad = args.with_breakpad
-    pml_builder = qipkg.parsers.get_pml_builder(args)
-    return pml_builder.make_package(output=output, with_breakpad=with_breakpad)
+    pml_builders = qipkg.parsers.get_pml_builders(args)
+    all_packages = list()
+    for pml_builder in pml_builders:
+        packages = pml_builder.make_package(output=output, with_breakpad=with_breakpad)
+        all_packages.extend(packages)
+    if args.pml_path.endswith(".pml"):
+        return all_packages
+    else:
+        meta_package = qipkg.metapackage.MetaPackage(args.pml_path)
+        return meta_package.make_meta_package(all_packages)
