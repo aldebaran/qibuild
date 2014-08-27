@@ -51,17 +51,21 @@ function(qi_stage_lib target)
   _qi_internal_stage_lib(${target} ${ARGN})
 endfunction()
 
-#! Generate a 'name'-config.cmake, allowing other projects to find the library.
-# This library does not have to be a cmake target, it's a header only library.
-# \arg:target a target created with qi_create_lib
+#! Generate a 'name'-config.cmake, allowing other projects to find the
+# header-only library.
+# If the library has some dependencies, use something like::
+#
+#       find_package(FOO)
+#       include_directories(${FOO_INCLUDE_DIRS})
+#       qi_stage_header_only_lib(bar DEPENDS FOO)
+#
+# \arg:name the name of the library, clients of the library can use
+#           ``qi_use_lib(... NAME)``
 # \group:DEPRECATED specify a deprecated message. This message will be displayed
 #                   each time another project use that lib.
-# \group:DEPENDS if not given, ${TARGET}_DEPENDS will be guessed from
+# \group:DEPENDS if not given, ${NAME}_DEPENDS will be empty
 #                the previous calls to qi_use_lib().
-#                Use this (whith care!) to override this behavior.
-#                One should list all the (public) "direct" dependencies *and*
-#                their (public) dependencies.
-# \group:INCLUDE_DIRS if not given, ${TARGET}_INCLUDE_DIRS  will be
+# \group:INCLUDE_DIRS if not given, ${NAME}_INCLUDE_DIRS  will be
 #                 guessed from the previous calls to
 #                 include_directories()
 #                 Use this (whith care!) to override this behavior.
