@@ -43,18 +43,16 @@ def get_test_runner(args):
         candidate = os.path.join(os.getcwd(), "qitest.json")
         if os.path.exists(candidate):
             qitest_json = candidate
-    try:
-        build_worktree = qibuild.parsers.get_build_worktree(args)
-
-        build_project = qibuild.parsers.get_one_build_project(build_worktree, args)
-        test_project = build_project.to_test_project()
-        build_project = True
-    except:
-        pass
+    if qitest_json:
+        test_project = qitest.project.TestProject(qitest_json)
     if not test_project:
-        if qitest_json:
-            test_project = qitest.project.TestProject(qitest_json)
-        else:
+        try:
+            build_worktree = qibuild.parsers.get_build_worktree(args)
+
+            build_project = qibuild.parsers.get_one_build_project(build_worktree, args)
+            test_project = build_project.to_test_project()
+            build_project = True
+        except:
             raise Exception(""" \
 Could not find a `qitest.json` in the current working directory, nor
 a qibuild CMake project.
