@@ -63,5 +63,6 @@ def gen_symbol_archive(project, base_dir=None, output=None, file_list=None):
         print "stripping", binary
         strip_binary(binary, strip_executable=strip_executable)
 
-    return qisys.archive.compress(pool_dir, output=output, flat=True)
+    qisys.archive.compress(pool_dir, output=output, flat=True)
+    qisys.sh.rm(pool_dir)
     return output

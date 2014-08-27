@@ -51,6 +51,9 @@ def do(args):
 
     ui.info(ui.blue, "::", ui.reset, ui.bold, "Compressing package ...")
     archive = qisys.archive.compress(destdir, algo="zip", quiet=True)
+
+    # Clean up after ourselves
+    qisys.sh.rm(destdir)
     ui.info(ui.green, "Package generated in", ui.reset, ui.bold, archive)
     return archive
 
