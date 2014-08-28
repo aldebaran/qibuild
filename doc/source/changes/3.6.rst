@@ -58,6 +58,7 @@ qitest
 
 * Fix crash when generating XML on Windows when tests have not been built
 
+* Prefer ``--qitest-json`` over default config.
 
 qitoolchain
 ------------
@@ -70,10 +71,18 @@ qitoolchain
 
 * Add ``qibuild gen-cmake-module``
 
+qipy
+----
+
+* ``qipy list``: display project paths too
+
 CMake
 -----
 
-* Fix Qt4Macros usage with CMake 3.0
+* Fix ``Qt4Macros`` usage with CMake 3.0
+* Avoid filenames with double slashes when installing
+* Never install ``.pyc`` or ``__pycache__`` files
+* ``USB_1``: extend include location list
 
 Misc
 ----
