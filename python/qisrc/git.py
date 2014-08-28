@@ -593,3 +593,32 @@ class Transaction:
     def __init__(self):
         self.ok = True
         self.output = ""
+
+def get_status(git, local_ref, remote_ref):
+    """Check if local_ref is ahead and / or behind remote_ref """
+    behind = 0
+    ahead = 0
+    (ret, out) = git.call("rev-list", "--left-right",
+                          "%s..%s" % (remote_ref, local_ref), raises=False)
+    if ret == 0:
+        ahead = len(out.split())
+    (ret, out) = git.call("rev-list", "--left-right",
+                          "%s..%s" % (local_ref, remote_ref), raises=False)
+    if ret == 0:
+        behind = len(out.split())
+    if not ahead and not behind:
+        return "no-diff", "<no changes>"
+    if ahead and not behind:
+        mess = "%i commit(s) to merge\n" % ahead
+        _, out = git.call("log", "%s..%s" % (remote_ref, local_ref),
+                           "--format=%h %s", raises=False)
+        mess += out
+        return "fast-forward", mess
+    if behind and not ahead:
+        mess ="%i commit(s) late\n" % behind
+        _, out = git.call("log", "%s..%s" % (local_ref, remote_ref),
+                           "--format=%h %s", raises=False)
+        mess += out
+        return "behind", mess
+    if ahead and behind:
+        return "diverged", "Branches have diverged: -%i / +%i" % (behind, ahead)
