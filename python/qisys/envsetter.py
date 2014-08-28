@@ -108,7 +108,7 @@ class EnvSetter():
         # TODO: handle non asccii chars?
         # Hint: decode("mcbs") ...
         if not os.path.exists(bat_file):
-            raise Exception("general.env.bat_file (%s) does not exists" % bat_file)
+            raise Exception("general.env.bat_file (%s) does not exist" % bat_file)
 
         # set of environment variables that are in fact list of paths
         # FIXME: what should we do with other env?

@@ -85,7 +85,7 @@ are some differences, here are a few
 Check of arguments
 ++++++++++++++++++
 
-If you try to install a file that does not exists,
+If you try to install a file that does not exist,
 using `install()` will exit during installation, but qi_install will
 exit during configuration.
 This does no prevent you from installing generated files, but you have to make

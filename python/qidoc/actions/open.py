@@ -27,7 +27,7 @@ def do(args):
     if not os.path.exists(doc_project.index_html):
         mess = """ \
 The doc project in {path} does no appear to have been built yet.
-({index_html} does not exists.
+({index_html} does not exist.
 Try running  `qidoc build`
 """
         mess = mess.format(path=doc_project.path, index_html=index_html)

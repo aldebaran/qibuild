@@ -14,7 +14,7 @@ endif()
 
 # remove qi_tests.json
 # Note:
-#  this will fail silently if the file does not exists
+#  this will fail silently if the file does not exist
 #  this file is used by `qibuild test` and other commands
 #  later on and can ben patched from CMake
 file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/qitest.cmake)

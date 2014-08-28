@@ -220,7 +220,7 @@ def install(src, dest, filter_fun=None, quiet=False):
     Few notes: rewriting ``cp`` or ``install`` is a hard problem.
     This version will happily erase whatever is inside dest,
     (even it the dest is readonly, dest will be erased before being
-    written) and it won't complain if dest does not exists (missing
+    written) and it won't complain if dest does not exist (missing
     directories will simply be created)
 
     This function will preserve relative symlinks between directories,
@@ -320,9 +320,9 @@ def rm(name):
     """This one can take a file or a directory.
     Contrary to shutil.remove or os.remove, it:
 
-    * won't fail if the directory does not exists
+    * won't fail if the directory does not exist
     * won't fail if the directory contains read-only files
-    * won't fail if the file does not exists
+    * won't fail if the file does not exist
 
     Please avoid using shutil.rmtree ...
     """

@@ -4,7 +4,7 @@
 
 # Hack here: we cannot integrate qmake in the
 # qt packages in the toolchains, because qmake will report
-# a path that probably does not exists, so we instead
+# a path that probably does not exist, so we instead
 # look for moc and uic, and the copy-paste the macros from
 # QT_USE_FILE ...
 

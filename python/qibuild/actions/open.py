@@ -29,7 +29,7 @@ def do(args):
     project = cmake_builder.projects[0]
     if not os.path.exists(project.build_directory):
         ui.error("""It looks like your project has not been configured yet
-(The build directory: '%s' does not exists)""" %
+(The build directory: '%s' does not exist)""" %
         project.build_directory)
         answer = qisys.interact.ask_yes_no(
             "Do you want me to run qibuild configure for you?",

@@ -53,7 +53,7 @@ def parse_bool_attr(tree, name, default=False):
         "1" or "true".
       * Returns False if the attribute exist and is
         "0" or "false"
-      * If the attribute does not exists and default is given,
+      * If the attribute does not exist and default is given,
         returns `default`
       * Otherwise raise an exception
 

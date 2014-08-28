@@ -34,7 +34,7 @@ class WorkTree(object):
         if not os.path.exists(root):
             raise Exception(""" \
 Could not open WorkTree in {0}.
-This path does not exists
+This path does not exist
 """.format(root))
 
         self._observers = list()

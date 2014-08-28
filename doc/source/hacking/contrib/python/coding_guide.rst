@@ -707,7 +707,7 @@ messages.
        (looked in /home/dmerejkowsky/work/tmp/qi/.qi/foo.cmake)
 
 
-    $ qibuild install foo (when build dir does not exists)
+    $ qibuild install foo (when build dir does not exist)
 
     Error: Could not find build directory:
       /home/dmerejkowsky/work/tmp/qi/foo/build-linux64-release

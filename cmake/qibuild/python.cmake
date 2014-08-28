@@ -50,7 +50,7 @@ _set_qibuild_python_path()
 #
 function(qi_run_py_script script)
   if(NOT EXISTS "${script}")
-    qi_error("${script} does not exists")
+    qi_error("${script} does not exist")
   endif()
 
   cmake_parse_arguments(ARG
