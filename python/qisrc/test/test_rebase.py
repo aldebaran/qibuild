@@ -59,3 +59,17 @@ def test_when_moved(git_server, qisrc_action, record_messages):
     qisrc_action("rebase", "master", "--all")
     rc, out = git.log("--pretty=oneline", raises=False)
     assert len(out.splitlines()) == 3
+
+def test_push_after_rebase(git_server, qisrc_action, interact):
+    git_server.create_repo("foo")
+    git_server.switch_manifest_branch("devel")
+    git_server.change_branch("foo", "devel")
+    qisrc_action("init", git_server.manifest_url, "--branch", "devel")
+    git_server.push_file("foo", "master.txt", "master")
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    git.commit_file("devel.txt", "devel")
+    git.fetch()
+    interact.answers = [True]
+    qisrc_action("rebase", "master", "--all", "--push")
