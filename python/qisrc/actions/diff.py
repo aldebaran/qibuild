@@ -13,6 +13,7 @@ def do(args):
     branch = args.branch
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
-                                                  default_all=True)
+                                                  default_all=False,
+                                                  use_build_deps=True)
     qisrc.diff.diff_worktree(git_worktree, git_projects, branch,
                              cmd=["diff", "--stat"])
