@@ -308,15 +308,7 @@ class Git(object):
                         "refs/heads/%s" % remote_branch)
         return True
 
-    def fetch_default(self, branch):
-        """ Fetch the default remote of branch """
-        if branch.tracks:
-            fetch_cmd = ("fetch", branch.tracks)
-        else:
-            fetch_cmd = ("fetch")
-        self.call(*fetch_cmd)
-
-    def sync_branch(self, branch):
+    def sync_branch(self, branch, fetch_first=True):
         """ git pull --rebase on steroids:
 
          * do not try anything if the worktree is not clean
@@ -334,15 +326,11 @@ class Git(object):
             - False: sync failed
             - True: sync succeeded
         """
+
         remote_branch = branch.remote_branch
         if not remote_branch:
             remote_branch = branch.name
         remote_ref = "%s/%s" % (branch.tracks, remote_branch)
-
-        if branch.tracks:
-            fetch_cmd = ("fetch", branch.tracks)
-        else:
-            fetch_cmd = ("fetch")
 
         ok, mess = self.require_clean_worktree()
         if not ok:
@@ -361,11 +349,13 @@ class Git(object):
                 # This may fail depending on the user configuration
                 update_cmd = ("rebase", branch.name)
 
+        if fetch_first:
+            rc, out = self.fetch(raises=False)
+            if rc != 0:
+                return False, "Fetch failed\n" + out
+
         update_successful = False
         message = ""
-        (fetch_rc, fetch_out) = self.call(*fetch_cmd, raises=False)
-        if fetch_rc != 0:
-            return False, "Fetch failed:\n" + fetch_out
         (update_rc, out) = self.call(*update_cmd, raises=False)
         if update_rc == 0:
             update_successful = True
@@ -373,13 +363,14 @@ class Git(object):
             if update_cmd[0] == "rebase":
                 # run rebase --abort so that the user is left
                 # in a clean state
-                message = "Rebase failed because of conflicts"
+                message = "Rebase failed with following output\n\n" + out
                 (abort_rc, abort_out) = self.call("rebase", "--abort", raises=False)
                 if abort_rc == 0:
                     return False, message
                 else:
                     full_message = message
-                    full_message += "\nAdditionally, git rebase --abort failed"
+                    full_message += "\n\nAdditionally, git rebase --abort failed "
+                    full_message += "with following output:\n\n"
                     full_message += abort_out
                     return False, full_message
 
@@ -407,17 +398,13 @@ class Git(object):
         if ret == 0:
             return sha1
 
-    def sync_branch_devel(self, local_branch, master_branch):
+    def sync_branch_devel(self, local_branch, master_branch, fetch_first=True):
         """ Make sure master stays compatible with your development branch
         Checks if your local master branch can be fast-forwarded to remote
         Update master's HEAD if it's the case
         """
-
-        if master_branch.tracks:
-            fetch_cmd = ("fetch", master_branch.tracks)
-        else:
-            fetch_cmd = ("fetch")
-        self.call(*fetch_cmd)
+        if fetch_first:
+            self.fetch()
 
         # First check if master can be fast-forwarded
         local_sha1 = self.get_ref_sha1("refs/heads/%s" % master_branch.name)

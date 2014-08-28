@@ -155,21 +155,23 @@ class GitProject(object):
         if not branch:
             return None, "No branch given, and no branch configured by default"
 
+        rc, out = git.fetch(raises=False)
+        if rc != 0:
+            return False, "fetch failed\n" + out
+
         current_branch = git.get_current_branch()
         if not current_branch:
-            git.fetch_default(branch)
             return None, "Not on any branch"
 
         if current_branch != branch.name and not rebase_devel:
-            git.fetch_default(branch)
             return None, "Not on the correct branch. " + \
                          "On %s but should be on %s" % (current_branch, branch.name)
 
         if current_branch != branch.name and rebase_devel:
-            return git.sync_branch_devel(current_branch, branch)
+            return git.sync_branch_devel(current_branch, branch, fetch_first=False)
 
         # Here current_branch == branch.name
-        return git.sync_branch(branch)
+        return git.sync_branch(branch, fetch_first=False)
 
 
     def apply_config(self):
