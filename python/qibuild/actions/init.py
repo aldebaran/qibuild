@@ -24,8 +24,9 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     root = os.getcwd()
-    if not qisys.sh.is_empty(root):
-        raise Exception("Please run this command from an empty directory")
+    if os.path.exists(os.path.join(root, '.qi')):
+        raise Exception("A .qi directory already exists here. " +
+                        "Please remove it or initialize elsewhere.")
     worktree = qisys.worktree.WorkTree(root)
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
     if args.config:
