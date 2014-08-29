@@ -118,13 +118,8 @@ class CMakeBuildConfig(object):
         for profile in self.profiles:
             parts.append(profile)
 
-        # When using cmake + visual studio, sharing the same build dir with
-        # several build config is mandatory.
-        # Otherwise, it's not a good idea, so we always specify it
-        # when it's not "Debug" (the default)
-        if not self.using_visual_studio:
-            if self.build_type and self.build_type != "Debug":
-                parts.append(self.build_type.lower())
+        if self.build_type and self.build_type != "Debug":
+            parts.append(self.build_type.lower())
         return "-".join(parts)
 
 
