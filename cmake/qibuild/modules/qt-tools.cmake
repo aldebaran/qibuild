@@ -42,7 +42,9 @@ function(qi_generate_qt_conf)
   # containing paths in the toolchain
 
   list(GET QT_QTCORE_LIBRARIES 0 _lib)
-  if("${_lib}" STREQUAL "debug" OR "${_lib}" STREQUAL "optimized")
+  if("${_lib}" STREQUAL "debug"
+      OR "${_lib}" STREQUAL "optimized"
+      OR "${_lib}" STREQUAL "general")
     list(GET QT_QTCORE_LIBRARIES 1 _lib)
   endif()
 
