@@ -14,13 +14,13 @@ import qibuild.cmake_builder
 
 
 def cmake_build_parser(parser, group=None):
-        qisys.parsers.build_parser(parser, group=None)
-        if not group:
-            group = parser.add_argument_group("Build options")
-        parser.add_argument("-j", dest="num_jobs", type=int)
-        parser.add_argument("--build-type", action="store")
-        group.add_argument("--verbose-make", action="store_true", default=False,
-                        help="Print the executed commands while building")
+    qisys.parsers.build_parser(parser, group=None)
+    if not group:
+        group = parser.add_argument_group("Build options")
+    parser.add_argument("-j", dest="num_jobs", type=int)
+    parser.add_argument("--build-type", action="store")
+    group.add_argument("--verbose-make", action="store_true", default=False,
+                    help="Print the executed commands while building")
 
 def project_parser(parser, positional=True):
     """Parser settings for every action using several build projects."""
@@ -45,7 +45,7 @@ def get_build_worktree(args, verbose=True):
     if verbose:
         ui.info(ui.green, "Current build worktree:", ui.reset, ui.bold, build_worktree.root)
     if not hasattr(args, "build_type"):
-        # build_parser() has not been called, so do leave the default build_config
+        # cmake_build_parser() has not been called, so do leave the default build_config
         return build_worktree
     build_config = get_build_config(build_worktree, args)
     build_worktree.build_config = build_config
