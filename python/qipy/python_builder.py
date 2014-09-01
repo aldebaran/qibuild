@@ -44,6 +44,8 @@ class PythonBuilder(AbstractBuilder):
         pass
 
     def install(self, dest, *args, **kwargs):
+        if not self.projects:
+            return
         n = len(self.projects)
         for i, project in enumerate(self.projects):
             ui.info_count(i, n, ui.green, "Installing",
