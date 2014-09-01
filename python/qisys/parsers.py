@@ -62,9 +62,10 @@ def project_parser(parser, positional=True):
     return group
 
 
-def build_parser(parser, group=None):
+def build_parser(parser, group=None, include_worktree_parser=True):
     """Parser settings for builders."""
-    worktree_parser(parser)
+    if include_worktree_parser:
+        worktree_parser(parser)
     if not group:
         group = parser.add_argument_group("build type options")
     group.add_argument("--release", action="store_const", const="Release",

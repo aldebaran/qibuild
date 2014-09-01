@@ -21,6 +21,7 @@ def configure_parser(parser):
     """Configure parser for this action"""
     qitest.parsers.test_parser(parser)
     qibuild.parsers.project_parser(parser)
+    qisys.parsers.build_parser(parser, include_worktree_parser=False)
 
 def do(args):
     """Main entry point"""
