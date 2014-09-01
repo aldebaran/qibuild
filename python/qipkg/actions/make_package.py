@@ -26,7 +26,12 @@ def do(args):
     worktree = qisys.parsers.get_worktree(args)
     pml_builders = qipkg.parsers.get_pml_builders(args)
     all_packages = list()
-    for pml_builder in pml_builders:
+    ui.info("\n", ui.green, "::", ui.reset, ui.bold,
+            "Building", len(pml_builders), "package(s)\n")
+    for i, pml_builder in enumerate(pml_builders):
+        ui.info(ui.green, "::", ui.reset,
+                ui.bold, "[%i on %i]" % (i + 1, len(pml_builders)),
+                ui.reset, ui.blue, pml_builder.pml_path)
         packages = pml_builder.make_package(output=output, with_breakpad=with_breakpad)
         all_packages.extend(packages)
     if args.pml_path.endswith(".pml"):

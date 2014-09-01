@@ -5,6 +5,7 @@
 """ Generate a binary package, ready to be used for a behavior """
 import copy
 
+from qisys import ui
 import qisys.parsers
 import qipkg.builder
 
@@ -46,6 +47,7 @@ def get_pml_builder(args):
 def get_pml_builders(args):
     res = list()
     if args.pml_path.endswith(".mpml"):
+        ui.info(ui.green, "::", ui.reset, ui.bold, "Reading", args.pml_path, "\n")
         worktree = qisys.parsers.get_worktree(args)
         metapackage = qipkg.metapackage.MetaPackage(worktree, args.pml_path)
         for pml_path in metapackage.pml_paths:

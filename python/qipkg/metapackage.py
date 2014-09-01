@@ -1,6 +1,7 @@
 import os
 import zipfile
 
+from qisys import ui
 import qisys.qixml
 
 class MetaPackage(object):
@@ -44,4 +45,5 @@ Root element must be <metapackage>
         for package in packages:
             archive.write(package, arcname=os.path.basename(package))
         archive.close()
+        ui.info(ui.green, "::", ui.reset, ui.bold, "Meta package generated in", output)
         return output

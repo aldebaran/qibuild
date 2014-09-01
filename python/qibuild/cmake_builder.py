@@ -137,7 +137,7 @@ class CMakeBuilder(AbstractBuilder):
         real_dest = os.path.join(dest_dir, prefix)
 
         if projects:
-            ui.info(ui.green, "The following projects")
+            ui.info(ui.green, "the following projects")
             for project in projects:
                 ui.info(ui.green, " *", ui.blue, project.name)
             if packages:
@@ -151,8 +151,7 @@ class CMakeBuilder(AbstractBuilder):
                 ui.info(ui.green, "(runtime components only)")
 
         if packages:
-            print
-            ui.info(ui.green, ":: ", "Installing packages")
+            ui.info(ui.green, ":: ", "installing packages")
         for i, package in enumerate(packages):
             ui.info_count(i, len(packages),
                           ui.green, "Installing",
@@ -166,8 +165,7 @@ class CMakeBuilder(AbstractBuilder):
         qisys.sh.rm(qitest_json)
 
         if projects:
-            print
-            ui.info(ui.green, ":: ", "Installing projects")
+            ui.info(ui.green, ":: ", "installing projects")
             for i, project in enumerate(projects):
                 ui.info_count(i, len(projects),
                             ui.green, "Installing",
