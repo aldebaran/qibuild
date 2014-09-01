@@ -29,6 +29,7 @@ def test_rebase_conflict(git_server, qisrc_action):
     foo_proj = git_worktree.get_git_project("foo")
     git = TestGit(foo_proj.path)
     git.commit_file("foo.txt", "devel")
+    git.push()
     _, before = git.call("show", raises=False)
     git.fetch()
     # pylint: disable-msg=E1101
@@ -74,6 +75,18 @@ def test_when_not_up_to_date(git_server, qisrc_action):
     retcode = qisrc_action("rebase", "--branch", "master", "--all", retcode=True)
     assert retcode == 0
 
+def test_when_ahead(git_server, qisrc_action):
+    git_server.create_repo("foo")
+    git_server.switch_manifest_branch("devel")
+    git_server.change_branch("foo", "devel")
+    qisrc_action("init", git_server.manifest_url, "--branch", "devel")
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    git.commit_file("devel.txt", "devel")
+    git.push()
+    qisrc_action("rebase", "--all")
+
 def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
@@ -88,27 +101,7 @@ def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):
     git.fetch()
     git.push("origin", "devel")
     interact.answers = [True]
-    qisrc_action("rebase", "--branch", "master", "--push", "--all")
+    qisrc_action("rebase", "--branch", "master", "--push", "--force", "--all")
     local_sha1 = git.get_ref_sha1("refs/heads/devel")
     remote_sha1 = git.get_ref_sha1("refs/remotes/origin/devel")
     assert local_sha1 == remote_sha1
-
-def test_undo(git_server, git_worktree, qisrc_action, interact):
-    git_server.create_repo("foo")
-    git_server.switch_manifest_branch("devel")
-    git_server.change_branch("foo", "devel")
-    git_server.push_file("foo", "master.txt", "devel")
-    qisrc_action("init", git_server.manifest_url, "--branch", "devel")
-    git_server.push_file("foo", "master.txt", "master")
-    git_worktree = TestGitWorkTree()
-    foo_proj = git_worktree.get_git_project("foo")
-    git = TestGit(foo_proj.path)
-    git.commit_file("devel.txt", "devel")
-    git.fetch()
-    git.push("origin", "devel")
-    expected_sha1 = git.get_ref_sha1("refs/remotes/origin/devel")
-    interact.answers = [True]
-    qisrc_action("rebase", "--branch", "master", "--push", "--all")
-    qisrc_action("rebase", "--undo", "--all")
-    actual_sha1 = git.get_ref_sha1("refs/remotes/origin/devel")
-    assert actual_sha1 == expected_sha1
