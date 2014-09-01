@@ -13,25 +13,32 @@ import qipy.parsers
 import qilinguist.parsers
 import qipkg.metapackage
 
+WORKTREES = None
 
 def pml_parser(parser):
     qisys.parsers.build_parser(parser)
     parser.add_argument("pml_path")
 
+def get_worktrees(args):
+    global WORKTREES
+    if WORKTREES is None:
+        build_worktree = qibuild.parsers.get_build_worktree(args)
+        python_worktree = qipy.parsers.get_python_worktree(args)
+        linguist_worktree = qilinguist.parsers.get_linguist_worktree(args)
+        WORKTREES = [build_worktree, python_worktree, linguist_worktree]
+    return WORKTREES
+
+
 def get_pml_builder(args):
     pml_path = args.pml_path
     worktree = qisys.parsers.get_worktree(args)
-    build_worktree = qibuild.parsers.get_build_worktree(args)
-    # Note that we do not use the get_*_builders because we will not
-    # read the projects from the command line.
-    # Instead the projects attribute of each builder will be set
-    # in PMLBuilder.__init__()
+    build_worktree, python_worktree, linguist_worktree = get_worktrees(args)
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
     cmake_builder.projects = list()
-    python_builder = qipy.parsers.get_python_builder(args, verbose=False)
+    python_builder = qipy.python_builder.PythonBuilder(python_worktree,
+                                                       build_worktree=build_worktree)
     python_builder.projects = list()
-    linguist_builder = qilinguist.parsers.get_linguist_builder(args,
-            with_projects=False)
+    linguist_builder = qilinguist.builder.QiLinguistBuilder(linguist_worktree)
     linguist_builder.projects = list()
     return qipkg.builder.PMLBuilder(pml_path, cmake_builder,
                                     python_builder, linguist_builder)
