@@ -103,13 +103,11 @@ def rebase_projects(git_projects, upstream_projects, branch):
     return rebased_projects, errors
 
 def display_changes(git, remote_ref, branch_name):
-    rc, out = git.call("shortlog", "%s..%s" % (remote_ref, branch_name),
-                    raises=False)
-    if out:
-        ui.info(ui.bold, "Remote changes:")
-        ui.info(out)
-    rc, out = git.call("shortlog", "%s..%s" % (branch_name, remote_ref),
+    rc, out = git.call("log", "--color", "--graph", "--abbrev-commit",
+                      "--pretty=format:%Cred%h%Creset " + \
+                                        "-%C(yellow)%d%Creset " + \
+                                        "%s %Cgreen(%cr) %C(bold blue) " + \
+                                        "<%an>%Creset",
+                        remote_ref, branch_name,
                         raises=False)
-    if out:
-        ui.info(ui.bold, "Local changes")
-        ui.info(out)
+    ui.info(out)
