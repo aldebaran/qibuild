@@ -14,26 +14,15 @@ import qipy.parsers
 import qilinguist.parsers
 import qipkg.metapackage
 
-WORKTREES = None
 
 def pml_parser(parser):
     qisys.parsers.build_parser(parser)
     parser.add_argument("pml_path")
 
-def get_worktrees(args):
-    global WORKTREES
-    if WORKTREES is None:
-        build_worktree = qibuild.parsers.get_build_worktree(args)
-        python_worktree = qipy.parsers.get_python_worktree(args)
-        linguist_worktree = qilinguist.parsers.get_linguist_worktree(args)
-        WORKTREES = [build_worktree, python_worktree, linguist_worktree]
-    return WORKTREES
 
-
-def get_pml_builder(args):
+def get_pml_builder(worktrees, args):
     pml_path = args.pml_path
-    worktree = qisys.parsers.get_worktree(args)
-    build_worktree, python_worktree, linguist_worktree = get_worktrees(args)
+    build_worktree, python_worktree, linguist_worktree = worktrees
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
     cmake_builder.projects = list()
     python_builder = qipy.python_builder.PythonBuilder(python_worktree,
@@ -46,6 +35,10 @@ def get_pml_builder(args):
 
 def get_pml_builders(args):
     res = list()
+    build_worktree = qibuild.parsers.get_build_worktree(args)
+    python_worktree = qipy.parsers.get_python_worktree(args)
+    linguist_worktree = qilinguist.parsers.get_linguist_worktree(args)
+    worktrees = [build_worktree, python_worktree, linguist_worktree]
     if args.pml_path.endswith(".mpml"):
         ui.info(ui.green, "::", ui.reset, ui.bold, "Reading", args.pml_path, "\n")
         worktree = qisys.parsers.get_worktree(args)
@@ -53,7 +46,7 @@ def get_pml_builders(args):
         for pml_path in metapackage.pml_paths:
             new_args = copy.copy(args)
             new_args.pml_path = pml_path
-            res.append(get_pml_builder(new_args))
+            res.append(get_pml_builder(worktrees, new_args))
     else:
-        res.append(get_pml_builder(args))
+        res.append(get_pml_builder(worktrees, args))
     return res
