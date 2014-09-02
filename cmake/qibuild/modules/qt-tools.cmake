@@ -41,14 +41,20 @@ endif()
 function(qi_generate_qt_conf)
   # First, find qt and generate qt.conf
   # containing paths in the toolchain
+  if(DEFINED QT_PLUGINS_PATH)
+    set(_plugins_path "${QT_PLUGINS_PATH}")
+  else()
+    list(GET QT_QTCORE_LIBRARIES 0 _lib)
+    if("${_lib}" STREQUAL "debug"
+        OR "${_lib}" STREQUAL "optimized"
+        OR "${_lib}" STREQUAL "general")
+      list(GET QT_QTCORE_LIBRARIES 1 _lib)
+    endif()
 
-  list(GET QT_QTCORE_LIBRARIES 0 _lib)
-  if("${_lib}" STREQUAL "debug" OR "${_lib}" STREQUAL "optimized")
-    list(GET QT_QTCORE_LIBRARIES 1 _lib)
+    get_filename_component(_lib_path ${_lib} PATH)
+    set(_plugins_path ${_lib_path}/qt4/plugins)
   endif()
 
-  get_filename_component(_lib_path ${_lib} PATH)
-  set(_plugins_path ${_lib_path}/qt4/plugins)
   file(WRITE "${QI_SDK_DIR}/${QI_SDK_BIN}/qt.conf"
 "[Paths]
 Plugins = ${_plugins_path}
