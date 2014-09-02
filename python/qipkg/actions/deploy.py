@@ -11,7 +11,6 @@ from qisys import ui
 import qisys.sh
 import qisys.parsers
 import qipkg.parsers
-import qipkg.package
 
 
 def configure_parser(parser):

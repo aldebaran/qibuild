@@ -6,7 +6,6 @@ import qibuild.worktree
 
 from qisys import ui
 import qisys.qixml
-import qipkg.package
 import qibuild.breakpad
 
 from qipy.worktree import PythonWorkTree

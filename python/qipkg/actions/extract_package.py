@@ -5,7 +5,7 @@ import zipfile
 
 from qisys import ui
 import qisys.parsers
-import qipkg.package
+import qipkg.builder
 
 def configure_parser(parser):
     qisys.parsers.default_parser(parser)
@@ -28,7 +28,7 @@ def do(args):
             if name == "manifest.xml":
                 archive.extract("manifest.xml", path=tmp)
                 manifest_xml_path = os.path.join(tmp, "manifest.xml")
-                pkg_name = qipkg.package.pkg_name(manifest_xml_path)
+                pkg_name = qipkg.builder.pkg_name(manifest_xml_path)
                 break
 
     if pkg_name is not None:
