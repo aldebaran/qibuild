@@ -6,6 +6,8 @@ qibuild
 
 * Fix ``qibuild deploy --split-debug``
 * ``qibuild depend``: rename ``--single`` to ``--direct``
+* Allow using ``qibuild make --release -G 'Visual Studio'``
+* Allow ``qibuild init`` to work in non-empty directories
 
 qisrc
 -----
@@ -17,12 +19,16 @@ qisrc
 * ``qisrc checkout`` now creates the local branch at the correct
   location
 * ``qisrc grep`` honors ``--build-deps`` option
-* Simplify ``qisrc reset``
+* ``qisrc reset``
 
   * ``--clean`` is gone, you can run ``qisrc foreach git clean`` if needed
   * less verbose
   * checkout branches to the correct location
   * better display of errors
+  * without argument, only run on the build project and its dependencies.
+    To get back the old behavior, use ``qisrc reset --all``
+
+* ``qisrc sync`` now fetches even when the project is dirty
 
 qipkg
 -----
@@ -46,6 +52,7 @@ qipy
 
 * Fix ``prefix`` parameter for ``install`` method
 * Fix error message when bootstrap has not been called yet
+* ``qipy list``: display project paths too
 
 
 qitest
@@ -53,12 +60,10 @@ qitest
 
 * ``qitjest.json`` and test files reports are in ``build/sdk`` instead of
   ``build/``
-
 * Fix ``qitest run --coverage``
-
 * Fix crash when generating XML on Windows when tests have not been built
-
 * Prefer ``--qitest-json`` over default config.
+* Allow specifying build config arguments such as ``--config``
 
 qitoolchain
 ------------
@@ -83,6 +88,8 @@ CMake
 * Avoid filenames with double slashes when installing
 * Never install ``.pyc`` or ``__pycache__`` files
 * ``USB_1``: extend include location list
+* ``qt_tools``: allow reading plugins path from ``QT_PLUGINS_PATH``
+* Modules: Add ``boost_iostream``
 
 Misc
 ----
