@@ -1,5 +1,6 @@
 """ Builder for pml files """
 import os
+import sys
 import zipfile
 
 import qibuild.worktree
@@ -153,27 +154,33 @@ class PMLBuilder(object):
         # Add everything from the staged path
         self.install(self.stage_path)
         ui.info(ui.bold, "-> Compressing package ...")
+        to_add = list()
         for root,_, filenames in os.walk(self.stage_path):
             for filename in filenames:
                 full_path = os.path.join(root, filename)
                 rel_path  = os.path.relpath(full_path, self.stage_path)
-                ui.info(ui.green, "adding", ui.reset, ui.bold, rel_path)
-                archive.write(full_path, rel_path)
+                to_add.append((full_path, rel_path))
+
+        for i, (full_path, rel_path) in enumerate(to_add):
+            n = len(to_add)
+            percent = float(i) / n * 100
+            sys.stdout.write("Done: %.0f%%\r" % percent)
+            sys.stdout.flush()
+            archive.write(full_path, rel_path)
         archive.close()
 
-        if with_breakpad:
-            if not self.build_project:
-                raise Exception("No C++ projects found")
+        symbols_archive = None
+        if with_breakpad and self.build_project:
+            ui.info(ui.bold, "-> Generating breakpad symbols ...")
             dirname = os.path.dirname(output)
             symbols_archive = os.path.join(dirname, self.pkg_name + "-symbols.zip")
             qibuild.breakpad.gen_symbol_archive(self.build_project,
                                                 output=symbols_archive,
                                                 base_dir=self.stage_path,
                                                 file_list=self.cpp_installed_files)
+            ui.info(ui.bold, "-> Symbols generated in", symbols_archive)
         ui.info(ui.bold, "-> Package generated in", output, "\n")
-        if with_breakpad:
-            ui.info(ui.green, "Symbols generated in",
-                    ui.reset, ui.bold, symbols_archive)
+        if symbols_archive:
             return [output, symbols_archive]
         else:
             return [output]

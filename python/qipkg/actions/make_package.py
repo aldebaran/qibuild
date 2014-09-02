@@ -7,7 +7,6 @@
 from qisys import ui
 import qisys.parsers
 import qipkg.parsers
-import qipkg.package
 import qipkg.metapackage
 import qipkg.parsers
 
