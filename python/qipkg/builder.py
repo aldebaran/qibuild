@@ -101,6 +101,17 @@ class PMLBuilder(object):
                 src = child.get("src")
                 self.pml_extra_files.append(src)
 
+        errors = list()
+        for file in self.pml_extra_files:
+            full_path = os.path.join(self.base_dir, file)
+            if not os.path.exists(full_path):
+                errors.append(file)
+        if errors:
+            mess = "Some files do not exist\n"
+            for error in errors:
+                mess += error + "\n"
+            raise Exception(mess)
+
     def configure(self):
         for builder in self.builders:
             builder.configure()
