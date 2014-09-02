@@ -211,17 +211,16 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
 
 
 def install(src, dest, filter_fun=None, quiet=False):
-    """Install a directory to a destination.
+    """Install a directory or a file to a destination.
 
     If filter_fun is not None, then the file will only be
     installed if filter_fun(relative/path/to/file) returns
     True.
 
-    Few notes: rewriting ``cp`` or ``install`` is a hard problem.
-    This version will happily erase whatever is inside dest,
-    (even it the dest is readonly, dest will be erased before being
-    written) and it won't complain if dest does not exist (missing
-    directories will simply be created)
+    If ``dest`` does not exist, it will be created first.
+
+    When installing files, if the destination already exists,
+    it will be removed first, then overwritten by the new file.
 
     This function will preserve relative symlinks between directories,
     used for instance in Mac frameworks::
@@ -276,7 +275,7 @@ def install(src, dest, filter_fun=None, quiet=False):
 
 
 def safe_copy(src, dest):
-    """ Copy a source to a destination but
+    """ Copy a source file to a destination but
     do not overwrite dest if it is more recent than src
 
     Create any missing directories when necessary
