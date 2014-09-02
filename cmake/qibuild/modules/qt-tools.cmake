@@ -62,9 +62,14 @@ Plugins = ${_plugins_path}
 
   # Then, generate and install a qt.conf
   # containing relative paths
+  if(APPLE)
+    set(_relative_plugins_path "../../lib/qt4/plugins")
+  else()
+    set(_relative_plugins_path "../lib/qt4/plugins")
+  endif()
   file(WRITE "${CMAKE_BINARY_DIR}/qt.conf"
 "[Paths]
-Plugins = ../lib/qt4/plugins
+Plugins = ${_relative_plugins_path}
 ")
   install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION bin COMPONENT runtime)
 
