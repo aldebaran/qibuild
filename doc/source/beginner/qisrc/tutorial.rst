@@ -67,9 +67,9 @@ Doing so is easy: just write a manifest looking like
    <manifest>
       <remote name="origin" url="git@git.aldebaran.lan" />
 
-      <repo project="qi/libqi.git"        src="lib/libqi" />
-      <repo project="lib/libnaoqi.git"    src="lib/libnaoqi" />
-      <repo project="gui/choregraphe.git" src="gui/choregraphe" />
+      <repo project="qi/libqi.git"        remotes="master" src="lib/libqi" />
+      <repo project="lib/libnaoqi.git"    remotes="master" src="lib/libnaoqi" />
+      <repo project="gui/choregraphe.git" remotes="master" src="gui/choregraphe" />
 
     </manifest>
 
@@ -93,7 +93,7 @@ Handling release branches
 +++++++++++++++++++++++++
 
 
-``qisrc`` makes it easy to have several projects all tracking the same branch.
+``qisrc`` makes it easy to have several projects all tracking different branches.
 
 For instance, when doing a choregraphe release, you may want to make sure everything
 is in the ``release-1.12`` branch
@@ -105,7 +105,9 @@ file to look like
 .. code-block:: xml
 
    <manifest>
-      <remote url="git@git.aldebaran.lan" branch="release-1.12" />
+      <remote name="origin" url="git@git.aldebaran.lan" />
+      <repo project="qi/libqi.git" remotes="origin" branch="release-1.12" />
+      ...
     </manifest>
 
 
