@@ -34,16 +34,3 @@ Root element must be <metapackage>
             if src.endswith(".mpml"):
                 sub_meta = MetaPackage(self.worktree, src)
                 self.pml_paths.extend(sub_meta.pml_paths)
-
-    def make_meta_package(self, packages, output=None):
-        if not output:
-            if self.version:
-                output = "%s-%s.mpkg" % (self.name, self.version)
-            else:
-                output = "%s.mpkg" % self.name
-        archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
-        for package in packages:
-            archive.write(package, arcname=os.path.basename(package))
-        archive.close()
-        ui.info(ui.green, "::", ui.reset, ui.bold, "Meta package generated in", output)
-        return output

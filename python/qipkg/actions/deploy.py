@@ -23,8 +23,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point"""
     urls = qisys.parsers.get_deploy_urls(args)
-    pml_builders = qipkg.parsers.get_pml_builder(args)
-    for pml_builder in pml_builders:
-        pml_builder.install(pml_builder.stage_path)
-        for url in urls:
-            pml_builder.deploy(url)
+    pml_builder = qipkg.parsers.get_pml_builder(args)
+    pml_builder.install(pml_builder.stage_path)
+    for url in urls:
+        pml_builder.deploy(url)
