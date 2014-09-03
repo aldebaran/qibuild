@@ -114,10 +114,14 @@ class PMLBuilder(object):
 
     def configure(self):
         for builder in self.builders:
+            if isinstance(builder, CMakeBuilder):
+                builder.dep_types=["build", "runtime", "test"]
             builder.configure()
 
     def build(self):
         for builder in self.builders:
+            if isinstance(builder, CMakeBuilder):
+                builder.dep_types=["build", "runtime", "test"]
             builder.build()
 
     def install(self, destination):
