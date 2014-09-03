@@ -1,5 +1,6 @@
 from qisys.test.conftest import *
 from qipy.test.conftest import *
+from qitoolchain.test.conftest import *
 from qibuild.test.conftest import QiBuildAction
 
 class QiPkgAction(TestAction):
