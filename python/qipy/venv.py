@@ -7,6 +7,7 @@ import qisys.command
 
 def configure_virtualenv(config, python_worktree,  build_worktree=None,
                          remote_packages=None, site_packages=True):
+    ui.info(ui.green, "Configuring virtualenv for", ui.reset, ui.bold, python_worktree.root)
     if not remote_packages:
         remote_packages = list()
 
@@ -22,26 +23,21 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         ui.error("Failed to create virtualenv")
         return
 
-    # Install all Python projects using pip install -e .
-    python_projects = python_worktree.python_projects
-    for i, project in enumerate(python_projects):
-        ui.info_count(i, len(python_projects),
-                     ui.green, "Configuring", ui.reset, ui.blue, project.src)
-        cmd = [pip, "install", "--editable", "."]
-        rc = qisys.command.call(cmd, cwd=project.path, ignore_ret_code=True)
-        if rc != 0:
-            ui.warning("Running pip install -e failed for project", project.src)
 
-    # Write a qi.pth file containing path to C/C++ extensions
+    ui.info("Adding python projects")
+    # Write a qi.pth file containing path to C/C++ extensions and
+    # path to pure python modules or packages
+    handle_pure_python(venv_path, python_worktree)
     if build_worktree:
         handle_extensions(venv_path, python_worktree, build_worktree)
 
-    # Install the extension in the virtualenv
+    ui.info("Adding other requirements: " + ", ".join(remote_packages))
     binaries_path = virtualenv.path_locations(venv_path)[-1]
     pip_binary = os.path.join(binaries_path, "pip")
     if remote_packages:
         cmd = [pip_binary, "install"] + remote_packages
         subprocess.check_call(cmd)
+    ui.info(ui.green, "Done")
 
 def find_script(venv_path, script_name):
     """ Find a script given its name
@@ -83,5 +79,14 @@ def handle_extensions(venv_path, python_worktree, build_worktree):
 
     lib_path = virtualenv.path_locations(venv_path)[1]
     qi_pth_dest = os.path.join(venv_path, lib_path, "site-packages/qi.pth")
-    with open(qi_pth_dest, "w") as fp:
+    with open(qi_pth_dest, "a") as fp:
         fp.write(to_write)
+
+def handle_pure_python(venv_path, python_worktree):
+    lib_path = virtualenv.path_locations(venv_path)[1]
+    qi_pth_dest = os.path.join(venv_path, lib_path, "site-packages/qi.pth")
+    with open(qi_pth_dest, "w") as fp:
+        fp.write("")
+        for project in python_worktree.python_projects:
+            for path in project.python_path:
+                fp.write(path + "\n")

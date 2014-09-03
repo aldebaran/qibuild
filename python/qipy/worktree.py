@@ -36,11 +36,8 @@ class PythonWorkTree(qisys.worktree.WorkTreeObserver):
         seen_names = dict()
         self.python_projects = list()
         for project in self.worktree.projects:
-            setup_dot_py = os.path.join(project.path, "setup.py")
             qiproject_xml = os.path.join(project.path, "qiproject.xml")
             if not os.path.exists(qiproject_xml):
-                continue
-            if not os.path.exists(setup_dot_py):
                 continue
             new_project = new_python_project(self, project)
             if not new_project:
@@ -97,6 +94,29 @@ def new_python_project(worktree, project):
         return
     name = qisys.qixml.parse_required_attr(qipython_elem, "name",
                                            xml_path=qiproject_xml)
-    res = qipy.project.PythonProject(worktree, project.src, name)
-    return res
+    python_project = qipy.project.PythonProject(worktree, project.src, name)
+    python_project.package_dir = qipython_elem.get("package_dir")
+    script_elems = qipython_elem.findall("script")
+    for script_elem in script_elems:
+        src = qisys.qixml.parse_required_attr(script_elem, "src",
+                                              xml_path=qiproject_xml)
+        script = qipy.project.Script(src)
+        python_project.scripts.append(script)
 
+    module_elems = qipython_elem.findall("module")
+    for module_elem in module_elems:
+        src = module_elem.get("src", "")
+        name = qisys.qixml.parse_required_attr(module_elem, "name",
+                                              xml_path=qiproject_xml)
+        module = qipy.project.Module(name, src)
+        python_project.modules.append(module)
+
+    package_elems = qipython_elem.findall("package")
+    for package_elem in package_elems:
+        name = qisys.qixml.parse_required_attr(package_elem, "name",
+                                              xml_path=qiproject_xml)
+        src = package_elem.get("src", "")
+        package = qipy.project.Package(name, src)
+        python_project.packages.append(package)
+
+    return python_project
