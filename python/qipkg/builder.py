@@ -50,10 +50,13 @@ class PMLBuilder(object):
 
         self.load_pml(pml_path)
 
+
+    @property
+    def stage_path(self):
         dot_qi = self.worktree.dot_qi
         build_config = self.cmake_builder.build_config
         name = build_config.build_directory(prefix="qipkg")
-        self.stage_path = os.path.join(dot_qi, name)
+        return os.path.join(dot_qi, name)
 
     def load_pml(self, pml_path):
         for builder in self.builders:
