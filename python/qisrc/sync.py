@@ -189,9 +189,10 @@ class WorkTreeSyncer(object):
         """ Update the local manifest clone with the remote """
         git = qisrc.git.Git(self.manifest_repo)
         git.set_remote("origin", self.manifest.url)
+        if git.get_current_branch() != self.manifest.branch:
+            git.checkout("-B", self.manifest.branch)
         with git.transaction() as transaction:
             git.fetch("origin")
-            git.checkout("-B", self.manifest.branch)
             if self.manifest.ref:
                 to_reset = self.manifest.ref
                 git.reset("--hard", to_reset)

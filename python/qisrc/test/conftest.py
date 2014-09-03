@@ -166,7 +166,8 @@ class TestGitServer(object):
         if allow_empty:
             commit_args.append("--allow-empty")
         git.commit(*commit_args)
-        git.checkout("--force", "-B", self.manifest_branch)
+        if git.get_current_branch() != self.manifest_branch:
+            git.checkout("--force", "-B", self.manifest_branch)
         git.push("origin", "%s:%s" % (self.manifest_branch, self.manifest_branch))
 
     def remove_repo(self, project):
@@ -212,7 +213,8 @@ class TestGitServer(object):
         src = project.replace(".git", "")
         repo_src = self.src.join(src)
         git = qisrc.git.Git(repo_src.strpath)
-        git.checkout("--force", "-B", branch)
+        if git.get_current_branch() != branch:
+            git.checkout("--force", "-B", branch)
         if not fast_forward:
             git.reset("--hard", "HEAD~1")
         to_write = repo_src.join(filename)
@@ -248,10 +250,11 @@ class TestGit(qisrc.git.Git):
         if rc == 0:
             return
         self.init()
-        self.checkout("-b", branch)
         self.root.join(".gitignore").write("")
         self.add(".gitignore")
         self.commit("--message", "initial commit")
+        if branch != "master":
+            self.checkout("-b", branch)
 
     def read_file(self, path):
         """ Read the contents of a file """
