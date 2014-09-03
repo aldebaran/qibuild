@@ -13,6 +13,7 @@
 import sys
 import os
 import datetime
+import difflib
 import functools
 
 # Try using pyreadline so that we can
@@ -292,3 +293,15 @@ class timer:
         as_str = "%sh %sm %ss %dms" % (hours, minutes, seconds, elapsed_time.microseconds / 1000)
         if CONFIG['timestamp']:
             info("%s took %s" % (self.description, as_str))
+
+
+def did_you_mean(message, user_input, choices):
+    if not choices:
+        return message
+    else:
+        result = {difflib.SequenceMatcher(a=user_input, b=choice).ratio(): choice \
+                  for choice in choices}
+        message += "\nDid you mean: %s?" % result[max(result)]
+        return message
+
+

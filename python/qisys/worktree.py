@@ -153,13 +153,8 @@ This path does not exist
         if not self.has_project(src):
             if not raises:
                 return None
-            result = {difflib.SequenceMatcher(a=src, b=x.src).ratio(): x.src for x in self.projects}
-            if not result:
-                mess = "There is no project in this work-tree."
-                raise WorkTreeError(mess)
-            project = result[max(result)]
-            mess  = "No project in '%s'\n" % src
-            mess += "Did you mean: %s?" % project
+            mess  = ui.did_you_mean("No project in '%s'\n" % src,
+                                    src, [x.src for x in self.projects])
             raise WorkTreeError(mess)
         match = (p for p in self.projects if p.src == src)
         return match.next()
