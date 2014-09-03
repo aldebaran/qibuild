@@ -114,6 +114,8 @@ def get_projects(worktree, args):
 def get_one_project(worktree, args):
     parser = WorkTreeProjectParser(worktree)
     projects = parser.parse_args(args)
+    if projects is None:
+        raise Exception("No project found")
     if not len(projects) == 1:
         raise Exception("This action can only work with one project")
     return projects[0]
