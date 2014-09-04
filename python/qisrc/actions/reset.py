@@ -34,9 +34,6 @@ def do(args):
     """Main entry points."""
 
     git_worktree = qisrc.parsers.get_git_worktree(args)
-    git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
-                                                  default_all=True,
-                                                  use_build_deps=True)
     snapshot = None
     if args.snapshot:
         snapshot = qisrc.snapshot.Snapshot()
@@ -45,6 +42,9 @@ def do(args):
     if snapshot and snapshot.format_version and snapshot.format_version >= 1:
         reset_manifest(git_worktree, snapshot, groups=args.groups)
 
+    git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
+                                                  default_all=True,
+                                                  use_build_deps=True)
     errors = list()
     for i, git_project in enumerate(git_projects):
         ui.info_count(i, len(git_projects), "Reset", git_project.src)
