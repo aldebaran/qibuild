@@ -5,8 +5,10 @@
 """ Collection of parser fonctions for qitests actions
 """
 
+import copy
 import os
 
+from qisys import ui
 import qisys.parsers
 import qibuild.parsers
 import qitest.project
@@ -29,16 +31,23 @@ def test_parser(parser, with_num_jobs=True):
     group.add_argument("--ncpu", dest="num_cpus", default=-1, type=int,
                         help="set number of CPU each test is allowed to use (linux)")
     group.add_argument("--nightly", action="store_true", dest="nightly")
-    group.add_argument("--qitest-json", dest="qitest_json")
+    group.add_argument("--qitest-json", dest="qitest_jsons", action="append")
     parser.set_defaults(nightly=False)
     if with_num_jobs:
         group.add_argument("-j", dest="num_jobs", default=1, type=int,
                             help="Number of tests to run in parallel")
     return group
 
-def get_test_runner(args):
+def get_test_runner(args, project_name=None, qitest_json=None):
+    project_names = args.projects or list()
+    if project_name:
+        project_names = [project_name]
+    else:
+        project_names = args.projects
+
     test_project = None
-    qitest_json = vars(args).get("qitest_json")
+    if not qitest_json:
+        qitest_json = vars(args).get("qitest_json")
     if not qitest_json:
         candidate = os.path.join(os.getcwd(), "qitest.json")
         if os.path.exists(candidate):
@@ -49,15 +58,14 @@ def get_test_runner(args):
         try:
             build_worktree = qibuild.parsers.get_build_worktree(args)
 
-            build_project = qibuild.parsers.get_one_build_project(build_worktree, args)
+            new_args = copy.deepcopy(args)
+            new_args.projects = project_names
+            build_project = qibuild.parsers.get_one_build_project(build_worktree, new_args)
             test_project = build_project.to_test_project()
             build_project = True
         except:
-            raise Exception(""" \
-Could not find a `qitest.json` in the current working directory, nor
-a qibuild CMake project.
-Please go to the root of a sdk directory or into a qibuild project.
-""")
+            ui.error("Error when parsing arguments")
+            raise
 
     if args.coverage and not build_project:
         raise Exception("""\
@@ -77,3 +85,17 @@ Please go to the root of a sdk directory or into a qibuild project.
     test_runner.nightly = args.nightly
 
     return test_runner
+
+def get_test_runners(args):
+    res = list()
+    qitest_jsons = args.qitest_jsons or list()
+    project_names = args.projects or list()
+    if not qitest_jsons and not project_names:
+        return [get_test_runner(args)]
+
+    for qitest_json in qitest_jsons:
+        res.append(get_test_runner(args, qitest_json=qitest_json))
+    for project_name in project_names:
+        res.append(get_test_runner(args, project_name=project_name))
+
+    return res

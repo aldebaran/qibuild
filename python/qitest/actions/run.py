@@ -25,11 +25,14 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    test_runner = qitest.parsers.get_test_runner(args)
-    res = test_runner.run()
-    if args.coverage:
-        build_worktree = qibuild.parsers.get_build_worktree(args)
-        build_project = qibuild.parsers.get_one_build_project(build_worktree, args)
-        qibuild.gcov.generate_coverage_xml_report(build_project)
-    if not res:
+    test_runners = qitest.parsers.get_test_runners(args)
+    global_res = True
+    for test_runner in test_runners:
+        res = test_runner.run()
+        if args.coverage:
+            build_worktree = qibuild.parsers.get_build_worktree(args)
+            build_project = qibuild.parsers.get_one_build_project(build_worktree, args)
+            qibuild.gcov.generate_coverage_xml_report(build_project)
+        global_res = global_res and res
+    if not global_res:
         sys.exit(1)

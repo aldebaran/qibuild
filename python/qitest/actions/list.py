@@ -15,6 +15,8 @@ def configure_parser(parser):
     qisys.parsers.build_parser(parser, include_worktree_parser=False)
 
 def do(args):
-    test_runner = qitest.parsers.get_test_runner(args)
-    for i, test in enumerate(test_runner.tests):
-        ui.info_count(i, len(test_runner.tests), test["name"])
+    test_runners = qitest.parsers.get_test_runners(args)
+    for test_runner in test_runners:
+        ui.info("Tests in ", test_runner.project.sdk_directory)
+        for i, test in enumerate(test_runner.tests):
+            ui.info_count(i, len(test_runner.tests), test["name"])
