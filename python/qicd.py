@@ -32,12 +32,23 @@ def find_best_match(worktree, token):
     are no '/' in token, else, the shortest src matching the token
 
     """
-    possibilities = [x.src for x in worktree.projects]
-    matches = difflib.get_close_matches(token, possibilities, cutoff=0)
-    if matches:
-        closest_src =  matches[0]
-        return worktree.get_project(closest_src).path
-    return None
+    project_scores = dict()
+    for project in worktree.projects:
+        if "/" in token:
+            to_match = project.src
+        else:
+            to_match = os.path.basename(project.src)
+        sequence_matcher = difflib.SequenceMatcher(a=token, b=to_match)
+        project_scores[project] = sequence_matcher.ratio()
+
+    max_score = 0
+    best_project = None
+    for project, score in project_scores.iteritems():
+        if score > max_score:
+            best_project = project
+            max_score = score
+    if best_project:
+        return best_project.path
 
 
 if __name__ == "__main__":
