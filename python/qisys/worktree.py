@@ -17,6 +17,7 @@ import qisys.project
 import qisys.command
 import qisys.sh
 import qisys.qixml
+from qisys import ui
 
 import qibuild.config
 
