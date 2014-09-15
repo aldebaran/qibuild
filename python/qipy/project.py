@@ -28,6 +28,10 @@ class PythonProject(object):
     def install(self, dest):
         if self.setup_with_distutils:
             python = self.worktree.python
+            if not os.path.exists(python):
+                mess = "Python executable not found in virtualenv\n"
+                mess += "Try running `qipy bootstrap`"
+                raise Exception(mess)
             cmd = [python, "setup.py", "install", "--root", dest, "--prefix=."]
             qisys.command.call(cmd, cwd=self.path)
             return
