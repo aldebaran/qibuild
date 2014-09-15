@@ -119,4 +119,9 @@ def new_python_project(worktree, project):
         package = qipy.project.Package(name, src)
         python_project.packages.append(package)
 
+    setup_elem = qipython_elem.find("setup")
+    if setup_elem is not None:
+        python_project.setup_with_distutils = \
+            qisys.qixml.parse_bool_attr(setup_elem, "with_distutils")
+
     return python_project

@@ -88,5 +88,9 @@ def handle_pure_python(venv_path, python_worktree):
     with open(qi_pth_dest, "w") as fp:
         fp.write("")
         for project in python_worktree.python_projects:
-            for path in project.python_path:
-                fp.write(path + "\n")
+            if project.setup_with_distutils:
+                cmd = [python_worktree.pip, "install", "--editable", "."]
+                qisys.command.call(cmd, cwd=project.path)
+            else:
+                for path in project.python_path:
+                    fp.write(path + "\n")

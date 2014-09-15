@@ -11,7 +11,7 @@ class PythonProject(object):
         self.scripts = list()
         self.modules = list()
         self.packages = list()
-        self.data = list()
+        self.setup_with_distutils = False
         self.package_dir = None
 
     @property
@@ -26,6 +26,12 @@ class PythonProject(object):
         return res
 
     def install(self, dest):
+        if self.setup_with_distutils:
+            python = self.worktree.python
+            cmd = [python, "setup.py", "install", "--root", dest, "--prefix=."]
+            qisys.command.call(cmd, cwd=self.path)
+            return
+
         for script in self.scripts:
             script_dest = os.path.join(dest, "bin")
             qisys.sh.mkdir(script_dest, recursive=True)
