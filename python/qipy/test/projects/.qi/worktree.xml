@@ -4,4 +4,5 @@
   <project src="c_swig" />
   <project src="../../../.." />
   <project src="big_project" />
+  <project src="with_distutils" />
 </worktree>
