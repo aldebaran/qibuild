@@ -144,7 +144,8 @@ class PMLBuilder(object):
                                                            components=["runtime"])
             else:
                 builder.install(destination)
-        # Also use file from pml_extra_files
+
+        # Also install self.pml_extra_files
         if self.pml_extra_files:
             ui.info(ui.bold, "-> Adding extra files ...")
         for src in self.pml_extra_files:
@@ -155,11 +156,6 @@ class PMLBuilder(object):
 
     def deploy(self, url):
         qisys.remote.deploy(self.stage_path, url)
-
-    def deploy_package(self, url):
-        package = self.make_package(output=None)
-        # waiting for qiys.remote.deploy_file
-        # qisys.remote.deploy_file(package)
 
     def make_package(self, output=None, with_breakpad=False):
         # Make sure self.stage_path exists and is empty
