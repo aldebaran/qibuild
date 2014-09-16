@@ -157,3 +157,19 @@ def test_install_test_libs(qibuild_action, tmpdir):
     installme.configure()
     installme.build()
     installme.install(dest.strpath, components=["runtime", "test"])
+
+def test_json_merge_tests(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("testme")
+    qibuild_action.add_test_project("world")
+    qibuild_action.add_test_project("hello")
+    qibuild_action("configure", "--all")
+    qibuild_action("make", "--all")
+    dest = tmpdir.join("dest")
+    qibuild_action("install", "--all", "--with-tests", dest.strpath)
+    # tests from both hello and testme should be in the generated
+    # json file
+    qitest_json = dest.join("qitest.json")
+    tests = qitest.conf.parse_tests(qitest_json.strpath)
+    test_names = [x["name"] for x in tests]
+    assert "zero_test" in test_names
+    assert "ok" in test_names
