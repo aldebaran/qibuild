@@ -1,3 +1,5 @@
+import os
+
 import qitest.parsers
 
 def test_nothing_specified_json_in_cwd(args, tmpdir, monkeypatch):
@@ -42,3 +44,12 @@ def test_several_qitest_json(args, tmpdir, monkeypatch):
     json2.write("[]")
     args.qitest_jsons = [json1.strpath, json2.strpath]
     qitest.parsers.get_test_runners(args)
+
+def test_qitest_json_from_worktree(args, build_worktree, monkeypatch):
+    testme_proj = build_worktree.add_test_project("testme")
+    testme_proj.configure()
+    monkeypatch.chdir(testme_proj.path)
+    qitest_json = os.path.join(testme_proj.sdk_directory, "qitest.json")
+    args.qitest_jsons = [qitest_json]
+    test_runner = qitest.parsers.get_test_runner(args)
+    assert test_runner.cwd == testme_proj.sdk_directory

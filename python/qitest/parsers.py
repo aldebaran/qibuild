@@ -46,6 +46,7 @@ def get_test_runner(args, project_name=None, qitest_json=None):
         project_names = args.projects
 
     test_project = None
+    build_project = None
     if not qitest_json:
         qitest_json = vars(args).get("qitest_json")
     if not qitest_json:
@@ -62,7 +63,6 @@ def get_test_runner(args, project_name=None, qitest_json=None):
             new_args.projects = project_names
             build_project = qibuild.parsers.get_one_build_project(build_worktree, new_args)
             test_project = build_project.to_test_project()
-            build_project = True
         except:
             ui.error("Error when parsing arguments")
             raise
@@ -72,8 +72,11 @@ def get_test_runner(args, project_name=None, qitest_json=None):
 --coverage can only be used from a qibuild CMake project
 """)
 
-
     test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
+    if build_project:
+        test_runner.cwd = build_project.sdk_directory
+    else:
+        test_runner.cwd = os.path.dirname(qitest_json)
 
     test_runner.pattern = args.pattern
     test_runner.perf = args.perf
