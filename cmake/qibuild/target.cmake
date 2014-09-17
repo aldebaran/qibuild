@@ -106,9 +106,11 @@ function(qi_create_bin name)
   endif()
 
   set_target_properties("${name}" PROPERTIES
-      RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${_runtime_out}"
-      RUNTIME_OUTPUT_DIRECTORY_RELEASE "${_runtime_out}"
-      RUNTIME_OUTPUT_DIRECTORY         "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY_DEBUG          "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY_RELEASE        "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY                "${_runtime_out}"
   )
 
   if(UNIX AND NOT APPLE)
@@ -287,15 +289,21 @@ function(qi_create_lib name)
   endif()
 
   set_target_properties("${name}" PROPERTIES
-      RUNTIME_OUTPUT_DIRECTORY_DEBUG    "${_runtime_out}"
-      RUNTIME_OUTPUT_DIRECTORY_RELEASE  "${_runtime_out}"
-      RUNTIME_OUTPUT_DIRECTORY          "${_runtime_out}"
-      LIBRARY_OUTPUT_DIRECTORY_DEBUG    "${_lib_out}"
-      LIBRARY_OUTPUT_DIRECTORY_RELEASE  "${_lib_out}"
-      LIBRARY_OUTPUT_DIRECTORY          "${_lib_out}"
-      ARCHIVE_OUTPUT_DIRECTORY_DEBUG    "${_lib_out}"
-      ARCHIVE_OUTPUT_DIRECTORY_RELEASE  "${_lib_out}"
-      ARCHIVE_OUTPUT_DIRECTORY          "${_lib_out}"
+      RUNTIME_OUTPUT_DIRECTORY_DEBUG          "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY_RELEASE        "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     "${_runtime_out}"
+      RUNTIME_OUTPUT_DIRECTORY                "${_runtime_out}"
+      LIBRARY_OUTPUT_DIRECTORY_DEBUG          "${_lib_out}"
+      LIBRARY_OUTPUT_DIRECTORY_RELEASE        "${_lib_out}"
+      LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_lib_out}"
+      LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL     "${_lib_out}"
+      LIBRARY_OUTPUT_DIRECTORY                "${_lib_out}"
+      ARCHIVE_OUTPUT_DIRECTORY_DEBUG          "${_lib_out}"
+      ARCHIVE_OUTPUT_DIRECTORY_RELEASE        "${_lib_out}"
+      ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_lib_out}"
+      ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL     "${_lib_out}"
+      ARCHIVE_OUTPUT_DIRECTORY                "${_lib_out}"
   )
 
   #make install rules
