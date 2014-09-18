@@ -160,6 +160,11 @@ class CMakeBuilder(AbstractBuilder):
             files = package.install(real_dest, runtime=runtime_only)
             installed.extend(files)
 
+        # Remove qitest.json so that we don't append tests twice
+        # when running qibuild install --with-tests twice
+        qitest_json = os.path.join(dest_dir, "qitest.json")
+        qisys.sh.rm(qitest_json)
+
         if projects:
             print
             ui.info(ui.green, ":: ", "Installing projects")

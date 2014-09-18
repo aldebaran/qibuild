@@ -173,3 +173,17 @@ def test_json_merge_tests(qibuild_action, tmpdir):
     test_names = [x["name"] for x in tests]
     assert "zero_test" in test_names
     assert "ok" in test_names
+
+def test_do_not_write_tests_twice(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("testme")
+    qibuild_action("configure", "--all")
+    qibuild_action("make", "--all")
+    dest = tmpdir.join("dest")
+    qitest_json = dest.join("qitest.json")
+    qibuild_action("install", "--all", "--with-tests", dest.strpath)
+    tests = qitest.conf.parse_tests(qitest_json.strpath)
+    first = len(tests)
+    qibuild_action("install", "--all", "--with-tests", dest.strpath)
+    tests = qitest.conf.parse_tests(qitest_json.strpath)
+    second = len(tests)
+    assert first == second
