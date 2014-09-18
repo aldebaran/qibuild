@@ -476,3 +476,27 @@ def test_worktree_paths(tmpdir):
     qibuild_cfg.read(global_xml.strpath)
     assert "/path/to/a" in qibuild_cfg.worktrees
     assert "/path/to/b" in qibuild_cfg.worktrees
+
+def test_do_not_leak_default_config(tmpdir):
+    global_xml = tmpdir.join("global.xml")
+    global_xml.write("""
+<qibuild>
+  <config name="system-qt">
+    <env path="/opt/qt/bin" bat_file="/path/to/foo.bat" ide="qtcreator"/>
+  </config>
+  <config name="no-qt" />
+</qibuild>
+""")
+    local_xml = tmpdir.join("local.xml")
+    local_xml.write("""
+<qibuild>
+  <defaults config="system-qt" />
+</qibuild>
+""")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(global_xml.strpath)
+    qibuild_cfg.read_local_config(local_xml.strpath)
+    qibuild_cfg.set_active_config("no-qt")
+    assert qibuild_cfg.env.path is None
+    assert qibuild_cfg.env.bat_file is None
+    assert qibuild_cfg.ide is None
