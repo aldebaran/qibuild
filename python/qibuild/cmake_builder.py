@@ -78,7 +78,7 @@ class CMakeBuilder(AbstractBuilder):
         every project
 
         """
-        projects = self.deps_solver.get_dep_projects(self.projects, ["build", "runtime"])
+        projects = self.deps_solver.get_dep_projects(self.projects, ["build", "runtime", "test"])
         # subtle diffs here: dependencies.cmake must be written for *all* projects,
         # with the build dependencies
         for project in projects:
