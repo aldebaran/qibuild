@@ -327,9 +327,19 @@ class LocalManifest(object):
     def __init__(self):
         self.url = None
         self.branch = "master"
-        self.groups = list()
+        self._groups = list()
         self.ref = None # used for snaphots or in case you
                         # don't want the head of a branch
+
+    @property
+    def groups(self):
+        return self._groups
+
+    @groups.setter
+    def groups(self, groups):
+        if groups is None:
+            groups = list()
+        self._groups = sorted(groups)
 
     def __eq__(self, other):
         if not isinstance(other, LocalManifest):
