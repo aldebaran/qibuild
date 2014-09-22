@@ -332,6 +332,8 @@ class LocalManifest(object):
                         # don't want the head of a branch
 
     def __eq__(self, other):
+        if not isinstance(other, LocalManifest):
+            return False
         return self.url == other.url and \
                self.groups == other.groups and \
                self.ref == other.ref and \
