@@ -22,7 +22,9 @@ import qitest.project
 
 def read_install_manifest(filepath, rootdir):
     with open(filepath, "r") as f:
-        return [filename.strip() for filename in f.readlines()]
+        res = [filename.strip() for filename in f.readlines()]
+        res = [os.path.normpath(x) for x in res]
+        return res
 
 def write_qi_path_conf(sdk_directory, sdk_dirs):
     """ Write the <build>/sdk/share/qi/path.conf file. This file
