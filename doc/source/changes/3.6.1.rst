@@ -1,0 +1,30 @@
+v3.6.1
+======
+
+CMake
+------
+
+* ``qi_generate_qt_conf``: fix for Mac
+* ``qt-tools``: do not call ``find_package(Qt4)``
+* modules:
+
+  * add ``tbb``
+  * add ``opencv2_ocl``
+
+qibuild
+-------
+
+* Fix ``qibuild configure`` in some corner cases
+
+    We used to only write the dependencies.cmake file only for build
+    and runtime depends, causing `qibuild configure` to fail when
+    using test time dependencies
+
+qisrc
+-----
+
+* qisrc reset: bug fix when using groups
+
+    Previously we were building the list of git
+    projects *before* having updated the manifest,
+    causing some projects to not be reset at all.

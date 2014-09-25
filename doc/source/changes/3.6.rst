@@ -76,11 +76,6 @@ qitoolchain
 
 * Add ``qibuild gen-cmake-module``
 
-qipy
-----
-
-* ``qipy list``: display project paths too
-
 CMake
 -----
 
