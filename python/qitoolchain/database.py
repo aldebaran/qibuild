@@ -84,11 +84,24 @@ class DataBase(object):
 
     def handle_package(self, package, feed):
         if package.url:
-            self.download_package(package)
+            if package.url.startswith("svn://"):
+                self.handle_svn_package(package)
+            else:
+                self.download_package(package)
         if package.directory:
             self.handle_local_package(package, feed)
         if package.toolchain_file:
             self.handle_toochain_file(package, feed)
+
+    def handle_svn_package(self, package):
+        dest = os.path.join(self.packages_path, package.name)
+        if os.path.exists(dest):
+            cmd = ["svn", "update"]
+            qisys.command.call(cmd, cwd=dest)
+        else:
+            cmd = ["svn", "checkout", package.url, package.name]
+            qisys.command.call(cmd, cwd=self.packages_path)
+        package.path = dest
 
     def handle_local_package(self, package, feed):
         directory = package.directory
