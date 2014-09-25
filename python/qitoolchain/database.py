@@ -95,11 +95,12 @@ class DataBase(object):
 
     def handle_svn_package(self, package):
         dest = os.path.join(self.packages_path, package.name)
-        revison = package.svn_revision
+        revision = package.version
         if os.path.exists(dest):
             cmd = ["svn", "update", "--revision", revision]
             qisys.command.call(cmd, cwd=dest)
         else:
+            qisys.sh.mkdir(self.packages_path, recursive=True)
             cmd = ["svn", "checkout", "--revision", revision, package.url, package.name]
             qisys.command.call(cmd, cwd=self.packages_path)
         package.path = dest
