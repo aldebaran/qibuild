@@ -1,4 +1,5 @@
 import os
+import re
 import zipfile
 
 from qisys.qixml import etree
@@ -37,7 +38,12 @@ class QiPackage(object):
             filter_fun = qisys.sh.is_runtime
         else:
             def filter_fun(src):
-                return "/" + src not in mask
+                src = qisys.sh.to_posix_path(src)
+                src = "/" + src
+                for regex in mask:
+                    match = re.match(regex, src)
+                    return not match
+
         return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
 
     def __repr__(self):

@@ -51,3 +51,17 @@ def test_reads_release_mask(tmpdir):
     package.install(dest.strpath, release=True, runtime=True)
     assert dest.join("lib", "QtCore4.lib").check(file=True)
     assert not dest.join("lib", "QtCored4.lib").check(file=True)
+
+def test_regexp_mask(tmpdir):
+    boost_path = tmpdir.mkdir("boost")
+    boost_path.ensure("include", "boost", "version.hpp", file=True)
+    boost_path.ensure("lib", "libboost_filesystem.so", file=True)
+    runtime_mask = boost_path.join("runtime.mask")
+    runtime_mask.write("""\
+/include/.*
+""")
+    package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
+    dest = tmpdir.join("dest")
+    package.install(dest.strpath, runtime=True)
+    assert not dest.join("include", "boost", "version.hpp").check(file=True)
+    assert dest.join("lib", "libboost_filesystem.so").check(file=True)
