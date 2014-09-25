@@ -57,6 +57,9 @@ class Toolchain(object):
         self.db.remove_package(name)
         self.db.save()
 
+    def solve_deps(self, packages, dep_types=None):
+        return self.db.solve_deps(packages, dep_types=dep_types)
+
     def get_package(self, name, raises=True):
         return self.db.get_package(name, raises=raises)
 

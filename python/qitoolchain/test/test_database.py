@@ -66,3 +66,12 @@ def test_downgrading_package(toolchain_db, feed):
     feed.add_package(old_boost_package)
     toolchain_db.update(feed.url)
     assert toolchain_db.packages["boost"] == old_boost_package
+
+def test_solve_deps(toolchain_db):
+    bar_package = qitoolchain.qipackage.QiPackage("bar")
+    foo_package = qitoolchain.qipackage.QiPackage("foo")
+    foo_package.build_depends = ["bar"]
+    toolchain_db.add_package(bar_package)
+    toolchain_db.add_package(foo_package)
+    res = toolchain_db.solve_deps([foo_package], dep_types=["build"])
+    assert res == [bar_package, foo_package]

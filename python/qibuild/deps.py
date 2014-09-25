@@ -47,7 +47,7 @@ class DepsSolver(object):
             if dep_package:
                 if dep_package.name not in build_project_names:
                     dep_packages.append(dep_package)
-        return dep_packages
+        return toolchain.solve_deps(dep_packages, dep_types=dep_types)
 
     def get_sdk_dirs(self, project, dep_types):
         """ Get the list of build/sdk dirs on which the project depends
