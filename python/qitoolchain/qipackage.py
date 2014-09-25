@@ -55,7 +55,7 @@ class QiPackage(object):
         else:
             res = self.name
         if self.path:
-            res += "in %s" % self.path
+            res += " in %s" % self.path
         return res
 
     def __cmp__(self, other):
