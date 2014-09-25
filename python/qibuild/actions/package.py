@@ -31,7 +31,7 @@ def do(args):
     archive_name = project.name
     version = project.version
     if not version:
-        version = "0.1"
+        project.version = "0.1"
 
     archive_name += "-" + version
 
@@ -47,21 +47,8 @@ def do(args):
     _do_package(cmake_builder, destdir, build_type=build_type)
 
     package_xml_path = os.path.join(destdir, "package.xml")
-    package_xml_root = etree.Element("package")
-    package_xml_tree = etree.ElementTree(package_xml_root)
-    package_xml_root.set("name", project.name)
-    package_xml_root.set("version", version)
-    build_dep_elem = etree.SubElement(package_xml_root, tag="depends")
-    build_dep_elem.set("buildtime", "true")
-    build_dep_elem.set("names", " ".join(project.build_depends))
-    runtime_dep_elem = etree.SubElement(package_xml_root, tag="depends")
-    runtime_dep_elem.set("runtime", "true")
-    runtime_dep_elem.set("names", " ".join(project.run_depends))
-    test_dep_elem = etree.SubElement(package_xml_root, tag="depends")
-    test_dep_elem.set("testtime", "true")
-    test_dep_elem.set("names", " ".join(project.test_depends))
+    project.gen_package_xml(package_xml_path)
 
-    qisys.qixml.write(package_xml_tree, package_xml_path)
     ui.info(ui.blue, "::", ui.reset, ui.bold, "Compressing package ...")
     archive = qisys.archive.compress(destdir,
                                      algo="zip", quiet=True, flat=True,

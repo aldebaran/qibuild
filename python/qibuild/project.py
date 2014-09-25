@@ -4,6 +4,7 @@ import os
 import platform
 import re
 import sys
+from xml.etree import ElementTree as etree
 
 from qisys import ui
 import qisys.command
@@ -55,6 +56,7 @@ class BuildProject(object):
         self.path = worktree_project.path
         self.src = worktree_project.src
         self.name = None
+        self.version = None
         # depends is a set at this point because they are not sorted yet
         self.build_depends = set()
         self.run_depends = set()
@@ -511,6 +513,22 @@ The following tools were not found: {missing}\
         for k in ret.keys():
             ret[k] = [os.path.join(self.path, x) for x in ret[k]]
         return ret
+
+    def gen_package_xml(self, output):
+        package_xml_root = etree.Element("package")
+        package_xml_tree = etree.ElementTree(package_xml_root)
+        package_xml_root.set("name", self.name)
+        package_xml_root.set("version", self.version)
+        build_dep_elem = etree.SubElement(package_xml_root, tag="depends")
+        build_dep_elem.set("buildtime", "true")
+        build_dep_elem.set("names", " ".join(self.build_depends))
+        runtime_dep_elem = etree.SubElement(package_xml_root, tag="depends")
+        runtime_dep_elem.set("runtime", "true")
+        runtime_dep_elem.set("names", " ".join(self.run_depends))
+        test_dep_elem = etree.SubElement(package_xml_root, tag="depends")
+        test_dep_elem.set("testtime", "true")
+        test_dep_elem.set("names", " ".join(self.test_depends))
+        qisys.qixml.write(package_xml_tree, output)
 
     def __repr__(self):
         return "<BuildProject %s in %s>" % (self.name, self.src)
