@@ -12,8 +12,8 @@ from qibuild.project       import write_qi_path_conf
 
 class CMakeBuilder(AbstractBuilder):
     """ CMake driver.
-        Allow building multiples cmake projects together.
-        Dependencies can optionally be resolved and be taken into account.
+        Allow building multiple cmake projects together.
+        Dependencies can optionally be resolved and taken into account.
     """
     def __init__(self, build_worktree, projects=list()):
         self.build_worktree = build_worktree
