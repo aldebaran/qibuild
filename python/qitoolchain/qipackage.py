@@ -11,6 +11,7 @@ class QiPackage(object):
         self.version = version
         self.path = path
         self.url = None
+        self.svn_revision = "HEAD"
         self.directory = None
         self.toolchain_file = None
         self.sysroot = None
@@ -76,6 +77,7 @@ def from_xml(element):
     res = QiPackage(name, version)
     res.path = element.get("path")
     res.url = element.get("url")
+    res.svn_revision = element.get("revision")
     res.directory = element.get("directory")
     res.toolchain_file = element.get("toolchain_file")
     res.sysroot = element.get("sysroot")
