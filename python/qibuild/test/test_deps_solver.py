@@ -42,6 +42,16 @@ def test_find_packages_in_toolchain(build_worktree, toolchains):
     deps_solver = DepsSolver(build_worktree)
     assert deps_solver.get_dep_packages([hello], ["build"]) == [world_package]
 
+def test_prefer_sources_over_packages(build_worktree, toolchains):
+    toolchains.create("foo")
+    world_package = toolchains.add_package("foo", "world")
+    world_proj = build_worktree.create_project("world")
+    hello_proj  = build_worktree.create_project("hello", build_depends=["world"])
+    build_worktree.set_active_config("foo")
+    deps_solver = DepsSolver(build_worktree)
+    assert deps_solver.get_dep_projects([hello_proj], ["build"]) == [world_proj, hello_proj]
+    assert not deps_solver.get_dep_packages([hello_proj], ["build"])
+
 def test_compute_sdk_dirs(build_worktree):
     libworld = build_worktree.create_project("libworld")
     hello_plugin = build_worktree.create_project("hello-plugin")

@@ -35,17 +35,18 @@ class DepsSolver(object):
         :return: a list of packages in the build worktree's toolchain
 
         """
-        # TODO: handle package deps too
         sorted_names = self._get_sorted_names(projects, dep_types)
         toolchain = self.build_worktree.toolchain
         if not toolchain:
             return list()
+        build_project_names = [x.name for x in self.build_worktree.build_projects]
 
         dep_packages = list()
         for name in sorted_names:
             dep_package = toolchain.get_package(name, raises=False)
             if dep_package:
-                dep_packages.append(dep_package)
+                if dep_package.name not in build_project_names:
+                    dep_packages.append(dep_package)
         return dep_packages
 
     def get_sdk_dirs(self, project, dep_types):
