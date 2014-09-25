@@ -1,3 +1,4 @@
+import os
 import zipfile
 
 from qisys.qixml import etree
@@ -14,12 +15,30 @@ class QiPackage(object):
         self.sysroot = None
         self.cross_gdb = None
 
-    def install(self, destdir, runtime=True):
+    def install(self, destdir, runtime=True, release=True):
+        mask = list()
         if runtime:
-            return qisys.sh.install(self.path, destdir,
-                                    filter_fun=qisys.sh.is_runtime)
+            mask.extend(self._read_install_mask("runtime"))
+        if release:
+            mask.extend(self._read_install_mask("release"))
+        return self._install_with_mask(destdir, mask, release=release)
+
+    def _read_install_mask(self, mask_name):
+        mask_path = os.path.join(self.path, mask_name + ".mask")
+        if not os.path.exists(mask_path):
+            return list()
+        with open(mask_path, "r") as fp:
+            mask = fp.readlines()
+            mask = [x.strip() for x in mask]
+            return mask
+
+    def _install_with_mask(self, destdir, mask, release=False):
+        if release and not mask:
+            filter_fun = qisys.sh.is_runtime
         else:
-            return qisys.sh.install(self.path, destdir)
+            def filter_fun(src):
+                return "/" + src not in mask
+        return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
 
     def __repr__(self):
         return "<Package %s %s>" % (self.name, self.version)
