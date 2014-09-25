@@ -4,6 +4,7 @@ import zipfile
 
 from qisys.qixml import etree
 import qisys.version
+import qibuild.deps
 
 class QiPackage(object):
     def __init__(self, name, version=None, path=None):
@@ -15,6 +16,9 @@ class QiPackage(object):
         self.toolchain_file = None
         self.sysroot = None
         self.cross_gdb = None
+        self.build_depends = set()
+        self.run_depends = set()
+        self.test_depends = set()
 
     def install(self, destdir, runtime=True, release=True):
         mask = list()
@@ -80,6 +84,7 @@ def from_xml(element):
     res.toolchain_file = element.get("toolchain_file")
     res.sysroot = element.get("sysroot")
     res.cross_gdb = element.get("cross_gdb")
+    qibuild.deps.read_deps_from_xml(res, element)
     return res
 
 def from_archive(archive_path):

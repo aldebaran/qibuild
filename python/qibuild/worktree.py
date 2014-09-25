@@ -6,6 +6,7 @@ import qisys.command
 import qisys.worktree
 import qibuild.build
 import qibuild.build_config
+import qibuild.deps
 import qibuild.project
 
 
@@ -148,25 +149,11 @@ def new_build_project(build_worktree, project):
     if not name:
         return None
 
-
     build_project = qibuild.project.BuildProject(build_worktree, project)
     build_project.name = name
     build_project.version = qibuild_elem.get("version", "0.1")
+    qibuild.deps.read_deps_from_xml(build_project, qibuild_elem)
 
-    depends_trees = qibuild_elem.findall("depends")
-
-    for depends_tree in depends_trees:
-        buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
-        runtime   = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
-        testtime  = qisys.qixml.parse_bool_attr(depends_tree, "testtime")
-        dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
-        for dep_name in dep_names:
-            if buildtime:
-                build_project.build_depends.add(dep_name)
-            if runtime:
-                build_project.run_depends.add(dep_name)
-            if testtime:
-                build_project.test_depends.add(dep_name)
     return build_project
 
 

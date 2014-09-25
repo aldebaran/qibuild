@@ -91,3 +91,20 @@ class DepsSolver(object):
                 deps.update(project.test_depends)
             to_sort[project.name] = deps
         return qisys.sort.topological_sort(to_sort, [x.name for x in projects])
+
+
+def read_deps_from_xml(object, xml_elem):
+    depends_trees = xml_elem.findall("depends")
+
+    for depends_tree in depends_trees:
+        buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
+        runtime   = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
+        testtime  = qisys.qixml.parse_bool_attr(depends_tree, "testtime")
+        dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
+        for dep_name in dep_names:
+            if buildtime:
+                object.build_depends.add(dep_name)
+            if runtime:
+                object.run_depends.add(dep_name)
+            if testtime:
+                object.test_depends.add(dep_name)
