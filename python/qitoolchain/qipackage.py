@@ -5,10 +5,10 @@ from qisys.qixml import etree
 import qisys.version
 
 class QiPackage(object):
-    def __init__(self, name, version):
+    def __init__(self, name, version=None, path=None):
         self.name = name
         self.version = version
-        self.path = None
+        self.path = path
         self.url = None
         self.directory = None
         self.toolchain_file = None
