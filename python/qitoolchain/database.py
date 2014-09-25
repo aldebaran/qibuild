@@ -59,6 +59,24 @@ class DataBase(object):
                 raise Exception("No such package: %s" % name)
         return res
 
+    def solve_deps(self, packages, dep_types=None):
+        to_sort = dict()
+        for package in self.packages.values():
+            deps = set()
+            if "build" in dep_types:
+                deps.update(package.build_depends)
+            if "runtime" in dep_types:
+                deps.update(package.run_depends)
+            if "test" in dep_types:
+                deps.update(package.test_depends)
+            to_sort[package.name] = deps
+        sorted_names = qisys.sort.topological_sort(to_sort, [x.name for x in packages])
+        res = list()
+        for name in sorted_names:
+            if name in self.packages:
+                res.append(self.packages[name])
+        return res
+
     def update(self, feed):
         feed_parser = qitoolchain.feed.ToolchainFeedParser()
         feed_parser.parse(feed)
