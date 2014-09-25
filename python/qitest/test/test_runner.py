@@ -15,6 +15,7 @@ def test_match_patterns(tmpdir):
     qitest.conf.write_tests(tests, qitest_json.strpath)
     test_project = qitest.project.TestProject(qitest_json.strpath)
     test_runner = qitest.runner.TestSuiteRunner(test_project)
+
     test_runner.pattern = "foo"
     assert test_runner.tests == [test_foo, test_foo_bar]
 
@@ -26,6 +27,7 @@ def test_match_patterns(tmpdir):
 
     test_runner.nightly = True
     test_runner.perf = False
+    assert test_runner.tests == [test_foo, test_bar, test_foo_bar, nightly]
 
     test_runner.perf = True
     test_runner.nightly = False

@@ -50,8 +50,11 @@ class TestSuiteRunner(object):
     @property
     def tests(self):
         res = [x for x in self._tests if match_pattern(self.pattern, x["name"])]
+        # Perf tests are run alone
         res = [x for x in res if x.get("perf", False) == self.perf]
-        res = [x for x in res if x.get("nightly", False) == self.nightly]
+        # But nightly tests are run along with the normal tests
+        if not self.nightly:
+            res = [x for x in res if x.get("nightly", False) is False]
         return res
 
 
