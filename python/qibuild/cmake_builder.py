@@ -6,7 +6,7 @@ from qisys import ui
 import qisys.sh
 import qisys.remote
 import qibuild.deploy
-import qibuild.deps_solver
+import qibuild.deps
 from qisys.abstractbuilder import AbstractBuilder
 from qibuild.project       import write_qi_path_conf
 
@@ -18,7 +18,7 @@ class CMakeBuilder(AbstractBuilder):
     def __init__(self, build_worktree, projects=list()):
         self.build_worktree = build_worktree
         self.projects = projects
-        self.deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
+        self.deps_solver = qibuild.deps.DepsSolver(build_worktree)
         self.dep_types = ["build", "runtime"]
 
     def add_project(self, project):
@@ -30,13 +30,13 @@ class CMakeBuilder(AbstractBuilder):
     @property
     def dep_types(self):
         """ The list of dependencies to use """
-        return qibuild.deps_solver.dep_types
+        return self.deps_solver.dep_types
 
     # pylint: disable-msg=E1101
     @dep_types.setter
     # pylint: disable-msg=E0102
     def dep_types(self, value):
-        qibuild.deps_solver.dep_types = value
+        self.deps_solver.dep_types = value
 
     @property
     def build_config(self):
