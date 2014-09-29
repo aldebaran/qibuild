@@ -1,6 +1,7 @@
 import os
 import zipfile
 
+import qisys.command
 import qibuild.worktree
 import qibuild.cmake_builder
 import qipy.worktree
@@ -21,9 +22,17 @@ def test_meta_builder(qipkg_action):
 
     meta_pml_builder.configure()
     meta_pml_builder.build()
-    pkg_path = meta_pml_builder.make_package(with_breakpad=True)
+    dump_syms = qisys.command.find_program("dump_syms")
+    if dump_syms:
+        with_breakpad = True
+    else:
+        with_breakpad = False
+    pkg_path = meta_pml_builder.make_package(with_breakpad=with_breakpad)
     contents = list()
     archive = zipfile.ZipFile(pkg_path)
     for fileinfo in archive.infolist():
         contents.append(fileinfo.filename)
-    assert contents == ['a-0.1.pkg', 'a-0.1-symbols.zip', 'd-0.1.pkg']
+    if with_breakpad:
+        assert contents == ['a-0.1.pkg', 'a-0.1-symbols.zip', 'd-0.1.pkg']
+    else:
+        assert contents == ['a-0.1.pkg', 'd-0.1.pkg']

@@ -1,8 +1,13 @@
 import os
 
+import pytest
+
+import qisys.command
 import qibuild.breakpad
 import qibuild.cmake_builder
 
+@pytest.mark.skipif(not qisys.command.find_program("dump_syms"),
+                    reason="dump_syms not found")
 def test_generate_symbols(build_worktree, tmpdir):
     build_worktree.add_test_project("world")
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
