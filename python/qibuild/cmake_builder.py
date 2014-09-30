@@ -5,6 +5,7 @@ import operator
 from qisys import ui
 import qisys.sh
 import qisys.remote
+import qibuild.deploy
 import qibuild.deps_solver
 from qisys.abstractbuilder import AbstractBuilder
 from qibuild.project       import write_qi_path_conf
