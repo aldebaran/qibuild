@@ -4,11 +4,11 @@ import qisys.interact
 import qisrc.manifest
 
 def rebase_worktree(git_worktree, git_projects, branch=None,
-                    push=False, dry_run=False):
+                    push=False, dry_run=False, verbose=False):
     if not git_projects:
         return
     upstream_projects = git_worktree.get_projects_on_branch(branch)
-    rebased_projects, errors = rebase_projects(git_projects, upstream_projects, branch)
+    rebased_projects, errors = rebase_projects(git_projects, upstream_projects, branch, verbose)
     if errors:
         raise Exception("Failed to rebase some projects")
 
@@ -46,12 +46,12 @@ def push_projects(git_projects, dry_run=False):
             ui.error(out)
 
 
-def rebase_projects(git_projects, upstream_projects, branch):
+def rebase_projects(git_projects, upstream_projects, branch, verbose):
     rebased_projects = list()
     errors = list()
     max_src = max(len(x.src) for x in git_projects)
     for i, git_project in enumerate(git_projects):
-        ui.info_count(i, len(git_projects), git_project.src)
+        ui.info_count(i, len(git_projects), git_project.src, end="\0")
         git = qisrc.git.Git(git_project.path)
         git.fetch()
         if not git_project.default_remote:
@@ -67,23 +67,23 @@ def rebase_projects(git_projects, upstream_projects, branch):
         remote_name = git_project.default_remote.name
         remote_ref = "%s/%s" % (remote_name, remote_branch)
         if git.get_current_branch() != local_branch:
-            ui.info(ui.brown, git_project.src, "[skipped]")
-            ui.info("Not on %s branch" % local_branch)
+            ui.info("\n", ui.brown, git_project.src, "[skipped]")
+            ui.info("Not on %s branch" % local_branch, "\n")
             continue
 
         if not git_project.src in upstream_projects:
-            ui.info(ui.brown, git_project.src, "[skipped]")
-            ui.info("No match for %s on %s branch" % (git_project.src, branch))
+            ui.info("\n", ui.brown, git_project.src, "[skipped]")
+            ui.info("No match for %s on %s branch" % (git_project.src, branch), "\n")
             continue
 
         status = qisrc.git.get_status(git, local_branch, remote_ref)
         if status == "ahead":
-            ui.info(ui.brown, git_project.src, "[skipped]")
-            ui.info("You have local changes not pushed yet")
+            ui.info("\n", ui.brown, git_project.src, "[skipped]")
+            ui.info("You have local changes not pushed yet", "\n")
             continue
         if status == "behind":
-            ui.info(ui.brown, git_project.src, "[skipped]")
-            ui.info("Local branch is not up-to-date")
+            ui.info("\n", ui.brown, git_project.src, "[skipped]")
+            ui.info("Local branch is not up-to-date", "\n")
             continue
 
         upstream_project = upstream_projects[git_project.src]
@@ -92,7 +92,10 @@ def rebase_projects(git_projects, upstream_projects, branch):
 
         status = qisrc.git.get_status(git, local_branch, upstream_ref)
         if status == "no-diff":
-            ui.info("no changes")
+            if verbose:
+                ui.info("\n", "no changes", "\n")
+            else:
+                ui.info("\r" + " ".ljust(ui.get_console_size()[0]), sep="", end="\r")
             continue
         if status == "behind":
             git.merge(upstream_ref)
@@ -103,8 +106,8 @@ def rebase_projects(git_projects, upstream_projects, branch):
             if rc == 0:
                 rebased_projects.append(git_project)
             else:
-                ui.info(ui.red, git_project.src, "  [failed]")
-                ui.info(out)
+                ui.info("\n", ui.red, git_project.src, "  [failed]")
+                ui.info(out, "\n")
                 git.call("rebase", "--abort", raises=False)
                 errors.append(git_project)
                 continue
