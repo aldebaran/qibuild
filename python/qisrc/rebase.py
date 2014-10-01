@@ -54,6 +54,14 @@ def rebase_projects(git_projects, upstream_projects, branch):
         ui.info_count(i, len(git_projects), git_project.src)
         git = qisrc.git.Git(git_project.path)
         git.fetch()
+        if not git_project.default_remote:
+            ui.info("\n", ui.brown, git_project.src, "[skipped]")
+            ui.info("No default remote", "\n")
+            continue
+        if not git_project.default_branch:
+            ui.info("\n", ui.brown, git_project.src, "[skipped]")
+            ui.info("No default branch", "\n")
+            continue
         local_branch = git_project.default_branch.name
         remote_branch = git_project.default_branch.remote_branch
         remote_name = git_project.default_remote.name
