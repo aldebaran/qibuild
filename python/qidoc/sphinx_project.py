@@ -162,7 +162,10 @@ class SphinxProject(qidoc.project.DocProject):
         cmd.extend([self.source_dir, html_dir])
         os.environ["build_type"] = kwargs.get("build_type", "")
         ui.debug("launching:", cmd)
-        rc = sphinx.main(argv=cmd)
+        try:
+            rc = sphinx.main(argv=cmd)
+        except SystemExit as e:
+            rc = e.code
         if rc != 0:
             raise SphinxBuildError(self)
 
