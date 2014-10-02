@@ -358,7 +358,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             ui.debug(mess)
 
         # Hack for http://www.cmake.org/Bug/print_bug_page.php?bug_id=13934
-        if self.using_make:
+        if "Unix Makefiles" in self.cmake_generator:
             self.build(target="preinstall", num_jobs=num_jobs, env=build_env)
         if components:
             for component in components:
