@@ -502,8 +502,7 @@ def to_dos_path(path):
 def to_native_path(path, normcase=True):
     """Return an absolute, native path from a path,
     :param normcase: make sure the path is all lower-case on
-                     case-insensitive filesystems
-
+    case-insensitive filesystems
     """
     path = os.path.expanduser(path)
     if normcase:
