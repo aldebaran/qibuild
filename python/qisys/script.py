@@ -202,7 +202,7 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
         doc_lines = module.__doc__.splitlines()
         epilog = "\n".join(doc_lines[1:])
         if epilog:
-            action_parser.epilog = epilog
+            action_parser.epilog = first_doc_line + "\n" + epilog
 
         action_modules[name] = module
 
