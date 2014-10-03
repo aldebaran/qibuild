@@ -15,20 +15,9 @@ function(boost_flib _prefix)
   clean(${_prefix})
   # Required so that FindBoost.cmake does not try to include this file
   set(Boost_NO_BOOST_CMAKE TRUE)
+  # Use shared libraries everywhere
+  set(Boost_USE_STATIC_LIBS OFF)
   if(MSVC)
-    # boost program option dll does not link:
-    #    main.obj : error LNK2001: unresolved external symbol
-    # "public: static unsigned int const
-    #    boost::program_options::options_description::m_default_line_length"
-    # main.obj : error LNK2001: unresolved external symbol
-    # "class std::basic_string<char,struct std::char_traits<char>,
-    #                          class std::allocator<char> >
-    #        boost::program_options::arg"
-    # http://lists.boost.org/boost-users/2011/07/69515.php
-    set(Boost_USE_STATIC_LIBS ON)
-    qi_persistent_set(${_prefix}_DEFINITIONS  "BOOST_ALL_NO_LIB")
-  else()
-    set(Boost_USE_STATIC_LIBS OFF)
     qi_persistent_set(${_prefix}_DEFINITIONS  "BOOST_ALL_DYN_LINK")
   endif()
 
