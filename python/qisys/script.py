@@ -133,7 +133,7 @@ def main_wrapper(module, args):
     """
     try:
         module.do(args)
-    except BaseException as e:
+    except Exception as e:
         if args.pdb:
             traceback = sys.exc_info()[2]
             print ""
