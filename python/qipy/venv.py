@@ -28,7 +28,9 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         ui.info_count(i, len(python_projects),
                      ui.green, "Configuring", ui.reset, ui.blue, project.src)
         cmd = [pip, "install", "--editable", "."]
-        qisys.command.call(cmd, cwd=project.path)
+        rc = qisys.command.call(cmd, cwd=project.path, ignore_ret_code=True)
+        if rc != 0:
+            ui.warning("Running pip install -e failed for project", project.src)
 
     # Write a qi.pth file containing path to C/C++ extensions
     if build_worktree:
