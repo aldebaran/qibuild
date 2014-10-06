@@ -50,9 +50,10 @@ def rebase_projects(git_projects, upstream_projects, branch, verbose):
     rebased_projects = list()
     errors = list()
     max_src = max(len(x.src) for x in git_projects)
+    eol = "\n" if verbose else ""
     fetch_quiet = False if verbose else True
     for i, git_project in enumerate(git_projects):
-        ui.info_count(i, len(git_projects), git_project.src, end="\0")
+        ui.info_count(i, len(git_projects), git_project.src, end=eol)
         git = qisrc.git.Git(git_project.path)
         git.fetch(quiet=fetch_quiet)
         if not git_project.default_remote:
