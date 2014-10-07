@@ -45,7 +45,10 @@ endfunction()
 # Create a binary that will not be run as a test, but rather used
 # by an other test.
 #
-# The helper can be installed along the proper tests using ``qibuild install --with-tests``
+# The helper can be installed along the proper tests using
+# ``qibuild install --with-tests``
+#
+# Arguments are the same as :cmake:function:`qi_create_bin`
 function(qi_create_test_helper name)
   qi_create_bin(${name} NO_INSTALL ${ARGN})
   if(TARGET ${name})
@@ -54,6 +57,28 @@ function(qi_create_test_helper name)
             COMPONENT "test")
     set_target_properties(${name} PROPERTIES FOLDER tests)
   endif()
+endfunction()
+
+#! Add a test library.
+#
+# The library can be installed along the other tests binaries using
+# ``qibuild install --with-tests``
+#
+# Arguments are the same as :cmake:function:`qi_create_lib`
+function(qi_create_test_lib target_name)
+  qi_create_lib(${target_name} ${ARGN} NO_INSTALL)
+
+  if(WIN32)
+    set(_runtime_output ${QI_SDK_BIN})
+  else()
+    set(_runtime_output ${QI_SDK_LIB})
+  endif()
+
+  install(TARGETS ${target_name}
+    RUNTIME COMPONENT test DESTINATION ${_runtime_output}
+    LIBRARY COMPONENT test DESTINATION ${_runtime_output}
+  )
+
 endfunction()
 
 #! Add a test using an existing binary. Arguments are the same as
@@ -85,17 +110,3 @@ function(qi_create_perf_test name)
   _qi_add_test_internal(${name} ${name} PERF_TEST ${ARGN})
 endfunction()
 
-function(qi_create_test_lib target_name)
-  qi_create_lib(${target_name} ${ARGN} NO_INSTALL)
-
-  if(WIN32)
-    set(_runtime_output ${QI_SDK_BIN})
-  else()
-    set(_runtime_output ${QI_SDK_LIB})
-  endif()
-
-  install(TARGETS ${target_name}
-    RUNTIME COMPONENT test DESTINATION ${_runtime_output}
-    LIBRARY COMPONENT test DESTINATION ${_runtime_output}
-  )
-endfunction()
