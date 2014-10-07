@@ -25,6 +25,7 @@ def do(args):
     for group_elem in groups_elems:
         all_groups.append(group_elem.get("name"))
 
+    all_groups.sort()
     for group in all_groups:
         if group in local_groups:
             ui.info("* ", ui.green, group)
