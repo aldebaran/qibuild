@@ -5,6 +5,7 @@ from qisys.qixml import etree
 import qisys.qixml
 import qitoolchain.feed
 import qitoolchain.qipackage
+import qitoolchain.svn_package
 
 class DataBase(object):
     def __init__(self, name, db_path):
@@ -85,7 +86,14 @@ class DataBase(object):
         local_packages = self.packages.values()
         to_add = list()
         to_remove = list()
-        for remote_package in remote_packages:
+        svn_packages = [x for x in remote_packages
+                            if isinstance(x, qitoolchain.svn_package.SvnPackage)]
+        other_packages = [x for x in remote_packages if x not in svn_packages]
+
+        for svn_package in svn_packages:
+            self.handle_svn_package(svn_package)
+
+        for remote_package in other_packages:
             if remote_package in local_packages:
                 continue
             to_add.append(remote_package)
@@ -103,26 +111,19 @@ class DataBase(object):
 
     def handle_package(self, package, feed):
         if package.url:
-            if package.url.startswith("svn://"):
-                self.handle_svn_package(package)
-            else:
-                self.download_package(package)
+            self.download_package(package)
         if package.directory:
             self.handle_local_package(package, feed)
         if package.toolchain_file:
             self.handle_toochain_file(package, feed)
 
-    def handle_svn_package(self, package):
-        dest = os.path.join(self.packages_path, package.name)
-        revision = package.version
+    def handle_svn_package(self, svn_package):
+        dest = os.path.join(self.packages_path, svn_package.name)
+        svn_package.path = dest
         if os.path.exists(dest):
-            cmd = ["svn", "update", "--revision", revision]
-            qisys.command.call(cmd, cwd=dest)
+            svn_package.checkout()
         else:
-            qisys.sh.mkdir(self.packages_path, recursive=True)
-            cmd = ["svn", "checkout", "--revision", revision, package.url, package.name]
-            qisys.command.call(cmd, cwd=self.packages_path)
-        package.path = dest
+            svn_package.update()
 
     def handle_local_package(self, package, feed):
         directory = package.directory
