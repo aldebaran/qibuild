@@ -1,3 +1,4 @@
+import qisys.sh
 import qitoolchain.qipackage
 import qisrc.svn
 
@@ -8,7 +9,10 @@ class SvnPackage(qitoolchain.qipackage.QiPackage):
         super(SvnPackage, self).__init__(name)
         self.url = None
         self.revision = None
-        self.svn = qisrc.svn.Svn(self.path)
+
+    @property
+    def svn(self):
+        return qisrc.svn.Svn(self.path)
 
     def update(self):
         """ Run ``svn update`` with the appropriate revision """
@@ -19,6 +23,7 @@ class SvnPackage(qitoolchain.qipackage.QiPackage):
 
     def checkout(self):
         """ Run ``svn checkout`` to create the package files """
+        qisys.sh.mkdir(self.path, recursive=True)
         self.svn.call("checkout", self.url, ".")
 
     def commit_all(self):
