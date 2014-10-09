@@ -90,7 +90,9 @@ def handle_pure_python(venv_path, python_worktree):
         for project in python_worktree.python_projects:
             if project.setup_with_distutils:
                 cmd = [python_worktree.pip, "install", "--editable", "."]
-                qisys.command.call(cmd, cwd=project.path)
+                rc = qisys.command.call(cmd, cwd=project.path, ignore_ret_code=True)
+                if rc != 0:
+                    ui.warning("Failed to run pip install on", project.src)
             else:
                 for path in project.python_path:
                     fp.write(path + "\n")
