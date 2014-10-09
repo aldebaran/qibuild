@@ -136,9 +136,13 @@ class DataBase(object):
         dest = os.path.join(self.packages_path, svn_package.name)
         svn_package.path = dest
         if os.path.exists(dest):
-            svn_package.checkout()
-        else:
+            ui.info(ui.green, "Updating",
+                    ui.reset, ui.blue, svn_package.name)
             svn_package.update()
+        else:
+            ui.info(ui.green, "Checkout",
+                    ui.reset, ui.blue, svn_package.name)
+            svn_package.checkout()
 
     def handle_local_package(self, package, feed):
         directory = package.directory
