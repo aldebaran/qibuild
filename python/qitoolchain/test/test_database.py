@@ -67,11 +67,19 @@ def test_downgrading_package(toolchain_db, feed):
     toolchain_db.update(feed.url)
     assert toolchain_db.packages["boost"] == old_boost_package
 
-def test_solve_deps(toolchain_db):
+def test_solve_deps(toolchain_db, tmpdir):
+    bar_path = tmpdir.ensure("bar", dir=True)
+    bar_path.join("package.xml").write("""
+<package name="bar">
+  <depends buildtime="true" names="foo" />
+</package>
+""")
+    foo_path = tmpdir.ensure("foo", dir=True)
     bar_package = qitoolchain.qipackage.QiPackage("bar")
+    bar_package.path = bar_path.strpath
     foo_package = qitoolchain.qipackage.QiPackage("foo")
-    foo_package.build_depends = ["bar"]
+    foo_package.path = foo_path.strpath
     toolchain_db.add_package(bar_package)
     toolchain_db.add_package(foo_package)
-    res = toolchain_db.solve_deps([foo_package], dep_types=["build"])
-    assert res == [bar_package, foo_package]
+    res = toolchain_db.solve_deps([bar_package], dep_types=["build"])
+    assert res == [foo_package, bar_package]

@@ -59,6 +59,7 @@ class TestFeed():
             package.url = base_url + "/packages/%s.zip" % archive_name
         self.db.add_package(package)
         self.db.save()
+        return package
 
     def remove_package(self, name):
         self.db.remove_package(name)

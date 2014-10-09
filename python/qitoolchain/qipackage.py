@@ -141,6 +141,7 @@ def from_xml(element):
         res.revision = element.get("revision")
     else:
         res = QiPackage(name)
+    res.url = url
     res.version = element.get("version")
     res.path = element.get("path")
     res.directory = element.get("directory")
