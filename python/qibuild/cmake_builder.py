@@ -138,6 +138,7 @@ class CMakeBuilder(AbstractBuilder):
         prefix = kwargs.get("prefix", "/")
         prefix = prefix[1:]
         real_dest = os.path.join(dest_dir, prefix)
+        components = kwargs.get("components")
 
         if projects:
             ui.info(ui.green, "the following projects")
@@ -159,7 +160,7 @@ class CMakeBuilder(AbstractBuilder):
             ui.info_count(i, len(packages),
                           ui.green, "Installing",
                           ui.blue, package.name)
-            files = package.install(real_dest, runtime=runtime_only)
+            files = package.install(real_dest, components=components)
             installed.extend(files)
 
         # Remove qitest.json so that we don't append tests twice
