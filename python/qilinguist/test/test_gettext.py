@@ -57,7 +57,8 @@ def test_cplusplus_sdk_workflow(qilinguist_action):
     binary = os.path.join(trad.sdk_directory, "bin", "translate")
     dictPath = os.path.join(trad.path, "po", "share", "locale", "translate")
     env = os.environ.copy()
-    env["LANGUAGE"] = "fr_FR.UTF-8"
+    env["LANGUAGE"] = "fr_FR.UTF-8" # for Ubuntu
+    env["LC_ALL"] = "fr_FR.UTF-8" # for Arch Linux
     cmd = [binary, dictPath]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE, env=env)
@@ -103,7 +104,8 @@ def test_cplusplus_install_workflow(qilinguist_action, tmpdir):
     binary = tmpdir.join("bin", "translate").strpath
     dictPath = tmpdir.join("share", "locale", "translate").strpath
     env = os.environ.copy()
-    env["LANGUAGE"] = "fr_FR.UTF-8"
+    env["LANGUAGE"] = "fr_FR.UTF-8" # for Ubuntu
+    env["LC_ALL"] = "fr_FR.UTF-8" # for Arch Linux
     cmd = [binary, dictPath]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE, env=env)
