@@ -7,6 +7,12 @@ import qisys.version
 import qibuild.deps
 
 class QiPackage(object):
+    """ Binary package for use with qibuild.
+
+    Package names are unique in a given toolchain.
+    path is None until the package is added to a database
+
+    """
     def __init__(self, name, version=None, path=None):
         self.name = name
         self.version = version
@@ -21,12 +27,23 @@ class QiPackage(object):
         self.test_depends = set()
 
     def load_deps(self):
+        """ Parse package.xml, set the dependencies """
         package_xml = os.path.join(self.path, "package.xml")
         if os.path.exists(package_xml):
             xml_root = qisys.qixml.read(package_xml)
             qibuild.deps.read_deps_from_xml(self, xml_root)
 
     def install(self, destdir, components=None, release=True):
+        """ Install the given components of the package to the given destination
+
+        Will read
+
+        * ``install_manifest_<component>.txt`` for each component if the file exists
+        * ``<component>.mask`` to exclude files matching some regex if the mask exists
+        * if none exits, will apply the ``qisys.sh.is_runtime`` filter when
+          installing *runtime* component
+
+        """
         if not components:
             return self._install_all(destdir)
         installed_files = list()

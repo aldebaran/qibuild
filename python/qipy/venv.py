@@ -7,6 +7,12 @@ import qisys.command
 
 def configure_virtualenv(config, python_worktree,  build_worktree=None,
                          remote_packages=None, site_packages=True):
+    """ Main entry point. Called by ``qipy bootstrap``
+
+    :param: remote_packages List of third-party packages to add in the virtualenv
+    :param: site_packages Allow access to global site packages
+
+    """
     ui.info(ui.green, "Configuring virtualenv for", ui.reset, ui.bold, python_worktree.root)
     if not remote_packages:
         remote_packages = list()
@@ -51,6 +57,7 @@ def find_script(venv_path, script_name):
     """ Find a script given its name
 
     First try in the virtualenv, then from $PATH
+
     :return: None if not found
 
     """
@@ -67,7 +74,10 @@ def find_script(venv_path, script_name):
         return res
 
 def handle_extensions(venv_path, python_worktree, build_worktree):
-    """ Check if there is a build project matching the given source """
+    """ Check if there is a build project matching the given source, and
+    add the correct path to the virtualenv
+
+    """
     extensions_projects = list()
     build_projects = build_worktree.build_projects
     for project in python_worktree.python_projects:
@@ -91,6 +101,7 @@ def handle_extensions(venv_path, python_worktree, build_worktree):
         fp.write(to_write)
 
 def handle_pure_python(venv_path, python_worktree):
+    """ Add the paths of all python projects to the virtualenv """
     lib_path = virtualenv.path_locations(venv_path)[1]
     qi_pth_dest = os.path.join(venv_path, lib_path, "site-packages/qi.pth")
     res = True

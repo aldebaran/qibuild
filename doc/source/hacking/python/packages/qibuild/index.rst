@@ -20,3 +20,5 @@ qibuild modules
    test_runner
    wizard
    worktree
+
+

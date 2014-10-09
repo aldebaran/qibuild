@@ -5,6 +5,9 @@ from qisys import ui
 import qisys.qixml
 
 class MetaPackage(object):
+    """ Built with a mpml path. Contains a list of pml paths
+
+    """
     def __init__(self, worktree, mpml_path):
         self.worktree = worktree
         self.mpml = mpml_path

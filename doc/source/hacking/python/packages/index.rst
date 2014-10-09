@@ -11,4 +11,7 @@ qiBuild Python packages documentation
     qibuild/index
     qitest/index
     qitoolchain/index
-
+    qidoc/index
+    qilinguist/index
+    qipy/index
+    qipkg/index

@@ -7,6 +7,8 @@ import qipkg.metapackage
 import qipkg.builder
 
 class MetaPMLBuilder(object):
+    """ Build a meta package from a mpml file """
+
     def __init__(self, worktree, mpml_path):
         ui.info(ui.green, "::", ui.reset, ui.bold,
                 "Reading", mpml_path, "\n")
@@ -20,6 +22,7 @@ class MetaPMLBuilder(object):
             self.pml_builders.append(pml_builder)
 
     def configure(self):
+        """ Configure every project """
         n = len(self.pml_builders)
         for i, pml_builder in enumerate(self.pml_builders):
             ui.info(ui.green, "::", ui.reset, ui.bold, "[%i/%i]" % ((i + 1), n),
@@ -27,6 +30,7 @@ class MetaPMLBuilder(object):
             pml_builder.configure()
 
     def build(self):
+        """ Build every project """
         n = len(self.pml_builders)
         for i, pml_builder in enumerate(self.pml_builders):
             ui.info(ui.green, "::", ui.reset, ui.bold, "[%i/%i]" % ((i + 1), n),
@@ -34,6 +38,7 @@ class MetaPMLBuilder(object):
             pml_builder.build()
 
     def install(self, dest):
+        """ Install every project to the given destination """
         n = len(self.pml_builders)
         for i, pml_builder in enumerate(self.pml_builders):
             ui.info(ui.green, "::", ui.reset, ui.bold, "[%i/%i]" % ((i + 1), n),
@@ -41,6 +46,7 @@ class MetaPMLBuilder(object):
             pml_builder.install(dest)
 
     def deploy(self, url):
+        """ Deploy every project to the given url """
         n = len(self.pml_builders)
         for i, pml_builder in enumerate(self.pml_builders):
             ui.info(ui.green, "::", ui.reset, ui.bold, "[%i/%i]" % ((i + 1), n),
@@ -48,6 +54,12 @@ class MetaPMLBuilder(object):
             pml_builder.deploy(url)
 
     def make_package(self, with_breakpad=False, output=None):
+        """ Generate a package containing every package.
+
+        :param: with_breakpad generate debug symbols for usage
+                               with breakpad
+
+        """
         all_packages = list()
         n = len(self.pml_builders)
         for i, pml_builder in enumerate(self.pml_builders):

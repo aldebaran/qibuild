@@ -17,6 +17,7 @@ import qilinguist.worktree
 import qilinguist.builder
 
 class PMLBuilder(object):
+    """ Build a package from a pml file """
     def __init__(self, worktree, pml_path):
         self.pml_path = pml_path
         self.base_dir = os.path.dirname(self.pml_path)
@@ -123,16 +124,19 @@ class PMLBuilder(object):
             raise Exception(mess)
 
     def configure(self):
+        """ Configure every project """
         for builder in self.builders:
             if isinstance(builder, qibuild.cmake_builder.CMakeBuilder):
                 builder.dep_types=["build", "runtime", "test"]
             builder.configure()
 
     def build(self):
+        """ Build every project """
         for builder in self.builders:
             builder.build()
 
     def install(self, destination):
+        """ Install every project to the given destination """
         # Use every available builder to install
         for builder in self.builders:
             desc = desc_from_builder(builder)
@@ -155,9 +159,16 @@ class PMLBuilder(object):
             qisys.sh.install(full_src, full_dest)
 
     def deploy(self, url):
+        """ Deploy every project to the given url """
         qisys.remote.deploy(self.stage_path, url)
 
     def make_package(self, output=None, with_breakpad=False):
+        """ Generate a package containing every project.
+
+        :param: with_breakpad generate debug symbols for usage
+                               with breakpad
+
+        """
         # Make sure self.stage_path exists and is empty
         qisys.sh.rm(self.stage_path)
         qisys.sh.mkdir(self.stage_path, recursive=True)

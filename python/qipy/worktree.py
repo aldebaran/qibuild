@@ -9,6 +9,7 @@ import qisys.qixml
 import qipy.project
 
 class PythonWorkTree(qisys.worktree.WorkTreeObserver):
+    """ Container for Python projects """
     def __init__(self, worktree, config="system"):
         self.worktree = worktree
         self.python_projects = list()
@@ -17,15 +18,12 @@ class PythonWorkTree(qisys.worktree.WorkTreeObserver):
         worktree.register(self)
 
     def on_project_added(self, project):
-        """ Called when a new project has been registered """
         self._load_python_projects()
 
     def on_project_removed(self, project):
-        """ Called when a project has been removed """
         self._load_python_projects()
 
     def on_project_moved(self, project):
-        """ Called when a project has moved """
         self._load_python_projects()
 
     @property
@@ -53,6 +51,7 @@ Found two projects with the same name. (%s)
             seen_names[new_project.name] = new_project.src
 
     def get_python_project(self, name, raises=False):
+        """ Get a Python project given its name """
         for project in self.python_projects:
             if project.name == name:
                 return project
@@ -64,24 +63,29 @@ Found two projects with the same name. (%s)
             return None
 
     def bin_path(self, name):
+        """ Path to the virtualenv's binaries """
         binaries_path = virtualenv.path_locations(self.venv_path)[-1]
         return os.path.join(binaries_path, name)
 
     @property
     def venv_path(self):
+        """ Path to the virtualenv """
         res = os.path.join(self.worktree.dot_qi, "venvs",
                            self.config)
         return res
 
     @property
     def pip(self):
+        """ Path to the pip binary """
         return self.bin_path("pip")
 
     @property
     def python(self):
+        """ Path to the python executable in the virtualenv """
         return self.bin_path("python")
 
     def activate_this(self):
+        """ Activate this virtualenv """
         activate_this_dot_py = self.bin_path("activate_this.py")
         execfile(activate_this_dot_py, { "__file__" : activate_this_dot_py })
 

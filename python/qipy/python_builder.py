@@ -11,12 +11,7 @@ from qibuild.project import write_qi_path_conf
 
 class PythonBuilder(AbstractBuilder):
     """
-    configure : make sources available for developement
-      (create a virtualenv and run pip install -e .)
-    make : no-op
-    install : just copy the python lib. If there are
-    extensions written in CMake, they will be installed by the
-    CMakeBuilder
+    Managing python projects
 
     """
     def __init__(self, python_worktree, build_worktree=None):
@@ -29,6 +24,10 @@ class PythonBuilder(AbstractBuilder):
         return self.python_worktree.config
 
     def bootstrap(self, remote_packages=None, site_packages=True):
+        """ Configure the virtualenv so that importing any
+        Python module works
+
+        """
         ok = qipy.venv.configure_virtualenv(self.config,
                                        self.python_worktree,
                                        build_worktree=self.build_worktree,
@@ -39,12 +38,19 @@ class PythonBuilder(AbstractBuilder):
         return ok
 
     def configure(self, *args, **kwargs):
+        "no -op"
         pass
 
     def build(self, *args, **kwargs):
+        "no -op"
         pass
 
     def install(self, dest, *args, **kwargs):
+        """ Just copy the Python scripts, modules and packages
+        If there are extensions written in CMake, they will be
+        installed by the CMakeBuilder
+
+        """
         if not self.projects:
             return
         n = len(self.projects)
@@ -67,6 +73,9 @@ exec python "$@"
         os.chmod(python_wrapper, 0755)
 
     def deploy(self, url):
+        """ Deploy scripts, modules and packages to the remote url
+
+        """
         with qisys.sh.TempDir() as tmp:
             self.install(tmp)
             qisys.remote.deploy(tmp, url)

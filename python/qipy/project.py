@@ -3,6 +3,7 @@ import os
 import qisys.sh
 
 class PythonProject(object):
+    """ Collections of scripts, modules and packages """
     def __init__(self, worktree, src, name):
         self.worktree = worktree
         self.src = src
@@ -16,6 +17,7 @@ class PythonProject(object):
 
     @property
     def python_path(self):
+        """ List of path to add to $PYTHONPATH to use this project """
         res = list()
         for module_package in self.modules + self.packages:
             src = module_package.src
@@ -26,6 +28,7 @@ class PythonProject(object):
         return res
 
     def install(self, dest):
+        """ Install scripts, modules and packages to the given destination """
         if self.setup_with_distutils:
             python = self.worktree.python
             if not os.path.exists(python):
