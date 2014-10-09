@@ -30,20 +30,24 @@ def test_reads_runtime_manifest(tmpdir):
 """)
     package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
     dest = tmpdir.join("dest")
-    package.install(dest.strpath, components=["runtime"])
+    installed = package.install(dest.strpath, components=["runtime"])
     assert not dest.join("include", "boost.h").check(file=True)
-    assert dest.join("lib", "libboost.so").check(file=True)
+    libbost_so = dest.join("lib", "libboost.so")
+    assert libbost_so.check(file=True)
+    assert installed == [libbost_so.strpath]
 
-def test_bacwkard_compat_runtime_install(tmpdir):
+def test_backward_compat_runtime_install(tmpdir):
     boost_path = tmpdir.mkdir("boost")
     boost_path.ensure("include", "boost.h", file=True)
     boost_path.ensure("lib", "libboost.so", file=True)
 
     package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
     dest = tmpdir.join("dest")
-    package.install(dest.strpath, components=["runtime"])
+    installed = package.install(dest.strpath, components=["runtime"])
     assert not dest.join("include", "boost.h").check(file=True)
-    assert dest.join("lib", "libboost.so").check(file=True)
+    libbost_so = dest.join("lib", "libboost.so")
+    assert libbost_so.check(file=True)
+    assert installed == [libbost_so.strpath]
 
 def test_reads_release_mask(tmpdir):
     qt_path = tmpdir.mkdir("qt")

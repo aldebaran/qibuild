@@ -28,15 +28,19 @@ class QiPackage(object):
 
     def install(self, destdir, components=None, release=True):
         if not components:
-            self._install_all(destdir)
-            return
+            return self._install_all(destdir)
+        installed_files = list()
         for component in components:
-            self._install_component(component, destdir, release=release)
+            installed_for_component = self._install_component(component,
+                                                              destdir, release=release)
+            installed_files.extend(installed_for_component)
+        return installed_files
 
     def _install_all(self, destdir):
-        qisys.sh.install(self.path, destdir)
+        return qisys.sh.install(self.path, destdir)
 
     def _install_component(self, component, destdir, release=True):
+        installed_files = list()
         manifest_name = "install_manifest_%s.txt" % component
         if not release:
             manifest_name += "install_manifest_%s_debug.txt" % component
@@ -47,12 +51,13 @@ class QiPackage(object):
                 mask.extend(self._read_install_mask("release"))
             if not mask and component=="runtime":
                 # retro-compat
-                qisys.sh.install(self.path, destdir, qisys.sh.is_runtime)
+                return qisys.sh.install(self.path, destdir,
+                                        filter_fun=qisys.sh.is_runtime)
             else:
                 # avoid install masks and package.xml
                 mask.append(".*\.mask")
                 mask.append("package\.xml")
-                self._install_with_mask(destdir, mask)
+                return self._install_with_mask(destdir, mask)
         else:
             with open(manifest_path, "r") as fp:
                 lines = fp.readlines()
@@ -62,6 +67,8 @@ class QiPackage(object):
                     src = os.path.join(self.path, line)
                     dest = os.path.join(destdir, line)
                     qisys.sh.install(src, dest)
+                    installed_files.append(dest)
+            return installed_files
 
 
     def _read_install_mask(self, mask_name):
