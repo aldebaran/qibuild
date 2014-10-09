@@ -8,6 +8,7 @@ import qitoolchain.qipackage
 import qitoolchain.svn_package
 
 class DataBase(object):
+    """ Binary packages storage """
     def __init__(self, name, db_path):
         self.name = name
         self.db_path = db_path
@@ -41,19 +42,31 @@ class DataBase(object):
             root.append(element)
         qisys.qixml.write(tree, self.db_path)
 
+    def remove(self):
+        """ Remove self """
+        qisys.sh.rm(self.packages_path)
+
+    def clean_cache(self):
+        qisys.sh.rm(self.cache_path)
+
+
     def add_package(self, package):
+        """ Add a package to the database """
         self.packages[package.name] = package
 
     def remove_package(self, name):
+        """ Remove a package from a database """
         if name not in self.packages:
             raise Exception("No such package: %s" % name)
         del self.packages[name]
 
     def get_package_path(self, name):
+        """ Get the path to a package given its name """
         if name in self.packages:
             return self.packages[name].path
 
     def get_package(self, name, raises=True):
+        """ Get a package given its name """
         res = self.packages.get(name)
         if res is None:
             if raises:
@@ -61,6 +74,7 @@ class DataBase(object):
         return res
 
     def solve_deps(self, packages, dep_types=None):
+        """ Parse every package.xml, and solve dependencies """
         to_sort = dict()
         for package in self.packages.values():
             package.load_deps()
@@ -80,6 +94,7 @@ class DataBase(object):
         return res
 
     def update(self, feed):
+        """ Update a toolchain given a feed """
         feed_parser = qitoolchain.feed.ToolchainFeedParser()
         feed_parser.parse(feed)
         remote_packages = feed_parser.get_packages()
@@ -146,12 +161,6 @@ class DataBase(object):
             package.sysroot = os.path.join(package.path, package.sysroot)
         if package.cross_gdb:
             package.cross_gdb = os.path.join(package.path, package.cross_gdb)
-
-    def remove(self):
-        qisys.sh.rm(self.packages_path)
-
-    def clean_cache(self):
-        qisys.sh.rm(self.cache_path)
 
     def download_package(self, package):
         archive = qisys.remote.download(package.url, self.cache_path,
