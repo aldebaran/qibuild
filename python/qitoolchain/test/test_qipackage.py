@@ -20,17 +20,28 @@ def test_from_archive(tmpdir):
     assert package.name == "foo"
     assert package.version == "0.1"
 
-def test_reads_runtime_mask(tmpdir):
+def test_reads_runtime_manifest(tmpdir):
     boost_path = tmpdir.mkdir("boost")
     boost_path.ensure("include", "boost.h", file=True)
     boost_path.ensure("lib", "libboost.so", file=True)
-    runtime_mask = boost_path.ensure("runtime.mask", file=True)
-    runtime_mask.write("""\
-/include/boost.h
+    runtime_manifest = boost_path.ensure("install_manifest_runtime.txt", file=True)
+    runtime_manifest.write("""\
+/lib/libboost.so
 """)
     package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
     dest = tmpdir.join("dest")
-    package.install(dest.strpath, runtime=True)
+    package.install(dest.strpath, components=["runtime"])
+    assert not dest.join("include", "boost.h").check(file=True)
+    assert dest.join("lib", "libboost.so").check(file=True)
+
+def test_bacwkard_compat_runtime_install(tmpdir):
+    boost_path = tmpdir.mkdir("boost")
+    boost_path.ensure("include", "boost.h", file=True)
+    boost_path.ensure("lib", "libboost.so", file=True)
+
+    package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
+    dest = tmpdir.join("dest")
+    package.install(dest.strpath, components=["runtime"])
     assert not dest.join("include", "boost.h").check(file=True)
     assert dest.join("lib", "libboost.so").check(file=True)
 
@@ -41,27 +52,32 @@ def test_reads_release_mask(tmpdir):
     qt_path.ensure("lib", "QtCored4.lib", file=True)
     qt_path.ensure("bin", "QtCore4.dll", file=True)
     qt_path.ensure("bin", "QtCored4.dll", file=True)
+    runtime_mask = qt_path.ensure("runtime.mask", file=True)
+    runtime_mask.write("""\
+/include/.*
+/lib/.*\.lib
+""")
     release_mask = qt_path.ensure("release.mask", file=True)
     release_mask.write("""\
-/lib/QtCored4.lib
 /bin/QtCored4.dll
 """)
     package = qitoolchain.qipackage.QiPackage("qt", path=qt_path.strpath)
     dest = tmpdir.join("dest")
-    package.install(dest.strpath, release=True, runtime=True)
-    assert dest.join("lib", "QtCore4.lib").check(file=True)
+    package.install(dest.strpath, release=True, components=["runtime"])
+    assert dest.join("bin", "QtCore4.dll").check(file=True)
     assert not dest.join("lib", "QtCored4.lib").check(file=True)
 
-def test_regexp_mask(tmpdir):
-    boost_path = tmpdir.mkdir("boost")
-    boost_path.ensure("include", "boost", "version.hpp", file=True)
-    boost_path.ensure("lib", "libboost_filesystem.so", file=True)
-    runtime_mask = boost_path.join("runtime.mask")
-    runtime_mask.write("""\
-/include/.*
+
+def test_load_deps(tmpdir):
+    libqi_path = tmpdir.mkdir("libqi")
+    libqi_path.ensure("package.xml").write("""\
+<package name="libqi">
+  <depends testtime="true" names="gtest" />
+  <depends runtime="true" names="boost python" />
+</package>
 """)
-    package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
-    dest = tmpdir.join("dest")
-    package.install(dest.strpath, runtime=True)
-    assert not dest.join("include", "boost", "version.hpp").check(file=True)
-    assert dest.join("lib", "libboost_filesystem.so").check(file=True)
+    package = qitoolchain.qipackage.QiPackage("libqi", path=libqi_path.strpath)
+    package.load_deps()
+    assert package.build_depends == set()
+    assert package.run_depends == set(["boost", "python"])
+    assert package.test_depends == set(["gtest"])

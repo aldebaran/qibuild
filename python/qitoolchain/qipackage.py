@@ -26,13 +26,43 @@ class QiPackage(object):
             xml_root = qisys.qixml.read(package_xml)
             qibuild.deps.read_deps_from_xml(self, xml_root)
 
-    def install(self, destdir, runtime=True, release=True):
-        mask = list()
-        if runtime:
-            mask.extend(self._read_install_mask("runtime"))
-        if release:
-            mask.extend(self._read_install_mask("release"))
-        return self._install_with_mask(destdir, mask, release=release)
+    def install(self, destdir, components=None, release=True):
+        if not components:
+            self._install_all(destdir)
+            return
+        for component in components:
+            self._install_component(component, destdir, release=release)
+
+    def _install_all(self, destdir):
+        qisys.sh.install(self.path, destdir)
+
+    def _install_component(self, component, destdir, release=True):
+        manifest_name = "install_manifest_%s.txt" % component
+        if not release:
+            manifest_name += "install_manifest_%s_debug.txt" % component
+        manifest_path = os.path.join(self.path, manifest_name)
+        if not os.path.exists(manifest_path):
+            mask = self._read_install_mask(component)
+            if release:
+                mask.extend(self._read_install_mask("release"))
+            if not mask and component=="runtime":
+                # retro-compat
+                qisys.sh.install(self.path, destdir, qisys.sh.is_runtime)
+            else:
+                # avoid install masks and package.xml
+                mask.append(".*\.mask")
+                mask.append("package\.xml")
+                self._install_with_mask(destdir, mask)
+        else:
+            with open(manifest_path, "r") as fp:
+                lines = fp.readlines()
+                for line in lines:
+                    line = line.strip()
+                    line = line[1:] # remove leading "/"
+                    src = os.path.join(self.path, line)
+                    dest = os.path.join(destdir, line)
+                    qisys.sh.install(src, dest)
+
 
     def _read_install_mask(self, mask_name):
         mask_path = os.path.join(self.path, mask_name + ".mask")
@@ -43,16 +73,15 @@ class QiPackage(object):
             mask = [x.strip() for x in mask]
             return mask
 
-    def _install_with_mask(self, destdir, mask, release=False):
-        if release and not mask:
-            filter_fun = qisys.sh.is_runtime
-        else:
-            def filter_fun(src):
-                src = qisys.sh.to_posix_path(src)
-                src = "/" + src
-                for regex in mask:
-                    match = re.match(regex, src)
-                    return not match
+    def _install_with_mask(self, destdir, mask):
+        def filter_fun(src):
+            src = qisys.sh.to_posix_path(src)
+            src = "/" + src
+            for regex in mask:
+                match = re.match(regex, src)
+                if match:
+                    return False
+            return True
 
         return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
 
@@ -82,10 +111,14 @@ class QiPackage(object):
 
 def from_xml(element):
     name = element.get("name")
-    res = QiPackage(name)
+    url = element.get("url")
+    if url and url.startswith("svn://"):
+        res = qitoolchain.svn_package.SvnPackage(name)
+        res.revision = element.get("revision")
+    else:
+        res = QiPackage(name)
     res.version = element.get("version")
     res.path = element.get("path")
-    res.url = element.get("url")
     res.directory = element.get("directory")
     res.toolchain_file = element.get("toolchain_file")
     res.sysroot = element.get("sysroot")
