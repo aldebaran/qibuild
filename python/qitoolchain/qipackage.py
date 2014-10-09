@@ -20,6 +20,12 @@ class QiPackage(object):
         self.run_depends = set()
         self.test_depends = set()
 
+    def load_deps(self):
+        package_xml = os.path.join(self.path, "package.xml")
+        if os.path.exists(package_xml):
+            xml_root = qisys.qixml.read(package_xml)
+            qibuild.deps.read_deps_from_xml(self, xml_root)
+
     def install(self, destdir, runtime=True, release=True):
         mask = list()
         if runtime:

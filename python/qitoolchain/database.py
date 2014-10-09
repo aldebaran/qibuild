@@ -62,6 +62,7 @@ class DataBase(object):
     def solve_deps(self, packages, dep_types=None):
         to_sort = dict()
         for package in self.packages.values():
+            package.load_deps()
             deps = set()
             if "build" in dep_types:
                 deps.update(package.build_depends)
