@@ -7,12 +7,11 @@ qibuild.deps -- Resolving dependencies
 DepsSolver
 ----------
 
-
 .. autoclass:: DepsSolver
     :members:
 
+Functions defined in this module
+--------------------------------
 
- read_deps_from_xml
- ------------------
+.. autofunction:: read_deps_from_xml
 
- .. autofunction:: read_deps_from_xml

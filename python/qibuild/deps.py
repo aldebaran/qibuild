@@ -94,6 +94,11 @@ class DepsSolver(object):
 
 
 def read_deps_from_xml(object, xml_elem):
+    """ Read all the ``<depends />`` tags in the xml element and set
+    ``object.build_depends``, ``object.run_depends``,
+    ``object.test_depends``
+
+    """
     depends_trees = xml_elem.findall("depends")
 
     for depends_tree in depends_trees:
