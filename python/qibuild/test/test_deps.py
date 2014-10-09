@@ -5,9 +5,7 @@
 
 """
 
-
-
-from qibuild.deps_solver import DepsSolver
+from qibuild.deps import DepsSolver
 
 
 def test_simple_deps(build_worktree):

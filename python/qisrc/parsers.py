@@ -12,6 +12,7 @@ import qisys.parsers
 import qisys.worktree
 import qisrc.worktree
 import qisrc.git
+import qibuild.deps
 import qibuild.parsers
 import qibuild.worktree
 
@@ -143,7 +144,7 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
         if not build_project:
             return [git_project]
         git_projects = list()  # Order matters
-        deps_solver = qibuild.deps_solver.DepsSolver(self.build_worktree)
+        deps_solver = qibuild.deps.DepsSolver(self.build_worktree)
         dep_types = qibuild.parsers.get_dep_types(args)
         deps_solver.dep_types = dep_types
         build_projects = deps_solver.get_dep_projects([build_project], dep_types)

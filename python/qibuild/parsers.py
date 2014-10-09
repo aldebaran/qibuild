@@ -11,6 +11,7 @@ from qisys import ui
 import qisys.parsers
 import qibuild.worktree
 import qibuild.cmake_builder
+import qibuild.deps
 
 
 def cmake_build_parser(parser, group=None, with_build_parser=True):
@@ -134,7 +135,7 @@ def get_build_projects(build_worktree, args, solve_deps=True, default_all=False)
     if not solve_deps or args.single:
         return projects
     dep_types = get_dep_types(args)
-    deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
+    deps_solver = qibuild.deps.DepsSolver(build_worktree)
     return deps_solver.get_dep_projects(projects, dep_types)
 
 def get_one_build_project(build_worktree, args):

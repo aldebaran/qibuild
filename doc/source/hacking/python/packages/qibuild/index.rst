@@ -10,7 +10,7 @@ qibuild modules
    cmake_builder
    cmake_modules
    config
-   deps_solver
+   deps
    deploy
    find
    gdb
