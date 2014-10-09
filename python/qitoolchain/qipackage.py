@@ -137,6 +137,7 @@ def from_xml(element):
     name = element.get("name")
     url = element.get("url")
     if url and url.startswith("svn://"):
+        import qitoolchain.svn_package
         res = qitoolchain.svn_package.SvnPackage(name)
         res.revision = element.get("revision")
     else:
