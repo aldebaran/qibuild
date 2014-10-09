@@ -183,7 +183,7 @@ def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
         if not dep_name:
             raise BadProjectConfig(qiproject_xml,
                                    "<depends> must have a 'name' attribute")
-        doc_project.depends.append(depend_elem.get("name"))
+        doc_project.depends.append(dep_name)
 
     prebuild = xml_elem.find("prebuild")
     if prebuild is not None:

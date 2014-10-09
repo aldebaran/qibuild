@@ -81,10 +81,12 @@ class DocProject(object):
                 res.append(doc_project)
         return res
 
-    def append_doxy_xml_path(self, pathes):
+    def append_doxy_xml_path(self, paths):
         for doxydep in self.doxydeps:
-            pathes.append(os.path.join(doxydep.build_dir, 'xml'))
-            doxydep.append_doxy_xml_path(pathes)
+            doxypath = os.path.join(doxydep.build_dir, 'xml')
+            if not doxypath in paths:
+                paths.append(doxypath)
+            doxydep.append_doxy_xml_path(paths)
 
     def __repr__(self):
         return "<%s %s in %s>" % (self.doc_type.capitalize() + "Project",
