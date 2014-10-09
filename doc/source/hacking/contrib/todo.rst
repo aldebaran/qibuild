@@ -18,25 +18,6 @@ qi_stage_lib/qi_use_lib
 * Use new CMake 2.8.11 features
 * avoid using the cache for global variables and use global properties instead
 
-Factorize qi_create_test() and qi_create_perf_test()
-+++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-It maybe a good idea to remove the compatibility with
-pure cmake tests.
-
-Instead, only use qi_create_test and generate custom
-files instead (thus we no longer have to parse cmake-generated
-cmake code)
-
-It became easier to write code like this
-
-.. code-block:: cmake
-
-  qi_create_test(... NIGHTLY)
-  qi_create_test(.... PERF)
-
-Introduce options like ``WITH_TESTS``, ``WITH_PERF_TESTS``
-instead of having to deal with ``BUILD_TESTS`` and ``enable_testing()``
 
 Use a build 'prefix'
 ++++++++++++++++++++
@@ -142,11 +123,7 @@ Command line
 qibuild
 -------
 
-* Use 3 components: build, runtime, test (ala maven)
-
-* add --reverse-deps
-
-* `qibuild config` should list the available build profiles
+* ``qibuild config`` should list the available build profiles
 
 * fix linker problems when using toolchain and third party libraries on mac
 
@@ -155,12 +132,7 @@ qibuild
 
 * handle custom build dir
 
-* handle custom sdk dir?
-
 * qibuild deploy: fix gdb config files generation
-
-* get rid of qibuild test ``--slow``, this makes no sense: the
-  list of tests and wether they are nightly or not is managed from cmake
 
 * add qibuild test --failed
 
@@ -177,45 +149,12 @@ qibuild
 qisrc
 -----
 
-* remove ``qisrc snapshot --manifest``
-
-* fix ``qisrc manifest`` API
-
-* qisrc sync:
-
-  * implement ``--rebase-devel``
-
-* find a better ``qisrc manifest`` API. Do we really need to support
-  several manifests in the same worktree?
 
 * mirroring qisrc manifests. (Same repos, same review, but an other
   "base URL")
 
 * use ``--depth``  option when cloning. May speed up the initial
   clone
-
-qitoolchain
------------
-
-Add metadata in the qitoolchain package format
-++++++++++++++++++++++++++++++++++++++++++++++
-
-At the very least ``name``, ``version`` and ``arch``.
-
-Tracking dependencies may be a good idea, too.
-
-This will allow to replace ``qitoolchain add-package foo foo.zip`` with
-``qitoolchain add-package foo.zip`` with makes much more sense
-
-Also : use XML for persistent storage of toolchain packages and add override
-config files to track the packages the user manually adds or removes
-
-This will solve the bug ``qitoolchain remove-package boost; qitoolchain update`` that
-makes boost reappear in the toolchain.
-
-
-qidoc
------
 
 
 Python
@@ -287,12 +226,3 @@ misc
   * qisys.command.find -> qisys.command.which
 
   * qisys.command.archive -> http://docs.python.org/3/library/shutil.html#archiving-operations
-
-
-qibuild2 leftovers cleanup
-++++++++++++++++++++++++++
-
-* remove qitoolchain.Toolchain.get
-
-* remove qibuild.configstore, use XML for toolchain
-  storage
