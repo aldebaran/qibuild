@@ -94,6 +94,9 @@ class CMakeBuilder(AbstractBuilder):
         for project in projects:
             write_qi_path_conf(project.sdk_directory, qi_path_sdk_dirs)
 
+        # also write a path.conf in the .qi directory
+        write_qi_path_conf(self.build_worktree.dot_qi, qi_path_sdk_dirs, sdk_layout=False)
+
     def pre_build(self, project):
         """ Called before building a project """
         sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "runtime"])

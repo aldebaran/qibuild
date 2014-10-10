@@ -22,6 +22,10 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         worktree.register(self)
 
     @property
+    def dot_qi(self):
+        return self.worktree.dot_qi
+
+    @property
     def qibuild_cfg(self):
         return self.build_config.qibuild_cfg
 
@@ -31,7 +35,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         Will be created if it does not exist
 
         """
-        config_path = os.path.join(self.worktree.dot_qi, "qibuild.xml")
+        config_path = os.path.join(self.dot_qi, "qibuild.xml")
         if not os.path.exists(config_path):
             with open(config_path, "w") as fp:
                 fp.write("<qibuild />\n")
