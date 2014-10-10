@@ -190,6 +190,11 @@ class CMakeBuilder(AbstractBuilder):
             qisys.sh.rm(deploy_manifest)
         to_deploy = list()
 
+        # Remove qitest.json so that we don't append tests twice
+        # when running `qibuild deploy --with-tests` twice
+        qitest_json = os.path.join(deploy_dir, "qitest.json")
+        qisys.sh.rm(qitest_json)
+
         dep_packages = self.deps_solver.get_dep_packages(self.projects,
                                                          self.dep_types)
         dep_projects = self.deps_solver.get_dep_projects(self.projects,
