@@ -13,24 +13,24 @@ def load_shlib(name, verbose=False):
   if sys.platform.startswith('linux'):
     soname = [".so"]
     prefix = "lib"
-    pathes = ['', '../lib', os.path.join(medir, '..', 'lib')]
+    paths = ['', '../lib', os.path.join(medir, '..', 'lib')]
   elif sys.platform.startswith('darwin'):
     soname = [".dylib"]
     prefix = "lib"
-    pathes = ['', '../lib', os.path.join(medir, '..', 'lib')]
+    paths = ['', '../lib', os.path.join(medir, '..', 'lib')]
   else:
     # Windows has no RPATH equivalent, but allows for changing the
     # search path within the process.
     ctypes.windll.kernel32.SetDllDirectoryA(os.path.join(medir))
     soname = [".dll", "_d.dll"]
     prefix = ''
-    pathes = ['', '.', os.path.join(medir, '..', 'lib'), os.path.join(medir, '..', 'bin')]
+    paths = ['', '.', os.path.join(medir, '..', 'lib'), os.path.join(medir, '..', 'bin')]
 
   if verbose:
     print("Loading " + name)
   handle = None
   for s in soname:
-    for p in pathes:
+    for p in paths:
       path = os.path.join(p, prefix + name + s)
       try:
         handle = ctypes.cdll.LoadLibrary(path)

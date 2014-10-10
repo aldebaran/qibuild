@@ -16,7 +16,7 @@ qisys.archive -- Manage .tar.gz and .zip files
 
     e.g.:
 
-    * Wrong leading field in pathes:
+    * Wrong leading field in paths:
 
       * Archive content::
 
