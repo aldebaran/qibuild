@@ -8,6 +8,7 @@ from xml.etree import ElementTree as etree
 
 from qisys import ui
 import qisys.command
+import qisys.parsers
 import qisys.sh
 import qibuild.cmake
 import qibuild.build
@@ -16,6 +17,8 @@ import qibuild.gdb
 import qibuild.dylibs
 import qibuild.dlls
 import qibuild.test_runner
+import qisrc.worktree
+import qisrc.git
 import qitoolchain.toolchain
 import qitest.conf
 import qitest.project
@@ -528,7 +531,24 @@ The following tools were not found: {missing}\
         test_dep_elem = etree.SubElement(package_xml_root, tag="depends")
         test_dep_elem.set("testtime", "true")
         test_dep_elem.set("names", " ".join(self.test_depends))
+        self._add_scm_info(package_xml_root)
         qisys.qixml.write(package_xml_tree, output)
+
+    def _add_scm_info(self, package_xml_root):
+        worktree = self.build_worktree.worktree
+        git_worktreee = qisrc.worktree.GitWorkTree(worktree)
+        git_projects = git_worktreee.git_projects
+        parent_git_project = qisys.parsers.find_parent_project(git_projects, self.path)
+        if not parent_git_project:
+            return
+        git = qisrc.git.Git(parent_git_project.path)
+        rc, out = git.call("rev-parse", "HEAD", raises=False)
+        if rc != 0:
+            return
+        sha1 = out.strip()
+        scm_elem = etree.SubElement(package_xml_root, "scm")
+        git_elem = etree.SubElement(scm_elem, "git")
+        git_elem.set("revision", sha1)
 
     def __repr__(self):
         return "<BuildProject %s in %s>" % (self.name, self.src)
@@ -538,7 +558,6 @@ The following tools were not found: {missing}\
 
     def __ne__(self, other):
         return not (self == other)
-
 
 
 class BadProjectConfig(Exception):
