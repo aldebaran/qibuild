@@ -111,6 +111,7 @@ class ToolchainFeedParser:
         """
         tree = tree_from_feed(feed)
         package_trees = tree.findall("package")
+        package_trees.extend(tree.findall("svn_package"))
         for package_tree in package_trees:
             package_tree.set("feed", feed)
             self.append_package(package_tree)

@@ -1,6 +1,7 @@
 from qisys.test.conftest import *
 
-
+import qisys.qixml
+from qisys.qixml import etree
 import qitoolchain
 import qitoolchain.qipackage
 import qitoolchain.database
@@ -60,6 +61,16 @@ class TestFeed():
         self.db.add_package(package)
         self.db.save()
         return package
+
+    def add_svn_package(self, package):
+        tree = qisys.qixml.read(self.feed_xml.strpath)
+        root = tree.getroot()
+        svn_elem = etree.SubElement(root, "svn_package")
+        svn_elem.set("name", package.name)
+        svn_elem.set("url", package.url)
+        if package.revision:
+            svn_elem.set("revision", package.revision)
+        qisys.qixml.write(tree, self.feed_xml.strpath)
 
     def remove_package(self, name):
         self.db.remove_package(name)

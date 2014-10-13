@@ -25,6 +25,9 @@ class DataBase(object):
         for element in tree.findall("package"):
             to_add = qitoolchain.qipackage.from_xml(element)
             self.packages[to_add.name] = to_add
+        for svn_elem in tree.findall("svn_package"):
+            to_add = qitoolchain.qipackage.from_xml(element)
+            self.packages[to_add.name] = to_add
 
     def save(self):
         """ Save the packages in the xml file """
@@ -107,11 +110,13 @@ class DataBase(object):
 
         for svn_package in svn_packages:
             self.handle_svn_package(svn_package)
+            self.packages[svn_package.name] = svn_package
 
         for remote_package in other_packages:
             if remote_package in local_packages:
                 continue
             to_add.append(remote_package)
+
         for local_package in local_packages:
             if local_package not in remote_packages:
                 to_remove.append(local_package)
