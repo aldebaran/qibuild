@@ -405,3 +405,37 @@ class QiSrcAction(TestAction):
     @property
     def tmpdir(self):
         return self.git_worktree.tmpdir
+
+
+class SvnServer(object):
+    def __init__(self, tmpdir):
+        self.tmpdir = tmpdir
+        self.srv = tmpdir.ensure("srv", dir=True)
+        self.src = tmpdir.join("src", dir=True)
+        cmd = ["svnadmin", "create", "srv"]
+        qisys.command.call(cmd, cwd=tmpdir.strpath)
+        self.base_url = "file://" + self.srv.strpath
+
+    def create_repo(self, name):
+        src = self.src.join(name).ensure(dir=True)
+        url = os.path.join(self.base_url, name)
+        cmd = ["svn", "import", src.strpath, url, "--message", "init %s" % name]
+        qisys.command.call(cmd)
+        return url
+
+    def commit_file(self, repo, filename, contents, message=None):
+        src = self.src.join(repo)
+        src.remove()
+        url = os.path.join(self.base_url, repo)
+        svn = qisrc.svn.Svn(src.strpath)
+        cmd = ["svn", "checkout", url, repo]
+        qisys.command.call(cmd, cwd=self.src.strpath)
+        src.join(filename).write(contents)
+        svn.call("add", filename, raises=False)
+        if message is None:
+            message = "Create %s" % filename
+        svn.call("commit", filename, "--message", message)
+
+@pytest.fixture
+def svn_server(tmpdir):
+    return SvnServer(tmpdir)
