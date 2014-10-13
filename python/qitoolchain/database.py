@@ -48,6 +48,7 @@ class DataBase(object):
     def remove(self):
         """ Remove self """
         qisys.sh.rm(self.packages_path)
+        qisys.sh.rm(self.db_path)
 
     def clean_cache(self):
         qisys.sh.rm(self.cache_path)

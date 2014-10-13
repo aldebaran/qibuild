@@ -59,3 +59,13 @@ def test_add_local_ctc(tmpdir):
     ctc_path = toolchain.db.get_package_path("ctc")
     config_cmake = os.path.join(ctc_path, "cross-config.cmake")
     assert ('include("%s")' % config_cmake) in tc_contents
+
+
+def test_removing(feed):
+    boost_package = qitoolchain.qipackage.QiPackage("boost", "1.42")
+    feed.add_package(boost_package, with_url=True)
+    toolchain = qitoolchain.toolchain.Toolchain("bar")
+    toolchain.update(feed.url)
+    toolchain.remove()
+    toolchain2 = qitoolchain.toolchain.Toolchain("bar")
+    assert not toolchain2.packages
