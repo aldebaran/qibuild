@@ -124,6 +124,12 @@ local branch ready to track the 'release-1.12' remote branch.
 Of course, since you have created a branch inside the manifest, it is
 easy to add new repositories just for master.
 
+If you do not want to create a new worktree, you can also use:
+
+.. code-block:: console
+
+    qisrc checkout release-1.12
+
 
 Handling profiles
 +++++++++++++++++
@@ -161,6 +167,10 @@ Of course, if you need to build the doc for the release, just use:
 .. code-block:: console
 
     qisrc init git@git.aldebaran.lan:qi/manifest.git --group doc --branch relase-1.12
+
+
+You can also list, add and remove the groups used in your worktree by using
+``qisrc list-groups``, ``qisrc add-group``, ``qisrc rm-group``
 
 
 But wait, there's more !
