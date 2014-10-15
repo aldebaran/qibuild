@@ -173,26 +173,30 @@ You can also list, add and remove the groups used in your worktree by using
 ``qisrc list-groups``, ``qisrc add-group``, ``qisrc rm-group``
 
 
-But wait, there's more !
-++++++++++++++++++++++++
+Handling development branches
++++++++++++++++++++++++++++++
 
-Let's assume you are in a development branch, called ``my_crazy_feature``
+Let's say you have two branches for every project in your worktree
+(and thus two branches in your manifest repo)
 
-You want to rebase ``my_crazy_feature`` with ``master``, and make sure
-it stays compatible with every other ``master`` branch on every other project.
+``master``, which is a stable branch, and ``next``, where development occurs.
+Bug fixes may be submitted on ``master`` directly, so you may want to make
+sure ``next`` is always up to date, by rebasing ``next`` on top of ``master``.
 
-So you just run ``qisrc sync --rebase-devel``, and:
+To do so, in a worktree configured with the ``next`` branch of the manifest,
+use:
 
-* The manifest you clone inside your worktree is updated
-* Every projects that were added to the manifest/default.xml file are
-  cloned to your worktree.
-* For each project, ``qisrc sync`` called ``git pull --rebase`` if you are
-  on the ``master`` branch
-* For the project you are currently working in, ``qisrc sync`` sees that
-  you are not on the correct branch, but your local ``master`` branch can be
-  fast-forwared to ``origin/master``. So it just does that, and then
-  put you back to your ``my_crazy_feature`` branch, ready to continue working
-  or just do something like ``git rebase master``
+.. code-block:: console
+
+    qisrc rebase master
+
+If you are happy with the changes, you can also run:
+
+.. code-block:: console
+
+    qisrc rebase master --push
+
+(Since this command uses ``git push --force``, use this at your own risk)
 
 
 Handling code review
