@@ -110,3 +110,4 @@ def test_flat(tmpdir):
     dest = tmpdir.mkdir("dest").mkdir("foo")
     qisys.archive.extract(res, dest.strpath, strict_mode=False)
     assert dest.join("include", "foo.h").check(file=True)
+

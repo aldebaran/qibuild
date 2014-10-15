@@ -85,3 +85,32 @@ def test_load_deps(tmpdir):
     assert package.build_depends == set()
     assert package.run_depends == set(["boost", "python"])
     assert package.test_depends == set(["gtest"])
+
+
+def test_extract_legacy_bad_top_dir(tmpdir):
+    src = tmpdir.mkdir("src")
+    boost = src.mkdir("boost")
+    boost.ensure("lib", "libboost.so", file=True)
+    res = qisys.archive.compress(boost.strpath)
+    dest = tmpdir.mkdir("dest").join("boost-1.55")
+    qitoolchain.qipackage.extract(res, dest.strpath)
+    assert dest.join("lib", "libboost.so").check(file=True)
+
+def test_extract_legacy_ok_top_dir(tmpdir):
+    src = tmpdir.mkdir("src")
+    boost = src.mkdir("boost-1.55")
+    boost.ensure("lib", "libboost.so", file=True)
+    res = qisys.archive.compress(boost.strpath)
+    dest = tmpdir.mkdir("dest").join("boost-1.55")
+    qitoolchain.qipackage.extract(res, dest.strpath)
+    assert dest.join("lib", "libboost.so").check(file=True)
+
+def test_extract_modern(tmpdir):
+    src = tmpdir.mkdir("src")
+    src.ensure("package.xml", file=True)
+    src.ensure("lib", "libboost.so", file=True)
+    output = tmpdir.join("boost.zip")
+    res = qisys.archive.compress(src.strpath, output=output.strpath, flat=True)
+    dest = tmpdir.mkdir("dest").join("boost-1.55")
+    qitoolchain.qipackage.extract(res, dest.strpath)
+    assert dest.join("lib", "libboost.so").check(file=True)

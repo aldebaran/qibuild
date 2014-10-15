@@ -157,3 +157,30 @@ def from_archive(archive_path):
     xml_data = archive.read("package.xml")
     element = etree.fromstring(xml_data)
     return from_xml(element)
+
+
+def extract(archive_path, dest):
+    if archive_path.endswith(".tar.gz"):
+        _extract_legacy(archive_path, dest)
+        return
+    with zipfile.ZipFile(archive_path) as archive:
+        if "package.xml" in archive.namelist():
+            _extract_modern(archive_path, dest)
+        else:
+            _extract_legacy(archive_path, dest)
+
+
+def _extract_modern(archive_path, dest):
+    qisys.archive.extract(archive_path, dest, strict_mode=False)
+
+def _extract_legacy(archive_path, dest):
+    algo = qisys.archive.guess_algo(archive_path)
+    extract_dest = os.path.dirname(dest)
+    extract_path = qisys.archive.extract(archive_path, extract_dest, algo=algo)
+    extract_path = os.path.abspath(extract_path)
+    if extract_path != dest:
+        qisys.sh.mkdir(dest, recursive=True)
+        qisys.sh.rm(dest)
+        qisys.sh.mv(extract_path, dest)
+        qisys.sh.rm(extract_path)
+

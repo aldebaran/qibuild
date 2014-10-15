@@ -180,6 +180,6 @@ class DataBase(object):
                             (package.name, package.version))
         ui.info(ui.green, "Extracting",
                 ui.reset, ui.blue, package.name, package.version)
-        qisys.archive.extract(archive, self.packages_path, strict_mode=False)
+        qitoolchain.qipackage.extract(archive, dest)
         qisys.sh.rm(archive)
         package.path = dest
