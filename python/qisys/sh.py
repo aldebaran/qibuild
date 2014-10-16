@@ -53,6 +53,7 @@ def get_path(*args):
     full_path = os.path.join(*args)
     to_make = os.path.dirname(full_path)
     mkdir(to_make, recursive=True)
+    full_path = to_native_path(full_path)
     return full_path
 
 def username():
