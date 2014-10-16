@@ -60,7 +60,7 @@ class QiPackage(object):
         installed_files = list()
         manifest_name = "install_manifest_%s.txt" % component
         if not release:
-            manifest_name += "install_manifest_%s_debug.txt" % component
+            manifest_name = "install_manifest_%s_debug.txt" % component
         manifest_path = os.path.join(self.path, manifest_name)
         if not os.path.exists(manifest_path):
             mask = self._read_install_mask(component)
