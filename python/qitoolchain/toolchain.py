@@ -44,7 +44,9 @@ class Toolchain(object):
     def unregister(self):
         qisys.sh.rm(self.config_path)
 
-    def update(self, feed_url):
+    def update(self, feed_url=None):
+        if feed_url is None:
+            feed_url = self.feed_url
         self.db.update(feed_url)
         self.feed_url = feed_url
         self.save()
