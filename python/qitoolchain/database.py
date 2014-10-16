@@ -176,8 +176,7 @@ class DataBase(object):
         archive = qisys.remote.download(package.url, self.cache_path,
                                         message = (ui.green, "Downloading",
                                                    ui.reset, ui.blue, package.url))
-        dest = os.path.join(self.packages_path, "%s-%s" % \
-                            (package.name, package.version))
+        dest = os.path.join(self.packages_path, package.name)
         ui.info(ui.green, "Extracting",
                 ui.reset, ui.blue, package.name, package.version)
         qitoolchain.qipackage.extract(archive, dest)
