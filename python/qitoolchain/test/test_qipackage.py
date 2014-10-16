@@ -71,6 +71,21 @@ def test_reads_release_mask(tmpdir):
     assert dest.join("bin", "QtCore4.dll").check(file=True)
     assert not dest.join("lib", "QtCored4.lib").check(file=True)
 
+def test_debug_install(tmpdir):
+    naoqi_path = tmpdir.mkdir("naoqi")
+    naoqi_path.ensure("bin", "naoqi_d.exe")
+    naoqi_path.ensure("bin", "naoqi.exe")
+    naoqi_path.join("install_manifest_runtime.txt").write("""\
+/bin/naoqi.exe
+""")
+    naoqi_path.join("install_manifest_runtime_debug.txt").write("""\
+/bin/naoqi_d.exe
+""")
+    package = qitoolchain.qipackage.QiPackage("naoqi", path=naoqi_path.strpath)
+    dest = tmpdir.join("dest")
+    package.install(dest.strpath, release=False, components=["runtime"])
+    assert dest.join("bin", "naoqi_d.exe").check(file=True)
+    assert not dest.join("bin", "naoqi.exe").check(file=True)
 
 def test_load_deps(tmpdir):
     libqi_path = tmpdir.mkdir("libqi")
@@ -85,7 +100,6 @@ def test_load_deps(tmpdir):
     assert package.build_depends == set()
     assert package.run_depends == set(["boost", "python"])
     assert package.test_depends == set(["gtest"])
-
 
 def test_extract_legacy_bad_top_dir(tmpdir):
     src = tmpdir.mkdir("src")
