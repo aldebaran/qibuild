@@ -1,6 +1,7 @@
 import os
 
 import qitoolchain.toolchain
+from qisrc.test.conftest import svn_server
 
 def get_tc_file_contents(tc):
     """ get the contents of the toolchain file of a toolchain
@@ -69,3 +70,25 @@ def test_removing(feed):
     toolchain.remove()
     toolchain2 = qitoolchain.toolchain.Toolchain("bar")
     assert not toolchain2.packages
+
+def test_update_svn_package(tmpdir, svn_server):
+    boost_url = svn_server.create_repo("boost")
+    svn_server.commit_file("boost", "libboost-1.55.so", "")
+    feed_xml = """
+<toolchain>
+  <svn_package name="boost" url="{url}" />
+</toolchain>
+"""
+    feed_xml = feed_xml.format(url=boost_url)
+    feed_path = tmpdir.join("feed.xml")
+    feed_path.write(feed_xml)
+    toolchain = qitoolchain.toolchain.Toolchain("bar")
+    toolchain.update(feed_path.strpath)
+    boost_package = toolchain.get_package("boost")
+    boost_lib = os.path.join(boost_package.path, "libboost-1.55.so")
+    assert os.path.exists(boost_lib)
+
+    svn_server.commit_file("boost", "libboost-1.56.so", "")
+    toolchain.update()
+    boost_lib = os.path.join(boost_package.path, "libboost-1.56.so")
+    assert os.path.exists(boost_lib)
