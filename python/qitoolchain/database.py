@@ -42,6 +42,13 @@ class DataBase(object):
                 element.set("version", package.version)
             if package.url:
                 element.set("url", package.url)
+            if package.toolchain_file:
+                element.set("toolchain_file", package.toolchain_file)
+            if package.sysroot:
+                element.set("sysroot", package.sysroot)
+            if package.cross_gdb:
+                element.set("cross_gdb", package.cross_gdb)
+
             root.append(element)
         qisys.qixml.write(tree, self.db_path)
 
