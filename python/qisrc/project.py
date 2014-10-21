@@ -129,6 +129,7 @@ class GitProject(object):
             previous_default = self.default_remote.name
 
         self.name = repo.project
+        self.remotes = list()
         for remote in repo.remotes:
             self.configure_remote(remote)
         if repo.default_branch and repo.default_remote:

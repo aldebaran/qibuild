@@ -214,3 +214,16 @@ def test_keeps_staged_changes(qisrc_action, git_server):
     test_git.add(staged_file)
     foo.sync()
     assert os.path.exists(staged_file)
+
+
+def test_new_project_under_gitorious(git_worktree, git_server):
+    git_server.create_repo("foo", review=False)
+    manifest_url = git_server.manifest_url
+    worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
+    worktree_syncer.configure_manifest(manifest_url)
+    foo = git_worktree.get_git_project("foo")
+    git_server.use_gitorious("foo")
+    worktree_syncer.sync()
+    foo = git_worktree.get_git_project("foo")
+    assert len(foo.remotes) == 1
+    assert foo.default_remote.name == "gitorious"

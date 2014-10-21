@@ -74,6 +74,8 @@ class TestGitServer(object):
         gerrit_url = "file://" + qisys.sh.to_posix_path(self.gerrit.strpath)
         self.manifest.add_remote("origin", origin_url)
         self.manifest.add_remote("gerrit", gerrit_url, review=True)
+        # Dummy second remote URL
+        self.manifest.add_remote("gitorious", origin_url)
         self.manifest_url = self.srv.join("manifest.git").strpath
         self.manifest_branch = "master"
 
@@ -189,6 +191,15 @@ class TestGitServer(object):
         repo.remote_names.append("gerrit")
         self.manifest.dump()
         self.push_manifest("%s: now under code review" % project)
+        self.manifest.load()
+
+    def use_gitorious(self, project):
+        """ Switch a project to another remote """
+        repo = self.manifest.get_repo(project)
+        repo.remote_names.append("gitorious")
+        repo.remote_names.remove("origin")
+        self.manifest.dump()
+        self.push_manifest("%s on gitorious" % project)
         self.manifest.load()
 
     def change_branch(self, project, new_branch):

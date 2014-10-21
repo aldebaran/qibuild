@@ -234,6 +234,9 @@ class WorkTreeSyncer(object):
                         ui.reset, "updating", ui.blue, old_repo.src)
                 if new_repo.review:
                     ui.info(ui.tabs(2), ui.green, "(now using code review)")
+                project = self.git_worktree.get_git_project(new_repo.src)
+                project.read_remote_config(new_repo)
+                project.apply_config()
 
 
         for repo in to_rm:
