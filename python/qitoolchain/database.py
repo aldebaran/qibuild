@@ -116,7 +116,10 @@ class DataBase(object):
                             if isinstance(x, qitoolchain.svn_package.SvnPackage)]
         other_packages = [x for x in remote_packages if x not in svn_packages]
 
-        for svn_package in svn_packages:
+        if svn_packages:
+            ui.info(ui.green, "Updating svn packages")
+        for i, svn_package in enumerate(svn_packages):
+            ui.info_count(i, len(svn_packages), ui.blue, svn_package.name)
             self.handle_svn_package(svn_package)
             self.packages[svn_package.name] = svn_package
 
@@ -129,9 +132,16 @@ class DataBase(object):
             if local_package not in remote_packages:
                 to_remove.append(local_package)
 
-        for package in to_remove:
+        if to_remove:
+            ui.info(ui.red, "Removing packages")
+        for i, package in enumerate(to_remove):
+            ui.info_count(i, len(to_remove), ui.blue, package.name)
             self.remove_package(package.name)
-        for package in to_add:
+
+        if to_add:
+            ui.info(ui.green, "Adding packages")
+        for i, package in enumerate(to_add):
+            ui.info_count(i, len(to_add), ui.blue, package.name)
             self.handle_package(package, feed)
             self.packages[package.name] = package
 
@@ -149,12 +159,8 @@ class DataBase(object):
         dest = os.path.join(self.packages_path, svn_package.name)
         svn_package.path = dest
         if os.path.exists(dest):
-            ui.info(ui.green, "Updating",
-                    ui.reset, ui.blue, svn_package.name)
             svn_package.update()
         else:
-            ui.info(ui.green, "Checkout",
-                    ui.reset, ui.blue, svn_package.name)
             svn_package.checkout()
 
     def handle_local_package(self, package, feed):
