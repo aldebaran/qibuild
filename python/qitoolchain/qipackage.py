@@ -158,7 +158,6 @@ def from_archive(archive_path):
     element = etree.fromstring(xml_data)
     return from_xml(element)
 
-
 def extract(archive_path, dest):
     if archive_path.endswith(".tar.gz"):
         _extract_legacy(archive_path, dest)
@@ -168,7 +167,6 @@ def extract(archive_path, dest):
             _extract_modern(archive_path, dest)
         else:
             _extract_legacy(archive_path, dest)
-
 
 def _extract_modern(archive_path, dest):
     qisys.archive.extract(archive_path, dest, strict_mode=False)
@@ -183,4 +181,3 @@ def _extract_legacy(archive_path, dest):
         qisys.sh.rm(dest)
         qisys.sh.mv(extract_path, dest)
         qisys.sh.rm(extract_path)
-
