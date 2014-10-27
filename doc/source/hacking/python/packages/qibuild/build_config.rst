@@ -19,3 +19,4 @@ CMakeBuildConfig
 
         Additional list of CMake flags
         (comming from ``qibuild configure -D<flags>``)
+        Should be a list of tuples (<key>, <value>)
