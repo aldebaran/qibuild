@@ -34,7 +34,6 @@ def test_install_on_self(tmpdir):
         qisys.sh.install(tmpdir.strpath, tmpdir.strpath)
     assert "are the same directory" in e.value.message
 
-
 def test_filter_hidden(tmpdir):
     src = tmpdir.ensure("src", dir=True)
     src.join("a_file").ensure(file=True)
