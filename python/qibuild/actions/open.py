@@ -84,7 +84,7 @@ def get_ide(qibuild_cfg):
     supported_names = [x.name for x in supported_ides]
     # Several IDEs, ask the user to choose
     ide_name = qisys.interact.ask_choice(supported_names,
-        "Please choose an ide to use")
+        "Please choose an IDE to use")
     if not ide_name:
         return None
     return qibuild_cfg.ides[ide_name]
