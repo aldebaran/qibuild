@@ -48,6 +48,7 @@ include("qibuild/subdirectory")
 include("qibuild/internal/layout")
 include("qibuild/internal/install")
 include("qibuild/internal/glob")
+include("qibuild/modules/qt5-tools")
 
 if (NOT QI_SDK_DIR)
   qi_persistent_set(QI_SDK_DIR "${CMAKE_BINARY_DIR}/sdk")
