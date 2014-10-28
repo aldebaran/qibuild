@@ -52,6 +52,19 @@ class PythonBuilder(AbstractBuilder):
                           ui.reset, ui.blue, project.name)
             project.install(dest)
 
+        # Also install a python wrapper so that everything goes smoothly
+        to_write="""\
+#!/bin/bash
+SDK_DIR=$(dirname "$(readlink -f $0 2>/dev/null)")
+export LD_LIBRARY_PATH=${SDK_DIR}/lib
+export PYTHONPATH=${SDK_DIR}/lib/python2.7/site-packages/
+exec python "$@"
+"""
+        python_wrapper = os.path.join(dest, "python")
+        with open(python_wrapper, "w") as fp:
+            fp.write(to_write)
+        os.chmod(python_wrapper, 0755)
+
     def deploy(self, url):
         with qisys.sh.TempDir() as tmp:
             self.install(tmp)
