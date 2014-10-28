@@ -13,8 +13,9 @@ import qibuild.worktree
 import qibuild.cmake_builder
 
 
-def cmake_build_parser(parser, group=None):
-    qisys.parsers.build_parser(parser, group=None)
+def cmake_build_parser(parser, group=None, with_build_parser=True):
+    if with_build_parser:
+        qisys.parsers.build_parser(parser, group=None)
     if not group:
         group = parser.add_argument_group("Build options")
     parser.add_argument("-j", dest="num_jobs", type=int)
