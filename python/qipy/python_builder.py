@@ -61,7 +61,7 @@ class PythonBuilder(AbstractBuilder):
 SDK_DIR=$(dirname "$(readlink -f $0 2>/dev/null)")
 export LD_LIBRARY_PATH=${SDK_DIR}/lib
 export PYTHONPATH=${SDK_DIR}/lib/python2.7/site-packages/
-python "$@"
+exec python "$@"
 """
         python_wrapper = os.path.join(dest, "python")
         with open(python_wrapper, "w") as fp:
