@@ -207,3 +207,13 @@ Layout is::
 The contents of the ``.in`` files will be concatenated together by ``qidoc build``
 That is, a ``conf.py`` file will be generated, containing first the contents of
 the file in the template project, then the contents of the file in the doc project.
+
+
+Troubleshooting
+---------------
+
+On Mac OSX, if you get ``[ERROR]:  ValueError unknown locale: UTF-8``, simply
+set the ``LC_ALL`` environment variable to ``en_US.utf8``, like so::
+
+  LC_ALL=en_US.utf8 qidoc build
+
