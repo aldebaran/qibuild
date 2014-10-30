@@ -53,3 +53,11 @@ def test_checkout_creates_at_correct_place(qisrc_action, git_server):
     git = TestGit(foo_proj.path)
     git.read_file("foo.txt")
 
+def test_checkout_non_existing_branch(qisrc_action, git_server):
+    manifest_url = git_server.manifest_url
+    git_server.create_repo("foo.git")
+    git_server.switch_manifest_branch("devel")
+    git_server.change_branch("foo.git", "devel")
+    qisrc_action("init", manifest_url, "--branch", "master")
+    error = qisrc_action("checkout", "does-not-exists", raises=True)
+    assert "Update failed" in error

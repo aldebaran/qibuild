@@ -184,7 +184,6 @@ class WorkTreeSyncer(object):
         new_repos = self.read_remote_manifest()
         return new_repos
 
-
     def _sync_manifest(self):
         """ Update the local manifest clone with the remote """
         git = qisrc.git.Git(self.manifest_repo)
@@ -199,9 +198,7 @@ class WorkTreeSyncer(object):
             else:
                 git.reset("--hard", "origin/%s" % self.manifest.branch)
         if not transaction.ok:
-            ui.warning("Update failed")
-            ui.info(transaction.output)
-
+            raise Exception("Update failed\n" + transaction.output)
 
     def _sync_repos(self, old_repos, new_repos):
         """ Sync the remote repo configurations with the git worktree """
@@ -237,7 +234,6 @@ class WorkTreeSyncer(object):
                 project = self.git_worktree.get_git_project(new_repo.src)
                 project.read_remote_config(new_repo)
                 project.apply_config()
-
 
         for repo in to_rm:
             self.git_worktree.remove_repo(repo)
@@ -304,7 +300,6 @@ class WorkTreeSyncer(object):
 
         groups_xml = os.path.join(self.git_worktree.root, ".qi", "groups.xml")
         qisys.qixml.write(remote_groups_elem, groups_xml)
-
 
     def sync_from_manifest_file(self, xml_path):
         """ Just synchronize the manifest coming from one xml file.
