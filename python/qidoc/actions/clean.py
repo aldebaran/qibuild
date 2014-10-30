@@ -19,9 +19,9 @@ def configure_parser(parser):
 
 
 def do(args):
-    doc_worktree = qidoc.parsers.get_doc_worktree(args)
     doc_builder = qidoc.parsers.get_doc_builder(args)
     doc_projects = doc_builder.get_dep_projects()
+    doc_worktree = doc_builder.doc_worktree
 
     to_clean = list()
     for doc_project in doc_projects:
