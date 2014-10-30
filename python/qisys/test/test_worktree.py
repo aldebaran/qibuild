@@ -160,3 +160,11 @@ def test_add_nested_projects(worktree):
 
     worktree.remove_project("spam")
     assert [p.src for p in worktree.projects] == ["foo"]
+
+def test_warns_on_nested_worktrees(tmpdir, record_messages):
+    work1 = tmpdir.mkdir("work1")
+    work1.mkdir(".qi")
+    work2 = work1.mkdir("work2")
+    work2.mkdir(".qi")
+    wt2 = qisys.worktree.WorkTree(work2.strpath)
+    assert record_messages.find("Nested worktrees")

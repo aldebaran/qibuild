@@ -83,9 +83,10 @@ This path does not exist
     def check(self):
         """ Perform a few sanity checks """
         # Check that we are not in an other worktree:
-        parent_worktree = guess_worktree(self.root)
+        parent_worktree = guess_worktree(os.path.join(self.root, ".."))
         if parent_worktree and parent_worktree != self.root:
-            raise WorkTreeError("""{0} is already in a worktree
+            ui.warning("""Nested worktrees detected:
+{0} is already in a worktree
 (in {1})
 """.format(self.root, parent_worktree))
 
@@ -253,6 +254,7 @@ def guess_worktree(cwd=None, raises=False):
     """Look for parent directories until a .qi dir is found somewhere."""
     if cwd is None:
         cwd = os.getcwd()
+    cwd = qisys.sh.to_native_path(cwd)
     head = cwd
     _tail = True
     while _tail:
