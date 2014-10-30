@@ -135,3 +135,75 @@ If you wish to share your documentation and you have
 .. code-block:: console
 
   qidoc install ~/public/html
+
+
+Adding templates
+----------------
+
+Sometimes you want to share configuration across several doc projects.
+To do this you can put all the common configuration in a 'template'
+project.
+
+Layout is::
+
+  <worktree>
+  |_ doc
+     |_ templates
+     |_ qiproject.xml
+     |_ sphinx
+     |  |_ conf.in.py
+     |  |__ _themes
+     |     |_ mytheme
+     |        |_ theme.conf
+     |        |_ layout.html
+     |_ doxygen
+     |  |_ Doxyfile.in
+     |  |_ doxygen.css
+     |  |_ footer.html
+     |  |_ header.html
+     |_ doc_proj1
+     |_ doc_proj2
+
+
+.. code-block:: xml
+
+  <!-- in doc/templates/qiproject.xml -->
+  <project version="3">
+    <qidoc type="template" />
+  </project>
+
+.. code-block:: python
+
+    # in doc/templates/sphinx/conf.in.py
+
+    master_doc = 'index'
+    pygments_style = 'sphinx'
+    html_theme = "mytheme"
+
+    extensions = ["custom.extension"]
+
+::
+
+    # in doc/templates/doxygen/Doxyfile.in
+
+    HTML_HEADER = header.html
+    HTML_FOOTER = footer.html
+    HTML_STYLESHEET = doxygen.css
+
+.. code-block:: python
+
+    # in doc/doc_proj1/source/conf.in.py
+
+    extensions.append("myext")
+
+::
+
+    # in doc/doc_proj2/Doxyfile.in
+
+    INPUT = .
+
+
+
+The contents of the ``.in`` files will be concatenated together by ``qidoc build``
+That is, a ``conf.py`` file will be generated, containing first the contents of
+the file in the template project, then the contents of the file in the doc project.
