@@ -29,13 +29,14 @@ class PythonBuilder(AbstractBuilder):
         return self.python_worktree.config
 
     def bootstrap(self, remote_packages=None, site_packages=True):
-        qipy.venv.configure_virtualenv(self.config,
+        ok = qipy.venv.configure_virtualenv(self.config,
                                        self.python_worktree,
                                        build_worktree=self.build_worktree,
                                        remote_packages=remote_packages,
                                        site_packages=site_packages)
         qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
         write_qi_path_conf(self.python_worktree.venv_path, qi_path_sdk_dirs)
+        return ok
 
     def configure(self, *args, **kwargs):
         pass
