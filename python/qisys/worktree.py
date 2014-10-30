@@ -106,7 +106,6 @@ This path does not exist
                 fp.write("<worktree />")
         return worktree_xml
 
-
     def has_project(self, path):
         src = self.normalize_path(path)
         srcs = (p.src for p in self.projects)
@@ -216,7 +215,6 @@ This path does not exist
         project = self.get_project(src)
         for observer in self._observers:
             observer.on_project_moved(project)
-
 
     def normalize_path(self, path):
         """ Make sure the path is a POSIX path, relative to
