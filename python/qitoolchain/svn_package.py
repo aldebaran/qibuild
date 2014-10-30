@@ -24,7 +24,7 @@ class SvnPackage(qitoolchain.qipackage.QiPackage):
     def checkout(self):
         """ Run ``svn checkout`` to create the package files """
         qisys.sh.mkdir(self.path, recursive=True)
-        self.svn.call("checkout", self.url, ".")
+        self.svn.call("checkout", self.url, ".", "--quiet")
 
     def commit_all(self):
         """ Commit all changes made to this package files """
