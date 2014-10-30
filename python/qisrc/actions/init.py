@@ -16,7 +16,7 @@ def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.default_parser(parser)
     qisrc.parsers.groups_parser(parser)
-    parser.add_argument("manifest_url")
+    parser.add_argument("manifest_url", nargs="?")
     parser.add_argument("-b", "--branch", dest="branch",
         help="Use this branch for the manifest")
     parser.set_defaults(branch="master")
