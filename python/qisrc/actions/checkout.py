@@ -26,4 +26,3 @@ def do(args):
     branch = args.branch
     git_worktree.configure_manifest(manifest.url, groups=groups, branch=branch)
     git_worktree.checkout(branch, force=args.force)
-

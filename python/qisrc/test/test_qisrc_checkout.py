@@ -61,3 +61,13 @@ def test_checkout_non_existing_branch(qisrc_action, git_server):
     qisrc_action("init", manifest_url, "--branch", "master")
     error = qisrc_action("checkout", "does-not-exists", raises=True)
     assert "Update failed" in error
+
+def test_skip_checkout_when_possible(qisrc_action, git_server, record_messages):
+    manifest_url = git_server.manifest_url
+    git_server.create_repo("foo.git")
+    git_server.create_repo("bar.git")
+    git_server.switch_manifest_branch("devel")
+    git_server.change_branch("foo.git", "devel")
+    qisrc_action("init", manifest_url, "--branch", "master")
+    qisrc_action("checkout", "devel")
+    assert not record_messages.find("Checkout bar")
