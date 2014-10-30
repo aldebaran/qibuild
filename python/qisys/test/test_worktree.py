@@ -36,7 +36,6 @@ def test_normalize_path(tmpdir):
     assert worktree.normalize_path(foo_abs_path) == "bar/foo"
     assert worktree.normalize_path("bar/foo") == "bar/foo"
 
-
 def test_add_project_simple(worktree):
     # pylint: disable-msg=E1101
     tmp = py.path.local(worktree.root)
@@ -45,7 +44,6 @@ def test_add_project_simple(worktree):
     assert len(worktree.projects) == 1
     foo = worktree.get_project("foo")
     assert foo.src == "foo"
-
 
 def test_fails_when_root_does_not_exists(tmpdir):
     non_exitsting = tmpdir.join("doesnotexist")
@@ -63,8 +61,6 @@ def test_ignore_src_dot(tmpdir):
 """)
     worktree  = qisys.worktree.WorkTree(tmpdir.strpath)
     worktree.add_project("foo")
-
-
 
 def test_remove_project(worktree):
     # pylint: disable-msg=E1101
@@ -85,7 +81,6 @@ def test_remove_project(worktree):
     worktree.remove_project("foo", from_disk=True)
     assert worktree.projects == list()
     assert not os.path.exists(foo_src.strpath)
-
 
 def test_nested_qiprojects(tmpdir):
     a_project = tmpdir.mkdir("a")
@@ -120,7 +115,6 @@ def test_nested_qiprojects(tmpdir):
     assert [p.src for p in worktree.projects] == \
         ["a", "a/b", "a/b/c"]
 
-
 def test_non_exiting_path_are_removed(tmpdir, interact):
     # all projects registered should exist:
     wt = qisys.worktree.WorkTree(tmpdir.strpath)
@@ -129,7 +123,6 @@ def test_non_exiting_path_are_removed(tmpdir, interact):
     a_path.remove()
     wt2 = qisys.worktree.WorkTree(tmpdir.strpath)
     assert wt2.projects == list()
-
 
 def test_check_subprojects_exist(tmpdir):
     # subprojets in qiproject.xml should exist
@@ -151,7 +144,6 @@ def test_observers_are_notified(worktree):
     worktree.register(mock_observer)
     worktree.create_project("foo")
     assert mock_observer.on_project_added.called
-
 
 def test_add_nested_projects(worktree):
     worktree.create_project("foo")
