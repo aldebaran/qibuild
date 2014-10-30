@@ -18,8 +18,8 @@ def test_parser(parser, with_num_jobs=True):
     group = parser.add_argument_group("test options")
     group.add_argument("--perf", dest="perf", action="store_true",
                         help="run perfs tests instead of pure tests.")
-    group.add_argument("-k", "--pattern", dest="pattern",
-                        help="Filter tests matching this pattern")
+    group.add_argument("-k", "--pattern", dest="patterns", action="append",
+                        help="Filter tests matching these patterns")
     group.add_argument("-V", dest="verbose_tests", action="store_true",
                         help="display tests output")
     group.add_argument("--valgrind", dest="valgrind", action="store_true",
@@ -78,7 +78,7 @@ def get_test_runner(args, project_name=None, qitest_json=None):
     else:
         test_runner.cwd = os.path.dirname(qitest_json)
 
-    test_runner.pattern = args.pattern
+    test_runner.patterns = args.patterns
     test_runner.perf = args.perf
     test_runner.coverage = args.coverage
     test_runner.valgrind = args.valgrind
