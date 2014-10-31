@@ -248,6 +248,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         max_src = max([len(x.src) for x in self.git_projects])
         to_checkout = list()
         for project in self.git_projects:
+            if project.default_branch is None:
+                continue
             branch_name = project.default_branch.name
             git = qisrc.git.Git(project.path)
             if git.get_current_branch() != branch_name:
