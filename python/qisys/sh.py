@@ -192,10 +192,10 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
             continue
         fsrc = os.path.join(root, f)
         fdest = os.path.join(new_root, f)
+        rel_path = os.path.join(rel_root, f)
         if os.path.islink(fsrc):
             mkdir(new_root, recursive=True)
             _copy_link(fsrc, fdest, quiet)
-            rel_path = os.path.join(rel_root, f)
             installed.append(rel_path)
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
@@ -207,6 +207,7 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
             # (following what `install` does, but not what `cp` does)
             rm(fdest)
             shutil.copy(fsrc, fdest)
+            installed.append(rel_path)
     return installed
 
 
