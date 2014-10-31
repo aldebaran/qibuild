@@ -134,8 +134,23 @@ class CMakeBuildConfig(object):
         if self.toolchain:
             args.append("-DCMAKE_TOOLCHAIN_FILE=%s" % self.toolchain.toolchain_file)
         args.append("-DCMAKE_BUILD_TYPE=%s" % self.build_type)
-        cmake_flags = qibuild.profile.get_cmake_flags(self.build_worktree.qibuild_xml,
-                                                      self.profiles)
+
+        # Read remote profiles coming from the qisrc manifest if it exists
+        remote_xml = os.path.join(self.build_worktree.root, ".qi", "manifests",
+                                  "default", "manifest.xml")
+        remote_cmake_flags = list()
+        if os.path.exists(remote_xml):
+            remote_cmake_flags = qibuild.profile.get_cmake_flags(remote_xml,
+                                    self.profiles)
+        # Read local profiles coming from .qi/qibuild.xml
+        local_cmake_flags = list()
+        try:
+            local_cmake_flags = qibuild.profile.get_cmake_flags(
+                                    self.build_worktree.qibuild_xml, self.profiles)
+        except qibuild.profile.NoSuchProfile:
+            pass
+        cmake_flags = remote_cmake_flags + local_cmake_flags
+
         for (name, value) in cmake_flags:
             args.append("-D%s=%s" % (name, value))
         for (name, value) in self.user_flags:
@@ -147,7 +162,6 @@ class CMakeBuildConfig(object):
         """ The default configuration, as read from the local build settings """
         self.read_local_settings()
         return self._default_config
-
 
     def read_global_qibuild_settings(self):
         """ Read ``~/.config/qi/qibuild.xml`` """

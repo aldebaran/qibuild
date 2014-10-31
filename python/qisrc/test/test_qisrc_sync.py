@@ -41,7 +41,6 @@ def test_clone_new_repos(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("bar")
 
-
 def test_configure_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
@@ -52,14 +51,12 @@ def test_configure_new_repos(qisrc_action, git_server):
     bar = git_worktree.get_git_project("bar")
     assert bar.default_remote
 
-
 def test_creates_required_subdirs(qisrc_action, git_server):
     git_server.create_repo("foo/bar.git")
     qisrc_action("init", git_server.manifest_url)
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("foo/bar")
-
 
 def test_uses_build_deps_by_default(qisrc_action, git_server):
     git_server.add_qibuild_test_project("world")
@@ -91,10 +88,13 @@ def test_sync_build_profiles(qisrc_action, git_server):
     git_server.add_build_profile("foo", [("WITH_FOO", "ON")])
     qisrc_action("init", git_server.manifest_url)
     build_worktree = TestBuildWorkTree()
-    qibuild_xml = build_worktree.qibuild_xml
-    foo_profile = qibuild.profile.parse_profiles(qibuild_xml)["foo"]
-    assert foo_profile.name == "foo"
-    assert foo_profile.cmake_flags == [("WITH_FOO", "ON")]
+    build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
+    build_config.profiles = ["foo"]
+    assert build_config.cmake_args == ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_FOO=ON"]
+    git_server.add_build_profile("foo", [("WITH_FOO", "ON"), ("WITH_BAR", "ON")])
+    qisrc_action("sync")
+    assert build_config.cmake_args == ["-DCMAKE_BUILD_TYPE=Debug",
+                                       "-DWITH_FOO=ON", "-DWITH_BAR=ON"]
 
 def test_sync_branch_devel(qisrc_action, git_server, test_git):
     # This tests the case where everything goes smoothly

@@ -86,7 +86,6 @@ class WorkTreeSyncer(object):
         else:
             ui.info()
         self._sync_manifest()
-        self._sync_build_profiles()
         self._sync_groups()
         self.new_repos = self.get_new_repos()
         res = self._sync_repos(self.old_repos, self.new_repos)
@@ -266,29 +265,6 @@ class WorkTreeSyncer(object):
                 res = False
 
         return res
-
-    def _sync_build_profiles(self):
-        """ Synchronize the build profiles read from the given manifest """
-        local_xml = os.path.join(self.git_worktree.root, ".qi", "qibuild.xml")
-        if not os.path.exists(local_xml):
-            with open(local_xml, "w") as fp:
-                fp.write("<qibuild />")
-        remote_xml = os.path.join(self.manifest_repo, "manifest.xml")
-        local = qibuild.profile.parse_profiles(local_xml)
-        remote = qibuild.profile.parse_profiles(remote_xml)
-        new_profiles, updated_profiles = compute_profile_updates(local, remote)
-        if new_profiles or updated_profiles:
-            ui.info(ui.green, ":: Synchronizing build profiles ...")
-        for new_profile in new_profiles:
-            ui.info(ui.green, " * New:", ui.blue, new_profile.name)
-            qibuild.profile.configure_build_profile(local_xml,
-                                                    new_profile.name,
-                                                    new_profile.cmake_flags)
-        if updated_profiles:
-            mess = "The following profiles have been updated remotely:\n"
-            for updated_profile in updated_profiles:
-                mess += "  * " + updated_profile.name + "\n"
-            ui.warning(mess)
 
     def _sync_groups(self):
         """ Synchronize the repsitories groups read from the given manifest """
