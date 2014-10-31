@@ -45,6 +45,7 @@ class Process:
         self.cwd = cwd
         self.env = env
         self.out = ""
+        self.returncode = None
         self._process = None
         self.exception = None
         self.return_type = Process.FAILED

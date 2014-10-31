@@ -142,7 +142,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             message = (ui.red, message)
 
         res.message = message
-        self._post_run(res, test)
+        self._post_run(process, res, test)
         return res
 
     def _update_test(self, test):
@@ -223,15 +223,19 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         taskset_opts = ["-c", ",".join(str(i) for i in cpu_list)]
         test["cmd"] = ["taskset"] + taskset_opts + test["cmd"]
 
-    def _post_run(self, res, test):
+    def _post_run(self, process, res, test):
         if self.suite_runner.valgrind:
             parse_valgrind(self.valgrind_log, res)
-        if not res.ok:
+
+        process_crashed = process.return_type not in [qisys.command.Process.OK,
+                                                      qisys.command.Process.FAILED]
+        process_crashed = process_crashed or process.returncode < 0
+        if process_crashed:
             # do not trust generated files:
             qisys.sh.rm(self.perf_out)
             qisys.sh.rm(self.test_out)
 
-        if not res.ok or not os.path.exists(self.test_out):
+        if process_crashed or not os.path.exists(self.test_out):
             self._write_xml(res, test, self.test_out)
 
     def _write_xml(self, res, test, out_xml):
