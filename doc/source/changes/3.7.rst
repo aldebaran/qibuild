@@ -1,0 +1,74 @@
+v3.7
+====
+
+General
+--------
+
+Warn when nesting worktrees are detected
+
+qicd
+----
+
+* Go back to 3.5 behavior
+
+qibuild
+--------
+
+* Write a ``path.conf`` in the .qi folder too
+* Merge ``qitest.json`` files when installing using ``--with-tests``
+* Fix  #24199: additional environment paths leaking from other configs
+* Fix using ``--build-type=[RelWithDebInfo|MinSizeRel]`` with Visual Studio
+* Fix using ``qibuild test`` with ``-p``
+* Fix updating build profiles remotely. To get an up-to-date profile, you
+  should first remove the ``<profiles>`` tag manually from ``.qi/qibuild.xml``
+
+qidoc
+------
+
+* Fix crash when ``build_type`` is None
+* Do not put doubles in ``qiapidoc_srcs``
+* Fix bug with recent ``sphinx``: except ``SystemExit`` to prevent early exit
+
+qipkg
+------
+
+* ``qipkg build``: allow usage of ``-j`` option
+* Better error message when files from the pml do not exist
+* Add support for meta packages
+* Implement ``qipkg make-package --with-breakpad``
+
+qipy
+-----
+
+* ``qipy bootstrap``: fix crash when calling ``pip install`` fails.
+* Allow specifying modules, script and packages to install directly from the
+  ``qiproject.xml`` instead of having to write a ``setup.py`` file
+
+qisrc
+------
+
+* ``qisrc checkout``: skip checkout when project is already on the correct branch
+* ``qisrc init`` : make manifest url argument optional
+* ``qisrc``: raise when updating the manifest fails
+* ``qisrc rebase``: make git fetch quiet when verbose is not set
+* Fix issue when changing remotes: the new remote was added but the previous
+  one never deleted
+* ``qisrc list-groups``: sort the output
+
+qitest
+-------
+
+* ``qitest run`` accept several ``-k`` options
+* ``qitest run``: correctly set working directory
+* ``qitest run`` allow specifying several build projects on the command line.
+  As a consequence, paths to ``qitest.json`` files should now be specified using
+  ``--qitest-json`` option.
+* ``qitest run --nightly``: also run the normal tests.
+
+cmake
+------
+
+* Look for boost shared libs on Windows
+* ``Qt``: Remove ``QT_USE_QMAKE`` option. Instead just look for the
+  ``qmake`` executable to include upstream CMake modules. Previous
+  behavior can be achieved by setting ``QT_QMAKE_EXECUTABLE`` variable.
