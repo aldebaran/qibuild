@@ -64,6 +64,7 @@ qitest
   As a consequence, paths to ``qitest.json`` files should now be specified using
   ``--qitest-json`` option.
 * ``qitest run --nightly``: also run the normal tests.
+* Do not overwrite generated XML files when return code is 1
 
 cmake
 ------
