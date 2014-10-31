@@ -143,6 +143,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
         ui.info(ui.green, "Running cmake for profiling ...")
     if trace_cmake:
         ui.info(ui.green, "Running cmake with --trace ...")
+    ui.debug("Running cmake " + " ".join(cmake_args))
     retcode = subprocess.call(["cmake"] + cmake_args, cwd=build_dir, env=env,
                    stdout=fp, stderr=fp)
     fp.close()
