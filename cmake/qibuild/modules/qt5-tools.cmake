@@ -23,7 +23,8 @@ function(qi_generate_qt_conf)
     endif()
 
     get_filename_component(_lib_path ${_lib} PATH)
-    set(_plugins_path ${_lib_path}/qt5/plugins)
+    get_filename_component(_root_path ${_lib_path} PATH)
+    set(_plugins_path ${_root_path}/plugins)
   endif()
 
   file(WRITE "${QI_SDK_DIR}/${QI_SDK_BIN}/qt.conf"
@@ -34,9 +35,9 @@ Plugins = ${_plugins_path}
   # Then, generate and install a qt.conf
   # containing relative paths
   if(APPLE)
-    set(_relative_plugins_path "../../lib/qt5/plugins")
+    set(_relative_plugins_path "../../plugins")
   else()
-    set(_relative_plugins_path "../lib/qt5/plugins")
+    set(_relative_plugins_path "../plugins")
   endif()
   file(WRITE "${CMAKE_BINARY_DIR}/qt.conf"
 "[Paths]
