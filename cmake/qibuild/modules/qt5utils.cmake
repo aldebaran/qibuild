@@ -12,11 +12,12 @@ function(qt5_flib prefix name)
   find_package(${name})
   foreach(_lib ${${name}_LIBRARIES})
     if(WIN32)
-      get_target_property(_lib_loc_debug ${_lib} LOCATION_DEBUG)
-      get_target_property(_lib_loc_release ${_lib} LOCATION_RELEASE)
+      get_target_property(_imported_lib_debug ${_lib} IMPORTED_IMPLIB_DEBUG)
+      get_target_property(_imported_lib_release ${_lib} IMPORTED_IMPLIB_RELEASE)
       list(APPEND ${prefix}_LIBRARIES
-      debug "${_lib_loc_debug}"
-      optimized "${_lib_loc_release}")
+        optimized ${_imported_lib_release}
+        debug ${_imported_lib_debug}
+      )
     else()
       get_target_property(_lib_loc ${_lib} LOCATION)
       list(APPEND ${prefix}_LIBRARIES ${_lib_loc})
