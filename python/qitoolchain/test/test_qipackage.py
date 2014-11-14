@@ -47,7 +47,7 @@ def test_backward_compat_runtime_install(tmpdir):
     assert not dest.join("include", "boost.h").check(file=True)
     libbost_so = dest.join("lib", "libboost.so")
     assert libbost_so.check(file=True)
-    assert installed == [libbost_so.strpath]
+    assert installed == ["lib/libboost.so"]
 
 def test_reads_release_mask(tmpdir):
     qt_path = tmpdir.mkdir("qt")

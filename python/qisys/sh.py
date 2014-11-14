@@ -272,7 +272,7 @@ def install(src, dest, filter_fun=None, quiet=False):
         # (following what `install` does, but not what `cp` does)
         rm(dest)
         shutil.copy(src, dest)
-        installed.append(dest)
+        installed.append(os.path.basename(src))
     return installed
 
 
