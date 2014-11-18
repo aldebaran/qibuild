@@ -1,0 +1,6 @@
+clean(SOPRANO)
+fpath(SOPRANO soprano/soprano.h)
+flib(SOPRANO soprano)
+flib(SOPRANO sopranoclient)
+flib(SOPRANO sopranoserver)
+export_lib(SOPRANO)
