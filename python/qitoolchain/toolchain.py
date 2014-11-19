@@ -108,6 +108,26 @@ class Toolchain(object):
 
         return toolchain_file_path
 
+    def get_sysroot(self):
+        """ Get the sysroot of the toolchain.
+        Assume that one and exactly one of the packages inside
+        the toolchain has a 'sysroot' attribute
+
+        """
+        for package in self.packages:
+            if package.sysroot:
+                return package.sysroot
+
+    def get_cross_gdb(self):
+        """ Get the cross-gdb path from the toolchain.
+        Assume that one and exactly one of the packages inside
+        the toolchain has a 'cross_gdb' attribute
+
+        """
+        for package in self.packages:
+            if package.cross_gdb:
+                return package.cross_gdb
+
     def __eq__(self, other):
         return self.name == other.name
 

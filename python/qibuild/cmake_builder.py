@@ -193,6 +193,9 @@ class CMakeBuilder(AbstractBuilder):
         if os.path.exists(deploy_manifest):
             qisys.sh.rm(deploy_manifest)
         to_deploy = list()
+        components = ["runtime"]
+        if with_tests:
+            components.append("test")
 
         # Remove qitest.json so that we don't append tests twice
         # when running `qibuild deploy --with-tests` twice
@@ -220,7 +223,7 @@ class CMakeBuilder(AbstractBuilder):
                     ui.green, "Deploying package", ui.blue, package.name,
                     ui.green, "to", ui.blue, url.as_string)
                 # Install package in local deploy dir
-                files = package.install(deploy_dir, runtime=True)
+                files = package.install(deploy_dir, components=components)
                 to_deploy.extend(files)
 
         print
@@ -233,9 +236,7 @@ class CMakeBuilder(AbstractBuilder):
                     ui.green, "Deploying project", ui.blue, project.name,
                     ui.green, "to", ui.blue, url.as_string)
 
-            components = ["runtime"]
             if with_tests:
-                components.append("test")
                 to_deploy.append("qitest.json")
             # Install project in local deploy dir
             installed = project.install(deploy_dir, components=components,

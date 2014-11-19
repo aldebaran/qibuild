@@ -95,3 +95,12 @@ def test_update_svn_package(tmpdir, svn_server):
     toolchain.update()
     boost_lib = os.path.join(boost_package.path, "libboost-1.56.so")
     assert os.path.exists(boost_lib)
+
+def test_sysroot(tmpdir):
+    ctc_package = qitoolchain.qipackage.QiPackage("ctc")
+    ctc_package.sysroot = "sysroot"
+    ctc_package.cross_gdb = "cross-gdb"
+    toolchain = qitoolchain.toolchain.Toolchain("test")
+    toolchain.add_package(ctc_package)
+    assert toolchain.get_sysroot() == "sysroot"
+    assert toolchain.get_cross_gdb() == "cross-gdb"
