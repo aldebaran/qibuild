@@ -6,3 +6,4 @@ get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 include("${_ROOT_DIR}/qt5utils.cmake")
 
 qt5_flib(QT5_FTP Qt5Ftp)
+qi_persistent_set(QT5_FTP_DEPENDS QT5_NETWORK)
