@@ -430,6 +430,7 @@ class SvnServer(object):
         svn = qisrc.svn.Svn(src.strpath)
         cmd = ["svn", "checkout", url, repo]
         qisys.command.call(cmd, cwd=self.src.strpath)
+        qisys.command.call(["svn", "update"], cwd=src.strpath)
         src.join(filename).write(contents)
         svn.call("add", filename, raises=False)
         if message is None:
