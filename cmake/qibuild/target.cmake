@@ -84,6 +84,10 @@ function(qi_create_bin name)
 
   add_executable("${name}" ${_SRC})
 
+  if(UNIX AND NOT APPLE)
+    set_target_properties("${name}" PROPERTIES COMPILE_FLAGS "-fPIE")
+  endif()
+
   if (NOT "${ARG_DEPENDS}" STREQUAL "")
     qi_use_lib("${name}" ${ARG_DEPENDS})
   endif()
