@@ -155,6 +155,14 @@ class WorkTreeSyncer(object):
             manifest_xml = os.path.join(self.manifest_repo, "manifest.xml")
         remote_manifest = qisrc.manifest.Manifest(manifest_xml)
         groups = self.manifest.groups
+        # if self.manifest.groups is empty but there is a default
+        # group in the manifest, we need to set self.manifest.groups
+        # so that subsequent calls to qisrc add-group, remove-group
+        # work
+        if not self.manifest.groups:
+            default_group = remote_manifest.groups.default_group
+            if default_group:
+                self.manifest.groups = [default_group.name]
         repos = remote_manifest.get_repos(groups=groups)
         return repos
 

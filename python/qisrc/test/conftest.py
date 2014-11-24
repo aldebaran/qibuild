@@ -123,7 +123,6 @@ class TestGitServer(object):
         self.manifest_branch = branch
         self.push_manifest("Switch to %s" % branch, allow_empty=True)
 
-
     def add_qibuild_test_project(self, src):
         project_name = src + ".git"
         repo_src = self._create_repo(project_name , src=src, review=False)
@@ -177,11 +176,11 @@ class TestGitServer(object):
         self.manifest.remove_repo(project)
         self.push_manifest("removed %s" % project)
 
-    def create_group(self, name, projects):
+    def create_group(self, name, projects, default=False):
         """ Add a group to the manifest """
         for project in projects:
             self.create_repo(project)
-        self.manifest.configure_group(name, projects)
+        self.manifest.configure_group(name, projects, default=default)
         self.push_manifest("add group %s" % name)
 
     def use_review(self, project):

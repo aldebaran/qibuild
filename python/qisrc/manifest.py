@@ -153,7 +153,7 @@ No such project: {1}
                 return remote
 
     # Following methods are mainly use for testing,
-    # but could be useful for othe use cases anyway
+    # but could be useful for other use cases anyway
 
     @change_config
     def add_remote(self, name, url, review=False):
@@ -184,9 +184,9 @@ No such project: {1}
         self.repos.remove(matching_repo)
 
     @change_config
-    def configure_group(self, name, projects):
+    def configure_group(self, name, projects, default=False):
         """ Configure a group """
-        self.groups.configure_group(name, projects)
+        self.groups.configure_group(name, projects, default=default)
 
 def from_git_repo(git_repo, ref):
     git = qisrc.git.Git(git_repo)

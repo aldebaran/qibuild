@@ -14,8 +14,10 @@ class Groups(object):
     def projects(self, group):
         return self.subgroups_group(group)
 
-    def configure_group(self, name, projects):
+    def configure_group(self, name, projects, default=False):
         group = Group(name)
+        if default:
+            group.default = True
         group.projects = projects
         self.groups[name] = group
 
