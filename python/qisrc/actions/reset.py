@@ -89,6 +89,8 @@ def reset_manifest(git_worktree, snapshot, groups=None):
     manifest = snapshot.manifest
     if not groups:
         groups=manifest.groups
+    if not manifest.branch:
+        raise Exception("No branch configured for the manifest of the snapshot")
     ok = git_worktree.configure_manifest(manifest.url, groups=groups,
                                          branch=manifest.branch, ref=manifest.ref)
     if not ok:
