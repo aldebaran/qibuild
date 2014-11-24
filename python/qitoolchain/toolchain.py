@@ -1,6 +1,7 @@
-import qisys.sh
 import os
 
+from qisys import ui
+import qisys.sh
 import qitoolchain.database
 
 class Toolchain(object):
@@ -146,8 +147,12 @@ class Toolchain(object):
             res += "No packages\n"
         sorted_packages = sorted(self.packages)
         for package in sorted_packages:
-            res += " " * 4 + str(package).replace("\n", "\n" + " " * 4)
+            res += ui.indent(package.name, 2)
+            if package.version:
+                res += " " + package.version
             res += "\n"
+            if package.path:
+                res +=  ui.indent("in " + package.path, 3) + "\n"
         return res
 
 def get_tc_names():
