@@ -25,7 +25,7 @@ function(qt5_flib prefix name)
   endforeach()
   set(${prefix}_LIBRARIES ${${prefix}_LIBRARIES} CACHE INTERNAL "" FORCE)
   set(${prefix}_INCLUDE_DIRS ${${name}_INCLUDE_DIRS} CACHE INTERNAL "" FORCE)
-  set(_define ${prefix}_lib)
+  set(_define ${prefix}_LIB)
   string(REPLACE QT5 QT _define ${_define})
   set(${prefix}_DEFINITIONS ${_define} CACHE INTERNAL "" FORCE)
 
