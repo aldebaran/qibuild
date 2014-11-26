@@ -10,6 +10,7 @@ function(qt5_flib prefix name)
   # upstream uses Qt5::Core notation but we need to dereference this
   # because we won't be calling find_package() again
   find_package(${name})
+  qi_persistent_set(${name}_INCLUDE_DIRS ${${name}_INCLUDE_DIRS})
   qi_persistent_set(${prefix}_LIBRARIES ${${name}_LIBRARIES})
   qi_persistent_set(${prefix}_INCLUDE_DIRS ${${name}_INCLUDE_DIRS})
   set(_define ${prefix}_LIB)
