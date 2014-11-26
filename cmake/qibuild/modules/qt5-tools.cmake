@@ -22,7 +22,8 @@ function(qi_generate_qt_conf)
       list(GET QT5_CORE_LIBRARIES 1 _lib)
     endif()
 
-    get_filename_component(_lib_path ${_lib} PATH)
+    get_target_property(_lib_loc ${_lib} LOCATION)
+    get_filename_component(_lib_path ${_lib_loc} PATH)
     get_filename_component(_root_path ${_lib_path} PATH)
   endif()
 

@@ -10,20 +10,7 @@ function(qt5_flib prefix name)
   # upstream uses Qt5::Core notation but we need to dereference this
   # because we won't be calling find_package() again
   find_package(${name})
-  foreach(_lib ${${name}_LIBRARIES})
-    if(WIN32)
-      get_target_property(_imported_lib_debug ${_lib} IMPORTED_IMPLIB_DEBUG)
-      get_target_property(_imported_lib_release ${_lib} IMPORTED_IMPLIB_RELEASE)
-      list(APPEND ${prefix}_LIBRARIES
-        optimized ${_imported_lib_release}
-        debug ${_imported_lib_debug}
-      )
-    else()
-      get_target_property(_lib_loc ${_lib} LOCATION)
-      list(APPEND ${prefix}_LIBRARIES ${_lib_loc})
-    endif()
-  endforeach()
-  set(${prefix}_LIBRARIES ${${prefix}_LIBRARIES} CACHE INTERNAL "" FORCE)
+  set(${prefix}_LIBRARIES ${${name}_LIBRARIES} CACHE INTERNAL "" FORCE)
   set(${prefix}_INCLUDE_DIRS ${${name}_INCLUDE_DIRS} CACHE INTERNAL "" FORCE)
   set(_define ${prefix}_LIB)
   string(REPLACE QT5 QT _define ${_define})
