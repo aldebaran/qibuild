@@ -111,3 +111,13 @@ def test_flat(tmpdir):
     qisys.archive.extract(res, dest.strpath, strict_mode=False)
     assert dest.join("include", "foo.h").check(file=True)
 
+@pytest.mark.xfail
+def test_symlinks(tmpdir):
+    src = tmpdir.mkdir("src")
+    src.ensure("lib", "libfoo.so.42", file=True)
+    src.join("lib", "libfoo.so").mksymlinkto("libfoo.so.42")
+    output = tmpdir.join("foo.zip")
+    res = qisys.archive.compress(src.strpath, output=output.strpath)
+    dest = tmpdir.mkdir("dest").mkdir("foo")
+    qisys.archive.extract(res, dest.strpath)
+    assert dest.join("lib", "libfoo.so").islink()
