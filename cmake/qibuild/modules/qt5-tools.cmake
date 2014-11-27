@@ -24,6 +24,10 @@ function(qi_generate_qt_conf)
 
     get_target_property(_lib_loc ${_lib} LOCATION)
     get_filename_component(_lib_path ${_lib_loc} PATH)
+    if(APPLE)
+      # location is: <prefix>/lib/QtCore.framework/QtCore
+      get_filename_component(_lib_path ${_lib_path} PATH)
+    endif()
     get_filename_component(_root_path ${_lib_path} PATH)
   endif()
 
