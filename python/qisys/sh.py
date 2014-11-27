@@ -175,7 +175,7 @@ def _handle_dirs(src, dest, root, directories, filter_fun, quiet):
             if os.path.lexists(ddest) and not os.path.isdir(ddest):
                 raise Exception("Expecting a directory but found a file: %s" % ddest)
             mkdir(ddest, recursive=True)
-        return installed
+    return installed
 
 
 def _handle_files(src, dest, root, files, filter_fun, quiet):

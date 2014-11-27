@@ -89,3 +89,13 @@ def test_install_return_value(tmpdir):
     assert ret == ["a/b", "a/c/d"]
     ret = qisys.sh.install(d.strpath, dest.strpath)
     assert ret == ["d"]
+
+def test_install_qt_symlinks(tmpdir):
+    tc_path = tmpdir.mkdir("toolchain")
+    qt_src = tc_path.mkdir("qt")
+    qt_src.ensure("lib", "QtCore.framework", "QtCore", file=True)
+    qt_src.join("QtCore.framework").mksymlinkto("lib/QtCore.framework")
+    dest = tmpdir.join("dest")
+    qisys.sh.install(qt_src.strpath, dest.strpath, filter_fun=qisys.sh.is_runtime)
+    assert dest.join("QtCore.framework").islink()
+
