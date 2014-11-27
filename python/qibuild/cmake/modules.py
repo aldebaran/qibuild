@@ -67,11 +67,12 @@ def add_cmake_module_to_archive(archive_path, name, interactive=True):
     algo   = qisys.archive.guess_algo(archive_path)
     with qisys.sh.TempDir() as work_dir:
         # pep8-ignore: E501
-        root_dir = qisys.archive.extract(archive_path, work_dir, algo=algo, quiet=True)
+        root_dir = qisys.archive.extract(archive_path, work_dir, algo=algo,
+                                         quiet=True, strict_mode=False)
         if name is None:
             name = os.path.basename(root_dir)
         module = generate_cmake_module(root_dir, name)
         if interactive:
             edit_module(module)
-        res = qisys.archive.compress(root_dir)
+        res = qisys.archive.compress(root_dir, flat=True)
         qisys.sh.mv(res, archive_path)

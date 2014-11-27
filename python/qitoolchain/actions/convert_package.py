@@ -20,6 +20,9 @@ def configure_parser(parser):
                         help="The name of the package")
     parser.add_argument("package_path", metavar='PACKAGE_PATH',
                         help="The path to the archive to be converted")
+    parser.add_argument("--batch", dest="interactive", action="store_false",
+                        help="Do not prompt for cmake module edition")
+    parser.set_defaults(interactive=True)
 
 
 def do(args):
@@ -27,16 +30,18 @@ def do(args):
 
     """
     name = args.name
+    interactive = args.interactive
     package_path = args.package_path
     ui.info("Converting", package_path, "into a qiBuild package")
-    res = convert_package(package_path, name, interactive=True)
+    res = convert_package(package_path, name, interactive=interactive)
     message = """\
 Conversion succeeded.
 
 qiBuild package:
-  {1}
+  {0}
 
 You can add this qiBuild package to a toolchain using:
-  qitoolchain add-package -c <toolchain name> {0} {1}\
-""".format(name, res)
+  qitoolchain add-package -c <toolchain name> {0}\
+""".format(res)
     qisys.ui.info(message)
+    return res
