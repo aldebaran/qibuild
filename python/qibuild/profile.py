@@ -99,50 +99,6 @@ def remove_build_profile(xml_path, name):
         if profile.get("name") == name:
             match_elem = profile
     if match_elem is None:
-        raise NoSuchProfile(xml_path, name)
+        raise Exception("No such profile: " + name)
     profiles.remove(match_elem)
     qisys.qixml.write(tree, xml_path)
-
-def get_cmake_flags(xml_path, profile_names):
-    """ Get the full list of flags to use give a list of
-    build profiles.
-    Every profile in the list should exist.
-
-    :returns: a list of tuples ``(name, value)``
-
-    """
-    cmake_flags = list()
-    profiles = parse_profiles(xml_path)
-    for profile_name in profile_names:
-        match = profiles.get(profile_name)
-        if not match:
-            raise NoSuchProfile(xml_path, profile_name)
-        else:
-            cmake_flags.extend(match.cmake_flags)
-    return cmake_flags
-
-
-class NoSuchProfile(Exception):
-    """ The profile specified by the user cannot be found """
-    def __init__(self, xml_file, profile_name):
-        self.profile_name = profile_name
-        self.xml_file = xml_file
-
-    def __str__(self):
-        profiles = parse_profiles(self.xml_file)
-        return """ Could not find profile {name}.
-Known profiles are: {profiles}
-Please check your worktree configuration in:
-{xml_file} \
-""".format(name=self.profile_name, xml_file=self.xml_file,
-           profiles=', '.join(sorted(profiles.keys())))
-
-class NoProfile(Exception):
-    """ The worktree does not contain any build profiles """
-    def __init__(self, xml_file, profile_name):
-        self.profile_name = profile_name
-        self.xml_file = xml_file
-
-    def __str__(self):
-        return "No profiles regisetered in %s" % self.xml_file
-

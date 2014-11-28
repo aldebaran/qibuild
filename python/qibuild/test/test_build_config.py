@@ -21,7 +21,6 @@ def test_users_flags_taken_last(build_worktree):
              "-DWITH_FOO=ON",
              "-DWITH_FOO=OFF"]
 
-
 def test_sane_defaults(build_worktree):
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
     assert build_config.cmake_generator is None
@@ -112,3 +111,34 @@ def test_local_cmake(build_worktree, toolchains):
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
     build_config.set_active_config("foo")
     assert build_config.local_cmake == foo_cmake
+
+def test_local_and_remote_profiles(build_worktree):
+    to_make = os.path.join(build_worktree.dot_qi, "manifests", "default")
+    qisys.sh.mkdir(to_make, recursive=True)
+    remote_xml = os.path.join(to_make, "manifest.xml")
+    with open(remote_xml, "w") as fp:
+        fp.write("<qibuild />")
+    qibuild.profile.configure_build_profile(remote_xml, "bar", [("WITH_BAR", "ON")])
+    local_xml = build_worktree.qibuild_xml
+    qibuild.profile.configure_build_profile(local_xml, "foo", [("WITH_FOO", "ON")])
+    build_config = build_worktree.build_config
+
+    build_config.profiles = ["bar"]
+    assert build_config._profile_flags == [("WITH_BAR", "ON")]
+
+    build_config.profiles = ["foo"]
+    assert build_config._profile_flags == [("WITH_FOO", "ON")]
+
+def test_overwriting_remote_profiles(build_worktree):
+    to_make = os.path.join(build_worktree.dot_qi, "manifests", "default")
+    qisys.sh.mkdir(to_make, recursive=True)
+    remote_xml = os.path.join(to_make, "manifest.xml")
+    with open(remote_xml, "w") as fp:
+        fp.write("<qibuild />")
+    qibuild.profile.configure_build_profile(remote_xml, "bar", [("WITH_BAR", "ON")])
+    local_xml = build_worktree.qibuild_xml
+    qibuild.profile.configure_build_profile(local_xml, "bar", [("WITH_BAR", "OFF")])
+    build_config = build_worktree.build_config
+
+    build_config.profiles = ["bar"]
+    assert build_config._profile_flags == [("WITH_BAR", "OFF")]

@@ -173,7 +173,6 @@ def test_sync_branch_devel_no_ff(qisrc_action, git_server, test_git):
     assert test_git.get_ref_sha1("refs/heads/master") == master_sha1
 
 def test_sync_dash_g(qisrc_action, git_server):
-
     git_server.create_group("mygroup", ["a", "b"])
     git_server.create_repo("other")
     git_server.push_file("other", "other.txt", "change 1")
@@ -200,7 +199,6 @@ def test_incorrect_branch_still_fetches(qisrc_action, git_server):
     new_sha1 = test_git.get_ref_sha1("refs/remotes/origin/master")
     assert previous_sha1 != new_sha1
 
-
 def test_keeps_staged_changes(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
@@ -214,7 +212,6 @@ def test_keeps_staged_changes(qisrc_action, git_server):
     test_git.add(staged_file)
     foo.sync()
     assert os.path.exists(staged_file)
-
 
 def test_new_project_under_gitorious(git_worktree, git_server):
     git_server.create_repo("foo", review=False)

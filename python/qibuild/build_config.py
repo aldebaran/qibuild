@@ -13,14 +13,14 @@ class CMakeBuildConfig(object):
     that can affect the build  (the toolchain name, the build
     profiles, etc ...)
 
-
     """
     def __init__(self, build_worktree):
         self.active_config = None
         self.build_worktree = build_worktree
         self.build_type = "Debug"
         self.user_flags = list()
-        self.profiles = list()
+        self._profiles = list()
+        self._profile_flags = list()
         self.verbose_make = False
         self._default_config = None
         self.qibuild_cfg = self.read_global_qibuild_settings()
@@ -28,6 +28,14 @@ class CMakeBuildConfig(object):
         self.read_local_settings()
         self.num_jobs = None
 
+    @property
+    def profiles(self):
+        return self._profiles
+
+    @profiles.setter
+    def profiles(self, value):
+        self._profiles = value
+        self.parse_profiles()
 
     @property
     def local_cmake(self):
@@ -122,12 +130,12 @@ class CMakeBuildConfig(object):
             parts.append(self.build_type.lower())
         return "-".join(parts)
 
-
     @property
     def cmake_args(self):
         """ The CMake arguments to use
 
         """
+        self.parse_profiles()
         args = list()
         if self.cmake_generator:
             args.append("-G%s" % self.cmake_generator)
@@ -135,23 +143,7 @@ class CMakeBuildConfig(object):
             args.append("-DCMAKE_TOOLCHAIN_FILE=%s" % self.toolchain.toolchain_file)
         args.append("-DCMAKE_BUILD_TYPE=%s" % self.build_type)
 
-        # Read remote profiles coming from the qisrc manifest if it exists
-        remote_xml = os.path.join(self.build_worktree.root, ".qi", "manifests",
-                                  "default", "manifest.xml")
-        remote_cmake_flags = list()
-        if os.path.exists(remote_xml):
-            remote_cmake_flags = qibuild.profile.get_cmake_flags(remote_xml,
-                                    self.profiles)
-        # Read local profiles coming from .qi/qibuild.xml
-        local_cmake_flags = list()
-        try:
-            local_cmake_flags = qibuild.profile.get_cmake_flags(
-                                    self.build_worktree.qibuild_xml, self.profiles)
-        except qibuild.profile.NoSuchProfile:
-            pass
-        cmake_flags = remote_cmake_flags + local_cmake_flags
-
-        for (name, value) in cmake_flags:
+        for (name, value) in self._profile_flags:
             args.append("-D%s=%s" % (name, value))
         for (name, value) in self.user_flags:
             args.append("-D%s=%s" % (name, value))
@@ -192,6 +184,26 @@ but this does not match any toolchain name
         self.qibuild_cfg.set_active_config(default_config)
         self.set_active_config(default_config)
 
+    def parse_profiles(self):
+        profile_flags = list()
+        remote_xml = os.path.join(self.build_worktree.root, ".qi", "manifests",
+                                  "default", "manifest.xml")
+        if os.path.exists(remote_xml):
+            profiles = qibuild.profile.parse_profiles(remote_xml)
+        else:
+            profiles = dict()
+        local_xml = self.build_worktree.qibuild_xml
+        local_profiles = qibuild.profile.parse_profiles(local_xml)
+        profiles.update(local_profiles)
+        res = list()
+        known_profiles = profiles.keys()
+        for name in self._profiles:
+            if not name in known_profiles:
+                raise NoSuchProfile(name, known_profiles)
+            flags = profiles[name].cmake_flags
+            profile_flags.extend(flags)
+        self._profile_flags = profile_flags
+
     def set_active_config(self, active_config):
         """ Set the active configuration. This should match an
         existing toolchain name.
@@ -201,3 +213,15 @@ but this does not match any toolchain name
         """
         self.active_config = active_config
         self.qibuild_cfg.set_active_config(active_config)
+
+class NoSuchProfile(Exception):
+    """ The profile specified by the user cannot be found """
+    def __init__(self, name, known_profiles):
+        self.name = name
+        self.known_profiles = known_profiles
+
+    def __str__(self):
+        return """ Could not find profile {name}.
+Known profiles are: {profiles}
+""".format(name=self.name,
+           profiles=', '.join(sorted(self.known_profiles)))

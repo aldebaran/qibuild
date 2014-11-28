@@ -4,6 +4,8 @@
 
 
 import qibuild.profile
+from qisrc.test.conftest import qisrc_action, git_server
+from qibuild.test.conftest import TestBuildWorkTree
 
 def test_read_build_profiles(tmpdir):
     qibuild_xml = tmpdir.join("qibuild.xml")
@@ -31,9 +33,6 @@ def test_read_build_profiles(tmpdir):
     assert len(profiles) == 2
     assert profiles['foo'].cmake_flags == [("WITH_FOO", "ON")]
     assert profiles['bar'].cmake_flags == [("WITH_BAR", "ON")]
-    assert qibuild.profile.get_cmake_flags(qibuild_xml.strpath,
-                                            ["bar", "foo"]) == \
-            [("WITH_BAR", "ON"), ("WITH_FOO", "ON")]
 
 def test_profiles_are_persistent(tmpdir):
     qibuild_xml = tmpdir.join("qibuild.xml")
@@ -44,3 +43,12 @@ def test_profiles_are_persistent(tmpdir):
     qibuild.profile.remove_build_profile(qibuild_xml.strpath, "foo")
     assert "foo" not in qibuild.profile.parse_profiles(qibuild_xml.strpath)
 
+def test_using_custom_profile(qibuild_action, qisrc_action, git_server):
+    git_server.add_build_profile("foo", [("WITH_FOO", "ON")])
+    qisrc_action("init", git_server.manifest_url)
+    build_worktree = TestBuildWorkTree()
+    qibuild_xml = build_worktree.qibuild_xml
+    qibuild.profile.configure_build_profile(qibuild_xml, "bar", [("WITH_BAR", "ON")])
+    build_worktree.create_project("spam")
+    qibuild_action("configure", "spam", "--profile", "foo", "--summarize-options")
+    qibuild_action("configure", "spam", "--profile", "bar", "--summarize-options")
