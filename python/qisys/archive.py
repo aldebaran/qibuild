@@ -183,7 +183,10 @@ Please set only one of these two options to 'True'
 
     archive_.close()
     ui.debug(archive, "extracted in", directory)
-    res = os.path.join(directory, orig_topdir)
+    if strict_mode:
+        res = os.path.join(directory, orig_topdir)
+    else:
+        res = directory
     return res
 
 

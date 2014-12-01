@@ -121,3 +121,12 @@ def test_symlinks(tmpdir):
     dest = tmpdir.mkdir("dest").mkdir("foo")
     qisys.archive.extract(res, dest.strpath)
     assert dest.join("lib", "libfoo.so").islink()
+
+def test_returned_value_when_extracting_flat_package(tmpdir):
+    src = tmpdir.mkdir("src")
+    src.ensure("a", file=True)
+    src.ensure("b", file=True)
+    archive = qisys.archive.compress(src.strpath, flat=True)
+    dest = tmpdir.mkdir("dest")
+    res = qisys.archive.extract(archive, dest.strpath, strict_mode=False)
+    assert res == dest.strpath
