@@ -246,7 +246,8 @@ class CMakeBuilder(AbstractBuilder):
         for project in self.projects:
             scripts = qibuild.deploy.generate_debug_scripts(self, deploy_dir,
                                                             project.name, url)
-            to_deploy.extend(scripts)
+            if scripts:
+                to_deploy.extend(scripts)
 
         # Write the list of files to be deployed
         with open(deploy_manifest, "a") as f:
