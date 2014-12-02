@@ -211,9 +211,18 @@ def download(url, output_dir, output_name=None,
 def deploy(local_directory, remote_url, filelist=None):
     """Deploy a local directory to a remote url."""
     # ensure destination directory exist before deploying data
-    cmd = ["ssh", "-p", str(remote_url.port),
-            "%s@%s" % (remote_url.user, remote_url.host),
-            "mkdir", "-p", remote_url.remote_directory]
+    if not (remote_url.host and remote_url.remote_directory):
+        message = "Remote URL is invalid; host and remote directory must be specified"
+        raise Exception(message)
+
+    cmd = ["ssh"]
+    if remote_url.port:
+        cmd.extend(["-p", str(remote_url.port)])
+    if remote_url.user:
+        cmd.extend(["%s@%s" % (remote_url.user, remote_url.host)])
+    else:
+        cmd.extend(["%s" % remote_url.host])
+    cmd.extend(["mkdir", "-p", remote_url.remote_directory])
     qisys.command.call(cmd)
     # This is required for rsync to do the right thing,
     # otherwise the basename of local_directory gets
@@ -228,7 +237,8 @@ def deploy(local_directory, remote_url, filelist=None):
         "--progress", # print a progress bar
         "--checksum", # verify checksum instead of size and date
         "--exclude=.debug/"]
-    cmd.extend(["-e", "ssh -p %d" % remote_url.port])
+    if remote_url.port:
+        cmd.extend(["-e", "ssh -p %d" % remote_url.port])
     if filelist:
         cmd.append("--files-from=%s" % filelist)
     cmd.append(local_directory)
