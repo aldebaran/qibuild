@@ -17,6 +17,7 @@ class TestSuiteRunner(object):
         self.perf = False
         self.nightly = False
         self.coverage = False
+        self.nightmare = False
         self._tests = project.tests
 
     @abc.abstractproperty

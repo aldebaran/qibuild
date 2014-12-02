@@ -75,5 +75,6 @@ Please go to the root of a sdk directory or into a qibuild project.
     test_runner.num_cpus = args.num_cpus
     test_runner.num_jobs = args.num_jobs
     test_runner.nightly = args.nightly
+    test_runner.nightmare = args.nightmare
 
     return test_runner

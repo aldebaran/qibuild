@@ -152,8 +152,11 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         self._update_test_env(test)
         self._update_test_cwd(test)
         valgrind = self.suite_runner.valgrind
+        nightmare = self.suite_runner.nightmare
         if valgrind:
             self._with_valgrind(test)
+        if nightmare:
+            self._nightmare_mode(test)
         num_cpus = self.suite_runner.num_cpus
         if num_cpus != -1:
             self._with_num_cpus(test, num_cpus)
@@ -216,6 +219,13 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         test["timeout"] = test["timeout"] * 10
         test["cmd"] = ["valgrind", "--track-fds=yes",
                        "--log-file=%s" % self.valgrind_log] + test["cmd"]
+
+    def _nightmare_mode(self, test):
+        if not test.get("gtest"):
+            return
+        cmd = test["cmd"]
+        cmd.extend(["--gtest_shuffle", "--gtest_repeat=20"])
+        test["timeout"] = test["timeout"] * 20
 
     def _with_num_cpus(self, test, num_cpus):
         cpu_list = get_cpu_list(multiprocessing.cpu_count(),
