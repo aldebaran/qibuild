@@ -321,6 +321,17 @@ MACRO(QT4_ADD_DBUS_ADAPTOR _sources _xml_file _include _parentClass) # _optional
 ENDMACRO(QT4_ADD_DBUS_ADAPTOR)
 
 
+MACRO (MACRO_ADD_FILE_DEPENDENCIES _file)
+   GET_SOURCE_FILE_PROPERTY(_deps ${_file} OBJECT_DEPENDS)
+   if (_deps)
+      SET(_deps ${_deps} ${ARGN})
+   else ()
+      SET(_deps ${ARGN})
+   endif ()
+   SET_SOURCE_FILES_PROPERTIES(${_file} PROPERTIES OBJECT_DEPENDS "${_deps}")
+ENDMACRO ()
+
+
 MACRO(QT4_AUTOMOC)
   QT4_GET_MOC_FLAGS(_moc_INCS)
 
