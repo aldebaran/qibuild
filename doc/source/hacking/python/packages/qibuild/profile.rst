@@ -20,13 +20,8 @@ Profile
 Other functions in this module
 ------------------------------
 
-.. autofunction:: get_cmake_flags
-
 .. autofunction:: configure_build_profile
 
 .. autofunction:: remove_build_profile
 
 .. autofunction:: parse_profiles
-
-
-
