@@ -185,10 +185,7 @@ class SphinxProject(qidoc.project.DocProject):
             real_dest = os.path.join(destdir, example_src)
             qisys.sh.install(example_path, real_dest, quiet=True)
 
-        def non_hidden(src):
-            return not src.startswith(".")
-
-        qisys.sh.install(self.html_dir, destdir, filter_fun=non_hidden)
+        qisys.sh.install(self.html_dir, destdir)
 
 
 class SphinxBuildError(Exception):
