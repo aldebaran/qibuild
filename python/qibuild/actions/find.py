@@ -39,7 +39,7 @@ def _use_cmake_cache(args):
     keys = [k for k in keys if k.upper().startswith(package.upper())]
     if not keys:
         ui.error("Nothing found about CMake module: ", package)
-        return
+        sys.exit(1)
     ui.info("CMake module: ", package)
     for key in keys:
         value = cache[key]
