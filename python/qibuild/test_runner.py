@@ -17,14 +17,12 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     def __init__(self, project):
         super(ProjectTestRunner, self).__init__(project)
+        self.test_results_dir = "test-results"
+        self.perf_results_dir = "perf-results"
         self._coverage = False
         self._valgrind = False
         self._num_cpus = -1
         tests = project.tests
-        for directory in (self.test_results_dir,
-                          self.perf_results_dir):
-            qisys.sh.rm(directory)
-            qisys.sh.mkdir(directory)
 
     @property
     def launcher(self):
@@ -33,17 +31,23 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @property
     def test_results_dir(self):
-        res = os.path.join(self.project.sdk_directory,
-                           "test-results")
-        qisys.sh.mkdir(res, recursive=True)
-        return res
+        return self._test_results_dir
+
+    @test_results_dir.setter
+    def test_results_dir(self, value):
+        self._test_results_dir = os.path.join(self.project.sdk_directory, value)
+        qisys.sh.rm(self._test_results_dir)
+        qisys.sh.mkdir(self._test_results_dir, recursive=True)
 
     @property
     def perf_results_dir(self):
-        res = os.path.join(self.project.sdk_directory,
-                           "perf-results")
-        qisys.sh.mkdir(res, recursive=True)
-        return res
+        return self._perf_results_dir
+
+    @perf_results_dir.setter
+    def perf_results_dir(self, value):
+        self._perf_results_dir = os.path.join(self.project.sdk_directory, value)
+        qisys.sh.rm(self._perf_results_dir)
+        qisys.sh.mkdir(self._perf_results_dir, recursive=True)
 
     @property
     def num_cpus(self):
