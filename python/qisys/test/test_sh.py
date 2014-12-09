@@ -78,6 +78,7 @@ def test_is_runtime():
     assert qisys.sh.is_runtime("include/python2.7/pyconfig.h") is True
     if sys.platform == "darwin":
         assert qisys.sh.is_runtime("lib/libfoo.dylib") is True
+    assert qisys.sh.is_runtime("lib/fonts/Vera.ttf") is True
 
 def test_install_return_value(tmpdir):
     src = tmpdir.mkdir("src")

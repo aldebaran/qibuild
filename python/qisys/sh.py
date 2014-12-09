@@ -610,27 +610,9 @@ def is_runtime(filename):
         else:
             return True
     if filename.startswith("lib"):
-        # exception for python:
-        if "python" in filename:
-            if filename.endswith(("Makefile", "pyconfig.h")):
-                return True
-        # shared libraries
-        shared_lib_ext = ""
-        if sys.platform.startswith("win"):
-            shared_lib_ext = ".dll"
-        if sys.platform.startswith("linux"):
-            shared_lib_ext = ".so"
-        if sys.platform == "darwin":
-            shared_lib_ext = ".dylib"
-        if shared_lib_ext in basename:
-            return True
-        # python
-        if basename.endswith(".py"):
-            return True
-        if basename.endswith(".pyd"):
-            return True
-        else:
+        if filename.endswith((".a", ".lib", ".la", ".pc")):
             return False
+        return True
     if filename.startswith(os.path.join("share", "cmake")):
         return False
     if filename.startswith(os.path.join("share", "man")):
