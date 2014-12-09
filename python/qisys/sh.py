@@ -147,6 +147,8 @@ def _copy_link(src, dest, quiet):
         rm(dest)
     if sys.stdout.isatty() and not quiet:
         print "-- Installing %s -> %s" % (dest, target)
+    to_make = os.path.dirname(dest)
+    mkdir(to_make, recursive=True)
     os.symlink(target, dest)
 
 
