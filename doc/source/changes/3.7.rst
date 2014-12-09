@@ -17,12 +17,28 @@ qibuild
 --------
 
 * Write a ``path.conf`` in the .qi folder too
+
 * Fix  #24199: additional environment paths leaking from other configs
+
 * Fix using ``--build-type=[RelWithDebInfo|MinSizeRel]`` with Visual Studio
+
 * Fix using ``qibuild test`` with ``-p``
-* Fix updating build profiles remotely. To get an up-to-date profile, you
-  should first remove the ``<profiles>`` tag manually from ``.qi/qibuild.xml``
+
+* Fix updating build profiles remotely.
+
+  To get an up-to-date profile, you should first remove the ``<profiles>`` tag
+  manually from ``.qi/qibuild.xml``.
+
   The ``tools/3.7-migration.py`` script can help you do that.
+
+* Fix crash in ``qibuild deploy`` when gdb is not installed
+
+* ``qibuild install``: small bug fix
+
+  The ``make preinstall`` hack used to look for
+  Unix Makefiles in the build config, instead of
+  reading the CMakeCache, causing install failures
+  when no generator was specified in the build config.
 
 qidoc
 ------
@@ -30,6 +46,7 @@ qidoc
 * Fix crash when ``build_type`` is None
 * Do not put doubles in ``qiapidoc_srcs``
 * Fix bug with recent ``sphinx``: except ``SystemExit`` to prevent early exit
+* Do not filter hidden files when installing
 
 qilinguist
 ----------
@@ -63,6 +80,13 @@ qisrc
 * Fix issue when changing remotes: the new remote was added but the previous
   one never deleted
 * ``qisrc list-groups``: sort the output
+* ``qisrc add-group``: fix #26829
+
+  We used to not store the default group when running
+  ``qisrc init``, causing ``qisrc add-group`` to remove some projects
+  when called afterwards.
+
+* ``qisrc reset``: fix crash when loading bad snapshot
 
 qitest
 -------
@@ -75,6 +99,7 @@ qitest
 * ``qitest run --nightly``: also run the normal tests.
 * Do not overwrite generated XML files when return code is 1
 * Merge ``qitest.json`` files when installing with ``--with-tests``
+* Re-implement ``qitest`` "nightmare" mode.
 
 qitoolchain
 -----------
@@ -111,7 +136,20 @@ cmake
 ------
 
 * Look for boost shared libs on Windows
+
 * ``Qt``: Remove ``QT_USE_QMAKE`` option. Instead just look for the
   ``qmake`` executable to include upstream CMake modules. Previous
   behavior can be achieved by setting ``QT_QMAKE_EXECUTABLE`` variable.
-* cmake modules: add ``curl``
+
+* cmake modules:
+
+  * add ``curl``
+  * add ``soprano``
+
+* Fix staging shared libraries in a subfolder
+
+* Add Qt5 support
+
+* Compile executables with -fPIE on linux (required for Qt5)
+
+* Fix ``QT4_AUTOMOC``
