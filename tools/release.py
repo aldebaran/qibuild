@@ -8,8 +8,6 @@ import qisrc.git
 
 FILES_TO_PATCH = [
     "setup.py",
-    "cmake/qibuild/version.cmake",
-    "doc/source/conf.in.py",
     "python/qisys/main.py",
 ]
 
