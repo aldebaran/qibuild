@@ -11,16 +11,79 @@ from qisys import ui
 import qisys.parsers
 import qibuild.worktree
 import qibuild.cmake_builder
+import qibuild.deps
 
 
-def cmake_build_parser(parser, group=None):
-    qisys.parsers.build_parser(parser, group=None)
+def cmake_build_parser(parser, group=None, with_build_parser=True):
+    if with_build_parser:
+        qisys.parsers.build_parser(parser, group=None)
     if not group:
         group = parser.add_argument_group("Build options")
     parser.add_argument("-j", dest="num_jobs", type=int)
     parser.add_argument("--build-type", action="store")
     group.add_argument("--verbose-make", action="store_true", default=False,
                     help="Print the executed commands while building")
+
+def cmake_configure_parser(parser):
+    group = parser.add_argument_group("configure options")
+    group.add_argument("-G", "--cmake-generator", action="store",
+        help="Specify the CMake generator")
+    group.add_argument("-D", dest="cmake_flags",
+        action="append",
+        help="additional cmake flags")
+    group.add_argument("--no-clean-first", dest="clean_first",
+        action="store_false",
+        help="do not clean CMake cache")
+    group.add_argument("--debug-trycompile", dest="debug_trycompile",
+        action="store_true",
+        help="pass --debug-trycompile to CMake call")
+    group.add_argument("--eff-c++", dest="effective_cplusplus",
+        action="store_true",
+        help="activate warnings from the 'Effective C++' book (gcc only)")
+    group.add_argument("--werror", dest="werror",
+        action="store_true",
+        help="treat warnings as error")
+    group.add_argument("--profiling", dest="profiling", action="store_true",
+        help="profile cmake execution")
+    group.add_argument("--summarize-options", dest="summarize_options",
+                        action="store_true",
+                        help="summarize build options at the end")
+    group.add_argument("--trace-cmake", dest="trace_cmake",
+                      action="store_true",
+                      help="run cmake in trace mode")
+    group.add_argument("--coverage", dest="coverage",
+                       action="store_true",
+                       help="activate coverage support (gcc only)")
+    group.add_argument("--32-bits", dest="force_32_bits",
+                       action="store_true", help="force 32 bits build")
+    group.add_argument("--with-debug-info", action="store_true", dest="debug_info",
+                        help="include debug information in binaries. Overrides --debug")
+    group.add_argument("--without-debug-info", action="store_false", dest="debug_info",
+                        help="remove debug information from binaries. Overrides --release")
+
+    parser.set_defaults(clean_first=True, effective_cplusplus=False,
+                        werror=False, profiling=False,
+                        trace_cmake=False, debug_info=None)
+
+def get_cmake_args(args):
+    """ Convert 'helper' options into cmake flags
+
+    """
+    if not args.cmake_flags:
+        args.cmake_flags = list()
+    if args.effective_cplusplus:
+        args.cmake_flags.append("QI_EFFECTIVE_CPP=ON")
+    if args.werror:
+        args.cmake_flags.append("QI_WERROR=ON")
+    if args.coverage:
+        args.cmake_flags.append("QI_WITH_COVERAGE=ON")
+    # args.debug_info has 3 values: None (not set at all), True, False
+    if args.debug_info is True:
+        args.cmake_flags.append("QI_WITH_DEBUG_INFO=ON")
+    if args.debug_info is False:
+        args.cmake_flags.append("QI_WITH_DEBUG_INFO=OFF")
+    if args.force_32_bits:
+        args.cmake_flags.append("QI_FORCE_32_BITS=ON")
 
 def project_parser(parser, positional=True):
     """Parser settings for every action using several build projects."""
@@ -72,7 +135,7 @@ def get_build_projects(build_worktree, args, solve_deps=True, default_all=False)
     if not solve_deps or args.single:
         return projects
     dep_types = get_dep_types(args)
-    deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
+    deps_solver = qibuild.deps.DepsSolver(build_worktree)
     return deps_solver.get_dep_projects(projects, dep_types)
 
 def get_one_build_project(build_worktree, args):

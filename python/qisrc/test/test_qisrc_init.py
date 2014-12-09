@@ -31,7 +31,6 @@ def test_finish_configure_after_error(cd_to_tmpdir, git_server):
     git_worktree = TestGitWorkTree()
     assert git_worktree.manifest
 
-
 def test_reconfigure(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     git_server.create_group("mygroup", ["a", "b"])
@@ -81,4 +80,9 @@ def test_re_add_path_exists(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 3
 
-
+def test_stores_default_group(qisrc_action, git_server):
+    git_server.create_group("default", ["a"], default=True)
+    manifest_url = git_server.manifest_url
+    qisrc_action("init", manifest_url)
+    git_worktree = TestGitWorkTree()
+    assert git_worktree.manifest.groups == ["default"]

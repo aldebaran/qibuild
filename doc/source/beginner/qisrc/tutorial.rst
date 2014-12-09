@@ -67,9 +67,9 @@ Doing so is easy: just write a manifest looking like
    <manifest>
       <remote name="origin" url="git@git.aldebaran.lan" />
 
-      <repo project="qi/libqi.git"        src="lib/libqi" />
-      <repo project="lib/libnaoqi.git"    src="lib/libnaoqi" />
-      <repo project="gui/choregraphe.git" src="gui/choregraphe" />
+      <repo project="qi/libqi.git"        remotes="master" src="lib/libqi" />
+      <repo project="lib/libnaoqi.git"    remotes="master" src="lib/libnaoqi" />
+      <repo project="gui/choregraphe.git" remotes="master" src="gui/choregraphe" />
 
     </manifest>
 
@@ -93,7 +93,7 @@ Handling release branches
 +++++++++++++++++++++++++
 
 
-``qisrc`` makes it easy to have several projects all tracking the same branch.
+``qisrc`` makes it easy to have several projects all tracking different branches.
 
 For instance, when doing a choregraphe release, you may want to make sure everything
 is in the ``release-1.12`` branch
@@ -105,7 +105,9 @@ file to look like
 .. code-block:: xml
 
    <manifest>
-      <remote url="git@git.aldebaran.lan" branch="release-1.12" />
+      <remote name="origin" url="git@git.aldebaran.lan" />
+      <repo project="qi/libqi.git" remotes="origin" branch="release-1.12" />
+      ...
     </manifest>
 
 
@@ -121,6 +123,12 @@ local branch ready to track the 'release-1.12' remote branch.
 
 Of course, since you have created a branch inside the manifest, it is
 easy to add new repositories just for master.
+
+If you do not want to create a new worktree, you can also use:
+
+.. code-block:: console
+
+    qisrc checkout release-1.12
 
 
 Handling profiles
@@ -161,26 +169,34 @@ Of course, if you need to build the doc for the release, just use:
     qisrc init git@git.aldebaran.lan:qi/manifest.git --group doc --branch relase-1.12
 
 
-But wait, there's more !
-++++++++++++++++++++++++
+You can also list, add and remove the groups used in your worktree by using
+``qisrc list-groups``, ``qisrc add-group``, ``qisrc rm-group``
 
-Let's assume you are in a development branch, called ``my_crazy_feature``
 
-You want to rebase ``my_crazy_feature`` with ``master``, and make sure
-it stays compatible with every other ``master`` branch on every other project.
+Handling development branches
++++++++++++++++++++++++++++++
 
-So you just run ``qisrc sync --rebase-devel``, and:
+Let's say you have two branches for every project in your worktree
+(and thus two branches in your manifest repo)
 
-* The manifest you clone inside your worktree is updated
-* Every projects that were added to the manifest/default.xml file are
-  cloned to your worktree.
-* For each project, ``qisrc sync`` called ``git pull --rebase`` if you are
-  on the ``master`` branch
-* For the project you are currently working in, ``qisrc sync`` sees that
-  you are not on the correct branch, but your local ``master`` branch can be
-  fast-forwared to ``origin/master``. So it just does that, and then
-  put you back to your ``my_crazy_feature`` branch, ready to continue working
-  or just do something like ``git rebase master``
+``master``, which is a stable branch, and ``next``, where development occurs.
+Bug fixes may be submitted on ``master`` directly, so you may want to make
+sure ``next`` is always up to date, by rebasing ``next`` on top of ``master``.
+
+To do so, in a worktree configured with the ``next`` branch of the manifest,
+use:
+
+.. code-block:: console
+
+    qisrc rebase master
+
+If you are happy with the changes, you can also run:
+
+.. code-block:: console
+
+    qisrc rebase master --push
+
+(Since this command uses ``git push --force``, use this at your own risk)
 
 
 Handling code review

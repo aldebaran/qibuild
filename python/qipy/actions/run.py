@@ -12,7 +12,9 @@ import qipy.parsers
 
 def configure_parser(parser):
     qibuild.parsers.cmake_build_parser(parser)
-    parser.add_argument("--list", action="store_true", dest="dolist", default=False, help="List all available binaries in the virtualenv")
+    parser.add_argument("--list", action="store_true", dest="dolist",
+                       default=False,
+                       help="List all available binaries in the virtualenv")
     parser.add_argument("command", metavar="COMMAND", nargs="*")
 
 def do(args):
@@ -50,5 +52,10 @@ def do(args):
         if script_path:
             cmd[0] = script_path
 
+    env = os.environ.copy()
+    lib_path = virtualenv.path_locations(venv_root)[1]
+    env["PYTHONHOME"] = venv_root
+    env["PYTHONPATH"] = os.path.join(lib_path, "site-packages")
+
     ui.debug("exec", cmd)
-    os.execv(cmd[0], cmd)
+    os.execve(cmd[0], cmd, env)

@@ -55,8 +55,6 @@ def test_read_git_configs(tmpdir, test_git):
     assert gerrit.name == "gerrit"
     assert origin.url == "git@srv:bar.git"
 
-
-
 def test_git_configs_are_persistent(git_worktree):
     foo = git_worktree.create_git_project("foo")
     upstream = Remote()
@@ -80,7 +78,6 @@ def test_git_configs_are_persistent(git_worktree):
     wt2 = qisrc.worktree.GitWorkTree(git_worktree.worktree)
     foo2 = wt2.get_git_project("foo")
     check_config(foo2)
-
 
 def test_clone_missing_simple(git_worktree, git_server):
     foo_repo = git_server.create_repo("foo")
@@ -122,7 +119,6 @@ def test_clone_missing_evil_nested(git_worktree, git_server):
     git_worktree.clone_missing(foo_repo)
     assert len(git_worktree.git_projects) == 2
 
-
 def test_clone_missing_already_correct(git_worktree, git_server, record_messages):
     foo_repo = git_server.create_repo("FooBar")
     git_worktree.clone_missing(foo_repo)
@@ -137,7 +133,6 @@ def test_clone_missing_empty(git_worktree, git_server, record_messages):
     git.init()
     git_worktree.clone_missing(foo_repo)
     assert record_messages.find("WARN")
-
 
 def test_read_groups(git_worktree, git_server):
     manifest_url = git_server.manifest_url

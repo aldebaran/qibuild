@@ -190,6 +190,11 @@ function(_qi_use_lib_internal name)
     endif()
 
     if (DEFINED ${_U_PKG}_LIBRARIES)
+      # hack for qt5:
+      string(REGEX MATCH "^QT5_.*" _match ${_U_PKG})
+      if(NOT "${_match}" STREQUAL "")
+        find_package(${_U_PKG})
+      endif()
       target_link_libraries("${name}" ${${_U_PKG}_LIBRARIES})
     elseif (DEFINED ${_U_PKG}_LIBRARY)
       target_link_libraries("${name}" ${${_U_PKG}_LIBRARY})

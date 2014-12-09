@@ -65,5 +65,5 @@ def test_fails_when_cloning_fails(qisrc_action, git_server):
     foo_project = git_worktree.get_git_project("foo")
     qisys.sh.rm(foo_project.path)
     qisys.sh.rm(git_server.root.strpath)
-    rc = qisrc_action("reset", "--snapshot", snapshot, "--force", retcode=True)
-    assert rc == 1
+    error = qisrc_action("reset", "--snapshot", snapshot, "--force", raises=True)
+    assert "Update failed" in error

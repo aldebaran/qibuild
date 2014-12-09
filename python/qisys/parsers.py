@@ -61,7 +61,6 @@ def project_parser(parser, positional=True):
     parser.set_defaults(single=False, projects = list())
     return group
 
-
 def build_parser(parser, group=None, include_worktree_parser=True):
     """Parser settings for builders."""
     if include_worktree_parser:
@@ -91,7 +90,6 @@ def deploy_parser(parser):
 def get_deploy_urls(args):
     return [qisys.remote.URL(x) for x in args.urls]
 
-
 def get_worktree(args=None):
     """ Get a worktree right after argument parsing.
 
@@ -114,6 +112,8 @@ def get_projects(worktree, args):
 def get_one_project(worktree, args):
     parser = WorkTreeProjectParser(worktree)
     projects = parser.parse_args(args)
+    if projects is None:
+        raise Exception("No project found")
     if not len(projects) == 1:
         raise Exception("This action can only work with one project")
     return projects[0]
@@ -181,7 +181,6 @@ class WorkTreeProjectParser(AbstractProjectParser):
         if res:
             return [res]
 
-
     def parse_one_project(self, args, project_arg):
         """ Accept both an absolute path matching a worktree project,
         or a project src
@@ -197,7 +196,6 @@ class WorkTreeProjectParser(AbstractProjectParser):
         # Now assume it is a project src
         project = self.worktree.get_project(project_arg, raises=True)
         return [project]
-
 
 def find_parent_project(projects, path):
     """ Find the parent project of a given path """

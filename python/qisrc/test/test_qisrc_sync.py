@@ -41,7 +41,6 @@ def test_clone_new_repos(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("bar")
 
-
 def test_configure_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
@@ -52,14 +51,12 @@ def test_configure_new_repos(qisrc_action, git_server):
     bar = git_worktree.get_git_project("bar")
     assert bar.default_remote
 
-
 def test_creates_required_subdirs(qisrc_action, git_server):
     git_server.create_repo("foo/bar.git")
     qisrc_action("init", git_server.manifest_url)
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("foo/bar")
-
 
 def test_uses_build_deps_by_default(qisrc_action, git_server):
     git_server.add_qibuild_test_project("world")
@@ -91,10 +88,13 @@ def test_sync_build_profiles(qisrc_action, git_server):
     git_server.add_build_profile("foo", [("WITH_FOO", "ON")])
     qisrc_action("init", git_server.manifest_url)
     build_worktree = TestBuildWorkTree()
-    qibuild_xml = build_worktree.qibuild_xml
-    foo_profile = qibuild.profile.parse_profiles(qibuild_xml)["foo"]
-    assert foo_profile.name == "foo"
-    assert foo_profile.cmake_flags == [("WITH_FOO", "ON")]
+    build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
+    build_config.profiles = ["foo"]
+    assert build_config.cmake_args == ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_FOO=ON"]
+    git_server.add_build_profile("foo", [("WITH_FOO", "ON"), ("WITH_BAR", "ON")])
+    qisrc_action("sync")
+    assert build_config.cmake_args == ["-DCMAKE_BUILD_TYPE=Debug",
+                                       "-DWITH_FOO=ON", "-DWITH_BAR=ON"]
 
 def test_sync_branch_devel(qisrc_action, git_server, test_git):
     # This tests the case where everything goes smoothly
@@ -173,7 +173,6 @@ def test_sync_branch_devel_no_ff(qisrc_action, git_server, test_git):
     assert test_git.get_ref_sha1("refs/heads/master") == master_sha1
 
 def test_sync_dash_g(qisrc_action, git_server):
-
     git_server.create_group("mygroup", ["a", "b"])
     git_server.create_repo("other")
     git_server.push_file("other", "other.txt", "change 1")
@@ -200,7 +199,6 @@ def test_incorrect_branch_still_fetches(qisrc_action, git_server):
     new_sha1 = test_git.get_ref_sha1("refs/remotes/origin/master")
     assert previous_sha1 != new_sha1
 
-
 def test_keeps_staged_changes(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
@@ -214,3 +212,15 @@ def test_keeps_staged_changes(qisrc_action, git_server):
     test_git.add(staged_file)
     foo.sync()
     assert os.path.exists(staged_file)
+
+def test_new_project_under_gitorious(git_worktree, git_server):
+    git_server.create_repo("foo", review=False)
+    manifest_url = git_server.manifest_url
+    worktree_syncer = qisrc.sync.WorkTreeSyncer(git_worktree)
+    worktree_syncer.configure_manifest(manifest_url)
+    foo = git_worktree.get_git_project("foo")
+    git_server.use_gitorious("foo")
+    worktree_syncer.sync()
+    foo = git_worktree.get_git_project("foo")
+    assert len(foo.remotes) == 1
+    assert foo.default_remote.name == "gitorious"

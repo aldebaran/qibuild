@@ -63,13 +63,13 @@ def do(args):
 
         (status, out) = git_project.sync(rebase_devel=args.rebase_devel)
         if status is None:
-            ui.info("\n", "\n", ui.brown, git_project.src, "  [skipped]")
+            ui.info("\n", ui.brown, "  [skipped]")
             skipped.append((git_project.src, out))
         if status is False:
-            ui.info("\n", "\n", git_project.src, ui.red, "  [failed]")
+            ui.info("\n", ui.red, "  [failed]")
             failed.append((git_project.src, out))
         if out:
-            print ui.indent(out, num=2)
+            print ui.indent(out + "\n\n", num=2)
     #clean the screen
     ui.info_count(i, len(git_projects), ui.blue, " ".ljust(max_src), end="\r")
     print_overview(len(git_projects), len(skipped), len(failed))

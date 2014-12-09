@@ -62,7 +62,6 @@ Please install it if necessary and re-run `qibuild config --wizard`\
         res.append(generator.strip())
     return res
 
-
 def get_cached_var(build_dir, var, default=None):
     """Get a variable from cmake cache
 
@@ -79,7 +78,6 @@ def get_cached_var(build_dir, var, default=None):
         raise Exception(mess)
     res = read_cmake_cache(cmakecache)
     return res.get(var, default)
-
 
 def cmake(source_dir, build_dir, cmake_args, env=None,
           clean_first=True, profiling=False, debug_trycompile=False,
@@ -143,6 +141,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
         ui.info(ui.green, "Running cmake for profiling ...")
     if trace_cmake:
         ui.info(ui.green, "Running cmake with --trace ...")
+    ui.debug("Running cmake " + " ".join(cmake_args))
     retcode = subprocess.call(["cmake"] + cmake_args, cwd=build_dir, env=env,
                    stdout=fp, stderr=fp)
     fp.close()
@@ -161,7 +160,6 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     qibuild.cmake.profiling.gen_annotations(profiling_res, outdir, qibuild_dir)
     ui.info(ui.green, "Annotations generated in", outdir)
 
-
 def display_options(build_dir):
     """ Display the options by looking in the CMake cache
 
@@ -177,7 +175,6 @@ def display_options(build_dir):
     padding = max(len(x) for x in opt_keys) + 3
     for key in opt_keys:
         print "  %s : %s" % (key.ljust(padding), cache[key])
-
 
 def read_cmake_cache(cache_path):
     """ Read a CMakeCache.txt file, returning a dict
@@ -217,7 +214,6 @@ def get_cmake_qibuild_dir():
         raise Exception(mess)
     return res
 
-
 def find_installed_cmake_qibuild_dir(python_dir):
     ui.debug("looking for cmake code from", python_dir)
     for candidate in [
@@ -250,8 +246,6 @@ def find_installed_cmake_qibuild_dir(python_dir):
         ui.debug("trying", qibuild_config)
         if os.path.exists(qibuild_config):
             return res
-
-
 
 def get_binutil(name, cmake_var=None, build_dir=None, env=None):
     """ Get a tool from the binutils package.

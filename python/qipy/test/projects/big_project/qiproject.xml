@@ -1,0 +1,7 @@
+<project version="3">
+  <qipython name="big_project">
+    <script src="bin/script.py" />
+    <module name="spam" />
+    <package src="lib" name="foo" />
+  </qipython>
+</project>

@@ -7,6 +7,13 @@ import qisys.command
 
 def configure_virtualenv(config, python_worktree,  build_worktree=None,
                          remote_packages=None, site_packages=True):
+    """ Main entry point. Called by ``qipy bootstrap``
+
+    :param: remote_packages List of third-party packages to add in the virtualenv
+    :param: site_packages Allow access to global site packages
+
+    """
+    ui.info(ui.green, "Configuring virtualenv for", ui.reset, ui.bold, python_worktree.root)
     if not remote_packages:
         remote_packages = list()
 
@@ -20,33 +27,37 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
                                       site_packages=site_packages)
     except:
         ui.error("Failed to create virtualenv")
-        return
+        return False
 
-    # Install all Python projects using pip install -e .
-    python_projects = python_worktree.python_projects
-    for i, project in enumerate(python_projects):
-        ui.info_count(i, len(python_projects),
-                     ui.green, "Configuring", ui.reset, ui.blue, project.src)
-        cmd = [pip, "install", "--editable", "."]
-        rc = qisys.command.call(cmd, cwd=project.path, ignore_ret_code=True)
-        if rc != 0:
-            ui.warning("Running pip install -e failed for project", project.src)
 
-    # Write a qi.pth file containing path to C/C++ extensions
+    ui.info("Adding python projects")
+    # Write a qi.pth file containing path to C/C++ extensions and
+    # path to pure python modules or packages
+    pure_python_ok = handle_pure_python(venv_path, python_worktree)
     if build_worktree:
         handle_extensions(venv_path, python_worktree, build_worktree)
 
-    # Install the extension in the virtualenv
+    ui.info("Adding other requirements: " + ", ".join(remote_packages))
     binaries_path = virtualenv.path_locations(venv_path)[-1]
     pip_binary = os.path.join(binaries_path, "pip")
+    remote_ok = True
     if remote_packages:
         cmd = [pip_binary, "install"] + remote_packages
-        subprocess.check_call(cmd)
+        rc = qisys.command.call(cmd, ignore_ret_code=True)
+        remote_ok = (rc == 0)
+    if pure_python_ok and remote_ok:
+        ui.info(ui.green, "Done")
+    if not pure_python_ok:
+        ui.info(ui.red, "Failed to add some python projects")
+    if not remote_ok:
+        ui.info(ui.red, "Failed to add some third party requirements")
+    return (pure_python_ok and remote_ok)
 
 def find_script(venv_path, script_name):
     """ Find a script given its name
 
     First try in the virtualenv, then from $PATH
+
     :return: None if not found
 
     """
@@ -63,7 +74,10 @@ def find_script(venv_path, script_name):
         return res
 
 def handle_extensions(venv_path, python_worktree, build_worktree):
-    """ Check if there is a build project matching the given source """
+    """ Check if there is a build project matching the given source, and
+    add the correct path to the virtualenv
+
+    """
     extensions_projects = list()
     build_projects = build_worktree.build_projects
     for project in python_worktree.python_projects:
@@ -83,5 +97,24 @@ def handle_extensions(venv_path, python_worktree, build_worktree):
 
     lib_path = virtualenv.path_locations(venv_path)[1]
     qi_pth_dest = os.path.join(venv_path, lib_path, "site-packages/qi.pth")
-    with open(qi_pth_dest, "w") as fp:
+    with open(qi_pth_dest, "a") as fp:
         fp.write(to_write)
+
+def handle_pure_python(venv_path, python_worktree):
+    """ Add the paths of all python projects to the virtualenv """
+    lib_path = virtualenv.path_locations(venv_path)[1]
+    qi_pth_dest = os.path.join(venv_path, lib_path, "site-packages/qi.pth")
+    res = True
+    with open(qi_pth_dest, "w") as fp:
+        fp.write("")
+        for project in python_worktree.python_projects:
+            if project.setup_with_distutils:
+                cmd = [python_worktree.pip, "install", "--editable", "."]
+                rc = qisys.command.call(cmd, cwd=project.path, ignore_ret_code=True)
+                if rc != 0:
+                    ui.warning("Failed to run pip install on", project.src)
+                    res = False
+            else:
+                for path in project.python_path:
+                    fp.write(path + "\n")
+    return res

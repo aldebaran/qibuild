@@ -1,6 +1,6 @@
 """ Change the branch of the manifest
 
-Also, checkout the the correct brannch for every git project
+Also, checkout the correct branch for every git project
 in the worktree
 
 """
@@ -26,4 +26,3 @@ def do(args):
     branch = args.branch
     git_worktree.configure_manifest(manifest.url, groups=groups, branch=branch)
     git_worktree.checkout(branch, force=args.force)
-

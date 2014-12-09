@@ -7,6 +7,7 @@
 import os
 import sys
 
+from qisys.qixml import etree
 from qisys import ui
 import qisys.sh
 import qisys.archive
@@ -18,10 +19,6 @@ def configure_parser(parser):
     qibuild.parsers.cmake_build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("package options")
-    group.add_argument("--version", help="Version of the package.")
-    group.add_argument("--package-name", help="Name of the package. "
-                       "Default is the name of the project")
-
 
 def do(args):
     """Main entry point"""
@@ -31,15 +28,15 @@ def do(args):
         raise Exception("This action can only work on one project")
     project = projects[0]
 
-    if args.package_name:
-        package_name = args.package_name
-    else:
-        package_name = project.name
-    if args.version:
-        package_name += "-" + args.version
+    archive_name = project.name
+    version = project.version
+    if not version:
+        project.version = "0.1"
+
+    archive_name += "-" + version
 
     destdir = os.path.join(cmake_builder.build_worktree.root, "package")
-    destdir = os.path.join(destdir, package_name)
+    destdir = os.path.join(destdir, archive_name)
 
     # Clean the destdir just in case the package was already generated
     qisys.sh.rm(destdir)
@@ -49,8 +46,16 @@ def do(args):
         _do_package(cmake_builder, destdir, build_type="Debug")
     _do_package(cmake_builder, destdir, build_type=build_type)
 
+    package_xml_path = os.path.join(destdir, "package.xml")
+    project.gen_package_xml(package_xml_path)
+
     ui.info(ui.blue, "::", ui.reset, ui.bold, "Compressing package ...")
-    archive = qisys.archive.compress(destdir, algo="zip", quiet=True)
+    archive = qisys.archive.compress(destdir,
+                                     algo="zip", quiet=True, flat=True,
+                                     output=destdir + ".zip")
+
+    # Clean up after ourselves
+    qisys.sh.rm(destdir)
     ui.info(ui.green, "Package generated in", ui.reset, ui.bold, archive)
     return archive
 

@@ -7,7 +7,7 @@
 """
 
 import qisys.ui
-import qibuild.deps_solver
+import qibuild.deps
 import qibuild.parsers
 
 def configure_parser(parser):
@@ -55,7 +55,7 @@ class DependencyRelationship:
 
 def get_deps(build_worktree, project, single, runtime, reverse):
     """ create a list of DependencyRelationship objects ready for display """
-    deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
+    deps_solver = qibuild.deps.DepsSolver(build_worktree)
     if reverse:
         (packages, projects) =  (set(), build_worktree.build_projects)
     else:

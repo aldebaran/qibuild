@@ -64,7 +64,7 @@ the C++ extension.
       <qibuild name="pyfoo">
         <depends runtime="true" buildtime="true" names="foo" />
       </qibuild>
-      <qipy name="pyfoo" />
+      <qipython name="pyfoo" />
     </project>
 
 .. code-block:: cmake

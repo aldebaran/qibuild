@@ -2,5 +2,7 @@
   <maintainer email="dmerejkowsky@aldebaran-robotics.com">Dimitri Merejkowsky</maintainer>
   <maintainer email="vbarbaresi@aldebaran-robotics.com">Vincent Barbaresi</maintainer>
   <project src="doc" />
-  <qipython name="qibuild" />
+  <qipython name="qibuild">
+    <setup with_distutils="true" />
+  </qipython>
 </project>

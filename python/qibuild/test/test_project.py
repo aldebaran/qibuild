@@ -1,5 +1,8 @@
 import os
 
+import qisys.qixml
+import qisrc.git
+
 import pytest
 
 def test_dependencies_cmake(build_worktree):
@@ -35,3 +38,18 @@ def test_parse_num_jobs_unknown_generator(build_worktree, record_messages):
     hello = build_worktree.create_project("hello")
     assert hello.parse_num_jobs(3, cmake_generator="KDevelop3") ==  list()
     assert record_messages.find("Unknown generator: KDevelop3")
+
+def test_gen_scm_info(build_worktree, tmpdir):
+    build_worktree.add_test_project("world")
+    hello_proj = build_worktree.add_test_project("hello")
+    git = qisrc.git.Git(hello_proj.path)
+    git.init()
+    git.add(".")
+    git.commit("--message", "initial commit")
+    rc, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    package_xml = tmpdir.join("package.xml").strpath
+    hello_proj.gen_package_xml(package_xml)
+    tree = qisys.qixml.read(package_xml)
+    scm_elem = tree.find("scm")
+    git_elem = scm_elem.find("git")
+    assert git_elem.get("revision") == sha1

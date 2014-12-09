@@ -43,6 +43,7 @@ Your CMake code may look like this:
    qi_create_lib(foo foo/foo.hpp foo/foo.cpp)
    qi_use_lib(foo bar boost_chrono)
    qi_stage_lib(foo)
+   qi_install_header(foo/foo.hpp SUBFOLDER foo)
 
 
 By default, the generated ``foo-config.cmake`` file will contain
@@ -50,19 +51,18 @@ By default, the generated ``foo-config.cmake`` file will contain
 :cmake:function:`qi_use_lib` and because boost chrono itself depends on
 boost system.
 
-But if you really want to hide the ``bar`` dependency, you may build a package
-for other people to use where ``bar`` is not even installed.
-
-(The topic of private libraries is covered in the :ref:`qibuild-private-lib` section)
-
 So here you must make sure that the generated ``foo-config.cmake`` file does
-not list bar in ``FOO_DEPENDS``.
+not list ``BAR`` in ``FOO_DEPENDS``.
 
 To do this, you should set the ``DEPENDS`` argument of :cmake:function:`qi_stage_lib`, like this:
 
 .. code-block:: cmake
 
-   qi_stage_lib(foo DEPENDS "boost_chrono;${BOOST_CHRONO_DEPENDS}")
+   qi_stage_lib(foo DEPENDS "BOOST_CHRONO;BOOST_SYSTEM")
+
+Of course, this also means you should not create any install rule for ``bar`` headers.
+Also, if the ``bar`` library is static, you can use ``qi_create_lib(bar NO_INSTALL)``
+to make sure the ``bar`` library is not installed.
 
 
 Using qi_stage_lib with INCLUDE_DIRS

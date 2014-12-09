@@ -57,7 +57,7 @@ function(_qi_gen_find_lib_code_redist res target _U_staged_name)
   if (NOT _lib_output_name)
     set(_lib_output_name ${target})
   endif()
-  if("${target}_SUBFOLDER" STREQUAL "")
+  if("${${target}_SUBFOLDER}" STREQUAL "")
     set(_res
 "
 find_library(${_U_staged_name}_DEBUG_LIBRARY ${_lib_output_name}_d)

@@ -32,9 +32,15 @@ def parse_tests(conf_path):
     with open(conf_path, "r") as fp:
         return json.load(fp)
 
-def write_tests(tests, conf_path):
+def write_tests(tests, conf_path, append=False):
     """ Write a list of tests to a config file
     """
+    if append:
+        if os.path.exists(conf_path):
+            previous_tests = parse_tests(conf_path)
+        else:
+            previous_tests = list()
+        tests = previous_tests + tests
     with open(conf_path, "w") as fp:
         return json.dump(tests, fp, indent=2)
 

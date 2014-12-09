@@ -160,9 +160,14 @@ class SphinxProject(qidoc.project.DocProject):
         if kwargs.get("werror"):
             cmd.append("-W")
         cmd.extend([self.source_dir, html_dir])
-        os.environ["build_type"] = kwargs.get("build_type", "")
+        build_type = kwargs.get("build_type")
+        if build_type:
+            os.environ["build_type"] = build_type
         ui.debug("launching:", cmd)
-        rc = sphinx.main(argv=cmd)
+        try:
+            rc = sphinx.main(argv=cmd)
+        except SystemExit as e:
+            rc = e.code
         if rc != 0:
             raise SphinxBuildError(self)
 
@@ -180,10 +185,7 @@ class SphinxProject(qidoc.project.DocProject):
             real_dest = os.path.join(destdir, example_src)
             qisys.sh.install(example_path, real_dest, quiet=True)
 
-        def non_hidden(src):
-            return not src.startswith(".")
-
-        qisys.sh.install(self.html_dir, destdir, filter_fun=non_hidden)
+        qisys.sh.install(self.html_dir, destdir)
 
 
 class SphinxBuildError(Exception):

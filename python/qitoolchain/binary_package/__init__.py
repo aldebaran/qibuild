@@ -18,6 +18,7 @@ import os
 import qisys
 import qisys.sh
 import qisys.ui
+from qisys.qixml import etree
 from qitoolchain.binary_package.core import BinaryPackage
 from qitoolchain.binary_package.core import BinaryPackageException
 
@@ -95,12 +96,10 @@ def _fix_package_tree(root_dir):
        for directory in dirs:
             dst = os.path.join(root, directory)
             dst = dst.replace(usr_dir, root_dir)
-            qisys.ui.info("mkdir", dst)
             qisys.sh.mkdir(dst)
        for filename in files:
             src = os.path.join(root, filename)
             dst = src.replace(usr_dir, root_dir)
-            qisys.ui.info("mv", src, "->", dst)
             qisys.sh.mv(src, dst)
     qisys.sh.rm(usr_dir)
 
@@ -142,6 +141,14 @@ def convert_to_qibuild(package, package_metadata=None,
     with qisys.sh.TempDir() as work_dir:
         root_dir = package.extract(work_dir)
         _fix_package_tree(root_dir)
-        res = qisys.archive.compress(root_dir, algo="zip", quiet=True)
+        package_xml_path = os.path.join(root_dir, "package.xml")
+        package_xml_root = etree.Element("package")
+        package_xml_tree = etree.ElementTree(package_xml_root)
+        package_xml_root.set("name", package_name)
+        version = metadata.get("version")
+        if version:
+            package_xml_root.set("version", version)
+        qisys.qixml.write(package_xml_root, package_xml_path)
+        res = qisys.archive.compress(root_dir, algo="zip", quiet=True, flat=True)
         qisys.sh.mv(res, output_path)
     return output_path

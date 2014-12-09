@@ -1,10 +1,12 @@
 import os
 import difflib
 
+from qisys import ui
 import qisys.command
 import qisys.worktree
 import qibuild.build
 import qibuild.build_config
+import qibuild.deps
 import qibuild.project
 
 
@@ -21,6 +23,10 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         worktree.register(self)
 
     @property
+    def dot_qi(self):
+        return self.worktree.dot_qi
+
+    @property
     def qibuild_cfg(self):
         return self.build_config.qibuild_cfg
 
@@ -30,7 +36,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         Will be created if it does not exist
 
         """
-        config_path = os.path.join(self.worktree.dot_qi, "qibuild.xml")
+        config_path = os.path.join(self.dot_qi, "qibuild.xml")
         if not os.path.exists(config_path):
             with open(config_path, "w") as fp:
                 fp.write("<qibuild />\n")
@@ -52,9 +58,8 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
             if build_project.name == name:
                 return build_project
         if raises:
-            result = {difflib.SequenceMatcher(a=name, b=x.name).ratio(): x.name for x in self.build_projects}
-            mess = "No such qibuild project: %s\n" % name
-            mess += "Did you mean: %s?" % result[max(result)]
+            mess = ui.did_you_mean("No such qibuild project: %s" % name,
+                                   name, [x.name for x in self.build_projects])
             raise BuildWorkTreeError(mess)
 
     def on_project_added(self, project):
@@ -146,21 +151,9 @@ def new_build_project(build_worktree, project):
 
     build_project = qibuild.project.BuildProject(build_worktree, project)
     build_project.name = name
+    build_project.version = qibuild_elem.get("version", "0.1")
+    qibuild.deps.read_deps_from_xml(build_project, qibuild_elem)
 
-    depends_trees = qibuild_elem.findall("depends")
-
-    for depends_tree in depends_trees:
-        buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
-        runtime   = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
-        testtime  = qisys.qixml.parse_bool_attr(depends_tree, "testtime")
-        dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
-        for dep_name in dep_names:
-            if buildtime:
-                build_project.build_depends.add(dep_name)
-            if runtime:
-                build_project.run_depends.add(dep_name)
-            if testtime:
-                build_project.test_depends.add(dep_name)
     return build_project
 
 

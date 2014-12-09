@@ -13,7 +13,8 @@
 include(qibuild/modules/qt-tools)
 
 function(qt_flib _suffix _libname)
-  if(QT_USE_QMAKE)
+  find_program(QT_QMAKE NAMES qmake-qt4 qmake)
+  if(QT_QMAKE)
     # Use upstream cmake files
     find_package(Qt4 COMPONENTS ${_libname})
     include("${QT_USE_FILE}")

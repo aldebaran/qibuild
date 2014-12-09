@@ -53,6 +53,7 @@ def get_path(*args):
     full_path = os.path.join(*args)
     to_make = os.path.dirname(full_path)
     mkdir(to_make, recursive=True)
+    full_path = to_native_path(full_path)
     return full_path
 
 def username():
@@ -192,10 +193,10 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
             continue
         fsrc = os.path.join(root, f)
         fdest = os.path.join(new_root, f)
+        rel_path = os.path.join(rel_root, f)
         if os.path.islink(fsrc):
             mkdir(new_root, recursive=True)
             _copy_link(fsrc, fdest, quiet)
-            rel_path = os.path.join(rel_root, f)
             installed.append(rel_path)
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
@@ -207,21 +208,21 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
             # (following what `install` does, but not what `cp` does)
             rm(fdest)
             shutil.copy(fsrc, fdest)
+            installed.append(rel_path)
     return installed
 
 
 def install(src, dest, filter_fun=None, quiet=False):
-    """Install a directory to a destination.
+    """Install a directory or a file to a destination.
 
     If filter_fun is not None, then the file will only be
     installed if filter_fun(relative/path/to/file) returns
     True.
 
-    Few notes: rewriting ``cp`` or ``install`` is a hard problem.
-    This version will happily erase whatever is inside dest,
-    (even it the dest is readonly, dest will be erased before being
-    written) and it won't complain if dest does not exist (missing
-    directories will simply be created)
+    If ``dest`` does not exist, it will be created first.
+
+    When installing files, if the destination already exists,
+    it will be removed first, then overwritten by the new file.
 
     This function will preserve relative symlinks between directories,
     used for instance in Mac frameworks::
@@ -271,12 +272,12 @@ def install(src, dest, filter_fun=None, quiet=False):
         # (following what `install` does, but not what `cp` does)
         rm(dest)
         shutil.copy(src, dest)
-        installed.append(dest)
+        installed.append(os.path.basename(src))
     return installed
 
 
 def safe_copy(src, dest):
-    """ Copy a source to a destination but
+    """ Copy a source file to a destination but
     do not overwrite dest if it is more recent than src
 
     Create any missing directories when necessary
@@ -503,8 +504,7 @@ def to_dos_path(path):
 def to_native_path(path, normcase=True):
     """Return an absolute, native path from a path,
     :param normcase: make sure the path is all lower-case on
-                     case-insensitive filesystems
-
+    case-insensitive filesystems
     """
     path = os.path.expanduser(path)
     if normcase:

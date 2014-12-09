@@ -4,6 +4,9 @@ qitoolchain modules
 .. toctree::
     :maxdepth: 1
 
-    toolchain
-    packages
+    database
     feed
+    packages
+    qipackage
+    svn_package
+    toolchain

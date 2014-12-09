@@ -31,7 +31,7 @@ def test_running_from_install_dir_dep_in_toolchain(cd_to_tmpdir):
     qibuild_action.add_test_project("hello")
     world_package = qibuild_action("package", "world")
     qitoolchain_action("create", "foo")
-    qitoolchain_action("add-package", "-c", "foo", "world", world_package)
+    qitoolchain_action("add-package", "-c", "foo", world_package)
     build_worktree.worktree.remove_project("world", from_disk=True)
 
     # install and run hello, (checking that the world lib is
@@ -130,7 +130,7 @@ def test_running_tests_after_install(qibuild_action, tmpdir):
     assert qitest_json.check(file=True)
     test_project = qitest.project.TestProject(qitest_json.strpath)
     test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
-    test_runner.pattern = "ok"
+    test_runner.patterns = ["ok"]
     test_runner.cwd = dest.strpath
     ok = test_runner.run()
     assert ok
@@ -157,3 +157,33 @@ def test_install_test_libs(qibuild_action, tmpdir):
     installme.configure()
     installme.build()
     installme.install(dest.strpath, components=["runtime", "test"])
+
+def test_json_merge_tests(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("testme")
+    qibuild_action.add_test_project("world")
+    qibuild_action.add_test_project("hello")
+    qibuild_action("configure", "--all")
+    qibuild_action("make", "--all")
+    dest = tmpdir.join("dest")
+    qibuild_action("install", "--all", "--with-tests", dest.strpath)
+    # tests from both hello and testme should be in the generated
+    # json file
+    qitest_json = dest.join("qitest.json")
+    tests = qitest.conf.parse_tests(qitest_json.strpath)
+    test_names = [x["name"] for x in tests]
+    assert "zero_test" in test_names
+    assert "ok" in test_names
+
+def test_do_not_write_tests_twice(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("testme")
+    qibuild_action("configure", "--all")
+    qibuild_action("make", "--all")
+    dest = tmpdir.join("dest")
+    qitest_json = dest.join("qitest.json")
+    qibuild_action("install", "--all", "--with-tests", dest.strpath)
+    tests = qitest.conf.parse_tests(qitest_json.strpath)
+    first = len(tests)
+    qibuild_action("install", "--all", "--with-tests", dest.strpath)
+    tests = qitest.conf.parse_tests(qitest_json.strpath)
+    second = len(tests)
+    assert first == second

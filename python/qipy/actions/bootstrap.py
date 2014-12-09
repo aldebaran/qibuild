@@ -19,4 +19,6 @@ def configure_parser(parser):
 
 def do(args):
     python_builder = qipy.parsers.get_python_builder(args)
-    python_builder.bootstrap(remote_packages=args.requirements)
+    ok = python_builder.bootstrap(remote_packages=args.requirements)
+    if not ok:
+        sys.exit(1)

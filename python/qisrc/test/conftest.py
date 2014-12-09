@@ -74,6 +74,8 @@ class TestGitServer(object):
         gerrit_url = "file://" + qisys.sh.to_posix_path(self.gerrit.strpath)
         self.manifest.add_remote("origin", origin_url)
         self.manifest.add_remote("gerrit", gerrit_url, review=True)
+        # Dummy second remote URL
+        self.manifest.add_remote("gitorious", origin_url)
         self.manifest_url = self.srv.join("manifest.git").strpath
         self.manifest_branch = "master"
 
@@ -120,7 +122,6 @@ class TestGitServer(object):
     def switch_manifest_branch(self, branch):
         self.manifest_branch = branch
         self.push_manifest("Switch to %s" % branch, allow_empty=True)
-
 
     def add_qibuild_test_project(self, src):
         project_name = src + ".git"
@@ -175,11 +176,11 @@ class TestGitServer(object):
         self.manifest.remove_repo(project)
         self.push_manifest("removed %s" % project)
 
-    def create_group(self, name, projects):
+    def create_group(self, name, projects, default=False):
         """ Add a group to the manifest """
         for project in projects:
             self.create_repo(project)
-        self.manifest.configure_group(name, projects)
+        self.manifest.configure_group(name, projects, default=default)
         self.push_manifest("add group %s" % name)
 
     def use_review(self, project):
@@ -189,6 +190,15 @@ class TestGitServer(object):
         repo.remote_names.append("gerrit")
         self.manifest.dump()
         self.push_manifest("%s: now under code review" % project)
+        self.manifest.load()
+
+    def use_gitorious(self, project):
+        """ Switch a project to another remote """
+        repo = self.manifest.get_repo(project)
+        repo.remote_names.append("gitorious")
+        repo.remote_names.remove("origin")
+        self.manifest.dump()
+        self.push_manifest("%s on gitorious" % project)
         self.manifest.load()
 
     def change_branch(self, project, new_branch):
@@ -394,3 +404,38 @@ class QiSrcAction(TestAction):
     @property
     def tmpdir(self):
         return self.git_worktree.tmpdir
+
+
+class SvnServer(object):
+    def __init__(self, tmpdir):
+        self.tmpdir = tmpdir
+        self.srv = tmpdir.ensure("srv", dir=True)
+        self.src = tmpdir.join("src", dir=True)
+        cmd = ["svnadmin", "create", "srv"]
+        qisys.command.call(cmd, cwd=tmpdir.strpath)
+        self.base_url = "file://" + self.srv.strpath
+
+    def create_repo(self, name):
+        src = self.src.join(name).ensure(dir=True)
+        url = os.path.join(self.base_url, name)
+        cmd = ["svn", "import", src.strpath, url, "--message", "init %s" % name]
+        qisys.command.call(cmd)
+        return url
+
+    def commit_file(self, repo, filename, contents, message=None):
+        src = self.src.join(repo)
+        src.remove()
+        url = os.path.join(self.base_url, repo)
+        svn = qisrc.svn.Svn(src.strpath)
+        cmd = ["svn", "checkout", url, repo]
+        qisys.command.call(cmd, cwd=self.src.strpath)
+        qisys.command.call(["svn", "update"], cwd=src.strpath)
+        src.join(filename).write(contents)
+        svn.call("add", filename, raises=False)
+        if message is None:
+            message = "Create %s" % filename
+        svn.call("commit", filename, "--message", message)
+
+@pytest.fixture
+def svn_server(tmpdir):
+    return SvnServer(tmpdir)

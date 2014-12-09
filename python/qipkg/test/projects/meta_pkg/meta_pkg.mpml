@@ -1,0 +1,4 @@
+<metapackage name="meta" version="0.1">
+  <include src="a_cpp/a_cpp.pml" />
+  <include src="d_pkg/d_pkg.pml" />
+</metapackage>

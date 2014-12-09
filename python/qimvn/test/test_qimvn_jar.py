@@ -86,7 +86,7 @@ def test_toolchain(tmpdir, monkeypatch, qimvn_action):
     qibuild_action.add_test_project("hello")
     world_package = qibuild_action("package", "world")
     qitoolchain_action("create", "foo")
-    qitoolchain_action("add-package", "-c", "foo", "world", world_package)
+    qitoolchain_action("add-package", "-c", "foo", world_package)
 
     qibuild_action.chdir("hello")
     qibuild_action("configure", "-c", "foo")

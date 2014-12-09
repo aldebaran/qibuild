@@ -88,3 +88,21 @@ def test_change_branch(git_server):
     git_server.change_branch("foo.git", "devel")
     foo_repo = git_server.get_repo("foo.git")
     assert foo_repo.default_branch == "devel"
+
+def test_create_svn_repo(svn_server, tmpdir):
+    foo_url = svn_server.create_repo("foo")
+    work = tmpdir.mkdir("work")
+    svn = qisrc.svn.Svn(work.strpath)
+    svn.call("checkout", foo_url)
+    foo = work.join("foo")
+    foo.check(dir=True)
+
+def test_svn_commit(svn_server, tmpdir):
+    foo_url = svn_server.create_repo("foo")
+    svn_server.commit_file("foo", "README.txt", "this is a readme\n")
+    work = tmpdir.mkdir("work")
+    svn = qisrc.svn.Svn(work.strpath)
+    svn.call("checkout", foo_url)
+    foo = work.join("foo")
+    readme = foo.join("README.txt")
+    assert readme.read() == "this is a readme\n"

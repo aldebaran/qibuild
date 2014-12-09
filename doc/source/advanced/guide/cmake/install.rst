@@ -180,12 +180,10 @@ bit like an autotools project)::
 
 .. code-block:: cmake
 
-    qi_install_header(foo
-                     HEADERS
-                       foo/include/foo.h
-                       foo/include/bar.h
-                       ${CMAKE_BUILD_DIR}/config.h
-                     SUBFOLDER foo)
+    qi_install_header(foo/include/foo.h
+                      foo/include/bar.h
+                      ${CMAKE_BUILD_DIR}/config.h
+                      SUBFOLDER foo)
 
 :cmake:function:`qi_install_header` will set DESTINATION "include" for you,
 but you need 'SUBFOLDER foo' argument to tell CMake to install files
@@ -211,13 +209,10 @@ hierarchy in the source tree and when installed (a bit like boost)::
 
 .. code-block:: cmake
 
-    qi_install_header(foo
-                      HEADERS
-                        foo/foo.h
-                        bar/bar.h
-                        bar/baz/baz.h
+    qi_install_header(foo/foo.h
+                      bar/bar.h
+                      bar/baz/baz.h
                       KEEP_RELATIVE_PATHS)
 
 :cmake:function:`qi_install_header` will set DESTINATION "include" for you, and you do not
 need ``SUBFOLDER`` because ``KEEP_RELATIVE_PATHS`` is set.
-

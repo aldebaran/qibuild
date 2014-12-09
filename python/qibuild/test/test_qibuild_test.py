@@ -72,3 +72,14 @@ def get_result_dir():
     testme = build_worktree.get_build_project("testme")
     result_dir = os.path.join(testme.sdk_directory, "test-results")
     return result_dir
+
+def test_do_not_overwrite_xml_when_test_fails(qibuild_action):
+    qibuild_action.add_test_project("testme")
+    qibuild_action("configure", "testme")
+    qibuild_action("make", "testme")
+    qibuild_action("test", "testme", "-k", "fake_gtest", retcode=True)
+    testme_proj = qibuild_action.build_worktree.get_build_project("testme")
+    fake_xml = os.path.join(testme_proj.sdk_directory, "test-results", "fake_gtest.xml")
+    with open(fake_xml, "r") as fp:
+        contents = fp.read()
+    assert contents == "<gtest>FAKE_RESULTS</gtest>\n"

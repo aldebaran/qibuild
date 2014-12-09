@@ -3,13 +3,17 @@
 ## found in the COPYING file.
 
 """ Generate a binary package, ready to be used for a behavior """
+import copy
 
+from qisys import ui
 import qisys.parsers
 import qipkg.builder
 
 import qibuild.parsers
 import qipy.parsers
 import qilinguist.parsers
+import qipkg.metapackage
+import qipkg.metabuilder
 
 
 def pml_parser(parser):
@@ -17,16 +21,26 @@ def pml_parser(parser):
     parser.add_argument("pml_path")
 
 def get_pml_builder(args):
-    pml_path = args.pml_path
     worktree = qisys.parsers.get_worktree(args)
-    build_worktree = qibuild.parsers.get_build_worktree(args)
-    # here we build a CMakeBuilder from scratch becaues we won't read
-    # the project names from the command line
-    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
-    python_builder = qipy.parsers.get_python_builder(args, verbose=False)
-    # and here for the same reason we do not try to get translatable projects
-    # from the command line
-    linguist_builder = qilinguist.parsers.get_linguist_builder(args,
-            with_projects=False)
-    return qipkg.builder.PMLBuilder(pml_path, cmake_builder,
-                                   python_builder, linguist_builder)
+    pml_path = args.pml_path
+    if pml_path.endswith(".mpml"):
+         res = qipkg.metabuilder.MetaPMLBuilder(worktree, pml_path)
+         configure_meta_builder(res, args)
+    else:
+         res = qipkg.builder.PMLBuilder(worktree, pml_path)
+         configure_builder(res, args)
+    return res
+
+def configure_builder(pml_builder, args):
+    build_worktree = pml_builder.build_worktree
+    build_config = qibuild.parsers.get_build_config(build_worktree, args)
+    build_worktree.build_config = build_config
+    python_worktree = pml_builder.python_worktree
+    config_name = build_config.build_directory(prefix="py")
+    python_worktree.config = config_name
+
+
+def configure_meta_builder(meta_builder, args):
+    for pml_builder in meta_builder.pml_builders:
+        configure_builder(pml_builder, args)
+

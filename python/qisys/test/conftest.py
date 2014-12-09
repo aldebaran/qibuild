@@ -87,8 +87,6 @@ def args(request):
     """
     return TestNamespace()
 
-
-
 @pytest.fixture
 def record_messages(request):
     """ Configure qisys.ui to record the messages sent to the user """
@@ -132,7 +130,6 @@ def tmpfiles(request, tmpdir):
     patcher = mock.patch("qisys.sh.get_path", fake_get_path)
     patcher.start()
     request.addfinalizer(patcher.stop)
-
 
 @pytest.fixture
 def cd_to_tmpdir(monkeypatch, tmpdir):

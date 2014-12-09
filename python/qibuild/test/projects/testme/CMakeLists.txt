@@ -12,6 +12,7 @@ qi_create_test(segfault segfault.cpp)
 qi_create_test(timeout timeout.cpp TIMEOUT 1)
 qi_create_test(spam spam.cpp)
 qi_create_test(encoding encoding.cpp)
+qi_create_test(fake_gtest fake_gtest.cpp ARGUMENTS "${QI_SDK_DIR}/test-results/fake_gtest.xml")
 qi_create_test(nightly nightly.cpp NIGHTLY)
 qi_create_test(env env.cpp ENVIRONMENT
   "FOO=BAR;SPAM=EGGS")

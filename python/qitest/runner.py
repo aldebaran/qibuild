@@ -9,7 +9,7 @@ class TestSuiteRunner(object):
 
     def __init__(self, project):
         self.project = project
-        self.pattern = None
+        self._patterns = list()
         self.num_jobs = 1
         self.cwd = os.getcwd()
         self.env = None
@@ -38,21 +38,23 @@ class TestSuiteRunner(object):
         return ok
 
     @property
-    def pattern(self):
-        return self._pattern
+    def patterns(self):
+        return self._patterns
 
-    @pattern.setter
-    def pattern(self, value):
+    @patterns.setter
+    def patterns(self, value):
         if value:
-            self._pattern = re.compile(value)
-        else:
-            self._pattern = None
+            [re.compile(x) for x in value] # just checking regexps are valid
+        self._patterns = value
 
     @property
     def tests(self):
-        res = [x for x in self._tests if match_pattern(self.pattern, x["name"])]
+        res = [x for x in self._tests if match_patterns(self.patterns, x["name"])]
+        # Perf tests are run alone
         res = [x for x in res if x.get("perf", False) == self.perf]
-        res = [x for x in res if x.get("nightly", False) == self.nightly]
+        # But nightly tests are run along with the normal tests
+        if not self.nightly:
+            res = [x for x in res if x.get("nightly", False) is False]
         return res
 
 
@@ -71,12 +73,11 @@ class TestLauncher(object):
         pass
 
 
-def match_pattern(pattern, name):
-    if not pattern:
+def match_patterns(patterns, name):
+    if not patterns:
         return True
-    try:
+    for pattern in patterns:
         res = re.search(pattern, name)
-    except Exception as e:
-        mess = "Invalid pattern \"{}\": {}".format(pattern, e)
-        raise Exception(mess)
-    return res
+        if res:
+            return True
+    return False

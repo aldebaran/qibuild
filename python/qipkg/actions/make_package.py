@@ -3,23 +3,25 @@
 ## found in the COPYING file.
 
 """ Generate a binary package, ready to be used for a behavior """
-import qipkg.parsers
 
 from qisys import ui
 import qisys.parsers
 import qipkg.parsers
-import qipkg.package
-
+import qipkg.metapackage
+import qipkg.parsers
 
 def configure_parser(parser):
     """Configure parser for this action"""
     qipkg.parsers.pml_parser(parser)
     parser.add_argument("-o", "--output")
+    parser.add_argument("--with-breakpad", action="store_true")
+    parser.set_defaults(with_breakpad=False)
 
 
 def do(args):
     """Main entry point"""
     output = args.output
+    with_breakpad = args.with_breakpad
+    worktree = qisys.parsers.get_worktree(args)
     pml_builder = qipkg.parsers.get_pml_builder(args)
-    package = qipkg.package.Package(args.pml_path)
-    package.make_package(pml_builder, output=output)
+    return pml_builder.make_package(output=output, with_breakpad=with_breakpad)

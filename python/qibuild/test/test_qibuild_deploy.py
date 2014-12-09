@@ -88,3 +88,20 @@ def test_deploy_builds_build_deps(qibuild_action, tmpdir):
     qibuild_action("make", "bar")
     qibuild_action("deploy", "bar", "--url", url)
     qibuild.find.find([foo_proj.sdk_directory], "foo", expect_one=True)
+
+def test_deploy_install_binary_packages(qibuild_action, qitoolchain_action,
+                                        tmpdir):
+    if not check_ssh_connection():
+        return
+    world = qibuild_action.add_test_project("world")
+    hello = qibuild_action.add_test_project("hello")
+    qitoolchain_action("create", "test")
+    world_package = qibuild_action("package", "world")
+    qitoolchain_action("add-package", "--config", "test", world_package)
+    build_worktree = qibuild_action.build_worktree
+    worktree = build_worktree.worktree
+    worktree.remove_project("world", from_disk=True)
+    qibuild_action("configure", "--config", "test", "hello")
+    qibuild_action("make", "--config", "test", "hello")
+    url = get_ssh_url(tmpdir)
+    qibuild_action("deploy", "hello", "--config", "test", "--url", url)

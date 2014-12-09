@@ -86,7 +86,6 @@ class WorkTreeSyncer(object):
         else:
             ui.info()
         self._sync_manifest()
-        self._sync_build_profiles()
         self._sync_groups()
         self.new_repos = self.get_new_repos()
         res = self._sync_repos(self.old_repos, self.new_repos)
@@ -156,6 +155,14 @@ class WorkTreeSyncer(object):
             manifest_xml = os.path.join(self.manifest_repo, "manifest.xml")
         remote_manifest = qisrc.manifest.Manifest(manifest_xml)
         groups = self.manifest.groups
+        # if self.manifest.groups is empty but there is a default
+        # group in the manifest, we need to set self.manifest.groups
+        # so that subsequent calls to qisrc add-group, remove-group
+        # work
+        if not self.manifest.groups:
+            default_group = remote_manifest.groups.default_group
+            if default_group:
+                self.manifest.groups = [default_group.name]
         repos = remote_manifest.get_repos(groups=groups)
         return repos
 
@@ -184,7 +191,6 @@ class WorkTreeSyncer(object):
         new_repos = self.read_remote_manifest()
         return new_repos
 
-
     def _sync_manifest(self):
         """ Update the local manifest clone with the remote """
         git = qisrc.git.Git(self.manifest_repo)
@@ -199,9 +205,7 @@ class WorkTreeSyncer(object):
             else:
                 git.reset("--hard", "origin/%s" % self.manifest.branch)
         if not transaction.ok:
-            ui.warning("Update failed")
-            ui.info(transaction.output)
-
+            raise Exception("Update failed\n" + transaction.output)
 
     def _sync_repos(self, old_repos, new_repos):
         """ Sync the remote repo configurations with the git worktree """
@@ -234,7 +238,9 @@ class WorkTreeSyncer(object):
                         ui.reset, "updating", ui.blue, old_repo.src)
                 if new_repo.review:
                     ui.info(ui.tabs(2), ui.green, "(now using code review)")
-
+                project = self.git_worktree.get_git_project(new_repo.src)
+                project.read_remote_config(new_repo)
+                project.apply_config()
 
         for repo in to_rm:
             self.git_worktree.remove_repo(repo)
@@ -268,29 +274,6 @@ class WorkTreeSyncer(object):
 
         return res
 
-    def _sync_build_profiles(self):
-        """ Synchronize the build profiles read from the given manifest """
-        local_xml = os.path.join(self.git_worktree.root, ".qi", "qibuild.xml")
-        if not os.path.exists(local_xml):
-            with open(local_xml, "w") as fp:
-                fp.write("<qibuild />")
-        remote_xml = os.path.join(self.manifest_repo, "manifest.xml")
-        local = qibuild.profile.parse_profiles(local_xml)
-        remote = qibuild.profile.parse_profiles(remote_xml)
-        new_profiles, updated_profiles = compute_profile_updates(local, remote)
-        if new_profiles or updated_profiles:
-            ui.info(ui.green, ":: Synchronizing build profiles ...")
-        for new_profile in new_profiles:
-            ui.info(ui.green, " * New:", ui.blue, new_profile.name)
-            qibuild.profile.configure_build_profile(local_xml,
-                                                    new_profile.name,
-                                                    new_profile.cmake_flags)
-        if updated_profiles:
-            mess = "The following profiles have been updated remotely:\n"
-            for updated_profile in updated_profiles:
-                mess += "  * " + updated_profile.name + "\n"
-            ui.warning(mess)
-
     def _sync_groups(self):
         """ Synchronize the repsitories groups read from the given manifest """
         remote_xml = os.path.join(self.manifest_repo, "manifest.xml")
@@ -301,7 +284,6 @@ class WorkTreeSyncer(object):
 
         groups_xml = os.path.join(self.git_worktree.root, ".qi", "groups.xml")
         qisys.qixml.write(remote_groups_elem, groups_xml)
-
 
     def sync_from_manifest_file(self, xml_path):
         """ Just synchronize the manifest coming from one xml file.
@@ -327,11 +309,23 @@ class LocalManifest(object):
     def __init__(self):
         self.url = None
         self.branch = "master"
-        self.groups = list()
+        self._groups = list()
         self.ref = None # used for snaphots or in case you
                         # don't want the head of a branch
 
+    @property
+    def groups(self):
+        return self._groups
+
+    @groups.setter
+    def groups(self, groups):
+        if groups is None:
+            groups = list()
+        self._groups = sorted(groups)
+
     def __eq__(self, other):
+        if not isinstance(other, LocalManifest):
+            return False
         return self.url == other.url and \
                self.groups == other.groups and \
                self.ref == other.ref and \

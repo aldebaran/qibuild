@@ -150,7 +150,7 @@ def main_wrapper(module, args):
                 sys.exit(0)
         if args.backtrace:
             raise
-        ui.error(e)
+        ui.error(e.__class__.__name__, e)
         sys.exit(2)
 
 def _dump_arguments(name, args):

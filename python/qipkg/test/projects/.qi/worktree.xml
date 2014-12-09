@@ -1,0 +1,5 @@
+<worktree>
+  <project src="a_cpp" />
+  <project src="b_py" />
+  <project src="c_pkg" />
+</worktree>

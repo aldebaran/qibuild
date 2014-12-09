@@ -17,14 +17,12 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     def __init__(self, project):
         super(ProjectTestRunner, self).__init__(project)
+        self.test_results_dir = "test-results"
+        self.perf_results_dir = "perf-results"
         self._coverage = False
         self._valgrind = False
         self._num_cpus = -1
         tests = project.tests
-        for directory in (self.test_results_dir,
-                          self.perf_results_dir):
-            qisys.sh.rm(directory)
-            qisys.sh.mkdir(directory)
 
     @property
     def launcher(self):
@@ -33,17 +31,23 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @property
     def test_results_dir(self):
-        res = os.path.join(self.project.sdk_directory,
-                           "test-results")
-        qisys.sh.mkdir(res, recursive=True)
-        return res
+        return self._test_results_dir
+
+    @test_results_dir.setter
+    def test_results_dir(self, value):
+        self._test_results_dir = os.path.join(self.project.sdk_directory, value)
+        qisys.sh.rm(self._test_results_dir)
+        qisys.sh.mkdir(self._test_results_dir, recursive=True)
 
     @property
     def perf_results_dir(self):
-        res = os.path.join(self.project.sdk_directory,
-                           "perf-results")
-        qisys.sh.mkdir(res, recursive=True)
-        return res
+        return self._perf_results_dir
+
+    @perf_results_dir.setter
+    def perf_results_dir(self, value):
+        self._perf_results_dir = os.path.join(self.project.sdk_directory, value)
+        qisys.sh.rm(self._perf_results_dir)
+        qisys.sh.mkdir(self._perf_results_dir, recursive=True)
 
     @property
     def num_cpus(self):
@@ -142,7 +146,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             message = (ui.red, message)
 
         res.message = message
-        self._post_run(res, test)
+        self._post_run(process, res, test)
         return res
 
     def _update_test(self, test):
@@ -233,15 +237,19 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         taskset_opts = ["-c", ",".join(str(i) for i in cpu_list)]
         test["cmd"] = ["taskset"] + taskset_opts + test["cmd"]
 
-    def _post_run(self, res, test):
+    def _post_run(self, process, res, test):
         if self.suite_runner.valgrind:
             parse_valgrind(self.valgrind_log, res)
-        if not res.ok:
+
+        process_crashed = process.return_type not in [qisys.command.Process.OK,
+                                                      qisys.command.Process.FAILED]
+        process_crashed = process_crashed or process.returncode < 0
+        if process_crashed:
             # do not trust generated files:
             qisys.sh.rm(self.perf_out)
             qisys.sh.rm(self.test_out)
 
-        if not res.ok or not os.path.exists(self.test_out):
+        if process_crashed or not os.path.exists(self.test_out):
             self._write_xml(res, test, self.test_out)
 
     def _write_xml(self, res, test, out_xml):

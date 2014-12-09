@@ -17,6 +17,7 @@ import qisys.project
 import qisys.command
 import qisys.sh
 import qisys.qixml
+from qisys import ui
 
 import qibuild.config
 
@@ -82,9 +83,10 @@ This path does not exist
     def check(self):
         """ Perform a few sanity checks """
         # Check that we are not in an other worktree:
-        parent_worktree = guess_worktree(self.root)
+        parent_worktree = guess_worktree(os.path.join(self.root, ".."))
         if parent_worktree and parent_worktree != self.root:
-            raise WorkTreeError("""{0} is already in a worktree
+            ui.warning("""Nested worktrees detected:
+{0} is already in a worktree
 (in {1})
 """.format(self.root, parent_worktree))
 
@@ -103,7 +105,6 @@ This path does not exist
             with open(worktree_xml, "w") as fp:
                 fp.write("<worktree />")
         return worktree_xml
-
 
     def has_project(self, path):
         src = self.normalize_path(path)
@@ -153,13 +154,8 @@ This path does not exist
         if not self.has_project(src):
             if not raises:
                 return None
-            result = {difflib.SequenceMatcher(a=src, b=x.src).ratio(): x.src for x in self.projects}
-            if not result:
-                mess = "There is no project in this work-tree."
-                raise WorkTreeError(mess)
-            project = result[max(result)]
-            mess  = "No project in '%s'\n" % src
-            mess += "Did you mean: %s?" % project
+            mess  = ui.did_you_mean("No project in '%s'\n" % src,
+                                    src, [x.src for x in self.projects])
             raise WorkTreeError(mess)
         match = (p for p in self.projects if p.src == src)
         return match.next()
@@ -220,7 +216,6 @@ This path does not exist
         for observer in self._observers:
             observer.on_project_moved(project)
 
-
     def normalize_path(self, path):
         """ Make sure the path is a POSIX path, relative to
         the worktree root
@@ -257,6 +252,7 @@ def guess_worktree(cwd=None, raises=False):
     """Look for parent directories until a .qi dir is found somewhere."""
     if cwd is None:
         cwd = os.getcwd()
+    cwd = qisys.sh.to_native_path(cwd)
     head = cwd
     _tail = True
     while _tail:

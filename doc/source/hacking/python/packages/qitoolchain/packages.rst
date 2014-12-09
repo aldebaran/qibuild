@@ -1,4 +1,4 @@
-qitoolchain.binary_package -- Toolchain binary packages
+qitoolchain.binary_package -- 3rd party binary packages
 =======================================================
 
 .. toctree::

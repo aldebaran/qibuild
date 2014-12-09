@@ -21,7 +21,6 @@ def test_url_win_filepath():
     assert remote.prefix == r"file:///c:\path\to\foo" + "\\"
     assert remote.protocol == "file"
 
-
 def test_url_git():
     remote = Remote()
     remote.url = "git://example.com"
@@ -57,7 +56,6 @@ def test_ssh_url():
     assert remote.protocol == "ssh"
     assert not remote.port
 
-
 def test_url_ssh_no_username():
     with mock.patch("qisrc.review.get_gerrit_username") as get_username:
         get_username.return_value = "john"
@@ -69,7 +67,6 @@ def test_url_ssh_no_username():
         assert remote.port == 29418
         assert remote.protocol == "ssh"
         assert remote.username == "john"
-
 
 def test_gerrit_url_ssh_subfolder():
     with mock.patch("qisrc.review.get_gerrit_username") as get_username:

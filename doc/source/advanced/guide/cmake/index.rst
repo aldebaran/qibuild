@@ -10,5 +10,3 @@ Using qiBuild CMake API
    managing_config_files
    writing_a_config_cmake
    using_qi_stage
-   private_lib
-

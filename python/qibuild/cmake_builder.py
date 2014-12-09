@@ -6,19 +6,19 @@ from qisys import ui
 import qisys.sh
 import qisys.remote
 import qibuild.deploy
-import qibuild.deps_solver
+import qibuild.deps
 from qisys.abstractbuilder import AbstractBuilder
 from qibuild.project       import write_qi_path_conf
 
 class CMakeBuilder(AbstractBuilder):
     """ CMake driver.
-        Allow building multiples cmake projects together.
-        Dependencies can optionally be resolved and be taken into account.
+        Allow building multiple cmake projects together.
+        Dependencies can optionally be resolved and taken into account.
     """
     def __init__(self, build_worktree, projects=list()):
         self.build_worktree = build_worktree
         self.projects = projects
-        self.deps_solver = qibuild.deps_solver.DepsSolver(build_worktree)
+        self.deps_solver = qibuild.deps.DepsSolver(build_worktree)
         self.dep_types = ["build", "runtime"]
 
     def add_project(self, project):
@@ -30,13 +30,13 @@ class CMakeBuilder(AbstractBuilder):
     @property
     def dep_types(self):
         """ The list of dependencies to use """
-        return qibuild.deps_solver.dep_types
+        return self.deps_solver.dep_types
 
     # pylint: disable-msg=E1101
     @dep_types.setter
     # pylint: disable-msg=E0102
     def dep_types(self, value):
-        qibuild.deps_solver.dep_types = value
+        self.deps_solver.dep_types = value
 
     @property
     def build_config(self):
@@ -94,6 +94,9 @@ class CMakeBuilder(AbstractBuilder):
         for project in projects:
             write_qi_path_conf(project.sdk_directory, qi_path_sdk_dirs)
 
+        # also write a path.conf in the .qi directory
+        write_qi_path_conf(self.build_worktree.dot_qi, qi_path_sdk_dirs, sdk_layout=False)
+
     def pre_build(self, project):
         """ Called before building a project """
         sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "runtime"])
@@ -135,9 +138,10 @@ class CMakeBuilder(AbstractBuilder):
         prefix = kwargs.get("prefix", "/")
         prefix = prefix[1:]
         real_dest = os.path.join(dest_dir, prefix)
+        components = kwargs.get("components")
 
         if projects:
-            ui.info(ui.green, "The following projects")
+            ui.info(ui.green, "the following projects")
             for project in projects:
                 ui.info(ui.green, " *", ui.blue, project.name)
             if packages:
@@ -151,18 +155,21 @@ class CMakeBuilder(AbstractBuilder):
                 ui.info(ui.green, "(runtime components only)")
 
         if packages:
-            print
-            ui.info(ui.green, ":: ", "Installing packages")
+            ui.info(ui.green, ":: ", "installing packages")
         for i, package in enumerate(packages):
             ui.info_count(i, len(packages),
                           ui.green, "Installing",
                           ui.blue, package.name)
-            files = package.install(real_dest, runtime=runtime_only)
+            files = package.install(real_dest, components=components)
             installed.extend(files)
 
+        # Remove qitest.json so that we don't append tests twice
+        # when running qibuild install --with-tests twice
+        qitest_json = os.path.join(dest_dir, "qitest.json")
+        qisys.sh.rm(qitest_json)
+
         if projects:
-            print
-            ui.info(ui.green, ":: ", "Installing projects")
+            ui.info(ui.green, ":: ", "installing projects")
             for i, project in enumerate(projects):
                 ui.info_count(i, len(projects),
                             ui.green, "Installing",
@@ -186,6 +193,14 @@ class CMakeBuilder(AbstractBuilder):
         if os.path.exists(deploy_manifest):
             qisys.sh.rm(deploy_manifest)
         to_deploy = list()
+        components = ["runtime"]
+        if with_tests:
+            components.append("test")
+
+        # Remove qitest.json so that we don't append tests twice
+        # when running `qibuild deploy --with-tests` twice
+        qitest_json = os.path.join(deploy_dir, "qitest.json")
+        qisys.sh.rm(qitest_json)
 
         dep_packages = self.deps_solver.get_dep_packages(self.projects,
                                                          self.dep_types)
@@ -208,7 +223,7 @@ class CMakeBuilder(AbstractBuilder):
                     ui.green, "Deploying package", ui.blue, package.name,
                     ui.green, "to", ui.blue, url.as_string)
                 # Install package in local deploy dir
-                files = package.install(deploy_dir, runtime=True)
+                files = package.install(deploy_dir, components=components)
                 to_deploy.extend(files)
 
         print
@@ -221,9 +236,7 @@ class CMakeBuilder(AbstractBuilder):
                     ui.green, "Deploying project", ui.blue, project.name,
                     ui.green, "to", ui.blue, url.as_string)
 
-            components = ["runtime"]
             if with_tests:
-                components.append("test")
                 to_deploy.append("qitest.json")
             # Install project in local deploy dir
             installed = project.install(deploy_dir, components=components,
@@ -233,7 +246,8 @@ class CMakeBuilder(AbstractBuilder):
         for project in self.projects:
             scripts = qibuild.deploy.generate_debug_scripts(self, deploy_dir,
                                                             project.name, url)
-            to_deploy.extend(scripts)
+            if scripts:
+                to_deploy.extend(scripts)
 
         # Write the list of files to be deployed
         with open(deploy_manifest, "a") as f:

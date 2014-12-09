@@ -34,7 +34,6 @@ def test_install_on_self(tmpdir):
         qisys.sh.install(tmpdir.strpath, tmpdir.strpath)
     assert "are the same directory" in e.value.message
 
-
 def test_filter_hidden(tmpdir):
     src = tmpdir.ensure("src", dir=True)
     src.join("a_file").ensure(file=True)
@@ -42,9 +41,11 @@ def test_filter_hidden(tmpdir):
     dest = tmpdir.join("dest")
     def non_hidden(src):
         return not src.startswith(".")
-    qisys.sh.install(src.strpath, dest.strpath, filter_fun=non_hidden)
-    assert dest.join("a_file").check(file=True)
+    installed = qisys.sh.install(src.strpath, dest.strpath, filter_fun=non_hidden)
+    a_file = dest.join("a_file")
+    assert a_file.check(file=True)
     assert not dest.join(".hidden").check(file=True)
+    assert installed == ["a_file"]
 
 def test_is_path_inside():
    assert qisys.sh.is_path_inside(os.path.join("foo", "bar"), "foo")
@@ -77,3 +78,13 @@ def test_is_runtime():
     assert qisys.sh.is_runtime("include/python2.7/pyconfig.h") is True
     if sys.platform == "darwin":
         assert qisys.sh.is_runtime("lib/libfoo.dylib") is True
+
+def test_install_return_value(tmpdir):
+    src = tmpdir.mkdir("src")
+    b = src.ensure("a", "b", file=True)
+    d = src.ensure("a", "c", "d", file=True)
+    dest = tmpdir.mkdir("dest")
+    ret = qisys.sh.install(src.strpath, dest.strpath)
+    assert ret == ["a/b", "a/c/d"]
+    ret = qisys.sh.install(d.strpath, dest.strpath)
+    assert ret == ["d"]

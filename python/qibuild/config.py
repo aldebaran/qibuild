@@ -498,8 +498,12 @@ class QiBuildConfig:
         selected <config > tag
 
         """
-        # reset to default in case set_active_config is called twice
+        # reset to defaults in case set_active_config is called twice
         self.cmake.generator = self.defaults.cmake.generator
+        self.env.path = self.defaults.env.path
+        self.env.bat_file = self.defaults.env.bat_file
+        self.ide = self.defaults.ide
+
         matching_config = self.configs.get(config)
         if matching_config:
             # Prepend path from matching_config to self.env.path

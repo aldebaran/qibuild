@@ -7,15 +7,6 @@ qitoolchain.toolchain -- Managing toolchains
 A Toolchain is simply a set of binary :term:`packages <package>`.
 
 
-qitoolchain.toolchain.Package
------------------------------
-
-.. py:class:: Package(name, path[, toolchain_file=None)
-
-    A package simply has a name and a path.
-    It may also be associated to a toolchain file, relative to its path
-
-
 qitoolchain.toolchain.Toolchain
 -------------------------------
 
@@ -24,19 +15,16 @@ qitoolchain.toolchain.Toolchain
     A toolchain is a set of packages
 
     If has a name that will later be used as 'build config'
-    by the toc object.
+    by the CMakeBuilder object.
 
-    It has a configuration in ~/.config/qi/toolchains/<name.cfg>
+    It has a configuration in ~/.config/qi/toolchains/<name.xml>
     looking like:
 
-    .. code-block:: ini
+    .. code-block:: xml
 
-      [package foo]
-      path = '~/.cache/share/qi/ .... '
-      toolchain_file = '...'
-
-      [package naoqi-sdk]
-      path = 'path/to/naoqi-sdk'
+      <toolchain>
+        <package name="..." path="..." />
+      </toolchain>
 
     thus added packages are stored permanentely.
 
@@ -62,9 +50,6 @@ qitoolchain.toolchain.Toolchain
           list(INSERT CMAKE_FIND_ROOT_PATH 0 "/path/to/a/ctc")
           list(INSERT CMAKE_FIND_ROOT_PATH 0 "/path/to/a/package")
 
-    .. py:method:: get(package_name)
-
-        Get the path to a package
 
     .. py:method:: add_package(package)
 
@@ -88,5 +73,3 @@ qitoolchain.toolchain.Toolchain
         Parse an xml feed, adding packages to self while doing so
         See :ref:`parsing-toolchain-feeds` and
         :py:mod:`qitoolchain.feed` for details
-
-
