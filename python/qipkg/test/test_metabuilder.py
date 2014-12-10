@@ -18,7 +18,7 @@ def test_meta_builder(qipkg_action):
     meta_pml = os.path.join(meta_pkg_proj.path, "meta_pkg.mpml")
 
     worktree = qipkg_action.worktree
-    meta_pml_builder = qipkg.metabuilder.MetaPMLBuilder(worktree, meta_pml)
+    meta_pml_builder = qipkg.metabuilder.MetaPMLBuilder(meta_pml, worktree=worktree)
 
     meta_pml_builder.configure()
     meta_pml_builder.build()

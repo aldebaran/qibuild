@@ -22,6 +22,5 @@ def do(args):
     """Main entry point"""
     output = args.output
     with_breakpad = args.with_breakpad
-    worktree = qisys.parsers.get_worktree(args)
     pml_builder = qipkg.parsers.get_pml_builder(args)
     return pml_builder.make_package(output=output, with_breakpad=with_breakpad)

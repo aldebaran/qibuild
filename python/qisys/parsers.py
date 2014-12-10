@@ -90,7 +90,7 @@ def deploy_parser(parser):
 def get_deploy_urls(args):
     return [qisys.remote.URL(x) for x in args.urls]
 
-def get_worktree(args=None):
+def get_worktree(args=None, raises=True):
     """ Get a worktree right after argument parsing.
 
     If --worktree was not given, try to guess it from
@@ -101,8 +101,11 @@ def get_worktree(args=None):
     if args:
         wt_root = args.worktree
     if not wt_root:
-        wt_root = qisys.worktree.guess_worktree(raises=True)
-    return qisys.worktree.WorkTree(wt_root)
+        wt_root = qisys.worktree.guess_worktree(raises=raises)
+    if wt_root:
+        return qisys.worktree.WorkTree(wt_root)
+    else:
+        return None
 
 def get_projects(worktree, args):
     """ Get a list of worktree projects from the command line """

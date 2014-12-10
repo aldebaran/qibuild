@@ -2,6 +2,8 @@ import os
 
 import qisys.command
 
+import pytest
+
 def test_make_package(qipkg_action, qipy_action):
     tmpdir = qipy_action.worktree.tmpdir
 
@@ -60,3 +62,47 @@ def test_meta(qipkg_action):
     for path in expected_paths:
         full_path = tmpdir.join("meta-0.1", path)
         assert full_path.check(file=True)
+
+
+def test_no_worktree_pure_pml(tmpdir, monkeypatch):
+    project = tmpdir.mkdir("project")
+    project.ensure("behavior_1", "behavior.xar", file=True)
+    manifest_path = project.join("manifest.xml")
+    manifest_path.write("""
+<package version="0.1" uuid="fooproject" />
+""")
+    pml_path = project.join("project.pml")
+    pml_path.write("""
+<Package name="project">
+
+    <BehaviorDescriptions>
+        <BehaviorDescription name="behavior" src="behavior_1" xar="behavior.xar" />
+    </BehaviorDescriptions>
+
+</Package>
+""")
+    monkeypatch.chdir(tmpdir)
+    package = qisys.script.run_action("qipkg.actions.make_package", [pml_path.strpath])
+    dest = tmpdir.mkdir("dest")
+    monkeypatch.chdir(dest)
+    qisys.script.run_action("qipkg.actions.extract_package", package)
+    assert dest.join("fooproject-0.1", "manifest.xml").check(file=True)
+    assert dest.join("fooproject-0.1", "behavior_1", "behavior.xar").check(file=True)
+
+def test_no_worktre_bad_pml(tmpdir, monkeypatch):
+    project = tmpdir.mkdir("project")
+    manifest_path = project.join("manifest.xml")
+    manifest_path.write("""
+<package version="0.1" uuid="fooproject" />
+""")
+    pml_path = project.join("project.pml")
+    pml_path.write("""
+<Package name="project">
+    <qibuild name="foo" />
+</Package>
+""")
+    monkeypatch.chdir(tmpdir)
+    with pytest.raises(Exception) as error:
+        package = qisys.script.run_action("qipkg.actions.make_package", [pml_path.strpath])
+    assert "not in a worktree" in error.value.message
+

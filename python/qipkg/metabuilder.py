@@ -9,7 +9,7 @@ import qipkg.builder
 class MetaPMLBuilder(object):
     """ Build a meta package from a mpml file """
 
-    def __init__(self, worktree, mpml_path):
+    def __init__(self, mpml_path, worktree=None):
         ui.info(ui.green, "::", ui.reset, ui.bold,
                 "Reading", mpml_path, "\n")
         self.worktree = worktree
@@ -18,7 +18,7 @@ class MetaPMLBuilder(object):
         self.pml_builders = list()
         pml_paths = self.meta_package.pml_paths
         for pml_path in pml_paths:
-            pml_builder = qipkg.builder.PMLBuilder(self.worktree, pml_path)
+            pml_builder = qipkg.builder.PMLBuilder(pml_path, worktree=worktree)
             self.pml_builders.append(pml_builder)
 
     def configure(self):

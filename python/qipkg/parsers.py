@@ -21,18 +21,20 @@ def pml_parser(parser):
     parser.add_argument("pml_path")
 
 def get_pml_builder(args):
-    worktree = qisys.parsers.get_worktree(args)
+    worktree = qisys.parsers.get_worktree(args, raises=False)
     pml_path = args.pml_path
     if pml_path.endswith(".mpml"):
-         res = qipkg.metabuilder.MetaPMLBuilder(worktree, pml_path)
+         res = qipkg.metabuilder.MetaPMLBuilder(pml_path, worktree=worktree)
          configure_meta_builder(res, args)
     else:
-         res = qipkg.builder.PMLBuilder(worktree, pml_path)
+         res = qipkg.builder.PMLBuilder(pml_path, worktree=worktree)
          configure_builder(res, args)
     return res
 
 def configure_builder(pml_builder, args):
     build_worktree = pml_builder.build_worktree
+    if not build_worktree:
+        return
     build_config = qibuild.parsers.get_build_config(build_worktree, args)
     build_worktree.build_config = build_config
     python_worktree = pml_builder.python_worktree

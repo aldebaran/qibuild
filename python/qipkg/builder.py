@@ -1,6 +1,7 @@
 """ Builder for pml files """
 import os
 import sys
+import tempfile
 import zipfile
 
 import qibuild.worktree
@@ -18,7 +19,7 @@ import qilinguist.builder
 
 class PMLBuilder(object):
     """ Build a package from a pml file """
-    def __init__(self, worktree, pml_path):
+    def __init__(self, pml_path, worktree=None):
         self.pml_path = pml_path
         self.base_dir = os.path.dirname(self.pml_path)
         self.manifest_xml = os.path.join(self.base_dir, "manifest.xml")
@@ -29,23 +30,33 @@ class PMLBuilder(object):
 
         self.worktree = worktree
 
-        self.build_worktree = qibuild.worktree.BuildWorkTree(self.worktree)
-        self.cmake_builder = qibuild.cmake_builder.CMakeBuilder(self.build_worktree)
+        if self.worktree:
+            self.build_worktree = qibuild.worktree.BuildWorkTree(self.worktree)
+            self.cmake_builder = qibuild.cmake_builder.CMakeBuilder(self.build_worktree)
 
-        self.python_worktree = qipy.worktree.PythonWorkTree(self.worktree)
-        self.python_builder = qipy.python_builder.PythonBuilder(
-               self.python_worktree,
-               build_worktree=self.build_worktree)
+            self.python_worktree = qipy.worktree.PythonWorkTree(self.worktree)
+            self.python_builder = qipy.python_builder.PythonBuilder(
+                self.python_worktree,
+                build_worktree=self.build_worktree)
 
-        self.linguist_worktree = qilinguist.worktree.LinguistWorkTree(self.worktree)
-        self.linguist_builder = qilinguist.builder.QiLinguistBuilder(self.linguist_worktree)
+            self.linguist_worktree = qilinguist.worktree.LinguistWorkTree(self.worktree)
+            self.linguist_builder = qilinguist.builder.QiLinguistBuilder(self.linguist_worktree)
 
-        self.builders = [self.cmake_builder, self.python_builder, self.linguist_builder]
+            self.builders = [self.cmake_builder, self.python_builder, self.linguist_builder]
+        else:
+            self.cmake_builder = None
+            self.build_worktree = None
+            self.python_builder = None
+            self.python_worktree = None
+            self.linguist_builder = None
+            self.linguist_worktree = None
+            self.builders = list()
 
         # Hack: we need to parse some cmake variables when generating the
         # breakpad symbols, so we need to keep one build project around
         self.build_project = None
 
+        self._stage_path = None
         self.pml_extra_files = list()
         self.cpp_installed_files = list()
 
@@ -54,10 +65,15 @@ class PMLBuilder(object):
 
     @property
     def stage_path(self):
-        dot_qi = self.worktree.dot_qi
-        build_config = self.cmake_builder.build_config
-        name = build_config.build_directory(prefix="qipkg")
-        return os.path.join(dot_qi, name)
+        if self.worktree:
+            dot_qi = self.worktree.dot_qi
+            build_config = self.cmake_builder.build_config
+            name = build_config.build_directory(prefix="qipkg")
+            return os.path.join(dot_qi, name)
+        else:
+            if not self._stage_path:
+                self._stage_path = tempfile.mkdtemp()
+            return self._stage_path
 
     def load_pml(self, pml_path):
         for builder in self.builders:
@@ -65,6 +81,8 @@ class PMLBuilder(object):
         tree= qisys.qixml.read(pml_path)
         root = tree.getroot()
         qibuild_elems = root.findall("qibuild")
+        if qibuild_elems and not self.worktree:
+            raise Exception("<qibuild> tag found but not in a worktree")
         for qibuild_elem in qibuild_elems:
             name = qisys.qixml.parse_required_attr(qibuild_elem, "name", pml_path)
             project = self.build_worktree.get_build_project(name, raises=True)
@@ -72,18 +90,22 @@ class PMLBuilder(object):
             self.build_project = project
 
         qipython_elems = root.findall("qipython")
+        if qipython_elems and not self.worktree:
+            raise Exception("<qipython> tag found but not in a worktree")
         for qipython_elem in qipython_elems:
             name = qisys.qixml.parse_required_attr(qipython_elem, "name", pml_path)
             project = self.python_worktree.get_python_project(name, raises=True)
             self.python_builder.projects.append(project)
 
         qilinguist_elems = root.findall("qilinguist")
+        if qilinguist_elems and not self.worktree:
+            raise Exception("<qilinguist> tag found but not in a worktree")
         for qilinguist_elem in qilinguist_elems:
             name = qisys.qixml.parse_required_attr(qilinguist_elem, "name", pml_path)
             project = self.linguist_worktree.get_linguist_project(name, raises=True)
             self.linguist_builder.projects.append(project)
 
-        # For top, ressource, dialog, behavior, add stuff to self.file_list
+        # For top, ressource, dialog, behavior, add stuff to self.pml_extra_files
         behaviors = root.find("BehaviorDescriptions")
         if behaviors is not None:
             for child in behaviors.findall("BehaviorDescription"):
@@ -211,13 +233,14 @@ class PMLBuilder(object):
                                                 file_list=self.cpp_installed_files)
             ui.info(ui.bold, "-> Symbols generated in", symbols_archive)
         ui.info(ui.bold, "-> Package generated in", output, "\n")
+        qisys.sh.rm(self.stage_path)
         if symbols_archive:
             return [output, symbols_archive]
         else:
             return [output]
 
     def __repr__(self):
-        return "<PMLBuilder in %s>" % self.pml_path
+        return "<PMLBuilder for %s>" % self.pml_path
 
 def pkg_name(manifest_xml):
     "Return a string name-version"
