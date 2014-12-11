@@ -23,7 +23,7 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    root = os.getcwd()
+    root = args.worktree or os.getcwd()
     if os.path.exists(os.path.join(root, '.qi')):
         raise Exception("A .qi directory already exists here. " +
                         "Please remove it or initialize elsewhere.")
