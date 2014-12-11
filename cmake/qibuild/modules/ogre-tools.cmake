@@ -43,7 +43,7 @@ function(configure_ogre)
   set(_backup ${CMAKE_FIND_LIBRARY_PREFIXES})
   set(CMAKE_FIND_LIBRARY_PREFIXES "")
   find_library(_ogre_plugin NAMES ${ARG_RENDER_PLUGIN}
-                            PATH_SUFFIXES "OGRE")
+                            PATH_SUFFIXES "OGRE" "OGRE-1.9.0")
   set(CMAKE_FIND_LIBRARY_PREFIXES ${_backup})
 
   if(NOT _ogre_plugin)
