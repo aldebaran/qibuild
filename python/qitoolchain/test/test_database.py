@@ -1,5 +1,6 @@
 import mock
 import pytest
+import os
 
 import qitoolchain.database
 import qitoolchain.qipackage
@@ -50,10 +51,12 @@ def test_package_removed_from_feed(toolchain_db, feed):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.42")
     feed.add_package(boost_package)
     toolchain_db.update(feed.url)
+    boost_path = toolchain_db.get_package_path("boost")
 
     feed.remove_package("boost")
     toolchain_db.update(feed.url)
     assert not toolchain_db.packages
+    assert not os.path.exists(boost_path)
 
 def test_downgrading_package(toolchain_db, feed):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")
