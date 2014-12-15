@@ -22,3 +22,8 @@ def test_in_subdir(qisrc_action):
     qisrc_action.chdir("bar")
     foo_proj = qisrc_action("create", "foo")
     assert foo_proj.src == "bar/foo"
+
+def test_slashes_in_argument(qisrc_action):
+    qisrc_action.tmpdir.mkdir("bar")
+    qisrc_action("create", "bar/baz")
+    qisys.script.run_action("qibuild.actions.configure", ["baz"])

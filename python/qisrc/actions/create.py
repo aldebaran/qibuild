@@ -38,7 +38,7 @@ def do(args):
     """"Create a new project """
     worktree = qisys.parsers.get_worktree(args)
 
-    project_name = args.project_name
+    project_name = os.path.basename(args.project_name)
     project_path = os.path.join(os.getcwd(), project_name)
 
     if os.path.exists(project_path):
