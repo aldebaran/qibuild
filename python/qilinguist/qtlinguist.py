@@ -48,4 +48,4 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
         qisys.sh.install(self.po_path, full_dest, filter_fun=filter)
 
     def __repr__(self):
-        return "<QtLinguistProject %s in %s>" % (self.name, self.src)
+        return "<QtLinguistProject %s in %s>" % (self.name, self.path)

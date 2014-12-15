@@ -1,4 +1,7 @@
 import os
+import py
+
+import qilinguist.worktree
 
 from qisys.test.conftest import *
 from qibuild.test.conftest import *
@@ -86,8 +89,32 @@ class QiLinguistAction(TestAction):
         fr_file.close()
         en_file.close()
 
+class TestLinguistWorktree(qilinguist.worktree.LinguistWorkTree):
+    def __init__(self, worktree=None):
+        if not worktree:
+            worktree = TestWorkTree()
+        super(TestLinguistWorktree, self).__init__(worktree)
+        self.tmpdir = py.path.local(self.root)
+
+    def create_gettext_project(self, name):
+        proj_path = os.path.join(self.root, name)
+        qisys.sh.mkdir(proj_path, recursive=True)
+        qiproject_xml = os.path.join(proj_path, "qiproject.xml")
+        with open(qiproject_xml, "w") as fp:
+            fp.write("""
+<project version="3">
+    <qilinguist name="{name}" tr="gettext" linguas="fr_FR en_US" />
+</project>
+""".format(name=name))
+        self.worktree.add_project(name)
+        return self.get_linguist_project(name, raises=True)
+
 
 @pytest.fixture
 def qilinguist_action(cd_to_tmpdir):
     res = QiLinguistAction()
     return res
+
+@pytest.fixture
+def linguist_worktree(cd_to_tmpdir):
+    return TestLinguistWorktree()

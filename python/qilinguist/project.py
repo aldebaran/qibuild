@@ -11,17 +11,11 @@ class LinguistProject(object):
     """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, worktree_project, name, domain=None, linguas=None):
-        self.worktree_project = worktree_project
-        self.src = worktree_project.src
-        self.path = worktree_project.path
+    def __init__(self, name, path, domain=None, linguas=None):
+        self.path = path
         self.domain = domain
         self.name = name
         self.linguas = linguas
-
-    @property
-    def qiproject_xml(self):
-        return self.worktree_project.qibuild_xml
 
     @property
     def po_path(self):

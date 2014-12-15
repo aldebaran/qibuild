@@ -177,4 +177,4 @@ class GettextProject(qilinguist.project.LinguistProject):
         qisys.sh.install(to_install, full_dest, filter_fun=filter)
 
     def __repr__(self):
-        return "<GettextProject %s in %s>" % (self.name, self.src)
+        return "<GettextProject %s in %s>" % (self.name, self.path)

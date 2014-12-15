@@ -1,22 +1,58 @@
+import qisys.sh
 import qisys.parsers
 import qilinguist.builder
 
 from qilinguist.worktree import LinguistWorkTree, new_linguist_project
+from qilinguist.pml_translator import new_pml_translator
 import qilinguist.builder
 
 def get_linguist_worktree(args):
-    worktree = qisys.parsers.get_worktree(args)
-    return LinguistWorkTree(worktree)
+    worktree = qisys.parsers.get_worktree(args, raises=False)
+    if worktree:
+        return LinguistWorkTree(worktree)
+    else:
+        return None
 
-def get_linguist_projects(worktree, args, default_all=False):
-    parser = LinguistProjectParser(worktree)
-    return parser.parse_args(args, default_all=default_all)
+def get_linguist_projects(args, default_all=False):
+    worktree = get_linguist_worktree(args)
+    project_args = args.projects
+    pml_paths = list()
+    project_names = list()
+    for arg in project_args:
+        if arg.endswith(".pml"):
+            pml_paths.append(qisys.sh.to_native_path(arg))
+        else:
+            if worktree:
+                project_names.append(arg)
+            else:
+                raise Exception("Cannot use project names when running "
+                                "outside a worktree")
+    if not worktree and not pml_paths:
+        raise Exception("You should specify at least a pml path when running "
+                        "outside a worktree")
+    res = list()
+    if worktree:
+        args.projects = project_names
+        parser = LinguistProjectParser(worktree)
+        try:
+            res.extend(parser.parse_args(args, default_all=default_all))
+        except CouldNotGuessProjectName:
+            pass
+
+    res.extend(get_pml_projects(pml_paths))
+    return res
+
+def get_pml_projects(pml_paths):
+    res = list()
+    for pml_path in pml_paths:
+        res.append(new_pml_translator(pml_path))
+    return res
 
 def get_linguist_builder(args, with_projects=True):
     worktree = get_linguist_worktree(args)
     builder = qilinguist.builder.QiLinguistBuilder(worktree)
     if with_projects:
-        projects = get_linguist_projects(worktree, args)
+        projects = get_linguist_projects(args)
         builder.projects = projects
     return builder
 

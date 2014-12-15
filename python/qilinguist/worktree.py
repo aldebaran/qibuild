@@ -99,11 +99,11 @@ Choose between 'linguist' or 'gettext'
 
     if tr_framework == "linguist":
         from qilinguist.qtlinguist import QtLinguistProject
-        new_project =  QtLinguistProject(project, name, domain=domain,
+        new_project =  QtLinguistProject(name, project.path, domain=domain,
                                          linguas=linguas)
     else:
         from qilinguist.qigettext import GettextProject
-        new_project = GettextProject(project, name, domain=domain,
+        new_project = GettextProject(name, project.path, domain=domain,
                                      linguas=linguas)
     return new_project
 
