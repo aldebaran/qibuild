@@ -12,9 +12,6 @@ class QiLinguistBuilder(AbstractBuilder):
         self.linguist_worktree = linguist_worktree
         self.projects = list()
 
-    def add_project(self, name):
-        self.projects.append(self.linguist_worktree.get_linguist_project(name))
-
     def configure(self, *args, **kwargs):
         for project in self.projects:
             project.update()
