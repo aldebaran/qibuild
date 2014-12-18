@@ -42,6 +42,17 @@ def test_read_qibuild_conf(build_worktree):
     assert build_config.cmake_args == \
             ["-GNinja", "-DCMAKE_BUILD_TYPE=Debug"]
 
+def test_custom_build_dir(build_worktree):
+    local_xml = build_worktree.qibuild_xml
+    with open(local_xml, "w") as fp:
+        fp.write("""
+<qibuild>
+ <build build_dir="mybuild" />
+</qibuild>
+""")
+    build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
+    assert build_config.custom_build_dir == "mybuild"
+
 def test_read_default_config(build_worktree):
     qitoolchain.toolchain.Toolchain("foo")
     build_worktree.set_default_config("foo")

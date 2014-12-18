@@ -81,7 +81,15 @@ class BuildProject(object):
         the build profiles, and the build type (debug/release)
 
         """
-        return os.path.join(self.path, self.build_config.build_directory())
+        build_directory_name = self.build_config.build_directory()
+        custom_build_dir = self.build_config.custom_build_dir
+        if custom_build_dir:
+            return os.path.join(self.build_worktree.root,
+                                custom_build_dir,
+                                build_directory_name,
+                                self.name)
+        else:
+            return os.path.join(self.path, build_directory_name)
 
     @property
     def cmake_cache(self):

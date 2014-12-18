@@ -52,3 +52,12 @@ def test_gen_scm_info(build_worktree, tmpdir):
     scm_elem = tree.find("scm")
     git_elem = scm_elem.find("git")
     assert git_elem.get("revision") == sha1
+
+def test_using_custom_build_dir(build_worktree):
+    world_proj = build_worktree.add_test_project("world")
+    build_config = build_worktree.build_config
+    build_config.custom_build_dir = "mybuild"
+    build_directory_name = build_config.build_directory()
+    assert world_proj.build_directory == os.path.join(build_worktree.root, "mybuild",
+                                                      build_directory_name, "world")
+
