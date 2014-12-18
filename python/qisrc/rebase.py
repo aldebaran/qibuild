@@ -10,7 +10,11 @@ def rebase_worktree(git_worktree, git_projects, branch=None,
     upstream_projects = git_worktree.get_projects_on_branch(branch)
     rebased_projects, errors = rebase_projects(git_projects, upstream_projects, branch, verbose)
     if errors:
-        raise Exception("Failed to rebase some projects")
+        mess = "Failed to rebase some projects:\n"
+        for git_project in errors:
+            mess += " * " + git_project.src
+            mess += "\n"
+        raise Exception(mess)
 
     if push:
         push_projects(rebased_projects, dry_run=dry_run)
