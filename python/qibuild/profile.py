@@ -93,7 +93,9 @@ def remove_build_profile(xml_path, name):
     root = tree.getroot()
     profiles = root.find("profiles")
     if profiles is None:
-        raise NoProfile(xml_path)
+        mess = "No profiled named '{name}' in {xml_path}"
+        mess = mess.format(name=name, xml_path=xml_path)
+        raise Exception(mess)
     match_elem = None
     for profile in profiles:
         if profile.get("name") == name:

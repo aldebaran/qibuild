@@ -24,6 +24,7 @@ def do(args):
     """Main entry point"""
     urls = qisys.parsers.get_deploy_urls(args)
     pml_builder = qipkg.parsers.get_pml_builder(args)
+    # pylint: disable-msg=E1103
     pml_builder.install(pml_builder.stage_path)
     for url in urls:
         pml_builder.deploy(url)

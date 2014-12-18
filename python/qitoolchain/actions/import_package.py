@@ -12,6 +12,7 @@ from qisys import ui
 import qisys
 import qitoolchain
 from qitoolchain.convert import convert_package
+import qitoolchain.qipackage
 
 
 def configure_parser(parser):
@@ -53,8 +54,9 @@ Importing '{1}' in the toolchain {0} ...
     package_dest = os.path.join(tc_packages_path, name)
     qisys.sh.rm(package_dest)
     with qisys.sh.TempDir() as tmp:
-        extracted = qisys.archive.extract(converted_package_path, tmp, quiet=True)
+        extracted = qisys.archive.extract(converted_package_path, tmp, quiet=True,
+                                          strict_mode=False)
         qisys.sh.install(extracted, package_dest, quiet=True)
-    qibuild_package = qitoolchain.Package(name, package_dest)
+    qibuild_package = qitoolchain.qipackage.QiPackage(name, package_dest)
     toolchain.add_package(qibuild_package)
     ui.info("done")

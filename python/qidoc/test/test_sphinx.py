@@ -128,6 +128,7 @@ def test_install_twice(doc_worktree, tmpdir):
     assert dest2.join("ref", "world", "index.html").check(file=True)
 
 # Intersphinx randomly fails here
+# pylint: disable-msg=E1101
 @pytest.mark.skipif("True")
 def test_intersphinx(doc_worktree, tmpdir):
     world_proj = doc_worktree.add_test_project("world")

@@ -6,6 +6,8 @@ import qisys.command
 import qibuild.breakpad
 import qibuild.cmake_builder
 
+
+# pylint: disable-msg=E1101
 @pytest.mark.skipif(not qisys.command.find_program("dump_syms"),
                     reason="dump_syms not found")
 def test_generate_symbols(build_worktree, tmpdir):

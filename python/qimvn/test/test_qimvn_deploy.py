@@ -56,15 +56,17 @@ def test_failing_deploy(qibuild_action, local_repository):
     deploy_path = local_repository.replace("file://", "")
     artifactId = "hellojavajni"
     ver = "1.0"
-    #pylint: disable-msg
+    # pylint: disable-msg=E1101
     with pytest.raises(CommandFailedException) as e:
         deploy.deploy("", ver, artifactId, jarname, local_repository)
     assert e.value.returncode == 1
 
+    # pylint: disable-msg=E1101
     with pytest.raises(CommandFailedException) as e:
         deploy.deploy("com.test", ver, "", jarname, local_repository)
     assert e.value.returncode == 1
 
+    # pylint: disable-msg=E1101
     with pytest.raises(CommandFailedException) as e:
         deploy.deploy("com.test", ver, artifactId, jarname, deploy_path)
     assert e.value.returncode == 1

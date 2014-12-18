@@ -34,7 +34,7 @@ class LinguistProject(object):
         res = os.path.join(self.po_path, "POTFILES.in")
         if not os.path.exists(res):
             mess = "No po/POTFILES.in for project {} in {}"
-            raise Exception(mess.format(self.name, self.src))
+            raise Exception(mess.format(self.name, self.path))
         return res
 
     def get_sources(self):

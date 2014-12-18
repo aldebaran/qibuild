@@ -379,7 +379,7 @@ def _get_console_size_linux():
             pass
     if not cr:
         try:
-            cr = (env['LINES'], env['COLUMNS'])
+            cr = (os.environ['LINES'], os.environ['COLUMNS'])
         except:
             return None
     return int(cr[1]), int(cr[0])

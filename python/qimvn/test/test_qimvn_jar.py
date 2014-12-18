@@ -55,6 +55,7 @@ def test_package_multiple_target(qibuild_action, qimvn_action):
 def test_without_input_files(qibuild_action):
     """ Test that exception is raised if no input file is given.
     """
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         jar.jar("foo.jar", list(), get_paths())
     assert e.value[0] == "Missing arguments : Files to package"

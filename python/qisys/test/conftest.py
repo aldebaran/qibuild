@@ -50,6 +50,7 @@ class TestWorkTree(qisys.worktree.WorkTree):
         return new_project
 
 # Because sometimes the most popular OS in the world is not the best one ...
+# pylint: disable-msg=E1101
 skip_on_win = pytest.mark.skipif(os.name == 'nt', reason="cannot pass on windows")
 
 # pylint: disable-msg=E1101

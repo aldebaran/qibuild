@@ -772,9 +772,9 @@ class ProjectConfig:
             for dep in self.build_depends:
                 res += ui.indent(dep, num=4)
                 res += "\n"
-        if self.runtime_depends:
+        if self.run_depends:
             res += "  runtime dependencies: \n"
-            for dep in self.runtime_depends:
+            for dep in self.run_depends:
                 res += ui.indent(dep, num=4)
                 res += "\n"
         if self.test_depends:

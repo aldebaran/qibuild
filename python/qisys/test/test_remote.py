@@ -36,8 +36,7 @@ def test_modern_urls():
     assert url.port == 2222
     assert url.remote_directory == "deploy"
 
-
-
 def test_errors():
+    # pylint: disable-msg=E1101
     with pytest.raises(URLParseError) as e:
         URL("foo")
