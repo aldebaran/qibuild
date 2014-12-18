@@ -65,7 +65,7 @@ def cmake_configure_parser(parser):
                         werror=False, profiling=False,
                         trace_cmake=False, debug_info=None)
 
-def get_cmake_args(args):
+def convert_cmake_args_to_flags(args):
     """ Convert 'helper' options into cmake flags
 
     """

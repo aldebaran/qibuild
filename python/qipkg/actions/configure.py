@@ -16,7 +16,6 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    args.cmake_args = qibuild.parsers.get_cmake_args(args)
+    qibuild.parsers.convert_cmake_args_to_flags(args)
     pml_builder = qipkg.parsers.get_pml_builder(args)
     pml_builder.configure()
-

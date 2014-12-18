@@ -27,7 +27,7 @@ Note:
 @ui.timer("qibuild configure")
 def do(args):
     """Main entry point"""
-    args.cmake_args = qibuild.parsers.get_cmake_args(args)
+    qibuild.parsers.convert_cmake_args_to_flags(args)
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
 
     if args.debug_trycompile:
