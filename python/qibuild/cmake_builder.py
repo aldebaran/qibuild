@@ -21,11 +21,6 @@ class CMakeBuilder(AbstractBuilder):
         self.deps_solver = qibuild.deps.DepsSolver(build_worktree)
         self.dep_types = ["build", "runtime"]
 
-    def add_project(self, project):
-        """ Add a project to the list of projects """
-        build_project = self.build_worktree.get_build_project(project)
-        self.projects.append(build_project)
-
     # pylint: disable-msg=E0202
     @property
     def dep_types(self):
