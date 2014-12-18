@@ -11,6 +11,7 @@ class PMLTranslator(object):
         self.pml_path = pml_path
         self.path = os.path.dirname(pml_path)
         self.ts_files = translations_files_from_pml(pml_path)
+        self.qm_files = list()
 
     def update(self):
         raise NotImplementedError()
@@ -22,9 +23,13 @@ class PMLTranslator(object):
             output = os.path.join(self.path, qm_file)
             cmd = ["lrelease", "-compress", input, "-qm", output]
             qisys.command.call(cmd)
+            self.qm_files.append(output)
 
     def install(self, dest):
-        raise NotImplementedError()
+        translations_dest = os.path.join(dest, "translations")
+        qisys.sh.mkdir(translations_dest, recursive=True)
+        for qm_file in self.qm_files:
+            qisys.sh.install(qm_file, translations_dest)
 
     def __repr__(self):
         return "<PMLTranslator for %s>" % self.pml_path

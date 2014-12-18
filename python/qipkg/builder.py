@@ -171,7 +171,7 @@ class PMLBuilder(object):
             else:
                 builder.install(destination)
 
-        # Also install self.pml_extra_files
+        # Install self.pml_extra_files
         if self.pml_extra_files:
             ui.info(ui.bold, "-> Adding extra files ...")
         for src in self.pml_extra_files:
@@ -179,6 +179,12 @@ class PMLBuilder(object):
             rel_src = os.path.relpath(full_src, self.base_dir)
             full_dest = os.path.join(destination, rel_src)
             qisys.sh.install(full_src, full_dest)
+
+        # Generate and install translations
+        ui.info(ui.bold, "-> Generating translations ...")
+        pml_translator = qilinguist.pml_translator.PMLTranslator(self.pml_path)
+        pml_translator.release()
+        pml_translator.install(destination)
 
     def deploy(self, url):
         """ Deploy every project to the given url """
