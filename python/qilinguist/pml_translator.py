@@ -23,6 +23,9 @@ class PMLTranslator(object):
             cmd = ["lrelease", "-compress", input, "-qm", output]
             qisys.command.call(cmd)
 
+    def install(self, dest):
+        raise NotImplementedError()
+
     def __repr__(self):
         return "<PMLTranslator for %s>" % self.pml_path
 
