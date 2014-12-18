@@ -50,7 +50,7 @@ def get_pml_projects(pml_paths):
 
 def get_linguist_builder(args, with_projects=True):
     worktree = get_linguist_worktree(args)
-    builder = qilinguist.builder.QiLinguistBuilder(worktree)
+    builder = qilinguist.builder.QiLinguistBuilder()
     if with_projects:
         projects = get_linguist_projects(args)
         builder.projects = projects

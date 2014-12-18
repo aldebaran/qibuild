@@ -40,7 +40,7 @@ class PMLBuilder(object):
                 build_worktree=self.build_worktree)
 
             self.linguist_worktree = qilinguist.worktree.LinguistWorkTree(self.worktree)
-            self.linguist_builder = qilinguist.builder.QiLinguistBuilder(self.linguist_worktree)
+            self.linguist_builder = qilinguist.builder.QiLinguistBuilder()
 
             self.builders = [self.cmake_builder, self.python_builder, self.linguist_builder]
         else:

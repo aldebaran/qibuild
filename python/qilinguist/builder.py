@@ -8,8 +8,7 @@ class QiLinguistBuilder(AbstractBuilder):
     """ Builder for linguist projects
     """
 
-    def __init__(self, linguist_worktree):
-        self.linguist_worktree = linguist_worktree
+    def __init__(self):
         self.projects = list()
 
     def configure(self, *args, **kwargs):
