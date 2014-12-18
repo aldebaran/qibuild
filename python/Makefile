@@ -14,11 +14,19 @@ TEST_MODULES:= $(foreach test,$(TEST_MODULES),\
 	$(filter $(test),$(wildcard $(shell dirname $(test))/*)))
 endif
 
-PYMODULES ?= qisys qibuild qitoolchain qisrc qidoc qilinguist \
-	bin/qibuild                                \
-	bin/qisrc                                  \
-	bin/qitoolchain                            \
-	bin/qilinguist
+
+PYMODULES =  \
+			qibuild         \
+			qicd            \
+			qidoc           \
+			qilinguist      \
+			qimvn           \
+			qipkg           \
+			qipy            \
+			qisrc           \
+			qisys           \
+			qitest          \
+			qitoolchain
 
 PYTHON    ?= python
 PIP       ?= pip
