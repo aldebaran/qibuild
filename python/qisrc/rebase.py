@@ -4,11 +4,11 @@ import qisys.interact
 import qisrc.manifest
 
 def rebase_worktree(git_worktree, git_projects, branch=None,
-                    push=False, dry_run=False, verbose=False):
+                    push=False, dry_run=False):
     if not git_projects:
         return
     upstream_projects = git_worktree.get_projects_on_branch(branch)
-    rebased_projects, errors = rebase_projects(git_projects, upstream_projects, branch, verbose)
+    rebased_projects, errors = rebase_projects(git_projects, upstream_projects, branch)
     if errors:
         mess = "Failed to rebase some projects:\n"
         for git_project in errors:
@@ -50,70 +50,78 @@ def push_projects(git_projects, dry_run=False):
             ui.error(out)
 
 
-def rebase_projects(git_projects, upstream_projects, branch, verbose):
+def rebase_projects(git_projects, upstream_projects, branch):
+    ui.info(ui.green, "Computing list of forked projects ...")
     rebased_projects = list()
     errors = list()
     max_src = max(len(x.src) for x in git_projects)
-    eol = "\n" if verbose else ""
-    fetch_quiet = False if verbose else True
-    for i, git_project in enumerate(git_projects):
-        ui.info_count(i, len(git_projects), git_project.src, end=eol)
-        git = qisrc.git.Git(git_project.path)
-        git.fetch(quiet=fetch_quiet)
+    forked_projects = list()
+    for git_project in git_projects:
         if not git_project.default_remote:
-            ui.info("\n", ui.brown, git_project.src, "[skipped]")
-            ui.info("No default remote", "\n")
+            ui.info(ui.brown, git_project.src, "[skipped]")
+            ui.info("No default remote")
             continue
         if not git_project.default_branch:
-            ui.info("\n", ui.brown, git_project.src, "[skipped]")
-            ui.info("No default branch", "\n")
+            ui.info(ui.brown, git_project.src, "[skipped]")
+            ui.info("No default branch")
             continue
         local_branch = git_project.default_branch.name
         remote_branch = git_project.default_branch.remote_branch
         remote_name = git_project.default_remote.name
         remote_ref = "%s/%s" % (remote_name, remote_branch)
+        git = qisrc.git.Git(git_project.path)
         if git.get_current_branch() != local_branch:
-            ui.info("\n", ui.brown, git_project.src, "[skipped]")
-            ui.info("Not on %s branch" % local_branch, "\n")
+            ui.info(ui.brown, git_project.src, "[skipped]")
+            ui.info("Not on %s branch" % local_branch)
             continue
-
         if not git_project.src in upstream_projects:
-            ui.info("\n", ui.brown, git_project.src, "[skipped]")
-            ui.info("No match for %s on %s branch" % (git_project.src, branch), "\n")
+            ui.info(ui.brown, git_project.src, "[skipped]")
+            ui.info("No match for %s on %s branch" % (git_project.src, branch))
             continue
-
-        status = qisrc.git.get_status(git, local_branch, remote_ref)
-        if status == "ahead":
-            ui.info("\n", ui.brown, git_project.src, "[skipped]")
-            ui.info("You have local changes not pushed yet", "\n")
-            continue
-        if status == "behind":
-            ui.info("\n", ui.brown, git_project.src, "[skipped]")
-            ui.info("Local branch is not up-to-date", "\n")
-            continue
-
         upstream_project = upstream_projects[git_project.src]
         upstream_branch = upstream_project.default_branch.name
         upstream_ref = "%s/%s" % (upstream_project.default_remote.name, upstream_branch)
+        if remote_ref != upstream_ref:
+            forked_projects.append(git_project)
 
-        status = qisrc.git.get_status(git, local_branch, upstream_ref)
-        if status == "no-diff":
-            if verbose:
-                ui.info("\n", "no changes", "\n")
-            else:
-                ui.info("\r" + " ".ljust(ui.get_console_size()[0]), sep="", end="\r")
+    if not forked_projects:
+        return list(), list()
+    max_length = max(len(x.src) for x in forked_projects)
+    ui.info(ui.green, "Rebasing forked projects ...")
+    for i, git_project in enumerate(forked_projects):
+        ui.info_count(i, len(forked_projects),
+                      git_project.src.ljust(max_length + 2), end="")
+        git = qisrc.git.Git(git_project.path)
+        git.fetch("--quiet")
+        local_branch = git_project.default_branch.name
+        remote_branch = git_project.default_branch.remote_branch
+        remote_name = git_project.default_remote.name
+        remote_ref = "%s/%s" % (remote_name, remote_branch)
+        status = qisrc.git.get_status(git, local_branch, remote_ref)
+        if status == "ahead":
+            ui.info(ui.brown, "[skipped]",
+                    ui.reset, "You have local changes not pushed yet")
             continue
         if status == "behind":
-            git.merge(upstream_ref)
+            ui.info(ui.brown, "[skipped]",
+                    ui.reset, "Local branch is not up-to-date")
+            continue
+        status = qisrc.git.get_status(git, local_branch, upstream_ref)
+        if status == "no-diff":
+            ui.info(ui.green, "[OK]", ui.reset, "already rebased")
+            continue
+        if status == "behind":
+            git.merge(upstream_ref, "--quiet")
             rebased_projects.append(git_project)
+            ui.info(ui.green, "[OK]", "fast forwarded")
         else:
             git.call("tag", "-f", "before-rebase")
             rc, out = git.call("rebase", upstream_ref, raises=False)
             if rc == 0:
                 rebased_projects.append(git_project)
+                ui.info(ui.green, "[OK]", "rebased")
             else:
-                ui.info("\n", ui.red, git_project.src, "  [failed]")
-                ui.info(out, "\n")
+                ui.info(ui.red, "[FAILED]", "there was some conflicts")
                 git.call("rebase", "--abort", raises=False)
                 errors.append(git_project)
                 continue

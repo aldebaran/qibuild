@@ -23,7 +23,6 @@ def do(args):
     branch = args.branch
     push = args.push
     dry_run = args.dry_run
-    verbose = args.verbose
 
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
@@ -31,4 +30,4 @@ def do(args):
                                                   use_build_deps=True)
 
     qisrc.rebase.rebase_worktree(git_worktree, git_projects, branch,
-                                 push=push, dry_run=dry_run, verbose=verbose)
+                                 push=push, dry_run=dry_run)

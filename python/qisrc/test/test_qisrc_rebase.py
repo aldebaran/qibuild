@@ -106,3 +106,15 @@ def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):
     local_sha1 = git.get_ref_sha1("refs/heads/devel")
     remote_sha1 = git.get_ref_sha1("refs/remotes/origin/devel")
     assert local_sha1 == remote_sha1
+
+
+def test_only_rebase_forked_projects(git_server, git_worktree, qisrc_action, record_messages):
+    git_server.create_repo("foo")
+    git_server.create_repo("bar")
+    git_server.switch_manifest_branch("devel")
+    git_server.change_branch("foo", "devel")
+    git_server.push_file("foo", "master.txt", "devel")
+    qisrc_action("init", git_server.manifest_url, "--branch", "devel")
+    record_messages.reset()
+    qisrc_action("rebase", "--branch", "master", "--all")
+    assert not record_messages.find("bar")
