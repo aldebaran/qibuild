@@ -316,11 +316,11 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             mess += "On Windows, you can use Jom or Ninja instead to compile "
             mess += "with multiple processors"
             raise Exception(mess)
-        if "Visual Studio" in cmake_generator or \
-            cmake_generator == "Xcode" or \
-            "JOM" in cmake_generator:
+        if cmake_generator == "Xcode" or "JOM" in cmake_generator:
             ui.warning("-j is ignored when used with", cmake_generator)
             return list()
+        if "Visual Studio" in cmake_generator:
+            return ["/cpumaxcount:%i" % num_jobs]
         ui.warning("Unknown generator: %s, ignoring -j option" % cmake_generator)
         return list()
 

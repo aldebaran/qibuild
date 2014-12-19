@@ -31,8 +31,7 @@ def test_parse_num_jobs_unsupported_generator(build_worktree):
 
 def test_parse_num_jobs_no_dash_j(build_worktree, record_messages):
     hello = build_worktree.create_project("hello")
-    assert hello.parse_num_jobs(3, cmake_generator="Visual Studio 10") ==  list()
-    assert record_messages.find("-j is ignored when used with Visual Studio 10")
+    assert hello.parse_num_jobs(3, cmake_generator="Visual Studio 10") == ["/cpumaxcount:3"]
 
 def test_parse_num_jobs_unknown_generator(build_worktree, record_messages):
     hello = build_worktree.create_project("hello")
