@@ -61,16 +61,16 @@ def do(args):
         elif not args.force:
             ui.info(ui.green, "Build directories that will be removed",
                 ui.reset, ui.bold, "(use -f to apply):")
-        for i, bdir in enumerate(bdirs['known_configs'], start=1):
-            to_print = [ui.green, "*", ui.reset, "(%i/%i)" % (i, bdir_count)]
+        for i, bdir in enumerate(bdirs['known_configs']):
+            message = list()
             if args.force:
-                to_print.extend([ui.green, "Cleaning", ui.reset, bdir])
+                message.extend([ui.green, "Cleaning", ui.reset, bdir])
 
                 # delete the build directory
                 qisys.sh.rm(bdir)
             else:
-                to_print.extend([ui.reset, bdir])
-            ui.info(*to_print)
+                message.append(bdir)
+            ui.info_count(i, bdir_count, *message)
 
     if clean_selection in ["all_configs", "unknown_configs"]:
         bdir_count = len(bdirs['unknown_configs'])
