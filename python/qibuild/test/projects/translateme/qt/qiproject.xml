@@ -2,6 +2,6 @@
   <qibuild name="translateme-qt" />
   <translate
     name="helloqt"
-    linguas="fr_FR en_US"
+    linguas="fr_FR"
     tr="linguist"/>
 </project>

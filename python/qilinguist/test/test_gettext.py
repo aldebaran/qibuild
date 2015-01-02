@@ -38,6 +38,7 @@ def test_release(qilinguist_action):
     assert not os.path.exists(fr_FR_mo_file)
     assert not os.path.exists(en_US_mo_file)
     qilinguist_action("update", "translate")
+    qilinguist_action.create_po(trad)
     qilinguist_action("release", "translate")
     assert os.path.exists(fr_FR_mo_file)
     assert os.path.exists(en_US_mo_file)

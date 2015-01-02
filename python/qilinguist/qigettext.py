@@ -52,13 +52,21 @@ class GettextProject(qilinguist.project.LinguistProject):
                 # generate PO file if it doesn't exist
                 self.generate_po_file(locale)
 
-    def release(self):
-        """ Compile every catalog """
+    def release(self, raises=True):
+        """ Compile every catalog.
+
+        """
         mo_output_dir = os.path.join(self.path, "po",
                                      "share", "locale", self.name)
         qisys.sh.mkdir(mo_output_dir, recursive=True)
+        all_ok = True
         for locale in self.linguas:
-            self.generate_mo_file(locale)
+            ok, message = self.generate_mo_file(locale)
+            if not ok:
+                ui.error(message)
+            all_ok = all_ok and ok
+        if not all_ok and raises:
+            raise Exception("`qilinguist release` failed")
 
     def extract_pot_file(self):
         """Extract sentence from source file and generate POT file"""
@@ -167,7 +175,15 @@ class GettextProject(qilinguist.project.LinguistProject):
         cmd.extend(["--directory", self.po_path])
         cmd.append(input_file)
 
-        qisys.command.call(cmd)
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
+        out, err = process.communicate()
+        ui.info(err.strip())
+        if "untranslated" in err:
+            return False, "Some untranslated messages were found"
+        if process.returncode != 0:
+            return False, "msgfmt failed"
+        return True, ""
 
     def install(self, destination):
         full_dest = os.path.join(destination, "share", "locale")

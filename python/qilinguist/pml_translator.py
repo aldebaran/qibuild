@@ -1,7 +1,10 @@
 import os
 
+from qisys import ui
 import qisys.command
 import qisys.qixml
+
+import qilinguist.qtlinguist
 
 def new_pml_translator(pml_path):
     return PMLTranslator(pml_path)
@@ -16,14 +19,21 @@ class PMLTranslator(object):
     def update(self):
         raise NotImplementedError()
 
-    def release(self):
+    def release(self, raises=True):
+        all_ok = True
         for ts_file in self.ts_files:
             qm_file = ts_file.replace(".ts", ".qm")
             input = os.path.join(self.path, ts_file)
             output = os.path.join(self.path, qm_file)
+            ok, message = qilinguist.qtlinguist.generate_qm_file(input, output)
+            if not ok:
+                ui.error(message)
+                all_ok = False
             cmd = ["lrelease", "-compress", input, "-qm", output]
             qisys.command.call(cmd)
             self.qm_files.append(output)
+        if not all_ok and raises:
+            raise Exception("`qilinguist release` failed")
 
     def install(self, dest):
         translations_dest = os.path.join(dest, "translations")

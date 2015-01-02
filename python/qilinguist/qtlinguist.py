@@ -8,6 +8,8 @@ QtLinguist
 """
 
 import os
+import subprocess
+
 from qisys import ui
 import qisys.command
 import qilinguist.project
@@ -26,8 +28,8 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
         cmd.extend(output_files)
         qisys.command.call(cmd, cwd=self.path)
 
-
-    def release(self):
+    def release(self, raises=True):
+        all_ok = True
         for locale in self.linguas:
             input_file = os.path.join(self.po_path, locale + ".ts")
             if not os.path.exists(input_file):
@@ -37,9 +39,12 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
                 continue
             output_file = os.path.join(self.po_path,
                                        self.name + "_" + locale + ".qm")
-            cmd = ["lrelease", "-compress",
-                   input_file, "-qm", output_file]
-            qisys.command.call(cmd, cwd=self.path)
+            ok, message = generate_qm_file(input_file, output_file)
+            if not ok:
+                all_ok = False
+                ui.error(message)
+        if not all_ok and raises:
+            raise Exception("`qilinguist release` failed")
 
     def install(self, destination):
         full_dest = os.path.join(destination, "share", "locale")
@@ -49,3 +54,19 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
 
     def __repr__(self):
         return "<QtLinguistProject %s in %s>" % (self.name, self.path)
+
+def generate_qm_file(input, output):
+    """ Generate a .qm file from a .ts file.
+    Returns (True, "") if everything went well,
+    (False, "<error message>") otherwise
+
+    """
+    cmd = ["lrelease", "-compress", input, "-qm", output]
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    out, _ = process.communicate()
+    ui.info(out.strip())
+    if process.returncode != 0:
+        return False, "lrelease failed"
+    if "untranslated" in out:
+        return False, "untranslated messages were found"
+    return True, ""

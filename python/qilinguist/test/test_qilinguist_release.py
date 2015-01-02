@@ -1,4 +1,8 @@
+import os
+
 import qisys.script
+
+from qibuild.test.conftest import TestBuildWorkTree
 
 import pytest
 
@@ -39,3 +43,35 @@ def test_raise_when_no_project_given_outside_a_worktree(tmpdir, monkeypatch):
     with pytest.raises(Exception) as e:
         qisys.script.run_action("qilinguist.actions.release")
     assert "outside a worktree" in e.value.message
+
+def test_non_translated_messages_gettext(qilinguist_action, record_messages):
+    trad_project = qilinguist_action.trad
+    qilinguist_action.create_po(trad_project)
+    main_cpp = os.path.join(trad_project.path, "main.cpp")
+    with open(main_cpp, "a") as fp:
+        fp.write("""
+char* foo() {
+    return _("Hello, world");
+}
+""")
+    qilinguist_action("update", "translate")
+    qilinguist_action("release", "translate", raises=True)
+    assert record_messages.find("untranslated")
+
+def test_non_translated_messages_qt(qilinguist_action):
+    build_worktree = TestBuildWorkTree()
+    project = build_worktree.add_test_project("translateme/qt")
+    qilinguist_action("update", "helloqt")
+    qilinguist_action("release", "helloqt", raises=True)
+
+def test_invalid_po_file(qilinguist_action):
+    trad_project = qilinguist_action.trad
+    qilinguist_action.create_po(trad_project)
+    fr_FR_po = os.path.join(trad_project.path, "po", "fr_FR.po")
+    with open(fr_FR_po, "a") as fp:
+        fp.write("""
+#: broken
+syntax-error
+""")
+    error = qilinguist_action("release", "translate", raises=True)
+    assert "failed" in error
