@@ -307,6 +307,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             cmake_generator = \
                     qibuild.cmake.get_cached_var(self.build_directory, "CMAKE_GENERATOR")
         if num_jobs is None:
+            # By default, use the "good" number just like Ninja
+            if "Visual Studio" in cmake_generator:
+                return ["/maxcpucount"]
             return list()
         if "Unix Makefiles" in cmake_generator or \
             "Ninja" in cmake_generator:
@@ -320,7 +323,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             ui.warning("-j is ignored when used with", cmake_generator)
             return list()
         if "Visual Studio" in cmake_generator:
-            return ["/cpumaxcount:%i" % num_jobs]
+            return ["/maxcpucount:%i" % num_jobs]
         ui.warning("Unknown generator: %s, ignoring -j option" % cmake_generator)
         return list()
 
