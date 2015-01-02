@@ -112,7 +112,8 @@ def config_title(fp):
         return True
     # else: auto
     legal_terms = ["xterm", "xterm-color", "Eterm", "aterm", "rxvt",
-            "screen", "kterm", "rxvt-unicode", "gnome", "interix"]
+            "screen", "kterm", "rxvt-unicode", "gnome", "interix",
+            "rxvt-unicode-256color"]
     return fp.isatty() and \
         'TERM' in os.environ and \
         os.environ['TERM'] in legal_terms
