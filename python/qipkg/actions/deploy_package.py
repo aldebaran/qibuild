@@ -7,9 +7,9 @@ import sys
 import zipfile
 
 from qisys import ui
-
 import qisys.command
 import qisys.parsers
+import qipkg.package
 
 def configure_parser(parser):
     qisys.parsers.default_parser(parser)
@@ -33,22 +33,24 @@ def deploy(pkg_paths, url):
                       ui.reset, ui.blue, pkg_path,
                       ui.reset, ui.green, "to",
                       ui.reset, ui.blue, url.as_string)
+        pkg_name = qipkg.package.name_from_archive(pkg_path)
         scp_cmd = ["scp",
                    pkg_path,
                    "%s@%s:" % (url.user, url.host)]
         qisys.command.call(scp_cmd)
 
         try:
-            _install_package(url, pkg_path)
+            _install_package(url, pkg_name, pkg_path)
         except Exception as e:
             ui.error("Unable to install package on target")
             ui.error("Error was: ", e)
 
-def _install_package(url, pkg_path):
+def _install_package(url, pkg_name, pkg_path):
     import qi
     session = qi.Session()
     session.connect("tcp://%s:9559" % (url.host))
     package_manager = session.service("PackageManager")
+    package_manager.remove(pkg_name)
     ret = package_manager.install(
             "/home/%s/%s" % (url.user, os.path.basename(pkg_path)))
     ui.info("PackageManager returned: ", ret)
