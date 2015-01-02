@@ -5,6 +5,8 @@
 
 """
 
+import re
+
 def compare(a_str, b_str):
     """ Compare two versions
 
@@ -53,6 +55,25 @@ def compare(a_str, b_str):
         if res:
             return res
     return 0
+
+def increment_version(version):
+    """
+    >>> increment_version("0.0.3")
+    '0.0.4'
+    >>> increment_version("2.4-rc1")
+    '2.4-rc2'
+    >>> increment_version("2.4-alpha")
+    Traceback (most recent call last):
+        ...
+    ValueError: version must end with a digit
+
+    """
+    match = re.search("\d+$", version)
+    if match is None:
+        raise ValueError("version must end with a digit")
+    as_int = int(match.group())
+    as_int += 1
+    return re.sub("\d+$", str(as_int), version)
 
 def eat_number(str, index):
     """ Helper for explode_version """
