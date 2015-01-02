@@ -1,3 +1,7 @@
+## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
+
 import os
 import subprocess
 
@@ -9,7 +13,7 @@ import qisrc.git
 import pytest
 
 
-# This modules also serves as a test for the
+# This module also serves as a test for the
 # qibuild cmake API
 
 def test_simple(qibuild_action):

@@ -1,3 +1,7 @@
+## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
+
 """ Stores configuration for git projects in a worktree
 Delegates most of the work to :py:mod:`qisrc.git`` and
 :py:mod:`qisrc.review`

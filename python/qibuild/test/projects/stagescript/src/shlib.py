@@ -1,3 +1,6 @@
+## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
 
 def load_shlib(name, verbose=False):
   """ Load a shared library, try to handle as many cases as possible

@@ -1,3 +1,6 @@
+## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
 def test_transaction_success(mock_git):
     mock_git.add_result("fetch", 0, "")
     mock_git.add_result("reset", 0, "")

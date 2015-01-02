@@ -1,3 +1,6 @@
+## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
 """ Install a doc project and its depencies.
 
 The index.html will be the one of the 'base project',

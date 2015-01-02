@@ -1,3 +1,7 @@
+## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
+
 project = u'qiBuild'
 version = '3.8'
 sys.path.insert(0, os.path.abspath('../tools'))

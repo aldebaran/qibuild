@@ -1,3 +1,7 @@
+## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
+
 function(_qi_add_test_internal test_name target_name)
   cmake_parse_arguments(ARG
     "NO_INSTALL;NO_ADD_TEST;NIGHTLY;PERF_TEST;GTEST_TEST"

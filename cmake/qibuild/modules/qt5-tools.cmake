@@ -1,4 +1,7 @@
-##
+## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
+
 # This is called *before* any call to qi_use_lib() is made.
 # Here we need to define the qt macros, such as qt5_wrap_cpp,
 # qt5_add_resources, qt5_wrap_ui
