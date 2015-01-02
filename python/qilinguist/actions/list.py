@@ -28,4 +28,4 @@ def do(args):
         ui.info(ui.green, " * ",
                 ui.blue, project.name.ljust(max_name + 2),
                 ui.reset, "in",
-                ui.bold, project.src)
+                ui.bold, project.path)
