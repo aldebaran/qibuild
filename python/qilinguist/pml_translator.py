@@ -37,6 +37,7 @@ class PMLTranslator(object):
             self.qm_files.append(output)
         if not all_ok and raises:
             raise Exception("`qilinguist release` failed")
+        return all_ok
 
     def install(self, dest):
         translations_dest = os.path.join(dest, "translations")

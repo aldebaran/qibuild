@@ -45,6 +45,7 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
                 ui.error(message)
         if not all_ok and raises:
             raise Exception("`qilinguist release` failed")
+        return all_ok
 
     def install(self, destination):
         full_dest = os.path.join(destination, "share", "locale")

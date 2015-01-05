@@ -67,6 +67,7 @@ class GettextProject(qilinguist.project.LinguistProject):
             all_ok = all_ok and ok
         if not all_ok and raises:
             raise Exception("`qilinguist release` failed")
+        return all_ok
 
     def extract_pot_file(self):
         """Extract sentence from source file and generate POT file"""
