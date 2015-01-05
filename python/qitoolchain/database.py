@@ -17,8 +17,6 @@ class DataBase(object):
         self.db_path = db_path
         self.packages = dict()
         self.load()
-        self.cache_path = qisys.sh.get_cache_path("qi", "toolchains",
-                                                  self.name)
         self.packages_path = qisys.sh.get_share_path("qi", "toolchains",
                                                      self.name)
 
@@ -59,9 +57,6 @@ class DataBase(object):
         """ Remove self """
         qisys.sh.rm(self.packages_path)
         qisys.sh.rm(self.db_path)
-
-    def clean_cache(self):
-        qisys.sh.rm(self.cache_path)
 
 
     def add_package(self, package):
@@ -195,12 +190,12 @@ class DataBase(object):
             package.cross_gdb = os.path.join(package.path, package.cross_gdb)
 
     def download_package(self, package):
-        archive = qisys.remote.download(package.url, self.cache_path,
-                                        message = (ui.green, "Downloading",
-                                                   ui.reset, ui.blue, package.url))
-        dest = os.path.join(self.packages_path, package.name)
-        ui.info(ui.green, "Extracting",
-                ui.reset, ui.blue, package.name, package.version)
-        qitoolchain.qipackage.extract(archive, dest)
-        qisys.sh.rm(archive)
+        with qisys.sh.TempDir() as tmp:
+            archive = qisys.remote.download(package.url, tmp,
+                                            message = (ui.green, "Downloading",
+                                                    ui.reset, ui.blue, package.url))
+            dest = os.path.join(self.packages_path, package.name)
+            ui.info(ui.green, "Extracting",
+                    ui.reset, ui.blue, package.name, package.version)
+            qitoolchain.qipackage.extract(archive, dest)
         package.path = dest
