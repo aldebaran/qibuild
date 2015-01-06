@@ -55,7 +55,7 @@ class TestGitServer(object):
         bar
  |__ work
         # where we will create worktrees and make our testing
-        # (used by qisrc_action fixture for instanc
+        # (used by qisrc_action fixture for instance)
 
     Two remotes are created by default: "origin" and "gerrit"
 
