@@ -55,6 +55,22 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         """ The default config to use """
         return self.build_config.default_config
 
+    def get_known_profiles(self):
+        """ Parse the remote profiles (coming from qisrc sync), and the
+        local profiles (written in .qi/qibuild.xml). Return a dict
+        name -> list of tuple (key, value)
+
+        """
+        res = dict()
+        remote_xml = os.path.join(self.root, ".qi", "manifests",
+                                  "default", "manifest.xml")
+        if os.path.exists(remote_xml):
+            res = qibuild.profile.parse_profiles(remote_xml)
+        local_xml = self.qibuild_xml
+        local_profiles = qibuild.profile.parse_profiles(local_xml)
+        res.update(local_profiles)
+        return res
+
     def get_build_project(self, name, raises=True):
         """ Get a :py:class:`.BuildProject` given its name """
         for build_project in self.build_projects:

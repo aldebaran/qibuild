@@ -508,7 +508,7 @@ The following tools were not found: {missing}\
         # build directory name pattern:
         # 'build-<tc_name>[-<profile>]...[-release]'
         qibuild_xml = self.build_worktree.qibuild_xml
-        profiles = qibuild.profile.parse_profiles(qibuild_xml)
+        profiles = self.build_worktree.get_known_profiles()
         profiles = list(profiles.keys())
         profiles = [re.escape(x) for x in profiles]
         toolchains = qitoolchain.toolchain.get_tc_names()

@@ -191,24 +191,14 @@ but this does not match any toolchain name
         self.set_active_config(default_config)
 
     def parse_profiles(self):
-        profile_flags = list()
-        remote_xml = os.path.join(self.build_worktree.root, ".qi", "manifests",
-                                  "default", "manifest.xml")
-        if os.path.exists(remote_xml):
-            profiles = qibuild.profile.parse_profiles(remote_xml)
-        else:
-            profiles = dict()
-        local_xml = self.build_worktree.qibuild_xml
-        local_profiles = qibuild.profile.parse_profiles(local_xml)
-        profiles.update(local_profiles)
-        res = list()
-        known_profiles = profiles.keys()
+        self._profile_flags = list()
+        known_profiles = self.build_worktree.get_known_profiles()
+        known_names = known_profiles.keys()
         for name in self._profiles:
-            if not name in known_profiles:
-                raise NoSuchProfile(name, known_profiles)
-            flags = profiles[name].cmake_flags
-            profile_flags.extend(flags)
-        self._profile_flags = profile_flags
+            if not name in known_names:
+                raise NoSuchProfile(name, known_names)
+            flags = known_profiles[name].cmake_flags
+            self._profile_flags.extend(flags)
 
     def set_active_config(self, active_config):
         """ Set the active configuration. This should match an
