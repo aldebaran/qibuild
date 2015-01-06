@@ -227,3 +227,17 @@ def test_new_project_under_gitorious(git_worktree, git_server):
     foo = git_worktree.get_git_project("foo")
     assert len(foo.remotes) == 1
     assert foo.default_remote.name == "gitorious"
+
+def test_removing_forked_project(qisrc_action, git_server):
+    git_server.create_repo("booz")
+    git_server.switch_manifest_branch("devel")
+    git_server.change_branch("booz", "devel")
+    qisrc_action("init", git_server.manifest_url, "--branch", "devel")
+    git_worktree = TestGitWorkTree()
+    booz_proj = git_worktree.get_git_project("booz")
+    git = qisrc.git.Git(booz_proj.path)
+    assert git.get_current_branch() == "devel"
+    git_server.change_branch("booz", "master")
+    qisrc_action("sync", "-a")
+    qisrc_action("checkout", "devel")
+    assert git.get_current_branch() == "master"
