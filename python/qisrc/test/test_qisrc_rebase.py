@@ -42,7 +42,7 @@ def test_rebase_conflict(git_server, qisrc_action):
     _, after = git.call("show", raises=False)
     assert after == before
 
-def test_skip_when_not_on_correct_branch(git_server, qisrc_action, record_messages):
+def test_raises_when_not_on_correct_branch(git_server, qisrc_action, record_messages):
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
     git_server.change_branch("foo", "devel")
@@ -51,7 +51,8 @@ def test_skip_when_not_on_correct_branch(git_server, qisrc_action, record_messag
     foo_proj = git_worktree.get_git_project("foo")
     git = TestGit(foo_proj.path)
     git.checkout("-B", "perso")
-    qisrc_action("rebase", "--branch", "master", "--all")
+    error = qisrc_action("rebase", "--branch", "master", "--all", raises=True)
+    assert " * foo" in error
     assert record_messages.find("skipped")
 
 def test_when_moved(git_server, qisrc_action, record_messages):
