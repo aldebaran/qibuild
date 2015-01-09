@@ -70,26 +70,26 @@ We then add a post-build rule :
       -P ${CMAKE_BINARY_DIR}/post-copy-dlls.cmake
       ${CMAKE_BINARY_DIR}
 
-CMAKE_CFG_INTDIR is something like $(OutDir), a variable that is expanded by
+``CMAKE_CFG_INTDIR`` is something like ``$(OutDir)``, a variable that is expanded by
 the native tool. In the case of visual studio, it’s the name of the current
 build configuration.
 
-Remember, CMake configures one sln that must be used in several build
+Remember, CMake configures one ``.sln`` that must be used in several build
 configurations.
 
 So for instance, we will call::
 
   c:\cmake\cmake.exe -DBUILD_TYPE=Debug -DPROJECT=HELLO -P hello\build\post-copy-dlls.cmake hello\build
 
-When you run cmake -P with two arguements, the last one is the path to the cache.
+When you run ``cmake -P`` with two arguments, the last one is the path to the cache.
 
-This is how we can find every variable we need, like HELLO_DEPENDS and
-WORLD_LIBRARIES.
+This is how we can find every variable we need, like ``HELLO_DEPENDS`` and
+``WORLD_LIBRARIES``.
 
-The last two variables we need (PROJECT and BUILD_TYPE), are directly set on
+The last two variables we need (``PROJECT`` and ``BUILD_TYPE``), are directly set on
 the command line.
 
-Nice, isn’t it?
+Nice, isn't it?
 
 MacOSx and .dylib
 -----------------

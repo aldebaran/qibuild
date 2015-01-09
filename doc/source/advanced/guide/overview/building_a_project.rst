@@ -25,7 +25,7 @@ Using an IDE
 ------------
 
 qiBuild is based on CMake, which in turns knows how to generate project files
-for many of IDEs : XCode, Eclipse, Visual Studio.
+for many of IDEs : Xcode, Eclipse, Visual Studio.
 Here we are only dealing with the details for:
 
 * QtCreator on Mac and Linux
@@ -38,7 +38,7 @@ See:
 * :ref:`qibuild-qtcreator`
 
 qiBuild is known to work fine with these IDEs, there may be some work to do to
-be able to use XCode or Eclipse. Patches and tutorials welcome !
+be able to use Xcode or Eclipse. Patches and tutorials welcome !
 
 
 Using Aldebaran packages

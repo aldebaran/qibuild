@@ -27,7 +27,7 @@ qisrc.worktree.Remote
 
     .. py:attribute:: review
 
-      Wether the remote supports code review.
+      Whether the remote supports code review.
 
 qisrc.worktree.Branch
 ----------------------
@@ -51,6 +51,6 @@ qisrc.worktree.Branch
 
   .. py:attribute:: default
 
-     Wether this is the default branch.
+     Whether this is the default branch.
      ``qisrc sync``, will try to synchronize
      this branch by default

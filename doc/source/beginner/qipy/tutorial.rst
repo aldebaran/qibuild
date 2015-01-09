@@ -162,10 +162,10 @@ Step three: Use `qipy bootstrap`
 
     qipy bootstrap
 
-This will initialize a virtualenv in the wortkree, and should be run
+This will initialize a virtualenv in the worktree, and should be run
 when changing or adding new python projects.
 
-You can use a ``-c`` option to have several virtualenv in the wortkree.
+You can use a ``-c`` option to have several virtualenv in the worktree.
 
 The virtualenv will be initialized using ``pip install --editable``, so you
 will be able to run your python code directly from the sources.

@@ -85,7 +85,7 @@ And then, running:
     qisrc init git@git.aldebaran.lan:qi/manifest.git
 
 
-Just works and lets you checkout every project you need to compile choregraphe,
+Just works and lets you checkout every project you need to compile Choregraphe,
 in the correct layout.
 
 
@@ -95,7 +95,7 @@ Handling release branches
 
 ``qisrc`` makes it easy to have several projects all tracking different branches.
 
-For instance, when doing a choregraphe release, you may want to make sure everything
+For instance, when doing a Choregraphe release, you may want to make sure everything
 is in the ``release-1.12`` branch
 
 So you create a ``release-1.12`` branch on every repository, then a ``release-1.12``

@@ -43,7 +43,7 @@ class BinaryPackage:
     def load(self):
         """ Set self.metadata and self.name
 
-        If the metadata has not been cached yet, then it is read/laoded and
+        If the metadata has not been cached yet, then it is read/loaded and
         cached in the instance.
 
         The metadata is stored in a dictionary, which has the following layout::

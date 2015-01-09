@@ -26,7 +26,7 @@ qitoolchain.toolchain.Toolchain
         <package name="..." path="..." />
       </toolchain>
 
-    thus added packages are stored permanentely.
+    thus added packages are stored permanently.
 
     .. py:attribute:: name
 

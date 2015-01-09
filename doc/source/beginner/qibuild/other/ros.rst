@@ -53,10 +53,10 @@ What is in the ROS build ecosystem and not in qiBuild
 * tools to install/visualize dependencies
 
 * workspace chaining: you can create several workspaces with several projects
-  and use them by chaining appropriate environement variables (which is done on
+  and use them by chaining appropriate environment variables (which is done on
   Unix by sourcing a ``setup.sh`` file)
 
-* a release toolm ``bloom``, to automatically bump versions, create packages
+* a release tool ``bloom``, to automatically bump versions, create packages
 
 CMake equivalences
 ------------------
@@ -183,9 +183,9 @@ qibuild
 
 Goes away from the CMake defaults:
 
-* ``@rpath`` on mac (actuall CMake 2.8.12 is going to do that by default too)
-* install ``rpath`` set to ``$ORIGIN/../lib`` on linux
-* ``_d`` prefix on VisualStudio when building in debug
+* ``@rpath`` on mac (actual CMake 2.8.12 is going to do that by default too)
+* install ``rpath`` set to ``$ORIGIN/../lib`` on Linux
+* ``_d`` prefix on Visual Studio when building in debug
 * install rules (force install in ``<prefix>/bin``)
 
 Adding libraries
@@ -209,7 +209,7 @@ qibuild
 
 Goes away from the CMake defaults:
 
-* ``@rpath`` on mac (actuall CMake 2.8.12 is going to do that by default too)
+* ``@rpath`` on mac (actual CMake 2.8.12 is going to do that by default too)
 * install ``rpath`` set to relative to ``$ORIGIN`` on linux, so that
   ``dlopen(<prefix>/lib/plugin/foo.so)``  finds the dependencies in
   ``<prefix>/lib/libbar.so``

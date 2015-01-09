@@ -5,7 +5,7 @@
 #! Translation support
 # ====================
 
-#! Create install rules for dictionnary
+#! Create install rules for dictionary
 #
 # Example of use: ::
 #

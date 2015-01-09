@@ -114,7 +114,7 @@ Found two projects sharing the same sources:
 
     def get_repos(self, groups=None):
         """ Get the repositories inside the given group
-        Retrun all repositories when no group is given
+        Return all repositories when no group is given
 
         """
         default_group = self.groups.default_group

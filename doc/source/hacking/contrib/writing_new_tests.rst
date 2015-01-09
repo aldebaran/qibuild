@@ -20,7 +20,7 @@ More specifically
 * The code essentially consists in calling commands with the correct arguments
 * Lots of code relies on the file system (to read the configuration file, to
   write generated CMake code and so on)
-* Some code is platform-dependant
+* Some code is platform-dependent
 
 Here are a few guide lines which should help you overcome these issues
 and writing new tests.
@@ -146,7 +146,7 @@ Then in your test, you can do something like:
 .. seealso::
 
    * `Don't Look For Things <http://www.youtube.com/watch?v=RlfLCWKxHJ0>`_
-     Google Tech Talk about this topic (For the Java programming langage, but
+     Google Tech Talk about this topic (For the Java programming language, but
      most of the talk is transposable to Python)
 
 Testing exceptions
@@ -183,11 +183,11 @@ This is how to do it:
 Notes:
 
 * The ``pylint disable-msg`` is necessary because ``pytest``
-  uses a "layz import" mechanism that causes false negative
+  uses a "lazy import" mechanism that causes false negative
   when running ``pylint``
 
 * You have to get the original exception with ``e.value.message``
-  ``py.test`` automatically rewrites the exceptions that are thown
+  ``py.test`` automatically rewrites the exceptions that are thrown
   during a test case, and for instance ``str(e)`` is **not** what you
   would expect ...
 

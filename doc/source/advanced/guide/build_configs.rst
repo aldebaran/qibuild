@@ -1,9 +1,9 @@
 .. _managing-build-configs:
 
-Mananing build configurations
+Managing build configurations
 =============================
 
-In this tutorial, you will learn how to use serveral build configurations with
+In this tutorial, you will learn how to use several build configurations with
 the same sources.
 
 The problem
@@ -31,7 +31,7 @@ So far so good.
 But now you have to pass "-DWITH_GTEST=ON" to all your projects when you
 configure them.
 
-Note that ther is a shortcut for that in qibuild CMake API using
+Note that there is a shortcut for that in qibuild CMake API using
 :cmake:function:`qi_add_optional_package`:
 
 .. code-block:: cmake
@@ -46,7 +46,7 @@ Note that ther is a shortcut for that in qibuild CMake API using
 Here, if GTEST is not found, no error is raised, and WITH_GTEST is simply set
 to "OFF"...
 
-But let’s assume you really need some flags.
+But let's assume you really need some flags.
 
 Passing CMake flags with qiBuild
 --------------------------------
@@ -66,14 +66,14 @@ Simply call:
 * You may want to trigger some flags depending on the toolchain / configuration
   you use.
 
-  For instance, if you want to pass -DWITH_FOO=OFF when you are using the
+  For instance, if you want to pass ``-DWITH_FOO=OFF`` when you are using the
   toolchain mingw32, you can write something like:
 
 .. code-block:: cmake
 
     set(WITH_FOO OFF CACHE INTERAL "" FORCE)
 
-in .qi/mingw32.cmake
+in ``.qi/mingw32.cmake``
 
 Using build configurations
 ---------------------------

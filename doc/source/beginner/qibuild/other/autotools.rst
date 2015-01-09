@@ -31,7 +31,7 @@ Using qiBuild with autotools projects
 Right now there are no plans to make it easier to use qibuild with autotools
 projects.
 
-Here are two small task that could be tackled, though. (Patches welcome!)
+Here are two small tasks that could be tackled, though. (Patches welcome!)
 
 
 Finding autotools-based projects
@@ -46,12 +46,12 @@ It looks like:
     find_package(PkgConfig)
     pkg_check_modules(FOO foo-0.42)
 
-Unfortunately, this does not work if foo-0.42.pc is in a toolchain, so
-you cannot use it to cross-compile a library which depends on foo.
+Unfortunately, this does not work if ``foo-0.42.pc`` is in a toolchain, so
+you cannot use it to cross-compile a library which depends on ``foo``.
 
-This may be fixed by patching `PkgConfig.cmake` to
-set PKG_CONFIG_PATH to `CMAKE_FIND_ROOT_PATH` and `--prefix` to
-`CMAKE_FIND_ROOT_PATH` when calling `pkg-config`.
+This may be fixed by patching ``PkgConfig.cmake`` to
+set ``PKG_CONFIG_PATH`` to ``CMAKE_FIND_ROOT_PATH`` and ``--prefix`` to
+``CMAKE_FIND_ROOT_PATH`` when calling ``pkg-config``.
 
 
 Generating pkg config files
@@ -60,5 +60,5 @@ Generating pkg config files
 Again, nothing hard to do here.
 
 During the call to :cmake:function:`qi_stage_lib`, it should be easy to
-generate the `.pc` file. All the information is already here.
+generate the ``.pc`` file. All the information is already here.
 

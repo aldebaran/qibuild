@@ -139,7 +139,7 @@ Optional: install qicd
 
 
 ``qicd`` is a small shell function that lets you jump quickly
-from one project to an other inside your wortkree.
+from one project to an other inside your worktree.
 
 If you have access to ``bash`` shell, you can patch your config file
 in order to use ``qicd``
@@ -166,7 +166,7 @@ Configuration fails
 Usually the best way to know what is going wrong it to have
 a look at the top of the error message, not the bottom...
 
-Windows: cannot find specifed file
+Windows: cannot find specified file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 qiBuild did not find ``cmake.exe.`` You have to make sure

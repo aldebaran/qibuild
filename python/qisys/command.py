@@ -206,7 +206,7 @@ def find_program(executable, env=None, raises=False):
     (and PATHEXT on windows)
 
     :return: None if program was not found,
-      the full path to executable otherwize
+      the full path to executable otherwise
     """
     import qibuild.config
     if executable in _FIND_PROGRAM_CACHE:

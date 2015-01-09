@@ -21,17 +21,17 @@ include(qibuild/internal/uselib)
 #                   each time another project use that lib.
 # \group:DEPENDS if not given, ${TARGET}_DEPENDS will be guessed from
 #                the previous calls to qi_use_lib().
-#                Use this (whith care!) to override this behavior.
+#                Use this (with care!) to override this behavior.
 #                One should list all the (public) "direct" dependencies *and*
 #                their (public) dependencies.
 # \group:INCLUDE_DIRS if not given, ${TARGET}_INCLUDE_DIRS  will be
 #                 guessed from the previous calls to
 #                 include_directories()
-#                 Use this (whith care!) to override this behavior.
+#                 Use this (with care!) to override this behavior.
 # \group:PATH_SUFFIXES when your header is installed in foo/bar.h,
 #                 but you still need to do #include <bar.h>, you can
 #                 set PATH_SUFFIXES to 'foo'. Be careful to test the
-#                 intall rules of your headers if you choose to do so.
+#                 install rules of your headers if you choose to do so.
 #
 function(qi_stage_lib target)
   if(NOT TARGET "${target}")
@@ -68,11 +68,11 @@ endfunction()
 # \group:INCLUDE_DIRS if not given, ${NAME}_INCLUDE_DIRS  will be
 #                 guessed from the previous calls to
 #                 include_directories()
-#                 Use this (whith care!) to override this behavior.
+#                 Use this (with care!) to override this behavior.
 # \group:PATH_SUFFIXES when your header is installed in foo/bar.h,
 #                 but you still need to do #include <bar.h>, you can
 #                 set PATH_SUFFIXES to 'foo'. Be careful to test the
-#                 intall rules of your headers if you choose to do so.
+#                 install rules of your headers if you choose to do so.
 function(qi_stage_header_only_lib target)
   _qi_internal_stage_header_only_lib(${target} ${ARGN})
 endfunction()

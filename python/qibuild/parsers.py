@@ -127,7 +127,7 @@ def get_build_worktree(args, verbose=True):
 def get_build_projects(build_worktree, args, solve_deps=True, default_all=False):
     """ Get a list of build projects to use from an argparse.Namespace
     object. Useful when you do not need a CMakeBuilder.
-    You can choose wether or not to solve the dependencies
+    You can choose whether or not to solve the dependencies
 
     """
     parser = BuildProjectParser(build_worktree)

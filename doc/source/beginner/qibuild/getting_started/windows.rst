@@ -38,7 +38,7 @@ The generator you want to use depends on how you wish to use qibuild
 Configuring qiBuild
 
 Note that you can run ``qibuild config`` to get a look at your current
-settings, and change them by editing the xml files, or re-running ``qibuild
+settings, and change them by editing the XML files, or re-running ``qibuild
 config --wizard``
 
 
@@ -50,7 +50,7 @@ with Visual Studio.
 
 Note when using Aldebaran packages, 64bits support is not available. You can
 still use Visual Studio on a 64bits machines to build and run 32 bits executable
-with a 32bist SDK, though.
+with a 32bits SDK, though.
 
 Here is what a complete ``~/.config/.qi/qibuild.xml`` would look like to use Visual Studio 2010
 
@@ -108,7 +108,7 @@ note that Aldebaran does not provide a C++ SDK for mingw.
 But, if you do not want to use Visual Studio, you can still use qibuild
 with QtCreator and the mingw package that comes with it.
 
-* Get the latest qtcreator and install it. (you only need the qtcreator
+* Get the latest QtCreator and install it. (you only need the QtCreator
   package, no need for the full-fledged Qt SDK)
 
 * Add the MinGW’s path to your %PATH% so that QtCreator can find mingw32-make
@@ -156,7 +156,7 @@ Here’s what a complete ``.config/qi/qibuild.xml`` would look like to use MinGW
     </defaults>
   </qibuild>
 
-.. note:: here you have to setup a complete msys environnement before being
+.. note:: here you have to setup a complete ``msys`` environment before being
    able to use qibuild.
 
 Using JOM

@@ -12,7 +12,7 @@ import pprint
 
 
 class SphinxProject(qidoc.project.DocProject):
-    """ A doc projet using Sphinx """
+    """ A doc project using Sphinx """
     def __init__(self, doc_worktree, project, name,
                  depends=None, dest=None):
         self.doc_type = "sphinx"

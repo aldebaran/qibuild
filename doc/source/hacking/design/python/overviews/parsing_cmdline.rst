@@ -66,7 +66,7 @@ So if you ever wanted to add an action outside ``qibuild.actions`` package, you 
 
 So what does the ``root_command_main`` do?
 
-You can see it taks a ``parser`` object as arument.
+You can see it takes a ``parser`` object as argument.
 
 You should call this function with an ``argparse.ArgumentParser``
 object.
@@ -96,5 +96,5 @@ This means that ``spam.py`` contains everything to handle the parsing:
 * The documentation of the action is simply the docstring of the module
 * Specific arguments are added using the ``configure_parser`` function of the module
 
-Thus, everything is put in one place, and the ``--help`` output is alwasy correct.
+Thus, everything is put in one place, and the ``--help`` output is always correct.
 

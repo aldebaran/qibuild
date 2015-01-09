@@ -10,7 +10,7 @@ TestResult
 
     .. py:attribute:: test
 
-        A dictionnary representing the test, as returned by
+        A dictionary representing the test, as returned by
         :py:func:`qitest.conf.parse_tests`
 
 
@@ -20,7 +20,7 @@ TestResult
 
     .. py:attribute:: ok
 
-        A boolean indicating wether the test was sucessful
+        A boolean indicating whether the test was successful
 
     .. py:attribute:: message
 

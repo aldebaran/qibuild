@@ -254,7 +254,7 @@ class Git(object):
     def is_clean(self, untracked=True):
         """
         Returns true if working dir is clean.
-        (ie no untracked files, no unstaged changes)
+        (i.e. no untracked files, no unstaged changes)
 
             :param untracked: will return True even if there are untracked files.
         """

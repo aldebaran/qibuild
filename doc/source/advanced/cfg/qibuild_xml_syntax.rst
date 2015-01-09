@@ -1,7 +1,7 @@
 .. _qibuild-xml-syntax:
 
-qibuild.xml configuration file syntax
-=====================================
+``qibuild.xml`` configuration file syntax
+==========================================
 
 
 General
@@ -22,8 +22,8 @@ Note: the presence of the file is not necessary for qibuild
 to find a work tree, only the ``.qi`` directory is used.
 
 
-Global configration file
-------------------------
+Global configuration file
+--------------------------
 
 .. _qibuild-xml-global-node:
 

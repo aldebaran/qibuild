@@ -28,7 +28,7 @@ qiBuild CMake framework is designed around a few principles:
 * Play nice with other build frameworks:
 
   * Every custom CMake function is prefixed with ``qi_``
-  * Every custom CMake files is in a ``qibuild`` subidrectory
+  * Every custom CMake files is in a ``qibuild`` subdirectory
   * Generated CMake code is always pure, standard CMake code
   * Absolutely NO environment variable is required, except for
     ``PATH`` and ``PYTHONPATH``
@@ -48,7 +48,7 @@ qiBuild CMake Concepts
 
 Here is an example of a SDK containing the ``bar`` executable,
 a ``bar.cfg`` configuration file for ``bar,`` a ``foo`` library
-with the ``foo-config.cmake`` file, and the ``foo.h`` hader::
+with the ``foo-config.cmake`` file, and the ``foo.h`` header::
 
 
     <sdk>
@@ -107,7 +107,7 @@ A package can be associated to a toolchain file.
 For instance, you may have a simple package ``foobar`` containing the result
 of the installation of the ``bar`` executable and the ``foo libaray``,
 requiring no toolchain file at all, or a complex package name ``geode-ctc``
-containg some libs in  ``ctc/sysroot/usr/lib``, and a cross-compiler in
+containing some libs in  ``ctc/sysroot/usr/lib``, and a cross-compiler in
 ``ctc/cross``, and a toolchain file forcing the compiler to be
 ``ctc/cross/bin/gcc``, and setting CMAKE_FIND_ROOT_PATH to ``ctc/sysroot``.
 

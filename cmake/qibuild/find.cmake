@@ -3,8 +3,8 @@
 ## found in the COPYING file.
 
 
-#! Functions to find libaries and include directories
-# ====================================================
+#! Functions to find libraries and include directories
+# =====================================================
 #
 # The qibuild CMake framework contains several ``-config.cmake`` files
 # when upstream ``Find-.cmake`` files are not correct or missing.

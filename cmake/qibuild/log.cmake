@@ -11,7 +11,7 @@
 # If you want the debug output call cmake with a DEBUG=1 environment variable set.
 # You can combine DEBUG and VERBOSE.
 #
-# You can also trigger deprectated warning messages with QI_WARN_DEPRECATED (OFF
+# You can also trigger deprecated warning messages with QI_WARN_DEPRECATED (OFF
 # by default)
 
 #! display a debug message
@@ -23,7 +23,7 @@ function(qi_debug)
   endif()
 endfunction()
 
-#! display a vebose message
+#! display a verbose message
 # To enable verbose output set VERBOSE=1 in your environment.
 # \argn: a message
 function(qi_verbose)

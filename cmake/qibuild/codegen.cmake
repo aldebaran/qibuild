@@ -93,7 +93,7 @@ endfunction()
 #  - QI_PATH to all the paths added to the other variables
 #
 # \warning for maximum portability, always explicitly invoke python when
-# runnning the trampoline script.
+# running the trampoline script.
 function(qi_generate_trampoline out in)
   cmake_parse_arguments(ARG
   "PYTHON"

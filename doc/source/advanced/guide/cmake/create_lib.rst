@@ -3,7 +3,7 @@
 Creating a library
 ==================
 
-This tutorial only convers the most simple way of writing a library.
+This tutorial only covers the most simple way of writing a library.
 
 If you are working in a large project, or wish to re-distribute your library,
 you may want to read this more in-depth tutorial: :ref:`how-to-write-a-library`
@@ -127,7 +127,7 @@ A few notes:
 
 * On linux, the library will be found in ``build/sdk/lib/libanswer.so``
 
-* On mac, the library will be fon in ``build/sdk/lib/libanswer.dylib``
+* On mac, the library will be found in ``build/sdk/lib/libanswer.dylib``
 
 .. note:: On UNIX, you can force the creation of static library by using
    -DBUILD_SHARED_LIBS=OFF

@@ -25,7 +25,7 @@ qisys.archive -- Manage .tar.gz and .zip files
           ./foo/bar/bar.txt
           ./foo/baz.txt
 
-      * Extacted location::
+      * Extracted location::
 
           directory/archive_name/foo
           directory/archive_name/foo/bar
@@ -41,7 +41,7 @@ qisys.archive -- Manage .tar.gz and .zip files
           foo/bar/bar.txt
           baz.txt
 
-      * Extacted location::
+      * Extracted location::
 
           directory/archive_name/foo
           directory/archive_name/foo/bar

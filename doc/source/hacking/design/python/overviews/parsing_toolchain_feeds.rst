@@ -4,8 +4,8 @@ Parsing toolchain feeds
 =======================
 
 Let's assume you have a cross-toolchain updated to
-http://example.com/packages/foo-ctc.tar.gz, a binary packge in
-http://example.com/packages/bar.tar.gz, and a xml feed
+http://example.com/packages/foo-ctc.tar.gz, a binary package in
+http://example.com/packages/bar.tar.gz, and an XML feed
 looking like:
 
 .. code-block:: xml
@@ -55,7 +55,7 @@ Then, when using
    $ qibuild configure -c cross-foo my_project
 
 
-A ``qibuild.toc.Toc`` object will be created, containg a ``qitoolchain.toolchain.Toolchain`` because
+A ``qibuild.toc.Toc`` object will be created, containing a ``qitoolchain.toolchain.Toolchain`` because
 ``cross-foo`` is a known name.
 
 Then, a build directory name ``build-cross-foo`` will be created, and cmake will
@@ -70,7 +70,7 @@ be called, as if you had type:
 
 And everything will just work:
 
-You will go throught the ``cross-config.cmake``, so the compiler to use will be
+You will go through the ``cross-config.cmake``, so the compiler to use will be
 properly set, and you will have a entry in ``CMAKE_FIND_ROOT_PATH`` to where the ``bar`` package
-has been extracted, so findingg ``bar`` libraries from the ``bar`` package will also work.
+has been extracted, so finding ``bar`` libraries from the ``bar`` package will also work.
 

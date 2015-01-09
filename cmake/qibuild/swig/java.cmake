@@ -17,7 +17,7 @@
 # \arg:interface_file the swig interface file (extension is .i)
 # \param:PACKAGE package name
 # \param:OUTDIR swig output directory
-# \flag:CPP whereare the lib is in C++
+# \flag:CPP whereas the lib is in C++
 # \group:SRC The list of source files
 # \group:DEPENDS The list of dependencies
 #

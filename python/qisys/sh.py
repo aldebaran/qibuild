@@ -115,7 +115,7 @@ def write_file_if_different(data, out_path, mode="w"):
 def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
     """Configure a file.
     :param in_path: input file
-    :parm out_path: output file
+    :param out_path: output file
 
     The out_path needs not to exist, missing leading directories will
     be created if necessary.
@@ -430,7 +430,7 @@ def mv(src, dest):
 
 
 def ls_r(directory):
-    """Returns a sorted list of all the files present in a diretory,
+    """Returns a sorted list of all the files present in a directory,
     relative to this directory.
 
     For instance, with::

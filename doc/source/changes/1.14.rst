@@ -4,16 +4,16 @@ v1.14
 Command line
 +++++++++++++
 
-* Lots of bug fixes for XCode
-* Do not force CMAKE_BUILD_TYPE to be all upper-case. Now CMAKE_BUILD_TYPE equals
+* Lots of bug fixes for Xcode
+* Do not force ``CMAKE_BUILD_TYPE`` to be all upper-case. Now ``CMAKE_BUILD_TYPE`` equals
   ("Debug" or "Release"). Note that the build folder name did not change
   (It's still `build-<config>-release` when using `qibuild configure --release`)
 * Do not fail if default config is non existent
-* qitolchain: now can set cmake generator from the feed.
-* qitolchain: preserve permissions when using `.zip` packages on linux and mac
-* <echanism to copy dlls inside the build dir and create the symlinks
+* ``qitolchain``: now can set cmake generator from the feed.
+* ``qitolchain``: preserve permissions when using ``.zip`` packages on Linux and Mac
+* Mechanism to copy ``dlls`` inside the build directory and create the symlinks
   at the end of the compilation is now done by the qibuild executable,
-  and NOT from the CMakeList.
+  and NOT from the ``CMakeList``.
 * ``qibuild help``: sort available actions by name
 * ``qibuild test``: small bug fix for ``--test-name``
 * ``qibuild config --wizard``: fix unsetting build dir or sdk dir
@@ -22,8 +22,8 @@ Command line
 * ``qibuild configure``: learned ``--debug-trycompile`` option
 * ``qibuild package`` : learned ``--include-deps`` option
 * ``qidoc``: fix for archlinux
-* ``qibuild configure``: learned use ``-c system`` where ther is a default config
-  in ther current worktree but user still wants to use no toolchain.
+* ``qibuild configure``: learned use ``-c system`` where there is a default config
+  in their current worktree but user still wants to use no toolchain.
 * Added ``qitoolchain import-package`` to import binary packages into a
   cross-toolchain.
 

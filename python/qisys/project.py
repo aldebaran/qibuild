@@ -11,7 +11,7 @@ import qisys.qixml
 
 
 class WorkTreeProject(object):
-    """ A project is indentified by its path relative to its
+    """ A project is identified by its path relative to its
     worktree.
 
     It can have nested subprojects

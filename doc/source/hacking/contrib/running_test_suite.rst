@@ -4,47 +4,49 @@ Running qiBuild test suite
 ==========================
 
 
-Installing required packages
-----------------------------
-
-You need to install the following Python packages to run the test suite:
-
-* python-tox
-
-Althought qiBuild is a cross-platform, running the test suite on Windows
-with Visual Studio is quite painful. (Patches welcome ...)
-
-
 All in one step
 ---------------
 
-Simply go to the root directory of qibuild and run:
+Create a virtualenv to run your tests:
 
 .. code-block:: console
 
-    tox -c python/tox.ini
+  virtualenv venv
+  source venv/bin/activate
 
-Note: if you are on a distribution where ``/usr/bin/python`` is Python3,
-you should use
+Install qibuild with the "--editable" option, so that your
+changes are reflected without the need to call ``pip install`` again
 
 .. code-block:: console
 
-    tox2 -c python/tox.ini
+  cd /path/to/qibuild
+  pip install --editable .
 
+Install all the test dependencies:
 
-This will use pylint to find obvious errors (like variables referenced
-before assignement, missing imports, and so on), then will run
-the automatic tests, and finally run a coverage report.
+.. code-block:: console
 
-Sometime pylint is mistaken, you can fix this by adding a small comment
-to disable the check, using the pylint error code:
+    cd /path/to/qibuild/python
+    pip install -r requirements.txt
+
+Finally, run ``make``:
+
+.. code-block:: console
+
+  cd /path/to/qibuild/python
+  make
+
+This will use ``pylint`` to check for obvious errors, then run the full test suite.
+
+Sometimes ``pylint`` is mistaken, you can fix this by adding a small comment
+to disable the check, using the ``pylint`` error code:
 
 .. code-block:: python
 
     # pylint: disable-msg=E1101
 
-Running test suite
-------------------
+Running the test suite
+----------------------
 
 This is on a build farm but only for linux and python2.7, so it is possible
 that some tests will fail.
@@ -66,26 +68,11 @@ failing test and mark it as 'skipped'
 This way when the bug is fixed we just have to remove the ``@pytest.skip``
 and we are sure the bug never occurs again.
 
-Note: some tests are slow to run, you can mark them with
-
-.. code-block:: python
-
-  @pytest.mark.slow
-  def test_slow_command(self):
-      # something long going on here ...
-
-And then run the tests with
-
-.. code-block:: console
-
-    cd python/
-    py.test -k -slow
-
 
 Running only some tests
 +++++++++++++++++++++++
 
-You can use ``py.test`` (or ``py.test2``) with
+You can use ``py.test`` like this:
 
   * Just for a given python package:
 
@@ -106,30 +93,23 @@ You can use ``py.test`` (or ``py.test2``) with
 
      py.test qisrc/test/test_git.py -k set_tracking_branch
 
-Note about ipdb
-++++++++++++++++
+Note about debuggers
+++++++++++++++++++++
 
 
-If you are using ``ipdb`` to insert break points in the code like this:
+If you are using ``ipdb`` or ``pdb`` to insert break points in the code like this:
 
 .. code-block:: python
 
     # in foo.py
     def test_my_complicated_function():
-        import ipdb; ipdb.set_trace()
+        from IPython.core.debugger import Tracer; debug_here=Tracer()
+        debug_here()
 
 
-You will get an error message like this if you run
+You will get an error message when you run ``py.test``
 
-.. code-block:: console
-
-  $ py.test foo.py
-  ValueError: fallback required, but not specified
-
-(This may be a bug in ``ipdb``, ``py.test`` or both ...)
-
-The solution is to use the ``-s`` option of py.test:
-
+The solution is to use the ``-s`` option of ``py.test``:
 
 .. code-block:: console
 

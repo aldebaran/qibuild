@@ -15,11 +15,11 @@
 #   * QI_EFFECTIVE_CPP : emit warnings from the 'Effective C++' book
 #
 # \flag:HIDDEN_SYMBOLS Hide symbol in dynamic
-#       unless exlicitely exported.
+#       unless explicitly exported.
 #       Useful when you want to
-#       have the same behavior between cl.exe and gcc
+#       have the same behavior between ``cl.exe`` and ``gcc``
 #       for shared libraries.
-#       Note that in this case, you should use qi/macro.hpp
+#       Note that in this case, you should use ``qi/macro.hpp``
 #       to export the symbols of your library.
 function(qi_sanitize_compile_flags)
   cmake_parse_arguments(ARGS "HIDDEN_SYMBOLS" "" "" ${ARGN})

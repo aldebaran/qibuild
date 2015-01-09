@@ -142,15 +142,15 @@ RFC keypoints
 
 * In any build qiBuild first parses the projects' dependencies, then:
 
-  * in native build, build (ie. CMake configuration and native compilation)
+  * in native build, build (i.e. CMake configuration and native compilation)
     just starts as usual.
 
   * in cross build, qiBuild will:
 
-    #. first run the *host build* (ie. CMake configuration for the *host
+    #. first run the *host build* (i.e. CMake configuration for the *host
        build* and native compilation),
 
-    #. then run the *target build* (ie. CMake configuration for the *cross
+    #. then run the *target build* (i.e. CMake configuration for the *cross
        build* and cross-compilation).
 
 * A toolchain should declare its type: *native* or *cross*, as any other

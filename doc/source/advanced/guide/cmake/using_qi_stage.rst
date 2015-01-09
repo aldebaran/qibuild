@@ -103,7 +103,7 @@ This can happen for instance if you generate some headers at compile time, like 
     )
 
 
-From an other project, you may have a file looke like
+From an other project, you may have a file looking like
 
 .. code-block:: cpp
 
@@ -114,7 +114,7 @@ From an other project, you may have a file looke like
 
 So here to find ``foo/foo.hpp`` when using the project foo from **sources**, you
 need to find ``/path/to/foo/src/libfoo/`` **and** ``/path/to/foo/build/``, because
-of the path wehere ``foo/config.hpp`` has been generated.
+of the path where ``foo/config.hpp`` has been generated.
 
 Note that you have to use **absolute**  paths here, like any other
 cmake code generated to be use from sources.

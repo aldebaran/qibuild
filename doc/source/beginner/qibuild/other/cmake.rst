@@ -253,7 +253,7 @@ qi_stage_lib versus export
 
 You may wonder why :cmake:function:`qi_stage_lib` does not use ``export``.
 
-There are several reaons but the main reason is that we did not like the idea
+There are several reasons but the main reason is that we did not like the idea
 of the "global CMake package registry".
 
 One workflow we needed to support since the beginning was to be able to use the
@@ -263,5 +263,5 @@ cross-compiling)
 Also, ``export`` does not work that well when you want to work with several versions
 of the same target (say ``master`` and a ``release-1.12`` branch).
 
-You can kind of solve that using version numbers (in a FooConfigVersion.cmake) for instance,
-but that's a bit clumsy too.
+You can kind of solve that using version numbers (in a
+``FooConfigVersion.cmake``) for instance, but that's a bit clumsy too.

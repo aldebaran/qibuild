@@ -12,7 +12,7 @@ You have the following files:
 
 * ``foo.hpp``: the public header of the ``foo`` library. It contains the public
   API, and include the least possible number of other headers. (Use of forward
-  declarations, and PIMPL implementations are recommanded)
+  declarations, and PIMPL implementations are recommended)
 
 * ``foo.cpp`` : implementation of the ``foo.hpp`` functions
 
@@ -115,7 +115,7 @@ With the proposed layout, you have something like::
   |__ foobar
        |__ foobar.cpp
 
-You may want to get rid of the libfoo/foo, libbar/bar redundancy  and do this
+You may want to get rid of the ``libfoo/foo``, ``libbar/bar`` redundancy  and do this
 instead::
 
   fooproject

@@ -113,9 +113,9 @@ def convert_to_qibuild(package, package_metadata=None,
                              or to provide the metadata if the could not be
                              read from the binary package
     :param output_dir: where to put the new qiBuild package, defaults to
-                       the basename of the binaray package
+                       the basename of the binary package
     :package output_name: the archive name of the qiBuild package,
-                          computed from the metadat if not given
+                          computed from the metadata if not given
     :param gen_cmake: whether we should try to generate a CMake module for
                       this package
     :return: path to the converted qiBuild package

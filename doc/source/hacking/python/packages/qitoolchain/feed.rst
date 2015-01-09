@@ -17,7 +17,7 @@ qitoolchain.feed.parse_feed
 
     :param toolchain: a
       :py:class:`Toolchain <qitoolchain.toolchain.Toolchain>` instance
-    :param feed: a feed location. Maybe a path or an url.
+    :param feed: a feed location. Maybe a path or an URL.
 
     Create a :py:class:`ToolchainFeedParser` object, then get
     the list of parsed packages, and call :py:func:`handle_package`
@@ -35,11 +35,11 @@ qitoolchain.feed.ToolchainFeedParser
 
       A list of packages, stored as ``ElementTree`` objects.
       The feed where the package came from is stored in a
-      "feed" XML atribute of this package for later use.
+      "feed" XML attribute of this package for later use.
 
     .. py:attribute:: _versions
 
-       A dict name->version used to only keep the latest
+       A dictionary ``name->version`` used to only keep the latest
        version of packages
 
     .. py:method::  append_package(package_tree)
@@ -106,7 +106,7 @@ Handling packages
 .. py:function:: handle_toochain_file(package, package_tree)
 
     Set ``package.toolchain_file`` using ``package.path``
-    The toolchain file path wil always be relative
+    The toolchain file path will always be relative
     to the package path.
 
 

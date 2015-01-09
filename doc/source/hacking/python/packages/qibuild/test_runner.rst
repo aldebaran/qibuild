@@ -11,11 +11,11 @@ ProjectTestRunner
 
     .. py:attribute:: perf
 
-      Wether we should run performance tests
+      Whether we should run performance tests
 
     .. py:attribute:: nightly
 
-      Wether we should run nightly tests
+      Whether we should run nightly tests
 
     .. py:attribute:: nightmare
 

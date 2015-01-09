@@ -15,9 +15,9 @@ Simply run:
 
   $ qibuild package --runtime foo
 
-This will configure, build and install the foo project in
-QI_WORK_TREE/package/foo, and  and generate a re-distributable binary package
-in QI_WORK_TREE/package/foo.tar.gz) (or foo.zip if you are on windows)
+This will configure, build and install the ``foo`` project in
+``QI_WORK_TREE/package/foo``, and generate a re-distributable binary package
+in ``QI_WORK_TREE/package/foo.tar.gz``) (or ``foo.zip`` if you are on windows)
 
 The archive will by default contain only the runtime components (executables,
 dependent libraries, data ...)
@@ -33,9 +33,9 @@ their own software with it, run:
   $ qibuild package foo
 
 The archive will contain the static libraries, the headers (provided
-you used the correct install rule), the cmake files, and so on.
-Notes: depedencies will not be installed inside the devel package, because
-this package is supposed to be use inside a toolchain.
+you used the correct install rule), the CMake files, and so on.
+Notes: dependencies will not be installed inside the devel package, because
+this package is supposed to be used inside a toolchain.
 
 More on this in the :ref:`using-toolchains` tutorial.
 

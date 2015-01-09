@@ -40,7 +40,7 @@ qisrc.manifest.RepoConfig
 
   .. py:attribute:: review
 
-      wether the project is under code review.
+      whether the project is under code review.
       Set during parsing
 
 

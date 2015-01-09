@@ -25,7 +25,7 @@ include(qibuild/internal/tests)
 # \group:SRC  sources of the test
 # \group:DEPENDS the dependencies of the test
 # \param:TIMEOUT the timeout of the test.
-# \param:WORKING_DIRECTORY working directory used when runing the test:
+# \param:WORKING_DIRECTORY working directory used when running the test:
 #                          default: ``<build>/sdk>/bin``
 # \flag: NIGHTLY: only compiled (and thus run) if QI_WITH_NIGHTLY_TESTS is ON
 # \flag: PERF: only compiled (and thus run) if QI_WITH_PERF_TESTS is ON

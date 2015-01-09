@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.abspath('../tools'))
 sys.path.insert(0, os.path.abspath('../../python'))
 extensions.append("cmakedomain")
 extensions.append("sphinx.ext.autodoc")
+extensions.append("sphinxcontrib.spelling")
 
 templates_path = [ "../source/_templates" ]
 

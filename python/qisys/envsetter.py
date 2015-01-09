@@ -30,12 +30,12 @@ class EnvSetter():
 
     Notes:
 
-    * this will work even in cmake was not in %PATH% before,
-      because we will use build_env when searching for 'cmake'.
+    * this will work even if ``cmake`` was not in ``%PATH%`` before,
+      because we will use ``build_env`` when searching for ``cmake``.
       (see :py:func:`qisys.command.call` documentation)
 
-    * the :py:meth:`source_bat` function is useful to use cl.exe and
-      NMake Makefiles. In this case, you have to source vsvarsall.bat.
+    * the :py:meth:`source_bat` function is useful to use ``cl.exe`` and
+      ``NMake Makefiles``. In this case, you have to source ``vsvarsall.bat``.
 
     """
     # Note: always use .copy() when working with dict, else you end up
@@ -46,8 +46,8 @@ class EnvSetter():
         self._build_env = build_env
 
     def get_build_env(self):
-        """ Returns a dict containing the new environnment
-        (note that os.environ is presevered)
+        """ Returns a dictionary containing the new environment
+        (note that ``os.environ`` is preserved)
         """
         return self._build_env.copy()
 
@@ -67,7 +67,7 @@ class EnvSetter():
 
         * No directory will be added twice
 
-        * The variable will be put in upper case on the dictionnary
+        * The variable will be put in upper case on the dictionary
           on windows.
 
         """

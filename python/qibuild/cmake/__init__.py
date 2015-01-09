@@ -85,7 +85,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     """Call cmake with from a build dir for a source dir.
     cmake_args are added on the command line.
 
-    :param env: defines the environnemt used when calling ``cmake``
+    :param env: defines the environment used when calling ``cmake``
                 ``os.environ`` will remain unchanged
     :param clean_first: Clean the cmake cache
     :param summarize_options: Whether to call :py:func:`display_options` at the end
@@ -94,7 +94,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
 
     :param profiling: Profile CMake executions
     :param debug_trycompile: Call ``cmake`` with ``--debug-trycompile``
-    :param trace_cmake: Call ``cmake`` with ``--trace`` The resuls
+    :param trace_cmake: Call ``cmake`` with ``--trace`` The results
                         will be written in <build>/cmake.log
 
     """
@@ -202,7 +202,7 @@ def read_cmake_cache(cache_path):
 def get_cmake_qibuild_dir():
     """Get the path to cmake modules.
 
-    First, look fo a project named `qibuild` in the worktree, (if
+    First, look for a project named `qibuild` in the worktree, (if
     a ``worktree`` was passed,
     then, assume we are using qibuild from sources,
     then assume we are using an installed version of qibuild.

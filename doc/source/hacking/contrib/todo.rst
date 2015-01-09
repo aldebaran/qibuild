@@ -127,23 +127,23 @@ qibuild
 
 * fix linker problems when using toolchain and third party libraries on mac
 
-* fix XCode support and other "multi-configuration" IDE by having
-  two SDK_DIRS (one debug, one release) in the same build dir
+* fix Xcode support and other "multi-configuration" IDE by having
+  two ``SDK_DIRS`` (one debug, one release) in the same build directory
 
-* handle custom build dir
+* handle custom build directory
 
-* qibuild deploy: fix gdb config files generation
+* qibuild deploy: fix gdb configuration files generation
 
-* add qibuild test --failed
+* add ``qibuild test --failed``
 
-* add ``qibuild find -z`` to look in every build dir
+* add ``qibuild find -z`` to look in every build directory
 
 * Better integration with QtCreator:
 
   * Write our own plugin to avoid the "CMakeList" pop-up (it only re-runs
     CMake to generate an XML code-blocks file, that is then re-parsed
     by QtCreator)
-  * Match qitoolchain configs with QtCreator's kits
+  * Match qitoolchain configurations with QtCreator's kits
   * Automatically configure tests when they take arguments
 
 qisrc

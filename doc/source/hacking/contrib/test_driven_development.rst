@@ -55,7 +55,7 @@ documentation, but we also find this technique very effective.
 
 Last, but not least, writing the tests first makes you think about the
 *interface* of the new code you are going to write, which is also a good thing:
-clear and clean API also make for more maintanable code.
+clear and clean API also make for more maintainable code.
 
 
 
@@ -86,7 +86,7 @@ Links
   <http://www.diveintopython.net/unit_testing/diving_in.html>`_
 * `What Killed Smalltalk Could Kill Ruby, too
   <http://www.youtube.com/watch?v=YX3iRjKj7C0>`_
-  (A fasinating talk by Robert Martin at RailsConf 09, about programming in general,
+  (A fascinating talk by Robert Martin at RailsConf 09, about programming in general,
   with a focus on unit testing at the end)
 * `Fast Test, Slow Test <https://www.youtube.com/watch?v=RAxiiRPHS9k>`_
   A talk by Gary Bernhardt at PyCon 2012

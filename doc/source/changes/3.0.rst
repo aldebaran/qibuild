@@ -88,12 +88,12 @@ qisrc
     </manifest>
 
 * The gerrit ssh port is now no longer hard-coded, and you
-  should specify the ``ssh`` url, not the ``http`` url.
+  should specify the ``ssh`` URL, not the ``http`` URL.
 * The ``next`` branch of the repo in ``lib/libfoo``
   will track ``ssh://<username>@gerrit:29418/libfoo.git`` instead of
   ``git@example.com:libfoo.git``. This makes it possible to use gerrit only,
   without any mirror, and it also means you don't have to wait for the
-  gerrit synchronization, which is hepful when using ``qisrc`` on a
+  gerrit synchronization, which is helpful when using ``qisrc`` on a
   buildfarm plugged to gerrit.
 * The default manifest is now called ``manifest.xml`` instead of ``default.xml`` to
   ease the transition.
@@ -190,7 +190,7 @@ qidoc
 
 * Now usable without a "templates" repository
 * Can choose the project to be at the root of the generated doc
-* Now only generates files in <project>/build-doc
+* Now only generates files in ``<project>/build-doc``
 * New commands: ``qidoc clean``, ``qidoc install``
 
 * Syntax of ``qiproject.xml`` changed:
@@ -220,9 +220,9 @@ qidoc
 CMake
 +++++
 
-* MacOS: use rpath: libraries use an ``@rpath`` based directory for the default
-  installed name. Executables contain a rpath pointing to the root of the
+* MacOS: use ``rpath`` :libraries use an ``@rpath`` based directory for the default
+  installed name. Executables contain a ``rpath`` pointing to the root of the
   install directory.
-* Linux shared libraries are linked with a RPATH set to ``$ORIGIN/../lib``
+* Linux shared libraries are linked with a ``rpath`` set to ``$ORIGIN/../lib``
   by default, as it was done for executables.
 

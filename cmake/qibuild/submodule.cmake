@@ -51,7 +51,7 @@ endfunction()
 
 
 #! This function is similar to qi_submodule_create but appends content to
-# the submodule. This function can be condional, if you specify IF
+# the submodule. This function can be conditional, if you specify IF
 # then the content will be appended to the submodule only if all the flags
 # are defined.
 #

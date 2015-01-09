@@ -215,7 +215,7 @@ class XMLParser(object):
 
     def _parse_attributes(self):
         """ You can overload this function to get attribute of root before parsing
-        its children. Attributes will be a dictionnary.
+        its children. Attributes will be a dictionary.
 
         """
         apply_xml_attributes(self.target, self._root)
@@ -225,7 +225,7 @@ class XMLParser(object):
 
     def _post_parse_attributes(self):
         """ You can overload this function to add post treatment to parsing of
-        attributes. Attributes will be a dictionnary.
+        attributes. Attributes will be a dictionary.
 
         """
         pass

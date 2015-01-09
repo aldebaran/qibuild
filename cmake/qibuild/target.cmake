@@ -9,7 +9,7 @@
 # scripts and libraries, handling dependencies and install rules,
 # in an easy, elegant and standard way.
 #
-# There could be differents targets:
+# There can be different targets:
 #
 # * *bin* : a program
 # * *lib* : a library
@@ -35,7 +35,7 @@ include(CMakeParseArguments)
 # \flag:NO_INSTALL Do not create install rules for the target
 # \flag:NO_RPATH Do not try to fix rpath
 #                By default, qibuild runs chrpath on the targets so
-#                everything work even when project is intalled to a
+#                everything work even when project is installed to a
 #                non-standard location.
 #                Use this to prevent chrpath to be run.
 # \flag:EXCLUDE_FROM_ALL Do not include the target in the 'all' target,

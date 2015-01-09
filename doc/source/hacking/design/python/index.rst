@@ -172,7 +172,7 @@ qibuild Python packages documentation
 -------------------------------------
 
 See :ref:`qibuild-python-doc` for a documentation of the
-main packges, classes and functions of the qiBuild Python
+main packages, classes and functions of the qiBuild Python
 Framework.
 
 

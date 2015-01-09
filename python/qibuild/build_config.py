@@ -80,7 +80,7 @@ class CMakeBuildConfig(object):
 
     @property
     def debug(self):
-        """ Wether we are building in debug. True unless user
+        """ Whether we are building in debug. True unless user
         specified --release
 
         """
@@ -108,7 +108,7 @@ class CMakeBuildConfig(object):
 
     @property
     def build_env(self):
-        """ A dict defining the environnment used when building, as
+        """ A dictionary defining the environment used when building, as
         read from qibuild configuration files.
         ``os.environ`` will remain unchanged
 

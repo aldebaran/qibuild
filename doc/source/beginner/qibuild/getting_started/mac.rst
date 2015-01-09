@@ -10,18 +10,18 @@ tools to use it.
 
 The best way to do so is to install ``Xcode`` from the Apple store.
 
-First of all you need to intall XCode4.
+First of all you need to install Xcode.
 
-* You must have a developper account to download the command line tools after installing XCode.
+* You must have a developer account to download the command line tools after installing Xcode.
   Preferences -> Download -> Components -> Command Line Tools
 
 .. image:: /pics/install-command-line-tools.png
 
-Starting with XCode4, the command line compile tools
-(gcc, make, and so on), are not installed by default and CMake cannot
+Starting with Xcode4, the command line compile tools
+(``gcc``, ``make``, and so on), are not installed by default and CMake cannot
 work without them.
 
-Go to Preferences/Downloads/Components and install
+Go to ``Preferences/Downloads/Components`` and install
 the command line tools form here:
 
 .. image:: /pics/install-command-line-tools.png

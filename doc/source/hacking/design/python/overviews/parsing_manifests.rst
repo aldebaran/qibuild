@@ -18,7 +18,7 @@ We just add the manifest repository to the worktree, using
 ``qisrc.sync.clone_project``, then reset it to the
 branch the user asked us.
 
-We then mark the project has beeing a manifest project,
+We then mark the project has being a manifest project,
 so that ``qisrc sync`` called later can now where to find
 the manifest XML file
 

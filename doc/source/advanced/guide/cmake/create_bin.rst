@@ -19,7 +19,7 @@ Every CMake project should begin with something like:
 
 The first line is required by the CMake standards.
 
-The second line let you use the ``qibuild`` cmake framwork.
+The second line let you use the ``qibuild`` cmake framework.
 
 The project() call is good practice, and is used by several IDEs.
 

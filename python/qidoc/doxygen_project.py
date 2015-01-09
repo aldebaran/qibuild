@@ -9,7 +9,7 @@ import qidoc.doxygen
 import qidoc.project
 
 class DoxygenProject(qidoc.project.DocProject):
-    """  A doc projet using doxygen """
+    """  A doc project using doxygen """
     def __init__(self, doc_worktree, project, name,
                  depends=None, dest=None):
         self.doc_type = "doxygen"

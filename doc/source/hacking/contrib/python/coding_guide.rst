@@ -304,7 +304,7 @@ You will be glad to have written your ``foo.py`` script this way if you want to
 add some spam to the eggs somewhere else :)
 
 * Keep all the imports at the beginning of the file. Separate imports from your
-  package and imports from dependencies/standart library. Also separate normal
+  package and imports from dependencies/standard library. Also separate normal
   imports and "from" imports.
 
   Example (bad):
