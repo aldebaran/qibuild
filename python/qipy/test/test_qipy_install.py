@@ -16,3 +16,10 @@ def test_install_with_distutils(qipy_action, tmpdir):
     qipy_action("bootstrap")
     qipy_action("install", "foo", dest.strpath)
     assert dest.join("bin", "foo").check(file=True)
+
+def test_empty_install(qipy_action, tmpdir):
+    empty = qipy_action.add_test_project("empty")
+    dest = tmpdir.join("dest")
+    qipy_action("bootstrap")
+    error = qipy_action("install", "empty", dest.strpath, raises=True)
+    assert "Could not find anything to install" in error

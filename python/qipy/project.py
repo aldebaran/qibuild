@@ -32,6 +32,19 @@ class PythonProject(object):
 
     def install(self, dest):
         """ Install scripts, modules and packages to the given destination """
+        empty =  (not self.setup_with_distutils) and \
+                 (not self.scripts) and \
+                 (not self.modules) and \
+                 (not self.packages)
+        if empty:
+            mess = """
+Could not find anything to install.
+Either write a setup.py file and use
+    <setup with_distutils="true" />
+Or specify at least some scripts, modules or packages
+in the qiproject.xml file
+"""
+            raise Exception(mess)
         if self.setup_with_distutils:
             python = self.worktree.python
             if not os.path.exists(python):
