@@ -27,6 +27,7 @@ class DocBuilder(object):
         self.build_type = ""
         self.werror = False
         self.warnings = True
+        self.spellcheck = False
         self._base_project = None
         if base_project_name:
             self.set_base_project(base_project_name)
@@ -62,9 +63,11 @@ class DocBuilder(object):
         for i, project in enumerate(projects):
             ui.info_count(i, len(projects),
                           ui.green, "Building", ui.blue, project.name)
-            project.build(werror=self.werror, build_type=self.build_type)
-            ui.info(ui.green, "Doc generated in",
-                    ui.reset, ui.bold, project.html_dir)
+            project.build(werror=self.werror, build_type=self.build_type,
+                          spellcheck=self.spellcheck)
+            if not self.spellcheck:
+                ui.info(ui.green, "Doc generated in",
+                        ui.reset, ui.bold, project.html_dir)
 
     def install(self, destdir):
         """ Install the doc projects to a dest dir

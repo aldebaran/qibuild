@@ -147,3 +147,20 @@ def test_intersphinx(doc_worktree, tmpdir):
     link =  find_link(tmpdir.join("index.html").strpath, "World intro")
     assert not os.path.isabs(link)
     assert tmpdir.join(link).check(file=True)
+
+def test_spellcheck(doc_worktree, record_messages):
+    spell_proj = doc_worktree.add_test_project("spell")
+    doc_builder = qidoc.builder.DocBuilder(doc_worktree, "spell")
+    doc_builder.spellcheck = True
+    doc_builder.configure()
+    with pytest.raises(qidoc.sphinx_project.SphinxBuildError):
+        doc_builder.build()
+    assert record_messages.find("Found 1 spelling error\(s\)")
+
+    index_rst = os.path.join(spell_proj.path, "source", "index.rst")
+    with open(index_rst, "r") as fp:
+        contents = fp.read()
+    contents = contents.replace("missstake", "mistake")
+    with open(index_rst, "w") as fp:
+        fp.write(contents)
+    doc_builder.build()

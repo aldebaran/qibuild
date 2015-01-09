@@ -157,12 +157,20 @@ class SphinxProject(qidoc.project.DocProject):
         self.generate_examples_zips()
 
         html_dir = os.path.join(self.build_dir, "html")
-        cmd = [sys.executable,
-               "-c", self.build_dir,
-                "-b", "html"]
+        qisys.sh.mkdir(html_dir, recursive=True)
+        spell_dir = os.path.join(self.build_dir, "spellcheck")
+        qisys.sh.mkdir(spell_dir, recursive=True)
+        if kwargs.get("spellcheck"):
+            cmd = [sys.executable, "-c", self.build_dir, "-b", "spelling"]
+        else:
+            cmd = [sys.executable, "-c", self.build_dir, "-b", "html"]
         if kwargs.get("werror"):
             cmd.append("-W")
-        cmd.extend([self.source_dir, html_dir])
+        cmd.append(self.source_dir)
+        if kwargs.get("spellcheck"):
+            cmd.append(spell_dir)
+        else:
+            cmd.append(html_dir)
         build_type = kwargs.get("build_type")
         if build_type:
             os.environ["build_type"] = build_type
@@ -171,6 +179,10 @@ class SphinxProject(qidoc.project.DocProject):
             rc = sphinx.main(argv=cmd)
         except SystemExit as e:
             rc = e.code
+        if kwargs.get("spellcheck"):
+            num_errors = get_num_spellcheck_errors(self.build_dir)
+            if num_errors != 0:
+                raise SphinxBuildError(self)
         if rc != 0:
             raise SphinxBuildError(self)
 
@@ -190,6 +202,18 @@ class SphinxProject(qidoc.project.DocProject):
 
         qisys.sh.install(self.html_dir, destdir)
 
+def get_num_spellcheck_errors(build_dir):
+    output_txt = os.path.join(build_dir, "spellcheck", "output.txt")
+    res = 0
+    if not os.path.exists(output_txt):
+        return 1  # so that we raise SphinxBuildError
+    with open(output_txt, "r") as fp:
+        lines = fp.readlines()
+        res = len(lines)
+    if res != 0:
+        ui.error("Found %i spelling error(s). See %s for the details" %
+                 (res, output_txt))
+    return res
 
 class SphinxBuildError(Exception):
     def __str__(self):

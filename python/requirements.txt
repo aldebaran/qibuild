@@ -19,6 +19,7 @@ pytest-runfailed==0.3
 # For qidoc tests
 BeautifulSoup4==4.2.1
 sphinxcontrib-doxylink==1.3
+sphinxcontrib-spelling==2.1.1
 
 # For coverage
 cov-core==1.7
