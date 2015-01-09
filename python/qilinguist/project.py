@@ -8,8 +8,8 @@ import qisys.sh
 
 class LinguistProject(object):
     """" A LinguistProject has a name, a domain name, and a
-    list of linguas.
-    It also has a tr_framework (gettext or QtLinguist)
+    list of linguas. Daughter classes should implement the
+    release() and update() methods
 
     """
     __metaclass__ = abc.ABCMeta
