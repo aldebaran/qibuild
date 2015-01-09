@@ -80,6 +80,7 @@ include("qibuild/stage")
 include("qibuild/option")
 include("qibuild/codegen")
 include("qibuild/gettext")
+include("qibuild/git")
 
 # Find libraries from self sdk dir before everything else.
 qi_persistent_prepend_uniq(CMAKE_PREFIX_PATH "${QI_SDK_DIR}")

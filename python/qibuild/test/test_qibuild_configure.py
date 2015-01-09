@@ -4,6 +4,7 @@ import subprocess
 import qisys.command
 import qibuild.cmake
 import qibuild.find
+import qisrc.git
 
 import pytest
 
@@ -115,6 +116,19 @@ def test_detects_incorrect_cmake(qibuild_action):
     proj = qibuild_action.add_test_project("incorrect_cmake")
     qibuild_action("configure", "incorrect_cmake", raises=True)
 
+def test_git_version(qibuild_action):
+    proj = qibuild_action.add_test_project("gitversion")
+    git = qisrc.git.Git(proj.path)
+    git.call("init")
+    git.call("add", ".")
+    git.call("commit", "--message", "initial commit")
+    git.call("tag", "v0.1")
+    qibuild_action("configure", "gitversion")
+    qibuild_action("make", "gitversion")
+    testversion = qibuild.find.find_bin([proj.sdk_directory], "testversion")
+    process = subprocess.Popen(testversion, stdout=subprocess.PIPE)
+    out, _ = process.communicate()
+    assert out.strip() == "v0.1"
 
 def test_submodule(qibuild_action):
     qibuild_action.add_test_project("submodule")

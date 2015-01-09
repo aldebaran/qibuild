@@ -32,6 +32,7 @@ qibuild CMake API functions
    api/find
    api/flags
    api/gettext
+   api/git
    api/subdirectory
    api/swig/python
    api/swig/java

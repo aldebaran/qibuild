@@ -19,6 +19,7 @@ DOCUMENTED_FILES=[
     "find",
     "flags",
     "gettext",
+    "git",
     "swig/python",
     "swig/java",
     "subdirectory",
