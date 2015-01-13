@@ -106,6 +106,9 @@ class DataBase(object):
 
     def update(self, feed):
         """ Update a toolchain given a feed """
+        ui.info(ui.green, "Updating toolchain",
+                self.name, "with feed", feed, "...")
+
         feed_parser = qitoolchain.feed.ToolchainFeedParser()
         feed_parser.parse(feed)
         remote_packages = feed_parser.get_packages()
@@ -145,6 +148,7 @@ class DataBase(object):
             self.handle_package(package, feed)
             self.packages[package.name] = package
 
+        ui.info(ui.green, "Done")
         self.save()
 
     def handle_package(self, package, feed):

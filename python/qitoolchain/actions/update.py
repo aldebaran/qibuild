@@ -37,7 +37,6 @@ def do(args):
                 mess += "Please check configuration or " \
                         "specifiy a feed on the command line\n"
                 raise Exception(mess)
-        ui.info(ui.green, "Updating toolchain", tc_name, "with", feed)
         toolchain.update(feed)
     else:
         tc_names = qitoolchain.get_tc_names()
@@ -49,5 +48,4 @@ def do(args):
                 continue
             ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, len(tc_names)),
                     ui.green, "Updating", ui.blue, tc_name)
-            ui.info(ui.green, "Reading", tc_feed)
             toolchain.update(tc_feed)
