@@ -69,7 +69,6 @@ def do(args):
 
     toolchain = qitoolchain.Toolchain(tc_name)
     if feed:
-        ui.info(ui.green, "Updating toolchain", tc_name, "with feed:", feed)
         toolchain.update(feed)
 
     if args.default:
