@@ -43,7 +43,7 @@ Python
 
 * Remove ``qibuild.archive`` use ``qisys.archive`` instead.
 * Add ``qibuild.toc.get_build_folder_name`` to get the name of a build
-  directory from some informations.
+  directory from some information.
 * Add ``qibuild.toc.Toc.get_build_folder_name`` to get the name of
   the build directory from a toc.
 * Remove ``qibuild.toc.set_build_folder_name`` and

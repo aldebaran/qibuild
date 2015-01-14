@@ -8,9 +8,9 @@ run.
 
 We have two cases to deal with:
 
-* When we’ve just compiled the hello executable
+* When we have just compiled the hello executable
 
-* When we’ve made a package containing hello and world.
+* When we have made a package containing hello and world.
 
 Linux and .so
 -------------

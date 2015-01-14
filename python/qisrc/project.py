@@ -152,7 +152,7 @@ class GitProject(object):
 
     def sync(self, rebase_devel=False, **kwargs):
         """ Synchronize remote changes with the underlying git repository
-        Calls py:meth:`qisys.git.Git.sync`
+        Calls :py:meth:`qisrc.git.Git.sync_branch`
 
         """
         git = qisrc.git.Git(self.path)

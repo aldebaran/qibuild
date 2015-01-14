@@ -256,7 +256,7 @@ class Git(object):
         Returns true if working dir is clean.
         (i.e. no untracked files, no unstaged changes)
 
-            :param untracked: will return True even if there are untracked files.
+        :param untracked: will return True even if there are untracked files.
         """
         out = self.get_status(untracked)
         if out is None:
@@ -317,15 +317,15 @@ class Git(object):
     def sync_branch(self, branch, fetch_first=True):
         """ git pull --rebase on steroids:
 
-         * do not try anything if the worktree is not clean
+        * do not try anything if the worktree is not clean
 
-         * update submodules and detect broken submodules configs
+        * update submodules and detect broken submodules configs
 
-         * if no development occurred (master == origin/master),
-           reset the local branch next to the remote
-           (don't try to rebase, maybe there was a push -f)
+        * if no development occurred (master == origin/master),
+          reset the local branch next to the remote
+          (don't try to rebase, maybe there was a push -f)
 
-         * if on the correct branch, rebase it
+        * if on the correct branch, rebase it
 
         Return a tuple (status, message), where status can be:
             - None: sync was skipped, but there was no error

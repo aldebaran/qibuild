@@ -142,7 +142,6 @@ hardcode
 helloworld
 hpp
 ide
-informations
 init
 interoperability
 intersphinx
@@ -170,7 +169,6 @@ makefiles
 metabuilder
 metadata
 metapackage
-meth
 mingw
 mkdir
 modularity
@@ -218,7 +216,6 @@ qisys
 qitest
 qitoolchain
 qixml
-qm
 qmake
 qtlinguist
 qtmobility
@@ -301,12 +298,10 @@ usernames
 usr
 valgrind
 vcvarsall
-ve
 venv
 versa
 virtualenv
 virtualenvs
-vsvarsall
 whitespace
 workflow
 workspace

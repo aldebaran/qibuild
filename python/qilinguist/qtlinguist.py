@@ -57,7 +57,7 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
         return "<QtLinguistProject %s in %s>" % (self.name, self.path)
 
 def generate_qm_file(input, output):
-    """ Generate a .qm file from a .ts file.
+    """ Generate a ``.qm`` file from a ``.ts`` file.
     Returns (True, "") if everything went well,
     (False, "<error message>") otherwise
 

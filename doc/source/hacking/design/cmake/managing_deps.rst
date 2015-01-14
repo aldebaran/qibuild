@@ -180,7 +180,7 @@ the **SDK** config file.
 There are several differences between the **redistributable** config file and the
 **SDK** config file.
 
-* The SDK file never has to call find_* functions: since we’ve just built the
+* The SDK file never has to call find_* functions: since we have just built the
   library, we know where it is. The redistributable file however must call
   ``find_library``, and ``find_path``.
 

@@ -61,8 +61,8 @@ Suggested layout:
   should match the argument of ``bindtextdomain`` and ``textdomain`` calls.
 
 
-Creating or updating .po files
-+++++++++++++++++++++++++++++++
+Creating or updating ``.po`` files
++++++++++++++++++++++++++++++++++++
 
 Run ``qilinguist update``
 
@@ -70,8 +70,8 @@ This will create or update the ``.po`` files in
 the ``po`` directory, one for each language defined in the
 ``linguas`` attribute of the ``qilinguist`` tag in the ``qiproject.xml``
 
-Generating the .mo files
-++++++++++++++++++++++++
+Generating the ``.mo`` files
+++++++++++++++++++++++++++++
 
 Run ``qilinguist release``.
 
@@ -120,8 +120,8 @@ Suggested layout:
   app.installTranslator(&translator);
   QString hello = QApplication::tr("Hello world!");
 
-Updating .ts files
-++++++++++++++++++
+Updating ``.ts`` files
+++++++++++++++++++++++
 
 Run ``qilinguist update``
 
@@ -129,8 +129,8 @@ This will create or update the ``.ts`` files in
 the ``po`` directory, one for each language defined in the
 ``linguas`` attribute of the ``qilinguist`` tag in the ``qiproject.xml``
 
-Creating the .qm files
-++++++++++++++++++++++
+Creating the ``.qm`` files
++++++++++++++++++++++++++++
 
 Run ``qilinguist release``.
 
