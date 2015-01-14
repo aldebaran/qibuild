@@ -20,6 +20,8 @@ qitoolchain.toolchain.Toolchain
     It has a configuration in ~/.config/qi/toolchains/<name.xml>
     looking like:
 
+    Most of the work is done by the :py:class:`qitoolchain.database.DataBase` class.
+
     .. code-block:: xml
 
       <toolchain>
@@ -34,7 +36,7 @@ qitoolchain.toolchain.Toolchain
 
     .. py:attribute:: packages
 
-       A list of :py:class:`Package` instances
+       A list of :py:class:`.QiPackage` instances
 
     .. py:attribute:: toolchain_file
 
@@ -55,7 +57,7 @@ qitoolchain.toolchain.Toolchain
 
         Add a package to this toolchain
 
-        :param package: A :py:class:`Package`
+        :param package: A :py:class:`.QiPackage`
             instance
 
     .. py:method:: remove_package(name)
@@ -68,7 +70,7 @@ qitoolchain.toolchain.Toolchain
 
         Clean cache, remove all packages, remove self from configuration
 
-    .. py:method:: parse_feed(feed)
+    .. py:method:: update(feed_url=None)
 
         Parse an xml feed, adding packages to self while doing so
         See :ref:`parsing-toolchain-feeds` and
