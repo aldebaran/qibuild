@@ -1,0 +1,80 @@
+v3.8
+====
+
+misc
+----
+
+* Add ``urxvt-unicode-256color`` as a possible value for ``$TERM`` when
+  trying to figure out whether color output should be enabled
+
+qibuild
+-------
+
+* ``qibuild clean``: fix when using remote profiles
+* ``qibuild init``: honor ``-w, --worktree`` option
+* Re-implement setting custom build directory. To use this feature, write something
+  like:
+
+  .. code-block:: xml
+
+    <qibuild>
+      <build build-dir="my-build" />
+    </qibuild>
+
+  in ``/path/to/worktree/.qi/qibuild.xml``
+* ``qibuild find``: fix return code when no CMake module is found
+* Fix using ``-j`` with ``Visual Studio`` generators.
+
+qidoc
+------
+
+* Implement ``qidoc build --spellcheck``, using
+  `sphinxcontrib-spelling <http://sphinxcontrib-spelling.readthedocs.org/>`_
+
+qilinguist
+-----------
+
+* Fail when non-translated messages are found
+* ``qilinguist release`` can also work with ``.pml`` files.
+
+qipkg
+-----
+
+* ``qipkg deploy-package``: Remove previous instance before installing
+* Add ``qipkg dump-version``
+* ``qipkg make-package /path/to/pml``: also works when not in a worktree
+
+qipy
+----
+
+* Raise when empty projects are found
+
+qisrc
+------
+
+* ``qisrc rebase``: several fixes
+
+  * Only work on forked projects
+  * Fix computation of git status before trying the rebase
+  * Prettier output
+
+* ``qisrc create``: better handling of ``"/"`` in argument
+
+qitoolchain
+-----------
+
+* No longer writes files in ``~/.cache/qi/toolchains``
+* Also remove package files when a package is removed from the feed
+
+cmake
+------
+
+* modules:
+
+  * ``ogre``: search in the right ``PATH_SUFFIX``
+  * Add ``v4l``
+  * Add ``Qt5X11Extras``
+
+* ``qi_swig_wrap_python``: handle lower case DEPENDS arguments
+* ``qi_install_python``: fix default destination on Windows
+* Add ``qi_get_git_version``
