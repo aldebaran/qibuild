@@ -10,7 +10,7 @@ import time
 import StringIO
 import sys
 import threading
-from Queue import Queue
+import Queue
 
 from qisys import ui
 import qisys.command
@@ -22,13 +22,13 @@ class TestQueue():
     def __init__(self, tests):
         self.tests = tests
         self.test_logger = TestLogger(tests)
-        self.task_queue = Queue()
+        self.task_queue = Queue.Queue()
         self.launcher = None
         self.results = collections.OrderedDict()
         self.ok = False
         self._interrupted = False
         self.elapsed_time = 0
-
+        self._workers = list()
 
     def run(self, num_jobs=1):
         """ Run all the tests """
@@ -52,7 +52,6 @@ class TestQueue():
 
         if num_jobs == 1:
             self.test_logger.single_job = True
-        threads = list()
 
         for i in range(0, num_jobs):
             worker = TestWorker(self.task_queue, i)
@@ -60,16 +59,14 @@ class TestQueue():
             worker.launcher.worker_index = i
             worker.test_logger = self.test_logger
             worker.results = self.results
-            threads.append(worker)
+            self._workers.append(worker)
             worker.start()
 
-        # Do not use .join() so that this can be interrupted:
-        while self.task_queue.unfinished_tasks and \
+        while not self.task_queue.empty() and \
               not self._interrupted:
             time.sleep(0.1)
 
-        for worker_thread in threads:
-            worker_thread.stop()
+        for worker_thread in self._workers:
             worker_thread.join()
 
     def summary(self):
@@ -119,6 +116,8 @@ class TestQueue():
                    "Interrupted by user, stopping every process.\n"
                    "This may take a few seconds")
         self._interrupted = True
+        for worker in self._workers:
+            worker.stop()
         signal.signal(signal.SIGINT, double_sigint)
 
 
@@ -136,16 +135,16 @@ class TestWorker(threading.Thread):
         self.results = dict()
         self._should_stop = False
 
-
     def stop(self):
         """ Tell the worker it should stop trying to read items from the queue """
         self._should_stop = True
 
     def run(self):
-        while not self.queue.empty():
-            if self._should_stop:
+        while not self._should_stop:
+            try:
+                test, index = self.queue.get_nowait()
+            except Queue.Empty:
                 return
-            test, index = self.queue.get()
             self.test_logger.on_start(test, index)
             result = None
             try:
@@ -158,7 +157,6 @@ class TestWorker(threading.Thread):
                 self.test_logger.on_completed(test, index, result.message)
             self.results[test["name"]] = result
             self.queue.task_done()
-
 
     def message_for_exception(self, exception):
         tb = sys.exc_info()[2]
@@ -204,5 +202,3 @@ class TestLogger:
         ui.info_count(index, len(self.tests),
                       ui.blue, test["name"].ljust(self.max_len + 2),
                       ui.reset, *message, **kwargs)
-
-
