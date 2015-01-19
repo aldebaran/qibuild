@@ -36,9 +36,12 @@ class Snapshot(object):
 
     def _dump_json(self, output_path):
         with open(output_path, "w") as fp:
-            # Json does not know about classes, so
-            # we are going to cheat a little
-            serializable_manifest = vars(self.manifest)
+            serializable_manifest = dict()
+            serializable_manifest["url"] = self.manifest.url
+            serializable_manifest["branch"] = self.manifest.branch
+            serializable_manifest["groups"] = self.manifest.groups
+            if self.manifest.ref:
+                serializable_manifest["ref"] = self.manifest.ref
             to_dump = {
                     "format" : 2,
                     "manifest" : serializable_manifest,
