@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
@@ -168,3 +169,7 @@ def test_warns_on_nested_worktrees(tmpdir, record_messages):
     work2.mkdir(".qi")
     wt2 = qisys.worktree.WorkTree(work2.strpath)
     assert record_messages.find("Nested worktrees")
+
+def test_non_ascii_path(tmpdir):
+    coffee_dir = tmpdir.mkdir("café")
+    wt = qisys.worktree.WorkTree(coffee_dir.strpath)

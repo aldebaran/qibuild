@@ -7,6 +7,7 @@
 """
 
 import abc
+import locale
 import os
 import ntpath
 import posixpath
@@ -56,7 +57,9 @@ This path does not exist
         qibuild_cfg = qibuild.config.QiBuildConfig()
         to_read = qibuild.config.get_global_cfg_path()
         qibuild_cfg.read(to_read, create_if_missing=True)
-        qibuild_cfg.add_worktree(self.root)
+        encoding = locale.getpreferredencoding()
+        as_unicode = self.root.decode(encoding)
+        qibuild_cfg.add_worktree(as_unicode)
         qibuild_cfg.write()
 
     def register(self, observer):
