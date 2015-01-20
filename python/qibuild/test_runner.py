@@ -100,9 +100,18 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         self.suite_runner = project_runner
         self.project = self.suite_runner.project
         self.verbose = self.suite_runner.verbose
-        self.valgrind_log = None
-        self.perf_out = None
-        self.test_out = None
+
+    def valgrind_log(self, test):
+        return  os.path.join(self.suite_runner.test_results_dir,
+                             test["name"] + "_valgrind.log")
+
+    def test_out(self, test):
+        return os.path.join(self.suite_runner.test_results_dir,
+                            test["name"] + ".xml")
+
+    def perf_out(self, test):
+        return os.path.join(self.suite_runner.perf_results_dir,
+                            test["name"] + ".xml")
 
     def launch(self, test):
         """ Implements :py:func:`qitest.runner.TestLauncher.launch`
@@ -112,10 +121,6 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         before being able to write one.
 
         """
-        self.perf_out = os.path.join(self.suite_runner.perf_results_dir,
-                                     test["name"] + ".xml")
-        self.test_out = os.path.join(self.suite_runner.test_results_dir,
-                                     test["name"] + ".xml")
         res = qitest.result.TestResult(test)
         self._update_test(test)
         cmd = test["cmd"]
@@ -172,11 +177,13 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         if not self.project:
             return
         if test.get("gtest"):
+            test_out = self.test_out(test)
             cmd = test["cmd"]
-            cmd.append("--gtest_output=xml:%s" % self.test_out)
+            cmd.append("--gtest_output=xml:%s" % test_out)
         if test.get("perf"):
+            perf_out = self.perf_out(test)
             cmd = test["cmd"]
-            cmd.extend(["--output", self.perf_out])
+            cmd.extend(["--output", perf_out])
 
     def _update_test_executable(self, test):
         """ Sometimes the path to the executable to run is a
@@ -222,10 +229,10 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         if not qisys.command.find_program("valgrind"):
             raise Exception("valgrind was not found on the system")
         cwd = test["working_directory"]
-        self.valgrind_log = os.path.join(cwd, test["name"] + "_valgrind.log")
+        valgrind_log = self.valgrind_log(test)
         test["timeout"] = test["timeout"] * 10
         test["cmd"] = ["valgrind", "--track-fds=yes",
-                       "--log-file=%s" % self.valgrind_log] + test["cmd"]
+                       "--log-file=%s" % valgrind_log] + test["cmd"]
 
     def _nightmare_mode(self, test):
         if not test.get("gtest"):
@@ -242,18 +249,23 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
     def _post_run(self, process, res, test):
         if self.suite_runner.valgrind:
-            parse_valgrind(self.valgrind_log, res)
+            valgrind_log = self.valgrind_log(test)
+            parse_valgrind(valgrind_log, res)
 
         process_crashed = process.return_type not in [qisys.command.Process.OK,
                                                       qisys.command.Process.FAILED]
         process_crashed = process_crashed or process.returncode < 0
+
+        test_out = self.test_out(test)
+        perf_out = self.perf_out(test)
+
         if process_crashed:
             # do not trust generated files:
-            qisys.sh.rm(self.perf_out)
-            qisys.sh.rm(self.test_out)
+            qisys.sh.rm(perf_out)
+            qisys.sh.rm(test_out)
 
-        if process_crashed or not os.path.exists(self.test_out):
-            self._write_xml(res, test, self.test_out)
+        if process_crashed or not os.path.exists(test_out):
+            self._write_xml(res, test, test_out)
 
     def _write_xml(self, res, test, out_xml):
         """ Make sure a Junit XML compatible file is written """
