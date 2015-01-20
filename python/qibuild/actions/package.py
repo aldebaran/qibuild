@@ -33,7 +33,10 @@ def do(args):
     if not version:
         project.version = "0.1"
 
+    build_dir_name = os.path.basename(project.build_directory)
+    archive_suffix = build_dir_name.replace("build-", "")
     archive_name += "-" + version
+    archive_name += "-" + archive_suffix
 
     destdir = os.path.join(cmake_builder.build_worktree.root, "package")
     destdir = os.path.join(destdir, archive_name)
