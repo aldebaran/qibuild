@@ -50,6 +50,7 @@ def deploy(pkg_paths, url):
 
 def _install_package(url, pkg_name, pkg_path):
     import qi
+    app = qi.Application()
     session = qi.Session()
     session.connect("tcp://%s:9559" % (url.host))
     package_manager = session.service("PackageManager")
