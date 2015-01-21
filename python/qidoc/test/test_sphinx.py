@@ -7,6 +7,7 @@ import os
 import py
 import pytest
 
+import qisys.sh
 from qidoc.test.conftest import find_link
 import qidoc.builder
 
@@ -163,4 +164,6 @@ def test_spellcheck(doc_worktree, record_messages):
     contents = contents.replace("missstake", "mistake")
     with open(index_rst, "w") as fp:
         fp.write(contents)
+    qisys.sh.rm(spell_proj.build_dir)
+    doc_builder.configure()
     doc_builder.build()
