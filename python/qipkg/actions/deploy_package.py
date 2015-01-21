@@ -48,6 +48,10 @@ def deploy(pkg_paths, url):
             ui.error("Unable to install package on target")
             ui.error("Error was: ", e)
 
+        rm_cmd = ["ssh", "%s@%s" % (url.user, url.host),
+                  "rm", os.path.basename(pkg_path)]
+        qisys.command.call(rm_cmd)
+
 def _install_package(url, pkg_name, pkg_path):
     import qi
     app = qi.Application()
