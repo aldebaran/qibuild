@@ -18,4 +18,5 @@ def test_convert_gentoo_package(tmpdir, toolchains):
     package = qitoolchain.qipackage.from_archive(converted)
     assert package.name == "json-c"
     assert package.version == "0.9"
+    package.path = tmpdir.strpath
     tc_test.add_package(package)

@@ -103,6 +103,7 @@ def test_sysroot(tmpdir):
     ctc_package = qitoolchain.qipackage.QiPackage("ctc")
     ctc_package.sysroot = "sysroot"
     ctc_package.cross_gdb = "cross-gdb"
+    ctc_package.path = tmpdir.strpath
     toolchain = qitoolchain.toolchain.Toolchain("test")
     toolchain.add_package(ctc_package)
     assert toolchain.get_sysroot() == "sysroot"

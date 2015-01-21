@@ -32,6 +32,7 @@ class CMakeBuildConfig(object):
         self._cmake_generator = None
         self.read_local_settings()
         self.num_jobs = None
+        self._toolchain = None
 
     @property
     def profiles(self):
@@ -64,9 +65,13 @@ class CMakeBuildConfig(object):
         line or read from the local qibuild settings
 
         """
+        if self._toolchain:
+            return self._toolchain
         if self.active_config:
-            return qitoolchain.get_toolchain(self.active_config)
-        return None
+            self._toolchain = qitoolchain.get_toolchain(self.active_config)
+            return self._toolchain
+        else:
+            return None
 
     @property
     def cmake_generator(self):
@@ -123,8 +128,8 @@ class CMakeBuildConfig(object):
         the build profiles, and the build type (debug/release)
         """
         parts = [prefix]
-        if self.toolchain:
-            parts.append(self.toolchain.name)
+        if self.active_config:
+            parts.append(self.active_config)
         else:
             parts.append("sys-%s-%s" % (platform.system().lower(),
                                         platform.machine().lower()))
