@@ -500,3 +500,26 @@ def test_do_not_leak_default_config(tmpdir):
     assert qibuild_cfg.env.path is None
     assert qibuild_cfg.env.bat_file is None
     assert qibuild_cfg.ide is None
+
+def test_read_default_config_for_worktree(tmpdir):
+    global_xml = tmpdir.join("global.xml")
+    global_xml.write("""
+<qibuild>
+  <worktree path="/path/to/a">
+    <defaults config="foo" />
+  </worktree>
+</qibuild>
+""")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(global_xml.strpath)
+    assert qibuild_cfg.get_default_config_for_worktree("/path/to/a") == "foo"
+
+def test_set_default_config_for_worktree(tmpdir):
+    global_xml = tmpdir.join("global.xml")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(global_xml.strpath, create_if_missing=True)
+    qibuild_cfg.set_default_config_for_worktree("/path/to/a", "foo")
+    qibuild_cfg.write(xml_path=global_xml.strpath)
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(global_xml.strpath)
+    assert qibuild_cfg.get_default_config_for_worktree("/path/to/a") == "foo"

@@ -9,7 +9,7 @@
 
 import os
 import operator
-
+import locale
 
 from qisys import ui
 
@@ -233,6 +233,7 @@ class Server:
 class WorkTree:
     def __init__(self):
         self.path = None
+        self.defaults = LocalDefaults()
 
     def parse(self, tree):
         path = tree.get("path")
@@ -240,11 +241,24 @@ class WorkTree:
             qisys.qixml.raise_parse_error(
                     "'worktree' node should have a 'path' attribute")
         self.path = path
+        defaults_tree = tree.find("defaults")
+        if defaults_tree is not None:
+            self.defaults.parse(defaults_tree)
 
     def tree(self):
         tree = etree.Element("worktree")
         tree.set("path", self.path)
+        tree.append(self.defaults.tree())
         return tree
+
+    def __str__(self):
+        encoding = locale.getpreferredencoding()
+        as_bytes = self.path.encode(encoding)
+        res = "worktree in %s" % as_bytes
+        defaults_str = str(self.defaults)
+        if defaults_str:
+            res += "\n  " + defaults_str
+        return res
 
 class LocalSettings:
     def __init__(self):
@@ -573,10 +587,11 @@ class QiBuildConfig:
         self.defaults.env.path = os.pathsep.join(splitted_paths)
 
     def add_worktree(self, path):
+        if path in self.worktrees:
+            return
         to_add = WorkTree()
         to_add.path = path
         self.worktrees[path] = to_add
-
 
     def get_server_access(self, server_name):
         """ Return the access settings of a server
@@ -601,6 +616,27 @@ class QiBuildConfig:
         access.username = username
         access.password = password
         access.root = root
+
+    def get_default_config_for_worktree(self, worktree_path):
+        """ Return the default configuration associated with the given
+        worktree
+
+        """
+        worktree = self.worktrees.get(worktree_path)
+        if not worktree:
+            return None
+        return worktree.defaults.config
+
+    def set_default_config_for_worktree(self, worktree_path, name):
+        """ Set the default configuration for the given worktree
+
+        """
+        worktree = self.worktrees.get(worktree_path)
+        if not worktree:
+            worktree = WorkTree()
+            worktree.path = worktree_path
+            self.worktrees[worktree.path] = worktree
+        worktree.defaults.config = name
 
     def write(self, xml_path=None):
         """ Write back the new config
@@ -674,6 +710,14 @@ class QiBuildConfig:
             res += "servers:\n"
             for server in servers:
                 res += ui.indent(str(server))
+                res += "\n"
+            res += "\n"
+        worktrees = self.worktrees.values()
+        worktrees.sort(key=operator.attrgetter('path'))
+        if worktrees:
+            res += "worktrees:\n"
+            for worktree in worktrees:
+                res += ui.indent(str(worktree))
                 res += "\n"
         return res
 

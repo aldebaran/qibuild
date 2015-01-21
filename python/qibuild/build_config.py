@@ -177,20 +177,26 @@ class CMakeBuildConfig(object):
         tree = qisys.qixml.read(self.build_worktree.qibuild_xml)
         local_settings.parse(tree)
         self.custom_build_dir = local_settings.build.build_dir
+
+        # Legacy: in .qi/qibuild.xml
         default_config = local_settings.defaults.config
         if not default_config:
-            return
-        try:
-            qitoolchain.get_toolchain(default_config)
-        except Exception:
-            mess = """ \
+            # New location: in ~/.config/qi/qibuild.xml
+            self.qibuild_cfg.read()
+            default_config = self.qibuild_cfg.get_default_config_for_worktree(
+                                    self.build_worktree.root)
+        if default_config:
+            try:
+                qitoolchain.get_toolchain(default_config)
+            except Exception:
+                mess = """ \
 Incorrect config detected for worktree in {build_worktree.root}
-Default config set in .qi/qibuild.xml is {default_config}
-but this does not match any toolchain name
+Default config is {default_config} but this does not match any
+toolchain name
 """
-            mess = mess.format(build_worktree=self.build_worktree,
-                               default_config=default_config)
-            raise Exception(mess)
+                mess = mess.format(build_worktree=self.build_worktree,
+                                default_config=default_config)
+                raise Exception(mess)
         self._default_config = default_config
         self.qibuild_cfg.set_active_config(default_config)
         self.set_active_config(default_config)

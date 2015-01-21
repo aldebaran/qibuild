@@ -115,14 +115,10 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
 
     def set_default_config(self, name):
         """ Set the default toolchain for this worktree """
-        tree = qisys.qixml.read(self.qibuild_xml)
-        root = tree.getroot()
-        defaults = root.find("defaults")
-        if defaults is None:
-            defaults = qisys.qixml.etree.Element("defaults")
-            root.append(defaults)
-        defaults.set("config", name)
-        qisys.qixml.write(tree, self.qibuild_xml)
+        qibuild_cfg = qibuild.config.QiBuildConfig()
+        qibuild_cfg.read(create_if_missing=True)
+        qibuild_cfg.set_default_config_for_worktree(self.root, name)
+        qibuild_cfg.write()
 
     def set_active_config(self, active_config):
         """ Set the config to use for this worktree

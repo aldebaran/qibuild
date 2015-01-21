@@ -5,6 +5,7 @@
 import os
 
 from qibuild.test.conftest import TestBuildWorkTree
+from qitoolchain.test.conftest import toolchains
 
 import pytest
 
@@ -53,3 +54,11 @@ def test_bad_qibuild2_qiproject(cd_to_tmpdir):
     bar_qiproj_xml = bar_path.join("qiproject.xml")
     bar_qiproj_xml.write("<project />")
     build_worktree = TestBuildWorkTree()
+
+def test_set_default_config(toolchains, cd_to_tmpdir):
+    toolchains.create("foo")
+    build_worktree = TestBuildWorkTree()
+    build_worktree.set_default_config("foo")
+    assert build_worktree.default_config == "foo"
+    build_worktree2 = TestBuildWorkTree()
+    assert build_worktree2.default_config == "foo"

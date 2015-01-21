@@ -5,6 +5,7 @@
 import os
 
 import qisys.sh
+from qisys.qixml import etree
 import qibuild.build_config
 import qitoolchain.toolchain
 
@@ -62,6 +63,21 @@ def test_read_default_config(build_worktree):
     build_worktree.set_default_config("foo")
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
     assert build_config.toolchain.name == "foo"
+
+def test_read_default_config_in_global_config_file(build_worktree):
+    qitoolchain.toolchain.Toolchain("foo")
+    qibuild_xml = qisys.sh.get_config_path("qi", "qibuild.xml")
+    tree = qisys.qixml.read(qibuild_xml)
+    root = tree.getroot()
+    worktree_elem = root.find("worktree")
+    assert worktree_elem is not None
+    defaults_elem = worktree_elem.find("defaults")
+    assert defaults_elem is not None
+    defaults_elem.set("config", "foo")
+    qisys.qixml.write(root, qibuild_xml)
+    build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
+    assert build_config.toolchain.name == "foo"
+
 
 def test_use_specific_generator_from_default_config(build_worktree):
     qibuild_xml = qisys.sh.get_config_path("qi", "qibuild.xml")
