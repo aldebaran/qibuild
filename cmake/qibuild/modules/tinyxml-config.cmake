@@ -3,9 +3,8 @@
 ## found in the COPYING file.
 
 clean(TINYXML)
-fpath(TINYXML tinyxml.h)
-fpath(TINYXML tinystr.h)
-
+fpath(TINYXML tinyxml/tinyxml.h)
+fpath(TINYXML tinyxml/tinystr.h)
 flib(TINYXML NAMES tinyxml)
 export_lib(TINYXML)
 
