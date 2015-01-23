@@ -33,6 +33,14 @@ function(qi_generate_qt_conf)
     get_filename_component(_root_path ${_lib_path} PATH)
   endif()
 
+  if(NOT EXISTS ${_root_path}/plugins)
+    # No need to write a qt.conf if the prefix is not
+    # correct.
+    # When not using a toolchain, the qt.conf file is
+    # not necessary anyways.
+    return()
+  endif()
+
   file(WRITE "${QI_SDK_DIR}/${QI_SDK_BIN}/qt.conf"
 "[Paths]
 Prefix = ${_root_path}
