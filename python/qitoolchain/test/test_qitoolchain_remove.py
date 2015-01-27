@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import qitoolchain.toolchain
+from qibuild.test.conftest import TestBuildWorkTree
 
 import pytest
 
@@ -17,3 +18,11 @@ def test_when_not_exists(qitoolchain_action):
     with pytest.raises(Exception) as e:
         qitoolchain_action("remove", "foo")
     assert "No such toolchain" in str(e.value)
+
+def test_when_is_default(qitoolchain_action):
+    qitoolchain_action("create", "foo")
+    test_build_worktre1 = TestBuildWorkTree()
+    test_build_worktre1.set_default_config("foo")
+    qitoolchain_action("remove", "foo", "--force")
+    test_build_worktre2 = TestBuildWorkTree()
+    assert test_build_worktre2.toolchain is None
