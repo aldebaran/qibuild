@@ -194,3 +194,19 @@ def test_using_dash_s_with_path_conf(qibuild_action):
     qibuild_action("configure", "-s", "usepath")
     path_conf_after = read_path_conf(stagepath_proj)
     assert path_conf_before == path_conf_after
+
+def test_adding_a_new_test(qibuild_action):
+    qibuild_proj = qibuild_action.add_test_project("testme")
+    qibuild_action("configure", "testme")
+    qibuild_action("make", "testme")
+    test_proj1 = qibuild_proj.to_test_project()
+    num_tests_before = len(test_proj1.tests)
+    cmake_lists = os.path.join(qibuild_proj.path, "CMakeLists.txt")
+    with open(cmake_lists, "a") as fp:
+        fp.write("""
+qi_create_test(env2 env.cpp)
+""")
+    qibuild_action("make", "testme")
+    test_proj2 = qibuild_proj.to_test_project()
+    num_tests_after = len(test_proj2.tests)
+    assert num_tests_after == num_tests_before + 1

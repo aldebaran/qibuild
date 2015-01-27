@@ -225,19 +225,17 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
                                 cmake_args, env=self.build_env, **kwargs)
         except qisys.command.CommandFailedException as error:
             raise qibuild.build.ConfigureFailed(self, error)
-        # Write the qitest.json file:
-        tests = self.parse_qitest_cmake()
-        with open(self.qitest_json, "w") as fp:
-            json.dump(tests, fp, indent=2)
+        self.generate_qitest_json()
 
-    def parse_qitest_cmake(self):
+    def generate_qitest_json(self):
         """ The qitest.cmake is written from CMake """
         qitest_cmake_path = os.path.join(self.build_directory, "qitest.cmake")
         tests = list()
-        if not os.path.exists(qitest_cmake_path):
-            return list()
-        with open(qitest_cmake_path, "r") as fp:
-            lines = fp.readlines()
+        if os.path.exists(qitest_cmake_path):
+            with open(qitest_cmake_path, "r") as fp:
+                lines = fp.readlines()
+        else:
+            lines = list()
         parser = argparse.ArgumentParser()
         parser.add_argument("cmd", nargs="+")
         parser.add_argument("--name", required=True)
@@ -267,7 +265,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             if as_list:
                 test["environment"] = dict(x.split("=") for x in as_list)
             tests.append(test)
-        return tests
+        with open(self.qitest_json, "w") as fp:
+            json.dump(tests, fp, indent=2)
+
 
     def build(self, num_jobs=None, rebuild=False, target=None,
               coverity=False, env=None):
@@ -312,6 +312,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             raise qibuild.build.BuildFailed(self)
 
         timer.stop()
+        # We need to call generate_qitest_json() here because
+        # `qibuild make` may have caused a re-run of cmake
+        self.generate_qitest_json()
 
     def parse_num_jobs(self, num_jobs, cmake_generator=None):
         """ Convert a number of jobs to a list of cmake args """
