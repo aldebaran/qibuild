@@ -38,3 +38,14 @@ def test_using_projects(qisrc_action):
     assert rc == 0
     rc = qisrc_action("grep", "-p", "bar", "spam", retcode=True)
     assert rc == 1
+
+def test_using_git_grep_options(qisrc_action, record_messages):
+    setup_projects(qisrc_action)
+    rc = qisrc_action("grep", "--", "-i", "-l", "Spam", retcode=True)
+    assert rc == 0
+    assert record_messages.find("a.txt")
+
+def test_worktree_paths(qisrc_action, record_messages):
+    setup_projects(qisrc_action)
+    rc = qisrc_action("grep", "--path", "worktree",  "--", "-i", "-l", "Spam", retcode=True)
+    assert record_messages.find("foo/a.txt")

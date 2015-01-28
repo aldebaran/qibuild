@@ -24,10 +24,8 @@ def configure_parser(parser):
     qibuild.parsers.project_parser(parser, positional=False)
     parser.add_argument("--path", help="type of patch to print",
             default="project", choices=['none', 'absolute', 'worktree', 'project'])
-    parser.add_argument("git_grep_opts", metavar="-- git grep options", nargs="*",
+    parser.add_argument("git_grep_opts", metavar="-- git grep options", nargs="+",
                         help="git grep options preceded with -- to escape the leading '-'")
-    parser.add_argument("pattern", metavar="PATTERN",
-                        help="pattern to be matched")
 
 def do(args):
     """Main entry point."""
@@ -36,15 +34,14 @@ def do(args):
                                                   use_build_deps=args.use_deps)
     git_grep_opts = args.git_grep_opts
     if args.path == 'none':
-        git_grep_opts.append("-h")
+        git_grep_opts.insert(0, "-h")
     else:
-        git_grep_opts.append("-H")
+        git_grep_opts.insert(0, "-H")
         if args.path == 'absolute' or args.path == 'worktree':
-            git_grep_opts.append("-I")
-            git_grep_opts.append("--null")
+            git_grep_opts.insert(0, "-I")
+            git_grep_opts.insert(0, "--null")
     if ui.config_color(sys.stdout):
-        git_grep_opts.append("--color=always")
-    git_grep_opts.append(args.pattern)
+        git_grep_opts.insert(0, "--color=always")
 
     if not git_projects:
         qisrc.worktree.on_no_matching_projects(git_worktree, groups=args.groups)
