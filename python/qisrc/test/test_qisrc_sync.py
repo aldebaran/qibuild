@@ -4,6 +4,7 @@
 import os
 
 import py
+import pytest
 
 import qisys.script
 import qisys.sh
@@ -241,3 +242,22 @@ def test_removing_forked_project(qisrc_action, git_server):
     qisrc_action("sync", "-a")
     qisrc_action("checkout", "devel")
     assert git.get_current_branch() == "master"
+
+def test_sync_reset(qisrc_action, git_server):
+    git_server.create_repo("bar")
+    git_server.create_repo("baz")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    bar_proj = git_worktree.get_git_project("bar")
+    baz_proj = git_worktree.get_git_project("baz")
+    bar_git = TestGit(bar_proj.path)
+    baz_git = TestGit(baz_proj.path)
+    bar_git.checkout("-B", "devel")
+    baz_git.commit_file("unrelated.txt", "unrelated\n")
+    git_server.push_file("bar", "bar.txt", "this is bar\n")
+    qisrc_action("sync", "--reset")
+    assert bar_git.get_current_branch() == "master"
+    assert bar_git.read_file("bar.txt") == "this is bar\n"
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception):
+        baz_git.read_file("unrelated.txt")

@@ -178,6 +178,27 @@ class GitProject(object):
         # Here current_branch == branch.name
         return git.sync_branch(branch, fetch_first=False)
 
+    def reset(self):
+        """ Same as sync, but discard any local changes """
+        git = qisrc.git.Git(self.path)
+        branch = self.default_branch
+        if not branch:
+            return None, "No branch given, and no branch configured by default"
+
+        rc, out = git.fetch(raises=False)
+        if rc != 0:
+            return False, "fetch failed\n" + out
+
+        git.checkout("-B", branch.name)
+        remote_branch = branch.remote_branch
+        if not remote_branch:
+            remote_branch = branch.name
+        remote_ref = "%s/%s" % (branch.tracks, remote_branch)
+        rc, out = git.reset("--hard", remote_ref, raises=False)
+        if rc != 0:
+            return False, "reset --hard failed\n" + out
+
+        return True, ""
 
     def apply_config(self):
         """ Apply configuration to the underlying git

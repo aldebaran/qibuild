@@ -26,6 +26,8 @@ def configure_parser(parser):
     group = parser.add_argument_group("qisrc sync options")
     group.add_argument("--rebase-devel", action="store_true",
                        help="Rebase development branches. Advanced users only")
+    group.add_argument("--reset", action="store_true",
+                       help="Do the same as `qisrc reset --all --force` after the fetch")
 
 def print_overview(total, skipped, failed):
     out = [ ui.green, "Success:", ui.white, total - skipped - failed ]
@@ -44,6 +46,7 @@ def print_overview(total, skipped, failed):
 @ui.timer("Synchronizing worktree")
 def do(args):
     """Main entry point"""
+    reset = args.reset
     git_worktree = qisrc.parsers.get_git_worktree(args)
     sync_ok = git_worktree.sync()
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
@@ -61,7 +64,10 @@ def do(args):
         ui.info_count(i, len(git_projects),
                       ui.blue, git_project.src.ljust(max_src), end="\r")
 
-        (status, out) = git_project.sync(rebase_devel=args.rebase_devel)
+        if reset:
+            (status, out) = git_project.reset()
+        else:
+            (status, out) = git_project.sync(rebase_devel=args.rebase_devel)
         if status is None:
             ui.info("\n", ui.brown, "  [skipped]")
             skipped.append((git_project.src, out))
