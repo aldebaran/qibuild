@@ -79,5 +79,5 @@ def do(args):
     #clean the screen
     ui.info_count(i, len(git_projects), ui.blue, " ".ljust(max_src), end="\r")
     print_overview(len(git_projects), len(skipped), len(failed))
-    if failed or not sync_ok:
+    if failed or skipped or not sync_ok:
         sys.exit(1)

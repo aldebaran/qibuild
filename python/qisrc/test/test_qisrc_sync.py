@@ -35,7 +35,8 @@ def test_sync_skips_unconfigured_projects(qisrc_action, git_server, test_git):
     git = test_git(new_proj.strpath)
     git.initialize()
     git_worktree.add_git_project(new_proj.strpath)
-    qisys.script.run_action("qisrc.actions.sync")
+    rc = qisrc_action("sync", retcode=True)
+    assert rc != 0
 
 def test_clone_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")
@@ -239,7 +240,7 @@ def test_removing_forked_project(qisrc_action, git_server):
     git = qisrc.git.Git(booz_proj.path)
     assert git.get_current_branch() == "devel"
     git_server.change_branch("booz", "master")
-    qisrc_action("sync", "-a")
+    qisrc_action("sync", "-a", retcode=True)
     qisrc_action("checkout", "devel")
     assert git.get_current_branch() == "master"
 
@@ -261,3 +262,13 @@ def test_sync_reset(qisrc_action, git_server):
     # pylint: disable-msg=E1101
     with pytest.raises(Exception):
         baz_git.read_file("unrelated.txt")
+
+def test_retcode_when_skipping(qisrc_action, git_server):
+    git_server.create_repo("bar")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    bar_proj = git_worktree.get_git_project("bar")
+    git = TestGit(bar_proj.path)
+    git.checkout("-b", "devel")
+    rc = qisrc_action("sync", retcode=True)
+    assert rc != 0
