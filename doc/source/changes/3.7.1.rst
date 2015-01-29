@@ -1,0 +1,31 @@
+v3.7.1
+======
+
+qibuild
+-------
+
+* ``qibuild package``: include the build configuration in the archive name
+* ``qibuild init``: honor ``-w, --worktree`` option
+* ``qibuild find`` : fix return code when no cmake module is found
+
+qisrc
+-----
+
+* ``qisrc snapshot``: bug fix when using groups
+
+qitoolchain
+------------
+* also remove package path when package is removed from feed
+
+
+cmake
+-----
+
+* Add ``qi_get_git_version``
+* ``qi_install_python``: fix default destination on Windows
+* modules:
+
+  * ``qt5-tools``: do not write invalid ``qt.conf`` files
+  * ``qt5-tools``: make ``Qt5WidgetsMacros`` inclusion optional
+  * ``tinyxml``: support both ``/usr/include/tinyxml.h`` and ``include/tinyxml/tinyxml.h``
+  * Add ``qt5_dbus``, ``qt5_x11extras``, ``v4l``
