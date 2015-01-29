@@ -33,6 +33,8 @@ def do(args):
 
     """
     feed = args.feed
+    if feed and not "://" in feed:
+        feed = qisys.sh.to_native_path(feed)
     tc_name = args.name
 
     # Validate the name: must be a valid filename:
