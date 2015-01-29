@@ -111,7 +111,7 @@ def config_title(fp):
     if config_title.lower() == "always":
         return True
     # else: auto
-    legal_terms = ["xterm", "xterm-color", "Eterm", "aterm", "rxvt",
+    legal_terms = ["xterm", "xterm-256color", "xterm-color", "Eterm", "aterm", "rxvt",
             "screen", "kterm", "rxvt-unicode", "gnome", "interix",
             "rxvt-unicode-256color"]
     return fp.isatty() and \
