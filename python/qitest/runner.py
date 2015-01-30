@@ -5,6 +5,7 @@ import abc
 import re
 import os
 
+from qisys import ui
 import qitest.test_queue
 
 class TestSuiteRunner(object):
@@ -58,6 +59,8 @@ class TestSuiteRunner(object):
         # But nightly tests are run along with the normal tests
         if not self.nightly:
             res = [x for x in res if x.get("nightly", False) is False]
+        if not res and self.patterns:
+            ui.error("No test found matching pattern")
         return res
 
 

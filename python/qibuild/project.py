@@ -434,7 +434,14 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         return test_runner.run()
 
     def to_test_project(self):
-        return qitest.project.TestProject(self.qitest_json)
+        if not os.path.exists(self.qitest_json):
+            raise Exception("qitest.json not found. Did you run qibuild configure?")
+        res = qitest.project.TestProject(self.qitest_json)
+        if not res.tests:
+            ui.error("No tests were found in qitest.json.\n" +
+                     "Add some in the CMakeLists using " +
+                     "qi_add_test() or similar")
+        return res
 
     def fix_shared_libs(self, paths):
         """ Do some magic so that shared libraries from other projects and

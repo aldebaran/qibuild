@@ -77,8 +77,6 @@ class TestQueue():
 
         """
         if not self.tests:
-            ui.error("No tests were found.",
-                     "Did you run qibuild configure?")
             self.ok = False
             return
         num_tests = len(self.results)
