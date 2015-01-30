@@ -1,9 +1,6 @@
-##
-## Author(s):
-##  - Cedric GESTES <gestes@aldebaran-robotics.com>
-##
-## Copyright (C) 2009, 2010, 2012-2014 Aldebaran Robotics
-##
+## Copyright (c) 2009-2015 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
 
 TEST_MODULES =
 ifneq ($(MYPYMODULES),)
