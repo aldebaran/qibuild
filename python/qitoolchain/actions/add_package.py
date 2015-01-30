@@ -7,6 +7,7 @@
 """
 
 import os
+import zipfile
 
 import qisys.archive
 import qisys.worktree
@@ -19,6 +20,8 @@ def configure_parser(parser):
                         help="name of the toolchain to use")
     parser.add_argument("package_path", metavar='PATH',
                         help="The path to the package")
+    parser.add_argument("--name", help="The name of the package.\n" +
+                        "Useful for legacy package format")
 
 def do(args):
     """ Add a package to a toolchain
@@ -29,15 +32,29 @@ def do(args):
 
     """
     toolchain = qitoolchain.parsers.get_toolchain(args)
+    name = args.name
     package_path = args.package_path
-    package = qitoolchain.qipackage.from_archive(package_path)
+    legacy = False
+    try:
+        archive = zipfile.ZipFile(package_path)
+        archive.read("package.xml")
+    except:
+        legacy = True
+    if legacy and not args.name:
+        raise Exception("Must specify --name when using legacy format")
+
+    package = None
+    if legacy:
+        package = qitoolchain.qipackage.QiPackage(args.name)
+    else:
+        package = qitoolchain.qipackage.from_archive(package_path)
 
     # extract it to the default packages path of the toolchain
     tc_name = toolchain.name
     tc_packages_path = qitoolchain.toolchain.get_default_packages_path(tc_name)
     dest = os.path.join(tc_packages_path, package.name)
     qisys.sh.rm(dest)
-    qisys.archive.extract(package_path, dest, strict_mode=False)
+    qitoolchain.qipackage.extract(package_path, dest)
     package.path = dest
 
     # add the package to the toolchain
