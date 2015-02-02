@@ -162,7 +162,7 @@ def from_archive(archive_path):
     return from_xml(element)
 
 def extract(archive_path, dest):
-    if archive_path.endswith(".tar.gz"):
+    if archive_path.endswith((".tar.gz", ".tbz2")):
         _extract_legacy(archive_path, dest)
         return
     with zipfile.ZipFile(archive_path) as archive:
