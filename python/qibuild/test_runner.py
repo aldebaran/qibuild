@@ -24,6 +24,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
         self.perf_results_dir = "perf-results"
         self._coverage = False
         self._valgrind = False
+        self.break_on_failure = False
         self._num_cpus = -1
         tests = project.tests
 
@@ -180,6 +181,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             test_out = self.test_out(test)
             cmd = test["cmd"]
             cmd.append("--gtest_output=xml:%s" % test_out)
+            if self.suite_runner.break_on_failure:
+                cmd.append("--gtest_break_on_failure")
         if test.get("perf"):
             perf_out = self.perf_out(test)
             cmd = test["cmd"]

@@ -31,6 +31,8 @@ def test_parser(parser, with_num_jobs=True):
     group.add_argument("--ncpu", dest="num_cpus", default=-1, type=int,
                         help="set number of CPU each test is allowed to use (linux)")
     group.add_argument("--nightly", action="store_true", dest="nightly")
+    group.add_argument("--break-on-failure", action="store_true", dest="break_on_failure",
+                      help="Break on failure (for gtest only)")
     group.add_argument("--qitest-json", dest="qitest_jsons", action="append")
     parser.set_defaults(nightly=False)
     if with_num_jobs:
@@ -81,6 +83,7 @@ def get_test_runner(args, project_name=None, qitest_json=None):
     test_runner.patterns = args.patterns
     test_runner.perf = args.perf
     test_runner.coverage = args.coverage
+    test_runner.break_on_failure = args.break_on_failure
     test_runner.valgrind = args.valgrind
     test_runner.verbose = args.verbose_tests
     test_runner.num_cpus = args.num_cpus
