@@ -9,7 +9,9 @@ import qisys.command
 import qibuild.cmake
 import qibuild.find
 import qisrc.git
+import qitoolchain
 
+from qibuild.test.conftest import TestBuildWorkTree
 import pytest
 
 
@@ -194,6 +196,26 @@ def test_using_dash_s_with_path_conf(qibuild_action):
     qibuild_action("configure", "-s", "usepath")
     path_conf_after = read_path_conf(stagepath_proj)
     assert path_conf_before == path_conf_after
+
+def test_path_conf_contains_toolchain_paths(qibuild_action, toolchains):
+    toolchains.create("foo")
+    toolchains.add_package("foo", "bar")
+    foo_tc = qitoolchain.get_toolchain("foo")
+    bar_path = foo_tc.get_package("bar").path
+    qibuild_action.add_test_project("hello")
+    qibuild_action.add_test_project("world")
+    build_woktree = TestBuildWorkTree()
+    build_woktree.build_config.set_active_config("foo")
+    qibuild_action("configure", "hello", "--config", "foo")
+    world_proj = build_woktree.get_build_project("world")
+    hello_proj = build_woktree.get_build_project("hello")
+    path_conf = os.path.join(hello_proj.sdk_directory, "share", "qi", "path.conf")
+    with open(path_conf, "r") as fp:
+        contents = fp.readlines()
+    sdk_dirs = [x.strip() for x in contents]
+    assert hello_proj.sdk_directory in sdk_dirs
+    assert world_proj.sdk_directory in sdk_dirs
+    assert bar_path in sdk_dirs
 
 def test_adding_a_new_test(qibuild_action):
     qibuild_proj = qibuild_action.add_test_project("testme")

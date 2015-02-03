@@ -86,6 +86,8 @@ class CMakeBuilder(AbstractBuilder):
             project.write_dependencies_cmake(sdk_dirs)
 
         qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
+        if self.toolchain:
+            qi_path_sdk_dirs.extend(package.path for package in self.toolchain.packages)
 
         # path.conf must be written right before cmake is called, and with
         # all the dependencies
