@@ -6,6 +6,7 @@ misc
 
 * Add ``urxvt-unicode-256color`` as a possible value for ``$TERM`` when
   trying to figure out whether color output should be enabled
+* Support creating worktrees in accentuated file paths
 
 qibuild
 -------
@@ -24,6 +25,10 @@ qibuild
   in ``/path/to/worktree/.qi/qibuild.xml``
 * ``qibuild find``: fix return code when no CMake module is found
 * Fix using ``-j`` with ``Visual Studio`` generators.
+* Include toolchain paths in path.conf
+* ``qibuild``: generate ``qitest.json`` file also after building
+* Store default config for worktree in the global config file
+  (``~/.config/qi/qibuild.xml``)
 
 qidoc
 ------
@@ -36,13 +41,16 @@ qilinguist
 
 * Fail when non-translated messages are found
 * ``qilinguist release`` can also work with ``.pml`` files.
+* ``qilinguist list``: sort by project name
 
 qipkg
 -----
 
 * ``qipkg deploy-package``: Remove previous instance before installing
-* Add ``qipkg dump-version``
+* Add ``qipkg bump-version``
 * ``qipkg make-package /path/to/pml``: also works when not in a worktree
+* ``qipkg make-package``: handle translations files from ``.pml``
+* Make it possible to use ``qipkg`` without a worktree
 
 qipy
 ----
@@ -59,12 +67,24 @@ qisrc
   * Prettier output
 
 * ``qisrc create``: better handling of ``"/"`` in argument
+* ``qisrc grep``: fix using git grep options such as
+  ``qisrc grep -- -i foo``
+* ``qisrc sync``: fix retcode when some projects are skipped
+* Implements ``qisrc sync --reset``
+
+qitest
+------
+
+* Implement ``qitest run --break-on-failure``
+* Fix error messages in some corner cases
+* Fix several race conditions when using ``-j``
 
 qitoolchain
 -----------
 
 * No longer writes files in ``~/.cache/qi/toolchains``
 * Also remove package files when a package is removed from the feed
+* ``qitoolchain add-package``: support legacy format
 
 cmake
 ------
@@ -74,7 +94,7 @@ cmake
   * ``ogre``: search in the right ``PATH_SUFFIX``
   * Add ``v4l``
   * Add ``Qt5X11Extras``
+  * Support ``opencv`` 2.4.10
 
 * ``qi_swig_wrap_python``: handle lower case DEPENDS arguments
 * ``qi_install_python``: fix default destination on Windows
-* Add ``qi_get_git_version``
