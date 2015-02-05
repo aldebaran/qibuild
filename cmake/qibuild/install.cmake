@@ -237,7 +237,7 @@ endfunction()
 #
 function(qi_install_python)
 
-  cmake_parse_arguments(ARG "" "COMPONENT;DESTINATION;VERSION;" "TARGETS" ${ARGN})
+  cmake_parse_arguments(ARG "" "COMPONENT;DESTINATION;VERSION" "TARGETS" ${ARGN})
 
   #XXX: this will only work if python headers have been found
   # we can either have found them via qibuild-specific wrapper
