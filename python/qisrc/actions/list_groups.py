@@ -31,6 +31,6 @@ def do(args):
     all_groups.sort()
     for group in all_groups:
         if group in local_groups:
-            ui.info("* ", ui.green, group)
+            ui.info("*", ui.green, group)
         else:
-            ui.info("  ", group)
+            ui.info(" ", group)
