@@ -4,6 +4,8 @@
 
 import os
 
+import qibuild.config
+
 from qibuild.test.conftest import TestBuildWorkTree
 from qitoolchain.test.conftest import toolchains
 
@@ -21,16 +23,11 @@ def test_setting_build_config_sets_projects_cmake_flags(build_worktree):
     world = build_worktree.get_build_project("world")
     assert world.cmake_args == ["-DCMAKE_BUILD_TYPE=Release"]
 
-def test_setting_build_config_sets_projects_build_dir(build_worktree):
-    build_worktree.create_project("world")
-    build_worktree.build_config.build_type = "Release"
-    world = build_worktree.get_build_project("world")
-    assert "-release" in os.path.basename(world.build_directory)
-
-def test_changing_active_config_changes_projects_build_dir(build_worktree, toolchains):
-    world_proj = build_worktree.create_project("world")
-    toolchains.create("foo")
+def test_changing_active_config_changes_projects_build_dir(cd_to_tmpdir):
+    qibuild.config.add_build_config("foo")
+    build_worktree = TestBuildWorkTree()
     build_worktree.set_active_config("foo")
+    world_proj = build_worktree.create_project("world")
     assert "foo" in  world_proj.build_directory
 
 def test_project_names_are_unique(build_worktree):
@@ -55,8 +52,8 @@ def test_bad_qibuild2_qiproject(cd_to_tmpdir):
     bar_qiproj_xml.write("<project />")
     build_worktree = TestBuildWorkTree()
 
-def test_set_default_config(toolchains, cd_to_tmpdir):
-    toolchains.create("foo")
+def test_set_default_config(cd_to_tmpdir):
+    qibuild.config.add_build_config("foo")
     build_worktree = TestBuildWorkTree()
     build_worktree.set_default_config("foo")
     assert build_worktree.default_config == "foo"

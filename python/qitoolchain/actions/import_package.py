@@ -19,8 +19,7 @@ import qitoolchain.qipackage
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
-    parser.add_argument("-c", "--config",
-                        help="name of the toolchain to use")
+    qitoolchain.parsers.toolchain_parser(parser)
     parser.add_argument("--name", required=True,
                         help="The name of the package")
     parser.add_argument("package_path", metavar='PACKAGE_PATH',

@@ -11,6 +11,7 @@ import qisys.sh
 import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree, TestGit
 from qibuild.test.conftest import TestBuildWorkTree
+import qibuild.config
 import qibuild.profile
 
 
@@ -94,7 +95,8 @@ def test_sync_build_profiles(qisrc_action, git_server):
     qisrc_action("init", git_server.manifest_url)
     build_worktree = TestBuildWorkTree()
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
-    build_config.profiles = ["foo"]
+    qibuild.config.add_build_config("foo", profiles=["foo"])
+    build_config.set_active_config("foo")
     assert build_config.cmake_args == ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_FOO=ON"]
     git_server.add_build_profile("foo", [("WITH_FOO", "ON"), ("WITH_BAR", "ON")])
     qisrc_action("sync")

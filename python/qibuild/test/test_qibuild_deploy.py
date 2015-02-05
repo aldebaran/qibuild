@@ -99,6 +99,7 @@ def test_deploy_install_binary_packages(qibuild_action, qitoolchain_action,
     world = qibuild_action.add_test_project("world")
     hello = qibuild_action.add_test_project("hello")
     qitoolchain_action("create", "test")
+    qibuild.config.add_build_config("test", toolchain="test")
     world_package = qibuild_action("package", "world")
     qitoolchain_action("add-package", "--config", "test", world_package)
     build_worktree = qibuild_action.build_worktree

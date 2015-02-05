@@ -24,9 +24,6 @@ def configure_parser(parser):
              "If not given, the toolchain will be empty.\n"
              "May be a local file or an url",
         nargs="?")
-    parser.add_argument("--default",
-        help="Use this toolchain by default in this worktree",
-        action="store_true")
 
 def do(args):
     """Main entry point
@@ -52,13 +49,6 @@ def do(args):
 
     build_worktree = None
 
-    if args.default:
-        try:
-            build_worktree = qibuild.parsers.get_build_worktree(args)
-        except qisys.worktree.NotInWorkTree:
-            mess = "You need to be in a worktree to use --default"
-            raise Exception(mess)
-
     if tc_name in qitoolchain.get_tc_names():
         toolchain = qitoolchain.Toolchain(tc_name)
         if feed and toolchain.feed_url != feed:
@@ -73,11 +63,4 @@ def do(args):
     if feed:
         toolchain.update(feed)
 
-    if args.default:
-        build_worktree.set_default_config(tc_name)
-        ui.info("Now using toolchain", ui.blue, tc_name, ui.reset, "by default")
-    else:
-        ui.info(ui.green, "Now try using", "\n"
-                "  qibuild configure -c", ui.blue, tc_name, ui.green, "\n"
-                "  qibuild make -c",      ui.blue, tc_name)
     return toolchain

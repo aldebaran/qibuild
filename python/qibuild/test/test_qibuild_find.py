@@ -1,9 +1,12 @@
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import qibuild.config
+from qibuild import find
+
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
-from qibuild import find
 
 def test_find_target_in_project_cmake(qibuild_action, record_messages):
     qibuild_action.add_test_project("world")
@@ -21,6 +24,7 @@ def test_find_target_in_toolchain_package_cmake(cd_to_tmpdir, record_messages):
     qibuild_action.add_test_project("hello")
     world_package = qibuild_action("package", "world")
     qitoolchain_action("create", "foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
     qitoolchain_action("add-package", "-c", "foo", world_package)
     build_worktree.worktree.remove_project("world", from_disk=True)
 
@@ -51,6 +55,7 @@ def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
     qibuild_action.add_test_project("hello")
     world_package = qibuild_action("package", "world")
     qitoolchain_action("create", "foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
     qitoolchain_action("add-package", "-c", "foo", world_package)
 
     qibuild_action.chdir("hello")

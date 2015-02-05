@@ -7,19 +7,24 @@ import os
 import qisys.sh
 from qisys.qixml import etree
 import qibuild.build_config
+import qibuild.config
 import qitoolchain.toolchain
+
+from qibuild.test.conftest import TestBuildWorkTree
 
 def test_read_profiles(build_worktree):
     build_worktree.configure_build_profile("foo", [("WITH_FOO", "ON")])
+    qibuild.config.add_build_config("foo", profiles=["foo"])
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
-    build_config.profiles = ["foo"]
+    build_config.set_active_config("foo")
     assert build_config.cmake_args == \
             ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_FOO=ON"]
 
 def test_users_flags_taken_last(build_worktree):
     build_worktree.configure_build_profile("foo", [("WITH_FOO", "ON")])
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
-    build_config.profiles = ["foo"]
+    qibuild.config.add_build_config("foo", profiles=["foo"])
+    build_config.set_active_config("foo")
     build_config.user_flags = [("WITH_FOO", "OFF")]
     assert build_config.cmake_args == \
             ["-DCMAKE_BUILD_TYPE=Debug",
@@ -59,13 +64,13 @@ def test_custom_build_dir(build_worktree):
     assert build_config.custom_build_dir == "mybuild"
 
 def test_read_default_config(build_worktree):
-    qitoolchain.toolchain.Toolchain("foo")
+    qibuild.config.add_build_config("foo")
     build_worktree.set_default_config("foo")
-    build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
-    assert build_config.toolchain.name == "foo"
+    cmake_build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
+    assert cmake_build_config.active_build_config.name == "foo"
 
 def test_read_default_config_in_global_config_file(build_worktree):
-    qitoolchain.toolchain.Toolchain("foo")
+    qibuild.config.add_build_config("foo")
     qibuild_xml = qisys.sh.get_config_path("qi", "qibuild.xml")
     tree = qisys.qixml.read(qibuild_xml)
     root = tree.getroot()
@@ -75,8 +80,10 @@ def test_read_default_config_in_global_config_file(build_worktree):
     assert defaults_elem is not None
     defaults_elem.set("config", "foo")
     qisys.qixml.write(root, qibuild_xml)
-    build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
-    assert build_config.toolchain.name == "foo"
+
+
+    cmake_build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
+    assert cmake_build_config.active_build_config.name == "foo"
 
 
 def test_use_specific_generator_from_default_config(build_worktree):
@@ -134,8 +141,8 @@ def test_build_env(build_worktree):
     assert r"c:\swig" in path
     assert r"c:\mingw\bin" in path
 
-def test_local_cmake(build_worktree, toolchains):
-    toolchains.create("foo")
+def test_local_cmake(build_worktree):
+    qibuild.config.add_build_config("foo")
     foo_cmake = os.path.join(build_worktree.root, ".qi", "foo.cmake")
     with open(foo_cmake, "w") as fp:
         fp.write("")
@@ -153,11 +160,13 @@ def test_local_and_remote_profiles(build_worktree):
     local_xml = build_worktree.qibuild_xml
     qibuild.profile.configure_build_profile(local_xml, "foo", [("WITH_FOO", "ON")])
     build_config = build_worktree.build_config
+    qibuild.config.add_build_config("bar", profiles=["bar"])
+    qibuild.config.add_build_config("foo", profiles=["foo"])
 
-    build_config.profiles = ["bar"]
+    build_config.set_active_config("bar")
     assert build_config._profile_flags == [("WITH_BAR", "ON")]
 
-    build_config.profiles = ["foo"]
+    build_config.set_active_config("foo")
     assert build_config._profile_flags == [("WITH_FOO", "ON")]
 
 def test_overwriting_remote_profiles(build_worktree):
@@ -171,5 +180,16 @@ def test_overwriting_remote_profiles(build_worktree):
     qibuild.profile.configure_build_profile(local_xml, "bar", [("WITH_BAR", "OFF")])
     build_config = build_worktree.build_config
 
-    build_config.profiles = ["bar"]
+    qibuild.config.add_build_config("bar", profiles=["bar"])
+    build_config.set_active_config("bar")
     assert build_config._profile_flags == [("WITH_BAR", "OFF")]
+
+def test_profiles_from_config(cd_to_tmpdir):
+    qibuild.config.add_build_config("foo", profiles=["bar"])
+    build_worktree = TestBuildWorkTree()
+    local_xml = build_worktree.qibuild_xml
+    qibuild.profile.configure_build_profile(local_xml, "bar", [("WITH_BAR", "ON")])
+    build_worktree.set_active_config("foo")
+    build_config = build_worktree.build_config
+    assert build_config.profiles == ["bar"]
+    assert build_config.cmake_args == ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_BAR=ON"]

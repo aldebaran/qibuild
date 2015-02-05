@@ -31,12 +31,11 @@ def do(args):
     else:
         ui.info("Would remove toolchain", ui.blue, tc.name)
         return
-    # Also remove default config from global qibuild.xml file, so
-    # that we don't get a default config pointing to a non-existing
-    # toolchain
+
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read()
-    for worktree in qibuild_cfg.worktrees.values():
-        if worktree.defaults.config == args.name:
-            qibuild_cfg.set_default_config_for_worktree(worktree.path, None)
+    build_configs = qibuild_cfg.configs.values()
+    for build_config in build_configs:
+        if build_config.toolchain == tc.name:
+            build_config.toolchain = None
     qibuild_cfg.write()

@@ -7,6 +7,7 @@ import subprocess
 
 import qisys.command
 import qibuild.cmake
+import qibuild.config
 import qibuild.find
 import qisrc.git
 import qitoolchain
@@ -199,6 +200,7 @@ def test_using_dash_s_with_path_conf(qibuild_action):
 
 def test_path_conf_contains_toolchain_paths(qibuild_action, toolchains):
     toolchains.create("foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
     toolchains.add_package("foo", "bar")
     foo_tc = qitoolchain.get_toolchain("foo")
     bar_path = foo_tc.get_package("bar").path

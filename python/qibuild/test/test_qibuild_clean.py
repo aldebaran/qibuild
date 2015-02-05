@@ -6,6 +6,7 @@ import os
 import py
 
 import qisys.sh
+import qibuild.config
 import qibuild.profile
 
 def test_clean_build_dir(qibuild_action):
@@ -16,11 +17,11 @@ def test_clean_build_dir(qibuild_action):
     qibuild_action("clean", "-f", "world")
     assert not os.path.exists(world_proj.build_directory)
 
-def test_only_clean_one_build_dir(qibuild_action, toolchains):
+def test_only_clean_one_build_dir(qibuild_action):
+    qibuild.config.add_build_config("foo")
     build_worktree = qibuild_action.build_worktree
     qibuild_action.add_test_project("world")
     world_proj = build_worktree.get_build_project("world")
-    toolchains.create("foo")
     qibuild_action("configure", "world")
     qibuild_action("configure", "-c", "foo", "world")
 
@@ -29,11 +30,11 @@ def test_only_clean_one_build_dir(qibuild_action, toolchains):
     build_worktree.set_active_config("foo")
     assert not os.path.exists(world_proj.build_directory)
 
-def test_cleaning_all_build_dirs(qibuild_action, toolchains):
+def test_cleaning_all_build_dirs(qibuild_action):
+    qibuild.config.add_build_config("foo")
     build_worktree = qibuild_action.build_worktree
     build_config = build_worktree.build_config
     world_proj = qibuild_action.add_test_project("world")
-    toolchains.create("foo")
     qibuild_action("configure", "world")
     qibuild_action("configure", "-c", "foo", "world")
     qibuild_action("configure", "--release", "-c", "foo", "world")
@@ -45,38 +46,19 @@ def test_cleaning_all_build_dirs(qibuild_action, toolchains):
     build_config.build_type = "Release"
     assert not os.path.exists(world_proj.build_directory)
 
-def test_clean_local_profiles(qibuild_action, toolchains, interact):
-    build_worktree = qibuild_action.build_worktree
-    build_worktree.configure_build_profile("a", [("A", "ON")])
-    build_worktree.configure_build_profile("b", [("B", "ON")])
-    toolchains.create("foo")
+def test_cleaning_unknown_configs(qibuild_action, toolchains, interact):
+    qibuild.config.add_build_config("a")
+    qibuild.config.add_build_config("b")
     world_proj = qibuild_action.add_test_project("world")
     # pylint: disable-msg=E1101
     world_path = py.path.local(world_proj.path)
-    build_foo_a = world_path.ensure("build-foo-a", dir=True)
-    build_foo_b = world_path.ensure("build-foo-b", dir=True)
-    build_foo_a_b = world_path.ensure("build-foo-a-b", dir=True)
-    build_foo_c = world_path.ensure("build-foo-c", dir=True)
+    build_a = world_path.ensure("build-a", dir=True)
+    build_b = world_path.ensure("build-b", dir=True)
+    build_c = world_path.ensure("build-c", dir=True)
     qibuild_action("clean", "-z", "--all", "--force")
-    assert build_foo_a.check(dir=False)
-    assert build_foo_b.check(dir=False)
-    assert build_foo_a_b.check(dir=False)
-    assert build_foo_c.check(dir=True)
+    assert build_a.check(dir=False)
+    assert build_b.check(dir=False)
+    assert build_c.check(dir=True)
     interact.answers = [True]
     qibuild_action("clean", "-x", "--all", "--force")
-    assert build_foo_c.check(dir=False)
-
-def test_clean_remote_profiles(qibuild_action, build_worktree, toolchains):
-    to_make = os.path.join(build_worktree.dot_qi, "manifests", "default")
-    qisys.sh.mkdir(to_make, recursive=True)
-    remote_xml = os.path.join(to_make, "manifest.xml")
-    toolchains.create("foo")
-    with open(remote_xml, "w") as fp:
-        fp.write("<qibuild />")
-    qibuild.profile.configure_build_profile(remote_xml, "bar", [("WITH_BAR", "ON")])
-    world_proj = qibuild_action.add_test_project("world")
-    # pylint: disable-msg=E1101
-    world_path = py.path.local(world_proj.path)
-    build_bar = world_path.ensure("build-foo-bar", dir=True)
-    qibuild_action("clean", "-z", "--force", "--all")
-    assert build_bar.check(dir=False)
+    assert build_c.check(dir=False)

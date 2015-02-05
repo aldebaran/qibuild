@@ -35,7 +35,6 @@ They are stored in ``~/.config/qi/qibuild.xml`` thusly:
     <qibuild>
       <configs>
         <config name="nao">
-          <build_type>release</build_type>
           <toolchain>atom<toolchain/>
           <profiles>
             <profile>nao</profile>

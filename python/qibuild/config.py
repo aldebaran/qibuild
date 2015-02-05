@@ -341,13 +341,15 @@ class LocalBuild:
         return res
 
 
-class Config:
+class BuildConfig:
     def __init__(self):
         self.name = None
         # The name of an ide
         self.ide = None
         self.env = Env()
         self.cmake = CMake()
+        self.toolchain = None
+        self.profiles = list()
 
     def parse(self, tree):
         name = tree.get("name")
@@ -362,6 +364,14 @@ class Config:
         cmake_tree = tree.find("cmake")
         if cmake_tree is not None:
             self.cmake.parse(cmake_tree)
+        toolchain_elem = tree.find("toolchain")
+        if toolchain_elem is not None:
+            self.toolchain = toolchain_elem.text
+        profiles_tree = tree.find("profiles")
+        if profiles_tree is not None:
+            profile_elems = profiles_tree.findall("profile")
+            for profile_elem in profile_elems:
+                self.profiles.append(profile_elem.text)
 
     def tree(self):
         tree = etree.Element("config")
@@ -372,6 +382,14 @@ class Config:
         tree.append(env_tree)
         cmake_tree = self.cmake.tree()
         tree.append(cmake_tree)
+        if self.toolchain:
+            toolchain_elem = etree.SubElement(tree, "toolchain")
+            toolchain_elem.text = self.toolchain
+        profiles_elem = etree.SubElement(tree, "profiles")
+        for profile in self.profiles:
+            profile_elem = etree.SubElement(profiles_elem, "profile")
+            profile_elem.text = profile
+
         return tree
 
     def __str__(self):
@@ -386,6 +404,12 @@ class Config:
         cmake_str = str(self.cmake)
         if cmake_str:
             res += ui.indent(cmake_str)
+            res += "\n"
+        if self.toolchain:
+            res += ui.indent("toolchain: " + self.toolchain)
+            res += "\n"
+        if self.profiles:
+            res += ui.indent("profiles: " + ", ".join(self.profiles))
             res += "\n"
         return res
 
@@ -457,7 +481,7 @@ class QiBuildConfig:
         # Parse configs:
         config_trees = self.tree.findall("config")
         for config_tree in config_trees:
-            config = Config()
+            config = BuildConfig()
             config.parse(config_tree)
             self.configs[config.name] = config
 
@@ -848,3 +872,21 @@ def get_build_env():
     envsetter = qisys.envsetter.EnvSetter()
     envsetter.read_config(qibuild_cfg)
     return envsetter.get_build_env()
+
+def add_build_config(name, toolchain=None, profiles=None,
+                     ide=None, cmake_generator=None):
+    """ Add a new build config to the list """
+    qibuild_cfg = QiBuildConfig()
+    qibuild_cfg.read(create_if_missing=True)
+
+    build_config = BuildConfig()
+    build_config.name = name
+    build_config.toolchain = toolchain
+    if profiles:
+        build_config.profiles = profiles
+    if cmake_generator:
+        build_config.cmake.generator = cmake_generator
+    if ide:
+        build_config.ide = ide
+    qibuild_cfg.add_config(build_config)
+    qibuild_cfg.write()

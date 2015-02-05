@@ -19,16 +19,17 @@ class CMakeBuildConfig(object):
 
     """
     def __init__(self, build_worktree):
-        self.active_config = None
         self.build_worktree = build_worktree
         self.build_type = "Debug"
+        self.active_build_config = None
         self.custom_build_dir = None
         self.user_flags = list()
         self._profiles = list()
         self._profile_flags = list()
         self.verbose_make = False
         self._default_config = None
-        self.qibuild_cfg = self.read_global_qibuild_settings()
+        self.qibuild_cfg = qibuild.config.QiBuildConfig()
+        self.qibuild_cfg.read(create_if_missing=True)
         self._cmake_generator = None
         self.read_local_settings()
         self.num_jobs = None
@@ -38,11 +39,6 @@ class CMakeBuildConfig(object):
     def profiles(self):
         return self._profiles
 
-    @profiles.setter
-    def profiles(self, value):
-        self._profiles = value
-        self.parse_profiles()
-
     @property
     def local_cmake(self):
         """ Path to the "custom" CMake file. Its content will be added
@@ -50,10 +46,10 @@ class CMakeBuildConfig(object):
 
         :returns: None if the custom CMake file does not exist
         """
-        if not self.active_config:
+        if not self.active_build_config:
             return None
         custom_cmake = os.path.join(self.build_worktree.root, ".qi",
-                                    self.active_config + ".cmake")
+                                    self.active_build_config.name + ".cmake")
         if os.path.exists(custom_cmake):
             return custom_cmake
         else:
@@ -67,8 +63,10 @@ class CMakeBuildConfig(object):
         """
         if self._toolchain:
             return self._toolchain
-        if self.active_config:
-            self._toolchain = qitoolchain.get_toolchain(self.active_config)
+        if self.active_build_config:
+            toolchain_name = self.active_build_config.toolchain
+            if toolchain_name:
+                self._toolchain = qitoolchain.get_toolchain(toolchain_name)
             return self._toolchain
         else:
             return None
@@ -127,18 +125,12 @@ class CMakeBuildConfig(object):
         build setting of the worktree: the name of the toolchain,
         the build profiles, and the build type (debug/release)
         """
-        parts = [prefix]
-        if self.active_config:
-            parts.append(self.active_config)
+        res = prefix + "-"
+        if self.active_build_config:
+            res += self.active_build_config.name
         else:
-            parts.append("sys-%s-%s" % (platform.system().lower(),
-                                        platform.machine().lower()))
-        for profile in self.profiles:
-            parts.append(profile)
-
-        if self.build_type and self.build_type != "Debug":
-            parts.append(self.build_type.lower())
-        return "-".join(parts)
+            res += "system"
+        return res
 
     @property
     def cmake_args(self):
@@ -165,12 +157,6 @@ class CMakeBuildConfig(object):
         self.read_local_settings()
         return self._default_config
 
-    def read_global_qibuild_settings(self):
-        """ Read ``~/.config/qi/qibuild.xml`` """
-        qibuild_cfg = qibuild.config.QiBuildConfig()
-        qibuild_cfg.read(create_if_missing=True)
-        return qibuild_cfg
-
     def read_local_settings(self):
         """ Read ``<worktree>/.qi/qibuild.xml`` """
         local_settings = qibuild.config.LocalSettings()
@@ -186,20 +172,18 @@ class CMakeBuildConfig(object):
             default_config = self.qibuild_cfg.get_default_config_for_worktree(
                                     self.build_worktree.root)
         if default_config:
-            try:
-                qitoolchain.get_toolchain(default_config)
-            except Exception:
+            matching_config = self.qibuild_cfg.configs.get(default_config)
+            if not matching_config:
                 mess = """ \
 Incorrect config detected for worktree in {build_worktree.root}
 Default config is {default_config} but this does not match any
-toolchain name
+config in ~/.config/qi/qibuild.xml
 """
                 mess = mess.format(build_worktree=self.build_worktree,
                                 default_config=default_config)
                 raise Exception(mess)
-        self._default_config = default_config
-        self.qibuild_cfg.set_active_config(default_config)
-        self.set_active_config(default_config)
+            self._default_config = matching_config.name
+            self.set_active_config(matching_config.name)
 
     def parse_profiles(self):
         self._profile_flags = list()
@@ -211,15 +195,21 @@ toolchain name
             flags = known_profiles[name].cmake_flags
             self._profile_flags.extend(flags)
 
-    def set_active_config(self, active_config):
+    def set_active_config(self, config_name):
         """ Set the active configuration. This should match an
-        existing toolchain name.
+        existing config name
 
         Used when running ``qibuild configure -c <config>``
 
         """
-        self.active_config = active_config
-        self.qibuild_cfg.set_active_config(active_config)
+        self.qibuild_cfg.read()
+        self.active_build_config = self.qibuild_cfg.configs.get(config_name)
+        if not self.active_build_config:
+            raise Exception("No such build config: %s" % config_name)
+        self.qibuild_cfg.set_active_config(config_name)
+        if self.active_build_config:
+            self._profiles = self.active_build_config.profiles
+            self.parse_profiles()
 
 class NoSuchProfile(Exception):
     """ The profile specified by the user cannot be found """

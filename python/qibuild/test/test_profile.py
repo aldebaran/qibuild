@@ -3,7 +3,9 @@
 ## found in the COPYING file.
 
 
+import qibuild.config
 import qibuild.profile
+
 from qisrc.test.conftest import qisrc_action, git_server
 from qibuild.test.conftest import TestBuildWorkTree
 
@@ -50,5 +52,7 @@ def test_using_custom_profile(qibuild_action, qisrc_action, git_server):
     qibuild_xml = build_worktree.qibuild_xml
     qibuild.profile.configure_build_profile(qibuild_xml, "bar", [("WITH_BAR", "ON")])
     build_worktree.create_project("spam")
-    qibuild_action("configure", "spam", "--profile", "foo", "--summarize-options")
-    qibuild_action("configure", "spam", "--profile", "bar", "--summarize-options")
+    qibuild.config.add_build_config("foo", profiles=["foo"])
+    qibuild.config.add_build_config("bar", profiles=["bar"])
+    qibuild_action("configure", "spam", "--config", "foo", "--summarize-options")
+    qibuild_action("configure", "spam", "--config", "bar", "--summarize-options")

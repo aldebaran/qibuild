@@ -4,6 +4,7 @@
 import os
 
 import qisys.sh
+import qibuild.config
 import qitoolchain
 
 def test_simple(qitoolchain_action, tmpdir, toolchains):
@@ -16,6 +17,7 @@ def test_simple(qitoolchain_action, tmpdir, toolchains):
                              "--name", "json-c",
                              "--batch", json_c_bz2_path)
     qitoolchain_action("create", "test")
+    qibuild.config.add_build_config("test", toolchain="test")
     qitoolchain_action("add-package", "--config", "test", res)
     toolchain = qitoolchain.get_toolchain("test")
     assert toolchain.get_package("json-c")

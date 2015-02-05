@@ -516,24 +516,15 @@ The following tools were not found: {missing}\
 
         # build directory name pattern:
         # 'build-<tc_name>[-<profile>]...[-release]'
-        qibuild_xml = self.build_worktree.qibuild_xml
-        profiles = self.build_worktree.get_known_profiles()
-        profiles = list(profiles.keys())
-        profiles = [re.escape(x) for x in profiles]
-        toolchains = qitoolchain.toolchain.get_tc_names()
-        toolchains.append("sys-%s-%s" % (platform.system().lower(),
-                                        platform.machine().lower()))
-        toolchains = [re.escape(x) for x in toolchains]
-        bdir_regex = r"^build"
-        bdir_regex += r"(-(" + "|".join(toolchains) + "))"
-        bdir_regex += r"(-(" + "|".join(profiles) + "))*"
-        bdir_regex += r"(-release)?$"
-        bdir_re = re.compile(bdir_regex)
-        ui.debug("matching:", bdir_regex)
+        build_names = ["build-system"]
+        qibuild_cfg = qibuild.config.QiBuildConfig()
+        qibuild_cfg.read(create_if_missing=True)
+        config_names = qibuild_cfg.configs.keys()
+        build_names.extend(["build-" + x for x in config_names])
         dirs = os.listdir(self.path)
         ret = {'known_configs': list(), 'unknown_configs': list()}
         for bdir in dirs:
-            if bdir_re.match(bdir):
+            if bdir in build_names:
                 ret['known_configs'].append(bdir)
             elif bdir.startswith("build-"):
                 ret['unknown_configs'].append(bdir)

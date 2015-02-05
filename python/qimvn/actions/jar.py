@@ -24,7 +24,8 @@ def do(args):
 
     # Get project list
     build_worktree = qibuild.parsers.get_build_worktree(args)
-    build_worktree.set_active_config(args.config)
+    if args.config:
+        build_worktree.set_active_config(args.config)
     projects = build_worktree.build_projects
 
     paths = list()

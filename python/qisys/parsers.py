@@ -67,19 +67,8 @@ def build_parser(parser, group=None, include_worktree_parser=True):
         worktree_parser(parser)
     if not group:
         group = parser.add_argument_group("build type options")
-    group.add_argument("--release", action="store_const", const="Release",
-        dest="build_type",
-        help="Build in release")
-    group.add_argument("--debug", action="store_const", const="Debug",
-        dest="build_type",
-        help="Build in debug, default")
     group.add_argument("-c", "--config",
         help="The configuration to use. ")
-    group.add_argument("-p", "--profile", dest="profiles", action="append",
-        metavar="PROFILE",
-        help="A profile to use. "
-             "It can appear several times. "
-             "It should match a declaration in .qi/qibuild.xml")
     parser.set_defaults(build_type="Debug")
 
 def deploy_parser(parser):

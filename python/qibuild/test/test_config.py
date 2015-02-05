@@ -159,7 +159,7 @@ class QiBuildConfig(unittest.TestCase):
 <qibuild version="1" />
 """
         qibuild_cfg = cfg_from_string(xml)
-        config = qibuild.config.Config()
+        config = qibuild.config.BuildConfig()
         config.name = "linux32"
         config.env.path = "/path/to/swig32"
         qibuild_cfg.add_config(config)
@@ -171,7 +171,7 @@ class QiBuildConfig(unittest.TestCase):
 
     def test_add_cmake_config(self):
         qibuild_cfg = cfg_from_string("<qibuild />")
-        config = qibuild.config.Config()
+        config = qibuild.config.BuildConfig()
         config.name = "mac64"
         config.cmake.generator = "Xcode"
         qibuild_cfg.add_config(config)
@@ -270,7 +270,7 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        config = qibuild.config.Config()
+        config = qibuild.config.BuildConfig()
         config.name = "linux32"
         config.cmake.generator = "Code::Blocks"
         qibuild_cfg.add_config(config)
@@ -523,3 +523,39 @@ def test_set_default_config_for_worktree(tmpdir):
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(global_xml.strpath)
     assert qibuild_cfg.get_default_config_for_worktree("/path/to/a") == "foo"
+
+def test_parse_build_configs(tmpdir):
+    global_xml = tmpdir.join("global.xml")
+    global_xml.write("""
+<qibuild>
+  <config name="nao-arm">
+    <toolchain>arm</toolchain>
+    <profiles>
+      <profile>nao</profile>
+      <profile>arm</profile>
+    </profiles>
+  </config>
+</qibuild>
+""")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(global_xml.strpath)
+    nao_arm = qibuild_cfg.configs["nao-arm"]
+    assert nao_arm.toolchain == "arm"
+    assert nao_arm.profiles == ["nao", "arm"]
+
+def test_write_build_configs(tmpdir):
+    global_xml = tmpdir.join("global.xml")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(global_xml.strpath, create_if_missing=True)
+    foo_config = qibuild.config.BuildConfig()
+    foo_config.name = "foo"
+    foo_config.toolchain = "bar"
+    foo_config.profiles = ["spam", "eggs"]
+    qibuild_cfg.add_config(foo_config)
+    qibuild_cfg.write(global_xml.strpath)
+    qibuild_cfg2 = qibuild.config.QiBuildConfig()
+    qibuild_cfg2.read(global_xml.strpath)
+    foo_config2 = qibuild_cfg2.configs.get("foo")
+    assert foo_config2.name == "foo"
+    assert foo_config2.toolchain == "bar"
+    assert foo_config2.profiles == ["spam", "eggs"]

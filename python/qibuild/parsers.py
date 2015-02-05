@@ -60,7 +60,12 @@ def cmake_configure_parser(parser):
                         help="include debug information in binaries. Overrides --debug")
     group.add_argument("--without-debug-info", action="store_false", dest="debug_info",
                         help="remove debug information from binaries. Overrides --release")
-
+    group.add_argument("--release", action="store_const", const="Release",
+        dest="build_type",
+        help="Build in release")
+    group.add_argument("--debug", action="store_const", const="Debug",
+        dest="build_type",
+        help="Build in debug, default")
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
                         werror=False, profiling=False,
                         trace_cmake=False, debug_info=None)
@@ -178,8 +183,6 @@ def get_build_config(build_worktree, args):
     if args.config:
         build_config.set_active_config(args.config)
     build_config.build_type = args.build_type
-    if args.profiles:
-        build_config.profiles = args.profiles
     if hasattr(args, "cmake_generator"):
         build_config.cmake_generator = args.cmake_generator
     if hasattr(args, "verbose_make"):

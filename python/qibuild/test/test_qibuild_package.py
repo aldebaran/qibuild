@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 import os
 
+import qibuild.config
 import qitoolchain.qipackage
 
 from qibuild.test.conftest import QiBuildAction
@@ -23,6 +24,7 @@ def test_using_toolchain(cd_to_tmpdir):
     qibuild_action.add_test_project("hello")
     world_package = qibuild_action("package", "world")
     qitoolchain_action("create", "foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
     qitoolchain_action("add-package", "-c", "foo", world_package)
     build_worktree.worktree.remove_project("world", from_disk=True)
 

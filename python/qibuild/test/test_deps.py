@@ -5,6 +5,7 @@
 
 """
 
+import qibuild.config
 from qibuild.deps import DepsSolver
 
 
@@ -33,6 +34,7 @@ def test_runtime_deps(build_worktree):
 
 def test_find_packages_in_toolchain(build_worktree, toolchains):
     toolchains.create("foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
     world_package = toolchains.add_package("foo", "world")
     hello = build_worktree.create_project("hello", build_depends=["world"])
     build_worktree.set_active_config("foo")
@@ -42,6 +44,7 @@ def test_find_packages_in_toolchain(build_worktree, toolchains):
 
 def test_prefer_sources_over_packages(build_worktree, toolchains):
     toolchains.create("foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
     world_package = toolchains.add_package("foo", "world")
     world_proj = build_worktree.create_project("world")
     hello_proj  = build_worktree.create_project("hello", build_depends=["world"])

@@ -33,6 +33,7 @@ def test_check_configure_called_on_runtime_deps(build_worktree):
 def test_default_install(build_worktree, toolchains, tmpdir):
     hello_proj = build_worktree.create_project("hello", run_depends="bar")
     toolchains.create("foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
     build_worktree.set_active_config("foo")
     toolchains.add_package("foo", "bar")
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, [hello_proj])
