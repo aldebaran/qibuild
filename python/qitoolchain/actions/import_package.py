@@ -9,8 +9,9 @@
 import os
 
 from qisys import ui
-import qisys
+import qisys.parsers
 import qitoolchain
+import qitoolchain.parsers
 from qitoolchain.convert import convert_package
 import qitoolchain.qipackage
 
@@ -23,14 +24,14 @@ def configure_parser(parser):
     parser.add_argument("--name", required=True,
                         help="The name of the package")
     parser.add_argument("package_path", metavar='PACKAGE_PATH',
-                        help="""\
-The path to the package (archive  or root install directory) to be convert.
-If PACKAGE_PATH points to a directory, then NAME is a mandatory.""")
+                        help="The path to the package to be converted")
     parser.add_argument("-d", "--directory", dest="dest_dir",
                         metavar='DESTDIR', help="""\
-destination directory of the qiBuild package after convertsion
+destination directory of the qiBuild package after conversion
 (default: aside the original package)""")
-    return
+    parser.add_argument("--batch", dest="interactive", action="store_false",
+                        help="Do not prompt for cmake module edition")
+    parser.set_defaults(interactive=True)
 
 
 def do(args):
@@ -43,7 +44,8 @@ def do(args):
     """
     name = args.name
     package_path = args.package_path
-    converted_package_path = convert_package(package_path, name, interactive=True)
+    converted_package_path = convert_package(package_path, name,
+                                             interactive=args.interactive)
     toolchain = qitoolchain.parsers.get_toolchain(args)
     tc_packages_path = qitoolchain.toolchain.get_default_packages_path(toolchain.name)
     message = """
@@ -57,6 +59,6 @@ Importing '{1}' in the toolchain {0} ...
         extracted = qisys.archive.extract(converted_package_path, tmp, quiet=True,
                                           strict_mode=False)
         qisys.sh.install(extracted, package_dest, quiet=True)
-    qibuild_package = qitoolchain.qipackage.QiPackage(name, package_dest)
+    qibuild_package = qitoolchain.qipackage.QiPackage(name, path=package_dest)
     toolchain.add_package(qibuild_package)
     ui.info("done")
