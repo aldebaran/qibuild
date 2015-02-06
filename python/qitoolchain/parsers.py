@@ -29,7 +29,10 @@ def get_toolchain(args):
         try:
             build_worktree = qibuild.parsers.get_build_worktree(args)
             active_build_config = build_worktree.build_config.active_build_config
-            config = active_build_config.toolchain
+            if active_build_config:
+                config = active_build_config.toolchain
+            else:
+                config = None
         except qisys.worktree.NotInWorkTree:
             config = None
 
@@ -37,7 +40,8 @@ def get_toolchain(args):
         mess  = "Could not find which config to use.\n"
         mess += "(not in a work tree or no default config in "
         mess += "current worktree configuration)\n"
-        mess += "Please specify a configuration with -c \n"
+        mess += "Please specify a configuration with -c, --config \n"
+        mess += "or a toolchain name with -t, --toolchain"
         raise Exception(mess)
 
 
@@ -50,4 +54,3 @@ def get_toolchain(args):
     if not tc_name:
         raise Exception("config %s has no toolchain" % config)
     return qitoolchain.get_toolchain(tc_name)
-
