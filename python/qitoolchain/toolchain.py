@@ -92,6 +92,10 @@ class Toolchain(object):
                 tc_file = qisys.sh.to_posix_path(package.toolchain_file)
                 lines.append('include("%s")\n' % tc_file)
         for package in self.packages:
+            if not package.path:
+                raise Exception(""" \
+Incorrect database configuration in %s: no path for package %s
+""" % (self.db.db_path, package.name))
             package_path = qisys.sh.to_posix_path(package.path)
             lines.append('list(INSERT CMAKE_PREFIX_PATH 0 "%s")\n' % package_path)
             # For some reason CMAKE_FRAMEWORK_PATH does not follow CMAKE_PREFIX_PATH
