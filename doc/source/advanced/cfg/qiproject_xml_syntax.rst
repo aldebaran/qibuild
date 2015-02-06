@@ -27,7 +27,7 @@ This is the basis for every qiBuild tool.
 Each tool then parses the same file using its associated tags,
 ignoring the rest.
 
-This helps having loosing coupled dependencies between the various tools.
+This helps having loosely coupled dependencies between the various tools.
 
 
 qibuild

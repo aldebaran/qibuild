@@ -73,7 +73,7 @@ qi_persistent_set(SDK_DIR ${QI_SDK_DIR})
 
 function(win32_copy_target)
   qi_deprecated("win32_copy_target is deprecated.
-  You sould even not have to call it now :)
+  You should even not have to call it now :)
   ")
 endfunction()
 

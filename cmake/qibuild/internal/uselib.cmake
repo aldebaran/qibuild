@@ -109,9 +109,9 @@ function(_qi_use_lib_get_deps dep_list_name)
 
   #We remove duplicate here..
   #Problem: If libA and libB each depends on libC, we will have "A C B C".
-  # libC need to be after libA and libB, so we need to take each libC occurence into acount,
+  # libC need to be after libA and libB, so we need to take each libC occurrence into acount,
   # in fact, we could optimise if we want and only take the last one,
-  # but REMOVE_DUPLICATES keep the first occurence
+  # but REMOVE_DUPLICATES keep the first occurrence
   # so ... we reverse the list, remove duplicate and reverse again!
   list(REVERSE ${dep_list_name})
   list(REMOVE_DUPLICATES ${dep_list_name})

@@ -618,7 +618,7 @@ Please do not overlook those. Often, when writing code you do something like:
     try:
         something_really_complicated()
     except SomeStrangeError, e:
-        log.error("Error occured: %s", e)
+        log.error("Error occurred: %s", e)
 
 Because you are in an hurry, and just are thinking "Great, I've handled the
 exception, now I can go back to write some code..."
