@@ -7,6 +7,7 @@ qiBuild tutorials
     qisrc/git_projects
     qisrc/templates
     qibuild/tutorial
+    qitoolchain/tutorial
     qidoc/tutorial
     qilinguist/tutorial
     qipy/tutorial
