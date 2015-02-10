@@ -44,4 +44,7 @@ class Svn(object):
             if line.startswith("!"):
                 rest = line.split()[1]
                 self.call("remove", rest)
+            if line.startswith("?"):
+                rest = line.split()[1]
+                self.call("add", rest)
         self.call("commit", "--message", message)
