@@ -38,7 +38,6 @@ class Svn(object):
             qisys.command.call(cmd, **kwargs)
 
     def commit_all(self, message):
-        self.call("add", ".", "--force")
         rc, out = self.call("status", raises=False)
         for line in out.splitlines():
             line = line.strip()
