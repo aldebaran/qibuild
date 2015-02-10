@@ -28,7 +28,7 @@ import qitest.conf
 import qitest.project
 
 
-def read_install_manifest(filepath, rootdir):
+def read_install_manifest(filepath):
     with open(filepath, "r") as f:
         res = [filename.strip() for filename in f.readlines()]
         res = [os.path.normpath(x) for x in res]
@@ -393,7 +393,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         else:
             self.build(target="install", env=build_env)
             manifest_path = os.path.join(self.build_directory, "install_manifest.txt")
-            installed.extend(read_install_manifest(manifest_path, destdir))
+            installed.extend(read_install_manifest(manifest_path))
         if "test" in components:
             self._install_qitest_json(destdir)
 
@@ -414,7 +414,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         qisys.command.call(["cmake"] + cmake_args, cwd=self.build_directory,
                             env=build_env)
         manifest_path = os.path.join(self.build_directory, "install_manifest_%s.txt" % component)
-        installed = read_install_manifest(manifest_path, destdir)
+        installed = read_install_manifest(manifest_path)
         return installed
 
     def _install_qitest_json(self, destdir):
