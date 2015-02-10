@@ -2,6 +2,9 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+include("${_ROOT_DIR}/qt-tools-common.cmake")
+
 # This is called *before* any call to qi_use_lib() is made.
 # Here we need to define the qt macros, such as qt5_wrap_cpp,
 # qt5_add_resources, qt5_wrap_ui

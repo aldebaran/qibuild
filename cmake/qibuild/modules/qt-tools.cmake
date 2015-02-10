@@ -2,13 +2,14 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+include("${_ROOT_DIR}/qt-tools-common.cmake")
+
 # Hack here: we cannot integrate qmake in the
 # qt packages in the toolchains, because qmake will report
 # a path that probably does not exist, so we instead
 # look for moc and uic, and the copy-paste the macros from
 # QT_USE_FILE ...
-
-get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
 
 find_program(QT_MOC_EXECUTABLE NAMES moc-qt4 moc)
 find_program(QT_UIC_EXECUTABLE NAMES uic-qt4 uic)
