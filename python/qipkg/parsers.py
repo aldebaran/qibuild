@@ -41,8 +41,6 @@ def configure_builder(pml_builder, args):
     config_name = build_config.build_directory(prefix="py")
     python_worktree.config = config_name
 
-
 def configure_meta_builder(meta_builder, args):
     for pml_builder in meta_builder.pml_builders:
         configure_builder(pml_builder, args)
-

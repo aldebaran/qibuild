@@ -162,6 +162,9 @@ class PMLBuilder(object):
 
     def install(self, destination):
         """ Install every project to the given destination """
+        # Copy the manifest
+        qisys.sh.install(self.manifest_xml, destination)
+
         # Use every available builder to install
         for builder in self.builders:
             desc = desc_from_builder(builder)
@@ -189,11 +192,12 @@ class PMLBuilder(object):
         pml_translator.release()
         pml_translator.install(destination)
 
+
     def deploy(self, url):
         """ Deploy every project to the given url """
         qisys.remote.deploy(self.stage_path, url)
 
-    def make_package(self, output=None, with_breakpad=False):
+    def package(self, output=None, with_breakpad=False):
         """ Generate a package containing every project.
 
         :param: with_breakpad generate debug symbols for usage
@@ -208,9 +212,6 @@ class PMLBuilder(object):
             output = os.path.join(os.getcwd(), self.pkg_name + ".pkg")
 
         archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
-        #  Add the manifest
-        manifest_xml = self.manifest_xml
-        archive.write(manifest_xml, "manifest.xml")
 
         # Add everything from the staged path
         self.install(self.stage_path)

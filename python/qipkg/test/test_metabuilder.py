@@ -30,11 +30,8 @@ def test_meta_builder(qipkg_action):
         with_breakpad = True
     else:
         with_breakpad = False
-    pkg_path = meta_pml_builder.make_package(with_breakpad=with_breakpad)
-    contents = list()
-    archive = zipfile.ZipFile(pkg_path)
-    for fileinfo in archive.infolist():
-        contents.append(fileinfo.filename)
+    packages = meta_pml_builder.package(with_breakpad=with_breakpad)
+    contents = [os.path.basename(x) for x in packages]
     if with_breakpad:
         assert contents == ['a-0.1.pkg', 'a-0.1-symbols.zip', 'd-0.1.pkg']
     else:

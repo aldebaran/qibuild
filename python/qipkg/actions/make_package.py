@@ -23,4 +23,4 @@ def do(args):
     output = args.output
     with_breakpad = args.with_breakpad
     pml_builder = qipkg.parsers.get_pml_builder(args)
-    return pml_builder.make_package(output=output, with_breakpad=with_breakpad)
+    return pml_builder.package(output=output, with_breakpad=with_breakpad)

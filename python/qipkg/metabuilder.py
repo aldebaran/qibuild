@@ -56,7 +56,7 @@ class MetaPMLBuilder(object):
                     "Deploying", pml_builder.pml_path)
             pml_builder.deploy(url)
 
-    def make_package(self, with_breakpad=False, output=None):
+    def package(self, with_breakpad=False, output=None):
         """ Generate a package containing every package.
 
         :param: with_breakpad generate debug symbols for usage
@@ -68,18 +68,6 @@ class MetaPMLBuilder(object):
         for i, pml_builder in enumerate(self.pml_builders):
             ui.info(ui.green, "::", ui.reset, ui.bold, "[%i/%i]" % ((i + 1), n),
                     "Making package from", pml_builder.pml_path)
-            packages = pml_builder.make_package(with_breakpad=with_breakpad)
+            packages = pml_builder.package(with_breakpad=with_breakpad)
             all_packages.extend(packages)
-        if not output:
-            name = self.meta_package.name
-            version = self.meta_package.version
-            if version:
-                output = "%s-%s.mpkg" % (name, version)
-            else:
-                output = "%s.mpkg" % name
-        archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
-        for package in all_packages:
-            archive.write(package, arcname=os.path.basename(package))
-        archive.close()
-        ui.info(ui.green, "::", ui.reset, ui.bold, "Meta package generated in", output)
-        return output
+        return all_packages

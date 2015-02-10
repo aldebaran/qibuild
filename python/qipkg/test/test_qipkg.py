@@ -55,16 +55,13 @@ def test_meta(qipkg_action):
     meta_pml = os.path.join(meta_pkg_proj.path, "meta_pkg.mpml")
     qipkg_action("configure", meta_pml)
     qipkg_action("build", meta_pml)
-    pkg = qipkg_action("make-package", meta_pml)
-    qipkg_action("extract-package", pkg)
-
+    pkgs = qipkg_action("make-package", meta_pml)
     expected_paths = [
             "a-0.1.pkg",
             "d-0.1.pkg"
     ]
-    for path in expected_paths:
-        full_path = tmpdir.join("meta-0.1", path)
-        assert full_path.check(file=True)
+    actual_paths = [os.path.basename(x) for x in pkgs]
+    assert actual_paths == expected_paths
 
 
 def test_no_worktree_pure_pml(tmpdir, monkeypatch):

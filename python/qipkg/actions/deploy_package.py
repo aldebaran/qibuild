@@ -22,35 +22,29 @@ def configure_parser(parser):
 def do(args):
     urls = qisys.parsers.get_deploy_urls(args)
     pkg_path = args.pkg_path
-    if pkg_path.endswith(".mpkg"):
-        pkg_paths = extract_meta_package(pkg_path)
-    else:
-        pkg_paths = [pkg_path]
     for url in urls:
-        deploy(pkg_paths, url)
+        deploy(pkg_path, url)
 
-def deploy(pkg_paths, url):
-    for i, pkg_path in enumerate(pkg_paths):
-        ui.info_count(i, len(pkg_paths),
-                      ui.green, "Deploying",
-                      ui.reset, ui.blue, pkg_path,
-                      ui.reset, ui.green, "to",
-                      ui.reset, ui.blue, url.as_string)
-        pkg_name = qipkg.package.name_from_archive(pkg_path)
-        scp_cmd = ["scp",
-                   pkg_path,
-                   "%s@%s:" % (url.user, url.host)]
-        qisys.command.call(scp_cmd)
+def deploy(pkg_path, url):
+    ui.info(ui.green, "Deploying",
+            ui.reset, ui.blue, pkg_path,
+            ui.reset, ui.green, "to",
+            ui.reset, ui.blue, url.as_string)
+    pkg_name = qipkg.package.name_from_archive(pkg_path)
+    scp_cmd = ["scp",
+                pkg_path,
+                "%s@%s:" % (url.user, url.host)]
+    qisys.command.call(scp_cmd)
 
-        try:
-            _install_package(url, pkg_name, pkg_path)
-        except Exception as e:
-            ui.error("Unable to install package on target")
-            ui.error("Error was: ", e)
+    try:
+        _install_package(url, pkg_name, pkg_path)
+    except Exception as e:
+        ui.error("Unable to install package on target")
+        ui.error("Error was: ", e)
 
-        rm_cmd = ["ssh", "%s@%s" % (url.user, url.host),
-                  "rm", os.path.basename(pkg_path)]
-        qisys.command.call(rm_cmd)
+    rm_cmd = ["ssh", "%s@%s" % (url.user, url.host),
+                "rm", os.path.basename(pkg_path)]
+    qisys.command.call(rm_cmd)
 
 def _install_package(url, pkg_name, pkg_path):
     import qi
@@ -62,14 +56,3 @@ def _install_package(url, pkg_name, pkg_path):
     ret = package_manager.install(
             "/home/%s/%s" % (url.user, os.path.basename(pkg_path)))
     ui.info("PackageManager returned: ", ret)
-
-def extract_meta_package(mpkg_path):
-    res = list()
-    with zipfile.ZipFile(mpkg_path) as archive:
-        members = archive.infolist()
-        for (i, member) in enumerate(members):
-            if member.filename.endswith("-symbols.zip"):
-                continue
-            archive.extract(member)
-            res.append(member.filename)
-    return res
