@@ -29,7 +29,7 @@ def do(args):
 
     output_dir = args.output_dir
     if not output_dir:
-        output_dir = qisrc.templates.snake_case(project_name)
+        output_dir = qisrc.templates.attached_lower(project_name)
         output_dir = os.path.join(os.getcwd(), output_dir)
 
     if os.path.exists(output_dir):
