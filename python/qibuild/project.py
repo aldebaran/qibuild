@@ -424,7 +424,6 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         tests = qitest.conf.relocate_tests(self, tests)
         qitest.conf.write_tests(tests, os.path.join(destdir, "qitest.json"), append=True)
 
-
     def run_tests(self, **kwargs):
         test_project = self.to_test_project()
         test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
