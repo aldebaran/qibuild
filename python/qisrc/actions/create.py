@@ -8,21 +8,7 @@ import os
 import qisrc # for QISRC_ROOT_DIR
 from qisys import ui
 import qisys.parsers
-
-def copy_helper(project_name, directory):
-    """Create a new project in the specified directory.
-
-    """
-    # Read the templates for projects
-    template_dir = os.path.join(qisrc.QISRC_ROOT_DIR, "templates", "project")
-    template_dir = os.path.abspath(template_dir)
-
-    for file_name in os.listdir(template_dir):
-        with open(os.path.join(template_dir, file_name), "r") as old_file:
-            old_contents = old_file.read()
-        new_contents = old_contents.replace("@project_name@", project_name)
-        with open(os.path.join(directory, file_name), "w") as new_file:
-            new_file.write(new_contents)
+import qisrc.templates
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -30,29 +16,37 @@ def configure_parser(parser):
     parser.add_argument("project_name",
         help="The name of the project. "
              "The project will be created in QI_WORK_TREE/<name> ")
+    parser.add_argument("-i", "--input", "--template-path", dest="template_path")
     parser.add_argument("--git", action="store_true",
         help="Create a git repository")
-
+    parser.add_argument("-o", "--output", dest="output_dir")
 
 def do(args):
     """"Create a new project """
     worktree = qisys.parsers.get_worktree(args)
 
     project_name = os.path.basename(args.project_name)
-    project_path = os.path.join(os.getcwd(), project_name)
 
-    if os.path.exists(project_path):
-        raise Exception("%s already exists" % project_path)
-    os.mkdir(project_path)
-    copy_helper(project_name, project_path)
+    output_dir = args.output_dir
+    if not output_dir:
+        output_dir = qisrc.templates.snake_case(project_name)
+        output_dir = os.path.join(os.getcwd(), output_dir)
+
+    if os.path.exists(output_dir):
+        raise Exception("%s already exists" % output_dir)
+
+    template_path = args.template_path
+    if not template_path:
+        template_path = os.path.join(qisrc.QISRC_ROOT_DIR, "templates", "project")
+    qisrc.templates.process(template_path, output_dir, project_name=project_name)
 
     if args.git:
-        qisys.command.call(["git", "init"], cwd=project_path)
-        with open(os.path.join(project_path, ".gitignore"), "w") as fp:
+        qisys.command.call(["git", "init"], cwd=output_dir)
+        with open(os.path.join(output_dir, ".gitignore"), "w") as fp:
             fp.write("build-*\n")
-        qisys.command.call(["git" , "add" , "."], cwd=project_path)
-        qisys.command.call(["git" , "commit" , "-m" , "initial commit"], cwd=project_path)
+        qisys.command.call(["git" , "add" , "."], cwd=output_dir)
+        qisys.command.call(["git" , "commit" , "-m" , "initial commit"], cwd=output_dir)
 
-    ui.info(ui.green, "New project initialized in", ui.bold,  project_path)
-    worktree.add_project(project_path)
-    return worktree.get_project(project_path)
+    ui.info(ui.green, "New project initialized in", ui.bold,  output_dir)
+    worktree.add_project(output_dir)
+    return worktree.get_project(output_dir)
