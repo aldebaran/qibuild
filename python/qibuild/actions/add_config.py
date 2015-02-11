@@ -1,0 +1,36 @@
+## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
+
+"""Add a build configuration"""
+
+from qisys import ui
+import qisys.parsers
+import qibuild.worktree
+
+def configure_parser(parser):
+    qisys.parsers.worktree_parser(parser)
+    parser.add_argument("name")
+    parser.add_argument("-t", "--toolchain", dest="toolchain")
+    parser.add_argument("-p", "--profile", dest="profiles", action="append")
+    parser.add_argument("--ide")
+    parser.add_argument("-G", "--cmake-generator", dest="cmake_generator")
+    parser.add_argument("--default", action="store_true")
+    parser.set_defaults(default=False)
+
+def do(args):
+    worktree = qisys.parsers.get_worktree(args, raises=False)
+    name = args.name
+    toolchain = args.toolchain
+    profiles = args.profiles
+    ide = args.ide
+    cmake_generator = args.cmake_generator
+
+    qibuild.config.add_build_config(name, toolchain=toolchain, profiles=profiles,
+                                    ide=ide, cmake_generator=cmake_generator)
+    if args.default:
+        if worktree:
+            build_worktree = qibuild.worktree.BuildWorkTree(worktree)
+            build_worktree.set_default_config(name)
+        else:
+            raise Exception("Must be in a worktree to use --default")

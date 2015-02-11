@@ -5,59 +5,34 @@
 
 import subprocess
 
-import qisys
+import qisys.parsers
 import qibuild.parsers
 import qibuild.wizard
 from qisys import ui
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qibuild.parsers.cmake_build_parser(parser)
-    subparsers = parser.add_subparsers(dest="config_action", title="actions")
-
-    add_parser = subparsers.add_parser("add")
-    add_parser.add_argument("name")
-    add_parser.add_argument("-t", "--toolchain", dest="toolchain")
-    add_parser.add_argument("-p", "--profile", dest="profiles", action="append")
-    add_parser.add_argument("--ide")
-    add_parser.add_argument("-G", "--cmake-generator", dest="cmake_generator")
-    add_parser.add_argument("--default", action="store_true")
-    add_parser.set_defaults(default=False)
-
-    remove_parser = subparsers.add_parser("remove")
-    remove_parser.add_argument("name")
-
-    show_parser = subparsers.add_parser("show")
-    show_parser.add_argument("--edit", action="store_true",
+    qisys.parsers.worktree_parser(parser)
+    parser.add_argument("--edit", action="store_true",
         help="edit the configuration")
-    show_parser.add_argument("--local", action="store_true", dest="is_local",
+    parser.add_argument("--local", action="store_true", dest="is_local",
         help="only display or edit the local configuration")
-    show_parser.set_defaults(local=False)
-
-    wizard_parser = subparsers.add_parser("wizard")
+    parser.add_argument("--wizard", action="store_true",
+        help="run a wizard to edit the configuration")
+    parser.set_defaults(local=False)
 
 def do(args):
     """Main entry point"""
-    build_worktree = None
-    try:
-        build_worktree = qibuild.parsers.get_build_worktree(args)
-    except qisys.worktree.NotInWorkTree:
-        pass
+    worktree = qisys.parsers.get_worktree(args, raises=None)
+    if worktree:
+        build_worktree = qibuild.worktree.BuildWorkTree(worktree)
+    else:
+        build_worktree = None
 
-    if args.config_action == "wizard":
-        qibuild.wizard.run_config_wizard(build_worktree)
-        return
-
-    if args.config_action == "show":
+    if args.wizard:
+        qibuild.wizard.run_config_wizard(build_worktree=build_worktree)
+    else:
         show_config(args, build_worktree)
-        return
-
-    if args.config_action == "add":
-        add_config(args, build_worktree)
-        return
-
-    if args.config_action == "remove":
-        remove_config(args)
 
 def show_config(args, build_worktree):
 
@@ -97,29 +72,3 @@ def show_config(args, build_worktree):
     print "-------------------"
     print ui.indent(str(qibuild_cfg.local))
 
-def add_config(args, build_worktree):
-    name = args.name
-    toolchain = args.toolchain
-    profiles = args.profiles
-    ide = args.ide
-    cmake_generator = args.cmake_generator
-    qibuild.config.add_build_config(name, toolchain=toolchain, profiles=profiles,
-                                    ide=ide, cmake_generator=cmake_generator)
-    if args.default:
-        if not build_worktree:
-            raise Exception("Must be in a worktree to use --default")
-        build_worktree.set_default_config(name)
-
-def remove_config(args):
-    name = args.name
-    qibuild_cfg = qibuild.config.QiBuildConfig()
-    qibuild_cfg.read()
-    del qibuild_cfg.configs[name]
-
-    # Also remove default config from global qibuild.xml file, so
-    # that we don't get a default config pointing to a non-existing
-    # config
-    for worktree in qibuild_cfg.worktrees.values():
-        if worktree.defaults.config == name:
-            qibuild_cfg.set_default_config_for_worktree(worktree.path, None)
-    qibuild_cfg.write()
