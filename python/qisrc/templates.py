@@ -42,7 +42,7 @@ def process_string(string, **kwargs):
 
 def magic_replace(string, old, new):
     res = string
-    for func in snake_case, camel_case, upper_case, mixed_case:
+    for func in snake_case, camel_case, upper_case, mixed_case, attached_lower, attached_upper:
         sub_old = "@%s@" % func(old)
         sub_new = func(new)
         res = res.replace(sub_old, sub_new)
@@ -87,6 +87,23 @@ def mixed_case(string):
     """
     splitted = split_chunks(string)
     return "".join(x.title() for x in splitted)
+
+
+def attached_lower(string):
+    """
+    >>> attached_lower("FooBar")
+    'foobar'
+    """
+    splitted = split_chunks(string)
+    return "".join(x.lower() for x in splitted)
+
+def attached_upper(string):
+    """
+    >>> attached_upper("FooBar")
+    'FOOBAR'
+    """
+    splitted = split_chunks(string)
+    return "".join(x.upper() for x in splitted)
 
 def split_chunks(string):
     """
