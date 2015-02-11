@@ -235,6 +235,7 @@ class TestGitServer(object):
                 message = "Update %s" % filename
             else:
                 message = "Add %s" % filename
+        repo_src.ensure(filename, file=True)
         repo_src.join(filename).write(contents)
         git.add(filename)
         git.commit("--message", message)
