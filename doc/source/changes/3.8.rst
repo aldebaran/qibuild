@@ -11,6 +11,28 @@ misc
 qibuild
 -------
 
+* Unify build configs: now a build config has a name, a toolchain and a list
+  of profiles. A build dir matches exactly one build config. Build directories
+  are the same when building in release or in debug.
+
+  To do the transition, you should create at least one config per toolchain,
+  for instance:
+
+  .. code-block:: console
+
+     qibuild add-config nao --toolchain atom --profile nao
+
+  Then use
+
+  .. code-block:: console
+
+     qibuild configure -c nao
+
+  As a consequence, the ``-p, --profile`` option is gone, and
+  ``--release`` can only be used for ``qibuild configure``
+
+* Add ``qibuild add-config``, ``qibuild list-configs``, ``qibuild rm-config``
+
 * ``qibuild clean``: fix when using remote profiles
 * ``qibuild init``: honor ``-w, --worktree`` option
 * Re-implement setting custom build directory. To use this feature, write something
@@ -29,6 +51,8 @@ qibuild
 * ``qibuild``: generate ``qitest.json`` file also after building
 * Store default config for worktree in the global config file
   (``~/.config/qi/qibuild.xml``)
+
+
 
 qidoc
 ------
