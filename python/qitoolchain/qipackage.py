@@ -57,7 +57,9 @@ class QiPackage(object):
         return installed_files
 
     def _install_all(self, destdir):
-        return qisys.sh.install(self.path, destdir)
+        def filter_fun(x):
+            return x != "package.xml"
+        return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
 
     def _install_component(self, component, destdir, release=True):
         installed_files = list()
@@ -71,8 +73,10 @@ class QiPackage(object):
                 mask.extend(self._read_install_mask("release"))
             if not mask and component=="runtime":
                 # retro-compat
+                def filter_fun(x):
+                    return qisys.sh.is_runtime(x) and x != "package.xml"
                 return qisys.sh.install(self.path, destdir,
-                                        filter_fun=qisys.sh.is_runtime)
+                                        filter_fun=filter_fun)
             else:
                 # avoid install masks and package.xml
                 mask.append(".*\.mask")

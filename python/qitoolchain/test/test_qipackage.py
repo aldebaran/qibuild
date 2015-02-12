@@ -23,6 +23,20 @@ def test_from_archive(tmpdir):
     assert package.name == "foo"
     assert package.version == "0.1"
 
+def test_skip_package_xml(tmpdir):
+    foo = tmpdir.mkdir("foo")
+    foo_xml = foo.join("package.xml")
+    foo_xml.write("""<package name="foo" version="0.1"/>""")
+    foo.ensure("include", "foo.h", file=True)
+    foo.ensure("lib", "libfoo.so", file=True)
+    package = qitoolchain.qipackage.QiPackage("foo", path=foo.strpath)
+    dest = tmpdir.join("dest")
+    print "dest.strpath:", dest.strpath
+    package.install(dest.strpath)
+    assert dest.join("include", "foo.h").check(file=True)
+    assert dest.join("lib", "libfoo.so").check(file=True)
+    assert not dest.join("package.xml").check(file=True)
+
 def test_reads_runtime_manifest(tmpdir):
     boost_path = tmpdir.mkdir("boost")
     boost_path.ensure("include", "boost.h", file=True)
@@ -43,6 +57,7 @@ def test_backward_compat_runtime_install(tmpdir):
     boost_path = tmpdir.mkdir("boost")
     boost_path.ensure("include", "boost.h", file=True)
     boost_path.ensure("lib", "libboost.so", file=True)
+    boost_path.ensure("package.xml", file=True)
 
     package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
     dest = tmpdir.join("dest")
