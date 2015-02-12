@@ -453,14 +453,16 @@ qi_create_lib(foo INTERNAL) instead
       _qi_gen_deprecated_message(_additional_code ${target} ${ARG_DEPRECATED})
   endif()
 
-  _qi_gen_code_lib_redist(_redist_code ${target} ${_U_staged_name})
-
   set(_module_name "${_l_staged_name}-config.cmake")
-
-  set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_module_name}")
-  set(_redist_code "${_redist_code} ${_additional_code}")
-  file(WRITE "${_redist_file}" "${_redist_code}")
-  _qi_install_redist_file("${_redist_file}" "${target}" "${_l_staged_name}")
+  if(${${target}_NO_INSTALL})
+    qi_debug("Skipping creation of redist config file for ${target}")
+  else()
+    _qi_gen_code_lib_redist(_redist_code ${target} ${_U_staged_name})
+    set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_module_name}")
+    set(_redist_code "${_redist_code} ${_additional_code}")
+    file(WRITE "${_redist_file}" "${_redist_code}")
+    _qi_install_redist_file("${_redist_file}" "${target}" "${_l_staged_name}")
+  endif()
 
   _qi_gen_code_lib_sdk(_sdk_code ${target} ${_U_staged_name})
   set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_module_name}")

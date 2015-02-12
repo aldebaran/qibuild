@@ -192,3 +192,11 @@ def test_do_not_write_tests_twice(qibuild_action, tmpdir):
     tests = qitest.conf.parse_tests(qitest_json.strpath)
     second = len(tests)
     assert first == second
+
+def test_do_not_generate_config_module_for_non_installed_targets(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("stagenoinstall")
+    qibuild_action("configure", "--all")
+    qibuild_action("make", "--all")
+    dest = tmpdir.mkdir("dest")
+    qibuild_action("install", "--all", dest.strpath)
+    assert not dest.join("share", "cmake", "foo", "foo-config.cmake").check(file=True)
