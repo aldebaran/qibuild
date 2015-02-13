@@ -1,5 +1,3 @@
-import os
-
 import qisys.script
 import qisrc.git
 from qisys.test.conftest import TestWorkTree
@@ -24,15 +22,3 @@ def test_in_subdir(qisrc_action):
     qisrc_action.chdir("bar")
     foo_proj = qisrc_action("create", "foo")
     assert foo_proj.src == "bar/foo"
-
-
-def test_template_path(qisrc_action, tmpdir):
-    tmpl = tmpdir.mkdir("tmpl")
-    tmpl.join("CMakeLists.txt").write("project(@ProjectName@)\n")
-    qisrc_action("create", "HelloWorld", "--output", "helloworld",
-                 "--template-path", tmpl.strpath)
-    qisrc_action.reload_worktree()
-    worktree = qisrc_action.git_worktree.worktree
-    helloworld_proj = worktree.get_project("helloworld")
-    with open(os.path.join(helloworld_proj.path, "CMakeLists.txt")) as fp:
-        assert fp.read() == "project(HelloWorld)\n"
