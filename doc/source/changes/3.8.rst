@@ -98,6 +98,9 @@ qisrc
 * ``qisrc sync``: fix retcode when some projects are skipped
 * Implements ``qisrc sync --reset``
 
+* ``qisrc create``: add ``-i,--template-path`` argument. This
+  allows users to create their own templates
+
 qitest
 ------
 
