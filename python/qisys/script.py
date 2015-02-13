@@ -156,13 +156,13 @@ def main_wrapper(module, args):
 def _dump_arguments(name, args):
     """ Dump an argparser namespace to log """
     output = ""
-    max_len = 0
-    for k in args.__dict__.keys():
-        if len(k) > max_len:
-            max_len = len(k)
-    for k, v in args.__dict__.iteritems():
-        pad = " " * (max_len - len(k))
-        output += "  %s%s = %s\n" % (str(k), pad, str(v))
+    keys = args.__dict__.keys()
+    keys.sort()
+    max_len = max(len(k) for k in keys)
+    keys.sort()
+    for k in keys:
+        value = args.__dict__[k]
+        output += "  " + k.ljust(max_len) + " = %s\n" % value
     if output[-1] == "\n":
         output = output[:-1]
     ui.debug("[%s] arguments:\n%s" % (name, output))
