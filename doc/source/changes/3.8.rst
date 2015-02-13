@@ -64,6 +64,8 @@ qilinguist
 -----------
 
 * Fail when non-translated messages are found
+  (``qilinguist release`` learned ``--allow-untranslated-messages`` to get back
+  the old behavior)
 * ``qilinguist release`` can also work with ``.pml`` files.
 * ``qilinguist list``: sort by project name
 
