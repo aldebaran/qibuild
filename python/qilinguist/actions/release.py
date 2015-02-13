@@ -15,9 +15,12 @@ def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
+    parser.add_argument("--allow-untranslated-messages", action="store_false",
+                        dest="raises")
+    parser.set_defaults(raises=True)
 
 
 def do(args):
     """Main entry point"""
     builder = qilinguist.parsers.get_linguist_builder(args)
-    builder.build()
+    builder.build(raises=args.raises)

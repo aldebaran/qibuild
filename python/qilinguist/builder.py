@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+from qisys import ui
 from qisys.abstractbuilder import AbstractBuilder
 
 class QiLinguistBuilder(AbstractBuilder):
@@ -12,13 +13,16 @@ class QiLinguistBuilder(AbstractBuilder):
         self.projects = list()
 
     def configure(self, *args, **kwargs):
-        for project in self.projects:
+        for i, project in enumerate(self.projects):
+            ui.info_count(i, len(self.projects), "Updating", project.name)
             project.update()
 
     def build(self, *args, **kwargs):
-        for project in self.projects:
-            project.release()
+        for i, project in enumerate(self.projects):
+            ui.info_count(i, len(self.projects), "Releasing", project.name)
+            project.release(raises=kwargs.get("raises"))
 
     def install(self, dest):
-        for project in self.projects:
+        for i, project in enumerate(self.projects):
+            ui.info_count(i, len(self.projects), "Installing", project.name)
             project.install(dest)

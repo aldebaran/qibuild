@@ -19,6 +19,7 @@ import qipy.worktree
 import qipy.python_builder
 import qilinguist.worktree
 import qilinguist.builder
+import qilinguist.pml_translator
 
 class PMLBuilder(object):
     """ Build a package from a pml file """

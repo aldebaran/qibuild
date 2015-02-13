@@ -52,5 +52,5 @@ class LinguistProject(object):
         pass
 
     @abc.abstractmethod
-    def release(self):
+    def release(self, raises=True):
         pass

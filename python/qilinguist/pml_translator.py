@@ -7,17 +7,21 @@ from qisys import ui
 import qisys.command
 import qisys.qixml
 
+import qilinguist.project
 import qilinguist.qtlinguist
 
 def new_pml_translator(pml_path):
     return PMLTranslator(pml_path)
 
-class PMLTranslator(object):
+class PMLTranslator(qilinguist.project.LinguistProject):
     def __init__(self, pml_path):
         self.pml_path = pml_path
         self.path = os.path.dirname(pml_path)
         self.ts_files = translations_files_from_pml(pml_path)
         self.qm_files = list()
+        path = os.path.dirname(pml_path)
+        name = get_name(pml_path)
+        super(PMLTranslator, self).__init__(name, path)
 
     def update(self):
         raise NotImplementedError()
@@ -60,3 +64,8 @@ def translations_files_from_pml(pml_path):
     for translation_elem in translation_elems:
         res.append(translation_elem.get("src"))
     return res
+
+def get_name(pml_path):
+    tree = qisys.qixml.read(pml_path)
+    root = tree.getroot()
+    return qisys.qixml.parse_required_attr(root, "name", xml_path=pml_path)
