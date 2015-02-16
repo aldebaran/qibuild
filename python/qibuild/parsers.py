@@ -20,7 +20,6 @@ def cmake_build_parser(parser, group=None, with_build_parser=True):
     if not group:
         group = parser.add_argument_group("Build options")
     parser.add_argument("-j", dest="num_jobs", type=int)
-    parser.add_argument("--build-type", action="store")
     group.add_argument("--verbose-make", action="store_true", default=False,
                     help="Print the executed commands while building")
 
@@ -68,7 +67,8 @@ def cmake_configure_parser(parser):
         help="Build in debug, default")
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
                         werror=False, profiling=False,
-                        trace_cmake=False, debug_info=None)
+                        trace_cmake=False, debug_info=None,
+                        build_type="Debug")
 
 def convert_cmake_args_to_flags(args):
     """ Convert 'helper' options into cmake flags
@@ -112,9 +112,6 @@ def get_build_worktree(args, verbose=True):
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
     if verbose:
         ui.info(ui.green, "Current build worktree:", ui.reset, ui.bold, build_worktree.root)
-    if not hasattr(args, "build_type"):
-        # cmake_build_parser() has not been called, so do leave the default build_config
-        return build_worktree
     build_config = get_build_config(build_worktree, args)
     build_worktree.build_config = build_config
 
@@ -124,8 +121,6 @@ def get_build_worktree(args, verbose=True):
 
         for profile in build_config.profiles:
             ui.info(ui.green, "Using profile:", ui.blue, profile)
-
-        ui.info(ui.green, "Build type:", ui.blue, build_config.build_type)
 
     return build_worktree
 
@@ -180,9 +175,11 @@ def get_build_config(build_worktree, args):
 
     """
     build_config = build_worktree.build_config
-    if args.config:
-        build_config.set_active_config(args.config)
-    build_config.build_type = args.build_type
+    if hasattr(args, "config"):
+        if args.config:
+            build_config.set_active_config(args.config)
+    if hasattr(args, "build_type"):
+        build_config.build_type = args.build_type
     if hasattr(args, "cmake_generator"):
         build_config.cmake_generator = args.cmake_generator
     if hasattr(args, "verbose_make"):

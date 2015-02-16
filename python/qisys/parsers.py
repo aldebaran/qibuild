@@ -69,7 +69,6 @@ def build_parser(parser, group=None, include_worktree_parser=True):
         group = parser.add_argument_group("build type options")
     group.add_argument("-c", "--config",
         help="The configuration to use. ")
-    parser.set_defaults(build_type="Debug")
 
 def deploy_parser(parser):
     group = parser.add_argument_group("deploy options")

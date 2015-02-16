@@ -274,7 +274,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         """ Build the project """
         timer = ui.timer("make %s" % self.name)
         timer.start()
-        build_type = self.build_config.build_type
+        build_type = qibuild.cmake.get_cached_var(self.build_directory,
+                                                  "CMAKE_BUILD_TYPE",
+                                                  default="Debug")
 
         cmd = []
         if coverity:
