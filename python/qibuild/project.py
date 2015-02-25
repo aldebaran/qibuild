@@ -132,6 +132,7 @@ class BuildProject(object):
     @property
     def using_visual_studio(self):
         return self.build_config.using_visual_studio
+
     @property
     def using_make(self):
         return self.build_config.using_make
