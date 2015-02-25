@@ -113,11 +113,11 @@ class WorkTreeSyncer(object):
                 to_configure.append(repo)
         if not to_configure:
             return
-        ui.info(ui.green, ":: Configuring projects ...")
+        ui.info(ui.green, ":: Setup git projects ...")
         max_src = max(len(x.src) for x in to_configure)
         n = len(to_configure)
         for i, repo in enumerate(to_configure):
-            ui.info_count(i, n, ui.white, "Configuring", ui.reset,
+            ui.info_count(i, n, ui.white, "Setup", ui.reset,
                           ui.blue, repo.src.ljust(max_src), end="\r")
             git_project = srcs[repo.src]
             git_project.read_remote_config(repo)
