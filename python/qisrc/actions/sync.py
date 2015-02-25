@@ -49,6 +49,9 @@ def do(args):
     reset = args.reset
     git_worktree = qisrc.parsers.get_git_worktree(args)
     sync_ok = git_worktree.sync()
+    if not sync_ok:
+        sys.exit(1)
+
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
                                                   default_all=True,
                                                   use_build_deps=True)
@@ -79,5 +82,5 @@ def do(args):
     #clean the screen
     ui.info_count(i, len(git_projects), ui.blue, " ".ljust(max_src), end="\r")
     print_overview(len(git_projects), len(skipped), len(failed))
-    if failed or skipped or not sync_ok:
+    if failed or skipped:
         sys.exit(1)

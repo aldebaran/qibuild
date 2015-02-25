@@ -5,6 +5,7 @@
 """Init a new qisrc workspace """
 
 import os
+import sys
 
 from qisys import ui
 import qisys.parsers
@@ -27,9 +28,11 @@ def do(args):
     workrtee = qisys.worktree.WorkTree(root)
     git_worktree = qisrc.worktree.GitWorkTree(workrtee)
     if args.manifest_url:
-        git_worktree.configure_manifest(args.manifest_url,
+        ok = git_worktree.configure_manifest(args.manifest_url,
                                         groups=args.groups,
                                         branch=args.branch)
+    if not ok:
+        sys.exit(1)
 
     ui.info(ui.green, "New qisrc worktree initialized in",
             ui.reset, ui.bold, root)

@@ -274,3 +274,12 @@ def test_retcode_when_skipping(qisrc_action, git_server):
     git.checkout("-b", "devel")
     rc = qisrc_action("sync", retcode=True)
     assert rc != 0
+
+def test_do_not_sync_when_clone_fails(qisrc_action, git_server, record_messages):
+    git_server.create_repo("bar.git")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.create_repo("baz.git")
+    git_server.srv.join("baz.git").remove()
+    rc = qisrc_action("sync", retcode=True)
+    assert rc != 0
+    assert not record_messages.find("Success")

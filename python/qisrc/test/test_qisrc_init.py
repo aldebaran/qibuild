@@ -23,14 +23,15 @@ def test_use_branch(cd_to_tmpdir, git_server):
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 2
 
-def test_finish_configure_after_error(cd_to_tmpdir, git_server):
+def test_finish_configure_after_error(qisrc_action, git_server):
     # bogus repo can't be configured, but we don't want configuration to be
     # interrupted
     git_server.create_repo("foo.git", review=True)
     git_server.manifest.add_repo("bogus", None, ["origin", "gerrit"])
     git_server.create_repo("bar.git", review=True)
 
-    qisys.script.run_action("qisrc.actions.init", [git_server.manifest_url])
+    rc = qisrc_action("init", git_server.manifest_url, retcode=True)
+    assert rc != 0
     git_worktree = TestGitWorkTree()
     assert git_worktree.manifest
 
@@ -89,3 +90,9 @@ def test_stores_default_group(qisrc_action, git_server):
     qisrc_action("init", manifest_url)
     git_worktree = TestGitWorkTree()
     assert git_worktree.manifest.groups == ["default"]
+
+def test_retcode_when_cloning_fails(qisrc_action, git_server):
+    git_server.create_repo("bar.git")
+    git_server.srv.join("bar.git").remove()
+    rc = qisrc_action("init", git_server.manifest_url, retcode=True)
+    assert rc != 0
