@@ -8,6 +8,8 @@ import qidoc.doxygen
 import qidoc.builder
 from qidoc.test.conftest import find_link
 
+import pytest
+
 def test_read_doxyfile(tmpdir):
     doxyfile = tmpdir.join("Doxyfile")
     doxyfile.write(
@@ -16,9 +18,39 @@ INPUT  =      foo \
   include/foo.h
 # This is a comment
 SPAM=eggs
+PREDEFINED = "FOO=1"
+PREDEFINED += "BAR=0"
 """)
     parsed = qidoc.doxygen.read_doxyfile(doxyfile.strpath)
     assert parsed["INPUT"] == "foo   include/foo.h"
+    assert parsed["SPAM"] == "eggs"
+    assert parsed["PREDEFINED"] == '"FOO=1" "BAR=0"'
+
+def test_bad_doxyfile(tmpdir):
+    doxyfile = tmpdir.join("Doxyfile")
+    doxyfile.write(""""
+FOO = 1
+BAR += 2
+""")
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        qidoc.doxygen.read_doxyfile(doxyfile.strpath)
+    assert "does not match" in e.value.message
+
+def test_appending_values(tmpdir):
+    doxyfile = tmpdir.join("Doxyfile")
+    contents = """\
+PREDEFINED = "FOO=1"
+PREDEFINED += "BAR=0"
+"""
+    doxyfile.write(contents)
+    parsed = qidoc.doxygen.read_doxyfile(doxyfile.strpath)
+    assert parsed["PREDEFINED"] == '"FOO=1" "BAR=0"'
+    generated = tmpdir.join("generated")
+    qidoc.doxygen.write_doxyfile(parsed, generated.strpath)
+    assert generated.read() == """\
+PREDEFINED = "FOO=1" "BAR=0"
+"""
 
 def test_forced_settings(doc_worktree):
     foo_dox = doc_worktree.create_doxygen_project("foo")
@@ -57,7 +89,6 @@ def test_ovewrite_name(doc_worktree):
     foo_dox.configure()
     conf = qidoc.doxygen.read_doxyfile(foo_dox.out_doxyfile)
     assert conf["PROJECT_NAME"] == "foo_overwrite"
-
 
 def test_depends_on_doxygen(doc_worktree, tmpdir):
     libworld_proj = doc_worktree.add_test_project("libworld")

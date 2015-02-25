@@ -52,13 +52,12 @@ qibuild
 * Store default config for worktree in the global config file
   (``~/.config/qi/qibuild.xml``)
 
-
-
 qidoc
 ------
 
 * Implement ``qidoc build --spellcheck``, using
   `sphinxcontrib-spelling <http://sphinxcontrib-spelling.readthedocs.org/>`_
+* Fix parsing of ``+=`` assignments in ``Doxyfile.in``
 
 qilinguist
 -----------

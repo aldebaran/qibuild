@@ -32,18 +32,25 @@ def read_doxyfile(doxyfile):
     for line in lines:
         if line.startswith("#"):
             continue
-        if "=" in line:
+        if "+=" in line:
+            key, value = line.split("+=", 1)
+            previous_value = res.get(key.strip())
+            if not previous_value:
+                mess = "Error when parsing Doxyfile in " + doxyfile + "\n"
+                mess += line + "\n"
+                mess += "does not match any assignment"
+                raise Exception(mess)
+            res[key.strip()] += " " + value.strip()
+        elif "=" in line:
             key,  value = line.split("=", 1)
             key = key.strip()
             value = value.strip()
             res[key] = value
-    return res
 
+    return res
 
 def write_doxyfile(config, doxyfile):
     """ Write a doxyfile """
     with open(doxyfile, "w") as fp:
         for key, value in config.iteritems():
             fp.write("%s = %s\n" % (key, value))
-
-
