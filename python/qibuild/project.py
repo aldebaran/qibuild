@@ -524,7 +524,8 @@ The following tools were not found: {missing}\
 
         # build directory name pattern:
         # 'build-<tc_name>[-<profile>]...[-release]'
-        build_names = ["build-system"]
+        build_names = ["build-sys-%s-%s" % (platform.system().lower(),
+                                            platform.machine().lower())]
         qibuild_cfg = qibuild.config.QiBuildConfig()
         qibuild_cfg.read(create_if_missing=True)
         config_names = qibuild_cfg.configs.keys()

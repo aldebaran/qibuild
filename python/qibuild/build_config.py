@@ -3,13 +3,12 @@
 ## found in the COPYING file.
 
 import os
+import platform
+
 import qisys.qixml
-
-
 import qibuild.config
 import qibuild.profile
 import qitoolchain
-import platform
 
 
 class CMakeBuildConfig(object):
@@ -129,7 +128,8 @@ class CMakeBuildConfig(object):
         if self.active_build_config:
             res += self.active_build_config.name
         else:
-            res += "system"
+            res += "sys-%s-%s" % (platform.system().lower(),
+                                  platform.machine().lower())
         return res
 
     @property
