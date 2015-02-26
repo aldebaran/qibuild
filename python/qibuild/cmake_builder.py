@@ -141,6 +141,7 @@ class CMakeBuilder(AbstractBuilder):
         real_dest = os.path.join(dest_dir, prefix)
         components = kwargs.get("components")
 
+        build_type = "Release"
         if projects:
             ui.info(ui.green, "the following projects")
             for project in projects:
@@ -154,14 +155,17 @@ class CMakeBuilder(AbstractBuilder):
             runtime_only = self.dep_types == ["runtime"]
             if runtime_only:
                 ui.info(ui.green, "(runtime components only)")
+            build_type = projects[0].build_type
 
+        release = build_type == "Release"
         if packages:
             ui.info(ui.green, ":: ", "installing packages")
         for i, package in enumerate(packages):
             ui.info_count(i, len(packages),
                           ui.green, "Installing",
                           ui.blue, package.name)
-            files = package.install(real_dest, components=components)
+            files = package.install(real_dest, components=components,
+                                    release=release)
             installed.extend(files)
 
         # Remove qitest.json so that we don't append tests twice

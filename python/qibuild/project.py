@@ -130,6 +130,14 @@ class BuildProject(object):
         return qibuild.cmake.get_cached_var(self.build_directory, "CMAKE_GENERATOR")
 
     @property
+    def build_type(self):
+        default = self.build_config.build_type
+        return qibuild.cmake.get_cached_var(self.build_directory,
+                                            "CMAKE_BUILD_TYPE",
+                                             default=default)
+
+
+    @property
     def using_visual_studio(self):
         return self.build_config.using_visual_studio
 
@@ -275,9 +283,6 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         """ Build the project """
         timer = ui.timer("make %s" % self.name)
         timer.start()
-        build_type = qibuild.cmake.get_cached_var(self.build_directory,
-                                                  "CMAKE_BUILD_TYPE",
-                                                  default="Debug")
 
         cmd = []
         if coverity:
@@ -288,7 +293,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             cmd += ["cov-build", "--dir", cov_dir]
 
         cmd += ["cmake", "--build", self.build_directory,
-                         "--config", build_type]
+                         "--config", self.build_type]
 
         if target:
             cmd += ["--target", target]
@@ -410,7 +415,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         build_env["DESTDIR"] = destdir
 
         cmake_args = list()
-        cmake_args += ["-DBUILD_TYPE=%s" % self.build_config.build_type]
+        cmake_args += ["-DBUILD_TYPE=%s" % self.build_type]
         cmake_args += ["-DCOMPONENT=%s" % component]
         cmake_args += ["-P", "cmake_install.cmake", "--"]
         ui.debug("Installing", component)
