@@ -21,6 +21,13 @@ import posixpath
 
 from qisys import ui
 
+try:
+    from xdg.BaseDirectory import xdg_cache_home, xdg_config_home, xdg_data_home
+except ImportError:
+    xdg_config_home = os.path.expanduser("~/.config")
+    xdg_cache_home = os.path.expanduser("~/.cache")
+    xdg_data_home = os.path.expanduser("~/.local/share")
+
 def get_config_path(*args):
     """ Get a config path to read or write some configuration.
 
@@ -28,7 +35,7 @@ def get_config_path(*args):
                  when needed
 
     """
-    return get_path(os.path.expanduser("~/.config"), *args)
+    return get_path(xdg_config_home, *args)
 
 def get_cache_path(*args):
     """ Get a config path to read or write some cached data
@@ -37,7 +44,7 @@ def get_cache_path(*args):
                  when needed
 
     """
-    return get_path(os.path.expanduser("~/.cache"), *args)
+    return get_path(xdg_cache_home, *args)
 
 def get_share_path(*args):
     """ Get a config path to read or write some persistent data
@@ -46,7 +53,7 @@ def get_share_path(*args):
                  when needed
 
     """
-    return get_path(os.path.expanduser("~/.local"), "share", *args)
+    return get_path(xdg_data_home, *args)
 
 def get_path(*args):
     """ Helper for get_*_path methods """
