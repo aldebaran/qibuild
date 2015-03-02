@@ -1,7 +1,19 @@
 qiBuild
 =======
 
-This project aims to make compilation of cmake-based projects easy.
+qiBuild is a collection of command-line tools to help development of multiple
+projects.
+
+It contains:
+
+ * ``qibuild`` : compilation of C++ projects made easy, using `CMake <http://www.cmake.org/>`_ as a backend
+ * ``qitoolchain``: managing cross-toolchains and pre-compiled packages
+ * ``qisrc``: managing several git projects
+ * ``qidoc``: managing documentation written using `Sphinx <http://sphinx-doc.org/>`_ or
+   `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_
+ * ``qipy``: managing Python projects depending on C++ projects using
+   `virtualenv <https://virtualenv.pypa.io/en/latest/>`_ as a backend
+
 Please refer to the documentation for more information.
 
 qibuild is under a BSD-style license that can be found in the COPYING file.
