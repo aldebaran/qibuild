@@ -6,10 +6,14 @@ pylint==0.28
 # on a buildfarm (brings pep8 and pyflakes)
 flake8
 
+# For qipy
+virtualenv==12.0.7
+
 # For doc:
 Sphinx==1.1.3
 docutils==0.11
 pyparsing==1.5.6
+pyenchant==1.6.6
 
 # For tests
 mock==1.0.1
