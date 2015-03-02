@@ -100,11 +100,48 @@ Finally, zip the package:
     cd /tmp/foo
     zip foo-0.1.zip -r .
 
+Excluding files at installation
+-------------------------------
+
+Say you are creating a binary package for Qt on Windows:
+
+You do not want to include all the compilation tools (such as ``moc``, ``rcc`` or ``uic``)
+when you install a project that has a runtime dependency on Qt.
+
+But you still want to include ``lrelease``, ``lupdate`` because your application uses
+these tools at runtime.
+
+You also want to remove all the debug ``.dll`` when you install your application in
+release mode.
+
+The solution is to create masks in the package looking like this:
+
+.. code-block:: console
+
+    # in /path/to/Qt/runtime.mask
+
+    # Remove all tools
+    exclude bin/.*\.exe
+
+    # But keep lrelease, lupdate:
+    include bin/lrelease\.exe
+    include bin/lupdate\.exe
+
+
+    # in /path/to/Qt/release.mask
+
+    exclude lib/.*d\.dll
+
+Blank lines and comments starting with ``#`` are ignored.
+Other lines should contain the word ``include`` or ``exclude``,
+followed by a regular expression.
+
 
 Creating a toolchain feed
 --------------------------
 
-You will need a place to host the packages and the feeds. It can be a simple HTTP or FTP web server.
+You will need a place to host the packages and the feeds. It can be a simple
+HTTP or FTP web server.
 
 Let's assume you have ``foo`` and ``bar`` packages. Write a feed looking like
 
