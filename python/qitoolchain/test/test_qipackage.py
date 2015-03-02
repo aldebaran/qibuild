@@ -75,18 +75,39 @@ def test_reads_release_mask(tmpdir):
     qt_path.ensure("bin", "QtCored4.dll", file=True)
     runtime_mask = qt_path.ensure("runtime.mask", file=True)
     runtime_mask.write("""\
-/include/.*
-/lib/.*\.lib
+# headers
+exclude include/.*
+
+# .lib
+exclude lib/.*\.lib
 """)
     release_mask = qt_path.ensure("release.mask", file=True)
     release_mask.write("""\
-/bin/QtCored4.dll
+exclude bin/QtCored4.dll
 """)
     package = qitoolchain.qipackage.QiPackage("qt", path=qt_path.strpath)
     dest = tmpdir.join("dest")
     package.install(dest.strpath, release=True, components=["runtime"])
     assert dest.join("bin", "QtCore4.dll").check(file=True)
     assert not dest.join("lib", "QtCored4.lib").check(file=True)
+
+def test_include_in_mask(tmpdir):
+    qt_path = tmpdir.mkdir("qt")
+    qt_path.ensure("bin", "assitant.exe")
+    qt_path.ensure("bin", "moc.exe")
+    qt_path.ensure("bin", "lrelease.exe")
+    qt_path.ensure("bin", "lupdate.exe")
+    runtime_mask = qt_path.ensure("runtime.mask", file=True)
+    runtime_mask.write("""\
+exclude bin/.*\.exe
+include bin/lrelease.exe
+include bin/lupdate.exe
+""")
+    dest = tmpdir.join("dest")
+    package = qitoolchain.qipackage.QiPackage("qt", path=qt_path.strpath)
+    package.install(dest.strpath, release=True, components=["runtime"])
+    assert dest.join("bin", "lrelease.exe").check(file=True)
+    assert not dest.join("bin", "moc.exe").check(file=True)
 
 def test_debug_install(tmpdir):
     naoqi_path = tmpdir.mkdir("naoqi")

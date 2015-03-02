@@ -80,8 +80,8 @@ class QiPackage(object):
                                         filter_fun=filter_fun)
             else:
                 # avoid install masks and package.xml
-                mask.append(".*\.mask")
-                mask.append("package\.xml")
+                mask.append("exclude .*\.mask")
+                mask.append("exclude package\.xml")
                 return self._install_with_mask(destdir, mask)
         else:
             with open(manifest_path, "r") as fp:
@@ -94,7 +94,6 @@ class QiPackage(object):
                     installed_files.append(line)
             return installed_files
 
-
     def _read_install_mask(self, mask_name):
         mask_path = os.path.join(self.path, mask_name + ".mask")
         if not os.path.exists(mask_path):
@@ -102,14 +101,32 @@ class QiPackage(object):
         with open(mask_path, "r") as fp:
             mask = fp.readlines()
             mask = [x.strip() for x in mask]
+            # remove empty lines and comments:
+            mask = [x for x in mask if x != ""]
+            mask = [x for x in mask if not x.startswith("#")]
+            for line in mask:
+                if not line.startswith(("include ", "exclude ")):
+                    mess = "Bad mask in %s\n" % mask_path
+                    mess += "line should start with 'include' or 'exclude'"
+                    raise Exception(mess)
             return mask
 
     def _install_with_mask(self, destdir, mask):
+        def get_match(line, src):
+            words = line.split()
+            regex = " ".join(words[1:])
+            return re.match(regex, src)
+
         def filter_fun(src):
             src = qisys.sh.to_posix_path(src)
-            src = "/" + src
-            for regex in mask:
-                match = re.match(regex, src)
+            positive_regexps = [x for x in mask if x.startswith("include")]
+            negative_regexps = [x for x in mask if x.startswith("exclude")]
+            for line in positive_regexps:
+                match = get_match(line, src)
+                if match:
+                    return True
+            for line in negative_regexps:
+                match = get_match(line, src)
                 if match:
                     return False
             return True
