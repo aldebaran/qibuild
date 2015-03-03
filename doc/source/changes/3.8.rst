@@ -77,6 +77,11 @@ qipkg
 * ``qipkg make-package /path/to/pml``: also works when not in a worktree
 * ``qipkg make-package``: handle translations files from ``.pml``
 * Make it possible to use ``qipkg`` without a worktree
+* Stop generating ``.mpkg`` files when using ``.mpml`` files. Instead
+  generate several ``.pkg``
+* ``qipkg install PML_PATH DEST``: add ``--pkg`` to generate and install
+  ``.pkg`` files to the given destination
+* ``qipkg install``: also install the manifest
 
 qipy
 ----
