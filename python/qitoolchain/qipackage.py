@@ -65,7 +65,7 @@ class QiPackage(object):
     def _install_component(self, component, destdir, release=True):
         installed_files = list()
         manifest_name = "install_manifest_%s.txt" % component
-        if not release:
+        if not release and sys.platform.startswith("win"):
             manifest_name = "install_manifest_%s_debug.txt" % component
         manifest_path = os.path.join(self.path, manifest_name)
         if not os.path.exists(manifest_path):

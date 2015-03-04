@@ -109,22 +109,6 @@ include bin/lupdate.exe
     assert dest.join("bin", "lrelease.exe").check(file=True)
     assert not dest.join("bin", "moc.exe").check(file=True)
 
-def test_debug_install(tmpdir):
-    naoqi_path = tmpdir.mkdir("naoqi")
-    naoqi_path.ensure("bin", "naoqi_d.exe")
-    naoqi_path.ensure("bin", "naoqi.exe")
-    naoqi_path.join("install_manifest_runtime.txt").write("""\
-/bin/naoqi.exe
-""")
-    naoqi_path.join("install_manifest_runtime_debug.txt").write("""\
-/bin/naoqi_d.exe
-""")
-    package = qitoolchain.qipackage.QiPackage("naoqi", path=naoqi_path.strpath)
-    dest = tmpdir.join("dest")
-    package.install(dest.strpath, release=False, components=["runtime"])
-    assert dest.join("bin", "naoqi_d.exe").check(file=True)
-    assert not dest.join("bin", "naoqi.exe").check(file=True)
-
 def test_load_deps(tmpdir):
     libqi_path = tmpdir.mkdir("libqi")
     libqi_path.ensure("package.xml").write("""\
