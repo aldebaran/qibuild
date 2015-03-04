@@ -20,6 +20,7 @@ mock==1.0.1
 pytest==2.4.1
 pytest-cov==1.6
 pytest-runfailed==0.3
+pytest-xdist==1.11
 # For qidoc tests
 BeautifulSoup4==4.2.1
 sphinxcontrib-doxylink==1.3
