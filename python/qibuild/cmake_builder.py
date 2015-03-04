@@ -256,8 +256,10 @@ class CMakeBuilder(AbstractBuilder):
 
         # Write the list of files to be deployed
         with open(deploy_manifest, "a") as f:
-            set_to_deploy = set(to_deploy)
-            f.write("\n".join(set_to_deploy))
+            # sort and remove duplicates:
+            to_deploy = list(set(to_deploy))
+            to_deploy.sort()
+            f.write("\n".join(to_deploy))
         qisys.remote.deploy(deploy_dir, url, filelist=deploy_manifest)
 
         print
