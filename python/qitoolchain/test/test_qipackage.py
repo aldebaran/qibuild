@@ -31,7 +31,6 @@ def test_skip_package_xml(tmpdir):
     foo.ensure("lib", "libfoo.so", file=True)
     package = qitoolchain.qipackage.QiPackage("foo", path=foo.strpath)
     dest = tmpdir.join("dest")
-    print "dest.strpath:", dest.strpath
     package.install(dest.strpath)
     assert dest.join("include", "foo.h").check(file=True)
     assert dest.join("lib", "libfoo.so").check(file=True)
