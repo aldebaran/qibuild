@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 
 import qisys.sort
+from qisys.qixml import etree
 
 class DepsSolver(object):
     """ Solve dependencies across projects in a build worktree
@@ -97,10 +98,10 @@ class DepsSolver(object):
         return qisys.sort.topological_sort(to_sort, [x.name for x in projects])
 
 
-def read_deps_from_xml(object, xml_elem):
+def read_deps_from_xml(target, xml_elem):
     """ Read all the ``<depends />`` tags in the xml element and set
-    ``object.build_depends``, ``object.run_depends``,
-    ``object.test_depends``
+    ``target.build_depends``, ``target.run_depends``,
+    ``target.test_depends``
 
     """
     depends_trees = xml_elem.findall("depends")
@@ -112,8 +113,22 @@ def read_deps_from_xml(object, xml_elem):
         dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
         for dep_name in dep_names:
             if buildtime:
-                object.build_depends.add(dep_name)
+                target.build_depends.add(dep_name)
             if runtime:
-                object.run_depends.add(dep_name)
+                target.run_depends.add(dep_name)
             if testtime:
-                object.test_depends.add(dep_name)
+                target.test_depends.add(dep_name)
+
+def dump_deps_to_xml(subject, xml_elem):
+    if subject.build_depends:
+        build_dep_elem = etree.SubElement(xml_elem, tag="depends")
+        build_dep_elem.set("buildtime", "true")
+        build_dep_elem.set("names", " ".join(subject.build_depends))
+    if subject.run_depends:
+        runtime_dep_elem = etree.SubElement(xml_elem, tag="depends")
+        runtime_dep_elem.set("runtime", "true")
+        runtime_dep_elem.set("names", " ".join(subject.run_depends))
+    if subject.test_depends:
+        test_dep_elem = etree.SubElement(xml_elem, tag="depends")
+        test_dep_elem.set("testtime", "true")
+        test_dep_elem.set("names", " ".join(subject.test_depends))
