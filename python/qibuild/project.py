@@ -31,7 +31,8 @@ import qitest.project
 def read_install_manifest(filepath):
     with open(filepath, "r") as f:
         res = [filename.strip() for filename in f.readlines()]
-        res = [os.path.normpath(x) for x in res]
+        res = [qisys.sh.to_posix_path(x) for x in res]
+        res = [x.lstrip("/") for x in res]
         return res
 
 def write_qi_path_conf(directory, sdk_dirs, sdk_layout=True):
@@ -499,7 +500,7 @@ The following tools were not found: {missing}\
             ui.warning(mess)
             return
         for filename in file_list:
-            full_path = os.path.join(destdir, filename[1:]) # remove starting /
+            full_path = os.path.join(destdir, filename)
             if qibuild.gdb.is_elf(full_path):
                 qibuild.gdb.split_debug(full_path, **tool_paths)
 

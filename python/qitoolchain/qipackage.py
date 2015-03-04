@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import os
+import sys
 import re
 import zipfile
 
@@ -87,11 +88,10 @@ class QiPackage(object):
                 lines = fp.readlines()
                 for line in lines:
                     line = line.strip()
-                    line = line[1:] # remove leading "/"
                     src = os.path.join(self.path, line)
                     dest = os.path.join(destdir, line)
                     qisys.sh.install(src, dest)
-                    installed_files.append(dest)
+                    installed_files.append(line)
             return installed_files
 
 

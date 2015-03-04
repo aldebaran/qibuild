@@ -147,14 +147,14 @@ def test_install_returns(qibuild_action, tmpdir):
     installme.configure()
     installme.build()
     installed = installme.install(dest.strpath, components=["devel", "runtime"])
-    assert set(installed) == {'/share/data_star/foo.dat',
-                             '/share/data_star/bar.dat',
-                             '/include/relative/foo/foo.h',
-                             '/include/relative/bar/bar.h',
-                             '/share/recurse/a_dir/b_dir/c_dir/d_file',
-                             '/share/recurse/a_dir/a_file',
-                             '/share/sub/bar.dat',
-                             '/lib/python2.7/site-packages/py/foo.py'}
+    assert set(installed) == {'share/data_star/foo.dat',
+                              'share/data_star/bar.dat',
+                              'include/relative/foo/foo.h',
+                              'include/relative/bar/bar.h',
+                              'share/recurse/a_dir/b_dir/c_dir/d_file',
+                              'share/recurse/a_dir/a_file',
+                              'share/sub/bar.dat',
+                              'lib/python2.7/site-packages/py/foo.py'}
 
 def test_install_test_libs(qibuild_action, tmpdir):
     installme = qibuild_action.add_test_project("installme")

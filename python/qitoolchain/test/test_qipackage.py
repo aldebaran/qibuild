@@ -42,7 +42,7 @@ def test_reads_runtime_manifest(tmpdir):
     boost_path.ensure("lib", "libboost.so", file=True)
     runtime_manifest = boost_path.ensure("install_manifest_runtime.txt", file=True)
     runtime_manifest.write("""\
-/lib/libboost.so
+lib/libboost.so
 """)
     package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
     dest = tmpdir.join("dest")
@@ -50,7 +50,7 @@ def test_reads_runtime_manifest(tmpdir):
     assert not dest.join("include", "boost.h").check(file=True)
     libbost_so = dest.join("lib", "libboost.so")
     assert libbost_so.check(file=True)
-    assert installed == [libbost_so.strpath]
+    assert installed == ["lib/libboost.so"]
 
 def test_backward_compat_runtime_install(tmpdir):
     boost_path = tmpdir.mkdir("boost")

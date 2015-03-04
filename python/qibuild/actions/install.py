@@ -52,6 +52,7 @@ def do(args):
         if "test" in args.dep_types:
             components.append("test")
 
-    cmake_builder.install(dest_dir, prefix=args.prefix,
-                          split_debug=args.split_debug,
-                          components=components)
+    res = cmake_builder.install(dest_dir, prefix=args.prefix,
+                                split_debug=args.split_debug,
+                                components=components)
+    return res
