@@ -149,7 +149,7 @@ class CMakeBuilder(AbstractBuilder):
             if packages:
                 ui.info(ui.green, "and the following packages")
                 for package in packages:
-                    ui.info(" *", ui.blue, package.name)
+                    ui.info(ui.green, " *", ui.blue, package.name)
             ui.info(ui.green, "will be installed to", ui.blue, real_dest)
 
             runtime_only = self.dep_types == ["runtime"]
@@ -213,11 +213,11 @@ class CMakeBuilder(AbstractBuilder):
                                                          self.dep_types)
         ui.info(ui.green, "The following projects")
         for project in sorted(dep_projects, key=operator.attrgetter("name")):
-            ui.info(ui.green, " *", ui.blue, project.name)
+            ui.info(ui.green, " *", ui.reset, ui.blue, project.name)
         if dep_packages:
             ui.info(ui.green, "and the following packages")
             for package in sorted(dep_packages, key=operator.attrgetter("name")):
-                ui.info(" *", ui.blue, package.name)
+                ui.info(ui.green, " *", ui.reset, ui.blue, package.name)
         ui.info(ui.green, "will be deployed to", ui.blue, url.as_string)
 
         if dep_packages:
