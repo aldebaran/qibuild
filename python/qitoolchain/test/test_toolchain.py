@@ -34,15 +34,6 @@ def test_stores_feed_after_updating(feed):
     toolchain2 = qitoolchain.toolchain.Toolchain("bar")
     assert toolchain2.feed_url == feed.url
 
-def test_toolchain_file(feed):
-    boost_package = qitoolchain.qipackage.QiPackage("boost", "1.42")
-    feed.add_package(boost_package, with_url=True)
-    toolchain = qitoolchain.toolchain.Toolchain("bar")
-    toolchain.update(feed.url)
-    boost_path = toolchain.db.get_package_path("boost")
-    tc_contents = get_tc_file_contents(toolchain)
-    assert ('list(INSERT CMAKE_PREFIX_PATH 0 "%s")' % boost_path) in tc_contents
-
 def test_add_local_ctc(tmpdir):
     ctc = tmpdir.mkdir("ctc")
     toolchain_xml = ctc.join("toolchain.xml")

@@ -122,7 +122,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
 
     def set_active_config(self, active_config):
         """ Set the config to use for this worktree
-        Should match a toolchain name
+        Should match a build config name
 
         """
         self.build_config.set_active_config(active_config)

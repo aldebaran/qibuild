@@ -78,11 +78,12 @@ class CMakeBuilder(AbstractBuilder):
         every project
 
         """
-        projects = self.deps_solver.get_dep_projects(self.projects, ["build", "runtime", "test"])
+        projects = self.deps_solver.get_dep_projects(self.projects,
+                                                     ["build", "runtime", "test"])
         # subtle diffs here: dependencies.cmake must be written for *all* projects,
         # with the build dependencies
         for project in projects:
-            sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build"])
+            sdk_dirs = self.get_sdk_dirs_for_project(project)
             project.write_dependencies_cmake(sdk_dirs)
 
         qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
@@ -97,6 +98,24 @@ class CMakeBuilder(AbstractBuilder):
 
         # also write a path.conf in the .qi directory
         write_qi_path_conf(self.build_worktree.dot_qi, qi_path_sdk_dirs, sdk_layout=False)
+
+    def get_sdk_dirs_for_project(self, project):
+        project_names = [p.name for p in self.build_worktree.build_projects]
+        sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build"])
+        # remove this when all qiproject.xml have been fixed
+        strict_mode = os.environ.get("QIBUILD_STRICT_DEPS_RESOLUTION")
+        if strict_mode:
+            packages = self.deps_solver.get_dep_packages([project], ["build"])
+        else:
+            # Just grab every package in the toolchain that does not match
+            # a project in the worktree without solving any deps
+            if self.toolchain:
+                packages = [p for p in self.toolchain.packages \
+                            if p.name not in project_names]
+            else:
+                packages = list()
+        sdk_dirs.extend([package.path for package in packages])
+        return sdk_dirs
 
     def pre_build(self, project):
         """ Called before building a project """
