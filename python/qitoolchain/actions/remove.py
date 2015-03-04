@@ -30,6 +30,7 @@ def do(args):
         ui.info(ui.green, "done")
     else:
         ui.info("Would remove toolchain", ui.blue, tc.name)
+        ui.info("Use --force to actually remove it.")
         return
 
     qibuild_cfg = qibuild.config.QiBuildConfig()
