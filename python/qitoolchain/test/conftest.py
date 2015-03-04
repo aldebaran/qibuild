@@ -6,6 +6,7 @@ from qisys.test.conftest import *
 
 import qisys.qixml
 from qisys.qixml import etree
+import qibuild.deps
 import qitoolchain
 import qitoolchain.qipackage
 import qitoolchain.database
@@ -25,11 +26,23 @@ class Toolchains():
         toolchain = qitoolchain.toolchain.Toolchain(name)
         return toolchain
 
-    def add_package(self, name, package_name, package_version="r1"):
+    def add_package(self, name, package_name, package_version="r1",
+                    build_depends=None, run_depends=None, test_depends=None):
         toolchain = qitoolchain.get_toolchain(name)
         package_path = self.tmp.mkdir(package_name)
         package = qitoolchain.qipackage.QiPackage(package_name, package_version)
         package.path = package_path.strpath
+        package.build_depends = build_depends
+        package.run_depends = run_depends
+        package.test_depends = test_depends
+        package_xml = self.tmp.join(package_name, "package.xml")
+        xml_elem = qisys.qixml.etree.Element("package")
+        xml_elem.set("name", package_name)
+        if package_version:
+            xml_elem.set("version", package_version)
+        qibuild.deps.dump_deps_to_xml(package, xml_elem)
+        qisys.qixml.write(xml_elem, package_xml.strpath)
+
         toolchain.add_package(package)
         return package
 

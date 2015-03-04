@@ -13,3 +13,11 @@ def test_feed(feed):
     parser.parse(feed.url)
     packages = parser.get_packages()
     assert packages[0].url == boost_package.url
+
+def test_create_package_with_dependencies(toolchains):
+    toolchains.create("foo")
+    world_package = toolchains.add_package("foo", "world")
+    hello_package = toolchains.add_package("foo", "hello", run_depends=["world"])
+    toolchain = qitoolchain.get_toolchain("foo")
+    actual = toolchain.solve_deps([hello_package], dep_types=["runtime"])
+    assert actual == [world_package, hello_package]
