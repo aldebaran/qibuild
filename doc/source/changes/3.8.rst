@@ -6,7 +6,7 @@ misc
 
 * Add ``urxvt-unicode-256color`` as a possible value for ``$TERM`` when
   trying to figure out whether color output should be enabled
-* Support creating worktrees in accentuated file paths
+* Setting terminal title now works on Mac and Windows
 
 qibuild
 -------
@@ -45,6 +45,20 @@ qibuild
     </qibuild>
 
   in ``/path/to/worktree/.qi/qibuild.xml``
+
+* Changes in handling dependencies to packages in the toolchain:
+
+  * ``CMAKE_PREFIX_PATH`` is set in the ``dependencies.cmake`` file,
+    no longer in the generated toolchain file
+
+  * Optionally use ``qiproject.xml`` information instead of adding every path
+    of every package in ``CMAKE_PREFIX_PATH``
+
+    (This behavior is triggered by setting the
+    ``QIBUILD_STRICT_DEPS_RESOLUTION`` environment variable for now, but will
+    be the default in the next release)
+
+
 * ``qibuild find``: fix return code when no CMake module is found
 * Fix using ``-j`` with ``Visual Studio`` generators.
 * Include toolchain paths in path.conf
@@ -96,14 +110,17 @@ qisrc
   * Fix computation of git status before trying the rebase
   * Prettier output
 
+* ``qisrc create``: add ``-i,--template-path`` argument. This
+  allows users to create their own templates
+
 * ``qisrc create``: better handling of ``"/"`` in argument
 * ``qisrc grep``: fix using git grep options such as
   ``qisrc grep -- -i foo``
-* ``qisrc sync``: fix retcode when some projects are skipped
+* ``qisrc sync``: fix return code when some projects are skipped
 * Implements ``qisrc sync --reset``
+* ``qisrc init``, ``qisrc sync``: fix return code when cloning new repositories fails
+* Fix using ``qisrc checkout --force`` when not on a branch
 
-* ``qisrc create``: add ``-i,--template-path`` argument. This
-  allows users to create their own templates
 
 qitest
 ------
@@ -118,6 +135,7 @@ qitoolchain
 * No longer writes files in ``~/.cache/qi/toolchains``
 * Also remove package files when a package is removed from the feed
 * ``qitoolchain add-package``: support legacy format
+* Allow including or excluding files with masks when installing packages
 
 cmake
 ------
@@ -131,3 +149,4 @@ cmake
 
 * ``qi_swig_wrap_python``: handle lower case DEPENDS arguments
 * ``qi_install_python``: fix default destination on Windows
+* ``qt-tools``: add ``qi_set_qt_plugin_properties``
