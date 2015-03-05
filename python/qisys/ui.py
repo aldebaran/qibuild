@@ -110,13 +110,18 @@ def config_title(fp):
         return False
     if config_title.lower() == "always":
         return True
-    # else: auto
-    legal_terms = ["xterm", "xterm-256color", "xterm-color", "Eterm", "aterm", "rxvt",
-            "screen", "kterm", "rxvt-unicode", "gnome", "interix",
-            "rxvt-unicode-256color"]
-    return fp.isatty() and \
-        'TERM' in os.environ and \
-        os.environ['TERM'] in legal_terms
+    if os.name == 'nt':
+        return fp.isatty() and _console is not None
+    else:
+        # else: auto
+        legal_terms = ["xterm", "xterm-256color", "xterm-color",
+                       "Eterm", "aterm", "rxvt", "screen", "kterm",
+                       "rxvt-unicode", "gnome", "interix", "cygwin",
+                       "rxvt-unicode-256color"]
+        return fp.isatty() and \
+            'TERM' in os.environ and \
+            os.environ['TERM'] in legal_terms
+
 
 def config_color(fp):
     config_color = CONFIG["color"]
@@ -133,15 +138,24 @@ def config_color(fp):
 _enable_xterm_title = None
 
 def update_title(mystr, fp):
+    if os.name == "nt":
+        _update_title_windows(mystr)
+    else:
+        _update_title_unix(mystr, fp)
+
+def _update_title_unix(mystr, fp):
     global _enable_xterm_title
     if _enable_xterm_title is None:
         _enable_xterm_title = config_title(fp)
 
     if _enable_xterm_title:
         mystr = '\x1b]0;%s\x07' % mystr
-
         fp.write(mystr)
         fp.flush()
+
+def _update_title_windows(mystr):
+    if _console and config_title(sys.stdout):
+        _console.title(txt=mystr)
 
 def _msg(*tokens, **kwargs):
     """ Helper method for error, warning, info, debug
@@ -319,7 +333,6 @@ def get_console_size():
     if current_os == 'Linux' or current_os == 'Darwin' or  current_os.startswith('CYGWIN'):
         tuple_xy = _get_console_size_linux()
     if tuple_xy is None:
-        print "default"
         tuple_xy = (80, 25)      # default value
     return tuple_xy
 
