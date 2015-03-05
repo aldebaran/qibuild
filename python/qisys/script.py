@@ -162,7 +162,7 @@ def _dump_arguments(name, args):
     keys.sort()
     for k in keys:
         value = args.__dict__[k]
-        output += "  " + k.ljust(max_len) + " = %s\n" % value
+        output += "  " + k.ljust(max_len) + " = %s\n" % (value,)
     if output[-1] == "\n":
         output = output[:-1]
     ui.debug("[%s] arguments:\n%s" % (name, output))
