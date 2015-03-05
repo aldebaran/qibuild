@@ -194,7 +194,7 @@ list(FIND CMAKE_PREFIX_PATH "{sdk_dir}" _found)
 if(_found STREQUAL "-1")
   list(INSERT CMAKE_PREFIX_PATH 0 "{sdk_dir}")
 endif()
-    """.format(sdk_dir=qisys.sh.to_posix_path(sdk_dir))
+""".format(sdk_dir=qisys.sh.to_posix_path(sdk_dir))
 
         to_write = to_write.format(
             cmake_qibuild_dir=cmake_qibuild_dir,
