@@ -10,6 +10,8 @@ misc
 * Add ``XDG`` base directory support
 * Add option ``--home`` to every command to choose the path to global config
   files.
+* Add a package for the Nix package manager in ``contrib/``. This enables
+  testing qibuild in an isolated environment with or without its dependencies.
 
 qibuild
 -------
