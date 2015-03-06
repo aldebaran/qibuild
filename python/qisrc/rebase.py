@@ -58,6 +58,7 @@ def rebase_projects(git_projects, upstream_projects, branch):
     errors = list()
     forked_projects = get_forked_projects(git_projects, upstream_projects, branch)
     if not forked_projects:
+        ui.info(ui.green, "Nothing to rebase")
         return list(), list()
     ui.info(ui.green, "Rebasing forked projects ...")
     max_src = max(len(x.src) for x in forked_projects)
