@@ -74,3 +74,16 @@ def test_skip_checkout_when_possible(qisrc_action, git_server, record_messages):
     qisrc_action("init", manifest_url, "--branch", "master")
     qisrc_action("checkout", "devel")
     assert not record_messages.find("Checkout bar")
+
+def test_using_force_when_not_an_a_branch(qisrc_action, git_server):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "foo.txt", "this is foo")
+    manifest_url = git_server.manifest_url
+    qisrc_action("init", manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = qisrc.git.Git(foo_proj.path)
+    git.checkout("HEAD~1")
+    assert not git.get_current_branch()
+    qisrc_action("checkout", "master", "--force")
+    assert git.get_current_branch() == "master"

@@ -481,7 +481,7 @@ class Git(object):
         (False, error) in case of error
         """
         current_branch = self.get_current_branch()
-        if not current_branch:
+        if not current_branch and not force:
             return False, "not on any branch, skipping"
         clean, error = self.require_clean_worktree()
         if not clean and not force:
