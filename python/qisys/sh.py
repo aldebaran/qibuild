@@ -28,6 +28,17 @@ except ImportError:
     xdg_cache_home = os.path.expanduser("~/.cache")
     xdg_data_home = os.path.expanduser("~/.local/share")
 
+CONFIG_PATH = xdg_config_home
+CACHE_PATH = xdg_cache_home
+SHARE_PATH = xdg_data_home
+
+def set_home(home):
+    global CONFIG_PATH, CACHE_PATH, SHARE_PATH
+
+    CONFIG_PATH = os.path.join(home, "config")
+    CACHE_PATH = os.path.join(home, "cache")
+    SHARE_PATH = os.path.join(home, "share")
+
 def get_config_path(*args):
     """ Get a config path to read or write some configuration.
 
@@ -35,7 +46,7 @@ def get_config_path(*args):
                  when needed
 
     """
-    return get_path(xdg_config_home, *args)
+    return get_path(CONFIG_PATH, *args)
 
 def get_cache_path(*args):
     """ Get a config path to read or write some cached data
@@ -44,7 +55,7 @@ def get_cache_path(*args):
                  when needed
 
     """
-    return get_path(xdg_cache_home, *args)
+    return get_path(CACHE_PATH, *args)
 
 def get_share_path(*args):
     """ Get a config path to read or write some persistent data
@@ -53,7 +64,7 @@ def get_share_path(*args):
                  when needed
 
     """
-    return get_path(xdg_data_home, *args)
+    return get_path(SHARE_PATH, *args)
 
 def get_path(*args):
     """ Helper for get_*_path methods """

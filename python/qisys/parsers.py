@@ -11,6 +11,15 @@ import os
 import qisys.sh
 import qisys.worktree
 
+class SetHome(argparse.Action):
+    """argparse action that calls qisys.sh.set_home on the argument value"""
+
+    def __init__(self, *args, **kwargs):
+        super(SetHome, self).__init__(*args, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string):
+        qisys.sh.set_home(values)
+
 def log_parser(parser):
     """Given a parser, add the options controlling log."""
     group = parser.add_argument_group("logging options")
@@ -31,6 +40,8 @@ def default_parser(parser):
     """Parser settings for every action."""
     # Every action should have access to a proper log
     log_parser(parser)
+    parser.add_argument("--home", action=SetHome,
+        help="Store global data in this directory instead of HOME")
     # Every action can use  --pdb and --backtrace
     group = parser.add_argument_group("debug options")
     group.add_argument("--backtrace", action="store_true", help="Display backtrace on error")
