@@ -20,8 +20,6 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     def __init__(self, project):
         super(ProjectTestRunner, self).__init__(project)
-        self.test_results_dir = "test-results"
-        self.perf_results_dir = "perf-results"
         self._coverage = False
         self._valgrind = False
         self.break_on_failure = False
@@ -35,23 +33,25 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @property
     def test_results_dir(self):
-        return self._test_results_dir
-
-    @test_results_dir.setter
-    def test_results_dir(self, value):
-        self._test_results_dir = os.path.join(self.project.sdk_directory, value)
-        qisys.sh.rm(self._test_results_dir)
-        qisys.sh.mkdir(self._test_results_dir, recursive=True)
+        if self.root_output_dir:
+            if self.project.name:
+                base = os.path.join(self.root_output_dir, self.project.name)
+            else:
+                base = self.root_output_dir
+        else:
+            base = self.project.sdk_directory
+        return os.path.join(base, "test-results")
 
     @property
     def perf_results_dir(self):
-        return self._perf_results_dir
-
-    @perf_results_dir.setter
-    def perf_results_dir(self, value):
-        self._perf_results_dir = os.path.join(self.project.sdk_directory, value)
-        qisys.sh.rm(self._perf_results_dir)
-        qisys.sh.mkdir(self._perf_results_dir, recursive=True)
+        if self.root_output_dir:
+            if self.project.name:
+                base = os.path.join(self.root_output_dir, self.project.name)
+            else:
+                base = self.root_output_dir
+        else:
+            base = self.project.sdk_directory
+        return os.path.join(base, "perf-results")
 
     @property
     def num_cpus(self):
@@ -101,6 +101,11 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         self.suite_runner = project_runner
         self.project = self.suite_runner.project
         self.verbose = self.suite_runner.verbose
+        # Make sure output dirs exist and are empty:
+        for directory in self.suite_runner.perf_results_dir, \
+                         self.suite_runner.test_results_dir:
+            qisys.sh.rm(directory)
+            qisys.sh.mkdir(directory, recursive=True)
 
     def valgrind_log(self, test):
         return  os.path.join(self.suite_runner.test_results_dir,

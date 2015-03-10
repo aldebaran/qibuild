@@ -9,6 +9,8 @@ import xml.etree.ElementTree as etree
 import qisys.worktree
 import qibuild.worktree
 
+from qitest.test.conftest import qitest_action
+
 def test_various_outcomes(qibuild_action, record_messages):
     qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme")
@@ -68,7 +70,6 @@ def test_various_outcomes(qibuild_action, record_messages):
     else:
         assert "flag" in content.decode("utf-8")
 
-
 def get_result_dir():
     worktree = qisys.worktree.WorkTree(os.getcwd())
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
@@ -86,3 +87,30 @@ def test_do_not_overwrite_xml_when_test_fails(qibuild_action):
     with open(fake_xml, "r") as fp:
         contents = fp.read()
     assert contents == "<gtest>FAKE_RESULTS</gtest>\n"
+
+def test_setting_output_dir_with_project(qitest_action, qibuild_action, tmpdir):
+    test_out = tmpdir.join("test-out", "testme")
+    qibuild_action.add_test_project("testme")
+    qibuild_action("configure", "testme")
+    qibuild_action("make", "testme")
+    qitest_action("run", "testme", "-k", "ok", "--root-output-dir", test_out.strpath)
+    ok_xml = test_out.join("testme", "test-results", "ok.xml")
+    assert ok_xml.check(file=True)
+    retcode = qitest_action("run", "testme", "-k", "fail",
+                            "--root-output-dir", test_out.strpath,
+                            retcode=True)
+    assert not ok_xml.check(file=True)
+
+def test_setting_output_dir_without_project(qitest_action, qibuild_action, tmpdir):
+    dest = tmpdir.join("dest")
+    qibuild_action.add_test_project("testme")
+    qibuild_action("configure", "testme")
+    qibuild_action("make", "testme")
+    qibuild_action("install", "--with-tests", "testme", dest.strpath)
+    qitest_json = dest.join("qitest.json")
+    out = tmpdir.join("out")
+    qitest_action("run",
+                  "-k", "ok",
+                  "--qitest-json", qitest_json.strpath,
+                  "--root-output-dir", out.strpath)
+    assert out.join("test-results", "ok.xml").check(file=True)

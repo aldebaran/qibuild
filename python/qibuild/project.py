@@ -453,6 +453,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             ui.error("No tests were found in qitest.json.\n" +
                      "Add some in the CMakeLists using " +
                      "qi_add_test() or similar")
+        res.name = self.name
         return res
 
     def fix_shared_libs(self, paths):

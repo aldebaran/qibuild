@@ -2,11 +2,13 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 from qibuild.test.conftest import *
+from qisys.test.conftest import TestAction
 
 import qibuild.find
 
 import pytest
 
+# pylint: disable-msg=E1103
 @pytest.fixture
 def compiled_tests(build_worktree):
     testme_proj = build_worktree.add_test_project("testme")
@@ -25,3 +27,12 @@ def compiled_tests(build_worktree):
         tests.append(test)
     return tests
 
+# pylint: disable-msg=E1103
+@pytest.fixture
+def qitest_action(cd_to_tmpdir):
+    res = QiTestAction()
+    return res
+
+class QiTestAction(TestAction):
+    def __init__(self):
+        super(QiTestAction, self).__init__("qitest.actions")

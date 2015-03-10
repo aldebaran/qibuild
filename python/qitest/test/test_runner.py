@@ -26,6 +26,7 @@ def test_match_patterns(tmpdir):
     test_runner.patterns = ["foo", "bar"]
     assert test_runner.tests == [test_foo, test_bar, test_foo_bar]
 
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception):
         test_runner.patterns = "foo("
 

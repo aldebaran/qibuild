@@ -27,13 +27,16 @@ def test_can_add_tests(tmpdir):
 
 def test_errors(tmpdir):
     qitest_json_path = tmpdir.join("qitest.json").strpath
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qitest.conf.add_test(qitest_json_path, name="foo")
     assert "Should provide a test cmd" in e.value.message
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qitest.conf.add_test(qitest_json_path, cmd="foo")
     assert "Should provide a test name" in e.value.message
     qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/foo"])
+    # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/bar"])
     assert "A test named 'foo' already exists" in e.value.message

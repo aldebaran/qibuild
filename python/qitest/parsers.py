@@ -34,6 +34,10 @@ def test_parser(parser, with_num_jobs=True):
     group.add_argument("--break-on-failure", action="store_true", dest="break_on_failure",
                       help="Break on failure (for gtest only)")
     group.add_argument("--qitest-json", dest="qitest_jsons", action="append")
+    group.add_argument("--root-output-dir", dest="root_output_dir",
+                      help="Generate XML reports in the given directory " + \
+                           "(instead of build/sdk/test-results)")
+
     parser.set_defaults(nightly=False)
     if with_num_jobs:
         group.add_argument("-j", dest="num_jobs", default=1, type=int,
@@ -90,6 +94,7 @@ def get_test_runner(args, project_name=None, qitest_json=None):
     test_runner.num_jobs = args.num_jobs
     test_runner.nightly = args.nightly
     test_runner.nightmare = args.nightmare
+    test_runner.root_output_dir = args.root_output_dir
 
     return test_runner
 
