@@ -5,6 +5,7 @@
 import qisys.sort
 from qisys.qixml import etree
 
+
 class DepsSolver(object):
     """ Solve dependencies across projects in a build worktree
     and packages in a toolchain
@@ -27,7 +28,8 @@ class DepsSolver(object):
         dep_projects = list()
 
         for name in sorted_names:
-            dep_project = self.build_worktree.get_build_project(name, raises=False)
+            dep_project = self.build_worktree.get_build_project(name,
+                raises=False)
             if dep_project:
                 dep_projects.append(dep_project)
         return dep_projects
@@ -44,7 +46,8 @@ class DepsSolver(object):
         toolchain = self.build_worktree.toolchain
         if not toolchain:
             return list()
-        build_project_names = [x.name for x in self.build_worktree.build_projects]
+        build_project_names = [x.name for x in
+            self.build_worktree.build_projects]
 
         dep_packages = list()
         for name in sorted_names:
@@ -68,7 +71,6 @@ class DepsSolver(object):
                 continue
             res.append(dep_project.sdk_directory)
         return res
-
 
     def _get_sorted_names(self, projects, dep_types, reverse=False):
         """ Helper for get_dep_* functions """
@@ -109,8 +111,8 @@ def read_deps_from_xml(target, xml_elem):
 
     for depends_tree in depends_trees:
         buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
-        runtime   = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
-        testtime  = qisys.qixml.parse_bool_attr(depends_tree, "testtime")
+        runtime = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
+        testtime = qisys.qixml.parse_bool_attr(depends_tree, "testtime")
         dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
         for dep_name in dep_names:
             if buildtime:
@@ -119,6 +121,7 @@ def read_deps_from_xml(target, xml_elem):
                 target.run_depends.add(dep_name)
             if testtime:
                 target.test_depends.add(dep_name)
+
 
 def dump_deps_to_xml(subject, xml_elem):
     if subject.build_depends:
