@@ -204,6 +204,26 @@ def test_review_projects_with_two_remotes(tmpdir):
     assert bar.review == True
     assert bar.default_remote.name == "origin"
 
+def test_no_review(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <remote name="gerrit" url="http://gerrit:8080" review="true" />
+  <repo project="foo/bar.git" src="lib/bar" remotes="origin gerrit" />
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath, review=False)
+
+    assert len(manifest.repos) == 1
+    [repo] = manifest.repos
+    assert repo.review == False
+    assert repo.default_remote.name == "origin"
+
+    assert len(repo.remotes) == 1
+    [remote] = repo.remotes
+    assert remote.name == "origin"
+    assert remote.review is False
 
 def test_default_remote(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")

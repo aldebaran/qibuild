@@ -20,8 +20,9 @@ class ManifestError(Exception):
 
 
 class Manifest(object):
-    def __init__(self, manifest_xml):
+    def __init__(self, manifest_xml, review=True):
         self.manifest_xml = manifest_xml
+        self.review = review
         self.repos = list()
         self.remotes = list()
         self.default_branch = None
@@ -58,6 +59,8 @@ class Manifest(object):
             project_names.append(repo.project)
 
         for remote in self.remotes:
+            if remote.review and not self.review:
+                continue
             remote.parse_url()
 
         review_remotes = list()
@@ -95,6 +98,8 @@ Found two projects sharing the same sources:
         if not matching_remote:
             raise ManifestError("No matching remote: %s for repo %s" %
                                 (remote_name, repo.project))
+        if matching_remote.review and not self.review:
+            return
         remote = copy.copy(matching_remote)
         remote.url = matching_remote.prefix + repo.project
         if repo.default_branch is None:
@@ -259,7 +264,7 @@ class RepoConfig(object):
 class ManifestParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(ManifestParser, self).__init__(target)
-        self._ignore = ["manifest_xml"]
+        self._ignore = ["manifest_xml", "review"]
 
     def _parse_branch(self, elem):
         self.target.default_branch = elem.get("default")
