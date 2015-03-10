@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 
 import os
+import platform
 import subprocess
 
 import qisys.command
@@ -234,3 +235,12 @@ qi_create_test(env2 env.cpp)
     test_proj2 = qibuild_proj.to_test_project()
     num_tests_after = len(test_proj2.tests)
     assert num_tests_after == num_tests_before + 1
+
+def test_using_build_prefix(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("world")
+    prefix = tmpdir.join("mybuild")
+    qibuild_action("configure", "world", "--build-prefix", prefix.strpath)
+    expected = prefix.join("world",
+                           "build-sys-%s-%s" % (platform.system().lower(),
+                                                platform.machine().lower()))
+    assert expected.join("CMakeCache.txt").check(file=True)

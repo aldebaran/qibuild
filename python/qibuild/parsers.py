@@ -19,9 +19,11 @@ def cmake_build_parser(parser, group=None, with_build_parser=True):
         qisys.parsers.build_parser(parser, group=None)
     if not group:
         group = parser.add_argument_group("Build options")
-    parser.add_argument("-j", dest="num_jobs", type=int)
+    group.add_argument("-j", dest="num_jobs", type=int)
     group.add_argument("--verbose-make", action="store_true", default=False,
                     help="Print the executed commands while building")
+    group.add_argument("--build-prefix", dest="build_prefix",
+                    help="Prefix for all the build directories")
 
 def cmake_configure_parser(parser):
     group = parser.add_argument_group("configure options")
@@ -195,6 +197,8 @@ def get_build_config(build_worktree, args):
         build_config.user_flags = user_flags
     if hasattr(args, "num_jobs"):
         build_config.num_jobs = args.num_jobs
+    if hasattr(args, "build_prefix"):
+        build_config.build_prefix = args.build_prefix
     return build_config
 
 ##
