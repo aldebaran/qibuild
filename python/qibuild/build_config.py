@@ -21,7 +21,7 @@ class CMakeBuildConfig(object):
         self.build_worktree = build_worktree
         self.build_type = "Debug"
         self.active_build_config = None
-        self.custom_build_dir = None
+        self.build_prefix = None
         self.user_flags = list()
         self._profiles = list()
         self._profile_flags = list()
@@ -162,7 +162,7 @@ class CMakeBuildConfig(object):
         local_settings = qibuild.config.LocalSettings()
         tree = qisys.qixml.read(self.build_worktree.qibuild_xml)
         local_settings.parse(tree)
-        self.custom_build_dir = local_settings.build.build_dir
+        self.build_prefix = local_settings.build.prefix
 
         # Legacy: in .qi/qibuild.xml
         default_config = local_settings.defaults.config

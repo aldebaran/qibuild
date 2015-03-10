@@ -178,14 +178,14 @@ def configure_local_settings(build_worktree):
         " (mandatory when using Eclipse)",
         default=False)
 
-    build_dir = None
+    build_prefix = None
     if answer:
-        build_dir = qisys.interact.ask_string("Path to a build directory")
-        build_dir = os.path.expanduser(build_dir)
-        full_path = os.path.join(worktree_root, build_dir)
+        build_prefix = qisys.interact.ask_string("Path to a build directory")
+        build_prefix = os.path.expanduser(build_prefix)
+        full_path = os.path.join(worktree_root, build_prefix)
         ui.info(ui.green, "::", ui.reset,
                 "Will use", full_path, "as a root for all build directories")
-    qibuild_cfg.local.build.build_dir = build_dir
+    qibuild_cfg.local.build.prefix = build_prefix
     qibuild_cfg.write_local_config(build_worktree.qibuild_xml)
 
 

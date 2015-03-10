@@ -333,7 +333,7 @@ class QiBuildConfig(unittest.TestCase):
         qibuild_cfg = cfg_from_string(xml)
         self.assertFalse(qibuild_cfg.build.incredibuild)
         self.assertTrue(qibuild_cfg.local.build.sdk_dir   is None)
-        self.assertTrue(qibuild_cfg.local.build.build_dir is None)
+        self.assertTrue(qibuild_cfg.local.build.prefix is None)
 
         xml = """
 <qibuild version="1">
@@ -346,7 +346,7 @@ class QiBuildConfig(unittest.TestCase):
 <qibuild version="1">
   <build
     sdk_dir="/path/to/sdk"
-    build_dir="/path/to/build"
+    prefix="/path/to/build"
   />
 </qibuild>
 """
@@ -354,7 +354,7 @@ class QiBuildConfig(unittest.TestCase):
         self.assertTrue(qibuild_cfg.build.incredibuild)
         qibuild_cfg.read_local_config(StringIO(local_xml))
         self.assertEqual(qibuild_cfg.local.build.sdk_dir, "/path/to/sdk")
-        self.assertEqual(qibuild_cfg.local.build.build_dir, "/path/to/build")
+        self.assertEqual(qibuild_cfg.local.build.prefix, "/path/to/build")
 
 
     def test_get_server_access(self):

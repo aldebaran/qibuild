@@ -267,7 +267,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.setup_generators(["Unix Makefiles"])
         self.setup_tc_names(list())
         self.run_wizard(build_worktree=self.build_worktree)
-        self.assertEqual(self.build_worktree.qibuild_cfg.local.build.build_dir,
+        self.assertEqual(self.build_worktree.qibuild_cfg.local.build.prefix,
                          "build")
 
     def test_full_wizard(self):
@@ -308,7 +308,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         worktree = qisys.worktree.WorkTree(self.tmp, sanity_check=False)
         old_build_worktree = qibuild.worktree.BuildWorkTree(worktree)
         self.run_wizard(build_worktree=old_build_worktree)
-        self.assertEqual(old_build_worktree.qibuild_cfg.local.build.build_dir,
+        self.assertEqual(old_build_worktree.qibuild_cfg.local.build.prefix,
                          "build")
 
         self.interact_patcher.stop()
@@ -321,7 +321,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         })
         new_build_worktree = qibuild.worktree.BuildWorkTree(worktree)
         self.run_wizard(build_worktree=new_build_worktree)
-        build_dir = new_build_worktree.qibuild_cfg.local.build.build_dir
+        build_dir = new_build_worktree.qibuild_cfg.local.build.prefix
         sdk_dir = new_build_worktree.qibuild_cfg.local.build.sdk_dir
         self.assertFalse(build_dir,
             "build_dir is '%s', should be None or empty" % build_dir)

@@ -96,12 +96,12 @@ class BuildProject(object):
 
         """
         build_directory_name = self.build_config.build_directory()
-        custom_build_dir = self.build_config.custom_build_dir
-        if custom_build_dir:
+        build_prefix = self.build_config.build_prefix
+        if build_prefix:
             return os.path.join(self.build_worktree.root,
-                                custom_build_dir,
-                                build_directory_name,
-                                self.name)
+                                build_prefix,
+                                self.name,
+                                build_directory_name)
         else:
             return os.path.join(self.path, build_directory_name)
 

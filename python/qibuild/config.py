@@ -316,26 +316,26 @@ class LocalDefaults:
 class LocalBuild:
     def __init__(self):
         self.sdk_dir = None
-        self.build_dir = None
+        self.prefix = None
 
     def parse(self, tree):
         # Not calling to_native_path because build_dir and sdk_dir can be
         # relative to the worktree
-        self.build_dir = tree.get("build_dir")
+        self.prefix = tree.get("prefix")
         self.sdk_dir = tree.get("sdk_dir")
 
     def tree(self):
         tree = etree.Element("build")
-        if self.build_dir:
-            tree.set("build_dir", self.build_dir)
+        if self.prefix:
+            tree.set("prefix", self.prefix)
         if self.sdk_dir:
             tree.set("sdk_dir", self.sdk_dir)
         return tree
 
     def __str__(self):
         res = ""
-        if self.build_dir:
-            res += "build_dir: %s\n" % self.build_dir
+        if self.prefix:
+            res += "build prefix: %s\n" % self.prefix
         if self.sdk_dir:
             res += "sdk_dir: %s\n" % self.sdk_dir
         return res

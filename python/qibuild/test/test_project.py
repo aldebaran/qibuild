@@ -57,13 +57,13 @@ def test_gen_scm_info(build_worktree, tmpdir):
     git_elem = scm_elem.find("git")
     assert git_elem.get("revision") == sha1
 
-def test_using_custom_build_dir(build_worktree):
+def test_using_build_prefix(build_worktree):
     world_proj = build_worktree.add_test_project("world")
     build_config = build_worktree.build_config
-    build_config.custom_build_dir = "mybuild"
+    build_config.build_prefix = "mybuild"
     build_directory_name = build_config.build_directory()
     assert world_proj.build_directory == os.path.join(build_worktree.root, "mybuild",
-                                                      build_directory_name, "world")
+                                                      "world", build_directory_name)
 
 def test_validates_name(build_worktree):
     # pylint:disable-msg=E1101
