@@ -39,10 +39,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self._syncer = qisrc.sync.WorkTreeSyncer(self)
 
     def configure_manifest(self, manifest_url, groups=None,
-                           branch="master", ref=None):
+                           branch="master", ref=None, review=True):
         """ Add a new manifest to this worktree """
         return self._syncer.configure_manifest(manifest_url, groups=groups,
-                                               branch=branch, ref=ref)
+                                               branch=branch, ref=ref, review=review)
 
     def configure_projects(self, projects):
         self._syncer.configure_projects(projects)

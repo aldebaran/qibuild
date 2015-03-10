@@ -23,6 +23,30 @@ def test_use_branch(cd_to_tmpdir, git_server):
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 2
 
+def test_no_review(qisrc_action, git_server):
+    git_server.create_repo("foo.git", review=True)
+    qisrc_action("init", git_server.manifest_url, "--no-review")
+    git_worktree = TestGitWorkTree()
+
+    assert len(git_worktree.git_projects) == 1
+    assert not git_worktree.manifest.review
+
+    remotes = git_worktree.git_projects[0].remotes
+    assert len(remotes) == 1
+    assert not remotes[0].review
+
+def test_review_on_by_default(qisrc_action, git_server):
+    git_server.create_repo("foo.git", review=True)
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+
+    assert len(git_worktree.git_projects) == 1
+    assert git_worktree.manifest.review
+
+    remotes = git_worktree.git_projects[0].remotes
+    assert len(remotes) == 2
+    assert [remote for remote in remotes if remote.review]
+
 def test_finish_configure_after_error(qisrc_action, git_server):
     # bogus repo can't be configured, but we don't want configuration to be
     # interrupted

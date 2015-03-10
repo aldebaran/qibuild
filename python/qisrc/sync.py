@@ -131,7 +131,7 @@ class WorkTreeSyncer(object):
         xml = parser.xml_elem()
         qisys.qixml.write(xml, self.manifest_xml)
 
-    def configure_manifest(self, url, branch="master", groups=None, ref=None):
+    def configure_manifest(self, url, branch="master", groups=None, ref=None, review=True):
         """ Add a manifest to the list. Will be stored in
         .qi/manifests/<name>
 
@@ -141,6 +141,7 @@ class WorkTreeSyncer(object):
         self.manifest.groups = groups
         self.manifest.branch = branch
         self.manifest.ref = ref
+        self.manifest.review = review
         self._sync_manifest()
         res = self.sync_repos()
         self.configure_projects()
@@ -153,7 +154,7 @@ class WorkTreeSyncer(object):
         """
         if not manifest_xml:
             manifest_xml = os.path.join(self.manifest_repo, "manifest.xml")
-        remote_manifest = qisrc.manifest.Manifest(manifest_xml)
+        remote_manifest = qisrc.manifest.Manifest(manifest_xml, review=self.manifest.review)
         groups = self.manifest.groups
         # if self.manifest.groups is empty but there is a default
         # group in the manifest, we need to set self.manifest.groups
@@ -312,6 +313,7 @@ class LocalManifest(object):
         self._groups = list()
         self.ref = None # used for snaphots or in case you
                         # don't want the head of a branch
+        self.review = True
 
     @property
     def groups(self):

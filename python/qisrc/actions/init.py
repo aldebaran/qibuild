@@ -20,17 +20,20 @@ def configure_parser(parser):
     parser.add_argument("manifest_url", nargs="?")
     parser.add_argument("-b", "--branch", dest="branch",
         help="Use this branch for the manifest")
+    parser.add_argument("--no-review", dest="review", action="store_false",
+        default=True, help="Do not sync the review remotes")
     parser.set_defaults(branch="master")
 
 def do(args):
     """Main entry point"""
     root = os.getcwd()
-    workrtee = qisys.worktree.WorkTree(root)
-    git_worktree = qisrc.worktree.GitWorkTree(workrtee)
+    worktree = qisys.worktree.WorkTree(root)
+    git_worktree = qisrc.worktree.GitWorkTree(worktree)
     if args.manifest_url:
         ok = git_worktree.configure_manifest(args.manifest_url,
                                         groups=args.groups,
-                                        branch=args.branch)
+                                        branch=args.branch,
+                                        review=args.review)
     if not ok:
         sys.exit(1)
 
