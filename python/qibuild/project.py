@@ -536,7 +536,11 @@ The following tools were not found: {missing}\
         qibuild_cfg.read(create_if_missing=True)
         config_names = qibuild_cfg.configs.keys()
         build_names.extend(["build-" + x for x in config_names])
-        dirs = os.listdir(self.path)
+        build_prefix = self.build_config.build_prefix
+        if build_prefix:
+            dirs = os.listdir(os.path.join(build_prefix, self.name))
+        else:
+            dirs = os.listdir(self.path)
         ret = {'known_configs': list(), 'unknown_configs': list()}
         for bdir in dirs:
             if bdir in build_names:
@@ -544,7 +548,10 @@ The following tools were not found: {missing}\
             elif bdir.startswith("build-"):
                 ret['unknown_configs'].append(bdir)
         for k in ret.keys():
-            ret[k] = [os.path.join(self.path, x) for x in ret[k]]
+            if build_prefix:
+                ret[k] = [os.path.join(build_prefix, self.name, x) for x in ret[k]]
+            else:
+                ret[k] = [os.path.join(self.path, x) for x in ret[k]]
         return ret
 
     def gen_package_xml(self, output):

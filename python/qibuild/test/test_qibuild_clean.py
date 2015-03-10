@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 
 import os
+import platform
 import py
 
 import qisys.sh
@@ -62,3 +63,16 @@ def test_cleaning_unknown_configs(qibuild_action, toolchains, interact):
     interact.answers = [True]
     qibuild_action("clean", "-x", "--all", "--force")
     assert build_c.check(dir=False)
+
+
+def test_using_build_prefix(qibuild_action, tmpdir):
+    mybuild = tmpdir.join("mybuild")
+    qibuild_action.add_test_project("world")
+    qibuild_action("configure", "world", "--build-prefix", mybuild.strpath)
+    build_dir = mybuild.join("world",
+                             "build-sys-%s-%s" % (platform.system().lower(),
+                                                platform.machine().lower()))
+    assert build_dir.check(dir=True)
+    qibuild_action("clean", "world", "-z", "--force",
+                   "--build-prefix", mybuild.strpath)
+    assert build_dir.check(dir=False)
