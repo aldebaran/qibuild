@@ -87,7 +87,7 @@ class WorkTreeSyncer(object):
             ui.info()
         self._sync_manifest()
         self._sync_groups()
-        self.new_repos = self.get_new_repos()
+        self.new_repos = self.read_remote_manifest()
         res = self._sync_repos(self.old_repos, self.new_repos)
         # re-read self.old_repos so we can do several syncs:
         self.old_repos = self.get_old_repos()
@@ -183,13 +183,6 @@ class WorkTreeSyncer(object):
                 old_repo.src = old_project.src
                 old_repos.append(old_repo)
         return old_repos
-
-    def get_new_repos(self):
-        """ Read all the repos coming from all the manifests
-
-        """
-        new_repos = self.read_remote_manifest()
-        return new_repos
 
     def _sync_manifest(self):
         """ Update the local manifest clone with the remote """
