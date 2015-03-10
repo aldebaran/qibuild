@@ -142,7 +142,6 @@ class WorkTreeSyncer(object):
         self.manifest.branch = branch
         self.manifest.ref = ref
         self.manifest.review = review
-        self._sync_manifest()
         res = self.sync_repos()
         self.configure_projects()
         return res
