@@ -7,6 +7,7 @@ misc
 * Add ``urxvt-unicode-256color`` as a possible value for ``$TERM`` when
   trying to figure out whether color output should be enabled
 * Setting terminal title now works on Mac and Windows
+* Add ``XDG`` base directory support
 
 qibuild
 -------
@@ -35,16 +36,26 @@ qibuild
 
 * ``qibuild clean``: fix when using remote profiles
 * ``qibuild init``: honor ``-w, --worktree`` option
-* Re-implement setting custom build directory. To use this feature, write something
-  like:
+* Re-implement setting a custom build prefix. (The feature was gone since qibuild 3.0)
+
+  To use this feature, write something like:
 
   .. code-block:: xml
 
     <qibuild>
-      <build build-dir="my-build" />
+      <build prefix="my-build" />
     </qibuild>
 
   in ``/path/to/worktree/.qi/qibuild.xml``
+
+  You can also use ``--build-prefix`` in your calls to ``qibuild configure``,
+  ``qibuild make`` and so on.
+
+  Note that the old syntax, using ``<build build_dir="my-build>`` is no longer
+  supported.
+
+  Also note that the build directories that will be created will be like
+  ``<prefix>/<project>/<build-dir>`` instead of ``<prefix>/<build-dir>/project``
 
 * Changes in handling dependencies to packages in the toolchain:
 
@@ -119,7 +130,10 @@ qisrc
 * ``qisrc sync``: fix return code when some projects are skipped
 * Implements ``qisrc sync --reset``
 * ``qisrc init``, ``qisrc sync``: fix return code when cloning new repositories fails
+* ``qisrc init``: re-implement ``--no-review``, which was gone since ``3.0``
 * Fix using ``qisrc checkout --force`` when not on a branch
+* Fix using ``qisrc init --worktree``
+* ``qisrc checkout --force``: fix when not on any branch
 
 
 qitest
@@ -128,6 +142,8 @@ qitest
 * Implement ``qitest run --break-on-failure``
 * Fix error messages in some corner cases
 * Fix several race conditions when using ``-j``
+* Implement ``qitest run --root-output-dir`` to store generated XML files
+  outside the sdk directory
 
 qitoolchain
 -----------
