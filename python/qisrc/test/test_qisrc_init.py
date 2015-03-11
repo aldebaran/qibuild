@@ -120,3 +120,8 @@ def test_retcode_when_cloning_fails(qisrc_action, git_server):
     git_server.srv.join("bar.git").remove()
     rc = qisrc_action("init", git_server.manifest_url, retcode=True)
     assert rc != 0
+
+def test_calling_init_twice(qisrc_action, git_server):
+    git_server.create_repo("bar.git")
+    qisrc_action("init", git_server.manifest_url)
+    qisrc_action("init")

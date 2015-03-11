@@ -34,8 +34,8 @@ def do(args):
                                         groups=args.groups,
                                         branch=args.branch,
                                         review=args.review)
-    if not ok:
-        sys.exit(1)
+        if not ok:
+            sys.exit(1)
 
     ui.info(ui.green, "New qisrc worktree initialized in",
             ui.reset, ui.bold, root)
