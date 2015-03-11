@@ -53,7 +53,7 @@ def test_prefer_sources_over_packages(build_worktree, toolchains):
     assert deps_solver.get_dep_projects([hello_proj], ["build"]) == [world_proj, hello_proj]
     assert not deps_solver.get_dep_packages([hello_proj], ["build"])
 
-def test_complex_dep_solving(build_worktree, toolchains):
+def test_complex_dep_solving1(build_worktree, toolchains):
     toolchains.create("foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
     libqi_package = toolchains.add_package("foo", "libqi")
@@ -65,6 +65,17 @@ def test_complex_dep_solving(build_worktree, toolchains):
     build_worktree.set_active_config("foo")
     assert deps_solver.get_dep_packages([naoqi_proj], ["runtime"]) == \
         [hal_package]
+
+def test_complex_dep_solving2(build_worktree, toolchains):
+    toolchains.create("foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
+    behavior_proj = build_worktree.create_project("behavior", build_depends=["libqiproject"])
+    toolchains.add_package("foo", "libqiproject", build_depends=["libqipackage"])
+    qipackage_proj = build_worktree.create_project("libqipackage")
+    deps_solver = DepsSolver(build_worktree)
+    build_worktree.set_active_config("foo")
+    assert deps_solver.get_dep_projects([behavior_proj], ["build"]) == \
+         [qipackage_proj, behavior_proj]
 
 def test_compute_sdk_dirs(build_worktree):
     libworld = build_worktree.create_project("libworld")

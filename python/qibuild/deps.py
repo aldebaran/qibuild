@@ -89,15 +89,20 @@ class DepsSolver(object):
             return sorted(list(reverse_deps))
 
         to_sort = dict()
-        for project in self.build_worktree.build_projects:
-            deps = set()
-            if "build" in dep_types:
-                deps.update(project.build_depends)
-            if "runtime" in dep_types:
-                deps.update(project.run_depends)
-            if "test" in dep_types:
-                deps.update(project.test_depends)
-            to_sort[project.name] = deps
+
+        # first, fill up dict with packages dependencies ...
+        toolchain = self.build_worktree.toolchain
+        if toolchain:
+            for package in toolchain.packages:
+                package.load_deps()
+            package_deps = gen_deps(toolchain.packages, dep_types)
+            to_sort.update(package_deps)
+
+        # then with project dependencies
+        project_deps = gen_deps(self.build_worktree.build_projects, dep_types)
+
+        to_sort.update(project_deps)
+
         return qisys.sort.topological_sort(to_sort, [x.name for x in projects])
 
 
@@ -136,3 +141,21 @@ def dump_deps_to_xml(subject, xml_elem):
         test_dep_elem = etree.SubElement(xml_elem, tag="depends")
         test_dep_elem.set("testtime", "true")
         test_dep_elem.set("names", " ".join(subject.test_depends))
+
+
+def gen_deps(objects_with_dependencies, dep_types):
+    """ Generate a dictionary name -> dependencies for the objects
+    passed as parameters (projects or packages)
+
+    """
+    res = dict()
+    for object_with_dependencies in objects_with_dependencies:
+        deps = set()
+        if "build" in dep_types:
+            deps.update(object_with_dependencies.build_depends)
+        if "runtime" in dep_types:
+            deps.update(object_with_dependencies.run_depends)
+        if "test" in dep_types:
+            deps.update(object_with_dependencies.test_depends)
+        res[object_with_dependencies.name] = deps
+    return res
