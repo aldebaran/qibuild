@@ -125,3 +125,8 @@ def test_calling_init_twice(qisrc_action, git_server):
     git_server.create_repo("bar.git")
     qisrc_action("init", git_server.manifest_url)
     qisrc_action("init")
+
+def test_explicit_worktree_root(qisrc_action, tmpdir):
+    custom_worktree = tmpdir.join("custom_worktree")
+    qisrc_action("init", "--worktree", custom_worktree.strpath)
+    assert qisys.worktree.WorkTree(custom_worktree.strpath)

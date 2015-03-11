@@ -8,6 +8,7 @@ import os
 import sys
 
 from qisys import ui
+import qisys.sh
 import qisys.parsers
 import qisys.worktree
 import qisrc.parsers
@@ -15,7 +16,7 @@ import qisrc.worktree
 
 def configure_parser(parser):
     """Configure parser for this action """
-    qisys.parsers.default_parser(parser)
+    qisys.parsers.worktree_parser(parser)
     qisrc.parsers.groups_parser(parser)
     parser.add_argument("manifest_url", nargs="?")
     parser.add_argument("-b", "--branch", dest="branch",
@@ -26,7 +27,8 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
-    root = os.getcwd()
+    root = args.worktree or os.getcwd()
+    qisys.sh.mkdir(root, recursive=True)
     worktree = qisys.worktree.WorkTree(root)
     git_worktree = qisrc.worktree.GitWorkTree(worktree)
     if args.manifest_url:
