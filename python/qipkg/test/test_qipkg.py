@@ -43,8 +43,8 @@ def test_breakpad_symbols(qipkg_action):
     pml = os.path.join(a_cpp_proj.path, "a_cpp.pml")
 
     qipkg_action("configure", "--release", "--with-debug-info", pml)
-    qipkg_action("build", "--release", pml)
-    pkg, symbols_archive = qipkg_action("make-package", "--with-breakpad", "--release", pml)
+    qipkg_action("build", pml)
+    pkg, symbols_archive = qipkg_action("make-package", "--with-breakpad", pml)
     assert os.path.exists(symbols_archive)
 
 def test_meta(qipkg_action):
