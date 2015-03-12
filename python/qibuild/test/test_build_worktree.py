@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 
 import os
+import sys
 
 import qibuild.config
 
@@ -59,3 +60,37 @@ def test_set_default_config(cd_to_tmpdir):
     assert build_worktree.default_config == "foo"
     build_worktree2 = TestBuildWorkTree()
     assert build_worktree2.default_config == "foo"
+
+def test_get_env(toolchains, cd_to_tmpdir):
+    toolchains.create("foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
+    bar_package = toolchains.add_package("foo", "bar")
+    build_worktree = TestBuildWorkTree()
+    build_worktree.set_active_config("foo")
+    world_proj = build_worktree.create_project("world")
+    env = build_worktree.get_env()
+    if sys.platform.startswith("linux"):
+        assert env["LD_LIBRARY_PATH"] == "%s:%s" % (
+                os.path.join(world_proj.sdk_directory, "lib"),
+                os.path.join(bar_package.path, "lib"))
+    if sys.platform.startswith("win"):
+        old_path = os.environ["PATH"]
+        assert env["PATH"] == "%s;%s;%s" % (
+                os.path.join(world_proj.sdk_directory, "bin"),
+                os.path.join(bar_package.path, "bin"),
+                old_path)
+    if sys.platform == "darwin":
+        assert env["DYLD_LIBRARY_PATH"] == "%s:%s" % (
+                os.path.join(world_proj.sdk_directory, "lib"),
+                os.path.join(bar_package.path, "lib"))
+        assert env["DYLD_FRAMEWORK_PATH"] == bar_package.path
+
+def test_set_pythonhome(toolchains, cd_to_tmpdir):
+    toolchains.create("foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
+    python_package = toolchains.add_package("foo", "python")
+    build_worktree = TestBuildWorkTree()
+    build_worktree.set_active_config("foo")
+    env = build_worktree.get_env()
+    assert env["PYTHONHOME"] == python_package.path
+

@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import os
+import sys
 import difflib
 
 from qisys import ui
@@ -54,6 +55,54 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
     def default_config(self):
         """ The default config to use """
         return self.build_config.default_config
+
+    def get_env(self):
+        """ Get an environment dictionary to help running binaries
+        using libraries from the build projects and the toolchain
+        packages
+
+        """
+        res = os.environ.copy()
+        if os.name == 'nt':
+            dlls_path = self._get_dll_paths()
+            res["PATH"] = ";".join(dlls_path) + ";" + os.environ["PATH"]
+        else:
+            lib_paths = self._get_lib_paths()
+            if sys.platform.startswith("linux"):
+                res["LD_LIBRARY_PATH"] = os.path.pathsep.join(lib_paths)
+            if sys.platform == "darwin":
+                res["DYLD_LIBRARY_PATH"] = os.path.pathsep.join(lib_paths)
+                res["DYLD_FRAMEWORK_PATH"] = os.path.pathsep.join(
+                        self._get_framework_paths())
+        if self.toolchain:
+            python_package = self.toolchain.get_package("python", raises=False)
+            if python_package:
+                res["PYTHONHOME"] = python_package.path
+        return res
+
+    def _get_lib_paths(self):
+        res = list()
+        for project in self.build_projects:
+            res.append(os.path.join(project.sdk_directory, "lib"))
+        if self.toolchain:
+            for package in self.toolchain.packages:
+                res.append(os.path.join(package.path, "lib"))
+        return res
+
+    def _get_framework_paths(self):
+        res = list()
+        if self.toolchain:
+            for package in self.toolchain.packages:
+                res.append(package.path)
+        return res
+
+    def _get_dll_paths(self):
+        res = list()
+        for project in self.build_projects:
+            res.append(os.path.join(project.sdk_directory, "bin"))
+        if self.toolchain:
+            for package in self.toolchain.packages:
+                res.append(os.path.join(package.path, "bin"))
 
     def get_known_profiles(self):
         """ Parse the remote profiles (coming from qisrc sync), and the
