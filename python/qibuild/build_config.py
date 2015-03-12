@@ -124,7 +124,10 @@ class CMakeBuildConfig(object):
         build setting of the worktree: the name of the toolchain,
         the build profiles, and the build type (debug/release)
         """
-        res = prefix + "-"
+        if prefix:
+            res = prefix + "-"
+        else:
+            res = ""
         if self.active_build_config:
             res += self.active_build_config.name
         else:
