@@ -1,212 +1,368 @@
-#compdef qibuild
+#compdef qibuild qisrc qitoolchain qitest
 
-typeset -A opt_args
+_qibuild_commands() {
+  local -a qibuild_commands
+  qibuild_commands=(
+  add-config:'Add a build configuration.'
+  clean:'Clean build directories.'
+  config:'Display the current config.'
+  configure:'Configure a project.'
+  convert:'Convert an existing project to a qiBuild project.'
+  depends:'Display dependencies of projects.'
+  deploy:'Deploy project(s) on a remote target.'
+  find:'Find a package.'
+  foreach:'Run the same command on each buildable project.'
+  gen-cmake-module:'Generate a -config.cmake file from the contents of a directory.'
+  init:'Initialize a new qibuild worktree.'
+  install:'Install a project and its dependencies.'
+  list:'List the name and path of every buildable project.'
+  list-configs:'List all the known configs.'
+  make:'Build a project.'
+  open:'Open a project with an IDE.'
+  package:'Generate a binary package, ready to be added in a toolchain.'
+  rm-config:'Remove the given build config.'
+  run:'Run a package found with qibuild find.'
+  set-default:'Set the default build config for the given worktree.'
+  status:'Display the status of each project.'
+  test:'Launch automatic tests -- deprecated, use `qitest run` instead.')
 
-_qibuild_find_worktree() {
-  local index file
-  for ((index=0; index < $#@; index++))
-  do
-    case $@[index] in
-      -w|--worktree|--work-tree)
-        file=${~@[index+1]}
-        if [ -d $file/.qi ];
-        then
-          WORKTREE=$file
-        else
-          WORKTREE=""
-        fi
-        ;;
-      *)
-        ;;
-    esac
-  done
+  integer ret=1
+  _describe -t qibuild-commands 'commands' qibuild_commands && ret=0
+  return ret
 }
 
-_qibuild_configs() {
-  local -a configs
-  configs=( "system" $(qitoolchain list | grep "   " | tr -d ' ') )
-  typeset -U configs
-  compadd "$@" -a configs
+qibuild_projects=(
+"(-a --all -s --single -g --group)"{-a,--all}"[Work on all projects.]"
+"(-s --single -a --all -g --group)"{-s,--single}"[Work on specified projects without taking dependencies into account.]"
+"(-g,--group -a --all -s --single)"{-g=,--group=}"[Specify a group of projects.]:Groups:(($(qisrc list-groups | cut -c3-)))"
+"--use-deps[Force deps resolution.]"
+"--build-deps-only[Work on specified projects by ignoring the runtime deps.]"
+"*:Projects:(($(qibuild list | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
+)
+
+qibuild_configs=(
+"(-c --config)"{-c,--config}"[The configuration to use.]:Configurations:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))"
+)
+
+qibuild_logging=(
+"(-v --verbose -q --quiet)"{-v,--verbose}"[Output debug messages.]"
+"(-v --verbose -q --quiet)"{-q,--quiet}"[Only output error messages.]"
+"--time-stamp[Add timestamps before each log message.]"
+"--color=[Colorize output.]:When:((always never auto))"
+"--title=[Update terminal title.]:When:((always never auto))"
+)
+
+qibuild_debug=(
+"--backtrace[Display backtrace on error.]"
+"--pdb[Use pdb on error.]"
+)
+
+_qibuild-clean () {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_projects \
+    $qibuild_configs \
+    $qibuild_logging \
+    $qibuild_debug \
+    "-z[Remove all build directories that match a known configuration.]" \
+    "-x[Remove build directories that do not match any known configuration.]" \
+    "(-f --force)"{-f,--force}"[Force the clean.]" \
+  && return
+
+  return ret
 }
 
-_qibuild_projects() {
-  local -a projects worktree
-  _qibuild_find_worktree $words
-  if [ -n "$WORKTREE" ];
-  then
-    projects=( $(qibuild list -w $WORKTREE | sed -n "s/ \*  \([a-z0-9_-]*\).*/\1/p") )
-  else
-    # remove output, as it will show ugly errors outside of worktrees
-    projects=( $(qibuild list 2> /dev/null | sed -n "s/ \*  \([a-z0-9_-]*\).*/\1/p") )
-  fi
-  typeset -U projects
-  compadd "$@" -a projects
+_qibuild-config() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "--edit[Edit the configuration.]" \
+    "--local[Only display or edit the local configuration.]" \
+    "--wizard[Run a wizard to edit the configuration."] \
+  && return
 }
 
-_qibuild_cmake_generators() {
-  local -a generators
-  generators=( "Ninja" "Unix Makefiles" )
-  typeset -U generators
-  compadd "$@" -a generators
+_qibuild-configure() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_projects \
+    $qibuild_configs \
+    $qibuild_logging \
+    $qibuild_debug \
+    "--no-clean-first[Do not clean CMake cache]" \
+    "--debug-trycompile[Pass --debug-trycompile to CMake call]" \
+    "--eff-c++[Activate warnings from the 'Effective C++' book (gcc only)]" \
+    "--werror[Treat warnings as error]" \
+    "--profiling[Profile cmake execution]" \
+    "--summarize-options[Summarize build options at the end]" \
+    "--trace-cmake[Run cmake in trace mode]" \
+    "--coverage[Activate coverage support (gcc only)]" \
+    "--32-bits[Force 32 bits build]" \
+    "(--without-debug-info)--with-debug-info[Include debug information in binaries. Overrides --debug]" \
+    "(--with-debug-info)--without-debug-info[Remove debug information from binaries. Overrides --release]" \
+    "(--debug)--release[build in release]" \
+    "(--release)--debug[build in debug, default]" \
+  && return
 }
 
-_qibuild_opts_actions=(
-  "1:action:(clean config configure convert create depends deploy doc find foreach init install list make open package status test -h --help)"
-)
+_qibuild-convert() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "--project-name=[Name of the project.]:Project name:(($(qibuild list | cut -c5- | cut -d" " -f1)))" \
+    "--go[Actually perform file changes.]" \
+    "--dry-run[Only print what would be done. This is the default.]" \
+    "--no-cmake[Do not touch any cmake file. You won't be able to use the qibuild cmake framework.]" \
+    ": :_files" \
+  && return
+}
 
-_qibuild_opts_projects=(
-  "*:projects:_qibuild_projects"
-)
+_qibuild-depends() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qibuild_configs \
+    $qibuild_projects \
+    "--runtime[Use runtime dependencies only.]" \
+    "--reverse[Show projects that depend on the current project.]" \
+    "--tree[Output in text tree format showing paths.]" \
+    "--graph[Output in format suitable for the \"dot\" graphing tool.]" \
+    "--direct[Only display direct dependencies.]" \
+  && return
+}
 
-_qibuild_opts_project=(
-  "-a[Work on all projects]"
-  "--all[Work on all projects]"
-  "-s[Work on specified projects without taking dependencies into account.]"
-  "--single[Work on specified projects without taking dependencies into account.]"
-  "--build-deps[Work on specified projects by ignoring the runtime deps. Useful when you have lots of runtime plugins you don't want to compile for instance]"
-  "--runtime[Work on specified projects by using only the runtime deps. Mostly used by qibuild install --runtime]"
-)
+_qibuild-deploy() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qibuild_configs \
+    $qibuild_projects \
+    "--url=[Deploy to each given url.]" \
+    "--split-debug[Split debug symbols. Enable remote debuging.]" \
+    "--with-tests[Also deploy the tests]" \
+  && return
+}
 
-_qibuild_opts_toc=(
-  "-h[show this help message and exit]"
-  "--help[show this help message and exit]"
-  "-w[Use a specific work tree path]:worktree:_directories"
-  "--worktree[Use a specific work tree path]:worktree:_directories"
-  "--work-tree[Use a specific work tree path]:worktree:_directories"
-  "-c[The configuration to use. It should match the name of a toolchain. The settings from <worktree>/.qi/<config>.cmake will also be used]:config:_qibuild_configs"
-  "--config[The configuration to use. It should match the name of a toolchain. The settings from <worktree>/.qi/<config>.cmake will also be used]:config:_qibuild_configs"
-)
+_qibuild-find() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qibuild_configs \
+    $qibuild_projects \
+    "--cflags=[Outputs required compiler flags.]" \
+    "--libs=[Ouputs required linnker flags.]" \
+    "--cmake[Search in cmake cache]" \
+  && return
+}
 
-_qibuild_opts_build=(
-  "--release[Build in release (set CMAKE_BUILD_TYPE=Release)]"
-  "--debug[Build in debug (set CMAKE_BUILD_TYPE=Debug)]"
-  "--build-type[CMAKE_BUILD_TYPE usually Debug or Release]:buildtype:(Debug Release)"
-  "-G[Specify the CMake generator]:cmakegenerator:_qibuild_cmake_generators"
-  "--cmake-generator[Specify the CMake generator]:cmakegenerator:_qibuild_cmake_generators"
-  "-j[Number of jobs to use]"
-)
+_qibuild-foreach() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qibuild_projects \
+    "(--continue --ignore-errors)"{--continue,--ignore-errors}"[Continue on error]" \
+  && return
+}
 
-_qibuild_opts_global=(
-  "-h[show this help message and exit]"
-  "--help[show this help message and exit]"
-  "--backtrace[Display backtrace on error]"
-  "--pdb[Use pdb on error]"
-  "-v[Output debug messages]"
-  "--verbose[Output debug messages]"
-  "--quiet[Only output error messages]"
-  "-q[Only output error messages]"
-  "--no-color[Do not use color]"
-  "--time-stamp[Add timestamps before each log message]"
-  "--color[Colorize output. This is the default]"
-)
+_qibuild-gen-cmake-module() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+  && return
+}
 
-_qibuild_opts_actions_make=(
-  "--rebuild[]"
-  "-r[]"
-  "--no-fix-shared-libs[Do not try to fix shared libraries after build. Used by \`qibuild package\`]"
-)
+_qibuild-init() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+  && return
+}
 
-_qibuild_opts_actions_configure=(
-  "-D[additional cmake flags]:cmakeflags:"
-  "--no-clean-first[do not clean CMake cache]"
-  "--debug-trycompile[pass --debug-trycompile to CMake call]"
-  "--eff-c++[activate warnings from the \'Effective C++\' book (gcc only)]"
-  "--werror[tread warnings as error]"
-)
+_qibuild-install() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_projects \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qibuild_configs \
+    "--prefix=[Value of CMAKE_INSTALL_PREFIX.]" \
+    "--runtime[Only install the runtime components.]" \
+    "--split-debug[Split debug symbols]" \
+    "--with-tests[Also install tests]" \
+  && return
+}
 
-_qibuild_opts_actions_config=(
-  "--edit[edit the configuration]"
-  "--local[only display or edit the local configuration]"
-  "--wizard[run a wizard to edit the configuration]"
-)
+_qibuild-list() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "(--paths --names)--names[Sort by names.]" \
+    "(--paths --names)--paths[Sort by paths.]" \
+  && return
+}
 
-_qibuild_opts_actions_deploy=(
-  "-p[port]"
-  "--port[port]"
-  "--split-debug[split debug symbols. Enable remote debuging]"
-  "--no-split-debug[do not split debug symbols. Remote debugging won't work]"
-)
+_qibuild-list-configs() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+  && return
+}
 
-_qibuild_action_none() {
-  _values -w "action" \
-    "*clean[Clean build directories.]" \
-    "*config[Display the current config]" \
-    "*configure[Configure a project]" \
-    "*convert[Convert an existing project to a qiBuild project]" \
-    "*create[Create a new project]" \
-    "*depends[Display dependencies of projects]" \
-    "*deploy[Deploy project(s) on a remote target]" \
-    "*doc[Alias for qidoc.actions.build]" \
-    "*find[Find a package]" \
-    "*foreach[Run the same command on each buildable project.]" \
-    "*init[Initialize a new toc worktree]" \
-    "*install[Install a project and its dependencies]" \
-    "*list[List the name and path of every buildable project]" \
-    "*make[Build a project]" \
-    "*open[Open a project with an IDE]" \
-    "*package[Generate a binary sdk]" \
-    "*status[Display the status of each project]" \
-    "*test[Launch automatic tests]"
+_qibuild-make() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qibuild_configs \
+    $qibuild_projects \
+    "(-r --rebuild)"{-r,--rebuild}"[Rebuild.]" \
+    "--coverity[Build using cov-build. Ensure you have cov-analysis installed on your machine.]" \
+  && return
+}
+
+_qibuild-open() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qibuild_configs \
+    $qibuild_projects \
+  && return
+}
+
+_qibuild-package() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qibuild_configs \
+    $qibuild_projects \
+  && return
+}
+
+_qibuild-rm-config() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "*:Configuration name:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
+  && return
+}
+
+_qibuild-run() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qibuild_configs \
+    ": :_files" \
+  && return
+}
+
+_qibuild-set-default() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "*:Configuration name:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
+  && return
+}
+
+_qibuild-status() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_projects \
+    $qibuild_debug \
+  && return
+}
+
+_qibuild-test() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_projects \
+    $qibuild_debug \
+    $qibuild_configs \
+    "--perf[Run perfs tests instead of pure tests]" \
+    "(-k --pattern)"{-k,--pattern}="[Filter tests matching these patterns.]" \
+    "-V[Display tests output.]" \
+    "--valgrind[Run tests under valgrind.]" \
+    "--nightmare[Run tests in shuffle and 20 times.]" \
+    "--coverage[Run coverage.]" \
+    "--ncpu=[Set number of CPU each test is allowed to use (linux).]" \
+    "--nightly[Run nighly tests.]" \
+    "--break-on-failure[Break on failure (for gtest only).]" \
+    "--qitest-json=:[]" \
+  && return
 }
 
 _qibuild() {
-  case $words[2] in
+  integer ret=1
+  local curcontext=$curcontext state line
+  declare -A opt_args
 
-    configure)
-      _arguments -s : \
-        "$_qibuild_opts_global[@]" \
-        "$_qibuild_opts_toc[@]" \
-        "$_qibuild_opts_project[@]" \
-        "$_qibuild_opts_actions_configure[@]" \
-        "$_qibuild_opts_projects[@]"
+  _arguments -C \
+    "(-h --help)"{-h,--help}"[Show this help message and exit]" \
+    "(-w --worktree --work-tree)"{-w=,--worktree=,--work-tree=}"[Use a specific work tree path.]" \
+    "(-): :->command" \
+    "(-)*:: :->option-or-argument" \
+    && return
+
+  case $state in
+    (command)
+      _qibuild_commands && ret=0
       ;;
+    (option-or-argument)
+      curcontext=${curcontext%:*:*}:qibuild-$words[1]:
 
-    config)
-      _arguments -s : \
-        "$_qibuild_opts_global[@]" \
-        "$_qibuild_opts_toc[@]" \
-        "$_qibuild_opts_actions_config[@]"
-      ;;
-
-    clean | convert | create | depends | doc | find | 'foreach' | init | install | list | package | status | 'test')
-      _arguments -s : \
-        "$_qibuild_opts_global[@]" \
-        "$_qibuild_opts_toc[@]" \
-        "*:arguments:_files"  #todo: only take build prefix
-      ;;
-
-    deploy)
-      _arguments -s : \
-        "$_qibuild_opts_global[@]" \
-        "$_qibuild_opts_toc[@]" \
-        "$_qibuild_opts_projects[@]" \
-        "$_qibuild_opts_build[@]" \
-        "$_qibuild_opts_actions_deploy[@]"
-      ;;
-
-    open)
-      _arguments -s : \
-        "$_qibuild_opts_global[@]" \
-        "$_qibuild_opts_toc[@]" \
-        "$_qibuild_opts_build[@]" \
-        "$_qibuild_opts_projects[@]"
-      ;;
-
-    make)
-      _arguments -s : \
-        "$_qibuild_opts_global[@]" \
-        "$_qibuild_opts_toc[@]" \
-        "$_qibuild_opts_build[@]" \
-        "$_qibuild_opts_project[@]" \
-        "$_qibuild_opts_projects[@]" \
-        "$_qibuild_opts_actions_make[@]"
-      ;;
-
-    # No argument provided, propose the list of actions
-    *)
-      _qibuild_action_none
+      _call_function ret _qibuild-$words[1]
       ;;
   esac
+  return ret
 }
 
-_qibuild "$@"
+_qisrc() {
+  integer ret=1
+  local curcontext=$curcontext state line
+  declare -A opt_args
+
+  _arguments -C \
+    "-z[toto]" \
+    && return
+
+  return ret
+}
+
+_call_function ret _$service
