@@ -172,7 +172,7 @@ def _msg(*tokens, **kwargs):
     if CONFIG["timestamp"]:
         now = datetime.datetime.now()
         res.append(now.strftime("[%Y-%m-%d %H:%M:%S] "))
-    for token in tokens:
+    for i, token in enumerate(tokens):
         if isinstance(token, _Color):
             if with_color:
                 res.append(token.code)
@@ -182,9 +182,11 @@ def _msg(*tokens, **kwargs):
                 nocolorres.append("\n")
             else:
                 res.append(str(token))
-                res.append(sep)
+                if i != len(tokens) - 1:
+                    res.append(sep)
                 nocolorres.append(str(token))
-                nocolorres.append(sep)
+                if i != len(tokens) - 1:
+                    nocolorres.append(sep)
     # always reset:
     if with_color:
         res.append(reset.code)
