@@ -283,7 +283,7 @@ _qibuild-run() {
     $qibuild_logging \
     $qibuild_debug \
     $qibuild_configs \
-    ": :_files" \
+    ":Binary:(($(qibuild list-binaries)))" \
   && return
 }
 
