@@ -207,7 +207,7 @@ def configure_parser(parser):
     parser.add_argument("--no-cmake", action="store_false",
         dest="fix_cmake",
         help="Do not touch any cmake file.\n"
-         "You won't be able to use the qibuild cmake frameowk")
+         "You won't be able to use the qibuild cmake framework")
     parser.set_defaults(dry_run=True, fix_cmake=True)
 
 def do(args):
