@@ -65,3 +65,7 @@ def test_using_custom_build_dir(build_worktree):
     assert world_proj.build_directory == os.path.join(build_worktree.root, "mybuild",
                                                       build_directory_name, "world")
 
+def test_validates_name(build_worktree):
+    # pylint:disable-msg=E1101
+    with pytest.raises(Exception):
+        build_worktree.create_project("foo/bar")

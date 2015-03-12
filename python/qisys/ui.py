@@ -397,3 +397,19 @@ def _get_console_size_linux():
         except:
             return None
     return int(cr[1]), int(cr[0])
+
+def valid_filename(value):
+    """ Validate that the string passed as input can safely
+    be used as a valid file name
+
+    """
+    # this is for Windows, but it does not hurt on other platforms
+    bad_chars = r'<>:"/\|?*'
+    for bad_char in bad_chars:
+        if bad_char in value:
+            mess  = "Invalid name: '%s'\n" % value
+            mess += "A valid name should not contain any "
+            mess += "of the following chars:\n"
+            mess += " ".join(bad_chars)
+            raise Exception(mess)
+    return value

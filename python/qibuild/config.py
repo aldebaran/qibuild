@@ -356,7 +356,7 @@ class BuildConfig:
         if not name:
             qisys.qixml.raise_parse_error("'config' node must have a 'name' attribute",
                 tree=tree)
-        self.name = name
+        self.name = ui.valid_filename(name)
         self.ide = tree.get("ide")
         env_tree = tree.find("env")
         if env_tree is not None:

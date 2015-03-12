@@ -63,12 +63,21 @@ class BuildProject(object):
         self.build_config = build_worktree.build_config
         self.path = worktree_project.path
         self.src = worktree_project.src
-        self.name = None
+        self._name = None
         self.version = None
         # depends is a set at this point because they are not sorted yet
         self.build_depends = set()
         self.run_depends = set()
         self.test_depends = set()
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        ui.valid_filename(value)
+        self._name = value
 
     @property
     def qiproject_xml(self):

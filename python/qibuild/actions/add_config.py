@@ -10,7 +10,7 @@ import qibuild.worktree
 
 def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
-    parser.add_argument("name")
+    parser.add_argument("name", type=ui.valid_filename)
     parser.add_argument("-t", "--toolchain", dest="toolchain")
     parser.add_argument("-p", "--profile", dest="profiles", action="append")
     parser.add_argument("--ide")

@@ -18,7 +18,7 @@ def configure_parser(parser):
     """ Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("name", metavar="NAME",
-        help="Name of the toolchain")
+        help="Name of the toolchain", type=ui.valid_filename)
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
         help="Optional: path to the toolchain configuration file.\n"
              "If not given, the toolchain will be empty.\n"

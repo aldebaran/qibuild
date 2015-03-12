@@ -19,7 +19,8 @@ def test_guess_git_repo(tmpdir, args):
     worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     foo = tmpdir.mkdir("foo")
     bar = foo.mkdir("bar")
-    foo.join("qiproject.xml").write("""<project>
+    foo.join("qiproject.xml").write("""\
+<project version="3">
   <project src="bar" />
 </project>
 """)
@@ -128,8 +129,8 @@ def test_groups(git_worktree, args):
 def test_no_duplicate_deps(cd_to_tmpdir, args):
     args.dep_types = "default"
     build_worktree = TestBuildWorkTree()
-    foo = build_worktree.create_project("foo", run_depends=["foo/bar"])
-    build_worktree.create_project("foo/bar")
+    foo = build_worktree.create_project("foo", run_depends=["bar"])
+    build_worktree.create_project("bar", src="foo/bar")
     git = qisrc.git.Git(foo.path)
     git.init()
     git_worktree = TestGitWorkTree()
