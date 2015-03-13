@@ -8,6 +8,8 @@ misc
   trying to figure out whether color output should be enabled
 * Setting terminal title now works on Mac and Windows
 * Add ``XDG`` base directory support
+* Add option ``--home`` to every command to choose the path to global config
+  files.
 
 qibuild
 -------
