@@ -145,6 +145,7 @@ class GitProject(object):
                 if not quiet:
                     ui.warning("Default remote changed", previous_default, "->",
                                                         new_default)
+        self.review = False
         if repo.review:
             ok = qisrc.review.setup_project(self)
             if ok:
