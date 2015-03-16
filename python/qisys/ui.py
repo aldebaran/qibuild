@@ -405,6 +405,9 @@ def valid_filename(value):
     be used as a valid file name
 
     """
+    if value in [".", ".."]:
+        raise Exception("Invalid name: %s" % value)
+
     # this is for Windows, but it does not hurt on other platforms
     bad_chars = r'<>:"/\|?*'
     for bad_char in bad_chars:

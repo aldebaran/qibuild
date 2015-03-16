@@ -6,6 +6,8 @@
 
 import qisys.ui as ui
 
+import pytest
+
 def main():
     ui.info(ui.red, "This is a an error message\n",
         ui.reset, "And here are the details")
@@ -18,6 +20,15 @@ def main():
     ui.info(ui.red, "red is dead")
     ui.info(ui.darkred, "darkred is really dead")
     ui.info(ui.yellow, "this is yellow")
+
+def test_valid_filename():
+    # pylint:disable-msg=E1101
+    with pytest.raises(Exception):
+        ui.valid_filename("foo/bar")
+    # pylint:disable-msg=E1101
+    with pytest.raises(Exception):
+        ui.valid_filename("..")
+    ui.valid_filename("foo")
 
 if __name__ == "__main__":
     import sys
