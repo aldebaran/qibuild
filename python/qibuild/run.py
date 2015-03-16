@@ -6,6 +6,7 @@
 
 """
 
+import os
 import sys
 
 from qisys import ui
