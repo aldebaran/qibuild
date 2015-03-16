@@ -35,6 +35,18 @@ def test_no_review(qisrc_action, git_server):
     assert len(remotes) == 1
     assert not remotes[0].review
 
+def test_no_review_activate_deactivate(qisrc_action, git_server):
+    git_server.create_repo("foo.git", review=True)
+
+    qisrc_action("init", git_server.manifest_url, "--no-review")
+    qisrc_action("push", "-n", "foo")
+
+    qisrc_action("init", git_server.manifest_url)
+    qisrc_action("push", "-n", "foo")
+
+    qisrc_action("init", git_server.manifest_url, "--no-review")
+    qisrc_action("push", "-n", "foo")
+
 def test_review_on_by_default(qisrc_action, git_server):
     git_server.create_repo("foo.git", review=True)
     qisrc_action("init", git_server.manifest_url)
