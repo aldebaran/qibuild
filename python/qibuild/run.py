@@ -5,9 +5,10 @@
 """ Run a package found with qibuild find
 
 """
-
+import os
 import os
 import sys
+import subprocess
 
 from qisys import ui
 import qibuild.find
@@ -15,7 +16,7 @@ import qibuild.parsers
 import qisys.parsers
 import qisys.command
 
-def run(projects, binary, bin_args):
+def run(projects, binary, bin_args, env=None):
     """ Find binary in worktree and
         exec it with given arguments.
     """
@@ -30,8 +31,5 @@ def run(projects, binary, bin_args):
         bin_path = qisys.command.find_program(binary)
     if not bin_path:
         raise Exception("Cannot find " + binary + " binary")
-    try:
-        retcode = qisys.command.call([bin_path] + bin_args, ignore_ret_code=False)
-    except qisys.command.CommandFailedException as e:
-        retcode = e.returncode
+    retcode = subprocess.call([bin_path] + bin_args, env=env)
     return retcode

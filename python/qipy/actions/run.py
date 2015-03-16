@@ -22,6 +22,7 @@ def configure_parser(parser):
 
 def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args)
+    env = build_worktree.get_env()
     build_config = qibuild.parsers.get_build_config(build_worktree, args)
     worktree = build_worktree.worktree
     cmd = args.command
@@ -55,7 +56,6 @@ def do(args):
         if script_path:
             cmd[0] = script_path
 
-    env = os.environ.copy()
     lib_path = virtualenv.path_locations(venv_root)[1]
     env["PYTHONHOME"] = venv_root
     env["PYTHONPATH"] = os.path.join(lib_path, "site-packages")

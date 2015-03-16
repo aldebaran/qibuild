@@ -24,6 +24,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point."""
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
+    env = cmake_builder.build_worktree.get_env()
     if len(cmake_builder.projects) != 1:
         raise Exception("This action can only work on one project")
     project = cmake_builder.projects[0]
@@ -44,11 +45,11 @@ def do(args):
         return
 
     if ide.name == "Visual Studio":
-        open_visual(project)
+        open_visual(project, env=env)
     elif ide.name == "Xcode":
-        open_xcode(project)
+        open_xcode(project, env=env)
     elif ide.name == "QtCreator":
-        open_qtcreator(project, ide.path)
+        open_qtcreator(project, ide.path, env=env)
     else:
         # Not supported (yet) IDE:
         mess  = "Invalid ide: %s\n" % ide.name
@@ -89,9 +90,7 @@ def get_ide(qibuild_cfg):
         return None
     return qibuild_cfg.ides[ide_name]
 
-
-
-def open_visual(project):
+def open_visual(project, env=None):
     sln_files = glob.glob(project.build_directory + "/*.sln")
     if not sln_files:
         raise OpenError(project, "No .sln file found\n"
@@ -101,9 +100,9 @@ def open_visual(project):
 
     print "starting VisualStudio:"
     print "%s %s" % ("start", sln_files[0])
-    subprocess.Popen(["start", sln_files[0]], shell=True)
+    subprocess.Popen(["start", sln_files[0]], shell=True, env=env)
 
-def open_xcode(project):
+def open_xcode(project, env=None):
     projs = glob.glob(project.build_directory + "/*.xcodeproj")
     if not projs:
         raise OpenError(project, "No .xcodeproj directory found\n")
@@ -112,9 +111,9 @@ def open_xcode(project):
                                  "got %s" % projs)
     print "starting Xcode:"
     print "%s %s" % ("open", projs[0])
-    subprocess.Popen(["open", projs[0]])
+    subprocess.Popen(["open", projs[0]], env=env)
 
-def open_qtcreator(project, qtcreator_path=None):
+def open_qtcreator(project, qtcreator_path=None, env=None):
     if not qtcreator_path:
         qtcreator_path = qisys.command.find_program("qtcreator")
     cmake_list = os.path.join(project.path, "CMakeLists.txt")
@@ -128,7 +127,7 @@ def open_qtcreator(project, qtcreator_path=None):
     else:
         cmd = [qtcreator_path, cmake_list]
     print " ".join(cmd)
-    subprocess.Popen(cmd)
+    subprocess.Popen(cmd, env=env)
 
 
 class OpenError(Exception):

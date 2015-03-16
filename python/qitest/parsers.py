@@ -53,6 +53,7 @@ def get_test_runner(args, project_name=None, qitest_json=None):
 
     test_project = None
     build_project = None
+    build_worktree = None
     if not qitest_json:
         qitest_json = vars(args).get("qitest_json")
     if not qitest_json:
@@ -81,6 +82,8 @@ def get_test_runner(args, project_name=None, qitest_json=None):
     test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
     if build_project:
         test_runner.cwd = build_project.sdk_directory
+    if build_worktree:
+        test_runner.env = build_worktree.get_env()
     else:
         test_runner.cwd = os.path.dirname(qitest_json)
 
