@@ -6,6 +6,6 @@ project(footool)
 
 find_package(qibuild)
 
-qi_create_bin(footool "footool.cpp" SUBFOLDER tools)
+qi_create_bin(footool "footool.cpp")
 qi_stage_bin(footool)
 
