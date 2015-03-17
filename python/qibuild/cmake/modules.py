@@ -16,6 +16,7 @@ def find_libs(directory):
     for candidate in candidates:
         if candidate.endswith((".so", ".a", ".lib", ".dylib")):
             res.append("lib/" + candidate)
+    res.sort()
     return res
 
 def generate_cmake_module(directory, name):
