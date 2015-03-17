@@ -80,6 +80,8 @@ qibuild
 * ``qibuild``: generate ``qitest.json`` file also after building
 * Store default config for worktree in the global config file
   (``~/.config/qi/qibuild.xml``)
+* ``qibuild deploy``: make specifying user and port optional
+  (this allows to specify them in ~/.ssh/config)
 
 qidoc
 ------
