@@ -215,13 +215,13 @@ def deploy(local_directory, remote_url, filelist=None):
         message = "Remote URL is invalid; host and remote directory must be specified"
         raise Exception(message)
 
+    user = "%s@" % remote_url.user if remote_url.user else ""
+
     cmd = ["ssh"]
     if remote_url.port:
         cmd.extend(["-p", str(remote_url.port)])
-    if remote_url.user:
-        cmd.extend(["%s@%s" % (remote_url.user, remote_url.host)])
-    else:
-        cmd.extend(["%s" % remote_url.host])
+
+    cmd.extend(["%s%s" % (user, remote_url.host)])
     cmd.extend(["mkdir", "-p", remote_url.remote_directory])
     qisys.command.call(cmd)
     # This is required for rsync to do the right thing,
@@ -242,8 +242,7 @@ def deploy(local_directory, remote_url, filelist=None):
     if filelist:
         cmd.append("--files-from=%s" % filelist)
     cmd.append(local_directory)
-    cmd.append("%s@%s:%s" % (remote_url.user, remote_url.host,
-                             remote_url.remote_directory))
+    cmd.append("%s%s:%s" % (user, remote_url.host, remote_url.remote_directory))
     qisys.command.call(cmd)
 
 
@@ -265,8 +264,9 @@ class URL(object):
 
         modern_scheme = """
 ssh://
-(?P<user>[^@]+)        # user is anything but @
-@                      # mandatory @ separator
+(?:
+    (?P<user>[^@]+)
+@)?       # user is anything but @, then the @ separator
 (?P<host>[^:/]+)       # host is anything but : and /
 (:(?P<port>\d+))?      # optional port
 (/(?P<remote_dir>.*))? # optional remote directory
@@ -298,7 +298,7 @@ Supported schemes are
 
     def _handle_match(self, match):
             dict = match.groupdict()
-            self.user = dict["user"]
+            self.user = dict.get("user")
             self.host = dict["host"]
             self.port = 22
             if "port" in dict and dict["port"]:

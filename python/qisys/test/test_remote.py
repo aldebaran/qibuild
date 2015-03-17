@@ -3,7 +3,7 @@
 ## found in the COPYING file.
 import pytest
 
-from qisys.remote import URL, URLParseError
+from qisys.remote import URL, URLParseError, deploy
 
 def test_simple_url():
     url = URL("foo@bar")
@@ -43,3 +43,9 @@ def test_errors():
     # pylint: disable-msg=E1101
     with pytest.raises(URLParseError) as e:
         URL("foo")
+
+def test_deploy(tmpdir):
+    local = tmpdir.mkdir("local")
+    remote = tmpdir.mkdir("remote")
+
+    deploy(local.strpath, URL("ssh://localhost/" + remote.strpath))
