@@ -20,6 +20,8 @@ class QiPackage(object):
     def __init__(self, name, version=None, path=None):
         self.name = name
         self.version = version
+        self.target = None
+        self.host = None
         self.path = path
         self.url = None
         self.directory = None
@@ -173,6 +175,8 @@ def from_xml(element):
     res.toolchain_file = element.get("toolchain_file")
     res.sysroot = element.get("sysroot")
     res.cross_gdb = element.get("cross_gdb")
+    res.target = element.get("target")
+    res.host = element.get("host")
     qibuild.deps.read_deps_from_xml(res, element)
     return res
 
