@@ -200,7 +200,7 @@ set(CMAKE_PREFIX_PATH ${{CMAKE_PREFIX_PATH}} CACHE INTERNAL ""  FORCE)
             dep_to_add += """\
 list(FIND CMAKE_PREFIX_PATH "{sdk_dir}" _found)
 if(_found STREQUAL "-1")
-  list(INSERT CMAKE_PREFIX_PATH 0 "{sdk_dir}")
+  list(APPEND CMAKE_PREFIX_PATH "{sdk_dir}")
 endif()
 """.format(sdk_dir=qisys.sh.to_posix_path(sdk_dir))
 
