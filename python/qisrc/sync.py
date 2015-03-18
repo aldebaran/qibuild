@@ -79,7 +79,7 @@ class WorkTreeSyncer(object):
         res = True
         ui.info(ui.green, ":: Updating manifest ...")
         ui.info(ui.green, "* ",
-                ui.reset, ui.bold, "(%s)" % self.manifest.branch,
+                ui.reset, ui.bold, "(%s) " % self.manifest.branch,
                 end="")
         if self.manifest.groups:
             ui.info("groups", ", ".join(self.manifest.groups))

@@ -30,6 +30,10 @@ def test_valid_filename():
         ui.valid_filename("..")
     ui.valid_filename("foo")
 
+def test_empty_end():
+    ui.info("[skipped]", end="")
+    ui.info("Your branch has diverged")
+
 if __name__ == "__main__":
     import sys
     if "-v" in  sys.argv:

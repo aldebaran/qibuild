@@ -139,7 +139,7 @@ def check_local_branch(git_project):
     current_branch = git.get_current_branch()
     local_branch = git_project.default_branch.name
     if current_branch != local_branch:
-        ui.info(ui.brown, "[skipped]", end="")
+        ui.info(ui.brown, "[skipped] ", end="")
         ui.info("On %s, should be on %s" % (current_branch, local_branch))
         return False
     remote_branch = git_project.default_branch.remote_branch
@@ -147,7 +147,7 @@ def check_local_branch(git_project):
     remote_ref = "%s/%s" % (remote_name, remote_branch)
     status = qisrc.git.get_status(git, local_branch, remote_ref)
     if status != "no-diff":
-        ui.info(ui.brown, "[skipped]", end="")
+        ui.info(ui.brown, "[skipped] ", end="")
         if status == "ahead":
             ui.info("You have changes not pushed yet")
         elif status == "behind":

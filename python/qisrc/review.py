@@ -124,7 +124,7 @@ def setup_project(project):
     if os.path.exists(commit_hook):
         return True
     ui.info("Configuring", ui.blue, project.src,
-            ui.reset, "for code review ...", end="")
+            ui.reset, "for code review ... ", end="")
     if remote.protocol == "ssh":
         ok, out = fetch_gerrit_hook_ssh(project.path, username, server, port=ssh_port)
         if not ok:
