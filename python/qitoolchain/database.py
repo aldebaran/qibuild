@@ -115,6 +115,7 @@ class DataBase(object):
         local_packages = self.packages.values()
         to_add = list()
         to_remove = list()
+        to_update = list()
         svn_packages = [x for x in remote_packages
                             if isinstance(x, qitoolchain.svn_package.SvnPackage)]
         other_packages = [x for x in remote_packages if x not in svn_packages]
@@ -127,13 +128,32 @@ class DataBase(object):
             self.packages[svn_package.name] = svn_package
 
         for remote_package in other_packages:
-            if remote_package in local_packages:
+            if remote_package.name in (x.name for x in local_packages):
                 continue
             to_add.append(remote_package)
 
         for local_package in local_packages:
-            if local_package not in remote_packages:
+            if local_package.name not in (x.name for x in remote_packages):
                 to_remove.append(local_package)
+
+        remote_names = [x.name for x in remote_packages]
+        for local_package in local_packages:
+            if local_package not in remote_packages and local_package.name in remote_names:
+                remote_package = [x for x in remote_packages
+                                  if x.name == local_package.name][0]
+                to_update.append(remote_package)
+
+        if to_update:
+            ui.info(ui.red, "Updating packages")
+        for i, package in enumerate(to_update):
+            remote_package = [x for x in remote_packages if x.name == package.name][0]
+            local_package = [x for x in local_packages if x.name == package.name][0]
+            ui.info_count(i, len(to_update), ui.blue,
+                          package.name, "from", local_package.version,
+                          "to", remote_package.version)
+            self.remove_package(package.name)
+            self.handle_package(package, feed)
+            self.packages[package.name] = package
 
         if to_remove:
             ui.info(ui.red, "Removing packages")
