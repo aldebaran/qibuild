@@ -188,16 +188,15 @@ def from_archive(archive_path):
 
 def extract(archive_path, dest):
     if archive_path.endswith((".tar.gz", ".tbz2")):
-        _extract_legacy(archive_path, dest)
-        return
+       return _extract_legacy(archive_path, dest)
     with zipfile.ZipFile(archive_path) as archive:
         if "package.xml" in archive.namelist():
-            _extract_modern(archive_path, dest)
+            return _extract_modern(archive_path, dest)
         else:
-            _extract_legacy(archive_path, dest)
+            return _extract_legacy(archive_path, dest)
 
 def _extract_modern(archive_path, dest):
-    qisys.archive.extract(archive_path, dest, strict_mode=False)
+    return qisys.archive.extract(archive_path, dest, strict_mode=False)
 
 def _extract_legacy(archive_path, dest):
     algo = qisys.archive.guess_algo(archive_path)
@@ -209,3 +208,6 @@ def _extract_legacy(archive_path, dest):
         qisys.sh.rm(dest)
         qisys.sh.mv(extract_path, dest)
         qisys.sh.rm(extract_path)
+        return dest
+    else:
+        return extract_path
