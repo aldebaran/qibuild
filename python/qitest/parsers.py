@@ -44,16 +44,8 @@ def test_parser(parser, with_num_jobs=True):
                             help="Number of tests to run in parallel")
     return group
 
-def get_test_runner(args, project_name=None, qitest_json=None):
-    project_names = args.projects or list()
-    if project_name:
-        project_names = [project_name]
-    else:
-        project_names = args.projects
-
+def get_test_runner(args, build_project=None, qitest_json=None):
     test_project = None
-    build_project = None
-    build_worktree = None
     if not qitest_json:
         qitest_json = vars(args).get("qitest_json")
     if not qitest_json:
@@ -63,16 +55,8 @@ def get_test_runner(args, project_name=None, qitest_json=None):
     if qitest_json:
         test_project = qitest.project.TestProject(qitest_json)
     if not test_project:
-        try:
-            build_worktree = qibuild.parsers.get_build_worktree(args)
-
-            new_args = copy.deepcopy(args)
-            new_args.projects = project_names
-            build_project = qibuild.parsers.get_one_build_project(build_worktree, new_args)
+        if build_project:
             test_project = build_project.to_test_project()
-        except:
-            ui.error("Error when parsing arguments")
-            raise
 
     if args.coverage and not build_project:
         raise Exception("""\
@@ -82,8 +66,7 @@ def get_test_runner(args, project_name=None, qitest_json=None):
     test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
     if build_project:
         test_runner.cwd = build_project.sdk_directory
-    if build_worktree:
-        test_runner.env = build_worktree.get_env()
+        test_runner.env = build_project.build_worktree.get_env()
     else:
         test_runner.cwd = os.path.dirname(qitest_json)
 
@@ -104,13 +87,27 @@ def get_test_runner(args, project_name=None, qitest_json=None):
 def get_test_runners(args):
     res = list()
     qitest_jsons = args.qitest_jsons or list()
-    project_names = args.projects or list()
-    if not qitest_jsons and not project_names:
-        return [get_test_runner(args)]
 
+    build_projects = list()
+    try:
+        build_worktree = qibuild.parsers.get_build_worktree(args)
+        solve_deps = False
+        if args.use_deps:
+            solve_deps = True
+        build_projects = qibuild.parsers.get_build_projects(
+                build_worktree,
+                args, solve_deps=solve_deps)
+    except:
+        pass
+
+    for build_project  in build_projects:
+        res.append(get_test_runner(args, build_project=build_project))
     for qitest_json in qitest_jsons:
-        res.append(get_test_runner(args, qitest_json=qitest_json))
-    for project_name in project_names:
-        res.append(get_test_runner(args, project_name=project_name))
+        test_runner = get_test_runner(args, qitest_json=qitest_json)
+        known_cwds = [x.cwd for x in res]
+        if not test_runner.cwd in known_cwds:
+            res.append(test_runner)
 
+    if not res:
+        raise Exception("Nothing found to test")
     return res
