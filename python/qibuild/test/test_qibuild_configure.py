@@ -183,14 +183,13 @@ def test_cmake_option_build_perf_test_off(qibuild_action):
     test_path = qibuild.find.find([project.sdk_directory], "perf_spam", expect_one=False)
     assert not test_path
 
+def read_path_conf(project):
+    path_conf_path = os.path.join(project.sdk_directory,
+                                  "share", "qi", "path.conf")
+    with open(path_conf_path, "r") as fp:
+        return fp.read()
 
 def test_using_dash_s_with_path_conf(qibuild_action):
-    def read_path_conf(project):
-        path_conf_path = os.path.join(stagepath_proj.sdk_directory,
-                                      "share", "qi", "path.conf")
-        with open(path_conf_path, "r") as fp:
-            return fp.read()
-
     stagepath_proj = qibuild_action.add_test_project("stagepath")
     usepath_proj = qibuild_action.add_test_project("usepath")
     qibuild_action("configure", "usepath")
@@ -198,6 +197,25 @@ def test_using_dash_s_with_path_conf(qibuild_action):
     qibuild_action("configure", "-s", "usepath")
     path_conf_after = read_path_conf(stagepath_proj)
     assert path_conf_before == path_conf_after
+
+def test_staged_path_first_in_path_conf(qibuild_action, toolchains):
+    toolchains.create("foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
+    bar_package = toolchains.add_package("foo", "bar")
+
+    qibuild_action.add_test_project("stagepath")
+    qibuild_action("configure", "stagepath", "--config", "foo")
+    build_worktree = TestBuildWorkTree()
+    build_worktree.set_active_config("foo")
+    stagepath_proj = build_worktree.get_build_project("stagepath")
+
+    path_conf = read_path_conf(stagepath_proj)
+    lines = path_conf.splitlines()
+    assert lines == [
+            stagepath_proj.path,
+            stagepath_proj.sdk_directory,
+            bar_package.path
+    ]
 
 def test_path_conf_contains_toolchain_paths(qibuild_action, toolchains):
     toolchains.create("foo")

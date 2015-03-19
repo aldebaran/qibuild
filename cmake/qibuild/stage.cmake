@@ -10,6 +10,7 @@
 #
 
 include(qibuild/internal/stage)
+include(qibuild/internal/list)
 include(qibuild/internal/uselib)
 
 #! Generate a 'name'-config.cmake, allowing other project to find the library.
@@ -276,7 +277,7 @@ function(qi_stage_dir)
   else()
     set(_to_stage "${CMAKE_CURRENT_SOURCE_DIR}")
   endif()
-  _qi_list_append_uniq(_dirs ${_to_stage})
+  _qi_list_prepend_uniq(_dirs ${_to_stage})
   # re-create the file:
   file(WRITE "${_path_conf}" "")
   foreach(_dir ${_dirs})
