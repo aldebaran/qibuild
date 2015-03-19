@@ -27,7 +27,11 @@ def do(args):
     """Main entry point"""
     test_runners = qitest.parsers.get_test_runners(args)
     global_res = True
-    for test_runner in test_runners:
+    n = len(test_runners)
+    for i, test_runner in enumerate(test_runners):
+        if n != 1:
+            ui.info(ui.bold, "::", "[%i on %i]" % (i + 1, len(test_runners)),
+                    ui.reset, "Running tests in", ui.blue, test_runner.cwd)
         res = test_runner.run()
         if args.coverage:
             build_worktree = qibuild.parsers.get_build_worktree(args)
