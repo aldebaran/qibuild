@@ -280,7 +280,7 @@ class WorkTreeSyncer(object):
 
     def sync_from_manifest_file(self, xml_path):
         """ Just synchronize the manifest coming from one xml file.
-        Used by ``qisrc manifest --check``
+        Used by ``qisrc check-manifest``
 
         """
         # don't use self.old_repos and self.new_repos here,
