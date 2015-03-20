@@ -30,3 +30,13 @@ def test_commit_all_removes_removed_files(svn_server, tmpdir):
     svn = qisrc.svn.Svn(foo2.strpath)
     svn.call("checkout", foo_url, ".")
     assert not foo2.join("bar.txt").check(file=True)
+
+def test_files_with_space(svn_server, tmpdir):
+    foo_url = svn_server.create_repo("foo")
+    svn_server.commit_file("foo", "file with space.txt", "some contents\n")
+    work = tmpdir.mkdir("work")
+    foo = work.mkdir("foo")
+    svn = qisrc.svn.Svn(foo.strpath)
+    svn.call("checkout", foo_url, ".")
+    foo.join("file with space.txt").remove()
+    svn.commit_all("test message")

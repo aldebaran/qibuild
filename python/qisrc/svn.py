@@ -42,9 +42,9 @@ class Svn(object):
         for line in out.splitlines():
             line = line.strip()
             if line.startswith("!"):
-                rest = line.split()[1]
-                self.call("remove", rest)
+                filename = line[8:]
+                self.call("remove", filename)
             if line.startswith("?"):
-                rest = line.split()[1]
-                self.call("add", rest)
+                filename = line[8:]
+                self.call("add", filename)
         self.call("commit", "--message", message)
