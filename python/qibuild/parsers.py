@@ -67,6 +67,8 @@ def cmake_configure_parser(parser):
     group.add_argument("--debug", action="store_const", const="Debug",
         dest="build_type",
         help="Build in debug, default")
+    group.add_argument("--build-type", dest="build_type",
+        help="Set CMAKE_BUILD_TYPE")
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
                         werror=False, profiling=False,
                         trace_cmake=False, debug_info=None,

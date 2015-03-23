@@ -262,3 +262,11 @@ def test_using_build_prefix(qibuild_action, tmpdir):
                            "build-sys-%s-%s" % (platform.system().lower(),
                                                 platform.machine().lower()))
     assert expected.join("CMakeCache.txt").check(file=True)
+
+
+def test_relwithdebinfo(qibuild_action):
+    world_proj = qibuild_action.add_test_project("world")
+    qibuild_action("configure", "world", "--build-type", "RelWithDebInfo")
+    cmake_build_type = qibuild.cmake.get_cached_var(world_proj.build_directory,
+                                                    "CMAKE_BUILD_TYPE")
+    assert cmake_build_type == "RelWithDebInfo"
