@@ -109,6 +109,7 @@ class QiPackage(object):
             for line in mask:
                 if not line.startswith(("include ", "exclude ")):
                     mess = "Bad mask in %s\n" % mask_path
+                    mess += line + "\n"
                     mess += "line should start with 'include' or 'exclude'"
                     raise Exception(mess)
             return mask
