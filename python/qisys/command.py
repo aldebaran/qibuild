@@ -75,7 +75,16 @@ class Process:
                 self.exception = e
                 self.return_type = Process.NOT_RUN
                 return
-            self.out = self._process.communicate()[0]
+            def read_target():
+                self.out = self._process.communicate()[0]
+            self._should_stop_reading = False
+            self._reading_thread = threading.Thread(target=read_target)
+            # Allow Python to exit even if the reading thread is still alive
+            # (i.e the process is still running even after we tried to kill it)
+            self._reading_thread.daemon = True
+            self._reading_thread.start()
+            while not self._should_stop_reading and self._reading_thread.is_alive():
+                self._reading_thread.join(1)
             self.returncode = self._process.returncode
             if self.returncode == 0:
                 ui.debug("Setting return code to Process.OK")
@@ -125,6 +134,7 @@ class Process:
             # pylint: disable-msg=E1101
             os.kill(self._process.pid, signal.CTRL_BREAK_EVENT)
         self.return_type = Process.ZOMBIE
+        self._should_stop_reading = True
         self._thread.join()
 
 def str_from_signal(code):
