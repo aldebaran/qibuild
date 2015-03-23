@@ -127,6 +127,10 @@ Incorrect database configuration in %s: no path for package %s
             if package.cross_gdb:
                 return package.cross_gdb
 
+    @property
+    def cross(self):
+        return self.get_sysroot() is not None
+
     def __eq__(self, other):
         return self.name == other.name
 
