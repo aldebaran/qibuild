@@ -263,10 +263,24 @@ def test_using_build_prefix(qibuild_action, tmpdir):
                                                 platform.machine().lower()))
     assert expected.join("CMakeCache.txt").check(file=True)
 
-
 def test_relwithdebinfo(qibuild_action):
     world_proj = qibuild_action.add_test_project("world")
     qibuild_action("configure", "world", "--build-type", "RelWithDebInfo")
     cmake_build_type = qibuild.cmake.get_cached_var(world_proj.build_directory,
                                                     "CMAKE_BUILD_TYPE")
     assert cmake_build_type == "RelWithDebInfo"
+
+def test_using_fake_ctc(qibuild_action, fake_ctc):
+    qibuild_action.add_test_project("footool")
+    qibuild_action("configure", "footool", "--config", "fake-ctc")
+    qibuild_action("make", "footool", "--config", "fake-ctc")
+    build_worktree = TestBuildWorkTree()
+    build_worktree.set_active_config("fake-ctc")
+    footool_proj = build_worktree.get_build_project("footool")
+    # assert that bin/footool exists but cannot be run:
+    footool = qibuild.find.find_bin([footool_proj.sdk_directory], "footool",
+                                    expect_one=True)
+    assert os.path.exists(footool)
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception):
+        qisys.command.call([footool])

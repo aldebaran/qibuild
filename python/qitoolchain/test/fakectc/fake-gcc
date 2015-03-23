@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+
+""" Fake cross-compiler: just create an empty file
+matching the -o option
+
+"""
+
+import sys
+import os
+
+
+def parse_opt(args, option):
+    """ Parse arguments for the given option. Ignores any unknown
+    argument
+
+    >>> parse_opt(["-o", "foo", "-b", "bar"], "-o")
+    'foo'
+    >>> parse_opt(["-b", "bar"], "-o") is None
+    True
+
+    """
+    index = None
+    try:
+        index = args.index(option)
+    except ValueError:
+        pass
+    if not index:
+        return None
+    value = args[index + 1]
+    return value
+
+
+def main():
+    output = parse_opt(sys.argv, "-o")
+    source = parse_opt(sys.argv, "-c")
+    if source:
+        if not os.path.exists(source):
+            sys.exit("%s: %s does not exist" %
+                     (sys.argv[0], source))
+    if output:
+        with open(output, "w") as fp:
+            fp.write("")
+
+
+if __name__ == "__main__":
+    main()

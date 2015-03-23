@@ -6,6 +6,7 @@ from qisys.test.conftest import *
 
 import qisys.qixml
 from qisys.qixml import etree
+import qibuild.config
 import qibuild.deps
 import qitoolchain
 import qitoolchain.qipackage
@@ -118,6 +119,15 @@ def toolchains(request):
 def qitoolchain_action(cd_to_tmpdir):
     res = QiToolchainAction()
     return res
+
+# pylint: disable-msg=E1101
+@pytest.fixture
+def fake_ctc():
+    toolchain = qitoolchain.toolchain.Toolchain("fake-ctc")
+    this_dir= os.path.dirname(__file__)
+    toolchain.update(feed_url = os.path.join(this_dir, "fakectc", "toolchain.xml"))
+    qibuild.config.add_build_config("fake-ctc", toolchain="fake-ctc")
+    return toolchain
 
 class QiToolchainAction(TestAction):
     def __init__(self):

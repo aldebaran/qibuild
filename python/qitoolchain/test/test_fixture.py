@@ -1,6 +1,9 @@
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import os
+
 import qitoolchain.database
 import qitoolchain.feed
 import qitoolchain.qipackage
@@ -21,3 +24,7 @@ def test_create_package_with_dependencies(toolchains):
     toolchain = qitoolchain.get_toolchain("foo")
     actual = toolchain.solve_deps([hello_package], dep_types=["runtime"])
     assert actual == [world_package, hello_package]
+
+def test_fake_ctc(fake_ctc):
+    sysroot = fake_ctc.get_sysroot()
+    assert os.path.exists(sysroot)
