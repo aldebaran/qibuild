@@ -85,8 +85,8 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         else:
             res = dict()
         if os.name == 'nt':
-            dlls_path = self._get_dll_paths()
-            res["PATH"] = ";".join(dlls_path) + ";" + os.environ["PATH"]
+            dlls_paths = self._get_dll_paths()
+            res["PATH"] = ";".join(dlls_paths) + ";" + os.environ["PATH"]
         else:
             lib_paths = self._get_lib_paths()
             if sys.platform.startswith("linux"):
@@ -124,6 +124,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         if self.toolchain:
             for package in self.toolchain.packages:
                 res.append(os.path.join(package.path, "bin"))
+        return res
 
     def get_known_profiles(self):
         """ Parse the remote profiles (coming from qisrc sync), and the
