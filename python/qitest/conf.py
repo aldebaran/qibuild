@@ -32,8 +32,17 @@ def parse_tests(conf_path):
     Returns a list of dictionaries
 
     """
+    res = list()
     with open(conf_path, "r") as fp:
-        return json.load(fp)
+        res = json.load(fp)
+    # Make sure environment is a dict string -> string
+    for test in res:
+        test_env = test.get("environment")
+        if test_env:
+            for key, value in test_env.iteritems():
+                del test_env[key]
+                test_env[key.encode("UTF-8")] = value.encode("UTF-8")
+    return res
 
 def write_tests(tests, conf_path, append=False):
     """ Write a list of tests to a config file
