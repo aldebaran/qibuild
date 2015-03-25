@@ -82,6 +82,7 @@ qibuild
   (``~/.config/qi/qibuild.xml``)
 * ``qibuild deploy``: make specifying user and port optional
   (this allows to specify them in ~/.ssh/config)
+* Put staged directories with ``qi_stage_dir`` first in ``path.conf``
 
 qidoc
 ------
@@ -150,6 +151,7 @@ qitest
 * Fix several race conditions when using ``-j``
 * Implement ``qitest run --root-output-dir`` to store generated XML files
   outside the sdk directory
+* Allow using ``--all`` or ``--use-deps``
 
 qitoolchain
 -----------
@@ -158,6 +160,8 @@ qitoolchain
 * Also remove package files when a package is removed from the feed
 * ``qitoolchain add-package``: support legacy format
 * Allow including or excluding files with masks when installing packages
+* Add ``qitoolchain make-package``, ``qitoolchain extract-package``
+* Packages can now have a ``target`` and ``host`` attributes
 
 cmake
 ------
@@ -167,6 +171,9 @@ cmake
   * ``ogre``: search in the right ``PATH_SUFFIX``
   * Add ``v4l``
   * Add ``Qt5X11Extras``
+  * Add  ``Qt5OpenGL``
+  * Add ``gmp``, ``mpfr``, ``raptor``, ``rasqual``, ``redland``, ``gpg-error``,
+    ``gcrypt``, ``libtool``, ``libdb``, ``libxslt``, ``c-ares``
   * Support ``opencv`` 2.4.10
 
 * ``qi_swig_wrap_python``: handle lower case DEPENDS arguments
