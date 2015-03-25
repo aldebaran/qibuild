@@ -89,7 +89,7 @@ Then write a ``package.xml`` file looking like:
 .. code-block:: xml
 
     <!--- in /tmp/foo/package.xml -->
-    <package name="foo" version="0.1">
+    <package name="foo" version="0.1" target="linux64" >
       <depends buildtime="true" runtime="true" names="bar" />
     </package>
 
