@@ -11,10 +11,11 @@ def test_create_extract(qitoolchain_action, tmpdir):
     foo = tmpdir.join("foo")
     foo.ensure("include", "foo.h", file=True)
     foo.ensure("lib", "libfoo.so", file=True)
+    package_xml = foo.join("package.xml")
+    package_xml.write("""
+<package name="foo" version="0.1" target="linux64" />
+""")
     package_path = qitoolchain_action("make-package",
-                                      "--target", "linux64",
-                                      "--version", "0.1",
-                                      "--name", "foo",
                                       "--output", tmpdir.strpath,
                                       foo.strpath)
     assert package_path == tmpdir.join("foo-linux64-0.1.zip").strpath
