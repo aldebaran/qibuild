@@ -40,6 +40,16 @@ qibuild_projects=(
 "*:Projects:(($(qibuild list | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
 )
 
+qisrc_projects=(
+"(-a --all -s --single -g --group)"{-a,--all}"[Work on all projects.]"
+"(-s --single -a --all -g --group)"{-s,--single}"[Work on specified projects without taking dependencies into account.]"
+"(-g,--group -a --all -s --single)"{-g=,--group=}"[Specify a group of projects.]:Groups:(($(qisrc list-groups | cut -c3-)))"
+"--use-deps[Force deps resolution.]"
+"--build-deps-only[Work on specified projects by ignoring the runtime deps.]"
+"*:Projects:(($(qisrc list | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
+)
+
+
 qibuild_configs=(
 "(-c --config)"{-c,--config}"[The configuration to use.]:Configurations:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))"
 )
@@ -328,7 +338,7 @@ _qibuild-test() {
   && return
 }
 
-_qibuild() {
+_qibuild_main() {
   integer ret=1
   local curcontext=$curcontext state line
   declare -A opt_args
@@ -353,16 +363,304 @@ _qibuild() {
   return ret
 }
 
-_qisrc() {
+_qisrc_commands() {
+  local -a qisrc_commands
+  qisrc_commands=(
+  add:'Add a new project to a worktree.'
+  add-group:'Add a group to the current worktree.'
+  check-manifest:'Apply changes from a manifest xml path.'
+  checkout:'Change the branch of the manifest.'
+  create:'Create a new project.'
+  diff:'Display diff with an other branch of the worktree.'
+  foreach:'Run the same command on each source project.'
+  grep:'Run git grep on every project.'
+  info:'Display info about the current git worktree.'
+  init:'Init a new qisrc workspace.'
+  list:'List the names and paths of every project, or those matching a pattern.'
+  list-groups:'List the available groups.'
+  log:'Display log between current branch and an other branch of the worktree.'
+  maintainers:'Manage the list of maintainers.'
+  push:'Push changes for review.'
+  rebase:'Rebase repositories on top of an other branch of the manifest.'
+  remove:'Remove a project from a worktree.'
+  reset:'Reset repositories to a clean state.'
+  rm-group:'Remove a group from the current worktree.'
+  snapshot:'Generate a snapshot of all the git projects.'
+  status:'List the state of all git repositories and exit.'
+  sync:'Synchronize the given worktree with its manifest.')
+
+  integer ret=1
+  _describe 'qisrc commands' qisrc_commands && ret=0
+  return ret
+}
+
+_qisrc-add() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "--src=[Where to clone the project.]" \
+    "(-b --branch)"{-b=,--branch=}"[Branch.]" \
+    ": :_files" \
+  && return
+}
+
+_qisrc-add-group() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+  && return
+}
+
+_qisrc-check-manifest() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+  && return
+}
+
+_qisrc-checkout() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "(-f --force)"{-f,--force}"[Discard local changes.]" \
+  && return
+}
+
+_qisrc-create() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "(-i --input --template-path)"{-i=,--input=,--template-path=}"[Path to the template.]" \
+    "--git[Create a git repository.]" \
+    "(-o --output)"{-o=,--output=}"[Output of creation.]: :_files" \
+  && return
+}
+
+_qisrc-diff() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+  && return
+}
+
+_qisrc-foreach() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+    "--git[Consider only the git projects.]" \
+    "(-c --continue --ignore-errors)"{-c,--continue,--ignore-errors}"[Continue on error.]" \
+  && return
+}
+
+_qisrc-grep() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+    "--path=[type of patch to print?]: :((none absolute worktree project))" \
+  && return
+}
+
+_qisrc-info() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+  && return
+}
+
+_qisrc-init() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    ": :_files" \
+  && return
+}
+
+_qisrc-list() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "(--names --paths)--names[Sort by names.]" \
+    "(--names --paths)--paths[Sort by paths.]" \
+  && return
+}
+
+_qisrc-list-groups() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+  && return
+}
+
+_qisrc-log() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+  && return
+}
+
+_qisrc-maintainers() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+    "(--add --list --remove --clear)--add[Add a new maintainer.]" \
+    "(--add --list --remove --clear)--list[List all maintainers.]" \
+    "(--add --list --remove --clear)--remove[Remove maintainer.]" \
+    "(--add --list --remove --clear)--clear[Remove all maintainers.]" \
+    "--name=[Name of the maintainer to add or remove.]" \
+    "--email=[Email of the maintainer to add or remove.]" \
+  && return
+}
+
+_qisrc-push() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+    {--cc=,--reviewers=}"[Add reviewers (full email or just username if the domain is the same as yours).]" \
+    "(-t --topic)"{-t,--topic}"[Add a topic to your code review. Useful for grouping patches together.]" \
+  && return
+}
+
+_qisrc-rebase() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+    "--push[Push the rebased branch.]" \
+    "--dry-run[Dry run.]" \
+    "--force-run[Use push --force.]" \
+  && return
+}
+
+_qisrc-remove() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "--from-disk[Also remove project sources from disk.]" \
+  && return
+}
+
+_qisrc-reset() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+    "(-f --force)"{-f,--force}"[Discard local changes.]" \
+    "--tag=[Reset everything to the given tag.]" \
+    "--snapshot=[Reset everything using the given snapshot.]" \
+  && return
+}
+
+_qisrc-rm-group() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+    ":Group to delete:(($(qisrc list-groups | cut -c3-)))" \
+  && return
+}
+
+_qisrc-snapshot() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+    "--deprecated-format[Only used for retro-compatibility.]" \
+    ": :_files" \
+  && return
+}
+
+_qisrc-status() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+    "(-u --untracked-files)"{-u,--untracked-files}"[Display untracked files.]" \
+  && return
+}
+
+_qisrc-sync() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    $qisrc_projects \
+    "--reset[Do the same as \`qisrc reset --all --force\` after the fetch.]" \
+    "--rebase-devel[Rebase development branches.]" \
+  && return
+}
+
+_qisrc_main() {
   integer ret=1
   local curcontext=$curcontext state line
   declare -A opt_args
 
   _arguments -C \
-    "-z[toto]" \
+    "(-h --help)"{-h,--help}"[Show this help message and exit]" \
+    "(-w --worktree --work-tree)"{-w=,--worktree=,--work-tree=}"[Use a specific work tree path.]" \
+    "(-): :->command" \
+    "(-)*:: :->option-or-argument" \
     && return
 
+  case $state in
+    (command)
+      _qisrc_commands && ret=0
+      ;;
+    (option-or-argument)
+      curcontext=${curcontext%:*:*}:qisrc-$words[1]:
+
+      _call_function ret _qisrc-$words[1]
+      ;;
+  esac
   return ret
 }
 
-_call_function ret _$service
+_call_function ret _${service}_main
