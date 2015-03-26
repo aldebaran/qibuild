@@ -12,7 +12,7 @@ import argparse
 import qisys.script
 
 def print_version(script_name):
-    sys.stdout.write("%s version 3.8rc3\n" % script_name)
+   sys.stdout.write("%s version 3.8\n" % script_name)
 
 def main():
     script_name = sys.argv[0]
