@@ -166,6 +166,7 @@ qitoolchain
 cmake
 ------
 
+* ``swig/python.cmake``: workaround some CMake bug
 * modules:
 
   * ``ogre``: search in the right ``PATH_SUFFIX``
