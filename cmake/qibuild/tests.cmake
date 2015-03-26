@@ -50,6 +50,10 @@ endfunction()
 #
 # Arguments are the same as :cmake:function:`qi_create_bin`
 function(qi_create_test_helper name)
+  if(NOT QI_WITH_TESTS)
+    return()
+  endif()
+
   qi_create_bin(${name} NO_INSTALL ${ARGN})
   if(TARGET ${name})
     install(TARGETS ${name}
