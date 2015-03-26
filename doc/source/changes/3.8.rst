@@ -174,7 +174,7 @@ cmake
   * Add ``Qt5X11Extras``
   * Add  ``Qt5OpenGL``
   * Add ``gmp``, ``mpfr``, ``raptor``, ``rasqual``, ``redland``, ``gpg-error``,
-    ``gcrypt``, ``libtool``, ``libdb``, ``libxslt``, ``c-ares``
+    ``gcrypt``, ``libtool``, ``libdb``, ``libxslt``, ``c-ares``, ``cgos``
   * Support ``opencv`` 2.4.10
 
 * ``qi_swig_wrap_python``: handle lower case DEPENDS arguments
