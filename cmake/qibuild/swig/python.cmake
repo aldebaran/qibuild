@@ -78,6 +78,12 @@ function(qi_swig_wrap_python module_name interface_file)
 
   swig_add_module(${module_name} python ${interface_file} ${_srcs})
 
+  # When interface_file looks like "foo/foo.i", cmake 2.8.12 tries
+  # to generate the fooPYTHON_wrap.cxx in build/foo/foo/ but fails
+  # because it does not create the subdirectory
+  get_filename_component(_interface_dir ${interface_file} DIRECTORY)
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_interface_dir})
+
   ##
   # Deal with the newly created target
 
