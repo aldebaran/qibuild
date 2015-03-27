@@ -1,0 +1,12 @@
+v3.9
+====
+
+qisrc
+-----
+
+* Fix using ``qisrc create`` outside a worktree
+
+qipkg
+-----
+
+* ``qipkg deploy-package``: do not try to remove non installed applications
