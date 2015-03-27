@@ -98,7 +98,10 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         if self.toolchain:
             python_package = self.toolchain.get_package("python", raises=False)
             if python_package:
-                res["PYTHONHOME"] = python_package.path
+                if sys.platform == "darwin":
+                    res["PYTHONHOME"] = python_package.path + "/Python.framework/Versions/2.7"
+                else:
+                    res["PYTHONHOME"] = python_package.path
         return res
 
     def _get_lib_paths(self):

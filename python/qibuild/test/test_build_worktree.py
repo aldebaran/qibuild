@@ -92,5 +92,7 @@ def test_set_pythonhome(toolchains, cd_to_tmpdir):
     build_worktree = TestBuildWorkTree()
     build_worktree.set_active_config("foo")
     env = build_worktree.get_env()
-    assert env["PYTHONHOME"] == python_package.path
-
+    if sys.platform == "darwin":
+        assert env["PYTHONHOME"] == python_package.path + "/Python.framework/Versions/2.7"
+    else:
+        assert env["PYTHONHOME"] == python_package.path
