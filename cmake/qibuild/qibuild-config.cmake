@@ -31,3 +31,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} CACHE INTERNAL ""  FORCE)
 # So that find_package(qibuild) works:
 set(qibuild_DIR ${_this_dir} CACHE INTERNAL "" FORCE)
 include(${_this_dir}/general.cmake)
+
+# Make sure *-config.cmake files are found first in toolchain packages,
+# then in qibuild/cmake/modules
+qi_persistent_append_uniq(CMAKE_PREFIX_PATH "${_ROOT_DIR}/modules/")

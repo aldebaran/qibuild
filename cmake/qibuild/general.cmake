@@ -36,10 +36,6 @@ message(STATUS "Using qibuild ${QIBUILD_VERSION}")
 include("qibuild/log")
 include("qibuild/set")
 
-# Make sure custom -config.cmake files are found *before* the
-# one in the system (useful for using qibuild/modules/gtest-config.cmake,
-# and not /usr/share/cmake/modules/FindGTest.cmake)
-qi_persistent_append_uniq(CMAKE_PREFIX_PATH "${_ROOT_DIR}/modules/")
 
 set(QI_ROOT_DIR ${_ROOT_DIR})
 set(QI_TEMPLATE_DIR ${_ROOT_DIR}/templates)
