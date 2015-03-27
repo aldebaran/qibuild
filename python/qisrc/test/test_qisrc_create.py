@@ -44,3 +44,13 @@ def test_template_path(qisrc_action, tmpdir):
     helloworld_proj = worktree.get_project("helloworld")
     with open(os.path.join(helloworld_proj.path, "CMakeLists.txt")) as fp:
         assert fp.read() == "project(HelloWorld)\n"
+
+def test_no_worktree(tmpdir):
+    tmpl = tmpdir.mkdir("tmpl")
+    tmpl.join("@project_name@.txt").write("")
+
+    dest = tmpdir.mkdir("dest")
+    with qisys.sh.change_cwd(dest.strpath):
+        qisys.script.run_action("qisrc.actions.create",
+                                ["--template-path", tmpl.strpath, "HelloWorld"])
+    assert dest.join("helloworld", "hello_world.txt").check(file=True)

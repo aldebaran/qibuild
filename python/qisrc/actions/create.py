@@ -23,7 +23,10 @@ def configure_parser(parser):
 
 def do(args):
     """"Create a new project """
-    worktree = qisys.parsers.get_worktree(args)
+    try:
+        worktree = qisys.parsers.get_worktree(args)
+    except qisys.worktree.NotInWorkTree:
+        worktree = None
 
     project_name = os.path.basename(args.project_name)
 
@@ -48,5 +51,6 @@ def do(args):
         qisys.command.call(["git" , "commit" , "-m" , "initial commit"], cwd=output_dir)
 
     ui.info(ui.green, "New project initialized in", ui.bold,  output_dir)
-    worktree.add_project(output_dir)
-    return worktree.get_project(output_dir)
+    if worktree:
+        worktree.add_project(output_dir)
+        return worktree.get_project(output_dir)
