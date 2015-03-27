@@ -41,6 +41,7 @@ def do(args):
     template_path = args.template_path
     if not template_path:
         template_path = os.path.join(qisrc.QISRC_ROOT_DIR, "templates", "project")
+
     qisrc.templates.process(template_path, output_dir, project_name=project_name)
 
     if args.git:

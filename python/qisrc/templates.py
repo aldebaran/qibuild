@@ -6,6 +6,8 @@ import qisys.sh
 import qisrc.git
 
 def process(input_dir, output_dir, **kwargs):
+    if qisys.sh.is_path_inside(output_dir, input_dir):
+        raise Exception("output directory is inside input directory")
     ui.info(ui.green, "Generating code in", output_dir)
     for root, directories, filenames in os.walk(input_dir):
         rel_root = os.path.relpath(root, input_dir)

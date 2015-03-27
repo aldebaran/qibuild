@@ -8,6 +8,8 @@ import qisys.script
 import qisrc.git
 from qisys.test.conftest import TestWorkTree
 
+import pytest
+
 def test_simple(qisrc_action):
     qisrc_action("create", "foo")
     # cannot use qibuild_action fixture without creating recursive
@@ -54,3 +56,15 @@ def test_no_worktree(tmpdir):
         qisys.script.run_action("qisrc.actions.create",
                                 ["--template-path", tmpl.strpath, "HelloWorld"])
     assert dest.join("helloworld", "hello_world.txt").check(file=True)
+
+def test_create_inside_template(qisrc_action, tmpdir):
+    tmpl = tmpdir.mkdir("tmpl")
+    tmpl.join("@project_name@.txt").write("")
+
+    inside = tmpl.mkdir("dest")
+    with qisys.sh.change_cwd(inside.strpath):
+        # pylint:disable-msg=E1101
+        with pytest.raises(Exception) as e:
+            qisys.script.run_action("qisrc.actions.create",
+                                    ["--template-path", tmpl.strpath, "HelloWorld"])
+        assert e.value.message == "output directory is inside input directory"
