@@ -2,11 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-# if (_QI_GENERAL_CMAKE_INCLUDED)
-#   return()
-# endif()
-# set(_QI_GENERAL_CMAKE_INCLUDED TRUE)
-
+cmake_minimum_required(VERSION 2.8.12.2)
 
 #yeah allow NORMAL endfunction/endif/..
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
@@ -16,17 +12,8 @@ cmake_policy(SET CMP0010 NEW)
 cmake_policy(SET CMP0011 NEW)
 # if() recognizes numbers and boolean constants.
 cmake_policy(SET CMP0012 NEW)
-
-if(CMAKE_VERSION VERSION_GREATER "2.8.3")
-  cmake_policy(SET CMP0017 NEW)
-endif()
-
-# We use RUNTIME_DIRECTORY_<CONFIG> for visual studio
-# which is a very nice feature but that only came up with
-# cmake 2.8.2
-if(MSVC_IDE)
-  cmake_minimum_required(VERSION 2.8.3)
-endif()
+# Prefer files from the CMake module directory when including from there.
+cmake_policy(SET CMP0017 NEW)
 
 #get the current directory of the file
 get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
