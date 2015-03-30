@@ -25,6 +25,12 @@ First, get the C++ SDK and extract it, say in ``/path/to/cpp/sdk``
 
     $ qitoolchain create naoqi-sdk /path/to/cpp/sdk/toolchain.xml
 
+* Create a build configuration associated with the toolchain:
+
+.. code-block:: console
+
+    $ qibuild add-config naoqi-sdk --toolchain naoqi-sdk
+
 
 * Configure and build the helloworld project:
 
