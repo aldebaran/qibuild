@@ -1,9 +1,0 @@
-v3.7.2
-======
-
-cmake
------
-
-* modules:
-
-  * Add ``qt5_opengl``
