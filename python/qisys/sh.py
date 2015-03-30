@@ -359,31 +359,29 @@ def rm(name):
 
 # Taken from gclient source code (BSD license)
 def rmtree(path):
-    """shutil.rmtree() on steroids.
-
-    Recursively removes a directory, even if it's marked read-only.
-
-    shutil.rmtree() doesn't work on Windows if any of the files or directories
-    are read-only, which svn repositories and some .svn files are.  We need to
-    be able to force the files to be writable (i.e., deletable) as we traverse
-    the tree.
-
-    Even with all this, Windows still sometimes fails to delete a file, citing
-    a permission error (maybe something to do with antivirus scans or disk
-    indexing).  The best suggestion any of the user forums had was to wait a
-    bit and try again, so we do that too.  It's hand-waving, but sometimes it
-    works. :/
-
-    On POSIX systems, things are a little bit simpler.  The modes of the files
-    to be deleted doesn't matter, only the modes of the directories containing
-    them are significant.  As the directory tree is traversed, each directory
-    has its mode set appropriately before descending into it.  This should
-    result in the entire tree being removed, with the possible exception of
-    ``path`` itself, because nothing attempts to change the mode of its parent.
-    Doing so would be hazardous, as it's not a directory slated for removal.
-    In the ordinary case, this is not a problem: for our purposes, the user
-    will never lack write permission on ``path``'s parent.
-    """
+    # shutil.rmtree() on steroids.
+    # Recursively removes a directory, even if it's marked read-only.
+    #
+    # shutil.rmtree() doesn't work on Windows if any of the files or directories
+    # are read-only, which svn repositories and some .svn files are.  We need to
+    # be able to force the files to be writable (i.e., deletable) as we traverse
+    # the tree.
+    #
+    # Even with all this, Windows still sometimes fails to delete a file, citing
+    # a permission error (maybe something to do with antivirus scans or disk
+    # indexing).  The best suggestion any of the user forums had was to wait a
+    # bit and try again, so we do that too.  It's hand-waving, but sometimes it
+    # works. :/
+    #
+    # On POSIX systems, things are a little bit simpler.  The modes of the files
+    # to be deleted doesn't matter, only the modes of the directories containing
+    # them are significant.  As the directory tree is traversed, each directory
+    # has its mode set appropriately before descending into it.  This should
+    # result in the entire tree being removed, with the possible exception of
+    # ``path`` itself, because nothing attempts to change the mode of its parent.
+    # Doing so would be hazardous, as it's not a directory slated for removal.
+    # In the ordinary case, this is not a problem: for our purposes, the user
+    # will never lack write permission on ``path``'s parent.
     if not os.path.exists(path):
         return
 
