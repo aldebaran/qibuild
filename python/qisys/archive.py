@@ -336,7 +336,7 @@ def compress(directory, algo="zip", output=None, flat=False,
     """Compress directory in an archive
 
     :param directory: directory to add to the archive
-    :param archive:   output archive basepath
+    :param output:    path to the compressed archive
     :param algo:      compression method (default: zip)
     :param quiet:     silent mode (default: False)
     :param verbose:   verbose mode, print all the archive content
