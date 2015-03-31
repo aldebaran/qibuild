@@ -12,6 +12,10 @@ Calling process
 
 .. autofunction:: call
 
+.. autofunction:: check_output
+
+.. autofunction:: check_output_error
+
 Notes about :py:func:`call`
 ++++++++++++++++++++++++++++
 
@@ -52,3 +56,7 @@ Exceptions
 ----------
 
 .. py:class:: CommandFailedException
+
+.. py:class:: ProcessCrashedError
+
+.. py:class:: NotInPath

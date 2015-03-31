@@ -31,6 +31,15 @@ class Process:
     process and wait 5 seconds for it to terminate alone (timeout). If it
     doesn't stop by itself, it will kill the group of process (created with
     subprocess) to exterminate it. Process is then considered to be a zombie.
+
+    You can then use Process.return_type to know the state of the process:
+    Possible values:
+
+    * Process.OK   (exit code is one)
+    * Process.FAILED (exit code is > 0)
+    * Process.TIME_OUT (process timed out)
+    * Process.INTERRUPTED (exit code is < 0)
+    * Process.NOT_RUN (could not start the process)
     """
 
     OK          = 0
@@ -266,7 +275,7 @@ def _check_access(executable, path):
 
 ## Implementation widely inspired by the python-2.7 one.
 def check_output(*popenargs, **kwargs):
-    """Run command with arguments and return its output as a byte string.
+    r"""Run command with arguments and return its output as a byte string.
 
     If the exit code was non-zero it raises a CommandFailedException. The
     CommandFailedException object will have the return code in the returncode
@@ -311,7 +320,7 @@ def check_output(*popenargs, **kwargs):
 
 
 def check_output_error(*popenargs, **kwargs):
-    """Run command with arguments and return its output and error as a byte string.
+    r"""Run command with arguments and return its output and error as a byte string.
 
     If the exit code was non-zero it raises a CalledProcessError.  The
     CalledProcessError object will have the return code in the returncode
@@ -321,7 +330,7 @@ def check_output_error(*popenargs, **kwargs):
 
     >>> check_output_error(["tar", "tf", "foo.tbz2"])
     ('./\n./usr/\n./usr/bin/\n./usr/bin/foo\n',
-     '\nbzip2: (stdin): trailing garbage after EOF ignored\n')
+    '\nbzip2: (stdin): trailing garbage after EOF ignored\n')
 
     >>> try:
     ...     qisys.command.check_output_error(['tar', '--bzip2', '-tf', 'foo.tar.gz'])
@@ -332,7 +341,7 @@ def check_output_error(*popenargs, **kwargs):
     Return code is 2
     Working dir was /tmp
     Stdout:
-
+        <nothing>
     Stderr:
         bzip2: (stdin) is not a bzip2 file.
         tar: Child returned status 2
