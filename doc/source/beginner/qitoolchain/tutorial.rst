@@ -48,10 +48,10 @@ correct layout:
 .. code-block:: console
 
     foo
-       lib
-         libfoo.so
-       include
-          foo.h
+      lib
+        libfoo.so
+      include
+        foo.h
 
 
 Then write a CMake module so that the foo library can be found:
@@ -92,6 +92,24 @@ Then write a ``package.xml`` file looking like:
     <package name="foo" version="0.1" target="linux64" >
       <depends buildtime="true" runtime="true" names="bar" />
     </package>
+
+
+In the end the package tree should look like this:
+
+.. code-block:: console
+
+    foo
+      package.xml
+      lib
+        libfoo.so
+      include
+        foo.h
+      share
+        cmake
+          foo
+            foo-config.cmake
+
+
 
 Finally, zip the package:
 
