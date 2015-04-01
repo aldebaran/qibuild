@@ -52,6 +52,7 @@ Advanced tutorials
 * :ref:`managing-build-configs`
 * :ref:`using-toolchains`
 * :ref:`extending-qibuild-actions`
+* :ref:`qibuild-host-tools`
 
 
 qiBuild tips and tricks

@@ -11,3 +11,4 @@ Using qiBuild CMake API
    managing_data
    writing_a_config_cmake
    using_qi_stage
+   using_host_tools
