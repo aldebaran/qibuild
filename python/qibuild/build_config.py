@@ -119,20 +119,29 @@ class CMakeBuildConfig(object):
         envsetter.read_config(self.qibuild_cfg)
         return envsetter.get_build_env()
 
-    def build_directory(self, prefix="build"):
-        """ Return a suitable build directory, depending on the
-        build setting of the worktree: the name of the toolchain,
-        the build profiles, and the build type (debug/release)
+    def build_directory(self, prefix="build", name=None, system=False):
+        """ Return a suitable build directory, making sure
+        there is one build directory per config name.
+
+        If name is None, read the active build config
+        (set by the user with -c, or read as the default config for the worktree0
+
+        If system is True, returns sys-<system>-<arch>
         """
         if prefix:
             res = prefix + "-"
         else:
             res = ""
-        if self.active_build_config:
-            res += self.active_build_config.name
+
+        if name:
+            res += name
         else:
-            res += "sys-%s-%s" % (platform.system().lower(),
-                                  platform.machine().lower())
+            if self.active_build_config and not system:
+                res += self.active_build_config.name
+            else:
+                res += "sys-%s-%s" % (platform.system().lower(),
+                                    platform.machine().lower())
+
         return res
 
     @property

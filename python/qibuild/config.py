@@ -350,6 +350,7 @@ class BuildConfig:
         self.cmake = CMake()
         self.toolchain = None
         self.profiles = list()
+        self.host = False
 
     def parse(self, tree):
         name = tree.get("name")
@@ -359,6 +360,7 @@ class BuildConfig:
         self.name = ui.valid_filename(name)
         self.ide = tree.get("ide")
         env_tree = tree.find("env")
+        self.host = qisys.qixml.parse_bool_attr(tree, "host")
         if env_tree is not None:
             self.env.parse(env_tree)
         cmake_tree = tree.find("cmake")
@@ -378,6 +380,8 @@ class BuildConfig:
         tree.set("name", self.name)
         if self.ide:
             tree.set("ide", self.ide)
+        if self.host:
+            tree.set("host", "true")
         env_tree = self.env.tree()
         tree.append(env_tree)
         cmake_tree = self.cmake.tree()
@@ -395,6 +399,8 @@ class BuildConfig:
     def __str__(self):
         res = self.name
         res += "\n"
+        if self.host:
+            res += "  (host config)\n"
         if self.ide:
             res += "  ide: %s\n" % self.ide
         env_str = str(self.env)
@@ -662,6 +668,18 @@ class QiBuildConfig:
             self.worktrees[worktree.path] = worktree
         worktree.defaults.config = name
 
+    def set_host_config(self, config_name):
+        """ Set the config used to build host tools """
+        if not config_name in self.configs:
+            raise Exception("No such config: %s" % config_name)
+        self.configs[config_name].host = True
+
+    def get_host_config(self):
+        """ Get the config to use when looking for host tools """
+        for name, config in self.configs.iteritems():
+            if config.host:
+                return name
+
     def write(self, xml_path=None):
         """ Write back the new config
 
@@ -874,7 +892,7 @@ def get_build_env():
     return envsetter.get_build_env()
 
 def add_build_config(name, toolchain=None, profiles=None,
-                     ide=None, cmake_generator=None):
+                     ide=None, cmake_generator=None, host=False):
     """ Add a new build config to the list """
     qibuild_cfg = QiBuildConfig()
     qibuild_cfg.read(create_if_missing=True)
@@ -888,5 +906,6 @@ def add_build_config(name, toolchain=None, profiles=None,
         build_config.cmake.generator = cmake_generator
     if ide:
         build_config.ide = ide
+    build_config.host = host
     qibuild_cfg.add_config(build_config)
     qibuild_cfg.write()

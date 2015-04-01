@@ -68,6 +68,7 @@ class BuildProject(object):
         self.build_depends = set()
         self.run_depends = set()
         self.test_depends = set()
+        self.host_depends = set()
 
     @property
     def name(self):
@@ -90,11 +91,14 @@ class BuildProject(object):
     @property
     def build_directory(self):
         """ Return a suitable build directory, depending on the
-        build setting of the worktree: the name of the toolchain,
-        the build profiles, and the build type (debug/release)
+        build setting of the worktree: the build config, and
+        whether or not a build prefix is set
 
         """
-        build_directory_name = self.build_config.build_directory()
+        return self._get_build_directory()
+
+    def _get_build_directory(self, name=None, system=False):
+        build_directory_name = self.build_config.build_directory(name=name, system=system)
         build_prefix = self.build_config.build_prefix
         if build_prefix:
             return os.path.join(self.build_worktree.root,
@@ -158,7 +162,7 @@ class BuildProject(object):
     def verbose_make(self):
         return self.build_config.verbose_make
 
-    def write_dependencies_cmake(self, sdk_dirs):
+    def write_dependencies_cmake(self, sdk_dirs, host_dirs=None):
         """ Write the dependencies.cmake file. This will be read by
         qibuild-config.cmake to set CMAKE_PREFIX_PATH and
         qibuild_DIR, so that just running `cmake ..` works
@@ -195,14 +199,17 @@ set(CMAKE_PREFIX_PATH ${{CMAKE_PREFIX_PATH}} CACHE INTERNAL ""  FORCE)
         cmake_qibuild_dir = self.cmake_qibuild_dir
         cmake_qibuild_dir = qisys.sh.to_posix_path(cmake_qibuild_dir)
         dep_to_add = ""
-        for sdk_dir in sdk_dirs:
+        dirs_to_add = sdk_dirs
+        if host_dirs:
+            dirs_to_add = host_dirs + sdk_dirs
+        for dir_to_add in dirs_to_add:
 
             dep_to_add += """\
-list(FIND CMAKE_PREFIX_PATH "{sdk_dir}" _found)
+list(FIND CMAKE_PREFIX_PATH "{dir_to_add}" _found)
 if(_found STREQUAL "-1")
-  list(APPEND CMAKE_PREFIX_PATH "{sdk_dir}")
+  list(APPEND CMAKE_PREFIX_PATH "{dir_to_add}")
 endif()
-""".format(sdk_dir=qisys.sh.to_posix_path(sdk_dir))
+""".format(dir_to_add=qisys.sh.to_posix_path(dir_to_add))
 
         to_write = to_write.format(
             cmake_qibuild_dir=cmake_qibuild_dir,
@@ -552,6 +559,16 @@ The following tools were not found: {missing}\
             else:
                 ret[k] = [os.path.join(self.path, x) for x in ret[k]]
         return ret
+
+    def get_host_sdk_dir(self):
+        qibuild_cfg = qibuild.config.QiBuildConfig()
+        qibuild_cfg.read(create_if_missing=True)
+        host_config = qibuild_cfg.get_host_config()
+        if host_config:
+            build_directory = self._get_build_directory(name=host_config)
+        else:
+            build_directory = self._get_build_directory(system=True)
+        return os.path.join(build_directory, "sdk")
 
     def gen_package_xml(self, output):
         package_xml_root = etree.Element("package")

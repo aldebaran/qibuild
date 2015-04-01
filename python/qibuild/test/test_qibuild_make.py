@@ -36,3 +36,21 @@ def test_running_from_build_dir_incremental(qibuild_action):
     qibuild_action("make", "hello")
     hello = qibuild.find.find_bin([hello_proj.sdk_directory], "hello")
     qisys.command.call([hello])
+
+def test_using_host_tools_for_cross_compilation_no_system(qibuild_action, fake_ctc):
+    qibuild_action.add_test_project("footool")
+    qibuild_action.add_test_project("usefootool")
+    qibuild_action("configure", "footool")
+    qibuild_action("make", "footool")
+    qibuild_action("configure", "usefootool", "--config", "fake-ctc")
+    qibuild_action("make", "usefootool", "--config", "fake-ctc")
+
+def test_using_host_tools_for_cross_compilation_with_host_config(qibuild_action, fake_ctc):
+    qibuild_action.add_test_project("footool")
+    qibuild_action.add_test_project("usefootool")
+    qibuild_action("add-config", "foo")
+    qibuild_action("set-host-config", "foo")
+    qibuild_action("configure", "footool", "--config", "foo")
+    qibuild_action("make", "footool", "--config", "foo")
+    qibuild_action("configure", "usefootool", "--config", "fake-ctc")
+    qibuild_action("make", "usefootool", "--config", "fake-ctc")

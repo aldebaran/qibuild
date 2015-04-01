@@ -6,6 +6,7 @@ import os
 
 import qisys.qixml
 import qisrc.git
+import qibuild.config
 
 import pytest
 
@@ -69,3 +70,24 @@ def test_validates_name(build_worktree):
     # pylint:disable-msg=E1101
     with pytest.raises(Exception):
         build_worktree.create_project("foo/bar")
+
+
+def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):
+    toolchains.create("foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
+    qibuild_cfg.set_host_config("foo")
+    qibuild_cfg.write()
+    assert qibuild_cfg.get_host_config() == "foo"
+    bar_proj = build_worktree.create_project("bar")
+    build_worktree.set_active_config("foo")
+    host_sdk_dir = bar_proj.sdk_directory
+    build_worktree.set_active_config("fake-ctc")
+    assert bar_proj.get_host_sdk_dir() == host_sdk_dir
+
+def test_get_host_sdk_dir_system(build_worktree, toolchains, fake_ctc):
+    bar_proj = build_worktree.create_project("bar")
+    system_sdk_dir = bar_proj.sdk_directory
+    build_worktree.set_active_config("fake-ctc")
+    assert bar_proj.get_host_sdk_dir() == system_sdk_dir

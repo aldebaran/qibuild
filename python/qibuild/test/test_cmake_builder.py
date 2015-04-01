@@ -74,3 +74,34 @@ def test_add_package_paths_from_toolchain(build_worktree, toolchains, monkeypatc
     monkeypatch.setenv("QIBUILD_STRICT_DEPS_RESOLUTION", "ON")
     sdk_dirs = cmake_builder.get_sdk_dirs_for_project(naoqi_proj)
     assert sdk_dirs == [boost_package.path, qi_package.path]
+
+def test_host_tools_happy_path(build_worktree, fake_ctc):
+    footool = build_worktree.add_test_project("footool")
+    footool.configure()
+    host_sdk_dir = footool.sdk_directory
+    usefootool_proj = build_worktree.add_test_project("usefootool")
+    build_worktree.set_active_config("fake-ctc")
+    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
+    host_dirs = cmake_builder.get_host_dirs(usefootool_proj)
+    assert host_dirs == [host_sdk_dir]
+
+def test_host_tools_no_host_config(build_worktree, fake_ctc):
+    footool = build_worktree.add_test_project("footool")
+    usefootool_proj = build_worktree.add_test_project("usefootool")
+    build_worktree.set_active_config("fake-ctc")
+    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
+    # pylint:disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        cmake_builder.get_host_dirs(usefootool_proj)
+    assert "`qibuild set-host-config`" in e.value.message
+
+def test_host_tools_host_tools_not_built(build_worktree, fake_ctc):
+    qibuild.config.add_build_config("foo", host=True)
+    footool = build_worktree.add_test_project("footool")
+    usefootool_proj = build_worktree.add_test_project("usefootool")
+    build_worktree.set_active_config("fake-ctc")
+    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
+    # pylint:disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        cmake_builder.get_host_dirs(usefootool_proj)
+    assert "(Using 'foo' build config)" in e.value.message

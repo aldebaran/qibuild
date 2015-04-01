@@ -16,7 +16,9 @@ def configure_parser(parser):
     parser.add_argument("--ide")
     parser.add_argument("-G", "--cmake-generator", dest="cmake_generator")
     parser.add_argument("--default", action="store_true")
-    parser.set_defaults(default=False)
+    parser.add_argument("--host", action="store_true",
+                        help="Wether this configuration is suitable to build host tools")
+    parser.set_defaults(default=False, host=None)
 
 def do(args):
     worktree = qisys.parsers.get_worktree(args, raises=False)
@@ -27,7 +29,8 @@ def do(args):
     cmake_generator = args.cmake_generator
 
     qibuild.config.add_build_config(name, toolchain=toolchain, profiles=profiles,
-                                    ide=ide, cmake_generator=cmake_generator)
+                                    ide=ide, cmake_generator=cmake_generator,
+                                    host=args.host)
     if args.default:
         if worktree:
             build_worktree = qibuild.worktree.BuildWorkTree(worktree)

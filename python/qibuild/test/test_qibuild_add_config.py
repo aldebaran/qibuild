@@ -18,3 +18,9 @@ def test_add_config(qibuild_action):
 def test_set_default_config(qibuild_action, build_worktree):
     qibuild_action("add-config", "foo", "--default")
     assert build_worktree.default_config == "foo"
+
+def test_set_host_config(qibuild_action):
+    qibuild_action("add-config", "foo", "--host")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
+    assert qibuild_cfg.get_host_config() == "foo"

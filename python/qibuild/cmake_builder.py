@@ -84,7 +84,8 @@ class CMakeBuilder(AbstractBuilder):
         # with the build dependencies
         for project in projects:
             sdk_dirs = self.get_sdk_dirs_for_project(project)
-            project.write_dependencies_cmake(sdk_dirs)
+            host_dirs = self.get_host_dirs(project)
+            project.write_dependencies_cmake(sdk_dirs, host_dirs=host_dirs)
 
         qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
         if self.toolchain:
@@ -116,6 +117,35 @@ class CMakeBuilder(AbstractBuilder):
                 packages = list()
         sdk_dirs.extend([package.path for package in packages])
         return sdk_dirs
+
+    def get_host_dirs(self, project):
+        res = list()
+        host_deps = project.host_depends
+        qibuild_cfg = qibuild.config.QiBuildConfig()
+        qibuild_cfg.read(create_if_missing=True)
+        host_config = qibuild_cfg.get_host_config()
+        for host_dep in host_deps:
+            matching_project = self.build_worktree.get_build_project(host_dep,
+                                                                     raises=False)
+            if matching_project:
+                host_sdk_dir = matching_project.get_host_sdk_dir()
+                res.append(host_sdk_dir)
+                if not os.path.exists(host_sdk_dir):
+                    mess = """\
+Host SDK dir for project {matching_project} does not exist.
+Make sure to configure and build it first.
+"""
+                    mess = mess.format(matching_project=matching_project.name)
+                    if host_config:
+                        mess += " (Using '%s' build config)" % host_config
+                    else:
+                        mess += """\
+Either set a host config with `qibuild set-host-config`
+Or configure the project with no config
+"""
+                    raise Exception(mess.format(matching_project=matching_project.name))
+
+        return res
 
     def pre_build(self, project):
         """ Called before building a project """

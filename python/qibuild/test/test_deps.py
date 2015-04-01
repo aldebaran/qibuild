@@ -132,3 +132,9 @@ def test_complex_reverse_deps(build_worktree):
 
     assert deps_solver.get_dep_projects([libworld], ["build", "runtime"],
         reverse=True) == [hello, libhello]
+
+
+def test_read_host_deps(build_worktree):
+    footool_proj = build_worktree.add_test_project("footool")
+    usefootool_proj = build_worktree.add_test_project("usefootool")
+    assert usefootool_proj.host_depends == {"footool"}

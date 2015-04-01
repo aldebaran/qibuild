@@ -118,6 +118,7 @@ def read_deps_from_xml(target, xml_elem):
         buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
         runtime = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
         testtime = qisys.qixml.parse_bool_attr(depends_tree, "testtime")
+        host = qisys.qixml.parse_bool_attr(depends_tree, "host")
         dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
         for dep_name in dep_names:
             if buildtime:
@@ -126,6 +127,8 @@ def read_deps_from_xml(target, xml_elem):
                 target.run_depends.add(dep_name)
             if testtime:
                 target.test_depends.add(dep_name)
+            if host:
+                target.host_depends.add(dep_name)
 
 
 def dump_deps_to_xml(subject, xml_elem):

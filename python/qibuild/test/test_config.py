@@ -559,3 +559,26 @@ def test_write_build_configs(tmpdir):
     assert foo_config2.name == "foo"
     assert foo_config2.toolchain == "bar"
     assert foo_config2.profiles == ["spam", "eggs"]
+
+def test_host_config_default_is_none(tmpdir):
+    global_xml = tmpdir.join("global.xml")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(global_xml.strpath, create_if_missing=True)
+    assert qibuild_cfg.get_host_config() is None
+
+def test_host_config_setting_host():
+    qibuild.config.add_build_config("foo")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
+    qibuild_cfg.set_host_config("foo")
+    assert qibuild_cfg.get_host_config() == "foo"
+
+def test_host_config_is_persistent():
+    qibuild.config.add_build_config("foo")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
+    qibuild_cfg.set_host_config("foo")
+    qibuild_cfg.write()
+    qibuild_cfg2 = qibuild.config.QiBuildConfig()
+    qibuild_cfg2.read()
+    assert qibuild_cfg2.get_host_config() == "foo"
