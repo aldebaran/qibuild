@@ -24,7 +24,6 @@ Introduce the concept of ``build-config``. It is given
 a unique string across all worktrees, and contains the following
 info:
 
-* build type (debug, release)
 * toolchain
 * list of build profiles.
 
@@ -53,7 +52,7 @@ When using ``-c atom`` you can use ``--debug -s`` to
 only compile a project in debug, and it will use the same
 build directory.
 
-(There is no danger of using the same build directory for debug and
+(There is no danger in using the same build directory for debug and
 release, even on Visual Studio)
 
 When we have binary packages compiled with the nao profile,
