@@ -197,3 +197,48 @@ distribution.
 .. code-block:: console
 
     qitoolchain import-package -t my-toolchain --name foo /path/to/foo.tbz2
+
+
+Putting binary packages in a subversion repository
+---------------------------------------------------
+
+
+Instead of hosting zips on a HTTP server, you may want to host the pre-compiled packages
+in a subversion server. Why subversion ? Because it allows partial checkouts, and it
+is not that bad at managing binary blobs.
+
+You may have a layout like this on the server:
+
+.. code-block:: console
+
+   <svn root>
+    master
+        win32-vs2010
+          boost
+          qt
+        linux64
+          boost
+          qt
+
+Then you can specify packages in the XML feed using a ``svn_package`` element:
+
+.. code-block:: xml
+
+    <!-- in feeds/linux64.xml -->
+    <feed>
+      <svn_package name="boost" url="svn://example.org/toolchains/master/linux64/boost" />
+      <svn_package name="qt" url="svn://example.org/toolchains/master/linux64/qt" />
+    </feed>
+
+When using ``qitoolchain create``, the packages will be created using ``svn checkout``, and
+then ``svn update`` will be called when using ``qitoolchain update``.
+
+You can also specify a revision inside the feed:
+
+
+.. code-block:: xml
+
+    <!-- in feeds/linux64.xml -->
+    <feed>
+      <svn_package name="boost" url="svn://example.org/toolchains/master/linux64/boost" revision="42" />
+    </feed>
