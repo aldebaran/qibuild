@@ -184,6 +184,25 @@ Or configure the project with no config
             self.pre_build(project)
             project.build(**kwargs)
 
+    def build_host_tools(self):
+        """ Build every host tool """
+        qibuild_cfg = qibuild.config.QiBuildConfig()
+        qibuild_cfg.read(create_if_missing=True)
+        host_config = qibuild_cfg.get_host_config()
+        host_deps = set()
+        for project in self.projects:
+            host_deps = host_deps.union(project.host_depends)
+
+        host_projects = [self.build_worktree.get_build_project(x, raises=False)
+                         for x in host_deps]
+        host_projects = filter(None, host_projects)
+        host_worktree = qibuild.worktree.BuildWorkTree(self.build_worktree.worktree)
+        if host_config:
+            host_worktree.set_active_config(host_config)
+        host_builder = CMakeBuilder(host_worktree, host_projects)
+        host_builder.configure()
+        host_builder.build()
+
     @need_configure
     def install(self, dest_dir, *args, **kwargs):
         """ Install the projects and the packages to the dest_dir """

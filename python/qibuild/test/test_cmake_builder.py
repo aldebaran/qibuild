@@ -105,3 +105,12 @@ def test_host_tools_host_tools_not_built(build_worktree, fake_ctc):
     with pytest.raises(Exception) as e:
         cmake_builder.get_host_dirs(usefootool_proj)
     assert "(Using 'foo' build config)" in e.value.message
+
+def test_build_host_tools(build_worktree, fake_ctc):
+    build_worktree.add_test_project("footool")
+    usefootool_proj = build_worktree.add_test_project("usefootool")
+    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, [usefootool_proj])
+    build_worktree.set_active_config("fake-ctc")
+    cmake_builder.build_host_tools()
+    cmake_builder.configure()
+    cmake_builder.build()
