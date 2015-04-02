@@ -13,6 +13,7 @@ class GitProject(object):
     def __init__(self, git_worktree, worktree_project):
         self.git_worktree = git_worktree
         self.src = worktree_project.src
+        self.qiproject_xml = worktree_project.qiproject_xml
         self.name = ""
         self.branches = list()
         self.remotes = list()

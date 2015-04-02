@@ -1,8 +1,12 @@
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
-from qisrc.test.conftest import TestGitWorkTree, TestGit
+import qisys.command
 import qisrc.git
+
+from qisrc.test.conftest import TestGitWorkTree, TestGit
+
+import mock
 
 def test_not_under_code_review(qisrc_action, git_server):
     foo_repo = git_server.create_repo("foo.git")
@@ -27,3 +31,34 @@ def test_publish_changes(qisrc_action, git_server):
     _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
     (_, remote) = foo_git.call("ls-remote", "gerrit", "refs/for/master", raises=False)
     assert remote == "%s\trefs/for/master" % sha1
+
+def test_using_carbon_copy(qisrc_action, git_server):
+    foo_repo = git_server.create_repo("foo.git", review=True)
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    foo_git = TestGit(foo_proj.path)
+    foo_git.commit_file("a.txt", "a")
+    with mock.patch.object(qisys.command, "call") as mocked_call:
+        qisrc_action("push", "foo", "--cc", "jdoe")
+    recieve_pack_arg = mocked_call.call_args[0][0][2]
+    reviewer_arg = recieve_pack_arg.split()[-1]
+    assert "jdoe" in reviewer_arg
+
+def test_alert_maintainers(qisrc_action, git_server):
+    foo_repo = git_server.create_repo("foo.git", review=True)
+    qiproject_xml = """\
+<project version="3">
+  <maintainer email="jdoe@company.com">John Doe</maintainer>
+</project>"""
+    git_server.push_file("foo.git", "qiproject.xml", qiproject_xml)
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    foo_git = TestGit(foo_proj.path)
+    foo_git.commit_file("a.txt", "a")
+    with mock.patch.object(qisys.command, "call") as mocked_call:
+        qisrc_action("push", "foo")
+    recieve_pack_arg = mocked_call.call_args[0][0][2]
+    reviewer_arg = recieve_pack_arg.split()[-1]
+    assert "jdoe@company.com" in reviewer_arg
