@@ -43,4 +43,8 @@ def test_run_failure(qibuild_action):
     project.build()
 
     e = qibuild_action("run", "idontexist", raises=True)
-    assert e == "idontexist not found"
+    assert e == "Cannot find idontexist binary"
+
+def test_run_system(qibuild_action):
+    retcode = qibuild_action("run", "ls", retcode=True)
+    assert retcode == 0
