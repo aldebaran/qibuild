@@ -256,12 +256,17 @@ endfunction()
 # For this to work, configuration files should be
 # in ``etc`` and data files in ``share``
 #
-# Note that this function does not create any install rule
+# Note that this function does not create any install rule,
+# so you should call qi_install_data(share/... ) for
+# the files to be found after your project is installed.
+#
+# See :ref:`cmake-data`
 #
 # \arg:directory (optional): the directory to
 #                 register, relative to
 #                 CMAKE_CURRENT_SOURCE_DIR. Defaults
 #                 to CMAKE_CURRENT_SOURCE_DIR
+#
 function(qi_stage_dir)
   set(_path_conf "${QI_SDK_DIR}/${QI_SDK_SHARE}/qi/path.conf")
   set(_dirs)

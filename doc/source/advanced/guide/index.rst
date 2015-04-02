@@ -39,6 +39,7 @@ Using qibuild CMake API
 * :ref:`cmake-create-lib`
 * :ref:`cmake-install`
 * :ref:`cmake-config-files`
+* :ref:`cmake-data`
 * :ref:`cmake-test`
 
 Advanced tutorials

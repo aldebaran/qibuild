@@ -8,5 +8,6 @@ Using qiBuild CMake API
    install
    test
    managing_config_files
+   managing_data
    writing_a_config_cmake
    using_qi_stage

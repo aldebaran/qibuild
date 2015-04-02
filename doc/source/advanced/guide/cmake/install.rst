@@ -31,6 +31,25 @@ components:
 * ``test`` : the dependencies required to test the software (the gtest library,
   some test executables, ...)
 
+
+Using ``qibuild install``
+--------------------------
+
+By default ``qibuild install <project> <destination>`` install the ``build``
+and ``runtime`` components.
+
+If you want to install the ``test`` component too, use ``qibuild install --with-tests``.
+
+If you only want the ``runtime`` component, use ``qibuild install --runtime``.
+
+Note that by default ``CMAKE_INSTALL_PREFIX`` is set to ``/``.
+
+To install directly to ``/usr/local`` do:
+
+.. code-block:: console
+
+    sudo qibuild install --prefix /usr/local /
+
 Install functions, destination, components
 -------------------------------------------
 
