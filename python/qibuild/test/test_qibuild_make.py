@@ -5,6 +5,7 @@ import os
 
 import qisys.command
 import qibuild.find
+import qitoolchain.qipackage
 
 import pytest
 
@@ -52,5 +53,16 @@ def test_using_host_tools_for_cross_compilation_with_host_config(qibuild_action,
     qibuild_action("set-host-config", "foo")
     qibuild_action("configure", "footool", "--config", "foo")
     qibuild_action("make", "footool", "--config", "foo")
+    qibuild_action("configure", "usefootool", "--config", "fake-ctc")
+    qibuild_action("make", "usefootool", "--config", "fake-ctc")
+
+def test_using_host_tools_for_cross_with_host_in_toolchain(qibuild_action,
+                                                           qitoolchain_action,
+                                                           fake_ctc):
+    footool_proj = qibuild_action.add_test_project("footool")
+    qibuild_action.add_test_project("usefootool")
+    footool_archive = qibuild_action("package", "footool")
+    qitoolchain_action("add-package", "-c", "fake-ctc", footool_archive)
+    qisys.sh.rm(footool_proj.path)
     qibuild_action("configure", "usefootool", "--config", "fake-ctc")
     qibuild_action("make", "usefootool", "--config", "fake-ctc")

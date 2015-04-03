@@ -144,6 +144,13 @@ Either set a host config with `qibuild set-host-config`
 Or configure the project with no config
 """
                     raise Exception(mess.format(matching_project=matching_project.name))
+            else:
+                # No project, try a package in the toolchain
+                toolchain = self.build_worktree.toolchain
+                if toolchain:
+                    matching_package = toolchain.get_package(host_dep, raises=False)
+                    if matching_package:
+                        res.append(matching_package.path)
 
         return res
 
