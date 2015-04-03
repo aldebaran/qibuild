@@ -581,6 +581,12 @@ function(_qi_internal_stage_bin target)
   set(_res "${_res} ${_vars}")
   set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_l_target}-config.cmake")
   file(WRITE "${_sdk_file}" "${_res}")
+
+  set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_l_target}-config.cmake")
+  file(WRITE ${_redist_file} "
+find_program(${_U_target}_EXECUTABLE ${target})
+")
+  _qi_install_redist_file(${_redist_file} ${target} ${_l_target})
 endfunction()
 
 #
