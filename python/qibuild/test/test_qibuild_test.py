@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 import os
 import sys
+import platform
 
 import xml.etree.ElementTree as etree
 
@@ -114,3 +115,16 @@ def test_setting_output_dir_without_project(qitest_action, qibuild_action, tmpdi
                   "--qitest-json", qitest_json.strpath,
                   "--root-output-dir", out.strpath)
     assert out.join("test-results", "ok.xml").check(file=True)
+
+
+def test_setting_build_prefix(qitest_action, qibuild_action, tmpdir):
+    prefix = tmpdir.join("prefix")
+    qibuild_action.add_test_project("testme")
+    qibuild_action("configure", "testme", "--build-prefix", prefix.strpath)
+    qibuild_action("make", "testme", "--build-prefix", prefix.strpath)
+    qitest_action("run", "testme", "-k", "ok", "--build-prefix", prefix.strpath)
+    test_results = prefix.join("testme",
+            "build-sys-%s-%s" % (platform.system().lower(),
+                                 platform.machine().lower()),
+                                 "sdk", "test-results")
+    assert test_results.join("ok.xml").check(file=True)

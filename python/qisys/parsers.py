@@ -80,6 +80,8 @@ def build_parser(parser, group=None, include_worktree_parser=True):
         group = parser.add_argument_group("build type options")
     group.add_argument("-c", "--config",
         help="The configuration to use. ")
+    group.add_argument("--build-prefix", dest="build_prefix",
+                    help="Prefix for all the build directories")
 
 def deploy_parser(parser):
     group = parser.add_argument_group("deploy options")
