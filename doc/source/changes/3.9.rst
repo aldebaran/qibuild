@@ -5,6 +5,8 @@ qisrc
 -----
 
 * Fix using ``qisrc create`` outside a worktree
+* ``qisrc status``: add option ``-S``/``--short`` to display status only for
+  dirty projects
 
 qipkg
 -----
