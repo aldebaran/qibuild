@@ -22,6 +22,9 @@ def configure_parser(parser):
         dest="untracked_files",
         action="store_true",
         help="display untracked files")
+    group.add_argument("--short", "-S",
+        action="store_true",
+        help="do not display clean projects on expected branch")
 
 def do(args):
     """Main method."""
@@ -55,7 +58,8 @@ def do(args):
     dirty = [x for x in state_projects if not x.sync_and_clean]
     ui.info("\n", ui.brown, "Dirty projects", len(dirty), "/", num_projs)
 
-    for git_project in state_projects:
+    projects_to_display = dirty if args.short else state_projects
+    for git_project in projects_to_display:
         qisrc.status.print_state(git_project, max_len)
 
     max_len = max(max_len, len("Project"))
