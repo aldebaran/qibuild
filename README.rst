@@ -33,7 +33,7 @@ https://groups.google.com/a/aldebaran-robotics.com/group/qibuild-dev/topics
 Documentation
 -------------
 
-https://community.aldebaran-robotics.com/doc/qibuild/
+http://doc.aldebaran.com/qibuild/
 
 Installation
 ------------
