@@ -1,11 +1,15 @@
 import os
-import re
 
 from qisys import ui
 import qisys.sh
-import qisrc.git
+
 
 def process(input_dir, output_dir, **kwargs):
+    if not os.path.isdir(input_dir):
+        if os.path.exists(input_dir):
+            raise Exception("%s is not a directory" % input_dir)
+        else:
+            raise Exception("%s does not exist" % input_dir)
     if qisys.sh.is_path_inside(output_dir, input_dir):
         raise Exception("output directory is inside input directory")
     ui.info(ui.green, "Generating code in", output_dir)
