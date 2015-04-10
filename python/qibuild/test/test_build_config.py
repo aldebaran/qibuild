@@ -193,3 +193,14 @@ def test_profiles_from_config(cd_to_tmpdir):
     build_config = build_worktree.build_config
     assert build_config.profiles == ["bar"]
     assert build_config.cmake_args == ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_BAR=ON"]
+
+
+def test_adding_removing_toolchains(qitoolchain_action, qibuild_action):
+    qitoolchain_action("create", "test")
+    qibuild_action("add-config", "test", "--toolchain", "test")
+    qitoolchain_action("remove", "test", "--force")
+    qitoolchain_action("create", "test")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
+    test_config = qibuild_cfg.configs["test"]
+    assert test_config.toolchain == "test"

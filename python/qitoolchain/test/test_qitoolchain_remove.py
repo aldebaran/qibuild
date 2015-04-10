@@ -28,5 +28,7 @@ def test_when_is_default(qitoolchain_action):
     test_build_worktre1.set_default_config("foo")
     qitoolchain_action("remove", "foo", "--force")
     test_build_worktre2 = TestBuildWorkTree()
-    assert test_build_worktre2.toolchain is None
-
+    # pylint:disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        test_build_worktre2.toolchain
+    assert "No such toolchain" in e.value.message
