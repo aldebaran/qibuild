@@ -162,6 +162,8 @@ class QiPackage(object):
 
 def from_xml(element):
     name = element.get("name")
+    if not name:
+        raise Exception("missing 'name' attribute")
     url = element.get("url")
     if element.tag == "svn_package":
         import qitoolchain.svn_package
@@ -173,6 +175,12 @@ def from_xml(element):
     res.version = element.get("version")
     res.path = element.get("path")
     res.directory = element.get("directory")
+    if res.url and res.directory:
+        mess = """\
+Bad configuration for package %s. 'directory' and 'url' are
+mutually exclusive
+"""
+        raise Exception(mess % name)
     res.toolchain_file = element.get("toolchain_file")
     res.sysroot = element.get("sysroot")
     res.cross_gdb = element.get("cross_gdb")
