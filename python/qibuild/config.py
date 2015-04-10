@@ -897,7 +897,10 @@ def add_build_config(name, toolchain=None, profiles=None,
     qibuild_cfg = QiBuildConfig()
     qibuild_cfg.read(create_if_missing=True)
 
-    build_config = BuildConfig()
+    if name in qibuild_cfg.configs:
+        build_config = qibuild_cfg.configs[name]
+    else:
+        build_config = BuildConfig()
     build_config.name = name
     build_config.toolchain = toolchain
     if profiles:
