@@ -109,6 +109,12 @@ function(qi_create_gtest name)
   qi_add_test(${name} ${name} GTEST_TEST ${ARGN})
 endfunction()
 
+#! Same as :cmake:function:`qi_create_test`, excepts it adds a dependency
+# to the gmock libraries
+function(qi_create_gmock name)
+  qi_add_test(${name} ${name} GMOCK_TEST ${ARGN})
+endfunction()
+
 #! Shortcut for :cmake:function:`qi_create_test(... PERF) <qi_create_test>`
 function(qi_create_perf_test name)
   _qi_add_test_internal(${name} ${name} PERF_TEST ${ARGN})
