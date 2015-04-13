@@ -412,6 +412,7 @@ _qisrc-add-group() {
   _arguments \
     $qibuild_logging \
     $qibuild_debug \
+    ":Group to add:(($(qisrc list-groups | cut -c3-)))" \
   && return
 }
 
