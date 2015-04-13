@@ -4,7 +4,7 @@
 
 function(_qi_add_test_internal test_name target_name)
   cmake_parse_arguments(ARG
-    "NO_INSTALL;NO_ADD_TEST;NIGHTLY;PERF_TEST;GTEST_TEST"
+    "NO_INSTALL;NO_ADD_TEST;NIGHTLY;PERF_TEST;GTEST_TEST;GMOCK_TEST"
     "TIMEOUT;WORKING_DIRECTORY"
     "SRC;DEPENDS;SUBMODULE;ARGUMENTS;ENVIRONMENT" ${ARGN})
 
@@ -29,6 +29,9 @@ function(_qi_add_test_internal test_name target_name)
     if(ARG_GTEST_TEST)
       list(APPEND _deps GTEST GTEST_MAIN)
     endif()
+    if(ARG_GMOCK_TEST)
+      list(APPEND _deps GMOCK GMOCK_MAIN)
+    endif()
     qi_use_lib(${target_name} ${_deps})
     return()
   endif()
@@ -46,6 +49,9 @@ function(_qi_add_test_internal test_name target_name)
     set(_submodules ${ARG_SUBMODULE})
     if(ARG_GTEST_TEST)
       list(APPEND _deps GTEST GTEST_MAIN)
+    endif()
+    if(ARG_GMOCK_TEST)
+      list(APPEND _deps GMOCK GMOCK_MAIN)
     endif()
     # Using NO_INSTALL because we don't want to be in the 'runtime'
     # component like the other binaries
@@ -96,6 +102,10 @@ function(_qi_add_test_internal test_name target_name)
   endif()
 
   if(ARG_GTEST_TEST)
+    list(APPEND _qi_add_test_args "--gtest")
+  endif()
+
+  if(ARG_GMOCK_TEST)
     list(APPEND _qi_add_test_args "--gtest")
   endif()
 
