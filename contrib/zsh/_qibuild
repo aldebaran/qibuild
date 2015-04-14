@@ -1,5 +1,7 @@
 #compdef qibuild qisrc qitoolchain qitest
 
+# TODO: load functions as in _git
+
 _qibuild_commands() {
   local -a qibuild_commands
   qibuild_commands=(
@@ -664,4 +666,181 @@ _qisrc_main() {
   return ret
 }
 
+_qitoolchain_commands() {
+  local -a qitoolchain_commands
+  qitoolchain_commands=(
+  add-package:'Add a new package to a toolchain.'
+  convert-package:'Convert a binary archive into a qiBuild package.'
+  create:'Configure a worktree to use a toolchain.'
+  extract-package:'Extract a binary toolchain package.'
+  import-package:'Convert a binary archive into a qiBuild package and add it to a toolchain.'
+  info:'Display a complete description of a toolchain.'
+  list:'Display the toolchains names.'
+  make-package:'Create a package from a directory.'
+  remove:'Uninstall a toolchain.'
+  remove-package:'Remove a package from a toolchain.'
+  status:'Display the toolchains status their names, and what projects they provide.'
+  update:'Update every toolchain using the feed that was used to create them.')
+
+  integer ret=1
+  _describe -t qitoolchain-commands 'commands' qitoolchain_commands && ret=0
+  return ret
+}
+
+_qitoolchain-add-package() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
+    "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list | grep '*' | cut -c3-)))" \
+    "--name=[The name of the package. Useful for legacy package format.]" \
+    ": :_files" \
+  && return
+}
+
+_qitoolchain-convert-package() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "--name=[The name of the package. Useful for legacy package format.]" \
+    "--batch[Do not prompt for cmake module edition.]" \
+    ": :_files" \
+  && return
+}
+
+_qitoolchain-create() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    ": :_files" \
+  && return
+}
+
+_qitoolchain-extract-package() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "(-o --output)"{-o,--output}"[Where to extract the files.]" \
+    ": :_files" \
+  && return
+}
+
+_qitoolchain-import-package() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
+    "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list | grep '*' | cut -c3-)))" \
+    "--name=[The name of the package. Useful for legacy package format.]" \
+    "--batch[Do not prompt for cmake module edition.]" \
+    "(-d --destdir)"{-d,--destdir}"[Destination directory of the qiBuild package after conversion.]" \
+    ": :_files" \
+  && return
+}
+
+_qitoolchain-info() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
+  && return
+}
+
+_qitoolchain-list() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+  && return
+}
+
+_qitoolchain-make-package() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "(-o --output)"{-o,--output}"[Base directory in which to create the archive.]" \
+    ": :_files" \
+  && return
+}
+
+_qitoolchain-remove() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
+  && return
+}
+
+# TODO: add support for name of specific toolchain
+_qitoolchain-remove-package() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
+    "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list | grep '*' | cut -c3-)))" \
+  && return
+}
+
+_qitoolchain-status() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
+  && return
+}
+
+_qitoolchain-update() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
+  && return
+}
+
+_qitoolchain_main() {
+  integer ret=1
+  local curcontext=$curcontext state line
+  declare -A opt_args
+
+  _arguments -C \
+    "(-h --help)"{-h,--help}"[Show this help message and exit]" \
+    "(-): :->command" \
+    "(-)*:: :->option-or-argument" \
+    && return
+
+  case $state in
+    (command)
+      _qitoolchain_commands && ret=0
+      ;;
+    (option-or-argument)
+      curcontext=${curcontext%:*:*}:qitoolchain-$words[1]:
+
+      _call_function ret _qitoolchain-$words[1]
+      ;;
+  esac
+  return ret
+}
 _call_function ret _${service}_main
