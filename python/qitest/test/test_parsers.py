@@ -7,6 +7,8 @@ import pytest
 
 import qitest.parsers
 
+from qibuild.test.conftest import TestBuildWorkTree
+
 def test_nothing_specified_json_in_cwd(args, tmpdir, monkeypatch):
     monkeypatch.chdir(tmpdir)
     qitest_json = tmpdir.ensure("qitest.json")
@@ -29,6 +31,19 @@ def test_specifying_qitest_json(args, tmpdir):
     args.qitest_json = qitest_json.strpath
     test_runner = qitest.parsers.get_test_runner(args)
     assert test_runner.project.sdk_directory == tmpdir.strpath
+
+def test_bad_qibuild_config_with_qitest_json(args, qibuild_action, monkeypatch):
+    qibuild_action.add_test_project("testme")
+    qibuild_action("add-config", "foo")
+    qibuild_action("configure", "--config", "foo", "testme")
+    build_worktree = TestBuildWorkTree()
+    build_worktree.set_active_config("foo")
+    testme_proj = build_worktree.get_build_project("testme")
+    testme_sdk = testme_proj.sdk_directory
+    qitest_json = os.path.join(testme_sdk, "qitest.json")
+    monkeypatch.chdir(testme_proj.path)
+    args.qitest_jsons = [qitest_json]
+    test_runners = qitest.parsers.get_test_runners(args)
 
 def test_several_qibuild_projects(args, build_worktree, monkeypatch):
     world_proj = build_worktree.add_test_project("world")
