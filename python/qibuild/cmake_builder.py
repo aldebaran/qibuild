@@ -101,18 +101,14 @@ class CMakeBuilder(AbstractBuilder):
         write_qi_path_conf(self.build_worktree.dot_qi, qi_path_sdk_dirs, sdk_layout=False)
 
     def get_sdk_dirs_for_project(self, project):
-        project_names = [p.name for p in self.build_worktree.build_projects]
         sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build"])
         # remove this when all qiproject.xml have been fixed
         strict_mode = os.environ.get("QIBUILD_STRICT_DEPS_RESOLUTION")
         if strict_mode:
             packages = self.deps_solver.get_dep_packages([project], ["build"])
         else:
-            # Just grab every package in the toolchain that does not match
-            # a project in the worktree without solving any deps
             if self.toolchain:
-                packages = [p for p in self.toolchain.packages \
-                            if p.name not in project_names]
+                packages = self.toolchain.packages
             else:
                 packages = list()
         sdk_dirs.extend([package.path for package in packages])
