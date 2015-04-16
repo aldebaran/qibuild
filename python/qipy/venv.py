@@ -54,18 +54,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         ui.info(ui.red, "Failed to add some python projects")
     if not remote_ok:
         ui.info(ui.red, "Failed to add some third party requirements")
-
-    requirements_ok = True
-    for project in python_worktree.python_projects:
-        path = os.path.join(project.path, "requirements.txt")
-        if os.path.isfile( path ):
-            ui.info(ui.green, " * Installing dependencies from " + path)
-            cmd = [pip_binary, "install", "--requirement", path]
-            rc = qisys.command.call(cmd, ignore_ret_code=True)
-            requirements_ok = (rc == 0)
-        else:
-            ui.debug(ui.yellow, " * missing " + path)
-    return (pure_python_ok and remote_ok and requirements_ok)
+    return (pure_python_ok and remote_ok)
 
 def find_script(venv_path, script_name):
     """ Find a script given its name
