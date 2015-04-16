@@ -27,8 +27,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.get_cfg_path = self.cfg_patcher.start()
         self.get_cfg_path.return_value = os.path.join(self.tmp, "qibuild.xml")
 
-        self.get_tc_names_patcher = mock.patch('qitoolchain.get_tc_names')
-        self.get_tc_names = self.get_tc_names_patcher.start()
+        self.get_config_names = mock.patch('qibuild.config.get_config_names')
+        self.get_config_names = self.get_config_names.start()
         self.find_patcher = mock.patch('qisys.command.find_program')
         self.find_program = self.find_patcher.start()
         self.get_generators_patcher = mock.patch(
@@ -44,11 +44,11 @@ class ConfigWizardTestCase(unittest.TestCase):
         """
         sys.platform = platform
 
-    def setup_tc_names(self, tc_names):
-        """ Setup qitoolchain.get_tc_names for this test
+    def setup_configs(self, names):
+        """ Setup qibuild.config.get_config_names for this test
 
         """
-        self.get_tc_names.return_value = tc_names
+        self.get_config_names.return_value = names
 
     def setup_initial_config(self, xml):
         """ Setup the contents of the global xml config file
@@ -229,10 +229,10 @@ class ConfigWizardTestCase(unittest.TestCase):
             "ide": "QtCreator",
         })
         self.setup_generators(["Unix Makefiles"])
-        self.setup_tc_names(list())
+        self.setup_configs(list())
         self.run_wizard(build_worktree=self.build_worktree)
 
-    def test_local_settings_choose_default_toolchain(self):
+    def test_local_settings_choose_default_config(self):
         self.setup_platform("linux")
         self.setup_find_program({
             "cmake": "/usr/bin/cmake",
@@ -241,11 +241,11 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.setup_answers({
             "generator": "Unix Makefiles",
             "ide": "QtCreator",
-            "toolchain": "linux64",
+            "config": "linux64",
             "configure settings for this worktree": True,
         })
         self.setup_generators(["Unix Makefiles"])
-        self.setup_tc_names(["linux32", "linux64"])
+        self.setup_configs(["linux32", "linux64"])
         self.run_wizard(build_worktree=self.build_worktree)
         self.assertEqual(self.build_worktree.qibuild_cfg.local.defaults.config,
                          "linux64")
@@ -265,7 +265,7 @@ class ConfigWizardTestCase(unittest.TestCase):
             "path to a build dir": "build",
         })
         self.setup_generators(["Unix Makefiles"])
-        self.setup_tc_names(list())
+        self.setup_configs(list())
         self.run_wizard(build_worktree=self.build_worktree)
         self.assertEqual(self.build_worktree.qibuild_cfg.local.build.prefix,
                          "build")
@@ -278,12 +278,12 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.setup_answers({
             "generator": "Visual Studio 10",
             "ide": "Visual Studio",
-            "use on of these toolchains by default": True,
+            "use on of these configs by default": True,
             "configure settings for this worktree": True,
-            "toolchain to use by default": "win32-vs2010",
+            "config to use by default": "win32-vs2010",
         })
         self.setup_generators(["Visual Studio 10"])
-        self.setup_tc_names(["win32-vs2010"])
+        self.setup_configs(["win32-vs2010"])
         self.run_wizard(build_worktree=self.build_worktree)
         self.assertEqual(self.build_worktree.qibuild_cfg.local.defaults.config,
                          "win32-vs2010")
@@ -304,7 +304,7 @@ class ConfigWizardTestCase(unittest.TestCase):
             "path to a build dir": "build",
         })
         self.setup_generators(["Unix Makefiles"])
-        self.setup_tc_names(list())
+        self.setup_configs(list())
         worktree = qisys.worktree.WorkTree(self.tmp, sanity_check=False)
         old_build_worktree = qibuild.worktree.BuildWorkTree(worktree)
         self.run_wizard(build_worktree=old_build_worktree)
@@ -332,7 +332,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         qisys.sh.rm(self.tmp)
         # pylint: disable-msg=E1103
         sys.platform = self.orig_platform
-        self.get_tc_names_patcher.stop()
+        self.get_config_names.stop()
         self.cfg_patcher.stop()
         self.find_patcher.stop()
         if self.interact_patcher:

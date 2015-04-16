@@ -160,16 +160,16 @@ def configure_local_settings(build_worktree):
         default=False)
     if not answer:
         return
-    tc_names = qitoolchain.get_tc_names()
-    if tc_names:
+    config_names = qibuild.config.get_config_names()
+    if config_names:
         ui.info(ui.green, "::", ui.reset,
-                "Found the following toolchains: ", ", ".join(tc_names))
+                "Found the following build configs: ", ", ".join(config_names))
         answer = qisys.interact.ask_yes_no(
-            "Use one of these toolchains by default",
+            "Use one of these build configs by default",
             default=True)
         if answer:
-            default = qisys.interact.ask_choice(tc_names,
-                "Choose a toolchain to use by default")
+            default = qisys.interact.ask_choice(config_names,
+                "Choose a build config to use by default")
             if default:
                 qibuild_cfg.local.defaults.config = default
                 qibuild_cfg.write_local_config(build_worktree.qibuild_xml)

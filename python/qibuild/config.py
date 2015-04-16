@@ -912,3 +912,8 @@ def add_build_config(name, toolchain=None, profiles=None,
     build_config.host = host
     qibuild_cfg.add_config(build_config)
     qibuild_cfg.write()
+
+def get_config_names():
+    qibuild_cfg = QiBuildConfig()
+    qibuild_cfg.read(create_if_missing=True)
+    return qibuild_cfg.configs.keys()
