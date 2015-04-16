@@ -254,10 +254,24 @@ qi_create_test(env2 env.cpp)
     num_tests_after = len(test_proj2.tests)
     assert num_tests_after == num_tests_before + 1
 
-def test_using_build_prefix(qibuild_action, tmpdir):
+def test_using_build_prefix_from_command_line(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
     prefix = tmpdir.join("mybuild")
     qibuild_action("configure", "world", "--build-prefix", prefix.strpath)
+    expected = prefix.join("world",
+                           "build-sys-%s-%s" % (platform.system().lower(),
+                                                platform.machine().lower()))
+    assert expected.join("CMakeCache.txt").check(file=True)
+
+def test_using_build_prefix_from_config(qibuild_action, tmpdir):
+    build_worktree = TestBuildWorkTree()
+    qibuild_action.add_test_project("world")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.local.build.prefix = "prefix"
+    qibuild_cfg.write_local_config(build_worktree.qibuild_xml)
+    qibuild_action("configure", "world")
+    prefix = build_worktree.tmpdir.join("prefix")
+
     expected = prefix.join("world",
                            "build-sys-%s-%s" % (platform.system().lower(),
                                                 platform.machine().lower()))

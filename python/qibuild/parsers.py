@@ -198,7 +198,8 @@ def get_build_config(build_worktree, args):
     if hasattr(args, "num_jobs"):
         build_config.num_jobs = args.num_jobs
     if hasattr(args, "build_prefix"):
-        build_config.build_prefix = args.build_prefix
+        if args.build_prefix:
+            build_config.build_prefix = args.build_prefix
     return build_config
 
 ##
