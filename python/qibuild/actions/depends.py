@@ -193,7 +193,6 @@ def collect_dependencies_reverse(project, projects, single, runtime, depth=0):
         else:
             depends = proj.build_depends
         if project.name in depends:
-            print "%s on %s" % (project.name, proj.name)
             dependency = DependencyRelationship(project.name, proj.name)
             dependency.is_known = True
             dependency.path = proj.path
