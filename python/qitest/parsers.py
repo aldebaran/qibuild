@@ -100,15 +100,20 @@ def get_test_runners(args):
         build_projects = qibuild.parsers.get_build_projects(
                 build_worktree,
                 args, solve_deps=solve_deps)
-        for build_project  in build_projects:
-            test_runner = get_test_runner(args, build_project=build_project)
-            # avoid appending a test_runner guessed from a build project
-            # when res already contains a test runner computed from a
-            # --qitest-json argument
-            known_cwds = [x.cwd for x in res]
-            if not test_runner.cwd in known_cwds:
-                res.append(test_runner)
-    except:
+        for build_project in build_projects:
+            test_runner = None
+            try:
+                test_runner = get_test_runner(args, build_project=build_project)
+            except qibuild.project.NoQiTestJson:
+                pass
+            if test_runner:
+                # avoid appending a test_runner guessed from a build project
+                # when res already contains a test runner computed from a
+                # --qitest-json argument
+                known_cwds = [x.cwd for x in res]
+                if not test_runner.cwd in known_cwds:
+                    res.append(test_runner)
+    except (qisys.worktree.NotInWorkTree, qibuild.parsers.CouldNotGuessProjectName):
         pass
 
     if not res:

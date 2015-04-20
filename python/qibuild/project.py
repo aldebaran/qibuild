@@ -453,7 +453,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
     def to_test_project(self):
         if not os.path.exists(self.qitest_json):
-            raise Exception("qitest.json not found. Did you run qibuild configure?")
+            raise NoQiTestJson()
         res = qitest.project.TestProject(self.qitest_json)
         if not res.tests:
             ui.error("No tests were found in qitest.json.\n" +
@@ -607,3 +607,7 @@ The following tools were not found: {missing}\
 
 class BadProjectConfig(Exception):
     pass
+
+class NoQiTestJson(Exception):
+    def __str__(self):
+        return """ Could not find qitest.json. Did you run `qibuild configure` ? """
