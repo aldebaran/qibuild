@@ -38,5 +38,6 @@ def run(projects, binary, bin_args, env=None):
         bin_path = qisys.command.find_program(binary)
     if not bin_path:
         raise Exception("Cannot find " + binary + " binary")
-    retcode = subprocess.call([bin_path] + bin_args, env=env)
-    return retcode
+    cmd = [bin_path] + bin_args
+    ui.debug("exec", cmd)
+    os.execve(bin_path,  cmd, env)

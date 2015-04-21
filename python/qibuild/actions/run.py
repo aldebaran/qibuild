@@ -26,9 +26,5 @@ def do(args):
     """Main entry point """
     build_worktree = qibuild.parsers.get_build_worktree(args)
     env = build_worktree.get_env()
-    retcode = qibuild.run.run(build_worktree.build_projects, args.binary, args.bin_args,
+    qibuild.run.run(build_worktree.build_projects, args.binary, args.bin_args,
                               env=env)
-    if retcode < 0:
-        ui.error("Process crashed: (%s)" % qisys.command.str_from_signal(-retcode))
-        sys.exit(1)
-    sys.exit(retcode)
