@@ -2,6 +2,7 @@
 
 # TODO: load functions as in _git
 
+(( $+functions[_qibuild_commands] )) ||
 _qibuild_commands() {
   local -a qibuild_commands
   qibuild_commands=(
@@ -68,6 +69,22 @@ qibuild_debug=(
 "--backtrace[Display backtrace on error.]"
 "--pdb[Use pdb on error.]"
 )
+
+_qibuild-add-config() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments \
+    $qibuild_logging \
+    $qibuild_debug \
+    "(-t --toolchain)"{-t,--toolchain}"[The toolchain to use.]:Toolchains:(($(qitoolchain list | grep '^*' | cut -c3-)))" \
+    "(-p --profile)"{-p=,--profile=}"[The profile to use.]" \
+    "(-G --cmake-generator)"{-G=,--cmake-generator=}"[The cmake generator to use.]" \
+    "--ide=[Ide to use.]" \
+    "--default" \
+  && return
+
+  return ret
+}
 
 _qibuild-clean () {
   local curcontext=$curcontext state line ret=1
@@ -816,7 +833,7 @@ _qitoolchain-update() {
   _arguments \
     $qibuild_logging \
     $qibuild_debug \
-    ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
+    ': :(($(echo ${XDG_CONFIG_HOME-$HOME/.config}/qi/toolchains/*.xml(.N\:t\:r))))' \
   && return
 }
 
