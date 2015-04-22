@@ -176,7 +176,10 @@ Or configure the project with no config
         for i, project in enumerate(projects):
             ui.info_count(i, len(projects),
                           ui.green, "Building",
-                          ui.blue, project.name, update_title=True)
+                          ui.blue, project.name,
+                          ui.green, "in",
+                          ui.blue, project.build_type,
+                          update_title=True)
             self.pre_build(project)
             project.build(**kwargs)
 
