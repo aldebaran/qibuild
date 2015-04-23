@@ -9,12 +9,12 @@ the target 'hostname'.
 
 Examples:
 
-  qibuild deploy foobar john@mytarget:deployed
+  qibuild deploy foobar --url john@mytarget:deployed
 
 Installs everything on the target 'mytarget' in the
 'deployed' directory from the 'john' 's home.
 
-  qibuild deploy foobar john@mytarget:/tmp/foobar
+  qibuild deploy foobar --url john@mytarget:/tmp/foobar
 
 Installs everything on the target 'mytarget' in the
 '/tmp/foobar' directory.
