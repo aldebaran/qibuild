@@ -1,0 +1,4 @@
+clean(WS2)
+set(WS2_INCLUDE_DIRS " " CACHE STRING "" FORCE)
+set(WS2_LIBRARIES Ws2_32.lib CACHE STRING "" FORCE)
+export_lib(WS2)
