@@ -6,6 +6,21 @@
 # =======================
 
 
+# CMAKE_C_FLAGS and the like are _strings_, not lists
+macro(_qi_add_flags var flags)
+  string(FIND "${${var}}" ${flags} _res)
+  if(${_res} EQUAL "-1")
+    set(${var} "${${var}} ${flags}")
+  endif()
+endmacro()
+
+macro(_qi_disable_warnings_msvc)
+  foreach(_number ${ARGN})
+    _qi_add_flags(CMAKE_C_FLAGS "/wd${_number}")
+    _qi_add_flags(CMAKE_CXX_FLAGS "/wd${_number}")
+  endforeach()
+endmacro()
+
 #! Sanitize compile flags between different compilers
 # (gcc and cl.exe)
 # The function will also read the following variables that
@@ -21,7 +36,7 @@
 #       for shared libraries.
 #       Note that in this case, you should use ``qi/macro.hpp``
 #       to export the symbols of your library.
-function(qi_sanitize_compile_flags)
+macro(qi_sanitize_compile_flags)
   cmake_parse_arguments(ARGS "HIDDEN_SYMBOLS" "" "" ${ARGN})
   # cl.exe :
   if(MSVC)
@@ -34,6 +49,8 @@ function(qi_sanitize_compile_flags)
     # Activate warnings
     # note that wchar.h causes warnings when using /Wall or /W4 ...
     add_definitions("/W3")
+
+    _qi_disable_warnings_msvc(4251 4275)
 
     if(QI_WERROR)
       add_definitions("/WX")
@@ -65,15 +82,8 @@ function(qi_sanitize_compile_flags)
 
   endif()
 
-endfunction()
+endmacro()
 
-# CMAKE_C_FLAGS and the like are _strings_, not lists
-function(_qi_add_flags var flags)
-  string(FIND "${${var}}" ${flags} _res)
-  if(${_res} EQUAL "-1")
-    set(${var} "${${var}} ${flags}" PARENT_SCOPE)
-  endif()
-endfunction()
 
 if (QI_WITH_COVERAGE)
   _qi_add_flags(CMAKE_C_FLAGS "--coverage")
