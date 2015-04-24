@@ -71,8 +71,8 @@ class WorkTreeSyncer(object):
             git.commit("-m", "initial commit")
         return res
 
-    def sync_repos(self):
-        """ Update every manifest, inspect changes, and updates the
+    def sync_repos(self, force=False):
+        """ Update the manifest, inspect changes, and updates the
         git worktree accordingly
 
         """
@@ -88,7 +88,7 @@ class WorkTreeSyncer(object):
         self._sync_manifest()
         self._sync_groups()
         self.new_repos = self.read_remote_manifest()
-        res = self._sync_repos(self.old_repos, self.new_repos)
+        res = self._sync_repos(self.old_repos, self.new_repos, force=force)
         # re-read self.old_repos so we can do several syncs:
         self.old_repos = self.get_old_repos()
         # if everything went well, save the manifests configurations:
@@ -131,7 +131,8 @@ class WorkTreeSyncer(object):
         xml = parser.xml_elem()
         qisys.qixml.write(xml, self.manifest_xml)
 
-    def configure_manifest(self, url, branch="master", groups=None, ref=None, review=True):
+    def configure_manifest(self, url, branch="master", groups=None,
+                           ref=None, review=True, force=False):
         """ Add a manifest to the list. Will be stored in
         .qi/manifests/<name>
 
@@ -142,7 +143,7 @@ class WorkTreeSyncer(object):
         self.manifest.branch = branch
         self.manifest.ref = ref
         self.manifest.review = review
-        res = self.sync_repos()
+        res = self.sync_repos(force=force)
         self.configure_projects()
         return res
 
@@ -200,7 +201,7 @@ class WorkTreeSyncer(object):
         if not transaction.ok:
             raise Exception("Update failed\n" + transaction.output)
 
-    def _sync_repos(self, old_repos, new_repos):
+    def _sync_repos(self, old_repos, new_repos, force=False):
         """ Sync the remote repo configurations with the git worktree """
         res = True
         ##
@@ -262,7 +263,7 @@ class WorkTreeSyncer(object):
         if to_move:
             ui.info(ui.green, ":: Moving repositories ...")
         for (repo, new_src) in to_move:
-            if not self.git_worktree.move_repo(repo, new_src):
+            if not self.git_worktree.move_repo(repo, new_src, force=force):
                 res = False
 
         return res

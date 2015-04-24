@@ -85,6 +85,16 @@ def test_moving_repos_rename_fails(git_worktree, git_server):
     assert  git_worktree.get_git_project("lib/foo")
     assert not git_worktree.get_git_project("foo")
 
+def test_moving_repos_with_force(git_worktree, git_server):
+    git_server.create_repo("foo.git")
+    manifest_url = git_server.manifest_url
+    git_worktree.configure_manifest(manifest_url)
+    git_server.move_repo("foo.git", "lib/foo")
+    git_worktree.tmpdir.ensure("lib", "foo", dir=True)
+    git_worktree.configure_manifest(manifest_url, force=True)
+    assert git_worktree.get_git_project("lib/foo")
+    assert not git_worktree.get_git_project("foo")
+
 def test_removing_repos(git_worktree, git_server):
     git_server.create_repo("foo.git")
     manifest_url = git_server.manifest_url
