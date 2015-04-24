@@ -41,8 +41,6 @@ class PythonTestCollector:
             pytest_data['name'] = name
             pytest_data['cmd'] = list()
             pytest_data['cmd'].append(self.pytest_path)
-            pytest_data['cmd'].append("--junitxml")
-            pytest_data['cmd'].append(name + ".xml" )
             pytest_data['cmd'].append(pytest)
             pytest_data['working_directory'] = project.path
             pytest_data['environment'] = ""

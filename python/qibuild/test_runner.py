@@ -182,15 +182,16 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
     def _update_test_cmd_for_project(self, test):
         if not self.project:
             return
+        test_out = self.test_out(test)
+        perf_out = self.perf_out(test)
+        cmd = test["cmd"]
         if test.get("gtest"):
-            test_out = self.test_out(test)
-            cmd = test["cmd"]
             cmd.append("--gtest_output=xml:%s" % test_out)
             if self.suite_runner.break_on_failure:
                 cmd.append("--gtest_break_on_failure")
+        if test.get("pytest"):
+            cmd.extend(["--junit-xml", test_out])
         if test.get("perf"):
-            perf_out = self.perf_out(test)
-            cmd = test["cmd"]
             cmd.extend(["--output", perf_out])
 
     def _update_test_executable(self, test):
