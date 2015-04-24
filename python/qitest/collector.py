@@ -8,13 +8,20 @@ import glob
 import qisrc
 import qisys.ui as ui
 import qisys.command
+import qipy.venv
 
 class PythonTestCollector:
     def __init__(self, python_worktree):
         self.python_worktree = python_worktree
         self.root = python_worktree.worktree.root
+        self.pytest_path = str()
         self.projects = list()
         self.tests_path = list()
+        venv_path = python_worktree.venv_path
+        if venv_path:
+            self.pytest_path = qipy.venv.find_script(venv_path, "py.test")
+        else:
+            self.pytest_path = qisys.command.find_program("py.test")
 
 
     def get_list_of_pytest(self, rep):
@@ -33,7 +40,7 @@ class PythonTestCollector:
             pytest_data = dict()
             pytest_data['name'] = name
             pytest_data['cmd'] = list()
-            pytest_data['cmd'].append(qisys.command.find_program("py.test"))
+            pytest_data['cmd'].append(self.pytest_path)
             pytest_data['cmd'].append("--junitxml")
             pytest_data['cmd'].append(name + ".xml" )
             pytest_data['cmd'].append(pytest)
