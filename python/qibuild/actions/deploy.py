@@ -36,7 +36,9 @@ def configure_parser(parser):
                        help="split debug symbols. Enable remote debuging")
     group.add_argument("--with-tests", dest="with_tests", action="store_true",
                        help="also deploy the tests")
-    parser.set_defaults(with_tests=False)
+    group.add_argument("--no-packages", action="store_false", dest="install_tc_packages",
+                        help="Do not install packages from toolchain")
+    parser.set_defaults(with_tests=False, install_tc_packages=True)
 
 def do(args):
     """Main entry point"""
@@ -51,4 +53,5 @@ def do(args):
                                     args, default_dep_types=default_dep_types)
     for url in urls:
         cmake_builder.deploy(url, split_debug=args.split_debug,
-                             with_tests=args.with_tests)
+                             with_tests=args.with_tests,
+                             install_tc_packages=args.install_tc_packages)

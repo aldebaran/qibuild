@@ -209,6 +209,11 @@ Or configure the project with no config
         installed = list()
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         packages = self.deps_solver.get_dep_packages(self.projects, self.dep_types)
+        if "install_tc_packages" in kwargs:
+            install_tc_packages = kwargs["install_tc_packages"]
+            del kwargs["install_tc_packages"]
+            if not install_tc_packages:
+                packages = list()
 
         # Compute the real path where to install the packages:
         prefix = kwargs.get("prefix", "/")
@@ -260,7 +265,7 @@ Or configure the project with no config
 
 
     @need_configure
-    def deploy(self, url, split_debug=False, with_tests=False):
+    def deploy(self, url, split_debug=False, with_tests=False, install_tc_packages=True):
         """ Deploy the project and the packages it depends to a remote url """
 
         # Deploy packages: install all of them in the same temp dir, then
@@ -282,8 +287,11 @@ Or configure the project with no config
         qitest_json = os.path.join(deploy_dir, "qitest.json")
         qisys.sh.rm(qitest_json)
 
-        dep_packages = self.deps_solver.get_dep_packages(self.projects,
-                                                         self.dep_types)
+        if install_tc_packages:
+            dep_packages = self.deps_solver.get_dep_packages(self.projects,
+                                                             self.dep_types)
+        else:
+            dep_packages = list()
         dep_projects = self.deps_solver.get_dep_projects(self.projects,
                                                          self.dep_types)
         ui.info(ui.green, "The following projects")

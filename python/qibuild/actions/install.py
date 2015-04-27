@@ -23,7 +23,11 @@ def configure_parser(parser):
                        help="Split debug symbols")
     group.add_argument("--with-tests", action="store_true", dest="with_tests",
                         help="Also install tests")
-    parser.set_defaults(prefix="/", split_debug=False, dep_types="default")
+    group.add_argument("--no-packages", action="store_false", dest="install_tc_packages",
+                        help="Do not install packages from toolchain")
+
+    parser.set_defaults(prefix="/", split_debug=False, dep_types="default",
+                        install_tc_packages=True)
     if not parser.epilog:
         parser.epilog = ""
     parser.epilog += """
@@ -54,5 +58,6 @@ def do(args):
 
     res = cmake_builder.install(dest_dir, prefix=args.prefix,
                                 split_debug=args.split_debug,
-                                components=components)
+                                components=components,
+                                install_tc_packages=args.install_tc_packages)
     return res

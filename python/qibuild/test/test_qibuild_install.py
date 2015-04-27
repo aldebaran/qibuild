@@ -200,3 +200,23 @@ def test_do_not_generate_config_module_for_non_installed_targets(qibuild_action,
     dest = tmpdir.mkdir("dest")
     qibuild_action("install", "--all", dest.strpath)
     assert not dest.join("share", "cmake", "foo", "foo-config.cmake").check(file=True)
+
+
+def test_no_packages(cd_to_tmpdir):
+    # create a foo toolchain containing the world package
+    qibuild_action = QiBuildAction()
+    qitoolchain_action = QiToolchainAction()
+    build_worktree = qibuild_action.build_worktree
+    qibuild_action.add_test_project("world")
+    qibuild_action.add_test_project("hello")
+    world_package = qibuild_action("package", "world")
+    qitoolchain_action("create", "foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
+    qitoolchain_action("add-package", "-c", "foo", world_package)
+    build_worktree.worktree.remove_project("world", from_disk=True)
+
+    qibuild_action("configure", "-c", "foo", "hello")
+    qibuild_action("make", "-c", "foo", "hello")
+    dest = cd_to_tmpdir.mkdir("dest")
+    qibuild_action("install", "--config", "foo", "--no-packages", "hello", dest.strpath)
+    assert not dest.join("lib", "libworld.so").check(file=True)
