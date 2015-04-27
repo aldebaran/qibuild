@@ -62,7 +62,6 @@ class PMLBuilder(object):
 
         self._stage_path = None
         self.pml_extra_files = list()
-        self.cpp_installed_files = list()
 
         self.load_pml(pml_path)
 
@@ -173,8 +172,7 @@ class PMLBuilder(object):
                 ui.info(ui.bold, "-> Adding %s ..." % desc)
             if isinstance(builder, qibuild.cmake_builder.CMakeBuilder):
                 builder.dep_types=["runtime"]
-                self.cpp_installed_files = builder.install(destination,
-                                                           components=["runtime"])
+                builder.install(destination, components=["runtime"])
             else:
                 builder.install(destination)
 
@@ -238,10 +236,8 @@ class PMLBuilder(object):
             ui.info(ui.bold, "-> Generating breakpad symbols ...")
             dirname = os.path.dirname(output)
             symbols_archive = os.path.join(dirname, self.pkg_name + "-symbols.zip")
-            qibuild.breakpad.gen_symbol_archive(self.build_project,
-                                                output=symbols_archive,
-                                                base_dir=self.stage_path,
-                                                file_list=self.cpp_installed_files)
+            qibuild.breakpad.gen_symbol_archive(base_dir=self.stage_path,
+                                                output=symbols_archive)
             ui.info(ui.bold, "-> Symbols generated in", symbols_archive)
         ui.info(ui.bold, "-> Package generated in", output, "\n")
         qisys.sh.rm(self.stage_path)

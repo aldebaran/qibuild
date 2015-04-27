@@ -29,9 +29,7 @@ def test_generate_symbols(build_worktree, tmpdir):
     dest = tmpdir.join("dest").strpath
     installed_files = cmake_builder.install(dest, components=["runtime"])
     symbols_archive = tmpdir.join("dest", "world.symbols.zip").strpath
-    res = qibuild.breakpad.gen_symbol_archive(world_proj, base_dir=dest,
-                                              output=symbols_archive,
-                                              file_list=installed_files)
+    res = qibuild.breakpad.gen_symbol_archive(base_dir=dest, output=symbols_archive)
     assert os.path.exists(res)
 
 def test_is_macho(qibuild_action):
