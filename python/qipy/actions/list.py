@@ -3,6 +3,8 @@
 ## found in the COPYING file.
 """ List all known python projects """
 
+import operator
+
 from qisys import ui
 
 import qisys.parsers
@@ -15,6 +17,7 @@ def configure_parser(parser):
 def do(args):
     python_worktree = qipy.parsers.get_python_worktree(args)
     python_projects = python_worktree.python_projects
+    python_projects.sort(key=operator.attrgetter("name"))
     if not python_projects:
         return
     ui.info(ui.green, "python projects in:", ui.blue, python_worktree.root)
