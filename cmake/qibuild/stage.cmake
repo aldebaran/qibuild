@@ -284,3 +284,55 @@ function(qi_stage_dir)
     file(APPEND "${_path_conf}" "${_dir}\n")
   endforeach()
 endfunction()
+
+
+#!
+# Register the given path as a CMAKE_PREFIX_PATH.
+#
+# Used when pre-compiled binaries are put under version control.
+#
+# Note that the pre-compiled SDK must have the following layout:
+#
+# .. code-block:: console
+#
+#   lib
+#     libfoo.so
+#   include
+#     foo
+#       foo.h
+#   share
+#     cmake
+#       foo-config.cmake
+#
+# \arg:path: the path to the pre-compiled SDK
+function(qi_add_bin_sdk path)
+  # Generate a -config.cmake in the build dir that includes the one
+  # put in share/cmake/
+
+  file(GLOB _cmake_files "${path}/share/cmake/*/*.cmake")
+  foreach(_cmake_file ${_cmake_files})
+    get_filename_component(_name ${_cmake_file} NAME)
+    set(_to_write "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_name}")
+    file(WRITE ${_to_write} "
+include(\"${_cmake_file}\")
+")
+  endforeach()
+
+  # Generate install rules
+  install(DIRECTORY "${path}/lib" DESTINATION "/"
+    USE_SOURCE_PERMISSIONS
+    COMPONENT runtime
+    PATTERN "*.a" EXCLUDE
+  )
+  install(DIRECTORY "${path}/lib" DESTINATION "/"
+    COMPONENT devel
+    PATTERN "*.a"
+  )
+  install(DIRECTORY "${path}/include" DESTINATION "/"
+    COMPONENT devel
+  )
+  install(DIRECTORY "${path}/share/cmake" DESTINATION "share"
+    COMPONENT devel
+  )
+
+endfunction()

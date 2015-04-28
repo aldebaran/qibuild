@@ -270,3 +270,9 @@ def test_relwithdebinfo(qibuild_action):
     cmake_build_type = qibuild.cmake.get_cached_var(world_proj.build_directory,
                                                     "CMAKE_BUILD_TYPE")
     assert cmake_build_type == "RelWithDebInfo"
+
+
+def test_bin_sdk(qibuild_action):
+    qibuild_action.add_test_project("binsdk")
+    qibuild_action.add_test_project("binsdkuser")
+    qibuild_action("configure", "binsdkuser")
