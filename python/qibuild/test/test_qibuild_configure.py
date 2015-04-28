@@ -284,3 +284,8 @@ def test_using_fake_ctc(qibuild_action, fake_ctc):
     # pylint: disable-msg=E1101
     with pytest.raises(Exception):
         qisys.command.call([footool])
+
+def test_bin_sdk(qibuild_action):
+    qibuild_action.add_test_project("binsdk")
+    qibuild_action.add_test_project("binsdkuser")
+    qibuild_action("configure", "binsdkuser")
