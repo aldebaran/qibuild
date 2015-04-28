@@ -59,9 +59,9 @@ class PythonTestCollector:
         self.tests_path.extend(test_list)
         if(test_list):
             self.create_pytest_json(project.path, test_list, project)
-            ui.info(ui.green, " * ", ui.blue, project.src + ": " + str(len(test_list)), ui.reset)
+            ui.info(ui.green, " * ", ui.blue, project.src, ":", len(test_list))
         else:
-            ui.info(ui.green, " * ", ui.yellow, project.src + ": " + str(len(test_list)), ui.reset)
+            ui.info(ui.green, " * ", ui.red, project.src, ":", "(no tests found)")
 
 
     def collect(self):
