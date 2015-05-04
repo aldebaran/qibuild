@@ -209,7 +209,7 @@ def test_bin_sdk(qibuild_action, tmpdir):
     qibuild_action("make", "binsdk")
     qibuild_action("install", "binsdk", dest.strpath)
     assert dest.join("lib", "libfoo.so").check(file=True)
-    assert not dest.join("lib", "libfoo.a").check(file=True)
+    assert dest.join("lib", "libfoo.a").check(file=True)
     assert dest.join("include", "foo.h").check(file=True)
     assert dest.join("share", "cmake", "foo",
             "foo-config.cmake").check(file=True)
