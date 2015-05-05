@@ -6,6 +6,7 @@ qiBuild tutorials
 
     qisrc/git_projects
     qisrc/templates
+    qisrc/git-to-qisrc_cookbook
     qibuild/tutorial
     qitoolchain/tutorial
     qidoc/tutorial
