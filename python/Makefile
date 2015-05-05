@@ -17,7 +17,6 @@ PYMODULES =  \
 			qicd            \
 			qidoc           \
 			qilinguist      \
-			qimvn           \
 			qipkg           \
 			qipy            \
 			qisrc           \
