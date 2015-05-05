@@ -150,3 +150,15 @@ def test_extract_modern(tmpdir):
     dest = tmpdir.mkdir("dest").join("boost-1.55")
     qitoolchain.qipackage.extract(res, dest.strpath)
     assert dest.join("lib", "libboost.so").check(file=True)
+
+def test_installing_test_component(tmpdir):
+    boost_path = tmpdir.mkdir("boost")
+    boost_path.ensure("include", "boost.h", file=True)
+    boost_path.ensure("lib", "libboost.so", file=True)
+    boost_path.ensure("package.xml", file=True)
+
+    package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
+    dest = tmpdir.join("dest")
+    installed = package.install(dest.strpath, components=["test", "runtime"])
+
+    assert not dest.join("include", "boost.h").check(file=True)

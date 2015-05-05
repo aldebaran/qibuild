@@ -71,6 +71,9 @@ class QiPackage(object):
             manifest_name = "install_manifest_%s_debug.txt" % component
         manifest_path = os.path.join(self.path, manifest_name)
         if not os.path.exists(manifest_path):
+            if component == "test":
+                # tests can only be listed in an install manifest
+                return list()
             mask = self._read_install_mask(component)
             if release:
                 mask.extend(self._read_install_mask("release"))

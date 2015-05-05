@@ -13,6 +13,16 @@ from qisys.test.conftest import skip_on_win
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
 
+def create_foo_toolchain_with_world_package(qibuild_action, qitoolchain_action):
+    build_worktree = qibuild_action.build_worktree
+    qibuild_action.add_test_project("world")
+    qibuild_action.add_test_project("hello")
+    world_package = qibuild_action("package", "world")
+    qitoolchain_action("create", "foo")
+    qibuild.config.add_build_config("foo", toolchain="foo")
+    qitoolchain_action("add-package", "-c", "foo", world_package)
+    build_worktree.worktree.remove_project("world", from_disk=True)
+
 def test_running_from_install_dir_dep_in_worktree(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
@@ -30,14 +40,8 @@ def test_running_from_install_dir_dep_in_toolchain(cd_to_tmpdir):
     # create a foo toolchain containing the world package
     qibuild_action = QiBuildAction()
     qitoolchain_action = QiToolchainAction()
-    build_worktree = qibuild_action.build_worktree
-    qibuild_action.add_test_project("world")
-    qibuild_action.add_test_project("hello")
-    world_package = qibuild_action("package", "world")
-    qitoolchain_action("create", "foo")
-    qibuild.config.add_build_config("foo", toolchain="foo")
-    qitoolchain_action("add-package", "-c", "foo", world_package)
-    build_worktree.worktree.remove_project("world", from_disk=True)
+
+    create_foo_toolchain_with_world_package(qibuild_action, qitoolchain_action)
 
     # install and run hello, (checking that the world lib is
     # installed form the package of the toolchain)
@@ -231,3 +235,25 @@ def test_bin_sdk(qibuild_action, tmpdir):
     assert dest.join("include", "foo.h").check(file=True)
     assert dest.join("share", "cmake", "foo",
             "foo-config.cmake").check(file=True)
+
+def test_with_tests_with_package(qibuild_action, qitoolchain_action, tmpdir):
+    create_foo_toolchain_with_world_package(qibuild_action, qitoolchain_action)
+
+    testme_proj = qibuild_action.add_test_project("testme")
+    add_dep_to_world(testme_proj)
+
+    dest = tmpdir.join("dest")
+
+    qibuild_action("configure", "--config", "foo", "testme")
+    qibuild_action("make", "--config", "foo", "testme")
+    qibuild_action("install", "--config", "foo", "--with-tests",
+                   "testme", dest.strpath)
+    assert not dest.join("include", "world", "world.h").check(file=True)
+
+def add_dep_to_world(project):
+    qiproject_xml_path = os.path.join(project.path, "qiproject.xml")
+    xml_tree = qisys.qixml.read(qiproject_xml_path).getroot()
+    project.build_depends.add("world")
+    project.run_depends.add("world")
+    qibuild.deps.dump_deps_to_xml(project, xml_tree)
+    qisys.qixml.write(xml_tree, qiproject_xml_path)
