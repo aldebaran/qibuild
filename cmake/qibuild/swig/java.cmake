@@ -39,7 +39,7 @@ function(qi_swig_wrap_java name interface_file)
 
   find_program(SWIG_EXECUTABLE swig)
   if(NOT SWIG_EXECUTABLE)
-    qi_warning("Could not find swig executable in PATH, java wrapping is disabled")
+    qi_error("Could not find swig executable in PATH, please install it")
     return()
   endif()
 
