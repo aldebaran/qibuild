@@ -12,3 +12,9 @@ qipkg
 -----
 
 * ``qipkg deploy-package``: do not try to remove non installed applications
+
+cmake
+-----
+
+* if ``qi_swig_wrap_python`` or ``qi_swig_wrap_java`` is used and swig is not
+  found, trigger an error instead of a warning
