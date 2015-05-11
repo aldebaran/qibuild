@@ -102,6 +102,7 @@ def test_no_worktre_bad_pml(tmpdir, monkeypatch):
 </Package>
 """)
     monkeypatch.chdir(tmpdir)
+    # pylint:disable-msg=E1101
     with pytest.raises(Exception) as error:
         package = qisys.script.run_action("qipkg.actions.make_package", [pml_path.strpath])
     assert "not in a worktree" in error.value.message
