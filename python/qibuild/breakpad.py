@@ -19,6 +19,14 @@ def is_elf(filename):
         data = fp.read(4)
     return data == "\x7fELF"
 
+def is_macho(filename):
+    """ Check that a file is in the Mach-O format
+
+    """
+    with open(filename, "rb") as fp:
+        data = fp.read(2)
+    return data == '\xcf\xfa'
+    
 def is_exe(filename):
     """ Check that a file is a Windows executable """
     return filename.endswith((".exe", ".dll"))
