@@ -16,6 +16,7 @@ import qisys.parsers
 import qisys.sh
 import qibuild.cmake
 import qibuild.build
+import qibuild.breakpad
 import qibuild.gcov
 import qibuild.gdb
 import qibuild.dylibs
@@ -512,7 +513,7 @@ The following tools were not found: {missing}\
             return
         for filename in file_list:
             full_path = os.path.join(destdir, filename)
-            if qibuild.gdb.is_elf(full_path):
+            if qibuild.breakpad.is_elf(full_path):
                 qibuild.gdb.split_debug(full_path, **tool_paths)
 
     def get_build_dirs(self, all_configs=False):

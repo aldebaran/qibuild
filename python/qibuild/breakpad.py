@@ -8,8 +8,16 @@ import subprocess
 from qisys import ui
 import qisys.archive
 import qisys.sh
-import qibuild.gdb
 import qibuild.cmake
+
+
+def is_elf(filename):
+    """ Check that a file is in the elf format
+
+   """
+    with open(filename, "rb") as fp:
+        data = fp.read(4)
+    return data == "\x7fELF"
 
 def dump_symbols_from_binary(binary, pool_dir, dump_syms_executable=None):
     """ Dump sympobls from the binary.
@@ -58,7 +66,7 @@ def gen_symbol_archive(project, base_dir=None, output=None, file_list=None):
     binaries = list()
     for filename in file_list:
         full_path = os.path.join(base_dir, filename.lstrip("/"))
-        if os.path.isfile(full_path) and qibuild.gdb.is_elf(full_path):
+        if os.path.isfile(full_path) and is_elf(full_path):
             binaries.append(full_path)
     for binary in binaries:
         print "dumping", binary

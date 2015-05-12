@@ -13,13 +13,6 @@ from qisys import ui
 import qisys.sh
 import qisys.command
 
-def is_elf(filename):
-    """ Check that a file is in the elf format
-
-   """
-    with open(filename, "rb") as fp:
-        data = fp.read(4)
-    return data == "\x7fELF"
 
 def contains_debug_info(filename, objdump=None):
     """ Check that an elf contains debug info
