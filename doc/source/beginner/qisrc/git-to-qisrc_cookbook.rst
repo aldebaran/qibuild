@@ -1,4 +1,4 @@
-.. _qisrc-tutorial:
+.. _git-to-qisrc-cookbook:
 
 Git-to-qisrc cookbook
 =====================
