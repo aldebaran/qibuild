@@ -4,6 +4,7 @@
  * found in the COPYING file.
  */
 #include "world/world.h"
+#include <string>
 
 
 int get_answer_to_the_question_of_life_universe_and_everything() {
@@ -12,6 +13,6 @@ int get_answer_to_the_question_of_life_universe_and_everything() {
 
 void kaboom()
 {
-  throw WorldError("Kaboom!");
+  throw WorldError(std::string("Kaboom!"));
 }
 
