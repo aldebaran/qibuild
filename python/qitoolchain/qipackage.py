@@ -49,6 +49,9 @@ class QiPackage(object):
         * if none exits, will apply the ``qisys.sh.is_runtime`` filter when
           installing *runtime* component
 
+        Note that when installing 'test' component, only the
+        install_manifest_test.txt manifest file will be read
+
         """
         if not components:
             return self._install_all(destdir)
