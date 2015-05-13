@@ -19,6 +19,10 @@ def is_elf(filename):
         data = fp.read(4)
     return data == "\x7fELF"
 
+def is_exe(filename):
+    """ Check that a file is a Windows executable """
+    return filename.endswith((".exe", ".dll"))
+
 def dump_symbols_from_binary(binary, pool_dir, dump_syms_executable=None):
     """ Dump sympobls from the binary.
     Results can be found in

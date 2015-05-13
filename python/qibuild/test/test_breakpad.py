@@ -31,3 +31,9 @@ def test_generate_symbols(build_worktree, tmpdir):
                                               output=symbols_archive,
                                               file_list=installed_files)
     assert os.path.exists(res)
+
+
+def test_is_exe():
+    assert qibuild.breakpad.is_exe("foo.exe")
+    assert qibuild.breakpad.is_exe("foo.dll")
+    assert not qibuild.breakpad.is_exe("foo.lib")
