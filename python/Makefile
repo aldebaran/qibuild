@@ -2,16 +2,6 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-TEST_MODULES =
-ifneq ($(MYPYMODULES),)
-PYMODULES    = $(MYPYMODULES)
-TEST_MODULES:= $(foreach module,$(MYPYMODULES),\
-	$(shell dirname $(module))/test/test_$(shell basename $(module)).py)
-TEST_MODULES:= $(foreach test,$(TEST_MODULES),\
-	$(filter $(test),$(wildcard $(shell dirname $(test))/*)))
-endif
-
-
 PYMODULES =  \
 			qibuild         \
 			qicd            \
@@ -41,18 +31,10 @@ pylint-error:
 	@echo "    Use make check-all for running a full pylint check"
 
 check:
-	@echo ":: Running tests: $(TEST_MODULES)"
+	@echo ":: Running tests:"
 	@$(PYTHON) -m pytest $(PYTEST_ARGS) $(TEST_MODULES) \
-				  --cov=. --cov-report=html
-
-check-fast:
-	@echo ":: Runnig fasts tests: $(TEST_MODULES)"
-	@$(PYTHON) -m pytest -k -slow $(TEST_MODULES)
+				  --cov=. --cov-report=html \
+				  -n `nproc`
 
 doc:
-	@$(PYTHON) ../doc/tools/gen_cmake_doc.py ..
-	@$(PYTHON) -c "from sphinx import main; main()" -b html ../doc/source ../doc/build/html
-
-upgrade-python:
-	@echo ":: Update python modules with $(PIP)"
-	@$(PIP) install --user --upgrade --requirement requirements.txt
+	qidoc build qibuild
