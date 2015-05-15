@@ -111,6 +111,8 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True):
     for (root, directories, filenames) in os.walk(root_dir):
         for filename in filenames:
             full_path = os.path.join(root_dir, root, filename)
+            if os.path.islink(full_path):
+                continue
             if can_be_dumped(full_path):
                 ui.info("dumping", full_path)
                 dump_symbols_from_binary(full_path, pool_dir)
