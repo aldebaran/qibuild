@@ -94,7 +94,9 @@ def strip_binary(binary, strip_executable=None, strip_args=None):
     if strip_args:
         cmd.extend(strip_args)
     cmd.append(binary)
-    qisys.command.call(cmd)
+    rc = qisys.command.call(cmd, ignore_ret_code=True)
+    if rc != 0:
+        ui.warning("Failed to strip symbols for", binary)
 
 def gen_dsym(binary):
     cmd = ["dsymutil", binary]
