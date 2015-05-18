@@ -61,9 +61,17 @@ def dump_symbols_from_binary(binary, pool_dir):
     ui.debug(cmd)
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
+
+    dump_ok = True
     (out, err) = process.communicate()
     if process.returncode != 0:
         ui.error("Failed to dump symbols", err)
+        dump_ok = False
+
+    if sys.platform == "darwin":
+        qisys.sh.rm(dsym)
+
+    if not dump_ok:
         return
 
     # First line looks like:
