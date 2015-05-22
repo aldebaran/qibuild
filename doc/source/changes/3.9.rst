@@ -1,20 +1,99 @@
 v3.9
 ====
 
-qisrc
------
+qibuild
+-------
 
-* Fix using ``qisrc create`` outside a worktree
-* ``qisrc status``: add option ``-S``/``--short`` to display status only for
-  dirty projects
+* Support host tools when cross-compiling. To use this feature, you must add a
+  ``host`` dependencies in the ``qiproject.xml``, like this:
+
+  .. code-block:: xml
+
+    <project version="3">
+      <qibuild name="foo">
+        <depends host="true" names="bar" />
+      </qibuild>
+    </project>
+
+  You must also set a "host" config using ``qibuild set-host-config <name>``
+
+* Fix setting ``PYTHONHOME`` on Mac.
+
+* Add ``qibuild info`` to display information about a qibuild project
+* Add ``qibuild list-profiles``
+
+* ``qibuid run``:
+  * Fix running arbitrary commands
+  * Ask when several matching binaries are found instead of raising
+  * Use ``os.execve`` to better handle ``ctrl-c``
+
+* ``qibuid add-config``: preserve environment settings
+
+* ``qibuid install, qibuid deploy``: add ``--no-packages``. This makes it
+  possible to install or deploy only the projects, ignoring the packages in
+  the toolchain
+* ``qibuid install, qibuid deploy``: fix bug when installing test component.
+
+* ``qibuid wizard``: do not prompt for a toolchain to use by default, but for a
+  build config
+
 
 qipkg
 -----
 
 * ``qipkg deploy-package``: do not try to remove non installed applications
 
+qipy
+----
+
+* ``qipy bootstrap`` : read ``requirements.txt`` to install dependencies
+  inside the virtualenv.
+* ``qipy list``: sort projects by name
+
+qisrc
+-----
+
+* Fix using ``qisrc create`` outside a worktree
+* ``qisrc create``: fix crash when output dir is inside template path
+* ``qisrc status``: add option ``-S``/``--short`` to display status only for
+  dirty projects
+* ``qisrc list``: fix specifying a pattern
+
+qisys
+-----
+
+* ``qisys.archive``: add support for symlinks in zips.
+
+qitest
+------
+
+* ``qitest run``: implement ``--build-prefix``
+* Add ``qitest collect`` : this makes it possible to run Python tests with
+  ``qitest``.
+
+qitoolchain
+-----------
+
+* ``qitoolchain remove``: do not silently update build configurations
+
 cmake
 -----
 
+* Minimal required version is now CMake 2.8.12. This means Ubuntu 12.04 is
+  no longer supported, please upgrade to Ubuntu 14.04 or later
 * if ``qi_swig_wrap_python`` or ``qi_swig_wrap_java`` is used and swig is not
   found, trigger an error instead of a warning
+* start next development
+* Don't create test helpers if QI_WITH_TESTS is OFF
+* cmake: find modules in ``qibuild/cmake/modules`` *after* the ones in the
+  toolchain packages
+* ``qi_stage_bin``: create install rule for ``-config.cmake`` file
+* Add ``qi_create_gmock`` to create tests using ``gmock`` library.
+* Add ``qi_add_bin_sdk``
+* ``qi_sanitize_compile_flags``: disable MSVC warnings about DLL interface and
+  template usage.
+* ``qi_swig_*``: fail if ``Swig`` cannot be found
+
+* Modules:
+  * Add ``COREFOUNDATION``
+  * Add ``DBGHELP``, ``DIA_SDK``, ``IMAGEHLP``, ``WS2``
