@@ -64,7 +64,10 @@ def _check_algo(algo):
         mess += " * " + algorithm + "\n"
     raise Exception(mess)
 
-
+# Symlink support in zip archive (for both compression and extraction) widely
+# inspired from:
+#
+# http://www.mail-archive.com/python-list@python.org/msg34223.html
 def _compress_zip(directory, quiet=True, verbose=False, flat=False, output=None):
     """Compress directory in a .zip file
 
@@ -75,6 +78,7 @@ def _compress_zip(directory, quiet=True, verbose=False, flat=False, output=None)
     :return: path to the generated archive (archive_basepath.zip)
 
     """
+
     if quiet and verbose:
         mess = """Unconsistent arguments: both 'quiet' and 'verbose' options are set.
 Please set only one of these two options to 'True'
@@ -82,22 +86,39 @@ Please set only one of these two options to 'True'
         raise ValueError(mess)
     ui.debug("Compressing", directory, "to", output)
     archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
-    for root, _, filenames in os.walk(directory):
-        for filename in filenames:
-            full_path = os.path.join(root, filename)
+    for root, directories, filenames in os.walk(directory):
+        entries = directories
+        entries.extend(filenames)
+        for entry in entries:
+            full_path = os.path.join(root, entry)
             # Do not zip ourselves
             if full_path == output:
                 continue
+
             rel_path  = os.path.relpath(full_path, directory)
             if flat:
                 arcname = rel_path
             else:
                 arcname = os.path.join(os.path.basename(directory), rel_path)
+            if os.path.islink(full_path):
+                content = os.readlink(full_path)
+                attr = zipfile.ZipInfo(arcname)
+                attr.create_system = 3
+                # long type of hex val of '0xA1ED0000L',
+                # say, symlink attr magic..
+                attr.external_attr = 2716663808L
+                zip_call = archive.writestr
+            elif os.path.isdir(full_path):
+                continue
+            else:
+                attr = full_path
+                content = arcname
+                zip_call = archive.write
             if not quiet:
                 sys.stdout.write("adding {0}\n".format(rel_path))
                 sys.stdout.flush()
-            if not qisys.sh.broken_symlink(full_path):
-                archive.write(full_path, arcname)
+            zip_call(attr, content)
+
     archive.close()
     return output
 
@@ -145,31 +166,36 @@ Please set only one of these two options to 'True'
                 (orig_topdir, member_top_dir)
             if strict_mode:
                 raise InvalidArchive(mess)
-        archive_.extract(member, path=directory)
-        # Fix permision on extracted file unless it is a directory
-        # or if we are on windows
-        if member.filename.endswith("/"):
-            directories.append(member)
-            new_path = os.path.join(directory, member.filename)
-            qisys.sh.mkdir(new_path, recursive=True)
-            new_st = 0777
-        else:
-            new_path = os.path.join(directory, member.filename)
-            new_st = member.external_attr >> 16L
-        # permissions are meaningless on windows, here only the exension counts
-        if not sys.platform.startswith("win"):
-            os.chmod(new_path, new_st)
 
-        percent = float(i) / size * 100
-        if sys.stdout.isatty():
-            message = None
-            if not quiet:
-                message = "Done: %.0f%%\r" % percent
-            elif verbose:
-                message = member
-            if message:
-                sys.stdout.write(message)
-                sys.stdout.flush()
+        new_path = os.path.join(directory, member.filename)
+        qisys.sh.mkdir(os.path.dirname(new_path), recursive=True)
+        if member.external_attr == 2716663808L:
+            target = archive_.read(member.filename)
+            os.symlink(target, new_path)
+        else:
+            archive_.extract(member, path=directory)
+            # Fix permision on extracted file unless it is a directory
+            # or if we are on windows
+            if member.filename.endswith("/"):
+                directories.append(member)
+                qisys.sh.mkdir(new_path)
+                new_st = 0777
+            else:
+                new_st = member.external_attr >> 16L
+            # permissions are meaningless on windows, here only the exension counts
+            if not sys.platform.startswith("win"):
+                os.chmod(new_path, new_st)
+
+            percent = float(i) / size * 100
+            if sys.stdout.isatty():
+                message = None
+                if not quiet:
+                    message = "Done: %.0f%%\r" % percent
+                elif verbose:
+                    message = member
+                if message:
+                    sys.stdout.write(message)
+                    sys.stdout.flush()
 
     # Reverse sort directories, and then fix perm on these
     directories.sort(key=operator.attrgetter('filename'))
