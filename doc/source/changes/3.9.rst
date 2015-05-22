@@ -23,6 +23,7 @@ qibuild
 * Add ``qibuild list-profiles``
 
 * ``qibuid run``:
+
   * Fix running arbitrary commands
   * Ask when several matching binaries are found instead of raising
   * Use ``os.execve`` to better handle ``ctrl-c``
@@ -92,8 +93,8 @@ cmake
 * Add ``qi_add_bin_sdk``
 * ``qi_sanitize_compile_flags``: disable MSVC warnings about DLL interface and
   template usage.
-* ``qi_swig_*``: fail if ``Swig`` cannot be found
 
 * Modules:
+
   * Add ``COREFOUNDATION``
   * Add ``DBGHELP``, ``DIA_SDK``, ``IMAGEHLP``, ``WS2``
