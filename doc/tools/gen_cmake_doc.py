@@ -147,16 +147,16 @@ def parse_example(txt):
 
 def decorate(name, type):
     """ Decorate a parameter
-    >>> decorate("foo", "arg")
-    'foo'
-    >>> decorate("foo", "flag")
+    >>> decorate("FOO", "arg")
+    'FOO'
+    >>> decorate("FOO", "flag")
     '[FOO]'
-    >>> decorate("foo", "param")
-    '[FOO foo]'
-    >>> decorate("foo", "group")
+    >>> decorate("FOO", "param")
+    '[FOO <foo>]'
+    >>> decorate("FOO", "group")
     '[FOO <foo> ...]'
     >>> decorate("foo", "argn")
-    None
+    '[<foo> ...]'
     """
     if type == "arg":
         return name
