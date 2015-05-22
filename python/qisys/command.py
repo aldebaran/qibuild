@@ -279,7 +279,7 @@ def check_output(*popenargs, **kwargs):
 
     If the exit code was non-zero it raises a CommandFailedException. The
     CommandFailedException object will have the return code in the returncode
-    attribute, output in the stdout attribute and error in the stderr
+    attribute, output in the ``stdout`` attribute and error in the ``stderr``
     attribute.
 
     The arguments are the same as for the Popen constructor.  Example:
@@ -287,8 +287,8 @@ def check_output(*popenargs, **kwargs):
     >>> check_output(["ls", "-l", "/dev/null"])
     'crw-rw-rw- 1 root root 1, 3 Oct 18  2007 /dev/null\n'
 
-    The stdout argument is not allowed as it is used internally.
-    To capture standard error in the result, use stderr=STDOUT.
+    The ``stdout`` argument is not allowed as it is used internally.
+    To capture standard error in the result, use ``stderr=STDOUT``.
 
     >>> check_output(["/bin/sh", "-c",
     ...               "ls -l non_existent_file ; exit 0"],
@@ -322,11 +322,11 @@ def check_output(*popenargs, **kwargs):
 def check_output_error(*popenargs, **kwargs):
     r"""Run command with arguments and return its output and error as a byte string.
 
-    If the exit code was non-zero it raises a CalledProcessError.  The
-    CalledProcessError object will have the return code in the returncode
-    attribute and error concatened at the end of output in the output attribute.
+    If the exit code was non-zero it raises a ``CalledProcessError``.  The
+    ``CalledProcessError`` object will have the return code in the returncode
+    attribute and error concatenated at the end of output in the output attribute.
 
-    The arguments are the same as for the Popen constructor.  Examples:
+    The arguments are the same as for the ``Popen`` constructor.  Examples:
 
     >>> check_output_error(["tar", "tf", "foo.tbz2"])
     ('./\n./usr/\n./usr/bin/\n./usr/bin/foo\n',
@@ -347,7 +347,7 @@ def check_output_error(*popenargs, **kwargs):
         tar: Child returned status 2
         tar: Error is not recoverable: exiting now
 
-    The stdout and stderr arguments are not allowed as they are used internally.
+    The ``stdout`` and ``stderr`` arguments are not allowed as they are used internally.
 
     """
     if 'stdout' in kwargs:

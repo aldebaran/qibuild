@@ -124,9 +124,9 @@ class CMakeBuildConfig(object):
         there is one build directory per config name.
 
         If name is None, read the active build config
-        (set by the user with -c, or read as the default config for the worktree0
+        (set by the user with ``-c``, or read as the default config for the worktree0
 
-        If system is True, returns sys-<system>-<arch>
+        If system is True, returns ``sys-<system>-<arch>``
         """
         if prefix:
             res = prefix + "-"

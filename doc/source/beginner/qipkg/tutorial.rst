@@ -35,7 +35,7 @@ After that, just use:
 
   qipkg make-package my-package.pml
 
-to generate a package, and then (if libqi python bindings are available)
+to generate a package, and then (if ``libqi`` python bindings are available)
 
 .. code-block:: console
 

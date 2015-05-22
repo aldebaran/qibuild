@@ -14,7 +14,7 @@ the qisrc worktree as a VCS repo.
 That means it must be possible to translate Git commands (that you would use if
 a project is managed using Git without qisrc) to the equivalent qisrc commands.
 
-For the sake of this comparision, let's suppose that the equivalent of a Git
+For the sake of this comparison, let's suppose that the equivalent of a Git
 repository is a qisrc group. This makes sense if we suppose that the point of a
 qisrc group is to work on a project, that for some practical reason can not be
 kept in only one Git repository.
@@ -214,7 +214,7 @@ If everything went well, this last command should do nothing.
 Afterwards
 ::::::::::
 
-Then, everytime you want to change something in a Git repository that you have
+Then, every time you want to change something in a Git repository that you have
 not changed yet, you have to reproduce step 1 and 3.
 
 Switch to a branch

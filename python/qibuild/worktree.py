@@ -57,7 +57,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         return self.build_config.default_config
 
     def generate_sourceme(self):
-        """ Generate a sourceme file to help running binaries using
+        """ Generate a ``sourceme`` file to help running binaries using
         libraries from the build projects and the toolchain packages
 
         """

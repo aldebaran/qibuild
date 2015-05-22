@@ -110,7 +110,7 @@ function(qi_create_gtest name)
 endfunction()
 
 #! Same as :cmake:function:`qi_create_test`, excepts it adds a dependency
-# to the gmock libraries
+# to the ``gmock`` libraries
 function(qi_create_gmock name)
   qi_add_test(${name} ${name} GMOCK_TEST ${ARGN})
 endfunction()
