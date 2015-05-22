@@ -248,10 +248,10 @@ def get_fun_name(line):
     'foo'
     >>> get_fun_name('set(')
     """
-    match = re.match(r'function\s*\((\w+)', line)
+    match = re.match(r'(function|macro)\s*\((\w+)', line)
     if not match:
         return
-    return match.groups()[0]
+    return match.groups()[1]
 
 def get_fun_blocks(txt):
     """ Get all the blocks associated to a function,
@@ -272,7 +272,7 @@ def get_fun_blocks(txt):
             if line.startswith("#"):
                 cur_block += clean_comment(line)
             else:
-                if line.startswith('function'):
+                if line.startswith(('function', 'macro')):
                     name = get_fun_name(line)
                     if name:
                         res.append((name, cur_block))
