@@ -30,10 +30,15 @@ Mailing list
 
 https://groups.google.com/a/aldebaran-robotics.com/group/qibuild-dev/topics
 
+IRC channel
+-----------
+
+Join us on ``#qi`` on freenode.
+
 Documentation
 -------------
 
-https://community.aldebaran-robotics.com/doc/qibuild/
+http://doc.aldebaran.com/qibuild/
 
 Installation
 ------------

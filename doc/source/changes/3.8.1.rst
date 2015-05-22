@@ -1,0 +1,8 @@
+v3.8.1
+======
+
+cmake
+-----
+
+* Add ``qi_create_gmock``
+* Add ``qi_add_bin_sdk``

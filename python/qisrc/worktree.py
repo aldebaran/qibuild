@@ -39,10 +39,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self._syncer = qisrc.sync.WorkTreeSyncer(self)
 
     def configure_manifest(self, manifest_url, groups=None,
-                           branch="master", ref=None, review=True):
+                           branch="master", ref=None, review=True, force=False):
         """ Add a new manifest to this worktree """
         return self._syncer.configure_manifest(manifest_url, groups=groups,
-                                               branch=branch, ref=ref, review=review)
+                                               branch=branch, ref=ref, review=review,
+                                               force=force)
 
     def configure_projects(self, projects):
         self._syncer.configure_projects(projects)
@@ -206,7 +207,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.load_git_projects()
         return True
 
-    def move_repo(self, repo, new_src):
+    def move_repo(self, repo, new_src, force=False):
         """ Move a project in the worktree (same remote url, different
         src)
 
@@ -219,10 +220,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         new_path = os.path.join(self.worktree.root, new_src)
         new_path = qisys.sh.to_native_path(new_path)
         if os.path.exists(new_path):
-            ui.error(new_path, "already exists")
-            ui.error("If you are sure there is nothing valuable here, "
-                     "remove this directory and try again")
-            return
+            if force:
+                qisys.sh.rm(new_path)
+            else:
+                ui.error(new_path, "already exists")
+                ui.error("If you are sure there is nothing valuable here, "
+                        "remove this directory and try again")
+                return
         new_base_dir = os.path.dirname(new_path)
         try:
             qisys.sh.mkdir(new_base_dir, recursive=True)
