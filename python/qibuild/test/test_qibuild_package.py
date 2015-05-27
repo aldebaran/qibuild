@@ -16,6 +16,10 @@ def test_simple(qibuild_action):
     qipackage = qitoolchain.qipackage.from_archive(world_archive)
     assert qipackage.name == "world"
 
+def test_building_in_release(qibuild_action):
+    qibuild_action.add_test_project("world")
+    qibuild_action("package", "world", "--release")
+
 def test_using_toolchain(cd_to_tmpdir):
     qibuild_action = QiBuildAction()
     qitoolchain_action = QiToolchainAction()
