@@ -180,7 +180,7 @@ Or configure the project with no config
             self.pre_build(project)
             project.build(**kwargs)
 
-    def build_host_tools(self, host_projects=None):
+    def build_host_tools(self):
         """ Build the set of projects passed as parameter,
         or every host tools project
 
@@ -189,14 +189,15 @@ Or configure the project with no config
         qibuild_cfg.read(create_if_missing=True)
         host_config = qibuild_cfg.get_host_config()
 
-        if host_projects is None:
-            host_deps = set()
-            for project in self.projects:
-                host_deps = host_deps.union(project.host_depends)
+        host_deps = set()
+        dep_projects = self.deps_solver.get_dep_projects(self.projects,
+                ["build", "runtime", "test"])
+        for project in dep_projects:
+            host_deps = host_deps.union(project.host_depends)
 
-            host_projects = [self.build_worktree.get_build_project(x, raises=False)
-                            for x in host_deps]
-            host_projects = filter(None, host_projects)
+        host_projects = [self.build_worktree.get_build_project(x, raises=False)
+                        for x in host_deps]
+        host_projects = filter(None, host_projects)
         host_worktree = qibuild.worktree.BuildWorkTree(self.build_worktree.worktree)
         if host_config:
             host_worktree.set_active_config(host_config)
