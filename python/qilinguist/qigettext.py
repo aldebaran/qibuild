@@ -188,10 +188,8 @@ class GettextProject(qilinguist.project.LinguistProject):
 
     def install(self, destination):
         full_dest = os.path.join(destination, "share", "locale")
-        def filter(f):
-            return f.endswith(".mo")
         to_install = os.path.join(self.po_path, "share", "locale")
-        qisys.sh.install(to_install, full_dest, filter_fun=filter)
+        qisys.sh.install(to_install, full_dest)
 
     def __repr__(self):
         return "<GettextProject %s in %s>" % (self.name, self.path)
