@@ -20,7 +20,7 @@ def do(args):
     output_path = args.output_path
     if not output_path:
         output_path = os.getcwd()
-    # Extract the manfist to a tempfile to
+    # Extract the manifest to a tempfile to
     # parse it
     archive = zipfile.ZipFile(pkg_path)
     name = None
