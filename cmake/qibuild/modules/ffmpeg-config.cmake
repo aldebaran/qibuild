@@ -3,14 +3,7 @@
 ## found in the COPYING file.
 
 clean(FFMPEG)
-fpath(FFMPEG avcodec.h PATH_SUFFIXES libavcodec)
-fpath(FFMPEG avdevice.h PATH_SUFFIXES libavdevice)
-fpath(FFMPEG avfilter.h PATH_SUFFIXES libavfilter)
-fpath(FFMPEG avformat.h PATH_SUFFIXES libavformat)
-fpath(FFMPEG avresample.h PATH_SUFFIXES libavresample)
-fpath(FFMPEG avutil.h PATH_SUFFIXES libavutil)
-fpath(FFMPEG swresample.h PATH_SUFFIXES libswresample)
-fpath(FFMPEG swscale.h PATH_SUFFIXES libswscale)
+fpath(FFMPEG libavcodec/avcodec.h)
 
 flib(FFMPEG NAMES avcodec)
 flib(FFMPEG NAMES avfilter)
