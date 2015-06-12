@@ -8,5 +8,4 @@ find_package(qibuild)
 qi_create_bin(@project_name@ "main.cpp")
 
 # Add a simple test:
-enable_testing()
 qi_create_test(test_@project_name@ "test.cpp")

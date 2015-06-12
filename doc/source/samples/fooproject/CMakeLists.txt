@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(fooproject)
 find_package(qibuild)
-enable_testing()
 
 # Add a subdirectory containing the foo library
 add_subdirectory(libfoo)

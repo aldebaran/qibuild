@@ -11,7 +11,6 @@ message(STATUS "bar_FOUND: ${bar_FOUND}")
 qi_create_bin(hello "main.cpp")
 qi_use_lib(hello world)
 
-enable_testing()
 # Add a test that just runs hello without arguments
 qi_add_test(zero_test hello)
 

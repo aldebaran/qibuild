@@ -9,14 +9,11 @@ forty plus two are forty-two. (Just in case ...)
 Adding a test
 --------------
 
-You first need to call ``enable_testing()``
-
-Then you call :cmake:function:`qi_create_test` with the first argument being the name of
+Call :cmake:function:`qi_create_test` with the first argument being the name of
 the test, and the rest being the sources of the executable.
 
 .. code-block:: cmake
 
-  enable_testing()
   qi_create_test(foo_test test.cpp)
 
 If you have arguments to pass to the executable you want to test,

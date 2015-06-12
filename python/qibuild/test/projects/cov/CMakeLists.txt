@@ -12,5 +12,4 @@ qi_sanitize_compile_flags()
 qi_create_bin(cov "main.cpp")
 
 # Add a simple test:
-enable_testing()
 qi_create_test(test_cov "test.cpp")
