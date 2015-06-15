@@ -13,7 +13,9 @@ def test_nothing_specified_json_in_cwd(args, tmpdir, monkeypatch):
     monkeypatch.chdir(tmpdir)
     qitest_json = tmpdir.ensure("qitest.json")
     qitest_json.write("[]")
-    test_runner = qitest.parsers.get_test_runner(args)
+    test_runners = qitest.parsers.get_test_runners(args)
+    assert len(test_runners) == 1
+    test_runner = test_runners[0]
     assert test_runner.project.sdk_directory == tmpdir.strpath
 
 def test_nothing_specified_inside_qibuild_project(args, build_worktree, monkeypatch):
