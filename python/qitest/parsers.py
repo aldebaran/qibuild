@@ -63,6 +63,9 @@ def get_test_runner(args, build_project=None, qitest_json=None):
 --coverage can only be used from a qibuild CMake project
 """)
 
+    if not test_project:
+        return
+
     test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
     if build_project:
         test_runner.cwd = build_project.sdk_directory
@@ -88,10 +91,17 @@ def get_test_runners(args):
     res = list()
     qitest_jsons = args.qitest_jsons or list()
 
+    # first case: qitest.json in current working directory
+    test_runner = get_test_runner(args)
+    if test_runner:
+        res.append(test_runner)
+
+    # second case: qitest.json specified with --qitest-json
     for qitest_json in qitest_jsons:
         test_runner = get_test_runner(args, qitest_json=qitest_json)
         res.append(test_runner)
 
+    # third case: parsing build projects
     try:
         build_worktree = qibuild.parsers.get_build_worktree(args)
         solve_deps = False
