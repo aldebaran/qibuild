@@ -69,7 +69,18 @@ def test_no_worktree_pure_pml(tmpdir, monkeypatch):
     project.ensure("behavior_1", "behavior.xar", file=True)
     manifest_path = project.join("manifest.xml")
     manifest_path.write("""
-<package version="0.1" uuid="fooproject" />
+<package version="0.1" uuid="fooproject">
+  <names>
+    <name lang="en_US">fooproject</name>
+  </names>
+  <supportedLanguages>
+    <language>en_US</language>
+  </supportedLanguages>
+  <requirements>
+    <naoqiRequirement minVersion="1.22"/>
+    <robotRequirement model="NAO"/>
+  </requirements>
+</package>
 """)
     pml_path = project.join("project.pml")
     pml_path.write("""
@@ -93,7 +104,18 @@ def test_no_worktre_bad_pml(tmpdir, monkeypatch):
     project = tmpdir.mkdir("project")
     manifest_path = project.join("manifest.xml")
     manifest_path.write("""
-<package version="0.1" uuid="fooproject" />
+<package version="0.1" uuid="fooproject">
+  <names>
+    <name lang="en_US">fooproject</name>
+  </names>
+  <supportedLanguages>
+    <language>en_US</language>
+  </supportedLanguages>
+  <requirements>
+    <naoqiRequirement minVersion="1.22"/>
+    <robotRequirement model="NAO"/>
+  </requirements>
+</package>
 """)
     pml_path = project.join("project.pml")
     pml_path.write("""
@@ -116,3 +138,16 @@ def test_translations(qipkg_action, tmpdir):
     qipkg_action.chdir(dest)
     qipkg_action("extract-package", package_path)
     assert dest.join("tr-0.1", "translations", "tr_fr_FR.qm").check(file=True)
+
+def test_validate_package(qipkg_action):
+    pkg_path = os.path.join(os.path.dirname(__file__), "projects", "python_services.pkg")
+    qipkg_action("validate_package", pkg_path)
+
+def test_validate_package_exception(qipkg_action):
+    pkg_path = os.path.join(os.path.dirname(__file__), "projects", "invalid_package.pkg")
+    as_thrown = False
+    try:
+        qipkg_action("validate_package", pkg_path)
+    except:
+        as_thrown = True
+    assert as_thrown is True

@@ -1,1 +1,12 @@
-<package version="0.1" uuid="meta" />
+<package version="0.1" uuid="meta">
+  <names>
+    <name lang="en_US">meta</name>
+  </names>
+  <supportedLanguages>
+    <language>en_US</language>
+  </supportedLanguages>
+  <requirements>
+    <naoqiRequirement minVersion="1.22"/>
+    <robotRequirement model="NAO"/>
+  </requirements>
+</package>

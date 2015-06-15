@@ -15,6 +15,7 @@ def configure_parser(parser):
     qipkg.parsers.pml_parser(parser)
     parser.add_argument("-o", "--output")
     parser.add_argument("--with-breakpad", action="store_true")
+    parser.add_argument("--force", action="store_true")
     parser.set_defaults(with_breakpad=False)
 
 
@@ -22,5 +23,6 @@ def do(args):
     """Main entry point"""
     output = args.output
     with_breakpad = args.with_breakpad
+    force = args.force
     pml_builder = qipkg.parsers.get_pml_builder(args)
-    return pml_builder.package(output=output, with_breakpad=with_breakpad)
+    return pml_builder.package(output=output, with_breakpad=with_breakpad, force=force)

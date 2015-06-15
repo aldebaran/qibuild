@@ -20,6 +20,7 @@ import qipy.python_builder
 import qilinguist.worktree
 import qilinguist.builder
 import qilinguist.pml_translator
+import qipkg.manifest
 
 class PMLBuilder(object):
     """ Build a package from a pml file """
@@ -65,6 +66,10 @@ class PMLBuilder(object):
 
         self.load_pml(pml_path)
 
+        # read the manifest and validate it
+        self.validator = qipkg.manifest.Validator(self.manifest_xml)
+        self.validator.print_errors()
+        self.validator.print_warnings()
 
     @property
     def stage_path(self):
@@ -196,13 +201,23 @@ class PMLBuilder(object):
         """ Deploy every project to the given url """
         qisys.remote.deploy(self.stage_path, url)
 
-    def package(self, output=None, with_breakpad=False):
+    def package(self, output=None, with_breakpad=False, force=False):
         """ Generate a package containing every project.
 
         :param: with_breakpad generate debug symbols for usage
                                with breakpad
 
+        :param: force make package even if it does not satisfy
+                               default package requirements
+
         """
+
+        # If the package is not valid, do not go further
+        if not self.validator.is_valid and not force:
+            raise Exception("Given package does not satisfy "
+                            "default package requirements.\n"
+                            "Use option '--force' to bypass this validation")
+
         # Make sure self.stage_path exists and is empty
         qisys.sh.rm(self.stage_path)
         qisys.sh.mkdir(self.stage_path, recursive=True)

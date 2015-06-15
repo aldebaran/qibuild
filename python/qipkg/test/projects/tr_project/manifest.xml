@@ -1,3 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <package version="0.1" uuid="tr">
+  <names>
+    <name lang="en_US">tr</name>
+  </names>
+  <supportedLanguages>
+    <language>en_US</language>
+  </supportedLanguages>
+  <requirements>
+    <naoqiRequirement minVersion="1.22"/>
+    <robotRequirement model="NAO"/>
+  </requirements>
 </package>
