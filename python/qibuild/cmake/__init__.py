@@ -126,6 +126,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
 
     # Check that the root CMakeLists file is correct
     root_cmake = os.path.join(source_dir, "CMakeLists.txt")
+    check_root_cmake_list(root_cmake)
 
     # Add path to source to the list of args, and set buildir for
     # the current working dir.
@@ -265,3 +266,76 @@ def get_binutil(name, cmake_var=None, build_dir=None, env=None):
     if res and not res.endswith("-NOTFOUND"):
         return res
     return qisys.command.find_program(name, env=env)
+
+
+def check_root_cmake_list(cmake_list_file):
+    """ Check that the root CMakeLists is correct.
+
+    * It should contain a cmake_minimum_required() line
+    * It should contain a call to project()
+    * If find_package(qibuild) is called, it should be
+      called after project()
+
+    """
+    dirname = os.path.dirname(cmake_list_file)
+    suggested_project_name = os.path.basename(dirname)
+    message = ""
+    lines = list()
+    with open(cmake_list_file, "r") as fp:
+        lines = fp.readlines()
+
+    project_line_number = None
+    find_qibuild_line_number = None
+    minimum_required_found = False
+    for (i, line) in enumerate(lines):
+        if re.match(r'^\s*project\s*\(', line, re.IGNORECASE):
+            project_line_number = i
+        if re.match(r'^\s*find_package\s*\(.*qibuild\.*\)', line,
+                    re.IGNORECASE):
+            find_qibuild_line_number = i
+        if re.match(r'^\s*cmake_minimum_required\(', line,
+                    re.IGNORECASE):
+            minimum_required_found = True
+
+    if not minimum_required_found:
+        message += """
+* Missing call to cmake_minimum_required()
+Add a line looking like:
+
+cmake_minimum_required(VERSION 2.8)
+
+At the top of the CMakeLists.txt file
+"""
+
+    if project_line_number is None:
+        message += """
+* Missing call to project().
+Please fix this by editing the file so that it looks like
+
+cmake_minimum_required(VERSION 2.8)
+project({project_name})
+find_package(qibuild)
+
+""".format(
+            project_name=suggested_project_name)
+
+    if find_qibuild_line_number is not None and \
+            project_line_number is not None and \
+            project_line_number > find_qibuild_line_number:
+        message += """
+* The call to find_package(qibuild) should be AFTER the call to project()
+"""
+    if message:
+        raise IncorrectCMakeLists(cmake_list_file, message)
+
+class IncorrectCMakeLists(Exception):
+    def __init__(self, cmake_list_file, message):
+        self.cmake_list_file = cmake_list_file
+        self.message = message
+
+    def __str__(self):
+        message = "Invalid CMakeLists.txt file detected\n"
+        message += "(in %s)\n" % self.cmake_list_file
+        message += self.message
+        return message
+

@@ -4,6 +4,8 @@ v3.9
 qibuild
 -------
 
+* Check top ``CMakeLists.txt`` file for correctness when using ``qibuild configure``
+
 * Support host tools when cross-compiling. To use this feature, you must add a
   ``host`` dependencies in the ``qiproject.xml``, like this:
 
