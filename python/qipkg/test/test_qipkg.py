@@ -4,6 +4,8 @@
 import os
 
 import qisys.command
+import qisys.qixml
+import qipkg.package
 
 import pytest
 
@@ -151,3 +153,23 @@ def test_validate_package_exception(qipkg_action):
     except:
         as_thrown = True
     assert as_thrown is True
+
+def test_release_package(qipkg_action, tmpdir):
+    pkg_path = os.path.join(os.path.dirname(__file__), "projects", "python_services.pkg")
+    output_path = tmpdir.join("output.pkg")
+    qipkg_action("release-package", pkg_path, "--output", str(output_path))
+    dest = tmpdir.mkdir("dest")
+    qipkg_action.chdir(dest)
+    qipkg_action("extract-package", str(output_path))
+    package = dest.join("python_services-0.0.2")
+    assert package.join("lib", "my_service.pyc").check(file=True)
+    assert package.join("lib", "my_service.py").check(file=False)
+
+    tree = qisys.qixml.read(str(package.join("manifest.xml")))
+    services = tree.getroot().findall("services/service")
+    assert(services[0].attrib["execStart"] == "/usr/bin/python2.7 lib/my_service.pyc")
+    assert(services[1].attrib["execStart"] == "/usr/bin/python2.7 lib/my_service.pyc '127.0.0.1'")
+    # it was already pointing to a *.pyc file, nothing should have changed
+    assert(services[2].attrib["execStart"] == "/usr/bin/python2.7 lib/my_service.pyc")
+    # it is not pointing to a file of the package, nothing should have changed
+    assert(services[3].attrib["execStart"] == "/usr/bin/python2.7 tata.py")
