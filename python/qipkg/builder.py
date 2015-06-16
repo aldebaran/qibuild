@@ -224,10 +224,7 @@ class PMLBuilder(object):
 
         for i, (full_path, rel_path) in enumerate(to_add):
             n = len(to_add)
-            if sys.stdout.isatty():
-                percent = float(i) / n * 100
-                sys.stdout.write("Done: %.0f%%\r" % percent)
-                sys.stdout.flush()
+            qisys.ui.info_progress(i, n, "Done")
             archive.write(full_path, rel_path)
         archive.close()
 

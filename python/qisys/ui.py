@@ -237,6 +237,21 @@ def info_count(i, n, *rest, **kwargs):
     counter_str = counter_format % (i+1, n)
     info(green, "*", reset, counter_str, reset, *rest, **kwargs)
 
+def info_progress(value, max_value, prefix):
+    """ Display info progress in percent
+    :param: value the current value
+    :param: max_value the max value
+    :param: prefix the prefix message to print
+
+    >>> info_progress(5, 20, "Done")
+    Done: 25%
+
+    """
+    if sys.stdout.isatty():
+        percent = float(value) / max_value * 100
+        sys.stdout.write(prefix + ": %.0f%%\r" % percent)
+        sys.stdout.flush()
+
 def debug(*tokens, **kwargs):
     """ Print a debug message """
     if not CONFIG["verbose"] or CONFIG["record"]:

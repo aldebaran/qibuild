@@ -186,16 +186,11 @@ Please set only one of these two options to 'True'
             if not sys.platform.startswith("win"):
                 os.chmod(new_path, new_st)
 
-            percent = float(i) / size * 100
-            if sys.stdout.isatty():
-                message = None
-                if not quiet:
-                    message = "Done: %.0f%%\r" % percent
-                elif verbose:
-                    message = member
-                if message:
-                    sys.stdout.write(message)
-                    sys.stdout.flush()
+            if not quiet:
+                qisys.ui.info_progress(i, size, "Done")
+            elif verbose and sys.stdout.isatty():
+                sys.stdout.write(member)
+                sys.stdout.flush()
 
     # Reverse sort directories, and then fix perm on these
     directories.sort(key=operator.attrgetter('filename'))

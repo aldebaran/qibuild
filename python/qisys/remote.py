@@ -23,11 +23,7 @@ import qibuild.config
 
 def callback(total, done):
     """ Called during download """
-    if not sys.stdout.isatty():
-        return
-    percent = done * 100 / total
-    sys.stdout.write("Done: %i%%\r" % percent)
-    sys.stdout.flush()
+    qisys.ui.info_progress(done, total, "Done")
 
 def get_server_access(server_name):
     """ Get server access for a remote site.
