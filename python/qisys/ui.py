@@ -224,12 +224,12 @@ def info(*tokens, **kwargs):
 def info_count(i, n, *rest, **kwargs):
     """ Same as info, but displays a nice counter
     color will be reset
-    >>> count(0, 4)
-    * (1/5)
-    >>> count(4, 12)
-    * ( 4/12)
-    >>> count(4, 10)
-    * (10/12)
+    >>> info_count(0, 4)
+    * (1/4)
+    >>> info_count(4, 12)
+    * ( 5/12)
+    >>> info_count(4, 10)
+    * ( 5/10)
 
     """
     num_digits = len(str(n)) # lame, I know
