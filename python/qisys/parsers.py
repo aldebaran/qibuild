@@ -6,6 +6,7 @@
 
 import abc
 import argparse
+import multiprocessing
 import os
 
 import qisys.sh
@@ -19,6 +20,24 @@ class SetHome(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string):
         qisys.sh.set_home(values)
+
+def cpu_count():
+    try:
+        default = multiprocessing.cpu_count()
+    except NotImplementedError:
+        default = 1
+
+def parallel_parser(parser, default=cpu_count()):
+    """Given a parser, add the -j option.
+
+    Sets variable 'num_jobs'.
+    Use the number of processors as the default
+    """
+
+    parser.add_argument("-j", "--njobs",
+        dest="num_jobs", type=int, default=default, metavar='N',
+        help="Specify the number of jobs to run simultaneously "
+             "(default: %(default)s)")
 
 def log_parser(parser):
     """Given a parser, add the options controlling log."""
