@@ -111,6 +111,7 @@ To do so, you should:
       qibuild configure footool -c linux64
       qibuild make footool -c linux64
 
+
 * Then you can cross-compile for arm:
 
   .. code-block:: console
@@ -127,3 +128,12 @@ If you are not using any toolchain, you can of course just configure and build `
 
     qibuild configure usefootool -c arm
     qibuild make usefootool -c arm
+
+* Alternatively, you can use ``qibuild make-host-tools`` from
+  the ``usefootool`` directory. It will parse the host dependencies
+  of the current build project and build them.
+
+  .. code-block:: console
+
+      cd usefootool
+      qibuild make-host-tools
