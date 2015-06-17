@@ -16,12 +16,15 @@ import qisys.parsers
 import qisrc.git
 import qisrc.sync
 import qisrc.parsers
+import qisys.parallel
+import threading
 
 
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
+    qisys.parsers.parallel_parser(parser)
 
     group = parser.add_argument_group("qisrc sync options")
     group.add_argument("--rebase-devel", action="store_true",
@@ -63,24 +66,35 @@ def do(args):
     failed = list()
     ui.info(ui.green, ":: Syncing projects ...")
     max_src = max(len(x.src) for x in git_projects)
-    for (i, git_project) in enumerate(git_projects):
-        ui.info_count(i, len(git_projects),
-                      ui.blue, git_project.src.ljust(max_src), end="\r")
 
+    # wrap with a list to sidestep problem described in
+    # https://www.python.org/dev/peps/pep-3104/
+    i = [0]
+    lock = threading.Lock()
+
+    def do_sync(git_project):
         if reset:
             (status, out) = git_project.reset()
         else:
             (status, out) = git_project.sync(rebase_devel=args.rebase_devel)
-        if status is None:
-            ui.info("\n", ui.brown, "  [skipped]")
-            skipped.append((git_project.src, out))
-        if status is False:
-            ui.info("\n", ui.red, "  [failed]")
-            failed.append((git_project.src, out))
-        if out:
-            print ui.indent(out + "\n\n", num=2)
-    #clean the screen
-    ui.info_count(i, len(git_projects), ui.blue, " ".ljust(max_src), end="\r")
+
+        with lock:
+            ui.info_count(i[0], len(git_projects),
+                          ui.blue, git_project.src.ljust(max_src))
+
+            if status is None:
+                ui.info(ui.brown, "  [skipped]")
+                skipped.append((git_project.src, out))
+            if status is False:
+                ui.info(ui.red, "  [failed]")
+                failed.append((git_project.src, out))
+            if out:
+                print ui.indent(out + "\n\n", num=2)
+
+            i[0] += 1
+
+    qisys.parallel.foreach(git_projects, do_sync, n_jobs=args.num_jobs)
+
     print_overview(len(git_projects), len(skipped), len(failed))
     if failed or skipped:
         sys.exit(1)
