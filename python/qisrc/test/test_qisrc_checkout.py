@@ -35,7 +35,8 @@ def test_checkout_preserve_changes_when_checkout_fails(qisrc_action, git_server)
     readme = os.path.join(foo_proj.path, "README.txt")
     with open(readme, "w") as fp:
         fp.write("unstaged\n")
-    qisrc_action("checkout", "devel")
+    rc = qisrc_action("checkout", "devel", retcode=True)
+    assert rc != 0
     foo_proj = git_worktree.get_git_project("foo")
     foo_git = qisrc.git.Git(foo_proj.path)
     assert foo_git.get_current_branch() == "master"
@@ -87,3 +88,19 @@ def test_using_force_when_not_an_a_branch(qisrc_action, git_server):
     assert not git.get_current_branch()
     qisrc_action("checkout", "master", "--force")
     assert git.get_current_branch() == "master"
+
+def test_retcode_when_checkout_fails(qisrc_action, git_server):
+    git_server.create_repo("foo.git")
+    qisrc_action("init", git_server.manifest_url)
+
+    git_server.switch_manifest_branch("devel")
+    git_server.change_branch("foo.git", "devel")
+
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    gitignore = os.path.join(foo_proj.path, ".gitignore")
+    with open(gitignore, "w") as fp:
+        fp.write("unstaged\n")
+
+    rc = qisrc_action("checkout", "devel", retcode=True)
+    assert rc != 0

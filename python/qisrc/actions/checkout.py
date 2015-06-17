@@ -28,4 +28,6 @@ def do(args):
     groups = manifest.groups
     branch = args.branch
     git_worktree.configure_manifest(manifest.url, groups=groups, branch=branch)
-    git_worktree.checkout(branch, force=args.force)
+    ok = git_worktree.checkout(branch, force=args.force)
+    if not ok:
+        sys.exit(1)

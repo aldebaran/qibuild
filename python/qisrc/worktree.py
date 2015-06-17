@@ -275,10 +275,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             if not ok:
                 errors.append((project.src, err))
         if not errors:
-            return
+            return True
         ui.error("Failed to checkout some projects")
         for (project, error) in errors:
             ui.info(project, ":", error)
+        return False
 
     def get_projects_on_branch(self, branch):
         """ Return a dict (src, project) for every project as configured

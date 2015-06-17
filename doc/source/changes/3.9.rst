@@ -61,6 +61,7 @@ qisrc
 * ``qisrc status``: add option ``-S``/``--short`` to display status only for
   dirty projects
 * ``qisrc list``: fix specifying a pattern
+* ``qisrc checkout``: fix return code when checkout fails
 
 qisys
 -----
