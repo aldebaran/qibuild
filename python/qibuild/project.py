@@ -60,6 +60,7 @@ def write_qi_path_conf(directory, sdk_dirs, sdk_layout=True):
 class BuildProject(object):
     def __init__(self, build_worktree, worktree_project):
         self.build_worktree = build_worktree
+        self.worktree_project = worktree_project
         self.path = worktree_project.path
         self.src = worktree_project.src
         self._name = None
@@ -82,6 +83,14 @@ class BuildProject(object):
     def name(self, value):
         ui.valid_filename(value)
         self._name = value
+
+    @property
+    def license(self):
+        return self.worktree_project.license
+
+    @license.setter
+    def license(self, value):
+        self.worktree_project.license = value
 
     @property
     def qiproject_xml(self):

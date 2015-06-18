@@ -9,6 +9,7 @@ import os
 import qisys.worktree
 import qisys.qixml
 
+import qisrc.license
 
 class WorkTreeProject(object):
     """ A project is identified by its path relative to its
@@ -33,6 +34,15 @@ class WorkTreeProject(object):
         """Give the path to the qiproject.xml."""
         xml_path = os.path.join(self.path, "qiproject.xml")
         return xml_path
+
+    @property
+    def license(self):
+        """ The license used by this project """
+        return qisrc.license.read_license(self.qiproject_xml)
+
+    @license.setter
+    def license(self, value):
+        qisrc.license.write_license(self.qiproject_xml, value)
 
     def parse_qiproject_xml(self):
         """ Parse the qiproject.xml, filling the

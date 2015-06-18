@@ -51,6 +51,10 @@ class TestWorkTree(qisys.worktree.WorkTree):
         to_make = os.path.join(self.root, src)
         qisys.sh.mkdir(to_make, recursive=True)
         new_project = super(TestWorkTree, self).add_project(src)
+        qiproject_xml = self.tmpdir.join(src, "qiproject.xml")
+        qiproject_xml.write("""
+<project version="3" />
+""")
         return new_project
 
 # Because sometimes the most popular OS in the world is not the best one ...

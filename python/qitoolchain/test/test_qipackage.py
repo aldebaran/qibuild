@@ -162,3 +162,14 @@ def test_installing_test_component(tmpdir):
     installed = package.install(dest.strpath, components=["test", "runtime"])
 
     assert not dest.join("include", "boost.h").check(file=True)
+
+def test_get_set_license(tmpdir):
+    boost_path = tmpdir.mkdir("boost")
+    boost_path.join("package.xml").write("""
+<package name="boost" version="1.58" />
+""")
+    package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
+    assert package.license is None
+    package.license = "BSD"
+    package2 = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
+    assert package2.license == "BSD"

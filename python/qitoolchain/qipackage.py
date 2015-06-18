@@ -8,6 +8,7 @@ import zipfile
 
 from qisys.qixml import etree
 import qisys.version
+import qisrc.license
 import qibuild.deps
 
 class QiPackage(object):
@@ -31,6 +32,17 @@ class QiPackage(object):
         self.build_depends = set()
         self.run_depends = set()
         self.test_depends = set()
+
+    @property
+    def license(self):
+        """ The license of the package """
+        package_xml = os.path.join(self.path, "package.xml")
+        return qisrc.license.read_license(package_xml)
+
+    @license.setter
+    def license(self, value):
+        package_xml = os.path.join(self.path, "package.xml")
+        qisrc.license.write_license(package_xml, value)
 
     def load_deps(self):
         """ Parse package.xml, set the dependencies """

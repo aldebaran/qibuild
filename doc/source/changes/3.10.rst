@@ -8,6 +8,22 @@ qibuild
   (No need for it to be a ``buildtime`` dependency)
 * Fix using ``qibuild make-host-tools --release`` and other similar
   build or configure options.
+* Add ``qibuild get-licenses`` to get the licenses used by the project.
+  In order to work, there should be a ``<license>`` tag in the ``qiproject.xml``
+  or the ``qipackage.xml`` file, like this:
+
+  .. code-block:: xml
+
+    <!-- in package.xml -->
+    <package name="foo" version="0.1">
+      <license>BSD</license>
+    </package>
+
+    <!-- in qiproject.xml -->
+    <project version="3">
+      <license>proprietary</license>
+      <qibuild name="foo" />
+    </project>
 
 qidoc
 -----
