@@ -19,7 +19,7 @@ def cmake_build_parser(parser, group=None, with_build_parser=True):
         qisys.parsers.build_parser(parser, group=None)
     if not group:
         group = parser.add_argument_group("Build options")
-    qisys.parsers.parallel_parser(group, default=None)
+    group.add_argument("-j", dest="num_jobs", type=int)
     group.add_argument("--verbose-make", action="store_true", default=False,
                     help="Print the executed commands while building")
     group.add_argument("--build-prefix", dest="build_prefix",
