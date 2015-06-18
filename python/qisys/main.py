@@ -12,7 +12,7 @@ import argparse
 import qisys.script
 
 def print_version(script_name):
-    sys.stdout.write("%s version 3.8.1\n" % script_name)
+    sys.stdout.write("%s version 3.8.2\n" % script_name)
     import qibuild
     qibuild_dir = os.path.dirname(qibuild.__file__)
     python_dir = os.path.dirname(qibuild_dir)
