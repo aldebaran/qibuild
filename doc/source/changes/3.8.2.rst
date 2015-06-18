@@ -13,6 +13,11 @@ qibuild
 * Fix bug when installing test components: we used to unnecessarily installed the headers
   for instance
 
+qitest
+-------
+
+* ``qitest run``: Fix parsing arguments in some corner cases.
+
 cmake
 ------
 
