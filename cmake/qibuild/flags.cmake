@@ -52,6 +52,12 @@ macro(qi_sanitize_compile_flags)
 
     _qi_disable_warnings_msvc(4251 4275)
 
+    # Prevents error C1128 when building in 64b (x64 compiler needs more sections)
+    # https://msdn.microsoft.com/en-us/library/8578y171.aspx
+    if(CMAKE_CL_64)
+      add_definitions("/bigobj")
+    endif()
+
     if(QI_WERROR)
       add_definitions("/WX")
     endif()
