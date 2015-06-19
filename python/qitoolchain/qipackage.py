@@ -214,6 +214,7 @@ def _extract_modern(archive_path, dest):
     return qisys.archive.extract(archive_path, dest, strict_mode=False)
 
 def _extract_legacy(archive_path, dest):
+    dest = qisys.sh.to_native_path(dest)
     algo = qisys.archive.guess_algo(archive_path)
     extract_dest = os.path.dirname(dest)
     extract_path = qisys.archive.extract(archive_path, extract_dest, algo=algo)
