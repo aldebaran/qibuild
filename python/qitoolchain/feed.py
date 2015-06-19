@@ -70,9 +70,10 @@ class ToolchainFeedParser:
     """
     def __init__(self):
         self.packages = list()
+        # A list of packages to be blacklisted
+        self.blacklist = list()
         # A dict name -> version used to only keep the latest
         # version
-        self.blacklist = list()
         self._versions = dict()
 
     def get_packages(self):
