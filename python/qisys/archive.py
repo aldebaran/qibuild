@@ -184,7 +184,8 @@ Please set only one of these two options to 'True'
                 new_st = member.external_attr >> 16L
             # permissions are meaningless on windows, here only the exension counts
             if not sys.platform.startswith("win"):
-                os.chmod(new_path, new_st)
+                if new_st != 0:
+                    os.chmod(new_path, new_st)
 
             if not quiet:
                 qisys.ui.info_progress(i, size, "Done")
@@ -200,7 +201,8 @@ Please set only one of these two options to 'True'
         dirpath = os.path.join(directory, zipinfo.filename)
         new_st = zipinfo.external_attr >> 16L
         if not sys.platform.startswith("win"):
-            os.chmod(dirpath, new_st)
+            if new_st != 0:
+                os.chmod(dirpath, new_st)
 
     archive_.close()
     ui.debug(archive, "extracted in", directory)
