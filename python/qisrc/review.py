@@ -134,28 +134,6 @@ def setup_project(project):
     ui.info(ui.green, "[OK]")
     return True
 
-def guess_emails(git, reviewers):
-    """ Fix the reviewer list.
-
-    Complete the email addresses with the committer email's domain name
-    when just the reviewer username is given, using the domain name of the
-    'user.email' setting from the given git.
-
-    :return: the list of reviewers' email
-
-    """
-    domain_name = git.get_config("user.email")
-    if not domain_name:
-        message = "Error: no user.email entry in the git configuration.\n"
-        message += "    Set your git configuration:\n"
-        message += "    $ git config --global user.name \"John Doe\"\n"
-        message += "    $ git config --global user.email \"john.doe@noname.org\"\n"
-        raise Exception(message)
-    domain_name = domain_name.rsplit("@")[1]
-    for idx, reviewer in enumerate(reviewers):
-        if "@" not in reviewer:
-            reviewers[idx] = reviewer + "@" + domain_name
-    return reviewers
 
 def push(project,  branch, bypass_review=False, dry_run=False,
          reviewers=None, topic=None):
@@ -181,10 +159,32 @@ def push(project,  branch, bypass_review=False, dry_run=False,
         if topic:
             remote_ref = "%s/%s" % (remote_ref, topic)
         args.append("%s:%s" % (branch, remote_ref))
-        if reviewers:
-            reviewers = guess_emails(git, reviewers)
-            receive_pack = "git receive-pack"
-            for reviewer in reviewers:
-                receive_pack += " --reviewer=%s" % reviewer
-            args = ["--receive-pack=%s" % receive_pack] + args
+    if reviewers and not dry_run:
+        # Get the SHA1s that will be pushed so that we can add reviewers
+        remote = project.review_remote
+        server = remote.server
+        username = remote.username
+        ssh_port = remote.port
+        commits_pushed = git.get_log("%s/%s" % (remote.name, branch), "HEAD")
+        sha1s = [commit["sha1"] for commit in commits_pushed]
     git.push(*args)
+    if reviewers and not dry_run:
+        ui.info("Adding reviewers...")
+        for sha1 in sha1s:
+            set_reviewers(sha1, reviewers, username, server, ssh_port)
+        ui.info("Done!")
+
+
+def set_reviewers(ref, reviewers, username, server, ssh_port):
+    """ Set reviewers using gerrit set-reviewers command
+
+    :param ref: The reference to the patchset, can be a SHA1 or a Change-Id
+    :param reviewers: A list of Gerrit reviewers, username or group name,
+    no e-mails
+    """
+    cmd = ["ssh", "-p", str(ssh_port),
+    "%s@%s" % (username, server),
+    "gerrit", "set-reviewers", ref]
+    for reviewer in reviewers:
+        cmd.append(" --add %s" % reviewer)
+    qisys.command.call(cmd, quiet=True)

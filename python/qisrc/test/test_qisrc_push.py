@@ -38,12 +38,13 @@ def test_using_carbon_copy(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
     foo_git = TestGit(foo_proj.path)
+    # Need to fetch gerrit remote at least once for gerrit/master to exist
+    foo_git.fetch("--all")
     foo_git.commit_file("a.txt", "a")
     with mock.patch.object(qisys.command, "call") as mocked_call:
         qisrc_action("push", "foo", "--cc", "jdoe")
-    recieve_pack_arg = mocked_call.call_args[0][0][2]
-    reviewer_arg = recieve_pack_arg.split()[-1]
-    assert "jdoe" in reviewer_arg
+    set_reviewers_args =  mocked_call.call_args_list[1][0][0][7]
+    assert "jdoe" in set_reviewers_args
 
 def test_alert_maintainers(qisrc_action, git_server):
     foo_repo = git_server.create_repo("foo.git", review=True)
@@ -56,9 +57,10 @@ def test_alert_maintainers(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
     foo_git = TestGit(foo_proj.path)
+    # Need to fetch gerrit remote at least once for gerrit/master to exist
+    foo_git.fetch("--all")
     foo_git.commit_file("a.txt", "a")
     with mock.patch.object(qisys.command, "call") as mocked_call:
         qisrc_action("push", "foo")
-    recieve_pack_arg = mocked_call.call_args[0][0][2]
-    reviewer_arg = recieve_pack_arg.split()[-1]
-    assert "jdoe@company.com" in reviewer_arg
+    set_reviewers_args =  mocked_call.call_args_list[2][0][0][7]
+    assert "jdoe@company.com" in set_reviewers_args
