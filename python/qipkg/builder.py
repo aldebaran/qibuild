@@ -264,8 +264,8 @@ class PMLBuilder(object):
 def pkg_name(manifest_xml):
     "Return a string name-version"
     root = qisys.qixml.read(manifest_xml).getroot()
-    uuid = root.get("uuid")
-    version = root.get("version")
+    uuid = qisys.qixml.parse_required_attr(root, "uuid", xml_path=manifest_xml)
+    version = qisys.qixml.parse_required_attr(root, "version", xml_path=manifest_xml)
     output_name = "%s-%s" % (uuid, version)
     return output_name
 

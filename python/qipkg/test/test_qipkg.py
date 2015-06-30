@@ -36,6 +36,16 @@ def test_make_package(qipkg_action, qipy_action):
         full_path = tmpdir.join("c-0.1", path)
         assert full_path.check(file=True)
 
+def test_make_package_empty_uuid(qipkg_action):
+    pml = os.path.join(os.path.dirname(__file__), "projects", "empty_uuid", "empty.pml")
+    error = qipkg_action("make-package", pml, raises=True)
+    assert "uuid" in error
+
+def test_make_package_empty_version(qipkg_action):
+    pml = os.path.join(os.path.dirname(__file__), "projects", "empty_version", "empty.pml")
+    error = qipkg_action("make-package", pml, raises=True)
+    assert "version" in error
+
 def test_breakpad_symbols(qipkg_action):
     dump_syms = qisys.command.find_program("dump_syms", raises=False)
     if not dump_syms:
