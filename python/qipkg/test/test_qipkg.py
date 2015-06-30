@@ -157,12 +157,8 @@ def test_validate_package(qipkg_action):
 
 def test_validate_package_exception(qipkg_action):
     pkg_path = os.path.join(os.path.dirname(__file__), "projects", "invalid_package.pkg")
-    as_thrown = False
-    try:
-        qipkg_action("validate_package", pkg_path)
-    except:
-        as_thrown = True
-    assert as_thrown is True
+    error = qipkg_action("validate_package", pkg_path, raises=True)
+    assert error == "Given package does not satisfy default package requirements"
 
 def test_release_package(qipkg_action, tmpdir):
     pkg_path = os.path.join(os.path.dirname(__file__), "projects", "python_services.pkg")
