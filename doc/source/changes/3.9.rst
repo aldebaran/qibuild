@@ -39,6 +39,10 @@ qilinguist
 qipkg
 -----
 
+* ``qipkg make-package`` now checks the package for correctness first.
+  You can use ``qipkg make-package --force`` to bypass the checks
+* Add ``qipkg validate-package`` to check if a package is compliant with QA
+* Add ``qipkg release-package`` to obfuscate Python code from the package
 * ``qipkg deploy-package``: do not try to remove non installed applications
 
 qipy
@@ -51,6 +55,9 @@ qipy
 qisrc
 -----
 
+* Parallelize ``qisrc sync``. By default, use as many threads as
+  the number of CPUs. You can use ``qisrc sync -j<n>`` to change the
+  number of threads used.
 * Fix using ``qisrc create`` outside a worktree
 * ``qisrc create``: fix crash when output dir is inside template path
 * ``qisrc status``: add option ``-S``/``--short`` to display status only for
@@ -90,10 +97,13 @@ cmake
 * ``qi_stage_bin``: create install rule for ``-config.cmake`` file
 * Add ``qi_create_gmock`` to create tests using ``gmock`` library.
 * Add ``qi_add_bin_sdk``
-* ``qi_sanitize_compile_flags``: disable MSVC warnings about DLL interface and
-  template usage.
+* ``qi_sanitize_compile_flags``:
+
+  * disable MSVC warnings about DLL interface and template usage.
+  * Add ``/bigobj`` for MSVC 64 bits
 
 * Modules:
 
   * Add ``COREFOUNDATION``
   * Add ``DBGHELP``, ``DIA_SDK``, ``IMAGEHLP``, ``WS2``
+  * Fix ``PTHREAD`` finder for 64 bits on windows
