@@ -156,9 +156,10 @@ class GitProject(object):
         """ Synchronize remote changes with the underlying git repository
         Calls :py:meth:`qisrc.git.Git.sync_branch`
 
-        WARNING: this method is called in parallel in
-        :py:meth:qisrc.actions.sync.do, therefore it must not cause any
-        side-effect on the global state outside of this repo.
+        .. warning::
+           this method is called in parallel when calling ``qisrc sync``,
+           therefore it must not cause any side-effect on the global state
+           outside of this repo.
         """
         git = qisrc.git.Git(self.path)
         branch = self.default_branch
@@ -186,9 +187,10 @@ class GitProject(object):
     def reset(self):
         """ Same as sync, but discard any local changes
 
-        WARNING: this method is called in parallel in
-        :py:meth:qisrc.actions.sync.do, therefore it must not cause any
-        side-effect on the global state outside of this repo.
+        .. warning::
+           this method is called in parallel when calling ``qisrc sync``,
+           therefore it must not cause any side-effect on the global state
+           outside of this repo.
         """
         git = qisrc.git.Git(self.path)
         branch = self.default_branch

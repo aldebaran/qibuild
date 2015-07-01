@@ -25,6 +25,7 @@ Namespace
 OutDir
 POTFILES
 Packge
+Parallelize
 Parsers
 Perf
 Popen
