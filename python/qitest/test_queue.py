@@ -161,6 +161,7 @@ class TestWorker(threading.Thread):
         io = StringIO.StringIO()
         traceback.print_tb(tb, file=io)
         return (ui.red, "Python exception during tests:\n",
+                exception.__class__.__name__,
                 str(exception), "\n",
                 ui.reset,
                 io.getvalue())
