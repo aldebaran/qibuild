@@ -14,6 +14,7 @@ from qisys import ui
 import qisrc.git
 import qisys.interact
 import qibuild.config
+import qisys.command
 
 
 def fetch_gerrit_hook_ssh(path, username, server, port=None):
@@ -170,9 +171,14 @@ def push(project,  branch, bypass_review=False, dry_run=False,
     git.push(*args)
     if reviewers and not dry_run:
         ui.info("Adding reviewers...")
-        for sha1 in sha1s:
-            set_reviewers(sha1, reviewers, username, server, ssh_port)
-        ui.info("Done!")
+        try:
+            for sha1 in sha1s:
+                set_reviewers(sha1, reviewers, username, server, ssh_port)
+        except qisys.command.CommandFailedException as e:
+            ui.warning("Couldn't set reviewers")
+            ui.warning(e)
+        else:
+            ui.info("Done!")
 
 
 def set_reviewers(ref, reviewers, username, server, ssh_port):
