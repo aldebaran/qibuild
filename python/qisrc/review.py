@@ -163,6 +163,7 @@ def push(project,  branch, bypass_review=False, dry_run=False,
     if reviewers and not dry_run:
         # Get the SHA1s that will be pushed so that we can add reviewers
         remote = project.review_remote
+        remote.parse_url()
         server = remote.server
         username = remote.username
         ssh_port = remote.port
