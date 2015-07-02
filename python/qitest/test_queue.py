@@ -30,8 +30,27 @@ class TestQueue():
         self.elapsed_time = 0
         self._workers = list()
 
-    def run(self, num_jobs=1):
+    def run(self, num_jobs=1, repeat_until_fail=0):
         """ Run all the tests """
+        if repeat_until_fail == 0:
+            self._run_once(num_jobs)
+            return self.ok
+
+        ui.info(ui.blue, "::", ui.reset, "Running tests until they fail")
+        num_runs = 0
+        while num_runs < repeat_until_fail:
+            ui.info(ui.bold, "Test run #%i" % (num_runs + 1))
+            self._run_once(num_jobs)
+            ui.info()
+            if self.ok:
+                num_runs += 1
+            else:
+                break
+
+        return self.ok
+
+    def _run_once(self, num_jobs):
+        """ Helper for run """
         signal.signal(signal.SIGINT, self.sigint_handler)
         start = datetime.datetime.now()
         self._run(num_jobs=num_jobs)
@@ -43,7 +62,7 @@ class TestQueue():
         return self.ok
 
     def _run(self, num_jobs=1):
-        """ Helper function for ._run """
+        """ Helper function for ._run_once """
         if not self.launcher:
             ui.error("test launcher not set, cannot run tests")
             return

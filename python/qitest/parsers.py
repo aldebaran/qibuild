@@ -33,6 +33,8 @@ def test_parser(parser, with_num_jobs=True):
     group.add_argument("--nightly", action="store_true", dest="nightly")
     group.add_argument("--break-on-failure", action="store_true", dest="break_on_failure",
                       help="Break on failure (for gtest only)")
+    group.add_argument("--repeat-until-fail", default=0, type=int, metavar="N",
+                       help="Repeat tests until they fail (at most N times)")
     group.add_argument("--qitest-json", dest="qitest_jsons", action="append")
     group.add_argument("--root-output-dir", dest="root_output_dir",
                       help="Generate XML reports in the given directory " + \
@@ -81,6 +83,7 @@ def get_test_runner(args, build_project=None, qitest_json=None):
     test_runner.verbose = args.verbose_tests
     test_runner.num_cpus = args.num_cpus
     test_runner.num_jobs = args.num_jobs
+    test_runner.repeat_until_fail = args.repeat_until_fail
     test_runner.nightly = args.nightly
     test_runner.nightmare = args.nightmare
     test_runner.root_output_dir = args.root_output_dir

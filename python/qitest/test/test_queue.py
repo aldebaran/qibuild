@@ -85,3 +85,29 @@ def test_no_tests():
     test_queue.launcher = dummy_launcher
     test_queue.run(num_jobs=1)
     assert not test_queue.ok
+
+class SporadicallyFailingLauncher(qitest.runner.TestLauncher):
+    def __init__(self):
+        self.num_runs = 0
+
+    def launch(self, test):
+        result = qitest.result.TestResult(test)
+        if self.num_runs == 3:
+            result.ok = False
+            result.message = (ui.red, "[FAILED]")
+        else:
+            result.ok = True
+            result.message = (ui.green, "[OK]")
+        self.num_runs += 1
+        return result
+
+def test_repeat_until_fail():
+    tests = [
+        { "name" : "one" },
+        { "name" : "two" }
+    ]
+    test_queue = qitest.test_queue.TestQueue(tests)
+    fake_launcher = SporadicallyFailingLauncher()
+    test_queue.launcher = fake_launcher
+    test_queue.run(repeat_until_fail=3)
+    assert  test_queue.ok is False

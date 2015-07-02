@@ -15,6 +15,7 @@ class TestSuiteRunner(object):
         self.project = project
         self._patterns = list()
         self.num_jobs = 1
+        self.repeat_until_fail = 0
         self.cwd = os.getcwd()
         self.env = None
         self.verbose = False
@@ -39,7 +40,8 @@ class TestSuiteRunner(object):
         """
         test_queue = qitest.test_queue.TestQueue(self.tests)
         test_queue.launcher = self.launcher
-        ok = test_queue.run(num_jobs=self.num_jobs)
+        ok = test_queue.run(num_jobs=self.num_jobs,
+                           repeat_until_fail=self.repeat_until_fail)
         return ok
 
     @property
