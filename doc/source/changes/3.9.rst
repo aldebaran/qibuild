@@ -64,7 +64,8 @@ qisrc
   dirty projects
 * ``qisrc list``: fix specifying a pattern
 * ``qisrc checkout``: fix return code when checkout fails
-* ``qisrc push``: always notify the maintainer
+* ``qisrc push``: always notify the maintainer. Also fix using bare names or
+  team names in the ``--cc`` argument.
 
 qisys
 -----

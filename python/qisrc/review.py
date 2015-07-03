@@ -187,7 +187,7 @@ def set_reviewers(ref, reviewers, username, server, ssh_port):
 
     :param ref: The reference to the patchset, can be a SHA1 or a Change-Id
     :param reviewers: A list of Gerrit reviewers, username or group name,
-    no e-mails
+                      no e-mails
     """
     cmd = ["ssh", "-p", str(ssh_port),
     "%s@%s" % (username, server),

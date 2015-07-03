@@ -188,6 +188,7 @@ os
 param
 parseable
 parsers
+patchset
 perf
 phonon
 pkgconfig
