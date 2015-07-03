@@ -234,7 +234,7 @@ class WorkTreeSyncer(object):
                     ui.info(ui.tabs(2), ui.green, "(now using code review)")
                 project = self.git_worktree.get_git_project(new_repo.src)
                 project.read_remote_config(new_repo)
-                project.apply_config()
+                project.save_config()
 
         for repo in to_rm:
             self.git_worktree.remove_repo(repo)
@@ -251,14 +251,14 @@ class WorkTreeSyncer(object):
             project = self.git_worktree.get_git_project(repo.src)
             if project:  # Repo is already there, re-apply config
                 project.read_remote_config(repo)
-                project.apply_config()
+                project.save_config()
                 continue
             if not self.git_worktree.clone_missing(repo):
                 res = False
             else:
                 project = self.git_worktree.get_git_project(repo.src)
                 project.read_remote_config(repo)
-                project.apply_config()
+                project.save_config()
 
         if to_move:
             ui.info(ui.green, ":: Moving repositories ...")
