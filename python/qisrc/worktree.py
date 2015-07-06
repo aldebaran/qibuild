@@ -196,7 +196,10 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             git.init()
             git.remote("add", remote_name, clone_url)
             git.fetch(remote_name, "--quiet")
-            git.checkout("-b", branch, "%s/%s" % (remote_name, branch))
+            remote_branch = "%s/%s" % (remote_name, branch)
+            rc, _ = git.call("rev-parse", "--verify", "--quiet", remote_branch, raises=False)
+            # When `remote_branch` is invalid, try to checkout `branch` instead
+            git.checkout("-b", branch, branch if rc else remote_branch)
         except:
             ui.error("Cloning repo failed")
             if git.is_empty():
