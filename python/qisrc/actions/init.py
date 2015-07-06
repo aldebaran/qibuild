@@ -32,6 +32,8 @@ def do(args):
     worktree = qisys.worktree.WorkTree(root)
     git_worktree = qisrc.worktree.GitWorkTree(worktree)
     if args.manifest_url:
+        if os.path.isdir(args.manifest_url):
+            args.manifest_url = qisys.sh.to_native_path(args.manifest_url)
         ok = git_worktree.configure_manifest(args.manifest_url,
                                         groups=args.groups,
                                         branch=args.branch,
