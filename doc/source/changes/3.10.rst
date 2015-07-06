@@ -1,0 +1,7 @@
+v3.10
+======
+
+qisrc
+-----
+
+* Fix using relative paths with ``qisrc init``

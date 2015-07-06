@@ -2,8 +2,10 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import qisys.script
+import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree
 
+import os
 import pytest
 
 def test_in_new_directory(cd_to_tmpdir, git_server):
@@ -150,3 +152,13 @@ def test_manifest_branch_does_not_exist(qisrc_action, git_server):
     with pytest.raises(Exception) as e:
         qisrc_action("init", git_server.manifest_url, "--branch", "devel")
     assert "origin/devel" in e.value.message
+
+def test_relative_path(qisrc_action, tmpdir):
+    git = qisrc.git.Git(tmpdir.strpath)
+    git.init()
+    manifest = tmpdir.join("manifest.xml")
+    manifest.write("<manifest />")
+    git.add("manifest.xml")
+    git.commit("-m", "Initial commit")
+    qisrc_action("init", os.path.relpath(tmpdir.strpath))
+    assert os.path.isfile(os.path.join(".qi", "manifests", "default", "manifest.xml"))
