@@ -67,9 +67,9 @@ Doing so is easy: just write a manifest looking like
    <manifest>
       <remote name="origin" url="git@git.aldebaran.lan" />
 
-      <repo project="qi/libqi.git"        remotes="master" src="lib/libqi" />
-      <repo project="lib/libnaoqi.git"    remotes="master" src="lib/libnaoqi" />
-      <repo project="gui/choregraphe.git" remotes="master" src="gui/choregraphe" />
+      <repo project="qi/libqi.git"        remotes="origin" src="lib/libqi" />
+      <repo project="lib/libnaoqi.git"    remotes="origin" src="lib/libnaoqi" />
+      <repo project="gui/choregraphe.git" remotes="origin" src="gui/choregraphe" />
 
     </manifest>
 
