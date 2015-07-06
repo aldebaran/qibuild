@@ -24,7 +24,7 @@ def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
-    qisys.parsers.parallel_parser(parser)
+    qisys.parsers.parallel_parser(parser, default=1)
 
     group = parser.add_argument_group("qisrc sync options")
     group.add_argument("--rebase-devel", action="store_true",
