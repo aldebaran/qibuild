@@ -13,14 +13,14 @@ Simply run:
 
 .. code-block:: console
 
-  $ qibuild package --runtime foo
+  $ qibuild install --runtime foo /path/to/dest
 
-This will configure, build and install the ``foo`` project in
-``QI_WORK_TREE/package/foo``, and generate a re-distributable binary package
-in ``QI_WORK_TREE/package/foo.tar.gz``) (or ``foo.zip`` if you are on windows)
+This installs the ``foo`` project in ``/path/to/dest``
 
-The archive will by default contain only the runtime components (executables,
+The destination folder will by default contain only the runtime components (executables,
 dependent libraries, data ...)
+
+You can then zip the destination folder to get a redistributable binary.
 
 Development package
 -------------------
@@ -34,8 +34,8 @@ their own software with it, run:
 
 The archive will contain the static libraries, the headers (provided
 you used the correct install rule), the CMake files, and so on.
+
 Notes: dependencies will not be installed inside the devel package, because
 this package is supposed to be used inside a toolchain.
 
 More on this in the :ref:`using-toolchains` tutorial.
-
