@@ -254,3 +254,41 @@ keep a reference to the upstream url.
   </manifest>
 
 This will create a remote called ``my-upstream`` with the ``git@somewhereelse.org`` url.
+
+
+Handling snapshots
+++++++++++++++++++
+
+Sometimes you would like to reset your worktree to a known state.
+
+The solution is to generate a snapshot of your worktree with
+``qisrc snapshot /path/to/snapshot.json`` and then use ``qisrc reset --snaphot
+/path/to/snapshot.json``.
+
+The format used by the snapshot looks like this:
+
+.. code-block:: json
+
+    {
+      "format" : 2,
+      "refs" :
+      {
+        "foo" : "ab453c"
+      },
+      "manifest" :
+      {
+        "url" : "git@example.com:manifest.git",
+        "branch" : "master",
+        "groups" : ["default"],
+        "ref" : "b8c64"
+      }
+    }
+
+The information about the manifest is mandatory, because the keys in the
+``refs`` dictionary are the paths to the projects in the worktree, and those
+paths are allowed to change when the manifest changes.
+
+You should trust the info generated for you by ``qisrc snapshot``.
+
+Also feel free to edit the snapshot by hand, for instance to use tags instead
+of SHA1s.
