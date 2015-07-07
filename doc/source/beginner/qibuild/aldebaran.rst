@@ -59,6 +59,12 @@ and extract it, say in ``/path/to/atom/ctc``
 
     $ qitoolchain create cross-atom /path/to/ctc/toolchain.xml
 
+* Create a build configuration associated with the cross-toolchain
+
+.. code-block:: console
+
+    $ qibuild add-config cross-atom --toolchain cross-atom
+
 * Then configure and build as usual
 
 .. code-block:: console
