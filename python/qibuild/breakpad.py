@@ -16,7 +16,7 @@ import qibuild.cmake
 def is_elf(filename):
     """ Check that a file is in the elf format
 
-   """
+    """
     with open(filename, "rb") as fp:
         data = fp.read(4)
     return data == "\x7fELF"
