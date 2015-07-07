@@ -22,6 +22,9 @@ class DocProject(object):
             dest = self.name
         self.depends = list()
         self.prebuild_script = None
+        self.translated = False
+        self.linguas = list()
+        self._html_dir = None
         self._dest = dest
         self._is_base_project = False
 
@@ -34,6 +37,10 @@ class DocProject(object):
         self._is_base_project = value
         if self._is_base_project:
             self._dest = "."
+
+    @property
+    def qiproject_xml(self):
+        return os.path.join(self.path, "qiproject.xml")
 
     @property
     def dest(self):
@@ -63,13 +70,19 @@ class DocProject(object):
 
     @property
     def html_dir(self):
-        html_dir = os.path.join(self.build_dir, "html")
-        qisys.sh.mkdir(html_dir)
-        return html_dir
+        if self._html_dir is None:
+            self._html_dir = os.path.join(self.build_dir, "html")
+        res = self._html_dir
+        qisys.sh.mkdir(res, recursive=True)
+        return res
+
+    @html_dir.setter
+    def html_dir(self, value):
+        self._html_dir = value
 
     @property
     def index_html(self):
-        return os.path.join(self.build_dir, "html", "index.html")
+        return os.path.join(self.html_dir, "index.html")
 
     @property
     def template_project(self):

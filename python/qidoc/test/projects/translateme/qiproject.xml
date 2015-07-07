@@ -1,0 +1,5 @@
+<project version="3">
+  <qidoc type="sphinx" name="translateme">
+    <translate linguas="fr" />
+  </qidoc>
+</project>

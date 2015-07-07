@@ -167,3 +167,24 @@ def test_spellcheck(doc_worktree, record_messages):
     qisys.sh.rm(spell_proj.build_dir)
     doc_builder.configure()
     doc_builder.build()
+
+def test_intl_update(doc_worktree):
+    translateme_proj = doc_worktree.add_test_project("translateme")
+    assert translateme_proj.linguas == ["fr"]
+    translateme_proj.configure()
+    translateme_proj.intl_update()
+    pot_expected = os.path.join(translateme_proj.source_dir, "locale", "index.pot")
+    assert os.path.exists(pot_expected)
+    po_expected = os.path.join(translateme_proj.source_dir, "locale",
+                               "fr", "LC_MESSAGES", "index.po")
+    assert os.path.exists(po_expected)
+
+def test_intl_build(doc_worktree):
+    translateme_proj = doc_worktree.add_test_project("translateme")
+    translateme_proj.configure()
+    translateme_proj.intl_update()
+    translateme_proj.intl_build("fr")
+
+    mo_expected = os.path.join(translateme_proj.source_dir, "locale",
+                               "fr", "LC_MESSAGES", "index.mo")
+    assert os.path.exists(mo_expected)

@@ -156,7 +156,13 @@ class SphinxProject(qidoc.project.DocProject):
 
         self.generate_examples_zips()
 
-        html_dir = os.path.join(self.build_dir, "html")
+        language = kwargs.get("language")
+        if language and language != "en" and language not in self.linguas:
+            raise UnknownLingua(self, language)
+        if self.translated:
+            self.intl_build(language)
+
+        html_dir = self.html_dir
         qisys.sh.mkdir(html_dir, recursive=True)
         spell_dir = os.path.join(self.build_dir, "spellcheck")
         qisys.sh.mkdir(spell_dir, recursive=True)
@@ -166,6 +172,8 @@ class SphinxProject(qidoc.project.DocProject):
             cmd = [sys.executable, "-c", self.build_dir, "-b", "html"]
         if kwargs.get("werror"):
             cmd.append("-W")
+        if language:
+            cmd.append("-Dlanguage=%s" % language)
         cmd.append(self.source_dir)
         if kwargs.get("spellcheck"):
             cmd.append(spell_dir)
@@ -194,6 +202,46 @@ class SphinxProject(qidoc.project.DocProject):
                 ui.info("Generating", zip_path)
                 qisys.archive.compress(example_path, algo="zip", quiet=True)
 
+    def intl_update(self):
+        ui.info(ui.blue, "::", ui.reset, "Generating message catalogs ...")
+        import sphinx
+        from sphinx_intl.commands import run as sphinx_intl_run
+        # First step: run sphinx-build -b gettext
+        cmd = [sys.executable, "-c", self.build_dir, "-b", "gettext"]
+        cmd.append(self.source_dir)
+        locale_dir = os.path.join(self.source_dir, "locale")
+        cmd.append(locale_dir)
+        try:
+            rc = sphinx.main(argv=cmd)
+        except SystemExit as e:
+            rc = e.code
+        if rc != 0:
+            raise SphinxBuildError(self)
+
+        ui.info()
+
+        # Second step: run sphinx-intl update -l <lingua> for every lingua
+        ui.info(ui.blue, "::", ui.reset, "Updating .po files ...")
+        for i, lingua in enumerate(self.linguas):
+            ui.info_count(i, len(self.linguas), ui.blue, lingua)
+            cmd = ["update",
+                "-c", os.path.join(self.build_dir, "conf.py"),
+                "--pot-dir", locale_dir,
+                "--locale-dir", locale_dir,
+                "--language", lingua]
+            sphinx_intl_run(cmd)
+
+    def intl_build(self, language):
+        from sphinx_intl.commands import run as sphinx_intl_run
+        locale_dir = os.path.join(self.source_dir, "locale")
+        ui.info(ui.blue, "::", ui.reset, "Building .mo files ...")
+        cmd = ["build",
+            "-c", os.path.join(self.build_dir, "conf.py"),
+            "--pot-dir", locale_dir,
+            "--locale-dir", locale_dir,
+            "--language", language]
+        sphinx_intl_run(cmd)
+
     def install(self, destdir):
         for example_src in self.examples:
             example_path = os.path.join(self.source_dir, example_src)
@@ -218,3 +266,15 @@ def get_num_spellcheck_errors(build_dir):
 class SphinxBuildError(Exception):
     def __str__(self):
         return "Error occurred when building doc project: %s" % self.args[0].name
+
+class UnknownLingua(Exception):
+    def __init__(self, project, language):
+        self.language = language
+        self.project = project
+
+    def __str__(self):
+        mess = """ Unknown language '{language}' for {project.name}.
+Please check the `linguas` attribute in the `<translate>` tag
+in {project.qiproject_xml}
+"""
+        return mess.format(language=self.language, project=self.project)

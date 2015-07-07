@@ -54,3 +54,16 @@ def test_setting_base_project_resets_dests(doc_worktree):
     world_proj = doc_worktree.get_doc_project("world")
     assert world_proj.dest == "."
 
+def test_setting_language(doc_worktree):
+    translateme_proj = doc_worktree.add_test_project("translateme")
+    doc_builder = DocBuilder(doc_worktree, "translateme")
+    doc_builder.language = "fr"
+    doc_builder.configure()
+    with mock.patch("sphinx.main") as mock_sphinx:
+        mock_sphinx.return_value = 0
+        doc_builder.build()
+        args_list = mock_sphinx.call_args_list
+        assert len(args_list) == 1
+        last_call = args_list[0]
+        argv = last_call[1]["argv"]
+        assert "-Dlanguage=fr" in argv

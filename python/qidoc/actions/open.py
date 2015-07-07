@@ -19,10 +19,15 @@ def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
     parser.add_argument("-b", "--browser")
+    parser.add_argument("-l", "--language")
+    parser.set_defaults(language="en")
 
 def do(args):
     doc_worktree = qidoc.parsers.get_doc_worktree(args)
     doc_project = qidoc.parsers.get_one_doc_project(doc_worktree, args)
+    if doc_project.translated:
+        doc_project.html_dir = os.path.join(doc_project.html_dir,
+                                            args.language)
     index_html = doc_project.index_html
     if not os.path.exists(doc_project.index_html):
         mess = """ \

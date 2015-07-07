@@ -206,6 +206,11 @@ def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
                                        "<example> must have a 'src' attribute")
     doc_project.examples = examples
 
+    translate = xml_elem.find("translate")
+    if translate is not None:
+        doc_project.translated = True
+        doc_project.linguas = qisys.qixml.parse_list_attr(translate, "linguas")
+
     return doc_project
 
 

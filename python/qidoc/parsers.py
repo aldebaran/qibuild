@@ -20,8 +20,9 @@ def build_doc_parser(parser):
     group.add_argument("--werror", action="store_true", dest="werror")
     group.add_argument("--no-warnings", action="store_true", dest="werror")
     group.add_argument("--spellcheck", action="store_true", dest="spellcheck")
+    group.add_argument("-l", "--language", dest="language")
     parser.set_defaults(hosted=True, build_type="debug", werror=False,
-                        spellcheck=False)
+                        spellcheck=False, language="en")
 
 def get_doc_worktree(args):
     worktree = qisys.parsers.get_worktree(args)
@@ -55,6 +56,7 @@ def get_doc_builder(args):
     doc_builder.build_type = vars(args).get("build_type")
     doc_builder.werror = vars(args).get("werror", False)
     doc_builder.spellcheck = vars(args).get("spellcheck", False)
+    doc_builder.language = vars(args).get("language", "en")
     return doc_builder
 
 ##

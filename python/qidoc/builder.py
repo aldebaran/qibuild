@@ -28,6 +28,7 @@ class DocBuilder(object):
         self.werror = False
         self.warnings = True
         self.spellcheck = False
+        self.language = None
         self._base_project = None
         if base_project_name:
             self.set_base_project(base_project_name)
@@ -52,6 +53,8 @@ class DocBuilder(object):
             "warnings"     : self.warnings
         }
         for project in projects:
+            if project.translated:
+                project.html_dir = os.path.join(project.html_dir, self.language)
             project.configure(**configure_args)
 
     def build(self):
@@ -64,10 +67,19 @@ class DocBuilder(object):
             ui.info_count(i, len(projects),
                           ui.green, "Building", ui.blue, project.name)
             project.build(werror=self.werror, build_type=self.build_type,
-                          spellcheck=self.spellcheck)
+                          spellcheck=self.spellcheck, language=self.language)
             if not self.spellcheck:
                 ui.info(ui.green, "Doc generated in",
                         ui.reset, ui.bold, project.html_dir)
+
+    def intl_update(self):
+        """ Regenerate translation catalogs for the top project """
+        projects = self.get_dep_projects()
+        for i, project in enumerate(projects):
+            ui.info_count(i, len(projects),
+                          ui.green, "Updating", ui.blue, project.name)
+            if project.doc_type == "sphinx":
+                project.intl_update()
 
     def install(self, destdir):
         """ Install the doc projects to a dest dir
@@ -87,6 +99,7 @@ class DocBuilder(object):
                 "rel_paths" : True,
             }
             project.configure(**options)
+            options["language"] = self.language
             project.build(**options)
             project.install(real_dest)
 
