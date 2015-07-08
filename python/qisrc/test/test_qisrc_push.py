@@ -43,7 +43,7 @@ def test_using_carbon_copy(qisrc_action, git_server):
     foo_git.commit_file("a.txt", "a")
     with mock.patch.object(qisys.command, "call") as mocked_call:
         qisrc_action("push", "foo", "--cc", "jdoe")
-    set_reviewers_args =  mocked_call.call_args_list[1][0][0][7]
+    set_reviewers_args =  mocked_call.call_args_list[2][0][0][7]
     assert "jdoe" in set_reviewers_args
 
 def test_alert_maintainers(qisrc_action, git_server):
@@ -62,5 +62,5 @@ def test_alert_maintainers(qisrc_action, git_server):
     foo_git.commit_file("a.txt", "a")
     with mock.patch.object(qisys.command, "call") as mocked_call:
         qisrc_action("push", "foo")
-    set_reviewers_args =  mocked_call.call_args_list[2][0][0][7]
+    set_reviewers_args =  mocked_call.call_args_list[3][0][0][7]
     assert "jdoe@company.com" in set_reviewers_args
