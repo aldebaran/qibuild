@@ -26,7 +26,7 @@ Install all the test dependencies:
 
 .. code-block:: console
 
-    cd /path/to/qibuild/python
+    cd /path/to/qibuild
     pip install -r requirements.txt
 
 Finally, run ``make``:
@@ -62,7 +62,7 @@ failing test and mark it as 'skipped'
   def test_subtle_bug(self):
      res = do_something_complicated()
      # Should be 42 but for some reason is 41 ...
-     self.assertTrue(res, 42)
+     assert res == 42
 
 
 This way when the bug is fixed we just have to remove the ``@pytest.skip``
