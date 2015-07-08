@@ -10,8 +10,11 @@ import pytest
 
 def test_parallel_empty():
     """Ensure that parallel does nothing with an empty iterator."""
+    # pylint:disable-msg=E1101
     qisys.parallel.foreach([], pytest.fail, 0)
+    # pylint:disable-msg=E1101
     qisys.parallel.foreach([], pytest.fail, 1)
+    # pylint:disable-msg=E1101
     qisys.parallel.foreach([], pytest.fail, 4)
 
 def test_parallel_result():
