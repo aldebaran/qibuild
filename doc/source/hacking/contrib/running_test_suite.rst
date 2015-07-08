@@ -74,24 +74,24 @@ Running only some tests
 
 You can use ``py.test`` like this:
 
-  * Just for a given python package:
+* Just for a given python package:
 
-  .. code-block:: console
+.. code-block:: console
 
-      cd python
-      py.test qisrc
+    cd python
+    py.test qisrc
 
-  * Just for a given test file:
+* Just for a given test file:
 
-  .. code-block:: console
+.. code-block:: console
 
-     py.test qisrc/test/test_git.py
+    py.test qisrc/test/test_git.py
 
-  * Just for a given test name:
+* Just for a given test name:
 
-  .. code-block:: console
+.. code-block:: console
 
-     py.test qisrc/test/test_git.py -k set_tracking_branch
+    py.test qisrc/test/test_git.py -k set_tracking_branch
 
 Note about debuggers
 ++++++++++++++++++++
@@ -114,3 +114,19 @@ The solution is to use the ``-s`` option of ``py.test``:
 .. code-block:: console
 
   $ py.test foo.py -s
+
+
+Exiting the virtualenv when you are done
+----------------------------------------
+
+Simply type
+
+.. code-block:: console
+
+  $ deactivate
+
+Feel free to remove the virtualenv folder
+
+.. code-block:: console
+
+  $ rm -fr venv
