@@ -73,7 +73,7 @@ def get_test_runner(args, build_project=None, qitest_json=None):
         test_runner.cwd = build_project.sdk_directory
         test_runner.env = build_project.build_worktree.get_env()
     else:
-        test_runner.cwd = os.path.dirname(qitest_json)
+        test_runner.cwd = qisys.sh.to_native_path(os.path.dirname(qitest_json))
 
     test_runner.patterns = args.patterns
     test_runner.perf = args.perf
