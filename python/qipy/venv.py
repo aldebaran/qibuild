@@ -33,7 +33,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         return False
 
 
-    ui.info("Adding python projects")
+    ui.info(ui.blue, "::", ui.reset, "Adding python projects")
     # Write a qi.pth file containing path to C/C++ extensions and
     # path to pure python modules or packages
     pure_python_ok = handle_pure_python(venv_path, python_worktree)
@@ -48,15 +48,18 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         cmd = [pip_binary, "install"] + remote_packages
         rc = qisys.command.call(cmd, ignore_ret_code=True)
         remote_ok = (rc == 0)
-    if pure_python_ok and remote_ok:
-        ui.info(ui.green, "Done")
     if not pure_python_ok:
         ui.info(ui.red, "Failed to add some python projects")
     if not remote_ok:
         ui.info(ui.red, "Failed to add some third party requirements")
 
+    ui.info()
+    ui.info(ui.blue, "::", ui.reset,
+            "Installing deps from requirements.txt files")
     requirements_ok = True
-    for project in python_worktree.python_projects:
+    for i, project in enumerate(python_worktree.python_projects):
+        ui.info_count(i, len(python_worktree.python_projects),
+                      ui.blue, project.name)
         path = os.path.join(project.path, "requirements.txt")
         if os.path.isfile( path ):
             ui.info(ui.green, " * Installing dependencies from " + path)
@@ -65,7 +68,11 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
             requirements_ok = (rc == 0)
         else:
             ui.debug(ui.yellow, " * missing " + path)
-    return (pure_python_ok and remote_ok and requirements_ok)
+    ui.info()
+    res = (pure_python_ok and remote_ok and requirements_ok)
+    if res:
+        ui.info(ui.green, "Done")
+    return res
 
 def find_script(venv_path, script_name):
     """ Find a script given its name
@@ -100,8 +107,13 @@ def handle_extensions(venv_path, python_worktree, build_worktree):
         if parent_project:
             extensions_projects.append(parent_project)
 
+    if extensions_projects:
+        ui.info()
+        ui.info(ui.blue, "::", ui.reset, "Registering C++ extensions")
     to_write = ""
-    for project in extensions_projects:
+    for i, project in enumerate(extensions_projects):
+        ui.info_count(i, len(extensions_projects),
+                ui.blue, project.name)
         qi_pth_src = os.path.join(project.sdk_directory, "qi.pth")
         if os.path.exists(qi_pth_src):
             with open(qi_pth_src, "r") as fp:
@@ -121,7 +133,9 @@ def handle_pure_python(venv_path, python_worktree):
     res = True
     with open(qi_pth_dest, "w") as fp:
         fp.write("")
-        for project in python_worktree.python_projects:
+        for i, project in enumerate(python_worktree.python_projects):
+            ui.info_count(i, len(python_worktree.python_projects),
+                          ui.blue, project.name)
             if project.setup_with_distutils:
                 cmd = [python_worktree.pip, "install", "--editable", "."]
                 rc = qisys.command.call(cmd, cwd=project.path, ignore_ret_code=True)
