@@ -66,6 +66,7 @@ qisrc
 * ``qisrc checkout``: fix return code when checkout fails
 * ``qisrc push``: always notify the maintainer. Also fix using bare names or
   team names in the ``--cc`` argument.
+* ``qisrc log``: display authors of commits
 
 qisys
 -----
