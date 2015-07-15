@@ -1,0 +1,28 @@
+v3.8.2
+======
+
+qipkg
+------
+
+* ``qipkg deploy-package``: bug fix: we used to always try to remove the package
+  before deploying, which always fails the first time
+
+qibuild
+--------
+
+* Fix bug when installing test components: we used to unnecessarily installed the headers
+  for instance
+
+qitest
+-------
+
+* ``qitest run``: Fix parsing arguments in some corner cases.
+
+cmake
+------
+
+* Modules:
+
+  * Add ``FFMPEG``
+  * Add ``COREFOUNDATION``
+  * Add ``DBGHELP``, ``DIA_SDK``, ``IMAGEHLP``, ``WS2``
