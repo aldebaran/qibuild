@@ -17,7 +17,7 @@ class PythonWorkTree(qisys.worktree.WorkTreeObserver):
         self.worktree = worktree
         self.python_projects = list()
         self._load_python_projects()
-        self.config = "default"
+        self.config = config
         worktree.register(self)
 
     def on_project_added(self, project):
