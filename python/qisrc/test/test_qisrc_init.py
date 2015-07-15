@@ -2,8 +2,10 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import qisys.script
+import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree
 
+import os
 import pytest
 
 def test_in_new_directory(cd_to_tmpdir, git_server):
@@ -142,3 +144,14 @@ def test_explicit_worktree_root(qisrc_action, tmpdir):
     custom_worktree = tmpdir.join("custom_worktree")
     qisrc_action("init", "--worktree", custom_worktree.strpath)
     assert qisys.worktree.WorkTree(custom_worktree.strpath)
+
+def test_relative_path(qisrc_action, tmpdir):
+    git = qisrc.git.Git(str(tmpdir))
+    git.init()
+    manifest = open(str(tmpdir.join("manifest.xml")), "w")
+    manifest.write("<manifest />")
+    manifest.close()
+    git.add("manifest.xml")
+    git.commit("-m", "Initial commit")
+    qisrc_action("init", os.path.relpath(str(tmpdir)))
+    assert os.path.isfile(os.path.join(".qi", "manifests", "default", "manifest.xml"))
