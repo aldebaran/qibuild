@@ -20,4 +20,6 @@ def configure_parser(parser):
 
 def do(args):
     python_builder = qipy.parsers.get_python_builder(args)
-    print python_builder.python_worktree.bin_path("activate")
+    res = python_builder.python_worktree.bin_path("activate")
+    print res
+    return res
