@@ -3,8 +3,25 @@
 Contributing to qiBuild
 ========================
 
+github
+-------
+
 qiBuild development process take place on github:
 https://github.com/aldebaran/qibuild
+
+There are two active branches:
+
+* ``next``, where the development occurs
+* ``master``, which is used for releases and bug fixes only
+
+Usually you should create your patches or pull requests on top
+of ``next``, unless you are fixing a blocking bug in a qibuild
+release.
+
+Note that we use ``gerrit`` and ``jenkins`` to test the patches
+internally at Aldebaran, so even if your pull request is closed,
+it can take some time before your code lands up on Aldebaran's
+repository.
 
 
 Reporting bugs
