@@ -18,7 +18,10 @@ def configure_parser(parser):
     parser.add_argument("--list", action="store_true", dest="dolist",
                        default=False,
                        help="List all available binaries in the virtualenv")
+    parser.add_argument("--no-exec", dest="exec_", action="store_false",
+                       help="Do not use os.execve (Mostly useful for tests")
     parser.add_argument("command", metavar="COMMAND", nargs="*")
+    parser.set_defaults(exec_=True)
 
 def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args)
@@ -60,5 +63,8 @@ def do(args):
     env["PYTHONHOME"] = venv_root
     env["PYTHONPATH"] = os.path.join(lib_path, "site-packages")
 
-    ui.debug("exec", cmd)
-    os.execve(cmd[0], cmd, env)
+    if args.exec_:
+        ui.debug("exec", cmd)
+        os.execve(cmd[0], cmd, env)
+    else:
+        qisys.command.call(cmd, env=env)
