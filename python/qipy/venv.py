@@ -39,8 +39,11 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
     pure_python_ok = handle_pure_python(venv_path, python_worktree)
     if build_worktree:
         handle_extensions(venv_path, python_worktree, build_worktree)
+    handle_modules(venv_path, python_worktree)
+    ui.info()
 
-    ui.info("Adding other requirements: " + ", ".join(remote_packages))
+    ui.info(ui.blue, "::", ui.reset,
+            "Adding other requirements: " + ", ".join(remote_packages))
     binaries_path = virtualenv.path_locations(venv_path)[-1]
     pip_binary = os.path.join(binaries_path, "pip")
     remote_ok = True
@@ -61,7 +64,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         ui.info_count(i, len(python_worktree.python_projects),
                       ui.blue, project.name)
         path = os.path.join(project.path, "requirements.txt")
-        if os.path.isfile( path ):
+        if os.path.isfile(path):
             ui.info(ui.green, " * Installing dependencies from " + path)
             cmd = [pip_binary, "install", "--quiet", "--requirement", path]
             rc = qisys.command.call(cmd, ignore_ret_code=True)
@@ -146,3 +149,25 @@ def handle_pure_python(venv_path, python_worktree):
                 for path in project.python_path:
                     fp.write(path + "\n")
     return res
+
+def handle_modules(venv_path, python_worktree):
+    """ Register the qi modules by writing the .mod file in the correct location """
+    qimodules = list()
+    for project in python_worktree.python_projects:
+        for module in project.modules:
+            if module.qimodule:
+                qimodules.append(module)
+        for package in project.packages:
+            if package.qimodule:
+                qimodules.append(package)
+    if qimodules:
+        ui.info()
+        ui.info(ui.blue, "::", ui.reset, "Registering Python qi modules")
+    for i, qimodule in enumerate(qimodules):
+        ui.info_count(i, len(qimodules), ui.blue, qimodule.name)
+        to_make = os.path.join(venv_path, "share", "qi", "module")
+        qisys.sh.mkdir(to_make, recursive=True)
+        to_write = os.path.join(to_make, "%s.mod" % qimodule.name)
+        with open(to_write, "w") as fp:
+            fp.write("python\n")
+

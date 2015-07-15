@@ -116,7 +116,9 @@ def new_python_project(worktree, project):
         name = qisys.qixml.parse_required_attr(module_elem, "name",
                                               xml_path=qiproject_xml)
         module = qipy.project.Module(name, src)
+        module.qimodule = qisys.qixml.parse_bool_attr(module_elem, "qimodule")
         python_project.modules.append(module)
+
 
     package_elems = qipython_elem.findall("package")
     for package_elem in package_elems:
@@ -124,6 +126,7 @@ def new_python_project(worktree, project):
                                               xml_path=qiproject_xml)
         src = package_elem.get("src", "")
         package = qipy.project.Package(name, src)
+        package.qimodule = qisys.qixml.parse_bool_attr(package_elem, "qimodule")
         python_project.packages.append(package)
 
     setup_elem = qipython_elem.find("setup")

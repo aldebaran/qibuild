@@ -45,3 +45,10 @@ def test_run(qipy_action):
     script = os.path.join(big_project.path, "bin", "script.py")
     cmd = [sys.executable, script]
     qisys.command.call(cmd, env=env)
+
+def test_qimodule(qipy_action):
+    foomodule_proj = qipy_action.add_test_project("foomodules")
+    module = foomodule_proj.modules[0]
+    assert module.qimodule
+    package = foomodule_proj.packages[0]
+    assert package.qimodule

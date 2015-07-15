@@ -105,11 +105,13 @@ class Module():
     def __init__(self, name, src):
         self.name = name
         self.src = src
+        self.qimodule = False
 
 class Package():
     def __init__(self, name, src):
         self.name = name
         self.src = src
+        self.qimodule = False
 
 class Script():
     def __init__(self, src):

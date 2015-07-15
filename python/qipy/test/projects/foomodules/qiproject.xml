@@ -1,0 +1,6 @@
+<project version="3">
+  <qipython name="foomodules">
+    <module name="foo" qimodule="true" />
+    <package name="bar" qimodule="true" />
+  </qipython>
+</project>
