@@ -34,8 +34,7 @@ class BinaryPackage:
     It stores metadata read from the binary package itself.
 
     """
-    def __init__(self, package_type, package_path):
-        self.type     = package_type
+    def __init__(self, package_path):
         self.path     = package_path
         self.metadata = None
         self.name = None

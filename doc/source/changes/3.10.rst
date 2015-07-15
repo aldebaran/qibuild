@@ -16,3 +16,9 @@ qisrc
 -----
 
 * Fix using relative paths with ``qisrc init``
+
+qitoolchain
+-----------
+
+* ``qitoolchain convert-package``: Properly raises an ``NotImplementedError``
+  when used with an ``.rpm`` file

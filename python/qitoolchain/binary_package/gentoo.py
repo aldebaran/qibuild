@@ -28,7 +28,7 @@ class GentooPackage(BinaryPackage):
     _RE_PF = re.compile(_PF)
 
     def __init__(self, package_path):
-        BinaryPackage.__init__(self, 'gentoo', package_path)
+        BinaryPackage.__init__(self, package_path)
 
     def _load(self):
         """ Guess the metadata from the package file name and store it in the
