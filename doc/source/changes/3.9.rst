@@ -78,7 +78,10 @@ qitest
 * ``qitest run``: implement ``--build-prefix``
 * Add ``qitest collect`` : this makes it possible to run Python tests with
   ``qitest``.
-* Add ``qitest run --repeat-until-fail <n>`` option to help find sporadic test failures
+* Add ``qitest run --repeat-until-fail <n>`` option to help find sporadic test
+  failures
+* Fix bug where qitest working directory was set to an empty string in some
+  corner cases
 
 qitoolchain
 -----------
