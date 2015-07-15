@@ -14,6 +14,7 @@ Optional:
 * ``doxygen`` and ``Sphinx`` for ``qidoc``
 * ``gettext`` or ``qtlinguist`` for ``qilinguist``
 * ``git`` for ``qisrc``
+* ``virtualenv`` for ``qipy``
 
 
 Getting the last stable release
@@ -40,14 +41,6 @@ equivalent with::
       return
     fi
     cd ${p}
-  }
-
-If you want to use ``qipython activate``, patch you ``~/.profile`` or
-equivalent with::
-
-  function qipyactivate {
-    sourceme = $(qipython activate)
-    source sourceme
   }
 
 
