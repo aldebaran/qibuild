@@ -45,7 +45,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
     pip_binary = os.path.join(binaries_path, "pip")
     remote_ok = True
     if remote_packages:
-        cmd = [pip_binary, "install"] + remote_packages
+        cmd = [pip_binary, "install", "--quiet"] + remote_packages
         rc = qisys.command.call(cmd, ignore_ret_code=True)
         remote_ok = (rc == 0)
     if not pure_python_ok:
@@ -63,7 +63,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         path = os.path.join(project.path, "requirements.txt")
         if os.path.isfile( path ):
             ui.info(ui.green, " * Installing dependencies from " + path)
-            cmd = [pip_binary, "install", "--requirement", path]
+            cmd = [pip_binary, "install", "--quiet", "--requirement", path]
             rc = qisys.command.call(cmd, ignore_ret_code=True)
             requirements_ok = (rc == 0)
         else:
@@ -137,7 +137,7 @@ def handle_pure_python(venv_path, python_worktree):
             ui.info_count(i, len(python_worktree.python_projects),
                           ui.blue, project.name)
             if project.setup_with_distutils:
-                cmd = [python_worktree.pip, "install", "--editable", "."]
+                cmd = [python_worktree.pip, "install", "--quiet", "--editable", "."]
                 rc = qisys.command.call(cmd, cwd=project.path, ignore_ret_code=True)
                 if rc != 0:
                     ui.warning("Failed to run pip install on", project.src)
