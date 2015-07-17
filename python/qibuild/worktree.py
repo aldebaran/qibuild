@@ -111,6 +111,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
                     res["PYTHONHOME"] = python_package.path + "/Python.framework/Versions/2.7"
                 else:
                     res["PYTHONHOME"] = python_package.path
+        res["QI_ADDITIONAL_SDK_PREFIXES"] = self.venv_path
         return res
 
     def _get_lib_paths(self):
