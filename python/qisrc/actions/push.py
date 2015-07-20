@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Push changes for review
+""" Push changes for review or to the server (deprecated)
 
 """
 import sys
@@ -32,6 +32,8 @@ def configure_parser(parser):
 
 def do(args):
     """ Main entry point """
+    ui.warning("qisrc push is deprecated, please use "
+               "`qisrc review` or `git push` instead")
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args)
     for git_project in git_projects:
