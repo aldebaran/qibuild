@@ -101,7 +101,7 @@ class CMakeBuilder(AbstractBuilder):
         write_qi_path_conf(self.build_worktree.dot_qi, qi_path_sdk_dirs, sdk_layout=False)
 
     def get_sdk_dirs_for_project(self, project):
-        sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build"])
+        sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "test"])
         # remove this when all qiproject.xml have been fixed
         strict_mode = os.environ.get("QIBUILD_STRICT_DEPS_RESOLUTION")
         if strict_mode:

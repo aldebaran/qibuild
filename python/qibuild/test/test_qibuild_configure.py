@@ -303,3 +303,11 @@ def test_bin_sdk(qibuild_action):
     qibuild_action.add_test_project("binsdk")
     qibuild_action.add_test_project("binsdkuser")
     qibuild_action("configure", "binsdkuser")
+
+def test_gtest(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("fakegtest")
+    qibuild_action.add_test_project("gtestuser")
+    qibuild_action("configure", "gtestuser")
+    qibuild_action("make", "gtestuser")
+    qibuild_action("install", "gtestuser", tmpdir.strpath)
+    assert not tmpdir.join("include", "fakegtest", "gtest.h").check(file=True)

@@ -1,0 +1,5 @@
+<project version="3">
+  <qibuild name="gtestuser">
+    <depends testtime="true" names="fakegtest" />
+ </qibuild>
+</project>
