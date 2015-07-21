@@ -1,0 +1,3 @@
+<project version="3">
+  <qipython name="testme" collect_tests="true" />
+</project>
