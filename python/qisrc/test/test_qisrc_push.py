@@ -64,3 +64,13 @@ def test_alert_maintainers(qisrc_action, git_server):
         qisrc_action("push", "foo")
     set_reviewers_args =  mocked_call.call_args_list[3][0][0][7]
     assert "jdoe@company.com" in set_reviewers_args
+
+def test_on_new_project(qisrc_action, git_server, tmpdir):
+    foo_repo = git_server.create_repo("foo.git")
+    foo_path = tmpdir.join("work").join("foo")
+    foo_path.ensure(dir=True)
+    git = qisrc.git.Git(foo_path.strpath)
+    git.clone(foo_repo.clone_url)
+    with qisys.sh.change_cwd(foo_path.strpath):
+        qisrc_action("push")
+    assert not foo_path.join("qiproject.xml").check(file=True)

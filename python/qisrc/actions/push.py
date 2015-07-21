@@ -35,23 +35,23 @@ def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args)
     for git_project in git_projects:
-        maintainers = qisrc.maintainers.get(git_project)
-        if not maintainers:
-            mess = """\
-The project in {src} has no maintainer.
-Please edit {qiproject_xml} to silence this warning
-"""
-            ui.warning(mess.format(src=git_project.src,
-                                   qiproject_xml=git_project.qiproject_xml),
-                                   end="")
-        reviewers = [x['email'] for x in maintainers]
-        reviewers.extend(args.reviewers or list())
         git = qisrc.git.Git(git_project.path)
         current_branch = git.get_current_branch()
         if not current_branch:
             ui.error("Not currently on any branch")
             sys.exit(2)
         if git_project.review:
+            maintainers = qisrc.maintainers.get(git_project)
+            if not maintainers:
+                mess = """\
+The project in {src} has no maintainer.
+Please edit {qiproject_xml} to silence this warning
+"""
+                ui.warning(mess.format(src=git_project.src,
+                                    qiproject_xml=git_project.qiproject_xml),
+                                    end="")
+            reviewers = [x['email'] for x in maintainers]
+            reviewers.extend(args.reviewers or list())
             qisrc.review.push(git_project, current_branch,
                               bypass_review=(not args.review),
                               dry_run=args.dry_run, reviewers=reviewers,
