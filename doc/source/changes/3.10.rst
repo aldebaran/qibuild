@@ -1,5 +1,16 @@
 v3.10
 ======
+qibuild
+--------
+
+* Include test dependencies in ``<build>/dependencies.cmake``
+  This allows you to declare ``gtest`` as a ``testtime`` dependency only.
+  (No need for it to be a ``buildtime`` dependency)
+
+qipy
+-----
+
+* ``qipy bootstrap``: prettier output
 
 qisrc
 -----
