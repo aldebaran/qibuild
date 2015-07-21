@@ -56,6 +56,15 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         """ The default config to use """
         return self.build_config.default_config
 
+    @property
+    def venv_path(self):
+        """ The virtualenv path associated with this worktree.
+        Only exists if ``qipy bootstrap`` has been called
+
+        """
+        config_name = self.build_config.build_directory(prefix="py")
+        return os.path.join(self.dot_qi, "venvs", config_name)
+
     def generate_sourceme(self):
         """ Generate a ``sourceme`` file to help running binaries using
         libraries from the build projects and the toolchain packages

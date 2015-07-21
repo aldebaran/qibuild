@@ -9,6 +9,7 @@ import qibuild.config
 
 from qibuild.test.conftest import TestBuildWorkTree
 from qitoolchain.test.conftest import toolchains
+from qipy.test.conftest import qipy_action
 
 import pytest
 
@@ -96,3 +97,10 @@ def test_set_pythonhome(toolchains, cd_to_tmpdir):
         assert env["PYTHONHOME"] == python_package.path + "/Python.framework/Versions/2.7"
     else:
         assert env["PYTHONHOME"] == python_package.path
+
+def test_venv_path(qipy_action):
+    qipy_action("bootstrap")
+    build_worktree = TestBuildWorkTree()
+    venv_path = build_worktree.venv_path
+    activate = os.path.join(venv_path, "bin", "activate")
+    assert os.path.exists(activate)
