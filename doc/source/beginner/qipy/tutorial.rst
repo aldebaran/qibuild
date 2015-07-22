@@ -185,3 +185,27 @@ Just use ``qipy run`` instead of ``python``
 If you have several commands to run, use something like
 ``source $(qipy sourceme -q)`` to activate the virtualenv in your
 current session.
+
+
+Step five: adding Python tests
+------------------------------
+
+It's recommended to use `pytest <http://pytest.org/latest/>`_ to run your
+tests.
+
+You can do something like
+
+.. code-block:: console
+
+    cd /path/to/project
+    qipy run -- py.test -- [OTHER py.test args]
+
+If you get a segmentation fault while running your tests
+(which can happen when you write C++ Python extensions),
+here is how to run ``pytest`` inside ``gdb``:
+
+.. code-block:: console
+
+    source $(qipy sourceme -q)
+    gdb /path/to/worktree/.qi/venv/py-<config>/bin/python
+    run -m pytest
