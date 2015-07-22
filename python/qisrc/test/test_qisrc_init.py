@@ -162,3 +162,12 @@ def test_relative_path(qisrc_action, tmpdir):
     git.commit("-m", "Initial commit")
     qisrc_action("init", os.path.relpath(tmpdir.strpath))
     assert os.path.isfile(os.path.join(".qi", "manifests", "default", "manifest.xml"))
+
+def test_using_checkout_after_no_review(qisrc_action, git_server):
+    git_server.create_repo("foo", review=True)
+    qisrc_action("init", git_server.manifest_url, "--no-review")
+    git_server.switch_manifest_branch("devel")
+    qisrc_action("checkout", "devel")
+    git_worktree = TestGitWorkTree()
+    foo = git_worktree.get_git_project("foo")
+    assert not foo.review

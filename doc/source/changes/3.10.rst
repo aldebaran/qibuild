@@ -30,6 +30,7 @@ qisrc
   (Previously you could run ``qisrc push --all``, but that was
   deemed to dangerous)
 * ``qisrc push`` displays reviewers before notifying them.
+* Fix using ``qisrc checkout`` after ``qisrc init --no-review``
 
 qitoolchain
 -----------

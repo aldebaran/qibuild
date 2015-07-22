@@ -132,11 +132,16 @@ class WorkTreeSyncer(object):
         qisys.qixml.write(xml, self.manifest_xml)
 
     def configure_manifest(self, url, branch="master", groups=None,
-                           ref=None, review=True, force=False):
+                           ref=None, review=None, force=False):
         """ Add a manifest to the list. Will be stored in
         .qi/manifests/<name>
 
         """
+        if review is None:
+            # not set explicitely by the user,
+            # (i.e not from qisrc init --no-review)
+            # read it from the config
+            review = self.manifest.review
         self.old_repos = self.get_old_repos()
         self.manifest.url = url
         self.manifest.groups = groups
@@ -145,6 +150,7 @@ class WorkTreeSyncer(object):
         self.manifest.review = review
         res = self.sync_repos(force=force)
         self.configure_projects()
+        self.dump_manifest()
         return res
 
     def read_remote_manifest(self, manifest_xml=None):
