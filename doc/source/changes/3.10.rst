@@ -16,10 +16,7 @@ qisrc
 -----
 
 * Fix using relative paths with ``qisrc init``
-* Depreciate ``qisrc push``. You should now use either:
-
-  * ``qisrc review`` if the project is under code review
-  * Just ``git push`` to push your changes to the remote server.
+* ``qisrc push``: warn when the project is not under code review
 
 qitoolchain
 -----------

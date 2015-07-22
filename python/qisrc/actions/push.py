@@ -32,8 +32,6 @@ def configure_parser(parser):
 
 def do(args):
     """ Main entry point """
-    ui.warning("qisrc push is deprecated, please use "
-               "`qisrc review` or `git push` instead")
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args)
     for git_project in git_projects:
@@ -54,4 +52,14 @@ def do(args):
             if args.dry_run:
                 git.push("-n")
             else:
-                git.push()
+                if args.review:
+                    mess = """\
+The project is not under code review.
+Are you sure you want to run `git push` ?
+This action cannot be undone\
+"""
+                    answer = qisys.interact.ask_yes_no(mess, default=False)
+                    if answer:
+                        git.push()
+                else:
+                    git.push()
