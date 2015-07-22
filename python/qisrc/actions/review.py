@@ -42,15 +42,7 @@ def do(args):
     if not current_branch:
         ui.error("Not currently on any branch")
         sys.exit(2)
-    maintainers = qisrc.maintainers.get(git_project)
-    if not maintainers:
-        mess = """\
-The project in {src} has no maintainer.
-Please edit {qiproject_xml} to silence this warning
-"""
-        ui.warning(mess.format(src=git_project.src,
-                                qiproject_xml=git_project.qiproject_xml),
-                                end="")
+    maintainers = qisrc.maintainers.get(git_project, warn_if_none=True)
     reviewers = [x['email'] for x in maintainers]
     reviewers.extend(args.reviewers or list())
     qisrc.review.push(git_project, current_branch,

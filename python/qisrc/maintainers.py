@@ -7,6 +7,7 @@
 import os
 from xml.etree import ElementTree as etree
 
+from qisys import ui
 import qisrc.git
 import qisys.qixml
 
@@ -50,10 +51,23 @@ def exists(project, name=None, email=None):
 
     return False
 
-def get(project):
+def get(project, warn_if_none=False):
     maintainers = list()
     project_xml = ProjectXML(maintainers)
     project_xml.parse(get_xml_root(project))
+    if not maintainers and warn_if_none:
+        mess = """\
+The project in {src} has no maintainer.
+Please add a <maintainer> tag in {qiproject_xml}
+to silence this warning, like this:
+
+<project version="3">
+  <maintainer email="EMAIL">NAME</maintainer>
+  ...
+"""
+        mess = mess.format(src=project.src, qiproject_xml=project.qiproject_xml)
+        ui.warning(mess, end="")
+
     return maintainers
 
 def remove(project, name=None, email=None):
