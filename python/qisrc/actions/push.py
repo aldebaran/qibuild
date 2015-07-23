@@ -46,6 +46,8 @@ Please edit {qiproject_xml} to silence this warning
                                    end="")
         reviewers = [x['email'] for x in maintainers]
         reviewers.extend(args.reviewers or list())
+        # Prefer gerrit logins or groups instead of e-mails
+        reviewers = [x.split("@")[0] for x in reviewers]
         git = qisrc.git.Git(git_project.path)
         current_branch = git.get_current_branch()
         if not current_branch:
