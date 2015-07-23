@@ -208,6 +208,83 @@ The contents of the ``.in`` files will be concatenated together by ``qidoc build
 That is, a ``conf.py`` file will be generated, containing first the contents of
 the file in the template project, then the contents of the file in the doc project.
 
+Translating sphinx documentation
+---------------------------------
+
+You can use ``qidoc`` to help you translate your documentation written with
+``Sphinx`` using ``sphinx-intl``.
+
+See `Sphinx documentation about internationalization
+<http://sphinx-doc.org/latest/intl.html>`_ for more information.
+
+First, edit the ``qiproject.xml`` to let ``qidoc`` know the list of languages
+you are going to support. For instance, to support French and Japanese:
+
+.. code-block:: xml
+
+    <project version="3">
+      <qidoc name="foo" type="sphinx">
+        <translate linguas="fr ja" />
+      </qidoc>
+    </project>
+
+Then, edit the ``conf.py`` (or ``conf.in.py``) to set ``locale_dirs``.
+
+.. code-block:: python
+
+    # in conf.py
+    locale_dirs = ["locale/"]
+
+    # in conf.in.py
+    locale_dirs = ["../source/locale"]
+
+Then, install ``sphinx-intl``
+
+.. code-block:: console
+
+    pip install sphinx-intl
+
+Lastly, run ``qidoc intl-update`` to generate the ``.pot`` and ``.po`` files.
+
+.. code-block:: console
+
+  qidoc intl-update
+
+
+You will end up with several ``.po`` files in ``source/locale/fr/LC_MESSAGES``
+that you can edit to start translating English strings into French.
+
+You can now build the French documentation by running
+
+.. code-block:: console
+
+  qidoc build --language fr
+
+This command will first generate the ``.mo`` files from the ``.po`` files,
+then build the documentation.
+
+The build output will be in ``/path/to/project/build-doc/html/fr``
+
+
+Running a spell checker
+-----------------------
+
+You can also use ``qidoc`` to check for spelling errors in your documentation
+using `sphinxcontrib.spelling
+<http://sphinxcontrib-spelling.readthedocs.org>`_
+
+Follow the installation guide in: `Installing sphinxcontrib.spelling
+<http://sphinxcontrib-spelling.readthedocs.org/en/latest/install.html>`_
+
+Then run
+
+.. code-block:: console
+
+  qidoc build --spellcheck
+
+You can specify a list of words to ignore in a ``spelling_wordlist.txt`` file
+in  the ``source`` directory.
+
 
 Troubleshooting
 ---------------
