@@ -45,6 +45,8 @@ def do(args):
     maintainers = qisrc.maintainers.get(git_project, warn_if_none=True)
     reviewers = [x['email'] for x in maintainers]
     reviewers.extend(args.reviewers or list())
+    # Prefer gerrit logins or groups instead of e-mails
+    reviewers = [x.split("@")[0] for x in reviewers]
     qisrc.review.push(git_project, current_branch,
                         bypass_review=(not args.review),
                         dry_run=args.dry_run, reviewers=reviewers,

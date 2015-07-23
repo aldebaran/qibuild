@@ -51,7 +51,8 @@ def test_alert_maintainers(qisrc_action, git_server):
     with mock.patch.object(qisys.command, "call") as mocked_call:
         qisrc_action("review", "foo")
     set_reviewers_args =  mocked_call.call_args_list[3][0][0][7]
-    assert "jdoe@company.com" in set_reviewers_args
+    assert "jdoe" in set_reviewers_args
+    assert not "@company.com" in set_reviewers_args
 
 def test_on_new_project(qisrc_action, git_server, tmpdir):
     foo_repo = git_server.create_repo("foo.git")
