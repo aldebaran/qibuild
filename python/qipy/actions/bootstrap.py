@@ -18,10 +18,16 @@ import qipy.worktree
 def configure_parser(parser):
     qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("requirements", nargs="*")
-    parser.set_defaults(requirements=["pip", "virtualenv", "ipython"])
+    parser.add_argument("--no-site-packages", action="store_false",
+                        dest="site_packages",
+                        help="Do not allow access to global `site-packages` "
+                             "directory")
+    parser.set_defaults(requirements=["pip", "virtualenv", "ipython"],
+                        site_packages=True)
 
 def do(args):
     python_builder = qipy.parsers.get_python_builder(args)
-    ok = python_builder.bootstrap(remote_packages=args.requirements)
+    ok = python_builder.bootstrap(remote_packages=args.requirements,
+                                  site_packages=args.site_packages)
     if not ok:
         sys.exit(1)

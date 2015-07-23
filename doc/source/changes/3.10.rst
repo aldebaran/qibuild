@@ -17,6 +17,7 @@ qipy
 -----
 
 * ``qipy bootstrap``: prettier output
+* ``qipy bootstrap``: add ``--no-site-packages``
 
 qisrc
 -----
