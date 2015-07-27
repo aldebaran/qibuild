@@ -19,6 +19,9 @@ qisrc
 * ``qisrc push``: When the project is not under code review,
   warn and ask the user if he is sure before running ``git push``.
   You can use the ``-y`` option to disable this check.
+* ``qisrc push`` can now only be used on one git project.
+  (Previously you could run ``qisrc push --all``, but that was
+  deemed to dangerous)
 
 qitoolchain
 -----------
