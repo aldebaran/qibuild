@@ -57,9 +57,9 @@ def ask_yes_no(question, default=False):
     """Ask the user to answer by yes or no"""
     while True:
         if default:
-            ui.info(ui.green, "::", ui.reset, question, " (Y/n)")
+            ui.info(ui.green, "::", ui.reset, question, "(Y/n)")
         else:
-            ui.info(ui.green, "::", ui.reset, question, " (y/N)")
+            ui.info(ui.green, "::", ui.reset, question, "(y/N)")
         answer = read_input()
         if answer.lower() in ["y", "yes"]:
             return True
