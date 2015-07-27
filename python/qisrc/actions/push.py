@@ -33,33 +33,32 @@ def configure_parser(parser):
 def do(args):
     """ Main entry point """
     git_worktree = qisrc.parsers.get_git_worktree(args)
-    git_projects = qisrc.parsers.get_git_projects(git_worktree, args)
-    for git_project in git_projects:
-        git = qisrc.git.Git(git_project.path)
-        current_branch = git.get_current_branch()
-        if not current_branch:
-            ui.error("Not currently on any branch")
-            sys.exit(2)
-        if git_project.review:
-            maintainers = qisrc.maintainers.get(git_project, warn_if_none=True)
-            reviewers = [x['email'] for x in maintainers]
-            reviewers.extend(args.reviewers or list())
-            qisrc.review.push(git_project, current_branch,
-                              bypass_review=(not args.review),
-                              dry_run=args.dry_run, reviewers=reviewers,
-                              topic=args.topic)
+    git_project = qisrc.parsers.get_one_git_project(git_worktree, args)
+    git = qisrc.git.Git(git_project.path)
+    current_branch = git.get_current_branch()
+    if not current_branch:
+        ui.error("Not currently on any branch")
+        sys.exit(2)
+    if git_project.review:
+        maintainers = qisrc.maintainers.get(git_project, warn_if_none=True)
+        reviewers = [x['email'] for x in maintainers]
+        reviewers.extend(args.reviewers or list())
+        qisrc.review.push(git_project, current_branch,
+                            bypass_review=(not args.review),
+                            dry_run=args.dry_run, reviewers=reviewers,
+                            topic=args.topic)
+    else:
+        if args.dry_run:
+            git.push("-n")
         else:
-            if args.dry_run:
-                git.push("-n")
-            else:
-                if args.review:
-                    mess = """\
+            if args.review:
+                mess = """\
 The project is not under code review.
 Are you sure you want to run `git push` ?
 This action cannot be undone\
 """
-                    answer = qisys.interact.ask_yes_no(mess, default=False)
-                    if answer:
-                        git.push()
-                else:
+                answer = qisys.interact.ask_yes_no(mess, default=False)
+                if answer:
                     git.push()
+            else:
+                git.push()
