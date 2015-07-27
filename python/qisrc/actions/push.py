@@ -27,7 +27,9 @@ def configure_parser(parser):
              "if the domain is the same as yours)")
     parser.add_argument("-t", "--topic", dest="topic",
         help="Add a topic to your code review. Useful for grouping patches together")
-    parser.set_defaults(review=True, dry_run=False)
+    parser.add_argument("-y", action="store_true", dest="yes",
+        help="Push even if the project is not under code review. Default is to ask")
+    parser.set_defaults(review=True, dry_run=False, yes=False)
 
 
 def do(args):
@@ -51,7 +53,7 @@ def do(args):
         if args.dry_run:
             git.push("-n")
         else:
-            if args.review:
+            if args.review and not args.yes:
                 mess = """\
 The project is not under code review.
 Are you sure you want to run `git push` ?

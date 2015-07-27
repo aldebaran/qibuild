@@ -38,6 +38,18 @@ def test_not_under_code_review_with_no_review(qisrc_action, git_server):
     (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
     assert remote == "%s\trefs/heads/master" % sha1
 
+def test_using_dash_y(qisrc_action, git_server):
+    foo_repo = git_server.create_repo("foo.git")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    foo_git = TestGit(foo_proj.path)
+    foo_git.commit_file("a.txt", "a")
+    qisrc_action("push",  "foo", "-y")
+    _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
+    (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
+    assert remote == "%s\trefs/heads/master" % sha1
+
 def test_on_new_project(qisrc_action, git_server, tmpdir):
     foo_repo = git_server.create_repo("foo.git")
     foo_path = tmpdir.join("work").join("foo")
