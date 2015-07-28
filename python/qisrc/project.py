@@ -137,7 +137,9 @@ class GitProject(object):
         self.remotes = list()
         for remote in repo.remotes:
             self.configure_remote(remote)
-        if repo.default_branch and repo.default_remote:
+        if repo.fixed_ref:
+            self.configure_branch(repo.default_branch, tracks=None, quiet=quiet)
+        elif repo.default_branch and repo.default_remote:
             self.configure_branch(repo.default_branch, tracks=repo.default_remote.name,
                                   remote_branch=repo.default_branch, default=True,
                                   quiet=quiet)
@@ -221,8 +223,9 @@ class GitProject(object):
         for remote in self.remotes:
             git.set_remote(remote.name, remote.url)
         for branch in self.branches:
-            git.set_tracking_branch(branch.name, branch.tracks,
-                                    remote_branch=branch.remote_branch)
+            if branch.tracks:
+                git.set_tracking_branch(branch.name, branch.tracks,
+                                        remote_branch=branch.remote_branch)
 
     def __deepcopy__(self, memo):
         shallow_copy = copy.copy(self)

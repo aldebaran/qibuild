@@ -113,7 +113,7 @@ def print_state(project, max_len):
             ui.info(ui.green, "*", ui.reset,
                     ui.blue, project.project.src.ljust(max_len), ui.reset,
                     ui.green, ":", project.current_branch,
-                        "tracking", project.tracking)
+                    "tracking " + project.tracking if project.tracking else "")
         if project.ahead_manifest or project.behind_manifest:
             numcommits = _print_behind_ahead(project.behind_manifest, project.ahead_manifest)
             ui.info(ui.bold, "Your branch", ui.green, project.current_branch,

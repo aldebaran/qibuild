@@ -321,6 +321,23 @@ def test_multiple_remotes(tmpdir):
     foo = manifest.repos[0]
     assert len(foo.remotes) == 2
 
+def test_tag_attribute(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="foo/bar.git" ref="v4.6.5.0" remotes="origin" />
+  <repo project="foo/baz.git" remotes="origin" />
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert len(manifest.repos) == 2
+    bar = manifest.repos[0]
+    baz = manifest.repos[1]
+    assert bar.default_branch == "v4.6.5.0"
+    assert bar.fixed_ref
+    assert not baz.fixed_ref
+
 def test_from_git_repo(git_server):
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")

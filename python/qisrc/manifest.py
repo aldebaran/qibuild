@@ -218,6 +218,7 @@ class RepoConfig(object):
         self.project = None
         self.default_branch = None
         self.default_remote_name = None
+        self.fixed_ref = False
         self.remotes = list()
         self.remote_names = None
 
@@ -327,6 +328,11 @@ class RepoConfigParser(qisys.qixml.XMLParser):
         self.target.src = src
 
         self.target.default_branch = self._root.get("branch")
+        if self._root.get("ref"):
+            if self.target.default_branch:
+                raise ManifestError("Specify either 'branch' or 'ref', but not both")
+            self.target.default_branch = self._root.get("ref")
+            self.target.fixed_ref = True
         remote_names = self._root.get("remotes")
         if remote_names is None:
             raise ManifestError("Missing 'remotes' attribute")
