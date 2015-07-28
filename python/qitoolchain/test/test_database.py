@@ -1,4 +1,5 @@
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+from qisrc.test.conftest import svn_server
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import mock
@@ -7,7 +8,10 @@ import os
 
 import qitoolchain.database
 import qitoolchain.qipackage
+import qitoolchain.svn_package
 import qitoolchain.feed
+
+from qisrc.test.conftest import svn_server
 
 def test_persistent(toolchain_db):
     foo_package = qitoolchain.qipackage.QiPackage("foo", version="1.3")
@@ -89,3 +93,18 @@ def test_solve_deps(toolchain_db, tmpdir):
     toolchain_db.add_package(foo_package)
     res = toolchain_db.solve_deps([bar_package], dep_types=["build"])
     assert res == [foo_package, bar_package]
+
+def test_svn_package_conflict(toolchain_db, feed, svn_server):
+    boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")
+    feed.add_package(boost_package)
+
+    toolchain = qitoolchain.toolchain.Toolchain("foo")
+    toolchain.update(feed.url)
+
+    boost_url = svn_server.create_repo("boost")
+    svn_server.commit_file("boost", "version.hpp", '#define BOOST_VERSION "1_55"\n')
+    svn_package = qitoolchain.svn_package.SvnPackage("boost")
+    svn_package.url = boost_url
+    feed.add_svn_package(svn_package)
+
+    toolchain.update(feed.url)
