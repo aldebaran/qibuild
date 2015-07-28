@@ -2,9 +2,10 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-"""Handling maintainers in git notes."""
+"""Handling maintainers in qiproject.xml files"""
 
 import os
+import locale
 from xml.etree import ElementTree as etree
 
 from qisys import ui
@@ -96,6 +97,9 @@ def clear(project):
 def add(project, name=None, email=None):
     if exists(project, name=name, email=email):
         return
+    encoding = locale.getpreferredencoding()
+    name = name.decode(encoding)
+    email = email.decode(encoding)
     tree = get_xml_tree(project)
     root = tree.getroot()
     maint_elem = etree.Element("maintainer")

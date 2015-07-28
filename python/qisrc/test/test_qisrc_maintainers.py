@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
@@ -33,3 +35,7 @@ def test_remove_maintainer(qisrc_action, interact):
     qisrc_action.chdir("foo")
     qisrc_action("maintainers", "--remove")
     assert not qisrc.maintainers.get(foo)
+
+def test_utf8(qisrc_action):
+    foo = qisrc_action.worktree.create_project("foo")
+    qisrc.maintainers.add(foo, name="Noé", email="noe@ark.com")
