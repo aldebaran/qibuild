@@ -143,6 +143,10 @@ class DataBase(object):
                                   if x.name == local_package.name][0]
                 to_update.append(remote_package)
 
+        # remove svn packages from the list of packages to update
+        to_update = [x for x in to_update
+                        if not isinstance(x, qitoolchain.svn_package.SvnPackage)]
+
         if to_update:
             ui.info(ui.red, "Updating packages")
         for i, package in enumerate(to_update):
