@@ -27,8 +27,11 @@ function(qi_generate_qt_conf)
         OR "${_lib}" STREQUAL "general")
       list(GET QT5_CORE_LIBRARIES 1 _lib)
     endif()
-
-    get_target_property(_lib_loc ${_lib} LOCATION)
+    if(TARGET ${_lib})
+      get_target_property(_lib_loc ${_lib} LOCATION)
+    else()
+      set(_lib_loc ${_lib})
+    endif()
     get_filename_component(_lib_path ${_lib_loc} PATH)
     if(APPLE)
       # location is: <prefix>/lib/QtCore.framework/QtCore
