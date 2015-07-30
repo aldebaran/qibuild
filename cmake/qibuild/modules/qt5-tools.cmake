@@ -12,10 +12,8 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt5Core REQUIRED)
 include("${Qt5Core_DIR}/Qt5CoreMacros.cmake")
 
-find_package(Qt5Widgets QUIET)
-if(Qt5Widgets_FOUND)
-  include("${Qt5Widgets_DIR}/Qt5WidgetsMacros.cmake")
-endif()
+set(_qt5_widggets_dir ${Qt5Core_DIR}/../Qt5Widgets)
+include("${_qt5_widggets_dir}/Qt5WidgetsMacros.cmake" OPTIONAL)
 
 function(qi_generate_qt_conf)
   # First, find qt and generate qt.conf
