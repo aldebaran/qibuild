@@ -4,6 +4,8 @@
 """ List the contents of a package """
 
 import zipfile
+
+from qisys import ui
 import qisys.parsers
 
 def configure_parser(parser):
@@ -14,4 +16,4 @@ def do(args):
     pkg_path = args.pkg_path
     archive = zipfile.ZipFile(pkg_path)
     for fileinfo in archive.infolist():
-        print fileinfo.filename
+        ui.info(fileinfo.filename)

@@ -2,13 +2,24 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import os
+import sys
 
 import qisys.command
 import qisys.qixml
 from qisys.qixml import etree
+import qipkg.builder
 import qipkg.package
 
+from qibuild.test.test_qibuild_deploy import get_ssh_url
+
+import mock
 import pytest
+
+def test_ls_package(qipkg_action, record_messages):
+    pkg_path = os.path.join(os.path.dirname(__file__), "projects", "python_services.pkg")
+    qipkg_action("ls-package", pkg_path)
+    assert record_messages.find("lib/my_service.py")
+    assert record_messages.find("manifest.xml")
 
 def test_make_package(qipkg_action, qipy_action):
     tmpdir = qipy_action.worktree.tmpdir
@@ -191,3 +202,62 @@ def test_qipkg_no_such_project(qipkg_action, tmpdir):
     error = qipkg_action("make-package", pml_path, raises=True)
     assert "No such python project: foo" in error
     assert pml_path in error
+
+def test_bump_version(qipkg_action):
+    d_proj = qipkg_action.add_test_project("d_pkg")
+    manifest_xml = os.path.join(d_proj.path, "manifest.xml")
+    name = qipkg.builder.pkg_name(manifest_xml)
+    assert name == "d-0.1"
+    qipkg_action("bump-version", manifest_xml)
+    name = qipkg.builder.pkg_name(manifest_xml)
+    assert name == "d-0.2"
+    qipkg_action("bump-version", manifest_xml, "2.0")
+    name = qipkg.builder.pkg_name(manifest_xml)
+    assert name == "d-2.0"
+
+def test_install(qipkg_action, tmpdir):
+    d_proj = qipkg_action.add_test_project("d_pkg")
+    pml = os.path.join(d_proj.path, "d_pkg.pml")
+    url = get_ssh_url(tmpdir)
+    qipkg_action("install", pml, tmpdir.strpath)
+    assert tmpdir.join("manifest.xml").check(file=True)
+
+def test_deploy(qipkg_action, tmpdir):
+    d_proj = qipkg_action.add_test_project("d_pkg")
+    pml = os.path.join(d_proj.path, "d_pkg.pml")
+    url = get_ssh_url(tmpdir)
+    qipkg_action("deploy", pml, "--url", url)
+
+    assert tmpdir.join("manifest.xml").check(file=True)
+
+def test_deploy_package(qipkg_action, tmpdir, record_messages):
+    d_proj = qipkg_action.add_test_project("d_pkg")
+    pml_path = os.path.join(d_proj.path, "d_pkg.pml")
+    d_package = qipkg_action("make-package", pml_path)
+    url = get_ssh_url(tmpdir)
+    parsed = qisys.remote.URL(url)
+    username = parsed.user
+
+    fake_qi = mock.Mock()
+    fake_qi.Application = mock.Mock()
+    fake_app = mock.Mock()
+    fake_qi.Application.return_value = fake_app
+    session = fake_qi.Session()
+    mock_connect = session.connect
+    fake_pm = mock.Mock()
+    session.service.return_value = fake_pm
+    remove_mock = fake_pm.removePkg
+    install_mock = fake_pm.install
+    install_mock.return_value = True
+
+    sys.modules["qi"] = fake_qi
+
+    record_messages.reset()
+    qipkg_action("deploy-package", d_package, "--url", url)
+
+    assert mock_connect.call_args_list == [mock.call("tcp://localhost:9559")]
+    assert session.service.call_args_list == [mock.call("PackageManager")]
+    assert remove_mock.call_args_list == [mock.call("d")]
+    assert install_mock.call_args_list == [mock.call("/home/%s/d-0.1.pkg" % username)]
+
+    assert record_messages.find("PackageManager returned: True")
