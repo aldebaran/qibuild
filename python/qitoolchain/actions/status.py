@@ -3,7 +3,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-"""Display the toolchains status their names, and what projects they provide
+"""Deprecated : Use `qitoolchain list` or `qitoolchain info`
 
 """
 
