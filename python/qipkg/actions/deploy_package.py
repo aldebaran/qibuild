@@ -58,4 +58,4 @@ def _install_package(url, pkg_name, pkg_path):
         pass
     ret = package_manager.install(
             "/home/%s/%s" % (url.user, os.path.basename(pkg_path)))
-    ui.info("PackageManager returned: ", ret)
+    ui.info("PackageManager returned:", ret)
