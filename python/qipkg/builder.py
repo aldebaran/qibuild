@@ -167,6 +167,7 @@ class PMLBuilder(object):
 
     def install(self, destination):
         """ Install every project to the given destination """
+        qisys.sh.mkdir(destination, recursive=True)
         # Copy the manifest
         qisys.sh.install(self.manifest_xml, destination)
 
