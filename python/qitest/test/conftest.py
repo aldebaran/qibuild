@@ -36,3 +36,13 @@ def qitest_action(cd_to_tmpdir):
 class QiTestAction(TestAction):
     def __init__(self):
         super(QiTestAction, self).__init__("qitest.actions")
+        self.worktree = TestWorkTree()
+
+    def add_test_project(self, src):
+        this_dir = os.path.dirname(__file__)
+        src_path = os.path.join(this_dir, "projects", src)
+        dest_path = os.path.join(self.worktree.root, src)
+        qisys.sh.copy_git_src(src_path, dest_path)
+        worktree_project = self.worktree.add_project(src)
+
+        return worktree_project
