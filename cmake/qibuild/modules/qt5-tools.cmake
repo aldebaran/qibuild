@@ -54,14 +54,16 @@ function(qi_generate_qt_conf)
 
   file(WRITE "${QI_SDK_DIR}/${QI_SDK_BIN}/qt.conf"
 "[Paths]
-Prefix = ${_root_path}
+Plugins = ${_root_path}/plugins
+Qml2Imports = ${_root_path}/qml
 ")
 
   # Then, generate and install a qt.conf
   # containing relative paths
   file(WRITE "${CMAKE_BINARY_DIR}/qt.conf"
 "[Paths]
-Prefix = ..
+Plugins = ../plugins
+Qml2Imports = ../qml
 ")
   install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION bin COMPONENT runtime)
 
