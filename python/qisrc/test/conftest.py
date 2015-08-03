@@ -244,6 +244,15 @@ class TestGitServer(object):
         else:
             git.push("origin", "--force", "%s:%s" % (branch, branch))
 
+    def delete_file(self, project, filename):
+        """ Delete a file from the repository """
+        src = project.replace(".git", "")
+        repo_src = self.src.join(src)
+        git = qisrc.git.Git(repo_src.strpath)
+        git.call("rm", filename)
+        git.commit("--message", "remove %s" % filename)
+        git.push("origin", "master:master")
+
 
 class TestGit(qisrc.git.Git):
     """ the Git class with a few other helpful methods """

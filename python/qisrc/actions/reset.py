@@ -55,7 +55,6 @@ def do(args):
             ui.warning(message)
             errors.append(src)
             continue
-        git.checkout(".")
         if not git_project.default_branch:
             ui.warning(git_project.src, "not in any manifest, skipping")
             continue
