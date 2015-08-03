@@ -28,3 +28,8 @@ qitoolchain
 
 * ``qitoolchain convert-package``: Properly raises an ``NotImplementedError``
   when used with an ``.rpm`` file
+
+cmake
+-----
+
+* Add ``Qt5Svg``
