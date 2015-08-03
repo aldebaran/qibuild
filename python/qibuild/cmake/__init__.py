@@ -60,7 +60,16 @@ Please install it if necessary and re-run `qibuild config --wizard`\
     for line in to_parse.splitlines():
         generator = line.split("=")[0]
         res.append(generator.strip())
-    return res
+    # Fix Visual Studio generators:
+    fixed_list = list()
+    for generator in res:
+        if "Visual Studio" in generator and "[arch]" in generator:
+            fixed_list.append(generator.replace(" [arch]", ""))
+            fixed_list.append(generator.replace("[arch]", "Win64"))
+            fixed_list.append(generator.replace("[arch]", "ARM"))
+        else:
+            fixed_list.append(generator)
+    return fixed_list
 
 def get_cached_var(build_dir, var, default=None):
     """Get a variable from cmake cache

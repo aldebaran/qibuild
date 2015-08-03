@@ -5,6 +5,7 @@
 import os
 import py
 import pytest
+import mock
 
 import qibuild.cmake
 
@@ -67,3 +68,52 @@ find_package(qibuild)
     with pytest.raises(qibuild.cmake.IncorrectCMakeLists) as e:
         qibuild.cmake.check_root_cmake_list(cmake_list.strpath)
     assert "Missing call to project()" in e.value.message
+
+
+def test_get_known_generators():
+    with mock.patch("subprocess.Popen") as mock_popen:
+        mock_process = mock.Mock()
+        mock_popen.return_value =  mock_process
+        mock_process.communicate.return_value = ("""
+Usage
+
+    cmake [options] <path-to-source>
+    cmake [options] <path-to-existing-build>
+
+Options
+
+Generators
+
+The following generators are available on this platform:
+  Unix Makefiles              = Generates standard UNIX makefiles.
+  Ninja                       = Generates build.ninja files (experimental).
+  Sublime Text 2 - Unix Makefiles
+                              = Generates Sublime Text 2 project files.
+""", "")
+        res = qibuild.cmake.get_known_cmake_generators()
+        call_args_list = mock_popen.call_args_list
+        assert "cmake" in call_args_list[0][0][0][0]
+        assert "--help" == call_args_list[0][0][0][1]
+        assert mock_process.communicate.call_args_list == [mock.call()]
+        assert res == ["Unix Makefiles", "Ninja", "Sublime Text 2 - Unix Makefiles"]
+
+def test_generators_on_windows_cmake_3_3():
+    with mock.patch("subprocess.Popen") as mock_popen:
+        mock_process = mock.Mock()
+        mock_popen.return_value =  mock_process
+        mock_process.communicate.return_value = ("""
+The following generators are available on this platform:
+  Visual Studio 14 2015 [arch] = Generates Visual Studio 2015 project files
+                                 Optional [arch] can be "Win64" or "ARM".
+  Visual Studio 12 2013 [arch] = Generates Visual Studio 2013 project files
+                                 Optional [arch] can be "Win64" or "ARM".
+  Borland Makefiles            = Generates Borland makefiles.
+""", "")
+        res = qibuild.cmake.get_known_cmake_generators()
+        assert res == ["Visual Studio 14 2015",
+                       "Visual Studio 14 2015 Win64",
+                       "Visual Studio 14 2015 ARM",
+                       "Visual Studio 12 2013",
+                       "Visual Studio 12 2013 Win64",
+                       "Visual Studio 12 2013 ARM",
+                       "Borland Makefiles"]
