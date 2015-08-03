@@ -7,6 +7,12 @@ qibuild
   This allows you to declare ``gtest`` as a ``testtime`` dependency only.
   (No need for it to be a ``buildtime`` dependency)
 
+qidoc
+-----
+
+* Add support for translating ``sphinx`` doc projects. See :ref:`qidoc-tutorial`
+  for details.
+
 qipy
 -----
 
