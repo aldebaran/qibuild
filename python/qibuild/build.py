@@ -51,15 +51,6 @@ def msbuild(sln_file, build_type="Debug", target=None, num_jobs=None):
 
     qisys.command.call(cmd)
 
-def num_jobs_to_args(num_jobs, cmake_generator):
-    """ Convert a number of jobs to a list of cmake args
-
-    """
-    if num_jobs is None:
-        return list()
-    else:
-        return ["-j", str(num_jobs)]
-
 class BuildFailed(Exception):
     def __init__(self, project):
         self.project = project
