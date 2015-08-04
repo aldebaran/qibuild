@@ -39,3 +39,4 @@ cmake
 -----
 
 * Add ``Qt5Svg``
+* ``qt5-tools``: fix some bugs occurring during cross-compilation
