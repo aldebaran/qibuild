@@ -1,0 +1,8 @@
+v3.9.2
+=======
+
+qitoolchain
+-----------
+
+* Fix bug when a package is both listed as a normal package and as a
+  subversion package in the feed.
