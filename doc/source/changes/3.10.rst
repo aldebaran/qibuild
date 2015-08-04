@@ -34,6 +34,8 @@ qitoolchain
 
 * ``qitoolchain convert-package``: Properly raises an ``NotImplementedError``
   when used with an ``.rpm`` file
+* Fix bug when a package is both listed as a normal package and as a
+  subversion package in the feed.
 
 cmake
 -----
