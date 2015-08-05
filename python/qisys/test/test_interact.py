@@ -2,12 +2,12 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import sys
+
 import qisys.interact
 from qisys.test.fake_interact import FakeInteract
 
 import mock
-
-
 
 def test_ask_yes_no():
     """ Test that you can answer with several types of common answers """
@@ -31,6 +31,40 @@ def test_ask_yes_no_wrong_input():
         m.side_effect = ["coffee!", "n"]
         assert qisys.interact.ask_yes_no("tea?") is False
         assert m.call_count == 2
+
+def test_ask_string():
+    with mock.patch('__builtin__.raw_input') as m:
+        m.side_effect = ["sugar!", ""]
+        res = qisys.interact.ask_string("coffee with what?")
+        assert res == "sugar!"
+        res = qisys.interact.ask_string("coffee with what?", default="milk")
+        assert res == "milk"
+
+def test_ask_program(record_messages):
+    with mock.patch('__builtin__.raw_input') as m:
+        m.side_effect = ["doesnotexists", "y",  __file__, "y", sys.executable]
+        res = qisys.interact.ask_program("path to program")
+        assert res == qisys.sh.to_native_path(sys.executable)
+        assert record_messages.find("does not exist")
+        assert record_messages.find("is not a valid executable")
+
+def test_get_editor_visual(monkeypatch):
+    monkeypatch.setenv("VISUAL", "/usr/bin/vim")
+    assert qisys.interact.get_editor() == "/usr/bin/vim"
+
+def test_get_editor_editor(monkeypatch):
+    monkeypatch.delenv("VISUAL", raising=False)
+    monkeypatch.setenv("EDITOR", "/usr/bin/vim")
+    assert qisys.interact.get_editor() == "/usr/bin/vim"
+
+def test_get_editor_ask(monkeypatch):
+    monkeypatch.delenv("VISUAL", raising=False)
+    monkeypatch.delenv("EDITOR", raising=False)
+    with mock.patch('__builtin__.raw_input') as m:
+        m.side_effect = ["/usr/bin/vim"]
+        res = qisys.interact.get_editor()
+        assert res == qisys.sh.to_native_path("/usr/bin/vim")
+        assert m.called
 
 def test_fake_interact_list():
     fake_interact = FakeInteract()
