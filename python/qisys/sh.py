@@ -681,3 +681,27 @@ def is_executable_binary(file_path):
     if not os.access(file_path, os.X_OK):
         return False
     return is_binary(file_path)
+
+class PreserveFileMetadata(object):
+    """ Preserve file metadata (permissions and times)
+
+    """
+    def __init__(self, path):
+        """ Preserve file metadata of 'path'
+        """
+        self.path = path
+        self.time = None
+        self.mode = None
+
+    def __enter__(self):
+        """ Enter method saving metadata
+        """
+        st = os.stat(self.path)
+        self.time = (st.st_atime, st.st_mtime)
+        self.mode = st.st_mode
+
+    def __exit__(self, type, value, tb):
+        """ Exit method restoring metadata
+        """
+        os.chmod(self.path, self.mode)
+        os.utime(self.path, self.time)
