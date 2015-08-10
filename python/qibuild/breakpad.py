@@ -35,8 +35,11 @@ def is_exe(filename):
 
 def can_be_dumped(filename):
     """" Check that symbols can be dumped from the given file """
-    # File must be writable by the user:
-    st = os.stat(filename)
+    st = os.lstat(filename)
+    # File must be a regular file
+    if not stat.S_ISREG(st.st_mode):
+        return False
+    # File must be writable by the user
     if not bool(st.st_mode & stat.S_IWUSR):
         return False
     # File must be an executable
