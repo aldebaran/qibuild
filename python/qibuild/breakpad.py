@@ -40,7 +40,8 @@ def can_be_dumped(filename):
     if not stat.S_ISREG(st.st_mode):
         return False
     # File must be writable by the user
-    if not bool(st.st_mode & stat.S_IWUSR):
+    # or we should have enough privileges to alter its permissions:
+    if not bool(st.st_mode & stat.S_IWUSR) and not os.getuid() == 0:
         return False
     # File must be an executable
     if sys.platform.startswith("linux"):
@@ -63,8 +64,11 @@ def dump_symbols_from_binary(binary, pool_dir):
     else:
         cmd = [dump_syms, binary]
     ui.debug(cmd)
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+    with qisys.sh.PreserveFileMetadata(binary):
+        mode_rw = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
+        os.chmod(binary, mode_rw)
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
 
     dump_ok = True
     (out, err) = process.communicate()
@@ -106,7 +110,10 @@ def strip_binary(binary, strip_executable=None, strip_args=None):
     if strip_args:
         cmd.extend(strip_args)
     cmd.append(binary)
-    rc = qisys.command.call(cmd, ignore_ret_code=True)
+    with qisys.sh.PreserveFileMetadata(binary):
+        mode_rw = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
+        os.chmod(binary, mode_rw)
+        rc = qisys.command.call(cmd, ignore_ret_code=True)
     if rc != 0:
         ui.warning("Failed to strip symbols for", binary)
 
