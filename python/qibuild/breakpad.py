@@ -138,12 +138,12 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True):
                     strip_binary(full_path, strip_args=strip_args)
     return pool_dir
 
-def gen_symbol_archive(base_dir=None, output=None):
+def gen_symbol_archive(base_dir=None, output=None, strip=True):
     """ Generate a symbol archive from all the
     binaries in the base_dir
 
     """
     with qisys.sh.TempDir() as pool_dir:
-        dump_symbols_from_directory(base_dir, pool_dir)
+        dump_symbols_from_directory(base_dir, pool_dir, strip=strip)
         qisys.archive.compress(pool_dir, output=output, flat=True)
     return output
