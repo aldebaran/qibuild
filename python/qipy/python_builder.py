@@ -67,8 +67,8 @@ class PythonBuilder(AbstractBuilder):
         to_write="""\
 #!/bin/bash
 SDK_DIR=$(dirname "$(readlink -f $0 2>/dev/null)")
-export LD_LIBRARY_PATH=${SDK_DIR}/lib
-export PYTHONPATH=${SDK_DIR}/lib/python2.7/site-packages/
+export LD_LIBRARY_PATH="${SDK_DIR}/lib:${LD_LIBRARY_PATH}"
+export PYTHONPATH="${SDK_DIR}/lib/python2.7/site-packages/:${PYTHONPATH}"
 exec python "$@"
 """
         python_wrapper = os.path.join(dest, "python")
