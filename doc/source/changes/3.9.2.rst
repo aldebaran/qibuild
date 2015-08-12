@@ -1,6 +1,11 @@
 v3.9.2
 =======
 
+qipkg
+------
+
+* Fix generated ``python`` script at the root of the package
+
 qitoolchain
 -----------
 
