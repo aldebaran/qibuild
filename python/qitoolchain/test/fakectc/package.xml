@@ -1,0 +1,1 @@
+<package name="ctc" toolchain_file="fake.cmake" sysroot="sysroot" />

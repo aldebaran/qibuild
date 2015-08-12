@@ -1,7 +1,9 @@
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
 import os
+import re
 
 import qisys.archive
 import qitoolchain
@@ -39,3 +41,26 @@ def test_legacy_happy_path(tmpdir, qitoolchain_action):
     world_package = tc.get_package("world")
     assert os.path.exists(os.path.join(world_package.path, "include", "world.h"))
     assert os.path.exists(os.path.join(world_package.path, "lib", "libworld.so"))
+
+def test_flags_package(tmpdir, qitoolchain_action):
+    qitoolchain_action("create", "foo")
+    c11_flags = tmpdir.mkdir("c++11-flags")
+    c11_flags.join("config.cmake").write("""
+set(CMAKE_CXX_FLAGS "-std=gnu++11")
+""")
+    c11_flags.join("package.xml").write("""
+<package name="c++11-flags" toolchain_file="config.cmake" />
+""")
+    flags_package = tmpdir.join("c++11-flags.zip")
+    qisys.archive.compress(c11_flags.strpath, output=flags_package.strpath, flat=True)
+    qitoolchain_action("add-package", "--toolchain", "foo", flags_package.strpath)
+    foo_toolchain = qitoolchain.get_toolchain("foo")
+    tc_file = foo_toolchain.toolchain_file
+    with open(tc_file, "r") as fp:
+        contents = fp.read()
+    included_file = None
+    for line in contents.splitlines():
+        match = re.match('include\("(.*)"\)', line)
+        if match:
+            included_file = match.groups()[0]
+    assert os.path.exists(included_file)

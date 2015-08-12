@@ -40,15 +40,20 @@ def test_add_local_ctc(tmpdir):
     toolchain_xml.write("""
 <toolchain>
   <package name="ctc"
-           cross_gdb="cross/bin/i686-linux-gnu-gdb"
-           sysroot="sysroot"
-           toolchain_file="cross-config.cmake"
            directory="."
   />
   <package name="boost" directory="boost" />
 </toolchain>
 """)
     toolchain = qitoolchain.toolchain.Toolchain("bar")
+    package_xml = ctc.join("package.xml")
+    package_xml.write("""
+<package name="ctc"
+         cross_gdb="cross/bin/i686-linux-gnu-gdb"
+         sysroot="sysroot"
+         toolchain_file="cross-config.cmake"
+/>
+""")
     toolchain.update(toolchain_xml.strpath)
     tc_contents = get_tc_file_contents(toolchain)
     ctc_path = toolchain.db.get_package_path("ctc")

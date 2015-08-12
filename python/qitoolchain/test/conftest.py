@@ -54,7 +54,6 @@ class TestFeed():
         self.feed_xml = tmp.join("feed.xml")
         self.feed_xml.write("<toolchain/>")
         self.url = "file://" + self.feed_xml.strpath
-        self.db = qitoolchain.database.DataBase("bar", self.feed_xml.strpath)
 
     def add_package(self, package, with_path=True, with_url=True):
         this_dir = os.path.dirname(__file__)
@@ -64,7 +63,7 @@ class TestFeed():
         package_path.ensure("include", "%s.h" % package.name, file=True)
         package_xml = package_path.join("package.xml")
         package_xml.write("""
-<package name=%s version=%s />
+<package name="%s" version="%s" />
 """ % (package.name, package.version))
         archive_name = "%s-%s" % (package.name, package.version)
         output = package_path.join(archive_name + ".zip")
@@ -76,8 +75,11 @@ class TestFeed():
         if with_url:
             base_url = self.url.replace("feed.xml", "")
             package.url = base_url + "/packages/%s.zip" % archive_name
-        self.db.add_package(package)
-        self.db.save()
+        tree = qisys.qixml.read(self.feed_xml.strpath)
+        root = tree.getroot()
+        package_elem = package.to_xml()
+        root.append(package_elem)
+        qisys.qixml.write(tree, self.feed_xml.strpath)
         return package
 
     def add_svn_package(self, package):
@@ -91,8 +93,12 @@ class TestFeed():
         qisys.qixml.write(tree, self.feed_xml.strpath)
 
     def remove_package(self, name):
-        self.db.remove_package(name)
-        self.db.save()
+        tree = qisys.qixml.read(self.feed_xml.strpath)
+        root = tree.getroot()
+        for elem in root.findall("package"):
+            if elem.get("name") == name:
+                root.remove(elem)
+        qisys.qixml.write(tree, self.feed_xml.strpath)
 
 # pylint: disable-msg=E1101
 @pytest.fixture

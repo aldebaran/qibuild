@@ -35,21 +35,7 @@ class DataBase(object):
         root = etree.Element("toolchain")
         tree = etree.ElementTree(root)
         for package in self.packages.itervalues():
-            element = etree.Element("package")
-            element.set("name", package.name)
-            if package.path:
-                element.set("path", package.path)
-            if package.version:
-                element.set("version", package.version)
-            if package.url:
-                element.set("url", package.url)
-            if package.toolchain_file:
-                element.set("toolchain_file", package.toolchain_file)
-            if package.sysroot:
-                element.set("sysroot", package.sysroot)
-            if package.cross_gdb:
-                element.set("cross_gdb", package.cross_gdb)
-
+            element = package.to_xml()
             root.append(element)
         qisys.qixml.write(tree, self.db_path)
 
@@ -61,6 +47,7 @@ class DataBase(object):
 
     def add_package(self, package):
         """ Add a package to the database """
+        package.load_package_xml()
         self.packages[package.name] = package
 
     def remove_package(self, name):
@@ -125,7 +112,7 @@ class DataBase(object):
         for i, svn_package in enumerate(svn_packages):
             ui.info_count(i, len(svn_packages), ui.blue, svn_package.name)
             self.handle_svn_package(svn_package)
-            self.packages[svn_package.name] = svn_package
+            self.add_package(svn_package)
 
         for remote_package in other_packages:
             if remote_package.name in (x.name for x in local_packages):
@@ -157,7 +144,7 @@ class DataBase(object):
                           "to", remote_package.version)
             self.remove_package(package.name)
             self.handle_package(package, feed)
-            self.packages[package.name] = package
+            self.add_package(package)
 
         if to_remove:
             ui.info(ui.red, "Removing packages")
@@ -170,7 +157,7 @@ class DataBase(object):
         for i, package in enumerate(to_add):
             ui.info_count(i, len(to_add), ui.blue, package.name)
             self.handle_package(package, feed)
-            self.packages[package.name] = package
+            self.add_package(package)
 
         ui.info(ui.green, "Done")
         self.save()
@@ -180,8 +167,6 @@ class DataBase(object):
             self.download_package(package)
         if package.directory:
             self.handle_local_package(package, feed)
-        if package.toolchain_file:
-            self.handle_toochain_file(package, feed)
 
     def handle_svn_package(self, svn_package):
         dest = os.path.join(self.packages_path, svn_package.name)
@@ -198,20 +183,6 @@ class DataBase(object):
         package_path = qisys.sh.to_native_path(package_path)
         package.path = package_path
 
-    def handle_toochain_file(self, package, feed):
-        toolchain_file = package.toolchain_file
-        package_path = package.path
-        # toolchain_file can be an url too
-        if not "://" in toolchain_file:
-            package.toolchain_file = os.path.join(package.path, toolchain_file)
-        else:
-            tc_file = qisys.remote.download(toolchain_file, package.path)
-            package.toolchain_file = tc_file
-
-        if package.sysroot:
-            package.sysroot = os.path.join(package.path, package.sysroot)
-        if package.cross_gdb:
-            package.cross_gdb = os.path.join(package.path, package.cross_gdb)
 
     def download_package(self, package):
         with qisys.sh.TempDir() as tmp:

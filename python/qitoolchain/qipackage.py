@@ -39,6 +39,24 @@ class QiPackage(object):
             xml_root = qisys.qixml.read(package_xml)
             qibuild.deps.read_deps_from_xml(self, xml_root)
 
+    def to_xml(self):
+        """ Return an etree.Element representing this package """
+        element = etree.Element("package")
+        element.set("name", self.name)
+        if self.path:
+            element.set("path", self.path)
+        if self.version:
+            element.set("version", self.version)
+        if self.url:
+            element.set("url", self.url)
+        if self.toolchain_file:
+            element.set("toolchain_file", self.toolchain_file)
+        if self.sysroot:
+            element.set("sysroot", self.sysroot)
+        if self.cross_gdb:
+            element.set("cross_gdb", self.cross_gdb)
+        return element
+
     def install(self, destdir, components=None, release=True):
         """ Install the given components of the package to the given destination
 
@@ -141,6 +159,21 @@ class QiPackage(object):
             return True
 
         return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
+
+    def load_package_xml(self):
+        package_xml = os.path.join(self.path, "package.xml")
+        if not os.path.exists(package_xml):
+            return
+        root = qisys.qixml.read(package_xml).getroot()
+        toolchain_file = root.get("toolchain_file")
+        if toolchain_file:
+            self.toolchain_file = os.path.join(self.path, toolchain_file)
+        sysroot = root.get("sysroot")
+        if sysroot:
+            self.sysroot = os.path.join(self.path, sysroot)
+        cross_gdb = root.get("cross_gdb")
+        if cross_gdb:
+            self.cross_gdb = os.path.join(self.path, cross_gdb)
 
     def __repr__(self):
         return "<Package %s %s>" % (self.name, self.version)

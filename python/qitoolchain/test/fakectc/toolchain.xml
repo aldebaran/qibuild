@@ -1,7 +1,3 @@
 <toolchain>
-  <package name="fake-ctc"
-    toolchain_file="fake.cmake"
-    directory="."
-    sysroot="sysroot"
-    />
+  <package name="fake-ctc" directory="." />
 </toolchain>
