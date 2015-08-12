@@ -11,3 +11,9 @@ qitoolchain
 
 * Fix bug when a package is both listed as a normal package and as a
   subversion package in the feed.
+
+cmake
+-----
+
+* Add ``Qt5Svg`` finder
+* Fix using ``Qt5`` when cross-compiling on some corner cases
