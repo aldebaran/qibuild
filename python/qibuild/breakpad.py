@@ -56,11 +56,12 @@ def dump_symbols_from_binary(binary, pool_dir):
     <pool_dir>/<binary name>/<id>/<binary name>.sym
 
     """
+    dump_syms = qisys.command.find_program("dump_syms", raises=True)
     if sys.platform == "darwin":
         dsym = gen_dsym(binary)
-        cmd = ["dump_syms", dsym]
+        cmd = [dump_syms, dsym]
     else:
-        cmd = ["dump_syms", binary]
+        cmd = [dump_syms, binary]
     ui.debug(cmd)
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
