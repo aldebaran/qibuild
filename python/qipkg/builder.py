@@ -243,7 +243,8 @@ Error when parsing {pml_path}
         self.install(self.stage_path)
 
         ui.info(ui.bold, "-> Compressing package ...")
-        qisys.archive.compress(self.stage_path, output=output, flat=True)
+        qisys.archive.compress(self.stage_path, output=output, flat=True,
+                               display_progress=True)
 
         symbols_archive = None
         if with_breakpad and self.build_project:
