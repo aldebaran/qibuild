@@ -18,11 +18,11 @@ def test_not_under_code_review_ask_user(qisrc_action, git_server, interact):
     foo_git = TestGit(foo_proj.path)
     foo_git.commit_file("a.txt", "a")
     interact.answers = [False, True]
-    qisrc_action("push", "foo")
+    qisrc_action("push", "--project", "foo")
     _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
     (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
     assert remote != "%s\trefs/heads/master" % sha1
-    qisrc_action("push", "foo")
+    qisrc_action("push", "--project", "foo")
     (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
     assert remote == "%s\trefs/heads/master" % sha1
 
@@ -33,7 +33,7 @@ def test_not_under_code_review_with_no_review(qisrc_action, git_server):
     foo_proj = git_worktree.get_git_project("foo")
     foo_git = TestGit(foo_proj.path)
     foo_git.commit_file("a.txt", "a")
-    qisrc_action("push", "--no-review", "foo")
+    qisrc_action("push", "--no-review", "--project", "foo")
     _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
     (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
     assert remote == "%s\trefs/heads/master" % sha1
@@ -45,7 +45,7 @@ def test_using_dash_y(qisrc_action, git_server):
     foo_proj = git_worktree.get_git_project("foo")
     foo_git = TestGit(foo_proj.path)
     foo_git.commit_file("a.txt", "a")
-    qisrc_action("push",  "foo", "-y")
+    qisrc_action("push",  "--project", "foo", "-y")
     _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
     (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
     assert remote == "%s\trefs/heads/master" % sha1
@@ -57,7 +57,7 @@ def test_publish_changes(qisrc_action, git_server):
     foo_proj = git_worktree.get_git_project("foo")
     foo_git = TestGit(foo_proj.path)
     foo_git.commit_file("a.txt", "a")
-    qisrc_action("push", "foo")
+    qisrc_action("push", "--project", "foo")
     _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
     (_, remote) = foo_git.call("ls-remote", "gerrit", "refs/for/master", raises=False)
     assert remote == "%s\trefs/for/master" % sha1
@@ -72,7 +72,7 @@ def test_using_carbon_copy(qisrc_action, git_server):
     foo_git.fetch("--all")
     foo_git.commit_file("a.txt", "a")
     with mock.patch.object(qisys.command, "call") as mocked_call:
-        qisrc_action("push", "foo", "--cc", "jdoe")
+        qisrc_action("push", "--project", "foo", "--cc", "jdoe")
     set_reviewers_args =  mocked_call.call_args_list[2][0][0][7]
     assert "jdoe" in set_reviewers_args
 
@@ -91,7 +91,7 @@ def test_alert_maintainers(qisrc_action, git_server):
     foo_git.fetch("--all")
     foo_git.commit_file("a.txt", "a")
     with mock.patch.object(qisys.command, "call") as mocked_call:
-        qisrc_action("push", "foo")
+        qisrc_action("push", "--project", "foo")
     set_reviewers_args =  mocked_call.call_args_list[-1][0][0][-1] # Last argument of last command
     assert "jdoe" in set_reviewers_args
     assert not "@company.com" in set_reviewers_args

@@ -17,7 +17,7 @@ import qisrc.review
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
-    qisys.parsers.project_parser(parser)
+    qisys.parsers.project_parser(parser, positional=False)
     parser.add_argument("--no-review", action="store_false", dest="review",
         help="Do not go through code review")
     parser.add_argument("-n", "--dry-run", action="store_true", dest="dry_run",
