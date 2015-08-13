@@ -52,10 +52,16 @@ def _install_package(url, pkg_name, pkg_path):
     session = qi.Session()
     session.connect("tcp://%s:9559" % (url.host))
     package_manager = session.service("PackageManager")
+    ui.info(ui.blue, "::",
+            ui.reset, ui.bold,
+            "Removing previous installation of the package")
     try:
         package_manager.removePkg(pkg_name)
     except:
         pass
+    ui.info(ui.blue, "::",
+            ui.reset, ui.bold,
+            "Installing package")
     ret = package_manager.install(
             "/home/%s/%s" % (url.user, os.path.basename(pkg_path)))
     ui.info("PackageManager returned:", ret)
