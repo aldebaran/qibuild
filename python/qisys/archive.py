@@ -68,7 +68,8 @@ def _check_algo(algo):
 # inspired from:
 #
 # http://www.mail-archive.com/python-list@python.org/msg34223.html
-def _compress_zip(directory, quiet=True, verbose=False, flat=False, output=None):
+def _compress_zip(directory, quiet=True, verbose=False, display_progress=False,
+                  flat=False, output=None):
     """Compress directory in a .zip file
 
     :param directory:        directory to add to the archive
@@ -86,6 +87,8 @@ Please set only one of these two options to 'True'
         raise ValueError(mess)
     ui.debug("Compressing", directory, "to", output)
     archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
+    # a list of tuple src, arcname to be added in the archive
+    to_add = list()
     for root, directories, filenames in os.walk(directory):
         entries = directories
         entries.extend(filenames)
@@ -94,30 +97,35 @@ Please set only one of these two options to 'True'
             # Do not zip ourselves
             if full_path == output:
                 continue
-
             rel_path  = os.path.relpath(full_path, directory)
             if flat:
                 arcname = rel_path
             else:
                 arcname = os.path.join(os.path.basename(directory), rel_path)
-            if os.path.islink(full_path):
-                content = os.readlink(full_path)
-                attr = zipfile.ZipInfo(arcname)
-                attr.create_system = 3
-                # long type of hex val of '0xA1ED0000L',
-                # say, symlink attr magic..
-                attr.external_attr = 2716663808L
-                zip_call = archive.writestr
-            elif os.path.isdir(full_path):
-                continue
-            else:
-                attr = full_path
-                content = arcname
-                zip_call = archive.write
-            if not quiet:
-                sys.stdout.write("adding {0}\n".format(rel_path))
-                sys.stdout.flush()
-            zip_call(attr, content)
+            to_add.append((full_path, arcname))
+
+    for i, (full_path, arcname) in enumerate(to_add):
+        if os.path.islink(full_path):
+            content = os.readlink(full_path)
+            attr = zipfile.ZipInfo(arcname)
+            attr.create_system = 3
+            # long type of hex val of '0xA1ED0000L',
+            # say, symlink attr magic..
+            attr.external_attr = 2716663808L
+            zip_call = archive.writestr
+        elif os.path.isdir(full_path):
+            continue
+        else:
+            attr = full_path
+            content = arcname
+            zip_call = archive.write
+        if not quiet and not display_progress:
+            rel_path  = os.path.relpath(full_path, directory)
+            sys.stdout.write("adding {0}\n".format(rel_path))
+            sys.stdout.flush()
+        if display_progress:
+            ui.info_progress(i, len(to_add), "Done")
+        zip_call(attr, content)
 
     archive.close()
     return output
@@ -355,7 +363,7 @@ Please set only one of these two options to 'True'
 
 
 def compress(directory, algo="zip", output=None, flat=False,
-            quiet=False, verbose=False):
+            quiet=False, verbose=False, display_progress=False):
     """Compress directory in an archive
 
     :param directory: directory to add to the archive
@@ -382,6 +390,7 @@ Please set only one of these two options to 'True'
         output = get_default_output(directory, algo)
     if algo == "zip":
         archive_path = _compress_zip(directory, quiet=quiet, verbose=verbose,
+                                     display_progress=display_progress,
                                      output=output, flat=flat)
     else:
         archive_path = _compress_tar(directory, quiet=quiet, verbose=verbose,
