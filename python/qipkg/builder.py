@@ -228,23 +228,12 @@ class PMLBuilder(object):
         if not output:
             output = os.path.join(os.getcwd(), self.pkg_name + ".pkg")
 
-        archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
 
         # Add everything from the staged path
         self.install(self.stage_path)
-        ui.info(ui.bold, "-> Compressing package ...")
-        to_add = list()
-        for root,_, filenames in os.walk(self.stage_path):
-            for filename in filenames:
-                full_path = os.path.join(root, filename)
-                rel_path  = os.path.relpath(full_path, self.stage_path)
-                to_add.append((full_path, rel_path))
 
-        for i, (full_path, rel_path) in enumerate(to_add):
-            n = len(to_add)
-            qisys.ui.info_progress(i, n, "Done")
-            archive.write(full_path, rel_path)
-        archive.close()
+        ui.info(ui.bold, "-> Compressing package ...")
+        qisys.archive.compress(self.stage_path, output=output, flat=True)
 
         symbols_archive = None
         if with_breakpad and self.build_project:
