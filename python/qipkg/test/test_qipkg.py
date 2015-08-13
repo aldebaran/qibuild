@@ -175,3 +175,7 @@ def test_release_package(qipkg_action, tmpdir):
     assert(services[2].attrib["execStart"] == "/usr/bin/python2.7 lib/my_service.pyc")
     # it is not pointing to a file of the package, nothing should have changed
     assert(services[3].attrib["execStart"] == "/usr/bin/python2.7 tata.py")
+
+def test_qipkg_in_wrong_directory(qipkg_action):
+    error = qipkg_action("make-package", "foo.pml", raises=True)
+    assert "foo.pml" in error

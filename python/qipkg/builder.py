@@ -25,6 +25,8 @@ import qipkg.manifest
 class PMLBuilder(object):
     """ Build a package from a pml file """
     def __init__(self, pml_path, worktree=None):
+        if not os.path.exists(pml_path):
+            raise Exception("%s does not exist" % pml_path)
         self.pml_path = pml_path
         self.base_dir = os.path.dirname(self.pml_path)
         self.manifest_xml = os.path.join(self.base_dir, "manifest.xml")
