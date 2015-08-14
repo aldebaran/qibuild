@@ -41,6 +41,8 @@ qitoolchain
 cmake
 -----
 
+* ``qi_stage_lib``: do not call ``find_library`` in the generated
+  ``-config.cmake`` files
 * Add ``Qt5Svg``
 * ``qt5-tools``: fix some bugs occurring during cross-compilation
 * ``qi_generate_qt_conf``: only set ``Plugins`` and ``Qml2Imports``, not

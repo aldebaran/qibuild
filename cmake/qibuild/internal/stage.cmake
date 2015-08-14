@@ -53,36 +53,75 @@ endfunction()
 
 function(_qi_gen_find_lib_code_redist res target _U_staged_name)
   string(TOUPPER ${target} _U_target)
+  if("${${target}_SUBFOLDER}" STREQUAL "")
+    set(_subfolder "/")
+  else()
+    set(_subfolder "${${target}_SUBFOLDER}/")
+  endif()
+  if(MSVC)
+    _get_lib_name(_lib_name_debug ${target} DEBUG)
+    _get_lib_name(_lib_name_release ${target} RELEASE)
+    set(_res
+"
+set(${_U_staged_name}_LIBRARIES
+  \"debug;\${ROOT_DIR}/lib${_subfolder}${_lib_name_debug};optimized;\${ROOT_DIR}/lib${_subfolder}${_lib_name_release}\"
+  CACHE STRING \"\" FORCE)
+")
+  else()
+    _get_lib_name(_lib_name ${target})
+    set(_res
+"
+set(${_U_staged_name}_LIBRARIES
+  \${ROOT_DIR}/lib${_subfolder}${_lib_name}
+  CACHE STRING \"\" FORCE)
+")
+  endif()
+
+  set(_res "${_res}
+mark_as_advanced(${_U_staged_name}_LIBRARIES)
+")
+  set(${res} ${_res} PARENT_SCOPE)
+endfunction()
+
+# _get_lib_name(res foo) :
+# res = libfoo.so
+function(_get_lib_name res target)
+  set(_build_type "${ARGN}")
   get_target_property(_lib_output_name ${target}  OUTPUT_NAME)
   if (NOT _lib_output_name)
     set(_lib_output_name ${target})
   endif()
-  if("${${target}_SUBFOLDER}" STREQUAL "")
-    set(_res
-"
-find_library(${_U_staged_name}_DEBUG_LIBRARY ${_lib_output_name}_d)
-find_library(${_U_staged_name}_LIBRARY       ${_lib_output_name})
-")
+  if(WIN32)
+    if(MSVC)
+      set(_lib_name_debug   "${_lib_output_name}_d.lib")
+      set(_lib_name_release "${_lib_output_name}.lib")
+      if("${_build_type}" STREQUAL "DEBUG")
+        set(${res} ${_lib_name_debug} PARENT_SCOPE)
+      else()
+        set(${res} ${_lib_name_release} PARENT_SCOPE)
+      endif()
+    else()
+      # MinGW
+      if("${_target_type}" STREQUAL SHARED_LIBRARY)
+        set(_lib_name    "lib${_lib_output_name}.dll.a")
+      else()
+        set(_lib_name    "lib${_lib_output_name}.a")
+      endif()
+      set(${res} ${_lib_name} PARENT_SCOPE)
+    endif()
   else()
-    set(_res
-"
-find_library(${_U_staged_name}_DEBUG_LIBRARY ${_lib_output_name}_d PATH_SUFFIXES ${${target}_SUBFOLDER})
-find_library(${_U_staged_name}_LIBRARY       ${_lib_output_name}   PATH_SUFFIXES ${${target}_SUBFOLDER})
-")
+    # Not win32:
+    if("${_target_type}" STREQUAL "SHARED_LIBRARY")
+      if(APPLE)
+        set(_lib_name "lib${_lib_output_name}.dylib")
+      else()
+        set(_lib_name "lib${_lib_output_name}.so")
+      endif()
+    else()
+      set(_lib_name "lib${_lib_output_name}.a")
+    endif()
+    set(${res} ${_lib_name} PARENT_SCOPE)
   endif()
-  set(_res
-"
-${_res}
-
-if (${_U_staged_name}_DEBUG_LIBRARY)
-  set(${_U_staged_name}_LIBRARIES optimized;\${${_U_staged_name}_LIBRARY};debug;\${${_U_staged_name}_DEBUG_LIBRARY})
-else()
-  set(${_U_staged_name}_LIBRARIES \${${_U_staged_name}_LIBRARY})
-endif()
-
-set(${_U_staged_name}_LIBRARIES \${${_U_staged_name}_LIBRARIES} CACHE INTERNAL \"\" FORCE)
-")
-  set(${res} ${_res} PARENT_SCOPE)
 endfunction()
 
 
@@ -96,11 +135,10 @@ function(_qi_gen_find_lib_code_sdk res target _U_staged_name)
 
   if(WIN32)
     if(MSVC)
-      # Trust ARCHIVE_OUTPUT_DIRECTORY, and handle the _d:
       get_target_property(_lib_dir_debug   ${target}  ARCHIVE_OUTPUT_DIRECTORY_DEBUG)
       get_target_property(_lib_dir_release ${target}  ARCHIVE_OUTPUT_DIRECTORY_RELEASE)
-      set(_lib_name_debug   "${_lib_output_name}_d.lib")
-      set(_lib_name_release "${_lib_output_name}.lib")
+      _get_lib_name(_lib_name_debug ${target} DEBUG)
+      _get_lib_name(_lib_name_release ${target} RELEASE)
       set(_lib_debug "${_lib_dir_debug}/${_lib_name_debug}")
       set(_lib_release "${_lib_dir_release}/${_lib_name_release}")
       set(${_U_staged_name}_LIBRARIES "debug;${_lib_debug};optimized;${_lib_release}")
@@ -108,25 +146,16 @@ function(_qi_gen_find_lib_code_sdk res target _U_staged_name)
       # Mingw: lib is .a when building a static library, and
       # .dll.a when building a shared library
       get_target_property(_lib_dir ${target} "ARCHIVE_OUTPUT_DIRECTORY")
-      if("${_target_type}" STREQUAL SHARED_LIBRARY)
-        set(_lib_name    "lib${_lib_output_name}.dll.a")
-      else()
-        set(_lib_name    "lib${_lib_output_name}.a")
-      endif()
+      _get_lib_name(_lib_name ${target})
       set(${_U_staged_name}_LIBRARIES "general;${_lib_dir}/${_lib_name}")
     endif()
   else()
     # Not win32:
+    _get_lib_name(_lib_name ${target})
     if("${_target_type}" STREQUAL "SHARED_LIBRARY")
       get_target_property(_lib_dir  ${target}  "LIBRARY_OUTPUT_DIRECTORY")
-      if(APPLE)
-        set(_lib_name "lib${_lib_output_name}.dylib")
-      else()
-        set(_lib_name "lib${_lib_output_name}.so")
-      endif()
     else()
       get_target_property(_lib_dir  ${target}  "ARCHIVE_OUTPUT_DIRECTORY")
-      set(_lib_name "lib${_lib_output_name}.a")
     endif()
     set(${_U_staged_name}_LIBRARIES "general;${_lib_dir}/${_lib_name}")
   endif()
@@ -187,17 +216,11 @@ function(_qi_gen_code_lib_redist res target _U_staged_name)
   _qi_gen_find_lib_code_redist(_find_libs ${target} ${_U_staged_name})
   set(_res "${_res} ${_find_libs}")
 
-  # FindPackageHandleStandardArgs:
-  set(_call_fphsa
+  set(_set_package_found
 "
-include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(${_U_staged_name} DEFAULT_MSG
-  ${_U_staged_name}_LIBRARIES
-  ${_U_staged_name}_INCLUDE_DIRS
-)
-set(${_U_staged_name}_PACKAGE_FOUND \${${_U_staged_name}_FOUND} CACHE INTERNAL \"\" FORCE)
+set(${_U_staged_name}_PACKAGE_FOUND TRUE CACHE INTERNAL \"\" FORCE)
 ")
-  set(_res "${_res} ${_call_fphsa}")
+  set(_res "${_res} ${_set_package_found}")
 
   # _DEPENDS:
   set(${_U_staged_name}_DEPENDS   ${${_U_staged_name}_DEPENDS})
