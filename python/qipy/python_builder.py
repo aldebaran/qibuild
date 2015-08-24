@@ -66,9 +66,9 @@ class PythonBuilder(AbstractBuilder):
         # Also install a python wrapper so that everything goes smoothly
         to_write="""\
 #!/bin/bash
-SDK_DIR=$(dirname "$(readlink -f $0 2>/dev/null)")
-export LD_LIBRARY_PATH="${SDK_DIR}/lib:${LD_LIBRARY_PATH}"
-export PYTHONPATH="${SDK_DIR}/lib/python2.7/site-packages/:${PYTHONPATH}"
+SDK_DIR="$(dirname "$(readlink -f $0 2>/dev/null)")"
+export LD_LIBRARY_PATH="${SDK_DIR}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export PYTHONPATH="${SDK_DIR}/lib/python2.7/site-packages${PYTHONPATH:+:$PYTHONPATH}"
 exec python "$@"
 """
         python_wrapper = os.path.join(dest, "python")
