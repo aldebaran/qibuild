@@ -172,7 +172,7 @@ def push(project,  branch, bypass_review=False, dry_run=False,
         sha1s = [commit["sha1"] for commit in commits_pushed]
     git.push(*args)
     if reviewers and not dry_run:
-        ui.info("Adding reviewers...")
+        ui.info("Adding reviewers...", ("(" + ", ".join(reviewers) + ")"))
         try:
             set_reviewers(sha1s, reviewers, username, server, ssh_port)
         except qisys.command.CommandFailedException as e:

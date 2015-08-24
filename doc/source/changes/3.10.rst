@@ -29,6 +29,7 @@ qisrc
 * ``qisrc push`` can now only be used on one git project.
   (Previously you could run ``qisrc push --all``, but that was
   deemed to dangerous)
+* ``qisrc push`` displays reviewers before notifying them.
 
 qitoolchain
 -----------
