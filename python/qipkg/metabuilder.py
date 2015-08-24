@@ -69,5 +69,8 @@ class MetaPMLBuilder(object):
             ui.info(ui.green, "::", ui.reset, ui.bold, "[%i/%i]" % ((i + 1), n),
                     "Making package from", pml_builder.pml_path)
             packages = pml_builder.package(with_breakpad=with_breakpad, force=force)
-            all_packages.extend(packages)
+            if isinstance(packages, list):
+                all_packages.extend(packages)
+            else:
+                all_packages.append(packages)
         return all_packages

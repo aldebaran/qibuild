@@ -257,7 +257,7 @@ class PMLBuilder(object):
         if symbols_archive:
             return [output, symbols_archive]
         else:
-            return [output]
+            return output
 
     def __repr__(self):
         return "<PMLBuilder for %s>" % self.pml_path

@@ -20,10 +20,7 @@ def test_make_package(qipkg_action, qipy_action):
     pml = os.path.join(c_pkg_proj.path, "c_pkg.pml")
     qipkg_action("configure", pml)
     qipkg_action("build", pml)
-    pkgs = qipkg_action("make-package", pml)
-    assert len(pkgs) == 1
-    pkg = pkgs[0]
-
+    pkg = qipkg_action("make-package", pml)
     qipkg_action("extract-package", pkg)
 
     expected_paths = [
@@ -108,7 +105,7 @@ def test_no_worktree_pure_pml(tmpdir, monkeypatch):
     package = qisys.script.run_action("qipkg.actions.make_package", [pml_path.strpath])
     dest = tmpdir.mkdir("dest")
     monkeypatch.chdir(dest)
-    qisys.script.run_action("qipkg.actions.extract_package", package)
+    qisys.script.run_action("qipkg.actions.extract_package", [package])
     assert dest.join("fooproject-0.1", "manifest.xml").check(file=True)
     assert dest.join("fooproject-0.1", "behavior_1", "behavior.xar").check(file=True)
 
@@ -144,11 +141,10 @@ def test_no_worktre_bad_pml(tmpdir, monkeypatch):
 def test_translations(qipkg_action, tmpdir):
     tr_project = qipkg_action.add_test_project("tr_project")
     pml_path = os.path.join(tr_project.path, "tr.pml")
-    packages = qipkg_action("make-package", pml_path)
-    package_path = packages[0]
+    package = qipkg_action("make-package", pml_path)
     dest = tmpdir.mkdir("dest")
     qipkg_action.chdir(dest)
-    qipkg_action("extract-package", package_path)
+    qipkg_action("extract-package", package)
     assert dest.join("tr-0.1", "translations", "tr_fr_FR.qm").check(file=True)
 
 def test_validate_package(qipkg_action):
