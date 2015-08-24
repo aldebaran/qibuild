@@ -157,6 +157,32 @@ Step two: Write a setup.py file
           }
     )
 
+If you do not want to use ``setup.py``, you can specify
+your modules, packages and scripts directly in the
+``qiproject.xml``, like this:
+
+.. code-block:: console
+
+    qiproject.xml
+    lib
+      foo
+        __init__.py
+        bar.py
+    spam.py
+    bin
+       eggs
+
+.. code-block:: xml
+
+    <project version="3">
+      <qipython name="foobar">
+        <package name="foo" src="lib" />
+        <module name="spam" />
+        <script src="bin/eggs" />
+      </qipython>
+    </project>
+
+
 Step three: Use `qipy bootstrap`
 --------------------------------
 
