@@ -40,3 +40,15 @@ def test_files_with_space(svn_server, tmpdir):
     svn.call("checkout", foo_url, ".")
     foo.join("file with space.txt").remove()
     svn.commit_all("test message")
+
+def test_file_replaced_by_symlink(svn_server, tmpdir):
+    foo_url = svn_server.create_repo("foo")
+    svn_server.commit_file("foo", "a.txt", "this is a\n")
+    work = tmpdir.mkdir("work")
+    foo = work.mkdir("foo")
+    svn = qisrc.svn.Svn(foo.strpath)
+    svn.call("checkout", foo_url, ".")
+    foo.join("a.txt").remove()
+    foo.ensure("b.txt", file=True)
+    foo.join("a.txt").mksymlinkto("b.txt")
+    svn.commit_all("test message")

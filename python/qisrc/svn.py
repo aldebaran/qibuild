@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import subprocess
+import os
 
 from qisys import ui
 import qisys.command
@@ -41,10 +42,24 @@ class Svn(object):
         rc, out = self.call("status", raises=False)
         for line in out.splitlines():
             line = line.strip()
+            filename = line[8:]
             if line.startswith("!"):
-                filename = line[8:]
                 self.call("remove", filename)
             if line.startswith("?"):
-                filename = line[8:]
                 self.call("add", filename)
+            # Prevent 'Node has unexpectedly changed kind' error
+            # when a file is replaced by a symlink.
+            # see http://antoniolorusso.com/blog/2008/09/29/svn-entry-has-unexpectedly-changed-special-status/
+            if line.startswith("~"):
+                full_path = os.path.join(self.path, filename)
+                if os.path.islink(full_path):
+                    target = os.readlink(full_path)
+                    os.remove(full_path)
+                    self.call("remove", filename)
+                    os.symlink(target, full_path)
+                    self.call("add", filename)
+                else:
+                    ui.error("Could not deal with", filename, "\n",
+                             "Please open a bug report")
+
         self.call("commit", "--message", message)
