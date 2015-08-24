@@ -121,3 +121,147 @@ Tags definitions:
 * **linguas**: A list of all locales supported.
 * **tr**: Defined if you use ``gettext`` or ``Qt Linguist``
   internationalization (value can be: ``gettext`` or ``qt``).
+
+qipy
+----
+
+This is used to configure Python projects.
+
+Assuming you have a layout looking like:
+
+.. code-block:: console
+
+
+    foobarspam
+      qiproject.xml
+      lib
+        bar.py
+        foo
+           __init__.py
+      bin
+        eggs
+
+Here is what the ``qiproject.xml`` should look like:
+
+.. code-block:: xml
+
+  <project version="3">
+    <qipython name="foobarspam">
+      <module name="bar" src="lib" />
+      <package name="foo" src="lib" />
+      <script name="eggs" src="bin/eggs" />
+    </qipython>
+  </projct>
+
+Note that you can also write a ``setup.py`` file.
+In this case, specify ``<setup with_distutils="true">`` in the
+``qiproject.xml``.
+
+.. code-block:: xml
+
+  <project  version="3">
+    <qipython name="foobarspam">
+      <setup with_distutils="true" />
+    </qipython>
+  </project>
+
+
+qidoc
+------
+
+This is used by ``qidoc``
+
+Doc projects can be of three type ``sphinx``,
+``doxygen`` or ``template``.
+
+Here is what the ``qiproject.xml`` looks like for each type.
+
+.. code-block:: xml
+
+  <project version="3">
+    <!-- for sphinx projects -->
+    <qidoc name="foo" type="sphinx" dest="lib/foo" />
+    <!-- for doxygen projects -->
+    <qidoc name="bar" type="doxygen" dest="lib/bar" />
+    <!-- for template project -->
+    <qidoc type="template"/>
+  </project>
+
+There should be zero or one ``template`` by worktree.
+
+Names of ``sphinx`` and ``doxygen`` projects should be unique.
+
+A project can have a list of dependencies, which is specified in
+a ``depends`` tag, like this:
+
+.. code-block:: xml
+
+  <qidoc type="sphinx" name="hello">
+    <depends name="world" />
+  </qidoc>
+
+Doc projects can have a ``dest`` attribute. For instance, assuming
+that ``world`` is a dependency of ``hello``, and you have the
+following ``qiproject.xml`` files:
+
+.. code-block:: xml
+
+  <!-- in hello/qiproject.xml -->
+  <project version="3">
+    <qidoc type="sphinx" name="hello">
+      <depends name="world" />
+    </qidoc>
+  </project>
+
+.. code-block:: xml
+
+  <!-- in world/qiproject.xml -->
+  <project version="3">
+    <qidoc type="sphinx" name="world" dest="lib/world" />
+  </project>
+
+Then when building ``hello`` documentation, ``world`` documentation
+will be built, and put in a ``lib/world`` subfolder.
+
+You can also specify a Python script to be run before building anything:
+
+.. code-block:: xml
+
+  <project version="3">
+    <qidoc type="sphinx" name="hello">
+      <prebuild script="gen_rst.py" />
+    </qidoc>
+  </project>
+
+Lastly, you can specify examples for Sphinx projects.
+For each example, the ``src`` folder will
+be zipped and made available as a ``..download`` directive:
+
+.. code-block:: console
+
+  hello
+    index.rst
+    samples
+      foo
+        foo.cpp
+        CMakeLists.txt
+      bar
+        bar.py
+        setup.py
+
+.. code-block:: xml
+
+  <project version="3">
+    <qidoc type="sphinx" name="hello">
+      <examples>
+        <example src="samples/foo" />
+        <example src="samples/bar" />
+      </examples>
+    </qidoc>
+
+.. code-block:: rst
+
+    .. In index.rst
+
+    Download the full sources of the ``foo`` example:
+    :download:`foo.zip <../foo.zip>`
