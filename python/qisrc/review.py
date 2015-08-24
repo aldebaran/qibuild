@@ -174,8 +174,7 @@ def push(project,  branch, bypass_review=False, dry_run=False,
     if reviewers and not dry_run:
         ui.info("Adding reviewers...")
         try:
-            for sha1 in sha1s:
-                set_reviewers(sha1, reviewers, username, server, ssh_port)
+            set_reviewers(sha1s, reviewers, username, server, ssh_port)
         except qisys.command.CommandFailedException as e:
             ui.warning("Couldn't set reviewers")
             ui.warning(e)
@@ -183,7 +182,7 @@ def push(project,  branch, bypass_review=False, dry_run=False,
             ui.info("Done!")
 
 
-def set_reviewers(ref, reviewers, username, server, ssh_port):
+def set_reviewers(refs, reviewers, username, server, ssh_port):
     """ Set reviewers using gerrit set-reviewers command
 
     :param ref: The reference to the patchset, can be a SHA1 or a Change-Id
@@ -192,7 +191,8 @@ def set_reviewers(ref, reviewers, username, server, ssh_port):
     """
     cmd = ["ssh", "-p", str(ssh_port),
     "%s@%s" % (username, server),
-    "gerrit", "set-reviewers", ref]
+    "gerrit", "set-reviewers"]
+    cmd.extend(refs)
     for reviewer in reviewers:
         cmd.append(" --add %s" % reviewer)
     qisys.command.call(cmd, quiet=True)

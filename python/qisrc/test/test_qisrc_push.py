@@ -102,7 +102,7 @@ def test_alert_maintainers(qisrc_action, git_server):
     foo_git.commit_file("a.txt", "a")
     with mock.patch.object(qisys.command, "call") as mocked_call:
         qisrc_action("push", "foo")
-    set_reviewers_args =  mocked_call.call_args_list[3][0][0][7]
+    set_reviewers_args =  mocked_call.call_args_list[-1][0][0][-1] # Last argument of last command
     assert "jdoe@company.com" in set_reviewers_args
 
 def test_on_new_project(qisrc_action, git_server, tmpdir, interact):
