@@ -89,7 +89,6 @@ In:
     def __repr__(self):
         return "<DocWorkTree in %s>" % self.root
 
-
 def new_doc_project(doc_worktree, project):
     qiproject_xml = project.qiproject_xml
     if not os.path.exists(qiproject_xml):
@@ -100,16 +99,6 @@ def new_doc_project(doc_worktree, project):
         return _new_doc_project_3(doc_worktree, project)
     else:
         return _new_doc_project_2(doc_worktree, project)
-
-def new_template_project(doc_worktree, project):
-    qiproject_xml = project.qiproject_xml
-    if not os.path.exists(qiproject_xml):
-        return None
-    tree = qisys.qixml.read(project.qiproject_xml)
-    root = tree.getroot()
-    if root.get("version") == "3":
-        return
-
 
 def _new_doc_project_3(doc_worktree, project):
     qiproject_xml = project.qiproject_xml
@@ -123,7 +112,6 @@ def _new_doc_project_3(doc_worktree, project):
         raise BadProjectConfig(qiproject_xml,
                                "Expecting a 'type' attribute")
     return _new_doc_project(doc_worktree, project, qidoc_elem, doc_type)
-
 
 def _new_doc_project_2(doc_worktree, project):
     """ Parse qidoc2 syntax in case the 'src' attribute is not used,
@@ -168,7 +156,6 @@ def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
     if not name:
         raise BadProjectConfig(qiproject_xml,
                                "Expecting a 'name' attribute")
-
 
     dest = xml_elem.get("dest")
     doc_project = None
