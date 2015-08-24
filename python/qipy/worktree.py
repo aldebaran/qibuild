@@ -102,7 +102,6 @@ def new_python_project(worktree, project):
     name = qisys.qixml.parse_required_attr(qipython_elem, "name",
                                            xml_path=qiproject_xml)
     python_project = qipy.project.PythonProject(worktree, project.src, name)
-    python_project.package_dir = qipython_elem.get("package_dir")
     script_elems = qipython_elem.findall("script")
     for script_elem in script_elems:
         src = qisys.qixml.parse_required_attr(script_elem, "src",

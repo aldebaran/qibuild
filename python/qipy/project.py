@@ -16,7 +16,6 @@ class PythonProject(object):
         self.modules = list()
         self.packages = list()
         self.setup_with_distutils = False
-        self.package_dir = None
 
     @property
     def python_path(self):
