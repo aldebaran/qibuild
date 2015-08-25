@@ -6,6 +6,7 @@
 
 import os
 
+from qisys import ui
 import qisys.parsers
 import qitoolchain.qipackage
 
@@ -35,4 +36,5 @@ def do(args):
         res = qitoolchain.qipackage.extract(package_path, dest)
     else:
         res = qisys.archive.extract(package_path, output)
+    ui.info(ui.green, "Package extracted to", ui.reset, ui.bold, res)
     return res
