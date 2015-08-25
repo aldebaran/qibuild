@@ -20,13 +20,7 @@ class PythonWorkTree(qisys.worktree.WorkTreeObserver):
         self.config = config
         worktree.register(self)
 
-    def on_project_added(self, project):
-        self._load_python_projects()
-
-    def on_project_removed(self, project):
-        self._load_python_projects()
-
-    def on_project_moved(self, project):
+    def reload(self):
         self._load_python_projects()
 
     @property

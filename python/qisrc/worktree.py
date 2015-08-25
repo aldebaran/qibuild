@@ -155,13 +155,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         new_proj = self.get_git_project(src)
         return new_proj
 
-    def on_project_removed(self, project):
-        self.load_git_projects()
-
-    def on_project_added(self, project):
-        self.load_git_projects()
-
-    def on_project_moved(self, project):
+    def reload(self):
         self.load_git_projects()
 
     def clone_missing(self, repo):

@@ -83,6 +83,17 @@ This path does not exist
                 cache.remove_src(src)
         return cache
 
+    def reload(self):
+        """ Re-read every qiproject.xml.
+        Useful when projects are added or removed, or when
+        qiproject.xml change
+
+        """
+        self.cache = self.load_cache()
+        self.load_projects()
+        for observer in self._observers:
+            observer.reload()
+
     def check(self):
         """ Perform a few sanity checks """
         # Check that we are not in an other worktree:
@@ -180,7 +191,7 @@ This path does not exist
         self.load_projects()
         project = self.get_project(src)
         for observer in self._observers:
-            observer.on_project_added(project)
+            observer.reload()
         return project
 
     def remove_project(self, path, from_disk=False):
@@ -200,7 +211,7 @@ This path does not exist
         self.cache.remove_src(src)
         self.load_projects()
         for observer in self._observers:
-            observer.on_project_removed(project)
+            observer.reload()
 
     def move_project(self, path, new_path):
         """ Move a project from a worktree """
@@ -217,7 +228,7 @@ This path does not exist
         self.load_projects()
         project = self.get_project(src)
         for observer in self._observers:
-            observer.on_project_moved(project)
+            observer.reload()
 
     def normalize_path(self, path):
         """ Make sure the path is a POSIX path, relative to
@@ -276,21 +287,7 @@ class WorkTreeObserver():
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def on_project_added(self, project):
-        """ Called when a project has been added to the worktree
-        """
-        pass
-
-    @abc.abstractmethod
-    def on_project_removed(self, project):
-        """ Called when a project has been removed from the worktree
-        """
-        pass
-
-    @abc.abstractmethod
-    def on_project_moved(self, project):
-        """ Called when a project has been removed from the worktree
-        """
+    def reload(self):
         pass
 
 class WorkTreeCache:

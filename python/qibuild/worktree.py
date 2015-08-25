@@ -164,15 +164,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
                                    name, [x.name for x in self.build_projects])
             raise BuildWorkTreeError(mess)
 
-    def on_project_added(self, project):
-        """ Called when a new project has been registered """
-        self._load_build_projects()
-
-    def on_project_removed(self, project):
-        """ Called when a build project has been removed """
-        self._load_build_projects()
-
-    def on_project_moved(self, project):
+    def reload(self):
         self._load_build_projects()
 
     def _load_build_projects(self):

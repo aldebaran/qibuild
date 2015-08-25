@@ -25,16 +25,7 @@ class LinguistWorkTree(qisys.worktree.WorkTreeObserver):
                 self.check_unique_name(linguist_project)
                 self.linguist_projects.append(linguist_project)
 
-    def on_project_added(self, project):
-        """ Called when a new project has been registered """
-        self._load_linguist_projects()
-
-    def on_project_removed(self, project):
-        """ Called when a build project has been removed """
-        self._load_linguist_projects()
-
-    def on_project_moved(self, project):
-        """ Called when a build project has been moved """
+    def reload(self):
         self._load_linguist_projects()
 
     def get_linguist_project(self, name, raises=False):

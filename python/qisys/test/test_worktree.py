@@ -144,7 +144,7 @@ def test_observers_are_notified(worktree):
     mock_observer = mock.Mock()
     worktree.register(mock_observer)
     worktree.create_project("foo")
-    assert mock_observer.on_project_added.called
+    assert mock_observer.reload.called
 
 def test_add_nested_projects(worktree):
     worktree.create_project("foo")

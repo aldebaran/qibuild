@@ -43,16 +43,7 @@ class DocWorkTree(qisys.worktree.WorkTreeObserver):
             raise Exception(mess)
         return res[0]
 
-    def on_project_added(self, project):
-        """ Called when a new project has been registered """
-        self._load_doc_projects()
-
-    def on_project_removed(self, project):
-        """ Called when a project has been removed """
-        self._load_doc_projects()
-
-    def on_project_moved(self, project):
-        """ Called when a project has moved """
+    def reload(self):
         self._load_doc_projects()
 
     def get_doc_project(self, name, raises=False):
