@@ -37,6 +37,9 @@ qitoolchain
   when used with an ``.rpm`` file
 * Fix bug when a package is both listed as a normal package and as a
   subversion package in the feed.
+* Read package metadata from ``package.xml``, not the feed.
+  This makes it possible to use cross-toolchains packages or package that
+  set compile flags without a feed.
 
 cmake
 -----
