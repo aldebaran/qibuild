@@ -111,12 +111,83 @@ In the end the package tree should look like this:
 
 
 
-Finally, zip the package:
+Finally, create the package with ``qitoolchain make-package``
 
 .. code-block:: console
 
-    cd /tmp/foo
-    zip foo-0.1.zip -r .
+    qitoolchain make-package /tmp/foo
+
+Using cross-toolchains
+-----------------------
+
+Let's say you want to cross-compile for ARM. You should find:
+
+* a cross-compiler
+* a ``sysroot``
+* a ``toolchain.cmake`` that calls ``CMAKE_FORCE_C_COMPILER`` and
+  ``CMAKE_FORCE_CXX_COMPILER``
+
+You should put all of this into a package, with a few additional metadata:
+
+.. code-block:: console
+
+  <ctc>
+     package.xml
+     sysroot
+        etc
+        usr
+          include
+      bin
+        arm-linux-gnu-gcc
+        arm-linux-gnu-g++
+        arm-linux-gnu-gdb
+
+.. code-block:: xml
+
+    <!-- in package.xml -->
+
+    <package name="arm-ctc"
+             host="linux64"
+             target="arm"
+             version="r1"
+             sysroot="sysroot"
+             gdb="bin/arm-linux-gnu-gdb"
+             toolchain_file="toolchain.cmake" />
+
+Then you can use:
+
+.. code-block:: console
+
+  qitoolchain make-package ctc
+  qitoolchain add-package arm-ctc-linux64-r1.zip
+
+as you would do for a normal package.
+
+Specifying custom flags
+------------------------
+
+Sometimes you just want to set some compile flags while building.
+To do that, you can create a package that will set ``CMAKE_CXX_FLAGS`` for you.
+
+For instance, to activate ``C++11`` support, you can create a ``c++11`` package
+
+.. code-block:: console
+
+  c++11
+    package.xml
+    config.cmake
+
+.. code-block:: xml
+
+  <!-- in package.xml -->
+  <package name="c++11" toolchain_file="config.cmake" />
+
+.. code-block:: cmake
+
+  # in config.cmake
+
+  set(CMAKE_CXX_FLAGS "-std=gnu++11" CACHE INTERNAL "" FORCE)
+
 
 Excluding files at installation
 -------------------------------
