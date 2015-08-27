@@ -49,10 +49,6 @@ This path does not exist
             self.check()
         self.register_self()
 
-    def reload(self):
-        self.cache = self.load_cache()
-        self.load_projects()
-
     def register_self(self):
         """ Register to the global list of all worktrees  in
         ~/.config/qi/qibuild.xml

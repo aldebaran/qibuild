@@ -102,7 +102,6 @@ class BinaryPackage:
 
     def __str__(self):
         res = "Binary package:\n"
-        res += '  Type: {0}\n'.format(self.type)
         res += '  Path: {0}\n'.format(self.path)
         res += '  Metadata:\n'
         res += pprint.pformat(self.metadata, indent=2)

@@ -26,6 +26,7 @@ def test_simple(qitoolchain_action, tmpdir, toolchains):
 
 def test_rpm(qitoolchain_action, tmpdir):
     rpm = tmpdir.ensure("json-c-0.9.x86_64.rpm", file=True)
+    # pylint:disable-msg=E1101
     with pytest.raises(NotImplementedError):
         qitoolchain_action("convert-package", "--name", "json-c",
                            "--batch", rpm.strpath)
