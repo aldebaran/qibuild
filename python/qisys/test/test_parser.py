@@ -96,3 +96,11 @@ def test_auto_add_nested(worktree, args):
 """)
     worktree2 = qisys.worktree.WorkTree(tmpdir.strpath)
     assert len(worktree2.projects) == 3
+
+def test_using_dash_all_with_dash_single(worktree, args):
+    args.all = True
+    args.single = True
+    # pylint:disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        qisys.parsers.get_projects(worktree, args)
+    assert "--single with --all" in e.value.message

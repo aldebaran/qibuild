@@ -173,6 +173,8 @@ class AbstractProjectParser:
             args.all = False
         if not hasattr(args, "single"):
             args.single = False
+        if args.all and args.single:
+            raise Exception("Cannot use --single with --all")
         # pylint: disable-msg=E1103
         if args.all:
             return self.all_projects(args)
