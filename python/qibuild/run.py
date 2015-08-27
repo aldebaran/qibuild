@@ -17,7 +17,7 @@ import qibuild.parsers
 import qisys.parsers
 import qisys.command
 
-def run(projects, binary, bin_args, env=None):
+def run(projects, binary, bin_args, env=None, exec_=True):
     """ Find binary in worktree and
         exec it with given arguments.
     """
@@ -39,5 +39,8 @@ def run(projects, binary, bin_args, env=None):
     if not bin_path:
         raise Exception("Cannot find " + binary + " binary")
     cmd = [bin_path] + bin_args
-    ui.debug("exec", cmd)
-    os.execve(bin_path,  cmd, env)
+    if exec_:
+      ui.debug("exec", cmd)
+      os.execve(bin_path,  cmd, env)
+    else:
+      qisys.command.call(cmd, env=env)

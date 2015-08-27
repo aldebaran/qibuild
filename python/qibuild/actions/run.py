@@ -18,6 +18,8 @@ import qibuild.run
 def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.cmake_build_parser(parser)
+    parser.add_argument("--no-exec", dest="exec_", action="store_false",
+                       help="Do not use os.execve (Mostly useful for tests")
     parser.add_argument("binary")
     parser.add_argument("bin_args", metavar="-- Binary arguments", nargs="*",
                         help="Binary arguments -- to escape the leading '-'")
@@ -27,4 +29,4 @@ def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args)
     env = build_worktree.get_env()
     qibuild.run.run(build_worktree.build_projects, args.binary, args.bin_args,
-                              env=env)
+                              env=env, exec_=args.exec_)
