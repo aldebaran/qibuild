@@ -5,6 +5,7 @@ import os
 
 import qisys.command
 import qisys.qixml
+from qisys.qixml import etree
 import qipkg.package
 
 import pytest
@@ -179,3 +180,14 @@ def test_release_package(qipkg_action, tmpdir):
 def test_qipkg_in_wrong_directory(qipkg_action):
     error = qipkg_action("make-package", "foo.pml", raises=True)
     assert "foo.pml" in error
+
+def test_qipkg_no_such_project(qipkg_action, tmpdir):
+    d_project = qipkg_action.add_test_project("d_pkg")
+    pml_path = os.path.join(d_project.path, "d_pkg.pml")
+    root = qisys.qixml.read(pml_path).getroot()
+    elem = etree.SubElement(root, "qipython")
+    elem.set("name", "foo")
+    qisys.qixml.write(root, pml_path)
+    error = qipkg_action("make-package", pml_path, raises=True)
+    assert "No such python project: foo" in error
+    assert pml_path in error

@@ -86,6 +86,16 @@ class PMLBuilder(object):
             return self._stage_path
 
     def load_pml(self, pml_path):
+        try:
+            self._load_pml(pml_path)
+        except qisys.worktree.NoSuchProject as e:
+            mess = """ \
+Error when parsing {pml_path}
+{mess}
+"""
+            raise Exception(mess.format(pml_path=pml_path, mess=str(e)))
+
+    def _load_pml(self, pml_path):
         for builder in self.builders:
             builder.projects = list()
         tree= qisys.qixml.read(pml_path)
