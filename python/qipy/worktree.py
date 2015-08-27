@@ -53,9 +53,9 @@ Found two projects with the same name. (%s)
             if project.name == name:
                 return project
         if raises:
-            mess = ui.did_you_mean("No such python project",
+            mess = ui.did_you_mean("No such python project: %s" % name,
                                          name, [x.name for x in self.python_projects])
-            raise Exception(mess)
+            raise qisys.worktree.NoSuchProject(name, mess)
         else:
             return None
 

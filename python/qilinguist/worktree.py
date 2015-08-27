@@ -35,7 +35,7 @@ class LinguistWorkTree(qisys.worktree.WorkTreeObserver):
         if raises:
             mess = ui.did_you_mean("No such linguist project: %s" % name,
                                    name, [x.name for x in self.linguist_projects])
-            raise Exception(mess)
+            raise qisys.worktree.NoSuchProject(name, mess)
         else:
             return None
 

@@ -334,3 +334,11 @@ class NotInWorkTree(Exception):
      - specify an existing work tree with --work-tree PATH
      - create a new work tree with `qibuild init`
 """
+
+class NoSuchProject(Exception):
+    def __init__(self, name, message):
+        self.name = name
+        self.message = message
+
+    def __str__(self):
+        return self.message

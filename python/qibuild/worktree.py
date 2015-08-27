@@ -163,7 +163,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
         if raises:
             mess = ui.did_you_mean("No such qibuild project: %s" % name,
                                    name, [x.name for x in self.build_projects])
-            raise BuildWorkTreeError(mess)
+            raise qisys.worktree.NoSuchProject(name, mess)
 
     def reload(self):
         self._load_build_projects()

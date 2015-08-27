@@ -55,7 +55,7 @@ class DocWorkTree(qisys.worktree.WorkTreeObserver):
         if raises:
             mess = ui.did_you_mean("No such qidoc project: %s\n" % name,
                                    name, [x.name for x in self.doc_projects])
-            raise Exception(mess)
+            raise qisys.worktree.NoSuchProject(name, mess)
         else:
             return None
 
