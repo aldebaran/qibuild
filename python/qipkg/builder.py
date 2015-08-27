@@ -59,8 +59,8 @@ class PMLBuilder(object):
             self.linguist_worktree = None
             self.builders = list()
 
-        # Hack: we need to parse some cmake variables when generating the
-        # breakpad symbols, so we need to keep one build project around
+        # Hack: we don't want to generate symbols from the staged dir
+        # unless we have at least one qibuild project
         self.build_project = None
 
         self._stage_path = None
