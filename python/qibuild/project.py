@@ -579,6 +579,9 @@ The following tools were not found: {missing}\
         package_xml_tree = etree.ElementTree(package_xml_root)
         package_xml_root.set("name", self.name)
         package_xml_root.set("version", self.version)
+        if self.license:
+            license_elem = etree.SubElement(package_xml_root, "license")
+            license_elem.text = self.license
         qibuild.deps.dump_deps_to_xml(self, package_xml_root)
         self._add_scm_info(package_xml_root)
         qisys.qixml.write(package_xml_tree, output)

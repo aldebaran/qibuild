@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 import os
 
+import qisrc.license
 import qibuild.config
 import qitoolchain.qipackage
 
@@ -37,3 +38,12 @@ def test_using_toolchain(cd_to_tmpdir):
 
     # but this should pass:
     qibuild_action("configure", "-c", "foo", "hello")
+
+def test_preserve_license(qibuild_action, qitoolchain_action):
+    world_proj = qibuild_action.add_test_project("world")
+    qisrc.license.write_license(world_proj.qiproject_xml, "BSD")
+    world_package = qibuild_action("package", "world")
+    extracted = qitoolchain_action("extract-package", world_package)
+    package_xml = os.path.join(extracted, "package.xml")
+    license = qisrc.license.read_license(package_xml)
+    assert license == "BSD"
