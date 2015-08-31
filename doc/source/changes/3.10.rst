@@ -46,6 +46,8 @@ qitoolchain
 * Read package metadata from ``package.xml``, not the feed.
   This makes it possible to use cross-toolchains packages or packages that
   set compile flags without a feed.
+* Add ``qitoolchain svn-status`` to display status of subversion packages
+  in the given toolchain
 
 cmake
 -----
