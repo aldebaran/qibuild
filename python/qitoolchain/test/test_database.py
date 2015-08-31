@@ -1,5 +1,4 @@
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-from qisrc.test.conftest import svn_server
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
