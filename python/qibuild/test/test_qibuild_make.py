@@ -28,7 +28,6 @@ def test_make_without_configure(qibuild_action):
     with pytest.raises(qibuild.cmake_builder.NotConfigured):
         qibuild_action("make", "-s", "hello")
 
-
 def test_running_from_build_dir_incremental(qibuild_action):
     qibuild_action.add_test_project("world")
     hello_proj = qibuild_action.add_test_project("hello")

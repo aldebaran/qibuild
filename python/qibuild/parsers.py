@@ -174,6 +174,35 @@ def get_cmake_builder(args, default_dep_types=None):
     cmake_builder.dep_types = get_dep_types(args, default=default_dep_types)
     return cmake_builder
 
+def get_host_tools_builder(args):
+    """ Get a :py:class:`.CMakeBuilder  object from the command line
+    suitable to build host dependencies
+
+    """
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(create_if_missing=True)
+    host_config = qibuild_cfg.get_host_config()
+    if args.config and args.config != host_config:
+        raise Exception("""\
+Trying to get a host tools builder with the following
+build config: {config}, but the given config is not
+marked as a host config\
+""".format(config=args.config))
+    build_worktree = get_build_worktree(args)
+    if host_config:
+        build_worktree.set_active_config(host_config)
+    host_projects = get_host_projects(build_worktree, args)
+    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, host_projects)
+    return cmake_builder
+
+def get_host_projects(build_worktree, args):
+    projects = list()
+    for project_name in args.projects:
+        project = build_worktree.get_build_project(project_name, raises=True)
+        projects.append(project)
+    deps_solver = qibuild.deps.DepsSolver(build_worktree)
+    return deps_solver.get_host_projects(projects)
+
 def get_build_config(build_worktree, args):
     """ Get a CMakeBuildConfig object from an argparse.Namespace object
 

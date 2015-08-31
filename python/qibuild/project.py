@@ -60,7 +60,6 @@ def write_qi_path_conf(directory, sdk_dirs, sdk_layout=True):
 class BuildProject(object):
     def __init__(self, build_worktree, worktree_project):
         self.build_worktree = build_worktree
-        self.build_config = build_worktree.build_config
         self.path = worktree_project.path
         self.src = worktree_project.src
         self._name = None
@@ -74,6 +73,10 @@ class BuildProject(object):
     @property
     def name(self):
         return self._name
+
+    @property
+    def build_config(self):
+        return self.build_worktree.build_config
 
     @name.setter
     def name(self, value):
