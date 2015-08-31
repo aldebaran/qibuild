@@ -8,11 +8,13 @@ import qibuild.parsers
 
 def configure_parser(parser):
     """ Configure parser for this action """
+    qibuild.parsers.cmake_configure_parser(parser)
     qibuild.parsers.cmake_build_parser(parser)
-    qibuild.parsers.project_parser(parser)
+    parser.add_argument("projects", nargs="*", metavar="PROJECT",
+                        help="Project name(s)")
 
 def do(args):
     """ Main entry point """
-    cmake_builder = qibuild.parsers.get_cmake_builder(args)
-    cmake_builder.build_host_tools()
-
+    host_builder = qibuild.parsers.get_host_tools_builder(args)
+    host_builder.configure()
+    host_builder.build()

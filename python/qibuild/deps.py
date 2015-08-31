@@ -72,6 +72,18 @@ class DepsSolver(object):
             res.append(dep_project.sdk_directory)
         return res
 
+    def get_host_projects(self, projects):
+        """ Get a sorted list of all the projects listed as host dependencies """
+        host_deps = set()
+        dep_projects = self.get_dep_projects(projects, ["build", "runtime", "test"])
+        for project in dep_projects:
+            host_deps = host_deps.union(project.host_depends)
+
+        host_projects = [self.build_worktree.get_build_project(x, raises=False)
+                        for x in host_deps]
+        host_projects = filter(None, host_projects)
+        return host_projects
+
     def _get_sorted_names(self, projects, dep_types, reverse=False):
         """ Helper for get_dep_* functions """
         if reverse:

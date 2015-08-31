@@ -17,3 +17,12 @@ def test_recurse_deps(qibuild_action):
     qibuild_action.create_project("bar", run_depends=["usefootool"])
     qibuild_action("make-host-tools", "bar")
     qibuild.find.find_bin([footool_proj.sdk_directory], "footool", expect_one=True)
+
+def test_building_host_tools_in_release(qibuild_action, record_messages):
+    qibuild_action.add_test_project("footool")
+    qibuild_action.add_test_project("usefootool")
+    record_messages.reset()
+    qibuild_action("make-host-tools", "--release", "usefootool")
+    assert record_messages.find("Building footool in Release")
+    qibuild_action("configure", "usefootool")
+    qibuild_action("make", "usefootool")
