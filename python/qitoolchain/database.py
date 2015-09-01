@@ -48,6 +48,7 @@ class DataBase(object):
     def add_package(self, package):
         """ Add a package to the database """
         package.load_package_xml()
+        package.reroot_paths()
         self.packages[package.name] = package
 
     def remove_package(self, name):

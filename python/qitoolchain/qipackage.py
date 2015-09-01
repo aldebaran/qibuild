@@ -161,19 +161,32 @@ class QiPackage(object):
         return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
 
     def load_package_xml(self):
+        """ Load metada from package.xml
+
+        Assume self.path is set: must be called after
+        the package has been added to a toolchain
+
+        """
         package_xml = os.path.join(self.path, "package.xml")
         if not os.path.exists(package_xml):
             return
         root = qisys.qixml.read(package_xml).getroot()
-        toolchain_file = root.get("toolchain_file")
-        if toolchain_file:
-            self.toolchain_file = os.path.join(self.path, toolchain_file)
-        sysroot = root.get("sysroot")
-        if sysroot:
-            self.sysroot = os.path.join(self.path, sysroot)
-        cross_gdb = root.get("cross_gdb")
-        if cross_gdb:
-            self.cross_gdb = os.path.join(self.path, cross_gdb)
+        self.toolchain_file = root.get("toolchain_file")
+        self.sysroot = root.get("sysroot")
+        self.cross_gdb = root.get("cross_gdb")
+
+    def reroot_paths(self):
+        """ Make sure all the paths are absolute.
+        Assume self.path is set: must be called after
+        the package has been added to a toolchain
+
+        """
+        if self.toolchain_file:
+            self.toolchain_file = os.path.join(self.path, self.toolchain_file)
+        if self.sysroot:
+            self.sysroot = os.path.join(self.path, self.sysroot)
+        if self.cross_gdb:
+            self.cross_gdb = os.path.join(self.path, self.cross_gdb)
 
     def __repr__(self):
         return "<Package %s %s>" % (self.name, self.version)
