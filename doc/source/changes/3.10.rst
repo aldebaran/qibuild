@@ -6,6 +6,8 @@ qibuild
 * Include test dependencies in ``<build>/dependencies.cmake``
   This allows you to declare ``gtest`` as a ``testtime`` dependency only.
   (No need for it to be a ``buildtime`` dependency)
+* Fix using ``qibuild make-host-tools --release`` and other similar
+  build or configure options.
 
 qidoc
 -----
