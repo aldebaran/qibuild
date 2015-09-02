@@ -1,7 +1,9 @@
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
 import os
+import sys
 import subprocess
 import virtualenv
 
@@ -9,7 +11,8 @@ from qisys import ui
 import qisys.command
 
 def configure_virtualenv(config, python_worktree,  build_worktree=None,
-                         remote_packages=None, site_packages=True):
+                         remote_packages=None, site_packages=True,
+                         python_executable=None):
     """ Main entry point. Called by ``qipy bootstrap``
 
     :param: remote_packages List of third-party packages to add in the virtualenv
@@ -25,13 +28,20 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
     venv_path = python_worktree.venv_path
     pip = python_worktree.pip
 
+    if not python_executable:
+        python_executable = sys.executable
+    virtualenv_py = virtualenv.__file__
+    if virtualenv_py.endswith(".pyc"):
+        virtualenv_py = virtualenv_py[:-1]
+    cmd = [python_executable, virtualenv_py]
+    cmd.append(venv_path)
+    if not site_packages:
+        cmd.append("--no-site-packages")
     try:
-        virtualenv.create_environment(python_worktree.venv_path,
-                                      site_packages=site_packages)
-    except:
+        qisys.command.call(cmd)
+    except qisys.command.CommandFailedException:
         ui.error("Failed to create virtualenv")
         return False
-
 
     ui.info(ui.blue, "::", ui.reset, "Adding python projects")
     # Write a qi.pth file containing path to C/C++ extensions and

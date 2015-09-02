@@ -36,6 +36,8 @@ qipy
 
 * ``qipy bootstrap``: prettier output
 * ``qipy bootstrap``: add ``--no-site-packages``
+* ``qipy bootstrap``: add ``-p, --python`` to create a ``virtualenv`` with
+  a custom interpreter
 
 qisrc
 -----

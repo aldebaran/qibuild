@@ -27,7 +27,8 @@ class PythonBuilder(AbstractBuilder):
     def config(self):
         return self.python_worktree.config
 
-    def bootstrap(self, remote_packages=None, site_packages=True):
+    def bootstrap(self, remote_packages=None, site_packages=True,
+                  python_executable=None):
         """ Configure the virtualenv so that importing any
         Python module works
 
@@ -36,7 +37,8 @@ class PythonBuilder(AbstractBuilder):
                                        self.python_worktree,
                                        build_worktree=self.build_worktree,
                                        remote_packages=remote_packages,
-                                       site_packages=site_packages)
+                                       site_packages=site_packages,
+                                       python_executable=python_executable)
         qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
         write_qi_path_conf(self.python_worktree.venv_path, qi_path_sdk_dirs)
         return ok

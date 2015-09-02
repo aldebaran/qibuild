@@ -22,12 +22,15 @@ def configure_parser(parser):
                         dest="site_packages",
                         help="Do not allow access to global `site-packages` "
                              "directory")
+    parser.add_argument("-p", "--python",
+                        help="The Python interpreter to use")
     parser.set_defaults(requirements=["pip", "virtualenv", "ipython"],
                         site_packages=True)
 
 def do(args):
     python_builder = qipy.parsers.get_python_builder(args)
     ok = python_builder.bootstrap(remote_packages=args.requirements,
-                                  site_packages=args.site_packages)
+                                  site_packages=args.site_packages,
+                                  python_executable=args.python)
     if not ok:
         sys.exit(1)
