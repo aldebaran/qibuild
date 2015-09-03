@@ -66,12 +66,17 @@ class Git(object):
         cmd = [git]
         cmd.extend(args)
         raises = kwargs.get("raises")
+        env = os.environ.copy()
+        for key in env.keys():
+            if key.startswith("GIT_"):
+                del env[key]
         if raises is False:
             del kwargs["raises"]
             del kwargs["quiet"]
             process = subprocess.Popen(cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
+                env=env,
                 **kwargs)
             out = process.communicate()[0]
             # Don't want useless blank lines
@@ -81,7 +86,7 @@ class Git(object):
         else:
             if "raises" in kwargs:
                 del kwargs["raises"]
-            qisys.command.call(cmd, **kwargs)
+            qisys.command.call(cmd, env=env, **kwargs)
 
     @contextlib.contextmanager
     def transaction(self):

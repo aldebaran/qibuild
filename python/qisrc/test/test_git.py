@@ -85,3 +85,17 @@ def test_safe_checkout(cd_to_tmpdir, git_server):
     ok, mess = git.safe_checkout("devel", "origin")
     assert git.get_current_branch() == "devel"
     assert ok
+
+def test_ignores_env(tmpdir, monkeypatch):
+    repo1 = tmpdir.mkdir("repo1")
+    repo2 = tmpdir.mkdir("repo2")
+    git1 = TestGit(repo1.strpath)
+    git2 = TestGit(repo2.strpath)
+    git1.initialize()
+    git2.initialize()
+    untracked = repo1.join("untracked")
+    untracked.ensure(file=True)
+    monkeypatch.setenv("GIT_DIR", repo1.join(".git").strpath)
+    monkeypatch.setenv("GIT_WORK_TREE", repo1.strpath)
+    git2.call("clean", "--force")
+    assert untracked.check(file=1)
