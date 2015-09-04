@@ -275,7 +275,7 @@ class UnknownLingua(Exception):
         self.project = project
 
     def __str__(self):
-        mess = """ Unknow language '{language}' for {project.name}.
+        mess = """ Unknown language '{language}' for {project.name}.
 Please check the `linguas` attribute in the `<translate>` tag
 in {project.qiproject_xml}
 """
