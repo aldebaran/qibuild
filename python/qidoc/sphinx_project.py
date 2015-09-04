@@ -17,6 +17,7 @@ class SphinxProject(qidoc.project.DocProject):
                  depends=None, dest=None):
         self.doc_type = "sphinx"
         self.examples = list()
+        self.translated = False
         super(SphinxProject, self).__init__(doc_worktree, project, name,
                                             depends=depends,
                                             dest=dest)
@@ -157,7 +158,8 @@ class SphinxProject(qidoc.project.DocProject):
         self.generate_examples_zips()
 
         language = kwargs.get("language")
-        if language and language != "en" and language not in self.linguas:
+        if self.translated and language and language != "en" \
+                and language not in self.linguas:
             raise UnknownLingua(self, language)
         if self.translated:
             self.intl_build(language)
@@ -273,7 +275,7 @@ class UnknownLingua(Exception):
         self.project = project
 
     def __str__(self):
-        mess = """ Unknown language '{language}' for {project.name}.
+        mess = """ Unknow language '{language}' for {project.name}.
 Please check the `linguas` attribute in the `<translate>` tag
 in {project.qiproject_xml}
 """
