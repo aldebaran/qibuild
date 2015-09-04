@@ -50,5 +50,5 @@ cmake
   ``-config.cmake`` files
 * Add ``Qt5Svg``
 * ``qt5-tools``: fix some bugs occurring during cross-compilation
-* ``qi_generate_qt_conf``: only set ``Plugins`` and ``Qml2Imports``, not
+* ``qi_generate_qt_conf``: only set ``Plugins``, ``Qml2Imports`` ``Translations``, not
   ``Prefix``

@@ -56,6 +56,7 @@ function(qi_generate_qt_conf)
 "[Paths]
 Plugins = ${_root_path}/plugins
 Qml2Imports = ${_root_path}/qml
+Translations = ${_root_path}/translations
 ")
 
   # Then, generate and install a qt.conf
@@ -64,6 +65,7 @@ Qml2Imports = ${_root_path}/qml
 "[Paths]
 Plugins = ../plugins
 Qml2Imports = ../qml
+Translations = ../translations
 ")
   install(FILES "${CMAKE_BINARY_DIR}/qt.conf" DESTINATION bin COMPONENT runtime)
 
