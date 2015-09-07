@@ -63,22 +63,21 @@ def check_state(project, untracked):
     state_project.tracking = git.get_tracking_branch()
     if project.default_remote and project.default_branch:
         state_project.manifest_branch = "%s/%s" % (project.default_remote.name, project.default_branch.name)
-    #clean worktree, but is the current branch sync with the remote one?
-    if state_project.clean:
-        if state_project.current_branch is None:
-            state_project.not_on_a_branch = True
-            return state_project
 
-        if project.default_branch:
-            if state_project.current_branch != project.default_branch.name:
-                state_project.incorrect_proj = True
+    if state_project.current_branch is None:
+        state_project.not_on_a_branch = True
+        return state_project
 
-        (state_project.ahead, state_project.behind) = stat_tracking_remote(git,
-                state_project.current_branch, state_project.tracking)
-        if state_project.incorrect_proj:
-            (state_project.ahead_manifest, state_project.behind_manifest) = stat_tracking_remote(
-                git, state_project.current_branch, "%s/%s" % (
-                project.default_remote.name, project.default_branch.name))
+    if project.default_branch:
+        if state_project.current_branch != project.default_branch.name:
+            state_project.incorrect_proj = True
+
+    (state_project.ahead, state_project.behind) = stat_tracking_remote(git,
+            state_project.current_branch, state_project.tracking)
+    if state_project.incorrect_proj:
+        (state_project.ahead_manifest, state_project.behind_manifest) = stat_tracking_remote(
+            git, state_project.current_branch, "%s/%s" % (
+            project.default_remote.name, project.default_branch.name))
 
     if not state_project.sync_and_clean:
         out = git.get_status(untracked)
