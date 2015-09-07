@@ -6,9 +6,11 @@
 
 """
 
+import argparse
 import os
 import zipfile
 
+from qisys import ui
 import qisys.archive
 import qisys.worktree
 import qitoolchain.parsers
@@ -19,8 +21,7 @@ def configure_parser(parser):
     qitoolchain.parsers.toolchain_parser(parser)
     parser.add_argument("package_path", metavar='PATH',
                         help="The path to the package")
-    parser.add_argument("--name", help="The name of the package.\n" +
-                        "Useful for legacy package format")
+    parser.add_argument("--name", help=argparse.SUPPRESS)
 
 def do(args):
     """ Add a package to a toolchain
@@ -41,6 +42,8 @@ def do(args):
         legacy = True
     if legacy and not args.name:
         raise Exception("Must specify --name when using legacy format")
+    if args.name and not legacy:
+        ui.warning("--name ignored when using modern format")
 
     package = None
     if legacy:
