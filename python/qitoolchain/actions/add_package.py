@@ -38,7 +38,7 @@ def do(args):
     try:
         archive = zipfile.ZipFile(package_path)
         archive.read("package.xml")
-    except:
+    except KeyError:
         legacy = True
     if legacy and not args.name:
         raise Exception("Must specify --name when using legacy format")
