@@ -180,8 +180,10 @@ class TestGitServer(object):
 
     def create_group(self, name, projects, default=False):
         """ Add a group to the manifest """
+        names = [x.project for x in self.manifest.repos]
         for project in projects:
-            self.create_repo(project)
+            if project not in names:
+                self.create_repo(project)
         self.manifest.configure_group(name, projects, default=default)
         self.push_manifest("add group %s" % name)
 
