@@ -33,6 +33,7 @@ qisrc
   deemed to dangerous)
 * ``qisrc push`` displays reviewers before notifying them.
 * Fix using ``qisrc checkout`` after ``qisrc init --no-review``
+* ``qisrc status`` displays commits ahead/behind even when a project is dirty.
 
 qitoolchain
 -----------
