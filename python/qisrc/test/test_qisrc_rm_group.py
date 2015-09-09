@@ -15,3 +15,17 @@ def test_qisrc_rm_group(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 2
 
+def test_switching_group(qisrc_action, git_server):
+    git_server.create_group("default",
+                            ["naooqi", "agility", "vision", "choregraphe"],
+                            default=True)
+    git_server.create_group("agility", ["agility"])
+    qisrc_action("init", git_server.manifest_url, "--group", "agility")
+    git_worktree = TestGitWorkTree()
+    assert len(git_worktree.git_projects) == 1
+    qisrc_action("add-group", "default")
+    git_worktree = TestGitWorkTree()
+    assert len(git_worktree.git_projects) == 4
+    qisrc_action("rm-group", "default")
+    git_worktree = TestGitWorkTree()
+    assert len(git_worktree.git_projects) == 1
