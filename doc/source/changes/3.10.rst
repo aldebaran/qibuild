@@ -34,6 +34,7 @@ qisrc
 * ``qisrc push`` displays reviewers before notifying them.
 * Fix using ``qisrc checkout`` after ``qisrc init --no-review``
 * ``qisrc status`` displays commits ahead/behind even when a project is dirty.
+* ``qisrc rm-group``: fix when trying to remove a default group
 
 qitoolchain
 -----------

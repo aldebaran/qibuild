@@ -123,7 +123,7 @@ Found two projects sharing the same sources:
 
         """
         default_group = self.groups.default_group
-        if not groups:
+        if groups is None:
             if default_group:
                 groups = [default_group.name]
             else:

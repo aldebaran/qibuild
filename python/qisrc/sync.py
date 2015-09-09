@@ -8,6 +8,7 @@
 
 import os
 
+from qisys.qixml import etree
 from qisys import ui
 import qisys.qixml
 import qisrc.git
@@ -27,9 +28,7 @@ class WorkTreeSyncer(object):
         self.git_worktree = git_worktree
         # Read manifest configuration now, before any
         self.manifest = LocalManifest()
-        root = qisys.qixml.read(self.manifest_xml).getroot()
-        parser = WorkTreeSyncerParser(self)
-        parser.parse(root)
+        self.read_manifest_config()
         self.old_repos = list()
         self.new_repos = list()
 
@@ -92,7 +91,7 @@ class WorkTreeSyncer(object):
         # re-read self.old_repos so we can do several syncs:
         self.old_repos = self.get_old_repos()
         # if everything went well, save the manifests configurations:
-        self.dump_manifest()
+        self.dump_manifest_config()
         return res
 
     def configure_projects(self, projects=None):
@@ -125,11 +124,35 @@ class WorkTreeSyncer(object):
         ui.info(" " * (max_src + 19), end="\r")
         self.git_worktree.save_git_config()
 
-    def dump_manifest(self):
+    def read_manifest_config(self):
+        tree = qisys.qixml.read(self.manifest_xml)
+        root = tree.getroot()
+        manifest_elem = root.find("manifest")
+        if manifest_elem is None:
+            return
+        self.manifest.url = manifest_elem.get("url")
+        self.manifest.branch = manifest_elem.get("branch", "master")
+        if manifest_elem.get("groups"):
+            self.manifest.groups = qisys.qixml.parse_list_attr(manifest_elem, "groups")
+        else:
+            self.manifest.groups = None
+        self.manifest.review = qisys.qixml.parse_bool_attr(manifest_elem, "review",
+                                                           default=True)
+
+    def dump_manifest_config(self):
         """ Save the manifest config in .qi/manifest.xml """
-        parser = WorkTreeSyncerParser(self)
-        xml = parser.xml_elem()
-        qisys.qixml.write(xml, self.manifest_xml)
+        root = etree.Element("worktree")
+        manifest_elem = etree.SubElement(root, "manifest")
+        manifest_elem.set("url", self.manifest.url)
+        manifest_elem.set("branch", self.manifest.branch)
+        if self.manifest.groups is not None:
+            manifest_elem.set("groups", " ".join(self.manifest.groups))
+        if self.manifest.review:
+            manifest_elem.set("review", "true")
+        else:
+            manifest_elem.set("review", "false")
+        tree = etree.ElementTree(root)
+        qisys.qixml.write(tree, self.manifest_xml)
 
     def configure_manifest(self, url, branch="master", groups=None,
                            ref=None, review=None, force=False):
@@ -150,7 +173,7 @@ class WorkTreeSyncer(object):
         self.manifest.review = review
         res = self.sync_repos(force=force)
         self.configure_projects()
-        self.dump_manifest()
+        self.dump_manifest_config()
         return res
 
     def read_remote_manifest(self, manifest_xml=None):
@@ -166,7 +189,7 @@ class WorkTreeSyncer(object):
         # group in the manifest, we need to set self.manifest.groups
         # so that subsequent calls to qisrc add-group, remove-group
         # work
-        if not self.manifest.groups:
+        if self.manifest.groups is None:
             default_group = remote_manifest.groups.default_group
             if default_group:
                 self.manifest.groups = [default_group.name]
@@ -309,7 +332,7 @@ class LocalManifest(object):
     def __init__(self):
         self.url = None
         self.branch = "master"
-        self._groups = list()
+        self._groups = None
         self.ref = None # used for snaphots or in case you
                         # don't want the head of a branch
         self.review = True
@@ -321,8 +344,9 @@ class LocalManifest(object):
     @groups.setter
     def groups(self, groups):
         if groups is None:
-            groups = list()
-        self._groups = sorted(groups)
+            self._groups = None
+        else:
+            self._groups = sorted(groups)
 
     def __eq__(self, other):
         if not isinstance(other, LocalManifest):
@@ -417,28 +441,3 @@ def compute_profile_updates(local_profiles, remote_profiles):
         else:
             new.append(remote_profile)
     return new, updated
-
-##
-# Parsing
-
-class WorkTreeSyncerParser(qisys.qixml.XMLParser):
-    def __init__(self, target):
-        super(WorkTreeSyncerParser, self).__init__(target)
-        self._ignore = ["manifest_xml", "manifest_repo",
-                        "old_repos", "new_repos"]
-
-    def _parse_manifest(self, elem):
-        manifest = LocalManifest()
-        parser = LocalManifestParser(manifest)
-        parser.parse(elem)
-        self.target.manifest = manifest
-
-    def _write_manifest(self, elem):
-        parser = LocalManifestParser(self.target.manifest)
-        manifest_elem = parser.xml_elem(node_name="manifest")
-        elem.append(manifest_elem)
-
-class LocalManifestParser(qisys.qixml.XMLParser):
-    def __init__(self, target):
-        super(LocalManifestParser, self).__init__(target)
-        self._required = ["url", "branch"]

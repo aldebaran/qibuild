@@ -114,7 +114,7 @@ def test_changing_manifest_groups(git_worktree, git_server):
     git_projects = git_worktree.git_projects
     assert len(git_projects) == 2
     git_worktree.configure_manifest(manifest_url,
-                                    groups=list())
+                                    groups=None)
     git_projects = git_worktree.git_projects
     assert len(git_projects) == 5
     git_worktree.configure_manifest(manifest_url,

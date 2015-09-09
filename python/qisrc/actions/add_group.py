@@ -5,6 +5,8 @@
 
 """
 
+import copy
+
 from qisys import ui
 import qisrc.parsers
 
@@ -19,7 +21,10 @@ def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
     group = args.group
     manifest = git_worktree.manifest
-    groups = git_worktree.manifest.groups[:]
+    if git_worktree.manifest.groups is None:
+        groups = list()
+    else:
+        groups = copy.copy(git_worktree.manifest.groups)
     if group in groups:
         ui.error("Group", group, "already in use")
         sys.exit(1)

@@ -29,3 +29,16 @@ def test_switching_group(qisrc_action, git_server):
     qisrc_action("rm-group", "default")
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 1
+
+def test_qisrc_remove_default_group(qisrc_action, git_server):
+    git_server.create_group("default", ["a", "b"], default=True)
+    git_server.create_group("minimal", ["a"])
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    assert len(git_worktree.git_projects) == 2
+    qisrc_action("rm-group", "default")
+    git_worktree = TestGitWorkTree()
+    assert len(git_worktree.git_projects) == 0
+    qisrc_action("add-group", "minimal")
+    git_worktree = TestGitWorkTree()
+    assert len(git_worktree.git_projects) == 1
