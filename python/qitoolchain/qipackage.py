@@ -40,7 +40,7 @@ class QiPackage(object):
             qibuild.deps.read_deps_from_xml(self, xml_root)
 
     def to_xml(self):
-        """ Return an etree.Element representing this package """
+        """ Return an ``etree.Element`` representing this package """
         element = etree.Element("package")
         element.set("name", self.name)
         if self.path:
@@ -161,7 +161,7 @@ class QiPackage(object):
         return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
 
     def load_package_xml(self):
-        """ Load metada from package.xml
+        """ Load metadata from package.xml
 
         Assume self.path is set: must be called after
         the package has been added to a toolchain
