@@ -26,7 +26,8 @@ def make_release(pkg_path, output_path):
         _update_python_services(tmp_path)
 
         # add everything from the temp path
-        qisys.archive.compress(tmp_path, output=output_path, flat=True)
+        qisys.archive.compress(tmp_path, output=output_path, flat=True,
+                               display_progress=True)
 
     ui.info(ui.green, "Package compiled to", ui.reset,
             ui.bold, output_path)
