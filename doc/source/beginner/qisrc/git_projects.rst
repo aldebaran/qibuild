@@ -131,8 +131,8 @@ If you do not want to create a new worktree, you can also use:
     qisrc checkout release-1.12
 
 
-Handling profiles
-+++++++++++++++++
+Handling groups
++++++++++++++++
 
 You may then want to build the documentation of ``libqi`` and ``libnaoqi``,
 while making sure the sources of ``choregraphe`` never leak.
@@ -171,6 +171,28 @@ Of course, if you need to build the doc for the release, just use:
 
 You can also list, add and remove the groups used in your worktree by using
 ``qisrc list-groups``, ``qisrc add-group``, ``qisrc rm-group``
+
+By default, when no group is given, ``qisrc init`` clones everything.
+You can change this behavior by using a group named "default", like this:
+
+.. code-block:: xml
+
+  <manifest>
+  ...
+  <repo project="a.git" />
+  <repo project="b.git" />
+  <repo project="c.git" />
+
+  <groups>
+    <group name="default" default="true">
+      <project name="a.git" />
+      <project name="b.git" />
+    </group>
+  </groups>
+
+
+Here only ``a.git`` and ``b.git`` will get cloned when no group is
+specified.
 
 
 Handling development branches
@@ -232,11 +254,59 @@ new ``gerrit`` remote to the ``manifest.xml`` file:
    <manifest>
       <remote name="origin" url="git@git.aldebaran.lan" />
       <remote name="gerrit" url="ssh://gerrit.aldebaran.lan:29418" />
-      <project name="qi/libqi.git" path="lib/libqi" remotes="origin gerrit" />
+      <repo project="qi/libqi.git" src="lib/libqi" remotes="origin gerrit" />
     </manifest>
 
 And then, ``qisrc sync`` will setup your project for code review, and using
 ``qisrc push`` will be able to upload your changes for code review.
+
+Editing the manifest
+++++++++++++++++++++
+
+If you have gone through the process of using code review for all your
+projects, you may want to put the manifest itself under code review.
+
+Even if you don't, you may want to test your changes to check that nothing is
+broken, without first pushing them and running ``qsirc sync``.
+
+You may be tempted to edit the manifest repository which is
+in ``<worktree>/.qi/manifest/default`` but this is a bad idea:
+this repository is automatically updated by ``qisrc sync``, and
+all your local changes could be lost.
+
+Here is how you can proceed instead.
+
+* Add a copy of the manifest inside the worktree
+
+.. code-block:: xml
+
+    <manifest>
+      <remote name="origin" url="..." />
+      <remote name="gerrit" url="..." />
+      ...
+      <!-- if you choose to not put the manifest under code review -->
+      <repo project="manifest.git" src="manifest" remotes="origin"/>
+
+      <!-- if you choose to put the manifest under code review -->
+      <repo project="manifest.git" src="manifest" remotes="origin gerrit"/>
+      ...
+  </manifest>
+
+* You can now edit the manifest in ``<worktree>/manifest`` and
+  push your changes to the ``gerrit`` or ``origin`` using ``qisrc push`` as usual.
+
+* To apply your changes to your worktree before submitting them, you can use
+
+.. code-block:: console
+
+    qisrc check-manifest manifest/manifest.xml
+
+Once you have check that all is correct, push or submit your changes and then run
+``qisrc sync`` as usual.
+
+If on the other hand you are not satisfied, you can undo the changes by
+running ``qisrc sync``.
+
 
 Handling several remotes
 ++++++++++++++++++++++++
