@@ -139,7 +139,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
                 res.append(os.path.join(package.path, "bin"))
         return res
 
-    def get_known_profiles(self):
+    def get_known_profiles(self, warns=True):
         """ Parse the remote profiles (coming from qisrc sync), and the
         local profiles (written in .qi/qibuild.xml). Return a dict
         name -> list of tuple (key, value)
@@ -152,6 +152,15 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
             res = qibuild.profile.parse_profiles(remote_xml)
         local_xml = self.qibuild_xml
         local_profiles = qibuild.profile.parse_profiles(local_xml)
+        for name in local_profiles.keys():
+            if name in res:
+                remote_profile = res[name]
+                local_profile = local_profiles[name]
+                if remote_profile != local_profile:
+                    if warns:
+                        ui.warning("Overriding remote profile", name, "\n",
+                                   "local: ", local_profile.cmake_flags, "\n",
+                                   "remote:", remote_profile.cmake_flags)
         res.update(local_profiles)
         return res
 

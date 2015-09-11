@@ -149,7 +149,7 @@ class CMakeBuildConfig(object):
         """ The CMake arguments to use
 
         """
-        self.parse_profiles()
+        self.parse_profiles(warns=False)
         args = list()
         if self.cmake_generator:
             args.append("-G%s" % self.cmake_generator)
@@ -197,9 +197,9 @@ config in ~/.config/qi/qibuild.xml
             self._default_config = matching_config.name
             self.set_active_config(matching_config.name)
 
-    def parse_profiles(self):
+    def parse_profiles(self, warns=True):
         self._profile_flags = list()
-        known_profiles = self.build_worktree.get_known_profiles()
+        known_profiles = self.build_worktree.get_known_profiles(warns=warns)
         known_names = known_profiles.keys()
         for name in self._profiles:
             if not name in known_names:
