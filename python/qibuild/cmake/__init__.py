@@ -184,7 +184,7 @@ def display_options(build_dir):
     opt_keys.sort()
     padding = max(len(x) for x in opt_keys) + 3
     for key in opt_keys:
-        print "  %s : %s" % (key.ljust(padding), cache[key])
+        ui.info("  %s : %s" % (key.ljust(padding), cache[key]))
 
 def read_cmake_cache(cache_path):
     """ Read a CMakeCache.txt file, returning a dict
