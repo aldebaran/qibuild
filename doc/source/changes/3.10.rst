@@ -49,6 +49,9 @@ qisrc
 * ``qisrc push`` can now only be used on one git project.
   (Previously you could run ``qisrc push --all``, but that was
   deemed to dangerous)
+* ``qisrc push``: project arguments are no longer positional.
+  This means you should use ``qisrc push --project foo`` instead
+  of ``qisrc push foo``
 * ``qisrc push`` displays reviewers before notifying them.
 * Fix using ``qisrc checkout`` after ``qisrc init --no-review``
 * ``qisrc status`` displays commits ahead/behind even when a project is dirty.
