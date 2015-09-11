@@ -11,6 +11,9 @@ class Toolchain(object):
     def __init__(self, name):
         self.name = name
         self.feed_url = None
+        # Used when feed_url is a git URL
+        self.feed_name = None
+        self.feed_branch = None
         self.config_path = qisys.sh.get_config_path("qi", "toolchains",
                                                     "%s.xml" % self.name)
 
@@ -37,11 +40,17 @@ class Toolchain(object):
         tree = qisys.qixml.read(self.config_path)
         root = tree.getroot()
         self.feed_url = root.get("feed")
+        self.feed_name = root.get("name")
+        self.feed_branch = root.get("branch")
 
     def save(self):
         tree = qisys.qixml.read(self.config_path)
         root = tree.getroot()
         root.set("feed", self.feed_url)
+        if self.feed_branch:
+            root.set("branch", self.feed_branch)
+        if self.feed_name:
+            root.set("name", self.feed_name)
         qisys.qixml.write(root, self.config_path)
 
     def register(self):
@@ -52,11 +61,17 @@ class Toolchain(object):
     def unregister(self):
         qisys.sh.rm(self.config_path)
 
-    def update(self, feed_url=None):
+    def update(self, feed_url=None, branch=None, name=None):
         if feed_url is None:
             feed_url = self.feed_url
-        self.db.update(feed_url)
+        if name is None:
+            name = self.feed_name
+        if branch is None:
+            branch = self.feed_branch
+        self.db.update(feed_url, branch=branch, name=name)
         self.feed_url = feed_url
+        self.feed_branch = branch
+        self.feed_name = name
         self.save()
         self.generate_toolchain_file()
 

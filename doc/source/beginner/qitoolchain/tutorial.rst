@@ -147,7 +147,6 @@ You should put all of this into a package, with a few additional metadata:
 .. code-block:: xml
 
     <!-- in package.xml -->
-
     <package name="arm-ctc"
              host="linux64"
              target="arm"
@@ -244,16 +243,35 @@ Let's assume you have ``foo`` and ``bar`` packages. Write a feed looking like
   </toolchain>
 
 
+Alternatively, you can create a git repository to store your feed.
+Just make sure it is in a 'feeds' subdirectory, like this:
+
+.. code-block:: console
+
+    <toolchains.git>
+      feeds
+        foo.xml
+
+
 Using a toolchain
 -----------------
 
 Once the feed has been created, run:
 
-.. code-block:: xml
+.. code-block:: console
 
   qitoolchain create my-toolchain http://example.com/feed.xml
 
-And use:
+Or:
+
+.. code-block:: console
+
+  qitoolchain create my-toolchain --name foo git@example.com:toolchains.git
+
+Here ``--name`` is the name of the feed in the ``feeds`` directory on the git
+repository, without the ``.xml`` extension.
+
+Then use:
 
 .. code-block:: console
 
@@ -274,7 +292,6 @@ distribution.
 
 Putting binary packages in a subversion repository
 ---------------------------------------------------
-
 
 Instead of hosting zips on a HTTP server, you may want to host the pre-compiled packages
 in a subversion server. Why subversion ? Because it allows partial checkouts, and it
@@ -315,3 +332,51 @@ You can also specify a revision inside the feed:
     <feed>
       <svn_package name="boost" url="svn://example.org/toolchains/master/linux64/boost" revision="42" />
     </feed>
+
+
+Using sub feeds
+---------------
+
+Let's assume you want to create several feeds for cross-compiling on several
+operating systems. Each feed will contain a specific package for the
+cross-compiler, which is host dependent, and a list of common packages for the
+third-party libraries, which are host independent.
+
+To solve this problem, you can include some feeds into an other one,
+like this:
+
+.. code-block:: console
+
+    arm.xml
+    linux64-arm.xml
+    mac64-arm.xml
+
+.. code-block:: xml
+
+    <!-- in arm.xml -->
+    <feed>
+      <package name="boost" url="..." />
+    </feed>
+
+    <!-- in linux64-arm.xml -->
+    <feed>
+      <feed url="http://example.com/feeds/arm.xml" />
+      <package name="ctc-linux64-arm" url="..." />
+    </feed>
+
+    <!-- in mac64-arm.xml -->
+    <feed>
+      <feed url="http://example.com/feeds/arm.xml" />
+      <package name="ctc-mac64-arm" url="..." />
+    </feed>
+
+If you chose to put the feeds in a git repository, you can specify
+sub feeds by name, like this
+
+.. code-block:: xml
+
+  <!-- in feeds/linux64-arm.xml -->
+  <feed>
+    <feed name="arm" />
+    ...
+  </feed>

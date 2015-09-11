@@ -92,13 +92,22 @@ class DataBase(object):
                 res.append(self.packages[name])
         return res
 
-    def update(self, feed):
-        """ Update a toolchain given a feed """
+    def update(self, feed, branch=None, name=None):
+        """ Update a toolchain given a feed
+
+        ``feed`` can be:
+
+        * a path
+        * a url
+        * a git url (in this case branch and name cannot be None,
+          and ``feeds/<name>.xml`` must exist on the given branch)
+
+        """
         ui.info(ui.green, "Updating toolchain",
                 self.name, "with feed", feed, "...")
 
-        feed_parser = qitoolchain.feed.ToolchainFeedParser()
-        feed_parser.parse(feed)
+        feed_parser = qitoolchain.feed.ToolchainFeedParser(self.name)
+        feed_parser.parse(feed, branch=branch, name=name)
         remote_packages = feed_parser.get_packages()
         local_packages = self.packages.values()
         to_add = list()

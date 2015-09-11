@@ -21,6 +21,11 @@ qitest
   output of the tests to be shown as they run, or when your test command
   requires a ``tty`` as ``stdout``)
 
+qitoolchain
+------------
+
+* Support using feeds as git URLs. (See :ref:`qitoolchain-tutorial` for more info)
+
 qidoc
 -----
 

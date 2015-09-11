@@ -17,6 +17,7 @@ import qisys
 import qisys.archive
 import qisys.remote
 import qisys.version
+import qisrc.git
 import qibuild.config
 import qitoolchain
 
@@ -37,8 +38,7 @@ def raise_parse_error(package_tree, feed, message):
     mess += message
     raise Exception(mess)
 
-
-def tree_from_feed(feed_location):
+def tree_from_feed(feed_location, branch=None, name=None):
     """ Returns an ElementTree object from an
     feed location
 
@@ -63,12 +63,26 @@ def tree_from_feed(feed_location):
             fp.close()
     return tree
 
+def open_git_feed(toolchain_name, feed_url, name=None, branch="master", first_pass=True):
+    git_path = qisys.sh.get_share_path("qi", "toolchains", toolchain_name + ".git")
+    git = qisrc.git.Git(git_path)
+    if first_pass:
+        if os.path.exists(git_path):
+            git.call("remote", "set-url", "origin", feed_url)
+            git.call("fetch", "origin", "--quiet")
+            git.call("reset", "--hard", "--quiet", "origin/%s" % branch)
+        else:
+            git.clone(feed_url, "--quiet", "--branch", branch)
+
+    feed_path = os.path.join(git_path, "feeds", name + ".xml")
+    return feed_path
 
 class ToolchainFeedParser:
     """ A class to handle feed parsing
 
     """
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.packages = list()
         # A list of packages to be blacklisted
         self.blacklist = list()
@@ -106,11 +120,16 @@ class ToolchainFeedParser:
                 self.packages.append(qitoolchain.qipackage.from_xml(package_tree))
                 self._versions[name] = version
 
-    def parse(self, feed):
+    def parse(self, feed, branch=None, name=None, first_pass=True):
         """ Recursively parse the feed, filling the self.packages
 
         """
-        tree = tree_from_feed(feed)
+        if branch and name:
+            feed_path = open_git_feed(self.name, feed, branch=branch, name=name,
+                                      first_pass=first_pass)
+            tree = tree_from_feed(feed_path)
+        else:
+            tree = tree_from_feed(feed)
         package_trees = tree.findall("package")
         package_trees.extend(tree.findall("svn_package"))
         for package_tree in package_trees:
@@ -124,6 +143,9 @@ class ToolchainFeedParser:
                 if not "://" in feed_url:
                     feed_url = urlparse.urljoin(feed, feed_url)
                 self.parse(feed_url)
+            feed_name = feed_tree.get("name")
+            if feed_name:
+                self.parse(feed, branch=branch, name=feed_name, first_pass=False)
         select_tree = tree.find("select")
         if select_tree is not None:
             blacklist_trees = select_tree.findall("blacklist")

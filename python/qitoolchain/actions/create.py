@@ -8,6 +8,8 @@ Toolchain packages and known configurations will be fetched from an URL.
 
 """
 
+import os
+
 from qisys import ui
 import qisys.parsers
 import qibuild.parsers
@@ -19,18 +21,25 @@ def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("name", metavar="NAME",
         help="Name of the toolchain", type=ui.valid_filename)
+    parser.add_argument("--name", dest="feed_name",
+        help="Name of the feed. To be specified when using a git url")
+    parser.add_argument("--branch",
+        help="Branch of the git url to use")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
         help="Optional: path to the toolchain configuration file.\n"
              "If not given, the toolchain will be empty.\n"
-             "May be a local file or an url",
+             "May be a local file, a url or a git URL (in this case\n"
+             "--name must be used)",
         nargs="?")
+    parser.set_defaults(branch="master")
 
 def do(args):
     """Main entry point
 
     """
     feed = args.feed
-    if feed and not "://" in feed:
+    # Normalize feed path:
+    if feed and os.path.exists(feed):
         feed = qisys.sh.to_native_path(feed)
     tc_name = args.name
 
@@ -53,6 +62,6 @@ def do(args):
 
     toolchain = qitoolchain.Toolchain(tc_name)
     if feed:
-        toolchain.update(feed)
+        toolchain.update(feed, branch=args.branch, name=args.feed_name)
 
     return toolchain

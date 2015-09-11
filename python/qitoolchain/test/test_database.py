@@ -13,6 +13,7 @@ import qitoolchain.svn_package
 import qitoolchain.feed
 
 from qisrc.test.conftest import svn_server
+from qisrc.test.conftest import git_server
 
 def test_persistent(toolchain_db):
     foo_package = qitoolchain.qipackage.QiPackage("foo", version="1.3")
@@ -104,6 +105,26 @@ def test_solve_deps(toolchain_db, tmpdir):
     res = toolchain_db.solve_deps([bar_package], dep_types=["build"])
     assert res == [foo_package, bar_package]
 
+def test_git_feed(toolchain_db, feed, git_server):
+    boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")
+    feed.add_package(boost_package)
+    git_server.create_repo("toolchains.git")
+    git_server.push_file("toolchains.git", "feeds/foo.xml", feed.feed_xml.read())
+    url = git_server.get_repo("toolchains.git").clone_url
+
+    toolchain = qitoolchain.toolchain.Toolchain("foo")
+    toolchain.update(url, branch="master", name="foo")
+    boost = toolchain.get_package("boost")
+    assert boost.version == "1.44"
+
+    new_boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.55")
+    feed.add_package(new_boost_package)
+    git_server.push_file("toolchains.git", "feeds/foo.xml", feed.feed_xml.read())
+
+    toolchain.update()
+    boost = toolchain.get_package("boost")
+    assert boost.version == "1.55"
+
 def test_svn_package_conflict(toolchain_db, feed, svn_server):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")
     feed.add_package(boost_package)
@@ -118,7 +139,6 @@ def test_svn_package_conflict(toolchain_db, feed, svn_server):
     feed.add_svn_package(svn_package)
 
     toolchain.update(feed.url)
-
 
 def test_package_with_flags(tmpdir, toolchain_db):
     feed = tmpdir.join("feed.xml")
