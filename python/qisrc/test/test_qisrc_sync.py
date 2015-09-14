@@ -283,3 +283,25 @@ def test_do_not_sync_when_clone_fails(qisrc_action, git_server, record_messages)
     rc = qisrc_action("sync", retcode=True)
     assert rc != 0
     assert not record_messages.find("Success")
+
+def test_changing_branch_of_repo_under_code_review(qisrc_action, git_server,
+                                                   record_messages):
+    git_server.create_repo("foo.git", review=True)
+    qisrc_action("init", git_server.manifest_url)
+    git_server.change_branch("foo.git", "devel")
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    git.checkout("-b", "devel")
+    record_messages.reset()
+    qisrc_action("sync")
+    assert record_messages.find("default branch changed")
+    assert not record_messages.find("now using code review")
+
+def test_using_code_review(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.use_review("foo.git")
+    record_messages.reset()
+    qisrc_action("sync")
+    assert record_messages.find("now using code review")

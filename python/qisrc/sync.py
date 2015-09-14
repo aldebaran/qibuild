@@ -119,7 +119,6 @@ class WorkTreeSyncer(object):
             ui.info_count(i, n, ui.white, "Setup", ui.reset,
                           ui.blue, repo.src.ljust(max_src), end="\r")
             git_project = srcs[repo.src]
-            git_project.read_remote_config(repo)
             git_project.apply_config()
         ui.info(" " * (max_src + 19), end="\r")
         self.git_worktree.save_git_config()
@@ -259,7 +258,7 @@ class WorkTreeSyncer(object):
             for (old_repo, new_repo) in to_update:
                 ui.info(ui.green, "* ",
                         ui.reset, "updating", ui.blue, old_repo.src)
-                if new_repo.review:
+                if new_repo.review and not old_repo.review:
                     ui.info(ui.tabs(2), ui.green, "(now using code review)")
                 project = self.git_worktree.get_git_project(new_repo.src)
                 project.read_remote_config(new_repo)
@@ -292,7 +291,11 @@ class WorkTreeSyncer(object):
         if to_move:
             ui.info(ui.green, ":: Moving repositories ...")
         for (repo, new_src) in to_move:
-            if not self.git_worktree.move_repo(repo, new_src, force=force):
+            if self.git_worktree.move_repo(repo, new_src, force=force):
+                project = self.git_worktree.get_git_project(new_src)
+                project.read_remote_config(repo)
+                project.save_config()
+            else:
                 res = False
 
         return res

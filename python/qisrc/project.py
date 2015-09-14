@@ -146,11 +146,20 @@ class GitProject(object):
                 if not quiet:
                     ui.warning("Default remote changed", previous_default, "->",
                                                         new_default)
-        self.review = False
-        if repo.review:
+        if repo.review and not self.review:
+        # Project is now under code review, try to setup
+        # gerrit and save success in self.review
+        # (so that we can retry if gerrit setup did not work)
             ok = qisrc.review.setup_project(self)
             if ok:
                 self.review = True
+            else:
+                self.review = False
+        if not repo.review and self.review:
+            # Project was under code review, but no longer is,
+            # simply set self.review to False so that `qisrc push`
+            # does not try to push to gerrit
+            self.review = False
 
     def sync(self, rebase_devel=False, **kwargs):
         """ Synchronize remote changes with the underlying git repository
