@@ -23,7 +23,8 @@ qi_create_lib(myplugin SHARED SUBFOLDER "word"
 qi_install_header(world/world.h SUBFOLDER world)
 qi_install_header(bar/bar.h KEEP_RELATIVE_PATHS)
 
-qi_stage_lib(world)
+qi_stage_lib(world CUSTOM_CODE
+  "set(WORLD_OK TRUE CACHE INTERNAL \"\" FORCE)")
 qi_stage_lib(bar)
 
 qi_stage_cmake(cmake/foo-config.cmake)

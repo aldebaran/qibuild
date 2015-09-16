@@ -10,6 +10,11 @@ message(STATUS "bar_FOUND: ${bar_FOUND}")
 
 qi_create_bin(hello "main.cpp")
 qi_use_lib(hello world)
+if("${WORLD_OK}" STREQUAL "TRUE")
+  qi_info("The world is OK")
+else()
+  qi_error("WORLD_OK should be set")
+endif()
 
 # Add a test that just runs hello without arguments
 qi_add_test(zero_test hello)
