@@ -5,3 +5,9 @@ qisrc
 ------
 
 * ``qisrc checkout``: do not re-add the default group
+
+cmake
+-----
+
+* Using ``qi_stage_lib(foo CUSTOM_CODE ..)`` did not generate
+  installed ``foo-config.cmake`` correctly
