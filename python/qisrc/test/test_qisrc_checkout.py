@@ -104,3 +104,13 @@ def test_retcode_when_checkout_fails(qisrc_action, git_server):
 
     rc = qisrc_action("checkout", "devel", retcode=True)
     assert rc != 0
+
+def test_qisrc_checkout_when_no_group(qisrc_action, git_server):
+    git_server.create_group("default", ["a", "b"], default=True)
+    qisrc_action("init", git_server.manifest_url)
+    qisrc_action("rm-group", "default")
+    git_server.switch_manifest_branch("devel")
+    qisrc_action("checkout", "devel")
+
+    git_worktree = TestGitWorkTree()
+    assert len(git_worktree.git_projects) == 0

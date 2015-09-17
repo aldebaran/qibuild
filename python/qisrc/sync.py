@@ -132,10 +132,10 @@ class WorkTreeSyncer(object):
             return
         self.manifest.url = manifest_elem.get("url")
         self.manifest.branch = manifest_elem.get("branch", "master")
-        if manifest_elem.get("groups"):
-            self.manifest.groups = qisys.qixml.parse_list_attr(manifest_elem, "groups")
-        else:
+        if manifest_elem.get("groups") is None:
             self.manifest.groups = None
+        else:
+            self.manifest.groups = qisys.qixml.parse_list_attr(manifest_elem, "groups")
         self.manifest.review = qisys.qixml.parse_bool_attr(manifest_elem, "review",
                                                            default=True)
 
