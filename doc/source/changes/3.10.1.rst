@@ -1,0 +1,7 @@
+v3.10.1
+=======
+
+qisrc
+------
+
+* ``qisrc checkout``: do not re-add the default group
