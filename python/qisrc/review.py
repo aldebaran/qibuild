@@ -185,7 +185,7 @@ def push(project,  branch, bypass_review=False, dry_run=False,
 def set_reviewers(refs, reviewers, username, server, ssh_port):
     """ Set reviewers using gerrit set-reviewers command
 
-    :param refs: A list of references to patchsets, can be SHA1s or Change-Ids
+    :param refs: A list of references to ``patchsets``, can be SHA1s or Change-Ids
     :param reviewers: A list of Gerrit reviewers, username or group name,
                       no e-mails
     """
