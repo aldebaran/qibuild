@@ -246,7 +246,6 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         errors = list()
         manifest_xml = os.path.join(self._syncer.manifest_repo, "manifest.xml")
         manifest = qisrc.manifest.Manifest(manifest_xml)
-        max_src = max([len(x.src) for x in self.git_projects])
         to_checkout = list()
         for project in self.git_projects:
             if project.default_branch is None:
@@ -257,6 +256,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                 to_checkout.append(project)
 
         n = len(to_checkout)
+        if n == 0:
+            ui.info(ui.green, "Nothing to checkout")
+            return True
+
+        max_src = max([len(x.src) for x in to_checkout])
         for i, project in enumerate(to_checkout):
             ui.info_count(i, n, ui.bold, "Checkout",
                          ui.reset, ui.blue, project.src.ljust(max_src), end="\r")
