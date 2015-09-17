@@ -150,7 +150,10 @@ def main_wrapper(module, args):
                 sys.exit(0)
         if args.backtrace:
             raise
-        ui.error(e.__class__.__name__, e)
+        message = str(e)
+        if message.endswith("\n"):
+            message = message[:-1]
+        ui.error(e.__class__.__name__, message)
         sys.exit(2)
 
 def _dump_arguments(name, args):
