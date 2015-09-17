@@ -305,3 +305,7 @@ def test_using_code_review(qisrc_action, git_server, record_messages):
     record_messages.reset()
     qisrc_action("sync")
     assert record_messages.find("now using code review")
+
+def test_no_manifest(qisrc_action):
+    error = qisrc_action("sync", raises=True)
+    assert "No manifest" in error

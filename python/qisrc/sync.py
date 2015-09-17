@@ -215,6 +215,12 @@ class WorkTreeSyncer(object):
 
     def _sync_manifest(self):
         """ Update the local manifest clone with the remote """
+        if not self.manifest.url:
+            mess = """ \
+No manifest set for worktree in {root}
+Please run `qisrc init MANIFEST_URL`
+"""
+            raise Exception(mess.format(root=self.git_worktree.root))
         git = qisrc.git.Git(self.manifest_repo)
         git.set_remote("origin", self.manifest.url)
         if git.get_current_branch() != self.manifest.branch:
