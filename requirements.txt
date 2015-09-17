@@ -21,10 +21,12 @@ pytest==2.7.2
 pytest-cov==1.6
 pytest-runfailed==0.3
 pytest-xdist==1.11
+
 # For qidoc tests
 BeautifulSoup4==4.2.1
 sphinxcontrib-doxylink==1.3
 sphinxcontrib-spelling==2.1.1
+sphinx-intl==0.9.5
 
 # For coverage
 cov-core==1.7
