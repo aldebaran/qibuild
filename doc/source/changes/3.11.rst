@@ -7,6 +7,11 @@ qibuild
 * Fix using ``qibuild make-host-tools`` when no project is specified
 * Implement ``qibuild make-host-tools --all``
 
+qidoc
+-----
+
+* ``qidoc build``: Forward ``--pdb`` option to ``Sphinx``
+
 cmake
 -----
 

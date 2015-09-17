@@ -18,4 +18,4 @@ def configure_parser(parser):
 def do(args):
     doc_builder = qidoc.parsers.get_doc_builder(args)
     doc_builder.configure()
-    doc_builder.build()
+    doc_builder.build(pdb=args.pdb)

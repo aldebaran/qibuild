@@ -57,7 +57,7 @@ class DocBuilder(object):
                 project.html_dir = os.path.join(project.html_dir, self.language)
             project.configure(**configure_args)
 
-    def build(self):
+    def build(self, pdb=False):
         """ Build the projects in the right order,
         making sure they are configured first
 
@@ -67,7 +67,8 @@ class DocBuilder(object):
             ui.info_count(i, len(projects),
                           ui.green, "Building", ui.blue, project.name)
             project.build(werror=self.werror, build_type=self.build_type,
-                          spellcheck=self.spellcheck, language=self.language)
+                          spellcheck=self.spellcheck, language=self.language,
+                          pdb=pdb)
             if not self.spellcheck:
                 ui.info(ui.green, "Doc generated in",
                         ui.reset, ui.bold, project.html_dir)

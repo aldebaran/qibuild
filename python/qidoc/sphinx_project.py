@@ -176,7 +176,12 @@ class SphinxProject(qidoc.project.DocProject):
             cmd.append("-W")
         if language:
             cmd.append("-Dlanguage=%s" % language)
+        pdb = kwargs.get("pdb")
+        if pdb:
+            cmd.append("-P")
+
         cmd.append(self.source_dir)
+
         if kwargs.get("spellcheck"):
             cmd.append(spell_dir)
         else:

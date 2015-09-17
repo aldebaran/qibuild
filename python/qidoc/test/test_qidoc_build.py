@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 
 import os
+import mock
 
 def test_simple_build(qidoc_action):
     qidoc_action.add_test_project("libqi")
@@ -76,3 +77,12 @@ def test_language_not_in_qiproject(qidoc_action):
     qidoc_action.add_test_project("translateme")
     error = qidoc_action("build", "translateme", "--language", "de", raises=True)
     assert "Unknown language 'de'" in error
+
+
+def test_forwarding_pdb(qidoc_action):
+    qidoc_action.add_test_project("world")
+    with mock.patch("sphinx.main") as mock_main:
+        mock_main.return_value = 0
+        qidoc_action("build", "world", "--pdb")
+        kwargs = mock_main.call_args[1]
+        assert "-P" in kwargs["argv"]
