@@ -108,12 +108,6 @@ class DataBase(object):
                             if isinstance(x, qitoolchain.svn_package.SvnPackage)]
         other_packages = [x for x in remote_packages if x not in svn_packages]
 
-        if svn_packages:
-            ui.info(ui.green, "Updating svn packages")
-        for i, svn_package in enumerate(svn_packages):
-            ui.info_count(i, len(svn_packages), ui.blue, svn_package.name)
-            self.handle_svn_package(svn_package)
-            self.add_package(svn_package)
 
         for remote_package in other_packages:
             if remote_package.name in (x.name for x in local_packages):
@@ -159,6 +153,13 @@ class DataBase(object):
             ui.info_count(i, len(to_add), ui.blue, package.name)
             self.handle_package(package, feed)
             self.add_package(package)
+
+        if svn_packages:
+            ui.info(ui.green, "Updating svn packages")
+        for i, svn_package in enumerate(svn_packages):
+            ui.info_count(i, len(svn_packages), ui.blue, svn_package.name)
+            self.handle_svn_package(svn_package)
+            self.add_package(svn_package)
 
         ui.info(ui.green, "Done")
         self.save()
