@@ -40,3 +40,11 @@ def test_qimodule(qipy_action):
         with open(mod_path, "r") as fp:
             contents = fp.read()
         assert contents == "python\n"
+
+def test_fails_on_bad_requirements_txt(qipy_action):
+    a_project = qipy_action.add_test_project("a_lib")
+    requirements_txt = os.path.join(a_project.path, "requirements.txt")
+    with open(requirements_txt, "w") as fp:
+        fp.write("no such package\n")
+    rc = qipy_action("bootstrap", retcode=True)
+    assert rc != 0

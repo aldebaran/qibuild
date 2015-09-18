@@ -70,27 +70,31 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         ui.info(ui.red, "Failed to add some third party requirements")
 
     ui.info()
+    projects_with_requirements = list()
+    for project in python_worktree.python_projects:
+        path = os.path.join(project.path, "requirements.txt")
+        if os.path.isfile(path):
+            projects_with_requirements.append(project)
+
     ui.info(ui.blue, "::", ui.reset,
             "Installing deps from requirements.txt files")
     requirements_ok = True
-    for i, project in enumerate(python_worktree.python_projects):
-        ui.info_count(i, len(python_worktree.python_projects),
+    for i, project in enumerate(projects_with_requirements):
+        ui.info_count(i, len(projects_with_requirements),
                       ui.blue, project.name)
+        cmd = [pip_binary, "install"]
+        if not ui.CONFIG["verbose"]:
+            cmd.append("--quiet")
         path = os.path.join(project.path, "requirements.txt")
-        if os.path.isfile(path):
-            ui.info(ui.green, " * Installing dependencies from " + path)
-            cmd = [pip_binary, "install"]
-            if not ui.CONFIG["verbose"]:
-                cmd.append("--quiet")
-            cmd.extend(["--requirement", path])
-            rc = qisys.command.call(cmd, ignore_ret_code=True)
-            requirements_ok = (rc == 0)
-        else:
-            ui.debug(ui.yellow, " * missing " + path)
+        cmd.extend(["--requirement", path])
+        rc = qisys.command.call(cmd, ignore_ret_code=True)
+        requirements_ok = (rc == 0)
     ui.info()
     res = (pure_python_ok and remote_ok and requirements_ok)
     if res:
         ui.info(ui.green, "Done")
+    else:
+        ui.error("Bootstrap failed")
     return res
 
 def find_script(venv_path, script_name):
