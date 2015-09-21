@@ -30,3 +30,9 @@ def test_create_extract(qitoolchain_action, tmpdir):
     assert package.name == "foo"
     assert package.version == "0.1"
     assert package.target == "linux64"
+
+def test_on_invalid_xml(qitoolchain_action, tmpdir):
+    package_xml = tmpdir.join("package.xml")
+    package_xml.write("<foo/>")
+    error = qitoolchain_action("make-package", tmpdir.strpath, raises=True)
+    assert "Root element" in error
