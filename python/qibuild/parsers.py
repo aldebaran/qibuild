@@ -115,14 +115,18 @@ def get_build_worktree(args, verbose=True):
     worktree = qisys.parsers.get_worktree(args)
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
     if verbose:
-        ui.info(ui.green, "Current build worktree:", ui.reset, ui.bold, build_worktree.root)
+        ui.info(ui.green, "Current build worktree:", ui.reset, ui.bold,
+                build_worktree.root)
     build_config = get_build_config(build_worktree, args)
     build_worktree.build_config = build_config
 
     if verbose:
+        if build_config.local_cmake:
+            ui.info(ui.green, "Using additional cmake file", ui.blue,
+                    build_config.local_cmake)
         if build_config.toolchain:
-            ui.info(ui.green, "Using toolchain:", ui.blue, build_config.toolchain.name)
-
+            ui.info(ui.green, "Using toolchain:", ui.blue,
+                    build_config.toolchain.name)
         for profile in build_config.profiles:
             ui.info(ui.green, "Using profile:", ui.blue, profile)
 
