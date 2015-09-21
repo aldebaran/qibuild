@@ -169,6 +169,10 @@ class AbstractProjectParser:
         """
         if isinstance(args, dict):
             args = argparse.Namespace(**args)
+        if not hasattr(args, "all"):
+            args.all = False
+        if not hasattr(args, "single"):
+            args.single = False
         # pylint: disable-msg=E1103
         if args.all:
             return self.all_projects(args)
