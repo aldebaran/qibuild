@@ -26,3 +26,10 @@ def test_building_host_tools_in_release(qibuild_action, record_messages):
     assert record_messages.find("Building footool in Release")
     qibuild_action("configure", "usefootool")
     qibuild_action("make", "usefootool")
+
+def test_no_project_specified(qibuild_action):
+    qibuild_action.add_test_project("footool")
+    usefootool_proj = qibuild_action.add_test_project("usefootool")
+    qibuild_action.chdir(usefootool_proj.path)
+    qibuild_action("make-host-tools")
+    qibuild_action("configure")

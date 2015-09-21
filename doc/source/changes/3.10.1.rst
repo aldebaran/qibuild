@@ -6,6 +6,11 @@ qisrc
 
 * ``qisrc checkout``: do not re-add the default group
 
+qibuild
+-------
+
+* Fix using ``qibuild make-host-tools`` when no project is specified
+
 cmake
 -----
 
