@@ -1,6 +1,11 @@
 v3.11
 =====
 
+qibuild
+-------
+
+* Fix using ``qibuild make-host-tools`` when no project is specified
+
 cmake
 -----
 
