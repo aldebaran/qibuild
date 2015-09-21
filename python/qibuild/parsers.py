@@ -201,12 +201,15 @@ marked as a host config\
 
 def get_host_projects(build_worktree, args):
     projects = list()
-    if args.projects:
-        for project_name in args.projects:
-            project = build_worktree.get_build_project(project_name, raises=True)
-            projects.append(project)
+    if args.all:
+        projects = build_worktree.build_projects
     else:
-        projects = [get_one_build_project(build_worktree, args)]
+        if args.projects:
+            for project_name in args.projects:
+                project = build_worktree.get_build_project(project_name, raises=True)
+                projects.append(project)
+        else:
+            projects = [get_one_build_project(build_worktree, args)]
     deps_solver = qibuild.deps.DepsSolver(build_worktree)
     return deps_solver.get_host_projects(projects)
 

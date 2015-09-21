@@ -33,3 +33,9 @@ def test_no_project_specified(qibuild_action):
     qibuild_action.chdir(usefootool_proj.path)
     qibuild_action("make-host-tools")
     qibuild_action("configure")
+
+def test_using_dash_all(qibuild_action):
+    qibuild_action.add_test_project("footool")
+    qibuild_action.add_test_project("usefootool")
+    qibuild_action("make-host-tools", "--all")
+    qibuild_action("configure", "usefootool")
