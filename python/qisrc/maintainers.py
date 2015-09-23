@@ -59,8 +59,8 @@ def get(project, warn_if_none=False):
     if not maintainers and warn_if_none:
         mess = """\
 The project in {src} has no maintainer.
-Please add a <maintainer> tag in {qiproject_xml}
-to silence this warning, like this:
+Please add one or several <maintainer> tags in
+{qiproject_xml} to silence this warning, like this:
 
 <project version="3">
   <maintainer email="EMAIL">NAME</maintainer>
