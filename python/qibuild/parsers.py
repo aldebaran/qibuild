@@ -233,7 +233,7 @@ def get_build_config(build_worktree, args):
         for flag_string in args.cmake_flags:
             if "=" not in flag_string:
                 raise Exception("Expecting a flag looking like -Dkey=value")
-            (key, value) = flag_string.split("=")
+            (key, value) = flag_string.split("=", 1)
             user_flags.append((key, value))
         build_config.user_flags = user_flags
     if hasattr(args, "num_jobs"):
