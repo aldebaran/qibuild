@@ -311,3 +311,7 @@ def test_gtest(qibuild_action, tmpdir):
     qibuild_action("make", "gtestuser")
     qibuild_action("install", "gtestuser", tmpdir.strpath)
     assert not tmpdir.join("include", "fakegtest", "gtest.h").check(file=True)
+
+def test_setting_cflags(qibuild_action):
+    qibuild_action.add_test_project("world")
+    qibuild_action("configure", "world", "-DCMAKE_CXX_FLAGS=-std=gnu++11")

@@ -6,6 +6,8 @@ qibuild
 
 * Fix using ``qibuild make-host-tools`` when no project is specified
 * Implement ``qibuild make-host-tools --all``
+* ``qibuild configure``: fix setting flags containing ``=``, such as
+  ``qibuild configure -DCMAKE_CXX_FLAGS="-std=gnu++11"``
 
 qidoc
 -----
