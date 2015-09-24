@@ -44,9 +44,6 @@ def do(args):
             mess += " ".join(bad_chars)
             raise Exception(mess)
 
-    if tc_name == "system":
-        raise Exception("'system' is a reserved name")
-
     build_worktree = None
 
     if tc_name in qitoolchain.get_tc_names():
