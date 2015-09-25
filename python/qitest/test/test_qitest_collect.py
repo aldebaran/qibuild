@@ -12,5 +12,7 @@ def test_simple(qitest_action, record_messages):
     pytest_json = os.path.join(testme_proj.path, "pytest.json")
     tests = qitest.conf.parse_tests(pytest_json)
     names = [x["name"] for x in tests]
-    assert "test_foo-testme" in names
-    assert "test_bar-testme" in names
+    assert set(names) == set([
+        "testme.test.test_foo",
+        "testme.test.test_bar",
+        "testme.test.subfolder.test_spam"])

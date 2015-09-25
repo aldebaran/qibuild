@@ -39,9 +39,11 @@ class PythonTestCollector:
         json_data = list()
         for pytest in pytest_list:
             relpath = os.path.relpath(pytest, project.path)
-            name = relpath.split(".py")[0].split("/")[-1] + '-' + project.name
+            test_name = os.path.splitext(relpath)[0]
+            test_name = test_name.replace("/", ".")
+            test_name = project.name + "." + test_name
             pytest_data = dict()
-            pytest_data['name'] = name
+            pytest_data['name'] = test_name
             pytest_data['cmd'] = list()
             pytest_data['cmd'].append(self.pytest_path)
             pytest_data['cmd'].append(pytest)
