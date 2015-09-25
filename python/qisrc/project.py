@@ -210,7 +210,10 @@ class GitProject(object):
         if rc != 0:
             return False, "fetch failed\n" + out
 
-        git.checkout("-B", branch.name)
+        rc, out = git.checkout("-B", branch.name, raises=False)
+        if rc != 0:
+            return False, "checkout failed\n" + out
+
         remote_branch = branch.remote_branch
         if not remote_branch:
             remote_branch = branch.name
@@ -219,7 +222,7 @@ class GitProject(object):
         if rc != 0:
             return False, "reset --hard failed\n" + out
 
-        return True, ""
+        return True, "reset to %s\n" % remote_ref + out
 
     def apply_config(self):
         """ Apply configuration to the underlying git

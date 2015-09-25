@@ -309,3 +309,10 @@ def test_using_code_review(qisrc_action, git_server, record_messages):
 def test_no_manifest(qisrc_action):
     error = qisrc_action("sync", raises=True)
     assert "No manifest" in error
+
+def test_dash_reset(qisrc_action, git_server):
+    git_server.create_repo("foo.git")
+    git_server.create_repo("bar.git")
+    git_server.change_branch("foo.git", "devel")
+    qisrc_action("init", git_server.manifest_url)
+    qisrc_action("sync", "--reset")
