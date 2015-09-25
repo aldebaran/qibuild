@@ -31,5 +31,3 @@ def do(args):
     if git_project:
         mess += "repo: %s" % git_project.name
     ui.info(mess)
-
-
