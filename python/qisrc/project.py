@@ -257,7 +257,8 @@ class GitProjectParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(GitProjectParser, self).__init__(target)
         self._ignore = ["worktree", "path", "clone_url",
-                        "default_branch", "review_url"]
+                        "default_branch", "review_url",
+                        "qiproject_xml"]
         self._required = ["src"]
 
     def _parse_remote(self, elem):
