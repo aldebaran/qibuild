@@ -205,13 +205,13 @@ def _msg(*tokens, **kwargs):
 
 def error(*tokens, **kwargs):
     """ Print an error message """
-    tokens = [bold, red, "[ERROR]: "] + list(tokens)
+    tokens = [bold, red, "[ERROR]:"] + list(tokens)
     kwargs["fp"] = sys.stderr
     _msg(*tokens, **kwargs)
 
 def warning(*tokens, **kwargs):
     """ Print a warning message """
-    tokens = [brown, "[WARN ]: "] + list(tokens)
+    tokens = [brown, "[WARN ]:"] + list(tokens)
     kwargs["fp"] = sys.stderr
     _msg(*tokens, **kwargs)
 
@@ -256,7 +256,7 @@ def debug(*tokens, **kwargs):
     """ Print a debug message """
     if not CONFIG["verbose"] or CONFIG["record"]:
         return
-    tokens = [blue, "[DEBUG]: "] + list(tokens)
+    tokens = [blue, "[DEBUG]:"] + list(tokens)
     _msg(*tokens, **kwargs)
 
 def indent_iterable(elems, num=2):
