@@ -41,7 +41,7 @@ def show_config(args, build_worktree):
         raise Exception("Cannot use --local when not in a worktree")
 
     qibuild_cfg = qibuild.config.QiBuildConfig()
-    qibuild_cfg.read()
+    qibuild_cfg.read(create_if_missing=True)
 
     if args.edit:
         editor = qibuild_cfg.defaults.env.editor
@@ -71,4 +71,3 @@ def show_config(args, build_worktree):
     print "Local configuration"
     print "-------------------"
     print ui.indent(str(qibuild_cfg.local))
-

@@ -11,6 +11,7 @@ class FakeInteract(object):
         self.answer_index = -1
         self._answers = None
         self.questions = list()
+        self.editor = None
 
     @property
     def answers(self):
@@ -84,6 +85,9 @@ class FakeInteract(object):
         answer =  self._get_answer(message)
         print ">", answer
         return answer
+
+    def get_editor(self):
+        return self.editor
 
     def _get_answer(self, message, choices=None, default=None):
         question = dict()
