@@ -167,7 +167,8 @@ def push(project,  branch, bypass_review=False, dry_run=False,
         server = remote.server
         username = remote.username
         ssh_port = remote.port
-        git.fetch(remote.name)
+        ui.info("Fetching", remote.name)
+        git.fetch(remote.name, "--quiet")
         commits_pushed = git.get_log("%s/%s" % (remote.name, branch), "HEAD")
         sha1s = [commit["sha1"] for commit in commits_pushed]
     git.push(*args)
