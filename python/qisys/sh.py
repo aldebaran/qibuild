@@ -165,6 +165,7 @@ def _copy_link(src, dest, quiet):
         #remove existing stuff
     if os.path.lexists(dest):
         rm(dest)
+    # pylint:disable-msg=no-member
     if sys.stdout.isatty() and not quiet:
         print("-- Installing %s -> %s" % (dest, target))
     to_make = os.path.dirname(dest)
@@ -292,6 +293,7 @@ def install(src, dest, filter_fun=None, quiet=False):
             raise qisys.error.Error(
                     "source and destination are the same file")
         mkdir(os.path.dirname(dest), recursive=True)
+        # pylint:disable-msg=no-member
         if sys.stdout.isatty() and not quiet:
             print("-- Installing %s" % dest)
         # We do not want to fail if dest exists but is read only

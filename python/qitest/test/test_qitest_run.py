@@ -37,6 +37,7 @@ def test_repeat_until_fail(tmpdir, qitest_action):
     assert rc != 0
 
 def test_no_capture(tmpdir, qitest_action):
+    # pylint:disable-msg=no-member
     if not sys.stdout.isatty():
         # The test will fail anyway
         return

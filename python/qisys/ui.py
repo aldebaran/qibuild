@@ -261,9 +261,12 @@ def info_progress(value, max_value, prefix):
     Done: 25%
 
     """
+    # pylint:disable-msg=no-member
     if sys.stdout.isatty():
         percent = float(value) / max_value * 100
+        # pylint:disable-msg=no-member
         sys.stdout.write(prefix + ": %.0f%%\r" % percent)
+        # pylint:disable-msg=no-member
         sys.stdout.flush()
 
 def debug(*tokens, **kwargs):

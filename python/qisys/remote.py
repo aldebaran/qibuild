@@ -72,6 +72,7 @@ def authenticated_urlopen(location):
             passman.add_password(None, location, user, password)
     authhandler = urllib.request.HTTPBasicAuthHandler(passman)
     opener = urllib.request.build_opener(authhandler)
+    # pylint:disable-msg=too-many-function-args
     urllib.request.install_opener(opener)
     return urllib.request.urlopen(location)
 

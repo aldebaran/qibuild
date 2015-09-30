@@ -28,7 +28,9 @@ def do(args):
     not_clean = list()
     for i, svn_package in enumerate(svn_packages, start=1):
         to_write = "Checking (%d/%d) " % (i, len(svn_packages))
+        # pylint:disable-msg=no-member
         sys.stdout.write(to_write + "\r")
+        # pylint:disable-msg=no-member
         sys.stdout.flush()
         svn = qisrc.svn.Svn(svn_package.path)
         rc, out = svn.call("status", raises=False)

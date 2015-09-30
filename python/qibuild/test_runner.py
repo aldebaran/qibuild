@@ -280,6 +280,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         test["timeout"] = test["timeout"] * 20
 
     def _with_num_cpus(self, test, num_cpus):
+        # pylint:disable-msg=no-member
         cpu_list = get_cpu_list(multiprocessing.cpu_count(),
                                 num_cpus, self.worker_index)
         taskset_opts = ["-c", ",".join(str(i) for i in cpu_list)]

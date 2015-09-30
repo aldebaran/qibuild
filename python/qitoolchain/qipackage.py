@@ -270,18 +270,6 @@ mutually exclusive
             res += " in %s" % self.path
         return res
 
-    def __cmp__(self, other):
-        if self.name == other.name:
-            if self.version is None and other.version is not None:
-                return -1
-            if self.version is not None and other.version is None:
-                return 1
-            if self.version is None and other.version is None:
-                return 0
-            return qisys.version.compare(self.version, other.version)
-        else:
-            return cmp(self.name, other.name)
-
     def __lt__(self, other):
         if self.name == other.name:
             if self.version is None and other.version is not None:

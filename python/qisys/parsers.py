@@ -26,6 +26,7 @@ class SetHome(argparse.Action):
 
 def cpu_count():
     try:
+        # pylint:disable-msg=no-member
         default = multiprocessing.cpu_count()
     except NotImplementedError:
         default = 1

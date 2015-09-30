@@ -58,6 +58,7 @@ def test_gen_scm_info(git_server, qisrc_action, tmpdir):
     world_proj.gen_package_xml(package_xml)
     tree = qisys.qixml.read(package_xml)
     scm_elem = tree.find("scm")
+    # pylint:disable-msg=no-member
     git_elem = scm_elem.find("git")
     revision_elem = git_elem.find("revision")
     url_elem = git_elem.find("url")
