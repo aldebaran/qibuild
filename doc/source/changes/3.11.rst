@@ -17,6 +17,10 @@ qitest
   * Old: ``basename_project``
   * New: ``project.subfolder.basename``
 
+* Implement ``qitest run --no-capture``. (Useful when you want the
+  output of the tests to be shown as they run, or when your test command
+  requires a ``tty`` as ``stdout``)
+
 qidoc
 -----
 

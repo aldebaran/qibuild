@@ -133,7 +133,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         timeout = test["timeout"]
         env = test["env"]
         cwd = test["working_directory"]
-        process = qisys.command.Process(cmd, cwd=cwd, env=env)
+        process = qisys.command.Process(cmd, cwd=cwd, env=env, capture=self.capture)
         start = datetime.datetime.now()
         process.run(timeout)
         end = datetime.datetime.now()

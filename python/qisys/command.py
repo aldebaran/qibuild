@@ -49,7 +49,7 @@ class Process:
     INTERRUPTED = 4
     NOT_RUN     = 5
 
-    def __init__(self, cmd, cwd=None, env=None):
+    def __init__(self, cmd, cwd=None, env=None, capture=True):
         self.cmd = cmd
         self.cwd = cwd
         self.env = env
@@ -58,6 +58,7 @@ class Process:
         self._process = None
         self.exception = None
         self.return_type = Process.FAILED
+        self.capture = capture
 
     def run(self, timeout=None):
         def target():
@@ -74,12 +75,15 @@ class Process:
                     opts = {
                         'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP,
                     }
-                self._process = subprocess.Popen(self.cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    cwd=self.cwd,
-                    env=self.env,
-                    **opts)
+                kwargs = {
+                        "cwd": self.cwd,
+                        "env" : self.env
+                }
+                kwargs.update(opts)
+                if self.capture:
+                    kwargs["stdout"] = subprocess.PIPE
+                    kwargs["stderr"] = subprocess.STDOUT
+                self._process = subprocess.Popen(self.cmd, **kwargs)
             except Exception, e:
                 self.exception = e
                 self.return_type = Process.NOT_RUN

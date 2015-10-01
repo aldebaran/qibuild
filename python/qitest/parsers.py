@@ -40,7 +40,8 @@ def test_parser(parser, with_num_jobs=True):
                       help="Generate XML reports in the given directory " + \
                            "(instead of build/sdk/test-results)")
 
-    parser.set_defaults(nightly=False)
+    group.add_argument("--no-capture", dest="capture", action="store_false")
+    parser.set_defaults(nightly=False, capture=True)
     if with_num_jobs:
         qisys.parsers.parallel_parser(group, default=1)
 
@@ -87,6 +88,7 @@ def get_test_runner(args, build_project=None, qitest_json=None):
     test_runner.nightly = args.nightly
     test_runner.nightmare = args.nightmare
     test_runner.root_output_dir = args.root_output_dir
+    test_runner.capture = args.capture
 
     return test_runner
 

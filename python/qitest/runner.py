@@ -24,6 +24,7 @@ class TestSuiteRunner(object):
         self.coverage = False
         self.nightmare = False
         self.root_output_dir = None
+        self.capture = True
         self._tests = project.tests
 
     @abc.abstractproperty
@@ -40,6 +41,7 @@ class TestSuiteRunner(object):
         """
         test_queue = qitest.test_queue.TestQueue(self.tests)
         test_queue.launcher = self.launcher
+        test_queue.launcher.capture = self.capture
         ok = test_queue.run(num_jobs=self.num_jobs,
                            repeat_until_fail=self.repeat_until_fail)
         return ok
@@ -75,6 +77,7 @@ class TestLauncher(object):
         # Set by the test suite, the launcher may need to know about its woker
         # index
         self.worker_index = None
+        self.capture = True
 
     @abc.abstractmethod
     def launch(self, test):
