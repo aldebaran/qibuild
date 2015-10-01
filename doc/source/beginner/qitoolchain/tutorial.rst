@@ -90,9 +90,11 @@ Then write a ``package.xml`` file looking like:
 
     <!--- in /tmp/foo/package.xml -->
     <package name="foo" version="0.1" target="linux64" >
+      <license>BSD</license>
       <depends buildtime="true" runtime="true" names="bar" />
     </package>
 
+.. note:: the ``<license>`` tag is not mandatory, but recommended
 
 In the end the package tree should look like this:
 
