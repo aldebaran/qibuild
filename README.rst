@@ -1,6 +1,9 @@
 qiBuild
 =======
 
+.. image:: http://img.shields.io/pypi/v/qibuild.png
+  :target: https://pypi.python.org/pypi/qibuild
+
 qiBuild is a collection of command-line tools to help development of multiple
 projects.
 
