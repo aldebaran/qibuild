@@ -3,7 +3,11 @@
 ## found in the COPYING file.
 
 import os
+import sys
 from setuptools import setup, find_packages
+
+if (sys.version_info.major, sys.version_info.minor) != (2, 7):
+    sys.exit("Error: qibuild only works with Python2.7")
 
 def get_qibuild_cmake_files():
     res = list()
