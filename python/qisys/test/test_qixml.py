@@ -201,7 +201,8 @@ def test_write_bool_attr():
     foo.bar = True
     parser = FooParser(foo)
     xml_elem = parser.xml_elem()
-    qisys.qixml.parse_bool_attr(xml_elem, "bar")
+    bar = qisys.qixml.parse_bool_attr(xml_elem, "bar")
+    assert bar is True
 
 
 def test_sanitize_xml():
@@ -209,3 +210,23 @@ def test_sanitize_xml():
     valid_xml = qisys.qixml.sanitize_xml(invalid_xml)
     assert "\r\nflag\r\n" in valid_xml
     etree.fromstring(valid_xml)  # Doesn't raise
+
+
+def test_ignore_attributes():
+    class Foo:
+        def __init__(self):
+            self.bar = "bar"
+            self.baz = "baz"
+
+    class FooParser(qisys.qixml.XMLParser):
+        def __init__(self, target):
+            super(FooParser, self).__init__(target)
+            self._ignore = ["bar"]
+
+    foo = Foo()
+    parser = FooParser(foo)
+    xml_elem = etree.fromstring('<foo bar="spam" baz="eggs" />')
+    parser.parse(xml_elem)
+
+    assert foo.bar == "bar" # should not have changed
+    assert foo.baz == "eggs" # should have changed

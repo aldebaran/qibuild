@@ -218,7 +218,7 @@ class XMLParser(object):
         its children. Attributes will be a dictionary.
 
         """
-        apply_xml_attributes(self.target, self._root)
+        apply_xml_attributes(self.target, self._root, ignore_list=self._ignore)
         for name in self._required:
             self.check_needed(name)
         self._post_parse_attributes()
@@ -296,13 +296,17 @@ class XMLParser(object):
         return res
 
 
-def apply_xml_attributes(target, elem):
+def apply_xml_attributes(target, elem, ignore_list=None):
     """ For each attribute of the xml element,
     set the attribute in the target if this one
     already exists, while matching the type
 
     """
+    if not ignore_list:
+        ignore_list = list()
     for attr in elem.attrib:
+        if attr in ignore_list:
+            continue
         if hasattr(target, attr):
             default_value = getattr(target, attr)
             type_value = type(default_value)
