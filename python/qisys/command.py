@@ -35,11 +35,12 @@ class Process:
     You can then use Process.return_type to know the state of the process:
     Possible values:
 
-    * Process.OK   (exit code is one)
+    * Process.OK   (exit code is zero)
     * Process.FAILED (exit code is > 0)
     * Process.TIME_OUT (process timed out)
     * Process.INTERRUPTED (exit code is < 0)
     * Process.NOT_RUN (could not start the process)
+    * Process.ZOMBIE (could not kill process after it timed out)
     """
 
     OK          = 0
@@ -373,7 +374,6 @@ def check_is_in_path(executable, env=None):
     """Check that the given executable is to be found in %PATH%"""
     if find_program(executable, env=env) is None:
         raise NotInPath(executable, env=env)
-
 
 def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
     """ Execute a command line.
