@@ -15,7 +15,7 @@ class GitProject(object):
     def __init__(self, git_worktree, worktree_project):
         self.git_worktree = git_worktree
         self.src = worktree_project.src
-        self.qiproject_xml = worktree_project.qiproject_xml
+        self.worktree_project = worktree_project
         self.name = ""
         self.branches = list()
         self.remotes = list()
@@ -33,6 +33,14 @@ class GitProject(object):
     def save_config(self):
         self.apply_config()
         self.git_worktree.save_project_config(self)
+
+    @property
+    def qiproject_xml(self):
+        """ Path to qiproject.xml. Used by qisrc push to find
+        the list of maintainers
+
+        """
+        return self.worktree_project.qiproject_xml
 
     @property
     def default_branch(self):
