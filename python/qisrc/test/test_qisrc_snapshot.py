@@ -11,3 +11,13 @@ def test_simple(qisrc_action):
     snapshot = qisrc.snapshot.Snapshot()
     snapshot.load(res)
     assert snapshot.format_version == 2
+
+
+def test_with_argument(qisrc_action):
+    qisrc_action.create_git_project("foo")
+    qisrc_action.create_git_project("bar")
+    res = qisrc_action("snapshot", "blah.xml")
+    assert res == "blah.xml"
+    snapshot = qisrc.snapshot.Snapshot()
+    snapshot.load(res)
+    assert snapshot.format_version == 2
