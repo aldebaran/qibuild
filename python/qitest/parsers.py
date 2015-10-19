@@ -60,14 +60,13 @@ def get_test_runner(args, build_project=None, qitest_json=None):
     if not test_project:
         if build_project:
             test_project = build_project.to_test_project()
+        else:
+            return
 
     if args.coverage and not build_project:
         raise Exception("""\
 --coverage can only be used from a qibuild CMake project
 """)
-
-    if not test_project:
-        return
 
     test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
     if build_project:
