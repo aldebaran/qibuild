@@ -103,3 +103,14 @@ def test_nothing_to_test(args, cd_to_tmpdir):
     with pytest.raises(Exception) as e:
         qitest.parsers.get_test_runners(args)
     assert e.value.message == "Nothing found to test"
+
+def test_coverage_in_build_worktree(args, build_worktree, monkeypatch):
+    world_proj = build_worktree.create_project("world")
+    world_proj.configure()
+    monkeypatch.chdir(world_proj.path)
+    args.coverage = True
+    test_runners = qitest.parsers.get_test_runners(args)
+    assert len(test_runners) == 1
+    test_runner = test_runners[0]
+    assert test_runner.cwd == world_proj.sdk_directory
+    assert test_runner.coverage

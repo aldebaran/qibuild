@@ -20,6 +20,7 @@ qitest
 * Implement ``qitest run --no-capture``. (Useful when you want the
   output of the tests to be shown as they run, or when your test command
   requires a ``tty`` as ``stdout``)
+* Fix using ``qitest run --coverage`` from a build worktree
 
 qitoolchain
 ------------
