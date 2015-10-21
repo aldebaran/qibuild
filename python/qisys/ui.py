@@ -173,20 +173,23 @@ def _msg(*tokens, **kwargs):
         now = datetime.datetime.now()
         res.append(now.strftime("[%Y-%m-%d %H:%M:%S] "))
     for i, token in enumerate(tokens):
+        should_add_sep = True
         if isinstance(token, _Color):
             if with_color:
                 res.append(token.code)
         else:
-            if sep == " " and token == "\n":
-                res.append("\n")
-                nocolorres.append("\n")
+            if sep == " " and str(token).endswith("\n"):
+                res.append(str(token))
+                nocolorres.append(str(token))
+                should_add_sep = False
             else:
                 res.append(str(token))
-                if i != len(tokens) - 1:
+                if i != len(tokens) - 1 and should_add_sep:
                     res.append(sep)
                 nocolorres.append(str(token))
-                if i != len(tokens) - 1:
+                if i != len(tokens) - 1 and should_add_sep:
                     nocolorres.append(sep)
+                should_add_sep = True
     # always reset:
     if with_color:
         res.append(reset.code)

@@ -4,6 +4,7 @@
 
 """ Just some tests for ui """
 
+import io
 import qisys.ui as ui
 
 import pytest
@@ -31,8 +32,47 @@ def test_valid_filename():
     ui.valid_filename("foo")
 
 def test_empty_end():
-    ui.info("[skipped]", end="")
-    ui.info("Your branch has diverged")
+    out = io.BytesIO()
+    ui.info("[skipped] ", end="", fp=out)
+    ui.info("Your branch has diverged", fp=out)
+    actual = out.getvalue()
+    expected = "[skipped] Your branch has diverged\n"
+    assert actual == expected
+
+def test_several_newlines():
+    out = io.BytesIO()
+    ui.info("foo\n", "bar\n", "baz", fp=out)
+    actual = out.getvalue()
+    expected = "foo\nbar\nbaz\n"
+    assert actual == expected
+
+def test_do_not_add_space_after_newline():
+    out = io.BytesIO()
+    ui.info("foo\n", "bar", fp=out)
+    actual = out.getvalue()
+    expected = "foo\nbar\n"
+    assert actual == expected
+
+def test_insert_spaces():
+    out = io.BytesIO()
+    ui.info("foo:", "bar", fp=out)
+    actual = out.getvalue()
+    expected = "foo: bar\n"
+    assert actual == expected
+
+def test_custom_sep():
+    out = io.BytesIO()
+    ui.info("foo", "bar", sep="\n", fp=out)
+    actual = out.getvalue()
+    expected = "foo\nbar\n"
+    assert actual == expected
+
+def test_convert_to_strings():
+    out = io.BytesIO()
+    ui.info("mylist", ["a", "b", "c"], fp=out)
+    actual = out.getvalue()
+    expected = "mylist ['a', 'b', 'c']\n"
+    assert actual == expected
 
 if __name__ == "__main__":
     import sys
