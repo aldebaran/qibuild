@@ -52,6 +52,9 @@ qisrc
 * Remove the project options in ``qisrc snapshot``. They were not used and
   prevented passing the snapshot path.
 
+* Warn when using ``qisrc foreach --group <group name>`` and the group
+  is not currently in use
+
 qitest
 ------
 

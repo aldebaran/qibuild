@@ -96,11 +96,18 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         projects = list()
         groups = qisrc.groups.get_groups(self.worktree)
         for group_name in group_names:
+            warn_for_group = True
             project_names = groups.projects(group_name)
             for project_name in project_names:
                 git_project = git_project_names.get(project_name)
                 if git_project:
                     res.add(git_project)
+                else:
+                    if warn_for_group:
+                        ui.warning("Group", group_name, "is not currently in use\n",
+                                   "Please use `qisrc add-group %s`" % group_name)
+                        warn_for_group = False
+
         res = list(res)
         res.sort(key=operator.attrgetter("src"))
         return res
