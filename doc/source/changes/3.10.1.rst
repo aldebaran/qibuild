@@ -12,6 +12,11 @@ qibuild
 * Fix using ``qibuild make-host-tools`` when no project is specified
 * Implement ``qibuild make-host-tools --all``
 
+qilinguist
+----------
+
+* Fix qilinguist extraction messages when they contain context (trContext)
+
 cmake
 -----
 

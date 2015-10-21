@@ -85,7 +85,7 @@ class GettextProject(qilinguist.project.LinguistProject):
             "--keyword=translate:1,4c,4t", "--keyword=translate:1,4c,5t",
             "--keyword=tr:1,1t", "--keyword=tr:1,2t",
             "--keyword=tr:1,3t", "--keyword=tr:1,4t",
-            "--keyword=tr:1,4c,4t", "--keyword=tr:1,4c,5t"
+            "--keyword=tr:1,4c,4t", "--keyword=tr:1,4c,5t",
             "--keyword=trContext:1,2c,2t", "--keyword=trContext:1,2c,3t",
             "--keyword=translateContext:1,2c,2t", "--keyword=translateContext:1,2c,3t",
 
