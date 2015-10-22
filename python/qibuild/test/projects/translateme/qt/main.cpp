@@ -3,7 +3,7 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the COPYING file.
  */
-#include <QApplication>
+#include <QCoreApplication>
 #include <QPushButton>
 #include <QTranslator>
 #include <QDebug>
@@ -12,7 +12,7 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    QCoreApplication app(argc, argv);
     if (argc < 3) {
       std::cerr << "Usage: translateme QM_DIR LOCALE" << std::endl;
      return 1;
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     translator.load(fileName, qmDir);
     app.installTranslator(&translator);
 
-    QString hello = QApplication::tr("Hello world!");
+    QString hello = QCoreApplication::tr("Hello world!");
     std::cout << hello.toUtf8().data();
 
     return 0;
