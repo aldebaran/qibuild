@@ -150,9 +150,13 @@ class DataBase(object):
         for i, package in enumerate(to_update):
             remote_package = [x for x in remote_packages if x.name == package.name][0]
             local_package = [x for x in local_packages if x.name == package.name][0]
-            ui.info_count(i, len(to_update), ui.blue,
-                          package.name, "from", local_package.version,
-                          "to", remote_package.version)
+            if isinstance(local_package, qitoolchain.svn_package.SvnPackage):
+                ui.info_count(i, len(to_update), ui.blue,
+                        package.name, "from subversion to", remote_package.version)
+            else:
+                ui.info_count(i, len(to_update), ui.blue,
+                            package.name, "from", local_package.version,
+                            "to", remote_package.version)
             self.remove_package(package.name)
             self.handle_package(package, feed)
             self.add_package(package)

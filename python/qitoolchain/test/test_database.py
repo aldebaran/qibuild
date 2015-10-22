@@ -182,3 +182,23 @@ def test_package_conflict(tmpdir, toolchain_db, record_messages):
     assert record_messages.find("When parsing")
     assert record_messages.find("Overriding name foo -> libfoo")
     assert record_messages.find("Overriding version 0.1 -> 0.2")
+
+def test_replacing_svn_package(toolchain_db, feed, svn_server, record_messages):
+    """ Test replacing a svn package by a normal package """
+    boost_url = svn_server.create_repo("boost")
+    svn_server.commit_file("boost", "version.hpp", '#define BOOST_VERSION "1_55\n"')
+    svn_package = qitoolchain.svn_package.SvnPackage("boost")
+    svn_package.url = boost_url
+    feed.add_svn_package(svn_package)
+    toolchain = qitoolchain.toolchain.Toolchain("foo")
+    toolchain.update(feed.url)
+
+    feed.remove_package("boost")
+    new_boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.56")
+    feed.add_package(new_boost_package)
+    record_messages.reset()
+    toolchain.update(feed.url)
+    assert record_messages.find("boost from subversion to 1\.56")
+
+    in_toolchain = toolchain.get_package("boost")
+    assert in_toolchain.version == "1.56"
