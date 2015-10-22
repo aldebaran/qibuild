@@ -1,0 +1,27 @@
+sudo: required
+dist: trusty
+
+language: python
+
+python:
+  - "2.7"
+
+addons:
+  apt:
+    packages:
+      - doxygen
+      - cmake
+      - gdb
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y ninja-build swig python-enchant
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  # Make sure ssh user@localhost works (for qibuild deploy tests)
+  - bash -xe ci/setup-ssh.sh
+  - bash -xe ci/setup-git.sh
+  - make -C python
