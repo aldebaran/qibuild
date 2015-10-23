@@ -37,6 +37,7 @@ qitest
   output of the tests to be shown as they run, or when your test command
   requires a ``tty`` as ``stdout``)
 * Fix using ``qitest run --coverage`` from a build worktree
+* Implement ``qitest run --last-failed`` to re-run previously failing tests
 
 qitoolchain
 ------------

@@ -52,3 +52,26 @@ if not sys.stdout.isatty():
     rc = qitest_action("run", "--no-capture",
                        cwd=tmpdir.strpath, retcode=True)
     assert rc == 0
+
+def test_run_last_failed(tmpdir, qitest_action, record_messages):
+    test_one = tmpdir.join("test_one.py")
+    test_one.write("import sys; sys.exit(1)")
+    test_two = tmpdir.join("test_two.py")
+    test_two.write("")
+    qitest_json = tmpdir.join("qitest.json")
+    tests = [
+              { "name": "test_one", "cmd" : [sys.executable, test_one.strpath], "timeout" : 1},
+              { "name": "test_two", "cmd" : [sys.executable, test_two.strpath], "timeout" : 1},
+           ]
+    qitest_json.write(json.dumps(tests))
+    qitest_action.chdir(tmpdir)
+    qitest_action("run", retcode=True)
+    record_messages.reset()
+    qitest_action("run", "--last-failed", retcode=True)
+    assert not record_messages.find("\(2/2\) test_two")
+    assert record_messages.find("\(1/1\) test_one")
+    test_one.write("")
+    record_messages.reset()
+    qitest_action("run", "--last-failed", retcode=True)
+    qitest_action("run", "--last-failed", retcode=True)
+    assert record_messages.find("No failing tests found")

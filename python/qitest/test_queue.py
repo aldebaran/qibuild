@@ -1,9 +1,12 @@
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import os
 import contextlib
 import collections
 import datetime
+import json
 import signal
 import traceback
 import time
@@ -106,15 +109,16 @@ class TestQueue():
         self.ok = (not failures) and not self._interrupted
         if self.ok:
             ui.info(ui.green, "All pass. Congrats!")
-            return
-        if num_failed != 0:
-            ui.error(num_failed, "failures")
-        if failures:
-            max_len = max(len(x.test["name"]) for x in failures)
-            for i, failure in enumerate(failures):
-                ui.info_count(i, num_failed,
-                            ui.blue, failure.test["name"].ljust(max_len + 2),
-                            ui.reset, *failure.message)
+        else:
+            if num_failed != 0:
+                ui.error(num_failed, "failures")
+            if failures:
+                max_len = max(len(x.test["name"]) for x in failures)
+                for i, failure in enumerate(failures):
+                    ui.info_count(i, num_failed,
+                                ui.blue, failure.test["name"].ljust(max_len + 2),
+                                ui.reset, *failure.message)
+        self.write_failures(failures)
 
     def sigint_handler(self, *args):
         """ Called when user press ctr+c during the test suite
@@ -137,6 +141,12 @@ class TestQueue():
             worker.stop()
         signal.signal(signal.SIGINT, double_sigint)
 
+    def write_failures(self, failures):
+        path = self.launcher.project.sdk_directory
+        fail_json = os.path.join(path, ".failed.json")
+        fail_names = [x.test["name"] for x in failures]
+        with open(fail_json, "w") as fp:
+            json.dump(fail_names, fp)
 
 class TestWorker(threading.Thread):
     """ Implementation of a 'worker' thread. It will consume

@@ -7,9 +7,14 @@ import qitest.test_queue
 import qitest.runner
 import qitest.result
 
+class DummyProject():
+    def __init__(self, tmpdir):
+        self.sdk_directory = tmpdir.strpath
+
 class DummyLauncher(qitest.runner.TestLauncher):
-    def __init__(self):
+    def __init__(self, tmpdir):
         self.results = dict()
+        self.project = DummyProject(tmpdir)
 
     def launch(self, test):
         default_time = 0.2
@@ -27,7 +32,7 @@ class DummyLauncher(qitest.runner.TestLauncher):
         time.sleep(sleep_time)
         return result
 
-def test_queue_happy():
+def test_queue_happy(tmpdir):
     tests = [
      {"name" : "one"},
      {"name" : "two"},
@@ -36,13 +41,13 @@ def test_queue_happy():
      {"name" : "five"},
     ]
     test_queue = qitest.test_queue.TestQueue(tests)
-    dummy_launcher = DummyLauncher()
+    dummy_launcher = DummyLauncher(tmpdir)
     test_queue.launcher = dummy_launcher
     test_queue.run(num_jobs=3)
     assert test_queue.ok
 
 
-def test_queue_sad():
+def test_queue_sad(tmpdir):
     tests = [
      {"name" : "one"},
      {"name" : "two"},
@@ -54,7 +59,7 @@ def test_queue_sad():
     fail_result = qitest.result.TestResult(tests[1])
     fail_result.ok = False
     fail_result.message = (ui.red, "[FAIL]")
-    dummy_launcher = DummyLauncher()
+    dummy_launcher = DummyLauncher(tmpdir)
     dummy_launcher.results = {
         "two" : {"result" : fail_result},
         "three" : {"raises" : True},
@@ -66,29 +71,30 @@ def test_queue_sad():
     assert not test_queue.ok
 
 
-def test_one_job():
+def test_one_job(tmpdir):
     tests = [
      {"name" : "one"},
      {"name" : "two"},
      {"name" : "three"},
     ]
     test_queue = qitest.test_queue.TestQueue(tests)
-    dummy_launcher = DummyLauncher()
+    dummy_launcher = DummyLauncher(tmpdir)
     test_queue.launcher = dummy_launcher
     test_queue.run(num_jobs=1)
     assert test_queue.ok
 
-def test_no_tests():
+def test_no_tests(tmpdir):
     tests = list()
     test_queue = qitest.test_queue.TestQueue(tests)
-    dummy_launcher = DummyLauncher()
+    dummy_launcher = DummyLauncher(tmpdir)
     test_queue.launcher = dummy_launcher
     test_queue.run(num_jobs=1)
     assert not test_queue.ok
 
 class SporadicallyFailingLauncher(qitest.runner.TestLauncher):
-    def __init__(self):
+    def __init__(self, tmpdir):
         self.num_runs = 0
+        self.project = DummyProject(tmpdir)
 
     def launch(self, test):
         result = qitest.result.TestResult(test)
@@ -101,13 +107,13 @@ class SporadicallyFailingLauncher(qitest.runner.TestLauncher):
         self.num_runs += 1
         return result
 
-def test_repeat_until_fail():
+def test_repeat_until_fail(tmpdir):
     tests = [
         { "name" : "one" },
         { "name" : "two" }
     ]
     test_queue = qitest.test_queue.TestQueue(tests)
-    fake_launcher = SporadicallyFailingLauncher()
+    fake_launcher = SporadicallyFailingLauncher(tmpdir)
     test_queue.launcher = fake_launcher
     test_queue.run(repeat_until_fail=3)
     assert  test_queue.ok is False
