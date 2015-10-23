@@ -35,7 +35,6 @@ The schema of the global xml file looks like this:
 .. code-block:: xml
 
     <qibuild version="1">
-      <build />
       <defaults>
         <env />
         <cmake />
@@ -60,18 +59,10 @@ It will be used for backward compatibility in case the format changes.
 
 It accepts:
 
-* One or zero :ref:`qibuild-xml-node-build`
 * One or zero :ref:`qibuild-xml-node-defaults`
 * Any number of :ref:`config nodes <qibuild-xml-node-config>`
 * Any number of :ref:`ide nodes <qibuild-xml-node-ide>`
 * Any number of :ref:`server nodes <qibuild-xml-node-server>`
-
-.. _qibuild-xml-node-build:
-
-build node
-~~~~~~~~~~
-
-The build node accepts the following attributes:
 
 .. _qibuild-xml-node-defaults:
 

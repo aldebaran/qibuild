@@ -331,15 +331,11 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        self.assertFalse(qibuild_cfg.build.incredibuild)
         self.assertTrue(qibuild_cfg.local.build.sdk_dir   is None)
         self.assertTrue(qibuild_cfg.local.build.prefix is None)
 
         xml = """
 <qibuild version="1">
-    <build
-        incredibuild="true"
-    />
 </qibuild>
 """
         local_xml = """
@@ -351,7 +347,6 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        self.assertTrue(qibuild_cfg.build.incredibuild)
         qibuild_cfg.read_local_config(StringIO(local_xml))
         self.assertEqual(qibuild_cfg.local.build.sdk_dir, "/path/to/sdk")
         self.assertEqual(qibuild_cfg.local.build.prefix, "/path/to/build")

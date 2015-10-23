@@ -61,30 +61,6 @@ def ask_ide():
         return None
     return ide
 
-def ask_incredibuild(qibuild_cfg):
-    """ Ask the user if he wants to use IncrediBuild
-
-    """
-    build_env = qibuild.config.get_build_env()
-    answer = qisys.interact.ask_yes_no("Do you want to use IncrediBuild?", False)
-    if not answer:
-        return
-
-    build_console = qisys.command.find_program("BuildConsole.exe", env=build_env)
-    if build_console:
-        print "Found BuildConsole.exe:", build_console
-        qibuild_cfg.build.incredibuild = True
-        return
-
-    build_console = qisys.interact.ask_program("Please enter full BuildConsole.exe path")
-    if not build_console:
-        print "Cannot use Incredibuild without knowing the path to BuildConsole.exe"
-        return
-    # Add path to CMake in build env
-    build_console_path = os.path.dirname(build_console)
-    qibuild_cfg.add_to_default_path(build_console_path)
-    qibuild_cfg.build.incredibuild = True
-
 def configure_qtcreator(qibuild_cfg):
     """ Configure QtCreator
 

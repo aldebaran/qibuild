@@ -86,26 +86,6 @@ class IDE:
         return res
 
 
-class Build:
-    def __init__(self):
-        self.incredibuild = False
-
-    def parse(self, tree):
-        self.incredibuild = qisys.qixml.parse_bool_attr(tree, "incredibuild")
-
-    def tree(self):
-        tree = etree.Element("build")
-        if self.incredibuild:
-            tree.set("incredibuild", "true")
-        return tree
-
-    def __str__(self):
-        res = ""
-        if self.incredibuild:
-            res += "incredibuild: %s\n" % self.incredibuild
-        return res
-
-
 class CMake:
     def __init__(self):
         self.generator = None
@@ -428,7 +408,6 @@ class QiBuildConfig:
     def __init__(self):
         self.tree = etree.ElementTree()
         self.defaults = Defaults()
-        self.build = Build()
 
         # Set by self.read_local_config()
         self.local = LocalSettings()
@@ -478,11 +457,6 @@ class QiBuildConfig:
         defaults_tree = self.tree.find("defaults")
         if defaults_tree is not None:
             self.defaults.parse(defaults_tree)
-
-        # Parse build settings:
-        build_tree = self.tree.find("build")
-        if build_tree is not None:
-            self.build.parse(build_tree)
 
         # Parse configs:
         config_trees = self.tree.findall("config")
@@ -693,8 +667,6 @@ class QiBuildConfig:
 
         qibuild_tree = etree.Element("qibuild")
         qibuild_tree.set("version", "1")
-        build_tree = self.build.tree()
-        qibuild_tree.append(build_tree)
         defaults_tree = self.defaults.tree()
         qibuild_tree.append(defaults_tree)
         configs = self.configs.values()
@@ -720,11 +692,6 @@ class QiBuildConfig:
 
     def __str__(self):
         res = ""
-        build_str = str(self.build)
-        if build_str:
-            res += "build:\n"
-            res += ui.indent(build_str) + "\n"
-            res += "\n"
         defaults_str = str(self.defaults)
         if defaults_str:
             res += "defaults:\n"
