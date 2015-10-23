@@ -6,6 +6,9 @@ import qitest.runner
 
 import pytest
 
+class DummyTestRunner(qitest.runner.TestSuiteRunner):
+    def launcher(self, *args):
+        pass
 
 def test_match_patterns(tmpdir):
     test_foo = { "name" : "test_foo"}
@@ -18,7 +21,7 @@ def test_match_patterns(tmpdir):
     qitest_json = tmpdir.ensure("qitest.json", file=True)
     qitest.conf.write_tests(tests, qitest_json.strpath)
     test_project = qitest.project.TestProject(qitest_json.strpath)
-    test_runner = qitest.runner.TestSuiteRunner(test_project)
+    test_runner = DummyTestRunner(test_project)
 
     test_runner.patterns = ["foo"]
     assert test_runner.tests == [test_foo, test_foo_bar]

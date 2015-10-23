@@ -10,6 +10,7 @@ import qitest.test_queue
 
 class TestSuiteRunner(object):
     """ Interface for a class able to run a test suite """
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self, project):
         self.project = project
