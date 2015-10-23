@@ -213,26 +213,12 @@ local build node
 
 The local ``build`` nodes accepts the following attributes:
 
-* ``prefix`` : Instead of scattering build directories inside each project
-  source directory, create them under the provided directory.
+* ``build_dir`` : Instead of creating a different build directory per project,
+  (for instance ``~/src/hello/build-linux``), every build
+  directory will be created under this directory, for instance
+  ``/path/to/build.directory/build-linux/hello``
 
-  This enables "out of worktree" builds, and is mandatory if you are using
-  Eclipse CDT.
-
-  For instance, given two projects "hello" and "world" and two build
-  configurations "cross" and "linux", the default layout would be::
-
-    ~/src/hello/build-cross
-    ~/src/hello/build-linux
-    ~/src/world/build-cross
-    ~/src/world/build-linux
-
-  with ``prefix="/path/to/build.prefix"``, it becomes::
-
-    /path/to/build.prefix/hello/build-cross
-    /path/to/build.prefix/hello/build-linux
-    /path/to/build.prefix/world/build-cross
-    /path/to/build.prefix/world/build-linux
+  Mandatory if you are using Eclipse CDT.
 
 .. _qibuild-config-merging:
 
