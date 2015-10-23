@@ -8,6 +8,7 @@ qibuild
 * Implement ``qibuild make-host-tools --all``
 * ``qibuild configure``: fix setting flags containing ``=``, such as
   ``qibuild configure -DCMAKE_CXX_FLAGS="-std=gnu++11"``
+* Fix using ``qibuild clean`` in some corner cases
 
 qitest
 ------

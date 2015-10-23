@@ -557,7 +557,11 @@ The following tools were not found: {missing}\
         build_names.extend(["build-" + x for x in config_names])
         build_prefix = self.build_config.build_prefix
         if build_prefix:
-            dirs = os.listdir(os.path.join(build_prefix, self.name))
+            to_list = os.path.join(build_prefix, self.name)
+            if os.path.exists(to_list):
+                dirs = os.listdir(to_list)
+            else:
+                dirs = list()
         else:
             dirs = os.listdir(self.path)
         ret = {'known_configs': list(), 'unknown_configs': list()}

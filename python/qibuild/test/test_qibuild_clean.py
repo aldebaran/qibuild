@@ -10,6 +10,8 @@ import qisys.sh
 import qibuild.config
 import qibuild.profile
 
+from qibuild.test.conftest import TestBuildWorkTree
+
 def test_clean_build_dir(qibuild_action):
     world_proj = qibuild_action.add_test_project("world")
     qibuild_action("configure", "world")
@@ -64,8 +66,7 @@ def test_cleaning_unknown_configs(qibuild_action, toolchains, interact):
     qibuild_action("clean", "-x", "--all", "--force")
     assert build_c.check(dir=False)
 
-
-def test_using_build_prefix(qibuild_action, tmpdir):
+def test_using_build_prefix_from_cli(qibuild_action, tmpdir):
     mybuild = tmpdir.join("mybuild")
     qibuild_action.add_test_project("world")
     qibuild_action("configure", "world", "--build-prefix", mybuild.strpath)
@@ -76,3 +77,25 @@ def test_using_build_prefix(qibuild_action, tmpdir):
     qibuild_action("clean", "world", "-z", "--force",
                    "--build-prefix", mybuild.strpath)
     assert build_dir.check(dir=False)
+
+def test_using_build_prefix_from_config_deps_already_cleaned(tmpdir, monkeypatch):
+    myprefix = tmpdir.join("prefix")
+    work = tmpdir.mkdir("work")
+    dot_qi = work.mkdir(".qi")
+    qibuild_xml = dot_qi.join("qibuild.xml")
+    to_write = """\
+<qibuild version="1">
+  <build prefix="%s" />
+</qibuild>
+"""
+    qibuild_xml.write(to_write % myprefix.strpath)
+    worktree = qisys.worktree.WorkTree(work.strpath)
+    build_worktree = TestBuildWorkTree(worktree)
+    bar_proj = build_worktree.create_project("bar")
+    foo_proj = build_worktree.create_project("foo", build_depends=["bar"])
+    foo_proj.configure()
+    build_dir = foo_proj.build_directory
+    assert os.path.exists(build_dir)
+    monkeypatch.chdir(foo_proj.path)
+    qisys.script.run_action("qibuild.actions.clean", ["--force", "-z"])
+    assert not os.path.exists(build_dir)
