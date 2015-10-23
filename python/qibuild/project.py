@@ -116,8 +116,8 @@ class BuildProject(object):
         if build_prefix:
             return os.path.join(self.build_worktree.root,
                                 build_prefix,
-                                self.name,
-                                build_directory_name)
+                                build_directory_name,
+                                self.name)
         else:
             return os.path.join(self.path, build_directory_name)
 
@@ -557,7 +557,7 @@ The following tools were not found: {missing}\
         build_names.extend(["build-" + x for x in config_names])
         build_prefix = self.build_config.build_prefix
         if build_prefix:
-            to_list = os.path.join(build_prefix, self.name)
+            to_list = os.path.join(build_prefix)
             if os.path.exists(to_list):
                 dirs = os.listdir(to_list)
             else:
@@ -572,7 +572,7 @@ The following tools were not found: {missing}\
                 ret['unknown_configs'].append(bdir)
         for k in ret.keys():
             if build_prefix:
-                ret[k] = [os.path.join(build_prefix, self.name, x) for x in ret[k]]
+                ret[k] = [os.path.join(build_prefix, x, self.name) for x in ret[k]]
             else:
                 ret[k] = [os.path.join(self.path, x) for x in ret[k]]
         return ret

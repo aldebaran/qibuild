@@ -70,9 +70,9 @@ def test_using_build_prefix_from_cli(qibuild_action, tmpdir):
     mybuild = tmpdir.join("mybuild")
     qibuild_action.add_test_project("world")
     qibuild_action("configure", "world", "--build-prefix", mybuild.strpath)
-    build_dir = mybuild.join("world",
-                             "build-sys-%s-%s" % (platform.system().lower(),
-                                                platform.machine().lower()))
+    build_dir = mybuild.join("build-sys-%s-%s" % (platform.system().lower(),
+                                                platform.machine().lower()),
+                            "world")
     assert build_dir.check(dir=True)
     qibuild_action("clean", "world", "-z", "--force",
                    "--build-prefix", mybuild.strpath)

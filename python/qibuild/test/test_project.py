@@ -64,7 +64,7 @@ def test_using_build_prefix(build_worktree):
     build_config.build_prefix = "mybuild"
     build_directory_name = build_config.build_directory()
     assert world_proj.build_directory == os.path.join(build_worktree.root, "mybuild",
-                                                      "world", build_directory_name)
+                                                      build_directory_name, "world")
 
 def test_validates_name(build_worktree):
     # pylint:disable-msg=E1101

@@ -258,9 +258,9 @@ def test_using_build_prefix_from_command_line(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
     prefix = tmpdir.join("mybuild")
     qibuild_action("configure", "world", "--build-prefix", prefix.strpath)
-    expected = prefix.join("world",
-                           "build-sys-%s-%s" % (platform.system().lower(),
-                                                platform.machine().lower()))
+    expected = prefix.join("build-sys-%s-%s" % (platform.system().lower(),
+                                                platform.machine().lower()),
+                           "world")
     assert expected.join("CMakeCache.txt").check(file=True)
 
 def test_using_build_prefix_from_config(qibuild_action, tmpdir):
@@ -272,9 +272,9 @@ def test_using_build_prefix_from_config(qibuild_action, tmpdir):
     qibuild_action("configure", "world")
     prefix = build_worktree.tmpdir.join("prefix")
 
-    expected = prefix.join("world",
-                           "build-sys-%s-%s" % (platform.system().lower(),
-                                                platform.machine().lower()))
+    expected = prefix.join("build-sys-%s-%s" % (platform.system().lower(),
+                                                platform.machine().lower()),
+                           "world")
     assert expected.join("CMakeCache.txt").check(file=True)
 
 def test_relwithdebinfo(qibuild_action):
