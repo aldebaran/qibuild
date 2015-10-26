@@ -1,51 +1,33 @@
 qisrc
 =====
 
-------------------------------------
+-----------------------------
 Managing several git projects
-------------------------------------
+-----------------------------
 
 :Manual section: 1
 
 SYNOPSIS
 --------
-**qisrc** <*COMMAND*> ...
-
+**qisrc** command
 
 DESCRIPTION
------------
+------------
 
-Provides actions to work with several sources.
-Right now only ``git`` is supported
+Provides several actions to work with multiple git projects
 
 COMMANDS
 --------
 
-Commands:
+Useful commands:
 
-add [--src ...] [[--branch|-b] ...] [URL|PATH]
-  Add a new project to a worktree.
+init MANIFEST_URL:
+  MANIFEST_URL should be a git URL containing a ``manifest.xml`` file
+  Create a new worktree, reading the repositories to clone from the manifest.
 
-foreach -- *COMMAND* *COMMAND ARGS*
-  Run the same command on each source project.
+sync:
+  Fetch and apply remote changes to the git projects of the worktree
 
-grep [pattern] [-- git grep options]
-  Run git grep on every project.
-
-init [[--branch|-b] ...] [[--profile|-p] ...] [--force|-f] [--no-review] MANIFEST_URL [MANIFEST_NAME]
-  Init a new qisrc workspace.
-
-list [PATTERN]
-  List the names and paths of every project, or those matching a pattern.
-
-push [--no-review] [-n|--dry-run] [[--cc|--reviewers] ...]
-  Push changes for review.
-
-remove [--from-disk] [SRC]
-  Remove a project from a worktree.
-
-status [-u|--untracked-files] [-b|--show-branch]
-  List the state of all git repositories and exit.
-
-sync [--no-review]
-  Synchronize the given worktree with its manifests.
+push:
+  Push changes for review, or directly to the remote server if the project is
+  not configured for code review

@@ -35,10 +35,10 @@ convert-package [NAME] PACKAGE_PATH
 
   * Gentoo
 
-add-package -c TOOLCHAIN_NAME PACKAGE_NAME PACKAGE_PATH
+add-package -t TOOLCHAIN_NAME PACKAGE_PATH
   add a new qiBuild package to the given toolchain
 
-import-package -c TOOLCHAIN_NAME [PACKAGE_NAME] PACKAGE_PATH
+import-package -t TOOLCHAIN_NAME --name PACKAGE_NAME PACKAGE_PATH
   import a package (binary archive or install directory) into a qiBuild package
 
   Convert the binary package to a qiBuild package and automatically
@@ -48,22 +48,19 @@ import-package -c TOOLCHAIN_NAME [PACKAGE_NAME] PACKAGE_PATH
 
   * Gentoo
 
-remove-package -c TOOLCHAIN_NAME PACKAGE_NAME
+remove-package -t TOOLCHAIN_NAME PACKAGE_NAME
   remove the package from the toolcain
 
-Note: to use host native toolchain (i.e. the default compiler installed on the system),
-you should pass the ``-c system`` option.
 
-Note: to use a toolchain, you must pass the ``-c`` option to your
-``qibuild`` action, or set a default toolchain in the
-configuration file of you worktree (``QI_WORK_TREE/.qi/qibuild.xml``)
-like this::
+NOTES
+-----
 
+.. note:: to use a toolchain, you must first create a build config with
+  ``qibuild add-config NAME --toolchain TOOLCHAIN_NAME`` and then
+  pass the ``-c`` option to your ``qibuild`` action.
 
-  <qibuild version="1">
-    <defaults config=NAME />
-  </qibuild>
+  You can also set a default build configuration with ``qibuild set-default``.
 
-Note: the ``import-package`` action may take benefit from *portage*
-(see: http://www.gentoo.org/proj/en/portage/index.xml) if it is found on your
-system.
+.. note:: the ``import-package`` action may take benefit from *portage*
+   (see: http://www.gentoo.org/proj/en/portage/index.xml) if it is found on your
+   system.

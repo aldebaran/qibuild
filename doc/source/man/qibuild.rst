@@ -31,24 +31,14 @@ init:
   Should be run in a empty directory. Create a new work tree.
 
 
-create PROJECT
-  Create a new project in the work tree.
-
-  In the following actions, you do not need to specify the project name if you
-  are in a subdirectory of this project
-
-
 All following command accept a ``-c,--config`` argument which should be
-the name of a toolchain (``-c system`` to use the native toolchain).
+the name of a build config (created with ``qibuild add-config``).
 
 configure [PROJECT]
   Configure a project.
 
 make [PROJECT]
   Build a project
-
-test [PROJECT]
-  Run the project tests
 
 install PROJECT DESTINATION
   Install PROJECT to the DESTINATION
@@ -57,16 +47,16 @@ package PROJECT
   Generate a pre-compiled archive of the project.
   Archive will be generated in ``QI_WORK_TREE/package/``
 
-deploy [PROJECT] URL
+deploy [PROJECT] --url URL
   Deploy a project on the remote target reachable at URL
 
 clean [PROJECT]
   Remove the build directories from the project source tree
 
-find [BINARY]
+find BINARY
   Search for artefact in worktree build directories
 
-run [PROGRAM]
+run PROGRAM
   Search for binary in worktree build directories and run it.
 
 .. note::
