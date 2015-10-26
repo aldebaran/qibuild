@@ -50,7 +50,7 @@ Continue with the tutorials
 .. toctree::
     :maxdepth: 1
 
-    qisrc/git_projects
+    qisrc/tutorial
     qisrc/templates
     qibuild/tutorial
     qidoc/tutorial

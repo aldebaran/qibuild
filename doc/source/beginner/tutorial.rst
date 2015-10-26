@@ -4,7 +4,7 @@ qiBuild tutorials
 .. toctree::
     :maxdepth: 1
 
-    qisrc/git_projects
+    qisrc/tutorial
     qisrc/templates
     qisrc/git-to-qisrc_cookbook
     qibuild/tutorial
