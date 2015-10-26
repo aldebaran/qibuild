@@ -1,3 +1,4 @@
+
 v3.11
 =====
 
@@ -17,6 +18,12 @@ qibuild
     ``<prefix>/<project>/<build-dir>``
   * In 3.11:
     ``<prefix>/<build-dir>/project>``
+
+qisrc
+-----
+
+* ``qisrc list``: add ``--group`` argument to list projects belonging
+  to the given group(s).
 
 qitest
 ------

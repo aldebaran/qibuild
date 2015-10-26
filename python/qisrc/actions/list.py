@@ -24,6 +24,7 @@ def configure_parser(parser):
                         help="sort by path")
     parser.add_argument("pattern", metavar="PATTERN", nargs="?",
                         help="pattern to be matched")
+    qisrc.parsers.groups_parser(parser)
     parser.set_defaults(names=True)
 
 def do(args):
@@ -33,7 +34,10 @@ def do(args):
         qisrc.worktree.on_no_matching_projects(git_worktree)
         return
     ui.info(ui.green, "qisrc projects in:", ui.blue, git_worktree.root)
-    projects = git_worktree.git_projects
+    if args.groups:
+        projects = git_worktree.get_git_projects(groups=args.groups)
+    else:
+        projects = git_worktree.git_projects
     max_name = max(len(x.name) for x in projects)
     max_src  = max(len(x.src)  for x in projects)
     regex = args.pattern
