@@ -213,12 +213,26 @@ local build node
 
 The local ``build`` nodes accepts the following attributes:
 
-* ``build_dir`` : Instead of creating a different build directory per project,
-  (for instance ``~/src/hello/build-linux``), every build
-  directory will be created under this directory, for instance
-  ``/path/to/build.directory/build-linux/hello``
+* ``prefix`` : Instead of scattering build directories inside each project
+  source directory, create them under the provided directory.
 
-  Mandatory if you are using Eclipse CDT.
+  This enables "out of worktree" builds, and is mandatory if you are using
+  Eclipse CDT.
+
+  For instance, given two projects "hello" and "world" and two build
+  configurations "cross" and "linux", the default layout would be::
+
+    ~/src/hello/build-cross
+    ~/src/hello/build-linux
+    ~/src/world/build-cross
+    ~/src/world/build-linux
+
+  with ``prefix="/path/to/build.prefix"``, it becomes::
+
+    /path/to/build.prefix/build-cross/hello
+    /path/to/build.prefix/build-cross/world
+    /path/to/build.prefix/build-linux/hello
+    /path/to/build.prefix/build-linux/world
 
 .. _qibuild-config-merging:
 
@@ -313,4 +327,3 @@ Here is what you could use:
 
 * When using ``-c vs2010``, ``%PATH%`` will look like:
   ``c:\swig\bin;...``
-
