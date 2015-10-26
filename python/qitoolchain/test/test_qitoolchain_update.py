@@ -25,5 +25,5 @@ def test_udpate_all_toolchains(qitoolchain_action, feed, record_messages):
     qitoolchain_action("create", "foo", feed.url)
     qitoolchain_action("create", "bar")
     qitoolchain_action("update")
-    assert record_messages.find("\[WARN \]:\s+No feed found for bar")
+    assert record_messages.find("These toolchains will be skipped because they have no feed: bar")
     assert record_messages.find("Updating foo")

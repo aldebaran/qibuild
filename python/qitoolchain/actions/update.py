@@ -40,12 +40,14 @@ def do(args):
         toolchain.update(feed)
     else:
         tc_names = qitoolchain.get_tc_names()
-        for i, tc_name in enumerate(tc_names, start=1):
+        tc_with_feed = [x for x in tc_names if qitoolchain.toolchain.Toolchain(x).feed_url]
+        tc_without_feed = list(set(tc_names) - set(tc_with_feed))
+        for i, tc_name in enumerate(tc_with_feed, start=1):
             toolchain = qitoolchain.toolchain.Toolchain(tc_name)
             tc_feed = toolchain.feed_url
-            if not tc_feed:
-                ui.warning("No feed found for %s, skipping" % tc_name)
-                continue
-            ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, len(tc_names)),
-                    ui.green, "Updating", ui.blue, tc_name)
+            ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, len(tc_with_feed)),
+                    ui.green, "Updating", ui.blue, tc_name, ui.reset, "with", ui.green,
+                    tc_feed)
             toolchain.update(tc_feed)
+        if tc_without_feed:
+            ui.info("These toolchains will be skipped because they have no feed:", ", ".join(tc_without_feed))
