@@ -9,6 +9,14 @@ qibuild
 * ``qibuild configure``: fix setting flags containing ``=``, such as
   ``qibuild configure -DCMAKE_CXX_FLAGS="-std=gnu++11"``
 * Fix using ``qibuild clean`` in some corner cases
+* Restore build directory paths when using a build prefix.
+
+  * Before 3.0:
+    ``<prefix>/<build-dir>/project>``
+  * From 3.8 to 3.10:
+    ``<prefix>/<project>/<build-dir>``
+  * In 3.11:
+    ``<prefix>/<build-dir>/project>``
 
 qitest
 ------
