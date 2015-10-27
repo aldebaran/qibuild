@@ -1,0 +1,24 @@
+v3.10.1
+=======
+
+qisrc
+------
+
+* ``qisrc checkout``: do not re-add the default group
+
+qibuild
+-------
+
+* Fix using ``qibuild make-host-tools`` when no project is specified
+* Implement ``qibuild make-host-tools --all``
+
+qilinguist
+----------
+
+* Fix qilinguist extraction messages when they contain context (trContext)
+
+cmake
+-----
+
+* Using ``qi_stage_lib(foo CUSTOM_CODE ..)`` did not generate
+  installed ``foo-config.cmake`` correctly
