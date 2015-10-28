@@ -147,9 +147,9 @@ class EnvSetter():
         """ Read a :py:class:`qibuild.config.QiBuildConfig` instance
 
         """
-        path_env = qibuild_cfg.env.path
         bat_file = qibuild_cfg.env.bat_file
-        if path_env:
-            self.prepend_to_path(path_env)
         if bat_file:
             self.source_bat(bat_file)
+        path_env = qibuild_cfg.env.path
+        if path_env:
+            self.prepend_to_path(path_env)

@@ -1,0 +1,8 @@
+v3.10.2
+=======
+
+qibuild
+-------
+
+* When reading ``~/.config/qi/qibuild.xml``, prepend contents of
+  ``<env path="..."/>`` *after* launching bat file.
