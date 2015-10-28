@@ -75,12 +75,16 @@ class DocBuilder(object):
 
     def intl_update(self):
         """ Regenerate translation catalogs for the top project """
-        projects = self.get_dep_projects()
-        for i, project in enumerate(projects):
-            ui.info_count(i, len(projects),
-                          ui.green, "Updating", ui.blue, project.name)
-            if project.doc_type == "sphinx":
-                project.intl_update()
+        if self.base_project.doc_type == "sphinx" and self.base_project.translated:
+            ui.info(ui.green, "Updating", ui.blue, self.base_project.name)
+            self.base_project.intl_update()
+        else:
+            mess = ["Cannot translate", self.base_project.name]
+            if self.base_project.doc_type != "sphinx":
+                mess.append("(not a Sphinx project)")
+            if not self.base_project.translated:
+                mess.append("(not marked as translated)")
+            ui.warning(*mess)
 
     def install(self, destdir):
         """ Install the doc projects to a dest dir
