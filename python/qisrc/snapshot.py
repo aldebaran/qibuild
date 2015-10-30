@@ -12,6 +12,7 @@ from qisys import ui
 import qisrc.git
 import qisrc.status
 import qisrc.reset
+import qisrc.sync
 
 
 class Snapshot(object):
