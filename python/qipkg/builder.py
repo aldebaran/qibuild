@@ -7,12 +7,9 @@ import sys
 import tempfile
 import zipfile
 
-import qibuild.worktree
-
 from qisys import ui
 import qisys.qixml
 import qibuild.breakpad
-
 import qibuild.worktree
 import qibuild.cmake_builder
 import qipy.worktree

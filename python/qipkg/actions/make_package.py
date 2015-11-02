@@ -8,7 +8,6 @@ from qisys import ui
 import qisys.parsers
 import qipkg.parsers
 import qipkg.metapackage
-import qipkg.parsers
 
 def configure_parser(parser):
     """Configure parser for this action"""

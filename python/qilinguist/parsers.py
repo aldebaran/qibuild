@@ -8,7 +8,6 @@ import qilinguist.builder
 
 from qilinguist.worktree import LinguistWorkTree, new_linguist_project
 from qilinguist.pml_translator import new_pml_translator
-import qilinguist.builder
 
 def get_linguist_worktree(args):
     worktree = qisys.parsers.get_worktree(args, raises=False)
@@ -110,4 +109,3 @@ Could not guess linguist project name from current working directory
 Please go inside a translatable project, or specify the project name
 on the command line
 """
-
