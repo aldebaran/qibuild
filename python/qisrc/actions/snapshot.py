@@ -35,6 +35,4 @@ def do(args):
         snapshot_path = os.path.join(os.getcwd(), "snapshot.json")
     qisrc.snapshot.generate_snapshot(git_worktree, snapshot_path,
                                      deprecated_format=args.deprecated_format)
-    ui.info(ui.green, "Snapshot generated in", ui.reset,
-            ui.bold, snapshot_path)
     return snapshot_path

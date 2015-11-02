@@ -101,8 +101,8 @@ class Snapshot(object):
 
 def generate_snapshot(git_worktree, output_path, deprecated_format=True):
     snapshot = git_worktree.snapshot()
-    return snapshot.dump(output_path, deprecated_format=deprecated_format)
     ui.info(ui.green, "Snapshot generated in", ui.white, output_path)
+    return snapshot.dump(output_path, deprecated_format=deprecated_format)
 
 def load_snapshot(git_worktree, input_path):
     """Load a snapshot file and reset projects."""
