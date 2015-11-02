@@ -577,3 +577,24 @@ def test_host_config_is_persistent():
     qibuild_cfg2 = qibuild.config.QiBuildConfig()
     qibuild_cfg2.read()
     assert qibuild_cfg2.get_host_config() == "foo"
+
+def test_setting_env_vars(tmpdir):
+    global_xml = tmpdir.join("global.xml")
+    global_xml.write("""
+<qibuild>
+  <defaults>
+    <env>
+     <var name="FOO">BAR</var>
+    </env>
+  </defaults>
+  <config name="spam">
+    <env>
+      <var name="SPAM">EGGS</var>
+    </env>
+  </config>
+</qibuild>
+""")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(global_xml.strpath)
+    qibuild_cfg.set_active_config("spam")
+    assert qibuild_cfg.env.vars == { "SPAM" : "EGGS", "FOO" : "BAR" }

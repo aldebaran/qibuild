@@ -19,6 +19,20 @@ qibuild
   * In 3.11:
     ``<prefix>/<build-dir>/project>``
 
+* Support setting arbitrary environment variables in ``~/.config/qi/qibuild.xml``.
+  Here's an example of a build configuration using ``clang``
+
+  .. code-block:: xml
+
+      <qibuild>
+        <config name="clang">
+          <env>
+            <var name="CC">clang</var>
+            <var name="CXX">clang++</var>
+          </env>
+        </config>
+      </qibuild>
+
 qisrc
 -----
 

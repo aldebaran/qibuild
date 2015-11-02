@@ -31,11 +31,13 @@ class Env:
         self.path = None
         self.bat_file = None
         self.editor = None
+        self.vars = dict()
 
     def parse(self, tree):
         self.path = tree.get("path")
         self.bat_file = tree.get("bat_file")
         self.editor   = tree.get("editor")
+        self.parse_vars(tree)
 
     def tree(self):
         tree = etree.Element("env")
@@ -45,7 +47,20 @@ class Env:
             tree.set("bat_file", self.bat_file)
         if self.editor:
             tree.set("editor", self.editor)
+        self.dump_vars(tree)
         return tree
+
+    def parse_vars(self, tree):
+        var_elems = tree.findall("var")
+        for var_elem in var_elems:
+            name = qisys.qixml.parse_required_attr(var_elem, "name")
+            self.vars[name] = var_elem.text
+
+    def dump_vars(self, tree):
+        for name, value in self.vars.iteritems():
+            var_elem = etree.SubElement(tree, "var")
+            var_elem.set("name", name)
+            var_elem.text = value
 
     def __str__(self):
         res = ""
@@ -55,6 +70,8 @@ class Env:
             res += "env.bat_file: %s\n" % self.bat_file
         if self.editor:
             res += "env.editor: %s\n" % self.editor
+        if self.vars:
+            res += "env.vars: %s\n" % self.vars
         return res
 
 
@@ -519,6 +536,7 @@ class QiBuildConfig:
         # reset to defaults in case set_active_config is called twice
         self.cmake.generator = self.defaults.cmake.generator
         self.env.path = self.defaults.env.path
+        self.env.vars = self.defaults.env.vars
         self.env.bat_file = self.defaults.env.bat_file
         self.ide = self.defaults.ide
 
@@ -542,6 +560,8 @@ class QiBuildConfig:
             if matching_config_ide:
                 if self.ides.get(matching_config_ide):
                     self.ide = self.ides[matching_config_ide]
+            # Update env.vars:
+            self.env.vars.update(matching_config.env.vars)
 
     def set_default_config(self, name):
         """ Set a new config to use by default

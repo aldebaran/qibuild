@@ -88,6 +88,13 @@ The ``env`` node accepts the following attributes:
 * ``bat_file``: A .bat file that will be sourced to get new environment.
   This makes it possible to use ``cl.exe`` from the command line
 * ``editor`` : Used by ``qibuild config --edit``
+* It also accepts a list of ``var`` children, like this:
+
+  .. code-block:: xml
+
+    <env>
+      <var name="NAME">VALUE</var>
+    </env>
 
 .. _qibuild-xml-node-cmake:
 
@@ -318,3 +325,7 @@ Here is what you could use:
 
 * When using ``-c vs2010``, ``%PATH%`` will look like:
   ``c:\swig\bin;...``
+
+
+* Other environment variables (set in ``<var>`` tags) are simply merged using the
+  ``update`` method of Python dictionaries.

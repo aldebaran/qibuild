@@ -153,3 +153,5 @@ class EnvSetter():
         path_env = qibuild_cfg.env.path
         if path_env:
             self.prepend_to_path(path_env)
+        env_vars = qibuild_cfg.env.vars
+        self._build_env.update(env_vars)

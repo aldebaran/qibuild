@@ -13,7 +13,7 @@ import unittest
 
 import qisys.sh
 import qisys.envsetter
-
+import qibuild.config
 
 class EnvSetterTestCase(unittest.TestCase):
     def setUp(self):
@@ -122,6 +122,56 @@ set LIBPATH={}
                 envsetter.source_bat(sourceme)
                 build_env_path2 = envsetter.get_build_env()["PATH"]
                 self.assertEquals(build_env_path2, build_env_path)
+
+
+def test_reads_env_vars_from_config(tmpdir):
+    qibuild_xml = tmpdir.join("qibuild.xml")
+    qibuild_xml.write("""
+<qibuild>
+  <defaults>
+    <env>
+     <var name="FOO">BAR</var>
+    </env>
+  </defaults>
+  <config name="spam">
+    <env>
+      <var name="SPAM">EGGS</var>
+    </env>
+  </config>
+</qibuild>
+""")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(qibuild_xml.strpath)
+    qibuild_cfg.set_active_config("spam")
+    env_setter = qisys.envsetter.EnvSetter()
+    env_setter.read_config(qibuild_cfg)
+    build_env = env_setter.get_build_env()
+    assert build_env["FOO"] == "BAR"
+    assert build_env["SPAM"] == "EGGS"
+
+def test_updating_env_vars(tmpdir):
+    qibuild_xml = tmpdir.join("qibuild.xml")
+    qibuild_xml.write("""
+<qibuild>
+  <defaults>
+    <env>
+     <var name="FOO">BAR</var>
+    </env>
+  </defaults>
+  <config name="spam">
+    <env>
+      <var name="FOO">SPAM</var>
+    </env>
+  </config>
+</qibuild>
+""")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read(qibuild_xml.strpath)
+    qibuild_cfg.set_active_config("spam")
+    env_setter = qisys.envsetter.EnvSetter()
+    env_setter.read_config(qibuild_cfg)
+    build_env = env_setter.get_build_env()
+    assert build_env["FOO"] == "SPAM"
 
 def main():
     unittest.main()
