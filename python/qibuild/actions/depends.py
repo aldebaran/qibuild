@@ -159,7 +159,7 @@ def print_deps_graph(root_name, label, dependency_relationships):
 
     # Show unique packages as rectangles
     package_names = sorted(set(
-        [x.to_name for x in dependency_relationships if x.is_package]))
+        x.to_name for x in dependency_relationships if x.is_package))
     for package_name in package_names:
         qisys.ui.info(qisys.ui.reset, "  \"" + package_name + "\" [shape=box]")
 
