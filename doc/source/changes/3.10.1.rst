@@ -15,7 +15,7 @@ qibuild
 qilinguist
 ----------
 
-* Fix qilinguist extraction messages when they contain context (trContext)
+* Fix qilinguist extraction messages when they contain context (``trContext``)
 
 cmake
 -----
