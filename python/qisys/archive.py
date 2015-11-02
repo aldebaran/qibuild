@@ -326,7 +326,7 @@ Please set only one of these two options to 'True'
     topdir    = line.split(os.sep, 1)[0]
     archroot  = None
     opts      = list()
-    while len(line) > 0:
+    while line:
         if line[0] in ["/", "."] or topdir != line[0]:
             if process.poll() is None:
                 process.terminate()

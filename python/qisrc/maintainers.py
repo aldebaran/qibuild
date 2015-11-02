@@ -87,7 +87,7 @@ def remove(project, name=None, email=None):
 
 def clear(project):
     maintainers = get(project)
-    if len(maintainers) == 0:
+    if not maintainers:
         return False
     for maintainer in maintainers:
         remove(project, **maintainer)
@@ -107,4 +107,3 @@ def add(project, name=None, email=None):
     maint_elem.text = name
     root.append(maint_elem)
     qisys.qixml.write(tree, project.qiproject_xml)
-

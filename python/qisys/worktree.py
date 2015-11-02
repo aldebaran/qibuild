@@ -251,7 +251,7 @@ This path does not exist
 
 def repr_list_projects(projects, name = "projects"):
     res = ""
-    if len(projects):
+    if projects:
         res += name
         for i, project in enumerate(projects):
             res += "(%s) %s, " % (i, project.src)

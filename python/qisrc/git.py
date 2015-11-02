@@ -126,7 +126,7 @@ class Git(object):
         """
         (status, out) = self.call("symbolic-ref", ref, raises=False)
         lines = out.splitlines()
-        if len(lines) < 1:
+        if not lines:
             return None
         if status != 0:
             return None

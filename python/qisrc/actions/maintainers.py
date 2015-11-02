@@ -67,7 +67,7 @@ def add_maintainer(project, args):
 
 def remove_maintainer(project, args):
     maintainers = qisrc.maintainers.get(project)
-    if len(maintainers) == 0:
+    if not maintainers:
         ui.info("No maintainer configured for this project")
         return
     maintainers_string = ["None"]

@@ -80,7 +80,7 @@ def get_deps(build_worktree, project, single, runtime, reverse):
 
 def print_deps_tree(dependency_relationships):
     """ --tree style output formatter """
-    if len(dependency_relationships) == 0:
+    if not dependency_relationships:
         qisys.ui.info("None")
         return
     max_name = max(
