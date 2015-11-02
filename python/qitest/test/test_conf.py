@@ -44,17 +44,25 @@ def test_errors(tmpdir):
 def test_relocate():
     proj = mock.Mock()
     proj.sdk_directory = "/path/to/sdk"
-    tests = [{
-        "name" : "test_one",
-        "cmd" : ["/path/to/sdk/bin/test_one", "/path/to/sdk/share/foo/one.txt"],
-        "name" : "test_two",
-        "cmd" : ["/path/to/sdk/bin/test_two", "/some/other/path"],
-        }]
+    tests = [
+        {
+            "name" : "test_one",
+            "cmd" : ["/path/to/sdk/bin/test_one", "/path/to/sdk/share/foo/one.txt"]
+        },
+        {
+            "name" : "test_two",
+            "cmd" : ["/path/to/sdk/bin/test_two", "/some/other/path"]
+        }
+    ]
 
     qitest.conf.relocate_tests(proj, tests)
-    assert tests == [{
-        "name" : "test_one",
-        "cmd" : ["bin/test_one", "share/foo/one.txt"],
-        "name" : "test_two",
-        "cmd" : ["bin/test_two", "/some/other/path"],
-        }]
+    assert tests == [
+            {
+                "name" : "test_one",
+                "cmd" : ["bin/test_one", "share/foo/one.txt"]
+            },
+            {
+                "name" : "test_two",
+                "cmd" : ["bin/test_two", "/some/other/path"],
+           }
+    ]
