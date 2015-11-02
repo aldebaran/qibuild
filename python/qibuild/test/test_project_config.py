@@ -10,7 +10,7 @@ from qibuild.config import ProjectConfig
 import unittest
 from StringIO import StringIO
 
-def cfg_from_string(str, user_config=None):
+def cfg_from_string(str):
     cfg_loc = StringIO(str)
     project_cfg = ProjectConfig()
     project_cfg.read(cfg_loc)

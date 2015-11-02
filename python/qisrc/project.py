@@ -188,7 +188,7 @@ class GitProject(object):
                          "On %s but should be on %s" % (current_branch, branch.name)
 
         if current_branch != branch.name and rebase_devel:
-            return git.sync_branch_devel(current_branch, branch, fetch_first=False)
+            return git.sync_branch_devel(branch, fetch_first=False)
 
         # Here current_branch == branch.name
         return git.sync_branch(branch, fetch_first=False)

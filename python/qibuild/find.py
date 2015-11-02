@@ -97,10 +97,10 @@ def find(paths, name, debug=True, expect_one=True):
 
 
 
-def binary_name(name, shared=True, debug=True, os_name=None):
+def binary_name(name, debug=True, os_name=None):
     """ Return exact binary name for current OS.
     """
-    return name + _binary_suffix(shared=shared, debug=debug, os_name=os_name)
+    return name + _binary_suffix(debug=debug, os_name=os_name)
 
 def library_name(name, shared=True, debug=True, os_name=None):
     """ Return exact library name for current OS.
@@ -143,7 +143,7 @@ def _library_suffix(shared=True, debug=True, os_name=None):
         return ".dylib"
     return ""
 
-def _binary_suffix(shared=True, debug=True, os_name=None):
+def _binary_suffix(debug=True, os_name=None):
     """ Return suitable binary suffix used on current OS.
     """
     # Os variable can be forced for test purpose

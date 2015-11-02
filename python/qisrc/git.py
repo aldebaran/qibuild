@@ -409,7 +409,7 @@ class Git(object):
         if ret == 0:
             return sha1
 
-    def sync_branch_devel(self, local_branch, master_branch, fetch_first=True):
+    def sync_branch_devel(self, master_branch, fetch_first=True):
         """ Make sure master stays compatible with your development branch
         Checks if your local master branch can be fast-forwarded to remote
         Update master's HEAD if it's the case

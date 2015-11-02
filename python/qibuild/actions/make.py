@@ -25,5 +25,4 @@ def do(args):
     """Main entry point"""
 
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
-    cmake_builder.build(num_jobs=args.num_jobs, rebuild=args.rebuild,
-                        coverity=args.coverity)
+    cmake_builder.build(rebuild=args.rebuild, coverity=args.coverity)

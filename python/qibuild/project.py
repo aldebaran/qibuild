@@ -302,7 +302,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             json.dump(tests, fp, indent=2)
 
 
-    def build(self, num_jobs=None, rebuild=False, target=None,
+    def build(self, rebuild=False, target=None,
               coverity=False, env=None):
         """ Build the project """
         timer = ui.timer("make %s" % self.name)
@@ -375,7 +375,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         return list()
 
 
-    def install(self, destdir, prefix="/", components=None, num_jobs=1,
+    def install(self, destdir, prefix="/", components=None,
                 split_debug=False):
         """ Install the project
 
@@ -417,7 +417,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
         # Hack for http://www.cmake.org/Bug/print_bug_page.php?bug_id=13934
         if "Unix Makefiles" in self.cmake_generator:
-            self.build(target="preinstall", num_jobs=num_jobs, env=build_env)
+            self.build(target="preinstall", env=build_env)
         if components:
             for component in components:
                 files = self._install_component(destdir, component)
