@@ -19,9 +19,12 @@ class CMakeBuilder(AbstractBuilder):
         Allow building multiple cmake projects together.
         Dependencies can optionally be resolved and taken into account.
     """
-    def __init__(self, build_worktree, projects=list()):
+    def __init__(self, build_worktree, projects=None):
         self.build_worktree = build_worktree
-        self.projects = projects
+        if not projects:
+            self.projects = list()
+        else:
+            self.projects = projects
         self.deps_solver = qibuild.deps.DepsSolver(build_worktree)
         self.dep_types = ["build", "runtime"]
 

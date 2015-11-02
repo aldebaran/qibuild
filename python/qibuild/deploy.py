@@ -51,8 +51,10 @@ echo ""
 echo ssh -p %(port)s %(host)s -- gdbserver %(gdb_listen)s "%(remote_dir)s/${1}"
 """
 
-def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=[], remote_gdb_address=""):
+def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=None, remote_gdb_address=""):
     """ generate a script that connects a local gdb to a gdbserver """
+    if not solib_search_path:
+        solib_search_path = list()
     source_file = os.path.abspath(os.path.join(dest, "setup.gdb"))
     with open(source_file, "w+") as f:
         f.write(FILE_SETUP_GDB % { 'sysroot'            : sysroot,
