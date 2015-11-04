@@ -128,6 +128,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
         """
         res = qitest.result.TestResult(test)
+        if not test.get("timeout"):
+            test["timeout"] = 20
         self._update_test(test)
         cmd = test["cmd"]
         timeout = test["timeout"]
