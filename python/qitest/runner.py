@@ -81,8 +81,6 @@ class TestSuiteRunner(object):
         # But nightly tests are run along with the normal tests
         if not self.nightly:
             res = [x for x in res if x.get("nightly", False) is False]
-        if not res and self.patterns:
-            ui.error("No test found matching pattern")
         if self.last_failed:
             failed_names = self.get_last_failed_names()
             res = [x for x in res if x["name"] in failed_names]
@@ -102,7 +100,6 @@ class TestSuiteRunner(object):
         with open(fail_json, "r") as fp:
             names = json.load(fp)
         return names
-
 class TestLauncher(object):
     """ Interface for a class able to launch a test. """
     __metaclass__ = abc.ABCMeta

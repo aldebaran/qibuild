@@ -54,6 +54,8 @@ class TestQueue():
 
     def _run_once(self, num_jobs):
         """ Helper for run """
+        if not self.tests:
+            ui.warning("No tests selected for run")
         signal.signal(signal.SIGINT, self.sigint_handler)
         start = datetime.datetime.now()
         self._run(num_jobs=num_jobs)
