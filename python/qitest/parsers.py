@@ -20,6 +20,8 @@ def test_parser(parser, with_num_jobs=True):
                         help="run perfs tests instead of pure tests.")
     group.add_argument("-k", "--pattern", dest="patterns", action="append",
                         help="Filter tests matching these patterns")
+    group.add_argument("-x", "--exclude", dest="excludes", action="append",
+                        help="Exclude test matching these patterns")
     group.add_argument("-V", dest="verbose_tests", action="store_true",
                         help="display tests output")
     group.add_argument("--valgrind", dest="valgrind", action="store_true",
@@ -78,6 +80,7 @@ def get_test_runner(args, build_project=None, qitest_json=None):
         test_runner.cwd = qisys.sh.to_native_path(os.path.dirname(qitest_json))
 
     test_runner.patterns = args.patterns
+    test_runner.excludes = args.excludes
     test_runner.perf = args.perf
     test_runner.coverage = args.coverage
     test_runner.break_on_failure = args.break_on_failure

@@ -53,6 +53,7 @@ qitest
   requires a ``tty`` as ``stdout``)
 * Fix using ``qitest run --coverage`` from a build worktree
 * Implement ``qitest run --last-failed`` to re-run previously failing tests
+* Implement ``qitest run --exclude`` to specify pattern of test name to exclude from the run
 
 qitoolchain
 ------------

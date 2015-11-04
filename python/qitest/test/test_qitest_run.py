@@ -75,3 +75,14 @@ def test_run_last_failed(tmpdir, qitest_action, record_messages):
     qitest_action("run", "--last-failed", retcode=True)
     qitest_action("run", "--last-failed", retcode=True)
     assert record_messages.find("No failing tests found")
+
+def test_exclude(tmpdir, qitest_action):
+    tests = [
+      { "name" : "foo", "cmd" : [sys.executable, "--version"]},
+      { "name" : "bar", "cmd" : [sys.executable , "-c", "import sys ; sys.exit(1)"]}
+    ]
+    qitest_json = tmpdir.join("qitest.json")
+    qitest_json.write(json.dumps(tests))
+    rc = qitest_action("run", "--exclude", "bar", cwd=tmpdir.strpath,
+            retcode=True)
+    assert rc == 0

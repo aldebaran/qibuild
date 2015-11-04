@@ -16,6 +16,7 @@ class TestSuiteRunner(object):
     def __init__(self, project):
         self.project = project
         self._patterns = list()
+        self._excludes = list()
         self.num_jobs = 1
         self.repeat_until_fail = 0
         self.cwd = os.getcwd()
@@ -60,8 +61,21 @@ class TestSuiteRunner(object):
         self._patterns = value
 
     @property
+    def excludes(self):
+       return self._excludes
+
+    @excludes.setter
+    def excludes(self, value):
+            if value:
+                [re.compile(x) for x in value] # just checking regexps are valid
+            self._excludes = value
+
+    @property
     def tests(self):
-        res = [x for x in self._tests if match_patterns(self.patterns, x["name"])]
+        res = [x for x in self._tests if
+                match_patterns(self.patterns, x["name"], default=True)]
+        res = [x for x in res if not
+                match_patterns(self.excludes, x["name"], default=False)]
         # Perf tests are run alone
         res = [x for x in res if x.get("perf", False) == self.perf]
         # But nightly tests are run along with the normal tests
@@ -105,9 +119,9 @@ class TestLauncher(object):
         pass
 
 
-def match_patterns(patterns, name):
+def match_patterns(patterns, name, default=True):
     if not patterns:
-        return True
+        return default
     for pattern in patterns:
         res = re.search(pattern, name)
         if res:
