@@ -5,7 +5,7 @@ import os
 import copy
 
 import qisrc.git
-from qisrc.git_config import Remote
+from qisrc.git_config import Remote, Branch
 from qisrc.manifest import RepoConfig
 
 from qisrc.test.conftest import TestGitWorkTree
@@ -35,6 +35,14 @@ def test_apply_git_config(git_worktree):
                          remote_branch="remote_branch")
     foo.apply_config()
     assert git.get_tracking_branch("feature") == "upstream/remote_branch"
+
+def test_branch_without_remote(git_worktree):
+    foo = git_worktree.create_git_project("foo")
+    branch = Branch()
+    branch.name = "master"
+    branch.default = True
+    foo.branches = [branch]
+    foo.apply_config()
 
 def test_apply_remote_config(git_worktree):
     foo = git_worktree.create_git_project("foo")

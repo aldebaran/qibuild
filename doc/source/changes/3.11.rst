@@ -38,6 +38,7 @@ qisrc
 
 * ``qisrc list``: add ``--group`` argument to list projects belonging
   to the given group(s).
+* ``qisrc sync``: fix crash in some corner cases
 
 qitest
 ------
