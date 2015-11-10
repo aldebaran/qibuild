@@ -6,3 +6,7 @@ qibuild
 
 * When reading ``~/.config/qi/qibuild.xml``, prepend contents of
   ``<env path="..."/>`` *after* launching bat file.
+
+qisrc
+-----
+* ``qisrc sync``: fix crash in some corner cases

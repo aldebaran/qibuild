@@ -221,8 +221,9 @@ class GitProject(object):
         for remote in self.remotes:
             git.set_remote(remote.name, remote.url)
         for branch in self.branches:
-            git.set_tracking_branch(branch.name, branch.tracks,
-                                    remote_branch=branch.remote_branch)
+            if branch.tracks:
+                git.set_tracking_branch(branch.name, branch.tracks,
+                                        remote_branch=branch.remote_branch)
 
     def __deepcopy__(self, memo):
         shallow_copy = copy.copy(self)
