@@ -460,7 +460,7 @@ class Git(object):
         res = list()
         rc, out = self.call("log", "--reverse",
                             "--format=%H%n%B\f",
-                            "%s..%s" % (before_ref, after_ref),
+                            "%s...%s" % (before_ref, after_ref),
                             raises=False)
         if rc != 0:
             ui.error(out)

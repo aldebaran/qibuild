@@ -10,3 +10,4 @@ qibuild
 qisrc
 -----
 * ``qisrc sync``: fix crash in some corner cases
+* ``qisrc.git.Git.get_log``: fix git log command
