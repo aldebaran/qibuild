@@ -76,10 +76,18 @@ class SphinxProject(qidoc.project.DocProject):
         conf += self.append_doxylink_settings(conf, rel_paths=rel_paths)
         conf += self.append_intersphinx_settings(conf, rel_paths=rel_paths)
         conf += self.append_qiapidoc_settings(conf, rel_paths=rel_paths)
+        conf += self.append_breathe_settings(conf, rel_paths=rel_paths)
 
         out_conf_py = os.path.join(self.build_dir, "conf.py")
         qisys.sh.write_file_if_different(conf, out_conf_py)
 
+
+    def append_breathe_settings(self, conf, rel_paths=False):
+        breathe_projects = dict();
+        for x in self.doxydeps:
+            breathe_projects[x.name] = os.path.join(x.build_dir, 'xml')
+
+        return "\nbreathe_projects = %s\n" % breathe_projects
 
     def append_qiapidoc_settings(self, conf, rel_paths=False):
         """ Return a string representing the qiapidoc settings """
