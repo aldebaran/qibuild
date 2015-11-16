@@ -104,8 +104,7 @@ class DocBuilder(object):
                 "rel_paths" : True,
             }
             project.configure(**options)
-            options["language"] = self.language
-            project.build(**options)
+            project.build(build_type=self.build_type, language=self.language)
             project.install(real_dest)
 
     def get_dep_projects(self):

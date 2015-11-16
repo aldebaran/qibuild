@@ -75,21 +75,21 @@ class SphinxProject(qidoc.project.DocProject):
 
         conf += self.append_doxylink_settings(conf, rel_paths=rel_paths)
         conf += self.append_intersphinx_settings(conf, rel_paths=rel_paths)
-        conf += self.append_qiapidoc_settings(conf, rel_paths=rel_paths)
-        conf += self.append_breathe_settings(conf, rel_paths=rel_paths)
+        conf += self.append_qiapidoc_settings()
+        conf += self.append_breathe_settings()
 
         out_conf_py = os.path.join(self.build_dir, "conf.py")
         qisys.sh.write_file_if_different(conf, out_conf_py)
 
 
-    def append_breathe_settings(self, conf, rel_paths=False):
+    def append_breathe_settings(self):
         breathe_projects = dict();
         for x in self.doxydeps:
             breathe_projects[x.name] = os.path.join(x.build_dir, 'xml')
 
         return "\nbreathe_projects = %s\n" % breathe_projects
 
-    def append_qiapidoc_settings(self, conf, rel_paths=False):
+    def append_qiapidoc_settings(self):
         """ Return a string representing the qiapidoc settings """
         path_list = []
         self.append_doxy_xml_path(path_list)
@@ -148,7 +148,8 @@ class SphinxProject(qidoc.project.DocProject):
         res += '\nextensions.append("%s")' % extension_name
         return res
 
-    def build(self, **kwargs):
+    def build(self, build_type=None, language=None,
+              spellcheck=False, werror=False, pdb=False):
         """ Run sphinx.main() with the correct arguments """
         try:
             import sphinx
@@ -165,36 +166,34 @@ class SphinxProject(qidoc.project.DocProject):
 
         self.generate_examples_zips()
 
-        language = kwargs.get("language")
         if self.translated and language and language != "en" \
                 and language not in self.linguas:
             raise UnknownLingua(self, language)
         if self.translated:
             self.intl_build(language)
 
-        html_dir = self.html_dir
-        qisys.sh.mkdir(html_dir, recursive=True)
+        qisys.sh.mkdir(self.html_dir, recursive=True)
         spell_dir = os.path.join(self.build_dir, "spellcheck")
         qisys.sh.mkdir(spell_dir, recursive=True)
-        if kwargs.get("spellcheck"):
-            cmd = [sys.executable, "-c", self.build_dir, "-b", "spelling"]
+        cmd = [sys.executable, "-c", self.build_dir]
+
+        if spellcheck:
+            cmd.extend(("-b", "spelling"))
         else:
-            cmd = [sys.executable, "-c", self.build_dir, "-b", "html"]
-        if kwargs.get("werror"):
+            cmd.extend(("-b", "html"))
+        if werror:
             cmd.append("-W")
         if language:
             cmd.append("-Dlanguage=%s" % language)
-        pdb = kwargs.get("pdb")
         if pdb:
             cmd.append("-P")
 
         cmd.append(self.source_dir)
 
-        if kwargs.get("spellcheck"):
+        if spellcheck:
             cmd.append(spell_dir)
         else:
-            cmd.append(html_dir)
-        build_type = kwargs.get("build_type")
+            cmd.append(self.html_dir)
         if build_type:
             os.environ["build_type"] = build_type
         ui.debug("launching:", cmd)
@@ -202,7 +201,7 @@ class SphinxProject(qidoc.project.DocProject):
             rc = sphinx.main(argv=cmd)
         except SystemExit as e:
             rc = e.code
-        if kwargs.get("spellcheck"):
+        if spellcheck:
             num_errors = get_num_spellcheck_errors(self.build_dir)
             if num_errors != 0:
                 raise SphinxBuildError(self)
