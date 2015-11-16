@@ -86,3 +86,13 @@ def test_forwarding_pdb(qidoc_action):
         qidoc_action("build", "world", "--pdb")
         kwargs = mock_main.call_args[1]
         assert "-P" in kwargs["argv"]
+
+def test_breathe(qidoc_action):
+    qidoc_action.add_test_project("libworld")
+    qidoc_action.add_test_project("templates")
+    world_breathe = qidoc_action.add_test_project("world-breathe")
+    qidoc_action("build", "world-breathe")
+    index_html = os.path.join(world_breathe.html_dir, "index.html")
+    with open(index_html, "r") as fp:
+        contents = fp.read()
+    assert "the answer" in contents
