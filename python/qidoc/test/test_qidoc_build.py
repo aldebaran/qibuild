@@ -96,3 +96,8 @@ def test_breathe(qidoc_action):
     with open(index_html, "r") as fp:
         contents = fp.read()
     assert "the answer" in contents
+
+def test_missing_deps(qidoc_action):
+    qidoc_action.add_test_project("hello")
+    error = qidoc_action("build", "hello", raises=True)
+    assert "world" in error

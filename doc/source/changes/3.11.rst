@@ -66,6 +66,8 @@ qidoc
 * ``qidoc install``: Add ``--clean`` to clean the destdir before installing doc
   projects
 * ``qidoc build``: Forward ``--pdb`` option to ``Sphinx``
+* Raise when dependencies are not found. We used to silently ignore missing
+  dependencies.
 
 qipkg
 -----

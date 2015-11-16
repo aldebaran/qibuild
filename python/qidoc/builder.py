@@ -136,4 +136,6 @@ class DocBuilder(object):
             project = self.doc_worktree.get_doc_project(name, raises=False)
             if project:
                 projects.append(project)
+            else:
+                raise Exception("Could not find %s dependency" % name)
         return projects
