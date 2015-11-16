@@ -38,7 +38,7 @@ class TemplateProject(object):
             if os.path.exists(full_path):
                 conf[var] = full_path
             else:
-                del conf[var]
+                conf.pop(var, None)
         return conf
 
     @property
