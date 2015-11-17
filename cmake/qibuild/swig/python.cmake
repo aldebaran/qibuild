@@ -48,9 +48,7 @@ function(qi_swig_wrap_python module_name interface_file)
     ${interface_file} PROPERTIES SWIG_MODULE_NAME "${module_name}")
 
 
-  # Everything will end up in ${SDK_DIR}/${SDK_DIR}, so that
-  # setting PYTHONPATH and LD_LIBRARY_PATH (or PATH) is enough
-  set(CMAKE_SWIG_OUTDIR ${QI_SDK_DIR}/${QI_SDK_LIB})
+  set(CMAKE_SWIG_OUTDIR ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages)
 
   ##
   # Deal with dependencies:
@@ -95,15 +93,15 @@ function(qi_swig_wrap_python module_name interface_file)
   # Fix output directory
   set_target_properties(${_swig_target}
       PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}"
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}"
-        RUNTIME_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}"
-        ARCHIVE_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}"
-        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}"
-        ARCHIVE_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}"
-        LIBRARY_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}"
-        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}"
-        LIBRARY_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
+        RUNTIME_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
+        ARCHIVE_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
+        LIBRARY_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
   )
 
   if (WIN32)
@@ -113,11 +111,13 @@ function(qi_swig_wrap_python module_name interface_file)
 
   qi_install_python(TARGETS ${_swig_target})
 
-  qi_install_python("${QI_SDK_DIR}/${QI_SDK_LIB}/${module_name}.py")
+  qi_install_python("${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages/${module_name}.py")
 
   ## FIXME: factorize this with qi_create_python_ext
   # Register the target into the build dir for qipy
   file(WRITE ${QI_SDK_DIR}/qi.pth
-    "${QI_SDK_DIR}/${QI_SDK_LIB}\n"
+    "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages\n"
   )
+
+  set(SWIG_MODULE_${module_name}_REAL_NAME ${_swig_target} PARENT_SCOPE)
 endfunction()
