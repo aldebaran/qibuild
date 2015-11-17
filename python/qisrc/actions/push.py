@@ -27,12 +27,14 @@ def configure_parser(parser):
              "if the domain is the same as yours)")
     parser.add_argument("-t", "--topic", dest="topic",
         help="Add a topic to your code review. Useful for grouping patches together")
+    parser.add_argument("-d", "--draft", dest="draft", action="store_true",
+        help="Publish as draft")
     parser.add_argument("-y", action="store_true", dest="yes",
         help="Push even if the project is not under code review. Default is to ask")
     parser.add_argument("refspec", nargs="?",
         help="Remote refspec. Either simply remote branch destination, "
              "or local_branch:remote_branch")
-    parser.set_defaults(review=True, dry_run=False, yes=False)
+    parser.set_defaults(review=True, dry_run=False, yes=False, draft=False)
 
 
 def do(args):
@@ -62,7 +64,7 @@ def do(args):
         qisrc.review.push(git_project, local_ref, remote_branch,
                             bypass_review=(not args.review),
                             dry_run=args.dry_run, reviewers=reviewers,
-                            topic=args.topic)
+                            topic=args.topic, draft=args.draft)
     else:
         if args.dry_run:
             git.push("-n")

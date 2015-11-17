@@ -144,6 +144,8 @@ qisrc
   without having to fetch everything from the remote server, and use local
   clones from ``OTHER_WORKTREE`` instead
 
+* ``qisrc push``: add ``-d, --draft`` option to push drafts to ``gerrit``
+
 cmake
 -----
 
