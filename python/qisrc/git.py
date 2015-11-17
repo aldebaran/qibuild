@@ -57,7 +57,7 @@ class Git(object):
 
     def _call(self, *args, **kwargs):
         """ Helper for self.call """
-        ui.debug("git", " ".join(args))
+        ui.debug("git", " ".join(args), "in", self.repo)
         if not "cwd" in kwargs.keys():
             kwargs["cwd"] = self.repo
         if not "quiet" in kwargs.keys():
