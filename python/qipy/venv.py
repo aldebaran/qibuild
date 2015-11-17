@@ -56,12 +56,12 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         ui.info(ui.red, "Failed to add some python projects")
     ui.info()
 
-    ui.info(ui.blue, "::", ui.reset,
-            "Adding other requirements: " + ", ".join(remote_packages))
     binaries_path = virtualenv.path_locations(venv_path)[-1]
     pip_binary = os.path.join(binaries_path, "pip")
     remote_ok = True
     if remote_packages:
+        ui.info(ui.blue, "::", ui.reset,
+                "Adding other requirements: " + ", ".join(remote_packages))
         cmd = [pip_binary, "install"]
         if not ui.CONFIG["verbose"]:
             cmd.append("--quiet")
