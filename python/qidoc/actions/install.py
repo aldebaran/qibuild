@@ -22,8 +22,10 @@ def configure_parser(parser):
     qidoc.parsers.build_doc_parser(parser)
     group = parser.add_argument_group("qidoc install options")
     group.add_argument("destdir")
+    group.add_argument("--clean", action="store_true",
+                       help="Clean destination first")
 
 
 def do(args):
     doc_builder = qidoc.parsers.get_doc_builder(args)
-    doc_builder.install(args.destdir)
+    doc_builder.install(args.destdir, clean=args.clean)

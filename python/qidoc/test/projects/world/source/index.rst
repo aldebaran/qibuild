@@ -7,4 +7,3 @@ Intro
 -----
 
 This is the intro of the world doc.
-

@@ -86,25 +86,38 @@ class DocBuilder(object):
                 mess.append("(not marked as translated)")
             ui.warning(*mess)
 
-    def install(self, destdir):
+    def install(self, destdir, clean=False):
         """ Install the doc projects to a dest dir
 
         """
         projects = self.get_dep_projects()
+        ui.info(ui.blue, "::", ui.reset, "Building all projects")
         for i, project in enumerate(projects):
-            real_dest = os.path.join(destdir, project.dest)
             ui.info_count(i, len(projects),
-                          ui.green, "Installing",
-                          ui.blue, project.name,
-                          ui.reset, "->", ui.white, real_dest)
+                          ui.green, "Building",
+                          ui.blue, project.name)
             options = {
                 "version"   : self.version,
                 "hosted"    : self.hosted,
                 "build_type" : self.build_type,
                 "rel_paths" : True,
             }
+            if clean:
+                project.clean()
             project.configure(**options)
             project.build(build_type=self.build_type, language=self.language)
+
+        if clean:
+            qisys.sh.rm(destdir)
+            qisys.sh.mkdir(destdir)
+
+        ui.info(ui.blue, "::", ui.reset, "Installing all projects")
+        for i, project in enumerate(projects):
+            real_dest = os.path.join(destdir, project.dest)
+            ui.info_count(i, len(projects),
+                          ui.green, "Installing",
+                          ui.blue, project.name,
+                          ui.reset, "->", ui.white, real_dest)
             project.install(real_dest)
 
     def get_dep_projects(self):

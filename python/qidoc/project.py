@@ -62,6 +62,9 @@ class DocProject(object):
     def install(self, destdir):
         pass
 
+    def clean(self):
+        qisys.sh.rm(self.build_dir)
+
     @property
     def build_dir(self):
         build_dir = os.path.join(self.path, "build-doc")

@@ -33,6 +33,12 @@ qibuild
         </config>
       </qibuild>
 
+qidoc
+-----
+
+* ``qidoc install``: Add ``--clean`` to clean the destdir before installing doc
+  projects
+
 qisrc
 -----
 
