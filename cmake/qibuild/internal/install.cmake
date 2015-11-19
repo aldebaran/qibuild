@@ -63,6 +63,7 @@ function(_qi_install_internal)
     set(_dest ${ARG_DESTINATION})
   endif()
   install(DIRECTORY ${_dirs_to_install}
+    USE_SOURCE_PERMISSIONS
     COMPONENT "${ARG_COMPONENT}"
     DESTINATION "${_dest}"
         PATTERN "*.pyc" EXCLUDE
