@@ -93,7 +93,7 @@ def clear_maintainers(project, *unused_args):
 def list_maintainers(project, *unused_args):
     maintainers = qisrc.maintainers.get(project)
 
-    if len(maintainers) > 0:
+    if maintainers:
         ui.info("Maintainers of", ui.green, project.src)
     else:
         ui.info("No maintainer configured for this project")

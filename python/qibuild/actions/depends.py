@@ -122,7 +122,7 @@ def separate_into_groups(dependency_relationships):
 
 def print_deps_compressed(dependency_relationships):
     """ default simple compressed output formatter """
-    if len(dependency_relationships) == 0:
+    if not dependency_relationships:
         qisys.ui.info("None")
         return
 

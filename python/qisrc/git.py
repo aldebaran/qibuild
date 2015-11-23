@@ -268,7 +268,7 @@ class Git(object):
             return None
 
         lines = [l for l in out.splitlines() if len(l.strip()) != 0]
-        if len(lines) > 0:
+        if lines:
             return False
         return True
 

@@ -56,7 +56,7 @@ def parse_args_for_help(args):
     def is_help(arg):
         return arg in ("-h", "--help", "help")
 
-    if len(args) == 0:
+    if not args:
         return (True, None)
     if len(args) > 2:
         return (False, None)
