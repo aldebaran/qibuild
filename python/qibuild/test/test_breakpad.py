@@ -27,7 +27,7 @@ def test_generate_symbols(build_worktree, tmpdir):
     cmake_builder.configure()
     cmake_builder.build()
     dest = tmpdir.join("dest").strpath
-    installed_files = cmake_builder.install(dest, components=["runtime"])
+    cmake_builder.install(dest, components=["runtime"])
     symbols_archive = tmpdir.join("dest", "world.symbols.zip").strpath
     res = qibuild.breakpad.gen_symbol_archive(base_dir=dest, output=symbols_archive)
     assert os.path.exists(res)
