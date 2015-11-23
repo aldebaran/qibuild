@@ -170,7 +170,7 @@ def _dump_arguments(name, args):
         output = output[:-1]
     ui.debug("[%s] arguments:\n%s" % (name, output))
 
-def root_command_main(name, parser, modules, args=None, return_if_no_action=False):
+def root_command_main(name, parser, modules, args=None):
     """name : name of the main program
        parser : an instance of ArgumentParser class
        modules : list of Python modules
@@ -210,8 +210,6 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
         action_modules[name] = module
 
     (help_requested, action) = parse_args_for_help(args)
-    # if not action and return_if_no_action:
-    #     return False
     if help_requested:
         if not action:
             parser.print_help()
@@ -225,34 +223,12 @@ def root_command_main(name, parser, modules, args=None, return_if_no_action=Fals
                 parser.parse_args([action, "--help"])
         sys.exit(0)
 
-    #we use a fake parser to know if arguments are good
-    #if they are not we return silently
-    global _cmdparse_no_action
-    if return_if_no_action:
-        def fake_error(b):
-            global _cmdparse_no_action
-            if "invalid choice" in b and "argument action" in b:
-                _cmdparse_no_action = True
-
-        parser_fake         = copy.copy(parser)
-        parser_fake.error   = fake_error
-        _cmdparse_no_action = False
-
-        try:
-            parser_fake.parse_known_args(args)
-        except:
-            if _cmdparse_no_action == True:
-                return False
-            else:
-                raise
-
     pargs = parser.parse_args(args)
     ui.configure_logging(pargs)
     module = action_modules[pargs.action]
     _dump_arguments(module.__name__, pargs)
     main_wrapper(module, pargs)
     return True
-
 
 
 def check_module(module):
