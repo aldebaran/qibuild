@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Deploy a complete package on the robot. This use rsync to be fast
+""" Deploy a complete package on the robot. This uses rsync to be fast
 """
 
 import os
