@@ -43,9 +43,12 @@ def test_parser(parser, with_num_jobs=True):
                            "(instead of build/sdk/test-results)")
 
     group.add_argument("--no-capture", dest="capture", action="store_false")
+    group.add_argument("--ignore-timeouts", dest="ignore_timeouts", action="store_true",
+                       help="Ignore timeouts when running tests")
     group.add_argument("--lf", "--last-failed", dest="last_failed", action="store_true",
                        help="Run the failing test from previous run")
-    parser.set_defaults(nightly=False, capture=True, last_failed=False)
+    parser.set_defaults(nightly=False, capture=True, last_failed=False,
+                       ignore_timeouts=False)
     if with_num_jobs:
         qisys.parsers.parallel_parser(group, default=1)
 
@@ -94,6 +97,7 @@ def get_test_runner(args, build_project=None, qitest_json=None):
     test_runner.root_output_dir = args.root_output_dir
     test_runner.capture = args.capture
     test_runner.last_failed = args.last_failed
+    test_runner.ignore_timeouts = args.ignore_timeouts
 
     return test_runner
 

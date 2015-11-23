@@ -25,6 +25,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
         self.break_on_failure = False
         self._num_cpus = -1
         tests = project.tests
+        self.ignore_timeouts = False
 
     @property
     def launcher(self):
@@ -101,6 +102,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         self.suite_runner = project_runner
         self.project = self.suite_runner.project
         self.verbose = self.suite_runner.verbose
+        self.ignore_timeouts = self.suite_runner.ignore_timeouts
         # Make sure output dirs exist and are empty:
         for directory in self.suite_runner.perf_results_dir, \
                          self.suite_runner.test_results_dir:
@@ -137,7 +139,10 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         cwd = test["working_directory"]
         process = qisys.command.Process(cmd, cwd=cwd, env=env, capture=self.capture)
         start = datetime.datetime.now()
-        process.run(timeout)
+        if self.ignore_timeouts:
+            process.run(timeout=None)
+        else:
+            process.run(timeout)
         end = datetime.datetime.now()
         delta = end - start
 

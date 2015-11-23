@@ -86,3 +86,15 @@ def test_exclude(tmpdir, qitest_action):
     rc = qitest_action("run", "--exclude", "bar", cwd=tmpdir.strpath,
             retcode=True)
     assert rc == 0
+
+def test_ignore_timeouts(qitest_action, tmpdir):
+    qitest_json = tmpdir.join("qitest.json")
+    sleep_cmd = qisys.command.find_program("sleep")
+    qitest_json.write("""
+[
+ {"name": "test_one", "cmd" : ["%s", "2"], "timeout" : 1}
+]
+""" % sleep_cmd)
+    rc = qitest_action("run", "--qitest-json", qitest_json.strpath, "--ignore-timeouts",
+                       retcode=True)
+    assert rc == 0

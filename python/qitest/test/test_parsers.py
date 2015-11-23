@@ -85,7 +85,8 @@ def test_several_qitest_json(args, tmpdir, monkeypatch):
     json2 = tmpdir.join("2.json")
     json2.write("[]")
     args.qitest_jsons = [json1.strpath, json2.strpath]
-    qitest.parsers.get_test_runners(args)
+    test_runners = qitest.parsers.get_test_runners(args)
+    assert len(test_runners) == 2
 
 def test_qitest_json_from_worktree(args, build_worktree, monkeypatch):
     testme_proj = build_worktree.add_test_project("testme")
@@ -114,3 +115,12 @@ def test_coverage_in_build_worktree(args, build_worktree, monkeypatch):
     test_runner = test_runners[0]
     assert test_runner.cwd == world_proj.sdk_directory
     assert test_runner.coverage
+
+def test_ignore_timeouts(args, tmpdir, monkeypatch):
+    monkeypatch.chdir(tmpdir)
+    tmpdir.join("qitest.json").write("[]")
+    args.ignore_timeouts = True
+    test_runners = qitest.parsers.get_test_runners(args)
+    assert len(test_runners) == 1
+    test_runner = test_runners[0]
+    assert test_runner.ignore_timeouts
