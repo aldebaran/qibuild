@@ -3,12 +3,15 @@
 ## found in the COPYING file.
 import os
 
+import qisys.archive
 import qisrc.license
 import qibuild.config
 import qitoolchain.qipackage
 
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
+
+import pytest
 
 def test_simple(qibuild_action):
     qibuild_action.add_test_project("world")
@@ -47,3 +50,26 @@ def test_preserve_license(qibuild_action, qitoolchain_action):
     package_xml = os.path.join(extracted, "package.xml")
     license = qisrc.license.read_license(package_xml)
     assert license == "BSD"
+
+def test_standalone(qibuild_action, tmpdir):
+    world_proj = qibuild_action.add_test_project("world")
+    hello_proj = qibuild_action.add_test_project("hello")
+    hello_archive = qibuild_action("package", "hello", "--standalone")
+
+    # Make sure bin/hello can run after extracting the standalone
+    # package
+    dest = tmpdir.join("dest")
+    extracted = qisys.archive.extract(hello_archive, dest.strpath)
+    hello_bin = os.path.join(extracted, "bin", "hello")
+    qisys.command.call([hello_bin])
+
+
+# pylint: disable-msg=E1101
+@pytest.mark.skipif(not qisys.command.find_program("dump_syms"),
+                    reason="dump_syms not found")
+def test_standalone_breakpad(qibuild_action, tmpdir):
+    world_proj = qibuild_action.add_test_project("world")
+    hello_proj = qibuild_action.add_test_project("hello")
+    hello_archive, hello_symbols = qibuild_action("package", "hello", "--standalone",
+                                                  "--breakpad")
+    assert os.path.exists(hello_symbols)

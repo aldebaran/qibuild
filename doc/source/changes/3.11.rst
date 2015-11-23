@@ -33,6 +33,13 @@ qibuild
         </config>
       </qibuild>
 
+* ``qibuild package``: add ``--standalone`` option. This generates a
+  package containing the runtime components and all the runtime dependencies.
+  Useful to redistribute compiled binaries.
+
+* ``qibuild package``: add ``--breakpad`` option. This generates a
+  symbols archive to be used with ``breakpad``.
+
 qidoc
 -----
 
