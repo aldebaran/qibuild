@@ -226,7 +226,8 @@ Or configure the project with no config
         for i, package in enumerate(packages):
             ui.info_count(i, len(packages),
                           ui.green, "Installing",
-                          ui.blue, package.name)
+                          ui.blue, package.name,
+                          update_title=True)
             files = package.install(real_dest, components=components,
                                     release=release)
             installed.extend(files)
@@ -241,7 +242,8 @@ Or configure the project with no config
             for i, project in enumerate(projects):
                 ui.info_count(i, len(projects),
                             ui.green, "Installing",
-                            ui.blue, project.name)
+                            ui.blue, project.name,
+                            update_title=True)
                 files = project.install(dest_dir, **kwargs)
                 installed.extend(files)
         return installed
@@ -292,7 +294,8 @@ Or configure the project with no config
             for i, package in enumerate(dep_packages):
                 ui.info_count(i, len(dep_packages),
                     ui.green, "Deploying package", ui.blue, package.name,
-                    ui.green, "to", ui.blue, url.as_string)
+                    ui.green, "to", ui.blue, url.as_string,
+                    update_title=True)
                 # Install package in local deploy dir
                 files = package.install(deploy_dir, components=components)
                 to_deploy.extend(files)
@@ -305,7 +308,8 @@ Or configure the project with no config
         for (i, project) in enumerate(dep_projects):
             ui.info_count(i, len(dep_projects),
                     ui.green, "Deploying project", ui.blue, project.name,
-                    ui.green, "to", ui.blue, url.as_string)
+                    ui.green, "to", ui.blue, url.as_string,
+                    update_title=True)
 
             if with_tests:
                 to_deploy.append("qitest.json")
@@ -326,6 +330,10 @@ Or configure the project with no config
             to_deploy = list(set(to_deploy))
             to_deploy.sort()
             f.write("\n".join(to_deploy))
+
+        print
+        ui.info(ui.green, "::", "Syncing to url", ui.reset, ui.bold,
+                url.as_string, update_title=True)
         qisys.remote.deploy(deploy_dir, url, filelist=deploy_manifest)
 
         print
