@@ -44,9 +44,9 @@ def compare(a_str, b_str):
         if not c_b:
             return 1
         if not c_a[0].isdigit():
-            a_sep = (c_a == "." or c_a == "-")
+            a_sep = (c_a in [".", "-"])
         if not c_b[0].isdigit():
-            b_sep = (c_b == "." or c_b == "-")
+            b_sep = (c_b in [".", "-"])
         if a_sep and not b_sep:
             return -1
         if not a_sep and b_sep:
