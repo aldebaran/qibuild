@@ -7,7 +7,7 @@ import qitest.test_queue
 import qitest.runner
 import qitest.result
 
-class DummyProject():
+class DummyProject(object):
     def __init__(self, tmpdir):
         self.sdk_directory = tmpdir.strpath
 

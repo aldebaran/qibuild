@@ -20,7 +20,7 @@ import qisys.command
 import qitest.result
 
 
-class TestQueue():
+class TestQueue(object):
     """ A class able to run tests in parallel """
     def __init__(self, tests):
         self.tests = tests
@@ -197,7 +197,7 @@ class TestWorker(threading.Thread):
                 ui.reset,
                 io.getvalue())
 
-class TestLogger:
+class TestLogger(object):
     """ Small class used to print what is going on during
     tests, using a mutex so that outputs are not mixed up
 

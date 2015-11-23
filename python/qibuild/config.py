@@ -26,7 +26,7 @@ def get_global_cfg_path():
     return qisys.sh.get_config_path("qi", "qibuild.xml")
 
 
-class Env:
+class Env(object):
     def __init__(self):
         self.path = None
         self.bat_file = None
@@ -75,7 +75,7 @@ class Env:
         return res
 
 
-class IDE:
+class IDE(object):
     def __init__(self):
         self.name = None
         self.path = None
@@ -103,7 +103,7 @@ class IDE:
         return res
 
 
-class CMake:
+class CMake(object):
     def __init__(self):
         self.generator = None
 
@@ -123,7 +123,7 @@ class CMake:
         return res
 
 
-class Defaults:
+class Defaults(object):
     def __init__(self):
         # An editor name to use by default
         self.editor = None
@@ -166,7 +166,7 @@ class Defaults:
         return res
 
 
-class Access:
+class Access(object):
     def __init__(self):
         self.root = None
         self.username = None
@@ -196,7 +196,7 @@ class Access:
         return res
 
 
-class Server:
+class Server(object):
     def __init__(self):
         self.name = None
         self.access = Access()
@@ -227,7 +227,7 @@ class Server:
             res += ui.indent(access_str)
         return res
 
-class WorkTree:
+class WorkTree(object):
     def __init__(self):
         self.path = None
         self.defaults = LocalDefaults()
@@ -257,7 +257,7 @@ class WorkTree:
             res += "\n  " + defaults_str
         return res
 
-class LocalSettings:
+class LocalSettings(object):
     def __init__(self):
         self.defaults = LocalDefaults()
         self.build = LocalBuild()
@@ -290,7 +290,7 @@ class LocalSettings:
         return res
 
 
-class LocalDefaults:
+class LocalDefaults(object):
     def __init__(self):
         # An config name to use by default
         self.config = None
@@ -310,7 +310,7 @@ class LocalDefaults:
             res += "default config: %s\n" % self.config
         return res
 
-class LocalBuild:
+class LocalBuild(object):
     def __init__(self):
         self.sdk_dir = None
         self.prefix = None
@@ -338,7 +338,7 @@ class LocalBuild:
         return res
 
 
-class BuildConfig:
+class BuildConfig(object):
     def __init__(self):
         self.name = None
         # The name of an ide
@@ -417,7 +417,7 @@ class BuildConfig:
         return res
 
 
-class QiBuildConfig:
+class QiBuildConfig(object):
     """ A class to represent both local and global
     qibuild.xml configuration files
 
@@ -751,7 +751,7 @@ class QiBuildConfig:
         return res
 
 
-class ProjectConfig:
+class ProjectConfig(object):
     """ A class to read project configuration
 
     """

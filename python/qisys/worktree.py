@@ -278,7 +278,7 @@ def guess_worktree(cwd=None, raises=False):
     else:
         return None
 
-class WorkTreeObserver():
+class WorkTreeObserver(object):
     """ To be subclasses for objects willing to be
     notified when a project is added or removed from
     the worktree
@@ -290,7 +290,7 @@ class WorkTreeObserver():
     def reload(self):
         pass
 
-class WorkTreeCache:
+class WorkTreeCache(object):
     """ Cache the paths to all the projects registered
     in a worktree
 

@@ -144,7 +144,7 @@ def get_one_project(worktree, args):
 ##
 # Implementation details
 
-class AbstractProjectParser:
+class AbstractProjectParser(object):
     """ Helper for get_projects() methods """
     __metaclass__ = abc.ABCMeta
     def __init__(self):

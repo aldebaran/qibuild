@@ -601,7 +601,7 @@ def name_from_url(url):
             return url.split("/")[-1]
 
 
-class Transaction:
+class Transaction(object):
     """ Used to simplify chaining git commands """
     def __init__(self):
         self.ok = True

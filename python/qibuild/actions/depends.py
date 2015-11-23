@@ -34,7 +34,7 @@ def configure_parser(parser):
     group.add_argument("--direct", action="store_true", default=False,
                        help="only display direct dependencies")
 
-class DependencyRelationship:
+class DependencyRelationship(object):
     """ helper class to separate dependency search from display """
     def __init__(self, from_name, to_name):
         self.from_name = from_name

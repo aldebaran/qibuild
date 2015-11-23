@@ -23,7 +23,7 @@ _FIND_PROGRAM_CACHE = dict()
 
 SIGINT_EVENT = threading.Event()
 
-class Process:
+class Process(object):
     """ A simple way to run commands.
 
     Command will be started by run according to timeout parameter (not
