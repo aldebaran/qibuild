@@ -197,8 +197,9 @@ class SphinxProject(qidoc.project.DocProject):
         if build_type:
             os.environ["build_type"] = build_type
         ui.debug("launching:", cmd)
+        rc = 0
         try:
-            rc = sphinx.main(argv=cmd)
+            sphinx.main(argv=cmd)
         except SystemExit as e:
             rc = e.code
         if spellcheck:
@@ -225,8 +226,9 @@ class SphinxProject(qidoc.project.DocProject):
         cmd.append(self.source_dir)
         locale_dir = os.path.join(self.source_dir, "locale")
         cmd.append(locale_dir)
+        rc = 0
         try:
-            rc = sphinx.main(argv=cmd)
+            sphinx.main(argv=cmd)
         except SystemExit as e:
             rc = e.code
         if rc != 0:
