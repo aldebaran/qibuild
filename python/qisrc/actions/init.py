@@ -22,8 +22,11 @@ def configure_parser(parser):
     parser.add_argument("-b", "--branch", dest="branch",
         help="Use this branch for the manifest")
     parser.add_argument("--no-review", dest="review", action="store_false",
-        default=True, help="Do not sync the review remotes")
-    parser.set_defaults(branch="master")
+        help="Do not sync the review remotes")
+    parser.add_argument("--all", dest="all", action="store_true",
+        help="Do not use the default group, and clone all the projects "
+             "of the manifest")
+    parser.set_defaults(branch="master", all=False, review=True)
 
 def do(args):
     """Main entry point"""
@@ -37,7 +40,8 @@ def do(args):
         ok = git_worktree.configure_manifest(args.manifest_url,
                                         groups=args.groups,
                                         branch=args.branch,
-                                        review=args.review)
+                                        review=args.review,
+                                        all_repos=args.all)
         if not ok:
             sys.exit(1)
 

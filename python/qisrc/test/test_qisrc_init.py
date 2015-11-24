@@ -171,3 +171,10 @@ def test_using_checkout_after_no_review(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     foo = git_worktree.get_git_project("foo")
     assert not foo.review
+
+def test_all(qisrc_action, git_server):
+    git_server.create_group("default", ["a.git", "b.git"])
+    git_server.create_repo("c.git")
+    qisrc_action("init", git_server.manifest_url, "--all")
+    git_worktree = TestGitWorkTree()
+    assert len(git_worktree.git_projects) == 3

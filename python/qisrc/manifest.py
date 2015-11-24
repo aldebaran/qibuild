@@ -117,14 +117,17 @@ Found two projects sharing the same sources:
         xml_elem = parser.xml_elem()
         qisys.qixml.write(xml_elem, self.manifest_xml)
 
-    def get_repos(self, groups=None):
+    def get_repos(self, groups=None, all=False):
         """ Get the repositories inside the given group
-        Return all repositories when no group is given
+
+        * If there is a default group, returns projects
+          from the default group, unless all is True,
+          then return all the projects
 
         """
         default_group = self.groups.default_group
         if groups is None:
-            if default_group:
+            if default_group and not all:
                 groups = [default_group.name]
             else:
                 return self.repos

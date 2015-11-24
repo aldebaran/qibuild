@@ -162,3 +162,10 @@ def test_rm_nested_repos_root(git_worktree, git_server, qisrc_action):
     assert git_worktree.get_git_project("foo")
     assert git_worktree.get_git_project("foo/bar")
     assert git_worktree.get_git_project("foo/lol")
+
+
+def test_all_repos(git_worktree, git_server):
+    git_server.create_group("default", ["a.git", "b.git"])
+    git_server.create_repo("c.git")
+    git_worktree.configure_manifest(git_server.manifest_url, all_repos=True)
+    assert len(git_worktree.git_projects) == 3

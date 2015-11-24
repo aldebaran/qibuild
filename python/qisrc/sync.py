@@ -136,6 +136,8 @@ class WorkTreeSyncer(object):
             self.manifest.groups = qisys.qixml.parse_list_attr(manifest_elem, "groups")
         self.manifest.review = qisys.qixml.parse_bool_attr(manifest_elem, "review",
                                                            default=True)
+        self.manifest.all_repos = qisys.qixml.parse_bool_attr(manifest_elem, "all_repos",
+                                                              default=False)
 
     def dump_manifest_config(self):
         """ Save the manifest config in .qi/manifest.xml """
@@ -152,7 +154,7 @@ class WorkTreeSyncer(object):
         tree = etree.ElementTree(root)
         qisys.qixml.write(tree, self.manifest_xml)
 
-    def configure_manifest(self, url, branch="master", groups=None,
+    def configure_manifest(self, url, branch="master", groups=None, all_repos=False,
                            ref=None, review=None, force=False):
         """ Add a manifest to the list. Will be stored in
         .qi/manifests/<name>
@@ -169,6 +171,7 @@ class WorkTreeSyncer(object):
         self.manifest.branch = branch
         self.manifest.ref = ref
         self.manifest.review = review
+        self.manifest.all_repos = all_repos
         res = self.sync_repos(force=force)
         self.configure_projects()
         self.dump_manifest_config()
@@ -346,6 +349,7 @@ class LocalManifest(object):
         self.ref = None # used for snaphots or in case you
                         # don't want the head of a branch
         self.review = True
+        self.all_repos = False
 
     @property
     def groups(self):
@@ -364,7 +368,8 @@ class LocalManifest(object):
         return self.url == other.url and \
                self.groups == other.groups and \
                self.ref == other.ref and \
-               self.branch == other.branch
+               self.branch == other.branch and \
+               self.all_repos == other.all_repos
 
 
 ###
