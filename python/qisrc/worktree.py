@@ -304,7 +304,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         """ Remove a project from the worktree """
         ui.info(ui.green, "Removing", project.src)
         # not sure when to use from_disk here ...
-        self.worktree.remove_project(project.src)
+        if project in self.worktree.projects:
+            self.worktree.remove_project(project.src)
 
 
     def _get_elem(self, src):
