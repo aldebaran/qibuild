@@ -29,7 +29,8 @@ Linux, mac
 It is recommended to install qibuild with ``pip install qibuild --user``
 in order to keep your system clean.
 
-If you do so, make sure that ``$HOME/.local/bin`` is in your ``$PATH``
+* On Linux, you'll have to add ``$HOME/.local/bin`` to your ``$PATH``
+* On Mac, you'll have to add ``$HOME/Library/Python/2.7/bin`` to your ``$PATH``
 
 Windows
 +++++++
