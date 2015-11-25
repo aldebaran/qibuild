@@ -97,11 +97,16 @@ def test_sync_build_profiles(qisrc_action, git_server):
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
     qibuild.config.add_build_config("foo", profiles=["foo"])
     build_config.set_active_config("foo")
-    assert build_config.cmake_args == ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_FOO=ON"]
+    cmake_args = build_config.cmake_args
+    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
+    assert cmake_args == ["-DCMAKE_BUILD_TYPE=Debug",
+                          "-DWITH_FOO=ON"]
     git_server.add_build_profile("foo", [("WITH_FOO", "ON"), ("WITH_BAR", "ON")])
     qisrc_action("sync")
-    assert build_config.cmake_args == ["-DCMAKE_BUILD_TYPE=Debug",
-                                       "-DWITH_FOO=ON", "-DWITH_BAR=ON"]
+    cmake_args = build_config.cmake_args
+    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
+    assert cmake_args == ["-DCMAKE_BUILD_TYPE=Debug",
+                          "-DWITH_FOO=ON", "-DWITH_BAR=ON"]
 
 def test_sync_branch_devel(qisrc_action, git_server, test_git):
     # This tests the case where everything goes smoothly

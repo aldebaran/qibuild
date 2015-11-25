@@ -23,7 +23,9 @@ def test_setting_build_config_sets_projects_cmake_flags(build_worktree):
     build_worktree.create_project("world")
     build_worktree.build_config.build_type = "Release"
     world = build_worktree.get_build_project("world")
-    assert world.cmake_args == ["-DCMAKE_BUILD_TYPE=Release"]
+    cmake_args = world.cmake_args
+    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
+    assert cmake_args == ["-DCMAKE_BUILD_TYPE=Release"]
 
 def test_changing_active_config_changes_projects_build_dir(cd_to_tmpdir):
     qibuild.config.add_build_config("foo")

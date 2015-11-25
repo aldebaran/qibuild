@@ -14,6 +14,8 @@ import qisrc.git
 import qitoolchain
 
 from qibuild.test.conftest import TestBuildWorkTree
+from qipy.test.conftest import qipy_action
+
 import pytest
 
 
@@ -315,3 +317,13 @@ def test_gtest(qibuild_action, tmpdir):
 def test_setting_cflags(qibuild_action):
     qibuild_action.add_test_project("world")
     qibuild_action("configure", "world", "-DCMAKE_CXX_FLAGS=-std=gnu++11")
+
+def test_virtualenv_path(qipy_action, qibuild_action):
+    py_proj = qibuild_action.add_test_project("py")
+    qibuild_action("configure", "py")
+    qibuild_action("make", "py")
+    qipy_action("bootstrap")
+    py_test = os.path.join(py_proj.sdk_directory, "bin", "py_test")
+    output = subprocess.check_output([py_test]).strip()
+    bin_python = os.path.join(output, "bin", "python")
+    assert os.path.exists(bin_python)

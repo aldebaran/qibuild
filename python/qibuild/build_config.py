@@ -161,6 +161,10 @@ class CMakeBuildConfig(object):
             args.append("-D%s=%s" % (name, value))
         for (name, value) in self.user_flags:
             args.append("-D%s=%s" % (name, value))
+
+        venv_path = self.build_worktree.venv_path
+        args.append("-DQI_VIRTUALENV_PATH=%s" % venv_path)
+
         return args
 
     @property
