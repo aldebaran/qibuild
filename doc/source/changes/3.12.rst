@@ -17,3 +17,18 @@ qibuild
           <depends runtime="true" names="bar baz" >
         </qibuild>
       </project>
+
+qisrc
+------
+
+* ``qisrc push``: allow specifying destination branch as first argument.
+
+  For instance, while on ``perso`` branch, you can use ``qisrc push master`` to
+  push run ``git push gerrit perso:refs/for/master``. This will push all
+  the commits from ``perso`` branch that are not yet on ``master`` branch
+  for review.
+
+  You can also specify the local ref by using ":" in the first argument.
+
+  For instance, to push everything but the last commit, you can use
+  ``qisrc push HEAD~1:master``

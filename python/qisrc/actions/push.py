@@ -29,6 +29,9 @@ def configure_parser(parser):
         help="Add a topic to your code review. Useful for grouping patches together")
     parser.add_argument("-y", action="store_true", dest="yes",
         help="Push even if the project is not under code review. Default is to ask")
+    parser.add_argument("refspec", nargs="?",
+        help="Remote refspec. Either simply remote branch destination, "
+             "or local_branch:remote_branch")
     parser.set_defaults(review=True, dry_run=False, yes=False)
 
 
@@ -37,17 +40,26 @@ def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_project = qisrc.parsers.get_one_git_project(git_worktree, args)
     git = qisrc.git.Git(git_project.path)
-    current_branch = git.get_current_branch()
-    if not current_branch:
-        ui.error("Not currently on any branch")
+    if args.refspec:
+        if ":" in args.refspec:
+            local_ref, remote_branch = args.refspec.split(":")
+        else:
+            local_ref = git.get_current_branch()
+            remote_branch = args.refspec
+    else:
+        local_ref = git.get_current_branch()
+        remote_branch = local_ref
+    if not local_ref:
+        ui.error("Not currently in any branch")
         sys.exit(2)
+
     if git_project.review:
         maintainers = qisrc.maintainers.get(git_project, warn_if_none=True)
         reviewers = [x['email'] for x in maintainers]
         reviewers.extend(args.reviewers or list())
         # Prefer gerrit logins or groups instead of e-mails
         reviewers = [x.split("@")[0] for x in reviewers]
-        qisrc.review.push(git_project, current_branch,
+        qisrc.review.push(git_project, local_ref, remote_branch,
                             bypass_review=(not args.review),
                             dry_run=args.dry_run, reviewers=reviewers,
                             topic=args.topic)

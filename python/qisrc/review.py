@@ -136,7 +136,7 @@ def setup_project(project):
     return True
 
 
-def push(project,  branch, bypass_review=False, dry_run=False,
+def push(project,  local_ref, remote_branch, bypass_review=False, dry_run=False,
          reviewers=None, topic=None):
     """ Push the changes for review.
 
@@ -153,13 +153,13 @@ def push(project,  branch, bypass_review=False, dry_run=False,
         args.append("--dry-run")
     args.append(review_remote.url)
     if bypass_review:
-        args.append("%s:%s" % (branch, branch))
+        args.append("%s:%s" % (local_ref, remote_branch))
     else:
         ui.info("Pushing code to", review_remote.name, "for review.")
-        remote_ref = "refs/for/%s" % branch
+        remote_ref = "refs/for/%s" % remote_branch
         if topic:
             remote_ref = "%s/%s" % (remote_ref, topic)
-        args.append("%s:%s" % (branch, remote_ref))
+        args.append("%s:%s" % (local_ref, remote_ref))
     if reviewers and not dry_run:
         # Get the SHA1s that will be pushed so that we can add reviewers
         remote = project.review_remote
@@ -169,7 +169,7 @@ def push(project,  branch, bypass_review=False, dry_run=False,
         ssh_port = remote.port
         ui.info("Fetching", remote.name)
         git.fetch(remote.name, "--quiet")
-        commits_pushed = git.get_log("%s/%s" % (remote.name, branch), "HEAD")
+        commits_pushed = git.get_log("%s/%s" % (remote.name, remote_branch), "HEAD")
         sha1s = [commit["sha1"] for commit in commits_pushed]
     git.push(*args)
     if reviewers and not dry_run:
