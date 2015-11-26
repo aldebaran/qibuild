@@ -62,6 +62,29 @@ qibuild
 
 * ``qibuild package``: add ``--version`` to override setting in ``qiproject.xml``
 
+* ``qibuild package``: add git URL to generated ``package.xml`` file
+
+  Note that the syntax changed lightly:
+
+  Before:
+
+  .. code-block:: xml
+
+    <scm>
+      <git revision="98a67de" />
+    </scm>
+
+  After:
+
+  .. code-block:: xml
+
+    <scm>
+      <git>
+        <revision>98a67de</revision>
+        <url>git@example.com:foo.git</url>
+      </git>
+    </scm>
+
 qicd
 ----
 

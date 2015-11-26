@@ -8,6 +8,9 @@ import qisys.qixml
 import qisrc.git
 import qibuild.config
 
+from qisrc.test.conftest import git_server, qisrc_action
+from qibuild.test.conftest import TestBuildWorkTree
+
 import pytest
 
 def test_dependencies_cmake(build_worktree):
@@ -43,20 +46,22 @@ def test_parse_num_jobs_unknown_generator(build_worktree, record_messages):
     assert hello.parse_num_jobs(3, cmake_generator="KDevelop3") ==  list()
     assert record_messages.find("Unknown generator: KDevelop3")
 
-def test_gen_scm_info(build_worktree, tmpdir):
-    build_worktree.add_test_project("world")
-    hello_proj = build_worktree.add_test_project("hello")
-    git = qisrc.git.Git(hello_proj.path)
-    git.init()
-    git.add(".")
-    git.commit("--message", "initial commit")
+def test_gen_scm_info(git_server, qisrc_action, tmpdir):
+    world_repo = git_server.add_qibuild_test_project("world")
+    qisrc_action("init", git_server.manifest_url)
+    build_worktree = TestBuildWorkTree()
+    world_proj = build_worktree.get_build_project("world")
+    git = qisrc.git.Git(world_proj.path)
     rc, sha1 = git.call("rev-parse", "HEAD", raises=False)
     package_xml = tmpdir.join("package.xml").strpath
-    hello_proj.gen_package_xml(package_xml)
+    world_proj.gen_package_xml(package_xml)
     tree = qisys.qixml.read(package_xml)
     scm_elem = tree.find("scm")
     git_elem = scm_elem.find("git")
-    assert git_elem.get("revision") == sha1
+    revision_elem = git_elem.find("revision")
+    url_elem = git_elem.find("url")
+    assert revision_elem.text == sha1
+    assert url_elem.text == world_repo.clone_url
 
 def test_using_build_prefix(build_worktree):
     world_proj = build_worktree.add_test_project("world")

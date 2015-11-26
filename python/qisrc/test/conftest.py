@@ -142,6 +142,7 @@ class TestGitServer(object):
         self.manifest.add_repo(project_name, src, ["origin"])
         repo = self.manifest.get_repo(project_name)
         self.push_manifest("Add qibuild test project: %s" % src)
+        return repo
 
     def add_build_profile(self, name, flags):
         # avoid circular deps

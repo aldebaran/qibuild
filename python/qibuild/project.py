@@ -686,10 +686,15 @@ The following tools were not found: {missing}\
         rc, out = git.call("rev-parse", "HEAD", raises=False)
         if rc != 0:
             return
+        clone_url = parent_git_project.clone_url
         sha1 = out.strip()
         scm_elem = etree.SubElement(package_xml_root, "scm")
         git_elem = etree.SubElement(scm_elem, "git")
-        git_elem.set("revision", sha1)
+        revision_elem = etree.SubElement(git_elem, "revision")
+        revision_elem.text = sha1
+        if clone_url:
+            url_elem = etree.SubElement(git_elem, "url")
+            url_elem.text = clone_url
 
     def __repr__(self):
         return "<BuildProject %s in %s>" % (self.name, self.src)
