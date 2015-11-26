@@ -71,7 +71,6 @@ def test_validates_name(build_worktree):
     with pytest.raises(Exception):
         build_worktree.create_project("foo/bar")
 
-
 def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):
     toolchains.create("foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
