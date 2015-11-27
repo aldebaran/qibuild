@@ -38,6 +38,7 @@ qidoc
 
 * ``qidoc install``: Add ``--clean`` to clean the destdir before installing doc
   projects
+* ``qidoc build``: Forward ``--pdb`` option to ``Sphinx``
 
 qisrc
 -----
@@ -74,11 +75,6 @@ qitoolchain
 ------------
 
 * Support using feeds as git URLs. (See :ref:`qitoolchain-tutorial` for more info)
-
-qidoc
------
-
-* ``qidoc build``: Forward ``--pdb`` option to ``Sphinx``
 
 cmake
 -----
