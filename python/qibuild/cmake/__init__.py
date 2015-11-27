@@ -72,6 +72,18 @@ Please install it if necessary and re-run `qibuild config --wizard`\
             fixed_list.append(generator)
     return fixed_list
 
+def get_cmake_version(cmake_binary):
+    """ Get CMake version number """
+    output = subprocess.check_output([cmake_binary, "--version"])
+    # output looks like:
+    #   cmake version 3.4.20151013-g3d9cf
+    #
+    #   CMake suite maintained and supported by Kitware (kitware.com/cmake).
+    # So take the last word of the first line
+    first_line = output.splitlines()[0]
+    words = first_line.split()
+    return words[-1]
+
 def get_cached_var(build_dir, var, default=None):
     """Get a variable from cmake cache
 
@@ -108,6 +120,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
                         will be written in <build>/cmake.log
 
     """
+    cmake_binary = qisys.command.find_program("cmake", env=env, raises=True)
     if not os.path.exists(source_dir):
         qisys.error.Error("source dir: %s does not exist, aborting")
 
@@ -123,7 +136,11 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     if debug_trycompile:
         cmake_args.append("--debug-trycompile")
     if profiling or trace_cmake:
-        cmake_args.append("--trace")
+        cmake_version = get_cmake_version(cmake_binary)
+        if qisys.version.compare(cmake_version, "3.4") >= 0:
+            cmake_args.append("--trace-expand")
+        else:
+            cmake_args.append("--trace")
 
     # Check that no one has made an in-source build
     in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
@@ -142,7 +159,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     # the current working dir.
     cmake_args += [source_dir]
     if not profiling and not trace_cmake:
-        qisys.command.call(["cmake"] + cmake_args, cwd=build_dir, env=env)
+        qisys.command.call([cmake_binary] + cmake_args, cwd=build_dir, env=env)
         if summarize_options:
             display_options(build_dir)
         return
@@ -153,7 +170,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     if trace_cmake:
         ui.info(ui.green, "Running cmake with --trace ...")
     ui.debug("Running cmake " + " ".join(cmake_args))
-    retcode = subprocess.call(["cmake"] + cmake_args, cwd=build_dir, env=env,
+    retcode = subprocess.call([cmake_binary] + cmake_args, cwd=build_dir, env=env,
                    stdout=fp, stderr=fp)
     fp.close()
     if retcode != 0:

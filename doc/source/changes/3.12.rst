@@ -92,6 +92,9 @@ qibuild
       </git>
     </scm>
 
+* ``qibuild configure --trace`` calls ``CMake`` with ``--trace-expand`` option
+  if version is greater than 3.4
+
 qicd
 ----
 
