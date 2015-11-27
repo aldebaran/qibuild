@@ -15,17 +15,11 @@ cmake_policy(SET CMP0012 NEW)
 # Prefer files from the CMake module directory when including from there.
 cmake_policy(SET CMP0017 NEW)
 
-#get the current directory of the file
-get_filename_component(_ROOT_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-
 include("qibuild/version")
 message(STATUS "Using qibuild ${QIBUILD_VERSION}")
 include("qibuild/log")
 include("qibuild/set")
 
-
-set(QI_ROOT_DIR ${_ROOT_DIR})
-set(QI_TEMPLATE_DIR ${_ROOT_DIR}/templates)
 
 include("qibuild/subdirectory")
 include("qibuild/internal/layout")

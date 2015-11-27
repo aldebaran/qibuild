@@ -34,4 +34,4 @@ include(${_this_dir}/general.cmake)
 
 # Make sure *-config.cmake files are found first in toolchain packages,
 # then in qibuild/cmake/modules
-qi_persistent_append_uniq(CMAKE_PREFIX_PATH "${_ROOT_DIR}/modules/")
+qi_persistent_append_uniq(CMAKE_PREFIX_PATH "${_this_dir}/modules/")
