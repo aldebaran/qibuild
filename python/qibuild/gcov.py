@@ -13,7 +13,6 @@ def generate_coverage_xml_report(project):
     bdir = project.build_directory
     sdir = project.path
     base_report = os.path.join(bdir, project.name + ".xml")
-    ui.info(ui.green, "*", ui.reset, "Generate XML coverage report")
     cmd = ["gcovr",
             "--root", sdir,
             "--exclude", ".*test.*",
@@ -22,3 +21,5 @@ def generate_coverage_xml_report(project):
             "--xml",
             "--output", base_report]
     qisys.command.call(cmd, cwd=sdir, quiet=True)
+    ui.info(ui.green, "*", ui.reset, "Generated XML coverage report in",
+            ui.reset, ui.bold, base_report)
