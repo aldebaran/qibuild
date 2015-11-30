@@ -1,4 +1,5 @@
 # For pylint:
+astroid==1.3.8
 logilab-astng==0.24.3
 pylint==0.28
 
