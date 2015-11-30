@@ -34,7 +34,7 @@ def do(args):
                     ui.reset, "Running tests in", ui.blue, test_runner.cwd)
         res = test_runner.run()
         if args.coverage:
-            build_worktree = qibuild.parsers.get_build_worktree(args)
+            build_worktree = qibuild.parsers.get_build_worktree(args, verbose=False)
             build_project = qibuild.parsers.get_one_build_project(build_worktree, args)
             qibuild.gcov.generate_coverage_xml_report(build_project)
         global_res = global_res and res
