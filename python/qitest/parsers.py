@@ -39,7 +39,7 @@ def test_parser(parser, with_num_jobs=True):
                        help="Repeat tests until they fail (at most N times)")
     group.add_argument("--qitest-json", dest="qitest_jsons", action="append")
     group.add_argument("--root-output-dir", dest="root_output_dir",
-                      help="Generate XML reports in the given directory " + \
+                      help="Generate XML and HTML reports in the given directory " + \
                            "(instead of build-<platform>)")
 
     group.add_argument("--no-capture", dest="capture", action="store_false")
