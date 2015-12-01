@@ -8,6 +8,8 @@ qibuild
   ``<env path="..."/>`` *after* launching bat file.
 * Using ``qibuild set-host-config`` twice with different configuration names
   lead to undefined behavior.
+* ``qibuild config --wizard``: fix infinite loop when asking for
+  ``QtCreator`` application path
 
 qisrc
 -----

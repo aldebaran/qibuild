@@ -66,6 +66,13 @@ def test_get_editor_ask(monkeypatch):
         assert res == qisys.sh.to_native_path("/usr/bin/vim")
         assert m.called
 
+def test_ask_app(tmpdir):
+    foo_app_path = tmpdir.ensure("Applications/foo.app", dir=True)
+    with mock.patch('__builtin__.raw_input') as m:
+        m.side_effect = ["doesnotexists", "y", foo_app_path.strpath]
+        assert qisys.interact.ask_app("foo") == foo_app_path.strpath
+        assert len(m.mock_calls) == 3
+
 def test_fake_interact_list():
     fake_interact = FakeInteract()
     fake_interact.answers = [False, "coffee!"]
