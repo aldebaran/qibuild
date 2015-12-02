@@ -43,6 +43,8 @@ qibuild
 * Using ``qibuild set-host-config`` twice with different configuration names
   lead to undefined behavior.
 
+* Fix using ``qibuild run`` in some corner cases.
+
 qidoc
 -----
 

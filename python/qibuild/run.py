@@ -23,8 +23,9 @@ def run(projects, binary, bin_args, env=None, exec_=True):
     paths = list()
     for proj in projects:
         paths += [proj.sdk_directory]
-    if os.path.exists(binary):
-        bin_path = qisys.sh.to_native_path(binary)
+    full_path = qisys.sh.to_native_path(binary)
+    if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
+        bin_path = full_path
     else:
         bin_path = None
         candidates = qibuild.find.find_bin(paths, binary, expect_one=False)

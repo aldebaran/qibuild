@@ -44,3 +44,10 @@ def test_run_system(qibuild_action):
     binary = call_args_list[0][0][0]
     assert os.path.isabs(binary)
     assert os.path.basename(binary) == "ls"
+
+def test_corner_case(qibuild_action, tmpdir):
+    project = qibuild_action.add_test_project("testme")
+    qibuild_action("configure", "testme")
+    qibuild_action("make", "testme")
+    tmpdir.join("work").join("ok").ensure(dir=True)
+    qibuild_action("run", "--no-exec", "ok")
