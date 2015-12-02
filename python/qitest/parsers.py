@@ -40,7 +40,7 @@ def test_parser(parser, with_num_jobs=True):
     group.add_argument("--qitest-json", dest="qitest_jsons", action="append")
     group.add_argument("--root-output-dir", dest="root_output_dir",
                       help="Generate XML reports in the given directory " + \
-                           "(instead of build/sdk/test-results)")
+                           "(instead of build-<platform>)")
 
     group.add_argument("--no-capture", dest="capture", action="store_false")
     group.add_argument("--ignore-timeouts", dest="ignore_timeouts", action="store_true",
