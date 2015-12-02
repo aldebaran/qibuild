@@ -666,7 +666,13 @@ class QiBuildConfig(object):
         """ Set the config used to build host tools """
         if not config_name in self.configs:
             raise Exception("No such config: %s" % config_name)
-        self.configs[config_name].host = True
+        # Make sure that we unset the previous 'host' config when
+        # called twice with different config names
+        for name, config in self.configs.iteritems():
+            if name == config_name:
+                config.host = True
+            else:
+                config.host = False
 
     def get_host_config(self):
         """ Get the config to use when looking for host tools """

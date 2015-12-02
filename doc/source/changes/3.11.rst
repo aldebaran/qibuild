@@ -40,6 +40,9 @@ qibuild
 * ``qibuild package``: add ``--breakpad`` option. This generates a
   symbols archive to be used with ``breakpad``.
 
+* Using ``qibuild set-host-config`` twice with different configuration names
+  lead to undefined behavior.
+
 qidoc
 -----
 

@@ -578,6 +578,17 @@ def test_host_config_is_persistent():
     qibuild_cfg2.read()
     assert qibuild_cfg2.get_host_config() == "foo"
 
+def test_host_config_is_unique():
+    qibuild.config.add_build_config("foo")
+    qibuild.config.add_build_config("bar")
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    qibuild_cfg.read()
+    qibuild_cfg.set_host_config("foo")
+    assert qibuild_cfg.configs["foo"].host
+    qibuild_cfg.set_host_config("bar")
+    assert not qibuild_cfg.configs["foo"].host
+    assert qibuild_cfg.configs["bar"].host
+
 def test_setting_env_vars(tmpdir):
     global_xml = tmpdir.join("global.xml")
     global_xml.write("""
