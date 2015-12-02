@@ -230,6 +230,8 @@ class GitProject(object):
 
         """
         git = qisrc.git.Git(self.path)
+        if git.is_empty():
+            ui.error("repo in %s has no commits yet" % self.src)
         for remote in self.remotes:
             git.set_remote(remote.name, remote.url)
         for branch in self.branches:

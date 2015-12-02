@@ -310,7 +310,6 @@ class Git(object):
         if self.get_tracking_branch(branch) == "%s/%s" % (remote_name, remote_branch):
             return True
         if self.is_empty():
-            ui.error("repo in %s has no commits yet" % self.repo)
             return False
         if not self.branch_exists(branch):
             self.branch(branch)
