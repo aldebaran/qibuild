@@ -193,6 +193,11 @@ No such project: {1}
         """ Configure a group """
         self.groups.configure_group(name, projects, default=default)
 
+    @change_config
+    def remove_group(self, name):
+        """ Remove a group from the manifest """
+        self.groups.remove_group(name)
+
 def from_git_repo(git_repo, ref):
     git = qisrc.git.Git(git_repo)
     rc, out = git.call("cat-file", "-p", ref + "^{tree}", raises=False)
@@ -353,4 +358,3 @@ class RepoConfigParser(qisys.qixml.XMLParser):
 
     def _write_default_branch(self, elem):
         elem.set("branch", self.target.default_branch)
-

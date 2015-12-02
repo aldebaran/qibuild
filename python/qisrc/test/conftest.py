@@ -187,6 +187,10 @@ class TestGitServer(object):
         self.manifest.configure_group(name, projects, default=default)
         self.push_manifest("add group %s" % name)
 
+    def remove_group(self, name):
+        self.manifest.remove_group(name)
+        self.push_manifest("remove group %s" % name)
+
     def use_review(self, project):
         """ Switch a project to gerrit for code review """
         self._create_repo(project, review=True)

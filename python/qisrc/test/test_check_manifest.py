@@ -70,3 +70,23 @@ def test_check_configures_review(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     foo_proj = git_worktree.get_git_project("foo")
     assert foo_proj.review
+
+
+def test_check_adding_group(qisrc_action, git_server):
+    git_server.create_repo("a.git")
+    git_server.create_group("default", ["b'.git"], default=True)
+    qisrc_action("init", git_server.manifest_url)
+
+    # Edit the manifest.xml to set code review for foo
+    srv_xml = git_server.src.join("manifest", "manifest.xml")
+    manifest = qisrc.manifest.Manifest(srv_xml.strpath)
+    editable_path = qisrc_action.tmpdir.join("manifest.xml")
+    manifest.manifest_xml = editable_path.strpath
+
+    manifest.configure_group("foo", ["a.git"])
+
+    qisrc_action("add-group", "foo")
+    qisrc_action("check-manifest", editable_path.strpath)
+
+    git_worktree = TestGitWorkTree()
+    assert git_worktree.get_git_project("a")

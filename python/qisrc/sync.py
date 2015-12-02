@@ -89,7 +89,7 @@ class WorkTreeSyncer(object):
         self.new_repos = self.read_remote_manifest()
         res = self._sync_repos(self.old_repos, self.new_repos, force=force)
         # re-read self.old_repos so we can do several syncs:
-        self.old_repos = self.get_old_repos()
+        self.old_repos = self.get_old_repos(warn_if_missing_group=False)
         # if everything went well, save the manifests configurations:
         self.dump_manifest_config()
         return res
@@ -164,7 +164,7 @@ class WorkTreeSyncer(object):
             # (i.e not from qisrc init --no-review)
             # read it from the config
             review = self.manifest.review
-        self.old_repos = self.get_old_repos()
+        self.old_repos = self.get_old_repos(warn_if_missing_group=False)
         self.manifest.url = url
         self.manifest.groups = groups
         self.manifest.branch = branch
@@ -175,7 +175,7 @@ class WorkTreeSyncer(object):
         self.dump_manifest_config()
         return res
 
-    def read_remote_manifest(self, manifest_xml=None):
+    def read_remote_manifest(self, manifest_xml=None, warn_if_missing_group=True):
         """ Read the manifest file in .qi/manifests/<name>/manifest.xml
         using the settings in .qi/manifest.xml (to know the name and the groups
         to use)
@@ -192,16 +192,29 @@ class WorkTreeSyncer(object):
             default_group = remote_manifest.groups.default_group
             if default_group:
                 self.manifest.groups = [default_group.name]
-        repos = remote_manifest.get_repos(groups=groups)
+        # Maybe some groups were removed from the manifest.
+        # Only consider those which exist
+        if groups is None:
+            groups_to_use = None
+        else:
+            groups_to_use = list()
+            for group in groups:
+                if group in remote_manifest.groups.group_names:
+                    groups_to_use.append(group)
+                else:
+                    if warn_if_missing_group:
+                        ui.warning("Group %s not found in the manifest" % group)
+        repos = remote_manifest.get_repos(groups=groups_to_use)
         return repos
 
-    def get_old_repos(self):
+    def get_old_repos(self, warn_if_missing_group=True):
         """ Backup all repos configuration before any synchronisation
         for compute_repo_diff to have the correct value
 
         """
         old_repos = list()
-        old_repos_expected = self.read_remote_manifest()
+        old_repos_expected = self.read_remote_manifest(
+                warn_if_missing_group=warn_if_missing_group)
         # The git projects may not match the previous repo config,
         # for instance the user removed a project by accident, or
         # a rename failed, or the project has not been cloned yet,
@@ -308,6 +321,9 @@ Please run `qisrc init MANIFEST_URL`
 
     def _sync_groups(self):
         """ Synchronize the repsitories groups read from the given manifest """
+        # FIXME: this only copies information from one place
+        # (.qi/manifests/default/manifests.xml) to an other
+        # (.qi/groups.xml) There's no advantage in doing that
         remote_xml = os.path.join(self.manifest_repo, "manifest.xml")
         remote_root_elem = qisys.qixml.read(remote_xml).getroot()
         remote_groups_elem = remote_root_elem.find("groups")
@@ -325,7 +341,7 @@ Please run `qisrc init MANIFEST_URL`
         # don't use self.old_repos and self.new_repos here,
         # because we are only using one manifest
         # Read groups from the manifests
-        old_repos = self.read_remote_manifest()
+        old_repos = self.read_remote_manifest(warn_if_missing_group=False)
         new_repos = self.read_remote_manifest(manifest_xml=xml_path)
         return self._sync_repos(old_repos, new_repos)
 

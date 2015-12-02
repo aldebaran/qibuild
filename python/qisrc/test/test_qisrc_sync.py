@@ -316,3 +316,32 @@ def test_dash_reset(qisrc_action, git_server):
     git_server.change_branch("foo.git", "devel")
     qisrc_action("init", git_server.manifest_url)
     qisrc_action("sync", "--reset")
+
+def test_removing_group_user_removes_group_by_hand(qisrc_action, git_server,
+                                                   record_messages):
+    git_server.create_group("foo", ["a.git"])
+    git_server.create_group("bar", ["b.git"])
+    qisrc_action("init", git_server.manifest_url,
+                 "--group", "foo",
+                 "--group", "bar")
+    git_server.remove_group("foo")
+    qisrc_action("sync")
+    assert record_messages.find("Group foo not found in the manifest")
+    record_messages.reset()
+    qisrc_action("rm-group", "foo")
+    qisrc_action("sync")
+    assert not record_messages.find("WARN")
+
+def test_removing_group_keep_warning_user(qisrc_action, git_server,
+                                          record_messages):
+    git_server.create_group("foo", ["a.git"])
+    git_server.create_group("bar", ["b.git"])
+    qisrc_action("init", git_server.manifest_url,
+                 "--group", "foo",
+                 "--group", "bar")
+    git_server.remove_group("foo")
+    qisrc_action("sync")
+    assert record_messages.find("Group foo not found in the manifest")
+    record_messages.reset()
+    qisrc_action("sync")
+    assert record_messages.find("Group foo not found in the manifest")

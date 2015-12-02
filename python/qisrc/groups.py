@@ -14,6 +14,10 @@ class Groups(object):
         self.groups = dict()
         self.default_group = None
 
+    @property
+    def group_names(self):
+        return self.groups.keys()
+
     def projects(self, group):
         return self.subgroups_group(group)
 
@@ -23,6 +27,9 @@ class Groups(object):
             group.default = True
         group.projects = projects
         self.groups[name] = group
+
+    def remove_group(self, name):
+        self.groups.pop(name, None)
 
     def subgroups_group(self, group_name, projects=None):
         if projects is None:
@@ -42,6 +49,7 @@ class Groups(object):
 class GroupsParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(GroupsParser, self).__init__(target)
+        self._ignore = ["group_names"]
 
     def _parse_group(self, element):
         group_name = element.attrib['name']
