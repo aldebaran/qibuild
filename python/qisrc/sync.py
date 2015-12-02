@@ -85,7 +85,6 @@ class WorkTreeSyncer(object):
         else:
             ui.info()
         self._sync_manifest()
-        self._sync_groups()
         self.new_repos = self.read_remote_manifest()
         res = self._sync_repos(self.old_repos, self.new_repos, force=force)
         # re-read self.old_repos so we can do several syncs:
@@ -318,20 +317,6 @@ Please run `qisrc init MANIFEST_URL`
                 res = False
 
         return res
-
-    def _sync_groups(self):
-        """ Synchronize the repsitories groups read from the given manifest """
-        # FIXME: this only copies information from one place
-        # (.qi/manifests/default/manifests.xml) to an other
-        # (.qi/groups.xml) There's no advantage in doing that
-        remote_xml = os.path.join(self.manifest_repo, "manifest.xml")
-        remote_root_elem = qisys.qixml.read(remote_xml).getroot()
-        remote_groups_elem = remote_root_elem.find("groups")
-        if remote_groups_elem is None:
-            remote_groups_elem = qisys.qixml.etree.Element("groups")
-
-        groups_xml = os.path.join(self.git_worktree.root, ".qi", "groups.xml")
-        qisys.qixml.write(remote_groups_elem, groups_xml)
 
     def sync_from_manifest_file(self, xml_path):
         """ Just synchronize the manifest coming from one xml file.

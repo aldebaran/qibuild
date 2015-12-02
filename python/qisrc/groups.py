@@ -96,11 +96,15 @@ class GroupParser(qisys.qixml.XMLParser):
             element.append(project_elem)
 
 def get_root(worktree):
-    file = os.path.join(worktree.root, ".qi", "groups.xml")
+    file = os.path.join(worktree.root, ".qi", "manifests", "default", "manifest.xml")
     if not os.path.exists(file):
         return None
     tree = etree.parse(file)
-    return tree.getroot()
+    root = tree.getroot()
+    groups_elem = root.find("groups")
+    if groups_elem is None:
+        return None
+    return groups_elem
 
 def get_groups(worktree):
     root = get_root(worktree)
@@ -110,13 +114,6 @@ def get_groups(worktree):
     parser = GroupsParser(groups)
     parser.parse(root)
     return groups
-
-def save_groups(worktree, groups):
-    groups_xml_path = os.path.join(worktree.root, ".qi", "groups.xml")
-    parser = GroupsParser(groups)
-    groups_elem = parser.xml_elem()
-    qisys.qixml.write(groups_elem, groups_xml_path)
-
 
 
 class GroupError(Exception):

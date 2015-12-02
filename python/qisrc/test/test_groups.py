@@ -45,10 +45,3 @@ def test_parser_write():
     parser = qisrc.groups.GroupsParser(groups)
     parser.parse(root)
     assert groups.projects("mygroup") == ["a", "b"]
-
-def test_save_groups(worktree):
-    groups = qisrc.groups.Groups()
-    groups.configure_group("mygroup", ["a", "b"])
-    qisrc.groups.save_groups(worktree, groups)
-    groups = qisrc.groups.get_groups(worktree)
-    assert groups.projects("mygroup") == ["a", "b"]

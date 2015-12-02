@@ -21,11 +21,10 @@ def do(args):
     local_groups = git_worktree._syncer.manifest.groups
 
     all_groups= list()
-    groups_xml = os.path.join(git_worktree.root, ".qi", "groups.xml")
-    tree = qisys.qixml.read(groups_xml)
-    root = tree.getroot()
-    groups_elems = root.findall("group")
-    for group_elem in groups_elems:
+    groups_elem = qisrc.groups.get_root(git_worktree)
+    if groups_elem is None:
+        groups_elem = list()
+    for group_elem in groups_elem:
         all_groups.append(group_elem.get("name"))
 
     all_groups.sort()
