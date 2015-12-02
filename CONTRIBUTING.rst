@@ -65,3 +65,10 @@ If one of your commits introduces a change in qibuild's behavior, you should
 document it in the changelog. (In ``doc/source/changes/<version>.rst``)
 
 You can do that in a separate commit or in the same commit that introduces the change.
+
+
+Add yourself to the AUTHORS file
+--------------------------------
+
+All of qibuild contributors are listed in the AUTHORS file. Feel free to
+send patches to it :)
