@@ -56,11 +56,11 @@ def cmake_configure_parser(parser):
     group.add_argument("--32-bits", dest="force_32_bits",
                        action="store_true", help="force 32 bits build")
     group.add_argument("--with-debug-info", action="store_true", dest="debug_info",
-                        help="include debug information in binaries. Overrides --release. "
+                        help="include debug information in binaries, even when used with --release. "
                              "Note that you can also use --build-type=RelWithDebInfo "
                              "for the same effect")
     group.add_argument("--without-debug-info", action="store_false", dest="debug_info",
-                        help="remove debug information from binaries. Overrides --debug")
+                        help="remove debug information from binaries, even when used with --debug")
     group.add_argument("--release", action="store_const", const="Release",
         dest="build_type",
         help="Build in release")
