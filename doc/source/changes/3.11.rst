@@ -83,6 +83,7 @@ qitest
 * Implement ``qitest run --last-failed`` to re-run previously failing tests
 * Implement ``qitest run --exclude`` to specify pattern of test name to exclude from the run
 * Implement ``qitest run --ignore-timeouts`` to ignore test timeouts set from CMake code.
+* Add HTML report generation when using ``qitest run --coverage``
 
 qitoolchain
 ------------

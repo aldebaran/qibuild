@@ -7,19 +7,21 @@ import qisys
 from qisys import ui
 
 
-def generate_coverage_xml_report(project):
-    """ Generate a XML coverage report
+def generate_coverage_reports(project):
+    """ Generate XML and HTML coverage reports
     """
     bdir = project.build_directory
     sdir = project.path
-    base_report = os.path.join(bdir, project.name + ".xml")
-    cmd = ["gcovr",
-            "--root", sdir,
-            "--exclude", ".*test.*",
-            "--exclude", ".*external.*",
-            "--exclude", ".*example.*",
-            "--xml",
-            "--output", base_report]
-    qisys.command.call(cmd, cwd=sdir, quiet=True)
-    ui.info(ui.green, "*", ui.reset, "Generated XML coverage report in",
-            ui.reset, ui.bold, base_report)
+    formats = {"xml": ["--xml"],
+               "html": ["--html", "--html-details"]}
+    for fmt, opts in formats.iteritems():
+        base_report = os.path.join(bdir, project.name + "." + fmt)
+        cmd = ["gcovr",
+                "--root", sdir,
+                "--exclude", ".*test.*",
+                "--exclude", ".*external.*",
+                "--exclude", ".*example.*"] + opts + \
+               ["--output", base_report]
+        qisys.command.call(cmd, cwd=sdir, quiet=True)
+        ui.info(ui.green, "*", ui.reset, "Generated", fmt.upper(),
+                "coverage report in", ui.reset, ui.bold, base_report)
