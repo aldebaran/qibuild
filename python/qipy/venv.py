@@ -12,7 +12,7 @@ import qisys.command
 
 def configure_virtualenv(config, python_worktree,  build_worktree=None,
                          remote_packages=None, site_packages=True,
-                         python_executable=None):
+                         python_executable=None, env=None):
     """ Main entry point. Called by ``qipy bootstrap``
 
     :param: remote_packages List of third-party packages to add in the virtualenv
@@ -38,7 +38,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
     if not site_packages:
         cmd.append("--no-site-packages")
     try:
-        qisys.command.call(cmd)
+        qisys.command.call(cmd, env=env)
     except qisys.command.CommandFailedException:
         ui.error("Failed to create virtualenv")
         return False
@@ -62,7 +62,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         if not ui.CONFIG["verbose"]:
             cmd.append("--quiet")
         cmd.extend(remote_packages)
-        rc = qisys.command.call(cmd, ignore_ret_code=True)
+        rc = qisys.command.call(cmd, ignore_ret_code=True, env=env)
         remote_ok = (rc == 0)
     if not pure_python_ok:
         ui.info(ui.red, "Failed to add some python projects")
@@ -83,7 +83,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
             if not ui.CONFIG["verbose"]:
                 cmd.append("--quiet")
             cmd.extend(["--requirement", path])
-            rc = qisys.command.call(cmd, ignore_ret_code=True)
+            rc = qisys.command.call(cmd, ignore_ret_code=True, env=env)
             requirements_ok = (rc == 0)
         else:
             ui.debug(ui.yellow, " * missing " + path)
@@ -189,4 +189,3 @@ def handle_modules(venv_path, python_worktree):
         to_write = os.path.join(to_make, "%s.mod" % qimodule.name)
         with open(to_write, "w") as fp:
             fp.write("python\n")
-
