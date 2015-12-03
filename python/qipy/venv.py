@@ -46,7 +46,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
     ui.info(ui.blue, "::", ui.reset, "Adding python projects")
     # Write a qi.pth file containing path to C/C++ extensions and
     # path to pure python modules or packages
-    pure_python_ok = handle_pure_python(venv_path, python_worktree)
+    pure_python_ok = handle_pure_python(venv_path, python_worktree, env=env)
     if build_worktree:
         handle_extensions(venv_path, python_worktree, build_worktree)
     handle_modules(venv_path, python_worktree)
@@ -149,7 +149,7 @@ def handle_extensions(venv_path, python_worktree, build_worktree):
     with open(qi_pth_dest, "a") as fp:
         fp.write(to_write)
 
-def handle_pure_python(venv_path, python_worktree):
+def handle_pure_python(venv_path, python_worktree, env=None):
     """ Add the paths of all python projects to the virtualenv """
     lib_path = virtualenv.path_locations(venv_path)[1]
     qi_pth_dest = os.path.join(venv_path, lib_path, "site-packages/qi.pth")
@@ -164,7 +164,8 @@ def handle_pure_python(venv_path, python_worktree):
                 if not ui.CONFIG["verbose"]:
                     cmd.append("--quiet")
                 cmd.extend(["--editable", "."])
-                rc = qisys.command.call(cmd, cwd=project.path, ignore_ret_code=True)
+                rc = qisys.command.call(cmd, cwd=project.path, ignore_ret_code=True,
+                                        env=env)
                 if rc != 0:
                     ui.warning("Failed to run pip install on", project.src)
                     res = False
