@@ -173,6 +173,16 @@ def test_updating_env_vars(tmpdir):
     build_env = env_setter.get_build_env()
     assert build_env["FOO"] == "SPAM"
 
+def test_prepending_variable_already_here():
+    env = {
+            "PATH" : "/foo:/bar"
+    }
+    envsetter = qisys.envsetter.EnvSetter(build_env=env)
+    envsetter.prepend_to_path("/baz")
+    envsetter.prepend_to_path("/foo")
+    actual = envsetter.get_build_env()["PATH"]
+    assert actual == "/foo:/baz:/bar"
+
 def main():
     unittest.main()
 

@@ -85,8 +85,10 @@ class EnvSetter(object):
         if old_value.endswith(pathsep):
             old_value = old_value[:-1]
         splitted_paths = old_value.split(pathsep)
-        if directory not in splitted_paths:
-            splitted_paths.insert(0, directory)
+        if directory in splitted_paths:
+            splitted_paths.remove(directory)
+
+        splitted_paths.insert(0, directory)
 
         self._build_env[variable] = pathsep.join(splitted_paths)
 
