@@ -81,6 +81,8 @@ qitest
 * Implement ``qitest run --exclude`` to specify pattern of test name to exclude from the run
 * Implement ``qitest run --ignore-timeouts`` to ignore test timeouts set from CMake code.
 
+* ``qitest run --coverage``: also generate HTML output (requires ``gcovr >= 3.2``)
+
 qitoolchain
 ------------
 
