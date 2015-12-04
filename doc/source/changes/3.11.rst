@@ -59,9 +59,6 @@ qisrc
   to the given group(s).
 * ``qisrc sync``: fix crash in some corner cases
 
-qisrc
------
-
 * Remove the project options in ``qisrc snapshot``. They were not used and
   prevented passing the snapshot path.
 
