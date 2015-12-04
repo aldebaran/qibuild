@@ -748,30 +748,23 @@ have to), so make the default obvious. (See for instance how
 Adding new tests
 ^^^^^^^^^^^^^^^^
 
-For historical reasons, lots of the qibuild tests still are using ``unittest``.
-You should add your new test using ``py.test`` instead. Basically, for each
-python module there should be a matching test module::
+You should add your new test using ``py.test``.
+For each Python module there should be a matching test module,
+containing unit tests:
+
+.. code-block:: console
 
     qisrc/foo.py
     qisrc/test/test_foo.py
 
-Also, when adding a new action, a good idea is to try to write the
-functionality of your action thinking of it as a library, then add tests for
-the library, and only then add the action.
+And for each action there should be a matching test module,
+containing high-level integration tests
 
-This makes writing tests much easier, and also makes refactoring easier.
+.. code-block:: console
 
-An other way to say this is that you should usually not find yourself using
-`qibuild.run_action` *inside* the qibuild project, it's rather meant to be used
-from a release script, for instance.
+    qibuild/actions/foo.py
+    qibuild/test/test_qibuild_foo.py
 
-.. code-block:: python
-
-    def continuous_tests():
-        qibuild.run_action("qisrc.actions.pull")
-        qibuild.run_action("qibuild.actions.configure")
-        qibuild.run_action("qibuild.actions.make")
-        qibuild.run_action("qibuild.actions.test")
 
 Using external programs
 ^^^^^^^^^^^^^^^^^^^^^^^
