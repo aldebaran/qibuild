@@ -5,8 +5,11 @@
 
 Mostly useful in scripts:
 
-    source $(qibuild sourceme)
+    source $(qibuild sourceme -q)
 """
+
+import sys
+import os
 
 from qisys import ui
 
@@ -21,5 +24,16 @@ def configure_parser(parser):
 def do(args):
     python_builder = qipy.parsers.get_python_builder(args)
     res = python_builder.python_worktree.bin_path("activate")
+    if not os.path.exists(res):
+        mess = """\
+Could not find 'activate' script.
+(%s does not exist)
+Make sure to call `qipy bootstrap` first
+"""
+        raise Exception(mess)
+
+    if os.name == "nt":
+        res = qisys.sh.to_posix_path(res, fix_drive=True)
+
     print res
     return res

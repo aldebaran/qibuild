@@ -112,6 +112,11 @@ qisrc
 * ``qisrc reset``: add ``--ignore-groups`` to ignore groups defined in the snapshot,
   and use groups configured for the current worktree instead.
 
+qipy
+---
+
+* ``qipy sourceme``: Fix usage on ``MingGW``
+
 qitest
 ------
 
