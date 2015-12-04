@@ -134,8 +134,6 @@ qibuild
 
 * qibuild deploy: fix gdb configuration files generation
 
-* add ``qibuild test --failed``
-
 * add ``qibuild find -z`` to look in every build directory
 
 * Better integration with QtCreator:
