@@ -51,9 +51,10 @@ def do(args):
         cmd = ["ipython"]
 
     if os.path.exists(cmd[0]):
-        # Assume it is a script we want to run
-        python_path = os.path.join(binaries_path, "python")
-        cmd.insert(0, python_path)
+        # If it's a script, prepend the correct python executable
+        if cmd[0].endswith(".py"):
+            python_path = os.path.join(binaries_path, "python")
+            cmd.insert(0, python_path)
     else:
         script_path = qipy.venv.find_script(venv_root, cmd[0])
         if script_path:
