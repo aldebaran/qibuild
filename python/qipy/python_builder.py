@@ -40,8 +40,9 @@ class PythonBuilder(AbstractBuilder):
                                        site_packages=site_packages,
                                        python_executable=python_executable,
                                        env=env)
-        qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
-        write_qi_path_conf(self.python_worktree.venv_path, qi_path_sdk_dirs)
+        if self.build_worktree:
+            qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
+            write_qi_path_conf(self.python_worktree.venv_path, qi_path_sdk_dirs)
         return ok
 
     def configure(self, *args, **kwargs):
