@@ -72,3 +72,27 @@ def test_parallel_build(qibuild_action):
     qibuild_action.create_project("c", build_depends=["a", "b"])
     qibuild_action("configure", "c")
     qibuild_action("make", "c", "--num-workers=2")
+
+def test_codegen_happy(qibuild_action):
+    qibuild_action.add_test_project("codegen")
+    qibuild_action("configure", "codegen")
+    qibuild_action("make", "codegen", "--verbose-make")
+
+def test_codegen_fail_when_generating_command_fails(qibuild_action):
+    qibuild_action.add_test_project("codegen")
+    qibuild_action("configure", "codegen", "-DFAIL=TRUE")
+    error = qibuild_action("make", "codegen", "--verbose-make", raises=True)
+    assert error
+
+def test_depend_on_the_generator_command(qibuild_action):
+    project = qibuild_action.add_test_project("codegen")
+    gen_py = os.path.join(project.path, "gen.py")
+    qibuild_action("configure", "codegen")
+    qibuild_action("make", "codegen", "--verbose-make")
+    with open(gen_py, "r") as fp:
+        lines = fp.readlines()
+    lines.append("sys.exit(2)\n")
+    with open(gen_py, "w") as fp:
+        fp.writelines(lines)
+    error = qibuild_action("make", "codegen", raises=True)
+    assert error
