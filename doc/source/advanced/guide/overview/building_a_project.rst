@@ -7,7 +7,7 @@ Building a project
 Simple build
 ------------
 
-Let’s assume you only want to compile your project once.
+Let's assume you only want to compile your project once.
 
 Doing so is easy:
 
@@ -15,11 +15,23 @@ Doing so is easy:
 
   $ qibuild make foo
 
-Or, to build in release, use:
+By default the binaries are built in debug.
+
+To build in release, you must first re-run ``qibuild configure``
+with a ``--release`` argument, then call ``qibuild make``
 
 .. code-block:: console
 
-  $ qibuild make --release foo
+  $ qibuild configure foo --release
+  $ qibuild make foo
+
+Behind the scenes, ``qibuild configure --release`` just sets
+``CMAKE_BUILD_TYPE`` to ``Release``. You can specify arbitrary
+build types with ``qibuild configure --build-type``, for instance:
+
+.. code-block:: console
+
+  $ qibuild configure --build-type=RelWithDebInfo
 
 Using an IDE
 ------------
