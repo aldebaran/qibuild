@@ -36,7 +36,7 @@ def do(args):
         if args.coverage:
             build_worktree = qibuild.parsers.get_build_worktree(args, verbose=False)
             build_project = qibuild.parsers.get_one_build_project(build_worktree, args)
-            qibuild.gcov.generate_coverage_reports(build_project)
+            qibuild.gcov.generate_coverage_reports(build_project, root_output_dir=args.root_output_dir)
         global_res = global_res and res
     if not global_res:
         sys.exit(1)
