@@ -34,22 +34,22 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @property
     def test_results_dir(self):
-        if self.root_output_dir:
+        if self.test_output_dir:
             if self.project.name:
-                base = os.path.join(self.root_output_dir, self.project.name)
+                base = os.path.join(self.test_output_dir, self.project.name)
             else:
-                base = self.root_output_dir
+                base = self.test_output_dir
         else:
             base = self.project.sdk_directory
         return os.path.join(base, "test-results")
 
     @property
     def perf_results_dir(self):
-        if self.root_output_dir:
+        if self.test_output_dir:
             if self.project.name:
-                base = os.path.join(self.root_output_dir, self.project.name)
+                base = os.path.join(self.test_output_dir, self.project.name)
             else:
-                base = self.root_output_dir
+                base = self.test_output_dir
         else:
             base = self.project.sdk_directory
         return os.path.join(base, "perf-results")
