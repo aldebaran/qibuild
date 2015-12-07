@@ -158,6 +158,7 @@ def test_install_returns(qibuild_action, tmpdir):
                               'share/recurse/a_dir/b_dir/c_dir/d_file',
                               'share/recurse/a_dir/a_file',
                               'share/sub/bar.dat',
+                              'share/qi/path.conf',
                               'lib/python2.7/site-packages/py/foo.py'}
 
 def test_install_test_libs(qibuild_action, tmpdir):
@@ -257,3 +258,10 @@ def add_dep_to_world(project):
     project.run_depends.add("world")
     qibuild.deps.dump_deps_to_xml(project, xml_tree)
     qisys.qixml.write(xml_tree, qiproject_xml_path)
+
+def test_install_path_conf(qibuild_action, tmpdir):
+    qibuild_action.add_test_project("installme")
+    qibuild_action("configure", "installme")
+    qibuild_action("make", "installme")
+    qibuild_action("install", "installme", tmpdir.strpath)
+    assert tmpdir.join("share", "qi", "path.conf").check(file=True)

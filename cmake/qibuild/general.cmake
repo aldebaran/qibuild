@@ -134,6 +134,6 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   qi_persistent_set(CMAKE_INSTALL_PREFIX "/")
 endif()
 
-# Always create an install rule, so that `qibuild install` never
-# fails
-install(CODE "")
+# Install a share/qi/path.conf so that libqi's sdkPrefix can be found
+file(WRITE "${CMAKE_BINARY_DIR}/path.conf" "# Installed by qibuild. Do not remove\n")
+qi_install_data(${CMAKE_BINARY_DIR}/path.conf SUBFOLDER "qi")

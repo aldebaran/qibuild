@@ -48,6 +48,9 @@ qibuild
 
 * Fix using ``qibuild run`` in some corner cases.
 
+* Always generate a ``share/qi/path.conf`` during installation.
+  (This is required by ``libqi``)
+
 qidoc
 -----
 
