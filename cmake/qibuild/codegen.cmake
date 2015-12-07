@@ -18,6 +18,25 @@
 # Note that the base dir of the output will automatically be created, so
 # you do not have to worry about it in your script.
 #
+# Also note that you should consider adding an explicit dependency to the
+# command that generates the sources, using the DEPENDS argument:
+#
+# For instance, when using a Python script::
+#
+#      qi_generate_src(...
+#           COMMAND ${PYTHON2_EXECUTABLE} myscript.py ...
+#           DEPENDS myscript.py
+#     )
+#
+# Or when using a target::
+#
+#      find_package(FOO REQUIRED)
+#
+#      qi_generate_src(...
+#           COMMAND ${FOO_EXECUTABLE} myscript.py ...
+#           DEPENDS ${FOO_EXECUTABLE}
+#     )
+#
 # \arg:out the generated files in a list
 # \group:SRC a group of sources to take as input
 # \group:COMMAND the command to run to generate the files
@@ -64,6 +83,8 @@ endfunction()
 #    you do not have to worry about it in your script.
 #  * ``include_directories()`` will be called with the directory where
 #    the header is generated.
+#  * As with :cmake:function:`qi_generate_src`, you should specify
+#    a ``DEPENDS`` argument.
 #
 #
 # \arg:out the resulting source file
@@ -167,4 +188,3 @@ sys.exit(rv)
   set(_res "${_rep}")
   file(WRITE  "${QI_SDK_DIR}/${QI_SDK_BIN}/${out}" "${_res}")
 endfunction()
-
