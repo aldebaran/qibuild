@@ -19,10 +19,10 @@ This module depends on *portage*: http://www.gentoo.org/proj/en/portage/index.xm
 
     :param dest_dir: the extraction directory
 
-    :rtype: the root directory of the extracted content
+    :return: the root directory of the extracted content
 
   .. py:method:: get_metadata()
 
     Read the metadata from the binary package and store them in the instance.
 
-    :rtype: the metadata dictionary
+    :return: the metadata dictionary
