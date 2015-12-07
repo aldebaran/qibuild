@@ -29,6 +29,9 @@ def configure_parser(parser):
     parser.add_argument("--tag", help="Reset everything to the given tag")
     parser.add_argument("--snapshot", help="Reset everything using the given "
                         "snapshot")
+    parser.add_argument("--ignore-groups", dest="ignore_groups", action="store_true",
+                        help="Ignore groups defined in the snapshot")
+    parser.set_defaults(ignore_groups=False)
 
 def do(args):
     """Main entry points."""
@@ -40,7 +43,8 @@ def do(args):
         snapshot.load(args.snapshot)
 
     if snapshot and snapshot.format_version and snapshot.format_version >= 1:
-        reset_manifest(git_worktree, snapshot, groups=args.groups)
+        reset_manifest(git_worktree, snapshot,
+                       ignore_groups=args.ignore_groups)
 
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
                                                   default_all=True,
@@ -84,10 +88,12 @@ def do(args):
         ui.info(ui.red, " * ", error)
     sys.exit(1)
 
-def reset_manifest(git_worktree, snapshot, groups=None):
+def reset_manifest(git_worktree, snapshot, ignore_groups=False):
     manifest = snapshot.manifest
-    if not groups:
-        groups=manifest.groups
+    if ignore_groups:
+        groups = git_worktree.manifest.groups
+    else:
+        groups = manifest.groups
     if not manifest.branch:
         raise Exception("No branch configured for the manifest of the snapshot")
     ok = git_worktree.configure_manifest(manifest.url, groups=groups,

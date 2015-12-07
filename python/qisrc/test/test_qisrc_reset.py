@@ -90,3 +90,16 @@ def test_no_files_in_repo(qisrc_action, git_server):
     git_server.delete_file("foo", ".gitignore")
     qisrc_action("init", git_server.manifest_url)
     qisrc_action("reset")
+
+def test_ignore_groups(qisrc_action, git_server):
+    git_server.create_group("a", ["a.git"])
+    git_server.create_group("b", ["b.git"])
+    qisrc_action("init", git_server.manifest_url,
+                 "--group", "a",
+                 "--group", "b")
+    snapshot = qisrc_action("snapshot")
+    qisrc_action("rm-group", "b")
+    qisrc_action("reset", "--snapshot", snapshot, "--ignore-groups")
+    git_worktree = TestGitWorkTree()
+    # Check that 'b' group was not re-added
+    assert len(git_worktree.git_projects) == 1
