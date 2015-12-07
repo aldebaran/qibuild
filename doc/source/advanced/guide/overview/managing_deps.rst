@@ -87,11 +87,11 @@ You can see that configuring ``hello`` caused the ``world`` project to be
 configured too, and that building ``hello`` also built the ``world`` project.
 
 On Windows, the ``world`` DLL was copied right next to ``hello.exe,`` so
-running ``qibuild test hello`` just worked.
+that ``hello.exe`` can run without issues.
 
 If you are using Visual Studio, you can open ``hello.sln`` in
 ``QI_WORK_TREE/hello/build-.../hello.sln``, select "hello" as startup project,
-and start debugging hello_d.exe right away.
+and start debugging ``hello_d.exe`` right away.
 
 .. warning:: If you try to compile hello in release, you’ll get an
   error because "world" has not been compiled in release, so world.lib could

@@ -13,3 +13,4 @@ qiBuild tutorials
     qilinguist/tutorial
     qipy/tutorial
     qipkg/tutorial
+    qitest/tutorial

@@ -178,9 +178,10 @@ Renames
 
 * qisrc.status.check_state(project, untracked) -> qisrc.status.check_state(project, untracked=False)
 
-* what we call "zombies" in the implementation of ``qibuild test`` are actually orphans
-  (see http://en.wikipedia.org/wiki/Orphan_process), so we should fix the
-  code accordingly. Plus this means we can write a ``kill_orphans`` method :)
+* what we call "zombies" in the implementation of ``qitest run`` are actually
+  orphans (see http://en.wikipedia.org/wiki/Orphan_process), so we should fix
+  the code accordingly. Plus this means we can write a ``kill_orphans``
+  method :)
 
 tests
 +++++

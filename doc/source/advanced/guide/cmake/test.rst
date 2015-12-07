@@ -34,7 +34,7 @@ If you have ``gtest`` installed, you can use
 
 This will automatically add the `--xml-output` option
 to store the results of the test as XML files in
-``foo/build-<config>/tests-results``, which is useful when
+``foo/<build-dir>/sdk/tests-results``, which is useful when
 you are doing continuous integration.
 
 If you need to run the same executable with different
@@ -43,8 +43,8 @@ called :cmake:function:`qi_add_test`
 
 .. code-block:: cmake
 
-   qi_create_bin(test_launcher
-    test_launcher.cpp NO_INSTALL)
+   qi_create_test_helper(test_launcher
+    test_launcher.cpp)
 
    qi_add_test(test_launch_foo
     test_launcher
@@ -54,10 +54,25 @@ called :cmake:function:`qi_add_test`
     test_launcher
       ARGUMENTS "bar")
 
+Note how we call ``qi_create_test_helper`` instead of
+``qi_create_bin`` in order to make sure the test executable
+does not get installed by default.
+
+Running the tests
+-----------------
+
+To run the tests, configure and build the project, then
+use ``qitest run``:
+
+.. code-block:: console
+
+    qibuild configure
+    qibuild make
+    qitest run
+
 
 Important
 ---------
 
-Please read :ref:`qibuild-ctest` before using ``qibuild test``
+Please read :ref:`qibuild-ctest` before using ``qitest run``
 for continuous integration.
-

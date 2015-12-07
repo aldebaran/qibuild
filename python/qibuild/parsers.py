@@ -99,7 +99,7 @@ def project_parser(parser, positional=True):
     """Parser settings for every action using several build projects."""
     group = qisys.parsers.project_parser(parser, positional=positional)
     # --use-deps is only useful when it would make more sense to
-    # NOT solve the deps by default (for instance for `qibuild test`)
+    # NOT solve the deps by default (for instance for `qitest run`)
     group.add_argument("--use-deps", action="store_true", dest="use_deps",
                        help="Force deps resolution")
     group.add_argument("--build-deps-only", action="store_const",

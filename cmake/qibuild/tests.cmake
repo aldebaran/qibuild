@@ -14,7 +14,7 @@
 
 include(qibuild/internal/tests)
 
-#! Create a new test that can be run by ``qibuild test``
+#! Create a new test that can be run by ``qitest run``
 #
 # Notes:
 #  * The test can be installed using ``qibuild install --with-tests``
@@ -119,4 +119,3 @@ endfunction()
 function(qi_create_perf_test name)
   _qi_add_test_internal(${name} ${name} PERF_TEST ${ARGN})
 endfunction()
-
