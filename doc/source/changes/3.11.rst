@@ -67,6 +67,24 @@ qidoc
   projects
 * ``qidoc build``: Forward ``--pdb`` option to ``Sphinx``
 
+qipkg
+-----
+
+* ``qipkg deploy-package``: now also accept a ``.pml`` path as argument.
+
+  This means you can do
+
+  .. code-block:: console
+
+      qipkg deploy-package foo.pml --url user@host
+
+  Instead of:
+
+  .. code-block:: console
+
+      qipkg make-package foo.pml
+      qipkg deploy-package foo-0.1.pkg --url user@host
+
 qisrc
 -----
 

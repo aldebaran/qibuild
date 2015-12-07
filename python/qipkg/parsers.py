@@ -20,6 +20,11 @@ def pml_parser(parser):
     qisys.parsers.build_parser(parser)
     parser.add_argument("pml_path")
 
+def pkg_parser(parser):
+    parser.add_argument("--with-breakpad", action="store_true")
+    parser.add_argument("--force", action="store_true")
+    parser.set_defaults(with_breakpad=False, force=False)
+
 def get_pml_builder(args):
     worktree = qisys.parsers.get_worktree(args, raises=False)
     pml_path = args.pml_path

@@ -12,16 +12,28 @@ import zipfile
 from qisys import ui
 import qisys.command
 import qisys.parsers
+import qipkg.parsers
 import qipkg.package
 
 def configure_parser(parser):
     qisys.parsers.default_parser(parser)
+    qipkg.parsers.pkg_parser(parser)
     qisys.parsers.deploy_parser(parser)
-    parser.add_argument("pkg_path")
+    parser.add_argument("pkg_path_or_pml")
 
 def do(args):
     urls = qisys.parsers.get_deploy_urls(args)
-    pkg_path = args.pkg_path
+    pkg_path_or_pml = args.pkg_path_or_pml
+    if pkg_path_or_pml.endswith(".pkg"):
+        pkg_path = pkg_path_or_pml
+    elif pkg_path_or_pml.endswith(".pml"):
+        pml_path = pkg_path_or_pml
+        pkg_path = qisys.script.run_action("qipkg.actions.make_package",
+                                           [pml_path],
+                                           forward_args=args)
+    else:
+        sys.exit("Please use a .pml or a .pkg as argument")
+
     for url in urls:
         deploy(pkg_path, url)
 
@@ -41,6 +53,7 @@ def deploy(pkg_path, url):
     except Exception as e:
         ui.error("Unable to install package on target")
         ui.error("Error was: ", e)
+        return
 
     rm_cmd = ["ssh", "%s@%s" % (url.user, url.host),
                 "rm", os.path.basename(pkg_path)]

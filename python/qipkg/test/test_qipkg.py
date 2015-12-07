@@ -261,3 +261,15 @@ def test_deploy_package(qipkg_action, tmpdir, record_messages):
     assert install_mock.call_args_list == [mock.call("/home/%s/d-0.1.pkg" % username)]
 
     assert record_messages.find("PackageManager returned: True")
+
+    del sys.modules["qi"]
+
+def test_deploy_package_from_pml(qipkg_action, tmpdir):
+    d_proj = qipkg_action.add_test_project("d_pkg")
+    pml_path = os.path.join(d_proj.path, "d_pkg.pml")
+    url = get_ssh_url(tmpdir)
+
+    qipkg_action("deploy-package", pml_path, "--url", url)
+
+    expected_path = os.path.expanduser("~/d-0.1.pkg")
+    assert os.path.exists(expected_path)

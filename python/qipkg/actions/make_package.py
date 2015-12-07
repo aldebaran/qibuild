@@ -13,9 +13,7 @@ def configure_parser(parser):
     """Configure parser for this action"""
     qipkg.parsers.pml_parser(parser)
     parser.add_argument("-o", "--output")
-    parser.add_argument("--with-breakpad", action="store_true")
-    parser.add_argument("--force", action="store_true")
-    parser.set_defaults(with_breakpad=False)
+    qipkg.parsers.pkg_parser(parser)
 
 
 def do(args):
