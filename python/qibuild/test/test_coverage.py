@@ -26,3 +26,9 @@ def test_generate_reports(qibuild_action):
     assert os.path.exists(expected_path_xml)
     assert os.path.exists(expected_path_html)
 
+    qibuild.gcov.generate_coverage_reports(proj, root_output_dir=proj.path)
+    expected_path_xml = os.path.join(proj.path, proj.name + ".xml")
+    expected_path_html = os.path.join(proj.path, proj.name + ".html")
+    assert os.path.exists(expected_path_xml)
+    assert os.path.exists(expected_path_html)
+

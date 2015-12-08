@@ -82,6 +82,7 @@ qitest
 * Implement ``qitest run --ignore-timeouts`` to ignore test timeouts set from CMake code.
 
 * ``qitest run --coverage``: also generate HTML output (requires ``gcovr >= 3.2``)
+* ``qitest run --coverage``: fix ``--root-output-dir`` option that was not used
 
 qitoolchain
 ------------
