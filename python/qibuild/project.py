@@ -459,9 +459,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
     def run_tests(self, **kwargs):
         test_project = self.to_test_project()
         test_runner = qibuild.test_runner.ProjectTestRunner(test_project)
-        # Note the env coming from the build config (in self.build_env()),
-        # suitable for running CMake, but the env coming from the build worktree,
-        # suitable to run the tests
+        # Note how we do NOT use the env coming from the build config (in
+        # self.build_env()), suitable for running CMake and building,
+        # but the env coming from the build worktree, suitable to run the tests
         test_runner.env = self.build_worktree.get_env()
         for key, value in kwargs.iteritems():
             if hasattr(test_runner, key):
