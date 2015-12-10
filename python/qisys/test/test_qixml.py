@@ -230,3 +230,15 @@ def test_ignore_attributes():
 
     assert foo.bar == "bar" # should not have changed
     assert foo.baz == "eggs" # should have changed
+
+def test_indent(tmpdir):
+    root = etree.Element("root")
+    sub = etree.SubElement(root, "sub")
+    sub.text = "some text"
+    out = tmpdir.join("out.xml")
+    qisys.qixml.write(root, out.strpath)
+    assert out.read() == """\
+<root>
+  <sub>some text</sub>
+</root>
+"""
