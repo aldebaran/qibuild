@@ -22,6 +22,9 @@ class ProjectXML(qisys.qixml.XMLParser):
         self.target.append(maintainer)
 
 def to_str(name=None, email=None):
+    encoding = locale.getpreferredencoding()
+    name = name.encode(encoding)
+    email = email.encode(encoding)
     string = ""
     if name:
         string += name

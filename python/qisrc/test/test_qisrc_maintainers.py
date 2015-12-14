@@ -5,6 +5,10 @@
 ## found in the COPYING file.
 import qisrc.maintainers
 
+def test_no_project(qisrc_action):
+    error = qisrc_action("maintainers", "--list", raises=True)
+    assert "at least one project" in error
+
 def test_no_maintainers_yet(qisrc_action, record_messages):
     foo = qisrc_action.worktree.create_project("foo")
     qisrc_action("maintainers", "--list", "--project", "foo")
@@ -36,6 +40,11 @@ def test_remove_maintainer(qisrc_action, interact):
     qisrc_action("maintainers", "--remove")
     assert not qisrc.maintainers.get(foo)
 
-def test_utf8(qisrc_action):
+def test_add_utf8(qisrc_action):
     foo = qisrc_action.worktree.create_project("foo")
     qisrc.maintainers.add(foo, name="Noé", email="noe@ark.com")
+
+def test_list_utf8(qisrc_action):
+    foo = qisrc_action.worktree.create_project("foo")
+    qisrc.maintainers.add(foo, name="Noé", email="noe@ark.com")
+    qisrc_action("maintainers", "--list", "--project", "foo")
