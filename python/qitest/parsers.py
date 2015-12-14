@@ -38,9 +38,14 @@ def test_parser(parser, with_num_jobs=True):
     group.add_argument("--repeat-until-fail", default=0, type=int, metavar="N",
                        help="Repeat tests until they fail (at most N times)")
     group.add_argument("--qitest-json", dest="qitest_jsons", action="append")
-    group.add_argument("--root-output-dir", dest="root_output_dir",
-                      help="Generate XML and HTML reports in the given directory " + \
-                           "(instead of build-<platform>)")
+    group.add_argument("--test-output-dir", dest="test_output_dir",
+                      help="Generate XML test reports in the given directory " + \
+                           "(instead of build-<platform>/sdk/test-results)")
+    group.add_argument("--coverage-output-dir", dest="coverage_output_dir",
+                      help="Generate XML and HTML coverage reports in the given " + \
+                           "directory (instead of build-<platform>/sdk/coverage-results)")
+    group.add_argument("--root-output-dir", dest="test_output_dir", metavar="ROOT_OUTPUT_DIR",
+                      help="same as --test-output-dir (deprecated)")
 
     group.add_argument("--no-capture", dest="capture", action="store_false")
     group.add_argument("--ignore-timeouts", dest="ignore_timeouts", action="store_true",
@@ -94,7 +99,7 @@ def get_test_runner(args, build_project=None, qitest_json=None):
     test_runner.repeat_until_fail = args.repeat_until_fail
     test_runner.nightly = args.nightly
     test_runner.nightmare = args.nightmare
-    test_runner.root_output_dir = args.root_output_dir
+    test_runner.test_output_dir = args.test_output_dir
     test_runner.capture = args.capture
     test_runner.last_failed = args.last_failed
     test_runner.ignore_timeouts = args.ignore_timeouts

@@ -26,7 +26,7 @@ class TestSuiteRunner(object):
         self.nightly = False
         self.coverage = False
         self.nightmare = False
-        self.root_output_dir = None
+        self.test_output_dir = None
         self.capture = True
         self.last_failed = False
         self._tests = project.tests

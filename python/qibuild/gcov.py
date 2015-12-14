@@ -6,16 +6,18 @@ import os
 import qisys
 from qisys import ui
 
-
-def generate_coverage_reports(project):
+def generate_coverage_reports(project, output_dir=None):
     """ Generate XML and HTML coverage reports
     """
-    bdir = project.build_directory
+    outdir = output_dir or os.path.join(project.sdk_directory, "coverage-results")
     sdir = project.path
+    # Make sure output dir exist and is empty:
+    qisys.sh.rm(outdir)
+    qisys.sh.mkdir(outdir, recursive=True)
     formats = {"xml": ["--xml"],
                "html": ["--html", "--html-details"]}
     for fmt, opts in formats.iteritems():
-        base_report = os.path.join(bdir, project.name + "." + fmt)
+        base_report = os.path.join(outdir, project.name + "." + fmt)
         cmd = ["gcovr",
                 "--root", sdir,
                 "--exclude", ".*test.*",
