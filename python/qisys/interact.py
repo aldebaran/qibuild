@@ -123,6 +123,8 @@ def ask_app(message):
         if not os.path.isdir(full_path):
             ui.error("%s does not exist or is not a directory" % full_path)
             keep_going = ask_yes_no("continue?")
+        else:
+            keep_going = False
     return full_path
 
 def get_editor():

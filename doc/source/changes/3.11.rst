@@ -51,6 +51,15 @@ qibuild
 * Always generate a ``share/qi/path.conf`` during installation.
   (This is required by ``libqi``)
 
+* When reading ``~/.config/qi/qibuild.xml``, prepend contents of
+  ``<env path="..."/>`` *after* launching bat file.
+
+* Using ``qibuild set-host-config`` twice with different configuration names
+  lead to undefined behavior.
+
+* ``qibuild config --wizard``: fix infinite loop when asking for
+  ``QtCreator`` application path
+
 qidoc
 -----
 
@@ -72,6 +81,7 @@ qisrc
 
 * Warn when using ``qisrc foreach --group <group name>`` and the group
   is not currently in use
+* ``qisrc.git.Git.get_log``: fix git log command
 
 qitest
 ------
