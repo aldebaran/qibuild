@@ -137,3 +137,5 @@ cmake
 * Using ``qi_stage_lib(foo CUSTOM_CODE ..)`` did not generate
   installed ``foo-config.cmake`` correctly
 * ``qi_install``: use ``USE_SOURCE_PERMISSIONS`` when installing directories
+* qibuild camke modules:
+  * Add ``bfl`` (http://www.orocos.org/bfl)
