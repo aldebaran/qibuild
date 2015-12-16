@@ -169,6 +169,8 @@ def handle_pure_python(venv_path, python_worktree):
                     ui.warning("Failed to run pip install on", project.src)
                     res = False
             else:
+                ui.debug("Adding python path for project", project.name, ":\n",
+                            project.python_path)
                 for path in project.python_path:
                     fp.write(path + "\n")
     return res
