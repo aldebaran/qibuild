@@ -142,5 +142,6 @@ cmake
 * ``qi_swig_wrap_python``: generate files in ``<build>/sdk/lib/python2.7/site-packages``,
   the same way ``qi_create_python_ext`` does
 * ``qi_swig_wrap_python``: export ``SWIG_MODULE_{target}_REAL_NAME`` to the parent scope
-* qibuild camke modules:
+* qibuild cmake modules:
+
   * Add ``bfl`` (http://www.orocos.org/bfl)
