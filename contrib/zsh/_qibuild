@@ -36,48 +36,53 @@ _qibuild_commands() {
   return ret
 }
 
-qibuild_projects=(
-"(-a --all -s --single -g --group)"{-a,--all}"[Work on all projects.]"
-"(-s --single -a --all -g --group)"{-s,--single}"[Work on specified projects without taking dependencies into account.]"
-"(-g,--group -a --all -s --single)"{-g=,--group=}"[Specify a group of projects.]:Groups:(($(qisrc list-groups | cut -c3-)))"
-"--use-deps[Force deps resolution.]"
-"--build-deps-only[Work on specified projects by ignoring the runtime deps.]"
-"*:Projects:(($(qibuild list | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
-)
+_arguments_for_qibuild_projects() {
+  $@ \
+  "(-a --all -s --single -g --group)"{-a,--all}"[Work on all projects.]" \
+  "(-s --single -a --all -g --group)"{-s,--single}"[Work on specified projects without taking dependencies into account.]" \
+  "(-g,--group -a --all -s --single)"{-g=,--group=}"[Specify a group of projects.]:Groups:(($(qisrc list-groups | cut -c3-)))" \
+  "--use-deps[Force deps resolution.]" \
+  "--build-deps-only[Work on specified projects by ignoring the runtime deps.]" \
+  "*:Projects:(($(qibuild list | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
+}
 
-qisrc_projects=(
-"(-a --all -s --single -g --group)"{-a,--all}"[Work on all projects.]"
-"(-s --single -a --all -g --group)"{-s,--single}"[Work on specified projects without taking dependencies into account.]"
-"(-g,--group -a --all -s --single)"{-g=,--group=}"[Specify a group of projects.]:Groups:(($(qisrc list-groups | cut -c3-)))"
-"--use-deps[Force deps resolution.]"
-"--build-deps-only[Work on specified projects by ignoring the runtime deps.]"
-"*:Projects:(($(qisrc list | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
-)
+_arguments_for_qisrc_projects() {
+  $@ \
+  "(-a --all -s --single -g --group)"{-a,--all}"[Work on all projects.]" \
+  "(-s --single -a --all -g --group)"{-s,--single}"[Work on specified projects without taking dependencies into account.]" \
+  "(-g,--group -a --all -s --single)"{-g=,--group=}"[Specify a group of projects.]:Groups:(($(qisrc list-groups | cut -c3-)))" \
+  "--use-deps[Force deps resolution.]" \
+  "--build-deps-only[Work on specified projects by ignoring the runtime deps.]" \
+  "*:Projects:(($(qisrc list | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
+}
 
 
-qibuild_configs=(
-"(-c --config)"{-c,--config}"[The configuration to use.]:Configurations:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))"
-)
+_arguments_for_qibuild_configs() {
+  $@ \
+  "(-c --config)"{-c,--config}"[The configuration to use.]:Configurations:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))"
+}
 
-qibuild_logging=(
-"(-v --verbose -q --quiet)"{-v,--verbose}"[Output debug messages.]"
-"(-v --verbose -q --quiet)"{-q,--quiet}"[Only output error messages.]"
-"--time-stamp[Add timestamps before each log message.]"
-"--color=[Colorize output.]:When:((always never auto))"
-"--title=[Update terminal title.]:When:((always never auto))"
-)
+_arguments_for_qibuild_logging() {
+  $@ \
+  "(-v --verbose -q --quiet)"{-v,--verbose}"[Output debug messages.]" \
+  "(-v --verbose -q --quiet)"{-q,--quiet}"[Only output error messages.]" \
+  "--time-stamp[Add timestamps before each log message.]" \
+  "--color=[Colorize output.]:When:((always never auto))" \
+  "--title=[Update terminal title.]:When:((always never auto))"
+}
 
-qibuild_debug=(
-"--backtrace[Display backtrace on error.]"
-"--pdb[Use pdb on error.]"
-)
+_arguments_for_qibuild_debug() {
+  $@ \
+  "--backtrace[Display backtrace on error.]" \
+  "--pdb[Use pdb on error.]"
+}
 
 _qibuild-add-config() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "(-t --toolchain)"{-t,--toolchain}"[The toolchain to use.]:Toolchains:(($(qitoolchain list | grep '^*' | cut -c3-)))" \
     "(-p --profile)"{-p,--profile}"[The profile to use.]:Profiles:(($(qibuild list-profiles | grep "*" | cut -c5-)))" \
     "(-G --cmake-generator)"{-G=,--cmake-generator=}"[The cmake generator to use.]" \
@@ -91,11 +96,11 @@ _qibuild-add-config() {
 _qibuild-clean () {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_projects \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_projects \
-    $qibuild_configs \
-    $qibuild_logging \
-    $qibuild_debug \
     "-z[Remove all build directories that match a known configuration.]" \
     "-x[Remove build directories that do not match any known configuration.]" \
     "(-f --force)"{-f,--force}"[Force the clean.]" \
@@ -107,9 +112,9 @@ _qibuild-clean () {
 _qibuild-config() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "--edit[Edit the configuration.]" \
     "--local[Only display or edit the local configuration.]" \
     "--wizard[Run a wizard to edit the configuration."] \
@@ -119,11 +124,11 @@ _qibuild-config() {
 _qibuild-configure() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_projects \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_projects \
-    $qibuild_configs \
-    $qibuild_logging \
-    $qibuild_debug \
     "--no-clean-first[Do not clean CMake cache]" \
     "--debug-trycompile[Pass --debug-trycompile to CMake call]" \
     "--eff-c++[Activate warnings from the 'Effective C++' book (gcc only)]" \
@@ -143,9 +148,9 @@ _qibuild-configure() {
 _qibuild-convert() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "--project-name=[Name of the project.]:Project name:(($(qibuild list | cut -c5- | cut -d" " -f1)))" \
     "--go[Actually perform file changes.]" \
     "--dry-run[Only print what would be done. This is the default.]" \
@@ -157,11 +162,11 @@ _qibuild-convert() {
 _qibuild-depends() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qibuild_configs \
-    $qibuild_projects \
     "--runtime[Use runtime dependencies only.]" \
     "--reverse[Show projects that depend on the current project.]" \
     "--tree[Output in text tree format showing paths.]" \
@@ -173,11 +178,11 @@ _qibuild-depends() {
 _qibuild-deploy() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qibuild_configs \
-    $qibuild_projects \
     "--url=[Deploy to each given url.]" \
     "--split-debug[Split debug symbols. Enable remote debuging.]" \
     "--with-tests[Also deploy the tests]" \
@@ -187,11 +192,11 @@ _qibuild-deploy() {
 _qibuild-find() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qibuild_configs \
-    $qibuild_projects \
     "--cflags=[Outputs required compiler flags.]" \
     "--libs=[Ouputs required linnker flags.]" \
     "--cmake[Search in cmake cache]" \
@@ -201,10 +206,10 @@ _qibuild-find() {
 _qibuild-foreach() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qibuild_projects \
     "(--continue --ignore-errors)"{--continue,--ignore-errors}"[Continue on error]" \
   && return
 }
@@ -212,29 +217,29 @@ _qibuild-foreach() {
 _qibuild-gen-cmake-module() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
   && return
 }
 
 _qibuild-init() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
   && return
 }
 
 _qibuild-install() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_projects \
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configs \
   _arguments \
-    $qibuild_projects \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qibuild_configs \
     "--prefix=[Value of CMAKE_INSTALL_PREFIX.]" \
     "--runtime[Only install the runtime components.]" \
     "--split-debug[Split debug symbols]" \
@@ -245,9 +250,9 @@ _qibuild-install() {
 _qibuild-list() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "(--paths --names)--names[Sort by names.]" \
     "(--paths --names)--paths[Sort by paths.]" \
   && return
@@ -256,37 +261,37 @@ _qibuild-list() {
 _qibuild-list-binaries() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
   && return
 }
 
 _qibuild-list-configs() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
   && return
 }
 
 _qibuild-list-profiles() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
   && return
 }
 
 _qibuild-make() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configs \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qibuild_configs \
     "(-r --rebuild)"{-r,--rebuild}"[Rebuild.]" \
     "--coverity[Build using cov-build. Ensure you have cov-analysis installed on your machine.]" \
     $qibuild_projects \
@@ -296,31 +301,31 @@ _qibuild-make() {
 _qibuild-open() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qibuild_configs \
-    $qibuild_projects \
   && return
 }
 
 _qibuild-package() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qibuild_configs \
-    $qibuild_projects \
   && return
 }
 
 _qibuild-rm-config() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "*:Configuration name:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
   && return
 }
@@ -328,10 +333,10 @@ _qibuild-rm-config() {
 _qibuild-run() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configs \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qibuild_configs \
     ":Binary:(($(qibuild list-binaries)))" \
   && return
 }
@@ -339,9 +344,9 @@ _qibuild-run() {
 _qibuild-set-default() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "*:Configuration name:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
   && return
 }
@@ -349,21 +354,21 @@ _qibuild-set-default() {
 _qibuild-status() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_projects \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_projects \
-    $qibuild_debug \
   && return
 }
 
 _qibuild-test() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_projects \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configs \
   _arguments \
-    $qibuild_logging \
-    $qibuild_projects \
-    $qibuild_debug \
-    $qibuild_configs \
     "--perf[Run perfs tests instead of pure tests]" \
     "(-k --pattern)"{-k,--pattern}="[Filter tests matching these patterns.]" \
     "-V[Display tests output.]" \
@@ -436,9 +441,9 @@ _qisrc_commands() {
 _qisrc-add() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "--src=[Where to clone the project.]" \
     "(-b --branch)"{-b=,--branch=}"[Branch.]" \
     ": :_files" \
@@ -448,9 +453,9 @@ _qisrc-add() {
 _qisrc-add-group() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     ":Group to add:(($(qisrc list-groups | cut -c3-)))" \
   && return
 }
@@ -458,18 +463,18 @@ _qisrc-add-group() {
 _qisrc-check-manifest() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
   && return
 }
 
 _qisrc-checkout() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "(-f --force)"{-f,--force}"[Discard local changes.]" \
   && return
 }
@@ -477,9 +482,9 @@ _qisrc-checkout() {
 _qisrc-create() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "(-i --input --template-path)"{-i=,--input=,--template-path=}"[Path to the template.]" \
     "--git[Create a git repository.]" \
     "(-o --output)"{-o=,--output=}"[Output of creation.]: :_files" \
@@ -489,20 +494,20 @@ _qisrc-create() {
 _qisrc-diff() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
   && return
 }
 
 _qisrc-foreach() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
     "--git[Consider only the git projects.]" \
     "(-c --continue --ignore-errors)"{-c,--continue,--ignore-errors}"[Continue on error.]" \
   && return
@@ -511,10 +516,10 @@ _qisrc-foreach() {
 _qisrc-grep() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
     "--path=[type of patch to print?]: :((none absolute worktree project))" \
   && return
 }
@@ -522,18 +527,18 @@ _qisrc-grep() {
 _qisrc-info() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
   && return
 }
 
 _qisrc-init() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     ": :_files" \
   && return
 }
@@ -541,9 +546,9 @@ _qisrc-init() {
 _qisrc-list() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "(--names --paths)--names[Sort by names.]" \
     "(--names --paths)--paths[Sort by paths.]" \
   && return
@@ -552,29 +557,29 @@ _qisrc-list() {
 _qisrc-list-groups() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
   && return
 }
 
 _qisrc-log() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
   && return
 }
 
 _qisrc-maintainers() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
     "(--add --list --remove --clear)--add[Add a new maintainer.]" \
     "(--add --list --remove --clear)--list[List all maintainers.]" \
     "(--add --list --remove --clear)--remove[Remove maintainer.]" \
@@ -587,10 +592,10 @@ _qisrc-maintainers() {
 _qisrc-push() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
     {--cc=,--reviewers=}"[Add reviewers (full email or just username if the domain is the same as yours).]" \
     "(-t --topic)"{-t,--topic}"[Add a topic to your code review. Useful for grouping patches together.]" \
   && return
@@ -599,10 +604,10 @@ _qisrc-push() {
 _qisrc-rebase() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
     "--push[Push the rebased branch.]" \
     "--dry-run[Dry run.]" \
     "--force-run[Use push --force.]" \
@@ -612,9 +617,9 @@ _qisrc-rebase() {
 _qisrc-remove() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "--from-disk[Also remove project sources from disk.]" \
   && return
 }
@@ -622,10 +627,10 @@ _qisrc-remove() {
 _qisrc-reset() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
     "(-f --force)"{-f,--force}"[Discard local changes.]" \
     "--tag=[Reset everything to the given tag.]" \
     "--snapshot=[Reset everything using the given snapshot.]" \
@@ -635,10 +640,10 @@ _qisrc-reset() {
 _qisrc-rm-group() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
     ":Group to delete:(($(qisrc list-groups | cut -c3-)))" \
   && return
 }
@@ -646,10 +651,10 @@ _qisrc-rm-group() {
 _qisrc-snapshot() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
     "--deprecated-format[Only used for retro-compatibility.]" \
     ": :_files" \
   && return
@@ -658,10 +663,10 @@ _qisrc-snapshot() {
 _qisrc-status() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
     "(-u --untracked-files)"{-u,--untracked-files}"[Display untracked files.]" \
   && return
 }
@@ -669,10 +674,10 @@ _qisrc-status() {
 _qisrc-sync() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
-    $qisrc_projects \
     "--reset[Do the same as \`qisrc reset --all --force\` after the fetch.]" \
     "--rebase-devel[Rebase development branches.]" \
   && return
@@ -727,9 +732,9 @@ _qitoolchain_commands() {
 _qitoolchain-add-package() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
     "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list | grep '*' | cut -c3-)))" \
     "--name=[The name of the package. Useful for legacy package format.]" \
@@ -740,9 +745,9 @@ _qitoolchain-add-package() {
 _qitoolchain-convert-package() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "--name=[The name of the package. Useful for legacy package format.]" \
     "--batch[Do not prompt for cmake module edition.]" \
     ": :_files" \
@@ -752,9 +757,9 @@ _qitoolchain-convert-package() {
 _qitoolchain-create() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     ": :_files" \
   && return
 }
@@ -762,9 +767,9 @@ _qitoolchain-create() {
 _qitoolchain-extract-package() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "(-o --output)"{-o,--output}"[Where to extract the files.]" \
     ": :_files" \
   && return
@@ -773,9 +778,9 @@ _qitoolchain-extract-package() {
 _qitoolchain-import-package() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
     "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list | grep '*' | cut -c3-)))" \
     "--name=[The name of the package. Useful for legacy package format.]" \
@@ -788,9 +793,9 @@ _qitoolchain-import-package() {
 _qitoolchain-info() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
   && return
 }
@@ -798,18 +803,18 @@ _qitoolchain-info() {
 _qitoolchain-list() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
   && return
 }
 
 _qitoolchain-make-package() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "(-o --output)"{-o,--output}"[Base directory in which to create the archive.]" \
     ": :_files" \
   && return
@@ -818,9 +823,9 @@ _qitoolchain-make-package() {
 _qitoolchain-remove() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
   && return
 }
@@ -829,9 +834,9 @@ _qitoolchain-remove() {
 _qitoolchain-remove-package() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
     "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list | grep '*' | cut -c3-)))" \
   && return
@@ -840,9 +845,9 @@ _qitoolchain-remove-package() {
 _qitoolchain-status() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
   && return
 }
@@ -850,9 +855,9 @@ _qitoolchain-status() {
 _qitoolchain-update() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
   _arguments \
-    $qibuild_logging \
-    $qibuild_debug \
     ': :(($(echo ${XDG_CONFIG_HOME-$HOME/.config}/qi/toolchains/*.xml(.N\:t\:r))))' \
   && return
 }
