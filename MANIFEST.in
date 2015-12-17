@@ -1,6 +1,8 @@
-include etc/qibuild.sh
-include README.rst
+include CONTRIBUTING.rst
 include COPYING
+include INSTALL.rst
+include README.rst
 include doc/source/man/*.rst
-recursive-include python/qisrc/templates *
+include etc/qibuild.sh
 recursive-include cmake/qibuild *
+recursive-include python/qisrc/templates *
