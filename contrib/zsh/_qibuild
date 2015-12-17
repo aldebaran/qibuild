@@ -40,26 +40,26 @@ _arguments_for_qibuild_projects() {
   $@ \
   "(-a --all -s --single -g --group)"{-a,--all}"[Work on all projects.]" \
   "(-s --single -a --all -g --group)"{-s,--single}"[Work on specified projects without taking dependencies into account.]" \
-  "(-g,--group -a --all -s --single)"{-g=,--group=}"[Specify a group of projects.]:Groups:(($(qisrc list-groups | cut -c3-)))" \
+  "(-g,--group -a --all -s --single)"{-g=,--group=}"[Specify a group of projects.]:Groups:(($(qisrc list-groups 2>/dev/null | cut -c3-)))" \
   "--use-deps[Force deps resolution.]" \
   "--build-deps-only[Work on specified projects by ignoring the runtime deps.]" \
-  "*:Projects:(($(qibuild list | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
+  "*:Projects:(($(qibuild list 2>/dev/null | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
 }
 
 _arguments_for_qisrc_projects() {
   $@ \
   "(-a --all -s --single -g --group)"{-a,--all}"[Work on all projects.]" \
   "(-s --single -a --all -g --group)"{-s,--single}"[Work on specified projects without taking dependencies into account.]" \
-  "(-g,--group -a --all -s --single)"{-g=,--group=}"[Specify a group of projects.]:Groups:(($(qisrc list-groups | cut -c3-)))" \
+  "(-g,--group -a --all -s --single)"{-g=,--group=}"[Specify a group of projects.]:Groups:(($(qisrc list-groups 2>/dev/null | cut -c3-)))" \
   "--use-deps[Force deps resolution.]" \
   "--build-deps-only[Work on specified projects by ignoring the runtime deps.]" \
-  "*:Projects:(($(qisrc list | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
+  "*:Projects:(($(qisrc list 2>/dev/null | tail -n +3 | cut -c5- | cut -d' ' -f1)))"
 }
 
 
 _arguments_for_qibuild_configs() {
   $@ \
-  "(-c --config)"{-c,--config}"[The configuration to use.]:Configurations:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))"
+  "(-c --config)"{-c,--config}"[The configuration to use.]:Configurations:(($(qibuild list-configs 2>/dev/null | tail -n +2 | grep "^*" | cut -c3-)))"
 }
 
 _arguments_for_qibuild_logging() {
@@ -83,8 +83,8 @@ _qibuild-add-config() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    "(-t --toolchain)"{-t,--toolchain}"[The toolchain to use.]:Toolchains:(($(qitoolchain list | grep '^*' | cut -c3-)))" \
-    "(-p --profile)"{-p,--profile}"[The profile to use.]:Profiles:(($(qibuild list-profiles | grep "*" | cut -c5-)))" \
+    "(-t --toolchain)"{-t,--toolchain}"[The toolchain to use.]:Toolchains:(($(qitoolchain list 2>/dev/null | grep '^*' | cut -c3-)))" \
+    "(-p --profile)"{-p,--profile}"[The profile to use.]:Profiles:(($(qibuild list-profiles 2>/dev/null | grep "*" | cut -c5-)))" \
     "(-G --cmake-generator)"{-G=,--cmake-generator=}"[The cmake generator to use.]" \
     "--ide=[Ide to use.]" \
     "--default" \
@@ -151,7 +151,7 @@ _qibuild-convert() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    "--project-name=[Name of the project.]:Project name:(($(qibuild list | cut -c5- | cut -d" " -f1)))" \
+    "--project-name=[Name of the project.]:Project name:(($(qibuild list 2>/dev/null | cut -c5- | cut -d" " -f1)))" \
     "--go[Actually perform file changes.]" \
     "--dry-run[Only print what would be done. This is the default.]" \
     "--no-cmake[Do not touch any cmake file. You won't be able to use the qibuild cmake framework.]" \
@@ -326,7 +326,7 @@ _qibuild-rm-config() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    "*:Configuration name:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
+    "*:Configuration name:(($(qibuild list-configs 2>/dev/null | tail -n +2 | grep "^*" | cut -c3-)))" \
   && return
 }
 
@@ -347,7 +347,7 @@ _qibuild-set-default() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    "*:Configuration name:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
+    "*:Configuration name:(($(qibuild list-configs 2>/dev/null | tail -n +2 | grep "^*" | cut -c3-)))" \
   && return
 }
 
@@ -456,7 +456,7 @@ _qisrc-add-group() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    ":Group to add:(($(qisrc list-groups | cut -c3-)))" \
+    ":Group to add:(($(qisrc list-groups 2>/dev/null | cut -c3-)))" \
   && return
 }
 
@@ -644,7 +644,7 @@ _qisrc-rm-group() {
   _arguments_for_qibuild_debug \
   _arguments_for_qisrc_projects \
   _arguments \
-    ":Group to delete:(($(qisrc list-groups | cut -c3-)))" \
+    ":Group to delete:(($(qisrc list-groups 2>/dev/null | cut -c3-)))" \
   && return
 }
 
@@ -735,8 +735,8 @@ _qitoolchain-add-package() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
-    "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list | grep '*' | cut -c3-)))" \
+    "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs 2>/dev/null | tail -n +2 | grep "^*" | cut -c3-)))" \
+    "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list 2>/dev/null | grep '*' | cut -c3-)))" \
     "--name=[The name of the package. Useful for legacy package format.]" \
     ": :_files" \
   && return
@@ -781,8 +781,8 @@ _qitoolchain-import-package() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
-    "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list | grep '*' | cut -c3-)))" \
+    "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs 2>/dev/null | tail -n +2 | grep "^*" | cut -c3-)))" \
+    "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list 2>/dev/null | grep '*' | cut -c3-)))" \
     "--name=[The name of the package. Useful for legacy package format.]" \
     "--batch[Do not prompt for cmake module edition.]" \
     "(-d --destdir)"{-d,--destdir}"[Destination directory of the qiBuild package after conversion.]" \
@@ -796,7 +796,7 @@ _qitoolchain-info() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
+    ": :(($(qitoolchain list 2>/dev/null | grep '*' | cut -c3-)))" \
   && return
 }
 
@@ -826,7 +826,7 @@ _qitoolchain-remove() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
+    ": :(($(qitoolchain list 2>/dev/null | grep '*' | cut -c3-)))" \
   && return
 }
 
@@ -837,8 +837,8 @@ _qitoolchain-remove-package() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs | tail -n +2 | grep "^*" | cut -c3-)))" \
-    "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list | grep '*' | cut -c3-)))" \
+    "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs 2>/dev/null | tail -n +2 | grep "^*" | cut -c3-)))" \
+    "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list 2>/dev/null | grep '*' | cut -c3-)))" \
   && return
 }
 
@@ -848,7 +848,7 @@ _qitoolchain-status() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    ": :(($(qitoolchain list | grep '*' | cut -c3-)))" \
+    ": :(($(qitoolchain list 2>/dev/null | grep '*' | cut -c3-)))" \
   && return
 }
 
