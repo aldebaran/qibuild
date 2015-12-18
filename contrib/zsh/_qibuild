@@ -770,9 +770,11 @@ _qitoolchain_commands() {
   info:'Display a complete description of a toolchain.'
   list:'Display the toolchains names.'
   make-package:'Create a package from a directory.'
+  package-info:'Display info about a toolchain package.'
   remove:'Uninstall a toolchain.'
   remove-package:'Remove a package from a toolchain.'
   status:'Display the toolchains status their names, and what projects they provide.'
+  svn-status:'Display status of subversion packages in the given toolchain.'
   update:'Update every toolchain using the feed that was used to create them.')
 
   integer ret=1
@@ -871,6 +873,18 @@ _qitoolchain-make-package() {
   && return
 }
 
+_qitoolchain-package-info() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments \
+    "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs 2>/dev/null | tail -n +2 | grep "^*" | cut -c3-)))" \
+    "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list 2>/dev/null | grep '*' | cut -c3-)))" \
+    ": :_files" \
+  && return
+}
+
 _qitoolchain-remove() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
@@ -894,6 +908,16 @@ _qitoolchain-remove-package() {
 }
 
 _qitoolchain-status() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments \
+    ": :(($(qitoolchain list 2>/dev/null | grep '*' | cut -c3-)))" \
+  && return
+}
+
+_qitoolchain-svn-status() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
   _arguments_for_qibuild_logging \
