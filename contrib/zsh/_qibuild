@@ -16,6 +16,8 @@ _qibuild_commands() {
   find:'Find a package.'
   foreach:'Run the same command on each buildable project.'
   gen-cmake-module:'Generate a -config.cmake file from the contents of a directory.'
+  get-licenses:'Get the list of all licenses used by the given projects.'
+  info:'Output information about the given project.'
   init:'Initialize a new qibuild worktree.'
   install:'Install a project and its dependencies.'
   list:'List the name and path of every buildable project.'
@@ -23,11 +25,14 @@ _qibuild_commands() {
   list-configs:'List all the known configs.'
   list-profiles:'List the known profiles of the given worktree.'
   make:'Build a project.'
+  make-host-tools:'Build host tools projects.'
   open:'Open a project with an IDE.'
   package:'Generate a binary package, ready to be added in a toolchain.'
   rm-config:'Remove the given build config.'
   run:'Run a package found with qibuild find.'
   set-default:'Set the default build config for the given worktree.'
+  set-host-config:'Set the configuration to be used when building host tools.'
+  sourceme:'Generate and return the path to a suitable "sourceme" file.'
   status:'Display the status of each project.'
   test:'Launch automatic tests -- deprecated, use `qitest run` instead.')
 
@@ -75,6 +80,23 @@ _arguments_for_qibuild_debug() {
   $@ \
   "--backtrace[Display backtrace on error.]" \
   "--pdb[Use pdb on error.]"
+}
+
+_arguments_for_qibuild_configure() {
+  $@ \
+  "--no-clean-first[Do not clean CMake cache]" \
+  "--debug-trycompile[Pass --debug-trycompile to CMake call]" \
+  "--eff-c++[Activate warnings from the 'Effective C++' book (gcc only)]" \
+  "--werror[Treat warnings as error]" \
+  "--profiling[Profile cmake execution]" \
+  "--summarize-options[Summarize build options at the end]" \
+  "--trace-cmake[Run cmake in trace mode]" \
+  "--coverage[Activate coverage support (gcc only)]" \
+  "--32-bits[Force 32 bits build]" \
+  "(--without-debug-info)--with-debug-info[Include debug information in binaries. Overrides --debug]" \
+  "(--with-debug-info)--without-debug-info[Remove debug information from binaries. Overrides --release]" \
+  "(--debug)--release[build in release]" \
+  "(--release)--debug[build in debug, default]" \
 }
 
 _qibuild-add-config() {
@@ -128,20 +150,8 @@ _qibuild-configure() {
   _arguments_for_qibuild_configs \
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configure \
   _arguments \
-    "--no-clean-first[Do not clean CMake cache]" \
-    "--debug-trycompile[Pass --debug-trycompile to CMake call]" \
-    "--eff-c++[Activate warnings from the 'Effective C++' book (gcc only)]" \
-    "--werror[Treat warnings as error]" \
-    "--profiling[Profile cmake execution]" \
-    "--summarize-options[Summarize build options at the end]" \
-    "--trace-cmake[Run cmake in trace mode]" \
-    "--coverage[Activate coverage support (gcc only)]" \
-    "--32-bits[Force 32 bits build]" \
-    "(--without-debug-info)--with-debug-info[Include debug information in binaries. Overrides --debug]" \
-    "(--with-debug-info)--without-debug-info[Remove debug information from binaries. Overrides --release]" \
-    "(--debug)--release[build in release]" \
-    "(--release)--debug[build in debug, default]" \
   && return
 }
 
@@ -223,6 +233,17 @@ _qibuild-gen-cmake-module() {
   && return
 }
 
+_qibuild-get-licenses() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_projects \
+  _arguments_for_qibuild_configs \
+  _arguments \
+  && return
+}
+
 _qibuild-init() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
@@ -298,6 +319,17 @@ _qibuild-make() {
   && return
 }
 
+_qibuild-make-host-tools() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_configure \
+  _arguments \
+  && return
+}
+
 _qibuild-open() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
@@ -348,6 +380,25 @@ _qibuild-set-default() {
   _arguments_for_qibuild_debug \
   _arguments \
     "*:Configuration name:(($(qibuild list-configs 2>/dev/null | tail -n +2 | grep "^*" | cut -c3-)))" \
+  && return
+}
+
+_qibuild-set-host-config() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_debug \
+  _arguments \
+  && return
+}
+
+_qibuild-sourceme() {
+  local curcontext=$curcontext state line ret=1
+  declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_projects \
+  _arguments_for_qibuild_configs \
+  _arguments \
   && return
 }
 
