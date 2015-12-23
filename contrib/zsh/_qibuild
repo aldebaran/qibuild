@@ -507,7 +507,7 @@ _qisrc-add-group() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
-    ":Group to add:(($(qisrc list-groups 2>/dev/null | cut -c3-)))" \
+    ":Group to add:(($(qisrc list-groups 2>/dev/null | grep -v "^\*" | cut -c3-)))" \
   && return
 }
 
@@ -695,7 +695,7 @@ _qisrc-rm-group() {
   _arguments_for_qibuild_debug \
   _arguments_for_qisrc_projects \
   _arguments \
-    ":Group to delete:(($(qisrc list-groups 2>/dev/null | cut -c3-)))" \
+    ":Group to delete:(($(qisrc list-groups 2>/dev/null | grep "^\*" | cut -c3-)))" \
   && return
 }
 
