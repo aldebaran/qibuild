@@ -517,6 +517,7 @@ _qisrc-check-manifest() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
+  ": :_files" \
   && return
 }
 
