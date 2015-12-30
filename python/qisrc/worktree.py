@@ -193,13 +193,14 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         qisys.sh.mkdir(git_project.path, recursive=True)
         git = qisrc.git.Git(git_project.path)
         remote_name = repo.default_remote.name
-        try:
+        with git.transaction() as transaction:
             git.init()
             git.remote("add", remote_name, clone_url)
             git.fetch(remote_name, "--quiet")
             git.checkout("-b", branch, "%s/%s" % (remote_name, branch))
-        except:
+        if not transaction.ok:
             ui.error("Cloning repo failed")
+            ui.error(transaction.output)
             if git.is_empty():
                 qisys.sh.rm(git_project.path)
             self.worktree.remove_project(repo.src)
