@@ -299,6 +299,10 @@ class TestGit(qisrc.git.Git):
         """ Read the contents of a file """
         return self.root.join(path).read()
 
+    def write_file(self, path, contents):
+        """ Write the given contents to the file """
+        self.root.join(path).write(contents)
+
     def commit_file(self, path, contents, message=None):
         """ Commit a file. Path will be created if it does not exits """
         file_path = self.root.join(path)
