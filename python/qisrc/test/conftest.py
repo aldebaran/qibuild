@@ -254,6 +254,13 @@ class TestGitServer(object):
         else:
             git.push("origin", "--force", "%s:%s" % (branch, branch))
 
+    def push_tag(self, project, tag_name):
+        src = project.replace(".git", "")
+        repo_src = self.src.join(src)
+        git = qisrc.git.Git(repo_src.strpath)
+        git.call("tag", tag_name)
+        git.push("origin", tag_name)
+
     def delete_file(self, project, filename):
         """ Delete a file from the repository """
         src = project.replace(".git", "")
