@@ -18,6 +18,7 @@ class GitProject(object):
         self.branches = list()
         self.remotes = list()
         self.review = False
+        self.fixed_ref = None
 
     def load_xml(self, xml_elem):
         parser = GitProjectParser(self)
@@ -160,6 +161,10 @@ class GitProject(object):
             # simply set self.review to False so that `qisrc push`
             # does not try to push to gerrit
             self.review = False
+        if repo.fixed_ref:
+            if not self.fixed_ref:
+                ui.warning("Now using fixed ref:", repo.fixed_ref)
+            self.fixed_ref = repo.fixed_ref
 
     def sync(self, rebase_devel=False, **kwargs):
         """ Synchronize remote changes with the underlying git repository
@@ -179,6 +184,9 @@ class GitProject(object):
         if rc != 0:
             return False, "fetch failed\n" + out
 
+        if self.fixed_ref:
+            return self.safe_reset_ref(self.fixed_ref)
+
         current_branch = git.get_current_branch()
         if not current_branch:
             return None, "Not on any branch"
@@ -192,6 +200,18 @@ class GitProject(object):
 
         # Here current_branch == branch.name
         return git.sync_branch(branch, fetch_first=False)
+
+    def safe_reset_ref(self, ref):
+        """ Read a fixed ref from the remote config.
+        Make sure to not discard any local changes
+
+        """
+        git = qisrc.git.Git(self.path)
+        ok, mess = git.require_clean_worktree()
+        if not ok:
+            return None, "Skipped: " + mess
+        ok, mess = qisrc.reset.clever_reset_ref(self, ref, raises=False)
+        return ok, mess
 
     def reset(self):
         """ Same as sync, but discard any local changes

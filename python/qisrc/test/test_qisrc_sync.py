@@ -350,3 +350,45 @@ def test_removing_group_keep_warning_user(qisrc_action, git_server,
     record_messages.reset()
     qisrc_action("sync")
     assert record_messages.find("Group foo not found in the manifest")
+
+def test_switching_to_fixed_ref_happy(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.push_file("foo.git", "b.txt", "b")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    qisrc_action("sync")
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = qisrc.git.Git(foo_proj.path)
+    actual = git.get_ref_sha1("refs/heads/master")
+    expected = git.get_ref_sha1("refs/tags/v0.1")
+    assert actual == expected
+    # qisrc.reset.clever_reset_ref should do nothing, so there should be
+    # no output
+    record_messages.reset()
+    qisrc_action("sync")
+    assert not record_messages.find("HEAD is now at")
+
+def test_fixed_ref_local_changes(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    git.write_file("a.txt", "unstaged changes")
+    git_server.push_tag("foo.git", "v.01")
+    record_messages.reset()
+    rc = qisrc_action("sync", retcode=True)
+    assert rc != 0
+    assert record_messages.find("unstaged changes")
+
+def test_fixed_ref_no_such_ref(qisrc_action, git_server, record_messages):
+    git_server.create_repo("foo.git")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    rc = qisrc_action("sync", retcode=True)
+    assert rc != 0
+    assert record_messages.find("Could not parse v0.1 as a valid ref")
