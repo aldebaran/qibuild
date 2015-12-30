@@ -225,6 +225,14 @@ class TestGitServer(object):
         self.push_manifest("%s on %s" % (repo.project, new_branch))
         self.manifest.load()
 
+    def set_fixed_ref(self, project, ref):
+        repo = self.get_repo(project)
+        repo.fixed_ref = ref
+        repo.default_branch = None
+        self.manifest.dump()
+        self.push_manifest("%s using fixed ref %s" % (repo.project, ref))
+        self.manifest.load()
+
     def push_file(self, project, filename, contents,
                   branch="master", fast_forward=True,
                   message=None):

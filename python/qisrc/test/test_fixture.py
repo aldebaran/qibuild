@@ -111,6 +111,13 @@ def test_push_tags(git_server, tmpdir):
         foo_git.read_file("b.txt")
     assert foo_git.read_file("a.txt") == "a"
 
+def test_fixed_ref(git_server, tmpdir):
+    git_server.create_repo("foo.git")
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    foo_repo = git_server.get_repo("foo.git")
+    assert foo_repo.default_branch is None
+    assert foo_repo.fixed_ref == "v0.1"
+
 def test_create_svn_repo(svn_server, tmpdir):
     foo_url = svn_server.create_repo("foo")
     work = tmpdir.mkdir("work")

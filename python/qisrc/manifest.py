@@ -109,6 +109,8 @@ Found two projects sharing the same sources:
             return
         remote = copy.copy(matching_remote)
         remote.url = matching_remote.prefix + repo.project
+        # Default branch can be set on the remote, or even
+        # on the manifest itself
         if repo.default_branch is None:
             if self.default_branch:
                 repo.default_branch = self.default_branch
@@ -116,6 +118,10 @@ Found two projects sharing the same sources:
                 repo.default_branch = remote.default_branch
         if remote.name == repo.default_remote_name:
             remote.default = True
+        # Make sure default_branch is None, even if it was
+        # set from the remote or the manifest
+        if repo.fixed_ref:
+            repo.default_branch = None
         repo.remotes.append(remote)
 
     def dump(self):
@@ -232,6 +238,7 @@ class RepoConfig(object):
         self.src = None
         self.project = None
         self.default_branch = None
+        self.fixed_ref = None
         self.default_remote_name = None
         self.remotes = list()
         self.remote_names = None
@@ -270,8 +277,9 @@ class RepoConfig(object):
         if self.default_branch:
             res += " default: %s" % self.default_branch
         if self.review:
-
             res += " (review)"
+        if self.fixed_ref:
+            res += " on %s" % self.fixed_ref
         res += ">"
         return res
 
@@ -344,6 +352,7 @@ class RepoConfigParser(qisys.qixml.XMLParser):
         self.target.src = src
 
         self.target.default_branch = self._root.get("branch")
+        self.target.fixed_ref = self._root.get("ref")
         remote_names = self._root.get("remotes")
         if remote_names is None:
             raise ManifestError("Missing 'remotes' attribute")
@@ -363,10 +372,13 @@ class RepoConfigParser(qisys.qixml.XMLParser):
             upstream_remote.url = url
             self.target.remotes.append(upstream_remote)
 
-
-
     def _write_remote_names(self, elem):
         elem.set("remotes", " ".join(self.target.remote_names))
 
+    def _write_fixed_ref(self, elem):
+        if self.target.fixed_ref:
+            elem.set("ref", self.target.fixed_ref)
+
     def _write_default_branch(self, elem):
-        elem.set("branch", self.target.default_branch)
+        if self.target.default_branch:
+            elem.set("branch", self.target.default_branch)
