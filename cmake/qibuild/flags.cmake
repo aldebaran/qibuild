@@ -61,10 +61,9 @@ macro(qi_sanitize_compile_flags)
     if(QI_WERROR)
       add_definitions("/WX")
     endif()
-  endif()
 
   # gcc or clang:
-  if(UNIX OR MINGW)
+  elseif(UNIX OR MINGW)
     # Use 'standard': c89 and c++98
 
     # doesn't work: bug #7215
