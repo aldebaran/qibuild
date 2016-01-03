@@ -61,7 +61,11 @@ def do(args):
             continue
         if not git_project.default_branch:
             if git_project.fixed_ref:
-                qisrc.reset.clever_reset_ref(git_project, git_project.fixed_ref)
+                ok, mess = qisrc.reset.clever_reset_ref(
+                        git_project, git_project.fixed_ref, raises=False)
+                if not ok:
+                    errors.append(src)
+                    ui.error(mess)
                 continue
             else:
                 ui.warning(git_project.src, "not in manifest, skipping")
