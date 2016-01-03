@@ -331,6 +331,23 @@ def test_fixed_ref(tmpdir):
     assert foo.default_branch is None
     assert foo.fixed_ref == "v0.1"
 
+def test_fixed_ref_and_branch_are_exclusive(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="foo/bar.git"
+        src="lib/bar"
+        remotes="origin"
+        ref="v0.1"
+        branch="master" />
+</manifest>
+""")
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception)as e:
+        qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert "'branch' and 'ref' are mutually exclusive" in e.value.args[0]
+
 def test_from_git_repo(git_server):
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")

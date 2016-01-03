@@ -353,6 +353,10 @@ class RepoConfigParser(qisys.qixml.XMLParser):
 
         self.target.default_branch = self._root.get("branch")
         self.target.fixed_ref = self._root.get("ref")
+        if self.target.fixed_ref and self.target.default_branch:
+            mess = "Error when parsing project %s\n" % self.target.project
+            mess += "'branch' and 'ref' are mutually exclusive"
+            raise ManifestError(mess)
         remote_names = self._root.get("remotes")
         if remote_names is None:
             raise ManifestError("Missing 'remotes' attribute")
