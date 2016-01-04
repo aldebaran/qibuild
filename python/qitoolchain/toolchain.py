@@ -5,6 +5,7 @@ import os
 
 from qisys import ui
 import qisys.sh
+import qisrc.git
 import qitoolchain.database
 
 class Toolchain(object):
@@ -153,9 +154,21 @@ Incorrect database configuration in %s: no path for package %s
         return not self.__eq__(other)
 
     def __str__(self):
+        git_path = qisys.sh.get_share_path("qi", "toolchains", self.name + ".git")
+        sha1 = None
+        if os.path.exists(git_path):
+            git = qisrc.git.Git(git_path)
+            _, sha1 = git.call("rev-parse", "HEAD", raises=False)
         res  = "Toolchain %s\n" % self.name
         if self.feed_url:
-            res += "Using feed from %s\n" % self.feed_url
+            res += "Using feed from %s" % self.feed_url
+            if self.feed_name:
+                res += " (feeds/%s.xml)"% self.feed_name
+            if self.feed_branch:
+                res += " on %s" % self.feed_branch
+            if sha1:
+                res += " - %s" % sha1[:8]
+            res += "\n"
         else:
             res += "No feed\n"
         if self.packages:

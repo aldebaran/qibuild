@@ -3,8 +3,12 @@
 ## found in the COPYING file.
 import os
 
+from qisys import ui
+import qisrc.git
 import qitoolchain.toolchain
+
 from qisrc.test.conftest import svn_server
+from qisrc.test.conftest import git_server
 
 def get_tc_file_contents(tc):
     """ get the contents of the toolchain file of a toolchain
@@ -105,3 +109,26 @@ def test_sysroot(tmpdir):
     path = toolchain.get_package("ctc").path
     assert toolchain.get_sysroot() == os.path.join(path, "sysroot")
     assert toolchain.get_cross_gdb() == os.path.join(path, "cross-gdb")
+
+def test_displays_git_info(tmpdir, git_server, feed, qitoolchain_action):
+    boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")
+    feed.add_package(boost_package)
+    git_server.create_repo("toolchains.git")
+    git_server.change_branch("toolchains.git", "devel")
+    git_server.push_file("toolchains.git", "feeds/bar.xml", feed.feed_xml.read(),
+                         branch="devel")
+
+    feed_url = git_server.get_repo("toolchains.git").clone_url
+
+    git = qisrc.git.Git(tmpdir.strpath)
+    _, out = git.call("ls-remote", feed_url, "devel", raises=False)
+    devel_sha1 = out.split()[0][:8]
+
+    qitoolchain_action("create", "--name", "bar", "--branch", "devel", "foo", feed_url)
+    foo_tc = qitoolchain.get_toolchain("foo")
+    as_str = str(foo_tc)
+    print as_str
+    assert "on devel" in as_str
+    assert "(feeds/bar.xml)" in as_str
+    assert "from %s" % feed_url in as_str
+    assert devel_sha1 in as_str
