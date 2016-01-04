@@ -87,6 +87,13 @@ qipkg
       qipkg make-package foo.pml
       qipkg deploy-package foo-0.1.pkg --url user@host
 
+
+qipy
+----
+
+* Fix creating ``virtualenv`` with access to global site-packages
+  (regression since ``3.10``)
+
 qisrc
 -----
 

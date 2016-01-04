@@ -35,8 +35,8 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         virtualenv_py = virtualenv_py[:-1]
     cmd = [python_executable, virtualenv_py]
     cmd.append(venv_path)
-    if not site_packages:
-        cmd.append("--no-site-packages")
+    if site_packages:
+        cmd.append("--system-site-packages")
     try:
         qisys.command.call(cmd, env=env)
     except qisys.command.CommandFailedException:
