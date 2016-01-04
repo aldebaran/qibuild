@@ -254,6 +254,8 @@ def new_build_project(build_worktree, project):
     build_project.version = qibuild_elem.get("version", "0.1")
     qibuild.deps.read_deps_from_xml(build_project, qibuild_elem)
 
+    build_project.meta = qisys.qixml.parse_bool_attr(qibuild_elem, "meta")
+
     return build_project
 
 

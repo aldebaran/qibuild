@@ -1,0 +1,19 @@
+v3.12
+======
+
+qibuild
+--------
+
+* Add support for meta projects, that is a project that only has dependencies
+  to other projects, but no source code or ``CMakeLists.txt``
+
+  To create a ``meta`` project, use a ``meta`` attribute in the ``qiproject.xml``,
+  like so:
+
+  .. code-block:: xml
+
+      <project version="3">
+        <qibuild name="foo" meta="true">
+          <depends runtime="true" names="bar baz" >
+        </qibuild>
+      </project>

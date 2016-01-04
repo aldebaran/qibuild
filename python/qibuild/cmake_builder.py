@@ -69,7 +69,7 @@ class CMakeBuilder(AbstractBuilder):
         def new_func(self, *args, **kwargs):
             projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
             for project in projects:
-                if not os.path.exists(project.cmake_cache):
+                if not os.path.exists(project.cmake_cache) and not project.meta:
                     raise NotConfigured(project)
             # pylint: disable-msg=E1102
             res = func(self, *args, **kwargs)
@@ -88,7 +88,8 @@ class CMakeBuilder(AbstractBuilder):
         for project in projects:
             sdk_dirs = self.get_sdk_dirs_for_project(project)
             host_dirs = self.get_host_dirs(project)
-            project.write_dependencies_cmake(sdk_dirs, host_dirs=host_dirs)
+            if not project.meta:
+                project.write_dependencies_cmake(sdk_dirs, host_dirs=host_dirs)
 
         qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
         if self.toolchain:
@@ -98,7 +99,8 @@ class CMakeBuilder(AbstractBuilder):
         # all the dependencies
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         for project in projects:
-            write_qi_path_conf(project.sdk_directory, qi_path_sdk_dirs)
+            if not project.meta:
+                write_qi_path_conf(project.sdk_directory, qi_path_sdk_dirs)
 
         # also write a path.conf in the .qi directory
         write_qi_path_conf(self.build_worktree.dot_qi, qi_path_sdk_dirs, sdk_layout=False)
@@ -170,6 +172,9 @@ Or configure the project with no config
             ui.info_count(i, len(projects),
                           ui.green, "Configuring",
                           ui.blue, project.name)
+            if project.meta:
+                ui.info("Meta project, skipping configure")
+                continue
             project.configure(**kwargs)
 
     @need_configure
@@ -177,12 +182,13 @@ Or configure the project with no config
         """ Build the projects in the correct order """
         projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         for i, project in enumerate(projects):
-            ui.info_count(i, len(projects),
-                          ui.green, "Building",
-                          ui.blue, project.name,
-                          ui.green, "in",
-                          ui.blue, project.build_type,
-                          update_title=True)
+            mess = [ui.green, "Building", ui.blue, project.name]
+            if project.build_type:
+                mess.extend(["in", ui.blue, project.build_type])
+            ui.info_count(i, len(projects), *mess, update_title=True)
+            if project.meta:
+                ui.info("Meta project, skipping build")
+                continue
             self.pre_build(project)
             project.build(**kwargs)
 
@@ -244,6 +250,9 @@ Or configure the project with no config
                             ui.green, "Installing",
                             ui.blue, project.name,
                             update_title=True)
+                if project.meta:
+                    ui.info("Meta project, skipping install")
+                    continue
                 files = project.install(dest_dir, **kwargs)
                 installed.extend(files)
         return installed
@@ -310,6 +319,9 @@ Or configure the project with no config
                     ui.green, "Deploying project", ui.blue, project.name,
                     ui.green, "to", ui.blue, url.as_string,
                     update_title=True)
+            if project.meta:
+                ui.info("Meta project, skipping deploy")
+                continue
 
             if with_tests:
                 to_deploy.append("qitest.json")

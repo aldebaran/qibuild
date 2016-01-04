@@ -265,3 +265,18 @@ def test_install_path_conf(qibuild_action, tmpdir):
     qibuild_action("make", "installme")
     qibuild_action("install", "installme", tmpdir.strpath)
     assert tmpdir.join("share", "qi", "path.conf").check(file=True)
+
+def test_meta(qibuild_action, tmpdir):
+    dest = tmpdir.join("dest")
+    top_proj = qibuild_action.add_test_project("meta/top")
+    qibuild_action.add_test_project("meta/spam")
+    qibuild_action.add_test_project("meta/eggs")
+    qibuild_action("configure", "top")
+    qibuild_action("make", "top")
+    qibuild_action("install", "--runtime", "top", dest.strpath)
+    assert dest.join("bin/spam").check(file=1)
+    assert dest.join("bin/eggs").check(file=1)
+
+    # Make sure no file has been created in the meta project sources:
+    contents = qisys.sh.ls_r(top_proj.path)
+    assert contents == ["qiproject.xml"]

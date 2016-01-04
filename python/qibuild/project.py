@@ -70,6 +70,7 @@ class BuildProject(object):
         self.run_depends = set()
         self.test_depends = set()
         self.host_depends = set()
+        self.meta = False
 
     @property
     def name(self):
@@ -157,6 +158,8 @@ class BuildProject(object):
 
     @property
     def build_type(self):
+        if self.meta:
+            return None
         default = self.build_config.build_type
         return qibuild.cmake.get_cached_var(self.build_directory,
                                             "CMAKE_BUILD_TYPE",

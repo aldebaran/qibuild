@@ -1,0 +1,5 @@
+<project version="3">
+  <qibuild name="top" meta="true">
+    <depends runtime="true" names="eggs spam" />
+  </qibuild>
+</project>

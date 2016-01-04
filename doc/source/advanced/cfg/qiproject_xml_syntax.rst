@@ -99,6 +99,19 @@ Here runtime dependencies are ``foo,`` ``bar`` and ``spam``, and buildtime
 dependencies are just ``foo`` and ``bar``.
 There is a host dependency on ``eggs``.
 
+You can also define ``meta`` projects. Those are projects that contains no
+source code or ``CMakeLists.txt``, but have dependencies to other projects.
+
+For instance:
+
+.. code-block:: xml
+
+    <project version="3">
+      <qibuild name="foo" meta="true">
+        <depends runtime="true" names="bar baz" >
+      </qibuild>
+    </project>
+
 qilinguist
 ----------
 
