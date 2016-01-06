@@ -16,9 +16,14 @@ def configure_parser(parser):
 def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
     manifest = git_worktree.manifest
-    ui.info(ui.green, "Manifest configured for",
-            ui.reset, ui.bold, git_worktree.root, "\n",
-            ui.reset, "url:   ", ui.bold, manifest.url, "\n",
-            ui.reset, "branch:", ui.bold, manifest.branch)
+    if manifest.url:
+        ui.info(ui.green, "Manifest configured for",
+                ui.reset, ui.bold, git_worktree.root, "\n",
+                ui.reset, "url:   ", ui.bold, manifest.url, "\n",
+                ui.reset, "branch:", ui.bold, manifest.branch)
+    else:
+        ui.info(ui.brown, "[WARN ]: No manifest configured",
+                   "Use qisrc init <MANIFEST_URL> to add a manifest to this worktree",
+                   sep="\n")
     if manifest.groups:
         ui.info(ui.reset, "groups:", ui.bold, ", ".join(manifest.groups))

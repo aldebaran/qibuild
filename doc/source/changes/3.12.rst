@@ -41,3 +41,5 @@ qisrc
 
   For instance, to push everything but the last commit, you can use
   ``qisrc push HEAD~1:master``
+
+* Fix ``qisrc info`` when there is no manifest
