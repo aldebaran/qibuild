@@ -30,3 +30,12 @@ def test_repeat_until_fail(tmpdir, qitest_action):
     rc = qitest_action("run", "--repeat-until-fail", "2",
                        cwd=tmpdir.strpath, retcode=True)
     assert rc != 0
+
+def test_action_coverage(qibuild_action, qitest_action):
+    gcovr = qisys.command.find_program("gcovr", raises=False)
+    if not gcovr:
+        return
+    qibuild_action.add_test_project("cov")
+    qibuild_action("configure", "cov", "--coverage")
+    qibuild_action("make", "cov")
+    qitest_action("run", "cov", "--coverage")

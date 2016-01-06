@@ -60,11 +60,6 @@ def get_test_runner(args, build_project=None, qitest_json=None):
         if build_project:
             test_project = build_project.to_test_project()
 
-    if args.coverage and not build_project:
-        raise Exception("""\
---coverage can only be used from a qibuild CMake project
-""")
-
     if not test_project:
         return
 
@@ -90,21 +85,8 @@ def get_test_runner(args, build_project=None, qitest_json=None):
 
     return test_runner
 
-def get_test_runners(args):
+def parse_build_projects(args):
     res = list()
-    qitest_jsons = args.qitest_jsons or list()
-
-    # first case: qitest.json in current working directory
-    test_runner = get_test_runner(args)
-    if test_runner:
-        res.append(test_runner)
-
-    # second case: qitest.json specified with --qitest-json
-    for qitest_json in qitest_jsons:
-        test_runner = get_test_runner(args, qitest_json=qitest_json)
-        res.append(test_runner)
-
-    # third case: parsing build projects
     try:
         build_worktree = qibuild.parsers.get_build_worktree(args)
         solve_deps = False
@@ -120,14 +102,41 @@ def get_test_runners(args):
             except qibuild.project.NoQiTestJson:
                 pass
             if test_runner:
-                # avoid appending a test_runner guessed from a build project
-                # when res already contains a test runner computed from a
-                # --qitest-json argument
-                known_cwds = [x.cwd for x in res]
-                if not test_runner.cwd in known_cwds:
-                    res.append(test_runner)
+                res.append(test_runner)
     except (qisys.worktree.NotInWorkTree, qibuild.parsers.CouldNotGuessProjectName):
         pass
+    return res
+
+def get_test_runners(args):
+    res = list()
+    qitest_jsons = args.qitest_jsons or list()
+
+    # first case: qitest.json in current working directory
+    test_runner = get_test_runner(args)
+    if test_runner:
+        res.append(test_runner)
+
+    # second case: qitest.json specified with --qitest-json
+    for qitest_json in qitest_jsons:
+        test_runner = get_test_runner(args, qitest_json=qitest_json)
+        res.append(test_runner)
+
+    # third case: parsing build projects
+    build_projects_runners = parse_build_projects(args)
+    # avoid appending a test_runner guessed from a build project
+    # when res already contains a test runner computed from a
+    # --qitest-json argument
+    known_cwds = [x.cwd for x in res]
+    for test_runner in build_projects_runners:
+        if not test_runner.cwd in known_cwds:
+            res.append(test_runner)
+
+    if args.coverage and not build_projects_runners:
+        raise Exception("""\
+--coverage can only be used from a qibuild CMake project
+""")
+    elif args.coverage:
+        return build_projects_runners
 
     if not res:
         raise Exception("Nothing found to test")
