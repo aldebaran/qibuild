@@ -1,3 +1,6 @@
+## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
 import qisrc.svn
 
 def test_commit_all_adds_new_subfolders(svn_server, tmpdir):

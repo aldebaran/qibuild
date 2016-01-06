@@ -1,8 +1,6 @@
-
-
+## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
+## Use of this source code is governed by a BSD-style license that can be
+## found in the COPYING file.
 
 add_subdirectory("target")
-
-#add_subdirectory("submodule")
-#add_subdirectory("uselib")
 add_subdirectory("install")
