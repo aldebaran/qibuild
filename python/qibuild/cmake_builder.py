@@ -107,15 +107,14 @@ class CMakeBuilder(AbstractBuilder):
 
     def get_sdk_dirs_for_project(self, project):
         sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "test"])
-        # remove this when all qiproject.xml have been fixed
-        strict_mode = os.environ.get("QIBUILD_STRICT_DEPS_RESOLUTION")
-        if strict_mode:
-            packages = self.deps_solver.get_dep_packages([project], ["build"])
-        else:
+        loose_mode = os.environ.get("QIBUILD_LOOSE_DEPS_RESOLUTION")
+        if loose_mode:
             if self.toolchain:
                 packages = self.toolchain.packages
             else:
                 packages = list()
+        else:
+            packages = self.deps_solver.get_dep_packages([project], ["build"])
         sdk_dirs.extend([package.path for package in packages])
         return sdk_dirs
 

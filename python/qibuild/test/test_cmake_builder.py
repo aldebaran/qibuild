@@ -2,6 +2,8 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import os
+
 import qibuild.cmake_builder
 import qibuild.config
 import qibuild.parsers
@@ -69,9 +71,10 @@ def test_add_package_paths_from_toolchain(build_worktree, toolchains, monkeypatc
     naoqi_proj = build_worktree.create_project("naoqi", build_depends=["libqi"])
     build_worktree.set_active_config("test")
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, [naoqi_proj])
+    os.environ["QIBUILD_LOOSE_DEPS_RESOLUTION"] = "ON"
     sdk_dirs = cmake_builder.get_sdk_dirs_for_project(naoqi_proj)
     assert sdk_dirs == [boost_package.path, qi_package.path, pthread_package.path]
-    monkeypatch.setenv("QIBUILD_STRICT_DEPS_RESOLUTION", "ON")
+    del os.environ["QIBUILD_LOOSE_DEPS_RESOLUTION"]
     sdk_dirs = cmake_builder.get_sdk_dirs_for_project(naoqi_proj)
     assert sdk_dirs == [boost_package.path, qi_package.path]
 
