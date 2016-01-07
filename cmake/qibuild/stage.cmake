@@ -307,7 +307,8 @@ endfunction()
 #       foo.h
 #   share
 #     cmake
-#       foo-config.cmake
+#       foo
+#         foo-config.cmake
 #
 # \arg:path: the path to the pre-compiled SDK
 function(qi_add_bin_sdk path)
