@@ -30,5 +30,6 @@ endif()
 qi_install_python("py")
 
 # test
+qi_create_test(test_foo test_foo.cpp)
 qi_create_test_lib(foo foo.cpp)
 qi_install_test_data(test_data.dat)

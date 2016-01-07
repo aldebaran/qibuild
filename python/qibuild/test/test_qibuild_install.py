@@ -53,7 +53,6 @@ def test_running_from_install_dir_dep_in_toolchain(cd_to_tmpdir):
     hello = qibuild.find.find_bin([prefix.strpath], "hello")
     qisys.command.call([hello])
 
-
 def test_devel_components_installed_by_default(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
@@ -280,3 +279,15 @@ def test_meta(qibuild_action, tmpdir):
     # Make sure no file has been created in the meta project sources:
     contents = qisys.sh.ls_r(top_proj.path)
     assert contents == ["qiproject.xml"]
+
+def test_installing_tests(qibuild_action, tmpdir):
+    dest = tmpdir.join("dest")
+    qibuild_action.add_test_project("installme")
+    qibuild_action("configure", "installme")
+    qibuild_action("make", "installme")
+    qibuild_action("install", "installme", dest.strpath)
+    contents = qisys.sh.ls_r(dest.strpath)
+    assert not "bin/test_foo" in contents
+    qibuild_action("install", "--with-tests", "installme", dest.strpath)
+    contents = qisys.sh.ls_r(dest.strpath)
+    assert "bin/test_foo" in contents

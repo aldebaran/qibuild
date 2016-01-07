@@ -47,7 +47,7 @@ def do(args):
         if args.with_tests:
             components = ["test", "runtime"]
         else:
-            components = None
+            components = ["devel", "runtime"]
     else:
         if "build" in args.dep_types:
             components.append("devel")

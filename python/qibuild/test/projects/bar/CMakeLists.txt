@@ -12,8 +12,9 @@ configure_file(run_foo_tool.in.cmake
  ${CMAKE_CURRENT_BINARY_DIR}/run_foo_tool.cmake)
 
 install(SCRIPT
- ${CMAKE_CURRENT_BINARY_DIR}/run_foo_tool.cmake)
+ ${CMAKE_CURRENT_BINARY_DIR}/run_foo_tool.cmake
+ COMPONENT runtime)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/foo.out
   DESTINATION "share/foo"
-  COMPONENT data)
+  COMPONENT runtime)

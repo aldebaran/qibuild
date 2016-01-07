@@ -27,7 +27,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/compile_data.in.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/compile_data.cmake
                @ONLY)
 
-install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/compile_data.cmake)
+install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/compile_data.cmake
+  COMPONENT runtime)
 
 qi_install_data(
   "${CMAKE_CURRENT_BINARY_DIR}/foo.out")
