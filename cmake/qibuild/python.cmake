@@ -17,7 +17,7 @@ endif()
 set(_QI_PYTHON_CMAKE TRUE)
 
 
-find_program(PYTHON2_EXECUTABLE NAMES python2 python)
+find_program(PYTHON2_EXECUTABLE NAMES python2 python NO_CMAKE_PATH)
 
 function(_set_qibuild_python_path)
   if(WIN32)
