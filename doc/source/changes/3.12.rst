@@ -146,6 +146,8 @@ qisrc
 
 * ``qisrc push``: add ``-d, --draft`` option to push drafts to ``gerrit``
 
+* ``qisrc diff``, ``qisrc log``: better output when branches have diverged
+
 cmake
 -----
 

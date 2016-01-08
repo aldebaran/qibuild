@@ -11,6 +11,8 @@ def configure_parser(parser):
     qisys.parsers.project_parser(parser)
     qisrc.parsers.worktree_parser(parser)
     parser.add_argument("branch")
+    parser.add_argument("--patch", action="store_true",
+                        help="Display full diff. Default is just the stats")
 
 def do(args):
     branch = args.branch
@@ -18,5 +20,8 @@ def do(args):
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
                                                   default_all=False,
                                                   use_build_deps=True)
-    qisrc.diff.diff_worktree(git_worktree, git_projects, branch,
-                             cmd=["diff", "--stat"])
+    if args.patch:
+        cmd = ["diff"]
+    else:
+        cmd = ["diff", "--stat"]
+    qisrc.diff.diff_worktree(git_worktree, git_projects, branch, cmd=cmd)

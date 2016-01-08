@@ -27,7 +27,7 @@ def do(args):
         # We need to build different format strings depending
         # on the --color option
         colors = ["green", "reset", "yellow", "reset", "bold blue", "reset"]
-        log_format = "{}%h{} - {}%d{} %s {}<%an>{}"
+        log_format = "%m {}%h{} - {}%d{} %s {}<%an>{}"
         if ui.config_color(sys.stdout):
             log_format = log_format.format(*("%C({})".format(x) for x in colors))
         else:

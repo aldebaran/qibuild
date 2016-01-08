@@ -46,3 +46,17 @@ def test_skips_when_no_diff(git_server, qisrc_action, record_messages):
     qisrc_action("log", "--all", "master")
     assert record_messages.find("repo_foo")
     assert not record_messages.find("repo_bar")
+
+def test_display_markers_when_diverged(git_server, qisrc_action, record_messages):
+    git_server.create_repo("foo.git")
+    git_server.switch_manifest_branch("devel")
+    git_server.change_branch("foo.git", "devel")
+    git_server.push_file("foo.git", "a.txt", "devel", branch="devel",
+                         message="on devel")
+    git_server.push_file("foo.git", "a.txt", "master", branch="master",
+                          message="on master", fast_forward=False)
+    qisrc_action("init", git_server.manifest_url, "--branch", "devel")
+    record_messages.reset()
+    qisrc_action("log", "--all", "master")
+    assert record_messages.find("> .*[a-f0-8]+.* on devel")
+    assert record_messages.find("< .*[a-f0-8]+.* on master")

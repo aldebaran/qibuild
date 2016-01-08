@@ -26,24 +26,22 @@ def diff_worktree(git_worktree, git_projects, branch, cmd=None):
         else:
             remote_branch = remote_project.default_branch.name
             remote_ref = "%s/%s" % (remote_project.default_remote.name, remote_branch)
-            rc, out = git.call("merge-base", local_branch, remote_ref, raises=False)
-            if rc != 0:
-                message = (ui.red, "Calling git merge-base failed")
+            if cmd[0] == "diff":
+                full_cmd = cmd + [remote_ref, local_branch]
             else:
-                merge_base = out.strip()
-                full_cmd = cmd + ["%s..%s" % (merge_base, local_branch)]
+                full_cmd = cmd + ["%s...%s" % (remote_ref, local_branch)]
 
-                color = ui.config_color(sys.stdout)
-                if color:
-                    full_cmd.append("--color=always")
-                rc, out = git.call(*full_cmd, raises=False)
-                if rc != 0:
-                    message = (ui.red, "Calling git log failed")
+            color = ui.config_color(sys.stdout)
+            if color:
+                full_cmd.append("--color=always")
+            rc, out = git.call(*full_cmd, raises=False)
+            if rc != 0:
+                message = (ui.red, "git", " ".join(full_cmd), "\n", out)
+            else:
+                if out:
+                    message = (out,)
                 else:
-                    if out:
-                        message = (out,)
-                    else:
-                        continue
+                    continue
         ui.info(ui.bold, git_project.src)
         ui.info(ui.bold, "-" * len(git_project.src))
         ui.info(*message)
