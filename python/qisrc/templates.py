@@ -13,23 +13,13 @@ def process(input_dir, output_dir, **kwargs):
     if qisys.sh.is_path_inside(output_dir, input_dir):
         raise Exception("output directory is inside input directory")
     ui.info(ui.green, "Generating code in", output_dir)
-    for root, directories, filenames in os.walk(input_dir):
-        rel_root = os.path.relpath(root, input_dir)
-        if rel_root == ".":
-            rel_root = ""
-        for directory in directories:
-            input_name = os.path.join(rel_root, directory)
-            output_name = process_string(input_name, **kwargs)
-            to_make = os.path.join(output_dir, output_name)
-            qisys.sh.mkdir(to_make, recursive=True)
-        for filename in filenames:
-            input_name = os.path.join(rel_root, filename)
-            output_name = process_string(input_name, **kwargs)
-            output_path = os.path.join(output_dir, output_name)
-            input_path = os.path.join(input_dir, input_name)
-            qisys.sh.install(input_path, output_path, quiet=True)
-            process_file(output_path, **kwargs)
-            ui.info("*", output_name)
+    for filename in qisys.sh.ls_r(input_dir):
+        output_name = process_string(filename, **kwargs)
+        output_path = os.path.join(output_dir, output_name)
+        input_path = os.path.join(input_dir, filename)
+        qisys.sh.install(input_path, output_path, quiet=True)
+        process_file(output_path, **kwargs)
+        ui.info("*", output_name)
 
 def process_file(file_path, **kwargs):
     with open(file_path, "r") as fp:

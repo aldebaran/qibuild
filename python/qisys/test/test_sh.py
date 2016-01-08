@@ -47,6 +47,44 @@ def test_filter_hidden(tmpdir):
     assert not dest.join(".hidden").check(file=True)
     assert installed == ["a_file"]
 
+def test_ls_r_default(tmpdir):
+    src = tmpdir.ensure("src", dir=True)
+    src.join("a_file").ensure(file=True)
+    src.join(".hidden").ensure(file=True)
+    src.join("b/b_file").ensure(file=True)
+    src.join("b/.b_file.swp").ensure(file=True)
+    res = qisys.sh.ls_r(src.strpath)
+    assert res == ["a_file", "b/b_file"]
+
+def test_ls_r_all(tmpdir):
+    src = tmpdir.join("src")
+    src.ensure(".git/objects/0abc4", file=True)
+    src.ensure(".a.txt.swp", file=True)
+    src.ensure("a.txt", file=True)
+    src.ensure("bar/baz.txt", file=True)
+    src.ensure("baz/.baz.txt.swp", file=True)
+    res = qisys.sh.ls_r(src.strpath)
+    assert res == ["a.txt", "bar/baz.txt"]
+    res = qisys.sh.ls_r(src.strpath, all=True)
+    assert res == [
+        ".a.txt.swp",
+        ".git/objects/0abc4",
+        "a.txt",
+        "bar/baz.txt",
+        "baz/.baz.txt.swp",
+    ]
+
+def test_iter_directory(tmpdir):
+    src = tmpdir.ensure("src", dir=True)
+    src.join("a_file").ensure(file=True)
+    src.join(".hidden").ensure(file=True)
+    src.join("b/b_file").ensure(file=True)
+    src.join("b/.b_file.swp").ensure(file=True)
+    res = sorted(qisys.sh.iter_directory(src.strpath, all=True))
+    assert res == [".hidden", "a_file", "b/.b_file.swp", "b/b_file"]
+    res = sorted(qisys.sh.iter_directory(src.strpath))
+    assert res == ["a_file", "b/b_file"]
+
 def test_is_path_inside():
    assert qisys.sh.is_path_inside(os.path.join("foo", "bar"), "foo")
    assert qisys.sh.is_path_inside(os.path.join("foo", "bar"),

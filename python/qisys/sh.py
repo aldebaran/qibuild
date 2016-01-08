@@ -445,9 +445,24 @@ def mv(src, dest):
     shutil.move(src, dest)
 
 
-def ls_r(directory):
-    """Returns a sorted list of all the files present in a directory,
+def iter_directory(directory, filter_fun=None, all=False):
+    """Returns a generator for all the files present in a directory,
     relative to this directory.
+
+    Empty directories are ignored>
+
+    By default, do not list hidden files and do not descend into
+    hidden directories.
+
+    You can use all=True to list all the files
+
+    (Hidden in this context means "starting with ."
+    If you want to support MacOS or Windows hidden files you are on your
+    own ...)
+
+    If  `filter_fun`` is given, it will be called with
+    ``(filename, dirname)`` optional argument and should return True
+    if the directory should be descended into or the filename should be yield
 
     For instance, with::
 
@@ -460,26 +475,45 @@ def ls_r(directory):
             |__a
             |__b
 
-    ls_r(foo) returns:
-    ["eggs/c", "eggs/d", "empty/", "spam/a", "spam/b"]
+    iter_directory(foo) yields:
+    ["eggs/c", "eggs/d", "spam/a", "spam/b"]
 
     """
+    def non_hidden(filename=None, dirname=None):
+        if filename:
+            return not filename.startswith(".")
+        if dirname:
+            return not dirname.startswith(".")
+
+    def filter_none(filename=None, dirname=None):
+        return True
+
+    if not filter_fun:
+        if all:
+            filter_fun = filter_none
+        else:
+            filter_fun = non_hidden
+
     res = list()
-    for root, dirs, files in os.walk(directory):
+    for root, dirs, files in os.walk(directory, topdown=True):
         new_root = os.path.relpath(root, directory)
+        dirs[:] = [x for x in dirs if filter_fun(dirname=x)]
+        files = [x for x in files if filter_fun(filename=x)]
         if new_root == "." and not files:
             continue
         if new_root == "." and files:
-            res.extend(files)
-            continue
-        if not files and not dirs:
-            res.append(new_root + os.path.sep)
+            for f in files:
+                yield f
             continue
         for f in files:
-            res.append(os.path.join(new_root, f))
-    res.sort()
-    return res
+            yield os.path.join(new_root, f)
 
+def ls_r(directory, filter_fun=None, all=False):
+    """ Same as :py:func`iter_directory` but returns a sorted list
+
+
+    """
+    return sorted(iter_directory(directory, filter_fun=filter_fun, all=all))
 
 def which(program):
     """
