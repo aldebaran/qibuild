@@ -21,7 +21,10 @@ def configure_parser(parser):
     qitoolchain.parsers.toolchain_parser(parser)
     parser.add_argument("package_path", metavar='PATH',
                         help="The path to the package")
-    parser.add_argument("--name", help=argparse.SUPPRESS)
+    parser.add_argument("--name", help="DEPRECATED. Name of the package. "
+                                       "Used for legacy format. "
+                                       "You should create a package.xml and "
+                                       "use `qitoolchain make-package` instead")
 
 def do(args):
     """ Add a package to a toolchain
