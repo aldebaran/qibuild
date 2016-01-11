@@ -5,6 +5,7 @@
 import os
 import platform
 
+import qisys.sh
 import qisys.qixml
 import qibuild.config
 import qibuild.profile
@@ -163,7 +164,7 @@ class CMakeBuildConfig(object):
             args.append("-D%s=%s" % (name, value))
 
         venv_path = self.build_worktree.venv_path
-        args.append("-DQI_VIRTUALENV_PATH=%s" % venv_path)
+        args.append("-DQI_VIRTUALENV_PATH=%s" % qisys.sh.to_posix_path(venv_path))
 
         return args
 
