@@ -644,11 +644,10 @@ def change_cwd(directory):
 def is_runtime(filename):
     """ Filter function to only install runtime components of packages
 
+    .. note:: This function is provided for retro-compatibility only
+              New qitoolchain packages should use masks or install
+              manifests
     """
-    # FIXME: this looks like a hack.
-    # Maybe a user-generated MANIFEST at the root of the package path
-    # would be better?
-
     basename = os.path.basename(filename)
     basedir = filename.split(os.path.sep)[0]
     if filename.startswith("bin"):
@@ -703,7 +702,6 @@ def is_binary(file_path):
         if b'\0' in data:
             return True
         return False
-
 
 def is_executable_binary(file_path):
     """ Returns true if the file:
