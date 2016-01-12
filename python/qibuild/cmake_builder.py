@@ -12,6 +12,7 @@ import qisys.sh
 import qisys.remote
 import qibuild.deploy
 import qibuild.deps
+from qibuild.parallel_builder import ParallelBuilder
 from qisys.abstractbuilder import AbstractBuilder
 from qibuild.project       import write_qi_path_conf
 
@@ -198,6 +199,17 @@ Or configure the project with no config
                 continue
             self.pre_build(project)
             project.build(**kwargs)
+
+    def build_parallel(self, *args, **kwargs):
+        """ Build the projects (in parallel) in the correct order """
+        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+        # do the prebuild step here (it is fast enough)
+        for i, project in enumerate(projects):
+            self.pre_build(project)
+
+        parallel_builder = ParallelBuilder()
+        parallel_builder.prepare_build_jobs(projects)
+        parallel_builder.build(*args, **kwargs)
 
     @need_configure
     def install(self, dest_dir, *args, **kwargs):

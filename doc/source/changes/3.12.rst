@@ -102,6 +102,14 @@ qibuild
 
 * ``qibuild deploy``: allow to use simple URLs like ``<host>:<deploy-dir>``
 
+* Add support for parallel builds. For instance, when using
+  ``qibuild make -j8 -J2``, ``qibuild`` will spawn two threads, each of
+  them running the build with 8 parallel jobs.
+
+  .. note:: This feature is best used in conjunction with a distributed
+            computing system such as ``incredibuild`` or ``distcc``
+
+
 qicd
 ----
 

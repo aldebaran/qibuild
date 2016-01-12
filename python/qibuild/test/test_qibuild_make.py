@@ -65,3 +65,10 @@ def test_using_host_tools_for_cross_with_host_in_toolchain(qibuild_action,
     qisys.sh.rm(footool_proj.path)
     qibuild_action("configure", "usefootool", "--config", "fake-ctc")
     qibuild_action("make", "usefootool", "--config", "fake-ctc")
+
+def test_parallel_build(qibuild_action):
+    qibuild_action.create_project("a")
+    qibuild_action.create_project("b")
+    qibuild_action.create_project("c", build_depends=["a", "b"])
+    qibuild_action("configure", "c")
+    qibuild_action("make", "c", "--num-workers=2")
