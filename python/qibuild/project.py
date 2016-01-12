@@ -256,9 +256,12 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         cmake_qibuild_dir = os.path.join(cmake_qibuild_dir, "qibuild")
         cmake_qibuild_dir = qisys.sh.to_posix_path(cmake_qibuild_dir)
         cmake_args.append("-Dqibuild_DIR=%s" % cmake_qibuild_dir)
+        # Make DYLD_ variables also available at configure time
+        # (Workaround OS X 10.11 not forwarding DYLD_ variables anymore)
+        build_env = self.fix_env(self.build_env)
         try:
             qibuild.cmake.cmake(self.path, self.build_directory,
-                                cmake_args, env=self.build_env, **kwargs)
+                                cmake_args, env=build_env, **kwargs)
         except qisys.command.CommandFailedException as error:
             raise qibuild.build.ConfigureFailed(self, error)
         self.generate_qitest_json()

@@ -25,6 +25,15 @@ qibuild
   You can set ``QIBUILD_LOOSE_DEPS_RESOLUTION=1`` environment variable
   to get back the old behavior
 
+* Set ``DYLD_LIBRARY_PATH`` and ``DYLD_FRAMEWORK_PATH`` environment variables when
+  running ``qibuild configure`` on OS X.
+
+  Use these variables in ``qi_generate_src`` and ``qi_generate_header`` custom commands.
+
+  This workarounds DYLD_ variables not being forwarded because of
+  OS X 10.11 System Integrity Protection
+
+
 qisrc
 ------
 

@@ -58,12 +58,24 @@ function(qi_generate_src)
   endif()
   list(GET ARG_COMMAND 0 _cmd)
   list(REMOVE_AT ARG_COMMAND 0)
-  add_custom_command(OUTPUT ${out}
-                     COMMENT "${_comment}"
-                     COMMAND ${_cmd}
-                     ARGS ${ARG_COMMAND}
-                     DEPENDS ${ARG_SRC} ${ARG_DEPENDS}
-  )
+  if(APPLE)  # Hack to forward DYLD_ variables
+    add_custom_command(OUTPUT ${out}
+                       COMMENT "${_comment}"
+                       COMMAND ${CMAKE_COMMAND} -E env
+                       "DYLD_FRAMEWORK_PATH=$ENV{DYLD_FRAMEWORK_PATH}"
+                       "DYLD_LIBRARY_PATH=$ENV{DYLD_LIBRARY_PATH}"
+                       ${_cmd}
+                       ARGS ${ARG_COMMAND}
+                       DEPENDS ${ARG_SRC} ${ARG_DEPENDS}
+                       )
+  else()
+    add_custom_command(OUTPUT ${out}
+                       COMMENT "${_comment}"
+                       COMMAND ${_cmd}
+                       ARGS ${ARG_COMMAND}
+                       DEPENDS ${ARG_SRC} ${ARG_DEPENDS}
+                       )
+  endif()
 endfunction()
 
 
