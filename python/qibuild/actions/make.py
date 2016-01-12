@@ -19,10 +19,17 @@ def configure_parser(parser):
     group.add_argument("--coverity", action="store_true", default=False,
                        help="Build using cov-build. Ensure you have "
                        "cov-analysis installed on your machine.")
+    group.add_argument("--num-workers", "-J", dest="num_workers", type=int,
+                       help="Number of projects to be built in parallel")
 
 @ui.timer("qibuild make")
 def do(args):
     """Main entry point"""
 
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
-    cmake_builder.build(rebuild=args.rebuild, coverity=args.coverity)
+    if args.num_workers:
+        cmake_builder.build_parallel(rebuild=args.rebuild,
+                                     coverity=args.coverity, num_workers=args.num_workers)
+    else:
+        cmake_builder.build(rebuild=args.rebuild,
+                            coverity=args.coverity)
