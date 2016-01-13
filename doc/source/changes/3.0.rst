@@ -1,5 +1,5 @@
-v3.0
------
+v3.0 (2013-09-05)
+-----------------
 
 General
 +++++++
@@ -225,4 +225,3 @@ CMake
   install directory.
 * Linux shared libraries are linked with a ``rpath`` set to ``$ORIGIN/../lib``
   by default, as it was done for executables.
-

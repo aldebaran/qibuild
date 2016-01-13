@@ -1,5 +1,5 @@
-v3.1.1
-======
+v3.1.1 (2013-10-25)
+===================
 
 
 Packaging
@@ -25,4 +25,3 @@ misc
 ----
 
 * better report of called command arguments
-

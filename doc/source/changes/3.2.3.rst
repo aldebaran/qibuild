@@ -1,5 +1,5 @@
-v3.2.3
-======
+v3.2.3 (2014-03-07)
+===================
 
 cmake
 -----
@@ -11,4 +11,3 @@ qisys
 -----
 
 * New meta builder AbstractBuilder object: create builders for all types of projects
-

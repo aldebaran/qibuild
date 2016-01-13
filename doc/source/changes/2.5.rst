@@ -1,5 +1,5 @@
-v2.5
-----
+v2.5 (2013-07-23)
+------------------
 
 Command line
 +++++++++++++
@@ -16,4 +16,3 @@ CMake
 +++++
 
 * Add ``TIMEOUT`` argument to ``qi_create_perf_test``
-

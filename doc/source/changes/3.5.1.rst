@@ -1,5 +1,5 @@
-v3.5.1
-======
+v3.5.1 (2014-06-26)
+===================
 
 Fixes for debian-based distributions
 

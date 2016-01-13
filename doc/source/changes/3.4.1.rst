@@ -1,8 +1,6 @@
-v3.4.1
-======
+v3.4.1 (2014-06-02)
+===================
 
 Fix regressions introduced by this change:
 
 * Worktrees now register themselves to the global config files
-
-

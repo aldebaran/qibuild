@@ -1,5 +1,5 @@
-v1.12.1
--------
+v1.12.1 (2012-02-06)
+--------------------
 
 Command line
 ++++++++++++
@@ -77,4 +77,3 @@ Misc:
 * ``Makefile``: allow usage of PYTHON environment variable
 * ``python/bin/qibuild`` script is usable as-is
 * Lots of documentation updates
-

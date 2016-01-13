@@ -1,5 +1,5 @@
-v1.14
------
+v1.14 (2012-08-28)
+------------------
 
 Command line
 +++++++++++++
@@ -75,4 +75,3 @@ Misc
 ++++
 
 * lots of documentation updates
-

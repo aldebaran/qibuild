@@ -1,10 +1,7 @@
-v3.0.1
-------
+v3.0.1 (2013-09-17)
+--------------------
 
 Bug fixes only.
 
 * ``qibuild deploy`` ensure destination path exist before deployment
 * ``qisrc sync``: fix resetting staged uncommitted changes.
-
-
-

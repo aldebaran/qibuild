@@ -1,5 +1,5 @@
-v2.0
-----
+v2.0 (2013-02-01)
+------------------
 
 Command line
 ++++++++++++
@@ -180,4 +180,3 @@ Misc
 * Now using `tox <http://tox.readthedocs.org/en/latest/>`_ to run the tests on Jenkins,
   get rid of ``run_tests.py``
 * Now using `py.test <http://pytest.org/latest/>`_ to write the automatic tests
-

@@ -1,5 +1,5 @@
-v3.2.1
-======
+v3.2.1 (2014-01-02)
+===================
 
 Packaging
 ----------
@@ -17,4 +17,3 @@ qitest
 
 * Set ``DYLD_*`` variables on mac
 * Fix gtest XML syntax
-
