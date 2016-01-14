@@ -222,9 +222,6 @@ In:
 * {new_project.path}
 """.format(project=project, new_project=new_project))
 
-
-
-
 def new_build_project(build_worktree, project):
     """ Cerate a new BuildProject from a worktree project.
     Return None if there is no BuildProject here
@@ -234,7 +231,7 @@ def new_build_project(build_worktree, project):
         return None
     tree = qisys.qixml.read(project.qiproject_xml)
     root = tree.getroot()
-    if root.get("version") == "3":
+    if root.get("version") == "3" or root.get("format") == "3":
         qibuild_elem = root.find("qibuild")
         if qibuild_elem is None:
             return None
@@ -251,7 +248,6 @@ def new_build_project(build_worktree, project):
 
     build_project = qibuild.project.BuildProject(build_worktree, project)
     build_project.name = name
-    build_project.version = qibuild_elem.get("version", "0.1")
     qibuild.deps.read_deps_from_xml(build_project, qibuild_elem)
 
     build_project.meta = qisys.qixml.parse_bool_attr(qibuild_elem, "meta")

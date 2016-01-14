@@ -64,10 +64,18 @@ class SphinxProject(qidoc.project.DocProject):
         if "project" not in from_conf:
             conf += '\nproject = "%s"\n' % self.name
 
-        if "version" not in from_conf:
-            if kwargs.get("version"):
-                conf += '\nversion = "%s"\n' % kwargs["version"]
+        # read version from 3 places, in this order:
+        #  * --version argument from the command line
+        #  * conf.py file
+        #  * <version> tag in qiproject.xml
+        version = kwargs.get("version")
+        if not version:
+            version = from_conf.get("version")
+            if not version:
+                version = self.version
 
+        if version:
+            conf += '\nversion = "%s"\n' % version
 
         if should_use_template and self.template_project:
             if "html_theme_path" not in from_conf:

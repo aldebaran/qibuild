@@ -73,3 +73,10 @@ def test_standalone_breakpad(qibuild_action, tmpdir):
     hello_archive, hello_symbols = qibuild_action("package", "hello", "--standalone",
                                                   "--breakpad")
     assert os.path.exists(hello_symbols)
+
+
+def test_setting_version_from_cmdline(qibuild_action):
+    qibuild_action.add_test_project("world")
+    world_package = qibuild_action("package", "world", "--version", "0.42")
+    basename = os.path.basename(world_package)
+    assert "0.42" in basename

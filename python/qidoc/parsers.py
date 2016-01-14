@@ -48,10 +48,7 @@ def get_doc_builder(args):
     doc_builder = qidoc.builder.DocBuilder(doc_worktree)
     doc_builder.set_base_project(doc_project.name)
     doc_builder.single = vars(args).get("single", False)
-    version = vars(args).get("version")
-    if not version:
-        version = "latest"
-    doc_builder.version = version
+    doc_builder.version = vars(args).get("version")
     doc_builder.local = vars(args).get("hosted", True)
     doc_builder.build_type = vars(args).get("build_type")
     doc_builder.werror = vars(args).get("werror", False)
@@ -104,4 +101,3 @@ Could not guess doc project name from current working directory
 Please go inside a doc project, or specify the project name
 on the command line
 """
-

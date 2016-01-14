@@ -61,6 +61,20 @@ The ``qiproject.xml`` should contain the license used by the project, like so
     <license>GPL</license>
   </project>
 
+Version
++++++++
+
+The ``qiproject.xml`` can optionally contain a version number, like so
+
+.. code-block:: xml
+
+  <project format="3">
+    <version>0.42</version>
+  </project>
+
+
+This will be used by ``qibuild package`` and ``qidoc build`` if
+``--version`` is not specified on the command line.
 
 qibuild
 --------

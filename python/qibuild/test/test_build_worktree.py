@@ -19,6 +19,20 @@ def test_read_deps(build_worktree):
     hello = build_worktree.get_build_project("hello")
     assert hello.build_depends == set(["world"])
 
+def test_new_syntax(build_worktree):
+    world_proj = build_worktree.create_project("world")
+    with open(world_proj.qiproject_xml, "w") as fp:
+        fp.write("""
+<project format="3">
+  <version>0.42</version>
+  <qibuild name="world" />
+</project>
+""")
+    build_worktree = TestBuildWorkTree()
+    world_proj = build_worktree.get_build_project("world")
+    assert world_proj.name == "world"
+    assert world_proj.version == "0.42"
+
 def test_setting_build_config_sets_projects_cmake_flags(build_worktree):
     build_worktree.create_project("world")
     build_worktree.build_config.build_type = "Release"

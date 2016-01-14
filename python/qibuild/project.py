@@ -64,7 +64,7 @@ class BuildProject(object):
         self.path = worktree_project.path
         self.src = worktree_project.src
         self._name = None
-        self.version = None
+        self.version = self.worktree_project.version
         # depends is a set at this point because they are not sorted yet
         self.build_depends = set()
         self.run_depends = set()
@@ -601,7 +601,8 @@ The following tools were not found: {missing}\
         package_xml_root = etree.Element("package")
         package_xml_tree = etree.ElementTree(package_xml_root)
         package_xml_root.set("name", self.name)
-        package_xml_root.set("version", self.version)
+        if self.version:
+            package_xml_root.set("version", self.version)
         if self.license:
             license_elem = etree.SubElement(package_xml_root, "license")
             license_elem.text = self.license

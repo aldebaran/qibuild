@@ -26,6 +26,8 @@ def configure_parser(parser):
     group.add_argument("--breakpad", action="store_true",
                        help="Generate breakpad symbols. "
                             "(Force CMAKE_BUILD_TYPE=RelWithDebInfo)")
+    group.add_argument("--version",
+                       help="Set project version. Override settings in qiproject.xml")
 
 def do(args):
     """Main entry point"""
@@ -41,13 +43,18 @@ def do(args):
     project = projects[0]
 
     archive_name = project.name
-    version = project.version
+    version = args.version
     if not version:
-        project.version = "0.1"
+        version = project.version
 
+    if not version:
+        ui.warning("Could not find project version!",
+                   "Either use --version or fix qiproject.xml",
+                   sep="\n")
     build_dir_name = os.path.basename(project.build_directory)
     archive_suffix = build_dir_name.replace("build-", "")
-    archive_name += "-" + version
+    if version:
+        archive_name += "-" + version
     archive_name += "-" + archive_suffix
 
     package_dir = os.path.join(cmake_builder.build_worktree.root, "package")

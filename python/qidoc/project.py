@@ -14,6 +14,7 @@ class DocProject(object):
     def __init__(self, doc_worktree, project, name, depends=None, dest=None):
         self.doc_worktree = doc_worktree
         self.name = name
+        self.worktree_project = project
         self.src = project.src
         self.path = project.path
         if not depends:
@@ -40,7 +41,15 @@ class DocProject(object):
 
     @property
     def qiproject_xml(self):
-        return os.path.join(self.path, "qiproject.xml")
+        return self.worktree_project.qiproject_xml
+
+    @property
+    def version(self):
+        return self.worktree_project.version
+
+    @version.setter
+    def version(self, value):
+        self.worktree_project.version = value
 
     @property
     def dest(self):

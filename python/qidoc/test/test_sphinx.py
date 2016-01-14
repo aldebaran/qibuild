@@ -47,6 +47,16 @@ def test_version(doc_worktree):
     conf_py = foo_path.join("build-doc", "conf.py").read()
     assert 'version = "1.2.3"' in conf_py
 
+def test_read_version_from_qiproject(doc_worktree):
+    foo_sphinx = doc_worktree.create_sphinx_project("foo")
+    # pylint:disable-msg=E1101
+    foo_path = py.path.local(foo_sphinx.path)
+    conf_py = foo_path.join("source", "conf.py").ensure(file=True)
+    conf_py.write('project = "foo"\n')
+    foo_sphinx.version = "0.42"
+    foo_sphinx.configure()
+    conf_py = foo_path.join("build-doc", "conf.py").read()
+    assert 'version = "0.42"' in conf_py
 
 def test_handles_dunder_file(doc_worktree):
     foo_sphinx = doc_worktree.create_sphinx_project("foo")

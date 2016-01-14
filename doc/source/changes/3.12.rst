@@ -1,6 +1,33 @@
 v3.12
 ======
 
+qiproject.xml
+--------------
+
+* Syntax for setting the version number of the projects changed
+
+  .. code-block:: xml
+
+      <!-- old -->
+      <project version="3">
+        <qibuild name="foo" version="0.42" />
+        <qidoc name="foo" type="sphinx" />
+      </project>
+
+      <!-- new: -->
+      <project format="3">
+         <version>0.42</version>
+          <qibuild name="foo" />
+          <qidoc name="foo" type="sphinx" />
+       </project>
+
+  The ``version`` tag in the ``<project>`` tag was misleading, it's
+  actually the format version supported by qibuild tools.
+
+  Also, having a ``version`` tag outside ``<qibuild>`` allows to set
+  the version number for the ``qidoc`` projects too
+
+
 qibuild
 --------
 
@@ -32,6 +59,8 @@ qibuild
 
   This workarounds ``DYLD_`` variables not being forwarded because of
   OS X 10.11 System Integrity Protection
+
+* ``qibuild package``: add ``--version`` to override setting in ``qiproject.xml``
 
 
 qisrc

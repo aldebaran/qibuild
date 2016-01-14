@@ -86,7 +86,7 @@ def new_doc_project(doc_worktree, project):
         return None
     tree = qisys.qixml.read(project.qiproject_xml)
     root = tree.getroot()
-    if root.get("version") == "3":
+    if root.get("version") == "3" or root.get("format") == "3":
         return _new_doc_project_3(doc_worktree, project)
     else:
         return _new_doc_project_2(doc_worktree, project)

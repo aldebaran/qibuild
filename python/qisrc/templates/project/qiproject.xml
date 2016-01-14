@@ -1,7 +1,11 @@
-<project version="3">
+<project format="3">
   <!-- Add your name and e-mail here
     <maintainer email="...">Your Name</maintainer>
   -->
+
+  <!-- set version and license below -->
+  <version>0.1</version>
+  <license>LICENSE</license>
 
   <qibuild name="@project_name@">
     <!-- Add your project dependencies here
