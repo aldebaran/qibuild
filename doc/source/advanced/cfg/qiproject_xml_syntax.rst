@@ -30,6 +30,10 @@ ignoring the rest.
 
 This helps having loosely coupled dependencies between the various tools.
 
+
+Maintainers
+++++++++++++
+
 The ``qiproject`.xml`` should contain the list of maintainers, like so
 
 .. code-block:: xml
@@ -44,6 +48,17 @@ If the project is no longer maintained, specify it like so:
 
   <project version="3">
     <maintainer>ORPHANED</maintainer>
+  </project>
+
+License
++++++++
+
+The ``qiproject.xml`` should contain the license used by the project, like so
+
+.. code-block:: xml
+
+  <project version="3">
+    <license>GPL</license>
   </project>
 
 
