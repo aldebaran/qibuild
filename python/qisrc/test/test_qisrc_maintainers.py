@@ -52,3 +52,15 @@ def test_list_utf8(qisrc_action):
     foo = qisrc_action.worktree.create_project("foo")
     qisrc.maintainers.add(foo, name="Noé", email="noe@ark.com")
     qisrc_action("maintainers", "--list", "--project", "foo")
+
+def test_orphaned(qisrc_action, record_messages):
+    foo_proj = qisrc_action.worktree.create_project("foo")
+    with open(foo_proj.qiproject_xml, "w") as fp:
+        fp.write("""\
+<project version="3">
+  <maintainer>ORPHANED</maintainer>
+</project>
+""")
+    record_messages.reset()
+    qisrc_action("maintainers", "--list", "--project", "foo")
+    assert record_messages.find("ORPHANED")

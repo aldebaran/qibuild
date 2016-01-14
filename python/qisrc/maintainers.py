@@ -18,7 +18,7 @@ class ProjectXML(qisys.qixml.XMLParser):
         super(ProjectXML, self).__init__(target)
 
     def _parse_maintainer(self, element):
-        maintainer = {'email': element.get('email'), 'name': element.text}
+        maintainer = {'email': element.get('email', ""), 'name': element.text}
         self.target.append(maintainer)
 
 def to_str(name=None, email=None):
