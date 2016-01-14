@@ -132,7 +132,6 @@ def test_pushing_from_perso_branch(qisrc_action, git_server):
     (_, remote) = foo_git.call("ls-remote", "gerrit", "refs/for/master", raises=False)
     assert remote == "%s\trefs/for/master" % sha1
 
-
 def test_pushing_custom_ref(qisrc_action, git_server):
     foo_repo = git_server.create_repo("foo.git", review=True)
     qisrc_action("init", git_server.manifest_url)
@@ -146,3 +145,17 @@ def test_pushing_custom_ref(qisrc_action, git_server):
     qisrc_action("push", "--project", "foo", "HEAD~1:master")
     (_, remote) = foo_git.call("ls-remote", "gerrit", "refs/for/master", raises=False)
     assert remote == "%s\trefs/for/master" % sha1
+
+def test_orphaned_project(qisrc_action, git_server, record_messages):
+    foo_repo = git_server.create_repo("foo.git", review=True)
+    qiproject_xml = """\
+<project version="3">
+  <maintainer>ORPHANED</maintainer>
+</project>"""
+    git_server.push_file("foo.git", "qiproject.xml", qiproject_xml)
+    # Need to fetch gerrit remote at least once for gerrit/master to exist
+    foo_git.fetch("--all")
+    foo_git.commit_file("a.txt", "a")
+    record_messages.reset()
+    qisrc_action("push", "--project", "foo")
+    assert record_messages.find("Project is orphaned")

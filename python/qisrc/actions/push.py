@@ -57,8 +57,13 @@ def do(args):
 
     if git_project.review:
         maintainers = qisrc.maintainers.get(git_project, warn_if_none=True)
-        reviewers = [x['email'] for x in maintainers]
-        reviewers.extend(args.reviewers or list())
+        orphaned = any(x["name"] == "ORPHANED" for x in maintainers)
+        if orphaned:
+            ui.warning("Project is orphaned, no reviewers set")
+            reviewers = list()
+        else:
+            reviewers = [x['email'] for x in maintainers]
+            reviewers.extend(args.reviewers or list())
         # Prefer gerrit logins or groups instead of e-mails
         reviewers = [x.split("@")[0] for x in reviewers]
         qisrc.review.push(git_project, local_ref, remote_branch,
