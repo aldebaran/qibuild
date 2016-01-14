@@ -44,8 +44,12 @@ def do(args):
 
     archive_name = project.name
     version = args.version
-    if not version:
+    if version:
+        project.version = version
+    else:
         version = project.version
+        if not version:
+            version = "0.1"
 
     if not version:
         ui.warning("Could not find project version!",

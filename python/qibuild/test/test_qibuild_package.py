@@ -4,6 +4,7 @@
 import os
 
 import qisys.archive
+import qisys.qixml
 import qisrc.license
 import qibuild.config
 import qitoolchain.qipackage
@@ -63,6 +64,21 @@ def test_standalone(qibuild_action, tmpdir):
     hello_bin = os.path.join(extracted, "bin", "hello")
     qisys.command.call([hello_bin])
 
+def test_standalone_version_from_cmd_line(qibuild_action, toolchains, tmpdir):
+    toolchains.create("linux64")
+    qibuild.config.add_build_config("linux64", toolchain="linux64")
+    world_proj = qibuild_action.add_test_project("world")
+    hello_proj = qibuild_action.add_test_project("hello")
+    hello_archive = qibuild_action("package", "--config", "linux64",
+                                   "--standalone", "--version", "0.42",
+                                   "hello")
+    expected_name = "hello-0.42-linux64"
+    assert os.path.basename(hello_archive) == expected_name + ".zip"
+    dest = tmpdir.join("dest")
+    extracted = qisys.archive.extract(hello_archive, dest.strpath)
+    package_xml = os.path.join(extracted, "package.xml")
+    tree = qisys.qixml.read(package_xml)
+    assert tree.getroot().get("version") == "0.42"
 
 # pylint: disable-msg=E1101
 @pytest.mark.skipif(not qisys.command.find_program("dump_syms"),

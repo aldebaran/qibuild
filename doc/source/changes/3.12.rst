@@ -60,7 +60,7 @@ qibuild
   This workarounds ``DYLD_`` variables not being forwarded because of
   OS X 10.11 System Integrity Protection
 
-* ``qibuild package``: add ``--version`` to override setting in ``qiproject.xml``
+* ``qibuild package``: add ``--version`` to override settings in ``qiproject.xml``
 
 * ``qibuild package``: add git URL to generated ``package.xml`` file
 
