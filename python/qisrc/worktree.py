@@ -6,13 +6,14 @@ import copy
 import operator
 
 from qisys import ui
+import qisys.error
 import qisys.worktree
 import qisrc.git
 import qisrc.snapshot
 import qisrc.sync
 import qisrc.project
 
-class NotInAGitRepo(Exception):
+class NotInAGitRepo(qisys.error.Error):
     """ Custom exception when user did not
     specify any git repo ond the command line
     and we did not manage to guess one from the
@@ -329,7 +330,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         ref = "origin/" + branch
         manifest = qisrc.manifest.from_git_repo(self._syncer.manifest_repo, ref)
         if not manifest:
-            raise Exception("Could not read manifest on %s"% ref)
+            raise qisys.error.Error("Could not read manifest on %s"% ref)
         groups = self._syncer.manifest.groups
         repos = manifest.get_repos(groups=groups)
         for repo in repos:
@@ -394,5 +395,5 @@ Tips:
 """
     ui.warning(mess.format(worktree=worktree, groups=groups) + tips)
 
-class NoSuchGitProject(Exception):
+class NoSuchGitProject(qisys.error.Error):
     pass

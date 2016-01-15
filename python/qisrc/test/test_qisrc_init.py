@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import qisys.error
 import qisys.script
 import qisrc.git
 
@@ -153,7 +154,7 @@ def test_manifest_branch_does_not_exist(qisrc_action, git_server):
     git_server.create_repo("bar.git")
     manifest_url = git_server.manifest_url
     # pylint:disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qisrc_action("init", git_server.manifest_url, "--branch", "devel")
     assert "origin/devel" in e.value.message
 

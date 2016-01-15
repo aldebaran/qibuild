@@ -9,6 +9,8 @@
 """
 
 import re
+
+import qisys.error
 from qisys import ui
 
 from xml.etree import ElementTree as etree
@@ -46,7 +48,7 @@ def raise_parse_error(message, xml_path=None, tree=None):
         as_str = etree.tostring(tree)
         mess += "Could not parse:\t%s\n" % as_str
     mess += message
-    raise Exception(mess)
+    raise qisys.error.Error(mess)
 
 def parse_bool_attr(tree, name, default=False):
     """ Parse a boolean attribute of an element
@@ -243,7 +245,7 @@ class XMLParser(object):
         if value is None:
             mess = "Node '%s' must have a '%s' attribute" % (node_name,
                                                                attribute_name)
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
 
     def xml_elem(self, node_name=None):
         """ Get the xml representation of the target
@@ -327,7 +329,7 @@ def _get_value_for_type(type_value, value):
         if value.lower() in ["false", "0"]:
             return False
         mess = "Waiting for a boolean but value is '%s'." % value
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
     if type_value == list:
         return value.split(" ")
     return value

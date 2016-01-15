@@ -6,6 +6,7 @@ import difflib
 import virtualenv
 
 from qisys import ui
+import qisys.error
 import qisys.worktree
 import qisys.qixml
 
@@ -43,7 +44,7 @@ Found two projects with the same name. (%s)
 %s
 %s
 """ % (new_project.name, seen_names[new_project.name], new_project.src)
-                raise Exception(mess)
+                raise qisys.error.Error(mess)
             self.python_projects.append(new_project)
             seen_names[new_project.name] = new_project.src
 

@@ -14,6 +14,7 @@ import py
 import pytest
 import mock
 
+import qisys.error
 import qisys.sh
 import qisys.worktree
 
@@ -50,7 +51,7 @@ def test_add_project_simple(worktree):
 def test_fails_when_root_does_not_exists(tmpdir):
     non_exitsting = tmpdir.join("doesnotexist")
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qisys.worktree.WorkTree(non_exitsting.strpath)
     assert "does not exist" in str(e.value)
 

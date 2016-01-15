@@ -7,6 +7,7 @@ import functools
 import operator
 
 from qisys import ui
+import qisys.error
 import qisys.sh
 import qisys.remote
 import qibuild.deploy
@@ -143,7 +144,8 @@ Make sure to configure and build it first.
 Either set a host config with `qibuild set-host-config`
 Or configure the project with no config
 """
-                    raise Exception(mess.format(matching_project=matching_project.name))
+                    raise qisys.error.Error(
+                            mess.format(matching_project=matching_project.name))
             else:
                 # No project, try a package in the toolchain
                 toolchain = self.build_worktree.toolchain
@@ -355,7 +357,7 @@ Or configure the project with no config
 
         print
 
-class NotConfigured(Exception):
+class NotConfigured(qisys.error.Error):
     def __init__(self, project):
         self.project = project
 

@@ -1,6 +1,8 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import qisys.error
 import qitest.conf
 
 import pytest
@@ -28,16 +30,16 @@ def test_can_add_tests(tmpdir):
 def test_errors(tmpdir):
     qitest_json_path = tmpdir.join("qitest.json").strpath
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qitest.conf.add_test(qitest_json_path, name="foo")
     assert "Should provide a test cmd" in e.value.message
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qitest.conf.add_test(qitest_json_path, cmd="foo")
     assert "Should provide a test name" in e.value.message
     qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/foo"])
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/bar"])
     assert "A test named 'foo' already exists" in e.value.message
 

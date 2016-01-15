@@ -9,6 +9,7 @@ import argparse
 import multiprocessing
 import os
 
+import qisys.error
 import qisys.sh
 import qisys.worktree
 
@@ -136,9 +137,9 @@ def get_one_project(worktree, args):
     parser = WorkTreeProjectParser(worktree)
     projects = parser.parse_args(args)
     if projects is None:
-        raise Exception("No project found")
+        raise qisys.error.Error("No project found")
     if not len(projects) == 1:
-        raise Exception("This action can only work with one project")
+        raise qisys.error.Error("This action can only work with one project")
     return projects[0]
 
 ##
@@ -174,7 +175,7 @@ class AbstractProjectParser(object):
         if not hasattr(args, "single"):
             args.single = False
         if args.all and args.single:
-            raise Exception("Cannot use --single with --all")
+            raise qisys.error.Error("Cannot use --single with --all")
         # pylint: disable-msg=E1103
         if args.all:
             return self.all_projects(args)

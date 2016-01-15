@@ -53,7 +53,7 @@ def deploy(pkg_path, url):
     except Exception as e:
         ui.error("Unable to install package on target")
         ui.error("Error was: ", e)
-        return
+        sys.exit(1)
 
     rm_cmd = ["ssh", "%s@%s" % (url.user, url.host),
                 "rm", os.path.basename(pkg_path)]

@@ -36,4 +36,4 @@ def do(args):
             build_worktree = qibuild.worktree.BuildWorkTree(worktree)
             build_worktree.set_default_config(name)
         else:
-            raise Exception("Must be in a worktree to use --default")
+            ui.fatal("Must be in a worktree to use --default")

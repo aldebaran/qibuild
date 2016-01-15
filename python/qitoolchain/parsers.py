@@ -1,6 +1,8 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import qisys.error
 import qisys.worktree
 import qibuild.parsers
 
@@ -42,15 +44,15 @@ def get_toolchain(args):
         mess += "current worktree configuration)\n"
         mess += "Please specify a configuration with -c, --config \n"
         mess += "or a toolchain name with -t, --toolchain"
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
 
 
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read()
     build_config = qibuild_cfg.configs.get(config)
     if not build_config:
-        raise Exception("No such config: %s" % config)
+        raise qisys.error.Error("No such config: %s" % config)
     tc_name = build_config.toolchain
     if not tc_name:
-        raise Exception("config %s has no toolchain" % config)
+        raise qisys.error.Error("config %s has no toolchain" % config)
     return qitoolchain.get_toolchain(tc_name)

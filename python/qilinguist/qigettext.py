@@ -13,6 +13,7 @@ import subprocess
 
 from qisys import ui
 import qisys.command
+import qisys.error
 import qilinguist.project
 
 class GettextProject(qilinguist.project.LinguistProject):
@@ -66,7 +67,7 @@ class GettextProject(qilinguist.project.LinguistProject):
                 ui.error(message)
             all_ok = all_ok and ok
         if not all_ok and raises:
-            raise Exception("`qilinguist release` failed")
+            raise qisys.error.Error("`qilinguist release` failed")
         return all_ok
 
     def extract_pot_file(self):

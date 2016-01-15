@@ -8,6 +8,7 @@ import subprocess
 import time
 
 import qisys.command
+import qisys.error
 import qibuild.cmake
 import qibuild.config
 import qibuild.find
@@ -55,7 +56,7 @@ def test_qi_use_lib(qibuild_action):
 
     # Make sure it fails when it should
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         qibuild_action("configure", "uselib", "-DSHOULD_FAIL=ON")
 
 
@@ -73,7 +74,7 @@ def test_qi_stage_lib_but_really_bin(qibuild_action):
 def test_qi_stage_lib_but_no_such_target(qibuild_action):
     qibuild_action.add_test_project("stagelib")
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         qibuild_action("configure", "stagelib",
                        "-DSHOULD_FAIL_STAGE_NO_SUCH_TARGET")
 

@@ -4,6 +4,7 @@
 import os
 
 from qisys import ui
+import qisys.error
 import qisys.sort
 
 
@@ -137,5 +138,5 @@ class DocBuilder(object):
             if project:
                 projects.append(project)
             else:
-                raise Exception("Could not find %s dependency" % name)
+                raise qisys.error.Error("Could not find %s dependency" % name)
         return projects

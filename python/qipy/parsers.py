@@ -1,6 +1,8 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import qisys.error
 import qisys.parsers
 import qibuild.parsers
 import qipy.worktree
@@ -23,7 +25,7 @@ def get_one_python_project(python_worktree, args):
     parser = PythonProjectParser(python_worktree)
     projects = parser.parse_args(args)
     if not len(projects) == 1:
-        raise Exception("This action can only work with one project")
+        raise qisys.error.Error("This action can only work with one project")
     return projects[0]
 
 def get_python_builder(args, verbose=True):
@@ -69,11 +71,10 @@ class PythonProjectParser(qisys.parsers.AbstractProjectParser):
         project = self.python_worktree.get_python_project(project_arg, raises=True)
         return [project]
 
-class CouldNotGuessProjectName(Exception):
+class CouldNotGuessProjectName(qisys.error.Error):
     def __str__(self):
         return """
 Could not guess python project name from current working directory
 Please go inside a python project, or specify the project name
 on the command line
 """
-

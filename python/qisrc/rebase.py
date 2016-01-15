@@ -1,7 +1,9 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
 from qisys import ui
+import qisys.error
 import qisys.interact
 
 import qisrc.manifest
@@ -17,7 +19,7 @@ def rebase_worktree(git_worktree, git_projects, branch=None,
         for git_project in errors:
             mess += " * " + git_project.src
             mess += "\n"
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
 
     if push:
         push_projects(rebased_projects, dry_run=dry_run)

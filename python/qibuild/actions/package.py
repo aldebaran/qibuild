@@ -39,7 +39,7 @@ def do(args):
 
     projects = cmake_builder.projects
     if len(projects) != 1:
-        raise Exception("This action can only work on one project")
+        ui.fatal("This action can only work on one project")
     project = projects[0]
 
     archive_name = project.name

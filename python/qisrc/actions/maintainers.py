@@ -39,7 +39,7 @@ def do(args):
     projects = qisys.parsers.get_projects(worktree, args)
 
     if not projects:
-        raise Exception("Please specify at least one project")
+        ui.fatal("Please specify at least one project")
 
     if args.maintainers_action == "add":
         to_call = add_maintainer

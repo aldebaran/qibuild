@@ -4,6 +4,7 @@
 
 from qitoolchain.feed import *
 
+import qisys.error
 from qisrc.test.conftest import git_server
 
 import pytest
@@ -15,7 +16,7 @@ def test_is_url():
 
 def test_parse_non_exising_path():
     #pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         tree_from_feed("does/not/exists")
     assert "not an existing path" in e.value.message
     assert "nor an url" in e.value.message

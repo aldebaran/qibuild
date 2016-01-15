@@ -5,6 +5,7 @@ import os
 
 
 from qisys import ui
+import qisys.error
 import qisys.worktree
 import qisys.qixml
 
@@ -43,7 +44,7 @@ class LinguistWorkTree(qisys.worktree.WorkTreeObserver):
         project_with_same_name = self.get_linguist_project(new_project.name,
                                                            raises=False)
         if project_with_same_name:
-            raise Exception("""\
+            raise qisys.error.Error("""\
 Found two projects with the same name ({0})
 In:
 * {1}
@@ -101,7 +102,7 @@ Choose between 'linguist' or 'gettext'
                                      linguas=linguas)
     return new_project
 
-class BadProjectConfig(Exception):
+class BadProjectConfig(qisys.error.Error):
     def __str__(self):
         return """
 Incorrect configuration detected for project in {0}

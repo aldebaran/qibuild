@@ -8,6 +8,7 @@
 import os
 
 from qisys import ui
+import qisys.error
 import qisys.parsers
 import qibuild.worktree
 import qibuild.cmake_builder
@@ -154,7 +155,7 @@ def get_one_build_project(build_worktree, args):
     parser = BuildProjectParser(build_worktree)
     projects = parser.parse_args(args)
     if not len(projects) == 1:
-        raise Exception("This action can only work on one project")
+        raise qisys.error.Error("This action can only work on one project")
     return projects[0]
 
 def get_dep_types(args, default=None):
@@ -187,7 +188,7 @@ def get_host_tools_builder(args):
     qibuild_cfg.read(create_if_missing=True)
     host_config = qibuild_cfg.get_host_config()
     if args.config and args.config != host_config:
-        raise Exception("""\
+        raise qisys.error.Error("""\
 Trying to get a host tools builder with the following
 build config: {config}, but the given config is not
 marked as a host config\
@@ -232,7 +233,8 @@ def get_build_config(build_worktree, args):
         user_flags = list()
         for flag_string in args.cmake_flags:
             if "=" not in flag_string:
-                raise Exception("Expecting a flag looking like -Dkey=value")
+                raise qisys.error.Error(
+                        "Expecting a flag looking like -Dkey=value")
             (key, value) = flag_string.split("=", 1)
             user_flags.append((key, value))
         build_config.user_flags = user_flags
@@ -290,7 +292,7 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
         project = self.build_worktree.get_build_project(project_arg, raises=True)
         return [project]
 
-class CouldNotGuessProjectName(Exception):
+class CouldNotGuessProjectName(qisys.error.Error):
     def __str__(self):
         return """
 Could not guess qibuild project name from current working directory

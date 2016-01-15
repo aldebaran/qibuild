@@ -9,7 +9,9 @@
 import StringIO
 import unittest
 import mock
+import pytest
 
+import qisys.error
 import qibuild.actions.open
 
 
@@ -33,20 +35,6 @@ class OpenTestCase(unittest.TestCase):
         self.assertEqual(ide.name, "QtCreator")
         self.assertEqual(ide.path, "/path/to/qtsdk/bin/qtcreator")
         self.assertFalse(self.ask_mock.called)
-
-    def test_eclipse_cdt_in_conf(self):
-        qibuild_cfg = qibuild.config.QiBuildConfig()
-        eclipse = qibuild.config.IDE()
-        eclipse.name = "Eclipse CDT"
-        qibuild_cfg.add_ide(eclipse)
-        try:
-            qibuild.actions.open.get_ide(qibuild_cfg)
-        except Exception, e:
-            error = e
-        self.assertFalse(error is None)
-        self.assertFalse("Could not find any IDE in configuration" in
-            error.message)
-        self.assertTrue("`qibuild open` only supports" in error.message)
 
     def test_two_ides(self):
         qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -108,6 +96,20 @@ class OpenTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.ask_patcher.stop()
+
+
+def test_eclipse_cdt_in_conf(record_messages):
+    qibuild_cfg = qibuild.config.QiBuildConfig()
+    eclipse = qibuild.config.IDE()
+    eclipse.name = "Eclipse CDT"
+    qibuild_cfg.add_ide(eclipse)
+    # pylint:disable-msg=E1101
+    with pytest.raises(SystemExit) as e:
+        qibuild.actions.open.get_ide(qibuild_cfg)
+    assert e.value.code != 0
+    assert not record_messages.find("Could not find any IDE in configuration")
+    assert record_messages.find("`qibuild open` only supports")
+
 
 if __name__ == "__main__":
     unittest.main()

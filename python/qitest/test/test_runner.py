@@ -1,6 +1,8 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import qisys.error
 import qitest.project
 import qitest.runner
 
@@ -30,7 +32,7 @@ def test_match_patterns(tmpdir):
     assert test_runner.tests == [test_foo, test_bar, test_foo_bar]
 
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         test_runner.patterns = "foo("
 
     test_runner.patterns = list()

@@ -15,7 +15,9 @@ All qiBuild packages should have the same layout.
 
 import pprint
 
-class BinaryPackageException(Exception):
+import qisys.error
+
+class BinaryPackageException(qisys.error.Error):
     """Just a custom exception
 
     """
@@ -68,7 +70,7 @@ class BinaryPackage:
             return
         self._load()
         if not "name" in self.metadata:
-            raise Exception("Failed to load package. "
+            raise BinaryPackageException("Failed to load package. "
                             "Expecting at least a 'name' key "
                             "in package metadata")
         self.name = self.metadata["name"]

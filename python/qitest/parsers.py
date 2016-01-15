@@ -9,6 +9,7 @@ import copy
 import os
 
 from qisys import ui
+import qisys.error
 import qisys.parsers
 import qibuild.parsers
 import qitest.project
@@ -148,12 +149,12 @@ def get_test_runners(args):
             res.append(test_runner)
 
     if args.coverage and not build_projects_runners:
-        raise Exception("""\
+        raise qisys.error.Error("""\
 --coverage can only be used from a qibuild CMake project
 """)
     elif args.coverage:
         return build_projects_runners
 
     if not res:
-        raise Exception("Nothing found to test")
+        raise qisys.error.Error("Nothing found to test")
     return res

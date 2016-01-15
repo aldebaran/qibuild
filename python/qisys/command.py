@@ -15,7 +15,7 @@ import threading
 import Queue
 
 from qisys import ui
-import qisys
+import qisys.error
 import qisys.envsetter
 
 # Cache for find_program()
@@ -166,7 +166,7 @@ def str_from_signal(code):
         return "Aborted"
     return "%i" % code
 
-class CommandFailedException(Exception):
+class CommandFailedException(qisys.error.Error):
     """Custom exception """
     def __init__(self, cmd, returncode, cwd=None, stdout=None, stderr=None):
         self.cmd = cmd
@@ -197,7 +197,7 @@ Working dir was {cwd}
             mess  = "\n".join("    " + line for line in self.stderr.split("\n"))
         return mess
 
-class ProcessCrashedError(Exception):
+class ProcessCrashedError(qisys.error.Error):
     """An other custom exception, used by call_background """
     def __init__(self, cmd):
         self.cmd = cmd
@@ -207,7 +207,7 @@ class ProcessCrashedError(Exception):
         mess += "Full command: %s" % self.cmd
         return mess
 
-class NotInPath(Exception):
+class NotInPath(qisys.error.Error):
     """Custom exception """
     def __init__(self, executable, env=None):
         self.executable = executable
@@ -410,7 +410,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
         if not os.path.exists(cwd):
             # We know we are likely to have a problem on windows here,
             # so always raise.
-            raise Exception("Trying to to run %s in non-existing %s" %
+            raise qisys.error.Error("Trying to to run %s in non-existing %s" %
                 (" ".join(cmd), cwd))
 
     ui.debug("Calling:", " ".join(cmd))

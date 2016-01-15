@@ -37,7 +37,7 @@ def run(projects, binary, bin_args, env=None, exec_=True):
     if not bin_path:
         bin_path = qisys.command.find_program(binary)
     if not bin_path:
-        raise Exception("Cannot find " + binary + " binary")
+        ui.fatal("Cannot find " + binary + " binary")
     cmd = [bin_path] + bin_args
     if exec_:
       ui.debug("exec", cmd)

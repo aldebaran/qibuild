@@ -5,7 +5,8 @@
 import os
 import json
 import glob
-import qisrc
+
+import qisys.error
 import qisys.ui as ui
 import qisys.command
 import qipy.venv
@@ -24,7 +25,7 @@ class PythonTestCollector:
         else:
             self.pytest_path = qisys.command.find_program("py.test")
         if not self.pytest_path:
-            raise Exception("pytest path is empty")
+            raise qisys.error.Error("pytest path is empty")
 
 
     def get_list_of_pytest(self, rep):
@@ -81,4 +82,3 @@ class PythonTestCollector:
                 self.get_test_and_write(project)
             projects.append(src)
         ui.info(ui.yellow, "%i tests found" % (len(self.tests_path)), ui.reset)
-

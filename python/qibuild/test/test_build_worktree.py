@@ -5,6 +5,7 @@
 import os
 import sys
 
+import qisys.error
 import qibuild.config
 
 from qibuild.test.conftest import TestBuildWorkTree
@@ -50,7 +51,7 @@ def test_changing_active_config_changes_projects_build_dir(cd_to_tmpdir):
 def test_project_names_are_unique(build_worktree):
     build_worktree.create_project("foo")
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         build_worktree.create_project("foo", src="bar/foo")
     assert "two projects with the same name" in str(e.value)
 

@@ -10,6 +10,7 @@ import os
 
 from qisys.qixml import etree
 from qisys import ui
+import qisys.error
 import qisys.qixml
 import qisrc.git
 import qisrc.manifest
@@ -238,7 +239,7 @@ class WorkTreeSyncer(object):
 No manifest set for worktree in {root}
 Please run `qisrc init MANIFEST_URL`
 """
-            raise Exception(mess.format(root=self.git_worktree.root))
+            raise qisys.error.Error(mess.format(root=self.git_worktree.root))
         git = qisrc.git.Git(self.manifest_repo)
         git.set_remote("origin", self.manifest.url)
         if git.get_current_branch() != self.manifest.branch:
@@ -251,7 +252,7 @@ Please run `qisrc init MANIFEST_URL`
             else:
                 git.reset("--hard", "origin/%s" % self.manifest.branch)
         if not transaction.ok:
-            raise Exception("Update failed\n" + transaction.output)
+            raise qisys.error.Error("Update failed\n" + transaction.output)
 
     def _sync_repos(self, old_repos, new_repos, force=False,
                     worktree_clone=None):

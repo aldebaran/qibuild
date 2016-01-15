@@ -5,6 +5,7 @@ import os
 
 from qisys import ui
 from qisys.qixml import etree
+import qisys.error
 import qisys.qixml
 import qitoolchain.feed
 import qitoolchain.qipackage
@@ -54,7 +55,7 @@ class DataBase(object):
     def remove_package(self, name):
         """ Remove a package from a database """
         if name not in self.packages:
-            raise Exception("No such package: %s" % name)
+            raise qisys.error.Error("No such package: %s" % name)
         to_remove = self.packages[name]
         qisys.sh.rm(to_remove.path)
         del self.packages[name]
@@ -69,7 +70,7 @@ class DataBase(object):
         res = self.packages.get(name)
         if res is None:
             if raises:
-                raise Exception("No such package: %s" % name)
+                raise qisys.error.Error("No such package: %s" % name)
         return res
 
     def solve_deps(self, packages, dep_types=None):

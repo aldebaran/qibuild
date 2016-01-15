@@ -7,6 +7,7 @@ import difflib
 
 from qisys import ui
 import qisys.command
+import qisys.error
 import qisys.worktree
 import qibuild.build
 import qibuild.build_config
@@ -215,7 +216,7 @@ class BuildWorkTree(qisys.worktree.WorkTreeObserver):
     def check_unique_name(self, new_project):
         for project in self.build_projects:
             if project.name == new_project.name:
-                raise Exception("""\
+                raise qisys.error.Error("""\
 Found two projects with the same name ({project.name})
 In:
 * {project.path}
@@ -255,10 +256,10 @@ def new_build_project(build_worktree, project):
     return build_project
 
 
-class BuildWorkTreeError(Exception):
+class BuildWorkTreeError(qisys.error.Error):
     pass
 
-class BadProjectConfig(Exception):
+class BadProjectConfig(qisys.error.Error):
     def __str__(self):
         return """
 Incorrect configuration detected for project in {0}

@@ -4,6 +4,7 @@
 
 import os
 
+import qisys.error
 import qisys.script
 
 from qibuild.test.conftest import TestBuildWorkTree
@@ -44,7 +45,7 @@ def test_pml_outside_worktree(tmpdir, monkeypatch):
 
 def test_raise_when_no_project_given_outside_a_worktree(tmpdir, monkeypatch):
     monkeypatch.chdir(tmpdir)
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qisys.script.run_action("qilinguist.actions.release")
     assert "outside a worktree" in e.value.message
 

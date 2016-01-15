@@ -9,6 +9,7 @@ import json
 
 from qisys import ui
 
+import qisys.error
 import qisrc.git
 import qisrc.status
 import qisrc.reset
@@ -86,7 +87,8 @@ class Snapshot(object):
         elif self.format_version == 2:
             manifest_json = parsed_json["manifest"]
         else:
-            raise Exception("unknown format: %s" % self.format_version)
+            raise qisys.error.Error(
+                    "unknown format: %s" % self.format_version)
         self.refs = parsed_json["refs"]
         for key, value in manifest_json.iteritems():
             setattr(self.manifest, key, value)

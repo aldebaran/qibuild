@@ -161,21 +161,36 @@ to display error messages to the end users.
 
      try:
           module.do()
-     except Exception as e:
+     except qisys.error.Error as e:
+          # "normal" exception raise, display it in red
+          # and exit
           ui.error(str(e))
+     except SystemExit as e:
+          # sys.exit or ui.fatal called, assume
+          # error message has already been displayed
+          # and exit
+          sys.exit(e.code)
+     except:
+          # Unexpected except raises:
+          # Generate a bug report
 
 
 So it's important to check the correctness of
 the error message.
 
-This is how to do it:
+Also, all exceptions raised by qibuild should
+derive from ``qisys.error.Error``
+in order to identify unexpected errors.
+
+This is how you should test the exception
+you raise:
 
 .. code-block:: python
 
     import pytest
 
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         do_something_that_should_raise()
     assert "Bad input"  in e.value.message
 

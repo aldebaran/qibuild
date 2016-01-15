@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 import os
 
+import qisys.error
 import qisys.sh
 
 class PythonProject(object):
@@ -43,13 +44,13 @@ Either write a setup.py file and use
 Or specify at least some scripts, modules or packages
 in the qiproject.xml file
 """
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
         if self.setup_with_distutils:
             python = self.worktree.python
             if not os.path.exists(python):
                 mess = "Python executable not found in virtualenv\n"
                 mess += "Try running `qipy bootstrap`"
-                raise Exception(mess)
+                raise qisys.error.Error(mess)
             cmd = [python, "setup.py", "install", "--root", dest, "--prefix=."]
             qisys.command.call(cmd, cwd=self.path)
             return

@@ -37,7 +37,7 @@ def do(args):
     if not os.path.exists(venv_root):
         err = "No Virtualenv found in %s\n" % (venv_root)
         err += "Please run `qipy bootstrap`"
-        raise Exception(err)
+        ui.fatal(err)
 
     binaries_path = virtualenv.path_locations(venv_root)[-1]
 

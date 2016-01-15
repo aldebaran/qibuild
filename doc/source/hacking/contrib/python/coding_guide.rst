@@ -665,7 +665,7 @@ messages.
         with open(config_file, "w") as fp:
             config = fp.read()
     except IOError, err:
-        raise Exception("Could not open config file for writing")
+        raise qisys.error.Error("Could not open config file for writing")
 
   It's not helpful at all! It does not answer those basic questions:
 
@@ -684,7 +684,7 @@ messages.
     except IOError, err:
         mess = "Could not open config '%s' file for writing\n" % config_file
         mess += "Error was: %s" % err
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
 
   So the error message would then be::
 

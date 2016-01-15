@@ -9,6 +9,7 @@
 import os
 
 from qisys import ui
+import qisys.error
 import qisys.parsers
 import qitoolchain
 import qitoolchain.parsers

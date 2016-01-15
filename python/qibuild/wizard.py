@@ -10,9 +10,9 @@ import os
 import sys
 
 from qisys import ui
-import qisys
-import qibuild
-import qitoolchain
+import qisys.error
+import qibuild.cmake
+import qibuild.config
 
 def guess_cmake(qibuild_cfg):
     """ Try to find cmake
@@ -28,8 +28,9 @@ def guess_cmake(qibuild_cfg):
     print "CMake not found"
     cmake = qisys.interact.ask_program("Please enter full CMake path")
     if not cmake:
-        raise Exception("qiBuild cannot work without CMake\n"
-            "Please install CMake if necessary and re-run this wizard\n")
+        raise qisys.error.Error(
+                "qiBuild cannot work without CMake\n"
+                "Please install CMake if necessary and re-run this wizard\n")
     # Add path to CMake in build env
     cmake_path = os.path.dirname(cmake)
     qibuild_cfg.add_to_default_path(cmake_path)

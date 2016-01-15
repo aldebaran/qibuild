@@ -9,6 +9,7 @@
 import os
 import platform
 
+import qisys.error
 import qisys.sh
 
 def find_lib(paths, name, debug=None, expect_one=True, shared=None):
@@ -172,13 +173,13 @@ def _filter_candidates(name, candidates, expect_one=True):
     return res[0]
 
 
-class NotFound(Exception):
+class NotFound(qisys.error.Error):
     def __init__(self, name):
         self.name = name
     def __str__(self):
         return "%s not found" % self.name
 
-class MulipleFound(Exception):
+class MulipleFound(qisys.error.Error):
     def __init__(self, name, res):
         self.name = name
         self.res = res

@@ -14,8 +14,8 @@ import subprocess
 import functools
 
 from qisys import ui
-import qisys
 import qisys.command
+import qisys.sh
 
 class Git(object):
     """ The Git represent a git tree """
@@ -182,7 +182,7 @@ class Git(object):
             mess  = "Broken submodules configuration detected for %s\n" % self.repo
             mess += "git status returned %s\n" % out
             if raises:
-                raise Exception(mess)
+                raise qisys.error.Error(mess)
             else:
                 return mess
         if not out:
@@ -194,7 +194,7 @@ class Git(object):
         mess  = "Failed to update submodules\n"
         mess += out
         if raises:
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
         return mess
 
     def get_local_branches(self):
@@ -206,7 +206,7 @@ class Git(object):
         if status != 0:
             mess  = "Could not get the list of local branches\n"
             mess += "Error was: %s" % out
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
         lines = out.splitlines()
         # Remove the star and the indentation:
         return [x[2:] for x in lines]

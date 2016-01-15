@@ -14,6 +14,7 @@ import pytest
 
 import qisys
 
+import qisys.error
 from qisys.archive import compress
 from qisys.archive import extract
 from qisys.archive import guess_algo
@@ -78,7 +79,7 @@ def test_extract_invalid_empty(tmpdir):
     archive = srcdir.join("empty.tar.gz")
     archive.write("")
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qisys.archive.extract(archive.strpath, destdir.strpath)
     assert "tar failed" in e.value.message
 

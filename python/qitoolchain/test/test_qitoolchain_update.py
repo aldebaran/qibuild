@@ -20,10 +20,11 @@ def test_update_local_ctc(qitoolchain_action, tmpdir):
     qitoolchain_action("update", "ctc", toolchain_xml.strpath)
     assert ctc_path.check(dir=True)
 
-def test_update_no_feed(qitoolchain_action):
+def test_update_no_feed(qitoolchain_action, record_messages):
     qitoolchain_action("create", "foo")
-    error = qitoolchain_action("update", "foo", raises=True)
-    assert "Could not find feed" in error
+    rc = qitoolchain_action("update", "foo", retcode=True)
+    assert rc != 0
+    assert record_messages.find("Could not find feed")
 
 def test_udpate_all_toolchains(qitoolchain_action, feed, record_messages):
     qitoolchain_action("create", "foo", feed.url)

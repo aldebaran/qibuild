@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 import pytest
 
+import qisys.error
 import qisys.qixml
 from xml.etree import ElementTree as etree
 
@@ -35,19 +36,19 @@ def test_qixml_parse_bool_attr():
     tree = etree.fromstring("<foo bar=\"blaaaah\" />")
 
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         qisys.qixml.parse_bool_attr(tree, "bar")
 
 def test_parse_int_attr():
     tree = etree.fromstring("<foo />")
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         qisys.qixml.parse_int_attr(tree, "bar", default=None)
 
     assert qisys.qixml.parse_int_attr(tree, "bar", default=2) == 2
 
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         qisys.qixml.parse_int_attr(tree, "bar")
 
     tree = etree.fromstring("<foo bar=\"2\" />")
@@ -57,7 +58,7 @@ def test_parse_int_attr():
 
     tree = etree.fromstring("<foo bar=\"false\" />")
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         qisys.qixml.parse_int_attr(tree, "bar")
 
 def test_parse_list_attr():
@@ -70,7 +71,7 @@ def test_parse_list_attr():
 def test_parse_required_attr():
     tree = etree.fromstring("<foo />")
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         qisys.qixml.parse_required_attr(tree, "bar")
 
     tree = etree.fromstring("<foo bar=\"foo\" />")
@@ -115,7 +116,7 @@ def test_required_attr():
     foo = Foo()
     foo_parser = FooParser(foo)
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         foo_parser.parse(tree)
     assert e.value.message == "Node 'foo' must have a 'bar' attribute"
 

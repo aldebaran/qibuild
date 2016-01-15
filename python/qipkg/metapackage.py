@@ -5,6 +5,7 @@ import os
 import zipfile
 
 from qisys import ui
+import qisys.error
 import qisys.qixml
 
 class MetaPackage(object):
@@ -23,7 +24,7 @@ class MetaPackage(object):
         tree = qisys.qixml.read(self.mpml)
         root = tree.getroot()
         if root.tag != "metapackage":
-            raise Exception("""
+            raise qisys.error.Error("""
 Invalid mpml %s
 Root element must be <metapackage>
 """ % self.mpml)

@@ -4,7 +4,9 @@
 import os
 import sys
 import subprocess
+
 import qisys.command
+import qisys.error
 import qibuild.find
 
 import pytest
@@ -33,7 +35,7 @@ def test_stage_script(qibuild_action, tmpdir):
     qibuild_action("install", "stagescript", tmpdir.strpath)
     # QI_PATH is only set by trampoline, so we expect next one to fail.
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
       run_python_script(os.path.join(tmpdir.strpath, 'bin', 'check_qipath'))
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenfoo'))
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenbar'))
@@ -49,4 +51,3 @@ def test_stage_script(qibuild_action, tmpdir):
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenfoo'))
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenbar'))
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenworlduser'))
-

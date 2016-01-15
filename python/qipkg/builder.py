@@ -8,6 +8,7 @@ import tempfile
 import zipfile
 
 from qisys import ui
+import qisys.error
 import qisys.qixml
 import qibuild.breakpad
 import qibuild.worktree
@@ -23,12 +24,12 @@ class PMLBuilder(object):
     """ Build a package from a pml file """
     def __init__(self, pml_path, worktree=None):
         if not os.path.exists(pml_path):
-            raise Exception("%s does not exist" % pml_path)
+            raise qisys.error.Error("%s does not exist" % pml_path)
         self.pml_path = pml_path
         self.base_dir = os.path.dirname(self.pml_path)
         self.manifest_xml = os.path.join(self.base_dir, "manifest.xml")
         if not os.path.exists(self.manifest_xml):
-            raise Exception("%s does not exist" % self.manifest_xml)
+            raise qisys.error.Error("%s does not exist" % self.manifest_xml)
         self.pkg_name = pkg_name(self.manifest_xml)
 
 
@@ -90,7 +91,8 @@ class PMLBuilder(object):
 Error when parsing {pml_path}
 {mess}
 """
-            raise Exception(mess.format(pml_path=pml_path, mess=str(e)))
+            raise qisys.error.Error(
+                    mess.format(pml_path=pml_path, mess=str(e)))
 
     def _load_pml(self, pml_path):
         for builder in self.builders:
@@ -99,7 +101,8 @@ Error when parsing {pml_path}
         root = tree.getroot()
         qibuild_elems = root.findall("qibuild")
         if qibuild_elems and not self.worktree:
-            raise Exception("<qibuild> tag found but not in a worktree")
+            raise qisys.error.Error(
+                    "<qibuild> tag found but not in a worktree")
         for qibuild_elem in qibuild_elems:
             name = qisys.qixml.parse_required_attr(qibuild_elem, "name", pml_path)
             project = self.build_worktree.get_build_project(name, raises=True)
@@ -108,7 +111,8 @@ Error when parsing {pml_path}
 
         qipython_elems = root.findall("qipython")
         if qipython_elems and not self.worktree:
-            raise Exception("<qipython> tag found but not in a worktree")
+            raise qisys.error.Error(
+                    "<qipython> tag found but not in a worktree")
         for qipython_elem in qipython_elems:
             name = qisys.qixml.parse_required_attr(qipython_elem, "name", pml_path)
             project = self.python_worktree.get_python_project(name, raises=True)
@@ -116,7 +120,8 @@ Error when parsing {pml_path}
 
         qilinguist_elems = root.findall("qilinguist")
         if qilinguist_elems and not self.worktree:
-            raise Exception("<qilinguist> tag found but not in a worktree")
+            raise qisys.error.Error(
+                    "<qilinguist> tag found but not in a worktree")
         for qilinguist_elem in qilinguist_elems:
             name = qisys.qixml.parse_required_attr(qilinguist_elem, "name", pml_path)
             project = self.linguist_worktree.get_linguist_project(name, raises=True)
@@ -160,7 +165,7 @@ Error when parsing {pml_path}
             mess = "Some files do not exist\n"
             for error in errors:
                 mess += error + "\n"
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
 
     def configure(self):
         """ Configure every project """
@@ -224,7 +229,8 @@ Error when parsing {pml_path}
 
         # If the package is not valid, do not go further
         if not self.validator.is_valid and not force:
-            raise Exception("Given package does not satisfy "
+            raise qisys.error.Error(
+                            "Given package does not satisfy "
                             "default package requirements.\n"
                             "Use option '--force' to bypass this validation")
 

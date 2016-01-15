@@ -5,6 +5,7 @@ import os
 
 import pytest
 
+import qisys.error
 import qitest.parsers
 
 from qibuild.test.conftest import TestBuildWorkTree
@@ -101,7 +102,7 @@ def test_qitest_json_from_worktree(args, build_worktree, monkeypatch):
 
 def test_nothing_to_test(args, cd_to_tmpdir):
     # pylint:disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qitest.parsers.get_test_runners(args)
     assert e.value.message == "Nothing found to test"
 

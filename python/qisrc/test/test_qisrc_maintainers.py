@@ -9,9 +9,10 @@
 ## found in the COPYING file.
 import qisrc.maintainers
 
-def test_no_project(qisrc_action):
-    error = qisrc_action("maintainers", "--list", raises=True)
-    assert "at least one project" in error
+def test_no_project(qisrc_action, record_messages):
+    rc = qisrc_action("maintainers", "--list", retcode=True)
+    assert rc != 0
+    assert record_messages.find("at least one project")
 
 def test_no_maintainers_yet(qisrc_action, record_messages):
     foo = qisrc_action.worktree.create_project("foo")

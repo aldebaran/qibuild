@@ -11,6 +11,7 @@ import pytest
 import mock
 
 from qisys import ui
+import qisys.error
 import qisys.sh
 import qisys.script
 import qisys.interact
@@ -169,7 +170,7 @@ class TestAction(object):
             self.chdir(cwd)
         if kwargs.get("raises"):
         # pylint: disable-msg=E1101
-            with pytest.raises(Exception) as error:
+            with pytest.raises(qisys.error.Error) as error:
                 qisys.script.run_action(module_name, args)
             return str(error.value)
         if kwargs.get("retcode"):

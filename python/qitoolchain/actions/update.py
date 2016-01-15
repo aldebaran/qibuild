@@ -40,7 +40,7 @@ def do(args):
                 mess  = "Could not find feed for toolchain %s\n" % tc_name
                 mess += "Please check configuration or " \
                         "specifiy a feed on the command line\n"
-                raise Exception(mess)
+                ui.fatal(mess)
         toolchain.update(feed, branch=args.branch, name=args.feed_name)
     else:
         tc_names = qitoolchain.get_tc_names()

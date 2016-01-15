@@ -11,12 +11,13 @@ import functools
 import StringIO
 
 from qisys import ui
+import qisys.error
 import qisys.sh
 import qisys.qixml
 import qisrc.git_config
 import qisrc.groups
 
-class ManifestError(Exception):
+class ManifestError(qisys.error.Error):
     pass
 
 
@@ -201,7 +202,7 @@ No such project: {1}
         """ Remove a repo from the manifest """
         matching_repo = self.get_repo(project_name)
         if not matching_repo:
-            raise Exception("No such repo:", project_name)
+            raise qisys.error.Error("No such repo:", project_name)
         self.repos.remove(matching_repo)
 
     @change_config

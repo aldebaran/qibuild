@@ -1,6 +1,8 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import qisys.error
 import qisys.parsers
 import qisys.worktree
 
@@ -101,6 +103,6 @@ def test_using_dash_all_with_dash_single(worktree, args):
     args.all = True
     args.single = True
     # pylint:disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qisys.parsers.get_projects(worktree, args)
     assert "--single with --all" in e.value.message

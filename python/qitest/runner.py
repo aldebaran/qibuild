@@ -7,6 +7,7 @@ import os
 import json
 
 from qisys import ui
+import qisys.error
 import qitest.test_queue
 
 class TestSuiteRunner(object):
@@ -57,7 +58,11 @@ class TestSuiteRunner(object):
     @patterns.setter
     def patterns(self, value):
         if value:
-            [re.compile(x) for x in value] # just checking regexps are valid
+            try:
+                [re.compile(x) for x in value]
+            except Exception as e:
+                raise qisys.error.Error(str(e))
+
         self._patterns = value
 
     @property

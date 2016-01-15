@@ -5,11 +5,13 @@ import argparse
 import os
 import json
 
+import qisys.error
+
 def add_test(output, **kwargs):
     if not "name" in kwargs:
-        raise Exception("Should provide a test name")
+        raise qisys.error.Error("Should provide a test name")
     if not "cmd" in kwargs:
-        raise Exception("Should provide a test cmd")
+        raise qisys.error.Error("Should provide a test cmd")
     tests = list()
     if os.path.exists(output):
         with open(output, "r") as fp:
@@ -21,7 +23,7 @@ def add_test(output, **kwargs):
     if matching_test:
         mess = "A test named '%s' already exists. (cmd=%s)" % (
             matching_test["name"], matching_test["cmd"])
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
 
     tests.append(kwargs)
     with open(output, "w") as fp:

@@ -46,14 +46,13 @@ def name_from_xml(xml_path):
     try:
         tree.parse(xml_path)
     except Exception, e:
-        mess += str(e)
-        raise Exception(mess)
+        ui.fatal(e)
 
     # Read name
     root = tree.getroot()
     if root.tag != "project":
         mess += "Root node must be 'project'"
-        raise Exception(mess)
+        ui.fatal(mess)
     if root.get("version") == "3":
         project_elem = root.find("qbuild")
         if not project_elem:
@@ -64,7 +63,7 @@ def name_from_xml(xml_path):
     name = project_elem.get('name')
     if not name:
         mess += "'project' node must have a 'name' attribute"
-        raise Exception(mess)
+        ui.fatal(mess)
 
     return name
 

@@ -5,6 +5,7 @@ import os
 
 from qisys import ui
 import qisys.command
+import qisys.error
 import qisys.qixml
 
 import qilinguist.project
@@ -40,7 +41,7 @@ class PMLTranslator(qilinguist.project.LinguistProject):
             qisys.command.call(cmd)
             self.qm_files.append(output)
         if not all_ok and raises:
-            raise Exception("`qilinguist release` failed")
+            raise qisys.error.Error("`qilinguist release` failed")
         return all_ok
 
     def install(self, dest):

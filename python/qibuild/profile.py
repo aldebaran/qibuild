@@ -8,6 +8,8 @@
 """
 
 import os
+
+import qisys.error
 import qisys.qixml
 
 class Profile:
@@ -95,12 +97,12 @@ def remove_build_profile(xml_path, name):
     if profiles is None:
         mess = "No profiled named '{name}' in {xml_path}"
         mess = mess.format(name=name, xml_path=xml_path)
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
     match_elem = None
     for profile in profiles:
         if profile.get("name") == name:
             match_elem = profile
     if match_elem is None:
-        raise Exception("No such profile: " + name)
+        raise qisys.error.Error("No such profile: " + name)
     profiles.remove(match_elem)
     qisys.qixml.write(tree, xml_path)

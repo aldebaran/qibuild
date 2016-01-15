@@ -7,6 +7,7 @@ import os
 import re
 import sys
 
+import qisys.error
 import qisys.sh
 from qisys import ui
 from qisys.qixml import etree
@@ -65,7 +66,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
         if not qisys.command.find_program("taskset"):
             mess = "taskset was not found on the system.\n"
             mess += "Cannot set number of CPUs used by the tests"
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
         self._num_cpus = value
 
     @property
@@ -77,7 +78,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
         if not value:
             return
         if not qisys.command.find_program("valgrind"):
-            raise Exception("valgrind was not found on the system")
+            raise qisys.error.Error("valgrind was not found on the system")
         self._valgrind = value
 
     @property
@@ -89,7 +90,8 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
         if not value:
             return
         if not qisys.command.find_program("gcovr"):
-            raise Exception("please install gcovr in order to measure coverage")
+            raise qisys.error.Error(
+                    "please install gcovr in order to measure coverage")
         self._coverage = value
 
 
@@ -243,7 +245,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
     def _with_valgrind(self, test):
         if not qisys.command.find_program("valgrind"):
-            raise Exception("valgrind was not found on the system")
+            raise qisys.error.Error("valgrind was not found on the system")
         cwd = test["working_directory"]
         valgrind_log = self.valgrind_log(test)
         test["timeout"] = test["timeout"] * 10
