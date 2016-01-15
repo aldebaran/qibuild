@@ -79,11 +79,7 @@ class CMakeBuildConfig(object):
         """
         if self._cmake_generator:
             return self._cmake_generator
-        from_conf = self.qibuild_cfg.cmake.generator
-        if from_conf:
-            return from_conf
-        if qisys.command.find_program("ninja", raises=False):
-            return "Ninja"
+        return self.qibuild_cfg.cmake.generator
 
     @property
     def debug(self):

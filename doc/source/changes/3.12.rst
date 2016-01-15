@@ -18,8 +18,6 @@ qibuild
         </qibuild>
       </project>
 
-* CMake Generator now defaults to ``Ninja`` if ``ninja`` executable is found.
-
 * Honor ``qiproject.xml`` when looking for dependencies in the toolchain.
 
   Previously all packages in the toolchain were taken into account.
