@@ -9,7 +9,6 @@ import pytest
 
 import mock
 
-
 def test_simple_read(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -42,7 +41,6 @@ def test_src_are_unique(tmpdir):
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Found two projects sharing the same sources" in str(e.value)
 
-
 def test_projects_are_unique(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -68,8 +66,6 @@ def test_empty_src(tmpdir):
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     bar = manifest.repos[0]
     assert bar.src == "foo/bar"
-
-
 
 def test_no_remotes_attr(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -161,8 +157,6 @@ def test_invalid_group(tmpdir):
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         manifest.get_repos(groups=["mygroup"])
     assert "No such group: mygroup" in str(e.value)
-
-
 
 def test_review_projects(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -351,3 +345,16 @@ def test_all_repos(tmpdir):
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     git_projects = manifest.get_repos(all=True)
     assert len(git_projects) == 3
+
+def test_only_gerrit_no_review(tmpdir, record_messages):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="gerrit" url="git@gerrit.lan" review="true"/>
+  <repo project="foo.git" remotes="gerrit" />
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath, review=False)
+    foo_repo = manifest.get_repos()[0]
+    assert foo_repo.clone_url is None
+    assert record_messages.find("foo.git only has a review remote")

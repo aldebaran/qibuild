@@ -10,6 +10,7 @@ import copy
 import functools
 import StringIO
 
+from qisys import ui
 import qisys.sh
 import qisys.qixml
 import qisrc.git_config
@@ -20,13 +21,14 @@ class ManifestError(Exception):
 
 
 class Manifest(object):
-    def __init__(self, manifest_xml, review=True):
+    def __init__(self, manifest_xml, review=True, warn=True):
         self.manifest_xml = manifest_xml
         self.review = review
         self.repos = list()
         self.remotes = list()
         self.default_branch = None
         self.groups = qisrc.groups.Groups()
+        self.warn = warn
         self.load()
 
     # pylint: disable-msg=E0213
@@ -86,6 +88,11 @@ Found two projects sharing the same sources:
 
             for remote_name in repo.remote_names:
                 self.set_remote(repo, remote_name)
+
+            if not repo.clone_url and not self.review:
+                if self.warn:
+                    ui.warning(repo.project, "only has a review remote "
+                            "and you used --no-review, project will be skipped")
 
             srcs[repo.src] = repo
 
@@ -246,6 +253,8 @@ class RepoConfig(object):
 
     @property
     def clone_url(self):
+        if not self.default_remote:
+            return None
         return self.default_remote.url
 
     @property
@@ -272,7 +281,7 @@ class RepoConfig(object):
 class ManifestParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(ManifestParser, self).__init__(target)
-        self._ignore = ["manifest_xml", "review"]
+        self._ignore = ["manifest_xml", "review", "warn"]
 
     def _parse_branch(self, elem):
         self.target.default_branch = elem.get("default")

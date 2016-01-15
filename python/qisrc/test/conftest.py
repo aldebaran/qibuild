@@ -81,12 +81,16 @@ class TestGitServer(object):
         self.manifest_url = self.srv.join("manifest.git").strpath
         self.manifest_branch = "master"
 
-    def create_repo(self, project, src=None, review=False, empty=False):
+    def create_repo(self, project, src=None, review=False, empty=False,
+                    only_review=False):
         """ Create a new repo and add it to the manifest """
         self._create_repo(project, src=src, review=False, empty=empty)
         if review:
             self._create_repo(project, src=src, review=True, empty=empty)
-            self.manifest.add_repo(project, src, ["origin", "gerrit"])
+            remotes = ["gerrit"]
+            if not only_review:
+                remotes.insert(0, "origin")
+            self.manifest.add_repo(project, src, remotes)
         else:
             self.manifest.add_repo(project, src, ["origin"])
         repo = self.manifest.get_repo(project)
