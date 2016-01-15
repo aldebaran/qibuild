@@ -18,6 +18,8 @@ qibuild
         </qibuild>
       </project>
 
+* CMake Generator now defaults to ``Ninja`` if ``ninja`` executable is found.
+
 qisrc
 ------
 

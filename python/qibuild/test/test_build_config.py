@@ -4,6 +4,8 @@
 
 import os
 
+import mock
+
 import qisys.sh
 from qisys.qixml import etree
 import qibuild.build_config
@@ -35,9 +37,17 @@ def test_users_flags_taken_last(build_worktree):
              "-DWITH_FOO=ON",
              "-DWITH_FOO=OFF"]
 
+def test_ninja_by_default(build_worktree):
+    with mock.patch("qisys.command.find_program") as mock_find:
+        build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
+        mock_find.return_value  = None
+        assert build_config.cmake_generator is None
+        mock_find.return_value = "/usr/bin/ninja"
+        build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
+        assert build_config.cmake_generator == "Ninja"
+
 def test_sane_defaults(build_worktree):
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
-    assert build_config.cmake_generator is None
     assert build_config.build_type == "Debug"
     cmake_args = build_config.cmake_args
     cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
