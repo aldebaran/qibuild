@@ -20,7 +20,7 @@ def test_guess_git_repo(tmpdir, args):
     foo = tmpdir.mkdir("foo")
     bar = foo.mkdir("bar")
     foo.join("qiproject.xml").write("""\
-<project version="3">
+<project format="3">
   <project src="bar" />
 </project>
 """)

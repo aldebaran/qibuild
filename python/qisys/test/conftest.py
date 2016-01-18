@@ -53,7 +53,7 @@ class TestWorkTree(qisys.worktree.WorkTree):
         new_project = super(TestWorkTree, self).add_project(src)
         qiproject_xml = self.tmpdir.join(src, "qiproject.xml")
         qiproject_xml.write("""
-<project version="3" />
+<project format="3" />
 """)
         return new_project
 

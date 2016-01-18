@@ -1,4 +1,4 @@
-<project version="3">
+<project format="3">
   <qipython name="with_deps">
     <module name="with_deps" />
   </qipython>

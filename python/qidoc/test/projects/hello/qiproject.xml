@@ -1,4 +1,4 @@
-<project version="3">
+<project format="3">
   <qidoc type="sphinx" name="hello">
     <depends name="world" />
   </qidoc>

@@ -1,4 +1,4 @@
-<project version="3">
+<project format="3">
   <qibuild name="translateme-gettext" />
   <translate
     name="translate"

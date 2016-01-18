@@ -1,4 +1,4 @@
-<project version="3">
+<project format="3">
   <qidoc type="sphinx" name="examples">
     <examples>
       <example src="samples/a" />

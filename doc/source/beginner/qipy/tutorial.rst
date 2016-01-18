@@ -30,7 +30,7 @@ Let's say you have a C++ library in a qibuild project, called ``foo``.
 .. code-block:: xml
 
     <!-- in <worktree>/foo/qiproject.xml -->
-    <project version="3">
+    <project format="3">
       <qibuild name="foo" />
     </project>
 
@@ -60,7 +60,7 @@ the C++ extension.
 .. code-block:: xml
 
     <!-- in pyfoo/qiproject.xml -->
-    <project version="3">
+    <project format="3">
       <qibuild name="pyfoo">
         <depends runtime="true" buildtime="true" names="foo" />
       </qibuild>
@@ -174,7 +174,7 @@ your modules, packages and scripts directly in the
 
 .. code-block:: xml
 
-    <project version="3">
+    <project format="3">
       <qipython name="foobar">
         <package name="foo" src="lib" />
         <module name="spam" />

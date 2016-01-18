@@ -79,7 +79,7 @@ def test_using_carbon_copy(qisrc_action, git_server):
 def test_alert_maintainers(qisrc_action, git_server):
     foo_repo = git_server.create_repo("foo.git", review=True)
     qiproject_xml = """\
-<project version="3">
+<project format="3">
   <maintainer email="jdoe@company.com">John Doe</maintainer>
 </project>"""
     git_server.push_file("foo.git", "qiproject.xml", qiproject_xml)

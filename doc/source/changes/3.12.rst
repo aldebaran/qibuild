@@ -39,7 +39,7 @@ qibuild
 
   .. code-block:: xml
 
-      <project version="3">
+      <project format="3">
         <qibuild name="foo" meta="true">
           <depends runtime="true" names="bar baz" >
         </qibuild>

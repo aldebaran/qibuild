@@ -1,4 +1,4 @@
-<project version="3">
+<project format="3">
   <qibuild  name="b" />
   <qipython name="b">
     <module name="b" />

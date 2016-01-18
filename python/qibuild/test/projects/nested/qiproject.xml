@@ -1,4 +1,4 @@
-<project version="3" >
+<project format="3" >
   <qibuild name="foo-top" />
   <project src="foo" />
 </project>

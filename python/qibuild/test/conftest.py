@@ -40,7 +40,7 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
         proj_path.ensure(dir=True)
 
         xml = """ \
-<project version="3">
+<project format="3">
   <qibuild name="{name}">
     <depends buildtime="true" runtime="false" testtime="false" names="{buildtime_names}" />
     <depends buildtime="false" runtime="true" testtime="false" names="{runtime_names}" />

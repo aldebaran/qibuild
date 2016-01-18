@@ -40,7 +40,7 @@ Here what the files would look like
 
   <!-- libfoo/qiproject.xml -->
 
-  <project version="3" >
+  <project format="3" >
 
     <!-- used by qibuild to build your library -->
     <qibuild name="libfoo" />
@@ -88,7 +88,7 @@ a sphinx doc project in the ``doc`` subfolder:
 .. code-block:: xml
 
   <!-- in libfoo/qiproject.xml -->
-  <project version="3">
+  <project format="3">
 
     <qibuild name="libfoo" />
     <project src="doc" />
@@ -97,7 +97,7 @@ a sphinx doc project in the ``doc`` subfolder:
 .. code-block:: xml
 
   <!-- in libfoo/doc/qiproject.xml -->
-  <project version="3">
+  <project format="3">
     <qidoc name="libfoo" type="sphinx" />
   </project>
 
@@ -168,7 +168,7 @@ Layout is::
 .. code-block:: xml
 
   <!-- in doc/templates/qiproject.xml -->
-  <project version="3">
+  <project format="3">
     <qidoc type="template" />
   </project>
 
@@ -222,7 +222,7 @@ you are going to support. For instance, to support French and Japanese:
 
 .. code-block:: xml
 
-    <project version="3">
+    <project format="3">
       <qidoc name="foo" type="sphinx">
         <translate linguas="fr ja" />
       </qidoc>

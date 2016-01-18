@@ -1,4 +1,4 @@
-<project version="3">
+<project format="3">
   <qidoc name="qibuild" type="sphinx">
     <prebuild script="tools/gen_cmake_doc.py" />
     <examples>

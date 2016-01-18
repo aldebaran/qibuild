@@ -31,7 +31,7 @@ Suggested layout:
 .. code-block:: xml
 
   <!-- qiproject.xml -->
-  <project version="3">
+  <project format="3">
     <qilinguist name="hello" linguas="en_US fr_FR" tr="gettext" />
   </project>
 
@@ -97,7 +97,7 @@ Suggested layout:
 .. code-block:: xml
 
   <!-- qiproject.xml -->
-  <project version="3">
+  <project format="3">
     <qilinguist name="hello" linguas="en_US fr_FR" tr="linguist" />
   </project>
 

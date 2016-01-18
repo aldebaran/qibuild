@@ -1,4 +1,4 @@
-<project version="3">
+<project format="3">
   <qibuild name="binsdkuser">
     <depends buildtime="true" runtime="true" names="binsdk" />
  </qibuild>

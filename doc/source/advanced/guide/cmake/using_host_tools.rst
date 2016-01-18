@@ -92,7 +92,7 @@ To do so, you should:
 .. code-block:: xml
 
     <!-- in usefootool/qiproject.xml -->
-    <project version="3">
+    <project format="3">
       <qibuild name="usefootool">
         <depends host="true" names="footool" />
       </qibuild>

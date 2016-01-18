@@ -42,7 +42,7 @@ def get_xml_tree(project):
     xml_path = project.qiproject_xml
     if not os.path.exists(xml_path):
         with open(xml_path, "w") as fp:
-            fp.write("""<project version="3" />\n""")
+            fp.write("""<project format="3" />\n""")
     tree = qisys.qixml.read(xml_path)
     return tree
 
@@ -65,7 +65,7 @@ The project in {src} has no maintainer.
 Please add one or several <maintainer> tags in
 {qiproject_xml} to silence this warning, like this:
 
-<project version="3">
+<project format="3">
   <maintainer email="EMAIL">NAME</maintainer>
   ...
 """

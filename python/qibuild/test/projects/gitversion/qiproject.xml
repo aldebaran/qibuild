@@ -4,6 +4,6 @@
   found in the COPYING file.
 -->
 
-<project version="3">
+<project format="3">
   <qibuild name="gitversion" />
 </project>

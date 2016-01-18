@@ -16,7 +16,7 @@ that you can have nested projects.
 
 .. code-block:: xml
 
-  <project version="3" />
+  <project format="3" />
     <project src="subfolder" />
   </project>
 
@@ -38,7 +38,7 @@ The ``qiproject`.xml`` should contain the list of maintainers, like so
 
 .. code-block:: xml
 
-  <project version="3">
+  <project format="3">
     <maintainer email="jdoe@company.com">John Doe</maintainer>
   </project>
 
@@ -46,7 +46,7 @@ If the project is no longer maintained, specify it like so:
 
 .. code-block:: xml
 
-  <project version="3">
+  <project format="3">
     <maintainer>ORPHANED</maintainer>
   </project>
 
@@ -57,7 +57,7 @@ The ``qiproject.xml`` should contain the license used by the project, like so
 
 .. code-block:: xml
 
-  <project version="3">
+  <project format="3">
     <license>GPL</license>
   </project>
 
@@ -115,7 +115,7 @@ For instance
 
 .. code-block:: xml
 
-  <project version="3" >
+  <project format="3" >
     <qibuild name="hello">
       <depends buildtime="true" runtime="true" names="foo bar" />
       <depends runtime="true" names="spam" />
@@ -135,7 +135,7 @@ For instance:
 
 .. code-block:: xml
 
-    <project version="3">
+    <project format="3">
       <qibuild name="foo" meta="true">
         <depends runtime="true" names="bar baz" >
       </qibuild>
@@ -153,7 +153,7 @@ The file will look like:
 
 .. code-block:: xml
 
-  <project version="3" >
+  <project format="3" >
     <qilinguist name="hello" linguas="fr_FR en_US" tr="gettext" />
   </project>
 
@@ -187,7 +187,7 @@ Here is what the ``qiproject.xml`` should look like:
 
 .. code-block:: xml
 
-  <project version="3">
+  <project format="3">
     <qipython name="foobarspam">
       <module name="bar" src="lib" />
       <package name="foo" src="lib" />
@@ -201,7 +201,7 @@ In this case, specify ``<setup with_distutils="true">`` in the
 
 .. code-block:: xml
 
-  <project  version="3">
+  <project  format="3">
     <qipython name="foobarspam">
       <setup with_distutils="true" />
     </qipython>
@@ -220,7 +220,7 @@ Here is what the ``qiproject.xml`` looks like for each type.
 
 .. code-block:: xml
 
-  <project version="3">
+  <project format="3">
     <!-- for sphinx projects -->
     <qidoc name="foo" type="sphinx" dest="lib/foo" />
     <!-- for doxygen projects -->
@@ -249,7 +249,7 @@ following ``qiproject.xml`` files:
 .. code-block:: xml
 
   <!-- in hello/qiproject.xml -->
-  <project version="3">
+  <project format="3">
     <qidoc type="sphinx" name="hello">
       <depends name="world" />
     </qidoc>
@@ -258,7 +258,7 @@ following ``qiproject.xml`` files:
 .. code-block:: xml
 
   <!-- in world/qiproject.xml -->
-  <project version="3">
+  <project format="3">
     <qidoc type="sphinx" name="world" dest="lib/world" />
   </project>
 
@@ -269,7 +269,7 @@ You can also specify a Python script to be run before building anything:
 
 .. code-block:: xml
 
-  <project version="3">
+  <project format="3">
     <qidoc type="sphinx" name="hello">
       <prebuild script="gen_rst.py" />
     </qidoc>
@@ -293,7 +293,7 @@ be zipped and made available as a ``..download`` directive:
 
 .. code-block:: xml
 
-  <project version="3">
+  <project format="3">
     <qidoc type="sphinx" name="hello">
       <examples>
         <example src="samples/foo" />

@@ -7,7 +7,7 @@ import qisrc.license
 def test_reads_license_from_qiproject(tmpdir):
     qiproject_xml = tmpdir.join("qiproject.xml")
     qiproject_xml.write("""
-<project version="3">
+<project format="3">
   <maintainer email="jdoe@example.com">John Doe</maintainer>
   <license>BSD</license>
 </project>
@@ -18,7 +18,7 @@ def test_reads_license_from_qiproject(tmpdir):
 def test_warns_when_no_license(tmpdir, record_messages):
     qiproject_xml = tmpdir.join("qiproject.xml")
     qiproject_xml.write("""
-<project version="3">
+<project format="3">
   <maintainer email="jdoe@example.com">John Doe</maintainer>
 </project>
 """)

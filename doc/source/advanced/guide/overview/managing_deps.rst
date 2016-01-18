@@ -67,7 +67,7 @@ qibuild that there is a project named ``world`` in
 
 .. code-block:: xml
 
-    <project version="3">
+    <project format="3">
       <qibuild name="world" />
     </project>
 
@@ -77,7 +77,7 @@ and that it depends on the ``world`` project:
 
 .. code-block:: xml
 
-  <project version="3" >
+  <project format="3" >
     <qibuild name="hello">
       <depends buildtime="true" runtime="true" names="world" />
     </qibuild>

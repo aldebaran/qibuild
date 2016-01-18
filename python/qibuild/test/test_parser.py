@@ -23,7 +23,7 @@ def test_finds_parent_qibuild_project(build_worktree, args):
     b_proj = worktree.create_project("a/b")
     qiproject_xml = os.path.join(b_proj.path, "qiproject.xml")
     with open(qiproject_xml, "w") as fp:
-        fp.write('<qibuild version="3" />\n')
+        fp.write('<qibuild format="3" />\n')
     with qisys.sh.change_cwd(b_proj.path):
         projects = qibuild.parsers.get_build_projects(build_worktree, args)
         assert projects == [a_proj]

@@ -1,4 +1,4 @@
-<project version="3">
+<project format="3">
   <qipython name="foo">
     <setup with_distutils="true" />
   </qipython>

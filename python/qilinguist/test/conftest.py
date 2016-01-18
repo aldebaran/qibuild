@@ -105,7 +105,7 @@ class TestLinguistWorktree(qilinguist.worktree.LinguistWorkTree):
         qiproject_xml = os.path.join(proj_path, "qiproject.xml")
         with open(qiproject_xml, "w") as fp:
             fp.write("""
-<project version="3">
+<project format="3">
     <qilinguist name="{name}" tr="gettext" linguas="fr_FR en_US" />
 </project>
 """.format(name=name))
