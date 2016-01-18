@@ -58,7 +58,7 @@ def new_linguist_project(linguist_worktree, project):
         return None
     tree = qisys.qixml.read(project.qiproject_xml)
     root = tree.getroot()
-    if root.get("version") != "3":
+    if root.get("version") != "3" and root.get("format") != "3":
         return None
     elem = root.find("qilinguist")
     if elem is None:
