@@ -232,7 +232,7 @@ class Git(object):
         out, _ = self.call("diff-files", "--quiet", "--ignore-submodules", raises=False)
         unstaged = False
         if out != 0:
-            message = "You have unstaged changes"
+            message = "You have unstaged changes\n"
             unstaged = True
         out, _ = self.call("diff-index", "--quiet", "--cached", "--ignore-submodules","HEAD",
                            raises = False)
