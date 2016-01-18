@@ -26,7 +26,8 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
         return py.path.local(self.root)
 
     def create_project(self, name, src=None,
-                       build_depends=None, run_depends=None, test_depends=None):
+                       build_depends=None, run_depends=None,
+                       test_depends=None, host_depends=None):
         """ Create a new build project """
         if not build_depends:
             build_depends = list()
@@ -34,6 +35,8 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
             run_depends = list()
         if not test_depends:
             test_depends = list()
+        if not host_depends:
+            host_depends = list()
         if not src:
             src = name
         proj_path = self.tmpdir.join(*src.split("/"))
@@ -42,17 +45,18 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
         xml = """ \
 <project format="3">
   <qibuild name="{name}">
-    <depends buildtime="true" runtime="false" testtime="false" names="{buildtime_names}" />
-    <depends buildtime="false" runtime="true" testtime="false" names="{runtime_names}" />
-    <depends buildtime="false" runtime="false" testtime="true" names="{testtime_names}" />
+    <depends buildtime="true" names="{buildtime_names}" />
+    <depends runtime="true" names="{runtime_names}" />
+    <depends testtime="true" names="{testtime_names}" />
+    <depends host="true" names="{host_names}" />
   </qibuild>
 </project>
 """
         xml = xml.format(name=name,
                         buildtime_names=" ".join(build_depends),
                         runtime_names=" ".join(run_depends),
-                        testtime_names=" ".join(test_depends)
-                        )
+                        testtime_names=" ".join(test_depends),
+                        host_names=" ".join(host_depends))
         proj_path.join("qiproject.xml").write(xml)
         cmake = """ \
 cmake_minimum_required(VERSION 2.8)
