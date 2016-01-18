@@ -156,7 +156,7 @@ class Branch(object):
         return self.name == other.name and \
                self.tracks == other.tracks and \
                self.remote_branch == self.remote_branch and \
-               self.default is self.default
+               self.default is other.default
 
     def __ne__(self, other):
         return not self.__eq__(other)
