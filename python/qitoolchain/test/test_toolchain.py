@@ -127,7 +127,6 @@ def test_displays_git_info(tmpdir, git_server, feed, qitoolchain_action):
     qitoolchain_action("create", "--name", "bar", "--branch", "devel", "foo", feed_url)
     foo_tc = qitoolchain.get_toolchain("foo")
     as_str = str(foo_tc)
-    print as_str
     assert "on devel" in as_str
     assert "(feeds/bar.xml)" in as_str
     assert "from %s" % feed_url in as_str
