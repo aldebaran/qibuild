@@ -30,7 +30,7 @@ qibuild
 
   Use these variables in ``qi_generate_src`` and ``qi_generate_header`` custom commands.
 
-  This workarounds DYLD_ variables not being forwarded because of
+  This workarounds ``DYLD_`` variables not being forwarded because of
   OS X 10.11 System Integrity Protection
 
 
