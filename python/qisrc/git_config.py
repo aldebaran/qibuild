@@ -107,8 +107,6 @@ class Remote(object):
         if match:
             groupdict = match.groupdict()
             self.protocol = groupdict["protocol"]
-            if self.protocol == "file://":
-                self.prefix = "foo"
             self.server = groupdict["server"]
             port = groupdict.get("port")
             if port:
@@ -176,4 +174,3 @@ class BranchParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(BranchParser, self).__init__(target)
         self._required = ["name"]
-
