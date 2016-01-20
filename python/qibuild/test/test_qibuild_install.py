@@ -1,8 +1,10 @@
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
 import sys
 import os
+import subprocess
 
 import qisys.command
 import qitest.project
@@ -52,6 +54,26 @@ def test_running_from_install_dir_dep_in_toolchain(cd_to_tmpdir):
 
     hello = qibuild.find.find_bin([prefix.strpath], "hello")
     qisys.command.call([hello])
+
+def test_libsubfolder(qibuild_action, tmpdir):
+    dest = tmpdir.join("dest")
+    qibuild_action.add_test_project("libsubfolder")
+    qibuild_action("configure", "libsubfolder")
+    qibuild_action("make", "libsubfolder")
+    qibuild_action("install", "libsubfolder", dest.strpath)
+    # Make sure bar binary can run:
+    bar = dest.join("bin", "bar")
+    qisys.command.call([bar.strpath])
+    # Make sure foo-config.cmake is correct
+    foo_config_cmake = dest.join("share", "cmake", "foo", "foo-config.cmake")
+    to_write = "\nmessage(STATUS ${FOO_LIBRARIES})\n"
+    foo_config_cmake.write(to_write, mode="a")
+    cmd = ["cmake", "-P", foo_config_cmake.strpath]
+    output = subprocess.check_output(cmd)
+    # output looks like:
+    # -- /path/to/libfoo.so
+    libs_from_cmake = output.split()[1]
+    assert os.path.exists(libs_from_cmake)
 
 def test_devel_components_installed_by_default(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
