@@ -111,7 +111,7 @@ If ``src`` is not given, it will deduced from the project name.
    <manifest>
       <remote name="origin" url="git://example.com" />
       <remote name="gerrit" url="ssh://review.corp.com:29418" review="true" />
-      <project name="bar/baz.git" remotes="origin gerrit" />
+      <repo project="bar/baz.git" remotes="origin gerrit" />
     </manifest>
 
 
@@ -123,7 +123,32 @@ The repository will be configured with two remotes: ``origin``, and ``gerrit``,
 and the ``commit-msg`` gerrit hook will be fetched automatically from
 ``<username>@<server>:hooks/commit-msg`` on the given port .
 
+The repository will be cloned using the URL from the first remote.
 
+Custom branch
++++++++++++++
+
+
+By default, a ``master`` branch will be created tracking the remote used for
+cloning.
+
+You can specify an other branch to use like this:
+
+.. code-block:: xml
+
+  <repo project="bar/baz.git" remotes="origin" branch="devel" />
+
+Here, a ``devel`` branch will be created, tracking ``origin/devel``
+
+Fixed reference
+++++++++++++++++
+
+Lastly, instead of a branch you can specify a fixed reference. (A tag or a SHA1)
+In this case, no branch will be configured.
+
+.. code-block:: xml
+
+    <repo project="bar/baz.git" remotes="origin" ref="v0.1" />
 
 groups node
 -----------
@@ -140,7 +165,7 @@ Then they contain a list of project name, and can include other groups.
     </group>
     <group name="core">
       <group name="testing" />
-      <project name="libcore" />
+      <project name="libcore.git" />
     </group>
   </groups>
 

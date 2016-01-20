@@ -78,6 +78,12 @@ qisrc
   For instance, to push everything but the last commit, you can use
   ``qisrc push HEAD~1:master``
 
+* Add support for fixed refs (or tags) in qisrc manifest
+
+  .. code-block:: xml
+
+    <repo project="foo/bar.git" ref="v0.1" />
+
 * Fix ``qisrc info`` when there is no manifest
 
 cmake
