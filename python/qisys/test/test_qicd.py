@@ -2,8 +2,11 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import os
-
+import pytest
 import qicd
+
+from qisys.worktree import NoSuchProject
+from qibuild.test.conftest import qibuild_action
 
 def get_best_match(worktree, token):
     # qicd.find_best_match returns an absolute path,
@@ -33,3 +36,13 @@ def test_matches_closest(worktree):
     assert get_best_match(worktree, "mathint") == "lib/libalmathinternal"
     assert get_best_match(worktree, "almathin") == "lib/libalmathinternal"
     assert get_best_match(worktree, "almath") == "lib/libalmath"
+
+def test_qicd_dash_b(qibuild_action, record_messages):
+    world_proj = qibuild_action.add_test_project("world")
+    hello_proj = qibuild_action.add_test_project("hello")
+    worktree = qibuild_action.build_worktree.worktree
+    res = qicd.get_qibuild_path(worktree, "world")
+    assert res == world_proj.path
+    # pylint:disable-msg=E1101
+    with pytest.raises(NoSuchProject) as e:
+        qicd.get_qibuild_path(worktree, "worl")

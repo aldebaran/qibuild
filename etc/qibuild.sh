@@ -2,10 +2,9 @@
 # helper functions for qibuild
 
 function qicd {
-  p=$(python -m 'qicd' $1)
+  p=$(python -m 'qicd' $@)
   if [[ $? -ne 0 ]]; then
-    return
+    return 1
   fi
   cd ${p}
 }
-
