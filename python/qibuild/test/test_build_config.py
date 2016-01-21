@@ -12,15 +12,20 @@ import qitoolchain.toolchain
 
 from qibuild.test.conftest import TestBuildWorkTree
 
+def get_flag(cmake_args, name):
+    arg = [x for x in cmake_args if name in x][0]
+    value = arg.split("=")[1]
+    return value
+
 def test_read_profiles(build_worktree):
     build_worktree.configure_build_profile("foo", [("WITH_FOO", "ON")])
     qibuild.config.add_build_config("foo", profiles=["foo"])
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
     build_config.set_active_config("foo")
     cmake_args = build_config.cmake_args
-    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
+    cmake_args = [x for x in cmake_args if "WITH" in x]
     assert cmake_args == \
-            ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_FOO=ON"]
+            ["-DWITH_FOO=ON"]
 
 def test_users_flags_taken_last(build_worktree):
     build_worktree.configure_build_profile("foo", [("WITH_FOO", "ON")])
@@ -29,19 +34,18 @@ def test_users_flags_taken_last(build_worktree):
     build_config.set_active_config("foo")
     build_config.user_flags = [("WITH_FOO", "OFF")]
     cmake_args = build_config.cmake_args
-    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
+    cmake_args = [x for x in cmake_args if "WITH" in x]
     assert cmake_args == \
-            ["-DCMAKE_BUILD_TYPE=Debug",
-             "-DWITH_FOO=ON",
-             "-DWITH_FOO=OFF"]
+            ["-DWITH_FOO=ON", "-DWITH_FOO=OFF"]
 
 def test_sane_defaults(build_worktree):
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
     assert build_config.cmake_generator is None
     assert build_config.build_type == "Debug"
     cmake_args = build_config.cmake_args
-    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
-    assert cmake_args == ["-DCMAKE_BUILD_TYPE=Debug"]
+    assert get_flag(cmake_args, "CMAKE_BUILD_TYPE") == "Debug"
+    qibuild_dir = os.path.join(qibuild.cmake.get_cmake_qibuild_dir(), "qibuild")
+    assert get_flag(cmake_args, "qibuild_DIR") == qibuild_dir
 
 def test_read_qibuild_conf(build_worktree):
     qibuild_xml = qisys.sh.get_config_path("qi", "qibuild.xml")
@@ -56,9 +60,7 @@ def test_read_qibuild_conf(build_worktree):
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
     assert build_config.cmake_generator == "Ninja"
     cmake_args = build_config.cmake_args
-    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
-    assert cmake_args == \
-            ["-GNinja", "-DCMAKE_BUILD_TYPE=Debug"]
+    assert "-GNinja" in cmake_args
 
 def test_build_prefix(build_worktree):
     local_xml = build_worktree.qibuild_xml
@@ -198,9 +200,11 @@ def test_profiles_from_config(cd_to_tmpdir):
     build_worktree.set_active_config("foo")
     build_config = build_worktree.build_config
     assert build_config.profiles == ["bar"]
+    # build_config.cmake contains qibuild_DIR, CMAKE_BUILD_TYPE, and
+    # QI_VIRTUALENV_PATH, which are not relevant to this test
     cmake_args = build_config.cmake_args
-    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
-    assert cmake_args == ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_BAR=ON"]
+    cmake_args = [x for x in cmake_args if "WITH" in x]
+    assert cmake_args == ["-DWITH_BAR=ON"]
 
 
 def test_adding_removing_toolchains(qitoolchain_action, qibuild_action):

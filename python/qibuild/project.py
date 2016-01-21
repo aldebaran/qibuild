@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 
 import argparse
+import copy
 import json
 import os
 import platform
@@ -14,6 +15,7 @@ from qisys import ui
 import qisys.command
 import qisys.parsers
 import qisys.sh
+import qibuild
 import qibuild.cmake
 import qibuild.build
 import qibuild.breakpad
@@ -98,9 +100,6 @@ class BuildProject(object):
         """ Path to qiproject.xml """
         return os.path.join(self.path, "qiproject.xml")
 
-    @property
-    def cmake_qibuild_dir(self):
-        return qibuild.cmake.get_cmake_qibuild_dir()
 
     @property
     def build_directory(self):
@@ -212,7 +211,7 @@ set(CMAKE_PREFIX_PATH ${{CMAKE_PREFIX_PATH}} CACHE INTERNAL ""  FORCE)
             to_include = qisys.sh.to_posix_path(self.build_config.local_cmake)
             custom_cmake_code += 'include("%s")\n' % to_include
 
-        cmake_qibuild_dir = self.cmake_qibuild_dir
+        cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
         cmake_qibuild_dir = qisys.sh.to_posix_path(cmake_qibuild_dir)
         dep_to_add = ""
         dirs_to_add = sdk_dirs
@@ -233,7 +232,6 @@ endif()
             custom_cmake_code=custom_cmake_code
         )
 
-        import qibuild
         qibuild_python = os.path.join(qibuild.__file__, "..", "..")
         qibuild_python = os.path.abspath(qibuild_python)
         qibuild_python = qisys.sh.to_posix_path(qibuild_python)
@@ -248,23 +246,90 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
     def configure(self, **kwargs):
         """ Delegate to :py:func:`qibuild.cmake.cmake` """
+        # Need a copy because cmake_args will be modified by
+        # qibuild.cmake.cmake()
+        cmake_args = copy.copy(self.cmake_args)
         qisys.sh.mkdir(self.sdk_directory, recursive=True)
-        cmake_args = self.cmake_args
-        # only required the first time, afterwards this setting is
-        # written in the cache by dependencies.cmake
-        cmake_qibuild_dir = self.cmake_qibuild_dir
-        cmake_qibuild_dir = os.path.join(cmake_qibuild_dir, "qibuild")
-        cmake_qibuild_dir = qisys.sh.to_posix_path(cmake_qibuild_dir)
-        cmake_args.append("-Dqibuild_DIR=%s" % cmake_qibuild_dir)
+        if kwargs.get("allow_cmake_skip"):
+            need_configure = self.need_configure()
+        else:
+            need_configure = True
+        if not need_configure:
+            ui.info("CMakeCache.txt already up to date, skipping")
+            return
+        kwargs.pop("allow_cmake_skip", None)
         # Make DYLD_ variables also available at configure time
         # (Workaround OS X 10.11 not forwarding DYLD_ variables anymore)
         build_env = self.fix_env(self.build_env)
         try:
             qibuild.cmake.cmake(self.path, self.build_directory,
                                 cmake_args, env=build_env, **kwargs)
+            self.write_cmake_args(self.cmake_args)
         except qisys.command.CommandFailedException as error:
             raise qibuild.build.ConfigureFailed(self, error)
         self.generate_qitest_json()
+
+    def write_cmake_args(self, cmake_args):
+        flags_txt = os.path.join(self.build_directory, "cmake_args.txt")
+        with open(flags_txt, "w") as fp:
+            fp.write("\n".join(cmake_args) + "\n")
+
+    def read_cmake_args(self):
+        flags_txt = os.path.join(self.build_directory, "cmake_args.txt")
+        if not os.path.exists(flags_txt):
+            return list()
+        with open(flags_txt, "r") as fp:
+            lines = fp.readlines()
+            return [x.strip() for x in lines]
+
+    def need_configure(self):
+        previous_args = self.read_cmake_args()
+        if not previous_args:
+            ui.debug("Could not read previous CMake args, re-running CMake")
+            # First time we run CMake, or configure failed:
+            return True
+
+        if previous_args != self.cmake_args:
+            if previous_args:
+                # Do not display a message if it's the first time
+                # we run CMake
+                ui.info("CMake arguments changed, re-running CMake")
+            return True
+
+        if not os.path.exists(self.cmake_cache):
+            ui.debug("CMakeCache.txt does not exist, re-running CMake")
+            return True
+
+        def cmake_filter(filename=None, dirname=None):
+            """ Return True if cmake should re-run when
+            the file has changed
+
+            """
+            if dirname:
+                # Don't descend into hidden folders
+                if dirname.startswith("."):
+                    return False
+                # Don't descend into build dirs:
+                if dirname.startswith("build-"):
+                    return False
+
+            if filename:
+                # Only consider CMakeLists.txt, qiproject.xml,
+                # and .cmake files
+                basename = os.path.basename(filename)
+                if basename in ["CMakeLists.txt", "qiproject.xml"]:
+                    return True
+                if basename.endswith(".cmake"):
+                    return True
+
+        cmake_cache_time = os.path.getmtime(self.cmake_cache)
+        filenames = qisys.sh.ls_r(self.path, filter_fun=cmake_filter)
+        for filename in filenames:
+            full_path = os.path.join(self.path, filename)
+            if os.path.getmtime(full_path) > cmake_cache_time:
+                rel_path = os.path.relpath(full_path, self.path)
+                ui.info("Re-running CMake because %s has changed" % rel_path)
+                return True
 
     def generate_qitest_json(self):
         """ The qitest.cmake is written from CMake """

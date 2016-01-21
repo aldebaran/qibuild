@@ -175,6 +175,11 @@ Or configure the project with no config
             if project.meta:
                 ui.info("Meta project, skipping configure")
                 continue
+
+            # Make sure CMake is always re-run when on the top projects (it's
+            # only ok to skip configure of the dependencies)
+            kwargs["allow_cmake_skip"] = (project not in self.projects)
+
             project.configure(**kwargs)
 
     @need_configure

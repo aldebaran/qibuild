@@ -7,6 +7,7 @@ import platform
 
 import qisys.sh
 import qisys.qixml
+import qibuild.cmake
 import qibuild.config
 import qibuild.profile
 import qitoolchain
@@ -163,8 +164,17 @@ class CMakeBuildConfig(object):
         for (name, value) in self.user_flags:
             args.append("-D%s=%s" % (name, value))
 
+        # Set QI_VIRTUALENV_PATH (useful when calling Python code from
+        # C++)
         venv_path = self.build_worktree.venv_path
         args.append("-DQI_VIRTUALENV_PATH=%s" % qisys.sh.to_posix_path(venv_path))
+
+        # Set qibuild_DIR in cache so that re-running CMake from an IDE
+        # finds qibuild cmake modules
+        cmake_qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
+        cmake_qibuild_dir = os.path.join(cmake_qibuild_dir, "qibuild")
+        cmake_qibuild_dir = qisys.sh.to_posix_path(cmake_qibuild_dir)
+        args.append("-Dqibuild_DIR=%s" % cmake_qibuild_dir)
 
         return args
 

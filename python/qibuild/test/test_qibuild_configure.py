@@ -5,6 +5,7 @@
 import os
 import platform
 import subprocess
+import time
 
 import qisys.command
 import qibuild.cmake
@@ -16,6 +17,7 @@ import qitoolchain
 from qibuild.test.conftest import TestBuildWorkTree
 from qipy.test.conftest import qipy_action
 
+import mock
 import pytest
 
 
@@ -327,3 +329,41 @@ def test_virtualenv_path(qipy_action, qibuild_action):
     output = subprocess.check_output([py_test]).strip()
     bin_python = os.path.join(output, "bin", "python")
     assert os.path.exists(bin_python)
+
+def test_skips_configure(qibuild_action, record_messages):
+    world_proj = qibuild_action.add_test_project("world")
+    qibuild_action.add_test_project("hello")
+    qibuild_action("configure", "hello")
+    with mock.patch("qisys.command.call") as mock_call:
+        qibuild_action("configure", "hello")
+        # hello should be rebuild because it's a top project,
+        # but world should be skipped
+        assert len(mock_call.call_args_list) == 1
+    world_cmake = os.path.join(world_proj.path, "CMakeLists.txt")
+    os.utime(world_cmake, None)
+    record_messages.reset()
+    with mock.patch("qisys.command.call") as mock_call:
+        qibuild_action("configure", "hello")
+        assert record_messages.find("Re-running CMake because CMakeLists.txt has changed")
+        assert len(mock_call.call_args_list) == 2
+
+def test_re_run_cmake_when_flags_change(qibuild_action, record_messages):
+    qibuild_action.add_test_project("world")
+    qibuild_action("configure", "world")
+    record_messages.reset()
+    qibuild_action("configure", "world", "-DFOO=BAR")
+    assert not record_messages.find("up to date")
+
+def test_never_skip_top_projects(qibuild_action, record_messages):
+    qibuild_action.add_test_project("world")
+    qibuild_action("configure", "world")
+    record_messages.reset()
+    qibuild_action("configure", "world")
+    assert not record_messages.find("skipping")
+
+def test_running_cmake_for_the_first_time(qibuild_action, record_messages):
+    qibuild_action.add_test_project("world")
+    qibuild_action.add_test_project("hello")
+    record_messages.reset()
+    qibuild_action("configure", "hello")
+    assert not record_messages.find("CMake arguments changed")
