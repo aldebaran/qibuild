@@ -68,7 +68,7 @@ def get_share_path(*args):
     return get_path(SHARE_PATH, *args)
 
 def get_path(*args):
-    """ Helper for get_*_path methods """
+    """ Helper for ``get_*_path`` methods """
     full_path = os.path.join(*args)
     to_make = os.path.dirname(full_path)
     mkdir(to_make, recursive=True)
@@ -88,7 +88,7 @@ def username():
          return username
 
 def mkdir(dest_dir, recursive=False):
-    """ Recursive mkdir (do not fail if file exists) """
+    """ Recursive ``mkdir`` (do not fail if file exists) """
     try:
         if recursive:
             os.makedirs(dest_dir)
@@ -97,21 +97,6 @@ def mkdir(dest_dir, recursive=False):
     except OSError, e:
         if e.errno == 17:
             # Directory already exists -> we don't care
-            pass
-        else:
-            raise
-
-
-#pylint: disable-msg=C0103
-def ln(src, dst, symlink=True):
-    """ ln (do not fail if file exists) """
-    try:
-        if symlink:
-            os.symlink(src, dst)
-        else:
-            raise NotImplementedError
-    except OSError, e:
-        if e.errno == 17:
             pass
         else:
             raise
@@ -129,31 +114,6 @@ def write_file_if_different(data, out_path, mode="w"):
         pass
     with open(out_path, mode) as out_file:
         out_file.write(data)
-
-
-def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
-    """Configure a file.
-    :param in_path: input file
-    :param out_path: output file
-
-    The out_path needs not to exist, missing leading directories will
-    be created if necessary.
-
-    If copy_only is True, the contents will be copied "as is".
-
-    If not, we will use the args and kwargs parameter as in::
-
-        in_content.format(*args, **kwargs)
-
-    """
-    mkdir(os.path.dirname(os.path.abspath(out_path)), recursive=True)
-    with open(in_path, "r") as in_file:
-        in_content = in_file.read()
-        if copy_only:
-            out_content = in_content
-        else:
-            out_content = in_content.format(*args, **kwargs)
-        write_file_if_different(out_content, out_path)
 
 
 def _copy_link(src, dest, quiet):
@@ -238,14 +198,15 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
 def install(src, dest, filter_fun=None, quiet=False):
     """Install a directory or a file to a destination.
 
-    If filter_fun is not None, then the file will only be
-    installed if filter_fun(relative/path/to/file) returns
+    If ``filter_fun`` is not None, then the file will only be
+    installed if ``filter_fun(relative/path/to/file)`` returns
     True.
 
     If ``dest`` does not exist, it will be created first.
 
     When installing files, if the destination already exists,
-    it will be removed first, then overwritten by the new file.
+    it will be removed first, then overwritten by the new file
+    This makes it possible to install read-only files twice
 
     This function will preserve relative symlinks between directories,
     used for instance in Mac frameworks::
@@ -303,11 +264,11 @@ def install(src, dest, filter_fun=None, quiet=False):
 
 def safe_copy(src, dest):
     """ Copy a source file to a destination but
-    do not overwrite dest if it is more recent than src
+    do not overwrite ``dest`` if it is more recent than ``src``
 
     Create any missing directories when necessary
 
-    If dest is a directory, src will be copied inside dest.
+    If ``dest`` is a directory, ``src`` will be copied inside ``dest``.
 
     """
     if os.path.isdir(dest):
@@ -316,8 +277,8 @@ def safe_copy(src, dest):
         shutil.copy(src, dest)
 
 def up_to_date(output_path, input_path):
-    """" Return True if output_path exists and is
-    more recent than input_path
+    """ Returns True if ``output_path`` exists and is
+    more recent than ``input_path``
 
     """
     if not os.path.exists(output_path):
@@ -344,13 +305,12 @@ def copy_git_src(src, dest):
 
 def rm(name):
     """This one can take a file or a directory.
-    Contrary to shutil.remove or os.remove, it:
+    Contrary to ``shutil.rmtree`` or ``os.remove``, it:
 
     * won't fail if the directory does not exist
     * won't fail if the directory contains read-only files
     * won't fail if the file does not exist
 
-    Please avoid using shutil.rmtree ...
     """
     if not os.path.lexists(name):
         return
@@ -360,7 +320,6 @@ def rm(name):
     else:
         ui.debug("Removing", name)
         os.remove(name)
-
 
 # Taken from gclient source code (BSD license)
 def rmtree(path):
@@ -441,7 +400,7 @@ def rmtree(path):
 
 def mv(src, dest):
     """Move a file into a directory, but do not crash
-    if dest/src exists
+    if ``dest/src`` exists
 
     """
     if os.path.isdir(dest):
@@ -456,18 +415,19 @@ def iter_directory(directory, filter_fun=None, all=False):
     """Returns a generator for all the files present in a directory,
     relative to this directory.
 
-    Empty directories are ignored>
+    Empty directories are ignored.
 
     By default, do not list hidden files and do not descend into
     hidden directories.
 
-    You can use all=True to list all the files
+    You can use ``all=True`` to list all the files
 
-    (Hidden in this context means "starting with ."
-    If you want to support MacOS or Windows hidden files you are on your
-    own ...)
+    .. note:: Hidden in this context means "starting with a dot"
 
-    If  `filter_fun`` is given, it will be called with
+              (If you want to support MacOS or Windows hidden files
+              you are on your own ...)
+
+    If  ``filter_fun`` is given, it will be called with
     ``(filename, dirname)`` optional argument and should return True
     if the directory should be descended into or the filename should be yield
 
@@ -482,8 +442,9 @@ def iter_directory(directory, filter_fun=None, all=False):
             |__a
             |__b
 
-    iter_directory(foo) yields:
-    ["eggs/c", "eggs/d", "spam/a", "spam/b"]
+    ``iter_directory(foo)`` yields::
+
+        ["eggs/c", "eggs/d", "spam/a", "spam/b"]
 
     """
     def non_hidden(filename=None, dirname=None):
@@ -516,29 +477,18 @@ def iter_directory(directory, filter_fun=None, all=False):
             yield os.path.join(new_root, f)
 
 def ls_r(directory, filter_fun=None, all=False):
-    """ Same as :py:func`iter_directory` but returns a sorted list
+    """ Same as :py:func:`iter_directory` but returns a sorted list
 
 
     """
     return sorted(iter_directory(directory, filter_fun=filter_fun, all=all))
 
-def which(program):
-    """
-    find program in the environment PATH
-    :return: path to program if found, None otherwise
-    """
-    import warnings
-    warnings.warn("qisys.sh.which is deprecated, "
-     "use qisys.command.find_program instead")
-    from qisys.command import find_program
-    return find_program(program)
-
-
 def to_posix_path(path, fix_drive=False):
     """
     Returns a POSIX path from a DOS path
-    :param fix_drive: if True, will replace c: by /c/
-    (ala mingw)
+
+    :param fix_drive: if True, will replace ``c:`` by ``/c/``
+                       (ala ``mingw``)
 
     """
     res = os.path.expanduser(path)
@@ -563,8 +513,9 @@ def to_dos_path(path):
 
 def to_native_path(path, normcase=True):
     """Return an absolute, native path from a path,
+
     :param normcase: make sure the path is all lower-case on
-    case-insensitive filesystems
+                     case-insensitive filesystems
     """
     path = os.path.expanduser(path)
     if normcase:
@@ -578,7 +529,7 @@ def to_native_path(path, normcase=True):
 
 
 def is_path_inside(a, b):
-    """ Returns True if a is inside b
+    """ Returns True if ``a`` is inside ``b``
 
     >>> is_path_inside("foo/bar", "foo")
     True
@@ -612,11 +563,11 @@ class TempDir:
 
     This piece of code makes sure that:
 
-    * a temporary directory named temp_dir has been
+    * a temporary directory named ``temp_dir`` has been
       created (guaranteed to exist, be empty, and writeable)
 
     * the directory will be removed when the scope of
-      temp_dir has ended unless an exception has occurred
+      ``temp_dir`` has ended unless an exception has occurred
       and DEBUG environment variable is set.
 
     """
@@ -653,6 +604,7 @@ def is_runtime(filename):
     """ Filter function to only install runtime components of packages
 
     .. note:: This function is provided for retro-compatibility only
+
               New qitoolchain packages should use masks or install
               manifests
     """
@@ -713,6 +665,7 @@ def is_binary(file_path):
 
 def is_executable_binary(file_path):
     """ Returns true if the file:
+
       * is executable
       * is a binary (i.e not a script)
     """
@@ -724,6 +677,14 @@ def is_executable_binary(file_path):
 
 class PreserveFileMetadata(object):
     """ Preserve file metadata (permissions and times)
+
+    Use it with a ``with`` statement::
+
+        with PreserveFileMetadata("foo.txt"):
+            os.chmod("foo.txt", 0777)
+
+    When exiting the scope, ``mtime`` and ``mode`` of
+    ``foo.txt`` will be restored to their original values
 
     """
     def __init__(self, path):
