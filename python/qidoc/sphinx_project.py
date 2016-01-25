@@ -196,6 +196,11 @@ class SphinxProject(qidoc.project.DocProject):
         if pdb:
             cmd.append("-P")
 
+        # Avoid putting doctrees in output dir
+        doctrees_dir = os.path.join(self.build_dir, "doctrees")
+        qisys.sh.mkdir(doctrees_dir)
+        cmd.extend(("-d", doctrees_dir))
+
         cmd.append(self.source_dir)
 
         if spellcheck:

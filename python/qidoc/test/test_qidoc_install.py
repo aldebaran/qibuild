@@ -43,3 +43,9 @@ def test_cleans_install_dir(qidoc_action, tmpdir):
     qidoc_action("install", "--clean", "world", dest.strpath)
     assert not dest.join("world.html").check(file=True)
     assert dest.join("index.html").check(file=True)
+
+def test_do_not_install_doctrees(tmpdir, qidoc_action):
+    dest = tmpdir.join("dest")
+    qidoc_action.add_test_project("world")
+    qidoc_action("install", "world", dest.strpath)
+    assert not dest.join(".doctrees").check(dir=True)
