@@ -3,6 +3,9 @@
 ## found in the COPYING file.
 """ Display log between current branch and an other branch of the worktree """
 
+import sys
+
+from qisys import ui
 import qisys.parsers
 import qisrc.parsers
 import qisrc.diff
@@ -21,8 +24,15 @@ def do(args):
     if short:
         log_cmd = ["shortlog"]
     else:
-        format = "%Cgreen%h%Creset -%C(yellow)%d%Creset %s %C(bold blue)<%an>%Creset"
-        log_cmd = ["log", "--pretty=format:%s" % format]
+        # We need to build different format strings depending
+        # on the --color option
+        colors = ["green", "reset", "yellow", "reset", "bold blue", "reset"]
+        log_format = "{}%h{} - {}%d{} %s {}<%an>{}"
+        if ui.config_color(sys.stdout):
+            log_format = log_format.format(*("%C({})".format(x) for x in colors))
+        else:
+            log_format = log_format.format(*([""] * len(colors)))
+        log_cmd = ["log", "--pretty=format:%s" % log_format]
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
                                                   default_all=False,
