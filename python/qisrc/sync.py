@@ -70,7 +70,7 @@ class WorkTreeSyncer(object):
             git.commit("-m", "initial commit")
         return res
 
-    def sync_repos(self, force=False):
+    def sync_repos(self, force=False, worktree_clone=None):
         """ Update the manifest, inspect changes, and updates the
         git worktree accordingly
 
@@ -86,7 +86,8 @@ class WorkTreeSyncer(object):
             ui.info()
         self._sync_manifest()
         self.new_repos = self.read_remote_manifest()
-        res = self._sync_repos(self.old_repos, self.new_repos, force=force)
+        res = self._sync_repos(self.old_repos, self.new_repos, force=force,
+                               worktree_clone=worktree_clone)
         # re-read self.old_repos so we can do several syncs:
         self.old_repos = self.get_old_repos(warn=False)
         # if everything went well, save the manifests configurations:
@@ -155,7 +156,8 @@ class WorkTreeSyncer(object):
         qisys.qixml.write(tree, self.manifest_xml)
 
     def configure_manifest(self, url, branch="master", groups=None, all_repos=False,
-                           ref=None, review=None, force=False):
+                           ref=None, review=None, force=False,
+                           worktree_clone=None):
         """ Add a manifest to the list. Will be stored in
         .qi/manifests/<name>
 
@@ -172,7 +174,7 @@ class WorkTreeSyncer(object):
         self.manifest.ref = ref
         self.manifest.review = review
         self.manifest.all_repos = all_repos
-        res = self.sync_repos(force=force)
+        res = self.sync_repos(force=force, worktree_clone=worktree_clone)
         self.configure_projects()
         self.dump_manifest_config()
         return res
@@ -251,7 +253,8 @@ Please run `qisrc init MANIFEST_URL`
         if not transaction.ok:
             raise Exception("Update failed\n" + transaction.output)
 
-    def _sync_repos(self, old_repos, new_repos, force=False):
+    def _sync_repos(self, old_repos, new_repos, force=False,
+                    worktree_clone=None):
         """ Sync the remote repo configurations with the git worktree """
         res = True
         ##
@@ -307,7 +310,7 @@ Please run `qisrc init MANIFEST_URL`
                 ui.warning("Could not find a clone URL for", repo.project)
                 res = False
                 continue
-            if not self.git_worktree.clone_missing(repo):
+            if not self.git_worktree.clone_missing(repo, worktree_clone=worktree_clone):
                 res = False
             else:
                 project = self.git_worktree.get_git_project(repo.src)

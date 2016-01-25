@@ -1,6 +1,7 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
 import qisys.script
 import qisrc.git
 
@@ -8,6 +9,7 @@ from qisrc.test.conftest import TestGit
 from qisrc.test.conftest import TestGitWorkTree
 
 import os
+import mock
 import pytest
 
 def test_in_new_directory(cd_to_tmpdir, git_server):
@@ -194,3 +196,33 @@ def test_tags(qisrc_action, git_server):
     actual_sha1 = git.get_ref_sha1("refs/heads/master")
     expected_sha1 = git.get_ref_sha1("refs/tags/v0.1")
     assert actual_sha1 == expected_sha1
+
+class GitRecorder(qisrc.git.Git):
+    call_args = list()
+
+    def __init__(self, repo):
+        super(GitRecorder, self).__init__(repo)
+
+    def call(self, *args, **kwargs):
+        self.call_args.append((self.repo, args, kwargs))
+        return super(GitRecorder, self).call(*args, **kwargs)
+
+def test_clone_worktree_happy(qisrc_action, git_server, tmpdir):
+    git_server.create_repo("foo.git")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    work2 = tmpdir.join("work2").ensure(dir=True)
+    with mock.patch("qisrc.git.Git", GitRecorder):
+        qisrc_action.chdir(work2.strpath)
+        qisrc_action("init", git_server.manifest_url, "--clone", qisrc_action.root)
+        all_args = [" ".join(x[1]) for x in GitRecorder.call_args]
+        assert [x for x in all_args if foo_proj.path in x]
+
+def test_clone_evil_nested(qisrc_action, git_server, tmpdir):
+    git_server.create_repo("foo.git", src="foo")
+    git_server.create_repo("bar.git", src="foo/bar")
+    qisrc_action("init", git_server.manifest_url)
+    work2 = tmpdir.join("work2").ensure(dir=True)
+    qisrc_action.chdir(work2.strpath)
+    qisrc_action("init", git_server.manifest_url, "--clone", qisrc_action.root)

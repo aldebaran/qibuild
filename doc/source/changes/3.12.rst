@@ -140,6 +140,10 @@ qisrc
 
 * Fix ``qisrc info`` when there is no manifest
 
+* ``qisrc init``: add ``--clone OTHER_WORKTREE`` to create a new worktree
+  without having to fetch everything from the remote server, and use local
+  clones from ``OTHER_WORKTREE`` instead
+
 cmake
 -----
 

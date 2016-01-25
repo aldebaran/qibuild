@@ -39,11 +39,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self._syncer = qisrc.sync.WorkTreeSyncer(self)
 
     def configure_manifest(self, manifest_url, groups=None, all_repos=False,
-                           branch="master", ref=None, review=None, force=False):
+                           branch="master", ref=None, review=None, force=False,
+                           worktree_clone=None):
         """ Add a new manifest to this worktree """
         return self._syncer.configure_manifest(manifest_url, groups=groups,
                                                branch=branch, ref=ref, review=review,
-                                               force=force, all_repos=all_repos)
+                                               force=force, all_repos=all_repos,
+                                               worktree_clone=worktree_clone)
 
     def configure_projects(self, projects):
         self._syncer.configure_projects(projects)
@@ -165,7 +167,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
     def reload(self):
         self.load_git_projects()
 
-    def clone_missing(self, repo):
+    def clone_missing(self, repo, worktree_clone=None):
         """ Add a new project.
         :returns: a boolean telling if the clone succeeded
 
@@ -185,23 +187,50 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                 # Do nothing, the remote will be re-configured later
                 # anyway
                 return True
-        return self._clone_missing(git_project, repo)
+        return self._clone_missing(git_project, repo, worktree_clone=worktree_clone)
 
-    def _clone_missing(self, git_project, repo):
+    def _clone_missing(self, git_project, repo, worktree_clone=None):
+        # You may be wondering why we use `git clone` when used with the --clone
+        # option, and a combination of `git init`, `git fetch`, `git checkout` in
+        # the general case.
+        # The  reason is that in the general case, we can have the following scenario:
+        #  - first foo/bar is created
+        #  - then foo/ is added to the manifest
+        # In that case, trying to call `git clone` in foo/ will fail
+        #
+        # But when we are using --clone we know we have sorted the repos to clone
+        # by their relative paths in the worktree, (see qisrc.sync.compute_repo_diff)
+        # so we know foo/ will always be created before foo/bar/
         branch = repo.default_branch
         fixed_ref = repo.fixed_ref
         clone_url = repo.clone_url
         qisys.sh.mkdir(git_project.path, recursive=True)
         git = qisrc.git.Git(git_project.path)
         remote_name = repo.default_remote.name
+        remote_ref = "%s/%s" % (remote_name, branch)
+        clone_project = None
+        if worktree_clone:
+            clone_project = worktree_clone.find_repo(repo)
         with git.transaction() as transaction:
-            git.init()
+            if clone_project:
+                clone_args = [clone_project.path, "--origin", "clone"]
+                if branch:
+                    clone_args.extend(("--branch", branch))
+                git.clone(*clone_args)
+                if branch:
+                    git.set_tracking_branch(branch, remote_name)
+            else:
+                git.init()
             git.remote("add", remote_name, clone_url)
             git.fetch(remote_name, "--quiet")
-            if branch:
-                git.checkout("-b", branch, "%s/%s" % (remote_name, branch))
+            if branch and not clone_project:
+                # Setting of tracking branch was done after local clone
+                git.checkout("-b", branch, remote_ref)
             if fixed_ref:
                 git.reset("--hard", fixed_ref)
+            if clone_project and not fixed_ref:
+                # Reset to correct revision:
+                git.reset("--hard", remote_ref)
         if not transaction.ok:
             ui.error("Cloning repo failed")
             ui.error(transaction.output)

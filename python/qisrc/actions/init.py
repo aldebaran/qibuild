@@ -26,6 +26,8 @@ def configure_parser(parser):
     parser.add_argument("--all", dest="all", action="store_true",
         help="Do not use the default group, and clone all the projects "
              "of the manifest")
+    parser.add_argument("--clone",
+        help="Use the given worktree to do faster local clones")
     parser.set_defaults(branch="master", all=False, review=True)
 
 def do(args):
@@ -34,6 +36,20 @@ def do(args):
     qisys.sh.mkdir(root, recursive=True)
     worktree = qisys.worktree.WorkTree(root)
     git_worktree = qisrc.worktree.GitWorkTree(worktree)
+    worktree_clone = None
+    if args.clone:
+        candidate_clone_path = qisys.sh.to_native_path(args.clone)
+        dot_qi = os.path.join(candidate_clone_path, ".qi")
+        git_xml = os.path.join(dot_qi, "git.xml")
+        if not os.path.exists(git_xml):
+            mess = """\
+Invalid --clone argument
+Worktree in {0} does not appear to be a valid qisrc worktree
+({1} does not exist)
+"""
+            sys.exit(mess.format(args.clone, git_xml))
+        candidate_worktree = qisys.worktree.WorkTree(candidate_clone_path)
+        worktree_clone = qisrc.worktree.GitWorkTree(candidate_worktree)
     if args.manifest_url:
         if os.path.isdir(args.manifest_url):
             args.manifest_url = qisys.sh.to_native_path(args.manifest_url)
@@ -41,7 +57,8 @@ def do(args):
                                         groups=args.groups,
                                         branch=args.branch,
                                         review=args.review,
-                                        all_repos=args.all)
+                                        all_repos=args.all,
+                                        worktree_clone=worktree_clone)
         if not ok:
             sys.exit(1)
 
