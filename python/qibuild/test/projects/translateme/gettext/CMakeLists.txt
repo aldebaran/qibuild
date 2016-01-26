@@ -8,9 +8,9 @@ find_package(qibuild)
 
 qi_create_bin(translate main.cpp)
 
-qi_add_optional_package(INTL)
+find_package(intl NO_MODULE)
 
-if (WITH_INTL)
+if(INTL_PACKAGE_FOUND)
   add_definitions("-DWITH_INTL")
   qi_use_lib(translate INTL)
   qi_create_trad(translate "po")
