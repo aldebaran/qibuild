@@ -1,6 +1,8 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+from __future__ import print_function
+
 import os
 import sys
 
@@ -8,6 +10,7 @@ import qisys.command
 import qisys.error
 import qisys.qixml
 from qisys.qixml import etree
+import qibuild.find
 import qipkg.builder
 import qipkg.package
 
@@ -35,16 +38,17 @@ def test_make_package(qipkg_action, qipy_action):
     qipkg_action("build", pml)
     pkg = qipkg_action("make-package", pml)
     qipkg_action("extract-package", pkg)
+    extracted = tmpdir.join("c-0.1").strpath
 
     expected_paths = [
             "manifest.xml",
-            "lib/libfoo.so",
             "lib/python2.7/site-packages/b.py",
             "c_behavior/behavior.xar",
     ]
     for path in expected_paths:
-        full_path = tmpdir.join("c-0.1", path)
-        assert full_path.check(file=True)
+        full_path = os.path.join(extracted, path)
+        assert os.path.exists(full_path)
+    qibuild.find.find_lib([extracted], "foo", expect_one=True)
 
 def test_make_package_empty_uuid(qipkg_action):
     pml = os.path.join(os.path.dirname(__file__), "projects", "empty_uuid", "empty.pml")
@@ -151,6 +155,8 @@ def test_no_worktre_bad_pml(tmpdir, monkeypatch):
         package = qisys.script.run_action("qipkg.actions.make_package", [pml_path.strpath])
     assert "not in a worktree" in error.value.message
 
+@pytest.mark.skipif(not qisys.command.find_program("lrelease", raises=False),
+                    reason="lrelease not found")
 def test_translations(qipkg_action, tmpdir):
     tr_project = qipkg_action.add_test_project("tr_project")
     pml_path = os.path.join(tr_project.path, "tr.pml")

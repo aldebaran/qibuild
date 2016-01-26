@@ -31,7 +31,7 @@ def test_parser(parser, with_num_jobs=True):
                         help="run tests in shuffle and 20 times (apply only to gtest)")
     group.add_argument("--coverage", dest="coverage", action="store_true",
                         help="run coverage")
-    group.add_argument("--ncpu", dest="num_cpus", default=-1, type=int,
+    group.add_argument("--ncpu", dest="num_cpus", type=int,
                         help="set number of CPU each test is allowed to use (linux)")
     group.add_argument("--nightly", action="store_true", dest="nightly")
     group.add_argument("--break-on-failure", action="store_true", dest="break_on_failure",

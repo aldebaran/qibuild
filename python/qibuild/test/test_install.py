@@ -5,8 +5,11 @@
 # Check that every install() function returns a list
 # of relative, POSIX paths
 
+import os
+
 import qisys.sh
 import qibuild.config
+import qibuild.find
 import qitoolchain.qipackage
 
 def test_install_project(qibuild_action, tmpdir):
@@ -31,9 +34,10 @@ def test_install_modern_package_without_manifest(qitoolchain_action,
     qibuild_action("make", "--config", "test", "hello")
     dest = tmpdir.join("dest")
     ret = qibuild_action("install", "--runtime", "--config", "test", "hello", dest.strpath)
-    print ret
+    libworld = qibuild.find.find_lib([dest.strpath], "world")
+    libworld = os.path.relpath(libworld, dest.strpath)
     assert "bin/hello" in ret
-    assert "lib/libworld.so" in ret
+    assert libworld in ret
 
 def test_install_modern_package_with_manifest(tmpdir):
     boost_path = tmpdir.mkdir("boost")

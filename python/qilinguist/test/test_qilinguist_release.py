@@ -4,6 +4,7 @@
 
 import os
 
+import qisys.command
 import qisys.error
 import qisys.script
 
@@ -11,6 +12,9 @@ from qibuild.test.conftest import TestBuildWorkTree
 
 import pytest
 
+# pylint: disable-msg=E1101
+@pytest.mark.skipif(not qisys.command.find_program("lrelease", raises=False),
+                    reason="lrelease not found")
 def test_pml_outside_worktree(tmpdir, monkeypatch):
     foo = tmpdir.mkdir("foo")
     pml_path = foo.join("foo.pml")
@@ -63,6 +67,8 @@ char* foo() {
     qilinguist_action("release", "translate", raises=True)
     assert record_messages.find("untranslated")
 
+@pytest.mark.skipif(not qisys.command.find_program("lrelease", raises=False),
+                    reason="lrelease not found")
 def test_non_translated_messages_qt(qilinguist_action):
     build_worktree = TestBuildWorkTree()
     project = build_worktree.add_test_project("translateme/qt")

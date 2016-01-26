@@ -7,6 +7,7 @@
 """
 
 import os
+import sys
 import stat
 import zipfile
 
@@ -71,15 +72,33 @@ def test_compress_broken_symlink(tmpdir):
     broken_symlink = os.symlink("/does/not/exist", src.join("broken").strpath)
     res = qisys.archive.compress(src.strpath, algo="zip")
 
+# pylint: disable-msg=E1101
+@pytest.mark.skipif(not sys.platform.startswith("linux"),
+                    reason="Test only makes sense on linux")
 def test_extract_invalid_empty(tmpdir):
-    if os.name == 'nt':
+    # tar is likely not in PATH on Windows, and on mac,
+    # tar is perfectly happy with empty archives
+    if not sys.platform.startswith("linux"):
         return
-    srcdir   = tmpdir.mkdir("src")
+    srcdir = tmpdir.mkdir("src")
     destdir = tmpdir.mkdir("dest")
     archive = srcdir.join("empty.tar.gz")
     archive.write("")
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
+        qisys.archive.extract(archive.strpath, destdir.strpath)
+    assert "tar failed" in e.value.message
+
+# pylint: disable-msg=E1101
+@pytest.mark.skipif(os.name == "nt",
+                    reason="Does not work on Windows")
+def test_extract_invalid_bad_tar(tmpdir):
+    srcdir = tmpdir.mkdir("src")
+    destdir = tmpdir.mkdir("dest")
+    archive = srcdir.join("empty.tar.gz")
+    archive.write("GARBAGE")
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
         qisys.archive.extract(archive.strpath, destdir.strpath)
     assert "tar failed" in e.value.message
 

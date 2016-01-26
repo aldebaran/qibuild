@@ -25,7 +25,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
         self._coverage = False
         self._valgrind = False
         self.break_on_failure = False
-        self._num_cpus = -1
+        self._num_cpus = None
         tests = project.tests
         self.ignore_timeouts = False
 
@@ -62,7 +62,7 @@ class ProjectTestRunner(qitest.runner.TestSuiteRunner):
 
     @num_cpus.setter
     def num_cpus(self, value):
-        if value == -1:
+        if not value:
             return
         if not qisys.command.find_program("taskset"):
             mess = "taskset was not found on the system.\n"
@@ -205,7 +205,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         if nightmare:
             self._nightmare_mode(test)
         num_cpus = self.suite_runner.num_cpus
-        if num_cpus != -1:
+        if num_cpus:
             self._with_num_cpus(test, num_cpus)
 
     def _update_test_cmd_for_project(self, test):
