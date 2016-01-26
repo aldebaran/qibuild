@@ -1,10 +1,11 @@
-sudo: required
-dist: trusty
-
-language: python
-
-python:
-  - "2.7"
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      python: 2.7
+      dist: trusty
+    - os: osx
+      python: 2.7
 
 addons:
   apt:
@@ -14,14 +15,14 @@ addons:
       - gdb
 
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y ninja-build swig python-enchant
+  - bash -xe ci/before-install.sh
 
 install:
-  - pip install -r requirements.txt
+  - pip install -r requirements.txt --user
+  - pip install -e . --user
 
 script:
   # Make sure ssh user@localhost works (for qibuild deploy tests)
   - bash -xe ci/setup-ssh.sh
   - bash -xe ci/setup-git.sh
-  - make -C python
+  - bash -xe ci/run-invoke.sh
