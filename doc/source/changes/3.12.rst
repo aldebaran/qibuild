@@ -166,3 +166,6 @@ cmake
 * Fix generation of installed ``foo-config.cmake`` files when
   used with ``qi_create_lib(foo foo.cpp SUBFOLDER bar)``
   (regression since ``3.10``)
+
+* ``qi_swig_wrap_python`` : add ``NO_CPLUSPLUS`` to allow
+  building ``swig`` extensions as ``C`` code. Default is ``C++``

@@ -21,12 +21,13 @@ include(CMakeParseArguments)
 #
 # \arg:module_name the target name
 # \arg:interface_file the swig interface file (extension is .i)
+# \flag: NO_CPLUSPLUS allow to compile the target as ``C`` code (default is ``C++``)
 # \group:SRC The list of source files
 # \group:DEPENDS The list of dependencies
 #
 function(qi_swig_wrap_python module_name interface_file)
   message(STATUS "Swig/python: ${module_name}")
-  cmake_parse_arguments(ARG "" "" "SRC;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "NO_CPLUSPLUS" "" "SRC;DEPENDS" ${ARGN})
   set(_srcs ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
 
   # we search for the SWIG_EXECUTABLE by yourself, because FindSWIG call find_file
@@ -40,7 +41,9 @@ function(qi_swig_wrap_python module_name interface_file)
 
   include("UseSWIG")
 
-  set_source_files_properties(${interface_file} PROPERTIES CPLUSPLUS ON)
+  if(NOT ARG_NO_CPLUSPLUS)
+    set_source_files_properties(${interface_file} PROPERTIES CPLUSPLUS ON)
+  endif()
   # tell swig that the generated module name is ${module_name}.py
   # without this property, it assumes that it is ${interface_file}.py
   # TODO: check that it is a correct way to do this and not a nifty hack
