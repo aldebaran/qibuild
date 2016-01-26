@@ -371,6 +371,11 @@ class RepoConfigParser(qisys.qixml.XMLParser):
         for upstream_elem in self._root.findall("upstream"):
             name = qisys.qixml.parse_required_attr(upstream_elem, "name")
             url = qisys.qixml.parse_required_attr(upstream_elem, "url")
+            if name in self.target.remote_names:
+                mess = "Error when parsing %s\n" % self.target.project
+                mess += "upstream at %s" % url
+                mess += " has the same name as one of the remotes"
+                raise Exception(mess)
             upstream_remote = qisrc.git_config.Remote()
             upstream_remote.name = name
             upstream_remote.url = url

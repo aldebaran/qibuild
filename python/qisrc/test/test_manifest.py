@@ -391,3 +391,18 @@ def test_only_gerrit_no_review(tmpdir, record_messages):
     foo_repo = manifest.get_repos()[0]
     assert foo_repo.clone_url is None
     assert record_messages.find("foo.git only has a review remote")
+
+def test_inconsistent_remotes(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="b.git" remotes="origin">
+    <upstream name="origin" url="git@other.org:b.git" />
+  </repo>
+</manifest>
+""")
+    # pylint:disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert "has the same name" in e.value.args[0]
