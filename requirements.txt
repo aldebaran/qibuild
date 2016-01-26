@@ -7,6 +7,12 @@ pylint==0.28
 # on a buildfarm (brings pep8 and pyflakes)
 flake8
 
+# For driving CI (invoke is better than a makefile)
+invoke==0.12.0
+
+# For releasing to Pypi
+twine==1.6.4
+
 # For qipy
 virtualenv==12.0.7
 
