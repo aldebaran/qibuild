@@ -108,6 +108,15 @@ qicd
       cd ${p}
     }
 
+qidoc
+-----
+
+* Version can now be set in 3 places, in this order:
+
+  * From the command line with ``qidoc build --version``
+  * ``conf.in.py`` or ``Doxyfile.in``
+  * From ``qiproject.xml``
+
 qisrc
 ------
 
