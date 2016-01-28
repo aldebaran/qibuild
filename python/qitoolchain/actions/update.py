@@ -21,6 +21,10 @@ def configure_parser(parser):
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
         help="Use this feed location to update the toolchain.\n",
         nargs="?")
+    parser.add_argument("--name", dest="feed_name",
+        help="Name of the feed. To be specified when using a git url")
+    parser.add_argument("-b", "--branch",
+        help="Branch of the git url to use")
 
 def do(args):
     """Main entry point
@@ -37,7 +41,7 @@ def do(args):
                 mess += "Please check configuration or " \
                         "specifiy a feed on the command line\n"
                 raise Exception(mess)
-        toolchain.update(feed)
+        toolchain.update(feed, branch=args.branch, name=args.feed_name)
     else:
         tc_names = qitoolchain.get_tc_names()
         tc_with_feed = [x for x in tc_names if qitoolchain.toolchain.Toolchain(x).feed_url]
