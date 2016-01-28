@@ -23,7 +23,7 @@ def configure_parser(parser):
         help="Name of the toolchain", type=ui.valid_filename)
     parser.add_argument("--name", dest="feed_name",
         help="Name of the feed. To be specified when using a git url")
-    parser.add_argument("--branch",
+    parser.add_argument("-b", "--branch",
         help="Branch of the git url to use")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
         help="Optional: path to the toolchain configuration file.\n"
