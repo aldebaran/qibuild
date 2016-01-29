@@ -12,6 +12,7 @@ class SvnPackage(qitoolchain.qipackage.QiPackage):
         super(SvnPackage, self).__init__(name)
         self.url = None
         self.revision = None
+        self._properties.append("revision")
 
     @property
     def svn(self):

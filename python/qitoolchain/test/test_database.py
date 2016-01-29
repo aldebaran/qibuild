@@ -146,7 +146,7 @@ def test_package_with_flags(tmpdir, toolchain_db):
     x_tools.ensure("sysroot", dir=True)
     x_tools.join("toolchain.cmake").ensure(file=True)
     x_tools.join("package.xml").write("""
-<package name="x_tools" version="0.1" toolchain_file="toolchain.cmake" />
+<package name="x-tools" version="0.1" toolchain_file="toolchain.cmake" />
 """)
     x_tools_package = tmpdir.join("x-tools-0.1.zip")
     qisys.archive.compress(x_tools.strpath, output=x_tools_package.strpath, flat=True)
@@ -159,3 +159,28 @@ def test_package_with_flags(tmpdir, toolchain_db):
 
     x_tools_in_db = toolchain_db.get_package("x-tools")
     assert x_tools_in_db.toolchain_file
+
+def test_package_conflict(tmpdir, toolchain_db, record_messages):
+    feed = tmpdir.join("feed.xml")
+    foo = tmpdir.mkdir("foo")
+    foo.join("package.xml").write("""
+<package name="libfoo" version="0.2" />
+""")
+    foo_package = tmpdir.join("libfoo-0.2.zip")
+    qisys.archive.compress(foo.strpath, output=foo_package.strpath, flat=True)
+    feed.write("""
+<toolchain>
+  <package name="foo" version="0.1" url="{url}" />
+</toolchain>
+""".format(url="file://" + foo_package.strpath))
+
+    # pylint:disable-msg=E1101
+    with pytest.raises(Exception) as e:
+      toolchain_db.update(feed.strpath)
+
+    assert e.value.args[0] == "Conflict between feed and package.xml"
+
+    # Make sure we warn properly
+    assert record_messages.find("When parsing")
+    assert record_messages.find("Overriding name foo -> libfoo")
+    assert record_messages.find("Overriding version 0.1 -> 0.2")

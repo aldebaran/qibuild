@@ -6,6 +6,7 @@ import sys
 import re
 import zipfile
 
+from qisys import ui
 from qisys.qixml import etree
 import qisys.version
 import qisrc.license
@@ -18,6 +19,12 @@ class QiPackage(object):
     path is None until the package is added to a database
 
     """
+
+    _properties = ["name", "version", "url",
+                   "path", "directory",
+                   "target", "host",
+                   "toolchain_file", "sysroot", "cross_gdb"]
+
     def __init__(self, name, version=None, path=None):
         self.name = name
         self.version = version
@@ -67,6 +74,7 @@ class QiPackage(object):
             element.set("sysroot", self.sysroot)
         if self.cross_gdb:
             element.set("cross_gdb", self.cross_gdb)
+        qibuild.deps.dump_deps_to_xml(self, element)
         return element
 
     def install(self, destdir, components=None, release=True):
@@ -172,20 +180,70 @@ class QiPackage(object):
 
         return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
 
-    def load_package_xml(self):
+    def load_package_xml(self, element=None):
         """ Load metadata from package.xml
 
         Assume self.path is set: must be called after
         the package has been added to a toolchain
 
         """
+        package_xml = None
+        if element is None:
+            package_xml = os.path.join(self.path, "package.xml")
+            if os.path.exists(package_xml):
+                element = qisys.qixml.read(package_xml).getroot()
+            else:
+                package_xml = None
+                element = etree.Element("package")
+
+        ok = True
+        for property in self._properties:
+            if not self._set_property(package_xml, property, element):
+                ok = False
+
+        if not ok:
+            raise Exception("Conflict between feed and package.xml")
+
+        if self.url and self.directory:
+            mess = """\
+Bad configuration for package %s. 'directory' and 'url' are
+mutually exclusive
+"""
+            raise Exception(mess % self.name)
+
+        qibuild.deps.read_deps_from_xml(self, element)
+
+    def _set_property(self, package_xml, name, element):
+        """ Helper for load_package_xml
+
+        This makes sure that:
+
+         * no property is overwritten by an None value
+
+         * package.xml is consistent with the feed
+
+        Return True if in the case, and False otherwise
+
+        """
+        res = True
+        to_set = element.get(name)
+        # Never override existing property by a None value
+        if to_set:
+            orig_property = getattr(self, name)
+            if orig_property and orig_property != to_set:
+                res = False
+                _on_bad_package_xml(package_xml, name, orig_property, to_set)
+            setattr(self, name, to_set)
+        return res
+
+    def write_package_xml(self):
+        """ Dump metadata in self.path/package.xml
+        Mainly useful for tests
+
+        """
         package_xml = os.path.join(self.path, "package.xml")
-        if not os.path.exists(package_xml):
-            return
-        root = qisys.qixml.read(package_xml).getroot()
-        self.toolchain_file = root.get("toolchain_file")
-        self.sysroot = root.get("sysroot")
-        self.cross_gdb = root.get("cross_gdb")
+        package_elem = self.to_xml()
+        qisys.qixml.write(package_elem, package_xml)
 
     def reroot_paths(self):
         """ Make sure all the paths are absolute.
@@ -225,32 +283,15 @@ class QiPackage(object):
             return cmp(self.name, other.name)
 
 def from_xml(element):
+    res = QiPackage(None) # need to pass an argument to the ctor
     name = element.get("name")
     if not name:
         raise Exception("missing 'name' attribute")
     url = element.get("url")
     if element.tag == "svn_package":
         import qitoolchain.svn_package
-        res = qitoolchain.svn_package.SvnPackage(name)
-        res.revision = element.get("revision")
-    else:
-        res = QiPackage(name)
-    res.url = url
-    res.version = element.get("version")
-    res.path = element.get("path")
-    res.directory = element.get("directory")
-    if res.url and res.directory:
-        mess = """\
-Bad configuration for package %s. 'directory' and 'url' are
-mutually exclusive
-"""
-        raise Exception(mess % name)
-    res.toolchain_file = element.get("toolchain_file")
-    res.sysroot = element.get("sysroot")
-    res.cross_gdb = element.get("cross_gdb")
-    res.target = element.get("target")
-    res.host = element.get("host")
-    qibuild.deps.read_deps_from_xml(res, element)
+        res = qitoolchain.svn_package.SvnPackage(None)
+    res.load_package_xml(element=element)
     return res
 
 def from_archive(archive_path):
@@ -285,3 +326,10 @@ def _extract_legacy(archive_path, dest):
         return dest
     else:
         return extract_path
+
+def _on_bad_package_xml(package_xml, name, old, new):
+    mess = list()
+    if package_xml:
+        mess = ["When parsing", package_xml, "\n"]
+    mess.extend(["Overriding", name, old, "->", new])
+    ui.error(*mess)

@@ -28,22 +28,24 @@ class Toolchains():
         return toolchain
 
     def add_package(self, name, package_name, package_version="r1",
-                    build_depends=None, run_depends=None, test_depends=None):
+                    build_depends=None, run_depends=None, test_depends=None,
+                    host_depends=None):
         toolchain = qitoolchain.get_toolchain(name)
         package_path = self.tmp.mkdir(package_name)
         package = qitoolchain.qipackage.QiPackage(package_name, package_version)
         package.path = package_path.strpath
-        package.build_depends = build_depends
-        package.run_depends = run_depends
-        package.test_depends = test_depends
-        package_xml = self.tmp.join(package_name, "package.xml")
-        xml_elem = qisys.qixml.etree.Element("package")
-        xml_elem.set("name", package_name)
-        if package_version:
-            xml_elem.set("version", package_version)
-        qibuild.deps.dump_deps_to_xml(package, xml_elem)
-        qisys.qixml.write(xml_elem, package_xml.strpath)
 
+        # Make sure self.*_depends are sets
+        for dep_type in ["build", "run", "test", "host"]:
+            attr_name = "%s_depends" % dep_type
+            value = locals()[attr_name]
+            if value:
+                print "setting", package, attr_name, set(value)
+                setattr(package, attr_name, set(value))
+            else:
+                setattr(package, attr_name, set())
+
+        package.write_package_xml()
         toolchain.add_package(package)
         return package
 
