@@ -1,11 +1,16 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
-from qisys import ui
+
 import time
+
+from qisys import ui
+import qisys.error
 import qitest.test_queue
 import qitest.runner
 import qitest.result
+
+import pytest
 
 class DummyProject(object):
     def __init__(self, tmpdir):
@@ -67,8 +72,9 @@ def test_queue_sad(tmpdir):
     }
 
     test_queue.launcher = dummy_launcher
-    test_queue.run(num_jobs=3)
-    assert not test_queue.ok
+    # pylint:disable-msg=E1101
+    with pytest.raises(qisys.error.Error):
+        test_queue.run(num_jobs=3)
 
 
 def test_one_job(tmpdir):

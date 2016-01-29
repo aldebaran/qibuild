@@ -3,10 +3,14 @@
 ## found in the COPYING file.
 
 import sys
+import os
 import json
 
 import qisys.command
+import qisys.error
 import qibuild.find
+
+import pytest
 
 def test_simple_run(tmpdir, qitest_action):
     ls = qisys.command.find_program("ls")
@@ -107,3 +111,25 @@ def test_action_coverage(qibuild_action, qitest_action):
     qibuild_action("configure", "cov", "--coverage")
     qibuild_action("make", "cov")
     qitest_action("run", "cov", "--coverage")
+
+def test_when_missing_libs(qibuild_action, qitest_action):
+    """ Sometimes the build system is broken and shared
+    libraries dependencies cannnot be found. In this case,
+    make sure ``qitest`` raises an exception instead
+    of just having a non-zero return code,
+    so that it's clear it's not just a failing test
+    but something more serious
+
+    """
+    world_proj = qibuild_action.add_test_project("world")
+    hello_proj = qibuild_action.add_test_project("hello")
+    qibuild_action("configure", "hello")
+    qibuild_action("make", "hello")
+    # Create a nasty bug:
+    lib_world = qibuild.find.find_lib([world_proj.sdk_directory], "world",
+                                     expect_one=True)
+    os.remove(lib_world)
+    qitest_action.chdir("hello")
+    # pylint: disable-msg=E1101
+    with pytest.raises(qisys.error.Error) as e:
+        qitest_action("run")

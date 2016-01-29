@@ -159,11 +159,18 @@ def str_from_signal(code):
     if os.name == "nt":
         # windows ret code are usually displayed
         # in hexa:
-        return "0x%X" % (2 ** 32 - code)
+        value = 2 ** 32 - code
+        as_str = "0x%X" % (value)
+        if value == 0xC0000135:
+            return "%s : Failed to find required DLL" % as_str
+        else:
+            return as_str
     if code == signal.SIGSEGV:
         return "Segmentation fault"
     if code == signal.SIGABRT:
         return "Aborted"
+    if code == signal.SIGTRAP and sys.platform == "darwin":
+        return "Trace trap (could not find .dylib)"
     return "%i" % code
 
 class CommandFailedException(qisys.error.Error):

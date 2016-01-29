@@ -5,6 +5,7 @@ import datetime
 import multiprocessing
 import os
 import re
+import signal
 import sys
 
 import qisys.error
@@ -156,6 +157,25 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             res.out = "<no output>"
 
         message = self.get_message(process, timeout=timeout)
+        # Set res.error to True if the crash was caused by
+        # the build system instead, using various heuristics
+        # (See the test in `qitest/test/test_qitest_run.py`
+        # where we remove a shared library dependency from the
+        # file system)
+        if sys.platform.startswith("linux"):
+            if process.returncode == 127:
+                # 127 is a reserved return code for linux process
+                res.error = True
+        if sys.platform == "darwin":
+            if process.returncode == - signal.SIGTRAP:
+                # This is usually a .dylib missing and seems
+                # mac specific
+                res.error = True
+        if sys.platform.startswith("win"):
+            value = 2 ** 32 + process.returncode
+            if value == 0xC0000135:
+                # Missing DLL on Windows
+                res.error = True
         if process.return_type == qisys.command.Process.OK:
             res.ok = True
             if self.verbose:
