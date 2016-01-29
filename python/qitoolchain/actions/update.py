@@ -35,7 +35,7 @@ def do(args):
     if tc_name:
         toolchain = qitoolchain.get_toolchain(tc_name)
         if not feed:
-            feed = toolchain.feed_url
+            feed = toolchain.feed_location
             if not feed:
                 mess  = "Could not find feed for toolchain %s\n" % tc_name
                 mess += "Please check configuration or " \
@@ -44,11 +44,11 @@ def do(args):
         toolchain.update(feed, branch=args.branch, name=args.feed_name)
     else:
         tc_names = qitoolchain.get_tc_names()
-        tc_with_feed = [x for x in tc_names if qitoolchain.toolchain.Toolchain(x).feed_url]
+        tc_with_feed = [x for x in tc_names if qitoolchain.toolchain.Toolchain(x).feed_location]
         tc_without_feed = list(set(tc_names) - set(tc_with_feed))
         for i, tc_name in enumerate(tc_with_feed, start=1):
             toolchain = qitoolchain.toolchain.Toolchain(tc_name)
-            tc_feed = toolchain.feed_url
+            tc_feed = toolchain.feed_location
             ui.info(ui.green, "*", ui.reset, "(%i/%i)" % (i, len(tc_with_feed)),
                     ui.green, "Updating", ui.blue, tc_name, ui.reset, "with", ui.green,
                     tc_feed)

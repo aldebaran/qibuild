@@ -131,7 +131,7 @@ def qitoolchain_action(cd_to_tmpdir):
 def fake_ctc():
     toolchain = qitoolchain.toolchain.Toolchain("fake-ctc")
     this_dir= os.path.dirname(__file__)
-    toolchain.update(feed_url = os.path.join(this_dir, "fakectc", "toolchain.xml"))
+    toolchain.update(feed_location=os.path.join(this_dir, "fakectc", "toolchain.xml"))
     qibuild.config.add_build_config("fake-ctc", toolchain="fake-ctc")
     return toolchain
 

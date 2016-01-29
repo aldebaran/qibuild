@@ -11,8 +11,8 @@ import qitoolchain.database
 class Toolchain(object):
     def __init__(self, name):
         self.name = name
-        self.feed_url = None
-        # Used when feed_url is a git URL
+        self.feed_location = None
+        # Used when feed_location is a git URL
         self.feed_name = None
         self.feed_branch = None
         self.config_path = qisys.sh.get_config_path("qi", "toolchains",
@@ -40,14 +40,14 @@ class Toolchain(object):
     def load(self):
         tree = qisys.qixml.read(self.config_path)
         root = tree.getroot()
-        self.feed_url = root.get("feed")
+        self.feed_location = root.get("feed")
         self.feed_name = root.get("name")
         self.feed_branch = root.get("branch")
 
     def save(self):
         tree = qisys.qixml.read(self.config_path)
         root = tree.getroot()
-        root.set("feed", self.feed_url)
+        root.set("feed", self.feed_location)
         if self.feed_branch:
             root.set("branch", self.feed_branch)
         if self.feed_name:
@@ -62,15 +62,15 @@ class Toolchain(object):
     def unregister(self):
         qisys.sh.rm(self.config_path)
 
-    def update(self, feed_url=None, branch=None, name=None):
-        if feed_url is None:
-            feed_url = self.feed_url
+    def update(self, feed_location=None, branch=None, name=None):
+        if feed_location is None:
+            feed_location = self.feed_location
         if name is None:
             name = self.feed_name
         if branch is None:
             branch = self.feed_branch
-        self.db.update(feed_url, branch=branch, name=name)
-        self.feed_url = feed_url
+        self.db.update(feed_location, branch=branch, name=name)
+        self.feed_location = feed_location
         self.feed_branch = branch
         self.feed_name = name
         self.save()
@@ -160,8 +160,8 @@ Incorrect database configuration in %s: no path for package %s
             git = qisrc.git.Git(git_path)
             _, sha1 = git.call("rev-parse", "HEAD", raises=False)
         res  = "Toolchain %s\n" % self.name
-        if self.feed_url:
-            res += "Using feed from %s" % self.feed_url
+        if self.feed_location:
+            res += "Using feed from %s" % self.feed_location
             if self.feed_name:
                 res += " (feeds/%s.xml)"% self.feed_name
             if self.feed_branch:

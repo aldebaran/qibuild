@@ -36,7 +36,7 @@ def test_stores_feed_after_updating(feed):
     toolchain = qitoolchain.toolchain.Toolchain("bar")
     toolchain.update(feed.url)
     toolchain2 = qitoolchain.toolchain.Toolchain("bar")
-    assert toolchain2.feed_url == feed.url
+    assert toolchain2.feed_location == feed.url
 
 def test_add_local_ctc(tmpdir):
     ctc = tmpdir.mkdir("ctc")

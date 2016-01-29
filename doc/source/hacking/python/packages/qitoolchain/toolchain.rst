@@ -70,7 +70,7 @@ qitoolchain.toolchain.Toolchain
 
         Clean cache, remove all packages, remove self from configuration
 
-    .. py:method:: update(feed_url=None)
+    .. py:method:: update(feed_location=None)
 
         Parse an xml feed, adding packages to self while doing so
         See :ref:`parsing-toolchain-feeds` and
