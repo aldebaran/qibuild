@@ -32,3 +32,38 @@ def test_git_feed(qitoolchain_action, git_server, feed):
     qitoolchain_action("update", "foo")
     foo_tc = qitoolchain.get_toolchain("foo")
     assert foo_tc.get_package("boost").version == "1.55"
+
+def make_local_ctc_feed(tmpdir, base_path, version):
+    base_path = tmpdir.join(base_path).ensure(dir=True)
+    ctc_toolchain_file = base_path.join("toolchain.cmake")
+    ctc_package = qitoolchain.qipackage.QiPackage("ctc", version=version)
+    ctc_package.path = base_path.strpath
+    ctc_package.toolchain_file = "toolchain.cmake"
+    ctc_package.write_package_xml()
+    feed_xml = base_path.join("toolchain.xml")
+    feed_xml.write("""
+<toolchain>
+   <package name="ctc" directory="." />
+</toolchain>
+""")
+    return feed_xml
+
+def test_upgrading_from_local_feed(qitoolchain_action, tmpdir, toolchains):
+    ctc = toolchains.create("ctc")
+    feed_1 = make_local_ctc_feed(tmpdir, "ctc_1", "0.1")
+    ctc.update(feed_1.strpath)
+    assert ctc.get_package("ctc").version == "0.1"
+    feed_2 = make_local_ctc_feed(tmpdir, "ctc_2", "0.2")
+    ctc.update(feed_2.strpath)
+    expected = tmpdir.join("ctc_2", "toolchain.cmake")
+    assert ctc.get_package("ctc").toolchain_file == expected
+
+def test_upgrading_after_local_feed_move(qitoolchain_action, tmpdir, toolchains):
+    ctc = toolchains.create("ctc")
+    feed_1 = make_local_ctc_feed(tmpdir, "ctc_1", "0.1")
+    ctc.update(feed_1.strpath)
+    assert ctc.get_package("ctc").version == "0.1"
+    feed_2 = make_local_ctc_feed(tmpdir, "ctc_2", "0.1")
+    ctc.update(feed_2.strpath)
+    expected = tmpdir.join("ctc_2", "toolchain.cmake")
+    assert ctc.get_package("ctc").toolchain_file == expected
