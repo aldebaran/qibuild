@@ -295,7 +295,11 @@ def from_xml(element):
 
 def from_archive(archive_path):
     archive = zipfile.ZipFile(archive_path)
-    xml_data = archive.read("package.xml")
+    try:
+        xml_data = archive.read("package.xml")
+    except KeyError:
+        raise qisys.error.Error("Could not find package.xml in %s" %
+                                archive_path)
     element = etree.fromstring(xml_data)
     return from_xml(element)
 
