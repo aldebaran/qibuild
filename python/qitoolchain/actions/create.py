@@ -43,16 +43,6 @@ def do(args):
         feed = qisys.sh.to_native_path(feed)
     tc_name = args.name
 
-    # Validate the name: must be a valid filename:
-    bad_chars = r'<>:"/\|?*'
-    for bad_char in bad_chars:
-        if bad_char in tc_name:
-            mess  = "Invalid toolchain name: '%s'\n" % tc_name
-            mess += "A valid toolchain name should not contain any "
-            mess += "of the following chars:\n"
-            mess += " ".join(bad_chars)
-            raise Exception(mess)
-
     build_worktree = None
 
     if tc_name in qitoolchain.get_tc_names():
