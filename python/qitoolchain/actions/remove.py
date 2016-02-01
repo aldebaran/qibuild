@@ -23,7 +23,13 @@ def configure_parser(parser):
 
 def do(args):
     """ Main entry point  """
-    tc = qitoolchain.get_toolchain(args.name)
+    try:
+        tc = qitoolchain.get_toolchain(args.name)
+    except Exception:
+        if args.force:
+            return
+        else:
+            raise
     if args.force:
         ui.info(ui.green, "Removing toolchain", ui.blue, tc.name)
         tc.remove()
