@@ -1,8 +1,15 @@
 v3.12
 ======
 
+general
+-------
+
+* Add a new command, ``qisys``. Used for actions that are common to
+  all other actions
+
 qiproject.xml
---------------
++++++++++++++
+
 
 * Syntax for setting the version number of the projects changed
 
@@ -147,6 +154,11 @@ qisrc
 * ``qisrc push``: add ``-d, --draft`` option to push drafts to ``gerrit``
 
 * ``qisrc diff``, ``qisrc log``: better output when branches have diverged
+
+qisys
+-----
+
+* Add ``qisys list`` to list all the paths known by the ``qiBuild`` tools.
 
 cmake
 -----

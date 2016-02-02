@@ -180,3 +180,13 @@ class TestAction(object):
             return 0
         else:
             return qisys.script.run_action(module_name, args)
+
+class QiSysAction(TestAction):
+    def __init__(self):
+        super(QiSysAction, self).__init__("qisys.actions")
+
+
+# pylint: disable-msg=E1101
+@pytest.fixture
+def qisys_action(cd_to_tmpdir):
+    return QiSysAction()
