@@ -50,13 +50,13 @@ looking like::
 qiBuild in action
 ------------------
 
-Configuring and building the hello project is as easy as
+Configuring, building and running the hello project is as easy as
 
 .. code-block:: console
 
   $ qibuild configure hello
   $ qibuild make hello
-  $ qibuild test hello
+  $ qibuild run hello
 
 
 For this to work, you only have to write two ``qiproject.xml`` files
@@ -102,6 +102,6 @@ and start debugging hello_d.exe right away.
   .. code-block:: console
 
     $ qibuild configure --release world
-    $ qibuild make --release world
+    $ qibuild make world
 
   And try again.

@@ -129,7 +129,7 @@ Now you can use:
 
 .. code-block:: console
 
-  $ qitoolchain add-package -c linux32 /path/to/worktree/package/world.tar.gz
+  $ qitoolchain add-package -t linux32 /path/to/worktree/package/world.tar.gz
 
 You can check that your package has been added with:
 
@@ -304,6 +304,3 @@ With an xsl looking like
       </ul>
     </body>
   </html>
-
-
-
