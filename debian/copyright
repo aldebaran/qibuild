@@ -1,6 +1,6 @@
 This work was packaged for Debian by:
 
-    Aldebaran Robotics <qidev@aldebaran-robotics.com> on Sun, 27 Feb 2011 16:11:23 +0000
+    Aldebaran Robotics <qidev@aldebaran.com> on Sun, 27 Feb 2011 16:11:23 +0000
 
 It was downloaded from:
 
@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 The Debian packaging is:
 
-    Copyright (C) 2011-2014 Aldebaran Robotics <qidev@aldebaran-robotics.com>
+    Copyright (C) 2011-2014 Aldebaran Robotics <qidev@aldebaran.com>
 
 and is licensed under the GPL version 3,
 see "/usr/share/common-licenses/GPL-3".

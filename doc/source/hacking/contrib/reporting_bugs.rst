@@ -22,7 +22,7 @@ You should search for duplicates first.
 
 Make sure to also browse the qibuild-dev archives, too.
 
-https://groups.google.com/a/aldebaran-robotics.com/group/qibuild-dev/
+https://groups.google.com/a/aldebaran.com/group/qibuild-dev/
 
 Gather useful information
 --------------------------

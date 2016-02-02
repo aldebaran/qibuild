@@ -33,7 +33,7 @@ http://github.com/aldebaran/qibuild
 Mailing list
 -------------
 
-https://groups.google.com/a/aldebaran-robotics.com/group/qibuild-dev/topics
+https://groups.google.com/a/aldebaran.com/group/qibuild-dev/topics
 
 IRC channel
 -----------

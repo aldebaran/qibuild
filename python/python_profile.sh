@@ -1,7 +1,7 @@
 #!/bin/sh
 ##
 ## Author(s):
-##  - Cedric GESTES <gestes@aldebaran-robotics.com>
+##  - Cedric GESTES <gestes@aldebaran.com>
 ##
 ## Copyright (C) 2011-2014 Aldebaran Robotics
 ##

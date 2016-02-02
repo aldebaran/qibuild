@@ -1,7 +1,7 @@
 Source: qibuild
 Section: devel
 Priority: extra
-Maintainer: Aldebaran Robotics <qidev@aldebaran-robotics.com>
+Maintainer: Aldebaran Robotics <qidev@aldebaran.com>
 Build-Depends: debhelper (>= 7.0.50~), cmake, python, asciidoc
 Standards-Version: 3.9.1
 Homepage: http://github.com/aldebaran/qibuild

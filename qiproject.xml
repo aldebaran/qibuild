@@ -1,7 +1,7 @@
 <project format="3">
-  <maintainer email="dmerejkowsky@aldebaran-robotics.com">Dimitri Merejkowsky</maintainer>
-  <maintainer email="vbarbaresi@aldebaran-robotics.com">Vincent Barbaresi</maintainer>
-  <maintainer email="hkouki@aldebaran-robotics.com">Houssem Kouki</maintainer>
+  <maintainer email="dmerejkowsky@aldebaran.com">Dimitri Merejkowsky</maintainer>
+  <maintainer email="vbarbaresi@aldebaran.com">Vincent Barbaresi</maintainer>
+  <maintainer email="hkouki@aldebaran.com">Houssem Kouki</maintainer>
   <project src="doc" />
   <qipython name="qibuild">
     <setup with_distutils="true" />

@@ -219,11 +219,9 @@ mutually exclusive
         This makes sure that:
 
          * no property is overwritten by an None value
-
          * package.xml is consistent with the feed
 
         Return True if in the case, and False otherwise
-
         """
         res = True
         to_set = element.get(name)
