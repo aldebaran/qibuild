@@ -24,6 +24,11 @@ Please refer to the documentation for more information.
 qibuild is under a BSD-style license that can be found in the COPYING file.
 Any contribution is more than welcome ;)
 
+Demo
+----
+
+`qiBuild demo on asciinema.org <https://asciinema.org/a/35360>`_
+
 
 git repository
 --------------
