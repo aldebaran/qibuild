@@ -155,10 +155,14 @@ qisrc
 
 * ``qisrc diff``, ``qisrc log``: better output when branches have diverged
 
+* ``qisrc foreach --all`` is deprecated, use ``qisys foreach`` instead
+
 qisys
 -----
 
 * Add ``qisys list`` to list all the paths known by the ``qiBuild`` tools.
+
+* Add ``qisys foreach`` to run a command on all projects in the worktree
 
 cmake
 -----

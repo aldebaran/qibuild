@@ -9,9 +9,8 @@ For instance
   qibuild --ignore-errors -- ls -l
 """
 
-import qisys.actions
+import qisys
 import qibuild.parsers
-
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -26,5 +25,5 @@ def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args)
     projects = qibuild.parsers.get_build_projects(build_worktree, args,
                                                  default_all=True)
-    qisys.actions.foreach(projects, args.command,
+    qisys.foreach(projects, args.command,
                           ignore_errors=args.ignore_errors)

@@ -2,14 +2,17 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-"""Run the same command on each source project.
+"""Run the same command on each git project.
+
 Example:
     qisrc foreach -- git reset --hard origin/mytag
 
 Use -- to seprate qisrc arguments from the arguments of the command.
 """
 
-import qisys.actions
+from qisys import ui
+
+import qisys
 import qisys.parsers
 import qisrc.parsers
 
@@ -28,6 +31,9 @@ def configure_parser(parser):
 
 def do(args):
     """Main entry point"""
+    if not args.git_only:
+        ui.warning("qisrc foreach with --all is deprecated, use\n",
+                   "qisys foreach instead")
     if args.git_only:
         git_worktree = qisrc.parsers.get_git_worktree(args)
         projects = git_worktree.get_git_projects(groups=args.groups)
@@ -35,5 +41,5 @@ def do(args):
         worktree = qisys.parsers.get_worktree(args)
         projects = worktree.projects
 
-    qisys.actions.foreach(projects, args.command,
+    qisys.foreach(projects, args.command,
                           ignore_errors=args.ignore_errors)
