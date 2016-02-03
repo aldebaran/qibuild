@@ -153,6 +153,12 @@ def test_orphaned_project(qisrc_action, git_server, record_messages):
   <maintainer>ORPHANED</maintainer>
 </project>"""
     git_server.push_file("foo.git", "qiproject.xml", qiproject_xml)
+
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    foo_git = TestGit(foo_proj.path)
+
     # Need to fetch gerrit remote at least once for gerrit/master to exist
     foo_git.fetch("--all")
     foo_git.commit_file("a.txt", "a")
