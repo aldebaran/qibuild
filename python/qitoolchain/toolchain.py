@@ -64,16 +64,29 @@ class Toolchain(object):
         qisys.sh.rm(self.config_path)
 
     def update(self, feed_location=None, branch=None, name=None):
+        # required to avoid circular dependencies:
+        from qitoolchain.feed import is_git_url
+
         if feed_location is None:
             feed_location = self.feed_location
         if name is None:
             name = self.feed_name
         if branch is None:
             branch = self.feed_branch
-        self.db.update(feed_location, branch=branch, name=name)
         self.feed_location = feed_location
         self.feed_branch = branch
         self.feed_name = name
+
+
+        if feed_location and not is_git_url(feed_location):
+            # Switching from a git feed to a regular feed,
+            # make sure name is None so that we don't try
+            # to use git
+            self.feed_name = None
+
+        self.db.update(feed_location,
+                       branch=self.feed_branch,
+                       name=self.feed_name)
         self.save()
         self.generate_toolchain_file()
 

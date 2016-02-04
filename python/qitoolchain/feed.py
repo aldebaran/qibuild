@@ -27,6 +27,13 @@ def is_url(location):
     """ Check that a given location is an URL """
     return "://" in location
 
+def is_git_url(location):
+    """ Check that the given location is a git URL
+    By convention, we assume it's the case if the
+    URL ends with .git
+
+    """
+    return location.endswith(".git")
 
 def raise_parse_error(package_tree, feed, message):
     """ Raise a nice pasing error about the given
@@ -151,6 +158,9 @@ class ToolchainFeedParser:
                 self.parse(feed_url)
             feed_name = feed_tree.get("name")
             if feed_name:
+                if not is_git_url(feed):
+                    mess = "Cannot use feed names with non-git URL"
+                    raise qisys.error.Error(mess)
                 self.parse(feed, branch=branch, name=feed_name, first_pass=False)
         select_tree = tree.find("select")
         if select_tree is not None:

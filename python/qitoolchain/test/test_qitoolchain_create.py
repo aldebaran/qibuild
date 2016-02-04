@@ -76,3 +76,22 @@ def test_upgrading_after_local_feed_move(qitoolchain_action, tmpdir, toolchains)
     ctc.update(feed_2.strpath)
     expected = tmpdir.join("ctc_2", "toolchain.cmake")
     assert ctc.get_package("ctc").toolchain_file == expected
+
+def test_switching_from_git_feed(qitoolchain_action, git_server, tmpdir):
+    git_server.create_repo("toolchains.git")
+    git_server.push_file("toolchains.git", "feeds/foo.xml", "<toolchain />")
+    feed_url = git_server.get_repo("toolchains.git").clone_url
+    qitoolchain_action("create", "--feed-name", "foo", "foo", feed_url)
+    feed_xml = tmpdir.join("feed.xml")
+    feed_xml.write("<toolchain />")
+    qitoolchain_action("create", "foo", feed_xml.strpath)
+
+def test_using_feed_name_from_regular_location(qitoolchain_action, tmpdir):
+    feed_path = tmpdir.join("toolchain.xml")
+    feed_path.write(""" \
+<toolchain>
+  <feed name="bar" />
+</toolchain>
+""")
+    error = qitoolchain_action("create", "foo", feed_path.strpath, raises=True)
+    assert "Cannot use feed names with non-git URL" in error
