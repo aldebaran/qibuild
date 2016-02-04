@@ -76,7 +76,11 @@ def open_git_feed(toolchain_name, feed_url, name=None, branch="master", first_pa
         else:
             git.clone(feed_url, "--quiet", "--branch", branch)
 
-    feed_path = os.path.join(git_path, "feeds", name + ".xml")
+    feed_rel_path = os.path.join("feeds", name + ".xml")
+    feed_path = os.path.join(git_path, feed_rel_path)
+    if not os.path.exists(feed_path):
+        mess = "No file named %s in %s" % (feed_rel_path, feed_url)
+        raise Exception(mess)
     return feed_path
 
 class ToolchainFeedParser:

@@ -33,6 +33,15 @@ def test_git_feed(qitoolchain_action, git_server, feed):
     foo_tc = qitoolchain.get_toolchain("foo")
     assert foo_tc.get_package("boost").version == "1.55"
 
+def test_incorrect_feed_name(qitoolchain_action, git_server):
+    toolchain_repo = git_server.create_repo("toolchains.git")
+    feed_url = toolchain_repo.clone_url
+    git_server.push_file("toolchains.git", "feeds/win32-vs2013.xml", "<toolchain />")
+    error = qitoolchain_action("create", "--name", "win32-vs2015",
+                               "foo", feed_url, raises=True)
+    expected = "No file named feeds/win32-vs2015.xml in %s" % feed_url
+    assert error == expected
+
 def make_local_ctc_feed(tmpdir, base_path, version):
     base_path = tmpdir.join(base_path).ensure(dir=True)
     ctc_toolchain_file = base_path.join("toolchain.cmake")
