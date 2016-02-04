@@ -21,7 +21,7 @@ def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("name", metavar="NAME",
         help="Name of the toolchain", type=ui.valid_filename)
-    parser.add_argument("--name", dest="feed_name",
+    parser.add_argument("--feed-name", "--name", dest="feed_name",
         help="Name of the feed. To be specified when using a git url")
     parser.add_argument("-b", "--branch",
         help="Branch of the git url to use")
@@ -29,7 +29,7 @@ def configure_parser(parser):
         help="Optional: path to the toolchain configuration file.\n"
              "If not given, the toolchain will be empty.\n"
              "May be a local file, a url or a git URL (in this case\n"
-             "--name must be used)",
+             "--feed-name must be used)",
         nargs="?")
     parser.set_defaults(branch="master")
 

@@ -22,7 +22,7 @@ def test_git_feed(qitoolchain_action, git_server, feed):
                          branch="devel")
     feed_url = git_server.get_repo("toolchains.git").clone_url
 
-    qitoolchain_action("create", "--name", "foo", "--branch", "devel", "foo", feed_url)
+    qitoolchain_action("create", "--feed-name", "foo", "--branch", "devel", "foo", feed_url)
 
     new_boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.55")
     feed.add_package(new_boost_package)

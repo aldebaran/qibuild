@@ -124,7 +124,7 @@ def test_displays_git_info(tmpdir, git_server, feed, qitoolchain_action):
     _, out = git.call("ls-remote", feed_url, "devel", raises=False)
     devel_sha1 = out.split()[0][:8]
 
-    qitoolchain_action("create", "--name", "bar", "--branch", "devel", "foo", feed_url)
+    qitoolchain_action("create", "--feed-name", "bar", "--branch", "devel", "foo", feed_url)
     foo_tc = qitoolchain.get_toolchain("foo")
     as_str = str(foo_tc)
     assert "on devel" in as_str
