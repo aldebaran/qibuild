@@ -71,7 +71,7 @@ def test_build_prefix(build_worktree):
 </qibuild>
 """)
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
-    assert build_config.build_prefix == "mybuild"
+    assert build_config.build_prefix == os.path.join(build_worktree.root, "mybuild")
 
 def test_read_default_config(build_worktree):
     qibuild.config.add_build_config("foo")

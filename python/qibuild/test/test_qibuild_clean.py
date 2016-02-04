@@ -79,7 +79,7 @@ def test_using_build_prefix_from_cli(qibuild_action, tmpdir):
     assert build_dir.check(dir=False)
 
 def test_using_build_prefix_from_config_deps_already_cleaned(tmpdir, monkeypatch):
-    myprefix = tmpdir.join("prefix")
+    myprefix = "../prefix"
     work = tmpdir.mkdir("work")
     dot_qi = work.mkdir(".qi")
     qibuild_xml = dot_qi.join("qibuild.xml")
@@ -88,7 +88,7 @@ def test_using_build_prefix_from_config_deps_already_cleaned(tmpdir, monkeypatch
   <build prefix="%s" />
 </qibuild>
 """
-    qibuild_xml.write(to_write % myprefix.strpath)
+    qibuild_xml.write(to_write % myprefix)
     worktree = qisys.worktree.WorkTree(work.strpath)
     build_worktree = TestBuildWorkTree(worktree)
     bar_proj = build_worktree.create_project("bar")

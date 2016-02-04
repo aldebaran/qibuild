@@ -190,6 +190,9 @@ class CMakeBuildConfig(object):
         tree = qisys.qixml.read(self.build_worktree.qibuild_xml)
         local_settings.parse(tree)
         self.build_prefix = local_settings.build.prefix
+        if self.build_prefix and not os.path.isabs(self.build_prefix):
+            self.build_prefix = os.path.join(self.build_worktree.root, self.build_prefix)
+            self.build_prefix = qisys.sh.to_native_path(self.build_prefix)
 
         # Legacy: in .qi/qibuild.xml
         default_config = local_settings.defaults.config
