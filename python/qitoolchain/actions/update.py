@@ -21,7 +21,7 @@ def configure_parser(parser):
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
         help="Use this feed location to update the toolchain.\n",
         nargs="?")
-    parser.add_argument("--name", dest="feed_name",
+    parser.add_argument("--feed-name", dest="feed_name",
         help="Name of the feed. To be specified when using a git url")
     parser.add_argument("-b", "--branch",
         help="Branch of the git url to use")

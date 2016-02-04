@@ -40,7 +40,7 @@ def test_switching_to_git_feed(qitoolchain_action, git_server, feed, record_mess
     boost_package.version = "1.45"
     feed.add_package(boost_package)
     git_server.push_file("toolchains.git", "feeds/foo.xml", feed.feed_xml.read())
-    qitoolchain_action("update", "--name", "foo", "foo", toolchain_repo.clone_url)
+    qitoolchain_action("update", "--feed-name", "foo", "foo", toolchain_repo.clone_url)
     assert record_messages.find("from 1.44 to 1.45")
     qitoolchain_action("info", "foo")
     assert record_messages.find("on master")

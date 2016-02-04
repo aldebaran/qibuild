@@ -266,9 +266,9 @@ Or:
 
 .. code-block:: console
 
-  qitoolchain create my-toolchain --name foo git@example.com:toolchains.git
+  qitoolchain create --feed-name foo my-toolchain git@example.com:toolchains.git
 
-Here ``--name`` is the name of the feed in the ``feeds`` directory on the git
+Here ``--feed-name`` is the name of the feed in the ``feeds`` directory on the git
 repository, without the ``.xml`` extension.
 
 Then use:
