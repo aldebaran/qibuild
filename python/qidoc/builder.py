@@ -22,7 +22,7 @@ class DocBuilder(object):
         self.doc_worktree = doc_worktree
         self.single = False
         self.deps_solver = None
-        self.version = "latest"
+        self.version = None
         self.hosted = True
         self.build_type = ""
         self.werror = False
