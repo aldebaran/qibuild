@@ -1,0 +1,13 @@
+3.11.2
+======
+
+qitoolchain
+-----------
+
+Still fixes in UI::
+
+  qitoolchain create --name FEED_NAME TOOLCHAIN_NAME FEED_URL``
+
+was not clear, and ``--name`` was replaced by ``--feed-name``::
+
+  qitoolchain create --feed-name FEED_NAME TOOLCHAIN_NAME FEED_URL``
