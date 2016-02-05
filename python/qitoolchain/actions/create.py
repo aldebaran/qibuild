@@ -9,6 +9,7 @@ Toolchain packages and known configurations will be fetched from an URL.
 """
 
 import os
+import sys
 
 from qisys import ui
 import qisys.parsers
@@ -37,6 +38,8 @@ def do(args):
     """Main entry point
 
     """
+    if "--name" in sys.argv:
+        ui.warning("--name is deprecated, use --feed-name instead")
     feed = args.feed
     # Normalize feed path:
     if feed and os.path.exists(feed):
