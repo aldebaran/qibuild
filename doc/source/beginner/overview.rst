@@ -32,6 +32,16 @@ For instance:
    # edit my_first_proj/qiproject.xml
    qisrc add my_first_proj
 
+Demo
+----
+
+.. raw:: html
+
+  <script type="text/javascript"
+          src="https://asciinema.org/a/35360.js"
+          id="asciicast-35360" async>
+  </script>
+
 
 qibuild: C++ compilation made easy
 ----------------------------------
@@ -154,4 +164,3 @@ Tutorial
 ++++++++
 
 See :ref:`qipkg-tutorial`
-
