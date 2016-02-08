@@ -6,6 +6,7 @@ Changelog
 .. toctree::
     :maxdepth: 1
 
+    changes/3.11.3
     changes/3.11.2
     changes/3.11.1
     changes/3.11
