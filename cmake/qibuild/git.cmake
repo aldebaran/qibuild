@@ -29,6 +29,7 @@ function(qi_get_git_version out)
   find_package(Git)
   execute_process(COMMAND
     ${GIT_EXECUTABLE} describe --tags --always --dirty
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     OUTPUT_VARIABLE _git_describe
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   set(${out} ${_git_describe} PARENT_SCOPE)
