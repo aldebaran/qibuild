@@ -43,7 +43,7 @@ def test_get_one_project(build_worktree, args):
         args.projects = None
         assert qibuild.parsers.get_one_build_project(build_worktree, args) == world
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         args.all = True
         qibuild.parsers.get_one_build_project(build_worktree, args)
     assert "one project" in str(e.value)

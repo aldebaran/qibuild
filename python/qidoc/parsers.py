@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 
 from qisys import ui
+import qisys.error
 import qisys.parsers
 
 
@@ -39,7 +40,7 @@ def get_one_doc_project(doc_worktree, args):
     parser = DocProjectParser(doc_worktree)
     projects = parser.parse_args(args)
     if not len(projects) == 1:
-        raise Exception("This action can only work with one project")
+        raise qisys.error.Error("This action can only work with one project")
     return projects[0]
 
 def get_doc_builder(args):
@@ -94,7 +95,7 @@ class DocProjectParser(qisys.parsers.AbstractProjectParser):
         project = self.doc_worktree.get_doc_project(project_arg, raises=True)
         return [project]
 
-class CouldNotGuessProjectName(Exception):
+class CouldNotGuessProjectName(qisys.error.Error):
     def __str__(self):
         return """
 Could not guess doc project name from current working directory

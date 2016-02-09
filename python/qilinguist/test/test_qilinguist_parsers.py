@@ -1,6 +1,8 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import qisys.error
 import qilinguist.parsers
 import qilinguist.pml_translator
 import qilinguist.qigettext
@@ -27,14 +29,14 @@ def test_parsing_pml_no_worktree(cd_to_tmpdir, tmpdir, args):
 
 def test_names_no_worktree(cd_to_tmpdir, args):
     args.projects = ["foo"]
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qilinguist.parsers.get_linguist_projects(args)
     assert e.value.message == "Cannot use project names when running " \
                                "outside a worktree"
 
 def test_no_worktree_no_args(cd_to_tmpdir, args):
     args.projects = list()
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qilinguist.parsers.get_linguist_projects(args)
     assert e.value.message == "You should specify at least a pml path " \
                               "when running outside a worktree"

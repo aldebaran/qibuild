@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import qisys.error
 import qisys.sh
 import qisys.parsers
 import qilinguist.builder
@@ -28,11 +29,13 @@ def get_linguist_projects(args, default_all=False):
             if worktree:
                 project_names.append(arg)
             else:
-                raise Exception("Cannot use project names when running "
-                                "outside a worktree")
-    if not worktree and not pml_paths:
-        raise Exception("You should specify at least a pml path when running "
+                raise qisys.error.Error(
+                        "Cannot use project names when running "
                         "outside a worktree")
+    if not worktree and not pml_paths:
+        raise qisys.error.Error(
+                "You should specify at least a pml path when running "
+                "outside a worktree")
     res = list()
     if worktree:
         args.projects = project_names
@@ -102,7 +105,7 @@ class LinguistProjectParser(qisys.parsers.AbstractProjectParser):
                                                               raises=True)
         return [project]
 
-class CouldNotGuessProjectName(Exception):
+class CouldNotGuessProjectName(qisys.error.Error):
     def __str__(self):
         return """
 Could not guess linguist project name from current working directory

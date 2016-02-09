@@ -19,15 +19,16 @@ def test_simple(qitoolchain_action):
     assert world_package.name == "world"
     assert world_package.path
 
-def test_legacy_no_name_given(tmpdir, qitoolchain_action):
+def test_legacy_no_name_given(tmpdir, qitoolchain_action, record_messages):
     qitoolchain_action("create", "foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
     world = tmpdir.mkdir("world")
     world.ensure("include", "world.h", file=True)
     world.ensure("lib", "libworld.so", file=True)
     archive = qisys.archive.compress(world.strpath)
-    error = qitoolchain_action("add-package", "-c", "foo", archive, raises=True)
-    assert "Must specify --name" in error
+    rc = qitoolchain_action("add-package", "-c", "foo", archive, retcode=True)
+    assert rc != 0
+    assert record_messages.find("Must specify --name")
 
 def test_legacy_happy_path(tmpdir, qitoolchain_action):
     qitoolchain_action("create", "foo")

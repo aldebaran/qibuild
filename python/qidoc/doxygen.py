@@ -6,6 +6,8 @@
 import os
 import collections
 
+import qisys.error
+
 def read_doxyfile(doxyfile):
     """ Parse a doxyfile path.
 
@@ -39,7 +41,7 @@ def read_doxyfile(doxyfile):
                 mess = "Error when parsing Doxyfile in " + doxyfile + "\n"
                 mess += line + "\n"
                 mess += "does not match any assignment"
-                raise Exception(mess)
+                raise qisys.error.Error(mess)
             res[key.strip()] += " " + value.strip()
         elif "=" in line:
             key,  value = line.split("=", 1)

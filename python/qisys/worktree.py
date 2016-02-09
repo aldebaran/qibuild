@@ -14,6 +14,7 @@ import posixpath
 import operator
 import difflib
 
+import qisys.error
 import qisys.project
 import qisys.command
 import qisys.sh
@@ -34,7 +35,7 @@ class WorkTree(object):
 
         """
         if not os.path.exists(root):
-            raise Exception(""" \
+            raise qisys.error.Error(""" \
 Could not open WorkTree in {0}.
 This path does not exist
 """.format(root))
@@ -322,10 +323,10 @@ class WorkTreeCache(object):
             srcs.append(qisys.qixml.parse_required_attr(project_elem, "src"))
         return srcs
 
-class WorkTreeError(Exception):
+class WorkTreeError(qisys.error.Error):
     """ Just a custom exception. """
 
-class NotInWorkTree(Exception):
+class NotInWorkTree(qisys.error.Error):
     """ Just a custom exception. """
     def __str__(self):
         return """ Could not guess worktree from current working directory
@@ -335,7 +336,7 @@ class NotInWorkTree(Exception):
      - create a new work tree with `qibuild init`
 """
 
-class NoSuchProject(Exception):
+class NoSuchProject(qisys.error.Error):
     def __init__(self, name, message):
         self.name = name
         self.message = message

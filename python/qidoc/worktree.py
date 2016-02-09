@@ -5,6 +5,7 @@ import os
 import difflib
 
 from qisys import ui
+import qisys.error
 import qisys.worktree
 import qisys.qixml
 
@@ -40,7 +41,7 @@ class DocWorkTree(qisys.worktree.WorkTreeObserver):
             mess = "Found multiple template projects\n"
             for project in res:
                 mess += "  * " + project.path + "\n"
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
         return res[0]
 
     def reload(self):
@@ -68,7 +69,7 @@ class DocWorkTree(qisys.worktree.WorkTreeObserver):
                                                       raises=False)
         # maybe the new project comes from qibuild2 compat ...
         if project_with_same_name:
-            raise Exception("""\
+            raise qisys.error.Error("""\
 Found two projects with the same name ({0})
 In:
 * {1}
@@ -192,7 +193,7 @@ def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
     return doc_project
 
 
-class BadProjectConfig(Exception):
+class BadProjectConfig(qisys.error.Error):
     def __str__(self):
         return """
 Incorrect configuration detected for project in {0}

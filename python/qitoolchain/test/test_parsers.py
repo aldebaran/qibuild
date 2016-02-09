@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 import pytest
 
+import qisys.error
 import qibuild.config
 
 import qitoolchain.parsers
@@ -16,7 +17,7 @@ def test_using_dash_c(toolchains, args):
     assert qitoolchain.parsers.get_toolchain(args) == foo_tc
     args.config = "baz"
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qitoolchain.parsers.get_toolchain(args)
     assert "config baz has no toolchain" in e.value.message
 
@@ -27,4 +28,3 @@ def test_using_defaut_config(toolchains, args, build_worktree):
     build_worktree.set_default_config("foo")
     args.worktree = build_worktree.root
     assert qitoolchain.parsers.get_toolchain(args) == foo_tc
-

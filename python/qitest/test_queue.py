@@ -17,6 +17,7 @@ import Queue
 
 from qisys import ui
 import qisys.command
+import qisys.error
 import qitest.result
 
 
@@ -121,6 +122,10 @@ class TestQueue(object):
                                 ui.blue, failure.test["name"].ljust(max_len + 2),
                                 ui.reset, *failure.message)
         self.write_failures(failures)
+        errors = [x for x in failures if x.error]
+        if errors:
+            # No need to display more errors
+            raise qisys.error.Error("Unexpected errors occurred during tests")
 
     def sigint_handler(self, *args):
         """ Called when user press ctr+c during the test suite
@@ -149,6 +154,16 @@ class TestQueue(object):
         fail_names = [x.test["name"] for x in failures]
         with open(fail_json, "w") as fp:
             json.dump(fail_names, fp)
+
+    def handle_errors(self, errors):
+        message = [ui.red]
+        for error in errors:
+            message.extend([error.test["name"], ":"])
+            message.extend(error.message)
+            message.append("\n")
+        ui.error(*message)
+        raise qisys.error.Error()
+
 
 class TestWorker(threading.Thread):
     """ Implementation of a 'worker' thread. It will consume
@@ -182,6 +197,7 @@ class TestWorker(threading.Thread):
                 result = qitest.result.TestResult(test)
                 result.ok = False
                 result.message = self.message_for_exception(e)
+                result.error = True
             if not self._should_stop:
                 self.test_logger.on_completed(test, index, result.message)
             self.results[test["name"]] = result

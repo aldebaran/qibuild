@@ -19,6 +19,7 @@ import subprocess
 import ntpath
 import posixpath
 
+import qisys.error
 from qisys import ui
 
 try:
@@ -157,7 +158,7 @@ def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
 
 def _copy_link(src, dest, quiet):
     if not os.path.islink(src):
-        raise Exception("%s is not a link!" % src)
+        raise qisys.error.Error("%s is not a link!" % src)
 
     target = os.readlink(src)
         #remove existing stuff
@@ -193,7 +194,8 @@ def _handle_dirs(src, dest, root, directories, filter_fun, quiet):
             installed.append(directory)
         else:
             if os.path.lexists(ddest) and not os.path.isdir(ddest):
-                raise Exception("Expecting a directory but found a file: %s" % ddest)
+                raise qisys.error.Error(
+                        "Expecting a directory but found a file: %s" % ddest)
             mkdir(ddest, recursive=True)
     return installed
 
@@ -220,7 +222,8 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
             installed.append(rel_path)
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
-                raise Exception("Expecting a file but found a directory: %s" % fdest)
+                raise qisys.error.Error(
+                        "Expecting a file but found a directory: %s" % fdest)
             if not quiet:
                 print "-- Installing %s" % fdest
             mkdir(new_root, recursive=True)
@@ -259,7 +262,7 @@ def install(src, dest, filter_fun=None, quiet=False):
     if not os.path.exists(src):
         mess = "Could not install '%s' to '%s'\n" % (src, dest)
         mess += '%s does not exist' % src
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
 
     src = to_native_path(src, normcase=False)
     dest = to_native_path(dest, normcase=False)
@@ -272,7 +275,8 @@ def install(src, dest, filter_fun=None, quiet=False):
 
     if os.path.isdir(src):
         if src == dest:
-            raise Exception("source and destination are the same directory")
+            raise qisys.error.Error(
+                    "source and destination are the same directory")
         for (root, dirs, files) in os.walk(src):
             dirs = _handle_dirs (src, dest, root, dirs,  filter_fun, quiet)
             files = _handle_files(src, dest, root, files, filter_fun, quiet)
@@ -284,7 +288,8 @@ def install(src, dest, filter_fun=None, quiet=False):
         if os.path.isdir(dest):
             dest = os.path.join(dest, os.path.basename(src))
         if src == dest:
-            raise Exception("source and destination are the same file")
+            raise qisys.error.Error(
+                    "source and destination are the same file")
         mkdir(os.path.dirname(dest), recursive=True)
         if sys.stdout.isatty() and not quiet:
             print "-- Installing %s" % dest
@@ -386,7 +391,8 @@ def rmtree(path):
         return
 
     if os.path.islink(path) or not os.path.isdir(path):
-        raise Exception('Called rmtree(%s) in non-directory' % path)
+        raise qisys.error.Error(
+                "Called rmtree(%s) in non-directory" % path)
 
     if sys.platform == 'win32':
         # Some people don't have the APIs installed. In that case we'll do without.
@@ -634,7 +640,7 @@ def change_cwd(directory):
     if not os.path.exists(directory):
         mess = "Cannot change working dir to '%s'\n" % directory
         mess += "This path does not exist"
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
     previous_cwd = os.getcwd()
     os.chdir(directory)
     yield

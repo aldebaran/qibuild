@@ -7,6 +7,7 @@ import zipfile
 import os
 
 from qisys import ui
+import qisys.error
 import qisys.parsers
 import qisys.qixml
 import qipkg.manifest
@@ -32,6 +33,6 @@ def do(args):
             ui.info(ui.green, "The package satisfies "
                               "default package requirements")
         else:
-            raise Exception("Given package does not satisfy "
-                            "default package requirements")
-
+            raise qisys.error.Error(
+                    "Given package does not satisfy "
+                    "default package requirements")

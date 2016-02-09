@@ -4,6 +4,7 @@
 import os
 
 from qisys import ui
+import qisys.error
 import qisys.sh
 import qisrc.git
 import qitoolchain.database
@@ -109,7 +110,7 @@ class Toolchain(object):
                 lines.append('include("%s")\n' % tc_file)
         for package in self.packages:
             if not package.path:
-                raise Exception(""" \
+                raise qisys.error.Error(""" \
 Incorrect database configuration in %s: no path for package %s
 """ % (self.db.db_path, package.name))
         oldlines = list()

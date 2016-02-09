@@ -338,6 +338,21 @@ add some spam to the eggs somewhere else :)
 * If you want to shorten the name of a module, you can use ``as alias_name`` to
   rename it, but then you must keep it consistent across your whole project.
 
+.. _qibuild-actions-libraries:
+
+Actions and libraries
+^^^^^^^^^^^^^^^^^^^^^
+
+* The code in ``qiBuild`` is divided between "actions" (the code in
+  ``*/actions/*.py`` and "libraries" (everything else).
+
+  The libraries are unit-tested, the actions are tested with integration
+  tests.
+
+  So, for instance ``qibuild.actions.foo`` may use ``do_foo`` in
+  ``qibuild.foo``. There will be unit tests for ``qibuild.foo`` in
+  ``qibuild/test/test_foo.py``, and integration tests for the
+  action in ``qibuild/test/test_qibuild_foo.py``
 
 Classes
 ^^^^^^^^
@@ -665,7 +680,7 @@ messages.
         with open(config_file, "w") as fp:
             config = fp.read()
     except IOError, err:
-        raise Exception("Could not open config file for writing")
+        raise qisys.error.Error("Could not open config file for writing")
 
   It's not helpful at all! It does not answer those basic questions:
 
@@ -684,7 +699,7 @@ messages.
     except IOError, err:
         mess = "Could not open config '%s' file for writing\n" % config_file
         mess += "Error was: %s" % err
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
 
   So the error message would then be::
 

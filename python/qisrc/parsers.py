@@ -8,6 +8,7 @@ import os
 
 from collections import OrderedDict
 
+import qisys.error
 import qisys.parsers
 import qisys.worktree
 import qisrc.worktree
@@ -61,7 +62,7 @@ def get_one_git_project(git_worktree, args):
     parser = GitProjectParser(git_worktree)
     projects = parser.parse_args(args)
     if not len(projects) == 1:
-        raise Exception("This action can only work with one project")
+        raise qisys.error.Error("This action can only work with one project")
     return projects[0]
 
 

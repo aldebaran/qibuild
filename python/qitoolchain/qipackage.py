@@ -8,6 +8,7 @@ import zipfile
 
 from qisys import ui
 from qisys.qixml import etree
+import qisys.error
 import qisys.version
 import qisrc.license
 import qibuild.deps
@@ -155,7 +156,7 @@ class QiPackage(object):
                     mess = "Bad mask in %s\n" % mask_path
                     mess += line + "\n"
                     mess += "line should start with 'include' or 'exclude'"
-                    raise Exception(mess)
+                    raise qisys.error.Error(mess)
             return mask
 
     def _install_with_mask(self, destdir, mask):
@@ -284,7 +285,7 @@ def from_xml(element):
     res = QiPackage(None) # need to pass an argument to the ctor
     name = element.get("name")
     if not name:
-        raise Exception("missing 'name' attribute")
+        raise qisys.error.Error("missing 'name' attribute")
     url = element.get("url")
     if element.tag == "svn_package":
         import qitoolchain.svn_package
@@ -294,7 +295,11 @@ def from_xml(element):
 
 def from_archive(archive_path):
     archive = zipfile.ZipFile(archive_path)
-    xml_data = archive.read("package.xml")
+    try:
+        xml_data = archive.read("package.xml")
+    except KeyError:
+        raise qisys.error.Error("Could not find package.xml in %s" %
+                                archive_path)
     element = etree.fromstring(xml_data)
     return from_xml(element)
 

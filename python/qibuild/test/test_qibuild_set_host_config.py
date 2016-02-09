@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import qisys.error
 import qibuild.config
 
 import pytest
@@ -15,6 +16,6 @@ def test_set_host_config_happy_path(qibuild_action):
 
 def test_set_host_config_no_such_config(qibuild_action):
     # pylint:disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qibuild_action("set-host-config", "foo")
     assert "No such config" in e.value.message

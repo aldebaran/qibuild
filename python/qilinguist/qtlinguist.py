@@ -12,6 +12,7 @@ import subprocess
 
 from qisys import ui
 import qisys.command
+import qisys.error
 import qilinguist.project
 
 class QtLinguistProject(qilinguist.project.LinguistProject):
@@ -44,7 +45,7 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
                 all_ok = False
                 ui.error(message)
         if not all_ok and raises:
-            raise Exception("`qilinguist release` failed")
+            raise qisys.error.Error("`qilinguist release` failed")
         return all_ok
 
     def install(self, destination):

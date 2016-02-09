@@ -23,11 +23,11 @@ def do(args):
     output = args.output or os.getcwd()
     package_xml = os.path.join(args.directory, "package.xml")
     if not os.path.exists(package_xml):
-        raise Exception("Expecting a package.xml at the root of the package")
+        ui.fatal("Expecting a package.xml at the root of the package")
     tree = qisys.qixml.read(package_xml)
     root = tree.getroot()
     if root.tag != "package":
-        raise Exception("Root element should have a 'package' tag")
+        ui.fatal("Root element should have a 'package' tag")
     name = qisys.qixml.parse_required_attr(root, "name")
     version = qisys.qixml.parse_required_attr(root, "version")
     target = qisys.qixml.parse_required_attr(root, "target")

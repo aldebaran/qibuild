@@ -3,6 +3,7 @@
 ## found in the COPYING file.
 import pytest
 
+import qisys.error
 from qisrc.test.conftest import TestGitWorkTree
 from qisrc.test.conftest import TestGit
 
@@ -36,7 +37,7 @@ def test_rebase_conflict(git_server, qisrc_action):
     _, before = git.call("show", raises=False)
     git.fetch()
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qisrc_action("rebase", "--branch", "master", "--all")
     assert " * foo" in e.value.message
     _, after = git.call("show", raises=False)

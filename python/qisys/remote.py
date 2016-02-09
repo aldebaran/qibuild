@@ -16,6 +16,7 @@ import urllib2
 import StringIO
 
 from qisys import ui
+import qisys.error
 import qisys.command
 import qisys.sh
 
@@ -144,7 +145,7 @@ def download(url, output_dir, output_name=None,
     except Exception, e:
         mess  = "Could not save %s to %s\n" % (url, dest_name)
         mess += "Error was %s" % e
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
 
     url_split = urlparse.urlsplit(url)
     url_obj = None
@@ -200,7 +201,7 @@ def download(url, output_dir, output_name=None,
             url_obj.close()
     if error:
         qisys.sh.rm(dest_name)
-        raise Exception(error)
+        raise qisys.error.Error(error)
 
     return dest_name
 
@@ -209,7 +210,7 @@ def deploy(local_directory, remote_url, filelist=None):
     # ensure destination directory exist before deploying data
     if not (remote_url.host and remote_url.remote_directory):
         message = "Remote URL is invalid; host and remote directory must be specified"
-        raise Exception(message)
+        raise qisys.error.Error(message)
 
     user = "%s@" % remote_url.user if remote_url.user else ""
 
@@ -243,7 +244,7 @@ def deploy(local_directory, remote_url, filelist=None):
 
 
 
-class URLParseError(Exception):
+class URLParseError(qisys.error.Error):
     def __int__(self, message):
         super(URLParseError).__int__(message)
 

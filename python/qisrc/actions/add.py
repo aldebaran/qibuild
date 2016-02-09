@@ -6,6 +6,7 @@
 
 import os
 
+from qisys import ui
 import qisys
 import qisys.parsers
 import qisrc.git
@@ -41,6 +42,6 @@ def do(args):
     worktree_proj = worktree.get_project(src)
     proj_path = worktree_proj.path
     if os.path.exists(proj_path):
-        raise Exception("%s already exists" % proj_path)
+        ui.fatal("%s already exists" % proj_path)
     git = qisrc.git.Git(proj_path)
     git.clone(url, "--branch", args.branch)

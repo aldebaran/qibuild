@@ -5,6 +5,7 @@ import os
 
 import xml.etree.ElementTree as etree
 
+import qisys.error
 import qisys.qixml
 
 from qisys import ui
@@ -116,5 +117,5 @@ def get_groups(worktree):
     return groups
 
 
-class GroupError(Exception):
+class GroupError(qisys.error.Error):
     pass

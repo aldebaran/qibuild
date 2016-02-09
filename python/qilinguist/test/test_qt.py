@@ -5,6 +5,8 @@ import os
 import subprocess
 
 from qibuild.test.conftest import TestBuildWorkTree
+
+import qisys.error
 import qisys.qixml
 import qibuild.find
 
@@ -13,7 +15,7 @@ def test_qt(qilinguist_action):
     project = build_worktree.add_test_project("translateme/qt")
     try:
         project.configure()
-    except Exception:
+    except qisys.error.Error:
         print "Qt not installed, skipping"
         return
     project.build()

@@ -13,6 +13,7 @@ from xml.etree import ElementTree as etree
 
 from qisys import ui
 import qisys.command
+import qisys.error
 import qisys.parsers
 import qisys.sh
 import qibuild
@@ -381,8 +382,8 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
         cmd = []
         if coverity:
-            if not qisys.command.find_program("cov-build"):
-                raise Exception("cov-build was not found on the system")
+            # So that we raise before creating the coverity directory
+            qisys.command.find_program("cov-build", raises=True)
             cov_dir = os.path.join(self.build_directory, "coverity")
             qisys.sh.mkdir(cov_dir)
             cmd += ["cov-build", "--dir", cov_dir]
@@ -436,7 +437,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             mess   = "-j is not supported for %s\n" % cmake_generator
             mess += "On Windows, you can use Jom or Ninja instead to compile "
             mess += "with multiple processors"
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
         if cmake_generator == "Xcode" or "JOM" in cmake_generator:
             ui.warning("-j is ignored when used with", cmake_generator)
             return list()
@@ -580,7 +581,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
     def split_debug(self, destdir, file_list):
         """ Split debug symbols after install """
         if self.using_visual_studio:
-            raise Exception("split debug not supported on Visual Studio")
+            qisys.error.Error("split debug not supported on Visual Studio")
         ui.info(ui.green, "Splitting debug symbols from binaries ...")
         tool_paths = dict()
         for name in ["objcopy", "objdump"]:
@@ -706,9 +707,9 @@ The following tools were not found: {missing}\
         return not (self == other)
 
 
-class BadProjectConfig(Exception):
+class BadProjectConfig(qisys.error.Error):
     pass
 
-class NoQiTestJson(Exception):
+class NoQiTestJson(qisys.error.Error):
     def __str__(self):
         return """ Could not find qitest.json. Did you run `qibuild configure` ? """

@@ -11,6 +11,7 @@ Delegates most of the work to :py:mod:`qisrc.git`` and
 import re
 import os
 
+import qisys.error
 import qisys.qixml
 import qisrc.git
 import qisrc.review
@@ -79,7 +80,7 @@ class Remote(object):
                 username = qisrc.review.get_gerrit_username(self.server,
                                                             ssh_port=self.port)
                 if not username:
-                    raise Exception("Could not guess ssh username")
+                    raise qisys.error.Error("Could not guess ssh username")
                 self.username = username
             prefix =  "ssh://%s@%s" % (username, self.server)
             if self.port:
@@ -122,7 +123,8 @@ class Remote(object):
             self.prefix = prefix
 
         if not self.prefix:
-            raise Exception("Could not parse %s as a git url" % self.url)
+            raise qisys.error.Error(
+                    "Could not parse %s as a git url" % self.url)
 
 
     def __repr__(self):

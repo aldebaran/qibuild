@@ -41,7 +41,7 @@ def do(args):
     except KeyError:
         legacy = True
     if legacy and not args.name:
-        raise Exception("Must specify --name when using legacy format")
+        ui.fatal("Must specify --name when using legacy format")
     if args.name and not legacy:
         ui.warning("--name ignored when using modern format")
 

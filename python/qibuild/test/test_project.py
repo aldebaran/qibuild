@@ -4,6 +4,7 @@
 
 import os
 
+import qisys.error
 import qisys.qixml
 import qisrc.git
 import qibuild.config
@@ -33,7 +34,7 @@ def test_parse_num_jobs_happy_path(build_worktree):
 def test_parse_num_jobs_unsupported_generator(build_worktree):
     hello = build_worktree.create_project("hello")
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         hello.parse_num_jobs(3, cmake_generator="NMake Makefiles") ==  list()
     assert "-j is not supported for NMake Makefiles" in str(e.value)
 
@@ -73,7 +74,7 @@ def test_using_build_prefix(build_worktree):
 
 def test_validates_name(build_worktree):
     # pylint:disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         build_worktree.create_project("foo/bar")
 
 def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):

@@ -27,8 +27,9 @@ def test_qisrc_add_url_in_subdir(qisrc_action, git_server):
     git_worktree = qisrc_action.git_worktree
     assert git_worktree.get_git_project("lib/foo")
 
-def test_qisrc_add_already_exists(qisrc_action, git_server):
+def test_qisrc_add_already_exists(qisrc_action, git_server, record_messages):
     foo = git_server.create_repo("foo.git")
     qisrc_action.tmpdir.mkdir("foo")
-    error = qisrc_action("add", foo.clone_url, raises=True)
-    assert "already exists" in error
+    rc = qisrc_action("add", foo.clone_url, retcode=True)
+    assert rc != 0
+    assert record_messages.find("already exists")

@@ -7,6 +7,7 @@ import os
 import json
 
 from qisys import ui
+import qisys.error
 import qitest.test_queue
 
 class TestSuiteRunner(object):
@@ -42,6 +43,12 @@ class TestSuiteRunner(object):
         """ Run all the tests.
         Return True if and only if the whole suite passed.
 
+        Note: you should check for the return value of run() and
+        not catch exceptions. Exceptions raised during run() indicate
+        something is wrong but not in the tests themselves.
+
+        See :py:class:`.TestResult` for more details
+
         """
         test_queue = qitest.test_queue.TestQueue(self.tests)
         test_queue.launcher = self.launcher
@@ -57,7 +64,11 @@ class TestSuiteRunner(object):
     @patterns.setter
     def patterns(self, value):
         if value:
-            [re.compile(x) for x in value] # just checking regexps are valid
+            try:
+                [re.compile(x) for x in value]
+            except Exception as e:
+                raise qisys.error.Error(str(e))
+
         self._patterns = value
 
     @property
@@ -100,6 +111,7 @@ class TestSuiteRunner(object):
         with open(fail_json, "r") as fp:
             names = json.load(fp)
         return names
+
 class TestLauncher(object):
     """ Interface for a class able to launch a test. """
     __metaclass__ = abc.ABCMeta
@@ -114,7 +126,6 @@ class TestLauncher(object):
     def launch(self, test):
         """ Should return a :py:class:`.TestResult` """
         pass
-
 
 def match_patterns(patterns, name, default=True):
     if not patterns:

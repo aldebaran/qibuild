@@ -12,6 +12,7 @@ import re
 import subprocess
 
 from qisys import ui
+import qisys.error
 import qisys.command
 import qisys.sh
 import qibuild.cmake.profiling
@@ -29,7 +30,7 @@ def get_known_cmake_generators():
 Could not find cmake executable
 Please install it if necessary and re-run `qibuild config --wizard`\
 """
-        raise Exception(message)
+        raise qisys.error.Error(message)
     process = subprocess.Popen([cmake_, "--help"], stdout=subprocess.PIPE)
     (out, _err) = process.communicate()
     intersting  = False
@@ -84,7 +85,7 @@ def get_cached_var(build_dir, var, default=None):
     cmakecache = os.path.join(build_dir, "CMakeCache.txt")
     if not os.path.exists(cmakecache):
         mess  = "Could not find CMakeCache.txt in %s" % build_dir
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
     res = read_cmake_cache(cmakecache)
     return res.get(var, default)
 
@@ -108,11 +109,11 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
 
     """
     if not os.path.exists(source_dir):
-        raise Exception("source dir: %s does not exist, aborting")
+        qisys.error.Error("source dir: %s does not exist, aborting")
 
     if not os.path.exists(build_dir):
         mess  = "Could not find build directory: %s \n" % build_dir
-        raise Exception(mess)
+        qisys.error.Error(mess)
 
     # Always remove CMakeCache
     if clean_first:
@@ -131,7 +132,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
         mess  = "You have run CMake from your sources\n"
         mess += "CMakeCache.txt found here: %s\n" % in_source_cache
         mess += "Please clean your sources and try again\n"
-        raise Exception(mess)
+        qisys.error.Error(mess)
 
     # Check that the root CMakeLists file is correct
     root_cmake = os.path.join(source_dir, "CMakeLists.txt")
@@ -221,7 +222,7 @@ def get_cmake_qibuild_dir():
     if not res:
         mess  = "Could not find qibuild cmake framework path\n"
         mess += "Please file a bug report with the details of your installation"
-        raise Exception(mess)
+        qisys.error.Error(mess)
     return res
 
 def find_installed_cmake_qibuild_dir(python_dir):
@@ -337,7 +338,7 @@ find_package(qibuild)
     if message:
         raise IncorrectCMakeLists(cmake_list_file, message)
 
-class IncorrectCMakeLists(Exception):
+class IncorrectCMakeLists(qisys.error.Error):
     def __init__(self, cmake_list_file, message):
         self.cmake_list_file = cmake_list_file
         self.message = message
@@ -347,4 +348,3 @@ class IncorrectCMakeLists(Exception):
         message += "(in %s)\n" % self.cmake_list_file
         message += self.message
         return message
-

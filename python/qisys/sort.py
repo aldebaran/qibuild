@@ -6,12 +6,13 @@
 
 """
 
+import qisys.error
+
 __all__ = [ "DagError", "assert_dag", "topological_sort" ]
 
-class DagError(Exception):
+class DagError(qisys.error.Error):
     """ Dag Exception """
     def __init__(self, node, parent, result):
-        Exception.__init__(self)
         self.node   = node
         self.parent = parent
         self.result = result

@@ -38,7 +38,7 @@ def show_config(args, build_worktree):
 
     is_local = args.is_local
     if is_local and not build_worktree:
-        raise Exception("Cannot use --local when not in a worktree")
+        ui.fatal("Cannot use --local when not in a worktree")
 
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(create_if_missing=True)

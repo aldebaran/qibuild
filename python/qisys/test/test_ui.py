@@ -5,7 +5,10 @@
 """ Just some tests for ui """
 
 import io
+
+import qisys.error
 import qisys.ui as ui
+
 
 import pytest
 
@@ -24,10 +27,10 @@ def main():
 
 def test_valid_filename():
     # pylint:disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         ui.valid_filename("foo/bar")
     # pylint:disable-msg=E1101
-    with pytest.raises(Exception):
+    with pytest.raises(qisys.error.Error):
         ui.valid_filename("..")
     ui.valid_filename("foo")
 

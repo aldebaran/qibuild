@@ -13,9 +13,10 @@ import urlparse
 from xml.etree import ElementTree
 
 from qisys import ui
-import qisys
 import qisys.archive
+import qisys.error
 import qisys.remote
+import qisys.sh
 import qisys.version
 import qisrc.git
 import qibuild.config
@@ -36,7 +37,7 @@ def raise_parse_error(package_tree, feed, message):
     mess  = "Error when parsing feed: '%s'\n" % feed
     mess += "Could not parse:\t%s\n" % as_str
     mess += message
-    raise Exception(mess)
+    raise qisys.error.Error(mess)
 
 def tree_from_feed(feed_location, branch=None, name=None):
     """ Returns an ElementTree object from an
@@ -52,12 +53,13 @@ def tree_from_feed(feed_location, branch=None, name=None):
             if is_url(feed_location):
                 fp = qisys.remote.open_remote_location(feed_location)
             else:
-                raise Exception("Feed location is not an existing path nor an url")
+                raise qisys.error.Error(
+                        "Feed location is not an existing path nor an url")
         tree = ElementTree.ElementTree()
         tree.parse(fp)
-    except Exception:
+    except Exception as e:
         ui.error("Could not parse", feed_location)
-        raise
+        raise qisys.error.Error(str(e))
     finally:
         if fp:
             fp.close()

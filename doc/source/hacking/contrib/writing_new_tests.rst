@@ -84,6 +84,7 @@ Basically, inside the code of an action, you should just:
 * Initialize a few objects
 * Call some methods from an other package.
 
+See also :ref:`qibuild-actions-libraries` section in the coding guide.
 
 Use dependency injection when possible
 --------------------------------------
@@ -152,8 +153,22 @@ Then in your test, you can do something like:
 Testing exceptions
 -------------------
 
-Most of qibuild source code use exception as a way
-to display error messages to the end users.
+There are two ways to terminate execution of ``qiBuild`` scripts,
+depending on whether you are in a library or in an action
+(see :ref:`qibuild-actions-libraries`)
+
+* In the "libraries":
+
+  * raise ``qisys.error.Error`` or a class derived from it
+
+* In the actions:
+
+  * Use ``ui.fatal()`` or ``sys.exit()``
+
+Any other termination (other type of exception being raised, or
+failed assert) means there's a bug in qiBuild and it crashed.
+
+This is how the code looks like:
 
 .. code-block:: python
 
@@ -161,21 +176,33 @@ to display error messages to the end users.
 
      try:
           module.do()
-     except Exception as e:
+     except qisys.error.Error as e:
+          # "normal" exception raise, display it in red
+          # and exit
           ui.error(str(e))
+     except SystemExit as e:
+          # sys.exit or ui.fatal called, assume
+          # error message has already been displayed
+          # and exit
+          sys.exit(e.code)
+     except:
+          # Unexpected exception raised
+          # Generate a bug report
 
+This means it is important to check the correctness of
+the error message and its type. (See also
+the section on :ref:`qibuild-coding-guide-error-messages` in the
+coding guide)
 
-So it's important to check the correctness of
-the error message.
-
-This is how to do it:
+So this is how you should test the exception
+you raise:
 
 .. code-block:: python
 
     import pytest
 
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         do_something_that_should_raise()
     assert "Bad input"  in e.value.message
 
@@ -190,13 +217,6 @@ Notes:
   ``py.test`` automatically rewrites the exceptions that are thrown
   during a test case, and for instance ``str(e)`` is **not** what you
   would expect ...
-
-.. seealso::
-
-  * The :ref:`qibuild-coding-guide-error-messages` section in the
-    qibuild coding guide
-
-
 
 Testing code that uses the filesystem
 -------------------------------------

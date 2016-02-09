@@ -36,7 +36,7 @@ def do(args):
         output_dir = os.path.join(os.getcwd(), output_dir)
 
     if os.path.exists(output_dir):
-        raise Exception("%s already exists" % output_dir)
+        raise ui.fatal("%s already exists" % output_dir)
 
     template_path = args.template_path
     if not template_path:

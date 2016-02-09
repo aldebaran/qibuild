@@ -13,6 +13,7 @@ import locale
 
 from qisys import ui
 
+import qisys.error
 import qisys.qixml
 import qisys.sh
 from qisys.qixml import etree
@@ -468,7 +469,7 @@ class QiBuildConfig(object):
         except Exception, e:
             mess  = "Could not parse config from %s\n" % cfg_path
             mess += "Error was: %s" % str(e)
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
 
         # Parse defaults:
         defaults_tree = self.tree.find("defaults")
@@ -593,7 +594,7 @@ class QiBuildConfig(object):
 
         """
         if not ide.name:
-            raise Exception("ide.name cannot be None")
+            raise qisys.error.Error("ide.name cannot be None")
         self.ides[ide.name] = ide
 
     def add_to_default_path(self, to_add):
@@ -665,7 +666,7 @@ class QiBuildConfig(object):
     def set_host_config(self, config_name):
         """ Set the config used to build host tools """
         if not config_name in self.configs:
-            raise Exception("No such config: %s" % config_name)
+            raise qisys.error.Error("No such config: %s" % config_name)
         # Make sure that we unset the previous 'host' config when
         # called twice with different config names
         for name, config in self.configs.iteritems():

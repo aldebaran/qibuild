@@ -8,17 +8,20 @@
 
 import os
 import sys
+import tempfile
 import argparse
 import copy
 import operator
+import traceback
 
 from qisys import ui
 
 
 
+import qisys.error
 import qisys.command
 
-class InvalidAction(Exception):
+class InvalidAction(qisys.error.Error):
     """Just a custom exception """
     def __init__(self, name, message):
         self.name = name
@@ -114,7 +117,7 @@ def run_action(module_name, args=None, forward_args=None):
         mess += message + "\n"
         mess += "args: %s\n" % " ".join(args)
         mess += "forward_args: %s\n" % forward_args
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
 
     parser.error = error
     if forward_args:
@@ -133,28 +136,54 @@ def main_wrapper(module, args):
     """
     try:
         module.do(args)
+    except qisys.error.Error as e:
+        # Normal exception raised from qibuild, display a message
+        # and exit
+        message = message_from_exception(e)
+        ui.error(message)
+        sys.exit(2)
+    except SystemExit as e:
+        # sys.exit() or ui.fatal() has been called, assume
+        # message has already been displayed and exit
+        sys.exit(e.code)
     except Exception as e:
+        tb = sys.exc_info()[2]
+        # Oh, oh we have an crash:
         if args.pdb:
-            traceback = sys.exc_info()[2]
             print ""
             print "### Exception:", e
             print "### Starting a debugger"
             try:
                 #pylint: disable-msg=F0401
                 import ipdb
-                ipdb.post_mortem(traceback)
+                ipdb.post_mortem(tb)
                 sys.exit(0)
             except ImportError:
                 import pdb
-                pdb.post_mortem(traceback)
+                pdb.post_mortem(tb)
                 sys.exit(0)
         if args.backtrace:
+            # Re-raise so backtrace is printed on screen
             raise
-        message = str(e)
-        if message.endswith("\n"):
-            message = message[:-1]
-        ui.error(e.__class__.__name__, message)
+        # Else, save the backtrace in a temp file for later
+        # bug reporting
+        message = message_from_exception(e)
+        ui.info(ui.red, e.__class__.__name__, message)
+        ui.error("qibuild crashed :\\")
+        dest = write_crash_report(tb)
+        ui.info(ui.red, "The full traceback has been saved in %s, if you want "
+                        "to report the issue to the developers." % dest)
         sys.exit(2)
+
+def message_from_exception(exeption):
+    r""" Transform the exeption into a readable string,
+    stripping last \n if necessary
+
+    """
+    message = str(exeption)
+    if message.endswith("\n"):
+        message = message[:-1]
+    return message
 
 def _dump_arguments(name, args):
     """ Dump an argparser namespace to log """
@@ -294,6 +323,11 @@ def action_modules_from_package(package_name):
     return res
 
 
+def write_crash_report(tb):
+    _, name = tempfile.mkstemp(".crash", "qibuild-err-")
+    with open(name, "w") as fp:
+        traceback.print_tb(tb, file=fp)
+    return name
 
 if __name__ == "__main__":
     import doctest

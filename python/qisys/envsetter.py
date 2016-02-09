@@ -11,7 +11,7 @@ import os
 import sys
 import subprocess
 
-import qisys
+import qisys.error
 import qisys.sh
 
 class EnvSetter(object):
@@ -110,7 +110,8 @@ class EnvSetter(object):
         # TODO: handle non asccii chars?
         # Hint: decode("mcbs") ...
         if not os.path.exists(bat_file):
-            raise Exception("general.env.bat_file (%s) does not exist" % bat_file)
+            raise qisys.error.Error(
+                    "bat file (%s) does not exist" % bat_file)
 
         # set of environment variables that are in fact list of paths
         # FIXME: what should we do with other env?
@@ -125,7 +126,7 @@ class EnvSetter(object):
         if process.returncode != 0:
             mess  = "Calling %s failed\n" % bat_file
             mess += "Error was: %s" % err
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
 
         #pylint: disable-msg=E1103
         for line in out.split("\n"):

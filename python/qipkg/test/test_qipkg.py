@@ -5,6 +5,7 @@ import os
 import sys
 
 import qisys.command
+import qisys.error
 import qisys.qixml
 from qisys.qixml import etree
 import qipkg.builder
@@ -146,7 +147,7 @@ def test_no_worktre_bad_pml(tmpdir, monkeypatch):
 """)
     monkeypatch.chdir(tmpdir)
     # pylint:disable-msg=E1101
-    with pytest.raises(Exception) as error:
+    with pytest.raises(qisys.error.Error) as error:
         package = qisys.script.run_action("qipkg.actions.make_package", [pml_path.strpath])
     assert "not in a worktree" in error.value.message
 
@@ -269,7 +270,9 @@ def test_deploy_package_from_pml(qipkg_action, tmpdir):
     pml_path = os.path.join(d_proj.path, "d_pkg.pml")
     url = get_ssh_url(tmpdir)
 
-    qipkg_action("deploy-package", pml_path, "--url", url)
+    # this will call sys.exit because 'import qi' will fail,
+    # but the package will still get deployed
+    qipkg_action("deploy-package", pml_path, "--url", url, retcode=True)
 
     expected_path = os.path.expanduser("~/d-0.1.pkg")
     assert os.path.exists(expected_path)

@@ -12,6 +12,7 @@ import subprocess
 
 from qisys import ui
 import qisys
+import qisys.error
 import qibuild.parsers
 
 SUPPORTED_IDES = ["QtCreator", "Visual Studio", "Xcode"]
@@ -25,7 +26,7 @@ def do(args):
     """Main entry point."""
     cmake_builder = qibuild.parsers.get_cmake_builder(args)
     if len(cmake_builder.projects) != 1:
-        raise Exception("This action can only work on one project")
+        ui.fatal("This action can only work on one project")
     project = cmake_builder.projects[0]
     if not os.path.exists(project.build_directory):
         ui.error("""It looks like your project has not been configured yet
@@ -53,7 +54,7 @@ def do(args):
         # Not supported (yet) IDE:
         mess  = "Invalid ide: %s\n" % ide.name
         mess += "Supported IDES are: %s" % ", ".join(SUPPORTED_IDES)
-        raise Exception(mess)
+        ui.fatal(mess)
 
 
 def get_ide(qibuild_cfg):
@@ -74,7 +75,7 @@ def get_ide(qibuild_cfg):
     if not supported_ides:
         mess  = "Found those IDEs in configuration: %s\n" % ", ".join(ide_names)
         mess += "But `qibuild open` only supports: %s\n" % ", ".join(SUPPORTED_IDES)
-        raise Exception(mess)
+        ui.fatal(mess)
 
     #  User chose a specific config and an IDE matches this config
     if qibuild_cfg.ide:
@@ -131,7 +132,7 @@ def open_qtcreator(project, qtcreator_path=None):
     subprocess.Popen(cmd)
 
 
-class OpenError(Exception):
+class OpenError(qisys.error.Error):
     def __init__(self, project, reason):
         self.project = project
         self.reason = reason

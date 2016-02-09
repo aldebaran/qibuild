@@ -5,6 +5,7 @@
 import os
 import platform
 
+import qisys.error
 import qisys.sh
 import qisys.qixml
 import qibuild.cmake
@@ -211,7 +212,7 @@ config in ~/.config/qi/qibuild.xml
 """
                 mess = mess.format(build_worktree=self.build_worktree,
                                 default_config=default_config)
-                raise Exception(mess)
+                raise qisys.error.Error(mess)
             self._default_config = matching_config.name
             self.set_active_config(matching_config.name)
 
@@ -235,13 +236,13 @@ config in ~/.config/qi/qibuild.xml
         self.qibuild_cfg.read()
         self.active_build_config = self.qibuild_cfg.configs.get(config_name)
         if not self.active_build_config:
-            raise Exception("No such build config: %s" % config_name)
+            raise qisys.error.Error("No such build config: %s" % config_name)
         self.qibuild_cfg.set_active_config(config_name)
         if self.active_build_config:
             self._profiles = self.active_build_config.profiles
             self.parse_profiles()
 
-class NoSuchProfile(Exception):
+class NoSuchProfile(qisys.error.Error):
     """ The profile specified by the user cannot be found """
     def __init__(self, name, known_profiles):
         self.name = name

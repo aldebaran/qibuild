@@ -6,7 +6,8 @@
 
 """
 
-import qisys
+import qisys.command
+import qisys.error
 
 def make(build_dir, num_jobs=None, target=None):
     """ Launch make from a build dir.
@@ -51,16 +52,18 @@ def msbuild(sln_file, build_type="Debug", target=None, num_jobs=None):
 
     qisys.command.call(cmd)
 
-class BuildFailed(Exception):
+class BuildFailed(qisys.error.Error):
     def __init__(self, project):
         self.project = project
+
     def __str__(self):
         return "Error occurred when building project %s" % self.project.name
 
-class ConfigureFailed(Exception):
+class ConfigureFailed(qisys.error.Error):
     def __init__(self, project, exception=None):
         self.project = project
         self.exception = exception
+
     def __str__(self):
         mess =  "Error occurred when configuring project %s" % self.project.name
         returncode = self.exception.returncode

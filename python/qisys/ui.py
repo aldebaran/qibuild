@@ -16,6 +16,8 @@ import datetime
 import difflib
 import functools
 
+import qisys.error
+
 # Try using pyreadline so that we can
 # have colors on windows, too.
 _console = None
@@ -205,6 +207,11 @@ def _msg(*tokens, **kwargs):
     else:
         fp.write(stringres)
         fp.flush()
+
+def fatal(*tokens, **kwargs):
+    """ Print an error message and calls sys.exit """
+    error(*tokens, **kwargs)
+    sys.exit(1)
 
 def error(*tokens, **kwargs):
     """ Print an error message """
@@ -424,7 +431,7 @@ def valid_filename(value):
 
     """
     if value in [".", ".."]:
-        raise Exception("Invalid name: %s" % value)
+        raise qisys.error.Error("Invalid name: %s" % value)
 
     # this is for Windows, but it does not hurt on other platforms
     bad_chars = r'<>:"/\|?*'
@@ -434,5 +441,5 @@ def valid_filename(value):
             mess += "A valid name should not contain any "
             mess += "of the following chars:\n"
             mess += " ".join(bad_chars)
-            raise Exception(mess)
+            raise qisys.error.Error(mess)
     return value

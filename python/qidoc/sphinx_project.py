@@ -6,6 +6,7 @@ import sys
 
 from qisys import ui
 import qisys.archive
+import qisys.error
 import qisys.sh
 import qidoc.project
 import pprint
@@ -292,11 +293,11 @@ def get_num_spellcheck_errors(build_dir):
                  (res, output_txt))
     return res
 
-class SphinxBuildError(Exception):
+class SphinxBuildError(qisys.error.Error):
     def __str__(self):
         return "Error occurred when building doc project: %s" % self.args[0].name
 
-class UnknownLingua(Exception):
+class UnknownLingua(qisys.error.Error):
     def __init__(self, project, language):
         self.language = language
         self.project = project

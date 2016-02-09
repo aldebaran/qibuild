@@ -4,6 +4,7 @@
 
 import os
 
+import qisys.error
 import qidoc.doxygen
 import qidoc.builder
 from qidoc.test.conftest import find_link
@@ -33,7 +34,7 @@ FOO = 1
 BAR += 2
 """)
     # pylint: disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qisys.error.Error) as e:
         qidoc.doxygen.read_doxyfile(doxyfile.strpath)
     assert "does not match" in e.value.message
 

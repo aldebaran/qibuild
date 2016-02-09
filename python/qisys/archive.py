@@ -35,6 +35,7 @@ import operator
 import subprocess
 import zipfile
 
+import qisys.error
 import qisys.sh
 import qisys.command
 from qisys import ui
@@ -42,11 +43,10 @@ from qisys import ui
 
 KNOWN_ALGOS = ["zip", "tar", "gzip", "bzip2", "xz"]
 
-class InvalidArchive(Exception):
+class InvalidArchive(qisys.error.Error):
     """Just a custom exception """
     def __init__(self, message):
         self._message = message
-        Exception.__init__(self)
 
     def __str__(self):
         return self._message
@@ -62,7 +62,7 @@ def _check_algo(algo):
     mess += "Known algorithms are: \n"
     for algorithm in KNOWN_ALGOS:
         mess += " * " + algorithm + "\n"
-    raise Exception(mess)
+    raise qisys.error.Error(mess)
 
 # Symlink support in zip archive (for both compression and extraction) widely
 # inspired from:
@@ -154,7 +154,7 @@ Please set only one of these two options to 'True'
     except zipfile.BadZipfile:
         mess = 'ZIP file seems corrupted. Try removing it and relaunch command.\n'
         mess += '              rm ' + archive + '\n'
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
     members  = archive_.infolist()
     # There is always the top dir as the first element of the archive
     # (or so we hope)
@@ -291,7 +291,7 @@ Please set only one of these two options to 'True'
         mess += "(algo: %s)\n" % algo
         mess += "Calling tar failed\n"
         mess += str(err)
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
     return output
 
 
@@ -354,7 +354,7 @@ Please set only one of these two options to 'True'
         mess  = "Could not extract %s to %s\n" % (archive, directory)
         mess += "Calling tar failed\n"
         mess += str(err)
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
     if not quiet:
         for line in str(printed).split("\n"):
             if not output_filter or not re.search(output_filter, line):

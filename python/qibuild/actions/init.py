@@ -25,7 +25,7 @@ def do(args):
     """Main entry point"""
     root = args.worktree or os.getcwd()
     if os.path.exists(os.path.join(root, '.qi')):
-        raise Exception("A .qi directory already exists here. " +
+        raise ui.fatal("A .qi directory already exists here. " +
                         "Please remove it or initialize elsewhere.")
     worktree = qisys.worktree.WorkTree(root)
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
