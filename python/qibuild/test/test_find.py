@@ -46,7 +46,7 @@ def test_expect_one(tmpdir):
     assert len(res) == 2
 
     # pylint: disable-msg=E1101
-    with pytest.raises(qibuild.find.MulipleFound) as e:
+    with pytest.raises(qibuild.find.MultipleFound) as e:
         qibuild.find.find([a_path.strpath, b_path.strpath], "foo",
                                 expect_one=True)
 

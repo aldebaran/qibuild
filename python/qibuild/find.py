@@ -25,7 +25,7 @@ def find_lib(paths, name, debug=None, expect_one=True, shared=None):
         If True, raises:
 
          * NotFound if no match is found
-         * MulipleFound if more than one match is found
+         * MultipleFound if more than one match is found
 
         Otherwise return a list of matches
 
@@ -68,7 +68,7 @@ def find_bin(paths, name, debug=None, expect_one=True):
         If True, raises:
 
          * NotFound if no match is found
-         * MulipleFound if more than one match is found
+         * MultipleFound if more than one match is found
 
         Otherwise return a list of matches
 
@@ -169,7 +169,7 @@ def _filter_candidates(name, candidates, expect_one=True):
     if expect_one and not res:
         raise NotFound(name)
     if len(res) > 1:
-        raise MulipleFound(name, res)
+        raise MultipleFound(name, res)
     return res[0]
 
 
@@ -179,7 +179,7 @@ class NotFound(qisys.error.Error):
     def __str__(self):
         return "%s not found" % self.name
 
-class MulipleFound(qisys.error.Error):
+class MultipleFound(qisys.error.Error):
     def __init__(self, name, res):
         self.name = name
         self.res = res
