@@ -171,3 +171,8 @@ cmake
 
 * ``qi_swig_wrap_python`` : add ``NO_CPLUSPLUS`` to allow
   building ``swig`` extensions as ``C`` code. Default is ``C++``
+
+* Modules:
+
+  * Fix using ``intl`` on mac when ``gettext`` has been installed
+    with ``homebrew``
