@@ -31,8 +31,12 @@ def do(args):
     name = qisys.qixml.parse_required_attr(root, "name")
     version = qisys.qixml.parse_required_attr(root, "version")
     target = qisys.qixml.parse_required_attr(root, "target")
+    host = root.get("host")
 
     parts = [name, target, version]
+    if host:
+        parts.insert(1, host)
+
     archive_name = "-".join(parts) + ".zip"
     output = os.path.join(output, archive_name)
     res = qisys.archive.compress(input_directory, flat=True, output=output)
