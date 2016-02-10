@@ -154,6 +154,29 @@ def test_symlinks_created_with_zip(tmpdir):
     qisys.archive.extract(output.strpath, dest.strpath)
     assert dest.join("lib", "libfoo.so").islink()
 
+def test_symlink_already_here(tmpdir):
+    src = tmpdir.mkdir("src")
+    src.ensure("lib", "libfoo.so.42", file=True)
+    src.join("lib", "libfoo.so").mksymlinkto("libfoo.so.42")
+    output = tmpdir.join("foo.zip")
+    res = qisys.archive.compress(src.strpath, output=output.strpath, flat=True)
+    dest = tmpdir.mkdir("dest").mkdir("foo")
+    dest.ensure("lib", "libfoo.so", file=True)
+    qisys.archive.extract(res, dest.strpath)
+    assert dest.join("lib", "libfoo.so").islink()
+
+def test_ro_file_already_here(tmpdir):
+    src = tmpdir.mkdir("src")
+    foo_src = src.ensure("foo.txt", file=True)
+    foo_src.write("This is foo\n")
+    dest = tmpdir.mkdir("dest")
+    foo_dest = dest.ensure("foo.txt", file=True)
+    foo_dest.chmod(000)
+    output = tmpdir.join("foo.zip")
+    res = qisys.archive.compress(src.strpath, output=output.strpath, flat=True)
+    qisys.archive.extract(res, dest.strpath)
+    assert foo_dest.read() == "This is foo\n"
+
 def test_returned_value_when_extracting_flat_package(tmpdir):
     src = tmpdir.mkdir("src")
     src.ensure("a", file=True)

@@ -177,6 +177,10 @@ Please set only one of these two options to 'True'
                 raise InvalidArchive(mess)
 
         new_path = os.path.join(directory, member.filename)
+        # Show no mercy and always remove destination
+        # This will prevent crash is it's a symlink that already exists,
+        # or a read-only file
+        qisys.sh.rm(new_path)
         qisys.sh.mkdir(os.path.dirname(new_path), recursive=True)
         if member.external_attr in [0xa1ed0000, 0xa1ff0000]:
             target = archive_.read(member.filename)
