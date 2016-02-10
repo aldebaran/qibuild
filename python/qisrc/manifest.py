@@ -376,7 +376,7 @@ class RepoConfigParser(qisys.qixml.XMLParser):
                 mess = "Error when parsing %s\n" % self.target.project
                 mess += "upstream at %s" % url
                 mess += " has the same name as one of the remotes"
-                raise Exception(mess)
+                raise ManifestError(mess)
             upstream_remote = qisrc.git_config.Remote()
             upstream_remote.name = name
             upstream_remote.url = url

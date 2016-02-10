@@ -203,14 +203,14 @@ class QiPackage(object):
                 ok = False
 
         if not ok:
-            raise Exception("Conflict between feed and package.xml")
+            raise qisys.error.Error("Conflict between feed and package.xml")
 
         if self.url and self.directory:
             mess = """\
 Bad configuration for package %s. 'directory' and 'url' are
 mutually exclusive
 """
-            raise Exception(mess % self.name)
+            raise qisys.error.Error(mess % self.name)
 
         qibuild.deps.read_deps_from_xml(self, element)
 
