@@ -56,13 +56,13 @@ def compare(a_str, b_str):
             return res
     return 0
 
-def increment_version(version):
+def increment(version):
     """
-    >>> increment_version("0.0.3")
+    >>> increment("0.0.3")
     '0.0.4'
-    >>> increment_version("2.4-rc1")
+    >>> increment("2.4-rc1")
     '2.4-rc2'
-    >>> increment_version("2.4-alpha")
+    >>> increment("2.4-alpha")
     Traceback (most recent call last):
         ...
     ValueError: version must end with a digit
