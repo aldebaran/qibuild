@@ -33,11 +33,13 @@ def pylint(errors_only=False):
     run(cmd)
 
 @task
-def test(coverage=False):
+def test(coverage=False, junit=False):
     cmd = "py.test"
     cmd += " -n%i" % multiprocessing.cpu_count()
     if coverage:
         cmd += " --cov=. --cov-report=html"
+    if junit:
+        cmd += " --junitxml=tests.xml"
     pytest_opts = os.environ.get("PYTEST_OPTS")
     if pytest_opts:
         cmd += " " + pytest_opts
