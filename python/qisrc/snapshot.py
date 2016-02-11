@@ -60,7 +60,8 @@ class Snapshot(object):
         except TypeError:
             data = source.read()
         try:
-            parsed = json.loads(data)
+            # Load JSON into an OrderedDict
+            parsed = json.loads(data, object_pairs_hook=collections.OrderedDict)
             self._load_json(parsed)
         except ValueError:
             self._load_deprecated(data)
