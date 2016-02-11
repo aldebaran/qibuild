@@ -40,7 +40,6 @@ class Toolchains():
             attr_name = "%s_depends" % dep_type
             value = locals()[attr_name]
             if value:
-                print "setting", package, attr_name, set(value)
                 setattr(package, attr_name, set(value))
             else:
                 setattr(package, attr_name, set())
