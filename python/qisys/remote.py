@@ -246,7 +246,7 @@ def deploy(local_directory, remote_url, filelist=None):
 
 class URLParseError(qisys.error.Error):
     def __init__(self, message):
-        super(URLParseError).__init__(message)
+        super(URLParseError, self).__init__(message)
 
 class URL(object):
     def __init__(self, url_as_string):
