@@ -23,11 +23,13 @@ def find_modules():
 @task
 def pylint(errors_only=False):
     modules = find_modules()
+    message = "Running pylint"
     cmd = "pylint " + " ".join(modules)
     cmd += " --rcfile pylint.rc"
     if errors_only:
         cmd += " --errors-only"
-    print("Checking for errors with pylint ...")
+        message += " (errors only)"
+    print(message)
     run(cmd)
 
 @task
