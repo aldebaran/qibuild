@@ -8,6 +8,7 @@ import pytest
 
 from qibuild.test.conftest import TestBuildWorkTree
 from qisrc.test.conftest import TestGit
+from qisrc.test.conftest import FakeGit
 
 def test_git_server_creates_valid_urls(tmpdir, git_server):
     origin_url = git_server.manifest.get_remote("origin").url
@@ -135,3 +136,63 @@ def test_svn_commit(svn_server, tmpdir):
     foo = work.join("foo")
     readme = foo.join("README.txt")
     assert readme.read() == "this is a readme\n"
+
+def test_fake_git_persistent_config():
+    git1 = FakeGit("repo")
+    git1.set_config("foo.bar", 42)
+    git2 = FakeGit("repo")
+    assert git2.get_config("foo.bar") == 42
+    assert git2.get_config("notset") is None
+
+def test_fake_git_fake_call():
+    git = FakeGit("repo")
+    git.add_result("fetch", 0, "")
+    (retcode, _) = git.fetch(raises=False)
+    assert retcode == 0
+    git2 = FakeGit("repo2")
+    git2.add_result("fetch", 2, "Remote end hung up unexpectedly")
+    (retcode, out) = git2.fetch(raises=False)
+    assert retcode == 2
+    assert "Remote end hung up" in out
+
+def test_fake_git_wrong_setup():
+    git = FakeGit("repo")
+    git.add_result("checkout", 0, "")
+    git.checkout("-f", "master")
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        git.fetch()
+    assert "Unexpected call to fetch" in e.value.args[0]
+
+def test_fake_git_configured_but_not_called_enough():
+    git = FakeGit("repo")
+    git.add_result("checkout", 0, "")
+    git.add_result("checkout", 1, "Unstaged changes")
+    git.checkout("next")
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception) as e:
+        git.check()
+    assert "checkout was configured to be called 2 times" in e.value.args[0]
+    assert "was only called 1 times" in e.value.args[0]
+
+def test_fake_git_configured_but_not_called():
+    git = FakeGit("repo")
+    git.add_result("checkout", 1, "")
+    git.add_result("reset", 0, "")
+    # pylint: disable-msg=E1101
+    git.checkout(raises=False)
+    with pytest.raises(Exception) as e:
+        git.check()
+    assert "reset was added as result but never called" in e.value.args[0]
+
+def test_fake_git_commands_are_logged():
+    git = FakeGit("repo")
+    git.add_result("fetch", 0, "")
+    git.add_result("reset", 0, "")
+    git.fetch()
+    git.reset("--hard", quiet=True)
+    calls = git.calls
+    assert len(calls) == 2
+    assert calls[0][0] == ("fetch",)
+    assert calls[1][0] == ("reset", "--hard")
+    assert calls[1][1] == {"quiet" : True}
