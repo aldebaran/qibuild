@@ -103,10 +103,6 @@ for the given COMMAND)
 -v, --verbose
     Set verbose output
 
---backtrace
-    Print the full backtrace when an error occurs. (useful for bug reports)
-
-
 Useful build options:
 
 --release

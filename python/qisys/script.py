@@ -77,7 +77,6 @@ def parse_args_for_help(args):
             return (True, args[0])
         return(False, None)
 
-
 def run_action(module_name, args=None, forward_args=None):
     """
     Run an action using its module path and a list of arguments
@@ -130,9 +129,13 @@ def run_action(module_name, args=None, forward_args=None):
 
 def main_wrapper(module, args):
     """This wraps the main method of an action so that:
-       - backtrace is not printed by default
-       - backtrace is printed is --backtrace was given
-       - a pdb session is run if --pdb was given
+    * when an exception is raised that derived from ``qisys.error.Error``,
+        simply dispaly the error message and exit
+    * when sys.exit() or ui.fatal() is called, just exit
+    * also handle KeyboardInterrupt
+    * Other cases imply there's a bug in qiBuild, so either:
+        * Generate a full backtrace or using cgitb
+        * Start a debugging session if ``--pdb`` was used
     """
     try:
         module.do(args)
@@ -146,6 +149,9 @@ def main_wrapper(module, args):
         # sys.exit() or ui.fatal() has been called, assume
         # message has already been displayed and exit
         sys.exit(e.code)
+    except KeyboardInterrupt:
+        ui.info("Interrupted by user, quitting")
+        sys.exit(2)
     except Exception as e:
         tb = sys.exc_info()[2]
         # Oh, oh we have an crash:
@@ -162,18 +168,8 @@ def main_wrapper(module, args):
                 import pdb
                 pdb.post_mortem(tb)
                 sys.exit(0)
-        if args.backtrace:
-            # Re-raise so backtrace is printed on screen
-            raise
-        # Else, save the backtrace in a temp file for later
-        # bug reporting
-        message = message_from_exception(e)
-        ui.info(ui.red, e.__class__.__name__, message)
-        ui.error("qibuild crashed :\\")
-        dest = write_crash_report(tb)
-        ui.info(ui.red, "The full traceback has been saved in %s, if you want "
-                        "to report the issue to the developers." % dest)
-        sys.exit(2)
+        # Raise, this will be caught by cgitb that was enabled in qisys.main
+        raise
 
 def message_from_exception(exeption):
     r""" Transform the exeption into a readable string,
@@ -285,8 +281,6 @@ at the top of the file
         mess = mess.format(module_path=module.__file__, module_name=module.__name__)
         raise InvalidAction(module.__name__, mess)
 
-
-
 def action_modules_from_package(package_name):
     """Returns a suitable list of modules from
     a package.
@@ -321,13 +315,6 @@ def action_modules_from_package(package_name):
 
     res.sort(key=operator.attrgetter("__name__"))
     return res
-
-
-def write_crash_report(tb):
-    _, name = tempfile.mkstemp(".crash", "qibuild-err-")
-    with open(name, "w") as fp:
-        traceback.print_tb(tb, file=fp)
-    return name
 
 if __name__ == "__main__":
     import doctest

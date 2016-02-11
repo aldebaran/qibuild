@@ -58,13 +58,12 @@ def log_parser(parser):
 
 def default_parser(parser):
     """Parser settings for every action."""
-    # Every action should have access to a proper log
     log_parser(parser)
     parser.add_argument("--home", action=SetHome,
         help="Store global data in this directory instead of HOME")
-    # Every action can use  --pdb and --backtrace
     group = parser.add_argument_group("debug options")
-    group.add_argument("--backtrace", action="store_true", help="Display backtrace on error")
+    group.add_argument("--backtrace", action="store_true",
+                       help="DEPRECATED: backtrace is always displayed")
     group.add_argument("--pdb", action="store_true", help="Use pdb on error")
 
 def worktree_parser(parser):

@@ -46,39 +46,26 @@ report :
 * Indicate how to reproduce the bug. This is very important, it will help
   people test the bug and potential patches on their own computer.
 
-* The stack trace: use ``--backtrace`` argument
+* Usually qibuild crashes because of an uncaught exception. When it's the case,
+  qibuild will display a bunch of text looking like::
 
-For instance:
+    $ qibuild foo
 
-::
+    <type 'exceptions.NameError'>
 
-    Cannot frobinicate with latest qibuild
+    Python 2.7.11: /home/dmerejkowsky/.virtualenvs/qibuild/bin/python2
+    Thu Feb 11 11:45:53 2016
 
-    Using qibuild from github (rev 0f452b), I get the
-    following when I try to frobnicate:
+    A problem occurred in a Python script.  Here is the sequence of
+    function calls leading up to the error, in the order they occurred.
 
-    $ qibuild frobnicate --baz baz --backtrace
-    Frobnicating baz
     ...
 
-    Traceback (most recent call last):
-    File "qibuild/python/bin/qibuild", line 61, in <module>
-    ...
-
-    File "qibuild/python/qibuild/cmake.py", line 76, in cmake
-    ...
-
-    Could not frobnicate baz:
-      error was: return code is 42 instead of 41
+    /home/user/src/foo/qibuild-crash-VcC_5u/tmp_Pjifl.txt contains the description of this error.
 
 
-This is a very useful bug report.
-
-This is not:
-
-::
-
-    I updated qibuild and now frobnicate is broken!
+  Please attach the .txt file in your current working directory to your bug report
+  (review it for sensitive information first !)
 
 Open the request
 ----------------

@@ -617,8 +617,6 @@ If it's an *unexpected* error message, here is what you can do:
 
 * run qibuild with ``-v`` flag to display debug messages
 
-* run qibuild with ``--backtrace`` to print the full backtrace
-
 * run qibuild with ``--pdb`` to drop to a pdb session when an uncaught exception is raised.
 
 .. _qibuild-coding-guide-error-messages:

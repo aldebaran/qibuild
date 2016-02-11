@@ -6,6 +6,7 @@
 
 import sys
 import os
+import cgitb
 
 import argparse
 
@@ -22,6 +23,7 @@ def print_version(script_name):
         print "Using CMake code from", qibuild.cmake.get_cmake_qibuild_dir()
 
 def main():
+    cgitb.enable(logdir=os.getcwd(), format="txt")
     script_name = sys.argv[0]
     # setuptools on windows creates a foo-script.py
     if os.name == 'nt':

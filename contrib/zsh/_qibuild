@@ -78,7 +78,6 @@ _arguments_for_qibuild_logging() {
 
 _arguments_for_qibuild_debug() {
   $@ \
-  "--backtrace[Display backtrace on error.]" \
   "--pdb[Use pdb on error.]"
 }
 
