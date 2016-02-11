@@ -405,7 +405,7 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
 
     """
     executable = cmd[0]
-    if os.path.abspath(executable):
+    if os.path.isabs(executable):
         exe_full_path = executable
     else:
         exe_full_path = find_program(cmd[0], env=env)
