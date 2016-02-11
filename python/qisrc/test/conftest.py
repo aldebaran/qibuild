@@ -335,6 +335,7 @@ class FakeGit(qisrc.git.Git):
         self.calls = list()
         self.calls_index = dict()
         self.results = dict()
+        self._transaction = None
 
     def get_config(self, name):
         return FakeGit.repo_configs[self.repo].get(name)

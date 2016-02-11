@@ -33,7 +33,7 @@ def test_wrong_setup():
     git.add_result("checkout", 0, "")
     git.checkout("-f", "master")
     # pylint: disable-msg=E1101
-    with pytest.raises(qisys.error.Error) as e:
+    with pytest.raises(Exception) as e:
         git.fetch()
     assert "Unexpected call to fetch" in e.value.message
 
@@ -43,7 +43,7 @@ def test_configured_but_not_called_enough():
     git.add_result("checkout", 1, "Unstaged changes")
     git.checkout("next")
     # pylint: disable-msg=E1101
-    with pytest.raises(qisys.error.Error) as e:
+    with pytest.raises(Exception) as e:
         git.check()
     assert "checkout was configured to be called 2 times" in e.value.message
     assert "was only called 1 times" in e.value.message
