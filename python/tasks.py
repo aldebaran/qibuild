@@ -43,6 +43,9 @@ def test(coverage=False, junit=False):
     pytest_opts = os.environ.get("PYTEST_OPTS")
     if pytest_opts:
         cmd += " " + pytest_opts
+    if os.name == "nt":
+        # Workaround 'filename too long' issues
+        cmd += " --basetemp=c:\\pytest"
     print("Running tests with py.test ...")
     run(cmd)
 
