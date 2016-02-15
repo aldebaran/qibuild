@@ -47,7 +47,7 @@ def write_qi_path_conf(sdk_directory, sdk_dirs):
     """
     to_write = ""
     for sdk_dir in sdk_dirs:
-        to_write += qisys.sh.to_posix_path(sdk_dir) + "\n"
+        to_write += qisys.sh.to_native_path(sdk_dir) + "\n"
 
     path_dconf = os.path.join(sdk_directory, "share", "qi")
     qisys.sh.mkdir(path_dconf, recursive=True)
