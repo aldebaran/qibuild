@@ -104,7 +104,8 @@ def ask_program(message):
             ui.error("%s does not exist" % full_path)
             keep_going = ask_yes_no("continue?")
             continue
-        if not os.access(full_path, os.X_OK):
+        # os.X_OK does not make sense on Windows
+        if os.name != "nt" and not os.access(full_path, os.X_OK):
             ui.error("%s is not a valid executable!" % full_path)
             keep_going = ask_yes_no("continue?")
             continue
