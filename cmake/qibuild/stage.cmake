@@ -325,16 +325,16 @@ include(\"${_cmake_file}\")
   endforeach()
 
   # Generate install rules
-  install(DIRECTORY "${path}/lib" DESTINATION "/"
+  install(DIRECTORY "${path}/lib" DESTINATION "."
     USE_SOURCE_PERMISSIONS
     COMPONENT runtime
     PATTERN "*.a" EXCLUDE
   )
-  install(DIRECTORY "${path}/lib" DESTINATION "/"
+  install(DIRECTORY "${path}/lib" DESTINATION "."
     COMPONENT devel
     PATTERN "*.a"
   )
-  install(DIRECTORY "${path}/include" DESTINATION "/"
+  install(DIRECTORY "${path}/include" DESTINATION "."
     COMPONENT devel
   )
   install(DIRECTORY "${path}/share/cmake" DESTINATION "share"
