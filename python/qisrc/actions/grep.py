@@ -11,9 +11,11 @@ Options are the same as in git grep, e.g.:
 """
 
 import os
+import posixpath
 import sys
 
 from qisys import ui
+import qisys.sh
 import qisrc.git
 import qisrc.parsers
 import qibuild.parsers
@@ -63,7 +65,11 @@ def do(args):
                 for line in lines:
                     line_split = line.split('\0')
                     prepend = project.src if args.path == 'worktree' else project.path
-                    line_split[0] = os.path.join(prepend, line_split[0])
+                    # paths returned by git grep and projects srcs are POSIX:
+                    line_split[0] = posixpath.join(prepend, line_split[0])
+                    if args.path == 'absolute':
+                        # But use native paths when we're asked for absolute paths
+                        line_split[0] = qisys.sh.to_native_path(line_split[0])
                     out_lines.append(":".join(line_split))
                 out = '\n'.join(out_lines)
             ui.info("\n", ui.reset, out)

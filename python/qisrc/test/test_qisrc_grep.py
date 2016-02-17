@@ -1,6 +1,9 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import os
+
 import qisrc.git
 
 import py
@@ -49,3 +52,12 @@ def test_worktree_paths(qisrc_action, record_messages):
     setup_projects(qisrc_action)
     rc = qisrc_action("grep", "--path", "worktree",  "--", "-i", "-l", "Spam", retcode=True)
     assert record_messages.find("foo/a.txt")
+
+def test_absolute(qisrc_action, record_messages):
+    setup_projects(qisrc_action)
+    rc = qisrc_action("grep", "--path", "absolute",  "--", "-i", "-l", "Spam", retcode=True)
+    if os.name == "nt":
+        to_find = r"work\\foo\\a.txt"
+    else:
+        to_find = "work/foo/a.txt"
+    assert record_messages.find(to_find)
