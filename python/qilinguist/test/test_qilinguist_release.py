@@ -9,12 +9,12 @@ import qisys.error
 import qisys.script
 
 from qibuild.test.conftest import TestBuildWorkTree
+from qilinguist.test.conftest import skip_no_gettext
+from qilinguist.test.conftest import skip_no_lrelease
 
 import pytest
 
-# pylint: disable-msg=E1101
-@pytest.mark.skipif(not qisys.command.find_program("lrelease", raises=False),
-                    reason="lrelease not found")
+@skip_no_lrelease
 def test_pml_outside_worktree(tmpdir, monkeypatch):
     foo = tmpdir.mkdir("foo")
     pml_path = foo.join("foo.pml")
@@ -46,13 +46,14 @@ def test_pml_outside_worktree(tmpdir, monkeypatch):
     qm_path = translations_dir.join("foo_fr_FR.qm")
     assert qm_path.check(file=True)
 
-
 def test_raise_when_no_project_given_outside_a_worktree(tmpdir, monkeypatch):
     monkeypatch.chdir(tmpdir)
+    # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qisys.script.run_action("qilinguist.actions.release")
     assert "outside a worktree" in e.value.message
 
+@skip_no_gettext
 def test_non_translated_messages_gettext(qilinguist_action, record_messages):
     trad_project = qilinguist_action.trad
     qilinguist_action.create_po(trad_project)
@@ -67,14 +68,14 @@ char* foo() {
     qilinguist_action("release", "translate", raises=True)
     assert record_messages.find("untranslated")
 
-@pytest.mark.skipif(not qisys.command.find_program("lrelease", raises=False),
-                    reason="lrelease not found")
+@skip_no_lrelease
 def test_non_translated_messages_qt(qilinguist_action):
     build_worktree = TestBuildWorkTree()
     project = build_worktree.add_test_project("translateme/qt")
     qilinguist_action("update", "helloqt")
     qilinguist_action("release", "helloqt", raises=True)
 
+@skip_no_gettext
 def test_invalid_po_file(qilinguist_action):
     trad_project = qilinguist_action.trad
     qilinguist_action.create_po(trad_project)

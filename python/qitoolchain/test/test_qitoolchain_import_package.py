@@ -5,6 +5,9 @@ import os
 
 import qisys.sh
 
+from qisys.test.conftest import skip_on_win
+
+@skip_on_win
 def test_simple(qitoolchain_action, tmpdir, toolchains):
     toolchains.create("test")
     this_dir = os.path.dirname(__file__)

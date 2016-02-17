@@ -2,6 +2,8 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import os
+
 def test_install(qipy_action, tmpdir):
     big_project = qipy_action.add_test_project("big_project")
     dest = tmpdir.join("dest")
@@ -16,7 +18,11 @@ def test_install_with_distutils(qipy_action, tmpdir):
     dest = tmpdir.join("dest")
     qipy_action("bootstrap")
     qipy_action("install", "foo", dest.strpath)
-    assert dest.join("bin", "foo").check(file=True)
+    if os.name == "nt":
+        foo_path = dest.join("Scripts", "foo.exe")
+    else:
+        foo_path = dest.join("bin", "foo")
+    assert foo_path.check(file=True)
 
 def test_empty_install(qipy_action, tmpdir):
     empty = qipy_action.add_test_project("empty")

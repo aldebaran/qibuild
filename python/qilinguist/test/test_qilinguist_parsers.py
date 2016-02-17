@@ -29,6 +29,7 @@ def test_parsing_pml_no_worktree(cd_to_tmpdir, tmpdir, args):
 
 def test_names_no_worktree(cd_to_tmpdir, args):
     args.projects = ["foo"]
+    # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qilinguist.parsers.get_linguist_projects(args)
     assert e.value.message == "Cannot use project names when running " \
@@ -36,6 +37,7 @@ def test_names_no_worktree(cd_to_tmpdir, args):
 
 def test_no_worktree_no_args(cd_to_tmpdir, args):
     args.projects = list()
+    # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qilinguist.parsers.get_linguist_projects(args)
     assert e.value.message == "You should specify at least a pml path " \

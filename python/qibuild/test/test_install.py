@@ -36,7 +36,11 @@ def test_install_modern_package_without_manifest(qitoolchain_action,
     ret = qibuild_action("install", "--runtime", "--config", "test", "hello", dest.strpath)
     libworld = qibuild.find.find_lib([dest.strpath], "world")
     libworld = os.path.relpath(libworld, dest.strpath)
-    assert "bin/hello" in ret
+    libworld = qisys.sh.to_posix_path(libworld)
+    hello = qibuild.find.find_bin([dest.strpath], "hello")
+    hello = os.path.relpath(hello, dest.strpath)
+    hello = qisys.sh.to_posix_path(hello)
+    assert hello in ret
     assert libworld in ret
 
 def test_install_modern_package_with_manifest(tmpdir):

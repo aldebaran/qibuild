@@ -4,8 +4,15 @@
  * found in the COPYING file.
  */
 #include <iostream>
+#include <string>
 #include <limits.h>
+#ifdef _MSC_VER
+#include <direct.h>
+#define PATH_MAX 255
+#define getcwd _getcwd
+#else
 #include <unistd.h>
+#endif
 
 std::string get_working_directory()
 {
@@ -29,8 +36,8 @@ int main(int argc, char* argv[])
   if (actual != expected) {
     std::cerr << "Expecting:" << std::endl
               << expected << std::endl
-              << "Got:"
-              << actual;
+              << "Got:" << std::endl
+              << actual << std::endl;
     return 1;
   }
   return 0;

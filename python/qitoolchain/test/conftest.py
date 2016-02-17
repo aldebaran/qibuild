@@ -6,6 +6,7 @@ from qisys.test.conftest import *
 
 import qisys.qixml
 from qisys.qixml import etree
+import qisys.remote
 import qibuild.config
 import qibuild.deps
 import qitoolchain
@@ -56,7 +57,7 @@ class TestFeed():
         self.packages_path = tmp.ensure("packages", dir=True)
         self.feed_xml = tmp.join("feed.xml")
         self.feed_xml.write("<toolchain/>")
-        self.url = "file://" + self.feed_xml.strpath
+        self.url = qisys.remote.local_url(self.feed_xml.strpath)
 
     def add_package(self, package, with_path=True, with_url=True):
         this_dir = os.path.dirname(__file__)

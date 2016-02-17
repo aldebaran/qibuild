@@ -43,7 +43,11 @@ def test_run_system(qibuild_action):
     call_args_list = execve_mock.call_args_list
     binary = call_args_list[0][0][0]
     assert os.path.isabs(binary)
-    assert os.path.basename(binary) == "ls"
+    if os.name == "nt":
+        expected = "ls.exe"
+    else:
+        expected = "ls"
+    assert os.path.basename(binary) == expected
 
 def test_corner_case(qibuild_action, tmpdir):
     project = qibuild_action.add_test_project("testme")

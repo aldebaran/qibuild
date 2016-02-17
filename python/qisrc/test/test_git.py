@@ -25,7 +25,7 @@ def test_name_from_url_common():
 def test_name_from_url_win():
     if not os.name == 'nt':
         return
-    url = r"file://c:\path\to\bar.git"
+    url = r"file:///c:/path/to/bar.git"
     assert qisrc.git.name_from_url(url) == "bar.git"
 
 def test_set_tracking_branch_on_empty_repo(tmpdir):

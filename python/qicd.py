@@ -36,7 +36,7 @@ def main():
         token = sys.argv[1]
         path = find_best_match(worktree, token)
     if path:
-        print(path)
+        print(qisys.sh.to_posix_path(path))
         sys.exit(0)
     else:
         sys.stderr.write("no match for %s\n" % token)

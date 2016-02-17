@@ -8,53 +8,26 @@ import qibuild.find
 
 import mock
 
-def check_ssh_connection():
-    # check we can log in to locahost, and that
-    # rsync and ssh are installed.
-    ssh = qisys.command.find_program("ssh")
-    if not ssh:
-        return False
+from qisys.test.conftest import skip_deploy
+from qisys.test.conftest import local_url
 
-    rsync = qisys.command.find_program("rsync")
-    if not rsync:
-        return False
-
-    retcode = qisys.command.call(["ssh", "localhost", "true"], ignore_ret_code=True)
-    if retcode != 0:
-        return False
-
-    return True
-
-def get_ssh_url(tmpdir):
-    username = os.environ.get("LOGNAME")
-    url = "%s@localhost:%s" % (username, tmpdir.strpath)
-    return url
-
-
-def test_deploying_to_localhost(qibuild_action, tmpdir):
-    # Nomical case : deploy to a single deploy directory.
-    if not check_ssh_connection():
-        return
-
-    url = get_ssh_url(tmpdir)
-
+@skip_deploy
+def test_deploying_to_localhost(qibuild_action, tmpdir, local_url):
+    """ Nomical case : deploy to a single deploy directory. """
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
     qibuild_action("configure", "hello")
     qibuild_action("make", "hello")
-    qibuild_action("deploy", "hello", "--url", url)
+    qibuild_action("deploy", "hello", "--url", local_url)
 
     assert tmpdir.join("lib").check(dir=True)
     assert tmpdir.join("bin").check(dir=True)
 
-
-def test_deploying_to_several_urls(qibuild_action, tmpdir):
-    # Deploy to several directories.
-    if not check_ssh_connection():
-        return
-    url = get_ssh_url(tmpdir)
-    first_url = "%s/first" % url
-    second_url = "%s/second" % url
+@skip_deploy
+def test_deploying_to_several_urls(qibuild_action, tmpdir, local_url):
+    """ Deploy to several directories. """
+    first_url = "%s/first" % local_url
+    second_url = "%s/second" % local_url
 
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
@@ -67,35 +40,29 @@ def test_deploying_to_several_urls(qibuild_action, tmpdir):
     assert tmpdir.join("second").join("lib").check(dir=True)
     assert tmpdir.join("second").join("bin").check(dir=True)
 
-def test_deploying_tests(qibuild_action, tmpdir):
-    if not check_ssh_connection():
-        return
-    url = get_ssh_url(tmpdir)
+@skip_deploy
+def test_deploying_tests(qibuild_action, tmpdir, local_url):
     qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme")
     qibuild_action("make", "testme")
     # default is no tests:
-    qibuild_action("deploy", "testme", "--url", url)
+    qibuild_action("deploy", "testme", "--url", local_url)
     assert tmpdir.join("bin/ok").check(file=False)
-    qibuild_action("deploy", "--with-tests", "testme", "--url", url)
+    qibuild_action("deploy", "--with-tests", "testme", "--url", local_url)
     assert tmpdir.join("bin/ok").check(file=True)
 
-
-def test_deploy_builds_build_deps(qibuild_action, tmpdir):
-    if not check_ssh_connection():
-        return
-    url = get_ssh_url(tmpdir)
+@skip_deploy
+def test_deploy_builds_build_deps(qibuild_action, tmpdir, local_url):
     foo_proj = qibuild_action.create_project("foo")
     bar_proj = qibuild_action.create_project("bar", build_depends=["foo"])
     qibuild_action("configure", "bar")
     qibuild_action("make", "bar")
-    qibuild_action("deploy", "bar", "--url", url)
+    qibuild_action("deploy", "bar", "--url", local_url)
     qibuild.find.find([foo_proj.sdk_directory], "foo", expect_one=True)
 
+@skip_deploy
 def test_deploy_install_binary_packages(qibuild_action, qitoolchain_action,
-                                        tmpdir):
-    if not check_ssh_connection():
-        return
+                                        tmpdir, local_url):
     world = qibuild_action.add_test_project("world")
     hello = qibuild_action.add_test_project("hello")
     qitoolchain_action("create", "test")
@@ -107,5 +74,4 @@ def test_deploy_install_binary_packages(qibuild_action, qitoolchain_action,
     worktree.remove_project("world", from_disk=True)
     qibuild_action("configure", "--config", "test", "hello")
     qibuild_action("make", "--config", "test", "hello")
-    url = get_ssh_url(tmpdir)
-    qibuild_action("deploy", "hello", "--config", "test", "--url", url)
+    qibuild_action("deploy", "hello", "--config", "test", "--url", local_url)

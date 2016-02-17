@@ -9,14 +9,15 @@ import subprocess
 
 import pytest
 
-from qibuild.test.conftest import TestBuildWorkTree
 import qisys.command
 import qisys.error
 import qisys.qixml
 import qibuild.find
 
-@pytest.mark.skipif(not qisys.command.find_program("lrelease", raises=False),
-                    reason="lrelease not found")
+from qibuild.test.conftest import TestBuildWorkTree
+from qilinguist.test.conftest import skip_no_lrelease
+
+@skip_no_lrelease
 def test_qt(qilinguist_action):
     build_worktree = TestBuildWorkTree()
     project = build_worktree.add_test_project("translateme/qt")

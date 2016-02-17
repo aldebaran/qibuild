@@ -45,6 +45,7 @@ def test_sane_defaults(build_worktree):
     cmake_args = build_config.cmake_args
     assert get_flag(cmake_args, "CMAKE_BUILD_TYPE") == "Debug"
     qibuild_dir = os.path.join(qibuild.cmake.get_cmake_qibuild_dir(), "qibuild")
+    qibuild_dir = qisys.sh.to_posix_path(qibuild_dir)
     assert get_flag(cmake_args, "qibuild_DIR") == qibuild_dir
 
 def test_read_qibuild_conf(build_worktree):

@@ -174,14 +174,28 @@ def test_updating_env_vars(tmpdir):
     assert build_env["FOO"] == "SPAM"
 
 def test_prepending_variable_already_here():
+    if os.name == "nt":
+        path = r"c:\foo;c:\bar"
+    else:
+        path = "/foo:/bar"
     env = {
-            "PATH" : "/foo:/bar"
+            "PATH" : path
     }
     envsetter = qisys.envsetter.EnvSetter(build_env=env)
-    envsetter.prepend_to_path("/baz")
-    envsetter.prepend_to_path("/foo")
+    if os.name == "nt":
+        envsetter.prepend_to_path(r"c:\baz")
+    else:
+        envsetter.prepend_to_path("/baz")
+    if os.name == "nt":
+        envsetter.prepend_to_path(r"c:\foo")
+    else:
+        envsetter.prepend_to_path(r"/foo")
     actual = envsetter.get_build_env()["PATH"]
-    assert actual == "/foo:/baz:/bar"
+    if os.name == "nt":
+        expected = r"c:\foo;c:\baz;c:\bar"
+    else:
+        expected = "/foo:/baz:/bar"
+    assert actual == expected
 
 def main():
     unittest.main()

@@ -4,16 +4,11 @@
 
 import qisys.command
 
-def check_gettext():
-    gettext = qisys.command.find_program("xgettext", raises=False)
-    if not gettext:
-        return False
-    return True
+from qilinguist.test.conftest import skip_no_gettext
 
+@skip_no_gettext
 def test_install_confintl_files(qilinguist_action, tmpdir):
     dest = tmpdir.join("dest")
-    if not check_gettext():
-        return
     trad = qilinguist_action.trad
     qilinguist_action("update", "--all")
     qilinguist_action.create_po(trad)

@@ -16,7 +16,9 @@ def test_simple(qipy_action):
 
 def test_cpp(qipy_action, qibuild_action):
     qipy_action.add_test_project("c_swig")
-    qibuild_action("configure", "swig_eggs")
+    # Building in debug won't work on Windows because Python27_d.lib
+    # will not be found
+    qibuild_action("configure", "swig_eggs", "--release")
     qibuild_action("make", "swig_eggs")
     qipy_action("bootstrap")
     qipy_action("run", "--no-exec", "--", "python", "-c", "import eggs")

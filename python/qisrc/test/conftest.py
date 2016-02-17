@@ -1,11 +1,16 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
+import os
+import posixpath
+
 from qisys.test.conftest import *
 
 import qisrc.git
 import qisrc.worktree
 import qisrc.manifest
+import qisys.remote
 import qisys.script
 
 class TestGitWorkTree(qisrc.worktree.GitWorkTree):
@@ -72,8 +77,8 @@ class TestGitServer(object):
         self.push_file("manifest.git", "manifest.xml", "<manifest />")
         manifest_xml = root.join("src", "manifest", "manifest.xml")
         self.manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
-        origin_url = "file://" + qisys.sh.to_posix_path(self.srv.strpath)
-        gerrit_url = "file://" + qisys.sh.to_posix_path(self.gerrit.strpath)
+        origin_url = qisys.remote.local_url(self.srv.strpath)
+        gerrit_url = qisys.remote.local_url(self.gerrit.strpath)
         self.manifest.add_remote("origin", origin_url)
         self.manifest.add_remote("gerrit", gerrit_url, review=True)
         # Dummy second remote URL
@@ -108,7 +113,7 @@ class TestGitServer(object):
         else:
             repo_srv = self.srv.ensure(project, dir=True)
 
-        repo_url = "file://" + qisys.sh.to_posix_path(repo_srv.strpath)
+        repo_url = qisys.remote.local_url(repo_srv.strpath)
         git = qisrc.git.Git(repo_srv.strpath)
         git.init("--bare")
 
@@ -460,11 +465,11 @@ class SvnServer(object):
         self.src = tmpdir.join("src", dir=True)
         cmd = ["svnadmin", "create", "srv"]
         qisys.command.call(cmd, cwd=tmpdir.strpath)
-        self.base_url = "file://" + self.srv.strpath
+        self.base_url = qisys.remote.local_url(self.srv.strpath)
 
     def create_repo(self, name):
         src = self.src.join(name).ensure(dir=True)
-        url = os.path.join(self.base_url, name)
+        url = posixpath.join(self.base_url, name)
         cmd = ["svn", "import", src.strpath, url, "--message", "init %s" % name]
         qisys.command.call(cmd)
         return url
@@ -472,7 +477,7 @@ class SvnServer(object):
     def commit_file(self, repo, filename, contents, message=None):
         src = self.src.join(repo)
         src.remove()
-        url = os.path.join(self.base_url, repo)
+        url = posixpath.join(self.base_url, repo)
         svn = qisrc.svn.Svn(src.strpath)
         cmd = ["svn", "checkout", url, repo]
         qisys.command.call(cmd, cwd=self.src.strpath)

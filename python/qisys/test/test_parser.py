@@ -6,6 +6,8 @@ import qisys.error
 import qisys.parsers
 import qisys.worktree
 
+from qisys.test.conftest import skip_on_win
+
 import pytest
 
 def test_guess_woktree(worktree, args):
@@ -107,6 +109,9 @@ def test_using_dash_all_with_dash_single(worktree, args):
         qisys.parsers.get_projects(worktree, args)
     assert "--single with --all" in e.value.message
 
+# On Windows, trying to remove working dir fails
+# with "file is used by another process" error
+@skip_on_win
 def test_non_existing_cwd(tmpdir, monkeypatch, args):
     # Warning: if this test fails, pytest will crash ...
     # (see https://github.com/pytest-dev/pytest/issues/1235)

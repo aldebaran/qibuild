@@ -20,6 +20,8 @@ from qisys.archive import compress
 from qisys.archive import extract
 from qisys.archive import guess_algo
 
+from qisys.test.conftest import skip_on_win
+
 # We don't use the stdlib for tar: it does not have
 # all the features `tar` has and is slower, so all tar tests
 # are disabled on Windows
@@ -63,7 +65,7 @@ def test_rewrite_top_dir_bz2(tmpdir):
     assert dest.join("foo/usr/lib/libfoo.so", file=True)
     assert dest.join("foo/usr/include/foo/foo.h", file=True)
 
-
+@skip_on_win
 def test_compress_broken_symlink(tmpdir):
     # Windows doesn't support symlink
     if os.name == 'nt':
@@ -78,8 +80,6 @@ def test_compress_broken_symlink(tmpdir):
 def test_extract_invalid_empty(tmpdir):
     # tar is likely not in PATH on Windows, and on mac,
     # tar is perfectly happy with empty archives
-    if not sys.platform.startswith("linux"):
-        return
     srcdir = tmpdir.mkdir("src")
     destdir = tmpdir.mkdir("dest")
     archive = srcdir.join("empty.tar.gz")
@@ -131,6 +131,7 @@ def test_flat(tmpdir):
     qisys.archive.extract(res, dest.strpath, strict_mode=False)
     assert dest.join("include", "foo.h").check(file=True)
 
+@skip_on_win
 def test_symlinks(tmpdir):
     src = tmpdir.mkdir("src")
     src.ensure("lib", "libfoo.so.42", file=True)
@@ -141,6 +142,7 @@ def test_symlinks(tmpdir):
     qisys.archive.extract(res, dest.strpath)
     assert dest.join("lib", "libfoo.so").islink()
 
+@skip_on_win
 def test_symlinks_created_with_zip(tmpdir):
     src = tmpdir.mkdir("src")
     src.ensure("lib", "libfoo.so.42", file=True)
@@ -154,6 +156,7 @@ def test_symlinks_created_with_zip(tmpdir):
     qisys.archive.extract(output.strpath, dest.strpath)
     assert dest.join("lib", "libfoo.so").islink()
 
+@skip_on_win
 def test_symlink_already_here(tmpdir):
     src = tmpdir.mkdir("src")
     src.ensure("lib", "libfoo.so.42", file=True)

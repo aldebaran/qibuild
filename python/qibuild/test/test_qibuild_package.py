@@ -8,6 +8,7 @@ import qisys.qixml
 import qisrc.license
 import qisrc.git
 import qibuild.config
+import qibuild.find
 import qitoolchain.qipackage
 
 from qibuild.test.conftest import QiBuildAction
@@ -62,7 +63,7 @@ def test_standalone(qibuild_action, tmpdir):
     # package
     dest = tmpdir.join("dest")
     extracted = qisys.archive.extract(hello_archive, dest.strpath)
-    hello_bin = os.path.join(extracted, "bin", "hello")
+    hello_bin = qibuild.find.find_bin([extracted], "hello")
     qisys.command.call([hello_bin])
 
 def test_standalone_version_from_cmd_line(qibuild_action, toolchains, tmpdir):

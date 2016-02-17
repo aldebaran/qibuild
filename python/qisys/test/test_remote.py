@@ -4,6 +4,7 @@
 import pytest
 
 from qisys.remote import URL, URLParseError, deploy
+from qisys.test.conftest import skip_deploy
 
 def test_simple_url():
     url = URL("foo@bar")
@@ -51,6 +52,7 @@ def test_errors():
     with pytest.raises(URLParseError) as e:
         URL("foo")
 
+@skip_deploy
 def test_deploy(tmpdir):
     local = tmpdir.mkdir("local")
     remote = tmpdir.mkdir("remote")

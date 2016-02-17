@@ -97,6 +97,7 @@ class TestLinguistWorktree(qilinguist.worktree.LinguistWorkTree):
         if not worktree:
             worktree = TestWorkTree()
         super(TestLinguistWorktree, self).__init__(worktree)
+        # pylint:disable-msg=E1103
         self.tmpdir = py.path.local(self.root)
 
     def create_gettext_project(self, name):
@@ -112,12 +113,23 @@ class TestLinguistWorktree(qilinguist.worktree.LinguistWorkTree):
         self.worktree.add_project(name)
         return self.get_linguist_project(name, raises=True)
 
-
+# pylint:disable-msg=E1103
 @pytest.fixture
 def qilinguist_action(cd_to_tmpdir):
     res = QiLinguistAction()
     return res
 
+# pylint:disable-msg=E1103
 @pytest.fixture
 def linguist_worktree(cd_to_tmpdir):
     return TestLinguistWorktree()
+
+# pylint:disable-msg=E1103
+skip_no_gettext = py.test.mark.skipif(
+        not qisys.command.find_program("gettext", raises=False),
+        reason="gettext not found")
+
+# pylint:disable-msg=E1103
+skip_no_lrelease = py.test.mark.skipif(
+        not qisys.command.find_program("lrelease", raises=False),
+        reason="lrelease not found")

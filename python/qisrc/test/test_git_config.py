@@ -19,9 +19,9 @@ def test_url_win_filepath():
     if not os.name == 'nt':
         return
     remote = Remote()
-    remote.url = r"file:///c:\path\to\foo"
+    remote.url = r"file:///c:/path/to/foo"
     remote.parse_url()
-    assert remote.prefix == r"file:///c:\path\to\foo" + "\\"
+    assert remote.prefix == r"file:///c:/path/to/foo/"
     assert remote.protocol == "file"
 
 def test_url_git():

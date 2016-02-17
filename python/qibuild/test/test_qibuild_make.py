@@ -12,6 +12,8 @@ import qibuild.cmake_builder
 import qibuild.find
 import qitoolchain.qipackage
 
+from qisys.test.conftest import skip_on_win
+
 import pytest
 
 def test_running_from_build_dir(qibuild_action):
@@ -42,6 +44,7 @@ def test_running_from_build_dir_incremental(qibuild_action):
     hello = qibuild.find.find_bin([hello_proj.sdk_directory], "hello")
     qisys.command.call([hello])
 
+@skip_on_win
 def test_using_host_tools_for_cross_compilation_no_system(qibuild_action, fake_ctc):
     qibuild_action.add_test_project("footool")
     qibuild_action.add_test_project("usefootool")
@@ -50,6 +53,7 @@ def test_using_host_tools_for_cross_compilation_no_system(qibuild_action, fake_c
     qibuild_action("configure", "usefootool", "--config", "fake-ctc")
     qibuild_action("make", "usefootool", "--config", "fake-ctc")
 
+@skip_on_win
 def test_using_host_tools_for_cross_compilation_with_host_config(qibuild_action, fake_ctc):
     qibuild_action.add_test_project("footool")
     qibuild_action.add_test_project("usefootool")
@@ -60,6 +64,7 @@ def test_using_host_tools_for_cross_compilation_with_host_config(qibuild_action,
     qibuild_action("configure", "usefootool", "--config", "fake-ctc")
     qibuild_action("make", "usefootool", "--config", "fake-ctc")
 
+@skip_on_win
 def test_using_host_tools_for_cross_with_host_in_toolchain(qibuild_action,
                                                            qitoolchain_action,
                                                            fake_ctc):
@@ -91,6 +96,7 @@ def test_codegen_fail_when_generating_command_fails(qibuild_action):
     # (but only when used with the xdist plugin on Windows)
     try:
         qibuild_action("make", "codegen", "--verbose-make")
+        # pylint:disable-msg=E1101
         pytest.fail("Build should have fail")
     except qibuild.build.BuildFailed:
         pass
@@ -110,7 +116,7 @@ def test_depend_on_the_generator_command(qibuild_action):
     # command and thus fail the build
     now = time.time()
     os.utime(gen_py, (now + 10, now + 10))
-    # Se above for why we do not use with pytest.raise()
+    # See above for why we do not use with pytest.raise()
     try:
         qibuild_action("make", "codegen")
         # pylint: disable-msg=E1101

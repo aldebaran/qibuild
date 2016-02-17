@@ -63,6 +63,35 @@ class TestWorkTree(qisys.worktree.WorkTree):
 # pylint: disable-msg=E1101
 skip_on_win = pytest.mark.skipif(os.name == 'nt', reason="cannot pass on windows")
 
+def check_deploy_ssh():
+    # check we can log in to locahost, and that
+    # rsync and ssh are installed.
+    ssh = qisys.command.find_program("ssh")
+    if not ssh:
+        return False
+
+    rsync = qisys.command.find_program("rsync")
+    if not rsync:
+        return False
+
+    retcode = qisys.command.call(["ssh", "localhost", "true"], ignore_ret_code=True)
+    if retcode != 0:
+        return False
+
+    return True
+
+# pylint: disable-msg=E1101
+@pytest.fixture
+def local_url(tmpdir):
+    username = os.environ.get("LOGNAME")
+    url = "%s@localhost:%s" % (username, tmpdir.strpath)
+    return url
+
+# pylint: disable-msg=E1101
+skip_deploy = pytest.mark.skipif(not check_deploy_ssh(),
+                                 reason="Cannot deploy with ssh")
+
+
 # pylint: disable-msg=E1101
 only_linux = pytest.mark.skipif(not sys.platform.startswith("linux"),
                                 reason="only works on linux")

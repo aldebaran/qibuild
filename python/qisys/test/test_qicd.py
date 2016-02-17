@@ -4,6 +4,7 @@
 import os
 import pytest
 import qicd
+import qisys.sh
 
 from qisys.worktree import NoSuchProject
 from qibuild.test.conftest import qibuild_action
@@ -13,7 +14,7 @@ def get_best_match(worktree, token):
     # this is used to simplify assertions
     res = qicd.find_best_match(worktree, token)
     if res:
-        return os.path.relpath(res, worktree.root)
+        return qisys.sh.to_posix_path(os.path.relpath(res, worktree.root))
 
 def test_matches_closest(worktree):
     worktree.create_project("agility/motion")

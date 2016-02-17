@@ -7,8 +7,11 @@ import qisys.sh
 import qibuild.config
 import qitoolchain
 
+from qisys.test.conftest import skip_on_win
+
 import pytest
 
+@skip_on_win
 def test_simple(qitoolchain_action, tmpdir, toolchains):
     this_dir = os.path.dirname(__file__)
     json_c_bz2_path_src = os.path.join(this_dir, "packages", "json-c-0.9.tbz2")
@@ -24,6 +27,7 @@ def test_simple(qitoolchain_action, tmpdir, toolchains):
     toolchain = qitoolchain.get_toolchain("test")
     assert toolchain.get_package("json-c")
 
+@skip_on_win
 def test_rpm(qitoolchain_action, tmpdir):
     rpm = tmpdir.ensure("json-c-0.9.x86_64.rpm", file=True)
     # pylint:disable-msg=E1101

@@ -6,6 +6,10 @@
 #include <fcntl.h>
 
 int main() {
+// This is supposed to be checked with valgrind, no
+// point trying to compile it on Windows
+#ifndef _MSC_VER
   int f = open("/dev/zero", O_RDONLY);
+#endif
   return 0;
 }

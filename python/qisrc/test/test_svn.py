@@ -1,7 +1,10 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
 import qisrc.svn
+
+from qisys.test.conftest import skip_on_win
 
 def test_commit_all_adds_new_subfolders(svn_server, tmpdir):
     foo_url = svn_server.create_repo("foo")
@@ -44,6 +47,7 @@ def test_files_with_space(svn_server, tmpdir):
     foo.join("file with space.txt").remove()
     svn.commit_all("test message")
 
+@skip_on_win
 def test_file_replaced_by_symlink(svn_server, tmpdir):
     foo_url = svn_server.create_repo("foo")
     svn_server.commit_file("foo", "a.txt", "this is a\n")

@@ -5,6 +5,7 @@
 import os
 
 import qisys.archive
+import qisys.sh
 import qibuild.config
 import qitoolchain.qipackage
 
@@ -36,8 +37,9 @@ def test_simple(qibuild_action, toolchains, tmpdir, record_messages):
         qibuild_action("find", "--cmake", "foo", "--config", "test")
     foo_lib = record_messages.find("FOO_LIBRARIES")
     value = foo_lib.split()[1]
-    values = value.split(";")
+    actual_list = value.split(";")
     # Need to resolve symlinks:
-    values = [os.path.realpath(value) for value in values]
-
-    assert values == [libfoo.strpath, libfoobar.strpath, libfoobaz.strpath]
+    actual_list = [os.path.realpath(x) for x in actual_list]
+    expected_list = [libfoo.strpath, libfoobar.strpath, libfoobaz.strpath]
+    for actual_path, expected_path in zip(actual_list, expected_list):
+        assert qisys.sh.samefile(actual_path, expected_path)

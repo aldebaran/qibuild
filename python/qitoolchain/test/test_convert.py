@@ -3,9 +3,11 @@
 ## found in the COPYING file.
 import os
 
+from qisys.test.conftest import skip_on_win
 from qitoolchain.binary_package import convert_to_qibuild
 import qitoolchain.qipackage
 
+@skip_on_win
 def test_convert_gentoo_package(tmpdir, toolchains):
     this_dir = os.path.dirname(__file__)
     json_c_bz2_path = os.path.join(this_dir, "packages", "json-c-0.9.tbz2")

@@ -14,6 +14,8 @@ from qisys.test.conftest import only_linux
 
 import pytest
 
+from qisys.test.conftest import skip_on_win
+
 def test_simple_run(tmpdir, qitest_action):
     ls = qisys.command.find_program("ls")
     tests = [
@@ -96,11 +98,13 @@ def test_exclude(tmpdir, qitest_action):
 def test_ignore_timeouts(qitest_action, tmpdir):
     qitest_json = tmpdir.join("qitest.json")
     sleep_cmd = qisys.command.find_program("sleep")
-    qitest_json.write("""
-[
- {"name": "test_one", "cmd" : ["%s", "2"], "timeout" : 1}
-]
-""" % sleep_cmd)
+    tests = [
+        { "name" : "test_one",
+          "cmd" : [sleep_cmd, "2"],
+          "timeout" : 1
+        }
+    ]
+    qitest_json.write(json.dumps(tests))
     rc = qitest_action("run", "--qitest-json", qitest_json.strpath, "--ignore-timeouts",
                        retcode=True)
     assert rc == 0
@@ -137,10 +141,18 @@ def test_when_missing_libs(qibuild_action, qitest_action):
     hello_proj = qibuild_action.add_test_project("hello")
     qibuild_action("configure", "hello")
     qibuild_action("make", "hello")
-    # Create a nasty bug:
     lib_world = qibuild.find.find_lib([world_proj.sdk_directory], "world",
-                                     expect_one=True)
+                                      shared=True, expect_one=True)
+    # create a nasty bug to make sure the 'hello' executable cannot find
+    # it's dependency on the 'world' shared library
     os.remove(lib_world)
+    if os.name == "nt":
+        # on windows we also have to remove the world.dll that was copied
+        # into hello's sdk directory
+        world_dll = qibuild.find.find_lib([hello_proj.sdk_directory], "world",
+                                          shared=True, expect_one=True)
+        os.remove(world_dll)
+
     qitest_action.chdir("hello")
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:

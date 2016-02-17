@@ -14,7 +14,7 @@ import qibuild.find
 import qipkg.builder
 import qipkg.package
 
-from qibuild.test.test_qibuild_deploy import get_ssh_url
+from qisys.test.conftest import skip_deploy, local_url
 
 import mock
 import pytest
@@ -163,6 +163,7 @@ def test_no_worktre_bad_pml(tmpdir, monkeypatch):
         package = qisys.script.run_action("qipkg.actions.make_package", [pml_path.strpath])
     assert "not in a worktree" in error.value.message
 
+# pylint:disable-msg=E1101
 @pytest.mark.skipif(not qisys.command.find_program("lrelease", raises=False),
                     reason="lrelease not found")
 def test_translations(qipkg_action, tmpdir):
@@ -233,24 +234,23 @@ def test_bump_version(qipkg_action):
 def test_install(qipkg_action, tmpdir):
     d_proj = qipkg_action.add_test_project("d_pkg")
     pml = os.path.join(d_proj.path, "d_pkg.pml")
-    url = get_ssh_url(tmpdir)
     qipkg_action("install", pml, tmpdir.strpath)
     assert tmpdir.join("manifest.xml").check(file=True)
 
-def test_deploy(qipkg_action, tmpdir):
+@skip_deploy
+def test_deploy(qipkg_action, tmpdir, local_url):
     d_proj = qipkg_action.add_test_project("d_pkg")
     pml = os.path.join(d_proj.path, "d_pkg.pml")
-    url = get_ssh_url(tmpdir)
-    qipkg_action("deploy", pml, "--url", url)
+    qipkg_action("deploy", pml, "--url", local_url)
 
     assert tmpdir.join("manifest.xml").check(file=True)
 
-def test_deploy_package(qipkg_action, tmpdir, record_messages):
+@skip_deploy
+def test_deploy_package(qipkg_action, tmpdir, local_url, record_messages):
     d_proj = qipkg_action.add_test_project("d_pkg")
     pml_path = os.path.join(d_proj.path, "d_pkg.pml")
     d_package = qipkg_action("make-package", pml_path)
-    url = get_ssh_url(tmpdir)
-    parsed = qisys.remote.URL(url)
+    parsed = qisys.remote.URL(local_url)
     username = parsed.user
 
     fake_qi = mock.Mock()
@@ -268,7 +268,7 @@ def test_deploy_package(qipkg_action, tmpdir, record_messages):
     sys.modules["qi"] = fake_qi
 
     record_messages.reset()
-    qipkg_action("deploy-package", d_package, "--url", url)
+    qipkg_action("deploy-package", d_package, "--url", local_url)
 
     assert mock_connect.call_args_list == [mock.call("tcp://localhost:9559")]
     assert session.service.call_args_list == [mock.call("PackageManager")]
@@ -279,14 +279,14 @@ def test_deploy_package(qipkg_action, tmpdir, record_messages):
 
     del sys.modules["qi"]
 
-def test_deploy_package_from_pml(qipkg_action, tmpdir):
+@skip_deploy
+def test_deploy_package_from_pml(qipkg_action, tmpdir, local_url):
     d_proj = qipkg_action.add_test_project("d_pkg")
     pml_path = os.path.join(d_proj.path, "d_pkg.pml")
-    url = get_ssh_url(tmpdir)
 
     # this will call sys.exit because 'import qi' will fail,
     # but the package will still get deployed
-    qipkg_action("deploy-package", pml_path, "--url", url, retcode=True)
+    qipkg_action("deploy-package", pml_path, "--url", local_url, retcode=True)
 
     expected_path = os.path.expanduser("~/d-0.1.pkg")
     assert os.path.exists(expected_path)

@@ -29,6 +29,15 @@ except ImportError:
     xdg_cache_home = os.path.expanduser("~/.cache")
     xdg_data_home = os.path.expanduser("~/.local/share")
 
+WITH_WIN32_API = False
+if os.name == "nt":
+    try:
+        import win32api
+        import pywintypes
+        WITH_WIN32_API = True
+    except ImportError:
+        WITH_WIN32_API = False
+
 CONFIG_PATH = xdg_config_home
 CACHE_PATH = xdg_cache_home
 SHARE_PATH = xdg_data_home
@@ -151,7 +160,7 @@ def _handle_dirs(src, dest, root, directories, filter_fun, quiet):
 
         if os.path.islink(dsrc):
             _copy_link(dsrc, ddest, quiet)
-            installed.append(directory)
+            installed.append(to_posix_path(directory))
         else:
             if os.path.lexists(ddest) and not os.path.isdir(ddest):
                 raise qisys.error.Error(
@@ -179,7 +188,7 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
         if os.path.islink(fsrc):
             mkdir(new_root, recursive=True)
             _copy_link(fsrc, fdest, quiet)
-            installed.append(rel_path)
+            installed.append(to_posix_path(rel_path))
         else:
             if os.path.lexists(fdest) and os.path.isdir(fdest):
                 raise qisys.error.Error(
@@ -191,7 +200,7 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
             # (following what `install` does, but not what `cp` does)
             rm(fdest)
             shutil.copy(fsrc, fdest)
-            installed.append(rel_path)
+            installed.append(to_posix_path(rel_path))
     return installed
 
 
@@ -460,6 +469,8 @@ def iter_directory(directory, filter_fun=None, all=False):
 
         ["eggs/c", "eggs/d", "spam/a", "spam/b"]
 
+    Note that paths will always be POSIX, even on Windows
+
     """
     def non_hidden(filename=None, dirname=None):
         if filename:
@@ -479,6 +490,7 @@ def iter_directory(directory, filter_fun=None, all=False):
     res = list()
     for root, dirs, files in os.walk(directory, topdown=True):
         new_root = os.path.relpath(root, directory)
+        new_root = qisys.sh.to_posix_path(new_root)
         dirs[:] = [x for x in dirs if filter_fun(dirname=x)]
         files = [x for x in files if filter_fun(filename=x)]
         if new_root == "." and not files:
@@ -488,7 +500,7 @@ def iter_directory(directory, filter_fun=None, all=False):
                 yield f
             continue
         for f in files:
-            yield os.path.join(new_root, f)
+            yield posixpath.join(new_root, f)
 
 def ls_r(directory, filter_fun=None, all=False):
     """ Same as :py:func:`iter_directory` but returns a sorted list
@@ -514,7 +526,6 @@ def to_posix_path(path, fix_drive=False):
         letter = drive[0]
         return "/" + letter + rest
     return res
-
 
 def to_dos_path(path):
     """Return a DOS path from a "windows with /" path.
@@ -662,6 +673,33 @@ def broken_symlink(file_path):
     """
     return os.path.lexists(file_path) and not os.path.exists(file_path)
 
+def samefile(a, b):
+    r""" Check that two files are the same.
+
+    Useful for theses tests, where files as seen by Python
+    use short names (C:\foo\mylong~1) and paths seen by
+    CMake use full names (C:\foo\mylongname)
+
+    Note: on Windows, this function won't  be able
+    to compare short and full names if pywin32 is
+    not installed. (But it will work if files only
+    differ by case for instance)
+
+    """
+    if os.name == "nt":
+        a_short = a
+        b_short = b
+        if WITH_WIN32_API:
+            try:
+                a_short = win32api.GetShortPathName(a)
+                b_short = win32api.GetShortPathName(b)
+            except pywintypes.error as e:
+                ui.warning("Error when calling GetShortPathName: ", e)
+        else:
+            ui.warning("win32api not found, using basic comparison")
+        return qisys.sh.to_native_path(a_short) == qisys.sh.to_native_path(b_short)
+    else:
+        return os.path.samefile(a, b)
 
 def is_binary(file_path):
     """ Returns True if the file is binary

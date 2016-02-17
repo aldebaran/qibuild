@@ -9,6 +9,7 @@ import time
 
 import qisys.command
 import qisys.error
+import qisys.sh
 import qibuild.cmake
 import qibuild.config
 import qibuild.find
@@ -19,11 +20,16 @@ from qibuild.test.conftest import TestBuildWorkTree
 from qipy.test.conftest import qipy_action
 
 import mock
+import py
 import pytest
 
+# Make sure we cannot run tests without pywin32 installed
+if os.name == "nt":
+    import win32api
 
 # This module also serves as a test for the
 # qibuild cmake API
+
 
 def test_simple(qibuild_action):
     # Just make sure that the basic stuff works
@@ -215,7 +221,7 @@ def test_using_dash_s_with_path_conf(qibuild_action):
     path_conf_after = read_path_conf(stagepath_proj)
     assert path_conf_before == path_conf_after
 
-def test_staged_path_first_in_path_conf(qibuild_action, toolchains):
+def test_staged_path_first_in_path_conf(tmpdir, qibuild_action, toolchains):
     toolchains.create("foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
     bar_package = toolchains.add_package("foo", "bar")
@@ -237,9 +243,8 @@ def test_staged_path_first_in_path_conf(qibuild_action, toolchains):
             stagepath_proj.sdk_directory,
             bar_package.path
     ]
-    expected = [os.path.realpath(x) for x in expected]
-
-    assert lines == expected
+    for actual_line, expected_line in zip(lines, expected):
+        assert qisys.sh.samefile(actual_line, expected_line)
 
 def test_path_conf_contains_toolchain_paths(qibuild_action, toolchains):
     toolchains.create("foo")
@@ -308,6 +313,8 @@ def test_relwithdebinfo(qibuild_action):
                                                     "CMAKE_BUILD_TYPE")
     assert cmake_build_type == "RelWithDebInfo"
 
+# pylint: disable-msg=E1101
+@pytest.mark.skipif(os.name == "nt", reason="No cross compilation on Windows yet")
 def test_using_fake_ctc(qibuild_action, fake_ctc):
     qibuild_action.add_test_project("footool")
     qibuild_action("configure", "footool", "--config", "fake-ctc")
@@ -345,9 +352,12 @@ def test_virtualenv_path(qipy_action, qibuild_action):
     qibuild_action("configure", "py")
     qibuild_action("make", "py")
     qipy_action("bootstrap")
-    py_test = os.path.join(py_proj.sdk_directory, "bin", "py_test")
-    output = subprocess.check_output([py_test]).strip()
-    bin_python = os.path.join(output, "bin", "python")
+    test_exe = qibuild.find.find_bin([py_proj.sdk_directory], "py_test")
+    output = subprocess.check_output([test_exe]).strip()
+    if os.name == "nt":
+        bin_python = os.path.join(output, "Scripts", "Python.exe")
+    else:
+        bin_python = os.path.join(output, "bin", "python")
     assert os.path.exists(bin_python)
 
 def test_skips_configure(qibuild_action, record_messages):

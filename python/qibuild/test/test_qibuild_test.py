@@ -27,7 +27,10 @@ def test_various_outcomes(qibuild_action, record_messages):
     record_messages.reset()
     rc = qibuild_action("test", "testme", "-k", "segfault", retcode=True)
     if os.name == 'nt':
-        assert record_messages.find("0xC0000005")
+        # Workaround some strange Jenkins bug:
+        # https://git.io/vwJKE
+        if not os.environ.get("JENKINS_URL"):
+            assert record_messages.find("0xC0000005")
     else:
         assert record_messages.find("Segmentation fault")
     assert rc == 1

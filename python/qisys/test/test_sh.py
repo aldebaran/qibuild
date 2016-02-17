@@ -9,6 +9,8 @@ import pytest
 
 import qisys.error
 import qisys.sh
+
+from qisys.test.conftest import skip_on_win
 from qisrc.test.conftest import TestGit
 
 def test_install_ro(tmpdir):
@@ -35,6 +37,7 @@ def test_install_on_self(tmpdir):
         qisys.sh.install(tmpdir.strpath, tmpdir.strpath)
     assert "are the same directory" in e.value.message
 
+@skip_on_win
 def test_install_symlink(tmpdir):
    src = tmpdir.mkdir("src")
    a = src.ensure("a", file=True)
@@ -125,14 +128,16 @@ def test_copy_git_src(tmpdir):
     assert not dest.join("c.txt").check(file=True)
 
 def test_is_runtime():
-    assert qisys.sh.is_runtime("lib/libfoo.a") is False
-    assert qisys.sh.is_runtime("include/foo.h") is False
-    assert qisys.sh.is_runtime("lib/python2.7/Makefile") is True
-    assert qisys.sh.is_runtime("lib/python2.7/config/pyconfig.h") is True
-    assert qisys.sh.is_runtime("include/python2.7/pyconfig.h") is True
+    def make_path(*parts):
+        return os.path.join(*parts)
+    assert qisys.sh.is_runtime(make_path("lib", "libfoo.a")) is False
+    assert qisys.sh.is_runtime(make_path("include", "foo.h")) is False
+    assert qisys.sh.is_runtime(make_path("lib", "python2.7", "Makefile")) is True
+    assert qisys.sh.is_runtime(make_path("lib", "python2.7", "config", "pyconfig.h")) is True
+    assert qisys.sh.is_runtime(make_path("include", "python2.7", "pyconfig.h")) is True
     if sys.platform == "darwin":
         assert qisys.sh.is_runtime("lib/libfoo.dylib") is True
-    assert qisys.sh.is_runtime("lib/fonts/Vera.ttf") is True
+    assert qisys.sh.is_runtime(make_path("lib", "fonts", "Vera.ttf")) is True
 
 def test_install_return_value(tmpdir):
     src = tmpdir.mkdir("src")
@@ -144,6 +149,7 @@ def test_install_return_value(tmpdir):
     ret = qisys.sh.install(d.strpath, dest.strpath)
     assert ret == ["d"]
 
+@skip_on_win
 def test_install_qt_symlinks(tmpdir):
     tc_path = tmpdir.mkdir("toolchain")
     qt_src = tc_path.mkdir("qt")

@@ -118,5 +118,9 @@ def test_venv_path(qipy_action):
     qipy_action("bootstrap")
     build_worktree = TestBuildWorkTree()
     venv_path = build_worktree.venv_path
-    activate = os.path.join(venv_path, "bin", "activate")
+    if os.name == "nt":
+        bin_dir = "Scripts"
+    else:
+        bin_dir = "bin"
+    activate = os.path.join(venv_path, bin_dir, "activate")
     assert os.path.exists(activate)

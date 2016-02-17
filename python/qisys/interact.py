@@ -140,5 +140,5 @@ def get_editor():
         # Ask the user to choose, and store the answer so
         # that we never ask again
         ui.warning("Could not find the editor to use.")
-        editor = qisys.interact.ask_program("Please enter an editor")
+        editor = ask_program("Please enter an editor")
     return editor

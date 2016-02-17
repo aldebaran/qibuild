@@ -2,11 +2,15 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import os
+
 import qisys.error
 import qitest.conf
 
 import pytest
 import mock
+
+from qisys.test.conftest import skip_on_win
 
 test_gtest_one = {
     "name" : "gtest_one",
@@ -43,7 +47,8 @@ def test_errors(tmpdir):
         qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/bar"])
     assert "A test named 'foo' already exists" in e.value.message
 
-def test_relocate():
+@skip_on_win
+def test_relocate_posix():
     proj = mock.Mock()
     proj.sdk_directory = "/path/to/sdk"
     tests = [
@@ -66,5 +71,33 @@ def test_relocate():
             {
                 "name" : "test_two",
                 "cmd" : ["bin/test_two", "/some/other/path"],
+           }
+    ]
+
+# pylint: disable-msg=E1101
+@pytest.mark.skipif(os.name != "nt", reason="This test is Windows-specific")
+def test_relocate_win():
+    proj = mock.Mock()
+    proj.sdk_directory = r"c:\path\to\sdk"
+    tests = [
+        {
+            "name" : "test_one",
+            "cmd" : [r"c:\path\to\sdk\bin\test_one.exe", r"c:\path\to\sdk\share\foo\one.txt"]
+        },
+        {
+            "name" : "test_two",
+            "cmd" : [r"c:\path\to\sdk\bin\test_two.exe", r"c:\some\other\path"]
+        }
+    ]
+
+    qitest.conf.relocate_tests(proj, tests)
+    assert tests == [
+            {
+                "name" : "test_one",
+                "cmd" : [r"bin\test_one.exe", r"share\foo\one.txt"]
+            },
+            {
+                "name" : "test_two",
+                "cmd" : [r"bin\test_two.exe", r"c:\some\other\path"],
            }
     ]

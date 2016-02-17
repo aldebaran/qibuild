@@ -7,6 +7,7 @@ import pytest
 import os
 
 import qisys.archive
+import qisys.remote
 import qitoolchain.database
 import qitoolchain.qipackage
 import qitoolchain.svn_package
@@ -154,7 +155,7 @@ def test_package_with_flags(tmpdir, toolchain_db):
 <toolchain>
   <package name="x-tools" version="0.1" url="{url}" />
 </toolchain>
-""".format(url="file://" + x_tools_package.strpath))
+""".format(url=qisys.remote.local_url(x_tools_package.strpath)))
     toolchain_db.update(feed.strpath)
 
     x_tools_in_db = toolchain_db.get_package("x-tools")
@@ -172,7 +173,7 @@ def test_package_conflict(tmpdir, toolchain_db, record_messages):
 <toolchain>
   <package name="foo" version="0.1" url="{url}" />
 </toolchain>
-""".format(url="file://" + foo_package.strpath))
+""".format(url=qisys.remote.local_url(foo_package.strpath)))
 
     # pylint:disable-msg=E1101
     with pytest.raises(qitoolchain.qipackage.FeedConflict) as e:
