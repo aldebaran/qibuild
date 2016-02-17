@@ -50,6 +50,14 @@ def test_make_package(qipkg_action, qipy_action):
         assert os.path.exists(full_path)
     qibuild.find.find_lib([extracted], "foo", expect_one=True)
 
+def test_extract_package(qipkg_action, tmpdir):
+    d_proj = qipkg_action.add_test_project("d_pkg")
+    pml = os.path.join(d_proj.path, "d_pkg.pml")
+    package = qipkg_action("make-package", pml)
+    dest = tmpdir.join("dest")
+    extracted = qipkg_action("extract-package", package, "--cwd", dest.strpath)
+    assert os.path.exists(os.path.join(extracted, "d_behavior/behavior.xar"))
+
 def test_make_package_empty_uuid(qipkg_action):
     pml = os.path.join(os.path.dirname(__file__), "projects", "empty_uuid", "empty.pml")
     error = qipkg_action("make-package", pml, raises=True)

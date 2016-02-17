@@ -5,8 +5,10 @@
 
 import os
 import zipfile
+from StringIO import StringIO
 
 from qisys import ui
+import qisys.error
 import qisys.parsers
 import qipkg.builder
 
@@ -26,13 +28,15 @@ def do(args):
     name = None
     version = None
     pkg_name = None
-    with qisys.sh.TempDir() as tmp:
-        for name in archive.namelist():
-            if name == "manifest.xml":
-                archive.extract("manifest.xml", path=tmp)
-                manifest_xml_path = os.path.join(tmp, "manifest.xml")
-                pkg_name = qipkg.builder.pkg_name(manifest_xml_path)
-                break
+
+    xml_data = None
+    try:
+        xml_data = archive.read("manifest.xml")
+    except KeyError:
+        raise qisys.error.Error("Could not find manifest.xml in %s" % pkg_path)
+
+    buffer = StringIO(xml_data)
+    pkg_name = qipkg.builder.pkg_name(buffer)
 
     if pkg_name is not None:
         to_make = os.path.join(output_path, os.path.basename(pkg_name))
@@ -46,3 +50,4 @@ def do(args):
     qisys.archive.extract(pkg_path, output_path, algo="zip", strict_mode=False)
     ui.info(ui.green, "Package extracted to", ui.reset,
             ui.bold, output_path)
+    return output_path
