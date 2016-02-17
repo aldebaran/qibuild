@@ -78,6 +78,11 @@ function(qi_create_test_lib target_name)
     set(_runtime_output ${QI_SDK_LIB})
   endif()
 
+  # Never install static tests libs
+  get_target_property(_type ${target_name} TYPE)
+  if("${_type}" STREQUAL "STATIC_LIBRARY")
+    return()
+  endif()
   install(TARGETS ${target_name}
     RUNTIME COMPONENT test DESTINATION ${_runtime_output}
     LIBRARY COMPONENT test DESTINATION ${_runtime_output}
