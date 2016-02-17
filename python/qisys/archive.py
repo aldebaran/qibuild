@@ -86,7 +86,6 @@ Please set only one of these two options to 'True'
 """
         raise ValueError(mess)
     ui.debug("Compressing", directory, "to", output)
-    archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
     # a list of tuple src, arcname to be added in the archive
     to_add = list()
     for root, directories, filenames in os.walk(directory):
@@ -103,7 +102,9 @@ Please set only one of these two options to 'True'
             else:
                 arcname = os.path.join(os.path.basename(directory), rel_path)
             to_add.append((full_path, arcname))
-
+    # ZipFile() creates an empty .zip file on disk, to call
+    # after to_add has been populated
+    archive = zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED)
     for i, (full_path, arcname) in enumerate(to_add):
         if os.path.islink(full_path):
             content = os.readlink(full_path)
