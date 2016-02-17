@@ -41,7 +41,7 @@ class PythonTestCollector:
         for pytest in pytest_list:
             relpath = os.path.relpath(pytest, project.path)
             test_name = os.path.splitext(relpath)[0]
-            test_name = test_name.replace("/", ".")
+            test_name = test_name.replace(os.path.sep, ".")
             test_name = project.name + "." + test_name
             pytest_data = dict()
             pytest_data['name'] = test_name
