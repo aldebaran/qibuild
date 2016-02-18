@@ -31,4 +31,4 @@ def test_keep_output_when_test_times_out(build_worktree):
     failure = test_case.find("failure")
     assert failure is not None
     assert failure.text == "timeout\n"
-    assert failure.get("message") == "Timed out (1s)"
+    assert failure.get("message") == "[TIMED OUT] (1s)"

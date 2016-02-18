@@ -34,7 +34,7 @@ def test_various_outcomes(qibuild_action, record_messages):
 
     record_messages.reset()
     rc = qibuild_action("test", "testme", "-k", "timeout", retcode=True)
-    assert record_messages.find("Timed out")
+    assert record_messages.find("TIMED OUT")
     assert rc == 1
 
     rc = qibuild_action("test", "testme", "-k", "spam", retcode=True)

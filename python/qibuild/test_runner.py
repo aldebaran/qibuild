@@ -360,22 +360,22 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         if process.return_type == qisys.command.Process.OK:
             return "[OK]"
         if process.return_type == qisys.command.Process.INTERRUPTED:
-            return "Interrupted"
+            return "[INTERRUPTED]"
         if process.return_type == qisys.command.Process.NOT_RUN:
-            mess = "Not run"
+            mess = "[NOT RUN]"
             if process.exception is not None:
                 mess += ": " + str(process.exception)
             return mess
         if process.return_type == qisys.command.Process.TIME_OUT:
-            return "Timed out (%is)" % timeout
+            return "[TIMED OUT] (%is)" % timeout
         if process.return_type == qisys.command.Process.ZOMBIE:
-            return "Zombie (Timeout = %is)" % timeout
+            return "[ZOMBIE] (Timeout = %is)" % timeout
         if process.return_type == qisys.command.Process.FAILED:
             retcode = process.returncode
             if retcode > 0:
                 return "[FAIL] Return code: %i" % retcode
             else:
-                return qisys.command.str_from_signal(-retcode)
+                return "[CRASHED] " + qisys.command.str_from_signal(-retcode)
 
 
 def get_cpu_list(total_cpus, num_cpus_per_test, worker_index):
