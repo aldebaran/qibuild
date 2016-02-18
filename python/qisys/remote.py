@@ -259,7 +259,9 @@ class URL(object):
 
     def _parse(self, string):
 
-        modern_scheme = """
+        schemes = [
+# ssh://user@host:directory
+"""
 ssh://
 (?:
     (?P<user>[^@]+)
@@ -267,30 +269,38 @@ ssh://
 (?P<host>[^:/]+)       # host is anything but : and /
 (:(?P<port>\d+))?      # optional port
 (/(?P<remote_dir>.*))? # optional remote directory
+""" ,
+# user@host:directory
 """
-        match = re.match(modern_scheme, string, re.VERBOSE)
-        if match:
-            self._handle_match(match)
-        else:
-            old_scheme = """
 (?P<user>[^@]+)        # user is anything but @, and optional
 @                      # mandatory @ separator
 (?P<host>[^:/]+)       # host is anything but : and /
 (
   (:|/)?               # directory separator is either : or /
   (?P<remote_dir>.*))? # remote directory is optional
-        """
-            match = re.match(old_scheme, string, re.VERBOSE)
+""",
+# host:directory
+"""
+(?P<host>[^:]+)    # host is anything but ':'
+:                  # mandatory ':' separator
+(?P<remote_dir>.*) # mandatory remote directory
+"""
+]
+        for scheme in schemes:
+            match = re.match(scheme, string, re.VERBOSE)
             if match:
                 self._handle_match(match)
-            else:
-                raise URLParseError(""" \
+                break
+        else:
+            # loop finished without finding a match:
+            raise URLParseError(""" \
 Could not parse %s as a valid url.
 Supported schemes are
 
   user@host:directory
-
   ssh://user@host:port/directory
+  host:directory
+
 """ % self.as_string)
 
     def _handle_match(self, match):

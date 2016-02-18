@@ -20,6 +20,13 @@ def test_simple_url_with_remote_dir():
     assert url.port == 22
     assert url.remote_directory == "deploy"
 
+def test_no_username():
+    url = URL("host:dir")
+    assert url.host == "host"
+    assert url.remote_directory == "dir"
+    assert url.port == 22
+    assert not url.user
+
 def test_modern_urls():
     url = URL("ssh://foo@bar/deploy")
     assert url.host == "bar"
