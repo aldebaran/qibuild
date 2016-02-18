@@ -5,16 +5,8 @@
 project = u'qiBuild'
 version = '3.11.3'
 sys.path.insert(0, os.path.abspath('../tools'))
-
-# for autodoc: make sure to pick the correct
-# qibuild modules
-qi_module_names = [x for x in sys.modules if x.startswith("qi")]
-
-for qi_module_name in qi_module_names:
-    del sys.modules[qi_module_name]
-
+# for autodoc
 sys.path.insert(0, os.path.abspath('../../python'))
-
 extensions.append("cmakedomain")
 extensions.append("sphinx.ext.autodoc")
 extensions.append("sphinxcontrib.spelling")
