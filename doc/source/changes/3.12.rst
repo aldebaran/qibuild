@@ -98,6 +98,8 @@ qibuild
 * ``qibuild configure --trace`` calls ``CMake`` with ``--trace-expand`` option
   if version is greater than 3.4
 
+* ``qibuild deploy``: allow to use simple URLs like ``<host>:<deploy-dir>``
+
 qicd
 ----
 
