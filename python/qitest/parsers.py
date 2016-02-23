@@ -45,6 +45,10 @@ def test_parser(parser, with_num_jobs=True):
     group.add_argument("--coverage-output-dir", dest="coverage_output_dir",
                       help="Generate XML and HTML coverage reports in the given " + \
                            "directory (instead of build-<platform>/sdk/coverage-results)")
+    group.add_argument("--cov-exclude", dest="cov_exclude_patterns", action="append",
+                       help="Exclude the given patterns from covegare.\n"
+                            "Default is: ['.*test.', '.*examples.*', '.*external.*']\n"
+                            "Use --cov-exclude=NONE to keep everything")
     group.add_argument("--root-output-dir", dest="test_output_dir", metavar="ROOT_OUTPUT_DIR",
                       help="same as --test-output-dir (deprecated)")
 

@@ -187,6 +187,18 @@ qisys
 
 * Add ``qisys foreach`` to run a command on all projects in the worktree
 
+qitest
+------
+
+* Fix using ``qitest --coverage`` with custom build prefix. Note that
+  the fix uses an undocumented feature of ``gocvr``. See
+  https://github.com/gcovr/gcovr/issues/61 for more details
+
+* Add ``qitest run --cov-exclude`` to specify excludes patterns for
+  ``gcovr``. Default is ``[".*test.*", ".*external.*", ".*examples.*]``
+
+  You can use ``--cov-exclude=NONE`` to include everything.
+
 cmake
 -----
 

@@ -4,6 +4,7 @@
 
 import os
 import re
+import sys
 import tempfile
 
 import py
@@ -61,6 +62,10 @@ class TestWorkTree(qisys.worktree.WorkTree):
 # Because sometimes the most popular OS in the world is not the best one ...
 # pylint: disable-msg=E1101
 skip_on_win = pytest.mark.skipif(os.name == 'nt', reason="cannot pass on windows")
+
+# pylint: disable-msg=E1101
+only_linux = pytest.mark.skipif(not sys.platform.startswith("linux"),
+                                reason="only works on linux")
 
 # pylint: disable-msg=E1101
 @pytest.fixture

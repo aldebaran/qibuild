@@ -10,6 +10,8 @@ import qisys.command
 import qisys.error
 import qibuild.find
 
+from qisys.test.conftest import only_linux
+
 import pytest
 
 def test_simple_run(tmpdir, qitest_action):
@@ -103,14 +105,24 @@ def test_ignore_timeouts(qitest_action, tmpdir):
                        retcode=True)
     assert rc == 0
 
+# Even though clang supports the --cov flag, gcovr does not seem
+# to work on mac
+@only_linux
 def test_action_coverage(qibuild_action, qitest_action):
     gcovr = qisys.command.find_program("gcovr", raises=False)
     if not gcovr:
         return
-    qibuild_action.add_test_project("cov")
-    qibuild_action("configure", "cov", "--coverage")
-    qibuild_action("make", "cov")
-    qitest_action("run", "cov", "--coverage")
+    coverme_proj = qibuild_action.add_test_project("coverme")
+    qibuild_action("configure", "coverme", "--coverage")
+    qibuild_action("make", "coverme")
+    qitest_action("run", "coverme", "--coverage", "--cov-exclude=NONE")
+    xml = os.path.join(coverme_proj.sdk_directory, "coverage-results",
+                       "coverme.xml")
+    # Can't do more tests because by default gcovr is called
+    # with --exclude *.test.*. See more low-level tests
+    # in qibuild/test/test_coverage.py for more precise tests
+    qisys.qixml.read(xml)
+
 
 def test_when_missing_libs(qibuild_action, qitest_action):
     """ Sometimes the build system is broken and shared
