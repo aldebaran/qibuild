@@ -10,6 +10,8 @@ general
 * Always generate crash reports with ``cgitb``. Also, deprecate ``--backtrace``
   option, it's always on.
 
+* Fix extracting archives created with ``zip --symlinks``
+
 qiproject.xml
 +++++++++++++
 

@@ -178,7 +178,7 @@ Please set only one of these two options to 'True'
 
         new_path = os.path.join(directory, member.filename)
         qisys.sh.mkdir(os.path.dirname(new_path), recursive=True)
-        if member.external_attr == 2716663808L:
+        if member.external_attr in [2716663808L, 2717843456L]:
             target = archive_.read(member.filename)
             os.symlink(target, new_path)
         else:
