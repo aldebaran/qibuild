@@ -112,7 +112,7 @@ Please set only one of these two options to 'True'
             attr.create_system = 3
             # long type of hex val of '0xA1ED0000L',
             # say, symlink attr magic..
-            attr.external_attr = 2716663808L
+            attr.external_attr = 0xa1ed0000
             zip_call = archive.writestr
         elif os.path.isdir(full_path):
             continue
@@ -178,7 +178,7 @@ Please set only one of these two options to 'True'
 
         new_path = os.path.join(directory, member.filename)
         qisys.sh.mkdir(os.path.dirname(new_path), recursive=True)
-        if member.external_attr in [2716663808L, 2717843456L]:
+        if member.external_attr in [0xa1ed0000, 0xa1ff0000]:
             target = archive_.read(member.filename)
             os.symlink(target, new_path)
         else:
