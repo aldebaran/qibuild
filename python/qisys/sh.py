@@ -442,6 +442,7 @@ def mv(src, dest):
         dest = os.path.join(dest, os.path.basename(src))
     if os.path.exists(dest):
         rm(dest)
+    ui.debug(src, "->", dest)
     shutil.move(src, dest)
 
 
