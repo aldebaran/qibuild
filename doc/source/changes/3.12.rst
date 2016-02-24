@@ -7,7 +7,7 @@ general
 * Add a new command, ``qisys``. Used for actions that are common to
   all other actions
 
-* Always enerate crash reports with ``cgitb``. Also, deprecate ``--backtrace``
+* Always generate crash reports with ``cgitb``. Also, deprecate ``--backtrace``
   option, it's always on.
 
 qiproject.xml
