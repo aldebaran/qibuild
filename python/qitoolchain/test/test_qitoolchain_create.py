@@ -2,10 +2,13 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import qisys.archive
+import qisys.remote
 import qitoolchain.qipackage
 
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
+
 
 from qisrc.test.conftest import git_server
 
@@ -95,3 +98,19 @@ def test_using_feed_name_from_regular_location(qitoolchain_action, tmpdir):
 """)
     error = qitoolchain_action("create", "foo", feed_path.strpath, raises=True)
     assert "Cannot use feed names with non-git URL" in error
+
+def test_non_strict_feed_parsing(qitoolchain_action, tmpdir):
+    # This test is Aldebaran-specific: We have broken feeds
+    # (where package.xml of the packages and metadata in the feed
+    # do not match) in production, and we need backward-compatibily
+    # on this ....
+    foo = tmpdir.mkdir("foo")
+    foo.join("package.xml").write('<package name="foo" version="0.1" />')
+    foo_archive = qisys.archive.compress(foo.strpath, flat=True)
+    feed = tmpdir.join("feed.xml")
+    feed.write("""
+<toolchain strict_metadata="false">
+ <package name="libfoo" version="0.2" url="{foo_url}" />
+</toolchain>
+""".format(foo_url=qisys.remote.local_url(foo_archive)))
+    qitoolchain_action("create", "tc", feed.strpath)

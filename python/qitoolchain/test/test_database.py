@@ -175,10 +175,8 @@ def test_package_conflict(tmpdir, toolchain_db, record_messages):
 """.format(url="file://" + foo_package.strpath))
 
     # pylint:disable-msg=E1101
-    with pytest.raises(Exception) as e:
+    with pytest.raises(qitoolchain.qipackage.FeedConflict) as e:
       toolchain_db.update(feed.strpath)
-
-    assert e.value.args[0] == "Conflict between feed and package.xml"
 
     # Make sure we warn properly
     assert record_messages.find("When parsing")

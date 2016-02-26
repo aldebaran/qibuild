@@ -20,6 +20,9 @@ class DataBase(object):
         self.load()
         self.packages_path = qisys.sh.get_share_path("qi", "toolchains",
                                                      self.name)
+        # Wether to ignore conflicts between package.xml of packages and
+        # metadata in feeds
+        self.strict_feed = True
 
     def load(self):
         """ Load the packages from the xml file """
@@ -48,7 +51,11 @@ class DataBase(object):
 
     def add_package(self, package):
         """ Add a package to the database """
-        package.load_package_xml()
+        try:
+            package.load_package_xml()
+        except qitoolchain.qipackage.FeedConflict:
+            if self.strict_feed:
+                raise
         package.reroot_paths()
         self.packages[package.name] = package
 
@@ -107,6 +114,7 @@ class DataBase(object):
 
         feed_parser = qitoolchain.feed.ToolchainFeedParser(self.name)
         feed_parser.parse(feed, branch=branch, name=name)
+        self.strict_feed = feed_parser.strict_feed
         remote_packages = feed_parser.get_packages()
         local_packages = self.packages.values()
         to_add = list()

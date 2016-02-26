@@ -203,7 +203,7 @@ class QiPackage(object):
                 ok = False
 
         if not ok:
-            raise qisys.error.Error("Conflict between feed and package.xml")
+            raise FeedConflict()
 
         if self.url and self.directory:
             mess = """\
@@ -336,3 +336,7 @@ def _on_bad_package_xml(package_xml, name, old, new):
         mess = ["When parsing", package_xml, "\n"]
     mess.extend(["Overriding", name, old, "->", new])
     ui.error(*mess)
+
+class FeedConflict(qisys.error.Error):
+    def __str__(self):
+        return "Conflict between feed and package.xml"

@@ -97,6 +97,7 @@ class ToolchainFeedParser:
     def __init__(self, name):
         self.name = name
         self.packages = list()
+        self.strict_feed = True
         # A list of packages to be blacklisted
         self.blacklist = list()
         # A dict name -> version used to only keep the latest
@@ -143,6 +144,11 @@ class ToolchainFeedParser:
             tree = tree_from_feed(feed_path)
         else:
             tree = tree_from_feed(feed)
+
+        root = tree.getroot()
+        self.strict_feed = qisys.qixml.parse_bool_attr(root,
+                "strict_metadata", default=True)
+
         package_trees = tree.findall("package")
         package_trees.extend(tree.findall("svn_package"))
         for package_tree in package_trees:
