@@ -30,6 +30,9 @@ class Manifest(object):
         self.default_branch = None
         self.groups = qisrc.groups.Groups()
         self.warn = warn
+        # We need to automatically set CMakeBuildConfig.loose_deps_resolution to False
+        # in certain cases, the manifest is the logical place to do it
+        self.loose_deps_resolution = True
         self.load()
 
     # pylint: disable-msg=E0213

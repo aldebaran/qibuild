@@ -136,10 +136,13 @@ class WorkTreeSyncer(object):
             self.manifest.groups = None
         else:
             self.manifest.groups = qisys.qixml.parse_list_attr(manifest_elem, "groups")
+        self.manifest.loose_deps_resolution = qisys.qixml.parse_bool_attr(manifest_elem,
+                "loose_deps_resolution", default=False)
         self.manifest.review = qisys.qixml.parse_bool_attr(manifest_elem, "review",
                                                            default=True)
         self.manifest.all_repos = qisys.qixml.parse_bool_attr(manifest_elem, "all_repos",
                                                               default=False)
+
 
     def dump_manifest_config(self):
         """ Save the manifest config in .qi/manifest.xml """
@@ -153,6 +156,8 @@ class WorkTreeSyncer(object):
             manifest_elem.set("review", "true")
         else:
             manifest_elem.set("review", "false")
+        if self.manifest.loose_deps_resolution:
+            manifest_elem.set("loose_deps_resolution", "true")
         tree = etree.ElementTree(root)
         qisys.qixml.write(tree, self.manifest_xml)
 
@@ -212,6 +217,7 @@ class WorkTreeSyncer(object):
                     if warn:
                         ui.warning("Group %s not found in the manifest" % group)
         repos = remote_manifest.get_repos(groups=groups_to_use)
+        self.manifest.loose_deps_resolution = remote_manifest.loose_deps_resolution
         return repos
 
     def get_old_repos(self, warn=True):
@@ -359,6 +365,7 @@ class LocalManifest(object):
                         # don't want the head of a branch
         self.review = True
         self.all_repos = False
+        self.loose_deps_resolution = False
 
     @property
     def groups(self):

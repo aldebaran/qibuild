@@ -10,6 +10,7 @@ from qisys import ui
 import qisys.error
 import qisys.sh
 import qisys.remote
+import qisrc.worktree
 import qibuild.deploy
 import qibuild.deps
 from qibuild.parallel_builder import ParallelBuilder
@@ -29,6 +30,22 @@ class CMakeBuilder(AbstractBuilder):
             self.projects = projects
         self.deps_solver = qibuild.deps.DepsSolver(build_worktree)
         self.dep_types = ["build", "runtime"]
+
+        # Whether we ignore the qiproject.xml and always look for
+        # -config.cmake files in all the packages of the toolchain.
+        # Two ways this can be set to 'True'
+        #  - setting the QIBUILD_LOOSE_DEPS_RESOLUTION environment variable
+        #  - have a setting in qisrc manifest saying so
+        self.loose_deps_resolution = False
+
+        git_worktree = qisrc.worktree.GitWorkTree(build_worktree.worktree)
+        self.loose_deps_resolution = git_worktree.manifest.loose_deps_resolution
+        if os.environ.get("QIBUILD_LOOSE_DEPS_RESOLUTION"):
+            self.loose_deps_resolution = True
+
+        if self.loose_deps_resolution:
+            ui.warning("You are using qibuild with loose dependency "
+                       "resolution. It means your qiproject.xml may not be correct")
 
     # pylint: disable-msg=E0202
     @property
@@ -109,8 +126,7 @@ class CMakeBuilder(AbstractBuilder):
 
     def get_sdk_dirs_for_project(self, project):
         sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "test"])
-        loose_mode = os.environ.get("QIBUILD_LOOSE_DEPS_RESOLUTION")
-        if loose_mode:
+        if self.loose_deps_resolution:
             if self.toolchain:
                 packages = self.toolchain.packages
             else:

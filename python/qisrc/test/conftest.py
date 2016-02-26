@@ -129,6 +129,10 @@ class TestGitServer(object):
         self.manifest_branch = branch
         self.push_manifest("Switch to %s" % branch, allow_empty=True)
 
+    def set_loose_deps_resolution(self):
+        self.manifest.loose_deps_resolution = True
+        self.push_manifest("Using loose deps resolution")
+
     def add_qibuild_test_project(self, src):
         project_name = src + ".git"
         repo_src = self._create_repo(project_name , src=src, review=False)

@@ -12,6 +12,9 @@ import qibuild.parsers
 import mock
 import pytest
 
+from qisrc.test.conftest import git_server, qisrc_action
+from qibuild.test.conftest import TestBuildWorkTree
+
 def test_check_configure_has_been_called_before_building(build_worktree):
     hello_proj = build_worktree.create_project("hello")
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, [hello_proj])
@@ -71,11 +74,12 @@ def test_add_package_paths_from_toolchain(build_worktree, toolchains, monkeypatc
     qi_package = toolchains.add_package("test", "libqi", build_depends=["boost"])
     naoqi_proj = build_worktree.create_project("naoqi", build_depends=["libqi"])
     build_worktree.set_active_config("test")
-    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, [naoqi_proj])
     os.environ["QIBUILD_LOOSE_DEPS_RESOLUTION"] = "ON"
+    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, [naoqi_proj])
     sdk_dirs = cmake_builder.get_sdk_dirs_for_project(naoqi_proj)
     assert sdk_dirs == [boost_package.path, qi_package.path, pthread_package.path]
     del os.environ["QIBUILD_LOOSE_DEPS_RESOLUTION"]
+    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, [naoqi_proj])
     sdk_dirs = cmake_builder.get_sdk_dirs_for_project(naoqi_proj)
     assert sdk_dirs == [boost_package.path, qi_package.path]
 
@@ -109,3 +113,10 @@ def test_host_tools_host_tools_not_built(build_worktree, fake_ctc):
     with pytest.raises(qisys.error.Error) as e:
         cmake_builder.get_host_dirs(usefootool_proj)
     assert "(Using 'foo' build config)" in e.value.message
+
+def test_setting_loose_deps_resolution_from_manifest(git_server, qisrc_action):
+    git_server.set_loose_deps_resolution()
+    qisrc_action("init", git_server.manifest_url)
+    build_worktree = TestBuildWorkTree()
+    cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree)
+    assert cmake_builder.loose_deps_resolution == True
