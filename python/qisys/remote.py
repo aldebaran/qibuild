@@ -311,3 +311,15 @@ Supported schemes are
             if "port" in dict and dict["port"]:
                 self.port = int(dict["port"])
             self.remote_directory = dict["remote_dir"] or None
+
+def local_url(path):
+    """ Convert a local, native path to an URL starting
+    with file:///
+
+    Mainly useful for tests
+
+    """
+    if os.name == "nt":
+        return "file:///"  + qisys.sh.to_posix_path(path)
+    else:
+        return "file://" + qisys.sh.to_native_path(path)
