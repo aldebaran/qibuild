@@ -6,9 +6,6 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-if (sys.version_info.major, sys.version_info.minor) != (2, 7):
-    sys.exit("Error: qibuild only works with Python2.7")
-
 def get_qibuild_cmake_files():
     res = list()
     cmake_dest = 'share/cmake'
@@ -25,7 +22,7 @@ def get_qibuild_cmake_files():
 data_files = get_qibuild_cmake_files()
 
 setup(name="qibuild",
-      version="3.12a1",
+      version="3.13a1",
       description="The meta build framework",
       url="http://doc.aldebaran.com/qibuild",
       author="Aldebaran Robotics",
@@ -49,5 +46,11 @@ setup(name="qibuild",
             "qitest       = qisys.main:main",
             "qitoolchain  = qisys.main:main",
         ]
-    }
+      },
+      classifiers = [
+        "Environment :: Console",
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
+      ]
 )
