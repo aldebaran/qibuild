@@ -12,6 +12,8 @@ general
 
 * Fix extracting archives created with ``zip --symlinks``
 
+* Fix crash when current working directory does not exist
+
 qiproject.xml
 +++++++++++++
 

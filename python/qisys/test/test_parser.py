@@ -106,3 +106,14 @@ def test_using_dash_all_with_dash_single(worktree, args):
     with pytest.raises(qisys.error.Error) as e:
         qisys.parsers.get_projects(worktree, args)
     assert "--single with --all" in e.value.message
+
+def test_non_existing_cwd(tmpdir, monkeypatch, args):
+    # Warning: if this test fails, pytest will crash ...
+    # (see https://github.com/pytest-dev/pytest/issues/1235)
+    work = tmpdir.mkdir("work")
+    monkeypatch.chdir(work)
+    work.remove()
+    # pylint:disable-msg=E1101
+    with pytest.raises(qisys.error.Error) as e:
+        qisys.parsers.get_worktree(args)
+    assert "not an existing directory" in e.value.args[0]

@@ -266,7 +266,10 @@ def is_worktree(path):
 def guess_worktree(cwd=None, raises=False):
     """Look for parent directories until a .qi dir is found somewhere."""
     if cwd is None:
-        cwd = os.getcwd()
+        try:
+            cwd = os.getcwd()
+        except OSError as e:
+            raise qisys.error.Error("Working directory is not an existing directory")
     cwd = qisys.sh.to_native_path(cwd)
     head = cwd
     _tail = True
