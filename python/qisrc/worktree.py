@@ -87,7 +87,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         if raises:
             raise NoSuchGitProject(src)
 
-    def get_git_projects(self, groups=None):
+    def get_git_projects(self, groups=None, ignore_missing_groups=True):
         """ Get the git projects matching a given group """
         if not groups:
             return self.git_projects
@@ -100,7 +100,13 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         groups = qisrc.groups.get_groups(self.worktree)
         for group_name in group_names:
             warn_for_group = True
-            project_names = groups.projects(group_name)
+            try:
+                project_names = groups.projects(group_name)
+            except qisrc.groups.NoSuchGroup:
+                if ignore_missing_groups:
+                    project_names = list()
+                else:
+                    raise
             for project_name in project_names:
                 git_project = git_project_names.get(project_name)
                 if git_project:

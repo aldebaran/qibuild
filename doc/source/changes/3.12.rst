@@ -177,6 +177,9 @@ qisrc
 
 * ``qisrc foreach --all`` is deprecated, use ``qisys foreach`` instead
 
+* ``qisrc rm-group``: add ``--from-disk`` to also remove projects sources
+  from disk. Use with care.
+
 qisys
 -----
 

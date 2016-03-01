@@ -4,11 +4,13 @@
 
 import os
 import copy
+import functools
 
 from qisys import ui
 import qisys.qixml
 import qisrc.git_config
 
+@functools.total_ordering
 class GitProject(object):
     def __init__(self, git_worktree, worktree_project):
         self.git_worktree = git_worktree
@@ -270,6 +272,12 @@ class GitProject(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self.src)
+
+    def __lt__(self, other):
+        return self.src < other.src
 
     def __repr__(self):
         return "<GitProject in %s>" % self.src

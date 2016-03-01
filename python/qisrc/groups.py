@@ -38,7 +38,7 @@ class Groups(object):
 
         group = self.groups.get(group_name)
         if group is None:
-            raise GroupError("No such group: %s" % group_name)
+            raise NoSuchGroup(group_name)
 
         projects.extend(group.projects)
 
@@ -119,3 +119,10 @@ def get_groups(worktree):
 
 class GroupError(qisys.error.Error):
     pass
+
+class NoSuchGroup(GroupError):
+    def __init__(self, group_name):
+        self.group_name = group_name
+
+    def __str__(self):
+        return "No such group: %s" % self.group_name
