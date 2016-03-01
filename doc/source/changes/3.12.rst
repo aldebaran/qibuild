@@ -149,10 +149,10 @@ qisrc
 
 * ``qisrc push``: allow specifying destination branch as first argument.
 
-  For instance, while on ``perso`` branch, you can use ``qisrc push master`` to
-  push run ``git push gerrit perso:refs/for/master``. This will push all
-  the commits from ``perso`` branch that are not yet on ``master`` branch
-  for review.
+  For instance, while on ``perso`` branch, you can use ``qisrc push master``.
+  This will push all the commits from ``perso`` branch that are not yet on
+  ``master`` branch for review. (Behind the scenes, ``qisrc`` will call
+  ``git push gerrit perso:refs/for/master``)
 
   You can also specify the local ref by using ":" in the first argument.
 
