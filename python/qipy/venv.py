@@ -50,6 +50,8 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
     if build_worktree:
         handle_extensions(venv_path, python_worktree, build_worktree)
     handle_modules(venv_path, python_worktree)
+    if not pure_python_ok:
+        ui.info(ui.red, "Failed to add some python projects")
     ui.info()
 
     ui.info(ui.blue, "::", ui.reset,
@@ -64,8 +66,6 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         cmd.extend(remote_packages)
         rc = qisys.command.call(cmd, ignore_ret_code=True, env=env)
         remote_ok = (rc == 0)
-    if not pure_python_ok:
-        ui.info(ui.red, "Failed to add some python projects")
     if not remote_ok:
         ui.info(ui.red, "Failed to add some third party requirements")
 
