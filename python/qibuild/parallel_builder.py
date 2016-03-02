@@ -191,14 +191,5 @@ class BuildWorker(threading.Thread):
                 except Exception, e:
                     self.result.ok = False
                     self.result.failed_project = job.project
-                    ui.error(*self.message_for_exception(e))
-
-    def message_for_exception(self, exception):
-        tb = sys.exc_info()[2]
-        io = StringIO.StringIO()
-        traceback.print_tb(tb, file=io)
-        return (ui.red, "Python exception during tests:\n",
-                exception.__class__.__name__,
-                str(exception), "\n",
-                ui.reset,
-                io.getvalue())
+                    ui.error(ui.red,
+                            *ui.message_for_exception(e, "Python exception during build"))

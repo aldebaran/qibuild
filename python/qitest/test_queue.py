@@ -196,22 +196,14 @@ class TestWorker(threading.Thread):
             except Exception, e:
                 result = qitest.result.TestResult(test)
                 result.ok = False
-                result.message = self.message_for_exception(e)
+                result.message = ui.message_for_exception(e,
+                        "Python exception during tests")
                 result.error = True
             if not self._should_stop:
                 self.test_logger.on_completed(test, index, result.message)
             self.results[test["name"]] = result
             self.queue.task_done()
 
-    def message_for_exception(self, exception):
-        tb = sys.exc_info()[2]
-        io = StringIO.StringIO()
-        traceback.print_tb(tb, file=io)
-        return (ui.red, "Python exception during tests:\n",
-                exception.__class__.__name__,
-                str(exception), "\n",
-                ui.reset,
-                io.getvalue())
 
 class TestLogger(object):
     """ Small class used to print what is going on during

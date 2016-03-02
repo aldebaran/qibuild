@@ -77,6 +77,25 @@ def test_convert_to_strings():
     expected = "mylist ['a', 'b', 'c']\n"
     assert actual == expected
 
+def test_display_traceback(record_messages):
+    def foo():
+        bar()
+
+    def bar():
+        baz()
+
+    def baz():
+        raise Exception("Kaboom")
+
+    try:
+        foo()
+    except Exception as e:
+        message = ui.message_for_exception(e, "foo crashed")
+    ui.error(*message)
+    assert record_messages.find("foo crashed")
+    # should contain the filename, a line number and the function name:
+    assert record_messages.find(".*test_ui.py.*(\d+).*in.*bar")
+
 if __name__ == "__main__":
     import sys
     if "-v" in  sys.argv:

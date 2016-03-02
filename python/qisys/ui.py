@@ -15,6 +15,8 @@ import os
 import datetime
 import difflib
 import functools
+import traceback
+from StringIO import StringIO
 
 import qisys.error
 
@@ -281,6 +283,25 @@ def indent(text, num=2):
 def tabs(num):
     """ Compute a blank tab """
     return "  " * num
+
+def message_for_exception(exception, message):
+    """ Returns a tuple suitable for ui.error()
+    from the given exception.
+    (Traceback will be part of the message, after
+    the ``message`` argument)
+
+    Useful when the exception occurs in an other thread
+    than the main one.
+
+    """
+    tb = sys.exc_info()[2]
+    io = StringIO()
+    traceback.print_tb(tb, file=io)
+    return (red, message + "\n",
+            exception.__class__.__name__,
+            str(exception), "\n",
+            reset,
+            io.getvalue())
 
 class timer:
     """ To be used as a decorator,
