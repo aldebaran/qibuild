@@ -18,4 +18,4 @@ def test_set_host_config_no_such_config(qibuild_action):
     # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qibuild_action("set-host-config", "foo")
-    assert "No such config" in e.value.message
+    assert "No such config" in e.value.args[0]

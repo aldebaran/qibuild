@@ -59,15 +59,15 @@ def show_config(args, build_worktree):
         return
 
     if not build_worktree:
-        print qibuild_cfg
+        print(qibuild_cfg)
         return
 
     if not is_local:
-        print "General configuration"
-        print "---------------------"
-        print ui.indent(str(qibuild_cfg))
-        print
+        print("General configuration")
+        print("---------------------")
+        print(ui.indent(str(qibuild_cfg)))
+        print()
 
-    print "Local configuration"
-    print "-------------------"
-    print ui.indent(str(qibuild_cfg.local))
+    print("Local configuration")
+    print("-------------------")
+    print(ui.indent(str(qibuild_cfg.local)))

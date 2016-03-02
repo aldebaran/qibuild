@@ -7,6 +7,7 @@
 # Mostly wrappers around somehow strange-behaving
 # shutil functions ...
 
+import locale
 import os
 import sys
 import contextlib
@@ -94,7 +95,7 @@ def mkdir(dest_dir, recursive=False):
             os.makedirs(dest_dir)
         else:
             os.mkdir(dest_dir)
-    except OSError, e:
+    except OSError as e:
         if e.errno == 17:
             # Directory already exists -> we don't care
             pass
@@ -110,7 +111,7 @@ def ln(src, dst, symlink=True):
             os.symlink(src, dst)
         else:
             raise NotImplementedError
-    except OSError, e:
+    except OSError as e:
         if e.errno == 17:
             pass
         else:
@@ -165,7 +166,7 @@ def _copy_link(src, dest, quiet):
     if os.path.lexists(dest):
         rm(dest)
     if sys.stdout.isatty() and not quiet:
-        print "-- Installing %s -> %s" % (dest, target)
+        print("-- Installing %s -> %s" % (dest, target))
     to_make = os.path.dirname(dest)
     mkdir(to_make, recursive=True)
     os.symlink(target, dest)
@@ -225,7 +226,7 @@ def _handle_files(src, dest, root, files, filter_fun, quiet):
                 raise qisys.error.Error(
                         "Expecting a file but found a directory: %s" % fdest)
             if not quiet:
-                print "-- Installing %s" % fdest
+                print("-- Installing %s" % fdest)
             mkdir(new_root, recursive=True)
             # We do not want to fail if dest exists but is read only
             # (following what `install` does, but not what `cp` does)
@@ -267,8 +268,8 @@ def install(src, dest, filter_fun=None, quiet=False):
     src = to_native_path(src, normcase=False)
     dest = to_native_path(dest, normcase=False)
     ui.debug("Installing", src, "->", dest)
-    #pylint: disable-msg=E0102
     # (function IS already defined, that's the point!)
+    # pylint: disable-msg=function-redefined
     if filter_fun is None:
         def filter_fun(_unused):
             return True
@@ -292,7 +293,7 @@ def install(src, dest, filter_fun=None, quiet=False):
                     "source and destination are the same file")
         mkdir(os.path.dirname(dest), recursive=True)
         if sys.stdout.isatty() and not quiet:
-            print "-- Installing %s" % dest
+            print("-- Installing %s" % dest)
         # We do not want to fail if dest exists but is read only
         # (following what `install` does, but not what `cp` does)
         rm(dest)
@@ -337,6 +338,7 @@ def copy_git_src(src, dest):
                                 stdout=subprocess.PIPE)
     (out, _) = process.communicate()
     for filename in out.splitlines():
+        filename = filename.decode(locale.getpreferredencoding())
         src_file = os.path.join(src, filename)
         dest_file = os.path.join(dest, filename)
         install(src_file, dest_file, quiet=True)
@@ -417,7 +419,7 @@ def rmtree(path):
                 win32api.SetFileAttributes(subpath, win32con.FILE_ATTRIBUTE_NORMAL)
         try:
             func(subpath)
-        except OSError, e:
+        except OSError as e:
             if e.errno != errno.EACCES or sys.platform != 'win32':
                 raise
             # Failed to delete, try again after a 100ms sleep.
@@ -628,9 +630,9 @@ class TempDir:
     def __exit__(self, type, value, tb):
         if os.environ.get("DEBUG"):
             if tb is not None:
-                print "=="
-                print "Not removing ", self._temp_dir
-                print "=="
+                print("==")
+                print("Not removing ", self._temp_dir)
+                print("==")
                 return
         rm(self._temp_dir)
 

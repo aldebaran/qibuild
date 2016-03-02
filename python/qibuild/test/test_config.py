@@ -8,7 +8,7 @@
 
 import os
 import unittest
-from StringIO import StringIO
+from io import BytesIO, StringIO
 
 import qisys
 import qisys.sh
@@ -17,7 +17,7 @@ import qibuild.config
 
 
 def cfg_from_string(str, user_config=None):
-    cfg_loc = StringIO(str)
+    cfg_loc = BytesIO(str.encode('utf-8'))
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(cfg_loc)
     if user_config:
@@ -26,13 +26,13 @@ def cfg_from_string(str, user_config=None):
 
 
 def cfg_to_string(cfg):
-    cfg_loc = StringIO()
+    cfg_loc = BytesIO()
     cfg.write(cfg_loc)
-    return cfg_loc.getvalue()
+    return cfg_loc.getvalue().decode('utf-8')
 
 
 def local_cfg_to_string(cfg):
-    cfg_loc = StringIO()
+    cfg_loc = BytesIO()
     cfg.write_local_config(cfg_loc)
     return cfg_loc.getvalue()
 
@@ -94,13 +94,13 @@ class QiBuildConfig(unittest.TestCase):
   </config>
 </qibuild>
 """
-        local_xml = """
+        local_xml = b"""
 <qibuild version="1">
   <defaults config="linux32" />
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        qibuild_cfg.read_local_config(StringIO(local_xml))
+        qibuild_cfg.read_local_config(BytesIO(local_xml))
         self.assertEquals(qibuild_cfg.local.defaults.config, "linux32")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig32")
 
@@ -115,13 +115,13 @@ class QiBuildConfig(unittest.TestCase):
   </config>
 </qibuild>
 """
-        local_xml = """
+        local_xml = b"""
 <qibuild version="1">
   <defaults config="linux32" />
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml, user_config="linux64")
-        qibuild_cfg.read_local_config(StringIO(local_xml))
+        qibuild_cfg.read_local_config(BytesIO(local_xml))
         self.assertEquals(qibuild_cfg.local.defaults.config, "linux32")
         self.assertEquals(qibuild_cfg.env.path, "/path/to/swig32")
 
@@ -179,7 +179,7 @@ class QiBuildConfig(unittest.TestCase):
         local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
-        new_cfg.read_local_config(StringIO(local_xml))
+        new_cfg.read_local_config(BytesIO(local_xml))
         self.assertEquals(new_cfg.cmake.generator, "Xcode")
 
     def test_default_cmake_generator(self):
@@ -215,7 +215,7 @@ class QiBuildConfig(unittest.TestCase):
         local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
-        new_cfg.read_local_config(StringIO(local_xml))
+        new_cfg.read_local_config(StringIO(local_xml.decode("utf-8")))
         self.assertEquals(new_cfg.cmake.generator, "Unix Makefiles")
 
     def test_change_default_config(self):
@@ -233,19 +233,19 @@ class QiBuildConfig(unittest.TestCase):
   </config>
 </qibuild>
 """
-        local_xml = """
+        local_xml = b"""
 <qibuild version="1">
   <defaults config="linux32" />
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        qibuild_cfg.read_local_config(StringIO(local_xml))
+        qibuild_cfg.read_local_config(BytesIO(local_xml))
         self.assertEquals(qibuild_cfg.cmake.generator, "Unix Makefiles")
         qibuild_cfg.set_default_config("win32-vs2010")
         local_xml = local_cfg_to_string(qibuild_cfg)
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
-        new_cfg.read_local_config(StringIO(local_xml))
+        new_cfg.read_local_config(BytesIO(local_xml))
         self.assertEquals(new_cfg.cmake.generator, "Visual Studio 10")
 
     def test_add_ide(self):
@@ -347,7 +347,7 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        qibuild_cfg.read_local_config(StringIO(local_xml))
+        qibuild_cfg.read_local_config(BytesIO(local_xml.encode("utf-8")))
         self.assertEqual(qibuild_cfg.local.build.sdk_dir, "/path/to/sdk")
         self.assertEqual(qibuild_cfg.local.build.prefix, "/path/to/build")
 

@@ -141,7 +141,7 @@ def test_git_version(qibuild_action):
     testversion = qibuild.find.find_bin([proj.sdk_directory], "testversion")
     process = subprocess.Popen(testversion, stdout=subprocess.PIPE)
     out, _ = process.communicate()
-    assert out.strip() == "v0.1"
+    assert out.strip() == b"v0.1"
 
 def test_submodule(qibuild_action):
     qibuild_action.add_test_project("submodule")
@@ -328,6 +328,7 @@ def test_virtualenv_path(qipy_action, qibuild_action):
     qipy_action("bootstrap")
     py_test = os.path.join(py_proj.sdk_directory, "bin", "py_test")
     output = subprocess.check_output([py_test]).strip()
+    output = output.decode("utf-8")
     bin_python = os.path.join(output, "bin", "python")
     assert os.path.exists(bin_python)
 

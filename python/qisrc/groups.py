@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import os
+import functools
 
 import xml.etree.ElementTree as etree
 
@@ -63,17 +64,21 @@ class GroupsParser(qisys.qixml.XMLParser):
             self.target.default_group = group
 
     def _write_groups(self, element):
-        for group in self.target.groups.values():
+        for group in sorted(self.target.groups.values()):
             parser = GroupParser(group)
             element.append(parser.xml_elem())
 
 
+@functools.total_ordering
 class Group(object):
     def __init__(self, name):
         self.name = name
         self.default = False
         self.subgroups = list()
         self.projects = list()
+
+    def __lt__(self, other):
+        return self.name < other.name
 
 class GroupParser(qisys.qixml.XMLParser):
     def __init__(self, target):

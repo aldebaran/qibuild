@@ -85,7 +85,7 @@ Found two projects with the same name. (%s)
     def activate_this(self):
         """ Activate this virtualenv """
         activate_this_dot_py = self.bin_path("activate_this.py")
-        execfile(activate_this_dot_py, { "__file__" : activate_this_dot_py })
+        exec(compile(open(activate_this_dot_py).read(), activate_this_dot_py, 'exec'), { "__file__" : activate_this_dot_py })
 
 
 def new_python_project(worktree, project):

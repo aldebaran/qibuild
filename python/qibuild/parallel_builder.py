@@ -2,12 +2,15 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-import Queue
 import threading
 import sys
-import StringIO
 import traceback
 import time
+
+from io import StringIO
+
+import six
+from six.moves import queue
 
 import qibuild.project
 
@@ -66,7 +69,7 @@ class ParallelBuilder(object):
     def __init__(self):
         self.all_jobs = []
         self.pending_jobs = []
-        self.running_jobs = Queue.Queue()
+        self.running_jobs = queue.Queue()
         self._workers = list()
         self.failed_project = None
         self.job_current_index = 0
@@ -179,7 +182,7 @@ class BuildWorker(threading.Thread):
             job = None
             try:
                 job = self.queue.get(True, 1);
-            except Queue.Empty:
+            except queue.Empty:
                 # ignore empty exception, this can happen
                 pass
 
@@ -188,7 +191,7 @@ class BuildWorker(threading.Thread):
                     ui.info(ui.green, "Worker #%i starts working on " % (self.index + 1), ui.reset, ui.bold, job.project.name)
                     job.execute(*self.args, **self.kwargs)
                     self.queue.task_done()
-                except Exception, e:
+                except Exception as e:
                     self.result.ok = False
                     self.result.failed_project = job.project
                     ui.error(ui.red,

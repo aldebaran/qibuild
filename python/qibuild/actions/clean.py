@@ -51,7 +51,7 @@ def do(args):
     all_configs = clean_selection != "given_config"
     for project in projects:
         bdirs_ = project.get_build_dirs(all_configs=all_configs)
-        for cat in bdirs_.keys():
+        for cat in sorted(bdirs_.keys()):
             bdirs[cat].extend(bdirs_[cat])
 
     if clean_selection in ["given_config", "all_configs", "known_configs"]:
@@ -87,7 +87,7 @@ def do(args):
             if not config_name in sorted_bdirs:
                 sorted_bdirs[config_name] = []
             sorted_bdirs[config_name].append(bdir)
-        for c, sbdirs in sorted_bdirs.items():
+        for c, sbdirs in sorted(sorted_bdirs.items()):
             question = "Remove build directories matching the '%s' configuration?" % c
             answer = qisys.interact.ask_yes_no(question, default=False)
             if not answer:
@@ -103,4 +103,3 @@ def do(args):
                 else:
                     to_print.extend([ui.reset, bdir])
                 ui.info(*to_print)
-

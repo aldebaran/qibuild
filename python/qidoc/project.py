@@ -4,11 +4,13 @@
 import abc
 import os
 
+import six
+
 import qisys.sh
 
+@six.add_metaclass(abc.ABCMeta)
 class DocProject(object):
 
-    __metaclass__ = abc.ABCMeta
     doc_type = None
 
     def __init__(self, doc_worktree, project, name, depends=None, dest=None):

@@ -73,7 +73,7 @@ def test_remove_project(worktree):
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.worktree.WorkTreeError) as e:
         worktree.remove_project("bar")
-    assert "No such project" in e.value.message
+    assert "No such project" in e.value.args[0]
 
     worktree.remove_project("foo")
     assert worktree.projects == list()
@@ -140,7 +140,7 @@ def test_check_subprojects_exist(tmpdir):
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.worktree.WorkTreeError) as e:
         wt.add_project("a")
-    assert "invalid sub project" in e.value.message
+    assert "invalid sub project" in e.value.args[0]
 
 def test_observers_are_notified(worktree):
     mock_observer = mock.Mock()

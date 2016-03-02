@@ -6,7 +6,7 @@
 
 """
 
-import StringIO
+import io
 import unittest
 import mock
 import pytest
@@ -52,21 +52,21 @@ class OpenTestCase(unittest.TestCase):
         call_args_list = self.ask_mock.call_args_list
         self.assertEqual(len(call_args_list), 1)
         (choices, _question) = call_args_list[0][0]
-        self.assertEqual(choices, ['Visual Studio', 'QtCreator'])
+        self.assertEqual(set(choices), set(['Visual Studio', 'QtCreator']))
 
     def test_two_ides_matching_default_conf(self):
-        global_cfg = StringIO.StringIO(r"""
+        global_cfg = io.StringIO(u"""
 <qibuild version="1">
   <config name="win32-vs2010" ide="Visual Studio" />
   <config name="mingw" ide="QtCreator" />
   <ide name="Visual Studio" />
-  <ide name="QtCreator" path="C:\QtSDK\bin\QtCreator" />
+  <ide name="QtCreator" path="C:\\QtSDK\\bin\\QtCreator" />
 </qibuild>
 """)
 
         qibuild_cfg = qibuild.config.QiBuildConfig()
         qibuild_cfg.read(global_cfg, create_if_missing=False)
-        local_cfg = StringIO.StringIO(r"""
+        local_cfg = io.StringIO(u"""
 <qibuild version="1">
   <defaults config="mingw" />
 </qibuild>
@@ -80,12 +80,12 @@ class OpenTestCase(unittest.TestCase):
         # A default config in local config file,
         # but user used -c
         qibuild_cfg = qibuild.config.QiBuildConfig()
-        global_cfg = StringIO.StringIO(r"""
+        global_cfg = io.StringIO(u"""
 <qibuild version="1">
   <config name="win32-vs2010" ide="Visual Studio" />
   <config name="mingw" ide="QtCreator" />
   <ide name="Visual Studio" />
-  <ide name="QtCreator" path="C:\QtSDK\bin\QtCreator" />
+  <ide name="QtCreator" path="C:\\QtSDK\\bin\\QtCreator" />
 </qibuild>
 """)
         qibuild_cfg.read(global_cfg, create_if_missing=False)

@@ -91,7 +91,7 @@ class Snapshot(object):
             raise qisys.error.Error(
                     "unknown format: %s" % self.format_version)
         self.refs = parsed_json["refs"]
-        for key, value in manifest_json.iteritems():
+        for key, value in manifest_json.items():
             setattr(self.manifest, key, value)
 
     def __eq__(self, other):
@@ -112,7 +112,7 @@ def load_snapshot(git_worktree, input_path):
     snapshot = Snapshot()
     ui.info(ui.green, "Loading snapshot from", ui.white,  input_path)
     snapshot.load(input_path)
-    for (src, ref) in snapshot.refs.iteritems():
+    for (src, ref) in snapshot.refs.items():
         ui.info("Loading", src)
         git_project = git_worktree.get_git_project(src, raises=False)
         if git_project:

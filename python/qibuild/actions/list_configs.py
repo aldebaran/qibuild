@@ -19,7 +19,7 @@ def do(args):
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read()
     configs = qibuild_cfg.configs.values()
-    configs.sort(key=operator.attrgetter("name"))
+    configs = sorted(configs, key=operator.attrgetter("name"))
     ui.info("Known configs")
     for config in configs:
         ui.info("*", config)

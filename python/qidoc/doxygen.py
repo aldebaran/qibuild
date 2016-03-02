@@ -54,5 +54,5 @@ def read_doxyfile(doxyfile):
 def write_doxyfile(config, doxyfile):
     """ Write a doxyfile """
     with open(doxyfile, "w") as fp:
-        for key, value in config.iteritems():
+        for key, value in config.items():
             fp.write("%s = %s\n" % (key, value))

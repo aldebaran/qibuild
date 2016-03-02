@@ -9,6 +9,11 @@ import qibuild.config
 from qibuild.deps import DepsSolver
 
 
+def is_before(mylist, a, b):
+    a_index = mylist.index(a)
+    b_index = mylist.index(b)
+    return a_index < b_index
+
 def test_simple_deps(build_worktree):
     world = build_worktree.create_project("world")
     hello = build_worktree.create_project("hello", build_depends=["world"])
@@ -30,7 +35,8 @@ def test_runtime_deps(build_worktree):
                                                    run_depends=["hello-plugin"])
     deps_solver = DepsSolver(build_worktree)
     dep_projects = deps_solver.get_dep_projects([hello], ["build", "runtime"])
-    assert dep_projects == [hello_plugin, libworld, hello]
+    assert set(dep_projects) == set([hello_plugin, libworld, hello])
+    assert is_before(dep_projects, libworld, hello)
 
 def test_find_packages_in_toolchain(build_worktree, toolchains):
     toolchains.create("foo")
@@ -84,8 +90,8 @@ def test_compute_sdk_dirs(build_worktree):
                                                    run_depends=["hello-plugin"])
     deps_solver = DepsSolver(build_worktree)
     assert deps_solver.get_sdk_dirs(hello, ["build"]) == [libworld.sdk_directory]
-    assert deps_solver.get_sdk_dirs(hello, ["build", "runtime"]) == \
-            [hello_plugin.sdk_directory, libworld.sdk_directory]
+    assert set(deps_solver.get_sdk_dirs(hello, ["build", "runtime"])) == \
+            {hello_plugin.sdk_directory, libworld.sdk_directory}
 
 def test_recurse_deps(build_worktree):
     gtest = build_worktree.create_project("gtest")

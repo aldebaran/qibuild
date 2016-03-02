@@ -13,12 +13,13 @@ def test_qibuild_sourceme(tmpdir, qibuild_action):
     print_env.write("""\
 import os
 for line in os.environ["LD_LIBRARY_PATH"].split():
-    print line
+    print(line)
 """)
     sourceme = qibuild_action("sourceme")
     process = subprocess.Popen(". %s && python %s" % (sourceme, print_env.strpath),
                                shell=True, stdout=subprocess.PIPE)
     out, err = process.communicate()
+    out = out.decode("utf-8")
     assert not err
     lines = out.splitlines()
     assert os.path.join(foo_proj.sdk_directory, "lib") in  lines

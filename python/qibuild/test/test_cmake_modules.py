@@ -13,6 +13,6 @@ def test_generates_cmake_module(tmpdir):
     expected_path = tmpdir.join("foo/share/cmake/foo/foo-config.cmake")
     assert module == expected_path.strpath
     contents = expected_path.read()
-    print contents
+    print(contents)
     assert "lib/libfoo.so" in contents
     assert "lib/libbar.so" in contents

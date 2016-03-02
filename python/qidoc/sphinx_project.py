@@ -58,7 +58,7 @@ class SphinxProject(qidoc.project.DocProject):
             from_conf["__file__"] = in_conf_py
             exec(conf, from_conf)
             conf = conf.replace("__file__", 'r"%s"' % in_conf_py)
-        except Exception, e:
+        except Exception as e:
             ui.error("Could not read", in_conf_py, "\n", e)
             return
 
@@ -104,7 +104,7 @@ class SphinxProject(qidoc.project.DocProject):
         self.append_doxy_xml_path(path_list)
         return (
             "\nqiapidoc_srcs=["
-            + ','.join(map(lambda x: "r'" + x + "'", path_list))
+            + ','.join(["r'" + x + "'" for x in path_list])
             + "]\n")
 
     def append_doxylink_settings(self, conf, rel_paths=False):
@@ -162,7 +162,7 @@ class SphinxProject(qidoc.project.DocProject):
         """ Run sphinx.main() with the correct arguments """
         try:
             import sphinx
-        except ImportError, e:
+        except ImportError as e:
             ui.error(e, "skipping build")
             return
 

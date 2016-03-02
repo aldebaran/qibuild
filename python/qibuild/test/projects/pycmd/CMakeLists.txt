@@ -39,6 +39,3 @@ if(NOT "${_out}" STREQUAL "Written from Python")
   qi_error("actual: ${_out}
             expected: ${_to_write}")
 endif()
-
-qi_run_py_cmd("import qibuild")
-

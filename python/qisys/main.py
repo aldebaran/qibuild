@@ -17,10 +17,10 @@ def print_version(script_name):
     import qibuild
     qibuild_dir = os.path.dirname(qibuild.__file__)
     python_dir = os.path.dirname(qibuild_dir)
-    print "Using Python code from", python_dir
+    print("Using Python code from", python_dir)
     if script_name == "qibuild":
         import qibuild.cmake
-        print "Using CMake code from", qibuild.cmake.get_cmake_qibuild_dir()
+        print("Using CMake code from", qibuild.cmake.get_cmake_qibuild_dir())
 
 def main():
     cgitb.enable(logdir=os.getcwd(), format="txt")

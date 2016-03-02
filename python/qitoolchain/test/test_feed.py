@@ -18,8 +18,8 @@ def test_parse_non_exising_path():
     #pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         tree_from_feed("does/not/exists")
-    assert "not an existing path" in e.value.message
-    assert "nor an url" in e.value.message
+    assert "not an existing path" in e.value.args[0]
+    assert "nor an url" in e.value.args[0]
 
 def test_git(git_server, feed):
     git_server.create_repo("toolchains.git")

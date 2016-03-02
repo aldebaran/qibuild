@@ -67,4 +67,4 @@ def test_create_inside_template(qisrc_action, tmpdir):
         with pytest.raises(qisys.error.Error) as e:
             qisys.script.run_action("qisrc.actions.create",
                                     ["--template-path", tmpl.strpath, "HelloWorld"])
-        assert e.value.message == "output directory is inside input directory"
+        assert e.value.args[0] == "output directory is inside input directory"

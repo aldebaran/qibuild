@@ -25,17 +25,17 @@ class CMakeFunctionIndex(Index):
 
     def generate(self, docnames=None):
         content = {}
-        for ev, modname in sorted(self.domain.data[self._data].iteritems()):
+        for ev, modname in sorted(self.domain.data[self._data].items()):
             entries = content.setdefault(ev[0].lower(), [])
             entries.append([ev, 2, modname, ev, '', '', ''])
         # sort by first letter
-        result   = sorted(content.iteritems())
+        result   = sorted(content.items())
         collapse = False
         return result, collapse
 
 
 class CMakeFunction(sphinx.directives.ObjectDescription):
-    objtype_pretty = u"CMake function"
+    objtype_pretty = "CMake function"
     doc_field_types = [
         TypedField('arg', label=l_('Arguments'),
                    names=['arg']),
@@ -50,7 +50,7 @@ class CMakeFunction(sphinx.directives.ObjectDescription):
                                   self.env.doc2path(inv[name]))
             self.env.warn(self.env.docname, msg, self.lineno)
         inv[name] = self.env.docname
-        indextext = u"{0} ({1})".format(name, self.objtype_pretty)
+        indextext = "{0} ({1})".format(name, self.objtype_pretty)
         self.indexnode['entries'].append(('single', indextext, name, name))
 
     def handle_signature(self, sig, signode):
@@ -91,7 +91,7 @@ class CMakeDomain(sphinx.domains.Domain):
     ]
 
     def clear_doc(self, docname):
-        for objtype in (u'function',):
+        for objtype in ('function',):
             for (objname, objdocname) in self.data[objtype].items():
                 if objdocname == docname:
                     del self.data[objtype][objname]

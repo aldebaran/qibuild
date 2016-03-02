@@ -2,6 +2,8 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+from __future__ import print_function
+
 class FakeInteract(object):
     """ A class to tests code depending on qisys.interact
 
@@ -51,39 +53,39 @@ class FakeInteract(object):
         raise Exception(mess)
 
     def ask_choice(self, choices, message, **unused):
-        print "::", message
+        print("::", message)
         for choice in choices:
-            print "* ", choice
+            print("* ", choice)
         answer = self._get_answer(message, choices)
-        print ">", answer
+        print(">", answer)
         return answer
 
     def ask_yes_no(self, message, default=False):
-        print "::", message,
+        print("::", message, end=' ')
         if default:
-            print "(Y/n)"
+            print("(Y/n)")
         else:
-            print "(y/N)"
+            print("(y/N)")
         answer = self._get_answer(message, default=default)
-        print ">", answer
+        print(">", answer)
         return answer
 
     def ask_path(self, message):
-        print "::", message
+        print("::", message)
         answer = self._get_answer(message)
-        print ">", answer
+        print(">", answer)
         return answer
 
     def ask_string(self, message):
-        print "::", message
+        print("::", message)
         answer = self._get_answer(message)
-        print ">", answer
+        print(">", answer)
         return answer
 
     def ask_program(self, message):
-        print "::", message
+        print("::", message)
         answer =  self._get_answer(message)
-        print ">", answer
+        print(">", answer)
         return answer
 
     def get_editor(self):

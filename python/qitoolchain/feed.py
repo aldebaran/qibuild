@@ -9,7 +9,7 @@
 import os
 import sys
 import hashlib
-import urlparse
+from six.moves import urllib
 from xml.etree import ElementTree
 
 from qisys import ui
@@ -161,7 +161,7 @@ class ToolchainFeedParser:
             if feed_url:
                 # feed_url can be relative to feed:
                 if not "://" in feed_url:
-                    feed_url = urlparse.urljoin(feed, feed_url)
+                    feed_url = urllib.parse.urljoin(feed, feed_url)
                 self.parse(feed_url, first_pass=False)
             feed_name = feed_tree.get("name")
             if feed_name:

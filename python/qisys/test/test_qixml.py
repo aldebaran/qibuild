@@ -118,7 +118,7 @@ def test_required_attr():
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         foo_parser.parse(tree)
-    assert e.value.message == "Node 'foo' must have a 'bar' attribute"
+    assert e.value.args[0] == "Node 'foo' must have a 'bar' attribute"
 
 
 def test_complex_xml_parser():
@@ -207,7 +207,7 @@ def test_write_bool_attr():
 
 
 def test_sanitize_xml():
-    invalid_xml = u'<failure message="\u001a\r\nflag\r\n" />'
+    invalid_xml = '<failure message="\u001a\r\nflag\r\n" />'
     valid_xml = qisys.qixml.sanitize_xml(invalid_xml)
     assert "\r\nflag\r\n" in valid_xml
     etree.fromstring(valid_xml)  # Doesn't raise

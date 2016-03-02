@@ -252,4 +252,4 @@ class NoSuchProfile(qisys.error.Error):
         return """ Could not find profile {name}.
 Known profiles are: {profiles}
 """.format(name=self.name,
-           profiles=', '.join(sorted(self.known_profiles)))
+           profiles=', '.join(self.known_profiles))

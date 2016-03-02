@@ -105,7 +105,7 @@ def test_using_dash_all_with_dash_single(worktree, args):
     # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qisys.parsers.get_projects(worktree, args)
-    assert "--single with --all" in e.value.message
+    assert "--single with --all" in e.value.args[0]
 
 def test_non_existing_cwd(tmpdir, monkeypatch, args):
     # Warning: if this test fails, pytest will crash ...

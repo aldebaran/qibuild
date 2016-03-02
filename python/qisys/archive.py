@@ -188,9 +188,9 @@ Please set only one of these two options to 'True'
             if member.filename.endswith("/"):
                 directories.append(member)
                 qisys.sh.mkdir(new_path)
-                new_st = 0777
+                new_st = 0o777
             else:
-                new_st = member.external_attr >> 16L
+                new_st = member.external_attr >> 16
             # permissions are meaningless on windows, here only the exension counts
             if not sys.platform.startswith("win"):
                 if new_st != 0:
@@ -208,7 +208,7 @@ Please set only one of these two options to 'True'
 
     for zipinfo in directories:
         dirpath = os.path.join(directory, zipinfo.filename)
-        new_st = zipinfo.external_attr >> 16L
+        new_st = zipinfo.external_attr >> 16
         if not sys.platform.startswith("win"):
             if new_st != 0:
                 os.chmod(dirpath, new_st)
@@ -323,7 +323,9 @@ Please set only one of these two options to 'True'
     list_cmd  = [tar, "--list", "--file", archive]
     process   = subprocess.Popen(list_cmd, stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
-    line      = process.stdout.readline().split(os.sep, 1)[0]
+    line      = process.stdout.readline()
+    line = line.decode("utf-8")
+    line = line.split(os.sep, 1)[0]
     topdir    = line.split(os.sep, 1)[0]
     archroot  = None
     opts      = list()
@@ -359,7 +361,7 @@ Please set only one of these two options to 'True'
     if not quiet:
         for line in str(printed).split("\n"):
             if not output_filter or not re.search(output_filter, line):
-                print line.strip()
+                print(line.strip())
     return destdir
 
 

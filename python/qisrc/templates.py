@@ -34,7 +34,7 @@ def process_file(file_path, **kwargs):
 
 def process_string(string, **kwargs):
     res = string
-    for key, value in kwargs.iteritems():
+    for key, value in kwargs.items():
         old = key
         new = value
         res = magic_replace(res, old, new)

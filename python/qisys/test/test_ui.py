@@ -7,10 +7,18 @@
 import io
 
 import qisys.error
-import qisys.ui as ui
+from qisys import ui
 
+import six
 
 import pytest
+
+@pytest.fixture
+def stdout_wrapper():
+    if six.PY3:
+        return io.StringIO()
+    else:
+        return io.BytesIO()
 
 def main():
     ui.info(ui.red, "This is a an error message\n",
@@ -34,46 +42,40 @@ def test_valid_filename():
         ui.valid_filename("..")
     ui.valid_filename("foo")
 
-def test_empty_end():
-    out = io.BytesIO()
-    ui.info("[skipped] ", end="", fp=out)
-    ui.info("Your branch has diverged", fp=out)
-    actual = out.getvalue()
+def test_empty_end(stdout_wrapper):
+    ui.info("[skipped] ", end="", fp=stdout_wrapper)
+    ui.info("Your branch has diverged", fp=stdout_wrapper)
+    actual = stdout_wrapper.getvalue()
     expected = "[skipped] Your branch has diverged\n"
     assert actual == expected
 
-def test_several_newlines():
-    out = io.BytesIO()
-    ui.info("foo\n", "bar\n", "baz", fp=out)
-    actual = out.getvalue()
+def test_several_newlines(stdout_wrapper):
+    ui.info("foo\n", "bar\n", "baz", fp=stdout_wrapper)
+    actual = stdout_wrapper.getvalue()
     expected = "foo\nbar\nbaz\n"
     assert actual == expected
 
-def test_do_not_add_space_after_newline():
-    out = io.BytesIO()
-    ui.info("foo\n", "bar", fp=out)
-    actual = out.getvalue()
+def test_do_not_add_space_after_newlines(stdout_wrapper):
+    ui.info("foo\n", "bar", fp=stdout_wrapper)
+    actual = stdout_wrapper.getvalue()
     expected = "foo\nbar\n"
     assert actual == expected
 
-def test_insert_spaces():
-    out = io.BytesIO()
-    ui.info("foo:", "bar", fp=out)
-    actual = out.getvalue()
+def test_insert_spaces(stdout_wrapper):
+    ui.info("foo:", "bar", fp=stdout_wrapper)
+    actual = stdout_wrapper.getvalue()
     expected = "foo: bar\n"
     assert actual == expected
 
-def test_custom_sep():
-    out = io.BytesIO()
-    ui.info("foo", "bar", sep="\n", fp=out)
-    actual = out.getvalue()
+def test_custom_sep(stdout_wrapper):
+    ui.info("foo", "bar", sep="\n", fp=stdout_wrapper)
+    actual = stdout_wrapper.getvalue()
     expected = "foo\nbar\n"
     assert actual == expected
 
-def test_convert_to_strings():
-    out = io.BytesIO()
-    ui.info("mylist", ["a", "b", "c"], fp=out)
-    actual = out.getvalue()
+def test_convert_to_strings(stdout_wrapper):
+    ui.info("mylist", ["a", "b", "c"], fp=stdout_wrapper)
+    actual = stdout_wrapper.getvalue()
     expected = "mylist ['a', 'b', 'c']\n"
     assert actual == expected
 

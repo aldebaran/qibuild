@@ -140,7 +140,7 @@ class EnvSetter(object):
                     value = value[:-1]
                 result[key] = value
 
-        for (variable, directories_list) in result.iteritems():
+        for (variable, directories_list) in result.items():
             directories = directories_list.split(os.path.pathsep)
             for directory in directories:
                 self.prepend_directory_to_variable(directory, variable)

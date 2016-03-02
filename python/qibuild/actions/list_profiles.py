@@ -17,8 +17,7 @@ def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args, verbose=False)
     profiles = build_worktree.get_known_profiles()
     profile_names = profiles.keys()
-    profile_names.sort()
-    for profile_name in profile_names:
+    for profile_name in sorted(profile_names):
         profile = profiles[profile_name]
         ui.info(" * ", ui.blue, profile_name)
         max_len = max(len(x[0])for x in profile.cmake_flags)

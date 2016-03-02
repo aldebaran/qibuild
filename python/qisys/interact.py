@@ -8,6 +8,8 @@
 
 import os
 
+import six
+
 import qisys
 from qisys import ui
 
@@ -16,8 +18,7 @@ def read_input():
 
     """
     ui.info(ui.green, "> ", end="")
-    return raw_input()
-
+    return six.moves.input()
 
 def ask_choice(choices, input_text, return_int=False):
     """Ask the user to choose from a list of choices
@@ -40,10 +41,10 @@ def ask_choice(choices, input_text, return_int=False):
         try:
             index = int(answer)
         except ValueError:
-            print "Please enter number"
+            print("Please enter number")
             continue
-        if index not in range(1, len(choices)+1):
-            print "%i is out of range" % index
+        if index not in range(1, len(choices+1)):
+            print("%i is out of range" % index)
             continue
         res = choices[index-1]
         keep_asking = False

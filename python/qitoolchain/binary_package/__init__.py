@@ -56,7 +56,7 @@ _PKG_TYPES = {
 
 
 def _guess_package_type(package_path):
-    for typename, data in _PKG_TYPES.iteritems():
+    for typename, data in _PKG_TYPES.items():
         if package_path.endswith(data.get('extension')):
             return  typename
     return None

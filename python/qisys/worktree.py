@@ -14,6 +14,8 @@ import posixpath
 import operator
 import difflib
 
+import six
+
 import qisys.error
 import qisys.project
 import qisys.command
@@ -58,9 +60,12 @@ This path does not exist
         qibuild_cfg = qibuild.config.QiBuildConfig()
         to_read = qibuild.config.get_global_cfg_path()
         qibuild_cfg.read(to_read, create_if_missing=True)
-        encoding = locale.getpreferredencoding()
-        as_unicode = self.root.decode(encoding)
-        qibuild_cfg.add_worktree(as_unicode)
+        if six.PY2:
+            encoding = locale.getpreferredencoding()
+            as_unicode = self.root.decode(encoding)
+            qibuild_cfg.add_worktree(as_unicode)
+        else:
+            qibuild_cfg.add_worktree(self.root)
         qibuild_cfg.write()
 
     def register(self, observer):
@@ -173,7 +178,7 @@ This path does not exist
                                     src, [x.src for x in self.projects])
             raise WorkTreeError(mess)
         match = (p for p in self.projects if p.src == src)
-        return match.next()
+        return next(match)
 
     def add_project(self, path):
         """ Add a project to a worktree
@@ -282,13 +287,13 @@ def guess_worktree(cwd=None, raises=False):
     else:
         return None
 
+@six.add_metaclass(abc.ABCMeta)
 class WorkTreeObserver(object):
     """ To be subclasses for objects willing to be
     notified when a project is added or removed from
     the worktree
 
     """
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def reload(self):

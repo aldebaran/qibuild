@@ -10,9 +10,9 @@ def load_shlib(name, verbose=False):
   import sys
   medir = os.path.dirname(os.path.abspath(__file__))
   if verbose:
-    print("PATH: " + os.environ.get('PATH', ''))
-    print("LD_LIBRARY_PATH: " + os.environ.get('LD_LIBRARY_PATH', ''))
-    print("DYLD_LIBRARY_PATH: " + os.environ.get('DYLD_LIBRARY_PATH', ''))
+    print(("PATH: " + os.environ.get('PATH', '')))
+    print(("LD_LIBRARY_PATH: " + os.environ.get('LD_LIBRARY_PATH', '')))
+    print(("DYLD_LIBRARY_PATH: " + os.environ.get('DYLD_LIBRARY_PATH', '')))
   if sys.platform.startswith('linux'):
     soname = [".so"]
     prefix = "lib"
@@ -30,7 +30,7 @@ def load_shlib(name, verbose=False):
     paths = ['', '.', os.path.join(medir, '..', 'lib'), os.path.join(medir, '..', 'bin')]
 
   if verbose:
-    print("Loading " + name)
+    print(("Loading " + name))
   handle = None
   for s in soname:
     for p in paths:
@@ -40,6 +40,6 @@ def load_shlib(name, verbose=False):
         break
       except Exception as e:
         if verbose:
-          print(path + " : " + str(e))
+          print((path + " : " + str(e)))
   return handle
 

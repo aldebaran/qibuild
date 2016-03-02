@@ -38,7 +38,7 @@ class DataBase(object):
         """ Save the packages in the xml file """
         root = etree.Element("toolchain")
         tree = etree.ElementTree(root)
-        for package in self.packages.itervalues():
+        for package in self.packages.values():
             element = package.to_xml()
             root.append(element)
         qisys.qixml.write(tree, self.db_path)

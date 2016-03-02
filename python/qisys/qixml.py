@@ -121,7 +121,7 @@ def read(xml_path):
     tree = etree.ElementTree()
     try:
         tree.parse(xml_path)
-    except Exception, e:
+    except Exception as e:
         raise_parse_error(str(e), xml_path=xml_path)
     return tree
 
@@ -184,10 +184,10 @@ class XMLParser(object):
             except AttributeError as err:
                 self._parse_unknown_element(child, err)
                 continue
-            if method.func_code.co_argcount != 2:
+            if method.__code__.co_argcount != 2:
                 mess = "Handler for tag `%s' must take" % child.tag
                 mess += " two arguments. (method: %s, takes " % method_name
-                mess += "%d argument(s))" % method.func_code.co_argcount
+                mess += "%d argument(s))" % method.__code__.co_argcount
                 raise TypeError(mess)
             method(self, child)
         self.backtrace.pop()
@@ -263,7 +263,7 @@ class XMLParser(object):
 
         def is_serializable(value):
             # no way to guess that from etree api:
-            return type(value) in (list, bool, str, unicode, int)
+            return type(value) in (list, bool, str, str, int)
 
         target_dir = dir(self.target)
         for member in target_dir:
@@ -278,10 +278,10 @@ class XMLParser(object):
             except AttributeError:
                 pass
             if method:
-                if method.func_code.co_argcount != 2:
+                if method.__code__.co_argcount != 2:
                     mess = "Handler for member `%s' must take" % member
                     mess += " two arguments. (method: %s, takes " % method_name
-                    mess += "%d argument(s))" % method.func_code.co_argcount
+                    mess += "%d argument(s))" % method.__code__.co_argcount
                     raise TypeError(mess)
                 method(res)
                 continue

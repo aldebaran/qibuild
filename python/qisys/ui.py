@@ -16,9 +16,11 @@ import datetime
 import difflib
 import functools
 import traceback
-from StringIO import StringIO
+import io
 
 import qisys.error
+
+import six
 
 # Try using pyreadline so that we can
 # have colors on windows, too.
@@ -295,13 +297,16 @@ def message_for_exception(exception, message):
 
     """
     tb = sys.exc_info()[2]
-    io = StringIO()
-    traceback.print_tb(tb, file=io)
+    if six.PY2:
+        buffer = io.BytesIO()
+    else:
+        buffer = io.StringIO()
+    traceback.print_tb(tb, file=buffer)
     return (red, message + "\n",
             exception.__class__.__name__,
             str(exception), "\n",
             reset,
-            io.getvalue())
+            buffer.getvalue())
 
 class timer:
     """ To be used as a decorator,

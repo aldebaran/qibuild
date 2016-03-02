@@ -6,8 +6,10 @@
 
 import abc
 
+import six
+
+@six.add_metaclass(abc.ABCMeta)
 class AbstractBuilder(object):
-    __metaclass__ = abc.ABCMeta
     """ the interface of a builder
         a builder can build multiples projects at once
     """
@@ -25,4 +27,3 @@ class AbstractBuilder(object):
     @abc.abstractmethod
     def install(self, dest, *args, **kwargs):
         raise NotImplementedError
-

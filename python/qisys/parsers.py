@@ -9,6 +9,8 @@ import argparse
 import multiprocessing
 import os
 
+import six
+
 import qisys.error
 import qisys.sh
 import qisys.worktree
@@ -144,9 +146,9 @@ def get_one_project(worktree, args):
 ##
 # Implementation details
 
+@six.add_metaclass(abc.ABCMeta)
 class AbstractProjectParser(object):
     """ Helper for get_projects() methods """
-    __metaclass__ = abc.ABCMeta
     def __init__(self):
         pass
 
@@ -179,7 +181,7 @@ class AbstractProjectParser(object):
         if args.all:
             return self.all_projects(args)
         project_args = args.projects
-        # pylint: disable-msg=E1103
+        # pylint: disable-msg=no-member
         if not args.projects:
             if default_all and not args.single:
                 return self.all_projects(args)

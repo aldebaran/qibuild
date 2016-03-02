@@ -33,7 +33,7 @@ def test_when_is_default(qitoolchain_action):
     # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         test_build_worktre2.toolchain
-    assert "No such toolchain" in e.value.message
+    assert "No such toolchain" in e.value.args[0]
 
 def test_removing_non_existing_with_force(qitoolchain_action):
     qitoolchain_action("remove", "foo", "--force")

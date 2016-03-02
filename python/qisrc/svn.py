@@ -30,6 +30,7 @@ class Svn(object):
                 **kwargs)
             out = process.communicate()[0]
             # Don't want useless blank lines
+            out = out.decode("utf-8")
             out = out.rstrip("\n")
             ui.debug("out:", out)
             return (process.returncode, out)

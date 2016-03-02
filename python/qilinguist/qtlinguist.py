@@ -66,6 +66,7 @@ def generate_qm_file(input, output):
     cmd = ["lrelease", "-compress", input, "-qm", output]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     out, _ = process.communicate()
+    out = out.decode("utf-8")
     ui.info(out.strip())
     if process.returncode != 0:
         return False, "lrelease failed"

@@ -44,4 +44,4 @@ def test_qt(qilinguist_action):
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     (out, _) = process.communicate()
 
-    assert "Bonjour, monde" in out
+    assert b"Bonjour, monde" in out

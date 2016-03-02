@@ -161,7 +161,7 @@ def test_no_worktre_bad_pml(tmpdir, monkeypatch):
     # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as error:
         package = qisys.script.run_action("qipkg.actions.make_package", [pml_path.strpath])
-    assert "not in a worktree" in error.value.message
+    assert "not in a worktree" in error.value.args[0]
 
 @pytest.mark.skipif(not qisys.command.find_program("lrelease", raises=False),
                     reason="lrelease not found")
@@ -183,6 +183,9 @@ def test_validate_package_exception(qipkg_action):
     error = qipkg_action("validate_package", pkg_path, raises=True)
     assert error == "Given package does not satisfy default package requirements"
 
+
+# this is Python2 specific
+@pytest.mark.xfail
 def test_release_package(qipkg_action, tmpdir):
     pkg_path = os.path.join(os.path.dirname(__file__), "projects", "python_services.pkg")
     output_path = tmpdir.join("output.pkg")
