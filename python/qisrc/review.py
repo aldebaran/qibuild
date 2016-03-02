@@ -174,6 +174,7 @@ def push(project,  local_ref, remote_branch, bypass_review=False, dry_run=False,
         git.fetch(remote.name, "--quiet")
         commits_pushed = git.get_log("%s/%s" % (remote.name, remote_branch), "HEAD")
         sha1s = [commit["sha1"] for commit in commits_pushed]
+    ui.info("Publishing changes")
     git.push(*args)
     if reviewers and not dry_run:
         ui.info("Adding reviewers...", ("(" + ", ".join(reviewers) + ")"))
