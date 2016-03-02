@@ -211,40 +211,54 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         branch = repo.default_branch
         fixed_ref = repo.fixed_ref
         clone_url = repo.clone_url
-        qisys.sh.mkdir(git_project.path, recursive=True)
         git = qisrc.git.Git(git_project.path)
         remote_name = repo.default_remote.name
         remote_ref = "%s/%s" % (remote_name, branch)
         clone_project = None
+        ok = True
+        message = ""
+        # Only use a local clone if:
+        #   * worktree_clone is set
+        #   * we find a matching project in the worktree_clone
+        use_local = False
         if worktree_clone:
             clone_project = worktree_clone.find_repo(repo)
-        with git.transaction() as transaction:
             if clone_project:
-                clone_args = [clone_project.path, "--origin", "clone"]
-                if branch:
-                    clone_args.extend(("--branch", branch))
-                git.clone(*clone_args)
-                if branch:
-                    git.set_tracking_branch(branch, remote_name)
-            else:
-                git.init()
-            git.remote("add", remote_name, clone_url)
-            git.fetch(remote_name, "--quiet")
-            if branch and not clone_project:
-                # Setting of tracking branch was done after local clone
-                git.checkout("-b", branch, remote_ref)
-            if fixed_ref:
-                git.reset("--hard", fixed_ref)
-            if clone_project and not fixed_ref:
-                # Reset to correct revision:
-                git.reset("--hard", remote_ref)
-        if not transaction.ok:
+                use_local = True
+
+        if use_local:
+            # Only need to create the parent directory, `git clone` will take
+            # care of the rest
+            to_make = os.path.dirname(git_project.path)
+            qisys.sh.mkdir(to_make)
+            (ok, message) = git.local_clone(clone_project, clone_url,
+                                            remote_name=remote_name,
+                                            branch=branch)
+        else:
+            # Need to create the full path, since we will use
+            # `git init ; git fetch ; git checkout`
+            qisys.sh.mkdir(git_project.path, recursive=True)
+            (ok, message) = git.safe_clone(clone_url,
+                                           remote_name=remote_name,
+                                           branch=branch)
+
+        if not ok:
             ui.error("Cloning repo failed")
-            ui.error(transaction.output)
-            if git.is_empty():
+            ui.error(message)
+            # If `git clone` fails, it's possible that the path does
+            # not exist
+            if os.path.exists(git_project.path) and git.is_empty():
                 qisys.sh.rm(git_project.path)
             self.worktree.remove_project(repo.src)
             return False
+
+        if fixed_ref:
+            rc, out = git.reset("--hard", fixed_ref, raises=False)
+            if rc != 0:
+                ui.error("Failed to reset to fixed ref")
+                ui.error(out)
+                return False
+
         self.save_project_config(git_project)
         self.load_git_projects()
         return True

@@ -227,3 +227,28 @@ def test_clone_evil_nested(qisrc_action, git_server, tmpdir):
     work2 = tmpdir.join("work2").ensure(dir=True)
     qisrc_action.chdir(work2.strpath)
     qisrc_action("init", git_server.manifest_url, "--clone", qisrc_action.root)
+
+def test_clone_maint_branch(qisrc_action, git_server, tmpdir):
+    git_server.create_repo("foo.git")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.switch_manifest_branch("maint")
+    git_server.change_branch("foo.git", "maint")
+    work2 = tmpdir.join("work2").ensure(dir=True)
+    qisrc_action.chdir(work2.strpath)
+    # The trick here is that the branch we want to clone does not exist
+    # in the cloned worktree ...
+    qisrc_action("init", git_server.manifest_url, "--branch", "maint",
+                 "--clone", qisrc_action.root)
+
+def test_clone_devel_branch_some_projs_added(qisrc_action, git_server, tmpdir):
+    git_server.create_repo("foo.git")
+    qisrc_action("init", git_server.manifest_url)
+    git_server.switch_manifest_branch("devel")
+    git_server.change_branch("foo.git", "devel")
+    git_server.create_repo("bar.git")
+    work2 = tmpdir.join("work2").ensure(dir=True)
+    qisrc_action.chdir(work2.strpath)
+    # The trick here is that we have to clone a repo from scratch because
+    # it did not exist on 'master'
+    qisrc_action("init", git_server.manifest_url, "--branch", "devel",
+                 "--clone", qisrc_action.root)

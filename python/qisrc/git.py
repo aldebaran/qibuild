@@ -167,7 +167,11 @@ class Git(object):
         raise AttributeError("Git instance has no attribute '%s'" % name)
 
     def clone(self, *args, **kwargs):
-        """ Wrapper for git clone """
+        """ Wrapper for git clone.
+
+        """
+        # It's the only case when self.repo is not an existing path,
+        # so do no set cwd
         args = list(args)
         args.append(self.repo)
         kwargs["cwd"] = None
@@ -295,6 +299,42 @@ class Git(object):
     def branch_exists(self, name):
         rc, _ = self.call("show-ref", "--verify", "refs/heads/%s" % name, raises=False)
         return rc == 0
+
+    def safe_clone(self, clone_url, remote_name="origin", branch="master"):
+        """ Same thing as git clone <remote_name> -b <branch>, but make
+        it possible to create the clone in an existing directory
+        (Can happen when a project in created in foo/bar, and then an other
+        one in foo)
+
+        """
+        remote_ref = "%s/%s" % (remote_name, branch)
+        with self.transaction() as transaction:
+            self.init()
+            self.remote("add", remote_name, clone_url)
+            self.fetch(remote_name, "--quiet")
+            if branch:
+                self.checkout("-b", branch, remote_ref)
+        return (transaction.ok, transaction.output)
+
+    def local_clone(self, clone_project, clone_url,
+                    remote_name="origin", branch="master"):
+        """ Clone from a project from an other worktree. The idea is to minimize
+        network usage, so this is as fast as possible
+
+        """
+        # Create the ref in the project from the *other* worktree: that way we
+        # are likely to not have to fetch anything
+        remote_ref = "%s/%s" % (remote_name, branch)
+        other_git = Git(clone_project.path)
+        rc, out = other_git.call("rev-parse", remote_ref, raises=False)
+        if rc != 0:
+            rc, out = other_git.call("fetch", remote_name, branch, raises=False)
+            if rc != 0:
+                return (False, "Could not find %s in %s" % (remote_ref, clone_url))
+        with self.transaction() as transaction:
+            clone_args = [clone_project.path, "--origin", "clone"]
+            self.clone(*clone_args)
+        return (transaction.ok, transaction.output)
 
     def set_tracking_branch(self, branch, remote_name, remote_branch=None):
         """ Update the configuration of a branch to track
