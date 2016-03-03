@@ -137,3 +137,8 @@ def test_install_qt_symlinks(tmpdir):
     dest = tmpdir.join("dest")
     qisys.sh.install(qt_src.strpath, dest.strpath, filter_fun=qisys.sh.is_runtime)
     assert dest.join("QtCore.framework").islink()
+
+def test_to_posix_path():
+   assert qisys.sh.to_posix_path(r"c:\foo\bar") ==  "c:/foo/bar"
+   assert qisys.sh.to_posix_path(r"foo//bar") == "foo/bar"
+   assert qisys.sh.to_posix_path(r"c:\foo\bar", fix_drive=True) == "/c/foo/bar"

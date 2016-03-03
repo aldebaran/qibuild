@@ -544,8 +544,9 @@ def to_posix_path(path, fix_drive=False):
     res = os.path.expanduser(path)
     res = os.path.abspath(res)
     res = path.replace(ntpath.sep, posixpath.sep)
+    res = posixpath.normpath(res)
     if fix_drive:
-        (drive, rest) = os.path.splitdrive(res)
+        (drive, rest) = ntpath.splitdrive(res)
         letter = drive[0]
         return "/" + letter + rest
     return res
