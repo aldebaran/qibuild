@@ -14,6 +14,13 @@ Base your work on 'next' branch
 'master' branch is reserved for bug fixes and maintenance releases.
 Development occurs on 'next' branch.
 
+
+Want to contribute but don't know where to start?
+-------------------------------------------------
+
+Have a look at the `issues marked with the "easy" label
+<https://github.com/aldebaran/qibuild/labels/easy>`_
+
 Test your pull request before submitting it
 -------------------------------------------
 
