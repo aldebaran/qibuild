@@ -21,10 +21,10 @@ class QiPackage(object):
 
     """
 
-    _properties = ["name", "version", "url",
+    _properties = ("name", "version", "url",
                    "path", "directory",
                    "target", "host",
-                   "toolchain_file", "sysroot", "cross_gdb"]
+                   "toolchain_file", "sysroot", "cross_gdb")
 
     def __init__(self, name, version=None, path=None):
         self.name = name

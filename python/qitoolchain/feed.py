@@ -146,8 +146,9 @@ class ToolchainFeedParser:
             tree = tree_from_feed(feed)
 
         root = tree.getroot()
-        self.strict_feed = qisys.qixml.parse_bool_attr(root,
-                "strict_metadata", default=True)
+        if first_pass:
+            self.strict_feed = qisys.qixml.parse_bool_attr(root,
+                    "strict_metadata", default=True)
 
         package_trees = tree.findall("package")
         package_trees.extend(tree.findall("svn_package"))
@@ -161,7 +162,7 @@ class ToolchainFeedParser:
                 # feed_url can be relative to feed:
                 if not "://" in feed_url:
                     feed_url = urlparse.urljoin(feed, feed_url)
-                self.parse(feed_url)
+                self.parse(feed_url, first_pass=False)
             feed_name = feed_tree.get("name")
             if feed_name:
                 if not is_git_url(feed):
