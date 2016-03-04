@@ -8,7 +8,7 @@
 
 import copy
 import functools
-import io
+import StringIO
 
 from qisys import ui
 import qisys.error
@@ -147,7 +147,7 @@ Found two projects sharing the same sources:
             if default_group and not all:
                 groups = [default_group.name]
             else:
-                return sorted(self.repos)
+                return self.repos
 
         repos = dict()
         for group in groups:
@@ -163,7 +163,7 @@ Found two projects sharing the same sources:
                     raise ManifestError("""When reading group {0}:
 No such project: {1}
 """.format(group, project_name))
-        return sorted(repos.values())
+        return repos.values()
 
     def get_repo(self, project):
         """ Get a repository given the project name (foo/bar.git) """
@@ -234,10 +234,9 @@ def from_git_repo(git_repo, ref):
     rc, as_string = git.call("cat-file", "-p", manifest_blob_sha1, raises=False)
     if rc !=0:
         return None
-    source = io.StringIO(as_string)
+    source = StringIO.StringIO(as_string)
     return Manifest(source)
 
-@functools.total_ordering
 class RepoConfig(object):
     def __init__(self):
         self.src = None
@@ -287,9 +286,6 @@ class RepoConfig(object):
             res += " on %s" % self.fixed_ref
         res += ">"
         return res
-
-    def __lt__(self, other):
-        return self.project < other.project
 
 ##
 # parsing

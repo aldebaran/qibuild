@@ -154,7 +154,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         # Sometimes the process did not have any output,
         # but we still want to let the user know it ran
         if not process.out:
-            res.out = b"<no output>"
+            res.out = "<no output>"
 
         message = self.get_message(process, timeout=timeout)
         # Set res.error to True if the crash was caused by
@@ -280,7 +280,6 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         test["timeout"] = test["timeout"] * 20
 
     def _with_num_cpus(self, test, num_cpus):
-        # pylint:disable-msg=no-member
         cpu_list = get_cpu_list(multiprocessing.cpu_count(),
                                 num_cpus, self.worker_index)
         taskset_opts = ["-c", ",".join(str(i) for i in cpu_list)]
@@ -310,7 +309,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         """ Make sure a Junit XML compatible file is written """
         # Arbitrary limit output (~700 lines) to prevent from crashing on read
         res.out = res.out[-16384:]
-        res.out = re.sub(b'\x1b[^m]*m', b"", res.out)
+        res.out = re.sub('\x1b[^m]*m', "", res.out)
 
         message_as_string = " ".join(str(x) for x in res.message
                                      if not isinstance(x, ui._Color))
@@ -321,6 +320,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             encoding = "UTF-8"
         try:
             res.out = res.out.decode(encoding, "ignore")
+            message_as_string = message_as_string.decode(encoding, "ignore")
         except UnicodeDecodeError:
             pass
         # Make sure there are no invalid data in the XML
@@ -394,10 +394,8 @@ def parse_valgrind(valgrind_log, res):
     with open(valgrind_log, "r") as f:
         lines = f.readlines()
 
-    out = res.out.decode("utf-8", "ignore")
-
     for l in lines:
-        out += l
+        res.out += l
         r = leak_fd_regex.search(l)
         if r:
             fdopen = int(r.group(1))

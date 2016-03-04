@@ -1,7 +1,6 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
-
 import pytest
 
 import qisys.error
@@ -20,7 +19,7 @@ def test_using_dash_c(toolchains, args):
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qitoolchain.parsers.get_toolchain(args)
-    assert "config baz has no toolchain" in e.value.args[0]
+    assert "config baz has no toolchain" in e.value.message
 
 
 def test_using_defaut_config(toolchains, args, build_worktree):

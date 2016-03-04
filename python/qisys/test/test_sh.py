@@ -29,11 +29,11 @@ def test_install_on_self(tmpdir):
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qisys.sh.install(a_file.strpath, tmpdir.strpath)
-    assert "are the same file" in e.value.args[0]
+    assert "are the same file" in e.value.message
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qisys.sh.install(tmpdir.strpath, tmpdir.strpath)
-    assert "are the same directory" in e.value.args[0]
+    assert "are the same directory" in e.value.message
 
 def test_filter_hidden(tmpdir):
     src = tmpdir.ensure("src", dir=True)

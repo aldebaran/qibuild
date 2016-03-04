@@ -3,18 +3,17 @@
 ## found in the COPYING file.
 import abc
 import os
-import six
 
 import qisys.error
 import qisys.sh
 
-@six.add_metaclass(abc.ABCMeta)
 class LinguistProject(object):
     """" A LinguistProject has a name, a domain name, and a
     list of linguas. Daughter classes should implement the
     release() and update() methods
 
     """
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self, name, path, domain=None, linguas=None):
         self.path = path

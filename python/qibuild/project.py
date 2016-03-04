@@ -535,7 +535,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         # self.build_env()), suitable for running CMake and building,
         # but the env coming from the build worktree, suitable to run the tests
         test_runner.env = self.build_worktree.get_env()
-        for key, value in kwargs.items():
+        for key, value in kwargs.iteritems():
             if hasattr(test_runner, key):
                 setattr(test_runner, key, value)
         return test_runner.run()
@@ -705,9 +705,6 @@ The following tools were not found: {missing}\
 
     def __ne__(self, other):
         return not (self == other)
-
-    def __hash__(self):
-        return hash((self.name, self.src))
 
 
 class BadProjectConfig(qisys.error.Error):

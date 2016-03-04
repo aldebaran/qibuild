@@ -101,7 +101,7 @@ def test_host_tools_no_host_config(build_worktree, fake_ctc):
     # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         cmake_builder.get_host_dirs(usefootool_proj)
-    assert "`qibuild set-host-config`" in e.value.args[0]
+    assert "`qibuild set-host-config`" in e.value.message
 
 def test_host_tools_host_tools_not_built(build_worktree, fake_ctc):
     qibuild.config.add_build_config("foo", host=True)
@@ -112,7 +112,7 @@ def test_host_tools_host_tools_not_built(build_worktree, fake_ctc):
     # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         cmake_builder.get_host_dirs(usefootool_proj)
-    assert "(Using 'foo' build config)" in e.value.args[0]
+    assert "(Using 'foo' build config)" in e.value.message
 
 def test_setting_loose_deps_resolution_from_manifest(git_server, qisrc_action):
     git_server.set_loose_deps_resolution()

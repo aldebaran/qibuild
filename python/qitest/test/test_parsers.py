@@ -104,7 +104,7 @@ def test_nothing_to_test(args, cd_to_tmpdir):
     # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qitest.parsers.get_test_runners(args)
-    assert e.value.args[0] == "Nothing found to test"
+    assert e.value.message == "Nothing found to test"
 
 def test_coverage_in_build_worktree(args, build_worktree, monkeypatch):
     world_proj = build_worktree.create_project("world")

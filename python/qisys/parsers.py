@@ -9,8 +9,6 @@ import argparse
 import multiprocessing
 import os
 
-import six
-
 import qisys.error
 import qisys.sh
 import qisys.worktree
@@ -26,7 +24,6 @@ class SetHome(argparse.Action):
 
 def cpu_count():
     try:
-        # pylint:disable-msg=no-member
         default = multiprocessing.cpu_count()
     except NotImplementedError:
         default = 1
@@ -147,9 +144,9 @@ def get_one_project(worktree, args):
 ##
 # Implementation details
 
-@six.add_metaclass(abc.ABCMeta)
 class AbstractProjectParser(object):
     """ Helper for get_projects() methods """
+    __metaclass__ = abc.ABCMeta
     def __init__(self):
         pass
 
@@ -182,7 +179,7 @@ class AbstractProjectParser(object):
         if args.all:
             return self.all_projects(args)
         project_args = args.projects
-        # pylint: disable-msg=no-member
+        # pylint: disable-msg=E1103
         if not args.projects:
             if default_all and not args.single:
                 return self.all_projects(args)

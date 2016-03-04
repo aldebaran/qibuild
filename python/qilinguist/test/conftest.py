@@ -21,7 +21,7 @@ class QiLinguistAction(TestAction):
         en_US_po_file = os.path.join(proj.path, "po", "en_US.po")
         fr_file = open(fr_FR_po_file, 'wb')
         en_file = open(en_US_po_file, 'wb')
-        fr_file.write(b"""
+        fr_file.write("""
     # French translations for qi package
     # Traductions fran\xc3\xa7aises du paquet qi.
     # Copyright (C) 2012 THE qi'S COPYRIGHT HOLDER
@@ -55,7 +55,7 @@ class QiLinguistAction(TestAction):
     msgid "Where is Brian?"
     msgstr "O\xc3\xb9 est Brian ?"
     """)
-        en_file.write(b"""
+        en_file.write("""
     # English translations for qi package.
     # Copyright (C) 2012 THE qi'S COPYRIGHT HOLDER
     # This file is distributed under the same license as the qi package.

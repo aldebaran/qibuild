@@ -1,7 +1,6 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
-import functools
 import os
 import sys
 import re
@@ -270,20 +269,17 @@ mutually exclusive
             res += " in %s" % self.path
         return res
 
-    def __lt__(self, other):
+    def __cmp__(self, other):
         if self.name == other.name:
             if self.version is None and other.version is not None:
-                return True
+                return -1
             if self.version is not None and other.version is None:
-                return False
+                return 1
             if self.version is None and other.version is None:
-                return True
-            return qisys.version.compare(self.version, other.version) == -1
+                return 0
+            return qisys.version.compare(self.version, other.version)
         else:
-            return self.name < other.name
-
-    def __eq__(self, other):
-        return self.name == other.name and self.version == other.version
+            return cmp(self.name, other.name)
 
 def from_xml(element):
     res = QiPackage(None) # need to pass an argument to the ctor

@@ -36,7 +36,7 @@ BAR += 2
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qidoc.doxygen.read_doxyfile(doxyfile.strpath)
-    assert "does not match" in e.value.args[0]
+    assert "does not match" in e.value.message
 
 def test_appending_values(tmpdir):
     doxyfile = tmpdir.join("Doxyfile")

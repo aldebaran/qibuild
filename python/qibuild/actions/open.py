@@ -60,9 +60,7 @@ def do(args):
 def get_ide(qibuild_cfg):
     """Return an IDE to use."""
     known_ides = qibuild_cfg.ides.values()
-    known_ides = sorted(known_ides)
     ide_names  = qibuild_cfg.ides.keys()
-    ide_names = sorted(ide_names)
     if not known_ides:
         ui.warning("No IDE configured yet")
         ui.info("Tips: use `qibuild config --wizard` to configure an IDE")
@@ -102,8 +100,8 @@ def open_visual(project):
     elif len(sln_files) > 1:
         raise OpenError(project, "Expecting only one sln, got %s" % sln_files)
 
-    print("starting VisualStudio:")
-    print("%s %s" % ("start", sln_files[0]))
+    print "starting VisualStudio:"
+    print "%s %s" % ("start", sln_files[0])
     subprocess.Popen(["start", sln_files[0]], shell=True)
 
 def open_xcode(project):
@@ -113,8 +111,8 @@ def open_xcode(project):
     elif len(projs) > 1:
         raise OpenError(project, "Expecting only one xcode project file, "
                                  "got %s" % projs)
-    print("starting Xcode:")
-    print("%s %s" % ("open", projs[0]))
+    print "starting Xcode:"
+    print "%s %s" % ("open", projs[0])
     subprocess.Popen(["open", projs[0]])
 
 def open_qtcreator(project, qtcreator_path=None):
@@ -125,12 +123,12 @@ def open_qtcreator(project, qtcreator_path=None):
         raise OpenError(project,
                         "QtCreator path not configured properly\n"
                         "Please run `qibuild config --wizard")
-    print("starting QtCreator:")
+    print "starting QtCreator:"
     if qtcreator_path.endswith((".app", ".app/")):
         cmd = ["open", "-a", qtcreator_path, cmake_list]
     else:
         cmd = [qtcreator_path, cmake_list]
-    print(" ".join(cmd))
+    print " ".join(cmd)
     subprocess.Popen(cmd)
 
 

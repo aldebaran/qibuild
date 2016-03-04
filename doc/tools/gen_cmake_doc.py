@@ -6,8 +6,6 @@
 
 """
 
-from __future__ import print_function
-
 DOCUMENTED_FILES=[
     "log",
     "target",
@@ -123,8 +121,8 @@ def parse_params(txt):
             # first word is the name, the rest is the description:
             match = re.match(r'\s*(\w+)\s*(.*)', rest, re.DOTALL)
             if not match:
-                print("warning, failed to parse parameters")
-                print("near", rest)
+                print "warning, failed to parse parameters"
+                print "near", rest
                 break
             (name, desc)= match.groups()
         desc = clean_indent(desc)
@@ -144,7 +142,7 @@ def parse_example(txt):
     if not res:
         return
     if len(res) > 1:
-        print("warning: only zero or one examples authorized for each function")
+        print "warning: only zero or one examples authorized for each function"
     return res[0]
 
 def decorate(name, type):
@@ -279,8 +277,8 @@ def get_fun_blocks(txt):
                     if name:
                         res.append((name, cur_block))
                     else:
-                        print('Warning: could not guess function name')
-                        print('near', line)
+                        print 'Warning: could not guess function name'
+                        print 'near', line
                     cur_block = ""
                     in_block = False
                 else:
@@ -359,7 +357,7 @@ def gen_cmake_doc(cmake_file, rst_file):
             should_skip = True
     if should_skip:
         return
-    print("Generating", rst_file)
+    print "Generating", rst_file
     with open(cmake_file, "r") as fp:
         txt = fp.read()
     rst = gen_rst(txt)

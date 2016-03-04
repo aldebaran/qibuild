@@ -87,7 +87,7 @@ def test_extract_invalid_empty(tmpdir):
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qisys.archive.extract(archive.strpath, destdir.strpath)
-    assert "tar failed" in e.value.args[0]
+    assert "tar failed" in e.value.message
 
 # pylint: disable-msg=E1101
 @pytest.mark.skipif(os.name == "nt",
@@ -100,7 +100,7 @@ def test_extract_invalid_bad_tar(tmpdir):
     # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
         qisys.archive.extract(archive.strpath, destdir.strpath)
-    assert "tar failed" in e.value.args[0]
+    assert "tar failed" in e.value.message
 
 def test_extract_invalid_no_topdir(tmpdir):
     src = tmpdir.mkdir("src")

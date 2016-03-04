@@ -85,7 +85,7 @@ Found two projects with the same name. (%s)
     def activate_this(self):
         """ Activate this virtualenv """
         activate_this_dot_py = self.bin_path("activate_this.py")
-        exec(compile(open(activate_this_dot_py).read(), activate_this_dot_py, 'exec'), { "__file__" : activate_this_dot_py })
+        execfile(activate_this_dot_py, { "__file__" : activate_this_dot_py })
 
 
 def new_python_project(worktree, project):
@@ -97,7 +97,6 @@ def new_python_project(worktree, project):
     name = qisys.qixml.parse_required_attr(qipython_elem, "name",
                                            xml_path=qiproject_xml)
     python_project = qipy.project.PythonProject(worktree, project.src, name)
-    # pylint:disable-msg=no-member
     script_elems = qipython_elem.findall("script")
     for script_elem in script_elems:
         src = qisys.qixml.parse_required_attr(script_elem, "src",
@@ -105,7 +104,6 @@ def new_python_project(worktree, project):
         script = qipy.project.Script(src)
         python_project.scripts.append(script)
 
-    # pylint:disable-msg=no-member
     module_elems = qipython_elem.findall("module")
     for module_elem in module_elems:
         src = module_elem.get("src", "")
@@ -115,7 +113,7 @@ def new_python_project(worktree, project):
         module.qimodule = qisys.qixml.parse_bool_attr(module_elem, "qimodule")
         python_project.modules.append(module)
 
-    # pylint:disable-msg=no-member
+
     package_elems = qipython_elem.findall("package")
     for package_elem in package_elems:
         name = qisys.qixml.parse_required_attr(package_elem, "name",
@@ -124,7 +122,6 @@ def new_python_project(worktree, project):
         package = qipy.project.Package(name, src)
         package.qimodule = qisys.qixml.parse_bool_attr(package_elem, "qimodule")
         python_project.packages.append(package)
-
 
     setup_elem = qipython_elem.find("setup")
     if setup_elem is not None:

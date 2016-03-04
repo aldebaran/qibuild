@@ -45,7 +45,7 @@ def name_from_xml(xml_path):
     tree = etree.ElementTree()
     try:
         tree.parse(xml_path)
-    except Exception as e:
+    except Exception, e:
         ui.fatal(e)
 
     # Read name

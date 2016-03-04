@@ -73,7 +73,7 @@ class GentooPackage(GentooNoPortagePackage):
                 pf = fpf.readline().strip()
             name, version, revision = portage.versions.pkgsplit(pf)
             dependency = dict()
-            for dep, dep_filename in _DEPENDENCY.items():
+            for dep, dep_filename in _DEPENDENCY.iteritems():
                 dep_path = os.path.join(work_dir, dep_filename)
                 if not os.path.exists(dep_path):
                     dependency[dep] = list()
@@ -83,7 +83,7 @@ class GentooPackage(GentooNoPortagePackage):
         dependency['all'] = list()
         for dep_list in _DEPENDENCY.keys():
             dependency['all'].extend(dependency[dep_list])
-        for dep, dep_list in dependency.items():
+        for dep, dep_list in dependency.iteritems():
             dependency[dep] = list(set(dep_list))
         metadata = {
             'name'         : name,

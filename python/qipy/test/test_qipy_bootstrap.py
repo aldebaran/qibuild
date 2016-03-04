@@ -7,8 +7,6 @@ import qisys.sh
 
 from qibuild.test.conftest import qibuild_action
 
-import pytest
-
 def test_simple(qipy_action):
     a_project = qipy_action.add_test_project("a_lib")
     big_project = qipy_action.add_test_project("big_project")
@@ -16,7 +14,6 @@ def test_simple(qipy_action):
     qipy_action("run", "--no-exec", "--", "python", "-m", "a")
     qipy_action("run", "--no-exec", "--", "python", "-m", "foo.bar.baz")
 
-@pytest.mark.skipif(True, reason="need python3 support in qibuild/cmake")
 def test_cpp(qipy_action, qibuild_action):
     qipy_action.add_test_project("c_swig")
     qibuild_action("configure", "swig_eggs")

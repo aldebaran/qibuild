@@ -77,7 +77,7 @@ exec python "$@"
         python_wrapper = os.path.join(dest, "python")
         with open(python_wrapper, "w") as fp:
             fp.write(to_write)
-        os.chmod(python_wrapper, 0o755)
+        os.chmod(python_wrapper, 0755)
 
     def deploy(self, url):
         """ Deploy scripts, modules and packages to the remote url

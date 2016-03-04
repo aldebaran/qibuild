@@ -35,7 +35,7 @@ def _use_cmake_cache(args):
     cache = qibuild.cmake.read_cmake_cache(project.cmake_cache)
 
     keys = cache.keys()
-    keys = sorted(keys)
+    keys.sort()
     keys = [k for k in keys if k.upper().startswith(package.upper())]
     if not keys:
         ui.error("Nothing found about CMake module: ", package)

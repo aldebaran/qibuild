@@ -32,16 +32,16 @@ def test_errors(tmpdir):
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qitest.conf.add_test(qitest_json_path, name="foo")
-    assert "Should provide a test cmd" in e.value.args[0]
+    assert "Should provide a test cmd" in e.value.message
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qitest.conf.add_test(qitest_json_path, cmd="foo")
-    assert "Should provide a test name" in e.value.args[0]
+    assert "Should provide a test name" in e.value.message
     qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/foo"])
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qitest.conf.add_test(qitest_json_path, name="foo", cmd=["/path/to/bar"])
-    assert "A test named 'foo' already exists" in e.value.args[0]
+    assert "A test named 'foo' already exists" in e.value.message
 
 def test_relocate():
     proj = mock.Mock()

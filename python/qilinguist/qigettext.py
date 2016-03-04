@@ -180,7 +180,6 @@ class GettextProject(qilinguist.project.LinguistProject):
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE)
         out, err = process.communicate()
-        err = err.decode("utf-8")
         ui.info(err.strip())
         if "untranslated" in err:
             return False, "Some untranslated messages were found"

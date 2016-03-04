@@ -65,6 +65,11 @@ def test_various_outcomes(qibuild_action, record_messages):
         content = f.read()
     # Parsing XML shouldn't raise
     etree.parse(result)
+    # Decode shouldn't raise
+    if sys.platform.startswith("win"):
+        assert "flag" in content.decode("ascii")
+    else:
+        assert "flag" in content.decode("utf-8")
 
 def get_result_dir():
     worktree = qisys.worktree.WorkTree(os.getcwd())

@@ -19,8 +19,8 @@ def configure_parser(parser):
 
 def do(args):
     """ Main method """
-    print("`qitoolchain status` is deprecated")
-    print("use `qitoolchain list` or `qitoolchain info` instead")
+    print "`qitoolchain status` is deprecated"
+    print "use `qitoolchain list` or `qitoolchain info` instead"
     if args.list:
         qisys.script.run_action("qitoolchain.actions.list",
             forward_args=args)

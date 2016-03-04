@@ -4,7 +4,7 @@
 
 """ Tools to deploy files to remote targets"""
 
-from six.moves import urllib
+import urlparse
 import os
 
 from collections import OrderedDict
@@ -79,7 +79,7 @@ def _generate_run_gdbserver_binary(dest, host, gdb, gdb_listen, remote_dir,
                                              'remote_dir': remote_dir,
                                              'gdb': gdb,
                                              'port': port})
-    os.chmod(remote_gdb_script_path, 0o755)
+    os.chmod(remote_gdb_script_path, 0755)
     return [os.path.basename(remote_gdb_script_path)]
 
 def _get_subfolder(directory):

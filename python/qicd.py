@@ -19,7 +19,7 @@ def main():
         sys.stderr.write(str(e))
         sys.exit(2)
     if len(sys.argv) < 2:
-        print((worktree.root))
+        print(worktree.root)
         sys.exit(0)
 
     parser = argparse.ArgumentParser()

@@ -16,11 +16,9 @@ import datetime
 import difflib
 import functools
 import traceback
-import io
+from StringIO import StringIO
 
 import qisys.error
-
-import six
 
 # Try using pyreadline so that we can
 # have colors on windows, too.
@@ -261,12 +259,9 @@ def info_progress(value, max_value, prefix):
     Done: 25%
 
     """
-    # pylint:disable-msg=no-member
     if sys.stdout.isatty():
         percent = float(value) / max_value * 100
-        # pylint:disable-msg=no-member
         sys.stdout.write(prefix + ": %.0f%%\r" % percent)
-        # pylint:disable-msg=no-member
         sys.stdout.flush()
 
 def debug(*tokens, **kwargs):
@@ -300,16 +295,13 @@ def message_for_exception(exception, message):
 
     """
     tb = sys.exc_info()[2]
-    if six.PY2:
-        buffer = io.BytesIO()
-    else:
-        buffer = io.StringIO()
-    traceback.print_tb(tb, file=buffer)
+    io = StringIO()
+    traceback.print_tb(tb, file=io)
     return (red, message + "\n",
             exception.__class__.__name__,
             str(exception), "\n",
             reset,
-            buffer.getvalue())
+            io.getvalue())
 
 class timer:
     """ To be used as a decorator,

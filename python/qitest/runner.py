@@ -6,15 +6,13 @@ import re
 import os
 import json
 
-import six
-
 from qisys import ui
 import qisys.error
 import qitest.test_queue
 
-@six.add_metaclass(abc.ABCMeta)
 class TestSuiteRunner(object):
     """ Interface for a class able to run a test suite """
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self, project):
         self.project = project
@@ -114,9 +112,9 @@ class TestSuiteRunner(object):
             names = json.load(fp)
         return names
 
-@six.add_metaclass(abc.ABCMeta)
 class TestLauncher(object):
     """ Interface for a class able to launch a test. """
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self):
         # Set by the test suite, the launcher may need to know about its worker

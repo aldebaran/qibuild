@@ -193,11 +193,11 @@ def display_options(build_dir):
 
     """
     cache_path = os.path.join(build_dir, "CMakeCache.txt")
-    print("-- Build options: ")
+    print "-- Build options: "
     cache = read_cmake_cache(cache_path)
     opt_keys = [x for x in cache if x.startswith(("WITH_", "ENABLE_"))]
     if not opt_keys:
-        print("  <no options found>")
+        print "  <no options found>"
         return
     opt_keys.sort()
     padding = max(len(x) for x in opt_keys) + 3

@@ -376,7 +376,7 @@ class FakeGit(qisrc.git.Git):
 
     def check(self):
         """ Check that everything that was configured has been called """
-        for (k, v) in self.results.items():
+        for (k, v) in self.results.iteritems():
             call_index = self.calls_index.get(k)
             if call_index is None:
                 mess = "%s was added as result but never called" % k

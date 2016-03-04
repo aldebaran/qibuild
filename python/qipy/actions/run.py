@@ -44,7 +44,7 @@ def do(args):
     if args.dolist:
         for f in sorted(os.listdir(binaries_path)):
             if os.path.isfile(os.path.join(binaries_path, f)):
-                print(f)
+                print f
         return
 
     if not cmd:

@@ -67,7 +67,7 @@ class Git(object):
         cmd.extend(args)
         raises = kwargs.get("raises")
         env = os.environ.copy()
-        for key in list(env.keys()):
+        for key in env.keys():
             if key.startswith("GIT_"):
                 del env[key]
         if raises is False:
@@ -79,7 +79,6 @@ class Git(object):
                 env=env,
                 **kwargs)
             out = process.communicate()[0]
-            out = out.decode("utf-8")
             # Don't want useless blank lines
             out = out.rstrip("\n")
             ui.debug("out:", out)

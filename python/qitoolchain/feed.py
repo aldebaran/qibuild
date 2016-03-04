@@ -9,7 +9,7 @@
 import os
 import sys
 import hashlib
-from six.moves import urllib
+import urlparse
 from xml.etree import ElementTree
 
 from qisys import ui
@@ -161,7 +161,7 @@ class ToolchainFeedParser:
             if feed_url:
                 # feed_url can be relative to feed:
                 if not "://" in feed_url:
-                    feed_url = urllib.parse.urljoin(feed, feed_url)
+                    feed_url = urlparse.urljoin(feed, feed_url)
                 self.parse(feed_url, first_pass=False)
             feed_name = feed_tree.get("name")
             if feed_name:
@@ -171,7 +171,6 @@ class ToolchainFeedParser:
                 self.parse(feed, branch=branch, name=feed_name, first_pass=False)
         select_tree = tree.find("select")
         if select_tree is not None:
-            # pylint:disable-msg=no-member
             blacklist_trees = select_tree.findall("blacklist")
             for blacklist_tree in blacklist_trees:
                 name = blacklist_tree.get("name")

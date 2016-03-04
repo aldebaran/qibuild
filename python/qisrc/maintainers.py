@@ -8,8 +8,6 @@ import os
 import locale
 from xml.etree import ElementTree as etree
 
-import six
-
 from qisys import ui
 import qisrc.git
 import qisys.qixml
@@ -25,9 +23,8 @@ class ProjectXML(qisys.qixml.XMLParser):
 
 def to_str(name=None, email=None):
     encoding = locale.getpreferredencoding()
-    if six.PY2:
-        name = name.encode(encoding)
-        email = email.encode(encoding)
+    name = name.encode(encoding)
+    email = email.encode(encoding)
     string = ""
     if name:
         string += name
@@ -104,9 +101,8 @@ def add(project, name=None, email=None):
     if exists(project, name=name, email=email):
         return
     encoding = locale.getpreferredencoding()
-    if six.PY2:
-        name = name.decode(encoding)
-        email = email.decode(encoding)
+    name = name.decode(encoding)
+    email = email.decode(encoding)
     tree = get_xml_tree(project)
     root = tree.getroot()
     maint_elem = etree.Element("maintainer")

@@ -145,7 +145,7 @@ def install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles"):
     if cmake_generator == "Ninja":
         ninja = qisys.command.find_program("ninja", raises=False)
         if not ninja:
-            print("Ninja not installed, skipping")
+            print "Ninja not installed, skipping"
             return
     cross_proj = qibuild_action.add_test_project("cross")
     toolchain_file = os.path.join(cross_proj.path, "toolchain.cmake")

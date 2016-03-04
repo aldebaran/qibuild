@@ -11,8 +11,9 @@ import os
 import re
 import sys
 import ftplib
-from six.moves import urllib
-import io
+import urlparse
+import urllib2
+import StringIO
 
 from qisys import ui
 import qisys.error
@@ -61,20 +62,19 @@ def authenticated_urlopen(location):
     if provided by the user.
 
     """
-    passman = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+    passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
     #pylint: disable-msg=E1103
-    server_name = urllib.parse.urlsplit(location).netloc
+    server_name = urlparse.urlsplit(location).netloc
     access = get_server_access(server_name)
     if access is not None:
         user = access.username
         password = access.password
         if user is not None and password is not None:
             passman.add_password(None, location, user, password)
-    authhandler = urllib.request.HTTPBasicAuthHandler(passman)
-    opener = urllib.request.build_opener(authhandler)
-    # pylint:disable-msg=too-many-function-args
-    urllib.request.install_opener(opener)
-    return urllib.request.urlopen(location)
+    authhandler = urllib2.HTTPBasicAuthHandler(passman)
+    opener = urllib2.build_opener(authhandler)
+    urllib2.install_opener(opener)
+    return urllib2.urlopen(location)
 
 def open_remote_location(location, timeout=10):
     """ Open a file from an url
@@ -83,7 +83,7 @@ def open_remote_location(location, timeout=10):
 
     """
     #pylint: disable-msg=E1103
-    url_split = urllib.parse.urlsplit(location)
+    url_split = urlparse.urlsplit(location)
     server_name = url_split.netloc
     #pylint: disable-msg=E1103
     if url_split.scheme == "ftp":
@@ -100,7 +100,7 @@ def open_remote_location(location, timeout=10):
         def retr_callback(data):
             Transfer.data += data
         ftp.retrbinary(cmd, retr_callback)
-        return io.StringIO(Transfer.data)
+        return StringIO.StringIO(Transfer.data)
     else:
         return authenticated_urlopen(location)
 
@@ -142,12 +142,12 @@ def download(url, output_dir, output_name=None,
         ui.info(*message)
     try:
         dest_file = open(dest_name, "wb")
-    except Exception as e:
+    except Exception, e:
         mess  = "Could not save %s to %s\n" % (url, dest_name)
         mess += "Error was %s" % e
         raise qisys.error.Error(mess)
 
-    url_split = urllib.parse.urlsplit(url)
+    url_split = urlparse.urlsplit(url)
     url_obj = None
     #pylint: disable-msg=E1103
     server_name = url_split.netloc
@@ -180,7 +180,7 @@ def download(url, output_dir, output_name=None,
             ftp.retrbinary(cmd, retr_callback)
         else:
             url_obj = authenticated_urlopen(url)
-            content_length = url_obj.headers.get('Content-length')
+            content_length = url_obj.headers.dict['content-length']
             size = int(content_length)
             buff_size = 100 * 1024
             xferd = 0
@@ -192,7 +192,7 @@ def download(url, output_dir, output_name=None,
                 if callback:
                     callback(size, xferd)
                 dest_file.write(data)
-    except Exception as e:
+    except Exception, e:
         error  = "Could not download file from %s\n to %s\n" % (url, dest_name)
         error += "Error was: %s" % e
     finally:

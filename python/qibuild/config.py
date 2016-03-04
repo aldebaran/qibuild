@@ -8,7 +8,6 @@
 """
 
 import os
-import functools
 import operator
 import locale
 
@@ -59,7 +58,7 @@ class Env(object):
             self.vars[name] = var_elem.text
 
     def dump_vars(self, tree):
-        for name, value in self.vars.items():
+        for name, value in self.vars.iteritems():
             var_elem = etree.SubElement(tree, "var")
             var_elem.set("name", name)
             var_elem.text = value
@@ -77,7 +76,6 @@ class Env(object):
         return res
 
 
-@functools.total_ordering
 class IDE(object):
     def __init__(self):
         self.name = None
@@ -97,9 +95,6 @@ class IDE(object):
         if self.path:
             tree.set("path", self.path)
         return tree
-
-    def __lt__(self, other):
-        return self.name < other.name
 
     def __str__(self):
         res = self.name
@@ -171,6 +166,7 @@ class Defaults(object):
             res += ui.indent(env_str) + "\n"
         return res
 
+
 class Access(object):
     def __init__(self):
         self.root = None
@@ -200,7 +196,7 @@ class Access(object):
             res += "password: XXXXX\n"
         return res
 
-@functools.total_ordering
+
 class Server(object):
     def __init__(self):
         self.name = None
@@ -223,9 +219,6 @@ class Server(object):
         access_tree = self.access.tree()
         tree.append(access_tree)
         return tree
-
-    def __lt__(self, other):
-        return self.name < other.name
 
     def __str__(self):
         res = self.name
@@ -473,7 +466,7 @@ class QiBuildConfig(object):
         ui.debug("Reading config from", cfg_path)
         try:
             self.tree.parse(cfg_path)
-        except Exception as e:
+        except Exception, e:
             mess  = "Could not parse config from %s\n" % cfg_path
             mess += "Error was: %s" % str(e)
             raise qisys.error.Error(mess)
@@ -676,7 +669,7 @@ class QiBuildConfig(object):
             raise qisys.error.Error("No such config: %s" % config_name)
         # Make sure that we unset the previous 'host' config when
         # called twice with different config names
-        for name, config in self.configs.items():
+        for name, config in self.configs.iteritems():
             if name == config_name:
                 config.host = True
             else:
@@ -684,7 +677,7 @@ class QiBuildConfig(object):
 
     def get_host_config(self):
         """ Get the config to use when looking for host tools """
-        for name, config in self.configs.items():
+        for name, config in self.configs.iteritems():
             if config.host:
                 return name
 
@@ -704,19 +697,21 @@ class QiBuildConfig(object):
         defaults_tree = self.defaults.tree()
         qibuild_tree.append(defaults_tree)
         configs = self.configs.values()
-        for config in sorted(configs, key=get_name):
+        configs.sort(key=get_name)
+        for config in configs:
             config_tree = config.tree()
             qibuild_tree.append(config_tree)
         ides = self.ides.values()
-        for ide in sorted(ides, key=get_name):
+        ides.sort(key=get_name)
+        for ide in ides:
             ide_tree = ide.tree()
             qibuild_tree.append(ide_tree)
         servers = self.servers.values()
-        for server in sorted(servers, key=get_name):
+        for server in servers:
             server_tree = server.tree()
             qibuild_tree.append(server_tree)
         worktrees = self.worktrees.values()
-        for worktree in sorted(worktrees, key=operator.attrgetter("path")):
+        for worktree in worktrees:
             worktree_tree = worktree.tree()
             qibuild_tree.append(worktree_tree)
 
@@ -730,7 +725,7 @@ class QiBuildConfig(object):
             res += ui.indent(defaults_str) + "\n"
             res += "\n"
         configs = self.configs.values()
-        configs = sorted(configs, key=operator.attrgetter('name'))
+        configs.sort(key=operator.attrgetter('name'))
         if configs:
             res += "configs:\n"
             for config in configs:
@@ -738,7 +733,7 @@ class QiBuildConfig(object):
                 res += "\n"
             res += "\n"
         ides = self.ides.values()
-        ides = sorted(ides, key=operator.attrgetter('name'))
+        ides.sort(key=operator.attrgetter('name'))
         if ides:
             res += "ides:\n"
             for ide in ides:
@@ -746,7 +741,7 @@ class QiBuildConfig(object):
                 res += "\n"
             res += "\n"
         servers = self.servers.values()
-        servers = sorted(servers, key=operator.attrgetter('name'))
+        servers.sort(key=operator.attrgetter('name'))
         if servers:
             res += "servers:\n"
             for server in servers:
@@ -754,7 +749,7 @@ class QiBuildConfig(object):
                 res += "\n"
             res += "\n"
         worktrees = self.worktrees.values()
-        worktrees = sorted(worktrees, key=operator.attrgetter('path'))
+        worktrees.sort(key=operator.attrgetter('path'))
         if worktrees:
             res += "worktrees:\n"
             for worktree in worktrees:
@@ -799,4 +794,4 @@ def add_build_config(name, toolchain=None, profiles=None,
 def get_config_names():
     qibuild_cfg = QiBuildConfig()
     qibuild_cfg.read(create_if_missing=True)
-    return sorted(qibuild_cfg.configs.keys())
+    return qibuild_cfg.configs.keys()

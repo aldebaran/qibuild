@@ -10,12 +10,10 @@ import json
 import signal
 import traceback
 import time
-import io
+import StringIO
 import sys
 import threading
-
-import six
-from six.moves import queue
+import Queue
 
 from qisys import ui
 import qisys.command
@@ -28,7 +26,7 @@ class TestQueue(object):
     def __init__(self, tests):
         self.tests = tests
         self.test_logger = TestLogger(tests)
-        self.task_queue = queue.Queue()
+        self.task_queue = Queue.Queue()
         self.launcher = None
         self.results = collections.OrderedDict()
         self.ok = False
@@ -189,13 +187,13 @@ class TestWorker(threading.Thread):
         while not self._should_stop:
             try:
                 test, index = self.queue.get_nowait()
-            except queue.Empty:
+            except Queue.Empty:
                 return
             self.test_logger.on_start(test, index)
             result = None
             try:
                 result = self.launcher.launch(test)
-            except Exception as e:
+            except Exception, e:
                 result = qitest.result.TestResult(test)
                 result.ok = False
                 result.message = ui.message_for_exception(e,
@@ -205,7 +203,6 @@ class TestWorker(threading.Thread):
                 self.test_logger.on_completed(test, index, result.message)
             self.results[test["name"]] = result
             self.queue.task_done()
-
 
 
 class TestLogger(object):

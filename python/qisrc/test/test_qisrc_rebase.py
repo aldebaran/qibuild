@@ -39,7 +39,7 @@ def test_rebase_conflict(git_server, qisrc_action):
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qisrc_action("rebase", "--branch", "master", "--all")
-    assert " * foo" in e.value.args[0]
+    assert " * foo" in e.value.message
     _, after = git.call("show", raises=False)
     assert after == before
 

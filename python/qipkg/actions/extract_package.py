@@ -5,7 +5,7 @@
 
 import os
 import zipfile
-from io import StringIO
+from StringIO import StringIO
 
 from qisys import ui
 import qisys.error
@@ -35,7 +35,7 @@ def do(args):
     except KeyError:
         raise qisys.error.Error("Could not find manifest.xml in %s" % pkg_path)
 
-    buffer = StringIO(xml_data.decode("UTF-8"))
+    buffer = StringIO(xml_data)
     pkg_name = qipkg.builder.pkg_name(buffer)
 
     if pkg_name is not None:

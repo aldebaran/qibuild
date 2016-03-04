@@ -47,9 +47,9 @@ def do(args):
             res[project.name] = project.license
 
     if args.json:
-        print(json.dumps(res, indent=2))
+        print json.dumps(res, indent=2)
     else:
-        for name, license in res.items():
+        for name, license in res.iteritems():
             ui.info(name, license)
 
     return res

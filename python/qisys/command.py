@@ -12,7 +12,7 @@ import contextlib
 import subprocess
 import signal
 import threading
-import six.moves.queue
+import Queue
 
 from qisys import ui
 import qisys.error
@@ -85,7 +85,7 @@ class Process(object):
                     kwargs["stdout"] = subprocess.PIPE
                     kwargs["stderr"] = subprocess.STDOUT
                 self._process = subprocess.Popen(self.cmd, **kwargs)
-            except Exception as e:
+            except Exception, e:
                 self.exception = e
                 self.return_type = Process.NOT_RUN
                 return
@@ -183,12 +183,10 @@ class CommandFailedException(qisys.error.Error):
         self.returncode = returncode
         self.stdout = stdout
         if stdout is None:
-            self.stdout = b""
+            self.stdout = ""
         self.stderr = stderr
         if stderr is None:
-            self.stderr = b""
-        self.stdout = self.stdout.decode("utf-8")
-        self.stderr = self.stderr.decode("utf-8")
+            self.stderr = ""
 
     def __str__(self):
         mess  = """The following command failed
@@ -459,7 +457,7 @@ def call_background(cmd, cwd=None, env=None):
     caught_error = None
     try:
         yield
-    except Exception as err:
+    except Exception, err:
         caught_error = err
     finally:
         try:
@@ -468,7 +466,7 @@ def call_background(cmd, cwd=None, env=None):
                 raise ProcessCrashedError(cmd)
             else:
                 process.kill()
-        except ProcessCrashedError as err:
+        except ProcessCrashedError, err:
             caught_error = err
     if caught_error:
     #pylint: disable-msg=E0702

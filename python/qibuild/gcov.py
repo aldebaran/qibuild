@@ -16,7 +16,7 @@ def generate_coverage_reports(project, output_dir=None):
     qisys.sh.mkdir(outdir, recursive=True)
     formats = {"xml": ["--xml"],
                "html": ["--html", "--html-details"]}
-    for fmt, opts in formats.items():
+    for fmt, opts in formats.iteritems():
         base_report = os.path.join(outdir, project.name + "." + fmt)
         cmd = ["gcovr",
                 "--root", sdir,

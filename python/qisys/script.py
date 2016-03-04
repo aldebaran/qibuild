@@ -11,7 +11,6 @@ import sys
 import tempfile
 import argparse
 import copy
-import importlib
 import operator
 import traceback
 
@@ -94,11 +93,11 @@ def run_action(module_name, args=None, forward_args=None):
     package_name = ".".join(module_name.split(".")[:-1])
     try:
         _tmp = __import__(package_name, globals(), locals(), [action_name])
-    except ImportError as err:
+    except ImportError, err:
         raise InvalidAction(module_name, str(err))
     try:
         module = getattr(_tmp, action_name)
-    except AttributeError as err:
+    except AttributeError, err:
         raise InvalidAction(module_name, "Could not find module %s in package %s" %
             (module_name, package_name))
     check_module(module)
@@ -157,9 +156,9 @@ def main_wrapper(module, args):
         tb = sys.exc_info()[2]
         # Oh, oh we have an crash:
         if args.pdb:
-            print("")
-            print("### Exception:", e)
-            print("### Starting a debugger")
+            print ""
+            print "### Exception:", e
+            print "### Starting a debugger"
             try:
                 #pylint: disable-msg=F0401
                 import ipdb
@@ -186,8 +185,10 @@ def _dump_arguments(name, args):
     """ Dump an argparser namespace to log """
     output = ""
     keys = args.__dict__.keys()
+    keys.sort()
     max_len = max(len(k) for k in keys)
-    for k in sorted(keys):
+    keys.sort()
+    for k in keys:
         value = args.__dict__[k]
         output += "  " + k.ljust(max_len) + " = %s\n" % (value,)
     if output[-1] == "\n":
@@ -212,9 +213,9 @@ def root_command_main(name, parser, modules, args=None):
     for module in modules:
         try:
             check_module(module)
-        except InvalidAction as err:
-            print("Warning, skipping", module.__name__)
-            print(err)
+        except InvalidAction, err:
+            print "Warning, skipping", module.__name__
+            print err
             continue
         name = module.__name__.split(".")[-1]
         # we want to type `foo bar-baz', and not type `foo bar_baz',
@@ -239,9 +240,9 @@ def root_command_main(name, parser, modules, args=None):
             parser.print_help()
         else:
             if not action in action_modules:
-                print("Invalid action!")
-                print("Choose between: ", " ".join(sorted(action_modules.keys())))
-                print()
+                print "Invalid action!"
+                print "Choose between: ", " ".join(action_modules.keys())
+                print
                 parser.print_help()
             else:
                 parser.parse_args([action, "--help"])
@@ -296,17 +297,20 @@ def action_modules_from_package(package_name):
 
     """
     res = list()
-    package = importlib.import_module(package_name)
+    splitted = package_name.split(".")[1:]
+    last_part = ".".join(splitted)
+    package = __import__(package_name, globals(), locals(), [last_part])
     base_path = os.path.dirname(package.__file__)
     module_paths = os.listdir(base_path)
     module_paths = [x[:-3] for x in module_paths if x.endswith(".py")]
     module_paths.remove("__init__")
     for module_path in module_paths:
         try:
-            module = importlib.import_module("%s.%s" % (package_name, module_path))
+            _tmp = __import__(package_name, globals(), locals(), [module_path], -1)
+            module = getattr(_tmp, module_path)
             res.append(module)
-        except ImportError as err:
-            print("Skipping %s (%s)" % (module_path, err))
+        except ImportError, err:
+            print "Skipping %s (%s)" % (module_path, err)
             continue
 
     res.sort(key=operator.attrgetter("__name__"))

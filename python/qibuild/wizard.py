@@ -23,9 +23,9 @@ def guess_cmake(qibuild_cfg):
     build_env = qibuild.config.get_build_env()
     cmake = qisys.command.find_program("cmake", env=build_env)
     if cmake:
-        print("Found CMake:" , cmake)
+        print "Found CMake:" , cmake
         return cmake
-    print("CMake not found")
+    print "CMake not found"
     cmake = qisys.interact.ask_program("Please enter full CMake path")
     if not cmake:
         raise qisys.error.Error(
@@ -128,7 +128,7 @@ def configure_local_settings(build_worktree):
     """ Configure local settings for this worktree
 
     """
-    print()
+    print
     worktree_root = build_worktree.root
     ui.info(ui.green, "::", ui.reset,  "Found a worktree in", worktree_root)
     qibuild_cfg = build_worktree.qibuild_cfg

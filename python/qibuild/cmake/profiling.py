@@ -40,6 +40,10 @@ def parse_cmake_log(input, qibuild_dir):
             if not line_no in profile[filename]:
                 profile[filename][line_no] = 0
             profile[filename][line_no] += 1
+    dirname = os.path.dirname(input)
+    profile_pickle = os.path.join(dirname, "profile.pickle")
+    with open(profile_pickle, "w") as fp:
+        pickle.dump(profile, fp)
     return profile
 
 
@@ -60,7 +64,7 @@ def gen_annotations(profile, out, qibuild_dir):
         lines = [" " * (pad + 1) + x for x in lines]
         file_stats = profile[filename]
 
-        for (line_no, hits) in file_stats.items():
+        for (line_no, hits) in file_stats.iteritems():
             orig_line = lines[line_no - 1]
             new_line = str(hits).rjust(pad) + orig_line[pad + 1:]
             lines[line_no - 1] = new_line

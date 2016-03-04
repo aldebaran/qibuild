@@ -18,5 +18,5 @@ def configure_parser(parser):
 def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args)
     sourceme = build_worktree.generate_sourceme()
-    print(sourceme)
+    print sourceme
     return sourceme

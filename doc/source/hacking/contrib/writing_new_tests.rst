@@ -204,7 +204,7 @@ you raise:
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         do_something_that_should_raise()
-    assert "Bad input"  in e.value.args[0]
+    assert "Bad input"  in e.value.message
 
 
 Notes:

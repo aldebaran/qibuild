@@ -165,7 +165,7 @@ def print_state(project, max_len):
             nlines = [ x[:3] + project.project.src + "/"
                     + x[3:] for x in project.status ]
             if nlines:
-                print("\n".join(nlines))
+                print "\n".join(nlines)
 
 def print_incorrect_projs(projects, max_len):
     """Print list of projets which are not on correct branch."""

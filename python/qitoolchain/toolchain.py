@@ -34,7 +34,9 @@ class Toolchain(object):
 
     @property
     def packages(self):
-        return sorted(self.db.packages.values())
+        values = self.db.packages.values()
+        values.sort()
+        return values
 
     def load(self):
         tree = qisys.qixml.read(self.config_path)

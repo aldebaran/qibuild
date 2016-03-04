@@ -156,7 +156,7 @@ def test_manifest_branch_does_not_exist(qisrc_action, git_server):
     # pylint:disable-msg=E1101
     with pytest.raises(qisys.error.Error) as e:
         qisrc_action("init", git_server.manifest_url, "--branch", "devel")
-    assert "origin/devel" in e.value.args[0]
+    assert "origin/devel" in e.value.message
 
 def test_relative_path(qisrc_action, tmpdir):
     git = qisrc.git.Git(tmpdir.strpath)

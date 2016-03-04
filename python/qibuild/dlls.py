@@ -48,7 +48,7 @@ def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):
     for dll_to_copy in dlls_to_copy:
         try:
             qisys.sh.safe_copy(dll_to_copy, dest)
-        except Exception as e:
+        except Exception, e:
             mess  = "Could not copy %s to %s\n" % (dll_to_copy, dest)
             mess += "Error was: %s\n" % e
             ui.warning(mess)
