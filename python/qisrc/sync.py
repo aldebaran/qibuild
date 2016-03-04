@@ -221,22 +221,17 @@ class WorkTreeSyncer(object):
         return repos
 
     def get_old_repos(self, warn=True):
-        """ Backup all repos configuration before any synchronisation
-        for compute_repo_diff to have the correct value
+        """ Read the state of the worktree (read from .qi/git.xml)
+
+        (for instance before compute_repo_diff)
 
         """
-        old_repos = list()
-        old_repos_expected = self.read_remote_manifest(warn=warn)
-        # The git projects may not match the previous repo config,
-        # for instance the user removed a project by accident, or
-        # a rename failed, or the project has not been cloned yet,
-        # so make sure old_repos matches the worktree state:
-        for old_repo in old_repos_expected:
-            old_project = self.git_worktree.find_repo(old_repo)
-            if old_project:
-                old_repo.src = old_project.src
-                old_repos.append(old_repo)
-        return old_repos
+        groups = self.manifest.groups
+        # Remove repos that are not from a manifest (where name is None)
+        # This makes sure projects that were manually added do not end up in
+        # self.old_repos(), and thus get unregistered in self.sync_repos()
+        return [x.to_repo() for x in self.git_worktree.get_git_projects(groups=groups)
+                if x.name]
 
     def _sync_manifest(self):
         """ Update the local manifest clone with the remote """

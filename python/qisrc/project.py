@@ -168,6 +168,20 @@ class GitProject(object):
                 ui.warning("Now using fixed ref:", repo.fixed_ref)
             self.fixed_ref = repo.fixed_ref
 
+    def to_repo(self):
+        """ The opposite of read_remote_config(). Return a RepoConfig object
+        from the settings found in .qi/git.xml
+
+        """
+        res = qisrc.manifest.RepoConfig()
+        res.src = self.src
+        res.project = self.name
+        if self.default_branch:
+            res.default_branch = self.default_branch.name
+        res.fixed_ref = self.fixed_ref
+        res.remotes = self.remotes
+        return res
+
     def sync(self, rebase_devel=False, **kwargs):
         """ Synchronize remote changes with the underlying git repository
         Calls :py:meth:`qisrc.git.Git.sync_branch`
