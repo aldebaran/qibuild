@@ -42,6 +42,9 @@ class DoxygenProject(qidoc.project.DocProject):
             template_conf = self.template_project.doxy_conf.copy()
 
         version = kwargs.get("version")
+        # If version is not set from command line, read it from qiproject
+        if not version:
+            version = self.version
         rel_paths = kwargs.get("rel_paths", False)
         in_conf = qidoc.doxygen.read_doxyfile(self.in_doxyfile)
         out_conf = template_conf.copy()

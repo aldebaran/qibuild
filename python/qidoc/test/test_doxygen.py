@@ -113,3 +113,34 @@ def test_build(doc_worktree):
     qi_dox.build()
 
     assert os.path.exists(qi_dox.index_html)
+
+def test_version_from_doxy(doc_worktree):
+    foo_proj = doc_worktree.create_doxygen_project("foo")
+    in_doxyfile = foo_proj.in_doxyfile
+    with open(in_doxyfile, "w") as fp:
+        fp.write("PROJECT_NUMBER=0.42\n")
+
+    # Command line should win over settings in Doxyfile
+    foo_proj.configure(version="0.2")
+    out_doxyfile = foo_proj.out_doxyfile
+    settings = qidoc.doxygen.read_doxyfile(out_doxyfile)
+    assert settings["PROJECT_NUMBER"] == "0.2"
+
+    # Doxyfile should be read when version is not set
+    # from command line
+    foo_proj.configure()
+    out_doxyfile = foo_proj.out_doxyfile
+    settings = qidoc.doxygen.read_doxyfile(out_doxyfile)
+    assert settings["PROJECT_NUMBER"] == "0.42"
+
+def test_version_from_qiproject_xml(doc_worktree):
+    foo_proj = doc_worktree.create_doxygen_project("foo")
+
+    # qiproject.xml should be read when version  is no set
+    # from command line
+    foo_proj.version = "0.42"
+    foo_proj.configure()
+
+    out_doxyfile = foo_proj.out_doxyfile
+    settings = qidoc.doxygen.read_doxyfile(out_doxyfile)
+    assert settings["PROJECT_NUMBER"] == "0.42"
