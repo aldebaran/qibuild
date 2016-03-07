@@ -6,11 +6,13 @@
 
 """
 
+import os
 import sys
 
 from qisys import ui
 import qibuild.find
 import qibuild.parsers
+import qibuild.cmake_builder
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -32,6 +34,8 @@ def _use_cmake_cache(args):
     project = qibuild.parsers.get_one_build_project(build_worktree, args)
     package = args.package
 
+    if not os.path.exists(project.cmake_cache):
+        raise qibuild.cmake_builder.NotConfigured(project)
     cache = qibuild.cmake.read_cmake_cache(project.cmake_cache)
 
     keys = cache.keys()

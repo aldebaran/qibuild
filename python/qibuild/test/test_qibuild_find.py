@@ -2,11 +2,15 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import qisys.error
 import qibuild.config
+import qibuild.cmake_builder
 from qibuild import find
 
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
+
+import pytest
 
 def test_find_target_in_project_cmake(qibuild_action, record_messages):
     qibuild_action.add_test_project("world")
@@ -48,6 +52,13 @@ def test_find_target_in_build_dir(qibuild_action, record_messages):
     rc = qibuild_action("find", "hello", "libworld", retcode=True)
     assert rc == 1
 
+def test_not_configured(qibuild_action):
+    world_proj = qibuild_action.add_test_project("world")
+    qibuild_action.chdir(world_proj.path)
+    # pylint: disable-msg=E1101
+    with pytest.raises(qibuild.cmake_builder.NotConfigured) as e:
+        qibuild_action("find", "--cmake", "world")
+
 def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
     qibuild_action = QiBuildAction()
     qitoolchain_action = QiToolchainAction()
@@ -72,4 +83,3 @@ def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
 
     rc = qibuild_action("find", "libeggs", "-c", "foo", retcode=True)
     assert rc == 1
-

@@ -101,7 +101,6 @@ class BuildProject(object):
         """ Path to qiproject.xml """
         return os.path.join(self.path, "qiproject.xml")
 
-
     @property
     def build_directory(self):
         """ Return a suitable build directory, depending on the
