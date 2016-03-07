@@ -56,7 +56,7 @@ def test_not_configured(qibuild_action):
     world_proj = qibuild_action.add_test_project("world")
     qibuild_action.chdir(world_proj.path)
     # pylint: disable-msg=E1101
-    with pytest.raises(qibuild.cmake_builder.NotConfigured) as e:
+    with pytest.raises(qibuild.cmake_builder.NotConfigured):
         qibuild_action("find", "--cmake", "world")
 
 def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
