@@ -14,6 +14,9 @@ general
 
 * Fix crash when current working directory does not exist
 
+* Test suite now runs without errors on Linux *and* Mac. Running
+  test suite on Windows does not work yet, but should be fixed for 3.13
+
 qiproject.xml
 +++++++++++++
 
@@ -45,6 +48,9 @@ qiproject.xml
 qibuild
 --------
 
+* ``qibuild configure`` : do not re-run CMake on the dependencies if the cache is
+  up-to-date.
+
 * Add support for meta projects, that is a project that only has dependencies
   to other projects, but no source code or ``CMakeLists.txt``
 
@@ -73,6 +79,8 @@ qibuild
 
   This workarounds ``DYLD_`` variables not being forwarded because of
   OS X 10.11 System Integrity Protection
+
+* ``qibuild install`` without argument no longer installs the tests.
 
 * ``qibuild package``: add ``--version`` to override settings in ``qiproject.xml``
 
@@ -147,6 +155,9 @@ qidoc
 qisrc
 ------
 
+* ``qisrc create`` used with a template no longer copies hidden files
+  (by hidden we mean "starting with a dot")
+
 * ``qisrc push``: allow specifying destination branch as first argument.
 
   For instance, while on ``perso`` branch, you can use ``qisrc push master``.
@@ -175,10 +186,15 @@ qisrc
 
 * ``qisrc diff``, ``qisrc log``: better output when branches have diverged
 
+* Fix using ``qisrc log`` when output is not a terminal
+
 * ``qisrc foreach --all`` is deprecated, use ``qisys foreach`` instead
 
 * ``qisrc rm-group``: add ``--from-disk`` to also remove projects sources
   from disk. Use with care.
+
+* Actually support orphaned projects. (The feature was documented but not
+  implemented)
 
 qisys
 -----
