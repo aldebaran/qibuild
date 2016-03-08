@@ -37,6 +37,8 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
     cmd.append(venv_path)
     if site_packages:
         cmd.append("--system-site-packages")
+    if not env:
+        env = os.environ.copy()
     # Make sure PYTHONHOME is never set when we call bootstrap
     env.pop("PYTHONHOME", None)
     try:
