@@ -109,6 +109,7 @@ def test_depend_on_the_generator_command(qibuild_action):
     # (but only when used with the xdist plugin)
     try:
         qibuild_action("make", "codegen")
+        # pylint: disable-msg=E1101
         pytest.fail("Build should have fail!")
     except qibuild.build.BuildFailed:
         pass
