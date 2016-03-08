@@ -3,7 +3,7 @@
 ## found in the COPYING file.
 
 project = u'qiBuild'
-version = '3.12a1'
+version = '3.12rc1'
 release = version
 sys.path.insert(0, os.path.abspath('../tools'))
 # for autodoc
