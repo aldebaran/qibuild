@@ -26,6 +26,7 @@ breathe==4.1.0
 # For tests
 mock==1.0.1
 pytest==2.8.2
+py==1.4.31
 pytest-cov==1.6
 pytest-timeout==1.0.0
 pytest-xdist==1.13.1
