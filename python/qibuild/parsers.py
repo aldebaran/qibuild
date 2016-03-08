@@ -105,7 +105,7 @@ def project_parser(parser, positional=True):
     group.add_argument("--build-deps-only", action="store_const",
                        const=["build"], dest="dep_types",
                        help="Work on specified projects by ignoring "
-                             "the runtime deps.")
+                             "the runtime and test deps.")
     parser.set_defaults(dep_types="default")
 
 def get_build_worktree(args, verbose=True):
