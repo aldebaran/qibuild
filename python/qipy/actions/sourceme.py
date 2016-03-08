@@ -13,6 +13,7 @@ import os
 
 from qisys import ui
 
+import qisys.error
 import qisys.parsers
 import qipy.parsers
 import qibuild.parsers
@@ -30,7 +31,7 @@ Could not find 'activate' script.
 (%s does not exist)
 Make sure to call `qipy bootstrap` first
 """
-        raise Exception(mess)
+        raise qisys.error.Error(mess)
 
     if os.name == "nt":
         res = qisys.sh.to_posix_path(res, fix_drive=True)
