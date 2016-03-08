@@ -216,11 +216,18 @@ def test_staged_path_first_in_path_conf(qibuild_action, toolchains):
 
     path_conf = read_path_conf(stagepath_proj)
     lines = path_conf.splitlines()
-    assert lines == [
+    # need to resolve symlinks
+    # (the path to the sources of stagepath_proj is written by CMake, so we
+    # have to do that by hand)
+    lines = [os.path.realpath(x) for x in lines]
+    expected = [
             stagepath_proj.path,
             stagepath_proj.sdk_directory,
             bar_package.path
     ]
+    expected = [os.path.realpath(x) for x in expected]
+
+    assert lines == expected
 
 def test_path_conf_contains_toolchain_paths(qibuild_action, toolchains):
     toolchains.create("foo")

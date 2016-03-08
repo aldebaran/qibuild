@@ -4,6 +4,7 @@
 import os
 
 import qisys.command
+import qibuild.cmake_builder
 import qibuild.find
 import qitoolchain.qipackage
 

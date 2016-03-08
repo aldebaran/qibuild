@@ -1,6 +1,7 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
 import os
 
 import qisys.archive
@@ -35,5 +36,8 @@ def test_simple(qibuild_action, toolchains, tmpdir, record_messages):
         qibuild_action("find", "--cmake", "foo", "--config", "test")
     foo_lib = record_messages.find("FOO_LIBRARIES")
     value = foo_lib.split()[1]
-    splitted = value.split(";")
-    assert splitted == [libfoo.strpath, libfoobar.strpath, libfoobaz.strpath]
+    values = value.split(";")
+    # Need to resolve symlinks:
+    values = [os.path.realpath(value) for value in values]
+
+    assert values == [libfoo.strpath, libfoobar.strpath, libfoobaz.strpath]

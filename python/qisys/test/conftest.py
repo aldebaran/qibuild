@@ -132,7 +132,9 @@ def tmpfiles(request, tmpdir):
     """ Configure qisys.sh.get_*_path functions to return temporary
     files instead
     """
-
+    # /tmp is a symlink on mac, leading to all kind of "interesting"
+    # problems
+    tmpdir = tmpdir.realpath()
     def fake_get_path(*args):
         prefix = args[0]
         rest = args[1:]
