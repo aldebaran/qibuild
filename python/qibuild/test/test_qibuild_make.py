@@ -1,9 +1,13 @@
 ## Copyright (c) 2012-2016 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+
 import os
+import time
+import subprocess
 
 import qisys.command
+import qibuild.build
 import qibuild.cmake_builder
 import qibuild.find
 import qitoolchain.qipackage
@@ -92,8 +96,19 @@ def test_depend_on_the_generator_command(qibuild_action):
     qibuild_action("make", "codegen", "--verbose-make")
     with open(gen_py, "r") as fp:
         lines = fp.readlines()
-    lines.append("sys.exit(2)\n")
+    lines.append("sys.exit('Kaboom!')\n")
     with open(gen_py, "w") as fp:
         fp.writelines(lines)
-    error = qibuild_action("make", "codegen", raises=True)
-    assert error
+    # Make sure mtime of the gen.py script is recent
+    # Make sure that re-running make cause re-running the generator
+    # command and thus fail the build
+    now = time.time()
+    os.utime(gen_py, (now + 10, now + 10))
+    # Bug in pytest, with pytest.raises() pytest fails with:
+    # ExceptionInfo object has no attribute 'typename'
+    # (but only when used with the xdist plugin)
+    try:
+        qibuild_action("make", "codegen")
+        pytest.fail("Build should have fail!")
+    except qibuild.build.BuildFailed:
+        pass
