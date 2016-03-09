@@ -585,12 +585,9 @@ class TempDir:
 
     def __exit__(self, type, value, tb):
         if os.environ.get("DEBUG"):
-            if tb is not None:
-                print "=="
-                print "Not removing ", self._temp_dir
-                print "=="
-                return
-        rm(self._temp_dir)
+            ui.debug("Not removing ", self._temp_dir)
+        else:
+            rm(self._temp_dir)
 
 
 @contextlib.contextmanager
