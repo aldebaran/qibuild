@@ -116,7 +116,7 @@ def write_file_if_different(data, out_path, mode="w"):
         out_file.write(data)
 
 
-def _copy_link(src, dest, quiet):
+def _copy_link(src, dest, quiet=False):
     if not os.path.islink(src):
         raise qisys.error.Error("%s is not a link!" % src)
 
@@ -225,6 +225,8 @@ def install(src, dest, filter_fun=None, quiet=False):
         mess += '%s does not exist' % src
         raise qisys.error.Error(mess)
 
+    # Keep a copy to check if src is a file and a symlink
+    orig_src = to_native_path(src, normcase=False, realpath=False)
     src = to_native_path(src, normcase=False)
     dest = to_native_path(dest, normcase=False)
     ui.debug("Installing", src, "->", dest)
@@ -257,7 +259,10 @@ def install(src, dest, filter_fun=None, quiet=False):
         # We do not want to fail if dest exists but is read only
         # (following what `install` does, but not what `cp` does)
         rm(dest)
-        shutil.copy(src, dest)
+        if os.path.islink(orig_src):
+            _copy_link(orig_src, dest)
+        else:
+            shutil.copy(src, dest)
         installed.append(os.path.basename(src))
     return installed
 
@@ -511,7 +516,7 @@ def to_dos_path(path):
     return res
 
 
-def to_native_path(path, normcase=True):
+def to_native_path(path, normcase=True, realpath=True):
     """Return an absolute, native path from a path,
 
     :param normcase: make sure the path is all lower-case on
@@ -522,7 +527,8 @@ def to_native_path(path, normcase=True):
         path = os.path.normcase(path)
     path = os.path.normpath(path)
     path = os.path.abspath(path)
-    path = os.path.realpath(path)
+    if realpath:
+        path = os.path.realpath(path)
     if sys.platform.startswith("win"):
         path = to_dos_path(path)
     return path

@@ -35,6 +35,21 @@ def test_install_on_self(tmpdir):
         qisys.sh.install(tmpdir.strpath, tmpdir.strpath)
     assert "are the same directory" in e.value.message
 
+def test_install_symlink(tmpdir):
+   src = tmpdir.mkdir("src")
+   a = src.ensure("a", file=True)
+   b = src.join("b")
+   b.mksymlinkto("a")
+   dest = tmpdir.mkdir("dest")
+   a_dest = dest.join("a")
+   b_dest = dest.join("b")
+   qisys.sh.install(b.strpath, b_dest.strpath)
+   # Also install a so that b is not a broken symlink
+   qisys.sh.install(a.strpath, a_dest.strpath)
+   assert b_dest.check(file=True)
+   assert b_dest.islink()
+   assert b_dest.readlink() == "a"
+
 def test_filter_hidden(tmpdir):
     src = tmpdir.ensure("src", dir=True)
     src.join("a_file").ensure(file=True)
