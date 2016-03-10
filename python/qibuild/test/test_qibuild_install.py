@@ -61,18 +61,28 @@ def test_libsubfolder(qibuild_action, tmpdir):
     qibuild_action("configure", "libsubfolder")
     qibuild_action("make", "libsubfolder")
     qibuild_action("install", "libsubfolder", dest.strpath)
+    env_setter = qisys.envsetter.EnvSetter()
     # Make sure bar binary can run:
-    bar = dest.join("bin", "bar")
-    qisys.command.call([bar.strpath])
+    # (On Windows, need to fix %PATH%
+    if os.name == 'nt':
+        env_setter.prepend_to_path(dest.join("lib", "foo").strpath)
+    env = env_setter.get_build_env()
+    bar = qibuild.find.find_bin([dest.strpath], "bar")
+    qisys.command.call([bar], env=env)
     # Make sure foo-config.cmake is correct
     foo_config_cmake = dest.join("share", "cmake", "foo", "foo-config.cmake")
-    to_write = "\nmessage(STATUS ${FOO_LIBRARIES})\n"
+    to_write = "\nmessage(STATUS \"${FOO_LIBRARIES}\")\n"
     foo_config_cmake.write(to_write, mode="a")
     cmd = ["cmake", "-P", foo_config_cmake.strpath]
     output = subprocess.check_output(cmd)
-    # output looks like:
-    # -- /path/to/libfoo.so
-    libs_from_cmake = output.split()[1]
+    if os.name == "nt":
+        # output looks like:
+        # -- debug;/path/to/foo_d.lib;optimized;/path/to/foo.lib
+        libs_from_cmake = output.split( )[1].split(";")[1]
+    else:
+        # output looks like:
+        # -- /path/to/libfoo.so
+        libs_from_cmake = output.split()[1]
     assert os.path.exists(libs_from_cmake)
 
 def test_devel_components_installed_by_default(qibuild_action, tmpdir):
@@ -134,13 +144,14 @@ def test_fails_early(qibuild_action, tmpdir):
     qibuild_action("configure", "installme", "-DFAIL_NON_EXISTING=TRUE", raises=True)
 
 
+@skip_on_win
 def test_install_cross_unix_makefiles(qibuild_action, tmpdir):
     install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles")
 
+@skip_on_win
 def test_install_cross_ninja(qibuild_action, tmpdir):
     install_cross(qibuild_action, tmpdir, cmake_generator="Ninja")
 
-@skip_on_win
 def install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles"):
     if cmake_generator == "Ninja":
         ninja = qisys.command.find_program("ninja", raises=False)
@@ -177,6 +188,10 @@ def test_install_returns(qibuild_action, tmpdir):
     installme.configure()
     installme.build()
     installed = installme.install(dest.strpath, components=["devel", "runtime"])
+    if os.name == "nt":
+        py_path = 'lib/py/foo.py'
+    else:
+        py_path = 'lib/python2.7/site-packages/py/foo.py'
     assert set(installed) == {'share/data_star/foo.dat',
                               'share/data_star/bar.dat',
                               'include/relative/foo/foo.h',
@@ -185,7 +200,7 @@ def test_install_returns(qibuild_action, tmpdir):
                               'share/recurse/a_dir/a_file',
                               'share/sub/bar.dat',
                               'share/qi/path.conf',
-                              'lib/python2.7/site-packages/py/foo.py'}
+                              py_path}
 
 def test_install_test_libs(qibuild_action, tmpdir):
     installme = qibuild_action.add_test_project("installme")
@@ -300,8 +315,8 @@ def test_meta(qibuild_action, tmpdir):
     qibuild_action("configure", "top")
     qibuild_action("make", "top")
     qibuild_action("install", "--runtime", "top", dest.strpath)
-    assert dest.join("bin/spam").check(file=1)
-    assert dest.join("bin/eggs").check(file=1)
+    assert qibuild.find.find_bin([dest.strpath], "spam")
+    assert qibuild.find.find_bin([dest.strpath], "eggs")
 
     # Make sure no file has been created in the meta project sources:
     contents = qisys.sh.ls_r(top_proj.path)
@@ -313,8 +328,6 @@ def test_installing_tests(qibuild_action, tmpdir):
     qibuild_action("configure", "installme")
     qibuild_action("make", "installme")
     qibuild_action("install", "installme", dest.strpath)
-    contents = qisys.sh.ls_r(dest.strpath)
-    assert not "bin/test_foo" in contents
+    assert not qibuild.find.find_bin([dest.strpath], "test_foo", expect_one=False)
     qibuild_action("install", "--with-tests", "installme", dest.strpath)
-    contents = qisys.sh.ls_r(dest.strpath)
-    assert "bin/test_foo" in contents
+    assert qibuild.find.find_bin([dest.strpath], "test_foo", expect_one=True)

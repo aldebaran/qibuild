@@ -3,7 +3,7 @@ project(libsubfolder C)
 
 find_package(qibuild)
 
-qi_create_lib(foo foo.c SUBFOLDER foo)
+qi_create_lib(foo foo.c SHARED SUBFOLDER foo)
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
   set_target_properties(foo
