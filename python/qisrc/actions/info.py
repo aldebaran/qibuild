@@ -27,3 +27,5 @@ def do(args):
                    sep="\n")
     if manifest.groups:
         ui.info(ui.reset, "groups:", ui.bold, ", ".join(manifest.groups))
+    if not manifest.review:
+        ui.info(ui.brown, "Not using code review")
