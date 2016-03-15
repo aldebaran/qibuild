@@ -110,7 +110,7 @@ class DocBuilder(object):
 
         if clean:
             qisys.sh.rm(destdir)
-            qisys.sh.mkdir(destdir)
+            qisys.sh.mkdir(destdir, recursive=True)
 
         ui.info(ui.blue, "::", ui.reset, "Installing all projects")
         for i, project in enumerate(projects):
