@@ -39,10 +39,6 @@ def push_projects(git_projects, dry_run=False):
         else:
             push_remote = git_project.default_remote
         remote_ref = "%s/%s" % (push_remote.name, remote_branch)
-        display_changes(git, default_branch, remote_ref)
-        answer = qisys.interact.ask_yes_no("OK to push?", default=False)
-        if not answer:
-            return
         to_push = "%s:%s" % (default_branch, remote_branch)
         push_args = [push_remote.name, to_push]
         push_args.append("--force")
@@ -98,6 +94,11 @@ def get_forked_projects(git_projects, upstream_projects, branch):
     return res
 
 def rebase_project(git_project, upstream_project):
+    """ Rebase the development branch of the project on the
+    base branch (from upstream_project)
+
+    Returns True if everything went well and we need to push
+    """
     ok = check_local_branch(git_project)
     if not ok:
         return False
@@ -108,10 +109,10 @@ def rebase_project(git_project, upstream_project):
     status = qisrc.git.get_status(git, local_branch, upstream_ref)
     if status == "ahead":
         ui.info(ui.green, "[OK]", ui.reset, "already rebased")
-        return None
+        return True
     if status == "no-diff":
         ui.info(ui.green, "[OK]", ui.reset, "no diff")
-        return None
+        return True
     if status == "behind":
         rc, out = git.merge(upstream_ref, raises=False)
         if rc != 0:
@@ -144,27 +145,4 @@ def check_local_branch(git_project):
         ui.info(ui.brown, "[skipped] ", end="")
         ui.info("On %s, should be on %s" % (current_branch, local_branch))
         return False
-    remote_branch = git_project.default_branch.remote_branch
-    remote_name = git_project.default_remote.name
-    remote_ref = "%s/%s" % (remote_name, remote_branch)
-    status = qisrc.git.get_status(git, local_branch, remote_ref)
-    if status != "no-diff":
-        ui.info(ui.brown, "[skipped] ", end="")
-        if status == "ahead":
-            ui.info("You have changes not pushed yet")
-        elif status == "behind":
-            ui.info("Your branch is not up to date")
-        elif status == "diverged":
-            ui.info("Your branch has diverged")
-        return False
     return True
-
-def display_changes(git, remote_ref, branch_name):
-    rc, out = git.call("log", "--color", "--graph", "--abbrev-commit",
-                      "--pretty=format:%Cred%h%Creset " + \
-                                        "-%C(yellow)%d%Creset " + \
-                                        "%s %Cgreen(%cr) %C(bold blue) " + \
-                                        "<%an>%Creset",
-                        remote_ref, branch_name,
-                        raises=False)
-    ui.info(out)
