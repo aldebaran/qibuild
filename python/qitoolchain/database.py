@@ -187,8 +187,11 @@ class DataBase(object):
     def handle_package(self, package, feed):
         if package.url:
             self.download_package(package)
-        if package.directory:
+        elif package.directory:
             self.handle_local_package(package, feed)
+        else:
+            mess = "Package %s has no URL nor directory" % package.name
+            raise qisys.error.Error(mess)
 
     def handle_svn_package(self, svn_package):
         dest = os.path.join(self.packages_path, svn_package.name)

@@ -202,3 +202,16 @@ def test_replacing_svn_package(toolchain_db, feed, svn_server, record_messages):
 
     in_toolchain = toolchain.get_package("boost")
     assert in_toolchain.version == "1.56"
+
+def test_empty_url(tmpdir, feed):
+    feed = tmpdir.join("feed.xml")
+    feed.write("""
+<toolchain>
+  <package name="foo" url="" />
+</toolchain>
+""")
+    toolchain = qitoolchain.toolchain.Toolchain("bar")
+    # pylint:disable-msg=E1101
+    with pytest.raises(qisys.error.Error) as e:
+      toolchain.update(feed.strpath)
+    assert "no URL nor directory" in e.value.args[0]
