@@ -438,11 +438,17 @@ def extract(archive, directory, algo=None,
     directory = os.path.abspath(directory)
     archive   = qisys.sh.to_native_path(archive)
     archive   = os.path.abspath(archive)
-    if algo == "zip":
-        extract_location = _extract_zip(archive, directory, quiet, verbose,
-                                        strict_mode=strict_mode)
-    else:
-        extract_location = _extract_tar(archive, directory, algo, quiet, verbose)
+    try:
+        if algo == "zip":
+            extract_location = _extract_zip(archive, directory, quiet, verbose,
+                                            strict_mode=strict_mode)
+        else:
+            extract_location = _extract_tar(archive, directory, algo, quiet, verbose)
+    except EnvironmentError as e:
+        mess = "Error when extracting %s:\n" % archive
+        mess += str(e)
+        raise qisys.error.Error(mess)
+
     return extract_location
 
 
