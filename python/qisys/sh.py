@@ -319,12 +319,18 @@ def rm(name):
     """
     if not os.path.lexists(name):
         return
-    if os.path.isdir(name) and not os.path.islink(name):
-        ui.debug("Removing directory:", name)
-        rmtree(name)
-    else:
-        ui.debug("Removing", name)
-        os.remove(name)
+    try:
+        if os.path.isdir(name) and not os.path.islink(name):
+            ui.debug("Removing directory:", name)
+            rmtree(name)
+        else:
+            ui.debug("Removing", name)
+            os.remove(name)
+    except EnvironmentError as e:
+        # Catch both IOError and OSError
+        mess = "Error when removing %s:\n" % name
+        mess += str(e)
+        raise qisys.error.Error(mess)
 
 # Taken from gclient source code (BSD license)
 def rmtree(path):
