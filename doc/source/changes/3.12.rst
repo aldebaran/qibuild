@@ -231,3 +231,5 @@ cmake
 
   * Fix using ``intl`` on mac when ``gettext`` has been installed
     with ``homebrew``
+
+  * Support ``opencv3``.

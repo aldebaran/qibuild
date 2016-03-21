@@ -1,7 +1,0 @@
-v3.13
-======
-
-cmake
------
-
-* Support ``opencv3``.
