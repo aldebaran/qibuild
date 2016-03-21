@@ -1,0 +1,435 @@
+# Things to improve:
+# - Handle variadic positionals placed before mandatory positionals
+# - Find a mechanism for completing variadic positionals with holistic semantics
+#   (e.g. multiword commands)
+# - Find a way to complete quoted strings with spaces while keeping the overall
+#   mechanism generic
+# - Replace $HOME with ~ in path completions for compactness
+#
+# Notes:
+# - Some syntactical forms are ugly but required for ZSH up to 5.0.7 (e.g.
+#   declaring a local array).
+# - The __keysZSHCompat function is very uglyly made for iterating over the keys
+#   of a map in a way compatible with bash and ZSH.
+# - Quoting keys in associative arrays makes a difference
+
+if [ -n "$ZSH_VERSION" ]; then
+	autoload -Uz bashcompinit && bashcompinit
+fi
+
+__qiComplete() {
+	local IFS_BACKUP="$IFS"
+
+	# ──────────────────────────
+	# Setup completion variables
+
+	local cur prev words cword
+	_get_comp_words_by_ref -n : cur prev words cword
+
+	# ──────────────────
+	# Initialize parsing
+
+	local subcommands switches; local -a positionals; declare -A named
+	local command="${words[0]}"
+	__parseArgparseHelp $command
+
+	# ──────────────────────────────────────────────
+	# Parse/validate all words up to the current one
+
+	local expected_arg=""
+	local -a parsed_positionals
+
+	# Parse each word except the last/current one anyway; we need to find which
+	# sub-command parse is in charge of cword; there may be errors which make us
+	# want to stop completing. We are thus validating whole words here, and
+	# updating the current sub-command if necessary.
+	local i; for i in $(seq 1 $(expr $cword - 1)); do
+		local word="${words[$i]}"
+		if [ -n "$expected_arg" ]; then
+			# We're expecting the right-hand side of a named parameter (e.g. --param
+			# current_word). Bash completion breaks words not only at spaces, but also at =
+			# signs even inside words
+			if [ "$word" = '=' ]; then
+				continue
+			else
+				expected_arg=""
+			fi
+		elif [ ${#subcommands[@]} -gt 0 ] && __in "$word" "${subcommands[*]}"; then
+			# The parsed word is a known subcommand
+			command="$command $word"
+			__parseArgparseHelp $command
+			parsed_positionals=()
+		elif [ ${#named[@]} -gt 0 ] && __in "$word" "$(__keysZSHCompat named[*])"; then
+			# The parsed word is a named parameter
+			expected_arg="${named[$word]}"
+		elif [ ${#named[@]} -gt 0 ] && __inNamed "$word" "$(__keysZSHCompat named[*])"; then
+			# The parsed word is a short named parameter in prefix form (e.g. -j5)
+			expected_arg="${named[$word]}"
+		elif __freePositional; then
+			parsed_positionals+=("$word")
+		fi
+	done
+
+	# ─────────
+	# Debugging
+
+	if [ ! -z ${QI_COMPLETE_DEBUG+x} ]; then
+		echo
+		echo    '┌────────────────────────────┈┈┈'
+		echo    "│ Complete: ${words[*]}"
+		echo    "│ • Sub-commands: ${subcommands[*]}"
+		echo    "│ • Switches: ${switches[*]}"
+		echo    "│ • Positionals: ${positionals[*]}"
+		echo    "│ • Named parameters: $(__keysZSHCompat named[*])"
+		echo    "│ Parsed positionals: ${parsed_positionals[*]}"
+		echo -n '└────────────────────────────┈┈┈'
+	fi
+
+	# ─────────────────────────
+	# Complete the current word
+
+	local -a completion_candidates
+	local completed_parameter
+
+	if [ -z "$expected_arg" ]; then
+		completion_candidates+=(${subcommands[@]})
+		completion_candidates+=(${switches[@]})
+		completion_candidates+=($(__keysZSHCompat named[@]))
+		if __freePositional; then
+			completed_parameter="$(__parameterSpec2Name "$(__nextPositional)")"
+		fi
+	else
+		choices=($(echo "$expected_arg" | sed -rn 's/^\{(.+)\}/\1/p' | tr ',' ' '))
+		if [ ${#choices[@]} -gt 0 ]; then
+			completion_candidates+=(${choices[@]})
+		else
+			completed_parameter="$(__parameterSpec2Name "$expected_arg")"
+		fi
+	fi
+
+	# Dynamic parameter completion generation
+	if [ -n "$completed_parameter" ]; then
+		local -a command_components; command_components=($command)
+		local i; for i in $(seq ${#command_components[@]} -1 0); do
+			local -a subcommand; subcommand=(${command_components[*]:0:$i})
+			local -a key_components; key_components=("${subcommand[@]}"); key_components+=("$completed_parameter")
+			local key="${key_components[*]}"
+			local plugin="${__QICOMPLETE_PLUGINS["$key"]}"
+			if [ -n "$plugin" ]; then
+				local plugin_output="$(eval "$plugin" 2>/dev/null)"
+				[ $? -eq 0 ] && completion_candidates+=($plugin_output)
+				break
+			fi
+		done
+	fi
+
+	# ─────────────────────────
+	# Return completion results
+
+	# Remove all completions starting with - if $cur is empty and there are other completions
+	local any_nonoption
+	local -a cleaned_completion_candidates
+	local c
+	for c in ${completion_candidates[@]}; do [[ $c == -* ]] || any_nonoption="true"; done
+	if [ -z "$cur" ] && [ -n "$any_nonoption" ]; then
+		for c in ${completion_candidates[@]}; do
+			[[ $c == -* ]] || cleaned_completion_candidates+=("$c")
+		done
+	else
+		cleaned_completion_candidates="${completion_candidates[@]}"
+	fi
+
+	COMPREPLY=( $( compgen -W "${cleaned_completion_candidates[*]}" -- "$cur" ) )
+	__ltrim_colon_completions "$cur"
+} && {
+	complete -F __qiComplete {qibuild,qidoc,qijava,qilinguist,qisrc,qitoolchain,qipkg,qipy,qitest}
+}
+
+declare -A __QICOMPLETE_PLUGINS
+__QICOMPLETE_PLUGINS["HOME"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["WORKTREE"]=$'cat ~/.config/qi/qibuild.xml | grep -Po \'(?<=<worktree path=").+(?=")\''
+__QICOMPLETE_PLUGINS["GROUPS"]='qisrc list-groups | xargs | sed "s/ \*//g"'
+__QICOMPLETE_PLUGINS["PROJECT"]='qibuild list | grep -Po "(?<= \*  )\S+" | xargs'
+__QICOMPLETE_PLUGINS["PROJECTS"]="${__QICOMPLETE_PLUGINS["PROJECT"]}"
+__QICOMPLETE_PLUGINS["CONFIG"]='qibuild list-configs | grep -Po "(?<=^\* ).+" | xargs'
+__QICOMPLETE_PLUGINS["BUILD_TYPE"]='echo DEBUG RELEASE RELWITHDEBINFO MINSIZEREL'
+__QICOMPLETE_PLUGINS["NUM_CPUS"]="seq 0 $(nproc)"
+__QICOMPLETE_PLUGINS["TOOLCHAIN"]='qitoolchain list | grep -Po "(?<=^\* ).+" | xargs'
+__QICOMPLETE_PLUGINS["DESTDIR"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["directory"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["qibuild CONFIGS"]="${__QICOMPLETE_PLUGINS["CONFIG"]}"
+__QICOMPLETE_PLUGINS["qibuild rm-config name"]="${__QICOMPLETE_PLUGINS["CONFIG"]}"
+__QICOMPLETE_PLUGINS["qibuild set-default config"]="${__QICOMPLETE_PLUGINS["CONFIG"]}"
+__QICOMPLETE_PLUGINS["qibuild N"]="${__QICOMPLETE_PLUGINS["NUM_CPUS"]}"
+__QICOMPLETE_PLUGINS["qibuild NUM_JOBS"]="${__QICOMPLETE_PLUGINS["NUM_CPUS"]}"
+__QICOMPLETE_PLUGINS["qibuild PROFILES"]='qibuild list-profiles | grep -Po "(?<=^ \*  ).+$" | xargs'
+__QICOMPLETE_PLUGINS["qibuild PROJECT_NAME"]="${__QICOMPLETE_PLUGINS["PROJECT"]}"
+__QICOMPLETE_PLUGINS["qibuild PROJECTS"]="${__QICOMPLETE_PLUGINS["PROJECT"]}"
+__QICOMPLETE_PLUGINS["qibuild QITEST_JSONS"]="compgen -o filenames -A file -X '!qitest.json' -- \$cur"
+__QICOMPLETE_PLUGINS["qibuild ROOT_OUTPUT_DIR"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["qibuild deploy URLS"]='__qiDeployCompletion'
+__QICOMPLETE_PLUGINS["qibuild gen-cmake-module directory"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["qidoc LANGUAGE"]='' # TODO
+__QICOMPLETE_PLUGINS["qidoc open BROWSER"]="compgen -c | grep -E '^google-chrome.*$' -E '^firefox$' -E '^chromium$'"
+__QICOMPLETE_PLUGINS["qipkg pml_path"]="compgen -o filenames -A file -X '!*.pml' -- \$cur"
+__QICOMPLETE_PLUGINS["qipkg pkg_path"]="compgen -o filenames -A file -X '!*.pkg' -- \$cur"
+__QICOMPLETE_PLUGINS["qipkg bump-version manifest_xml"]="compgen -o filenames -A file -X '!manifest.xml' -- \$cur"
+__QICOMPLETE_PLUGINS["qipkg deploy-package URLS"]="${__QICOMPLETE_PLUGINS["qibuild deploy URLS"]}"
+__QICOMPLETE_PLUGINS["qipkg extract-package OUTPUT_PATH"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["qipy PYTHON"]="compgen -c | grep -E '^python[0-9.]+$'"
+__QICOMPLETE_PLUGINS["qisrc SRC"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["qisrc URL|PATH"]='' # TODO List git urls of projects on gitlab
+__QICOMPLETE_PLUGINS["qisrc BRANCH"]='git -C "$(qisrc info | head -1 | rev | cut -d" " -f2 | rev)/.qi/manifests/default"'" branch -r | grep -Po '(?<=origin/)(master|release|team).+' | xargs"
+__QICOMPLETE_PLUGINS["qisrc branch"]="${__QICOMPLETE_PLUGINS["qisrc BRANCH"]}"
+__QICOMPLETE_PLUGINS["qisrc xml_path"]="compgen -o filenames -A file -X '!*.xml' -- \$cur"
+__QICOMPLETE_PLUGINS["qisrc TEMPLATE_PATH"]="${__QICOMPLETE_PLUGINS["qisrc BRANCH"]}"
+__QICOMPLETE_PLUGINS["qisrc OUTPUT_DIR"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["qisrc manifest_url"]='echo git@gitlab.aldebaran.lan:qi/manifest.git'
+__QICOMPLETE_PLUGINS["qisrc init BRANCH"]='git -C "$(cat ~/.config/qi/qibuild.xml | grep -Po "(?<=<worktree path=\").+(?=\")" | head -1)/.qi/manifests/default" branch -r | grep -Po "(?<=origin/)(master|release|team).+" | xargs'
+__QICOMPLETE_PLUGINS["qisrc init GROUPS"]='qisrc list-groups -w "$(cat ~/.config/qi/qibuild.xml | grep -Po "(?<=<worktree path=\").+(?=\")" | head -1)" | xargs | sed "s/ \*//g"'
+__QICOMPLETE_PLUGINS["qisrc NAME"]='' # TODO Fetch a list of names from gitlab (cache?)
+__QICOMPLETE_PLUGINS["qisrc EMAIL"]='' # TODO Fetch a list of emails from gitlab (cache?)
+__QICOMPLETE_PLUGINS["qisrc REVIEWERS"]='' # TODO Fetch a list of emails from gitlab (cache?) and remove the domain part
+__QICOMPLETE_PLUGINS["qisrc TOPIC"]='' # TODO Fetch a list of topics from gerrit
+__QICOMPLETE_PLUGINS["qisrc TAG"]='git -C "$(qisrc info | head -1 | rev | cut -d" " -f2 | rev)/.qi/manifests/default" ls-remote --tags origin v\* | grep -Po "v.+$" | xargs'
+__QICOMPLETE_PLUGINS["qisrc SNAPSHOT"]='' # TODO Is a snapshot an xml file?
+__QICOMPLETE_PLUGINS["qisrc group"]="${__QICOMPLETE_PLUGINS["GROUPS"]}"
+__QICOMPLETE_PLUGINS["qisrc snapshot_path"]='compgen -o filenames -A file -- $cur'
+__QICOMPLETE_PLUGINS["qisrc N"]="${__QICOMPLETE_PLUGINS["NUM_CPUS"]}"
+__QICOMPLETE_PLUGINS["qisrc remove PATH"]='qisrc list | tr -s " " | cut -d " " -f4'
+__QICOMPLETE_PLUGINS["qitest QITEST_JSONS"]="${__QICOMPLETE_PLUGINS["qibuild QITEST_JSONS"]}"
+__QICOMPLETE_PLUGINS["qitest TEST_OUTPUT_DIR"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["qitest COVERAGE_OUTPUT_DIR"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["qitest ROOT_OUTPUT_DIR"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["qitest N"]="${__QICOMPLETE_PLUGINS["NUM_CPUS"]}"
+__QICOMPLETE_PLUGINS["qitoolchain TOOLCHAIN_NAME"]="${__QICOMPLETE_PLUGINS["TOOLCHAIN"]}"
+__QICOMPLETE_PLUGINS["qitoolchain PACKAGE_PATH"]="compgen -o filenames -A file -X '!*.zip' -- \$cur"
+__QICOMPLETE_PLUGINS["qitoolchain add-package PATH"]="${__QICOMPLETE_PLUGINS["qitoolchain PACKAGE_PATH"]}"
+__QICOMPLETE_PLUGINS["qitoolchain TOOLCHAIN_FEED"]="curl -s http://kiwi.aldebaran.lan/qi/toolchains/feeds/master/ | grep -Po '(?<=a href=\")[^<]+.xml(?=\">)' | sed -e 's#^#http://kiwi.aldebaran.lan/qi/toolchains/feeds/master/#'"
+__QICOMPLETE_PLUGINS["qitoolchain OUTPUT"]='compgen -o dirnames -- $cur'
+__QICOMPLETE_PLUGINS["qitoolchain package_path"]="${__QICOMPLETE_PLUGINS["qitoolchain PACKAGE_PATH"]}"
+__QICOMPLETE_PLUGINS["qitoolchain package_name"]="${__QICOMPLETE_PLUGINS["qitoolchain PACKAGE_PATH"]}"
+__QICOMPLETE_PLUGINS["qitoolchain name"]="${__QICOMPLETE_PLUGINS["qitoolchain TOOLCHAIN_NAME"]}"
+__QICOMPLETE_PLUGINS["qitoolchain NAME"]="${__QICOMPLETE_PLUGINS["qitoolchain TOOLCHAIN_NAME"]}"
+__QICOMPLETE_PLUGINS["qijava input_apk"]="compgen -o filenames -A file -X '!*.apk' -- \$cur"
+
+__qiDeployCompletion() {
+	# Asynchronously make avahi update results anyway; in this function we'll
+	# request only cached values for responsiveness
+	nohup avahi-browse -rt _naoqi._tcp >/dev/null & disown
+
+	local user="$(grep -Po "^[^@]*" <<< "$cur")"; user="${user:-nao}"
+	local host="$(grep -Po "(?<=${user}@)[^:]*" <<< "$cur")"
+	local deploy="$(grep -Po "(?<=${user}@${host}:).*$" <<< "$cur")"
+	if [[ ! "$cur" == *:* ]]; then
+		local -a hosts; hosts=($(avahi-browse -pct _naoqi._tcp | sed -r 's/^.*;([^;]+);[^;]+;([^;]+)$/\1.\2/'))
+		local -a qualified_hosts; qualified_hosts=($(for h in ${hosts[@]}; do echo "${user}@${h}"; done))
+		local -a remaining_hosts; remaining_hosts=()
+		local h; for h in ${qualified_hosts[@]}; do [[ $h == $cur* ]] && remaining_hosts+=($h); done
+
+		if [ ${#remaining_hosts[@]} -eq 1 ]; then
+			host="${remaining_hosts[0]#${user}@}"
+		else
+			echo "${qualified_hosts[*]}"
+			return
+		fi
+	fi
+	local -a deploys; deploys=($(sshpass -p nao ssh "$user@$host" -o UserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no 2>/dev/null -- compgen -o dirnames -- "$deploy"))
+	if [ ${#deploys[@]} -gt 0 ]; then
+		local -a qualified_deploys; qualified_deploys=($(for d in ${deploys[@]}; do echo "${user}@${host}:${d}"; done))
+		echo "${qualified_deploys[*]}"
+	else
+		echo "${user}@${host}"
+	fi
+}
+
+__qiProjectCompletion() {
+	COMPREPLY=($(compgen -W "$(qisrc list | grep '^ \*' | grep -oE '[^ ]+$' | sed 's#.*/##' | xargs)" -- "${COMP_WORDS[COMP_CWORD]}"))
+} && {
+	complete -F __qiProjectCompletion qicd
+}
+
+#──────────────────────────────────────────────────────────────────────────────#
+#                                   Helpers                                    #
+#──────────────────────────────────────────────────────────────────────────────#
+
+## $@: command the --help of which will be parsed (e.g. qibuild make)
+##
+## Warning: This function returns by setting variables in the caller's
+##          environment; declare subcommands, switches, positionals and named as
+##          local before calling this function to avoid polluting the global
+##          dictionary.
+__parseArgparseHelp() {
+	local command help usage; local -a named_raw
+	declare -Ag named
+	command="$@"
+	help=$($command --help)
+	usage=$(echo "$help" | sed -ne '/^usage:/,$ p' | sed -ne '1,/^$/p' | tr -d '\n' | sed -r 's/[[:space:]]{2,}/ /g' | sed "s/^.* $command //")
+
+	local IFS_BACKUP="$IFS"; IFS=' '
+	subcommands=($(echo "$usage" | sed -rn 's/^.+\{(.+)\}[^]]+$/\1/p' | tr ',' ' '))
+	switches=($(echo "$usage" | grep -Eo '\[(-\S+)\]'| tr -d '[]' | xargs))
+	named_raw=($(echo "$usage" | grep -Po '(?<=\[)-[^]]+ \S+(?=])|(?<=\s|^)-[^]\s]+ [^-[]\S*' | xargs))
+	IFS=$'\n';
+	positionals=($(echo "$usage" | sed -r 's/\s+-\S+\s+[^-]\S*//' | grep -Po '(?<=^|[[:space:]])\w+(?=[[:space:]]|$)|\[(\S+) \[\1 \.{3}\]\]|\[[^][-][^][]+\]' | xargs -0))
+	IFS="$IFS_BACKUP"
+
+	# Named parameters are described as --name PARAM pairs; return this as an
+	# associative array with names as keys and params as values.
+	local k; for k in $(__keysZSHCompat named[@]); do unset "named[$k]"; done
+	local i; for i in $(seq 0 2 $(expr ${#named_raw[@]} - 2)); do
+		named[${named_raw[$i]}]="${named_raw[$i+1]}"
+	done
+}
+
+__in() {
+	local -a list; list=($2)
+	local x; for x in ${list[@]}; do if [[ $x = $1 ]]; then return 0; fi; done
+	return 1
+}
+
+__inNamed() {
+	local -a list; list=($2)
+	local x; for x in ${list[@]}; do if [[ ! $1 =~ ^-- ]] && [[ $1 =~ ^$x ]]; then return 0; fi; done
+	return 1
+}
+
+__parameterSpec2Name() {
+	echo "$@" | sed -r 's/^\[(.+)\]$/\1/' | cut -d' ' -f1
+}
+
+## Warning: this function reads the parsed_positionals and positionals
+##          environement variables from the caller's environment dictionary.
+__nextPositional() {
+	local n_parsed=${#parsed_positionals[@]}; local n_positionals=${#positionals[@]}
+	if [ $n_parsed -ge $n_positionals ]; then
+		echo "${positionals[-1]}"
+	else
+		echo "${positionals[$n_parsed]}"
+	fi
+}
+
+## Tests whether there are free positionals, i.e. that the next word could fit.
+##
+## Warning: this function reads the parsed_positionals and positionals
+##          environement variables from the caller's environment dictionary.
+__freePositional() {
+	local n_parsed=${#parsed_positionals[@]}; local n_positionals=${#positionals[@]}
+	# Either we have less positionals then the total
+	if [ $n_parsed -lt $n_positionals ]; then return 0; fi
+	# Or the last one is of the form [X [X ...]]
+	if [ $n_positionals -gt 0 ] && [ $n_parsed -ge $n_positionals ] && grep -Eq '\.{3}' <<< "${positionals[-1]}"; then
+		return 0;
+	fi
+	return 1
+}
+
+#──────────────────────────────────────────────────────────────────────────────#
+#                               zsh compatibility                              #
+#──────────────────────────────────────────────────────────────────────────────#
+
+__keysZSHCompat() {
+	if [ -n "$ZSH_VERSION" ]; then
+		eval echo '${(@k)'"$1"'}'
+	else
+		eval echo '${!'"$1"'}'
+	fi
+}
+
+if [ -n "$ZSH_VERSION" ]; then
+	if ! type __ltrim_colon_completions >/dev/null 2>&1; then
+	__ltrim_colon_completions()
+	{
+	    if [[ "$1" == *:* && "$COMP_WORDBREAKS" == *:* ]]; then
+	        # Remove colon-word prefix from COMPREPLY items
+	        local colon_word=${1%"${1##*:}"}
+	        local i=${#COMPREPLY[*]}
+	        while [[ $((--i)) -ge 0 ]]; do
+	            COMPREPLY[$i]=${COMPREPLY[$i]#"$colon_word"}
+	        done
+	    fi
+	}
+	fi
+
+	# The following is taken as-is from /usr/share/bash-completion/completions/git
+
+	if ! type __git_reassemble_comp_words_by_ref >/dev/null 2>&1; then
+	__git_reassemble_comp_words_by_ref()
+	{
+	        local exclude i j first
+	        # Which word separators to exclude?
+	        cword_=$COMP_CWORD
+	        if [ -n "$COMP_WORDBREAKS" ]; then
+	                exclude="${1//[^${COMP_WORDBREAKS}]}"
+	        fi
+	        if [ -z "$exclude" ]; then
+	                words_=("${COMP_WORDS[@]}")
+	                return
+	        fi
+	        # List of word completion separators has shrunk;
+	        # re-assemble words to complete.
+	        for ((i=0, j=0; i < ${#COMP_WORDS[@]}; i++, j++)); do
+	                # Append each nonempty word consisting of just
+	                # word separator characters to the current word.
+	                first=t
+	                while
+	                        [ $i -gt 0 ] &&
+	                        [ -n "${COMP_WORDS[$i]}" ] &&
+	                        # word consists of excluded word separators
+	                        [ "${COMP_WORDS[$i]//[^$exclude]}" = "${COMP_WORDS[$i]}" ]
+	                do
+	                        # Attach to the previous token,
+	                        # unless the previous token is the command name.
+	                        if [ $j -ge 2 ] && [ -n "$first" ]; then
+	                                ((j--))
+	                        fi
+	                        first=
+	                        words_[$j]=${words_[j]}${COMP_WORDS[i]}
+	                        if [ $i = $COMP_CWORD ]; then
+	                                cword_=$j
+	                        fi
+	                        if (($i < ${#COMP_WORDS[@]} - 1)); then
+	                                ((i++))
+	                        else
+	                                # Done.
+	                                return
+	                        fi
+	                done
+	                words_[$j]=${words_[j]}${COMP_WORDS[i]}
+	                if [ $i = $COMP_CWORD ]; then
+	                        cword_=$j
+	                fi
+	        done
+	}
+	fi
+
+	if ! type _get_comp_words_by_ref >/dev/null 2>&1; then
+	_get_comp_words_by_ref ()
+	{
+	        local exclude cur_ words_ cword_
+	        if [ "$1" = "-n" ]; then
+	                exclude=$2
+	                shift 2
+	        fi
+	        __git_reassemble_comp_words_by_ref "$exclude"
+	        cur_=${words_[cword_]}
+	        while [ $# -gt 0 ]; do
+	                case "$1" in
+	                cur)
+	                        cur=$cur_
+	                        ;;
+	                prev)
+	                        prev=${words_[$cword_-1]}
+	                        ;;
+	                words)
+	                        words=("${words_[@]}")
+	                        ;;
+	                cword)
+	                        cword=$cword_
+	                        ;;
+	                esac
+	                shift
+	        done
+	}
+	fi
+fi
