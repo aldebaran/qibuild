@@ -534,7 +534,7 @@ class Git(object):
         # Fetch if necessary:
         rc, out = self.call("show-ref", ref, raises=False)
         if rc != 0:
-            self.fetch(remote)
+            self.fetch("--quiet", remote)
         # If it is still not here, do not use --track
         rc, out = self.call("show-ref", ref, raises=False)
         if rc == 0:
