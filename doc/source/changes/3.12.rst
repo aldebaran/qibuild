@@ -196,6 +196,17 @@ qisrc
 * Actually support orphaned projects. (The feature was documented but not
   implemented)
 
+* Simplify ``qisrc rebase``: it now does much less safety checks, which
+  renders the command actually usable. (Previously it was impossible to
+  run the command twice for instance).
+
+  Also, when used with ``--push`` always use ``--force`` (if you rebase
+  you *want* to rewrite history), so the ``--force`` option of
+  ``qisrc rebase`` is gone.
+
+  Lastly, ``qisrc rebase --push`` only pushes repositories that were
+  not already rebased.
+
 qisys
 -----
 

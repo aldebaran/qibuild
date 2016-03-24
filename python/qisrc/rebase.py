@@ -13,7 +13,7 @@ def rebase_worktree(git_worktree, git_projects, branch=None,
     if not git_projects:
         return
     upstream_projects = git_worktree.get_projects_on_branch(branch)
-    rebased_projects, errors = rebase_projects(git_projects, upstream_projects, branch)
+    to_push, errors = rebase_projects(git_projects, upstream_projects, branch)
     if errors:
         mess = "Failed to rebase some projects:\n"
         for git_project in errors:
@@ -22,13 +22,13 @@ def rebase_worktree(git_worktree, git_projects, branch=None,
         raise qisys.error.Error(mess)
 
     if push:
-        push_projects(rebased_projects, dry_run=dry_run)
-
+        push_projects(to_push, dry_run=dry_run)
 
 def push_projects(git_projects, dry_run=False):
     if not git_projects:
+        ui.info(ui.green, "Nothing to push")
         return
-    ui.info(ui.green, "Pushing ", len(git_projects), "projects")
+    ui.info(ui.green, "Pushing", len(git_projects), "projects")
     for i, git_project in enumerate(git_projects):
         default_branch = git_project.default_branch.name
         remote_branch = git_project.default_branch.remote_branch
@@ -51,25 +51,32 @@ def push_projects(git_projects, dry_run=False):
             ui.error(out)
 
 def rebase_projects(git_projects, upstream_projects, branch):
+    """ Rebase all the forked project on top of the upstream
+    branch
+
+    Return a tuple (to_push, errors)
+
+    """
     ui.info(ui.green, "Computing list of forked projects ...")
-    rebased_projects = list()
-    errors = list()
     forked_projects = get_forked_projects(git_projects, upstream_projects, branch)
     if not forked_projects:
         ui.info(ui.green, "Nothing to rebase")
         return list(), list()
     ui.info(ui.green, "Rebasing forked projects ...")
+    errors = list()
+    to_push = list()
     max_src = max(len(x.src) for x in forked_projects)
     for i, git_project in enumerate(forked_projects):
         ui.info_count(i, len(forked_projects),
                       git_project.src.ljust(max_src + 2), end="")
         upstream_project = upstream_projects[git_project.src]
-        status = rebase_project(git_project, upstream_project)
-        if status is True:
-            rebased_projects.append(git_project)
-        if status is False:
+        ok, rebased = rebase_project(git_project, upstream_project)
+        if not ok:
             errors.append(git_project)
-    return rebased_projects, errors
+        if rebased:
+            to_push.append(git_project)
+
+    return to_push, errors
 
 def get_forked_projects(git_projects, upstream_projects, branch):
     res = list()
@@ -97,11 +104,16 @@ def rebase_project(git_project, upstream_project):
     """ Rebase the development branch of the project on the
     base branch (from upstream_project)
 
-    Returns True if everything went well and we need to push
+    Returns a tuple (ok, should_push)
+
+    * ok is True if rebase went well (either the repo was already up-to-date,
+      or the rebase happened without conflicts)
+    * should_push is True if the repo should be pushed (useful to avoid
+      pushing already up-to-date repos)
     """
     ok = check_local_branch(git_project)
     if not ok:
-        return False
+        return False, False
     git = qisrc.git.Git(git_project.path)
     local_branch = git_project.default_branch.name
     upstream_branch = upstream_project.default_branch.name
@@ -109,28 +121,28 @@ def rebase_project(git_project, upstream_project):
     status = qisrc.git.get_status(git, local_branch, upstream_ref)
     if status == "ahead":
         ui.info(ui.green, "[OK]", ui.reset, "already rebased")
-        return True
+        return True, False
     if status == "no-diff":
         ui.info(ui.green, "[OK]", ui.reset, "no diff")
-        return True
+        return True, False
     if status == "behind":
         rc, out = git.merge(upstream_ref, raises=False)
         if rc != 0:
             ui.info(ui.red, "[FAILED]")
             ui.info(ui.red, "git merge failed\n" + out)
-            return False
+            return False, False
         ui.info(ui.green, "[OK]", ui.reset, "fast-forwarded")
-        return True
+        return True, True
     git.call("tag", "-f", "before-rebase", raises=False) # suppress output
     rc, out = git.call("rebase", upstream_ref, raises=False)
     if rc == 0:
         ui.info(ui.green, "[OK]", ui.reset, "rebased")
-        return True
+        return True, True
     else:
         ui.info(ui.red, "[FAILED]", ui.reset, "there was some conflicts")
         git.call("rebase", "--abort", raises=False)
         git.call("tag", "-d", "before-rebase", raises=False) # suppress output
-        return False
+        return False, False
 
 def check_local_branch(git_project):
     git = qisrc.git.Git(git_project.path)

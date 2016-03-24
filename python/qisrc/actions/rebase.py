@@ -15,12 +15,11 @@ def configure_parser(parser):
     qisys.parsers.project_parser(parser)
     parser.add_argument("--branch")
     parser.add_argument("--push", action="store_true",
-                        help="Push the rebased branch")
+                        help="Push the rebased branch. "
+                             "Warning: uses --fore, so be careful")
     parser.add_argument("--dry-run", action="store_true", dest="dry_run",
                         help="Dry run")
-    parser.add_argument("--force-run", action="store_false", dest="dry_run",
-                        help="Use push --force. Use with caution.")
-    parser.set_defaults(branch="master", push=False, dry_run=True)
+    parser.set_defaults(branch="master", push=False, dry_run=False)
 
 def do(args):
     branch = args.branch

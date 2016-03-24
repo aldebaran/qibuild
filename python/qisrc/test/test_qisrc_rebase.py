@@ -107,7 +107,7 @@ def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):
     git.fetch()
     git.push("origin", "devel")
     interact.answers = [True]
-    qisrc_action("rebase", "--branch", "master", "--push", "--force", "--all")
+    qisrc_action("rebase", "--branch", "master", "--push", "--all")
     local_sha1 = git.get_ref_sha1("refs/heads/devel")
     remote_sha1 = git.get_ref_sha1("refs/remotes/origin/devel")
     assert local_sha1 == remote_sha1
