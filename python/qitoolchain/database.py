@@ -111,6 +111,7 @@ class DataBase(object):
           and ``feeds/<name>.xml`` must exist on the given branch)
 
         """
+        ui.info(ui.green, "Updating from", ui.reset, ui.blue, feed)
 
         feed_parser = qitoolchain.feed.ToolchainFeedParser(self.name)
         feed_parser.parse(feed, branch=branch, name=name)
