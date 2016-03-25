@@ -134,3 +134,14 @@ qi_install_data(${CMAKE_BINARY_DIR}/path.conf SUBFOLDER "qi")
 
 # Avoid warning about unused variable:
 qi_persistent_set(QI_VIRTUALENV_PATH ${QI_VIRTUALENV_PATH})
+
+# Make sure cmake is re-run when qiproject.xml changes:
+set(_qiproject_xml "${CMAKE_SOURCE_DIR}/qiproject.xml")
+if(EXISTS "${_qiproject_xml}")
+  get_directory_property(_cmake_configure_depends "${CMAKE_SOURCE_DIR}")
+  _qi_list_append_uniq(_cmake_configure_depends ${_qiproject_xml})
+  set_directory_properties(
+    PROPERTIES
+      CMAKE_CONFIGURE_DEPENDS ${_cmake_configure_depends}
+  )
+endif()
