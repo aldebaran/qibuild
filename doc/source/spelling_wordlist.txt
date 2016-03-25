@@ -229,6 +229,7 @@ qtxmlpatterns
 qxt
 readme
 rebase
+rebased
 rebases
 rebasing
 recurse
