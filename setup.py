@@ -49,5 +49,5 @@ setup(name="qibuild",
             "qitest       = qisys.main:main",
             "qitoolchain  = qisys.main:main",
         ]
-    }
+      }
 )
