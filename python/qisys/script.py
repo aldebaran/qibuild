@@ -184,12 +184,13 @@ def message_from_exception(exeption):
 def _dump_arguments(name, args):
     """ Dump an argparser namespace to log """
     output = ""
-    keys = args.__dict__.keys()
+    as_dict = vars(args)
+    keys = as_dict.keys()
     keys.sort()
     max_len = max(len(k) for k in keys)
     keys.sort()
     for k in keys:
-        value = args.__dict__[k]
+        value = as_dict[k]
         output += "  " + k.ljust(max_len) + " = %s\n" % (value,)
     if output[-1] == "\n":
         output = output[:-1]
