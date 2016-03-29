@@ -113,6 +113,7 @@ Some string functions you will always use:
 * You can compute max/min/join on any iterator, so no need to create a list, a generator is enough:
   ``max(len(x) for x in myiterable)``
 
+
 Some more specific rules
 ------------------------
 
@@ -165,6 +166,15 @@ new optional argument *before* ``config``:
 
 The line in ``bar.py`` will call ``foo()`` with ``clean="linux32"``
 and ``config=None``, leading to interesting bugs.
+
+
+Note: this can be fixed in Python3 using something like:
+
+.. code-block:: python
+
+  def foo(project, *, clean=False):
+      pass
+
 
 
 Doc strings
@@ -618,6 +628,8 @@ If it's an *unexpected* error message, here is what you can do:
 * run qibuild with ``-v`` flag to display debug messages
 
 * run qibuild with ``--pdb`` to drop to a pdb session when an uncaught exception is raised.
+  (If you have ``IPython`` installed, you'll get the nice IPython build-in debugger for
+  free :)
 
 .. _qibuild-coding-guide-error-messages:
 
