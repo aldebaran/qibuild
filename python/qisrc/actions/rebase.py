@@ -16,7 +16,7 @@ def configure_parser(parser):
     parser.add_argument("--branch")
     parser.add_argument("--push", action="store_true",
                         help="Push the rebased branch. "
-                             "Warning: uses --fore, so be careful")
+                             "Warning: uses --force, so be careful")
     parser.add_argument("--dry-run", action="store_true", dest="dry_run",
                         help="Dry run")
     parser.set_defaults(branch="master", push=False, dry_run=False)
