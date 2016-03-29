@@ -33,8 +33,11 @@ setup(name="qibuild",
       py_modules=['qicd'],
       packages=find_packages("python"),
       package_dir={"": "python"},
-      include_package_data = True,
-      install_requires=["virtualenv"],
+      include_package_data=True,
+      install_requires=[
+          "virtualenv",
+          "packaging",
+      ],
       data_files=data_files,
       license="BSD",
       entry_points = {
