@@ -40,6 +40,10 @@ def test_deps(qibuild_action):
     # As should `qibuild configure --all`
     qibuild_action("configure", "-a")
 
+def test_error_when_using_dash_j(qibuild_action):
+    qibuild_action.add_test_project("world")
+    error = qibuild_action("configure", "world", "-j", "2", raises=True)
+    assert "unrecognized arguments" in error
 
 def test_qi_use_lib(qibuild_action):
     use_lib_proj = qibuild_action.add_test_project("uselib")
