@@ -161,6 +161,9 @@ class BuildProject(object):
                                             "CMAKE_BUILD_TYPE",
                                              default=default)
 
+    @property
+    def toolchain(self):
+        return self.build_config.toolchain
 
     @property
     def using_visual_studio(self):
@@ -241,6 +244,12 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         dep_cmake = os.path.join(self.build_directory, "dependencies.cmake")
         qisys.sh.write_file_if_different(to_write, dep_cmake)
 
+    def bootstrap(self):
+        qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
+        if self.toolchain:
+            qi_path_sdk_dirs.extend(package.path for package in self.toolchain.packages)
+        write_qi_path_conf(self.sdk_directory, qi_path_sdk_dirs)
+
     def configure(self, **kwargs):
         """ Delegate to :py:func:`qibuild.cmake.cmake` """
         # Need a copy because cmake_args will be modified by
@@ -258,6 +267,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         # Make DYLD_ variables also available at configure time
         # (Workaround OS X 10.11 not forwarding DYLD_ variables anymore)
         build_env = self.fix_env(self.build_env)
+        self.bootstrap()
         try:
             qibuild.cmake.cmake(self.path, self.build_directory,
                                 cmake_args, env=build_env, **kwargs)

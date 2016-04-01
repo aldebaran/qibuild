@@ -375,3 +375,12 @@ def test_running_cmake_for_the_first_time(qibuild_action, record_messages):
     record_messages.reset()
     qibuild_action("configure", "hello")
     assert not record_messages.find("CMake arguments changed")
+
+def test_dont_write_path_conf_if_configure_skip(qibuild_action):
+    stagepath_proj = qibuild_action.add_test_project("stagepath")
+    qibuild_action.add_test_project("usepath")
+    qibuild_action("configure", "usepath")
+    path_conf_first = read_path_conf(stagepath_proj)
+    qibuild_action("configure", "usepath")
+    path_conf_second = read_path_conf(stagepath_proj)
+    assert path_conf_first == path_conf_second

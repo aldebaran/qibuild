@@ -110,17 +110,6 @@ class CMakeBuilder(AbstractBuilder):
             if not project.meta:
                 project.write_dependencies_cmake(sdk_dirs, host_dirs=host_dirs)
 
-        qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
-        if self.toolchain:
-            qi_path_sdk_dirs.extend(package.path for package in self.toolchain.packages)
-
-        # path.conf must be written right before cmake is called, and with
-        # all the dependencies
-        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
-        for project in projects:
-            if not project.meta:
-                write_qi_path_conf(project.sdk_directory, qi_path_sdk_dirs)
-
     def get_sdk_dirs_for_project(self, project):
         sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "test"])
         if self.loose_deps_resolution:
