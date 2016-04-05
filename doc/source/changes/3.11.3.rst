@@ -1,0 +1,7 @@
+v3.11.3
+=======
+
+cmake
+-----
+
+* Fix using ``qi_get_git_version`` in some corner cases.

@@ -1,0 +1,17 @@
+v3.11.1
+=======
+
+qitoolchain
+-----------
+
+Small fixes in UI:
+
+* ``qitoolchain info`` : display git information
+* ``qitoolchain create``: fix using ``-b`` instead of ``--branch``
+* ``qitoolchain update``: allow using ``-b,--branch`` and ``--feed-name`` (same as ``qitoolchain create``)
+
+qipy
+----
+
+* Fix setting setting environment in ``qipy.venv.configure_virtualenv()``. This is
+  mostly useful when using the Python API for continuous integration

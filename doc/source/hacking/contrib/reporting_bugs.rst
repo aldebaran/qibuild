@@ -67,6 +67,20 @@ report :
   Please attach the .txt file in your current working directory to your bug report
   (review it for sensitive information first !)
 
+Special case: compilation issues
+++++++++++++++++++++++++++++++++
+
+When you have a compilation issue and can't figure out what is wrong,
+you will have to add even more information to your bug report.
+
+In particular, you should:
+
+* Run ``qibuild configure`` with ``--trace-cmake`` and attach
+  the ``cmake.log`` file generated in the build directory.
+
+* Run ``qibuild make --verbose-make -j1`` and send the full
+  output of the build.
+
 Open the request
 ----------------
 
