@@ -39,23 +39,20 @@ def read_install_manifest(filepath):
         res = [x.lstrip("/") for x in res]
         return res
 
-def write_qi_path_conf(directory, sdk_dirs, sdk_layout=True):
+def write_qi_path_conf(sdk_directory, sdk_dirs):
     """ Write the <build>/sdk/share/qi/path.conf file. This file
     can be used for instance by qi::path::find() functions, to
-    find files from the dependencies' build directories
+    find files from the dependencies' build directory
 
     """
     to_write = ""
     for sdk_dir in sdk_dirs:
         to_write += qisys.sh.to_posix_path(sdk_dir) + "\n"
 
-    if sdk_layout:
-        to_make = os.path.join(directory, "share", "qi")
-        qisys.sh.mkdir(to_make, recursive=True)
-        path_conf = os.path.join(to_make, "path.conf")
-    else:
-        path_conf = os.path.join(directory, "path.conf")
+    path_dconf = os.path.join(sdk_directory, "share", "qi")
+    qisys.sh.mkdir(path_dconf, recursive=True)
 
+    path_conf = os.path.join(path_dconf, "path.conf")
     with open(path_conf, "w") as fp:
         fp.write(to_write)
 
