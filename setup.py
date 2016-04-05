@@ -25,7 +25,7 @@ def get_qibuild_cmake_files():
 data_files = get_qibuild_cmake_files()
 
 setup(name="qibuild",
-      version="3.12rc2",
+      version="3.12rc3",
       description="The meta build framework",
       url="http://doc.aldebaran.com/qibuild",
       author="Aldebaran Robotics",
