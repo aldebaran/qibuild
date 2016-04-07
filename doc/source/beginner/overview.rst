@@ -69,14 +69,73 @@ qibuild is composed of two parts:
   taking dependencies into account and generate re-distributable binary
   packages.
 
+What makes qiBuild different ?
+++++++++++++++++++++++++++++++
 
-Is qibuild the only one build framework?
-++++++++++++++++++++++++++++++++++++++++
+The good parts
+~~~~~~~~~~~~~~
 
+* Full support for Visual Studio
 
-Of course not!
+* Full support for cross-compilation (hosts: linux, mac: targets : x86, arm, android, ...)
 
-You can have a loot at
+* Comes with a tool to use pre-compiled dependencies
+
+* No environment variables required, and keep your environment clean
+
+* Written in Python like many others but:
+
+  * Python2/Python3 compatible
+
+  * >80% test coverage
+
+  * Only pure-Python dependencies, for easier installation on Windows
+
+* Can find dependencies **from the sources**. For instance, in a worktree with
+  two different CMake projects , ``world`` and ``hello``, when compiling ``hello``,
+  we will find ``world`` headers directly from ``world`` sources.
+
+* Automatic install rules (you have to *explicitly* exclude targets from installation)
+
+* ``qibuild package --standalone`` generates an archive that is:
+
+  * relocatable
+
+  * and work across linux distributions
+
+* Full Python support : you can write Python code that use extensions written in C++
+  with ease, and run the C++ and the Python tests with the same tool
+
+* Each project build dir contains a nice ``sdk`` folder with files where you expect them
+  (``.dlls`` and ``.exe`` in ``sdk/bin``, ``.so`` in ``sdk/lib/`` and data in
+  ``sdk/share``)
+
+* You can deploy your code to a remote host via ``ssh`` and ``rsync``
+
+* You can also deploy or install your tests, and then only run them with
+  ``qitest``
+
+The bad parts
+~~~~~~~~~~~~~
+
+* Requires a :term:`worktree`. So it's useless if you have only one project.
+
+* Re-implements
+  `CMake build system
+  <https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html>`_
+
+* Cannot directly use upstream ``Find*.cmake``` files, especially if they
+  contained exported target (We have hacks for Qt5 because of this)
+
+* Generated ``-config.cmake`` files could be used by other CMake code, but they
+  contain a ``_DEPENDS`` variable that only ``qiBuild`` can understand.
+  Also, they use old-style ``*_INCLUDE_DIRS``, ``*_LIBRARIES`` variables instead
+  of modern exported targets
+
+qibuild compared to other build frameworks
++++++++++++++++++++++++++++++++++++++++++++
+
+Have a look at
 
 .. toctree::
    :maxdepth: 1

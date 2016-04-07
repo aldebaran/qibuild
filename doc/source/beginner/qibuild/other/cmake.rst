@@ -77,6 +77,31 @@ the library)
 Also note how easy it is to make sure that someone using bar will only depend on ``FOO_SPAM``,
 and not the whole ``FOO`` package.
 
+Note: ``CMake`` has evolved a lot since this section was written.
+
+Here's how the code looks like with modern CMake:
+(As explained in
+`CMake build system documentation
+<https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html>`_)
+
+.. code-block:: cmake
+
+    include(GNUInstallDirs)
+
+    find_package(foo COMPONENTS spam eggs)
+
+    add_library(bar bar.h bar.c)
+    target_include_directories(bar Foo::Spam)
+    target_link_libraries(bar Foo::Spam)
+
+    add_library(baz baz.h baz.c)
+
+    target_link_libraries(baz baz)
+
+    install(TARGETS baz EXPORT baz
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+
 
 CMake variables
 ---------------
