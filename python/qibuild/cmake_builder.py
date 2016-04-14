@@ -43,6 +43,9 @@ class CMakeBuilder(AbstractBuilder):
         if os.environ.get("QIBUILD_LOOSE_DEPS_RESOLUTION"):
             self.loose_deps_resolution = True
 
+        if os.environ.get("QIBUILD_STRICT_DEPS_RESOLUTION") in ["1", "true", "on"]:
+            self.loose_deps_resolution = False
+
         if self.loose_deps_resolution:
             ui.warning("You are using qibuild with loose dependency "
                        "resolution. It means your qiproject.xml may not be correct")
