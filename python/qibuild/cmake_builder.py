@@ -29,7 +29,7 @@ class CMakeBuilder(AbstractBuilder):
         else:
             self.projects = projects
         self.deps_solver = qibuild.deps.DepsSolver(build_worktree)
-        self.dep_types = ["build", "runtime"]
+        self.dep_types = ["build", "runtime", "test"]
 
         # Whether we ignore the qiproject.xml and always look for
         # -config.cmake files in all the packages of the toolchain.
@@ -164,16 +164,19 @@ Or configure the project with no config
 
     def pre_build(self, project):
         """ Called before building a project """
-        sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "runtime"])
+        sdk_dirs = self.deps_solver.get_sdk_dirs(project,
+                ["build", "runtime", "test"])
         paths = sdk_dirs[:]
-        packages = self.deps_solver.get_dep_packages([project], ["build", "runtime"])
+        packages = self.deps_solver.get_dep_packages([project],
+                ["build", "runtime", "test"])
         paths.extend([package.path for package in packages])
         project.fix_shared_libs(paths)
 
     def configure(self, *args, **kwargs):
         """ Configure the projects in the correct order """
         self.bootstrap_projects()
-        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+        projects = self.deps_solver.get_dep_projects(self.projects,
+                                                     ["build", "runtime", "test"])
 
         for i, project in enumerate(projects):
             ui.info_count(i, len(projects),
