@@ -15,6 +15,8 @@ if [[ "${TRAVIS_OS_NAME}" == "osx" ]] ; then
   brew install gettext
   # for qidoc tests
   brew install doxygen
+  # Upgrade pip
+  pip install pip --upgrade --user
 fi
 if [[ "${TRAVIS_OS_NAME}" == "linux" ]] ; then
   sudo apt-get update -qq

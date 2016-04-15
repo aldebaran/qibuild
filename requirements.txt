@@ -5,10 +5,14 @@ pylint==0.28
 
 # For running pyflakes and pylint
 # on a buildfarm (brings pep8 and pyflakes)
-flake8
+flake8==2.5.1
 
 # For driving CI (invoke is better than a makefile)
 invoke==0.12.0
+
+# Brought by sphinxcontrib-spelling, but buggy
+# in 1.9
+pbr==1.8.1
 
 # For releasing to Pypi
 twine==1.6.4
