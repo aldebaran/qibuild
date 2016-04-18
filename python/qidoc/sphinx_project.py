@@ -211,17 +211,17 @@ class SphinxProject(qidoc.project.DocProject):
         if build_type:
             os.environ["build_type"] = build_type
         ui.debug("launching:", cmd)
+        output_txt = os.path.join(self.build_dir, "spellcheck", "output.txt")
         rc = 0
         try:
             sphinx.main(argv=cmd)
         except SystemExit as e:
             rc = e.code
-        if spellcheck:
-            num_errors = get_num_spellcheck_errors(self.build_dir)
-            if num_errors != 0:
-                raise SphinxBuildError(self)
         if rc != 0:
-            raise SphinxBuildError(self)
+            if spellcheck:
+                raise SpellingErrors(output_txt)
+            else:
+                raise SphinxBuildError(self)
 
     def generate_examples_zips(self):
         for example_src in self.examples:
@@ -280,22 +280,29 @@ class SphinxProject(qidoc.project.DocProject):
 
         qisys.sh.install(self.html_dir, destdir)
 
-def get_num_spellcheck_errors(build_dir):
-    output_txt = os.path.join(build_dir, "spellcheck", "output.txt")
-    res = 0
-    if not os.path.exists(output_txt):
-        return 1  # so that we raise SphinxBuildError
-    with open(output_txt, "r") as fp:
-        lines = fp.readlines()
-        res = len(lines)
-    if res != 0:
-        ui.error("Found %i spelling error(s). See %s for the details" %
-                 (res, output_txt))
-    return res
 
 class SphinxBuildError(qisys.error.Error):
     def __str__(self):
         return "Error occurred when building doc project: %s" % self.args[0].name
+
+class SpellingErrors(SphinxBuildError):
+    def __init__(self, output_txt):
+        self.output_txt = output_txt
+
+    def __str__(self):
+        with open(self.output_txt, "r") as fp:
+            lines = fp.readlines()
+        num_errors = len(lines)
+        res = "Found %s spelling error" % num_errors
+        if num_errors > 1:
+            res += "s"
+        res += "\n"
+        # Do not flood the user with too much data:
+        if num_errors > 25:
+            return res
+        else:
+            res += "".join(lines)
+            return res
 
 class UnknownLingua(qisys.error.Error):
     def __init__(self, project, language):

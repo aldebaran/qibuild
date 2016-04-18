@@ -65,8 +65,10 @@ class DocBuilder(object):
         """
         projects = self.get_dep_projects()
         for i, project in enumerate(projects):
-            ui.info_count(i, len(projects),
-                          ui.green, "Building", ui.blue, project.name)
+            message = (ui.green, "Building", ui.blue, project.name)
+            if self.spellcheck:
+                message += (ui.reset, ui.bold, "(with spell checking)")
+            ui.info_count(i, len(projects), *message)
             project.build(werror=self.werror, build_type=self.build_type,
                           spellcheck=self.spellcheck, language=self.language,
                           pdb=pdb)
