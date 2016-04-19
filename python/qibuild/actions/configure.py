@@ -7,14 +7,14 @@
 """
 
 from qisys import ui
-
+import qisys.parsers
 import qibuild.cmake
 import qibuild.parsers
 
 def configure_parser(parser):
     """Configure parser for this action"""
+    qisys.parsers.build_parser(parser)
     qibuild.parsers.cmake_configure_parser(parser)
-    qibuild.parsers.cmake_build_parser(parser)
     qibuild.parsers.project_parser(parser)
     if not parser.epilog:
         parser.epilog = ""
