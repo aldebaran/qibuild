@@ -37,4 +37,3 @@ def do(args):
     else:
         ui.info("Would remove toolchain", ui.blue, tc.name)
         ui.info("Use --force to actually remove it.")
-        return
