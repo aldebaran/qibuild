@@ -2,7 +2,12 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
-""" Build host tools projects """
+"""Build host tools projects
+
+Usage:
+    cd /project/that/needs/host/tools
+    qibuild make-host-tools
+"""
 
 import qibuild.parsers
 
