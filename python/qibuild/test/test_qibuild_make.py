@@ -86,8 +86,14 @@ def test_codegen_happy(qibuild_action):
 def test_codegen_fail_when_generating_command_fails(qibuild_action):
     qibuild_action.add_test_project("codegen")
     qibuild_action("configure", "codegen", "-DFAIL=TRUE")
-    error = qibuild_action("make", "codegen", "--verbose-make", raises=True)
-    assert error
+    # Bug in pytest, with pytest.raises() pytest fails with:
+    # ExceptionInfo object has no attribute 'typename'
+    # (but only when used with the xdist plugin on Windows)
+    try:
+        qibuild_action("make", "codegen", "--verbose-make")
+        pytest.fail("Build should have fail")
+    except qibuild.build.BuildFailed:
+        pass
 
 def test_depend_on_the_generator_command(qibuild_action):
     project = qibuild_action.add_test_project("codegen")
@@ -104,9 +110,7 @@ def test_depend_on_the_generator_command(qibuild_action):
     # command and thus fail the build
     now = time.time()
     os.utime(gen_py, (now + 10, now + 10))
-    # Bug in pytest, with pytest.raises() pytest fails with:
-    # ExceptionInfo object has no attribute 'typename'
-    # (but only when used with the xdist plugin)
+    # Se above for why we do not use with pytest.raise()
     try:
         qibuild_action("make", "codegen")
         # pylint: disable-msg=E1101
