@@ -24,13 +24,13 @@ def configure_parser(parser):
 
 def do(args):
     python_builder = qipy.parsers.get_python_builder(args)
-    res = python_builder.python_worktree.bin_path("activate")
+    res = python_builder.python_worktree.bin_path("activate", win_extension=".bat")
     if not os.path.exists(res):
         mess = """\
 Could not find 'activate' script.
 (%s does not exist)
 Make sure to call `qipy bootstrap` first
-"""
+""" % res
         raise qisys.error.Error(mess)
 
     if os.name == "nt":
