@@ -3,16 +3,22 @@ project(foo)
 
 find_package(qibuild)
 
-set(_out ${CMAKE_BINARY_DIR}/main.cpp)
+set(_out "${CMAKE_BINARY_DIR}/main.cpp")
 set(_cmd
-  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/gen.py
-          ${CMAKE_CURRENT_SOURCE_DIR}/main.in.cpp
-          ${_out}
-          DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gen.py
+    python "${CMAKE_CURRENT_SOURCE_DIR}/gen.py"
+           "${CMAKE_CURRENT_SOURCE_DIR}/main.in.cpp"
+           "${_out}"
 )
-if(FAIL)
+if(DEFINED FAIL)
   list(APPEND _cmd "--fail")
+  message(STATUS "Build should fail")
+else()
+  message(STATUS "Build should succeed")
 endif()
 
-qi_generate_src(${_out} SRC main.in.cpp COMMAND ${_cmd})
-qi_create_bin(test_foo ${_out})
+qi_generate_src(${_out}
+    SRC main.in.cpp
+    COMMAND ${_cmd}
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/gen.py"
+)
+qi_create_bin(test_foo "${_out}")

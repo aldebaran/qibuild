@@ -1,10 +1,19 @@
-import sys
+from __future__ import print_function
+
+import argparse
 import shutil
+import sys
 
-input = sys.argv[1]
-output = sys.argv[2]
+print("sys.argv:", "\n".join(sys.argv))
+parser = argparse.ArgumentParser()
+parser.add_argument("input")
+parser.add_argument("output")
+parser.add_argument("--fail", action="store_true")
+parser.set_defaults(fail=False)
+args = parser.parse_args()
 
-shutil.copy(input, output)
+print(args.input, "->", args.output)
+shutil.copy(args.input, args.output)
 
-if len(sys.argv) > 3:
+if args.fail:
     sys.exit("gen.py failed")
