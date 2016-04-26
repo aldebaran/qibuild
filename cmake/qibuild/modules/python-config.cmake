@@ -4,10 +4,20 @@
 
 clean(PYTHON)
 # first, use fpath flib to get python from one of our pre-compiled packages
-# note than we patch Python.h to NOT autolink with python27_d.lib,
-# which prevent us from using boost_python
+# note that we patch Python.h to NOT autolink with python27_d.lib,
+# which prevents us from using boost_python
 fpath(PYTHON Python.h PATH_SUFFIXES "python2.7")
-flib(PYTHON NAMES python27 python2.7 Python)
+
+# LIBPATH is set by ShiningPanda (among others), so use it:
+if(DEFINED ENV{LIBPATH})
+  # Note: using NO_DEFAULT_PATH in order to not search in
+  # /System/Library or /Library ...
+  flib(PYTHON NAMES python27 python2.7 PATHS $ENV{LIBPATH}
+         NO_DEFAULT_PATH)
+else()
+  # Note: 'Python' is used on Mac to find the .framework ...
+  flib(PYTHON NAMES python27 python2.7 Python)
+endif()
 set(_python_deps)
 if(UNIX)
   list(APPEND _python_deps PTHREAD)
@@ -35,4 +45,3 @@ if(NOT PYTHON_LIBRARIES OR NOT PYTHON_INCLUDE_DIRS)
   endif()
 endif()
 export_lib(PYTHON)
-
