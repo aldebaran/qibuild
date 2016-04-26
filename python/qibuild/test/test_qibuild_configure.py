@@ -348,7 +348,8 @@ def test_skips_configure(qibuild_action, record_messages):
         # but world should be skipped
         assert len(mock_call.call_args_list) == 1
     world_cmake = os.path.join(world_proj.path, "CMakeLists.txt")
-    os.utime(world_cmake, None)
+    now = time.time()
+    os.utime(world_cmake, (now + 10, now + 10))
     record_messages.reset()
     with mock.patch("qisys.command.call") as mock_call:
         qibuild_action("configure", "hello")
