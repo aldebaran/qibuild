@@ -21,10 +21,18 @@ import qibuild.parsers
 def configure_parser(parser):
     qisys.parsers.project_parser(parser)
     qibuild.parsers.cmake_build_parser(parser)
+    if os.name == "nt":
+        parser.add_argument("--mingw", action="store_true",
+                          help="To be used from MinGW")
+    parser.set_defaults(mingw=False)
 
 def do(args):
     python_builder = qipy.parsers.get_python_builder(args)
-    res = python_builder.python_worktree.bin_path("activate", win_extension=".bat")
+    if args.mingw:
+        win_extension=""
+    else:
+        win_extension=".bat"
+    res = python_builder.python_worktree.bin_path("activate", win_extension=win_extension)
     if not os.path.exists(res):
         mess = """\
 Could not find 'activate' script.
@@ -33,7 +41,7 @@ Make sure to call `qipy bootstrap` first
 """ % res
         raise qisys.error.Error(mess)
 
-    if os.name == "nt":
+    if args.mingw:
         res = qisys.sh.to_posix_path(res, fix_drive=True)
 
     print res
