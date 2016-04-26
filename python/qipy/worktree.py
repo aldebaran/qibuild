@@ -60,12 +60,12 @@ Found two projects with the same name. (%s)
         else:
             return None
 
-    def bin_path(self, name):
+    def bin_path(self, name, win_extension=".exe"):
         """ Path to the virtualenv's binaries """
         binaries_path = virtualenv.path_locations(self.venv_path)[-1]
         res = os.path.join(binaries_path, name)
         if os.name == "nt":
-            res += ".exe"
+            res += win_extension
         return res
 
     @property
