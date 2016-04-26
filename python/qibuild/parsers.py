@@ -196,6 +196,11 @@ marked as a host config\
     build_worktree = get_build_worktree(args)
     if host_config:
         build_worktree.set_active_config(host_config)
+    # Don't build tests for host tools except if user specified otherwise
+    cmake_flags = build_worktree.build_config.user_flags
+    if not any(flag[0].startswith("QI_WITH_TESTS") for flag in cmake_flags):
+        cmake_flags.append(("QI_WITH_TESTS", "OFF"))
+
     host_projects = get_host_projects(build_worktree, args)
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, host_projects)
     return cmake_builder
