@@ -325,6 +325,9 @@ def rm(name):
             rmtree(name)
         else:
             ui.debug("Removing", name)
+            # On Windows, we need write permission to remove a file
+            if sys.platform == 'win32':
+                os.chmod(name, stat.S_IWRITE)
             os.remove(name)
     except EnvironmentError as e:
         # Catch both IOError and OSError
