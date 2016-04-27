@@ -8,11 +8,12 @@ clean(PYTHON)
 # which prevents us from using boost_python
 fpath(PYTHON Python.h PATH_SUFFIXES "python2.7")
 
-# LIBPATH is set by ShiningPanda (among others), so use it:
-if(DEFINED ENV{LIBPATH})
+# Make sure to find the correct libraries when used in
+# a virtualenv:
+if(DEFINED ENV{VIRTUAL_ENV})
   # Note: using NO_DEFAULT_PATH in order to not search in
   # /System/Library or /Library ...
-  flib(PYTHON NAMES python27 python2.7 PATHS $ENV{LIBPATH}
+  flib(PYTHON NAMES python27 python2.7 PATHS $ENV{VIRTUAL_ENV}/lib
          NO_DEFAULT_PATH)
 else()
   # Note: 'Python' is used on Mac to find the .framework ...

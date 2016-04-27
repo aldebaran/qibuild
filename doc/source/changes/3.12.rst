@@ -245,5 +245,4 @@ cmake
 
   * Support ``opencv3``.
 
-  * Fix finding Python libraries on Mac when run from
-    `ShiningPanda <https://wiki.jenkins-ci.org/display/JENKINS/ShiningPanda+Plugin>`_
+  * Fix finding Python libraries on Mac when run from a ``virtualenv``
