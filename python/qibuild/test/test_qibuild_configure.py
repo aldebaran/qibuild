@@ -40,6 +40,18 @@ def test_deps(qibuild_action):
     # As should `qibuild configure --all`
     qibuild_action("configure", "-a")
 
+def test_single(qibuild_action, record_messages):
+    # We need to configure world at least once before testing
+    # anything
+    qibuild_action.add_test_project("world")
+    qibuild_action.add_test_project("hello")
+    qibuild_action("configure", "hello")
+
+    # Now make sure `qibuild configure -s` works:
+    record_messages.reset()
+    qibuild_action("configure", "hello", "--single")
+    assert not record_messages.find("world")
+
 
 def test_qi_use_lib(qibuild_action):
     use_lib_proj = qibuild_action.add_test_project("uselib")

@@ -39,4 +39,5 @@ def do(args):
                             debug_trycompile=args.debug_trycompile,
                             trace_cmake=args.trace_cmake,
                             profiling=args.profiling,
-                            summarize_options=args.summarize_options)
+                            summarize_options=args.summarize_options,
+                            single=args.single)
