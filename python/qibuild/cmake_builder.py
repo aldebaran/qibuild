@@ -167,8 +167,13 @@ Or configure the project with no config
     def configure(self, *args, **kwargs):
         """ Configure the projects in the correct order """
         self.bootstrap_projects()
-        projects = self.deps_solver.get_dep_projects(self.projects,
-                                                     ["build", "runtime", "test"])
+        if kwargs.get("single"):
+            projects = self.projects
+        else:
+            projects = self.deps_solver.get_dep_projects(self.projects,
+                                                        ["build", "runtime", "test"])
+        # Make sure to not pass the 'single' option to project.configure()
+        kwargs.pop("single", None)
 
         for i, project in enumerate(projects):
             ui.info_count(i, len(projects),
