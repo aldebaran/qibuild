@@ -3,6 +3,8 @@
 ## found in the COPYING file.
 
 import qibuild.find
+import pytest
+import qisys
 
 def test_make_host_tools(qibuild_action, fake_ctc):
     footool_proj = qibuild_action.add_test_project("footool")
@@ -39,3 +41,12 @@ def test_using_dash_all(qibuild_action):
     qibuild_action.add_test_project("usefootool")
     qibuild_action("make-host-tools", "--all")
     qibuild_action("configure", "usefootool")
+
+def test_not_building_host_tool_tests(qibuild_action):
+    footool_proj = qibuild_action.add_test_project("footool")
+    qibuild_action.add_test_project("usefootool")
+    qibuild_action("make-host-tools", "usefootool")
+    qibuild_action("configure", "usefootool")
+    # pylint: disable-msg=E1101
+    with pytest.raises(qibuild.find.NotFound):
+        qibuild.find.find_bin([footool_proj.sdk_directory], "test_footool")

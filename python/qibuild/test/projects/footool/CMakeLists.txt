@@ -9,3 +9,4 @@ find_package(qibuild)
 qi_create_bin(footool "footool.cpp")
 qi_stage_bin(footool)
 
+qi_create_test(test_footool test_footool.cpp)
