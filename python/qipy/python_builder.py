@@ -76,7 +76,7 @@ export PYTHONPATH="${SDK_DIR}/lib/python2.7/site-packages${PYTHONPATH:+:$PYTHONP
 exec python "$@"
 """
         python_wrapper = os.path.join(dest, "python")
-        with open(python_wrapper, "w") as fp:
+        with open(python_wrapper, "wb") as fp:
             fp.write(to_write)
         os.chmod(python_wrapper, 0755)
 
