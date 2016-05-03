@@ -17,7 +17,7 @@ class Toolchains():
     """ A class to help qitoolchain testing """
     def __init__(self):
         tmpdir = tempfile.mkdtemp(prefix="test-qitoolchain")
-        # /tmp is a symlink on mac, leading to all kind of "interesting" 
+        # /tmp is a symlink on mac, leading to all kind of "interesting"
         # problems
         # pylint: disable-msg=E1101
         self.tmp = py.path.local(tmpdir).realpath()
