@@ -238,6 +238,10 @@ cmake
 * ``qi_swig_wrap_python`` : add ``NO_CPLUSPLUS`` to allow
   building ``swig`` extensions as ``C`` code. Default is ``C++``
 
+* ``qi_add_optional_package(FOO)`` used to be behave incorrectly
+  when ``WITH_FOO`` was enabled.
+  More precisely, dependencies were ignored, leading to compile failures.
+
 * Modules:
 
   * Fix using ``intl`` on mac when ``gettext`` has been installed

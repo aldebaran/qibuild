@@ -46,6 +46,8 @@ function(qi_add_optional_package name)
       # re-find the package, in case the
       # -config contains some macros:
       find_package("${_U_name}" QUIET)
+      # re-set PACKAGE_FOUND to not break qi_use_lib
+      qi_persistent_set(${_U_name}_PACKAGE_FOUND FALSE)
     else()
       # user forced WITH_* to OFF:
       return()

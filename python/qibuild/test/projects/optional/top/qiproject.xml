@@ -1,0 +1,5 @@
+<project format="3">
+  <qibuild name="top">
+    <depends buildtime="true" runtime="true" names="foo" />
+  </qibuild>
+</project>

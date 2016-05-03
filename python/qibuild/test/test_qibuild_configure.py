@@ -407,3 +407,29 @@ def test_dont_write_path_conf_if_configure_skip(qibuild_action):
     qibuild_action("configure", "usepath")
     path_conf_second = read_path_conf(stagepath_proj)
     assert path_conf_first == path_conf_second
+
+def extract_and_add(tmpdir, toolchain,  package_path):
+    package = qitoolchain.qipackage.from_archive(package_path)
+    dest = tmpdir.mkdir(package.name)
+    qitoolchain.qipackage.extract(package_path, dest.strpath)
+    package.path = dest.strpath
+    toolchain.add_package(package)
+
+def test_optional_package(qibuild_action, toolchains, tmpdir):
+    spam_toolchain = toolchains.create("spam")
+    qibuild.config.add_build_config("spam", toolchain="spam")
+
+    bar_project = qibuild_action.add_test_project("optional/bar")
+    foo_project = qibuild_action.add_test_project("optional/foo")
+    qibuild_action.add_test_project("optional/top")
+    bar_package_path = qibuild_action("package", "bar")
+    foo_package_path = qibuild_action("package", "foo")
+
+    extract_and_add(tmpdir, spam_toolchain, bar_package_path)
+    extract_and_add(tmpdir, spam_toolchain, foo_package_path)
+    qisys.sh.rm(bar_project.path)
+    qisys.sh.rm(foo_project.path)
+    qibuild_action("configure", "top", "--config", "spam", "-DWITH_FOO=ON")
+    # it works if you don't set WITH_FOO ...
+    #qibuild_action("configure", "top", "--config", "spam")
+    qibuild_action("make", "top", "--config", "spam", "--verbose-make")
