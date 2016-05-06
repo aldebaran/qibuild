@@ -684,8 +684,8 @@ The following tools were not found: {missing}\
 
     def _add_scm_info(self, package_xml_root):
         worktree = self.build_worktree.worktree
-        git_worktreee = qisrc.worktree.GitWorkTree(worktree)
-        git_projects = git_worktreee.git_projects
+        git_worktree = qisrc.worktree.GitWorkTree(worktree)
+        git_projects = git_worktree.git_projects
         parent_git_project = qisys.parsers.find_parent_project(git_projects, self.path)
         if not parent_git_project:
             return

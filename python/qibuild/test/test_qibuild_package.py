@@ -6,6 +6,7 @@ import os
 import qisys.archive
 import qisys.qixml
 import qisrc.license
+import qisrc.git
 import qibuild.config
 import qitoolchain.qipackage
 
@@ -96,3 +97,17 @@ def test_setting_version_from_cmdline(qibuild_action):
     world_package = qibuild_action("package", "world", "--version", "0.42")
     basename = os.path.basename(world_package)
     assert "0.42" in basename
+
+
+def test_package_project_not_in_manifest(build_worktree, qibuild_action):
+    this_dir = os.path.dirname(__file__)
+    src_path = os.path.join(this_dir, "projects", "world")
+    dest_path = os.path.join(build_worktree.root, "world")
+    qisys.sh.copy_git_src(src_path, dest_path)
+    # Init the project so that it's considered a git project not in manifest
+    # (as if it was cloned manually in a worktree)
+    git = qisrc.git.Git(dest_path)
+    git.init()
+    git.commit("--allow-empty", "-m", "init")
+    qibuild_action.chdir(dest_path)
+    qibuild_action("package")

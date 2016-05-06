@@ -69,6 +69,8 @@ class GitProject(object):
         the first time
 
         """
+        if self.default_remote is None:
+            return None
         return self.default_remote.url
 
     @property
