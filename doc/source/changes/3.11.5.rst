@@ -1,0 +1,7 @@
+v3.11.5
+=======
+
+cmake
+-----
+
+* Add ``Qt5AndroidExtras``
