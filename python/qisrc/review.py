@@ -137,7 +137,7 @@ def setup_project(project):
 
 
 def push(project,  local_ref, remote_branch, bypass_review=False, dry_run=False,
-         reviewers=None, topic=None, draft=False, force=False):
+         reviewers=None, topic=None, draft=False):
     """ Push the changes for review.
 
     Unless review is False, in this case, simply update
@@ -151,8 +151,6 @@ def push(project,  local_ref, remote_branch, bypass_review=False, dry_run=False,
     args = list()
     if dry_run:
         args.append("--dry-run")
-    if force:
-        args.append("--force")
     args.append(review_remote.url)
     if bypass_review:
         args.append("%s:%s" % (local_ref, remote_branch))
