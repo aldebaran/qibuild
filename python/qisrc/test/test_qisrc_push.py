@@ -5,6 +5,8 @@
 import qisys.command
 import qisys.sh
 import qisrc.git
+import qisys.command
+import pytest
 
 from qisrc.test.conftest import TestGitWorkTree, TestGit
 
@@ -49,6 +51,57 @@ def test_using_dash_y(qisrc_action, git_server):
     _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
     (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
     assert remote == "%s\trefs/heads/master" % sha1
+
+def test_using_dash_f_without_review(qisrc_action, git_server):
+    foo_repo = git_server.create_repo("foo.git")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    foo_git = TestGit(foo_proj.path)
+    foo_git.commit_file("a.txt", "a")
+    qisrc_action("push",  "--project", "foo", "-y")
+    _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
+    (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
+
+    foo_git.commit("--amend", "-mfoobar")
+    _, new_sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
+
+    # pylint:disable-msg=E1101
+    with pytest.raises(qisys.command.CommandFailedException):
+        qisrc_action("push", "--project", "foo", "-y")
+
+    (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
+
+    assert remote == "%s\trefs/heads/master" % sha1
+
+    qisrc_action("push",  "--project", "foo", "-y", "-f")
+    (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
+    assert remote == "%s\trefs/heads/master" % new_sha1
+
+def test_using_dash_f_with_review(qisrc_action, git_server):
+    foo_repo = git_server.create_repo("foo.git", review=True)
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    foo_git = TestGit(foo_proj.path)
+    foo_git.commit_file("a.txt", "a")
+    qisrc_action("push",  "--project", "foo", "--no-review")
+    _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
+    (_, remote) = foo_git.call("ls-remote", "gerrit", "master", raises=False)
+
+    foo_git.commit("--amend", "-mfoobar")
+    _, new_sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
+
+    # pylint:disable-msg=E1101
+    with pytest.raises(qisys.command.CommandFailedException):
+        qisrc_action("push", "--project", "foo", "--no-review")
+
+    (_, remote) = foo_git.call("ls-remote", "gerrit", "master", raises=False)
+    assert remote.split()[0] == sha1
+
+    qisrc_action("push",  "--project", "foo", "--no-review", "-f")
+    (_, remote) = foo_git.call("ls-remote", "gerrit", "master", raises=False)
+    assert remote.split()[0] == new_sha1
 
 def test_publish_changes(qisrc_action, git_server):
     foo_repo = git_server.create_repo("foo.git", review=True)
