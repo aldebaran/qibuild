@@ -210,13 +210,13 @@ use:
 
 .. code-block:: console
 
-    qisrc rebase master
+    qisrc rebase --branch master
 
 If you are happy with the changes, you can also run:
 
 .. code-block:: console
 
-    qisrc rebase master --push
+    qisrc rebase --branch master --push
 
 (Since this command uses ``git push --force``, use this at your own risk)
 
