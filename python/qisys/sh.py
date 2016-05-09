@@ -604,7 +604,7 @@ class TempDir:
         return self._temp_dir
 
     def __exit__(self, type, value, tb):
-        if os.environ.get("DEBUG"):
+        if os.environ.get("DEBUG") or os.environ.get("VERBOSE"):
             ui.debug("Not removing ", self._temp_dir)
         else:
             rm(self._temp_dir)
