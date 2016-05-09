@@ -31,6 +31,8 @@ def configure_parser(parser):
         help="Publish as draft")
     parser.add_argument("-y", action="store_true", dest="yes",
         help="Push even if the project is not under code review. Default is to ask")
+    parser.add_argument("-f", "--force", action="store_true", dest="force",
+        help="Use `git push --force`. Implies `--no-review`. Use with caution.")
     parser.add_argument("refspec", nargs="?",
         help="Remote refspec. Either simply remote branch destination, "
              "or local_branch:remote_branch")
@@ -42,6 +44,10 @@ def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_project = qisrc.parsers.get_one_git_project(git_worktree, args)
     git = qisrc.git.Git(git_project.path)
+
+    if args.force:
+        args.review = True
+
     if args.refspec:
         if ":" in args.refspec:
             local_ref, remote_branch = args.refspec.split(":")
@@ -67,21 +73,30 @@ def do(args):
         # Prefer gerrit logins or groups instead of e-mails
         reviewers = [x.split("@")[0] for x in reviewers]
         qisrc.review.push(git_project, local_ref, remote_branch,
-                            bypass_review=(not args.review),
-                            dry_run=args.dry_run, reviewers=reviewers,
-                            topic=args.topic, draft=args.draft)
+                          bypass_review=(not args.review),
+                          dry_run=args.dry_run, reviewers=reviewers,
+                          topic=args.topic, draft=args.draft, force=args.force)
     else:
+        push_args = []
+
         if args.dry_run:
-            git.push("-n")
-        else:
-            if args.review and not args.yes:
-                mess = """\
-The project is not under code review.
-Are you sure you want to run `git push` ?
-This action cannot be undone\
-"""
-                answer = qisys.interact.ask_yes_no(mess, default=False)
-                if answer:
-                    git.push()
-            else:
-                git.push()
+            push_args.append("--dry-run")
+
+        if args.force:
+            push_args.append("--force")
+
+        mess = (
+            "The project is not under code review.\n"
+            "Are you sure you want to run `git push` ?\n"
+            "This action cannot be undone"
+        )
+
+        ok = (
+            not args.review
+            or args.dry_run
+            or args.yes
+            or qisys.interact.ask_yes_no(mess, default=False)
+        )
+
+        if ok:
+            git.push(*push_args)
