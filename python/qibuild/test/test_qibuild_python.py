@@ -16,8 +16,9 @@ from qitest.test.conftest import qitest_action
 
 def test_finding_qi_python_modules(qipy_action, qibuild_action, qitest_action):
     qipy_action.add_test_project("foomodules")
-    # Need to have qibuild inside the virtualenv for
-    # qipy run -- qitest run to work
+    # Need to have qibuild in the worktree so that it
+    # gets installed in the virtualenv and
+    # qipy run -- qitest works
     this_dir = os.path.dirname(__file__)
     top_dir = os.path.join(this_dir, "..", "..", "..")
     qipy_action.worktree.add_project(top_dir)
@@ -29,7 +30,9 @@ def test_finding_qi_python_modules(qipy_action, qibuild_action, qitest_action):
 
     project = qibuild_action.add_test_project("usefoopymodule")
 
-    qipy_action("bootstrap")
+    # Using --no-site-packages to make sure we're not using
+    # an old qibuild already installed on the system:
+    qipy_action("bootstrap", "--no-site-packages")
     with qisys.sh.change_cwd(project.path):
         qibuild_action("configure")
         qipy_action("run", "--no-exec", "--", "qitest", "run")
