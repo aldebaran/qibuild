@@ -5,3 +5,9 @@ cmake
 -----
 
 * Add ``Qt5AndroidExtras``
+
+qibuild
+-------
+
+* ``CMakeBuilder``: fix ``dep_types`` not being initialized properly, which
+  caused configure failures on dependencies in ``testtime`` only
