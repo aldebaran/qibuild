@@ -43,6 +43,9 @@ report :
 
   * **Add the full command line you used, and the full output**
 
+  * Make sure to run ``qibuild`` with debug output using the
+    ``-v,--verbose`` option
+
 * Indicate how to reproduce the bug. This is very important, it will help
   people test the bug and potential patches on their own computer.
 
