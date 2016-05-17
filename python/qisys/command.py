@@ -362,6 +362,7 @@ def check_output_error(*popenargs, **kwargs):
     The ``stdout`` and ``stderr`` arguments are not allowed as they are used internally.
 
     """
+    ui.debug("calling", *popenargs)
     if 'stdout' in kwargs:
         raise ValueError('stdout argument not allowed, it will be overridden.')
     if 'stderr' in kwargs:
