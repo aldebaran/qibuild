@@ -1,0 +1,7 @@
+v3.11.6
+=======
+
+qibuild
+-------
+
+* Fix ``qibuild configure -s``
