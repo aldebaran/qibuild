@@ -207,6 +207,8 @@ qisrc
   Lastly, ``qisrc rebase --push`` only pushes repositories that were
   not already rebased.
 
+* Add ``qisrc push --force``
+
 qisys
 -----
 
