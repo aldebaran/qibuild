@@ -14,8 +14,7 @@ general
 
 * Fix crash when current working directory does not exist
 
-* Test suite now runs without errors on Linux *and* Mac. Running
-  test suite on Windows does not work yet, but should be fixed for 3.13
+* Test suite now runs without errors on Linux, Mac and Windows.
 
 qiproject.xml
 +++++++++++++
