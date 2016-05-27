@@ -18,6 +18,7 @@ import tempfile
 import subprocess
 import ntpath
 import posixpath
+import filecmp
 
 import qisys.error
 from qisys import ui
@@ -265,6 +266,9 @@ def install(src, dest, filter_fun=None, quiet=False):
         mkdir(os.path.dirname(dest), recursive=True)
         if sys.stdout.isatty() and not quiet:
             print "-- Installing %s" % dest
+        if os.path.isfile(dest) and filecmp.cmp(src, dest):
+            ui.info("Up-to-date", dest)
+            return [dest]
         # We do not want to fail if dest exists but is read only
         # (following what `install` does, but not what `cp` does)
         rm(dest)

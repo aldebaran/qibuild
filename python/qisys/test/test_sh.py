@@ -163,3 +163,12 @@ def test_to_posix_path():
    assert qisys.sh.to_posix_path(r"c:\foo\bar") ==  "c:/foo/bar"
    assert qisys.sh.to_posix_path(r"foo//bar") == "foo/bar"
    assert qisys.sh.to_posix_path(r"c:\foo\bar", fix_drive=True) == "/c/foo/bar"
+
+def test_install_twice(tmpdir, record_messages):
+    src_file = tmpdir.join("a")
+    src_file.write("data")
+    dest_file = tmpdir.join("b")
+    dest_file.write("data")
+    qisys.sh.install(src_file.strpath, dest_file.strpath)
+    qisys.sh.install(src_file.strpath, dest_file.strpath)
+    assert record_messages.find("Up-to-date")
