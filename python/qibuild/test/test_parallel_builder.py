@@ -1,4 +1,7 @@
 import qibuild.parallel_builder
+import qibuild.build
+
+import pytest
 
 class FakeProject(object):
     build_log = list()
@@ -29,3 +32,14 @@ def test_simple():
     build_log = FakeProject.build_log
     assert is_before(build_log, "a", "c")
     assert is_before(build_log, "b", "c")
+
+def test_running_build_with_compilation_errors_fails(qibuild_action):
+    # Running `qibuild make -J1` on a c++ project with compilation
+    # errors should fail
+
+    qibuild_action.add_test_project("with_compile_error")
+    qibuild_action("configure", "with_compile_error")
+
+    # pylint: disable-msg=E1101
+    with pytest.raises(qibuild.build.BuildFailed):
+        qibuild_action("make", "-J1", "with_compile_error")
