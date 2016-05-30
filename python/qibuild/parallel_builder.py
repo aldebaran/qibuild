@@ -161,17 +161,15 @@ class ParallelBuilder(object):
 
     def _has_any_worker_failed(self):
         for worker in self._workers:
-            with worker.result_lock:
-                if not worker.result.ok:
-                    self.failed_project = worker.result.failed_project
-                    return True
+            if worker.result.failed_project:
+                self.failed_project = worker.result.failed_project
+                return True
 
         return False
 
 
 class BuildResult(object):
     def __init__(self):
-        self.ok = True
         self.failed_project = None
 
 
@@ -185,14 +183,13 @@ class BuildWorker(threading.Thread):
         self.kwargs = kwargs
         self._should_stop = False
         self.result = BuildResult()
-        self.result_lock = threading.Lock() # should be locked when accessing self.result!
 
     def stop(self):
         """ Tell the worker it should stop trying to read items from the queue """
         self._should_stop = True
 
     def run(self):
-        while not self._should_stop and self.result.ok:
+        while not self._should_stop and not self.result.failed_project:
             job = None
             try:
                 job = self.queue.get(True, 1);
@@ -206,14 +203,10 @@ class BuildWorker(threading.Thread):
                     job.execute(*self.args, **self.kwargs)
                 except qibuild.build.BuildFailed as failed_build:
                     # not an exceptional condition -> no need to display backtrace
-                    with self.result_lock:
-                        self.result.ok = False
-                        self.result.failed_project = failed_build.project
+                    self.result.failed_project = failed_build.project
                 except Exception, e:
-                    with self.result_lock:
-                        self.result.ok = False
-                        self.result.failed_project = job.project
-                        ui.error(ui.red,
-                                 *ui.message_for_exception(e, "Python exception during build"))
+                    self.result.failed_project = job.project
+                    ui.error(ui.red,
+                            *ui.message_for_exception(e, "Python exception during build"))
 
                 self.queue.task_done()
