@@ -108,13 +108,21 @@ class ParallelBuilder(object):
                     self.pending_jobs.remove(job)
 
             # check if any worker failed
-            for worker in self._workers:
-                if not worker.result.ok:
-                    all_ok = False
-                    self.failed_project = worker.result.failed_project
-                    break
+            all_ok = not self._has_any_worker_failed()
 
         # end (all done or error)
+        # Wait for the last job to finish processing if needed.
+        # running_jobs.empty() will return true when the last job
+        # is 'get' from the queue, so the loop will end too early
+        # to get the status of the last job.
+
+        # all jobs except the last were ok?
+        if all_ok:
+            # wait for the end of the last job
+            self.running_jobs.join()
+            # check the last job's result
+            all_ok = not self._has_any_worker_failed()
+
         # say to all workers to stop
         for worker in self._workers:
             worker.stop()
@@ -151,11 +159,17 @@ class ParallelBuilder(object):
 
         return None
 
+    def _has_any_worker_failed(self):
+        for worker in self._workers:
+            if worker.result.failed_project:
+                self.failed_project = worker.result.failed_project
+                return True
+
+        return False
 
 
 class BuildResult(object):
     def __init__(self):
-        self.ok = True
         self.failed_project = None
 
 
@@ -175,7 +189,7 @@ class BuildWorker(threading.Thread):
         self._should_stop = True
 
     def run(self):
-        while not self._should_stop and self.result.ok:
+        while not self._should_stop and not self.result.failed_project:
             job = None
             try:
                 job = self.queue.get(True, 1);
@@ -187,9 +201,12 @@ class BuildWorker(threading.Thread):
                 try:
                     ui.info(ui.green, "Worker #%i starts working on " % (self.index + 1), ui.reset, ui.bold, job.project.name)
                     job.execute(*self.args, **self.kwargs)
-                    self.queue.task_done()
+                except qibuild.build.BuildFailed as failed_build:
+                    # not an exceptional condition -> no need to display backtrace
+                    self.result.failed_project = failed_build.project
                 except Exception, e:
-                    self.result.ok = False
                     self.result.failed_project = job.project
                     ui.error(ui.red,
                             *ui.message_for_exception(e, "Python exception during build"))
+
+                self.queue.task_done()
