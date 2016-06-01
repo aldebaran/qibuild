@@ -311,10 +311,10 @@ _qibuild-make() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_projects \
   _arguments \
     "(-r --rebuild)"{-r,--rebuild}"[Rebuild.]" \
     "--coverity[Build using cov-build. Ensure you have cov-analysis installed on your machine.]" \
-    $qibuild_projects \
   && return
 }
 
