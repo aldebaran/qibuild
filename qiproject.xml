@@ -1,5 +1,4 @@
 <project format="3">
-  <maintainer email="dmerejkowsky@aldebaran.com">Dimitri Merejkowsky</maintainer>
   <maintainer email="vbarbaresi@aldebaran.com">Vincent Barbaresi</maintainer>
   <maintainer email="hkouki@aldebaran.com">Houssem Kouki</maintainer>
   <project src="doc" />
