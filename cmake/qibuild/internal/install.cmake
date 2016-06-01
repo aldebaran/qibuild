@@ -62,12 +62,14 @@ function(_qi_install_internal)
   else()
     set(_dest ${ARG_DESTINATION})
   endif()
-  install(DIRECTORY ${_dirs_to_install}
-    USE_SOURCE_PERMISSIONS
-    COMPONENT "${ARG_COMPONENT}"
-    DESTINATION "${_dest}"
-        PATTERN "*.pyc" EXCLUDE
-        PATTERN "__pycache__" EXCLUDE)
+  if (NOT "${_dirs_to_install}" STREQUAL "")
+    install(DIRECTORY ${_dirs_to_install}
+      USE_SOURCE_PERMISSIONS
+      COMPONENT "${ARG_COMPONENT}"
+      DESTINATION "${_dest}"
+          PATTERN "*.pyc" EXCLUDE
+          PATTERN "__pycache__" EXCLUDE)
+  endif()
   if(${ARG_KEEP_RELATIVE_PATHS})
     foreach(_file ${_files_to_install})
       get_filename_component(_file_subdir ${_file} PATH)
