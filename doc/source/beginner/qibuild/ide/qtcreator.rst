@@ -27,6 +27,6 @@ Remember to use the same CMake generator in QtCreator and in your configuration
 file, if QtCreator asks you to choose one.
 
 Note: If QtCreator does not ask you for a build directory, one way to force it
-do to so is to delete the ``CMakeLists.txt.user`` file.
+to do so is to delete the ``CMakeLists.txt.user`` file.
 
 .. image:: /pics/qtcreator-hello.png
