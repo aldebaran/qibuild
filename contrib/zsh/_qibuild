@@ -98,6 +98,12 @@ _arguments_for_qibuild_configure() {
   "(--release)--debug[build in debug, default]" \
 }
 
+_arguments_for_qibuild_make() {
+  $@ \
+  "(-j --njobs)"{-j,--njobs}"[Specify the number of jobs to run simultaneously]" \
+  "--verbose-make[Print the executed commands while building]" \
+}
+
 _qibuild-add-config() {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
@@ -312,6 +318,7 @@ _qibuild-make() {
   _arguments_for_qibuild_debug \
   _arguments_for_qibuild_configs \
   _arguments_for_qibuild_projects \
+  _arguments_for_qibuild_make \
   _arguments \
     "(-r --rebuild)"{-r,--rebuild}"[Rebuild.]" \
     "--coverity[Build using cov-build. Ensure you have cov-analysis installed on your machine.]" \
@@ -960,4 +967,114 @@ _qitoolchain_main() {
   esac
   return ret
 }
+
+_qitest_commands() {
+  local -a qitest_commands
+  qitest_commands=(
+  collect:'Collect all python test in worktree.'
+  list:'List the tests.'
+  run:'Launch automatic tests.')
+
+  integer ret=1
+  _describe 'qitest commands' qitest_commands && ret=0
+  return ret
+}
+
+_qitest-collect() {
+  local curcontext=$curcontext state line
+  declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qibuild_make \
+  _arguments \
+  && return
+}
+
+_qitest-list() {
+  local curcontext=$curcontext state line
+  declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
+  _arguments \
+  "(-j --njobs)"{-j,--njobs}"[Specify the number of jobs to run simultaneously]" \
+  "--perf[Run perfs tests instead of pure tests.]" \
+  "(-k --pattern)"{-k,--pattern}="[Filter tests matching these patterns.]" \
+  "(-x --exclude)"{-x,--exclude}"[Exclude test matching these patterns.]" \
+  "-V[Display tests output.]" \
+  "--valgrind[Run tests under valgrind.]" \
+  "--nightmare[Run tests in shuffle and 20 times (apply only to gtest).]" \
+  "--coverage[Run coverage.]" \
+  "--ncpu=[Set number of CPU each test is allowed to use (linux).]" \
+  "--nightly[Run nightly tests.]" \
+  "--break-on-failure[Break on failure (for gtest only).]" \
+  "--repeat-until-fail=[Repeat tests until they fail (at most N times).]" \
+  "--qitest-json=[]" \
+  "--test-output-dir=[Generate XML test reports in the given directory.]:Output directory:_directories" \
+  "--coverage-output-dir=[Generate XML and HTML coverage reports in the given directory.]:Coverage output directory:_directories" \
+  "--cov-exclude=[Exclude the given patterns from covegare.]" \
+  "--root-output-dir=[Same as --test-output-dir (deprecated).]:Root output directory:_directories" \
+  "--no-capture[]" \
+  "--ignore-timeouts[Ignore timeouts when running tests.]" \
+  "(--lf --last-failed)"{--lf,--last-failed}"[Run the failing test from previous run.]" \
+  && return
+}
+
+_qitest-run() {
+  local curcontext=$curcontext state line
+  declare -A opt_args
+  _arguments_for_qibuild_logging \
+  _arguments_for_qibuild_configs \
+  _arguments_for_qibuild_debug \
+  _arguments_for_qisrc_projects \
+  _arguments \
+  "(-j --njobs)"{-j,--njobs}"[Specify the number of jobs to run simultaneously]" \
+  "--perf[Run perfs tests instead of pure tests.]" \
+  "(-k --pattern)"{-k,--pattern}="[Filter tests matching these patterns.]" \
+  "(-x --exclude)"{-x,--exclude}"[Exclude test matching these patterns.]" \
+  "-V[Display tests output.]" \
+  "--valgrind[Run tests under valgrind.]" \
+  "--nightmare[Run tests in shuffle and 20 times (apply only to gtest).]" \
+  "--coverage[Run coverage.]" \
+  "--ncpu=[Set number of CPU each test is allowed to use (linux).]" \
+  "--nightly[Run nightly tests.]" \
+  "--break-on-failure[Break on failure (for gtest only).]" \
+  "--repeat-until-fail=[Repeat tests until they fail (at most N times).]" \
+  "--qitest-json=[]" \
+  "--test-output-dir=[Generate XML test reports in the given directory.]:Output directory:_directories" \
+  "--coverage-output-dir=[Generate XML and HTML coverage reports in the given directory.]:Coverage output directory:_directories" \
+  "--cov-exclude=[Exclude the given patterns from covegare.]" \
+  "--root-output-dir=[Same as --test-output-dir (deprecated).]:Root output directory:_directories" \
+  "--no-capture[]" \
+  "--ignore-timeouts[Ignore timeouts when running tests.]" \
+  "(--lf --last-failed)"{--lf,--last-failed}"[Run the failing test from previous run.]" \
+  && return
+}
+
+_qitest_main() {
+  integer ret=1
+  local curcontext=$curcontext state line
+  declare -A opt_args
+
+  _arguments -C \
+    "(-h --help)"{-h,--help}"[Show this help message and exit]" \
+    "(-w --worktree --work-tree)"{-w=,--worktree=,--work-tree=}"[Use a specific work tree path.]" \
+    "(-): :->command" \
+    "(-)*:: :->option-or-argument" \
+    && return
+
+  case $state in
+    (command)
+      _qitest_commands && ret=0
+      ;;
+    (option-or-argument)
+      curcontext=${curcontext%:*:*}:qitest-$words[1]:
+      _call_function ret _qitest-$words[1]
+      ;;
+  esac
+  return ret
+}
+
 _call_function ret _${service}_main
