@@ -61,7 +61,7 @@ def test_using_dash_f_without_review(qisrc_action, git_server):
     foo_git.commit_file("a.txt", "a")
     qisrc_action("push",  "--project", "foo", "-y")
     _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
-    (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
+    (_, remote) = foo_git.call("ls-remote", "origin", "refs/heads/master", raises=False)
 
     foo_git.commit("--amend", "-mfoobar")
     _, new_sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
@@ -70,12 +70,12 @@ def test_using_dash_f_without_review(qisrc_action, git_server):
     with pytest.raises(qisys.command.CommandFailedException):
         qisrc_action("push", "--project", "foo", "-y")
 
-    (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
+    (_, remote) = foo_git.call("ls-remote", "origin", "refs/heads/master", raises=False)
 
     assert remote == "%s\trefs/heads/master" % sha1
 
     qisrc_action("push",  "--project", "foo", "-y", "-f")
-    (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
+    (_, remote) = foo_git.call("ls-remote", "origin", "refs/heads/master", raises=False)
     assert remote == "%s\trefs/heads/master" % new_sha1
 
 def test_using_dash_f_with_review(qisrc_action, git_server):
@@ -87,7 +87,7 @@ def test_using_dash_f_with_review(qisrc_action, git_server):
     foo_git.commit_file("a.txt", "a")
     qisrc_action("push",  "--project", "foo", "--no-review")
     _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
-    (_, remote) = foo_git.call("ls-remote", "gerrit", "master", raises=False)
+    (_, remote) = foo_git.call("ls-remote", "gerrit", "refs/heads/master", raises=False)
 
     foo_git.commit("--amend", "-mfoobar")
     _, new_sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
@@ -96,11 +96,11 @@ def test_using_dash_f_with_review(qisrc_action, git_server):
     with pytest.raises(qisys.command.CommandFailedException):
         qisrc_action("push", "--project", "foo", "--no-review")
 
-    (_, remote) = foo_git.call("ls-remote", "gerrit", "master", raises=False)
+    (_, remote) = foo_git.call("ls-remote", "gerrit", "refs/heads/master", raises=False)
     assert remote.split()[0] == sha1
 
-    qisrc_action("push",  "--project", "foo", "--no-review", "-f")
-    (_, remote) = foo_git.call("ls-remote", "gerrit", "master", raises=False)
+    qisrc_action("push",  "--project", "foo", "-f")
+    (_, remote) = foo_git.call("ls-remote", "gerrit", "refs/heads/master", raises=False)
     assert remote.split()[0] == new_sha1
 
 def test_publish_changes(qisrc_action, git_server):

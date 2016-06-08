@@ -47,7 +47,7 @@ def do(args):
     git = qisrc.git.Git(git_project.path)
 
     if args.force:
-        args.review = True
+        args.review = False
 
     if args.refspec:
         if ":" in args.refspec:
