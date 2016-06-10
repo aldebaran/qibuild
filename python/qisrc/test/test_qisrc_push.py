@@ -218,3 +218,20 @@ def test_orphaned_project(qisrc_action, git_server, record_messages):
     record_messages.reset()
     qisrc_action("push", "--project", "foo")
     assert record_messages.find("Project is orphaned")
+
+def test_no_reviewers_when_no_review(qisrc_action, git_server):
+    foo_repo = git_server.create_repo("foo.git", review=True)
+    qiproject_xml = """\
+<project format="3">
+  <maintainer email="jdoe@company.com">John Doe</maintainer>
+</project>"""
+    git_server.push_file("foo.git", "qiproject.xml", qiproject_xml)
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    foo_git = TestGit(foo_proj.path)
+    foo_git.commit_file("a.txt", "a")
+    with mock.patch("qisrc.review.set_reviewers") as set_reviewers:
+        qisrc_action("push", "--no-review", "--project", "foo")
+        assert not set_reviewers.called
+
