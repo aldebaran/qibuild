@@ -5,6 +5,7 @@
 """ Generate a binary package, ready to be added in a toolchain """
 
 import os
+import re
 import sys
 
 from qisys.qixml import etree
@@ -14,6 +15,7 @@ import qisys.sh
 import qisys.archive
 import qibuild.parsers
 
+ARCHIVE_SUFFIX = ".zip"
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -28,6 +30,9 @@ def configure_parser(parser):
                             "(Force CMAKE_BUILD_TYPE=RelWithDebInfo)")
     group.add_argument("--version",
                        help="Set project version. Override settings in qiproject.xml")
+    group.add_argument("--output",
+                       help="Filename where the package will be stored. Must end in '{}'"
+                            .format(ARCHIVE_SUFFIX))
 
 def do(args):
     """Main entry point"""
@@ -61,8 +66,19 @@ def do(args):
         archive_name += "-" + version
     archive_name += "-" + archive_suffix
 
-    package_dir = os.path.join(cmake_builder.build_worktree.root, "package")
+    build_prefix = cmake_builder.build_config.build_prefix or ""
+    package_dir = os.path.join(cmake_builder.build_worktree.root,
+                               build_prefix,
+                               "package")
     destdir = os.path.join(package_dir, archive_name)
+
+    if args.output:
+        if not args.output.endswith(ARCHIVE_SUFFIX):
+            ui.fatal("The output filename should end with {}".format(ARCHIVE_SUFFIX))
+
+        output = args.output
+    else:
+        output = destdir + ARCHIVE_SUFFIX
 
     # Clean the destdir just in case the package was already generated
     qisys.sh.rm(destdir)
@@ -89,7 +105,7 @@ def do(args):
     flat = not standalone
     archive = qisys.archive.compress(destdir,
                                      algo="zip", quiet=True, flat=flat,
-                                     output=destdir + ".zip")
+                                     output=output)
 
     # Clean up after ourselves
     qisys.sh.rm(destdir)

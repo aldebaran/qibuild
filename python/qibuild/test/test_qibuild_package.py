@@ -112,3 +112,18 @@ def test_package_project_not_in_manifest(build_worktree, qibuild_action):
     git.commit("--allow-empty", "-m", "init")
     qibuild_action.chdir(dest_path)
     qibuild_action("package")
+
+def test_output(qibuild_action):
+    qibuild_action.add_test_project("world")
+
+    qibuild_action("package", "world", "--output", "foobar.zip")
+    assert os.path.exists("foobar.zip")
+
+    # pylint:disable-msg=E1101
+    with pytest.raises(SystemExit):
+        qibuild_action("package", "world", "--output", "foobar")
+
+def test_build_prefix(qibuild_action):
+    qibuild_action.add_test_project("world")
+    qibuild_action("package", "world", "--build-prefix", "foo/bar/baz/qux")
+    assert os.path.exists("foo/bar/baz/qux/package")
