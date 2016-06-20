@@ -144,15 +144,3 @@ def _do_package(cmake_builder, destdir, build_type="Release", standalone=False):
         cmake_builder.install(destdir, components=["runtime"])
     else:
         cmake_builder.install(destdir)
-
-
-def get_package_name(project, version=None, config=None):
-    """Get the package name of a project.
-
-    """
-    res = [project.name]
-    if version:
-        res.append(version)
-    if config:
-        res.append(config)
-    return "-".join(res)
