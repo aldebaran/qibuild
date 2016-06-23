@@ -38,6 +38,9 @@ report :
 
 * Add relevant information when any is available:
 
+  * If the bug is reproducible, re-run adding ``--verbose`` to the command line
+    to get as much information as possible.
+
   * **Add the full error messages**. We make sure qibuild error messages
     are precise and useful, (see :ref:`qibuild-coding-guide-error-messages`)
 
