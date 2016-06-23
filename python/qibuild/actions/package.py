@@ -12,7 +12,6 @@ from qisys.qixml import etree
 from qisys import ui
 import qisys.archive
 import qisys.sh
-import qisys.archive
 import qibuild.parsers
 
 ARCHIVE_SUFFIX = ".zip"

@@ -5,7 +5,6 @@
 import qisys.command
 import qisys.sh
 import qisrc.git
-import qisys.command
 import pytest
 
 from qisrc.test.conftest import TestGitWorkTree, TestGit
