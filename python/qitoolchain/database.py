@@ -2,6 +2,7 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 import os
+import hashlib
 
 from qisys import ui
 from qisys.qixml import etree
@@ -10,6 +11,23 @@ import qisys.qixml
 import qitoolchain.feed
 import qitoolchain.qipackage
 import qitoolchain.svn_package
+
+
+DEFAULT_BUF_SIZE = 0x100000 # 1 mebibyte
+
+
+def hash_file(path, buf_size = DEFAULT_BUF_SIZE):
+    # pylint: disable-msg=E1101
+    h = hashlib.sha512()
+    with open(path, 'rb') as f:
+        while True:
+            data = f.read(buf_size)
+            h.update(data)
+            if len(data) < buf_size:
+                break
+
+    return h.hexdigest()
+
 
 class DataBase(object):
     """ Binary packages storage """
@@ -100,7 +118,7 @@ class DataBase(object):
                 res.append(self.packages[name])
         return res
 
-    def update(self, feed, branch=None, name=None):
+    def update(self, feed, branch=None, name=None, update_checksums=False):
         """ Update a toolchain given a feed
 
         ``feed`` can be:
@@ -137,7 +155,9 @@ class DataBase(object):
 
         remote_names = [x.name for x in remote_packages]
         for local_package in local_packages:
-            if local_package not in remote_packages and local_package.name in remote_names:
+            is_in_feed = local_package.name in remote_names
+            needs_update = update_checksums or local_package not in remote_packages
+            if is_in_feed and needs_update:
                 remote_package = [x for x in remote_packages
                                   if x.name == local_package.name][0]
                 to_update.append(remote_package)
@@ -159,7 +179,7 @@ class DataBase(object):
                             package.name, "from", local_package.version,
                             "to", remote_package.version)
             self.remove_package(package.name)
-            self.handle_package(package, feed)
+            self.handle_package(package, feed, update_checksums)
             self.add_package(package)
 
         if to_remove:
@@ -172,7 +192,7 @@ class DataBase(object):
             ui.info(ui.green, "Adding packages")
         for i, package in enumerate(to_add):
             ui.info_count(i, len(to_add), ui.blue, package.name)
-            self.handle_package(package, feed)
+            self.handle_package(package, feed, update_checksums)
             self.add_package(package)
 
         if svn_packages:
@@ -183,11 +203,15 @@ class DataBase(object):
             self.add_package(svn_package)
 
         ui.info(ui.green, "Done")
+
+        if update_checksums:
+            feed_parser.write_checksums(feed)
+
         self.save()
 
-    def handle_package(self, package, feed):
+    def handle_package(self, package, feed, update_checksums=False):
         if package.url:
-            self.download_package(package)
+            self.download_package(package, update_checksums)
         elif package.directory:
             self.handle_local_package(package, feed)
         else:
@@ -210,11 +234,31 @@ class DataBase(object):
         package.path = package_path
 
 
-    def download_package(self, package):
+    def download_package(self, package, update_checksums=False):
         with qisys.sh.TempDir() as tmp:
             archive = qisys.remote.download(package.url, tmp,
                                             message = (ui.green, "Downloading",
                                                     ui.reset, ui.blue, package.url))
+
+            archive_checksum = hash_file(archive)
+            if package.checksum != archive_checksum:
+                if update_checksums:
+                    ui.warning("Will update checksum for package", package)
+                    ui.warning("Old:", package.checksum)
+                    ui.warning("New:", archive_checksum)
+
+                    package.checksum = archive_checksum
+                elif package.checksum is None:
+                    ui.warning("The feed does not specify a checksum for "
+                               "package", package)
+                    ui.warning("Checksum for the downloaded archive:", archive_checksum)
+                else:
+                    raise qisys.error.Error(
+                        "Bad checksum for package {}\n"
+                        "Expected: {}\n"
+                        "Actual:   {}"
+                        .format(package, package.checksum, archive_checksum))
+
             dest = os.path.join(self.packages_path, package.name)
             message = [ui.green, "Extracting",
                        ui.reset, ui.blue, package.name]

@@ -24,7 +24,8 @@ class QiPackage(object):
     _properties = ("name", "version", "url",
                    "path", "directory",
                    "target", "host",
-                   "toolchain_file", "sysroot", "cross_gdb")
+                   "toolchain_file", "sysroot", "cross_gdb",
+                   "checksum")
 
     def __init__(self, name, version=None, path=None):
         self.name = name
@@ -40,6 +41,8 @@ class QiPackage(object):
         self.build_depends = set()
         self.run_depends = set()
         self.test_depends = set()
+        self.checksum = None
+        self.overriden_properties = {}
 
     @property
     def license(self):
@@ -75,6 +78,8 @@ class QiPackage(object):
             element.set("sysroot", self.sysroot)
         if self.cross_gdb:
             element.set("cross_gdb", self.cross_gdb)
+        if self.checksum:
+            element.set("checksum", self.checksum)
         qibuild.deps.dump_deps_to_xml(self, element)
         return element
 
@@ -232,6 +237,7 @@ mutually exclusive
             if orig_property and orig_property != to_set:
                 res = False
                 _on_bad_package_xml(package_xml, name, orig_property, to_set)
+            self.overriden_properties[name] = orig_property
             setattr(self, name, to_set)
         return res
 
@@ -272,14 +278,28 @@ mutually exclusive
     def __cmp__(self, other):
         if self.name == other.name:
             if self.version is None and other.version is not None:
-                return -1
-            if self.version is not None and other.version is None:
-                return 1
-            if self.version is None and other.version is None:
-                return 0
-            return qisys.version.compare(self.version, other.version)
+                result = -1
+            elif self.version is not None and other.version is None:
+                result = 1
+            elif self.version is None and other.version is None:
+                result = 0
+            else:
+                result = qisys.version.compare(self.version, other.version)
+
+            if result == 0 and self.checksum != other.checksum:
+                mess = ["Checksum mismatch for package", self.name]
+                if self.version is not None:
+                    mess.append(self.version)
+
+                ui.warning(*mess)
+                ui.warning("Local: ", self.checksum)
+                ui.warning("Remote:", other.checksum)
+
+                result = -1
         else:
-            return cmp(self.name, other.name)
+            result = cmp(self.name, other.name)
+
+        return result
 
 def from_xml(element):
     res = QiPackage(None) # need to pass an argument to the ctor

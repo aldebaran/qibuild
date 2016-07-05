@@ -2,6 +2,8 @@
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
+import pytest
+
 import qisys.archive
 import qisys.remote
 import qitoolchain.qipackage
@@ -89,16 +91,6 @@ def test_switching_from_git_feed(qitoolchain_action, git_server, tmpdir):
     feed_xml.write("<toolchain />")
     qitoolchain_action("create", "foo", feed_xml.strpath)
 
-def test_using_feed_name_from_regular_location(qitoolchain_action, tmpdir):
-    feed_path = tmpdir.join("toolchain.xml")
-    feed_path.write(""" \
-<toolchain>
-  <feed name="bar" />
-</toolchain>
-""")
-    error = qitoolchain_action("create", "foo", feed_path.strpath, raises=True)
-    assert "Cannot use feed names with non-git URL" in error
-
 def test_non_strict_feed_parsing(qitoolchain_action, tmpdir):
     # This test is Aldebaran-specific: We have broken feeds
     # (where package.xml of the packages and metadata in the feed
@@ -114,3 +106,40 @@ def test_non_strict_feed_parsing(qitoolchain_action, tmpdir):
 </toolchain>
 """.format(foo_url=qisys.remote.local_url(foo_archive)))
     qitoolchain_action("create", "tc", feed.strpath)
+
+def test_update_checksums(qitoolchain_action, tmpdir):
+    foo = tmpdir.mkdir("foo")
+    foo.join("package.xml").write('<package name="foo" version="0.1" />')
+    foo_archive = qisys.archive.compress(foo.strpath, flat=True)
+    feed = tmpdir.join("feed.xml")
+    feed.write("""
+<toolchain>
+ <package name="foo" version="0.1" url="{foo_url}" />
+</toolchain>
+""".format(foo_url=qisys.remote.local_url(foo_archive)))
+    qitoolchain_action("create", "--update-checksums", "tc", feed.strpath)
+
+    assert "checksum=" in feed.read()
+
+    feed.write("""
+<toolchain>
+ <package name="foo" version="0.1" url="{foo_url}" checksum="buggy"/>
+</toolchain>
+""".format(foo_url=qisys.remote.local_url(foo_archive)))
+
+    # pylint: disable-msg=E1101
+    with pytest.raises(qisys.error.Error):
+        qitoolchain_action("update")
+
+    qitoolchain_action("update", "--update-checksums", "tc")
+
+    feed.write("""
+<toolchain strict_metadata="false">
+ <package name="NAME_HAS_BEEN_CHANGED" version="0.1" url="{foo_url}"/>
+</toolchain>
+""".format(foo_url=qisys.remote.local_url(foo_archive)))
+
+    qitoolchain_action("create", "--update-checksums", "tc", feed.strpath)
+
+    assert "NAME_HAS_BEEN_CHANGED" in feed.read()
+    assert "checksum=" in feed.read()

@@ -9,6 +9,16 @@ import qisys.sh
 import qisrc.git
 import qitoolchain.database
 
+
+def is_git_url(location):
+    """ Check that the given location is a git URL
+    By convention, we assume it's the case if the
+    URL ends with .git
+
+    """
+    return location.endswith(".git")
+
+
 class Toolchain(object):
     def __init__(self, name):
         self.name = name
@@ -63,10 +73,8 @@ class Toolchain(object):
     def unregister(self):
         qisys.sh.rm(self.config_path)
 
-    def update(self, feed_location=None, branch=None, name=None):
-        # required to avoid circular dependencies:
-        from qitoolchain.feed import is_git_url
-
+    def update(self, feed_location=None, branch=None, name=None,
+               update_checksums=False):
         if feed_location is None:
             feed_location = self.feed_location
         if name is None:
@@ -86,7 +94,8 @@ class Toolchain(object):
 
         self.db.update(feed_location,
                        branch=self.feed_branch,
-                       name=self.feed_name)
+                       name=self.feed_name,
+                       update_checksums=update_checksums)
         self.save()
         self.generate_toolchain_file()
 

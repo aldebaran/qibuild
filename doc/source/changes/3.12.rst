@@ -251,3 +251,11 @@ cmake
   * Support ``opencv3``.
 
   * Fix finding Python libraries on Mac when run from a ``virtualenv``
+
+qitoolchain
+-----------
+
+* Add checksum support. Feeds can now specify a ``checksum`` attribute for each
+  downloaded package, and qitoolchain will check it upon download. The ``create``
+  and ``update`` subcommands now provide an ``--update-checksums`` switch, for
+  use with local toolchain feeds.

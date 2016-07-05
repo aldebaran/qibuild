@@ -58,9 +58,10 @@ def test_downloads_only_once(toolchain_db, feed):
     feed.add_package(boost_package, with_path=False, with_url=True)
     with mock.patch.object(qisys.remote, "download") as mock_dl:
         with mock.patch.object(qitoolchain.qipackage, "extract") as mock_extract:
-            mock_dl.return_value = "/path/to/boost.zip"
-            toolchain_db.update(feed.url)
-            toolchain_db.update(feed.url)
+            with mock.patch.object(qitoolchain.database, "hash_file") as mock_hash_file:
+                mock_dl.return_value = "/path/to/boost.zip"
+                toolchain_db.update(feed.url)
+                toolchain_db.update(feed.url)
     assert mock_dl.call_count == 1
     assert mock_extract.call_count == 1
     assert mock_extract.call_args_list[0][0][0] == "/path/to/boost.zip"

@@ -7,10 +7,13 @@
 
 
 import os
-import sys
-import hashlib
 import urlparse
-from xml.etree import ElementTree
+try:
+    # Prefer ElementTree from lxml as it will not reorder attributes when
+    # writing XML.
+    import lxml.etree as ElementTree
+except ImportError:
+    from xml.etree import ElementTree
 
 from qisys import ui
 import qisys.archive
@@ -19,21 +22,12 @@ import qisys.remote
 import qisys.sh
 import qisys.version
 import qisrc.git
-import qibuild.config
 import qitoolchain
 
 
 def is_url(location):
     """ Check that a given location is an URL """
     return "://" in location
-
-def is_git_url(location):
-    """ Check that the given location is a git URL
-    By convention, we assume it's the case if the
-    URL ends with .git
-
-    """
-    return location.endswith(".git")
 
 def raise_parse_error(package_tree, feed, message):
     """ Raise a nice pasing error about the given
@@ -46,7 +40,7 @@ def raise_parse_error(package_tree, feed, message):
     mess += message
     raise qisys.error.Error(mess)
 
-def tree_from_feed(feed_location, branch=None, name=None):
+def tree_from_feed(feed_location):
     """ Returns an ElementTree object from an
     feed location
 
@@ -97,7 +91,7 @@ class ToolchainFeedParser:
     def __init__(self, name):
         self.name = name
         self.packages = list()
-        self.strict_feed = True
+        self.strict_feed = None
         # A list of packages to be blacklisted
         self.blacklist = list()
         # A dict name -> version used to only keep the latest
@@ -134,45 +128,80 @@ class ToolchainFeedParser:
                 self.packages.append(qitoolchain.qipackage.from_xml(package_tree))
                 self._versions[name] = version
 
-    def parse(self, feed, branch=None, name=None, first_pass=True):
-        """ Recursively parse the feed, filling the self.packages
-
+    def iter_feeds(self, feed, branch=None, name=None):
+        """Recursively parse the feed and yield all the feed paths
         """
         if branch and name:
-            feed_path = open_git_feed(self.name, feed, branch=branch, name=name,
-                                      first_pass=first_pass)
-            tree = tree_from_feed(feed_path)
+            feed_path = open_git_feed(self.name, feed, branch=branch, name=name)
         else:
-            tree = tree_from_feed(feed)
+            feed_path = feed
 
-        root = tree.getroot()
-        if first_pass:
-            self.strict_feed = qisys.qixml.parse_bool_attr(root,
-                    "strict_metadata", default=True)
+        yield feed_path
 
-        package_trees = tree.findall("package")
-        package_trees.extend(tree.findall("svn_package"))
-        for package_tree in package_trees:
-            package_tree.set("feed", feed)
-            self.append_package(package_tree)
+        tree = tree_from_feed(feed_path)
+
         feeds = tree.findall("feed")
         for feed_tree in feeds:
+            child = None
+
             feed_url = feed_tree.get("url")
             if feed_url:
                 # feed_url can be relative to feed:
                 if not "://" in feed_url:
-                    feed_url = urlparse.urljoin(feed, feed_url)
-                self.parse(feed_url, first_pass=False)
-            feed_name = feed_tree.get("name")
-            if feed_name:
-                if not is_git_url(feed):
-                    mess = "Cannot use feed names with non-git URL"
-                    raise qisys.error.Error(mess)
-                self.parse(feed, branch=branch, name=feed_name, first_pass=False)
-        select_tree = tree.find("select")
-        if select_tree is not None:
-            blacklist_trees = select_tree.findall("blacklist")
-            for blacklist_tree in blacklist_trees:
-                name = blacklist_tree.get("name")
-                if name:
-                    self.blacklist.append(name)
+                    child = urlparse.urljoin(feed, feed_url)
+            else:
+                feed_name = feed_tree.get("name")
+                if feed_name:
+                    child = os.path.join(os.path.dirname(feed_path), feed_name + ".xml")
+
+            if child:
+                for i in self.iter_feeds(child):
+                    yield i
+
+    def parse(self, feed, branch=None, name=None):
+        """ Recursively parse the feed, filling the self.packages
+
+        """
+
+        for feed_path in self.iter_feeds(feed, branch, name):
+            tree = tree_from_feed(feed_path)
+            root = tree.getroot()
+            if self.strict_feed is None:
+                self.strict_feed = qisys.qixml.parse_bool_attr(root,
+                        "strict_metadata", default=True)
+
+            package_trees = tree.findall("package")
+            package_trees.extend(tree.findall("svn_package"))
+            for package_tree in package_trees:
+                package_tree.set("feed", feed)
+                self.append_package(package_tree)
+
+            select_tree = tree.find("select")
+            if select_tree is not None:
+                blacklist_trees = select_tree.findall("blacklist")
+                for blacklist_tree in blacklist_trees:
+                    name = blacklist_tree.get("name")
+                    if name:
+                        self.blacklist.append(name)
+
+    def write_checksums(self, feed):
+        for feed_path in self.iter_feeds(feed):
+            if not os.access(feed_path, os.W_OK):
+                raise qisys.error.Error(
+                    "Not a writable file, cannot update checksums: {}".format(feed_path))
+
+            tree = tree_from_feed(feed_path)
+
+            package_trees = tree.findall("package")
+            for package_tree in package_trees:
+                name_from_feed = package_tree.get("name")
+                for package in self.packages:
+                    try:
+                        name_from_database = package.overriden_properties["name"]
+                    except KeyError:
+                        name_from_database = package.name
+
+                    if name_from_feed == name_from_database and package.checksum is not None:
+                        package_tree.set("checksum", package.checksum)
+
+            tree.write(feed_path)

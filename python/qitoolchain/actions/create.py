@@ -26,6 +26,9 @@ def configure_parser(parser):
         help="Name of the feed. To be specified when using a git url")
     parser.add_argument("-b", "--branch",
         help="Branch of the git url to use")
+    parser.add_argument("--update-checksums", action='store_true',
+        help="Update the checksums in the feed file. "
+             "Requires specifying a local toolchain configuration file.")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
         help="Optional: path to the toolchain configuration file.\n"
              "If not given, the toolchain will be empty.\n"
@@ -40,7 +43,13 @@ def do(args):
     """
     if "--name" in sys.argv:
         ui.warning("--name is deprecated, use --feed-name instead")
+
     feed = args.feed
+
+    if args.update_checksums:
+        if not os.access(feed, os.W_OK):
+            ui.fatal("Not a writable file, cannot update checksums:", feed)
+
     # Normalize feed path:
     if feed and os.path.exists(feed):
         feed = qisys.sh.to_native_path(feed)
@@ -55,6 +64,7 @@ def do(args):
 
     toolchain = qitoolchain.Toolchain(tc_name)
     if feed:
-        toolchain.update(feed, branch=args.branch, name=args.feed_name)
+        toolchain.update(feed, branch=args.branch, name=args.feed_name,
+                         update_checksums=args.update_checksums)
 
     return toolchain

@@ -9,6 +9,8 @@ If a feed url is given, use this feed instead of the recorded one
 to update the given toolchain.
 """
 
+import os
+
 from qisys import ui
 import qisys.parsers
 import qitoolchain
@@ -25,6 +27,9 @@ def configure_parser(parser):
         help="Name of the feed. To be specified when using a git url")
     parser.add_argument("-b", "--branch",
         help="Branch of the git url to use")
+    parser.add_argument("--update-checksums", action='store_true',
+        help="Update the checksums in the feed file. "
+             "Requires using a local toolchain configuration file.")
 
 def do(args):
     """Main entry point
@@ -32,6 +37,11 @@ def do(args):
     """
     feed = args.feed
     tc_name = args.name
+    tc_name_required = args.branch or args.feed_name or args.update_checksums
+
+    if tc_name_required and not tc_name:
+        ui.fatal("Must specify a toolchain name")
+
     if tc_name:
         toolchain = qitoolchain.get_toolchain(tc_name)
         if not feed:
@@ -41,7 +51,13 @@ def do(args):
                 mess += "Please check configuration or " \
                         "specifiy a feed on the command line\n"
                 ui.fatal(mess)
-        toolchain.update(feed, branch=args.branch, name=args.feed_name)
+
+        if args.update_checksums:
+            if not os.access(feed, os.W_OK):
+                ui.fatal("Not a writable file, cannot update checksums:", feed)
+
+        toolchain.update(feed, branch=args.branch, name=args.feed_name,
+                         update_checksums=args.update_checksums)
     else:
         tc_names = qitoolchain.get_tc_names()
         tc_with_feed = [x for x in tc_names if qitoolchain.toolchain.Toolchain(x).feed_location]
