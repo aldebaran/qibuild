@@ -286,7 +286,7 @@ def from_xml(element):
     name = element.get("name")
     if not name:
         raise qisys.error.Error("missing 'name' attribute")
-    url = element.get("url")
+    res.url = element.get("url")
     if element.tag == "svn_package":
         import qitoolchain.svn_package
         res = qitoolchain.svn_package.SvnPackage(None)
@@ -305,7 +305,7 @@ def from_archive(archive_path):
 
 def extract(archive_path, dest):
     if archive_path.endswith((".tar.gz", ".tbz2")):
-       return _extract_legacy(archive_path, dest)
+        return _extract_legacy(archive_path, dest)
     with zipfile.ZipFile(archive_path) as archive:
         if "package.xml" in archive.namelist():
             return _extract_modern(archive_path, dest)
