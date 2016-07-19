@@ -149,6 +149,8 @@ class ToolchainFeedParser:
                 # feed_url can be relative to feed:
                 if not "://" in feed_url:
                     child = urlparse.urljoin(feed, feed_url)
+                else:
+                    child = feed_url
             else:
                 feed_name = feed_tree.get("name")
                 if feed_name:
