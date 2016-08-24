@@ -200,7 +200,7 @@ endfunction()
 
 # Generate CMake code to be put in a
 # ${target}-config.cmake, ready to be installed
-function(_qi_gen_code_lib_redist res target _U_staged_name)
+function(_qi_gen_code_lib_redist res target _U_staged_name header_only)
   string(TOUPPER ${target} _U_target)
   set(_res "")
 
@@ -212,63 +212,33 @@ function(_qi_gen_code_lib_redist res target _U_staged_name)
   _qi_gen_inc_dir_code_redist(_inc ${target} ${_U_staged_name})
   set(_res "${_res} ${_inc}")
 
-  # Find libs:
-  _qi_gen_find_lib_code_redist(_find_libs ${target} ${_U_staged_name})
-  set(_res "${_res} ${_find_libs}")
-
-  set(_set_package_found
-"
-set(${_U_staged_name}_PACKAGE_FOUND TRUE CACHE INTERNAL \"\" FORCE)
-")
-  set(_res "${_res} ${_set_package_found}")
-
-  # _DEPENDS:
-  set(${_U_staged_name}_DEPENDS   ${${_U_staged_name}_DEPENDS})
-  _qi_gen_code_from_vars(_vars
-    ${_U_staged_name}_DEPENDS
-  )
-
-  set(_res "${_res} ${_vars}")
-
-  set(${res} ${_res} PARENT_SCOPE)
-endfunction()
-
-# Generate CMake code to be put in a
-# ${target}-config.cmake, ready to be installed
-function(_qi_gen_code_header_only_lib_redist res target _U_staged_name)
-  string(TOUPPER ${target} _U_target)
-  set(_res "")
-
-  # Header:
-  _qi_gen_header_code_redist(_header)
-  set(_res ${_header})
-
-  # INCLUDE_DIRS:
-  _qi_gen_inc_dir_code_redist(_inc ${target} ${_U_staged_name})
-  set(_res "${_res} ${_inc}")
-
-  # FindPackageHandleStandardArgs:
-  set(_call_fphsa
+  if(header_only)
+    # FindPackageHandleStandardArgs:
+    set(_call_fphsa
 "
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(${_U_staged_name} DEFAULT_MSG
   ${_U_staged_name}_INCLUDE_DIRS
-)
-set(${_U_staged_name}_PACKAGE_FOUND \${${_U_staged_name}_FOUND} CACHE INTERNAL \"\" FORCE)
-")
-  set(_res "${_res} ${_call_fphsa}")
+)")
+    set(_res "${_res} ${_call_fphsa}")
+  else()
+    # Find libs:
+    _qi_gen_find_lib_code_redist(_find_libs ${target} ${_U_staged_name})
+    set(_res "${_res} ${_find_libs}")
+  endif()
 
   # _DEPENDS:
   set(${_U_staged_name}_DEPENDS   ${${_U_staged_name}_DEPENDS})
+  set(${_U_staged_name}_PACKAGE_FOUND TRUE)
   _qi_gen_code_from_vars(_vars
     ${_U_staged_name}_DEPENDS
+    ${_U_staged_name}_PACKAGE_FOUND
   )
 
   set(_res "${_res} ${_vars}")
+
   set(${res} ${_res} PARENT_SCOPE)
 endfunction()
-
-
 
 # Generate CMake code to be put in a
 # ${target}-config.cmake, ready to be included
@@ -480,7 +450,7 @@ qi_create_lib(foo INTERNAL) instead
   if(${${target}_NO_INSTALL})
     qi_debug("Skipping creation of redist config file for ${target}")
   else()
-    _qi_gen_code_lib_redist(_redist_code ${target} ${_U_staged_name})
+    _qi_gen_code_lib_redist(_redist_code ${target} ${_U_staged_name} FALSE)
     set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_module_name}")
     set(_redist_code "${_redist_code} ${_additional_code}")
     if (ARG_CUSTOM_CODE)
@@ -499,8 +469,6 @@ qi_create_lib(foo INTERNAL) instead
   file(WRITE "${_sdk_file}" "${_sdk_code}")
 
 endfunction()
-
-
 
 ##
 # Implements qi_stage_header_only_lib
@@ -539,7 +507,7 @@ function(_qi_internal_stage_header_only_lib target)
     _qi_gen_deprecated_message(_additional_code ${target} ${ARG_DEPRECATED})
   endif()
 
-  _qi_gen_code_header_only_lib_redist(_redist_code ${target} ${_U_staged_name})
+  _qi_gen_code_lib_redist(_redist_code ${target} ${_U_staged_name} TRUE)
   set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_l_target}-config.cmake")
   set(_redist_code "${_redist_code} ${_additional_code}")
   file(WRITE "${_redist_file}" "${_redist_code}")
