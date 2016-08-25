@@ -382,21 +382,27 @@ endfunction()
 #  - The library has been marked as deprecated, because a new library is meant
 #       to replace it
 #  - The library is internal, so the redist file should not be installed by default
-function(_qi_internal_stage_lib target)
+function(_qi_internal_stage_lib target header_only)
   cmake_parse_arguments(ARG
     "INTERNAL"
     "STAGED_NAME"
     "DEPRECATED;INCLUDE_DIRS;PATH_SUFFIXES;DEPENDS;CUSTOM_CODE"
     ${ARGN})
 
-
   # dm: temp warning:
   if (${ARG_INTERNAL})
-    qi_warning("Using qi_stage_lib(.. INTERNAL ..) is deprecated
+    if (header_only)
+      qi_warning("Using qi_stage_header_only_lib(.. INTERNAL ..) is deprecated
+
+What were you trying to do anyway?
+")
+    else()
+      qi_warning("Using qi_stage_lib(.. INTERNAL ..) is deprecated
 Please use
 
 qi_create_lib(foo INTERNAL) instead
 ")
+    endif()
   endif()
 
   string(TOUPPER ${target} _U_target)
@@ -427,7 +433,7 @@ qi_create_lib(foo INTERNAL) instead
   if(${${target}_NO_INSTALL})
     qi_debug("Skipping creation of redist config file for ${target}")
   else()
-    _qi_gen_code_lib_redist(_redist_code ${target} ${_U_staged_name} FALSE)
+    _qi_gen_code_lib_redist(_redist_code ${target} ${_U_staged_name} ${header_only})
     set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_module_name}")
     set(_redist_code "${_redist_code} ${_additional_code}")
     if (ARG_CUSTOM_CODE)
@@ -437,7 +443,7 @@ qi_create_lib(foo INTERNAL) instead
     _qi_install_redist_file("${_redist_file}" "${target}" "${_l_staged_name}")
   endif()
 
-  _qi_gen_code_lib_sdk(_sdk_code ${target} ${_U_staged_name} FALSE)
+  _qi_gen_code_lib_sdk(_sdk_code ${target} ${_U_staged_name} ${header_only})
   set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_module_name}")
   set(_sdk_code "${_sdk_code} ${_additional_code}")
   if (ARG_CUSTOM_CODE)
@@ -446,57 +452,6 @@ qi_create_lib(foo INTERNAL) instead
   file(WRITE "${_sdk_file}" "${_sdk_code}")
 
 endfunction()
-
-##
-# Implements qi_stage_header_only_lib
-#
-function(_qi_internal_stage_header_only_lib target)
-  cmake_parse_arguments(ARG "INTERNAL" "" "DEPRECATED;INCLUDE_DIRS;PATH_SUFFIXES;DEPENDS" ${ARGN})
-  # dm: temp warning:
-  if (${ARG_INTERNAL})
-    qi_warning("Using qi_stage_header_only_lib(.. INTERNAL ..) is deprecated
-
-    What were you trying to do anyway?
-")
-  endif()
-
-  string(TOUPPER ${target} _U_target)
-  string(TOLOWER ${target} _l_target)
-  if(ARG_STAGED_NAME)
-    string(TOLOWER "${ARG_STAGED_NAME}" _l_staged_name)
-    string(TOUPPER "${ARG_STAGED_NAME}" _U_staged_name)
-  else()
-    set(_l_staged_name ${_l_target})
-    set(_U_staged_name ${_U_target})
-  endif()
-
-  set(_new_args)
-  foreach(_arg INCLUDE_DIRS PATH_SUFFIXES DEPENDS)
-    if (DEFINED ARG_${_arg})
-      list(APPEND _new_args "${_arg}" "${ARG_${_arg}}")
-    endif()
-  endforeach()
-
-  _qi_set_vars(${target} ${_new_args})
-
-  set(_additional_code)
-  if (ARG_DEPRECATED)
-    _qi_gen_deprecated_message(_additional_code ${target} ${ARG_DEPRECATED})
-  endif()
-
-  _qi_gen_code_lib_redist(_redist_code ${target} ${_U_staged_name} TRUE)
-  set(_redist_file "${CMAKE_BINARY_DIR}/${QI_SDK_CMAKE_MODULES}/sdk/${_l_target}-config.cmake")
-  set(_redist_code "${_redist_code} ${_additional_code}")
-  file(WRITE "${_redist_file}" "${_redist_code}")
-  _qi_install_redist_file(${_redist_file} ${target} ${_l_staged_name})
-
-  _qi_gen_code_lib_sdk(_sdk_code ${target} ${_U_staged_name} TRUE)
-  set(_sdk_file "${QI_SDK_DIR}/${QI_SDK_CMAKE_MODULES}/${_l_target}-config.cmake")
-  set(_sdk_code "${_sdk_code} ${_additional_code}")
-  file(WRITE "${_sdk_file}" "${_sdk_code}")
-
-endfunction()
-
 
 #
 # Implements qi_stage_script

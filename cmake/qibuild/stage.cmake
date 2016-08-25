@@ -49,7 +49,7 @@ function(qi_stage_lib target)
     Target is an executable, expecting a library
     ")
   endif()
-  _qi_internal_stage_lib(${target} ${ARGN})
+  _qi_internal_stage_lib(${target} FALSE ${ARGN})
 endfunction()
 
 #! Generate a 'name'-config.cmake, allowing other projects to find the
@@ -75,7 +75,7 @@ endfunction()
 #                 set PATH_SUFFIXES to 'foo'. Be careful to test the
 #                 install rules of your headers if you choose to do so.
 function(qi_stage_header_only_lib target)
-  _qi_internal_stage_header_only_lib(${target} ${ARGN})
+  _qi_internal_stage_lib(${target} TRUE ${ARGN})
 endfunction()
 
 #! Generate a 'name'-config.cmake, allowing other projects
