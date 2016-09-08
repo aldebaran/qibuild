@@ -49,6 +49,9 @@ def set_home(home):
     CACHE_PATH = os.path.join(home, "cache")
     SHARE_PATH = os.path.join(home, "share")
 
+if os.environ.get("QI_HOME"):
+    set_home(os.environ.get("QI_HOME"))
+
 def get_config_path(*args):
     """ Get a config path to read or write some configuration.
 
