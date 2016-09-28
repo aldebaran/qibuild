@@ -68,40 +68,86 @@ It also means you can nest qibuild and qidoc projects anyway you want.
 
 For instance:
 
-* a build project at the root in ``<worktree>/foo``, with the doc in
-  ``<worktree>/foo/doc``
+* a build project at the root in :file:`foo`, with the doc in
+  :file:`foo/doc`
 
-.. code-block:: xml
+  .. code-block:: xml
 
-  <!-- in foo/qiproject.xml -->
-  <project>
-    <qibuild name="foo" />
-    <project src="doc" />
-  </project>
+    <!-- in foo/qiproject.xml -->
+    <project>
+      <qibuild name="foo" />
+      <project src="doc" />
+    </project>
 
-  <!-- in foo/doc/qiproject.xml -->
+    <!-- in foo/doc/qiproject.xml -->
 
-  <project>
-    <qidoc name="foo" type="shinx" />
-  </project>
+    <project>
+      <qidoc name="foo" type="shinx" />
+    </project>
 
 
-* Two build projects in the same git project:
+* Two nested build projects in the same git project (best avoided):
 
-.. code-block:: xml
+  .. code-block:: xml
 
-  <!-- in worktree/top/qiproject.xml -->
-  <project>
-    <project src="hello" />
-    <project src="world" />
-  <project>
+    <!-- in top/qiproject.xml -->
+    <project>
+      <project src="libhello" />
+      <qibuild name="helloworld">
+        <depends buildtime="true" runtime="true" names="libhello" />
+      <qibuild/>
+    </project>
 
-  <!-- in worktree/top/hello/qiproject.xml -->
-  <project>
-    <qibuild name="hello" />
-  </project>
+    <!-- in top/libhello/qiproject.xml -->
+    <project>
+      <qibuild name="libhello" />
+    </project>
 
-  <!-- in worktree/top/world/qiproject.xml -->
-  <project>
-    <qibuild name="world" />
-  </project>
+  In this case, the libhello build project lies within the helloworld build
+  project (which is at the root in :file:`top`).
+
+  While nested build projects are supported by qibuild, they are best avoided:
+  nested build projects complicate mapping between projects and path which
+  makes using git log and continuous integration unnecessarilly harder (see
+  bellow).
+
+
+* Two build projects in the same git project, forming
+  a "flat hierarchy":
+
+  .. code-block:: xml
+
+    <!-- in top/qiproject.xml -->
+    <project>
+      <project src="libhello" />
+      <project src="helloworld" />
+    <project>
+
+    <!-- in top/libhello/qiproject.xml -->
+    <project>
+      <qibuild name="libhello" />
+    </project>
+
+    <!-- in top/helloworld/qiproject.xml -->
+    <project>
+      <qibuild name="helloworld">
+        <depends buildtime="true" runtime="true" names="libhello" />
+      <qibuild/>
+    </project>
+
+  Note that, while the two build projects are nested within the root
+  qiproject, the root one is not a build project, so there is no nested build
+  project.
+
+  With this layout, looking at the history of the helloworld project is as
+  easy as
+
+  .. code-block:: bash
+
+    cd top
+    gitk -- helloworld
+
+  It is easy to setup per-project contiguous integration jobs triggered by
+  git commit using path filters.
+  Eg. if a commit only changes files in the :file:`libhello` sub-folder,
+  the libhello job should be triggered but not the helloworld one.
