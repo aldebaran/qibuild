@@ -106,14 +106,3 @@ def generate_snapshot(git_worktree, output_path, deprecated_format=True):
     snapshot = git_worktree.snapshot()
     ui.info(ui.green, "Snapshot generated in", ui.white, output_path)
     return snapshot.dump(output_path, deprecated_format=deprecated_format)
-
-def load_snapshot(git_worktree, input_path):
-    """Load a snapshot file and reset projects."""
-    snapshot = Snapshot()
-    ui.info(ui.green, "Loading snapshot from", ui.white,  input_path)
-    snapshot.load(input_path)
-    for (src, ref) in snapshot.refs.iteritems():
-        ui.info("Loading", src)
-        git_project = git_worktree.get_git_project(src, raises=False)
-        if git_project:
-            qisrc.reset.clever_reset_ref(git_project, ref)
