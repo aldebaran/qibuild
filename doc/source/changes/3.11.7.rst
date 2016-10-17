@@ -1,0 +1,7 @@
+v3.11.6
+=======
+
+qibuild
+-------
+
+* Add Opencv3 and Qt-5.7 cmake finders
