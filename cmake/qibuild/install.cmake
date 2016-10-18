@@ -291,10 +291,13 @@ function(qi_install_python)
     )
   else()
     cmake_parse_arguments(ARG "RECURSE;KEEP_RELATIVE_PATHS" "IF;COMPONENT;DESTINATION;SUBFOLDER;VERSION" "" ${ARGN})
+    if(ARG_SUBFOLDER)
+      set(_subfolder /${ARG_SUBFOLDER})
+    endif()
     install(${ARG_UNPARSED_ARGUMENTS}
       COMPONENT runtime
-      LIBRARY DESTINATION "${_qi_sdk_python_site_packages}"
-      RUNTIME DESTINATION "${_qi_sdk_python_site_packages}"
+      LIBRARY DESTINATION "${_qi_sdk_python_site_packages}${_subfolder}"
+      RUNTIME DESTINATION "${_qi_sdk_python_site_packages}${_subfolder}"
     )
   endif()
 

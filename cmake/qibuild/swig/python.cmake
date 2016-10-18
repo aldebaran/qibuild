@@ -24,11 +24,15 @@ include(CMakeParseArguments)
 # \flag: NO_CPLUSPLUS allow to compile the target as ``C`` code (default is ``C++``)
 # \group:SRC The list of source files
 # \group:DEPENDS The list of dependencies
+# \group:SUBFOLDER Subfolder where the module will be built. Used to add the wrapper to an existing package.
 #
 function(qi_swig_wrap_python module_name interface_file)
   message(STATUS "Swig/python: ${module_name}")
-  cmake_parse_arguments(ARG "NO_CPLUSPLUS" "" "SRC;DEPENDS" ${ARGN})
+  cmake_parse_arguments(ARG "NO_CPLUSPLUS" "SUBFOLDER" "SRC;DEPENDS" ${ARGN})
   set(_srcs ${ARG_SRC} ${ARG_UNPARSED_ARGUMENTS})
+  if (ARG_SUBFOLDER)
+    set(_subfolder /${ARG_SUBFOLDER})
+  endif()
 
   # we search for the SWIG_EXECUTABLE by yourself, because FindSWIG call find_file
   # but when we are cross-compiling and we want to use swig from the system
@@ -51,7 +55,7 @@ function(qi_swig_wrap_python module_name interface_file)
     ${interface_file} PROPERTIES SWIG_MODULE_NAME "${module_name}")
 
 
-  set(CMAKE_SWIG_OUTDIR ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages)
+  set(CMAKE_SWIG_OUTDIR ${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder})
 
   ##
   # Deal with dependencies:
@@ -96,15 +100,15 @@ function(qi_swig_wrap_python module_name interface_file)
   # Fix output directory
   set_target_properties(${_swig_target}
       PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
-        RUNTIME_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
-        ARCHIVE_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
-        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
-        ARCHIVE_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
-        LIBRARY_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
-        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
-        LIBRARY_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}"
+        RUNTIME_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}"
+        ARCHIVE_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}"
+        ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}"
+        ARCHIVE_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG   "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}"
+        LIBRARY_OUTPUT_DIRECTORY         "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}"
   )
 
   if (WIN32)
@@ -112,14 +116,14 @@ function(qi_swig_wrap_python module_name interface_file)
     set_target_properties(${_swig_target} PROPERTIES SUFFIX   ".pyd")
   endif()
 
-  qi_install_python(TARGETS ${_swig_target})
+  qi_install_python(TARGETS ${_swig_target} SUBFOLDER ${ARG_SUBFOLDER})
 
-  qi_install_python("${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages/${module_name}.py")
+  qi_install_python("${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}/${module_name}.py" SUBFOLDER ${ARG_SUBFOLDER})
 
   ## FIXME: factorize this with qi_create_python_ext
   # Register the target into the build dir for qipy
   file(WRITE ${QI_SDK_DIR}/qi.pth
-    "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages\n"
+    "${QI_SDK_DIR}/${QI_SDK_LIB}/python2.7/site-packages${_subfolder}\n"
   )
 
   set(SWIG_MODULE_${module_name}_REAL_NAME ${_swig_target} PARENT_SCOPE)
