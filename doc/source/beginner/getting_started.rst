@@ -3,7 +3,6 @@
 Getting Started
 ===============
 
-
 Requirements
 ------------
 
@@ -13,7 +12,6 @@ Only **Python 2.7** is supported.
 
 Note that most linux distributions now comes with **Python3**
 by default now, so you may need to install **python 2** first.
-
 
 Installation
 ------------
@@ -73,20 +71,16 @@ Step    Action
 
             pip install qibuild
 
-2.      To use scripts written in Python:
-
-        Add ``C:\Python2x`` and
-        ``c:\Python2x\Scripts`` in your ``PATH``.
+2.      Add ``C:\Python27`` and
+        ``c:\Python27\Scripts`` in your ``PATH``.
 
 
 3.      If you'd like to have nice colors in your console, you can install
         the Python readline library: http://pypi.python.org/pypi/pyreadline.
 =====  ============================================================================
 
-
 Continue with the tutorials
 ----------------------------
-
 
 .. toctree::
     :maxdepth: 1
