@@ -59,11 +59,11 @@ def do(args):
         ui.warning("Could not find project version!",
                    "Either use --version or fix qiproject.xml",
                    sep="\n")
-    build_dir_name = os.path.basename(project.build_directory)
-    archive_suffix = build_dir_name.replace("build-", "")
     if version:
         archive_name += "-" + version
-    archive_name += "-" + archive_suffix
+    archive_suffix = args.config
+    if archive_suffix:
+        archive_name += "-" + archive_suffix
 
     build_prefix = cmake_builder.build_config.build_prefix or ""
     package_dir = os.path.join(cmake_builder.build_worktree.root,
