@@ -222,7 +222,7 @@ Please set only one of these two options to 'True'
 
 
 # pylint: disable-msg=R0913
-def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None):
+def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None, flat=False):
     """Generate a tar command line
 
     :param action:    compression/exctraction switch [compress|extract]
@@ -233,6 +233,8 @@ def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None):
     :param quiet:     quiet mode
     :param add_opts:  list of additional options directly added to the
                       generated tar command line
+    :param flat:      if False, put all files in a common top dir
+                      (default: False)
 
     :return: the list containing the whole tar commnand
 
@@ -244,8 +246,12 @@ def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None):
         cmd += add_opts
     if action == "compress":
         cmd += ["--create"]
-        cwd  = os.path.dirname(directory)
-        data = os.path.basename(directory)
+        if flat:
+            cwd  = directory
+            data = '.'
+        else:
+            cwd  = os.path.dirname(directory)
+            data = os.path.basename(directory)
     elif action == "extract":
         cmd += ["--extract"]
         cwd  = directory
@@ -262,7 +268,7 @@ def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None):
 
 
 def _compress_tar(directory, output=None, algo=None,
-                  quiet=True, verbose=False):
+                  quiet=True, verbose=False, flat=False):
     """Compress directory in a .tar.* archive
 
     :param directory:        directory to add to the archive
@@ -270,6 +276,8 @@ def _compress_tar(directory, output=None, algo=None,
     :param algo:             compression method
     :param quiet:            quiet mode (print nothing)
     :param verbose:          verbose mode (print all the archive content)
+    :param flat:             if False, put all files in a common top dir
+                             (default: False)
 
     :return: path to the generated archive (archive_basepath.tar.*)
 
@@ -280,7 +288,7 @@ Please set only one of these two options to 'True'
 """
         raise ValueError(mess)
     ui.debug("Compressing", directory, "to", output)
-    cmd = _get_tar_command("compress", algo, output, directory, quiet)
+    cmd = _get_tar_command("compress", algo, output, directory, quiet, flat=flat)
     try:
         if verbose:
             printed = qisys.command.check_output(cmd, stderr=subprocess.STDOUT)
@@ -394,7 +402,7 @@ Please set only one of these two options to 'True'
                                      output=output, flat=flat)
     else:
         archive_path = _compress_tar(directory, quiet=quiet, verbose=verbose,
-                                     output=output, algo=algo)
+                                     output=output, algo=algo, flat=flat)
     return archive_path
 
 def get_default_output(directory, algo):
