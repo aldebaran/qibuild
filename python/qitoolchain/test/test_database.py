@@ -159,3 +159,35 @@ def test_package_with_flags(tmpdir, toolchain_db):
 
     x_tools_in_db = toolchain_db.get_package("x-tools")
     assert x_tools_in_db.toolchain_file
+
+def test_post_add(tmpdir, toolchain_db):
+    boost = tmpdir.mkdir("boost")
+    script = boost.join("post-add.sh")
+    script.write(
+        '#!/bin/sh\n'
+        'echo $@ > foobar\n'
+    )
+    os.chmod(script.strpath, 0755)
+
+    boost_package = tmpdir.join("boost-1.58.zip")
+    qisys.archive.compress(boost.strpath, output=boost_package.strpath)
+
+    feed = tmpdir.join("feed.xml")
+    feed.write("""
+<toolchain>
+  <package name="boost" version="1.58" url="{url}" post-add="post-add.sh hello world" />
+</toolchain>
+""".format(url="file://" + boost_package.strpath))
+
+    print boost.strpath
+    print script.strpath
+    print boost_package.strpath
+    print feed.strpath
+
+    toolchain_db.update(feed.strpath)
+
+    boost_in_db = toolchain_db.get_package("boost")
+    with open(os.path.join(boost_in_db.path, 'foobar')) as f:
+        txt = f.read()
+
+    assert "hello world" in txt

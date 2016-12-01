@@ -5,6 +5,7 @@ import os
 import sys
 import re
 import zipfile
+import shlex
 
 from qisys.qixml import etree
 import qisys.version
@@ -32,6 +33,7 @@ class QiPackage(object):
         self.build_depends = set()
         self.run_depends = set()
         self.test_depends = set()
+        self._post_add = None
 
     @property
     def license(self):
@@ -186,6 +188,7 @@ class QiPackage(object):
         self.toolchain_file = root.get("toolchain_file")
         self.sysroot = root.get("sysroot")
         self.cross_gdb = root.get("cross_gdb")
+        self._post_add = root.get("post-add")
 
     def reroot_paths(self):
         """ Make sure all the paths are absolute.
@@ -199,6 +202,25 @@ class QiPackage(object):
             self.sysroot = os.path.join(self.path, self.sysroot)
         if self.cross_gdb:
             self.cross_gdb = os.path.join(self.path, self.cross_gdb)
+
+    def post_add(self):
+        """ Run the post-add script if it exists.
+
+        Raises:
+            * CommandFailedException if the post-add script fails
+        """
+
+        # Make sure the post-add is loaded
+        self.load_package_xml()
+
+        if not self._post_add:
+            return
+
+        # Make sure the script is found in the package directory
+        post_add_cmd = shlex.split(self._post_add)
+        post_add_cmd[0] = os.path.join(self.path, post_add_cmd[0])
+
+        qisys.command.call(post_add_cmd, cwd=self.path)
 
     def __repr__(self):
         return "<Package %s %s>" % (self.name, self.version)
@@ -239,6 +261,7 @@ def from_xml(element):
     res.version = element.get("version")
     res.path = element.get("path")
     res.directory = element.get("directory")
+    res._post_add = element.get("post-add")
     if res.url and res.directory:
         mess = """\
 Bad configuration for package %s. 'directory' and 'url' are

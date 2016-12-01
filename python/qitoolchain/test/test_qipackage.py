@@ -1,8 +1,12 @@
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
+import pytest
+import os
+
 import qisys.archive
 import qitoolchain.qipackage
+from qisys.test.conftest import skip_on_win
 
 def test_equality():
     foo = qitoolchain.qipackage.QiPackage("foo", "1.2")
@@ -173,3 +177,48 @@ def test_get_set_license(tmpdir):
     package.license = "BSD"
     package2 = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
     assert package2.license == "BSD"
+
+def test_post_add_noop(tmpdir):
+    boost_path = tmpdir.mkdir("boost")
+    boost_path.join("package.xml").write("""
+<package name="boost" version="1.58" />
+""")
+
+    package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
+    package.post_add()  # no-op
+
+def test_post_add_does_not_exist(tmpdir):
+    boost_path = tmpdir.mkdir("boost")
+    boost_path.join("package.xml").write("""
+<package name="boost" version="1.58" post-add="asdf" />
+""")
+
+    package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
+
+    # pylint: disable-msg=E1101
+    with pytest.raises(qisys.command.NotInPath):
+        package.post_add()
+
+@skip_on_win
+def test_post_add(tmpdir):
+    boost_path = tmpdir.mkdir("boost")
+    boost_path.join("package.xml").write(
+        '<package name="boost" version="1.58" '
+        'post-add="post-add.sh hello world" />'
+    )
+
+    script = boost_path.join("post-add.sh")
+    script.write(
+        '#!/bin/sh\n'
+        'echo $@ > foobar\n'
+    )
+    os.chmod(script.strpath, 0755)
+
+    package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
+
+    package.post_add()
+
+    with open(os.path.join(boost_path.strpath, 'foobar')) as f:
+        txt = f.read()
+
+    assert "hello world" in txt
