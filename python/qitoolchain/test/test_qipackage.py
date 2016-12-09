@@ -194,6 +194,7 @@ def test_post_add_does_not_exist(tmpdir):
 """)
 
     package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
+    package.load_package_xml()
 
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.command.NotInPath):
@@ -215,6 +216,7 @@ def test_post_add(tmpdir):
     os.chmod(script.strpath, 0755)
 
     package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
+    package.load_package_xml()
 
     package.post_add()
 

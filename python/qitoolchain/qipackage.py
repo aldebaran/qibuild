@@ -210,9 +210,6 @@ class QiPackage(object):
             * CommandFailedException if the post-add script fails
         """
 
-        # Make sure the post-add is loaded
-        self.load_package_xml()
-
         if not self._post_add:
             return
 
