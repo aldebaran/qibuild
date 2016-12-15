@@ -222,6 +222,7 @@ This path does not exist
             mess  = "Could not move project\n"
             mess += "Path %s is already registered\n" % src
             mess += "Current worktree: %s" % self.root
+            raise WorkTreeError(mess)
         self.cache.remove_src(src)
         self.cache.add_src(new_src)
         self.load_projects()
