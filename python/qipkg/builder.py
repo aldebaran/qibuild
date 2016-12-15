@@ -3,9 +3,7 @@
 ## found in the COPYING file.
 """ Builder for pml files """
 import os
-import sys
 import tempfile
-import zipfile
 
 from qisys import ui
 import qisys.qixml
@@ -95,7 +93,7 @@ Error when parsing {pml_path}
     def _load_pml(self, pml_path):
         for builder in self.builders:
             builder.projects = list()
-        tree= qisys.qixml.read(pml_path)
+        tree = qisys.qixml.read(pml_path)
         root = tree.getroot()
         qibuild_elems = root.findall("qibuild")
         if qibuild_elems and not self.worktree:
@@ -122,7 +120,8 @@ Error when parsing {pml_path}
             project = self.linguist_worktree.get_linguist_project(name, raises=True)
             self.linguist_builder.projects.append(project)
 
-        # For top, ressource, dialog, behavior, add stuff to self.pml_extra_files
+        # For top, ressource, dialog, behavior
+        # add stuff to self.pml_extra_files
         behaviors = root.find("BehaviorDescriptions")
         if behaviors is not None:
             for child in behaviors.findall("BehaviorDescription"):
@@ -166,7 +165,7 @@ Error when parsing {pml_path}
         """ Configure every project """
         for builder in self.builders:
             if isinstance(builder, qibuild.cmake_builder.CMakeBuilder):
-                builder.dep_types=["build", "runtime", "test"]
+                builder.dep_types = ["build", "runtime", "test"]
             builder.configure()
 
     def build(self):
@@ -174,7 +173,7 @@ Error when parsing {pml_path}
         for builder in self.builders:
             builder.build()
 
-    def install(self, destination):
+    def install(self, destination, install_tc_packages=False):
         """ Install every project to the given destination """
         qisys.sh.mkdir(destination, recursive=True)
         # Copy the manifest
@@ -186,8 +185,9 @@ Error when parsing {pml_path}
             if builder.projects:
                 ui.info(ui.bold, "-> Adding %s ..." % desc)
             if isinstance(builder, qibuild.cmake_builder.CMakeBuilder):
-                builder.dep_types=["runtime"]
-                builder.install(destination, components=["runtime"])
+                builder.dep_types = ["runtime"]
+                builder.install(destination, components=["runtime"],
+                                install_tc_packages=install_tc_packages)
             else:
                 builder.install(destination)
 
@@ -211,7 +211,7 @@ Error when parsing {pml_path}
         """ Deploy every project to the given url """
         qisys.remote.deploy(self.stage_path, url)
 
-    def package(self, output=None, with_breakpad=False, force=False):
+    def package(self, *args, **kwargs):
         """ Generate a package containing every project.
 
         :param: with_breakpad generate debug symbols for usage
@@ -221,7 +221,13 @@ Error when parsing {pml_path}
                                default package requirements
 
         """
-
+        output = kwargs.get('output', None)
+        force = kwargs.get('force', False)
+        with_breakpad = kwargs.get('with_breakpad', False)
+        strip = kwargs.get('strip', True)
+        install_tc_packages = kwargs.get('install_tc_packages', False)
+        strip_args = kwargs.get('strip_args', None)
+        strip_exe = kwargs.get('strip_exe', None)
         # If the package is not valid, do not go further
         if not self.validator.is_valid and not force:
             raise Exception("Given package does not satisfy "
@@ -237,11 +243,7 @@ Error when parsing {pml_path}
 
 
         # Add everything from the staged path
-        self.install(self.stage_path)
-
-        ui.info(ui.bold, "-> Compressing package ...")
-        qisys.archive.compress(self.stage_path, output=output, flat=True,
-                               display_progress=True)
+        self.install(self.stage_path, install_tc_packages=install_tc_packages)
 
         symbols_archive = None
         if with_breakpad and self.build_project:
@@ -249,9 +251,16 @@ Error when parsing {pml_path}
             dirname = os.path.dirname(output)
             symbols_archive = os.path.join(dirname, self.pkg_name + "-symbols.zip")
             qibuild.breakpad.gen_symbol_archive(base_dir=self.stage_path,
-                                                output=symbols_archive)
+                                                output=symbols_archive,
+                                                strip=strip,
+                                                strip_exe=strip_exe,
+                                                strip_args=strip_args)
             ui.info(ui.bold, "-> Symbols generated in", symbols_archive)
         ui.info(ui.bold, "-> Package generated in", output, "\n")
+
+        ui.info(ui.bold, "-> Compressing package ...")
+        qisys.archive.compress(self.stage_path, output=output, flat=True,
+                               display_progress=True)
         qisys.sh.rm(self.stage_path)
         if symbols_archive:
             return [output, symbols_archive]
@@ -265,7 +274,8 @@ def pkg_name(manifest_xml):
     "Return a string name-version"
     root = qisys.qixml.read(manifest_xml).getroot()
     uuid = qisys.qixml.parse_required_attr(root, "uuid", xml_path=manifest_xml)
-    version = qisys.qixml.parse_required_attr(root, "version", xml_path=manifest_xml)
+    version = qisys.qixml.parse_required_attr(root, "version",
+                                              xml_path=manifest_xml)
     output_name = "%s-%s" % (uuid, version)
     return output_name
 
