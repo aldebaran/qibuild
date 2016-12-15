@@ -203,9 +203,7 @@ This path does not exist
 
         """
         src = self.normalize_path(path)
-        if not self.has_project(src):
-            raise WorkTreeError("No such project: %s" % src)
-        project = self.get_project(src)
+        project = self.get_project(src, raises=True)
         if from_disk:
             qisys.sh.rm(project.path)
         self.cache.remove_src(src)
@@ -217,8 +215,9 @@ This path does not exist
         """ Move a project from a worktree """
         src = self.normalize_path(path)
         new_src = self.normalize_path(new_path)
-        if not self.has_project(src):
-            raise WorkTreeError("No such project: %s" % src)
+
+        project = self.get_project(src, raises=True)
+
         if self.has_project(new_src):
             mess  = "Could not move project\n"
             mess += "Path %s is already registered\n" % src
@@ -226,7 +225,6 @@ This path does not exist
         self.cache.remove_src(src)
         self.cache.add_src(new_src)
         self.load_projects()
-        project = self.get_project(src)
         for observer in self._observers:
             observer.reload()
 
