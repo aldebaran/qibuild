@@ -38,3 +38,6 @@ gcovr==3.2
 
 # For more checks, thanks pyflakes
 pyflakes==0.6.1
+
+# For ls-package
+tabulate==0.7.5
