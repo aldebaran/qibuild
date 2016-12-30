@@ -14,6 +14,8 @@ from qisys import ui
 import qisys.archive
 import qisys.worktree
 import qitoolchain.parsers
+import qisys.remote
+import urlparse
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -36,6 +38,8 @@ def do(args):
     package_path = args.package_path
     legacy = False
     try:
+        if urlparse.urlparse(package_path).scheme:
+            package_path = qisys.remote.download(package_path, ".")
         archive = zipfile.ZipFile(package_path)
         archive.read("package.xml")
     except KeyError:
