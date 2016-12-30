@@ -905,6 +905,7 @@ _qitoolchain-remove-package() {
   _arguments \
     "(-c --config)"{-c,--config}"[Name of a config to use.]:Configs:(($(qibuild list-configs 2>/dev/null | tail -n +2 | grep "^*" | cut -c3-)))" \
     "(-t --toolchain)"{-t,--toolchain}"[Name of the toolchain to use.]:Toolchains:(($(qitoolchain list 2>/dev/null | grep '*' | cut -c3-)))" \
+    ": :(($(qitoolchain info  2>/dev/null | grep '^  [^ ]' | cut -d' ' -f3 | grep -v 'Packages:')))" \
   && return
 }
 
