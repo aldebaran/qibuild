@@ -309,7 +309,6 @@ Or configure the project with no config
         ui.info(ui.green, "will be deployed to", ui.blue, url.as_string)
 
         if dep_packages:
-            print
             ui.info(ui.green, ":: ", "Deploying packages")
             for i, package in enumerate(dep_packages):
                 ui.info_count(i, len(dep_packages),
@@ -320,7 +319,6 @@ Or configure the project with no config
                 files = package.install(deploy_dir, components=components)
                 to_deploy.extend(files)
 
-        print
         ui.info(ui.green, ":: ", "Deploying projects")
         # Deploy projects: install them inside a 'deploy' dir in the worktree
         # root, then deploy this dir to the target
@@ -351,12 +349,9 @@ Or configure the project with no config
             to_deploy.sort()
             f.write("\n".join(to_deploy))
 
-        print
         ui.info(ui.green, "::", "Syncing to url", ui.reset, ui.bold,
                 url.as_string, update_title=True)
         qisys.remote.deploy(deploy_dir, url, filelist=deploy_manifest)
-
-        print
 
 class NotConfigured(Exception):
     def __init__(self, project):
