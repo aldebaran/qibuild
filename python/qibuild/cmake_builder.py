@@ -226,7 +226,7 @@ Or configure the project with no config
 
         build_type = "Release"
         if projects:
-            ui.info(ui.green, "the following projects")
+            ui.info(ui.green, "The following projects")
             for project in projects:
                 ui.info(ui.green, " *", ui.blue, project.name)
             if packages:
@@ -242,11 +242,11 @@ Or configure the project with no config
 
         release = build_type == "Release"
         if packages:
-            ui.info(ui.green, ":: ", "installing packages")
+            ui.info(ui.green, ":: Installing packages")
         for i, package in enumerate(packages):
             ui.info_count(i, len(packages),
-                          ui.green, "Installing",
-                          ui.blue, package.name,
+                          ui.green, "Installing", ui.blue, package.name,
+                          ui.green, "to", ui.blue, dest_dir,
                           update_title=True)
             files = package.install(real_dest, components=components,
                                     release=release)
@@ -258,11 +258,11 @@ Or configure the project with no config
         qisys.sh.rm(qitest_json)
 
         if projects:
-            ui.info(ui.green, ":: ", "installing projects")
+            ui.info(ui.green, ":: Installing projects")
             for i, project in enumerate(projects):
                 ui.info_count(i, len(projects),
-                            ui.green, "Installing",
-                            ui.blue, project.name,
+                            ui.green, "Installing", ui.blue, project.name,
+                            ui.green, "to", ui.blue, dest_dir,
                             update_title=True)
                 files = project.install(dest_dir, **kwargs)
                 installed.extend(files)
@@ -272,6 +272,11 @@ Or configure the project with no config
     @need_configure
     def deploy(self, url, split_debug=False, with_tests=False, install_tc_packages=True):
         """ Deploy the project and the packages it depends to a remote url """
+        to_deploy = list()
+        dep_projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+        dep_packages = self.deps_solver.get_dep_packages(self.projects, self.dep_types)
+        if not install_tc_packages:
+            dep_packages = list()
 
         # Deploy packages: install all of them in the same temp dir, then
         # deploy this temp dir to the target
@@ -282,7 +287,7 @@ Or configure the project with no config
         deploy_manifest = os.path.join(deploy_dir, "deploy_manifest.txt")
         if os.path.exists(deploy_manifest):
             qisys.sh.rm(deploy_manifest)
-        to_deploy = list()
+
         components = ["runtime"]
         if with_tests:
             components.append("test")
@@ -292,13 +297,6 @@ Or configure the project with no config
         qitest_json = os.path.join(deploy_dir, "qitest.json")
         qisys.sh.rm(qitest_json)
 
-        if install_tc_packages:
-            dep_packages = self.deps_solver.get_dep_packages(self.projects,
-                                                             self.dep_types)
-        else:
-            dep_packages = list()
-        dep_projects = self.deps_solver.get_dep_projects(self.projects,
-                                                         self.dep_types)
         ui.info(ui.green, "The following projects")
         for project in sorted(dep_projects, key=operator.attrgetter("name")):
             ui.info(ui.green, " *", ui.reset, ui.blue, project.name)
@@ -309,7 +307,7 @@ Or configure the project with no config
         ui.info(ui.green, "will be deployed to", ui.blue, url.as_string)
 
         if dep_packages:
-            ui.info(ui.green, ":: ", "Deploying packages")
+            ui.info(ui.green, ":: Deploying packages")
             for i, package in enumerate(dep_packages):
                 ui.info_count(i, len(dep_packages),
                     ui.green, "Deploying package", ui.blue, package.name,
@@ -319,7 +317,7 @@ Or configure the project with no config
                 files = package.install(deploy_dir, components=components)
                 to_deploy.extend(files)
 
-        ui.info(ui.green, ":: ", "Deploying projects")
+        ui.info(ui.green, ":: Deploying projects")
         # Deploy projects: install them inside a 'deploy' dir in the worktree
         # root, then deploy this dir to the target
 
