@@ -122,7 +122,8 @@ def gen_dsym(binary):
     qisys.command.call(cmd)
     return binary + ".dSYM"
 
-def dump_symbols_from_directory(root_dir, pool_dir, strip=True):
+def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
+                                strip_exe=None, strip_args=None):
     """ Dump symbols for every binary in the root dir.
     Assumes that dump_syms is in $PATH.
     If strip is True, also strip the binaries. (assumes that strip is
@@ -143,15 +144,18 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True):
                     else:
                         strip_args = list()
                     ui.info("stripping", full_path)
-                    strip_binary(full_path, strip_args=strip_args)
+                    strip_binary(full_path, strip_executable=strip_exe,
+                                 strip_args=strip_args)
     return pool_dir
 
-def gen_symbol_archive(base_dir=None, output=None, strip=True):
+def gen_symbol_archive(base_dir=None, output=None, strip=True,
+                       strip_exe=None, strip_args=None):
     """ Generate a symbol archive from all the
     binaries in the base_dir
 
     """
     with qisys.sh.TempDir() as pool_dir:
-        dump_symbols_from_directory(base_dir, pool_dir, strip=strip)
+        dump_symbols_from_directory(base_dir, pool_dir, strip=strip,
+                                    strip_exe=strip_exe, strip_args=strip_args)
         qisys.archive.compress(pool_dir, output=output, flat=True)
     return output
