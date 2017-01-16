@@ -1,0 +1,7 @@
+v3.11.10
+=======
+
+qipkg
+-------
+
+* allow to strip binary pkgs
