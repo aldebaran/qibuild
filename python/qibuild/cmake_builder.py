@@ -82,8 +82,7 @@ class CMakeBuilder(AbstractBuilder):
         every project
 
         """
-        projects = self.deps_solver.get_dep_projects(self.projects,
-                                                     ["build", "runtime", "test"])
+        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
         # subtle diffs here: dependencies.cmake must be written for *all* projects,
         # with the build dependencies
         for project in projects:
@@ -105,7 +104,7 @@ class CMakeBuilder(AbstractBuilder):
         write_qi_path_conf(self.build_worktree.dot_qi, qi_path_sdk_dirs, sdk_layout=False)
 
     def get_sdk_dirs_for_project(self, project):
-        sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "test"])
+        sdk_dirs = self.deps_solver.get_sdk_dirs(project, self.dep_types)
         # remove this when all qiproject.xml have been fixed
         strict_mode = os.environ.get("QIBUILD_STRICT_DEPS_RESOLUTION")
         if strict_mode:
@@ -156,11 +155,9 @@ Or configure the project with no config
 
     def pre_build(self, project):
         """ Called before building a project """
-        sdk_dirs = self.deps_solver.get_sdk_dirs(project,
-                ["build", "runtime", "test"])
+        sdk_dirs = self.deps_solver.get_sdk_dirs(project, self.dep_types)
         paths = sdk_dirs[:]
-        packages = self.deps_solver.get_dep_packages([project],
-                ["build", "runtime", "test"])
+        packages = self.deps_solver.get_dep_packages([project], self.dep_types)
         paths.extend([package.path for package in packages])
         project.fix_shared_libs(paths)
 
@@ -171,7 +168,7 @@ Or configure the project with no config
             projects = self.projects
         else:
             projects = self.deps_solver.get_dep_projects(self.projects,
-                                                        ["build", "runtime", "test"])
+                                                         self.dep_types)
         # Make sure to not pass the 'single' option to project.configure()
         kwargs.pop("single", None)
 

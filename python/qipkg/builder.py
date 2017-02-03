@@ -164,8 +164,6 @@ Error when parsing {pml_path}
     def configure(self):
         """ Configure every project """
         for builder in self.builders:
-            if isinstance(builder, qibuild.cmake_builder.CMakeBuilder):
-                builder.dep_types = ["build", "runtime", "test"]
             builder.configure()
 
     def build(self):
