@@ -3,7 +3,9 @@
 ## found in the COPYING file.
 
 import qisys.sort
+import qibuild.project
 from qisys.qixml import etree
+from qisys import ui
 
 
 class DepsSolver(object):
@@ -86,6 +88,14 @@ class DepsSolver(object):
 
     def _get_sorted_names(self, projects, dep_types, reverse=False):
         """ Helper for get_dep_* functions """
+
+        if "test" in dep_types and \
+            "QI_WITH_TESTS" in self.build_worktree.build_config.cmake_vars and \
+            self.build_worktree.build_config.cmake_vars["QI_WITH_TESTS"] == "OFF":
+                ui.warning("Project configured with QI_WITH_TESTS==\"OFF\" but ",
+                           "`dep_types' contains \"test\". Ignoring dep_type.")
+                dep_types.remove("test")
+
         if reverse:
             reverse_deps = set()
             for project in self.build_worktree.build_projects:
@@ -165,6 +175,15 @@ def gen_deps(objects_with_dependencies, dep_types):
     """
     res = dict()
     for object_with_dependencies in objects_with_dependencies:
+
+        if "test" in dep_types and \
+            isinstance(object_with_dependencies, qibuild.project.BuildProject) and \
+            "QI_WITH_TESTS" in object_with_dependencies.cmake_vars and \
+            object_with_dependencies.cmake_vars["QI_WITH_TESTS"]["value"] == "OFF":
+                ui.warning("Project configured with QI_WITH_TESTS==\"OFF\" but ",
+                           "`dep_types' contains \"test\". Ignoring dep_type.")
+                dep_types.remove("test")
+
         deps = set()
         if "build" in dep_types:
             deps.update(object_with_dependencies.build_depends)
