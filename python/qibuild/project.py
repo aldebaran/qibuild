@@ -126,6 +126,26 @@ class BuildProject(object):
         return os.path.join(self.build_directory, "CMakeCache.txt")
 
     @property
+    def cmake_vars(self):
+        cmake_vars = dict()
+        try:
+            with open(self.cmake_cache, "r") as fp:
+                for r in fp.readlines():
+                    if not r[0].isalnum():
+                        continue
+                    sep1 = r.index(":")
+                    sep2 = r.index("=")
+                    var_name = r[0:sep1]
+                    var_type = r[sep1 + 1:sep2]
+                    if var_type == "UNINITIALIZED":
+                        continue
+                    var_value = r[sep2 + 1:-1]
+                    cmake_vars[var_name] = { "value": var_value, "type": var_type }
+        except Exception:
+            cmake_vars = dict()
+        return cmake_vars
+
+    @property
     def qitest_json(self):
         return os.path.join(self.sdk_directory, "qitest.json")
 
