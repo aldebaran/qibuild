@@ -146,26 +146,36 @@ class CMakeBuildConfig(object):
         return res
 
     @property
+    def cmake_vars(self):
+        """ The CMake variables to use
+
+        """
+        self.parse_profiles(warns=False)
+        args = dict()
+        if self.toolchain:
+            args["CMAKE_TOOLCHAIN_FILE"] = self.toolchain.toolchain_file
+        args["CMAKE_BUILD_TYPE"] = self.build_type
+
+        for (name, value) in self._profile_flags:
+            args[name] = value
+        for (name, value) in self.user_flags:
+            args[name] = value
+
+        venv_path = self.build_worktree.venv_path
+        args["QI_VIRTUALENV_PATH"] = qisys.sh.to_posix_path(venv_path)
+
+        return args
+
+    @property
     def cmake_args(self):
         """ The CMake arguments to use
 
         """
-        self.parse_profiles(warns=False)
         args = list()
+        for k in self.cmake_vars:
+            args.append("-D%s=%s" % (k, self.cmake_vars[k]))
         if self.cmake_generator:
             args.append("-G%s" % self.cmake_generator)
-        if self.toolchain:
-            args.append("-DCMAKE_TOOLCHAIN_FILE=%s" % self.toolchain.toolchain_file)
-        args.append("-DCMAKE_BUILD_TYPE=%s" % self.build_type)
-
-        for (name, value) in self._profile_flags:
-            args.append("-D%s=%s" % (name, value))
-        for (name, value) in self.user_flags:
-            args.append("-D%s=%s" % (name, value))
-
-        venv_path = self.build_worktree.venv_path
-        args.append("-DQI_VIRTUALENV_PATH=%s" % qisys.sh.to_posix_path(venv_path))
-
         return args
 
     @property
