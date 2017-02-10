@@ -124,6 +124,7 @@ class ToolchainFeedParser:
         """ Recursively parse the feed, filling the self.packages
 
         """
+        tc_path = qisys.sh.get_share_path("qi", "toolchains", self.name)
         if branch and name:
             feed_path = open_git_feed(self.name, feed, branch=branch, name=name,
                                       first_pass=first_pass)
@@ -135,6 +136,13 @@ class ToolchainFeedParser:
         for package_tree in package_trees:
             package_tree.set("feed", feed)
             self.append_package(package_tree)
+            subpkg_trees = package_tree.findall("package")
+            for subpkg_tree in subpkg_trees:
+                subpkg_tree.set("feed", feed)
+                subpkg_tree.set("directory",
+                        os.path.join(tc_path, package_tree.get("name")))
+                self.append_package(subpkg_tree)
+
         feeds = tree.findall("feed")
         for feed_tree in feeds:
             feed_url = feed_tree.get("url")

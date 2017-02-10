@@ -1,0 +1,22 @@
+v3.11.13
+========
+
+qitoolchain
+-----------
+
+*  In the toolchain xml file, a 'package' tag can now contain other 'package' tags::
+
+     <toolchain strict_metadata="false">
+       <package name="meta-package" ...>
+         <package name="sub-pkg1" version="..."/>
+         <package name="sub-pkg2" version="..."/>
+         <package name="sub-pkg3" version="..."/>
+       </package>
+     </toolchain>
+
+   This is needed when a package (eg. yocto-sdk) provides several
+   sub-packages that need to appear as qitoolchain packages.
+
+   The xml sub package tag should not contain 'directory' or 'url'
+   attributes as 'directory' attribute will be set to the parent package
+   'directory' attribute.
