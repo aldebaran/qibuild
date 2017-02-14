@@ -1,11 +1,14 @@
 v3.11.13
 ========
 
-qitoolchain
+qipkg
 -----------
 
-*  In the toolchain xml file, a 'package' tag can now contain other 'package' tags::
+* Add option to install toolchain packages
 
+qitoolchain
+-----------
+*  In the toolchain xml file, a 'package' tag can now contain other 'package' tags::
      <toolchain strict_metadata="false">
        <package name="meta-package" ...>
          <package name="sub-pkg1" version="..."/>
