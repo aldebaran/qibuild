@@ -23,7 +23,8 @@ def pml_parser(parser):
 def pkg_parser(parser):
     parser.add_argument("--with-breakpad", action="store_true")
     parser.add_argument("--force", action="store_true")
-    parser.set_defaults(with_breakpad=False, force=False)
+    parser.add_argument("--with-toolchain", action="store_true")
+    parser.set_defaults(with_breakpad=False, force=False, with_toolchain=False)
 
 def get_pml_builder(args):
     worktree = qisys.parsers.get_worktree(args, raises=False)
