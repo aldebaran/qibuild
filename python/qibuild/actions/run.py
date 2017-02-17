@@ -13,6 +13,7 @@ import qibuild.find
 import qibuild.parsers
 import qisys.parsers
 import qisys.command
+import qisys.envsetter
 import qibuild.run
 
 def configure_parser(parser):
@@ -27,6 +28,7 @@ def configure_parser(parser):
 def do(args):
     """Main entry point """
     build_worktree = qibuild.parsers.get_build_worktree(args)
-    env = build_worktree.get_env()
+    envsetter = qisys.envsetter.EnvSetter()
+    envsetter.read_config(build_worktree.build_config.qibuild_cfg)
     qibuild.run.run(build_worktree.build_projects, args.binary, args.bin_args,
-                              env=env, exec_=args.exec_)
+                              env=envsetter.get_build_env(), exec_=args.exec_)
