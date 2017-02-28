@@ -892,6 +892,7 @@ _qitoolchain-remove() {
   _arguments_for_qibuild_logging \
   _arguments_for_qibuild_debug \
   _arguments \
+    "(-f --force)"{-f,--force}"[Remove the whole toolchain, including any local packages you may have added to the toolchain.]" \
     ": :(($(qitoolchain list 2>/dev/null | grep '*' | cut -c3-)))" \
   && return
 }
