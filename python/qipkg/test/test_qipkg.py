@@ -5,12 +5,15 @@ from __future__ import print_function
 
 import os
 import sys
+import zipfile
 
+import qibuild.config
 import qisys.command
 import qisys.error
 import qisys.qixml
 from qisys.qixml import etree
 import qibuild.find
+import qitoolchain.qipackage
 import qipkg.builder
 import qipkg.package
 
@@ -290,3 +293,31 @@ def test_deploy_package_from_pml(qipkg_action, tmpdir, local_url):
 
     expected_path = os.path.expanduser("~/d-0.1.pkg")
     assert os.path.exists(expected_path)
+
+def test_no_toolchain_packages(qipkg_action, tmpdir, toolchains):
+    a_proj = qipkg_action.add_test_project("a_cpp")
+    qiproject_xml = a_proj.qiproject_xml
+    with open(qiproject_xml, "w") as fp:
+        fp.write("""
+<qibuild format="3">
+  <qibuild name="a_cpp">
+    <depends runtime="true" names="bar" />
+  </qibuild>
+</qibuild>
+""")
+    a_pml = os.path.join(a_proj.path, "a_cpp.pml")
+    tc = toolchains.create("tc")
+    bar_path = tmpdir.join("bar")
+    bar_path.ensure("lib", "libbar.so", file=True)
+    tc_package = qitoolchain.qipackage.QiPackage("bar", "0.1")
+    tc_package.path = bar_path.strpath
+    tc.add_package(tc_package)
+    qibuild.config.add_build_config("tc", toolchain="tc")
+    qipkg_action("configure", "--config", "tc", a_pml)
+    qipkg_action("build", "--config", "tc", a_pml)
+    pkg = qipkg_action("make-package",
+                        "--config", "tc",
+                        "--no-toolchain-packages",
+                        a_pml)
+    archive = zipfile.ZipFile(pkg)
+    assert "lib/libbar.so" not in [x.filename for x in archive.infolist()]

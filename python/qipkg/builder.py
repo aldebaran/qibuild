@@ -179,7 +179,7 @@ Error when parsing {pml_path}
         for builder in self.builders:
             builder.build()
 
-    def install(self, destination):
+    def install(self, destination, include_tc_packages=True):
         """ Install every project to the given destination """
         qisys.sh.mkdir(destination, recursive=True)
         # Copy the manifest
@@ -192,7 +192,8 @@ Error when parsing {pml_path}
                 ui.info(ui.bold, "-> Adding %s ..." % desc)
             if isinstance(builder, qibuild.cmake_builder.CMakeBuilder):
                 builder.dep_types=["runtime"]
-                builder.install(destination, components=["runtime"])
+                builder.install(destination, components=["runtime"],
+                                install_tc_packages=include_tc_packages)
             else:
                 builder.install(destination)
 
@@ -216,7 +217,8 @@ Error when parsing {pml_path}
         """ Deploy every project to the given url """
         qisys.remote.deploy(self.stage_path, url)
 
-    def package(self, output=None, with_breakpad=False, force=False):
+    def package(self, output=None, with_breakpad=False, force=False,
+                include_tc_packages=True):
         """ Generate a package containing every project.
 
         :param: with_breakpad generate debug symbols for usage
@@ -243,7 +245,7 @@ Error when parsing {pml_path}
 
 
         # Add everything from the staged path
-        self.install(self.stage_path)
+        self.install(self.stage_path, include_tc_packages=include_tc_packages)
 
         ui.info(ui.bold, "-> Compressing package ...")
         qisys.archive.compress(self.stage_path, output=output, flat=True,

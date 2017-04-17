@@ -151,6 +151,14 @@ qidoc
   * ``conf.in.py`` or ``Doxyfile.in``
   * From ``qiproject.xml``
 
+qipkg
+-----
+
+* ``qipkg make-package``: add ``--no-toolchain-packages`` to *not* include
+  packages from toolchain in the generated ``.pkg`` file.
+  Note that this will speed up development, at the cost of generating packages
+  that may no longer work on a different NAOqi version
+
 qisrc
 ------
 
