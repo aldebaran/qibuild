@@ -23,7 +23,7 @@ def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("project_name",
         help="The name of the project. "
-             "The project will be created in QI_WORK_TREE/<name> ")
+             "The project will be created in PWD/<name> ")
     parser.add_argument("-i", "--input", "--template-path", dest="template_path")
     parser.add_argument("--git", action="store_true",
         help="Create a git repository.")
