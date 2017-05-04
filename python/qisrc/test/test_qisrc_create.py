@@ -47,6 +47,17 @@ def test_template_path(qisrc_action, tmpdir):
     with open(os.path.join(helloworld_proj.path, "CMakeLists.txt")) as fp:
         assert fp.read() == "project(HelloWorld)\n"
 
+def test_domain(qisrc_action, tmpdir):
+    tmpl = tmpdir.mkdir("tmpl")
+    tmpl.join("CMakeLists.txt").write("project(@ProjectName@)\n@domain@")
+    qisrc_action("create", "HelloWorld", "--params", "domain=aldebaran.com", "--output", "helloworld",
+                 "--template-path", tmpl.strpath)
+    qisrc_action.reload_worktree()
+    worktree = qisrc_action.git_worktree.worktree
+    helloworld_proj = worktree.get_project("helloworld")
+    with open(os.path.join(helloworld_proj.path, "CMakeLists.txt")) as fp:
+        assert fp.read() == "project(HelloWorld)\naldebaran.com"
+
 def test_no_worktree(tmpdir):
     tmpl = tmpdir.mkdir("tmpl")
     tmpl.join("@project_name@.txt").write("")

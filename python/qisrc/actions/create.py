@@ -10,6 +10,14 @@ from qisys import ui
 import qisys.parsers
 import qisrc.templates
 
+def parse_params_arg(params_arg):
+    params = dict()
+    args = params_arg.split(',')
+    for arg in args:
+        keyvalue = arg.split('=')
+        params[keyvalue[0]] = keyvalue[1]
+    return params
+
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
@@ -18,8 +26,11 @@ def configure_parser(parser):
              "The project will be created in QI_WORK_TREE/<name> ")
     parser.add_argument("-i", "--input", "--template-path", dest="template_path")
     parser.add_argument("--git", action="store_true",
-        help="Create a git repository")
+        help="Create a git repository.")
     parser.add_argument("-o", "--output", dest="output_dir")
+    parser.add_argument("-p", "--params", action="append", type=parse_params_arg, dest="params",
+        help="Set parameters to be used to fill in the template, for example:"
+        "--params namespace=AL,domain=aldebaran.com")
 
 def do(args):
     """"Create a new project """
@@ -28,11 +39,16 @@ def do(args):
     except qisys.worktree.NotInWorkTree:
         worktree = None
 
-    project_name = os.path.basename(args.project_name)
+    template_kwargs = dict()
+    if args.params is not None:
+        for params in args.params:
+            template_kwargs.update(params)
+    template_kwargs["project_name"] = os.path.basename(args.project_name)
 
     output_dir = args.output_dir
+
     if not output_dir:
-        output_dir = qisrc.templates.attached_lower(project_name)
+        output_dir = qisrc.templates.attached_lower(template_kwargs["project_name"])
         output_dir = os.path.join(os.getcwd(), output_dir)
 
     if os.path.exists(output_dir):
@@ -42,7 +58,7 @@ def do(args):
     if not template_path:
         template_path = os.path.join(qisrc.QISRC_ROOT_DIR, "templates", "project")
 
-    qisrc.templates.process(template_path, output_dir, project_name=project_name)
+    qisrc.templates.process(template_path, output_dir, **template_kwargs)
 
     if args.git:
         qisys.command.call(["git", "init"], cwd=output_dir)
