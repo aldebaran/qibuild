@@ -109,7 +109,7 @@ For instance:
   While nested build projects are supported by qibuild, they are best avoided:
   nested build projects complicate mapping between projects and path which
   makes using git log and continuous integration unnecessarilly harder (see
-  bellow).
+  below).
 
 
 * Two build projects in the same git project, forming
