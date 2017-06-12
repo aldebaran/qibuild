@@ -438,6 +438,8 @@ def mv(src, dest):
     if dest/src exists
 
     """
+    if src == dest:
+        return
     if os.path.isdir(dest):
         dest = os.path.join(dest, os.path.basename(src))
     if os.path.exists(dest):
