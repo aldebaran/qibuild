@@ -37,6 +37,7 @@ def test_deps(qibuild_action):
     # As should `qibuild configure --all`
     qibuild_action("configure", "-a")
 
+
 def test_single(qibuild_action, record_messages):
     # We need to configure world at least once before testing
     # anything
@@ -334,7 +335,8 @@ def test_virtualenv_path(qipy_action, qibuild_action):
     py_proj = qibuild_action.add_test_project("py")
     qibuild_action("configure", "py")
     qibuild_action("make", "py")
-    qipy_action("bootstrap")
+    # ipython 5 is the last version compatible with Python 2.7
+    qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")
     py_test = os.path.join(py_proj.sdk_directory, "bin", "py_test")
     output = subprocess.check_output([py_test]).strip()
     bin_python = os.path.join(output, "bin", "python")

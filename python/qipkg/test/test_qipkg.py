@@ -27,7 +27,8 @@ def test_make_package(qipkg_action, qipy_action):
     qipkg_action.add_test_project("a_cpp")
     qipkg_action.add_test_project("b_py")
     c_pkg_proj = qipkg_action.add_test_project("c_pkg")
-    qipy_action("bootstrap")
+    # ipython 5 is the last version compatible with Python 2.7
+    qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")
 
     pml = os.path.join(c_pkg_proj.path, "c_pkg.pml")
     qipkg_action("configure", pml)
@@ -67,6 +68,7 @@ def test_breakpad_symbols(qipkg_action):
     qipkg_action("build", pml)
     pkg, symbols_archive = qipkg_action("make-package", "--with-breakpad", pml)
     assert os.path.exists(symbols_archive)
+
 
 def test_meta(qipkg_action):
     tmpdir = qipkg_action.worktree.tmpdir

@@ -29,7 +29,8 @@ def test_finding_qi_python_modules(qipy_action, qibuild_action, qitest_action):
 
     project = qibuild_action.add_test_project("usefoopymodule")
 
-    qipy_action("bootstrap")
+    # ipython 5 is the last version compatible with Python 2.7
+    qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")
     with qisys.sh.change_cwd(project.path):
         qibuild_action("configure")
         qipy_action("run", "--no-exec", "--", "qitest", "run")

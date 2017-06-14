@@ -101,7 +101,8 @@ def test_set_pythonhome(toolchains, cd_to_tmpdir):
         assert env["PYTHONHOME"] == python_package.path
 
 def test_venv_path(qipy_action):
-    qipy_action("bootstrap")
+    # ipython 5 is the last version compatible with Python 2.7
+    qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")
     build_worktree = TestBuildWorkTree()
     venv_path = build_worktree.venv_path
     activate = os.path.join(venv_path, "bin", "activate")

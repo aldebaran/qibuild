@@ -14,13 +14,15 @@ def test_install(qipy_action, tmpdir):
 def test_install_with_distutils(qipy_action, tmpdir):
     with_distutils = qipy_action.add_test_project("with_distutils")
     dest = tmpdir.join("dest")
-    qipy_action("bootstrap")
+    # ipython 5 is the last version compatible with Python 2.7
+    qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")
     qipy_action("install", "foo", dest.strpath)
     assert dest.join("bin", "foo").check(file=True)
 
 def test_empty_install(qipy_action, tmpdir):
     empty = qipy_action.add_test_project("empty")
     dest = tmpdir.join("dest")
-    qipy_action("bootstrap")
+    # ipython 5 is the last version compatible with Python 2.7
+    qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")
     error = qipy_action("install", "empty", dest.strpath, raises=True)
     assert "Could not find anything to install" in error
