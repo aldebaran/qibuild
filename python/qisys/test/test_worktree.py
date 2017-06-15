@@ -31,11 +31,13 @@ def test_read_projects(tmpdir):
     p_srcs = [p.src for p in worktree.projects]
     assert p_srcs == ["core/naoqi", "lib/libqi"]
 
+
 def test_normalize_path(tmpdir):
     worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     foo_abs_path = tmpdir.join("bar").join("foo").strpath
     assert worktree.normalize_path(foo_abs_path) == "bar/foo"
     assert worktree.normalize_path("bar/foo") == "bar/foo"
+
 
 def test_add_project_simple(worktree):
     # pylint: disable-msg=E1101
@@ -46,12 +48,14 @@ def test_add_project_simple(worktree):
     foo = worktree.get_project("foo")
     assert foo.src == "foo"
 
+
 def test_fails_when_root_does_not_exists(tmpdir):
-    non_exitsting = tmpdir.join("doesnotexist")
+    non_existing = tmpdir.join("doesnotexist")
     # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
-        qisys.worktree.WorkTree(non_exitsting.strpath)
+        qisys.worktree.WorkTree(non_existing.strpath)
     assert "does not exist" in str(e.value)
+
 
 def test_ignore_src_dot(tmpdir):
     foo_path = tmpdir.mkdir("foo")
@@ -63,6 +67,7 @@ def test_ignore_src_dot(tmpdir):
     worktree  = qisys.worktree.WorkTree(tmpdir.strpath)
     worktree.add_project("foo")
 
+
 def test_remove_project(worktree):
     # pylint: disable-msg=E1101
     tmp = py.path.local(worktree.root)
@@ -71,7 +76,7 @@ def test_remove_project(worktree):
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.worktree.WorkTreeError) as e:
         worktree.remove_project("bar")
-    assert "No such project" in e.value.message
+    assert "No project in 'bar'" in e.value.message
 
     worktree.remove_project("foo")
     assert worktree.projects == list()
@@ -82,6 +87,7 @@ def test_remove_project(worktree):
     worktree.remove_project("foo", from_disk=True)
     assert worktree.projects == list()
     assert not os.path.exists(foo_src.strpath)
+
 
 def test_nested_qiprojects(tmpdir):
     a_project = tmpdir.mkdir("a")
@@ -116,6 +122,7 @@ def test_nested_qiprojects(tmpdir):
     assert [p.src for p in worktree.projects] == \
         ["a", "a/b", "a/b/c"]
 
+
 def test_non_exiting_path_are_removed(tmpdir, interact):
     # all projects registered should exist:
     wt = qisys.worktree.WorkTree(tmpdir.strpath)
@@ -124,6 +131,7 @@ def test_non_exiting_path_are_removed(tmpdir, interact):
     a_path.remove()
     wt2 = qisys.worktree.WorkTree(tmpdir.strpath)
     assert wt2.projects == list()
+
 
 def test_check_subprojects_exist(tmpdir):
     # subprojets in qiproject.xml should exist
@@ -140,11 +148,13 @@ def test_check_subprojects_exist(tmpdir):
         wt.add_project("a")
     assert "invalid sub project" in e.value.message
 
+
 def test_observers_are_notified(worktree):
     mock_observer = mock.Mock()
     worktree.register(mock_observer)
     worktree.create_project("foo")
     assert mock_observer.reload.called
+
 
 def test_add_nested_projects(worktree):
     worktree.create_project("foo")
@@ -162,6 +172,7 @@ def test_add_nested_projects(worktree):
     worktree.remove_project("spam")
     assert [p.src for p in worktree.projects] == ["foo"]
 
+
 def test_warns_on_nested_worktrees(tmpdir, record_messages):
     work1 = tmpdir.mkdir("work1")
     work1.mkdir(".qi")
@@ -169,6 +180,7 @@ def test_warns_on_nested_worktrees(tmpdir, record_messages):
     work2.mkdir(".qi")
     wt2 = qisys.worktree.WorkTree(work2.strpath)
     assert record_messages.find("Nested worktrees")
+
 
 def test_non_ascii_path(tmpdir):
     coffee_dir = tmpdir.mkdir("café")
