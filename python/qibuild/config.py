@@ -612,10 +612,11 @@ class QiBuildConfig(object):
 
     def add_worktree(self, path):
         if path in self.worktrees:
-            return
+            return False
         to_add = WorkTree()
         to_add.path = path
         self.worktrees[path] = to_add
+        return True
 
     def get_server_access(self, server_name):
         """ Return the access settings of a server

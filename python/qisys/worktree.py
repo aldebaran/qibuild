@@ -59,8 +59,8 @@ This path does not exist
         qibuild_cfg.read(to_read, create_if_missing=True)
         encoding = locale.getpreferredencoding()
         as_unicode = self.root.decode(encoding)
-        qibuild_cfg.add_worktree(as_unicode)
-        qibuild_cfg.write()
+        if qibuild_cfg.add_worktree(as_unicode):
+            qibuild_cfg.write()
 
     def register(self, observer):
         """ Called when an observer wants to be notified
