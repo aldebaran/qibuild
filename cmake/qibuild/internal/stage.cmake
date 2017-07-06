@@ -193,6 +193,17 @@ function(_qi_gen_inc_dir_code_sdk res target _U_staged_name)
   string(TOUPPER ${target} _U_target)
   get_directory_property(_inc_dirs INCLUDE_DIRECTORIES)
   list(APPEND ${_U_staged_name}_INCLUDE_DIRS ${_inc_dirs})
+
+  get_target_property(_inc_target_dirs ${target} INTERFACE_INCLUDE_DIRECTORIES)
+  if(_inc_target_dirs)
+    _qi_list_append_uniq(${_U_staged_name}_INCLUDE_DIRS ${_inc_target_dirs})
+  endif()
+
+  get_target_property(_inc_target_dirs_2 ${target} INTERFACE_SYSTEM_INCLUDE_DIRECTORIES)
+  if(_inc_target_dirs_2)
+    _qi_list_append_uniq(${_U_staged_name}_INCLUDE_DIRS ${_inc_target_dirs_2})
+  endif()
+
   _qi_gen_code_from_vars(_res ${_U_staged_name}_INCLUDE_DIRS)
   set(${res} ${_res} PARENT_SCOPE)
 endfunction()
