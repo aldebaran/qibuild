@@ -141,6 +141,7 @@ class ToolchainFeedParser:
                 subpkg_tree.set("feed", feed)
                 subpkg_tree.set("directory",
                         os.path.join(tc_path, package_tree.get("name")))
+                subpkg_tree.set("subpkg", "1")
                 self.append_package(subpkg_tree)
 
         feeds = tree.findall("feed")

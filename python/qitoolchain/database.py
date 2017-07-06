@@ -57,7 +57,9 @@ class DataBase(object):
         if name not in self.packages:
             raise Exception("No such package: %s" % name)
         to_remove = self.packages[name]
-        qisys.sh.rm(to_remove.path)
+
+        if not to_remove.subpkg:
+            qisys.sh.rm(to_remove.path)
         del self.packages[name]
 
     def get_package_path(self, name):

@@ -34,6 +34,7 @@ class QiPackage(object):
         self.run_depends = set()
         self.test_depends = set()
         self._post_add = None
+        self.subpkg = None
 
     @property
     def license(self):
@@ -69,6 +70,8 @@ class QiPackage(object):
             element.set("sysroot", self.sysroot)
         if self.cross_gdb:
             element.set("cross_gdb", self.cross_gdb)
+        if self.subpkg:
+            element.set("subpkg", self.subpkg)
         return element
 
     def install(self, destdir, components=None, release=True):
@@ -85,6 +88,8 @@ class QiPackage(object):
         install_manifest_test.txt manifest file will be read
 
         """
+        if self.subpkg:
+            return list()
         if not components:
             return self._install_all(destdir)
         installed_files = list()
@@ -259,6 +264,7 @@ def from_xml(element):
     res.path = element.get("path")
     res.directory = element.get("directory")
     res._post_add = element.get("post-add")
+    res.subpkg = element.get("subpkg")
     if res.url and res.directory:
         mess = """\
 Bad configuration for package %s. 'directory' and 'url' are
