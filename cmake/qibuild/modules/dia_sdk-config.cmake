@@ -23,6 +23,17 @@ if(NOT IS_DIRECTORY ${_dia_sdk_dir})
   qi_error("Could not find DIA SDK. (looked in ${_dia_sdk_dir})
 Please check your Visual Studio installation")
 endif()
-set(DIA_SDK_LIBRARIES "${_dia_sdk_dir}/lib/diaguids.lib" CACHE INTERNAL "" FORCE)
+
+set(_arch_dir )
+
+if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8") # 64bit
+  set(_arch_dir "amd64/")
+elseif("${CMAKE_SIZEOF_VOID_P}" EQUAL "4") # 32bit
+  # Do nothing, we use the the root directory
+else() # unknown
+  qi_error("No known location of DIA SDK library for this architecture") # for example ARM exists but is not managed here
+endif()
+
+set(DIA_SDK_LIBRARIES "${_dia_sdk_dir}/lib/${_arch_dir}diaguids.lib" CACHE INTERNAL "" FORCE)
 set(DIA_SDK_INCLUDE_DIRS "${_dia_sdk_dir}/include" CACHE INTERNAL "" FORCE)
 export_lib(DIA_SDK)
