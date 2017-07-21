@@ -326,6 +326,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         test_case = etree.SubElement(test_suite, "testcase")
         test_case.set("name", test["name"])
         test_case.set("status", "run")
+        test_case.set("time", str(res.time))
         if not res.ok:
             failure = etree.SubElement(test_case, "failure")
             failure.set("message", message_as_string)
