@@ -16,14 +16,18 @@ def configure_parser(parser):
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("depends arguments",
         description="Shows project and package dependencies."
-            "\nUse --runtime, --direct, and --reverse to control "
+            "\nUse --runtime, --buildtime, --testtime, --direct, and --reverse to control "
             "the dependencies to examine. Default usage shows "
             "compressed, recursive, build time dependencies. "
             "\nUse --tree or --graph to control the output format."
             "\nFor best results with --graph, use:\nqibuild depends "
             "--graph | dot -Tpng -oout.png -Goverlap=scale -Gsplines=true")
     group.add_argument("--runtime", action="store_true", default=False,
-                       help="use runtime dependencies only")
+                       help="use runtime dependencies")
+    group.add_argument("--testtime", action="store_true", default=False,
+                       help="use testtime dependencies")
+    group.add_argument("--buildtime", action="store_true", default=False,
+                       help="use buildtime dependencies")
     group.add_argument("--reverse", action="store_true", default=False,
                        help="show projects that depend on the current project")
     group.add_argument("--tree", action="store_true", default=False,
@@ -53,16 +57,12 @@ class DependencyRelationship(object):
         return (other.from_name == self.from_name and
             other.to_name == self.to_name)
 
-def get_deps(build_worktree, project, single, runtime, reverse):
+def get_deps(build_worktree, project, single, dep_types, reverse):
     """ create a list of DependencyRelationship objects ready for display """
     deps_solver = qibuild.deps.DepsSolver(build_worktree)
     if reverse:
         (packages, projects) =  (set(), build_worktree.build_projects)
     else:
-        if runtime:
-            dep_types = ["build"]
-        else:
-            dep_types = ["runtime"]
         projects = deps_solver.get_dep_projects([project], dep_types)
         packages = deps_solver.get_dep_packages([project], dep_types)
 
@@ -71,10 +71,10 @@ def get_deps(build_worktree, project, single, runtime, reverse):
 
     if reverse:
         collected_dependencies = collect_dependencies_reverse(
-            project, projects, single, runtime)
+            project, projects, single, dep_types)
     else:
         collected_dependencies = collect_dependencies(
-            project, projects, packages, single, runtime)
+            project, projects, packages, single, dep_types)
 
     return collected_dependencies
 
@@ -182,16 +182,19 @@ def print_deps_graph(root_name, label, dependency_relationships):
                 qisys.ui.reset, line_type)
     qisys.ui.info(qisys.ui.reset, "}")
 
-def collect_dependencies_reverse(project, projects, single, runtime, depth=0):
+def collect_dependencies_reverse(project, projects, single, dep_types, depth=0):
     """ recursively collects projects that depends on the current project """
     collected_dependencies = list()
     for proj in projects:
         dependency = None
-        depends = list()
-        if runtime:
-            depends = proj.run_depends
-        else:
-            depends = proj.build_depends
+        depends = set()
+        if "runtime" in dep_types:
+            depends = depends.union(proj.run_depends)
+        if "build" in dep_types:
+            depends = depends.union(proj.build_depends)
+        if "test" in dep_types:
+            depends = depends.union(proj.test_depends)
+
         if project.name in depends:
             dependency = DependencyRelationship(project.name, proj.name)
             dependency.is_known = True
@@ -200,7 +203,7 @@ def collect_dependencies_reverse(project, projects, single, runtime, depth=0):
             collected_dependencies.append(dependency)
             if not single:
                 sub = collect_dependencies_reverse(
-                    proj, projects, False, runtime, depth+1)
+                    proj, projects, False, dep_types, depth+1)
                 collected_dependencies.extend(sub)
 
     return collected_dependencies
@@ -214,19 +217,21 @@ def package_names_first(dependency_names, package_names):
     dep_packages.extend(dep_projects)
     return dep_packages
 
-def collect_dependencies(project, projects, packages, single, runtime, depth=0):
+def collect_dependencies(project, projects, packages, single, dep_types, depth=0):
     """ recursively collect dependent projects and packages """
     if depth > 99:
         qisys.ui.error("Probable recursion problem: ", project.name)
         exit(1)
 
-    # Look at runtime dependencies if runtime
-    if runtime:
-        dependency_names = project.run_depends
-    else:
-        dependency_names = project.build_depends
+    deps = set()
+    if "runtime" in dep_types:
+        deps = deps.union(project.run_depends)
+    if "build" in dep_types:
+        deps = deps.union(project.build_depends)
+    if "test" in dep_types:
+        deps = deps.union(project.test_depends)
     package_names = [package.name for package in packages]
-    dependency_names = package_names_first(dependency_names, package_names)
+    dependency_names = package_names_first(deps, package_names)
     collected_dependencies = list()
 
     # Go through them and gather information
@@ -256,7 +261,7 @@ def collect_dependencies(project, projects, packages, single, runtime, depth=0):
         if not single and next_item:
             collected_dependencies.extend(
                 collect_dependencies(next_item, projects, packages,
-                                     False, runtime, depth+1))
+                                     False, dep_types, depth+1))
     return collected_dependencies
 
 
@@ -264,8 +269,15 @@ def do(args):
     """Main entry point for depends action"""
     build_worktree = qibuild.parsers.get_build_worktree(args, verbose=(not args.graph))
     project = qibuild.parsers.get_one_build_project(build_worktree, args)
+    dep_types = []
+    if args.runtime:
+        dep_types.append("runtime")
+    if args.testtime:
+        dep_types.append("test")
+    if args.buildtime or not dep_types:
+        dep_types.append("build")
     collected_dependencies = get_deps(
-        build_worktree, project, args.direct, args.runtime, args.reverse)
+        build_worktree, project, args.direct, dep_types, args.reverse)
 
     # create title
     label = project.name
