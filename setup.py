@@ -1,4 +1,4 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
+## Copyright (c) 2012-2017 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
@@ -25,7 +25,7 @@ def get_qibuild_cmake_files():
 data_files = get_qibuild_cmake_files()
 
 setup(name="qibuild",
-      version="3.11.15",
+      version="3.11.16",
       description="The meta build framework",
       url="http://doc.aldebaran.com/qibuild",
       author="Aldebaran Robotics",

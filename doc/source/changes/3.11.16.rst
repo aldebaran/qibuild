@@ -1,7 +1,7 @@
-v3.11.14
+v3.11.16
 ========
 
-qibuild deploy
+qibuild
 -----------
 
 * update third party sub-packages behavior to not deploy them
