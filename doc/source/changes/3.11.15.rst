@@ -1,0 +1,9 @@
+v3.11.14
+========
+
+qibuild deploy
+-----------
+
+* update third party sub-packages behavior to not deploy them
+* Do not build dependencies tagged as testtime when QI_WITH_TESTS is set to OFF
+* Add a dict to access CMake vars in build_config
