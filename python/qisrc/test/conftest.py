@@ -250,6 +250,22 @@ class TestGitServer(object):
         else:
             git.push("origin", "--force", "%s:%s" % (branch, branch))
 
+    def push_tag(self, project, tag, branch="master", fast_forward=True):
+        """ push tag on project """
+        src = project.replace(".git", "")
+        repo_src = self.src.join(src)
+        git = qisrc.git.Git(repo_src.strpath)
+        if git.get_current_branch() != branch:
+            git.checkout("--force", "-B", branch)
+        if not fast_forward:
+            git.reset("--hard", "HEAD~1")
+        # tag the branch
+        git.call("tag", tag)
+        if fast_forward:
+            git.push("origin", tag)
+        else:
+            git.push("origin", "--force", tag)
+
     def delete_file(self, project, filename):
         """ Delete a file from the repository """
         src = project.replace(".git", "")

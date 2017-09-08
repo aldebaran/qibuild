@@ -56,13 +56,16 @@ class MetaPMLBuilder(object):
                     "Deploying", pml_builder.pml_path)
             pml_builder.deploy(url)
 
-    def package(self, with_breakpad=False, output=None, force=False):
+    def package(self, *args, **kwargs):
         """ Generate a package containing every package.
 
         :param: with_breakpad generate debug symbols for usage
                                with breakpad
 
         """
+        output = kwargs.get('output', None)
+        force = kwargs.get('force', False)
+        with_breakpad = kwargs.get('with_breakpad', False)
         all_packages = list()
         n = len(self.pml_builders)
         for i, pml_builder in enumerate(self.pml_builders):

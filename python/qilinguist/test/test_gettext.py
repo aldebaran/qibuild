@@ -1,11 +1,14 @@
+# coding: utf-8
 ## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
 import os
 import subprocess
+import pytest
 
 import qisys.command
+
 
 def check_gettext():
     gettext = qisys.command.find_program("xgettext", raises=False)
@@ -28,6 +31,7 @@ def test_update(qilinguist_action):
     assert os.path.exists(fr_FR_po_file)
     assert os.path.exists(en_US_po_file)
     assert os.path.exists(pot_file)
+
 
 def test_release(qilinguist_action):
     if not check_gettext():
@@ -54,7 +58,7 @@ def test_cplusplus_sdk_workflow(qilinguist_action):
     trad.configure()
     trad.build()
 
-    ## check binary output
+    # check binary output
     binary = os.path.join(trad.sdk_directory, "bin", "translate")
     dictPath = os.path.join(trad.path, "po", "share", "locale", "translate")
     env = os.environ.copy()
@@ -95,19 +99,19 @@ def test_cplusplus_install_workflow(qilinguist_action, tmpdir):
     trad.build()
     trad.install(tmpdir.strpath)
 
-    ## check mo files
-    fr_FR_mo_file = tmpdir.join("share", "locale", "translate", "fr_FR", "LC_MESSAGES", "translate.mo").strpath
-    en_US_mo_file = tmpdir.join("share", "locale", "translate", "en_US", "LC_MESSAGES", "translate.mo").strpath
-    assert os.path.exists(fr_FR_mo_file)
-    assert os.path.exists(en_US_mo_file)
+    # check mo files
+    fr_mo_file = tmpdir.join("share", "locale", "translate", "fr_FR", "LC_MESSAGES", "translate.mo").strpath
+    en_mo_file = tmpdir.join("share", "locale", "translate", "en_US", "LC_MESSAGES", "translate.mo").strpath
+    assert os.path.exists(fr_mo_file)
+    assert os.path.exists(en_mo_file)
 
-    ## check binary output
+    # check binary output
     binary = tmpdir.join("bin", "translate").strpath
-    dictPath = tmpdir.join("share", "locale", "translate").strpath
+    dict_path = tmpdir.join("share", "locale", "translate").strpath
     env = os.environ.copy()
-    env["LANGUAGE"] = "fr_FR.UTF-8" # for Ubuntu
-    env["LC_ALL"] = "fr_FR.UTF-8" # for Arch Linux
-    cmd = [binary, dictPath]
+    env["LANGUAGE"] = "fr_FR.UTF-8"  # for Ubuntu
+    env["LC_ALL"] = "fr_FR.UTF-8"  # for Arch Linux
+    cmd = [binary, dict_path]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE, env=env)
     out, _ = process.communicate()
@@ -115,11 +119,13 @@ def test_cplusplus_install_workflow(qilinguist_action, tmpdir):
 O\xc3\xb9 est Brian ?
 Brian est dans la cuisine.
 """
-    assert out_fr in out
+
+    if out_fr not in out:
+        pytest.fail("Wrong translation : {} not in {}".format(out_fr, out))
 
     env = os.environ.copy()
     env["LANGUAGE"] = "en_US.UTF-8"
-    cmd = [binary, dictPath]
+    cmd = [binary, dict_path]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE, env=env)
     out, _ = process.communicate()
@@ -127,4 +133,5 @@ Brian est dans la cuisine.
 Where is Brian?
 Brian is in the kitchen.
 """
-    assert out_en in out
+    if out_en not in out:
+        pytest.fail("Wrong translation : {} not in {}".format(out_en, out))

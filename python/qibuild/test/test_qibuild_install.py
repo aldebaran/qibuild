@@ -116,6 +116,7 @@ def test_fails_early(qibuild_action, tmpdir):
 def test_install_cross_unix_makefiles(qibuild_action, tmpdir):
     install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles")
 
+
 def test_install_cross_ninja(qibuild_action, tmpdir):
     install_cross(qibuild_action, tmpdir, cmake_generator="Ninja")
 
