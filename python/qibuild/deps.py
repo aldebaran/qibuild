@@ -75,7 +75,7 @@ class DepsSolver(object):
     def get_host_projects(self, projects):
         """ Get a sorted list of all the projects listed as host dependencies """
         host_deps = set()
-        dep_projects = self.get_dep_projects(projects, ["build", "runtime"])
+        dep_projects = self.get_dep_projects(projects, ["build", "runtime", "test"])
         for project in dep_projects:
             host_deps = host_deps.union(project.host_depends)
 
