@@ -1,0 +1,7 @@
+v3.11.17
+========
+
+qibuild
+-----------
+
+* fix a regression when configuring a single project
