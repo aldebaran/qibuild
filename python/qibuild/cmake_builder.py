@@ -210,9 +210,8 @@ Or configure the project with no config
     def install(self, dest_dir, *args, **kwargs):
         """ Install the projects and the packages to the dest_dir """
         installed = list()
-        components = kwargs.get("components")
-        projects = self.deps_solver.get_dep_projects(self.projects, components)
-        packages = self.deps_solver.get_dep_packages(self.projects, components)
+        projects = self.deps_solver.get_dep_projects(self.projects, self.dep_types)
+        packages = self.deps_solver.get_dep_packages(self.projects, self.dep_types)
         if "install_tc_packages" in kwargs:
             install_tc_packages = kwargs["install_tc_packages"]
             del kwargs["install_tc_packages"]
@@ -223,6 +222,7 @@ Or configure the project with no config
         prefix = kwargs.get("prefix", "/")
         prefix = prefix[1:]
         real_dest = os.path.join(dest_dir, prefix)
+        components = kwargs.get("components")
 
         build_type = "Release"
         if projects:
