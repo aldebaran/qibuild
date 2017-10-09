@@ -105,13 +105,14 @@ class CMakeBuilder(AbstractBuilder):
         """
         projects = self.deps_solver.get_dep_projects(self.projects,
                                                      ["build", "runtime", "test"])
-        # subtle diffs here: dependencies.cmake must be written for *all* projects,
-        # with the build dependencies
+        # subtle diffs here: dependencies.cmake and project.cmake must be written
+        # for *all* projects, with the build dependencies
         for project in projects:
             sdk_dirs = self.get_sdk_dirs_for_project(project)
             host_dirs = self.get_host_dirs(project)
             if not project.meta:
                 project.write_dependencies_cmake(sdk_dirs, host_dirs=host_dirs)
+                project.write_project_cmake()
 
     def get_sdk_dirs_for_project(self, project):
         sdk_dirs = self.deps_solver.get_sdk_dirs(project, ["build", "test"])

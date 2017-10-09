@@ -12,6 +12,12 @@ if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
   include(${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake)
 endif()
 
+# If someone is using qibuild configure, includes
+# the project.cmake file
+if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/project.cmake)
+  include(${CMAKE_CURRENT_BINARY_DIR}/project.cmake)
+endif()
+
 # remove qi_tests.json
 # Note:
 #  this will fail silently if the file does not exist
