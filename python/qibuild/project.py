@@ -179,7 +179,7 @@ class BuildProject(object):
 
     def write_project_cmake(self):
         """ Write the project.cmake file. This will be read by
-        qibuild-config.cmake to set QI_SDK_VERSION.
+        qibuild-config.cmake to set QI_PROJECT_VERSION.
         """
         to_write = """
 #############################################
@@ -187,7 +187,7 @@ class BuildProject(object):
 #############################################
 
 # Add qiproject version to CMake
-set(QI_SDK_VERSION %s CACHE STRING "" FORCE)
+set(QI_PROJECT_VERSION %s CACHE STRING "" FORCE)
 """ % self.version 
 
 
