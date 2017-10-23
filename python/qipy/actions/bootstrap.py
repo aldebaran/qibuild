@@ -24,7 +24,8 @@ def configure_parser(parser):
                              "directory")
     parser.add_argument("-p", "--python",
                         help="The Python interpreter to use")
-    parser.set_defaults(requirements=["pip", "virtualenv", "ipython"],
+    # Limit IPython package version to comply with python 2.7 compatibility
+    parser.set_defaults(requirements=["pip", "virtualenv", "ipython<6"],
                         site_packages=True)
 
 def do(args):
