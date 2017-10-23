@@ -56,7 +56,7 @@ class MetaPMLBuilder(object):
                     "Deploying", pml_builder.pml_path)
             pml_builder.deploy(url)
 
-    def package(self, with_breakpad=False, output=None, force=False):
+    def package(self, with_breakpad=False, output=None, force=False, install_tc_packages=False):
         """ Generate a package containing every package.
 
         :param: with_breakpad generate debug symbols for usage
@@ -68,7 +68,9 @@ class MetaPMLBuilder(object):
         for i, pml_builder in enumerate(self.pml_builders):
             ui.info(ui.green, "::", ui.reset, ui.bold, "[%i/%i]" % ((i + 1), n),
                     "Making package from", pml_builder.pml_path)
-            packages = pml_builder.package(with_breakpad=with_breakpad, force=force)
+            packages = pml_builder.package(with_breakpad=with_breakpad,
+                                           force=force,
+                                           install_tc_packages=install_tc_packages)
             if isinstance(packages, list):
                 all_packages.extend(packages)
             else:
