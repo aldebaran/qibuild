@@ -26,7 +26,6 @@ def is_url(location):
     """ Check that a given location is an URL """
     return "://" in location
 
-
 def raise_parse_error(package_tree, feed, message):
     """ Raise a nice pasing error about the given
     package_tree element.
@@ -73,8 +72,9 @@ def open_git_feed(toolchain_name, feed_url, name=None, branch="master", first_pa
             git.call("reset", "--hard", "--quiet", "origin/%s" % branch)
         else:
             git.clone(feed_url, "--quiet", "--branch", branch)
-
-    feed_path = os.path.join(git_path, "feeds", name + ".xml")
+        feed_path = os.path.join(git_path, "feeds", name + ".xml")
+    else:
+        feed_path = feed_url
     return feed_path
 
 class ToolchainFeedParser:
@@ -126,11 +126,10 @@ class ToolchainFeedParser:
         """
         tc_path = qisys.sh.get_share_path("qi", "toolchains", self.name)
         if branch and name:
-            feed_path = open_git_feed(self.name, feed, branch=branch, name=name,
+            feed = open_git_feed(self.name, feed, branch=branch, name=name,
                                       first_pass=first_pass)
-            tree = tree_from_feed(feed_path)
-        else:
-            tree = tree_from_feed(feed)
+
+        tree = tree_from_feed(feed)
         package_trees = tree.findall("package")
         package_trees.extend(tree.findall("svn_package"))
         for package_tree in package_trees:
@@ -146,15 +145,20 @@ class ToolchainFeedParser:
 
         feeds = tree.findall("feed")
         for feed_tree in feeds:
+            feed_name = feed_tree.get("name")
             feed_url = feed_tree.get("url")
-            if feed_url:
-                # feed_url can be relative to feed:
-                if not "://" in feed_url:
+            # feed_url can be relative to feed:
+            if feed_tree.get("path") and branch:
+                feed_path = os.path.join(tc_path + ".git", feed_tree.get("path"))
+                self.parse(feed_path)
+                if feed_name:
+                    self.parse(feed_path, branch=branch, name=feed_name, first_pass=False)
+            elif feed_url:
+                if not is_url(feed_url):
                     feed_url = urlparse.urljoin(feed, feed_url)
                 self.parse(feed_url)
-            feed_name = feed_tree.get("name")
-            if feed_name:
-                self.parse(feed, branch=branch, name=feed_name, first_pass=False)
+                if feed_name:
+                    self.parse(feed, branch=branch, name=feed_name, first_pass=False)
         select_tree = tree.find("select")
         if select_tree is not None:
             blacklist_trees = select_tree.findall("blacklist")
