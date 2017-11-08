@@ -122,3 +122,54 @@ def test_qisrc_checkout_when_no_group(qisrc_action, git_server):
 
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 0
+
+def test_qisrc_checkout_with_ref_to_branch(qisrc_action, git_server):
+    manifest_url = git_server.manifest_url
+    git_server.create_repo("foo.git")
+    git_server.create_repo("bar.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.push_file("foo.git", "b.txt", "b")
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    qisrc_action("init", manifest_url)
+    git_server.switch_manifest_branch("devel")
+    git_server.set_branch("foo.git", "devel")
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    _, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    expected = git.get_ref_sha1("refs/tags/v0.1")
+    assert sha1 == expected
+    qisrc_action("checkout", "devel")
+    foo_git = qisrc.git.Git(foo_proj.path)
+    assert foo_git.get_current_branch() == "devel"
+    bar_proj = git_worktree.get_git_project("bar")
+    bar_git = qisrc.git.Git(bar_proj.path)
+    assert bar_git.get_current_branch() == "master"
+
+def test_qisrc_checkout_with_branch_to_ref(qisrc_action, git_server):
+    manifest_url = git_server.manifest_url
+    git_server.create_repo("foo.git")
+    git_server.create_repo("bar.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.push_file("foo.git", "b.txt", "b")
+    git_server.push_tag("bar.git", "v0.2")
+    git_server.push_file("bar.git", "c.txt", "b")
+    qisrc_action("init", manifest_url)
+    git_server.switch_manifest_branch("devel")
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    git_server.set_fixed_ref("bar.git", "v0.2")
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    assert git.get_current_branch() == "master"
+    qisrc_action("checkout", "devel")
+    _, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    expected = git.get_ref_sha1("refs/tags/v0.1")
+    assert sha1 == expected
+    bar_proj = git_worktree.get_git_project("bar")
+    bar_git = qisrc.git.Git(bar_proj.path)
+    _, sha1 = bar_git.call("rev-parse", "HEAD", raises=False)
+    expected = bar_git.get_ref_sha1("refs/tags/v0.2")
+    assert sha1 == expected

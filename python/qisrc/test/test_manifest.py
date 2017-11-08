@@ -330,6 +330,38 @@ def test_multiple_remotes(tmpdir):
     foo = manifest.repos[0]
     assert len(foo.remotes) == 2
 
+def test_fixed_ref(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="foo/bar.git"
+        src="lib/bar"
+        remotes="origin"
+        ref="v0.1" />
+</manifest>
+""")
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    foo = manifest.repos[0]
+    assert foo.default_branch is None
+    assert foo.fixed_ref == "v0.1"
+
+def test_fixed_ref_and_branch_are_exclusive(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+<manifest>
+  <remote name="origin" url="git@example.com" />
+  <repo project="foo/bar.git"
+        src="lib/bar"
+        remotes="origin"
+        ref="v0.1"
+        branch="master" />
+</manifest>
+""")
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception)as e:
+        qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert "'branch' and 'ref' are mutually exclusive" in e.value.args[0]
 
 def test_from_git_repo(git_server):
     git_server.create_repo("foo")
@@ -362,3 +394,70 @@ def test_all_repos(tmpdir):
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     git_projects = manifest.get_repos(all=True)
     assert len(git_projects) == 3
+
+def test_import_parser(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+    <manifest>
+      <remote name="origin" url="git@example.com" />
+      <import manifest="a.git" remotes="origin" />
+      <import manifest="b.git" remotes="origin" />
+    </manifest>
+    """)
+    manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    import_manifest = manifest.import_manifest
+    assert len(import_manifest) == 2
+    assert len(import_manifest[0].remote_names) == 1
+    assert import_manifest[0].default_remote_name == "origin"
+    assert import_manifest[0].remotes[0].url == "git@example.com:a.git"
+
+def test_import_parser_error_manifest(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+    <manifest>
+      <remote name="origin" url="git@example.com" />
+      <import remotes="origin" />
+    </manifest>
+    """)
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception)as e:
+        manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert "Missing 'manifest' attribute" in e.value.args[0]
+
+def test_import_parser_error_remote_empty(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+    <manifest>
+      <remote name="origin" url="git@example.com" />
+      <import manifest="a.git" remotes="" />
+    </manifest>
+    """)
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception)as e:
+        manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert "Empty 'remotes' attribute" in e.value.args[0]
+
+def test_import_parser_error_remote(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+    <manifest>
+      <remote name="origin" url="git@example.com" />
+      <import manifest="a.git"/>
+    </manifest>
+    """)
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception)as e:
+        manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert "Missing 'remotes' attribute" in e.value.args[0]
+
+def test_import_parser_error_remote_missing(tmpdir):
+    manifest_xml = tmpdir.join("manifest.xml")
+    manifest_xml.write(""" \
+    <manifest>
+       <import manifest="a.git" remotes="origin" />
+    </manifest>
+    """)
+    # pylint: disable-msg=E1101
+    with pytest.raises(Exception)as e:
+        manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
+    assert "No matching remote: origin for repo a.git" in e.value.args[0]

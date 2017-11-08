@@ -3,6 +3,8 @@
 # found in the COPYING file.
 import qisys.script
 import qisrc.git
+
+from qisrc.test.conftest import TestGit
 from qisrc.test.conftest import TestGitWorkTree
 
 import os
@@ -197,3 +199,17 @@ def test_all(qisrc_action, git_server):
     qisrc_action("init", git_server.manifest_url, "--all")
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 3
+
+def test_tags(qisrc_action, git_server):
+    git_server.create_repo("foo.git")
+    git_server.push_file("foo.git", "a.txt", "a")
+    git_server.push_tag("foo.git", "v0.1")
+    git_server.push_file("foo.git", "b.txt", "b")
+    git_server.set_fixed_ref("foo.git", "v0.1")
+    qisrc_action("init", git_server.manifest_url)
+    git_worktree = TestGitWorkTree()
+    foo_proj = git_worktree.get_git_project("foo")
+    git = TestGit(foo_proj.path)
+    _, sha1 = git.call("rev-parse", "HEAD", raises=False)
+    expected = git.get_ref_sha1("refs/tags/v0.1")
+    assert sha1 == expected
