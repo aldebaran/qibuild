@@ -1,5 +1,5 @@
 clean(RASQAL)
-
 fpath(RASQAL rasqal/rasqal.h)
+fpath(RASQAL rasqal.h PATH_SUFFIXES rasqal)
 flib(RASQAL NAMES rasqal)
 export_lib(RASQAL)
