@@ -127,7 +127,9 @@ function(qi_create_bin name)
     endif()
   endif()
   if(APPLE AND NOT ARG_NO_RPATH)
-    _qi_set_apple_rpath("${name}" "${ARG_SUBFOLDER}")
+     set_target_properties("${name}"
+       PROPERTIES
+         INSTALL_RPATH "@executable_path/../lib;@executable_path/..")
   endif()
 endfunction()
 
@@ -316,7 +318,7 @@ function(qi_create_lib name)
   endif()
 
   if(NOT DEFINED QI_INSTALL_NAME_DIR)
-    set(QI_INSTALL_NAME_DIR "@rpath/${QI_SDK_LIB}/${ARG_SUBFOLDER}")
+    set(QI_INSTALL_NAME_DIR "@rpath/${ARG_SUBFOLDER}")
   endif()
   if(APPLE)
     set_target_properties("${name}"
@@ -324,7 +326,6 @@ function(qi_create_lib name)
       # Contrary to what the cmake doc says,
       # this is the only variable that works on mac:
         INSTALL_NAME_DIR ${QI_INSTALL_NAME_DIR}
-        BUILD_WITH_INSTALL_RPATH 1
     )
   endif()
   if(UNIX AND NOT APPLE)
@@ -337,7 +338,9 @@ function(qi_create_lib name)
     endif()
   endif()
   if(APPLE AND NOT ARG_NO_RPATH AND NOT _type STREQUAL "STATIC")
-    _qi_set_apple_rpath("${name}" "${ARG_SUBFOLDER}")
+     set_target_properties("${name}"
+       PROPERTIES
+         INSTALL_RPATH "@loader_path;@loader_path/..")
   endif()
 endfunction()
 

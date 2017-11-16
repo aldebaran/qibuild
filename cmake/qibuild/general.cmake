@@ -67,6 +67,10 @@ if (QI_T001CHAIN_COMPAT)
   include("qibuild/compat/compat")
 endif()
 
+if (APPLE)
+  qi_persistent_set(CMAKE_MACOSX_RPATH ON)
+endif()
+
 # temporary work around for ubuntu >= natty and cmake < 2.8.6
 # (inspired by http://www.cmake.org/Bug/view.php?id=12037
 
