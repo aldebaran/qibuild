@@ -1,0 +1,51 @@
+doitall:
+  variables:
+    # Pretend we're Travis so the scripts in the 'ci' dir work
+    TRAVIS_OS_NAME: 'linux'
+    packages: >
+      libpython2.7-dev
+      wget
+      openssh-server
+      subversion
+      doxygen
+
+  before_script:
+    # Handle SSH authentication to the internal gitlab server
+    # Source: https://docs.gitlab.com/ee/ci/ssh_keys/README.html#ssh-keys-when-using-the-docker-executor
+
+    # Install ssh-agent if not already installed, it is required by Docker.
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+
+    # Run ssh-agent (inside the build environment)
+    - eval $(ssh-agent -s)
+
+    # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+
+    # For Docker builds disable host key checking. Be aware that by adding that
+    # you are suspectible to man-in-the-middle attacks.
+    # WARNING: Use this only with the Docker executor, if you use it with shell
+    # you will overwrite your user's SSH config.
+    # - mkdir -p ~/.ssh
+    #- '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+    # In order to properly check the server's host key, assuming you created the
+    # SSH_SERVER_HOSTKEYS variable previously, uncomment the following two lines
+    # instead.
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts'
+
+    # before_install
+    - apt-get update && apt-get install -y ${packages}
+
+    # Always use an up-to-date version of pip
+    - wget https://bootstrap.pypa.io/get-pip.py
+    - python get-pip.py
+    - pip install -r requirements.txt --user
+    - pip install -e . --user
+
+  script:
+    # Make sure ssh user@localhost works (for qibuild deploy tests)
+    - bash -xe ci/setup-ssh.sh
+    - bash -xe ci/setup-git.sh
+    - make -C python
