@@ -36,11 +36,12 @@ doitall:
     - '[[ -f /.dockerenv ]] && echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts'
 
     # before_install
-    - apt-get update && apt-get install -y ${packages}
+    - sudo apt-get update && sudo apt-get install -y ${packages}
 
     # Always use an up-to-date version of pip
     - wget https://bootstrap.pypa.io/get-pip.py
-    - python get-pip.py
+    - python get-pip.py --user
+    - export PATH=$HOME/.local/bin:$PATH
     - pip install -r requirements.txt --user
     - pip install -e . --user
 
