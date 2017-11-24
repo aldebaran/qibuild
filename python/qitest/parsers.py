@@ -94,7 +94,7 @@ def get_test_runner(args, build_project=None, qitest_json=None):
     test_runner.repeat_until_fail = args.repeat_until_fail
     test_runner.nightly = args.nightly
     test_runner.nightmare = args.nightmare
-    test_runner.test_output_dir = args.test_output_dir
+    test_runner.test_output_dir = os.path.abspath(args.test_output_dir)
     test_runner.capture = args.capture
     test_runner.last_failed = args.last_failed
     test_runner.ignore_timeouts = args.ignore_timeouts
