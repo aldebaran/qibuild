@@ -43,6 +43,19 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         ui.error("Failed to create virtualenv")
         return False
 
+    binaries_path = virtualenv.path_locations(venv_path)[-1]
+    pip_binary = os.path.join(binaries_path, "pip")
+
+    # Upgrade pip separately, because old versions may cause install errors
+    cmd = [pip_binary, "install", "--upgrade", "pip"]
+    if remote_packages and "pip" in remote_packages:
+        remote_packages.remove("pip")
+    try:
+        qisys.command.call(cmd, env=env)
+    except qisys.command.CommandFailedException:
+        ui.error("Failed to upgrade pip")
+        return False
+
     ui.info(ui.blue, "::", ui.reset, "Adding python projects")
     # Write a qi.pth file containing path to C/C++ extensions and
     # path to pure python modules or packages
@@ -54,8 +67,6 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
 
     ui.info(ui.blue, "::", ui.reset,
             "Adding other requirements: " + ", ".join(remote_packages))
-    binaries_path = virtualenv.path_locations(venv_path)[-1]
-    pip_binary = os.path.join(binaries_path, "pip")
     remote_ok = True
     if remote_packages:
         cmd = [pip_binary, "install"]
