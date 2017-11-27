@@ -8,6 +8,7 @@ doitall:
       openssh-server
       subversion
       doxygen
+      vim
 
   before_script:
     # Handle SSH authentication to the internal gitlab server
