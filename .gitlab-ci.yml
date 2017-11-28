@@ -9,6 +9,8 @@ doitall:
       subversion
       doxygen
       vim
+      qt4-linguist-tools
+      gettext
 
   before_script:
     # Handle SSH authentication to the internal gitlab server
