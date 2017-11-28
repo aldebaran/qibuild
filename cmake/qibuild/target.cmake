@@ -127,9 +127,10 @@ function(qi_create_bin name)
     endif()
   endif()
   if(APPLE AND NOT ARG_NO_RPATH)
+     file(RELATIVE_PATH _dotdot "${_runtime_out}" "${QI_SDK_DIR}/${QI_SDK_LIB}")
      set_target_properties("${name}"
        PROPERTIES
-         INSTALL_RPATH "@executable_path/../lib;@executable_path/..")
+         INSTALL_RPATH "@executable_path/${_dotdot};@executable_path/${_dotdot}/..")
   endif()
 endfunction()
 
@@ -338,9 +339,14 @@ function(qi_create_lib name)
     endif()
   endif()
   if(APPLE AND NOT ARG_NO_RPATH AND NOT _type STREQUAL "STATIC")
+     set(_rpath "@loader_path")
+     file(RELATIVE_PATH _dotdot "${_lib_out}" "${QI_SDK_DIR}/${QI_SDK_LIB}")
+     if(NOT "${_dotdot}" STREQUAL "")
+         set(_rpath "${_rpath};@loader_path/${_dotdot}")
+     endif()
      set_target_properties("${name}"
        PROPERTIES
-         INSTALL_RPATH "@loader_path;@loader_path/..")
+         INSTALL_RPATH "${_rpath}")
   endif()
 endfunction()
 
