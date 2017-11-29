@@ -2,6 +2,7 @@ doitall:
   variables:
     # Pretend we're Travis so the scripts in the 'ci' dir work
     TRAVIS_OS_NAME: 'linux'
+    LOGNAME: 'gitlab-runner'
     packages: >
       libpython2.7-dev
       wget
@@ -40,6 +41,9 @@ doitall:
 
     # before_install
     - sudo apt-get update && sudo apt-get install -y ${packages}
+
+    # Run the ssh server
+    - sudo service ssh start
 
     # Always use an up-to-date version of pip
     - wget https://bootstrap.pypa.io/get-pip.py
