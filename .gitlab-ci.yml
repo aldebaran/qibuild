@@ -3,6 +3,7 @@ doitall:
     # Pretend we're Travis so the scripts in the 'ci' dir work
     TRAVIS_OS_NAME: 'linux'
     LOGNAME: 'gitlab-runner'
+    locales: 'en_US.UTF-8 fr_FR.UTF-8'
     packages: >
       libpython2.7-dev
       wget
@@ -44,6 +45,11 @@ doitall:
 
     # Run the ssh server
     - sudo service ssh start
+
+    # Make sure the fr_FR locale is available and UTF-8 is available
+    - sudo locale-gen ${locales}
+    - export LANG=en_US.UTF-8
+    - export LC_ALL=en_US.UTF-8
 
     # Always use an up-to-date version of pip
     - wget https://bootstrap.pypa.io/get-pip.py
