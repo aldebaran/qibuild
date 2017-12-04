@@ -625,24 +625,3 @@ find_program(${_U_target}_EXECUTABLE ${target})
 ")
   _qi_install_redist_file(${_redist_file} ${target} ${_l_target})
 endfunction()
-
-#
-# Use install_name_tool to set rpath on target \p name
-#
-function(_qi_set_apple_rpath name subfolder)
-# We need to set a rpath into libraries in addition to binaries, in case they are the
-    # starting point of loading chain: for instance an unrelated binary performing
-    # a dlopen.
-    set(_dotdot "")
-    if(subfolder)
-      # Get path from subfolder to lib
-      file(RELATIVE_PATH _dotdot "/${subfolder}" /)
-    endif()
-    find_program(install_name_tool install_name_tool)
-    # INSTALL_RPATH has no effect, although the linker supports -rpath.
-    # So create a post-processing target
-    # Add an extra ../ to dotdot to go from lib to root dir
-    add_custom_command(TARGET "${name}" POST_BUILD
-      COMMAND ${install_name_tool} -add_rpath "@loader_path/../${_dotdot}" $<TARGET_FILE:${name}>
-    )
-endfunction()
