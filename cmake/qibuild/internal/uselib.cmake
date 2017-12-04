@@ -120,6 +120,45 @@ function(_qi_use_lib_get_deps dep_list_name)
   set(${dep_list_name} ${${dep_list_name}} PARENT_SCOPE)
 endfunction()
 
+# Use this function to complete the list of rpath necessary to
+# make binaries working ok OSX.
+#
+# When setting CMAKE_MACOSX_RPATH to ON, CMake get the path of all dependencies
+# by itself to add them into the target rpath at build time,
+# but it ignores dependencies those do not exist yet.
+#
+# This function workaround this issue by manually adding necessary directories
+# to the property BUILD_RPATH of the <target>
+function(_add_lib_to_rpath_osx target libname)
+    set(_libraries "")
+    if(DEFINED ${libname}_LIBRARIES)
+        set(_libraries "${${libname}_LIBRARIES}")
+    elseif(DEFINED ${libname}_LIBRARY)
+        set(_libraries "${${libname}_LIBRARY}")
+    endif()
+    if(NOT "${_libraries}" STREQUAL "")
+        foreach(_library_path ${_libraries})
+            if(IS_ABSOLUTE "${_library_path}")
+                # get parent directory
+                get_filename_component(_library_path "${_library_path}" DIRECTORY)
+                # if this is a system dir, no rpath needed -> ignore it
+                LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${_library_path}" isSystemDir)
+                if("${isSystemDir}" STREQUAL "-1")
+                    set(_rpaths "")
+                    get_target_property(_rpaths "${target}" BUILD_RPATH)
+                    if("${_rpaths}" STREQUAL "_rpaths-NOTFOUND")
+                        set(_rpaths "${_library_path}")
+                    else()
+                        _qi_list_append_uniq(_rpaths "${_library_path}")
+                    endif()
+                    set_target_properties("${target}"
+                      PROPERTIES
+                        BUILD_RPATH "${_rpaths}")
+                endif()
+            endif()
+        endforeach()
+    endif()
+endfunction()
 
 #! Find dependencies and add them to the target <name>.
 #
@@ -198,6 +237,11 @@ function(_qi_use_lib_internal name)
       target_link_libraries("${name}" ${${_U_PKG}_LIBRARIES})
     elseif (DEFINED ${_U_PKG}_LIBRARY)
       target_link_libraries("${name}" ${${_U_PKG}_LIBRARY})
+    endif()
+
+    # get lib output dir and add it to BUILD_RPATH
+    if(APPLE)
+      _add_lib_to_rpath_osx("${name}" "${_U_PKG}")
     endif()
 
     if ((DEFINED "${_U_PKG}_TARGET") AND (TARGET "${${_U_PKG}_TARGET}"))
