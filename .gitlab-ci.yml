@@ -13,6 +13,7 @@ doitall:
       vim
       qt4-linguist-tools
       gettext
+      zip
 
   before_script:
     # Handle SSH authentication to the internal gitlab server
