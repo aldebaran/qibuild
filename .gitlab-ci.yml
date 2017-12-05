@@ -10,6 +10,11 @@ doitall:
       openssh-server
       subversion
       doxygen
+      cmake
+      gdb
+      ninja-build
+      swig
+      python-enchant
       vim
       qt4-linguist-tools
       gettext
