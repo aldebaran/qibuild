@@ -1,4 +1,5 @@
 doitall:
+  image: liberforce/buildfarm:trusty
   variables:
     # Pretend we're Travis so the scripts in the 'ci' dir work
     TRAVIS_OS_NAME: 'linux'
