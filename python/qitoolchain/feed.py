@@ -72,9 +72,8 @@ def open_git_feed(toolchain_name, feed_url, name=None, branch="master", first_pa
             git.call("reset", "--hard", "--quiet", "origin/%s" % branch)
         else:
             git.clone(feed_url, "--quiet", "--branch", branch)
-        feed_path = os.path.join(git_path, "feeds", name + ".xml")
-    else:
-        feed_path = feed_url
+
+    feed_path = os.path.join(git_path, "feeds", name + ".xml")
     return feed_path
 
 class ToolchainFeedParser:
@@ -126,10 +125,12 @@ class ToolchainFeedParser:
         """
         tc_path = qisys.sh.get_share_path("qi", "toolchains", self.name)
         if branch and name:
-            feed = open_git_feed(self.name, feed, branch=branch, name=name,
-                                      first_pass=first_pass)
+            feed_location = open_git_feed(self.name, feed, branch=branch, name=name,
+                                          first_pass=first_pass)
+        else:
+            feed_location = feed
 
-        tree = tree_from_feed(feed)
+        tree = tree_from_feed(feed_location)
         package_trees = tree.findall("package")
         package_trees.extend(tree.findall("svn_package"))
         for package_tree in package_trees:
@@ -147,18 +148,22 @@ class ToolchainFeedParser:
         for feed_tree in feeds:
             feed_name = feed_tree.get("name")
             feed_url = feed_tree.get("url")
-            # feed_url can be relative to feed:
-            if feed_tree.get("path") and branch:
-                feed_path = os.path.join(tc_path + ".git", feed_tree.get("path"))
-                self.parse(feed_path)
-                if feed_name:
-                    self.parse(feed_path, branch=branch, name=feed_name, first_pass=False)
-            elif feed_url:
+            feed_path = feed_tree.get("path")
+
+            if feed_url:
+                # feed_url can be relative to feed:
                 if not is_url(feed_url):
                     feed_url = urlparse.urljoin(feed, feed_url)
                 self.parse(feed_url)
-                if feed_name:
-                    self.parse(feed, branch=branch, name=feed_name, first_pass=False)
+
+            if feed_path and branch:
+                feed_path = os.path.join(tc_path + ".git", feed_path)
+
+            feed = feed_path or feed_url or feed
+
+            if feed_name:
+                self.parse(feed, branch=branch, name=feed_name, first_pass=False)
+
         select_tree = tree.find("select")
         if select_tree is not None:
             blacklist_trees = select_tree.findall("blacklist")
