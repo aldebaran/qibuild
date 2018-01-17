@@ -87,7 +87,6 @@ function(qi_swig_wrap_python module_name interface_file)
 
   # Store the target created by swig_add_module in a more friendly name:
   set(_swig_target ${SWIG_MODULE_${module_name}_REAL_NAME})
-
   qi_use_lib(${_swig_target} PYTHON ${ARG_DEPENDS})
 
   # Fix output directory
@@ -107,6 +106,14 @@ function(qi_swig_wrap_python module_name interface_file)
   if (WIN32)
   # Be sure a .pyd file gets created.
     set_target_properties(${_swig_target} PROPERTIES SUFFIX   ".pyd")
+  endif()
+
+  if(APPLE)
+     get_target_property(_output_path ${_swig_target} LIBRARY_OUTPUT_DIRECTORY)
+     file(RELATIVE_PATH _dotdot ${_output_path} "${QI_SDK_DIR}/${QI_SDK_LIB}")
+     set_target_properties("${_swig_target}"
+       PROPERTIES
+         INSTALL_RPATH "@loader_path/${_dotdot};@loader_path/${_dotdot}..")
   endif()
 
   qi_install_python(TARGETS ${_swig_target})

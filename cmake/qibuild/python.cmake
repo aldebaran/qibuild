@@ -135,6 +135,14 @@ function(qi_create_python_ext target)
     )
   endif()
 
+  if(APPLE)
+    get_target_property(_output_dir ${target} LIBRARY_OUTPUT_DIRECTORY)
+    file(RELATIVE_PATH _dotdot "${_output_dir}" "${QI_SDK_DIR}/${QI_SDK_LIB}")
+    set_target_properties(${target}
+      PROPERTIES
+        INSTALL_RPATH "@loader_path/${_dotdot};@loader_path/${_dotdot}..")
+  endif()
+
   if(WIN32)
     set_target_properties(${target} PROPERTIES
       SUFFIX ".pyd"
