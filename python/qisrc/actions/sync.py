@@ -83,10 +83,10 @@ def do(args):
                           ui.blue, git_project.src.ljust(max_src))
 
             if status is None:
-                ui.info(ui.brown, "  [skipped]")
+                ui.info(git_project.src, ui.brown, "  [skipped]")
                 skipped.append((git_project.src, out))
             if status is False:
-                ui.info(ui.red, "  [failed]")
+                ui.info(git_project.src, ui.red, "  [failed]")
                 failed.append((git_project.src, out))
             if out:
                 print ui.indent(out + "\n\n", num=2)
