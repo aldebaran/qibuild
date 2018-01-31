@@ -8,7 +8,7 @@ Introduction
 
 qiBuild is a command line framework composed of several tools.
 
-If you to know  more, see the overview:
+If you want to know more, see the overview:
 
 .. toctree::
     :maxdepth: 1
