@@ -22,6 +22,7 @@ doitall:
       qt4-linguist-tools
       gettext
       zip
+      rsync
 
   before_script:
     # Handle SSH authentication to the internal gitlab server
