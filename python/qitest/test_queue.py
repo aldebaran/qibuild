@@ -22,6 +22,9 @@ import qitest.result
 
 class TestQueue(object):
     """ A class able to run tests in parallel """
+
+    __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
+
     def __init__(self, tests):
         self.tests = tests
         self.test_logger = TestLogger(tests)
@@ -155,6 +158,9 @@ class TestWorker(threading.Thread):
     the test queue, running the tests and logging the results
 
     """
+
+    __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
+
     def __init__(self, queue, worker_index):
         super(TestWorker, self).__init__(name="TestWorker#%i" % worker_index)
         self.index = worker_index
@@ -202,6 +208,9 @@ class TestLogger(object):
     tests, using a mutex so that outputs are not mixed up
 
     """
+
+    __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
+
     def __init__(self, tests):
         self.mutex = threading.Lock()
         self.tests = tests

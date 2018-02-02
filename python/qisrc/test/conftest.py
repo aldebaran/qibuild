@@ -13,6 +13,9 @@ class TestGitWorkTree(qisrc.worktree.GitWorkTree):
     can create git projects
 
     """
+
+    __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
+
     def __init__(self, worktree=None):
         if not worktree:
             worktree = TestWorkTree()
@@ -278,6 +281,9 @@ class TestGitServer(object):
 
 class TestGit(qisrc.git.Git):
     """ the Git class with a few other helpful methods """
+
+    __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
+
     def __init__(self, repo=None):
         if repo is None:
             repo = os.getcwd()
