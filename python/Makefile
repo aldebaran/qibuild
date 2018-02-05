@@ -17,7 +17,11 @@ PYMODULES =  \
 PYTHON    ?= python
 PIP       ?= pip
 
-all: pylint-error check
+all: pycodestyle pylint-error check
+
+pycodestyle:
+	@echo ":: Running pycodestyle on root folder"
+	@pycodestyle .. 2>&1
 
 pylint-full:
 	@echo ":: Running pylint: $(PYMODULES)"
