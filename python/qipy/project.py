@@ -103,20 +103,20 @@ in the qiproject.xml file
         return "<%s in %s>" % (self.name, self.src)
 
 
-class Module():
+class Module:
     def __init__(self, name, src):
         self.name = name
         self.src = src
         self.qimodule = False
 
 
-class Package():
+class Package:
     def __init__(self, name, src):
         self.name = name
         self.src = src
         self.qimodule = False
 
 
-class Script():
+class Script:
     def __init__(self, src):
         self.src = src

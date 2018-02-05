@@ -117,7 +117,7 @@ def record_messages(request):
     return recorder
 
 
-class MessageRecorder():
+class MessageRecorder:
     def __init__(self):
         ui.CONFIG["record"] = True
         ui._MESSAGES = list()

@@ -5,7 +5,7 @@ import os
 import qitest.conf
 
 
-class TestProject():
+class TestProject:
     def __init__(self, qitest_json):
         self.name = None
         self.tests = qitest.conf.parse_tests(qitest_json)
