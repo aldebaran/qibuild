@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Rebase repositories on top of an other branch of the manifest
 
 """
@@ -9,6 +9,7 @@ from qisys import ui
 import qisys.parsers
 import qisrc.parsers
 import qisrc.rebase
+
 
 def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
@@ -21,6 +22,7 @@ def configure_parser(parser):
     parser.add_argument("--force-run", action="store_false", dest="dry_run",
                         help="Use push --force. Use with caution.")
     parser.set_defaults(branch="master", push=False, dry_run=True)
+
 
 def do(args):
     branch = args.branch

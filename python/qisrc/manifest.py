@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Set of tools to parse qisrc manifests
 
@@ -14,6 +14,7 @@ import qisys.sh
 import qisys.qixml
 import qisrc.git_config
 import qisrc.groups
+
 
 class ManifestError(Exception):
     pass
@@ -201,6 +202,7 @@ No such project: {1}
         """ Remove a group from the manifest """
         self.groups.remove_group(name)
 
+
 def from_git_repo(git_repo, ref):
     git = qisrc.git.Git(git_repo)
     rc, out = git.call("cat-file", "-p", ref + "^{tree}", raises=False)
@@ -215,10 +217,11 @@ def from_git_repo(git_repo, ref):
         return None
     manifest_blob_sha1 = manifest_line.split()[2]
     rc, as_string = git.call("cat-file", "-p", manifest_blob_sha1, raises=False)
-    if rc !=0:
+    if rc != 0:
         return None
     source = StringIO.StringIO(as_string)
     return Manifest(source)
+
 
 class RepoConfig(object):
     def __init__(self):
@@ -234,6 +237,7 @@ class RepoConfig(object):
         for remote in self.remotes:
             if remote.review:
                 return remote
+
     @property
     def default_remote(self):
         """ Return the remote that will be used to clone
@@ -257,7 +261,7 @@ class RepoConfig(object):
         return self.review_remote is not None
 
     def __repr__(self):
-        res = "<Repo %s in %s" %  (self.project, self.src)
+        res = "<Repo %s in %s" % (self.project, self.src)
         if self.default_branch:
             res += " default: %s" % self.default_branch
         if self.review:
@@ -268,6 +272,7 @@ class RepoConfig(object):
 
 ##
 # parsing
+
 
 class ManifestParser(qisys.qixml.XMLParser):
     def __init__(self, target):
@@ -312,6 +317,7 @@ class ManifestParser(qisys.qixml.XMLParser):
         parser = qisrc.groups.GroupsParser(self.target.groups)
         elem.append(parser.xml_elem())
 
+
 class RepoConfigParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(RepoConfigParser, self).__init__(target)
@@ -341,7 +347,7 @@ class RepoConfigParser(qisys.qixml.XMLParser):
         if remote_names == "":
             raise ManifestError("Empty 'remotes' attribute")
         remote_names = remote_names.split()
-        self.target.remote_names =  remote_names
+        self.target.remote_names = remote_names
         self.target.default_remote_name = self._root.get("default_remote")
         if not self.target.default_remote_name:
             self.target.default_remote_name = remote_names[0]
@@ -353,8 +359,6 @@ class RepoConfigParser(qisys.qixml.XMLParser):
             upstream_remote.name = name
             upstream_remote.url = url
             self.target.remotes.append(upstream_remote)
-
-
 
     def _write_remote_names(self, elem):
         elem.set("remotes", " ".join(self.target.remote_names))

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Find a package
 
@@ -11,6 +11,7 @@ import sys
 from qisys import ui
 import qibuild.find
 import qibuild.parsers
+
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -23,6 +24,7 @@ def configure_parser(parser):
     parser.add_argument("--cmake", dest="cmake", action="store_true",
                         help="Search in cmake cache")
     parser.add_argument("package")
+
 
 def _use_cmake_cache(args):
     """ Use cmake cache to get informations about searched package.
@@ -48,6 +50,7 @@ def _use_cmake_cache(args):
         ui.info(ui.tabs(1), key, "\n",
                 ui.tabs(2), value)
 
+
 def _use_build_directories(args):
     """ Print packages found with find().
     """
@@ -62,6 +65,7 @@ def _use_build_directories(args):
         sys.exit(1)
     for res in found:
         ui.info(res)
+
 
 def do(args):
     """Main entry point """

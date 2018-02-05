@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import subprocess
@@ -21,6 +21,7 @@ def is_elf(filename):
         data = fp.read(4)
     return data == "\x7fELF"
 
+
 def is_macho(filename):
     """ Check that a file is in the Mach-O format
 
@@ -29,9 +30,11 @@ def is_macho(filename):
         data = fp.read(2)
     return data == '\xcf\xfa'
 
+
 def is_exe(filename):
     """ Check that a file is a Windows executable """
     return filename.endswith((".exe", ".dll"))
+
 
 def can_be_dumped(filename):
     """" Check that symbols can be dumped from the given file """
@@ -51,6 +54,7 @@ def can_be_dumped(filename):
     if os.name == "nt":
         return is_exe(filename)
 
+
 def dump_symbols_from_binary(binary, pool_dir):
     """ Dump sympobls from the binary.
     Results can be found in
@@ -68,7 +72,7 @@ def dump_symbols_from_binary(binary, pool_dir):
         mode_rw = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
         os.chmod(binary, mode_rw)
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE)
+                                   stderr=subprocess.PIPE)
 
     dump_ok = True
     (out, err) = process.communicate()
@@ -103,6 +107,7 @@ def dump_symbols_from_binary(binary, pool_dir):
     with open(os.path.join(to_make, basename + ".sym"), "w") as fp:
         fp.write(out)
 
+
 def strip_binary(binary, strip_executable=None, strip_args=None):
     if not strip_executable:
         strip_executable = qisys.command.find_program("strip", raises=True)
@@ -117,10 +122,12 @@ def strip_binary(binary, strip_executable=None, strip_args=None):
     if rc != 0:
         ui.warning("Failed to strip symbols for", binary)
 
+
 def gen_dsym(binary):
     cmd = ["dsymutil", binary]
     qisys.command.call(cmd)
     return binary + ".dSYM"
+
 
 def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
                                 strip_exe=None, strip_args=None):
@@ -147,6 +154,7 @@ def dump_symbols_from_directory(root_dir, pool_dir, strip=True,
                     strip_binary(full_path, strip_executable=strip_exe,
                                  strip_args=strip_args)
     return pool_dir
+
 
 def gen_symbol_archive(base_dir=None, output=None, strip=True,
                        strip_exe=None, strip_args=None):

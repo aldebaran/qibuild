@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Open a project with an IDE
 
@@ -16,10 +16,12 @@ import qibuild.parsers
 
 SUPPORTED_IDES = ["QtCreator", "Visual Studio", "Xcode"]
 
+
 def configure_parser(parser):
     """Configure parser for this action """
     qibuild.parsers.cmake_build_parser(parser)
     qibuild.parsers.project_parser(parser)
+
 
 def do(args):
     """Main entry point."""
@@ -30,7 +32,7 @@ def do(args):
     if not os.path.exists(project.build_directory):
         ui.error("""It looks like your project has not been configured yet
 (The build directory: '%s' does not exist)""" %
-        project.build_directory)
+                 project.build_directory)
         answer = qisys.interact.ask_yes_no(
             "Do you want me to run qibuild configure for you?",
             default=True)
@@ -51,7 +53,7 @@ def do(args):
         open_qtcreator(project, ide.path)
     else:
         # Not supported (yet) IDE:
-        mess  = "Invalid ide: %s\n" % ide.name
+        mess = "Invalid ide: %s\n" % ide.name
         mess += "Supported IDES are: %s" % ", ".join(SUPPORTED_IDES)
         raise Exception(mess)
 
@@ -59,7 +61,7 @@ def do(args):
 def get_ide(qibuild_cfg):
     """Return an IDE to use."""
     known_ides = qibuild_cfg.ides.values()
-    ide_names  = qibuild_cfg.ides.keys()
+    ide_names = qibuild_cfg.ides.keys()
     if not known_ides:
         ui.warning("No IDE configured yet")
         ui.info("Tips: use `qibuild config --wizard` to configure an IDE")
@@ -72,7 +74,7 @@ def get_ide(qibuild_cfg):
         return supported_ides[0]
 
     if not supported_ides:
-        mess  = "Found those IDEs in configuration: %s\n" % ", ".join(ide_names)
+        mess = "Found those IDEs in configuration: %s\n" % ", ".join(ide_names)
         mess += "But `qibuild open` only supports: %s\n" % ", ".join(SUPPORTED_IDES)
         raise Exception(mess)
 
@@ -80,15 +82,13 @@ def get_ide(qibuild_cfg):
     if qibuild_cfg.ide:
         return qibuild_cfg.ide
 
-
     supported_names = [x.name for x in supported_ides]
     # Several IDEs, ask the user to choose
     ide_name = qisys.interact.ask_choice(supported_names,
-        "Please choose an IDE to use")
+                                         "Please choose an IDE to use")
     if not ide_name:
         return None
     return qibuild_cfg.ides[ide_name]
-
 
 
 def open_visual(project):
@@ -103,6 +103,7 @@ def open_visual(project):
     print "%s %s" % ("start", sln_files[0])
     subprocess.Popen(["start", sln_files[0]], shell=True)
 
+
 def open_xcode(project):
     projs = glob.glob(project.build_directory + "/*.xcodeproj")
     if not projs:
@@ -113,6 +114,7 @@ def open_xcode(project):
     print "starting Xcode:"
     print "%s %s" % ("open", projs[0])
     subprocess.Popen(["open", projs[0]])
+
 
 def open_qtcreator(project, qtcreator_path=None):
     if not qtcreator_path:

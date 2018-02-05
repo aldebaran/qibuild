@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import pytest
 
@@ -27,6 +27,7 @@ def test_fake_call():
     assert retcode == 2
     assert "Remote end hung up" in out
 
+
 def test_wrong_setup():
     git = FakeGit("repo")
     git.add_result("checkout", 0, "")
@@ -35,6 +36,7 @@ def test_wrong_setup():
     with pytest.raises(Exception) as e:
         git.fetch()
     assert "Unexpected call to fetch" in e.value.message
+
 
 def test_configured_but_not_called_enough():
     git = FakeGit("repo")
@@ -47,6 +49,7 @@ def test_configured_but_not_called_enough():
     assert "checkout was configured to be called 2 times" in e.value.message
     assert "was only called 1 times" in e.value.message
 
+
 def test_configured_but_not_called():
     git = FakeGit("repo")
     git.add_result("checkout", 1, "")
@@ -56,6 +59,7 @@ def test_configured_but_not_called():
     with pytest.raises(Exception) as e:
         git.check()
     assert "reset was added as result but never called" in e.value.message
+
 
 def test_commands_are_logged():
     git = FakeGit("repo")
@@ -67,4 +71,4 @@ def test_commands_are_logged():
     assert len(calls) == 2
     assert calls[0][0] == ("fetch",)
     assert calls[1][0] == ("reset", "--hard")
-    assert calls[1][1] == {"quiet" : True}
+    assert calls[1][1] == {"quiet": True}

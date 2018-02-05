@@ -1,12 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import subprocess
 
 from qibuild.test.conftest import TestBuildWorkTree
 import qisys.qixml
 import qibuild.find
+
 
 def test_qt(qilinguist_action):
     build_worktree = TestBuildWorkTree()

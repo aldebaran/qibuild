@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """Display the current config """
 
 import subprocess
@@ -10,16 +10,18 @@ import qibuild.parsers
 import qibuild.wizard
 from qisys import ui
 
+
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("--edit", action="store_true",
-        help="edit the configuration")
+                        help="edit the configuration")
     parser.add_argument("--local", action="store_true", dest="is_local",
-        help="only display or edit the local configuration")
+                        help="only display or edit the local configuration")
     parser.add_argument("--wizard", action="store_true",
-        help="run a wizard to edit the configuration")
+                        help="run a wizard to edit the configuration")
     parser.set_defaults(local=False)
+
 
 def do(args):
     """Main entry point"""
@@ -33,6 +35,7 @@ def do(args):
         qibuild.wizard.run_config_wizard(build_worktree=build_worktree)
     else:
         show_config(args, build_worktree)
+
 
 def show_config(args, build_worktree):
 

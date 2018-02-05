@@ -1,7 +1,7 @@
 # coding: utf-8
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import subprocess
@@ -37,8 +37,10 @@ def test_release(qilinguist_action):
     if not check_gettext():
         return
     trad = qilinguist_action.trad
-    fr_FR_mo_file = os.path.join(trad.path, "po", "share", "locale", "translate", "fr_FR", "LC_MESSAGES", "translate.mo")
-    en_US_mo_file = os.path.join(trad.path, "po", "share", "locale", "translate", "fr_FR", "LC_MESSAGES", "translate.mo")
+    fr_FR_mo_file = os.path.join(trad.path, "po", "share", "locale", "translate",
+                                 "fr_FR", "LC_MESSAGES", "translate.mo")
+    en_US_mo_file = os.path.join(trad.path, "po", "share", "locale", "translate",
+                                 "fr_FR", "LC_MESSAGES", "translate.mo")
     assert not os.path.exists(fr_FR_mo_file)
     assert not os.path.exists(en_US_mo_file)
     qilinguist_action("update", "translate")
@@ -62,8 +64,8 @@ def test_cplusplus_sdk_workflow(qilinguist_action):
     binary = os.path.join(trad.sdk_directory, "bin", "translate")
     dictPath = os.path.join(trad.path, "po", "share", "locale", "translate")
     env = os.environ.copy()
-    env["LANGUAGE"] = "fr_FR.UTF-8" # for Ubuntu
-    env["LC_ALL"] = "fr_FR.UTF-8" # for Arch Linux
+    env["LANGUAGE"] = "fr_FR.UTF-8"  # for Ubuntu
+    env["LC_ALL"] = "fr_FR.UTF-8"  # for Arch Linux
     cmd = [binary, dictPath]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE, env=env)
@@ -78,7 +80,7 @@ Brian est dans la cuisine.
     env["LANGUAGE"] = "en_US.UTF-8"
     cmd = [binary, dictPath]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                               stderr = subprocess.PIPE, env=env)
+                               stderr=subprocess.PIPE, env=env)
     out, _ = process.communicate()
     out_en = """Hi, my name is NAO.
 Where is Brian?

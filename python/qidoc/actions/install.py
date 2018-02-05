@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Install a doc project and its depencies.
 
 The index.html will be the one of the 'base project',
@@ -15,6 +15,7 @@ from qisys import ui
 import qisys.parsers
 import qidoc.parsers
 import qidoc.builder
+
 
 def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)

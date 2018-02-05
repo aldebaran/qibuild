@@ -1,11 +1,12 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qisys.sh
 import qisrc.snapshot
 from qisrc.test.conftest import TestGitWorkTree
 
 import pytest
+
 
 def test_dump_load(tmpdir):
     snapshot = qisrc.snapshot.Snapshot()
@@ -68,6 +69,7 @@ def test_load_file_object(tmpdir):
         snapshot2.load(fp)
     assert snapshot2 == snapshot
 
+
 def test_load_file_path(tmpdir):
     snapshot = qisrc.snapshot.Snapshot()
     snapshot.refs["foo"] = "d34db33f"
@@ -77,6 +79,7 @@ def test_load_file_path(tmpdir):
     snapshot2.load(snapshot_txt)
     assert snapshot2 == snapshot
 
+
 def test_stores_manifest_in_snapshot(git_server, git_worktree):
     git_server.create_repo("foo")
     manifest_url = git_server.manifest_url
@@ -84,6 +87,7 @@ def test_stores_manifest_in_snapshot(git_server, git_worktree):
     snapshot = git_worktree.snapshot()
     manifest = snapshot.manifest
     assert manifest.url == manifest_url
+
 
 def test_generate_load_json(tmpdir, git_server, git_worktree):
     snapshot1 = qisrc.snapshot.Snapshot()
@@ -97,4 +101,3 @@ def test_generate_load_json(tmpdir, git_server, git_worktree):
     snapshot2 = qisrc.snapshot.Snapshot()
     snapshot2.load(snapshot_json)
     assert snapshot2 == snapshot1
-

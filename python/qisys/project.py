@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ WorkTreeProject object """
 
@@ -11,6 +11,7 @@ import qisys.qixml
 
 import qisrc.license
 
+
 class WorkTreeProject(object):
     """ A project is identified by its path relative to its
     worktree.
@@ -18,6 +19,7 @@ class WorkTreeProject(object):
     It can have nested subprojects
 
     """
+
     def __init__(self, worktree, src):
         self.worktree = worktree
         self.src = src

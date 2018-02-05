@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import qisys.sh
 import qisys.parsers
@@ -9,12 +9,14 @@ import qilinguist.builder
 from qilinguist.worktree import LinguistWorkTree, new_linguist_project
 from qilinguist.pml_translator import new_pml_translator
 
+
 def get_linguist_worktree(args):
     worktree = qisys.parsers.get_worktree(args, raises=False)
     if worktree:
         return LinguistWorkTree(worktree)
     else:
         return None
+
 
 def get_linguist_projects(args, default_all=False):
     worktree = get_linguist_worktree(args)
@@ -45,11 +47,13 @@ def get_linguist_projects(args, default_all=False):
     res.extend(get_pml_projects(pml_paths))
     return res
 
+
 def get_pml_projects(pml_paths):
     res = list()
     for pml_path in pml_paths:
         res.append(new_pml_translator(pml_path))
     return res
+
 
 def get_linguist_builder(args, with_projects=True):
     worktree = get_linguist_worktree(args)
@@ -58,8 +62,6 @@ def get_linguist_builder(args, with_projects=True):
         projects = get_linguist_projects(args)
         builder.projects = projects
     return builder
-
-
 
 
 ##
@@ -101,6 +103,7 @@ class LinguistProjectParser(qisys.parsers.AbstractProjectParser):
         project = self.linguist_worktree.get_linguist_project(project_arg,
                                                               raises=True)
         return [project]
+
 
 class CouldNotGuessProjectName(Exception):
     def __str__(self):

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Collection of parser fonctions for qitests actions
 """
@@ -13,40 +13,41 @@ import qisys.parsers
 import qibuild.parsers
 import qitest.project
 
+
 def test_parser(parser, with_num_jobs=True):
     qisys.parsers.worktree_parser(parser)
     group = parser.add_argument_group("test options")
     group.add_argument("--perf", dest="perf", action="store_true",
-                        help="run perfs tests instead of pure tests.")
+                       help="run perfs tests instead of pure tests.")
     group.add_argument("-k", "--pattern", dest="patterns", action="append",
-                        help="Filter tests matching these patterns")
+                       help="Filter tests matching these patterns")
     group.add_argument("-x", "--exclude", dest="excludes", action="append",
-                        help="Exclude test matching these patterns")
+                       help="Exclude test matching these patterns")
     group.add_argument("-V", dest="verbose_tests", action="store_true",
-                        help="display tests output")
+                       help="display tests output")
     group.add_argument("--valgrind", dest="valgrind", action="store_true",
-                        help="run tests under valgrind")
+                       help="run tests under valgrind")
     group.add_argument("--nightmare", dest="nightmare", action="store_true",
-                        help="run tests in shuffle and 20 times (apply only to gtest)")
+                       help="run tests in shuffle and 20 times (apply only to gtest)")
     group.add_argument("--coverage", dest="coverage", action="store_true",
-                        help="run coverage")
+                       help="run coverage")
     group.add_argument("--ncpu", dest="num_cpus", default=-1, type=int,
-                        help="set number of CPU each test is allowed to use (linux)")
+                       help="set number of CPU each test is allowed to use (linux)")
     group.add_argument("--nightly", action="store_true", dest="nightly")
     group.add_argument("--break-on-failure", action="store_true", dest="break_on_failure",
-                      help="Break on failure (for gtest only)")
+                       help="Break on failure (for gtest only)")
     group.add_argument("--repeat-until-fail", default=0, type=int, metavar="N",
                        help="Repeat tests until they fail (at most N times)")
     group.add_argument("--qitest-json", dest="qitest_jsons", action="append")
     group.add_argument("--test-output-dir", type=os.path.abspath,
                        dest="test_output_dir",
-                       help="Generate XML test reports in the given directory " + \
-                           "(instead of build-<platform>/sdk/test-results)")
+                       help="Generate XML test reports in the given directory " +
+                       "(instead of build-<platform>/sdk/test-results)")
     group.add_argument("--coverage-output-dir", dest="coverage_output_dir",
-                      help="Generate XML and HTML coverage reports in the given " + \
-                           "directory (instead of build-<platform>/sdk/coverage-results)")
+                       help="Generate XML and HTML coverage reports in the given " +
+                       "directory (instead of build-<platform>/sdk/coverage-results)")
     group.add_argument("--root-output-dir", dest="test_output_dir", metavar="ROOT_OUTPUT_DIR",
-                      help="same as --test-output-dir (deprecated)")
+                       help="same as --test-output-dir (deprecated)")
 
     group.add_argument("--no-capture", dest="capture", action="store_false")
     group.add_argument("--ignore-timeouts", dest="ignore_timeouts", action="store_true",
@@ -54,11 +55,12 @@ def test_parser(parser, with_num_jobs=True):
     group.add_argument("--lf", "--last-failed", dest="last_failed", action="store_true",
                        help="Run the failing test from previous run")
     parser.set_defaults(nightly=False, capture=True, last_failed=False,
-                       ignore_timeouts=False)
+                        ignore_timeouts=False)
     if with_num_jobs:
         qisys.parsers.parallel_parser(group, default=1)
 
     return group
+
 
 def get_test_runner(args, build_project=None, qitest_json=None):
     test_project = None
@@ -102,6 +104,7 @@ def get_test_runner(args, build_project=None, qitest_json=None):
 
     return test_runner
 
+
 def parse_build_projects(args):
     res = list()
     try:
@@ -110,8 +113,8 @@ def parse_build_projects(args):
         if args.use_deps:
             solve_deps = True
         build_projects = qibuild.parsers.get_build_projects(
-                build_worktree,
-                args, solve_deps=solve_deps)
+            build_worktree,
+            args, solve_deps=solve_deps)
         for build_project in build_projects:
             test_runner = None
             try:
@@ -123,6 +126,7 @@ def parse_build_projects(args):
     except (qisys.worktree.NotInWorkTree, qibuild.parsers.CouldNotGuessProjectName):
         pass
     return res
+
 
 def get_test_runners(args):
     res = list()

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Convert an existing project to a qiBuild project
 
@@ -34,11 +34,12 @@ def guess_project_name(source_dir):
     res = os.path.basename(source_dir)
     return res
 
+
 def name_from_xml(xml_path):
     """ Get a name from an qiproject.xml file
 
     """
-    mess  = "Invalid qiproject.xml file detected!\n"
+    mess = "Invalid qiproject.xml file detected!\n"
     mess += "(%s)\n" % xml_path
     if not os.path.exists(xml_path):
         return None
@@ -88,6 +89,7 @@ def name_from_cmakelists(cmakelists):
             res = res.strip()
             return res
     return res
+
 
 def fix_root_cmake(cmakelists, project_name, dry_run=True):
     """ Fix the root CMakeLists.txt file
@@ -164,6 +166,7 @@ find_package(qibuild)
         ui.info("Patching", cmakelists)
         fp.writelines(new_lines)
 
+
 def create_qiproj_xml(args):
     """ Create a new qiproject.xml
 
@@ -183,7 +186,7 @@ def create_qiproj_xml(args):
     qisys.qixml.indent(proj_elem)
     if args.dry_run:
         ui.info("Would create", qiproj_xml, "\n"
-               "with", "\n", etree.tostring(proj_elem))
+                "with", "\n", etree.tostring(proj_elem))
         return
 
     ui.info("Creating", qiproj_xml)
@@ -194,22 +197,23 @@ def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.default_parser(parser)
     parser.add_argument("source_dir", nargs="?",
-        help="Top source directory of the project. "
-             "Defaults to current working directory.")
+                        help="Top source directory of the project. "
+                        "Defaults to current working directory.")
     parser.add_argument("--project-name",
-        dest="project_name",
-        help="Name of the project. Guess if not given")
+                        dest="project_name",
+                        help="Name of the project. Guess if not given")
     parser.add_argument("--go", action="store_false",
-        dest="dry_run",
-        help="Actually perform file changes")
+                        dest="dry_run",
+                        help="Actually perform file changes")
     parser.add_argument("--dry-run", action="store_true",
-        dest="dry_run",
-        help="Only print what would be done. This is the default")
+                        dest="dry_run",
+                        help="Only print what would be done. This is the default")
     parser.add_argument("--no-cmake", action="store_false",
-        dest="fix_cmake",
-        help="Do not touch any cmake file.\n"
-         "You won't be able to use the qibuild cmake framework")
+                        dest="fix_cmake",
+                        help="Do not touch any cmake file.\n"
+                        "You won't be able to use the qibuild cmake framework")
     parser.set_defaults(dry_run=True, fix_cmake=True)
+
 
 def do(args):
     """Main entry point """

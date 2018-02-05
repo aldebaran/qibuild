@@ -1,11 +1,12 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Set of tools relate to version numbers
 
 """
 
 import re
+
 
 def compare(a_str, b_str):
     """ Compare two versions
@@ -56,6 +57,7 @@ def compare(a_str, b_str):
             return res
     return 0
 
+
 def increment_version(version):
     """
     >>> increment_version("0.0.3")
@@ -75,6 +77,7 @@ def increment_version(version):
     as_int += 1
     return re.sub("\d+$", str(as_int), version)
 
+
 def eat_number(str, index):
     """ Helper for explode_version """
     first = index
@@ -83,6 +86,7 @@ def eat_number(str, index):
             break
         index += 1
     return (str[first:index], index)
+
 
 def eat_alpha(str, index):
     """ Helper for explode_version """
@@ -121,6 +125,7 @@ def explode_version(str):
             index += 1
     return res
 
+
 def compare_substring(a_str, b_str):
     """ Helper for compare """
     a_digit = a_str[0].isdigit()
@@ -145,6 +150,7 @@ def compare_substring(a_str, b_str):
         if a_str > b_str:
             return -1
     return 0
+
 
 if __name__ == "__main__":
     import doctest

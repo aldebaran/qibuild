@@ -2,6 +2,7 @@ import collections
 import threading
 import functools
 
+
 def foreach(source, action, n_jobs=0):
     """Parallel for
 
@@ -21,6 +22,7 @@ def foreach(source, action, n_jobs=0):
     else:
         _foreach_with_limit(source, action, n_jobs)
 
+
 def _foreach_worker(q, action):
     while True:
         try:
@@ -29,6 +31,7 @@ def _foreach_worker(q, action):
             break
 
         action(item)
+
 
 def _foreach_with_limit(source, action, n_jobs):
     assert n_jobs >= 0
@@ -44,6 +47,7 @@ def _foreach_with_limit(source, action, n_jobs):
         t.start()
     for t in threads:
         t.join()
+
 
 def _foreach_no_limit(source, action):
     threads = [threading.Thread(target=functools.partial(action, item))

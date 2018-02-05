@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Builder for pml files """
 import os
 import tempfile
@@ -17,8 +17,10 @@ import qilinguist.builder
 import qilinguist.pml_translator
 import qipkg.manifest
 
+
 class PMLBuilder(object):
     """ Build a package from a pml file """
+
     def __init__(self, pml_path, worktree=None):
         if not os.path.exists(pml_path):
             raise Exception("%s does not exist" % pml_path)
@@ -28,7 +30,6 @@ class PMLBuilder(object):
         if not os.path.exists(self.manifest_xml):
             raise Exception("%s does not exist" % self.manifest_xml)
         self.pkg_name = pkg_name(self.manifest_xml)
-
 
         self.worktree = worktree
 
@@ -206,7 +207,6 @@ Error when parsing {pml_path}
         pml_translator.release()
         pml_translator.install(destination)
 
-
     def deploy(self, url):
         """ Deploy every project to the given url """
         qisys.remote.deploy(self.stage_path, url)
@@ -243,7 +243,6 @@ Error when parsing {pml_path}
         if not output:
             output = os.path.join(os.getcwd(), self.pkg_name + ".pkg")
 
-
         # Add everything from the staged path
         self.install(self.stage_path, install_tc_packages=install_tc_packages)
 
@@ -272,6 +271,7 @@ Error when parsing {pml_path}
     def __repr__(self):
         return "<PMLBuilder for %s>" % self.pml_path
 
+
 def pkg_name(manifest_xml):
     "Return a string name-version"
     root = qisys.qixml.read(manifest_xml).getroot()
@@ -280,6 +280,7 @@ def pkg_name(manifest_xml):
                                               xml_path=manifest_xml)
     output_name = "%s-%s" % (uuid, version)
     return output_name
+
 
 def desc_from_builder(builder):
     class_name = builder.__class__.__name__

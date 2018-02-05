@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Automatic testing for handling archives
 
@@ -33,6 +33,7 @@ def test_create_extract_zip_simple(tmpdir):
     assert tmpdir.join("dest", "foo", "a", "b.txt").check(file=True)
     assert tmpdir.join("dest", "foo", "c.txt").check(file=True)
 
+
 def test_create_extract_tar_simple(tmpdir):
     if os.name == 'nt':
         return
@@ -45,6 +46,7 @@ def test_create_extract_tar_simple(tmpdir):
     qisys.archive.extract(foo_tar_gz, dest.strpath)
     assert tmpdir.join("dest", "foo", "a", "b.txt").check(file=True)
     assert tmpdir.join("dest", "foo", "c.txt").check(file=True)
+
 
 def test_rewrite_top_dir_bz2(tmpdir):
     if os.name == 'nt':
@@ -70,10 +72,11 @@ def test_compress_broken_symlink(tmpdir):
     broken_symlink = os.symlink("/does/not/exist", src.join("broken").strpath)
     res = qisys.archive.compress(src.strpath, algo="zip")
 
+
 def test_extract_invalid_empty(tmpdir):
     if os.name == 'nt':
         return
-    srcdir   = tmpdir.mkdir("src")
+    srcdir = tmpdir.mkdir("src")
     destdir = tmpdir.mkdir("dest")
     archive = srcdir.join("empty.tar.gz")
     archive.write("")
@@ -81,6 +84,7 @@ def test_extract_invalid_empty(tmpdir):
     with pytest.raises(Exception) as e:
         qisys.archive.extract(archive.strpath, destdir.strpath)
     assert "tar failed" in e.value.message
+
 
 def test_extract_invalid_no_topdir(tmpdir):
     src = tmpdir.mkdir("src")
@@ -100,6 +104,7 @@ def test_extract_invalid_no_topdir(tmpdir):
         qisys.archive.extract(buggy_zip_path, dest.strpath)
     assert "same top dir" in str(e.value)
 
+
 def test_flat(tmpdir):
     src = tmpdir.mkdir("src")
     src.ensure("lib", "libfoo.so", file=True)
@@ -111,6 +116,7 @@ def test_flat(tmpdir):
     qisys.archive.extract(res, dest.strpath, strict_mode=False)
     assert dest.join("include", "foo.h").check(file=True)
 
+
 def test_symlinks(tmpdir):
     src = tmpdir.mkdir("src")
     src.ensure("lib", "libfoo.so.42", file=True)
@@ -120,6 +126,7 @@ def test_symlinks(tmpdir):
     dest = tmpdir.mkdir("dest").mkdir("foo")
     qisys.archive.extract(res, dest.strpath)
     assert dest.join("lib", "libfoo.so").islink()
+
 
 def test_returned_value_when_extracting_flat_package(tmpdir):
     src = tmpdir.mkdir("src")

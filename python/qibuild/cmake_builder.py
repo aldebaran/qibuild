@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import functools
@@ -13,13 +13,15 @@ import qibuild.deploy
 import qibuild.deps
 from qibuild.parallel_builder import ParallelBuilder
 from qisys.abstractbuilder import AbstractBuilder
-from qibuild.project       import write_qi_path_conf
+from qibuild.project import write_qi_path_conf
+
 
 class CMakeBuilder(AbstractBuilder):
     """ CMake driver.
         Allow building multiple cmake projects together.
         Dependencies can optionally be resolved and taken into account.
     """
+
     def __init__(self, build_worktree, projects=None):
         self.build_worktree = build_worktree
         if not projects:
@@ -157,10 +159,10 @@ Or configure the project with no config
     def pre_build(self, project):
         """ Called before building a project """
         sdk_dirs = self.deps_solver.get_sdk_dirs(project,
-                ["build", "runtime", "test"])
+                                                 ["build", "runtime", "test"])
         paths = sdk_dirs[:]
         packages = self.deps_solver.get_dep_packages([project],
-                ["build", "runtime", "test"])
+                                                     ["build", "runtime", "test"])
         paths.extend([package.path for package in packages])
         project.fix_shared_libs(paths)
 
@@ -171,7 +173,7 @@ Or configure the project with no config
             projects = self.projects
         else:
             projects = self.deps_solver.get_dep_projects(self.projects,
-                                                        ["build", "runtime", "test"])
+                                                         ["build", "runtime", "test"])
         # Make sure to not pass the 'single' option to project.configure()
         kwargs.pop("single", None)
 
@@ -261,13 +263,12 @@ Or configure the project with no config
             ui.info(ui.green, ":: Installing projects")
             for i, project in enumerate(projects):
                 ui.info_count(i, len(projects),
-                            ui.green, "Installing", ui.blue, project.name,
-                            ui.green, "to", ui.blue, dest_dir,
-                            update_title=True)
+                              ui.green, "Installing", ui.blue, project.name,
+                              ui.green, "to", ui.blue, dest_dir,
+                              update_title=True)
                 files = project.install(dest_dir, **kwargs)
                 installed.extend(files)
         return installed
-
 
     @need_configure
     def deploy(self, url, split_debug=False, with_tests=False, install_tc_packages=True):
@@ -310,9 +311,9 @@ Or configure the project with no config
             ui.info(ui.green, ":: Deploying packages")
             for i, package in enumerate(dep_packages):
                 ui.info_count(i, len(dep_packages),
-                    ui.green, "Deploying package", ui.blue, package.name,
-                    ui.green, "to", ui.blue, url.as_string,
-                    update_title=True)
+                              ui.green, "Deploying package", ui.blue, package.name,
+                              ui.green, "to", ui.blue, url.as_string,
+                              update_title=True)
                 # Install package in local deploy dir
                 files = package.install(deploy_dir, components=components)
                 to_deploy.extend(files)
@@ -323,9 +324,9 @@ Or configure the project with no config
 
         for (i, project) in enumerate(dep_projects):
             ui.info_count(i, len(dep_projects),
-                    ui.green, "Deploying project", ui.blue, project.name,
-                    ui.green, "to", ui.blue, url.as_string,
-                    update_title=True)
+                          ui.green, "Deploying project", ui.blue, project.name,
+                          ui.green, "to", ui.blue, url.as_string,
+                          update_title=True)
 
             if with_tests:
                 to_deploy.append("qitest.json")
@@ -350,6 +351,7 @@ Or configure the project with no config
         ui.info(ui.green, "::", "Syncing to url", ui.reset, ui.bold,
                 url.as_string, update_title=True)
         qisys.remote.deploy(deploy_dir, url, filelist=deploy_manifest)
+
 
 class NotConfigured(Exception):
     def __init__(self, project):

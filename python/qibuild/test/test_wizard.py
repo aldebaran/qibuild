@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ testing for qibuild.wizard.run_config_wizard
 
@@ -288,7 +288,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.assertEqual(self.build_worktree.qibuild_cfg.local.defaults.config,
                          "win32-vs2010")
         self.assertEqual(self.build_worktree.qibuild_cfg.defaults.cmake.generator,
-            "Visual Studio 10")
+                         "Visual Studio 10")
 
     def test_unsetting_unique_build_dir(self):
         self.setup_platform("linux")
@@ -324,9 +324,9 @@ class ConfigWizardTestCase(unittest.TestCase):
         build_dir = new_build_worktree.qibuild_cfg.local.build.prefix
         sdk_dir = new_build_worktree.qibuild_cfg.local.build.sdk_dir
         self.assertFalse(build_dir,
-            "build_dir is '%s', should be None or empty" % build_dir)
+                         "build_dir is '%s', should be None or empty" % build_dir)
         self.assertFalse(sdk_dir,
-            "sdk_dir is '%s', should be None or empty" % sdk_dir)
+                         "sdk_dir is '%s', should be None or empty" % sdk_dir)
 
     def tearDown(self):
         qisys.sh.rm(self.tmp)
@@ -338,6 +338,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         if self.interact_patcher:
             self.interact_patcher.stop()
         self.get_generators_patcher.stop()
+
 
 if __name__ == "__main__":
     unittest.main()

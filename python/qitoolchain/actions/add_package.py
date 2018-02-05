@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Add a new package to a toolchain
 
@@ -17,6 +17,7 @@ import qitoolchain.parsers
 import qisys.remote
 import urlparse
 
+
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
@@ -24,6 +25,7 @@ def configure_parser(parser):
     parser.add_argument("package_path", metavar='PATH',
                         help="The path to the package")
     parser.add_argument("--name", help=argparse.SUPPRESS)
+
 
 def do(args):
     """ Add a package to a toolchain

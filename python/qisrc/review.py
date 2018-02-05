@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Handling pushing changes to gerrit
 
@@ -33,9 +33,9 @@ def fetch_gerrit_hook_ssh(path, username, server, port=None):
     scp = qisys.command.find_program("scp", raises=False)
     if not scp:
         return False, "Could not find scp executable"
-    cmd = [scp, "-P" , str(port),
-        "%s@%s:hooks/commit-msg" % (username, server),
-        git_hooks_dir]
+    cmd = [scp, "-P", str(port),
+           "%s@%s:hooks/commit-msg" % (username, server),
+           git_hooks_dir]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     (out, _) = process.communicate()
     if process.returncode == 0:
@@ -47,13 +47,14 @@ def fetch_gerrit_hook_ssh(path, username, server, port=None):
 def check_gerrit_connection(username, server, ssh_port=29418):
     """ Check that the user can connect to gerrit with ssh """
     cmd = ["ssh", "-p", str(ssh_port),
-        "%s@%s" % (username, server),
-        "gerrit", "version"]
+           "%s@%s" % (username, server),
+           "gerrit", "version"]
     try:
         qisys.command.call(cmd, quiet=True)
     except qisys.command.CommandFailedException:
         return False
     return True
+
 
 def ask_gerrit_username(server, ssh_port=29418):
     """ Run a wizard to try to configure gerrit access
@@ -85,6 +86,7 @@ def ask_gerrit_username(server, ssh_port=29418):
 
     if check_gerrit_connection(username, server, ssh_port=ssh_port):
         return username
+
 
 def get_gerrit_username(server, ssh_port):
     """ Get the username to use when using code review.
@@ -191,8 +193,8 @@ def set_reviewers(refs, reviewers, username, server, ssh_port):
                       no e-mails
     """
     cmd = ["ssh", "-p", str(ssh_port),
-    "%s@%s" % (username, server),
-    "gerrit", "set-reviewers"]
+           "%s@%s" % (username, server),
+           "gerrit", "set-reviewers"]
     cmd.extend(refs)
     for reviewer in reviewers:
         cmd.append("--add %s" % reviewer)

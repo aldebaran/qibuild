@@ -1,19 +1,21 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qisys.worktree
 import qibuild.parsers
 
 import qibuild.config
 import qitoolchain
 
+
 def toolchain_parser(parser):
     """ Parser for every action that requires a toolchain """
     parser.add_argument("-c", "--config", dest="config",
-                        help="Name of a config to use. " + \
+                        help="Name of a config to use. " +
                               "The config should be associated to a toolchain")
     parser.add_argument("-t", "--toolchain", dest="toolchain_name",
                         help="Name of the toolchain to use")
+
 
 def get_toolchain(args):
     """ Get the toolchain to use.
@@ -37,13 +39,12 @@ def get_toolchain(args):
             config = None
 
     if not config:
-        mess  = "Could not find which config to use.\n"
+        mess = "Could not find which config to use.\n"
         mess += "(not in a work tree or no default config in "
         mess += "current worktree configuration)\n"
         mess += "Please specify a configuration with -c, --config \n"
         mess += "or a toolchain name with -t, --toolchain"
         raise Exception(mess)
-
 
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read()

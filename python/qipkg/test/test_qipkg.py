@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import sys
 
@@ -15,11 +15,13 @@ from qibuild.test.test_qibuild_deploy import get_ssh_url
 import mock
 import pytest
 
+
 def test_ls_package(qipkg_action, record_messages):
     pkg_path = os.path.join(os.path.dirname(__file__), "projects", "python_services.pkg")
     qipkg_action("ls-package", pkg_path)
     assert record_messages.find("lib/my_service.py")
     assert record_messages.find("manifest.xml")
+
 
 def test_make_package(qipkg_action, qipy_action):
     tmpdir = qipy_action.worktree.tmpdir
@@ -37,24 +39,27 @@ def test_make_package(qipkg_action, qipy_action):
     qipkg_action("extract-package", pkg)
 
     expected_paths = [
-            "manifest.xml",
-            "lib/libfoo.so",
-            "lib/python2.7/site-packages/b.py",
-            "c_behavior/behavior.xar",
+        "manifest.xml",
+        "lib/libfoo.so",
+        "lib/python2.7/site-packages/b.py",
+        "c_behavior/behavior.xar",
     ]
     for path in expected_paths:
         full_path = tmpdir.join("c-0.1", path)
         assert full_path.check(file=True)
+
 
 def test_make_package_empty_uuid(qipkg_action):
     pml = os.path.join(os.path.dirname(__file__), "projects", "empty_uuid", "empty.pml")
     error = qipkg_action("make-package", pml, raises=True)
     assert "uuid" in error
 
+
 def test_make_package_empty_version(qipkg_action):
     pml = os.path.join(os.path.dirname(__file__), "projects", "empty_version", "empty.pml")
     error = qipkg_action("make-package", pml, raises=True)
     assert "version" in error
+
 
 def test_breakpad_symbols(qipkg_action):
     dump_syms = qisys.command.find_program("dump_syms", raises=False)
@@ -80,8 +85,8 @@ def test_meta(qipkg_action):
     qipkg_action("build", meta_pml)
     pkgs = qipkg_action("make-package", meta_pml)
     expected_paths = [
-            "a-0.1.pkg",
-            "d-0.1.pkg"
+        "a-0.1.pkg",
+        "d-0.1.pkg"
     ]
     actual_paths = [os.path.basename(x) for x in pkgs]
     assert actual_paths == expected_paths
@@ -123,6 +128,7 @@ def test_no_worktree_pure_pml(tmpdir, monkeypatch):
     assert dest.join("fooproject-0.1", "manifest.xml").check(file=True)
     assert dest.join("fooproject-0.1", "behavior_1", "behavior.xar").check(file=True)
 
+
 def test_no_worktre_bad_pml(tmpdir, monkeypatch):
     project = tmpdir.mkdir("project")
     manifest_path = project.join("manifest.xml")
@@ -152,6 +158,7 @@ def test_no_worktre_bad_pml(tmpdir, monkeypatch):
         package = qisys.script.run_action("qipkg.actions.make_package", [pml_path.strpath])
     assert "not in a worktree" in error.value.message
 
+
 def test_translations(qipkg_action, tmpdir):
     tr_project = qipkg_action.add_test_project("tr_project")
     pml_path = os.path.join(tr_project.path, "tr.pml")
@@ -161,14 +168,17 @@ def test_translations(qipkg_action, tmpdir):
     qipkg_action("extract-package", package)
     assert dest.join("tr-0.1", "translations", "tr_fr_FR.qm").check(file=True)
 
+
 def test_validate_package(qipkg_action):
     pkg_path = os.path.join(os.path.dirname(__file__), "projects", "python_services.pkg")
     qipkg_action("validate_package", pkg_path)
+
 
 def test_validate_package_exception(qipkg_action):
     pkg_path = os.path.join(os.path.dirname(__file__), "projects", "invalid_package.pkg")
     error = qipkg_action("validate_package", pkg_path, raises=True)
     assert error == "Given package does not satisfy default package requirements"
+
 
 def test_release_package(qipkg_action, tmpdir):
     pkg_path = os.path.join(os.path.dirname(__file__), "projects", "python_services.pkg")
@@ -190,9 +200,11 @@ def test_release_package(qipkg_action, tmpdir):
     # it is not pointing to a file of the package, nothing should have changed
     assert(services[3].attrib["execStart"] == "/usr/bin/python2.7 tata.py")
 
+
 def test_qipkg_in_wrong_directory(qipkg_action):
     error = qipkg_action("make-package", "foo.pml", raises=True)
     assert "foo.pml" in error
+
 
 def test_qipkg_no_such_project(qipkg_action, tmpdir):
     d_project = qipkg_action.add_test_project("d_pkg")
@@ -204,6 +216,7 @@ def test_qipkg_no_such_project(qipkg_action, tmpdir):
     error = qipkg_action("make-package", pml_path, raises=True)
     assert "No such python project: foo" in error
     assert pml_path in error
+
 
 def test_bump_version(qipkg_action):
     d_proj = qipkg_action.add_test_project("d_pkg")
@@ -217,12 +230,14 @@ def test_bump_version(qipkg_action):
     name = qipkg.builder.pkg_name(manifest_xml)
     assert name == "d-2.0"
 
+
 def test_install(qipkg_action, tmpdir):
     d_proj = qipkg_action.add_test_project("d_pkg")
     pml = os.path.join(d_proj.path, "d_pkg.pml")
     url = get_ssh_url(tmpdir)
     qipkg_action("install", pml, tmpdir.strpath)
     assert tmpdir.join("manifest.xml").check(file=True)
+
 
 def test_deploy(qipkg_action, tmpdir):
     d_proj = qipkg_action.add_test_project("d_pkg")
@@ -231,6 +246,7 @@ def test_deploy(qipkg_action, tmpdir):
     qipkg_action("deploy", pml, "--url", url)
 
     assert tmpdir.join("manifest.xml").check(file=True)
+
 
 def test_deploy_package(qipkg_action, tmpdir, record_messages):
     d_proj = qipkg_action.add_test_project("d_pkg")
@@ -265,6 +281,7 @@ def test_deploy_package(qipkg_action, tmpdir, record_messages):
     assert record_messages.find("PackageManager returned: True")
 
     del sys.modules["qi"]
+
 
 def test_deploy_package_from_pml(qipkg_action, tmpdir):
     d_proj = qipkg_action.add_test_project("d_pkg")

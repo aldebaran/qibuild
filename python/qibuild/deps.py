@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import qisys.sort
 from qisys.qixml import etree
@@ -11,6 +11,7 @@ class DepsSolver(object):
     and packages in a toolchain
 
     """
+
     def __init__(self, build_worktree):
         self.build_worktree = build_worktree
 
@@ -29,7 +30,7 @@ class DepsSolver(object):
 
         for name in sorted_names:
             dep_project = self.build_worktree.get_build_project(name,
-                raises=False)
+                                                                raises=False)
             if dep_project:
                 dep_projects.append(dep_project)
         return dep_projects
@@ -47,7 +48,7 @@ class DepsSolver(object):
         if not toolchain:
             return list()
         build_project_names = [x.name for x in
-            self.build_worktree.build_projects]
+                               self.build_worktree.build_projects]
 
         dep_packages = list()
         for name in sorted_names:
@@ -80,7 +81,7 @@ class DepsSolver(object):
             host_deps = host_deps.union(project.host_depends)
 
         host_projects = [self.build_worktree.get_build_project(x, raises=False)
-                        for x in host_deps]
+                         for x in host_deps]
         host_projects = filter(None, host_projects)
         return host_projects
 

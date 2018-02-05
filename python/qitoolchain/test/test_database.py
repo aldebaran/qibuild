@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import mock
 import pytest
@@ -15,6 +15,7 @@ import qitoolchain.feed
 from qisrc.test.conftest import svn_server
 from qisrc.test.conftest import git_server
 
+
 def test_persistent(toolchain_db):
     foo_package = qitoolchain.qipackage.QiPackage("foo", version="1.3")
     foo_package.path = "/path/to/foo"
@@ -24,12 +25,14 @@ def test_persistent(toolchain_db):
     actual_package = db2.packages["foo"]
     assert actual_package == foo_package
 
+
 def test_adding_same_package_twice(toolchain_db):
     foo_package = qitoolchain.qipackage.QiPackage("foo", version="1.3")
     foo_package.path = "/path/to/foo"
     toolchain_db.add_package(foo_package)
     toolchain_db.add_package(foo_package)
     assert len(toolchain_db.packages) == 1
+
 
 def test_update(toolchain_db, feed):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.42")
@@ -45,12 +48,14 @@ def test_update(toolchain_db, feed):
     toolchain_db.update(feed.url)
     assert toolchain_db.packages["boost"] == new_boost_package
 
+
 def test_downloads_remote_package(toolchain_db, feed):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.42")
     feed.add_package(boost_package, with_path=False, with_url=True)
 
     toolchain_db.update(feed.url)
     assert toolchain_db.packages["boost"].path
+
 
 def test_downloads_only_once(toolchain_db, feed):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.42")
@@ -64,6 +69,7 @@ def test_downloads_only_once(toolchain_db, feed):
     assert mock_extract.call_count == 1
     assert mock_extract.call_args_list[0][0][0] == "/path/to/boost.zip"
 
+
 def test_package_removed_from_feed(toolchain_db, feed):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.42")
     feed.add_package(boost_package)
@@ -74,6 +80,7 @@ def test_package_removed_from_feed(toolchain_db, feed):
     toolchain_db.update(feed.url)
     assert not toolchain_db.packages
     assert not os.path.exists(boost_path)
+
 
 def test_downgrading_package(toolchain_db, feed):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")
@@ -87,6 +94,7 @@ def test_downgrading_package(toolchain_db, feed):
     feed.add_package(old_boost_package)
     toolchain_db.update(feed.url)
     assert toolchain_db.packages["boost"] == old_boost_package
+
 
 def test_solve_deps(toolchain_db, tmpdir):
     bar_path = tmpdir.ensure("bar", dir=True)
@@ -104,6 +112,7 @@ def test_solve_deps(toolchain_db, tmpdir):
     toolchain_db.add_package(foo_package)
     res = toolchain_db.solve_deps([bar_package], dep_types=["build"])
     assert res == [foo_package, bar_package]
+
 
 def test_git_feed(toolchain_db, feed, git_server):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")
@@ -125,6 +134,7 @@ def test_git_feed(toolchain_db, feed, git_server):
     boost = toolchain.get_package("boost")
     assert boost.version == "1.55"
 
+
 def test_svn_package_conflict(toolchain_db, feed, svn_server):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")
     feed.add_package(boost_package)
@@ -139,6 +149,7 @@ def test_svn_package_conflict(toolchain_db, feed, svn_server):
     feed.add_svn_package(svn_package)
 
     toolchain.update(feed.url)
+
 
 def test_package_with_flags(tmpdir, toolchain_db):
     feed = tmpdir.join("feed.xml")
@@ -159,6 +170,7 @@ def test_package_with_flags(tmpdir, toolchain_db):
 
     x_tools_in_db = toolchain_db.get_package("x-tools")
     assert x_tools_in_db.toolchain_file
+
 
 def test_post_add(tmpdir, toolchain_db):
     boost = tmpdir.mkdir("boost")

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 
 # Colorized output to console code inspired by
@@ -42,35 +42,36 @@ class _Color:
         else:
             self.code += 'm'
 
-reset     = _Color(0)
-bold      = _Color(1)
-faint     = _Color(2)
-standout  = _Color(3)
+
+reset = _Color(0)
+bold = _Color(1)
+faint = _Color(2)
+standout = _Color(3)
 underline = _Color(4)
-blink     = _Color(5)
-overline  = _Color(6)
+blink = _Color(5)
+overline = _Color(6)
 
-black      = _Color(30)
-darkred    = _Color(31)
-darkgreen  = _Color(32)
-brown      = _Color(33)
-darkblue   = _Color(34)
-purple     = _Color(35)
-teal       = _Color(36)
-lightgray  = _Color(37)
+black = _Color(30)
+darkred = _Color(31)
+darkgreen = _Color(32)
+brown = _Color(33)
+darkblue = _Color(34)
+purple = _Color(35)
+teal = _Color(36)
+lightgray = _Color(37)
 
-darkgray   = _Color(30, 1)
-red        = _Color(31, 1)
-green      = _Color(32, 1)
-yellow     = _Color(33, 1)
-blue       = _Color(34, 1)
-fuchsia    = _Color(35, 1)
-turquoise  = _Color(36, 1)
-white      = _Color(37, 1)
+darkgray = _Color(30, 1)
+red = _Color(31, 1)
+green = _Color(32, 1)
+yellow = _Color(33, 1)
+blue = _Color(34, 1)
+fuchsia = _Color(35, 1)
+turquoise = _Color(36, 1)
+white = _Color(37, 1)
 
-darkteal   = turquoise
+darkteal = turquoise
 darkyellow = brown
-fuscia     = fuchsia
+fuscia = fuchsia
 
 
 # Global variable to store qisys.ui configuration
@@ -92,6 +93,7 @@ CONFIG = {
 
 # used for testing
 _MESSAGES = list()
+
 
 def configure_logging(args):
     verbose = os.environ.get("VERBOSE", False)
@@ -135,13 +137,16 @@ def config_color(fp):
     else:
         return True
 
+
 _enable_xterm_title = None
+
 
 def update_title(mystr, fp):
     if os.name == "nt":
         _update_title_windows(mystr)
     else:
         _update_title_unix(mystr, fp)
+
 
 def _update_title_unix(mystr, fp):
     global _enable_xterm_title
@@ -153,9 +158,11 @@ def _update_title_unix(mystr, fp):
         fp.write(mystr)
         fp.flush()
 
+
 def _update_title_windows(mystr):
     if _console and config_title(sys.stdout):
         _console.title(txt=mystr)
+
 
 def _msg(*tokens, **kwargs):
     """ Helper method for error, warning, info, debug
@@ -206,11 +213,13 @@ def _msg(*tokens, **kwargs):
         fp.write(stringres)
         fp.flush()
 
+
 def error(*tokens, **kwargs):
     """ Print an error message """
     tokens = [bold, red, "[ERROR]:"] + list(tokens)
     kwargs["fp"] = sys.stderr
     _msg(*tokens, **kwargs)
+
 
 def warning(*tokens, **kwargs):
     """ Print a warning message """
@@ -218,11 +227,13 @@ def warning(*tokens, **kwargs):
     kwargs["fp"] = sys.stderr
     _msg(*tokens, **kwargs)
 
+
 def info(*tokens, **kwargs):
     """ Print an informative message """
     if CONFIG["quiet"]:
         return
     _msg(*tokens, **kwargs)
+
 
 def info_count(i, n, *rest, **kwargs):
     """ Same as info, but displays a nice counter
@@ -235,10 +246,11 @@ def info_count(i, n, *rest, **kwargs):
     * ( 5/10)
 
     """
-    num_digits = len(str(n)) # lame, I know
+    num_digits = len(str(n))  # lame, I know
     counter_format = "(%{}d/%d)".format(num_digits)
     counter_str = counter_format % (i+1, n)
     info(green, "*", reset, counter_str, reset, *rest, **kwargs)
+
 
 def info_progress(value, max_value, prefix):
     """ Display info progress in percent
@@ -255,6 +267,7 @@ def info_progress(value, max_value, prefix):
         sys.stdout.write(prefix + ": %.0f%%\r" % percent)
         sys.stdout.flush()
 
+
 def debug(*tokens, **kwargs):
     """ Print a debug message """
     if not CONFIG["verbose"] or CONFIG["record"]:
@@ -262,18 +275,22 @@ def debug(*tokens, **kwargs):
     tokens = [blue, "[DEBUG]:"] + list(tokens)
     _msg(*tokens, **kwargs)
 
+
 def indent_iterable(elems, num=2):
     """Indent an iterable."""
     return [" " * num + l for l in elems]
+
 
 def indent(text, num=2):
     """Indent a piece of text."""
     lines = text.splitlines()
     return '\n'.join(indent_iterable(lines, num=num))
 
+
 def tabs(num):
     """ Compute a blank tab """
     return "  " * num
+
 
 class timer:
     """ To be used as a decorator,
@@ -292,6 +309,7 @@ class timer:
     'something took 2h 33m 42s'
 
     """
+
     def __init__(self, description):
         self.description = description
         self.start_time = None
@@ -329,11 +347,12 @@ class timer:
         if CONFIG['timestamp']:
             info("%s took %s" % (self.description, as_str))
 
+
 def did_you_mean(message, user_input, choices):
     if not choices:
         return message
     else:
-        result = {difflib.SequenceMatcher(a=user_input, b=choice).ratio(): choice \
+        result = {difflib.SequenceMatcher(a=user_input, b=choice).ratio(): choice
                   for choice in choices}
         message += "\nDid you mean: %s?" % result[max(result)]
         return message
@@ -344,7 +363,7 @@ def get_console_size():
     """ Return a tuple containing the current console size: (width, height) """
     import platform
     current_os = platform.system()
-    tuple_xy=None
+    tuple_xy = None
     if current_os == "Windows":
         tuple_xy = _get_console_size_windows()
         if tuple_xy is None:
@@ -356,8 +375,9 @@ def get_console_size():
         tuple_xy = (80, 25)      # default value
     return tuple_xy
 
+
 def _get_console_size_windows():
-    res=None
+    res = None
     try:
         from ctypes import windll, create_string_buffer
 
@@ -380,26 +400,31 @@ def _get_console_size_windows():
     else:
         return None
 
+
 def _get_console_size_tput():
     # get terminal width
     # src: http://stackoverflow.com/questions/263890/how-do-i-find-the-width-height-of-a-terminal-window
     try:
         import subprocess
-        proc=subprocess.Popen(["tput", "cols"],stdin=subprocess.PIPE,stdout=subprocess.PIPE)
-        output=proc.communicate(input=None)
-        cols=int(output[0])
-        proc=subprocess.Popen(["tput", "lines"],stdin=subprocess.PIPE,stdout=subprocess.PIPE)
-        output=proc.communicate(input=None)
-        rows=int(output[0])
-        return (cols,rows)
+        proc = subprocess.Popen(["tput", "cols"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        output = proc.communicate(input=None)
+        cols = int(output[0])
+        proc = subprocess.Popen(["tput", "lines"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        output = proc.communicate(input=None)
+        rows = int(output[0])
+        return (cols, rows)
     except:
         return None
+
 
 def _get_console_size_linux():
     def ioctl_GWINSZ(fd):
         try:
-            import fcntl, termios, struct, os
-            cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ,'1234'))
+            import fcntl
+            import termios
+            import struct
+            import os
+            cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
         except:
             return None
         return cr
@@ -418,6 +443,7 @@ def _get_console_size_linux():
             return None
     return int(cr[1]), int(cr[0])
 
+
 def valid_filename(value):
     """ Validate that the string passed as input can safely
     be used as a valid file name
@@ -430,7 +456,7 @@ def valid_filename(value):
     bad_chars = r'<>:"/\|?*'
     for bad_char in bad_chars:
         if bad_char in value:
-            mess  = "Invalid name: '%s'\n" % value
+            mess = "Invalid name: '%s'\n" % value
             mess += "A valid name should not contain any "
             mess += "of the following chars:\n"
             mess += " ".join(bad_chars)

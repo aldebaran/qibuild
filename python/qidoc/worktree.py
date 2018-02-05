@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import difflib
 
@@ -15,6 +15,7 @@ from qidoc.template_project import TemplateProject
 
 class DocWorkTree(qisys.worktree.WorkTreeObserver):
     """ Stores configuration of doxygen and sphinx projects """
+
     def __init__(self, worktree):
         self.worktree = worktree
         self.root = worktree.root
@@ -80,6 +81,7 @@ In:
     def __repr__(self):
         return "<DocWorkTree in %s>" % self.root
 
+
 def new_doc_project(doc_worktree, project):
     qiproject_xml = project.qiproject_xml
     if not os.path.exists(qiproject_xml):
@@ -90,6 +92,7 @@ def new_doc_project(doc_worktree, project):
         return _new_doc_project_3(doc_worktree, project)
     else:
         return _new_doc_project_2(doc_worktree, project)
+
 
 def _new_doc_project_3(doc_worktree, project):
     qiproject_xml = project.qiproject_xml
@@ -103,6 +106,7 @@ def _new_doc_project_3(doc_worktree, project):
         raise BadProjectConfig(qiproject_xml,
                                "Expecting a 'type' attribute")
     return _new_doc_project(doc_worktree, project, qidoc_elem, doc_type)
+
 
 def _new_doc_project_2(doc_worktree, project):
     """ Parse qidoc2 syntax in case the 'src' attribute is not used,
@@ -137,6 +141,7 @@ def _new_doc_project_2(doc_worktree, project):
         doc_type = "doxygen"
 
     return _new_doc_project(doc_worktree, project, doc_elem, doc_type)
+
 
 def _new_doc_project(doc_worktree, project, xml_elem, doc_type):
     qiproject_xml = project.qiproject_xml

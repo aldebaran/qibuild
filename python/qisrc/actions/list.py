@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ List the names and paths of every project, or those matching a pattern
 
@@ -27,6 +27,7 @@ def configure_parser(parser):
     qisrc.parsers.groups_parser(parser)
     parser.set_defaults(names=True)
 
+
 def do(args):
     """ Main method """
     git_worktree = qisrc.parsers.get_git_worktree(args)
@@ -39,7 +40,7 @@ def do(args):
     else:
         projects = git_worktree.git_projects
     max_name = max(len(x.name) for x in projects)
-    max_src  = max(len(x.src)  for x in projects)
+    max_src = max(len(x.src) for x in projects)
     regex = args.pattern
     if args.pattern:
         regex = re.compile(regex)

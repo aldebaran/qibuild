@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 
 """ This is just a set of convenience functions to be used with
@@ -12,6 +12,7 @@ import re
 from qisys import ui
 
 from xml.etree import ElementTree as etree
+
 
 def indent(elem, level=0):
     """ Poor man's pretty print for elementTree
@@ -32,6 +33,7 @@ def indent(elem, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
+
 def raise_parse_error(message, xml_path=None, tree=None):
     """ Raise a nice parsing error about the given
     tree element
@@ -45,6 +47,7 @@ def raise_parse_error(message, xml_path=None, tree=None):
         mess += "Could not parse:\t%s\n" % as_str
     mess += message
     raise Exception(mess)
+
 
 def parse_bool_attr(tree, name, default=False):
     """ Parse a boolean attribute of an element
@@ -65,9 +68,10 @@ def parse_bool_attr(tree, name, default=False):
         return False
     if res is not None:
         raise_parse_error("Expecting value in [true, false, 0, 1] "
-            "for attribute %s" % name,
-            tree=tree)
+                          "for attribute %s" % name,
+                          tree=tree)
     return default
+
 
 def parse_int_attr(tree, name, default=None):
     """ Parse a integer from a xml element
@@ -107,7 +111,6 @@ def parse_required_attr(tree, name, xml_path=None):
         mess = "node %s must have a '%s' attribute" % (tree.tag, name)
         raise_parse_error(mess, xml_path=xml_path)
     return value
-
 
 
 def read(xml_path):
@@ -174,7 +177,7 @@ class XMLParser(object):
         self._parse_attributes()
         self.backtrace.append(root.tag)
         for child in root:
-            method_name = "_parse_{tagname}".format(tagname = child.tag)
+            method_name = "_parse_{tagname}".format(tagname=child.tag)
             try:
                 method = getattr(self.__class__, method_name)
             except AttributeError as err:
@@ -240,7 +243,7 @@ class XMLParser(object):
 
         if value is None:
             mess = "Node '%s' must have a '%s' attribute" % (node_name,
-                                                               attribute_name)
+                                                             attribute_name)
             raise Exception(mess)
 
     def xml_elem(self, node_name=None):
@@ -315,7 +318,7 @@ def apply_xml_attributes(target, elem, ignore_list=None):
                 setattr(target, attr, new_value)
             except AttributeError:
                 ui.warning("Could not set", attr, "on", target, "with value",
-                            new_value)
+                           new_value)
 
 
 def _get_value_for_type(type_value, value):
@@ -329,6 +332,7 @@ def _get_value_for_type(type_value, value):
     if type_value == list:
         return value.split(" ")
     return value
+
 
 def sanitize_xml(val, replacement="?"):
     """  Remove illegal XML characters from the input string.

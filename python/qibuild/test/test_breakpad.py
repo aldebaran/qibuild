@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import sys
@@ -32,6 +32,7 @@ def test_generate_symbols(build_worktree, tmpdir):
     res = qibuild.breakpad.gen_symbol_archive(base_dir=dest, output=symbols_archive)
     assert os.path.exists(res)
 
+
 def test_is_macho(qibuild_action):
     if not sys.platform == "darwin":
         return
@@ -42,9 +43,10 @@ def test_is_macho(qibuild_action):
     lib_world = qibuild.find.find_lib([world_project.sdk_directory], "world",
                                       expect_one=True)
     lib_bar = qibuild.find.find_lib([world_project.sdk_directory], "bar",
-                                      expect_one=True)
+                                    expect_one=True)
     assert qibuild.breakpad.is_macho(lib_world)
     assert not qibuild.breakpad.is_macho(lib_bar)
+
 
 def test_is_exe():
     assert qibuild.breakpad.is_exe("foo.exe")

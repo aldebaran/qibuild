@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Extract a binary toolchain package """
 
@@ -10,12 +10,14 @@ from qisys import ui
 import qisys.parsers
 import qitoolchain.qipackage
 
+
 def configure_parser(parser):
     qisys.parsers.default_parser(parser)
     parser.add_argument("package_path",
                         help="Path to the package to extract")
     parser.add_argument("-o", "--output", dest="output",
                         help="Where to extract the files (default: working directory")
+
 
 def do(args):
     package_path = args.package_path

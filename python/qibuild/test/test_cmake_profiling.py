@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 
@@ -35,14 +35,14 @@ def test_simple_parse(tmpdir):
     cmake_log.write(out)
 
     profile = parse_cmake_log(cmake_log.strpath, qibuild_dir)
-    assert profile["internal/stage.cmake"]   == {73:1, 74:1}
-    assert profile["internal/install.cmake"] == {64:1, 63:2}
+    assert profile["internal/stage.cmake"] == {73: 1, 74: 1}
+    assert profile["internal/install.cmake"] == {64: 1, 63: 2}
 
 
 def test_gen_annotations(tmpdir):
     profile = {
-        "internal/stage.cmake" : {1:3, 2:39} ,
-        "internal/install.cmake" : {3:3},
+        "internal/stage.cmake": {1: 3, 2: 39},
+        "internal/install.cmake": {3: 3},
     }
     qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
     gen_annotations(profile, tmpdir.strpath, qibuild_dir)

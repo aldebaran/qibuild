@@ -1,14 +1,16 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import qisys.command
+
 
 def check_gettext():
     gettext = qisys.command.find_program("xgettext", raises=False)
     if not gettext:
         return False
     return True
+
 
 def test_install_confintl_files(qilinguist_action, tmpdir):
     dest = tmpdir.join("dest")

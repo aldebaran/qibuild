@@ -1,17 +1,19 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import qisys.sh
 
+
 class PythonProject(object):
     """ Collections of scripts, modules and packages """
+
     def __init__(self, worktree, src, name):
         self.worktree = worktree
         self.src = src
         self.path = os.path.join(worktree.root, src)
-        self.name  = name
+        self.name = name
         self.scripts = list()
         self.modules = list()
         self.packages = list()
@@ -31,10 +33,10 @@ class PythonProject(object):
 
     def install(self, dest):
         """ Install scripts, modules and packages to the given destination """
-        empty =  (not self.setup_with_distutils) and \
-                 (not self.scripts) and \
-                 (not self.modules) and \
-                 (not self.packages)
+        empty = (not self.setup_with_distutils) and \
+            (not self.scripts) and \
+            (not self.modules) and \
+            (not self.packages)
         if empty:
             mess = """
 Could not find anything to install.
@@ -100,17 +102,20 @@ in the qiproject.xml file
     def __repr__(self):
         return "<%s in %s>" % (self.name, self.src)
 
+
 class Module():
     def __init__(self, name, src):
         self.name = name
         self.src = src
         self.qimodule = False
 
+
 class Package():
     def __init__(self, name, src):
         self.name = name
         self.src = src
         self.qimodule = False
+
 
 class Script():
     def __init__(self, src):

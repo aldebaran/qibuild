@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import subprocess
 
@@ -9,6 +9,7 @@ from qitoolchain.test.conftest import *
 
 import qisys.worktree
 import qibuild.worktree
+
 
 class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
     """ A subclass of qisrc.worktree.WorkTree that
@@ -52,10 +53,10 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
 </project>
 """
         xml = xml.format(name=name,
-                        buildtime_names=" ".join(build_depends),
-                        runtime_names=" ".join(run_depends),
-                        testtime_names=" ".join(test_depends)
-                        )
+                         buildtime_names=" ".join(build_depends),
+                         runtime_names=" ".join(run_depends),
+                         testtime_names=" ".join(test_depends)
+                         )
         proj_path.join("qiproject.xml").write(xml)
         cmake = """ \
 cmake_minimum_required(VERSION 2.8)
@@ -94,17 +95,19 @@ int main()
         return build_project
 
 
-
 # pylint: disable-msg=E1103
 @pytest.fixture
 def build_worktree(cd_to_tmpdir):
     return TestBuildWorkTree()
 
 # pylint: disable-msg=E1103
+
+
 @pytest.fixture
 def qibuild_action(cd_to_tmpdir):
     res = QiBuildAction()
     return res
+
 
 class QiBuildAction(TestAction):
     def __init__(self):

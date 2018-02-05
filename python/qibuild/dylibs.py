@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Set of tools to handle .dylib and frameworks on Mac
 
@@ -8,6 +8,7 @@
 
 import os
 import qisys.sh
+
 
 def fix_dylibs(sdk_dir, paths=None):
     """ Create symlinks to every framework
@@ -27,7 +28,7 @@ def fix_dylibs(sdk_dir, paths=None):
         frameworks = os.listdir(path)
         frameworks = [x for x in frameworks if x.endswith(".framework")]
         for framework in frameworks:
-            src  = os.path.join(path    , framework)
+            src = os.path.join(path, framework)
             dest = os.path.join(sdk_dir, framework)
             qisys.sh.rm(dest)
             os.symlink(src, dest)
@@ -37,7 +38,7 @@ def fix_dylibs(sdk_dir, paths=None):
         dylibs = os.listdir(lib_dir)
         dylibs = [x for x in dylibs if ".dylib" in x]
         for dylib in dylibs:
-            src  = os.path.join(path   , "lib", dylib)
+            src = os.path.join(path, "lib", dylib)
             dest = os.path.join(sdk_dir, "lib", dylib)
             if os.path.islink(src):
                 # don't create recursive links

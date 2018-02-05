@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 
 import qisrc.sync
@@ -21,6 +21,7 @@ def test_stores_url_and_groups(git_worktree, git_server):
     assert manifest.url == manifest_url
     assert manifest.groups == ["mygroup"]
 
+
 def test_stores_branches(git_worktree, git_server):
     git_server.switch_manifest_branch("devel")
     manifest_url = git_server.manifest_url
@@ -30,6 +31,7 @@ def test_stores_branches(git_worktree, git_server):
     manifest = worktree_syncer.manifest
     assert manifest.url == manifest_url
     assert manifest.branch == "devel"
+
 
 def test_pull_manifest_changes_when_syncing(git_worktree, git_server):
     manifest_url = git_server.manifest_url
@@ -43,6 +45,7 @@ def test_pull_manifest_changes_when_syncing(git_worktree, git_server):
     a_file = git_worktree.tmpdir.join(".qi", "manifests", "default", "a_file")
     assert a_file.read() == "some contents\n"
 
+
 def test_use_correct_manifest_branch(git_worktree, git_server):
     git_server.switch_manifest_branch("devel")
     # Push a random file to the 'devel' branch
@@ -55,11 +58,13 @@ def test_use_correct_manifest_branch(git_worktree, git_server):
     a_file = git_worktree.tmpdir.join(".qi", "manifests", "default", "a_file")
     assert a_file.read() == "some contents\n"
 
+
 def test_new_repos(git_worktree, git_server):
     git_server.create_repo("foo.git")
     manifest_url = git_server.manifest_url
     git_worktree.configure_manifest(manifest_url)
     assert git_worktree.get_git_project("foo")
+
 
 def test_moving_repos_simple_case(git_worktree, git_server):
     git_server.create_repo("foo.git")
@@ -68,6 +73,7 @@ def test_moving_repos_simple_case(git_worktree, git_server):
     git_server.move_repo("foo.git", "lib/foo")
     git_worktree.sync()
     assert git_worktree.get_git_project("lib/foo")
+
 
 def test_moving_repos_rename_fails(git_worktree, git_server):
     git_server.create_repo("foo.git")
@@ -82,8 +88,9 @@ def test_moving_repos_rename_fails(git_worktree, git_server):
     assert git_worktree.get_git_project("foo")
     lib.remove()
     git_worktree.sync()
-    assert  git_worktree.get_git_project("lib/foo")
+    assert git_worktree.get_git_project("lib/foo")
     assert not git_worktree.get_git_project("foo")
+
 
 def test_moving_repos_with_force(git_worktree, git_server):
     git_server.create_repo("foo.git")
@@ -94,6 +101,7 @@ def test_moving_repos_with_force(git_worktree, git_server):
     git_worktree.configure_manifest(manifest_url, force=True)
     assert git_worktree.get_git_project("lib/foo")
     assert not git_worktree.get_git_project("foo")
+
 
 def test_removing_repos(git_worktree, git_server):
     git_server.create_repo("foo.git")
@@ -110,7 +118,7 @@ def test_changing_manifest_groups(git_worktree, git_server):
     git_server.create_repo("c")
     manifest_url = git_server.manifest_url
     git_worktree.configure_manifest(manifest_url,
-                                     groups=["a_group"])
+                                    groups=["a_group"])
     git_projects = git_worktree.git_projects
     assert len(git_projects) == 2
     git_worktree.configure_manifest(manifest_url,
@@ -121,6 +129,7 @@ def test_changing_manifest_groups(git_worktree, git_server):
                                     groups=["a_group", "foo_group"])
     git_projects = git_worktree.git_projects
     assert len(git_projects) == 4
+
 
 def test_add_on_empty(git_worktree, git_server):
     foo = git_worktree.tmpdir.join("foo")

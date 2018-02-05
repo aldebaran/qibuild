@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Update every toolchain using the feed that was used to create them
 
@@ -13,18 +13,20 @@ from qisys import ui
 import qisys.parsers
 import qitoolchain
 
+
 def configure_parser(parser):
     """ Configure parser for this action """
     qisys.parsers.default_parser(parser)
     parser.add_argument("name", nargs="?", metavar="NAME",
-        help="Update only this toolchain")
+                        help="Update only this toolchain")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
-        help="Use this feed location to update the toolchain.\n",
-        nargs="?")
+                        help="Use this feed location to update the toolchain.\n",
+                        nargs="?")
     parser.add_argument("--feed-name", dest="feed_name",
-        help="Name of the feed. To be specified when using a git url")
+                        help="Name of the feed. To be specified when using a git url")
     parser.add_argument("-b", "--branch",
-        help="Branch of the git url to use")
+                        help="Branch of the git url to use")
+
 
 def do(args):
     """Main entry point
@@ -37,7 +39,7 @@ def do(args):
         if not feed:
             feed = toolchain.feed_url
             if not feed:
-                mess  = "Could not find feed for toolchain %s\n" % tc_name
+                mess = "Could not find feed for toolchain %s\n" % tc_name
                 mess += "Please check configuration or " \
                         "specifiy a feed on the command line\n"
                 raise Exception(mess)

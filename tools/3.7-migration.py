@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import argparse
 import ConfigParser
 import os
@@ -11,6 +11,7 @@ import qisys.sh
 import qisys.qixml
 
 import qitoolchain.toolchain
+
 
 def get_old_toolchains():
     """ Return a dict name -> feed from the previous config format
@@ -26,6 +27,7 @@ def get_old_toolchains():
     for name, value in tc_items:
         res[name] = value
     return res
+
 
 def recreate_toolchains():
     old_toolchains = get_old_toolchains()
@@ -46,6 +48,7 @@ def recreate_toolchains():
         ui.error("Could not update some toolchains")
         for name, error in errors:
             ui.error(" * ", name, error)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -73,6 +76,7 @@ def main():
         else:
             root.remove(profiles)
     qisys.qixml.write(root, qibuild_xml_path)
+
 
 if __name__ == "__main__":
     main()

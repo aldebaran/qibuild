@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import qitoolchain.qipackage
 
@@ -9,9 +9,11 @@ from qitoolchain.test.conftest import QiToolchainAction
 
 from qisrc.test.conftest import git_server
 
+
 def test_simple(qitoolchain_action):
     foo_tc = qitoolchain_action("create", "foo")
     assert foo_tc.packages == list()
+
 
 def test_git_feed(qitoolchain_action, git_server, feed):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")

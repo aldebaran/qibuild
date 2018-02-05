@@ -1,11 +1,12 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qilinguist.parsers
 import qilinguist.pml_translator
 import qilinguist.qigettext
 
 import pytest
+
 
 def test_parsing_pml_from_wortktree(worktree, args):
     foo_proj = worktree.create_project("foo")
@@ -16,6 +17,7 @@ def test_parsing_pml_from_wortktree(worktree, args):
     project = projects[0]
     assert isinstance(project, qilinguist.pml_translator.PMLTranslator)
 
+
 def test_parsing_pml_no_worktree(cd_to_tmpdir, tmpdir, args):
     pml_path = tmpdir.join("foo.pml")
     pml_path.write('<Package name="foo" />')
@@ -25,12 +27,14 @@ def test_parsing_pml_no_worktree(cd_to_tmpdir, tmpdir, args):
     project = projects[0]
     assert isinstance(project, qilinguist.pml_translator.PMLTranslator)
 
+
 def test_names_no_worktree(cd_to_tmpdir, args):
     args.projects = ["foo"]
     with pytest.raises(Exception) as e:
         qilinguist.parsers.get_linguist_projects(args)
     assert e.value.message == "Cannot use project names when running " \
-                               "outside a worktree"
+        "outside a worktree"
+
 
 def test_no_worktree_no_args(cd_to_tmpdir, args):
     args.projects = list()
@@ -38,6 +42,7 @@ def test_no_worktree_no_args(cd_to_tmpdir, args):
         qilinguist.parsers.get_linguist_projects(args)
     assert e.value.message == "You should specify at least a pml path " \
                               "when running outside a worktree"
+
 
 def test_names_and_pml_from_worktree(linguist_worktree, args, monkeypatch):
     linguist_worktree.create_gettext_project("foo")
@@ -52,6 +57,7 @@ def test_names_and_pml_from_worktree(linguist_worktree, args, monkeypatch):
     assert foo.linguas == ["fr_FR", "en_US"]
     bar = projects[1]
     assert bar.pml_path == linguist_worktree.tmpdir.join("bar.pml").strpath
+
 
 def test_no_args_in_project(linguist_worktree, monkeypatch, args):
     foo_proj = linguist_worktree.create_gettext_project("foo")

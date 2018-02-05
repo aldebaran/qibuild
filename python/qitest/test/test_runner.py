@@ -1,22 +1,24 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qitest.project
 import qitest.runner
 
 import pytest
 
+
 class DummyTestRunner(qitest.runner.TestSuiteRunner):
     def launcher(self, *args):
         pass
 
+
 def test_match_patterns(tmpdir):
-    test_foo = { "name" : "test_foo"}
-    test_bar = { "name" : "test_bar"}
-    test_foo_bar = { "name" : "test_foo_bar" }
-    test_spam = { "name" : "test_spam" }
-    nightly = { "name" : "nightly", "nightly" : True}
-    perf = { "name" : "perf", "perf" : True}
+    test_foo = {"name": "test_foo"}
+    test_bar = {"name": "test_bar"}
+    test_foo_bar = {"name": "test_foo_bar"}
+    test_spam = {"name": "test_spam"}
+    nightly = {"name": "nightly", "nightly": True}
+    perf = {"name": "perf", "perf": True}
     tests = [test_foo, test_bar, test_foo_bar, test_spam, nightly, perf]
     qitest_json = tmpdir.ensure("qitest.json", file=True)
     qitest.conf.write_tests(tests, qitest_json.strpath)
@@ -38,16 +40,18 @@ def test_match_patterns(tmpdir):
 
     test_runner.nightly = True
     test_runner.perf = False
-    assert test_runner.tests == [test_foo, test_bar, test_foo_bar, test_spam, nightly]
+    assert test_runner.tests == [
+        test_foo, test_bar, test_foo_bar, test_spam, nightly]
 
     test_runner.perf = True
     test_runner.nightly = False
     assert test_runner.tests == [perf]
 
+
 def test_exclude(tmpdir):
-    test_foo = { "name" : "test_foo"}
-    test_bar = { "name" : "test_bar"}
-    test_foo_bar = { "name" : "test_foo_bar" }
+    test_foo = {"name": "test_foo"}
+    test_bar = {"name": "test_bar"}
+    test_foo_bar = {"name": "test_foo_bar"}
 
     tests = [test_foo, test_bar, test_foo_bar]
     qitest_json = tmpdir.ensure("qitest.json", file=True)

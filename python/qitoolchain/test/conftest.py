@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 from qisys.test.conftest import *
 
@@ -13,8 +13,10 @@ import qitoolchain.qipackage
 import qitoolchain.database
 import qitoolchain.toolchain
 
+
 class Toolchains():
     """ A class to help qitoolchain testing """
+
     def __init__(self):
         tmpdir = tempfile.mkdtemp(prefix="test-qitoolchain")
         # pylint: disable-msg=E1101
@@ -46,6 +48,7 @@ class Toolchains():
 
         toolchain.add_package(package)
         return package
+
 
 class TestFeed():
     def __init__(self, tmp):
@@ -101,10 +104,13 @@ class TestFeed():
         qisys.qixml.write(tree, self.feed_xml.strpath)
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def feed(tmpdir):
     res = TestFeed(tmpdir)
     return res
+
 
 @pytest.fixture
 def toolchain_db(tmpdir):
@@ -114,6 +120,8 @@ def toolchain_db(tmpdir):
     return db
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def toolchains(request):
     res = Toolchains()
@@ -121,19 +129,24 @@ def toolchains(request):
     return res
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def qitoolchain_action(cd_to_tmpdir):
     res = QiToolchainAction()
     return res
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def fake_ctc():
     toolchain = qitoolchain.toolchain.Toolchain("fake-ctc")
-    this_dir= os.path.dirname(__file__)
-    toolchain.update(feed_url = os.path.join(this_dir, "fakectc", "toolchain.xml"))
+    this_dir = os.path.dirname(__file__)
+    toolchain.update(feed_url=os.path.join(this_dir, "fakectc", "toolchain.xml"))
     qibuild.config.add_build_config("fake-ctc", toolchain="fake-ctc")
     return toolchain
+
 
 class QiToolchainAction(TestAction):
     def __init__(self):

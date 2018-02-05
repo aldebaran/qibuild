@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Finding a Python qimodule from C++
 
@@ -13,6 +13,7 @@ import qisys.sh
 
 from qipy.test.conftest import qipy_action
 from qitest.test.conftest import qitest_action
+
 
 def test_finding_qi_python_modules(qipy_action, qibuild_action, qitest_action):
     qipy_action.add_test_project("foomodules")

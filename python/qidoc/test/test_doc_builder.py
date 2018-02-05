@@ -1,16 +1,18 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import mock
 
 from qidoc.test.conftest import TestDocWorkTree
 from qidoc.builder import DocBuilder
+
 
 def test_doc_builder_solve_deps_by_default(doc_worktree):
     qibuild_doc = doc_worktree.create_sphinx_project("qibuild")
     general_doc = doc_worktree.create_sphinx_project("general", depends=["qibuild"])
     doc_builder = DocBuilder(doc_worktree, "general")
     assert doc_builder.get_dep_projects() == [qibuild_doc, general_doc]
+
 
 def test_using_dash_s(doc_worktree):
     qibuild_doc = doc_worktree.create_sphinx_project("qibuild")
@@ -41,6 +43,7 @@ def test_install_doxy(doc_worktree, tmpdir):
     doc_builder.install(inst_dir.strpath)
     assert "qi" in inst_dir.join("index.html").read()
 
+
 def test_setting_base_project_resets_dests(doc_worktree):
     doc_worktree.add_test_project("world")
     doc_worktree.add_test_project("hello")
@@ -53,6 +56,7 @@ def test_setting_base_project_resets_dests(doc_worktree):
     doc_builder = DocBuilder(doc_worktree, "world")
     world_proj = doc_worktree.get_doc_project("world")
     assert world_proj.dest == "."
+
 
 def test_setting_language(doc_worktree):
     translateme_proj = doc_worktree.add_test_project("translateme")

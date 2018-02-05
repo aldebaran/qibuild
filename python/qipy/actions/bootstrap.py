@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Make all python projects available in the current build configuration
 
 """
@@ -15,6 +15,7 @@ import qibuild.parsers
 import qipy.parsers
 import qipy.worktree
 
+
 def configure_parser(parser):
     qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("requirements", nargs="*")
@@ -26,6 +27,7 @@ def configure_parser(parser):
                         help="The Python interpreter to use")
     parser.set_defaults(requirements=["pip", "virtualenv", "ipython"],
                         site_packages=True)
+
 
 def do(args):
     python_builder = qipy.parsers.get_python_builder(args)

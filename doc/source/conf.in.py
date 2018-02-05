@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2017 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 project = u'qiBuild'
 version = '3.11.17'
@@ -12,13 +12,13 @@ extensions.append("cmakedomain")
 extensions.append("sphinx.ext.autodoc")
 extensions.append("sphinxcontrib.spelling")
 
-templates_path = [ "../source/_templates" ]
+templates_path = ["../source/_templates"]
 
 html_additional_pages = {
-        'index': 'index.html'
+    'index': 'index.html'
 }
 
-autodoc_member_order='bysource'
+autodoc_member_order = 'bysource'
 
 exclude_patterns = ['man/*']
 

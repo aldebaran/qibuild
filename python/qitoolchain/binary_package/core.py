@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """This module provides the abstract BinaryPackage class, which should be
 inherited when implementing additional binary package supports.
@@ -15,10 +15,12 @@ All qiBuild packages should have the same layout.
 
 import pprint
 
+
 class BinaryPackageException(Exception):
     """Just a custom exception
 
     """
+
     def __init__(self, message):
         self._message = message
 
@@ -27,6 +29,7 @@ class BinaryPackageException(Exception):
         message += self._message
         return message
 
+
 class BinaryPackage:
     """ A binary package is the endpoint of a binary package file provided by
     most of the Linux distribution.
@@ -34,8 +37,9 @@ class BinaryPackage:
     It stores metadata read from the binary package itself.
 
     """
+
     def __init__(self, package_path):
-        self.path     = package_path
+        self.path = package_path
         self.metadata = None
         self.name = None
 
@@ -88,7 +92,6 @@ class BinaryPackage:
 
         """
         raise NotImplementedError()
-
 
     def extract(self, dest_dir):
         """ Extract the binary package content, without the metadata.

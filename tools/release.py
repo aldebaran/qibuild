@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """" To be run for each qibuild release """
 
 import argparse
@@ -14,12 +14,14 @@ FILES_TO_PATCH = [
     "python/qisys/main.py",
 ]
 
+
 def fix_version_for_file(filename, old_version, new_version):
     with open(filename, "r") as fp:
         old_contents = fp.read()
     new_contents = old_contents.replace(old_version, new_version)
     with open(filename, "w") as fp:
         fp.write(new_contents)
+
 
 def main():
     parser = argparse.ArgumentParser()

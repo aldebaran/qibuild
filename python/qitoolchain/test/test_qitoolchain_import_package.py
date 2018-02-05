@@ -2,6 +2,7 @@ import os
 
 import qisys.sh
 
+
 def test_simple(qitoolchain_action, tmpdir, toolchains):
     toolchains.create("test")
     this_dir = os.path.dirname(__file__)

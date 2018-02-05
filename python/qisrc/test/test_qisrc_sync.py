@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import py
@@ -26,6 +26,7 @@ def test_sync_clones_new_repos(qisrc_action, git_server):
     qisys.script.run_action("qisrc.actions.sync")
     assert cwd.join("foo").join("README").check(file=True)
 
+
 def test_sync_skips_unconfigured_projects(qisrc_action, git_server, test_git):
     git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
@@ -39,6 +40,7 @@ def test_sync_skips_unconfigured_projects(qisrc_action, git_server, test_git):
     rc = qisrc_action("sync", retcode=True)
     assert rc != 0
 
+
 def test_clone_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
@@ -46,6 +48,7 @@ def test_clone_new_repos(qisrc_action, git_server):
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("bar")
+
 
 def test_configure_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")
@@ -57,12 +60,14 @@ def test_configure_new_repos(qisrc_action, git_server):
     bar = git_worktree.get_git_project("bar")
     assert bar.default_remote
 
+
 def test_creates_required_subdirs(qisrc_action, git_server):
     git_server.create_repo("foo/bar.git")
     qisrc_action("init", git_server.manifest_url)
     qisrc_action("sync")
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("foo/bar")
+
 
 def test_uses_build_deps_by_default(qisrc_action, git_server):
     git_server.add_qibuild_test_project("world")
@@ -90,6 +95,7 @@ def test_uses_build_deps_by_default(qisrc_action, git_server):
     world_txt = os.path.join(world_proj.path, "world.txt")
     assert os.path.exists(world_txt)
 
+
 def test_sync_build_profiles(qisrc_action, git_server):
     git_server.add_build_profile("foo", [("WITH_FOO", "ON")])
     qisrc_action("init", git_server.manifest_url)
@@ -107,6 +113,7 @@ def test_sync_build_profiles(qisrc_action, git_server):
     cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
     assert cmake_args == ["-DCMAKE_BUILD_TYPE=Debug",
                           "-DWITH_FOO=ON", "-DWITH_BAR=ON"]
+
 
 def test_sync_branch_devel(qisrc_action, git_server, test_git):
     # This tests the case where everything goes smoothly
@@ -138,6 +145,7 @@ def test_sync_branch_devel(qisrc_action, git_server, test_git):
     developing_txt = os.path.join(foo.path, "developing.txt")
     assert os.path.exists(developing_txt)
 
+
 def test_sync_branch_devel_unclean(qisrc_action, git_server, test_git):
     # Case where the worktree isn't clean
 
@@ -162,6 +170,7 @@ def test_sync_branch_devel_unclean(qisrc_action, git_server, test_git):
     # Master has been fast-forwarded and I haven't lost my WIP
     assert os.path.exists(wip_txt)
 
+
 def test_sync_branch_devel_no_ff(qisrc_action, git_server, test_git):
     # Case where master can't be fast-forwarded, does nothing except warning
 
@@ -184,6 +193,7 @@ def test_sync_branch_devel_no_ff(qisrc_action, git_server, test_git):
     # Master HEAD is untouched
     assert test_git.get_ref_sha1("refs/heads/master") == master_sha1
 
+
 def test_sync_dash_g(qisrc_action, git_server):
     git_server.create_group("mygroup", ["a", "b"])
     git_server.create_repo("other")
@@ -196,6 +206,7 @@ def test_sync_dash_g(qisrc_action, git_server):
     other_proj = git_worktree.get_git_project("other")
     other_git = TestGit(other_proj.path)
     assert other_git.read_file("other.txt") == "change 1"
+
 
 def test_incorrect_branch_still_fetches(qisrc_action, git_server):
     git_server.create_repo("foo.git")
@@ -211,6 +222,7 @@ def test_incorrect_branch_still_fetches(qisrc_action, git_server):
     new_sha1 = test_git.get_ref_sha1("refs/remotes/origin/master")
     assert previous_sha1 != new_sha1
 
+
 def test_keeps_staged_changes(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
@@ -225,6 +237,7 @@ def test_keeps_staged_changes(qisrc_action, git_server):
     foo.sync()
     assert os.path.exists(staged_file)
 
+
 def test_new_project_under_gitorious(git_worktree, git_server):
     git_server.create_repo("foo", review=False)
     manifest_url = git_server.manifest_url
@@ -236,6 +249,7 @@ def test_new_project_under_gitorious(git_worktree, git_server):
     foo = git_worktree.get_git_project("foo")
     assert len(foo.remotes) == 1
     assert foo.default_remote.name == "gitorious"
+
 
 def test_removing_forked_project(qisrc_action, git_server):
     git_server.create_repo("booz")
@@ -250,6 +264,7 @@ def test_removing_forked_project(qisrc_action, git_server):
     qisrc_action("sync", "-a", retcode=True)
     qisrc_action("checkout", "devel")
     assert git.get_current_branch() == "master"
+
 
 def test_sync_reset(qisrc_action, git_server):
     git_server.create_repo("bar")
@@ -270,6 +285,7 @@ def test_sync_reset(qisrc_action, git_server):
     with pytest.raises(Exception):
         baz_git.read_file("unrelated.txt")
 
+
 def test_retcode_when_skipping(qisrc_action, git_server):
     git_server.create_repo("bar")
     qisrc_action("init", git_server.manifest_url)
@@ -280,6 +296,7 @@ def test_retcode_when_skipping(qisrc_action, git_server):
     rc = qisrc_action("sync", retcode=True)
     assert rc != 0
 
+
 def test_do_not_sync_when_clone_fails(qisrc_action, git_server, record_messages):
     git_server.create_repo("bar.git")
     qisrc_action("init", git_server.manifest_url)
@@ -288,6 +305,7 @@ def test_do_not_sync_when_clone_fails(qisrc_action, git_server, record_messages)
     rc = qisrc_action("sync", retcode=True)
     assert rc != 0
     assert not record_messages.find("Success")
+
 
 def test_changing_branch_of_repo_under_code_review(qisrc_action, git_server,
                                                    record_messages):
@@ -303,6 +321,7 @@ def test_changing_branch_of_repo_under_code_review(qisrc_action, git_server,
     assert record_messages.find("default branch changed")
     assert not record_messages.find("now using code review")
 
+
 def test_using_code_review(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
@@ -311,9 +330,11 @@ def test_using_code_review(qisrc_action, git_server, record_messages):
     qisrc_action("sync")
     assert record_messages.find("now using code review")
 
+
 def test_no_manifest(qisrc_action):
     error = qisrc_action("sync", raises=True)
     assert "No manifest" in error
+
 
 def test_dash_reset(qisrc_action, git_server):
     git_server.create_repo("foo.git")
@@ -321,6 +342,7 @@ def test_dash_reset(qisrc_action, git_server):
     git_server.change_branch("foo.git", "devel")
     qisrc_action("init", git_server.manifest_url)
     qisrc_action("sync", "--reset")
+
 
 def test_removing_group_user_removes_group_by_hand(qisrc_action, git_server,
                                                    record_messages):
@@ -336,6 +358,7 @@ def test_removing_group_user_removes_group_by_hand(qisrc_action, git_server,
     qisrc_action("rm-group", "foo")
     qisrc_action("sync")
     assert not record_messages.find("WARN")
+
 
 def test_removing_group_keep_warning_user(qisrc_action, git_server,
                                           record_messages):

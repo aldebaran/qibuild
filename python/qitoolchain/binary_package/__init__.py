@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """This module contains function to import binary packages in qiBuild
 toolchains.
@@ -24,7 +24,7 @@ from qitoolchain.binary_package.core import BinaryPackageException
 
 WITH_PORTAGE = True
 try:
-    #pylint: disable-msg=F0401
+    # pylint: disable-msg=F0401
     import portage
 except ImportError:
     WITH_PORTAGE = False
@@ -58,7 +58,7 @@ _PKG_TYPES = {
 def _guess_package_type(package_path):
     for typename, data in _PKG_TYPES.iteritems():
         if package_path.endswith(data.get('extension')):
-            return  typename
+            return typename
     return None
 
 
@@ -93,11 +93,11 @@ def _fix_package_tree(root_dir):
         return
 
     for (root, dirs, files) in os.walk(usr_dir):
-       for directory in dirs:
+        for directory in dirs:
             dst = os.path.join(root, directory)
             dst = dst.replace(usr_dir, root_dir)
             qisys.sh.mkdir(dst)
-       for filename in files:
+        for filename in files:
             src = os.path.join(root, filename)
             dst = src.replace(usr_dir, root_dir)
             qisys.sh.mv(src, dst)

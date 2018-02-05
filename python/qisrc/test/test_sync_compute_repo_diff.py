@@ -1,9 +1,10 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qisrc.manifest
 import qisrc.git_config
 import qisrc.sync
+
 
 def make_repos(*args):
     res = list()
@@ -16,7 +17,7 @@ def make_repos(*args):
         repo = qisrc.manifest.RepoConfig()
         for remote_name in remote_names:
             remote = qisrc.git_config.Remote()
-            if  remote_name == "gerrit":
+            if remote_name == "gerrit":
                 remote.review = True
             remote.name = remote_name
             remote.url = "git://%s/%s" % (remote_name, project_name)
@@ -26,6 +27,7 @@ def make_repos(*args):
         repo.default_branch = default_branch
         res.append(repo)
     return res
+
 
 def test_no_diff():
     old = make_repos(
@@ -42,6 +44,7 @@ def test_no_diff():
     assert to_rm == list()
     assert to_update == list()
 
+
 def test_adding_a_remote():
     old = make_repos(
         ("foo.git", "foo", ["origin"]),
@@ -54,6 +57,7 @@ def test_adding_a_remote():
     assert to_move == list()
     assert to_rm == list()
     assert len(to_update) == 1
+
 
 def test_change_branch():
     old = make_repos(
@@ -74,6 +78,7 @@ def test_change_branch():
     assert foo_old.default_branch == "master"
     assert foo_new.default_branch == "devel"
 
+
 def test_moving():
     old = make_repos(
         ("foo.git", "foo", ["origin"]),
@@ -90,6 +95,7 @@ def test_moving():
     assert to_move[0][1] == "lib/foo"
     assert to_rm == list()
     assert to_update == list()
+
 
 def test_rm_add():
     old = make_repos(
@@ -108,6 +114,7 @@ def test_rm_add():
     assert to_rm[0].project == "bar.git"
     assert to_update == list()
 
+
 def test_changing_remote_url():
     old = make_repos(
         ("git/foo.git", "foo", ["origin"]),
@@ -123,6 +130,7 @@ def test_changing_remote_url():
     assert to_move == list()
     assert len(to_update) == 1
     assert to_update[0] == (old[0], new[0])
+
 
 def test_evil_nested():
     old = make_repos()

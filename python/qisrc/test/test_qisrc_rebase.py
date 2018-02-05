@@ -1,10 +1,11 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import pytest
 
 from qisrc.test.conftest import TestGitWorkTree
 from qisrc.test.conftest import TestGit
+
 
 def test_happy_rebase(git_server, qisrc_action):
     git_server.create_repo("foo")
@@ -21,6 +22,7 @@ def test_happy_rebase(git_server, qisrc_action):
     qisrc_action("rebase", "--branch", "master", "--all")
     rc, out = git.log("--pretty=oneline", raises=False)
     assert len(out.splitlines()) == 3
+
 
 def test_rebase_conflict(git_server, qisrc_action):
     git_server.create_repo("foo")
@@ -42,6 +44,7 @@ def test_rebase_conflict(git_server, qisrc_action):
     _, after = git.call("show", raises=False)
     assert after == before
 
+
 def test_raises_when_not_on_correct_branch(git_server, qisrc_action, record_messages):
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
@@ -54,6 +57,7 @@ def test_raises_when_not_on_correct_branch(git_server, qisrc_action, record_mess
     error = qisrc_action("rebase", "--branch", "master", "--all", raises=True)
     assert " * foo" in error
     assert record_messages.find("skipped")
+
 
 def test_when_moved(git_server, qisrc_action, record_messages):
     git_server.create_repo("foo")
@@ -71,6 +75,7 @@ def test_when_moved(git_server, qisrc_action, record_messages):
     rc, out = git.log("--pretty=oneline", raises=False)
     assert len(out.splitlines()) == 3
 
+
 def test_when_not_up_to_date(git_server, qisrc_action):
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
@@ -79,6 +84,7 @@ def test_when_not_up_to_date(git_server, qisrc_action):
     git_server.push_file("foo", "master.txt", "devel")
     retcode = qisrc_action("rebase", "--branch", "master", "--all", retcode=True)
     assert retcode == 0
+
 
 def test_when_ahead(git_server, qisrc_action):
     git_server.create_repo("foo")
@@ -91,6 +97,7 @@ def test_when_ahead(git_server, qisrc_action):
     git.commit_file("devel.txt", "devel")
     git.push()
     qisrc_action("rebase", "--all")
+
 
 def test_push_after_rebase(git_server, git_worktree, qisrc_action, interact):
     git_server.create_repo("foo")

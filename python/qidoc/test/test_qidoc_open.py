@@ -1,9 +1,10 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import mock
 import os
+
 
 def test_simple(qidoc_action):
     world_proj = qidoc_action.add_test_project("world")
@@ -13,6 +14,7 @@ def test_simple(qidoc_action):
         qidoc_action("open", "world")
         index_html = mock_open.call_args[0][0]
         assert os.path.exists(index_html)
+
 
 def test_open_translated(qidoc_action):
     translateme_proj = qidoc_action.add_test_project("translateme")

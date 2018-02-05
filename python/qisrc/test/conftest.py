@@ -1,12 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 from qisys.test.conftest import *
 
 import qisrc.git
 import qisrc.worktree
 import qisrc.manifest
 import qisys.script
+
 
 class TestGitWorkTree(qisrc.worktree.GitWorkTree):
     """ A subclass of qisrc.worktree.WorkTree that
@@ -36,6 +37,7 @@ class TestGitWorkTree(qisrc.worktree.GitWorkTree):
         new_project = super(TestGitWorkTree, self).add_git_project(src)
         return new_project
 
+
 class TestGitServer(object):
     """ Represent a set of git urls
 
@@ -63,6 +65,7 @@ class TestGitServer(object):
     Two remotes are created by default: "origin" and "gerrit"
 
     """
+
     def __init__(self, root):
         self.root = root
         self.srv = root.mkdir("srv")
@@ -130,7 +133,7 @@ class TestGitServer(object):
 
     def add_qibuild_test_project(self, src):
         project_name = src + ".git"
-        repo_src = self._create_repo(project_name , src=src, review=False)
+        repo_src = self._create_repo(project_name, src=src, review=False)
         this_dir = os.path.dirname(__file__)
         src_path = os.path.join(this_dir, "..", "..", "qibuild", "test", "projects", src)
         qisys.sh.copy_git_src(src_path, repo_src)
@@ -319,6 +322,7 @@ class TestGit(qisrc.git.Git):
         self.add(path)
         self.commit("--message", message)
 
+
 class FakeGit(qisrc.git.Git):
     """ To be used as a mock object for testing
 
@@ -407,11 +411,15 @@ def git_worktree(cd_to_tmpdir):
     return TestGitWorkTree()
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def test_git(request):
     return TestGit
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def git_server(tmpdir):
     # pylint: disable-msg=E1101
@@ -419,14 +427,19 @@ def git_server(tmpdir):
     return git_srv
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def mock_git(request):
     return FakeGit("repo")
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def qisrc_action(cd_to_tmpdir):
     return QiSrcAction()
+
 
 class QiSrcAction(TestAction):
     def __init__(self):
@@ -475,6 +488,7 @@ class SvnServer(object):
         if message is None:
             message = "Create %s" % filename
         svn.call("commit", filename, "--message", message)
+
 
 @pytest.fixture
 def svn_server(tmpdir):

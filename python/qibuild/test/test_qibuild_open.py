@@ -1,15 +1,17 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qibuild.config
 
 import mock
+
 
 def test_no_ide_yet(qibuild_action, record_messages):
     qibuild_action.add_test_project("world")
     qibuild_action("configure", "world")
     qibuild_action("open", "world")
     assert record_messages.find("No IDE configured yet")
+
 
 def test_run_configure(qibuild_action, interact):
     qibuild_cfg = qibuild.config.QiBuildConfig()

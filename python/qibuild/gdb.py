@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Tools for the GNU debugger
 
@@ -21,8 +21,9 @@ def contains_debug_info(filename, objdump=None):
     if not objdump:
         objdump = "objdump"
     retcode = subprocess.call([objdump, "-j", ".debug_info", "-h", filename],
-                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     return (retcode == 0)
+
 
 def split_debug(src, objcopy=None, objdump=None):
     """ Split the debug information in the `src` binary.

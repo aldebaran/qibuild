@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2017 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import sys
@@ -8,6 +8,7 @@ from setuptools import setup, find_packages
 
 if (sys.version_info.major, sys.version_info.minor) != (2, 7):
     sys.exit("Error: qibuild only works with Python2.7")
+
 
 def get_qibuild_cmake_files():
     res = list()
@@ -33,20 +34,20 @@ setup(name="qibuild",
       py_modules=['qicd'],
       packages=find_packages("python"),
       package_dir={"": "python"},
-      include_package_data = True,
+      include_package_data=True,
       install_requires=["virtualenv"],
       data_files=data_files,
       license="BSD",
-      entry_points = {
-        "console_scripts" : [
-            "qidoc        = qisys.main:main",
-            "qilinguist   = qisys.main:main",
-            "qisrc        = qisys.main:main",
-            "qibuild      = qisys.main:main",
-            "qipkg        = qisys.main:main",
-            "qipy         = qisys.main:main",
-            "qitest       = qisys.main:main",
-            "qitoolchain  = qisys.main:main",
-        ]
-    }
-)
+      entry_points={
+          "console_scripts": [
+              "qidoc        = qisys.main:main",
+              "qilinguist   = qisys.main:main",
+              "qisrc        = qisys.main:main",
+              "qibuild      = qisys.main:main",
+              "qipkg        = qisys.main:main",
+              "qipy         = qisys.main:main",
+              "qitest       = qisys.main:main",
+              "qitoolchain  = qisys.main:main",
+          ]
+      }
+      )

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Launch automatic tests -- deprecated, use `qitest run` instead
 """
@@ -15,6 +15,7 @@ import qisys.parsers
 import qibuild.parsers
 import qitest.parsers
 import qitest.actions.run
+
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -34,4 +35,4 @@ def do(args):
         projects = args.projects
         ui.warning("`qibuild test` is deprecated, use `qitest run` instead")
         qisys.script.run_action("qitest.actions.run", args=projects,
-                                 forward_args=args)
+                                forward_args=args)

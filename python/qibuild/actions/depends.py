@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Display dependencies of projects
 
@@ -10,32 +10,35 @@ import qisys.ui
 import qibuild.deps
 import qibuild.parsers
 
+
 def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.cmake_build_parser(parser)
     qibuild.parsers.project_parser(parser)
     group = parser.add_argument_group("depends arguments",
-        description="Shows project and package dependencies."
-            "\nUse --runtime, --direct, and --reverse to control "
-            "the dependencies to examine. Default usage shows "
-            "compressed, recursive, build time dependencies. "
-            "\nUse --tree or --graph to control the output format."
-            "\nFor best results with --graph, use:\nqibuild depends "
-            "--graph | dot -Tpng -oout.png -Goverlap=scale -Gsplines=true")
+                                      description="Shows project and package dependencies."
+                                      "\nUse --runtime, --direct, and --reverse to control "
+                                      "the dependencies to examine. Default usage shows "
+                                      "compressed, recursive, build time dependencies. "
+                                      "\nUse --tree or --graph to control the output format."
+                                      "\nFor best results with --graph, use:\nqibuild depends "
+                                      "--graph | dot -Tpng -oout.png -Goverlap=scale -Gsplines=true")
     group.add_argument("--runtime", action="store_true", default=False,
                        help="use runtime dependencies only")
     group.add_argument("--reverse", action="store_true", default=False,
                        help="show projects that depend on the current project")
     group.add_argument("--tree", action="store_true", default=False,
-                        help="output in text tree format showing paths")
+                       help="output in text tree format showing paths")
     group.add_argument("--graph", action="store_true",
-                        help="output in format suitable for the \"dot\" "
-                        "graphing tool")
+                       help="output in format suitable for the \"dot\" "
+                       "graphing tool")
     group.add_argument("--direct", action="store_true", default=False,
                        help="only display direct dependencies")
 
+
 class DependencyRelationship(object):
     """ helper class to separate dependency search from display """
+
     def __init__(self, from_name, to_name):
         self.from_name = from_name
         self.to_name = to_name
@@ -51,13 +54,14 @@ class DependencyRelationship(object):
     def same_as(self, other):
         """ return true if from_name and to_name are the same """
         return (other.from_name == self.from_name and
-            other.to_name == self.to_name)
+                other.to_name == self.to_name)
+
 
 def get_deps(build_worktree, project, single, runtime, reverse):
     """ create a list of DependencyRelationship objects ready for display """
     deps_solver = qibuild.deps.DepsSolver(build_worktree)
     if reverse:
-        (packages, projects) =  (set(), build_worktree.build_projects)
+        (packages, projects) = (set(), build_worktree.build_projects)
     else:
         if runtime:
             dep_types = ["build"]
@@ -78,6 +82,7 @@ def get_deps(build_worktree, project, single, runtime, reverse):
 
     return collected_dependencies
 
+
 def print_deps_tree(dependency_relationships):
     """ --tree style output formatter """
     if not dependency_relationships:
@@ -93,6 +98,7 @@ def print_deps_tree(dependency_relationships):
             color = qisys.ui.red
         item = "  " + "    "*dep.depth + dep.to_name
         qisys.ui.info(color, item.ljust(max_name+2), qisys.ui.reset, dep.path)
+
 
 def separate_into_groups(dependency_relationships):
     """ split into sorted logical groups """
@@ -142,18 +148,19 @@ def print_deps_compressed(dependency_relationships):
         for package in packages_bad:
             qisys.ui.info(qisys.ui.red, "    " + package)
 
+
 def print_deps_graph(root_name, label, dependency_relationships):
     """ --graph output, suitable for dot """
     # header
     qisys.ui.info(qisys.ui.reset, "digraph", qisys.ui.green,
                   "\"" + root_name + "\"", qisys.ui.reset, "{")
     qisys.ui.info(qisys.ui.reset, "  label=",
-        qisys.ui.green, "\"" + label + "\"")
+                  qisys.ui.green, "\"" + label + "\"")
 
     cleaned = list()
     # TODO cleaner duplicate removal (depth could be different)
     for dep in dependency_relationships:
-        if not next( (y for y in cleaned if y.same_as(dep)), None):
+        if not next((y for y in cleaned if y.same_as(dep)), None):
             cleaned.append(dep)
     dependency_relationships = cleaned
 
@@ -176,11 +183,12 @@ def print_deps_graph(root_name, label, dependency_relationships):
             dest_color = qisys.ui.red
             line_type = "[style=dotted]"
         qisys.ui.info(src_color, "  " + "  "*dep.depth,
-                "\"" + dep.from_name + "\"",
-                qisys.ui.reset, "->",
-                dest_color, "\"" + dep.to_name + "\"",
-                qisys.ui.reset, line_type)
+                      "\"" + dep.from_name + "\"",
+                      qisys.ui.reset, "->",
+                      dest_color, "\"" + dep.to_name + "\"",
+                      qisys.ui.reset, line_type)
     qisys.ui.info(qisys.ui.reset, "}")
+
 
 def collect_dependencies_reverse(project, projects, single, runtime, depth=0):
     """ recursively collects projects that depends on the current project """
@@ -205,6 +213,7 @@ def collect_dependencies_reverse(project, projects, single, runtime, depth=0):
 
     return collected_dependencies
 
+
 def package_names_first(dependency_names, package_names):
     """ put package names first """
     dep_packages = sorted(
@@ -213,6 +222,7 @@ def package_names_first(dependency_names, package_names):
         [x for x in dependency_names if x not in package_names])
     dep_packages.extend(dep_projects)
     return dep_packages
+
 
 def collect_dependencies(project, projects, packages, single, runtime, depth=0):
     """ recursively collect dependent projects and packages """

@@ -1,10 +1,11 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import abc
 import os
 
 import qisys.sh
+
 
 class DocProject(object):
 
@@ -113,8 +114,8 @@ class DocProject(object):
 
     def __eq__(self, other):
         return self.doc_type == other.doc_type and \
-                self.src == other.src and \
-                self.name == other.name
+            self.src == other.src and \
+            self.name == other.name
 
     def __ne__(self, other):
         return not self.__eq__(other)

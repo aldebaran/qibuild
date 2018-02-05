@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Get the list of all licenses used by the given projects """
 import json
@@ -10,6 +10,7 @@ import qisys.parsers
 import qibuild.parsers
 import collections
 
+
 def configure_parser(parser):
     """ Configure parser for this action """
     qisys.parsers.build_parser(parser)
@@ -18,6 +19,7 @@ def configure_parser(parser):
                         help="Output the result in JSON format")
     parser.add_argument("--oss", action="store_true",
                         help="Only dispaly non-proprietary licenses")
+
 
 def do(args):
     """ Main entry point """

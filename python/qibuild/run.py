@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Run a package found with qibuild find
 
@@ -15,6 +15,7 @@ import qibuild.find
 import qibuild.parsers
 import qisys.parsers
 import qisys.command
+
 
 def run(projects, binary, bin_args, env=None, exec_=True):
     """ Find binary in worktree and
@@ -40,7 +41,7 @@ def run(projects, binary, bin_args, env=None, exec_=True):
         raise Exception("Cannot find " + binary + " binary")
     cmd = [bin_path] + bin_args
     if exec_:
-      ui.debug("exec", cmd)
-      os.execve(bin_path,  cmd, env)
+        ui.debug("exec", cmd)
+        os.execve(bin_path,  cmd, env)
     else:
-      qisys.command.call(cmd, env=env)
+        qisys.command.call(cmd, env=env)

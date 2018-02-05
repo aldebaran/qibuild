@@ -1,12 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import qisys.parallel
 import functools
 import threading
 import time
 import pytest
+
 
 def test_parallel_empty():
     """Ensure that parallel does nothing with an empty iterator."""
@@ -17,6 +18,7 @@ def test_parallel_empty():
     # pylint:disable-msg=E1101
     qisys.parallel.foreach([], pytest.fail, 4)
 
+
 def test_parallel_result():
     """Ensure that parallel does not change the result."""
 
@@ -26,7 +28,7 @@ def test_parallel_result():
         lock.release()
 
     lock = threading.Lock()
-    nums = [1,2,3,4,5]
+    nums = [1, 2, 3, 4, 5]
 
     result = [0]
     qisys.parallel.foreach(nums, sum_worker)

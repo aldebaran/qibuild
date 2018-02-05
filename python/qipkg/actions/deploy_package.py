@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Deploy and install a package to a target
 
 """
@@ -15,11 +15,13 @@ import qisys.parsers
 import qipkg.parsers
 import qipkg.package
 
+
 def configure_parser(parser):
     qisys.parsers.default_parser(parser)
     qipkg.parsers.pkg_parser(parser)
     qisys.parsers.deploy_parser(parser)
     parser.add_argument("pkg_path_or_pml")
+
 
 def do(args):
     urls = qisys.parsers.get_deploy_urls(args)
@@ -37,6 +39,7 @@ def do(args):
     for url in urls:
         deploy(pkg_path, url)
 
+
 def deploy(pkg_path, url):
     ui.info(ui.green, "Deploying",
             ui.reset, ui.blue, pkg_path,
@@ -44,8 +47,8 @@ def deploy(pkg_path, url):
             ui.reset, ui.blue, url.as_string)
     pkg_name = qipkg.package.name_from_archive(pkg_path)
     scp_cmd = ["scp",
-                pkg_path,
-                "%s@%s:" % (url.user, url.host)]
+               pkg_path,
+               "%s@%s:" % (url.user, url.host)]
     qisys.command.call(scp_cmd)
 
     try:
@@ -56,8 +59,9 @@ def deploy(pkg_path, url):
         return
 
     rm_cmd = ["ssh", "%s@%s" % (url.user, url.host),
-                "rm", os.path.basename(pkg_path)]
+              "rm", os.path.basename(pkg_path)]
     qisys.command.call(rm_cmd)
+
 
 def _install_package(url, pkg_name, pkg_path):
     import qi
@@ -76,5 +80,5 @@ def _install_package(url, pkg_name, pkg_path):
             ui.reset, ui.bold,
             "Installing package")
     ret = package_manager.install(
-            "/home/%s/%s" % (url.user, os.path.basename(pkg_path)))
+        "/home/%s/%s" % (url.user, os.path.basename(pkg_path)))
     ui.info("PackageManager returned:", ret)

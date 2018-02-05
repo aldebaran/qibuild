@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import qisrc.manifest
 import qisrc.review
@@ -25,6 +25,7 @@ def test_simple_read(tmpdir):
     assert bar.src == "lib/bar"
     assert bar.clone_url == "git@example.com:foo/bar.git"
     assert bar.default_branch == "next"
+
 
 def test_src_are_unique(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -57,6 +58,7 @@ def test_projects_are_unique(tmpdir):
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "foo/bar.git found twice" in str(e.value)
 
+
 def test_empty_src(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -68,7 +70,6 @@ def test_empty_src(tmpdir):
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     bar = manifest.repos[0]
     assert bar.src == "foo/bar"
-
 
 
 def test_no_remotes_attr(tmpdir):
@@ -84,6 +85,7 @@ def test_no_remotes_attr(tmpdir):
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert e.value.message == "Missing 'remotes' attribute"
 
+
 def test_several_reviews(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -97,6 +99,7 @@ def test_several_reviews(tmpdir):
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Only one" in str(e.value)
 
+
 def test_no_matching_remote(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -109,6 +112,7 @@ def test_no_matching_remote(tmpdir):
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert e.value.message == "No matching remote: invalid for repo foo/bar.git"
+
 
 def test_repo_branch(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -125,6 +129,7 @@ def test_repo_branch(tmpdir):
     assert bar.default_branch == "master"
     assert foo.default_branch == "devel"
 
+
 def test_remote_branch(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -136,6 +141,7 @@ def test_remote_branch(tmpdir):
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     bar = manifest.repos[0]
     assert bar.default_branch == "release"
+
 
 def test_invalid_group(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -161,7 +167,6 @@ def test_invalid_group(tmpdir):
     with pytest.raises(qisrc.manifest.ManifestError) as e:
         manifest.get_repos(groups=["mygroup"])
     assert "No such group: mygroup" in str(e.value)
-
 
 
 def test_review_projects(tmpdir):
@@ -204,6 +209,7 @@ def test_review_projects_with_two_remotes(tmpdir):
     assert bar.review == True
     assert bar.default_remote.name == "origin"
 
+
 def test_no_review(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -225,6 +231,7 @@ def test_no_review(tmpdir):
     assert remote.name == "origin"
     assert remote.review is False
 
+
 def test_default_remote(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -241,6 +248,7 @@ def test_default_remote(tmpdir):
     assert manifest.get_repo("foo.git").default_remote.name == "gerrit"
     assert manifest.get_repo("bar.git").default_remote.name == "origin"
     assert manifest.get_repo("baz.git").default_remote.name == "origin"
+
 
 def test_groups(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -287,6 +295,7 @@ def test_default_group(tmpdir):
     git_projects = manifest.get_repos()
     assert len(git_projects) == 2
 
+
 def test_default_branch(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -321,6 +330,7 @@ def test_multiple_remotes(tmpdir):
     foo = manifest.repos[0]
     assert len(foo.remotes) == 2
 
+
 def test_from_git_repo(git_server):
     git_server.create_repo("foo")
     git_server.switch_manifest_branch("devel")
@@ -330,6 +340,7 @@ def test_from_git_repo(git_server):
     assert len(manifest.repos) == 1
     manifest = qisrc.manifest.from_git_repo(manifest_repo, "devel")
     assert len(manifest.repos) == 2
+
 
 def test_all_repos(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import json
@@ -9,6 +9,7 @@ import qisrc
 import qisys.ui as ui
 import qisys.command
 import qipy.venv
+
 
 class PythonTestCollector:
     def __init__(self, python_worktree):
@@ -26,13 +27,11 @@ class PythonTestCollector:
         if not self.pytest_path:
             raise Exception("pytest path is empty")
 
-
     def get_list_of_pytest(self, rep):
         pytest_list = list()
         for root, dirnames, filenames in os.walk(rep):
             pytest_list.extend(glob.glob(root + "/test_*.py"))
         return pytest_list
-
 
     def create_pytest_json(self, json_path, pytest_list, project):
         json_path = os.path.join(json_path, "pytest.json")
@@ -56,8 +55,7 @@ class PythonTestCollector:
             pytest_data['timeout'] = 1000
             json_data.append(pytest_data)
         with open(json_path, "w") as o:
-            o.write(json.dumps(json_data,indent=2))
-
+            o.write(json.dumps(json_data, indent=2))
 
     def get_test_and_write(self, project):
         test_list = self.get_list_of_pytest(project.path)
@@ -67,7 +65,6 @@ class PythonTestCollector:
             ui.info(ui.green, " * ", ui.blue, project.src, ":", len(test_list))
         else:
             ui.info(ui.green, " * ", ui.red, project.src, ": (no tests found)")
-
 
     def collect(self):
         projects = list()
@@ -81,4 +78,3 @@ class PythonTestCollector:
                 self.get_test_and_write(project)
             projects.append(src)
         ui.info(ui.yellow, "%i tests found" % (len(self.tests_path)), ui.reset)
-

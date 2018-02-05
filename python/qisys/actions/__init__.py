@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Common tools for actions
 
 """
@@ -9,6 +9,7 @@ import sys
 from qisys import ui
 import qisys.command
 import qisys
+
 
 def foreach(projects, cmd, ignore_errors=True):
     """ Execute the command on every project

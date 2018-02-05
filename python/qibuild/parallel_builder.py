@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import Queue
 import threading
@@ -39,11 +39,11 @@ class BuildJob(object):
 
     def execute(self, *args, **kwargs):
         ui.info_count(self.index, self.num_projects,
-                ui.green, "Building",
-                ui.blue, self.project.name,
-                ui.green, "in",
-                ui.blue, self.project.build_type,
-                update_title=True)
+                      ui.green, "Building",
+                      ui.blue, self.project.name,
+                      ui.green, "in",
+                      ui.blue, self.project.build_type,
+                      update_title=True)
 
         self.project.build(**kwargs)
 
@@ -99,7 +99,7 @@ class ParallelBuilder(object):
 
         all_ok = True
         while all_ok and \
-              (self.pending_jobs or not self.running_jobs.empty()):
+                (self.pending_jobs or not self.running_jobs.empty()):
 
             # parse pending_jobs to see if any needs to be moved to running
             for job in self.pending_jobs:
@@ -127,13 +127,11 @@ class ParallelBuilder(object):
         if not all_ok:
             raise qibuild.build.BuildFailed(self.failed_project)
 
-
     def _schedule_job(self, job):
         job.index = self.job_current_index
         self.job_current_index += 1
         job.num_projects = self.num_projects
         self.running_jobs.put(job)
-
 
     def _resolve_job_build_dependencies(self, job):
         for p in job.project.build_depends:
@@ -141,8 +139,8 @@ class ParallelBuilder(object):
             if dep_job:
                 job.add_dependency(dep_job)
             else:
-                ui.debug("Job {job}: Couldn't find the job for the project dependency {dep}". \
-                    format(job=job.project.name, dep=p))
+                ui.debug("Job {job}: Couldn't find the job for the project dependency {dep}".
+                         format(job=job.project.name, dep=p))
 
     def _find_job_by_name(self, name):
         for job in self.all_jobs:
@@ -152,12 +150,10 @@ class ParallelBuilder(object):
         return None
 
 
-
 class BuildResult(object):
     def __init__(self):
         self.ok = True
         self.failed_project = None
-
 
 
 class BuildWorker(threading.Thread):
@@ -178,14 +174,15 @@ class BuildWorker(threading.Thread):
         while not self._should_stop and self.result.ok:
             job = None
             try:
-                job = self.queue.get(True, 1);
+                job = self.queue.get(True, 1)
             except Queue.Empty:
                 # ignore empty exception, this can happen
                 pass
 
             if job:
                 try:
-                    ui.info(ui.green, "Worker #%i starts working on " % (self.index + 1), ui.reset, ui.bold, job.project.name)
+                    ui.info(ui.green, "Worker #%i starts working on " % (self.index + 1),
+                            ui.reset, ui.bold, job.project.name)
                     job.execute(*self.args, **self.kwargs)
                     self.queue.task_done()
                 except Exception, e:

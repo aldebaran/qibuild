@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import sys
 import gettext
@@ -28,9 +28,10 @@ if path is None:
 gettext.bindtextdomain(name, path)
 gettext.textdomain(name)
 
+
 def main():
     print gettext.gettext("hello, world")
 
+
 if __name__ == "__main__":
     main()
-

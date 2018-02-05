@@ -1,12 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import qisys.command
 import qibuild.find
 
 import mock
+
 
 def check_ssh_connection():
     # check we can log in to locahost, and that
@@ -24,6 +25,7 @@ def check_ssh_connection():
         return False
 
     return True
+
 
 def get_ssh_url(tmpdir):
     username = os.environ.get("LOGNAME")
@@ -67,6 +69,7 @@ def test_deploying_to_several_urls(qibuild_action, tmpdir):
     assert tmpdir.join("second").join("lib").check(dir=True)
     assert tmpdir.join("second").join("bin").check(dir=True)
 
+
 def test_deploying_tests(qibuild_action, tmpdir):
     if not check_ssh_connection():
         return
@@ -91,6 +94,7 @@ def test_deploy_builds_build_deps(qibuild_action, tmpdir):
     qibuild_action("make", "bar")
     qibuild_action("deploy", "bar", "--url", url)
     qibuild.find.find([foo_proj.sdk_directory], "foo", expect_one=True)
+
 
 def test_deploy_install_binary_packages(qibuild_action, qitoolchain_action,
                                         tmpdir):

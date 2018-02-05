@@ -1,6 +1,7 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
+
 
 def test_install(qipy_action, tmpdir):
     big_project = qipy_action.add_test_project("big_project")
@@ -11,6 +12,7 @@ def test_install(qipy_action, tmpdir):
     assert site_packages.join("foo", "bar", "baz.py").check(file=True)
     assert dest.join("bin", "script.py").check(file=True)
 
+
 def test_install_with_distutils(qipy_action, tmpdir):
     with_distutils = qipy_action.add_test_project("with_distutils")
     dest = tmpdir.join("dest")
@@ -18,6 +20,7 @@ def test_install_with_distutils(qipy_action, tmpdir):
     qipy_action("bootstrap", "pip", "virtualenv", "ipython<=5")
     qipy_action("install", "foo", dest.strpath)
     assert dest.join("bin", "foo").check(file=True)
+
 
 def test_empty_install(qipy_action, tmpdir):
     empty = qipy_action.add_test_project("empty")

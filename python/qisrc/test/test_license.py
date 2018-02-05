@@ -1,8 +1,9 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import qisrc.license
+
 
 def test_reads_license_from_qiproject(tmpdir):
     qiproject_xml = tmpdir.join("qiproject.xml")
@@ -15,6 +16,7 @@ def test_reads_license_from_qiproject(tmpdir):
     license_ = qisrc.license.read_license(qiproject_xml.strpath)
     assert license_ == "BSD"
 
+
 def test_warns_when_no_license(tmpdir, record_messages):
     qiproject_xml = tmpdir.join("qiproject.xml")
     qiproject_xml.write("""
@@ -26,6 +28,7 @@ def test_warns_when_no_license(tmpdir, record_messages):
     assert license_ is None
     assert record_messages.find("does not define")
 
+
 def test_reads_license_from_package(tmpdir):
     package_xml = tmpdir.join("package.xml")
     package_xml.write("""
@@ -35,6 +38,7 @@ def test_reads_license_from_package(tmpdir):
 """)
     license_ = qisrc.license.read_license(package_xml.strpath)
     assert license_ == "LGPL"
+
 
 def write_license(tmpdir):
     qiproject_xml = tmpdir.join("qiproject.xml")

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Find a target given its name
 
@@ -10,6 +10,7 @@ import os
 import platform
 
 import qisys.sh
+
 
 def find_lib(paths, name, debug=None, expect_one=True, shared=None):
     """ Find a library in a list of paths.
@@ -86,6 +87,7 @@ def find_bin(paths, name, debug=None, expect_one=True):
 
     return _filter_candidates(name, candidates, expect_one=expect_one)
 
+
 def find(paths, name, debug=True, expect_one=True):
     """ Search a binary or a library given its name
 
@@ -96,17 +98,18 @@ def find(paths, name, debug=True, expect_one=True):
     return _filter_candidates(name, candidates, expect_one=expect_one)
 
 
-
 def binary_name(name, debug=True, os_name=None):
     """ Return exact binary name for current OS.
     """
     return name + _binary_suffix(debug=debug, os_name=os_name)
+
 
 def library_name(name, shared=True, debug=True, os_name=None):
     """ Return exact library name for current OS.
     """
     return _library_prefix(os_name) + name + _library_suffix(shared=shared, debug=debug,
                                                              os_name=os_name)
+
 
 def _library_prefix(os_name=None):
     """ Return suitable library prefix used on current OS.
@@ -118,6 +121,7 @@ def _library_prefix(os_name=None):
         return ""
     else:
         return "lib"
+
 
 def _library_suffix(shared=True, debug=True, os_name=None):
     """ Return suitable library suffix used on current OS.
@@ -143,6 +147,7 @@ def _library_suffix(shared=True, debug=True, os_name=None):
         return ".dylib"
     return ""
 
+
 def _binary_suffix(debug=True, os_name=None):
     """ Return suitable binary suffix used on current OS.
     """
@@ -160,6 +165,7 @@ def _binary_suffix(debug=True, os_name=None):
         return debug_suffix + ".exe"
     return ""
 
+
 def _filter_candidates(name, candidates, expect_one=True):
     res = [x for x in candidates if os.path.exists(x)]
     res = [qisys.sh.to_native_path(x) for x in res]
@@ -175,8 +181,10 @@ def _filter_candidates(name, candidates, expect_one=True):
 class NotFound(Exception):
     def __init__(self, name):
         self.name = name
+
     def __str__(self):
         return "%s not found" % self.name
+
 
 class MulipleFound(Exception):
     def __init__(self, name, res):

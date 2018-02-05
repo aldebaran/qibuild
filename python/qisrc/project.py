@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import copy
@@ -8,6 +8,7 @@ import copy
 from qisys import ui
 import qisys.qixml
 import qisrc.git_config
+
 
 class GitProject(object):
     def __init__(self, git_worktree, worktree_project):
@@ -66,7 +67,6 @@ class GitProject(object):
         res = os.path.join(self.git_worktree.root, self.src)
         return qisys.sh.to_native_path(res)
 
-
     def configure_remote(self, remote):
         """ Configure a remote. If a remote with the same name
         exists, its url will be overwritten
@@ -102,7 +102,7 @@ class GitProject(object):
         if previous_default_branch and previous_default_branch.name != name:
             if not quiet:
                 ui.warning(self.src, ": default branch changed",
-                            previous_default_branch.name, "->", name)
+                           previous_default_branch.name, "->", name)
             previous_default_branch.default = False
         branch_found = False
         for branch in self.branches:
@@ -111,7 +111,7 @@ class GitProject(object):
                 if branch.tracks != tracks:
                     if not quiet:
                         ui.warning(self.src, ":", branch.name, "now tracks", tracks,
-                                "instead of", branch.tracks)
+                                   "instead of", branch.tracks)
                     branch.tracks = tracks
                 branch.default = default
         if not branch_found:
@@ -145,11 +145,11 @@ class GitProject(object):
             if previous_default is not None and previous_default != new_default:
                 if not quiet:
                     ui.warning("Default remote changed", previous_default, "->",
-                                                        new_default)
+                               new_default)
         if repo.review and not self.review:
-        # Project is now under code review, try to setup
-        # gerrit and save success in self.review
-        # (so that we can retry if gerrit setup did not work)
+            # Project is now under code review, try to setup
+            # gerrit and save success in self.review
+            # (so that we can retry if gerrit setup did not work)
             ok = qisrc.review.setup_project(self)
             if ok:
                 self.review = True
@@ -255,6 +255,7 @@ class GitProject(object):
         return "<GitProject in %s>" % self.src
 ##
 # Parsing
+
 
 class GitProjectParser(qisys.qixml.XMLParser):
     def __init__(self, target):

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Handling synchronization of a worktree with some manifests
 
@@ -24,6 +24,7 @@ class WorkTreeSyncer(object):
     worktree
 
     """
+
     def __init__(self, git_worktree):
         self.git_worktree = git_worktree
         # Read manifest configuration now, before any
@@ -216,7 +217,7 @@ class WorkTreeSyncer(object):
         """
         old_repos = list()
         old_repos_expected = self.read_remote_manifest(
-                warn_if_missing_group=warn_if_missing_group)
+            warn_if_missing_group=warn_if_missing_group)
         # The git projects may not match the previous repo config,
         # for instance the user removed a project by accident, or
         # a rename failed, or the project has not been cloned yet,
@@ -293,10 +294,10 @@ Please run `qisrc init MANIFEST_URL`
 
         for i, repo in enumerate(to_add):
             ui.info_count(i, len(to_add),
-                    ui.blue, repo.project,
-                    ui.green, "->",
-                    ui.blue, repo.src,
-                    ui.white, "(%s)" % repo.default_branch)
+                          ui.blue, repo.project,
+                          ui.green, "->",
+                          ui.blue, repo.src,
+                          ui.white, "(%s)" % repo.default_branch)
             project = self.git_worktree.get_git_project(repo.src)
             if project:  # Repo is already there, re-apply config
                 project.read_remote_config(repo)
@@ -342,12 +343,13 @@ class LocalManifest(object):
 
 
     """
+
     def __init__(self):
         self.url = None
         self.branch = "master"
         self._groups = None
-        self.ref = None # used for snaphots or in case you
-                        # don't want the head of a branch
+        self.ref = None  # used for snaphots or in case you
+        # don't want the head of a branch
         self.review = True
         self.all_repos = False
 
@@ -366,15 +368,14 @@ class LocalManifest(object):
         if not isinstance(other, LocalManifest):
             return False
         return self.url == other.url and \
-               self.groups == other.groups and \
-               self.ref == other.ref and \
-               self.branch == other.branch and \
-               self.all_repos == other.all_repos
+            self.groups == other.groups and \
+            self.ref == other.ref and \
+            self.branch == other.branch and \
+            self.all_repos == other.all_repos
 
 
 ###
 # Compute updates
-
 
 
 def compute_repo_diff(old_repos, new_repos):
@@ -393,14 +394,14 @@ def compute_repo_diff(old_repos, new_repos):
             common_url = find_common_url(old_repo, new_repo)
             if common_url:
                 if new_repo.src == old_repo.src:
-                    pass # nothing to do
+                    pass  # nothing to do
                 else:
                     to_move.append((old_repo, new_repo.src))
                 break
         else:
             # actually we are adding repos that
             # only changed remotes, because we did not
-            #commpute to_update yet
+            # commpute to_update yet
             to_add.append(new_repo)
 
     for old_repo in old_repos:
@@ -432,11 +433,13 @@ def compute_repo_diff(old_repos, new_repos):
 
     return (to_add, to_move, to_rm, to_update)
 
+
 def find_common_url(repo_a, repo_b):
     for url_a in repo_a.urls:
         for url_b in repo_b.urls:
             if url_a == url_b:
                 return url_b
+
 
 def compute_profile_updates(local_profiles, remote_profiles):
     """ Compare a local set of profiles with a remote set.

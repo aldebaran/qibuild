@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import sys
 import os
 
@@ -13,6 +13,7 @@ from qisys.test.conftest import skip_on_win
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
 
+
 def create_foo_toolchain_with_world_package(qibuild_action, qitoolchain_action):
     build_worktree = qibuild_action.build_worktree
     qibuild_action.add_test_project("world")
@@ -22,6 +23,7 @@ def create_foo_toolchain_with_world_package(qibuild_action, qitoolchain_action):
     qibuild.config.add_build_config("foo", toolchain="foo")
     qitoolchain_action("add-package", "-c", "foo", world_package)
     build_worktree.worktree.remove_project("world", from_disk=True)
+
 
 def test_running_from_install_dir_dep_in_worktree(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
@@ -35,6 +37,7 @@ def test_running_from_install_dir_dep_in_worktree(qibuild_action, tmpdir):
     qisys.command.call([hello])
 
     assert not tmpdir.join("include").check()
+
 
 def test_running_from_install_dir_dep_in_toolchain(cd_to_tmpdir):
     # create a foo toolchain containing the world package
@@ -63,6 +66,7 @@ def test_devel_components_installed_by_default(qibuild_action, tmpdir):
     qibuild_action("install", "hello", tmpdir.strpath)
     assert tmpdir.join("include").join("world").join("world.h").check()
 
+
 def test_setting_prefix(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
@@ -72,6 +76,7 @@ def test_setting_prefix(qibuild_action, tmpdir):
     qibuild_action("install", "--prefix=/usr", "--runtime",
                    "hello", tmpdir.strpath)
     hello = qibuild.find.find([tmpdir.join("usr").strpath], "hello")
+
 
 def test_using_compiled_tool_for_install(qibuild_action, tmpdir):
     qibuild_action.add_test_project("footool")
@@ -83,6 +88,7 @@ def test_using_compiled_tool_for_install(qibuild_action, tmpdir):
     foo_out = tmpdir.join("share", "foo", "foo.out")
     assert foo_out.check(file=True)
 
+
 def test_compile_data(qibuild_action, tmpdir):
     qibuild_action.add_test_project("compile_data")
     qibuild_action("configure", "compile_data")
@@ -90,12 +96,14 @@ def test_compile_data(qibuild_action, tmpdir):
     qibuild_action("install", "compile_data", tmpdir.strpath)
     assert tmpdir.join("share", "foo.out").check(file=True)
 
+
 def test_failing_compiler_makes_install_fail(qibuild_action, tmpdir):
     qibuild_action.add_test_project("compile_data")
     qibuild_action("configure", "compile_data", "-DFAIL_COMPILER=ON")
     qibuild_action("make", "compile_data")
     error = qibuild_action("install", "compile_data", tmpdir.strpath, raises=True)
     assert error
+
 
 def test_qi_install_cmake(qibuild_action, tmpdir):
     qibuild_action.add_test_project("installme")
@@ -106,6 +114,7 @@ def test_qi_install_cmake(qibuild_action, tmpdir):
     assert tmpdir.join("share", "data_star", "bar.dat").check(file=True)
     assert tmpdir.join("share", "recurse", "a_dir/a_file").check(file=True)
     assert tmpdir.join("share", "recurse", "a_dir/b_dir/c_dir/d_file").check(file=True)
+
 
 def test_fails_early(qibuild_action, tmpdir):
     qibuild_action.add_test_project("installme")
@@ -120,6 +129,7 @@ def test_install_cross_unix_makefiles(qibuild_action, tmpdir):
 def test_install_cross_ninja(qibuild_action, tmpdir):
     install_cross(qibuild_action, tmpdir, cmake_generator="Ninja")
 
+
 @skip_on_win
 def install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles"):
     cross_proj = qibuild_action.add_test_project("cross")
@@ -129,6 +139,7 @@ def install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles"):
                    "-DCMAKE_TOOLCHAIN_FILE=%s" % toolchain_file)
     qibuild_action("make", "cross",)
     qibuild_action("install", "cross",  tmpdir.strpath)
+
 
 def test_running_tests_after_install(qibuild_action, tmpdir):
     testme = qibuild_action.add_test_project("testme")
@@ -162,12 +173,14 @@ def test_install_returns(qibuild_action, tmpdir):
                               'share/qi/path.conf',
                               'lib/python2.7/site-packages/py/foo.py'}
 
+
 def test_install_test_libs(qibuild_action, tmpdir):
     installme = qibuild_action.add_test_project("installme")
     dest = tmpdir.join("dest")
     installme.configure()
     installme.build()
     installme.install(dest.strpath, components=["runtime", "test"])
+
 
 def test_json_merge_tests(qibuild_action, tmpdir):
     qibuild_action.add_test_project("testme")
@@ -185,6 +198,7 @@ def test_json_merge_tests(qibuild_action, tmpdir):
     assert "zero_test" in test_names
     assert "ok" in test_names
 
+
 def test_do_not_write_tests_twice(qibuild_action, tmpdir):
     qibuild_action.add_test_project("testme")
     qibuild_action("configure", "--all")
@@ -199,6 +213,7 @@ def test_do_not_write_tests_twice(qibuild_action, tmpdir):
     second = len(tests)
     assert first == second
 
+
 def test_do_not_generate_config_module_for_non_installed_targets(qibuild_action, tmpdir):
     qibuild_action.add_test_project("stagenoinstall")
     qibuild_action("configure", "--all")
@@ -206,6 +221,7 @@ def test_do_not_generate_config_module_for_non_installed_targets(qibuild_action,
     dest = tmpdir.mkdir("dest")
     qibuild_action("install", "--all", dest.strpath)
     assert not dest.join("share", "cmake", "foo", "foo-config.cmake").check(file=True)
+
 
 def test_no_packages(cd_to_tmpdir):
     # create a foo toolchain containing the world package
@@ -226,6 +242,7 @@ def test_no_packages(cd_to_tmpdir):
     qibuild_action("install", "--config", "foo", "--no-packages", "hello", dest.strpath)
     assert not dest.join("lib", "libworld.so").check(file=True)
 
+
 def test_bin_sdk(qibuild_action, tmpdir):
     qibuild_action.add_test_project("binsdk")
     dest = tmpdir.mkdir("dest")
@@ -236,7 +253,8 @@ def test_bin_sdk(qibuild_action, tmpdir):
     assert dest.join("lib", "libfoo.a").check(file=True)
     assert dest.join("include", "foo.h").check(file=True)
     assert dest.join("share", "cmake", "foo",
-            "foo-config.cmake").check(file=True)
+                     "foo-config.cmake").check(file=True)
+
 
 def test_with_tests_with_package(qibuild_action, qitoolchain_action, tmpdir):
     create_foo_toolchain_with_world_package(qibuild_action, qitoolchain_action)
@@ -252,6 +270,7 @@ def test_with_tests_with_package(qibuild_action, qitoolchain_action, tmpdir):
                    "testme", dest.strpath)
     assert not dest.join("include", "world", "world.h").check(file=True)
 
+
 def add_dep_to_world(project):
     qiproject_xml_path = os.path.join(project.path, "qiproject.xml")
     xml_tree = qisys.qixml.read(qiproject_xml_path).getroot()
@@ -259,6 +278,7 @@ def add_dep_to_world(project):
     project.run_depends.add("world")
     qibuild.deps.dump_deps_to_xml(project, xml_tree)
     qisys.qixml.write(xml_tree, qiproject_xml_path)
+
 
 def test_install_path_conf(qibuild_action, tmpdir):
     qibuild_action.add_test_project("installme")

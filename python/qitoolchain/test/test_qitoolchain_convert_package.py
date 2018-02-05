@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import qisys.sh
@@ -8,6 +8,7 @@ import qibuild.config
 import qitoolchain
 
 import pytest
+
 
 def test_simple(qitoolchain_action, tmpdir, toolchains):
     this_dir = os.path.dirname(__file__)
@@ -23,6 +24,7 @@ def test_simple(qitoolchain_action, tmpdir, toolchains):
     qitoolchain_action("add-package", "--config", "test", res)
     toolchain = qitoolchain.get_toolchain("test")
     assert toolchain.get_package("json-c")
+
 
 def test_rpm(qitoolchain_action, tmpdir):
     rpm = tmpdir.ensure("json-c-0.9.x86_64.rpm", file=True)

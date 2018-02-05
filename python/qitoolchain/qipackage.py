@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import sys
 import re
@@ -12,6 +12,7 @@ import qisys.version
 import qisrc.license
 import qibuild.deps
 
+
 class QiPackage(object):
     """ Binary package for use with qibuild.
 
@@ -19,6 +20,7 @@ class QiPackage(object):
     path is None until the package is added to a database
 
     """
+
     def __init__(self, name, version=None, path=None):
         self.name = name
         self.version = version
@@ -117,7 +119,7 @@ class QiPackage(object):
             mask = self._read_install_mask(component)
             if release:
                 mask.extend(self._read_install_mask("release"))
-            if not mask and component=="runtime":
+            if not mask and component == "runtime":
                 # retro-compat
                 def filter_fun(x):
                     return qisys.sh.is_runtime(x) and x != "package.xml"
@@ -248,6 +250,7 @@ class QiPackage(object):
         else:
             return cmp(self.name, other.name)
 
+
 def from_xml(element):
     name = element.get("name")
     if not name:
@@ -279,23 +282,27 @@ mutually exclusive
     qibuild.deps.read_deps_from_xml(res, element)
     return res
 
+
 def from_archive(archive_path):
     archive = zipfile.ZipFile(archive_path)
     xml_data = archive.read("package.xml")
     element = etree.fromstring(xml_data)
     return from_xml(element)
 
+
 def extract(archive_path, dest):
     if archive_path.endswith((".tar.gz", ".tbz2")):
-       return _extract_legacy(archive_path, dest)
+        return _extract_legacy(archive_path, dest)
     with zipfile.ZipFile(archive_path) as archive:
         if "package.xml" in archive.namelist():
             return _extract_modern(archive_path, dest)
         else:
             return _extract_legacy(archive_path, dest)
 
+
 def _extract_modern(archive_path, dest):
     return qisys.archive.extract(archive_path, dest, strict_mode=False)
+
 
 def _extract_legacy(archive_path, dest):
     dest = qisys.sh.to_native_path(dest)

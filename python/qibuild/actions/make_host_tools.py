@@ -1,10 +1,11 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Build host tools projects """
 
 import qibuild.parsers
+
 
 def configure_parser(parser):
     """ Configure parser for this action """
@@ -14,6 +15,7 @@ def configure_parser(parser):
                         help="Build every host project")
     parser.add_argument("projects", nargs="*", metavar="PROJECT",
                         help="Project name(s)")
+
 
 def do(args):
     """ Main entry point """

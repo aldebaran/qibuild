@@ -1,13 +1,15 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import mock
 
+
 def test_simple_build(qidoc_action):
     qidoc_action.add_test_project("libqi")
     qidoc_action("build", "qi-api")
+
 
 def test_translated_project(qidoc_action):
     translateme_proj = qidoc_action.add_test_project("translateme")
@@ -73,6 +75,7 @@ def test_full_translation_workflow(qidoc_action):
         contents = fp.read()
         assert "Bienvenue" in contents
 
+
 def test_language_not_in_qiproject(qidoc_action):
     qidoc_action.add_test_project("translateme")
     error = qidoc_action("build", "translateme", "--language", "de", raises=True)
@@ -87,6 +90,7 @@ def test_forwarding_pdb(qidoc_action):
         kwargs = mock_main.call_args[1]
         assert "-P" in kwargs["argv"]
 
+
 def test_breathe(qidoc_action):
     qidoc_action.add_test_project("libworld")
     qidoc_action.add_test_project("templates")
@@ -96,6 +100,7 @@ def test_breathe(qidoc_action):
     with open(index_html, "r") as fp:
         contents = fp.read()
     assert "the answer" in contents
+
 
 def test_missing_deps(qidoc_action):
     qidoc_action.add_test_project("hello")

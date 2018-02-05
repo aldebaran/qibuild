@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 from qisys import ui
 import qisys.parsers
@@ -8,6 +8,7 @@ import qisys.parsers
 
 import qidoc.builder
 from qidoc.worktree import DocWorkTree, new_doc_project
+
 
 def build_doc_parser(parser):
     """ Add options used during the building of the documentation """
@@ -24,16 +25,19 @@ def build_doc_parser(parser):
     parser.set_defaults(hosted=True, build_type="debug", werror=False,
                         spellcheck=False, language="en")
 
+
 def get_doc_worktree(args):
     worktree = qisys.parsers.get_worktree(args)
-    doc_worktree =  DocWorkTree(worktree)
+    doc_worktree = DocWorkTree(worktree)
     ui.info(ui.green, "Current doc worktree:", ui.reset,
             ui.bold, doc_worktree.root)
     return doc_worktree
 
+
 def get_doc_projects(doc_worktree, args, default_all=False):
     parser = DocProjectParser(doc_worktree)
     return parser.parse_args(args, default_all=default_all)
+
 
 def get_one_doc_project(doc_worktree, args):
     parser = DocProjectParser(doc_worktree)
@@ -41,6 +45,7 @@ def get_one_doc_project(doc_worktree, args):
     if not len(projects) == 1:
         raise Exception("This action can only work with one project")
     return projects[0]
+
 
 def get_doc_builder(args):
     doc_worktree = get_doc_worktree(args)
@@ -61,6 +66,7 @@ def get_doc_builder(args):
 
 ##
 # Implementation details
+
 
 class DocProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a DocWorkTree """
@@ -97,6 +103,7 @@ class DocProjectParser(qisys.parsers.AbstractProjectParser):
         project = self.doc_worktree.get_doc_project(project_arg, raises=True)
         return [project]
 
+
 class CouldNotGuessProjectName(Exception):
     def __str__(self):
         return """
@@ -104,4 +111,3 @@ Could not guess doc project name from current working directory
 Please go inside a doc project, or specify the project name
 on the command line
 """
-

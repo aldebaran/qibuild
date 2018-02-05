@@ -7,6 +7,7 @@ import os
 import os.path
 import sys
 
+
 def main():
     from_env = os.environ.get("QI_ADDITIONAL_SDK_PREFIXES")
     if not from_env:
@@ -25,6 +26,7 @@ def main():
         sys.exit("foo.mod not found")
 
     import foo
+
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Automatic testing for worktree
 
@@ -64,7 +64,7 @@ def test_ignore_src_dot(tmpdir):
   <project src="." />
 </project>
 """)
-    worktree  = qisys.worktree.WorkTree(tmpdir.strpath)
+    worktree = qisys.worktree.WorkTree(tmpdir.strpath)
     worktree.add_project("foo")
 
 

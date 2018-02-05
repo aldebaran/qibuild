@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Deploy project(s) on a remote target
 
@@ -25,6 +25,7 @@ import qisys.parsers
 import qibuild.parsers
 import qibuild.deploy
 
+
 def configure_parser(parser):
     """Configure parser for this action"""
     qibuild.parsers.project_parser(parser)
@@ -36,8 +37,9 @@ def configure_parser(parser):
     group.add_argument("--with-tests", dest="with_tests", action="store_true",
                        help="also deploy the tests")
     group.add_argument("--no-packages", action="store_false", dest="install_tc_packages",
-                        help="Do not install packages from toolchain")
+                       help="Do not install packages from toolchain")
     parser.set_defaults(with_tests=False, install_tc_packages=True)
+
 
 def do(args):
     """Main entry point"""
@@ -49,7 +51,7 @@ def do(args):
     else:
         default_dep_types = ["runtime"]
     cmake_builder = qibuild.parsers.get_cmake_builder(
-                                    args, default_dep_types=default_dep_types)
+        args, default_dep_types=default_dep_types)
     for url in urls:
         cmake_builder.deploy(url, split_debug=args.split_debug,
                              with_tests=args.with_tests,

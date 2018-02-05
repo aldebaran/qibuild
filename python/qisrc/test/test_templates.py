@@ -1,5 +1,6 @@
 import qisrc.templates
 
+
 def test_process_templates(tmpdir):
     tmpl = tmpdir.mkdir("tmpl")
     tmpl_cmake_list = tmpl.ensure("CMakeLists.txt", file=True)
@@ -27,7 +28,6 @@ class @ProjectName@ {
     dest = tmpdir.mkdir("dest")
     qisrc.templates.process(tmpl.strpath, dest.strpath, project_name="monthyPython")
 
-
     dest_cmake = dest.join("CMakeLists.txt")
     assert dest_cmake.read() == """\
 cmake_minimum_required(VERSION 3.0)
@@ -50,6 +50,7 @@ class MonthyPython {
 
 #endif
 """
+
 
 def test_process_string():
     res = qisrc.templates.process_string("@project_name@.cpp",

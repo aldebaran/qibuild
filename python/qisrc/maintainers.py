@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Handling maintainers in qiproject.xml files"""
 
@@ -21,6 +21,7 @@ class ProjectXML(qisys.qixml.XMLParser):
         maintainer = {'email': element.get('email'), 'name': element.text}
         self.target.append(maintainer)
 
+
 def to_str(name=None, email=None):
     encoding = locale.getpreferredencoding()
     name = name.encode(encoding)
@@ -34,9 +35,11 @@ def to_str(name=None, email=None):
         string += "<" + email + ">"
     return string
 
+
 def get_xml_root(project):
     tree = get_xml_tree(project)
     return tree.getroot()
+
 
 def get_xml_tree(project):
     xml_path = project.qiproject_xml
@@ -46,6 +49,7 @@ def get_xml_tree(project):
     tree = qisys.qixml.read(xml_path)
     return tree
 
+
 def exists(project, name=None, email=None):
     maintainers = get(project)
 
@@ -54,6 +58,7 @@ def exists(project, name=None, email=None):
             return True
 
     return False
+
 
 def get(project, warn_if_none=False):
     maintainers = list()
@@ -73,6 +78,7 @@ Please add one or several <maintainer> tags in
         ui.warning(mess, end="")
 
     return maintainers
+
 
 def remove(project, name=None, email=None):
     if not exists(project, name=name, email=email):

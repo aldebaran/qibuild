@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 
@@ -16,9 +16,9 @@ def test_perf(qibuild_action):
     proj.run_tests(perf=True)
     for name in ["perf_spam", "perf_eggs"]:
         expected_path = os.path.join(proj.sdk_directory,
-            "perf-results", name + ".xml")
+                                     "perf-results", name + ".xml")
         assert os.path.exists(expected_path)
     for name in ["perf_timeout", "perf_segv"]:
         expected_path = os.path.join(proj.sdk_directory,
-            "perf-results", name + ".xml")
+                                     "perf-results", name + ".xml")
         assert not os.path.exists(expected_path)

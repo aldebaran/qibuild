@@ -1,10 +1,11 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 from qisys import ui
 import qisys.interact
 
 import qisrc.manifest
+
 
 def rebase_worktree(git_worktree, git_projects, branch=None,
                     push=False, dry_run=False):
@@ -52,6 +53,7 @@ def push_projects(git_projects, dry_run=False):
         else:
             ui.error(out)
 
+
 def rebase_projects(git_projects, upstream_projects, branch):
     ui.info(ui.green, "Computing list of forked projects ...")
     rebased_projects = list()
@@ -72,6 +74,7 @@ def rebase_projects(git_projects, upstream_projects, branch):
         if status is False:
             errors.append(git_project)
     return rebased_projects, errors
+
 
 def get_forked_projects(git_projects, upstream_projects, branch):
     res = list()
@@ -94,6 +97,7 @@ def get_forked_projects(git_projects, upstream_projects, branch):
         if remote_ref != upstream_ref:
             res.append(git_project)
     return res
+
 
 def rebase_project(git_project, upstream_project):
     ok = check_local_branch(git_project)
@@ -118,7 +122,7 @@ def rebase_project(git_project, upstream_project):
             return False
         ui.info(ui.green, "[OK]", ui.reset, "fast-forwarded")
         return True
-    git.call("tag", "-f", "before-rebase", raises=False) # suppress output
+    git.call("tag", "-f", "before-rebase", raises=False)  # suppress output
     rc, out = git.call("rebase", upstream_ref, raises=False)
     if rc == 0:
         ui.info(ui.green, "[OK]", ui.reset, "rebased")
@@ -126,8 +130,9 @@ def rebase_project(git_project, upstream_project):
     else:
         ui.info(ui.red, "[FAILED]", ui.reset, "there was some conflicts")
         git.call("rebase", "--abort", raises=False)
-        git.call("tag", "-d", "before-rebase", raises=False) # suppress output
+        git.call("tag", "-d", "before-rebase", raises=False)  # suppress output
         return False
+
 
 def check_local_branch(git_project):
     git = qisrc.git.Git(git_project.path)
@@ -157,12 +162,13 @@ def check_local_branch(git_project):
         return False
     return True
 
+
 def display_changes(git, remote_ref, branch_name):
     rc, out = git.call("log", "--color", "--graph", "--abbrev-commit",
-                      "--pretty=format:%Cred%h%Creset " + \
-                                        "-%C(yellow)%d%Creset " + \
-                                        "%s %Cgreen(%cr) %C(bold blue) " + \
-                                        "<%an>%Creset",
-                        remote_ref, branch_name,
-                        raises=False)
+                       "--pretty=format:%Cred%h%Creset " +
+                       "-%C(yellow)%d%Creset " +
+                       "%s %Cgreen(%cr) %C(bold blue) " +
+                       "<%an>%Creset",
+                       remote_ref, branch_name,
+                       raises=False)
     ui.info(out)

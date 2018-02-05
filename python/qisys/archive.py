@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """This module contains functions to manipulate archives.
 
@@ -42,8 +42,10 @@ from qisys import ui
 
 KNOWN_ALGOS = ["zip", "tar", "gzip", "bzip2", "xz"]
 
+
 class InvalidArchive(Exception):
     """Just a custom exception """
+
     def __init__(self, message):
         self._message = message
         Exception.__init__(self)
@@ -68,6 +70,8 @@ def _check_algo(algo):
 # inspired from:
 #
 # http://www.mail-archive.com/python-list@python.org/msg34223.html
+
+
 def _compress_zip(directory, quiet=True, verbose=False, display_progress=False,
                   flat=False, output=None):
     """Compress directory in a .zip file
@@ -97,7 +101,7 @@ Please set only one of these two options to 'True'
             # Do not zip ourselves
             if full_path == output:
                 continue
-            rel_path  = os.path.relpath(full_path, directory)
+            rel_path = os.path.relpath(full_path, directory)
             if flat:
                 arcname = rel_path
             else:
@@ -120,7 +124,7 @@ Please set only one of these two options to 'True'
             content = arcname
             zip_call = archive.write
         if not quiet and not display_progress:
-            rel_path  = os.path.relpath(full_path, directory)
+            rel_path = os.path.relpath(full_path, directory)
             sys.stdout.write("adding {0}\n".format(rel_path))
             sys.stdout.flush()
         if display_progress:
@@ -155,12 +159,12 @@ Please set only one of these two options to 'True'
         mess = 'ZIP file seems corrupted. Try removing it and relaunch command.\n'
         mess += '              rm ' + archive + '\n'
         raise Exception(mess)
-    members  = archive_.infolist()
+    members = archive_.infolist()
     # There is always the top dir as the first element of the archive
     # (or so we hope)
-    ##  BUG ON !!!
-    ##    zipped ro files do not appears as members, so the following
-    ##    stratement failed if the whole content of the archive is read-only.
+    # BUG ON !!!
+    # zipped ro files do not appears as members, so the following
+    # stratement failed if the whole content of the archive is read-only.
     orig_topdir = members[0].filename.split(posixpath.sep)[0]
     size = len(members)
     directories = list()
@@ -169,7 +173,7 @@ Please set only one of these two options to 'True'
         if i != 0 and member_top_dir != orig_topdir:
             # something wrong: members do not have the
             # same basename
-            mess  = "Invalid member %s in archive:\n" % member.filename
+            mess = "Invalid member %s in archive:\n" % member.filename
             mess += "Every file must be in the same top dir (%s != %s)" % \
                 (orig_topdir, member_top_dir)
             if strict_mode:
@@ -239,7 +243,7 @@ def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None, fl
     :return: the list containing the whole tar commnand
 
     """
-    cmd  = [qisys.command.find_program("tar", raises=True)]
+    cmd = [qisys.command.find_program("tar", raises=True)]
     if not quiet:
         cmd += ["--verbose"]
     if add_opts is not None:
@@ -247,14 +251,14 @@ def _get_tar_command(action, algo, filename, directory, quiet, add_opts=None, fl
     if action == "compress":
         cmd += ["--create"]
         if flat:
-            cwd  = directory
+            cwd = directory
             data = '.'
         else:
-            cwd  = os.path.dirname(directory)
+            cwd = os.path.dirname(directory)
             data = os.path.basename(directory)
     elif action == "extract":
         cmd += ["--extract"]
-        cwd  = directory
+        cwd = directory
         data = None
     if algo != "tar":
         cmd += ["--{0}".format(algo)]
@@ -295,7 +299,7 @@ Please set only one of these two options to 'True'
         else:
             unused_output, printed = qisys.command.check_output_error(cmd)
     except qisys.command.CommandFailedException as err:
-        mess  = "Could not compress directory %s\n" % directory
+        mess = "Could not compress directory %s\n" % directory
         mess += "(algo: %s)\n" % algo
         mess += "Calling tar failed\n"
         mess += str(err)
@@ -326,14 +330,14 @@ Please set only one of these two options to 'True'
     # outputs (no progress bar).
     ui.debug("Extracting", archive, "to", directory)
     # first, list the archive and check the topdir of its content
-    tar       = qisys.command.find_program("tar")
-    list_cmd  = [tar, "--list", "--file", archive]
-    process   = subprocess.Popen(list_cmd, stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE)
-    line      = process.stdout.readline().split(os.sep, 1)[0]
-    topdir    = line.split(os.sep, 1)[0]
-    archroot  = None
-    opts      = list()
+    tar = qisys.command.find_program("tar")
+    list_cmd = [tar, "--list", "--file", archive]
+    process = subprocess.Popen(list_cmd, stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    line = process.stdout.readline().split(os.sep, 1)[0]
+    topdir = line.split(os.sep, 1)[0]
+    archroot = None
+    opts = list()
     while line:
         if line[0] in ["/", "."] or topdir != line[0]:
             if process.poll() is None:
@@ -348,9 +352,9 @@ Please set only one of these two options to 'True'
         line = process.stdout.readline().split(os.sep, 1)[0]
     if archroot is not None:
         directory = os.path.join(directory, archroot)
-        destdir   = directory
+        destdir = directory
     else:
-        destdir   = os.path.join(directory, topdir)
+        destdir = os.path.join(directory, topdir)
     cmd = _get_tar_command("extract", algo, archive, directory, quiet, add_opts=opts)
     qisys.sh.mkdir(directory)
     try:
@@ -359,7 +363,7 @@ Please set only one of these two options to 'True'
         else:
             unused_output, printed = qisys.command.check_output_error(cmd)
     except qisys.command.CommandFailedException as err:
-        mess  = "Could not extract %s to %s\n" % (archive, directory)
+        mess = "Could not extract %s to %s\n" % (archive, directory)
         mess += "Calling tar failed\n"
         mess += str(err)
         raise Exception(mess)
@@ -371,7 +375,7 @@ Please set only one of these two options to 'True'
 
 
 def compress(directory, algo="zip", output=None, flat=False,
-            quiet=False, verbose=False, display_progress=False):
+             quiet=False, verbose=False, display_progress=False):
     """Compress directory in an archive
 
     :param directory: directory to add to the archive
@@ -405,6 +409,7 @@ Please set only one of these two options to 'True'
                                      output=output, algo=algo, flat=flat)
     return archive_path
 
+
 def get_default_output(directory, algo):
     res = directory
     if algo == "tar":
@@ -419,9 +424,10 @@ def get_default_output(directory, algo):
         res += ".zip"
     return res
 
+
 def extract(archive, directory, algo=None,
-                     quiet=False, verbose=False,
-                     strict_mode=True):
+            quiet=False, verbose=False,
+            strict_mode=True):
     """Extract a an archive into directory
 
     :param archive:   path of the archive
@@ -439,8 +445,8 @@ def extract(archive, directory, algo=None,
         algo = guess_algo(archive)
     directory = qisys.sh.to_native_path(directory)
     directory = os.path.abspath(directory)
-    archive   = qisys.sh.to_native_path(archive)
-    archive   = os.path.abspath(archive)
+    archive = qisys.sh.to_native_path(archive)
+    archive = os.path.abspath(archive)
     if algo == "zip":
         extract_location = _extract_zip(archive, directory, quiet, verbose,
                                         strict_mode=strict_mode)

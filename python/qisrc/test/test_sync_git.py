@@ -1,9 +1,10 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 from qisrc.git_config import Branch
+
 
 def create_foo(git_server, tmpdir, test_git):
     foo_git = test_git(tmpdir.join("foo").strpath)
@@ -11,12 +12,14 @@ def create_foo(git_server, tmpdir, test_git):
     foo_git.clone(foo_repo.clone_url)
     return foo_git
 
+
 def test_up_to_date(git_server, tmpdir, test_git):
     foo_git = create_foo(git_server, tmpdir, test_git)
     branch = Branch()
     branch.name = "master"
     branch.tracks = "origin"
     foo_git.sync_branch(branch)
+
 
 def test_fast_forward(git_server, tmpdir, test_git):
     foo_git = create_foo(git_server, tmpdir, test_git)
@@ -27,6 +30,7 @@ def test_fast_forward(git_server, tmpdir, test_git):
     foo_git.sync_branch(branch)
     assert foo_git.get_current_branch() == "master"
     assert foo_git.read_file("README") == "README on master"
+
 
 def test_rebase_by_default(git_server, tmpdir, test_git):
     foo_git = create_foo(git_server, tmpdir, test_git)
@@ -43,6 +47,7 @@ def test_rebase_by_default(git_server, tmpdir, test_git):
     assert rc == 0
     assert "Merge" not in head
 
+
 def test_skip_if_unclean(git_server, tmpdir, test_git):
     foo_git = create_foo(git_server, tmpdir, test_git)
     branch = Branch()
@@ -56,6 +61,7 @@ def test_skip_if_unclean(git_server, tmpdir, test_git):
     assert res is None
     assert "unstaged changes" in message
 
+
 def test_do_not_call_rebase_abort_when_reset_fails(git_server, tmpdir, test_git):
     foo_git = create_foo(git_server, tmpdir, test_git)
     branch = Branch()
@@ -66,9 +72,10 @@ def test_do_not_call_rebase_abort_when_reset_fails(git_server, tmpdir, test_git)
     index_lock = os.path.join(foo_path, ".git", "index.lock")
     with open(index_lock, "w") as fp:
         fp.write("")
-    (res, message) =  foo_git.sync_branch(branch)
+    (res, message) = foo_git.sync_branch(branch)
     assert res is False
     assert "rebase --abort" not in message
+
 
 def test_push_nonfastforward(git_server, tmpdir, test_git):
     foo_git = create_foo(git_server, tmpdir, test_git)
@@ -82,6 +89,7 @@ def test_push_nonfastforward(git_server, tmpdir, test_git):
     (res, message) = foo_git.sync_branch(branch)
     assert res is True
     assert foo_git.read_file("README") == "README on master v2"
+
 
 def test_run_abort_when_rebase_fails(git_server, tmpdir, test_git):
     foo_git = create_foo(git_server, tmpdir, test_git)
@@ -101,6 +109,7 @@ def test_run_abort_when_rebase_fails(git_server, tmpdir, test_git):
     assert foo_git.read_file("unrelated.txt") == "Unrelated changes"
     assert foo_git.read_file("README") == "README on master v1"
 
+
 def test_fail_if_empty(tmpdir, test_git):
     foo_git = test_git(tmpdir.strpath)
     branch = Branch()
@@ -110,6 +119,7 @@ def test_fail_if_empty(tmpdir, test_git):
     (res, message) = foo_git.sync_branch(branch)
     assert res is None
     assert "no commits" in message
+
 
 def test_clean_error_when_fetch_fails(git_server, tmpdir, test_git):
     foo_git = create_foo(git_server, tmpdir, test_git)

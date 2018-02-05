@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Configure a worktree to use a toolchain.
 
@@ -21,18 +21,19 @@ def configure_parser(parser):
     """ Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     parser.add_argument("name", metavar="NAME",
-        help="Name of the toolchain", type=ui.valid_filename)
+                        help="Name of the toolchain", type=ui.valid_filename)
     parser.add_argument("--feed-name", "--name", dest="feed_name",
-        help="Name of the feed. To be specified when using a git url")
+                        help="Name of the feed. To be specified when using a git url")
     parser.add_argument("-b", "--branch",
-        help="Branch of the git url to use")
+                        help="Branch of the git url to use")
     parser.add_argument("feed", metavar="TOOLCHAIN_FEED",
-        help="Optional: path to the toolchain configuration file.\n"
-             "If not given, the toolchain will be empty.\n"
-             "May be a local file, a url or a git URL (in this case\n"
-             "--feed-name must be used)",
-        nargs="?")
+                        help="Optional: path to the toolchain configuration file.\n"
+                        "If not given, the toolchain will be empty.\n"
+                        "May be a local file, a url or a git URL (in this case\n"
+                        "--feed-name must be used)",
+                        nargs="?")
     parser.set_defaults(branch="master")
+
 
 def do(args):
     """Main entry point
@@ -50,7 +51,7 @@ def do(args):
     bad_chars = r'<>:"/\|?*'
     for bad_char in bad_chars:
         if bad_char in tc_name:
-            mess  = "Invalid toolchain name: '%s'\n" % tc_name
+            mess = "Invalid toolchain name: '%s'\n" % tc_name
             mess += "A valid toolchain name should not contain any "
             mess += "of the following chars:\n"
             mess += " ".join(bad_chars)

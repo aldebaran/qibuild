@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import copy
 
@@ -10,11 +10,13 @@ from qisrc.manifest import RepoConfig
 
 from qisrc.test.conftest import TestGitWorkTree
 
+
 def test_native_paths(git_worktree):
     foo = git_worktree.create_git_project("foo/bar")
     assert os.path.exists(foo.path)
     if os.name == 'nt':
         assert "/" not in foo.path
+
 
 def test_apply_git_config(git_worktree):
     foo = git_worktree.create_git_project("foo")
@@ -36,6 +38,7 @@ def test_apply_git_config(git_worktree):
     foo.apply_config()
     assert git.get_tracking_branch("feature") == "upstream/remote_branch"
 
+
 def test_branch_without_remote(git_worktree):
     foo = git_worktree.create_git_project("foo")
     branch = Branch()
@@ -43,6 +46,7 @@ def test_branch_without_remote(git_worktree):
     branch.default = True
     foo.branches = [branch]
     foo.apply_config()
+
 
 def test_apply_remote_config(git_worktree):
     foo = git_worktree.create_git_project("foo")
@@ -73,28 +77,29 @@ def test_warn_on_remote_change(git_worktree, record_messages):
     foo = git_worktree.create_git_project("foo")
     origin = Remote()
     origin.name = "origin"
-    origin.url =  "git@srv:foo.git"
+    origin.url = "git@srv:foo.git"
     foo.configure_remote(origin)
     foo.configure_branch("master", tracks="origin", default=True)
     origin2 = Remote()
     origin2.name = "origin"
-    origin2.url =  "git@srv:libfoo.git"
+    origin2.url = "git@srv:libfoo.git"
     foo.configure_remote(origin2)
     assert record_messages.find("remote url changed")
     foo.configure_branch("next", default=True)
     assert record_messages.find("default branch changed")
     gerrit = Remote()
     gerrit.name = "gerrit"
-    gerrit.url =  "http://gerrit/libfoo.git"
+    gerrit.url = "http://gerrit/libfoo.git"
     foo.configure_remote(gerrit)
     foo.configure_branch("next", tracks="gerrit")
     assert record_messages.find("now tracks gerrit instead")
+
 
 def test_warn_on_default_change(git_worktree, record_messages):
     foo = git_worktree.create_git_project("foo")
     gitorious = Remote()
     gitorious.name = "gitorious"
-    gitorious.url =  "git@gitorious:libfoo/libfoo.git"
+    gitorious.url = "git@gitorious:libfoo/libfoo.git"
     gitorious.default = True
     gitlab = Remote()
     gitlab.name = "gitlab"
@@ -135,6 +140,7 @@ def test_setting_default_branch(git_worktree):
     assert foo.default_branch is None
     foo.configure_branch("master", default=True)
     assert foo.default_branch.name == "master"
+
 
 def test_change_default_branch(git_worktree):
     foo_proj = git_worktree.create_git_project("foo")

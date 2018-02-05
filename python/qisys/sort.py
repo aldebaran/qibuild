@@ -1,24 +1,27 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Topological sort
 
 """
 
-__all__ = [ "DagError", "assert_dag", "topological_sort" ]
+__all__ = ["DagError", "assert_dag", "topological_sort"]
+
 
 class DagError(Exception):
     """ Dag Exception """
+
     def __init__(self, node, parent, result):
         Exception.__init__(self)
-        self.node   = node
+        self.node = node
         self.parent = parent
         self.result = result
 
     def __str__(self):
         return "Circular dependency error: Starting from '%s', node '%s' depends on '%s', complete path %s" \
                % (self.node, self.parent, self.node, self.result)
+
 
 def assert_dag(data):
     """ Check if data is a dag
@@ -39,6 +42,7 @@ def assert_dag(data):
 
     for node, _ in data.items():
         _topological_sort(data, node, node, True)
+
 
 def topological_sort(data, heads):
     """ Topological sort
@@ -110,13 +114,14 @@ def topological_sort(data, heads):
     if isinstance(heads, list):
         data['internalfakehead'] = heads
         head = 'internalfakehead'
-        result =  _topological_sort(data, head, head)
-        return [ x for x in result if x != 'internalfakehead' ]
+        result = _topological_sort(data, head, head)
+        return [x for x in result if x != 'internalfakehead']
     else:
         head = heads
         return _topological_sort(data, head, head)
 
-def _topological_sort(data, head, top_node, raise_exception = False, result = None, visited = None):
+
+def _topological_sort(data, head, top_node, raise_exception=False, result=None, visited=None):
     """ Internal function
     """
     if not result:
@@ -133,7 +138,7 @@ def _topological_sort(data, head, top_node, raise_exception = False, result = No
         try:
             result.index(i)
         except ValueError:
-            #the item does not exist
+            # the item does not exist
             result = _topological_sort(data, i, top_node, raise_exception, result, visited)
     result.append(head)
     return result

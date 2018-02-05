@@ -1,16 +1,18 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import zipfile
 
 from qisys import ui
 import qisys.qixml
 
+
 class MetaPackage(object):
     """ Built with a mpml path. Contains a list of pml paths
 
     """
+
     def __init__(self, worktree, mpml_path):
         self.worktree = worktree
         self.mpml = mpml_path

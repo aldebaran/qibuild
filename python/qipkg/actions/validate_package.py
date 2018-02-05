@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Aldebaran Robotics. All rights reserved.
+# Copyright (c) 2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 """ Check the given pkg satisfy default package requirements to be published """
@@ -10,6 +10,7 @@ from qisys import ui
 import qisys.parsers
 import qisys.qixml
 import qipkg.manifest
+
 
 def configure_parser(parser):
     qisys.parsers.default_parser(parser)
@@ -34,4 +35,3 @@ def do(args):
         else:
             raise Exception("Given package does not satisfy "
                             "default package requirements")
-

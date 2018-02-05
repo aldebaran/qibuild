@@ -1,11 +1,12 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 
 import qisys.qixml
 import qitoolchain.qipackage
+
 
 def test_create_extract(qitoolchain_action, tmpdir):
     foo = tmpdir.join("foo")
@@ -22,7 +23,7 @@ def test_create_extract(qitoolchain_action, tmpdir):
     dest = tmpdir.join("dest")
     extracted = qitoolchain_action("extract-package",
                                    "--output", dest.strpath,
-                                    package_path)
+                                   package_path)
     package_xml = os.path.join(extracted, "package.xml")
     tree = qisys.qixml.read(package_xml)
     root = tree.getroot()
@@ -30,6 +31,7 @@ def test_create_extract(qitoolchain_action, tmpdir):
     assert package.name == "foo"
     assert package.version == "0.1"
     assert package.target == "linux64"
+
 
 def test_on_invalid_xml(qitoolchain_action, tmpdir):
     package_xml = tmpdir.join("package.xml")

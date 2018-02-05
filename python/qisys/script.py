@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Tools to related to command line parsing
 
@@ -15,11 +15,12 @@ import operator
 from qisys import ui
 
 
-
 import qisys.command
+
 
 class InvalidAction(Exception):
     """Just a custom exception """
+
     def __init__(self, name, message):
         self.name = name
         self._message = message
@@ -87,7 +88,7 @@ def run_action(module_name, args=None, forward_args=None):
     if not args:
         args = list()
     ui.debug("running", module_name, " ".join(args))
-    action_name  = module_name.split(".")[-1]
+    action_name = module_name.split(".")[-1]
     package_name = ".".join(module_name.split(".")[:-1])
     try:
         _tmp = __import__(package_name, globals(), locals(), [action_name])
@@ -97,7 +98,7 @@ def run_action(module_name, args=None, forward_args=None):
         module = getattr(_tmp, action_name)
     except AttributeError, err:
         raise InvalidAction(module_name, "Could not find module %s in package %s" %
-            (module_name, package_name))
+                            (module_name, package_name))
     check_module(module)
     parser = argparse.ArgumentParser()
     module.configure_parser(parser)
@@ -105,12 +106,13 @@ def run_action(module_name, args=None, forward_args=None):
     #  - print usage to the console
     #  - call SystemExit
     # Instead, raise a nice Exception
+
     def custom_exit():
         return
     parser.exit = custom_exit
 
     def error(message):
-        mess  = "Invalid arguments when calling run_action(%s)\n" % module_name
+        mess = "Invalid arguments when calling run_action(%s)\n" % module_name
         mess += message + "\n"
         mess += "args: %s\n" % " ".join(args)
         mess += "forward_args: %s\n" % forward_args
@@ -140,7 +142,7 @@ def main_wrapper(module, args):
             print "### Exception:", e
             print "### Starting a debugger"
             try:
-                #pylint: disable-msg=F0401
+                # pylint: disable-msg=F0401
                 import ipdb
                 ipdb.post_mortem(traceback)
                 sys.exit(0)
@@ -156,6 +158,7 @@ def main_wrapper(module, args):
         ui.error(e.__class__.__name__, message)
         sys.exit(2)
 
+
 def _dump_arguments(name, args):
     """ Dump an argparser namespace to log """
     output = ""
@@ -169,6 +172,7 @@ def _dump_arguments(name, args):
     if output[-1] == "\n":
         output = output[:-1]
     ui.debug("[%s] arguments:\n%s" % (name, output))
+
 
 def root_command_main(name, parser, modules, args=None):
     """name : name of the main program
@@ -257,7 +261,6 @@ at the top of the file
         raise InvalidAction(module.__name__, mess)
 
 
-
 def action_modules_from_package(package_name):
     """Returns a suitable list of modules from
     a package.
@@ -292,7 +295,6 @@ def action_modules_from_package(package_name):
 
     res.sort(key=operator.attrgetter("__name__"))
     return res
-
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """This module implements the Gentoo binary packages class.
 
@@ -14,6 +14,7 @@ import re
 
 import qisys
 from qitoolchain.binary_package.core import BinaryPackage
+
 
 class GentooPackage(BinaryPackage):
     """ Gentoo binary package endpoint (does not use ``portage``).
@@ -40,10 +41,10 @@ class GentooPackage(BinaryPackage):
         pkg_pf = os.path.basename(self.path)[:-5]
         match = self._RE_PF.search(pkg_pf)
         pkg_metadata = {
-            'name'         : match.groupdict()['pn'],
-            'version'      : match.groupdict()['ver'],
-            'revision'     : match.groupdict()['rev'],
-            }
+            'name': match.groupdict()['pn'],
+            'version': match.groupdict()['ver'],
+            'revision': match.groupdict()['rev'],
+        }
         self.metadata = pkg_metadata
 
     def extract(self, dest_dir):
@@ -58,7 +59,7 @@ class GentooPackage(BinaryPackage):
             mess = 'No such file or directory: %s' % dest_dir
             raise Exception(mess)
         discard_pattern = "trailing garbage after EOF ignored"
-        root_dir =  qisys.archive._extract_tar(self.path, dest_dir, algo="bzip2",
-                                                 quiet=True, verbose=False,
-                                                 output_filter=discard_pattern)
+        root_dir = qisys.archive._extract_tar(self.path, dest_dir, algo="bzip2",
+                                              quiet=True, verbose=False,
+                                              output_filter=discard_pattern)
         return root_dir

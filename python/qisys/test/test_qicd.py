@@ -1,9 +1,10 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import qicd
+
 
 def get_best_match(worktree, token):
     # qicd.find_best_match returns an absolute path,
@@ -11,6 +12,7 @@ def get_best_match(worktree, token):
     res = qicd.find_best_match(worktree, token)
     if res:
         return os.path.relpath(res, worktree.root)
+
 
 def test_matches_closest(worktree):
     worktree.create_project("agility/motion")

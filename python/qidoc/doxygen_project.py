@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import collections
 import os
 
@@ -8,8 +8,10 @@ import qisys.command
 import qidoc.doxygen
 import qidoc.project
 
+
 class DoxygenProject(qidoc.project.DocProject):
     """  A doc project using doxygen """
+
     def __init__(self, doc_worktree, project, name,
                  depends=None, dest=None):
         self.doc_type = "doxygen"
@@ -79,7 +81,6 @@ class DoxygenProject(qidoc.project.DocProject):
                 continue
             out_value = self.make_rel_paths(in_value)
             out_conf[path_key] = out_value
-
 
         qidoc.doxygen.write_doxyfile(out_conf, self.out_doxyfile)
 

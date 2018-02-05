@@ -31,12 +31,14 @@ def process(input_dir, output_dir, **kwargs):
             process_file(output_path, **kwargs)
             ui.info("*", output_name)
 
+
 def process_file(file_path, **kwargs):
     with open(file_path, "r") as fp:
         contents = fp.read()
     to_write = process_string(contents, **kwargs)
     with open(file_path, "w") as fp:
         fp.write(to_write)
+
 
 def process_string(string, **kwargs):
     res = string
@@ -46,6 +48,7 @@ def process_string(string, **kwargs):
         res = magic_replace(res, old, new)
     return res
 
+
 def magic_replace(string, old, new):
     res = string
     for func in snake_case, camel_case, upper_case, mixed_case, attached_lower, attached_upper:
@@ -53,6 +56,7 @@ def magic_replace(string, old, new):
         sub_new = func(new)
         res = res.replace(sub_old, sub_new)
     return res
+
 
 def snake_case(string):
     """
@@ -64,6 +68,7 @@ def snake_case(string):
     res = "_".join(x.lower() for x in splitted)
     return res
 
+
 def camel_case(string):
     """
     >>> camel_case("FooBar")
@@ -74,6 +79,7 @@ def camel_case(string):
     res = res[0].lower() + res[1:]
     return res
 
+
 def upper_case(string):
     """
     >>> upper_case("FooBar")
@@ -82,6 +88,7 @@ def upper_case(string):
     """
     splitted = split_chunks(string)
     return "_".join(x.upper() for x in splitted)
+
 
 def mixed_case(string):
     """
@@ -103,6 +110,7 @@ def attached_lower(string):
     splitted = split_chunks(string)
     return "".join(x.lower() for x in splitted)
 
+
 def attached_upper(string):
     """
     >>> attached_upper("FooBar")
@@ -110,6 +118,7 @@ def attached_upper(string):
     """
     splitted = split_chunks(string)
     return "".join(x.upper() for x in splitted)
+
 
 def split_chunks(string):
     """

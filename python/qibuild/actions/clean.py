@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Clean build directories.
 
@@ -21,6 +21,7 @@ import qisys.interact
 import qibuild
 import qibuild.parsers
 
+
 def configure_parser(parser):
     """Configure parser for this action."""
     qibuild.parsers.cmake_build_parser(parser)
@@ -31,6 +32,7 @@ def configure_parser(parser):
                         help="remove build directories that do not match any known configuration")
     parser.add_argument("--force", "-f", dest="force", action="store_true", help="force the clean")
 
+
 @ui.timer("qibuild clean")
 def do(args):
     """Main entry point."""
@@ -39,7 +41,7 @@ def do(args):
                                                   solve_deps=True)
 
     if args.remove_known_configs and args.remove_unknown_configs:
-        clean_selection= "all_configs"
+        clean_selection = "all_configs"
     elif args.remove_known_configs and not args.remove_unknown_configs:
         clean_selection = "known_configs"
     elif not args.remove_known_configs and args.remove_unknown_configs:
@@ -60,7 +62,7 @@ def do(args):
             ui.info(ui.green, "No build directory to clean")
         elif not args.force:
             ui.info(ui.green, "Build directories that will be removed",
-                ui.reset, ui.bold, "(use -f to apply):")
+                    ui.reset, ui.bold, "(use -f to apply):")
         for i, bdir in enumerate(bdirs['known_configs']):
             message = list()
             if args.force:
@@ -78,7 +80,7 @@ def do(args):
             ui.info(ui.green, "No build directory matching unknown configuration to clean")
         elif not args.force:
             ui.info(ui.green, "Build directories matching unknown configuration that may be removed",
-                ui.reset, ui.bold, "(interactive mode, use -f to apply):")
+                    ui.reset, ui.bold, "(interactive mode, use -f to apply):")
         # remove uncertain build directories, by configuration name, so sort them
         sorted_bdirs = {}
         for bdir in bdirs['unknown_configs']:
@@ -103,4 +105,3 @@ def do(args):
                 else:
                     to_print.extend([ui.reset, bdir])
                 ui.info(*to_print)
-

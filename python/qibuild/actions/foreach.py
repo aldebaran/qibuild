@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Run the same command on each buildable project.
 
@@ -21,10 +21,11 @@ def configure_parser(parser):
     parser.add_argument("--continue", "--ignore-errors", dest="ignore_errors",
                         action="store_true", help="continue on error")
 
+
 def do(args):
     """Main entry point"""
     build_worktree = qibuild.parsers.get_build_worktree(args)
     projects = qibuild.parsers.get_build_projects(build_worktree, args,
-                                                 default_all=True)
+                                                  default_all=True)
     qisys.actions.foreach(projects, args.command,
                           ignore_errors=args.ignore_errors)

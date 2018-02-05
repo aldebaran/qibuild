@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Common parsers for qisrc actions """
 
@@ -16,13 +16,16 @@ import qibuild.deps
 import qibuild.parsers
 import qibuild.worktree
 
+
 def worktree_parser(parser):
     qisys.parsers.worktree_parser(parser)
+
 
 def groups_parser(parser):
     """Parsers settings for groups."""
     parser.add_argument("-g", "--group", dest="groups", action="append",
                         help="Specify a group of projects.")
+
 
 def get_git_worktree(args):
     """ Get a git worktree to use
@@ -41,7 +44,7 @@ def get_git_projects(git_worktree, args,
     git_parser = GitProjectParser(git_worktree)
     groups = vars(args).get("groups")
     if groups:
-        use_build_deps=False
+        use_build_deps = False
 
     if use_build_deps:
         # To avoid getting all the projects when no project is given
@@ -56,6 +59,7 @@ def get_git_projects(git_worktree, args,
         return git_worktree.get_git_projects(groups=groups)
 
     return git_parser.parse_args(args, default_all=default_all)
+
 
 def get_one_git_project(git_worktree, args):
     parser = GitProjectParser(git_worktree)
@@ -72,13 +76,14 @@ def at_top_worktree(git_worktree):
     """ Return True if we are at the root of the worktree """
     return os.getcwd() == git_worktree.root
 
+
 class GitProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a GitWorkTree """
+
     def __init__(self, git_worktree):
         self.git_worktree = git_worktree
         self.git_projects = git_worktree.git_projects
         self.wt_parser = qisys.parsers.WorkTreeProjectParser(git_worktree.worktree)
-
 
     def all_projects(self, args):
         return self.git_worktree.git_projects
@@ -108,6 +113,7 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
     --use-deps is used.
 
     """
+
     def __init__(self, git_worktree, build_worktree):
         self.git_worktree = git_worktree
         self.build_worktree = build_worktree
@@ -138,7 +144,7 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
         """
         build_project = None
         try:
-            build_project =  self.build_parser.parse_no_project(args)[-1]
+            build_project = self.build_parser.parse_no_project(args)[-1]
         except qibuild.parsers.CouldNotGuessProjectName:
             pass
         if not build_project:

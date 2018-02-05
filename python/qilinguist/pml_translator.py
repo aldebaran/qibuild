@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 from qisys import ui
@@ -10,8 +10,10 @@ import qisys.qixml
 import qilinguist.project
 import qilinguist.qtlinguist
 
+
 def new_pml_translator(pml_path):
     return PMLTranslator(pml_path)
+
 
 class PMLTranslator(qilinguist.project.LinguistProject):
     def __init__(self, pml_path):
@@ -64,6 +66,7 @@ def translations_files_from_pml(pml_path):
     for translation_elem in translation_elems:
         res.append(translation_elem.get("src"))
     return res
+
 
 def get_name(pml_path):
     tree = qisys.qixml.read(pml_path)

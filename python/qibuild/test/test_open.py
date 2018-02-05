@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ testing for qibuild open
 
@@ -45,7 +45,7 @@ class OpenTestCase(unittest.TestCase):
             error = e
         self.assertFalse(error is None)
         self.assertFalse("Could not find any IDE in configuration" in
-            error.message)
+                         error.message)
         self.assertTrue("`qibuild open` only supports" in error.message)
 
     def test_two_ides(self):
@@ -108,6 +108,7 @@ class OpenTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.ask_patcher.stop()
+
 
 if __name__ == "__main__":
     unittest.main()

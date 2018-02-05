@@ -1,9 +1,10 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import qidoc.doxygen
+
 
 class TemplateProject(object):
     def __init__(self, doc_worktree, worktree_project):
@@ -43,7 +44,7 @@ class TemplateProject(object):
 
     @property
     def themes_path(self):
-        return  os.path.join(self.path, "sphinx", "_themes")
+        return os.path.join(self.path, "sphinx", "_themes")
 
     def __repr__(self):
         return "<TemplateProject in %s>" % self.src

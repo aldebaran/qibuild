@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import zipfile
 
@@ -13,6 +13,7 @@ import qilinguist.worktree
 import qilinguist.builder
 import qipkg.metabuilder
 
+
 def test_meta_builder(qipkg_action):
 
     qipkg_action.add_test_project("a_cpp")
@@ -21,7 +22,8 @@ def test_meta_builder(qipkg_action):
     meta_pml = os.path.join(meta_pkg_proj.path, "meta_pkg.mpml")
 
     worktree = qipkg_action.worktree
-    meta_pml_builder = qipkg.metabuilder.MetaPMLBuilder(meta_pml, worktree=worktree)
+    meta_pml_builder = qipkg.metabuilder.MetaPMLBuilder(
+        meta_pml, worktree=worktree)
 
     meta_pml_builder.configure()
     meta_pml_builder.build()

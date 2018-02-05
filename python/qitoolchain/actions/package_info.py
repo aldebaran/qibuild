@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Display info about a toolchain package """
 
@@ -8,11 +8,13 @@ from qisys import ui
 import qisys.parsers
 import qitoolchain.parsers
 
+
 def configure_parser(parser):
     """ Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     qitoolchain.parsers.toolchain_parser(parser)
     parser.add_argument("package_name")
+
 
 def do(args):
     """ Main entry point """

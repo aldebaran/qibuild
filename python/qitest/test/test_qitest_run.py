@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import sys
 import json
@@ -8,14 +8,16 @@ import json
 import qisys.command
 import qibuild.find
 
+
 def test_simple_run(tmpdir, qitest_action):
     ls = qisys.command.find_program("ls")
     tests = [
-            { "name": "ls", "cmd" : [ls], "timeout" : 1 }
+        {"name": "ls", "cmd": [ls], "timeout": 1}
     ]
     qitest_json = tmpdir.join("qitest.json")
     qitest_json.write(json.dumps(tests))
     qitest_action("run", cwd=tmpdir.strpath)
+
 
 def test_repeat_until_fail(tmpdir, qitest_action):
     ls = qisys.command.find_program("ls")
@@ -23,14 +25,15 @@ def test_repeat_until_fail(tmpdir, qitest_action):
     foo = tmpdir.join("foo")
     foo.write("this is foo\n")
     tests = [
-            {"name" : "ls", "cmd" : [ls, foo.strpath], "timeout" : 1 },
-            {"name" : "rm", "cmd" : [rm, foo.strpath], "timeout" : 1 },
+        {"name": "ls", "cmd": [ls, foo.strpath], "timeout": 1},
+        {"name": "rm", "cmd": [rm, foo.strpath], "timeout": 1},
     ]
     qitest_json = tmpdir.join("qitest.json")
     qitest_json.write(json.dumps(tests))
     rc = qitest_action("run", "--repeat-until-fail", "2",
                        cwd=tmpdir.strpath, retcode=True)
     assert rc != 0
+
 
 def test_no_capture(tmpdir, qitest_action):
     if not sys.stdout.isatty():
@@ -45,13 +48,14 @@ if not sys.stdout.isatty():
 """)
 
     tests = [
-            { "name": "test_tty", "cmd" : [sys.executable, test_tty.strpath], "timeout" : 1 }
+        {"name": "test_tty", "cmd": [sys.executable, test_tty.strpath], "timeout": 1}
     ]
     qitest_json = tmpdir.join("qitest.json")
     qitest_json.write(json.dumps(tests))
     rc = qitest_action("run", "--no-capture",
                        cwd=tmpdir.strpath, retcode=True)
     assert rc == 0
+
 
 def test_run_last_failed(tmpdir, qitest_action, record_messages):
     test_one = tmpdir.join("test_one.py")
@@ -60,9 +64,9 @@ def test_run_last_failed(tmpdir, qitest_action, record_messages):
     test_two.write("")
     qitest_json = tmpdir.join("qitest.json")
     tests = [
-              { "name": "test_one", "cmd" : [sys.executable, test_one.strpath], "timeout" : 1},
-              { "name": "test_two", "cmd" : [sys.executable, test_two.strpath], "timeout" : 1},
-           ]
+        {"name": "test_one", "cmd": [sys.executable, test_one.strpath], "timeout": 1},
+        {"name": "test_two", "cmd": [sys.executable, test_two.strpath], "timeout": 1},
+    ]
     qitest_json.write(json.dumps(tests))
     qitest_action.chdir(tmpdir)
     qitest_action("run", retcode=True)
@@ -76,16 +80,18 @@ def test_run_last_failed(tmpdir, qitest_action, record_messages):
     qitest_action("run", "--last-failed", retcode=True)
     assert record_messages.find("No failing tests found")
 
+
 def test_exclude(tmpdir, qitest_action):
     tests = [
-      { "name" : "foo", "cmd" : [sys.executable, "--version"]},
-      { "name" : "bar", "cmd" : [sys.executable , "-c", "import sys ; sys.exit(1)"]}
+        {"name": "foo", "cmd": [sys.executable, "--version"]},
+        {"name": "bar", "cmd": [sys.executable, "-c", "import sys ; sys.exit(1)"]}
     ]
     qitest_json = tmpdir.join("qitest.json")
     qitest_json.write(json.dumps(tests))
     rc = qitest_action("run", "--exclude", "bar", cwd=tmpdir.strpath,
-            retcode=True)
+                       retcode=True)
     assert rc == 0
+
 
 def test_ignore_timeouts(qitest_action, tmpdir):
     qitest_json = tmpdir.join("qitest.json")
@@ -98,6 +104,7 @@ def test_ignore_timeouts(qitest_action, tmpdir):
     rc = qitest_action("run", "--qitest-json", qitest_json.strpath, "--ignore-timeouts",
                        retcode=True)
     assert rc == 0
+
 
 def test_action_coverage(qibuild_action, qitest_action):
     gcovr = qisys.command.find_program("gcovr", raises=False)

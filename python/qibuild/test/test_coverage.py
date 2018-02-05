@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Automatic testing for qibuild with coverage option
 
@@ -31,4 +31,3 @@ def test_generate_reports(qibuild_action):
     expected_path_html = os.path.join(proj.path, proj.name + ".html")
     assert os.path.exists(expected_path_xml)
     assert os.path.exists(expected_path_html)
-

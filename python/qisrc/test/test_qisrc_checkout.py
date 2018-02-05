@@ -1,11 +1,12 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree
 from qisrc.test.conftest import TestGit
+
 
 def test_checkout_happy(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
@@ -22,6 +23,7 @@ def test_checkout_happy(qisrc_action, git_server):
     bar_proj = git_worktree.get_git_project("bar")
     bar_git = qisrc.git.Git(bar_proj.path)
     assert bar_git.get_current_branch() == "master"
+
 
 def test_checkout_preserve_changes_when_checkout_fails(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
@@ -44,6 +46,7 @@ def test_checkout_preserve_changes_when_checkout_fails(qisrc_action, git_server)
     qisrc_action("checkout", "devel", "--force")
     assert foo_git.get_current_branch() == "devel"
 
+
 def test_checkout_creates_at_correct_place(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
@@ -57,6 +60,7 @@ def test_checkout_creates_at_correct_place(qisrc_action, git_server):
     git = TestGit(foo_proj.path)
     git.read_file("foo.txt")
 
+
 def test_checkout_non_existing_branch(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
@@ -65,6 +69,7 @@ def test_checkout_non_existing_branch(qisrc_action, git_server):
     qisrc_action("init", manifest_url, "--branch", "master")
     error = qisrc_action("checkout", "does-not-exists", raises=True)
     assert "Update failed" in error
+
 
 def test_skip_checkout_when_possible(qisrc_action, git_server, record_messages):
     manifest_url = git_server.manifest_url
@@ -75,6 +80,7 @@ def test_skip_checkout_when_possible(qisrc_action, git_server, record_messages):
     qisrc_action("init", manifest_url, "--branch", "master")
     qisrc_action("checkout", "devel")
     assert not record_messages.find("Checkout bar")
+
 
 def test_using_force_when_not_an_a_branch(qisrc_action, git_server):
     git_server.create_repo("foo.git")
@@ -88,6 +94,7 @@ def test_using_force_when_not_an_a_branch(qisrc_action, git_server):
     assert not git.get_current_branch()
     qisrc_action("checkout", "master", "--force")
     assert git.get_current_branch() == "master"
+
 
 def test_retcode_when_checkout_fails(qisrc_action, git_server):
     git_server.create_repo("foo.git")
@@ -104,6 +111,7 @@ def test_retcode_when_checkout_fails(qisrc_action, git_server):
 
     rc = qisrc_action("checkout", "devel", retcode=True)
     assert rc != 0
+
 
 def test_qisrc_checkout_when_no_group(qisrc_action, git_server):
     git_server.create_group("default", ["a", "b"], default=True)

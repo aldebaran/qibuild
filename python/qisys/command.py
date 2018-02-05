@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ This module contains few functions around subprocess
 
@@ -23,6 +23,7 @@ _FIND_PROGRAM_CACHE = dict()
 
 SIGINT_EVENT = threading.Event()
 
+
 class Process(object):
     """ A simple way to run commands.
 
@@ -43,12 +44,12 @@ class Process(object):
     * Process.ZOMBIE (could not kill process after it timed out)
     """
 
-    OK          = 0
-    FAILED      = 1
-    TIME_OUT    = 2
-    ZOMBIE      = 3
+    OK = 0
+    FAILED = 1
+    TIME_OUT = 2
+    ZOMBIE = 3
     INTERRUPTED = 4
-    NOT_RUN     = 5
+    NOT_RUN = 5
 
     def __init__(self, cmd, cwd=None, env=None, capture=True):
         self.cmd = cmd
@@ -77,8 +78,8 @@ class Process(object):
                         'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP,
                     }
                 kwargs = {
-                        "cwd": self.cwd,
-                        "env" : self.env
+                    "cwd": self.cwd,
+                    "env": self.env
                 }
                 kwargs.update(opts)
                 if self.capture:
@@ -89,6 +90,7 @@ class Process(object):
                 self.exception = e
                 self.return_type = Process.NOT_RUN
                 return
+
             def read_target():
                 self.out = self._process.communicate()[0]
             self._should_stop_reading = False
@@ -151,6 +153,7 @@ class Process(object):
         self._should_stop_reading = True
         self._thread.join()
 
+
 def str_from_signal(code):
     """ Return a description about what happened when the
     retcode of a program is less than zero
@@ -166,8 +169,10 @@ def str_from_signal(code):
         return "Aborted"
     return "%i" % code
 
+
 class CommandFailedException(Exception):
     """Custom exception """
+
     def __init__(self, cmd, returncode, cwd=None, stdout=None, stderr=None):
         self.cmd = cmd
         self.cwd = cwd
@@ -182,7 +187,7 @@ class CommandFailedException(Exception):
             self.stderr = ""
 
     def __str__(self):
-        mess  = """The following command failed
+        mess = """The following command failed
 {cmd}
 Return code is {returncode}
 Working dir was {cwd}
@@ -191,14 +196,16 @@ Working dir was {cwd}
                            cwd=self.cwd)
         if self.stdout:
             mess += "Stdout: \n"
-            mess  = "\n".join("    " + line for line in self.stdout.split("\n"))
+            mess = "\n".join("    " + line for line in self.stdout.split("\n"))
         if self.stderr:
             mess += "Stderr: \n"
-            mess  = "\n".join("    " + line for line in self.stderr.split("\n"))
+            mess = "\n".join("    " + line for line in self.stderr.split("\n"))
         return mess
+
 
 class ProcessCrashedError(Exception):
     """An other custom exception, used by call_background """
+
     def __init__(self, cmd):
         self.cmd = cmd
 
@@ -207,8 +214,10 @@ class ProcessCrashedError(Exception):
         mess += "Full command: %s" % self.cmd
         return mess
 
+
 class NotInPath(Exception):
     """Custom exception """
+
     def __init__(self, executable, env=None):
         self.executable = executable
         self.env = env
@@ -218,7 +227,7 @@ class NotInPath(Exception):
             path_env = self.env.get("PATH")
         else:
             path_env = os.environ["PATH"]
-        mess  = "Could not find executable: %s\n" % self.executable
+        mess = "Could not find executable: %s\n" % self.executable
         mess += "Looked in:\n"
         mess += "\n".join(path_env.split(os.pathsep))
         return mess
@@ -266,11 +275,13 @@ def _find_program_in_path_win(executable, path):
         if res:
             return res
 
+
 def _find_program_in_path(executable, path):
     if os.name == 'nt':
         return _find_program_in_path_win(executable, path)
     else:
         return _check_access(executable, path)
+
 
 def _check_access(executable, path):
     full_path = os.path.join(path, executable)
@@ -278,7 +289,7 @@ def _check_access(executable, path):
         return full_path
 
 
-## Implementation widely inspired by the python-2.7 one.
+# Implementation widely inspired by the python-2.7 one.
 def check_output(*popenargs, **kwargs):
     r"""Run command with arguments and return its output as a byte string.
 
@@ -375,6 +386,7 @@ def check_is_in_path(executable, env=None):
     if find_program(executable, env=env) is None:
         raise NotInPath(executable, env=env)
 
+
 def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
     """ Execute a command line.
 
@@ -407,11 +419,11 @@ def call(cmd, cwd=None, env=None, ignore_ret_code=False, quiet=False):
             # We know we are likely to have a problem on windows here,
             # so always raise.
             raise Exception("Trying to to run %s in non-existing %s" %
-                (" ".join(cmd), cwd))
+                            (" ".join(cmd), cwd))
 
     ui.debug("Calling:", " ".join(cmd))
 
-    call_kwargs = {"env":env, "cwd":cwd}
+    call_kwargs = {"env": env, "cwd": cwd}
     if quiet or ui.CONFIG.get("quiet"):
         call_kwargs["stdout"] = subprocess.PIPE
     returncode = subprocess.call(cmd, **call_kwargs)
@@ -458,6 +470,6 @@ def call_background(cmd, cwd=None, env=None):
         except ProcessCrashedError, err:
             caught_error = err
     if caught_error:
-    #pylint: disable-msg=E0702
-    #(we are not going to raise None...)
+        # pylint: disable-msg=E0702
+        #(we are not going to raise None...)
         raise caught_error

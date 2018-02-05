@@ -1,11 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
+
 
 class FakeInteract(object):
     """ A class to tests code depending on qisys.interact
 
     """
+
     def __init__(self):
         self.answers_type = None
         self.answer_index = -1
@@ -41,12 +43,12 @@ class FakeInteract(object):
                 if answer in choices:
                     return answer
                 else:
-                    mess  = "Would answer %s\n" % answer
+                    mess = "Would answer %s\n" % answer
                     mess += "But choices are: %s\n" % choices
                     raise Exception(mess)
         if default is not None:
             return default
-        mess  = "Could not find answer for\n  :: %s\n" % message
+        mess = "Could not find answer for\n  :: %s\n" % message
         mess += "Known keys are: %s" % ", ".join(keys)
         raise Exception(mess)
 
@@ -82,7 +84,7 @@ class FakeInteract(object):
 
     def ask_program(self, message):
         print "::", message
-        answer =  self._get_answer(message)
+        answer = self._get_answer(message)
         print ">", answer
         return answer
 

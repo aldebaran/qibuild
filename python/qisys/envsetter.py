@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 r""" This module contains the :py:class:`EnvSetter` class,
 designed to take care of environment variables.
@@ -13,6 +13,7 @@ import subprocess
 
 import qisys
 import qisys.sh
+
 
 class EnvSetter(object):
     r""" A class to manage environment variables
@@ -40,6 +41,7 @@ class EnvSetter(object):
     """
     # Note: always use .copy() when working with dict, else you end up
     # returning a *reference* to the directory ...
+
     def __init__(self, build_env=None):
         if not build_env:
             build_env = os.environ.copy()
@@ -98,7 +100,6 @@ class EnvSetter(object):
         """
         self.prepend_directory_to_variable(directory, "PATH")
 
-
     def source_bat(self, bat_file):
         """Set environment variables using a .bat script
 
@@ -119,15 +120,15 @@ class EnvSetter(object):
         result = {}
 
         process = subprocess.Popen('"%s"& set' % (bat_file),
-                             stdout=subprocess.PIPE,
-                             shell=True)
+                                   stdout=subprocess.PIPE,
+                                   shell=True)
         (out, err) = process.communicate()
         if process.returncode != 0:
-            mess  = "Calling %s failed\n" % bat_file
+            mess = "Calling %s failed\n" % bat_file
             mess += "Error was: %s" % err
             raise Exception(mess)
 
-        #pylint: disable-msg=E1103
+        # pylint: disable-msg=E1103
         for line in out.split("\n"):
             if '=' not in line:
                 continue
@@ -143,7 +144,6 @@ class EnvSetter(object):
             directories = directories_list.split(os.path.pathsep)
             for directory in directories:
                 self.prepend_directory_to_variable(directory, variable)
-
 
     def read_config(self, qibuild_cfg):
         """ Read a :py:class:`qibuild.config.QiBuildConfig` instance

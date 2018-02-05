@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import argparse
 import json
@@ -35,6 +35,7 @@ def read_install_manifest(filepath):
         res = [qisys.sh.to_posix_path(x) for x in res]
         res = [x.lstrip("/") for x in res]
         return res
+
 
 def write_qi_path_conf(directory, sdk_dirs, sdk_layout=True):
     """ Write the <build>/sdk/share/qi/path.conf file. This file
@@ -140,7 +141,7 @@ class BuildProject(object):
                     if var_type == "UNINITIALIZED":
                         continue
                     var_value = r[sep2 + 1:-1]
-                    cmake_vars[var_name] = { "value": var_value, "type": var_type }
+                    cmake_vars[var_name] = {"value": var_value, "type": var_type}
         except Exception:
             cmake_vars = dict()
         return cmake_vars
@@ -180,8 +181,7 @@ class BuildProject(object):
         default = self.build_config.build_type
         return qibuild.cmake.get_cached_var(self.build_directory,
                                             "CMAKE_BUILD_TYPE",
-                                             default=default)
-
+                                            default=default)
 
     @property
     def using_visual_studio(self):
@@ -258,7 +258,6 @@ endif()
 set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 """ % qibuild_python
 
-
         qisys.sh.mkdir(self.build_directory, recursive=True)
         dep_cmake = os.path.join(self.build_directory, "dependencies.cmake")
         qisys.sh.write_file_if_different(to_write, dep_cmake)
@@ -301,13 +300,14 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         parser.add_argument("--env", action="append",
                             dest="environment")
         parser.set_defaults(nightly=False, perf=False)
+
         def log_error(message, line):
             test_name = line.split(";")[1]
             mess = "Could not parse test options for test: '%s'\n" % test_name
             mess += "Error was: %s" % message
             ui.error(mess)
         for line in lines:
-            parser.error = lambda message : log_error(message, line)
+            parser.error = lambda message: log_error(message, line)
             line = line.strip()
             try:
                 args = parser.parse_args(args=line.split(";"))
@@ -320,7 +320,6 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             tests.append(test)
         with open(self.qitest_json, "w") as fp:
             json.dump(tests, fp, indent=2)
-
 
     def build(self, rebuild=False, target=None,
               coverity=False, env=None):
@@ -344,7 +343,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
 
         if rebuild:
             cmd += ["--clean-first"]
-        cmd += [ "--" ]
+        cmd += ["--"]
         cmd += self.parse_num_jobs(self.build_config.num_jobs)
 
         if not env:
@@ -372,17 +371,17 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         """ Convert a number of jobs to a list of cmake args """
         if not cmake_generator:
             cmake_generator = \
-                    qibuild.cmake.get_cached_var(self.build_directory, "CMAKE_GENERATOR")
+                qibuild.cmake.get_cached_var(self.build_directory, "CMAKE_GENERATOR")
         if num_jobs is None:
             # By default, use the "good" number just like Ninja
             if "Visual Studio" in cmake_generator:
                 return ["/maxcpucount"]
             return list()
         if "Unix Makefiles" in cmake_generator or \
-            "Ninja" in cmake_generator:
+                "Ninja" in cmake_generator:
             return ["-j", str(num_jobs)]
         if cmake_generator == "NMake Makefiles":
-            mess   = "-j is not supported for %s\n" % cmake_generator
+            mess = "-j is not supported for %s\n" % cmake_generator
             mess += "On Windows, you can use Jom or Ninja instead to compile "
             mess += "with multiple processors"
             raise Exception(mess)
@@ -393,7 +392,6 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             return ["/maxcpucount:%i" % num_jobs]
         ui.warning("Unknown generator: %s, ignoring -j option" % cmake_generator)
         return list()
-
 
     def install(self, destdir, prefix="/", components=None,
                 split_debug=False):
@@ -427,9 +425,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
                                                "CMAKE_INSTALL_PREFIX")
         if cprefix != prefix:
             qibuild.cmake.cmake(self.path, self.build_directory,
-                ['-DCMAKE_INSTALL_PREFIX=%s' % prefix],
-                clean_first=False,
-                env=build_env)
+                                ['-DCMAKE_INSTALL_PREFIX=%s' % prefix],
+                                clean_first=False,
+                                env=build_env)
         else:
             mess = "Skipping configuration of project %s\n" % self.name
             mess += "CMAKE_INSTALL_PREFIX is already correct"
@@ -464,7 +462,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         cmake_args += ["-P", "cmake_install.cmake", "--"]
         ui.debug("Installing", component)
         qisys.command.call(["cmake"] + cmake_args, cwd=self.build_directory,
-                            env=build_env)
+                           env=build_env)
         manifest_path = os.path.join(self.build_directory, "install_manifest_%s.txt" % component)
         installed = read_install_manifest(manifest_path)
         return installed
@@ -534,17 +532,17 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
         tool_paths = dict()
         for name in ["objcopy", "objdump"]:
             tool_path = qibuild.cmake.get_binutil(name,
-                                                    build_dir=self.build_directory,
-                                                    env=self.build_env)
+                                                  build_dir=self.build_directory,
+                                                  env=self.build_env)
             tool_paths[name] = tool_path
 
         missing = [x for x in tool_paths if not tool_paths[x]]
         if missing:
-            mess  = """\
+            mess = """\
 Could not split debug symbols from binaries for project {name}.
 The following tools were not found: {missing}\
 """
-            mess = mess.format(name=self.name, missing = ", ".join(missing))
+            mess = mess.format(name=self.name, missing=", ".join(missing))
             ui.warning(mess)
             return
         for filename in file_list:
@@ -651,6 +649,7 @@ The following tools were not found: {missing}\
 
 class BadProjectConfig(Exception):
     pass
+
 
 class NoQiTestJson(Exception):
     def __str__(self):

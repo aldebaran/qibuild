@@ -1,8 +1,9 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 from qisys.test.conftest import TestWorkTree
+
 
 def test_get_set_license(worktree):
     foo = worktree.create_project("foo")

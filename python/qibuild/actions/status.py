@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Display the status of each project
 """
@@ -14,9 +14,11 @@ from qisys import ui
 import qisys.parsers
 import qibuild.parsers
 
+
 def usage():
     "Specific usage"
     return """status [--all, -a] [projects...]"""
+
 
 def configure_parser(parser):
     """Configure parser for this action """
@@ -45,11 +47,11 @@ def list_build_dir(path):
             ctim = time.time()
             ftim = os.path.getmtime(bdir)
             delta = ctim - ftim
-            ddelta = datetime.timedelta(seconds = delta)
+            ddelta = datetime.timedelta(seconds=delta)
             todisplay = ""
             if ddelta.days > 0:
                 todisplay = "%d days, %d hours" % \
-                        (ddelta.days, ddelta.seconds / 3600)
+                    (ddelta.days, ddelta.seconds / 3600)
             elif ddelta.seconds > 3600:
                 todisplay = "%d hours" % (ddelta.seconds / 3600)
             else:

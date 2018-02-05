@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Common filesystem operations """
 
@@ -32,12 +32,14 @@ CONFIG_PATH = xdg_config_home
 CACHE_PATH = xdg_cache_home
 SHARE_PATH = xdg_data_home
 
+
 def set_home(home):
     global CONFIG_PATH, CACHE_PATH, SHARE_PATH
 
     CONFIG_PATH = os.path.join(home, "config")
     CACHE_PATH = os.path.join(home, "cache")
     SHARE_PATH = os.path.join(home, "share")
+
 
 def get_config_path(*args):
     """ Get a config path to read or write some configuration.
@@ -48,6 +50,7 @@ def get_config_path(*args):
     """
     return get_path(CONFIG_PATH, *args)
 
+
 def get_cache_path(*args):
     """ Get a config path to read or write some cached data
 
@@ -56,6 +59,7 @@ def get_cache_path(*args):
 
     """
     return get_path(CACHE_PATH, *args)
+
 
 def get_share_path(*args):
     """ Get a config path to read or write some persistent data
@@ -66,6 +70,7 @@ def get_share_path(*args):
     """
     return get_path(SHARE_PATH, *args)
 
+
 def get_path(*args):
     """ Helper for get_*_path methods """
     full_path = os.path.join(*args)
@@ -73,6 +78,7 @@ def get_path(*args):
     mkdir(to_make, recursive=True)
     full_path = to_native_path(full_path)
     return full_path
+
 
 def username():
     """ Get the current user name """
@@ -84,7 +90,8 @@ def username():
             return pw_info.pw_name
     username = os.environ.get("USERNAME")
     if username:
-         return username
+        return username
+
 
 def mkdir(dest_dir, recursive=False):
     """ Recursive mkdir (do not fail if file exists) """
@@ -101,7 +108,7 @@ def mkdir(dest_dir, recursive=False):
             raise
 
 
-#pylint: disable-msg=C0103
+# pylint: disable-msg=C0103
 def ln(src, dst, symlink=True):
     """ ln (do not fail if file exists) """
     try:
@@ -114,6 +121,7 @@ def ln(src, dst, symlink=True):
             pass
         else:
             raise
+
 
 def write_file_if_different(data, out_path, mode="w"):
     """ Write the data to out_path if the content is different
@@ -160,7 +168,7 @@ def _copy_link(src, dest, quiet):
         raise Exception("%s is not a link!" % src)
 
     target = os.readlink(src)
-        #remove existing stuff
+    # remove existing stuff
     if os.path.lexists(dest):
         rm(dest)
     if sys.stdout.isatty() and not quiet:
@@ -264,7 +272,7 @@ def install(src, dest, filter_fun=None, quiet=False):
     src = to_native_path(src, normcase=False)
     dest = to_native_path(dest, normcase=False)
     ui.debug("Installing", src, "->", dest)
-    #pylint: disable-msg=E0102
+    # pylint: disable-msg=E0102
     # (function IS already defined, that's the point!)
     if filter_fun is None:
         def filter_fun(_unused):
@@ -274,7 +282,7 @@ def install(src, dest, filter_fun=None, quiet=False):
         if src == dest:
             raise Exception("source and destination are the same directory")
         for (root, dirs, files) in os.walk(src):
-            dirs = _handle_dirs (src, dest, root, dirs,  filter_fun, quiet)
+            dirs = _handle_dirs(src, dest, root, dirs,  filter_fun, quiet)
             files = _handle_files(src, dest, root, files, filter_fun, quiet)
             installed.extend(files)
     else:
@@ -310,6 +318,7 @@ def safe_copy(src, dest):
     if not up_to_date(dest, src):
         shutil.copy(src, dest)
 
+
 def up_to_date(output_path, input_path):
     """" Return True if output_path exists and is
     more recent than input_path
@@ -329,7 +338,7 @@ def copy_git_src(src, dest):
 
     """
     process = subprocess.Popen(["git", "ls-files", "."], cwd=src,
-                                stdout=subprocess.PIPE)
+                               stdout=subprocess.PIPE)
     (out, _) = process.communicate()
     for filename in out.splitlines():
         src_file = os.path.join(src, filename)
@@ -395,7 +404,8 @@ def rmtree(path):
         try:
             # Unable to import 'XX'
             # pylint: disable=F0401
-            import win32api, win32con
+            import win32api
+            import win32con
         except ImportError:
             pass
     else:
@@ -491,7 +501,7 @@ def which(program):
     """
     import warnings
     warnings.warn("qisys.sh.which is deprecated, "
-     "use qisys.command.find_program instead")
+                  "use qisys.command.find_program instead")
     from qisys.command import find_program
     return find_program(program)
 
@@ -557,6 +567,7 @@ def is_path_inside(a, b):
             return False
     return True
 
+
 def is_empty(path):
     """ Check if a path is empty """
     return os.listdir(path) == list()
@@ -581,6 +592,7 @@ class TempDir:
       and DEBUG environment variable is set.
 
     """
+
     def __init__(self, name="tmp"):
         self._temp_dir = tempfile.mkdtemp(prefix=name + "-")
 
@@ -685,10 +697,12 @@ def is_executable_binary(file_path):
         return False
     return is_binary(file_path)
 
+
 class PreserveFileMetadata(object):
     """ Preserve file metadata (permissions and times)
 
     """
+
     def __init__(self, path):
         """ Preserve file metadata of 'path'
         """

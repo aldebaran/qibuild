@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Tools to profile cmake execution
 
@@ -33,7 +33,7 @@ def parse_cmake_log(input, qibuild_dir):
                 continue
             # 9 is len("/qibuild/")
             filename = filename[len(qibuild_dir) + 9:]
-            filename = filename.replace("\\" , "/" )
+            filename = filename.replace("\\", "/")
             line_no = int(line_no)
             if not filename in profile:
                 profile[filename] = dict()
