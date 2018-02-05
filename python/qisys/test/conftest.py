@@ -32,6 +32,9 @@ class TestWorkTree(qisys.worktree.WorkTree):
     can create projects
 
     """
+
+    __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
+
     def __init__(self, root=None):
         if root is None:
             # TestWorkTree is often used with cd_to_tmpdir fixture,

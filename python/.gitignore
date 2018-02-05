@@ -8,5 +8,5 @@ qibuild.egg-info/
 .pytest
 
 # Coverage
-.coverage
+.coverage*
 htmlcov/

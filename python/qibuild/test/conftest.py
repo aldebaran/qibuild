@@ -15,6 +15,9 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
     can create git projects
 
     """
+
+    __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect
+
     def __init__(self, worktree=None):
         if not worktree:
             worktree = TestWorkTree()

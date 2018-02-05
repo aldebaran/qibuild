@@ -27,7 +27,7 @@ def is_url(location):
     return "://" in location
 
 def raise_parse_error(package_tree, feed, message):
-    """ Raise a nice pasing error about the given
+    """ Raise a nice parsing error about the given
     package_tree element.
 
     """
@@ -51,11 +51,11 @@ def tree_from_feed(feed_location, branch=None, name=None):
             if is_url(feed_location):
                 fp = qisys.remote.open_remote_location(feed_location)
             else:
-                raise Exception("Feed location is not an existing path nor an url")
+                raise Exception("Could not parse %s: Feed location is not an existing path nor an url" % feed_location)
         tree = ElementTree.ElementTree()
         tree.parse(fp)
-    except Exception:
-        ui.error("Could not parse", feed_location)
+    except Exception as e:
+        ui.error(e.message)
         raise
     finally:
         if fp:
@@ -147,18 +147,16 @@ class ToolchainFeedParser:
         for feed_tree in feeds:
             feed_name = feed_tree.get("name")
             feed_url = feed_tree.get("url")
+            feed_path = feed_tree.get("path")
+            assert feed_path or feed_url, "Either 'url' or 'path' attributes must be set in a 'feed' non-root element"
             # feed_url can be relative to feed:
-            if feed_tree.get("path") and branch:
+            if feed_path and branch:
                 feed_path = os.path.join(tc_path + ".git", feed_tree.get("path"))
                 self.parse(feed_path)
-                if feed_name:
-                    self.parse(feed_path, branch=branch, name=feed_name, first_pass=False)
             elif feed_url:
                 if not is_url(feed_url):
                     feed_url = urlparse.urljoin(feed, feed_url)
                 self.parse(feed_url)
-                if feed_name:
-                    self.parse(feed, branch=branch, name=feed_name, first_pass=False)
         select_tree = tree.find("select")
         if select_tree is not None:
             blacklist_trees = select_tree.findall("blacklist")

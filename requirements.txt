@@ -18,11 +18,11 @@ pyenchant==1.6.6
 breathe==4.1.0
 
 # For tests
-mock==1.0.1
-pytest==3.2.3
-pytest-cov==1.6
-pytest-timeout==1.0.0
-pytest-xdist==1.13.1
+mock==2.0.0
+pytest==3.4.0
+pytest-cov==2.5.1
+pytest-timeout==1.2.1
+pytest-xdist==1.22.0
 
 # For qidoc tests
 BeautifulSoup4==4.2.1
@@ -31,12 +31,15 @@ sphinxcontrib-spelling==2.1.1
 sphinx-intl==0.9.5
 
 # For coverage
-cov-core==1.7
-coverage==3.6
-gcovr==3.2
+cov-core==1.15.0
+coverage==4.4.2
+gcovr==3.3
 
 # For more checks, thanks pyflakes
-pyflakes==0.6.1
+pyflakes==1.6.0
 
 # For ls-package
 tabulate==0.7.5
+
+# For py2 py3 compat
+six==1.11.0

@@ -19,8 +19,11 @@ debian/qibuild/
 # IDE project's files
 .idea
 
-# Transient files
+# Generic transient files
 *~
 ~*
 *.log
 
+# PyTest transient files
+.cache
+.pytest_cache
