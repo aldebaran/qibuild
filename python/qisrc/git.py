@@ -57,9 +57,9 @@ class Git(object):
     def _call(self, *args, **kwargs):
         """ Helper for self.call """
         ui.debug("git", " ".join(args), "in", self.repo)
-        if not "cwd" in kwargs.keys():
+        if "cwd" not in kwargs.keys():
             kwargs["cwd"] = self.repo
-        if not "quiet" in kwargs.keys():
+        if "quiet" not in kwargs.keys():
             kwargs["quiet"] = False
         git = qisys.command.find_program("git", raises=True)
         cmd = [git]

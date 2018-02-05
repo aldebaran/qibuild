@@ -25,7 +25,7 @@ def do(args):
     qipackage = None
     try:
         qipackage = qitoolchain.qipackage.from_archive(package_path)
-    except:
+    except Exception:
         pass
     res = None
     if qipackage:

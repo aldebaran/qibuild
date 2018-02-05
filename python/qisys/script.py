@@ -218,7 +218,7 @@ def root_command_main(name, parser, modules, args=None):
         if not action:
             parser.print_help()
         else:
-            if not action in action_modules:
+            if action not in action_modules:
                 print "Invalid action!"
                 print "Choose between: ", " ".join(action_modules.keys())
                 print

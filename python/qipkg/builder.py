@@ -220,8 +220,8 @@ Error when parsing {pml_path}
         :param: force make package even if it does not satisfy
                                default package requirements
 
-        :param install_tc_packages also install toolchain 
-                               packages 
+        :param install_tc_packages also install toolchain
+                               packages
         """
         output = kwargs.get('output', None)
         force = kwargs.get('force', False)

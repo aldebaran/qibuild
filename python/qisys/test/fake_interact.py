@@ -25,9 +25,9 @@ class FakeInteract(object):
     @answers.setter
     # pylint: disable-msg=E0102
     def answers(self, value):
-        if type(value) == type(dict()):
+        if isinstance(value, dict):
             self.answers_type = "dict"
-        elif type(value) == type(list()):
+        elif isinstance(value, list):
             self.answers_type = "list"
         else:
             raise Exception("Unknow answer type: " + type(value))

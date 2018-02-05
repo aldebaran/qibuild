@@ -80,7 +80,7 @@ def do(args):
             to_reset = "%s/%s" % (remote, branch)
         try:
             qisrc.reset.clever_reset_ref(git_project, to_reset)
-        except:
+        except Exception:
             errors.append(src)
 
     if not errors:

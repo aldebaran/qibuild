@@ -13,10 +13,10 @@ class Svn(object):
         self.path = path
 
     def call(self, *args, **kwargs):
-        if not "cwd" in kwargs.keys():
+        if "cwd" not in kwargs.keys():
             kwargs["cwd"] = self.path
         ui.debug("svn", " ".join(args), "in", kwargs["cwd"])
-        if not "quiet" in kwargs.keys():
+        if "quiet" not in kwargs.keys():
             kwargs["quiet"] = False
         svn = qisys.command.find_program("svn", raises=True)
         cmd = [svn]

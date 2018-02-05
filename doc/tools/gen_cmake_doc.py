@@ -6,6 +6,10 @@
 
 """
 
+import re
+import os
+import sys
+
 DOCUMENTED_FILES = [
     "log",
     "target",
@@ -24,10 +28,6 @@ DOCUMENTED_FILES = [
     "swig/java",
     "subdirectory",
 ]
-
-import re
-import os
-import sys
 
 
 def clean_comment(line):

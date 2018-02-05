@@ -7,9 +7,9 @@ import json
 
 
 def add_test(output, **kwargs):
-    if not "name" in kwargs:
+    if "name" not in kwargs:
         raise Exception("Should provide a test name")
-    if not "cmd" in kwargs:
+    if "cmd" not in kwargs:
         raise Exception("Should provide a test cmd")
     tests = list()
     if os.path.exists(output):

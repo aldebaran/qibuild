@@ -74,7 +74,7 @@ def _install_package(url, pkg_name, pkg_path):
             "Removing previous installation of the package")
     try:
         package_manager.removePkg(pkg_name)
-    except:
+    except Exception:
         pass
     ui.info(ui.blue, "::",
             ui.reset, ui.bold,

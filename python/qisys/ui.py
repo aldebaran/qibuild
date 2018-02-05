@@ -25,7 +25,7 @@ if os.name == 'nt':
         # pylint: disable-msg=F0401
         from pyreadline.console import Console
         _console = Console()
-    except:
+    except Exception:
         HAS_PYREADLINE = False
 
 # ANSI color codes, as classes,
@@ -388,7 +388,7 @@ def _get_console_size_windows():
         h = windll.kernel32.GetStdHandle(-12)
         csbi = create_string_buffer(22)
         res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
-    except:
+    except Exception:
         return None
     if res:
         import struct
@@ -413,7 +413,7 @@ def _get_console_size_tput():
         output = proc.communicate(input=None)
         rows = int(output[0])
         return (cols, rows)
-    except:
+    except Exception:
         return None
 
 
@@ -425,7 +425,7 @@ def _get_console_size_linux():
             import struct
             import os
             cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
-        except:
+        except Exception:
             return None
         return cr
     cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
@@ -434,12 +434,12 @@ def _get_console_size_linux():
             fd = os.open(os.ctermid(), os.O_RDONLY)
             cr = ioctl_GWINSZ(fd)
             os.close(fd)
-        except:
+        except Exception:
             pass
     if not cr:
         try:
             cr = (os.environ['LINES'], os.environ['COLUMNS'])
-        except:
+        except Exception:
             return None
     return int(cr[1]), int(cr[0])
 

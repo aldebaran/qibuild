@@ -93,9 +93,9 @@ class SphinxProject(qidoc.project.DocProject):
         path_list = []
         self.append_doxy_xml_path(path_list)
         return (
-            "\nqiapidoc_srcs=["
-            + ','.join(map(lambda x: "r'" + x + "'", path_list))
-            + "]\n")
+            "\nqiapidoc_srcs=[" +
+            ','.join(map(lambda x: "r'" + x + "'", path_list)) +
+            "]\n")
 
     def append_doxylink_settings(self, conf, rel_paths=False):
         """ Return a string representing the doxylink settings """

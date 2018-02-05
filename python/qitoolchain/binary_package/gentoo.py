@@ -21,7 +21,7 @@ class GentooPackage(BinaryPackage):
 
     """
     # regex copied from portage.versions source
-    _PN = r'(?P<pn>[\w+][\w+-]*?(?P<pn_inval>-(cvs\.)?(\d+)((\.\d+)*)([a-z]?)((_(pre|p|beta|alpha|rc)\d*)*)(-r(\d+))?)?)'
+    _PN = r'(?P<pn>[\w+][\w+-]*?(?P<pn_inval>-(cvs\.)?(\d+)((\.\d+)*)([a-z]?)((_(pre|p|beta|alpha|rc)\d*)*)(-r(\d+))?)?)'  # noqa
     _PV = r'(?P<ver>(cvs\.)?(\d+)((\.\d+)*)([a-z]?)((_(pre|p|beta|alpha|rc)\d*)*))'
     _PR = r'(-r(?P<rev>\d+))?'
     _PF = r'^' + _PN + '-' + _PV + _PR + '$'

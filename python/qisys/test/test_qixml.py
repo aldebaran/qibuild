@@ -9,29 +9,29 @@ from xml.etree import ElementTree as etree
 
 def test_qixml_parse_bool_attr():
     tree = etree.fromstring("<foo />")
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) == True
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) == False
-    assert qisys.qixml.parse_bool_attr(tree, "bar") == False
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) is True
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) is False
+    assert qisys.qixml.parse_bool_attr(tree, "bar") is False
 
     tree = etree.fromstring("<foo bar=\"true\" />")
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) == True
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) == True
-    assert qisys.qixml.parse_bool_attr(tree, "bar") == True
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) is True
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) is True
+    assert qisys.qixml.parse_bool_attr(tree, "bar") is True
 
     tree = etree.fromstring("<foo bar=\"false\" />")
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) == False
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) == False
-    assert qisys.qixml.parse_bool_attr(tree, "bar") == False
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) is False
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) is False
+    assert qisys.qixml.parse_bool_attr(tree, "bar") is False
 
     tree = etree.fromstring("<foo bar=\"1\" />")
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) == True
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) == True
-    assert qisys.qixml.parse_bool_attr(tree, "bar") == True
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) is True
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) is True
+    assert qisys.qixml.parse_bool_attr(tree, "bar") is True
 
     tree = etree.fromstring("<foo bar=\"0\" />")
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) == False
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) == False
-    assert qisys.qixml.parse_bool_attr(tree, "bar") == False
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) is False
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) is False
+    assert qisys.qixml.parse_bool_attr(tree, "bar") is False
 
     tree = etree.fromstring("<foo bar=\"blaaaah\" />")
 
@@ -167,8 +167,8 @@ def test_complex_xml_parser():
     parser = FooParser(foo2)
     parser.parse(foo_xml)
     assert foo2.bar.baz == "Baz!"
-    foo.spam == 42
-    foo.eggs == True
+    assert foo.spam == 42
+    assert foo.eggs is True
 
 
 def test_list_attr():

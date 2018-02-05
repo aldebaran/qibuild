@@ -23,7 +23,7 @@ def test_simple_parse(tmpdir):
 @qibuild_root@/qibuild/internal/stage.cmake(74):  set(_dest_dir ${CMAKE_BINARY_DIR}/redist-cmake )
 @qibuild_root@/qibuild/internal/install.cmake(63):  get_filename_component(_file_subdir ${_file} PATH )
 @qibuild_root@/qibuild/internal/install.cmake(63):  get_filename_component(_file_subdir ${_file} PATH )
-"""
+"""  # noqa
     qibuild_dir = qibuild.cmake.get_cmake_qibuild_dir()
     qibuild_dir = qisys.sh.to_posix_path(qibuild_dir)
     if os.name == 'nt':

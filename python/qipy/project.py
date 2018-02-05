@@ -27,7 +27,7 @@ class PythonProject(object):
             src = module_package.src
             to_add = os.path.join(self.worktree.root, self.src, src)
             to_add = qisys.sh.to_native_path(to_add)
-            if not to_add in res:
+            if to_add not in res:
                 res.append(to_add)
         return res
 

@@ -71,7 +71,7 @@ class BinaryPackage:
         if self.metadata:
             return
         self._load()
-        if not "name" in self.metadata:
+        if "name" not in self.metadata:
             raise Exception("Failed to load package. "
                             "Expecting at least a 'name' key "
                             "in package metadata")

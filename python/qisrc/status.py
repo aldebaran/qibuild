@@ -20,10 +20,10 @@ def stat_tracking_remote(git, branch, tracking):
                           "%s..%s" % (branch, tracking), raises=False)
     if ret == 0:
         behind = len(out.split())
-    return (ahead, behind)
+    return ahead, behind
 
 
-class ProjectState():
+class ProjectState:
     """A class which represent a project and is cleanlyness."""
 
     def __init__(self, project):
@@ -76,8 +76,10 @@ def check_state(project, untracked):
         if state_project.current_branch != project.default_branch.name:
             state_project.incorrect_proj = True
 
-    (state_project.ahead, state_project.behind) = stat_tracking_remote(git,
-                                                                       state_project.current_branch, state_project.tracking)
+    (state_project.ahead, state_project.behind) = stat_tracking_remote(
+        git,
+        state_project.current_branch,
+        state_project.tracking)
     if state_project.incorrect_proj:
         (state_project.ahead_manifest, state_project.behind_manifest) = stat_tracking_remote(
             git, state_project.current_branch, "%s/%s" % (
@@ -105,8 +107,6 @@ def _print_behind_ahead(behind, ahead):
 
 def print_state(project, max_len):
     """Print a state project."""
-    #shortpath = os.path.relpath(project.path, qiwt.root)
-
     if project.valid:
         if project.ahead or project.behind:
             numcommits = _print_behind_ahead(project.behind, project.ahead)
@@ -127,8 +127,8 @@ def print_state(project, max_len):
 
     if not project.sync_and_clean:
         if project.status is not None:
-            nlines = [x[:3] + project.project.src + "/"
-                      + x[3:] for x in project.status]
+            nlines = [x[:3] + project.project.src + "/" + x[3:]
+                      for x in project.status]
             if nlines:
                 print "\n".join(nlines)
 

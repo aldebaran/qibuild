@@ -19,7 +19,7 @@ def test_read_profiles(build_worktree):
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
     build_config.set_active_config("foo")
     cmake_args = build_config.cmake_args
-    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
+    cmake_args = [x for x in cmake_args if "VIRTUALENV" not in x]
     assert cmake_args == \
         ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_FOO=ON"]
 
@@ -31,7 +31,7 @@ def test_users_flags_taken_last(build_worktree):
     build_config.set_active_config("foo")
     build_config.user_flags = [("WITH_FOO", "OFF")]
     cmake_args = build_config.cmake_args
-    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
+    cmake_args = [x for x in cmake_args if "VIRTUALENV" not in x]
     assert cmake_args == \
         ["-DCMAKE_BUILD_TYPE=Debug",
          "-DWITH_FOO=ON",
@@ -43,7 +43,7 @@ def test_sane_defaults(build_worktree):
     assert build_config.cmake_generator is None
     assert build_config.build_type == "Debug"
     cmake_args = build_config.cmake_args
-    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
+    cmake_args = [x for x in cmake_args if "VIRTUALENV" not in x]
     assert cmake_args == ["-DCMAKE_BUILD_TYPE=Debug"]
 
 
@@ -60,7 +60,7 @@ def test_read_qibuild_conf(build_worktree):
     build_config = qibuild.build_config.CMakeBuildConfig(build_worktree)
     assert build_config.cmake_generator == "Ninja"
     cmake_args = build_config.cmake_args
-    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
+    cmake_args = [x for x in cmake_args if "VIRTUALENV" not in x]
     assert cmake_args == \
         ["-GNinja", "-DCMAKE_BUILD_TYPE=Debug"]
 
@@ -213,7 +213,7 @@ def test_profiles_from_config(cd_to_tmpdir):
     build_config = build_worktree.build_config
     assert build_config.profiles == ["bar"]
     cmake_args = build_config.cmake_args
-    cmake_args = [x for x in cmake_args if not "VIRTUALENV" in x]
+    cmake_args = [x for x in cmake_args if "VIRTUALENV" not in x]
     assert cmake_args == ["-DCMAKE_BUILD_TYPE=Debug", "-DWITH_BAR=ON"]
 
 

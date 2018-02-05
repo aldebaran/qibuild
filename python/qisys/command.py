@@ -462,7 +462,7 @@ def call_background(cmd, cwd=None, env=None):
         caught_error = err
     finally:
         try:
-            if process.poll() != None:
+            if process.poll() is not None:
                 # Process should not have died !
                 raise ProcessCrashedError(cmd)
             else:
@@ -471,5 +471,5 @@ def call_background(cmd, cwd=None, env=None):
             caught_error = err
     if caught_error:
         # pylint: disable-msg=E0702
-        #(we are not going to raise None...)
+        # (we are not going to raise None...)
         raise caught_error

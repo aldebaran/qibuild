@@ -105,4 +105,4 @@ def test_questions_are_recorded():
     with mock.patch('qisys.interact', fake_interact):
         assert qisys.interact.ask_yes_no("Do you like tea?") == "n"
         assert fake_interact.questions[0]['message'] == "Do you like tea?"
-        assert fake_interact.questions[0]['default'] == False
+        assert fake_interact.questions[0]['default'] is False

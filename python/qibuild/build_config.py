@@ -208,7 +208,7 @@ config in ~/.config/qi/qibuild.xml
         known_profiles = self.build_worktree.get_known_profiles(warns=warns)
         known_names = known_profiles.keys()
         for name in self._profiles:
-            if not name in known_names:
+            if name not in known_names:
                 raise NoSuchProfile(name, known_names)
             flags = known_profiles[name].cmake_flags
             self._profile_flags.extend(flags)

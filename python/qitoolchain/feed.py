@@ -97,7 +97,7 @@ class ToolchainFeedParser:
 
     def get_packages(self):
         """ Get the parsed packages """
-        res = [x for x in self.packages if not x.name in self.blacklist]
+        res = [x for x in self.packages if x.name not in self.blacklist]
         return res
 
     def append_package(self, package_tree):

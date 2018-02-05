@@ -42,7 +42,7 @@ Please install it if necessary and re-run `qibuild config --wizard`\
         # Generator = "blalblalba"
         #       files.
         if len(line) >= 3:
-            if line[2] == ' ' and not "=" in line:
+            if line[2] == ' ' and "=" not in line:
                 continue
         if line == magic_line:
             intersting = True

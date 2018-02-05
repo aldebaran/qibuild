@@ -24,4 +24,5 @@ def do(args):
     force = args.force
     with_toolchain = args.with_toolchain
     pml_builder = qipkg.parsers.get_pml_builder(args)
-    return pml_builder.package(output=output, with_breakpad=with_breakpad, force=force, install_tc_packages=with_toolchain)
+    return pml_builder.package(output=output, with_breakpad=with_breakpad,
+                               force=force, install_tc_packages=with_toolchain)

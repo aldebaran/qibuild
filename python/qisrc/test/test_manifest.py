@@ -206,7 +206,7 @@ def test_review_projects_with_two_remotes(tmpdir):
     assert gerrit_remote.name == "gerrit"
     assert gerrit_remote.review is True
     assert bar.review_remote == gerrit_remote
-    assert bar.review == True
+    assert bar.review is True
     assert bar.default_remote.name == "origin"
 
 
@@ -223,7 +223,7 @@ def test_no_review(tmpdir):
 
     assert len(manifest.repos) == 1
     [repo] = manifest.repos
-    assert repo.review == False
+    assert repo.review is False
     assert repo.default_remote.name == "origin"
 
     assert len(repo.remotes) == 1

@@ -86,7 +86,7 @@ def do(args):
         for bdir in bdirs['unknown_configs']:
             # all build directory names should be prefixed with "build-", so strip it
             config_name = os.path.basename(bdir)[6:]
-            if not config_name in sorted_bdirs:
+            if config_name not in sorted_bdirs:
                 sorted_bdirs[config_name] = []
             sorted_bdirs[config_name].append(bdir)
         for c, sbdirs in sorted_bdirs.items():

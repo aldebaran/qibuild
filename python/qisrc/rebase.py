@@ -87,7 +87,7 @@ def get_forked_projects(git_projects, upstream_projects, branch):
         remote_branch = git_project.default_branch.remote_branch
         remote_name = git_project.default_remote.name
         remote_ref = "%s/%s" % (remote_name, remote_branch)
-        if not git_project.src in upstream_projects:
+        if git_project.src not in upstream_projects:
             ui.info(ui.brown, git_project.src, "[skipped]")
             ui.info("No match for %s on %s branch" % (git_project.src, branch))
             continue

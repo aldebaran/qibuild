@@ -100,7 +100,7 @@ def test_alert_maintainers(qisrc_action, git_server):
         qisrc_action("push", "--project", "foo")
     set_reviewers_args = mocked_call.call_args_list[-1][0][0][-1]  # Last argument of last command
     assert "jdoe" in set_reviewers_args
-    assert not "@company.com" in set_reviewers_args
+    assert "@company.com" not in set_reviewers_args
 
 
 def test_on_new_project(qisrc_action, git_server, tmpdir, interact):

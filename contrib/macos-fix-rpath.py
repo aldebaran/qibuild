@@ -25,14 +25,14 @@
 usage: fix-rpath.py CROSS_ROOTPATH LIBDIR
 """
 
-_dryrun = False
-
 import os
 import re
 import shutil
 import stat
 import subprocess
 import sys
+
+_dryrun = False
 
 _FILE_EXEC = r'.*?:\s+Mach-O 64-bit (dynamically linked shared library|executable) x86_64'
 re_FILE_EXEC = re.compile(_FILE_EXEC)

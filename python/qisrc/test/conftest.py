@@ -331,8 +331,8 @@ class FakeGit(qisrc.git.Git):
     repo_configs = dict()
 
     def __init__(self, repo):
-        self.repo = repo
-        if not self.repo in FakeGit.repo_configs:
+        super(FakeGit, self).__init__(repo)
+        if self.repo not in FakeGit.repo_configs:
             FakeGit.repo_configs[repo] = dict()
         self.calls = list()
         self.calls_index = dict()
@@ -357,9 +357,9 @@ class FakeGit(qisrc.git.Git):
         """ Look for the expected result
 
         """
-        if not cmd in self.results:
+        if cmd not in self.results:
             raise Exception("Unexpected call to %s" % cmd)
-        if not cmd in self.calls_index:
+        if cmd not in self.calls_index:
             self.calls_index[cmd] = 0
         index = self.calls_index[cmd]
         res_list = self.results[cmd]

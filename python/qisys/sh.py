@@ -132,7 +132,7 @@ def write_file_if_different(data, out_path, mode="w"):
         if out_prev == data:
             ui.debug("skipping write to %s: same content" % (out_path))
             return
-    except:
+    except Exception:
         pass
     with open(out_path, mode) as out_file:
         out_file.write(data)

@@ -149,7 +149,7 @@ def get_test_runners(args):
     # --qitest-json argument
     known_cwds = [x.cwd for x in res]
     for test_runner in build_projects_runners:
-        if not test_runner.cwd in known_cwds:
+        if test_runner.cwd not in known_cwds:
             res.append(test_runner)
 
     if args.coverage and not build_projects_runners:

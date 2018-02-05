@@ -668,7 +668,7 @@ class QiBuildConfig(object):
 
     def set_host_config(self, config_name):
         """ Set the config used to build host tools """
-        if not config_name in self.configs:
+        if config_name not in self.configs:
             raise Exception("No such config: %s" % config_name)
         # Make sure that we unset the previous 'host' config when
         # called twice with different config names

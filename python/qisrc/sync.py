@@ -416,7 +416,7 @@ def compute_repo_diff(old_repos, new_repos):
                     to_update.append((old_repo, new_repo))
                 break
         else:
-            if not old_repo in [x[0] for x in to_move]:
+            if old_repo not in [x[0] for x in to_move]:
                 to_rm.append(old_repo)
 
     really_to_add = list()

@@ -104,7 +104,7 @@ class DocProject(object):
     def append_doxy_xml_path(self, paths):
         for doxydep in self.doxydeps:
             doxypath = os.path.join(doxydep.build_dir, 'xml')
-            if not doxypath in paths:
+            if doxypath not in paths:
                 paths.append(doxypath)
             doxydep.append_doxy_xml_path(paths)
 
