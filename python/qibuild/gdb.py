@@ -22,7 +22,7 @@ def contains_debug_info(filename, objdump=None):
         objdump = "objdump"
     retcode = subprocess.call([objdump, "-j", ".debug_info", "-h", filename],
                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    return (retcode == 0)
+    return retcode == 0
 
 
 def split_debug(src, objcopy=None, objdump=None):

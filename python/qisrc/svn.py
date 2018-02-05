@@ -33,7 +33,7 @@ class Svn(object):
             # Don't want useless blank lines
             out = out.rstrip("\n")
             ui.debug("out:", out)
-            return (process.returncode, out)
+            return process.returncode, out
         else:
             if "raises" in kwargs:
                 del kwargs["raises"]

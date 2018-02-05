@@ -473,7 +473,7 @@ def compute_repo_diff(old_repos, new_repos):
     for repo_list in [to_move, to_update]:
         repo_list.sort(key=lambda x: x[0].src)
 
-    return (to_add, to_move, to_rm, to_update)
+    return to_add, to_move, to_rm, to_update
 
 
 def find_common_url(repo_a, repo_b):

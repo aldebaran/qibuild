@@ -50,7 +50,7 @@ def setup_test():
     foo = git_worktree.get_git_project("foo")
     hello = git_worktree.get_git_project("hello")
     world = git_worktree.get_git_project("world")
-    return (foo, hello, world)
+    return foo, hello, world
 
 
 def test_default_all(cd_to_tmpdir, args):

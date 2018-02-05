@@ -412,7 +412,7 @@ def _get_console_size_tput():
         proc = subprocess.Popen(["tput", "lines"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         output = proc.communicate(input=None)
         rows = int(output[0])
-        return (cols, rows)
+        return cols, rows
     except Exception:
         return None
 

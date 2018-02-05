@@ -53,9 +53,9 @@ def get_ftp_access(server_name):
     """
     access = get_server_access(server_name)
     if not access:
-        return ("anonymous", "anonymous", "/")
+        return "anonymous", "anonymous", "/"
     else:
-        return (access.username, access.password, access.root)
+        return access.username, access.password, access.root
 
 
 def authenticated_urlopen(location):

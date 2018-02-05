@@ -123,7 +123,7 @@ def separate_into_groups(dependency_relationships):
     projects_bad = sorted(set(projects_bad))
     packages = sorted(set(packages))
     packages_bad = sorted(set(packages_bad))
-    return (projects, projects_bad, packages, packages_bad)
+    return projects, projects_bad, packages, packages_bad
 
 
 def print_deps_compressed(dependency_relationships):

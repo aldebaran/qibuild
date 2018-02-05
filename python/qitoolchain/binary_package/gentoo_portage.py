@@ -50,7 +50,7 @@ def _get_pkg_arch(metadata_dir):
         variant = _parse_march(os.path.join(metadata_dir, flag_file))
         if variant is not None:
             break
-    return (arch, variant)
+    return arch, variant
 
 
 class GentooPackage(GentooNoPortagePackage):

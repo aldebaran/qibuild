@@ -58,21 +58,21 @@ def parse_args_for_help(args):
         return arg in ("-h", "--help", "help")
 
     if not args:
-        return (True, None)
+        return True, None
     if len(args) > 2:
-        return (False, None)
+        return False, None
 
     if len(args) == 1:
         if is_help(args[0]):
-            return (True, None)
+            return True, None
         else:
             return(False, None)
 
     if len(args) == 2:
         if is_help(args[0]):
-            return (True, args[1])
+            return True, args[1]
         if is_help(args[1]):
-            return (True, args[0])
+            return True, args[0]
         return(False, None)
 
 

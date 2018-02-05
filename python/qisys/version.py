@@ -85,7 +85,7 @@ def eat_number(str, index):
         if not str[index].isdigit():
             break
         index += 1
-    return (str[first:index], index)
+    return str[first:index], index
 
 
 def eat_alpha(str, index):
@@ -95,7 +95,7 @@ def eat_alpha(str, index):
         if not str[index].isalpha():
             break
         index += 1
-    return (str[first:index], index)
+    return str[first:index], index
 
 
 def explode_version(str):

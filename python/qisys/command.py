@@ -378,7 +378,7 @@ def check_output_error(*popenargs, **kwargs):
         if cmd is None:
             cmd = popenargs[0]
         raise CommandFailedException(cmd, retcode, stdout=output, stderr=error)
-    return (output, error)
+    return output, error
 
 
 def check_is_in_path(executable, env=None):

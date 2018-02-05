@@ -52,7 +52,7 @@ class Git(object):
             self._transaction.ok = False
             self._transaction.output += "git %s failed\n" % (" ".join(args))
             self._transaction.output += out
-        return (retcode, out)
+        return retcode, out
 
     def _call(self, *args, **kwargs):
         """ Helper for self.call """
@@ -81,7 +81,7 @@ class Git(object):
             # Don't want useless blank lines
             out = out.rstrip("\n")
             ui.debug("out:", out)
-            return (process.returncode, out)
+            return process.returncode, out
         else:
             if "raises" in kwargs:
                 del kwargs["raises"]

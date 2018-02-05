@@ -419,7 +419,7 @@ class FakeGit(qisrc.git.Git):
         (retcode, out) = self.get_result(args[0])
         raises = kwargs.get("raises")
         if raises is False:
-            return (retcode, out)
+            return retcode, out
         else:
             if retcode != 0:
                 raise Exception("%s failed" % " ".join(args))
