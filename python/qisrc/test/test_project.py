@@ -10,6 +10,9 @@ from qisrc.manifest import RepoConfig
 
 from qisrc.test.conftest import TestGitWorkTree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_native_paths(git_worktree):
     foo = git_worktree.create_git_project("foo/bar")

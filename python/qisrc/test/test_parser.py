@@ -15,6 +15,9 @@ from qisrc.parsers import get_git_projects
 from qibuild.test.conftest import TestBuildWorkTree
 from qisrc.test.conftest import TestGitWorkTree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_guess_git_repo(tmpdir, args):
     worktree = qisys.worktree.WorkTree(tmpdir.strpath)

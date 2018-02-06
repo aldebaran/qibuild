@@ -8,6 +8,9 @@ import json
 import qisys.command
 import qibuild.find
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_simple_run(tmpdir, qitest_action):
     ls = qisys.command.find_program("ls")

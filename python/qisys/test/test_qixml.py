@@ -7,6 +7,9 @@ import pytest
 
 import qisys.qixml
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_qixml_parse_bool_attr():
     tree = etree.fromstring("<foo />")

@@ -4,6 +4,9 @@
 
 from qibuild.test.conftest import TestBuildWorkTree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_no_cmake(qibuild_action, record_messages):
     qibuild_action.add_test_project("convert/no_cmake")

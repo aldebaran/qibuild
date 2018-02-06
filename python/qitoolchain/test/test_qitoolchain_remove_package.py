@@ -5,6 +5,9 @@
 import qibuild.config
 import qitoolchain.toolchain
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_simple(qitoolchain_action):
     qitoolchain_action("create", "foo")

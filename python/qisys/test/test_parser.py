@@ -6,6 +6,9 @@ import pytest
 import qisys.parsers
 import qisys.worktree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_guess_woktree(worktree, args):
     tmpdir = worktree.tmpdir

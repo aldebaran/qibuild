@@ -16,6 +16,9 @@ import mock
 import qisys.sh
 import qisys.worktree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_read_projects(tmpdir):
     tmpdir.mkdir("core").mkdir("naoqi")

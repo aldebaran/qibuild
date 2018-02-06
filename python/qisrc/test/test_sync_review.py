@@ -7,6 +7,9 @@ import pytest
 import qisrc.sync
 from qisrc.test.conftest import TestGitWorkTree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_call_setup_review(git_worktree, git_server):
     git_server.create_repo("foo", review=True)

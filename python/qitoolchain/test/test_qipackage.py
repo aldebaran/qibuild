@@ -9,6 +9,9 @@ import qisys.archive
 import qitoolchain.qipackage
 from qisys.test.conftest import skip_on_win
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_equality():
     foo = qitoolchain.qipackage.QiPackage("foo", "1.2")

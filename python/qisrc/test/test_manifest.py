@@ -7,6 +7,9 @@ import pytest
 import qisrc.manifest
 import qisrc.review
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_simple_read(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")

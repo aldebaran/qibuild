@@ -6,6 +6,9 @@ import py
 import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_untracked(qisrc_action, record_messages):
     git_worktree = qisrc_action.git_worktree

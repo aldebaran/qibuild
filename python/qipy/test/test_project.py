@@ -6,6 +6,9 @@ import sys
 
 import qisys.command
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_read_config(qipy_action):
     big_project = qipy_action.add_test_project("big_project")

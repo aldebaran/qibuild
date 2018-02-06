@@ -3,6 +3,9 @@
 # found in the COPYING file.
 from qisrc.test.conftest import TestGitWorkTree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_qisrc_add_dot(qisrc_action):
     tmpdir = qisrc_action.tmpdir

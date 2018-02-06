@@ -4,6 +4,9 @@ import qisys.archive
 import qibuild.config
 import qitoolchain.qipackage
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_simple(qibuild_action, toolchains, tmpdir, record_messages):
     test_tc = toolchains.create("test")

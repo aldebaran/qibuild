@@ -5,6 +5,9 @@
 # found in the COPYING file.
 import qisrc.maintainers
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_no_project(qisrc_action):
     error = qisrc_action("maintainers", "--list", raises=True)

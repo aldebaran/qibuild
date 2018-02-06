@@ -6,6 +6,9 @@ import qisrc.git
 
 from qibuild.test.conftest import TestBuildWorkTree
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_git_server_creates_valid_urls(tmpdir, git_server):
     origin_url = git_server.manifest.get_remote("origin").url

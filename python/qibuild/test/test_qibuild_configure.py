@@ -17,6 +17,9 @@ import qitoolchain
 from qibuild.test.conftest import TestBuildWorkTree
 from qipy.test.conftest import qipy_action
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 # This module also serves as a test for the
 # qibuild cmake API

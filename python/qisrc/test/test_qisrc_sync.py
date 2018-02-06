@@ -14,6 +14,9 @@ from qibuild.test.conftest import TestBuildWorkTree
 import qibuild.config
 import qibuild.profile
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_sync_clones_new_repos(qisrc_action, git_server):
     git_server.create_repo("foo.git")

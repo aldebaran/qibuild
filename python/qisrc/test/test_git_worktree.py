@@ -9,6 +9,9 @@ import qisrc.worktree
 
 from qisrc.git_config import Remote
 
+# allow the existing foo/bar/baz names
+# pylint: disable=blacklisted-name
+
 
 def test_read_git_configs(tmpdir, test_git):
     tmpdir.mkdir("foo")
