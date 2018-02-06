@@ -51,21 +51,21 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
     def install(self, destination):
         full_dest = os.path.join(destination, "share", "locale")
 
-        def filter(f):
+        def filter_fun(f):
             return f.endswith(".qm")
-        qisys.sh.install(self.po_path, full_dest, filter_fun=filter)
+        qisys.sh.install(self.po_path, full_dest, filter_fun=filter_fun)
 
     def __repr__(self):
         return "<QtLinguistProject %s in %s>" % (self.name, self.path)
 
 
-def generate_qm_file(input, output):
+def generate_qm_file(input_file, output):
     """ Generate a ``.qm`` file from a ``.ts`` file.
     Returns (True, "") if everything went well,
     (False, "<error message>") otherwise
 
     """
-    cmd = ["lrelease", "-compress", input, "-qm", output]
+    cmd = ["lrelease", "-compress", input_file, "-qm", output]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     out, _ = process.communicate()
     ui.info(out.strip())

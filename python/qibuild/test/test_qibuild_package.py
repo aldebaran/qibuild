@@ -52,8 +52,8 @@ def test_preserve_license(qibuild_action, qitoolchain_action):
     world_package = qibuild_action("package", "world")
     extracted = qitoolchain_action("extract-package", world_package)
     package_xml = os.path.join(extracted, "package.xml")
-    license = qisrc.license.read_license(package_xml)
-    assert license == "BSD"
+    license_name = qisrc.license.read_license(package_xml)
+    assert license_name == "BSD"
 
 
 def test_standalone(qibuild_action, tmpdir):

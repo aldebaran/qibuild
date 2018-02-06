@@ -22,8 +22,8 @@ def do(args):
     if short:
         log_cmd = ["shortlog"]
     else:
-        format = "%Cgreen%h%Creset -%C(yellow)%d%Creset %s %C(bold blue)<%an>%Creset"
-        log_cmd = ["log", "--pretty=format:%s" % format]
+        log_format = "%Cgreen%h%Creset -%C(yellow)%d%Creset %s %C(bold blue)<%an>%Creset"
+        log_cmd = ["log", "--pretty=format:%s" % log_format]
     git_worktree = qisrc.parsers.get_git_worktree(args)
     git_projects = qisrc.parsers.get_git_projects(git_worktree, args,
                                                   default_all=False,

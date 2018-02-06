@@ -78,27 +78,27 @@ def increment_version(version):
     return re.sub(r"\d+$", str(as_int), version)
 
 
-def eat_number(str, index):
+def eat_number(input_str, index):
     """ Helper for explode_version """
     first = index
-    while index < len(str):
-        if not str[index].isdigit():
+    while index < len(input_str):
+        if not input_str[index].isdigit():
             break
         index += 1
-    return str[first:index], index
+    return input_str[first:index], index
 
 
-def eat_alpha(str, index):
+def eat_alpha(input_str, index):
     """ Helper for explode_version """
     first = index
-    while index < len(str):
-        if not str[index].isalpha():
+    while index < len(input_str):
+        if not input_str[index].isalpha():
             break
         index += 1
-    return str[first:index], index
+    return input_str[first:index], index
 
 
-def explode_version(str):
+def explode_version(input_str):
     """ Explode a version string into a list
     made of either numbers, or alphabetic chars,
     or separators
@@ -112,16 +112,16 @@ def explode_version(str):
     """
     res = list()
     index = 0
-    while index < len(str):
-        if str[index].isdigit():
-            (to_append, index) = eat_number(str, index)
+    while index < len(input_str):
+        if input_str[index].isdigit():
+            (to_append, index) = eat_number(input_str, index)
             res.append(to_append)
-        elif str[index].isalpha():
-            (to_append, index) = eat_alpha(str, index)
+        elif input_str[index].isalpha():
+            (to_append, index) = eat_alpha(input_str, index)
             res.append(to_append)
         else:
             # append a string with just one char
-            res.append("%s" % str[index])
+            res.append("%s" % input_str[index])
             index += 1
     return res
 

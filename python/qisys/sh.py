@@ -599,7 +599,7 @@ class TempDir:
     def __enter__(self):
         return self._temp_dir
 
-    def __exit__(self, type, value, tb):
+    def __exit__(self, _type, value, tb):
         if os.environ.get("DEBUG"):
             if tb is not None:
                 print "=="
@@ -717,7 +717,7 @@ class PreserveFileMetadata(object):
         self.time = (st.st_atime, st.st_mtime)
         self.mode = st.st_mode
 
-    def __exit__(self, type, value, tb):
+    def __exit__(self, _type, value, tb):
         """ Exit method restoring metadata
         """
         os.chmod(self.path, self.mode)

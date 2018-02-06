@@ -152,10 +152,10 @@ Error when parsing {pml_path}
                 self.pml_extra_files.append(src)
 
         errors = list()
-        for file in self.pml_extra_files:
-            full_path = os.path.join(self.base_dir, file)
+        for extra_file in self.pml_extra_files:
+            full_path = os.path.join(self.base_dir, extra_file)
             if not os.path.exists(full_path):
-                errors.append(file)
+                errors.append(extra_file)
         if errors:
             mess = "Some files do not exist\n"
             for error in errors:

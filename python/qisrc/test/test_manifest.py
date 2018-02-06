@@ -396,7 +396,7 @@ def test_all_repos(tmpdir):
 </manifest>
 """)
     manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
-    git_projects = manifest.get_repos(all=True)
+    git_projects = manifest.get_repos(get_all=True)
     assert len(git_projects) == 3
 
 

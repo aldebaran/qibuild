@@ -11,8 +11,8 @@ import unittest
 from qibuild.config import ProjectConfig
 
 
-def cfg_from_string(str):
-    cfg_loc = StringIO(str)
+def cfg_from_string(input_str):
+    cfg_loc = StringIO(input_str)
     project_cfg = ProjectConfig()
     project_cfg.read(cfg_loc)
     return project_cfg

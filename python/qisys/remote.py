@@ -301,10 +301,10 @@ Supported schemes are
 """ % self.as_string)
 
     def _handle_match(self, match):
-        dict = match.groupdict()
-        self.user = dict.get("user")
-        self.host = dict["host"]
+        match_dict = match.groupdict()
+        self.user = match_dict.get("user")
+        self.host = match_dict["host"]
         self.port = 22
-        if "port" in dict and dict["port"]:
-            self.port = int(dict["port"])
-        self.remote_directory = dict["remote_dir"] or None
+        if "port" in match_dict and match_dict["port"]:
+            self.port = int(match_dict["port"])
+        self.remote_directory = match_dict["remote_dir"] or None

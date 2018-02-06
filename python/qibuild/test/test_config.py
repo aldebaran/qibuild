@@ -16,8 +16,8 @@ import qibuild
 import qibuild.config
 
 
-def cfg_from_string(str, user_config=None):
-    cfg_loc = StringIO(str)
+def cfg_from_string(input_str, user_config=None):
+    cfg_loc = StringIO(input_str)
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(cfg_loc)
     if user_config:

@@ -15,7 +15,7 @@ import qisys.sh
 LOG_RE = re.compile(r"(.*?)\((\d+)\):")
 
 
-def parse_cmake_log(input, qibuild_dir):
+def parse_cmake_log(input_file, qibuild_dir):
     """ Parse cmake logs
 
     Generate annotated source code for each cmake file in qibuild,
@@ -23,7 +23,7 @@ def parse_cmake_log(input, qibuild_dir):
     # cmake log is written like c:/path/to/qibuild/cmake/
     qibuild_dir = qisys.sh.to_posix_path(qibuild_dir)
     profile = dict()
-    with open(input, "r") as fp:
+    with open(input_file, "r") as fp:
         for line in fp:
             match = re.match(LOG_RE, line)
             if not match:
@@ -40,7 +40,7 @@ def parse_cmake_log(input, qibuild_dir):
             if line_no not in profile[filename]:
                 profile[filename][line_no] = 0
             profile[filename][line_no] += 1
-    dirname = os.path.dirname(input)
+    dirname = os.path.dirname(input_file)
     profile_pickle = os.path.join(dirname, "profile.pickle")
     with open(profile_pickle, "w") as fp:
         pickle.dump(profile, fp)
