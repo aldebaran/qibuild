@@ -64,7 +64,7 @@ set(CMAKE_CXX_FLAGS "-std=gnu++11")
         contents = fp.read()
     included_file = None
     for line in contents.splitlines():
-        match = re.match('include\("(.*)"\)', line)
+        match = re.match(r'include\("(.*)"\)', line)
         if match:
             included_file = match.groups()[0]
     assert os.path.exists(included_file)

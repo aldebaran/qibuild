@@ -266,7 +266,7 @@ class URL(object):
 
     def _parse(self, string):
 
-        modern_scheme = """
+        modern_scheme = r"""
 ssh://
 (?:
     (?P<user>[^@]+)

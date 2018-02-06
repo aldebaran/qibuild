@@ -16,5 +16,5 @@ def test_list_profiles(qibuild_action, qisrc_action, git_server, record_messages
     qibuild.profile.configure_build_profile(qibuild_xml, "bar", [("WITH_BAR", "ON")])
     record_messages.reset()
     qibuild_action("list-profiles")
-    assert record_messages.find("\*\s+foo")
-    assert record_messages.find("\*\s+bar")
+    assert record_messages.find(r"\*\s+foo")
+    assert record_messages.find(r"\*\s+bar")

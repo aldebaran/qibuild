@@ -45,21 +45,21 @@ class Remote(object):
             self.prefix = prefix
             return
 
-        full_ssh = re.compile("""
+        full_ssh = re.compile(r"""
                         ssh://
                         ((?P<username>[^@]+)@)?
                         (?P<server>[^:/]+)
                         (:(?P<port>\d+))?
                         (?P<subfolder>.*)
                         """, re.VERBOSE)
-        ssh_url = re.compile("""
+        ssh_url = re.compile(r"""
                         (?P<username>.*?)
                         @
                         (?P<server>.*)
                         (?P<sep>[:/])?
                         (?P<subfolder>)
                         """, re.VERBOSE)
-        other_url = re.compile("""
+        other_url = re.compile(r"""
                         ((?P<protocol>(git|http|https))://)
                         (?P<server>[^:/]+)
                         (:(?P<port>\d+))?

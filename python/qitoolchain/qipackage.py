@@ -127,8 +127,8 @@ class QiPackage(object):
                                         filter_fun=filter_fun)
             else:
                 # avoid install masks and package.xml
-                mask.append("exclude .*\.mask")
-                mask.append("exclude package\.xml")
+                mask.append(r"exclude .*\.mask")
+                mask.append(r"exclude package\.xml")
                 return self._install_with_mask(destdir, mask)
         else:
             with open(manifest_path, "r") as fp:

@@ -59,10 +59,10 @@ def test_using_custom_profile(qibuild_action, qisrc_action, git_server,
     qibuild.config.add_build_config("foo", profiles=["foo"])
     qibuild.config.add_build_config("bar", profiles=["bar"])
     qibuild_action("configure", "spam", "--config", "foo", "--summarize-options")
-    assert record_messages.find("WITH_FOO\s+: ON")
+    assert record_messages.find(r"WITH_FOO\s+: ON")
     record_messages.reset()
     qibuild_action("configure", "spam", "--config", "bar", "--summarize-options")
-    assert record_messages.find("WITH_BAR\s+: ON")
+    assert record_messages.find(r"WITH_BAR\s+: ON")
 
 
 def test_warns_on_conflict(qibuild_action, qisrc_action, git_server,
@@ -76,5 +76,5 @@ def test_warns_on_conflict(qibuild_action, qisrc_action, git_server,
     qibuild.config.add_build_config("foo", profiles=["foo"])
     record_messages.reset()
     qibuild_action("configure", "spam", "--config", "foo", "--summarize-options")
-    assert record_messages.find("WITH_FOO\s+: OFF")
+    assert record_messages.find(r"WITH_FOO\s+: OFF")
     assert record_messages.find("WARN")

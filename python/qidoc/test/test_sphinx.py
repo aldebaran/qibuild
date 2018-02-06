@@ -164,7 +164,7 @@ def test_spellcheck(doc_worktree, record_messages):
     doc_builder.configure()
     with pytest.raises(qidoc.sphinx_project.SphinxBuildError):
         doc_builder.build()
-    assert record_messages.find("Found 1 spelling error\(s\)")
+    assert record_messages.find(r"Found 1 spelling error\(s\)")
 
     index_rst = os.path.join(spell_proj.path, "source", "index.rst")
     with open(index_rst, "r") as fp:

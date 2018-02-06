@@ -13,4 +13,4 @@ def test_no_toolchain(qitoolchain_action, record_messages):
 def test_list(qitoolchain_action, record_messages):
     qitoolchain_action("create", "foo")
     qitoolchain_action("list")
-    assert record_messages.find("\* foo")
+    assert record_messages.find(r"\* foo")

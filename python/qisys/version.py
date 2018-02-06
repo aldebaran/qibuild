@@ -70,12 +70,12 @@ def increment_version(version):
     ValueError: version must end with a digit
 
     """
-    match = re.search("\d+$", version)
+    match = re.search(r"\d+$", version)
     if match is None:
         raise ValueError("version must end with a digit")
     as_int = int(match.group())
     as_int += 1
-    return re.sub("\d+$", str(as_int), version)
+    return re.sub(r"\d+$", str(as_int), version)
 
 
 def eat_number(str, index):

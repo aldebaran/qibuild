@@ -4,5 +4,5 @@ def test_list_groups(qisrc_action, git_server, record_messages):
     qisrc_action("init", git_server.manifest_url)
     record_messages.reset()
     qisrc_action("list-groups")
-    assert record_messages.find("\* default")
+    assert record_messages.find(r"\* default")
     assert record_messages.find(" spam")

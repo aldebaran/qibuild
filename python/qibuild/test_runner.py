@@ -369,8 +369,8 @@ def get_cpu_list(total_cpus, num_cpus_per_test, worker_index):
 def parse_valgrind(valgrind_log, res):
     """ Parse valgrind logs and extract interesting errors. """
     message = ""
-    leak_fd_regex = re.compile("==\d+== FILE DESCRIPTORS: (\d+)")
-    invalid_read_regex = re.compile("==\d+== Invalid read of size (\d+)")
+    leak_fd_regex = re.compile(r"==\d+== FILE DESCRIPTORS: (\d+)")
+    invalid_read_regex = re.compile(r"==\d+== Invalid read of size (\d+)")
     with open(valgrind_log, "r") as f:
         lines = f.readlines()
 

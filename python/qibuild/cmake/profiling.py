@@ -12,7 +12,7 @@ import pickle
 
 import qisys.sh
 
-LOG_RE = re.compile("(.*?)\((\d+)\):")
+LOG_RE = re.compile(r"(.*?)\((\d+)\):")
 
 
 def parse_cmake_log(input, qibuild_dir):
