@@ -100,7 +100,7 @@ def mkdir(dest_dir, recursive=False):
             os.makedirs(dest_dir)
         else:
             os.mkdir(dest_dir)
-    except OSError, e:
+    except OSError, e:  # pylint: disable=invalid-name
         if e.errno == 17:
             # Directory already exists -> we don't care
             pass
