@@ -48,9 +48,7 @@ Found two projects with the same name ({0})
 In:
 * {1}
 * {2}
-""".format(new_project.name,
-                project_with_same_name.path,
-                new_project.path))
+""".format(new_project.name, project_with_same_name.path, new_project.path))
 
 
 def new_linguist_project(linguist_worktree, project):

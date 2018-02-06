@@ -55,8 +55,7 @@ class TestBuildWorkTree(qibuild.worktree.BuildWorkTree):
         xml = xml.format(name=name,
                          buildtime_names=" ".join(build_depends),
                          runtime_names=" ".join(run_depends),
-                         testtime_names=" ".join(test_depends)
-                         )
+                         testtime_names=" ".join(test_depends))
         proj_path.join("qiproject.xml").write(xml)
         cmake = """ \
 cmake_minimum_required(VERSION 2.8)

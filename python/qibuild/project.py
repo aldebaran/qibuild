@@ -335,8 +335,9 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             qisys.sh.mkdir(cov_dir)
             cmd += ["cov-build", "--dir", cov_dir]
 
-        cmd += ["cmake", "--build", self.build_directory,
-                         "--config", self.build_type]
+        cmd += ["cmake",
+                "--build", self.build_directory,
+                "--config", self.build_type]
 
         if target:
             cmd += ["--target", target]

@@ -57,13 +57,15 @@ def _generate_setup_gdb(dest, sysroot="\"\"", solib_search_path=None, remote_gdb
         solib_search_path = list()
     source_file = os.path.abspath(os.path.join(dest, "setup.gdb"))
     with open(source_file, "w+") as f:
-        f.write(FILE_SETUP_GDB % {'sysroot': sysroot,
-                                  'solib_search_path': ":".join(solib_search_path)
-                                  })
+        f.write(FILE_SETUP_GDB % {
+            'sysroot': sysroot,
+            'solib_search_path': ":".join(solib_search_path)
+        })
     with open(os.path.join(dest, "setup_target.gdb"), "w+") as f:
-        f.write(FILE_SETUP_TARGET_GDB % {'source_file': source_file,
-                                         'remote_gdb_address': remote_gdb_address
-                                         })
+        f.write(FILE_SETUP_TARGET_GDB % {
+            'source_file': source_file,
+            'remote_gdb_address': remote_gdb_address
+        })
     return ["setup_target.gdb", "setup.gdb"]
 
 

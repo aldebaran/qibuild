@@ -11,8 +11,7 @@ import qitoolchain
 def toolchain_parser(parser):
     """ Parser for every action that requires a toolchain """
     parser.add_argument("-c", "--config", dest="config",
-                        help="Name of a config to use. " +
-                              "The config should be associated to a toolchain")
+                        help="Name of a config to use. The config should be associated to a toolchain")
     parser.add_argument("-t", "--toolchain", dest="toolchain_name",
                         help="Name of the toolchain to use")
 

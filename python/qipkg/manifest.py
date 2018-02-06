@@ -113,7 +113,7 @@ class Validator(object):
                 "contents/behaviorContent"):
             for supported_language in supported_languages:
                 if behavior_content.find(
-                    ".//triggerSentences/sentence[@lang=\'%s\']"
+                        ".//triggerSentences/sentence[@lang=\'%s\']"
                         % supported_language.text) is None:
                     self._add_error("Behavior \'%s\' has no trigger "
                                     "sentence defined for \'%s\'."
