@@ -645,7 +645,7 @@ The following tools were not found: {missing}\
         return self.name == other.name and self.src == other.src
 
     def __ne__(self, other):
-        return not (self == other)
+        return not self == other
 
 
 class BadProjectConfig(Exception):

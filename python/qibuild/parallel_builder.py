@@ -144,7 +144,7 @@ class ParallelBuilder(object):
 
     def _find_job_by_name(self, name):
         for job in self.all_jobs:
-            if (job.project.name == name):
+            if job.project.name == name:
                 return job
 
         return None

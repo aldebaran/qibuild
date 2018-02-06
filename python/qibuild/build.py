@@ -68,6 +68,6 @@ class ConfigureFailed(Exception):
     def __str__(self):
         mess = "Error occurred when configuring project %s" % self.project.name
         returncode = self.exception.returncode
-        if (returncode < 0):
+        if returncode < 0:
             mess += " (%s)" % qisys.command.str_from_signal(-returncode)
         return mess

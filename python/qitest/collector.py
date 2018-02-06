@@ -60,7 +60,7 @@ class PythonTestCollector:
     def get_test_and_write(self, project):
         test_list = self.get_list_of_pytest(project.path)
         self.tests_path.extend(test_list)
-        if(test_list):
+        if test_list:
             self.create_pytest_json(project.path, test_list, project)
             ui.info(ui.green, " * ", ui.blue, project.src, ":", len(test_list))
         else:
@@ -72,7 +72,7 @@ class PythonTestCollector:
             src = project.src
             exist = False
             for p in projects:
-                if(src.find(p) == 0):
+                if src.find(p) == 0:
                     exist = True
             if not exist:
                 self.get_test_and_write(project)

@@ -67,10 +67,10 @@ def test_add_local_ctc(tmpdir):
     tc_contents = get_tc_file_contents(toolchain)
     ctc_path = toolchain.db.get_package_path("ctc")
     config_cmake = os.path.join(ctc_path, "cross-config.cmake")
-    assert ('include("%s")' % config_cmake) in tc_contents
+    assert 'include("%s")' % config_cmake in tc_contents
     toolchain2 = qitoolchain.toolchain.Toolchain("bar")
     tc_contents = get_tc_file_contents(toolchain2)
-    assert ('include("%s")' % config_cmake) in tc_contents
+    assert 'include("%s")' % config_cmake in tc_contents
 
 
 def test_removing(feed):
