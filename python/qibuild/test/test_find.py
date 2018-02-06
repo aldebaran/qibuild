@@ -5,11 +5,11 @@
 import os
 import platform
 
+import pytest
+
 import qibuild.find
 from qibuild.find import library_name
 from qibuild.find import binary_name
-
-import pytest
 
 
 def test_library_name():

@@ -1,13 +1,12 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import mock
+import pytest
 
 import qibuild.cmake_builder
 import qibuild.config
 import qibuild.parsers
-
-import mock
-import pytest
 
 
 def test_check_configure_has_been_called_before_building(build_worktree):

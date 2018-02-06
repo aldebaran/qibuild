@@ -2,8 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 """ test qibuild init """
-import qisys.script
 import pytest
+
+import qisys.script
 
 
 def test_works_from_an_empty_dir(tmpdir, monkeypatch):

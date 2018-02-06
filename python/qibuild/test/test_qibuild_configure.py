@@ -1,10 +1,11 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-
 import os
 import platform
 import subprocess
+
+import pytest
 
 import qisys.command
 import qibuild.cmake
@@ -15,8 +16,6 @@ import qitoolchain
 
 from qibuild.test.conftest import TestBuildWorkTree
 from qipy.test.conftest import qipy_action
-
-import pytest
 
 
 # This module also serves as a test for the

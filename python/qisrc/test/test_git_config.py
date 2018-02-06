@@ -3,10 +3,10 @@
 # found in the COPYING file.
 import os
 
+import mock
+
 from qisrc.git_config import Remote
 import qisrc.review
-
-import mock
 
 
 def test_url_filepath():

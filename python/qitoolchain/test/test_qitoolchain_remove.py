@@ -1,12 +1,12 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import pytest
+
 import qibuild.config
 import qitoolchain.toolchain
 
 from qibuild.test.conftest import TestBuildWorkTree
-
-import pytest
 
 
 def test_simple(qitoolchain_action):

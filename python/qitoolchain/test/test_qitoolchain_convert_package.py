@@ -3,11 +3,11 @@
 # found in the COPYING file.
 import os
 
+import pytest
+
 import qisys.sh
 import qibuild.config
 import qitoolchain
-
-import pytest
 
 
 def test_simple(qitoolchain_action, tmpdir, toolchains):

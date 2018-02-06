@@ -7,11 +7,10 @@
 `The ElemtTree XML API <http://docs.python.org/library/xml.etree.elementtree.html>`_
 
 """
-
 import re
-from qisys import ui
-
 from xml.etree import ElementTree as etree
+
+from qisys import ui
 
 
 def indent(elem, level=0):

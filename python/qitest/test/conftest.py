@@ -1,12 +1,12 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import pytest
+
 from qibuild.test.conftest import *
 from qisys.test.conftest import TestAction
 
 import qibuild.find
-
-import pytest
 
 # pylint: disable-msg=E1103
 

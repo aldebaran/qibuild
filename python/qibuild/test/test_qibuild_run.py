@@ -1,17 +1,16 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-
 import os
+
+import mock
+import pytest
 
 import qibuild.find
 
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
 from qibuild.actions import run
-
-import pytest
-import mock
 
 
 def test_run_target(qibuild_action):

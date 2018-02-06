@@ -4,13 +4,12 @@
 """ List the available groups
 
 """
+import os
+import sys
 
 from qisys import ui
 import qisrc.parsers
 import qisys.qixml
-
-import sys
-import os
 
 
 def configure_parser(parser):

@@ -1,13 +1,12 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-
 import sys
+
+import mock
 
 import qisys.interact
 from qisys.test.fake_interact import FakeInteract
-
-import mock
 
 
 def test_ask_yes_no():

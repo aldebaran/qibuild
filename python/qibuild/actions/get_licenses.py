@@ -3,12 +3,12 @@
 # found in the COPYING file.
 
 """ Get the list of all licenses used by the given projects """
+import collections
 import json
 
 from qisys import ui
 import qisys.parsers
 import qibuild.parsers
-import collections
 
 
 def configure_parser(parser):

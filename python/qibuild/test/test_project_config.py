@@ -5,10 +5,10 @@
 """ Automatic testing for qibuild.project.ProjectConfig
 
 """
+from StringIO import StringIO
+import unittest
 
 from qibuild.config import ProjectConfig
-import unittest
-from StringIO import StringIO
 
 
 def cfg_from_string(str):

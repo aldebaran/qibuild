@@ -3,11 +3,11 @@
 # found in the COPYING file.
 import os
 
+import pytest
+
 import qisys.command
 import qibuild.find
 import qitoolchain.qipackage
-
-import pytest
 
 
 def test_running_from_build_dir(qibuild_action):

@@ -3,10 +3,10 @@
 # found in the COPYING file.
 import os
 
+import mock
+
 import qisys.command
 import qibuild.find
-
-import mock
 
 
 def check_ssh_connection():

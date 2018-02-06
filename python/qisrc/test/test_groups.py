@@ -3,9 +3,9 @@
 # found in the COPYING file.
 import xml.etree.ElementTree as etree
 
-import qisrc.groups
-
 import pytest
+
+import qisrc.groups
 
 
 def test_parser_read():

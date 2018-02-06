@@ -1,6 +1,7 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import pprint
 import os
 import sys
 
@@ -8,7 +9,6 @@ from qisys import ui
 import qisys.archive
 import qisys.sh
 import qidoc.project
-import pprint
 
 
 class SphinxProject(qidoc.project.DocProject):

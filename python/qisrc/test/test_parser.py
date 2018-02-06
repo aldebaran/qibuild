@@ -1,6 +1,9 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import mock
+import pytest
+
 import qisys.sh
 import qisys.parsers
 import qisrc.git
@@ -11,9 +14,6 @@ from qisrc.parsers import get_git_projects
 
 from qibuild.test.conftest import TestBuildWorkTree
 from qisrc.test.conftest import TestGitWorkTree
-
-import mock
-import pytest
 
 
 def test_guess_git_repo(tmpdir, args):

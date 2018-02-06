@@ -3,6 +3,8 @@
 # found in the COPYING file.
 import os
 
+import pytest
+
 import qisys.archive
 import qisrc.license
 import qibuild.config
@@ -10,8 +12,6 @@ import qitoolchain.qipackage
 
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
-
-import pytest
 
 
 def test_simple(qibuild_action):

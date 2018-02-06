@@ -1,14 +1,15 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import os
+
+import pytest
+
 import qisys.script
 import qisrc.git
 
 from qisrc.test.conftest import TestGit
 from qisrc.test.conftest import TestGitWorkTree
-
-import os
-import pytest
 
 
 def test_in_new_directory(cd_to_tmpdir, git_server):

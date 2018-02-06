@@ -5,10 +5,10 @@
 import os
 import subprocess
 
+import pytest
+
 import qisys.command
 import qibuild.gdb
-
-import pytest
 
 
 def check_gdb():

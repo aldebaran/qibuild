@@ -3,10 +3,10 @@
 # found in the COPYING file.
 import os
 
+import pytest
+
 import qisys.sh
 import qibuild.parsers
-
-import pytest
 
 
 def test_parse_one_arg(build_worktree, args):

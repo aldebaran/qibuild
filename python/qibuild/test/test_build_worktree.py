@@ -5,13 +5,13 @@
 import os
 import sys
 
+import pytest
+
 import qibuild.config
 
 from qibuild.test.conftest import TestBuildWorkTree
 from qitoolchain.test.conftest import toolchains
 from qipy.test.conftest import qipy_action
-
-import pytest
 
 
 def test_read_deps(build_worktree):

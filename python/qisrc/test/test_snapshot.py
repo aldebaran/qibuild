@@ -1,11 +1,11 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+import pytest
+
 import qisys.sh
 import qisrc.snapshot
 from qisrc.test.conftest import TestGitWorkTree
-
-import pytest
 
 
 def test_dump_load(tmpdir):

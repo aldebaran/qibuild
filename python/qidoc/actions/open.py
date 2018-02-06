@@ -7,13 +7,13 @@
 import os
 import sys
 
+import webbrowser
+
 from qisys import ui
 import qisys.command
 import qisys.parsers
 import qisys.sh
 import qidoc.parsers
-
-import webbrowser
 
 
 def configure_parser(parser):

@@ -1,10 +1,11 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
+from xml.etree import ElementTree as etree
+
 import pytest
 
 import qisys.qixml
-from xml.etree import ElementTree as etree
 
 
 def test_qixml_parse_bool_attr():

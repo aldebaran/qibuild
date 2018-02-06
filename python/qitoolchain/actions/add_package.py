@@ -5,9 +5,10 @@
 """Add a new package to a toolchain
 
 """
+import os
 
 import argparse
-import os
+import urlparse
 import zipfile
 
 from qisys import ui
@@ -15,7 +16,6 @@ import qisys.archive
 import qisys.worktree
 import qitoolchain.parsers
 import qisys.remote
-import urlparse
 
 
 def configure_parser(parser):
