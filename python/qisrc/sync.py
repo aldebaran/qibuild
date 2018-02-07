@@ -277,7 +277,8 @@ Please run `qisrc init MANIFEST_URL`
             raise Exception(mess.format(root=self.git_worktree.root))
         self._sync_git(self.manifest_repo, self.manifest.url, self.manifest.branch, self.manifest.ref)
 
-    def _sync_git(self, repo, url, branch, ref):
+    @staticmethod
+    def _sync_git(repo, url, branch, ref):
         git = qisrc.git.Git(repo)
         git.set_remote("origin", url)
         if git.get_current_branch() != branch:

@@ -138,7 +138,8 @@ class SphinxProject(qidoc.project.DocProject):
         res += "\nintersphinx_mapping= " + str(intersphinx_mapping)
         return res
 
-    def append_extension(self, conf, extension_name):
+    @staticmethod
+    def append_extension(conf, extension_name):
         from_conf = dict()
         exec(conf, from_conf)
         res = ""

@@ -251,7 +251,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         test["cmd"] = ["valgrind", "--track-fds=yes",
                        "--log-file=%s" % valgrind_log] + test["cmd"]
 
-    def _nightmare_mode(self, test):
+    @staticmethod
+    def _nightmare_mode(test):
         if not test.get("gtest"):
             return
         cmd = test["cmd"]
@@ -284,7 +285,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         if process_crashed or not os.path.exists(test_out):
             self._write_xml(res, test, test_out)
 
-    def _write_xml(self, res, test, out_xml):
+    @staticmethod
+    def _write_xml(res, test, out_xml):
         """ Make sure a Junit XML compatible file is written """
         # Arbitrary limit output (~700 lines) to prevent from crashing on read
         res.out = res.out[-16384:]
@@ -335,7 +337,8 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
         qisys.qixml.write(root, out_xml, encoding=encoding)
 
-    def get_message(self, process, timeout=None):  # pylint: disable=too-many-return-statements
+    @staticmethod
+    def get_message(process, timeout=None):  # pylint: disable=too-many-return-statements
         """ Human readable string describing the state of the process """
         if process.return_type == qisys.command.Process.OK:
             return "[OK]"

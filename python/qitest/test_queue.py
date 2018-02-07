@@ -194,7 +194,8 @@ class TestWorker(threading.Thread):
             self.results[test["name"]] = result
             self.queue.task_done()
 
-    def message_for_exception(self, exception):
+    @staticmethod
+    def message_for_exception(exception):
         tb = sys.exc_info()[2]
         io = StringIO.StringIO()
         traceback.print_tb(tb, file=io)

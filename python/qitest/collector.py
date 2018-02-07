@@ -27,7 +27,8 @@ class PythonTestCollector:
         if not self.pytest_path:
             raise Exception("pytest path is empty")
 
-    def get_list_of_pytest(self, rep):
+    @staticmethod
+    def get_list_of_pytest(rep):
         pytest_list = list()
         for root, dirnames, filenames in os.walk(rep):
             pytest_list.extend(glob.glob(root + "/test_*.py"))

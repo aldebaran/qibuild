@@ -122,14 +122,17 @@ class MessageRecorder:
         ui.CONFIG["record"] = True
         ui._MESSAGES = list()
 
-    def stop(self):
+    @staticmethod
+    def stop():
         ui.CONFIG["record"] = False
         ui._MESSAGES = list()
 
-    def reset(self):
+    @staticmethod
+    def reset():
         ui._MESSAGES = list()
 
-    def find(self, pattern):
+    @staticmethod
+    def find(pattern):
         regexp = re.compile(pattern)
         for message in ui._MESSAGES:
             if re.search(regexp, message):
@@ -173,7 +176,8 @@ class TestAction(object):
         self.package = package
         self.worktree = TestWorkTree()
 
-    def chdir(self, directory):
+    @staticmethod
+    def chdir(directory):
         try:
             directory = directory.strpath
         except AttributeError:

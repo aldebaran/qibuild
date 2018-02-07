@@ -38,7 +38,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         worktree = qisys.worktree.WorkTree(self.tmp, sanity_check=False)
         self.build_worktree = qibuild.worktree.BuildWorkTree(worktree)
 
-    def setup_platform(self, platform):
+    @staticmethod
+    def setup_platform(platform):
         """ Setup sys.platform
 
         """
@@ -87,7 +88,8 @@ class ConfigWizardTestCase(unittest.TestCase):
         """
         self.get_generators.return_value = generators
 
-    def run_wizard(self, build_worktree=None):
+    @staticmethod
+    def run_wizard(build_worktree=None):
         """ Run the wizard, return the QiBuildConfig object
 
         """

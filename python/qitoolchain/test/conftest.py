@@ -25,7 +25,8 @@ class Toolchains:
     def clean(self):
         self.tmp.remove()
 
-    def create(self, name):
+    @staticmethod
+    def create(name):
         toolchain = qitoolchain.toolchain.Toolchain(name)
         return toolchain
 
@@ -152,7 +153,8 @@ class QiToolchainAction(TestAction):
     def __init__(self):
         super(QiToolchainAction, self).__init__("qitoolchain.actions")
 
-    def get_test_package(self, name):
+    @staticmethod
+    def get_test_package(name):
         # FIXME: handle mac, windows
         this_dir = os.path.dirname(__file__)
         return os.path.join(this_dir, "packages", name + ".zip")

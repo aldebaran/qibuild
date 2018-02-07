@@ -188,7 +188,8 @@ class DataBase(object):
         else:
             svn_package.checkout()
 
-    def handle_local_package(self, package, feed):
+    @staticmethod
+    def handle_local_package(package, feed):
         directory = package.directory
         feed_root = os.path.dirname(feed)
         package_path = os.path.join(feed_root, directory)
