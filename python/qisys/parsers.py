@@ -19,7 +19,7 @@ class SetHome(argparse.Action):
     def __init__(self, *args, **kwargs):
         super(SetHome, self).__init__(*args, **kwargs)
 
-    def __call__(self, parser, namespace, values, option_string):
+    def __call__(self, parser, namespace, values, option_string=None):
         qisys.sh.set_home(values)
 
 
