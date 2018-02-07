@@ -123,13 +123,12 @@ class QiPackage(object):
                 # retro-compat
                 def filter_fun(x):
                     return qisys.sh.is_runtime(x) and x != "package.xml"
-                return qisys.sh.install(self.path, destdir,
-                                        filter_fun=filter_fun)
-            else:
-                # avoid install masks and package.xml
-                mask.append(r"exclude .*\.mask")
-                mask.append(r"exclude package\.xml")
-                return self._install_with_mask(destdir, mask)
+                return qisys.sh.install(self.path, destdir, filter_fun=filter_fun)
+
+            # avoid install masks and package.xml
+            mask.append(r"exclude .*\.mask")
+            mask.append(r"exclude package\.xml")
+            return self._install_with_mask(destdir, mask)
         else:
             with open(manifest_path, "r") as fp:
                 lines = fp.readlines()
@@ -296,8 +295,8 @@ def extract(archive_path, dest):
     with zipfile.ZipFile(archive_path) as archive:
         if "package.xml" in archive.namelist():
             return _extract_modern(archive_path, dest)
-        else:
-            return _extract_legacy(archive_path, dest)
+
+        return _extract_legacy(archive_path, dest)
 
 
 def _extract_modern(archive_path, dest):
@@ -316,5 +315,5 @@ def _extract_legacy(archive_path, dest):
         qisys.sh.mv(extract_path, dest)
         qisys.sh.rm(extract_path)
         return dest
-    else:
-        return extract_path
+
+    return extract_path

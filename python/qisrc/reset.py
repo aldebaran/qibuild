@@ -40,8 +40,8 @@ def clever_reset_ref(git_project, ref, raises=True):  # pylint: disable=too-many
     if actual_sha1 == ref_sha1:  # Nothing to do
         if raises:
             return
-        else:
-            return True, ""
+
+        return True, ""
     ret, _ = git.call("show", "--oneline", ref, raises=False)
     if ret == 0:  # SHA-1 exists locally
         if raises:

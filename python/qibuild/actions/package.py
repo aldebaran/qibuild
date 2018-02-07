@@ -88,8 +88,8 @@ def do(args):
         ui.info(ui.green, "Symbols package generated in", ui.reset, ui.bold,
                 symbols_archive)
         return archive, symbols_archive
-    else:
-        return archive
+
+    return archive
 
 
 def _do_package(cmake_builder, destdir, build_type="Release", standalone=False):

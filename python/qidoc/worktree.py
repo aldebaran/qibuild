@@ -90,8 +90,8 @@ def new_doc_project(doc_worktree, project):
     root = tree.getroot()
     if root.get("version") == "3":
         return _new_doc_project_3(doc_worktree, project)
-    else:
-        return _new_doc_project_2(doc_worktree, project)
+
+    return _new_doc_project_2(doc_worktree, project)
 
 
 def _new_doc_project_3(doc_worktree, project):

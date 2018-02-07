@@ -40,8 +40,8 @@ def fetch_gerrit_hook_ssh(path, username, server, port=None):
     (out, _) = process.communicate()
     if process.returncode == 0:
         return True, ""
-    else:
-        return False, out
+
+    return False, out
 
 
 def check_gerrit_connection(username, server, ssh_port=29418):

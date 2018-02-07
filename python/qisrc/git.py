@@ -240,10 +240,11 @@ class Git(object):
                 message += "Additionally, your index contains uncommited changes"
             else:
                 message = "Your index contains uncommited changes"
+
         if message:
             return False, message
-        else:
-            return True, ""
+
+        return True, ""
 
     def get_status(self, untracked=True):
         """Return the output of status or None if it failed."""
@@ -376,12 +377,12 @@ class Git(object):
                 (abort_rc, abort_out) = self.call("rebase", "--abort", raises=False)
                 if abort_rc == 0:
                     return False, message
-                else:
-                    full_message = message
-                    full_message += "\n\nAdditionally, git rebase --abort failed "
-                    full_message += "with following output:\n\n"
-                    full_message += abort_out
-                    return False, full_message
+
+                full_message = message
+                full_message += "\n\nAdditionally, git rebase --abort failed "
+                full_message += "with following output:\n\n"
+                full_message += abort_out
+                return False, full_message
 
         return update_successful, message
 
@@ -395,9 +396,9 @@ class Git(object):
             ui.error("Calling merge-base failed")
             ui.error(out)
             return
-        else:
-            common_ancestor = out.strip()
-            return common_ancestor == local_sha1
+
+        common_ancestor = out.strip()
+        return common_ancestor == local_sha1
 
     def get_ref_sha1(self, ref):
         """Return the sha1 from a ref. None if not found."""
@@ -545,24 +546,26 @@ def is_submodule(path):
         dot_git = os.path.join(path, ".git")
         if os.path.isdir(dot_git):
             return False
+
         parent_repo_root = get_repo_root(os.path.dirname(path))
     else:
         parent_repo_root = get_repo_root(path)
+
     parent_git = Git(parent_repo_root)
     (retcode, out) = parent_git.submodule(raises=False)
     if retcode == 0:
         if not out:
             return False
-        else:
-            lines = out.splitlines()
-            submodules = [x.split()[1] for x in lines]
-            rel_path = os.path.relpath(path, parent_repo_root)
-            return rel_path in submodules
-    else:
-        ui.warning("git submodules configuration is broken for",
-                   parent_repo_root, "!",
-                   "\nError was: ", ui.reset, "\n", "  " + out)
-        return True
+
+        lines = out.splitlines()
+        submodules = [x.split()[1] for x in lines]
+        rel_path = os.path.relpath(path, parent_repo_root)
+        return rel_path in submodules
+
+    ui.warning("git submodules configuration is broken for",
+               parent_repo_root, "!",
+               "\nError was: ", ui.reset, "\n", "  " + out)
+    return True
 
 
 def is_git(path):
@@ -583,6 +586,7 @@ def name_from_url(url):
         sep = "/"
         if os.name == 'nt' and "\\" in url:
             sep = "\\"
+
         return url.split(sep)[-1]
 
     if "://" in url:
@@ -590,13 +594,13 @@ def name_from_url(url):
         if ":" in url:
             port_and_rest = url.split(":")[-1]
             return port_and_rest.split("/", 1)[-1]
-        else:
-            return url.split("/", 1)[-1]
+
+        return url.split("/", 1)[-1]
     else:
         if ":" in url:
             return url.split(":")[-1]
-        else:
-            return url.split("/")[-1]
+
+        return url.split("/")[-1]
 
 
 class Transaction(object):

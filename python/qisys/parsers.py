@@ -136,8 +136,8 @@ def get_worktree(args=None, raises=True):
         wt_root = qisys.worktree.guess_worktree(raises=raises)
     if wt_root:
         return qisys.worktree.WorkTree(wt_root)
-    else:
-        return None
+
+    return None
 
 
 def get_projects(worktree, args):
@@ -199,8 +199,8 @@ class AbstractProjectParser(object):
         if not args.projects:
             if default_all and not args.single:
                 return self.all_projects(args)
-            else:
-                return self.parse_no_project(args)
+
+            return self.parse_no_project(args)
         res = list()
         for project_arg in project_args:
             # parsing one arg can result in several projets

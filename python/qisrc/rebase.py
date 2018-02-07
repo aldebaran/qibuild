@@ -129,11 +129,11 @@ def rebase_project(git_project, upstream_project):  # pylint: disable=too-many-r
     if rc == 0:
         ui.info(ui.green, "[OK]", ui.reset, "rebased")
         return True
-    else:
-        ui.info(ui.red, "[FAILED]", ui.reset, "there was some conflicts")
-        git.call("rebase", "--abort", raises=False)
-        git.call("tag", "-d", "before-rebase", raises=False)  # suppress output
-        return False
+
+    ui.info(ui.red, "[FAILED]", ui.reset, "there was some conflicts")
+    git.call("rebase", "--abort", raises=False)
+    git.call("tag", "-d", "before-rebase", raises=False)  # suppress output
+    return False
 
 
 def check_local_branch(git_project):

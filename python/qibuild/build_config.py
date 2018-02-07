@@ -49,12 +49,13 @@ class CMakeBuildConfig(object):
         """
         if not self.active_build_config:
             return None
+
         custom_cmake = os.path.join(self.build_worktree.root, ".qi",
                                     self.active_build_config.name + ".cmake")
         if os.path.exists(custom_cmake):
             return custom_cmake
-        else:
-            return None
+
+        return None
 
     @property
     def toolchain(self):

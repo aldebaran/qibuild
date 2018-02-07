@@ -119,8 +119,8 @@ def _library_prefix(os_name=None):
         os_name = platform.system()
     if os_name == "Windows":
         return ""
-    else:
-        return "lib"
+
+    return "lib"
 
 
 def _library_suffix(shared=True, debug=True, os_name=None):

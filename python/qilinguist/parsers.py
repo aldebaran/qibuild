@@ -14,8 +14,8 @@ def get_linguist_worktree(args):
     worktree = qisys.parsers.get_worktree(args, raises=False)
     if worktree:
         return LinguistWorkTree(worktree)
-    else:
-        return None
+
+    return None
 
 
 def get_linguist_projects(args, default_all=False):

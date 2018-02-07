@@ -357,8 +357,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             retcode = process.returncode
             if retcode > 0:
                 return "[FAIL] Return code: %i" % retcode
-            else:
-                return qisys.command.str_from_signal(-retcode)
+            return qisys.command.str_from_signal(-retcode)
 
 
 def get_cpu_list(total_cpus, num_cpus_per_test, worker_index):

@@ -279,8 +279,8 @@ def _find_program_in_path_win(executable, path):
 def _find_program_in_path(executable, path):
     if os.name == 'nt':
         return _find_program_in_path_win(executable, path)
-    else:
-        return _check_access(executable, path)
+
+    return _check_access(executable, path)
 
 
 def _check_access(executable, path):

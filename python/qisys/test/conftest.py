@@ -200,5 +200,5 @@ class TestAction(object):
             except SystemExit as e:
                 return e.code
             return 0
-        else:
-            return qisys.script.run_action(module_name, args)
+
+        return qisys.script.run_action(module_name, args)

@@ -119,8 +119,8 @@ class BuildProject(object):
                                 build_prefix,
                                 build_directory_name,
                                 self.name)
-        else:
-            return os.path.join(self.path, build_directory_name)
+
+        return os.path.join(self.path, build_directory_name)
 
     @property
     def cmake_cache(self):

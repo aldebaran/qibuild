@@ -114,15 +114,15 @@ def config_title(fp):
         return True
     if os.name == 'nt':
         return fp.isatty() and _console is not None
-    else:
-        # else: auto
-        legal_terms = ["xterm", "xterm-256color", "xterm-color",
-                       "Eterm", "aterm", "rxvt", "screen", "kterm",
-                       "rxvt-unicode", "gnome", "interix", "cygwin",
-                       "rxvt-unicode-256color"]
-        return fp.isatty() and \
-            'TERM' in os.environ and \
-            os.environ['TERM'] in legal_terms
+
+    # else: auto
+    legal_terms = ["xterm", "xterm-256color", "xterm-color",
+                   "Eterm", "aterm", "rxvt", "screen", "kterm",
+                   "rxvt-unicode", "gnome", "interix", "cygwin",
+                   "rxvt-unicode-256color"]
+    return fp.isatty() and \
+        'TERM' in os.environ and \
+        os.environ['TERM'] in legal_terms
 
 
 def config_color(fp):
@@ -131,11 +131,12 @@ def config_color(fp):
         return False
     if config_color.lower() == "always":
         return True
+
     # else: auto
     if os.name == 'nt' and not HAS_PYREADLINE or not fp.isatty():
         return False
-    else:
-        return True
+
+    return True
 
 
 _enable_xterm_title = None
@@ -351,11 +352,11 @@ class timer(object):
 def did_you_mean(message, user_input, choices):
     if not choices:
         return message
-    else:
-        result = {difflib.SequenceMatcher(a=user_input, b=choice).ratio(): choice
-                  for choice in choices}
-        message += "\nDid you mean: %s?" % result[max(result)]
-        return message
+
+    result = {difflib.SequenceMatcher(a=user_input, b=choice).ratio(): choice
+              for choice in choices}
+    message += "\nDid you mean: %s?" % result[max(result)]
+    return message
 
 
 # Console size code inspired by: http://pastebin.com/rJqMVnZJ
@@ -377,7 +378,6 @@ def get_console_size():
 
 
 def _get_console_size_windows():
-    res = None
     try:
         from ctypes import windll, create_string_buffer
 
@@ -390,6 +390,7 @@ def _get_console_size_windows():
         res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
     except Exception:
         return None
+
     if res:
         import struct
         (bufx, bufy, curx, cury, wattr,
@@ -397,8 +398,8 @@ def _get_console_size_windows():
         sizex = right - left + 1
         sizey = bottom - top + 1
         return sizex, sizey
-    else:
-        return None
+
+    return None
 
 
 def _get_console_size_tput():
