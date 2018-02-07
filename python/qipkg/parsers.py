@@ -8,12 +8,12 @@ import copy
 from qisys import ui
 import qisys.parsers
 import qipkg.builder
+import qipkg.metapackage
+import qipkg.metabuilder
 
 import qibuild.parsers
 import qipy.parsers
 import qilinguist.parsers
-import qipkg.metapackage
-import qipkg.metabuilder
 
 
 def pml_parser(parser):

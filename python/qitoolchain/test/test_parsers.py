@@ -4,9 +4,9 @@
 import pytest
 
 import qibuild.config
+from qibuild.test.conftest import build_worktree
 
 import qitoolchain.parsers
-from qibuild.test.conftest import build_worktree
 
 
 def test_using_dash_c(toolchains, args):

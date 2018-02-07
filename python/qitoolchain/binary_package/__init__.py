@@ -19,8 +19,8 @@ import qisys
 import qisys.sh
 import qisys.ui
 from qisys.qixml import etree
-from qitoolchain.binary_package.core import BinaryPackage
-from qitoolchain.binary_package.core import BinaryPackageException
+from qitoolchain.binary_package.core import BinaryPackage  # pylint: disable=ungrouped-imports
+from qitoolchain.binary_package.core import BinaryPackageException  # pylint: disable=ungrouped-imports
 
 WITH_PORTAGE = True
 try:

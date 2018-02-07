@@ -2,12 +2,13 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
-import qitoolchain.qipackage
 
 from qibuild.test.conftest import QiBuildAction
-from qitoolchain.test.conftest import QiToolchainAction
 
 from qisrc.test.conftest import git_server
+
+import qitoolchain.qipackage
+from qitoolchain.test.conftest import QiToolchainAction
 
 
 def test_simple(qitoolchain_action):

@@ -11,10 +11,10 @@ import qisys.command
 import qibuild.cmake
 import qibuild.config
 import qibuild.find
+from qibuild.test.conftest import TestBuildWorkTree
 import qisrc.git
 import qitoolchain
 
-from qibuild.test.conftest import TestBuildWorkTree
 from qipy.test.conftest import qipy_action
 
 # allow the existing foo/bar/baz names

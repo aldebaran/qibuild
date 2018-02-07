@@ -8,9 +8,9 @@ import qisys.sh
 from qisys.qixml import etree
 import qibuild.build_config
 import qibuild.config
-import qitoolchain.toolchain
-
 from qibuild.test.conftest import TestBuildWorkTree
+
+import qitoolchain.toolchain
 
 
 def test_read_profiles(build_worktree):

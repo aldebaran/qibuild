@@ -3,12 +3,11 @@
 # found in the COPYING file.
 import os
 
-from qisys import ui
 import qisrc.git
-import qitoolchain.toolchain
-
 from qisrc.test.conftest import svn_server
 from qisrc.test.conftest import git_server
+from qisys import ui
+import qitoolchain.toolchain
 
 
 def get_tc_file_contents(tc):

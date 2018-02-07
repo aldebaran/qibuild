@@ -9,11 +9,11 @@
 import sys
 
 from qisys import ui
-import qibuild.find
-import qibuild.parsers
 import qisys.parsers
 import qisys.command
 import qisys.envsetter
+import qibuild.find
+import qibuild.parsers
 import qibuild.run
 
 

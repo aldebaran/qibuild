@@ -6,8 +6,8 @@ import os
 import pytest
 
 import qisys.script
-import qisrc.git
 from qisys.test.conftest import TestWorkTree
+import qisrc.git
 
 
 def test_simple(qisrc_action):

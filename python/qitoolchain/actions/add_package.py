@@ -13,9 +13,9 @@ import zipfile
 
 from qisys import ui
 import qisys.archive
+import qisys.remote
 import qisys.worktree
 import qitoolchain.parsers
-import qisys.remote
 
 
 def configure_parser(parser):

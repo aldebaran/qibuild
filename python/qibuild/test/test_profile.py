@@ -5,9 +5,9 @@
 
 import qibuild.config
 import qibuild.profile
+from qibuild.test.conftest import TestBuildWorkTree
 
 from qisrc.test.conftest import qisrc_action, git_server
-from qibuild.test.conftest import TestBuildWorkTree
 
 
 def test_read_build_profiles(tmpdir):

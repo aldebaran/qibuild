@@ -7,12 +7,12 @@ import functools
 import operator
 
 from qisys import ui
+from qisys.abstractbuilder import AbstractBuilder
 import qisys.sh
 import qisys.remote
 import qibuild.deploy
 import qibuild.deps
 from qibuild.parallel_builder import ParallelBuilder
-from qisys.abstractbuilder import AbstractBuilder
 from qibuild.project import write_qi_path_conf
 
 

@@ -4,9 +4,9 @@
 import pytest
 
 import qibuild.config
-import qitoolchain.toolchain
-
 from qibuild.test.conftest import TestBuildWorkTree
+
+import qitoolchain.toolchain
 
 
 def test_simple(qitoolchain_action):

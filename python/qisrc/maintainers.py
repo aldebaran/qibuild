@@ -9,8 +9,8 @@ import locale
 from xml.etree import ElementTree as etree
 
 from qisys import ui
-import qisrc.git
 import qisys.qixml
+import qisrc.git
 
 
 class ProjectXML(qisys.qixml.XMLParser):

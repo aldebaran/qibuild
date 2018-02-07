@@ -9,8 +9,8 @@ import pytest
 import qibuild.find
 
 from qibuild.test.conftest import QiBuildAction
-from qitoolchain.test.conftest import QiToolchainAction
 from qibuild.actions import run
+from qitoolchain.test.conftest import QiToolchainAction
 
 
 def test_run_target(qibuild_action):

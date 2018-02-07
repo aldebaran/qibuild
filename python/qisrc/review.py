@@ -10,11 +10,11 @@ import os
 import sys
 import subprocess
 
-from qisys import ui
 import qisrc.git
+from qisys import ui
 import qisys.interact
-import qibuild.config
 import qisys.command
+import qibuild.config
 
 
 def fetch_gerrit_hook_ssh(path, username, server, port=None):

@@ -10,11 +10,11 @@ import sys
 import subprocess
 
 from qisys import ui
+import qisys.command
 import qisys.interact
+import qisys.parsers
 import qibuild.find
 import qibuild.parsers
-import qisys.parsers
-import qisys.command
 
 
 def run(projects, binary, bin_args, env=None, exec_=True):

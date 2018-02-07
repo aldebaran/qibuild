@@ -8,9 +8,9 @@ import pytest
 import qisys.archive
 import qisrc.license
 import qibuild.config
-import qitoolchain.qipackage
-
 from qibuild.test.conftest import QiBuildAction
+
+import qitoolchain.qipackage
 from qitoolchain.test.conftest import QiToolchainAction
 
 

@@ -2,11 +2,11 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 from qisys.test.conftest import *
+import qisys.script
 
 import qisrc.git
 import qisrc.worktree
 import qisrc.manifest
-import qisys.script
 
 
 class TestGitWorkTree(qisrc.worktree.GitWorkTree):

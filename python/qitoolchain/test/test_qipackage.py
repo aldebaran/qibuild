@@ -6,8 +6,8 @@ import os
 import pytest
 
 import qisys.archive
-import qitoolchain.qipackage
 from qisys.test.conftest import skip_on_win
+import qitoolchain.qipackage
 
 # allow the existing foo/bar/baz names
 # pylint: disable=blacklisted-name

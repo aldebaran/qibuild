@@ -13,8 +13,8 @@ import tempfile
 import unittest
 import mock
 
-import qisys
 import qibuild.wizard
+import qisys
 from qisys.test.fake_interact import FakeInteract
 
 

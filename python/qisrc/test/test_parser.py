@@ -11,9 +11,9 @@ import qisrc.parsers
 import qisrc.worktree
 
 from qisrc.parsers import get_git_projects
+from qisrc.test.conftest import TestGitWorkTree
 
 from qibuild.test.conftest import TestBuildWorkTree
-from qisrc.test.conftest import TestGitWorkTree
 
 # allow the existing foo/bar/baz names
 # pylint: disable=blacklisted-name

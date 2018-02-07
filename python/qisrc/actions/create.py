@@ -6,9 +6,9 @@
 import os
 
 import qisrc  # for QISRC_ROOT_DIR
+import qisrc.templates
 from qisys import ui
 import qisys.parsers
-import qisrc.templates
 
 
 def parse_params_arg(params_arg):

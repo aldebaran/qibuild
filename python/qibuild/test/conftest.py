@@ -5,9 +5,10 @@
 import subprocess
 
 from qisys.test.conftest import *
+import qisys.worktree
+
 from qitoolchain.test.conftest import *
 
-import qisys.worktree
 import qibuild.worktree
 
 

@@ -4,9 +4,9 @@
 import pytest
 
 from qibuild.test.conftest import *
-from qisys.test.conftest import TestAction
-
 import qibuild.find
+
+from qisys.test.conftest import TestAction
 
 # pylint: disable-msg=E1103
 

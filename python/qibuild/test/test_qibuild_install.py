@@ -5,11 +5,11 @@ import sys
 import os
 
 import qisys.command
+from qisys.test.conftest import skip_on_win
 import qitest.project
 import qibuild.config
 import qibuild.find
 
-from qisys.test.conftest import skip_on_win
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
 
