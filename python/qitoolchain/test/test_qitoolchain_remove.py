@@ -33,5 +33,5 @@ def test_when_is_default(qitoolchain_action):
     test_build_worktre2 = TestBuildWorkTree()
     # pylint:disable-msg=E1101
     with pytest.raises(Exception) as e:
-        test_build_worktre2.toolchain
+        test_build_worktre2.toolchain  # pylint: disable=pointless-statement
     assert "No such toolchain" in e.value.message
