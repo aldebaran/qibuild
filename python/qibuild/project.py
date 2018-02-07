@@ -307,7 +307,7 @@ set(QIBUILD_PYTHON_PATH "%s" CACHE STRING "" FORCE)
             mess += "Error was: %s" % message
             ui.error(mess)
         for line in lines:
-            parser.error = lambda message: log_error(message, line)
+            parser.error = lambda message, current_line_in_loop=line: log_error(message, current_line_in_loop)
             line = line.strip()
             try:
                 args = parser.parse_args(args=line.split(";"))
