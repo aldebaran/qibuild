@@ -129,6 +129,7 @@ disable=print-statement,
         dict-values-not-iterating,
         # custom disable warnings
         missing-docstring,
+        broad-except,
         invalid-name  # regex seems to be buggy
 
 # Enable the message, report, category or checker with the given id(s). You can
