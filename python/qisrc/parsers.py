@@ -81,6 +81,7 @@ class GitProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a GitWorkTree """
 
     def __init__(self, git_worktree):
+        super(GitProjectParser, self).__init__()
         self.git_worktree = git_worktree
         self.git_projects = git_worktree.git_projects
         self.wt_parser = qisys.parsers.WorkTreeProjectParser(git_worktree.worktree)
@@ -115,6 +116,7 @@ class GitBuildProjectParser(qisys.parsers.AbstractProjectParser):
     """
 
     def __init__(self, git_worktree, build_worktree):
+        super(GitBuildProjectParser, self).__init__()
         self.git_worktree = git_worktree
         self.build_worktree = build_worktree
         self.parser = GitProjectParser(git_worktree)

@@ -54,6 +54,7 @@ def msbuild(sln_file, build_type="Debug", target=None, num_jobs=None):
 
 class BuildFailed(Exception):
     def __init__(self, project):
+        super(BuildFailed, self).__init__()
         self.project = project
 
     def __str__(self):
@@ -62,6 +63,7 @@ class BuildFailed(Exception):
 
 class ConfigureFailed(Exception):
     def __init__(self, project, exception=None):
+        super(ConfigureFailed, self).__init__()
         self.project = project
         self.exception = exception
 

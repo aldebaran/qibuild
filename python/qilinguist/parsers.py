@@ -71,6 +71,7 @@ class LinguistProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a LinguistWorkTree """
 
     def __init__(self, linguist_worktree):
+        super(LinguistProjectParser, self).__init__()
         self.linguist_worktree = linguist_worktree
         self.linguist_projects = linguist_worktree.linguist_projects
 

@@ -21,6 +21,7 @@ class PythonBuilder(AbstractBuilder):
     """
 
     def __init__(self, python_worktree, build_worktree=None):
+        super(PythonBuilder, self).__init__(self.__class__.__name__)
         self.python_worktree = python_worktree
         self.build_worktree = build_worktree
         self.projects = list()

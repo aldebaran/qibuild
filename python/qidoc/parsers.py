@@ -72,6 +72,7 @@ class DocProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a DocWorkTree """
 
     def __init__(self, doc_worktree):
+        super(DocProjectParser, self).__init__()
         self.doc_worktree = doc_worktree
         self.doc_projects = doc_worktree.doc_projects
 

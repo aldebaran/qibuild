@@ -100,6 +100,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
     """
 
     def __init__(self, project_runner):
+        super(ProcessTestLauncher, self).__init__()
         self.suite_runner = project_runner
         self.project = self.suite_runner.project
         self.verbose = self.suite_runner.verbose

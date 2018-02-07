@@ -42,6 +42,7 @@ class PythonProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a PythonWorkTree """
 
     def __init__(self, python_worktree):
+        super(PythonProjectParser, self).__init__()
         self.python_worktree = python_worktree
         self.python_projects = python_worktree.python_projects
 

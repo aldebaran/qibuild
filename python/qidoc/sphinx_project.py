@@ -288,6 +288,7 @@ class SphinxBuildError(Exception):
 
 class UnknownLingua(Exception):
     def __init__(self, project, language):
+        super(UnknownLingua, self).__init__()
         self.language = language
         self.project = project
 

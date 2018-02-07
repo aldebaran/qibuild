@@ -262,6 +262,7 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
     """ Implements AbstractProjectParser for a BuildWorkTree """
 
     def __init__(self, build_worktree):
+        super(BuildProjectParser, self).__init__()
         self.build_worktree = build_worktree
 
     def all_projects(self, args):

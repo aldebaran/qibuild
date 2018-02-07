@@ -348,6 +348,7 @@ find_package(qibuild)
 
 class IncorrectCMakeLists(Exception):
     def __init__(self, cmake_list_file, message):
+        super(IncorrectCMakeLists, self).__init__()
         self.cmake_list_file = cmake_list_file
         self.message = message
 

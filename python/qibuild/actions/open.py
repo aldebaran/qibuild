@@ -135,6 +135,7 @@ def open_qtcreator(project, qtcreator_path=None):
 
 class OpenError(Exception):
     def __init__(self, project, reason):
+        super(OpenError, self).__init__()
         self.project = project
         self.reason = reason
 

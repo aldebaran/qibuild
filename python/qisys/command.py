@@ -174,6 +174,7 @@ class CommandFailedException(Exception):
     """Custom exception """
 
     def __init__(self, cmd, returncode, cwd=None, stdout=None, stderr=None):
+        super(CommandFailedException, self).__init__()
         self.cmd = cmd
         self.cwd = cwd
         if cwd is None:
@@ -207,6 +208,7 @@ class ProcessCrashedError(Exception):
     """An other custom exception, used by call_background """
 
     def __init__(self, cmd):
+        super(ProcessCrashedError, self).__init__()
         self.cmd = cmd
 
     def __str__(self):
@@ -219,6 +221,7 @@ class NotInPath(Exception):
     """Custom exception """
 
     def __init__(self, executable, env=None):
+        super(NotInPath, self).__init__()
         self.executable = executable
         self.env = env
 

@@ -22,6 +22,7 @@ class InvalidAction(Exception):
     """Just a custom exception """
 
     def __init__(self, name, message):
+        super(InvalidAction, self).__init__()
         self.name = name
         self._message = message
 

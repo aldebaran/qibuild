@@ -16,6 +16,7 @@ class DummyProject(object):
 
 class DummyLauncher(qitest.runner.TestLauncher):
     def __init__(self, tmpdir):
+        super(DummyLauncher, self).__init__()
         self.results = dict()
         self.project = DummyProject(tmpdir)
 
@@ -99,6 +100,7 @@ def test_no_tests(tmpdir):
 
 class SporadicallyFailingLauncher(qitest.runner.TestLauncher):
     def __init__(self, tmpdir):
+        super(SporadicallyFailingLauncher, self).__init__()
         self.num_runs = 0
         self.project = DummyProject(tmpdir)
 

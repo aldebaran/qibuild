@@ -213,6 +213,7 @@ class WorkTreeProjectParser(AbstractProjectParser):
     """ Implements AbstractProjectParser for a basic WorkTree """
 
     def __init__(self, worktree):
+        super(WorkTreeProjectParser, self).__init__()
         self.worktree = worktree
 
     def all_projects(self, args):

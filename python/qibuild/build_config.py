@@ -235,6 +235,7 @@ class NoSuchProfile(Exception):
     """ The profile specified by the user cannot be found """
 
     def __init__(self, name, known_profiles):
+        super(NoSuchProfile, self).__init__()
         self.name = name
         self.known_profiles = known_profiles
 

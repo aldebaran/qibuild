@@ -11,6 +11,7 @@ class QiLinguistBuilder(AbstractBuilder):
     """
 
     def __init__(self):
+        super(QiLinguistBuilder, self).__init__(self.__class__.__name__)
         self.projects = list()
 
     def configure(self, *args, **kwargs):

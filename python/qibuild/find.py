@@ -180,6 +180,7 @@ def _filter_candidates(name, candidates, expect_one=True):
 
 class NotFound(Exception):
     def __init__(self, name):
+        super(NotFound, self).__init__()
         self.name = name
 
     def __str__(self):
@@ -188,6 +189,7 @@ class NotFound(Exception):
 
 class MulipleFound(Exception):
     def __init__(self, name, res):
+        super(MulipleFound, self).__init__()
         self.name = name
         self.res = res
 

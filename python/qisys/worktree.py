@@ -346,6 +346,7 @@ class NotInWorkTree(Exception):
 
 class NoSuchProject(Exception):
     def __init__(self, name, message):
+        super(NoSuchProject, self).__init__()
         self.name = name
         self.message = message
 

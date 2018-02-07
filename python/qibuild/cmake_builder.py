@@ -23,6 +23,7 @@ class CMakeBuilder(AbstractBuilder):
     """
 
     def __init__(self, build_worktree, projects=None):
+        super(CMakeBuilder, self).__init__(self.__class__.__name__)
         self.build_worktree = build_worktree
         if not projects:
             self.projects = list()
@@ -355,6 +356,7 @@ Or configure the project with no config
 
 class NotConfigured(Exception):
     def __init__(self, project):
+        super(NotConfigured, self).__init__()
         self.project = project
 
     def __str__(self):
