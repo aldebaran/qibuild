@@ -78,9 +78,6 @@ class Group(object):
 
 
 class GroupParser(qisys.qixml.XMLParser):
-    def __init__(self, target):
-        super(GroupParser, self).__init__(target)
-
     def _parse_project(self, element):
         self.target.projects.append(element.attrib['name'])
 

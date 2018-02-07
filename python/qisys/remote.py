@@ -251,8 +251,7 @@ def deploy(local_directory, remote_url, filelist=None):
 
 
 class URLParseError(Exception):
-    def __init__(self, message):
-        super(URLParseError, self).__init__(message)
+    pass
 
 
 class URL(object):

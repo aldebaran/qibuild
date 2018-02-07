@@ -100,8 +100,7 @@ def test_simple_xml_parser():
             self.quzz = 42
 
     class FooParser(qisys.qixml.XMLParser):
-        def __init__(self, target):
-            super(FooParser, self).__init__(target)
+        pass
 
     foo = Foo()
     foo_parser = FooParser(foo)
@@ -134,13 +133,9 @@ def test_required_attr():
 def test_complex_xml_parser():
 
     class BarParser(qisys.qixml.XMLParser):
-        def __init__(self, target):
-            super(BarParser, self).__init__(target)
+        pass
 
     class FooParser(qisys.qixml.XMLParser):
-        def __init__(self, target):
-            super(FooParser, self).__init__(target)
-
         def _write_bar(self, elem):
             parser = BarParser(self.target.bar)
             bar_elem = parser.xml_elem()
@@ -181,8 +176,7 @@ def test_list_attr():
             self.names = list()
 
     class FooParser(qisys.qixml.XMLParser):
-        def __init__(self, target):
-            super(FooParser, self).__init__(target)
+        pass
 
     foo = Foo()
     foo.names = ["a", "b"]
@@ -206,8 +200,7 @@ def test_write_bool_attr():
             self.bar = False
 
     class FooParser(qisys.qixml.XMLParser):
-        def __init__(self, target):
-            super(FooParser, self).__init__(target)
+        pass
 
     foo = Foo()
     foo.bar = True
