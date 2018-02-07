@@ -1,11 +1,12 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 from qisys.test.conftest import *
 from qipy.test.conftest import *
 from qitoolchain.test.conftest import *
 from qibuild.test.conftest import QiBuildAction
+
 
 class QiPkgAction(TestAction):
     def __init__(self):
@@ -21,6 +22,8 @@ class QiPkgAction(TestAction):
         return worktree_project
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def qipkg_action(cd_to_tmpdir):
     res = QiPkgAction()

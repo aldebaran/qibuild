@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import platform
@@ -18,6 +18,7 @@ class CMakeBuildConfig(object):
     profiles, etc ...)
 
     """
+
     def __init__(self, build_worktree):
         self.build_worktree = build_worktree
         self.build_type = "Debug"
@@ -141,7 +142,7 @@ class CMakeBuildConfig(object):
                 res += self.active_build_config.name
             else:
                 res += "sys-%s-%s" % (platform.system().lower(),
-                                    platform.machine().lower())
+                                      platform.machine().lower())
 
         return res
 
@@ -187,7 +188,7 @@ class CMakeBuildConfig(object):
             # New location: in ~/.config/qi/qibuild.xml
             self.qibuild_cfg.read()
             default_config = self.qibuild_cfg.get_default_config_for_worktree(
-                                    self.build_worktree.root)
+                self.build_worktree.root)
         if default_config:
             matching_config = self.qibuild_cfg.configs.get(default_config)
             if not matching_config:
@@ -197,7 +198,7 @@ Default config is {default_config} but this does not match any
 config in ~/.config/qi/qibuild.xml
 """
                 mess = mess.format(build_worktree=self.build_worktree,
-                                default_config=default_config)
+                                   default_config=default_config)
                 raise Exception(mess)
             self._default_config = matching_config.name
             self.set_active_config(matching_config.name)
@@ -207,7 +208,7 @@ config in ~/.config/qi/qibuild.xml
         known_profiles = self.build_worktree.get_known_profiles(warns=warns)
         known_names = known_profiles.keys()
         for name in self._profiles:
-            if not name in known_names:
+            if name not in known_names:
                 raise NoSuchProfile(name, known_names)
             flags = known_profiles[name].cmake_flags
             self._profile_flags.extend(flags)
@@ -228,8 +229,10 @@ config in ~/.config/qi/qibuild.xml
             self._profiles = self.active_build_config.profiles
             self.parse_profiles()
 
+
 class NoSuchProfile(Exception):
     """ The profile specified by the user cannot be found """
+
     def __init__(self, name, known_profiles):
         self.name = name
         self.known_profiles = known_profiles

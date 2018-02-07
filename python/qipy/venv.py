@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import sys
@@ -9,6 +9,7 @@ import virtualenv
 
 from qisys import ui
 import qisys.command
+
 
 def configure_virtualenv(config, python_worktree,  build_worktree=None,
                          remote_packages=None, site_packages=True,
@@ -108,6 +109,7 @@ def configure_virtualenv(config, python_worktree,  build_worktree=None,
         ui.error("Bootstrap failed")
     return res
 
+
 def find_script(venv_path, script_name):
     """ Find a script given its name
 
@@ -128,6 +130,7 @@ def find_script(venv_path, script_name):
     if res:
         return res
 
+
 def handle_extensions(venv_path, python_worktree, build_worktree):
     """ Check if there is a build project matching the given source, and
     add the correct path to the virtualenv
@@ -147,7 +150,7 @@ def handle_extensions(venv_path, python_worktree, build_worktree):
     to_write = ""
     for i, project in enumerate(extensions_projects):
         ui.info_count(i, len(extensions_projects),
-                ui.blue, project.name)
+                      ui.blue, project.name)
         qi_pth_src = os.path.join(project.sdk_directory, "qi.pth")
         if os.path.exists(qi_pth_src):
             with open(qi_pth_src, "r") as fp:
@@ -159,6 +162,7 @@ def handle_extensions(venv_path, python_worktree, build_worktree):
     qi_pth_dest = os.path.join(venv_path, lib_path, "site-packages/qi.pth")
     with open(qi_pth_dest, "a") as fp:
         fp.write(to_write)
+
 
 def handle_pure_python(venv_path, python_worktree, env=None):
     """ Add the paths of all python projects to the virtualenv """
@@ -182,10 +186,11 @@ def handle_pure_python(venv_path, python_worktree, env=None):
                     res = False
             else:
                 ui.debug("Adding python path for project", project.name, ":\n",
-                            project.python_path)
+                         project.python_path)
                 for path in project.python_path:
                     fp.write(path + "\n")
     return res
+
 
 def handle_modules(venv_path, python_worktree):
     """ Register the qi modules by writing the .mod file in the correct location """

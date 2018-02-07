@@ -1,11 +1,12 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import re
 
 from qisys import ui
 import qisys.qixml
 import qisys.version
+
 
 def bump_version(xml_path, version=None):
     tree = qisys.qixml.read(xml_path)
@@ -19,6 +20,7 @@ def bump_version(xml_path, version=None):
 
 class Validator(object):
     """ Check if a manifest xml is valid """
+
     def __init__(self, manifest_path):
         self.errors = list()
         self.warnings = list()
@@ -79,7 +81,7 @@ class Validator(object):
 
     def _validate_robot_requirements(self):
         robot_requirements = self.manifest_root.findall(
-              "requirements/robotRequirement")
+            "requirements/robotRequirement")
         if not robot_requirements:
             self._add_error("Robot requirements are not defined.")
             return
@@ -90,7 +92,7 @@ class Validator(object):
 
     def _validate_naoqi_requirements(self):
         naoqi_requirements = self.manifest_root.findall(
-              "requirements/naoqiRequirement")
+            "requirements/naoqiRequirement")
         if not naoqi_requirements:
             self._add_error("NAOqi requirements are missing.")
             return
@@ -102,17 +104,17 @@ class Validator(object):
 
     def _validate_trigger_sentences(self):
         if not self.manifest_root.findall(
-              "contents/behaviorContent/triggerSentences/sentence"):
+                "contents/behaviorContent/triggerSentences/sentence"):
             return
 
         supported_languages = self.manifest_root.findall(
-              "supportedLanguages/language")
+            "supportedLanguages/language")
         for behavior_content in self.manifest_root.findall(
-              "contents/behaviorContent"):
+                "contents/behaviorContent"):
             for supported_language in supported_languages:
                 if behavior_content.find(
-                      ".//triggerSentences/sentence[@lang=\'%s\']"
-                      % supported_language.text) is None:
+                    ".//triggerSentences/sentence[@lang=\'%s\']"
+                        % supported_language.text) is None:
                     self._add_error("Behavior \'%s\' has no trigger "
                                     "sentence defined for \'%s\'."
                                     % (behavior_content.get("path"),
@@ -120,7 +122,7 @@ class Validator(object):
 
     def _validate_names(self):
         supported_languages = self.manifest_root.findall(
-              "supportedLanguages/language")
+            "supportedLanguages/language")
         for supported_language in supported_languages:
             if self.manifest_root.find("names/name[@lang=\'%s\']"
                                        % supported_language.text) is None:
@@ -135,7 +137,7 @@ class Validator(object):
 
     def _validate_description(self):
         supported_languages = self.manifest_root.findall(
-              "supportedLanguages/language")
+            "supportedLanguages/language")
         for supported_language in supported_languages:
             if self.manifest_root.find("descriptions/description[@lang=\'%s\']"
                                        % supported_language.text) is None:

@@ -1,12 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import qisys.sh
 import qibuild.parsers
 
 import pytest
+
 
 def test_parse_one_arg(build_worktree, args):
     world = build_worktree.create_project("world")
@@ -34,6 +35,7 @@ def test_set_generator(build_worktree, args):
     build_config = qibuild.parsers.get_build_config(build_worktree, args)
     assert build_config.cmake_generator == "Ninja"
 
+
 def test_get_one_project(build_worktree, args):
     build_worktree.create_project("hello")
     world = build_worktree.create_project("world")
@@ -48,22 +50,23 @@ def test_get_one_project(build_worktree, args):
         qibuild.parsers.get_one_build_project(build_worktree, args)
     assert "one project" in str(e.value)
 
+
 def test_default_all(build_worktree, args):
     args.dep_types = "default"
     world_proj = build_worktree.create_project("world")
-    foo_proj   = build_worktree.create_project("foo")
+    foo_proj = build_worktree.create_project("foo")
     hello_proj = build_worktree.create_project("hello", build_depends=["world"])
     with qisys.sh.change_cwd(hello_proj.path):
         assert qibuild.parsers.get_build_projects(build_worktree, args) == \
-                [world_proj, hello_proj]
+            [world_proj, hello_proj]
         assert qibuild.parsers.get_build_projects(build_worktree, args,
                                                   default_all=True) == \
-                [foo_proj, world_proj, hello_proj]
+            [foo_proj, world_proj, hello_proj]
     # can still restrict the list of projects when default_all is True
     args.projects = ["hello"]
     assert qibuild.parsers.get_build_projects(build_worktree, args,
                                               default_all=True) == \
-            [world_proj, hello_proj]
+        [world_proj, hello_proj]
 
 
 def test_using_dash_s(build_worktree, args):

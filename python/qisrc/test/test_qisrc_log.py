@@ -1,10 +1,11 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import qisrc.git
 
 from qisrc.test.conftest import TestGitWorkTree
+
 
 def test_calls_git_log(git_server, qisrc_action, record_messages):
     git_server.create_repo("foo.git")
@@ -17,6 +18,7 @@ def test_calls_git_log(git_server, qisrc_action, record_messages):
     record_messages.reset()
     qisrc_action("log", "--all", "master")
     assert record_messages.find("start developing")
+
 
 def test_when_not_on_a_branch(git_server, qisrc_action, record_messages):
     git_server.create_repo("foo.git")
@@ -33,6 +35,7 @@ def test_when_not_on_a_branch(git_server, qisrc_action, record_messages):
     record_messages.reset()
     qisrc_action("log", "--all", "master")
     assert record_messages.find("Not on a branch")
+
 
 def test_skips_when_no_diff(git_server, qisrc_action, record_messages):
     git_server.create_repo("repo_foo.git")

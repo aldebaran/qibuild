@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Install all the projects to the given dest
 """
@@ -9,6 +9,7 @@ import qisys.parsers
 import qisys.sh
 import qipkg.parsers
 
+
 def configure_parser(parser):
     """Configure parser for this action"""
     qipkg.parsers.pml_parser(parser)
@@ -16,6 +17,7 @@ def configure_parser(parser):
                         help="Generate and install .pkg files")
     parser.add_argument("dest")
     parser.set_defaults(pkg=False)
+
 
 def do(args):
     """Main entry point"""

@@ -1,12 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 from qisys import ui
 import qisys.sh
 import qisrc.git
 import qitoolchain.database
+
 
 class Toolchain(object):
     def __init__(self, name):
@@ -101,7 +102,7 @@ class Toolchain(object):
                  "# Make sure we don't keep adding elements to this list:\n",
                  "set(CMAKE_PREFIX_PATH \"\" CACHE INTERNAL \"\" FORCE)\n",
                  "set(CMAKE_FRAMEWORK_PATH \"\" CACHE INTERNAL \"\" FORCE)\n"
-        ]
+                 ]
 
         for package in self.packages:
             if package.toolchain_file:
@@ -159,11 +160,11 @@ Incorrect database configuration in %s: no path for package %s
         if os.path.exists(git_path):
             git = qisrc.git.Git(git_path)
             _, sha1 = git.call("rev-parse", "HEAD", raises=False)
-        res  = "Toolchain %s\n" % self.name
+        res = "Toolchain %s\n" % self.name
         if self.feed_url:
             res += "Using feed from %s" % self.feed_url
             if self.feed_name:
-                res += " (feeds/%s.xml)"% self.feed_name
+                res += " (feeds/%s.xml)" % self.feed_name
             if self.feed_branch:
                 res += " on %s" % self.feed_branch
             if sha1:
@@ -182,8 +183,9 @@ Incorrect database configuration in %s: no path for package %s
                 res += " " + package.version
             res += "\n"
             if package.path:
-                res +=  ui.indent("in " + package.path, 3) + "\n"
+                res += ui.indent("in " + package.path, 3) + "\n"
         return res
+
 
 def get_tc_names():
     configs_path = qisys.sh.get_config_path("qi", "toolchains")
@@ -193,6 +195,7 @@ def get_tc_names():
     contents = [x for x in contents if x.endswith(".xml")]
     contents.sort()
     return [x.replace(".xml", "") for x in contents]
+
 
 def get_default_packages_path(tc_name):
     root = qisys.sh.get_share_path("qi", "toolchains")

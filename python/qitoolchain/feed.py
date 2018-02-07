@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Toolchain feeds
 
 """
@@ -26,16 +26,18 @@ def is_url(location):
     """ Check that a given location is an URL """
     return "://" in location
 
+
 def raise_parse_error(package_tree, feed, message):
     """ Raise a nice parsing error about the given
     package_tree element.
 
     """
     as_str = ElementTree.tostring(package_tree)
-    mess  = "Error when parsing feed: '%s'\n" % feed
+    mess = "Error when parsing feed: '%s'\n" % feed
     mess += "Could not parse:\t%s\n" % as_str
     mess += message
     raise Exception(mess)
+
 
 def tree_from_feed(feed_location, branch=None, name=None):
     """ Returns an ElementTree object from an
@@ -62,6 +64,7 @@ def tree_from_feed(feed_location, branch=None, name=None):
             fp.close()
     return tree
 
+
 def open_git_feed(toolchain_name, feed_url, name=None, branch="master", first_pass=True):
     git_path = qisys.sh.get_share_path("qi", "toolchains", toolchain_name + ".git")
     git = qisrc.git.Git(git_path)
@@ -77,10 +80,12 @@ def open_git_feed(toolchain_name, feed_url, name=None, branch="master", first_pa
         feed_path = feed_url
     return feed_path
 
+
 class ToolchainFeedParser:
     """ A class to handle feed parsing
 
     """
+
     def __init__(self, name):
         self.name = name
         self.packages = list()
@@ -92,7 +97,7 @@ class ToolchainFeedParser:
 
     def get_packages(self):
         """ Get the parsed packages """
-        res = [x for x in self.packages if not x.name in self.blacklist]
+        res = [x for x in self.packages if x.name not in self.blacklist]
         return res
 
     def append_package(self, package_tree):
@@ -127,7 +132,7 @@ class ToolchainFeedParser:
         tc_path = qisys.sh.get_share_path("qi", "toolchains", self.name)
         if branch and name:
             feed = open_git_feed(self.name, feed, branch=branch, name=name,
-                                      first_pass=first_pass)
+                                 first_pass=first_pass)
 
         tree = tree_from_feed(feed)
         package_trees = tree.findall("package")
@@ -139,7 +144,7 @@ class ToolchainFeedParser:
             for subpkg_tree in subpkg_trees:
                 subpkg_tree.set("feed", feed)
                 subpkg_tree.set("directory",
-                        os.path.join(tc_path, package_tree.get("name")))
+                                os.path.join(tc_path, package_tree.get("name")))
                 subpkg_tree.set("subpkg", "1")
                 self.append_package(subpkg_tree)
 

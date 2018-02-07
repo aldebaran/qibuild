@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 from qisys import ui
@@ -9,6 +9,7 @@ import qitoolchain.toolchain
 
 from qisrc.test.conftest import svn_server
 from qisrc.test.conftest import git_server
+
 
 def get_tc_file_contents(tc):
     """ get the contents of the toolchain file of a toolchain
@@ -19,10 +20,12 @@ def get_tc_file_contents(tc):
         contents = fp.read()
     return contents
 
+
 def test_get_tc_names():
     toolchain = qitoolchain.toolchain.Toolchain("bar")
     toolchain = qitoolchain.toolchain.Toolchain("baz")
     assert qitoolchain.get_tc_names() == ["bar", "baz"]
+
 
 def test_persistent_storage(feed):
     boost_package = qitoolchain.qipackage.QiPackage("boost", "1.42")
@@ -32,11 +35,13 @@ def test_persistent_storage(feed):
     toolchain2 = qitoolchain.get_toolchain("bar")
     assert toolchain2.packages == toolchain.packages
 
+
 def test_stores_feed_after_updating(feed):
     toolchain = qitoolchain.toolchain.Toolchain("bar")
     toolchain.update(feed.url)
     toolchain2 = qitoolchain.toolchain.Toolchain("bar")
     assert toolchain2.feed_url == feed.url
+
 
 def test_add_local_ctc(tmpdir):
     ctc = tmpdir.mkdir("ctc")
@@ -77,6 +82,7 @@ def test_removing(feed):
     toolchain2 = qitoolchain.toolchain.Toolchain("bar")
     assert not toolchain2.packages
 
+
 def test_update_svn_package(tmpdir, svn_server):
     boost_url = svn_server.create_repo("boost")
     svn_server.commit_file("boost", "libboost-1.55.so", "")
@@ -99,6 +105,7 @@ def test_update_svn_package(tmpdir, svn_server):
     boost_lib = os.path.join(boost_package.path, "libboost-1.56.so")
     assert os.path.exists(boost_lib)
 
+
 def test_sysroot(tmpdir):
     ctc_package = qitoolchain.qipackage.QiPackage("ctc")
     ctc_package.sysroot = "sysroot"
@@ -109,6 +116,7 @@ def test_sysroot(tmpdir):
     path = toolchain.get_package("ctc").path
     assert toolchain.get_sysroot() == os.path.join(path, "sysroot")
     assert toolchain.get_cross_gdb() == os.path.join(path, "cross-gdb")
+
 
 def test_displays_git_info(tmpdir, git_server, feed, qitoolchain_action):
     boost_package = qitoolchain.qipackage.QiPackage("boost", version="1.44")

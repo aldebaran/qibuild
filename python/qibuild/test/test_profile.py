@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 
 import qibuild.config
@@ -8,6 +8,7 @@ import qibuild.profile
 
 from qisrc.test.conftest import qisrc_action, git_server
 from qibuild.test.conftest import TestBuildWorkTree
+
 
 def test_read_build_profiles(tmpdir):
     qibuild_xml = tmpdir.join("qibuild.xml")
@@ -36,14 +37,16 @@ def test_read_build_profiles(tmpdir):
     assert profiles['foo'].cmake_flags == [("WITH_FOO", "ON")]
     assert profiles['bar'].cmake_flags == [("WITH_BAR", "ON")]
 
+
 def test_profiles_are_persistent(tmpdir):
     qibuild_xml = tmpdir.join("qibuild.xml")
     qibuild_xml.write("<qibuild />")
     qibuild.profile.configure_build_profile(qibuild_xml.strpath, "foo", [("WITH_FOO", "ON")])
     assert qibuild.profile.parse_profiles(qibuild_xml.strpath)["foo"].cmake_flags == \
-            [("WITH_FOO", "ON")]
+        [("WITH_FOO", "ON")]
     qibuild.profile.remove_build_profile(qibuild_xml.strpath, "foo")
     assert "foo" not in qibuild.profile.parse_profiles(qibuild_xml.strpath)
+
 
 def test_using_custom_profile(qibuild_action, qisrc_action, git_server,
                               record_messages):
@@ -60,6 +63,7 @@ def test_using_custom_profile(qibuild_action, qisrc_action, git_server,
     record_messages.reset()
     qibuild_action("configure", "spam", "--config", "bar", "--summarize-options")
     assert record_messages.find("WITH_BAR\s+: ON")
+
 
 def test_warns_on_conflict(qibuild_action, qisrc_action, git_server,
                            record_messages):

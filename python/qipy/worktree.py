@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import difflib
 import virtualenv
@@ -11,8 +11,10 @@ import qisys.qixml
 
 import qipy.project
 
+
 class PythonWorkTree(qisys.worktree.WorkTreeObserver):
     """ Container for Python projects """
+
     def __init__(self, worktree, config="system"):
         self.worktree = worktree
         self.python_projects = list()
@@ -54,7 +56,7 @@ Found two projects with the same name. (%s)
                 return project
         if raises:
             mess = ui.did_you_mean("No such python project: %s" % name,
-                                         name, [x.name for x in self.python_projects])
+                                   name, [x.name for x in self.python_projects])
             raise qisys.worktree.NoSuchProject(name, mess)
         else:
             return None
@@ -84,7 +86,7 @@ Found two projects with the same name. (%s)
     def activate_this(self):
         """ Activate this virtualenv """
         activate_this_dot_py = self.bin_path("activate_this.py")
-        execfile(activate_this_dot_py, { "__file__" : activate_this_dot_py })
+        execfile(activate_this_dot_py, {"__file__": activate_this_dot_py})
 
 
 def new_python_project(worktree, project):
@@ -107,16 +109,15 @@ def new_python_project(worktree, project):
     for module_elem in module_elems:
         src = module_elem.get("src", "")
         name = qisys.qixml.parse_required_attr(module_elem, "name",
-                                              xml_path=qiproject_xml)
+                                               xml_path=qiproject_xml)
         module = qipy.project.Module(name, src)
         module.qimodule = qisys.qixml.parse_bool_attr(module_elem, "qimodule")
         python_project.modules.append(module)
 
-
     package_elems = qipython_elem.findall("package")
     for package_elem in package_elems:
         name = qisys.qixml.parse_required_attr(package_elem, "name",
-                                              xml_path=qiproject_xml)
+                                               xml_path=qiproject_xml)
         src = package_elem.get("src", "")
         package = qipy.project.Package(name, src)
         package.qimodule = qisys.qixml.parse_bool_attr(package_elem, "qimodule")

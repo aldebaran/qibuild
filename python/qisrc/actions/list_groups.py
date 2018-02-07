@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ List the available groups
 
 """
@@ -12,6 +12,7 @@ import qisys.qixml
 import sys
 import os
 
+
 def configure_parser(parser):
     qisrc.parsers.worktree_parser(parser)
 
@@ -20,7 +21,7 @@ def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)
     local_groups = git_worktree._syncer.manifest.groups
 
-    all_groups= list()
+    all_groups = list()
     groups_elem = qisrc.groups.get_root(git_worktree)
     if groups_elem is None:
         groups_elem = list()

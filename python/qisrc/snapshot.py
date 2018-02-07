@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Functions to generate and load snapshot."""
 
@@ -17,6 +17,7 @@ import qisrc.sync
 
 class Snapshot(object):
     """ Just a container for a git worktree snapshot """
+
     def __init__(self):
         self.refs = collections.OrderedDict()
         self.manifest = qisrc.sync.LocalManifest()
@@ -44,10 +45,10 @@ class Snapshot(object):
             if self.manifest.ref:
                 serializable_manifest["ref"] = self.manifest.ref
             to_dump = {
-                    "format" : 2,
-                    "manifest" : serializable_manifest,
-                    "refs" : self.refs
-                    }
+                "format": 2,
+                "manifest": serializable_manifest,
+                "refs": self.refs
+            }
             json.dump(to_dump, fp, indent=2)
 
     def load(self, source):
@@ -99,10 +100,12 @@ class Snapshot(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+
 def generate_snapshot(git_worktree, output_path, deprecated_format=True):
     snapshot = git_worktree.snapshot()
     ui.info(ui.green, "Snapshot generated in", ui.white, output_path)
     return snapshot.dump(output_path, deprecated_format=deprecated_format)
+
 
 def load_snapshot(git_worktree, input_path):
     """Load a snapshot file and reset projects."""

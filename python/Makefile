@@ -1,4 +1,4 @@
-## Copyright (c) 2009-2015 Aldebaran Robotics. All rights reserved.
+## Copyright (c) 2009-2018 SoftBank Robotics. All rights reserved.
 ## Use of this source code is governed by a BSD-style license that can be
 ## found in the COPYING file.
 
@@ -17,7 +17,11 @@ PYMODULES =  \
 PYTHON    ?= python
 PIP       ?= pip
 
-all: pylint-error check
+all: pycodestyle pylint-error check
+
+pycodestyle:
+	@echo ":: Running pycodestyle on root folder"
+	@pycodestyle .. 2>&1
 
 pylint-full:
 	@echo ":: Running pylint: $(PYMODULES)"

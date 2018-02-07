@@ -1,9 +1,10 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 from qisrc.test.conftest import TestGitWorkTree
 
 import qisrc.manifest
+
 
 def test_check(qisrc_action, git_server):
     # Get a correct xml file from the server:
@@ -38,6 +39,7 @@ def test_check(qisrc_action, git_server):
 
     # running qisrc sync just to be sure:
     qisrc_action("sync")
+
 
 def test_check_configures_review(qisrc_action, git_server):
 

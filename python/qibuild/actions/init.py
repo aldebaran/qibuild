@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """Initialize a new qibuild worktree """
 
 import argparse
@@ -21,6 +21,7 @@ def configure_parser(parser):
                         help=argparse.SUPPRESS)
     parser.set_defaults(interactive=False)
 
+
 def do(args):
     """Main entry point"""
     root = args.worktree or os.getcwd()
@@ -38,4 +39,4 @@ def do(args):
         ui.warning("`qibuild init --interactive` is deprecated", "\n",
                    "Use `qibuild config --wizard` instead")
         qisys.script.run_action("qibuild.actions.config",
-                               ["--wizard", "--worktree", build_worktree.root])
+                                ["--wizard", "--worktree", build_worktree.root])

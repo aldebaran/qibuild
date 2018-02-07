@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Add a new project to a worktree """
 
@@ -18,10 +18,11 @@ def configure_parser(parser):
                         help="git url or path of project")
     group = parser.add_argument_group("git options")
     group.add_argument("--src", help="Where to clone the project. "
-                        "If not given, will be guessed from the git url "
-                        "and the working dir")
+                       "If not given, will be guessed from the git url "
+                       "and the working dir")
     group.add_argument("-b", "--branch")
     parser.set_defaults(branch="master")
+
 
 def do(args):
     """Main entry point"""

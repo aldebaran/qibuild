@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Reset repositories to a clean state
 
@@ -20,6 +20,7 @@ import qisrc.status
 import qisrc.parsers
 import qisrc.reset
 
+
 def configure_parser(parser):
     """Configure parser for this action."""
     qisys.parsers.worktree_parser(parser)
@@ -32,6 +33,7 @@ def configure_parser(parser):
     parser.add_argument("--ignore-groups", dest="ignore_groups", action="store_true",
                         help="Ignore groups defined in the snapshot")
     parser.set_defaults(ignore_groups=False)
+
 
 def do(args):
     """Main entry points."""
@@ -78,7 +80,7 @@ def do(args):
             to_reset = "%s/%s" % (remote, branch)
         try:
             qisrc.reset.clever_reset_ref(git_project, to_reset)
-        except:
+        except Exception:
             errors.append(src)
 
     if not errors:
@@ -87,6 +89,7 @@ def do(args):
     for error in errors:
         ui.info(ui.red, " * ", error)
     sys.exit(1)
+
 
 def reset_manifest(git_worktree, snapshot, ignore_groups=False):
     manifest = snapshot.manifest

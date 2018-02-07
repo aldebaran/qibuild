@@ -1,11 +1,12 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Display log between current branch and an other branch of the worktree """
 
 import qisys.parsers
 import qisrc.parsers
 import qisrc.diff
+
 
 def configure_parser(parser):
     qisys.parsers.project_parser(parser)

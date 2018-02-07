@@ -1,42 +1,44 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import pytest
 
 import qisys.qixml
 from xml.etree import ElementTree as etree
 
+
 def test_qixml_parse_bool_attr():
     tree = etree.fromstring("<foo />")
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) == True
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) == False
-    assert qisys.qixml.parse_bool_attr(tree, "bar") == False
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) is True
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) is False
+    assert qisys.qixml.parse_bool_attr(tree, "bar") is False
 
     tree = etree.fromstring("<foo bar=\"true\" />")
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) == True
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) == True
-    assert qisys.qixml.parse_bool_attr(tree, "bar") == True
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) is True
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) is True
+    assert qisys.qixml.parse_bool_attr(tree, "bar") is True
 
     tree = etree.fromstring("<foo bar=\"false\" />")
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) == False
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) == False
-    assert qisys.qixml.parse_bool_attr(tree, "bar") == False
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) is False
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) is False
+    assert qisys.qixml.parse_bool_attr(tree, "bar") is False
 
     tree = etree.fromstring("<foo bar=\"1\" />")
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) == True
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) == True
-    assert qisys.qixml.parse_bool_attr(tree, "bar") == True
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) is True
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) is True
+    assert qisys.qixml.parse_bool_attr(tree, "bar") is True
 
     tree = etree.fromstring("<foo bar=\"0\" />")
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) == False
-    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) == False
-    assert qisys.qixml.parse_bool_attr(tree, "bar") == False
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=True) is False
+    assert qisys.qixml.parse_bool_attr(tree, "bar", default=False) is False
+    assert qisys.qixml.parse_bool_attr(tree, "bar") is False
 
     tree = etree.fromstring("<foo bar=\"blaaaah\" />")
 
     # pylint: disable-msg=E1101
     with pytest.raises(Exception):
         qisys.qixml.parse_bool_attr(tree, "bar")
+
 
 def test_parse_int_attr():
     tree = etree.fromstring("<foo />")
@@ -60,12 +62,14 @@ def test_parse_int_attr():
     with pytest.raises(Exception):
         qisys.qixml.parse_int_attr(tree, "bar")
 
+
 def test_parse_list_attr():
     tree = etree.fromstring("<foo />")
     assert qisys.qixml.parse_list_attr(tree, "bar") == list()
 
     tree = etree.fromstring("<foo bar=\"foo bar\" />")
     assert qisys.qixml.parse_list_attr(tree, "bar") == ["foo", "bar"]
+
 
 def test_parse_required_attr():
     tree = etree.fromstring("<foo />")
@@ -76,6 +80,7 @@ def test_parse_required_attr():
     tree = etree.fromstring("<foo bar=\"foo\" />")
     assert qisys.qixml.parse_required_attr(tree, "bar") == "foo"
 
+
 def test_simple_xml_parser():
     tree = etree.fromstring("""
 <foo
@@ -83,6 +88,7 @@ def test_simple_xml_parser():
     spam="eggs"
 />
 """)
+
     class Foo:
         def __init__(self):
             self.bar = None
@@ -93,7 +99,6 @@ def test_simple_xml_parser():
         def __init__(self, target):
             super(FooParser, self).__init__(target)
 
-
     foo = Foo()
     foo_parser = FooParser(foo)
     foo_parser.parse(tree)
@@ -102,8 +107,10 @@ def test_simple_xml_parser():
     assert foo.bar == "baz"
     assert foo.spam == "eggs"
 
+
 def test_required_attr():
     tree = etree.fromstring("<foo />")
+
     class Foo:
         pass
 
@@ -160,8 +167,9 @@ def test_complex_xml_parser():
     parser = FooParser(foo2)
     parser.parse(foo_xml)
     assert foo2.bar.baz == "Baz!"
-    foo.spam == 42
-    foo.eggs == True
+    assert foo.spam == 42
+    assert foo.eggs is True
+
 
 def test_list_attr():
     class Foo:
@@ -228,5 +236,5 @@ def test_ignore_attributes():
     xml_elem = etree.fromstring('<foo bar="spam" baz="eggs" />')
     parser.parse(xml_elem)
 
-    assert foo.bar == "bar" # should not have changed
-    assert foo.baz == "eggs" # should have changed
+    assert foo.bar == "bar"  # should not have changed
+    assert foo.baz == "eggs"  # should have changed

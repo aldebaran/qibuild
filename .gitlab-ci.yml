@@ -64,6 +64,7 @@ doitall:
     # Always use an up-to-date version of pip
     - wget https://bootstrap.pypa.io/get-pip.py
     - python get-pip.py --user
+    - rm -f get-pip.py
     - export PATH=$HOME/.local/bin:$PATH
     - pip install -r requirements.txt --user
     - pip install -e . --user

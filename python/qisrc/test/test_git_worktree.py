@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qisys.qixml
 import qisys.worktree
 import qisrc.worktree
@@ -8,6 +8,7 @@ import qisrc.worktree
 from qisrc.git_config import Remote
 
 import pytest
+
 
 def test_read_git_configs(tmpdir, test_git):
     tmpdir.mkdir("foo")
@@ -35,7 +36,6 @@ def test_read_git_configs(tmpdir, test_git):
 </qigit>
 """)
 
-
     git_wt = qisrc.worktree.GitWorkTree(wt)
     git_projects = git_wt.git_projects
     assert len(git_projects) == 2
@@ -57,6 +57,7 @@ def test_read_git_configs(tmpdir, test_git):
     gerrit = bar.remotes[1]
     assert gerrit.name == "gerrit"
     assert origin.url == "git@srv:bar.git"
+
 
 def test_git_configs_are_persistent(git_worktree):
     foo = git_worktree.create_git_project("foo")
@@ -82,10 +83,12 @@ def test_git_configs_are_persistent(git_worktree):
     foo2 = wt2.get_git_project("foo")
     check_config(foo2)
 
+
 def test_clone_missing_simple(git_worktree, git_server):
     foo_repo = git_server.create_repo("foo")
     git_worktree.clone_missing(foo_repo)
     assert len(git_worktree.git_projects) == 1
+
 
 def test_clone_missing_create_subdirs(git_worktree, git_server):
     foo_repo = git_server.create_repo("foo", src="long/path/to/foo")
@@ -93,6 +96,7 @@ def test_clone_missing_create_subdirs(git_worktree, git_server):
     assert len(git_worktree.git_projects) == 1
     foo_proj = git_worktree.get_git_project("long/path/to/foo")
     assert foo_proj
+
 
 def test_clone_missing_wrong_branch(git_worktree, git_server, record_messages):
     foo_repo = git_server.create_repo("foo")
@@ -102,16 +106,18 @@ def test_clone_missing_wrong_branch(git_worktree, git_server, record_messages):
     new_git_worktree = qisrc.worktree.GitWorkTree(git_worktree.worktree)
     assert not new_git_worktree.git_projects
 
+
 def test_network_error_while_cloning(git_worktree, git_server):
     foo_repo = git_server.create_repo("foo")
     srv_temp = git_server.root.join("srv.temp")
-    srv  = git_server.root.join("srv")
+    srv = git_server.root.join("srv")
     srv.rename(srv_temp)
     git_worktree.clone_missing(foo_repo)
     assert not git_worktree.git_projects
     srv_temp.rename(srv)
     git_worktree.clone_missing(foo_repo)
     assert len(git_worktree.git_projects) == 1
+
 
 def test_clone_missing_evil_nested(git_worktree, git_server):
     foo_bar_repo = git_server.create_repo("foo/bar")
@@ -122,12 +128,14 @@ def test_clone_missing_evil_nested(git_worktree, git_server):
     git_worktree.clone_missing(foo_repo)
     assert len(git_worktree.git_projects) == 2
 
+
 def test_clone_missing_already_correct(git_worktree, git_server, record_messages):
     foo_repo = git_server.create_repo("FooBar")
     git_worktree.clone_missing(foo_repo)
     git_worktree.worktree.remove_project("FooBar")
     git_worktree.clone_missing(foo_repo)
     assert record_messages.find("ERROR") is None
+
 
 def test_clone_missing_empty(git_worktree, git_server, record_messages):
     foo_repo = git_server.create_repo("foo")
@@ -136,6 +144,7 @@ def test_clone_missing_empty(git_worktree, git_server, record_messages):
     git.init()
     git_worktree.clone_missing(foo_repo)
     assert record_messages.find("WARN")
+
 
 def test_read_groups(git_worktree, git_server):
     manifest_url = git_server.manifest_url

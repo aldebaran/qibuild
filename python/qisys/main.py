@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Entry point for most of qibuild scripts
 """
 
@@ -11,6 +11,7 @@ import argparse
 
 import qisys.script
 
+
 def print_version(script_name):
     sys.stdout.write("%s version 3.11.17\n" % script_name)
     import qibuild
@@ -20,6 +21,7 @@ def print_version(script_name):
     if script_name == "qibuild":
         import qibuild.cmake
         print "Using CMake code from", qibuild.cmake.get_cmake_qibuild_dir()
+
 
 def main():
     script_name = sys.argv[0]
@@ -37,6 +39,7 @@ def main():
         sys.exit(0)
 
     qisys.script.root_command_main(script_name, parser, modules)
+
 
 if __name__ == "__main__":
     sys.argv.pop(0)

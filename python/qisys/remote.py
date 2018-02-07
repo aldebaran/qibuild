@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Set of tools to perform remote operations,
 downloading package or reading configs from URLs
@@ -21,9 +21,11 @@ import qisys.sh
 
 import qibuild.config
 
+
 def callback(total, done):
     """ Called during download """
     qisys.ui.info_progress(done, total, "Done")
+
 
 def get_server_access(server_name):
     """ Get server access for a remote site.
@@ -62,7 +64,7 @@ def authenticated_urlopen(location):
 
     """
     passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-    #pylint: disable-msg=E1103
+    # pylint: disable-msg=E1103
     server_name = urlparse.urlsplit(location).netloc
     access = get_server_access(server_name)
     if access is not None:
@@ -75,27 +77,30 @@ def authenticated_urlopen(location):
     urllib2.install_opener(opener)
     return urllib2.urlopen(location)
 
+
 def open_remote_location(location, timeout=10):
     """ Open a file from an url
 
     :return: a file-like object
 
     """
-    #pylint: disable-msg=E1103
+    # pylint: disable-msg=E1103
     url_split = urlparse.urlsplit(location)
     server_name = url_split.netloc
-    #pylint: disable-msg=E1103
+    # pylint: disable-msg=E1103
     if url_split.scheme == "ftp":
         (username, password, root) = get_ftp_access(server_name)
         ftp = ftplib.FTP(server_name, username, password, timeout=timeout)
         if root:
             ftp.cwd(root)
+
         class Transfer:
             pass
         Transfer.data = ""
-        #url_split.path has a trailing "/":
-        #pylint: disable-msg=E1103
+        # url_split.path has a trailing "/":
+        # pylint: disable-msg=E1103
         cmd = "RETR " + url_split.path[1:]
+
         def retr_callback(data):
             Transfer.data += data
         ftp.retrbinary(cmd, retr_callback)
@@ -105,8 +110,8 @@ def open_remote_location(location, timeout=10):
 
 
 def download(url, output_dir, output_name=None,
-            callback=callback, clobber=True,
-            message=None):
+             callback=callback, clobber=True,
+             message=None):
     """ Download a file from an url, and save it
     in output_dir.
 
@@ -142,39 +147,41 @@ def download(url, output_dir, output_name=None,
     try:
         dest_file = open(dest_name, "wb")
     except Exception, e:
-        mess  = "Could not save %s to %s\n" % (url, dest_name)
+        mess = "Could not save %s to %s\n" % (url, dest_name)
         mess += "Error was %s" % e
         raise Exception(mess)
 
     url_split = urlparse.urlsplit(url)
     url_obj = None
-    #pylint: disable-msg=E1103
+    # pylint: disable-msg=E1103
     server_name = url_split.netloc
     try:
-        #pylint: disable-msg=E1103
+        # pylint: disable-msg=E1103
         if url_split.scheme == "ftp":
-        # We cannot use urllib2 here because it has no support
-        # for username/password for ftp, so we will use ftplib
-        # here.
-            #pylint: disable-msg=E1103
+            # We cannot use urllib2 here because it has no support
+            # for username/password for ftp, so we will use ftplib
+            # here.
+            # pylint: disable-msg=E1103
 
             (username, password, root) = get_ftp_access(server_name)
             ftp = ftplib.FTP(server_name, username, password)
             if root:
                 ftp.cwd(root)
+
             class Tranfert:
                 pass
             # Set binary mode
             ftp.voidcmd("TYPE I")
-            #pylint: disable-msg=E1103
+            # pylint: disable-msg=E1103
             size = ftp.size(url_split.path[1:])
             Tranfert.xferd = 0
+
             def retr_callback(data):
                 Tranfert.xferd += len(data)
                 if callback:
                     callback(size, Tranfert.xferd)
                 dest_file.write(data)
-            #pylint: disable-msg=E1103
+            # pylint: disable-msg=E1103
             cmd = "RETR " + url_split.path[1:]
             ftp.retrbinary(cmd, retr_callback)
         else:
@@ -192,7 +199,7 @@ def download(url, output_dir, output_name=None,
                     callback(size, xferd)
                 dest_file.write(data)
     except Exception, e:
-        error  = "Could not download file from %s\n to %s\n" % (url, dest_name)
+        error = "Could not download file from %s\n to %s\n" % (url, dest_name)
         error += "Error was: %s" % e
     finally:
         dest_file.close()
@@ -203,6 +210,7 @@ def download(url, output_dir, output_name=None,
         raise Exception(error)
 
     return dest_name
+
 
 def deploy(local_directory, remote_url, filelist=None):
     """Deploy a local directory to a remote url."""
@@ -225,14 +233,14 @@ def deploy(local_directory, remote_url, filelist=None):
     # created
     local_directory = local_directory + "/."
     cmd = ["rsync",
-        "--recursive",
-        "--links",
-        "--perms",
-        "--times",
-        "--specials",
-        "--progress", # print a progress bar
-        "--checksum", # verify checksum instead of size and date
-        "--exclude=.debug/"]
+           "--recursive",
+           "--links",
+           "--perms",
+           "--times",
+           "--specials",
+           "--progress",  # print a progress bar
+           "--checksum",  # verify checksum instead of size and date
+           "--exclude=.debug/"]
     if remote_url.port:
         cmd.extend(["-e", "ssh -p %d" % remote_url.port])
     if filelist:
@@ -242,10 +250,10 @@ def deploy(local_directory, remote_url, filelist=None):
     qisys.command.call(cmd)
 
 
-
 class URLParseError(Exception):
     def __int__(self, message):
         super(URLParseError).__int__(message)
+
 
 class URL(object):
     def __init__(self, url_as_string):
@@ -293,10 +301,10 @@ Supported schemes are
 """ % self.as_string)
 
     def _handle_match(self, match):
-            dict = match.groupdict()
-            self.user = dict.get("user")
-            self.host = dict["host"]
-            self.port = 22
-            if "port" in dict and dict["port"]:
-                self.port = int(dict["port"])
-            self.remote_directory = dict["remote_dir"] or None
+        dict = match.groupdict()
+        self.user = dict.get("user")
+        self.host = dict["host"]
+        self.port = 22
+        if "port" in dict and dict["port"]:
+            self.port = int(dict["port"])
+        self.remote_directory = dict["remote_dir"] or None

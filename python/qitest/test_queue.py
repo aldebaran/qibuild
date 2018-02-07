@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import contextlib
@@ -90,7 +90,7 @@ class TestQueue(object):
             worker.start()
 
         while not self.task_queue.empty() and \
-              not self._interrupted:
+                not self._interrupted:
             time.sleep(0.1)
 
         for worker_thread in self._workers:
@@ -121,8 +121,8 @@ class TestQueue(object):
                 max_len = max(len(x.test["name"]) for x in failures)
                 for i, failure in enumerate(failures):
                     ui.info_count(i, num_failed,
-                                ui.blue, failure.test["name"].ljust(max_len + 2),
-                                ui.reset, *failure.message)
+                                  ui.blue, failure.test["name"].ljust(max_len + 2),
+                                  ui.reset, *failure.message)
         self.write_failures(failures)
 
     def sigint_handler(self, *args):
@@ -136,7 +136,7 @@ class TestQueue(object):
         """
         def double_sigint(signum, frame):
             sys.exit("Exiting main program \n",
-                       "This may leave orphan processes")
+                     "This may leave orphan processes")
         qisys.command.SIGINT_EVENT.set()
         ui.warning("\n!!!",
                    "Interrupted by user, stopping every process.\n"
@@ -152,6 +152,7 @@ class TestQueue(object):
         fail_names = [x.test["name"] for x in failures]
         with open(fail_json, "w") as fp:
             json.dump(fail_names, fp)
+
 
 class TestWorker(threading.Thread):
     """ Implementation of a 'worker' thread. It will consume
@@ -202,6 +203,7 @@ class TestWorker(threading.Thread):
                 str(exception), "\n",
                 ui.reset,
                 io.getvalue())
+
 
 class TestLogger(object):
     """ Small class used to print what is going on during

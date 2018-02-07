@@ -1,10 +1,11 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qisrc.git
 from qisrc.test.conftest import TestGitWorkTree
 
 import py
+
 
 def test_untracked(qisrc_action, record_messages):
     git_worktree = qisrc_action.git_worktree
@@ -22,6 +23,7 @@ def test_untracked(qisrc_action, record_messages):
     dirty = record_messages.find("Dirty projects")
     assert "1" in dirty
 
+
 def test_behind(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
@@ -33,6 +35,7 @@ def test_behind(qisrc_action, git_server, record_messages):
     foo_git.fetch()
     qisrc_action("status")
     assert record_messages.find("foo : master tracking -1")
+
 
 def test_wrong_branch(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
@@ -46,6 +49,7 @@ def test_wrong_branch(qisrc_action, git_server, record_messages):
     qisrc_action("status")
     assert record_messages.find("Some projects are not on the expected branch")
     assert record_messages.find(r"\* foo\s+devel\s+master")
+
 
 def test_not_on_any_branch(qisrc_action, record_messages):
     git_worktree = TestGitWorkTree()

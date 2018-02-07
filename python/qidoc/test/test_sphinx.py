@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 
@@ -10,6 +10,7 @@ import pytest
 import qisys.sh
 from qidoc.test.conftest import find_link
 import qidoc.builder
+
 
 def test_no_templates(doc_worktree):
     foo_sphinx = doc_worktree.create_sphinx_project("foo")
@@ -26,6 +27,7 @@ version = "2.3"
     foo_sphinx.configure()
     conf_py = foo_path.join("build-doc", "conf.py")
     assert settings in conf_py.read()
+
 
 def test_sets_project_name_when_not_defined(doc_worktree):
     foo_sphinx = doc_worktree.create_sphinx_project("foo")
@@ -92,6 +94,7 @@ def test_build(doc_worktree):
 
     assert os.path.exists(qi_sphinx.index_html)
 
+
 def test_prebuild(doc_worktree):
     doc_worktree.add_test_project("prebuild")
     qi_sphinx = doc_worktree.get_doc_project("prebuild")
@@ -107,18 +110,20 @@ def test_examples(doc_worktree, tmpdir):
     examples_proj.install(dest.strpath)
     assert dest.join("samples", "a", "Makefile").check(file=True)
 
+
 def test_doxydeps(doc_worktree, tmpdir):
     sphinx_proj = doc_worktree.add_test_project("libworld-sphinx")
-    doxy_proj   = doc_worktree.add_test_project("libworld")
+    doxy_proj = doc_worktree.add_test_project("libworld")
     doc_builder = qidoc.builder.DocBuilder(doc_worktree, "libworld-sphinx")
     doc_builder.configure()
     doc_builder.build()
-    link =  find_link(sphinx_proj.index_html, "answer()")
+    link = find_link(sphinx_proj.index_html, "answer()")
     assert os.path.exists(link)
     doc_builder.install(tmpdir.strpath)
-    link =  find_link(tmpdir.join("index.html").strpath, "answer()")
+    link = find_link(tmpdir.join("index.html").strpath, "answer()")
     assert not os.path.isabs(link)
     assert tmpdir.join(link).check(file=True)
+
 
 def test_install_twice(doc_worktree, tmpdir):
     world_proj = doc_worktree.add_test_project("world")
@@ -134,6 +139,8 @@ def test_install_twice(doc_worktree, tmpdir):
 
 # Intersphinx randomly fails here
 # pylint: disable-msg=E1101
+
+
 @pytest.mark.skipif("True")
 def test_intersphinx(doc_worktree, tmpdir):
     world_proj = doc_worktree.add_test_project("world")
@@ -142,12 +149,13 @@ def test_intersphinx(doc_worktree, tmpdir):
     doc_builder.werror = True
     doc_builder.configure()
     doc_builder.build()
-    link =  find_link(hello_proj.index_html, "World intro")
+    link = find_link(hello_proj.index_html, "World intro")
     assert os.path.exists(link)
     doc_builder.install(tmpdir.strpath)
-    link =  find_link(tmpdir.join("index.html").strpath, "World intro")
+    link = find_link(tmpdir.join("index.html").strpath, "World intro")
     assert not os.path.isabs(link)
     assert tmpdir.join(link).check(file=True)
+
 
 def test_spellcheck(doc_worktree, record_messages):
     spell_proj = doc_worktree.add_test_project("spell")
@@ -168,6 +176,7 @@ def test_spellcheck(doc_worktree, record_messages):
     doc_builder.configure()
     doc_builder.build()
 
+
 def test_intl_update(doc_worktree):
     translateme_proj = doc_worktree.add_test_project("translateme")
     assert translateme_proj.linguas == ["fr"]
@@ -178,6 +187,7 @@ def test_intl_update(doc_worktree):
     po_expected = os.path.join(translateme_proj.source_dir, "locale",
                                "fr", "LC_MESSAGES", "index.po")
     assert os.path.exists(po_expected)
+
 
 def test_intl_build(doc_worktree):
     translateme_proj = doc_worktree.add_test_project("translateme")

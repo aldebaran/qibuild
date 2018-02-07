@@ -1,21 +1,22 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import subprocess
 import os
 
 from qisys import ui
 import qisys.command
 
+
 class Svn(object):
     def __init__(self, path):
         self.path = path
 
     def call(self, *args, **kwargs):
-        if not "cwd" in kwargs.keys():
+        if "cwd" not in kwargs.keys():
             kwargs["cwd"] = self.path
         ui.debug("svn", " ".join(args), "in", kwargs["cwd"])
-        if not "quiet" in kwargs.keys():
+        if "quiet" not in kwargs.keys():
             kwargs["quiet"] = False
         svn = qisys.command.find_program("svn", raises=True)
         cmd = [svn]
@@ -25,9 +26,9 @@ class Svn(object):
             del kwargs["raises"]
             del kwargs["quiet"]
             process = subprocess.Popen(cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                **kwargs)
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.STDOUT,
+                                       **kwargs)
             out = process.communicate()[0]
             # Don't want useless blank lines
             out = out.rstrip("\n")

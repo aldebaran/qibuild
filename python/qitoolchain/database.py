@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 from qisys import ui
@@ -10,8 +10,10 @@ import qitoolchain.feed
 import qitoolchain.qipackage
 import qitoolchain.svn_package
 
+
 class DataBase(object):
     """ Binary packages storage """
+
     def __init__(self, name, db_path):
         self.name = name
         self.db_path = db_path
@@ -43,7 +45,6 @@ class DataBase(object):
         """ Remove self """
         qisys.sh.rm(self.packages_path)
         qisys.sh.rm(self.db_path)
-
 
     def add_package(self, package):
         """ Add a package to the database """
@@ -115,9 +116,8 @@ class DataBase(object):
         to_remove = list()
         to_update = list()
         svn_packages = [x for x in remote_packages
-                            if isinstance(x, qitoolchain.svn_package.SvnPackage)]
+                        if isinstance(x, qitoolchain.svn_package.SvnPackage)]
         other_packages = [x for x in remote_packages if x not in svn_packages]
-
 
         for remote_package in other_packages:
             if remote_package.name in (x.name for x in local_packages):
@@ -137,7 +137,7 @@ class DataBase(object):
 
         # remove svn packages from the list of packages to update
         to_update = [x for x in to_update
-                        if not isinstance(x, qitoolchain.svn_package.SvnPackage)]
+                     if not isinstance(x, qitoolchain.svn_package.SvnPackage)]
 
         if to_update:
             ui.info(ui.red, "Updating packages")
@@ -195,12 +195,11 @@ class DataBase(object):
         package_path = qisys.sh.to_native_path(package_path)
         package.path = package_path
 
-
     def download_package(self, package):
         with qisys.sh.TempDir() as tmp:
             archive = qisys.remote.download(package.url, tmp,
-                                            message = (ui.green, "Downloading",
-                                                    ui.reset, ui.blue, package.url))
+                                            message=(ui.green, "Downloading",
+                                                     ui.reset, ui.blue, package.url))
             dest = os.path.join(self.packages_path, package.name)
             message = [ui.green, "Extracting",
                        ui.reset, ui.blue, package.name]

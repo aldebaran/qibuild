@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import sys
 import os
@@ -13,11 +13,13 @@ import qisys.command
 import qipy.venv
 from qibuild.project import write_qi_path_conf
 
+
 class PythonBuilder(AbstractBuilder):
     """
     Managing python projects
 
     """
+
     def __init__(self, python_worktree, build_worktree=None):
         self.python_worktree = python_worktree
         self.build_worktree = build_worktree
@@ -28,18 +30,18 @@ class PythonBuilder(AbstractBuilder):
         return self.python_worktree.config
 
     def bootstrap(self, remote_packages=None, site_packages=True,
-            python_executable=None, env=None):
+                  python_executable=None, env=None):
         """ Configure the virtualenv so that importing any
         Python module works
 
         """
         ok = qipy.venv.configure_virtualenv(self.config,
-                                       self.python_worktree,
-                                       build_worktree=self.build_worktree,
-                                       remote_packages=remote_packages,
-                                       site_packages=site_packages,
-                                       python_executable=python_executable,
-                                       env=env)
+                                            self.python_worktree,
+                                            build_worktree=self.build_worktree,
+                                            remote_packages=remote_packages,
+                                            site_packages=site_packages,
+                                            python_executable=python_executable,
+                                            env=env)
         qi_path_sdk_dirs = [p.sdk_directory for p in self.build_worktree.build_projects]
         write_qi_path_conf(self.python_worktree.venv_path, qi_path_sdk_dirs)
         return ok
@@ -67,7 +69,7 @@ class PythonBuilder(AbstractBuilder):
             project.install(dest)
 
         # Also install a python wrapper so that everything goes smoothly
-        to_write="""\
+        to_write = """\
 #!/bin/bash
 SDK_DIR="$(dirname "$(readlink -f $0 2>/dev/null)")"
 export LD_LIBRARY_PATH="${SDK_DIR}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"

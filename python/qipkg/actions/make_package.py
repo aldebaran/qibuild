@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Generate a binary package, ready to be used for a behavior """
 
@@ -8,6 +8,7 @@ from qisys import ui
 import qisys.parsers
 import qipkg.parsers
 import qipkg.metapackage
+
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -23,4 +24,5 @@ def do(args):
     force = args.force
     with_toolchain = args.with_toolchain
     pml_builder = qipkg.parsers.get_pml_builder(args)
-    return pml_builder.package(output=output, with_breakpad=with_breakpad, force=force, install_tc_packages=with_toolchain)
+    return pml_builder.package(output=output, with_breakpad=with_breakpad,
+                               force=force, install_tc_packages=with_toolchain)

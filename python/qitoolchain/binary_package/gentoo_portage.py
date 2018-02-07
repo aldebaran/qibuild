@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """This module implements the Gentoo binary packages class, which take benefit
 from portage's modules.
@@ -12,7 +12,7 @@ http://www.gentoo.org/proj/en/portage/index.xml
 
 import os
 import re
-#pylint: disable-msg=F0401
+# pylint: disable-msg=F0401
 import portage
 
 import qisys
@@ -22,10 +22,11 @@ _ARCH_VARIANT = r'-m(arch|cpu)=(\S+)\s'
 _RE_ARCH_VARIANT = re.compile(_ARCH_VARIANT)
 
 _DEPENDENCY = {
-    'buildtime'    : 'DEPEND',
-    'runtime'      : 'RDEPEND',
-    'post-install' : 'PDEPEND',
-    }
+    'buildtime': 'DEPEND',
+    'runtime': 'RDEPEND',
+    'post-install': 'PDEPEND',
+}
+
 
 def _get_pkg_arch(metadata_dir):
     """Return the tuple architecture/variant for which the package has been
@@ -45,16 +46,18 @@ def _get_pkg_arch(metadata_dir):
     with open(os.path.join(metadata_dir, 'CHOST'), 'r') as fchost:
         arch = fchost.readline().strip().split('-', 1)[0]
     variant = None
-    for flag_file in [ 'CFLAGS', 'CXXFLAGS' ]:
+    for flag_file in ['CFLAGS', 'CXXFLAGS']:
         variant = _parse_march(os.path.join(metadata_dir, flag_file))
         if variant is not None:
             break
     return (arch, variant)
 
+
 class GentooPackage(GentooNoPortagePackage):
     """ Gentoo binary package endpoint using ``portage``.
 
     """
+
     def __init__(self, package_path):
         GentooNoPortagePackage.__init__(self, package_path)
 
@@ -86,11 +89,11 @@ class GentooPackage(GentooNoPortagePackage):
         for dep, dep_list in dependency.iteritems():
             dependency[dep] = list(set(dep_list))
         metadata = {
-            'name'         : name,
-            'version'      : version,
-            'revision'     : revision,
-            'arch'         : arch,
-            'arch_variant' : arch_variant,
-            'dependencies' : dependency,
-            }
+            'name': name,
+            'version': version,
+            'revision': revision,
+            'arch': arch,
+            'arch_variant': arch_variant,
+            'dependencies': dependency,
+        }
         self.metadata = metadata

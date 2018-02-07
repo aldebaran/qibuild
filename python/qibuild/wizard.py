@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ qibuild wizard
 
@@ -14,6 +14,7 @@ import qisys
 import qibuild
 import qitoolchain
 
+
 def guess_cmake(qibuild_cfg):
     """ Try to find cmake
 
@@ -23,18 +24,19 @@ def guess_cmake(qibuild_cfg):
     build_env = qibuild.config.get_build_env()
     cmake = qisys.command.find_program("cmake", env=build_env)
     if cmake:
-        print "Found CMake:" , cmake
+        print "Found CMake:", cmake
         return cmake
     print "CMake not found"
     cmake = qisys.interact.ask_program("Please enter full CMake path")
     if not cmake:
         raise Exception("qiBuild cannot work without CMake\n"
-            "Please install CMake if necessary and re-run this wizard\n")
+                        "Please install CMake if necessary and re-run this wizard\n")
     # Add path to CMake in build env
     cmake_path = os.path.dirname(cmake)
     qibuild_cfg.add_to_default_path(cmake_path)
     qibuild_cfg.write()
     return cmake
+
 
 def ask_cmake_generator():
     """ Ask the user to choose a cmake generator
@@ -42,9 +44,10 @@ def ask_cmake_generator():
     """
     cmake_generators = qibuild.cmake.get_known_cmake_generators()
     cmake_generator = qisys.interact.ask_choice(cmake_generators,
-        "Please choose a generator")
+                                                "Please choose a generator")
 
     return cmake_generator
+
 
 def ask_ide():
     """ Ask the user to choose an IDE
@@ -56,10 +59,11 @@ def ask_ide():
     if sys.platform == "darwin":
         ides.append("Xcode")
     ide = qisys.interact.ask_choice(ides,
-        "Please choose an IDE")
+                                    "Please choose an IDE")
     if ide is "None":
         return None
     return ide
+
 
 def configure_qtcreator(qibuild_cfg):
     """ Configure QtCreator
@@ -70,6 +74,7 @@ def configure_qtcreator(qibuild_cfg):
     else:
         _configure_qtcreator(qibuild_cfg)
 
+
 def _configure_qtcreator(qibuild_cfg):
     """ Helper for configure_qtcreator on Linux and Windows """
     ide = qibuild.config.IDE()
@@ -78,7 +83,7 @@ def _configure_qtcreator(qibuild_cfg):
     qtcreator_path = qisys.command.find_program("qtcreator", env=build_env)
     if qtcreator_path:
         ui.info(ui.green, "::", ui.reset,  "Found QtCreator:", qtcreator_path)
-        mess  = "Do you want to use qtcreator from %s?\n" % qtcreator_path
+        mess = "Do you want to use qtcreator from %s?\n" % qtcreator_path
         mess += "Answer 'no' if you installed qtcreator from Nokia's installer"
         answer = qisys.interact.ask_yes_no(mess, default=True)
         if not answer:
@@ -94,6 +99,7 @@ def _configure_qtcreator(qibuild_cfg):
         return
     ide.path = qtcreator_path
     qibuild_cfg.add_ide(ide)
+
 
 def _configure_qtcreator_mac(qibuild_cfg):
     ide = qibuild.config.IDE()
@@ -123,6 +129,7 @@ def configure_ide(qibuild_cfg, ide_name):
     ide.name = ide_name
     qibuild_cfg.add_ide(ide)
 
+
 def configure_local_settings(build_worktree):
     """ Configure local settings for this worktree
 
@@ -145,7 +152,7 @@ def configure_local_settings(build_worktree):
             default=True)
         if answer:
             default = qisys.interact.ask_choice(config_names,
-                "Choose a build config to use by default")
+                                                "Choose a build config to use by default")
             if default:
                 qibuild_cfg.local.defaults.config = default
                 qibuild_cfg.write_local_config(build_worktree.qibuild_xml)
@@ -163,7 +170,6 @@ def configure_local_settings(build_worktree):
                 "Will use", full_path, "as a root for all build directories")
     qibuild_cfg.local.build.prefix = build_prefix
     qibuild_cfg.write_local_config(build_worktree.qibuild_xml)
-
 
 
 def run_config_wizard(build_worktree=None):

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ List the tests"""
 
 import os
@@ -13,10 +13,12 @@ import qitest.conf
 import qitest.parsers
 import qibuild.parsers
 
+
 def configure_parser(parser):
     qitest.parsers.test_parser(parser)
     qibuild.parsers.project_parser(parser)
     qisys.parsers.build_parser(parser, include_worktree_parser=False)
+
 
 def do(args):
     test_runners = qitest.parsers.get_test_runners(args)

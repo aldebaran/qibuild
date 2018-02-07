@@ -1,9 +1,10 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qisrc.git
 
 import py
+
 
 def setup_projects(qisrc_action):
     """ Create two git projects with one match for the
@@ -32,6 +33,7 @@ def test_all_by_default(qisrc_action, record_messages):
     assert record_messages.find("bar")
     assert record_messages.find("this is spam")
 
+
 def test_using_projects(qisrc_action):
     setup_projects(qisrc_action)
     rc = qisrc_action("grep", "-p", "foo", "spam", retcode=True)
@@ -39,11 +41,13 @@ def test_using_projects(qisrc_action):
     rc = qisrc_action("grep", "-p", "bar", "spam", retcode=True)
     assert rc == 1
 
+
 def test_using_git_grep_options(qisrc_action, record_messages):
     setup_projects(qisrc_action)
     rc = qisrc_action("grep", "--", "-i", "-l", "Spam", retcode=True)
     assert rc == 0
     assert record_messages.find("a.txt")
+
 
 def test_worktree_paths(qisrc_action, record_messages):
     setup_projects(qisrc_action)

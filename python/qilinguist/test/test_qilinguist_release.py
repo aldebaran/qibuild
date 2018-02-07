@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 
@@ -9,6 +9,7 @@ import qisys.script
 from qibuild.test.conftest import TestBuildWorkTree
 
 import pytest
+
 
 def test_pml_outside_worktree(tmpdir, monkeypatch):
     foo = tmpdir.mkdir("foo")
@@ -48,6 +49,7 @@ def test_raise_when_no_project_given_outside_a_worktree(tmpdir, monkeypatch):
         qisys.script.run_action("qilinguist.actions.release")
     assert "outside a worktree" in e.value.message
 
+
 def test_non_translated_messages_gettext(qilinguist_action, record_messages):
     trad_project = qilinguist_action.trad
     qilinguist_action.create_po(trad_project)
@@ -62,11 +64,13 @@ char* foo() {
     qilinguist_action("release", "translate", raises=True)
     assert record_messages.find("untranslated")
 
+
 def test_non_translated_messages_qt(qilinguist_action):
     build_worktree = TestBuildWorkTree()
     project = build_worktree.add_test_project("translateme/qt")
     qilinguist_action("update", "helloqt")
     qilinguist_action("release", "helloqt", raises=True)
+
 
 def test_invalid_po_file(qilinguist_action):
     trad_project = qilinguist_action.trad

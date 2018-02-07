@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import copy
 import operator
@@ -12,6 +12,7 @@ import qisrc.snapshot
 import qisrc.sync
 import qisrc.project
 
+
 class NotInAGitRepo(Exception):
     """ Custom exception when user did not
     specify any git repo ond the command line
@@ -19,6 +20,7 @@ class NotInAGitRepo(Exception):
     working dir
 
     """
+
     def __str__(self):
         return """ Could not guess git repository from current working directory
   Here is what you can do :
@@ -29,6 +31,7 @@ class NotInAGitRepo(Exception):
 
 class GitWorkTree(qisys.worktree.WorkTreeObserver):
     """ Stores a list of git projects and a list of manifests """
+
     def __init__(self, worktree):
         self.worktree = worktree
         self.root = worktree.root
@@ -198,7 +201,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             git.remote("add", remote_name, clone_url)
             git.fetch(remote_name, "--quiet")
             git.checkout("-b", branch, "%s/%s" % (remote_name, branch))
-        except:
+        except Exception:
             ui.error("Cloning repo failed")
             if git.is_empty():
                 qisys.sh.rm(git_project.path)
@@ -226,7 +229,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             else:
                 ui.error(new_path, "already exists")
                 ui.error("If you are sure there is nothing valuable here, "
-                        "remove this directory and try again")
+                         "remove this directory and try again")
                 return
         new_base_dir = os.path.dirname(new_path)
         try:
@@ -234,7 +237,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             os.rename(project.path, new_path)
         except Exception as e:
             ui.error("Error when moving", project.src, "to", new_path,
-                     "\n", e , "\n",
+                     "\n", e, "\n",
                      "Repository left in", project.src)
             return
         self.worktree.move_project(project.src, new_src)
@@ -270,7 +273,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         max_src = max([len(x.src) for x in to_checkout])
         for i, project in enumerate(to_checkout):
             ui.info_count(i, n, ui.bold, "Checkout",
-                         ui.reset, ui.blue, project.src.ljust(max_src), end="\r")
+                          ui.reset, ui.blue, project.src.ljust(max_src), end="\r")
             if project.default_branch is None:
                 continue
             branch_name = project.default_branch.name
@@ -295,7 +298,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         ref = "origin/" + branch
         manifest = qisrc.manifest.from_git_repo(self._syncer.manifest_repo, ref)
         if not manifest:
-            raise Exception("Could not read manifest on %s"% ref)
+            raise Exception("Could not read manifest on %s" % ref)
         groups = self._syncer.manifest.groups
         repos = manifest.get_repos(groups=groups)
         for repo in repos:
@@ -313,7 +316,6 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         # not sure when to use from_disk here ...
         if project in self.worktree.projects:
             self.worktree.remove_project(project.src)
-
 
     def _get_elem(self, src):
         for xml_elem in self._root_xml.findall("project"):
@@ -343,6 +345,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
     def __repr__(self):
         return "<GitWorkTree in %s>" % self.root
 
+
 def on_no_matching_projects(worktree, groups=None):
     """ What to do when we find an empty worktree """
     if groups and len(groups) > 1:
@@ -359,6 +362,7 @@ Tips:
     * Use `qisrc add` to register a new project path to this worktree
 """
     ui.warning(mess.format(worktree=worktree, groups=groups) + tips)
+
 
 class NoSuchGitProject(Exception):
     pass

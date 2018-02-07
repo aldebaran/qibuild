@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 from qisys import ui
@@ -18,6 +18,7 @@ class DocBuilder(object):
     directly from the build dir.
 
     """
+
     def __init__(self, doc_worktree, base_project_name=None):
         self.doc_worktree = doc_worktree
         self.single = False
@@ -47,10 +48,10 @@ class DocBuilder(object):
         """
         projects = self.get_dep_projects()
         configure_args = {
-            "version" : self.version,
-            "hosted"  : self.hosted,
-            "build_type"   : self.build_type,
-            "warnings"     : self.warnings
+            "version": self.version,
+            "hosted": self.hosted,
+            "build_type": self.build_type,
+            "warnings": self.warnings
         }
         for project in projects:
             if project.translated:
@@ -97,10 +98,10 @@ class DocBuilder(object):
                           ui.green, "Building",
                           ui.blue, project.name)
             options = {
-                "version"   : self.version,
-                "hosted"    : self.hosted,
-                "build_type" : self.build_type,
-                "rel_paths" : True,
+                "version": self.version,
+                "hosted": self.hosted,
+                "build_type": self.build_type,
+                "rel_paths": True,
             }
             if clean:
                 project.clean()

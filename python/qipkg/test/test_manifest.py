@@ -1,7 +1,8 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qipkg.manifest
+
 
 def test_bump_version_explicit(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -11,6 +12,7 @@ def test_bump_version_explicit(tmpdir):
     actual = manifest_xml.read()
     assert actual == expected
 
+
 def test_bump_version_implicit(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write('<package uuid="foo" version="0.0.3" />')
@@ -18,4 +20,3 @@ def test_bump_version_implicit(tmpdir):
     expected = '<package uuid="foo" version="0.0.4" />'
     actual = manifest_xml.read()
     assert actual == expected
-

@@ -1,10 +1,11 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import qibuild.config
 import qipkg.parsers
+
 
 def test_pml_parser(qipkg_action, args):
     qipkg_action.add_test_project("a_cpp")
@@ -16,6 +17,7 @@ def test_pml_parser(qipkg_action, args):
     [a_pml, d_pml] = meta_builder.pml_builders
     assert len(a_pml.cmake_builder.projects) == 1
     assert len(d_pml.cmake_builder.projects) == 0
+
 
 def test_reads_build_config(qipkg_action, args, toolchains):
 

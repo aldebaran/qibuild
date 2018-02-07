@@ -1,6 +1,7 @@
 import qibuild.config
 from qibuild.test.conftest import TestBuildWorkTree
 
+
 def test_remove(qibuild_action):
     qibuild_action("add-config", "foo", "--toolchain", "foo")
     qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -10,6 +11,7 @@ def test_remove(qibuild_action):
     qibuild_cfg2 = qibuild.config.QiBuildConfig()
     qibuild_cfg2.read()
     assert qibuild_cfg2.configs.get("foo") is None
+
 
 def test_when_is_default(qibuild_action):
     qibuild_action("add-config", "foo", "--default")

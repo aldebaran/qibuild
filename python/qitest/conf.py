@@ -1,14 +1,15 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import argparse
 import os
 import json
 
+
 def add_test(output, **kwargs):
-    if not "name" in kwargs:
+    if "name" not in kwargs:
         raise Exception("Should provide a test name")
-    if not "cmd" in kwargs:
+    if "cmd" not in kwargs:
         raise Exception("Should provide a test cmd")
     tests = list()
     if os.path.exists(output):
@@ -27,6 +28,7 @@ def add_test(output, **kwargs):
     with open(output, "w") as fp:
         json.dump(tests, fp, indent=2)
 
+
 def parse_tests(conf_path):
     """ Parse the tests described in a qitest.json file.
     Returns a list of dictionaries
@@ -44,6 +46,7 @@ def parse_tests(conf_path):
                 test_env[key.encode("UTF-8")] = value.encode("UTF-8")
     return res
 
+
 def write_tests(tests, conf_path, append=False):
     """ Write a list of tests to a config file
     """
@@ -56,6 +59,7 @@ def write_tests(tests, conf_path, append=False):
     with open(conf_path, "w") as fp:
         return json.dump(tests, fp, indent=2)
 
+
 def relocate_tests(project, tests):
     """ Make sure the tests can be relocated to the dest directory """
     new_tests = list()
@@ -63,6 +67,7 @@ def relocate_tests(project, tests):
         test["cmd"] = relocate_cmd(project, test["cmd"])
         new_tests.append(test)
     return new_tests
+
 
 def relocate_cmd(project, cmd):
     """ Replace every absolute path by a relative path """

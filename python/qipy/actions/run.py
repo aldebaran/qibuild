@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Run a python script from the virtualenv"""
 
 import os
@@ -13,15 +13,17 @@ import qisys.parsers
 import qibuild.parsers
 import qipy.parsers
 
+
 def configure_parser(parser):
     qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("--list", action="store_true", dest="dolist",
-                       default=False,
-                       help="List all available binaries in the virtualenv")
+                        default=False,
+                        help="List all available binaries in the virtualenv")
     parser.add_argument("--no-exec", dest="exec_", action="store_false",
-                       help="Do not use os.execve (Mostly useful for tests")
+                        help="Do not use os.execve (Mostly useful for tests")
     parser.add_argument("command", metavar="COMMAND", nargs="*")
     parser.set_defaults(exec_=True)
+
 
 def do(args):
     build_worktree = qibuild.parsers.get_build_worktree(args)
@@ -31,7 +33,7 @@ def do(args):
     cmd = args.command
 
     venvs_path = os.path.join(worktree.dot_qi,
-                             "venvs")
+                              "venvs")
     name = build_config.build_directory("py")
     venv_root = os.path.join(venvs_path, name)
     if not os.path.exists(venv_root):

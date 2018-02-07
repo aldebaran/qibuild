@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ List the name and path of every buildable project
 
@@ -36,7 +36,7 @@ def do(args):
         return
     ui.info(ui.green, "qibuild projects in:", ui.blue, build_worktree.root)
     max_name = max(len(x.name) for x in projects)
-    max_src  = max(len(x.src)  for x in projects)
+    max_src = max(len(x.src) for x in projects)
     regex = args.pattern
     if args.pattern:
         regex = re.compile(regex)

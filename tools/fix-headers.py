@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
 
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 
 import sys
 
 HEADER = """## Copyright (C) 2011-2014 Aldebaran Robotics
 """
+
 
 def fix_file(filename):
     start_header = -1
@@ -44,8 +45,8 @@ def fix_file(filename):
             new_lines = header_lines + lines
     else:
         new_lines = lines[:start_header] +\
-                    header_lines +\
-                    lines[end_header:]
+            header_lines +\
+            lines[end_header:]
 
     with open(filename, "w") as fp:
         fp.writelines(new_lines)
@@ -55,4 +56,3 @@ if __name__ == "__main__":
     for file in sys.argv[1:]:
         print "fixing ", file
         fix_file(file)
-

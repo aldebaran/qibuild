@@ -1,9 +1,10 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qisys.sh
 import qitoolchain.qipackage
 import qisrc.svn
+
 
 class SvnPackage(qitoolchain.qipackage.QiPackage):
     """ A ``QiPackage`` managed by subversion """

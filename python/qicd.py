@@ -1,11 +1,12 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import sys
 import os
 import difflib
 
 import qisys.parsers
+
 
 def main():
     """ Main entry point """
@@ -27,6 +28,7 @@ def main():
         sys.stderr.write("no match for %s\n" % token)
         sys.exit(1)
 
+
 def find_best_match(worktree, token):
     """ Find the best match for a project in a worktree
 
@@ -47,6 +49,7 @@ def find_best_match(worktree, token):
             best_project = candidate
     if best_project:
         return best_project.path
+
 
 if __name__ == "__main__":
     main()

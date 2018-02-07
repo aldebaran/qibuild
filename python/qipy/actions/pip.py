@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Run pip from the correct virtualenv
 
 """
@@ -17,9 +17,11 @@ import qibuild.parsers
 import qipy.parsers
 import qipy.worktree
 
+
 def configure_parser(parser):
     qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("pip_options", metavar="COMMAND", nargs="*")
+
 
 def do(args):
     pip_options = args.pip_options

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 
@@ -9,6 +9,7 @@ import qisrc.git
 import qibuild.config
 
 import pytest
+
 
 def test_dependencies_cmake(build_worktree):
     hello_proj = build_worktree.create_project("hello")
@@ -19,29 +20,34 @@ def test_dependencies_cmake(build_worktree):
     # cmake projects, so no other assertions here
     assert os.path.exists(dep_cmake)
 
+
 def test_parse_num_jobs_happy_path(build_worktree):
     hello = build_worktree.create_project("hello")
-    assert hello.parse_num_jobs(3, cmake_generator="Unix Makefiles") ==  ["-j", "3"]
-    assert hello.parse_num_jobs(2, cmake_generator="Ninja") ==  ["-j", "2"]
+    assert hello.parse_num_jobs(3, cmake_generator="Unix Makefiles") == ["-j", "3"]
+    assert hello.parse_num_jobs(2, cmake_generator="Ninja") == ["-j", "2"]
     # Don't force -j1 when using Ninja
     assert hello.parse_num_jobs(None, cmake_generator="Ninja") == list()
-    assert hello.parse_num_jobs(1, cmake_generator="Ninja") ==  ["-j", "1"]
+    assert hello.parse_num_jobs(1, cmake_generator="Ninja") == ["-j", "1"]
+
 
 def test_parse_num_jobs_unsupported_generator(build_worktree):
     hello = build_worktree.create_project("hello")
     # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
-        hello.parse_num_jobs(3, cmake_generator="NMake Makefiles") ==  list()
+        hello.parse_num_jobs(3, cmake_generator="NMake Makefiles") == list()
     assert "-j is not supported for NMake Makefiles" in str(e.value)
+
 
 def test_parse_num_jobs_no_dash_j(build_worktree, record_messages):
     hello = build_worktree.create_project("hello")
     assert hello.parse_num_jobs(3, cmake_generator="Visual Studio 10") == ["/maxcpucount:3"]
 
+
 def test_parse_num_jobs_unknown_generator(build_worktree, record_messages):
     hello = build_worktree.create_project("hello")
-    assert hello.parse_num_jobs(3, cmake_generator="KDevelop3") ==  list()
+    assert hello.parse_num_jobs(3, cmake_generator="KDevelop3") == list()
     assert record_messages.find("Unknown generator: KDevelop3")
+
 
 def test_gen_scm_info(build_worktree, tmpdir):
     build_worktree.add_test_project("world")
@@ -58,6 +64,7 @@ def test_gen_scm_info(build_worktree, tmpdir):
     git_elem = scm_elem.find("git")
     assert git_elem.get("revision") == sha1
 
+
 def test_using_build_prefix(build_worktree):
     world_proj = build_worktree.add_test_project("world")
     build_config = build_worktree.build_config
@@ -66,10 +73,12 @@ def test_using_build_prefix(build_worktree):
     assert world_proj.build_directory == os.path.join(build_worktree.root, "mybuild",
                                                       build_directory_name, "world")
 
+
 def test_validates_name(build_worktree):
     # pylint:disable-msg=E1101
     with pytest.raises(Exception):
         build_worktree.create_project("foo/bar")
+
 
 def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):
     toolchains.create("foo")
@@ -84,6 +93,7 @@ def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):
     host_sdk_dir = bar_proj.sdk_directory
     build_worktree.set_active_config("fake-ctc")
     assert bar_proj.get_host_sdk_dir() == host_sdk_dir
+
 
 def test_get_host_sdk_dir_system(build_worktree, toolchains, fake_ctc):
     bar_proj = build_worktree.create_project("bar")

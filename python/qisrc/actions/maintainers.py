@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Manage the list of maintainers."""
 
@@ -9,28 +9,30 @@ import qisys.parsers
 import qisrc.git
 import qisrc.maintainers
 
+
 def configure_parser(parser):
     """Configure parser for this action."""
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser, positional=False)
     group = parser.add_argument_group("qisrc maintainers options")
     group.add_argument("--add", action="store_const",
-                        dest="maintainers_action", const="add",
-                        help="Add a new maintainer")
+                       dest="maintainers_action", const="add",
+                       help="Add a new maintainer")
     group.add_argument("--list", action="store_const",
-                        dest="maintainers_action", const="list",
-                        help="List all the maintainers")
+                       dest="maintainers_action", const="list",
+                       help="List all the maintainers")
     group.add_argument("--remove", action="store_const",
-                        dest="maintainers_action", const="remove",
-                        help="Remove maintainers")
+                       dest="maintainers_action", const="remove",
+                       help="Remove maintainers")
     group.add_argument("--clear", action="store_const",
-                        dest="maintainers_action", const="clear",
-                        help="Remove all maintainers")
+                       dest="maintainers_action", const="clear",
+                       help="Remove all maintainers")
     group.add_argument("--name",
                        help="Name of the maintainer to add or remove")
     group.add_argument("--email",
                        help="email of the maintainer to add or remove")
     parser.set_defaults(maintainers_action="list")
+
 
 def do(args):
     """Main entry point."""
@@ -53,6 +55,7 @@ def do(args):
     for project in projects:
         to_call(project, args)
 
+
 def add_maintainer(project, args):
     name = args.name
     if not name:
@@ -65,7 +68,6 @@ def add_maintainer(project, args):
         if not email:
             return
     qisrc.maintainers.add(project, name=name, email=email)
-
 
 
 def remove_maintainer(project, args):
@@ -85,6 +87,7 @@ def remove_maintainer(project, args):
     qisrc.maintainers.remove(project, **maintainer)
     ui.info(ui.blue, qisrc.maintainers.to_str(**maintainer),
             ui.reset, "removed from maintainers")
+
 
 def clear_maintainers(project, *unused_args):
     if qisrc.maintainers.clear(project):

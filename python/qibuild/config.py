@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 
 """ Read / write qibuild configuration file
@@ -16,7 +16,6 @@ from qisys import ui
 import qisys.qixml
 import qisys.sh
 from qisys.qixml import etree
-
 
 
 def get_global_cfg_path():
@@ -36,7 +35,7 @@ class Env(object):
     def parse(self, tree):
         self.path = tree.get("path")
         self.bat_file = tree.get("bat_file")
-        self.editor   = tree.get("editor")
+        self.editor = tree.get("editor")
         self.parse_vars(tree)
 
     def tree(self):
@@ -84,7 +83,7 @@ class IDE(object):
         name = tree.get("name")
         if not name:
             qisys.qixml.raise_parse_error("ide node should have a name attribute",
-                tree=tree)
+                                          tree=tree)
         self.name = name
         self.path = tree.get("path")
 
@@ -205,7 +204,7 @@ class Server(object):
         name = tree.get("name")
         if not name:
             qisys.qixml.raise_parse_error("server node should have a name attribute",
-                tree=tree)
+                                          tree=tree)
         self.name = name
         access_tree = tree.find("access")
         if access_tree is not None:
@@ -227,6 +226,7 @@ class Server(object):
             res += ui.indent(access_str)
         return res
 
+
 class WorkTree(object):
     def __init__(self):
         self.path = None
@@ -236,7 +236,7 @@ class WorkTree(object):
         path = tree.get("path")
         if not path:
             qisys.qixml.raise_parse_error(
-                    "'worktree' node should have a 'path' attribute")
+                "'worktree' node should have a 'path' attribute")
         self.path = path
         defaults_tree = tree.find("defaults")
         if defaults_tree is not None:
@@ -256,6 +256,7 @@ class WorkTree(object):
         if defaults_str:
             res += "\n  " + defaults_str
         return res
+
 
 class LocalSettings(object):
     def __init__(self):
@@ -310,6 +311,7 @@ class LocalDefaults(object):
             res += "default config: %s\n" % self.config
         return res
 
+
 class LocalBuild(object):
     def __init__(self):
         self.sdk_dir = None
@@ -353,7 +355,7 @@ class BuildConfig(object):
         name = tree.get("name")
         if not name:
             qisys.qixml.raise_parse_error("'config' node must have a 'name' attribute",
-                tree=tree)
+                                          tree=tree)
         self.name = ui.valid_filename(name)
         self.ide = tree.get("ide")
         env_tree = tree.find("env")
@@ -422,6 +424,7 @@ class QiBuildConfig(object):
     qibuild.xml configuration files
 
     """
+
     def __init__(self):
         self.tree = etree.ElementTree()
         self.defaults = Defaults()
@@ -466,7 +469,7 @@ class QiBuildConfig(object):
         try:
             self.tree.parse(cfg_path)
         except Exception, e:
-            mess  = "Could not parse config from %s\n" % cfg_path
+            mess = "Could not parse config from %s\n" % cfg_path
             mess += "Error was: %s" % str(e)
             raise Exception(mess)
 
@@ -629,7 +632,7 @@ class QiBuildConfig(object):
         return server.access
 
     def set_server_access(self, server_name, username,
-                            password=None, root=None):
+                          password=None, root=None):
         """ Configure access to a server """
         server = self.servers.get(server_name)
         if not server:
@@ -665,7 +668,7 @@ class QiBuildConfig(object):
 
     def set_host_config(self, config_name):
         """ Set the config used to build host tools """
-        if not config_name in self.configs:
+        if config_name not in self.configs:
             raise Exception("No such config: %s" % config_name)
         # Make sure that we unset the previous 'host' config when
         # called twice with different config names
@@ -762,6 +765,7 @@ class ProjectConfig(object):
     """ A class to read project configuration
 
     """
+
     def __init__(self):
         self.name = None
         self.build_depends = set()
@@ -784,19 +788,19 @@ class ProjectConfig(object):
         root = self.tree.getroot()
         if root.tag != "project":
             qisys.qixml.raise_parse_error("Root node must be 'project'",
-                xml_path=cfg_path)
+                                          xml_path=cfg_path)
         name = root.get("name")
         if not name:
             qisys.qixml.raise_parse_error("'project' node must have a 'name' attribute",
-                xml_path=cfg_path)
+                                          xml_path=cfg_path)
         self.name = name
 
         # Read depends:
         depends_trees = self.tree.findall("depends")
         for depends_tree in depends_trees:
             buildtime = qisys.qixml.parse_bool_attr(depends_tree, "buildtime")
-            runtime   = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
-            testtime  = qisys.qixml.parse_bool_attr(depends_tree, "testtime")
+            runtime = qisys.qixml.parse_bool_attr(depends_tree, "runtime")
+            testtime = qisys.qixml.parse_bool_attr(depends_tree, "testtime")
             dep_names = qisys.qixml.parse_list_attr(depends_tree, "names")
             for dep_name in dep_names:
                 if buildtime:
@@ -840,7 +844,6 @@ class ProjectConfig(object):
         test_elem.set("names", " ".join(self.test_depends))
         project_tree.append(test_elem)
 
-
         qisys.qixml.write(self.tree, location)
 
     def __str__(self):
@@ -866,9 +869,9 @@ class ProjectConfig(object):
 
     def __eq__(self, other):
         return other.name == self.name and \
-                other.build_depends == self.build_depends and \
-                other.run_depends == self.run_depends and \
-                other.test_depends == self.test_depends
+            other.build_depends == self.build_depends and \
+            other.run_depends == self.run_depends and \
+            other.test_depends == self.test_depends
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -884,6 +887,7 @@ def get_build_env():
     envsetter = qisys.envsetter.EnvSetter()
     envsetter.read_config(qibuild_cfg)
     return envsetter.get_build_env()
+
 
 def add_build_config(name, toolchain=None, profiles=None,
                      ide=None, cmake_generator=None, host=False):
@@ -906,6 +910,7 @@ def add_build_config(name, toolchain=None, profiles=None,
     build_config.host = host
     qibuild_cfg.add_config(build_config)
     qibuild_cfg.write()
+
 
 def get_config_names():
     qibuild_cfg = QiBuildConfig()

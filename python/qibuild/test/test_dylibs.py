@@ -1,9 +1,10 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import sys
 import qibuild.dylibs
+
 
 def test_create_symlinks_to_deps(tmpdir):
     if sys.platform != 'darwin':

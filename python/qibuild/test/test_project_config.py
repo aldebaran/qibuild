@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Automatic testing for qibuild.project.ProjectConfig
 
@@ -10,11 +10,13 @@ from qibuild.config import ProjectConfig
 import unittest
 from StringIO import StringIO
 
+
 def cfg_from_string(str):
     cfg_loc = StringIO(str)
     project_cfg = ProjectConfig()
     project_cfg.read(cfg_loc)
     return project_cfg
+
 
 class ProjectConfigTestClass(unittest.TestCase):
 
@@ -61,9 +63,6 @@ def test_write(tmpdir):
     cfg2.read(xml.strpath)
 
     assert cfg2 == cfg
-
-
-
 
 
 if __name__ == "__main__":

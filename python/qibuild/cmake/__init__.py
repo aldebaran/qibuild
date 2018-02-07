@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """This module contains function to handle CMake managed project.
 
@@ -16,6 +16,7 @@ import qisys.command
 import qisys.sh
 import qibuild.cmake.profiling
 
+
 def get_known_cmake_generators():
     """ Get the list of known cmake generators.
     Assume cmake is in PATH, or path to cmake is correctly
@@ -23,7 +24,7 @@ def get_known_cmake_generators():
 
     """
     build_env = qibuild.config.get_build_env()
-    cmake_    = qisys.command.find_program("cmake", env=build_env)
+    cmake_ = qisys.command.find_program("cmake", env=build_env)
     if not cmake_:
         message = """\
 Could not find cmake executable
@@ -32,7 +33,7 @@ Please install it if necessary and re-run `qibuild config --wizard`\
         raise Exception(message)
     process = subprocess.Popen([cmake_, "--help"], stdout=subprocess.PIPE)
     (out, _err) = process.communicate()
-    intersting  = False
+    intersting = False
     intersting_lines = list()
     magic_line = "The following generators are available on this platform:"
     # pylint: disable-msg=E1103
@@ -41,7 +42,7 @@ Please install it if necessary and re-run `qibuild config --wizard`\
         # Generator = "blalblalba"
         #       files.
         if len(line) >= 3:
-            if line[2] == ' ' and not "=" in line:
+            if line[2] == ' ' and "=" not in line:
                 continue
         if line == magic_line:
             intersting = True
@@ -71,6 +72,7 @@ Please install it if necessary and re-run `qibuild config --wizard`\
             fixed_list.append(generator)
     return fixed_list
 
+
 def get_cached_var(build_dir, var, default=None):
     """Get a variable from cmake cache
 
@@ -83,10 +85,11 @@ def get_cached_var(build_dir, var, default=None):
     """
     cmakecache = os.path.join(build_dir, "CMakeCache.txt")
     if not os.path.exists(cmakecache):
-        mess  = "Could not find CMakeCache.txt in %s" % build_dir
+        mess = "Could not find CMakeCache.txt in %s" % build_dir
         raise Exception(mess)
     res = read_cmake_cache(cmakecache)
     return res.get(var, default)
+
 
 def cmake(source_dir, build_dir, cmake_args, env=None,
           clean_first=True, profiling=False, debug_trycompile=False,
@@ -111,7 +114,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
         raise Exception("source dir: %s does not exist, aborting")
 
     if not os.path.exists(build_dir):
-        mess  = "Could not find build directory: %s \n" % build_dir
+        mess = "Could not find build directory: %s \n" % build_dir
         raise Exception(mess)
 
     # Always remove CMakeCache
@@ -128,7 +131,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     in_source_cache = os.path.join(source_dir, "CMakeCache.txt")
     if os.path.exists(in_source_cache):
         # FIXME: better wording
-        mess  = "You have run CMake from your sources\n"
+        mess = "You have run CMake from your sources\n"
         mess += "CMakeCache.txt found here: %s\n" % in_source_cache
         mess += "Please clean your sources and try again\n"
         raise Exception(mess)
@@ -153,7 +156,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
         ui.info(ui.green, "Running cmake with --trace ...")
     ui.debug("Running cmake " + " ".join(cmake_args))
     retcode = subprocess.call(["cmake"] + cmake_args, cwd=build_dir, env=env,
-                   stdout=fp, stderr=fp)
+                              stdout=fp, stderr=fp)
     fp.close()
     if retcode != 0:
         mess = "CMake failed"
@@ -170,6 +173,7 @@ def cmake(source_dir, build_dir, cmake_args, env=None,
     qibuild.cmake.profiling.gen_annotations(profiling_res, outdir, qibuild_dir)
     ui.info(ui.green, "Annotations generated in", outdir)
 
+
 def display_options(build_dir):
     """ Display the options by looking in the CMake cache
 
@@ -185,6 +189,7 @@ def display_options(build_dir):
     padding = max(len(x) for x in opt_keys) + 3
     for key in opt_keys:
         ui.info("  %s : %s" % (key.ljust(padding), cache[key]))
+
 
 def read_cmake_cache(cache_path):
     """ Read a CMakeCache.txt file, returning a dict
@@ -209,6 +214,7 @@ def read_cmake_cache(cache_path):
             res[key] = value
     return res
 
+
 def get_cmake_qibuild_dir():
     """Get the path to cmake modules.
 
@@ -219,10 +225,11 @@ def get_cmake_qibuild_dir():
     """
     res = find_installed_cmake_qibuild_dir(qibuild.QIBUILD_ROOT_DIR)
     if not res:
-        mess  = "Could not find qibuild cmake framework path\n"
+        mess = "Could not find qibuild cmake framework path\n"
         mess += "Please file a bug report with the details of your installation"
         raise Exception(mess)
     return res
+
 
 def find_installed_cmake_qibuild_dir(python_dir):
     ui.debug("looking for cmake code from", python_dir)
@@ -247,7 +254,7 @@ def find_installed_cmake_qibuild_dir(python_dir):
         ("..", "share", "cmake"),
         # pip on mac
         (sys.prefix, "share", "cmake")
-        ]:
+    ]:
 
         rel_path = os.path.join(*candidate)
         res = os.path.join(python_dir, rel_path)
@@ -256,6 +263,7 @@ def find_installed_cmake_qibuild_dir(python_dir):
         ui.debug("trying", qibuild_config)
         if os.path.exists(qibuild_config):
             return res
+
 
 def get_binutil(name, cmake_var=None, build_dir=None, env=None):
     """ Get a tool from the binutils package.
@@ -271,7 +279,7 @@ def get_binutil(name, cmake_var=None, build_dir=None, env=None):
     if not cmake_var:
         cmake_var = "CMAKE_" + name.upper()
     if build_dir:
-        res =  get_cached_var(build_dir, cmake_var)
+        res = get_cached_var(build_dir, cmake_var)
     if res and not res.endswith("-NOTFOUND"):
         return res
     return qisys.command.find_program(name, env=env)
@@ -337,6 +345,7 @@ find_package(qibuild)
     if message:
         raise IncorrectCMakeLists(cmake_list_file, message)
 
+
 class IncorrectCMakeLists(Exception):
     def __init__(self, cmake_list_file, message):
         self.cmake_list_file = cmake_list_file
@@ -347,4 +356,3 @@ class IncorrectCMakeLists(Exception):
         message += "(in %s)\n" % self.cmake_list_file
         message += self.message
         return message
-

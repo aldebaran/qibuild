@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import py
@@ -11,9 +11,11 @@ import qibuild.cmake
 
 from qisys.test.conftest import skip_on_win
 
+
 def test_get_cmake_qibuild_dir_no_worktree():
     res = qibuild.cmake.get_cmake_qibuild_dir()
     assert os.path.exists(os.path.join(res, "qibuild/general.cmake"))
+
 
 def test_pip_std_install(tmpdir):
     python_dir = tmpdir.join("lib", "python2.7", "site-packages", "qibuild")
@@ -22,6 +24,7 @@ def test_pip_std_install(tmpdir):
     cmake_dir.ensure("qibuild", "qibuild-config.cmake", file=True)
     res = qibuild.cmake.find_installed_cmake_qibuild_dir(python_dir.strpath)
     assert res == cmake_dir.strpath
+
 
 @skip_on_win
 def test_pip_debian_install(tmpdir):
@@ -35,6 +38,7 @@ def test_pip_debian_install(tmpdir):
     res = qibuild.cmake.find_installed_cmake_qibuild_dir(python_dir.strpath)
     assert res == cmake_dir.strpath
 
+
 def test_check_root_cmake_no_cmake_minimum_required(tmpdir):
     cmake_list = tmpdir.join("CMakeLists.txt")
     cmake_list.write("""
@@ -45,6 +49,7 @@ find_package(qibuild)
     with pytest.raises(qibuild.cmake.IncorrectCMakeLists) as e:
         qibuild.cmake.check_root_cmake_list(cmake_list.strpath)
     assert "Missing call to cmake_minimum_required" in e.value.message
+
 
 def test_check_root_cmake_find_package_before_project(tmpdir):
     cmake_list = tmpdir.join("CMakeLists.txt")
@@ -57,6 +62,7 @@ project(foo)
     with pytest.raises(qibuild.cmake.IncorrectCMakeLists) as e:
         qibuild.cmake.check_root_cmake_list(cmake_list.strpath)
     assert "The call to find_package(qibuild) should be AFTER" in e.value.message
+
 
 def test_check_root_cmake_no_project(tmpdir):
     cmake_list = tmpdir.join("CMakeLists.txt")
@@ -73,7 +79,7 @@ find_package(qibuild)
 def test_get_known_generators():
     with mock.patch("subprocess.Popen") as mock_popen:
         mock_process = mock.Mock()
-        mock_popen.return_value =  mock_process
+        mock_popen.return_value = mock_process
         mock_process.communicate.return_value = ("""
 Usage
 
@@ -97,10 +103,11 @@ The following generators are available on this platform:
         assert mock_process.communicate.call_args_list == [mock.call()]
         assert res == ["Unix Makefiles", "Ninja", "Sublime Text 2 - Unix Makefiles"]
 
+
 def test_generators_on_windows_cmake_3_3():
     with mock.patch("subprocess.Popen") as mock_popen:
         mock_process = mock.Mock()
-        mock_popen.return_value =  mock_process
+        mock_popen.return_value = mock_process
         mock_process.communicate.return_value = ("""
 The following generators are available on this platform:
   Visual Studio 14 2015 [arch] = Generates Visual Studio 2015 project files

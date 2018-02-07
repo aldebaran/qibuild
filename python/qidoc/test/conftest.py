@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import bs4
 
@@ -8,6 +8,7 @@ from qisys.test.conftest import *
 import qisys.qixml
 
 import qidoc.worktree
+
 
 class TestDocWorkTree(qidoc.worktree.DocWorkTree):
     """ A subclass of DocWorkTree that can create doc projects """
@@ -56,6 +57,7 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
     def create_sphinx_project(self, name, src=None, depends=None):
         return self.create_doc_project(name, src=src, depends=depends,
                                        doc_type="sphinx")
+
     def create_doxygen_project(self, name, src=None, depends=None):
         return self.create_doc_project(name, src=src, depends=depends,
                                        doc_type="doxygen")
@@ -73,6 +75,7 @@ class TestDocWorkTree(qidoc.worktree.DocWorkTree):
         worktree_project = self.worktree.add_project(src)
         doc_project = qidoc.worktree.new_doc_project(self, worktree_project)
         return doc_project
+
 
 class QiDocAction(TestAction):
     def __init__(self):
@@ -105,6 +108,8 @@ def doc_worktree(cd_to_tmpdir):
     return TestDocWorkTree()
 
 # pylint: disable-msg=E1103
+
+
 @pytest.fixture
 def qidoc_action(cd_to_tmpdir):
     res = QiDocAction()

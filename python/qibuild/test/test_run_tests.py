@@ -1,8 +1,9 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import qisys.qixml
+
 
 def test_run(build_worktree):
     testme = build_worktree.add_test_project("testme")
@@ -16,6 +17,7 @@ def test_run(build_worktree):
     for xml_file in xml_files:
         full_path = os.path.join(test_dir, xml_file)
         qisys.qixml.read(full_path)
+
 
 def test_keep_output_when_test_times_out(build_worktree):
     testme = build_worktree.add_test_project("testme")

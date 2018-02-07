@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Run git grep on every project
 
@@ -18,14 +18,16 @@ import qisrc.git
 import qisrc.parsers
 import qibuild.parsers
 
+
 def configure_parser(parser):
     """Configure parser for this action."""
     qisrc.parsers.worktree_parser(parser)
     qibuild.parsers.project_parser(parser, positional=False)
     parser.add_argument("--path", help="type of patch to print",
-            default="project", choices=['none', 'absolute', 'worktree', 'project'])
+                        default="project", choices=['none', 'absolute', 'worktree', 'project'])
     parser.add_argument("git_grep_opts", metavar="-- git grep options", nargs="+",
                         help="git grep options preceded with -- to escape the leading '-'")
+
 
 def do(args):
     """Main entry point."""

@@ -1,11 +1,12 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import xml.etree.ElementTree as etree
 
 import qisrc.groups
 
 import pytest
+
 
 def test_parser_read():
     file = """
@@ -34,6 +35,7 @@ def test_parser_read():
     # pylint: disable-msg=E1101
     with pytest.raises(qisrc.groups.GroupError):
         groups.projects("c")
+
 
 def test_parser_write():
     groups = qisrc.groups.Groups()

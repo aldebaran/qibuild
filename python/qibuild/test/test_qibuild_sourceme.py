@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 
+
 def test_qibuild_sourceme(tmpdir, qibuild_action):
     foo_proj = qibuild_action.create_project("foo")
     if not sys.platform.startswith("linux"):
@@ -18,4 +19,4 @@ for line in os.environ["LD_LIBRARY_PATH"].split():
     out, err = process.communicate()
     assert not err
     lines = out.splitlines()
-    assert os.path.join(foo_proj.sdk_directory, "lib") in  lines
+    assert os.path.join(foo_proj.sdk_directory, "lib") in lines

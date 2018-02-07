@@ -1,10 +1,11 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import sys
 
 import qisys.command
+
 
 def test_read_config(qipy_action):
     big_project = qipy_action.add_test_project("big_project")
@@ -26,6 +27,7 @@ def test_read_config(qipy_action):
     assert big_project.python_path == [big_project.path,
                                        os.path.join(big_project.path, "lib")]
 
+
 def test_install(qipy_action, tmpdir):
     big_project = qipy_action.add_test_project("big_project")
     dest = tmpdir.join("dest")
@@ -36,6 +38,7 @@ def test_install(qipy_action, tmpdir):
     assert site_packages.join("foo", "__init__.py").check(file=True)
     assert site_packages.join("foo", "bar", "baz.py").check(file=True)
 
+
 def test_run(qipy_action):
     # can't use `qipy run` here because it will call os.execv and
     # screw other tests
@@ -45,6 +48,7 @@ def test_run(qipy_action):
     script = os.path.join(big_project.path, "bin", "script.py")
     cmd = [sys.executable, script]
     qisys.command.call(cmd, env=env)
+
 
 def test_qimodule(qipy_action):
     foomodule_proj = qipy_action.add_test_project("foomodules")

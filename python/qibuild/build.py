@@ -1,12 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Low-level build functions
 
 """
 
 import qisys
+
 
 def make(build_dir, num_jobs=None, target=None):
     """ Launch make from a build dir.
@@ -32,7 +33,6 @@ def nmake(build_dir, target=None):
     qisys.command.call(cmd, cwd=build_dir)
 
 
-
 def msbuild(sln_file, build_type="Debug", target=None, num_jobs=None):
     """ Launch msbuild with correct configuration
     (debug or release), and with correct switch if num_jobs is not None
@@ -51,18 +51,22 @@ def msbuild(sln_file, build_type="Debug", target=None, num_jobs=None):
 
     qisys.command.call(cmd)
 
+
 class BuildFailed(Exception):
     def __init__(self, project):
         self.project = project
+
     def __str__(self):
         return "Error occurred when building project %s" % self.project.name
+
 
 class ConfigureFailed(Exception):
     def __init__(self, project, exception=None):
         self.project = project
         self.exception = exception
+
     def __str__(self):
-        mess =  "Error occurred when configuring project %s" % self.project.name
+        mess = "Error occurred when configuring project %s" % self.project.name
         returncode = self.exception.returncode
         if (returncode < 0):
             mess += " (%s)" % qisys.command.str_from_signal(-returncode)

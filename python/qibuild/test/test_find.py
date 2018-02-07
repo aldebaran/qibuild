@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import platform
@@ -10,6 +10,7 @@ from qibuild.find import library_name
 from qibuild.find import binary_name
 
 import pytest
+
 
 def test_library_name():
     assert library_name("foo", debug=False, shared=True,  os_name="Windows") == "foo.dll"
@@ -42,17 +43,17 @@ def test_expect_one(tmpdir):
     b_path.ensure("bin/foo", file=True)
 
     res = qibuild.find.find([a_path.strpath, b_path.strpath], "foo",
-                           expect_one=False)
+                            expect_one=False)
     assert len(res) == 2
 
     # pylint: disable-msg=E1101
     with pytest.raises(qibuild.find.MulipleFound) as e:
         qibuild.find.find([a_path.strpath, b_path.strpath], "foo",
-                                expect_one=True)
+                          expect_one=True)
 
     with pytest.raises(qibuild.find.NotFound) as e:
         qibuild.find.find([a_path.strpath, b_path.strpath], "bar",
-                                expect_one=True)
+                          expect_one=True)
 
     res = qibuild.find.find_bin([b_path.strpath], "foo", expect_one=True)
     assert os.path.exists(res)

@@ -1,12 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import qibuild.config
 from qibuild import find
 
 from qibuild.test.conftest import QiBuildAction
 from qitoolchain.test.conftest import QiToolchainAction
+
 
 def test_find_target_in_project_cmake(qibuild_action, record_messages):
     qibuild_action.add_test_project("world")
@@ -15,6 +16,7 @@ def test_find_target_in_project_cmake(qibuild_action, record_messages):
     record_messages.reset()
     qibuild_action("find", "--cmake", "hello", "world")
     assert record_messages.find("WORLD_LIBRARIES")
+
 
 def test_find_target_in_toolchain_package_cmake(cd_to_tmpdir, record_messages):
     qibuild_action = QiBuildAction()
@@ -35,6 +37,7 @@ def test_find_target_in_toolchain_package_cmake(cd_to_tmpdir, record_messages):
 
     assert record_messages.find("WORLD_LIBRARIES")
 
+
 def test_find_target_in_build_dir(qibuild_action, record_messages):
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
@@ -47,6 +50,7 @@ def test_find_target_in_build_dir(qibuild_action, record_messages):
 
     rc = qibuild_action("find", "hello", "libworld", retcode=True)
     assert rc == 1
+
 
 def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
     qibuild_action = QiBuildAction()
@@ -72,4 +76,3 @@ def test_find_target_in_toolchain_package(cd_to_tmpdir, record_messages):
 
     rc = qibuild_action("find", "libeggs", "-c", "foo", retcode=True)
     assert rc == 1
-

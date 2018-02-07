@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Just some tests for ui """
 
@@ -9,9 +9,10 @@ import qisys.ui as ui
 
 import pytest
 
+
 def main():
     ui.info(ui.red, "This is a an error message\n",
-        ui.reset, "And here are the details")
+            ui.reset, "And here are the details")
     ui.error("could not build")
     ui.warning("-j ignored for this generator")
     ui.info("building foo")
@@ -22,6 +23,7 @@ def main():
     ui.info(ui.darkred, "darkred is really dead")
     ui.info(ui.yellow, "this is yellow")
 
+
 def test_valid_filename():
     # pylint:disable-msg=E1101
     with pytest.raises(Exception):
@@ -31,6 +33,7 @@ def test_valid_filename():
         ui.valid_filename("..")
     ui.valid_filename("foo")
 
+
 def test_empty_end():
     out = io.BytesIO()
     ui.info("[skipped] ", end="", fp=out)
@@ -39,12 +42,14 @@ def test_empty_end():
     expected = "[skipped] Your branch has diverged\n"
     assert actual == expected
 
+
 def test_several_newlines():
     out = io.BytesIO()
     ui.info("foo\n", "bar\n", "baz", fp=out)
     actual = out.getvalue()
     expected = "foo\nbar\nbaz\n"
     assert actual == expected
+
 
 def test_do_not_add_space_after_newline():
     out = io.BytesIO()
@@ -53,12 +58,14 @@ def test_do_not_add_space_after_newline():
     expected = "foo\nbar\n"
     assert actual == expected
 
+
 def test_insert_spaces():
     out = io.BytesIO()
     ui.info("foo:", "bar", fp=out)
     actual = out.getvalue()
     expected = "foo: bar\n"
     assert actual == expected
+
 
 def test_custom_sep():
     out = io.BytesIO()
@@ -67,6 +74,7 @@ def test_custom_sep():
     expected = "foo\nbar\n"
     assert actual == expected
 
+
 def test_convert_to_strings():
     out = io.BytesIO()
     ui.info("mylist", ["a", "b", "c"], fp=out)
@@ -74,10 +82,11 @@ def test_convert_to_strings():
     expected = "mylist ['a', 'b', 'c']\n"
     assert actual == expected
 
+
 if __name__ == "__main__":
     import sys
-    if "-v" in  sys.argv:
+    if "-v" in sys.argv:
         ui.CONFIG["verbose"] = True
     if "-q" in sys.argv:
-        ui.CONFIG["quiet"]  = True
+        ui.CONFIG["quiet"] = True
     main()

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Automatic testing for qibuild.config.QiBuildConfig
 
@@ -75,7 +75,6 @@ class QiBuildConfig(unittest.TestCase):
         configs = qibuild_cfg.configs
         self.assertEquals(len(configs), 2)
         [linux32_cfg, linux64_cfg] = [configs["linux32"], configs["linux64"]]
-
 
         self.assertEquals(linux32_cfg.name, "linux32")
         self.assertEquals(linux64_cfg.name, "linux64")
@@ -195,9 +194,8 @@ class QiBuildConfig(unittest.TestCase):
 """
         default_cfg = cfg_from_string(xml)
         self.assertEquals(default_cfg.cmake.generator, "Visual Studio 10")
-        mingw_cfg  = cfg_from_string(xml, user_config="win32-mingw")
+        mingw_cfg = cfg_from_string(xml, user_config="win32-mingw")
         self.assertEquals(mingw_cfg.cmake.generator, "NMake Makefiles")
-
 
     def test_set_default_config(self):
         xml = """
@@ -277,8 +275,7 @@ class QiBuildConfig(unittest.TestCase):
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
         self.assertEqual(new_cfg.configs["linux32"].cmake.generator,
-            "Code::Blocks")
-
+                         "Code::Blocks")
 
     def test_ide_from_config(self):
         xml = """
@@ -307,7 +304,6 @@ class QiBuildConfig(unittest.TestCase):
         self.assertEqual(vc_cfg.ide.name, "QtCreator")
         self.assertEqual(vc_cfg.ide.path, "/path/to/qtsdk/qtcreator")
 
-
     def test_adding_ide_twice(self):
         xml = """
 <qibuild version="1">
@@ -322,8 +318,7 @@ class QiBuildConfig(unittest.TestCase):
         new_conf = cfg_to_string(qibuild_cfg)
         new_cfg = cfg_from_string(new_conf)
         self.assertEqual(new_cfg.ides["qtcreator"].path,
-            "/path/to/qtcreator")
-
+                         "/path/to/qtcreator")
 
     def test_build_settings(self):
         xml = """
@@ -331,7 +326,7 @@ class QiBuildConfig(unittest.TestCase):
 </qibuild>
 """
         qibuild_cfg = cfg_from_string(xml)
-        self.assertTrue(qibuild_cfg.local.build.sdk_dir   is None)
+        self.assertTrue(qibuild_cfg.local.build.sdk_dir is None)
         self.assertTrue(qibuild_cfg.local.build.prefix is None)
 
         xml = """
@@ -350,7 +345,6 @@ class QiBuildConfig(unittest.TestCase):
         qibuild_cfg.read_local_config(StringIO(local_xml))
         self.assertEqual(qibuild_cfg.local.build.sdk_dir, "/path/to/sdk")
         self.assertEqual(qibuild_cfg.local.build.prefix, "/path/to/build")
-
 
     def test_get_server_access(self):
         xml = """
@@ -377,7 +371,6 @@ class QiBuildConfig(unittest.TestCase):
         access = new_cfg.get_server_access("doesnotexists")
         self.assertTrue(access is None)
 
-
     def test_set_server_access(self):
         xml = '<qibuild />'
         qibuild_cfg = cfg_from_string(xml)
@@ -401,7 +394,6 @@ class QiBuildConfig(unittest.TestCase):
         new_cfg = cfg_from_string(new_conf)
         access = new_cfg.get_server_access("gerrit")
         self.assertEqual(access.username, "john")
-
 
     def test_merge_settings_with_empty_active(self):
         xml = """
@@ -431,7 +423,7 @@ class QiBuildConfig(unittest.TestCase):
     <cmake/>
   </config>
 </qibuild>
-"""
+"""  # noqa
         qibuild_cfg = cfg_from_string(xml,  user_config='win32-vs2010')
         self.assertEquals(qibuild_cfg.cmake.generator, "NMake Makefiles")
 
@@ -459,6 +451,7 @@ def test_recompute_cmake_generator(tmpdir):
     qibuild_cfg.set_active_config("b")
     assert qibuild_cfg.cmake.generator is None
 
+
 def test_worktree_paths(tmpdir):
     global_xml = tmpdir.join("global.xml")
     global_xml.write("""
@@ -471,6 +464,7 @@ def test_worktree_paths(tmpdir):
     qibuild_cfg.read(global_xml.strpath)
     assert "/path/to/a" in qibuild_cfg.worktrees
     assert "/path/to/b" in qibuild_cfg.worktrees
+
 
 def test_do_not_leak_default_config(tmpdir):
     global_xml = tmpdir.join("global.xml")
@@ -496,6 +490,7 @@ def test_do_not_leak_default_config(tmpdir):
     assert qibuild_cfg.env.bat_file is None
     assert qibuild_cfg.ide is None
 
+
 def test_read_default_config_for_worktree(tmpdir):
     global_xml = tmpdir.join("global.xml")
     global_xml.write("""
@@ -509,6 +504,7 @@ def test_read_default_config_for_worktree(tmpdir):
     qibuild_cfg.read(global_xml.strpath)
     assert qibuild_cfg.get_default_config_for_worktree("/path/to/a") == "foo"
 
+
 def test_set_default_config_for_worktree(tmpdir):
     global_xml = tmpdir.join("global.xml")
     qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -518,6 +514,7 @@ def test_set_default_config_for_worktree(tmpdir):
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(global_xml.strpath)
     assert qibuild_cfg.get_default_config_for_worktree("/path/to/a") == "foo"
+
 
 def test_parse_build_configs(tmpdir):
     global_xml = tmpdir.join("global.xml")
@@ -538,6 +535,7 @@ def test_parse_build_configs(tmpdir):
     assert nao_arm.toolchain == "arm"
     assert nao_arm.profiles == ["nao", "arm"]
 
+
 def test_write_build_configs(tmpdir):
     global_xml = tmpdir.join("global.xml")
     qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -555,11 +553,13 @@ def test_write_build_configs(tmpdir):
     assert foo_config2.toolchain == "bar"
     assert foo_config2.profiles == ["spam", "eggs"]
 
+
 def test_host_config_default_is_none(tmpdir):
     global_xml = tmpdir.join("global.xml")
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(global_xml.strpath, create_if_missing=True)
     assert qibuild_cfg.get_host_config() is None
+
 
 def test_host_config_setting_host():
     qibuild.config.add_build_config("foo")
@@ -567,6 +567,7 @@ def test_host_config_setting_host():
     qibuild_cfg.read()
     qibuild_cfg.set_host_config("foo")
     assert qibuild_cfg.get_host_config() == "foo"
+
 
 def test_host_config_is_persistent():
     qibuild.config.add_build_config("foo")
@@ -578,6 +579,7 @@ def test_host_config_is_persistent():
     qibuild_cfg2.read()
     assert qibuild_cfg2.get_host_config() == "foo"
 
+
 def test_host_config_is_unique():
     qibuild.config.add_build_config("foo")
     qibuild.config.add_build_config("bar")
@@ -588,6 +590,7 @@ def test_host_config_is_unique():
     qibuild_cfg.set_host_config("bar")
     assert not qibuild_cfg.configs["foo"].host
     assert qibuild_cfg.configs["bar"].host
+
 
 def test_setting_env_vars(tmpdir):
     global_xml = tmpdir.join("global.xml")
@@ -608,4 +611,4 @@ def test_setting_env_vars(tmpdir):
     qibuild_cfg = qibuild.config.QiBuildConfig()
     qibuild_cfg.read(global_xml.strpath)
     qibuild_cfg.set_active_config("spam")
-    assert qibuild_cfg.env.vars == { "SPAM" : "EGGS", "FOO" : "BAR" }
+    assert qibuild_cfg.env.vars == {"SPAM": "EGGS", "FOO": "BAR"}

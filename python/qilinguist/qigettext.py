@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Library to extract, generate, update and compile translatable
 sentences with gettext
@@ -15,11 +15,11 @@ from qisys import ui
 import qisys.command
 import qilinguist.project
 
+
 class GettextProject(qilinguist.project.LinguistProject):
 
     def __init__(self, *args, **kwargs):
         super(GettextProject, self).__init__(*args, **kwargs)
-
 
     @property
     def pot_file(self):
@@ -89,7 +89,7 @@ class GettextProject(qilinguist.project.LinguistProject):
             "--keyword=trContext:1,2c,2t", "--keyword=trContext:1,2c,3t",
             "--keyword=translateContext:1,2c,2t", "--keyword=translateContext:1,2c,3t",
 
-            ])
+        ])
         # generate sorted output
         cmd.append("--sort-output")
 
@@ -108,9 +108,9 @@ class GettextProject(qilinguist.project.LinguistProject):
         def new_func(self, *args, **kwargs):
             if not os.path.exists(self.pot_file):
                 ui.error("No pot file found. Maybe no translatable strings "
-                        "were found?")
+                         "were found?")
                 return
-            #pylint: disable-msg=E1102
+            # pylint: disable-msg=E1102
             res = func(self, *args, **kwargs)
             return res
         return new_func
@@ -142,8 +142,7 @@ class GettextProject(qilinguist.project.LinguistProject):
                 os.path.relpath(output_file, self.path))
         # remove annoying stderr output
         subprocess.check_call(cmd, stdout=subprocess.PIPE,
-                                   stderr=subprocess.STDOUT)
-
+                              stderr=subprocess.STDOUT)
 
     def generate_mo_file(self, locale):
         """ Generate .mo file for the given locale
@@ -177,7 +176,7 @@ class GettextProject(qilinguist.project.LinguistProject):
         cmd.append(input_file)
 
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE)
+                                   stderr=subprocess.PIPE)
         out, err = process.communicate()
         ui.info(err.strip())
         if "untranslated" in err:

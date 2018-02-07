@@ -1,5 +1,6 @@
 import qisrc.svn
 
+
 def test_commit_all_adds_new_subfolders(svn_server, tmpdir):
     foo_url = svn_server.create_repo("foo")
     work = tmpdir.mkdir("work")
@@ -16,6 +17,7 @@ def test_commit_all_adds_new_subfolders(svn_server, tmpdir):
     assert foo2.join("some", "sub", "folder").check(dir=True)
     assert foo2.join("some", "sub", "folder", "bar.txt").check(file=True)
 
+
 def test_commit_all_removes_removed_files(svn_server, tmpdir):
     foo_url = svn_server.create_repo("foo")
     svn_server.commit_file("foo", "bar.txt", "this is bar")
@@ -31,6 +33,7 @@ def test_commit_all_removes_removed_files(svn_server, tmpdir):
     svn.call("checkout", foo_url, ".")
     assert not foo2.join("bar.txt").check(file=True)
 
+
 def test_files_with_space(svn_server, tmpdir):
     foo_url = svn_server.create_repo("foo")
     svn_server.commit_file("foo", "file with space.txt", "some contents\n")
@@ -40,6 +43,7 @@ def test_files_with_space(svn_server, tmpdir):
     svn.call("checkout", foo_url, ".")
     foo.join("file with space.txt").remove()
     svn.commit_all("test message")
+
 
 def test_file_replaced_by_symlink(svn_server, tmpdir):
     foo_url = svn_server.create_repo("foo")

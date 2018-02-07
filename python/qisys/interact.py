@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Small set of tools to interact with the user
 
@@ -10,6 +10,7 @@ import os
 
 import qisys
 from qisys import ui
+
 
 def read_input():
     """ Read input from the user
@@ -53,6 +54,7 @@ def ask_choice(choices, input_text, return_int=False):
 
     return res
 
+
 def ask_yes_no(question, default=False):
     """Ask the user to answer by yes or no"""
     while True:
@@ -69,6 +71,7 @@ def ask_yes_no(question, default=False):
             return default
         ui.warning("Please answer by 'yes' or 'no'")
 
+
 def ask_string(question, default=None):
     """Ask the user to enter something.
 
@@ -84,6 +87,7 @@ def ask_string(question, default=None):
     if not answer:
         return default
     return answer
+
 
 def ask_program(message):
     """Ask the user to enter a path
@@ -126,6 +130,7 @@ def ask_app(message):
         else:
             keep_going = False
     return full_path
+
 
 def get_editor():
     """Find the editor searching the environment, lastly ask the user.

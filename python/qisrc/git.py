@@ -1,9 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
-
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ A Pythonic git API
 
@@ -17,8 +14,10 @@ from qisys import ui
 import qisys
 import qisys.command
 
+
 class Git(object):
     """ The Git represent a git tree """
+
     def __init__(self, repo):
         """ :param repo: The path to the tree """
         self.repo = repo
@@ -58,9 +57,9 @@ class Git(object):
     def _call(self, *args, **kwargs):
         """ Helper for self.call """
         ui.debug("git", " ".join(args), "in", self.repo)
-        if not "cwd" in kwargs.keys():
+        if "cwd" not in kwargs.keys():
             kwargs["cwd"] = self.repo
-        if not "quiet" in kwargs.keys():
+        if "quiet" not in kwargs.keys():
             kwargs["quiet"] = False
         git = qisys.command.find_program("git", raises=True)
         cmd = [git]
@@ -74,10 +73,10 @@ class Git(object):
             del kwargs["raises"]
             del kwargs["quiet"]
             process = subprocess.Popen(cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                env=env,
-                **kwargs)
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.STDOUT,
+                                       env=env,
+                                       **kwargs)
             out = process.communicate()[0]
             # Don't want useless blank lines
             out = out.rstrip("\n")
@@ -144,7 +143,7 @@ class Git(object):
             branch = self.get_current_branch()
 
         remote = self.get_config("branch.%s.remote" % branch)
-        merge  = self.get_config("branch.%s.merge" % branch)
+        merge = self.get_config("branch.%s.merge" % branch)
         if not remote:
             return None
         if not merge:
@@ -179,7 +178,7 @@ class Git(object):
         # (ie git metadata does not match .gitmodules)
         res, out = self.submodule("status", raises=False)
         if res != 0:
-            mess  = "Broken submodules configuration detected for %s\n" % self.repo
+            mess = "Broken submodules configuration detected for %s\n" % self.repo
             mess += "git status returned %s\n" % out
             if raises:
                 raise Exception(mess)
@@ -188,10 +187,10 @@ class Git(object):
         if not out:
             return
         res, out = self.submodule("update", "--init", "--recursive",
-                            raises=False)
+                                  raises=False)
         if res == 0:
             return
-        mess  = "Failed to update submodules\n"
+        mess = "Failed to update submodules\n"
         mess += out
         if raises:
             raise Exception(mess)
@@ -204,7 +203,7 @@ class Git(object):
         """
         (status, out) = self.branch("--no-color", raises=False)
         if status != 0:
-            mess  = "Could not get the list of local branches\n"
+            mess = "Could not get the list of local branches\n"
             mess += "Error was: %s" % out
             raise Exception(mess)
         lines = out.splitlines()
@@ -234,8 +233,8 @@ class Git(object):
         if out != 0:
             message = "You have unstaged changes"
             unstaged = True
-        out, _ = self.call("diff-index", "--quiet", "--cached", "--ignore-submodules","HEAD",
-                           raises = False)
+        out, _ = self.call("diff-index", "--quiet", "--cached", "--ignore-submodules", "HEAD",
+                           raises=False)
         if out != 0:
             if unstaged:
                 message += "Additionally, your index contains uncommited changes"
@@ -252,7 +251,7 @@ class Git(object):
             (status, out) = self.status("--porcelain", raises=False)
         else:
             (status, out) = self.status("--porcelain", "--untracked-files=no",
-                                                            raises=False)
+                                        raises=False)
 
         return out if status == 0 else None
 
@@ -403,7 +402,7 @@ class Git(object):
     def get_ref_sha1(self, ref):
         """Return the sha1 from a ref. None if not found."""
         (ret, sha1) = self.call("show-ref", "--verify", "--hash",
-                               ref, raises=False)
+                                ref, raises=False)
 
         if ret == 0:
             return sha1
@@ -441,9 +440,9 @@ class Git(object):
         reason = "qisrc Fast-forward to %s" % remote_sha1
         master_head = "refs/heads/%s" % master_branch.name
         self.call("update-ref", "-m", reason, master_head,
-        remote_sha1, local_sha1)
+                  remote_sha1, local_sha1)
         return True, "Fast-forwarded %s. Feel free to rebase on %s" % \
-                                        ((master_branch.name,) * 2)
+            ((master_branch.name,) * 2)
 
     def get_log(self, before_ref, after_ref):
         """ Return a list of commits between two refspecs, in
@@ -471,8 +470,8 @@ class Git(object):
             sha1, message = log_chunk.split('\n', 1)
             message = message.strip()
             commit = {
-                "sha1" : sha1,
-                "message" : message,
+                "sha1": sha1,
+                "message": message,
             }
             res.append(commit)
         return res
@@ -582,7 +581,7 @@ def name_from_url(url):
     """
     if url.startswith("file://"):
         sep = "/"
-        if os.name == 'nt' and "\\"  in url:
+        if os.name == 'nt' and "\\" in url:
             sep = "\\"
         return url.split(sep)[-1]
 
@@ -602,9 +601,11 @@ def name_from_url(url):
 
 class Transaction(object):
     """ Used to simplify chaining git commands """
+
     def __init__(self):
         self.ok = True
         self.output = ""
+
 
 def get_status(git, local_ref, remote_ref):
     """Check if local_ref is ahead and / or behind remote_ref """

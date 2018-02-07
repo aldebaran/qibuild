@@ -1,6 +1,8 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
+
+
 def test_qisrc_foreach(qisrc_action, record_messages):
     worktree = qisrc_action.worktree
     worktree.create_project("not_in_git")
@@ -14,6 +16,7 @@ def test_qisrc_foreach(qisrc_action, record_messages):
     assert record_messages.find("not_in_git")
     assert record_messages.find("git_project")
 
+
 def test_non_cloned_groups(qisrc_action, git_server, record_messages):
     git_server.create_group("foo", ["a.git", "b.git"])
     git_server.create_group("bar", ["b.git", "c.git"])
@@ -23,6 +26,7 @@ def test_non_cloned_groups(qisrc_action, git_server, record_messages):
     warning = record_messages.find("\[WARN \]")
     assert warning
     assert "Group bar is not currently in use" in warning
+
 
 def test_do_not_warn_on_subgroups(qisrc_action, git_server, record_messages):
     git_server.create_group("big", ["a.git", "b.git"])

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Library to generate, update and compile translatable sentences with
 QtLinguist
@@ -13,6 +13,7 @@ import subprocess
 from qisys import ui
 import qisys.command
 import qilinguist.project
+
 
 class QtLinguistProject(qilinguist.project.LinguistProject):
     def __init__(self, *args, **kwargs):
@@ -49,12 +50,14 @@ class QtLinguistProject(qilinguist.project.LinguistProject):
 
     def install(self, destination):
         full_dest = os.path.join(destination, "share", "locale")
+
         def filter(f):
             return f.endswith(".qm")
         qisys.sh.install(self.po_path, full_dest, filter_fun=filter)
 
     def __repr__(self):
         return "<QtLinguistProject %s in %s>" % (self.name, self.path)
+
 
 def generate_qm_file(input, output):
     """ Generate a ``.qm`` file from a ``.ts`` file.

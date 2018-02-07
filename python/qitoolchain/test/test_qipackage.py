@@ -1,12 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import pytest
 import os
 
 import qisys.archive
 import qitoolchain.qipackage
 from qisys.test.conftest import skip_on_win
+
 
 def test_equality():
     foo = qitoolchain.qipackage.QiPackage("foo", "1.2")
@@ -18,6 +19,7 @@ def test_equality():
     assert foo2 < foo3
     assert foo != bar
 
+
 def test_from_archive(tmpdir):
     foo = tmpdir.mkdir("foo")
     foo_xml = foo.join("package.xml")
@@ -26,6 +28,7 @@ def test_from_archive(tmpdir):
     package = qitoolchain.qipackage.from_archive(archive)
     assert package.name == "foo"
     assert package.version == "0.1"
+
 
 def test_skip_package_xml(tmpdir):
     foo = tmpdir.mkdir("foo")
@@ -39,6 +42,7 @@ def test_skip_package_xml(tmpdir):
     assert dest.join("include", "foo.h").check(file=True)
     assert dest.join("lib", "libfoo.so").check(file=True)
     assert not dest.join("package.xml").check(file=True)
+
 
 def test_reads_runtime_manifest(tmpdir):
     boost_path = tmpdir.mkdir("boost")
@@ -56,6 +60,7 @@ lib/libboost.so
     assert libbost_so.check(file=True)
     assert installed == ["lib/libboost.so"]
 
+
 def test_backward_compat_runtime_install(tmpdir):
     boost_path = tmpdir.mkdir("boost")
     boost_path.ensure("include", "boost.h", file=True)
@@ -69,6 +74,7 @@ def test_backward_compat_runtime_install(tmpdir):
     libbost_so = dest.join("lib", "libboost.so")
     assert libbost_so.check(file=True)
     assert installed == ["lib/libboost.so"]
+
 
 def test_reads_release_mask(tmpdir):
     qt_path = tmpdir.mkdir("qt")
@@ -95,6 +101,7 @@ exclude bin/QtCored4.dll
     assert dest.join("bin", "QtCore4.dll").check(file=True)
     assert not dest.join("lib", "QtCored4.lib").check(file=True)
 
+
 def test_include_in_mask(tmpdir):
     qt_path = tmpdir.mkdir("qt")
     qt_path.ensure("bin", "assitant.exe")
@@ -113,6 +120,7 @@ include bin/lupdate.exe
     assert dest.join("bin", "lrelease.exe").check(file=True)
     assert not dest.join("bin", "moc.exe").check(file=True)
 
+
 def test_load_deps(tmpdir):
     libqi_path = tmpdir.mkdir("libqi")
     libqi_path.ensure("package.xml").write("""\
@@ -127,6 +135,7 @@ def test_load_deps(tmpdir):
     assert package.run_depends == set(["boost", "python"])
     assert package.test_depends == set(["gtest"])
 
+
 def test_extract_legacy_bad_top_dir(tmpdir):
     src = tmpdir.mkdir("src")
     boost = src.mkdir("boost")
@@ -135,6 +144,7 @@ def test_extract_legacy_bad_top_dir(tmpdir):
     dest = tmpdir.mkdir("dest").join("boost-1.55")
     qitoolchain.qipackage.extract(res, dest.strpath)
     assert dest.join("lib", "libboost.so").check(file=True)
+
 
 def test_extract_legacy_ok_top_dir(tmpdir):
     src = tmpdir.mkdir("src")
@@ -145,6 +155,7 @@ def test_extract_legacy_ok_top_dir(tmpdir):
     qitoolchain.qipackage.extract(res, dest.strpath)
     assert dest.join("lib", "libboost.so").check(file=True)
 
+
 def test_extract_modern(tmpdir):
     src = tmpdir.mkdir("src")
     src.ensure("package.xml", file=True)
@@ -154,6 +165,7 @@ def test_extract_modern(tmpdir):
     dest = tmpdir.mkdir("dest").join("boost-1.55")
     qitoolchain.qipackage.extract(res, dest.strpath)
     assert dest.join("lib", "libboost.so").check(file=True)
+
 
 def test_installing_test_component(tmpdir):
     boost_path = tmpdir.mkdir("boost")
@@ -167,6 +179,7 @@ def test_installing_test_component(tmpdir):
 
     assert not dest.join("include", "boost.h").check(file=True)
 
+
 def test_get_set_license(tmpdir):
     boost_path = tmpdir.mkdir("boost")
     boost_path.join("package.xml").write("""
@@ -178,6 +191,7 @@ def test_get_set_license(tmpdir):
     package2 = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
     assert package2.license == "BSD"
 
+
 def test_post_add_noop(tmpdir):
     boost_path = tmpdir.mkdir("boost")
     boost_path.join("package.xml").write("""
@@ -186,6 +200,7 @@ def test_post_add_noop(tmpdir):
 
     package = qitoolchain.qipackage.QiPackage("boost", path=boost_path.strpath)
     package.post_add()  # no-op
+
 
 def test_post_add_does_not_exist(tmpdir):
     boost_path = tmpdir.mkdir("boost")
@@ -199,6 +214,7 @@ def test_post_add_does_not_exist(tmpdir):
     # pylint: disable-msg=E1101
     with pytest.raises(qisys.command.NotInPath):
         package.post_add()
+
 
 @skip_on_win
 def test_post_add(tmpdir):

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Generate a binary package, ready to be added in a toolchain """
 
@@ -26,6 +26,7 @@ def configure_parser(parser):
     group.add_argument("--breakpad", action="store_true",
                        help="Generate breakpad symbols. "
                             "(Force CMAKE_BUILD_TYPE=RelWithDebInfo)")
+
 
 def do(args):
     """Main entry point"""
@@ -72,7 +73,6 @@ def do(args):
             pool_dir = os.path.join(tmp, "symbols")
             qibuild.breakpad.dump_symbols_from_directory(destdir, pool_dir)
             qisys.archive.compress(pool_dir, flat=True, output=symbols_archive)
-
 
     ui.info(ui.blue, "::", ui.reset, ui.bold, "Compressing package ...")
     flat = not standalone

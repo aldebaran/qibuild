@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Install the given python project """
 import os
 import sys
@@ -12,10 +12,12 @@ import qisys.parsers
 import qipy.parsers
 import qibuild.parsers
 
+
 def configure_parser(parser):
     qisys.parsers.project_parser(parser)
     qibuild.parsers.cmake_build_parser(parser)
     parser.add_argument("dest")
+
 
 def do(args):
     dest = args.dest

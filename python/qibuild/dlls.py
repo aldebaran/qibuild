@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Set of tools to handle DLLs on Windows.
 
@@ -9,6 +9,7 @@ import os
 
 from qisys import ui
 import qisys.sh
+
 
 def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):
     """ Copy the dlls fron the toolchains and the other build dirs
@@ -41,14 +42,14 @@ def fix_dlls(sdk_dir, env=None, paths=None, mingw=False):
             dlls = os.listdir(candidate)
             dlls = [x for x in dlls if x.endswith(".dll")]
             dlls_to_copy.extend([os.path.join(candidate, x) for x in dlls
-                if x.startswith("libgcc")])
+                                 if x.startswith("libgcc")])
             dlls_to_copy.extend([os.path.join(candidate, x) for x in dlls
-                if x.startswith("mingw")])
+                                 if x.startswith("mingw")])
 
     for dll_to_copy in dlls_to_copy:
         try:
             qisys.sh.safe_copy(dll_to_copy, dest)
         except Exception, e:
-            mess  = "Could not copy %s to %s\n" % (dll_to_copy, dest)
+            mess = "Could not copy %s to %s\n" % (dll_to_copy, dest)
             mess += "Error was: %s\n" % e
             ui.warning(mess)

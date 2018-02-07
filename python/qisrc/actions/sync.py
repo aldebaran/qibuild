@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Synchronize the given worktree with its manifest
 
@@ -32,8 +32,9 @@ def configure_parser(parser):
     group.add_argument("--reset", action="store_true",
                        help="Do the same as `qisrc reset --all --force` after the fetch")
 
+
 def print_overview(total, skipped, failed):
-    out = [ ui.green, "Success:", ui.white, total - skipped - failed ]
+    out = [ui.green, "Success:", ui.white, total - skipped - failed]
     if skipped:
         out.append(ui.yellow)
     else:
@@ -45,6 +46,7 @@ def print_overview(total, skipped, failed):
         out.append(ui.blue)
     out.extend(("Failed:", ui.white, failed))
     ui.info(*out)
+
 
 @ui.timer("Synchronizing worktree")
 def do(args):

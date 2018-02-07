@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import abc
 import re
 import os
@@ -8,6 +8,7 @@ import json
 
 from qisys import ui
 import qitest.test_queue
+
 
 class TestSuiteRunner(object):
     """ Interface for a class able to run a test suite """
@@ -47,7 +48,7 @@ class TestSuiteRunner(object):
         test_queue.launcher = self.launcher
         test_queue.launcher.capture = self.capture
         ok = test_queue.run(num_jobs=self.num_jobs,
-                           repeat_until_fail=self.repeat_until_fail)
+                            repeat_until_fail=self.repeat_until_fail)
         return ok
 
     @property
@@ -57,25 +58,25 @@ class TestSuiteRunner(object):
     @patterns.setter
     def patterns(self, value):
         if value:
-            [re.compile(x) for x in value] # just checking regexps are valid
+            [re.compile(x) for x in value]  # just checking regexps are valid
         self._patterns = value
 
     @property
     def excludes(self):
-       return self._excludes
+        return self._excludes
 
     @excludes.setter
     def excludes(self, value):
-            if value:
-                [re.compile(x) for x in value] # just checking regexps are valid
-            self._excludes = value
+        if value:
+            [re.compile(x) for x in value]  # just checking regexps are valid
+        self._excludes = value
 
     @property
     def tests(self):
         res = [x for x in self._tests if
-                match_patterns(self.patterns, x["name"], default=True)]
+               match_patterns(self.patterns, x["name"], default=True)]
         res = [x for x in res if not
-                match_patterns(self.excludes, x["name"], default=False)]
+               match_patterns(self.excludes, x["name"], default=False)]
         # Perf tests are run alone
         res = [x for x in res if x.get("perf", False) == self.perf]
         # But nightly tests are run along with the normal tests
@@ -100,6 +101,8 @@ class TestSuiteRunner(object):
         with open(fail_json, "r") as fp:
             names = json.load(fp)
         return names
+
+
 class TestLauncher(object):
     """ Interface for a class able to launch a test. """
     __metaclass__ = abc.ABCMeta

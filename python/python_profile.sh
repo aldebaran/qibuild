@@ -3,7 +3,7 @@
 ## Author(s):
 ##  - Cedric GESTES <gestes@aldebaran-robotics.com>
 ##
-## Copyright (C) 2011-2014 Aldebaran Robotics
+## Copyright (C) 2011-2018 SoftBank Robotics
 ##
 
 PYTHONPATH=. python -m cProfile -stime $@

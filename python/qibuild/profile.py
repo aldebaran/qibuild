@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Tools to handle build profiles
 
@@ -10,12 +10,14 @@
 import os
 import qisys.qixml
 
+
 class Profile:
     """ A profile is just a set of CMake flags for now.
     If has a name you can specify when building using
     ``qibuild configure --profile <name>``
 
     """
+
     def __init__(self, name):
         self.name = name
         self.cmake_flags = list()
@@ -71,6 +73,7 @@ def parse_profiles(xml_path):
             profile.cmake_flags.append(to_add)
     return res
 
+
 def configure_build_profile(xml_path, name, flags):
     """ Add a new profile to an XML file """
     profile = Profile(name)
@@ -86,6 +89,7 @@ def configure_build_profile(xml_path, name, flags):
             profiles_elem.remove(profile_elem)
     profiles_elem.append(profile.elem())
     qisys.qixml.write(tree, xml_path)
+
 
 def remove_build_profile(xml_path, name):
     """ Remove a build profile from XML file """

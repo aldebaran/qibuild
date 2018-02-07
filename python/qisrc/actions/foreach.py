@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Run the same command on each source project.
 Example:
@@ -13,18 +13,20 @@ import qisys.actions
 import qisys.parsers
 import qisrc.parsers
 
+
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
     qisrc.parsers.groups_parser(parser)
     parser.add_argument("--git", action="store_true", dest="git_only",
-        help="consider only the git projects")
+                        help="consider only the git projects")
     parser.add_argument("--all", action="store_false", dest="git_only",
-        help="consider all the projects")
+                        help="consider all the projects")
     parser.add_argument("command", metavar="COMMAND", nargs="+")
     parser.add_argument("-c", "--ignore-errors", "--continue",
-        action="store_true", help="continue on error")
+                        action="store_true", help="continue on error")
     parser.set_defaults(git_only=True)
+
 
 def do(args):
     """Main entry point"""

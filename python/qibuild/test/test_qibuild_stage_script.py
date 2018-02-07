@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import sys
 import subprocess
@@ -9,10 +9,12 @@ import qibuild.find
 
 import pytest
 
+
 def run_python_script(name):
-  args = [sys.executable, name]
-  rcode = qisys.command.call(args)
-  assert rcode == 0
+    args = [sys.executable, name]
+    rcode = qisys.command.call(args)
+    assert rcode == 0
+
 
 def test_stage_script(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
@@ -34,7 +36,7 @@ def test_stage_script(qibuild_action, tmpdir):
     # QI_PATH is only set by trampoline, so we expect next one to fail.
     # pylint: disable-msg=E1101
     with pytest.raises(Exception):
-      run_python_script(os.path.join(tmpdir.strpath, 'bin', 'check_qipath'))
+        run_python_script(os.path.join(tmpdir.strpath, 'bin', 'check_qipath'))
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenfoo'))
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenbar'))
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenworlduser'))
@@ -49,4 +51,3 @@ def test_stage_script(qibuild_action, tmpdir):
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenfoo'))
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenbar'))
     run_python_script(os.path.join(tmpdir.strpath, 'bin', 'dlopenworlduser'))
-

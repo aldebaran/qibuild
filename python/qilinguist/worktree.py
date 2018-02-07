@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 
@@ -49,8 +49,8 @@ In:
 * {1}
 * {2}
 """.format(new_project.name,
-               project_with_same_name.path,
-               new_project.path))
+                project_with_same_name.path,
+                new_project.path))
 
 
 def new_linguist_project(linguist_worktree, project):
@@ -93,13 +93,14 @@ Choose between 'linguist' or 'gettext'
 
     if tr_framework == "linguist":
         from qilinguist.qtlinguist import QtLinguistProject
-        new_project =  QtLinguistProject(name, project.path, domain=domain,
-                                         linguas=linguas)
+        new_project = QtLinguistProject(name, project.path, domain=domain,
+                                        linguas=linguas)
     else:
         from qilinguist.qigettext import GettextProject
         new_project = GettextProject(name, project.path, domain=domain,
                                      linguas=linguas)
     return new_project
+
 
 class BadProjectConfig(Exception):
     def __str__(self):

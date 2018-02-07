@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 
@@ -12,6 +12,7 @@ from qibuild.actions import run
 
 import pytest
 import mock
+
 
 def test_run_target(qibuild_action):
     project = qibuild_action.add_test_project("testme")
@@ -29,6 +30,7 @@ def test_run_target(qibuild_action):
     cmd = call_args_list[0][0][1]
     assert cmd == [binary, "arg1"]
 
+
 def test_using_no_exec(qibuild_action):
     project = qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme")
@@ -37,6 +39,7 @@ def test_using_no_exec(qibuild_action):
     error = qibuild_action("run", "--no-exec", "fail", raises=True)
     assert "Return code is 1" in error
 
+
 def test_run_system(qibuild_action):
     with mock.patch("os.execve") as execve_mock:
         qibuild_action("run", "ls")
@@ -44,6 +47,7 @@ def test_run_system(qibuild_action):
     binary = call_args_list[0][0][0]
     assert os.path.isabs(binary)
     assert os.path.basename(binary) == "ls"
+
 
 def test_corner_case(qibuild_action, tmpdir):
     project = qibuild_action.add_test_project("testme")

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ##
-## Sample python script
+# Sample python script
 ##
 
 if __name__ == "__name__":

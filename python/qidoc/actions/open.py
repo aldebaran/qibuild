@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Open the current documentation in a web browser."""
 
@@ -15,12 +15,14 @@ import qidoc.parsers
 
 import webbrowser
 
+
 def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
     qisys.parsers.project_parser(parser)
     parser.add_argument("-b", "--browser")
     parser.add_argument("-l", "--language")
     parser.set_defaults(language="en")
+
 
 def do(args):
     doc_worktree = qidoc.parsers.get_doc_worktree(args)

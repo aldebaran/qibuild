@@ -1,15 +1,17 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 from qisys import ui
 import time
 import qitest.test_queue
 import qitest.runner
 import qitest.result
 
+
 class DummyProject(object):
     def __init__(self, tmpdir):
         self.sdk_directory = tmpdir.strpath
+
 
 class DummyLauncher(qitest.runner.TestLauncher):
     def __init__(self, tmpdir):
@@ -32,13 +34,14 @@ class DummyLauncher(qitest.runner.TestLauncher):
         time.sleep(sleep_time)
         return result
 
+
 def test_queue_happy(tmpdir):
     tests = [
-     {"name" : "one"},
-     {"name" : "two"},
-     {"name" : "three"},
-     {"name" : "four"},
-     {"name" : "five"},
+        {"name": "one"},
+        {"name": "two"},
+        {"name": "three"},
+        {"name": "four"},
+        {"name": "five"},
     ]
     test_queue = qitest.test_queue.TestQueue(tests)
     dummy_launcher = DummyLauncher(tmpdir)
@@ -49,11 +52,11 @@ def test_queue_happy(tmpdir):
 
 def test_queue_sad(tmpdir):
     tests = [
-     {"name" : "one"},
-     {"name" : "two"},
-     {"name" : "three"},
-     {"name" : "four"},
-     {"name" : "five"},
+        {"name": "one"},
+        {"name": "two"},
+        {"name": "three"},
+        {"name": "four"},
+        {"name": "five"},
     ]
     test_queue = qitest.test_queue.TestQueue(tests)
     fail_result = qitest.result.TestResult(tests[1])
@@ -61,9 +64,9 @@ def test_queue_sad(tmpdir):
     fail_result.message = (ui.red, "[FAIL]")
     dummy_launcher = DummyLauncher(tmpdir)
     dummy_launcher.results = {
-        "two" : {"result" : fail_result},
-        "three" : {"raises" : True},
-        "four" : {"sleep_time" : 0.4},
+        "two": {"result": fail_result},
+        "three": {"raises": True},
+        "four": {"sleep_time": 0.4},
     }
 
     test_queue.launcher = dummy_launcher
@@ -73,15 +76,16 @@ def test_queue_sad(tmpdir):
 
 def test_one_job(tmpdir):
     tests = [
-     {"name" : "one"},
-     {"name" : "two"},
-     {"name" : "three"},
+        {"name": "one"},
+        {"name": "two"},
+        {"name": "three"},
     ]
     test_queue = qitest.test_queue.TestQueue(tests)
     dummy_launcher = DummyLauncher(tmpdir)
     test_queue.launcher = dummy_launcher
     test_queue.run(num_jobs=1)
     assert test_queue.ok
+
 
 def test_no_tests(tmpdir):
     tests = list()
@@ -90,6 +94,7 @@ def test_no_tests(tmpdir):
     test_queue.launcher = dummy_launcher
     test_queue.run(num_jobs=1)
     assert not test_queue.ok
+
 
 class SporadicallyFailingLauncher(qitest.runner.TestLauncher):
     def __init__(self, tmpdir):
@@ -107,13 +112,14 @@ class SporadicallyFailingLauncher(qitest.runner.TestLauncher):
         self.num_runs += 1
         return result
 
+
 def test_repeat_until_fail(tmpdir):
     tests = [
-        { "name" : "one" },
-        { "name" : "two" }
+        {"name": "one"},
+        {"name": "two"}
     ]
     test_queue = qitest.test_queue.TestQueue(tests)
     fake_launcher = SporadicallyFailingLauncher(tmpdir)
     test_queue.launcher = fake_launcher
     test_queue.run(repeat_until_fail=3)
-    assert  test_queue.ok is False
+    assert test_queue.ok is False

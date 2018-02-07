@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import datetime
 import multiprocessing
 import os
@@ -98,6 +98,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
     :py:class:`qisys.command.Process`
 
     """
+
     def __init__(self, project_runner):
         self.suite_runner = project_runner
         self.project = self.suite_runner.project
@@ -105,13 +106,13 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
         self.ignore_timeouts = self.suite_runner.ignore_timeouts
         # Make sure output dirs exist and are empty:
         for directory in self.suite_runner.perf_results_dir, \
-                         self.suite_runner.test_results_dir:
+                self.suite_runner.test_results_dir:
             qisys.sh.rm(directory)
             qisys.sh.mkdir(directory, recursive=True)
 
     def valgrind_log(self, test):
-        return  os.path.join(self.suite_runner.test_results_dir,
-                             test["name"] + "_valgrind.log")
+        return os.path.join(self.suite_runner.test_results_dir,
+                            test["name"] + "_valgrind.log")
 
     def test_out(self, test):
         return os.path.join(self.suite_runner.test_results_dir,
@@ -230,7 +231,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
             envsetter.prepend_directory_to_variable(lib_dir, "DYLD_LIBRARY_PATH")
             envsetter.prepend_directory_to_variable(sdk_dir, "DYLD_FRAMEWORK_PATH")
         env = envsetter.get_build_env()
-        test["env"] =  env
+        test["env"] = env
 
         # Quick hack:
         gtest_repeat = env.get("GTEST_REPEAT", "1")
@@ -368,7 +369,7 @@ def get_cpu_list(total_cpus, num_cpus_per_test, worker_index):
 def parse_valgrind(valgrind_log, res):
     """ Parse valgrind logs and extract interesting errors. """
     message = ""
-    leak_fd_regex      = re.compile("==\d+== FILE DESCRIPTORS: (\d+)")
+    leak_fd_regex = re.compile("==\d+== FILE DESCRIPTORS: (\d+)")
     invalid_read_regex = re.compile("==\d+== Invalid read of size (\d+)")
     with open(valgrind_log, "r") as f:
         lines = f.readlines()

@@ -4,6 +4,7 @@ import qisys.archive
 import qibuild.config
 import qitoolchain.qipackage
 
+
 def test_simple(qibuild_action, toolchains, tmpdir, record_messages):
     test_tc = toolchains.create("test")
     qibuild.config.add_build_config("test", toolchain="test")

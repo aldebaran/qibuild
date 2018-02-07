@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import xml.etree.ElementTree as etree
@@ -8,6 +8,7 @@ import xml.etree.ElementTree as etree
 import qisys.qixml
 
 from qisys import ui
+
 
 class Groups(object):
     def __init__(self):
@@ -46,6 +47,7 @@ class Groups(object):
 
         return projects
 
+
 class GroupsParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(GroupsParser, self).__init__(target)
@@ -74,6 +76,7 @@ class Group(object):
         self.subgroups = list()
         self.projects = list()
 
+
 class GroupParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(GroupParser, self).__init__(target)
@@ -95,6 +98,7 @@ class GroupParser(qisys.qixml.XMLParser):
             project_elem.set("name", project)
             element.append(project_elem)
 
+
 def get_root(worktree):
     file = os.path.join(worktree.root, ".qi", "manifests", "default", "manifest.xml")
     if not os.path.exists(file):
@@ -105,6 +109,7 @@ def get_root(worktree):
     if groups_elem is None:
         return None
     return groups_elem
+
 
 def get_groups(worktree):
     root = get_root(worktree)

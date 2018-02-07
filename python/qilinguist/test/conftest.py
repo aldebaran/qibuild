@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import py
 
@@ -92,6 +92,7 @@ class QiLinguistAction(TestAction):
         fr_file.close()
         en_file.close()
 
+
 class TestLinguistWorktree(qilinguist.worktree.LinguistWorkTree):
     def __init__(self, worktree=None):
         if not worktree:
@@ -117,6 +118,7 @@ class TestLinguistWorktree(qilinguist.worktree.LinguistWorkTree):
 def qilinguist_action(cd_to_tmpdir):
     res = QiLinguistAction()
     return res
+
 
 @pytest.fixture
 def linguist_worktree(cd_to_tmpdir):

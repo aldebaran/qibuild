@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import posixpath
 
@@ -37,6 +37,7 @@ def convert_project(project):
     qisys.qixml.write(root_elem, qiproject_xml)
     return True
 
+
 def handle_src_attribute(project, root_elem, doc_elem):
     worktree = project.worktree
     src = doc_elem.get("src")
@@ -58,6 +59,7 @@ def handle_src_attribute(project, root_elem, doc_elem):
 
 def convert_template_project(project):
     pass
+
 
 def create_sub_project(worktree, root_elem, project, src):
     project_elem = qisys.qixml.etree.Element("project")

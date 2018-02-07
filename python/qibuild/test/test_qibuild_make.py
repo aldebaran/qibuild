@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 
 import qisys.command
@@ -8,6 +8,7 @@ import qibuild.find
 import qitoolchain.qipackage
 
 import pytest
+
 
 def test_running_from_build_dir(qibuild_action):
     # Running `qibuild configure hello` `qibuild make hello` and running
@@ -20,6 +21,7 @@ def test_running_from_build_dir(qibuild_action):
     hello = qibuild.find.find_bin([hello_proj.sdk_directory], "hello")
     qisys.command.call([hello])
 
+
 def test_make_without_configure(qibuild_action):
     qibuild_action.add_test_project("world")
     qibuild_action.add_test_project("hello")
@@ -27,6 +29,7 @@ def test_make_without_configure(qibuild_action):
     # pylint: disable-msg=E1101
     with pytest.raises(qibuild.cmake_builder.NotConfigured):
         qibuild_action("make", "-s", "hello")
+
 
 def test_running_from_build_dir_incremental(qibuild_action):
     qibuild_action.add_test_project("world")
@@ -37,6 +40,7 @@ def test_running_from_build_dir_incremental(qibuild_action):
     hello = qibuild.find.find_bin([hello_proj.sdk_directory], "hello")
     qisys.command.call([hello])
 
+
 def test_using_host_tools_for_cross_compilation_no_system(qibuild_action, fake_ctc):
     qibuild_action.add_test_project("footool")
     qibuild_action.add_test_project("usefootool")
@@ -44,6 +48,7 @@ def test_using_host_tools_for_cross_compilation_no_system(qibuild_action, fake_c
     qibuild_action("make", "footool")
     qibuild_action("configure", "usefootool", "--config", "fake-ctc")
     qibuild_action("make", "usefootool", "--config", "fake-ctc")
+
 
 def test_using_host_tools_for_cross_compilation_with_host_config(qibuild_action, fake_ctc):
     qibuild_action.add_test_project("footool")
@@ -55,6 +60,7 @@ def test_using_host_tools_for_cross_compilation_with_host_config(qibuild_action,
     qibuild_action("configure", "usefootool", "--config", "fake-ctc")
     qibuild_action("make", "usefootool", "--config", "fake-ctc")
 
+
 def test_using_host_tools_for_cross_with_host_in_toolchain(qibuild_action,
                                                            qitoolchain_action,
                                                            fake_ctc):
@@ -65,6 +71,7 @@ def test_using_host_tools_for_cross_with_host_in_toolchain(qibuild_action,
     qisys.sh.rm(footool_proj.path)
     qibuild_action("configure", "usefootool", "--config", "fake-ctc")
     qibuild_action("make", "usefootool", "--config", "fake-ctc")
+
 
 def test_parallel_build(qibuild_action):
     qibuild_action.create_project("a")

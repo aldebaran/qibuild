@@ -1,12 +1,13 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Add a build configuration"""
 
 from qisys import ui
 import qisys.parsers
 import qibuild.worktree
+
 
 def configure_parser(parser):
     qisys.parsers.worktree_parser(parser)
@@ -19,6 +20,7 @@ def configure_parser(parser):
     parser.add_argument("--host", action="store_true",
                         help="Wether this configuration is suitable to build host tools")
     parser.set_defaults(default=False, host=None)
+
 
 def do(args):
     worktree = qisys.parsers.get_worktree(args, raises=False)

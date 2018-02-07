@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import platform
@@ -27,6 +27,7 @@ def test_simple(qibuild_action):
     # (find qibuild-config.cmake)
     qibuild_action.add_test_project("world")
     qibuild_action("configure", "world")
+
 
 def test_deps(qibuild_action):
     # Running `qibuild configure hello` should work out of the box
@@ -74,6 +75,7 @@ def test_qi_stage_lib_simple(qibuild_action):
     qibuild_action.add_test_project("stagelib")
     qibuild_action("configure", "stagelib")
 
+
 def test_qi_stage_lib_but_really_bin(qibuild_action):
     qibuild_action.add_test_project("stagelib")
     # pylint: disable-msg=E1101
@@ -81,12 +83,14 @@ def test_qi_stage_lib_but_really_bin(qibuild_action):
         qibuild_action("configure", "stagelib",
                        "-DSHOULD_FAIL_STAGE_LIB_BUT_REALLY_BIN=ON")
 
+
 def test_qi_stage_lib_but_no_such_target(qibuild_action):
     qibuild_action.add_test_project("stagelib")
     # pylint: disable-msg=E1101
     with pytest.raises(Exception):
         qibuild_action("configure", "stagelib",
                        "-DSHOULD_FAIL_STAGE_NO_SUCH_TARGET")
+
 
 def test_preserve_cache(qibuild_action):
     foo_proj = qibuild_action.add_test_project("foo")
@@ -111,6 +115,7 @@ def test_preserve_cache(qibuild_action):
             cache_after[k] = cache_after[k].lower()
     assert cache_before == cache_after
 
+
 def test_config_h_simple(qibuild_action, tmpdir):
     proj = qibuild_action.add_test_project("config_h")
     qibuild_action("configure", "config_h")
@@ -124,6 +129,8 @@ def test_config_h_simple(qibuild_action, tmpdir):
     assert tmpdir.join("include", "foo", "config.h").check(file=1)
 
 # pylint: disable-msg=E1101
+
+
 @pytest.mark.xfail
 def test_config_h_extra_install_rule(qibuild_action, tmpdir):
     proj = qibuild_action.add_test_project("config_h")
@@ -131,13 +138,15 @@ def test_config_h_extra_install_rule(qibuild_action, tmpdir):
     qibuild_action("make", "config_h")
     qibuild_action("install", "config_h", tmpdir.strpath)
     full_config_h = os.path.join(proj.build_directory,
-            "include", "foo", "config.h")
+                                 "include", "foo", "config.h")
     full_config_h = os.path.join(tmpdir.strpath, full_config_h)
     assert not os.path.exists(full_config_h)
+
 
 def test_detects_incorrect_cmake(qibuild_action):
     proj = qibuild_action.add_test_project("incorrect_cmake")
     qibuild_action("configure", "incorrect_cmake", raises=True)
+
 
 def test_git_version(qibuild_action):
     proj = qibuild_action.add_test_project("gitversion")
@@ -153,10 +162,12 @@ def test_git_version(qibuild_action):
     out, _ = process.communicate()
     assert out.strip() == "v0.1"
 
+
 def test_submodule(qibuild_action):
     qibuild_action.add_test_project("submodule")
     qibuild_action("configure", "submodule")
     qibuild_action("make", "submodule")
+
 
 def test_pycmd(qibuild_action):
     pycmd_proj = qibuild_action.add_test_project("pycmd")
@@ -165,6 +176,7 @@ def test_pycmd(qibuild_action):
     with open(test_txt, "r") as fp:
         assert fp.read() == "Written from Python\n"
     qibuild_action("configure", "pycmd", "-DFAIL=TRUE", raises=True)
+
 
 def test_cmake_option_build_test_on(qibuild_action):
     project = qibuild_action.add_test_project("testme")
@@ -175,12 +187,14 @@ def test_cmake_option_build_test_on(qibuild_action):
     assert test_path is not None
     assert os.path.exists(test_path)
 
+
 def test_cmake_option_build_test_off(qibuild_action):
     project = qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme", "-DQI_WITH_TESTS=OFF")
     qibuild_action("make", "testme")
     test_path = qibuild.find.find([project.sdk_directory], "ok", expect_one=False)
     assert not test_path
+
 
 def test_cmake_option_build_perf_test_on(qibuild_action):
     project = qibuild_action.add_test_project("perf")
@@ -191,6 +205,7 @@ def test_cmake_option_build_perf_test_on(qibuild_action):
     assert test_path is not None
     assert os.path.exists(test_path)
 
+
 def test_cmake_option_build_perf_test_off(qibuild_action):
     project = qibuild_action.add_test_project("perf")
     qibuild_action("configure", "perf", "-DQI_WITH_PERF_TESTS=OFF")
@@ -198,11 +213,13 @@ def test_cmake_option_build_perf_test_off(qibuild_action):
     test_path = qibuild.find.find([project.sdk_directory], "perf_spam", expect_one=False)
     assert not test_path
 
+
 def read_path_conf(project):
     path_conf_path = os.path.join(project.sdk_directory,
                                   "share", "qi", "path.conf")
     with open(path_conf_path, "r") as fp:
         return fp.read()
+
 
 def test_using_dash_s_with_path_conf(qibuild_action):
     stagepath_proj = qibuild_action.add_test_project("stagepath")
@@ -212,6 +229,7 @@ def test_using_dash_s_with_path_conf(qibuild_action):
     qibuild_action("configure", "-s", "usepath")
     path_conf_after = read_path_conf(stagepath_proj)
     assert path_conf_before == path_conf_after
+
 
 def test_staged_path_first_in_path_conf(qibuild_action, toolchains):
     toolchains.create("foo")
@@ -227,10 +245,11 @@ def test_staged_path_first_in_path_conf(qibuild_action, toolchains):
     path_conf = read_path_conf(stagepath_proj)
     lines = path_conf.splitlines()
     assert lines == [
-            stagepath_proj.path,
-            stagepath_proj.sdk_directory,
-            bar_package.path
+        stagepath_proj.path,
+        stagepath_proj.sdk_directory,
+        bar_package.path
     ]
+
 
 def test_path_conf_contains_toolchain_paths(qibuild_action, toolchains):
     toolchains.create("foo")
@@ -253,6 +272,7 @@ def test_path_conf_contains_toolchain_paths(qibuild_action, toolchains):
     assert world_proj.sdk_directory in sdk_dirs
     assert bar_path in sdk_dirs
 
+
 def test_adding_a_new_test(qibuild_action):
     qibuild_proj = qibuild_action.add_test_project("testme")
     qibuild_action("configure", "testme")
@@ -269,6 +289,7 @@ qi_create_test(env2 env.cpp)
     num_tests_after = len(test_proj2.tests)
     assert num_tests_after == num_tests_before + 1
 
+
 def test_using_build_prefix_from_command_line(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
     prefix = tmpdir.join("mybuild")
@@ -277,6 +298,7 @@ def test_using_build_prefix_from_command_line(qibuild_action, tmpdir):
                                                 platform.machine().lower()),
                            "world")
     assert expected.join("CMakeCache.txt").check(file=True)
+
 
 def test_using_build_prefix_from_config(qibuild_action, tmpdir):
     build_worktree = TestBuildWorkTree()
@@ -292,12 +314,14 @@ def test_using_build_prefix_from_config(qibuild_action, tmpdir):
                            "world")
     assert expected.join("CMakeCache.txt").check(file=True)
 
+
 def test_relwithdebinfo(qibuild_action):
     world_proj = qibuild_action.add_test_project("world")
     qibuild_action("configure", "world", "--build-type", "RelWithDebInfo")
     cmake_build_type = qibuild.cmake.get_cached_var(world_proj.build_directory,
                                                     "CMAKE_BUILD_TYPE")
     assert cmake_build_type == "RelWithDebInfo"
+
 
 def test_using_fake_ctc(qibuild_action, fake_ctc):
     qibuild_action.add_test_project("footool")
@@ -314,10 +338,12 @@ def test_using_fake_ctc(qibuild_action, fake_ctc):
     with pytest.raises(Exception):
         qisys.command.call([footool])
 
+
 def test_bin_sdk(qibuild_action):
     qibuild_action.add_test_project("binsdk")
     qibuild_action.add_test_project("binsdkuser")
     qibuild_action("configure", "binsdkuser")
+
 
 def test_gtest(qibuild_action, tmpdir):
     qibuild_action.add_test_project("fakegtest")
@@ -327,9 +353,11 @@ def test_gtest(qibuild_action, tmpdir):
     qibuild_action("install", "gtestuser", tmpdir.strpath)
     assert not tmpdir.join("include", "fakegtest", "gtest.h").check(file=True)
 
+
 def test_setting_cflags(qibuild_action):
     qibuild_action.add_test_project("world")
     qibuild_action("configure", "world", "-DCMAKE_CXX_FLAGS=-std=gnu++11")
+
 
 def test_virtualenv_path(qipy_action, qibuild_action):
     py_proj = qibuild_action.add_test_project("py")

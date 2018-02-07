@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import re
@@ -16,16 +16,19 @@ import qisys.script
 import qisys.interact
 import qisys.worktree
 
+
 class TestNamespace(object):
     """ A class that behaves like a argparse.Namespace
     objects, except all unknown attributes are set to None
 
     """
+
     def __getattr__(self, name):
         if name.startswith("_"):
             raise AttributeError()
         setattr(self, name, None)
         return None
+
 
 class TestWorkTree(qisys.worktree.WorkTree):
     """ A subclass of qisys.worktree.WorkTree that
@@ -60,11 +63,14 @@ class TestWorkTree(qisys.worktree.WorkTree):
 """)
         return new_project
 
+
 # Because sometimes the most popular OS in the world is not the best one ...
 # pylint: disable-msg=E1101
 skip_on_win = pytest.mark.skipif(os.name == 'nt', reason="cannot pass on windows")
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def worktree(cd_to_tmpdir):
     """ A new worktree in a temporary dir.
@@ -77,6 +83,8 @@ def worktree(cd_to_tmpdir):
     return wt
 
 # pylint: disable-msg=E1101
+
+
 @pytest.fixture
 def interact(request):
     """ Replace all functions in qisys.interact, and
@@ -90,6 +98,7 @@ def interact(request):
     request.addfinalizer(patcher.stop)
     return patcher.start()
 
+
 @pytest.fixture
 def args(request):
     """ Forge argparse.Namespace objects
@@ -99,12 +108,14 @@ def args(request):
     """
     return TestNamespace()
 
+
 @pytest.fixture
 def record_messages(request):
     """ Configure qisys.ui to record the messages sent to the user """
     recorder = MessageRecorder()
     request.addfinalizer(recorder.stop)
     return recorder
+
 
 class MessageRecorder():
     def __init__(self):
@@ -123,6 +134,7 @@ class MessageRecorder():
         for message in ui._MESSAGES:
             if re.search(regexp, message):
                 return message
+
 
 @pytest.fixture(autouse=True)
 def tmpfiles(request, tmpdir):
@@ -143,17 +155,20 @@ def tmpfiles(request, tmpdir):
     patcher.start()
     request.addfinalizer(patcher.stop)
 
+
 @pytest.fixture
 def cd_to_tmpdir(monkeypatch, tmpdir):
     workdir = tmpdir.mkdir("work")
     monkeypatch.chdir(workdir)
     return workdir
 
+
 class TestAction(object):
     """ Helper class to test actions
     Make sure cwd is in a temporary directory,
     and provide a nicer syntax for qisys.script.run_action
     """
+
     def __init__(self, package):
         self.package = package
         self.worktree = TestWorkTree()
@@ -171,7 +186,7 @@ class TestAction(object):
         if cwd:
             self.chdir(cwd)
         if kwargs.get("raises"):
-        # pylint: disable-msg=E1101
+            # pylint: disable-msg=E1101
             with pytest.raises(Exception) as error:
                 qisys.script.run_action(module_name, args)
             return str(error.value)

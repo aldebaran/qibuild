@@ -5,6 +5,7 @@ import qisys.sh
 import qibuild.config
 import qitoolchain.qipackage
 
+
 def test_install_project(qibuild_action, tmpdir):
     qibuild_action.add_test_project("world")
     qibuild_action("configure", "--all")
@@ -13,8 +14,9 @@ def test_install_project(qibuild_action, tmpdir):
     ret = qibuild_action("install", "world", dest.strpath)
     assert "include/world/world.h" in ret
 
+
 def test_install_modern_package_without_manifest(qitoolchain_action,
-        qibuild_action, tmpdir):
+                                                 qibuild_action, tmpdir):
     qitoolchain_action("create", "test")
     qibuild.config.add_build_config("test", toolchain="test")
     world_proj = qibuild_action.add_test_project("world")
@@ -31,6 +33,7 @@ def test_install_modern_package_without_manifest(qitoolchain_action,
     assert "bin/hello" in ret
     assert "lib/libworld.so" in ret
 
+
 def test_install_modern_package_with_manifest(tmpdir):
     boost_path = tmpdir.mkdir("boost")
     boost_path.ensure("include", "boost.h", file=True)
@@ -43,5 +46,3 @@ lib/libboost.so
     dest = tmpdir.join("dest")
     installed = package.install(dest.strpath, components=["runtime"])
     assert installed == ["lib/libboost.so"]
-
-

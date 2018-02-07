@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """This package contains the WorkTree object.
 
@@ -25,6 +25,7 @@ import qibuild.config
 
 class WorkTree(object):
     """ This class represent a :term:`worktree`. """
+
     def __init__(self, root, sanity_check=True):
         """
         Construct a new worktree
@@ -168,8 +169,8 @@ This path does not exist
         if not self.has_project(src):
             if not raises:
                 return None
-            mess  = ui.did_you_mean("No project in '%s'\n" % src,
-                                    src, [x.src for x in self.projects])
+            mess = ui.did_you_mean("No project in '%s'\n" % src,
+                                   src, [x.src for x in self.projects])
             raise WorkTreeError(mess)
         match = (p for p in self.projects if p.src == src)
         return match.next()
@@ -183,7 +184,7 @@ This path does not exist
         """
         src = self.normalize_path(path)
         if self.has_project(src):
-            mess  = "Could not add project to worktree\n"
+            mess = "Could not add project to worktree\n"
             mess += "Path %s is already registered\n" % src
             mess += "Current worktree: %s" % self.root
             raise WorkTreeError(mess)
@@ -219,7 +220,7 @@ This path does not exist
         project = self.get_project(src, raises=True)
 
         if self.has_project(new_src):
-            mess  = "Could not move project\n"
+            mess = "Could not move project\n"
             mess += "Path %s is already registered\n" % src
             mess += "Current worktree: %s" % self.root
             raise WorkTreeError(mess)
@@ -242,13 +243,13 @@ This path does not exist
         return path
 
     def __repr__(self):
-        res  = "<WorkTree in %s\n" % self.root
+        res = "<WorkTree in %s\n" % self.root
         res += repr_list_projects(self.projects)
         res += ">\n"
         return res
 
 
-def repr_list_projects(projects, name = "projects"):
+def repr_list_projects(projects, name="projects"):
     res = ""
     if projects:
         res += name
@@ -257,9 +258,11 @@ def repr_list_projects(projects, name = "projects"):
         res += "\n"
     return res
 
+
 def is_worktree(path):
     path = os.path.join(path, ".qi")
     return os.path.isdir(path)
+
 
 def guess_worktree(cwd=None, raises=False):
     """Look for parent directories until a .qi dir is found somewhere."""
@@ -277,6 +280,7 @@ def guess_worktree(cwd=None, raises=False):
     else:
         return None
 
+
 class WorkTreeObserver(object):
     """ To be subclasses for objects willing to be
     notified when a project is added or removed from
@@ -289,11 +293,13 @@ class WorkTreeObserver(object):
     def reload(self):
         pass
 
+
 class WorkTreeCache(object):
     """ Cache the paths to all the projects registered
     in a worktree
 
     """
+
     def __init__(self, xml_path):
         self.xml_path = xml_path
         self.xml_root = qisys.qixml.read(xml_path).getroot()
@@ -321,11 +327,14 @@ class WorkTreeCache(object):
             srcs.append(qisys.qixml.parse_required_attr(project_elem, "src"))
         return srcs
 
+
 class WorkTreeError(Exception):
     """ Just a custom exception. """
 
+
 class NotInWorkTree(Exception):
     """ Just a custom exception. """
+
     def __str__(self):
         return """ Could not guess worktree from current working directory
   Here is what you can do :
@@ -333,6 +342,7 @@ class NotInWorkTree(Exception):
      - specify an existing work tree with --work-tree PATH
      - create a new work tree with `qibuild init`
 """
+
 
 class NoSuchProject(Exception):
     def __init__(self, name, message):

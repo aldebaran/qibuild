@@ -1,10 +1,11 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Tools for doxygen """
 
 import os
 import collections
+
 
 def read_doxyfile(doxyfile):
     """ Parse a doxyfile path.
@@ -48,6 +49,7 @@ def read_doxyfile(doxyfile):
             res[key] = value
 
     return res
+
 
 def write_doxyfile(config, doxyfile):
     """ Write a doxyfile """

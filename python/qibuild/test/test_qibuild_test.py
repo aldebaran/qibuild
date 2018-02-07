@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import os
 import sys
 import platform
@@ -11,6 +11,7 @@ import qisys.worktree
 import qibuild.worktree
 
 from qitest.test.conftest import qitest_action
+
 
 def test_various_outcomes(qibuild_action, record_messages):
     qibuild_action.add_test_project("testme")
@@ -47,13 +48,13 @@ def test_various_outcomes(qibuild_action, record_messages):
     if qisys.command.find_program("valgrind"):
         # Test one file descriptor leak with --valgrind
         record_messages.reset()
-        rc = qibuild_action("test", "testme", "-k", "fdleak","--valgrind", retcode=True)
+        rc = qibuild_action("test", "testme", "-k", "fdleak", "--valgrind", retcode=True)
         assert record_messages.find("file descriptor leaks: 1")
         assert rc == 1
 
         # Test for false positives with --valgrind
         record_messages.reset()
-        rc = qibuild_action("test", "testme", "-k", "ok","--valgrind", retcode=True)
+        rc = qibuild_action("test", "testme", "-k", "ok", "--valgrind", retcode=True)
         assert not record_messages.find("file descriptor leaks")
         assert rc == 0
 
@@ -71,12 +72,14 @@ def test_various_outcomes(qibuild_action, record_messages):
     else:
         assert "flag" in content.decode("utf-8")
 
+
 def get_result_dir():
     worktree = qisys.worktree.WorkTree(os.getcwd())
     build_worktree = qibuild.worktree.BuildWorkTree(worktree)
     testme = build_worktree.get_build_project("testme")
     result_dir = os.path.join(testme.sdk_directory, "test-results")
     return result_dir
+
 
 def test_do_not_overwrite_xml_when_test_fails(qibuild_action):
     qibuild_action.add_test_project("testme")
@@ -88,6 +91,7 @@ def test_do_not_overwrite_xml_when_test_fails(qibuild_action):
     with open(fake_xml, "r") as fp:
         contents = fp.read()
     assert contents == "<gtest>FAKE_RESULTS</gtest>\n"
+
 
 def test_setting_output_dir_with_project(qitest_action, qibuild_action, tmpdir):
     test_out = tmpdir.join("test-out", "testme")
@@ -101,6 +105,7 @@ def test_setting_output_dir_with_project(qitest_action, qibuild_action, tmpdir):
                             "--root-output-dir", test_out.strpath,
                             retcode=True)
     assert not ok_xml.check(file=True)
+
 
 def test_setting_output_dir_without_project(qitest_action, qibuild_action, tmpdir):
     dest = tmpdir.join("dest")
@@ -124,6 +129,6 @@ def test_setting_build_prefix(qitest_action, qibuild_action, tmpdir):
     qibuild_action("make", "testme", "--build-prefix", prefix.strpath)
     qitest_action("run", "testme", "-k", "ok", "--build-prefix", prefix.strpath)
     test_results = prefix.join("build-sys-%s-%s" % (platform.system().lower(),
-                               platform.machine().lower()),
+                                                    platform.machine().lower()),
                                "testme", "sdk", "test-results")
     assert test_results.join("ok.xml").check(file=True)

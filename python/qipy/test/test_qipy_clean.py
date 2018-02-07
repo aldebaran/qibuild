@@ -1,6 +1,7 @@
 import os
 import qipy.parsers
 
+
 def test_simple(qipy_action, args):
     qipy_action.add_test_project("a_lib")
     python_worktree = qipy.parsers.get_python_worktree(args)

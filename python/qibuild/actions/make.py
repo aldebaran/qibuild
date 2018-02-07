@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Build a project
 
@@ -9,6 +9,7 @@
 from qisys import ui
 
 import qibuild.parsers
+
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -21,6 +22,7 @@ def configure_parser(parser):
                        "cov-analysis installed on your machine.")
     group.add_argument("--num-workers", "-J", dest="num_workers", type=int,
                        help="Number of projects to be built in parallel")
+
 
 @ui.timer("qibuild make")
 def do(args):

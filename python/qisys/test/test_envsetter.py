@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Automatic testing for qibuild.EnvSetter
 
@@ -15,6 +15,7 @@ import qisys.sh
 import qisys.envsetter
 import qibuild.config
 
+
 class EnvSetterTestCase(unittest.TestCase):
     def setUp(self):
         self.environ_back = os.environ.copy()
@@ -24,11 +25,11 @@ class EnvSetterTestCase(unittest.TestCase):
         if sys.platform.startswith("win"):
             os.environ["PATH"] = r"c:\windows;c:\windows\system32\;"
             self.unlikely = r"c:\program files (x86)\unlikely"
-            self.absurd   = r"c:\this\is\absurd"
+            self.absurd = r"c:\this\is\absurd"
         else:
             os.environ["PATH"] = "/usr/bin:/usr/local/bin"
             self.unlikely = "/a/very/unlikely/path"
-            self.absurd   = "/this/is/absurd"
+            self.absurd = "/this/is/absurd"
 
     def tearDown(self):
         os.environ = self.environ_back.copy()
@@ -38,7 +39,7 @@ class EnvSetterTestCase(unittest.TestCase):
 
         """
         paths = path_env.split(os.path.pathsep)
-        mess  = "Could not find %s in %s" % (directory, paths)
+        mess = "Could not find %s in %s" % (directory, paths)
         self.assertTrue(directory in paths, mess)
 
     def test_create_new_env(self):
@@ -79,7 +80,6 @@ class EnvSetterTestCase(unittest.TestCase):
         self._check_is_in_path(self.unlikely, env_path)
         self._check_is_in_path(self.absurd, env_path)
 
-
     def test_prepend_to_path_several_times(self):
         # adding two different paths should work
         previous_path = os.environ["PATH"]
@@ -89,7 +89,7 @@ class EnvSetterTestCase(unittest.TestCase):
         path_env = envsetter.get_build_env()["PATH"]
         self.assertEquals(os.environ["PATH"], previous_path)
         self._check_is_in_path(self.unlikely, path_env)
-        self._check_is_in_path(self.absurd  , path_env)
+        self._check_is_in_path(self.absurd, path_env)
 
     def test_no_side_effects(self):
         # messing up with the return value of EnvSetter
@@ -101,7 +101,7 @@ class EnvSetterTestCase(unittest.TestCase):
 
     if sys.platform.startswith("win"):
         def test_source_bat(self):
-            vc_path  = r'c:\microsoft\vc\bin'
+            vc_path = r'c:\microsoft\vc\bin'
             lib_path = r'c:\microsoft\vc\lib'
             with qisys.sh.TempDir() as tmp:
                 sourceme = os.path.join(tmp, "sourceme.bat")
@@ -149,6 +149,7 @@ def test_reads_env_vars_from_config(tmpdir):
     assert build_env["FOO"] == "BAR"
     assert build_env["SPAM"] == "EGGS"
 
+
 def test_updating_env_vars(tmpdir):
     qibuild_xml = tmpdir.join("qibuild.xml")
     qibuild_xml.write("""
@@ -173,9 +174,10 @@ def test_updating_env_vars(tmpdir):
     build_env = env_setter.get_build_env()
     assert build_env["FOO"] == "SPAM"
 
+
 def test_prepending_variable_already_here():
     env = {
-            "PATH" : "/foo:/bar"
+        "PATH": "/foo:/bar"
     }
     envsetter = qisys.envsetter.EnvSetter(build_env=env)
     envsetter.prepend_to_path("/baz")
@@ -183,8 +185,10 @@ def test_prepending_variable_already_here():
     actual = envsetter.get_build_env()["PATH"]
     assert actual == "/foo:/baz:/bar"
 
+
 def main():
     unittest.main()
+
 
 if __name__ == "__main__":
     main()

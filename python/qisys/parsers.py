@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Collection of parser fonctions for various actions."""
 
@@ -12,6 +12,7 @@ import os
 import qisys.sh
 import qisys.worktree
 
+
 class SetHome(argparse.Action):
     """argparse action that calls qisys.sh.set_home on the argument value"""
 
@@ -21,11 +22,13 @@ class SetHome(argparse.Action):
     def __call__(self, parser, namespace, values, option_string):
         qisys.sh.set_home(values)
 
+
 def cpu_count():
     try:
         default = multiprocessing.cpu_count()
     except NotImplementedError:
         default = 1
+
 
 def parallel_parser(parser, default=cpu_count()):
     """Given a parser, add the -j option.
@@ -35,61 +38,67 @@ def parallel_parser(parser, default=cpu_count()):
     """
 
     parser.add_argument("-j", "--njobs",
-        dest="num_jobs", type=int, default=default, metavar='N',
-        help="Specify the number of jobs to run simultaneously "
-             "(default: %(default)s)")
+                        dest="num_jobs", type=int, default=default, metavar='N',
+                        help="Specify the number of jobs to run simultaneously "
+                        "(default: %(default)s)")
+
 
 def log_parser(parser):
     """Given a parser, add the options controlling log."""
     group = parser.add_argument_group("logging options")
     group.add_argument("-v", "--verbose", dest="verbose", action="store_true",
-         help="Output debug messages")
+                       help="Output debug messages")
     group.add_argument("--quiet", "-q", dest="quiet", action="store_true",
-        help="Only output error messages")
+                       help="Only output error messages")
     group.add_argument("--time-stamp", dest="timestamp", action="store_true",
-        help="Add timestamps before each log message")
+                       help="Add timestamps before each log message")
     group.add_argument("--color", choices=["always", "never", "auto"],
-        help="Colorize output, defaults to 'auto'")
+                       help="Colorize output, defaults to 'auto'")
     group.add_argument("--title", choices=["always", "never", "auto"],
-        help="Update terminal title, defaults to 'auto'")
+                       help="Update terminal title, defaults to 'auto'")
 
     parser.set_defaults(verbose=False, quiet=False, color="auto", title="auto")
+
 
 def default_parser(parser):
     """Parser settings for every action."""
     # Every action should have access to a proper log
     log_parser(parser)
     parser.add_argument("--home", action=SetHome,
-        help="Store global data in this directory instead of HOME")
+                        help="Store global data in this directory instead of HOME")
     # Every action can use  --pdb and --backtrace
     group = parser.add_argument_group("debug options")
-    group.add_argument("--backtrace", action="store_true", help="Display backtrace on error")
+    group.add_argument("--backtrace", action="store_true",
+                       help="Display backtrace on error")
     group.add_argument("--pdb", action="store_true", help="Use pdb on error")
+
 
 def worktree_parser(parser):
     """Parser settings for every action using a work tree."""
     default_parser(parser)
     parser.add_argument("-w", "--worktree", "--work-tree", dest="worktree",
-        help="Use a specific work tree path.")
+                        help="Use a specific work tree path.")
+
 
 def project_parser(parser, positional=True):
     """Parser settings for every action using projects."""
     group = parser.add_argument_group("projects specifications options")
     group.add_argument("-a", "--all", action="store_true",
-        help="Work on all projects")
+                       help="Work on all projects")
     group.add_argument("-s", "--single", action="store_true",
-        help="Work on specified projects without taking dependencies into account.")
+                       help="Work on specified projects without taking dependencies into account.")
     group.add_argument("-g", "--group", dest="groups", action="append",
                        help="Specify a group of projects.")
 
     if positional:
         group.add_argument("projects", nargs="*", metavar="PROJECT",
-                            help="Project name(s)")
+                           help="Project name(s)")
     else:
         group.add_argument("-p", "--project", dest="projects", action="append",
-                help="Project name(s)")
-    parser.set_defaults(single=False, projects = list())
+                           help="Project name(s)")
+    parser.set_defaults(single=False, projects=list())
     return group
+
 
 def build_parser(parser, group=None, include_worktree_parser=True):
     """Parser settings for builders."""
@@ -98,17 +107,20 @@ def build_parser(parser, group=None, include_worktree_parser=True):
     if not group:
         group = parser.add_argument_group("build type options")
     group.add_argument("-c", "--config",
-        help="The configuration to use. ")
+                       help="The configuration to use. ")
     group.add_argument("--build-prefix", dest="build_prefix",
-                    help="Prefix for all the build directories")
+                       help="Prefix for all the build directories")
+
 
 def deploy_parser(parser):
     group = parser.add_argument_group("deploy options")
     group.add_argument("--url", dest="urls", action="append",
                        help="deploy to each given url.", required=True)
 
+
 def get_deploy_urls(args):
     return [qisys.remote.URL(x) for x in args.urls]
+
 
 def get_worktree(args=None, raises=True):
     """ Get a worktree right after argument parsing.
@@ -127,10 +139,12 @@ def get_worktree(args=None, raises=True):
     else:
         return None
 
+
 def get_projects(worktree, args):
     """ Get a list of worktree projects from the command line """
     parser = WorkTreeProjectParser(worktree)
     return parser.parse_args(args)
+
 
 def get_one_project(worktree, args):
     parser = WorkTreeProjectParser(worktree)
@@ -144,9 +158,11 @@ def get_one_project(worktree, args):
 ##
 # Implementation details
 
+
 class AbstractProjectParser(object):
     """ Helper for get_projects() methods """
     __metaclass__ = abc.ABCMeta
+
     def __init__(self):
         pass
 
@@ -192,6 +208,7 @@ class AbstractProjectParser(object):
             res.extend(self.parse_one_project(args, project_arg))
         return res
 
+
 class WorkTreeProjectParser(AbstractProjectParser):
     """ Implements AbstractProjectParser for a basic WorkTree """
 
@@ -226,6 +243,7 @@ class WorkTreeProjectParser(AbstractProjectParser):
         project = self.worktree.get_project(project_arg, raises=True)
         return [project]
 
+
 def find_parent_project(projects, path):
     """ Find the parent project of a given path """
     projs = projects[:]
@@ -233,6 +251,7 @@ def find_parent_project(projects, path):
     for project in projs:
         if qisys.sh.is_path_inside(path, project.path):
             return project
+
 
 def find_or_add(worktree, cwd=None):
     """ If we find a qiproject.xml in a path not

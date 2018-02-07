@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Stores configuration for git projects in a worktree
 Delegates most of the work to :py:mod:`qisrc.git`` and
@@ -81,7 +81,7 @@ class Remote(object):
                 if not username:
                     raise Exception("Could not guess ssh username")
                 self.username = username
-            prefix =  "ssh://%s@%s" % (username, self.server)
+            prefix = "ssh://%s@%s" % (username, self.server)
             if self.port:
                 prefix += ":%i" % self.port
             subfolder = groupdict.get("subfolder", "")
@@ -126,7 +126,6 @@ class Remote(object):
         if not self.prefix:
             raise Exception("Could not parse %s as a git url" % self.url)
 
-
     def __repr__(self):
         res = "<Remote %s: %s" % (self.name, self.url)
         if self.review:
@@ -136,9 +135,9 @@ class Remote(object):
 
     def __eq__(self, other):
         return self.name == other.name and \
-                self.url == other.url and \
-                self.review is other.review and \
-                self.default is other.default
+            self.url == other.url and \
+            self.review is other.review and \
+            self.default is other.default
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -156,9 +155,9 @@ class Branch(object):
 
     def __eq__(self, other):
         return self.name == other.name and \
-               self.tracks == other.tracks and \
-               self.remote_branch == self.remote_branch and \
-               self.default is self.default
+            self.tracks == other.tracks and \
+            self.remote_branch == self.remote_branch and \
+            self.default is self.default
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -166,14 +165,15 @@ class Branch(object):
 ##
 # parsing
 
+
 class RemoteParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(RemoteParser, self).__init__(target)
         self._required = ["name"]
         self._ignore = ["prefix", "protocol", "username", "server", "port"]
 
+
 class BranchParser(qisys.qixml.XMLParser):
     def __init__(self, target):
         super(BranchParser, self).__init__(target)
         self._required = ["name"]
-

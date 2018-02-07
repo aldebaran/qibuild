@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """ Collection of parser fonctions for qibuild actions
 """
@@ -21,58 +21,60 @@ def cmake_build_parser(parser, group=None, with_build_parser=True):
         group = parser.add_argument_group("Build options")
     qisys.parsers.parallel_parser(group, default=None)
     group.add_argument("--verbose-make", action="store_true", default=False,
-                    help="Print the executed commands while building")
+                       help="Print the executed commands while building")
+
 
 def cmake_configure_parser(parser):
     group = parser.add_argument_group("configure options")
     group.add_argument("-G", "--cmake-generator", action="store",
-        help="Specify the CMake generator")
+                       help="Specify the CMake generator")
     group.add_argument("-D", dest="cmake_flags",
-        action="append",
-        help="additional cmake flags")
+                       action="append",
+                       help="additional cmake flags")
     group.add_argument("--no-clean-first", dest="clean_first",
-        action="store_false",
-        help="do not clean CMake cache")
+                       action="store_false",
+                       help="do not clean CMake cache")
     group.add_argument("--debug-trycompile", dest="debug_trycompile",
-        action="store_true",
-        help="pass --debug-trycompile to CMake call")
+                       action="store_true",
+                       help="pass --debug-trycompile to CMake call")
     group.add_argument("--eff-c++", dest="effective_cplusplus",
-        action="store_true",
-        help="activate warnings from the 'Effective C++' book (gcc only)")
+                       action="store_true",
+                       help="activate warnings from the 'Effective C++' book (gcc only)")
     group.add_argument("--werror", dest="werror",
-        action="store_true",
-        help="treat warnings as error")
+                       action="store_true",
+                       help="treat warnings as error")
     group.add_argument("--profiling", dest="profiling", action="store_true",
-        help="profile cmake execution")
+                       help="profile cmake execution")
     group.add_argument("--summarize-options", dest="summarize_options",
-                        action="store_true",
-                        help="summarize build options at the end")
+                       action="store_true",
+                       help="summarize build options at the end")
     group.add_argument("--trace-cmake", dest="trace_cmake",
-                      action="store_true",
-                      help="run cmake in trace mode")
+                       action="store_true",
+                       help="run cmake in trace mode")
     group.add_argument("--coverage", dest="coverage",
                        action="store_true",
                        help="activate coverage support (gcc only)")
     group.add_argument("--32-bits", dest="force_32_bits",
                        action="store_true", help="force 32 bits build")
     group.add_argument("--with-debug-info", action="store_true", dest="debug_info",
-                        help="include debug information in binaries, even when used with --release. "
-                             "Note that you can also use --build-type=RelWithDebInfo "
-                             "for the same effect")
+                       help="include debug information in binaries, even when used with --release. "
+                       "Note that you can also use --build-type=RelWithDebInfo "
+                       "for the same effect")
     group.add_argument("--without-debug-info", action="store_false", dest="debug_info",
-                        help="remove debug information from binaries, even when used with --debug")
+                       help="remove debug information from binaries, even when used with --debug")
     group.add_argument("--release", action="store_const", const="Release",
-        dest="build_type",
-        help="Build in release")
+                       dest="build_type",
+                       help="Build in release")
     group.add_argument("--debug", action="store_const", const="Debug",
-        dest="build_type",
-        help="Build in debug, default")
+                       dest="build_type",
+                       help="Build in debug, default")
     group.add_argument("--build-type", dest="build_type",
-        help="Set CMAKE_BUILD_TYPE")
+                       help="Set CMAKE_BUILD_TYPE")
     parser.set_defaults(clean_first=True, effective_cplusplus=False,
                         werror=False, profiling=False,
                         trace_cmake=False, debug_info=None,
                         build_type="Debug")
+
 
 def convert_cmake_args_to_flags(args):
     """ Convert 'helper' options into cmake flags
@@ -94,6 +96,7 @@ def convert_cmake_args_to_flags(args):
     if args.force_32_bits:
         args.cmake_flags.append("QI_FORCE_32_BITS=ON")
 
+
 def project_parser(parser, positional=True):
     """Parser settings for every action using several build projects."""
     group = qisys.parsers.project_parser(parser, positional=positional)
@@ -104,8 +107,9 @@ def project_parser(parser, positional=True):
     group.add_argument("--build-deps-only", action="store_const",
                        const=["build"], dest="dep_types",
                        help="Work on specified projects by ignoring "
-                             "the runtime deps.")
+                       "the runtime deps.")
     parser.set_defaults(dep_types="default")
+
 
 def get_build_worktree(args, verbose=True):
     """ Get a build worktree to use from a argparse.Namespace
@@ -132,6 +136,7 @@ def get_build_worktree(args, verbose=True):
 
     return build_worktree
 
+
 def get_build_projects(build_worktree, args, solve_deps=True, default_all=False):
     """ Get a list of build projects to use from an argparse.Namespace
     object. Useful when you do not need a CMakeBuilder.
@@ -146,6 +151,7 @@ def get_build_projects(build_worktree, args, solve_deps=True, default_all=False)
     deps_solver = qibuild.deps.DepsSolver(build_worktree)
     return deps_solver.get_dep_projects(projects, dep_types)
 
+
 def get_one_build_project(build_worktree, args):
     """ Get one build project from the command line.
     (zero or one project name may be specified)
@@ -157,6 +163,7 @@ def get_one_build_project(build_worktree, args):
         raise Exception("This action can only work on one project")
     return projects[0]
 
+
 def get_dep_types(args, default=None):
     """ Get a list of dep types from the command line """
     if not default:
@@ -166,6 +173,7 @@ def get_dep_types(args, default=None):
     if not hasattr(args, "dep_types") or args.dep_types == "default":
         return default
     return args.dep_types
+
 
 def get_cmake_builder(args, default_dep_types=None):
     """ Get a :py:class:`.CMakeBuilder` object from the command line
@@ -177,6 +185,7 @@ def get_cmake_builder(args, default_dep_types=None):
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, build_projects)
     cmake_builder.dep_types = get_dep_types(args, default=default_dep_types)
     return cmake_builder
+
 
 def get_host_tools_builder(args):
     """ Get a :py:class:`.CMakeBuilder  object from the command line
@@ -199,6 +208,7 @@ marked as a host config\
     cmake_builder = qibuild.cmake_builder.CMakeBuilder(build_worktree, host_projects)
     return cmake_builder
 
+
 def get_host_projects(build_worktree, args):
     projects = list()
     if args.all:
@@ -213,6 +223,7 @@ def get_host_projects(build_worktree, args):
     deps_solver = qibuild.deps.DepsSolver(build_worktree)
     return deps_solver.get_host_projects(projects)
 
+
 def get_build_config(build_worktree, args):
     """ Get a CMakeBuildConfig object from an argparse.Namespace object
 
@@ -226,7 +237,7 @@ def get_build_config(build_worktree, args):
     if hasattr(args, "cmake_generator"):
         build_config.cmake_generator = args.cmake_generator
     if hasattr(args, "verbose_make"):
-        build_config.verbose_make= args.verbose_make
+        build_config.verbose_make = args.verbose_make
     if hasattr(args, "cmake_flags") and args.cmake_flags:
         # should be a list a strings looking like key=value
         user_flags = list()
@@ -289,6 +300,7 @@ class BuildProjectParser(qisys.parsers.AbstractProjectParser):
         """
         project = self.build_worktree.get_build_project(project_arg, raises=True)
         return [project]
+
 
 class CouldNotGuessProjectName(Exception):
     def __str__(self):

@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 """Configure a project
 
@@ -10,6 +10,7 @@ from qisys import ui
 
 import qibuild.cmake
 import qibuild.parsers
+
 
 def configure_parser(parser):
     """Configure parser for this action"""
@@ -23,6 +24,7 @@ Note:
     if CMAKE_INSTALL_PREFIX is set during configure, it will be necessary to
     repeat it at install (for further details, see: qibuild install --help).
 """
+
 
 @ui.timer("qibuild configure")
 def do(args):

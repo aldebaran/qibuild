@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """
 Sphinx domain for documenting CMake functions
 
@@ -17,6 +17,7 @@ from sphinx.domains import ObjType, Index
 from sphinx.util.docfields import TypedField, Field
 from sphinx.util.nodes import make_refnode
 
+
 class CMakeFunctionIndex(Index):
     name = 'functions-index'
     localname = l_('CMake functions Index')
@@ -29,7 +30,7 @@ class CMakeFunctionIndex(Index):
             entries = content.setdefault(ev[0].lower(), [])
             entries.append([ev, 2, modname, ev, '', '', ''])
         # sort by first letter
-        result   = sorted(content.iteritems())
+        result = sorted(content.iteritems())
         collapse = False
         return result, collapse
 
@@ -40,6 +41,7 @@ class CMakeFunction(sphinx.directives.ObjectDescription):
         TypedField('arg', label=l_('Arguments'),
                    names=['arg']),
     ]
+
     def add_target_and_index(self, name, sig, signode):
         signode['ids'].append(name)
         self.state.document.note_explicit_target(signode)
@@ -70,21 +72,22 @@ class CMakeFunction(sphinx.directives.ObjectDescription):
         name = sig.split("(")[0]
         return name
 
+
 class CMakeDomain(sphinx.domains.Domain):
     name = 'cmake'
     label = 'CMake'
 
     object_types = {
-            'function': ObjType(l_('functions'), 'functions'),
+        'function': ObjType(l_('functions'), 'functions'),
     }
     directives = {
-            'function': CMakeFunction,
+        'function': CMakeFunction,
     }
     initial_data = {
         'function': {}
     }
     roles = {
-        'function' : XRefRole()
+        'function': XRefRole()
     }
     indices = [
         CMakeFunctionIndex,
@@ -103,7 +106,7 @@ class CMakeDomain(sphinx.domains.Domain):
         except KeyError:
             return None
         return make_refnode(builder, fromdocname, todocname, target,
-	        contnode, target)
+                            contnode, target)
 
 
 def setup(app):

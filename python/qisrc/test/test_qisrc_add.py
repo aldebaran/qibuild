@@ -1,7 +1,8 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 from qisrc.test.conftest import TestGitWorkTree
+
 
 def test_qisrc_add_dot(qisrc_action):
     tmpdir = qisrc_action.tmpdir
@@ -13,11 +14,13 @@ def test_qisrc_add_dot(qisrc_action):
     worktree = qisrc_action.worktree
     assert worktree.get_project("foo")
 
+
 def test_qisrc_add_url_at_root(qisrc_action, git_server):
     foo = git_server.create_repo("foo.git")
     qisrc_action("add", foo.clone_url)
     git_worktree = TestGitWorkTree()
     assert git_worktree.get_git_project("foo")
+
 
 def test_qisrc_add_url_in_subdir(qisrc_action, git_server):
     foo = git_server.create_repo("foo.git")
@@ -26,6 +29,7 @@ def test_qisrc_add_url_in_subdir(qisrc_action, git_server):
     qisrc_action.reload_worktree()
     git_worktree = qisrc_action.git_worktree
     assert git_worktree.get_git_project("lib/foo")
+
 
 def test_qisrc_add_already_exists(qisrc_action, git_server):
     foo = git_server.create_repo("foo.git")

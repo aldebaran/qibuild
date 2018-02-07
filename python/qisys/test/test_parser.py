@@ -1,16 +1,18 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 import qisys.parsers
 import qisys.worktree
 
 import pytest
+
 
 def test_guess_woktree(worktree, args):
     tmpdir = worktree.tmpdir
     bar = tmpdir.mkdir("foo").mkdir("bar")
     with qisys.sh.change_cwd(bar.strpath):
         assert qisys.parsers.get_worktree(args).root == worktree.root
+
 
 def test_raises_when_not_in_worktree(tmpdir, args):
     with qisys.sh.change_cwd(tmpdir.strpath):
@@ -43,6 +45,7 @@ def test_guess_current_project(worktree, args):
     with qisys.sh.change_cwd(other.strpath):
         assert not qisys.parsers.get_projects(worktree, args)
 
+
 def test_parse_one_arg(worktree, args):
     foo = worktree.create_project("foo")
 
@@ -60,6 +63,7 @@ def test_parse_one_arg(worktree, args):
     assert len(projects) == 1
     assert projects[0].src == "foo"
 
+
 def test_auto_add_simple(worktree, args):
     tmpdir = worktree.tmpdir
     foo = tmpdir.mkdir("foo")
@@ -70,6 +74,7 @@ def test_auto_add_simple(worktree, args):
         projects = qisys.parsers.get_projects(worktree, args)
         assert len(projects) == 1
         assert projects[0].src == "foo"
+
 
 def test_auto_add_nested(worktree, args):
     tmpdir = worktree.tmpdir
@@ -96,6 +101,7 @@ def test_auto_add_nested(worktree, args):
 """)
     worktree2 = qisys.worktree.WorkTree(tmpdir.strpath)
     assert len(worktree2.projects) == 3
+
 
 def test_using_dash_all_with_dash_single(worktree, args):
     args.all = True

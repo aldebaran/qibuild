@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 """ Display info about the current git worktree
 
 """
@@ -10,8 +10,10 @@ import qisrc.parsers
 
 import sys
 
+
 def configure_parser(parser):
     qisrc.parsers.worktree_parser(parser)
+
 
 def do(args):
     git_worktree = qisrc.parsers.get_git_worktree(args)

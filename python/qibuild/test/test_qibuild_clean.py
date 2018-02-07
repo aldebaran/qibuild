@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import os
 import platform
@@ -12,6 +12,7 @@ import qibuild.profile
 
 from qibuild.test.conftest import TestBuildWorkTree
 
+
 def test_clean_build_dir(qibuild_action):
     world_proj = qibuild_action.add_test_project("world")
     qibuild_action("configure", "world")
@@ -19,6 +20,7 @@ def test_clean_build_dir(qibuild_action):
     assert os.path.exists(world_proj.build_directory)
     qibuild_action("clean", "-f", "world")
     assert not os.path.exists(world_proj.build_directory)
+
 
 def test_only_clean_one_build_dir(qibuild_action):
     qibuild.config.add_build_config("foo")
@@ -32,6 +34,7 @@ def test_only_clean_one_build_dir(qibuild_action):
     assert os.path.exists(world_proj.build_directory)
     build_worktree.set_active_config("foo")
     assert not os.path.exists(world_proj.build_directory)
+
 
 def test_cleaning_all_build_dirs(qibuild_action):
     qibuild.config.add_build_config("foo")
@@ -48,6 +51,7 @@ def test_cleaning_all_build_dirs(qibuild_action):
     assert not os.path.exists(world_proj.build_directory)
     build_config.build_type = "Release"
     assert not os.path.exists(world_proj.build_directory)
+
 
 def test_cleaning_unknown_configs(qibuild_action, toolchains, interact):
     qibuild.config.add_build_config("a")
@@ -66,17 +70,19 @@ def test_cleaning_unknown_configs(qibuild_action, toolchains, interact):
     qibuild_action("clean", "-x", "--all", "--force")
     assert build_c.check(dir=False)
 
+
 def test_using_build_prefix_from_cli(qibuild_action, tmpdir):
     mybuild = tmpdir.join("mybuild")
     qibuild_action.add_test_project("world")
     qibuild_action("configure", "world", "--build-prefix", mybuild.strpath)
     build_dir = mybuild.join("build-sys-%s-%s" % (platform.system().lower(),
-                                                platform.machine().lower()),
-                            "world")
+                                                  platform.machine().lower()),
+                             "world")
     assert build_dir.check(dir=True)
     qibuild_action("clean", "world", "-z", "--force",
                    "--build-prefix", mybuild.strpath)
     assert build_dir.check(dir=False)
+
 
 def test_using_build_prefix_from_config_deps_already_cleaned(tmpdir, monkeypatch):
     myprefix = tmpdir.join("prefix")
