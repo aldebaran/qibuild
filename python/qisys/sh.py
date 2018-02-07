@@ -18,6 +18,7 @@ import tempfile
 import subprocess
 import ntpath
 import posixpath
+import warnings
 
 from qisys import ui
 
@@ -138,7 +139,8 @@ def write_file_if_different(data, out_path, mode="w"):
         out_file.write(data)
 
 
-def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
+# pylint: disable=keyword-arg-before-vararg
+def configure_file__legacy(in_path, out_path, copy_only=False, *args, **kwargs):
     """Configure a file.
     :param in_path: input file
     :param out_path: output file
@@ -153,6 +155,14 @@ def configure_file(in_path, out_path, copy_only=False, *args, **kwargs):
         in_content.format(*args, **kwargs)
 
     """
+    # This function seems to be never called, and has been renamed with __legacy suffix (2018-02-07)
+    # If nobody complains, remove this function in the next release
+    warnings.warn(
+        "Deprecated function: "
+        "This function seems to be never called, and has been renamed with __legacy suffix (2018-02-07)\n"
+        "If nobody complains, remove this function in the next release, else, deals with its bad args/kwargs signature",
+        DeprecationWarning)
+
     mkdir(os.path.dirname(os.path.abspath(out_path)), recursive=True)
     with open(in_path, "r") as in_file:
         in_content = in_file.read()
