@@ -59,7 +59,6 @@ class BuildJob(object):
                 self.deps.remove(job)
             except ValueError:
                 ui.debug(ui.red, "Job not in the deps list!", self.deps, job)
-                pass
 
 
 class ParallelBuilder(object):

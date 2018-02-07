@@ -55,7 +55,6 @@ class Validator(object):
         ui.info(ui.yellow, "\nPackage warnings:")
         for warning in self.warnings:
             ui.info(ui.bold, "\t%s" % warning)
-        pass
 
     def _load_manifest(self, manifest_path):
         tree = qisys.qixml.read(manifest_path)
