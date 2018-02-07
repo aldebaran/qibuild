@@ -58,9 +58,8 @@ def ask_ide():
         ides.append("Visual Studio")
     if sys.platform == "darwin":
         ides.append("Xcode")
-    ide = qisys.interact.ask_choice(ides,
-                                    "Please choose an IDE")
-    if ide is "None":
+    ide = qisys.interact.ask_choice(ides, "Please choose an IDE")
+    if ide == "None":
         return None
     return ide
 

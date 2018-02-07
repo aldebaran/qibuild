@@ -87,7 +87,7 @@ class Validator(object):
             return
 
         for requirement in robot_requirements:
-            if requirement.get('model', '') is '':
+            if requirement.get('model', '') == '':
                 self._add_error("A robot requirement has no model defined.")
 
     def _validate_naoqi_requirements(self):
@@ -98,7 +98,7 @@ class Validator(object):
             return
 
         for requirement in naoqi_requirements:
-            if requirement.get('minVersion', '') is '':
+            if requirement.get('minVersion', '') == '':
                 self._add_error("A NAOqi requirement has no "
                                 "minimum version defined.")
 
