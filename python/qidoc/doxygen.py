@@ -43,7 +43,7 @@ def read_doxyfile(doxyfile):
                 raise Exception(mess)
             res[key.strip()] += " " + value.strip()
         elif "=" in line:
-            key,  value = line.split("=", 1)
+            key, value = line.split("=", 1)
             key = key.strip()
             value = value.strip()
             res[key] = value

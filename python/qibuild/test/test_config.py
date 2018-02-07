@@ -424,7 +424,7 @@ class QiBuildConfig(unittest.TestCase):
   </config>
 </qibuild>
 """  # noqa
-        qibuild_cfg = cfg_from_string(xml,  user_config='win32-vs2010')
+        qibuild_cfg = cfg_from_string(xml, user_config='win32-vs2010')
         self.assertEquals(qibuild_cfg.cmake.generator, "NMake Makefiles")
 
 

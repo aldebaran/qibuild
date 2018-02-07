@@ -14,7 +14,7 @@ import qisrc.git
 def configure_parser(parser):
     """Configure parser for this action """
     qisys.parsers.worktree_parser(parser)
-    parser.add_argument("path_or_url",  metavar="[URL|PATH]",
+    parser.add_argument("path_or_url", metavar="[URL|PATH]",
                         help="git url or path of project")
     group = parser.add_argument_group("git options")
     group.add_argument("--src", help="Where to clone the project. "

@@ -24,7 +24,7 @@ class Profile:
 
     def elem(self):
         elem = qisys.qixml.etree.Element("profile")
-        elem.set("name",  self.name)
+        elem.set("name", self.name)
         if self.cmake_flags:
             cmake_elem = qisys.qixml.etree.Element("cmake")
             flags_elem = qisys.qixml.etree.Element("flags")

@@ -42,6 +42,6 @@ def run(projects, binary, bin_args, env=None, exec_=True):
     cmd = [bin_path] + bin_args
     if exec_:
         ui.debug("exec", cmd)
-        os.execve(bin_path,  cmd, env)
+        os.execve(bin_path, cmd, env)
     else:
         qisys.command.call(cmd, env=env)

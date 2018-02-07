@@ -47,7 +47,7 @@ def test_using_dash_y(qisrc_action, git_server):
     foo_proj = git_worktree.get_git_project("foo")
     foo_git = TestGit(foo_proj.path)
     foo_git.commit_file("a.txt", "a")
-    qisrc_action("push",  "--project", "foo", "-y")
+    qisrc_action("push", "--project", "foo", "-y")
     _, sha1 = foo_git.call("log", "-1", "--pretty=%H", raises=False)
     (_, remote) = foo_git.call("ls-remote", "origin", "master", raises=False)
     assert remote == "%s\trefs/heads/master" % sha1

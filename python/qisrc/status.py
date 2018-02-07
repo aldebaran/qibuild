@@ -192,7 +192,7 @@ def print_incorrect_projs(projects, max_len):
                 "Manifest")
         for project in incorrect_projs:
             ui.info(ui.green, " *", ui.reset,
-                    ui.blue,  project.project.src.ljust(max_len + 3),
+                    ui.blue, project.project.src.ljust(max_len + 3),
                     ui.green, project.current_branch.ljust(max_branch_len + 3),
                     ui.green, project.project.default_branch.name)
 

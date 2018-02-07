@@ -13,21 +13,21 @@ from qibuild.find import binary_name
 
 
 def test_library_name():
-    assert library_name("foo", debug=False, shared=True,  os_name="Windows") == "foo.dll"
-    assert library_name("foo", debug=True,  shared=True,  os_name="Windows") == "foo_d.dll"
+    assert library_name("foo", debug=False, shared=True, os_name="Windows") == "foo.dll"
+    assert library_name("foo", debug=True, shared=True, os_name="Windows") == "foo_d.dll"
     assert library_name("foo", debug=False, shared=False, os_name="Windows") == "foo.lib"
-    assert library_name("foo", debug=True,  shared=False, os_name="Windows") == "foo_d.lib"
+    assert library_name("foo", debug=True, shared=False, os_name="Windows") == "foo_d.lib"
 
-    assert library_name("foo", shared=True,  os_name="Linux") == "libfoo.so"
+    assert library_name("foo", shared=True, os_name="Linux") == "libfoo.so"
     assert library_name("foo", shared=False, os_name="Linux") == "libfoo.a"
 
-    assert library_name("foo", shared=True,  os_name="Darwin") == "libfoo.dylib"
+    assert library_name("foo", shared=True, os_name="Darwin") == "libfoo.dylib"
     assert library_name("foo", shared=False, os_name="Darwin") == "libfoo.a"
 
 
 def test_binary_name():
     assert binary_name("foo", debug=False, os_name="Windows") == "foo.exe"
-    assert binary_name("foo", debug=True,  os_name="Windows") == "foo_d.exe"
+    assert binary_name("foo", debug=True, os_name="Windows") == "foo_d.exe"
 
     assert binary_name("foo", os_name="Darwin") == "foo"
     assert binary_name("foo", os_name="Linux") == "foo"

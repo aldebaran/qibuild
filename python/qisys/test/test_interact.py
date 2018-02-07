@@ -46,7 +46,7 @@ def test_ask_string():
 
 def test_ask_program(record_messages):
     with mock.patch('__builtin__.raw_input') as m:
-        m.side_effect = ["doesnotexists", "y",  __file__, "y", sys.executable]
+        m.side_effect = ["doesnotexists", "y", __file__, "y", sys.executable]
         res = qisys.interact.ask_program("path to program")
         assert res == qisys.sh.to_native_path(sys.executable)
         assert record_messages.find("does not exist")

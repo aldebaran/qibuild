@@ -138,8 +138,7 @@ def setup_project(project):
     return True
 
 
-def push(project,  branch, bypass_review=False, dry_run=False,
-         reviewers=None, topic=None):
+def push(project, branch, bypass_review=False, dry_run=False, reviewers=None, topic=None):
     """ Push the changes for review.
 
     Unless review is False, in this case, simply update

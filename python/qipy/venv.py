@@ -11,7 +11,7 @@ from qisys import ui
 import qisys.command
 
 
-def configure_virtualenv(config, python_worktree,  build_worktree=None,
+def configure_virtualenv(config, python_worktree, build_worktree=None,
                          remote_packages=None, site_packages=True,
                          python_executable=None, env=None):
     """ Main entry point. Called by ``qipy bootstrap``

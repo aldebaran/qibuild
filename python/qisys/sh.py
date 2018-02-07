@@ -292,7 +292,7 @@ def install(src, dest, filter_fun=None, quiet=False):
         if src == dest:
             raise Exception("source and destination are the same directory")
         for (root, dirs, files) in os.walk(src):
-            dirs = _handle_dirs(src, dest, root, dirs,  filter_fun, quiet)
+            dirs = _handle_dirs(src, dest, root, dirs, filter_fun, quiet)
             files = _handle_files(src, dest, root, files, filter_fun, quiet)
             installed.extend(files)
     else:

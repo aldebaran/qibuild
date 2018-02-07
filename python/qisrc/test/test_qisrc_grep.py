@@ -51,5 +51,5 @@ def test_using_git_grep_options(qisrc_action, record_messages):
 
 def test_worktree_paths(qisrc_action, record_messages):
     setup_projects(qisrc_action)
-    rc = qisrc_action("grep", "--path", "worktree",  "--", "-i", "-l", "Spam", retcode=True)
+    rc = qisrc_action("grep", "--path", "worktree", "--", "-i", "-l", "Spam", retcode=True)
     assert record_messages.find("foo/a.txt")

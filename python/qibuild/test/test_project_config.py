@@ -45,7 +45,7 @@ class ProjectConfigTestClass(unittest.TestCase):
 </project>
 """
         project_cfg = cfg_from_string(xml)
-        self.assertEqual(project_cfg.build_depends,  set(["bar", "baz", "eggs"]))
+        self.assertEqual(project_cfg.build_depends, set(["bar", "baz", "eggs"]))
         self.assertEqual(project_cfg.run_depends, set(["bar", "baz", "spam"]))
         self.assertEqual(project_cfg.test_depends, set(["gtest"]))
 

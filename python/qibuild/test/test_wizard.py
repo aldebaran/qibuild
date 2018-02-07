@@ -138,7 +138,7 @@ class ConfigWizardTestCase(unittest.TestCase):
         self.assertEqual(qtcreator.name, 'QtCreator')
         self.assertEqual(qtcreator.path, '/home/john/QtSDK/bin/qtcreator')
         defaults_env_path = qibuild_cfg.defaults.env.path
-        self.assertEqual(defaults_env_path,  "/home/john/.local/cmake/bin")
+        self.assertEqual(defaults_env_path, "/home/john/.local/cmake/bin")
 
     def test_qtcreator_in_conf(self):
         if sys.platform == "darwin":

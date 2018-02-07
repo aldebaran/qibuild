@@ -138,7 +138,7 @@ def install_cross(qibuild_action, tmpdir, cmake_generator="Unix Makefiles"):
                    "-G", cmake_generator,
                    "-DCMAKE_TOOLCHAIN_FILE=%s" % toolchain_file)
     qibuild_action("make", "cross",)
-    qibuild_action("install", "cross",  tmpdir.strpath)
+    qibuild_action("install", "cross", tmpdir.strpath)
 
 
 def test_running_tests_after_install(qibuild_action, tmpdir):

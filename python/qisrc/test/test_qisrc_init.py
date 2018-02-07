@@ -90,7 +90,7 @@ def test_reconfigure(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     git_server.create_group("mygroup", ["a", "b"])
     git_server.create_repo("c")
-    qisrc_action("init",  manifest_url)
+    qisrc_action("init", manifest_url)
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 3
     qisrc_action("init", manifest_url, "-g", "mygroup")

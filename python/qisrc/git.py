@@ -288,7 +288,7 @@ class Git(object):
         in_conf = self.get_config("remote.%s.url" % name)
         if in_conf and in_conf == url:
             return
-        self.remote("rm",  name, quiet=True, raises=False)
+        self.remote("rm", name, quiet=True, raises=False)
         self.remote("add", name, url, quiet=True)
 
     def branch_exists(self, name):

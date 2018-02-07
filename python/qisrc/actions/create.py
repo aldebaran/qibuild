@@ -70,7 +70,7 @@ def do(args):
         qisys.command.call(["git", "add", "."], cwd=output_dir)
         qisys.command.call(["git", "commit", "-m", "initial commit"], cwd=output_dir)
 
-    ui.info(ui.green, "New project initialized in", ui.bold,  output_dir)
+    ui.info(ui.green, "New project initialized in", ui.bold, output_dir)
     if worktree:
         worktree.add_project(output_dir)
         return worktree.get_project(output_dir)
