@@ -93,7 +93,7 @@ def test_simple_xml_parser():
 />
 """)
 
-    class Foo:
+    class Foo(object):
         def __init__(self):
             self.bar = None
             self.spam = None
@@ -115,7 +115,7 @@ def test_simple_xml_parser():
 def test_required_attr():
     tree = etree.fromstring("<foo />")
 
-    class Foo:
+    class Foo(object):
         pass
 
     class FooParser(qisys.qixml.XMLParser):
@@ -150,11 +150,11 @@ def test_complex_xml_parser():
             parser = BarParser(self.target.bar)
             parser.parse(elem)
 
-    class Bar:
+    class Bar(object):
         def __init__(self):
             self.baz = None
 
-    class Foo:
+    class Foo(object):
         def __init__(self):
             self.bar = Bar()
             self.spam = None
@@ -176,7 +176,7 @@ def test_complex_xml_parser():
 
 
 def test_list_attr():
-    class Foo:
+    class Foo(object):
         def __init__(self):
             self.names = list()
 
@@ -201,7 +201,7 @@ def test_list_attr():
 
 
 def test_write_bool_attr():
-    class Foo:
+    class Foo(object):
         def __init__(self):
             self.bar = False
 
@@ -225,7 +225,7 @@ def test_sanitize_xml():
 
 
 def test_ignore_attributes():
-    class Foo:
+    class Foo(object):
         def __init__(self):
             self.bar = "bar"
             self.baz = "baz"

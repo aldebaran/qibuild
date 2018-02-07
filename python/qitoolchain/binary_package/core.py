@@ -30,7 +30,7 @@ class BinaryPackageException(Exception):
         return message
 
 
-class BinaryPackage:
+class BinaryPackage(object):
     """ A binary package is the endpoint of a binary package file provided by
     most of the Linux distribution.
 

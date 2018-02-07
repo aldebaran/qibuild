@@ -94,7 +94,7 @@ def open_remote_location(location, timeout=10):
         if root:
             ftp.cwd(root)
 
-        class Transfer:
+        class Transfer(object):
             pass
         Transfer.data = ""
         # url_split.path has a trailing "/":
@@ -168,7 +168,7 @@ def download(url, output_dir, output_name=None,
             if root:
                 ftp.cwd(root)
 
-            class Tranfert:
+            class Tranfert(object):
                 pass
             # Set binary mode
             ftp.voidcmd("TYPE I")

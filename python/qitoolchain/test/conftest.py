@@ -14,7 +14,7 @@ import qitoolchain.database
 import qitoolchain.toolchain
 
 
-class Toolchains:
+class Toolchains(object):
     """ A class to help qitoolchain testing """
 
     def __init__(self):
@@ -51,7 +51,7 @@ class Toolchains:
         return package
 
 
-class TestFeed:
+class TestFeed(object):
     def __init__(self, tmp):
         self.tmp = tmp
         self.packages_path = tmp.ensure("packages", dir=True)

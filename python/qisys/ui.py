@@ -34,7 +34,7 @@ if os.name == 'nt':
 #  qisys.ui.msg(qisys.ui.bold, "This is bold", qisys.ui.reset)
 
 
-class _Color:
+class _Color(object):
     def __init__(self, code, modifier=None):
         self.code = '\033[%d' % code
         if modifier is not None:
@@ -292,7 +292,7 @@ def tabs(num):
     return "  " * num
 
 
-class timer:
+class timer(object):
     """ To be used as a decorator,
     or as a with statement:
 

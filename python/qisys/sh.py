@@ -583,7 +583,7 @@ def is_empty(path):
     return os.listdir(path) == list()
 
 
-class TempDir:
+class TempDir(object):
     """This is a nice wrapper around tempfile module.
 
     Usage::

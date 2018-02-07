@@ -81,7 +81,7 @@ def open_git_feed(toolchain_name, feed_url, name=None, branch="master", first_pa
     return feed_path
 
 
-class ToolchainFeedParser:
+class ToolchainFeedParser(object):
     """ A class to handle feed parsing
 
     """

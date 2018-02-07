@@ -11,7 +11,7 @@ import qisys.command
 import qipy.venv
 
 
-class PythonTestCollector:
+class PythonTestCollector(object):
     def __init__(self, python_worktree):
         self.python_worktree = python_worktree
         self.root = python_worktree.worktree.root

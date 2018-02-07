@@ -11,7 +11,7 @@ import os
 import qisys.qixml
 
 
-class Profile:
+class Profile(object):
     """ A profile is just a set of CMake flags for now.
     If has a name you can specify when building using
     ``qibuild configure --profile <name>``
