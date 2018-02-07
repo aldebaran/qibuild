@@ -58,7 +58,8 @@ class TestSuiteRunner(object):
     @patterns.setter
     def patterns(self, value):
         if value:
-            [re.compile(x) for x in value]  # just checking regexps are valid
+            # just checking regexps are valid
+            [re.compile(x) for x in value]  # pylint: disable=expression-not-assigned
         self._patterns = value
 
     @property
@@ -68,7 +69,8 @@ class TestSuiteRunner(object):
     @excludes.setter
     def excludes(self, value):
         if value:
-            [re.compile(x) for x in value]  # just checking regexps are valid
+            # just checking regexps are valid
+            [re.compile(x) for x in value]  # pylint: disable=expression-not-assigned
         self._excludes = value
 
     @property

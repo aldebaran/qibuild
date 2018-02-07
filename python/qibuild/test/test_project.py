@@ -33,7 +33,7 @@ def test_parse_num_jobs_unsupported_generator(build_worktree):
     hello = build_worktree.create_project("hello")
     # pylint: disable-msg=E1101
     with pytest.raises(Exception) as e:
-        hello.parse_num_jobs(3, cmake_generator="NMake Makefiles") == list()
+        assert hello.parse_num_jobs(3, cmake_generator="NMake Makefiles") == list()
     assert "-j is not supported for NMake Makefiles" in str(e.value)
 
 
