@@ -178,6 +178,19 @@ class WorkTreeSyncer(object):
         self.dump_manifest_config()
         return res
 
+    def _read_import_manifest(self, parent_manifest):
+        """ Read and parse imported manifest in parent_manifest recursively """
+        # git clone imported manifest repository if any
+        # parse all imported manifest and repo in it to parent repo list
+        for import_manifest in parent_manifest.import_manifest:
+            self._import_manifest(import_manifest)
+            manifest_xml = os.path.join(import_manifest.repo, "manifest.xml")
+            import_manifest = qisrc.manifest.Manifest(manifest_xml,
+                                                      review=None)
+            self._read_import_manifest(import_manifest)
+            parent_manifest.repos += import_manifest.repos
+            parent_manifest.groups.groups.update(import_manifest.groups.groups)
+
     def read_remote_manifest(self, manifest_xml=None, warn_if_missing_group=True):
         """ Read the manifest file in .qi/manifests/<name>/manifest.xml
         using the settings in .qi/manifest.xml (to know the name and the groups
@@ -186,6 +199,10 @@ class WorkTreeSyncer(object):
         if not manifest_xml:
             manifest_xml = os.path.join(self.manifest_repo, "manifest.xml")
         remote_manifest = qisrc.manifest.Manifest(manifest_xml, review=self.manifest.review)
+
+        # parse imported manifest recursively if any
+        self._read_import_manifest(remote_manifest)
+
         groups = self.manifest.groups
         # if self.manifest.groups is empty but there is a default
         # group in the manifest, we need to set self.manifest.groups
@@ -229,6 +246,27 @@ class WorkTreeSyncer(object):
                 old_repos.append(old_repo)
         return old_repos
 
+    def _import_manifest(self, import_manifest=None):
+        if import_manifest.project is None:
+            return
+        repo_name = os.path.split(import_manifest.project)[1].replace(".git", "")
+        repo = os.path.join(self.git_worktree.root, ".qi", "manifests", repo_name)
+        import_manifest.repo = repo
+        if not os.path.exists(repo):
+            qisys.sh.mkdir(repo, recursive=True)
+            git = qisrc.git.Git(repo)
+            git.init()
+            manifest_xml = os.path.join(repo, "manifest.xml")
+            with open(manifest_xml, "w") as fp:
+                fp.write("<manifest />")
+            git.add(".")
+            git.commit("-m", "initial commit")
+        if import_manifest.branch:
+            import_manifest.default_branch = import_manifest.branch
+        else:
+            import_manifest.default_branch = self.manifest.branch
+        self._sync_git(repo, import_manifest.remotes[0].url, import_manifest.default_branch, import_manifest.fixed_ref)
+
     def _sync_manifest(self):
         """ Update the local manifest clone with the remote """
         if not self.manifest.url:
@@ -237,17 +275,20 @@ No manifest set for worktree in {root}
 Please run `qisrc init MANIFEST_URL`
 """
             raise Exception(mess.format(root=self.git_worktree.root))
-        git = qisrc.git.Git(self.manifest_repo)
-        git.set_remote("origin", self.manifest.url)
-        if git.get_current_branch() != self.manifest.branch:
-            git.checkout("-B", self.manifest.branch)
+        self._sync_git(self.manifest_repo, self.manifest.url, self.manifest.branch, self.manifest.ref)
+
+    def _sync_git(self, repo, url, branch, ref):
+        git = qisrc.git.Git(repo)
+        git.set_remote("origin", url)
+        if git.get_current_branch() != branch:
+            git.checkout("-B", branch)
         with git.transaction() as transaction:
             git.fetch("origin")
-            if self.manifest.ref:
-                to_reset = self.manifest.ref
+            if ref:
+                to_reset = ref
                 git.reset("--hard", to_reset)
             else:
-                git.reset("--hard", "origin/%s" % self.manifest.branch)
+                git.reset("--hard", "origin/%s" % branch)
         if not transaction.ok:
             raise Exception("Update failed\n" + transaction.output)
 
@@ -409,7 +450,10 @@ def compute_repo_diff(old_repos, new_repos):
             if old_repo.src == new_repo.src:
                 if new_repo.remotes == old_repo.remotes:
                     if new_repo.default_branch == old_repo.default_branch:
-                        pass
+                        if new_repo.fixed_ref == old_repo.fixed_ref:
+                            pass
+                        else:
+                            to_update.append((old_repo, new_repo))
                     else:
                         to_update.append((old_repo, new_repo))
                 else:

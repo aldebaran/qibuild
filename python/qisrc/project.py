@@ -19,6 +19,8 @@ class GitProject(object):
         self.branches = list()
         self.remotes = list()
         self.review = False
+        self.fixed_ref = None
+        self.switch_ref_to_branch = False
 
     def load_xml(self, xml_elem):
         parser = GitProjectParser(self)
@@ -161,6 +163,15 @@ class GitProject(object):
             # does not try to push to gerrit
             self.review = False
 
+        if repo.fixed_ref:
+            ui.warning("Now using fixed ref:", repo.fixed_ref)
+            self.fixed_ref = repo.fixed_ref
+        else:
+            if self.fixed_ref:
+                ui.warning("Now instead of fixed ref using branch:", repo.default_branch)
+                self.switch_ref_to_branch = True
+
+
     def sync(self, rebase_devel=False, **kwargs):
         """ Synchronize remote changes with the underlying git repository
         Calls :py:meth:`qisrc.git.Git.sync_branch`
@@ -179,6 +190,9 @@ class GitProject(object):
         if rc != 0:
             return False, "fetch failed\n" + out
 
+        if self.fixed_ref:
+            return self.safe_reset_ref(self.fixed_ref)
+
         current_branch = git.get_current_branch()
         if not current_branch:
             return None, "Not on any branch"
@@ -192,6 +206,48 @@ class GitProject(object):
 
         # Here current_branch == branch.name
         return git.sync_branch(branch, fetch_first=False)
+
+    def safe_reset_ref(self, ref):
+        """ Read a fixed ref from the remote config.
+        Make sure to not discard any local changes
+
+        """
+        git = qisrc.git.Git(self.path)
+        ok, mess = git.require_clean_worktree()
+        if not ok:
+            return None, "Skipped: " + mess
+        ok, mess = qisrc.reset.clever_reset_ref(self, ref, raises=False)
+        return ok, mess
+
+    def safe_reset_to_branch(self, ref, branch):
+        """ Switch from a ref to a branch
+        Make sure to not discard any local changes
+
+        """
+        git = qisrc.git.Git(self.path)
+
+        rc, out = git.fetch(raises=False)
+        if rc != 0:
+            return False, "fetch failed\n" + out
+
+        ok, mess = git.require_clean_worktree()
+        if not ok:
+            return None, "Skipped: " + mess
+
+        # switch to new branch
+        branch_remote = "%s/%s" % (self.default_remote.name, branch)
+
+        rc, out = git.call("show-ref", branch_remote, raises=False)
+        if rc == 0:
+            checkout_args = ["-B", branch, "--track", branch_remote]
+        else:
+            checkout_args = ["-B", branch]
+
+        ok, mess = git.checkout(*checkout_args, raises=False)
+        if ok != 0:
+            return False, "Checkout failed " + mess
+
+        return True, ""
 
     def reset(self):
         """ Same as sync, but discard any local changes
@@ -238,6 +294,18 @@ class GitProject(object):
             if branch.tracks:
                 git.set_tracking_branch(branch.name, branch.tracks,
                                         remote_branch=branch.remote_branch)
+        if self.switch_ref_to_branch:
+            ok, mess = self.safe_reset_to_branch(self.fixed_ref, self.default_branch.name)
+            if not ok:
+                ui.error("%s\n %s" % (self.name, mess))
+            else:
+                self.fixed_ref = None
+                self.switch_ref_to_branch = False
+
+        if self.fixed_ref:
+            ok, mess = self.safe_reset_ref(self.fixed_ref)
+            if not ok:
+                ui.error("%s\n %s" % (self.name, mess))
 
     def __deepcopy__(self, memo):
         shallow_copy = copy.copy(self)

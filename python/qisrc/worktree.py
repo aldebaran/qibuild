@@ -192,6 +192,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
 
     def _clone_missing(self, git_project, repo):
         branch = repo.default_branch
+        fixed_ref = repo.fixed_ref
         clone_url = repo.clone_url
         qisys.sh.mkdir(git_project.path, recursive=True)
         git = qisrc.git.Git(git_project.path)
@@ -200,8 +201,11 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
             git.init()
             git.remote("add", remote_name, clone_url)
             git.fetch(remote_name, "--quiet")
-            git.checkout("-b", branch, "%s/%s" % (remote_name, branch))
-        except Exception:
+            if branch:
+                git.checkout("-b", branch, "%s/%s" % (remote_name, branch))
+            if fixed_ref:
+                git.checkout("-q", fixed_ref)
+        except:
             ui.error("Cloning repo failed")
             if git.is_empty():
                 qisys.sh.rm(git_project.path)
@@ -259,6 +263,8 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         to_checkout = list()
         for project in self.git_projects:
             if project.default_branch is None:
+                continue
+            if project.fixed_ref:
                 continue
             branch_name = project.default_branch.name
             git = qisrc.git.Git(project.path)

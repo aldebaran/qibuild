@@ -91,7 +91,7 @@ def do(args):
                 ui.info(git_project.src, ui.red, "  [failed]")
                 failed.append((git_project.src, out))
             if out:
-                print ui.indent(out + "\n\n", num=2)
+                ui.info(ui.indent(out + "\n\n", num=2))
 
             i[0] += 1
 

@@ -49,6 +49,7 @@ class Manifest(object):
         project_names = list()
         self.repos = list()
         self.remotes = list()
+        self.import_manifest = list()
         self.groups = qisrc.groups.Groups()
         root = qisys.qixml.read(self.manifest_xml).getroot()
         parser = ManifestParser(self)
@@ -74,6 +75,9 @@ class Manifest(object):
 Only one remote can be configured with review="true", found {0}
 """.format(len(review_remotes))
             raise ManifestError(mess)
+
+        for import_manifest in self.import_manifest:
+            self.set_remote(import_manifest, import_manifest.default_remote_name)
 
         srcs = dict()
         for repo in self.repos:
@@ -103,6 +107,8 @@ Found two projects sharing the same sources:
             return
         remote = copy.copy(matching_remote)
         remote.url = matching_remote.prefix + repo.project
+        # Default branch can be set on the remote, or even
+        # on the manifest itself
         if repo.default_branch is None:
             if self.default_branch:
                 repo.default_branch = self.default_branch
@@ -110,6 +116,10 @@ Found two projects sharing the same sources:
                 repo.default_branch = remote.default_branch
         if remote.name == repo.default_remote_name:
             remote.default = True
+        # Make sure default_branch is None, even if it was
+        # set from the remote or the manifest
+        if repo.fixed_ref:
+            repo.default_branch = None
         repo.remotes.append(remote)
 
     def dump(self):
@@ -228,6 +238,7 @@ class RepoConfig(object):
         self.src = None
         self.project = None
         self.default_branch = None
+        self.fixed_ref = None
         self.default_remote_name = None
         self.remotes = list()
         self.remote_names = None
@@ -265,8 +276,28 @@ class RepoConfig(object):
         if self.default_branch:
             res += " default: %s" % self.default_branch
         if self.review:
-
             res += " (review)"
+        if self.fixed_ref:
+            res += " on %s" % self.fixed_ref
+        res += ">"
+        return res
+
+class ImportManifest(object):
+    def __init__(self):
+        self.project = None
+        self.default_branch = None
+        self.branch = None
+        self.fixed_ref = None
+        self.default_remote_name = None
+        self.remotes = list()
+        self.remote_names = None
+
+    def __repr__(self):
+        res = "<Import manifest %s" % self.project
+        if self.branch:
+            res += " branch: %s" % self.branch
+        if self.fixed_ref:
+            res += " on %s" % self.fixed_ref
         res += ">"
         return res
 
@@ -294,6 +325,12 @@ class ManifestParser(qisys.qixml.XMLParser):
         parser.parse(elem)
         self.target.remotes.append(remote)
 
+    def _parse_import(self, elem):
+        import_manifest = ImportManifest()
+        parser = ImportManifestParser(import_manifest)
+        parser.parse(elem)
+        self.target.import_manifest.append(import_manifest)
+
     def _parse_groups(self, elem):
         parser = qisrc.groups.GroupsParser(self.target.groups)
         parser.parse(elem)
@@ -316,6 +353,43 @@ class ManifestParser(qisys.qixml.XMLParser):
     def _write_groups(self, elem):
         parser = qisrc.groups.GroupsParser(self.target.groups)
         elem.append(parser.xml_elem())
+
+
+class ImportManifestParser(qisys.qixml.XMLParser):
+    def __init__(self, target):
+        super(ImportManifestParser, self).__init__(target)
+        self._ignore = ["review_remote",
+                        "default_remote_name",
+                        "clone_url",
+                        "review",
+                        "urls",
+                        "remotes"]
+        self._required = ["manifest"]
+
+    # the 'remote' XML attribute matches an attribute named
+    # 'remote_name' in the RepoConfig class
+    def _parse_attributes(self):
+        self.target.project = self._root.get("manifest")
+        if not self.target.project:
+            raise ManifestError("Missing 'manifest' attribute")
+
+        self.target.branch = self._root.get("branch")
+        self.target.fixed_ref = self._root.get("ref")
+        if self.target.fixed_ref and self.target.branch:
+            mess = "Error when parsing project %s\n" % self.target.project
+            mess += "'branch' and 'ref' are mutually exclusive"
+            raise ManifestError(mess)
+
+        remote_names = self._root.get("remotes")
+        if remote_names is None:
+            raise ManifestError("Missing 'remotes' attribute")
+        if remote_names == "":
+            raise ManifestError("Empty 'remotes' attribute")
+        remote_names = remote_names.split()
+        self.target.remote_names = remote_names
+        self.target.default_remote_name = self._root.get("default_remote")
+        if not self.target.default_remote_name:
+            self.target.default_remote_name = remote_names[0]
 
 
 class RepoConfigParser(qisys.qixml.XMLParser):
@@ -341,6 +415,11 @@ class RepoConfigParser(qisys.qixml.XMLParser):
         self.target.src = src
 
         self.target.default_branch = self._root.get("branch")
+        self.target.fixed_ref = self._root.get("ref")
+        if self.target.fixed_ref and self.target.default_branch:
+            mess = "Error when parsing project %s\n" % self.target.project
+            mess += "'branch' and 'ref' are mutually exclusive"
+            raise ManifestError(mess)
         remote_names = self._root.get("remotes")
         if remote_names is None:
             raise ManifestError("Missing 'remotes' attribute")
@@ -363,5 +442,10 @@ class RepoConfigParser(qisys.qixml.XMLParser):
     def _write_remote_names(self, elem):
         elem.set("remotes", " ".join(self.target.remote_names))
 
+    def _write_fixed_ref(self, elem):
+        if self.target.fixed_ref:
+            elem.set("ref", self.target.fixed_ref)
+
     def _write_default_branch(self, elem):
-        elem.set("branch", self.target.default_branch)
+        if self.target.default_branch:
+            elem.set("branch", self.target.default_branch)
