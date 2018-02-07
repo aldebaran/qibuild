@@ -640,39 +640,24 @@ def is_runtime(filename):
     # Maybe a user-generated MANIFEST at the root of the package path
     # would be better?
 
-    basename = os.path.basename(filename)
     basedir = filename.split(os.path.sep)[0]
-    if filename.startswith("bin"):
-        if sys.platform.startswith("win"):
-            if filename.endswith(".exe"):
-                return True
-            if filename.endswith(".dll"):
-                return True
-            else:
-                return False
-        else:
-            return True
+    if filename.startswith("bin") and sys.platform.startswith("win"):
+        return filename.endswith(".exe") or filename.endswith(".dll")
     if filename.startswith("lib"):
-        if filename.endswith((".a", ".lib", ".la", ".pc")):
-            return False
-        return True
-    if filename.startswith(os.path.join("share", "cmake")):
+        is_lib_prefixed_runtime = not filename.endswith((".a", ".lib", ".la", ".pc"))
+        return is_lib_prefixed_runtime
+    if filename.startswith(os.path.join("share", "cmake")) or \
+            filename.startswith(os.path.join("share", "man")):
         return False
-    if filename.startswith(os.path.join("share", "man")):
-        return False
-    if basedir == "share":
-        return True
     if basedir == "include":
-        # exception for python:
-        if filename.endswith("pyconfig.h"):
-            return True
-        else:
-            return False
-    if basedir.endswith(".framework"):
-        return True
+        # Usually runtime dir names aren't include, but there is an exception for python:
+        return filename.endswith("pyconfig.h")
 
-    # True by default: better have too much stuff than
-    # not enough
+    # True by default: better have too much stuff than not enough
+    # That includes these known cases:
+    # * filename.startswith("bin") but not sys.platform.startswith("win")
+    # * basedir == "share"
+    # * basedir.endswith(".framework")
     return True
 
 

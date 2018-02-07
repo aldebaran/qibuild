@@ -31,7 +31,7 @@ class InvalidAction(Exception):
         return message
 
 
-def parse_args_for_help(args):
+def parse_args_for_help(args):  # pylint: disable=too-many-return-statements
     """Parse a command line for help usage.
 
     Returns a tuple:
@@ -66,14 +66,14 @@ def parse_args_for_help(args):
         if is_help(args[0]):
             return True, None
         else:
-            return(False, None)
+            return False, None
 
     if len(args) == 2:
         if is_help(args[0]):
             return True, args[1]
         if is_help(args[1]):
             return True, args[0]
-        return(False, None)
+        return False, None
 
 
 def run_action(module_name, args=None, forward_args=None):

@@ -99,10 +99,11 @@ def get_forked_projects(git_projects, upstream_projects, branch):
     return res
 
 
-def rebase_project(git_project, upstream_project):
+def rebase_project(git_project, upstream_project):  # pylint: disable=too-many-return-statements
     ok = check_local_branch(git_project)
     if not ok:
         return False
+
     git = qisrc.git.Git(git_project.path)
     local_branch = git_project.default_branch.name
     upstream_branch = upstream_project.default_branch.name
@@ -122,6 +123,7 @@ def rebase_project(git_project, upstream_project):
             return False
         ui.info(ui.green, "[OK]", ui.reset, "fast-forwarded")
         return True
+
     git.call("tag", "-f", "before-rebase", raises=False)  # suppress output
     rc, out = git.call("rebase", upstream_ref, raises=False)
     if rc == 0:

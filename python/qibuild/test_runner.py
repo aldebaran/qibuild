@@ -335,7 +335,7 @@ class ProcessTestLauncher(qitest.runner.TestLauncher):
 
         qisys.qixml.write(root, out_xml, encoding=encoding)
 
-    def get_message(self, process, timeout=None):
+    def get_message(self, process, timeout=None):  # pylint: disable=too-many-return-statements
         """ Human readable string describing the state of the process """
         if process.return_type == qisys.command.Process.OK:
             return "[OK]"
