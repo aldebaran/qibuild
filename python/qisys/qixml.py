@@ -19,7 +19,9 @@ def indent(elem, level=0):
     """
     # Taken from http://infix.se/2007/02/06/gentlemen-indent-your-xml
     i = "\n" + level*"  "
-    if len(elem):  # Can't use "if elem": etree advises against it for future compat
+
+    # Can't use "if elem": etree advises against it for future compat
+    if len(elem):  # pylint: disable=len-as-condition
         if not elem.text or not elem.text.strip():
             elem.text = i + "  "
         for e in elem:

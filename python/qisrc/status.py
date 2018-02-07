@@ -122,8 +122,7 @@ def _set_status(git, state_project, untracked=False):
     if not state_project.sync_and_clean:
         out = git.get_status(untracked)
         if out is not None:
-            state_project.status = [x for x in out.splitlines() if
-                                    len(x.strip()) > 0]
+            state_project.status = [x for x in out.splitlines() if x.strip()]
 
 
 def _print_behind_ahead(behind, ahead):

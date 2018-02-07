@@ -9,7 +9,7 @@ from qisys.test.conftest import skip_on_win
 
 
 def test_worktree(worktree):
-    assert len(worktree.projects) == 0
+    assert not worktree.projects
     assert os.path.exists(worktree.worktree_xml)
 
 
