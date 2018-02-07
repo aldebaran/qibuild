@@ -84,7 +84,7 @@ class GentooPackage(GentooNoPortagePackage):
                 with open(dep_path, 'r') as fdep:
                     dependency[dep] = fdep.read().strip().split()
         dependency['all'] = list()
-        for dep_list in _DEPENDENCY.keys():
+        for dep_list in _DEPENDENCY:
             dependency['all'].extend(dependency[dep_list])
         for dep, dep_list in dependency.iteritems():
             dependency[dep] = list(set(dep_list))

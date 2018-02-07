@@ -593,7 +593,7 @@ The following tools were not found: {missing}\
                 ret['known_configs'].append(bdir)
             elif bdir.startswith("build-"):
                 ret['unknown_configs'].append(bdir)
-        for k in ret.keys():
+        for k in ret:
             if build_prefix:
                 ret[k] = [os.path.join(build_prefix, x, self.name) for x in ret[k]]
             else:
