@@ -99,7 +99,7 @@ The following generators are available on this platform:
         res = qibuild.cmake.get_known_cmake_generators()
         call_args_list = mock_popen.call_args_list
         assert "cmake" in call_args_list[0][0][0][0]
-        assert "--help" == call_args_list[0][0][0][1]
+        assert call_args_list[0][0][0][1] == "--help"
         assert mock_process.communicate.call_args_list == [mock.call()]
         assert res == ["Unix Makefiles", "Ninja", "Sublime Text 2 - Unix Makefiles"]
 

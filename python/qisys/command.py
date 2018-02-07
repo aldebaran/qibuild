@@ -61,6 +61,7 @@ class Process(object):
         self.exception = None
         self.return_type = Process.FAILED
         self.capture = capture
+        self._thread = None
 
     def run(self, timeout=None):
         def target():
@@ -109,8 +110,9 @@ class Process(object):
 
         self._thread = threading.Thread(target=target)
         self._thread.start()
-        while ((timeout is None or 0 < timeout) and self._thread.is_alive() and
-               not SIGINT_EVENT.is_set()):
+        while ((timeout is None or timeout > 0)
+               and self._thread.is_alive()
+               and not SIGINT_EVENT.is_set()):
             self._thread.join(1)
             if timeout is not None:
                 timeout -= 1
