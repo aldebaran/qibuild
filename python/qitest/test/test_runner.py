@@ -8,7 +8,7 @@ import qitest.runner
 
 
 class DummyTestRunner(qitest.runner.TestSuiteRunner):
-    def launcher(self, *args):
+    def launcher(self):
         pass
 
 

@@ -23,7 +23,7 @@ class QiLinguistBuilder(AbstractBuilder):
             ui.info_count(i, len(self.projects), "Releasing", project.name)
             project.release(raises=kwargs.get("raises"))
 
-    def install(self, dest):
+    def install(self, dest, *args, **kwargs):
         for i, project in enumerate(self.projects):
             ui.info_count(i, len(self.projects), "Installing", project.name)
             project.install(dest)
