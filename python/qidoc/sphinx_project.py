@@ -56,7 +56,7 @@ class SphinxProject(qidoc.project.DocProject):
         try:
             # quick hack if conf.in.py used __file__
             from_conf["__file__"] = in_conf_py
-            exec(conf, from_conf)
+            exec(conf, from_conf)  # pylint: disable=exec-used
             conf = conf.replace("__file__", 'r"%s"' % in_conf_py)
         except Exception, e:
             ui.error("Could not read", in_conf_py, "\n", e)
@@ -141,7 +141,7 @@ class SphinxProject(qidoc.project.DocProject):
     @staticmethod
     def append_extension(conf, extension_name):
         from_conf = dict()
-        exec(conf, from_conf)
+        exec(conf, from_conf)  # pylint: disable=exec-used
         res = ""
         if "extensions" not in from_conf:
             res += "extensions = list()\n"

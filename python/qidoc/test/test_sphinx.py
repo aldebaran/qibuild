@@ -59,7 +59,7 @@ def test_handles_dunder_file(doc_worktree):
     foo_sphinx.configure(version="1.2.3")
     conf_py = foo_path.join("build-doc", "conf.py").read()
     new_conf = dict()
-    exec(conf_py, new_conf)
+    exec(conf_py, new_conf)  # pylint: disable=exec-used
     assert new_conf["this_file"] == conf_py_path.strpath
 
 
@@ -79,7 +79,7 @@ project = "foo"
     conf_py = foo_path.join("build-doc", "conf.py").read()
     conf_dict = dict()
     assert "# My custom settings" in conf_py
-    exec(conf_py, conf_dict)
+    exec(conf_py, conf_dict)  # pylint: disable=exec-used
     assert conf_dict["version"] == "1.2.3"
     expected = doc_worktree.template_project.themes_path
     assert conf_dict["html_theme_path"] == [expected]
