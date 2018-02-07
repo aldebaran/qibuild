@@ -11,6 +11,38 @@ from qisys import ui
 import qisys.command
 
 
+def _create_virtualenv(config, python_worktree, site_packages=True, python_executable=None, env=None):
+    python_worktree.config = config
+    venv_path = python_worktree.venv_path
+    pip = python_worktree.pip
+
+    if not python_executable:
+        python_executable = sys.executable
+    virtualenv_py = virtualenv.__file__
+    if virtualenv_py.endswith(".pyc"):
+        virtualenv_py = virtualenv_py[:-1]
+    cmd = [python_executable, virtualenv_py, venv_path]
+    if site_packages:
+        cmd.append("--system-site-packages")
+    try:
+        qisys.command.call(cmd, env=env)
+    except qisys.command.CommandFailedException:
+        ui.error("Failed to create virtualenv")
+        return False
+
+    binaries_path = virtualenv.path_locations(venv_path)[-1]
+    pip_binary = os.path.join(binaries_path, "pip")
+
+    return pip_binary, venv_path
+
+
+def _update_pip(pip_binary, remote_packages, env):
+    cmd = [pip_binary, "install", "--upgrade", "pip"]
+    if remote_packages and "pip" in remote_packages:
+        remote_packages.remove("pip")
+    qisys.command.call(cmd, env=env)
+
+
 def configure_virtualenv(config, python_worktree, build_worktree=None,
                          remote_packages=None, site_packages=True,
                          python_executable=None, env=None):
@@ -25,34 +57,13 @@ def configure_virtualenv(config, python_worktree, build_worktree=None,
         remote_packages = list()
 
     # create a new virtualenv
-    python_worktree.config = config
-    venv_path = python_worktree.venv_path
-    pip = python_worktree.pip
-
-    if not python_executable:
-        python_executable = sys.executable
-    virtualenv_py = virtualenv.__file__
-    if virtualenv_py.endswith(".pyc"):
-        virtualenv_py = virtualenv_py[:-1]
-    cmd = [python_executable, virtualenv_py]
-    cmd.append(venv_path)
-    if site_packages:
-        cmd.append("--system-site-packages")
-    try:
-        qisys.command.call(cmd, env=env)
-    except qisys.command.CommandFailedException:
-        ui.error("Failed to create virtualenv")
-        return False
-
-    binaries_path = virtualenv.path_locations(venv_path)[-1]
-    pip_binary = os.path.join(binaries_path, "pip")
+    pip_binary, venv_path = _create_virtualenv(
+        config, python_worktree,
+        site_packages=site_packages, python_executable=python_executable, env=env)
 
     # Upgrade pip separately, because old versions may cause install errors
-    cmd = [pip_binary, "install", "--upgrade", "pip"]
-    if remote_packages and "pip" in remote_packages:
-        remote_packages.remove("pip")
     try:
-        qisys.command.call(cmd, env=env)
+        _update_pip(pip_binary, remote_packages, env)
     except qisys.command.CommandFailedException:
         ui.error("Failed to upgrade pip")
         return False
