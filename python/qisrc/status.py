@@ -126,7 +126,7 @@ def _set_status(git, state_project, untracked=False):
                                     len(x.strip()) > 0]
 
 
-def print_behind_ahead(behind, ahead):
+def _print_behind_ahead(behind, ahead):
     numcommits = ""
     if behind:
         numcommits += "-" + str(behind)
@@ -141,7 +141,7 @@ def print_state(project, max_len):
     """Print a state project."""
     if project.valid:
         if project.ahead or project.behind:
-            numcommits = print_behind_ahead(project.behind, project.ahead)
+            numcommits = _print_behind_ahead(project.behind, project.ahead)
             if project.fixed_ref:
                 ui.info(ui.green, "*", ui.reset,
                         ui.blue, project.project.src.ljust(max_len), ui.reset,
@@ -166,7 +166,7 @@ def print_state(project, max_len):
                         ui.green, ":", project.current_branch,
                         "tracking", project.tracking)
         if project.ahead_manifest or project.behind_manifest:
-            numcommits = print_behind_ahead(project.behind_manifest, project.ahead_manifest)
+            numcommits = _print_behind_ahead(project.behind_manifest, project.ahead_manifest)
             ui.info(ui.bold, "Your branch", ui.green, project.current_branch,
                     ui.reset, ui.bold, "is", numcommits, "commits from branch",
                     ui.blue, project.manifest_branch)

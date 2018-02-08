@@ -61,13 +61,15 @@ def do(args):
             ui.warning(message)
             errors.append(src)
             continue
+
         if not git_project.default_branch:
             if git_project.fixed_ref:
                 qisrc.reset.clever_reset_ref(git_project, git_project.fixed_ref)
                 continue
-            else:
-                ui.warning(git_project.src, "not in manifest, skipping")
-                continue
+
+            ui.warning(git_project.src, "not in manifest, skipping")
+            continue
+
         branch = git_project.default_branch.name
         remote = git_project.default_remote.name
         git.safe_checkout(branch, remote, force=True)
