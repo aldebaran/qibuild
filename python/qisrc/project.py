@@ -152,11 +152,7 @@ class GitProject(object):
             # Project is now under code review, try to setup
             # gerrit and save success in self.review
             # (so that we can retry if gerrit setup did not work)
-            ok = qisrc.review.setup_project(self)
-            if ok:
-                self.review = True
-            else:
-                self.review = False
+            self.review = bool(qisrc.review.setup_project(self))
         if not repo.review and self.review:
             # Project was under code review, but no longer is,
             # simply set self.review to False so that `qisrc push`

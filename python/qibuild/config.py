@@ -673,10 +673,7 @@ class QiBuildConfig(object):
         # Make sure that we unset the previous 'host' config when
         # called twice with different config names
         for name, config in self.configs.iteritems():
-            if name == config_name:
-                config.host = True
-            else:
-                config.host = False
+            config.host = name == config_name
 
     def get_host_config(self):
         """ Get the config to use when looking for host tools """
