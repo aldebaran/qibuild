@@ -62,6 +62,8 @@ class Process(object):
         self.return_type = Process.FAILED
         self.capture = capture
         self._thread = None
+        self._should_stop_reading = False
+        self._reading_thread = None
 
     def run(self, timeout=None):
         def target():
