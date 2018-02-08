@@ -150,7 +150,8 @@ def update_title(mystr, fp):
 
 
 def _update_title_unix(mystr, fp):
-    global _enable_xterm_title
+    # This module should be refactored into object to avoid the anti-pattern global statement
+    global _enable_xterm_title  # pylint: disable=global-statement
     if _enable_xterm_title is None:
         _enable_xterm_title = config_title(fp)
 

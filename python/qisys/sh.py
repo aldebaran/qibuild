@@ -35,7 +35,8 @@ SHARE_PATH = xdg_data_home
 
 
 def set_home(home):
-    global CONFIG_PATH, CACHE_PATH, SHARE_PATH
+    # This module should be refactored into object to avoid the anti-pattern global statement
+    global CONFIG_PATH, CACHE_PATH, SHARE_PATH  # pylint: disable=global-statement
 
     CONFIG_PATH = os.path.join(home, "config")
     CACHE_PATH = os.path.join(home, "cache")
