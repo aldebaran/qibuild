@@ -29,7 +29,7 @@ class DataBase(object):
             to_add = qitoolchain.qipackage.from_xml(element)
             self.packages[to_add.name] = to_add
         for svn_elem in tree.findall("svn_package"):
-            to_add = qitoolchain.qipackage.from_xml(element)
+            to_add = qitoolchain.qipackage.from_xml(svn_elem)
             self.packages[to_add.name] = to_add
 
     def save(self):

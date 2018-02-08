@@ -28,8 +28,8 @@ def indent(elem, level=0):
             indent(e, level+1)
             if not e.tail or not e.tail.strip():
                 e.tail = i + "  "
-        if not e.tail or not e.tail.strip():
-            e.tail = i
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
     else:
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
