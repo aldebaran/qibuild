@@ -200,6 +200,7 @@ def test_all(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 3
 
+
 def test_tags(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     git_server.push_file("foo.git", "a.txt", "a")

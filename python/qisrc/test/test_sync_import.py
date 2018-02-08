@@ -1,6 +1,6 @@
-## Copyright (c) 2012-2015 Aldebaran Robotics. All rights reserved.
-## Use of this source code is governed by a BSD-style license that can be
-## found in the COPYING file.
+# Copyright (c) 2012-2018 Softbank. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the COPYING file.
 
 import qisys
 from qisrc.test.conftest import TestGitWorkTree
@@ -165,6 +165,7 @@ def test_import_manifest_branch(cd_to_tmpdir, tmpdir, git_server):
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 3
 
+
 def test_import_manifest_group(cd_to_tmpdir, tmpdir, git_server):
     git_server.create_repo("foo_manifest.git")
     git_server.create_repo("bar.git")
@@ -176,13 +177,13 @@ def test_import_manifest_group(cd_to_tmpdir, tmpdir, git_server):
       <remote name="origin" url="%s/git/srv" />
       <repo branch="master" project="baz.git" remotes="origin" />
       <import manifest="foo_manifest.git" remotes="origin" />
-      
+
        <groups>
             <group name="baz">
                 <project name="baz.git"/>
             </group>
        </groups>
-       
+
     </manifest>
     """)
 
@@ -193,14 +194,14 @@ def test_import_manifest_group(cd_to_tmpdir, tmpdir, git_server):
         <remote name="origin" review="false" url="%s/git/srv" />
         <repo branch="master" project="foo.git" remotes="origin" src="foo" />
         <repo branch="master" project="bar.git" remotes="origin" />
-        
+
         <groups>
             <group name="foo">
                 <project name="foo.git"/>
                 <project name="bar.git"/>
             </group>
         </groups>
-        
+
     </manifest>
     """)
 
@@ -224,13 +225,13 @@ def test_import_manifest_add_group(cd_to_tmpdir, tmpdir, git_server, qisrc_actio
       <remote name="origin" url="%s/git/srv" />
       <repo branch="master" project="baz.git" remotes="origin" />
       <import manifest="foo_manifest.git" remotes="origin" />
-      
+
       <groups>
             <group name="baz">
                 <project name="baz.git"/>
             </group>
        </groups>
-        
+
     </manifest>
     """)
 
@@ -310,4 +311,3 @@ def test_import_manifest_group_use_imported_group(cd_to_tmpdir, tmpdir, git_serv
 
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 3
-

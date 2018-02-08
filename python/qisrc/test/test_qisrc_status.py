@@ -60,6 +60,7 @@ def test_not_on_any_branch(qisrc_action, record_messages):
     qisrc_action("status")
     assert record_messages.find("not on any branch")
 
+
 def test_fixed_ref_up_to_date(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
     git_server.push_tag("foo.git", "v0.1")
@@ -70,6 +71,7 @@ def test_fixed_ref_up_to_date(qisrc_action, git_server, record_messages):
     record_messages.reset()
     qisrc_action("status", "--short")
     assert not record_messages.find("fixed ref")
+
 
 def test_fixed_ref_behind(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")

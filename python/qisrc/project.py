@@ -171,7 +171,6 @@ class GitProject(object):
                 ui.warning("Now instead of fixed ref using branch:", repo.default_branch)
                 self.switch_ref_to_branch = True
 
-
     def sync(self, rebase_devel=False, **kwargs):
         """ Synchronize remote changes with the underlying git repository
         Calls :py:meth:`qisrc.git.Git.sync_branch`

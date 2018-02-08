@@ -97,6 +97,7 @@ def test_no_files_in_repo(qisrc_action, git_server):
     qisrc_action("init", git_server.manifest_url)
     qisrc_action("reset")
 
+
 def test_fixed_ref(qisrc_action, git_server):
     git_server.create_repo("foo.git")
     git_server.push_tag("foo.git", "v0.1")
@@ -110,6 +111,7 @@ def test_fixed_ref(qisrc_action, git_server):
     _, actual = git.call("rev-parse", "HEAD", raises=False)
     _, expected = git.call("rev-parse", "v0.1", raises=False)
     assert actual == expected
+
 
 def test_ignore_groups(qisrc_action, git_server):
     git_server.create_group("a", ["a.git"])

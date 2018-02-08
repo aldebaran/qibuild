@@ -374,6 +374,7 @@ def test_removing_group_keep_warning_user(qisrc_action, git_server,
     qisrc_action("sync")
     assert record_messages.find("Group foo not found in the manifest")
 
+
 def test_switching_to_fixed_ref_happy(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
     git_server.push_file("foo.git", "a.txt", "a")
@@ -393,6 +394,7 @@ def test_switching_to_fixed_ref_happy(qisrc_action, git_server, record_messages)
     record_messages.reset()
     qisrc_action("sync")
     assert not record_messages.find("HEAD is now at")
+
 
 def test_switching_to_fixed_ref_long_name_happy(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
@@ -414,6 +416,7 @@ def test_switching_to_fixed_ref_long_name_happy(qisrc_action, git_server, record
     qisrc_action("sync")
     assert not record_messages.find("HEAD is now at")
 
+
 def test_fixed_ref_local_changes(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
     git_server.push_file("foo.git", "a.txt", "a")
@@ -428,6 +431,7 @@ def test_fixed_ref_local_changes(qisrc_action, git_server, record_messages):
     assert rc != 0
     assert record_messages.find("unstaged changes")
 
+
 def test_fixed_ref_no_such_ref(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
     qisrc_action("init", git_server.manifest_url)
@@ -435,6 +439,7 @@ def test_fixed_ref_no_such_ref(qisrc_action, git_server, record_messages):
     rc = qisrc_action("sync", retcode=True)
     assert rc != 0
     assert record_messages.find("Could not parse v0.1 as a valid ref")
+
 
 def test_switching_to_new_fixed_ref(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
@@ -455,6 +460,7 @@ def test_switching_to_new_fixed_ref(qisrc_action, git_server, record_messages):
     assert sha1 == expected
     _, msg = git.branch("--no-color", raises=False)
     assert not msg.find('2') == -1
+
 
 def test_switching_to_new_fixed_ref_local_changes(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
@@ -487,6 +493,7 @@ def test_switching_to_new_fixed_ref_local_changes(qisrc_action, git_server, reco
     assert rc != 0
     assert sha1 == expected
 
+
 def test_switching_from_fixed_ref_to_branch(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")
     git_server.push_file("foo.git", "a.txt", "a")
@@ -504,6 +511,7 @@ def test_switching_from_fixed_ref_to_branch(qisrc_action, git_server, record_mes
     git_server.set_branch("foo.git", "master")
     qisrc_action("sync")
     assert git.get_current_branch() == "master"
+
 
 def test_switching_from_fixed_ref_to_branch_local_changes(qisrc_action, git_server, record_messages):
     git_server.create_repo("foo.git")

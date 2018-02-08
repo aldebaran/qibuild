@@ -123,6 +123,7 @@ def test_qisrc_checkout_when_no_group(qisrc_action, git_server):
     git_worktree = TestGitWorkTree()
     assert len(git_worktree.git_projects) == 0
 
+
 def test_qisrc_checkout_with_ref_to_branch(qisrc_action, git_server):
     manifest_url = git_server.manifest_url
     git_server.create_repo("foo.git")
@@ -146,6 +147,7 @@ def test_qisrc_checkout_with_ref_to_branch(qisrc_action, git_server):
     bar_proj = git_worktree.get_git_project("bar")
     bar_git = qisrc.git.Git(bar_proj.path)
     assert bar_git.get_current_branch() == "master"
+
 
 def test_qisrc_checkout_with_branch_to_ref(qisrc_action, git_server):
     manifest_url = git_server.manifest_url

@@ -330,6 +330,7 @@ def test_multiple_remotes(tmpdir):
     foo = manifest.repos[0]
     assert len(foo.remotes) == 2
 
+
 def test_fixed_ref(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -345,6 +346,7 @@ def test_fixed_ref(tmpdir):
     foo = manifest.repos[0]
     assert foo.default_branch is None
     assert foo.fixed_ref == "v0.1"
+
 
 def test_fixed_ref_and_branch_are_exclusive(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -362,6 +364,7 @@ def test_fixed_ref_and_branch_are_exclusive(tmpdir):
     with pytest.raises(Exception)as e:
         qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "'branch' and 'ref' are mutually exclusive" in e.value.args[0]
+
 
 def test_from_git_repo(git_server):
     git_server.create_repo("foo")
@@ -395,6 +398,7 @@ def test_all_repos(tmpdir):
     git_projects = manifest.get_repos(all=True)
     assert len(git_projects) == 3
 
+
 def test_import_parser(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -411,6 +415,7 @@ def test_import_parser(tmpdir):
     assert import_manifest[0].default_remote_name == "origin"
     assert import_manifest[0].remotes[0].url == "git@example.com:a.git"
 
+
 def test_import_parser_error_manifest(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -423,6 +428,7 @@ def test_import_parser_error_manifest(tmpdir):
     with pytest.raises(Exception)as e:
         manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Missing 'manifest' attribute" in e.value.args[0]
+
 
 def test_import_parser_error_remote_empty(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
@@ -437,6 +443,7 @@ def test_import_parser_error_remote_empty(tmpdir):
         manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Empty 'remotes' attribute" in e.value.args[0]
 
+
 def test_import_parser_error_remote(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")
     manifest_xml.write(""" \
@@ -449,6 +456,7 @@ def test_import_parser_error_remote(tmpdir):
     with pytest.raises(Exception)as e:
         manifest = qisrc.manifest.Manifest(manifest_xml.strpath)
     assert "Missing 'remotes' attribute" in e.value.args[0]
+
 
 def test_import_parser_error_remote_missing(tmpdir):
     manifest_xml = tmpdir.join("manifest.xml")

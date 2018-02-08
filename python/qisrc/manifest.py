@@ -282,6 +282,7 @@ class RepoConfig(object):
         res += ">"
         return res
 
+
 class ImportManifest(object):
     def __init__(self):
         self.project = None

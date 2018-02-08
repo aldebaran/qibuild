@@ -205,7 +205,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
                 git.checkout("-b", branch, "%s/%s" % (remote_name, branch))
             if fixed_ref:
                 git.checkout("-q", fixed_ref)
-        except:
+        except Exception:
             ui.error("Cloning repo failed")
             if git.is_empty():
                 qisys.sh.rm(git_project.path)

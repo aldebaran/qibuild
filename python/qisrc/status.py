@@ -16,10 +16,12 @@ def stat_tracking_remote(git, branch, tracking):
     _, remote_ref = git.call("rev-parse", tracking, raises=False)
     return stat_ahead_behind(git, local_ref, remote_ref)
 
+
 def stat_fixed_ref(git, remote_ref):
     """ Check is HEAD is and and / or behind given ref. """
     _, local_ref = git.call("rev-parse", "HEAD", raises=False)
     return stat_ahead_behind(git, local_ref, remote_ref)
+
 
 def stat_ahead_behind(git, local_ref, remote_ref):
     """ Returns a tuple (ahead, behind) describing how far
@@ -111,6 +113,7 @@ def check_state(project, untracked):
         _set_status(git, state_project, untracked=untracked)
     return state_project
 
+
 def _set_status(git, state_project, untracked=False):
     """ When project is not clean, display git status
     (untracked files and the like)
@@ -143,15 +146,15 @@ def print_state(project, max_len):
                 ui.info(ui.green, "*", ui.reset,
                         ui.blue, project.project.src.ljust(max_len), ui.reset,
                         ui.green, "fixed ref", project.fixed_ref,
-                            ui.reset, ui.bold, ui.red,
-                            numcommits)
+                        ui.reset, ui.bold, ui.red,
+                        numcommits)
             else:
                 ui.info(ui.green, "*", ui.reset,
                         ui.blue, project.project.src.ljust(max_len), ui.reset,
                         ui.green, ":", project.current_branch,
-                            "tracking",
-                            ui.reset, ui.bold, ui.red,
-                            numcommits, ui.green, project.tracking)
+                        "tracking",
+                        ui.reset, ui.bold, ui.red,
+                        numcommits, ui.green, project.tracking)
         else:
             if project.fixed_ref:
                 ui.info(ui.green, "*", ui.reset,
@@ -161,7 +164,7 @@ def print_state(project, max_len):
                 ui.info(ui.green, "*", ui.reset,
                         ui.blue, project.project.src.ljust(max_len), ui.reset,
                         ui.green, ":", project.current_branch,
-                            "tracking", project.tracking)
+                        "tracking", project.tracking)
         if project.ahead_manifest or project.behind_manifest:
             numcommits = print_behind_ahead(project.behind_manifest, project.ahead_manifest)
             ui.info(ui.bold, "Your branch", ui.green, project.current_branch,
