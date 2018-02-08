@@ -510,7 +510,6 @@ def which(program):
     find program in the environment PATH
     :return: path to program if found, None otherwise
     """
-    import warnings
     warnings.warn("qisys.sh.which is deprecated, "
                   "use qisys.command.find_program instead")
     from qisys.command import find_program
