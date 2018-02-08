@@ -263,7 +263,7 @@ class XMLParser(object):
 
         def is_serializable(value):
             # no way to guess that from etree api:
-            return type(value) in (list, bool, str, unicode, int)
+            return isinstance(value, (list, bool, str, unicode, int))
 
         target_dir = dir(self.target)
         for member in target_dir:
@@ -287,12 +287,12 @@ class XMLParser(object):
                 continue
             member_value = getattr(self.target, member)
             if is_serializable(member_value):
-                if type(member_value) == bool:
+                if isinstance(member_value, bool):
                     if member_value:
                         res.set(member, "true")
                     else:
                         res.set(member, "false")
-                elif type(member_value) == list:
+                elif isinstance(member_value, list):
                     if member_value:
                         res.set(member, " ".join(member_value))
                 else:
