@@ -123,7 +123,7 @@ This path does not exist
 
     def has_project(self, path):
         src = self.normalize_path(path)
-        srcs = (p.src for p in self.projects)
+        srcs = (self.normalize_path(p.src) for p in self.projects)
         return src in srcs
 
     def load_projects(self):
@@ -170,9 +170,9 @@ This path does not exist
             if not raises:
                 return None
             mess = ui.did_you_mean("No project in '%s'\n" % src,
-                                   src, [x.src for x in self.projects])
+                                   src, [self.normalize_path(x.src) for x in self.projects])
             raise WorkTreeError(mess)
-        match = (p for p in self.projects if p.src == src)
+        match = (p for p in self.projects if self.normalize_path(p.src) == src)
         return match.next()
 
     def add_project(self, path):
