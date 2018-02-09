@@ -135,6 +135,7 @@ disable=print-statement,
         # redefined-outer-name,  # set loccaly in each test files to beginning with due to real bad practice outside the tests: activate it globally if too harsh to maintain
         fixme,
         too-few-public-methods,
+        inconsistent-return-statements,  # remove it when dealing with #13
         invalid-name  # regex seems to be buggy
 
 
