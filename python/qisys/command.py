@@ -23,7 +23,7 @@ _FIND_PROGRAM_CACHE = dict()
 SIGINT_EVENT = threading.Event()
 
 
-class Process(object):
+class Process(object):  # pylint: disable=too-many-instance-attributes
     """ A simple way to run commands.
 
     Command will be started by run according to timeout parameter (not

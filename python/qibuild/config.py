@@ -419,7 +419,7 @@ class BuildConfig(object):
         return res
 
 
-class QiBuildConfig(object):
+class QiBuildConfig(object):  # pylint: disable=too-many-instance-attributes
     """ A class to represent both local and global
     qibuild.xml configuration files
 

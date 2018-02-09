@@ -41,7 +41,7 @@ def stat_ahead_behind(git, local_ref, remote_ref):
     return ahead, behind
 
 
-class ProjectState(object):
+class ProjectState(object):  # pylint: disable=too-many-instance-attributes
     """A class which represent a project and is cleanlyness."""
 
     def __init__(self, project):

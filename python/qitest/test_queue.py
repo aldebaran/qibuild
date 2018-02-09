@@ -19,7 +19,7 @@ import qisys.command
 import qitest.result
 
 
-class TestQueue(object):
+class TestQueue(object):  # pylint: disable=too-many-instance-attributes
     """ A class able to run tests in parallel """
 
     __test__ = False  # Tell PyTest to ignore this Test* named class: This is as test to collect

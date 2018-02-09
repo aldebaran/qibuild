@@ -58,6 +58,7 @@ def write_qi_path_conf(directory, sdk_dirs, sdk_layout=True):
 
 
 # pylint: disable=too-many-public-methods
+# pylint: disable=too-many-instance-attributes
 class BuildProject(object):
     def __init__(self, build_worktree, worktree_project):
         self.build_worktree = build_worktree

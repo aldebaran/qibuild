@@ -10,7 +10,7 @@ import qisys.qixml
 import qisrc.git_config
 
 
-class GitProject(object):
+class GitProject(object):  # pylint: disable=too-many-instance-attributes
     def __init__(self, git_worktree, worktree_project):
         self.git_worktree = git_worktree
         self.src = worktree_project.src
@@ -167,7 +167,7 @@ class GitProject(object):
                 ui.warning("Now instead of fixed ref using branch:", repo.default_branch)
                 self.switch_ref_to_branch = True
 
-    def sync(self, rebase_devel=False, **kwargs):  # pylint: disable=too-many-return-statements
+    def sync(self, rebase_devel=False, **kwargs):
         """ Synchronize remote changes with the underlying git repository
         Calls :py:meth:`qisrc.git.Git.sync_branch`
 
@@ -176,6 +176,8 @@ class GitProject(object):
            therefore it must not cause any side-effect on the global state
            outside of this repo.
         """
+        # pylint: disable=too-many-return-statements
+        # pylint: disable=too-many-instance-attributes
         git = qisrc.git.Git(self.path)
         branch = self.default_branch
         if not branch:

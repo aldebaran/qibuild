@@ -40,7 +40,7 @@ class TestGitWorkTree(qisrc.worktree.GitWorkTree):
         return new_project
 
 
-class TestGitServer(object):
+class TestGitServer(object):  # pylint: disable=too-many-instance-attributes
     """ Represent a set of git urls
 
     everything is done relative to the <root> parameter

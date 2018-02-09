@@ -18,7 +18,7 @@ import qisys
 from qisys.test.fake_interact import FakeInteract
 
 
-class ConfigWizardTestCase(unittest.TestCase):
+class ConfigWizardTestCase(unittest.TestCase):  # pylint: disable=too-many-instance-attributes
 
     def setUp(self):
         self.orig_platform = sys.platform

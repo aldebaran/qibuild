@@ -10,7 +10,7 @@ from qisys import ui
 import qitest.test_queue
 
 
-class TestSuiteRunner(object):
+class TestSuiteRunner(object):  # pylint: disable=too-many-instance-attributes
     """ Interface for a class able to run a test suite """
     __metaclass__ = abc.ABCMeta
 

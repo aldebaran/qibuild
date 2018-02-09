@@ -16,7 +16,7 @@ import qisrc.git
 import qisrc.review
 
 
-class Remote(object):
+class Remote(object):  # pylint: disable=too-many-instance-attributes
     def __init__(self):
         self.name = None
         self.url = None

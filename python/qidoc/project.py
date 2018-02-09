@@ -7,7 +7,7 @@ import os
 import qisys.sh
 
 
-class DocProject(object):
+class DocProject(object):  # pylint: disable=too-many-instance-attributes
 
     __metaclass__ = abc.ABCMeta
     doc_type = None

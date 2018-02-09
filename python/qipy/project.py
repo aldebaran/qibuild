@@ -6,7 +6,7 @@ import os
 import qisys.sh
 
 
-class PythonProject(object):
+class PythonProject(object):  # pylint: disable=too-many-instance-attributes
     """ Collections of scripts, modules and packages """
 
     def __init__(self, worktree, src, name):

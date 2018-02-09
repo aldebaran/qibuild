@@ -12,7 +12,7 @@ import qibuild.profile
 import qitoolchain
 
 
-class CMakeBuildConfig(object):
+class CMakeBuildConfig(object):  # pylint: disable=too-many-instance-attributes
     """ Compute a list of CMake flags from all the settings
     that can affect the build  (the toolchain name, the build
     profiles, etc ...)

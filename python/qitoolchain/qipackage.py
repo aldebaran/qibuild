@@ -13,7 +13,7 @@ import qisrc.license
 import qibuild.deps
 
 
-class QiPackage(object):
+class QiPackage(object):  # pylint: disable=too-many-instance-attributes
     """ Binary package for use with qibuild.
 
     Package names are unique in a given toolchain.

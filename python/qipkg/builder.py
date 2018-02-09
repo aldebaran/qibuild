@@ -18,7 +18,7 @@ import qilinguist.pml_translator
 import qipkg.manifest
 
 
-class PMLBuilder(object):
+class PMLBuilder(object):  # pylint: disable=too-many-instance-attributes
     """ Build a package from a pml file """
 
     def __init__(self, pml_path, worktree=None):
