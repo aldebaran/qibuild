@@ -134,6 +134,7 @@ disable=print-statement,
         # check https://github.com/PyCQA/pylint/issues/1535 some times to see if feature to restrict ignores from regex is developed
         # redefined-outer-name,  # set loccaly in each test files to beginning with due to real bad practice outside the tests: activate it globally if too harsh to maintain
         fixme,
+        too-few-public-methods,
         invalid-name  # regex seems to be buggy
 
 
