@@ -27,7 +27,7 @@ def test_building_in_release(qibuild_action):
     qibuild_action("package", "world", "--release")
 
 
-def test_using_toolchain(cd_to_tmpdir):
+def test_using_toolchain(cd_to_tmpdir):  # pylint: disable=unused-argument
     qibuild_action = QiBuildAction()
     qitoolchain_action = QiToolchainAction()
     build_worktree = qibuild_action.build_worktree
@@ -72,7 +72,7 @@ def test_standalone(qibuild_action, tmpdir):
 # pylint: disable-msg=E1101
 @pytest.mark.skipif(not qisys.command.find_program("dump_syms"),
                     reason="dump_syms not found")
-def test_standalone_breakpad(qibuild_action, tmpdir):
+def test_standalone_breakpad(qibuild_action, tmpdir):  # pylint: disable=unused-argument
     world_proj = qibuild_action.add_test_project("world")
     hello_proj = qibuild_action.add_test_project("hello")
     hello_archive, hello_symbols = qibuild_action("package", "hello", "--standalone",

@@ -5,6 +5,8 @@
 import qisys
 from qisrc.test.conftest import TestGitWorkTree
 
+# pylint: disable=unused-argument
+
 
 def test_import_manifest(cd_to_tmpdir, tmpdir, git_server):
     git_server.create_repo("foo_manifest.git")

@@ -7,7 +7,7 @@ import os
 import qitest.conf
 
 
-def test_simple(qitest_action, record_messages):
+def test_simple(qitest_action, record_messages):  # pylint: disable=unused-argument
     testme_proj = qitest_action.add_test_project("testme")
     qitest_action("collect")
     pytest_json = os.path.join(testme_proj.path, "pytest.json")

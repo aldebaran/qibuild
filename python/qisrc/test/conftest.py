@@ -1,7 +1,7 @@
 # Copyright (c) 2012-2018 SoftBank Robotics. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
-from qisys.test.conftest import *  # pylint: disable=wildcard-import
+from qisys.test.conftest import *  # pylint: disable=wildcard-import,unused-wildcard-import
 import qisys.script
 
 import qisrc.git
@@ -429,14 +429,14 @@ class FakeGit(qisrc.git.Git):
 
 # pylint: disable-msg=E1101
 @pytest.fixture
-def git_worktree(cd_to_tmpdir):
+def git_worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
     return TestGitWorkTree()
 
 # pylint: disable-msg=E1101
 
 
 @pytest.fixture
-def test_git(request):
+def test_git(request):  # pylint: disable=unused-argument
     return TestGit
 
 # pylint: disable-msg=E1101
@@ -452,14 +452,14 @@ def git_server(tmpdir):
 
 
 @pytest.fixture
-def mock_git(request):
+def mock_git(request):  # pylint: disable=unused-argument
     return FakeGit("repo")
 
 # pylint: disable-msg=E1101
 
 
 @pytest.fixture
-def qisrc_action(cd_to_tmpdir):
+def qisrc_action(cd_to_tmpdir):  # pylint: disable=unused-argument
     return QiSrcAction()
 
 

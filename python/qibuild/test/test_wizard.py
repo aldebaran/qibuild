@@ -67,7 +67,7 @@ class ConfigWizardTestCase(unittest.TestCase):  # pylint: disable=too-many-insta
         for this test
 
         """
-        def fake_find(name, raises=True, env=None):
+        def fake_find(name, raises=True, env=None):  # pylint: disable=unused-argument
             return programs.get(name)
         self.find_program.side_effect = fake_find
 

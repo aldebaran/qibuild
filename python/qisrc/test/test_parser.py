@@ -56,7 +56,7 @@ def setup_test():
     return foo, hello, world
 
 
-def test_default_all(cd_to_tmpdir, args):
+def test_default_all(cd_to_tmpdir, args):  # pylint: disable=unused-argument
     (foo, hello, world) = setup_test()
     git_worktree = TestGitWorkTree()
 
@@ -71,7 +71,7 @@ def test_default_all(cd_to_tmpdir, args):
         get_git_projects(git_worktree, args, default_all=False)
 
 
-def test_default_all_build_deps(cd_to_tmpdir, args):
+def test_default_all_build_deps(cd_to_tmpdir, args):  # pylint: disable=unused-argument
     (foo, hello, world) = setup_test()
     git_worktree = TestGitWorkTree()
 
@@ -128,7 +128,7 @@ def test_build_deps_not_top_dir(cd_to_tmpdir, args):
         assert projs == [dep_proj, top_proj]
 
 
-def test_groups(git_worktree, args):
+def test_groups(git_worktree, args):  # pylint: disable=unused-argument
     git_worktree = mock.Mock()
     args.groups = ["mygroup"]
     get_git_projects(git_worktree, args)

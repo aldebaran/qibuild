@@ -211,7 +211,7 @@ Error when parsing {pml_path}
         """ Deploy every project to the given url """
         qisys.remote.deploy(self.stage_path, url)
 
-    def package(self, *args, **kwargs):
+    def package(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Generate a package containing every project.
 
         :param: with_breakpad generate debug symbols for usage

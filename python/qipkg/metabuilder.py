@@ -54,7 +54,7 @@ class MetaPMLBuilder(object):
                     "Deploying", pml_builder.pml_path)
             pml_builder.deploy(url)
 
-    def package(self, *args, **kwargs):
+    def package(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Generate a package containing every package.
 
         :param: with_breakpad generate debug symbols for usage

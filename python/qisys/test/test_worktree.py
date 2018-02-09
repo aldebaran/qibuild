@@ -126,7 +126,7 @@ def test_nested_qiprojects(tmpdir):
         ["a", "a/b", "a/b/c"]
 
 
-def test_non_exiting_path_are_removed(tmpdir, interact):
+def test_non_exiting_path_are_removed(tmpdir, interact):  # pylint: disable=unused-argument
     # all projects registered should exist:
     wt = qisys.worktree.WorkTree(tmpdir.strpath)
     a_path = tmpdir.mkdir("a")

@@ -115,7 +115,7 @@ def test_qi_install_cmake(qibuild_action, tmpdir):
     assert tmpdir.join("share", "recurse", "a_dir/b_dir/c_dir/d_file").check(file=True)
 
 
-def test_fails_early(qibuild_action, tmpdir):
+def test_fails_early(qibuild_action, tmpdir):  # pylint: disable=unused-argument
     qibuild_action.add_test_project("installme")
     qibuild_action("configure", "installme", "-DFAIL_EMPTY_GLOB=TRUE", raises=True)
     qibuild_action("configure", "installme", "-DFAIL_NON_EXISTING=TRUE", raises=True)

@@ -39,7 +39,7 @@ def test_running_from_build_dir_incremental(qibuild_action):
     qisys.command.call([hello])
 
 
-def test_using_host_tools_for_cross_compilation_no_system(qibuild_action, fake_ctc):
+def test_using_host_tools_for_cross_compilation_no_system(qibuild_action, fake_ctc):  # pylint: disable=unused-argument
     qibuild_action.add_test_project("footool")
     qibuild_action.add_test_project("usefootool")
     qibuild_action("configure", "footool")
@@ -49,6 +49,7 @@ def test_using_host_tools_for_cross_compilation_no_system(qibuild_action, fake_c
 
 
 def test_using_host_tools_for_cross_compilation_with_host_config(qibuild_action, fake_ctc):
+    # pylint: disable=unused-argument
     qibuild_action.add_test_project("footool")
     qibuild_action.add_test_project("usefootool")
     qibuild_action("add-config", "foo")
@@ -62,6 +63,7 @@ def test_using_host_tools_for_cross_compilation_with_host_config(qibuild_action,
 def test_using_host_tools_for_cross_with_host_in_toolchain(qibuild_action,
                                                            qitoolchain_action,
                                                            fake_ctc):
+    # pylint: disable=unused-argument
     footool_proj = qibuild_action.add_test_project("footool")
     qibuild_action.add_test_project("usefootool")
     footool_archive = qibuild_action("package", "footool")

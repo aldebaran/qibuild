@@ -15,7 +15,7 @@ def test_show(qibuild_action):
     qibuild_action("config")
 
 
-def test_when_not_in_a_worktree(cd_to_tmpdir):
+def test_when_not_in_a_worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
     qisys.script.run_action("qibuild.actions.config", list())
 
 

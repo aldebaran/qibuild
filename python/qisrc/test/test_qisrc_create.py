@@ -75,7 +75,7 @@ def test_no_worktree(tmpdir):
     assert dest.join("helloworld", "hello_world.txt").check(file=True)
 
 
-def test_create_inside_template(qisrc_action, tmpdir):
+def test_create_inside_template(tmpdir):
     tmpl = tmpdir.mkdir("tmpl")
     tmpl.join("@project_name@.txt").write("")
 

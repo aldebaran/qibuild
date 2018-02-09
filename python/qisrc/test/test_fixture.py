@@ -49,7 +49,7 @@ def test_create_several_commits(git_server):
     git_server.push_file("foo.git", "foo.txt", "change 2")
 
 
-def test_no_review_by_default(tmpdir, git_server):
+def test_no_review_by_default(tmpdir, git_server):  # pylint: disable=unused-argument
     foo_repo = git_server.create_repo("foo.git")
     assert foo_repo.review is False
     origin = git_server.manifest.get_remote("origin")
@@ -104,7 +104,7 @@ def test_change_branch(git_server):
     assert foo_repo.default_branch == "devel"
 
 
-def test_fixed_ref(git_server, tmpdir):
+def test_fixed_ref(git_server):
     git_server.create_repo("foo.git")
     git_server.set_fixed_ref("foo.git", "v0.1")
     foo_repo = git_server.get_repo("foo.git")

@@ -99,7 +99,7 @@ def test_clone_missing_create_subdirs(git_worktree, git_server):
     assert foo_proj
 
 
-def test_clone_missing_wrong_branch(git_worktree, git_server, record_messages):
+def test_clone_missing_wrong_branch(git_worktree, git_server, record_messages):  # pylint: disable=unused-argument
     foo_repo = git_server.create_repo("foo")
     foo_repo.default_branch = "devel"
     git_worktree.clone_missing(foo_repo)

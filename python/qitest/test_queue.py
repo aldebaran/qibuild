@@ -124,7 +124,7 @@ class TestQueue(object):  # pylint: disable=too-many-instance-attributes
                                   ui.reset, *failure.message)
         self.write_failures(failures)
 
-    def sigint_handler(self, *args):
+    def sigint_handler(self, *args):  # pylint: disable=unused-argument
         """ Called when user press ctr+c during the test suite
 
         * Tell qisys.command to kill every process still running
@@ -133,7 +133,7 @@ class TestQueue(object):  # pylint: disable=too-many-instance-attributes
         * Setup a second sigint for when killing process failed
 
         """
-        def double_sigint(signum, frame):
+        def double_sigint(signum, frame):  # pylint: disable=unused-argument
             sys.exit("Exiting main program \n",
                      "This may leave orphan processes")
         qisys.command.SIGINT_EVENT.set()

@@ -32,7 +32,7 @@ def test_setting_build_config_sets_projects_cmake_flags(build_worktree):
     assert cmake_args == ["-DCMAKE_BUILD_TYPE=Release"]
 
 
-def test_changing_active_config_changes_projects_build_dir(cd_to_tmpdir):
+def test_changing_active_config_changes_projects_build_dir(cd_to_tmpdir):  # pylint: disable=unused-argument
     qibuild.config.add_build_config("foo")
     build_worktree = TestBuildWorkTree()
     build_worktree.set_active_config("foo")
@@ -48,7 +48,7 @@ def test_project_names_are_unique(build_worktree):
     assert "two projects with the same name" in str(e.value)
 
 
-def test_bad_qibuild2_qiproject(cd_to_tmpdir):
+def test_bad_qibuild2_qiproject(cd_to_tmpdir):  # pylint: disable=unused-argument
     build_worktree = TestBuildWorkTree()
     build_worktree.create_project("foo")
     foo_qiproj_xml = build_worktree.tmpdir.join("foo").join("qiproject.xml")
@@ -64,7 +64,7 @@ def test_bad_qibuild2_qiproject(cd_to_tmpdir):
     build_worktree = TestBuildWorkTree()
 
 
-def test_set_default_config(cd_to_tmpdir):
+def test_set_default_config(cd_to_tmpdir):  # pylint: disable=unused-argument
     qibuild.config.add_build_config("foo")
     build_worktree = TestBuildWorkTree()
     build_worktree.set_default_config("foo")
@@ -73,7 +73,7 @@ def test_set_default_config(cd_to_tmpdir):
     assert build_worktree2.default_config == "foo"
 
 
-def test_get_env(toolchains, cd_to_tmpdir):
+def test_get_env(toolchains, cd_to_tmpdir):  # pylint: disable=unused-argument
     toolchains.create("foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
     bar_package = toolchains.add_package("foo", "bar")
@@ -98,7 +98,7 @@ def test_get_env(toolchains, cd_to_tmpdir):
         assert env["DYLD_FRAMEWORK_PATH"] == bar_package.path
 
 
-def test_set_pythonhome(toolchains, cd_to_tmpdir):
+def test_set_pythonhome(toolchains, cd_to_tmpdir):  # pylint: disable=unused-argument
     toolchains.create("foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
     python_package = toolchains.add_package("foo", "python")

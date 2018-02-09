@@ -1,0 +1,7 @@
+ <project version="3">
+  <qibuild name="hello">
+    <depends buildtime="true" runtime="false" testtime="false" names="world" />
+    <depends buildtime="false" runtime="true" testtime="false" names="" />
+    <depends buildtime="false" runtime="false" testtime="true" names="" />
+  </qibuild>
+</project>

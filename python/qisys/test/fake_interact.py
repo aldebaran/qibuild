@@ -52,7 +52,7 @@ class FakeInteract(object):
         mess += "Known keys are: %s" % ", ".join(keys)
         raise Exception(mess)
 
-    def ask_choice(self, choices, message, **unused):
+    def ask_choice(self, choices, message, **unused):  # pylint: disable=unused-argument
         print "::", message
         for choice in choices:
             print "* ", choice

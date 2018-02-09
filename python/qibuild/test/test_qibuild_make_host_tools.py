@@ -5,7 +5,7 @@
 import qibuild.find
 
 
-def test_make_host_tools(qibuild_action, fake_ctc):
+def test_make_host_tools(qibuild_action, fake_ctc):  # pylint: disable=unused-argument
     footool_proj = qibuild_action.add_test_project("footool")
     qibuild_action.add_test_project("usefootool")
     qibuild_action("make-host-tools", "usefootool")

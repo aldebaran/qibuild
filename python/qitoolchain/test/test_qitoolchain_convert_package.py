@@ -10,7 +10,7 @@ import qibuild.config
 import qitoolchain
 
 
-def test_simple(qitoolchain_action, tmpdir, toolchains):
+def test_simple(qitoolchain_action, tmpdir, toolchains):  # pylint: disable=unused-argument
     this_dir = os.path.dirname(__file__)
     json_c_bz2_path_src = os.path.join(this_dir, "packages", "json-c-0.9.tbz2")
     json_c_bz2_path = tmpdir.join("json-c-0.9.tbz2").strpath

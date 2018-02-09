@@ -51,7 +51,7 @@ In:
 """.format(new_project.name, project_with_same_name.path, new_project.path))
 
 
-def new_linguist_project(linguist_worktree, project):
+def new_linguist_project(linguist_worktree, project):  # pylint: disable=unused-argument
     if not os.path.exists(project.qiproject_xml):
         return None
     tree = qisys.qixml.read(project.qiproject_xml)

@@ -17,7 +17,7 @@ from qitest.test.conftest import qitest_action  # pylint: disable=unused-import
 # pylint: disable=redefined-outer-name
 
 
-def test_finding_qi_python_modules(qipy_action, qibuild_action, qitest_action):
+def test_finding_qi_python_modules(qipy_action, qibuild_action, qitest_action):  # pylint: disable=unused-argument
     qipy_action.add_test_project("foomodules")
     # Need to have qibuild inside the virtualenv for
     # qipy run -- qitest run to work

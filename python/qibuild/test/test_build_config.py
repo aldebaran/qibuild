@@ -203,7 +203,7 @@ def test_overwriting_remote_profiles(build_worktree):
     assert build_config._profile_flags == [("WITH_BAR", "OFF")]  # pylint: disable=protected-access
 
 
-def test_profiles_from_config(cd_to_tmpdir):
+def test_profiles_from_config(cd_to_tmpdir):  # pylint: disable=unused-argument
     qibuild.config.add_build_config("foo", profiles=["bar"])
     build_worktree = TestBuildWorkTree()
     local_xml = build_worktree.qibuild_xml

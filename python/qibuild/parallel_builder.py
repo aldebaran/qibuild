@@ -36,7 +36,7 @@ class BuildJob(object):
     def add_back_dependency(self, job):
         self.back_deps.append(job)
 
-    def execute(self, *args, **kwargs):
+    def execute(self, *args, **kwargs):  # pylint: disable=unused-argument
         ui.info_count(self.index, self.num_projects,
                       ui.green, "Building",
                       ui.blue, self.project.name,

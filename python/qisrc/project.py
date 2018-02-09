@@ -178,6 +178,7 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         """
         # pylint: disable=too-many-return-statements
         # pylint: disable=too-many-instance-attributes
+        # pylint: disable=unused-argument
         git = qisrc.git.Git(self.path)
         branch = self.default_branch
         if not branch:
@@ -188,7 +189,7 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
             return False, "fetch failed\n" + out
 
         if self.fixed_ref:
-            return self.safe_reset_ref(self.fixed_ref)
+            return self.safe_reset_to_ref(self.fixed_ref)
 
         current_branch = git.get_current_branch()
         if not current_branch:
@@ -204,7 +205,7 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         # Here current_branch == branch.name
         return git.sync_branch(branch, fetch_first=False)
 
-    def safe_reset_ref(self, ref):
+    def safe_reset_to_ref(self, ref):
         """ Read a fixed ref from the remote config.
         Make sure to not discard any local changes
 
@@ -216,7 +217,7 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
         ok, mess = qisrc.reset.clever_reset_ref(self, ref, raises=False)
         return ok, mess
 
-    def safe_reset_to_branch(self, ref, branch):
+    def safe_reset_to_branch(self, branch):
         """ Switch from a ref to a branch
         Make sure to not discard any local changes
 
@@ -292,7 +293,7 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
                 git.set_tracking_branch(branch.name, branch.tracks,
                                         remote_branch=branch.remote_branch)
         if self.switch_ref_to_branch:
-            ok, mess = self.safe_reset_to_branch(self.fixed_ref, self.default_branch.name)
+            ok, mess = self.safe_reset_to_branch(self.default_branch.name)
             if not ok:
                 ui.error("%s\n %s" % (self.name, mess))
             else:
@@ -300,7 +301,7 @@ class GitProject(object):  # pylint: disable=too-many-instance-attributes
                 self.switch_ref_to_branch = False
 
         if self.fixed_ref:
-            ok, mess = self.safe_reset_ref(self.fixed_ref)
+            ok, mess = self.safe_reset_to_ref(self.fixed_ref)
             if not ok:
                 ui.error("%s\n %s" % (self.name, mess))
 

@@ -53,7 +53,7 @@ def test_cleaning_all_build_dirs(qibuild_action):
     assert not os.path.exists(world_proj.build_directory)
 
 
-def test_cleaning_unknown_configs(qibuild_action, toolchains, interact):
+def test_cleaning_unknown_configs(qibuild_action, toolchains, interact):  # pylint: disable=unused-argument
     qibuild.config.add_build_config("a")
     qibuild.config.add_build_config("b")
     world_proj = qibuild_action.add_test_project("world")

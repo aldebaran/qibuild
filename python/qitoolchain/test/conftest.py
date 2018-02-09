@@ -7,7 +7,7 @@ import tempfile
 import qibuild
 import qitoolchain
 
-from qisys.test.conftest import *  # pylint: disable=wildcard-import
+from qisys.test.conftest import *  # pylint: disable=wildcard-import,unused-wildcard-import
 import qisys.qixml
 from qisys.qixml import etree
 
@@ -133,7 +133,7 @@ def toolchains(request):
 
 
 @pytest.fixture
-def qitoolchain_action(cd_to_tmpdir):
+def qitoolchain_action(cd_to_tmpdir):  # pylint: disable=unused-argument
     res = QiToolchainAction()
     return res
 

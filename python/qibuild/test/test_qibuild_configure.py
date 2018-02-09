@@ -304,7 +304,7 @@ def test_using_build_prefix_from_command_line(qibuild_action, tmpdir):
     assert expected.join("CMakeCache.txt").check(file=True)
 
 
-def test_using_build_prefix_from_config(qibuild_action, tmpdir):
+def test_using_build_prefix_from_config(qibuild_action, tmpdir):  # pylint: disable=unused-argument
     build_worktree = TestBuildWorkTree()
     qibuild_action.add_test_project("world")
     qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -327,7 +327,7 @@ def test_relwithdebinfo(qibuild_action):
     assert cmake_build_type == "RelWithDebInfo"
 
 
-def test_using_fake_ctc(qibuild_action, fake_ctc):
+def test_using_fake_ctc(qibuild_action, fake_ctc):  # pylint: disable=unused-argument
     qibuild_action.add_test_project("footool")
     qibuild_action("configure", "footool", "--config", "fake-ctc")
     qibuild_action("make", "footool", "--config", "fake-ctc")

@@ -17,7 +17,7 @@ def configure_parser(parser):
     qisys.parsers.default_parser(parser)
 
 
-def do(args):
+def do(args):  # pylint: disable=unused-argument
     """ Main method """
     tc_names = qitoolchain.get_tc_names()
     if not tc_names:

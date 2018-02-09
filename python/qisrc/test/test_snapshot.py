@@ -86,7 +86,7 @@ def test_stores_manifest_in_snapshot(git_server, git_worktree):
     assert manifest.url == manifest_url
 
 
-def test_generate_load_json(tmpdir, git_server, git_worktree):
+def test_generate_load_json(tmpdir, git_server, git_worktree):  # pylint: disable=unused-argument
     snapshot1 = qisrc.snapshot.Snapshot()
     snapshot1.manifest = qisrc.sync.LocalManifest()
     snapshot1.manifest.ref = "refs/heads/master"

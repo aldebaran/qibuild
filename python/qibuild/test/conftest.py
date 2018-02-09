@@ -2,10 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the COPYING file.
 
-from qisys.test.conftest import *  # pylint: disable=wildcard-import
+from qisys.test.conftest import *  # pylint: disable=wildcard-import,unused-wildcard-import
 import qisys.worktree
 
-from qitoolchain.test.conftest import *  # pylint: disable=wildcard-import
+from qitoolchain.test.conftest import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 import qibuild.worktree
 
@@ -97,14 +97,14 @@ int main()
 
 # pylint: disable-msg=E1103
 @pytest.fixture
-def build_worktree(cd_to_tmpdir):
+def build_worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
     return TestBuildWorkTree()
 
 # pylint: disable-msg=E1103
 
 
 @pytest.fixture
-def qibuild_action(cd_to_tmpdir):
+def qibuild_action(cd_to_tmpdir):  # pylint: disable=unused-argument
     res = QiBuildAction()
     return res
 

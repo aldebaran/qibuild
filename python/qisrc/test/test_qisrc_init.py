@@ -15,7 +15,7 @@ from qisrc.test.conftest import TestGitWorkTree
 # pylint: disable=blacklisted-name
 
 
-def test_in_new_directory(cd_to_tmpdir, git_server):
+def test_in_new_directory(cd_to_tmpdir, git_server):  # pylint: disable=unused-argument
     git_server.create_repo("foo.git")
     git_server.create_repo("bar.git")
     qisys.script.run_action("qisrc.actions.init", [git_server.manifest_url])
@@ -23,7 +23,7 @@ def test_in_new_directory(cd_to_tmpdir, git_server):
     assert len(git_worktree.git_projects) == 2
 
 
-def test_use_branch(cd_to_tmpdir, git_server):
+def test_use_branch(cd_to_tmpdir, git_server):  # pylint: disable=unused-argument
     git_server.create_repo("foo.git")
     git_server.switch_manifest_branch("devel")
     git_server.create_repo("onlyindevel.git")

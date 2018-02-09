@@ -73,7 +73,7 @@ skip_on_win = pytest.mark.skipif(os.name == 'nt', reason="cannot pass on windows
 
 
 @pytest.fixture
-def worktree(cd_to_tmpdir):
+def worktree(cd_to_tmpdir):  # pylint: disable=unused-argument
     """ A new worktree in a temporary dir.
     As a bonus, we also change working dir to the temporary dir.
     This object has the same methods as WorkTree, plus:
@@ -101,7 +101,7 @@ def interact(request):
 
 
 @pytest.fixture
-def args(request):
+def args(request):  # pylint: disable=unused-argument
     """ Forge argparse.Namespace objects
     All unknown attributes will be initialized to
     None

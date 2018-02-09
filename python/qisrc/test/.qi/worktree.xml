@@ -1,0 +1,6 @@
+<worktree>
+  <project src="foo" />
+  <project src="world" />
+  <project src="hello" />
+  <project src="../../.." />
+  </worktree>

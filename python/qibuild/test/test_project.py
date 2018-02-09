@@ -37,7 +37,7 @@ def test_parse_num_jobs_unsupported_generator(build_worktree):
     assert "-j is not supported for NMake Makefiles" in str(e.value)
 
 
-def test_parse_num_jobs_no_dash_j(build_worktree, record_messages):
+def test_parse_num_jobs_no_dash_j(build_worktree, record_messages):  # pylint: disable=unused-argument
     hello = build_worktree.create_project("hello")
     assert hello.parse_num_jobs(3, cmake_generator="Visual Studio 10") == ["/maxcpucount:3"]
 
@@ -79,7 +79,7 @@ def test_validates_name(build_worktree):
         build_worktree.create_project("foo/bar")
 
 
-def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):
+def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):  # pylint: disable=unused-argument
     toolchains.create("foo")
     qibuild.config.add_build_config("foo", toolchain="foo")
     qibuild_cfg = qibuild.config.QiBuildConfig()
@@ -94,7 +94,7 @@ def test_get_host_sdk_dir_no_system(build_worktree, toolchains, fake_ctc):
     assert bar_proj.get_host_sdk_dir() == host_sdk_dir
 
 
-def test_get_host_sdk_dir_system(build_worktree, toolchains, fake_ctc):
+def test_get_host_sdk_dir_system(build_worktree, toolchains, fake_ctc):  # pylint: disable=unused-argument
     bar_proj = build_worktree.create_project("bar")
     system_sdk_dir = bar_proj.sdk_directory
     build_worktree.set_active_config("fake-ctc")

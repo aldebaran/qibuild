@@ -249,7 +249,7 @@ class GitWorkTree(qisys.worktree.WorkTreeObserver):
         self.save_project_config(project)
         return True
 
-    def checkout(self, branch, force=False):  # pylint: disable=too-many-locals
+    def checkout(self, branch, force=False):  # pylint: disable=too-many-locals,unused-argument
         """ Called by ``qisrc checkout``
 
         For each project, checkout the branch if it is different than

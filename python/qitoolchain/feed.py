@@ -35,7 +35,7 @@ def raise_parse_error(package_tree, feed, message):
     raise Exception(mess)
 
 
-def tree_from_feed(feed_location, branch=None, name=None):
+def tree_from_feed(feed_location, branch=None, name=None):  # pylint: disable=unused-argument
     """ Returns an ElementTree object from an
     feed location
 
