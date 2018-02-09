@@ -15,6 +15,7 @@ import qisys
 import qisys.command
 
 
+# pylint: disable=too-many-public-methods
 class Git(object):
     """ The Git represent a git tree """
 

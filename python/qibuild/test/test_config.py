@@ -35,6 +35,7 @@ def local_cfg_to_string(cfg):
     return cfg_loc.getvalue()
 
 
+# pylint: disable=too-many-public-methods
 class QiBuildConfig(unittest.TestCase):
 
     def test_simple(self):

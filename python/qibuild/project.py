@@ -57,6 +57,7 @@ def write_qi_path_conf(directory, sdk_dirs, sdk_layout=True):
         fp.write(to_write)
 
 
+# pylint: disable=too-many-public-methods
 class BuildProject(object):
     def __init__(self, build_worktree, worktree_project):
         self.build_worktree = build_worktree
